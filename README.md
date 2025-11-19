@@ -1,20 +1,139 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Jay Rosen Digital Archive (JRDA)
 
-# Run and deploy your AI Studio app
+A curated, interactive public collection of the works, critiques, and teachings of NYU Professor Jay Rosen. This application serves as a frontend interface to explore decades of journalism scholarship, utilizing a lightweight architecture powered by Google Sheets as a Content Management System (CMS).
 
-This contains everything you need to run your app locally.
+![Archive Preview](https://i.imgur.com/iaBrkg8.png)
 
-View your app in AI Studio: https://ai.studio/apps/drive/1rM_rM5lCX1fSzx16i67PZ5VJVUk1Eblp
+## 🏗️ Dual-Architecture Overview
 
-## Run Locally
+**Important Note for Developers:**
+This project is unique in that it maintains **two paired versions** of the application logic within the same repository. This structure allows for robust development in AI-assisted environments while ensuring the final product can be deployed to any static web host (via FTP) without a build process.
 
-**Prerequisites:**  Node.js
+### 1. The TypeScript Version (Development)
+*   **Files:** `*.tsx`, `*.ts`
+*   **Purpose:** Used for editing, type-checking, and previewing within environments like **Google AI Studio** or modern IDEs.
+*   **Stack:** React, TypeScript, Tailwind CSS.
+*   **Benefit:** Provides strong typing and better developer tooling during the creation phase.
 
+### 2. The Vanilla JS Version (Production / FTP)
+*   **Files:** `*.js` (using ES Modules)
+*   **Purpose:** Designed for immediate deployment to standard web hosting (Apache/Nginx) via FTP or GitHub Pages.
+*   **Stack:** React (via CDN), `htm` (for JSX-like syntax in plain JS), Tailwind CSS (via CDN).
+*   **Benefit:** **Zero-Build System.** No `npm run build`, Webpack, or Vite is required. You simply upload the `.js`, `.css`, and `index.html` files to a server, and it works.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+> **Current Configuration:** The `index.html` file is currently configured to load the **JS Version** (`src="./index.js"`).
+
+---
+
+## 🌟 Key Features
+
+### 🗂️ Browsing & Discovery
+*   **Smart Filtering:** Filter records by Era (90s, 00s, 10s, 20s), Media Type (Article, Video, Social), Publication, and Thematic Categories.
+*   **Full-Text Search:** Instant search across titles, summaries, and concepts with keyword highlighting.
+*   **Interactive Timeline:** A dynamic bar-chart visualization allowing users to filter the dataset by specific years.
+
+### 🕸️ The Explorer (Network Visualization)
+*   **Interactive Graph:** A canvas-based visualization that maps relationships between articles based on shared Key Concepts and Categories.
+*   **Manhattan Routing:** Aesthetic connection paths inspired by subway maps to visualize intellectual lineage.
+*   **Export Capabilities:** Users can generate and download high-resolution PNG cards of specific records or the entire network graph for social sharing.
+
+---
+
+## 🚀 Quick Start (Local)
+
+Because the production version uses a "no-build" architecture, you do not need `npm` or `node_modules` to run the application logic locally.
+
+### Prerequisites
+*   A modern web browser (Chrome, Firefox, Safari, Edge).
+*   A local static server (to avoid CORS issues with ES modules).
+
+### Running the App
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/jay-rosen-archive.git
+    cd jay-rosen-archive
+    ```
+
+2.  **Start a static server:**
+    *   **Python:** `python -m http.server 8000`
+    *   **Node (npx):** `npx serve .`
+    *   **VS Code:** Use the "Live Server" extension.
+
+3.  **Open the app:**
+    Navigate to `http://localhost:8000`.
+
+---
+
+## 📊 Data Management (Google Sheets)
+
+The application content is populated dynamically via CSV exports from a Google Sheet. The configuration is located in `constants.js` (for production) and `constants.ts` (for dev).
+
+### 1. Sheet Structure
+Your Google Sheet must have a tab with the following columns (headers are case-insensitive):
+
+| Column Header | Description |
+| :--- | :--- |
+| `ID` | Unique identifier (e.g., `art-001`) |
+| `Title` | Title of the work |
+| `Author` | Author name (defaults to Jay Rosen) |
+| `Publication_Date` | Format: `YYYY-MM-DD` |
+| `Original_Publication`| Publisher name (e.g., PressThink, Twitter) |
+| `URL` | Link to the source material |
+| `Summary` | Brief description or abstract |
+| `Thematic_Categories`| Comma-separated list (e.g., `Public Journalism, Trust`) |
+| `Key_Concepts` | Comma-separated list (e.g., `View from Nowhere`) |
+| `Verified` | `TRUE` or `FALSE`. Only TRUE records are displayed. |
+
+### 2. Publishing the Data
+1.  Open your Google Sheet.
+2.  Go to **File > Share > Publish to web**.
+3.  Select the tab (e.g., "Test Runs") and format **Comma-separated values (.csv)**.
+4.  Click **Publish** and copy the link.
+
+### 3. Updating Configuration
+Update `constants.js` (and `constants.ts`) with your new URL:
+
+```javascript
+export const DATA_CONFIG = {
+    test_runs: 'YOUR_GOOGLE_SHEET_CSV_URL_HERE',
+    // ...
+};
+```
+
+---
+
+## 📂 Project Structure
+
+```text
+├── components/
+│   ├── Explorer.js / .tsx        # Network visualization
+│   ├── FeaturedSection.js / .tsx # Carousel highlights
+│   ├── RecordModal.js / .tsx     # Detail view overlay
+│   ├── Sidebar.js / .tsx         # Filters and search
+│   └── ...
+├── services/
+│   └── archiveService.js / .ts   # Data fetching & parsing
+├── App.js / .tsx                 # Main application controller
+├── constants.js / .ts            # Config (Sheet URLs, Colors)
+├── html.js                       # HTM helper (JS version only)
+├── index.html                    # Entry point
+└── types.ts                      # Type definitions (TS version only)
+```
+
+---
+
+## 🛠️ Deployment
+
+### Web Hosting (FTP / Netlify / GitHub Pages)
+1.  Ensure `index.html` points to `./index.js`.
+2.  Upload **all files** (specifically `.html`, `.css`, `.js` files, and the `components/` and `services/` folders) to your web host's `public_html` directory.
+3.  Ensure your server serves `.js` files with the MIME type `application/javascript`.
+
+### Editing in AI Studio
+1.  Edit the `.tsx` and `.ts` files.
+2.  If major logic changes are made, ensure they are ported to the matching `.js` files for production deployment.
+
+---
+
+**Curated by Joe Amditis.**
