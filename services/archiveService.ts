@@ -4,6 +4,8 @@ import { ArchiveRecord, RawCsvRecord, Facets } from '../types';
 import { DATA_CONFIG, ERAS } from '../constants';
 
 // Utilities
+// Simple hash function for UI color selection (djb1 variant)
+// Used by App.tsx to deterministically assign colors to categories
 export const hashString = (str: string): number => {
   let hash = 0;
   for (let i = 0; i < str.length; i++) hash = (hash << 5) - hash + str.charCodeAt(i);
@@ -49,16 +51,95 @@ const DISSERTATION_RECORD: ArchiveRecord = {
   type: 'Dissertation'
 };
 
+// Cache configuration
+const CACHE_TTL_MS = 1000 * 60 * 60; // 1 hour cache
+const CACHE_VERSION = 'v1'; // Increment to invalidate all caches
+const LOG_URL_MAX_LENGTH = 80; // Maximum URL length to display in console logs
+
+interface CacheEntry<T = any> {
+  data: T[];
+  timestamp: number;
+  version: string;
+}
+
+const getCacheKey = (url: string): string => {
+  // Use djb2 hash algorithm for cache keys to avoid encoding issues with non-ASCII URLs
+  // and reduce collision probability. Different from hashString() which is used for UI colors.
+  let hash = 5381;
+  for (let i = 0; i < url.length; i++) {
+    hash = ((hash << 5) + hash) + url.charCodeAt(i); // hash * 33 + c
+  }
+  return `archive_csv_${Math.abs(hash >>> 0)}`; // Convert to unsigned 32-bit integer
+};
+
+const getCachedData = (url: string): any[] | null => {
+  try {
+    const cacheKey = getCacheKey(url);
+    const cached = localStorage.getItem(cacheKey);
+    if (!cached) return null;
+    
+    const entry: CacheEntry = JSON.parse(cached);
+    const now = Date.now();
+    
+    // Check if cache is still valid
+    if (entry.version !== CACHE_VERSION || (now - entry.timestamp) > CACHE_TTL_MS) {
+      localStorage.removeItem(cacheKey);
+      return null;
+    }
+    
+    return entry.data;
+  } catch (e) {
+    console.warn('Cache read error:', e);
+    return null;
+  }
+};
+
+const setCachedData = <T = any>(url: string, data: T[]): void => {
+  try {
+    const cacheKey = getCacheKey(url);
+    const entry: CacheEntry<T> = {
+      data,
+      timestamp: Date.now(),
+      version: CACHE_VERSION
+    };
+    localStorage.setItem(cacheKey, JSON.stringify(entry));
+  } catch (e) {
+    console.warn('Cache write error (storage might be full). Try clearing browser storage or old caches:', e);
+  }
+};
+
 const fetchCSV = (url: string): Promise<any[]> => {
+  // Check cache first
+  const cached = getCachedData(url);
+  if (cached) {
+    console.log('Using cached data for:', url.substring(0, LOG_URL_MAX_LENGTH));
+    return Promise.resolve(cached);
+  }
+  
   return new Promise((resolve) => {
     Papa.parse(url, {
       download: true,
       header: true,
       skipEmptyLines: true,
-      complete: (results) => resolve(results.data),
+      complete: (results) => {
+        setCachedData(url, results.data);
+        resolve(results.data);
+      },
       error: () => resolve([]) 
     });
   });
+};
+
+// Export function to manually clear all archive caches
+export const clearArchiveCache = (): void => {
+  try {
+    const keys = Object.keys(localStorage);
+    const archiveCacheKeys = keys.filter(key => key.startsWith('archive_csv_'));
+    archiveCacheKeys.forEach(key => localStorage.removeItem(key));
+    console.log(`Cleared ${archiveCacheKeys.length} cache entries`);
+  } catch (e) {
+    console.warn('Error clearing cache:', e);
+  }
 };
 
 export const fetchArchiveData = async (): Promise<{ records: ArchiveRecord[]; facets: Facets; autocompleteIndex: string[] }> => {
