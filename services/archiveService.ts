@@ -49,16 +49,88 @@ const DISSERTATION_RECORD: ArchiveRecord = {
   type: 'Dissertation'
 };
 
+// Cache configuration
+const CACHE_TTL_MS = 1000 * 60 * 60; // 1 hour cache
+const CACHE_VERSION = 'v1'; // Increment to invalidate all caches
+
+interface CacheEntry {
+  data: any[];
+  timestamp: number;
+  version: string;
+}
+
+const getCacheKey = (url: string): string => {
+  return `archive_csv_${btoa(url).substring(0, 20)}`;
+};
+
+const getCachedData = (url: string): any[] | null => {
+  try {
+    const cacheKey = getCacheKey(url);
+    const cached = localStorage.getItem(cacheKey);
+    if (!cached) return null;
+    
+    const entry: CacheEntry = JSON.parse(cached);
+    const now = Date.now();
+    
+    // Check if cache is still valid
+    if (entry.version !== CACHE_VERSION || (now - entry.timestamp) > CACHE_TTL_MS) {
+      localStorage.removeItem(cacheKey);
+      return null;
+    }
+    
+    return entry.data;
+  } catch (e) {
+    console.warn('Cache read error:', e);
+    return null;
+  }
+};
+
+const setCachedData = (url: string, data: any[]): void => {
+  try {
+    const cacheKey = getCacheKey(url);
+    const entry: CacheEntry = {
+      data,
+      timestamp: Date.now(),
+      version: CACHE_VERSION
+    };
+    localStorage.setItem(cacheKey, JSON.stringify(entry));
+  } catch (e) {
+    console.warn('Cache write error (storage might be full):', e);
+  }
+};
+
 const fetchCSV = (url: string): Promise<any[]> => {
+  // Check cache first
+  const cached = getCachedData(url);
+  if (cached) {
+    console.log('Using cached data for:', url.substring(0, 80));
+    return Promise.resolve(cached);
+  }
+  
   return new Promise((resolve) => {
     Papa.parse(url, {
       download: true,
       header: true,
       skipEmptyLines: true,
-      complete: (results) => resolve(results.data),
+      complete: (results) => {
+        setCachedData(url, results.data);
+        resolve(results.data);
+      },
       error: () => resolve([]) 
     });
   });
+};
+
+// Export function to manually clear all archive caches
+export const clearArchiveCache = (): void => {
+  try {
+    const keys = Object.keys(localStorage);
+    const archiveCacheKeys = keys.filter(key => key.startsWith('archive_csv_'));
+    archiveCacheKeys.forEach(key => localStorage.removeItem(key));
+    console.log(`Cleared ${archiveCacheKeys.length} cache entries`);
+  } catch (e) {
+    console.warn('Error clearing cache:', e);
+  }
 };
 
 export const fetchArchiveData = async (): Promise<{ records: ArchiveRecord[]; facets: Facets; autocompleteIndex: string[] }> => {

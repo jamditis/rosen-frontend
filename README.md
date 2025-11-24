@@ -101,6 +101,25 @@ export const DATA_CONFIG = {
 };
 ```
 
+### 4. Performance Optimization (Caching)
+
+To improve loading times, the application automatically caches fetched CSV data in the browser's localStorage:
+
+*   **Cache Duration:** 1 hour (configurable via `CACHE_TTL_MS` in `archiveService.js/ts`)
+*   **Cache Version:** Increment `CACHE_VERSION` to invalidate all existing caches
+*   **Manual Cache Clear:** Open browser console and run:
+    ```javascript
+    import { clearArchiveCache } from './services/archiveService.js';
+    clearArchiveCache();
+    ```
+
+**Benefits:**
+*   Subsequent page loads are nearly instantaneous (data loaded from cache)
+*   Reduces load on Google Sheets servers
+*   Better user experience, especially for repeat visitors
+
+**Note:** Cache is automatically invalidated after 1 hour or when `CACHE_VERSION` is incremented.
+
 ---
 
 ## 📂 Project Structure
