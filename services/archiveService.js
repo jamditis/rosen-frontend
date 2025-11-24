@@ -2,6 +2,8 @@
 import Papa from 'papaparse';
 import { DATA_CONFIG, ERAS } from '../constants.js';
 
+// Simple hash function for UI color selection (djb1 variant)
+// Used by App.js to deterministically assign colors to categories
 export const hashString = (str) => {
   let hash = 0;
   for (let i = 0; i < str.length; i++) hash = (hash << 5) - hash + str.charCodeAt(i);
@@ -53,8 +55,8 @@ const CACHE_VERSION = 'v1'; // Increment to invalidate all caches
 const LOG_URL_MAX_LENGTH = 80; // Maximum URL length to display in console logs
 
 const getCacheKey = (url) => {
-  // Use djb2 hash algorithm to avoid encoding issues with non-ASCII URLs
-  // and reduce collision probability
+  // Use djb2 hash algorithm for cache keys to avoid encoding issues with non-ASCII URLs
+  // and reduce collision probability. Different from hashString() which is used for UI colors.
   let hash = 5381;
   for (let i = 0; i < url.length; i++) {
     hash = ((hash << 5) + hash) + url.charCodeAt(i); // hash * 33 + c

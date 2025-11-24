@@ -4,6 +4,8 @@ import { ArchiveRecord, RawCsvRecord, Facets } from '../types';
 import { DATA_CONFIG, ERAS } from '../constants';
 
 // Utilities
+// Simple hash function for UI color selection (djb1 variant)
+// Used by App.tsx to deterministically assign colors to categories
 export const hashString = (str: string): number => {
   let hash = 0;
   for (let i = 0; i < str.length; i++) hash = (hash << 5) - hash + str.charCodeAt(i);
@@ -61,8 +63,8 @@ interface CacheEntry<T = any> {
 }
 
 const getCacheKey = (url: string): string => {
-  // Use djb2 hash algorithm to avoid encoding issues with non-ASCII URLs
-  // and reduce collision probability
+  // Use djb2 hash algorithm for cache keys to avoid encoding issues with non-ASCII URLs
+  // and reduce collision probability. Different from hashString() which is used for UI colors.
   let hash = 5381;
   for (let i = 0; i < url.length; i++) {
     hash = ((hash << 5) + hash) + url.charCodeAt(i); // hash * 33 + c
