@@ -52,6 +52,7 @@ const DISSERTATION_RECORD: ArchiveRecord = {
 // Cache configuration
 const CACHE_TTL_MS = 1000 * 60 * 60; // 1 hour cache
 const CACHE_VERSION = 'v1'; // Increment to invalidate all caches
+const LOG_URL_MAX_LENGTH = 80; // Maximum URL length to display in console logs
 
 interface CacheEntry<T = any> {
   data: T[];
@@ -60,13 +61,13 @@ interface CacheEntry<T = any> {
 }
 
 const getCacheKey = (url: string): string => {
-  // Use a simple hash instead of btoa to avoid encoding issues with non-ASCII URLs
-  let hash = 0;
+  // Use djb2 hash algorithm to avoid encoding issues with non-ASCII URLs
+  // and reduce collision probability
+  let hash = 5381;
   for (let i = 0; i < url.length; i++) {
-    hash = ((hash << 5) - hash) + url.charCodeAt(i);
-    hash = hash & hash; // Convert to 32-bit integer
+    hash = ((hash << 5) + hash) + url.charCodeAt(i); // hash * 33 + c
   }
-  return `archive_csv_${Math.abs(hash)}`;
+  return `archive_csv_${Math.abs(hash >>> 0)}`; // Convert to unsigned 32-bit integer
 };
 
 const getCachedData = (url: string): any[] | null => {
@@ -109,7 +110,7 @@ const fetchCSV = (url: string): Promise<any[]> => {
   // Check cache first
   const cached = getCachedData(url);
   if (cached) {
-    console.log('Using cached data for:', url.substring(0, 80));
+    console.log('Using cached data for:', url.substring(0, LOG_URL_MAX_LENGTH));
     return Promise.resolve(cached);
   }
   
