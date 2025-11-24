@@ -52,7 +52,13 @@ const CACHE_TTL_MS = 1000 * 60 * 60; // 1 hour cache
 const CACHE_VERSION = 'v1'; // Increment to invalidate all caches
 
 const getCacheKey = (url) => {
-  return `archive_csv_${btoa(url).substring(0, 20)}`;
+  // Use a simple hash instead of btoa to avoid encoding issues with non-ASCII URLs
+  let hash = 0;
+  for (let i = 0; i < url.length; i++) {
+    hash = ((hash << 5) - hash) + url.charCodeAt(i);
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return `archive_csv_${Math.abs(hash)}`;
 };
 
 const getCachedData = (url) => {
@@ -87,7 +93,7 @@ const setCachedData = (url, data) => {
     };
     localStorage.setItem(cacheKey, JSON.stringify(entry));
   } catch (e) {
-    console.warn('Cache write error (storage might be full):', e);
+    console.warn('Cache write error (storage might be full). Try clearing browser storage or old caches:', e);
   }
 };
 
