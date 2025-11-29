@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Glossary: The Impossible Press | Jay Rosen</title>
+    <meta name="description" content="An interactive glossary of key concepts from Jay Rosen's 1986 dissertation." />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              body: ['"Roboto Mono"', 'monospace'],
+              display: ['"Special Elite"', 'cursive'],
+            },
+            colors: {
+              paper: '#fdfbf7',
+              card: '#ffffff',
+            }
+          }
+        }
+      }
+    </script>
+
+    <link rel="stylesheet" href="../shared-styles.css" />
+    <style>
+      .concept-card {
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .concept-card:hover {
+        transform: translateY(-2px);
+      }
+      .concept-card.selected {
+        ring: 2px;
+        ring-color: #0284c7;
+      }
+      /* Desktop: side panel */
+      @media (min-width: 1024px) {
+        .detail-panel {
+          transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .detail-panel.hidden {
+          transform: translateX(100%);
+          opacity: 0;
+          pointer-events: none;
+        }
+        .detail-panel .close-btn {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          margin: 0;
+          padding: 0;
+          border: none;
+          background: transparent;
+        }
+      }
+      /* Mobile/Tablet: full-screen modal */
+      @media (max-width: 1023px) {
+        .main-content {
+          flex-direction: column;
+        }
+        .detail-panel {
+          position: fixed;
+          inset: 0;
+          z-index: 60;
+          background: white;
+          overflow-y: auto;
+          width: 100% !important;
+          transition: transform 0.3s ease;
+        }
+        .detail-panel.hidden {
+          transform: translateY(100%);
+          pointer-events: none;
+        }
+        .detail-panel > .card {
+          border-radius: 0;
+          box-shadow: none;
+          min-height: 100vh;
+          padding-top: 1rem;
+        }
+        .detail-panel .close-btn {
+          position: sticky;
+          top: 0;
+          background: white;
+          padding: 1rem;
+          margin: -1.5rem -1.5rem 1rem -1.5rem;
+          border-bottom: 1px solid #e7e5e4;
+          display: flex;
+          justify-content: flex-end;
+        }
+      }
+    </style>
+  </head>
+
+  <body class="antialiased font-body text-stone-900 min-h-screen bg-paper">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-paper/95 backdrop-blur-sm border-b border-stone-200">
+      <div class="max-w-7xl mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="font-display text-xl md:text-2xl text-stone-850">Glossary</h1>
+            <p class="text-xs text-stone-500 mt-1">Key Concepts from The Impossible Press</p>
+          </div>
+          <nav class="flex items-center gap-4">
+            <a href="https://drive.google.com/file/d/14sIj3nYzOaV_CRHLMRvbgv9EcYbCsp4L/view"
+               target="_blank"
+               class="text-xs bg-stone-800 text-white px-3 py-1.5 rounded hover:bg-stone-700 transition-colors">
+              Read Full Dissertation
+            </a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+      <!-- Introduction -->
+      <section class="mb-12 max-w-3xl">
+        <p class="text-stone-600 leading-relaxed mb-4">
+          The dissertation introduces a rich vocabulary for understanding the relationship between press and public.
+          Click on any concept to explore its meaning, context, and contemporary relevance.
+        </p>
+
+        <!-- Category Filters -->
+        <div class="flex flex-wrap gap-2 mt-6">
+          <button class="pill active" data-filter="all">All Concepts</button>
+          <button class="pill" data-filter="epistemology">How We Know</button>
+          <button class="pill" data-filter="public-sphere">The Public</button>
+          <button class="pill" data-filter="press-criticism">Press Criticism</button>
+          <button class="pill" data-filter="structure">Structural Forces</button>
+        </div>
+      </section>
+
+      <div class="main-content flex flex-col lg:flex-row gap-8">
+        <!-- Concept Grid -->
+        <div id="concepts-grid" class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <!-- Detail Panel -->
+        <aside id="detail-panel" class="detail-panel hidden lg:w-96 flex-shrink-0 lg:sticky lg:top-24 lg:h-fit">
+          <div class="card p-6 relative">
+            <div class="close-btn">
+              <button id="close-panel" class="text-stone-400 hover:text-stone-600 p-2 -m-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
+            <div id="detail-content">
+              <!-- Populated by JavaScript -->
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Key Figures Section -->
+      <section class="mt-16 pt-12 border-t border-stone-200">
+        <h2 class="font-display text-2xl text-stone-850 mb-8">Key Figures</h2>
+        <div id="figures-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Populated by JavaScript -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 bg-stone-100 border-t border-stone-200 mt-16">
+      <div class="max-w-4xl mx-auto text-center">
+        <p class="text-sm text-stone-600 mb-4">
+          From <span class="font-display">The Impossible Press</span> by Jay Rosen
+        </p>
+        <p class="text-xs text-stone-500">
+          Ph.D. Dissertation, New York University, 1986
+        </p>
+      </div>
+    </footer>
+
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Timeline: From Dissertation to Now | Jay Rosen</title>
+    <meta name="description" content="How ideas from The Impossible Press evolved over 40 years." />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              body: ['"Roboto Mono"', 'monospace'],
+              display: ['"Special Elite"', 'cursive'],
+            },
+            colors: {
+              paper: '#fdfbf7',
+            }
+          }
+        }
+      }
+    </script>
+
+    <link rel="stylesheet" href="../shared-styles.css" />
+    <style>
+      .timeline-line {
+        position: absolute;
+        left: 1.5rem;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(to bottom, #78716c, #0284c7);
+      }
+      @media (min-width: 768px) {
+        .timeline-line {
+          left: 50%;
+          transform: translateX(-50%);
+        }
+      }
+      .timeline-entry {
+        position: relative;
+        padding-left: 4rem;
+      }
+      @media (min-width: 768px) {
+        .timeline-entry {
+          padding-left: 0;
+        }
+        .timeline-entry:nth-child(odd) .timeline-content {
+          margin-right: calc(50% + 2rem);
+          text-align: right;
+        }
+        .timeline-entry:nth-child(even) .timeline-content {
+          margin-left: calc(50% + 2rem);
+        }
+      }
+      .timeline-dot {
+        position: absolute;
+        left: 1rem;
+        top: 0.5rem;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 0 0 2px currentColor;
+      }
+      @media (min-width: 768px) {
+        .timeline-dot {
+          left: 50%;
+          transform: translateX(-50%);
+        }
+      }
+    </style>
+  </head>
+
+  <body class="antialiased font-body text-stone-900 min-h-screen bg-paper">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-paper/95 backdrop-blur-sm border-b border-stone-200">
+      <div class="max-w-5xl mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="font-display text-xl md:text-2xl text-stone-850">From Dissertation to Now</h1>
+            <p class="text-xs text-stone-500 mt-1">40 Years of Ideas</p>
+          </div>
+          <a href="https://drive.google.com/file/d/14sIj3nYzOaV_CRHLMRvbgv9EcYbCsp4L/view"
+             target="_blank"
+             class="text-xs bg-stone-800 text-white px-3 py-1.5 rounded hover:bg-stone-700 transition-colors">
+            Read Dissertation
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="py-16 px-4 text-center border-b border-stone-200">
+      <div class="max-w-3xl mx-auto">
+        <h2 class="font-display text-2xl md:text-3xl text-stone-850 mb-4">
+          The Intellectual Journey
+        </h2>
+        <p class="text-stone-600 leading-relaxed">
+          The dissertation was not an endpoint but a beginning. The ideas Jay Rosen developed in 1986 would evolve through the public journalism movement, PressThink, and ongoing work on the press-public relationship.
+        </p>
+      </div>
+    </section>
+
+    <!-- Filter Pills -->
+    <section class="py-6 px-4 border-b border-stone-100">
+      <div class="max-w-5xl mx-auto flex flex-wrap gap-2 justify-center">
+        <button class="pill active" data-filter="all">All</button>
+        <button class="pill" data-filter="milestone">Milestones</button>
+        <button class="pill" data-filter="publication">Publications</button>
+        <button class="pill" data-filter="concept">Key Concepts</button>
+        <button class="pill" data-filter="career">Career</button>
+        <button class="pill" data-filter="period">Periods</button>
+      </div>
+    </section>
+
+    <!-- Timeline -->
+    <main class="max-w-5xl mx-auto px-4 py-12">
+      <div id="timeline" class="relative">
+        <div class="timeline-line"></div>
+        <!-- Entries populated by JavaScript -->
+      </div>
+
+      <!-- Recurring Themes -->
+      <section class="mt-16 pt-12 border-t border-stone-200">
+        <h2 class="font-display text-2xl text-stone-850 mb-8 text-center">Recurring Themes</h2>
+        <div id="themes" class="grid md:grid-cols-3 gap-6">
+          <!-- Populated by JavaScript -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 bg-stone-100 border-t border-stone-200">
+      <div class="max-w-4xl mx-auto text-center">
+        <p class="text-sm text-stone-600 mb-4">
+          From <span class="font-display">The Impossible Press</span> by Jay Rosen
+        </p>
+        <p class="text-xs text-stone-500">
+          Ph.D. Dissertation, New York University, 1986
+        </p>
+      </div>
+    </footer>
+
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>

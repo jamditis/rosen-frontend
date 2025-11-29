@@ -1,5 +1,81 @@
 
 # Changelog - Jay Rosen Digital Archive
+
+*Session Date: November 29, 2025 (Continued)*
+
+## FAQ Expansion & Mobile Responsiveness
+
+### FAQ Expansion (`/faq/data.js`)
+- Expanded from 25 to 46 Q&A pairs (21 new questions added)
+- New Basics questions: dissertation structure, how to read it, what's original
+- New Concepts questions: news as drama, stereotypes, five factors, technological utopianism, sensationalism
+- New Key Figures questions: Robert Park, Gabriel Tarde, Thomas Jefferson on scale
+- New Arguments questions: what the dissertation is NOT arguing, proposed solutions
+- New Contemporary questions: AI and journalism, political polarization, Substack/creators, solutions journalism, election coverage
+- New Later Work questions: audience atomization overcome, "Getting the Connections Right" book, "What Are Journalists For?" book
+- Updated FAQ_KEYWORDS for all new items
+
+### Mobile Responsiveness Improvements
+- **Glossary**: Detail panel now becomes full-screen modal on mobile/tablet (under 1024px)
+- **Glossary**: Added body scroll lock when modal is open on mobile
+- **Comparison Tool**: Improved header navigation for mobile (hidden on very small screens)
+- **Shared Styles**: Added mobile improvements (larger touch targets for pills, iOS safe area insets, scroll lock utility)
+- All tools now properly responsive across mobile, tablet, and desktop
+
+---
+
+*Session Date: November 29, 2025*
+
+## Dissertation Presentation Tools Suite
+
+### "Then and Now" Comparison Tool (`/comparison-tool/`)
+- Side-by-side presentation of 1986 dissertation insights alongside 2025 realities
+- 7 core comparisons: Attention Economy, Pseudo-Environment, Communication Without Community, News as Drama, Technological Utopianism, The Impossible Press, Making Things Public
+- Scroll-based animations, navigation dots, keyboard navigation (j/k or arrow keys)
+
+### Glossary (`/glossary/`)
+- Interactive visual glossary of 16 key concepts from the dissertation
+- Filterable by category: How We Know, The Public, Press Criticism, Structural Forces
+- Click-to-expand detail panel with definitions, quotes, contemporary relevance
+- Key figures section: Lippmann, Dewey, Postman, Park
+
+### 1986 in Journalism (`/context-1986/`)
+- Historical context: media landscape when dissertation was written
+- 6 detailed sections: Broadcast Dominance, Cable Rising, Print Still Strong, No Internet, Reagan Era, Journalism's Professional Peak
+- "What Didn't Exist" section highlighting technologies invented after 1986
+- Key events of 1986 with media significance
+
+### Timeline (`/timeline/`)
+- Visual timeline from 1986 to 2025 showing intellectual evolution
+- 14 entries covering milestones, publications, key concepts, career events
+- Filterable by type (milestone, publication, concept, career, period)
+- Recurring themes section showing continuity across decades
+
+### Annotated Excerpts (`/annotated-excerpts/`)
+- 12 key passages with full annotation
+- Each excerpt includes: original text, 1986 context, 2025 reflection (placeholder for Jay), contemporary example, connection to later work
+- Filterable by tags: Foundational, Prescient, Epistemology, Public Sphere
+- Navigation dots and keyboard navigation
+
+### FAQ / Ask the Dissertation (`/faq/`)
+- 25+ pre-generated Q&A pairs covering basics, concepts, arguments, key thinkers, contemporary relevance
+- Searchable and filterable by category
+- Links to NotebookLM for deeper exploration
+- BYOK (Bring Your Own Key) option for interactive Claude chat
+
+### BYOK Chat Interface (`/faq/chat.html`)
+- Interactive chat with Claude using user's own API key
+- API key stored locally in browser, never transmitted to our servers
+- System prompt includes full dissertation context and key concepts
+- Conversation history maintained during session
+
+### Shared Infrastructure
+- Created `shared-styles.css` for consistent styling across all tools
+- All tools: zero-build static files for FTP upload to WordPress
+- All tools match archive theme (Roboto Mono, Special Elite, paper texture)
+
+---
+
 *Session Date: November 19, 2025*
 ## 15:34 - Initial Build & Core Infrastructure
 - Investigate and fix the "No records found" display error occurring when filtering for Twitter/X or Bluesky records in the Jay Rosen Digital Archive. Ensure these records display correctly, and that the filters for social media types return the expected results.

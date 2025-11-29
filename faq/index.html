@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ask the Dissertation | The Impossible Press</title>
+    <meta name="description" content="Frequently asked questions about Jay Rosen's 1986 dissertation, with AI-powered exploration options." />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              body: ['"Roboto Mono"', 'monospace'],
+              display: ['"Special Elite"', 'cursive'],
+            },
+            colors: {
+              paper: '#fdfbf7',
+            }
+          }
+        }
+      }
+    </script>
+
+    <link rel="stylesheet" href="../shared-styles.css" />
+    <style>
+      .faq-item {
+        cursor: pointer;
+      }
+      .faq-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+      }
+      .faq-item.open .faq-answer {
+        max-height: 2000px;
+      }
+      .faq-item.open .faq-chevron {
+        transform: rotate(180deg);
+      }
+      .faq-chevron {
+        transition: transform 0.3s ease;
+      }
+      .search-highlight {
+        background: #fef08a;
+        padding: 0 2px;
+        border-radius: 2px;
+      }
+    </style>
+  </head>
+
+  <body class="antialiased font-body text-stone-900 min-h-screen bg-paper">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-paper/95 backdrop-blur-sm border-b border-stone-200">
+      <div class="max-w-4xl mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="font-display text-xl md:text-2xl text-stone-850">Ask the Dissertation</h1>
+            <p class="text-xs text-stone-500 mt-1">Questions & Answers</p>
+          </div>
+          <a href="https://drive.google.com/file/d/14sIj3nYzOaV_CRHLMRvbgv9EcYbCsp4L/view"
+             target="_blank"
+             class="text-xs bg-stone-800 text-white px-3 py-1.5 rounded hover:bg-stone-700 transition-colors">
+            Read Dissertation
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero + Search -->
+    <section class="py-12 px-4 border-b border-stone-200">
+      <div class="max-w-3xl mx-auto text-center">
+        <h2 class="font-display text-2xl md:text-3xl text-stone-850 mb-4">
+          What would you like to know?
+        </h2>
+        <p class="text-stone-600 leading-relaxed mb-8">
+          Search through common questions about "The Impossible Press" or browse by category.
+        </p>
+
+        <!-- Search Box -->
+        <div class="relative max-w-xl mx-auto">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search questions..."
+            class="w-full px-4 py-3 pl-12 rounded-lg border border-stone-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none transition-all"
+          />
+          <svg class="w-5 h-5 text-stone-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <button id="clear-search" class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Category Pills -->
+        <div class="flex flex-wrap gap-2 justify-center mt-6">
+          <button class="pill active" data-category="all">All Questions</button>
+          <button class="pill" data-category="basics">The Basics</button>
+          <button class="pill" data-category="concepts">Key Concepts</button>
+          <button class="pill" data-category="arguments">Core Arguments</button>
+          <button class="pill" data-category="contemporary">Today's Relevance</button>
+          <button class="pill" data-category="later-work">Later Developments</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- AI Tools Banner -->
+    <section class="bg-gradient-to-r from-sky-50 to-violet-50 border-b border-stone-200 py-6 px-4">
+      <div class="max-w-4xl mx-auto">
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-8">
+          <div class="flex-1">
+            <h3 class="font-medium text-stone-850 mb-1">Want deeper exploration?</h3>
+            <p class="text-sm text-stone-600">
+              Use NotebookLM for AI-powered research, or bring your own Claude API key for interactive chat.
+            </p>
+          </div>
+          <div class="flex gap-3">
+            <a href="#" id="notebook-link" target="_blank" class="text-xs bg-white border border-stone-300 px-4 py-2 rounded hover:bg-stone-50 transition-colors">
+              Open NotebookLM
+            </a>
+            <button id="open-byok-modal" class="text-xs bg-violet-600 text-white px-4 py-2 rounded hover:bg-violet-700 transition-colors">
+              Use Your API Key
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ List -->
+    <main class="max-w-4xl mx-auto px-4 py-12">
+      <!-- Results count -->
+      <p id="results-count" class="text-sm text-stone-500 mb-6"></p>
+
+      <!-- FAQ Items -->
+      <div id="faq-container" class="space-y-4">
+        <!-- Populated by JavaScript -->
+      </div>
+
+      <!-- No results message -->
+      <div id="no-results" class="hidden text-center py-12">
+        <p class="text-stone-500 mb-4">No questions match your search.</p>
+        <button id="clear-filters" class="text-sm text-sky-600 hover:text-sky-800">
+          Clear filters and show all questions
+        </button>
+      </div>
+    </main>
+
+    <!-- BYOK Modal -->
+    <div id="byok-modal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 bg-black/50" id="byok-backdrop"></div>
+      <div class="absolute inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-lg bg-white rounded-lg shadow-xl overflow-hidden">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="font-display text-xl">Use Your Own API Key</h3>
+            <button id="close-byok" class="text-stone-400 hover:text-stone-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="space-y-4">
+            <p class="text-sm text-stone-600">
+              Enter your Claude API key to enable interactive chat with the dissertation. Your key is stored locally in your browser and never sent to our servers.
+            </p>
+
+            <div>
+              <label class="block text-xs text-stone-500 mb-1">Claude API Key</label>
+              <input
+                type="password"
+                id="api-key-input"
+                placeholder="sk-ant-..."
+                class="w-full px-3 py-2 border border-stone-300 rounded focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none"
+              />
+            </div>
+
+            <div class="flex items-start gap-2">
+              <input type="checkbox" id="save-key" class="mt-1" checked />
+              <label for="save-key" class="text-xs text-stone-600">
+                Save key locally (encrypted in localStorage)
+              </label>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-200 rounded p-3">
+              <p class="text-xs text-amber-800">
+                <strong>Privacy note:</strong> Your API key is stored only in your browser's localStorage. It is never transmitted to any server. API calls go directly from your browser to Anthropic's API.
+              </p>
+            </div>
+
+            <div class="pt-4 flex gap-3">
+              <button id="save-api-key" class="flex-1 bg-stone-800 text-white py-2 rounded hover:bg-stone-700 transition-colors">
+                Save & Continue
+              </button>
+              <button id="cancel-byok" class="px-4 py-2 border border-stone-300 rounded hover:bg-stone-50 transition-colors">
+                Cancel
+              </button>
+            </div>
+
+            <div id="key-status" class="hidden text-center py-2">
+              <p class="text-sm text-emerald-600">API key saved! Redirecting to chat...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 bg-stone-100 border-t border-stone-200">
+      <div class="max-w-4xl mx-auto text-center">
+        <p class="text-sm text-stone-600 mb-4">
+          From <span class="font-display">The Impossible Press</span> by Jay Rosen
+        </p>
+        <p class="text-xs text-stone-500">
+          Ph.D. Dissertation, New York University, 1986
+        </p>
+      </div>
+    </footer>
+
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>

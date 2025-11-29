@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Annotated Excerpts | The Impossible Press</title>
+    <meta name="description" content="Key passages from Jay Rosen's 1986 dissertation with 2025 commentary." />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              body: ['"Roboto Mono"', 'monospace'],
+              display: ['"Special Elite"', 'cursive'],
+            },
+            colors: {
+              paper: '#fdfbf7',
+            }
+          }
+        }
+      }
+    </script>
+
+    <link rel="stylesheet" href="../shared-styles.css" />
+    <style>
+      .excerpt-quote {
+        font-size: 1.125rem;
+        line-height: 1.75;
+        position: relative;
+        padding-left: 1.5rem;
+      }
+      .excerpt-quote::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(to bottom, #78716c, #0284c7);
+        border-radius: 2px;
+      }
+      .section-1986 {
+        border-left: 3px solid #78716c;
+      }
+      .section-2025 {
+        border-left: 3px solid #0284c7;
+      }
+    </style>
+  </head>
+
+  <body class="antialiased font-body text-stone-900 min-h-screen bg-paper">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-paper/95 backdrop-blur-sm border-b border-stone-200">
+      <div class="max-w-4xl mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="font-display text-xl md:text-2xl text-stone-850">Annotated Excerpts</h1>
+            <p class="text-xs text-stone-500 mt-1">Key Passages with Commentary</p>
+          </div>
+          <a href="https://drive.google.com/file/d/14sIj3nYzOaV_CRHLMRvbgv9EcYbCsp4L/view"
+             target="_blank"
+             class="text-xs bg-stone-800 text-white px-3 py-1.5 rounded hover:bg-stone-700 transition-colors">
+            Read Full Dissertation
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="py-12 md:py-16 px-4 border-b border-stone-200">
+      <div class="max-w-3xl mx-auto text-center">
+        <h2 class="font-display text-2xl md:text-3xl text-stone-850 mb-4">
+          The Most Prescient Passages
+        </h2>
+        <p class="text-stone-600 leading-relaxed mb-4">
+          These passages represent some of the most prescient and provocative moments in the dissertation.
+          Each is presented with its original context, a 2025 reflection, and connections to contemporary media reality.
+        </p>
+        <p class="text-sm text-stone-500 italic">
+          Commentary marked "[2025 reflection]" represents placeholder text for Jay Rosen to revise.
+        </p>
+      </div>
+    </section>
+
+    <!-- Navigation -->
+    <nav class="sticky top-16 z-40 bg-paper/95 backdrop-blur-sm border-b border-stone-100 py-3 px-4 overflow-x-auto no-print">
+      <div class="max-w-4xl mx-auto flex gap-2">
+        <button class="pill active" data-filter="all">All Excerpts</button>
+        <button class="pill" data-filter="foundational">Foundational</button>
+        <button class="pill" data-filter="prescient">Prescient</button>
+        <button class="pill" data-filter="epistemology">Epistemology</button>
+        <button class="pill" data-filter="public-sphere">Public Sphere</button>
+      </div>
+    </nav>
+
+    <!-- Excerpts -->
+    <main class="max-w-4xl mx-auto px-4 py-12">
+      <div id="excerpts-container" class="space-y-16">
+        <!-- Populated by JavaScript -->
+      </div>
+    </main>
+
+    <!-- Navigation Dots -->
+    <nav id="nav-dots" class="fixed right-4 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col gap-2 no-print">
+      <!-- Populated by JavaScript -->
+    </nav>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 bg-stone-100 border-t border-stone-200">
+      <div class="max-w-4xl mx-auto text-center">
+        <p class="text-sm text-stone-600 mb-4">
+          From <span class="font-display">The Impossible Press</span> by Jay Rosen
+        </p>
+        <p class="text-xs text-stone-500 mb-6">
+          Ph.D. Dissertation, New York University, 1986
+        </p>
+        <a href="https://drive.google.com/file/d/14sIj3nYzOaV_CRHLMRvbgv9EcYbCsp4L/view"
+           target="_blank"
+           class="inline-block text-sm bg-stone-800 text-white px-6 py-2 rounded hover:bg-stone-700 transition-colors">
+          Read the Full Dissertation
+        </a>
+      </div>
+    </footer>
+
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>

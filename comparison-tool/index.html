@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Then and Now: The Impossible Press | Jay Rosen</title>
+    <meta name="description" content="An interactive comparison of Jay Rosen's 1986 dissertation predictions alongside 2025 media realities." />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Then and Now: The Impossible Press" />
+    <meta property="og:description" content="Jay Rosen's 1986 dissertation predictions meet 2025 realities" />
+    <meta property="og:type" content="website" />
+
+    <!-- Google Fonts (matching main archive) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              body: ['"Roboto Mono"', 'monospace'],
+              display: ['"Special Elite"', 'cursive'],
+            },
+            colors: {
+              paper: '#fdfbf7',
+              card: '#ffffff',
+              stone: {
+                850: '#1c1917',
+              }
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-out forwards',
+              'slide-in-left': 'slideInLeft 0.6s ease-out forwards',
+              'slide-in-right': 'slideInRight 0.6s ease-out forwards',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              slideInLeft: {
+                '0%': { opacity: '0', transform: 'translateX(-30px)' },
+                '100%': { opacity: '1', transform: 'translateX(0)' },
+              },
+              slideInRight: {
+                '0%': { opacity: '0', transform: 'translateX(30px)' },
+                '100%': { opacity: '1', transform: 'translateX(0)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+
+  <body class="antialiased font-body text-stone-900 min-h-screen bg-paper">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-paper/95 backdrop-blur-sm border-b border-stone-200">
+      <div class="max-w-6xl mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="font-display text-xl md:text-2xl text-stone-850">Then and Now</h1>
+            <p class="text-xs text-stone-500 mt-1">The Impossible Press: 1986 → 2025</p>
+          </div>
+          <nav class="flex items-center gap-2 md:gap-4">
+            <a href="#intro" class="hidden sm:inline text-xs text-stone-600 hover:text-stone-900 transition-colors">About</a>
+            <a href="#comparisons" class="hidden sm:inline text-xs text-stone-600 hover:text-stone-900 transition-colors">Comparisons</a>
+            <a href="https://drive.google.com/file/d/14sIj3nYzOaV_CRHLMRvbgv9EcYbCsp4L/view"
+               target="_blank"
+               class="text-xs bg-stone-800 text-white px-3 py-1.5 rounded hover:bg-stone-700 transition-colors whitespace-nowrap">
+              <span class="hidden sm:inline">Read Full </span>Dissertation
+            </a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="py-16 md:py-24 px-4">
+      <div class="max-w-4xl mx-auto text-center">
+        <p class="text-sm text-stone-500 mb-4 tracking-widest uppercase">Jay Rosen, Ph.D. Dissertation, NYU 1986</p>
+        <h2 class="font-display text-3xl md:text-5xl text-stone-850 mb-6 leading-tight">
+          The Impossible Press
+        </h2>
+        <p class="text-lg md:text-xl text-stone-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+          American Journalism and the Decline of Public Life
+        </p>
+        <div class="w-24 h-px bg-stone-300 mx-auto mb-8"></div>
+        <p class="text-sm text-stone-500 max-w-xl mx-auto">
+          Advisor: Neil Postman
+        </p>
+      </div>
+    </section>
+
+    <!-- Introduction -->
+    <section id="intro" class="py-12 px-4 bg-white border-y border-stone-200">
+      <div class="max-w-3xl mx-auto">
+        <p class="text-stone-700 leading-relaxed mb-6">
+          In 1986, Jay Rosen completed his doctoral dissertation under Neil Postman at NYU. Nearly four decades later, his analysis of the troubled relationship between press and public reads less like historical scholarship and more like prophecy.
+        </p>
+        <p class="text-stone-700 leading-relaxed mb-6">
+          This interactive tool places his 1986 observations alongside the realities of 2025. What Rosen identified as emerging tendencies have become the dominant features of our media environment. The "impossible press" he described has only become more impossible.
+        </p>
+        <p class="text-stone-600 text-sm italic">
+          Scroll through the comparisons below to see how his insights anticipated our present moment.
+        </p>
+      </div>
+    </section>
+
+    <!-- Navigation Dots -->
+    <nav id="nav-dots" class="fixed right-4 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col gap-2">
+      <!-- Populated by JavaScript -->
+    </nav>
+
+    <!-- Comparisons Container -->
+    <main id="comparisons" class="py-16">
+      <div id="comparisons-container" class="max-w-6xl mx-auto px-4">
+        <!-- Populated by JavaScript -->
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 bg-stone-100 border-t border-stone-200">
+      <div class="max-w-4xl mx-auto text-center">
+        <p class="text-sm text-stone-600 mb-4">
+          From <span class="font-display">The Impossible Press</span> by Jay Rosen
+        </p>
+        <p class="text-xs text-stone-500 mb-6">
+          Ph.D. Dissertation, New York University, 1986
+        </p>
+        <a href="https://drive.google.com/file/d/14sIj3nYzOaV_CRHLMRvbgv9EcYbCsp4L/view"
+           target="_blank"
+           class="inline-block text-sm bg-stone-800 text-white px-6 py-2 rounded hover:bg-stone-700 transition-colors">
+          Read the Full Dissertation (PDF)
+        </a>
+        <p class="text-xs text-stone-400 mt-8">
+          Part of the Jay Rosen Digital Archive
+        </p>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>

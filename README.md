@@ -37,6 +37,15 @@ This project is unique in that it maintains **two paired versions** of the appli
 *   **Manhattan Routing:** Aesthetic connection paths inspired by subway maps to visualize intellectual lineage.
 *   **Export Capabilities:** Users can generate and download high-resolution PNG cards of specific records or the entire network graph for social sharing.
 
+### 📜 Dissertation Presentation Tools
+*   **Interactive Mind Map:** Tree-structured visualization of the 1986 dissertation's chapters and key arguments.
+*   **"Then and Now" Comparison Tool:** Side-by-side presentation of 1986 dissertation insights alongside 2025 media realities. (`/comparison-tool/`)
+*   **Glossary:** Interactive visual glossary of key concepts with definitions, connections, and contemporary relevance. (`/glossary/`)
+*   **1986 in Journalism:** Historical context page showing the media landscape when the dissertation was written. (`/context-1986/`)
+*   **Timeline:** Visual timeline tracing how dissertation ideas evolved through 40 years of work. (`/timeline/`)
+*   **Annotated Excerpts:** Key passages with original context, 2025 reflections, and contemporary examples. (`/annotated-excerpts/`)
+*   **FAQ / Ask the Dissertation:** Searchable Q&A database with 25+ pre-generated answers, plus BYOK (Bring Your Own Key) Claude chat. (`/faq/`)
+
 ---
 
 ## 🚀 Quick Start (Local)
@@ -130,9 +139,26 @@ To improve loading times, the application automatically caches fetched CSV data 
 │   ├── FeaturedSection.js / .tsx # Carousel highlights
 │   ├── RecordModal.js / .tsx     # Detail view overlay
 │   ├── Sidebar.js / .tsx         # Filters and search
+│   ├── DissertationPage.js       # Dissertation view container
+│   ├── MindMap.js                # Interactive mind map
+│   ├── DetailPanel.js            # Dissertation node details
+│   ├── dissertationData.js       # Full dissertation content
 │   └── ...
 ├── services/
 │   └── archiveService.js / .ts   # Data fetching & parsing
+├── comparison-tool/              # "Then and Now" comparisons
+│   ├── index.html, styles.css, script.js, data.js
+├── glossary/                     # Interactive concept glossary
+│   ├── index.html, script.js, data.js
+├── context-1986/                 # Historical context
+│   ├── index.html, script.js, data.js
+├── timeline/                     # Dissertation → later work timeline
+│   ├── index.html, script.js, data.js
+├── annotated-excerpts/           # Key passages with commentary
+│   ├── index.html, script.js, data.js
+├── faq/                          # FAQ + BYOK Chat
+│   ├── index.html, script.js, data.js, chat.html, chat.js
+├── shared-styles.css             # Common styles for all tools
 ├── App.js / .tsx                 # Main application controller
 ├── constants.js / .ts            # Config (Sheet URLs, Colors)
 ├── html.js                       # HTM helper (JS version only)
