@@ -43,12 +43,60 @@
         ring: 2px;
         ring-color: #0284c7;
       }
-      .detail-panel {
-        transition: transform 0.3s ease, opacity 0.3s ease;
+      /* Desktop: side panel */
+      @media (min-width: 1024px) {
+        .detail-panel {
+          transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        .detail-panel.hidden {
+          transform: translateX(100%);
+          opacity: 0;
+          pointer-events: none;
+        }
+        .detail-panel .close-btn {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          margin: 0;
+          padding: 0;
+          border: none;
+          background: transparent;
+        }
       }
-      .detail-panel.hidden {
-        transform: translateX(100%);
-        opacity: 0;
+      /* Mobile/Tablet: full-screen modal */
+      @media (max-width: 1023px) {
+        .main-content {
+          flex-direction: column;
+        }
+        .detail-panel {
+          position: fixed;
+          inset: 0;
+          z-index: 60;
+          background: white;
+          overflow-y: auto;
+          width: 100% !important;
+          transition: transform 0.3s ease;
+        }
+        .detail-panel.hidden {
+          transform: translateY(100%);
+          pointer-events: none;
+        }
+        .detail-panel > .card {
+          border-radius: 0;
+          box-shadow: none;
+          min-height: 100vh;
+          padding-top: 1rem;
+        }
+        .detail-panel .close-btn {
+          position: sticky;
+          top: 0;
+          background: white;
+          padding: 1rem;
+          margin: -1.5rem -1.5rem 1rem -1.5rem;
+          border-bottom: 1px solid #e7e5e4;
+          display: flex;
+          justify-content: flex-end;
+        }
       }
     </style>
   </head>
@@ -92,20 +140,22 @@
         </div>
       </section>
 
-      <div class="flex gap-8">
+      <div class="main-content flex flex-col lg:flex-row gap-8">
         <!-- Concept Grid -->
-        <div id="concepts-grid" class="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div id="concepts-grid" class="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <!-- Populated by JavaScript -->
         </div>
 
         <!-- Detail Panel -->
-        <aside id="detail-panel" class="detail-panel hidden w-96 flex-shrink-0 sticky top-24 h-fit">
-          <div class="card p-6">
-            <button id="close-panel" class="absolute top-4 right-4 text-stone-400 hover:text-stone-600">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
+        <aside id="detail-panel" class="detail-panel hidden lg:w-96 flex-shrink-0 lg:sticky lg:top-24 lg:h-fit">
+          <div class="card p-6 relative">
+            <div class="close-btn">
+              <button id="close-panel" class="text-stone-400 hover:text-stone-600 p-2 -m-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </button>
+            </div>
             <div id="detail-content">
               <!-- Populated by JavaScript -->
             </div>

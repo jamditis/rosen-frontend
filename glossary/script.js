@@ -104,6 +104,11 @@ function renderDetail(concept) {
   });
 }
 
+// Check if mobile view
+function isMobileView() {
+  return window.innerWidth < 1024;
+}
+
 // Select a concept
 function selectConcept(concept) {
   selectedConcept = concept;
@@ -117,6 +122,11 @@ function selectConcept(concept) {
   // Show panel
   detailPanel.classList.remove('hidden');
   renderDetail(concept);
+
+  // Lock body scroll on mobile
+  if (isMobileView()) {
+    document.body.classList.add('modal-open');
+  }
 }
 
 // Close panel
@@ -126,6 +136,9 @@ function closeDetailPanel() {
   document.querySelectorAll('.concept-card').forEach(card => {
     card.classList.remove('ring-2', 'ring-sky-500');
   });
+
+  // Unlock body scroll
+  document.body.classList.remove('modal-open');
 }
 
 // Filter concepts

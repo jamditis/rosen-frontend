@@ -421,23 +421,483 @@ Rosen argues this is both impossible and misleading:
 
 **Testing Dewey:** PressThink represents an attempt to do what Dewey advocated — create a community of inquiry around shared problems.`,
     sources: ['pressthink.org', 'Timeline']
+  },
+
+  // === ADDITIONAL BASICS ===
+  {
+    id: 'dissertation-structure',
+    category: 'basics',
+    question: 'How is the dissertation structured?',
+    answer: `The dissertation is organized in roughly 10 chapters, moving from foundational problems to analysis to conclusion:
+
+**Part I: The Problem**
+- Introduction: Why "the press informs the public" is inadequate as a description
+- Chapter 1-2: The scale problem and the nature of information
+
+**Part II: Historical Analysis**
+- Chapter 3: Technological utopianism — how each new medium promised democratic renewal
+- Chapter 4: The newspaper and the public — how journalism developed as an institution
+- Chapter 5: Communication without community — the structural paradox of mass media
+
+**Part III: The Professional Response**
+- Chapter 6: The Impossible Press — how professionalism tried (and failed) to solve structural problems
+
+**Part IV: The Intellectual Tradition**
+- Chapter 7: The Myth of the Omnicompetent Citizen — Lippmann's critique
+- Chapter 8: Dewey's response — forming publics, not just informing them
+
+**Conclusion:** What follows from taking these arguments seriously
+
+Each chapter builds on previous ones, creating a cumulative argument that professional standards alone cannot solve journalism's democratic problems.`,
+    sources: ['Table of Contents', 'Throughout']
+  },
+  {
+    id: 'how-to-read',
+    category: 'basics',
+    question: 'What\'s the best way to read this dissertation?',
+    answer: `Here are several approaches depending on your goals:
+
+**For the impatient:** Start with the Introduction and Conclusion. They contain the core argument in concentrated form. Then read Chapter 6 ("The Impossible Press") for the central critique.
+
+**For the historically minded:** Read Chapter 3 (technological utopianism) and Chapter 5 (communication without community) to understand how Rosen situates journalism within the broader history of media.
+
+**For the philosophically inclined:** Focus on Chapters 7 and 8, the Lippmann-Dewey debate. This is where the deepest theoretical work happens.
+
+**For practitioners:** Chapter 6 on the professional attitude is most directly relevant to how journalists think about their work today.
+
+**For contemporary relevance:** Use the comparison tools on this site to see how 1986 arguments apply to 2025 conditions, then dive into the chapters that interest you most.
+
+**A warning:** This is an academic dissertation written in 1986. The prose is careful and sometimes dense. Give it time — the ideas reward patience.`,
+    sources: ['Introduction']
+  },
+  {
+    id: 'whats-original',
+    category: 'basics',
+    question: 'What\'s original about this dissertation?',
+    answer: `The dissertation's originality lies in how it combines and extends existing ideas:
+
+**The synthesis:** Rosen brings together media ecology (Postman), democratic theory (Lippmann, Dewey), sociology of news (Park, Tarde), and philosophy of communication into a unified critique.
+
+**The framing:** "The impossible press" as a concept is original — the idea that professional journalism made a structural promise it structurally cannot keep.
+
+**The five factors:** The argument that five things must be inserted between "press" and "public" — scale, social bonds, media structure, language, professional attitude — provides an original analytical framework.
+
+**The relational view:** While the idea that information is relational comes from others, applying it systematically to journalism criticism was relatively new.
+
+**The predictive power:** The dissertation identified tendencies (attention economy, eclipse of content) that have become central features of our media environment. This suggests genuine insight rather than just synthesis.
+
+**The practical implications:** By showing that professional conduct can't solve structural problems, the dissertation opened space for the public journalism movement that followed.`,
+    sources: ['Throughout']
+  },
+
+  // === ADDITIONAL CONCEPTS ===
+  {
+    id: 'news-as-drama',
+    category: 'concepts',
+    question: 'What does the dissertation say about "news as drama"?',
+    answer: `The dissertation argues that news inevitably tends toward dramatic presentation because of the attention economy.
+
+**The structural logic:** When media must compete for attention, dramatic narratives outperform information. Stories with conflict, characters, and emotional stakes engage audiences more than policy analysis or context.
+
+**The pseudo-environment effect:** Dramatic news doesn't just present reality — it constructs a picture of reality organized around dramatic principles. Citizens then respond to this dramatized pseudo-environment.
+
+**The personalization trap:** Drama requires characters. Complex structural problems get reduced to individual heroes and villains. The housing crisis becomes about greedy bankers, not systemic issues. This shapes how citizens understand and respond to public problems.
+
+**The episodic vs. thematic:** Research later confirmed this: news that presents issues as isolated dramatic episodes (episodic framing) leads viewers to attribute problems to individual failings, while thematic framing that emphasizes context leads to structural attribution.
+
+In 2025, this is the dominant logic of viral content: dramatic narratives spread; context and nuance don't.`,
+    sources: ['Chapter 5', 'Chapter 2']
+  },
+  {
+    id: 'stereotypes',
+    category: 'concepts',
+    question: 'What role do stereotypes play in Lippmann\'s theory?',
+    answer: `For Lippmann, stereotypes are not simply prejudices to be overcome — they are an inevitable feature of how human cognition works under conditions of complexity.
+
+**The problem of scale:** We cannot directly experience most of what affects us. We must rely on simplified mental models — stereotypes — to navigate a world too large and complex to know directly.
+
+**"We define first, then see":** Stereotypes don't just describe; they shape perception. We fit new information into existing categories rather than letting information revise our categories.
+
+**The cultural inheritance:** Stereotypes are not individual but cultural. We inherit most of our mental pictures from our community, not from direct experience.
+
+**Why this matters for journalism:** The press assumes it can correct false stereotypes by presenting accurate information. But if we "define first, then see," accurate information gets filtered through existing stereotypes. Facts don't automatically override mental pictures.
+
+**The contemporary application:** This explains why fact-checking doesn't change minds, why partisans interpret the same news differently, and why "more information" doesn't produce consensus.`,
+    sources: ['Chapter 7']
+  },
+  {
+    id: 'five-factors',
+    category: 'concepts',
+    question: 'What are the "five factors" between press and public?',
+    answer: `Rosen argues that the phrase "the press informs the public" skips over five crucial factors that determine whether information actually informs:
+
+**1. Scale of the world:** Modern society operates at continental and global scales. Democracy was designed for communities where citizens could directly observe public affairs. The mismatch between human cognitive capacity and modern complexity is structural.
+
+**2. Character of social bonds:** Mass communication connects people who share no actual community. Without community, information has no context, no framework for interpretation, no mechanism for deliberation.
+
+**3. Structural characteristics of media:** Different media create different relationships between communicators. Print, broadcast, and now digital media each structure the press-public relationship differently.
+
+**4. Nature of language:** Language is not a transparent medium for transmitting facts. It shapes what can be thought and said. Meaning is made, not transferred.
+
+**5. The professional attitude:** Journalism's self-understanding — objectivity, fairness, accuracy — shapes what gets covered and how. The professional attitude is part of the structure it claims to transcend.
+
+Together, these factors determine whether "the press informs the public" or whether it merely addresses an atomized audience with decontextualized information.`,
+    sources: ['Introduction', 'Conclusion']
+  },
+  {
+    id: 'technological-utopianism',
+    category: 'concepts',
+    question: 'What is technological utopianism and why does it keep recurring?',
+    answer: `Chapter 3 traces a recurring pattern: every major new communication technology inspires utopian hopes that it will restore democratic participation.
+
+**The telegraph (1840s):** Would create mutual understanding between distant peoples, end war through communication.
+
+**Radio (1920s):** Would create a "town meeting of the air," restore direct democracy, educate the masses.
+
+**Television (1950s):** Would bring all citizens into the same conversation, create an informed electorate.
+
+**Cable/satellite (1970s-80s):** Would fragment the mass audience in healthy ways, create targeted public-affairs programming.
+
+**The internet (1990s-2010s):** Would democratize publishing, create global conversation, route around gatekeepers.
+
+**The pattern:** Each technology promises to solve the problems created by the previous technology. Each disappoints. The underlying structural problems — scale, atomization, attention competition — persist across technological changes.
+
+**Why it recurs:** We want technological solutions to social and political problems. New technologies create genuine new possibilities, which get interpreted through utopian hopes. The disappointment is predictable but never prevents the next cycle.
+
+Social media was the latest iteration. The dissertation, written in 1986, essentially predicted this pattern would repeat.`,
+    sources: ['Chapter 3']
+  },
+  {
+    id: 'sensationalism',
+    category: 'concepts',
+    question: 'Does the dissertation explain sensationalism in news?',
+    answer: `Yes, but not as a moral failing — as a structural inevitability.
+
+**The attention explanation:** When attention must be competed for rather than assumed, content that grabs attention wins. Sensational content — dramatic, emotional, conflictual, novel — captures attention more effectively than nuanced analysis.
+
+**The historical cycle:** Professional journalism emerged partly as a response to yellow journalism's sensationalism. But the underlying pressure toward sensationalism didn't disappear; it was temporarily suppressed by professional norms and oligopolistic market structures.
+
+**The erosion of gatekeeping:** When a few outlets controlled distribution, they could afford to prioritize quality over attention-grabbing. When distribution is infinite and attention is the scarce resource, sensationalism returns.
+
+**The content eclipse:** Rosen's phrase "the content of public discourse is eclipsed by the struggle to be heard" explains sensationalism as a symptom, not a cause. The problem is the attention economy, not individual editorial choices.
+
+**The 2025 reality:** Algorithmic feeds optimize explicitly for engagement metrics that reward sensational content. What Rosen described as a tendency has become the dominant business model.`,
+    sources: ['Chapter 5', 'Chapter 6']
+  },
+
+  // === ADDITIONAL KEY FIGURES ===
+  {
+    id: 'who-park',
+    category: 'figures',
+    question: 'Who was Robert Park and what did he contribute?',
+    answer: `Robert Park (1864-1944) was a sociologist at the University of Chicago who had previously worked as a journalist and press agent. His work on cities, immigration, and the newspaper is foundational to both urban sociology and journalism studies.
+
+**The newspaper as social institution:** Park analyzed the newspaper not just as a business or a source of information, but as a force that shapes the social body. The newspaper creates new forms of community — and new forms of atomization.
+
+**The stranger and the city:** Park studied how urban life creates relationships with strangers — people we encounter regularly but never know. The newspaper extends this: we develop parasocial relationships with public figures and distant events.
+
+**Mobilized privacy:** A concept Rosen draws on: the modern citizen is hooked into "long lines of communication from remote sources" while remaining isolated from neighbors. We have publicity without public-ness.
+
+**The Great Migration context:** Park studied how newspapers helped integrate immigrants and African Americans into (or excluded them from) American public life.
+
+His work helps Rosen explain how mass media creates "communication without community."`,
+    sources: ['Chapter 5']
+  },
+  {
+    id: 'who-tarde',
+    category: 'figures',
+    question: 'Who was Gabriel Tarde?',
+    answer: `Gabriel Tarde (1843-1904) was a French sociologist whose work on publics and imitation Rosen draws upon.
+
+**The public as conversation:** Tarde argued that a "public" is defined by what it pays attention to and discusses. The newspaper creates publics by focusing collective attention on particular topics.
+
+**Imitation:** Tarde theorized that social behavior spreads through imitation. Ideas, beliefs, and behaviors propagate through networks of influence. This anticipated later work on diffusion, viral content, and social contagion.
+
+**The opinion formation process:** Tarde was interested in how individual opinions aggregate into public opinion — a process mediated by media and conversation.
+
+**Why he matters for the dissertation:** Tarde helps explain how mass media creates the appearance of a public without the reality of one. People may all pay attention to the same news, but they don't form a genuine community of deliberation. The "public" created by shared attention is different from the public formed by shared action.
+
+His work adds nuance to the Lippmann-Dewey debate: neither simple information transfer nor simple community formation explains how publics actually work.`,
+    sources: ['Chapter 5', 'Chapter 8']
+  },
+  {
+    id: 'jefferson-scale',
+    category: 'figures',
+    question: 'What did Jefferson say about scale and democracy?',
+    answer: `Thomas Jefferson appears in Chapter 1 as an advocate for the importance of scale in democracy.
+
+**The ward republic idea:** Jefferson proposed dividing the country into small "ward republics" — local units small enough that citizens could directly participate. Each ward would handle local affairs; higher levels would handle only what couldn't be managed locally.
+
+**The scale problem:** Jefferson understood that democratic participation requires human-scale communities. Large-scale representative democracy creates distance between citizens and decisions that affect them.
+
+**The information assumption:** Jefferson famously preferred "newspapers without government to government without newspapers." But this assumes newspapers can adequately inform citizens — precisely what the dissertation questions.
+
+**The contemporary relevance:** The dissertation uses Jefferson to establish that concerns about scale are not new. From the founding, thoughtful observers worried that democracy might not scale. Modern mass communication didn't solve this problem; it may have intensified it.
+
+**The irony:** Jefferson's faith in newspapers as sufficient to sustain informed citizenship across a large republic was optimistic even for his time. The structural problems the dissertation identifies were present, if less severe, from the beginning.`,
+    sources: ['Chapter 1']
+  },
+
+  // === ADDITIONAL ARGUMENTS ===
+  {
+    id: 'what-not-arguing',
+    category: 'arguments',
+    question: 'What is the dissertation NOT arguing?',
+    answer: `The dissertation is often misunderstood. Here's what it does NOT argue:
+
+**NOT: Journalists are incompetent or biased.** The critique is structural, not personnel. Individual journalists can be excellent at their jobs while the overall system fails.
+
+**NOT: Professional standards don't matter.** Rosen explicitly says the professional attitude is "necessary but insufficient." Better that journalists be accurate than inaccurate.
+
+**NOT: Information doesn't matter.** The argument is that information is relational, not that it's irrelevant. Context and community matter for whether information informs.
+
+**NOT: Democracy is impossible.** The dissertation diagnoses problems with optimism that they can be addressed. The public journalism movement was an attempt at solutions.
+
+**NOT: We should abandon journalism.** The argument is for rethinking journalism's role, not eliminating it. Journalism should help form publics, not just inform them.
+
+**NOT: Technology is the problem.** Each technology creates new possibilities and problems. The issue is how we think about technology, not technology itself.
+
+The dissertation is a call for clearer thinking about what journalism can and cannot do, not a counsel of despair.`,
+    sources: ['Conclusion']
+  },
+  {
+    id: 'solutions-proposed',
+    category: 'arguments',
+    question: 'Does the dissertation propose solutions?',
+    answer: `The dissertation is primarily diagnostic, but it points toward solutions that Rosen developed more fully later.
+
+**What doesn't work:**
+- More information (the problem isn't information deficit)
+- Better professional standards (can't solve structural problems)
+- New technology (repeats the utopian cycle)
+- Expecting journalists to "just do their job better"
+
+**What the dissertation suggests:**
+- Understanding journalism as transaction, not action — focusing on the relationship, not just the output
+- Recognizing that publics must be formed, not just informed
+- Thinking about community as precondition for meaningful information
+- Accepting that scale creates problems journalism cannot solve alone
+
+**What came after:**
+- Public journalism (1990s): Help form publics through deliberation, connection, civic engagement
+- "Getting the connections right": Link information to citizens' capacity to act
+- Engagement journalism: Build relationships with communities, not just audiences
+- Solutions journalism: Focus on responses to problems, not just problems
+
+The dissertation created the theoretical foundation for these practical experiments.`,
+    sources: ['Conclusion', 'Later Work']
+  },
+
+  // === ADDITIONAL CONTEMPORARY ===
+  {
+    id: 'ai-journalism',
+    category: 'contemporary',
+    question: 'What would the dissertation say about AI and journalism?',
+    answer: `The dissertation doesn't mention AI (it didn't exist as we know it), but its framework suggests several concerns:
+
+**Technological utopianism redux:** AI is inspiring familiar utopian hopes — democratized access to knowledge, automated fact-checking, personalized news. The dissertation predicts disappointment: structural problems won't be solved by technical tools.
+
+**The pseudo-environment industrialized:** If AI generates news summaries, creates personalized feeds, and curates information, it becomes a major constructor of pseudo-environments. AI makes the pictures in our heads without us knowing who's holding the brush.
+
+**Attention economy accelerated:** AI enables content production at scales humans can't match, potentially intensifying the attention competition that already eclipses substantive communication.
+
+**The relational question:** The dissertation asks: does this help people understand and act on their world? AI-generated content may be accurate without being informative in the relational sense. Information still needs community context.
+
+**What could help:** AI that helps form communities of inquiry, facilitates deliberation, connects people with shared problems — tools that address the structural issues, not just information production.
+
+The dissertation would urge caution about AI-powered journalism repeating the impossible promise in new technological form.`,
+    sources: ['Chapter 3', 'Conclusion']
+  },
+  {
+    id: 'polarization',
+    category: 'contemporary',
+    question: 'Does the dissertation explain political polarization?',
+    answer: `The dissertation provides important conceptual tools for understanding polarization:
+
+**Fragmented pseudo-environments:** When different communities inhabit different pseudo-environments — different "pictures in their heads" — they're not just disagreeing about facts; they're perceiving different realities.
+
+**Stereotypes and perception:** "We define first, then see." Partisans literally perceive the same events differently because their interpretive frameworks differ. This is deeper than "bias."
+
+**Communication without community:** Polarization might be seen as a response to atomization. In the absence of genuine community, people form pseudo-communities around shared enemies. Tribal identity fills the void where civic community used to be.
+
+**The attention economy:** Outrage and conflict capture attention. Platforms optimizing for engagement systematically amplify polarizing content. What Rosen called "eclipse of content" now manifests as eclipse-of-content-by-conflict.
+
+**The limits of professional journalism:** "Both sides" journalism assumes two coherent sides that can be fairly represented. When the sides inhabit different realities, this framing breaks down. Professional norms weren't designed for asymmetric polarization.
+
+The dissertation suggests polarization isn't primarily an information problem solvable by better journalism — it's a community problem, a scale problem, a structural problem.`,
+    sources: ['Chapter 5', 'Chapter 7']
+  },
+  {
+    id: 'substack-creators',
+    category: 'contemporary',
+    question: 'How does the dissertation framework apply to Substack and independent creators?',
+    answer: `Substack and the creator economy represent an interesting case from the dissertation's perspective:
+
+**Audience atomization... overcome?** Rosen later coined "audience atomization overcome" to describe how the internet connected previously isolated audience members. Substack takes this further: readers form communities around individual writers.
+
+**Scale matters:** Successful substacks often operate at more human scales than mass media. A writer with 50,000 subscribers might actually know their audience, respond to comments, build genuine community.
+
+**The transaction model:** Substack makes the transactional nature of journalism explicit. Readers pay directly; writers respond to subscriber interests. This is closer to the relationship the dissertation advocates.
+
+**But also:** The problems don't disappear. Successful substacks still compete for attention. The pseudo-environment problem persists — readers choose substacks that confirm their views. And most people can't sustain paid subscriptions to enough sources to be broadly informed.
+
+**The community question:** Some substacks build genuine communities of inquiry. Others build audiences with parasocial relationships to charismatic writers. The dissertation would ask: which kind of "public" is being formed?
+
+Substack is a partial solution at best — valuable for some, but not a systemic answer to mass communication's structural problems.`,
+    sources: ['Chapter 5', 'Later Work']
+  },
+  {
+    id: 'solutions-journalism',
+    category: 'contemporary',
+    question: 'How does the dissertation relate to solutions journalism?',
+    answer: `Solutions journalism — focusing on responses to problems, not just problems themselves — is a direct descendant of public journalism, which grew from the dissertation.
+
+**The problem with problem-focus:** Traditional journalism excels at exposing problems: corruption, failure, crisis. But exposition doesn't automatically produce solutions. "Making things public" doesn't make a public capable of responding.
+
+**The dissertation's contribution:** By arguing that journalism should help form publics, not just inform them, the dissertation created theoretical space for journalism that helps communities respond to problems.
+
+**Solutions journalism's premise:** Reporting on how communities have successfully addressed problems gives audiences models for action, not just awareness of failure. This is closer to what Dewey wanted — communication embedded in capacity for response.
+
+**The limits:** Solutions journalism can become advocacy, or can overstate success stories. Not every problem has a solution ready to be reported. The structural issues the dissertation identifies — scale, atomization, attention — affect solutions journalism too.
+
+**The connection:** Solutions journalism accepts the dissertation's premise: journalism's job isn't done when the story is published. The question is whether the journalism helped form a public capable of action.`,
+    sources: ['Conclusion', 'Public Journalism']
+  },
+  {
+    id: 'election-coverage',
+    category: 'contemporary',
+    question: 'What does the dissertation suggest about election coverage?',
+    answer: `Election coverage is a case study in the dissertation's critique:
+
+**Horse-race journalism:** Coverage focuses on who's winning, poll numbers, campaign strategy — drama, not substance. This is the "news as drama" tendency taken to its extreme.
+
+**The attention economy:** Campaign coverage competes for attention with everything else. Dramatic conflicts, gaffes, and personality clashes outperform policy analysis.
+
+**The professional attitude's limits:** "Both sides" coverage assumes rough equivalence between candidates. When one side lies more or threatens democratic norms, "fair" coverage becomes distorting. Professional standards weren't designed for asymmetric situations.
+
+**Pseudo-environment construction:** Election coverage constructs the "race" as a reality — but the race is itself partly a media construction. Polls measure opinions shaped by coverage, which then gets reported as news.
+
+**Communication without community:** Voters receive campaign information as isolated individuals, not as members of deliberating communities. The "public" that votes isn't a public in Dewey's sense.
+
+**What might help:** Coverage that helps citizens deliberate about what they actually care about; journalism that facilitates conversation, not just transmission; attention to local races where scale permits genuine community.`,
+    sources: ['Chapter 5', 'Chapter 6']
+  },
+
+  // === ADDITIONAL LATER WORK ===
+  {
+    id: 'audience-atomization-overcome',
+    category: 'later-work',
+    question: 'What is "audience atomization overcome"?',
+    answer: `"Audience atomization overcome" is a concept Rosen developed in the 2000s to describe how the internet changed the relationship between media and audiences.
+
+**The atomized audience:** In the broadcast era, mass media addressed millions of isolated individuals. Audience members couldn't communicate with each other; they could only receive. This is the "mobilized privacy" the dissertation describes.
+
+**What the internet changed:** Digital networks allowed audience members to connect horizontally. Readers could discuss stories, share them, comment, respond, and organize. The audience became networked.
+
+**The significance:** This fundamentally changed the media power structure. Journalists could no longer simply broadcast to a passive mass. "The people formerly known as the audience" had voices of their own.
+
+**The complication:** Audience atomization overcome didn't automatically create the deliberating publics Dewey envisioned. The connections formed on social media were often tribal, shallow, or toxic. Communication without community took new forms.
+
+**The lesson:** Technology changed the structure but didn't solve the underlying problems. Connecting atomized individuals doesn't automatically form a public capable of democratic self-governance.`,
+    sources: ['PressThink', 'Chapter 5']
+  },
+  {
+    id: 'getting-connections-right',
+    category: 'later-work',
+    question: 'What is "Getting the Connections Right" about?',
+    answer: `"Getting the Connections Right: Public Journalism and the Troubles in the Press" (1996) was Rosen's first book-length work after the dissertation, translating its academic arguments into a reform program.
+
+**The core argument:** Journalism has lost connection with citizens because it treats them as spectators rather than participants. To restore connection, journalism must help people participate in public life.
+
+**The critique extended:** The book argues that journalism's disconnection isn't just professional failure — it reflects a genuine confusion about journalism's public purpose.
+
+**The solution proposed:** Public journalism: newspapers sponsoring civic forums, facilitating deliberation, treating citizens as potential participants rather than passive consumers.
+
+**The controversy:** Traditional journalists attacked public journalism as abandoning objectivity and neutrality. Rosen argued that the pretense of pure observation was itself part of the problem.
+
+**The connection to the dissertation:** The book is the dissertation's practical application. If "making things public doesn't make a public," then journalism must actively help form publics. "Getting the Connections Right" explains how.
+
+**The legacy:** Public journalism as a formal movement faded, but its insights influenced subsequent developments in civic, engagement, and community journalism.`,
+    sources: ['Getting the Connections Right (1996)']
+  },
+  {
+    id: 'what-are-journalists-for',
+    category: 'later-work',
+    question: 'What is "What Are Journalists For?" about?',
+    answer: `"What Are Journalists For?" (1999) is Rosen's second book and the most comprehensive account of the public journalism movement.
+
+**The question:** The title isn't rhetorical. Rosen argues that journalism has never adequately answered this basic question. Default answers ("inform the public," "hold power accountable") obscure more than they reveal.
+
+**The history:** The book chronicles experiments in public journalism at newspapers across America — Charlotte, Wichita, Minneapolis, and others. It documents what worked, what failed, and what was learned.
+
+**The argument:** Journalism exists not to produce a product (news) but to maintain a relationship (between citizens and public life). When that relationship breaks down, journalism has failed even if the product remains excellent.
+
+**The resistance:** The book addresses critics who saw public journalism as abandoning professional detachment. Rosen argues that detachment was always a fiction and that pretending otherwise makes journalism complicit in public disengagement.
+
+**The continuing relevance:** The question "what are journalists for?" remains unanswered and urgent. In 2025, with trust collapsed and business models failing, the question is unavoidable.
+
+**The connection:** This book is the fullest expression of the trajectory that began with the dissertation.`,
+    sources: ['What Are Journalists For? (1999)']
   }
 ];
 
 // Search-friendly keywords for each FAQ
 export const FAQ_KEYWORDS = {
+  // Basics
   'what-is-dissertation': ['about', 'summary', 'overview', 'what is', 'explain'],
   'why-impossible': ['impossible', 'why', 'meaning', 'title'],
   'who-is-rosen': ['jay rosen', 'author', 'who wrote', 'biography'],
+  'who-is-postman': ['postman', 'neil', 'advisor', 'media ecology', 'amusing ourselves'],
+  'dissertation-structure': ['structure', 'chapters', 'outline', 'organization', 'parts'],
+  'how-to-read': ['read', 'reading', 'approach', 'start', 'where to begin'],
+  'whats-original': ['original', 'new', 'contribution', 'novel', 'innovative'],
+
+  // Concepts
   'pseudo-environment': ['pseudo', 'pictures', 'mental', 'perception', 'lippmann'],
   'omnicompetent-citizen': ['citizen', 'omnicompetent', 'informed', 'myth'],
   'journalism-transaction': ['transaction', 'action', 'communication'],
   'communication-without-community': ['community', 'communication', 'isolation', 'mobilized'],
   'attention-economy': ['attention', 'eclipse', 'engagement', 'content'],
   'making-public': ['public', 'making', 'formation', 'publishing'],
+  'news-as-drama': ['drama', 'dramatic', 'narrative', 'conflict', 'story'],
+  'stereotypes': ['stereotype', 'define', 'perception', 'cognition', 'bias'],
+  'five-factors': ['five factors', 'scale', 'social bonds', 'language', 'structure'],
+  'technological-utopianism': ['utopia', 'technology', 'telegraph', 'radio', 'television', 'internet'],
+  'sensationalism': ['sensational', 'yellow journalism', 'clickbait', 'dramatic'],
+
+  // Arguments
+  'main-argument': ['main', 'central', 'thesis', 'argument', 'claim'],
+  'what-wrong-journalism': ['wrong', 'problem', 'critique', 'criticism', 'flawed'],
+  'professional-attitude': ['professional', 'objectivity', 'fairness', 'standards'],
+  'lippmann-dewey': ['lippmann', 'dewey', 'debate', 'democracy', 'experts'],
+  'what-not-arguing': ['not', 'isn\'t', 'misunderstanding', 'doesn\'t say'],
+  'solutions-proposed': ['solution', 'fix', 'answer', 'proposal', 'remedy'],
+
+  // Figures
+  'who-lippmann': ['lippmann', 'walter', 'public opinion', 'stereotype'],
+  'who-dewey': ['dewey', 'john', 'pragmatism', 'education', 'community'],
+  'who-park': ['park', 'robert', 'chicago', 'sociology', 'city'],
+  'who-tarde': ['tarde', 'gabriel', 'french', 'imitation', 'publics'],
+  'jefferson-scale': ['jefferson', 'ward', 'republic', 'scale', 'founding'],
+
+  // Contemporary
   'relevance-today': ['today', 'relevant', '2025', 'now', 'contemporary'],
   'social-media': ['social media', 'twitter', 'facebook', 'platform', 'internet'],
   'misinformation': ['misinformation', 'fact-check', 'fake news', 'truth'],
   'trust-collapse': ['trust', 'distrust', 'decline', 'collapse'],
-  'local-news': ['local', 'newspaper', 'community news', 'news desert']
+  'local-news': ['local', 'newspaper', 'community news', 'news desert'],
+  'ai-journalism': ['ai', 'artificial intelligence', 'chatgpt', 'automation', 'algorithm'],
+  'polarization': ['polarization', 'partisan', 'divided', 'tribal', 'conflict'],
+  'substack-creators': ['substack', 'newsletter', 'creator', 'independent', 'subscription'],
+  'solutions-journalism': ['solutions', 'constructive', 'reform', 'positive'],
+  'election-coverage': ['election', 'campaign', 'horse race', 'polls', 'voting'],
+
+  // Later Work
+  'public-journalism': ['public journalism', 'civic', 'engagement', 'reform'],
+  'view-from-nowhere': ['view from nowhere', 'neutrality', 'objectivity', 'bias'],
+  'people-formerly': ['people formerly', 'audience', 'participants', 'users'],
+  'pressthink': ['pressthink', 'blog', 'website', 'media criticism'],
+  'audience-atomization-overcome': ['atomization', 'networked', 'connected', 'horizontal'],
+  'getting-connections-right': ['connections', 'book', '1996', 'public journalism'],
+  'what-are-journalists-for': ['what are journalists for', 'book', '1999', 'purpose']
 };

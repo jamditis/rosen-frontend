@@ -1,6 +1,29 @@
 
 # Changelog - Jay Rosen Digital Archive
 
+*Session Date: November 29, 2025 (Continued)*
+
+## FAQ Expansion & Mobile Responsiveness
+
+### FAQ Expansion (`/faq/data.js`)
+- Expanded from 25 to 46 Q&A pairs (21 new questions added)
+- New Basics questions: dissertation structure, how to read it, what's original
+- New Concepts questions: news as drama, stereotypes, five factors, technological utopianism, sensationalism
+- New Key Figures questions: Robert Park, Gabriel Tarde, Thomas Jefferson on scale
+- New Arguments questions: what the dissertation is NOT arguing, proposed solutions
+- New Contemporary questions: AI and journalism, political polarization, Substack/creators, solutions journalism, election coverage
+- New Later Work questions: audience atomization overcome, "Getting the Connections Right" book, "What Are Journalists For?" book
+- Updated FAQ_KEYWORDS for all new items
+
+### Mobile Responsiveness Improvements
+- **Glossary**: Detail panel now becomes full-screen modal on mobile/tablet (under 1024px)
+- **Glossary**: Added body scroll lock when modal is open on mobile
+- **Comparison Tool**: Improved header navigation for mobile (hidden on very small screens)
+- **Shared Styles**: Added mobile improvements (larger touch targets for pills, iOS safe area insets, scroll lock utility)
+- All tools now properly responsive across mobile, tablet, and desktop
+
+---
+
 *Session Date: November 29, 2025*
 
 ## Dissertation Presentation Tools Suite
