@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, SearchX, ChevronLeft, ChevronRight, Network, FolderOpen } from 'lucide-react';
+import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, SearchX, ChevronLeft, ChevronRight, Network, FolderOpen, BookOpen } from 'lucide-react';
 import { fetchArchiveData, hashString } from './services/archiveService';
 import { ArchiveRecord, Facets, FilterState } from './types';
 import { ITEMS_PER_PAGE, COLORS } from './constants';
@@ -10,6 +10,7 @@ import RecordModal from './components/RecordModal';
 import FeaturedSection from './components/FeaturedSection';
 import Timeline from './components/Timeline';
 import Explorer from './components/Explorer';
+import DissertationPage from './pages/DissertationPage';
 
 // Helper to highlight text
 const Highlight: React.FC<{ text: string; term: string }> = ({ text, term }) => {
@@ -36,6 +37,7 @@ const App: React.FC = () => {
   const [sortBy, setSortBy] = useState<'date-desc' | 'date-asc' | 'title-asc'>('date-desc');
   const [isScrolled, setIsScrolled] = useState(false);
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
+  const [currentView, setCurrentView] = useState<'archive' | 'dissertation'>('archive');
 
   // Refs
   const recordsRef = useRef<HTMLDivElement>(null);
@@ -48,6 +50,15 @@ const App: React.FC = () => {
     publication: [],
     type: null
   });
+
+  // --- Check URL for view param on mount ---
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const viewParam = params.get('view');
+    if (viewParam === 'dissertation') {
+      setCurrentView('dissertation');
+    }
+  }, []);
 
   // --- Data Loading ---
   useEffect(() => {
@@ -87,6 +98,26 @@ const App: React.FC = () => {
         console.warn("Could not update URL history", e);
       }
   }, [selectedRecordId]);
+
+  // Update URL when view changes
+  useEffect(() => {
+      const url = new URL(window.location.href);
+      if (currentView === 'dissertation') {
+          url.searchParams.set('view', 'dissertation');
+          url.searchParams.delete('record'); // Clear record param when viewing dissertation
+      } else {
+          url.searchParams.delete('view');
+      }
+      try {
+        window.history.pushState({}, '', url);
+      } catch (e) {
+        console.warn("Could not update URL history", e);
+      }
+  }, [currentView]);
+
+  // Navigation handlers
+  const navigateToDissertation = () => setCurrentView('dissertation');
+  const navigateToArchive = () => setCurrentView('archive');
 
   // --- Scroll Listener ---
   useEffect(() => {
@@ -228,11 +259,16 @@ const App: React.FC = () => {
   // Is explorer mode active?
   const isExplorer = viewMode === 'explorer';
 
+  // If viewing dissertation, render the dissertation page
+  if (currentView === 'dissertation') {
+    return <DissertationPage onBack={navigateToArchive} />;
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <WelcomeModal />
 
-      <RecordModal 
+      <RecordModal
         record={selectedRecord}
         allRecords={records}
         isOpen={!!selectedRecordId}
@@ -248,8 +284,8 @@ const App: React.FC = () => {
 
       {/* Header */}
       <header className={`sticky top-0 z-50 w-full border-b transition-all duration-300 ${
-          isScrolled 
-            ? 'bg-paper border-stone-300 shadow-sm' 
+          isScrolled
+            ? 'bg-paper border-stone-300 shadow-sm'
             : 'bg-paper/80 backdrop-blur-md border-stone-200'
       }`}>
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -275,14 +311,22 @@ const App: React.FC = () => {
                 </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
+                {/* Dissertation Link */}
+                <button
+                  onClick={navigateToDissertation}
+                  className="flex items-center gap-2 text-stone-600 hover:text-stone-900 transition-colors text-xs border border-stone-200 px-3 py-1.5 hover:border-stone-300 hidden sm:flex"
+                >
+                    <BookOpen className="w-3.5 h-3.5" />
+                    <span>1986 Dissertation</span>
+                </button>
                 <a href="https://twitter.com/jsamditis" target="_blank" rel="noreferrer" className="text-stone-500 hover:text-stone-900 transition-colors text-xs hidden md:inline-block">
                     Curated by Joe Amditis
                 </a>
                 {/* Hide mobile menu button in explorer mode since sidebar is hidden */}
                 {!isExplorer && (
-                    <button 
-                    onClick={() => setSidebarOpen(true)} 
+                    <button
+                    onClick={() => setSidebarOpen(true)}
                     className="lg:hidden p-2 text-stone-800 hover:bg-stone-100 rounded-md border border-stone-300"
                     >
                         <SlidersHorizontal className="w-5 h-5" />
