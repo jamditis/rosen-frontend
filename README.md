@@ -37,6 +37,10 @@ This project is unique in that it maintains **two paired versions** of the appli
 *   **Manhattan Routing:** Aesthetic connection paths inspired by subway maps to visualize intellectual lineage.
 *   **Export Capabilities:** Users can generate and download high-resolution PNG cards of specific records or the entire network graph for social sharing.
 
+### 📜 Dissertation Presentation Tools
+*   **Interactive Mind Map:** Tree-structured visualization of the 1986 dissertation's chapters and key arguments.
+*   **"Then and Now" Comparison Tool:** Side-by-side presentation of 1986 dissertation insights alongside 2025 media realities. Located in `/comparison-tool/` as a standalone static site for WordPress deployment.
+
 ---
 
 ## 🚀 Quick Start (Local)
@@ -130,9 +134,18 @@ To improve loading times, the application automatically caches fetched CSV data 
 │   ├── FeaturedSection.js / .tsx # Carousel highlights
 │   ├── RecordModal.js / .tsx     # Detail view overlay
 │   ├── Sidebar.js / .tsx         # Filters and search
+│   ├── DissertationPage.js       # Dissertation view container
+│   ├── MindMap.js                # Interactive mind map
+│   ├── DetailPanel.js            # Dissertation node details
+│   ├── dissertationData.js       # Full dissertation content
 │   └── ...
 ├── services/
 │   └── archiveService.js / .ts   # Data fetching & parsing
+├── comparison-tool/              # Standalone "Then and Now" tool
+│   ├── index.html                # Entry point
+│   ├── styles.css                # Styling (matches archive theme)
+│   ├── script.js                 # Interactivity
+│   └── data.js                   # Comparison content
 ├── App.js / .tsx                 # Main application controller
 ├── constants.js / .ts            # Config (Sheet URLs, Colors)
 ├── html.js                       # HTM helper (JS version only)

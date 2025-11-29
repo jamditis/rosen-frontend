@@ -1,5 +1,17 @@
 
 # Changelog - Jay Rosen Digital Archive
+
+*Session Date: November 29, 2025*
+
+## "Then and Now" Comparison Tool
+- **New Standalone Tool:** Created `/comparison-tool/` directory containing a self-contained static site for presenting dissertation insights alongside 2025 realities
+- **7 Core Comparisons:** Attention Economy, Pseudo-Environment, Communication Without Community, News as Drama, Technological Utopianism, The Impossible Press, Making Things Public
+- **Features:** Side-by-side responsive layout, scroll-based animations, navigation dots, keyboard navigation (j/k or arrow keys), mobile-optimized
+- **Design:** Matches archive theme (Roboto Mono, Special Elite fonts, paper texture background, Tailwind CSS)
+- **Deployment:** Zero-build static files for FTP upload to WordPress domain
+
+---
+
 *Session Date: November 19, 2025*
 ## 15:34 - Initial Build & Core Infrastructure
 - Investigate and fix the "No records found" display error occurring when filtering for Twitter/X or Bluesky records in the Jay Rosen Digital Archive. Ensure these records display correctly, and that the filters for social media types return the expected results.
