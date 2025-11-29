@@ -4,24 +4,21 @@ A curated, interactive public collection of the works, critiques, and teachings 
 
 ![Archive Preview](https://i.imgur.com/iaBrkg8.png)
 
-## 🏗️ Dual-Architecture Overview
+## 🏗️ Zero-Build Architecture
 
 **Important Note for Developers:**
-This project is unique in that it maintains **two paired versions** of the application logic within the same repository. This structure allows for robust development in AI-assisted environments while ensuring the final product can be deployed to any static web host (via FTP) without a build process.
+This project uses a **zero-build static architecture** designed for simple deployment to any web host via FTP—including WordPress subdirectories.
 
-### 1. The TypeScript Version (Development)
-*   **Files:** `*.tsx`, `*.ts`
-*   **Purpose:** Used for editing, type-checking, and previewing within environments like **Google AI Studio** or modern IDEs.
-*   **Stack:** React, TypeScript, Tailwind CSS.
-*   **Benefit:** Provides strong typing and better developer tooling during the creation phase.
+### Tech Stack
+*   **Files:** `*.js` (ES Modules), `*.html`, `*.css`
+*   **Stack:** React (via CDN), `htm` (for JSX-like syntax in plain JS), Tailwind CSS (via CDN)
+*   **Dependencies:** All loaded via `esm.sh` CDN—no `node_modules` required
 
-### 2. The Vanilla JS Version (Production / FTP)
-*   **Files:** `*.js` (using ES Modules)
-*   **Purpose:** Designed for immediate deployment to standard web hosting (Apache/Nginx) via FTP or GitHub Pages.
-*   **Stack:** React (via CDN), `htm` (for JSX-like syntax in plain JS), Tailwind CSS (via CDN).
-*   **Benefit:** **Zero-Build System.** No `npm run build`, Webpack, or Vite is required. You simply upload the `.js`, `.css`, and `index.html` files to a server, and it works.
-
-> **Current Configuration:** The `index.html` file is currently configured to load the **JS Version** (`src="./index.js"`).
+### Why Zero-Build?
+*   **No build step required.** No `npm run build`, Webpack, or Vite. Simply upload files and it works.
+*   **WordPress compatible.** Can be deployed to any WordPress domain by uploading to a subdirectory.
+*   **Universal hosting.** Works on any static web host (Apache, Nginx, GitHub Pages, Netlify, etc.)
+*   **Simple deployment.** Upload `.js`, `.css`, and `.html` files via FTP and you're done.
 
 ---
 
@@ -76,7 +73,7 @@ Because the production version uses a "no-build" architecture, you do not need `
 
 ## 📊 Data Management (Google Sheets)
 
-The application content is populated dynamically via CSV exports from a Google Sheet. The configuration is located in `constants.js` (for production) and `constants.ts` (for dev).
+The application content is populated dynamically via CSV exports from a Google Sheet. The configuration is located in `constants.js`.
 
 ### 1. Sheet Structure
 Your Google Sheet must have a tab with the following columns (headers are case-insensitive):
@@ -101,7 +98,7 @@ Your Google Sheet must have a tab with the following columns (headers are case-i
 4.  Click **Publish** and copy the link.
 
 ### 3. Updating Configuration
-Update `constants.js` (and `constants.ts`) with your new URL:
+Update `constants.js` with your new URL:
 
 ```javascript
 export const DATA_CONFIG = {
@@ -114,7 +111,7 @@ export const DATA_CONFIG = {
 
 To improve loading times, the application automatically caches fetched CSV data in the browser's localStorage:
 
-*   **Cache Duration:** 1 hour (configurable via `CACHE_TTL_MS` in `archiveService.js/ts`)
+*   **Cache Duration:** 1 hour (configurable via `CACHE_TTL_MS` in `archiveService.js`)
 *   **Cache Version:** Increment `CACHE_VERSION` to invalidate all existing caches
 *   **Manual Cache Clear:** Open browser console and run:
     ```javascript
@@ -135,17 +132,17 @@ To improve loading times, the application automatically caches fetched CSV data 
 
 ```text
 ├── components/
-│   ├── Explorer.js / .tsx        # Network visualization
-│   ├── FeaturedSection.js / .tsx # Carousel highlights
-│   ├── RecordModal.js / .tsx     # Detail view overlay
-│   ├── Sidebar.js / .tsx         # Filters and search
+│   ├── Explorer.js               # Network visualization
+│   ├── FeaturedSection.js        # Carousel highlights
+│   ├── RecordModal.js            # Detail view overlay
+│   ├── Sidebar.js                # Filters and search
 │   ├── DissertationPage.js       # Dissertation view container
 │   ├── MindMap.js                # Interactive mind map
 │   ├── DetailPanel.js            # Dissertation node details
 │   ├── dissertationData.js       # Full dissertation content
 │   └── ...
 ├── services/
-│   └── archiveService.js / .ts   # Data fetching & parsing
+│   └── archiveService.js         # Data fetching & parsing
 ├── comparison-tool/              # "Then and Now" comparisons
 │   ├── index.html, styles.css, script.js, data.js
 ├── glossary/                     # Interactive concept glossary
@@ -159,25 +156,23 @@ To improve loading times, the application automatically caches fetched CSV data 
 ├── faq/                          # FAQ + BYOK Chat
 │   ├── index.html, script.js, data.js, chat.html, chat.js
 ├── shared-styles.css             # Common styles for all tools
-├── App.js / .tsx                 # Main application controller
-├── constants.js / .ts            # Config (Sheet URLs, Colors)
-├── html.js                       # HTM helper (JS version only)
+├── App.js                        # Main application controller
+├── constants.js                  # Config (Sheet URLs, Colors)
+├── html.js                       # HTM helper for JSX-like syntax
 ├── index.html                    # Entry point
-└── types.ts                      # Type definitions (TS version only)
+└── index.css                     # Global styles
 ```
 
 ---
 
 ## 🛠️ Deployment
 
-### Web Hosting (FTP / Netlify / GitHub Pages)
-1.  Ensure `index.html` points to `./index.js`.
-2.  Upload **all files** (specifically `.html`, `.css`, `.js` files, and the `components/` and `services/` folders) to your web host's `public_html` directory.
+### Web Hosting (FTP / Netlify / GitHub Pages / WordPress)
+1.  Upload **all files** (`.html`, `.css`, `.js` files, and the `components/` and `services/` folders) to your web host.
+2.  For WordPress: upload to a subdirectory (e.g., `/archive/`) via FTP.
 3.  Ensure your server serves `.js` files with the MIME type `application/javascript`.
 
-### Editing in AI Studio
-1.  Edit the `.tsx` and `.ts` files.
-2.  If major logic changes are made, ensure they are ported to the matching `.js` files for production deployment.
+That's it—no build step required.
 
 ---
 
