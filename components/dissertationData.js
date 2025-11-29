@@ -1,6 +1,14 @@
 
-// Full dissertation node structure based on the Table of Contents
-// Summaries, quotes, and related records can be filled in later
+// Full dissertation node structure with rich content from the breakdown
+// Jay Rosen, Ph.D., New York University, 1986
+
+export const DISSERTATION_METADATA = {
+  author: 'Jay Rosen',
+  degree: 'Ph.D., New York University, 1986',
+  committee: 'Neil Postman (Chair), Christine Nystrom, Henry Perkinson',
+  program: 'Media Ecology, School of Education, Health, Nursing, and Arts Professions',
+  centralThesis: 'The idea that "the press informs the public" is an impoverished view of journalism that treats information as something "in" the news rather than as a relationship between people and their environment. Journalism should be understood as a transaction between producers and consumers, not merely as an activity conducted by journalists.'
+};
 
 export const DISSERTATION_NODES = [
   // ROOT
@@ -11,9 +19,10 @@ export const DISSERTATION_NODES = [
     subtitle: 'American Journalism and the Decline of Public Life',
     pageStart: 1,
     parentId: null,
-    summary: 'Jay Rosen\'s 1986 PhD dissertation exploring the decline of the "public" as a social group and the rise of the mass audience. It contrasts the democratic ideal of a "universal town meeting" with the realities of modern communication.',
-    keyConcepts: ['Public Sphere', 'Mass Society', 'Objectivity', 'Professionalism'],
-    keyFigures: ['Walter Lippmann', 'John Dewey', 'Robert Park', 'Tocqueville']
+    summary: 'A critical examination of the foundational assumption in democratic theory that "the press informs the public." Rosen argues this phrase obscures far more than it reveals, and that understanding the relationship between press and public requires examining factors that conventional press criticism ignores. The dissertation traces how modern conditions—urbanization, mass communication, professionalization—have made the classical ideal of an informed democratic public increasingly "impossible" to achieve.',
+    pullQuote: 'Journalism is not an activity conducted solely by journalists; or, to put it another way, journalism is communication and communication is something that takes place between people. It is not an action but a transaction.',
+    keyConcepts: ['Journalism as Transaction', 'Information as Relation', 'The Impossible Press', 'Scale of Democracy', 'Communication Without Community'],
+    keyFigures: ['Walter Lippmann', 'John Dewey', 'Neil Postman', 'Gabriel Tarde', 'Robert Park']
   },
 
   // INTRODUCTION
@@ -25,8 +34,9 @@ export const DISSERTATION_NODES = [
     pageStart: 5,
     pageEnd: 12,
     parentId: 'root',
-    summary: 'Sets up the central argument: journalism is not merely a profession or industry, but a transaction between press and public that shapes democratic life.',
-    keyConcepts: ['Journalism as Transaction', 'Press-Public Relationship']
+    summary: 'Establishes the central argument: the phrase "the press informs the public" obscures more than it reveals. Rosen argues that journalism must be understood as a transaction between producers and consumers, not merely as an activity conducted by journalists. The introduction sets up the dissertation\'s critique of professional journalism\'s assumptions about its democratic function.',
+    pullQuote: 'Journalism is not an activity conducted solely by journalists; or, to put it another way, journalism is communication and communication is something that takes place between people. It is not an action but a transaction.',
+    keyConcepts: ['Journalism as Transaction', 'Press-Public Relationship', 'Democratic Function of Press']
   },
 
   // PART ONE
@@ -38,8 +48,8 @@ export const DISSERTATION_NODES = [
     pageStart: 13,
     pageEnd: 197,
     parentId: 'root',
-    summary: 'Traces the historical emergence of the "public" as a political concept and social reality, examining how modern communication technologies and urban life transformed the nature of public participation.',
-    keyConcepts: ['Modern Public', 'Democratic Participation', 'Mass Communication']
+    summary: 'Examines how modern conditions challenge traditional conceptions of press and public, with particular focus on the penny press revolution of the 1830s. Traces the historical emergence of the "public" as a political concept and social reality, examining how urbanization, mass communication technologies, and the expansion of democratic participation transformed the nature of public life.',
+    keyConcepts: ['Modern Public', 'Penny Press Revolution', 'Democratic Participation', 'Mass Communication', 'Urban Society']
   },
 
   // Chapter 1
@@ -51,9 +61,10 @@ export const DISSERTATION_NODES = [
     pageStart: 13,
     pageEnd: 41,
     parentId: 'part-1',
-    summary: 'Examines the fundamental problem of scale in democracy: how can self-governance work when citizens are separated by vast distances and cannot directly deliberate together?',
-    keyConcepts: ['Democracy and Distance', 'Scale of Democracy', 'Representation'],
-    keyFigures: ['Tocqueville', 'James Gordon Bennett']
+    summary: 'News arises from distance. The need for journalism only emerges when events unfold beyond the reach of direct experience. The Romans were the first to need news because their empire extended beyond the spoken word. The American republic created a public whose scale demanded newspaper communication. Jefferson understood that an informed public was only possible in a small, self-contained community—he advocated for ward republics precisely because he knew democracy required limits on scale.',
+    pullQuote: 'News arrives from a distance. It crosses the space between individuals and events.',
+    keyConcepts: ['News as Function of Distance', 'The Imagined Community', 'Jefferson\'s Dilemma', 'Scale of Democracy', 'Ward Republics'],
+    keyFigures: ['Thomas Jefferson', 'Alexis de Tocqueville', 'James Gordon Bennett']
   },
 
   // Chapter 2
@@ -65,9 +76,10 @@ export const DISSERTATION_NODES = [
     pageStart: 42,
     pageEnd: 89,
     parentId: 'part-1',
-    summary: 'Contrasts competing conceptions of what news is and what it should do—presenting the fundamental tension between news as commodity and news as democratic resource.',
-    keyConcepts: ['News as Commodity', 'News as Democratic Resource', 'Penny Press'],
-    keyFigures: ['James Gordon Bennett', 'Joseph Pulitzer']
+    summary: 'There are fundamentally two types of news with different functions—news as information (requiring action) and news as drama (requiring only spectation). For news to function as information, three conditions must be met: structure (an ordered understanding), action (a feeling of participation), and contingency (unpredictable outcomes). The human interest story functions not as information but as drama—the journalist becomes a dramatist; the audience becomes spectators rather than participants.',
+    pullQuote: 'Information is not really "in" the items which come over the wire... It is "in" the relations between people and a changing environment.',
+    keyConcepts: ['Information vs Identification', 'News as Drama', 'Human Interest Story', 'Sensationalism', 'Three Conditions for Information'],
+    keyFigures: ['James Gordon Bennett', 'Joseph Pulitzer', 'Roland Barthes']
   },
 
   // Chapter 3
@@ -79,9 +91,10 @@ export const DISSERTATION_NODES = [
     pageStart: 90,
     pageEnd: 116,
     parentId: 'part-1',
-    summary: 'Explores the idealistic vision of mass media as a "universal town meeting" that could unite dispersed citizens in common deliberation, and why this vision proved impossible.',
-    keyConcepts: ['Universal Town Meeting', 'Public Sphere', 'Democratic Ideal'],
-    keyFigures: ['Tocqueville']
+    summary: 'The telegraph and penny press inspired utopian visions of democracy restored—a "universal town meeting"—but these visions ignored fundamental problems with extending communication across distances where no genuine community existed. Each new communication technology inspired hopes that it would restore the scale of democratic participation possible in small communities.',
+    pullQuote: 'Improvements in communication also make communication more difficult because they ensure that there will be more to communicate about.',
+    keyConcepts: ['Technological Utopianism', 'Universal Town Meeting', 'Communication Paradox', 'Thoreau\'s Skepticism'],
+    keyFigures: ['Henry David Thoreau', 'Alexis de Tocqueville']
   },
 
   // Chapter 4
@@ -93,9 +106,10 @@ export const DISSERTATION_NODES = [
     pageStart: 117,
     pageEnd: 151,
     parentId: 'part-1',
-    summary: 'Analyzes the sociological distinction between crowds and publics, tracing how early social scientists understood the transformation of collective behavior in modern society.',
-    keyConcepts: ['Crowd Psychology', 'Public Formation', 'Mass Society'],
-    keyFigures: ['Robert Park', 'Gabriel Tarde']
+    summary: 'The mass circulation newspaper created a new kind of social body—neither a traditional community nor merely a crowd—with ambiguous properties that alarmed social theorists. The public is the social body that emerges from the newspaper form. As a way of tying people together the newspaper has a dissolving as well as a connecting tendency—it weakens local ties while creating abstract, unstable bonds.',
+    pullQuote: 'As a way of tying people together the newspaper has a dissolving as well as a connecting tendency.',
+    keyConcepts: ['Crowd Psychology', 'Public Formation', 'Mass Circulation', 'Stable vs Unstable Publics', 'Communication Outruns Community'],
+    keyFigures: ['Gabriel Tarde', 'Gustave Le Bon', 'Robert Park']
   },
 
   // Chapter 5
@@ -107,9 +121,10 @@ export const DISSERTATION_NODES = [
     pageStart: 152,
     pageEnd: 197,
     parentId: 'part-1',
-    summary: 'Examines the paradox of modern communication: technologies that connect us across distances may actually undermine the local communities necessary for genuine public life.',
-    keyConcepts: ['Communication vs Community', 'Media Effects', 'Social Isolation'],
-    keyFigures: ['Robert Park', 'John Dewey']
+    summary: 'The modern public is gathered together without actually meeting—a fundamental fact that changes the nature of public life and the function of the press. Our system of communication is not addressed at the public but at private individuals. We have evolved a radical form of mobilized privacy: the individual hooked into long lines of communication from remote sources. The press begins to structure events according to its own demands—drama, conflict, brevity, consumability.',
+    pullQuote: 'Our system of communication is not addressed at the public but at private individuals. We have evolved a radical form of mobilized privacy: the individual hooked into long lines of communication from remote sources.',
+    keyConcepts: ['Public Transmission Private Reception', 'Mobilized Privacy', 'Attention Economy', 'The Front Page', 'Eclipse of Content'],
+    keyFigures: ['Robert Park', 'John Dewey', 'Hannah Arendt', 'Richard Sennett']
   },
 
   // PART TWO
@@ -121,8 +136,8 @@ export const DISSERTATION_NODES = [
     pageStart: 198,
     pageEnd: 373,
     parentId: 'root',
-    summary: 'Analyzes how the professionalization of journalism created new relationships between press and public, and how this transformation both enabled and constrained democratic participation.',
-    keyConcepts: ['Professionalization', 'Journalistic Authority', 'Press-Public Relations']
+    summary: 'Analyzes the professional attitude journalism developed in the twentieth century and contrasts it with the critiques offered by Walter Lippmann and John Dewey. Examines how the professionalization of journalism after 1900 was an attempt to reconcile the contradiction between journalism as a business and journalism as a public service.',
+    keyConcepts: ['Professionalization', 'Objectivity', 'Yellow Journalism Crisis', 'Press Criticism Golden Age']
   },
 
   // Chapter 6
@@ -134,10 +149,10 @@ export const DISSERTATION_NODES = [
     pageStart: 198,
     pageEnd: 267,
     parentId: 'part-2',
-    summary: 'The titular chapter argues that the press was given an impossible task: to create an informed citizenry capable of self-governance through objective reporting alone.',
-    keyConcepts: ['Impossible Press', 'Objectivity', 'Informed Citizenry', 'Professional Journalism'],
-    keyFigures: ['Walter Lippmann'],
-    pullQuote: 'An impossible press was born, one which sought to solve the whole problem of public life simply by controlling the conduct of journalists.'
+    summary: 'The titular chapter argues that the professionalization of journalism after 1900 was an attempt to reconcile the contradiction between journalism as a business and journalism as a public service—but the professional attitude obscured fundamental problems in the relationship between press and public. Yellow journalism put a sharper edge on the conflict between private profits and public duties. Professional standards (objectivity, accuracy, fairness, completeness) became the standards journalists adopted to prove their public responsibility, but they assume too much and ignore fundamental questions about what a public is.',
+    pullQuote: 'An impossible press was born, one which sought to solve the whole problem of public life simply by controlling the conduct of journalists.',
+    keyConcepts: ['The Impossible Press', 'Professional Standards', 'Yellow Journalism Crisis', 'Public as Abstraction', 'First Amendment Battles'],
+    keyFigures: ['Walter Lippmann', 'Joseph Pulitzer', 'William Randolph Hearst']
   },
 
   // Chapter 7
@@ -149,9 +164,10 @@ export const DISSERTATION_NODES = [
     pageStart: 268,
     pageEnd: 329,
     parentId: 'part-2',
-    summary: 'Critiques the assumption underlying much democratic theory: that citizens can and should be informed about all public matters. Traces how Lippmann demolished this myth.',
-    keyConcepts: ['Omnicompetent Citizen', 'Democratic Theory', 'Public Opinion', 'Expertise'],
-    keyFigures: ['Walter Lippmann', 'John Dewey']
+    summary: 'Lippmann was the first to recognize that the classical democratic ideal of the informed citizen was incompatible with modern conditions. People respond not to the world itself but to "pictures in their heads"—representations that may have little to do with reality. The stereotype is a form of perception that works from private belief toward reality: we define first and then see. The expectation that average citizens can have informed opinions on all public questions is "entirely unworkable."',
+    pullQuote: 'One could free all the facts in the world and still not be informing the public, for the important question was not what was released into the environment, but what took shape in the beliefs and behavior of the average citizen.',
+    keyConcepts: ['Pseudo-environment', 'Stereotypes', 'Omnicompetence Myth', 'Manufacture of Consent', 'Pictures in Our Heads'],
+    keyFigures: ['Walter Lippmann', 'Thomas Jefferson']
   },
 
   // Chapter 8
@@ -163,8 +179,9 @@ export const DISSERTATION_NODES = [
     pageStart: 330,
     pageEnd: 373,
     parentId: 'part-2',
-    summary: 'Presents Dewey\'s response to Lippmann: the public must be actively formed through communication and inquiry, not merely informed through journalism.',
-    keyConcepts: ['Public Formation', 'Dewey vs Lippmann', 'Democratic Communication', 'Inquiry'],
+    summary: 'Dewey agreed with Lippmann\'s diagnosis but rejected his elitist solution, arguing instead for the reconstruction of community as the basis for a revitalized public. There is no public out there waiting to be informed—a public is something that must be created through shared understanding of common problems. Communication is an art: seeds are sown not by being thrown out at random, but by being distributed to take root and grow. Till the Great Society is converted into a Great Community, the Public will remain in eclipse.',
+    pullQuote: 'Seeds are sown not by being thrown out at random, but by being so distributed as to take root and have a chance of growth.',
+    keyConcepts: ['Public Must Be Formed', 'Communication as Art', 'Great Community', 'Journalism and Propaganda', 'Sowing Seeds Model'],
     keyFigures: ['John Dewey', 'Walter Lippmann']
   },
 
@@ -177,8 +194,70 @@ export const DISSERTATION_NODES = [
     pageStart: 374,
     pageEnd: 415,
     parentId: 'root',
-    summary: 'Proposes an "ecological" understanding of the press-public relationship that moves beyond the impossible demands of objectivity toward a more realistic and democratic vision.',
-    keyConcepts: ['Ecological View', 'Press Reform', 'Democratic Future']
+    summary: 'Proposes an "ecological" understanding of the press-public relationship. Identifies five factors that must be inserted between "press" and "public" for an adequate understanding: (1) the size and scale of the world to be informed about, (2) the character of the social bond among audience members, (3) structural characteristics of mass media, (4) the nature of language and symbols, and (5) the professional attitude. The most important finding is that the professional attitude is a very limited view of press and public.',
+    pullQuote: 'Presenting "all the news" is therefore an impossible goal, and the press that avows it can only be an impossible press.',
+    keyConcepts: ['Ecological View', 'Five Factors', 'Scale Problem', 'Social Bond', 'Structural Characteristics', 'Language Bias', 'Professional Attitude Limits'],
+    keyFigures: ['Neil Postman', 'Harold Innis', 'Marshall McLuhan', 'James Carey']
+  }
+];
+
+// Notable quotations for the archive
+export const NOTABLE_QUOTATIONS = [
+  {
+    quote: 'Journalism is not an activity conducted solely by journalists; or, to put it another way, journalism is communication and communication is something that takes place between people. It is not an action but a transaction.',
+    context: 'Central thesis of the dissertation'
+  },
+  {
+    quote: 'Information is not really "in" the items which come over the wire and make their way into the newspaper. It is "in" the relations between people and a changing environment.',
+    context: 'On the relational nature of information'
+  },
+  {
+    quote: 'Sensationalism is not a perverse appetite for the crude and spectacular, but the increasing difficulty of interesting a population which does not act on its world in a way which requires a constant supply of fresh information.',
+    context: 'Explaining sensationalism'
+  },
+  {
+    quote: 'For any press anywhere, making things public does not a public make.',
+    context: 'On the limits of publicity'
+  },
+  {
+    quote: 'Presenting "all the news" is therefore an impossible goal, and the press that avows it can only be an impossible press.',
+    context: 'On the impossibility of comprehensive coverage'
+  },
+  {
+    quote: 'The same conditions which make citizens dependent on the press for information have other consequences as well... It is no accident that the beginning of professional propaganda began with the beginnings of professional journalism.',
+    context: 'On propaganda and journalism'
+  }
+];
+
+// Key recurring themes
+export const KEY_THEMES = [
+  {
+    theme: 'Journalism as transaction, not action',
+    description: 'The meaning of journalism lies not in what journalists do but in what happens between journalists and their audiences.'
+  },
+  {
+    theme: 'Information is relational',
+    description: 'Information is not "in" the news but "in" the relationship between people and their changing environment.'
+  },
+  {
+    theme: 'The impossibility of the informed citizen',
+    description: 'Modern conditions make the classical democratic ideal of the generally competent, naturally informed citizen impossible to achieve.'
+  },
+  {
+    theme: 'Scale matters',
+    description: 'Democratic theory was developed for small, self-contained communities; extending it to a continental republic creates problems the press cannot solve.'
+  },
+  {
+    theme: 'Communication does not equal community',
+    description: 'Linking people through media does not create the conditions for genuine public life.'
+  },
+  {
+    theme: 'The competition for attention transforms public life',
+    description: 'When attention must be gained rather than granted, the content of public discourse is eclipsed by the struggle to be heard.'
+  },
+  {
+    theme: 'The professional attitude obscures fundamental problems',
+    description: 'By focusing exclusively on accuracy and fairness, journalism criticism misses the structural factors that determine whether the press can inform the public.'
   }
 ];
 
