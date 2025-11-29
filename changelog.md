@@ -3,12 +3,41 @@
 
 *Session Date: November 29, 2025*
 
-## "Then and Now" Comparison Tool
-- **New Standalone Tool:** Created `/comparison-tool/` directory containing a self-contained static site for presenting dissertation insights alongside 2025 realities
-- **7 Core Comparisons:** Attention Economy, Pseudo-Environment, Communication Without Community, News as Drama, Technological Utopianism, The Impossible Press, Making Things Public
-- **Features:** Side-by-side responsive layout, scroll-based animations, navigation dots, keyboard navigation (j/k or arrow keys), mobile-optimized
-- **Design:** Matches archive theme (Roboto Mono, Special Elite fonts, paper texture background, Tailwind CSS)
-- **Deployment:** Zero-build static files for FTP upload to WordPress domain
+## Dissertation Presentation Tools Suite
+
+### "Then and Now" Comparison Tool (`/comparison-tool/`)
+- Side-by-side presentation of 1986 dissertation insights alongside 2025 realities
+- 7 core comparisons: Attention Economy, Pseudo-Environment, Communication Without Community, News as Drama, Technological Utopianism, The Impossible Press, Making Things Public
+- Scroll-based animations, navigation dots, keyboard navigation (j/k or arrow keys)
+
+### Glossary (`/glossary/`)
+- Interactive visual glossary of 16 key concepts from the dissertation
+- Filterable by category: How We Know, The Public, Press Criticism, Structural Forces
+- Click-to-expand detail panel with definitions, quotes, contemporary relevance
+- Key figures section: Lippmann, Dewey, Postman, Park
+
+### 1986 in Journalism (`/context-1986/`)
+- Historical context: media landscape when dissertation was written
+- 6 detailed sections: Broadcast Dominance, Cable Rising, Print Still Strong, No Internet, Reagan Era, Journalism's Professional Peak
+- "What Didn't Exist" section highlighting technologies invented after 1986
+- Key events of 1986 with media significance
+
+### Timeline (`/timeline/`)
+- Visual timeline from 1986 to 2025 showing intellectual evolution
+- 14 entries covering milestones, publications, key concepts, career events
+- Filterable by type (milestone, publication, concept, career, period)
+- Recurring themes section showing continuity across decades
+
+### Annotated Excerpts (`/annotated-excerpts/`)
+- 12 key passages with full annotation
+- Each excerpt includes: original text, 1986 context, 2025 reflection (placeholder for Jay), contemporary example, connection to later work
+- Filterable by tags: Foundational, Prescient, Epistemology, Public Sphere
+- Navigation dots and keyboard navigation
+
+### Shared Infrastructure
+- Created `shared-styles.css` for consistent styling across all tools
+- All tools: zero-build static files for FTP upload to WordPress
+- All tools match archive theme (Roboto Mono, Special Elite, paper texture)
 
 ---
 

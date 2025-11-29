@@ -39,7 +39,11 @@ This project is unique in that it maintains **two paired versions** of the appli
 
 ### 📜 Dissertation Presentation Tools
 *   **Interactive Mind Map:** Tree-structured visualization of the 1986 dissertation's chapters and key arguments.
-*   **"Then and Now" Comparison Tool:** Side-by-side presentation of 1986 dissertation insights alongside 2025 media realities. Located in `/comparison-tool/` as a standalone static site for WordPress deployment.
+*   **"Then and Now" Comparison Tool:** Side-by-side presentation of 1986 dissertation insights alongside 2025 media realities. (`/comparison-tool/`)
+*   **Glossary:** Interactive visual glossary of key concepts with definitions, connections, and contemporary relevance. (`/glossary/`)
+*   **1986 in Journalism:** Historical context page showing the media landscape when the dissertation was written. (`/context-1986/`)
+*   **Timeline:** Visual timeline tracing how dissertation ideas evolved through 40 years of work. (`/timeline/`)
+*   **Annotated Excerpts:** Key passages with original context, 2025 reflections, and contemporary examples. (`/annotated-excerpts/`)
 
 ---
 
@@ -141,11 +145,17 @@ To improve loading times, the application automatically caches fetched CSV data 
 │   └── ...
 ├── services/
 │   └── archiveService.js / .ts   # Data fetching & parsing
-├── comparison-tool/              # Standalone "Then and Now" tool
-│   ├── index.html                # Entry point
-│   ├── styles.css                # Styling (matches archive theme)
-│   ├── script.js                 # Interactivity
-│   └── data.js                   # Comparison content
+├── comparison-tool/              # "Then and Now" comparisons
+│   ├── index.html, styles.css, script.js, data.js
+├── glossary/                     # Interactive concept glossary
+│   ├── index.html, script.js, data.js
+├── context-1986/                 # Historical context
+│   ├── index.html, script.js, data.js
+├── timeline/                     # Dissertation → later work timeline
+│   ├── index.html, script.js, data.js
+├── annotated-excerpts/           # Key passages with commentary
+│   ├── index.html, script.js, data.js
+├── shared-styles.css             # Common styles for all tools
 ├── App.js / .tsx                 # Main application controller
 ├── constants.js / .ts            # Config (Sheet URLs, Colors)
 ├── html.js                       # HTM helper (JS version only)

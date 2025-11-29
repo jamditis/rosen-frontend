@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>1986 in Journalism | The Impossible Press</title>
+    <meta name="description" content="The media landscape when Jay Rosen wrote The Impossible Press." />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              body: ['"Roboto Mono"', 'monospace'],
+              display: ['"Special Elite"', 'cursive'],
+            },
+            colors: {
+              paper: '#fdfbf7',
+            }
+          }
+        }
+      }
+    </script>
+
+    <link rel="stylesheet" href="../shared-styles.css" />
+  </head>
+
+  <body class="antialiased font-body text-stone-900 min-h-screen bg-paper">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-paper/95 backdrop-blur-sm border-b border-stone-200">
+      <div class="max-w-5xl mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="font-display text-xl md:text-2xl text-stone-850">1986 in Journalism</h1>
+            <p class="text-xs text-stone-500 mt-1">The World That Wrote The Impossible Press</p>
+          </div>
+          <a href="https://drive.google.com/file/d/14sIj3nYzOaV_CRHLMRvbgv9EcYbCsp4L/view"
+             target="_blank"
+             class="text-xs bg-stone-800 text-white px-3 py-1.5 rounded hover:bg-stone-700 transition-colors">
+            Read Dissertation
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="py-16 px-4 text-center border-b border-stone-200">
+      <div class="max-w-3xl mx-auto">
+        <div class="year-marker mx-auto mb-6 text-3xl w-20 h-20">1986</div>
+        <h2 class="font-display text-2xl md:text-3xl text-stone-850 mb-4">
+          The Media Landscape When It Was Written
+        </h2>
+        <p class="text-stone-600 leading-relaxed">
+          To understand the dissertation's arguments, it helps to understand the media environment in which they were made.
+          1986 was a pivotal moment: the broadcast era was at its peak, cable was rising, and the digital revolution was still a decade away.
+        </p>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="max-w-5xl mx-auto px-4 py-12">
+      <!-- Media Landscape -->
+      <section id="landscape" class="mb-16">
+        <h2 class="font-display text-2xl text-stone-850 mb-8">The Media Landscape</h2>
+        <div id="landscape-grid" class="grid gap-6 md:grid-cols-2">
+          <!-- Populated by JavaScript -->
+        </div>
+      </section>
+
+      <!-- What Didn't Exist -->
+      <section id="didnt-exist" class="mb-16 py-12 px-8 bg-stone-100 rounded-lg -mx-4 md:mx-0">
+        <h2 class="font-display text-2xl text-stone-850 mb-4">What Didn't Exist</h2>
+        <p class="text-stone-600 mb-8">Technologies and media forms that would transform journalism — none existed when the dissertation was written.</p>
+        <div id="didnt-exist-grid" class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <!-- Populated by JavaScript -->
+        </div>
+      </section>
+
+      <!-- Key Events -->
+      <section id="events" class="mb-16">
+        <h2 class="font-display text-2xl text-stone-850 mb-8">Key Events of 1986</h2>
+        <div id="events-list" class="space-y-4">
+          <!-- Populated by JavaScript -->
+        </div>
+      </section>
+
+      <!-- Dissertation Context -->
+      <section id="context" class="mb-16">
+        <h2 class="font-display text-2xl text-stone-850 mb-8">The Dissertation's Context</h2>
+        <div id="context-content" class="card p-8">
+          <!-- Populated by JavaScript -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 bg-stone-100 border-t border-stone-200">
+      <div class="max-w-4xl mx-auto text-center">
+        <p class="text-sm text-stone-600 mb-4">
+          From <span class="font-display">The Impossible Press</span> by Jay Rosen
+        </p>
+        <p class="text-xs text-stone-500">
+          Ph.D. Dissertation, New York University, 1986
+        </p>
+      </div>
+    </footer>
+
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>

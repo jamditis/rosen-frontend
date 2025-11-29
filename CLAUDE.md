@@ -74,12 +74,22 @@ The `index.html` loads the JS version. When editing, ensure changes are reflecte
 ├── services/
 │   └── archiveService.js         # Data fetching, parsing, caching
 │
-├── comparison-tool/              # Standalone "Then and Now" tool
-│   ├── index.html                # Self-contained entry point
-│   ├── styles.css                # Styling (matches main theme)
-│   ├── script.js                 # Interactivity
-│   └── data.js                   # 7 comparison entries
+├── comparison-tool/              # "Then and Now" 1986 vs 2025 comparisons
+│   ├── index.html, styles.css, script.js, data.js
 │
+├── glossary/                     # Interactive concept glossary
+│   ├── index.html, script.js, data.js (16 concepts, 4 key figures)
+│
+├── context-1986/                 # Historical context page
+│   ├── index.html, script.js, data.js (media landscape, what didn't exist)
+│
+├── timeline/                     # Dissertation → later work timeline
+│   ├── index.html, script.js, data.js (14 entries, 1986-2025)
+│
+├── annotated-excerpts/           # Key passages with commentary
+│   ├── index.html, script.js, data.js (12 excerpts)
+│
+├── shared-styles.css             # Common CSS for all standalone tools
 ├── README.md                     # User documentation
 ├── changelog.md                  # Development history
 └── CLAUDE.md                     # This file
@@ -212,23 +222,23 @@ npx serve .
 The dissertation is being released publicly with multiple presentation formats:
 
 ### Implemented
-1. **Interactive Mind Map** - Tree visualization of dissertation structure
-2. **"Then and Now" Comparison Tool** - 7 side-by-side 1986 vs 2025 comparisons
+1. **Interactive Mind Map** - Tree visualization of dissertation structure (in main archive)
+2. **"Then and Now" Comparison Tool** - 7 side-by-side 1986 vs 2025 comparisons (`/comparison-tool/`)
+3. **Glossary** - 16 key concepts, filterable, with detail panel (`/glossary/`)
+4. **1986 in Journalism** - Historical context, media landscape, what didn't exist (`/context-1986/`)
+5. **Timeline** - 14 entries from dissertation to 2025, filterable by type (`/timeline/`)
+6. **Annotated Excerpts** - 12 key passages with 2025 commentary (`/annotated-excerpts/`)
 
-### Planned (assess feasibility and build as needed)
-3. Annotated excerpts with 2025 commentary
-4. Timeline connecting dissertation to later work
-5. Audio commentary / office hours
-6. "What I got wrong" essay
-7. "The chapter I'd add today" essay
-8. Glossary as standalone explainer
-9. Reading group format with discussion prompts
-10. Collaborative annotation (Hypothesis integration)
-11. "The dissertation in context" archival package
-12. AI-powered Q&A agent trained on dissertation
-13. And more...
+### Under Discussion
+7. **AI-powered Q&A agent** - Claude-based interface for querying dissertation content
 
-See the full list of 25 presentation ideas in the project documentation.
+### Planned (requires external content/production)
+8. Audio commentary / office hours (requires Jay to record)
+9. "What I got wrong" essay (requires Jay to write)
+10. "The chapter I'd add today" essay (requires Jay to write)
+11. Reading group format with discussion prompts
+12. Collaborative annotation (Hypothesis integration)
+13. Video essay (requires video production)
 
 ---
 
