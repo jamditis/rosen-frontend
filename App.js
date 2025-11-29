@@ -1,7 +1,7 @@
 
 import { useEffect, useState, useMemo, useRef } from 'react';
 import { html } from './html.js';
-import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network } from 'lucide-react';
+import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network, BookOpen } from 'lucide-react';
 import { fetchArchiveData, hashString } from './services/archiveService.js';
 import { ITEMS_PER_PAGE, COLORS } from './constants.js';
 import Sidebar from './components/Sidebar.js';
@@ -10,6 +10,7 @@ import RecordModal from './components/RecordModal.js';
 import FeaturedSection from './components/FeaturedSection.js';
 import Timeline from './components/Timeline.js';
 import Explorer from './components/Explorer.js';
+import DissertationPage from './components/DissertationPage.js';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
@@ -35,6 +36,7 @@ const App = () => {
   const [sortBy, setSortBy] = useState('date-desc');
   const [isScrolled, setIsScrolled] = useState(false);
   const [selectedRecordId, setSelectedRecordId] = useState(null);
+  const [currentView, setCurrentView] = useState('archive'); // 'archive' or 'dissertation'
 
   const [filters, setFilters] = useState({
     search: '',
@@ -48,6 +50,33 @@ const App = () => {
   // Ref for scrolling to results
   const resultsRef = useRef(null);
   const recordsRef = useRef(null);
+
+  // Check URL for view param on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const viewParam = params.get('view');
+    if (viewParam === 'dissertation') {
+      setCurrentView('dissertation');
+    }
+  }, []);
+
+  // Update URL when view changes
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (currentView === 'dissertation') {
+      url.searchParams.set('view', 'dissertation');
+      url.searchParams.delete('record');
+    } else {
+      url.searchParams.delete('view');
+    }
+    try {
+      window.history.pushState({}, '', url);
+    } catch(e) { console.warn("History update blocked"); }
+  }, [currentView]);
+
+  // Navigation handlers
+  const navigateToDissertation = () => setCurrentView('dissertation');
+  const navigateToArchive = () => setCurrentView('archive');
 
   // Load Data
   useEffect(() => {
@@ -210,6 +239,11 @@ const App = () => {
   
   const isExplorer = viewMode === 'explorer';
 
+  // If viewing dissertation, render the dissertation page
+  if (currentView === 'dissertation') {
+    return html`<${DissertationPage} onBack=${navigateToArchive} />`;
+  }
+
   return html`
     <div className="min-h-screen flex flex-col">
       <${WelcomeModal} />
@@ -256,13 +290,21 @@ const App = () => {
                 </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
+                <!-- Dissertation Link -->
+                <button
+                  onClick=${navigateToDissertation}
+                  className="flex items-center gap-2 text-stone-600 hover:text-stone-900 transition-colors text-xs border border-stone-200 px-3 py-1.5 hover:border-stone-300 hidden sm:flex"
+                >
+                    <${BookOpen} className="w-3.5 h-3.5" />
+                    <span>1986 Dissertation</span>
+                </button>
                 <a href="https://twitter.com/jsamditis" target="_blank" rel="noreferrer" className="text-stone-500 hover:text-stone-900 transition-colors text-xs hidden md:inline-block">
                     Curated by Joe Amditis
                 </a>
                 ${!isExplorer && html`
-                    <button 
-                    onClick=${() => setSidebarOpen(true)} 
+                    <button
+                    onClick=${() => setSidebarOpen(true)}
                     className="lg:hidden p-2 text-stone-800 hover:bg-stone-100 rounded-md border border-stone-300"
                     >
                         <${SlidersHorizontal} className="w-5 h-5" />
