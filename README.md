@@ -44,6 +44,7 @@ This project is unique in that it maintains **two paired versions** of the appli
 *   **1986 in Journalism:** Historical context page showing the media landscape when the dissertation was written. (`/context-1986/`)
 *   **Timeline:** Visual timeline tracing how dissertation ideas evolved through 40 years of work. (`/timeline/`)
 *   **Annotated Excerpts:** Key passages with original context, 2025 reflections, and contemporary examples. (`/annotated-excerpts/`)
+*   **FAQ / Ask the Dissertation:** Searchable Q&A database with 25+ pre-generated answers, plus BYOK (Bring Your Own Key) Claude chat. (`/faq/`)
 
 ---
 
@@ -155,6 +156,8 @@ To improve loading times, the application automatically caches fetched CSV data 
 │   ├── index.html, script.js, data.js
 ├── annotated-excerpts/           # Key passages with commentary
 │   ├── index.html, script.js, data.js
+├── faq/                          # FAQ + BYOK Chat
+│   ├── index.html, script.js, data.js, chat.html, chat.js
 ├── shared-styles.css             # Common styles for all tools
 ├── App.js / .tsx                 # Main application controller
 ├── constants.js / .ts            # Config (Sheet URLs, Colors)

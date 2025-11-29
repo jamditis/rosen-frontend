@@ -34,6 +34,18 @@
 - Filterable by tags: Foundational, Prescient, Epistemology, Public Sphere
 - Navigation dots and keyboard navigation
 
+### FAQ / Ask the Dissertation (`/faq/`)
+- 25+ pre-generated Q&A pairs covering basics, concepts, arguments, key thinkers, contemporary relevance
+- Searchable and filterable by category
+- Links to NotebookLM for deeper exploration
+- BYOK (Bring Your Own Key) option for interactive Claude chat
+
+### BYOK Chat Interface (`/faq/chat.html`)
+- Interactive chat with Claude using user's own API key
+- API key stored locally in browser, never transmitted to our servers
+- System prompt includes full dissertation context and key concepts
+- Conversation history maintained during session
+
 ### Shared Infrastructure
 - Created `shared-styles.css` for consistent styling across all tools
 - All tools: zero-build static files for FTP upload to WordPress

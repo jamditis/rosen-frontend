@@ -89,6 +89,10 @@ The `index.html` loads the JS version. When editing, ensure changes are reflecte
 ├── annotated-excerpts/           # Key passages with commentary
 │   ├── index.html, script.js, data.js (12 excerpts)
 │
+├── faq/                          # FAQ + BYOK Chat interface
+│   ├── index.html, script.js, data.js (25+ Q&A pairs)
+│   ├── chat.html, chat.js (BYOK Claude chat)
+│
 ├── shared-styles.css             # Common CSS for all standalone tools
 ├── README.md                     # User documentation
 ├── changelog.md                  # Development history
@@ -228,17 +232,16 @@ The dissertation is being released publicly with multiple presentation formats:
 4. **1986 in Journalism** - Historical context, media landscape, what didn't exist (`/context-1986/`)
 5. **Timeline** - 14 entries from dissertation to 2025, filterable by type (`/timeline/`)
 6. **Annotated Excerpts** - 12 key passages with 2025 commentary (`/annotated-excerpts/`)
-
-### Under Discussion
-7. **AI-powered Q&A agent** - Claude-based interface for querying dissertation content
+7. **FAQ / Ask the Dissertation** - 25+ pre-generated Q&A pairs, searchable (`/faq/`)
+8. **BYOK Chat Interface** - Interactive Claude chat using user's own API key (`/faq/chat.html`)
 
 ### Planned (requires external content/production)
-8. Audio commentary / office hours (requires Jay to record)
-9. "What I got wrong" essay (requires Jay to write)
-10. "The chapter I'd add today" essay (requires Jay to write)
-11. Reading group format with discussion prompts
-12. Collaborative annotation (Hypothesis integration)
-13. Video essay (requires video production)
+9. Audio commentary / office hours (requires Jay to record)
+10. "What I got wrong" essay (requires Jay to write)
+11. "The chapter I'd add today" essay (requires Jay to write)
+12. Reading group format with discussion prompts
+13. Collaborative annotation (Hypothesis integration)
+14. Video essay (requires video production)
 
 ---
 
