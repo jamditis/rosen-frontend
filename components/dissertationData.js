@@ -1,14 +1,8 @@
-import { MindMapNodeData } from '../MindMap/types';
 
 // Full dissertation node structure based on the Table of Contents
 // Summaries, quotes, and related records can be filled in later
 
-export interface DissertationNodeConfig extends MindMapNodeData {
-  parentId: string | null;
-  childIds: string[];
-}
-
-export const DISSERTATION_NODES: DissertationNodeConfig[] = [
+export const DISSERTATION_NODES = [
   // ROOT
   {
     id: 'root',
@@ -17,7 +11,6 @@ export const DISSERTATION_NODES: DissertationNodeConfig[] = [
     subtitle: 'American Journalism and the Decline of Public Life',
     pageStart: 1,
     parentId: null,
-    childIds: ['intro', 'part-1', 'part-2', 'conclusion'],
     summary: 'Jay Rosen\'s 1986 PhD dissertation exploring the decline of the "public" as a social group and the rise of the mass audience. It contrasts the democratic ideal of a "universal town meeting" with the realities of modern communication.',
     keyConcepts: ['Public Sphere', 'Mass Society', 'Objectivity', 'Professionalism'],
     keyFigures: ['Walter Lippmann', 'John Dewey', 'Robert Park', 'Tocqueville']
@@ -32,9 +25,7 @@ export const DISSERTATION_NODES: DissertationNodeConfig[] = [
     pageStart: 5,
     pageEnd: 12,
     parentId: 'root',
-    childIds: [],
     summary: 'Sets up the central argument: journalism is not merely a profession or industry, but a transaction between press and public that shapes democratic life.',
-    pullQuote: undefined, // To be filled in
     keyConcepts: ['Journalism as Transaction', 'Press-Public Relationship']
   },
 
@@ -47,7 +38,6 @@ export const DISSERTATION_NODES: DissertationNodeConfig[] = [
     pageStart: 13,
     pageEnd: 197,
     parentId: 'root',
-    childIds: ['ch-1', 'ch-2', 'ch-3', 'ch-4', 'ch-5'],
     summary: 'Traces the historical emergence of the "public" as a political concept and social reality, examining how modern communication technologies and urban life transformed the nature of public participation.',
     keyConcepts: ['Modern Public', 'Democratic Participation', 'Mass Communication']
   },
@@ -61,11 +51,9 @@ export const DISSERTATION_NODES: DissertationNodeConfig[] = [
     pageStart: 13,
     pageEnd: 41,
     parentId: 'part-1',
-    childIds: [],
     summary: 'Examines the fundamental problem of scale in democracy: how can self-governance work when citizens are separated by vast distances and cannot directly deliberate together?',
     keyConcepts: ['Democracy and Distance', 'Scale of Democracy', 'Representation'],
-    keyFigures: ['Tocqueville', 'James Gordon Bennett'],
-    pullQuote: undefined // To be filled in
+    keyFigures: ['Tocqueville', 'James Gordon Bennett']
   },
 
   // Chapter 2
@@ -77,11 +65,9 @@ export const DISSERTATION_NODES: DissertationNodeConfig[] = [
     pageStart: 42,
     pageEnd: 89,
     parentId: 'part-1',
-    childIds: [],
     summary: 'Contrasts competing conceptions of what news is and what it should do—presenting the fundamental tension between news as commodity and news as democratic resource.',
     keyConcepts: ['News as Commodity', 'News as Democratic Resource', 'Penny Press'],
-    keyFigures: ['James Gordon Bennett', 'Joseph Pulitzer'],
-    pullQuote: undefined
+    keyFigures: ['James Gordon Bennett', 'Joseph Pulitzer']
   },
 
   // Chapter 3
@@ -93,11 +79,9 @@ export const DISSERTATION_NODES: DissertationNodeConfig[] = [
     pageStart: 90,
     pageEnd: 116,
     parentId: 'part-1',
-    childIds: [],
     summary: 'Explores the idealistic vision of mass media as a "universal town meeting" that could unite dispersed citizens in common deliberation, and why this vision proved impossible.',
     keyConcepts: ['Universal Town Meeting', 'Public Sphere', 'Democratic Ideal'],
-    keyFigures: ['Tocqueville'],
-    pullQuote: undefined
+    keyFigures: ['Tocqueville']
   },
 
   // Chapter 4
@@ -109,11 +93,9 @@ export const DISSERTATION_NODES: DissertationNodeConfig[] = [
     pageStart: 117,
     pageEnd: 151,
     parentId: 'part-1',
-    childIds: [],
     summary: 'Analyzes the sociological distinction between crowds and publics, tracing how early social scientists understood the transformation of collective behavior in modern society.',
     keyConcepts: ['Crowd Psychology', 'Public Formation', 'Mass Society'],
-    keyFigures: ['Robert Park', 'Gabriel Tarde'],
-    pullQuote: undefined
+    keyFigures: ['Robert Park', 'Gabriel Tarde']
   },
 
   // Chapter 5
@@ -125,11 +107,9 @@ export const DISSERTATION_NODES: DissertationNodeConfig[] = [
     pageStart: 152,
     pageEnd: 197,
     parentId: 'part-1',
-    childIds: [],
     summary: 'Examines the paradox of modern communication: technologies that connect us across distances may actually undermine the local communities necessary for genuine public life.',
     keyConcepts: ['Communication vs Community', 'Media Effects', 'Social Isolation'],
-    keyFigures: ['Robert Park', 'John Dewey'],
-    pullQuote: undefined
+    keyFigures: ['Robert Park', 'John Dewey']
   },
 
   // PART TWO
@@ -141,7 +121,6 @@ export const DISSERTATION_NODES: DissertationNodeConfig[] = [
     pageStart: 198,
     pageEnd: 373,
     parentId: 'root',
-    childIds: ['ch-6', 'ch-7', 'ch-8'],
     summary: 'Analyzes how the professionalization of journalism created new relationships between press and public, and how this transformation both enabled and constrained democratic participation.',
     keyConcepts: ['Professionalization', 'Journalistic Authority', 'Press-Public Relations']
   },
@@ -155,7 +134,6 @@ export const DISSERTATION_NODES: DissertationNodeConfig[] = [
     pageStart: 198,
     pageEnd: 267,
     parentId: 'part-2',
-    childIds: [],
     summary: 'The titular chapter argues that the press was given an impossible task: to create an informed citizenry capable of self-governance through objective reporting alone.',
     keyConcepts: ['Impossible Press', 'Objectivity', 'Informed Citizenry', 'Professional Journalism'],
     keyFigures: ['Walter Lippmann'],
@@ -171,11 +149,9 @@ export const DISSERTATION_NODES: DissertationNodeConfig[] = [
     pageStart: 268,
     pageEnd: 329,
     parentId: 'part-2',
-    childIds: [],
     summary: 'Critiques the assumption underlying much democratic theory: that citizens can and should be informed about all public matters. Traces how Lippmann demolished this myth.',
     keyConcepts: ['Omnicompetent Citizen', 'Democratic Theory', 'Public Opinion', 'Expertise'],
-    keyFigures: ['Walter Lippmann', 'John Dewey'],
-    pullQuote: undefined
+    keyFigures: ['Walter Lippmann', 'John Dewey']
   },
 
   // Chapter 8
@@ -187,11 +163,9 @@ export const DISSERTATION_NODES: DissertationNodeConfig[] = [
     pageStart: 330,
     pageEnd: 373,
     parentId: 'part-2',
-    childIds: [],
     summary: 'Presents Dewey\'s response to Lippmann: the public must be actively formed through communication and inquiry, not merely informed through journalism.',
     keyConcepts: ['Public Formation', 'Dewey vs Lippmann', 'Democratic Communication', 'Inquiry'],
-    keyFigures: ['John Dewey', 'Walter Lippmann'],
-    pullQuote: undefined
+    keyFigures: ['John Dewey', 'Walter Lippmann']
   },
 
   // CONCLUSION
@@ -203,39 +177,22 @@ export const DISSERTATION_NODES: DissertationNodeConfig[] = [
     pageStart: 374,
     pageEnd: 415,
     parentId: 'root',
-    childIds: [],
     summary: 'Proposes an "ecological" understanding of the press-public relationship that moves beyond the impossible demands of objectivity toward a more realistic and democratic vision.',
-    keyConcepts: ['Ecological View', 'Press Reform', 'Democratic Future'],
-    pullQuote: undefined
+    keyConcepts: ['Ecological View', 'Press Reform', 'Democratic Future']
   }
 ];
 
 // Helper to get a node by ID
-export const getNodeById = (id: string): DissertationNodeConfig | undefined => {
+export const getNodeById = (id) => {
   return DISSERTATION_NODES.find(node => node.id === id);
 };
 
 // Helper to get children of a node
-export const getChildNodes = (parentId: string): DissertationNodeConfig[] => {
+export const getChildNodes = (parentId) => {
   return DISSERTATION_NODES.filter(node => node.parentId === parentId);
 };
 
 // Helper to get root node
-export const getRootNode = (): DissertationNodeConfig => {
-  return DISSERTATION_NODES.find(node => node.id === 'root')!;
-};
-
-// Get all nodes at a specific level (for progressive disclosure)
-export const getNodesAtLevel = (level: number): DissertationNodeConfig[] => {
-  if (level === 0) return [getRootNode()];
-
-  let currentLevel = [getRootNode()];
-  for (let i = 0; i < level; i++) {
-    const nextLevel: DissertationNodeConfig[] = [];
-    currentLevel.forEach(node => {
-      nextLevel.push(...getChildNodes(node.id));
-    });
-    currentLevel = nextLevel;
-  }
-  return currentLevel;
+export const getRootNode = () => {
+  return DISSERTATION_NODES.find(node => node.id === 'root');
 };

@@ -1,33 +1,45 @@
-import React from 'react';
+
+import { useState } from 'react';
+import { html } from '../html.js';
 import { BookOpen, ExternalLink, ArrowLeft, Calendar, GraduationCap } from 'lucide-react';
-import { DissertationMindMap } from '../components/DissertationMindMap';
+import MindMap from './MindMap.js';
+import DetailPanel from './DetailPanel.js';
+import { DISSERTATION_NODES } from './dissertationData.js';
 
-interface DissertationPageProps {
-  onBack?: () => void;
-}
+const DissertationPage = ({ onBack }) => {
+  const [selectedNode, setSelectedNode] = useState(null);
+  const [detailPanelOpen, setDetailPanelOpen] = useState(false);
 
-const DissertationPage: React.FC<DissertationPageProps> = ({ onBack }) => {
   const dissertationPdfUrl = 'https://drive.google.com/file/d/14sIj3nYzOaV_CRHLMRvbgv9EcYbCsp4L/view?usp=sharing';
 
-  return (
+  const handleNodeSelect = (node) => {
+    setSelectedNode(node);
+    setDetailPanelOpen(true);
+  };
+
+  const closeDetailPanel = () => {
+    setDetailPanelOpen(false);
+  };
+
+  return html`
     <div className="min-h-screen bg-paper flex flex-col">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full bg-paper border-b border-stone-200">
+      <!-- Header -->
+      <header className="sticky top-0 z-30 w-full bg-paper border-b border-stone-200">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          {/* Left: Back button */}
+          <!-- Left: Back button -->
           <div className="flex items-center gap-4">
-            {onBack && (
+            ${onBack && html`
               <button
-                onClick={onBack}
+                onClick=${onBack}
                 className="flex items-center gap-2 text-stone-600 hover:text-stone-900 transition-colors text-sm"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <${ArrowLeft} className="w-4 h-4" />
                 <span className="hidden sm:inline">Back to Archive</span>
               </button>
-            )}
+            `}
             <div className="flex items-center gap-3">
               <div className="bg-stone-900 text-white p-1.5">
-                <BookOpen className="w-5 h-5" />
+                <${BookOpen} className="w-5 h-5" />
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-sm font-display font-bold text-stone-900 leading-tight">
@@ -38,33 +50,33 @@ const DissertationPage: React.FC<DissertationPageProps> = ({ onBack }) => {
             </div>
           </div>
 
-          {/* Center: Metadata */}
+          <!-- Center: Metadata -->
           <div className="hidden md:flex items-center gap-6 text-xs text-stone-500">
             <div className="flex items-center gap-2">
-              <GraduationCap className="w-4 h-4" />
+              <${GraduationCap} className="w-4 h-4" />
               <span>Jay Rosen</span>
             </div>
             <div className="h-4 w-px bg-stone-200" />
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
+              <${Calendar} className="w-4 h-4" />
               <span>New York University, 1986</span>
             </div>
           </div>
 
-          {/* Right: CTA */}
+          <!-- Right: CTA -->
           <a
-            href={dissertationPdfUrl}
+            href=${dissertationPdfUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 bg-stone-800 text-white px-4 py-2 text-xs font-bold hover:bg-stone-700 transition-colors"
           >
             <span>Read Full Text</span>
-            <ExternalLink className="w-3.5 h-3.5" />
+            <${ExternalLink} className="w-3.5 h-3.5" />
           </a>
         </div>
       </header>
 
-      {/* Hero Section */}
+      <!-- Hero Section -->
       <div className="bg-stone-50 border-b border-stone-200">
         <div className="container mx-auto px-4 py-8 md:py-12">
           <div className="max-w-3xl">
@@ -82,20 +94,20 @@ const DissertationPage: React.FC<DissertationPageProps> = ({ onBack }) => {
               solving the problem of public life through objective reporting alone.
             </p>
             <div className="flex flex-wrap gap-2">
-              {['Public Sphere', 'Objectivity', 'Walter Lippmann', 'John Dewey', 'Mass Society'].map(tag => (
+              ${['Public Sphere', 'Objectivity', 'Walter Lippmann', 'John Dewey', 'Mass Society'].map(tag => html`
                 <span
-                  key={tag}
+                  key=${tag}
                   className="text-[10px] uppercase font-bold px-2 py-1 bg-white border border-stone-200 text-stone-600 tracking-wide"
                 >
-                  {tag}
+                  ${tag}
                 </span>
-              ))}
+              `)}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Instructions Bar */}
+      <!-- Instructions Bar -->
       <div className="bg-white border-b border-stone-200">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="text-xs text-stone-500">
@@ -113,12 +125,23 @@ const DissertationPage: React.FC<DissertationPageProps> = ({ onBack }) => {
         </div>
       </div>
 
-      {/* Mind Map Container */}
-      <div className="flex-grow relative">
-        <DissertationMindMap className="absolute inset-0" />
+      <!-- Mind Map Container -->
+      <div className="flex-grow relative" style=${{ minHeight: '500px' }}>
+        <${MindMap}
+          nodes=${DISSERTATION_NODES}
+          onNodeSelect=${handleNodeSelect}
+          className="absolute inset-0"
+        />
       </div>
 
-      {/* Footer */}
+      <!-- Detail Panel -->
+      <${DetailPanel}
+        node=${selectedNode}
+        isOpen=${detailPanelOpen}
+        onClose=${closeDetailPanel}
+      />
+
+      <!-- Footer -->
       <footer className="bg-stone-50 border-t border-stone-200 py-4">
         <div className="container mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
           <div>
@@ -146,7 +169,7 @@ const DissertationPage: React.FC<DissertationPageProps> = ({ onBack }) => {
         </div>
       </footer>
     </div>
-  );
+  `;
 };
 
 export default DissertationPage;

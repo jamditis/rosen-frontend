@@ -1,26 +1,7 @@
 {
-  "name": "jay-rosen-digital-archive-(frontend)",
-  "private": true,
-  "version": "0.0.0",
+  "name": "jay-rosen-digital-archive",
+  "version": "1.0.0",
+  "description": "Interactive frontend for Jay Rosen's journalism scholarship archive",
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "18.2.0",
-    "htm": "3.1.1",
-    "lucide-react": "0.292.0",
-    "papaparse": "5.4.1",
-    "react-dom": "18.2.0",
-    "reactflow": "^11.11.4",
-    "@dagrejs/dagre": "^1.1.4"
-  },
-  "devDependencies": {
-    "@types/node": "^22.14.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
-  }
+  "private": true
 }
