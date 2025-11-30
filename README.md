@@ -35,13 +35,20 @@ This project uses a **zero-build static architecture** designed for simple deplo
 *   **Export Capabilities:** Users can generate and download high-resolution PNG cards of specific records or the entire network graph for social sharing.
 
 ### 📜 Dissertation Presentation Tools
-*   **Interactive Mind Map:** Tree-structured visualization of the 1986 dissertation's chapters and key arguments.
+*   **Interactive Mind Map:** Left-to-right tree visualization of the 1986 dissertation's chapters and key arguments. Features auto-fit zooming, expand/collapse all, keyboard navigation, and touch support.
 *   **"Then and Now" Comparison Tool:** Side-by-side presentation of 1986 dissertation insights alongside 2025 media realities. (`/comparison-tool/`)
 *   **Glossary:** Interactive visual glossary of key concepts with definitions, connections, and contemporary relevance. (`/glossary/`)
 *   **1986 in Journalism:** Historical context page showing the media landscape when the dissertation was written. (`/context-1986/`)
 *   **Timeline:** Visual timeline tracing how dissertation ideas evolved through 40 years of work. (`/timeline/`)
 *   **Annotated Excerpts:** Key passages with original context, 2025 reflections, and contemporary examples. (`/annotated-excerpts/`)
-*   **FAQ / Ask the Dissertation:** Searchable Q&A database with 25+ pre-generated answers, plus BYOK (Bring Your Own Key) Claude chat. (`/faq/`)
+*   **FAQ / Ask the Dissertation:** Searchable Q&A database with 46 pre-generated answers, plus BYOK (Bring Your Own Key) Claude chat. (`/faq/`)
+
+### ♿ Accessibility
+*   **Keyboard Navigation:** Full keyboard support for mind map (arrow keys to pan, +/- to zoom, ESC to close panels)
+*   **Screen Reader Support:** ARIA labels, roles, and live regions for all interactive elements
+*   **Focus Management:** Visible focus indicators and automatic focus management for dialogs
+*   **Touch Support:** Mobile-optimized touch targets (44px+) and touch-based panning
+*   **Responsive Design:** All tools work across mobile, tablet, and desktop devices
 
 ---
 
