@@ -1,6 +1,50 @@
 
 # Changelog - Jay Rosen Digital Archive
 
+*Session Date: November 29, 2025 (Continued - Session 3)*
+
+## Repository Consolidation: Merged rosen-archive
+
+Merged the `jamditis/rosen-archive` repository into this monorepo for unified development.
+
+### New Directories Added
+- **`/backend/`** - Python data pipeline for scraping, AI analysis, and archiving
+  - `src/` - Core source code (processors, scraper, categorizer)
+  - `scripts/` - Maintenance and utility scripts
+  - `tests/` - Test suite
+  - `pyproject.toml` & `poetry.lock` - Poetry dependencies
+  - `schema.json` - Data schema definitions
+
+- **`/dissertation/`** - Dissertation source materials
+  - PDF scans of original dissertation
+  - Transcribed markdown
+  - `build_unified_pdf.py` - PDF builder script
+
+- **`/data-tools/`** - Analysis tools
+  - `RStudio/` - R scripts for data analysis and visualization
+  - `planning/` - Project planning documents
+
+- **`/docs/`** - Documentation
+  - `agent-personas/` - AI persona definitions
+  - `narrative/` - Project logs and history
+
+- **`/tools/`** - Additional presentation tools (renamed from `/legacy/`)
+  - `dataexplorer/` - Data explorer grid (active development)
+  - `dataviz/` - Data visualization tool (active development)
+  - `dissertation-reader/` - Dissertation reader app (active development)
+  - `archive-v1/` - Original archive application (reference)
+  - `web/` - Promotional website
+
+- **`/release-assets/`** - Promotional materials and documentation
+
+### Configuration Updates
+- Merged `.gitignore` files to include Python, R, and credential patterns
+- Updated `README.md` with monorepo structure and backend documentation
+- Updated `CLAUDE.md` with new directory structure and backend setup instructions
+- Added MIT `LICENSE` file
+
+---
+
 *Session Date: November 29, 2025 (Continued - Session 2)*
 
 ## Dissertation Mind Map Enhancements & Accessibility

@@ -81,19 +81,32 @@
   </head>
 
   <body class="antialiased font-body text-stone-900 min-h-screen bg-paper">
+    <!-- Skip to main content link for accessibility -->
+    <a href="#timeline" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-stone-800 focus:text-white focus:px-4 focus:py-2 focus:rounded">
+      Skip to timeline
+    </a>
+
     <!-- Header -->
     <header class="sticky top-0 z-50 bg-paper/95 backdrop-blur-sm border-b border-stone-200">
-      <div class="max-w-5xl mx-auto px-4 py-4">
+      <div class="max-w-5xl mx-auto px-4 py-3">
         <div class="flex items-center justify-between">
-          <div>
-            <h1 class="font-display text-xl md:text-2xl text-stone-850">From Dissertation to Now</h1>
-            <p class="text-xs text-stone-500 mt-1">40 Years of Ideas</p>
-          </div>
-          <a href="https://drive.google.com/file/d/14sIj3nYzOaV_CRHLMRvbgv9EcYbCsp4L/view"
-             target="_blank"
-             class="text-xs bg-stone-800 text-white px-3 py-1.5 rounded hover:bg-stone-700 transition-colors">
-            Read Dissertation
+          <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <div class="bg-stone-900 text-white p-1.5">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-lg md:text-xl font-display font-bold text-stone-900 tracking-tight">Jay Rosen Digital Archive</h1>
+              <p class="text-xs text-stone-500">Timeline</p>
+            </div>
           </a>
+          <nav class="flex items-center gap-3">
+            <a href="/tools/dissertation-reader/dist/"
+               class="text-xs bg-stone-800 text-white px-3 py-1.5 rounded hover:bg-stone-700 transition-colors">
+              Read Dissertation
+            </a>
+          </nav>
         </div>
       </div>
     </header>
@@ -105,7 +118,7 @@
           The Intellectual Journey
         </h2>
         <p class="text-stone-600 leading-relaxed">
-          The dissertation was not an endpoint but a beginning. The ideas Jay Rosen developed in 1986 would evolve through the public journalism movement, PressThink, and ongoing work on the press-public relationship.
+          <em><a href="/tools/dissertation-reader/dist/" class="text-stone-700 hover:text-stone-900 underline">The Impossible Press</a></em> was not an endpoint but a beginning. The ideas Jay Rosen developed in 1986 would evolve through the public journalism movement, PressThink, and ongoing work on the press-public relationship.
         </p>
       </div>
     </section>

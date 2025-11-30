@@ -1,0 +1,37 @@
+[project]
+name = "rosen-scraper"
+version = "0.1.0"
+description = "A project to archive, analyze, and process web content related to Jay Rosen's work."
+authors = [
+    {name = "Joe Amditis",email = "jamditis@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13, <4.0"
+dependencies = [
+    "trafilatura (==2.0.0)",
+    "requests (==2.32.5)",
+    "playwright (==1.55.0)",
+    "playwright-stealth (==2.0.0)",
+    "beautifulsoup4 (==4.14.2)",
+    "gspread (==6.2.1)",
+    "google-api-python-client (==2.184.0)",
+    "google-auth-httplib2 (==0.2.0)",
+    "google-auth-oauthlib (==1.2.2)",
+    "google-cloud-speech (==2.33.0)",
+    "google-generativeai (==0.8.5)",
+    "google-genai (==1.43.0)",
+    "reportlab (==4.4.4)",
+    "yt-dlp (==2025.9.26)",
+    "python-dotenv (==1.1.1)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (==8.4.2)",
+    "pytest-mock (==3.15.1)"
+]

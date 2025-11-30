@@ -1,0 +1,41 @@
+Site structure planning (how the website will be organized):
+HOME
+├── Search & browse
+│   ├── Simple search (basic search box)
+│   ├── Advanced search (multiple filters)
+│   └── Browse by:
+│       ├── Year
+│       ├── Category
+│       ├── Format
+│       └── Key concepts
+├── Featured collections
+│   ├── Signature concepts (10-12 items)
+│   ├── Essential readings
+│   ├── Timeline of ideas
+│   └── Thematic journeys
+├── About
+│   ├── About Jay Rosen
+│   ├── About the archive
+│   └── How to use
+├── Resources
+│   ├── For researchers
+│   ├── For journalists
+│   └── For students
+└── API/data access (for developers to access data)
+
+User journey mapping to anticipate and plan for how different people will use the site:
+Researcher path:
+Enters via advanced search
+Filters by date range and topic
+Downloads citations (formatted references for academic papers)
+Follows relationship links
+Student path:
+Starts with featured collections
+Explores key concepts
+Watches explanatory videos
+Reads foundational texts
+Journalist path:
+Quick search for specific topic
+Finds relevant quotes/concepts
+Links to original sources
+Shares specific items

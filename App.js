@@ -1,16 +1,17 @@
 
-import { useEffect, useState, useMemo, useRef } from 'react';
+import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { html } from './html.js';
-import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network, BookOpen } from 'lucide-react';
+import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network, BookOpen, Compass } from 'lucide-react';
 import { fetchArchiveData, hashString } from './services/archiveService.js';
 import { ITEMS_PER_PAGE, COLORS } from './constants.js';
 import Sidebar from './components/Sidebar.js';
 import WelcomeModal from './components/WelcomeModal.js';
 import RecordModal from './components/RecordModal.js';
 import FeaturedSection from './components/FeaturedSection.js';
-import Timeline from './components/Timeline.js';
 import Explorer from './components/Explorer.js';
 import DissertationPage from './components/DissertationPage.js';
+import ToolsModal from './components/ToolsModal.js';
+import LoadingQuotes from './components/LoadingQuotes.js';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
@@ -37,6 +38,7 @@ const App = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [selectedRecordId, setSelectedRecordId] = useState(null);
   const [currentView, setCurrentView] = useState('archive'); // 'archive' or 'dissertation'
+  const [toolsModalOpen, setToolsModalOpen] = useState(false);
 
   const [filters, setFilters] = useState({
     search: '',
@@ -77,6 +79,15 @@ const App = () => {
   // Navigation handlers
   const navigateToDissertation = () => setCurrentView('dissertation');
   const navigateToArchive = () => setCurrentView('archive');
+
+  // Tool selection handler
+  const handleToolSelect = useCallback((action) => {
+    if (action === 'mindmap') {
+      setCurrentView('dissertation');
+    } else if (action === 'explorer') {
+      setViewMode('explorer');
+    }
+  }, []);
 
   // Load Data
   useEffect(() => {
@@ -191,7 +202,9 @@ const App = () => {
       r.categories.forEach(c => counts[c] = (counts[c] || 0) + 1);
     });
     return Object.keys(counts)
+      .filter(cat => counts[cat] >= 10) // Only show categories with 10+ records
       .sort((a, b) => counts[b] - counts[a])
+      .slice(0, 6) // Limit to top 6 folders
       .map(cat => ({ name: cat, count: counts[cat] }));
   }, [filteredRecords]);
 
@@ -210,14 +223,6 @@ const App = () => {
     } else if (direction === 'prev' && idx > 0) {
       setSelectedRecordId(filteredRecords[idx - 1].id);
     }
-  };
-
-  const handleYearSelect = (year) => {
-    setFilters(prev => ({
-        ...prev,
-        year: year,
-        era: year ? null : prev.era
-    }));
   };
 
   const handlePageChange = (newPage) => {
@@ -248,6 +253,12 @@ const App = () => {
     <div className="min-h-screen flex flex-col">
       <${WelcomeModal} />
 
+      <${ToolsModal}
+        isOpen=${toolsModalOpen}
+        onClose=${() => setToolsModalOpen(false)}
+        onSelectTool=${handleToolSelect}
+      />
+
       <${RecordModal} 
         record=${selectedRecord}
         allRecords=${records}
@@ -273,7 +284,7 @@ const App = () => {
                     <${Newspaper} className="w-5 h-5" />
                 </div>
                 <h1 className="text-lg md:text-xl font-display font-bold text-stone-900 tracking-tight hidden sm:block">
-                    Jay Rosen digital archive
+                    Jay Rosen Digital Archive
                 </h1>
                 <h1 className="text-lg font-display font-bold text-stone-900 sm:hidden">JRDA</h1>
             </div>
@@ -291,13 +302,13 @@ const App = () => {
             </div>
 
             <div className="flex items-center gap-4">
-                <!-- Dissertation Link -->
+                <!-- Mobile-only Tools Button (shows when tools section isn't visible) -->
                 <button
-                  onClick=${navigateToDissertation}
-                  className="flex items-center gap-2 text-stone-600 hover:text-stone-900 transition-colors text-xs border border-stone-200 px-3 py-1.5 hover:border-stone-300 hidden sm:flex"
+                  onClick=${() => setToolsModalOpen(true)}
+                  className="sm:hidden p-2 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-md border border-stone-200"
+                  aria-label="Explore tools"
                 >
-                    <${BookOpen} className="w-3.5 h-3.5" />
-                    <span>1986 Dissertation</span>
+                    <${Compass} className="w-5 h-5" />
                 </button>
                 <a href="https://twitter.com/jsamditis" target="_blank" rel="noreferrer" className="text-stone-500 hover:text-stone-900 transition-colors text-xs hidden md:inline-block">
                     Curated by Joe Amditis
@@ -332,16 +343,55 @@ const App = () => {
             
             ${!isExplorer && html`
                 <div>
+                    <!-- Tools Section (above Featured Works) -->
                     ${!loading && !filters.search && !filters.era && !filters.year && filters.categories.length === 0 && html`
-                        <${FeaturedSection} />
+                        <section className="mb-8 py-6 border-b border-stone-200">
+                            <div className="mb-4">
+                                <h2 className="font-display text-lg text-stone-800">Explore the archive</h2>
+                                <p className="text-xs text-stone-500 mt-1">Interactive tools for exploring the archive</p>
+                            </div>
+                            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                                <button
+                                    onClick=${navigateToDissertation}
+                                    className="flex flex-col items-center p-4 bg-white rounded-lg border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all group"
+                                >
+                                    <${BookOpen} className="w-6 h-6 text-stone-500 group-hover:text-stone-700 mb-2" />
+                                    <span className="text-xs font-medium text-stone-700">Mind Map</span>
+                                </button>
+                                <button
+                                    onClick=${() => setViewMode('explorer')}
+                                    className="flex flex-col items-center p-4 bg-white rounded-lg border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all group"
+                                >
+                                    <${Network} className="w-6 h-6 text-stone-500 group-hover:text-stone-700 mb-2" />
+                                    <span className="text-xs font-medium text-stone-700">Network</span>
+                                </button>
+                                <a
+                                    href="/comparison-tool/"
+                                    className="flex flex-col items-center p-4 bg-white rounded-lg border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all group"
+                                >
+                                    <span className="text-xl mb-1">⚡</span>
+                                    <span className="text-xs font-medium text-stone-700">Then & Now</span>
+                                </a>
+                                <a
+                                    href="/glossary/"
+                                    className="flex flex-col items-center p-4 bg-white rounded-lg border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all group"
+                                >
+                                    <span className="text-xl mb-1">📚</span>
+                                    <span className="text-xs font-medium text-stone-700">Glossary</span>
+                                </a>
+                                <button
+                                    onClick=${() => setToolsModalOpen(true)}
+                                    className="flex flex-col items-center p-4 bg-stone-50 rounded-lg border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all group"
+                                >
+                                    <${Compass} className="w-6 h-6 text-stone-400 group-hover:text-stone-600 mb-2" />
+                                    <span className="text-xs font-medium text-stone-500 group-hover:text-stone-700">More tools</span>
+                                </button>
+                            </div>
+                        </section>
                     `}
 
-                    ${!loading && html`
-                        <${Timeline} 
-                            records=${records}
-                            selectedYear=${filters.year}
-                            onSelectYear=${handleYearSelect}
-                        />
+                    ${!loading && !filters.search && !filters.era && !filters.year && filters.categories.length === 0 && html`
+                        <${FeaturedSection} />
                     `}
                 </div>
             `}
@@ -362,19 +412,12 @@ const App = () => {
                         >
                             <${LayoutGrid} className="w-3 h-3" /> <span className="hidden sm:inline">Cards</span>
                         </button>
-                        <button 
+                        <button
                           onClick=${() => setViewMode('folder')}
                           className=${`flex items-center justify-center gap-2 py-1.5 px-3 text-xs font-medium rounded shadow-sm transition-all ${viewMode === 'folder' ? 'bg-white text-stone-900' : 'text-stone-600 hover:bg-stone-100'}`}
                           title="Folder View"
                         >
                             <${Folder} className="w-3 h-3" /> <span className="hidden sm:inline">Folders</span>
-                        </button>
-                        <button 
-                          onClick=${() => setViewMode('explorer')}
-                          className=${`flex items-center justify-center gap-2 py-1.5 px-3 text-xs font-medium rounded shadow-sm transition-all ${viewMode === 'explorer' ? 'bg-white text-stone-900' : 'text-stone-600 hover:bg-stone-100'}`}
-                          title="Explorer View"
-                        >
-                            <${Network} className="w-3 h-3" /> <span className="hidden sm:inline">Explorer</span>
                         </button>
                     </div>
 
@@ -403,11 +446,7 @@ const App = () => {
             ${!isExplorer && html`
                 <div>
                     ${loading && html`
-                    <div className="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6">
-                        ${[1, 2, 3, 4, 5, 6].map(i => html`
-                            <div key=${i} className="break-inside-avoid bg-white border border-stone-200 p-6 shadow-sm h-64 animate-pulse" />
-                        `)}
-                    </div>
+                    <${LoadingQuotes} />
                     `}
 
                     ${!loading && filteredRecords.length === 0 && html`

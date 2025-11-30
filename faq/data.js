@@ -1,10 +1,10 @@
 // FAQ: Questions & Answers about The Impossible Press
-// Pre-generated responses for common questions about the dissertation
+// Pre-generated responses for common questions about the work
 
 export const FAQ_METADATA = {
-  title: 'Ask the Dissertation',
-  subtitle: 'Frequently Asked Questions about "The Impossible Press"',
-  introduction: 'Explore answers to common questions about Jay Rosen\'s 1986 dissertation. These responses are grounded in the text and connect its arguments to contemporary media.',
+  title: 'Ask The Impossible Press',
+  subtitle: 'Frequently Asked Questions',
+  introduction: 'Explore answers to common questions about Jay Rosen\'s 1986 work. These responses are grounded in the text and connect its arguments to contemporary media.',
   notebookLM: {
     dissertation: 'https://notebooklm.google.com/notebook/YOUR_DISSERTATION_NOTEBOOK_ID',
     archive: 'https://notebooklm.google.com/notebook/YOUR_ARCHIVE_NOTEBOOK_ID',
@@ -27,9 +27,9 @@ export const FAQ_ITEMS = [
     id: 'what-is-dissertation',
     category: 'basics',
     question: 'What is "The Impossible Press" about?',
-    answer: `"The Impossible Press: American Journalism and the Decline of Public Life" is Jay Rosen's 1986 doctoral dissertation, completed at NYU under Neil Postman. It argues that the common phrase "the press informs the public" obscures more than it reveals.
+    answer: `<em>The Impossible Press: American Journalism and the Decline of Public Life</em> is Jay Rosen's 1986 doctoral dissertation, completed at NYU under Neil Postman. It argues that the common phrase "the press informs the public" obscures more than it reveals.
 
-The dissertation's central claim is that professional journalism made an impossible promise: that by adopting standards like objectivity, accuracy, and fairness, the press could solve "the whole problem of public life." Rosen shows why this promise cannot be kept — the structural conditions of mass communication make it impossible for the press to simply "inform the public."
+The central claim is that professional journalism made an impossible promise: that by adopting standards like objectivity, accuracy, and fairness, the press could solve "the whole problem of public life." Rosen shows why this promise cannot be kept — the structural conditions of mass communication make it impossible for the press to simply "inform the public."
 
 The work draws heavily on Walter Lippmann and John Dewey, tracing debates about democracy, media, and the public from the 1920s through the 1980s.`,
     sources: ['Introduction', 'Chapter 6']
@@ -53,13 +53,13 @@ The "impossible press" is a press that tries to solve structural problems throug
     id: 'who-is-rosen',
     category: 'basics',
     question: 'Who is Jay Rosen?',
-    answer: `Jay Rosen is a professor of journalism at New York University, where he has taught since 1986 — the same year he completed this dissertation. He is one of the most influential press critics in America.
+    answer: `Jay Rosen is a professor of journalism at New York University, where he has taught since 1986 — the same year he completed <em>The Impossible Press</em>. He is one of the most influential press critics in America.
 
-After the dissertation, Rosen became a leading voice in the "public journalism" movement of the 1990s, arguing that journalism should help form publics, not just inform them. He founded PressThink, one of the first and most important media criticism blogs, in 2003.
+After completing the work, Rosen became a leading voice in the "public journalism" movement of the 1990s, arguing that journalism should help form publics, not just inform them. He founded PressThink, one of the first and most important media criticism blogs, in 2003.
 
 Rosen coined influential concepts like "the view from nowhere" (the pretense of journalistic neutrality) and "the people formerly known as the audience" (recognizing that digital technology has transformed passive audiences into active participants).
 
-The dissertation represents the intellectual foundation for all his later work.`,
+<em>The Impossible Press</em> represents the intellectual foundation for all his later work.`,
     sources: ['Timeline', 'Introduction']
   },
   {
@@ -68,9 +68,9 @@ The dissertation represents the intellectual foundation for all his later work.`
     question: 'Who was Neil Postman and why does he matter?',
     answer: `Neil Postman (1931-2003) was Rosen's dissertation advisor and one of the most important media theorists of the 20th century. He founded the Media Ecology program at NYU, which studied how communication technologies shape culture, thought, and social life.
 
-Postman is best known for "Amusing Ourselves to Death" (1985), published just as Rosen was completing the dissertation. That book argued that television was transforming public discourse into entertainment, making serious democratic deliberation impossible.
+Postman is best known for "Amusing Ourselves to Death" (1985), published just as Rosen was completing <em>The Impossible Press</em>. That book argued that television was transforming public discourse into entertainment, making serious democratic deliberation impossible.
 
-Rosen's dissertation extends Postman's approach — analyzing how media structure shapes the relationship between press and public. The dissertation is fundamentally a work of "media ecology," examining the environment created by mass communication rather than just the content transmitted through it.
+<em>The Impossible Press</em> extends Postman's approach — analyzing how media structure shapes the relationship between press and public. The work is fundamentally a piece of "media ecology," examining the environment created by mass communication rather than just the content transmitted through it.
 
 Postman taught Rosen to ask not "what is the press saying?" but "what kind of relationship between press and public does this form of communication create?"`,
     sources: ['Conclusion', 'Acknowledgments']
@@ -107,7 +107,7 @@ Rosen isn't arguing that citizens should be uninformed or that democracy is impo
     id: 'journalism-transaction',
     category: 'concepts',
     question: 'What does it mean that journalism is a "transaction, not an action"?',
-    answer: `This is one of the dissertation's foundational reframings. Conventionally, we think of journalism as what journalists do — gathering facts, writing stories, publishing news. This makes journalism an "action."
+    answer: `This is one of the foundational reframings in <em>The Impossible Press</em>. Conventionally, we think of journalism as what journalists do — gathering facts, writing stories, publishing news. This makes journalism an "action."
 
 Rosen argues that journalism is better understood as a "transaction" — something that takes place between journalists and audiences. Information isn't a substance that gets transferred from the newsroom to the citizen's mind. Information is relational: it exists in the interaction between people and their environment.
 
@@ -122,7 +122,7 @@ A perfectly crafted, accurate, objective news story can still fail to inform if 
     question: 'What is "communication without community"?',
     answer: `This phrase captures a central paradox of modern media: mass communication connects millions of people who share no actual community. The newspaper reader in 1900, like the social media user in 2025, receives public information in private, surrounded by strangers.
 
-Rosen, drawing on Robert Park and John Dewey, calls this "mobilized privacy" — individuals hooked into "long lines of communication from remote sources" but isolated from each other. We have publicity without public-ness.
+In <em>The Impossible Press</em>, Rosen draws on Robert Park and John Dewey to describe this as "mobilized privacy" — individuals hooked into "long lines of communication from remote sources" but isolated from each other. We have publicity without public-ness.
 
 The problem is that a functioning democracy requires more than information transmission. It requires communities capable of deliberating and acting together. Mass media can inform isolated individuals, but it cannot by itself create the communities that would give that information meaning.
 
@@ -133,7 +133,7 @@ Social media was supposed to solve this by connecting the atomized audience memb
     id: 'attention-economy',
     category: 'concepts',
     question: 'Did Rosen predict the attention economy?',
-    answer: `Yes, remarkably. In 1986, Rosen wrote: "When attention must be gained rather than granted, the content of public discourse is eclipsed by the struggle to be heard."
+    answer: `Yes, remarkably. In <em>The Impossible Press</em>, Rosen wrote: "When attention must be gained rather than granted, the content of public discourse is eclipsed by the struggle to be heard."
 
 He identified that as media compete for finite audience attention, the substance of communication becomes secondary to the techniques of capturing notice. The battle for attention overwhelms the effort to communicate something worth attending to.
 
@@ -146,7 +146,7 @@ What Rosen saw as an emerging tendency in 1986 has become the dominant logic of 
     id: 'making-public',
     category: 'concepts',
     question: 'What does "making things public does not a public make" mean?',
-    answer: `This is perhaps the dissertation's most quotable insight. It means that publishing information does not automatically create an informed public capable of acting on it.
+    answer: `This is perhaps the most quotable insight from <em>The Impossible Press</em>. It means that publishing information does not automatically create an informed public capable of acting on it.
 
 A public is not the same as an audience. An audience receives messages. A public is a social body that forms around shared problems and develops the capacity for shared action. Publics don't exist naturally; they must be formed.
 
@@ -160,8 +160,8 @@ In 2025, information has never been more public. We have unprecedented transpare
   {
     id: 'main-argument',
     category: 'arguments',
-    question: 'What is the dissertation\'s main argument?',
-    answer: `The dissertation makes several interconnected arguments:
+    question: 'What is the main argument of The Impossible Press?',
+    answer: `<em>The Impossible Press</em> makes several interconnected arguments:
 
 **1. "The press informs the public" obscures more than it reveals.** This phrase treats journalism as a simple action and the public as a fixed entity. Both assumptions are wrong.
 
@@ -179,8 +179,8 @@ The upshot is that conventional press criticism — focused on whether journalis
   {
     id: 'what-wrong-journalism',
     category: 'arguments',
-    question: 'What does the dissertation say is wrong with journalism?',
-    answer: `The dissertation doesn't say journalism is badly done. It says journalism is based on a flawed premise.
+    question: 'What does The Impossible Press say is wrong with journalism?',
+    answer: `<em>The Impossible Press</em> doesn't say journalism is badly done. It says journalism is based on a flawed premise.
 
 Professional journalism after 1900 developed standards — objectivity, accuracy, fairness, completeness — to prove its public responsibility. These standards assume that if journalists perform their job properly, the public will be informed, and democracy will function.
 
@@ -218,7 +218,7 @@ In 2025, this manifests as fact-checking that doesn't reduce belief in misinform
     id: 'lippmann-dewey',
     category: 'arguments',
     question: 'What is the Lippmann-Dewey debate and why does it matter?',
-    answer: `The Lippmann-Dewey debate in the 1920s is central to the dissertation. Walter Lippmann argued that democratic theory was obsolete: modern society is too complex for ordinary citizens to understand, so governance should be left to experts who can penetrate the "pseudo-environment" of public opinion to grasp reality.
+    answer: `The Lippmann-Dewey debate in the 1920s is central to <em>The Impossible Press</em>. Walter Lippmann argued that democratic theory was obsolete: modern society is too complex for ordinary citizens to understand, so governance should be left to experts who can penetrate the "pseudo-environment" of public opinion to grasp reality.
 
 John Dewey agreed with Lippmann's diagnosis but rejected his elitist solution. Dewey argued that the problem wasn't democracy itself but the lack of genuine community. If communities could be reconstructed — if people could deliberate together about shared problems — then democratic participation could be revitalized.
 
@@ -274,8 +274,8 @@ Rosen's sympathies are largely with Dewey, but he recognizes that Dewey never fu
   {
     id: 'relevance-today',
     category: 'contemporary',
-    question: 'Why does a 1986 dissertation matter in 2025?',
-    answer: `The dissertation is more relevant now than when it was written. What Rosen identified as emerging tendencies have become the dominant features of our media environment.
+    question: 'Why does a 1986 work matter in 2025?',
+    answer: `<em>The Impossible Press</em> is more relevant now than when it was written. What Rosen identified as emerging tendencies have become the dominant features of our media environment.
 
 **The attention economy:** Rosen's "eclipse of content" — where the struggle to be heard overwhelms actual communication — is now the explicit business model of every major platform.
 
@@ -287,14 +287,14 @@ Rosen's sympathies are largely with Dewey, but he recognizes that Dewey never fu
 
 **Making things public ≠ making a public:** We have unprecedented transparency — leaked documents, investigative reports, fact-checks — and unprecedented democratic dysfunction.
 
-The dissertation provides the conceptual vocabulary to understand why our media environment feels broken.`,
+<em>The Impossible Press</em> provides the conceptual vocabulary to understand why our media environment feels broken.`,
     sources: ['Throughout', '2025 Context']
   },
   {
     id: 'social-media',
     category: 'contemporary',
-    question: 'What would the dissertation say about social media?',
-    answer: `The dissertation doesn't mention social media (it didn't exist), but its framework applies directly:
+    question: 'What would The Impossible Press say about social media?',
+    answer: `<em>The Impossible Press</em> doesn't mention social media (it didn't exist), but its framework applies directly:
 
 **Technological utopianism repeats:** In Chapter 3, Rosen shows how each new communication technology — the telegraph, radio, TV — inspired utopian hopes that it would restore democratic participation. Social media repeated this pattern exactly: "Twitter revolutions," the "global village," democratized media. The disappointment was predictable.
 
@@ -310,8 +310,8 @@ The dissertation provides the conceptual vocabulary to understand why our media 
   {
     id: 'misinformation',
     category: 'contemporary',
-    question: 'What does the dissertation say about misinformation and fact-checking?',
-    answer: `The dissertation explains why fact-checking alone can't solve misinformation.
+    question: 'What does The Impossible Press say about misinformation and fact-checking?',
+    answer: `<em>The Impossible Press</em> explains why fact-checking alone can't solve misinformation.
 
 **Information is relational:** Facts don't exist independently of the people receiving them. The same fact can be informative to one person and meaningless (or actively rejected) by another. Information is "in" the relationship, not "in" the content.
 
@@ -321,14 +321,14 @@ The dissertation provides the conceptual vocabulary to understand why our media 
 
 **Professional standards assume too much:** Fact-checking assumes that if we just verify the facts and publish corrections, the public will be accurately informed. But this assumes the transactional relationship exists that would make correction effective.
 
-The dissertation suggests that misinformation isn't primarily a fact problem — it's a community and meaning problem. Without shared frameworks and genuine community, more facts won't create more understanding.`,
+<em>The Impossible Press</em> suggests that misinformation isn't primarily a fact problem — it's a community and meaning problem. Without shared frameworks and genuine community, more facts won't create more understanding.`,
     sources: ['Chapter 2', 'Chapter 7']
   },
   {
     id: 'trust-collapse',
     category: 'contemporary',
-    question: 'Does the dissertation explain why trust in media has collapsed?',
-    answer: `Yes, though perhaps not in the way you'd expect. The conventional explanation for declining trust is that journalists have become biased or incompetent. The dissertation offers a structural explanation.
+    question: 'Does The Impossible Press explain why trust in media has collapsed?',
+    answer: `Yes, though perhaps not in the way you'd expect. The conventional explanation for declining trust is that journalists have become biased or incompetent. <em>The Impossible Press</em> offers a structural explanation.
 
 **The impossible promise:** Professional journalism promised that if journalists followed professional standards, the public would be informed and democracy would function. This was always an impossible promise. The collapse of trust represents the public recognizing — in confused and often misdirected ways — that the promise hasn't been kept.
 
@@ -342,8 +342,8 @@ The dissertation suggests that misinformation isn't primarily a fact problem —
   {
     id: 'local-news',
     category: 'contemporary',
-    question: 'What does the dissertation suggest about the local news crisis?',
-    answer: `The dissertation provides important context for understanding the local news collapse.
+    question: 'What does The Impossible Press suggest about the local news crisis?',
+    answer: `<em>The Impossible Press</em> provides important context for understanding the local news collapse.
 
 **Scale is fundamental:** Chapter 1 argues that democracy was designed for small communities where citizens could directly observe public affairs. Jefferson advocated for "ward republics" because he knew democracy required limits on scale. Local news represents the closest journalism comes to this ideal scale.
 
@@ -351,7 +351,7 @@ The dissertation suggests that misinformation isn't primarily a fact problem —
 
 **National news can't substitute:** When local news disappears, national news can't fill the gap. National news reaches atomized individuals, not communities. It operates at a scale where the problems Rosen identifies are most severe.
 
-**The dissertation's implicit warning:** If "communication without community" is the fundamental problem, then eliminating the journalism that's closest to actual communities makes everything worse. The local news crisis isn't just a business story; it's a democracy story.`,
+**The implicit warning:** If "communication without community" is the fundamental problem, then eliminating the journalism that's closest to actual communities makes everything worse. The local news crisis isn't just a business story; it's a democracy story.`,
     sources: ['Chapter 1', 'Chapter 5']
   },
 
@@ -359,14 +359,14 @@ The dissertation suggests that misinformation isn't primarily a fact problem —
   {
     id: 'public-journalism',
     category: 'later-work',
-    question: 'How did the dissertation lead to "public journalism"?',
-    answer: `The public journalism movement of the 1990s was the direct practical application of the dissertation's insights.
+    question: 'How did The Impossible Press lead to "public journalism"?',
+    answer: `The public journalism movement of the 1990s was the direct practical application of the insights from <em>The Impossible Press</em>.
 
 **The problem:** If "making things public doesn't make a public," what should journalism do differently?
 
 **The solution:** Help form publics, not just inform them. Public journalism argued that newspapers should actively help citizens participate in public life — sponsoring forums, facilitating deliberation, connecting people to each other, not just reporting on events.
 
-**Key books:** Rosen's "Getting the Connections Right" (1996) and "What Are Journalists For?" (1999) extended the dissertation into a reform program.
+**Key books:** Rosen's "Getting the Connections Right" (1996) and "What Are Journalists For?" (1999) extended the ideas from <em>The Impossible Press</em> into a reform program.
 
 **The controversy:** Traditional journalists attacked public journalism as abandoning objectivity and neutrality. They saw the reporter as an outside observer, not a participant in civic life.
 
@@ -376,7 +376,7 @@ The dissertation suggests that misinformation isn't primarily a fact problem —
   {
     id: 'view-from-nowhere',
     category: 'later-work',
-    question: 'What is "the view from nowhere" and how does it connect to the dissertation?',
+    question: 'What is "the view from nowhere" and how does it connect to The Impossible Press?',
     answer: `"The view from nowhere" is a phrase Rosen coined around 2003 to describe the stance of artificial neutrality that professional journalism adopts.
 
 The journalist claims to occupy no particular position — to see all sides equally, to stand outside politics, to have no point of view. This is presented as objectivity.
@@ -387,37 +387,37 @@ Rosen argues this is both impossible and misleading:
 
 **Misleading:** Claiming no perspective while actually having one is a kind of deception. It also prevents journalists from acknowledging when one side is simply correct or when "both sides" framing distorts reality.
 
-**Connection to dissertation:** The dissertation's Chapter 6 critiques "the professional attitude" — the belief that professional standards like objectivity solve the problem of journalism's democratic function. "The view from nowhere" is a later, more pointed version of this critique, focusing on how the objectivity norm specifically fails.`,
+**Connection to The Impossible Press:** Chapter 6 critiques "the professional attitude" — the belief that professional standards like objectivity solve the problem of journalism's democratic function. "The view from nowhere" is a later, more pointed version of this critique, focusing on how the objectivity norm specifically fails.`,
     sources: ['Chapter 6', 'PressThink']
   },
   {
     id: 'people-formerly',
     category: 'later-work',
-    question: 'How does "the people formerly known as the audience" relate to the dissertation?',
+    question: 'How does "the people formerly known as the audience" relate to The Impossible Press?',
     answer: `"The People Formerly Known as the Audience" is a 2006 PressThink post that became one of Rosen's most influential pieces. It declared that the passive mass audience of the broadcast era no longer exists.
 
 **The broadcast assumption:** Traditional media assumed a one-to-many model: professionals produce, audiences consume. The audience was a mass to be addressed, not individuals with their own voices.
 
 **What changed:** The internet gave audience members the ability to publish, to connect with each other, and to route around traditional gatekeepers. The people formerly known as the audience became participants.
 
-**Connection to dissertation:** This directly updates the dissertation's analysis. Chapter 5 describes "mobilized privacy" — individuals hooked into media but isolated from each other. The internet partially overcame this atomization by connecting audience members horizontally.
+**Connection to The Impossible Press:** This directly updates the analysis from Chapter 5, which describes "mobilized privacy" — individuals hooked into media but isolated from each other. The internet partially overcame this atomization by connecting audience members horizontally.
 
-**The complication:** The dissertation would have predicted (and Rosen later acknowledged) that connecting audience members doesn't automatically create a public. The connections that formed on social media weren't always the deliberative communities Dewey envisioned.`,
+**The complication:** <em>The Impossible Press</em> would have predicted (and Rosen later acknowledged) that connecting audience members doesn't automatically create a public. The connections that formed on social media weren't always the deliberative communities Dewey envisioned.`,
     sources: ['Chapter 5', 'PressThink 2006']
   },
   {
     id: 'pressthink',
     category: 'later-work',
-    question: 'What is PressThink and how does it continue the dissertation\'s project?',
-    answer: `PressThink is a blog Jay Rosen launched in 2003, focused on press criticism and the state of American journalism. It's one of the most influential media criticism sites and continues the intellectual project begun in the dissertation.
+    question: 'What is PressThink and how does it continue the project begun in The Impossible Press?',
+    answer: `PressThink is a blog Jay Rosen launched in 2003, focused on press criticism and the state of American journalism. It's one of the most influential media criticism sites and continues the intellectual project begun in <em>The Impossible Press</em>.
 
-**Real-time press criticism:** Where the dissertation was an academic work, PressThink applies similar analysis to current events — critiquing coverage in real time, testing ideas against actual journalism.
+**Real-time press criticism:** Where <em>The Impossible Press</em> was an academic work, PressThink applies similar analysis to current events — critiquing coverage in real time, testing ideas against actual journalism.
 
-**Developing concepts:** PressThink is where Rosen developed ideas like "the view from nowhere," "audience atomization overcome," and "the people formerly known as the audience" — all extensions of dissertation themes.
+**Developing concepts:** PressThink is where Rosen developed ideas like "the view from nowhere," "audience atomization overcome," and "the people formerly known as the audience" — all extensions of themes from <em>The Impossible Press</em>.
 
 **Public intellectual mode:** The blog brought academic press criticism to a broader audience, engaging journalists, readers, and other commentators in ongoing dialogue.
 
-**Enacting the transaction:** The blog form itself embodies the dissertation's insight that journalism is a transaction. Rosen's posts become dialogues with readers, not one-way transmissions.
+**Enacting the transaction:** The blog form itself embodies the insight from <em>The Impossible Press</em> that journalism is a transaction. Rosen's posts become dialogues with readers, not one-way transmissions.
 
 **Testing Dewey:** PressThink represents an attempt to do what Dewey advocated — create a community of inquiry around shared problems.`,
     sources: ['pressthink.org', 'Timeline']
@@ -427,8 +427,8 @@ Rosen argues this is both impossible and misleading:
   {
     id: 'dissertation-structure',
     category: 'basics',
-    question: 'How is the dissertation structured?',
-    answer: `The dissertation is organized in roughly 10 chapters, moving from foundational problems to analysis to conclusion:
+    question: 'How is The Impossible Press structured?',
+    answer: `<em>The Impossible Press</em> is organized in roughly 10 chapters, moving from foundational problems to analysis to conclusion:
 
 **Part I: The Problem**
 - Introduction: Why "the press informs the public" is inadequate as a description
@@ -454,7 +454,7 @@ Each chapter builds on previous ones, creating a cumulative argument that profes
   {
     id: 'how-to-read',
     category: 'basics',
-    question: 'What\'s the best way to read this dissertation?',
+    question: 'What\'s the best way to read The Impossible Press?',
     answer: `Here are several approaches depending on your goals:
 
 **For the impatient:** Start with the Introduction and Conclusion. They contain the core argument in concentrated form. Then read Chapter 6 ("The Impossible Press") for the central critique.
@@ -473,8 +473,8 @@ Each chapter builds on previous ones, creating a cumulative argument that profes
   {
     id: 'whats-original',
     category: 'basics',
-    question: 'What\'s original about this dissertation?',
-    answer: `The dissertation's originality lies in how it combines and extends existing ideas:
+    question: 'What\'s original about The Impossible Press?',
+    answer: `The originality of <em>The Impossible Press</em> lies in how it combines and extends existing ideas:
 
 **The synthesis:** Rosen brings together media ecology (Postman), democratic theory (Lippmann, Dewey), sociology of news (Park, Tarde), and philosophy of communication into a unified critique.
 
@@ -484,9 +484,9 @@ Each chapter builds on previous ones, creating a cumulative argument that profes
 
 **The relational view:** While the idea that information is relational comes from others, applying it systematically to journalism criticism was relatively new.
 
-**The predictive power:** The dissertation identified tendencies (attention economy, eclipse of content) that have become central features of our media environment. This suggests genuine insight rather than just synthesis.
+**The predictive power:** <em>The Impossible Press</em> identified tendencies (attention economy, eclipse of content) that have become central features of our media environment. This suggests genuine insight rather than just synthesis.
 
-**The practical implications:** By showing that professional conduct can't solve structural problems, the dissertation opened space for the public journalism movement that followed.`,
+**The practical implications:** By showing that professional conduct can't solve structural problems, <em>The Impossible Press</em> opened space for the public journalism movement that followed.`,
     sources: ['Throughout']
   },
 
@@ -494,8 +494,8 @@ Each chapter builds on previous ones, creating a cumulative argument that profes
   {
     id: 'news-as-drama',
     category: 'concepts',
-    question: 'What does the dissertation say about "news as drama"?',
-    answer: `The dissertation argues that news inevitably tends toward dramatic presentation because of the attention economy.
+    question: 'What does The Impossible Press say about "news as drama"?',
+    answer: `<em>The Impossible Press</em> argues that news inevitably tends toward dramatic presentation because of the attention economy.
 
 **The structural logic:** When media must compete for attention, dramatic narratives outperform information. Stories with conflict, characters, and emotional stakes engage audiences more than policy analysis or context.
 
@@ -564,13 +564,13 @@ Together, these factors determine whether "the press informs the public" or whet
 
 **Why it recurs:** We want technological solutions to social and political problems. New technologies create genuine new possibilities, which get interpreted through utopian hopes. The disappointment is predictable but never prevents the next cycle.
 
-Social media was the latest iteration. The dissertation, written in 1986, essentially predicted this pattern would repeat.`,
+Social media was the latest iteration. <em>The Impossible Press</em>, written in 1986, essentially predicted this pattern would repeat.`,
     sources: ['Chapter 3']
   },
   {
     id: 'sensationalism',
     category: 'concepts',
-    question: 'Does the dissertation explain sensationalism in news?',
+    question: 'Does The Impossible Press explain sensationalism in news?',
     answer: `Yes, but not as a moral failing — as a structural inevitability.
 
 **The attention explanation:** When attention must be competed for rather than assumed, content that grabs attention wins. Sensational content — dramatic, emotional, conflictual, novel — captures attention more effectively than nuanced analysis.
@@ -615,7 +615,7 @@ His work helps Rosen explain how mass media creates "communication without commu
 
 **The opinion formation process:** Tarde was interested in how individual opinions aggregate into public opinion — a process mediated by media and conversation.
 
-**Why he matters for the dissertation:** Tarde helps explain how mass media creates the appearance of a public without the reality of one. People may all pay attention to the same news, but they don't form a genuine community of deliberation. The "public" created by shared attention is different from the public formed by shared action.
+**Why he matters for The Impossible Press:** Tarde helps explain how mass media creates the appearance of a public without the reality of one. People may all pay attention to the same news, but they don't form a genuine community of deliberation. The "public" created by shared attention is different from the public formed by shared action.
 
 His work adds nuance to the Lippmann-Dewey debate: neither simple information transfer nor simple community formation explains how publics actually work.`,
     sources: ['Chapter 5', 'Chapter 8']
@@ -630,11 +630,11 @@ His work adds nuance to the Lippmann-Dewey debate: neither simple information tr
 
 **The scale problem:** Jefferson understood that democratic participation requires human-scale communities. Large-scale representative democracy creates distance between citizens and decisions that affect them.
 
-**The information assumption:** Jefferson famously preferred "newspapers without government to government without newspapers." But this assumes newspapers can adequately inform citizens — precisely what the dissertation questions.
+**The information assumption:** Jefferson famously preferred "newspapers without government to government without newspapers." But this assumes newspapers can adequately inform citizens — precisely what <em>The Impossible Press</em> questions.
 
-**The contemporary relevance:** The dissertation uses Jefferson to establish that concerns about scale are not new. From the founding, thoughtful observers worried that democracy might not scale. Modern mass communication didn't solve this problem; it may have intensified it.
+**The contemporary relevance:** <em>The Impossible Press</em> uses Jefferson to establish that concerns about scale are not new. From the founding, thoughtful observers worried that democracy might not scale. Modern mass communication didn't solve this problem; it may have intensified it.
 
-**The irony:** Jefferson's faith in newspapers as sufficient to sustain informed citizenship across a large republic was optimistic even for his time. The structural problems the dissertation identifies were present, if less severe, from the beginning.`,
+**The irony:** Jefferson's faith in newspapers as sufficient to sustain informed citizenship across a large republic was optimistic even for his time. The structural problems <em>The Impossible Press</em> identifies were present, if less severe, from the beginning.`,
     sources: ['Chapter 1']
   },
 
@@ -642,8 +642,8 @@ His work adds nuance to the Lippmann-Dewey debate: neither simple information tr
   {
     id: 'what-not-arguing',
     category: 'arguments',
-    question: 'What is the dissertation NOT arguing?',
-    answer: `The dissertation is often misunderstood. Here's what it does NOT argue:
+    question: 'What is The Impossible Press NOT arguing?',
+    answer: `<em>The Impossible Press</em> is often misunderstood. Here's what it does NOT argue:
 
 **NOT: Journalists are incompetent or biased.** The critique is structural, not personnel. Individual journalists can be excellent at their jobs while the overall system fails.
 
@@ -651,20 +651,20 @@ His work adds nuance to the Lippmann-Dewey debate: neither simple information tr
 
 **NOT: Information doesn't matter.** The argument is that information is relational, not that it's irrelevant. Context and community matter for whether information informs.
 
-**NOT: Democracy is impossible.** The dissertation diagnoses problems with optimism that they can be addressed. The public journalism movement was an attempt at solutions.
+**NOT: Democracy is impossible.** <em>The Impossible Press</em> diagnoses problems with optimism that they can be addressed. The public journalism movement was an attempt at solutions.
 
 **NOT: We should abandon journalism.** The argument is for rethinking journalism's role, not eliminating it. Journalism should help form publics, not just inform them.
 
 **NOT: Technology is the problem.** Each technology creates new possibilities and problems. The issue is how we think about technology, not technology itself.
 
-The dissertation is a call for clearer thinking about what journalism can and cannot do, not a counsel of despair.`,
+<em>The Impossible Press</em> is a call for clearer thinking about what journalism can and cannot do, not a counsel of despair.`,
     sources: ['Conclusion']
   },
   {
     id: 'solutions-proposed',
     category: 'arguments',
-    question: 'Does the dissertation propose solutions?',
-    answer: `The dissertation is primarily diagnostic, but it points toward solutions that Rosen developed more fully later.
+    question: 'Does The Impossible Press propose solutions?',
+    answer: `<em>The Impossible Press</em> is primarily diagnostic, but it points toward solutions that Rosen developed more fully later.
 
 **What doesn't work:**
 - More information (the problem isn't information deficit)
@@ -672,7 +672,7 @@ The dissertation is a call for clearer thinking about what journalism can and ca
 - New technology (repeats the utopian cycle)
 - Expecting journalists to "just do their job better"
 
-**What the dissertation suggests:**
+**What The Impossible Press suggests:**
 - Understanding journalism as transaction, not action — focusing on the relationship, not just the output
 - Recognizing that publics must be formed, not just informed
 - Thinking about community as precondition for meaningful information
@@ -684,7 +684,7 @@ The dissertation is a call for clearer thinking about what journalism can and ca
 - Engagement journalism: Build relationships with communities, not just audiences
 - Solutions journalism: Focus on responses to problems, not just problems
 
-The dissertation created the theoretical foundation for these practical experiments.`,
+<em>The Impossible Press</em> created the theoretical foundation for these practical experiments.`,
     sources: ['Conclusion', 'Later Work']
   },
 
@@ -692,27 +692,27 @@ The dissertation created the theoretical foundation for these practical experime
   {
     id: 'ai-journalism',
     category: 'contemporary',
-    question: 'What would the dissertation say about AI and journalism?',
-    answer: `The dissertation doesn't mention AI (it didn't exist as we know it), but its framework suggests several concerns:
+    question: 'What would The Impossible Press say about AI and journalism?',
+    answer: `<em>The Impossible Press</em> doesn't mention AI (it didn't exist as we know it), but its framework suggests several concerns:
 
-**Technological utopianism redux:** AI is inspiring familiar utopian hopes — democratized access to knowledge, automated fact-checking, personalized news. The dissertation predicts disappointment: structural problems won't be solved by technical tools.
+**Technological utopianism redux:** AI is inspiring familiar utopian hopes — democratized access to knowledge, automated fact-checking, personalized news. <em>The Impossible Press</em> predicts disappointment: structural problems won't be solved by technical tools.
 
 **The pseudo-environment industrialized:** If AI generates news summaries, creates personalized feeds, and curates information, it becomes a major constructor of pseudo-environments. AI makes the pictures in our heads without us knowing who's holding the brush.
 
 **Attention economy accelerated:** AI enables content production at scales humans can't match, potentially intensifying the attention competition that already eclipses substantive communication.
 
-**The relational question:** The dissertation asks: does this help people understand and act on their world? AI-generated content may be accurate without being informative in the relational sense. Information still needs community context.
+**The relational question:** <em>The Impossible Press</em> asks: does this help people understand and act on their world? AI-generated content may be accurate without being informative in the relational sense. Information still needs community context.
 
 **What could help:** AI that helps form communities of inquiry, facilitates deliberation, connects people with shared problems — tools that address the structural issues, not just information production.
 
-The dissertation would urge caution about AI-powered journalism repeating the impossible promise in new technological form.`,
+<em>The Impossible Press</em> would urge caution about AI-powered journalism repeating the impossible promise in new technological form.`,
     sources: ['Chapter 3', 'Conclusion']
   },
   {
     id: 'polarization',
     category: 'contemporary',
-    question: 'Does the dissertation explain political polarization?',
-    answer: `The dissertation provides important conceptual tools for understanding polarization:
+    question: 'Does The Impossible Press explain political polarization?',
+    answer: `<em>The Impossible Press</em> provides important conceptual tools for understanding polarization:
 
 **Fragmented pseudo-environments:** When different communities inhabit different pseudo-environments — different "pictures in their heads" — they're not just disagreeing about facts; they're perceiving different realities.
 
@@ -724,24 +724,24 @@ The dissertation would urge caution about AI-powered journalism repeating the im
 
 **The limits of professional journalism:** "Both sides" journalism assumes two coherent sides that can be fairly represented. When the sides inhabit different realities, this framing breaks down. Professional norms weren't designed for asymmetric polarization.
 
-The dissertation suggests polarization isn't primarily an information problem solvable by better journalism — it's a community problem, a scale problem, a structural problem.`,
+<em>The Impossible Press</em> suggests polarization isn't primarily an information problem solvable by better journalism — it's a community problem, a scale problem, a structural problem.`,
     sources: ['Chapter 5', 'Chapter 7']
   },
   {
     id: 'substack-creators',
     category: 'contemporary',
-    question: 'How does the dissertation framework apply to Substack and independent creators?',
-    answer: `Substack and the creator economy represent an interesting case from the dissertation's perspective:
+    question: 'How does The Impossible Press framework apply to Substack and independent creators?',
+    answer: `Substack and the creator economy represent an interesting case from the perspective of <em>The Impossible Press</em>:
 
 **Audience atomization... overcome?** Rosen later coined "audience atomization overcome" to describe how the internet connected previously isolated audience members. Substack takes this further: readers form communities around individual writers.
 
 **Scale matters:** Successful substacks often operate at more human scales than mass media. A writer with 50,000 subscribers might actually know their audience, respond to comments, build genuine community.
 
-**The transaction model:** Substack makes the transactional nature of journalism explicit. Readers pay directly; writers respond to subscriber interests. This is closer to the relationship the dissertation advocates.
+**The transaction model:** Substack makes the transactional nature of journalism explicit. Readers pay directly; writers respond to subscriber interests. This is closer to the relationship <em>The Impossible Press</em> advocates.
 
 **But also:** The problems don't disappear. Successful substacks still compete for attention. The pseudo-environment problem persists — readers choose substacks that confirm their views. And most people can't sustain paid subscriptions to enough sources to be broadly informed.
 
-**The community question:** Some substacks build genuine communities of inquiry. Others build audiences with parasocial relationships to charismatic writers. The dissertation would ask: which kind of "public" is being formed?
+**The community question:** Some substacks build genuine communities of inquiry. Others build audiences with parasocial relationships to charismatic writers. <em>The Impossible Press</em> would ask: which kind of "public" is being formed?
 
 Substack is a partial solution at best — valuable for some, but not a systemic answer to mass communication's structural problems.`,
     sources: ['Chapter 5', 'Later Work']
@@ -749,25 +749,25 @@ Substack is a partial solution at best — valuable for some, but not a systemic
   {
     id: 'solutions-journalism',
     category: 'contemporary',
-    question: 'How does the dissertation relate to solutions journalism?',
-    answer: `Solutions journalism — focusing on responses to problems, not just problems themselves — is a direct descendant of public journalism, which grew from the dissertation.
+    question: 'How does The Impossible Press relate to solutions journalism?',
+    answer: `Solutions journalism — focusing on responses to problems, not just problems themselves — is a direct descendant of public journalism, which grew from <em>The Impossible Press</em>.
 
 **The problem with problem-focus:** Traditional journalism excels at exposing problems: corruption, failure, crisis. But exposition doesn't automatically produce solutions. "Making things public" doesn't make a public capable of responding.
 
-**The dissertation's contribution:** By arguing that journalism should help form publics, not just inform them, the dissertation created theoretical space for journalism that helps communities respond to problems.
+**The contribution of The Impossible Press:** By arguing that journalism should help form publics, not just inform them, <em>The Impossible Press</em> created theoretical space for journalism that helps communities respond to problems.
 
 **Solutions journalism's premise:** Reporting on how communities have successfully addressed problems gives audiences models for action, not just awareness of failure. This is closer to what Dewey wanted — communication embedded in capacity for response.
 
-**The limits:** Solutions journalism can become advocacy, or can overstate success stories. Not every problem has a solution ready to be reported. The structural issues the dissertation identifies — scale, atomization, attention — affect solutions journalism too.
+**The limits:** Solutions journalism can become advocacy, or can overstate success stories. Not every problem has a solution ready to be reported. The structural issues <em>The Impossible Press</em> identifies — scale, atomization, attention — affect solutions journalism too.
 
-**The connection:** Solutions journalism accepts the dissertation's premise: journalism's job isn't done when the story is published. The question is whether the journalism helped form a public capable of action.`,
+**The connection:** Solutions journalism accepts the premise of <em>The Impossible Press</em>: journalism's job isn't done when the story is published. The question is whether the journalism helped form a public capable of action.`,
     sources: ['Conclusion', 'Public Journalism']
   },
   {
     id: 'election-coverage',
     category: 'contemporary',
-    question: 'What does the dissertation suggest about election coverage?',
-    answer: `Election coverage is a case study in the dissertation's critique:
+    question: 'What does The Impossible Press suggest about election coverage?',
+    answer: `Election coverage is a case study in the critique from <em>The Impossible Press</em>:
 
 **Horse-race journalism:** Coverage focuses on who's winning, poll numbers, campaign strategy — drama, not substance. This is the "news as drama" tendency taken to its extreme.
 
@@ -790,7 +790,7 @@ Substack is a partial solution at best — valuable for some, but not a systemic
     question: 'What is "audience atomization overcome"?',
     answer: `"Audience atomization overcome" is a concept Rosen developed in the 2000s to describe how the internet changed the relationship between media and audiences.
 
-**The atomized audience:** In the broadcast era, mass media addressed millions of isolated individuals. Audience members couldn't communicate with each other; they could only receive. This is the "mobilized privacy" the dissertation describes.
+**The atomized audience:** In the broadcast era, mass media addressed millions of isolated individuals. Audience members couldn't communicate with each other; they could only receive. This is the "mobilized privacy" <em>The Impossible Press</em> describes.
 
 **What the internet changed:** Digital networks allowed audience members to connect horizontally. Readers could discuss stories, share them, comment, respond, and organize. The audience became networked.
 
@@ -805,7 +805,7 @@ Substack is a partial solution at best — valuable for some, but not a systemic
     id: 'getting-connections-right',
     category: 'later-work',
     question: 'What is "Getting the Connections Right" about?',
-    answer: `"Getting the Connections Right: Public Journalism and the Troubles in the Press" (1996) was Rosen's first book-length work after the dissertation, translating its academic arguments into a reform program.
+    answer: `"Getting the Connections Right: Public Journalism and the Troubles in the Press" (1996) was Rosen's first book-length work after <em>The Impossible Press</em>, translating its academic arguments into a reform program.
 
 **The core argument:** Journalism has lost connection with citizens because it treats them as spectators rather than participants. To restore connection, journalism must help people participate in public life.
 
@@ -815,7 +815,7 @@ Substack is a partial solution at best — valuable for some, but not a systemic
 
 **The controversy:** Traditional journalists attacked public journalism as abandoning objectivity and neutrality. Rosen argued that the pretense of pure observation was itself part of the problem.
 
-**The connection to the dissertation:** The book is the dissertation's practical application. If "making things public doesn't make a public," then journalism must actively help form publics. "Getting the Connections Right" explains how.
+**The connection to The Impossible Press:** The book is the practical application of <em>The Impossible Press</em>. If "making things public doesn't make a public," then journalism must actively help form publics. "Getting the Connections Right" explains how.
 
 **The legacy:** Public journalism as a formal movement faded, but its insights influenced subsequent developments in civic, engagement, and community journalism.`,
     sources: ['Getting the Connections Right (1996)']
@@ -836,7 +836,7 @@ Substack is a partial solution at best — valuable for some, but not a systemic
 
 **The continuing relevance:** The question "what are journalists for?" remains unanswered and urgent. In 2025, with trust collapsed and business models failing, the question is unavoidable.
 
-**The connection:** This book is the fullest expression of the trajectory that began with the dissertation.`,
+**The connection:** This book is the fullest expression of the trajectory that began with <em>The Impossible Press</em>.`,
     sources: ['What Are Journalists For? (1999)']
   }
 ];

@@ -83,7 +83,7 @@ const FeaturedSection = () => {
                 className="group relative flex flex-col bg-white border border-stone-200 hover:border-stone-800 transition-all duration-500 shadow-sm hover:shadow-xl overflow-hidden animate-fade-in"
                 style=${{ animationDelay: `${index * 100}ms` }}
             >
-                <div className="relative h-48 overflow-hidden bg-stone-100">
+                <div className="relative h-28 overflow-hidden bg-stone-100">
                 <div className="absolute inset-0 bg-stone-900/10 group-hover:bg-transparent transition-colors z-10" />
                 <img 
                     src=${work.image} 
@@ -95,18 +95,21 @@ const FeaturedSection = () => {
                 </span>
                 </div>
 
-                <div className="p-6 flex-grow flex flex-col">
-                <h3 className="text-xl font-display font-bold text-stone-900 mb-3 group-hover:text-stone-600 transition-colors">
+                <div className="p-4 flex-grow flex flex-col">
+                <h3 className="text-base font-display font-bold text-stone-900 mb-1 group-hover:text-stone-600 transition-colors leading-tight">
                     ${work.title}
                 </h3>
-                <p className="text-stone-600 text-sm leading-relaxed mb-4 flex-grow font-body">
-                    ${work.description}
-                </p>
-                
-                <div className="mt-auto pt-4 flex items-center justify-between text-xs font-bold uppercase tracking-widest text-stone-400 group-hover:text-stone-900 transition-colors">
+
+                <div className="mt-auto pt-2 flex items-center justify-between text-xs font-bold uppercase tracking-widest text-stone-400 group-hover:text-stone-900 transition-colors">
                     <span>Explore</span>
                     <${ArrowRight} className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
                 </div>
+                </div>
+
+                <!-- Tooltip on hover -->
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-stone-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none w-64 text-center z-50 shadow-lg hidden sm:block" style=${{ lineHeight: '1.5' }}>
+                  ${work.description}
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-stone-900"></div>
                 </div>
             </a>
             `)}

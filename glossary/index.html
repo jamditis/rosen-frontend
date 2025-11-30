@@ -32,6 +32,18 @@
 
     <link rel="stylesheet" href="../shared-styles.css" />
     <style>
+      /* Screen reader only - for accessibility */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+      }
       .concept-card {
         cursor: pointer;
         transition: all 0.2s ease;
@@ -102,19 +114,33 @@
   </head>
 
   <body class="antialiased font-body text-stone-900 min-h-screen bg-paper">
+    <!-- Skip to main content link for accessibility -->
+    <a href="#concepts-grid" class="skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-stone-800 focus:text-white focus:px-4 focus:py-2 focus:rounded">
+      Skip to concepts
+    </a>
+
+    <!-- Screen reader announcements -->
+    <div id="sr-announcements" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
     <!-- Header -->
     <header class="sticky top-0 z-50 bg-paper/95 backdrop-blur-sm border-b border-stone-200">
-      <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="max-w-7xl mx-auto px-4 py-3">
         <div class="flex items-center justify-between">
-          <div>
-            <h1 class="font-display text-xl md:text-2xl text-stone-850">Glossary</h1>
-            <p class="text-xs text-stone-500 mt-1">Key Concepts from The Impossible Press</p>
-          </div>
-          <nav class="flex items-center gap-4">
-            <a href="https://drive.google.com/file/d/14sIj3nYzOaV_CRHLMRvbgv9EcYbCsp4L/view"
-               target="_blank"
+          <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <div class="bg-stone-900 text-white p-1.5">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-lg md:text-xl font-display font-bold text-stone-900 tracking-tight">Jay Rosen Digital Archive</h1>
+              <p class="text-xs text-stone-500">Glossary</p>
+            </div>
+          </a>
+          <nav class="flex items-center gap-3">
+            <a href="/tools/dissertation-reader/dist/"
                class="text-xs bg-stone-800 text-white px-3 py-1.5 rounded hover:bg-stone-700 transition-colors">
-              Read Full Dissertation
+              Read Dissertation
             </a>
           </nav>
         </div>
@@ -126,7 +152,7 @@
       <!-- Introduction -->
       <section class="mb-12 max-w-3xl">
         <p class="text-stone-600 leading-relaxed mb-4">
-          The dissertation introduces a rich vocabulary for understanding the relationship between press and public.
+          <em><a href="/tools/dissertation-reader/dist/" class="text-stone-700 hover:text-stone-900 underline">The Impossible Press</a></em> introduces a rich vocabulary for understanding the relationship between press and public.
           Click on any concept to explore its meaning, context, and contemporary relevance.
         </p>
 
@@ -147,11 +173,22 @@
         </div>
 
         <!-- Detail Panel -->
-        <aside id="detail-panel" class="detail-panel hidden lg:w-96 flex-shrink-0 lg:sticky lg:top-24 lg:h-fit">
+        <aside
+          id="detail-panel"
+          class="detail-panel hidden lg:w-96 flex-shrink-0 lg:sticky lg:top-24 lg:h-fit"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="detail-panel-title"
+          aria-describedby="detail-panel-description"
+        >
           <div class="card p-6 relative">
             <div class="close-btn">
-              <button id="close-panel" class="text-stone-400 hover:text-stone-600 p-2 -m-2">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button
+                id="close-panel"
+                class="text-stone-400 hover:text-stone-600 p-2 -m-2 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 rounded"
+                aria-label="Close concept details"
+              >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
               </button>

@@ -39,7 +39,7 @@ const DISSERTATION_RECORD = {
   year: '1986',
   era: 'Public Journalism (90s)', 
   pub: 'New York University (Ph.D. Dissertation)',
-  url: 'https://drive.google.com/file/d/14sIj3nYzOaV_CRHLMRvbgv9EcYbCsp4L/view?usp=sharing',
+  url: '/tools/dissertation-reader/dist/',
   summary: 'Rosen\'s doctoral dissertation traces the history of the idea that the function of the press is to inform the public. It argues that the rise of the mass circulation newspaper, while creating a technical ability to reach everyone, actually undermined the conditions necessary for a "universal town meeting." Drawing heavily on Walter Lippmann and John Dewey, it suggests that the professionalization of journalism ("objectivity") was a retreat from the problem of creating a genuine public life in a complex society. It contrasts news as "symptom" vs. news as "symbol" and explores how the press creates a "pseudo-environment" of public opinion.',
   quote: 'An impossible press was born, one which sought to solve the whole problem of public life simply by controlling the conduct of journalists.',
   categories: ['Journalism History', 'Democratic Theory', 'Press Criticism', 'Public Life'],
@@ -51,8 +51,25 @@ const DISSERTATION_RECORD = {
 
 // Cache configuration
 const CACHE_TTL_MS = 1000 * 60 * 60; // 1 hour cache
-const CACHE_VERSION = 'v1'; // Increment to invalidate all caches
+const CACHE_VERSION = 'v3'; // Increment to invalidate all caches
 const LOG_URL_MAX_LENGTH = 80; // Maximum URL length to display in console logs
+
+// Performance: Add prefetch hints for data URLs
+// This tells the browser to start fetching these resources early
+export const prefetchDataSources = (dataConfig) => {
+  if (typeof document !== 'undefined' && document.head) {
+    ['test_runs', 'social_posts', 'relationships'].forEach(key => {
+      if (dataConfig[key]) {
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.href = dataConfig[key];
+        link.as = 'fetch';
+        link.crossOrigin = 'anonymous';
+        document.head.appendChild(link);
+      }
+    });
+  }
+};
 
 const getCacheKey = (url) => {
   // Use djb2 hash algorithm for cache keys to avoid encoding issues with non-ASCII URLs
@@ -214,7 +231,17 @@ export const fetchArchiveData = async () => {
   let allRecords = [...mainRecords, ...socialRecords];
   allRecords.push({ ...DISSERTATION_RECORD, relatedIds: [] });
   
-  allRecords = allRecords.filter(r => r.verified && r.title);
+  // Filter out records that are:
+  // - Not verified
+  // - Missing title or have "Untitled" placeholder
+  // - Have titles shorter than 5 characters (likely garbage data)
+  // - Missing both date and URL (incomplete records)
+  allRecords = allRecords.filter(r => {
+    if (!r.verified) return false;
+    if (!r.title || r.title === 'Untitled' || r.title.trim().length < 5) return false;
+    if (!r.date && r.url === '#') return false; // Need at least a date or valid URL
+    return true;
+  });
   allRecords.sort((a, b) => b.date.localeCompare(a.date));
 
   DISSERTATION_RECORD.categories.forEach(c => { categories.add(c); searchTerms.add(c); });
