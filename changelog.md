@@ -28,11 +28,11 @@ Merged the `jamditis/rosen-archive` repository into this monorepo for unified de
   - `agent-personas/` - AI persona definitions
   - `narrative/` - Project logs and history
 
-- **`/legacy/`** - Previous frontend iterations
-  - `archive-v1/` - Original archive application
-  - `dataviz/` - Data visualization tool
-  - `dataexplorer/` - Data explorer grid
-  - `dissertation-reader/` - Dissertation reader app
+- **`/tools/`** - Additional presentation tools (renamed from `/legacy/`)
+  - `dataexplorer/` - Data explorer grid (active development)
+  - `dataviz/` - Data visualization tool (active development)
+  - `dissertation-reader/` - Dissertation reader app (active development)
+  - `archive-v1/` - Original archive application (reference)
   - `web/` - Promotional website
 
 - **`/release-assets/`** - Promotional materials and documentation

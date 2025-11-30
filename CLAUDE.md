@@ -107,11 +107,11 @@ The `index.html` loads the JS version. When editing, ensure changes are reflecte
 │   ├── agent-personas/           # AI persona definitions
 │   └── narrative/                # Project logs and history
 │
-├── legacy/                       # Previous frontend iterations
-│   ├── archive-v1/               # Original archive app
-│   ├── dataviz/                  # Data visualization tool
-│   ├── dataexplorer/             # Data explorer grid
-│   ├── dissertation-reader/      # Dissertation reader app
+├── tools/                        # Additional presentation tools
+│   ├── dataexplorer/             # Data explorer grid (active development)
+│   ├── dataviz/                  # Data visualization tool (active development)
+│   ├── dissertation-reader/      # Dissertation reader app (active development)
+│   ├── archive-v1/               # Original archive app (reference)
 │   └── web/                      # Promotional website
 │
 ├── release-assets/               # Promotional materials

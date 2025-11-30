@@ -15,7 +15,7 @@ This monorepo contains:
 | **`/dissertation`** | Full dissertation PDFs and transcribed markdown |
 | **`/data-tools`** | R scripts and planning documents for data analysis |
 | **`/docs`** | Documentation, agent personas, and project narrative |
-| **`/legacy`** | Previous frontend iterations (dataviz, dataexplorer, etc.) |
+| **`/tools`** | Additional presentation tools (dataexplorer, dataviz, dissertation-reader, etc.) |
 | **`/release-assets`** | Promotional materials and release documentation |
 
 ---
@@ -181,11 +181,12 @@ python src/workflow.py
 │   ├── agent-personas/          # AI persona definitions
 │   └── narrative/               # Project logs
 │
-├── legacy/                      # Previous frontend versions
-│   ├── dataviz/                 # Data visualization tool
+├── tools/                       # Additional presentation tools
 │   ├── dataexplorer/            # Data explorer grid
+│   ├── dataviz/                 # Data visualization tool
 │   ├── dissertation-reader/     # Dissertation reader app
-│   └── archive-v1/              # Original archive version
+│   ├── archive-v1/              # Original archive version (reference)
+│   └── web/                     # Promotional website
 │
 ├── release-assets/              # Promotional materials
 ├── App.js                       # Main frontend controller
