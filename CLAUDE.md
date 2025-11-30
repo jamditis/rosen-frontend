@@ -4,7 +4,12 @@ This file provides context for Claude Code when working on this repository.
 
 ## Project Overview
 
-The **Jay Rosen Digital Archive (JRDA)** is a curated, interactive public collection of the works, critiques, and teachings of NYU Professor Jay Rosen. It includes a main archive application and standalone presentation tools for his 1986 doctoral dissertation "The Impossible Press."
+The **Jay Rosen Digital Archive (JRDA)** is a comprehensive monorepo containing:
+1. **Frontend Application** - Zero-build React app for exploring Jay Rosen's work
+2. **Backend Data Pipeline** - Python system for scraping, AI analysis, and archiving content
+3. **Dissertation Materials** - Full PDFs and transcription of the 1986 dissertation
+4. **Data Tools** - R scripts and analysis tools
+5. **Legacy Frontends** - Previous iterations of the archive interface
 
 ### Key Person: Jay Rosen
 - Professor of Journalism at NYU since 1986
@@ -69,30 +74,47 @@ The `index.html` loads the JS version. When editing, ensure changes are reflecte
 │   ├── DissertationPage.js       # Dissertation view container
 │   ├── MindMap.js                # Interactive tree visualization
 │   ├── DetailPanel.js            # Dissertation node details
-│   └── dissertationData.js       # Full dissertation content (13 nodes)
+│   └── dissertationData.js       # Full dissertation content (70+ nodes)
 │
 ├── services/
 │   └── archiveService.js         # Data fetching, parsing, caching
 │
 ├── comparison-tool/              # "Then and Now" 1986 vs 2025 comparisons
-│   ├── index.html, styles.css, script.js, data.js
-│
 ├── glossary/                     # Interactive concept glossary
-│   ├── index.html, script.js, data.js (16 concepts, 4 key figures)
-│
 ├── context-1986/                 # Historical context page
-│   ├── index.html, script.js, data.js (media landscape, what didn't exist)
-│
 ├── timeline/                     # Dissertation → later work timeline
-│   ├── index.html, script.js, data.js (14 entries, 1986-2025)
-│
 ├── annotated-excerpts/           # Key passages with commentary
-│   ├── index.html, script.js, data.js (12 excerpts)
-│
 ├── faq/                          # FAQ + BYOK Chat interface
-│   ├── index.html, script.js, data.js (25+ Q&A pairs)
-│   ├── chat.html, chat.js (BYOK Claude chat)
 │
+├── backend/                      # Python data pipeline
+│   ├── src/                      # Core source code (processors, scraper, categorizer)
+│   ├── scripts/                  # Maintenance and utility scripts
+│   ├── tests/                    # Test suite
+│   ├── pyproject.toml            # Poetry dependencies
+│   ├── poetry.lock               # Locked dependencies
+│   └── schema.json               # Data schema
+│
+├── dissertation/                 # Dissertation source materials
+│   ├── *.pdf                     # Original PDF scans
+│   ├── *.md                      # Transcribed markdown
+│   └── build_unified_pdf.py      # PDF builder script
+│
+├── data-tools/                   # Analysis and planning tools
+│   ├── RStudio/                  # R scripts for analysis
+│   └── planning/                 # Project planning docs
+│
+├── docs/                         # Documentation
+│   ├── agent-personas/           # AI persona definitions
+│   └── narrative/                # Project logs and history
+│
+├── legacy/                       # Previous frontend iterations
+│   ├── archive-v1/               # Original archive app
+│   ├── dataviz/                  # Data visualization tool
+│   ├── dataexplorer/             # Data explorer grid
+│   ├── dissertation-reader/      # Dissertation reader app
+│   └── web/                      # Promotional website
+│
+├── release-assets/               # Promotional materials
 ├── shared-styles.css             # Common CSS for all standalone tools
 ├── README.md                     # User documentation
 ├── changelog.md                  # Development history
@@ -247,13 +269,47 @@ The dissertation is being released publicly with multiple presentation formats:
 
 ## Important Notes for Claude
 
-1. **No build step required** - Don't suggest npm commands or build processes
+1. **No build step required** - Don't suggest npm commands or build processes for frontend
 2. **Match existing style** - Use Roboto Mono, Special Elite fonts, paper texture
 3. **Standalone tools go in subdirectories** - Like `comparison-tool/`
 4. **Update documentation** - Keep README.md, changelog.md, and this file current
 5. **Dissertation content is sacred** - Quotes and content from `dissertationData.js` are accurate citations
 6. **Jay Rosen's voice** - 2025 commentary should be placeholder text for Jay to revise, or clearly marked as draft
 7. **WordPress deployment** - Final tools will be uploaded via FTP to a WordPress domain
+8. **Backend uses Poetry** - Python dependencies managed via Poetry, not pip directly
+9. **Dissertation source in /dissertation/** - Full PDFs and transcription available there
+
+---
+
+## Backend Data Pipeline
+
+Located in `/backend/`, the Python pipeline processes and archives content.
+
+### Setup
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install poetry
+poetry install
+playwright install
+```
+
+### Configuration
+Create `.env` in `/backend/`:
+```
+SPREADSHEET_NAME="Your Google Sheet Name"
+GEMINI_API_KEY="your_gemini_api_key"
+```
+
+Place Google Cloud credentials in `backend/google_credentials.json`.
+
+### Commands
+```bash
+python src/workflow.py                      # Main pipeline
+python tools/diagnostics/data_deduper.py    # Clean data
+python tools/backfill/backfill_worker.py    # Fill missing fields
+```
 
 ---
 

@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jay Rosen Digital Archive (Optimized)</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- PapaParse for CSV parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Special+Elite&display=swap" rel="stylesheet">
+    
+    <style>
+        body { background-color: #f9f6f1 !important; }
+        #rosen-archive-wrapper { font-family: 'Roboto Mono', monospace !important; color: #2d2d2d; }
+        #rosen-archive-wrapper h1, #rosen-archive-wrapper h2, #rosen-archive-wrapper h3, #rosen-archive-wrapper .font-display { font-family: 'Special Elite', cursive !important; }
+        
+        #rosen-archive-wrapper ::-webkit-scrollbar { width: 8px; height: 8px; }
+        #rosen-archive-wrapper ::-webkit-scrollbar-track { background: #e4e0d8; border-radius: 10px; }
+        #rosen-archive-wrapper ::-webkit-scrollbar-thumb { background: #a89974; border-radius: 10px; }
+        #rosen-archive-wrapper ::-webkit-scrollbar-thumb:hover { background: #5a5a5a; }
+        
+        #rosen-archive-wrapper .archive-card { background-color: #fbf5e8; border: 1px solid #e6dbbf; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); transition: all 0.2s ease-in-out; position: relative; margin-top: 10px; cursor: pointer; }
+        #rosen-archive-wrapper .archive-card:hover { transform: translateY(-4px); box-shadow: 4px 4px 10px rgba(0,0,0,0.15); }
+        #rosen-archive-wrapper .card-tab { position: absolute; top: -11px; left: 10px; background-color: #fbf5e8; border: 1px solid #e6dbbf; border-bottom: none; padding: 2px 12px; border-radius: 6px 6px 0 0; font-size: 10px; color: #a89974; text-transform: uppercase; }
+        
+        #rosen-archive-wrapper .concept-tag { cursor: pointer; display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 500; margin: 2px; border: 1px solid; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.2s ease-in-out; }
+        #rosen-archive-wrapper .concept-tag:hover { filter: brightness(95%); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
+        #rosen-archive-wrapper .search-input, #rosen-archive-wrapper .select-input { font-family: 'Roboto Mono', monospace; background-color: #ffffff; color: #2d2d2d; border-color: #9ca3af; }
+        #rosen-archive-wrapper .search-input::placeholder { color: #9ca3af; }
+        #rosen-archive-wrapper .search-input:focus, #rosen-archive-wrapper .select-input:focus { --tw-ring-color: #2d2d2d; }
+        
+        #rosen-archive-wrapper .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0); transition: background-color 0.3s ease-in-out; }
+        #rosen-archive-wrapper .modal.is-open { background-color: rgba(0,0,0,0.6); }
+        
+        #rosen-archive-wrapper .modal-content { background-color: #f9f6f1; margin: 5% auto; padding: 2rem; border: 1px solid #888; width: 90%; max-width: 800px; border-radius: 8px; position: relative; animation: modal-show 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; }
+        #rosen-archive-wrapper .modal.is-closing .modal-content { animation: modal-hide 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards; }
+        @media (min-width: 1280px) { #rosen-archive-wrapper .modal-content { max-width: 1100px; } }
+        
+        #rosen-archive-wrapper .modal-close { color: #9ca3af; position: absolute; top: 0.5rem; right: 0.5rem; width: 2rem; height: 2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        #rosen-archive-wrapper .modal-close:hover { color: #2d2d2d; }
+        
+        #rosen-archive-wrapper .modal-tab { position: absolute; top: -14px; left: 20px; background-color: #f9f6f1; border: 1px solid #888; border-bottom: none; padding: 4px 16px; border-radius: 8px 8px 0 0; font-size: 12px; color: #a89974; text-transform: uppercase; }
+        #rosen-archive-wrapper .modal-body { max-height: 70vh; overflow-y: auto; padding-right: 15px; }
+        
+        #rosen-archive-wrapper .pagination-btn { background-color: #fff; border: 1px solid #5a5a5a; color: #2d2d2d; padding: 8px 16px; cursor: pointer; transition: all 0.2s ease-in-out; }
+        #rosen-archive-wrapper .pagination-btn:hover:not(:disabled) { background-color: #2d2d2d; color: #f9f6f1; }
+        #rosen-archive-wrapper .pagination-btn:disabled { background-color: #e4e0d8; color: #9ca3af; cursor: not-allowed; }
+        
+        #rosen-archive-wrapper .welcome-button { background-color: #2d3748; color: white; padding: 12px 24px; border-radius: 5px; cursor: pointer; font-size: 1.2rem; border: none; transition: background-color 0.2s; }
+        #rosen-archive-wrapper .welcome-button:hover:not(:disabled) { background-color: #4a5568; }
+        #rosen-archive-wrapper .welcome-button:disabled { background-color: #9ca3af; cursor: not-allowed; }
+
+        #rosen-archive-wrapper #welcome-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(45, 45, 45, 0.7); z-index: 2000; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s ease-in-out; }
+        #rosen-archive-wrapper #welcome-modal.hidden { opacity: 0; pointer-events: none; }
+        #rosen-archive-wrapper .welcome-content { background-color: #f9f6f1; padding: 2.5rem; border-radius: 8px; text-align: center; max-width: 500px; width: 90%; }
+        
+        #rosen-archive-wrapper .modal-title-link:hover h2 { text-decoration: underline; color: #1d4ed8; }
+        
+        #rosen-archive-wrapper #filter-drawer { position: fixed; top: 0; right: -600px; width: clamp(350px, 35vw, 550px); height: 100%; background-color: #fbf5e8; box-shadow: -4px 0 15px rgba(0,0,0,0.2); z-index: 1500; transition: right 0.4s ease-in-out; border-left: 1px solid #e6dbbf; }
+        #rosen-archive-wrapper #filter-drawer.open { right: 0; }
+        #rosen-archive-wrapper .filter-drawer-body { height: calc(100% - 120px); overflow-y: auto; }
+        #rosen-archive-wrapper .filter-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); z-index: 1400; }
+        #rosen-archive-wrapper .filter-overlay.open { display: block; }
+
+        #rosen-archive-wrapper #scroll-to-top { position: fixed; bottom: 20px; right: 20px; opacity: 0; visibility: hidden; z-index: 1000; transition: opacity 0.3s, visibility 0.3s; }
+        #rosen-archive-wrapper #scroll-to-top.visible { opacity: 1; visibility: visible; }
+        
+        #rosen-archive-wrapper #sort-notification { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background-color: #2d3748; color: #f7fafc; padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 2000; transition: top 0.4s ease-in-out; font-family: 'Roboto Mono', monospace; }
+        #rosen-archive-wrapper #sort-notification.show { top: 20px; }
+        
+        #rosen-archive-wrapper .skeleton-card { background-color: #fbf5e8; border: 1px solid #e6dbbf; }
+        #rosen-archive-wrapper .skeleton { background-color: #e4e0d8; animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        
+        #rosen-archive-wrapper .accordion-toggle { cursor: pointer; }
+
+        /* The .folder class is now used as a modifier alongside .archive-card for consistent styling */
+        #rosen-archive-wrapper .folder {
+            border-bottom-width: 4px; /* Add a thicker border for color-coding */
+            aspect-ratio: 4 / 3; /* Maintain a 4:3 aspect ratio for a consistent folder shape */
+            display: flex; /* Ensure flexbox layout for direct children */
+            flex-direction: column; /* Stack children vertically */
+        }
+
+        #rosen-archive-wrapper .view-toggle-active { background-color: #2d2d2d; color: #f9f6f1; cursor: default; }
+
+        @keyframes pulse { 50% { opacity: .5; } }
+        @keyframes modal-show { from { opacity: 0; transform: scale(0.9) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes modal-hide { from { opacity: 1; transform: scale(1) translateY(0); } to { opacity: 0; transform: scale(0.9) translateY(10px); } }
+    </style>
+</head>
+<body class="antialiased">
+<div id="rosen-archive-wrapper">
+    <!-- Welcome Modal -->
+    <div id="welcome-modal"> <div class="welcome-content"> <h2 class="text-3xl font-display text-gray-900 mb-4">Welcome</h2> <p class="text-gray-700 mb-8">This is a public archive of the work of Jay Rosen, a writer, and professor of journalism at New York University.</p> <button id="welcome-button" class="welcome-button">View the archive &rarr;</button> </div> </div>
+
+    <!-- Main Content -->
+    <div id="page-wrapper" class="opacity-0 transition-opacity duration-500">
+        <header class="bg-[#f9f6f1] border-b-2 border-gray-700 sticky top-0 z-50">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-center items-center">
+                <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 text-center">The Jay Rosen Digital Archive</h1>
+            </div>
+        </header>
+
+        <main id="main-content" class="container mx-auto p-4 sm:p-6 lg:p-8">
+            <div id="record-count-container" class="text-sm text-gray-600 text-center mb-4"> <p>Loading records...</p> </div>
+            <div class="p-6 bg-white/50 rounded-lg shadow-md border border-gray-200">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="relative flex-grow">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg></div>
+                        <input type="text" id="search" class="search-input block w-full pl-10 pr-10 py-3 border rounded-md leading-5 focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm" placeholder="Search by title, summary, key concepts...">
+                        <button id="clear-search" aria-label="Clear search input" class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-gray-400 hover:text-gray-600"><svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" /></svg></button>
+                    </div>
+                    <div class="flex items-center justify-center md:justify-end space-x-2 flex-shrink-0">
+                         <div class="flex items-center space-x-2"> <label for="items-per-page" class="text-sm font-medium text-gray-700 whitespace-nowrap">Per page:</label> <select id="items-per-page" class="select-input block w-full py-2.5 pl-3 pr-8 border rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 sm:text-sm"> <option value="15" selected>15</option><option value="21">21</option><option value="36">36</option><option value="45">45</option><option value="65">65</option><option value="100">100</option> </select> </div>
+                         <button id="open-filter-drawer" class="pagination-btn flex items-center space-x-2 relative rounded-md"> <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd" /></svg> <span>Filters & Sort</span> <span id="filter-count-badge" class="hidden absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span> </button>
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-center mt-8 mb-12">
+                <div id="view-toggle-buttons" class="flex rounded-md shadow-sm" role="group">
+                    <button type="button" id="view-folders-btn" class="pagination-btn rounded-r-none rounded-l-md">
+                        View as folders
+                    </button>
+                    <button type="button" id="view-all-btn" class="pagination-btn rounded-l-none rounded-r-md border-l-0">
+                        View all records
+                    </button>
+                </div>
+            </div>
+            <div id="error" class="hidden text-center py-16 bg-red-50 text-red-700 rounded-lg border border-red-200"><p class="text-lg font-semibold font-display">Could not load data</p><p id="error-details">There was an issue fetching the archive data.</p></div>
+            <div id="skeleton-loader" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="skeleton-card rounded-lg p-6 space-y-4"><div class="skeleton h-4 w-1/4 rounded"></div><div class="space-y-2"><div class="skeleton h-6 w-full rounded"></div><div class="skeleton h-6 w-5/6 rounded"></div></div><div class="skeleton h-4 w-1/2 rounded"></div><div class="skeleton h-12 w-full rounded"></div><div class="skeleton h-5 w-1/3 rounded"></div></div>
+                <div class="skeleton-card rounded-lg p-6 space-y-4 hidden md:block"><div class="skeleton h-4 w-1/4 rounded"></div><div class="space-y-2"><div class="skeleton h-6 w-full rounded"></div><div class="skeleton h-6 w-5/6 rounded"></div></div><div class="skeleton h-4 w-1/2 rounded"></div><div class="skeleton h-12 w-full rounded"></div><div class="skeleton h-5 w-1/3 rounded"></div></div>
+                <div class="skeleton-card rounded-lg p-6 space-y-4 hidden lg:block"><div class="skeleton h-4 w-1/4 rounded"></div><div class="space-y-2"><div class="skeleton h-6 w-full rounded"></div><div class="skeleton h-6 w-5/6 rounded"></div></div><div class="skeleton h-4 w-1/2 rounded"></div><div class="skeleton h-12 w-full rounded"></div><div class="skeleton h-5 w-1/3 rounded"></div></div>
+            </div>
+            <div id="folder-view" class="hidden"></div>
+            <div id="archive-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+            <div id="no-results" class="hidden text-center py-16"> <p class="text-lg font-semibold text-gray-600 font-display">No matching records found</p> <p class="text-gray-500 mt-1">Try adjusting your search terms or filters.</p> <button id="no-results-reset" class="mt-4 pagination-btn rounded-md">Reset All Filters</button> </div>
+            <div id="pagination-controls" class="hidden mt-12 flex items-center justify-center space-x-4"> <button id="prev-page" class="pagination-btn rounded-md">&larr; Previous</button> <span id="page-info" class="text-gray-700 font-semibold"></span> <button id="next-page" class="pagination-btn rounded-md">Next &rarr;</button> </div>
+        </main>
+        <footer class="bg-[#f9f6f1] mt-12 border-t border-gray-300"><div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-600"><p><strong>&copy; <a href="https://twitter.com/jsamditis">Joe Amditis</a> (2025).</strong><br>The Jay Rosen Digital Archive. Last updated Sept. 24, 2025.</p></div></footer>
+    </div>
+
+    <!-- Record Modal -->
+    <div id="record-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"> <div class="modal-content"> <div id="modal-tab-container"></div> <button class="modal-close" aria-label="Close dialog"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button> <div id="modal-body-content" class="modal-body"></div> <div id="modal-nav-controls" class="flex justify-between items-center mt-4 pt-4 border-t border-gray-300"> <button id="prev-record" class="pagination-btn text-sm rounded-md">&lt; Previous</button> <span id="modal-nav-info" class="text-sm text-gray-600 font-semibold"></span> <button id="next-record" class="pagination-btn text-sm rounded-md">Next &gt;</button> </div> </div> </div>
+
+    <!-- Filter Drawer -->
+    <div id="filter-overlay" class="filter-overlay"></div> <div id="filter-drawer" role="region" aria-label="Filters and sorting options"> <div class="p-5 border-b border-gray-300 flex justify-between items-center"> <h3 class="text-xl font-display">Filters & Sorting</h3> <button id="close-filter-drawer" class="text-gray-500 hover:text-gray-800" aria-label="Close filters and sorting drawer"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button> </div> <div class="p-5 filter-drawer-body"> <div> <label for="sort-by" class="block text-sm font-medium text-gray-700 mb-1">Sort by</label> <select id="sort-by" class="select-input w-full"> <option value="date-desc" selected>Date: Newest First</option><option value="date-asc">Date: Oldest First</option><option value="title-asc">Title: A-Z</option> </select> </div> <div class="mt-4"><h4 class="text-sm font-medium text-gray-700 mb-1">Top Publications</h4><div id="publication-filters" class="space-y-1 max-h-48 overflow-y-auto pr-2"></div></div> <div class="mt-4"><h4 class="text-sm font-medium text-gray-700 mb-1">Collection</h4><div id="collection-filters" class="space-y-1 max-h-48 overflow-y-auto pr-2"></div></div> <div class="mt-4"><h4 class="text-sm font-medium text-gray-700 mb-2">Content Type</h4><div id="content-type-filters" class="flex items-center space-x-4"></div></div> <div class="mt-4"><h4 class="text-sm font-medium text-gray-700 mb-1">Thematic Categories</h4><div id="category-filters" class="space-y-1 max-h-48 overflow-y-auto pr-2"></div></div> <div class="mt-4"><h4 class="text-sm font-medium text-gray-700 mb-1">Era</h4><div id="era-filters" class="space-y-1"></div></div> </div> <div class="absolute bottom-0 left-0 w-full p-4 bg-[#fbf5e8] border-t border-gray-300 flex items-center justify-end"> <button id="reset-filters" class="text-sm text-gray-600 hover:text-gray-900 hover:underline">Reset All Filters</button> </div> </div>
+    
+    <button id="scroll-to-top" class="pagination-btn p-3 rounded-full shadow-lg" aria-label="Scroll to top of page"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /></svg></button>
+    <div id="sort-notification"><p id="sort-notification-message"></p></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- CONFIGURATION ---
+            const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-XqQXvMJNaBXVWlmXu1EyOpa_Cc6ur-pklWX1mbrWIFybZjmbE6UTIteSoCSvf0a7j5r8A6earp3H/pub?gid=928818664&single=true&output=csv';
+            const ALLOWED_COLUMNS = ['id', 'title', 'author', 'publication_date', 'original_publication', 'summary', 'url', 'tags', 'thematic_categories', 'era', 'responds_to', 'key_concepts', 'pull_quote', 'verified', 'collection_id'];
+            const TOP_PUBLICATIONS = ["PressThink", "The Guardian", "Vox", "Los Angeles Times", "The Atlantic", "NPR", "Columbia Journalism Review"];
+            const COLOR_PALETTE = [{ bg: '#e0f2fe', text: '#0c4a6e', border: '#7dd3fc' }, { bg: '#dcfce7', text: '#166534', border: '#86efac' }, { bg: '#fef9c3', text: '#854d0e', border: '#fde047' }, { bg: '#ffe4e6', text: '#9f1239', border: '#fda4af' }, { bg: '#f3e8ff', text: '#581c87', border: '#d8b4fe' }, { bg: '#fff7ed', text: '#9a3412', border: '#fdba74' }, { bg: '#e0e7ff', text: '#3730a3', border: '#a5b4fc' }, { bg: '#d1fae5', text: '#065f46', border: '#6ee7b7' }, { bg: '#fee2e2', text: '#991b1b', border: '#fca5a5' }, { bg: '#cffafe', text: '#155e75', border: '#67e8f9' },  { bg: '#e5e7eb', text: '#1f2937', border: '#9ca3af' }, { bg: '#fbcfe8', text: '#9d174d', border: '#f9a8d4' }];
+            const CATEGORY_DESCRIPTIONS = {
+                "Audience & Public Engagement": "Explores the evolving relationship between journalists and the public they serve.",
+                "Journalism Education": "Focuses on the methods and philosophies behind training the next generation of journalists.",
+                "Journalism Theory & Practice": "Examines the core principles and practical challenges of reporting and newsgathering.",
+                "Politics & Democracy": "Analyzes the crucial role of the press in a democratic society and its political coverage.",
+                "Press & Media Criticism": "Provides critical analysis of media performance, ethics, and industry trends.",
+                "Technology & Digital Media": "Investigates the impact of digital tools and platforms on the field of journalism."
+            };
+
+            // --- STATE MANAGEMENT ---
+            const state = {
+                allRecords: [],
+                filteredRecords: [],
+                uniqueCategories: [],
+                uniqueEras: [],
+                uniqueCollections: [],
+                currentPage: 1,
+                itemsPerPage: 15,
+                isDataReady: false,
+                currentRecordIndex: -1,
+                view: 'folders' // 'folders' or 'grid'
+            };
+
+            // --- DOM ELEMENTS ---
+            const dom = {
+                welcomeModal: document.getElementById('welcome-modal'), welcomeButton: document.getElementById('welcome-button'), pageWrapper: document.getElementById('page-wrapper'),
+                grid: document.getElementById('archive-grid'), folderView: document.getElementById('folder-view'),
+                skeletonLoader: document.getElementById('skeleton-loader'), searchInput: document.getElementById('search'), clearSearchBtn: document.getElementById('clear-search'),
+                itemsPerPageSelect: document.getElementById('items-per-page'), errorDisplay: document.getElementById('error'), errorDetails: document.getElementById('error-details'),
+                noResultsDisplay: document.getElementById('no-results'), recordCountContainer: document.getElementById('record-count-container'),
+                paginationControls: document.getElementById('pagination-controls'), prevPageBtn: document.getElementById('prev-page'),
+                nextPageBtn: document.getElementById('next-page'), pageInfoSpan: document.getElementById('page-info'), scrollToTopBtn: document.getElementById('scroll-to-top'),
+                sortNotification: document.getElementById('sort-notification'), sortNotificationMessage: document.getElementById('sort-notification-message'),
+                noResultsResetBtn: document.getElementById('no-results-reset'),
+                recordModal: document.getElementById('record-modal'), modalTabContainer: document.getElementById('modal-tab-container'),
+                modalBody: document.getElementById('modal-body-content'), closeModalBtn: document.querySelector('#record-modal .modal-close'),
+                prevRecordBtn: document.getElementById('prev-record'), nextRecordBtn: document.getElementById('next-record'), modalNavInfo: document.getElementById('modal-nav-info'),
+                filterDrawer: document.getElementById('filter-drawer'), filterOverlay: document.getElementById('filter-overlay'),
+                openFilterDrawerBtn: document.getElementById('open-filter-drawer'), closeFilterDrawerBtn: document.getElementById('close-filter-drawer'),
+                categoryFiltersContainer: document.getElementById('category-filters'), eraFiltersContainer: document.getElementById('era-filters'),
+                publicationFiltersContainer: document.getElementById('publication-filters'), collectionFiltersContainer: document.getElementById('collection-filters'),
+                contentTypeFiltersContainer: document.getElementById('content-type-filters'), sortBySelect: document.getElementById('sort-by'),
+                resetFiltersBtn: document.getElementById('reset-filters'), filterCountBadge: document.getElementById('filter-count-badge'),
+                viewFoldersBtn: document.getElementById('view-folders-btn'), viewAllBtn: document.getElementById('view-all-btn')
+            };
+
+            // --- DATA HANDLING & CLEANING ---
+            const clean = {
+                normalizeHeader: h => h.toLowerCase().trim().replace(/[^a-z0-9_]/g, ''),
+                cleanTitle: t => { if (typeof t !== 'string') return ''; const d = /\s(—|-|\|)/; const m = t.match(d); return m ? t.substring(0, m.index).trim() : t.trim(); },
+                cleanString: v => typeof v !== 'string' ? '' : v.replace(/^['"\[\s]+|['"\]\s]+$/g, ''),
+                standardizeDate: d => { if (!d || typeof d !== 'string' || !d.trim()) return ''; const dt = new Date(d); if (isNaN(dt.getTime())) return ''; const y = dt.getUTCFullYear(); const m = String(dt.getUTCMonth() + 1).padStart(2, '0'); const day = String(dt.getUTCDate()).padStart(2, '0'); return `${y}-${m}-${day}`; },
+                parseAndCleanTags: v => { if (typeof v !== 'string' || !v.trim() || v.trim() === '[]' || v.startsWith('=')) return []; const r = /['"]([^'"]*?)['"]/g; let i = []; let m; while ((m = r.exec(v)) !== null) { if (m[1].length < 100 && !m[1].startsWith('=')) i.push(m[1]); } const c = v.replace(/\[.*?\]/g, '').replace(/['"]/g, ''); const rem = c.split(/[;,]/).map(item => item.trim()).filter(item => item && item.length < 100 && !item.startsWith('=')); return [...new Set([...i, ...rem].map(item => item.trim()).filter(Boolean))]; },
+                getEraFromDate: dateString => { const y = new Date(dateString).getFullYear(); if (y >= 1990 && y <= 1999) return "The Public Journalism Movement (1990s)"; if (y >= 2000 && y <= 2009) return "The Rise of the Web & Blogging (2000-2009)"; if (y >= 2010 && y <= 2019) return "The View from Nowhere & Its Critics (2010s)"; if (y >= 2020) return "Democracy in Crisis & The Information War (2020s)"; return "Unknown Era"; }
+            };
+
+            function cleanAndFilterData(r) {
+                return r.map(raw => {
+                    const f = {};
+                    ALLOWED_COLUMNS.forEach(c => {
+                        const n = clean.normalizeHeader(c); let v = raw[n] || '';
+                        if (c === 'title') v = clean.cleanTitle(v);
+                        else if (['original_publication', 'collection_id'].includes(c)) v = clean.cleanString(v);
+                        else if (c === 'publication_date') v = clean.standardizeDate(v);
+                        else if (['tags', 'thematic_categories', 'responds_to', 'key_concepts'].includes(c)) v = clean.parseAndCleanTags(v);
+                        f[c] = v;
+                    });
+                    f.era = [clean.getEraFromDate(f.publication_date)];
+                    return f;
+                }).filter(rec => rec.verified === 'TRUE' && rec.id && rec.title.trim() !== '' && rec.publication_date.trim() !== '');
+            }
+
+            function fetchData() {
+                Papa.parse(csvUrl, {
+                    download: true, header: true, skipEmptyLines: true, transformHeader: clean.normalizeHeader,
+                    complete: res => {
+                        if (res.errors.length > 0 || res.data.length === 0) { dom.errorDisplay.classList.remove('hidden'); dom.skeletonLoader.classList.add('hidden'); dom.welcomeButton.textContent = "Error Loading Data"; if (res.errors.some(e => e.code === 'NotPublished')) dom.errorDetails.textContent = "The Google Sheet may not be published to the web."; return; }
+                        state.allRecords = cleanAndFilterData(res.data);
+                        const catSet = new Set(), eraSet = new Set(), colSet = new Set();
+                        state.allRecords.forEach(rec => { rec.thematic_categories.forEach(c => catSet.add(c)); rec.era.forEach(e => eraSet.add(e)); if (rec.collection_id) colSet.add(rec.collection_id); });
+                        state.uniqueCategories = [...catSet].sort(); state.uniqueEras = [...eraSet].sort((a,b) => b.localeCompare(a)); state.uniqueCollections = [...colSet].sort();
+                        
+                        populateFilters();
+                        applyAllFiltersAndRender();
+                        
+                        dom.skeletonLoader.classList.add('hidden');
+                        state.isDataReady = true; dom.welcomeButton.textContent = 'View the archive →'; dom.welcomeButton.disabled = false; checkUrlForRecordId();
+                    },
+                    error: err => { dom.skeletonLoader.classList.add('hidden'); dom.errorDisplay.classList.remove('hidden'); dom.errorDetails.textContent = `A network error occurred.`; dom.welcomeButton.textContent = "Error Loading Data"; console.error("CSV Error:", err); }
+                });
+            }
+
+            // --- UTILITY FUNCTIONS ---
+            const util = {
+                stringToHash: str => { let h = 0; for (let i = 0; i < str.length; i++) { h = (h << 5) - h + str.charCodeAt(i); h |= 0; } return Math.abs(h); },
+                getYouTubeId: url => { if (!url || typeof url !== 'string') return null; const r = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#&\?]*).*/; const m = url.match(r); return (m && m[2].length === 11) ? m[2] : null; },
+                levenshtein: (a,b) => {if(a.length==0)return b.length;if(b.length==0)return a.length;let m=[];for(let i=0;i<=b.length;i++)m[i]=[i];for(let j=0;j<=a.length;j++)m[0][j]=j;for(let i=1;i<=b.length;i++)for(let j=1;j<=a.length;j++)m[i][j]=b.charAt(i-1)==a.charAt(j-1)?m[i-1][j-1]:Math.min(m[i-1][j-1]+1,m[i][j-1]+1,m[i-1][j]+1);return m[b.length][a.length]},
+                generateIntelligentSearchQuery: tagText => { let p = '', k = tagText; const q = tagText.match(/"([^"]+)"/); if (q && q[1]) { p = `"${q[1]}"`; k = k.replace(q[0], ''); } k = k.replace(/\(([^)]+)\)/, ' $1 ').replace(/Related to|article/ig, '').replace(/[()"]/g, '').trim(); return `${p} ${k}`.trim(); },
+                debounce: (func, delay) => { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); }; }
+            };
+
+            // --- MAIN SEARCH & FILTER LOGIC ---
+            function performAdvancedSearch(records, searchTerm) { const w = { title: 10, key_concepts: 8, thematic_categories: 8, pull_quote: 5, summary: 3, tags: 2, original_publication: 2, author: 1 }; const p = [...searchTerm.matchAll(/"([^"]+)"/g)].map(m => m[1]); const rem = searchTerm.replace(/"[^"]+"/g, '').trim(); const keys = rem.split(' ').filter(k => k.length > 1); return records.map(rec => { let score = 0; const txt = { title: rec.title||'', key_concepts: (rec.key_concepts||[]).join(' '), thematic_categories: (rec.thematic_categories||[]).join(' '), pull_quote: rec.pull_quote||'', summary: rec.summary||'', tags: (rec.tags||[]).join(' '), original_publication: rec.original_publication||'', author: rec.author||'' }; const corpus = Object.values(txt).join(' ').toLowerCase(); p.forEach(ph => { if (corpus.includes(ph.toLowerCase())) score += 20; }); keys.forEach(k => { for (const f in w) { const ft = txt[f].toLowerCase(); if (ft.includes(k.toLowerCase())) { score += w[f]; } else if (k.length > 3) { const words = ft.split(/\s+/); for (const word of words) { if (util.levenshtein(k.toLowerCase(), word) <= 1) { score += w[f] / 2; break; } } } } }); return { ...rec, relevanceScore: score }; }).filter(r => r.relevanceScore > 0); }
+            
+            function applyAllFiltersAndRender() {
+                const searchTerm = dom.searchInput.value.trim();
+                let records = state.allRecords, activeFilterCount = 0;
+                if (searchTerm) {
+                    records = performAdvancedSearch(records, searchTerm);
+                    updateView('grid'); // Switch to grid view on search
+                }
+                
+                const getChecked = sel => [...document.querySelectorAll(`${sel} input:checked`)].map(el => el.value);
+                const selPubs = getChecked('#publication-filters'); if (selPubs.length > 0) { records = records.filter(r => selPubs.includes(r.original_publication)); activeFilterCount += selPubs.length; }
+                const selCols = getChecked('#collection-filters'); if (selCols.length > 0) { records = records.filter(r => selCols.includes(r.collection_id)); activeFilterCount += selCols.length; }
+                const selCats = getChecked('#category-filters'); if (selCats.length > 0) { records = records.filter(r => selCats.every(c => r.thematic_categories.includes(c))); activeFilterCount += selCats.length; }
+                const selEra = document.querySelector('#era-filters input:checked')?.value; if (selEra && selEra !== 'all') { records = records.filter(r => r.era.includes(selEra)); activeFilterCount++; }
+                const selType = document.querySelector('input[name="content-type"]:checked').value; if (selType !== 'all') { records = records.filter(r => (selType === 'video') ? util.getYouTubeId(r.url) : !util.getYouTubeId(r.url)); activeFilterCount++; }
+                
+                updateFilterBadge(activeFilterCount);
+                if (searchTerm) records.sort((a, b) => b.relevanceScore - a.relevanceScore);
+                else { const sb = dom.sortBySelect.value; if (sb === 'date-asc') records.sort((a,b) => new Date(a.publication_date) - new Date(b.publication_date)); else if (sb === 'title-asc') records.sort((a,b) => a.title.localeCompare(b.title)); else records.sort((a,b) => new Date(b.publication_date) - new Date(a.publication_date)); }
+                
+                state.filteredRecords = records;
+                const totalPages = Math.ceil(state.filteredRecords.length / state.itemsPerPage);
+                if (state.currentPage > totalPages && totalPages > 0) state.currentPage = totalPages; else if (totalPages === 0) state.currentPage = 1;
+
+                if(state.view === 'folders') {
+                    renderFolderView();
+                } else {
+                    displayRecords(state.filteredRecords.slice((state.currentPage - 1) * state.itemsPerPage, state.currentPage * state.itemsPerPage));
+                    renderPaginationControls(totalPages);
+                }
+                updateCounts();
+            }
+
+            // --- DISPLAY & UI ---
+            const templates = {
+                card: rec => {
+                    const primaryCat = rec.thematic_categories[0];
+                    const color = primaryCat ? COLOR_PALETTE[util.stringToHash(primaryCat) % COLOR_PALETTE.length] : { bg: '#e5e7eb', text: '#1f2937', border: '#9ca3af' };
+                    const tagHtml = primaryCat ? `<span class="concept-tag" style="background-color:${color.bg}; color:${color.text}; border-color:${color.border};" data-tag="${primaryCat}">${primaryCat}</span>` : '<div class="h-[29px]"></div>';
+                    return `<div class="archive-card rounded-lg flex flex-col" data-id="${rec.id}" tabindex="0" role="button" aria-label="View details for: ${rec.title}">
+                        <div class="card-tab">${rec.publication_date}</div>
+                        <div class="p-6 pt-6 flex-grow flex flex-col">
+                            <div><h3 class="text-xl font-display text-gray-900 mt-2">${rec.title||'Untitled'}</h3><p class="text-sm font-semibold text-blue-900 mt-1">${rec.original_publication||''}</p></div>
+                            <div class="text-gray-700 text-sm my-4 italic">${(rec.pull_quote||rec.summary||'').substring(0,180)}...</div>
+                            <div class="mt-auto pt-2 border-t border-gray-200">${tagHtml}</div>
+                        </div>
+                    </div>`;
+                },
+                modalContent: record => {
+                    const createTagHtml = (items, title, isLink = false) => {
+                        if (!Array.isArray(items) || items.length === 0) return '';
+                        const allTags = items.map((item, i) => `<span class="concept-tag ${i >= 2 ? 'hidden' : ''}" style="background-color:${COLOR_PALETTE[util.stringToHash(item) % COLOR_PALETTE.length].bg}; color:${COLOR_PALETTE[util.stringToHash(item) % COLOR_PALETTE.length].text}; border-color:${COLOR_PALETTE[util.stringToHash(item) % COLOR_PALETTE.length].border};" data-tag-title="${title}" data-tag="${item}" ${isLink && state.allRecords.some(r => r.id === item) ? `data-record-link="${item}"` : ''}>${item}</span>`).join('');
+                        const exp = items.length > 2 ? `<button class="accordion-toggle text-xs font-bold text-gray-600 hover:text-black ml-2">more...</button>` : '';
+                        return `<div class="mt-4"><h4 class="font-bold text-sm uppercase text-gray-500">${title}</h4><div class="flex flex-wrap mt-2 items-center">${allTags}${exp}</div></div>`;
+                    };
+                    const yid = util.getYouTubeId(record.url);
+                    const media = yid ? `<h4 class="font-bold text-sm uppercase text-gray-500">Video</h4><div class="aspect-w-16 aspect-h-9 mt-1 relative" style="padding-bottom:56.25%;"><iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/${yid}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>` : `<h4 class="font-bold text-sm uppercase text-gray-500">Pull Quote</h4><div class="border-l-4 border-gray-400 pl-4 mt-1 text-gray-800 italic">${record.pull_quote || 'Not available.'}</div>`;
+                    return `<div class="flex flex-col md:flex-row md:space-x-8">
+                        <div class="md:w-2/3">
+                            <a href="${record.url || '#'}" target="_blank" rel="noopener noreferrer" class="modal-title-link"><h2 id="modal-title" class="text-2xl font-display text-gray-900">${record.title || 'Untitled'}</h2></a>
+                            <p class="text-md font-semibold text-blue-900 mt-1">${record.original_publication || ''}</p>
+                            <a href="${record.url || '#'}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline text-sm">View Original Source</a>
+                            <hr class="my-4">${media}
+                            <div class="mt-4"><h4 class="font-bold text-sm uppercase text-gray-500">Summary</h4><p class="mt-1 text-gray-800">${record.summary || 'Not available.'}</p></div>
+                        </div>
+                        <div class="md:w-1/3 mt-6 md:mt-0">
+                            ${createTagHtml(record.thematic_categories, 'Thematic Categories')} ${createTagHtml(record.key_concepts, 'Key Concepts')}
+                            ${createTagHtml(record.tags, 'Tags')} ${createTagHtml(record.era, 'Era')} ${createTagHtml(record.responds_to, 'Responds To', true)}
+                        </div>
+                    </div>`;
+                }
+            };
+
+            function displayRecords(records) {
+                dom.grid.innerHTML = records.map(templates.card).join('');
+                dom.noResultsDisplay.classList.toggle('hidden', state.filteredRecords.length > 0);
+            }
+
+            function renderFolderView() {
+                const categoryCounts = state.allRecords.reduce((acc, record) => {
+                    record.thematic_categories.forEach(cat => {
+                        acc[cat] = (acc[cat] || 0) + 1;
+                    });
+                    return acc;
+                }, {});
+
+                dom.folderView.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    ${state.uniqueCategories.map(cat => {
+                        const color = COLOR_PALETTE[util.stringToHash(cat) % COLOR_PALETTE.length];
+                    const count = categoryCounts[cat] || 0;
+                    const description = CATEGORY_DESCRIPTIONS[cat] || '';
+                    
+                    return `
+                    <div class="archive-card folder" data-category="${cat}" tabindex="0" role="button" aria-label="View all records in category: ${cat}" style="border-bottom-color: ${color.border};">
+                        <div class="card-tab">${count} record${count === 1 ? '' : 's'}</div>
+                        <div class="p-6 pt-6 flex-grow flex flex-col">
+                            <div><h3 class="text-xl font-display text-gray-900 mt-2">${cat}</h3></div>
+                            <div class="text-gray-700 text-sm my-4">${description}</div>
+                            <div class="mt-auto pt-2 border-t border-gray-200"><div class="h-[29px]"></div></div>
+                        </div>
+                    </div>
+                    `;
+                }).join('')}
+            </div>`;
+        }
+
+        function updateView(viewToShow) {
+            state.view = viewToShow;
+                dom.paginationControls.classList.add('hidden');
+                dom.noResultsDisplay.classList.add('hidden');
+
+                if (state.view === 'folders') {
+                    dom.grid.classList.add('hidden');
+                    dom.folderView.classList.remove('hidden');
+                    dom.viewFoldersBtn.classList.add('view-toggle-active');
+                    dom.viewAllBtn.classList.remove('view-toggle-active');
+                    renderFolderView();
+                } else { // grid view
+                    dom.folderView.classList.add('hidden');
+                    dom.grid.classList.remove('hidden');
+                    dom.viewAllBtn.classList.add('view-toggle-active');
+                    dom.viewFoldersBtn.classList.remove('view-toggle-active');
+                    const totalPages = Math.ceil(state.filteredRecords.length / state.itemsPerPage);
+                    displayRecords(state.filteredRecords.slice((state.currentPage - 1) * state.itemsPerPage, state.currentPage * state.itemsPerPage));
+                    renderPaginationControls(totalPages);
+                }
+            }
+            
+            function renderPaginationControls(totalPages) {
+                if (totalPages <= 1) {
+                    dom.paginationControls.classList.add('hidden');
+                } else {
+                    dom.paginationControls.classList.remove('hidden');
+                }
+                dom.pageInfoSpan.textContent = `Page ${state.currentPage} of ${totalPages}`;
+                dom.prevPageBtn.disabled = state.currentPage === 1;
+                dom.nextPageBtn.disabled = state.currentPage === totalPages;
+            }
+            function updateCounts() { dom.recordCountContainer.innerHTML = `<p>Loaded ${state.allRecords.length} total records. Displaying ${state.filteredRecords.length}.</p>`; }
+            function updateFilterBadge(count) { if (count > 0) { dom.filterCountBadge.textContent = count; dom.filterCountBadge.classList.remove('hidden'); } else { dom.filterCountBadge.classList.add('hidden'); } }
+            
+            function renderModalContent(record, index) {
+                state.currentRecordIndex = index;
+                if (window.location.hash !== `#${record.id}`) { window.location.hash = record.id; }
+                dom.modalTabContainer.innerHTML = `<div class="modal-tab">${record.publication_date}</div>`;
+                dom.modalBody.innerHTML = templates.modalContent(record);
+                dom.modalNavInfo.textContent = `Record ${index + 1} of ${state.filteredRecords.length}`;
+                dom.prevRecordBtn.disabled = index <= 0;
+                dom.nextRecordBtn.disabled = index >= state.filteredRecords.length - 1;
+            }
+
+            function openModal(modalToOpen, onOpen = () => {}) { modalToOpen.style.display = "flex"; document.body.style.overflow = 'hidden'; setTimeout(() => modalToOpen.classList.add('is-open'), 10); onOpen(); }
+            function closeModal(modalToClose) { modalToClose.classList.add('is-closing'); modalToClose.classList.remove('is-open'); setTimeout(() => { modalToClose.style.display = "none"; modalToClose.classList.remove('is-closing'); document.body.style.overflow = ''; if(modalToClose.id === 'record-modal' && window.location.hash) { window.location.hash = ''; } }, 400); }
+            function navigateInModal(dir) { if (state.currentRecordIndex === -1 || state.filteredRecords.length === 0) return; let newIndex = state.currentRecordIndex + dir; if (newIndex >= 0 && newIndex < state.filteredRecords.length) renderModalContent(state.filteredRecords[newIndex], newIndex); }
+            function checkUrlForRecordId() { if (window.location.hash) { const rid = window.location.hash.substring(1); const find = () => { if (!state.isDataReady) { setTimeout(find, 100); return; } dom.welcomeModal.classList.add('hidden'); dom.pageWrapper.classList.remove('opacity-0'); updateView('grid'); const idx = state.filteredRecords.findIndex(r => r.id === rid); if (idx > -1) openModal(dom.recordModal, () => renderModalContent(state.filteredRecords[idx], idx)); else { const rec = state.allRecords.find(r => r.id === rid); if (rec) openModal(dom.recordModal, () => renderModalContent(rec, -1)); } }; find(); } }
+            
+            function populateFilters() {
+                const createCheckboxes = (items) => items.map(i => `<label class="flex items-center text-sm"><input type="checkbox" value="${i}" class="h-4 w-4 text-gray-800 border-gray-400 focus:ring-gray-700 rounded"><span class="ml-2">${i}</span></label>`).join('');
+                dom.publicationFiltersContainer.innerHTML = createCheckboxes(TOP_PUBLICATIONS);
+                dom.collectionFiltersContainer.innerHTML = createCheckboxes(state.uniqueCollections);
+                dom.categoryFiltersContainer.innerHTML = createCheckboxes(state.uniqueCategories);
+                dom.eraFiltersContainer.innerHTML = `<label class="flex items-center text-sm"><input type="radio" name="era" value="all" class="h-4 w-4 text-gray-800 border-gray-400 focus:ring-gray-700" checked><span class="ml-2">All Eras</span></label>` + state.uniqueEras.map(e => `<label class="flex items-center text-sm"><input type="radio" name="era" value="${e}" class="h-4 w-4 text-gray-800 border-gray-400 focus:ring-gray-700"><span class="ml-2">${e}</span></label>`).join('');
+                dom.contentTypeFiltersContainer.innerHTML = `<label class="flex items-center"><input type="radio" name="content-type" value="all" class="h-4 w-4 text-gray-800 border-gray-400 focus:ring-gray-700" checked> <span class="ml-2 text-sm">All</span></label><label class="flex items-center"><input type="radio" name="content-type" value="article" class="h-4 w-4 text-gray-800 border-gray-400 focus:ring-gray-700"> <span class="ml-2 text-sm">Article</span></label><label class="flex items-center"><input type="radio" name="content-type" value="video" class="h-4 w-4 text-gray-800 border-gray-400 focus:ring-gray-700"> <span class="ml-2 text-sm">Video</span></label>`
+            }
+
+            function toggleDrawer(isOpen) { if (isOpen) { dom.filterDrawer.classList.add('open'); dom.filterOverlay.classList.add('open'); } else { dom.filterDrawer.classList.remove('open'); dom.filterOverlay.classList.remove('open'); } }
+            
+            // --- EVENT LISTENERS ---
+            function setupEventListeners() {
+                dom.welcomeButton.addEventListener('click', () => {
+                    const check = () => { if (state.isDataReady) { dom.welcomeModal.classList.add('hidden'); dom.pageWrapper.classList.remove('opacity-0'); } else { dom.welcomeButton.textContent = "Loading Archive..."; dom.welcomeButton.disabled = true; setTimeout(check, 100); } };
+                    check();
+                });
+
+                const debouncedSearch = util.debounce(() => { state.currentPage = 1; applyAllFiltersAndRender(); }, 300);
+                dom.searchInput.addEventListener('input', debouncedSearch);
+                dom.clearSearchBtn.addEventListener('click', () => { dom.searchInput.value = ''; state.currentPage = 1; applyAllFiltersAndRender(); });
+                dom.itemsPerPageSelect.addEventListener('change', e => { state.itemsPerPage = parseInt(e.target.value, 10); state.currentPage = 1; applyAllFiltersAndRender(); });
+                
+                dom.prevPageBtn.addEventListener('click', () => { if (state.currentPage > 1) { state.currentPage--; applyAllFiltersAndRender(); } });
+                dom.nextPageBtn.addEventListener('click', () => { const total = Math.ceil(state.filteredRecords.length / state.itemsPerPage); if (state.currentPage < total) { state.currentPage++; applyAllFiltersAndRender(); } });
+                
+                dom.grid.addEventListener('click', e => { const tag = e.target.closest('.concept-tag'); const card = e.target.closest('.archive-card'); if (tag) { e.stopPropagation(); dom.searchInput.value = `"${tag.dataset.tag}"`; state.currentPage = 1; applyAllFiltersAndRender(); window.scrollTo({ top: 0, behavior: 'smooth' }); } else if (card) { const idx = state.filteredRecords.findIndex(r => r.id === card.dataset.id); if (idx > -1) openModal(dom.recordModal, () => renderModalContent(state.filteredRecords[idx], idx)); } });
+                dom.grid.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { const card = e.target.closest('.archive-card'); if (card) { e.preventDefault(); const idx = state.filteredRecords.findIndex(r => r.id === card.dataset.id); if (idx > -1) openModal(dom.recordModal, () => renderModalContent(state.filteredRecords[idx], idx)); } } });
+
+                dom.folderView.addEventListener('click', e => {
+                    const folder = e.target.closest('.folder');
+                    if (folder) {
+                        const category = folder.dataset.category;
+                        document.querySelectorAll('#category-filters input:checked').forEach(el => el.checked = false);
+                        const catInput = document.querySelector(`#category-filters input[value="${CSS.escape(category)}"]`);
+                        if (catInput) catInput.checked = true;
+                        state.currentPage = 1;
+                        applyAllFiltersAndRender();
+                        updateView('grid');
+                    }
+                });
+                
+                dom.folderView.addEventListener('keydown', e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        const folder = e.target.closest('.folder');
+                        if (folder) {
+                            e.preventDefault();
+                            folder.click();
+                        }
+                    }
+                });
+                
+                dom.modalBody.addEventListener('click', e => {
+                    const toggle = e.target.closest('.accordion-toggle');
+                    if (toggle) {
+                        toggle.parentElement.querySelectorAll('.concept-tag.hidden').forEach(t => t.classList.remove('hidden'));
+                        toggle.remove();
+                    }
+                    const tag = e.target.closest('.concept-tag');
+                    if (tag) {
+                        if (tag.dataset.recordLink) {
+                            const idx = state.filteredRecords.findIndex(r => r.id === tag.dataset.recordLink);
+                            if (idx > -1) renderModalContent(state.filteredRecords[idx], idx);
+                        } else if (tag.dataset.tag) {
+                            const tagText = tag.dataset.tag;
+                            const tagTitle = tag.dataset.tagTitle;
+                            const filterableTitles = ['Thematic Categories', 'Era'];
+                            closeModal(dom.recordModal);
+                            if (filterableTitles.includes(tagTitle)) {
+                                dom.searchInput.value = '';
+                                document.querySelectorAll('#filter-drawer input:checked').forEach(el => el.checked = false);
+                                let filterInput;
+                                if (tagTitle === 'Thematic Categories') {
+                                    filterInput = document.querySelector(`#category-filters input[value="${CSS.escape(tagText)}"]`);
+                                } else if (tagTitle === 'Era') {
+                                    document.querySelector('input[name="era"][value="all"]').checked = false;
+                                    filterInput = document.querySelector(`#era-filters input[value="${CSS.escape(tagText)}"]`);
+                                }
+                                if (filterInput) filterInput.checked = true;
+                            } else {
+                                dom.searchInput.value = util.generateIntelligentSearchQuery(tagText);
+                            }
+                            applyAllFiltersAndRender();
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                    }
+                });
+                
+                dom.openFilterDrawerBtn.addEventListener('click', () => toggleDrawer(true));
+                dom.closeFilterDrawerBtn.addEventListener('click', () => toggleDrawer(false));
+                dom.filterOverlay.addEventListener('click', () => toggleDrawer(false));
+
+                const applyFilters = () => { state.currentPage = 1; applyAllFiltersAndRender(); };
+                dom.sortBySelect.addEventListener('change', () => { const selectedOption = dom.sortBySelect.options[dom.sortBySelect.selectedIndex].text; dom.sortNotificationMessage.textContent = `Sorted by: ${selectedOption}`; dom.sortNotification.classList.add('show'); setTimeout(() => dom.sortNotification.classList.remove('show'), 2000); applyFilters(); });
+                [dom.publicationFiltersContainer, dom.collectionFiltersContainer, dom.contentTypeFiltersContainer, dom.categoryFiltersContainer, dom.eraFiltersContainer].forEach(el => el.addEventListener('change', applyFilters));
+                
+                const resetAllFilters = () => { dom.searchInput.value = ''; dom.sortBySelect.value = 'date-desc'; document.querySelectorAll('#filter-drawer input:checked').forEach(el => el.checked = false); document.querySelector('input[name="content-type"][value="all"]').checked = true; document.querySelector('input[name="era"][value="all"]').checked = true; applyFilters(); };
+                dom.resetFiltersBtn.addEventListener('click', resetAllFilters); dom.noResultsResetBtn.addEventListener('click', resetAllFilters);
+                
+                dom.closeModalBtn.onclick = () => closeModal(dom.recordModal);
+                window.onclick = e => { if (e.target == dom.recordModal) closeModal(dom.recordModal); };
+                window.addEventListener('hashchange', () => { if (window.location.hash) { checkUrlForRecordId(); } else { if (dom.recordModal.style.display !== 'none') closeModal(dom.recordModal); } });
+                
+                dom.prevRecordBtn.addEventListener('click', () => navigateInModal(-1)); dom.nextRecordBtn.addEventListener('click', () => navigateInModal(1));
+                document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (dom.recordModal.style.display !== 'none') closeModal(dom.recordModal); } if (dom.recordModal.style.display !== 'none' && e.target.tagName !== 'INPUT') { if (e.key === 'ArrowRight') { e.preventDefault(); navigateInModal(1); } else if (e.key === 'ArrowLeft') { e.preventDefault(); navigateInModal(-1); } } });
+                
+                window.addEventListener('scroll', () => { if (window.pageYOffset > 300) { dom.scrollToTopBtn.classList.add('visible'); } else { dom.scrollToTopBtn.classList.remove('visible'); } });
+                dom.scrollToTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+                dom.viewFoldersBtn.addEventListener('click', () => updateView('folders'));
+                dom.viewAllBtn.addEventListener('click', () => {
+                    document.querySelectorAll('#category-filters input:checked').forEach(el => el.checked = false);
+                    applyAllFiltersAndRender();
+                    updateView('grid');
+                });
+            }
+            
+            // --- INITIALIZATION ---
+            function init() {
+                setupEventListeners();
+                fetchData();
+                updateView(state.view);
+            }
+
+            init();
+        });
+    </script>
+</div>
+</body>
+</html>

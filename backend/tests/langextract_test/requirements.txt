@@ -1,0 +1,17 @@
+# For AI-powered extraction
+langextract
+google-generativeai
+
+# For web scraping
+requests
+trafilatura
+playwright
+lxml
+selenium
+webdriver-manager
+
+# For web search fallback
+googlesearch-python
+
+# For loading environment variables
+python-dotenv

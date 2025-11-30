@@ -1,0 +1,128 @@
+﻿{
+  "taxonomy": {
+    "thematic_categories": [
+      {
+        "name": "Press & Media Criticism",
+        "description": "Critical analysis of media institutions, news coverage patterns, professional journalistic practices, media performance, press behavior, and critiques of how journalism operates. Includes examinations of specific news organizations, coverage failures, and industry dysfunction."
+      },
+      {
+        "name": "Journalism Theory & Practice",
+        "description": "Foundational principles, methodologies, and evolving practices in journalism. Theoretical frameworks for understanding journalism's role and function, journalistic methods, professional standards, objectivity debates, and the craft of reporting and storytelling."
+      },
+      {
+        "name": "Journalism Education",
+        "description": "Teaching journalism, pedagogical approaches, curriculum development, academic programs, and educational aspects of training journalists. Includes discussions of journalism schools, learning outcomes, and preparing future journalists."
+      },
+      {
+        "name": "Politics & Democracy",
+        "description": "Political coverage, democratic institutions, journalism's civic role, election reporting, government accountability, and the relationship between press and democracy. Includes analysis of political journalism, campaign coverage, and journalism's function in democratic society."
+      },
+      {
+        "name": "Technology & Digital Media",
+        "description": "Digital platforms, technological tools, online media, social networks, and how technology is transforming journalism and media. Includes discussions of blogging, social media, digital distribution, platform dynamics, and technological disruption of traditional media."
+      },
+      {
+        "name": "Audience & Public Engagement",
+        "description": "Reader/viewer participation, community interaction, audience evolution from passive consumers to active participants, user-generated content, public journalism, and the changing relationship between journalists and their audiences. Includes the shift from broadcast to participatory media."
+      }
+    ],
+    "key_concepts": [
+      "View from Nowhere",
+      "Church of the Savvy",
+      "The People Formerly Known as the Audience",
+      "Parity Product",
+      "Verification in reverse",
+      "He said/she said journalism",
+      "Audience atomization overcome",
+      "The Production of Innocence",
+      "Horse-race journalism",
+      "False balance",
+      "The Citizens' Agenda",
+      "Not the odds but the stakes",
+      "Mindcasting"
+    ],
+    "era": [
+      {
+        "name": "Early Career & Public Journalism (1990-1999)",
+        "description": "Foundational work on civic journalism movement, academic research, and theoretical frameworks. Covers public journalism experiments at newspapers (Charlotte Observer, Norfolk Virginian-Pilot), scholarship drawing on Dewey and Habermas, and publication of 'What Are Journalists For?' (1999). Themes: civic engagement, public dialogue, journalism's democratic role, community connection."
+      },
+      {
+        "name": "Blogging Launch & Digital Disruption (2000-2004)",
+        "description": "Launch of PressThink blog (2003), early blogging culture, and post-9/11 Iraq War coverage critique. Initial exploration of how the internet transforms journalism and audience relationships. Themes: blogging as journalism, digital publishing, war coverage failures, emergence of citizen media."
+      },
+      {
+        "name": "Peak Blogging & Citizen Journalism (2005-2009)",
+        "description": "Peak blogging productivity, introduction of 'The People Formerly Known as the Audience' (2006), NewAssignment.Net pro-am experiments, and early signs of newspaper industry collapse. Themes: pro-am collaboration, audience transformation, participatory journalism, business model crisis."
+      },
+      {
+        "name": "Social Media & Financial Crisis (2010-2015)",
+        "description": "Twitter and Facebook emerge as dominant news platforms, newspaper industry financial devastation, development of 'View from Nowhere' and 'Church of the Savvy' critiques. Experimentation with new journalism models and 2012/2016 election coverage. Themes: social media impact, political journalism dysfunction, objectivity debates, platform power."
+      },
+      {
+        "name": "Trump Era & Democratic Crisis (2016-2020)",
+        "description": "2016 election coverage failures, systematic disinformation and 'verification in reverse,' press legitimacy crisis under authoritarian threat. Development of pro-democracy journalism frameworks and 'not the odds but the stakes' approach. Themes: truth and verification crisis, journalism's civic duty, coverage reform, authoritarian resistance."
+      },
+      {
+        "name": "Platform Transition & Future Models (2021-Present)",
+        "description": "Post-Trump recalibration, Membership Puzzle Project research, growth of newsletter economics (Substack, Ghost, Patreon), exploration of sustainable journalism models, Bluesky migration, and AI's impact on news production. Themes: direct audience relationships, economic sustainability, alternative platforms, technological transformation."
+      }
+    ],
+    "content_format": [
+      "Blog Post",
+      "Article",
+      "Academic Paper",
+      "Book Chapter",
+      "Interview (Text)",
+      "Interview (Audio/Video)",
+      "Lecture/Presentation",
+      "Panel Discussion",
+      "Tweet/Thread"
+    ],
+    "scope": [
+      "Theoretical",
+      "Commentary/Critique",
+      "Historical Analysis",
+      "Case Study",
+      "Pedagogical",
+      "Personal Reflection"
+    ]
+  },
+  "output_headers": [
+    "id",
+    "title",
+    "url",
+    "author",
+    "publication_date",
+    "original_publication",
+    "publisher",
+    "platform",
+    "collection_id",
+    "content_type",
+    "format",
+    "word_count",
+    "length_in_seconds",
+    "excerpt",
+    "summary",
+    "thematic_categories",
+    "key_concepts",
+    "series",
+    "era",
+    "scope",
+    "tags",
+    "related_to",
+    "responds_to",
+    "influence",
+    "copyright",
+    "license",
+    "permissions",
+    "date_processed",
+    "gdrive_pdf_link",
+    "gdrive_raw_file_link",
+    "gdrive_transcript_link",
+    "transcript_filepath",
+    "pull_quote",
+    "raw_text",
+    "verified",
+    "notes"
+  ]
+}

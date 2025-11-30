@@ -1,0 +1,18 @@
+{
+  "session_id": "20251011_160359",
+  "total_duration": 0.004893779754638672,
+  "total_processed": 1,
+  "successful": 1,
+  "failed": 0,
+  "poison_pills": 6,
+  "success_rate_percent": 100.0,
+  "average_processing_time": 0.0,
+  "records_per_minute": 12260.46,
+  "error_breakdown": {},
+  "poison_pill_breakdown": {
+    "paywall_detected": 1,
+    "dead_link": 2,
+    "malformed_content": 1,
+    "content_too_short": 2
+  }
+}

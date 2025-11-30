@@ -7,10 +7,36 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Node
 node_modules
 dist
 dist-ssr
 *.local
+
+# Secrets and Credentials
+.env
+google_credentials.json
+*.key
+*.pem
+secrets.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+venv_production/
+.pytest_cache/
+.coverage
+htmlcov/
+build/
+*.egg-info/
+
+# R
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +48,19 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+*.swp
+*.swo
+
+# Data and Output (backend)
+data/
+processed_pdf_library/
+raw_media_files/
+tmp/
+output/
+
+# Project Specific
+known_entities.json
+
+# Playwright
+test-results/
+playwright-report/
