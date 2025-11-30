@@ -1,6 +1,42 @@
 
 # Changelog - Jay Rosen Digital Archive
 
+*Session Date: November 30, 2025*
+
+## UX Improvements & Project Management Setup
+
+### Terminology Standardization
+- **FAQ Content**: Replaced all 24 instances of "the dissertation" with "*The Impossible Press*" throughout FAQ data
+  - Questions use plain title: "What does The Impossible Press say about..."
+  - Answers use italicized `<em>` tags for proper formatting
+  - Possessive forms rephrased for clarity
+
+### Branding Consistency
+- **Header Standardization**: Updated all standalone tools to use "Jay Rosen Digital Archive" branding
+  - FAQ, Glossary, Timeline, Comparison Tool, Annotated Excerpts, 1986 Context pages
+  - Consistent logo, title, and subtitle across all entry points
+
+### Homepage Improvements
+- **Featured Works Tooltips**: Converted descriptions to hover tooltips for cleaner layout
+- **Folder View Filtering**: Categories now only show if they have 10+ records
+- **Loading Quotes**: Added dissertation excerpts during data loading states
+- **Tools Modal**: Added quick-access modal for archive tools
+
+### Data Quality
+- **Untitled Records**: Fixed handling of empty/blank records in archive service
+- **Timeline Updates**: Corrected dates and improved categorization
+
+### GitHub Project Management
+- **Labels Created**: `backend` (purple), `frontend` (green)
+- **Milestones Created**:
+  - December 2025 Dissertation Release (due Dec 31)
+  - Backend Stabilization (6 issues)
+  - Developer Experience (10 issues)
+- **Issues Created**: 16 issues (#9-#24) tracking all PR review recommendations
+- **Documentation**: Added GitHub Issues & Labels section to CLAUDE.md
+
+---
+
 *Session Date: November 29, 2025 (Continued - Session 3)*
 
 ## Repository Consolidation: Merged rosen-archive
