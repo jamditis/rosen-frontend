@@ -313,6 +313,36 @@ python tools/backfill/backfill_worker.py    # Fill missing fields
 
 ---
 
+## GitHub Issues & Labels
+
+When creating GitHub issues, always apply appropriate labels:
+
+### Available Labels
+| Label | Color | Description |
+|-------|-------|-------------|
+| `backend` | Purple (#5319E7) | Backend Python pipeline |
+| `frontend` | Green (#0E8A16) | Frontend React/JS application |
+| `bug` | Red (default) | Something isn't working |
+| `enhancement` | Blue (default) | New feature or request |
+| `documentation` | Blue (default) | Improvements or additions to documentation |
+
+### Labeling Guidelines
+- **Always label issues** - Every issue should have at least one label
+- **Use component labels** - Add `backend` or `frontend` to indicate which part of the codebase
+- **Use type labels** - Add `bug`, `enhancement`, or `documentation`
+- **Multiple labels are good** - e.g., `backend, bug` for a backend bug
+
+### Creating Issues via CLI
+```bash
+# Good - with labels
+gh issue create --title "Fix broken import" --body "..." --label "backend,bug"
+
+# If labels don't exist yet, create them first
+gh label create "backend" --description "Backend Python pipeline" --color "5319E7"
+```
+
+---
+
 ## Contact & Attribution
 
 - **Archive Curator:** Joe Amditis
