@@ -5,7 +5,7 @@ export const CONTEXT_1986 = {
   year: 1986,
   title: '1986 in Journalism',
   subtitle: 'The Media Landscape When "The Impossible Press" Was Written',
-  introduction: 'To understand the dissertation\'s arguments, it helps to understand the media environment in which they were made. 1986 was a pivotal moment: the broadcast era was at its peak, cable was rising, and the digital revolution was still a decade away.'
+  introduction: 'To understand the arguments in <em>The Impossible Press</em>, it helps to understand the media environment in which they were made. 1986 was a pivotal moment: the broadcast era was at its peak, cable was rising, and the digital revolution was still a decade away.'
 };
 
 export const MEDIA_LANDSCAPE = [

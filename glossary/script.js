@@ -8,10 +8,22 @@ const detailContent = document.getElementById('detail-content');
 const figuresGrid = document.getElementById('figures-grid');
 const closePanel = document.getElementById('close-panel');
 const filterButtons = document.querySelectorAll('[data-filter]');
+const srAnnouncements = document.getElementById('sr-announcements');
 
 // State
 let selectedConcept = null;
 let activeFilter = 'all';
+let lastFocusedElement = null;
+
+// Announce to screen readers
+function announce(message) {
+  if (srAnnouncements) {
+    srAnnouncements.textContent = message;
+    setTimeout(() => {
+      srAnnouncements.textContent = '';
+    }, 1000);
+  }
+}
 
 // Get category for a concept
 function getConceptCategory(conceptId) {
@@ -51,8 +63,9 @@ function renderDetail(concept) {
   detailContent.innerHTML = `
     <div class="mb-6">
       ${category ? `<span class="badge badge-stone mb-2">${category.name}</span>` : ''}
-      <h2 class="font-display text-2xl text-stone-850 mt-2">${concept.term}</h2>
+      <h2 id="detail-panel-title" class="font-display text-2xl text-stone-850 mt-2">${concept.term}</h2>
     </div>
+    <p id="detail-panel-description" class="sr-only">Concept details for ${concept.term} from ${concept.chapter}</p>
 
     <div class="chapter-ref mb-4">
       <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -113,6 +126,9 @@ function isMobileView() {
 function selectConcept(concept) {
   selectedConcept = concept;
 
+  // Save last focused element for returning focus when panel closes
+  lastFocusedElement = document.activeElement;
+
   // Update card states
   document.querySelectorAll('.concept-card').forEach(card => {
     card.classList.toggle('ring-2', card.dataset.id === concept.id);
@@ -127,6 +143,14 @@ function selectConcept(concept) {
   if (isMobileView()) {
     document.body.classList.add('modal-open');
   }
+
+  // Focus the close button for accessibility
+  setTimeout(() => {
+    closePanel.focus();
+  }, 100);
+
+  // Announce to screen readers
+  announce(`Opened concept: ${concept.term}`);
 }
 
 // Close panel
@@ -139,6 +163,15 @@ function closeDetailPanel() {
 
   // Unlock body scroll
   document.body.classList.remove('modal-open');
+
+  // Return focus to the last focused element
+  if (lastFocusedElement) {
+    lastFocusedElement.focus();
+    lastFocusedElement = null;
+  }
+
+  // Announce to screen readers
+  announce('Concept panel closed');
 }
 
 // Filter concepts

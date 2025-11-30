@@ -4,7 +4,7 @@
 export const TIMELINE_METADATA = {
   title: 'From Dissertation to Now',
   subtitle: 'How "The Impossible Press" Ideas Evolved Over 40 Years',
-  introduction: 'The dissertation was not an endpoint but a beginning. The ideas Jay Rosen developed in 1986 would evolve through the public journalism movement, PressThink, and ongoing work on the press-public relationship. This timeline traces that intellectual journey.'
+  introduction: '<em>The Impossible Press</em> was not an endpoint but a beginning. The ideas Jay Rosen developed in 1986 would evolve through the public journalism movement, PressThink, and ongoing work on the press-public relationship. This timeline traces that intellectual journey.'
 };
 
 export const TIMELINE_ENTRIES = [
@@ -22,7 +22,7 @@ export const TIMELINE_ENTRIES = [
       'The professional attitude as inadequate solution'
     ],
     dissertationConnection: 'The foundational document. All later work builds on these insights.',
-    link: 'https://drive.google.com/file/d/14sIj3nYzOaV_CRHLMRvbgv9EcYbCsp4L/view'
+    link: '/tools/dissertation-reader/dist/'
   },
   {
     id: 'nyu-appointment',
@@ -182,7 +182,7 @@ export const TIMELINE_ENTRIES = [
     subtitle: 'December 2025',
     description: 'Nearly 40 years after its completion, "The Impossible Press" is made publicly available for the first time, allowing readers to see the intellectual foundations of Rosen\'s later work.',
     dissertationConnection: 'The origin document becomes available, revealing how much of the later work was already present in embryonic form.',
-    link: 'https://drive.google.com/file/d/14sIj3nYzOaV_CRHLMRvbgv9EcYbCsp4L/view'
+    link: '/tools/dissertation-reader/dist/'
   }
 ];
 

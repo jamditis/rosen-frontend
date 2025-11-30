@@ -4,7 +4,7 @@
 export const EXCERPTS_METADATA = {
   title: 'Annotated Excerpts',
   subtitle: 'Key Passages from "The Impossible Press" with 2025 Commentary',
-  introduction: 'These passages represent some of the most prescient and provocative moments in the dissertation. Each is presented with its original context, a 2025 reflection, and connections to contemporary media reality.',
+  introduction: 'These passages represent some of the most prescient and provocative moments in <em>The Impossible Press</em>. Each is presented with its original context, a 2025 reflection, and connections to contemporary media reality.',
   note: 'Commentary marked as "[2025 reflection]" represents placeholder text for Jay Rosen to revise with his own perspective.'
 };
 

@@ -1,6 +1,19 @@
 /* Then and Now: Custom Styles */
 /* Extends the Jay Rosen Digital Archive design language */
 
+/* Screen reader only - for accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 /* Paper Texture Background */
 body {
   background-color: #fdfbf7;

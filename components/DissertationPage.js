@@ -10,7 +10,7 @@ const DissertationPage = ({ onBack }) => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [detailPanelOpen, setDetailPanelOpen] = useState(false);
 
-  const dissertationPdfUrl = 'https://drive.google.com/file/d/14sIj3nYzOaV_CRHLMRvbgv9EcYbCsp4L/view?usp=sharing';
+  const dissertationPdfUrl = '/tools/dissertation-reader/dist/';
 
   const handleNodeSelect = (node) => {
     if (node) {

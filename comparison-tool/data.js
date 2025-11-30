@@ -176,6 +176,6 @@ export const METADATA = {
   author: 'Jay Rosen',
   degree: 'Ph.D., New York University, 1986',
   advisor: 'Neil Postman',
-  pdfUrl: 'https://drive.google.com/file/d/14sIj3nYzOaV_CRHLMRvbgv9EcYbCsp4L/view?usp=sharing',
+  pdfUrl: '/tools/dissertation-reader/dist/',
   introduction: 'In 1986, Jay Rosen completed his doctoral dissertation under Neil Postman at NYU. Nearly four decades later, his analysis of the troubled relationship between press and public reads less like historical scholarship and more like prophecy. This tool places his 1986 observations alongside the realities of 2025.'
 };

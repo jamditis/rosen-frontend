@@ -57,19 +57,32 @@
   </head>
 
   <body class="antialiased font-body text-stone-900 min-h-screen bg-paper">
+    <!-- Skip to main content link for accessibility -->
+    <a href="#faq-container" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-stone-800 focus:text-white focus:px-4 focus:py-2 focus:rounded">
+      Skip to questions
+    </a>
+
     <!-- Header -->
     <header class="sticky top-0 z-50 bg-paper/95 backdrop-blur-sm border-b border-stone-200">
-      <div class="max-w-4xl mx-auto px-4 py-4">
+      <div class="max-w-4xl mx-auto px-4 py-3">
         <div class="flex items-center justify-between">
-          <div>
-            <h1 class="font-display text-xl md:text-2xl text-stone-850">Ask the Dissertation</h1>
-            <p class="text-xs text-stone-500 mt-1">Questions & Answers</p>
-          </div>
-          <a href="https://drive.google.com/file/d/14sIj3nYzOaV_CRHLMRvbgv9EcYbCsp4L/view"
-             target="_blank"
-             class="text-xs bg-stone-800 text-white px-3 py-1.5 rounded hover:bg-stone-700 transition-colors">
-            Read Dissertation
+          <a href="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <div class="bg-stone-900 text-white p-1.5">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-lg md:text-xl font-display font-bold text-stone-900 tracking-tight">Jay Rosen Digital Archive</h1>
+              <p class="text-xs text-stone-500">FAQ</p>
+            </div>
           </a>
+          <nav class="flex items-center gap-3">
+            <a href="/tools/dissertation-reader/dist/"
+               class="text-xs bg-stone-800 text-white px-3 py-1.5 rounded hover:bg-stone-700 transition-colors">
+              Read Dissertation
+            </a>
+          </nav>
         </div>
       </div>
     </header>
@@ -95,8 +108,8 @@
           <svg class="w-5 h-5 text-stone-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
           </svg>
-          <button id="clear-search" class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button id="clear-search" class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-sky-500 rounded" aria-label="Clear search">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
@@ -138,8 +151,8 @@
 
     <!-- FAQ List -->
     <main class="max-w-4xl mx-auto px-4 py-12">
-      <!-- Results count -->
-      <p id="results-count" class="text-sm text-stone-500 mb-6"></p>
+      <!-- Results count (aria-live for screen readers) -->
+      <p id="results-count" class="text-sm text-stone-500 mb-6" aria-live="polite" aria-atomic="true"></p>
 
       <!-- FAQ Items -->
       <div id="faq-container" class="space-y-4">
@@ -156,14 +169,14 @@
     </main>
 
     <!-- BYOK Modal -->
-    <div id="byok-modal" class="fixed inset-0 z-50 hidden">
+    <div id="byok-modal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="byok-modal-title">
       <div class="absolute inset-0 bg-black/50" id="byok-backdrop"></div>
       <div class="absolute inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-lg bg-white rounded-lg shadow-xl overflow-hidden">
         <div class="p-6">
           <div class="flex items-center justify-between mb-6">
-            <h3 class="font-display text-xl">Use Your Own API Key</h3>
-            <button id="close-byok" class="text-stone-400 hover:text-stone-600">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <h3 id="byok-modal-title" class="font-display text-xl">Use Your Own API Key</h3>
+            <button id="close-byok" class="text-stone-400 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 rounded" aria-label="Close API key dialog">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
             </button>

@@ -6,9 +6,21 @@ import { COMPARISONS, METADATA } from './data.js';
 // DOM Elements
 const comparisonsContainer = document.getElementById('comparisons-container');
 const navDotsContainer = document.getElementById('nav-dots');
+const srAnnouncements = document.getElementById('sr-announcements');
 
 // State
 let activeComparison = 0;
+
+// Announce to screen readers
+function announce(message) {
+  if (srAnnouncements) {
+    srAnnouncements.textContent = message;
+    // Clear after announcement to allow repeated announcements of same text
+    setTimeout(() => {
+      srAnnouncements.textContent = '';
+    }, 1000);
+  }
+}
 
 // Render a single comparison card
 function renderComparison(comparison, index) {
@@ -144,7 +156,13 @@ function updateActiveNavDot() {
     activeComparison = closestIndex;
     navDotsContainer.querySelectorAll('.nav-dot').forEach((dot, i) => {
       dot.classList.toggle('active', i === closestIndex);
+      dot.setAttribute('aria-current', i === closestIndex ? 'true' : 'false');
     });
+    // Announce to screen readers
+    const currentComparison = COMPARISONS[closestIndex];
+    if (currentComparison) {
+      announce(`Viewing comparison ${closestIndex + 1} of ${COMPARISONS.length}: ${currentComparison.theme}`);
+    }
   }
 }
 
