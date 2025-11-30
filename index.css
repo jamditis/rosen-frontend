@@ -1,4 +1,10 @@
 
+/* Prevent horizontal overflow */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
 /* Global Texture */
 body {
   background-color: #fdfbf7;

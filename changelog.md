@@ -1,6 +1,55 @@
 
 # Changelog - Jay Rosen Digital Archive
 
+*Session Date: November 29, 2025 (Continued - Session 2)*
+
+## Dissertation Mind Map Enhancements & Accessibility
+
+### Mind Map Layout & Interaction (`/components/MindMap.js`)
+- **Layout Change**: Converted from top-down to left-to-right tree layout for better horizontal screen utilization
+- **Single-Click Expansion**: Nodes now expand/collapse on single click (previously double-click)
+- **Auto-Fit View**: Mind map automatically zooms and pans to show all visible nodes when expanding/collapsing
+- **Node Cluster Focus**: Selecting a node auto-fits to show the selected node, its parent, and children
+- **Expand/Collapse All**: Added buttons to expand or collapse all nodes at once
+- **Re-center Button**: Added button to reset view to show all currently visible nodes
+- **Touch Support**: Added touch event handlers for mobile panning (drag to pan)
+- **Keyboard Navigation**: Arrow keys to pan, +/- to zoom, ESC to close panel, 0 to reset zoom
+
+### Detail Panel Improvements (`/components/DetailPanel.js`)
+- **Wider Panel**: Increased from 384px to 420px for better content display
+- **Improved Padding**: Added extra right padding to prevent text clipping
+- **Text Wrapping**: Added `break-words` to all text elements to handle long content
+- **Close on ESC**: Panel closes when pressing ESC key
+- **Close on Click Outside**: Clicking empty space in mind map deselects node and closes panel
+- **Smooth Close Animation**: Panel content persists during slide-out animation
+
+### Dissertation Data Updates (`/components/dissertationData.js`)
+- **Page Citations**: Added accurate page numbers (pageStart/pageEnd) to all 70+ dissertation nodes
+- **Figure References**: Added pageRef citations to all key figure nodes
+- **Quote Citations**: Added page references to NOTABLE_QUOTATIONS array
+
+### Accessibility Improvements (WCAG 2.1)
+- **ARIA Labels**: All icon-only buttons now have `aria-label` attributes
+- **Focus Indicators**: Visible focus rings (`focus:ring-2`) on all interactive elements
+- **Dialog Semantics**: Detail panel uses `role="dialog"`, `aria-modal`, `aria-labelledby`
+- **Focus Management**: Close button auto-focuses when detail panel opens
+- **Screen Reader Support**: Zoom level announced via `aria-live` region
+- **Keyboard Accessible**: Full keyboard navigation without requiring a mouse
+
+### Mobile Responsiveness
+- **Touch Targets**: Increased button sizes on mobile (44px+ minimum tap target)
+- **Responsive Controls**: Buttons and controls use responsive padding (`p-3 sm:p-2.5`)
+- **Full-Width Panel**: Detail panel fills screen on mobile, fixed width on desktop
+- **Flexible Bottom Bar**: Bottom controls wrap on small screens with `flex-wrap`
+- **Hidden Tips**: Tip text hidden on smaller screens to save space
+
+### Bug Fixes
+- Fixed horizontal overflow causing page content to shift right
+- Fixed text clipping in detail panel on narrow screens
+- Added `overflow-x: hidden` to prevent horizontal scrollbar
+
+---
+
 *Session Date: November 29, 2025 (Continued)*
 
 ## FAQ Expansion & Mobile Responsiveness
