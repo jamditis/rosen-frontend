@@ -104,16 +104,36 @@ const getCachedData = (url) => {
 };
 
 const setCachedData = (url, data) => {
-  try {
-    const cacheKey = getCacheKey(url);
-    const entry = {
-      data,
-      timestamp: Date.now(),
-      version: CACHE_VERSION
-    };
+  const cacheKey = getCacheKey(url);
+  const entry = {
+    data,
+    timestamp: Date.now(),
+    version: CACHE_VERSION
+  };
+
+  const trySetItem = () => {
     localStorage.setItem(cacheKey, JSON.stringify(entry));
+  };
+
+  try {
+    trySetItem();
   } catch (e) {
-    console.warn('Cache write error (storage might be full). Try clearing browser storage or old caches:', e);
+    if (e.name === 'QuotaExceededError' || e.code === 22) {
+      // Storage is full - clear old archive caches and retry
+      console.log('Cache storage full, clearing old archive caches...');
+      try {
+        const keys = Object.keys(localStorage);
+        const archiveCacheKeys = keys.filter(key => key.startsWith('archive_csv_'));
+        archiveCacheKeys.forEach(key => localStorage.removeItem(key));
+        trySetItem(); // Retry after clearing
+        console.log('Cache cleared and data stored successfully');
+      } catch (retryError) {
+        // Still failing - storage may be consumed by other data
+        console.warn('Cache disabled: browser storage is full. The archive will work but without caching.');
+      }
+    } else {
+      console.warn('Cache write error:', e);
+    }
   }
 };
 
