@@ -12,6 +12,7 @@ import Explorer from './components/Explorer.js';
 import DissertationPage from './components/DissertationPage.js';
 import ToolsModal from './components/ToolsModal.js';
 import LoadingQuotes from './components/LoadingQuotes.js';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
@@ -324,6 +325,8 @@ const App = () => {
             </div>
         </div>
       </header>
+
+      <${WorkInProgressBanner} onNavigateToDissertation=${navigateToDissertation} />
 
       <div className=${`flex-grow container mx-auto px-4 py-6 flex gap-8 ${isExplorer ? 'justify-center' : ''}`}>
          
