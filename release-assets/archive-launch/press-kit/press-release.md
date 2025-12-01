@@ -8,7 +8,7 @@
 
 **Contact:** Jay Rosen
 **Email:** rosen.jay@gmail.com
-**Date:** [LAUNCH DATE]
+**Date:** December 2, 2025
 
 ---
 
@@ -18,7 +18,7 @@
 
 ---
 
-**[CITY, STATE]** — The Jay Rosen Digital Archive, a comprehensive collection of journalism criticism spanning 36 years (1986-2025), launches today at [URL]. The archive includes over 849 records—articles, essays, blog posts, social media content, and videos—along with the first public release of Rosen's 1986 doctoral dissertation, "The Impossible Press: American Journalism and the Decline of Public Life."
+**NEW YORK, NY** — The Jay Rosen Digital Archive, a comprehensive collection of journalism criticism spanning 36 years (1986-2025), launches today at https://pressthink.org/wp-content/rosen-archive/index.html. The archive includes over 849 records—articles, essays, blog posts, social media content, and videos—along with the first public release of Rosen's 1986 doctoral dissertation, "The Impossible Press: American Journalism and the Decline of Public Life."
 
 Jay Rosen, professor of journalism at New York University since 1986, is one of the most widely read critics of the American press. His concepts, including "the view from nowhere," "the people formerly known as the audience," and "church of the savvy," have shaped how journalists, scholars, and the public understand media's role in democracy.
 
@@ -72,11 +72,11 @@ The archive is designed for:
 
 ### Access
 
-The archive is freely available at [URL].
+The archive is freely available at https://pressthink.org/wp-content/rosen-archive/index.html.
 
 The dissertation is available at:
 - Google Docs: https://docs.google.com/document/d/1OHTatfz57Oxcn1YbWHJ6smpWmRpwrWChlbtaO46Q3i0
-- Archive: [URL]
+- Archive: https://pressthink.org/wp-content/rosen-archive/index.html
 
 ---
 
@@ -92,7 +92,7 @@ rosen.jay@gmail.com
 
 - Jay Rosen is available for interviews via email at jayrosen.jay@gmail.com
 - Screenshots and archive statistics available in press kit
-- Full press kit with fact sheet, bio, and images at [URL]
+- Full press kit with fact sheet, bio, and images at https://pressthink.org/wp-content/rosen-archive/press-kit/
 - The dissertation has never been publicly available before this release
 
 ### Quick Statistics
