@@ -189,7 +189,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
                                 onClick=${() => onSelectRecord(rel.id)}
                                 className="text-left p-4 bg-stone-50 border border-stone-200 hover:border-stone-400 hover:shadow-sm transition-all rounded-sm group w-full"
                             >
-                                <div className="text-xs font-bold text-stone-400 mb-1 uppercase tracking-wider">${rel.year}</div>
+                                <div className="text-xs font-bold text-stone-400 mb-1 uppercase tracking-wider">${rel.date}</div>
                                 <h4 className="text-sm font-bold text-stone-800 group-hover:text-blue-800 leading-tight mb-1 line-clamp-2">
                                     ${rel.title}
                                 </h4>

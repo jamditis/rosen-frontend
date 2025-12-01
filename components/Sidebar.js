@@ -192,9 +192,9 @@ const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, a
                 { label: 'Tumblr', value: 'tumblr' },
               ].map((opt) => html`
                 <label key=${opt.label} className="flex items-center gap-2 cursor-pointer">
-                   <input 
-                    type="radio" 
-                    name="ctype" 
+                   <input
+                    type="radio"
+                    name="ctype"
                     checked=${filters.type === opt.value}
                     onChange=${() => handleTypeChange(opt.value)}
                     className="accent-stone-900 focus:ring-stone-900"
@@ -202,6 +202,18 @@ const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, a
                   <span className="text-sm">${opt.label}</span>
                 </label>
               `)}
+            </div>
+            <div className="mt-4 pt-3 border-t border-stone-100">
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked=${filters.includeReplies}
+                  onChange=${() => setFilters(prev => ({ ...prev, includeReplies: !prev.includeReplies }))}
+                  className="w-4 h-4 accent-stone-900 border-stone-300 rounded focus:ring-stone-900"
+                />
+                <span className="text-sm text-stone-600 group-hover:text-stone-900">Include social media replies</span>
+              </label>
+              <p className="text-xs text-stone-400 mt-1 ml-6">Show replies to other posts (hidden by default)</p>
             </div>
           </div>
 
