@@ -8,8 +8,8 @@
 
 | | |
 |---|---|
-| **Launch Date** | [REVIEW] |
-| **URL** | [URL] |
+| **Launch Date** | December 2, 2025 |
+| **URL** | https://pressthink.org/wp-content/rosen-archive/index.html |
 | **Created By** | Joe Amditis, Center for Cooperative Media |
 | **Subject** | Jay Rosen, journalism critic and NYU professor |
 
@@ -21,8 +21,9 @@
 |--------------|-------|
 | Web articles, essays, blog posts | 765+ |
 | Newspaper clippings | 84 |
-| Twitter posts/threads | [REVIEW] |
-| Tumblr posts | [REVIEW] |
+| Twitter posts/threads | 26,117 |
+| Bluesky posts | 3,071 |
+| Tumblr posts | TBD |
 | YouTube videos | ~50 |
 | Doctoral dissertation | 1 |
 | **Total Records** | **849+** |
@@ -117,12 +118,12 @@ Center for Cooperative Media
 
 ## Links
 
-- **Archive:** [URL]
-- **Dissertation:** [URL]
-- **Press Kit:** [URL]
+- **Archive:** https://pressthink.org/wp-content/rosen-archive/index.html
+- **Dissertation:** https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
+- **Press Kit:** https://pressthink.org/wp-content/rosen-archive/press-kit/
 - **PressThink:** pressthink.org
 - **Jay Rosen Twitter:** @jayrosen_nyu
 
 ---
 
-*Last Updated: November 2025*
+*Last Updated: December 2025*

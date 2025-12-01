@@ -104,8 +104,8 @@ Henry Perkinson
 
 Digital Edition
 Jay Rosen Digital Archive
-[URL]
-[Year]
+pressthink.org/wp-content/rosen-archive
+2025
 ```
 
 **Page ii: About This Edition**
@@ -121,7 +121,7 @@ Citation:
 Rosen, J. (1986). The impossible press: American journalism
 and the decline of public life [Doctoral dissertation,
 New York University]. Jay Rosen Digital Archive.
-https://[URL]
+https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 
 For questions or to report issues:
 jamditis@gmail.com
@@ -265,4 +265,4 @@ Output: `rosen-impossible-press-dissertation-1986.pdf`
 
 ---
 
-*Last Updated: November 2025*
+*Last Updated: December 2025*

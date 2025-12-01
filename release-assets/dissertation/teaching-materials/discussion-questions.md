@@ -203,4 +203,4 @@
 
 ---
 
-*Prepared for the Jay Rosen Digital Archive, November 2025*
+*Prepared for the Jay Rosen Digital Archive, December 2025*

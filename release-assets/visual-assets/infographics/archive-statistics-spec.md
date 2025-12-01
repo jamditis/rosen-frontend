@@ -62,7 +62,7 @@ A visually engaging infographic displaying key archive statistics for use in soc
 │ • 1 dissertation      │
 ├────────────────────────┤
 │ Jay Rosen Digital Archive │
-│ [URL]                  │
+│ pressthink.org/wp-content/rosen-archive │
 └────────────────────────┘
 ```
 
@@ -122,8 +122,8 @@ Use archive color palette:
 
 ## Source Attribution
 
-Include: "Jay Rosen Digital Archive | [URL]"
+Include: "Jay Rosen Digital Archive | pressthink.org/wp-content/rosen-archive"
 
 ---
 
-*Last Updated: November 2025*
+*Last Updated: December 2025*

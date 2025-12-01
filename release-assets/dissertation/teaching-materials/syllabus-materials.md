@@ -358,4 +358,4 @@ A: The dissertation is primarily diagnostic. Point students toward Rosen's later
 
 ---
 
-*Prepared for the Jay Rosen Digital Archive, November 2025*
+*Prepared for the Jay Rosen Digital Archive, December 2025*

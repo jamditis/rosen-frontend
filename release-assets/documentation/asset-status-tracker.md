@@ -1,6 +1,6 @@
 # Asset Status Tracker
 
-**Last Updated:** November 2025
+**Last Updated:** December 2025
 
 ---
 
@@ -177,4 +177,4 @@ See `/release-assets/documentation/data-processing-status.md` for detailed requi
 
 ---
 
-*Last Updated: November 2025*
+*Last Updated: December 2025*

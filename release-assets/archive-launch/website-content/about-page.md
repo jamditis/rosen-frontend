@@ -205,4 +205,4 @@ A: The archive is updated periodically as new content is identified and processe
 
 ---
 
-*Last Updated: November 2025*
+*Last Updated: December 2025*

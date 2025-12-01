@@ -24,7 +24,7 @@
 ```
 Rosen, J. (1986). The impossible press: American journalism and the decline
     of public life [Doctoral dissertation, New York University]. Jay Rosen
-    Digital Archive. https://[ARCHIVE-URL]/dissertation
+    Digital Archive. https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 ```
 
 ### MLA 9th Edition
@@ -32,7 +32,7 @@ Rosen, J. (1986). The impossible press: American journalism and the decline
 ```
 Rosen, Jay. "The Impossible Press: American Journalism and the Decline of
     Public Life." 1986. New York University, PhD dissertation. Jay Rosen
-    Digital Archive, [ARCHIVE-URL]/dissertation.
+    Digital Archive, pressthink.org/wp-content/rosen-archive/index.html#dissertation.
 ```
 
 ### Chicago 17th Edition (Notes-Bibliography)
@@ -41,14 +41,14 @@ Rosen, Jay. "The Impossible Press: American Journalism and the Decline of
 ```
 Jay Rosen, "The Impossible Press: American Journalism and the Decline of
 Public Life" (PhD diss., New York University, 1986), Jay Rosen Digital
-Archive, https://[ARCHIVE-URL]/dissertation.
+Archive, https://pressthink.org/wp-content/rosen-archive/index.html#dissertation.
 ```
 
 **Bibliography:**
 ```
 Rosen, Jay. "The Impossible Press: American Journalism and the Decline of
     Public Life." PhD diss., New York University, 1986. Jay Rosen Digital
-    Archive. https://[ARCHIVE-URL]/dissertation.
+    Archive. https://pressthink.org/wp-content/rosen-archive/index.html#dissertation.
 ```
 
 ### Chicago 17th Edition (Author-Date)
@@ -56,7 +56,7 @@ Rosen, Jay. "The Impossible Press: American Journalism and the Decline of
 ```
 Rosen, Jay. 1986. "The Impossible Press: American Journalism and the
     Decline of Public Life." PhD diss., New York University. Jay Rosen
-    Digital Archive. https://[ARCHIVE-URL]/dissertation.
+    Digital Archive. https://pressthink.org/wp-content/rosen-archive/index.html#dissertation.
 ```
 
 ### Harvard
@@ -64,7 +64,7 @@ Rosen, Jay. 1986. "The Impossible Press: American Journalism and the
 ```
 Rosen, J. (1986) The impossible press: American journalism and the decline
 of public life. PhD thesis. New York University. Available at:
-https://[ARCHIVE-URL]/dissertation (Accessed: [DATE]).
+https://pressthink.org/wp-content/rosen-archive/index.html#dissertation (Accessed: December 2, 2025).
 ```
 
 ### IEEE
@@ -73,7 +73,7 @@ https://[ARCHIVE-URL]/dissertation (Accessed: [DATE]).
 J. Rosen, "The impossible press: American journalism and the decline of
 public life," Ph.D. dissertation, School Educ., Health, Nursing, Arts
 Professions, New York Univ., New York, NY, USA, 1986. [Online].
-Available: https://[ARCHIVE-URL]/dissertation
+Available: https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 ```
 
 ---
@@ -91,8 +91,8 @@ Available: https://[ARCHIVE-URL]/dissertation
   type         = {{PhD} dissertation},
   note         = {Committee: Neil Postman (Chair), Christine Nystrom,
                   Henry Perkinson},
-  url          = {https://[ARCHIVE-URL]/dissertation},
-  urldate      = {[ACCESS-DATE]}
+  url          = {https://pressthink.org/wp-content/rosen-archive/index.html#dissertation},
+  urldate      = {2025-12-02}
 }
 ```
 
@@ -104,7 +104,7 @@ Available: https://[ARCHIVE-URL]/dissertation
 ```
 Rosen, J. (1986). The impossible press: American journalism and the decline
     of public life [Doctoral dissertation, New York University]. Jay Rosen
-    Digital Archive. https://[ARCHIVE-URL]/dissertation (Chapter 6, pp. XX-XX)
+    Digital Archive. https://pressthink.org/wp-content/rosen-archive/index.html#dissertation (Chapter 6, pp. XX-XX)
 ```
 
 ### In-text citation examples
@@ -134,8 +134,8 @@ TODO: Investigate DOI assignment options:
 
 **Original Source:** NYU Archives
 **Digital Archive:** Jay Rosen Digital Archive
-**Archive URL:** https://[ARCHIVE-URL]
-**Dissertation URL:** https://[ARCHIVE-URL]/dissertation
+**Archive URL:** https://pressthink.org/wp-content/rosen-archive/index.html
+**Dissertation URL:** https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 **Google Docs:** https://docs.google.com/document/d/1OHTatfz57Oxcn1YbWHJ6smpWmRpwrWChlbtaO46Q3i0
 
 ---
@@ -153,8 +153,8 @@ This dissertation is shared for educational and research purposes. When citing:
 
 For citation assistance or questions about using dissertation content:
 - Email: jamditis@gmail.com
-- Archive: [CONTACT-URL]
+- Archive: https://pressthink.org/wp-content/rosen-archive/index.html
 
 ---
 
-*Last Updated: November 2025*
+*Last Updated: December 2025*
