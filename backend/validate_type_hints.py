@@ -9,7 +9,9 @@ import sys
 import os
 
 # Add src to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+SRC_DIR = os.path.join(SCRIPT_DIR, 'src')
+sys.path.insert(0, SRC_DIR)
 
 from rosen_scraper import workflow, scraper, categorizer, dispatcher, entity_resolver
 from typing import Dict, Any
@@ -19,12 +21,14 @@ def test_type_hints():
     
     # Test workflow functions
     print("Testing workflow functions...")
-    schema = workflow.get_schema("schema.json")
+    schema_path = os.path.join(SCRIPT_DIR, 'schema.json')
+    schema = workflow.get_schema(schema_path)
     assert schema is None or isinstance(schema, dict), "get_schema should return None or dict"
     
     # Test entity_resolver functions  
     print("Testing entity_resolver functions...")
-    entities = entity_resolver.load_known_entities("known_entities.json")
+    entities_path = os.path.join(SCRIPT_DIR, 'known_entities.json')
+    entities = entity_resolver.load_known_entities(entities_path)
     assert entities is None or isinstance(entities, dict), "load_known_entities should return None or dict"
     
     # Test that we can call functions with proper type hints
