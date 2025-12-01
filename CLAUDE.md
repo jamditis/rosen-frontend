@@ -84,7 +84,10 @@ The `index.html` loads the JS version. When editing, ensure changes are reflecte
 ├── context-1986/                 # Historical context page
 ├── timeline/                     # Dissertation → later work timeline
 ├── annotated-excerpts/           # Key passages with commentary
-├── faq/                          # FAQ + BYOK Chat interface
+├── faq/                          # FAQ interface (Ask the Dissertation)
+│
+├── future-features/              # Archived features for potential future use
+│   └── byok-chat/                # BYOK Claude chat interface (archived)
 │
 ├── backend/                      # Python data pipeline
 │   ├── src/                      # Core source code (processors, scraper, categorizer)
@@ -255,7 +258,9 @@ The dissertation is being released publicly with multiple presentation formats:
 5. **Timeline** - 14 entries from dissertation to 2025, filterable by type (`/timeline/`)
 6. **Annotated Excerpts** - 12 key passages with 2025 commentary (`/annotated-excerpts/`)
 7. **FAQ / Ask the Dissertation** - 25+ pre-generated Q&A pairs, searchable (`/faq/`)
-8. **BYOK Chat Interface** - Interactive Claude chat using user's own API key (`/faq/chat.html`)
+
+### Archived (developed but not active)
+8. **BYOK Chat Interface** - Interactive Claude chat using user's own API key (`/future-features/byok-chat/`)
 
 ### Planned (requires external content/production)
 9. Audio commentary / office hours (requires Jay to record)
