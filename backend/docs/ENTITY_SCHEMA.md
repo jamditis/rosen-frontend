@@ -29,7 +29,7 @@ The system recognizes six primary entity types, each with a unique ID prefix:
 - `entity_type` (string): `"Person"`
 - `entity_name` (string): Full name of the person
 - `normalized_name` (string): Lowercased, deduplicated form
-- `role` (string): Their role or title (e.g., "Journalism professor", "Media critic")
+- `role` (string): Their role or title (e.g., "Journalism professor", "Media critic") - *stored as `role_or_description` in sheets*
 - `affiliation` (string): Their organization/institution (e.g., "New York University")
 - `prominence_score` (int 1-10): How central this person is to the text
 
@@ -52,7 +52,7 @@ The system recognizes six primary entity types, each with a unique ID prefix:
 - `entity_type` (string): `"Organization"`
 - `entity_name` (string): Full organization name
 - `normalized_name` (string): Lowercased, deduplicated form (handles abbreviations)
-- `org_type` (string): Type classification (e.g., "News outlet", "Academic institution", "Media company")
+- `org_type` (string): Type classification (e.g., "News outlet", "Academic institution", "Media company") - *stored as `role_or_description` in sheets*
 - `prominence_score` (int 1-10): How central this organization is to the text
 
 **Examples:**
@@ -79,7 +79,7 @@ The system recognizes six primary entity types, each with a unique ID prefix:
 - `entity_type` (string): `"Work"`
 - `entity_name` (string): Title of the work
 - `normalized_name` (string): Lowercased, deduplicated form
-- `work_type` (string): Classification (e.g., "Blog post", "Book", "Article", "Study")
+- `work_type` (string): Classification (e.g., "Blog post", "Book", "Article", "Study") - *stored as `role_or_description` in sheets*
 - `author` (string): Creator of the work
 - `publication_year` (string): Year published (when available)
 - `prominence_score` (int 1-10): How central this work is to the text
@@ -125,6 +125,7 @@ The system recognizes six primary entity types, each with a unique ID prefix:
 - `entity_type` (string): `"Event"`
 - `entity_name` (string): Name of the event
 - `normalized_name` (string): Lowercased, deduplicated form
+- `event_type` (string): Event classification - *stored as `role_or_description` in sheets*
 - `event_date` (string): When the event occurred
 - `location` (string): Where the event took place
 - `significance` (string): Why the event matters
@@ -148,7 +149,7 @@ The system recognizes six primary entity types, each with a unique ID prefix:
 - `entity_type` (string): `"Location"`
 - `entity_name` (string): Name of the location
 - `normalized_name` (string): Lowercased, deduplicated form
-- `location_type` (string): Classification (e.g., "City", "Country", "Region")
+- `location_type` (string): Classification (e.g., "City", "Country", "Region") - *stored as `role_or_description` in sheets*
 - `relevance` (string): Why this location matters in context
 - `prominence_score` (int 1-10): How central this location is to the text
 
@@ -602,6 +603,19 @@ Prioritize entities related to:
 ---
 
 ## Data Schema (Google Sheets)
+
+### Property Mapping: Extraction vs Storage
+
+**Important:** The AI extraction uses type-specific property names, but these are consolidated when stored in Google Sheets:
+
+**Extraction Properties** → **Sheet Column**
+- `role` (Person) → `role_or_description`
+- `org_type` (Organization) → `role_or_description`
+- `work_type` (Work) → `role_or_description`
+- `event_type` (Event) → `role_or_description`
+- `location_type` (Location) → `role_or_description`
+
+This consolidation allows all entity types to use the same sheet schema while preserving type-specific information.
 
 ### Entities Sheet (`extracted_entities`)
 
