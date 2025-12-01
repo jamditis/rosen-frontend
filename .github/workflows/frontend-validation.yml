@@ -42,6 +42,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
       - name: Check HTML files for syntax errors
         run: |
           echo "Checking HTML files..."
@@ -67,8 +72,8 @@ jobs:
           echo "Checking for CDN links in HTML files..."
           for file in $(find . -name "*.html" -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./backend/*"); do
             echo "Checking CDN links in: $file"
-            # Check for common CDN domains
-            grep -oP 'https?://[^"'\'']+' "$file" | grep -E '(esm\.sh|unpkg\.com|cdn\.)' | head -5 || true
+            # Check for common CDN domains using standard grep
+            grep -o 'https\?://[^"'\'']*' "$file" 2>/dev/null | grep -E '(esm\.sh|unpkg\.com|cdn\.)' | head -5 || true
           done
       
       - name: Verify main entry points exist
