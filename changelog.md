@@ -1,6 +1,26 @@
 
 # Changelog - Jay Rosen Digital Archive
 
+*Session Date: December 1, 2025*
+
+## BYOK Chat Feature Archived
+
+### Feature Archival
+- **BYOK Chat Moved**: Relocated interactive Claude chat feature to `/future-features/byok-chat/`
+  - `chat.html` and `chat.js` preserved for potential future implementation
+  - Added README.md documenting the archived feature and reactivation steps
+
+### FAQ Page Updates (`/faq/`)
+- **Simplified Banner**: Removed BYOK option, now only shows NotebookLM link
+- **Removed Modal**: Removed API key input modal from FAQ page
+- **Cleaned Script**: Removed all BYOK-related JavaScript handlers
+
+### Documentation Updates
+- **CLAUDE.md**: Updated directory structure, moved BYOK to "Archived" section
+- **README.md**: Updated project structure and feature descriptions
+
+---
+
 *Session Date: November 30, 2025*
 
 ## UX Improvements & Project Management Setup

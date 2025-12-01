@@ -55,7 +55,7 @@ The frontend uses a **zero-build static architecture** designed for simple deplo
 *   **1986 in Journalism:** Historical context page (`/context-1986/`)
 *   **Timeline:** Visual timeline of intellectual evolution (`/timeline/`)
 *   **Annotated Excerpts:** Key passages with commentary (`/annotated-excerpts/`)
-*   **FAQ / Ask the Dissertation:** 46 Q&A pairs plus BYOK Claude chat (`/faq/`)
+*   **FAQ / Ask the Dissertation:** 46 Q&A pairs, searchable (`/faq/`)
 
 #### ♿ Accessibility
 *   **Keyboard Navigation:** Full keyboard support (arrow keys, +/-, ESC)
@@ -160,7 +160,8 @@ python src/workflow.py
 ├── context-1986/                # Historical context
 ├── timeline/                    # Intellectual evolution timeline
 ├── annotated-excerpts/          # Key passages with commentary
-├── faq/                         # FAQ + BYOK Chat
+├── faq/                         # FAQ (Ask the Dissertation)
+├── future-features/             # Archived features for future use
 │
 ├── backend/                     # Python data pipeline
 │   ├── src/                     # Core source code

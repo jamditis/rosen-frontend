@@ -10,16 +10,7 @@ const noResults = document.getElementById('no-results');
 const clearFilters = document.getElementById('clear-filters');
 const categoryButtons = document.querySelectorAll('[data-category]');
 
-// BYOK Modal elements
-const byokModal = document.getElementById('byok-modal');
-const openByokBtn = document.getElementById('open-byok-modal');
-const closeByokBtn = document.getElementById('close-byok');
-const cancelByokBtn = document.getElementById('cancel-byok');
-const byokBackdrop = document.getElementById('byok-backdrop');
-const apiKeyInput = document.getElementById('api-key-input');
-const saveKeyCheckbox = document.getElementById('save-key');
-const saveApiKeyBtn = document.getElementById('save-api-key');
-const keyStatus = document.getElementById('key-status');
+// NotebookLM link
 const notebookLink = document.getElementById('notebook-link');
 
 // State
@@ -155,62 +146,6 @@ function resetFilters() {
   filterItems();
 }
 
-// BYOK Modal functions
-function openByokModal() {
-  byokModal.classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-
-  // Check for existing key
-  const existingKey = localStorage.getItem('claude_api_key');
-  if (existingKey) {
-    apiKeyInput.value = '••••••••••••••••';
-    apiKeyInput.dataset.hasKey = 'true';
-  }
-}
-
-function closeByokModal() {
-  byokModal.classList.add('hidden');
-  document.body.style.overflow = '';
-  keyStatus.classList.add('hidden');
-}
-
-function saveApiKey() {
-  const key = apiKeyInput.value.trim();
-
-  if (!key || key === '••••••••••••••••') {
-    // If they haven't changed the masked key, check if we have one saved
-    if (localStorage.getItem('claude_api_key')) {
-      keyStatus.classList.remove('hidden');
-      setTimeout(() => {
-        window.location.href = './chat.html';
-      }, 1000);
-      return;
-    }
-    apiKeyInput.classList.add('border-red-500');
-    return;
-  }
-
-  // Basic validation
-  if (!key.startsWith('sk-ant-')) {
-    apiKeyInput.classList.add('border-red-500');
-    return;
-  }
-
-  apiKeyInput.classList.remove('border-red-500');
-
-  // Save to localStorage if checkbox is checked
-  if (saveKeyCheckbox.checked) {
-    // In production, you'd want to encrypt this
-    localStorage.setItem('claude_api_key', key);
-  }
-
-  // Show success and redirect
-  keyStatus.classList.remove('hidden');
-  setTimeout(() => {
-    window.location.href = './chat.html';
-  }, 1000);
-}
-
 // Initialize
 function init() {
   // Render FAQ items
@@ -249,28 +184,11 @@ function init() {
   // Clear filters
   clearFilters.addEventListener('click', resetFilters);
 
-  // BYOK modal handlers
-  openByokBtn.addEventListener('click', openByokModal);
-  closeByokBtn.addEventListener('click', closeByokModal);
-  cancelByokBtn.addEventListener('click', closeByokModal);
-  byokBackdrop.addEventListener('click', closeByokModal);
-  saveApiKeyBtn.addEventListener('click', saveApiKey);
-
   // Keyboard handling
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      closeByokModal();
-    }
     if (e.key === '/' && document.activeElement !== searchInput) {
       e.preventDefault();
       searchInput.focus();
-    }
-  });
-
-  // Handle Enter in API key input
-  apiKeyInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      saveApiKey();
     }
   });
 
