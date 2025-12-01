@@ -73,6 +73,7 @@ backend/
 │   └── README.md               # Scripts documentation
 ├── tests/                       # Test suite
 ├── pyproject.toml              # Poetry dependencies
+├── poetry.lock                 # Locked dependency versions
 ├── schema.json                 # Taxonomy and data schema
 └── entity_extraction_schema.json  # Entity extraction rules
 ```
@@ -322,11 +323,15 @@ Logs are written to:
 
 ### Poison Pill Detection
 
-The pipeline includes automatic detection of failed scrapes (paywalls, blocks, etc.):
+The pipeline includes automatic detection of failed scrapes (paywalls, anti-bot blocks, CAPTCHAs, etc.):
 
+- **Automatic Detection** - Identifies problematic content that will cause processing failures
+- **Classification** - Categorizes issues by type and severity (low, medium, high, critical)
+- **Routing Strategies** - Recommends appropriate handling for different failure types
+- **Retry Logic** - Provides intelligent retry strategies for recoverable issues
 - Check logs for "POISON PILL DETECTED" messages
-- Review `src/rosen_scraper/poison_pill_handler.py` for detection logic
-- Known paywalled domains in `workflow.py`: Washington Post, NY Times, WSJ
+- Review `src/rosen_scraper/poison_pill_handler.py` for complete detection logic
+- Known paywalled domains tracked: Washington Post, NY Times, WSJ, FT, Atlantic, New Yorker, Medium
 
 ---
 
