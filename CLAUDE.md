@@ -301,7 +301,12 @@ playwright install
 ```
 
 ### Configuration
-Create `.env` in `/backend/`:
+Copy `backend/.env.example` to `backend/.env` and fill in your values:
+```bash
+cp backend/.env.example backend/.env
+```
+
+Edit `backend/.env`:
 ```
 SPREADSHEET_NAME="Your Google Sheet Name"
 GEMINI_API_KEY="your_gemini_api_key"
