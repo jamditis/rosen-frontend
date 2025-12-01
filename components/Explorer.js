@@ -1,5 +1,5 @@
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { html } from '../html.js';
 import { ExternalLink, RefreshCw, Download, Settings2, Network } from 'lucide-react';
 import { COLORS } from '../constants.js';
@@ -403,6 +403,20 @@ const Explorer = ({ records }) => {
     .map(c => ({ ...nodes[c.targetId], strength: c.strength }))
     .sort((a, b) => b.strength - a.strength);
 
+  // Calculate category-to-color mapping for legend
+  const categoryColors = useMemo(() => {
+    const uniqueCategories = new Map();
+    records.forEach(r => {
+      const primaryCat = r.categories[0] || 'Other';
+      if (!uniqueCategories.has(primaryCat)) {
+        const hash = primaryCat.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const colorTheme = COLORS[hash % COLORS.length] || COLORS[0];
+        uniqueCategories.set(primaryCat, colorTheme);
+      }
+    });
+    return Array.from(uniqueCategories.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  }, [records]);
+
   return html`
     <div className="relative flex flex-col w-full" style=${{ minHeight: '80vh' }} ref=${containerRef}>
         
@@ -456,6 +470,21 @@ const Explorer = ({ records }) => {
                     </div>
                 </div>
             `}
+        </div>
+
+        <div className="absolute bottom-4 left-4 z-20 bg-white border border-stone-300 rounded shadow-lg p-3 max-w-xs">
+            <h4 className="text-xs font-bold text-stone-600 mb-2 uppercase tracking-wider">Category Colors</h4>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+                ${categoryColors.map(([category, color]) => html`
+                    <div key=${category} className="flex items-center gap-2">
+                        <div
+                            className="w-3 h-3 rounded-full shrink-0"
+                            style=${{ backgroundColor: color.text }}
+                        />
+                        <span className="text-stone-700 truncate" title=${category}>${category}</span>
+                    </div>
+                `)}
+            </div>
         </div>
 
         <div className="flex-grow bg-paper flex justify-center overflow-hidden cursor-crosshair">

@@ -302,11 +302,11 @@ See `release-assets/documentation/pre-publication-report.md` for the full status
 3. **Standalone tools go in subdirectories** - Like `comparison-tool/`
 4. **Update documentation** - Keep README.md, changelog.md, and this file current
 5. **Dissertation content is sacred** - Quotes and content from `dissertationData.js` are accurate citations
-6. **Jay Rosen's voice** - 2025 commentary should be placeholder text for Jay to revise, or clearly marked as draft
-7. **WordPress deployment** - Final tools will be uploaded via FTP to a WordPress domain
-8. **Backend uses Poetry** - Python dependencies managed via Poetry, not pip directly
-9. **Dissertation source in /dissertation/** - Full PDFs (managed via Git LFS) and transcription available there
-10. **Git LFS required** - Repository uses Git LFS for large PDF files; install before cloning
+6. **WordPress deployment** - Final tools will be uploaded via FTP to a WordPress domain
+7. **Backend uses Poetry** - Python dependencies managed via Poetry, not pip directly
+8. **Dissertation source in /dissertation/** - Full PDFs (managed via Git LFS) and transcription available there
+9. **Git LFS required** - Repository uses Git LFS for large PDF files; install before cloning
+10. **Always check PROJECT_LOG.md** - Review `docs/narrative/PROJECT_LOG.md` before major edits for context
 
 ---
 
@@ -340,10 +340,42 @@ Place Google Cloud credentials in `backend/google_credentials.json`.
 
 ### Commands
 ```bash
-python src/workflow.py                      # Main pipeline
+python src/workflow.py                      # Main pipeline (now supports Twitter, Tumblr, PDFs)
 python tools/diagnostics/data_deduper.py    # Clean data
 python tools/backfill/backfill_worker.py    # Fill missing fields
 ```
+
+### NEW: Content Type Processors (Dec 1, 2025)
+
+The backend now supports three additional content types beyond articles and videos:
+
+**Processors Location:** `backend/src/rosen_scraper/processors/`
+
+1. **Twitter/X Processor** (`twitter_processor.py`)
+   - Extracts threads and individual tweets
+   - Nitter proxy with 4 fallback instances + Playwright fallback
+   - Handles both `twitter.com` and `x.com` URLs
+   - Full thread extraction with numbering and quote tweets
+
+2. **Tumblr Processor** (`tumblr_processor.py`)
+   - Processes Tumblr export files (JSON, HTML) and live URLs
+   - Supports 8 post types: text, quote, link, photo, video, audio, answer, chat
+   - OCR-ready for archive exports
+   - Generates `TUMBLR-XXXXX` IDs
+
+3. **Newspaper Clipping Processor** (`clipping_processor.py`)
+   - OCR text cleanup (artifacts, line breaks, hyphenation)
+   - Metadata extraction (publication, date, author, page)
+   - Supports 12 major publications (NYT, WSJ, WP, LAT, etc.)
+   - Generates publication-specific IDs (`NYT-XXXXX`, `WSJ-XXXXX`, `CLIP-XXXXX`)
+   - Confidence scoring for extracted metadata
+
+**Dispatcher Integration:**
+- `dispatcher.py` automatically routes URLs to appropriate processors
+- All new processors integrated with AI analysis pipeline
+- Schema updated with "Tumblr Post" and "Newspaper Clipping" content formats
+
+**Status:** ✅ Backend fully operational. Can process Twitter, Tumblr, and PDF content. Frontend display updates pending.
 
 ---
 
