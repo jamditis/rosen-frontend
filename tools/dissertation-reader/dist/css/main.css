@@ -1,0 +1,10 @@
+/**
+ * Main CSS Entry Point
+ * The Impossible Press - Dissertation Reader
+ */
+
+@import 'variables.css';
+@import 'typography.css';
+@import 'layout.css';
+
+/* Additional component-specific styles can be added here */
