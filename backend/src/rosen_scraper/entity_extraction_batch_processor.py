@@ -33,18 +33,8 @@ from rosen_scraper.entity_registry import EntityRegistry
 # Load environment variables
 load_dotenv()
 
-# Define the project's base directory using pathlib for cleaner path handling
-def find_project_root() -> Path:
-    """
-    Find the project root by looking for pyproject.toml.
-    This is more reliable than using multiple dirname() calls.
-    """
-    current = Path(__file__).resolve()
-    while current.parent != current:
-        if (current / "pyproject.toml").exists():
-            return current
-        current = current.parent
-    raise FileNotFoundError("Project root (pyproject.toml) not found")
+# Import shared path utility
+from rosen_scraper.path_utils import find_project_root
 
 # Configuration
 BASE_DIR = find_project_root()

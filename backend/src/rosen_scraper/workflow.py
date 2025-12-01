@@ -22,6 +22,7 @@ from rosen_scraper import transcript_saver
 from rosen_scraper import entity_resolver
 from rosen_scraper.logger import get_logger, init_logger, PoisonPillType
 from rosen_scraper.poison_pill_handler import get_poison_pill_manager
+from rosen_scraper.path_utils import find_project_root
 
 # Load environment variables from a .env file for secure configuration management.
 load_dotenv()
@@ -32,18 +33,6 @@ load_dotenv()
 PAYWALLED_DOMAINS = ["www.washingtonpost.com", "www.nytimes.com", "www.wsj.com"]
 
 # Define key file paths using pathlib for cleaner path handling.
-def find_project_root() -> Path:
-    """
-    Find the project root by looking for pyproject.toml.
-    This is more reliable than using multiple dirname() calls.
-    """
-    current = Path(__file__).resolve()
-    while current.parent != current:
-        if (current / "pyproject.toml").exists():
-            return current
-        current = current.parent
-    raise FileNotFoundError("Project root (pyproject.toml) not found")
-
 SCRIPT_DIR = Path(__file__).resolve().parent
 BASE_DIR = find_project_root()
 SCHEMA_FILE = BASE_DIR / 'schema.json'

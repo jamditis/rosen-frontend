@@ -16,23 +16,11 @@ import gspread
 from dotenv import load_dotenv
 import google.generativeai as genai
 
-
+from rosen_scraper.path_utils import find_project_root
 
 load_dotenv()
 
 # Define the project's base directory using pathlib for cleaner path handling
-def find_project_root() -> Path:
-    """
-    Find the project root by looking for pyproject.toml.
-    This is more reliable than using multiple dirname() calls.
-    """
-    current = Path(__file__).resolve()
-    while current.parent != current:
-        if (current / "pyproject.toml").exists():
-            return current
-        current = current.parent
-    raise FileNotFoundError("Project root (pyproject.toml) not found")
-
 BASE_DIR = find_project_root()
 
 # Rate limiting

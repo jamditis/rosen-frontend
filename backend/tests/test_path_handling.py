@@ -18,6 +18,7 @@ if str(src_dir) not in sys.path:
 from rosen_scraper import workflow
 from rosen_scraper import backfill_entity_metadata
 from rosen_scraper import entity_extraction_batch_processor
+from rosen_scraper.path_utils import find_project_root as shared_find_project_root
 
 
 def test_workflow_paths():
@@ -97,14 +98,20 @@ def test_find_project_root_function():
     print("\nTesting find_project_root function...")
     
     # Test that it finds the project root
-    project_root = workflow.find_project_root()
+    project_root = shared_find_project_root()
     assert project_root.exists(), "Project root does not exist"
     assert (project_root / "pyproject.toml").exists(), "pyproject.toml not found in project root"
     
     # Test that it returns a Path object
     assert isinstance(project_root, Path), "find_project_root should return a Path object"
     
+    # Test that all modules use the same function
+    assert workflow.BASE_DIR == project_root, "workflow.BASE_DIR doesn't match shared function result"
+    assert backfill_entity_metadata.BASE_DIR == project_root, "backfill_entity_metadata.BASE_DIR doesn't match shared function result"
+    assert entity_extraction_batch_processor.BASE_DIR == project_root, "entity_extraction_batch_processor.BASE_DIR doesn't match shared function result"
+    
     print(f"✓ find_project_root correctly identifies: {project_root}")
+    print("✓ All modules use the shared function correctly")
 
 
 if __name__ == "__main__":
