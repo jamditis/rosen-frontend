@@ -42,17 +42,20 @@ def test_html_escaping_in_mock_html():
         # Verify that HTML special characters are escaped
         assert result is not None, "Result should not be None"
         
-        # Check that dangerous characters are escaped
-        assert '<script>' not in result, "Script tags should be escaped"
-        assert 'alert("XSS")' not in result or '&lt;script&gt;' in result, "Script content should be escaped"
+        # Check that dangerous content is NOT present in its original form
+        assert '<script>' not in result, "Original script tags should not be present"
+        assert 'alert("XSS")' not in result, "Unescaped alert should not be present"
+        assert '<img src=x onerror=' not in result, "Dangerous img tag should not be present"
+        
+        # Verify that escaped versions ARE present
+        assert '&lt;script&gt;' in result, "Script tags should be escaped to &lt;script&gt;"
         assert '&lt;' in result, "< should be escaped to &lt;"
         assert '&gt;' in result, "> should be escaped to &gt;"
         assert '&amp;' in result, "& should be escaped to &amp;"
         assert '&quot;' in result, 'Double quotes should be escaped to &quot;'
         
-        # Verify escaped content is present
-        assert '&lt;script&gt;' in result, "Escaped script tag should be present"
-        assert 'Test &amp; Author' in result, "Escaped ampersand should be present"
+        # Verify specific escaped content is present
+        assert 'Test &amp; Author' in result, "Escaped ampersand in author should be present"
         
         print("✓ HTML special characters are properly escaped")
         print(f"✓ Script tags are neutralized")
