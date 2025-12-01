@@ -36,7 +36,7 @@ const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState('grid');
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState('date-desc');
+  const [sortBy, setSortBy] = useState('date-asc');
   const [isScrolled, setIsScrolled] = useState(false);
   const [selectedRecordId, setSelectedRecordId] = useState(null);
   const [currentView, setCurrentView] = useState('archive'); // 'archive' or 'dissertation'
@@ -49,7 +49,8 @@ const App = () => {
     era: null,
     year: null,
     publication: [],
-    type: null
+    type: null,
+    includeReplies: false
   });
 
   // Ref for scrolling to results
@@ -187,6 +188,11 @@ const App = () => {
          if (platform === 'twitter' && !r.pub.toLowerCase().includes('twitter') && !r.pub.toLowerCase().includes('x.com')) return false;
          if (platform === 'bluesky' && !r.pub.toLowerCase().includes('bluesky')) return false;
          if (platform === 'tumblr' && !r.pub.toLowerCase().includes('tumblr')) return false;
+      }
+
+      // Hide social media replies by default (they flood the archive with low-value content)
+      if (!filters.includeReplies && r.type === 'social' && r.title.toLowerCase().includes('reply')) {
+        return false;
       }
 
       return true;
@@ -367,7 +373,7 @@ const App = () => {
                 setFilters=${setFilters}
                 isOpen=${sidebarOpen}
                 onClose=${() => setSidebarOpen(false)}
-                resetFilters=${() => setFilters({ search: '', categories: [], era: null, year: null, publication: [], type: null })}
+                resetFilters=${() => setFilters({ search: '', categories: [], era: null, year: null, publication: [], type: null, includeReplies: false })}
                 autocompleteIndex=${autocompleteIndex}
              />
          `}
@@ -502,7 +508,7 @@ const App = () => {
                         <h3 className="font-display text-xl text-stone-700 mb-2">No records found</h3>
                         <p className="text-stone-500 text-sm mb-6">Try adjusting your search terms or filters.</p>
                         <button 
-                            onClick=${() => setFilters({ search: '', categories: [], era: null, year: null, publication: [], type: null })}
+                            onClick=${() => setFilters({ search: '', categories: [], era: null, year: null, publication: [], type: null, includeReplies: false })}
                             className="text-sm border-b-2 border-stone-800 pb-0.5 hover:text-stone-600 transition-colors font-bold"
                         >
                             Clear all filters
@@ -527,7 +533,7 @@ const App = () => {
                                 <div className="p-6 flex flex-col h-full">
                                     <div className="flex justify-between items-start mb-3">
                                         <span className="text-xs font-bold uppercase tracking-wider text-stone-400">${item.pub}</span>
-                                        <span className="text-xs text-stone-400 font-mono border border-stone-200 px-1 rounded">${item.year}</span>
+                                        <span className="text-xs text-stone-400 font-mono border border-stone-200 px-1 rounded">${item.date}</span>
                                     </div>
                                     
                                     <h3 className="text-lg font-display font-bold text-stone-900 leading-tight mb-3 group-hover:text-stone-600 transition-colors">
