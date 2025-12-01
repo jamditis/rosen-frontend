@@ -18,10 +18,11 @@ This export system generates a single pre-processed JSON file that loads in ~100
 |------|---------|
 | `IMPLEMENTATION_PLAN.md` | Detailed migration plan and architecture |
 | `export-archive-data.js` | Node.js script to generate JSON |
-| `archive-data.json` | Generated data file (23MB, ~30k records) |
+| `archive-data.json` | Generated data file (~25MB, ~30k records, ~5k entities) |
 | `archive_records-public.csv` | Main archive records (articles, essays) |
 | `social_posts.csv` | Social media posts (Bluesky, Twitter) |
 | `extracted_relationships.csv` | Entity relationships between records |
+| `extracted_entities.csv` | Named entities (people, orgs, concepts, etc.) |
 
 ## Quick Start
 
@@ -47,11 +48,12 @@ npm run export-data
 
 ## Data Sources
 
-The export script reads from three CSV files:
+The export script reads from four CSV files:
 
 - **archive_records-public.csv**: Main articles, essays, and publications
 - **social_posts.csv**: Social media posts from Bluesky and Twitter
 - **extracted_relationships.csv**: Entity relationships for network visualization
+- **extracted_entities.csv**: Named entities (Person, Organization, Concept, Event, Location, Work)
 
 ## Output Structure
 
@@ -59,15 +61,17 @@ The generated `archive-data.json` contains:
 
 ```json
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "generated": "2025-12-01T...",
-  "records": [...],      // Array of processed records
+  "records": [...],      // Array of processed records (~30k)
+  "entities": [...],     // Array of named entities (~5k)
   "facets": {
     "categories": [...], // Unique categories for filtering
     "eras": [...],       // Time period classifications
-    "publications": [...] // Publication sources
+    "publications": [...], // Publication sources
+    "entityTypes": [...]   // Entity types (Person, Organization, etc.)
   },
-  "autocompleteIndex": [...] // Search terms for autocomplete
+  "autocompleteIndex": [...] // Search terms for autocomplete (~35k)
 }
 ```
 
