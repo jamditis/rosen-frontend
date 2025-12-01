@@ -42,6 +42,8 @@ The frontend uses a **zero-build architecture** - no npm build, no webpack, no b
    git clone https://github.com/jamditis/rosen-frontend.git
    cd rosen-frontend
    ```
+   
+   > **Note:** Replace with your fork URL if contributing via fork.
 
 2. **Start a local server:**
    ```bash
@@ -173,10 +175,10 @@ cd backend
 python src/workflow.py
 
 # Data deduplication
-python tools/diagnostics/data_deduper.py
+python scripts/diagnostics/data_deduper.py
 
 # Backfill missing fields
-python tools/backfill/backfill_worker.py
+python scripts/backfill/backfill_worker.py
 ```
 
 ---
@@ -195,8 +197,8 @@ python tools/backfill/backfill_worker.py
 
 **Example:**
 ```javascript
-import { html } from './html.js';
 import { useState, useEffect } from 'react';
+import { html } from '../html.js';  // Relative path from components/
 
 export function MyComponent({ data }) {
   const [isOpen, setIsOpen] = useState(false);
