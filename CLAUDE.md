@@ -2,6 +2,58 @@
 
 This file provides context for Claude Code when working on this repository.
 
+---
+
+## 🔄 Resuming Work on This Repository
+
+**IMPORTANT:** You do NOT need to clone this repository every time you work on it!
+
+### Quick Start for New Sessions
+
+**Just navigate to the local directory:**
+```
+C:\Users\amdit\OneDrive\Desktop\Crimes\playground\rosen-frontend
+```
+
+Claude Code will automatically detect:
+- ✅ This is a git repository
+- ✅ Connected to GitHub (jamditis/rosen-frontend)
+- ✅ Current branch and commit history
+- ✅ Any uncommitted changes
+
+### Recommended Workflow
+
+**Before starting work:**
+```bash
+git status              # Check current state
+git pull origin main    # Get latest changes from GitHub
+```
+
+**After completing work:**
+```bash
+git add .
+git commit -m "Description of changes"
+git push origin main    # Or push to feature branch
+```
+
+### When to Clone Fresh
+
+Only clone the repository again if:
+- 🔴 The local repository is corrupted
+- 🔴 Working from a different computer
+- 🔴 You want a completely clean slate
+
+### Why This Workflow is Better
+
+- ⚡ **Much faster** - No re-downloading entire repository
+- 📚 **Preserves history** - Keeps your full git history and branches
+- 💾 **Saves work** - Any uncommitted local changes are preserved
+- 🔄 **Easy sync** - Simple `git pull` to get updates from GitHub
+
+**Your local repository is already perfectly set up. Just navigate to the directory and start working!**
+
+---
+
 ## Project Status
 
 **STATUS: READY FOR PUBLICATION (December 2025)**

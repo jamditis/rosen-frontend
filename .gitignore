@@ -59,6 +59,7 @@ processed_pdf_library/
 raw_media_files/
 tmp/
 output/
+csv/
 
 # Project Specific
 known_entities.json
