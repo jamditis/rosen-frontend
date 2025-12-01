@@ -217,6 +217,34 @@ The frontend content is populated via CSV exports from Google Sheets.
 
 ---
 
+## 🔄 CI/CD & Automated Testing
+
+The repository includes GitHub Actions workflows for continuous integration:
+
+### Backend Workflows
+- **`backend-tests.yml`** - Runs pytest on all backend code changes
+  - Triggers on push/PR to `main` when backend files change
+  - Uses Python 3.13 and Poetry
+  - Installs Playwright for browser-based tests
+  - Caches dependencies for faster runs
+
+- **`backend-linting.yml`** - Runs code quality checks
+  - `ruff` for linting
+  - `black` for formatting validation
+  - `mypy` for type checking
+  - Non-blocking to avoid breaking builds during adoption
+
+### Frontend Workflow
+- **`frontend-validation.yml`** - Basic smoke tests
+  - Validates HTML syntax
+  - Checks JavaScript for syntax errors
+  - Verifies main entry points exist
+  - Checks for broken CDN links
+
+All workflows run automatically on pull requests to ensure code quality.
+
+---
+
 ## 🛠️ Deployment
 
 ### Frontend (Static Hosting)

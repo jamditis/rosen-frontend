@@ -3,6 +3,34 @@
 
 *Session Date: December 1, 2025*
 
+## CI/CD Workflows Added
+
+### GitHub Actions Setup
+- **Backend Tests Workflow** (`.github/workflows/backend-tests.yml`)
+  - Runs pytest on push/PR when backend code changes
+  - Uses Python 3.13 as specified in pyproject.toml
+  - Installs Poetry and project dependencies
+  - Installs Playwright browsers for testing
+  - Caches Poetry dependencies for faster runs
+
+- **Backend Linting Workflow** (`.github/workflows/backend-linting.yml`)
+  - Runs ruff, black, and mypy on backend code
+  - Checks code style and type hints
+  - Non-blocking (continue-on-error) to avoid breaking builds during adoption
+
+- **Frontend Validation Workflow** (`.github/workflows/frontend-validation.yml`)
+  - Basic smoke tests for frontend code
+  - Validates HTML syntax
+  - Checks JavaScript files for syntax errors
+  - Verifies main entry points exist
+  - Checks for broken CDN links
+
+### Identified in PR #8 code review
+
+---
+
+*Session Date: December 1, 2025*
+
 ## BYOK Chat Feature Archived
 
 ### Feature Archival
