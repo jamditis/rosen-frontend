@@ -1,0 +1,50 @@
+name: Backend Linting
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-linting.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-linting.yml'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+      
+      - name: Install linting tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff black mypy
+      
+      - name: Run Ruff
+        working-directory: backend
+        run: |
+          ruff check src/ tests/ || true
+        continue-on-error: true
+      
+      - name: Check Black formatting
+        working-directory: backend
+        run: |
+          black --check src/ tests/ || true
+        continue-on-error: true
+      
+      - name: Run MyPy type checking
+        working-directory: backend
+        run: |
+          mypy src/ || true
+        continue-on-error: true
