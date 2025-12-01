@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import google.generativeai as genai
+from rosen_scraper.rate_limiter import rate_limited_gemini_call
 
 # Configuration
 ENTITY_DEBUG_DIR = Path("logs/entity_extraction")
@@ -195,6 +196,23 @@ def _validate_entity_extraction(
 
     return valid_entities, valid_relationships, issues
 
+@rate_limited_gemini_call
+def _call_gemini_for_entity_extraction(model, prompt):
+    """
+    Make a rate-limited call to Gemini API for entity extraction.
+    
+    This function is decorated with rate limiting to prevent API throttling.
+    
+    Args:
+        model: Gemini model instance
+        prompt: The prompt to send
+        
+    Returns:
+        The API response object
+    """
+    response = model.generate_content(prompt)
+    return response
+
 
 def extract_entities_and_relationships(
     text_content: str,
@@ -334,7 +352,7 @@ Focus on entities relevant to journalism, media criticism, and political coverag
 
     try:
         print(f"  [ENTITY] Extracting entities from record {record_id}...")
-        response = model.generate_content(prompt)
+        response = _call_gemini_for_entity_extraction(model, prompt)
 
         # Clean up the response
         cleaned_response = response.text.strip().replace('```json', '').replace('```', '').strip()

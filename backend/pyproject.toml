@@ -22,7 +22,8 @@ dependencies = [
     "google-genai (==1.43.0)",
     "reportlab (==4.4.4)",
     "yt-dlp (==2025.9.26)",
-    "python-dotenv (==1.1.1)"
+    "python-dotenv (==1.1.1)",
+    "ratelimit (==2.2.1)"
 ]
 
 
