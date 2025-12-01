@@ -32,18 +32,11 @@ def find_project_root() -> Path:
     # Start from this file's directory and walk up
     current = Path(__file__).resolve().parent
     
+    # Walk up the directory tree until we find pyproject.toml or reach the root
     while current.parent != current:
         if (current / "pyproject.toml").exists():
             return current
         current = current.parent
     
+    # If we reached the filesystem root without finding pyproject.toml, raise an error
     raise FileNotFoundError("Project root (pyproject.toml) not found")
-
-
-# Pre-compute common paths for convenience
-try:
-    PROJECT_ROOT = find_project_root()
-except FileNotFoundError:
-    # If we can't find the project root, this will be set to None
-    # and modules can handle this gracefully
-    PROJECT_ROOT = None
