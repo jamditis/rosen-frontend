@@ -275,8 +275,20 @@ def main():
             logger.logger.info("No URLs to process.")
             return
 
-        # Extract URLs from the second column, for rows 610-619.
-        urls_to_process = [row[1] for row in all_values[609:619] if len(row) > 1 and row[1]]
+        # Get configurable row range from environment variables
+        # START_ROW: Starting row index (0-based), default is 0 (process from beginning)
+        # END_ROW: Ending row index (0-based), default is -1 (process all remaining rows)
+        start_row = int(os.environ.get("PROCESS_START_ROW", "0"))
+        end_row_str = os.environ.get("PROCESS_END_ROW", "-1")
+        end_row = int(end_row_str) if end_row_str != "-1" else None
+        
+        # Extract URLs from the second column using configurable row range
+        if end_row is None:
+            urls_to_process = [row[1] for row in all_values[start_row:] if len(row) > 1 and row[1]]
+        else:
+            urls_to_process = [row[1] for row in all_values[start_row:end_row] if len(row) > 1 and row[1]]
+        
+        logger.logger.info(f"Processing rows {start_row} to {end_row if end_row else 'end'}")
         logger.logger.info(f"Starting processing for {len(urls_to_process)} URLs")
 
         # --- 3. Process Each URL ---
