@@ -8,17 +8,17 @@ import sys
 from pathlib import Path
 
 # Add project root to path
-project_root = Path(__file__).resolve().parent
-sys.path.insert(0, str(project_root))
-sys.path.insert(0, str(project_root / 'tools' / 'diagnostics'))
+project_root = Path(__file__).resolve().parent.parent  # Go to backend root
+sys.path.insert(0, str(project_root / 'scripts'))
+sys.path.insert(0, str(project_root / 'scripts' / 'diagnostics'))
 
-from tools.diagnostics.smart_corrector.processors import (
+from diagnostics.smart_corrector.processors import (
     SoundCloudProcessor,
     CSpanProcessor,
     YouTubeEnhancedProcessor,
     TwitterProcessor
 )
-from tools.diagnostics.smart_corrector import AudioOptimizer
+from diagnostics.smart_corrector import AudioOptimizer
 
 # Test URLs from the sheet
 test_urls = {

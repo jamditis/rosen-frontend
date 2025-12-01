@@ -13,7 +13,7 @@ ROOT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT_DIR))
 
 # Now import and run the date backfill
-from tools.backfill import enhanced_date_backfill
+from backfill import enhanced_date_backfill
 
 if __name__ == "__main__":
     backfiller = enhanced_date_backfill.EnhancedDateBackfiller()

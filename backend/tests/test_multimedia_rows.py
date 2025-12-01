@@ -7,16 +7,16 @@ Focus on YouTube and SoundCloud processing
 import sys
 from pathlib import Path
 
-project_root = Path(__file__).resolve().parent
-sys.path.insert(0, str(project_root))
-sys.path.insert(0, str(project_root / 'tools' / 'diagnostics'))
+project_root = Path(__file__).resolve().parent.parent  # Go to backend root
+sys.path.insert(0, str(project_root / 'scripts'))
+sys.path.insert(0, str(project_root / 'scripts' / 'diagnostics'))
 sys.path.insert(0, str(project_root / 'src'))
 
-from tools.diagnostics.smart_corrector.processors import (
+from diagnostics.smart_corrector.processors import (
     SoundCloudProcessor,
     YouTubeEnhancedProcessor
 )
-from tools.diagnostics.smart_corrector import AudioOptimizer
+from diagnostics.smart_corrector import AudioOptimizer
 
 import gspread
 from google.oauth2.service_account import Credentials

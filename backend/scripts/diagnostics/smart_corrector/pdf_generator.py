@@ -10,12 +10,12 @@ from pathlib import Path
 from typing import Dict, Optional
 
 # Add project root to path for imports
-project_root = Path(__file__).resolve().parents[4]
+project_root = Path(__file__).resolve().parents[2]  # Go to scripts directory
 sys.path.insert(0, str(project_root))
-sys.path.insert(0, str(project_root / 'tools' / 'pdf' / 'enhanced_pdf_generator'))
+sys.path.insert(0, str(project_root / 'pdf' / 'enhanced_pdf_generator'))
 
 try:
-    from tools.pdf.enhanced_pdf_generator.accessible_pdf_generator import AccessiblePDFGenerator
+    from pdf.enhanced_pdf_generator.accessible_pdf_generator import AccessiblePDFGenerator
     PDF_GENERATOR_AVAILABLE = True
 except ImportError:
     PDF_GENERATOR_AVAILABLE = False
