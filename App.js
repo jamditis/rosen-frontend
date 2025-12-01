@@ -1,7 +1,7 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { html } from './html.js';
-import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network, BookOpen, Compass } from 'lucide-react';
+import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network, BookOpen, Compass, AlertCircle, ChevronUp } from 'lucide-react';
 import { fetchArchiveData, hashString } from './services/archiveService.js';
 import { ITEMS_PER_PAGE, COLORS } from './constants.js';
 import Sidebar from './components/Sidebar.js';
@@ -32,6 +32,7 @@ const App = () => {
   const [facets, setFacets] = useState({ categories: [], eras: [], publications: [] });
   const [autocompleteIndex, setAutocompleteIndex] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState('grid');
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,6 +41,7 @@ const App = () => {
   const [selectedRecordId, setSelectedRecordId] = useState(null);
   const [currentView, setCurrentView] = useState('archive'); // 'archive' or 'dissertation'
   const [toolsModalOpen, setToolsModalOpen] = useState(false);
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
   const [filters, setFilters] = useState({
     search: '',
@@ -125,6 +127,7 @@ const App = () => {
       })
       .catch(err => {
         console.error(err);
+        setError('Failed to load archive data. Please refresh the page or try again later.');
         setLoading(false);
       });
   }, []);
@@ -145,6 +148,7 @@ const App = () => {
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
+      setShowBackToTop(window.scrollY > 500);
     };
     handleScroll();
     window.addEventListener('scroll', handleScroll);
@@ -256,8 +260,15 @@ const App = () => {
 
   const selectedRecord = filteredRecords.find(r => r.id === selectedRecordId) || null;
   const selectedRecordIndex = filteredRecords.findIndex(r => r.id === selectedRecordId);
-  
+
   const isExplorer = viewMode === 'explorer';
+
+  // Calculate active filter count
+  const activeFilterCount = (filters.search ? 1 : 0) +
+    filters.categories.length +
+    (filters.era ? 1 : 0) +
+    (filters.year ? 1 : 0) +
+    (filters.type ? 1 : 0);
 
   // If viewing dissertation, render the dissertation page
   if (currentView === 'dissertation') {
@@ -331,9 +342,14 @@ const App = () => {
                 ${!isExplorer && html`
                     <button
                     onClick=${() => setSidebarOpen(true)}
-                    className="lg:hidden p-2 text-stone-800 hover:bg-stone-100 rounded-md border border-stone-300"
+                    className="lg:hidden p-2 text-stone-800 hover:bg-stone-100 rounded-md border border-stone-300 relative"
                     >
                         <${SlidersHorizontal} className="w-5 h-5" />
+                        ${activeFilterCount > 0 && html`
+                          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                            ${activeFilterCount}
+                          </span>
+                        `}
                     </button>
                 `}
             </div>
@@ -462,11 +478,25 @@ const App = () => {
 
             ${!isExplorer && html`
                 <div>
-                    ${loading && html`
+                    ${error && html`
+                    <div className="text-center py-20 border-2 border-red-200 rounded-lg bg-red-50 mx-4">
+                        <${AlertCircle} className="w-12 h-12 mx-auto text-red-500 mb-4" />
+                        <h3 className="font-display text-xl text-red-700 mb-2">Error Loading Archive</h3>
+                        <p className="text-red-600 text-sm mb-6">${error}</p>
+                        <button
+                            onClick=${() => window.location.reload()}
+                            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors font-bold text-sm"
+                        >
+                            Reload Page
+                        </button>
+                    </div>
+                    `}
+
+                    ${!error && loading && html`
                     <${LoadingQuotes} />
                     `}
 
-                    ${!loading && filteredRecords.length === 0 && html`
+                    ${!error && !loading && filteredRecords.length === 0 && html`
                     <div className="text-center py-20 border-2 border-dashed border-stone-200 rounded-lg bg-stone-50">
                         <${SearchX} className="w-12 h-12 mx-auto text-stone-300 mb-4" />
                         <h3 className="font-display text-xl text-stone-700 mb-2">No records found</h3>
@@ -480,7 +510,7 @@ const App = () => {
                     </div>
                     `}
 
-                    ${!loading && viewMode === 'grid' && html`
+                    ${!error && !loading && viewMode === 'grid' && html`
                     <div className="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6">
                         ${paginatedRecords.map(item => {
                             const primaryCat = item.categories[0] || 'Uncategorized';
@@ -522,7 +552,7 @@ const App = () => {
                     </div>
                     `}
 
-                    ${!loading && viewMode === 'folder' && html`
+                    ${!error && !loading && viewMode === 'folder' && html`
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         ${folderGroups.map(group => {
                             const colorIdx = hashString(group.name) % COLORS.length;
@@ -580,6 +610,16 @@ const App = () => {
                 </div>
             `}
          </main>
+
+      ${showBackToTop && html`
+        <button
+          onClick=${() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-6 right-6 z-40 p-3 bg-stone-800 text-white rounded-full shadow-lg hover:bg-stone-700 transition-all hover:scale-110"
+          aria-label="Back to top"
+        >
+          <${ChevronUp} className="w-5 h-5" />
+        </button>
+      `}
       </div>
     </div>
   `;

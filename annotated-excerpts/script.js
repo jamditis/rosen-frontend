@@ -5,6 +5,9 @@ import { EXCERPTS, EXCERPTS_METADATA, EXCERPT_TAGS } from './data.js';
 const container = document.getElementById('excerpts-container');
 const navDots = document.getElementById('nav-dots');
 const filterButtons = document.querySelectorAll('[data-filter]');
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+const navCounter = document.getElementById('nav-counter');
 
 // State
 let activeExcerpt = 0;
@@ -121,7 +124,22 @@ function renderNavDots() {
   });
 }
 
-// Update active nav dot
+// Update navigation UI (dots, buttons, counter)
+function updateNavigationUI() {
+  // Update nav dots
+  navDots.querySelectorAll('.nav-dot').forEach((dot, i) => {
+    dot.classList.toggle('active', i === activeExcerpt);
+  });
+
+  // Update counter
+  navCounter.textContent = `${activeExcerpt + 1} / ${EXCERPTS.length}`;
+
+  // Update button states
+  prevBtn.disabled = activeExcerpt === 0;
+  nextBtn.disabled = activeExcerpt === EXCERPTS.length - 1;
+}
+
+// Update active nav dot based on scroll
 function updateActiveNavDot() {
   const cards = document.querySelectorAll('.excerpt-card');
   const viewportCenter = window.innerHeight / 2;
@@ -143,9 +161,16 @@ function updateActiveNavDot() {
 
   if (closestIndex !== activeExcerpt) {
     activeExcerpt = closestIndex;
-    navDots.querySelectorAll('.nav-dot').forEach((dot, i) => {
-      dot.classList.toggle('active', i === closestIndex);
-    });
+    updateNavigationUI();
+  }
+}
+
+// Navigate to excerpt by index
+function navigateToExcerpt(index) {
+  if (index < 0 || index >= EXCERPTS.length) return;
+  const card = document.querySelector(`[data-index="${index}"]`);
+  if (card && card.style.display !== 'none') {
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
 
@@ -213,16 +238,19 @@ function init() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowDown' || e.key === 'j') {
       e.preventDefault();
-      const nextIndex = Math.min(activeExcerpt + 1, EXCERPTS.length - 1);
-      const card = document.querySelector(`[data-index="${nextIndex}"]`);
-      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      navigateToExcerpt(activeExcerpt + 1);
     } else if (e.key === 'ArrowUp' || e.key === 'k') {
       e.preventDefault();
-      const prevIndex = Math.max(activeExcerpt - 1, 0);
-      const card = document.querySelector(`[data-index="${prevIndex}"]`);
-      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      navigateToExcerpt(activeExcerpt - 1);
     }
   });
+
+  // Next/Prev button handlers
+  prevBtn.addEventListener('click', () => navigateToExcerpt(activeExcerpt - 1));
+  nextBtn.addEventListener('click', () => navigateToExcerpt(activeExcerpt + 1));
+
+  // Initial navigation state
+  updateNavigationUI();
 
   // Setup animations
   setTimeout(setupScrollAnimations, 100);

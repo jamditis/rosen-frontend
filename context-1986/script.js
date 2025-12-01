@@ -133,6 +133,52 @@ function setupScrollAnimations() {
   document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 }
 
+// Track active section for TOC highlighting
+function setupTOCTracking() {
+  const sections = ['landscape', 'didnt-exist', 'events', 'context'];
+  const tocLinks = document.querySelectorAll('.toc-link');
+
+  function updateActiveTOC() {
+    let activeSection = null;
+    const scrollPos = window.scrollY + window.innerHeight / 3;
+
+    // Find the current section
+    for (const sectionId of sections) {
+      const section = document.getElementById(sectionId);
+      if (section) {
+        const rect = section.getBoundingClientRect();
+        const sectionTop = window.scrollY + rect.top;
+        if (scrollPos >= sectionTop) {
+          activeSection = sectionId;
+        }
+      }
+    }
+
+    // Update active class on TOC links
+    tocLinks.forEach(link => {
+      const href = link.getAttribute('href').substring(1); // Remove #
+      if (href === activeSection) {
+        link.classList.add('active');
+      } else {
+        link.classList.remove('active');
+      }
+    });
+  }
+
+  // Throttled scroll listener
+  let scrollTimeout;
+  window.addEventListener('scroll', () => {
+    if (scrollTimeout) return;
+    scrollTimeout = setTimeout(() => {
+      updateActiveTOC();
+      scrollTimeout = null;
+    }, 100);
+  });
+
+  // Initial update
+  updateActiveTOC();
+}
+
 // Initialize
 function init() {
   renderLandscape();
@@ -142,6 +188,9 @@ function init() {
 
   // Setup scroll animations after render
   setTimeout(setupScrollAnimations, 100);
+
+  // Setup TOC tracking
+  setupTOCTracking();
 
   console.log('1986 Context page initialized');
 }

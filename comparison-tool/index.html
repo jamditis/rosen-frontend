@@ -143,6 +143,21 @@
       </div>
     </main>
 
+    <!-- Next/Prev Navigation -->
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-4 bg-white border border-stone-300 rounded-full shadow-lg px-4 py-2" aria-label="Comparison navigation">
+      <button id="prev-btn" class="p-2 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-full transition-colors disabled:opacity-30 disabled:cursor-not-allowed" aria-label="Previous comparison">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+      </button>
+      <span id="nav-counter" class="text-sm text-stone-600 font-mono px-2">1 / 7</span>
+      <button id="next-btn" class="p-2 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-full transition-colors disabled:opacity-30 disabled:cursor-not-allowed" aria-label="Next comparison">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </button>
+    </nav>
+
     <!-- Footer -->
     <footer class="py-12 px-4 bg-stone-100 border-t border-stone-200">
       <div class="max-w-4xl mx-auto text-center">

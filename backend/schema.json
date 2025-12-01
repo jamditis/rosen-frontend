@@ -76,7 +76,9 @@
       "Interview (Audio/Video)",
       "Lecture/Presentation",
       "Panel Discussion",
-      "Tweet/Thread"
+      "Tweet/Thread",
+      "Tumblr Post",
+      "Newspaper Clipping"
     ],
     "scope": [
       "Theoretical",

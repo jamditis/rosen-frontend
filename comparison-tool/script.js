@@ -7,6 +7,9 @@ import { COMPARISONS, METADATA } from './data.js';
 const comparisonsContainer = document.getElementById('comparisons-container');
 const navDotsContainer = document.getElementById('nav-dots');
 const srAnnouncements = document.getElementById('sr-announcements');
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+const navCounter = document.getElementById('nav-counter');
 
 // State
 let activeComparison = 0;
@@ -133,6 +136,28 @@ function renderNavDots() {
   });
 }
 
+// Update navigation UI (dots, buttons, counter)
+function updateNavigationUI() {
+  // Update nav dots
+  navDotsContainer.querySelectorAll('.nav-dot').forEach((dot, i) => {
+    dot.classList.toggle('active', i === activeComparison);
+    dot.setAttribute('aria-current', i === activeComparison ? 'true' : 'false');
+  });
+
+  // Update counter
+  navCounter.textContent = `${activeComparison + 1} / ${COMPARISONS.length}`;
+
+  // Update button states
+  prevBtn.disabled = activeComparison === 0;
+  nextBtn.disabled = activeComparison === COMPARISONS.length - 1;
+
+  // Announce to screen readers
+  const currentComparison = COMPARISONS[activeComparison];
+  if (currentComparison) {
+    announce(`Viewing comparison ${activeComparison + 1} of ${COMPARISONS.length}: ${currentComparison.theme}`);
+  }
+}
+
 // Update active nav dot based on scroll position
 function updateActiveNavDot() {
   const cards = document.querySelectorAll('.comparison-card');
@@ -154,15 +179,16 @@ function updateActiveNavDot() {
 
   if (closestIndex !== activeComparison) {
     activeComparison = closestIndex;
-    navDotsContainer.querySelectorAll('.nav-dot').forEach((dot, i) => {
-      dot.classList.toggle('active', i === closestIndex);
-      dot.setAttribute('aria-current', i === closestIndex ? 'true' : 'false');
-    });
-    // Announce to screen readers
-    const currentComparison = COMPARISONS[closestIndex];
-    if (currentComparison) {
-      announce(`Viewing comparison ${closestIndex + 1} of ${COMPARISONS.length}: ${currentComparison.theme}`);
-    }
+    updateNavigationUI();
+  }
+}
+
+// Navigate to comparison by index
+function navigateToComparison(index) {
+  if (index < 0 || index >= COMPARISONS.length) return;
+  const card = document.querySelector(`[data-index="${index}"]`);
+  if (card) {
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
 
@@ -192,19 +218,22 @@ function setupKeyboardNav() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowDown' || e.key === 'j') {
       e.preventDefault();
-      const nextIndex = Math.min(activeComparison + 1, COMPARISONS.length - 1);
-      const nextCard = document.querySelector(`[data-index="${nextIndex}"]`);
-      if (nextCard) {
-        nextCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      navigateToComparison(activeComparison + 1);
     } else if (e.key === 'ArrowUp' || e.key === 'k') {
       e.preventDefault();
-      const prevIndex = Math.max(activeComparison - 1, 0);
-      const prevCard = document.querySelector(`[data-index="${prevIndex}"]`);
-      if (prevCard) {
-        prevCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      navigateToComparison(activeComparison - 1);
     }
+  });
+}
+
+// Setup next/prev button handlers
+function setupNavButtons() {
+  prevBtn.addEventListener('click', () => {
+    navigateToComparison(activeComparison - 1);
+  });
+
+  nextBtn.addEventListener('click', () => {
+    navigateToComparison(activeComparison + 1);
   });
 }
 
@@ -222,6 +251,7 @@ function init() {
   // Setup interactions
   setupScrollAnimations();
   setupKeyboardNav();
+  setupNavButtons();
 
   // Scroll listener for nav dots (throttled)
   let scrollTimeout;
@@ -233,8 +263,8 @@ function init() {
     }, 100);
   });
 
-  // Initial nav dot state
-  updateActiveNavDot();
+  // Initial navigation UI state
+  updateNavigationUI();
 
   console.log('Then and Now: Comparison Tool initialized');
   console.log(`Loaded ${COMPARISONS.length} comparisons`);

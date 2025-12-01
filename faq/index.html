@@ -149,8 +149,18 @@
 
     <!-- FAQ List -->
     <main class="max-w-4xl mx-auto px-4 py-12">
-      <!-- Results count (aria-live for screen readers) -->
-      <p id="results-count" class="text-sm text-stone-500 mb-6" aria-live="polite" aria-atomic="true"></p>
+      <!-- Results count and controls -->
+      <div class="flex items-center justify-between mb-6">
+        <p id="results-count" class="text-sm text-stone-500" aria-live="polite" aria-atomic="true"></p>
+        <div class="flex gap-2">
+          <button id="expand-all" class="text-xs text-sky-600 hover:text-sky-800 px-3 py-1.5 border border-sky-300 rounded hover:bg-sky-50 transition-colors">
+            Expand All
+          </button>
+          <button id="collapse-all" class="text-xs text-stone-600 hover:text-stone-800 px-3 py-1.5 border border-stone-300 rounded hover:bg-stone-50 transition-colors">
+            Collapse All
+          </button>
+        </div>
+      </div>
 
       <!-- FAQ Items -->
       <div id="faq-container" class="space-y-4">

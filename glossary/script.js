@@ -9,10 +9,13 @@ const figuresGrid = document.getElementById('figures-grid');
 const closePanel = document.getElementById('close-panel');
 const filterButtons = document.querySelectorAll('[data-filter]');
 const srAnnouncements = document.getElementById('sr-announcements');
+const searchInput = document.getElementById('search-input');
+const clearSearchBtn = document.getElementById('clear-search');
 
 // State
 let selectedConcept = null;
 let activeFilter = 'all';
+let searchQuery = '';
 let lastFocusedElement = null;
 
 // Announce to screen readers
@@ -174,8 +177,8 @@ function closeDetailPanel() {
   announce('Concept panel closed');
 }
 
-// Filter concepts
-function filterConcepts(categoryId) {
+// Filter concepts based on category and search
+function filterConcepts(categoryId = activeFilter) {
   activeFilter = categoryId;
 
   // Update button states
@@ -183,14 +186,65 @@ function filterConcepts(categoryId) {
     btn.classList.toggle('active', btn.dataset.filter === categoryId);
   });
 
+  const query = searchQuery.toLowerCase();
+  let visibleCount = 0;
+
   // Filter cards
   document.querySelectorAll('.concept-card').forEach(card => {
-    if (categoryId === 'all') {
+    const conceptId = card.dataset.id;
+    const concept = CONCEPTS.find(c => c.id === conceptId);
+
+    if (!concept) {
+      card.style.display = 'none';
+      return;
+    }
+
+    // Check category filter
+    const categoryMatch = categoryId === 'all' || card.dataset.category === categoryId;
+
+    // Check search filter
+    const searchMatch = !query ||
+      concept.term.toLowerCase().includes(query) ||
+      concept.shortDef.toLowerCase().includes(query) ||
+      concept.fullDef.toLowerCase().includes(query);
+
+    // Show if both filters match
+    if (categoryMatch && searchMatch) {
       card.style.display = '';
+      visibleCount++;
     } else {
-      card.style.display = card.dataset.category === categoryId ? '' : 'none';
+      card.style.display = 'none';
     }
   });
+
+  // Announce results
+  if (query) {
+    announce(`${visibleCount} concepts found`);
+  }
+}
+
+// Handle search input
+function handleSearch(e) {
+  searchQuery = e.target.value;
+
+  // Show/hide clear button
+  if (searchQuery) {
+    clearSearchBtn.classList.remove('hidden');
+  } else {
+    clearSearchBtn.classList.add('hidden');
+  }
+
+  // Apply filters
+  filterConcepts();
+}
+
+// Clear search
+function clearSearch() {
+  searchInput.value = '';
+  searchQuery = '';
+  clearSearchBtn.classList.add('hidden');
+  filterConcepts();
+  searchInput.focus();
 }
 
 // Render key figures
@@ -230,6 +284,10 @@ function init() {
   filterButtons.forEach(btn => {
     btn.addEventListener('click', () => filterConcepts(btn.dataset.filter));
   });
+
+  // Setup search handlers
+  searchInput.addEventListener('input', handleSearch);
+  clearSearchBtn.addEventListener('click', clearSearch);
 
   // Setup close handler
   closePanel.addEventListener('click', closeDetailPanel);
