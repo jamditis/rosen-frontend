@@ -34,7 +34,7 @@ export const FEATURED_WORKS = [
     title: 'The Impossible Press (1986)',
     description: 'Rosen\'s PhD dissertation exploring the decline of the "public" as a social group and the rise of the mass audience. It contrasts the democratic ideal of a "universal town meeting" with the realities of modern communication.',
     image: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&q=80&w=800',
-    link: '/tools/dissertation-reader/dist/',
+    link: '/wp-content/rosen-archive/tools/dissertation-reader/dist/',
     type: 'PhD Dissertation'
   },
   {

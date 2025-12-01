@@ -10,6 +10,7 @@ lerna-debug.log*
 # Node
 node_modules
 dist
+!tools/dissertation-reader/dist/
 dist-ssr
 *.local
 
