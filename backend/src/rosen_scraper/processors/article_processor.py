@@ -5,12 +5,13 @@ the scraping of content and analysis by the AI model. PDF generation is handled
 in the main workflow.
 """
 
+from typing import Optional, Dict, Any
 from rosen_scraper import scraper
 import json
 from rosen_scraper import categorizer
 import os
 
-def _run_scraping(url):
+def _run_scraping(url: str) -> Optional[Dict[str, Any]]:
     """
     Scrapes the article content from the given URL using the enhanced scraper
     that includes URL Context support as the first step in the cascade.
@@ -53,7 +54,7 @@ def _run_scraping(url):
     
     return article_data
 
-def _run_ai_analysis(text, schema):
+def _run_ai_analysis(text: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
     Runs the AI analysis on the given text.
     """
@@ -67,7 +68,7 @@ def _run_ai_analysis(text, schema):
     print("  [Processor] Step 2 SUCCESS: AI analysis complete.")
     return ai_analysis_data
 
-def process_article(url, schema):
+def process_article(url: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
     Processes a single article URL through a multi-step pipeline.
     """

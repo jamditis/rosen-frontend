@@ -181,20 +181,20 @@ def _validate_ai_payload(ai_data: Dict[str, Any], schema: Dict[str, Any], raw_pa
 def _call_gemini_for_classification(model, prompt):
     """
     Make a rate-limited call to Gemini API for content classification.
-    
+
     This function is decorated with rate limiting to prevent API throttling.
-    
+
     Args:
         model: Gemini model instance
         prompt: The prompt to send
-        
+
     Returns:
         The API response object
     """
     response = model.generate_content(prompt)
     return response
 
-def summarize_and_classify(text_content, schema):
+def summarize_and_classify(text_content: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
     Uses the Gemini API to extract metadata, generate a summary, and classify an article.
 

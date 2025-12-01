@@ -3,10 +3,11 @@
 This module is responsible for saving raw text transcripts to a file.
 """
 
+from typing import Optional, Dict, Any
 import os
 import re
 
-def save_transcript(article_data, output_dir="processed_transcripts"):
+def save_transcript(article_data: Dict[str, Any], output_dir: str = "processed_transcripts") -> Optional[str]:
     """
     Saves the raw text of a transcript to a .txt file.
 

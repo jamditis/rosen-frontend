@@ -6,6 +6,7 @@ dynamically-rendered web pages, and uses the trafilatura library for
 intelligent content extraction.
 """
 
+from typing import Optional, Dict, Any, Tuple
 import random
 import requests
 import trafilatura
@@ -30,15 +31,15 @@ USER_AGENTS = [
 def _call_gemini_url_context(client, model_id, prompt, tools):
     """
     Make a rate-limited call to Gemini API with URL Context tool.
-    
+
     This function is decorated with rate limiting to prevent API throttling.
-    
+
     Args:
         client: Gemini client instance
         model_id: Model ID to use
         prompt: The prompt to send
         tools: Tools configuration for URL Context
-        
+
     Returns:
         The API response object
     """
@@ -49,7 +50,7 @@ def _call_gemini_url_context(client, model_id, prompt, tools):
     )
     return response
 
-def fetch_with_url_context(url):
+def fetch_with_url_context(url: str) -> Optional[Dict[str, Any]]:
     """
     Attempts to fetch article content using Google's URL Context tool via Gemini API.
     This serves as the fastest method in our scraping cascade, providing structured
@@ -134,7 +135,7 @@ def fetch_with_url_context(url):
         print(f"URL Context fetch failed: {e}")
         return None
 
-def fetch_article_content(url):
+def fetch_article_content(url: str) -> Optional[str]:
     """
     Fetches the full HTML content of a URL using a "scraping cascade" approach.
 
@@ -226,7 +227,7 @@ def fetch_article_content(url):
         print(f"Playwright scrape also failed for {url}: {e}")
         return None
 
-def fetch_article_content_enhanced(url):
+def fetch_article_content_enhanced(url: str) -> Tuple[Optional[Any], bool]:
     """
     Enhanced version that can return either HTML content or structured data.
     
@@ -251,7 +252,7 @@ def fetch_article_content_enhanced(url):
     html_content = fetch_article_content(url)
     return html_content, False
 
-def extract_article_data(html_content, url):
+def extract_article_data(html_content: str, url: str) -> Optional[str]:
     """
     Uses the trafilatura library to extract the main article content and
     metadata from raw HTML.

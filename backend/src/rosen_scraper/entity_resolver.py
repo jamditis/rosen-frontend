@@ -3,11 +3,12 @@
 This module resolves entities against a known list of publications and platforms.
 """
 
+from typing import Optional, Dict, Any
 import json
 import os
 from urllib.parse import urlparse
 
-def load_known_entities(schema_file):
+def load_known_entities(schema_file: str) -> Optional[Dict[str, Any]]:
     """
     Loads the known entities from the specified JSON file.
     """
@@ -18,7 +19,7 @@ def load_known_entities(schema_file):
         print(f"Could not load known entities. Error: {e}")
         return None
 
-def resolve_publication(publication, url, known_entities):
+def resolve_publication(publication: str, url: str, known_entities: Optional[Dict[str, Any]]) -> str:
     """
     Resolves the publication name against a list of known entities.
     """
@@ -34,7 +35,7 @@ def resolve_publication(publication, url, known_entities):
 
     return publication
 
-def resolve_platform(url, known_entities):
+def resolve_platform(url: str, known_entities: Optional[Dict[str, Any]]) -> Optional[str]:
     """
     Resolves the platform name against a list of known entities.
     """
