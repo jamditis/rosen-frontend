@@ -278,9 +278,25 @@ def main():
         # Get configurable row range from environment variables
         # START_ROW: Starting row index (0-based), default is 0 (process from beginning)
         # END_ROW: Ending row index (0-based), default is -1 (process all remaining rows)
-        start_row = int(os.environ.get("PROCESS_START_ROW", "0"))
-        end_row_str = os.environ.get("PROCESS_END_ROW", "-1")
-        end_row = int(end_row_str) if end_row_str != "-1" else None
+        try:
+            start_row = int(os.environ.get("PROCESS_START_ROW", "0"))
+            if start_row < 0:
+                logger.log_error("configuration", "PROCESS_START_ROW must be >= 0", details={"value": start_row})
+                return
+        except ValueError as e:
+            logger.log_error("configuration", "PROCESS_START_ROW must be a valid integer", details={"error": str(e)})
+            return
+        
+        try:
+            end_row_str = os.environ.get("PROCESS_END_ROW", "-1")
+            end_row = int(end_row_str) if end_row_str != "-1" else None
+            if end_row is not None and end_row < start_row:
+                logger.log_error("configuration", "PROCESS_END_ROW must be >= PROCESS_START_ROW", 
+                               details={"start": start_row, "end": end_row})
+                return
+        except ValueError as e:
+            logger.log_error("configuration", "PROCESS_END_ROW must be a valid integer or -1", details={"error": str(e)})
+            return
         
         # Extract URLs from the second column using configurable row range
         if end_row is None:
