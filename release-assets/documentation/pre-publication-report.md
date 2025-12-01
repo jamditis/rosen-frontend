@@ -131,26 +131,37 @@ When ready to publish, upload these directories to `/wp-content/rosen-archive/`:
 
 ```
 /
-├── index.html
-├── index.js
-├── index.css
-├── App.js
-├── constants.js
-├── html.js
-├── shared-styles.css
-├── components/
-├── services/
-├── comparison-tool/
-├── glossary/
-├── timeline/
-├── faq/
-├── annotated-excerpts/
-├── context-1986/
-├── dissertation/          (PDFs)
-└── tools/
-    └── dissertation-reader/
-        └── dist/
+├── index.html              # Main entry point
+├── shared-styles.css       # Common styles for all tools
+├── favicon.ico
+│
+├── frontend/               # Main React application
+│   ├── App.js
+│   ├── index.js
+│   ├── index.css
+│   ├── constants.js
+│   ├── html.js
+│   ├── components/
+│   ├── services/
+│   └── dist/
+│       └── tailwind.css
+│
+├── features/               # Standalone dissertation tools
+│   ├── comparison-tool/
+│   ├── glossary/
+│   ├── timeline/
+│   ├── faq/
+│   ├── annotated-excerpts/
+│   ├── context-1986/
+│   └── dissertation-reader/
+│
+├── data/                   # Archive data files
+│   └── archive-data.json
+│
+└── dissertation/           # PDFs (uploaded separately)
 ```
+
+> **Note:** Repository was reorganized on December 1, 2025. All feature tools are now under `/features/`, frontend code is under `/frontend/`, and data files are under `/data/`.
 
 ---
 

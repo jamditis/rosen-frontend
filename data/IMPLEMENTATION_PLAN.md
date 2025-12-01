@@ -30,7 +30,7 @@ Browser → WordPress (/data/archive-data.json) → Render
 
 ### Phase 1: Create the Data Export Script
 
-**File:** `csv/export-archive-data.js`
+**File:** `data/export-archive-data.js`
 
 This Node.js script will:
 1. Fetch current data from Google Sheets
@@ -56,7 +56,7 @@ This Node.js script will:
 
 ### Phase 2: Create the JSON Data File
 
-**File:** `csv/archive-data.json`
+**File:** `data/archive-data.json`
 
 Pre-processed data structure:
 ```json
@@ -159,14 +159,16 @@ Remove the PapaParse import from the importmap:
 
 ```
 rosen-frontend/
-├── csv/
+├── data/
 │   ├── IMPLEMENTATION_PLAN.md      # This document
 │   ├── export-archive-data.js      # Export script (Node.js)
 │   ├── archive-data.json           # Generated data file
 │   └── README.md                   # Usage instructions
-├── services/
-│   └── archiveService.js           # Updated (simplified)
-├── constants.js                    # Updated (new data URL)
+├── frontend/
+│   ├── services/
+│   │   └── archiveService.js       # Updated (simplified)
+│   ├── constants.js                # Updated (new data URL)
+│   └── ...
 └── index.html                      # Updated (remove PapaParse)
 ```
 
@@ -187,7 +189,7 @@ rosen-frontend/
 When archive data needs to be updated:
 
 1. Update the Google Sheet (still the source of truth for editing)
-2. Run `node csv/export-archive-data.js`
+2. Run `node data/export-archive-data.js`
 3. Upload new `archive-data.json` to WordPress
 4. Optionally increment `CACHE_VERSION` in `archiveService.js` to force cache refresh
 

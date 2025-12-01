@@ -4,6 +4,119 @@ This document records significant architectural decisions and notable changes to
 
 ---
 
+### **[2.20.0] - 2025-12-01**
+
+#### **Major Repository Reorganization for Public Release**
+
+**Status:** Complete - Repository restructured for public open-source release
+
+##### **Overview**
+
+Comprehensive reorganization of the entire repository structure in preparation for transitioning from private to public. This is the largest structural change in the project's history, affecting 229 files across all major directories.
+
+##### **New Directory Structure**
+
+The repository has been reorganized with the following structure:
+
+```
+/
+├── frontend/                # Main React application (moved from root)
+│   ├── components/          # React components
+│   ├── services/            # Data services
+│   └── dist/                # Pre-built Tailwind CSS
+│
+├── features/                # Standalone feature tools (NEW)
+│   ├── comparison-tool/     # Moved from /comparison-tool/
+│   ├── glossary/            # Moved from /glossary/
+│   ├── context-1986/        # Moved from /context-1986/
+│   ├── timeline/            # Moved from /timeline/
+│   ├── annotated-excerpts/  # Moved from /annotated-excerpts/
+│   ├── faq/                 # Moved from /faq/
+│   └── dissertation-reader/ # Moved from /tools/dissertation-reader/
+│
+├── data/                    # Archive data files (moved from /csv/)
+├── tools/
+│   ├── active/              # Active dev tools (dataexplorer, dataviz)
+│   └── analysis/            # R scripts (moved from /data-tools/)
+│
+├── archived/                # Legacy code (NEW)
+│   ├── archive-v1/          # Moved from /tools/archive-v1/
+│   ├── web/                 # Moved from /tools/web/
+│   └── byok-chat/           # Moved from /future-features/byok-chat/
+│
+└── [unchanged]              # backend/, dissertation/, docs/, release-assets/
+```
+
+##### **Key Changes**
+
+**1. Frontend Consolidation**
+- Moved all root-level JS files to `/frontend/`
+- `App.js`, `index.js`, `constants.js`, `html.js` → `/frontend/`
+- `components/` → `/frontend/components/`
+- `services/` → `/frontend/services/`
+- `dist/tailwind.css` → `/frontend/dist/tailwind.css`
+
+**2. Feature Tools Organization**
+- Created `/features/` directory for all standalone dissertation tools
+- Moved 7 tools from root level to `/features/`
+- Moved `dissertation-reader` from `/tools/` to `/features/`
+
+**3. Data Directory**
+- Renamed `/csv/` to `/data/`
+- Updated `.gitignore` to track `/data/` (was previously ignored)
+- All data files now in a standard location
+
+**4. Tools Reorganization**
+- Created `/tools/active/` for maintained dev tools
+- Created `/tools/analysis/` for R scripts (from `/data-tools/`)
+- Moved legacy tools to `/archived/`
+
+**5. Standard Open Source Files Added**
+- `SECURITY.md` - Vulnerability reporting policy
+- `CODE_OF_CONDUCT.md` - Contributor Covenant v2.1
+- `.github/ISSUE_TEMPLATE/bug_report.md`
+- `.github/ISSUE_TEMPLATE/feature_request.md`
+- `.github/PULL_REQUEST_TEMPLATE.md`
+
+**6. Duplicate Files Removed**
+- Removed duplicate dissertation transcription from root (kept in `/dissertation/`)
+- Removed duplicate `CLAUDE.md` from `/docs/`
+- Removed `dissertation-reader/dist/` (regeneratable)
+- Removed debug screenshots from `tools/web/95/errors/`
+- Space savings: ~800KB
+
+##### **Path Updates Required**
+
+All import paths updated in:
+- `index.html` - Updated CSS and JS references to `/frontend/`
+- `frontend/constants.js` - Updated data path to `/data/`
+- `frontend/services/archiveService.js` - Updated dissertation reader URL
+- All feature tool `index.html` files - Updated relative paths to shared styles
+
+##### **Documentation Updated**
+- `CLAUDE.md` - Complete directory structure rewrite
+- `README.md` - Updated project structure section
+- `CHANGELOG.md` renamed from `changelog.md`
+
+##### **Files Modified**
+- **229 files** reorganized
+- **5 new files** added (standard open source files)
+- **~20 files** deleted (duplicates and debug artifacts)
+
+##### **Breaking Changes**
+- All feature tools now at `/features/[tool-name]/` instead of `/[tool-name]/`
+- Frontend code now at `/frontend/` instead of root
+- Data files now at `/data/` instead of `/csv/`
+- Legacy tools now at `/archived/` instead of `/tools/`
+
+##### **Migration Notes**
+For existing deployments:
+1. Update any bookmarked/linked URLs to use `/features/` prefix
+2. Update any scripts referencing `/csv/` to use `/data/`
+3. Update any CI/CD paths referencing root-level components
+
+---
+
 ### **[2.19.0] - 2025-12-01**
 
 #### **✨ Frontend UX Polish & NotebookLM Integration for December 2025 Launch**
