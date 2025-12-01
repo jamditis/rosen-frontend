@@ -1,16 +1,25 @@
 # -*- coding: utf-8 -*-
 """
 This module orchestrates the entire backend pipeline for the Rosen Scraper project.
-It reads URLs from a Google Sheet, dispatches them to the appropriate content
-processor, enriches the extracted data, and writes the final records back to
-another sheet.
+It reads URLs from local CSV files, dispatches them to the appropriate content
+processor, enriches the extracted data, and writes the final records to CSV output.
+
+Data Flow:
+    1. Read URLs from csv/urls_to_scrape.csv
+    2. Process each URL through the appropriate processor
+    3. Write results to csv/output/processed_records_YYYYMMDD.csv
+    4. Log processing status to csv/output/processing_log_YYYYMMDD.csv
+
+To update the archive:
+    1. Export Google Sheets tabs to CSV files in the csv/ directory
+    2. Run this workflow
+    3. Merge output CSV files back into the main archive
 """
 
 from typing import Optional, Dict, Any, List, Set
 from rosen_scraper import dispatcher
 from rosen_scraper.processors import article_processor
-import gspread
-from gspread import Worksheet
+from rosen_scraper.csv_data_service import get_csv_service, CSVDataService
 import os
 import json
 import time
@@ -214,25 +223,23 @@ def determine_permissions(data: Dict[str, Any], url: str) -> str:
     # Default
     return "Standard Copyright"
 
-def append_record_to_sheet(worksheet: Worksheet, data: Dict[str, Any], headers: List[str], logger: Optional[ArchiveLogger] = None) -> bool:
+def append_record_to_csv(csv_service: CSVDataService, data: Dict[str, Any], headers: List[str], logger: Optional[ArchiveLogger] = None) -> bool:
     """
-    Formats and appends a new row to the specified Google Sheet.
+    Formats and appends a new row to the output CSV file.
     The row is ordered according to the provided headers.
     """
     if not logger:
         logger = get_logger()
 
     if not headers:
-        logger.log_error("sheets_operation", "Cannot append row: No headers defined.", record_id=data.get('id'))
+        logger.log_error("csv_operation", "Cannot append row: No headers defined.", record_id=data.get('id'))
         return False
 
-    # Create a list of values in the correct order for the sheet.
-    new_row = [str(data.get(header, "")) for header in headers]
     try:
-        # Append the new row to the worksheet.
-        worksheet.append_row(new_row)
-        logger.log_sheets_operation("write", data.get('id'), True, {"url": data.get('url')})
-        return True
+        success = csv_service.append_record(data, headers)
+        if success:
+            logger.log_sheets_operation("write", data.get('id'), True, {"url": data.get('url')})
+        return success
     except Exception as e:
         logger.log_sheets_operation("write", data.get('id'), False, {"error": str(e), "url": data.get('url')})
         return False
@@ -258,31 +265,16 @@ def main() -> None:
             logger.log_error("configuration", "Could not load known entities file", details={"entities_file": KNOWN_ENTITIES_FILE})
             return
 
-        # Get the expected order of columns for the output sheet.
+        # Get the expected order of columns for the output.
         headers = schema.get('output_headers', [])
 
-        # --- 1. Connect to Google Sheets ---
-        try:
-            credentials_path = BASE_DIR / os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
-            gc = gspread.service_account(filename=str(credentials_path))
-            sh = gc.open(os.environ.get("SPREADSHEET_NAME", "Rosen Archive URL List"))
-            urls_worksheet = sh.worksheet("urls_to_scrape")
-            processed_worksheet = sh.worksheet("test_runs")
-            access_worksheet = sh.worksheet("access")
-            logger.logger.info("Successfully connected to Google Sheets")
-        except Exception as e:
-            logger.log_error("sheets_connection", f"Error connecting to Google Sheets: {e}")
-            return
+        # --- 1. Initialize CSV Data Service ---
+        csv_service = get_csv_service()
+        logger.logger.info(f"Using CSV data from: {csv_service.csv_dir}")
+        logger.logger.info(f"Output will be written to: {csv_service.output_dir}")
 
         # --- 2. Fetch URLs to Process ---
-        all_values = urls_worksheet.get_all_values()
-        if len(all_values) < 2:
-            logger.logger.info("No URLs to process.")
-            return
-
         # Get configurable row range from environment variables
-        # START_ROW: Starting row index (0-based), default is 0 (process from beginning)
-        # END_ROW: Ending row index (0-based), default is -1 (process all remaining rows)
         try:
             start_row = int(os.environ.get("PROCESS_START_ROW", "0"))
             if start_row < 0:
@@ -291,45 +283,57 @@ def main() -> None:
         except ValueError as e:
             logger.log_error("configuration", "PROCESS_START_ROW must be a valid integer", details={"error": str(e)})
             return
-        
+
         try:
             end_row_str = os.environ.get("PROCESS_END_ROW", "-1")
             end_row = int(end_row_str) if end_row_str != "-1" else None
             if end_row is not None and end_row < start_row:
-                logger.log_error("configuration", "PROCESS_END_ROW must be >= PROCESS_START_ROW", 
+                logger.log_error("configuration", "PROCESS_END_ROW must be >= PROCESS_START_ROW",
                                details={"start": start_row, "end": end_row})
                 return
         except ValueError as e:
             logger.log_error("configuration", "PROCESS_END_ROW must be a valid integer or -1", details={"error": str(e)})
             return
-        
-        # Extract URLs from the second column using configurable row range
-        if end_row is None:
-            urls_to_process = [row[1] for row in all_values[start_row:] if len(row) > 1 and row[1]]
-        else:
-            urls_to_process = [row[1] for row in all_values[start_row:end_row] if len(row) > 1 and row[1]]
-        
+
+        # Check if we should skip already processed URLs
+        skip_processed = os.environ.get("SKIP_PROCESSED", "true").lower() == "true"
+
+        # Get URLs from CSV file
+        url_records = csv_service.get_urls_to_process(start_row, end_row, skip_processed=skip_processed)
+
+        if not url_records:
+            logger.logger.info("No URLs to process.")
+            return
+
+        urls_to_process = [r['url'] for r in url_records]
         logger.logger.info(f"Processing rows {start_row} to {end_row if end_row else 'end'}")
         logger.logger.info(f"Starting processing for {len(urls_to_process)} URLs")
 
-        # --- 3. Process Each URL ---
-        try:
-            processed_ids = set(processed_worksheet.col_values(1)[1:])
-            logger.logger.info(f"Loaded {len(processed_ids)} existing IDs from the sheet.")
-        except Exception as e:
-            logger.log_error("sheets_operation", f"Could not load existing IDs: {e}")
-            processed_ids = set()
+        # --- 3. Load existing record IDs ---
+        processed_ids = csv_service.get_existing_record_ids()
+        logger.logger.info(f"Loaded {len(processed_ids)} existing IDs from CSV files.")
+
+        # Also check for already processed URLs to avoid duplicates
+        existing_urls = csv_service.get_existing_urls()
+        logger.logger.info(f"Loaded {len(existing_urls)} existing URLs from CSV files.")
 
         for url in urls_to_process:
+            # Skip if URL already exists in archive
+            if url in existing_urls:
+                logger.logger.info(f"Skipping already archived URL: {url}")
+                csv_service.update_url_status(url, "SKIPPED", "Already in archive")
+                continue
+
             # Check for poison pills at URL level
             should_process, poison_result = poison_manager.check_url(url)
 
             if not should_process:
                 if poison_result.pill_type == PoisonPillType.PAYWALL_DETECTED:
-                    logger.logger.info(f"Paywalled domain detected for {url}. Moving to 'access' sheet.")
-                    access_worksheet.append_row([url])
+                    logger.logger.info(f"Paywalled domain detected for {url}. Logging to access file.")
+                    csv_service.update_url_status(url, "PAYWALL", "Requires subscription access")
                 else:
                     logger.logger.warning(f"Skipping poison pill URL: {url} (type: {poison_result.pill_type.value})")
+                    csv_service.update_url_status(url, "SKIPPED", f"Poison pill: {poison_result.pill_type.value}")
                 continue
 
             # Start processing with timing
@@ -388,14 +392,18 @@ def main() -> None:
                             logger.log_pdf_generation(item_id, pdf_filepath, True)
                             file_generated = True
 
-                # Write the final, enriched record to the Google Sheet.
-                success = append_record_to_sheet(processed_worksheet, processed_data, headers, logger)
+                # Write the final, enriched record to CSV.
+                success = append_record_to_csv(csv_service, processed_data, headers, logger)
                 if success:
                     processed_ids.add(item_id)
+                    existing_urls.add(url)
+                    csv_service.update_url_status(url, "SUCCESS", f"ID: {item_id}")
                     logger.log_processing_end(item_id, process_start_time, True)
                 else:
+                    csv_service.update_url_status(url, "FAILED", "Could not write record")
                     logger.log_processing_end(item_id, process_start_time, False)
             else:
+                csv_service.update_url_status(url, "FAILED", "Processing returned no data")
                 logger.log_processing_end("failed", process_start_time, False)
 
     except Exception as e:
