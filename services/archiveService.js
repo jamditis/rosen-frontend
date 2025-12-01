@@ -39,7 +39,7 @@ const DISSERTATION_RECORD = {
   year: '1986',
   era: 'Public Journalism (90s)', 
   pub: 'New York University (Ph.D. Dissertation)',
-  url: '/tools/dissertation-reader/dist/',
+  url: '/wp-content/rosen-archive/tools/dissertation-reader/dist/',
   summary: 'Rosen\'s doctoral dissertation traces the history of the idea that the function of the press is to inform the public. It argues that the rise of the mass circulation newspaper, while creating a technical ability to reach everyone, actually undermined the conditions necessary for a "universal town meeting." Drawing heavily on Walter Lippmann and John Dewey, it suggests that the professionalization of journalism ("objectivity") was a retreat from the problem of creating a genuine public life in a complex society. It contrasts news as "symptom" vs. news as "symbol" and explores how the press creates a "pseudo-environment" of public opinion.',
   quote: 'An impossible press was born, one which sought to solve the whole problem of public life simply by controlling the conduct of journalists.',
   categories: ['Journalism History', 'Democratic Theory', 'Press Criticism', 'Public Life'],
@@ -104,16 +104,36 @@ const getCachedData = (url) => {
 };
 
 const setCachedData = (url, data) => {
-  try {
-    const cacheKey = getCacheKey(url);
-    const entry = {
-      data,
-      timestamp: Date.now(),
-      version: CACHE_VERSION
-    };
+  const cacheKey = getCacheKey(url);
+  const entry = {
+    data,
+    timestamp: Date.now(),
+    version: CACHE_VERSION
+  };
+
+  const trySetItem = () => {
     localStorage.setItem(cacheKey, JSON.stringify(entry));
+  };
+
+  try {
+    trySetItem();
   } catch (e) {
-    console.warn('Cache write error (storage might be full). Try clearing browser storage or old caches:', e);
+    if (e.name === 'QuotaExceededError' || e.code === 22) {
+      // Storage is full - clear old archive caches and retry
+      console.log('Cache storage full, clearing old archive caches...');
+      try {
+        const keys = Object.keys(localStorage);
+        const archiveCacheKeys = keys.filter(key => key.startsWith('archive_csv_'));
+        archiveCacheKeys.forEach(key => localStorage.removeItem(key));
+        trySetItem(); // Retry after clearing
+        console.log('Cache cleared and data stored successfully');
+      } catch (retryError) {
+        // Still failing - storage may be consumed by other data
+        console.warn('Cache disabled: browser storage is full. The archive will work but without caching.');
+      }
+    } else {
+      console.warn('Cache write error:', e);
+    }
   }
 };
 

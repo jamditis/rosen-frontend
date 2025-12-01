@@ -54,14 +54,38 @@ const App = () => {
   const resultsRef = useRef(null);
   const recordsRef = useRef(null);
 
-  // Check URL for view param on mount
+  // Check URL for view param on mount and handle browser back/forward
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const viewParam = params.get('view');
-    if (viewParam === 'dissertation') {
-      setCurrentView('dissertation');
-    }
-  }, []);
+    const handleURLChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      const viewParam = params.get('view');
+      const recordParam = params.get('record');
+
+      if (viewParam === 'dissertation') {
+        setCurrentView('dissertation');
+        setSelectedRecordId(null);
+      } else {
+        setCurrentView('archive');
+        if (recordParam && records.length > 0) {
+          const target = records.find(r => r.id === recordParam);
+          if (target) {
+            setSelectedRecordId(recordParam);
+          } else {
+            setSelectedRecordId(null);
+          }
+        } else {
+          setSelectedRecordId(null);
+        }
+      }
+    };
+
+    // Handle initial URL state
+    handleURLChange();
+
+    // Listen for browser back/forward navigation
+    window.addEventListener('popstate', handleURLChange);
+    return () => window.removeEventListener('popstate', handleURLChange);
+  }, [records]);
 
   // Update URL when view changes
   useEffect(() => {
@@ -98,16 +122,6 @@ const App = () => {
         setFacets(data.facets);
         setAutocompleteIndex(data.autocompleteIndex);
         setLoading(false);
-        
-        // Check URL params for shared record AFTER data is loaded
-        const params = new URLSearchParams(window.location.search);
-        const recordParam = params.get('record');
-        if (recordParam) {
-            const target = data.records.find(r => r.id === recordParam);
-            if (target) {
-                setSelectedRecordId(recordParam);
-            }
-        }
       })
       .catch(err => {
         console.error(err);
@@ -346,8 +360,8 @@ const App = () => {
             
             ${!isExplorer && html`
                 <div>
-                    <!-- Tools Section (above Featured Works) -->
-                    ${!loading && !filters.search && !filters.era && !filters.year && filters.categories.length === 0 && html`
+                    <!-- Tools Section (above Featured Works) - always visible even while loading -->
+                    ${!filters.search && !filters.era && !filters.year && filters.categories.length === 0 && html`
                         <section className="mb-8 py-6 border-b border-stone-200">
                             <div className="mb-4">
                                 <h2 className="font-display text-lg text-stone-800">Explore the archive</h2>
