@@ -7,7 +7,7 @@ export const FAQ_METADATA = {
   introduction: 'Explore answers to common questions about Jay Rosen\'s 1986 work. These responses are grounded in the text and connect its arguments to contemporary media.',
   notebookLM: {
     dissertation: 'https://notebooklm.google.com/notebook/d26d326e-20ec-46dc-b9b4-2c752b90e607',
-    archive: 'https://notebooklm.google.com/notebook/YOUR_ARCHIVE_NOTEBOOK_ID',
+    archive: 'https://notebooklm.google.com/notebook/8d7e0d5f-63cd-4638-9f80-a668a070eed9',
     note: 'For deeper exploration, try our NotebookLM-powered research assistants.'
   }
 };
