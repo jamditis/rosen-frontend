@@ -1,6 +1,6 @@
 # Archive Data Export
 
-This directory contains tools for exporting archive data from Google Sheets to static JSON for improved load performance.
+This directory contains tools for exporting archive data from CSV files to static JSON for improved load performance.
 
 ## Purpose
 
@@ -17,30 +17,62 @@ This export system generates a single pre-processed JSON file that loads in ~100
 | File | Purpose |
 |------|---------|
 | `IMPLEMENTATION_PLAN.md` | Detailed migration plan and architecture |
-| `export-archive-data.js` | Node.js script to generate JSON (to be created) |
-| `archive-data.json` | Generated data file (to be created) |
+| `export-archive-data.js` | Node.js script to generate JSON |
+| `archive-data.json` | Generated data file (23MB, ~30k records) |
+| `archive_records-public.csv` | Main archive records (articles, essays) |
+| `social_posts.csv` | Social media posts (Bluesky, Twitter) |
+| `extracted_relationships.csv` | Entity relationships between records |
 
 ## Quick Start
 
 ```bash
+# From the repository root:
+
 # Install dependencies
-npm install papaparse
+npm install
 
 # Generate the JSON data file
-node export-archive-data.js
+npm run export-data
 
 # Upload archive-data.json to WordPress
-# Path: /wp-content/rosen-archive/data/archive-data.json
+# Path: /wp-content/rosen-archive/csv/archive-data.json
 ```
 
 ## Workflow
 
-1. **Edit**: Update content in Google Sheets (source of truth)
-2. **Export**: Run `node export-archive-data.js` to generate JSON
-3. **Deploy**: Upload JSON file to WordPress via FTP
+1. **Export CSV from Google Sheets**: Download the latest CSV files from Google Sheets
+2. **Replace CSV files**: Place updated CSV files in this directory
+3. **Export to JSON**: Run `npm run export-data` to generate JSON
+4. **Deploy**: Upload JSON file to WordPress via FTP
+
+## Data Sources
+
+The export script reads from three CSV files:
+
+- **archive_records-public.csv**: Main articles, essays, and publications
+- **social_posts.csv**: Social media posts from Bluesky and Twitter
+- **extracted_relationships.csv**: Entity relationships for network visualization
+
+## Output Structure
+
+The generated `archive-data.json` contains:
+
+```json
+{
+  "version": "1.0.0",
+  "generated": "2025-12-01T...",
+  "records": [...],      // Array of processed records
+  "facets": {
+    "categories": [...], // Unique categories for filtering
+    "eras": [...],       // Time period classifications
+    "publications": [...] // Publication sources
+  },
+  "autocompleteIndex": [...] // Search terms for autocomplete
+}
+```
 
 ## See Also
 
 - `IMPLEMENTATION_PLAN.md` for full technical details
-- `../services/archiveService.js` for current data loading logic
+- `../services/archiveService.js` for data loading logic
 - `../constants.js` for data source URLs

@@ -1,5 +1,4 @@
 
-import Papa from 'papaparse';
 import { DATA_CONFIG, ERAS } from '../constants.js';
 
 // Simple hash function for UI color selection (djb1 variant)
@@ -10,34 +9,13 @@ export const hashString = (str) => {
   return Math.abs(hash);
 };
 
-const cleanTags = (str) => {
-  if (!str) return [];
-  return str.replace(/[\[\]"']/g, '').split(/[;,]/)
-    .map(s => s.trim())
-    .filter(s => s && s.length > 0 && !s.startsWith('='));
-};
-
-const formatDate = (str) => {
-  if (!str) return '';
-  const d = new Date(str);
-  return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
-};
-
-const getEra = (dateStr) => {
-  const y = new Date(dateStr).getFullYear();
-  if (y < 2000) return ERAS[0];
-  if (y < 2010) return ERAS[1];
-  if (y < 2020) return ERAS[2];
-  return ERAS[3];
-};
-
 const DISSERTATION_RECORD = {
   id: 'dissertation-1986',
   title: 'The Impossible Press: American Journalism and the Decline of Public Life',
   author: 'Jay Rosen',
   date: '1986-01-01',
   year: '1986',
-  era: 'Public Journalism (90s)', 
+  era: 'Public Journalism (90s)',
   pub: 'New York University (Ph.D. Dissertation)',
   url: '/wp-content/rosen-archive/tools/dissertation-reader/dist/',
   summary: 'Rosen\'s doctoral dissertation traces the history of the idea that the function of the press is to inform the public. It argues that the rise of the mass circulation newspaper, while creating a technical ability to reach everyone, actually undermined the conditions necessary for a "universal town meeting." Drawing heavily on Walter Lippmann and John Dewey, it suggests that the professionalization of journalism ("objectivity") was a retreat from the problem of creating a genuine public life in a complex society. It contrasts news as "symptom" vs. news as "symbol" and explores how the press creates a "pseudo-environment" of public opinion.',
@@ -51,25 +29,7 @@ const DISSERTATION_RECORD = {
 
 // Cache configuration
 const CACHE_TTL_MS = 1000 * 60 * 60; // 1 hour cache
-const CACHE_VERSION = 'v3'; // Increment to invalidate all caches
-const LOG_URL_MAX_LENGTH = 80; // Maximum URL length to display in console logs
-
-// Performance: Add prefetch hints for data URLs
-// This tells the browser to start fetching these resources early
-export const prefetchDataSources = (dataConfig) => {
-  if (typeof document !== 'undefined' && document.head) {
-    ['test_runs', 'social_posts', 'relationships'].forEach(key => {
-      if (dataConfig[key]) {
-        const link = document.createElement('link');
-        link.rel = 'prefetch';
-        link.href = dataConfig[key];
-        link.as = 'fetch';
-        link.crossOrigin = 'anonymous';
-        document.head.appendChild(link);
-      }
-    });
-  }
-};
+const CACHE_VERSION = 'v4'; // Increment to invalidate all caches
 
 const getCacheKey = (url) => {
   // Use djb2 hash algorithm for cache keys to avoid encoding issues with non-ASCII URLs
@@ -78,7 +38,7 @@ const getCacheKey = (url) => {
   for (let i = 0; i < url.length; i++) {
     hash = ((hash << 5) + hash) + url.charCodeAt(i); // hash * 33 + c
   }
-  return `archive_csv_${Math.abs(hash >>> 0)}`; // Convert to unsigned 32-bit integer
+  return `archive_json_${Math.abs(hash >>> 0)}`; // Convert to unsigned 32-bit integer
 };
 
 const getCachedData = (url) => {
@@ -86,16 +46,16 @@ const getCachedData = (url) => {
     const cacheKey = getCacheKey(url);
     const cached = localStorage.getItem(cacheKey);
     if (!cached) return null;
-    
+
     const entry = JSON.parse(cached);
     const now = Date.now();
-    
+
     // Check if cache is still valid
     if (entry.version !== CACHE_VERSION || (now - entry.timestamp) > CACHE_TTL_MS) {
       localStorage.removeItem(cacheKey);
       return null;
     }
-    
+
     return entry.data;
   } catch (e) {
     console.warn('Cache read error:', e);
@@ -123,7 +83,7 @@ const setCachedData = (url, data) => {
       console.log('Cache storage full, clearing old archive caches...');
       try {
         const keys = Object.keys(localStorage);
-        const archiveCacheKeys = keys.filter(key => key.startsWith('archive_csv_'));
+        const archiveCacheKeys = keys.filter(key => key.startsWith('archive_json_') || key.startsWith('archive_csv_'));
         archiveCacheKeys.forEach(key => localStorage.removeItem(key));
         trySetItem(); // Retry after clearing
         console.log('Cache cleared and data stored successfully');
@@ -137,33 +97,11 @@ const setCachedData = (url, data) => {
   }
 };
 
-const fetchCSV = (url) => {
-  // Check cache first
-  const cached = getCachedData(url);
-  if (cached) {
-    console.log('Using cached data for:', url.substring(0, LOG_URL_MAX_LENGTH));
-    return Promise.resolve(cached);
-  }
-  
-  return new Promise((resolve) => {
-    Papa.parse(url, {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete: (results) => {
-        setCachedData(url, results.data);
-        resolve(results.data);
-      },
-      error: () => resolve([]) 
-    });
-  });
-};
-
 // Export function to manually clear all archive caches
 export const clearArchiveCache = () => {
   try {
     const keys = Object.keys(localStorage);
-    const archiveCacheKeys = keys.filter(key => key.startsWith('archive_csv_'));
+    const archiveCacheKeys = keys.filter(key => key.startsWith('archive_json_') || key.startsWith('archive_csv_'));
     archiveCacheKeys.forEach(key => localStorage.removeItem(key));
     console.log(`Cleared ${archiveCacheKeys.length} cache entries`);
   } catch (e) {
@@ -172,110 +110,53 @@ export const clearArchiveCache = () => {
 };
 
 export const fetchArchiveData = async () => {
-  const [testRunsData, socialPostsData, relationshipsData] = await Promise.all([
-    fetchCSV(DATA_CONFIG.test_runs),
-    fetchCSV(DATA_CONFIG.social_posts),
-    fetchCSV(DATA_CONFIG.relationships)
-  ]);
+  const dataUrl = DATA_CONFIG.archive_json;
 
-  const categories = new Set();
-  const publications = new Set();
-  const searchTerms = new Set();
-  
-  const relationshipsMap = {};
-  relationshipsData.forEach(rel => {
-     const source = rel['Source'] || rel['source'];
-     const target = rel['Target'] || rel['target'];
-     if(source && target) {
-         if(!relationshipsMap[source]) relationshipsMap[source] = [];
-         if(!relationshipsMap[target]) relationshipsMap[target] = [];
-         if(!relationshipsMap[source].includes(target)) relationshipsMap[source].push(target);
-         if(!relationshipsMap[target].includes(source)) relationshipsMap[target].push(source);
-     }
-  });
+  // Check cache first
+  const cached = getCachedData(dataUrl);
+  if (cached) {
+    console.log('Using cached archive data');
+    return cached;
+  }
 
-  const processRecord = (row, index, type) => {
-      const rawCats = row.Thematic_Categories || row.thematic_categories || row.Categories || '';
-      const rawConcepts = row.Key_Concepts || row.key_concepts || row.Concepts || '';
-      const rawTags = row.Tags || row.tags || '';
-      const rawDate = row.Publication_Date || row.publication_date || row.Date || '';
-      const rawPub = row.Original_Publication || row.original_publication || row.Platform || 'Unknown';
-      const rawTitle = row.Title || row.title || row.Content || 'Untitled';
-      const rawId = row.ID || row.id || `${type}-${index}`;
-      const rawUrl = row.URL || row.url || '#';
-      
-      let author = (row.Author || row.author || 'Jay Rosen').trim();
+  console.log('Fetching archive data from:', dataUrl);
 
-      const cats = cleanTags(rawCats);
-      const concepts = cleanTags(rawConcepts);
-      const tags = cleanTags(rawTags);
-      const date = formatDate(rawDate);
-      const pub = rawPub.trim();
-      const title = rawTitle.trim();
-      
-      const displayTitle = (type === 'social' && title.length > 100) 
-          ? title.substring(0, 100) + '...' 
-          : title;
+  try {
+    const response = await fetch(dataUrl);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-      cats.forEach(c => { categories.add(c); searchTerms.add(c); });
-      concepts.forEach(c => searchTerms.add(c));
-      tags.forEach(t => searchTerms.add(t));
-      if (pub && pub.length > 2) { publications.add(pub); searchTerms.add(pub); }
-      if (displayTitle.length > 3) searchTerms.add(displayTitle);
+    const data = await response.json();
 
-      const directRelIds = relationshipsMap[rawId] || [];
+    // Inject dissertation record if not present
+    if (!data.records.find(r => r.id === 'dissertation-1986')) {
+      data.records.push({ ...DISSERTATION_RECORD, relatedIds: [] });
 
-      return {
-        id: rawId,
-        title: displayTitle,
-        author: author,
-        date: date,
-        year: date ? date.split('-')[0] : '',
-        era: getEra(date),
-        pub: pub,
-        url: rawUrl,
-        summary: (row.Summary || row.summary || title), 
-        quote: (row.Pull_Quote || row.pull_quote || ''),
-        categories: cats,
-        concepts: concepts,
-        tags: tags,
-        verified: (row.Verified || row.verified) === 'TRUE' || type === 'social', 
-        type: type, 
-        relatedIds: directRelIds
-      };
-  };
+      // Also add dissertation facets if missing
+      DISSERTATION_RECORD.categories.forEach(c => {
+        if (!data.facets.categories.includes(c)) {
+          data.facets.categories.push(c);
+        }
+      });
+      data.facets.categories.sort();
+    }
 
-  const mainRecords = testRunsData.map((row, i) => processRecord(row, i, 'article'));
-  const socialRecords = socialPostsData.map((row, i) => processRecord(row, i, 'social'));
+    // Cache the result
+    setCachedData(dataUrl, data);
 
-  let allRecords = [...mainRecords, ...socialRecords];
-  allRecords.push({ ...DISSERTATION_RECORD, relatedIds: [] });
-  
-  // Filter out records that are:
-  // - Not verified
-  // - Missing title or have "Untitled" placeholder
-  // - Have titles shorter than 5 characters (likely garbage data)
-  // - Missing both date and URL (incomplete records)
-  allRecords = allRecords.filter(r => {
-    if (!r.verified) return false;
-    if (!r.title || r.title === 'Untitled' || r.title.trim().length < 5) return false;
-    if (!r.date && r.url === '#') return false; // Need at least a date or valid URL
-    return true;
-  });
-  allRecords.sort((a, b) => b.date.localeCompare(a.date));
-
-  DISSERTATION_RECORD.categories.forEach(c => { categories.add(c); searchTerms.add(c); });
-  DISSERTATION_RECORD.concepts.forEach(c => searchTerms.add(c));
-  DISSERTATION_RECORD.tags.forEach(t => searchTerms.add(t));
-  searchTerms.add(DISSERTATION_RECORD.title);
-
-  return {
-    records: allRecords,
-    facets: {
-      categories: Array.from(categories).sort(),
-      eras: ERAS,
-      publications: Array.from(publications).sort()
-    },
-    autocompleteIndex: Array.from(searchTerms).sort()
-  };
+    return data;
+  } catch (error) {
+    console.error('Error fetching archive data:', error);
+    // Return empty structure on error
+    return {
+      records: [{ ...DISSERTATION_RECORD, relatedIds: [] }],
+      facets: {
+        categories: DISSERTATION_RECORD.categories.sort(),
+        eras: ERAS,
+        publications: [DISSERTATION_RECORD.pub]
+      },
+      autocompleteIndex: [...DISSERTATION_RECORD.categories, ...DISSERTATION_RECORD.concepts, ...DISSERTATION_RECORD.tags, DISSERTATION_RECORD.title].sort()
+    };
+  }
 };

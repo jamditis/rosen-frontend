@@ -1,13 +1,15 @@
-
-// Base Google Sheet URL
-const SHEET_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-XqQXvMJNaBXVWlmXu1EyOpa_Cc6ur-pklWX1mbrWIFybZjmbE6UTIteSoCSvf0a7j5r8A6earp3H/pub';
-
-// YOU MUST REPLACE THESE GIDS WITH THE ACTUAL GID FROM YOUR GOOGLE SHEET URL FOR EACH TAB
+// Static JSON data file (pre-processed from CSV sources)
+// Run `npm run export-data` to regenerate from CSV files
 export const DATA_CONFIG = {
-    test_runs: `${SHEET_BASE}?gid=928818664&single=true&output=csv`, // Main records
-    social_posts: `${SHEET_BASE}?gid=0&single=true&output=csv`,      // Social media records (Replace gid=0)
-    entities: `${SHEET_BASE}?gid=0&single=true&output=csv`,          // Extracted entities (Replace gid=0)
-    relationships: `${SHEET_BASE}?gid=0&single=true&output=csv`      // Extracted relationships (Replace gid=0)
+    // Primary data source - pre-processed JSON file
+    archive_json: '/wp-content/rosen-archive/csv/archive-data.json'
+
+    // Legacy Google Sheet URLs (kept for reference/fallback if needed)
+    // const SHEET_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-XqQXvMJNaBXVWlmXu1EyOpa_Cc6ur-pklWX1mbrWIFybZjmbE6UTIteSoCSvf0a7j5r8A6earp3H/pub';
+    // test_runs: `${SHEET_BASE}?gid=928818664&single=true&output=csv`,
+    // social_posts: `${SHEET_BASE}?gid=0&single=true&output=csv`,
+    // entities: `${SHEET_BASE}?gid=0&single=true&output=csv`,
+    // relationships: `${SHEET_BASE}?gid=0&single=true&output=csv`
 };
 
 export const ITEMS_PER_PAGE = 24;

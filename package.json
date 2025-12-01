@@ -3,5 +3,11 @@
   "version": "1.0.0",
   "description": "Interactive frontend for Jay Rosen's journalism scholarship archive",
   "type": "module",
-  "private": true
+  "private": true,
+  "scripts": {
+    "export-data": "node csv/export-archive-data.js"
+  },
+  "devDependencies": {
+    "csv-parse": "^5.5.6"
+  }
 }
