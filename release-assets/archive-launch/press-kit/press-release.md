@@ -62,7 +62,7 @@ His concepts have entered the vocabulary of media criticism:
 
 ### About the Archive
 
-The Jay Rosen Digital Archive was created by (Joe Amditis)[https://twitter.com/jsamditis]. It uses automated processing with Google's Gemini AI, human curation and verification, and sophisticated entity extraction to preserve and make accessible Rosen's complete digital record.
+The Jay Rosen Digital Archive was created by [Joe Amditis](https://twitter.com/jsamditis). It uses automated processing with Google's Gemini AI, human curation and verification, and sophisticated entity extraction to preserve and make accessible Rosen's complete digital record.
 
 The archive is designed for:
 - **Researchers** seeking primary sources on media criticism and journalism history
