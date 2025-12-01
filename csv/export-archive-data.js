@@ -140,13 +140,15 @@ async function main() {
   const archiveRecordsPath = path.join(__dirname, 'archive_records-public.csv');
   const socialPostsPath = path.join(__dirname, 'social_posts.csv');
   const relationshipsPath = path.join(__dirname, 'extracted_relationships.csv');
+  const entitiesPath = path.join(__dirname, 'extracted_entities.csv');
   const outputPath = path.join(__dirname, 'archive-data.json');
 
   // Check that files exist
   const filesToCheck = [
     { path: archiveRecordsPath, name: 'archive_records-public.csv' },
     { path: socialPostsPath, name: 'social_posts.csv' },
-    { path: relationshipsPath, name: 'extracted_relationships.csv' }
+    { path: relationshipsPath, name: 'extracted_relationships.csv' },
+    { path: entitiesPath, name: 'extracted_entities.csv' }
   ];
 
   for (const file of filesToCheck) {
@@ -163,23 +165,50 @@ async function main() {
   const archiveRecordsCsv = fs.readFileSync(archiveRecordsPath, 'utf-8');
   const socialPostsCsv = fs.readFileSync(socialPostsPath, 'utf-8');
   const relationshipsCsv = fs.readFileSync(relationshipsPath, 'utf-8');
+  const entitiesCsv = fs.readFileSync(entitiesPath, 'utf-8');
 
   const archiveRecordsData = parse(archiveRecordsCsv, { columns: true, skip_empty_lines: true });
   const socialPostsData = parse(socialPostsCsv, { columns: true, skip_empty_lines: true });
   const relationshipsData = parse(relationshipsCsv, { columns: true, skip_empty_lines: true });
+  const entitiesData = parse(entitiesCsv, { columns: true, skip_empty_lines: true });
 
   console.log(`  - Archive records: ${archiveRecordsData.length} rows`);
   console.log(`  - Social posts: ${socialPostsData.length} rows`);
   console.log(`  - Relationships: ${relationshipsData.length} rows`);
+  console.log(`  - Entities: ${entitiesData.length} rows`);
 
   // Build relationships map
   console.log('\n🔗 Building relationships map...');
   const relationshipsMap = buildRelationshipsMap(relationshipsData);
 
+  // Process entities
+  console.log('\n👤 Processing entities...');
+  const entities = entitiesData.map(row => ({
+    id: row.entity_id,
+    type: row.entity_type,
+    name: row.entity_name,
+    normalizedName: row.normalized_name,
+    role: row.role_or_description || '',
+    affiliation: row.affiliation || '',
+    prominence: parseInt(row.prominence_score) || 0,
+    firstMentionRecordId: row.first_mention_record_id,
+    totalMentions: parseInt(row.total_mentions) || 1
+  }));
+
+  // Group entities by type for facets
+  const entityTypes = new Set();
+  entities.forEach(e => entityTypes.add(e.type));
+
   // Track categories, publications, and search terms
   const categories = new Set();
   const publications = new Set();
   const searchTerms = new Set();
+
+  // Add entity names to search terms
+  entities.forEach(e => {
+    if (e.name && e.name.length > 2) searchTerms.add(e.name);
+    if (e.normalizedName && e.normalizedName !== e.name) searchTerms.add(e.normalizedName);
+  });
 
   // Process records
   console.log('\n⚙️  Processing records...');
@@ -237,13 +266,15 @@ async function main() {
 
   // Build output structure
   const output = {
-    version: "1.0.0",
+    version: "1.1.0",
     generated: new Date().toISOString(),
     records: allRecords,
+    entities: entities,
     facets: {
       categories: Array.from(categories).sort(),
       eras: ERAS,
-      publications: Array.from(publications).sort()
+      publications: Array.from(publications).sort(),
+      entityTypes: Array.from(entityTypes).sort()
     },
     autocompleteIndex: Array.from(searchTerms).sort()
   };
@@ -258,6 +289,8 @@ async function main() {
   console.log(`\n✅ Export complete!`);
   console.log(`\n📊 Summary:`);
   console.log(`  - Total records: ${output.records.length}`);
+  console.log(`  - Entities: ${output.entities.length}`);
+  console.log(`  - Entity types: ${output.facets.entityTypes.join(', ')}`);
   console.log(`  - Categories: ${output.facets.categories.length}`);
   console.log(`  - Publications: ${output.facets.publications.length}`);
   console.log(`  - Autocomplete terms: ${output.autocompleteIndex.length}`);
