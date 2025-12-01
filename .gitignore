@@ -10,8 +10,7 @@ lerna-debug.log*
 # Node
 node_modules
 dist
-!dist/tailwind.css
-!tools/dissertation-reader/dist/
+!frontend/dist/tailwind.css
 dist-ssr
 *.local
 
@@ -54,12 +53,11 @@ build/
 *.swo
 
 # Data and Output (backend)
-data/
+# Note: /data/ directory contains public archive data and is intentionally tracked
 processed_pdf_library/
 raw_media_files/
 tmp/
 output/
-csv/
 
 # Project Specific
 known_entities.json

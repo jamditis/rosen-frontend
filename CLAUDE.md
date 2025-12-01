@@ -116,38 +116,48 @@ The `index.html` loads the JS version. When editing, ensure changes are reflecte
 
 ```
 /
-├── index.html                    # Main entry point
-├── index.js                      # React root mount
-├── index.css                     # Global styles (paper texture, scrollbar)
-├── App.js                        # Main application component
-├── constants.js                  # Config: Sheet URLs, featured works, colors
-├── html.js                       # HTM JSX helper binding
+├── index.html                    # Main entry point (loads frontend/)
+├── shared-styles.css             # Common CSS for all standalone tools
+├── favicon.ico                   # Site favicon
 │
-├── components/
-│   ├── App.js                    # Root container & state management
-│   ├── Sidebar.js                # Filters, search, autocomplete
-│   ├── FeaturedSection.js        # Curated works carousel
-│   ├── Timeline.js               # Year-based bar chart filter
-│   ├── RecordModal.js            # Detail view modal
-│   ├── Explorer.js               # Canvas network visualization
-│   ├── WelcomeModal.js           # Intro overlay
-│   ├── DissertationPage.js       # Dissertation view container
-│   ├── MindMap.js                # Interactive tree visualization
-│   ├── DetailPanel.js            # Dissertation node details
-│   └── dissertationData.js       # Full dissertation content (70+ nodes)
+├── frontend/                     # Main React application
+│   ├── index.js                  # React root mount
+│   ├── index.css                 # Global styles (paper texture, scrollbar)
+│   ├── App.js                    # Main application component
+│   ├── constants.js              # Config: data URLs, featured works, colors
+│   ├── html.js                   # HTM JSX helper binding
+│   ├── tailwind.config.js        # Tailwind CSS configuration
+│   ├── dist/                     # Pre-built CSS
+│   │   └── tailwind.css          # Compiled Tailwind styles
+│   ├── components/               # React components
+│   │   ├── Sidebar.js            # Filters, search, autocomplete
+│   │   ├── FeaturedSection.js    # Curated works carousel
+│   │   ├── Timeline.js           # Year-based bar chart filter
+│   │   ├── RecordModal.js        # Detail view modal
+│   │   ├── Explorer.js           # Canvas network visualization
+│   │   ├── WelcomeModal.js       # Intro overlay
+│   │   ├── DissertationPage.js   # Dissertation view container
+│   │   ├── MindMap.js            # Interactive tree visualization
+│   │   ├── DetailPanel.js        # Dissertation node details
+│   │   └── dissertationData.js   # Full dissertation content (70+ nodes)
+│   └── services/
+│       └── archiveService.js     # Data fetching, parsing, caching
 │
-├── services/
-│   └── archiveService.js         # Data fetching, parsing, caching
+├── features/                     # Standalone feature tools
+│   ├── comparison-tool/          # "Then and Now" 1986 vs 2025 comparisons
+│   ├── glossary/                 # Interactive concept glossary
+│   ├── context-1986/             # Historical context page
+│   ├── timeline/                 # Dissertation → later work timeline
+│   ├── annotated-excerpts/       # Key passages with commentary
+│   ├── faq/                      # FAQ interface (Ask the Dissertation)
+│   └── dissertation-reader/      # Dissertation PDF viewer
 │
-├── comparison-tool/              # "Then and Now" 1986 vs 2025 comparisons
-├── glossary/                     # Interactive concept glossary
-├── context-1986/                 # Historical context page
-├── timeline/                     # Dissertation → later work timeline
-├── annotated-excerpts/           # Key passages with commentary
-├── faq/                          # FAQ interface (Ask the Dissertation)
-│
-├── future-features/              # Archived features for potential future use
-│   └── byok-chat/                # BYOK Claude chat interface (archived)
+├── data/                         # Archive data files
+│   ├── archive-data.json         # Main archive data (25MB)
+│   ├── archive_records-public.csv
+│   ├── extracted_entities.csv
+│   ├── extracted_relationships.csv
+│   └── README.md                 # Data dictionary
 │
 ├── backend/                      # Python data pipeline
 │   ├── src/                      # Core source code (processors, scraper, categorizer)
@@ -159,34 +169,44 @@ The `index.html` loads the JS version. When editing, ensure changes are reflecte
 │
 ├── dissertation/                 # Dissertation source materials
 │   ├── *.pdf                     # Original PDF scans (stored via Git LFS)
-│   ├── *.md                      # Transcribed markdown
+│   ├── FINAL-ROSEN_...md         # Transcribed markdown
 │   └── build_unified_pdf.py      # PDF builder script
 │
-├── data-tools/                   # Analysis and planning tools
-│   ├── RStudio/                  # R scripts for analysis
-│   └── planning/                 # Project planning docs
+├── tools/                        # Development and analysis tools
+│   ├── active/                   # Currently maintained tools
+│   │   ├── dataexplorer/         # Data explorer grid
+│   │   └── dataviz/              # Data visualization tool
+│   └── analysis/                 # R scripts and planning docs
+│       ├── RStudio/              # R analysis scripts
+│       └── planning/             # Project planning documentation
+│
+├── archived/                     # Legacy and archived code
+│   ├── archive-v1/               # Original archive interface
+│   ├── web/                      # Promotional website
+│   └── byok-chat/                # BYOK Claude chat (archived feature)
 │
 ├── docs/                         # Documentation
 │   ├── agent-personas/           # AI persona definitions
 │   └── narrative/                # Project logs and history
 │
-├── tools/                        # Additional presentation tools
-│   ├── dataexplorer/             # Data explorer grid (active development)
-│   ├── dataviz/                  # Data visualization tool (active development)
-│   ├── dissertation-reader/      # Dissertation reader app (active development)
-│   ├── archive-v1/               # Original archive app (reference)
-│   └── web/                      # Promotional website
-│
 ├── release-assets/               # Promotional materials and documentation
 │   └── documentation/            # Pre-publication reports and status docs
-├── shared-styles.css             # Common CSS for all standalone tools
-├── .github/workflows/            # CI/CD pipelines
-│   ├── frontend-validation.yml   # HTML/JS/CSS validation
-│   ├── backend-tests.yml         # Python test suite
-│   └── backend-linting.yml       # Code quality checks
+│
+├── .github/                      # GitHub configuration
+│   ├── workflows/                # CI/CD pipelines
+│   │   ├── frontend-validation.yml
+│   │   ├── backend-tests.yml
+│   │   └── backend-linting.yml
+│   ├── ISSUE_TEMPLATE/           # Issue templates
+│   └── PULL_REQUEST_TEMPLATE.md  # PR template
+│
 ├── README.md                     # User documentation
-├── changelog.md                  # Development history
-└── CLAUDE.md                     # This file
+├── CHANGELOG.md                  # Development history
+├── CLAUDE.md                     # This file
+├── SECURITY.md                   # Security policy
+├── CODE_OF_CONDUCT.md            # Community standards
+├── CONTRIBUTING.md               # Contribution guidelines
+└── LICENSE                       # Project license
 ```
 
 ---
@@ -194,13 +214,13 @@ The `index.html` loads the JS version. When editing, ensure changes are reflecte
 ## Data Sources
 
 ### Main Archive Data
-- Stored in Google Sheets, published as CSV
-- URLs configured in `constants.js`
+- Pre-processed JSON stored in `/data/archive-data.json`
+- URLs configured in `frontend/constants.js`
 - Cached in localStorage (1-hour TTL)
-- Sheet structure: ID, Title, Author, Publication_Date, URL, Summary, Categories, Concepts, Verified
+- Structure: ID, Title, Author, Publication_Date, URL, Summary, Categories, Concepts, Verified
 
 ### Dissertation Data
-- Hardcoded in `components/dissertationData.js`
+- Hardcoded in `frontend/components/dissertationData.js`
 - Contains 70+ nodes covering the full dissertation structure:
   - Root, Introduction, 2 Parts, 8 Chapters, Conclusion
   - Detailed concept nodes for each chapter
@@ -232,26 +252,26 @@ The `index.html` loads the JS version. When editing, ensure changes are reflecte
 
 ## Key Components Explained
 
-### archiveService.js
-- Fetches CSV from Google Sheets
+### frontend/services/archiveService.js
+- Fetches JSON data from `/data/archive-data.json`
 - Parses and normalizes records
 - Implements localStorage caching with TTL
 - Injects the dissertation record into all queries
 
-### Explorer.js
+### frontend/components/Explorer.js
 - HTML5 Canvas network visualization
 - Nodes represent archive records
 - Connections based on shared concepts/categories
 - Manhattan-style curved paths
 - Export to PNG capability
 
-### MindMap.js
+### frontend/components/MindMap.js
 - Tree visualization of dissertation structure
 - Click to select nodes
 - Double-click to expand/collapse
 - Dynamic layout calculation
 
-### comparison-tool/
+### features/comparison-tool/
 - **Completely standalone** - can be deployed separately
 - No dependencies on main archive code
 - Side-by-side 1986 vs 2025 comparisons
@@ -262,7 +282,7 @@ The `index.html` loads the JS version. When editing, ensure changes are reflecte
 ## Common Tasks
 
 ### Adding a New Comparison (comparison-tool)
-Edit `comparison-tool/data.js`:
+Edit `features/comparison-tool/data.js`:
 ```javascript
 {
   id: 'unique-id',
@@ -285,15 +305,15 @@ Edit `comparison-tool/data.js`:
 ```
 
 ### Adding Dissertation Content
-Edit `components/dissertationData.js`:
+Edit `frontend/components/dissertationData.js`:
 - Add nodes to `DISSERTATION_NODES` array
 - Add quotes to `NOTABLE_QUOTATIONS`
 - Add themes to `KEY_THEMES`
 
 ### Updating Archive Data
-1. Update the Google Sheet
+1. Update the source data and regenerate `/data/archive-data.json`
 2. Wait for cache to expire (1 hour) OR
-3. Increment `CACHE_VERSION` in `archiveService.js`
+3. Increment `CACHE_VERSION` in `frontend/services/archiveService.js`
 
 ### Local Development
 ```bash
@@ -307,10 +327,11 @@ npx serve .
 ```
 
 ### Deployment
-1. Upload all `.html`, `.css`, `.js` files
-2. Include `components/` and `services/` directories
-3. Include `comparison-tool/` if deploying that feature
-4. Ensure server serves `.js` with MIME type `application/javascript`
+1. Upload `index.html`, `shared-styles.css`, `favicon.ico` from root
+2. Upload entire `frontend/` directory
+3. Upload entire `features/` directory
+4. Upload `data/` directory with archive data
+5. Ensure server serves `.js` with MIME type `application/javascript`
 
 ---
 
@@ -322,17 +343,17 @@ The dissertation is being released publicly with multiple presentation formats:
 
 ### Implemented and Ready
 1. **Interactive Mind Map** - Tree visualization of dissertation structure (in main archive)
-2. **"Then and Now" Comparison Tool** - 7 side-by-side 1986 vs 2025 comparisons (`/comparison-tool/`)
-3. **Glossary** - 16 key concepts, filterable, with detail panel (`/glossary/`)
-4. **1986 in Journalism** - Historical context, media landscape, what didn't exist (`/context-1986/`)
-5. **Timeline** - 14 entries from dissertation to 2025, filterable by type (`/timeline/`)
-6. **Annotated Excerpts** - 12 key passages with 2025 commentary (`/annotated-excerpts/`)
-7. **FAQ / Ask the Dissertation** - 46 Q&A pairs, searchable, NotebookLM integration (`/faq/`)
-8. **Dissertation Reader** - Landing page with PDF download, ToC, citation info (`/tools/dissertation-reader/dist/`)
+2. **"Then and Now" Comparison Tool** - 7 side-by-side 1986 vs 2025 comparisons (`/features/comparison-tool/`)
+3. **Glossary** - 16 key concepts, filterable, with detail panel (`/features/glossary/`)
+4. **1986 in Journalism** - Historical context, media landscape, what didn't exist (`/features/context-1986/`)
+5. **Timeline** - 14 entries from dissertation to 2025, filterable by type (`/features/timeline/`)
+6. **Annotated Excerpts** - 12 key passages with 2025 commentary (`/features/annotated-excerpts/`)
+7. **FAQ / Ask the Dissertation** - 46 Q&A pairs, searchable, NotebookLM integration (`/features/faq/`)
+8. **Dissertation Reader** - Landing page with PDF download, ToC, citation info (`/features/dissertation-reader/src/`)
 9. **Network Explorer** - Canvas visualization of archive record relationships (in main archive)
 
 ### Archived (developed but not active)
-10. **BYOK Chat Interface** - Interactive Claude chat using user's own API key (`/future-features/byok-chat/`)
+10. **BYOK Chat Interface** - Interactive Claude chat using user's own API key (`/archived/byok-chat/`)
 
 ### Future Development (requires external content)
 - Audio commentary / office hours (requires Jay to record)
@@ -351,14 +372,15 @@ See `release-assets/documentation/pre-publication-report.md` for the full status
 
 1. **No build step required** - Don't suggest npm commands or build processes for frontend
 2. **Match existing style** - Use Roboto Mono, Special Elite fonts, paper texture
-3. **Standalone tools go in subdirectories** - Like `comparison-tool/`
-4. **Update documentation** - Keep README.md, changelog.md, and this file current
-5. **Dissertation content is sacred** - Quotes and content from `dissertationData.js` are accurate citations
+3. **Standalone tools go in /features/** - Each feature has its own subdirectory
+4. **Update documentation** - Keep README.md, CHANGELOG.md, and this file current
+5. **Dissertation content is sacred** - Quotes and content from `frontend/components/dissertationData.js` are accurate citations
 6. **WordPress deployment** - Final tools will be uploaded via FTP to a WordPress domain
 7. **Backend uses Poetry** - Python dependencies managed via Poetry, not pip directly
 8. **Dissertation source in /dissertation/** - Full PDFs (managed via Git LFS) and transcription available there
 9. **Git LFS required** - Repository uses Git LFS for large PDF files; install before cloning
 10. **Always check PROJECT_LOG.md** - Review `docs/narrative/PROJECT_LOG.md` before major edits for context
+11. **Archived code in /archived/** - Legacy tools and archived features kept for reference
 
 ---
 

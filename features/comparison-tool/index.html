@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Then and Now: The Impossible Press | Jay Rosen</title>
+    <link rel="icon" href="/wp-content/rosen-archive/favicon.ico" />
+    <meta name="description" content="An interactive comparison of Jay Rosen's 1986 dissertation predictions alongside 2025 media realities." />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Then and Now: The Impossible Press" />
+    <meta property="og:description" content="Jay Rosen's 1986 dissertation predictions meet 2025 realities" />
+    <meta property="og:type" content="website" />
+
+    <!-- Google Fonts (matching main archive) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS (pre-built for production) -->
+    <link rel="stylesheet" href="../../frontend/dist/tailwind.css" />
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+
+  <body class="antialiased font-body text-stone-900 min-h-screen bg-paper">
+
+    <!-- Skip to main content link for accessibility -->
+    <a href="#comparisons" class="skip-link sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-stone-800 focus:text-white focus:px-4 focus:py-2 focus:rounded">
+      Skip to comparisons
+    </a>
+
+    <!-- Screen reader announcements -->
+    <div id="sr-announcements" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-paper/95 backdrop-blur-sm border-b border-stone-200">
+      <div class="max-w-6xl mx-auto px-4 py-3">
+        <div class="flex items-center justify-between">
+          <a href="/wp-content/rosen-archive/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <div class="bg-stone-900 text-white p-1.5">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-lg md:text-xl font-display font-bold text-stone-900 tracking-tight">Jay Rosen Digital Archive</h1>
+              <p class="text-xs text-stone-500">Then and Now</p>
+            </div>
+          </a>
+          <nav class="flex items-center gap-2 md:gap-4">
+            <a href="#intro" class="hidden md:inline text-xs text-stone-600 hover:text-stone-900 transition-colors">About</a>
+            <a href="#comparisons" class="hidden md:inline text-xs text-stone-600 hover:text-stone-900 transition-colors">Comparisons</a>
+            <a href="/wp-content/rosen-archive/tools/dissertation-reader/dist/"
+               class="text-xs bg-stone-800 text-white px-3 py-1.5 rounded hover:bg-stone-700 transition-colors whitespace-nowrap">
+              <span class="hidden sm:inline">Read </span>Dissertation
+            </a>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="py-16 md:py-24 px-4">
+      <div class="max-w-4xl mx-auto text-center">
+        <p class="text-sm text-stone-500 mb-4 tracking-widest uppercase">Jay Rosen, Ph.D. Dissertation, NYU 1986</p>
+        <h2 class="font-display text-3xl md:text-5xl text-stone-850 mb-6 leading-tight">
+          The Impossible Press
+        </h2>
+        <p class="text-lg md:text-xl text-stone-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+          American Journalism and the Decline of Public Life
+        </p>
+        <div class="w-24 h-px bg-stone-300 mx-auto mb-8"></div>
+        <p class="text-sm text-stone-500 max-w-xl mx-auto">
+          Advisor: Neil Postman
+        </p>
+      </div>
+    </section>
+
+    <!-- Introduction -->
+    <section id="intro" class="py-12 px-4 bg-white border-y border-stone-200">
+      <div class="max-w-3xl mx-auto">
+        <p class="text-stone-700 leading-relaxed mb-6">
+          In 1986, Jay Rosen completed his doctoral dissertation under Neil Postman at NYU. Nearly four decades later, his analysis of the troubled relationship between press and public reads less like historical scholarship and more like prophecy.
+        </p>
+        <p class="text-stone-700 leading-relaxed mb-6">
+          This interactive tool places his 1986 observations alongside the realities of 2025. What Rosen identified as emerging tendencies have become the dominant features of our media environment. The "impossible press" he described has only become more impossible.
+        </p>
+        <p class="text-stone-600 text-sm italic">
+          Scroll through the comparisons below to see how his insights anticipated our present moment.
+        </p>
+      </div>
+    </section>
+
+    <!-- Navigation Dots -->
+    <nav id="nav-dots" class="fixed right-4 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col gap-2" role="navigation" aria-label="Comparison navigation">
+      <!-- Populated by JavaScript -->
+    </nav>
+
+    <!-- Comparisons Container -->
+    <main id="comparisons" class="py-16">
+      <div id="comparisons-container" class="max-w-6xl mx-auto px-4">
+        <!-- Populated by JavaScript -->
+      </div>
+    </main>
+
+    <!-- Next/Prev Navigation -->
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-4 bg-white border border-stone-300 rounded-full shadow-lg px-4 py-2" aria-label="Comparison navigation">
+      <button id="prev-btn" class="p-2 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-full transition-colors disabled:opacity-30 disabled:cursor-not-allowed" aria-label="Previous comparison">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+      </button>
+      <span id="nav-counter" class="text-sm text-stone-600 font-mono px-2">1 / 7</span>
+      <button id="next-btn" class="p-2 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-full transition-colors disabled:opacity-30 disabled:cursor-not-allowed" aria-label="Next comparison">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </button>
+    </nav>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 bg-stone-100 border-t border-stone-200">
+      <div class="max-w-4xl mx-auto text-center">
+        <p class="text-sm text-stone-600 mb-4">
+          From <span class="font-display">The Impossible Press</span> by Jay Rosen
+        </p>
+        <p class="text-xs text-stone-500 mb-6">
+          Ph.D. Dissertation, New York University, 1986
+        </p>
+        <a href="/wp-content/rosen-archive/tools/dissertation-reader/dist/"
+           class="inline-block text-sm bg-stone-800 text-white px-6 py-2 rounded hover:bg-stone-700 transition-colors">
+          Read the Full Dissertation
+        </a>
+        <p class="text-xs text-stone-400 mt-8">
+          Part of the Jay Rosen Digital Archive
+        </p>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>

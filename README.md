@@ -17,12 +17,14 @@ This monorepo contains:
 
 | Directory | Description |
 |-----------|-------------|
-| **Root** (`/`) | Zero-build frontend application (React, HTM, Tailwind via CDN) |
+| **`/frontend`** | Zero-build React application (React, HTM, Tailwind via CDN) |
+| **`/features`** | Standalone feature tools (comparison-tool, glossary, timeline, etc.) |
+| **`/data`** | Archive data files (JSON, CSV exports) |
 | **`/backend`** | Python data pipeline for scraping, AI analysis, and archiving |
 | **`/dissertation`** | Full dissertation PDFs (stored via Git LFS) and transcribed markdown |
-| **`/data-tools`** | R scripts and planning documents for data analysis |
+| **`/tools`** | Development tools (dataexplorer, dataviz) and analysis scripts |
+| **`/archived`** | Legacy code and archived features for reference |
 | **`/docs`** | Documentation, agent personas, and project narrative |
-| **`/tools`** | Additional presentation tools (dataexplorer, dataviz, dissertation-reader, etc.) |
 | **`/release-assets`** | Promotional materials and release documentation |
 
 ---
@@ -58,13 +60,13 @@ The frontend uses a **zero-build static architecture** designed for simple deplo
 #### 📜 Dissertation Presentation Tools (9 Tools)
 *   **Interactive Mind Map:** Left-to-right tree visualization with auto-fit zooming, keyboard navigation, and touch support (in main archive)
 *   **Network Explorer:** Canvas-based visualization of relationships between archive records (in main archive)
-*   **"Then and Now" Comparison Tool:** 7 side-by-side 1986 vs 2025 comparisons (`/comparison-tool/`)
-*   **Glossary:** 16 key concepts with definitions and contemporary relevance (`/glossary/`)
-*   **1986 in Journalism:** Historical context—the media landscape when the dissertation was written (`/context-1986/`)
-*   **Timeline:** 14 entries tracking intellectual evolution from 1986 to 2025 (`/timeline/`)
-*   **Annotated Excerpts:** 12 key passages with 2025 commentary (`/annotated-excerpts/`)
-*   **FAQ / Ask the Dissertation:** 46 Q&A pairs, searchable, with NotebookLM integration (`/faq/`)
-*   **Dissertation Reader:** Landing page with PDF download, table of contents, citation info (`/tools/dissertation-reader/dist/`)
+*   **"Then and Now" Comparison Tool:** 7 side-by-side 1986 vs 2025 comparisons (`/features/comparison-tool/`)
+*   **Glossary:** 16 key concepts with definitions and contemporary relevance (`/features/glossary/`)
+*   **1986 in Journalism:** Historical context—the media landscape when the dissertation was written (`/features/context-1986/`)
+*   **Timeline:** 14 entries tracking intellectual evolution from 1986 to 2025 (`/features/timeline/`)
+*   **Annotated Excerpts:** 12 key passages with 2025 commentary (`/features/annotated-excerpts/`)
+*   **FAQ / Ask the Dissertation:** 46 Q&A pairs, searchable, with NotebookLM integration (`/features/faq/`)
+*   **Dissertation Reader:** Landing page with PDF download, table of contents, citation info (`/features/dissertation-reader/`)
 
 #### ♿ Accessibility
 *   **Keyboard Navigation:** Full keyboard support (arrow keys, +/-, ESC)
@@ -167,21 +169,34 @@ python src/workflow.py
 ## 📂 Full Project Structure
 
 ```text
-├── components/                  # Frontend React components
-│   ├── Explorer.js              # Network visualization
-│   ├── MindMap.js               # Dissertation mind map
-│   ├── DetailPanel.js           # Dissertation node details
-│   ├── dissertationData.js      # Full dissertation content
-│   └── ...
-├── services/
-│   └── archiveService.js        # Data fetching & caching
-├── comparison-tool/             # "Then and Now" comparisons
-├── glossary/                    # Interactive concept glossary
-├── context-1986/                # Historical context
-├── timeline/                    # Intellectual evolution timeline
-├── annotated-excerpts/          # Key passages with commentary
-├── faq/                         # FAQ (Ask the Dissertation)
-├── future-features/             # Archived features for future use
+├── index.html                   # Main entry point
+├── shared-styles.css            # Common CSS for standalone tools
+│
+├── frontend/                    # Main React application
+│   ├── App.js                   # Main frontend controller
+│   ├── index.js                 # React root mount
+│   ├── constants.js             # Configuration
+│   ├── components/              # React components
+│   │   ├── Explorer.js          # Network visualization
+│   │   ├── MindMap.js           # Dissertation mind map
+│   │   ├── DetailPanel.js       # Dissertation node details
+│   │   ├── dissertationData.js  # Full dissertation content
+│   │   └── ...
+│   └── services/
+│       └── archiveService.js    # Data fetching & caching
+│
+├── features/                    # Standalone feature tools
+│   ├── comparison-tool/         # "Then and Now" comparisons
+│   ├── glossary/                # Interactive concept glossary
+│   ├── context-1986/            # Historical context
+│   ├── timeline/                # Intellectual evolution timeline
+│   ├── annotated-excerpts/      # Key passages with commentary
+│   ├── faq/                     # FAQ (Ask the Dissertation)
+│   └── dissertation-reader/     # Dissertation PDF viewer
+│
+├── data/                        # Archive data files
+│   ├── archive-data.json        # Main archive data
+│   └── *.csv                    # CSV exports
 │
 ├── backend/                     # Python data pipeline
 │   ├── src/                     # Core source code
@@ -194,29 +209,31 @@ python src/workflow.py
 │   ├── *.pdf                    # Original PDF scans
 │   └── *.md                     # Transcribed markdown
 │
-├── data-tools/                  # Analysis tools
-│   ├── RStudio/                 # R scripts
-│   └── planning/                # Project planning docs
+├── tools/                       # Development & analysis tools
+│   ├── active/                  # Active tools (dataexplorer, dataviz)
+│   └── analysis/                # R scripts and planning docs
+│
+├── archived/                    # Legacy and archived code
+│   ├── archive-v1/              # Original archive version
+│   ├── web/                     # Promotional website
+│   └── byok-chat/               # Archived BYOK chat feature
 │
 ├── docs/                        # Documentation
 │   ├── agent-personas/          # AI persona definitions
 │   └── narrative/               # Project logs
 │
-├── tools/                       # Additional presentation tools
-│   ├── dataexplorer/            # Data explorer grid
-│   ├── dataviz/                 # Data visualization tool
-│   ├── dissertation-reader/     # Dissertation reader app
-│   ├── archive-v1/              # Original archive version (reference)
-│   └── web/                     # Promotional website
-│
 ├── release-assets/              # Promotional materials
 │   └── documentation/           # Pre-publication reports
-├── .github/workflows/           # CI/CD pipelines
-├── App.js                       # Main frontend controller
-├── constants.js                 # Configuration
-├── index.html                   # Frontend entry point
-├── shared-styles.css            # Common CSS for standalone tools
-└── CLAUDE.md                    # AI assistant instructions
+│
+├── .github/                     # GitHub configuration
+│   ├── workflows/               # CI/CD pipelines
+│   ├── ISSUE_TEMPLATE/          # Issue templates
+│   └── PULL_REQUEST_TEMPLATE.md # PR template
+│
+├── CLAUDE.md                    # AI assistant instructions
+├── SECURITY.md                  # Security policy
+├── CODE_OF_CONDUCT.md           # Community standards
+└── CONTRIBUTING.md              # Contribution guidelines
 ```
 
 ---
@@ -271,9 +288,12 @@ All workflows run automatically on pull requests to ensure code quality.
 ## 🛠️ Deployment
 
 ### Frontend (Static Hosting)
-1. Upload all `.html`, `.css`, `.js` files and the `components/`, `services/` folders
-2. For WordPress: upload to a subdirectory via FTP
-3. Ensure server serves `.js` with MIME type `application/javascript`
+1. Upload `index.html`, `shared-styles.css`, and `favicon.ico` from root
+2. Upload entire `frontend/` directory
+3. Upload entire `features/` directory
+4. Upload `data/` directory with archive data
+5. For WordPress: upload to a subdirectory via FTP
+6. Ensure server serves `.js` with MIME type `application/javascript`
 
 ### Backend (Server)
 1. Set up Python 3.10+ environment with Poetry
