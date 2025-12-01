@@ -10,6 +10,7 @@ lerna-debug.log*
 # Node
 node_modules
 dist
+!dist/tailwind.css
 !tools/dissertation-reader/dist/
 dist-ssr
 *.local

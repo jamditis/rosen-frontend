@@ -18,36 +18,8 @@
     <!-- External CSS -->
     <link rel="stylesheet" href="./index.css" />
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              body: ['"Roboto Mono"', 'monospace'],
-              display: ['"Special Elite"', 'cursive'],
-            },
-            colors: {
-              paper: '#fdfbf7',
-              card: '#ffffff',
-              stone: {
-                850: '#1c1917', // Custom dark for text
-              }
-            },
-            animation: {
-              'fade-in': 'fadeIn 0.5s ease-out forwards',
-            },
-            keyframes: {
-              fadeIn: {
-                '0%': { opacity: '0', transform: 'translateY(10px)' },
-                '100%': { opacity: '1', transform: 'translateY(0)' },
-              }
-            }
-          }
-        }
-      }
-    </script>
+    <!-- Tailwind CSS (pre-built for production) -->
+    <link rel="stylesheet" href="./dist/tailwind.css" />
   
   <!-- Import Map -->
   <script type="importmap">
@@ -56,7 +28,8 @@
     "react": "https://esm.sh/react@18.2.0",
     "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
     "htm": "https://esm.sh/htm@3.1.1",
-    "lucide-react": "https://esm.sh/lucide-react@0.292.0?deps=react@18.2.0"
+    "lucide-react": "https://esm.sh/lucide-react@0.292.0?deps=react@18.2.0",
+    "papaparse": "https://esm.sh/papaparse@5.4.1"
   }
 }
 </script>
