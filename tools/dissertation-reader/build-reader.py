@@ -17,6 +17,10 @@ def convert_markdown_to_html(md_content):
     """Simple markdown to HTML conversion"""
     html = md_content
 
+    # Remove empty markdown headers (artifacts from PDF transcription)
+    # These are lines with only # symbols and optional whitespace
+    html = re.sub(r'^#{1,6}\s*$', '', html, flags=re.MULTILINE)
+
     # Escape HTML entities first
     html = html.replace('&', '&amp;')
     html = html.replace('<', '&lt;')
