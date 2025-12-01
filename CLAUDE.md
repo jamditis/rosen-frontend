@@ -2,6 +2,14 @@
 
 This file provides context for Claude Code when working on this repository.
 
+## Project Status
+
+**STATUS: READY FOR PUBLICATION (December 2025)**
+
+All development work for the December 2025 dissertation release is complete. The archive has been fully validated and is ready for deployment to the production WordPress site.
+
+---
+
 ## Project Overview
 
 The **Jay Rosen Digital Archive (JRDA)** is a comprehensive monorepo containing:
@@ -21,7 +29,7 @@ The **Jay Rosen Digital Archive (JRDA)** is a comprehensive monorepo containing:
 - Full title: "The Impossible Press: American Journalism and the Decline of Public Life"
 - Advisor: Neil Postman
 - Central argument: The phrase "the press informs the public" obscures more than it reveals. Journalism is a transaction, not just an action. Professional standards cannot solve structural problems in the press-public relationship.
-- Being released publicly in December 2025
+- **Releasing publicly: December 2025**
 
 ---
 
@@ -117,8 +125,13 @@ The `index.html` loads the JS version. When editing, ensure changes are reflecte
 │   ├── archive-v1/               # Original archive app (reference)
 │   └── web/                      # Promotional website
 │
-├── release-assets/               # Promotional materials
+├── release-assets/               # Promotional materials and documentation
+│   └── documentation/            # Pre-publication reports and status docs
 ├── shared-styles.css             # Common CSS for all standalone tools
+├── .github/workflows/            # CI/CD pipelines
+│   ├── frontend-validation.yml   # HTML/JS/CSS validation
+│   ├── backend-tests.yml         # Python test suite
+│   └── backend-linting.yml       # Code quality checks
 ├── README.md                     # User documentation
 ├── changelog.md                  # Development history
 └── CLAUDE.md                     # This file
@@ -136,9 +149,12 @@ The `index.html` loads the JS version. When editing, ensure changes are reflecte
 
 ### Dissertation Data
 - Hardcoded in `components/dissertationData.js`
-- Contains 13 nodes: root, intro, 2 parts, 8 chapters, conclusion
+- Contains 70+ nodes covering the full dissertation structure:
+  - Root, Introduction, 2 Parts, 8 Chapters, Conclusion
+  - Detailed concept nodes for each chapter
+  - Key figure nodes with page references
 - Rich content: summaries, pull quotes, key concepts, key figures, page ranges
-- Also includes `NOTABLE_QUOTATIONS` and `KEY_THEMES` arrays
+- Also includes `NOTABLE_QUOTATIONS` (9 entries) and `KEY_THEMES` (7 entries) arrays
 
 ---
 
@@ -246,29 +262,36 @@ npx serve .
 
 ---
 
-## December 2025 Dissertation Release Plans
+## December 2025 Dissertation Release
+
+**STATUS: ALL TOOLS COMPLETE AND VALIDATED**
 
 The dissertation is being released publicly with multiple presentation formats:
 
-### Implemented
+### Implemented and Ready
 1. **Interactive Mind Map** - Tree visualization of dissertation structure (in main archive)
 2. **"Then and Now" Comparison Tool** - 7 side-by-side 1986 vs 2025 comparisons (`/comparison-tool/`)
 3. **Glossary** - 16 key concepts, filterable, with detail panel (`/glossary/`)
 4. **1986 in Journalism** - Historical context, media landscape, what didn't exist (`/context-1986/`)
 5. **Timeline** - 14 entries from dissertation to 2025, filterable by type (`/timeline/`)
 6. **Annotated Excerpts** - 12 key passages with 2025 commentary (`/annotated-excerpts/`)
-7. **FAQ / Ask the Dissertation** - 25+ pre-generated Q&A pairs, searchable (`/faq/`)
+7. **FAQ / Ask the Dissertation** - 46 Q&A pairs, searchable, NotebookLM integration (`/faq/`)
+8. **Dissertation Reader** - Landing page with PDF download, ToC, citation info (`/tools/dissertation-reader/dist/`)
+9. **Network Explorer** - Canvas visualization of archive record relationships (in main archive)
 
 ### Archived (developed but not active)
-8. **BYOK Chat Interface** - Interactive Claude chat using user's own API key (`/future-features/byok-chat/`)
+10. **BYOK Chat Interface** - Interactive Claude chat using user's own API key (`/future-features/byok-chat/`)
 
-### Planned (requires external content/production)
-9. Audio commentary / office hours (requires Jay to record)
-10. "What I got wrong" essay (requires Jay to write)
-11. "The chapter I'd add today" essay (requires Jay to write)
-12. Reading group format with discussion prompts
-13. Collaborative annotation (Hypothesis integration)
-14. Video essay (requires video production)
+### Future Development (requires external content)
+- Audio commentary / office hours (requires Jay to record)
+- "What I got wrong" essay (requires Jay to write)
+- "The chapter I'd add today" essay (requires Jay to write)
+- Reading group format with discussion prompts
+- Collaborative annotation (Hypothesis integration)
+- Video essay (requires video production)
+
+### Pre-Publication Report
+See `release-assets/documentation/pre-publication-report.md` for the full status report.
 
 ---
 
@@ -279,11 +302,11 @@ The dissertation is being released publicly with multiple presentation formats:
 3. **Standalone tools go in subdirectories** - Like `comparison-tool/`
 4. **Update documentation** - Keep README.md, changelog.md, and this file current
 5. **Dissertation content is sacred** - Quotes and content from `dissertationData.js` are accurate citations
-6. **Jay Rosen's voice** - 2025 commentary should be placeholder text for Jay to revise, or clearly marked as draft
-7. **WordPress deployment** - Final tools will be uploaded via FTP to a WordPress domain
-8. **Backend uses Poetry** - Python dependencies managed via Poetry, not pip directly
-9. **Dissertation source in /dissertation/** - Full PDFs (managed via Git LFS) and transcription available there
-10. **Git LFS required** - Repository uses Git LFS for large PDF files; install before cloning
+6. **WordPress deployment** - Final tools will be uploaded via FTP to a WordPress domain
+7. **Backend uses Poetry** - Python dependencies managed via Poetry, not pip directly
+8. **Dissertation source in /dissertation/** - Full PDFs (managed via Git LFS) and transcription available there
+9. **Git LFS required** - Repository uses Git LFS for large PDF files; install before cloning
+10. **Always check PROJECT_LOG.md** - Review `docs/narrative/PROJECT_LOG.md` before major edits for context
 
 ---
 
@@ -317,10 +340,56 @@ Place Google Cloud credentials in `backend/google_credentials.json`.
 
 ### Commands
 ```bash
-python src/workflow.py                      # Main pipeline
+python src/workflow.py                      # Main pipeline (now supports Twitter, Tumblr, PDFs)
 python tools/diagnostics/data_deduper.py    # Clean data
 python tools/backfill/backfill_worker.py    # Fill missing fields
 ```
+
+### NEW: Content Type Processors (Dec 1, 2025)
+
+The backend now supports three additional content types beyond articles and videos:
+
+**Processors Location:** `backend/src/rosen_scraper/processors/`
+
+1. **Twitter/X Processor** (`twitter_processor.py`)
+   - Extracts threads and individual tweets
+   - Nitter proxy with 4 fallback instances + Playwright fallback
+   - Handles both `twitter.com` and `x.com` URLs
+   - Full thread extraction with numbering and quote tweets
+
+2. **Tumblr Processor** (`tumblr_processor.py`)
+   - Processes Tumblr export files (JSON, HTML) and live URLs
+   - Supports 8 post types: text, quote, link, photo, video, audio, answer, chat
+   - OCR-ready for archive exports
+   - Generates `TUMBLR-XXXXX` IDs
+
+3. **Newspaper Clipping Processor** (`clipping_processor.py`)
+   - OCR text cleanup (artifacts, line breaks, hyphenation)
+   - Metadata extraction (publication, date, author, page)
+   - Supports 12 major publications (NYT, WSJ, WP, LAT, etc.)
+   - Generates publication-specific IDs (`NYT-XXXXX`, `WSJ-XXXXX`, `CLIP-XXXXX`)
+   - Confidence scoring for extracted metadata
+
+**Dispatcher Integration:**
+- `dispatcher.py` automatically routes URLs to appropriate processors
+- All new processors integrated with AI analysis pipeline
+- Schema updated with "Tumblr Post" and "Newspaper Clipping" content formats
+
+**Status:** ✅ Backend fully operational. Can process Twitter, Tumblr, and PDF content. Frontend display updates pending.
+
+---
+
+## CI/CD Pipelines
+
+GitHub Actions workflows automatically validate code on push/PR:
+
+| Workflow | Purpose | Triggers |
+|----------|---------|----------|
+| `frontend-validation.yml` | Validates HTML syntax, JS syntax, CDN links | Frontend file changes |
+| `backend-tests.yml` | Runs pytest on backend code | Backend file changes |
+| `backend-linting.yml` | Runs ruff, black, mypy | Backend file changes |
+
+All workflows run automatically on pull requests to ensure code quality before merging.
 
 ---
 

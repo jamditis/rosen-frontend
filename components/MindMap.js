@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { html } from '../html.js';
-import { ChevronDown, ChevronRight, ZoomIn, ZoomOut, Maximize2, Focus } from 'lucide-react';
+import { ChevronDown, ChevronRight, ZoomIn, ZoomOut, Maximize2, Focus, HelpCircle } from 'lucide-react';
 
 // Enhanced node type styles with gradients and shadows
 const NODE_STYLES = {
@@ -390,6 +390,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const [isAnimating, setIsAnimating] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
   const animationRef = useRef(null);
 
   // Add child counts to nodes
@@ -792,9 +793,63 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
         >
           Expand All
         </button>
-        <div className="hidden lg:block text-xs text-stone-400 bg-white/90 px-3 py-2 rounded-lg shadow-md border border-stone-200">
-          <span className="font-semibold text-stone-600">Tip:</span> Click to expand · ESC to close
+        <button
+          onClick=${() => setShowShortcuts(!showShortcuts)}
+          className="p-2.5 sm:p-2 bg-white hover:bg-stone-50 text-stone-600 rounded-lg shadow-md border border-stone-200 transition-all hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
+          title="Keyboard shortcuts"
+          aria-label="Show keyboard shortcuts"
+        >
+          <${HelpCircle} className="w-5 h-5" />
+        </button>
+      </div>
+
+      <!-- Keyboard Shortcuts Panel -->
+      ${showShortcuts && html`
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 bg-white rounded-lg shadow-xl border border-stone-300 p-4 max-w-sm">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold text-stone-800 text-sm">Keyboard Shortcuts</h3>
+            <button
+              onClick=${() => setShowShortcuts(false)}
+              className="text-stone-400 hover:text-stone-600 transition-colors"
+              aria-label="Close shortcuts panel"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
+          <div className="space-y-2 text-xs">
+            <div className="flex justify-between items-center">
+              <span className="text-stone-600">Zoom in</span>
+              <kbd className="px-2 py-1 bg-stone-100 rounded border border-stone-300 font-mono text-stone-700">+</kbd>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-stone-600">Zoom out</span>
+              <kbd className="px-2 py-1 bg-stone-100 rounded border border-stone-300 font-mono text-stone-700">-</kbd>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-stone-600">Reset zoom</span>
+              <kbd className="px-2 py-1 bg-stone-100 rounded border border-stone-300 font-mono text-stone-700">0</kbd>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-stone-600">Pan view</span>
+              <div className="flex gap-1">
+                <kbd className="px-2 py-1 bg-stone-100 rounded border border-stone-300 font-mono text-stone-700">↑</kbd>
+                <kbd className="px-2 py-1 bg-stone-100 rounded border border-stone-300 font-mono text-stone-700">↓</kbd>
+                <kbd className="px-2 py-1 bg-stone-100 rounded border border-stone-300 font-mono text-stone-700">←</kbd>
+                <kbd className="px-2 py-1 bg-stone-100 rounded border border-stone-300 font-mono text-stone-700">→</kbd>
+              </div>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-stone-600">Close panel</span>
+              <kbd className="px-2 py-1 bg-stone-100 rounded border border-stone-300 font-mono text-stone-700">Esc</kbd>
+            </div>
+            <div className="border-t border-stone-200 my-2 pt-2">
+              <p className="text-stone-500 text-[10px] italic">Click nodes to expand/collapse • Drag to pan</p>
+            </div>
+          </div>
         </div>
+      `}
       </div>
 
       <!-- SVG Canvas -->

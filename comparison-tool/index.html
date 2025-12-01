@@ -17,46 +17,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              body: ['"Roboto Mono"', 'monospace'],
-              display: ['"Special Elite"', 'cursive'],
-            },
-            colors: {
-              paper: '#fdfbf7',
-              card: '#ffffff',
-              stone: {
-                850: '#1c1917',
-              }
-            },
-            animation: {
-              'fade-in': 'fadeIn 0.5s ease-out forwards',
-              'slide-in-left': 'slideInLeft 0.6s ease-out forwards',
-              'slide-in-right': 'slideInRight 0.6s ease-out forwards',
-            },
-            keyframes: {
-              fadeIn: {
-                '0%': { opacity: '0', transform: 'translateY(10px)' },
-                '100%': { opacity: '1', transform: 'translateY(0)' },
-              },
-              slideInLeft: {
-                '0%': { opacity: '0', transform: 'translateX(-30px)' },
-                '100%': { opacity: '1', transform: 'translateX(0)' },
-              },
-              slideInRight: {
-                '0%': { opacity: '0', transform: 'translateX(30px)' },
-                '100%': { opacity: '1', transform: 'translateX(0)' },
-              }
-            }
-          }
-        }
-      }
-    </script>
+    <!-- Tailwind CSS (pre-built for production) -->
+    <link rel="stylesheet" href="../dist/tailwind.css" />
 
     <!-- Custom Styles -->
     <link rel="stylesheet" href="./styles.css" />
@@ -142,6 +104,21 @@
         <!-- Populated by JavaScript -->
       </div>
     </main>
+
+    <!-- Next/Prev Navigation -->
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-4 bg-white border border-stone-300 rounded-full shadow-lg px-4 py-2" aria-label="Comparison navigation">
+      <button id="prev-btn" class="p-2 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-full transition-colors disabled:opacity-30 disabled:cursor-not-allowed" aria-label="Previous comparison">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+      </button>
+      <span id="nav-counter" class="text-sm text-stone-600 font-mono px-2">1 / 7</span>
+      <button id="next-btn" class="p-2 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-full transition-colors disabled:opacity-30 disabled:cursor-not-allowed" aria-label="Next comparison">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </button>
+    </nav>
 
     <!-- Footer -->
     <footer class="py-12 px-4 bg-stone-100 border-t border-stone-200">

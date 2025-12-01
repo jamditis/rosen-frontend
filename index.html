@@ -12,46 +12,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
 
-    <!-- Preconnect to Google Sheets for faster CSV loading -->
-    <link rel="preconnect" href="https://docs.google.com">
-
-    <!-- Prefetch archive data sources for faster loading -->
-    <link rel="prefetch" href="https://docs.google.com/spreadsheets/d/e/2PACX-1vT-XqQXvMJNaBXVWlmXu1EyOpa_Cc6ur-pklWX1mbrWIFybZjmbE6UTIteSoCSvf0a7j5r8A6earp3H/pub?gid=928818664&single=true&output=csv" as="fetch" crossorigin="anonymous">
-    <link rel="prefetch" href="https://docs.google.com/spreadsheets/d/e/2PACX-1vT-XqQXvMJNaBXVWlmXu1EyOpa_Cc6ur-pklWX1mbrWIFybZjmbE6UTIteSoCSvf0a7j5r8A6earp3H/pub?gid=0&single=true&output=csv" as="fetch" crossorigin="anonymous">
+    <!-- Prefetch archive data for faster loading -->
+    <link rel="prefetch" href="/wp-content/rosen-archive/csv/archive-data.json" as="fetch">
 
     <!-- External CSS -->
     <link rel="stylesheet" href="./index.css" />
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              body: ['"Roboto Mono"', 'monospace'],
-              display: ['"Special Elite"', 'cursive'],
-            },
-            colors: {
-              paper: '#fdfbf7',
-              card: '#ffffff',
-              stone: {
-                850: '#1c1917', // Custom dark for text
-              }
-            },
-            animation: {
-              'fade-in': 'fadeIn 0.5s ease-out forwards',
-            },
-            keyframes: {
-              fadeIn: {
-                '0%': { opacity: '0', transform: 'translateY(10px)' },
-                '100%': { opacity: '1', transform: 'translateY(0)' },
-              }
-            }
-          }
-        }
-      }
-    </script>
+    <!-- Tailwind CSS (pre-built for production) -->
+    <link rel="stylesheet" href="./dist/tailwind.css" />
   
   <!-- Import Map -->
   <script type="importmap">

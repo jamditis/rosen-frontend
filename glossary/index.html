@@ -12,24 +12,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              body: ['"Roboto Mono"', 'monospace'],
-              display: ['"Special Elite"', 'cursive'],
-            },
-            colors: {
-              paper: '#fdfbf7',
-              card: '#ffffff',
-            }
-          }
-        }
-      }
-    </script>
+    <!-- Tailwind CSS (pre-built for production) -->
+    <link rel="stylesheet" href="../dist/tailwind.css" />
 
     <link rel="stylesheet" href="../shared-styles.css" />
     <style>
@@ -156,6 +140,24 @@
           <em><a href="/wp-content/rosen-archive/tools/dissertation-reader/dist/" class="text-stone-700 hover:text-stone-900 underline">The Impossible Press</a></em> introduces a rich vocabulary for understanding the relationship between press and public.
           Click on any concept to explore its meaning, context, and contemporary relevance.
         </p>
+
+        <!-- Search -->
+        <div class="relative max-w-md mb-6">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search concepts..."
+            class="w-full px-4 py-3 pl-12 rounded-lg border border-stone-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none transition-all"
+          />
+          <svg class="w-5 h-5 text-stone-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <button id="clear-search" class="hidden absolute right-4 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 focus:outline-none focus:ring-2 focus:ring-sky-500 rounded" aria-label="Clear search">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
 
         <!-- Category Filters -->
         <div class="flex flex-wrap gap-2 mt-6">

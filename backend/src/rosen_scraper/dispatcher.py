@@ -8,14 +8,17 @@ handler (e.g., for video, articles, etc.).
 from typing import Optional, Dict, Any
 import re
 from rosen_scraper.processors import article_processor, video_processor
+from rosen_scraper.processors.twitter_processor import TwitterProcessor
+from rosen_scraper.processors.tumblr_processor import TumblrProcessor
+from rosen_scraper.processors.clipping_processor import ClippingProcessor
 
 def dispatch_url(url: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
     Determines the content type of a URL and returns the appropriate processor.
 
-    This function inspects the provided URL to identify its source (e.g., YouTube)
-    and decides which processing pipeline should handle it. The default is 'article'
-    if no other specific content type is matched.
+    This function inspects the provided URL to identify its source (e.g., YouTube,
+    Twitter, Tumblr, PDF) and decides which processing pipeline should handle it.
+    The default is 'article' if no other specific content type is matched.
 
     Args:
         url (str): The URL to be dispatched to a content processor.
@@ -24,12 +27,44 @@ def dispatch_url(url: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     Returns:
         dict: A dictionary containing the processed data, or None if an error occurs.
     """
-    # Use regular expressions to check if the URL is a YouTube link.
-    # This covers both standard youtube.com URLs and shortened youtu.be links.
+    # YouTube videos
     if re.search(r"(youtube\.com|youtu\.be)", url):
         return video_processor.process_video(url, schema)
+
+    # Twitter/X posts
+    elif re.search(r"(twitter\.com|x\.com)/.*?/status/", url):
+        processor = TwitterProcessor()
+        result = processor.process(url)
+        # If processing succeeded, add schema for AI analysis
+        if result.get('status') == 'success' and result.get('raw_text'):
+            # Run AI analysis on the extracted text
+            ai_result = article_processor._run_ai_analysis(result['raw_text'], schema)
+            if ai_result:
+                result.update(ai_result)
+        return result
+
+    # Tumblr posts
+    elif re.search(r"\.tumblr\.com", url):
+        processor = TumblrProcessor()
+        result = processor.process(url)
+        if result.get('status') == 'success' and result.get('raw_text'):
+            ai_result = article_processor._run_ai_analysis(result['raw_text'], schema)
+            if ai_result:
+                result.update(ai_result)
+        return result
+
+    # PDF newspaper clippings
+    elif url.lower().endswith('.pdf') or 'pdf' in url.lower():
+        processor = ClippingProcessor()
+        result = processor.process(url)
+        if result.get('status') == 'success' and result.get('raw_text'):
+            ai_result = article_processor._run_ai_analysis(result['raw_text'], schema)
+            if ai_result:
+                result.update(ai_result)
+        return result
+
     else:
-        # If the URL is not a video, default to the article processor.
+        # If the URL is not a video or special content type, default to the article processor.
         return article_processor.process_article(url, schema)
 
 def reprocess_text(raw_text: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:

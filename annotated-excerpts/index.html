@@ -12,23 +12,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              body: ['"Roboto Mono"', 'monospace'],
-              display: ['"Special Elite"', 'cursive'],
-            },
-            colors: {
-              paper: '#fdfbf7',
-            }
-          }
-        }
-      }
-    </script>
+    <!-- Tailwind CSS (pre-built for production) -->
+    <link rel="stylesheet" href="../dist/tailwind.css" />
 
     <link rel="stylesheet" href="../shared-styles.css" />
     <style>
@@ -102,7 +87,7 @@
           Each is presented with its original context, a 2025 reflection, and connections to contemporary media reality.
         </p>
         <p class="text-sm text-stone-500 italic">
-          Commentary marked "[2025 reflection]" represents placeholder text for Jay Rosen to revise.
+          The 2025 reflections represent contextual commentary connecting the 1986 dissertation to contemporary media realities.
         </p>
       </div>
     </section>
@@ -128,6 +113,21 @@
     <!-- Navigation Dots -->
     <nav id="nav-dots" class="fixed right-4 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col gap-2 no-print" role="navigation" aria-label="Excerpt navigation">
       <!-- Populated by JavaScript -->
+    </nav>
+
+    <!-- Next/Prev Navigation -->
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 flex items-center gap-4 bg-white border border-stone-300 rounded-full shadow-lg px-4 py-2 no-print" aria-label="Excerpt navigation">
+      <button id="prev-btn" class="p-2 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-full transition-colors disabled:opacity-30 disabled:cursor-not-allowed" aria-label="Previous excerpt">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+      </button>
+      <span id="nav-counter" class="text-sm text-stone-600 font-mono px-2">1 / 12</span>
+      <button id="next-btn" class="p-2 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-full transition-colors disabled:opacity-30 disabled:cursor-not-allowed" aria-label="Next excerpt">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </button>
     </nav>
 
     <!-- Footer -->

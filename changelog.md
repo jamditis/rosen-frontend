@@ -1,5 +1,189 @@
-
 # Changelog - Jay Rosen Digital Archive
+
+---
+
+*Session Date: December 1, 2025*
+
+## Pre-Publication Final Checks Complete
+
+### Project Status: READY FOR PUBLICATION
+
+All development work for the December 2025 dissertation release is complete.
+
+### Merged Pull Requests (12 PRs)
+The following PRs were merged and closed:
+
+1. **PR #35** - Migrate PDFs to Git LFS
+2. **PR #33** - Review and fix TODO comments
+3. **PR #42** - Improve path handling with pathlib
+4. **PR #36** - Add GitHub Actions CI/CD
+5. **PR #49** - Fix open issues
+6. **PR #38** - Add integration tests for backend
+7. **PR #43** - Add type hints to backend Python code
+8. **PR #37** - Add Gemini API rate limiting
+9. **PR #34** - Remove hardcoded row ranges in workflow.py
+10. **PR #39** - Fix broken imports after monorepo merge
+11. **PR #32** - Relax Python requirement to 3.10+
+12. **PR #40, #41** - Add backend .env.example and README
+
+### Validation Results
+- **JavaScript Syntax**: All 28 files pass
+- **HTML Structure**: All 17 pages valid
+- **TODO/FIXME Comments**: None remaining in frontend
+- **Accessibility**: Skip links, ARIA labels present on all pages
+
+### Pre-Publication Report
+- Created comprehensive report at `release-assets/documentation/pre-publication-report.md`
+- Covers all tools, deployment checklist, and items requiring Jay's input
+
+### Documentation Updates
+- Updated CLAUDE.md with publication status and CI/CD section
+- Updated README.md with status badges and tool counts
+- Updated changelog.md (this file)
+
+---
+
+*Session Date: December 1, 2025*
+
+## Major UX Polish & Quality-of-Life Improvements
+
+### Main Archive (`App.js`)
+- **Error Handling**: Added comprehensive error state with user-friendly messaging
+  - Displays error message when data loading fails
+  - Includes reload button for easy recovery
+  - Prevents silent failures
+- **Back to Top Button**: Added floating back-to-top button
+  - Appears after scrolling 500px
+  - Smooth scroll animation
+  - Hidden when near top of page
+- **Active Filter Count Badge**: Added visual indicator showing number of active filters
+  - Red badge on filter button showing count
+  - Updates dynamically as filters change
+  - Improves filter awareness
+
+### Glossary (`/glossary/`)
+- **Search Functionality**: Added real-time concept search
+  - Searches across term, short definition, and full definition
+  - Combined with category filtering
+  - Clear search button
+  - Shows result count
+  - Accessible with proper ARIA labels
+
+### Explorer Network Visualization (`components/Explorer.js`)
+- **Color Legend**: Added category-to-color mapping legend
+  - Shows which colors represent which categories
+  - Fixed position in bottom-left
+  - Alphabetically sorted
+  - Improves visualization understanding
+
+### FAQ / "Ask the Dissertation" (`/faq/`)
+- **Permalinks**: Added shareable links to individual questions
+  - Copy link button on each question
+  - URL hash support for direct linking
+  - Auto-opens and scrolls to linked question on page load
+  - Updates URL when question is opened
+- **Expand/Collapse All**: Added bulk control buttons
+  - Expand all visible questions at once
+  - Collapse all questions with one click
+  - Positioned in header for easy access
+
+### Comparison Tool (`/comparison-tool/`)
+- **Next/Prev Navigation**: Added floating navigation controls
+  - Fixed position at bottom center
+  - Shows current position (e.g., "3 / 7")
+  - Prev/Next buttons with disabled states
+  - Works alongside existing keyboard navigation (arrows, j/k)
+  - Updates as user scrolls
+
+### Annotated Excerpts (`/annotated-excerpts/`)
+- **Next/Prev Navigation**: Added floating navigation controls
+  - Fixed position at bottom center
+  - Shows current position (e.g., "5 / 12")
+  - Prev/Next buttons with disabled states
+  - Works alongside existing keyboard navigation (arrows, j/k)
+  - Respects active filters
+
+### Mind Map (`components/MindMap.js`)
+- **Keyboard Shortcuts Documentation**: Added help panel
+  - Help button (? icon) in control panel
+  - Modal showing all keyboard shortcuts:
+    - `+` / `-` for zoom
+    - `0` for reset zoom
+    - Arrow keys for panning
+    - `Esc` for closing panel
+  - Styled with KBD elements
+  - Includes usage tips
+
+### 1986 Context (`/context-1986/`)
+- **Table of Contents Navigation**: Added sticky TOC
+  - Links to all 4 main sections
+  - Highlights active section while scrolling
+  - Smooth scroll navigation
+  - Sticky positioning below header
+
+### Overall Impact
+- **11 major improvements** across 8 different tools/pages
+- Significantly improved discoverability and usability
+- Better navigation and wayfinding
+- Enhanced accessibility
+- Professional polish for December 2, 2025 launch
+
+---
+
+*Session Date: December 1, 2025*
+
+## Dissertation Launch Readiness (Dec 2, 2025)
+
+### Content Finalization for Soft Launch
+- **Annotated Excerpts Updates** (`/annotated-excerpts/`)
+  - Removed `[2025 reflection]` placeholder markers from all 12 excerpts
+  - Updated intro note to reflect final commentary status
+  - Updated HTML page to match data.js changes
+  - All 2025 reflections now production-ready
+
+### Pre-Launch Validation
+- **JavaScript Syntax Checks**: Validated all 7 dissertation tools
+  - ✅ Comparison Tool - No syntax errors
+  - ✅ Glossary - No syntax errors
+  - ✅ 1986 Context - No syntax errors
+  - ✅ Timeline - No syntax errors
+  - ✅ Annotated Excerpts - No syntax errors
+  - ✅ FAQ - No syntax errors
+  - ✅ Mind Map Components - No syntax errors
+
+- **External Links Verified**
+  - NotebookLM link confirmed in FAQ: `https://notebooklm.google.com/notebook/d26d326e-20ec-46dc-b9b4-2c752b90e607`
+  - Dissertation PDF reader links consistent: `/wp-content/rosen-archive/tools/dissertation-reader/dist/`
+
+### All 7 Dissertation Tools Ready for Launch
+1. Interactive Mind Map (in main archive)
+2. "Then and Now" Comparison Tool (7 entries)
+3. Glossary (16 key concepts)
+4. 1986 in Journalism Context
+5. Timeline (14 entries)
+6. Annotated Excerpts (12 passages)
+7. FAQ / "Ask the Dissertation" (46 Q&A pairs)
+
+### Backend: New Content Type Integration (Phase 1)
+- **Processors Added** (`backend/src/rosen_scraper/processors/`)
+  - `twitter_processor.py` - Twitter/X thread extraction with Nitter proxy + Playwright fallback
+  - `tumblr_processor.py` - Tumblr post processing for exports and live URLs
+  - `clipping_processor.py` - PDF newspaper clipping OCR and metadata extraction
+
+- **Dispatcher Updated** (`backend/src/rosen_scraper/dispatcher.py`)
+  - Added routing for Twitter/X URLs (`twitter.com`, `x.com`)
+  - Added routing for Tumblr URLs (`.tumblr.com`)
+  - Added routing for PDF files (newspaper clippings)
+  - All new processors integrated with AI analysis pipeline
+
+- **Schema Updated** (`backend/schema.json`)
+  - Added "Tumblr Post" to `content_format` taxonomy
+  - Added "Newspaper Clipping" to `content_format` taxonomy
+  - "Tweet/Thread" already present in schema
+
+**Status:** Backend integration complete. Ready to process Twitter, Tumblr, and newspaper clipping content. Frontend display updates pending.
+
+---
 
 *Session Date: December 1, 2025*
 
