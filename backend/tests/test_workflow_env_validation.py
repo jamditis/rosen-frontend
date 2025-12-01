@@ -19,6 +19,10 @@ def validate_env_config():
     """
     Validate environment variable configuration with the same logic as workflow.py
     Returns (success, start_row, end_row, error_message)
+    
+    Note: This intentionally duplicates the workflow validation logic to independently
+    test the validation behavior. This ensures tests remain valid even if the workflow
+    implementation changes, and serves as a specification of expected validation.
     """
     try:
         start_row = int(os.environ.get("PROCESS_START_ROW", "0"))

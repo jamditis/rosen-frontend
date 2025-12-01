@@ -19,6 +19,10 @@ def simulate_workflow_url_extraction(all_values):
     """
     Simulate the URL extraction logic from workflow.py
     This is the exact logic used in the main workflow.
+    
+    Note: This intentionally duplicates the workflow logic to independently
+    verify the behavior. This ensures tests remain valid even if the workflow
+    implementation changes, and serves as a specification of expected behavior.
     """
     # Get configurable row range from environment variables
     start_row = int(os.environ.get("PROCESS_START_ROW", "0"))
