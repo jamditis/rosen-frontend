@@ -91,6 +91,9 @@ graph LR
 ```
 
 ### Setup
+
+**Requirements:** Python 3.10 or higher
+
 ```bash
 cd backend
 python -m venv venv
