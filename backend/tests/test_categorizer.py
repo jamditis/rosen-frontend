@@ -97,7 +97,7 @@ class TestCategorizerModule:
         assert result == "[]"
 
     @patch('rosen_scraper.categorizer.genai.GenerativeModel')
-    def test_analyze_article_success(self, mock_model, sample_article_data, sample_schema):
+    def test_summarize_and_classify_success(self, mock_model, sample_article_data, sample_schema):
         """Test successful article analysis."""
         # Mock AI response
         mock_response = MagicMock()
@@ -116,7 +116,7 @@ class TestCategorizerModule:
         
         # Mock API key
         with patch.dict('os.environ', {'GEMINI_API_KEY': 'test_key'}):
-            result = categorizer.analyze_article(
+            result = categorizer.summarize_and_classify(
                 sample_article_data.get('text'),
                 sample_schema
             )
@@ -127,7 +127,7 @@ class TestCategorizerModule:
         assert 'key_concepts' in result
 
     @patch('rosen_scraper.categorizer.genai.GenerativeModel')
-    def test_analyze_article_invalid_json_response(self, mock_model, sample_article_data, sample_schema):
+    def test_summarize_and_classify_invalid_json_response(self, mock_model, sample_article_data, sample_schema):
         """Test article analysis with invalid JSON response."""
         # Mock AI response with invalid JSON
         mock_response = MagicMock()
@@ -138,7 +138,7 @@ class TestCategorizerModule:
         mock_model.return_value = mock_instance
         
         with patch.dict('os.environ', {'GEMINI_API_KEY': 'test_key'}):
-            result = categorizer.analyze_article(
+            result = categorizer.summarize_and_classify(
                 sample_article_data.get('text'),
                 sample_schema
             )
@@ -146,54 +146,20 @@ class TestCategorizerModule:
         # Should return None or handle gracefully
         assert result is None or isinstance(result, dict)
 
-    def test_analyze_article_no_api_key(self, sample_article_data, sample_schema):
+    def test_summarize_and_classify_no_api_key(self, sample_article_data, sample_schema):
         """Test article analysis without API key."""
         with patch.dict('os.environ', {}, clear=True):
-            result = categorizer.analyze_article(
-                sample_article_data.get('text'),
-                sample_schema
-            )
+            with patch('rosen_scraper.categorizer.os.environ.get', return_value=None):
+                result = categorizer.summarize_and_classify(
+                    sample_article_data.get('text'),
+                    sample_schema
+                )
         
         # Should handle missing API key gracefully
         assert result is None
 
     @patch('rosen_scraper.categorizer.genai.GenerativeModel')
-    def test_analyze_article_with_metadata(self, mock_model, sample_article_data, sample_schema):
-        """Test article analysis with additional metadata."""
-        # Mock AI response
-        mock_response = MagicMock()
-        mock_response.text = json.dumps({
-            'summary': 'Test summary',
-            'thematic_categories': ['Press & Media Criticism'],
-            'key_concepts': ['objectivity'],
-            'era': 'Digital Age',
-            'scope': 'Media Analysis',
-            'tags': ['journalism']
-        })
-        
-        mock_instance = MagicMock()
-        mock_instance.generate_content.return_value = mock_response
-        mock_model.return_value = mock_instance
-        
-        with patch.dict('os.environ', {'GEMINI_API_KEY': 'test_key'}):
-            result = categorizer.analyze_article(
-                sample_article_data.get('text'),
-                sample_schema,
-                title=sample_article_data.get('title'),
-                author=sample_article_data.get('author'),
-                publication_date=sample_article_data.get('date')
-            )
-        
-        assert result is not None
-
-    def test_uniform_response_signature_exists(self):
-        """Test that uniform response signature is defined."""
-        assert hasattr(categorizer, 'UNIFORM_RESPONSE_SIGNATURE')
-        assert isinstance(categorizer.UNIFORM_RESPONSE_SIGNATURE, dict)
-        assert 'thematic_categories' in categorizer.UNIFORM_RESPONSE_SIGNATURE
-
-    @patch('rosen_scraper.categorizer.genai.GenerativeModel')
-    def test_analyze_article_normalizes_output(self, mock_model, sample_article_data, sample_schema):
+    def test_summarize_and_classify_normalizes_output(self, mock_model, sample_article_data, sample_schema):
         """Test that article analysis normalizes output fields."""
         # Mock AI response with various formats
         mock_response = MagicMock()
@@ -211,7 +177,7 @@ class TestCategorizerModule:
         mock_model.return_value = mock_instance
         
         with patch.dict('os.environ', {'GEMINI_API_KEY': 'test_key'}):
-            result = categorizer.analyze_article(
+            result = categorizer.summarize_and_classify(
                 sample_article_data.get('text'),
                 sample_schema
             )

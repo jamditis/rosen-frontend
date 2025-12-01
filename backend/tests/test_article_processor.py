@@ -95,8 +95,8 @@ class TestArticleProcessor:
         assert result is None
 
     @patch('rosen_scraper.processors.article_processor._run_scraping')
-    @patch('rosen_scraper.processors.article_processor.categorizer.analyze_article')
-    def test_process_article_success(self, mock_analyze, mock_scrape, sample_article_data, sample_schema):
+    @patch('rosen_scraper.processors.article_processor.categorizer.summarize_and_classify')
+    def test_process_article_success(self, mock_summarize, mock_scrape, sample_article_data, sample_schema):
         """Test full article processing pipeline."""
         # Mock scraping success
         mock_scrape.return_value = sample_article_data
@@ -108,7 +108,7 @@ class TestArticleProcessor:
             'concepts': ['objectivity'],
             'sentiment': 'neutral'
         }
-        mock_analyze.return_value = analysis_result
+        mock_summarize.return_value = analysis_result
         
         url = "https://example.com/test"
         result = article_processor.process_article(url, sample_schema)
