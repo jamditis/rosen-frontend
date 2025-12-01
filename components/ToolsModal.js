@@ -19,7 +19,7 @@ const TOOLS = {
       name: 'Then & Now',
       description: '1986 vs 2025 comparisons',
       icon: Zap,
-      href: '/comparison-tool/',
+      href: '/wp-content/rosen-archive/comparison-tool/',
       status: 'ready'
     },
     {
@@ -27,7 +27,7 @@ const TOOLS = {
       name: 'Glossary',
       description: 'Key concepts defined',
       icon: BookOpen,
-      href: '/glossary/',
+      href: '/wp-content/rosen-archive/glossary/',
       status: 'ready'
     },
     {
@@ -35,7 +35,7 @@ const TOOLS = {
       name: 'Timeline',
       description: '40 years of ideas',
       icon: Calendar,
-      href: '/timeline/',
+      href: '/wp-content/rosen-archive/timeline/',
       status: 'ready'
     },
     {
@@ -43,7 +43,7 @@ const TOOLS = {
       name: 'Annotated Excerpts',
       description: 'Key passages with commentary',
       icon: FileText,
-      href: '/annotated-excerpts/',
+      href: '/wp-content/rosen-archive/annotated-excerpts/',
       status: 'ready'
     },
     {
@@ -51,7 +51,7 @@ const TOOLS = {
       name: '1986 Context',
       description: 'The media landscape then',
       icon: Tv,
-      href: '/context-1986/',
+      href: '/wp-content/rosen-archive/context-1986/',
       status: 'ready'
     },
     {
@@ -59,7 +59,7 @@ const TOOLS = {
       name: 'FAQ',
       description: 'Questions & answers',
       icon: HelpCircle,
-      href: '/faq/',
+      href: '/wp-content/rosen-archive/faq/',
       status: 'ready'
     },
     {
@@ -67,7 +67,7 @@ const TOOLS = {
       name: 'Dissertation Reader',
       description: 'Read the full text',
       icon: BookMarked,
-      href: '/tools/dissertation-reader/dist/',
+      href: '/wp-content/rosen-archive/tools/dissertation-reader/dist/',
       status: 'beta'
     }
   ],
@@ -85,7 +85,7 @@ const TOOLS = {
       name: 'Data Visualization',
       description: 'Charts and analysis',
       icon: BarChart3,
-      href: '/tools/dataviz/dataviz.html',
+      href: '/wp-content/rosen-archive/tools/dataviz/dataviz.html',
       status: 'beta'
     }
   ]
