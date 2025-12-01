@@ -98,7 +98,7 @@ The `index.html` loads the JS version. When editing, ensure changes are reflecte
 │   └── schema.json               # Data schema
 │
 ├── dissertation/                 # Dissertation source materials
-│   ├── *.pdf                     # Original PDF scans
+│   ├── *.pdf                     # Original PDF scans (stored via Git LFS)
 │   ├── *.md                      # Transcribed markdown
 │   └── build_unified_pdf.py      # PDF builder script
 │
@@ -282,7 +282,8 @@ The dissertation is being released publicly with multiple presentation formats:
 6. **Jay Rosen's voice** - 2025 commentary should be placeholder text for Jay to revise, or clearly marked as draft
 7. **WordPress deployment** - Final tools will be uploaded via FTP to a WordPress domain
 8. **Backend uses Poetry** - Python dependencies managed via Poetry, not pip directly
-9. **Dissertation source in /dissertation/** - Full PDFs and transcription available there
+9. **Dissertation source in /dissertation/** - Full PDFs (managed via Git LFS) and transcription available there
+10. **Git LFS required** - Repository uses Git LFS for large PDF files; install before cloning
 
 ---
 
