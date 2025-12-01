@@ -1,8 +1,18 @@
 # Release Assets
 
+**Status: Ready for December 2025 Publication**
+
 This directory contains all assets needed for the public release of:
 1. **"The Impossible Press"** - Jay Rosen's 1986 dissertation
 2. **Jay Rosen Digital Archive** - The comprehensive 36-year archive
+
+## Pre-Publication Report
+
+See **`documentation/pre-publication-report.md`** for the comprehensive status report including:
+- All implemented tools and features
+- Validation results
+- Deployment checklist
+- Items requiring Jay's input
 
 ## Directory Structure
 

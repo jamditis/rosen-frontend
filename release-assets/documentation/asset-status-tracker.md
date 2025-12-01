@@ -1,6 +1,8 @@
 # Asset Status Tracker
 
-**Last Updated:** December 2025
+**Last Updated:** December 1, 2025
+
+**Overall Status:** Ready for Publication
 
 ---
 
@@ -8,11 +10,38 @@
 
 Track completion status of all release assets.
 
+### Pre-Publication Report
+See `pre-publication-report.md` for the comprehensive technical validation report.
+
 **Legend:**
 - ✅ Complete
 - 🔄 In Progress
 - 📝 Draft
 - ❌ Not Started
+
+---
+
+## Frontend Tools (Code Complete)
+
+### Dissertation Presentation Tools
+| Tool | Status | Location | Notes |
+|------|--------|----------|-------|
+| Interactive Mind Map | ✅ | Main archive | 70+ nodes, keyboard/touch support |
+| Network Explorer | ✅ | Main archive | Canvas visualization |
+| Then and Now | ✅ | `/comparison-tool/` | 7 comparisons |
+| Glossary | ✅ | `/glossary/` | 16 concepts |
+| 1986 in Journalism | ✅ | `/context-1986/` | Historical context |
+| Timeline | ✅ | `/timeline/` | 14 entries |
+| Annotated Excerpts | ✅ | `/annotated-excerpts/` | 12 passages |
+| FAQ | ✅ | `/faq/` | 46 Q&A pairs |
+| Dissertation Reader | ✅ | `/tools/dissertation-reader/dist/` | Landing page |
+
+### Infrastructure
+| Component | Status | Notes |
+|-----------|--------|-------|
+| CI/CD Pipelines | ✅ | GitHub Actions (frontend + backend) |
+| Git LFS | ✅ | PDFs tracked |
+| Documentation | ✅ | CLAUDE.md, README.md updated |
 
 ---
 
@@ -142,12 +171,15 @@ See `/release-assets/documentation/data-processing-status.md` for detailed requi
 
 | Category | Total | Complete | In Progress | Not Started |
 |----------|-------|----------|-------------|-------------|
+| **Frontend Tools** | **12** | **12** | **0** | **0** |
 | Dissertation | 10 | 10 | 0 | 0 |
 | Archive Launch | 10 | 11 | 0 | 0 |
 | Promotional | 5 | 5 | 0 | 0 |
 | Visual | 15 | 2 | 0 | 13 |
 | Data Processing | 5 | 1 | 3 | 1 |
-| **TOTAL** | **45** | **29** | **3** | **13** |
+| **TOTAL** | **57** | **41** | **3** | **13** |
+
+**Note:** All frontend tools and infrastructure are code-complete and validated. Remaining items are primarily visual assets and data processing tasks.
 
 ---
 
@@ -177,4 +209,4 @@ See `/release-assets/documentation/data-processing-status.md` for detailed requi
 
 ---
 
-*Last Updated: December 2025*
+*Last Updated: December 1, 2025*
