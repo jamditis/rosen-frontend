@@ -12,6 +12,7 @@ import trafilatura
 from playwright.sync_api import sync_playwright
 from playwright_stealth import Stealth
 import os
+from html import escape
 from google import genai
 from google.genai.types import Tool, GenerateContentConfig
 
@@ -139,14 +140,14 @@ def fetch_article_content(url):
         mock_html = f"""
         <html>
         <head>
-            <title>{url_context_data.get('title', '')}</title>
-            <meta name="author" content="{url_context_data.get('author', '')}">
-            <meta name="publication" content="{url_context_data.get('original_publication', '')}">
+            <title>{escape(url_context_data.get('title', ''))}</title>
+            <meta name="author" content="{escape(url_context_data.get('author', ''))}">
+            <meta name="publication" content="{escape(url_context_data.get('original_publication', ''))}">
         </head>
         <body>
             <article>
-                <h1>{url_context_data.get('title', '')}</h1>
-                <div class="content">{url_context_data.get('text', '')}</div>
+                <h1>{escape(url_context_data.get('title', ''))}</h1>
+                <div class="content">{escape(url_context_data.get('text', ''))}</div>
             </article>
         </body>
         </html>
