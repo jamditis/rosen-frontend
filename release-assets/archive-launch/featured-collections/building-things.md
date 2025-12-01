@@ -83,7 +83,7 @@ Records in the archive that discuss these projects can be found by:
   "title": "Building Things",
   "description": "Key projects and initiatives in Jay Rosen's work as a builder of journalism infrastructure",
   "curator": "Joe Amditis",
-  "created": "November 2025",
+  "created": "December 2025",
   "themes": ["participation", "experimentation", "education"]
 }
 ```
@@ -96,4 +96,4 @@ Records in the archive that discuss these projects can be found by:
 
 ---
 
-*Last Updated: November 2025*
+*Last Updated: December 2025*

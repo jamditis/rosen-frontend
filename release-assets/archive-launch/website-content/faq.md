@@ -197,4 +197,4 @@ For bugs, broken links, or technical problems with the archive interface, contac
 
 ---
 
-*Last Updated: November 2025*
+*Last Updated: December 2025*

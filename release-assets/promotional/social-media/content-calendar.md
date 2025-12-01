@@ -68,7 +68,7 @@ Written under Neil Postman, it's the intellectual foundation for 40 years of jou
 Rosen's answer, written before the internet, before social media, before the current crisis of trust, is remarkably prescient. [2/X]
 
 **Thread/Post 3:**
-> Read it here: [LINK]
+> Read it here: https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 
 Part of the new Jay Rosen Digital Archive, which preserves 36 years of journalism criticism in one searchable place. [3/X]
 
@@ -96,7 +96,7 @@ Here's what's inside: 🧵 [1/X]
 
 This was written before the internet. Before Fox News. Before Twitter.
 
-Full dissertation: [LINK]
+Full dissertation: https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 
 ---
 
@@ -118,7 +118,7 @@ Here's how it evolved from 2006 to today: 🧵
 
 Every article is connected to people, organizations, and concepts.
 
-Here's how to use it for research: [LINK to Research Guide]
+Here's how to use it for research: https://pressthink.org/wp-content/rosen-archive/index.html
 
 ---
 
@@ -129,7 +129,7 @@ Here's how to use it for research: [LINK to Research Guide]
 
 > "For any press anywhere, making things public does not a public make."
 
-Read the full dissertation: [LINK]
+Read the full dissertation: https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 
 ---
 
@@ -142,7 +142,7 @@ Read the full dissertation: [LINK]
 ✓ First-ever public release of his 1986 dissertation
 ✓ 36 years of journalism criticism preserved
 
-If you haven't explored yet: [LINK]
+If you haven't explored yet: https://pressthink.org/wp-content/rosen-archive/index.html
 
 ---
 
@@ -228,4 +228,4 @@ If you haven't explored yet: [LINK]
 
 ---
 
-*Last Updated: November 2025*
+*Last Updated: December 2025*

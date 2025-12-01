@@ -252,4 +252,4 @@ This glossary defines key terms and concepts introduced or developed in Jay Rose
 
 ---
 
-*Prepared for the Jay Rosen Digital Archive, November 2025*
+*Prepared for the Jay Rosen Digital Archive, December 2025*

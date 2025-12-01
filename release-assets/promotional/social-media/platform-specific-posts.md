@@ -69,9 +69,9 @@ The archive is free and open. Use it for:
 • Journalism
 • Just exploring 36 years of media criticism
 
-Start here: [LINK]
+Start here: https://pressthink.org/wp-content/rosen-archive/index.html
 
-Read the dissertation: [LINK]
+Read the dissertation: https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 
 ---
 
@@ -82,7 +82,7 @@ Read the dissertation: [LINK]
 
 —Jay Rosen, "The Impossible Press" (1986)
 
-Read the full dissertation, now public for the first time: [LINK]
+Read the full dissertation, now public for the first time: https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 
 ---
 
@@ -91,7 +91,7 @@ Read the full dissertation, now public for the first time: [LINK]
 
 This was written in 1986. Before the internet. Before social media. Before the trust crisis.
 
-[LINK]
+https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 
 ---
 
@@ -100,21 +100,21 @@ This was written in 1986. Before the internet. Before social media. Before the t
 
 Written 39 years ago—and somehow more true now than ever.
 
-[LINK]
+https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 
 ---
 
 **Archive Quote 1:**
 > "The people formerly known as the audience wish to inform media people of our existence, and of a shift in power that goes with the platform shift you've all heard about."
 
-From 2006. One of 849+ records in the Jay Rosen Digital Archive: [LINK]
+From 2006. One of 849+ records in the Jay Rosen Digital Archive: https://pressthink.org/wp-content/rosen-archive/index.html
 
 ---
 
 **Archive Quote 2:**
 > "The view from nowhere is a bid for trust that advertises the viewlessness of the one who reports."
 
-From 2010. Explore the full "View from Nowhere" collection: [LINK]
+From 2010. Explore the full "View from Nowhere" collection: https://pressthink.org/wp-content/rosen-archive/index.html
 
 ---
 
@@ -127,7 +127,7 @@ TODAY: Launching the Jay Rosen Digital Archive.
 
 All searchable. All preserved.
 
-Explore: [LINK]
+Explore: https://pressthink.org/wp-content/rosen-archive/index.html
 
 [Thread continues similarly to Twitter]
 
@@ -140,7 +140,7 @@ It's called "The Impossible Press: American Journalism and the Decline of Public
 
 It's never been publicly available. Until today.
 
-[LINK]
+https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 
 ---
 
@@ -150,7 +150,7 @@ It's never been publicly available. Until today.
 
 **Headline:** Announcing the Jay Rosen Digital Archive: 36 Years of Journalism Criticism, Now Searchable
 
-Today, we're launching a project I've been working on for [TIME]: the Jay Rosen Digital Archive.
+Today, we're launching a project I've been working on for the past several months: the Jay Rosen Digital Archive.
 
 **What it is:**
 A comprehensive, searchable archive of journalism criticism by Jay Rosen, NYU professor and one of the most influential voices in media criticism for the past four decades.
@@ -167,9 +167,9 @@ Rosen's concepts—"the view from nowhere," "the people formerly known as the au
 
 For researchers, journalists, and anyone interested in how we got here with the press, the archive is free and open.
 
-Explore: [LINK]
+Explore: https://pressthink.org/wp-content/rosen-archive/index.html
 
-Read the dissertation: [LINK]
+Read the dissertation: https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 
 [Optional: Tag Jay Rosen, NYU, relevant organizations]
 
@@ -184,7 +184,7 @@ One searchable archive.
 
 Plus: Jay Rosen's 1986 dissertation, public for the first time.
 
-The Jay Rosen Digital Archive is live. [LINK]
+The Jay Rosen Digital Archive is live. https://pressthink.org/wp-content/rosen-archive/index.html
 
 ---
 
@@ -197,7 +197,7 @@ The numbers behind the Jay Rosen Digital Archive:
 🕸️ 7,499+ relationships
 💡 13 key concepts tracked
 
-Explore: [LINK]
+Explore: https://pressthink.org/wp-content/rosen-archive/index.html
 
 [Attach statistics infographic]
 
@@ -209,4 +209,4 @@ Explore: [LINK]
 
 ---
 
-*Last Updated: November 2025*
+*Last Updated: December 2025*

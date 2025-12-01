@@ -80,7 +80,7 @@ The dissertation is now:
 
 ### Access
 
-The archive is **free and open access** at [URL].
+The archive is **free and open access** at https://pressthink.org/wp-content/rosen-archive/index.html.
 
 No registration required for basic access.
 
@@ -102,11 +102,11 @@ jamditis@gmail.com
 
 ### Links
 
-- Archive: [URL]
-- Dissertation: [URL]
-- Research Guide: [URL]
-- Teaching Materials: [URL]
-- Citation Guide: [URL]
+- Archive: https://pressthink.org/wp-content/rosen-archive/index.html
+- Dissertation: https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
+- Research Guide: https://pressthink.org/wp-content/rosen-archive/index.html
+- Teaching Materials: https://pressthink.org/wp-content/rosen-archive/index.html
+- Citation Guide: https://pressthink.org/wp-content/rosen-archive/index.html
 
 ---
 
@@ -141,4 +141,4 @@ jamditis@gmail.com
 
 ---
 
-*Last Updated: November 2025*
+*Last Updated: December 2025*

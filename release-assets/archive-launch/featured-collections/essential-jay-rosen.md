@@ -136,11 +136,11 @@ All selections above, plus:
   "title": "Essential Jay Rosen",
   "description": "The most important pieces for understanding Jay Rosen's journalism criticism",
   "curator": "Joe Amditis",
-  "created": "November 2025",
+  "created": "December 2025",
   "suggested_reading_order": true
 }
 ```
 
 ---
 
-*Last Updated: November 2025*
+*Last Updated: December 2025*

@@ -104,8 +104,8 @@ The existence of a free press does not automatically produce an informed public 
 ## How to Access
 
 - **Full Text (Google Docs):** [https://docs.google.com/document/d/1OHTatfz57Oxcn1YbWHJ6smpWmRpwrWChlbtaO46Q3i0](https://docs.google.com/document/d/1OHTatfz57Oxcn1YbWHJ6smpWmRpwrWChlbtaO46Q3i0)
-- **Jay Rosen Digital Archive:** [URL]
-- **PDF Download:** [URL]
+- **Jay Rosen Digital Archive:** https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
+- **PDF Download:** https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 
 ---
 
@@ -119,4 +119,4 @@ Digital Archive.
 
 ---
 
-*Prepared for the Jay Rosen Digital Archive, November 2025*
+*Prepared for the Jay Rosen Digital Archive, December 2025*

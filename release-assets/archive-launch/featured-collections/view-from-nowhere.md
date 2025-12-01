@@ -112,11 +112,11 @@ Cross-reference with the "Church of the Savvy" and "He Said, She Said" concepts 
   "description": "All articles developing Jay Rosen's signature concept about journalistic objectivity and false neutrality",
   "key_concept": "View from Nowhere",
   "curator": "Joe Amditis",
-  "created": "November 2025",
+  "created": "December 2025",
   "related_concepts": ["Church of the Savvy", "He Said/She Said Journalism", "Verification in Reverse", "False Balance"]
 }
 ```
 
 ---
 
-*Last Updated: November 2025*
+*Last Updated: December 2025*

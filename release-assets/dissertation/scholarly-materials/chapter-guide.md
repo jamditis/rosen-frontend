@@ -287,4 +287,4 @@ The conclusion points directly toward concepts Rosen would develop over the foll
 
 ---
 
-*Prepared for the Jay Rosen Digital Archive, November 2025*
+*Prepared for the Jay Rosen Digital Archive, December 2025*
