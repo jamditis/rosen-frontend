@@ -5,7 +5,10 @@ It currently contains a placeholder function that will be implemented
 to handle transcription, analysis, and metadata extraction from audio URLs.
 """
 
-def process_audio(url):
+from typing import Dict, Any
+
+
+def process_audio(url: str) -> Dict[str, Any]:
     """
     Processes an audio URL. (Currently a placeholder).
 

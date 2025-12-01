@@ -6,6 +6,7 @@ dynamically-rendered web pages, and uses the trafilatura library for
 intelligent content extraction.
 """
 
+from typing import Optional, Dict, Any, Tuple
 import random
 import requests
 import trafilatura
@@ -24,7 +25,7 @@ USER_AGENTS = [
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
 ]
 
-def fetch_with_url_context(url):
+def fetch_with_url_context(url: str) -> Optional[Dict[str, Any]]:
     """
     Attempts to fetch article content using Google's URL Context tool via Gemini API.
     This serves as the fastest method in our scraping cascade, providing structured
@@ -113,7 +114,7 @@ def fetch_with_url_context(url):
         print(f"URL Context fetch failed: {e}")
         return None
 
-def fetch_article_content(url):
+def fetch_article_content(url: str) -> Optional[str]:
     """
     Fetches the full HTML content of a URL using a "scraping cascade" approach.
 
@@ -205,7 +206,7 @@ def fetch_article_content(url):
         print(f"Playwright scrape also failed for {url}: {e}")
         return None
 
-def fetch_article_content_enhanced(url):
+def fetch_article_content_enhanced(url: str) -> Tuple[Optional[Any], bool]:
     """
     Enhanced version that can return either HTML content or structured data.
     
@@ -230,7 +231,7 @@ def fetch_article_content_enhanced(url):
     html_content = fetch_article_content(url)
     return html_content, False
 
-def extract_article_data(html_content, url):
+def extract_article_data(html_content: str, url: str) -> Optional[str]:
     """
     Uses the trafilatura library to extract the main article content and
     metadata from raw HTML.

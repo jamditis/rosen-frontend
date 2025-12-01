@@ -175,7 +175,7 @@ def _validate_ai_payload(ai_data: Dict[str, Any], schema: Dict[str, Any], raw_pa
 
     return ai_data
 
-def summarize_and_classify(text_content, schema):
+def summarize_and_classify(text_content: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
     Uses the Gemini API to extract metadata, generate a summary, and classify an article.
 

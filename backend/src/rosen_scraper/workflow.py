@@ -6,9 +6,11 @@ processor, enriches the extracted data, and writes the final records back to
 another sheet.
 """
 
+from typing import Optional, Dict, Any, List, Set
 from rosen_scraper import dispatcher
 from rosen_scraper.processors import article_processor
 import gspread
+from gspread import Worksheet
 import os
 import json
 import time
@@ -19,8 +21,8 @@ import re
 from rosen_scraper import pdf_generator
 from rosen_scraper import transcript_saver
 from rosen_scraper import entity_resolver
-from rosen_scraper.logger import get_logger, init_logger, PoisonPillType
-from rosen_scraper.poison_pill_handler import get_poison_pill_manager
+from rosen_scraper.logger import get_logger, init_logger, PoisonPillType, Logger
+from rosen_scraper.poison_pill_handler import get_poison_pill_manager, PoisonPillManager
 
 # Load environment variables from a .env file for secure configuration management.
 load_dotenv()
@@ -35,7 +37,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 SCHEMA_FILE = os.path.join(BASE_DIR, 'schema.json')
 KNOWN_ENTITIES_FILE = os.path.join(BASE_DIR, 'known_entities.json')
 
-def get_schema(schema_file):
+def get_schema(schema_file: str) -> Optional[Dict[str, Any]]:
     """
     Loads the JSON schema from the specified file.
     The schema contains taxonomy and configuration needed for processing.
@@ -47,7 +49,7 @@ def get_schema(schema_file):
         print(f"FATAL: Could not load schema. Error: {e}")
         return None
 
-def generate_source_based_id(publication, existing_ids):
+def generate_source_based_id(publication: str, existing_ids: Set[str]) -> str:
     """
     Generates a unique ID based on the source publication.
     The ID consists of a 5-8 character uppercase prefix derived from the publication
@@ -101,7 +103,7 @@ def generate_source_based_id(publication, existing_ids):
     # Format the new ID with leading zeros.
     return f"{prefix}-{new_id_num:05d}"
 
-def format_date_mmddyyyy(date_str):
+def format_date_mmddyyyy(date_str: str) -> str:
     """
     Convert various date formats to MM/DD/YYYY format.
     """
@@ -128,7 +130,7 @@ def format_date_mmddyyyy(date_str):
     # If no format matches, return original
     return date_str
 
-def enrich_data(data, url, known_entities):
+def enrich_data(data: Dict[str, Any], url: str, known_entities: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     """
     Adds final calculated and derived fields to the data dictionary before saving.
     This includes processing timestamps, word counts, platform information, and new schema fields.
@@ -158,7 +160,7 @@ def enrich_data(data, url, known_entities):
 
     return data
 
-def generate_collection_id(data, url):
+def generate_collection_id(data: Dict[str, Any], url: str) -> str:
     """
     Generate a collection ID based on content patterns.
     Groups related content together for better organization.
@@ -182,7 +184,7 @@ def generate_collection_id(data, url):
     # Default: no specific collection
     return ""
 
-def determine_permissions(data, url):
+def determine_permissions(data: Dict[str, Any], url: str) -> str:
     """
     Determine permission/rights status based on source and content.
     """
@@ -209,7 +211,7 @@ def determine_permissions(data, url):
     # Default
     return "Standard Copyright"
 
-def append_record_to_sheet(worksheet, data, headers, logger=None):
+def append_record_to_sheet(worksheet: Worksheet, data: Dict[str, Any], headers: List[str], logger: Optional[Logger] = None) -> bool:
     """
     Formats and appends a new row to the specified Google Sheet.
     The row is ordered according to the provided headers.
@@ -232,7 +234,7 @@ def append_record_to_sheet(worksheet, data, headers, logger=None):
         logger.log_sheets_operation("write", data.get('id'), False, {"error": str(e), "url": data.get('url')})
         return False
 
-def main():
+def main() -> None:
     """The main workflow for the backend pipeline with enhanced error handling and logging."""
     # Initialize logging system
     logger = init_logger()
@@ -377,7 +379,7 @@ def main():
         if poison_summary['total'] > 0:
             logger.logger.info(f"Poison pill summary: {poison_summary}")
 
-def process_url_with_error_handling(url, schema, logger, poison_manager):
+def process_url_with_error_handling(url: str, schema: Dict[str, Any], logger: Logger, poison_manager: PoisonPillManager) -> Optional[Dict[str, Any]]:
     """
     Process a single URL with comprehensive error handling and poison pill detection.
     """
