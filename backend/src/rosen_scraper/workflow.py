@@ -13,6 +13,7 @@ import os
 import json
 import time
 from urllib.parse import urlparse
+from pathlib import Path
 from dotenv import load_dotenv
 from datetime import datetime
 import re
@@ -29,11 +30,24 @@ load_dotenv()
 # A list of domains known to be behind a paywall, which are handled separately.
 # Note: This is now also handled by the poison pill detection system
 PAYWALLED_DOMAINS = ["www.washingtonpost.com", "www.nytimes.com", "www.wsj.com"]
-# Define key file paths relative to the script's location.
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SCHEMA_FILE = os.path.join(BASE_DIR, 'schema.json')
-KNOWN_ENTITIES_FILE = os.path.join(BASE_DIR, 'known_entities.json')
+
+# Define key file paths using pathlib for cleaner path handling.
+def find_project_root() -> Path:
+    """
+    Find the project root by looking for pyproject.toml.
+    This is more reliable than using multiple dirname() calls.
+    """
+    current = Path(__file__).resolve()
+    while current.parent != current:
+        if (current / "pyproject.toml").exists():
+            return current
+        current = current.parent
+    raise FileNotFoundError("Project root (pyproject.toml) not found")
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+BASE_DIR = find_project_root()
+SCHEMA_FILE = BASE_DIR / 'schema.json'
+KNOWN_ENTITIES_FILE = BASE_DIR / 'known_entities.json'
 
 def get_schema(schema_file):
     """
@@ -258,8 +272,8 @@ def main():
 
         # --- 1. Connect to Google Sheets ---
         try:
-            credentials_path = os.path.join(BASE_DIR, os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json"))
-            gc = gspread.service_account(filename=credentials_path)
+            credentials_path = BASE_DIR / os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+            gc = gspread.service_account(filename=str(credentials_path))
             sh = gc.open(os.environ.get("SPREADSHEET_NAME", "Rosen Archive URL List"))
             urls_worksheet = sh.worksheet("urls_to_scrape")
             processed_worksheet = sh.worksheet("test_runs")

@@ -10,6 +10,7 @@ import os
 import sys
 import time
 from typing import Dict, List, Optional
+from pathlib import Path
 
 import gspread
 from dotenv import load_dotenv
@@ -19,8 +20,20 @@ import google.generativeai as genai
 
 load_dotenv()
 
-# Define the project's base directory to reliably locate credentials
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Define the project's base directory using pathlib for cleaner path handling
+def find_project_root() -> Path:
+    """
+    Find the project root by looking for pyproject.toml.
+    This is more reliable than using multiple dirname() calls.
+    """
+    current = Path(__file__).resolve()
+    while current.parent != current:
+        if (current / "pyproject.toml").exists():
+            return current
+        current = current.parent
+    raise FileNotFoundError("Project root (pyproject.toml) not found")
+
+BASE_DIR = find_project_root()
 
 # Rate limiting
 RATE_LIMIT_DELAY = 2  # seconds between API calls
@@ -47,10 +60,10 @@ class EntityMetadataBackfiller:
     def connect_to_sheets(self):
         """Connect to Google Sheets."""
         try:
-            credentials_path = os.path.join(BASE_DIR, os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json"))
+            credentials_path = BASE_DIR / os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
 
             print("[BACKFILL] Connecting to Google Sheets...")
-            self.gc = gspread.service_account(filename=credentials_path)
+            self.gc = gspread.service_account(filename=str(credentials_path))
             self.spreadsheet = self.gc.open(self.spreadsheet_name)
             self.entities_sheet = self.spreadsheet.worksheet("extracted_entities")
             self.test_runs_sheet = self.spreadsheet.worksheet("test_runs")

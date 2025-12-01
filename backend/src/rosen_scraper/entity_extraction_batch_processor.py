@@ -33,7 +33,21 @@ from rosen_scraper.entity_registry import EntityRegistry
 # Load environment variables
 load_dotenv()
 
+# Define the project's base directory using pathlib for cleaner path handling
+def find_project_root() -> Path:
+    """
+    Find the project root by looking for pyproject.toml.
+    This is more reliable than using multiple dirname() calls.
+    """
+    current = Path(__file__).resolve()
+    while current.parent != current:
+        if (current / "pyproject.toml").exists():
+            return current
+        current = current.parent
+    raise FileNotFoundError("Project root (pyproject.toml) not found")
+
 # Configuration
+BASE_DIR = find_project_root()
 PROGRESS_FILE = Path("logs/entity_extraction_progress.json")
 DEFAULT_BATCH_SIZE = 50
 RATE_LIMIT_DELAY = 6  # seconds between extractions (10 per minute)
@@ -106,12 +120,12 @@ class EntityExtractionProcessor:
     def connect_to_sheets(self):
         """Establish connection to Google Sheets."""
         try:
-credentials_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "google_credentials.json")
+            credentials_path = BASE_DIR / "google_credentials.json"
 
             print("[SHEETS] Connecting to Google Sheets...")
             print(f"[SHEETS] Using credentials: {credentials_path}")
 
-            self.gc = gspread.service_account(filename=credentials_path)
+            self.gc = gspread.service_account(filename=str(credentials_path))
             self.spreadsheet = self.gc.open(self.spreadsheet_name)
 
             # Open or create worksheets
