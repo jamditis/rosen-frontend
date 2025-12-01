@@ -4,6 +4,60 @@
 
 *Session Date: December 1, 2025*
 
+## [2.20.0] Major Repository Reorganization for Public Release
+
+### Overview
+Comprehensive restructuring of the entire repository in preparation for transitioning from private to public open-source. This is the largest structural change in the project's history.
+
+### New Directory Structure
+- **`/frontend/`** - Main React application (moved from root)
+- **`/features/`** - All standalone dissertation tools (moved from root-level directories)
+- **`/data/`** - Archive data files (renamed from `/csv/`)
+- **`/tools/active/`** - Active development tools
+- **`/tools/analysis/`** - R scripts and planning (moved from `/data-tools/`)
+- **`/archived/`** - Legacy code and archived features
+
+### Files Reorganized
+- **229 files** moved to new locations
+- **5 new files** added (SECURITY.md, CODE_OF_CONDUCT.md, issue templates)
+- **~20 files** deleted (duplicates, debug artifacts)
+- **~800KB** saved from duplicate removal
+
+### Standard Open Source Files Added
+- `SECURITY.md` - Vulnerability reporting policy
+- `CODE_OF_CONDUCT.md` - Contributor Covenant v2.1
+- `.github/ISSUE_TEMPLATE/bug_report.md`
+- `.github/ISSUE_TEMPLATE/feature_request.md`
+- `.github/PULL_REQUEST_TEMPLATE.md`
+
+### Path Changes
+| Old Path | New Path |
+|----------|----------|
+| `/App.js`, `/index.js`, etc. | `/frontend/App.js`, etc. |
+| `/components/` | `/frontend/components/` |
+| `/services/` | `/frontend/services/` |
+| `/comparison-tool/` | `/features/comparison-tool/` |
+| `/glossary/` | `/features/glossary/` |
+| `/context-1986/` | `/features/context-1986/` |
+| `/timeline/` | `/features/timeline/` |
+| `/annotated-excerpts/` | `/features/annotated-excerpts/` |
+| `/faq/` | `/features/faq/` |
+| `/tools/dissertation-reader/` | `/features/dissertation-reader/` |
+| `/csv/` | `/data/` |
+| `/data-tools/` | `/tools/analysis/` |
+| `/future-features/` | `/archived/` |
+| `/tools/archive-v1/` | `/archived/archive-v1/` |
+| `/tools/web/` | `/archived/web/` |
+
+### Documentation Updated
+- `CLAUDE.md` - Complete directory structure rewrite
+- `README.md` - Updated project structure section
+- `docs/narrative/PROJECT_LOG.md` - Added reorganization entry
+
+---
+
+*Session Date: December 1, 2025*
+
 ## Pre-Publication Final Checks Complete
 
 ### Project Status: READY FOR PUBLICATION

@@ -26,15 +26,17 @@ See `pre-publication-report.md` for the comprehensive technical validation repor
 ### Dissertation Presentation Tools
 | Tool | Status | Location | Notes |
 |------|--------|----------|-------|
-| Interactive Mind Map | ✅ | Main archive | 70+ nodes, keyboard/touch support |
-| Network Explorer | ✅ | Main archive | Canvas visualization |
-| Then and Now | ✅ | `/comparison-tool/` | 7 comparisons |
-| Glossary | ✅ | `/glossary/` | 16 concepts |
-| 1986 in Journalism | ✅ | `/context-1986/` | Historical context |
-| Timeline | ✅ | `/timeline/` | 14 entries |
-| Annotated Excerpts | ✅ | `/annotated-excerpts/` | 12 passages |
-| FAQ | ✅ | `/faq/` | 46 Q&A pairs |
-| Dissertation Reader | ✅ | `/tools/dissertation-reader/dist/` | Landing page |
+| Interactive Mind Map | ✅ | Main archive (`/frontend/`) | 70+ nodes, keyboard/touch support |
+| Network Explorer | ✅ | Main archive (`/frontend/`) | Canvas visualization |
+| Then and Now | ✅ | `/features/comparison-tool/` | 7 comparisons |
+| Glossary | ✅ | `/features/glossary/` | 16 concepts |
+| 1986 in Journalism | ✅ | `/features/context-1986/` | Historical context |
+| Timeline | ✅ | `/features/timeline/` | 14 entries |
+| Annotated Excerpts | ✅ | `/features/annotated-excerpts/` | 12 passages |
+| FAQ | ✅ | `/features/faq/` | 46 Q&A pairs |
+| Dissertation Reader | ✅ | `/features/dissertation-reader/` | Landing page |
+
+> **Note:** Repository reorganized December 1, 2025. All feature tools now under `/features/`.
 
 ### Infrastructure
 | Component | Status | Notes |

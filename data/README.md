@@ -36,7 +36,7 @@ npm install
 npm run export-data
 
 # Upload archive-data.json to WordPress
-# Path: /wp-content/rosen-archive/csv/archive-data.json
+# Path: /wp-content/rosen-archive/data/archive-data.json
 ```
 
 ## Workflow
@@ -78,5 +78,5 @@ The generated `archive-data.json` contains:
 ## See Also
 
 - `IMPLEMENTATION_PLAN.md` for full technical details
-- `../services/archiveService.js` for data loading logic
-- `../constants.js` for data source URLs
+- `../frontend/services/archiveService.js` for data loading logic
+- `../frontend/constants.js` for data source URLs

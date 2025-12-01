@@ -18,7 +18,7 @@ Thank you for your interest in contributing to the Jay Rosen Digital Archive (JR
 
 ## Code of Conduct
 
-We are committed to providing a welcoming and inclusive environment. Please be respectful and constructive in all interactions.
+We are committed to providing a welcoming and inclusive environment. Please be respectful and constructive in all interactions. See our [Code of Conduct](CODE_OF_CONDUCT.md) for details.
 
 ---
 
@@ -70,15 +70,29 @@ The frontend uses a **zero-build architecture** - no npm build, no webpack, no b
 
 #### Frontend File Structure
 ```
-/                           # Root is the frontend
-├── index.html             # Entry point
-├── App.js                 # Main application
-├── components/            # React components
-├── services/              # Data fetching & caching
-├── constants.js           # Configuration
-├── comparison-tool/       # Standalone tool
-├── glossary/              # Standalone tool
-└── [other tools]/         # Additional features
+/
+├── index.html              # Entry point
+├── shared-styles.css       # Common styles for feature tools
+│
+├── frontend/               # Main React application
+│   ├── App.js              # Main application
+│   ├── index.js            # React root mount
+│   ├── constants.js        # Configuration
+│   ├── components/         # React components
+│   ├── services/           # Data fetching & caching
+│   └── dist/               # Pre-built Tailwind CSS
+│
+├── features/               # Standalone dissertation tools
+│   ├── comparison-tool/    # Then and Now comparisons
+│   ├── glossary/           # Key concepts
+│   ├── context-1986/       # Historical context
+│   ├── timeline/           # Intellectual evolution
+│   ├── annotated-excerpts/ # Key passages
+│   ├── faq/                # Ask the Dissertation
+│   └── dissertation-reader/# PDF viewer landing page
+│
+└── data/                   # Archive data files
+    └── archive-data.json   # Main data (25MB)
 ```
 
 #### Key Frontend Concepts
@@ -86,7 +100,9 @@ The frontend uses a **zero-build architecture** - no npm build, no webpack, no b
 - **All files are vanilla ES modules** - Import/export syntax
 - **HTM for JSX** - Use `html` template tag instead of JSX
 - **CDN dependencies** - No `node_modules` directory
-- **Data from Google Sheets** - CSV export cached in localStorage
+- **Data from JSON** - Pre-processed JSON cached in localStorage
+- **Frontend code in `/frontend/`** - Main app is in the frontend directory
+- **Feature tools in `/features/`** - Standalone tools are in the features directory
 
 ---
 
@@ -481,7 +497,9 @@ Any other context or screenshots.
 ### Documentation
 - **[README.md](README.md)** - Project overview and quick start
 - **[CLAUDE.md](CLAUDE.md)** - AI assistant context (detailed architecture)
-- **[changelog.md](changelog.md)** - Development history
+- **[CHANGELOG.md](CHANGELOG.md)** - Development history
+- **[SECURITY.md](SECURITY.md)** - Security policy
+- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)** - Community standards
 
 ### Key Concepts
 
