@@ -6,7 +6,7 @@ authors = [
     {name = "Joe Amditis",email = "jamditis@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.13, <4.0"
+requires-python = ">=3.12, <4.0"
 dependencies = [
     "trafilatura (==2.0.0)",
     "requests (==2.32.5)",
