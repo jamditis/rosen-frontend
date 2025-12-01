@@ -1,6 +1,30 @@
 
 # Changelog - Jay Rosen Digital Archive
 
+*Session Date: December 1, 2025*
+
+## WordPress Publication Preparation
+
+### Deployment Fixes
+- **Import Map Cleanup**: Removed unused `react-dom/` import pointing to `aistudiocdn.com` from `index.html`
+- **Path Correction**: Fixed dissertation link in `constants.js` to use WordPress deployment path (`/wp-content/rosen-archive/`)
+- **Dissertation Reader Landing Page**: Created placeholder page at `tools/dissertation-reader/dist/index.html`
+  - Matches archive design system
+  - Links to PDF download, mind map, and all dissertation tools
+  - Table of contents preview
+  - Proper citation format
+
+### Stability Improvements
+- **Tailwind CDN Version Pinning**: Pinned all HTML files to Tailwind v3.4.0 for stability
+  - Main archive (`index.html`)
+  - All dissertation tools (comparison-tool, glossary, timeline, context-1986, annotated-excerpts, faq)
+  - Dissertation reader landing page
+
+### Configuration
+- **`.gitignore` Update**: Added exception for `tools/dissertation-reader/dist/` to support zero-build deployment
+
+---
+
 *Session Date: November 30, 2025*
 
 ## UX Improvements & Project Management Setup
