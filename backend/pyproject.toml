@@ -6,7 +6,7 @@ authors = [
     {name = "Joe Amditis",email = "jamditis@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.13, <4.0"
+requires-python = ">=3.12, <4.0"
 dependencies = [
     "trafilatura (==2.0.0)",
     "requests (==2.32.5)",
@@ -22,7 +22,8 @@ dependencies = [
     "google-genai (==1.43.0)",
     "reportlab (==4.4.4)",
     "yt-dlp (==2025.9.26)",
-    "python-dotenv (==1.1.1)"
+    "python-dotenv (==1.1.1)",
+    "ratelimit (==2.2.1)"
 ]
 
 

@@ -14,6 +14,7 @@ from playwright_stealth import Stealth
 import os
 from google import genai
 from google.genai.types import Tool, GenerateContentConfig
+from rosen_scraper.rate_limiter import rate_limited_gemini_call
 
 
 # A list of common user agents to rotate through for both requests and Playwright.
@@ -23,6 +24,30 @@ USER_AGENTS = [
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
 ]
+
+@rate_limited_gemini_call
+def _call_gemini_url_context(client, model_id, prompt, tools):
+    """
+    Make a rate-limited call to Gemini API with URL Context tool.
+    
+    This function is decorated with rate limiting to prevent API throttling.
+    
+    Args:
+        client: Gemini client instance
+        model_id: Model ID to use
+        prompt: The prompt to send
+        tools: Tools configuration for URL Context
+        
+    Returns:
+        The API response object
+    """
+    from google.genai.types import GenerateContentConfig
+    response = client.models.generate_content(
+        model=model_id,
+        contents=prompt,
+        config=GenerateContentConfig(tools=tools)
+    )
+    return response
 
 def fetch_with_url_context(url):
     """
@@ -70,11 +95,7 @@ def fetch_with_url_context(url):
         """
         
         # Make the API call with URL Context
-        response = client.models.generate_content(
-            model=model_id,
-            contents=prompt,
-            config=GenerateContentConfig(tools=tools)
-        )
+        response = _call_gemini_url_context(client, model_id, prompt, tools)
         
         # Extract the text response
         response_text = ""
