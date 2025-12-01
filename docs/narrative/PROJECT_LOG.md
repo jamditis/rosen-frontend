@@ -3688,3 +3688,66 @@ arrative/ARCHITECTURE.md,
 arrative/README.md, 
 arrative/QUICK_START.md, and 
 arrative/LLM_INSTRUCTIONS.md.
+
+
+---
+
+### **[4.0.0] - 2025-12-01**
+
+#### **Pre-Publication Release: Ready for December 2025 Launch**
+
+**Status:** Complete - All tools validated and ready for deployment
+
+##### **Overview**
+
+Completed final pre-publication checks and validation for the December 2025 public release of *The Impossible Press* dissertation. All 12 pending PRs have been merged, documentation updated, and the archive is ready for deployment.
+
+##### **Merged Pull Requests**
+
+1. **PR #35** - Migrate dissertation PDFs to Git LFS (~135 MB)
+2. **PR #33** - Review and fix all TODO/FIXME comments
+3. **PR #42** - Improve path handling with pathlib
+4. **PR #36** - Add GitHub Actions CI/CD pipelines
+5. **PR #49** - Fix open issues from code review
+6. **PR #38** - Add integration tests for backend
+7. **PR #43** - Add type hints to backend Python code
+8. **PR #37** - Add Gemini API rate limiting
+9. **PR #34** - Remove hardcoded row ranges in workflow.py
+10. **PR #39** - Fix broken imports after monorepo merge
+11. **PR #32** - Relax Python requirement to 3.10+
+12. **PR #40, #41** - Add backend .env.example and README
+
+##### **Validation Results**
+
+| Check | Result |
+|-------|--------|
+| JavaScript Syntax | All 28 files pass |
+| HTML Structure | All 17 pages valid |
+| TODO/FIXME Comments | None remaining in frontend |
+| Accessibility Features | Present on all pages |
+| CI/CD Pipelines | All workflows operational |
+
+##### **Dissertation Presentation Tools (9 Complete)**
+
+1. Interactive Mind Map (main archive)
+2. Network Explorer (main archive)
+3. Then and Now Comparison Tool (`/comparison-tool/`)
+4. Glossary - 16 concepts (`/glossary/`)
+5. 1986 in Journalism (`/context-1986/`)
+6. Timeline - 14 entries (`/timeline/`)
+7. Annotated Excerpts - 12 passages (`/annotated-excerpts/`)
+8. FAQ - 46 Q&A pairs (`/faq/`)
+9. Dissertation Reader (`/tools/dissertation-reader/dist/`)
+
+##### **Documentation Updates**
+
+- Created pre-publication report: `release-assets/documentation/pre-publication-report.md`
+- Updated CLAUDE.md with publication status and CI/CD section
+- Updated README.md with status badges and tool counts
+- Updated changelog.md with merged PRs
+- Updated PROJECT_LOG.md (this file)
+
+##### **Deployment Path**
+
+The archive is ready for deployment to `/wp-content/rosen-archive/` via FTP upload. All tools are zero-build static files requiring no server-side processing.
+
