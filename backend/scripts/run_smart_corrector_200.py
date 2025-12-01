@@ -12,17 +12,17 @@ import json
 # Add project root to path
 project_root = Path(__file__).resolve().parent
 sys.path.insert(0, str(project_root))
-sys.path.insert(0, str(project_root / 'tools' / 'diagnostics'))
+sys.path.insert(0, str(project_root / 'diagnostics'))
 sys.path.insert(0, str(project_root / 'src'))
 
-from tools.diagnostics.smart_corrector import (
+from diagnostics.smart_corrector import (
     ContentDetector,
     QualityValidator,
     AudioOptimizer,
     CostTracker,
     SmartCorrectorPDFGenerator
 )
-from tools.diagnostics.smart_corrector.processors import (
+from diagnostics.smart_corrector.processors import (
     SoundCloudProcessor,
     CSpanProcessor,
     YouTubeEnhancedProcessor,
