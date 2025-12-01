@@ -74,40 +74,60 @@ def convert_markdown_to_html(md_content):
 
     return html
 
+def strip_html_tags(text):
+    """Remove HTML tags from text for comparison purposes"""
+    return re.sub(r'<[^>]+>', '', text)
+
 def add_section_ids(html):
     """Add IDs to headings for navigation"""
-    counter = {'intro': 0, 'chapter': 0, 'conclusion': 0, 'notes': 0, 'works': 0}
+    chapter_counter = 0
 
     def make_id(match):
+        nonlocal chapter_counter
         tag = match.group(1)
         content = match.group(2).strip()
 
-        # Create ID from content
-        content_lower = content.lower()
+        # Strip HTML tags for comparison
+        plain_text = strip_html_tags(content).strip()
+        text_lower = plain_text.lower()
 
-        if 'acknowledgement' in content_lower:
+        if 'acknowledgement' in text_lower:
             id_val = 'acknowledgements'
-        elif 'introduction' in content_lower:
+        elif 'introduction' in text_lower:
             id_val = 'introduction'
-        elif 'conclusion' in content_lower:
+        elif text_lower == 'conclusion' or 'toward an ecological view' in text_lower:
             id_val = 'conclusion'
-        elif 'notes' == content_lower:
+        elif text_lower == 'notes':
             id_val = 'notes'
-        elif 'works consulted' in content_lower:
+        elif 'works consulted' in text_lower:
             id_val = 'works-consulted'
-        elif 'part one' in content_lower or 'part two' in content_lower:
-            id_val = content_lower.replace(' ', '-').replace(':', '')
-        elif content_lower.startswith('chapter') or re.match(r'^\d+\.', content_lower):
-            # Extract chapter number
-            num_match = re.search(r'(\d+)', content)
-            if num_match:
-                id_val = f'chapter-{num_match.group(1)}'
+        elif 'part one' in text_lower:
+            id_val = 'part-one'
+        elif 'part two' in text_lower:
+            id_val = 'part-two'
+        elif text_lower.startswith('chapter') or re.match(r'^chapter\s', text_lower):
+            # Chapter heading like "CHAPTER ONE" - extract number word or digit
+            chapter_words = {
+                'one': 1, 'two': 2, 'three': 3, 'four': 4,
+                'five': 5, 'six': 6, 'seven': 7, 'eight': 8,
+                'nine': 9, 'ten': 10
+            }
+            # Try to find chapter number as word
+            for word, num in chapter_words.items():
+                if word in text_lower:
+                    id_val = f'chapter-{num}'
+                    break
             else:
-                counter['chapter'] += 1
-                id_val = f'chapter-{counter["chapter"]}'
+                # Try to find digit
+                num_match = re.search(r'(\d+)', plain_text)
+                if num_match:
+                    id_val = f'chapter-{num_match.group(1)}'
+                else:
+                    chapter_counter += 1
+                    id_val = f'chapter-{chapter_counter}'
         else:
-            # Generic ID
-            id_val = re.sub(r'[^a-z0-9]+', '-', content_lower).strip('-')[:50]
+            # Generic ID - use plain text without HTML tags
+            id_val = re.sub(r'[^a-z0-9]+', '-', text_lower).strip('-')[:50]
 
         return f'<{tag} id="{id_val}">{content}</{tag}>'
 
