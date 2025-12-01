@@ -13,8 +13,26 @@ from ratelimit import limits, sleep_and_retry
 
 # Load rate limit configuration from environment variables
 # Default: 60 calls per minute (conservative limit for Gemini API)
-API_RATE_LIMIT_CALLS = int(os.environ.get("GEMINI_API_RATE_LIMIT_CALLS", "60"))
-API_RATE_LIMIT_PERIOD = int(os.environ.get("GEMINI_API_RATE_LIMIT_PERIOD", "60"))
+try:
+    API_RATE_LIMIT_CALLS = int(os.environ.get("GEMINI_API_RATE_LIMIT_CALLS", "60"))
+except ValueError:
+    print(f"WARNING: Invalid GEMINI_API_RATE_LIMIT_CALLS value. Using default: 60")
+    API_RATE_LIMIT_CALLS = 60
+
+try:
+    API_RATE_LIMIT_PERIOD = int(os.environ.get("GEMINI_API_RATE_LIMIT_PERIOD", "60"))
+except ValueError:
+    print(f"WARNING: Invalid GEMINI_API_RATE_LIMIT_PERIOD value. Using default: 60")
+    API_RATE_LIMIT_PERIOD = 60
+
+# Validate configuration
+if API_RATE_LIMIT_CALLS <= 0:
+    print(f"WARNING: GEMINI_API_RATE_LIMIT_CALLS must be positive. Using default: 60")
+    API_RATE_LIMIT_CALLS = 60
+
+if API_RATE_LIMIT_PERIOD <= 0:
+    print(f"WARNING: GEMINI_API_RATE_LIMIT_PERIOD must be positive. Using default: 60")
+    API_RATE_LIMIT_PERIOD = 60
 
 
 def rate_limited_gemini_call(func):

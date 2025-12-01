@@ -41,7 +41,6 @@ def _call_gemini_url_context(client, model_id, prompt, tools):
     Returns:
         The API response object
     """
-    from google.genai.types import GenerateContentConfig
     response = client.models.generate_content(
         model=model_id,
         contents=prompt,

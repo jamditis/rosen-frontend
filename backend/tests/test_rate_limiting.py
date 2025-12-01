@@ -165,6 +165,28 @@ class TestRateLimiterConfiguration:
         # Check that the configuration was updated
         assert rate_limiter.API_RATE_LIMIT_CALLS == 30
         assert rate_limiter.API_RATE_LIMIT_PERIOD == 60
+    
+    @patch.dict(os.environ, {"GEMINI_API_RATE_LIMIT_CALLS": "invalid", "GEMINI_API_RATE_LIMIT_PERIOD": "also_invalid"})
+    def test_invalid_environment_variables(self):
+        """Test that invalid environment variables fall back to defaults."""
+        import importlib
+        from rosen_scraper import rate_limiter
+        importlib.reload(rate_limiter)
+        
+        # Should fall back to defaults when invalid values are provided
+        assert rate_limiter.API_RATE_LIMIT_CALLS == 60
+        assert rate_limiter.API_RATE_LIMIT_PERIOD == 60
+    
+    @patch.dict(os.environ, {"GEMINI_API_RATE_LIMIT_CALLS": "-10", "GEMINI_API_RATE_LIMIT_PERIOD": "0"})
+    def test_negative_or_zero_environment_variables(self):
+        """Test that negative or zero values fall back to defaults."""
+        import importlib
+        from rosen_scraper import rate_limiter
+        importlib.reload(rate_limiter)
+        
+        # Should fall back to defaults when negative or zero values are provided
+        assert rate_limiter.API_RATE_LIMIT_CALLS == 60
+        assert rate_limiter.API_RATE_LIMIT_PERIOD == 60
 
 
 class TestRateLimiterIntegration:
