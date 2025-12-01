@@ -6,7 +6,7 @@ authors = [
     {name = "Joe Amditis",email = "jamditis@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.13, <4.0"
+requires-python = ">=3.12, <4.0"
 dependencies = [
     "trafilatura (==2.0.0)",
     "requests (==2.32.5)",
@@ -33,5 +33,6 @@ build-backend = "poetry.core.masonry.api"
 [dependency-groups]
 dev = [
     "pytest (==8.4.2)",
-    "pytest-mock (==3.15.1)"
+    "pytest-mock (==3.15.1)",
+    "pytest-cov (>=7.0.0,<8.0.0)"
 ]
