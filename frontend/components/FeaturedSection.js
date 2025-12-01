@@ -106,7 +106,6 @@ const FeaturedSection = () => {
                 </div>
                 </div>
 
-                <!-- Tooltip on hover -->
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-stone-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none w-64 text-center z-50 shadow-lg hidden sm:block" style=${{ lineHeight: '1.5' }}>
                   ${work.description}
                   <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-stone-900"></div>

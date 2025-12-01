@@ -19,7 +19,7 @@ const TOOLS = {
       name: 'Then & Now',
       description: '1986 vs 2025 comparisons',
       icon: Zap,
-      href: '/wp-content/rosen-archive/comparison-tool/',
+      href: '/wp-content/rosen-archive/features/comparison-tool/',
       status: 'ready'
     },
     {
@@ -27,7 +27,7 @@ const TOOLS = {
       name: 'Glossary',
       description: 'Key concepts defined',
       icon: BookOpen,
-      href: '/wp-content/rosen-archive/glossary/',
+      href: '/wp-content/rosen-archive/features/glossary/',
       status: 'ready'
     },
     {
@@ -35,7 +35,7 @@ const TOOLS = {
       name: 'Timeline',
       description: '40 years of ideas',
       icon: Calendar,
-      href: '/wp-content/rosen-archive/timeline/',
+      href: '/wp-content/rosen-archive/features/timeline/',
       status: 'ready'
     },
     {
@@ -43,7 +43,7 @@ const TOOLS = {
       name: 'Annotated Excerpts',
       description: 'Key passages with commentary',
       icon: FileText,
-      href: '/wp-content/rosen-archive/annotated-excerpts/',
+      href: '/wp-content/rosen-archive/features/annotated-excerpts/',
       status: 'ready'
     },
     {
@@ -51,7 +51,7 @@ const TOOLS = {
       name: '1986 Context',
       description: 'The media landscape then',
       icon: Tv,
-      href: '/wp-content/rosen-archive/context-1986/',
+      href: '/wp-content/rosen-archive/features/context-1986/',
       status: 'ready'
     },
     {
@@ -59,7 +59,7 @@ const TOOLS = {
       name: 'FAQ',
       description: 'Questions & answers',
       icon: HelpCircle,
-      href: '/wp-content/rosen-archive/faq/',
+      href: '/wp-content/rosen-archive/features/faq/',
       status: 'ready'
     },
     {
@@ -67,7 +67,7 @@ const TOOLS = {
       name: 'Dissertation Reader',
       description: 'Read the full text',
       icon: BookMarked,
-      href: '/wp-content/rosen-archive/tools/dissertation-reader/dist/',
+      href: '/wp-content/rosen-archive/features/dissertation-reader/src/',
       status: 'beta'
     }
   ],
@@ -85,7 +85,7 @@ const TOOLS = {
       name: 'Data Visualization',
       description: 'Charts and analysis',
       icon: BarChart3,
-      href: '/wp-content/rosen-archive/tools/dataviz/dataviz.html',
+      href: '/wp-content/rosen-archive/tools/active/dataviz/dataviz.html',
       status: 'beta'
     }
   ]
@@ -191,7 +191,6 @@ const ToolsModal = ({ isOpen, onClose, onSelectTool }) => {
         ref=${modalRef}
         className="bg-paper w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg shadow-2xl"
       >
-        <!-- Header -->
         <div className="sticky top-0 bg-paper border-b border-stone-200 px-6 py-4 flex items-center justify-between z-10">
           <div>
             <h2 id="tools-modal-title" className="font-display text-xl text-stone-800">
@@ -211,9 +210,7 @@ const ToolsModal = ({ isOpen, onClose, onSelectTool }) => {
           </button>
         </div>
 
-        <!-- Content -->
         <div className="p-6 space-y-8">
-          <!-- Dissertation Tools -->
           <section>
             <h3 className="font-display text-sm font-bold text-stone-600 uppercase tracking-wider mb-4 flex items-center gap-2">
               <${BookOpen} className="w-4 h-4" />
@@ -224,7 +221,6 @@ const ToolsModal = ({ isOpen, onClose, onSelectTool }) => {
             </div>
           </section>
 
-          <!-- Data Tools -->
           <section>
             <h3 className="font-display text-sm font-bold text-stone-600 uppercase tracking-wider mb-4 flex items-center gap-2">
               <${BarChart3} className="w-4 h-4" />
@@ -236,7 +232,6 @@ const ToolsModal = ({ isOpen, onClose, onSelectTool }) => {
           </section>
         </div>
 
-        <!-- Footer -->
         <div className="border-t border-stone-200 px-6 py-4 bg-stone-50">
           <p className="text-xs text-stone-500 text-center">
             Tools marked <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-[10px] font-bold">Beta</span> are still in development
