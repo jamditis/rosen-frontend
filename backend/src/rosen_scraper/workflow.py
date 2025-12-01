@@ -21,7 +21,7 @@ import re
 from rosen_scraper import pdf_generator
 from rosen_scraper import transcript_saver
 from rosen_scraper import entity_resolver
-from rosen_scraper.logger import get_logger, init_logger, PoisonPillType, Logger
+from rosen_scraper.logger import get_logger, init_logger, PoisonPillType, ArchiveLogger
 from rosen_scraper.poison_pill_handler import get_poison_pill_manager, PoisonPillManager
 
 # Load environment variables from a .env file for secure configuration management.
@@ -211,7 +211,7 @@ def determine_permissions(data: Dict[str, Any], url: str) -> str:
     # Default
     return "Standard Copyright"
 
-def append_record_to_sheet(worksheet: Worksheet, data: Dict[str, Any], headers: List[str], logger: Optional[Logger] = None) -> bool:
+def append_record_to_sheet(worksheet: Worksheet, data: Dict[str, Any], headers: List[str], logger: Optional[ArchiveLogger] = None) -> bool:
     """
     Formats and appends a new row to the specified Google Sheet.
     The row is ordered according to the provided headers.
@@ -379,7 +379,7 @@ def main() -> None:
         if poison_summary['total'] > 0:
             logger.logger.info(f"Poison pill summary: {poison_summary}")
 
-def process_url_with_error_handling(url: str, schema: Dict[str, Any], logger: Logger, poison_manager: PoisonPillManager) -> Optional[Dict[str, Any]]:
+def process_url_with_error_handling(url: str, schema: Dict[str, Any], logger: ArchiveLogger, poison_manager: PoisonPillManager) -> Optional[Dict[str, Any]]:
     """
     Process a single URL with comprehensive error handling and poison pill detection.
     """
