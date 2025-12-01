@@ -12,7 +12,7 @@ This monorepo contains:
 |-----------|-------------|
 | **Root** (`/`) | Zero-build frontend application (React, HTM, Tailwind via CDN) |
 | **`/backend`** | Python data pipeline for scraping, AI analysis, and archiving |
-| **`/dissertation`** | Full dissertation PDFs and transcribed markdown |
+| **`/dissertation`** | Full dissertation PDFs (stored via Git LFS) and transcribed markdown |
 | **`/data-tools`** | R scripts and planning documents for data analysis |
 | **`/docs`** | Documentation, agent personas, and project narrative |
 | **`/tools`** | Additional presentation tools (dataexplorer, dataviz, dissertation-reader, etc.) |
@@ -131,7 +131,8 @@ python tools/backfill/backfill_worker.py    # Fill missing fields
 
 ### Frontend (Local Development)
 ```bash
-# Clone the repository
+# Clone the repository (Git LFS required for dissertation PDFs)
+git lfs install
 git clone https://github.com/jamditis/rosen-frontend.git
 cd rosen-frontend
 
@@ -140,6 +141,8 @@ python -m http.server 8000
 
 # Open http://localhost:8000
 ```
+
+> **Note:** This repository uses [Git LFS](https://git-lfs.github.com/) to manage large dissertation PDF files (~135 MB). Install Git LFS before cloning to automatically download the PDF files.
 
 ### Backend (Data Pipeline)
 ```bash
