@@ -569,7 +569,7 @@ node --check components/MindMap.js        # ✅ Pass
 
 **External Links Verified:**
 - NotebookLM: `https://notebooklm.google.com/notebook/d26d326e-20ec-46dc-b9b4-2c752b90e607`
-- Dissertation PDF: `/wp-content/rosen-archive/tools/dissertation-reader/dist/`
+- Dissertation PDF: `/wp-content/rosen-archive/features/dissertation-reader/src/`
 
 ##### **Next Steps (Post-Launch)**
 
@@ -4341,13 +4341,13 @@ Completed final pre-publication checks and validation for the December 2025 publ
 
 1. Interactive Mind Map (main archive)
 2. Network Explorer (main archive)
-3. Then and Now Comparison Tool (`/comparison-tool/`)
-4. Glossary - 16 concepts (`/glossary/`)
-5. 1986 in Journalism (`/context-1986/`)
-6. Timeline - 14 entries (`/timeline/`)
-7. Annotated Excerpts - 12 passages (`/annotated-excerpts/`)
-8. FAQ - 46 Q&A pairs (`/faq/`)
-9. Dissertation Reader (`/tools/dissertation-reader/dist/`)
+3. Then and Now Comparison Tool (`/features/comparison-tool/`)
+4. Glossary - 16 concepts (`/features/glossary/`)
+5. 1986 in Journalism (`/features/context-1986/`)
+6. Timeline - 14 entries (`/features/timeline/`)
+7. Annotated Excerpts - 12 passages (`/features/annotated-excerpts/`)
+8. FAQ - 46 Q&A pairs (`/features/faq/`)
+9. Dissertation Reader (`/features/dissertation-reader/src/`)
 
 ##### **Documentation Updates**
 

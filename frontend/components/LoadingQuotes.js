@@ -70,16 +70,13 @@ const LoadingQuotes = () => {
 
   return html`
     <div className="flex flex-col items-center justify-center py-16 px-4">
-      <!-- Animated book icon -->
       <div className="relative mb-8">
         <div className="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center">
           <${BookOpen} className="w-8 h-8 text-stone-400 animate-pulse" />
         </div>
-        <!-- Spinning ring -->
         <div className="absolute inset-0 w-16 h-16 border-2 border-stone-200 border-t-stone-500 rounded-full animate-spin" style=${{ animationDuration: '1.5s' }} />
       </div>
 
-      <!-- Quote container with fade animation -->
       <div
         className="max-w-xl text-center transition-opacity duration-300"
         style=${{ opacity: isVisible ? 1 : 0 }}
@@ -92,7 +89,6 @@ const LoadingQuotes = () => {
         </cite>
       </div>
 
-      <!-- Loading indicator -->
       <div className="mt-8 flex items-center gap-2">
         <div className="flex gap-1">
           <span className="w-2 h-2 bg-stone-300 rounded-full animate-bounce" style=${{ animationDelay: '0ms' }} />
@@ -102,7 +98,6 @@ const LoadingQuotes = () => {
         <span className="text-xs text-stone-400 ml-2">Loading archive...</span>
       </div>
 
-      <!-- Progress hint -->
       <p className="text-xs text-stone-300 mt-6">
         Tip: Records are cached for faster loading next time
       </p>

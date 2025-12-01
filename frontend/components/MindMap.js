@@ -187,7 +187,6 @@ const MindMapNode = ({ node, nodeWidth, nodeHeight, isExpanded, hasChildren, isS
       onMouseEnter=${() => setIsHovered(true)}
       onMouseLeave=${() => setIsHovered(false)}
     >
-      <!-- Drop shadow -->
       <rect
         x=${shadowOffset}
         y=${shadowOffset}
@@ -198,7 +197,6 @@ const MindMapNode = ({ node, nodeWidth, nodeHeight, isExpanded, hasChildren, isS
         style=${{ transition: 'all 0.2s ease' }}
       />
 
-      <!-- Node background - this is the clickable area -->
       <rect
         width=${nodeWidth}
         height=${nodeHeight}
@@ -210,7 +208,6 @@ const MindMapNode = ({ node, nodeWidth, nodeHeight, isExpanded, hasChildren, isS
         style=${{ transition: 'all 0.2s ease', cursor: 'pointer' }}
       />
 
-      <!-- Selection indicator ring -->
       ${isSelected && html`
         <rect
           x="-3"
@@ -226,7 +223,6 @@ const MindMapNode = ({ node, nodeWidth, nodeHeight, isExpanded, hasChildren, isS
         />
       `}
 
-      <!-- Node content - pointer-events none so clicks pass through -->
       <foreignObject
         width=${nodeWidth}
         height=${nodeHeight}
@@ -283,7 +279,6 @@ const MindMapNode = ({ node, nodeWidth, nodeHeight, isExpanded, hasChildren, isS
         </div>
       </foreignObject>
 
-      <!-- Expand/collapse button - positioned on the right edge -->
       ${hasChildren && html`
         <g
           transform="translate(${nodeWidth - 14}, ${nodeHeight / 2 - 14})"
@@ -321,7 +316,6 @@ const MindMapNode = ({ node, nodeWidth, nodeHeight, isExpanded, hasChildren, isS
         </g>
       `}
 
-      <!-- Child count badge -->
       ${hasChildren && !isExpanded && html`
         <g transform="translate(${nodeWidth - 28}, ${nodeHeight - 10})">
           <rect
@@ -357,7 +351,6 @@ const MindMapEdge = ({ edge }) => {
 
   return html`
     <g style=${{ transition: 'opacity 0.3s ease' }}>
-      <!-- Shadow/glow -->
       <path
         d=${path}
         fill="none"
@@ -366,7 +359,6 @@ const MindMapEdge = ({ edge }) => {
         strokeLinecap="round"
         style=${{ transition: 'd 0.35s cubic-bezier(0.4, 0, 0.2, 1)' }}
       />
-      <!-- Main line -->
       <path
         d=${path}
         fill="none"
@@ -743,7 +735,6 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
 
   return html`
     <div className=${`relative w-full h-full bg-stone-100 overflow-hidden ${className}`} ref=${containerRef}>
-      <!-- Controls -->
       <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
         <button
           onClick=${handleZoomIn}
@@ -772,7 +763,6 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
         </button>
       </div>
 
-      <!-- Bottom left controls: zoom + expand/collapse buttons -->
       <div className="absolute bottom-4 left-4 z-10 flex flex-wrap items-center gap-2 max-w-[calc(100vw-2rem)]">
         <div className="text-xs font-mono text-stone-500 bg-white/90 px-3 py-2 rounded-lg shadow-md border border-stone-200" aria-live="polite" aria-label=${`Zoom level: ${Math.round(zoom * 100)} percent`}>
           ${Math.round(zoom * 100)}%
@@ -803,7 +793,6 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
         </button>
       </div>
 
-      <!-- Keyboard Shortcuts Panel -->
       ${showShortcuts && html`
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 bg-white rounded-lg shadow-xl border border-stone-300 p-4 max-w-sm">
           <div className="flex items-center justify-between mb-3">
@@ -850,9 +839,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
           </div>
         </div>
       `}
-      </div>
 
-      <!-- SVG Canvas -->
       <svg
         className="w-full h-full touch-none"
         style=${{ cursor: isPanning ? 'grabbing' : 'grab' }}
@@ -875,12 +862,10 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
             transition: isAnimating ? 'none' : (isPanning ? 'none' : 'transform 0.3s ease-out')
           }}
         >
-          <!-- Edges (render first so they're behind nodes) -->
           ${edges.map(edge => html`
             <${MindMapEdge} key=${edge.id} edge=${edge} />
           `)}
 
-          <!-- Nodes -->
           ${visibleNodes.map(node => html`
             <${MindMapNode}
               key=${node.id}

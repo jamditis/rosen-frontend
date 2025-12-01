@@ -405,14 +405,14 @@ const App = () => {
                                     <span className="text-xs font-medium text-stone-700">Network</span>
                                 </button>
                                 <a
-                                    href="/wp-content/rosen-archive/comparison-tool/"
+                                    href="/wp-content/rosen-archive/features/comparison-tool/"
                                     className="flex flex-col items-center p-4 bg-white rounded-lg border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all group"
                                 >
                                     <span className="text-xl mb-1">⚡</span>
                                     <span className="text-xs font-medium text-stone-700">Then & Now</span>
                                 </a>
                                 <a
-                                    href="/wp-content/rosen-archive/glossary/"
+                                    href="/wp-content/rosen-archive/features/glossary/"
                                     className="flex flex-col items-center p-4 bg-white rounded-lg border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all group"
                                 >
                                     <span className="text-xl mb-1">📚</span>

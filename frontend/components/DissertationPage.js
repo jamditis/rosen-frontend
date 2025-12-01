@@ -10,7 +10,7 @@ const DissertationPage = ({ onBack }) => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [detailPanelOpen, setDetailPanelOpen] = useState(false);
 
-  const dissertationPdfUrl = '/wp-content/rosen-archive/tools/dissertation-reader/dist/';
+  const dissertationPdfUrl = '/wp-content/rosen-archive/features/dissertation-reader/src/';
 
   const handleNodeSelect = (node) => {
     if (node) {
@@ -30,10 +30,8 @@ const DissertationPage = ({ onBack }) => {
 
   return html`
     <div className="h-screen w-screen bg-paper flex flex-col overflow-hidden max-w-full">
-      <!-- Header -->
       <header className="flex-shrink-0 z-30 w-full bg-paper border-b border-stone-200">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <!-- Left: Back button -->
           <div className="flex items-center gap-4">
             ${onBack && html`
               <button
@@ -57,7 +55,6 @@ const DissertationPage = ({ onBack }) => {
             </div>
           </div>
 
-          <!-- Center: Metadata -->
           <div className="hidden md:flex items-center gap-6 text-xs text-stone-500">
             <div className="flex items-center gap-2">
               <${GraduationCap} className="w-4 h-4" />
@@ -70,7 +67,6 @@ const DissertationPage = ({ onBack }) => {
             </div>
           </div>
 
-          <!-- Right: CTA -->
           <a
             href=${dissertationPdfUrl}
             target="_blank"
@@ -83,7 +79,6 @@ const DissertationPage = ({ onBack }) => {
         </div>
       </header>
 
-      <!-- Compact Hero Section -->
       <div className="flex-shrink-0 bg-gradient-to-r from-stone-50 to-stone-100 border-b border-stone-200">
         <div className="container mx-auto px-4 py-4 md:py-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -109,7 +104,6 @@ const DissertationPage = ({ onBack }) => {
         </div>
       </div>
 
-      <!-- Instructions Bar -->
       <div className="flex-shrink-0 bg-white border-b border-stone-200">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="text-xs text-stone-500">
@@ -130,7 +124,6 @@ const DissertationPage = ({ onBack }) => {
         </div>
       </div>
 
-      <!-- Mind Map Container - fills ALL remaining viewport height -->
       <div className="flex-1 relative overflow-hidden">
         <${MindMap}
           nodes=${DISSERTATION_NODES}
@@ -140,14 +133,12 @@ const DissertationPage = ({ onBack }) => {
         />
       </div>
 
-      <!-- Detail Panel -->
       <${DetailPanel}
         node=${selectedNode}
         isOpen=${detailPanelOpen}
         onClose=${closeDetailPanel}
       />
 
-      <!-- Compact Footer -->
       <footer className="bg-stone-50 border-t border-stone-200 py-2 flex-shrink-0">
         <div className="container mx-auto px-4 flex items-center justify-between text-xs text-stone-400">
           <div>

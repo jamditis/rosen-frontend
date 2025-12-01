@@ -55,7 +55,6 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
   if (!displayNode) return null;
 
   return html`
-    <!-- Backdrop -->
     ${isOpen && html`
       <div
         className="fixed inset-0 bg-black/20 z-40 sm:hidden"
@@ -63,7 +62,6 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
       />
     `}
 
-    <!-- Panel -->
     <div
       ref=${panelRef}
       role="dialog"
@@ -76,7 +74,6 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
       `}
       style=${{ maxWidth: 'calc(100vw - 16px)' }}
     >
-      <!-- Header -->
       <div className="sticky top-0 bg-white border-b border-stone-200 px-4 sm:px-6 py-4 flex items-center justify-between">
         <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400">
           ${TYPE_LABELS[displayNode.type] || 'Section'}
@@ -92,9 +89,7 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
         </button>
       </div>
 
-      <!-- Content -->
       <div className="pl-4 pr-6 sm:pl-6 sm:pr-8 py-6 overflow-y-auto overflow-x-hidden h-[calc(100%-64px)]">
-        <!-- Title -->
         <h2 id="detail-panel-title" className="font-display text-xl font-bold text-stone-900 leading-tight mb-2 break-words">
           ${displayNode.label}
         </h2>
@@ -103,7 +98,6 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
           <p className="text-stone-600 text-sm mb-4 break-words">${displayNode.subtitle}</p>
         `}
 
-        <!-- Page reference -->
         ${(displayNode.pageStart || displayNode.pageRef) && html`
           <div className="flex items-center gap-2 text-xs text-stone-400 mb-6 font-mono">
             <${FileText} className="w-3.5 h-3.5" />
@@ -113,7 +107,6 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
           </div>
         `}
 
-        <!-- Pull Quote -->
         ${displayNode.pullQuote && html`
           <div className="mb-6">
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-2">
@@ -126,7 +119,6 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
           </div>
         `}
 
-        <!-- Summary -->
         ${displayNode.summary && html`
           <div className="mb-6">
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-2">
@@ -139,7 +131,6 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
           </div>
         `}
 
-        <!-- Key Concepts -->
         ${displayNode.keyConcepts && displayNode.keyConcepts.length > 0 && html`
           <div className="mb-6">
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-2">
@@ -159,7 +150,6 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
           </div>
         `}
 
-        <!-- Key Figures -->
         ${displayNode.keyFigures && displayNode.keyFigures.length > 0 && html`
           <div className="mb-6">
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-2">
@@ -179,7 +169,6 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
           </div>
         `}
 
-        <!-- Placeholder if no detail content -->
         ${!displayNode.summary && !displayNode.pullQuote && !displayNode.keyConcepts?.length && !displayNode.keyFigures?.length && html`
           <div className="text-center py-8 text-stone-400">
             <${FileText} className="w-8 h-8 mx-auto mb-2 opacity-30" />
