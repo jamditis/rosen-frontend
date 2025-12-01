@@ -37,13 +37,13 @@ def process_from_offset(limit_param=50, batch_size=25, resume=True):
     import gspread
     from google.oauth2.service_account import Credentials
     import os
-    from tools.diagnostics.smart_corrector import (
+    from diagnostics.smart_corrector import (
         ContentDetector,
         QualityValidator,
         AudioOptimizer,
         CostTracker
     )
-    from tools.diagnostics.smart_corrector.processors import (
+    from diagnostics.smart_corrector.processors import (
         SoundCloudProcessor,
         CSpanProcessor,
         YouTubeEnhancedProcessor,

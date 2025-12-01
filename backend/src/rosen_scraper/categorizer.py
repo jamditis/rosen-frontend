@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import google.generativeai as genai
+from rosen_scraper.rate_limiter import rate_limited_gemini_call
 
 AI_DEBUG_DIR = Path("logs/ai_responses")
 UNIFORM_RESPONSE_SIGNATURE = {
@@ -175,7 +176,25 @@ def _validate_ai_payload(ai_data: Dict[str, Any], schema: Dict[str, Any], raw_pa
 
     return ai_data
 
-def summarize_and_classify(text_content, schema):
+
+@rate_limited_gemini_call
+def _call_gemini_for_classification(model, prompt):
+    """
+    Make a rate-limited call to Gemini API for content classification.
+
+    This function is decorated with rate limiting to prevent API throttling.
+
+    Args:
+        model: Gemini model instance
+        prompt: The prompt to send
+
+    Returns:
+        The API response object
+    """
+    response = model.generate_content(prompt)
+    return response
+
+def summarize_and_classify(text_content: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
     Uses the Gemini API to extract metadata, generate a summary, and classify an article.
 
@@ -277,7 +296,7 @@ def summarize_and_classify(text_content, schema):
     try:
         # Send the request to the Gemini API and await the response.
         print("  [AI] Sending request to Gemini API for analysis...")
-        response = model.generate_content(prompt)
+        response = _call_gemini_for_classification(model, prompt)
         
         # Clean up the response text to ensure it's valid JSON.
         # This involves removing markdown code block delimiters.

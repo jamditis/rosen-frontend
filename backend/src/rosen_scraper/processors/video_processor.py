@@ -5,12 +5,13 @@ It uses the yt-dlp library to extract metadata from video URLs without
 downloading the entire video file.
 """
 
+from typing import Optional, Dict, Any
 import yt_dlp
 from rosen_scraper import categorizer
 import os
 import re
 
-def _clean_vtt(vtt_content):
+def _clean_vtt(vtt_content: str) -> str:
     """Cleans a VTT file content to extract only the spoken text."""
     lines = vtt_content.splitlines()
     cleaned_lines = []
@@ -23,7 +24,7 @@ def _clean_vtt(vtt_content):
         cleaned_lines.append(cleaned_line.strip())
     return "\n".join(cleaned_lines)
 
-def process_video(url, schema):
+def process_video(url: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
     Extracts metadata and transcript from a YouTube video URL, then analyzes it.
     """

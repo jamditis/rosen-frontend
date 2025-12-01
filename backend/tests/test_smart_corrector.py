@@ -8,11 +8,11 @@ import sys
 from pathlib import Path
 
 # Add project root to path
-ROOT_DIR = Path(__file__).resolve().parent
-sys.path.insert(0, str(ROOT_DIR))
-sys.path.insert(0, str(ROOT_DIR / 'tools' / 'diagnostics'))
+ROOT_DIR = Path(__file__).resolve().parent.parent  # Go to backend root
+sys.path.insert(0, str(ROOT_DIR / 'scripts'))
+sys.path.insert(0, str(ROOT_DIR / 'scripts' / 'diagnostics'))
 
-from tools.diagnostics.smart_corrector import (
+from diagnostics.smart_corrector import (
     ContentDetector,
     QualityValidator,
     AudioOptimizer,

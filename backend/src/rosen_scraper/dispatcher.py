@@ -5,10 +5,11 @@ processor based on the URL's structure. It helps in routing URLs to the correct
 handler (e.g., for video, articles, etc.).
 """
 
+from typing import Optional, Dict, Any
 import re
 from rosen_scraper.processors import article_processor, video_processor
 
-def dispatch_url(url, schema):
+def dispatch_url(url: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
     Determines the content type of a URL and returns the appropriate processor.
 
@@ -31,7 +32,7 @@ def dispatch_url(url, schema):
         # If the URL is not a video, default to the article processor.
         return article_processor.process_article(url, schema)
 
-def reprocess_text(raw_text, schema):
+def reprocess_text(raw_text: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
     Reprocesses existing raw text using the AI analysis module.
 

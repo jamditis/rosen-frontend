@@ -5,6 +5,7 @@ It uses the reportlab library to create a structured and readable PDF layout,
 including metadata, excerpts, and the main article text.
 """
 
+from typing import Optional, Dict, Any
 import os
 import re
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
@@ -19,7 +20,7 @@ try:
 except ImportError:
     ENHANCED_FORMATTER_AVAILABLE = False
 
-def create_article_pdf(article_data, output_dir="processed_pdf_library"):
+def create_article_pdf(article_data: Dict[str, Any], output_dir: str = "processed_pdf_library") -> Optional[str]:
     """
     Creates a clean PDF from structured article data with a specific filename
     format and internal layout.

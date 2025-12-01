@@ -6,21 +6,25 @@ processor, enriches the extracted data, and writes the final records back to
 another sheet.
 """
 
+from typing import Optional, Dict, Any, List, Set
 from rosen_scraper import dispatcher
 from rosen_scraper.processors import article_processor
 import gspread
+from gspread import Worksheet
 import os
 import json
 import time
 from urllib.parse import urlparse
+from pathlib import Path
 from dotenv import load_dotenv
 from datetime import datetime
 import re
 from rosen_scraper import pdf_generator
 from rosen_scraper import transcript_saver
 from rosen_scraper import entity_resolver
-from rosen_scraper.logger import get_logger, init_logger, PoisonPillType
-from rosen_scraper.poison_pill_handler import get_poison_pill_manager
+from rosen_scraper.logger import get_logger, init_logger, PoisonPillType, ArchiveLogger
+from rosen_scraper.poison_pill_handler import get_poison_pill_manager, PoisonPillManager
+from rosen_scraper.path_utils import find_project_root
 
 # Load environment variables from a .env file for secure configuration management.
 load_dotenv()
@@ -29,13 +33,14 @@ load_dotenv()
 # A list of domains known to be behind a paywall, which are handled separately.
 # Note: This is now also handled by the poison pill detection system
 PAYWALLED_DOMAINS = ["www.washingtonpost.com", "www.nytimes.com", "www.wsj.com"]
-# Define key file paths relative to the script's location.
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SCHEMA_FILE = os.path.join(BASE_DIR, 'schema.json')
-KNOWN_ENTITIES_FILE = os.path.join(BASE_DIR, 'known_entities.json')
 
-def get_schema(schema_file):
+# Define key file paths using pathlib for cleaner path handling.
+SCRIPT_DIR = Path(__file__).resolve().parent
+BASE_DIR = find_project_root()
+SCHEMA_FILE = BASE_DIR / 'schema.json'
+KNOWN_ENTITIES_FILE = BASE_DIR / 'known_entities.json'
+
+def get_schema(schema_file: str) -> Optional[Dict[str, Any]]:
     """
     Loads the JSON schema from the specified file.
     The schema contains taxonomy and configuration needed for processing.
@@ -47,7 +52,7 @@ def get_schema(schema_file):
         print(f"FATAL: Could not load schema. Error: {e}")
         return None
 
-def generate_source_based_id(publication, existing_ids):
+def generate_source_based_id(publication: str, existing_ids: Set[str]) -> str:
     """
     Generates a unique ID based on the source publication.
     The ID consists of a 5-8 character uppercase prefix derived from the publication
@@ -101,7 +106,7 @@ def generate_source_based_id(publication, existing_ids):
     # Format the new ID with leading zeros.
     return f"{prefix}-{new_id_num:05d}"
 
-def format_date_mmddyyyy(date_str):
+def format_date_mmddyyyy(date_str: str) -> str:
     """
     Convert various date formats to MM/DD/YYYY format.
     """
@@ -128,7 +133,7 @@ def format_date_mmddyyyy(date_str):
     # If no format matches, return original
     return date_str
 
-def enrich_data(data, url, known_entities):
+def enrich_data(data: Dict[str, Any], url: str, known_entities: Optional[Dict[str, Any]]) -> Dict[str, Any]:
     """
     Adds final calculated and derived fields to the data dictionary before saving.
     This includes processing timestamps, word counts, platform information, and new schema fields.
@@ -158,7 +163,7 @@ def enrich_data(data, url, known_entities):
 
     return data
 
-def generate_collection_id(data, url):
+def generate_collection_id(data: Dict[str, Any], url: str) -> str:
     """
     Generate a collection ID based on content patterns.
     Groups related content together for better organization.
@@ -182,7 +187,7 @@ def generate_collection_id(data, url):
     # Default: no specific collection
     return ""
 
-def determine_permissions(data, url):
+def determine_permissions(data: Dict[str, Any], url: str) -> str:
     """
     Determine permission/rights status based on source and content.
     """
@@ -209,7 +214,7 @@ def determine_permissions(data, url):
     # Default
     return "Standard Copyright"
 
-def append_record_to_sheet(worksheet, data, headers, logger=None):
+def append_record_to_sheet(worksheet: Worksheet, data: Dict[str, Any], headers: List[str], logger: Optional[ArchiveLogger] = None) -> bool:
     """
     Formats and appends a new row to the specified Google Sheet.
     The row is ordered according to the provided headers.
@@ -232,7 +237,7 @@ def append_record_to_sheet(worksheet, data, headers, logger=None):
         logger.log_sheets_operation("write", data.get('id'), False, {"error": str(e), "url": data.get('url')})
         return False
 
-def main():
+def main() -> None:
     """The main workflow for the backend pipeline with enhanced error handling and logging."""
     # Initialize logging system
     logger = init_logger()
@@ -258,8 +263,8 @@ def main():
 
         # --- 1. Connect to Google Sheets ---
         try:
-            credentials_path = os.path.join(BASE_DIR, os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json"))
-            gc = gspread.service_account(filename=credentials_path)
+            credentials_path = BASE_DIR / os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+            gc = gspread.service_account(filename=str(credentials_path))
             sh = gc.open(os.environ.get("SPREADSHEET_NAME", "Rosen Archive URL List"))
             urls_worksheet = sh.worksheet("urls_to_scrape")
             processed_worksheet = sh.worksheet("test_runs")
@@ -275,8 +280,36 @@ def main():
             logger.logger.info("No URLs to process.")
             return
 
-        # Extract URLs from the second column, for rows 610-619.
-        urls_to_process = [row[1] for row in all_values[609:619] if len(row) > 1 and row[1]]
+        # Get configurable row range from environment variables
+        # START_ROW: Starting row index (0-based), default is 0 (process from beginning)
+        # END_ROW: Ending row index (0-based), default is -1 (process all remaining rows)
+        try:
+            start_row = int(os.environ.get("PROCESS_START_ROW", "0"))
+            if start_row < 0:
+                logger.log_error("configuration", "PROCESS_START_ROW must be >= 0", details={"value": start_row})
+                return
+        except ValueError as e:
+            logger.log_error("configuration", "PROCESS_START_ROW must be a valid integer", details={"error": str(e)})
+            return
+        
+        try:
+            end_row_str = os.environ.get("PROCESS_END_ROW", "-1")
+            end_row = int(end_row_str) if end_row_str != "-1" else None
+            if end_row is not None and end_row < start_row:
+                logger.log_error("configuration", "PROCESS_END_ROW must be >= PROCESS_START_ROW", 
+                               details={"start": start_row, "end": end_row})
+                return
+        except ValueError as e:
+            logger.log_error("configuration", "PROCESS_END_ROW must be a valid integer or -1", details={"error": str(e)})
+            return
+        
+        # Extract URLs from the second column using configurable row range
+        if end_row is None:
+            urls_to_process = [row[1] for row in all_values[start_row:] if len(row) > 1 and row[1]]
+        else:
+            urls_to_process = [row[1] for row in all_values[start_row:end_row] if len(row) > 1 and row[1]]
+        
+        logger.logger.info(f"Processing rows {start_row} to {end_row if end_row else 'end'}")
         logger.logger.info(f"Starting processing for {len(urls_to_process)} URLs")
 
         # --- 3. Process Each URL ---
@@ -377,7 +410,7 @@ def main():
         if poison_summary['total'] > 0:
             logger.logger.info(f"Poison pill summary: {poison_summary}")
 
-def process_url_with_error_handling(url, schema, logger, poison_manager):
+def process_url_with_error_handling(url: str, schema: Dict[str, Any], logger: ArchiveLogger, poison_manager: PoisonPillManager) -> Optional[Dict[str, Any]]:
     """
     Process a single URL with comprehensive error handling and poison pill detection.
     """
