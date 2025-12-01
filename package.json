@@ -5,9 +5,12 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "export-data": "node csv/export-archive-data.js"
+    "export-data": "node csv/export-archive-data.js",
+    "build:css": "tailwindcss -i src/tailwind.css -o dist/tailwind.css --minify",
+    "watch:css": "tailwindcss -i src/tailwind.css -o dist/tailwind.css --watch"
   },
   "devDependencies": {
-    "csv-parse": "^5.5.6"
+    "csv-parse": "^5.5.6",
+    "tailwindcss": "^3.4.18"
   }
 }
