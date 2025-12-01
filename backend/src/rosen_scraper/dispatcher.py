@@ -11,6 +11,7 @@ from rosen_scraper.processors import article_processor, video_processor
 from rosen_scraper.processors.twitter_processor import TwitterProcessor
 from rosen_scraper.processors.tumblr_processor import TumblrProcessor
 from rosen_scraper.processors.clipping_processor import ClippingProcessor
+from rosen_scraper.processors.bluesky_processor import BlueskyProcessor
 
 def dispatch_url(url: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
@@ -38,6 +39,16 @@ def dispatch_url(url: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         # If processing succeeded, add schema for AI analysis
         if result.get('status') == 'success' and result.get('raw_text'):
             # Run AI analysis on the extracted text
+            ai_result = article_processor._run_ai_analysis(result['raw_text'], schema)
+            if ai_result:
+                result.update(ai_result)
+        return result
+
+    # Bluesky posts
+    elif re.search(r"bsky\.app/profile/.*/post/", url):
+        processor = BlueskyProcessor()
+        result = processor.process(url)
+        if result.get('status') == 'success' and result.get('raw_text'):
             ai_result = article_processor._run_ai_analysis(result['raw_text'], schema)
             if ai_result:
                 result.update(ai_result)
