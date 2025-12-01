@@ -1,6 +1,13 @@
 # Jay Rosen Digital Archive (JRDA)
 
+[![Frontend Validation](https://github.com/jamditis/rosen-frontend/actions/workflows/frontend-validation.yml/badge.svg)](https://github.com/jamditis/rosen-frontend/actions/workflows/frontend-validation.yml)
+[![Backend Tests](https://github.com/jamditis/rosen-frontend/actions/workflows/backend-tests.yml/badge.svg)](https://github.com/jamditis/rosen-frontend/actions/workflows/backend-tests.yml)
+
+**Status: Ready for Publication (December 2025)**
+
 A comprehensive digital archive project for NYU Professor Jay Rosen's work, including an interactive frontend application, a Python-based data pipeline for content processing, and supporting tools for analysis and visualization.
+
+This archive includes the public release of Jay Rosen's 1986 doctoral dissertation, *The Impossible Press: American Journalism and the Decline of Public Life*, with 9 interactive presentation tools for exploring the dissertation and its contemporary relevance.
 
 ![Archive Preview](https://i.imgur.com/iaBrkg8.png)
 
@@ -48,14 +55,16 @@ The frontend uses a **zero-build static architecture** designed for simple deplo
 *   **Manhattan Routing:** Aesthetic connection paths inspired by subway maps
 *   **Export Capabilities:** Generate and download high-resolution PNG cards
 
-#### 📜 Dissertation Presentation Tools
-*   **Interactive Mind Map:** Left-to-right tree visualization with auto-fit zooming, keyboard navigation, and touch support
-*   **"Then and Now" Comparison Tool:** 1986 insights alongside 2025 realities (`/comparison-tool/`)
-*   **Glossary:** Interactive concept glossary with definitions (`/glossary/`)
-*   **1986 in Journalism:** Historical context page (`/context-1986/`)
-*   **Timeline:** Visual timeline of intellectual evolution (`/timeline/`)
-*   **Annotated Excerpts:** Key passages with commentary (`/annotated-excerpts/`)
-*   **FAQ / Ask the Dissertation:** 46 Q&A pairs, searchable (`/faq/`)
+#### 📜 Dissertation Presentation Tools (9 Tools)
+*   **Interactive Mind Map:** Left-to-right tree visualization with auto-fit zooming, keyboard navigation, and touch support (in main archive)
+*   **Network Explorer:** Canvas-based visualization of relationships between archive records (in main archive)
+*   **"Then and Now" Comparison Tool:** 7 side-by-side 1986 vs 2025 comparisons (`/comparison-tool/`)
+*   **Glossary:** 16 key concepts with definitions and contemporary relevance (`/glossary/`)
+*   **1986 in Journalism:** Historical context—the media landscape when the dissertation was written (`/context-1986/`)
+*   **Timeline:** 14 entries tracking intellectual evolution from 1986 to 2025 (`/timeline/`)
+*   **Annotated Excerpts:** 12 key passages with 2025 commentary (`/annotated-excerpts/`)
+*   **FAQ / Ask the Dissertation:** 46 Q&A pairs, searchable, with NotebookLM integration (`/faq/`)
+*   **Dissertation Reader:** Landing page with PDF download, table of contents, citation info (`/tools/dissertation-reader/dist/`)
 
 #### ♿ Accessibility
 *   **Keyboard Navigation:** Full keyboard support (arrow keys, +/-, ESC)
@@ -201,9 +210,12 @@ python src/workflow.py
 │   └── web/                     # Promotional website
 │
 ├── release-assets/              # Promotional materials
+│   └── documentation/           # Pre-publication reports
+├── .github/workflows/           # CI/CD pipelines
 ├── App.js                       # Main frontend controller
 ├── constants.js                 # Configuration
 ├── index.html                   # Frontend entry point
+├── shared-styles.css            # Common CSS for standalone tools
 └── CLAUDE.md                    # AI assistant instructions
 ```
 

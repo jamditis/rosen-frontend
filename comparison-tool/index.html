@@ -17,46 +17,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              body: ['"Roboto Mono"', 'monospace'],
-              display: ['"Special Elite"', 'cursive'],
-            },
-            colors: {
-              paper: '#fdfbf7',
-              card: '#ffffff',
-              stone: {
-                850: '#1c1917',
-              }
-            },
-            animation: {
-              'fade-in': 'fadeIn 0.5s ease-out forwards',
-              'slide-in-left': 'slideInLeft 0.6s ease-out forwards',
-              'slide-in-right': 'slideInRight 0.6s ease-out forwards',
-            },
-            keyframes: {
-              fadeIn: {
-                '0%': { opacity: '0', transform: 'translateY(10px)' },
-                '100%': { opacity: '1', transform: 'translateY(0)' },
-              },
-              slideInLeft: {
-                '0%': { opacity: '0', transform: 'translateX(-30px)' },
-                '100%': { opacity: '1', transform: 'translateX(0)' },
-              },
-              slideInRight: {
-                '0%': { opacity: '0', transform: 'translateX(30px)' },
-                '100%': { opacity: '1', transform: 'translateX(0)' },
-              }
-            }
-          }
-        }
-      }
-    </script>
+    <!-- Tailwind CSS (pre-built for production) -->
+    <link rel="stylesheet" href="../dist/tailwind.css" />
 
     <!-- Custom Styles -->
     <link rel="stylesheet" href="./styles.css" />

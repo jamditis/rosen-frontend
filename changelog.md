@@ -1,5 +1,47 @@
-
 # Changelog - Jay Rosen Digital Archive
+
+---
+
+*Session Date: December 1, 2025*
+
+## Pre-Publication Final Checks Complete
+
+### Project Status: READY FOR PUBLICATION
+
+All development work for the December 2025 dissertation release is complete.
+
+### Merged Pull Requests (12 PRs)
+The following PRs were merged and closed:
+
+1. **PR #35** - Migrate PDFs to Git LFS
+2. **PR #33** - Review and fix TODO comments
+3. **PR #42** - Improve path handling with pathlib
+4. **PR #36** - Add GitHub Actions CI/CD
+5. **PR #49** - Fix open issues
+6. **PR #38** - Add integration tests for backend
+7. **PR #43** - Add type hints to backend Python code
+8. **PR #37** - Add Gemini API rate limiting
+9. **PR #34** - Remove hardcoded row ranges in workflow.py
+10. **PR #39** - Fix broken imports after monorepo merge
+11. **PR #32** - Relax Python requirement to 3.10+
+12. **PR #40, #41** - Add backend .env.example and README
+
+### Validation Results
+- **JavaScript Syntax**: All 28 files pass
+- **HTML Structure**: All 17 pages valid
+- **TODO/FIXME Comments**: None remaining in frontend
+- **Accessibility**: Skip links, ARIA labels present on all pages
+
+### Pre-Publication Report
+- Created comprehensive report at `release-assets/documentation/pre-publication-report.md`
+- Covers all tools, deployment checklist, and items requiring Jay's input
+
+### Documentation Updates
+- Updated CLAUDE.md with publication status and CI/CD section
+- Updated README.md with status badges and tool counts
+- Updated changelog.md (this file)
+
+---
 
 *Session Date: December 1, 2025*
 

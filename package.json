@@ -3,5 +3,14 @@
   "version": "1.0.0",
   "description": "Interactive frontend for Jay Rosen's journalism scholarship archive",
   "type": "module",
-  "private": true
+  "private": true,
+  "scripts": {
+    "export-data": "node csv/export-archive-data.js",
+    "build:css": "tailwindcss -i src/tailwind.css -o dist/tailwind.css --minify",
+    "watch:css": "tailwindcss -i src/tailwind.css -o dist/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "csv-parse": "^5.5.6",
+    "tailwindcss": "^3.4.18"
+  }
 }
