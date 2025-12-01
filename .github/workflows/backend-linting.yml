@@ -34,17 +34,17 @@ jobs:
       - name: Run Ruff
         working-directory: backend
         run: |
-          ruff check src/ tests/ || true
+          ruff check src/ tests/
         continue-on-error: true
       
       - name: Check Black formatting
         working-directory: backend
         run: |
-          black --check src/ tests/ || true
+          black --check src/ tests/
         continue-on-error: true
       
       - name: Run MyPy type checking
         working-directory: backend
         run: |
-          mypy src/ || true
+          mypy src/
         continue-on-error: true

@@ -54,8 +54,6 @@ jobs:
       - name: Check for JavaScript syntax errors
         run: |
           echo "Checking JavaScript files..."
-          # Install Node.js for basic validation
-          npm install -g jshint || true
           for file in $(find . -name "*.js" -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./backend/*" -not -path "./tools/web/*"); do
             echo "Checking: $file"
             # Basic syntax check - just try to parse the file
