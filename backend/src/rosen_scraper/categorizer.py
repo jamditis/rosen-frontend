@@ -176,6 +176,7 @@ def _validate_ai_payload(ai_data: Dict[str, Any], schema: Dict[str, Any], raw_pa
 
     return ai_data
 
+
 @rate_limited_gemini_call
 def _call_gemini_for_classification(model, prompt):
     """

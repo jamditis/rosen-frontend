@@ -196,7 +196,6 @@ def _validate_entity_extraction(
 
     return valid_entities, valid_relationships, issues
 
-
 @rate_limited_gemini_call
 def _call_gemini_for_entity_extraction(model, prompt):
     """
