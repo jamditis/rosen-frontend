@@ -26,8 +26,7 @@ REFERENCE IMPLEMENTATIONS:
 - soundcloud_processor.py: SoundCloud-specific metadata extraction
 - audio_optimizer.py: FFmpeg-based audio optimization (2x speed = 50% cost)
 
-For tracking: Create GitHub issue titled "Implement audio processor integration"
-with label "backend,enhancement"
+See AUDIO_PROCESSOR_IMPLEMENTATION.md for complete implementation plan.
 """
 
 def process_audio(url):

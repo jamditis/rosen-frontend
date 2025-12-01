@@ -88,8 +88,9 @@ See `backend/AUDIO_PROCESSOR_IMPLEMENTATION.md` for comprehensive implementation
 6-10 days of development time across 4 phases
 
 ## Related
-- Original TODO comment from PR #8 code review
+- Original TODO comment identified in backend code review
 - Existing audio infrastructure in diagnostic scripts
+- Implementation plan: `backend/AUDIO_PROCESSOR_IMPLEMENTATION.md`
 
 ---
 

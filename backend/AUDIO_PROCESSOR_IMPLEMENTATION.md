@@ -3,7 +3,7 @@
 ## Issue Context
 This document tracks the implementation plan for the audio processor integration referenced in:
 - `src/rosen_scraper/processors/audio_processor.py`
-- Original TODO comment from code review in PR #8
+- Original TODO comment identified in code review
 
 ## Current State
 
