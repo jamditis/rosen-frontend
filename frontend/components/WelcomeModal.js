@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { html } from '../html.js?v=2.0.1';
+import { html } from '../html.js?v=2.0.2';
 import { Archive, ArrowRight } from 'lucide-react';
 
 const WelcomeModal = () => {

@@ -569,7 +569,7 @@ node --check components/MindMap.js        # ✅ Pass
 
 **External Links Verified:**
 - NotebookLM: `https://notebooklm.google.com/notebook/d26d326e-20ec-46dc-b9b4-2c752b90e607`
-- Dissertation PDF: `/wp-content/rosen-archive/features/dissertation-reader/src/`
+- Dissertation PDF: `/wp-content/rosen-archive/features/dissertation-reader/`
 
 ##### **Next Steps (Post-Launch)**
 
@@ -4347,7 +4347,7 @@ Completed final pre-publication checks and validation for the December 2025 publ
 6. Timeline - 14 entries (`/features/timeline/`)
 7. Annotated Excerpts - 12 passages (`/features/annotated-excerpts/`)
 8. FAQ - 46 Q&A pairs (`/features/faq/`)
-9. Dissertation Reader (`/features/dissertation-reader/src/`)
+9. Dissertation Reader (`/features/dissertation-reader/`)
 
 ##### **Documentation Updates**
 

@@ -207,7 +207,7 @@ The following PRs were merged and closed:
 
 - **External Links Verified**
   - NotebookLM link confirmed in FAQ: `https://notebooklm.google.com/notebook/d26d326e-20ec-46dc-b9b4-2c752b90e607`
-  - Dissertation PDF reader links consistent: `/wp-content/rosen-archive/features/dissertation-reader/src/`
+  - Dissertation PDF reader links consistent: `/wp-content/rosen-archive/features/dissertation-reader/`
 
 ### All 7 Dissertation Tools Ready for Launch
 1. Interactive Mind Map (in main archive)

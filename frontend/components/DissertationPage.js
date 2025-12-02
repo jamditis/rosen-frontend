@@ -1,16 +1,16 @@
 
 import { useState } from 'react';
-import { html } from '../html.js?v=2.0.1';
+import { html } from '../html.js?v=2.0.2';
 import { BookOpen, ExternalLink, ArrowLeft, Calendar, GraduationCap } from 'lucide-react';
-import MindMap from './MindMap.js?v=2.0.1';
-import DetailPanel from './DetailPanel.js?v=2.0.1';
-import { DISSERTATION_NODES } from './dissertationData.js?v=2.0.1';
+import MindMap from './MindMap.js?v=2.0.2';
+import DetailPanel from './DetailPanel.js?v=2.0.2';
+import { DISSERTATION_NODES } from './dissertationData.js?v=2.0.2';
 
 const DissertationPage = ({ onBack }) => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [detailPanelOpen, setDetailPanelOpen] = useState(false);
 
-  const dissertationPdfUrl = '/wp-content/rosen-archive/features/dissertation-reader/src/';
+  const dissertationPdfUrl = '/wp-content/rosen-archive/features/dissertation-reader/';
 
   const handleNodeSelect = (node) => {
     if (node) {

@@ -1,18 +1,18 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=2.0.1';
+import { html } from './html.js?v=2.0.2';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network, BookOpen, Compass, AlertCircle, ChevronUp } from 'lucide-react';
-import { fetchArchiveData, hashString } from './services/archiveService.js?v=2.0.1';
-import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=2.0.1';
-import Sidebar from './components/Sidebar.js?v=2.0.1';
-import WelcomeModal from './components/WelcomeModal.js?v=2.0.1';
-import RecordModal from './components/RecordModal.js?v=2.0.1';
-import FeaturedSection from './components/FeaturedSection.js?v=2.0.1';
-import Explorer from './components/Explorer.js?v=2.0.1';
-import DissertationPage from './components/DissertationPage.js?v=2.0.1';
-import ToolsModal from './components/ToolsModal.js?v=2.0.1';
-import LoadingQuotes from './components/LoadingQuotes.js?v=2.0.1';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=2.0.1';
+import { fetchArchiveData, hashString } from './services/archiveService.js?v=2.0.2';
+import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=2.0.2';
+import Sidebar from './components/Sidebar.js?v=2.0.2';
+import WelcomeModal from './components/WelcomeModal.js?v=2.0.2';
+import RecordModal from './components/RecordModal.js?v=2.0.2';
+import FeaturedSection from './components/FeaturedSection.js?v=2.0.2';
+import Explorer from './components/Explorer.js?v=2.0.2';
+import DissertationPage from './components/DissertationPage.js?v=2.0.2';
+import ToolsModal from './components/ToolsModal.js?v=2.0.2';
+import LoadingQuotes from './components/LoadingQuotes.js?v=2.0.2';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=2.0.2';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
