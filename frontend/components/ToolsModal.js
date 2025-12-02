@@ -67,7 +67,7 @@ const TOOLS = {
       name: 'Dissertation Reader',
       description: 'Read the full text',
       icon: BookMarked,
-      href: '/wp-content/rosen-archive/features/dissertation-reader/src/',
+      href: '/wp-content/rosen-archive/features/dissertation-reader/',
       status: 'beta'
     }
   ],

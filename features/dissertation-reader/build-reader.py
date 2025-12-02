@@ -9,9 +9,9 @@ import os
 
 # Paths
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-MD_SOURCE = os.path.join(SCRIPT_DIR, '../web/95/impossible-press.md')
+MD_SOURCE = os.path.join(SCRIPT_DIR, '../../archived/web/95/impossible-press.md')
 TEMPLATE = os.path.join(SCRIPT_DIR, 'src/templates/shell.html')
-OUTPUT = os.path.join(SCRIPT_DIR, 'dist/index.html')
+OUTPUT = os.path.join(SCRIPT_DIR, 'index.html')  # Output directly to dissertation-reader root
 
 def convert_markdown_to_html(md_content):
     """Simple markdown to HTML conversion"""
