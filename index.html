@@ -12,8 +12,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
 
-    <!-- Prefetch archive data for faster loading -->
-    <link rel="prefetch" href="/wp-content/rosen-archive/data/archive-data.json" as="fetch">
+    <!-- Prefetch archive data for faster loading (core data loads first, details lazy-loaded) -->
+    <link rel="prefetch" href="/wp-content/rosen-archive/data/archive-core.json" as="fetch">
 
     <!-- External CSS (versioned for cache busting) -->
     <link rel="stylesheet" href="./frontend/index.css?v=2.0.2" />
@@ -29,7 +29,7 @@
     "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
     "htm": "https://esm.sh/htm@3.1.1",
     "lucide-react": "https://esm.sh/lucide-react@0.292.0?deps=react@18.2.0",
-    "papaparse": "https://esm.sh/papaparse@5.4.1"
+    "sql.js": "https://esm.sh/sql.js@1.10.3"
   }
 }
 </script>
@@ -39,5 +39,20 @@
     
     <!-- Main Entry Point (versioned for cache busting) -->
     <script type="module" src="./frontend/index.js?v=2.0.2"></script>
+
+    <!-- Service Worker Registration (for offline support & fast caching) -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/wp-content/rosen-archive/frontend/sw.js')
+            .then(registration => {
+              console.log('SW registered:', registration.scope);
+            })
+            .catch(err => {
+              console.log('SW registration failed:', err);
+            });
+        });
+      }
+    </script>
   </body>
 </html>

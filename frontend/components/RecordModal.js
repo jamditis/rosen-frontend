@@ -1,7 +1,8 @@
 
 import { useEffect, useState } from 'react';
 import { html } from '../html.js?v=2.0.2';
-import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2 } from 'lucide-react';
+import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2 } from 'lucide-react';
+import { fetchRecordDetails } from '../services/archiveService.js?v=2.0.2';
 
 const TagGroup = ({title, tags}) => {
     if (!tags || tags.length === 0) return null;
@@ -25,31 +26,69 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
   const [toastMessage, setToastMessage] = useState('');
   const [relatedWorks, setRelatedWorks] = useState([]);
 
+  // State for lazy-loaded details
+  const [fullRecord, setFullRecord] = useState(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+
+  // Fetch details when modal opens
   useEffect(() => {
-    if (isOpen && record && allRecords) {
+    if (isOpen && record) {
       document.body.style.overflow = 'hidden';
       setIsClosing(false);
-      
-      let related = [];
-      if (record.relatedIds && record.relatedIds.length > 0) {
-          related = allRecords.filter(r => record.relatedIds.includes(r.id));
+
+      // Check if we already have full details (from previous load or full data)
+      if (record.summary && record.url) {
+        // Already have full record
+        setFullRecord(record);
+        setLoadingDetails(false);
+      } else {
+        // Need to fetch details
+        setLoadingDetails(true);
+        fetchRecordDetails(record.id).then(details => {
+          if (details) {
+            setFullRecord({ ...record, ...details });
+          } else {
+            // Fallback: use summaryPreview as summary
+            setFullRecord({
+              ...record,
+              summary: record.summaryPreview || record.title,
+              quote: '',
+              concepts: [],
+              tags: [],
+              url: '#',
+              author: record.author || 'Jay Rosen',
+              relatedIds: []
+            });
+          }
+          setLoadingDetails(false);
+        });
       }
-      
+    } else {
+      document.body.style.overflow = '';
+      setFullRecord(null);
+    }
+  }, [isOpen, record?.id]);
+
+  // Find related works based on loaded details
+  useEffect(() => {
+    if (fullRecord && allRecords) {
+      let related = [];
+      if (fullRecord.relatedIds && fullRecord.relatedIds.length > 0) {
+          related = allRecords.filter(r => fullRecord.relatedIds.includes(r.id));
+      }
+
       if (related.length < 4) {
-          const more = allRecords.filter(r => 
-            r.id !== record.id && 
+          const more = allRecords.filter(r =>
+            r.id !== fullRecord.id &&
             !related.some(rel => rel.id === r.id) &&
-            (r.categories.some(c => record.categories.includes(c)) || 
-             r.concepts.some(c => record.concepts.includes(c)))
+            (r.categories || []).some(c => (fullRecord.categories || []).includes(c))
           ).slice(0, 4 - related.length);
           related = [...related, ...more];
       }
-      
+
       setRelatedWorks(related);
-    } else {
-      document.body.style.overflow = '';
     }
-  }, [isOpen, record, allRecords]);
+  }, [fullRecord, allRecords]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -77,8 +116,8 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
   };
 
   const handleCopyCitation = () => {
-    if (!record) return;
-    const text = `${record.author} (${record.year}). "${record.title}". ${record.pub}. Retrieved from ${window.location.href}`;
+    if (!fullRecord) return;
+    const text = `${fullRecord.author} (${fullRecord.year}). "${fullRecord.title}". ${fullRecord.pub}. Retrieved from ${window.location.href}`;
     navigator.clipboard.writeText(text).then(() => showNotification("Citation copied to clipboard"));
   };
 
@@ -90,8 +129,10 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
 
   if (!isOpen || !record) return null;
 
-  const isVideo = record.url.includes('youtube') || record.url.includes('vimeo');
-  const youtubeId = record.url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/)?.[2];
+  // Use fullRecord for display (with details), fallback to record for basic info
+  const displayRecord = fullRecord || record;
+  const isVideo = (displayRecord.url || '').includes('youtube') || (displayRecord.url || '').includes('vimeo');
+  const youtubeId = (displayRecord.url || '').match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/)?.[2];
 
   return html`
     <div className="fixed inset-0 z-[80]" role="dialog" aria-modal="true">
@@ -114,9 +155,14 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
           
           <div className="flex items-center justify-between p-4 sm:p-6 border-b border-stone-200 bg-white/50">
             <div className="flex items-center gap-2 text-xs font-bold uppercase text-stone-400 tracking-widest">
-              <span>${record.date}</span>
+              <span>${displayRecord.date}</span>
               <span>•</span>
               <span>${isVideo ? 'Video' : 'Article'}</span>
+              ${loadingDetails && html`
+                <span className="ml-2 flex items-center gap-1 text-stone-500">
+                  <${Loader2} className="w-3 h-3 animate-spin" /> Loading...
+                </span>
+              `}
             </div>
             <div className="flex items-center gap-2">
               <button onClick=${handleShare} className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded transition-colors" title="Share Link">
@@ -133,47 +179,49 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
 
           <div className="overflow-y-auto p-6 sm:p-10 font-body leading-relaxed space-y-8">
             <div>
-                <h2 className="text-3xl sm:text-4xl font-display font-bold text-stone-900 mb-2 leading-tight">${record.title}</h2>
-                
+                <h2 className="text-3xl sm:text-4xl font-display font-bold text-stone-900 mb-2 leading-tight">${displayRecord.title}</h2>
+
                 <div className="text-lg text-stone-600 mb-4 font-display">
-                    By ${record.author}
+                    By ${displayRecord.author || 'Jay Rosen'}
                 </div>
 
-                <a href=${record.url} target="_blank" rel="noreferrer" className="text-blue-700 hover:underline font-bold text-sm inline-flex items-center gap-1 mb-6">
-                  Read on ${record.pub} <${ExternalLink} className="w-3 h-3" />
-                </a>
+                ${displayRecord.url && displayRecord.url !== '#' && html`
+                  <a href=${displayRecord.url} target="_blank" rel="noreferrer" className="text-blue-700 hover:underline font-bold text-sm inline-flex items-center gap-1 mb-6">
+                    Read on ${displayRecord.pub} <${ExternalLink} className="w-3 h-3" />
+                  </a>
+                `}
             </div>
 
             ${youtubeId && html`
                <div className="aspect-video bg-black rounded-lg overflow-hidden mb-8 shadow-lg">
-                  <iframe 
-                    src=${`https://www.youtube.com/embed/${youtubeId}`} 
+                  <iframe
+                    src=${`https://www.youtube.com/embed/${youtubeId}`}
                     allowFullScreen=${true}
                     className="w-full h-full border-0"
                   />
                </div>
             `}
 
-            ${!youtubeId && record.quote && html`
+            ${!youtubeId && displayRecord.quote && html`
                <blockquote className="border-l-4 border-stone-800 pl-6 py-2 my-8 italic text-xl text-stone-700 font-display bg-stone-50/50 rounded-r-lg">
-                  "${record.quote}"
+                  "${displayRecord.quote}"
                </blockquote>
             `}
 
             <div className="prose prose-stone max-w-none">
-              <p className="text-lg text-stone-800 leading-relaxed">${record.summary}</p>
+              <p className="text-lg text-stone-800 leading-relaxed">${displayRecord.summary || displayRecord.summaryPreview || ''}</p>
             </div>
 
             <hr className="my-8 border-stone-200" />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-               <${TagGroup} title="Thematic categories" tags=${record.categories} />
-               <${TagGroup} title="Tags" tags=${record.tags} />
-               <${TagGroup} title="Key concepts" tags=${record.concepts} />
-               
+               <${TagGroup} title="Thematic categories" tags=${displayRecord.categories} />
+               <${TagGroup} title="Tags" tags=${displayRecord.tags} />
+               <${TagGroup} title="Key concepts" tags=${displayRecord.concepts} />
+
                <div>
                   <h5 className="text-xs font-bold uppercase text-stone-400 mb-2">Era</h5>
-                  <span className="inline-block px-3 py-1 bg-stone-800 text-white text-xs font-bold rounded">${record.era}</span>
+                  <span className="inline-block px-3 py-1 bg-stone-800 text-white text-xs font-bold rounded">${displayRecord.era}</span>
                </div>
             </div>
             

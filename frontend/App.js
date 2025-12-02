@@ -2,7 +2,7 @@
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { html } from './html.js?v=2.0.2';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network, BookOpen, Compass, AlertCircle, ChevronUp } from 'lucide-react';
-import { fetchArchiveData, hashString } from './services/archiveService.js?v=2.0.2';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=2.0.2';
 import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=2.0.2';
 import Sidebar from './components/Sidebar.js?v=2.0.2';
 import WelcomeModal from './components/WelcomeModal.js?v=2.0.2';
@@ -117,14 +117,18 @@ const App = () => {
     }
   }, []);
 
-  // Load Data
+  // Load Data (optimized: core data first, details preloaded in background)
   useEffect(() => {
-    fetchArchiveData()
+    fetchCoreData()
       .then((data) => {
         setRecords(data.records);
         setFacets(data.facets);
         setAutocompleteIndex(data.autocompleteIndex);
         setLoading(false);
+
+        // Preload details in background after initial render
+        // This ensures modal opens instantly even on first click
+        setTimeout(() => preloadDetails(), 1000);
       })
       .catch(err => {
         console.error(err);
@@ -159,11 +163,12 @@ const App = () => {
   const filteredRecords = useMemo(() => {
     const term = filters.search.toLowerCase();
     let res = records.filter(r => {
-      const matchesSearch = !term || 
-        r.title.toLowerCase().includes(term) || 
-        r.summary.toLowerCase().includes(term) ||
-        r.quote.toLowerCase().includes(term) ||
-        r.concepts.some(c => c.toLowerCase().includes(term));
+      // Use summaryPreview for search (available in core data)
+      const summary = r.summaryPreview || r.summary || '';
+      const matchesSearch = !term ||
+        r.title.toLowerCase().includes(term) ||
+        summary.toLowerCase().includes(term) ||
+        (r.categories || []).some(c => c.toLowerCase().includes(term));
       if (!matchesSearch) return false;
 
       if (filters.categories.length > 0) {
@@ -543,7 +548,7 @@ const App = () => {
                                     </h3>
                                     
                                     <p className="text-stone-600 text-sm leading-relaxed mb-4 flex-grow font-body">
-                                        <${Highlight} text=${item.summary.length > 180 ? item.summary.substring(0, 180) + '...' : item.summary} term=${filters.search} />
+                                        <${Highlight} text=${item.summaryPreview || item.summary || ''} term=${filters.search} />
                                     </p>
             
                                     <div className="mt-auto pt-4 border-t border-stone-100 flex flex-wrap gap-2">
