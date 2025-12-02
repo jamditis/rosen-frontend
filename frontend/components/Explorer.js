@@ -1,8 +1,8 @@
 
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { html } from '../html.js';
+import { html } from '../html.js?v=2.0.1';
 import { ExternalLink, RefreshCw, Download, Settings2, Network } from 'lucide-react';
-import { COLORS } from '../constants.js';
+import { COLORS } from '../constants.js?v=2.0.1';
 
 const CANVAS_WIDTH = 1200;
 const CANVAS_HEIGHT = 1200;

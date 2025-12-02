@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { html } from '../html.js';
+import { html } from '../html.js?v=2.0.1';
 import { Construction, X, BookOpen } from 'lucide-react';
 
 const BANNER_DISMISSED_KEY = 'jrda_wip_banner_dismissed';
