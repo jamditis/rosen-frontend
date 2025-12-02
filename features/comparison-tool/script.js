@@ -226,14 +226,35 @@ function setupKeyboardNav() {
   });
 }
 
+// Get the current visible card index from DOM (real-time, not state-dependent)
+function getCurrentVisibleCardIndex() {
+  const cards = document.querySelectorAll('.comparison-card');
+  const viewportCenter = window.innerHeight / 2;
+  let closestIndex = 0;
+  let closestDistance = Infinity;
+
+  cards.forEach((card, index) => {
+    const rect = card.getBoundingClientRect();
+    const cardCenter = rect.top + rect.height / 2;
+    const distance = Math.abs(cardCenter - viewportCenter);
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestIndex = index;
+    }
+  });
+  return closestIndex;
+}
+
 // Setup next/prev button handlers
 function setupNavButtons() {
   prevBtn.addEventListener('click', () => {
-    navigateToComparison(activeComparison - 1);
+    const current = getCurrentVisibleCardIndex();
+    navigateToComparison(current - 1);
   });
 
   nextBtn.addEventListener('click', () => {
-    navigateToComparison(activeComparison + 1);
+    const current = getCurrentVisibleCardIndex();
+    navigateToComparison(current + 1);
   });
 }
 

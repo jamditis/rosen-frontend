@@ -181,15 +181,13 @@ const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, a
           </div>
 
           <div className="border-t border-stone-200 pt-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-stone-500 mb-3">Media type</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-stone-500 mb-3">Content type</h4>
             <div className="flex flex-wrap gap-4">
               ${[
                 { label: 'All', value: null },
-                { label: 'Text', value: 'article' },
-                { label: 'Video', value: 'video' },
+                { label: 'Articles', value: 'article' },
                 { label: 'Twitter/X', value: 'twitter' },
                 { label: 'Bluesky', value: 'bluesky' },
-                { label: 'Tumblr', value: 'tumblr' },
               ].map((opt) => html`
                 <label key=${opt.label} className="flex items-center gap-2 cursor-pointer">
                    <input
