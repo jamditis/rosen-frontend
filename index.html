@@ -15,11 +15,11 @@
     <!-- Prefetch archive data for faster loading -->
     <link rel="prefetch" href="/wp-content/rosen-archive/data/archive-data.json" as="fetch">
 
-    <!-- External CSS -->
-    <link rel="stylesheet" href="./frontend/index.css" />
+    <!-- External CSS (versioned for cache busting) -->
+    <link rel="stylesheet" href="./frontend/index.css?v=2.0.1" />
 
     <!-- Tailwind CSS (pre-built for production) -->
-    <link rel="stylesheet" href="./frontend/dist/tailwind.css" />
+    <link rel="stylesheet" href="./frontend/dist/tailwind.css?v=2.0.1" />
 
   <!-- Import Map -->
   <script type="importmap">
@@ -37,7 +37,7 @@
   <body class="antialiased font-body text-stone-900 min-h-screen flex flex-col">
     <div id="root"></div>
     
-    <!-- Main Entry Point -->
-    <script type="module" src="./frontend/index.js"></script>
+    <!-- Main Entry Point (versioned for cache busting) -->
+    <script type="module" src="./frontend/index.js?v=2.0.1"></script>
   </body>
 </html>
