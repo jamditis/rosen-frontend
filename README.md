@@ -9,7 +9,7 @@ A comprehensive digital archive project for NYU Professor Jay Rosen's work, incl
 
 This archive includes the public release of Jay Rosen's 1986 doctoral dissertation, *The Impossible Press: American Journalism and the Decline of Public Life*, with 9 interactive presentation tools for exploring the dissertation and its contemporary relevance.
 
-![Archive Preview](https://i.imgur.com/iaBrkg8.png)
+![Archive Preview](https://i.imgur.com/pwU0BYb.png)
 
 ## 📦 Repository Structure
 
