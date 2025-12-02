@@ -349,7 +349,7 @@ The dissertation is being released publicly with multiple presentation formats:
 5. **Timeline** - 14 entries from dissertation to 2025, filterable by type (`/features/timeline/`)
 6. **Annotated Excerpts** - 12 key passages with 2025 commentary (`/features/annotated-excerpts/`)
 7. **FAQ / Ask the Dissertation** - 46 Q&A pairs, searchable, NotebookLM integration (`/features/faq/`)
-8. **Dissertation Reader** - Landing page with PDF download, ToC, citation info (`/features/dissertation-reader/src/`)
+8. **Dissertation Reader** - Landing page with PDF download, ToC, citation info (`/features/dissertation-reader/`)
 9. **Network Explorer** - Canvas visualization of archive record relationships (in main archive)
 
 ### Archived (developed but not active)

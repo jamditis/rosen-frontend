@@ -22,7 +22,7 @@ export const TIMELINE_ENTRIES = [
       'The professional attitude as inadequate solution'
     ],
     dissertationConnection: 'The foundational document. All later work builds on these insights.',
-    link: '/wp-content/rosen-archive/features/dissertation-reader/src/'
+    link: '/wp-content/rosen-archive/features/dissertation-reader/'
   },
   {
     id: 'nyu-appointment',
@@ -182,7 +182,7 @@ export const TIMELINE_ENTRIES = [
     subtitle: 'December 2025',
     description: 'Nearly 40 years after its completion, "The Impossible Press" is made publicly available for the first time, allowing readers to see the intellectual foundations of Rosen\'s later work.',
     dissertationConnection: 'The origin document becomes available, revealing how much of the later work was already present in embryonic form.',
-    link: '/wp-content/rosen-archive/features/dissertation-reader/src/'
+    link: '/wp-content/rosen-archive/features/dissertation-reader/'
   }
 ];
 

@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { html } from '../html.js?v=2.0.1';
+import { html } from '../html.js?v=2.0.2';
 import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2 } from 'lucide-react';
 
 const TagGroup = ({title, tags}) => {
