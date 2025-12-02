@@ -1,8 +1,19 @@
 
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { html } from '../html.js?v=2.0.2';
-import { ExternalLink, RefreshCw, Download, Settings2, Network } from 'lucide-react';
+import { ExternalLink, RefreshCw, Download, Settings2, Network, Users, Building2, Lightbulb, Globe, Tags } from 'lucide-react';
 import { COLORS } from '../constants.js?v=2.0.2';
+import { calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=2.0.2';
+
+// Connection mode configurations
+const CONNECTION_MODES = {
+  entities: { label: 'All Entities', icon: Globe, filter: null, description: 'Connect via any shared entity' },
+  people: { label: 'People', icon: Users, filter: 'Person', description: 'Connect via shared people' },
+  organizations: { label: 'Organizations', icon: Building2, filter: 'Organization', description: 'Connect via shared organizations' },
+  concepts: { label: 'Concepts', icon: Lightbulb, filter: 'Concept', description: 'Connect via shared concepts' },
+  key_concepts: { label: 'Key Concepts (Legacy)', icon: Tags, filter: 'legacy_concepts', description: 'Connect via key concepts array' },
+  categories: { label: 'Categories (Legacy)', icon: Tags, filter: 'legacy_categories', description: 'Connect via thematic categories' }
+};
 
 const CANVAS_WIDTH = 1200;
 const CANVAS_HEIGHT = 1200;
@@ -26,10 +37,11 @@ const Explorer = ({ records }) => {
   const [panelState, setPanelState] = useState('closed');
   
   const [config, setConfig] = useState({
-    connectionField: 'key_concepts',
+    connectionMode: 'entities',  // New: uses CONNECTION_MODES keys
     maxConnections: 30,
     snapToGrid: true,
-    showSettings: false
+    showSettings: false,
+    sortByProminence: true  // Sort by prominence score vs count
   });
 
   const processData = useCallback(() => {
@@ -95,13 +107,45 @@ const Explorer = ({ records }) => {
     processData();
   }, [processData]);
 
-  const getConnectionStrength = (n1, n2) => {
-    const field = config.connectionField === 'key_concepts' ? 'concepts' : 'categories';
-    const arr1 = n1[field] || [];
-    const arr2 = n2[field] || [];
-    const shared = arr1.filter(x => arr2.includes(x));
-    return { strength: shared.length, sharedValue: shared[0] };
-  };
+  const getConnectionStrength = useCallback((n1, n2) => {
+    const modeConfig = CONNECTION_MODES[config.connectionMode];
+
+    // Handle legacy modes (concepts and categories arrays)
+    if (modeConfig.filter === 'legacy_concepts') {
+      const arr1 = n1.concepts || [];
+      const arr2 = n2.concepts || [];
+      const shared = arr1.filter(x => arr2.includes(x));
+      return {
+        strength: shared.length,
+        prominenceScore: shared.length,
+        sharedEntities: shared.map(name => ({ name, type: 'Concept (legacy)' })),
+        sharedValue: shared[0]
+      };
+    }
+
+    if (modeConfig.filter === 'legacy_categories') {
+      const arr1 = n1.categories || [];
+      const arr2 = n2.categories || [];
+      const shared = arr1.filter(x => arr2.includes(x));
+      return {
+        strength: shared.length,
+        prominenceScore: shared.length,
+        sharedEntities: shared.map(name => ({ name, type: 'Category' })),
+        sharedValue: shared[0]
+      };
+    }
+
+    // Use entity-based connections
+    const entityTypeFilter = modeConfig.filter; // null for all entities, or specific type
+    const result = calculateEntityConnectionStrength(n1.id, n2.id, entityTypeFilter);
+
+    return {
+      strength: result.strength,
+      prominenceScore: result.prominenceScore,
+      sharedEntities: result.sharedEntities,
+      sharedValue: result.sharedEntities[0]?.name || null
+    };
+  }, [config.connectionMode]);
 
   const handleNodeClick = (node) => {
     if (node.isPlaceholder) return;
@@ -121,8 +165,8 @@ const Explorer = ({ records }) => {
 
     nodes.forEach(target => {
       if (target.numericId === node.numericId || target.isPlaceholder) return;
-      
-      const { strength, sharedValue } = getConnectionStrength(node, target);
+
+      const { strength, prominenceScore, sharedEntities, sharedValue } = getConnectionStrength(node, target);
       if (strength > 0) {
         newConnections.push({
           targetId: target.numericId,
@@ -132,12 +176,19 @@ const Explorer = ({ records }) => {
           horizontalFirst: Math.random() > 0.5,
           midPointRatio: Math.random() * 0.8 + 0.1,
           sharedValue,
-          strength
+          strength,
+          prominenceScore,
+          sharedEntities  // Store full entity objects for display
         });
       }
     });
 
-    newConnections.sort((a, b) => b.strength - a.strength);
+    // Sort by prominence score (weighted) or count based on config
+    if (config.sortByProminence) {
+      newConnections.sort((a, b) => b.prominenceScore - a.prominenceScore);
+    } else {
+      newConnections.sort((a, b) => b.strength - a.strength);
+    }
     setConnections(newConnections.slice(0, config.maxConnections));
   };
 
@@ -400,8 +451,16 @@ const Explorer = ({ records }) => {
 
   const selectedNode = selectedId !== null ? nodes[selectedId] : null;
   const connectedNodes = connections
-    .map(c => ({ ...nodes[c.targetId], strength: c.strength }))
-    .sort((a, b) => b.strength - a.strength);
+    .map(c => ({
+      ...nodes[c.targetId],
+      strength: c.strength,
+      prominenceScore: c.prominenceScore,
+      sharedEntities: c.sharedEntities || []
+    }))
+    .sort((a, b) => config.sortByProminence ? b.prominenceScore - a.prominenceScore : b.strength - a.strength);
+
+  // Get the current mode config for display
+  const currentModeConfig = CONNECTION_MODES[config.connectionMode];
 
   // Calculate category-to-color mapping for legend
   const categoryColors = useMemo(() => {
@@ -446,27 +505,51 @@ const Explorer = ({ records }) => {
             </div>
 
             ${config.showSettings && html`
-                <div className="bg-white border border-stone-300 rounded shadow-lg p-4 w-64 animate-fade-in text-sm space-y-4">
+                <div className="bg-white border border-stone-300 rounded shadow-lg p-4 w-72 animate-fade-in text-sm space-y-4">
                     <div>
-                        <label className="block font-bold text-stone-600 mb-1">Connect by:</label>
-                        <select 
-                            value=${config.connectionField}
-                            onChange=${(e) => setConfig({...config, connectionField: e.target.value})}
-                            className="w-full border border-stone-300 p-1.5 rounded text-stone-700"
-                        >
-                            <option value="key_concepts">Key Concepts</option>
-                            <option value="thematic_categories">Categories</option>
-                        </select>
+                        <label className="block font-bold text-stone-600 mb-2">Connect by:</label>
+                        <div className="space-y-1">
+                            ${Object.entries(CONNECTION_MODES).map(([key, mode]) => html`
+                                <button
+                                    key=${key}
+                                    onClick=${() => setConfig({...config, connectionMode: key})}
+                                    className=${`w-full text-left px-3 py-2 rounded flex items-center gap-2 transition-colors ${
+                                        config.connectionMode === key
+                                            ? 'bg-stone-800 text-white'
+                                            : 'bg-stone-50 text-stone-700 hover:bg-stone-100'
+                                    }`}
+                                >
+                                    <${mode.icon} className="w-4 h-4" />
+                                    <span className="flex-1">${mode.label}</span>
+                                    ${config.connectionMode === key && html`
+                                        <span className="text-xs opacity-75">Active</span>
+                                    `}
+                                </button>
+                            `)}
+                        </div>
+                        <p className="text-xs text-stone-400 mt-2 italic">${currentModeConfig.description}</p>
                     </div>
                     <div>
                         <label className="block font-bold text-stone-600 mb-1">Max Connections: ${config.maxConnections}</label>
-                        <input 
-                            type="range" 
-                            min="5" max="50" 
+                        <input
+                            type="range"
+                            min="5" max="50"
                             value=${config.maxConnections}
                             onChange=${(e) => setConfig({...config, maxConnections: Number(e.target.value)})}
                             className="w-full accent-stone-900"
                         />
+                    </div>
+                    <div>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked=${config.sortByProminence}
+                                onChange=${(e) => setConfig({...config, sortByProminence: e.target.checked})}
+                                className="rounded border-stone-300 accent-stone-900"
+                            />
+                            <span className="text-stone-700">Sort by prominence score</span>
+                        </label>
+                        <p className="text-xs text-stone-400 mt-1">When enabled, connections are weighted by entity importance</p>
                     </div>
                 </div>
             `}
@@ -569,29 +652,101 @@ const Explorer = ({ records }) => {
                                     `)}
                                 </div>
                             </div>
+
+                            ${(() => {
+                                const nodeEntities = getEntitiesByRecord(selectedNode.id);
+                                if (nodeEntities.length === 0) return null;
+
+                                // Group entities by type
+                                const grouped = nodeEntities.reduce((acc, e) => {
+                                    const type = e.type || 'Other';
+                                    if (!acc[type]) acc[type] = [];
+                                    acc[type].push(e);
+                                    return acc;
+                                }, {});
+
+                                return html`
+                                    <div className="space-y-2 pt-4 border-t border-stone-100">
+                                        <h4 className="text-xs font-bold uppercase text-stone-400">Extracted Entities (${nodeEntities.length})</h4>
+                                        <div className="space-y-3">
+                                            ${Object.entries(grouped).map(([type, entities]) => html`
+                                                <div key=${type}>
+                                                    <div className="flex items-center gap-1 text-xs text-stone-500 mb-1">
+                                                        ${type === 'Person' && html`<${Users} className="w-3 h-3" />`}
+                                                        ${type === 'Organization' && html`<${Building2} className="w-3 h-3" />`}
+                                                        ${type === 'Concept' && html`<${Lightbulb} className="w-3 h-3" />`}
+                                                        <span>${type}s (${entities.length})</span>
+                                                    </div>
+                                                    <div className="flex flex-wrap gap-1">
+                                                        ${entities.slice(0, 8).map(e => html`
+                                                            <span
+                                                                key=${e.id}
+                                                                className="px-2 py-0.5 text-xs rounded-full bg-stone-50 text-stone-600 border border-stone-200"
+                                                                title=${e.role ? `${e.name} - ${e.role}` : e.name}
+                                                            >
+                                                                ${e.name}
+                                                            </span>
+                                                        `)}
+                                                        ${entities.length > 8 && html`
+                                                            <span className="px-2 py-0.5 text-xs rounded-full bg-stone-100 text-stone-400">
+                                                                +${entities.length - 8} more
+                                                            </span>
+                                                        `}
+                                                    </div>
+                                                </div>
+                                            `)}
+                                        </div>
+                                    </div>
+                                `;
+                            })()}
                         </div>
 
                         <div className="md:w-1/3 border-l border-stone-100 pl-0 md:pl-8 md:block">
-                            <h4 className="font-bold text-stone-800 mb-4 flex items-center gap-2">
-                                <${Network} className="w-4 h-4" />
-                                Connected Records (${connectedNodes.length})
+                            <h4 className="font-bold text-stone-800 mb-2 flex items-center gap-2">
+                                <${currentModeConfig.icon} className="w-4 h-4" />
+                                Connected via ${currentModeConfig.label}
                             </h4>
-                            <div className="space-y-2 max-h-60 overflow-y-auto pr-2 scrollbar-thin">
+                            <p className="text-xs text-stone-400 mb-3">${connectedNodes.length} records share ${config.connectionMode === 'entities' ? 'entities' : currentModeConfig.label.toLowerCase()}</p>
+                            <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2 scrollbar-thin">
                                 ${connectedNodes.length === 0 ? html`
-                                    <p className="text-sm text-stone-400 italic">No strong connections found based on current criteria.</p>
+                                    <p className="text-sm text-stone-400 italic">No connections found. Try a different connection mode.</p>
                                 ` : (
                                     connectedNodes.map(node => html`
-                                        <button 
+                                        <button
                                             key=${node.numericId}
                                             onClick=${() => handleNodeClick(node)}
-                                            className="w-full text-left p-2 hover:bg-stone-50 rounded border border-transparent hover:border-stone-200 transition-all group"
+                                            className="w-full text-left p-3 hover:bg-stone-50 rounded-lg border border-stone-100 hover:border-stone-300 transition-all group"
                                         >
-                                            <div className="text-xs font-bold text-stone-700 group-hover:text-stone-900 truncate">
+                                            <div className="text-sm font-bold text-stone-700 group-hover:text-stone-900 line-clamp-2">
                                                 ${node.title}
                                             </div>
-                                            <div className="text-[10px] text-stone-400 flex justify-between mt-0.5">
-                                                <span>${node.year}</span>
-                                                <span className="font-mono">Strength: {node.strength}</span>
+                                            <div className="text-xs text-stone-400 mt-1 flex justify-between">
+                                                <span>${node.year} • ${node.pub}</span>
+                                            </div>
+                                            ${node.sharedEntities && node.sharedEntities.length > 0 && html`
+                                                <div className="mt-2 flex flex-wrap gap-1">
+                                                    ${node.sharedEntities.slice(0, 4).map((entity, idx) => html`
+                                                        <span
+                                                            key=${idx}
+                                                            className="inline-flex items-center gap-1 px-1.5 py-0.5 text-[10px] rounded-full bg-stone-100 text-stone-600"
+                                                            title=${entity.type ? `${entity.type}: ${entity.name}` : entity.name}
+                                                        >
+                                                            ${entity.type === 'Person' && html`<${Users} className="w-2.5 h-2.5" />`}
+                                                            ${entity.type === 'Organization' && html`<${Building2} className="w-2.5 h-2.5" />`}
+                                                            ${entity.type === 'Concept' && html`<${Lightbulb} className="w-2.5 h-2.5" />`}
+                                                            ${entity.name?.substring(0, 15)}${entity.name?.length > 15 ? '...' : ''}
+                                                        </span>
+                                                    `)}
+                                                    ${node.sharedEntities.length > 4 && html`
+                                                        <span className="px-1.5 py-0.5 text-[10px] rounded-full bg-stone-200 text-stone-500">
+                                                            +${node.sharedEntities.length - 4} more
+                                                        </span>
+                                                    `}
+                                                </div>
+                                            `}
+                                            <div className="text-[10px] text-stone-400 mt-2 flex justify-between items-center border-t border-stone-100 pt-1">
+                                                <span>${node.strength} shared ${node.strength === 1 ? 'entity' : 'entities'}</span>
+                                                <span className="font-mono text-stone-500">Score: ${node.prominenceScore}</span>
                                             </div>
                                         </button>
                                     `)
