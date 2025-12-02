@@ -32,7 +32,9 @@ const STATIC_ASSETS = [
   '/wp-content/rosen-archive/frontend/components/dissertationData.js',
   '/wp-content/rosen-archive/frontend/components/ToolsModal.js',
   '/wp-content/rosen-archive/frontend/components/LoadingQuotes.js',
-  '/wp-content/rosen-archive/frontend/components/WorkInProgressBanner.js'
+  '/wp-content/rosen-archive/frontend/components/WorkInProgressBanner.js',
+  '/wp-content/rosen-archive/frontend/components/AnalyticsDashboard.js',
+  '/wp-content/rosen-archive/frontend/services/sqliteService.js'
 ];
 
 // Data files to cache with stale-while-revalidate

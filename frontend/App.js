@@ -1,7 +1,7 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { html } from './html.js?v=2.0.2';
-import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network, BookOpen, Compass, AlertCircle, ChevronUp } from 'lucide-react';
+import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3 } from 'lucide-react';
 import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=2.0.2';
 import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=2.0.2';
 import Sidebar from './components/Sidebar.js?v=2.0.2';
@@ -13,6 +13,7 @@ import DissertationPage from './components/DissertationPage.js?v=2.0.2';
 import ToolsModal from './components/ToolsModal.js?v=2.0.2';
 import LoadingQuotes from './components/LoadingQuotes.js?v=2.0.2';
 import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=2.0.2';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=2.0.2';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
@@ -42,6 +43,7 @@ const App = () => {
   const [currentView, setCurrentView] = useState('archive'); // 'archive' or 'dissertation'
   const [toolsModalOpen, setToolsModalOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [analyticsOpen, setAnalyticsOpen] = useState(false);
 
   const [filters, setFilters] = useState({
     search: '',
@@ -294,6 +296,11 @@ const App = () => {
         onSelectTool=${handleToolSelect}
       />
 
+      <${AnalyticsDashboard}
+        isOpen=${analyticsOpen}
+        onClose=${() => setAnalyticsOpen(false)}
+      />
+
       <${RecordModal} 
         record=${selectedRecord}
         allRecords=${records}
@@ -396,7 +403,7 @@ const App = () => {
                                 <h2 className="font-display text-lg text-stone-800">Explore the archive</h2>
                                 <p className="text-xs text-stone-500 mt-1">Interactive tools for exploring the archive</p>
                             </div>
-                            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                            <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
                                 <button
                                     onClick=${navigateToDissertation}
                                     className="flex flex-col items-center p-4 bg-white rounded-lg border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all group"
@@ -410,6 +417,13 @@ const App = () => {
                                 >
                                     <${Network} className="w-6 h-6 text-stone-500 group-hover:text-stone-700 mb-2" />
                                     <span className="text-xs font-medium text-stone-700">Network</span>
+                                </button>
+                                <button
+                                    onClick=${() => setAnalyticsOpen(true)}
+                                    className="flex flex-col items-center p-4 bg-white rounded-lg border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all group"
+                                >
+                                    <${BarChart3} className="w-6 h-6 text-stone-500 group-hover:text-stone-700 mb-2" />
+                                    <span className="text-xs font-medium text-stone-700">Analytics</span>
                                 </button>
                                 <a
                                     href="/wp-content/rosen-archive/features/comparison-tool/"
