@@ -279,12 +279,89 @@ async function main() {
     autocompleteIndex: Array.from(searchTerms).sort()
   };
 
-  // Write JSON file
+  // Write JSON file (full version for backward compatibility)
   console.log('\n💾 Writing archive-data.json...');
   fs.writeFileSync(outputPath, JSON.stringify(output, null, 2));
 
   const fileSizeBytes = fs.statSync(outputPath).size;
   const fileSizeMB = (fileSizeBytes / 1024 / 1024).toFixed(2);
+
+  // ============================================
+  // SPLIT DATA FILES FOR OPTIMIZED LOADING
+  // ============================================
+  console.log('\n💾 Writing split data files for optimized loading...');
+
+  // 1. Core data - lightweight, loaded first (for card display)
+  const coreRecords = allRecords.map(r => ({
+    id: r.id,
+    title: r.title,
+    date: r.date,
+    year: r.year,
+    era: r.era,
+    pub: r.pub,
+    categories: r.categories,
+    type: r.type,
+    verified: r.verified,
+    // Include truncated summary for card preview
+    summaryPreview: r.summary.length > 180 ? r.summary.substring(0, 180) + '...' : r.summary
+  }));
+
+  const coreOutput = {
+    version: "1.1.0",
+    generated: new Date().toISOString(),
+    records: coreRecords,
+    facets: output.facets,
+    autocompleteIndex: output.autocompleteIndex
+  };
+
+  const coreOutputPath = path.join(__dirname, 'archive-core.json');
+  fs.writeFileSync(coreOutputPath, JSON.stringify(coreOutput));
+  const coreSizeBytes = fs.statSync(coreOutputPath).size;
+  const coreSizeMB = (coreSizeBytes / 1024 / 1024).toFixed(2);
+
+  // 2. Details data - full content, loaded on demand
+  const detailsMap = {};
+  allRecords.forEach(r => {
+    detailsMap[r.id] = {
+      summary: r.summary,
+      quote: r.quote,
+      concepts: r.concepts,
+      tags: r.tags,
+      url: r.url,
+      author: r.author,
+      relatedIds: r.relatedIds
+    };
+  });
+
+  const detailsOutput = {
+    version: "1.1.0",
+    generated: new Date().toISOString(),
+    details: detailsMap
+  };
+
+  const detailsOutputPath = path.join(__dirname, 'archive-details.json');
+  fs.writeFileSync(detailsOutputPath, JSON.stringify(detailsOutput));
+  const detailsSizeBytes = fs.statSync(detailsOutputPath).size;
+  const detailsSizeMB = (detailsSizeBytes / 1024 / 1024).toFixed(2);
+
+  // 3. Entities data - for Explorer, loaded on demand
+  const entitiesOutput = {
+    version: "1.1.0",
+    generated: new Date().toISOString(),
+    entities: entities,
+    // Include relatedIds mapping for entity connections
+    recordEntityMap: allRecords.reduce((acc, r) => {
+      if (r.relatedIds && r.relatedIds.length > 0) {
+        acc[r.id] = r.relatedIds;
+      }
+      return acc;
+    }, {})
+  };
+
+  const entitiesOutputPath = path.join(__dirname, 'archive-entities.json');
+  fs.writeFileSync(entitiesOutputPath, JSON.stringify(entitiesOutput));
+  const entitiesSizeBytes = fs.statSync(entitiesOutputPath).size;
+  const entitiesSizeMB = (entitiesSizeBytes / 1024 / 1024).toFixed(2);
 
   console.log(`\n✅ Export complete!`);
   console.log(`\n📊 Summary:`);
@@ -294,8 +371,12 @@ async function main() {
   console.log(`  - Categories: ${output.facets.categories.length}`);
   console.log(`  - Publications: ${output.facets.publications.length}`);
   console.log(`  - Autocomplete terms: ${output.autocompleteIndex.length}`);
-  console.log(`  - File size: ${fileSizeMB} MB`);
-  console.log(`  - Output: ${outputPath}`);
+  console.log(`\n📦 File sizes:`);
+  console.log(`  - archive-data.json (full):     ${fileSizeMB} MB`);
+  console.log(`  - archive-core.json (cards):    ${coreSizeMB} MB`);
+  console.log(`  - archive-details.json (modal): ${detailsSizeMB} MB`);
+  console.log(`  - archive-entities.json (explorer): ${entitiesSizeMB} MB`);
+  console.log(`\n📍 Output directory: ${__dirname}`);
 }
 
 main().catch(err => {

@@ -1,5 +1,19 @@
 
 import { DATA_CONFIG, ERAS } from '../constants.js';
+import {
+  initDatabase,
+  loadArchiveData as loadSqliteData,
+  isReady as isSqliteReady,
+  queryAsObjects,
+  getRecordCountByYear,
+  getRecordCountByCategory,
+  getRecordCountByEra,
+  getMostMentionedEntities,
+  getMostCommonConcepts,
+  getCategoryCoOccurrence,
+  searchRecords as sqlSearchRecords,
+  getStats as getSqliteStats
+} from './sqliteService.js';
 
 // Simple hash function for UI color selection (djb1 variant)
 // Used by App.js to deterministically assign colors to categories
@@ -8,6 +22,20 @@ export const hashString = (str) => {
   for (let i = 0; i < str.length; i++) hash = (hash << 5) - hash + str.charCodeAt(i);
   return Math.abs(hash);
 };
+
+// ============================================
+// LAZY LOADING STATE
+// ============================================
+
+// Cache for loaded details (populated on demand)
+let detailsCache = null;
+let detailsLoading = false;
+let detailsLoadPromise = null;
+
+// Cache for loaded entities (populated on demand)
+let entitiesCache = null;
+let entitiesLoading = false;
+let entitiesLoadPromise = null;
 
 // Entity lookup maps - populated when data is loaded
 let entityById = new Map();        // entity_id -> entity object
@@ -234,6 +262,293 @@ export const clearArchiveCache = () => {
     console.warn('Error clearing cache:', e);
   }
 };
+
+/**
+ * Fetch core archive data (lightweight, for initial page load)
+ * This is the new optimized entry point - loads ~8MB instead of ~25MB
+ */
+export const fetchCoreData = async () => {
+  const dataUrl = DATA_CONFIG.archive_core;
+
+  // Check cache first
+  const cached = getCachedData(dataUrl);
+  if (cached) {
+    console.log('Using cached core data');
+    return cached;
+  }
+
+  console.log('Fetching core data from:', dataUrl);
+
+  try {
+    const response = await fetch(dataUrl);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Inject dissertation record if not present
+    if (!data.records.find(r => r.id === 'dissertation-1986')) {
+      data.records.push({
+        id: DISSERTATION_RECORD.id,
+        title: DISSERTATION_RECORD.title,
+        date: DISSERTATION_RECORD.date,
+        year: DISSERTATION_RECORD.year,
+        era: DISSERTATION_RECORD.era,
+        pub: DISSERTATION_RECORD.pub,
+        categories: DISSERTATION_RECORD.categories,
+        type: DISSERTATION_RECORD.type,
+        verified: DISSERTATION_RECORD.verified,
+        summaryPreview: DISSERTATION_RECORD.summary.substring(0, 180) + '...'
+      });
+
+      // Also add dissertation facets if missing
+      DISSERTATION_RECORD.categories.forEach(c => {
+        if (!data.facets.categories.includes(c)) {
+          data.facets.categories.push(c);
+        }
+      });
+      data.facets.categories.sort();
+    }
+
+    // Cache the result
+    setCachedData(dataUrl, data);
+
+    return data;
+  } catch (error) {
+    console.error('Error fetching core data:', error);
+    // Return empty structure on error
+    return {
+      records: [{
+        id: DISSERTATION_RECORD.id,
+        title: DISSERTATION_RECORD.title,
+        date: DISSERTATION_RECORD.date,
+        year: DISSERTATION_RECORD.year,
+        era: DISSERTATION_RECORD.era,
+        pub: DISSERTATION_RECORD.pub,
+        categories: DISSERTATION_RECORD.categories,
+        type: DISSERTATION_RECORD.type,
+        verified: DISSERTATION_RECORD.verified,
+        summaryPreview: DISSERTATION_RECORD.summary.substring(0, 180) + '...'
+      }],
+      facets: {
+        categories: DISSERTATION_RECORD.categories.sort(),
+        eras: ERAS,
+        publications: [DISSERTATION_RECORD.pub]
+      },
+      autocompleteIndex: [...DISSERTATION_RECORD.categories, ...DISSERTATION_RECORD.concepts, ...DISSERTATION_RECORD.tags, DISSERTATION_RECORD.title].sort()
+    };
+  }
+};
+
+/**
+ * Fetch record details (on-demand, when modal opens)
+ * Returns full summary, quote, concepts, tags, url, author, relatedIds
+ */
+export const fetchRecordDetails = async (recordId) => {
+  // Return dissertation details from constant
+  if (recordId === 'dissertation-1986') {
+    return {
+      summary: DISSERTATION_RECORD.summary,
+      quote: DISSERTATION_RECORD.quote,
+      concepts: DISSERTATION_RECORD.concepts,
+      tags: DISSERTATION_RECORD.tags,
+      url: DISSERTATION_RECORD.url,
+      author: DISSERTATION_RECORD.author,
+      relatedIds: []
+    };
+  }
+
+  // Load details cache if not already loaded
+  if (!detailsCache) {
+    await loadDetailsCache();
+  }
+
+  return detailsCache?.[recordId] || null;
+};
+
+/**
+ * Load the full details cache (called once when first modal opens)
+ */
+const loadDetailsCache = async () => {
+  // Prevent multiple simultaneous loads
+  if (detailsLoading) {
+    return detailsLoadPromise;
+  }
+
+  detailsLoading = true;
+  detailsLoadPromise = (async () => {
+    const dataUrl = DATA_CONFIG.archive_details;
+
+    // Check cache first
+    const cached = getCachedData(dataUrl);
+    if (cached) {
+      console.log('Using cached details data');
+      detailsCache = cached.details;
+      return;
+    }
+
+    console.log('Fetching details data from:', dataUrl);
+
+    try {
+      const response = await fetch(dataUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      detailsCache = data.details;
+
+      // Cache the result
+      setCachedData(dataUrl, data);
+    } catch (error) {
+      console.error('Error fetching details data:', error);
+      detailsCache = {};
+    } finally {
+      detailsLoading = false;
+    }
+  })();
+
+  return detailsLoadPromise;
+};
+
+/**
+ * Fetch entities data (on-demand, when Explorer opens)
+ */
+export const fetchEntitiesData = async () => {
+  // Return from cache if already loaded
+  if (entitiesCache) {
+    return entitiesCache;
+  }
+
+  // Prevent multiple simultaneous loads
+  if (entitiesLoading) {
+    return entitiesLoadPromise;
+  }
+
+  entitiesLoading = true;
+  entitiesLoadPromise = (async () => {
+    const dataUrl = DATA_CONFIG.archive_entities;
+
+    // Check cache first
+    const cached = getCachedData(dataUrl);
+    if (cached) {
+      console.log('Using cached entities data');
+      entitiesCache = cached;
+      buildEntityMaps(cached);
+      return cached;
+    }
+
+    console.log('Fetching entities data from:', dataUrl);
+
+    try {
+      const response = await fetch(dataUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      entitiesCache = data;
+
+      // Build entity maps for Explorer
+      buildEntityMaps({
+        entities: data.entities,
+        records: Object.entries(data.recordEntityMap).map(([id, relatedIds]) => ({
+          id,
+          relatedIds
+        }))
+      });
+
+      // Cache the result
+      setCachedData(dataUrl, data);
+
+      return data;
+    } catch (error) {
+      console.error('Error fetching entities data:', error);
+      return { entities: [], recordEntityMap: {} };
+    } finally {
+      entitiesLoading = false;
+    }
+  })();
+
+  return entitiesLoadPromise;
+};
+
+/**
+ * Check if details are loaded
+ */
+export const areDetailsLoaded = () => detailsCache !== null;
+
+/**
+ * Check if entities are loaded
+ */
+export const areEntitiesLoaded = () => entitiesCache !== null;
+
+/**
+ * Preload details in background (optional optimization)
+ */
+export const preloadDetails = () => {
+  if (!detailsCache && !detailsLoading) {
+    loadDetailsCache();
+  }
+};
+
+/**
+ * Initialize SQLite database with full archive data (optional)
+ * Call this to enable SQL queries for advanced analytics
+ */
+export const initSqlite = async () => {
+  try {
+    // Initialize the database
+    await initDatabase();
+
+    // Load full data if we have it cached, otherwise fetch it
+    const fullDataUrl = DATA_CONFIG.archive_json;
+    let fullData = getCachedData(fullDataUrl);
+
+    if (!fullData) {
+      console.log('[SQLite] Fetching full archive data for SQL database...');
+      const response = await fetch(fullDataUrl);
+      if (response.ok) {
+        fullData = await response.json();
+        setCachedData(fullDataUrl, fullData);
+      }
+    }
+
+    if (fullData) {
+      await loadSqliteData(fullData);
+      console.log('[SQLite] Database ready for queries');
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    console.error('[SQLite] Failed to initialize:', error);
+    return false;
+  }
+};
+
+/**
+ * Check if SQLite is ready for queries
+ */
+export { isSqliteReady };
+
+// Re-export SQL query functions for easy access
+export {
+  queryAsObjects,
+  getRecordCountByYear,
+  getRecordCountByCategory,
+  getRecordCountByEra,
+  getMostMentionedEntities,
+  getMostCommonConcepts,
+  getCategoryCoOccurrence,
+  sqlSearchRecords,
+  getSqliteStats
+};
+
+// ============================================
+// LEGACY: Full data fetch (backward compatible)
+// ============================================
 
 export const fetchArchiveData = async () => {
   const dataUrl = DATA_CONFIG.archive_json;

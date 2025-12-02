@@ -1,15 +1,18 @@
-// Static JSON data file (pre-processed from CSV sources)
-// Run `npm run export-data` to regenerate from CSV files
+// Static JSON data files (pre-processed from CSV sources)
+// Run `node data/export-archive-data.js` to regenerate from CSV files
 export const DATA_CONFIG = {
-    // Primary data source - pre-processed JSON file
-    archive_json: '/wp-content/rosen-archive/data/archive-data.json'
+    // Split data loading for optimized performance
+    // Core data: lightweight records for card display (~8MB, loads first)
+    archive_core: '/wp-content/rosen-archive/data/archive-core.json',
 
-    // Legacy Google Sheet URLs (kept for reference/fallback if needed)
-    // const SHEET_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-XqQXvMJNaBXVWlmXu1EyOpa_Cc6ur-pklWX1mbrWIFybZjmbE6UTIteSoCSvf0a7j5r8A6earp3H/pub';
-    // test_runs: `${SHEET_BASE}?gid=928818664&single=true&output=csv`,
-    // social_posts: `${SHEET_BASE}?gid=0&single=true&output=csv`,
-    // entities: `${SHEET_BASE}?gid=0&single=true&output=csv`,
-    // relationships: `${SHEET_BASE}?gid=0&single=true&output=csv`
+    // Details: full summaries, quotes, concepts, tags (~11MB, loads on demand)
+    archive_details: '/wp-content/rosen-archive/data/archive-details.json',
+
+    // Entities: for Explorer network visualization (~1MB, loads on demand)
+    archive_entities: '/wp-content/rosen-archive/data/archive-entities.json',
+
+    // Full data file (backward compatible, for fallback)
+    archive_json: '/wp-content/rosen-archive/data/archive-data.json'
 };
 
 export const ITEMS_PER_PAGE = 24;
