@@ -555,7 +555,7 @@ const Explorer = ({ records }) => {
             `}
         </div>
 
-        <div className="absolute top-16 right-4 z-20 bg-white/95 backdrop-blur-sm border border-stone-300 rounded shadow-lg p-3 max-w-[180px]">
+        <div className=${`absolute right-4 z-10 bg-white/95 backdrop-blur-sm border border-stone-300 rounded shadow-lg p-3 max-w-[180px] transition-all duration-200 ${config.showSettings ? 'top-[420px]' : 'top-16'}`}>
             <h4 className="text-xs font-bold text-stone-600 mb-2 uppercase tracking-wider">Category Colors</h4>
             <div className="flex flex-col gap-1.5 text-xs max-h-[300px] overflow-y-auto">
                 ${categoryColors.map(([category, color]) => html`
