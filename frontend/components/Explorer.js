@@ -47,19 +47,30 @@ const Explorer = ({ records }) => {
   const [config, setConfig] = useState({
     connectionMode: 'entities',  // New: uses CONNECTION_MODES keys
     maxConnections: 30,
-    gridSize: 625,  // Default to 25x25 grid
-    onlyWithEntities: true,  // Filter to show only records with entity connections
+    gridSize: 900,  // Default to 30x30 grid to fit all articles
+    recordFilter: 'articles',  // 'all', 'articles', 'with_entities'
     showSettings: false,
     sortByProminence: true  // Sort by prominence score vs count
   });
 
-  // Filter and count records based on settings
+  // Filter records based on settings
   const filteredRecords = useMemo(() => {
-    if (config.onlyWithEntities) {
-      return records.filter(r => r.relatedIds && r.relatedIds.length > 0);
+    switch (config.recordFilter) {
+      case 'articles':
+        return records.filter(r => r.type === 'article');
+      case 'with_entities':
+        return records.filter(r => r.relatedIds && r.relatedIds.length > 0);
+      default:
+        return records;
     }
-    return records;
-  }, [records, config.onlyWithEntities]);
+  }, [records, config.recordFilter]);
+
+  // Record filter options
+  const RECORD_FILTERS = {
+    articles: { label: 'Articles Only', description: 'Core archive articles' },
+    with_entities: { label: 'With Entities', description: 'Records with extracted entities' },
+    all: { label: 'All Records', description: 'Including social posts' }
+  };
 
   const processData = useCallback(() => {
     const sorted = [...filteredRecords].sort((a, b) => a.date.localeCompare(b.date));
@@ -529,24 +540,26 @@ const Explorer = ({ records }) => {
             ${config.showSettings && html`
                 <div className="bg-white border border-stone-300 rounded shadow-lg p-4 w-80 animate-fade-in text-sm space-y-4 max-h-[80vh] overflow-y-auto">
                     <div className="border-b border-stone-200 pb-3">
-                        <label className="block font-bold text-stone-600 mb-2">Grid Display</label>
-                        <div className="space-y-2">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked=${config.onlyWithEntities}
-                                    onChange=${(e) => setConfig({...config, onlyWithEntities: e.target.checked})}
-                                    className="rounded border-stone-300 accent-stone-900"
-                                />
-                                <span className="text-stone-700">Only records with entities</span>
-                            </label>
-                            <p className="text-xs text-stone-400">
-                                ${config.onlyWithEntities
-                                    ? `Showing ${filteredRecords.length} records with entity connections`
-                                    : `Showing all ${filteredRecords.length} records`
-                                }
-                            </p>
+                        <label className="block font-bold text-stone-600 mb-2">Show Records</label>
+                        <div className="space-y-1">
+                            ${Object.entries(RECORD_FILTERS).map(([key, filter]) => html`
+                                <button
+                                    key=${key}
+                                    onClick=${() => setConfig({...config, recordFilter: key})}
+                                    className=${`w-full text-left px-3 py-1.5 rounded flex items-center justify-between transition-colors ${
+                                        config.recordFilter === key
+                                            ? 'bg-stone-800 text-white'
+                                            : 'bg-stone-50 text-stone-700 hover:bg-stone-100'
+                                    }`}
+                                >
+                                    <span>${filter.label}</span>
+                                    <span className="text-xs opacity-75">${filter.description}</span>
+                                </button>
+                            `)}
                         </div>
+                        <p className="text-xs text-stone-400 mt-2">
+                            Showing ${filteredRecords.length} records
+                        </p>
                     </div>
                     <div className="border-b border-stone-200 pb-3">
                         <label className="block font-bold text-stone-600 mb-2">Grid Size</label>
