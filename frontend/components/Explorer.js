@@ -15,6 +15,15 @@ const CONNECTION_MODES = {
   categories: { label: 'Categories (Legacy)', icon: Tags, filter: 'legacy_categories', description: 'Connect via thematic categories' }
 };
 
+// Grid size presets
+const GRID_PRESETS = [
+  { value: 441, label: '21×21 (441)', description: 'Compact view' },
+  { value: 625, label: '25×25 (625)', description: 'Default - fits entity records' },
+  { value: 900, label: '30×30 (900)', description: 'Medium density' },
+  { value: 1600, label: '40×40 (1,600)', description: 'High density' },
+  { value: 2500, label: '50×50 (2,500)', description: 'Maximum density' }
+];
+
 const CANVAS_WIDTH = 1200;
 const CANVAS_HEIGHT = 1200;
 const DOT_RADIUS = 5;
@@ -27,28 +36,40 @@ const Explorer = ({ records }) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const reqRef = useRef(null);
-  
+
   const [nodes, setNodes] = useState([]);
-  const [gridSize, setGridSize] = useState(441);
-  
+
   const [selectedId, setSelectedId] = useState(null);
   const [hoveredId, setHoveredId] = useState(null);
   const [connections, setConnections] = useState([]);
   const [panelState, setPanelState] = useState('closed');
-  
+
   const [config, setConfig] = useState({
     connectionMode: 'entities',  // New: uses CONNECTION_MODES keys
     maxConnections: 30,
-    snapToGrid: true,
+    gridSize: 625,  // Default to 25x25 grid
+    onlyWithEntities: true,  // Filter to show only records with entity connections
     showSettings: false,
     sortByProminence: true  // Sort by prominence score vs count
   });
 
+  // Filter and count records based on settings
+  const filteredRecords = useMemo(() => {
+    if (config.onlyWithEntities) {
+      return records.filter(r => r.relatedIds && r.relatedIds.length > 0);
+    }
+    return records;
+  }, [records, config.onlyWithEntities]);
+
   const processData = useCallback(() => {
-    const sorted = [...records].sort((a, b) => a.date.localeCompare(b.date));
-    
-    const totalSlots = gridSize;
+    const sorted = [...filteredRecords].sort((a, b) => a.date.localeCompare(b.date));
+
+    const totalSlots = config.gridSize;
     const processed = [];
+
+    // Calculate dynamic dot radius based on grid density
+    const cols = Math.ceil(Math.sqrt(totalSlots));
+    const baseDotRadius = Math.max(2, Math.min(DOT_RADIUS, 600 / cols));
 
     for (let i = 0; i < totalSlots; i++) {
       if (i < sorted.length) {
@@ -60,33 +81,34 @@ const Explorer = ({ records }) => {
         processed.push({
           ...r,
           numericId: i,
-          x: 0, 
+          x: 0,
           y: 0,
           color: colorTheme.text,
-          baseRadius: DOT_RADIUS,
-          currentRadius: DOT_RADIUS,
+          baseRadius: baseDotRadius,
+          currentRadius: baseDotRadius,
           isPlaceholder: false,
           aggregateConnectionCount: r.concepts.length + r.categories.length
         });
       } else {
         processed.push({
-          ...sorted[0],
           id: `placeholder-${i}`,
           title: 'Empty Slot',
           author: '',
           numericId: i,
           x: 0, y: 0,
           color: '#e5e7eb',
-          baseRadius: DOT_RADIUS * 0.6,
-          currentRadius: DOT_RADIUS * 0.6,
+          baseRadius: baseDotRadius * 0.6,
+          currentRadius: baseDotRadius * 0.6,
           isPlaceholder: true,
           aggregateConnectionCount: 0,
-          verified: false
+          verified: false,
+          concepts: [],
+          categories: [],
+          relatedIds: []
         });
       }
     }
 
-    const cols = Math.ceil(Math.sqrt(totalSlots));
     const padding = 40;
     const effectiveWidth = CANVAS_WIDTH - (padding * 2);
     const effectiveHeight = CANVAS_HEIGHT - (padding * 2);
@@ -101,7 +123,7 @@ const Explorer = ({ records }) => {
     });
 
     setNodes(processed);
-  }, [records, gridSize]);
+  }, [filteredRecords, config.gridSize]);
 
   useEffect(() => {
     processData();
@@ -505,15 +527,60 @@ const Explorer = ({ records }) => {
             </div>
 
             ${config.showSettings && html`
-                <div className="bg-white border border-stone-300 rounded shadow-lg p-4 w-72 animate-fade-in text-sm space-y-4">
-                    <div>
+                <div className="bg-white border border-stone-300 rounded shadow-lg p-4 w-80 animate-fade-in text-sm space-y-4 max-h-[80vh] overflow-y-auto">
+                    <div className="border-b border-stone-200 pb-3">
+                        <label className="block font-bold text-stone-600 mb-2">Grid Display</label>
+                        <div className="space-y-2">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked=${config.onlyWithEntities}
+                                    onChange=${(e) => setConfig({...config, onlyWithEntities: e.target.checked})}
+                                    className="rounded border-stone-300 accent-stone-900"
+                                />
+                                <span className="text-stone-700">Only records with entities</span>
+                            </label>
+                            <p className="text-xs text-stone-400">
+                                ${config.onlyWithEntities
+                                    ? `Showing ${filteredRecords.length} records with entity connections`
+                                    : `Showing all ${filteredRecords.length} records`
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    <div className="border-b border-stone-200 pb-3">
+                        <label className="block font-bold text-stone-600 mb-2">Grid Size</label>
+                        <div className="space-y-1">
+                            ${GRID_PRESETS.map(preset => html`
+                                <button
+                                    key=${preset.value}
+                                    onClick=${() => setConfig({...config, gridSize: preset.value})}
+                                    className=${`w-full text-left px-3 py-1.5 rounded flex items-center justify-between transition-colors ${
+                                        config.gridSize === preset.value
+                                            ? 'bg-stone-800 text-white'
+                                            : 'bg-stone-50 text-stone-700 hover:bg-stone-100'
+                                    }`}
+                                >
+                                    <span>${preset.label}</span>
+                                    <span className="text-xs opacity-75">${preset.description}</span>
+                                </button>
+                            `)}
+                        </div>
+                        <p className="text-xs text-stone-400 mt-2">
+                            ${filteredRecords.length > config.gridSize
+                                ? `⚠️ ${filteredRecords.length - config.gridSize} records won't fit`
+                                : `${config.gridSize - filteredRecords.length} empty slots`
+                            }
+                        </p>
+                    </div>
+                    <div className="border-b border-stone-200 pb-3">
                         <label className="block font-bold text-stone-600 mb-2">Connect by:</label>
                         <div className="space-y-1">
                             ${Object.entries(CONNECTION_MODES).map(([key, mode]) => html`
                                 <button
                                     key=${key}
                                     onClick=${() => setConfig({...config, connectionMode: key})}
-                                    className=${`w-full text-left px-3 py-2 rounded flex items-center gap-2 transition-colors ${
+                                    className=${`w-full text-left px-3 py-1.5 rounded flex items-center gap-2 transition-colors ${
                                         config.connectionMode === key
                                             ? 'bg-stone-800 text-white'
                                             : 'bg-stone-50 text-stone-700 hover:bg-stone-100'
@@ -521,9 +588,6 @@ const Explorer = ({ records }) => {
                                 >
                                     <${mode.icon} className="w-4 h-4" />
                                     <span className="flex-1">${mode.label}</span>
-                                    ${config.connectionMode === key && html`
-                                        <span className="text-xs opacity-75">Active</span>
-                                    `}
                                 </button>
                             `)}
                         </div>
@@ -533,7 +597,7 @@ const Explorer = ({ records }) => {
                         <label className="block font-bold text-stone-600 mb-1">Max Connections: ${config.maxConnections}</label>
                         <input
                             type="range"
-                            min="5" max="50"
+                            min="5" max="100"
                             value=${config.maxConnections}
                             onChange=${(e) => setConfig({...config, maxConnections: Number(e.target.value)})}
                             className="w-full accent-stone-900"
@@ -555,7 +619,7 @@ const Explorer = ({ records }) => {
             `}
         </div>
 
-        <div className=${`absolute right-4 z-10 bg-white/95 backdrop-blur-sm border border-stone-300 rounded shadow-lg p-3 max-w-[180px] transition-all duration-200 ${config.showSettings ? 'top-[420px]' : 'top-16'}`}>
+        <div className=${`absolute right-4 z-10 bg-white/95 backdrop-blur-sm border border-stone-300 rounded shadow-lg p-3 max-w-[180px] transition-all duration-200 ${config.showSettings ? 'top-[580px]' : 'top-16'}`}>
             <h4 className="text-xs font-bold text-stone-600 mb-2 uppercase tracking-wider">Category Colors</h4>
             <div className="flex flex-col gap-1.5 text-xs max-h-[300px] overflow-y-auto">
                 ${categoryColors.map(([category, color]) => html`
