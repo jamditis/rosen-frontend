@@ -177,17 +177,15 @@ const App = () => {
         if (r.era !== filters.era) return false;
       }
       
-      if (filters.type === 'video') {
-         if (!(r.url.includes('youtube') || r.url.includes('vimeo'))) return false;
-      } else if (filters.type === 'article') {
-         if (r.url.includes('youtube') || r.url.includes('vimeo')) return false;
+      if (filters.type === 'article') {
+         // Articles are non-social content
+         if (r.type === 'social') return false;
       } else if (filters.type) {
-         // Specific social types
+         // Specific social platform types
          if (r.type !== 'social') return false;
          const platform = filters.type;
          if (platform === 'twitter' && !r.pub.toLowerCase().includes('twitter') && !r.pub.toLowerCase().includes('x.com')) return false;
          if (platform === 'bluesky' && !r.pub.toLowerCase().includes('bluesky')) return false;
-         if (platform === 'tumblr' && !r.pub.toLowerCase().includes('tumblr')) return false;
       }
 
       // Hide social media replies by default (they flood the archive with low-value content)
@@ -264,7 +262,7 @@ const App = () => {
   const minYear = years.length ? Math.min(...years) : 0;
   const maxYear = years.length ? Math.max(...years) : 0;
 
-  const selectedRecord = filteredRecords.find(r => r.id === selectedRecordId) || null;
+  const selectedRecord = records.find(r => r.id === selectedRecordId) || null;
   const selectedRecordIndex = filteredRecords.findIndex(r => r.id === selectedRecordId);
 
   const isExplorer = viewMode === 'explorer';
@@ -311,7 +309,11 @@ const App = () => {
             : 'bg-paper/80 backdrop-blur-md border-stone-200'
       }`}>
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <button
+              onClick=${navigateToArchive}
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
+              aria-label="Return to archive home"
+            >
                 <div className="bg-stone-900 text-white p-1.5">
                     <${Newspaper} className="w-5 h-5" />
                 </div>
@@ -319,7 +321,7 @@ const App = () => {
                     Jay Rosen Digital Archive
                 </h1>
                 <h1 className="text-lg font-display font-bold text-stone-900 sm:hidden">JRDA</h1>
-            </div>
+            </button>
 
             <div className="hidden md:flex items-center gap-6 text-xs text-stone-500 border-l border-r border-stone-200 px-6 h-full">
                 <div className="flex flex-col leading-tight">
