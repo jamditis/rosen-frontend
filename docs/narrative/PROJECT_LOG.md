@@ -4,6 +4,94 @@ This document records significant architectural decisions and notable changes to
 
 ---
 
+### **[2.21.0] - 2025-12-03**
+
+#### **Data Pipeline Optimization & Analytics Features**
+
+**Status:** In Progress - Frontend complete, entity extraction pending
+
+##### **Overview**
+
+Major work on optimizing data loading, adding SQL analytics capabilities, and fixing critical issues in the entity extraction pipeline. This session focused on both improving the user experience and preparing for a complete re-run of entity extraction with an improved schema.
+
+##### **Key Accomplishments**
+
+**1. Data Loading Optimization**
+- Split 25MB archive-data.json into three files:
+  - `archive-core.json` (8.2MB) - Initial page load
+  - `archive-details.json` (11MB) - Lazy loaded on modal open
+  - `archive-entities.json` (1.1MB) - Lazy loaded for Explorer
+- Implemented Service Worker (`sw.js`) for caching
+- Added `.htaccess` for gzip compression
+- Result: 67% reduction in initial load size
+
+**2. SQL Analytics Dashboard**
+- Integrated sql.js (SQLite compiled to WebAssembly)
+- Created `sqliteService.js` with query functions
+- Built `AnalyticsDashboard.js` with pre-built visualizations
+- Added custom SQL console for advanced users
+
+**3. Query Builder (No SQL Required)**
+- Created "mad-libs" style query interface
+- 13 pre-built query templates
+- Sentence-based interface with colored inputs
+- Makes data exploration accessible to non-technical users
+
+**4. Entity Extraction Schema v3.0**
+- Identified critical bugs:
+  - 209 false "Jay Rosen Founded By [article]" relationships
+  - Missing "Authored By" relationship type
+  - CSV parsing issues creating malformed data
+- Created improved schema with:
+  - "Authored By" for proper authorship tracking
+  - "Quoted", "Interviewed", "Responds To" relationships
+  - Negative examples to prevent common errors
+  - Record context awareness
+
+**5. Data Validation Tools**
+- Created `validate_archive_data.py` script
+- Automated quality checking for:
+  - Field completeness
+  - ID format validity
+  - Duplicate detection
+  - Entity coverage reporting
+
+**6. Import Directory Setup**
+- Created `backend/tumblr_export/` for Tumblr imports
+- Created `backend/clippings/` for newspaper clipping imports
+- Added README documentation for each
+
+##### **Data Status Discovery**
+
+Analysis revealed current data state:
+- Archive Records: 659 (articles/essays)
+- Social Posts: 29,187 (Twitter + Bluesky)
+- Entity Coverage: Only 2.1% (622 records have entities)
+- Tumblr: 0 (pending import)
+- Newspaper Clippings: 0 (pending import)
+
+##### **Pending Work**
+
+1. Import Tumblr archive (user has files locally)
+2. Import newspaper clippings (user has PDFs locally)
+3. Update entity extractor to use v3.0 schema
+4. Run entity extraction on remaining 29,200+ records
+5. Regenerate frontend data files
+
+##### **Files Created**
+
+- `frontend/components/QueryBuilder.js`
+- `frontend/components/AnalyticsDashboard.js`
+- `frontend/services/sqliteService.js`
+- `frontend/sw.js`
+- `backend/entity_extraction_schema_v3.json`
+- `backend/scripts/validate_archive_data.py`
+- `backend/tumblr_export/README.md`
+- `backend/clippings/README.md`
+- `docs/narrative/PROGRESS_UPDATE_2025-12-03.md`
+
+---
+
 ### **[2.20.0] - 2025-12-01**
 
 #### **Major Repository Reorganization for Public Release**
