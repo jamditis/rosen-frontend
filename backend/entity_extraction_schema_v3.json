@@ -1,0 +1,337 @@
+{
+  "entity_extraction_config": {
+    "description": "Schema for extracting named entities and relationships from Jay Rosen Digital Archive content",
+    "version": "3.0",
+    "changelog": [
+      "v3.0: Added 'Authored By' relationship, clarified 'Founded By', added negative examples",
+      "v3.0: Added record context awareness to prevent self-referential entities",
+      "v3.0: Added 'Quoted', 'Interviewed', 'Responds To' relationships"
+    ],
+    "extraction_focus": [
+      "People (journalists, politicians, media figures, academics)",
+      "Organizations (news outlets, media companies, academic institutions, advocacy groups)",
+      "Works (books, major articles, papers, studies - NOT the current record being analyzed)",
+      "Concepts (journalism theories, media criticism frameworks, Jay Rosen's key concepts)",
+      "Events (conferences, elections, media crises, historical moments)",
+      "Locations (cities, countries, regions relevant to media/journalism context)"
+    ]
+  },
+  "critical_rules": {
+    "record_context": "You are analyzing a RECORD from the Jay Rosen Digital Archive. The record itself (the article/post you're reading) should NOT be extracted as a new Work entity. Only extract OTHER works that are referenced within the text.",
+    "authorship_vs_founding": "Use 'Authored By' when someone WROTE an article, book, or piece. Use 'Founded By' ONLY when someone CREATED an organization, publication outlet, or ongoing project (like PressThink the blog, not individual blog posts).",
+    "deduplication": "If an entity appears multiple times with slight variations (e.g., 'Jay Rosen', 'Rosen', 'Professor Rosen'), consolidate to one canonical entity with the full name."
+  },
+  "entity_types": {
+    "Person": {
+      "description": "Individual people mentioned in the text",
+      "prefix": "P",
+      "examples": ["Jay Rosen", "George W. Bush", "Margaret Sullivan", "Brian Stelter"],
+      "attributes": ["entity_name", "role", "affiliation", "prominence_score"]
+    },
+    "Organization": {
+      "description": "Media organizations, news outlets, institutions, corporations, government bodies",
+      "prefix": "O",
+      "examples": ["The New York Times", "CNN", "New York University", "The Washington Post"],
+      "attributes": ["entity_name", "org_type", "industry", "prominence_score"],
+      "note": "Includes ongoing publications like 'PressThink' (the blog as a whole) but NOT individual articles"
+    },
+    "Work": {
+      "description": "Published works REFERENCED in the text - books, major reports, academic papers, influential articles. Do NOT create a Work entity for the record you are currently analyzing.",
+      "prefix": "W",
+      "examples": ["The Elements of Journalism (book)", "Manufacturing Consent (book)", "The 1619 Project"],
+      "attributes": ["entity_name", "work_type", "author", "publication_year", "prominence_score"],
+      "exclude": ["The current article/post being analyzed", "Individual tweets or social posts", "Brief news items"]
+    },
+    "Concept": {
+      "description": "Journalism theories, media criticism frameworks, intellectual concepts",
+      "prefix": "C",
+      "examples": ["View from Nowhere", "Church of the Savvy", "Public Journalism", "The Citizens' Agenda", "Audience Atomization Overcome"],
+      "attributes": ["entity_name", "originator", "related_concepts", "prominence_score"]
+    },
+    "Event": {
+      "description": "Significant events, conferences, elections, media crises, historical moments",
+      "prefix": "E",
+      "examples": ["2016 Presidential Election", "Iraq War Coverage", "Watergate Scandal", "January 6 Insurrection"],
+      "attributes": ["entity_name", "event_date", "location", "significance", "prominence_score"]
+    },
+    "Location": {
+      "description": "Geographic locations relevant to media/journalism context",
+      "prefix": "L",
+      "examples": ["Washington D.C.", "New York City", "United States"],
+      "attributes": ["entity_name", "location_type", "relevance", "prominence_score"]
+    }
+  },
+  "relationship_types": {
+    "Authored By": {
+      "description": "Work A was written/authored by Person B. Use for articles, books, papers, posts.",
+      "valid_source_types": ["Work"],
+      "valid_target_types": ["Person"],
+      "examples": ["'The Elements of Journalism' Authored By Bill Kovach", "'Why Political Coverage Is Broken' Authored By Jay Rosen"]
+    },
+    "Quoted": {
+      "description": "Person/Work A directly quotes Person B",
+      "valid_source_types": ["Person", "Work"],
+      "valid_target_types": ["Person"],
+      "examples": ["Jay Rosen Quoted Donald Trump saying..."]
+    },
+    "Interviewed": {
+      "description": "Person A interviewed Person B",
+      "valid_source_types": ["Person"],
+      "valid_target_types": ["Person"],
+      "examples": ["Terry Gross Interviewed Jay Rosen"]
+    },
+    "Responds To": {
+      "description": "Work/Person A is responding to or rebutting Work/Person B",
+      "valid_source_types": ["Person", "Work"],
+      "valid_target_types": ["Person", "Work", "Event"],
+      "examples": ["Jay Rosen Responds To criticism from..."]
+    },
+    "Mentions": {
+      "description": "Entity A mentions entity B in passing or substantively",
+      "valid_source_types": ["Person", "Organization", "Work"],
+      "valid_target_types": ["Person", "Organization", "Work", "Event", "Location"]
+    },
+    "Criticizes": {
+      "description": "Entity A criticizes or negatively evaluates entity B",
+      "valid_source_types": ["Person", "Organization", "Work"],
+      "valid_target_types": ["Person", "Organization", "Work", "Concept", "Event"]
+    },
+    "Cites": {
+      "description": "Entity A cites or references entity B as source material",
+      "valid_source_types": ["Person", "Work"],
+      "valid_target_types": ["Work", "Person", "Organization"]
+    },
+    "Discusses": {
+      "description": "Entity A discusses or analyzes concept/event B in depth",
+      "valid_source_types": ["Person", "Work", "Organization"],
+      "valid_target_types": ["Concept", "Event", "Work"]
+    },
+    "Expands On": {
+      "description": "Entity A expands, elaborates, or builds upon concept/work B",
+      "valid_source_types": ["Person", "Work"],
+      "valid_target_types": ["Concept", "Work"]
+    },
+    "Affiliated With": {
+      "description": "Person A is affiliated, employed by, or associated with Organization B",
+      "valid_source_types": ["Person"],
+      "valid_target_types": ["Organization"]
+    },
+    "Published In": {
+      "description": "Work A was published in/by Organization B",
+      "valid_source_types": ["Work"],
+      "valid_target_types": ["Organization"]
+    },
+    "Originated By": {
+      "description": "Concept A was originated or coined by Person B",
+      "valid_source_types": ["Concept"],
+      "valid_target_types": ["Person"]
+    },
+    "Occurred At": {
+      "description": "Event A occurred at Location B",
+      "valid_source_types": ["Event"],
+      "valid_target_types": ["Location"]
+    },
+    "Supports": {
+      "description": "Entity A supports, advocates for, or defends entity B",
+      "valid_source_types": ["Person", "Organization", "Work"],
+      "valid_target_types": ["Person", "Organization", "Concept", "Event"]
+    },
+    "Owns": {
+      "description": "Organization/Person A owns or controls Organization B (media ownership, corporate structure)",
+      "valid_source_types": ["Organization", "Person"],
+      "valid_target_types": ["Organization"],
+      "examples": ["Jeff Bezos Owns The Washington Post", "News Corp Owns Fox News"]
+    },
+    "Founded": {
+      "description": "Person/Organization A founded Organization B. ONLY use for creating organizations, publications (as ongoing entities), or major projects. Do NOT use for writing individual articles.",
+      "valid_source_types": ["Person", "Organization"],
+      "valid_target_types": ["Organization"],
+      "examples": ["Jay Rosen Founded PressThink (the blog)", "Craig Newmark Founded Craigslist"],
+      "do_not_use_for": ["Individual articles", "Single blog posts", "Tweets", "Any content that someone 'wrote' rather than 'founded'"]
+    },
+    "Pioneered": {
+      "description": "Person A pioneered, invented, or was first to develop Concept B",
+      "valid_source_types": ["Person"],
+      "valid_target_types": ["Concept"],
+      "examples": ["Jay Rosen Pioneered 'View from Nowhere' concept"]
+    },
+    "Inspired By": {
+      "description": "Work or Concept A was inspired by, influenced by, or built upon Work/Concept/Person B",
+      "valid_source_types": ["Work", "Concept"],
+      "valid_target_types": ["Work", "Concept", "Person"]
+    }
+  },
+  "negative_examples": {
+    "description": "Examples of INCORRECT extractions to avoid",
+    "wrong_extractions": [
+      {
+        "text": "This article by Jay Rosen discusses...",
+        "wrong": {"relationship": "Jay Rosen Founded This Article"},
+        "correct": "Do not create a relationship for the current article. The record metadata already captures authorship.",
+        "reason": "The current record IS the article - don't create a Work entity for it"
+      },
+      {
+        "text": "By Jay Rosen, PressThink",
+        "wrong": {"relationship": "Jay Rosen Founded PressThink (for every single post)"},
+        "correct": "Only create 'Jay Rosen Founded PressThink' ONCE in the entire archive, not for every post",
+        "reason": "Founding is a one-time event, not repeated per article"
+      },
+      {
+        "text": "In my latest post, I wrote about...",
+        "wrong": {"entity": "Work: 'my latest post'"},
+        "correct": "Do not extract. This refers to the current record.",
+        "reason": "Self-reference to current record"
+      }
+    ]
+  },
+  "extraction_guidelines": {
+    "prominence_threshold": "Extract entities that are substantively discussed, not just mentioned in passing",
+    "context_required": "Include enough context to disambiguate entities (e.g., 'Jay Rosen, NYU professor' vs 'Jay Rosen')",
+    "relationship_evidence": "Relationships should be explicitly stated or strongly implied in the text",
+    "entity_normalization": "Standardize entity names (e.g., 'NYT' -> 'The New York Times')",
+    "record_awareness": "Remember: You are analyzing an existing archive record. Do not create entities for the record itself.",
+    "focus_areas": [
+      "Journalism criticism and theory",
+      "Media industry analysis",
+      "Political journalism",
+      "Digital media evolution",
+      "Press accountability",
+      "Audience engagement"
+    ]
+  },
+  "output_format": {
+    "entities_sheet_columns": [
+      "entity_id",
+      "entity_type",
+      "entity_name",
+      "normalized_name",
+      "role_or_description",
+      "affiliation",
+      "prominence_score",
+      "first_mention_record_id",
+      "total_mentions",
+      "related_entities",
+      "notes"
+    ],
+    "relationships_sheet_columns": [
+      "relationship_id",
+      "source_record_id",
+      "source_entity_id",
+      "source_entity_name",
+      "relationship_type",
+      "target_entity_id",
+      "target_entity_name",
+      "context_snippet",
+      "confidence_score",
+      "extracted_date"
+    ]
+  },
+  "example_extraction": {
+    "record_context": {
+      "record_id": "PRESSTH-00042",
+      "title": "Why Political Coverage Is Broken",
+      "author": "Jay Rosen",
+      "publication": "PressThink"
+    },
+    "sample_text": "In this piece, I criticize the Washington press corps for embracing what I call 'The Church of the Savvy.' As I discussed in my book 'What Are Journalists For?' the problem runs deep. Margaret Sullivan at The Washington Post has written about similar concerns. Jeff Bezos, who owns the Post, rarely intervenes in editorial matters.",
+    "expected_entities": [
+      {
+        "entity_id": "P001",
+        "entity_type": "Person",
+        "entity_name": "Jay Rosen",
+        "role": "Author, Journalism professor",
+        "affiliation": "New York University, PressThink",
+        "prominence_score": 10,
+        "note": "Author of the current record - extracted as entity but NO 'Founded' relationship for this post"
+      },
+      {
+        "entity_id": "O001",
+        "entity_type": "Organization",
+        "entity_name": "Washington press corps",
+        "org_type": "Media collective",
+        "prominence_score": 8
+      },
+      {
+        "entity_id": "C001",
+        "entity_type": "Concept",
+        "entity_name": "The Church of the Savvy",
+        "originator": "Jay Rosen",
+        "prominence_score": 9
+      },
+      {
+        "entity_id": "W001",
+        "entity_type": "Work",
+        "entity_name": "What Are Journalists For?",
+        "work_type": "Book",
+        "author": "Jay Rosen",
+        "prominence_score": 7,
+        "note": "This IS a valid Work entity - it's a book referenced in the text, not the current record"
+      },
+      {
+        "entity_id": "P002",
+        "entity_type": "Person",
+        "entity_name": "Margaret Sullivan",
+        "role": "Media columnist",
+        "affiliation": "The Washington Post",
+        "prominence_score": 6
+      },
+      {
+        "entity_id": "O002",
+        "entity_type": "Organization",
+        "entity_name": "The Washington Post",
+        "org_type": "News outlet",
+        "prominence_score": 5
+      },
+      {
+        "entity_id": "P003",
+        "entity_type": "Person",
+        "entity_name": "Jeff Bezos",
+        "role": "Owner",
+        "affiliation": "Amazon, The Washington Post",
+        "prominence_score": 4
+      }
+    ],
+    "expected_relationships": [
+      {
+        "source_entity_id": "P001",
+        "relationship_type": "Criticizes",
+        "target_entity_id": "O001",
+        "context": "I criticize the Washington press corps"
+      },
+      {
+        "source_entity_id": "C001",
+        "relationship_type": "Originated By",
+        "target_entity_id": "P001",
+        "context": "what I call 'The Church of the Savvy'"
+      },
+      {
+        "source_entity_id": "W001",
+        "relationship_type": "Authored By",
+        "target_entity_id": "P001",
+        "context": "my book 'What Are Journalists For?'"
+      },
+      {
+        "source_entity_id": "P002",
+        "relationship_type": "Affiliated With",
+        "target_entity_id": "O002",
+        "context": "Margaret Sullivan at The Washington Post"
+      },
+      {
+        "source_entity_id": "P003",
+        "relationship_type": "Owns",
+        "target_entity_id": "O002",
+        "context": "Jeff Bezos, who owns the Post"
+      }
+    ],
+    "entities_NOT_to_extract": [
+      {
+        "wrong": "Work entity for 'Why Political Coverage Is Broken'",
+        "reason": "This is the current record (PRESSTH-00042), not a referenced work"
+      },
+      {
+        "wrong": "Jay Rosen 'Founded' this article",
+        "reason": "He WROTE it (authorship is in record metadata), he didn't FOUND it"
+      }
+    ]
+  }
+}
