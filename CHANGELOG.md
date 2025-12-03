@@ -2,6 +2,57 @@
 
 ---
 
+*Session Date: December 3, 2025*
+
+## [2.21.0] Data Pipeline Optimization & Analytics Features
+
+### Frontend Enhancements
+
+**Data Loading Optimization**
+- Split 25MB archive-data.json into three optimized files (67% reduction in initial load)
+- Added lazy loading for record details and entity data
+- Implemented Service Worker for caching and offline support
+- Added gzip compression via .htaccess
+
+**SQL Analytics Dashboard**
+- Integrated sql.js (SQLite WebAssembly) for in-browser queries
+- Created AnalyticsDashboard.js with pre-built visualizations
+- Added custom SQL query console
+
+**Query Builder (Mad-Libs Style)**
+- Created QueryBuilder.js with sentence-based query interface
+- 13 pre-built query templates for common operations
+- No SQL knowledge required - fill in dropdowns and text fields
+- Color-coded inputs for different field types
+
+### Backend Improvements
+
+**Entity Extraction Schema v3.0**
+- Added "Authored By" relationship (fixes "Founded By" false positives)
+- Added "Quoted", "Interviewed", "Responds To" relationships
+- Clarified "Founded" to exclude individual articles
+- Added negative examples to prevent common extraction errors
+- Added record context awareness guidelines
+
+**Data Validation**
+- Created validate_archive_data.py script
+- Checks field completeness, ID format, duplicates, relationships
+- Reports entity extraction coverage (currently 2.1%)
+
+**Import Directory Setup**
+- Created backend/tumblr_export/ with documentation
+- Created backend/clippings/ with documentation
+- Ready for Tumblr and newspaper clipping imports
+
+### Data Status
+| Metric | Value |
+|--------|-------|
+| Archive Records | 659 |
+| Social Posts | 29,187 |
+| Entity Coverage | 2.1% (needs full extraction run) |
+
+---
+
 *Session Date: December 1, 2025*
 
 ## [2.20.0] Major Repository Reorganization for Public Release
