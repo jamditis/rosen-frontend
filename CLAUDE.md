@@ -62,6 +62,101 @@ All development work for the December 2025 dissertation release is complete. The
 
 ---
 
+## 🔄 CURRENT SESSION STATUS (December 3, 2025)
+
+**Branch:** main
+**Last PR Merged:** #93 (taxonomy-consolidation-dec3)
+
+### ✅ Recently Completed (Dec 3)
+1. **Taxonomy Consolidation** - PR #93 MERGED
+   - Consolidated 14 overlapping eras → 8 clean eras (added COVID-19 2020-2021 and Trump II 2025-Present)
+   - Normalized 2,992 tag instances (862 case variations fixed)
+   - Fixed 8 key_concepts case variations
+   - Removed colQ_changes column (schema violation)
+   - Fixed 31 content_type records, 5 scope records
+   - **Result:** 650/659 records updated (98.6%), 100% schema compliant
+   - Files: [archive_records-public.csv](data/archive_records-public.csv)
+
+2. **Tumblr Import** - 138 posts processed
+   - Source: studio20nyu.tumblr.com export
+   - Format: JSON with full metadata
+   - IDs: TUMBLR-00001 to TUMBLR-00138
+   - File: [backend/tumblr_records.json](backend/tumblr_records.json)
+
+3. **Newspaper Clipping OCR** - 62 clippings processed
+   - Gemini Flash 2.0: 58/84 success
+   - Tesseract fallback: 16 additional (74/84 total)
+   - IDs: CLIP-00001 to CLIP-00062
+   - File: [backend/clipping_records.json](backend/clipping_records.json)
+
+4. **Entity Extraction Schema v3.0**
+   - Added record context awareness
+   - Prevents self-referential entities
+   - Updated [backend/entity_extraction_schema_v3.json](backend/entity_extraction_schema_v3.json)
+
+### ✅ RECENTLY COMPLETED (Dec 3 - Session 2)
+**Merge new records into main archive CSV - COMPLETED**
+
+**Accomplished:**
+1. ✅ Created `backend/scripts/merge_new_records.py` with full validation
+2. ✅ Successfully merged 138 Tumblr + 62 clipping records
+3. ✅ All 200 new records properly transformed (dates, eras, word counts)
+4. ✅ Backup created: `archive_records-public_backup_20251202_221548.csv`
+5. ✅ Merge report generated: `backend/merge_report_20251202_221548.json`
+6. ✅ Backfilled 2 missing publication dates (book records set to 1999-01-01)
+7. ✅ **Final result:** 859 total records, 859 valid, 0 errors
+
+**Files created:**
+- [backend/scripts/merge_new_records.py](backend/scripts/merge_new_records.py) - Main merge script
+- [backend/scripts/backfill_missing_dates.py](backend/scripts/backfill_missing_dates.py) - Date backfill utility
+
+### 🚧 NEXT IMMEDIATE TASK
+**Social Media Threading & Relationship Mapping**
+
+**Current state:**
+- Main archive: 859 records (newly merged)
+- Social posts: 29,187 (26,116 Twitter + 3,071 Bluesky)
+- Existing relationships: 7,500 (incomplete, main archive only)
+- Threading: Bluesky 67.7%, Twitter 0%
+
+**What needs to happen:**
+1. Reconstruct Bluesky threads (parse AT protocol URIs)
+2. Reconstruct Twitter threads (multi-strategy heuristic)
+3. Run entity extraction on ~15K substantive posts (7+ words, $50 budget)
+4. Generate thread relationships (REPLIES_TO, PART_OF_THREAD)
+5. Generate topical relationships (DISCUSSES_SAME_TOPIC)
+6. Link social posts to archive records (REFERENCES, RELATED_TO)
+7. Merge all into unified `all_relationships.csv`
+
+**Key reference:**
+- [backend/UNIFIED_THREADING_AND_RELATIONSHIPS_ROADMAP.md](backend/UNIFIED_THREADING_AND_RELATIONSHIPS_ROADMAP.md) - Full implementation plan
+
+### 📋 Remaining Tasks (After Merge)
+1. Test entity extraction on sample records (v3.0 schema)
+2. Run batch entity extraction on all 200 new records
+3. Regenerate frontend data files
+
+### 📊 Documentation Updated
+- [CHANGELOG.md](CHANGELOG.md) - Added [2.23.0] entry
+- [docs/narrative/PROGRESS_UPDATE_2025-12-03-part2.md](docs/narrative/PROGRESS_UPDATE_2025-12-03-part2.md) - Full session narrative
+- [docs/narrative/PROJECT_LOG.md](docs/narrative/PROJECT_LOG.md) - Added [2.23.0] entry
+- [backend/TAXONOMY_ANALYSIS_SUMMARY.md](backend/TAXONOMY_ANALYSIS_SUMMARY.md) - Era consolidation analysis
+
+### 🔧 Key Scripts Created
+- [backend/scripts/analyze_taxonomy.py](backend/scripts/analyze_taxonomy.py) - Deep taxonomy analysis
+- [backend/scripts/analyze_csv_schema.py](backend/scripts/analyze_csv_schema.py) - Schema validation
+- [backend/scripts/analyze_data_standardization.py](backend/scripts/analyze_data_standardization.py) - Format checking
+- [backend/scripts/consolidate_taxonomy.py](backend/scripts/consolidate_taxonomy.py) - Main consolidation (USED)
+
+### ⚠️ Important Notes for Next Session
+1. DO NOT re-run consolidate_taxonomy.py - changes already applied and merged
+2. When creating merge script, preserve the 8-era structure exactly
+3. Tumblr dates use M/D/YYYY format (e.g., "09/24/2011")
+4. Clipping dates use MM/DD/YYYY format (e.g., "09/14/1991")
+5. Both JSON files have compatible field names with CSV schema
+
+---
+
 ## Project Overview
 
 The **Jay Rosen Digital Archive (JRDA)** is a comprehensive monorepo containing:

@@ -1,0 +1,28 @@
+{
+  "timestamp": "2025-12-02T22:15:48.476075",
+  "records_before_merge": 659,
+  "tumblr_records_added": 138,
+  "clipping_records_added": 62,
+  "total_new_records": 200,
+  "records_after_merge": 859,
+  "validation": {
+    "total_records": 859,
+    "valid": 859,
+    "errors": [],
+    "warnings": [
+      "RECORD-00069: Era not in valid set: Early Career & Public Journalism (1989-1999)",
+      "RECORD-00072: Era not in valid set: The Rise of the Web & Blogging (2000-2009)",
+      "RECORD-00085: Era not in valid set: Social Media & Networked Journalism (2010-2016)"
+    ]
+  },
+  "era_distribution": {
+    "Early Career & Public Journalism (1990-1999)": 0,
+    "Blogging Launch & Digital Disruption (2000-2004)": 0,
+    "Peak Blogging & Citizen Journalism (2005-2009)": 0,
+    "Social Media & Financial Crisis (2010-2015)": 0,
+    "Trump Era & Democratic Crisis (2016-2019)": 0,
+    "COVID-19 & Misinformation Crisis (2020-2021)": 0,
+    "Post-Trump Transition (2022-2024)": 0,
+    "Second Trump Administration (2025-Present)": 0
+  }
+}
