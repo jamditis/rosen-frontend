@@ -34,6 +34,7 @@ const STATIC_ASSETS = [
   '/wp-content/rosen-archive/frontend/components/LoadingQuotes.js',
   '/wp-content/rosen-archive/frontend/components/WorkInProgressBanner.js',
   '/wp-content/rosen-archive/frontend/components/AnalyticsDashboard.js',
+  '/wp-content/rosen-archive/frontend/components/QueryBuilder.js',
   '/wp-content/rosen-archive/frontend/services/sqliteService.js'
 ];
 

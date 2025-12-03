@@ -30,6 +30,7 @@ import {
   getSqliteStats,
   queryAsObjects
 } from '../services/archiveService.js?v=2.0.2';
+import QueryBuilder from './QueryBuilder.js';
 
 // Simple bar chart component
 const BarChart = ({ data, labelKey, valueKey, maxBars = 10, color = '#1c1917' }) => {
@@ -287,10 +288,22 @@ const AnalyticsDashboard = ({ isOpen, onClose }) => {
                 </div>
               </section>
 
-              <!-- Custom Query Section -->
+              <!-- Query Builder (Mad Libs Style) -->
+              <section className="bg-gradient-to-br from-stone-50 to-amber-50 border-2 border-stone-200 rounded-lg p-6">
+                <h3 className="text-sm uppercase tracking-wider text-stone-500 font-bold mb-4 flex items-center gap-2">
+                  <${Database} className="w-4 h-4" /> Query Builder
+                  <span className="ml-2 px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full font-normal normal-case">No SQL knowledge required!</span>
+                </h3>
+                <p className="text-sm text-stone-600 mb-6">
+                  Build custom queries by completing sentences. Choose from dropdowns and enter values to explore the archive your way.
+                </p>
+                <${QueryBuilder} />
+              </section>
+
+              <!-- Custom Query Section (Advanced) -->
               <section className="bg-stone-800 text-white rounded-lg p-4">
                 <h3 className="text-sm uppercase tracking-wider text-stone-400 font-bold mb-4 flex items-center gap-2">
-                  <${Database} className="w-4 h-4" /> Run Custom SQL Query
+                  <${Database} className="w-4 h-4" /> Advanced: Raw SQL Query
                 </h3>
                 <div className="space-y-4">
                   <textarea
