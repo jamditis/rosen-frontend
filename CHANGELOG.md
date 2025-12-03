@@ -2,6 +2,121 @@
 
 ---
 
+*Session Date: December 3, 2025 (Continued)*
+
+## [2.23.0] Data Quality & Taxonomy Consolidation
+
+### Data Standardization & Schema Compliance
+
+**Comprehensive Taxonomy Analysis**
+- Analyzed 659 archive records for data quality and taxonomy issues
+- Identified 13 overlapping era definitions across 14 variations
+- Found 862 tags with case variations across 2,549 unique tags
+- Discovered 10 `content_type` values not matching schema definitions
+- Detected 5 `scope` values inconsistent with schema
+- Identified unexpected `colQ_changes` column not in schema
+
+**Taxonomy Consolidation Script**
+- Created `backend/scripts/consolidate_taxonomy.py` for safe, non-destructive cleaning
+- Consolidated 14 overlapping eras → 8 clean eras with COVID-19 and Trump II
+- Normalized 2,992 tag instances (862 case variations fixed)
+- Fixed 8 key_concepts case variations
+- Mapped 31 content_type records to schema values
+- Corrected 5 scope records to match schema
+- Removed non-schema `colQ_changes` column (659 records)
+
+**New Era Structure (8 Eras)**
+1. Early Career & Public Journalism (1990-1999)
+2. Blogging Launch & Digital Disruption (2000-2004)
+3. Peak Blogging & Citizen Journalism (2005-2009)
+4. Social Media & Financial Crisis (2010-2015)
+5. Trump Era & Democratic Crisis (2016-2019)
+6. **COVID-19 & Misinformation Crisis (2020-2021)** ← NEW
+7. Post-Trump Transition (2022-2024)
+8. **Second Trump Administration (2025-Present)** ← NEW
+
+**Analysis Tools Created**
+- `backend/scripts/analyze_taxonomy.py` - Eras, tags, key_concepts analysis
+- `backend/scripts/analyze_data_standardization.py` - Field standardization check
+- `backend/scripts/analyze_csv_schema.py` - Schema compliance validation
+- `backend/scripts/clean_csv_data.py` - URL/author/date cleaning (from previous session)
+
+**Entity Extraction v3.0 Schema**
+- Updated `entity_extraction_schema_v3.json` with record context awareness
+- Added "Authored By" relationship (separate from "Founded")
+- Prevents self-referential entities (e.g., article won't create Work entity for itself)
+- Created negative examples to guide extraction
+- Updated `entity_extractor.py` to pass record metadata
+
+**Documentation**
+- Created `backend/TAXONOMY_ANALYSIS_SUMMARY.md` - Complete analysis with recommendations
+- Generated `backend/taxonomy_consolidation_changes.txt` - Detailed change log
+- Generated machine-readable reports: `taxonomy_analysis_report.json`, `csv_schema_validation_report.json`
+
+**Test Suite**
+- Created `backend/test_entity_extractor_v3.py` - Validates v3.0 schema improvements
+
+### Results
+| Metric | Before | After | Change |
+|--------|--------|-------|--------|
+| Era definitions | 14 (overlapping) | 8 (clean) | Consolidated |
+| Tag case variations | 862 | 0 | Normalized |
+| Records changed | 0 | 650 | Updated |
+| Eras reassigned | N/A | 623 | Date-based |
+| Tags normalized | N/A | 2,992 instances | Fixed |
+| Schema violations | 16 | 0 | Resolved |
+
+---
+
+## [2.22.0] Content Import & OCR Processing
+
+### Backend Content Processing
+
+**Tumblr Archive Import**
+- Processed 138 posts from Studio 20 NYU Tumblr export
+- Fixed `tumblr_processor.py` to extract dates from `<time datetime="">` tags
+- Fixed title extraction from `<h2>` tags
+- Successfully generated `tumblr_records.json` with all posts
+
+**Newspaper Clipping OCR**
+- Attempted AI vision OCR with Gemini: 58 of 84 PDFs processed (26 missed)
+- Attempted AI vision OCR with Claude: also missed small text mentions
+- **Switched to Traditional OCR (Tesseract)** with quadrant-based approach
+- Created `traditional_ocr_processor.py` with:
+  - Multi-pass OCR (full page + 4 overlapping quadrants)
+  - Text pattern matching for Jay Rosen mentions
+  - Metadata extraction from filenames and PDF text layer
+  - newspapers.com URL extraction
+- Successfully validated tesseract finds mentions that AI vision missed
+- Batch processing 26 missed PDFs with tesseract (in progress)
+
+**OCR Architecture Decision**
+- AI vision models (Gemini, Claude) struggle with small text in newspaper scans
+- Traditional tesseract OCR more accurate for printed newspaper text
+- Quadrant approach (300 DPI, overlapping sections) improves small text detection
+- Fair use compliance: storing excerpts only, linking to newspapers.com sources
+
+### New Processors Created
+- `backend/src/rosen_scraper/processors/traditional_ocr_processor.py` - Tesseract OCR with quadrant scanning
+- `backend/src/rosen_scraper/processors/claude_ocr_processor.py` - Claude vision OCR (archived approach)
+- `backend/reprocess_missed_clippings.py` - Batch reprocessing script
+
+### Dependencies Added
+- `pytesseract` - Python wrapper for tesseract OCR
+- `PyMuPDF` (fitz) - PDF rendering for OCR
+- `anthropic` - Claude API (for vision experiments)
+- Tesseract OCR engine (via Homebrew)
+
+### Data Status After Imports
+| Metric | Value |
+|--------|-------|
+| Tumblr Posts | 138 (completed) |
+| Newspaper Clippings (Gemini) | 58 records |
+| Newspaper Clippings (Tesseract) | ~26 additional (processing) |
+| **Expected Total Clippings** | **~84 records** |
+
+---
+
 *Session Date: December 3, 2025*
 
 ## [2.21.0] Data Pipeline Optimization & Analytics Features

@@ -1,0 +1,383 @@
+{
+  "generated": "2025-12-02T21:39:00.929133",
+  "recommendations": [
+    {
+      "category": "eras",
+      "issue": "Date range overlaps",
+      "details": [
+        {
+          "era1": "Early Career & Public Journalism (1989-1999)",
+          "era2": "Early Career & Public Journalism (1990-1999)",
+          "overlap_years": 10,
+          "years": "1990-1999"
+        },
+        {
+          "era1": "The Rise of the Web & Blogging (2000-2009)",
+          "era2": "Rise of Web & Blogging (2000-2009)",
+          "overlap_years": 10,
+          "years": "2000-2009"
+        },
+        {
+          "era1": "The Rise of the Web & Blogging (2000-2009)",
+          "era2": "Peak Blogging & Citizen Journalism (2005-2009)",
+          "overlap_years": 5,
+          "years": "2005-2009"
+        },
+        {
+          "era1": "Rise of Web & Blogging (2000-2009)",
+          "era2": "Peak Blogging & Citizen Journalism (2005-2009)",
+          "overlap_years": 5,
+          "years": "2005-2009"
+        },
+        {
+          "era1": "Social Media & Networked Journalism (2010-2016)",
+          "era2": "Social Media & Financial Crisis (2010-2015)",
+          "overlap_years": 7,
+          "years": "2010-2016"
+        },
+        {
+          "era1": "Social Media & Networked Journalism (2010-2016)",
+          "era2": "Trump Era & Democratic Crisis (2016-2020)",
+          "overlap_years": 1,
+          "years": "2016-2016"
+        },
+        {
+          "era1": "Trump Era & Democratic Crisis (2016-2020)",
+          "era2": "Trump Era & Press Crisis (2017-2021)",
+          "overlap_years": 4,
+          "years": "2017-2020"
+        },
+        {
+          "era1": "Trump Era & Democratic Crisis (2016-2020)",
+          "era2": "Digital Media & Platform Era (2017-Present)",
+          "overlap_years": 4,
+          "years": "2017-2020"
+        },
+        {
+          "era1": "Trump Era & Press Crisis (2017-2021)",
+          "era2": "Digital Media & Platform Era (2017-Present)",
+          "overlap_years": 5,
+          "years": "2017-2021"
+        },
+        {
+          "era1": "Trump Era & Press Crisis (2017-2021)",
+          "era2": "Platform Transition & Future Models (2021-Present)",
+          "overlap_years": 1,
+          "years": "2021-2021"
+        },
+        {
+          "era1": "Digital Media & Platform Era (2017-Present)",
+          "era2": "Platform Transition & Future Models (2021-Present)",
+          "overlap_years": 5,
+          "years": "2021-2025"
+        },
+        {
+          "era1": "Digital Media & Platform Era (2017-Present)",
+          "era2": "Post-Trump & Future of News (2022-Present)",
+          "overlap_years": 4,
+          "years": "2022-2025"
+        },
+        {
+          "era1": "Platform Transition & Future Models (2021-Present)",
+          "era2": "Post-Trump & Future of News (2022-Present)",
+          "overlap_years": 4,
+          "years": "2022-2025"
+        }
+      ],
+      "priority": "HIGH"
+    },
+    {
+      "category": "eras",
+      "issue": "Missing era assignments",
+      "count": 11,
+      "priority": "MEDIUM"
+    },
+    {
+      "category": "tags",
+      "issue": "Case variations",
+      "count": 375,
+      "examples": [
+        {
+          "normalized": "1960 democratic convention",
+          "variations": [
+            "1960 democratic convention",
+            "1960 Democratic Convention"
+          ],
+          "total_count": 2
+        },
+        {
+          "normalized": "2004 dnc",
+          "variations": [
+            "2004 dnc",
+            "2004 DNC"
+          ],
+          "total_count": 5
+        },
+        {
+          "normalized": "2004 election",
+          "variations": [
+            "2004 election",
+            "2004 Election"
+          ],
+          "total_count": 49
+        },
+        {
+          "normalized": "60 minutes",
+          "variations": [
+            "60 minutes",
+            "60 Minutes"
+          ],
+          "total_count": 5
+        },
+        {
+          "normalized": "abc news",
+          "variations": [
+            "abc news",
+            "ABC News"
+          ],
+          "total_count": 7
+        },
+        {
+          "normalized": "about.com",
+          "variations": [
+            "About.com",
+            "about.com"
+          ],
+          "total_count": 4
+        },
+        {
+          "normalized": "abu ghraib",
+          "variations": [
+            "abu ghraib",
+            "Abu Ghraib"
+          ],
+          "total_count": 6
+        },
+        {
+          "normalized": "accountability",
+          "variations": [
+            "accountability",
+            "Accountability"
+          ],
+          "total_count": 19
+        },
+        {
+          "normalized": "adam nagourney",
+          "variations": [
+            "Adam Nagourney",
+            "adam nagourney"
+          ],
+          "total_count": 3
+        },
+        {
+          "normalized": "aejmc",
+          "variations": [
+            "aejmc",
+            "AEJMC"
+          ],
+          "total_count": 2
+        }
+      ],
+      "priority": "HIGH"
+    },
+    {
+      "category": "tags",
+      "issue": "Potential duplicate concepts",
+      "count": 5,
+      "examples": [
+        {
+          "concept": "new york times",
+          "variants": [
+            {
+              "tag": "new york times",
+              "count": 97,
+              "variations": [
+                "New York Times",
+                "new york times"
+              ]
+            },
+            {
+              "tag": "the new york times",
+              "count": 2,
+              "variations": [
+                "The New York Times"
+              ]
+            }
+          ],
+          "total": 99
+        },
+        {
+          "concept": "social media",
+          "variants": [
+            {
+              "tag": "social media",
+              "count": 23,
+              "variations": [
+                "social media",
+                "Social Media",
+                "Social media"
+              ]
+            },
+            {
+              "tag": "social networks",
+              "count": 7,
+              "variations": [
+                "social networks"
+              ]
+            }
+          ],
+          "total": 30
+        },
+        {
+          "concept": "twitter",
+          "variants": [
+            {
+              "tag": "twitter",
+              "count": 9,
+              "variations": [
+                "Twitter",
+                "twitter"
+              ]
+            },
+            {
+              "tag": "x",
+              "count": 1,
+              "variations": [
+                "X"
+              ]
+            }
+          ],
+          "total": 10
+        },
+        {
+          "concept": "journalism",
+          "variants": [
+            {
+              "tag": "journalism",
+              "count": 183,
+              "variations": [
+                "journalism",
+                "Journalism"
+              ]
+            },
+            {
+              "tag": "journalists",
+              "count": 1,
+              "variations": [
+                "journalists"
+              ]
+            }
+          ],
+          "total": 184
+        },
+        {
+          "concept": "media",
+          "variants": [
+            {
+              "tag": "media",
+              "count": 32,
+              "variations": [
+                "media",
+                "Media"
+              ]
+            },
+            {
+              "tag": "news media",
+              "count": 8,
+              "variations": [
+                "news media",
+                "News Media",
+                "News media"
+              ]
+            },
+            {
+              "tag": "mainstream media",
+              "count": 42,
+              "variations": [
+                "mainstream media"
+              ]
+            },
+            {
+              "tag": "msm",
+              "count": 9,
+              "variations": [
+                "MSM",
+                "msm"
+              ]
+            }
+          ],
+          "total": 91
+        }
+      ],
+      "priority": "MEDIUM"
+    },
+    {
+      "category": "key_concepts",
+      "issue": "Case variations",
+      "count": 3,
+      "examples": [
+        {
+          "normalized": "citizen journalism",
+          "variations": [
+            "Citizen Journalism",
+            "Citizen journalism"
+          ],
+          "total_count": 8
+        },
+        {
+          "normalized": "pro-am journalism",
+          "variations": [
+            "Pro-am journalism",
+            "pro-am journalism"
+          ],
+          "total_count": 2
+        },
+        {
+          "normalized": "view from nowhere",
+          "variations": [
+            "View from Nowhere",
+            "view from nowhere",
+            "View From Nowhere"
+          ],
+          "total_count": 169
+        }
+      ],
+      "priority": "HIGH"
+    },
+    {
+      "category": "key_concepts",
+      "issue": "Potentially too generic",
+      "concepts": [
+        {
+          "concept": "The People Formerly Known as the Audience",
+          "count": 318
+        },
+        {
+          "concept": "View from Nowhere",
+          "count": 163
+        },
+        {
+          "concept": "He said/she said journalism",
+          "count": 134
+        },
+        {
+          "concept": "Audience atomization overcome",
+          "count": 128
+        },
+        {
+          "concept": "The Production of Innocence",
+          "count": 125
+        },
+        {
+          "concept": "False balance",
+          "count": 103
+        },
+        {
+          "concept": "Verification in reverse",
+          "count": 57
+        }
+      ],
+      "priority": "LOW"
+    }
+  ]
+}

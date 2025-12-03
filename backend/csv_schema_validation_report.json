@@ -1,0 +1,206 @@
+{
+  "schema_headers": [
+    "id",
+    "title",
+    "url",
+    "author",
+    "publication_date",
+    "original_publication",
+    "publisher",
+    "platform",
+    "collection_id",
+    "content_type",
+    "format",
+    "word_count",
+    "length_in_seconds",
+    "excerpt",
+    "summary",
+    "thematic_categories",
+    "key_concepts",
+    "series",
+    "era",
+    "scope",
+    "tags",
+    "related_to",
+    "responds_to",
+    "influence",
+    "copyright",
+    "license",
+    "permissions",
+    "date_processed",
+    "gdrive_pdf_link",
+    "gdrive_raw_file_link",
+    "gdrive_transcript_link",
+    "transcript_filepath",
+    "pull_quote",
+    "raw_text",
+    "verified",
+    "notes"
+  ],
+  "csv_headers": [
+    "id",
+    "title",
+    "url",
+    "author",
+    "publication_date",
+    "original_publication",
+    "publisher",
+    "platform",
+    "collection_id",
+    "content_type",
+    "format",
+    "word_count",
+    "length_in_seconds",
+    "excerpt",
+    "summary",
+    "thematic_categories",
+    "key_concepts",
+    "series",
+    "era",
+    "scope",
+    "tags",
+    "related_to",
+    "responds_to",
+    "influence",
+    "copyright",
+    "license",
+    "permissions",
+    "date_processed",
+    "gdrive_pdf_link",
+    "gdrive_raw_file_link",
+    "gdrive_transcript_link",
+    "transcript_filepath",
+    "pull_quote",
+    "raw_text",
+    "verified",
+    "notes",
+    "colQ_changes"
+  ],
+  "unexpected_columns": [
+    "colQ_changes"
+  ],
+  "missing_columns": [],
+  "controlled_vocab_issues": {
+    "content_type": {
+      "schema": [
+        "Blog Post",
+        "Newspaper Clipping",
+        "Tweet/Thread",
+        "Tumblr Post",
+        "Panel Discussion",
+        "Interview (Audio/Video)",
+        "Lecture/Presentation",
+        "Interview (Text)",
+        "Academic Paper",
+        "Book Chapter",
+        "Article"
+      ],
+      "csv_unique": [
+        "Video",
+        "Transcript",
+        "Book",
+        "video",
+        "Radio",
+        "Appearance",
+        "Social",
+        "Podcast",
+        "Bio",
+        "Twitter Video",
+        "Article"
+      ],
+      "unexpected": [
+        "Video",
+        "Book",
+        "video",
+        "Radio",
+        "Appearance",
+        "Social",
+        "Podcast",
+        "Bio",
+        "Transcript",
+        "Twitter Video"
+      ]
+    },
+    "scope": {
+      "schema": [
+        "Case Study",
+        "Commentary/Critique",
+        "Theoretical",
+        "Historical Analysis",
+        "Personal Reflection",
+        "Pedagogical"
+      ],
+      "csv_unique": [
+        "Journalism Theory",
+        "Case Study",
+        "Commentary/Critique",
+        "Media Industry Analysis",
+        "Commentary/Critique, Theoretical",
+        "Theoretical",
+        "Historical Analysis",
+        "Technology Analysis",
+        "Personal Reflection",
+        "Pedagogical",
+        "News"
+      ],
+      "unexpected": [
+        "Journalism Theory",
+        "Media Industry Analysis",
+        "Commentary/Critique, Theoretical",
+        "Technology Analysis",
+        "News"
+      ]
+    },
+    "platform": {
+      "csv_unique": [
+        "Medium",
+        "CJR",
+        "Nation Magazine",
+        "Web",
+        "SoundCloud",
+        "YouTube",
+        "Tumblr"
+      ],
+      "schema": null
+    }
+  },
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "issue": "1 unexpected columns in CSV",
+      "action": "Review and either add to schema or remove from CSV",
+      "columns": [
+        "colQ_changes"
+      ]
+    },
+    {
+      "priority": "HIGH",
+      "issue": "10 content_type values not in schema",
+      "action": "Add to schema.json content_format list or fix typos in CSV",
+      "values": [
+        "Video",
+        "Book",
+        "video",
+        "Radio",
+        "Appearance",
+        "Social",
+        "Podcast",
+        "Bio",
+        "Transcript",
+        "Twitter Video"
+      ]
+    },
+    {
+      "priority": "HIGH",
+      "issue": "5 scope values not in schema",
+      "action": "Add to schema.json scope list or fix typos in CSV",
+      "values": [
+        "Journalism Theory",
+        "Media Industry Analysis",
+        "Commentary/Critique, Theoretical",
+        "Technology Analysis",
+        "News"
+      ]
+    }
+  ]
+}
