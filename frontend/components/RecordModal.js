@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { html } from '../html.js?v=2.0.2';
 import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2 } from 'lucide-react';
 import { fetchRecordDetails } from '../services/archiveService.js?v=2.0.2';
+import { ThreadModal } from './ThreadModal.js?v=2.0.2';
 
 const TagGroup = ({title, tags}) => {
     if (!tags || tags.length === 0) return null;
@@ -208,9 +209,14 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
                </blockquote>
             `}
 
-            <div className="prose prose-stone max-w-none">
-              <p className="text-lg text-stone-800 leading-relaxed">${displayRecord.summary || displayRecord.summaryPreview || ''}</p>
-            </div>
+            ${/* Check if this is a thread record */}
+            ${displayRecord.id?.startsWith('THREAD-') && displayRecord.thread_data ? html`
+              <${ThreadModal} record=${displayRecord} />
+            ` : html`
+              <div className="prose prose-stone max-w-none">
+                <p className="text-lg text-stone-800 leading-relaxed">${displayRecord.summary || displayRecord.summaryPreview || ''}</p>
+              </div>
+            `}
 
             <hr className="my-8 border-stone-200" />
 

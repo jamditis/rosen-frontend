@@ -4,6 +4,72 @@
 
 *Session Date: December 3, 2025 (Continued)*
 
+## [2.24.0] Entity Extraction & Thread Visualization
+
+### Social Media Entity Extraction
+**Full-Scale Entity Extraction Complete**
+- Extracted entities from 10,000 prioritized social media posts
+- 5-worker parallel processing with Gemini API rate limiting
+- **Results**: 25,972 entities and 16,197 relationships extracted
+- Processing time: 91.6 minutes (from estimated 7 hours via parallelization)
+- Cost: ~$50 (within budget)
+
+**Error Analysis**
+- 988 "errors" out of 10,000 posts (9.88%)
+- **99.8% legitimate**: Posts with no extractable entities (short/generic content)
+- Only 2 actual failures (0.02%): JSON trailing comma issues from Gemini
+- Created `backend/scripts/analyze_extraction_errors.py` for comprehensive error analysis
+
+**Entity Extraction Scripts Created**
+- `extract_entities_csv_batch.py` - CSV-based batch processor (fixed Google Sheets dependency)
+- `extract_entities_full_parallel.py` - 5-worker parallel extraction with progress tracking
+- `analyze_extraction_errors.py` - Error categorization and analysis tool
+- Fixed CSV field handling to support variable entity/relationship fields
+
+### Bluesky Thread Reconstruction & Visualization
+
+**Thread Mapping Infrastructure**
+- Reconstructed 3,071 Bluesky posts into thread hierarchies
+- Found 171 parent-child connections (5.6% linkage rate)
+- Identified 1,907 orphaned replies (expected - replies to other users)
+- Max thread depth: 32 levels, largest thread: 33 posts
+- Created `bluesky_thread_mappings.json` with full hierarchy data
+
+**Thread Viewer Components**
+- Created `ThreadModal.js` - React component for thread visualization
+- Depth-based color coding (sky→green→amber→pink)
+- Nested indentation based on reply depth
+- Integrated into `RecordModal.js` with auto-detection of THREAD-* IDs
+- Generated 10 THREAD-* archive records for largest threads
+
+**Thread Processing Scripts**
+- `reconstruct_bluesky_threads.py` - AT Protocol URI parsing and hierarchy building
+- `generate_thread_records.py` - Archive-compatible thread record generation
+- `generate_thread_relationships.py` - 342 REPLIES_TO and PART_OF_THREAD relationships
+- `merge_thread_records.py` - Schema alignment and CSV merge (869 total records)
+
+### Archive Data Updates
+- Merged 10 thread records into main archive (859 → 869 records)
+- Regenerated `archive-data.json` with thread_data field
+- Created backup: `archive_records-public_backup_20251203_230825.csv`
+- Updated frontend to support thread visualization in modals
+
+### Files Created/Modified
+**Backend Scripts (8 new)**
+- Entity extraction: 3 scripts
+- Thread processing: 4 scripts
+- Error analysis: 1 script
+
+**Frontend Components (2 modified)**
+- `ThreadModal.js` (new)
+- `RecordModal.js` (updated with thread detection)
+
+**Data Files (2 updated)**
+- `archive_records-public.csv` (869 records)
+- `archive-data.json` (10.7 MB)
+
+---
+
 ## [2.23.0] Data Quality & Taxonomy Consolidation
 
 ### Data Standardization & Schema Compliance

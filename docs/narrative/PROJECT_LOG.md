@@ -4,6 +4,112 @@ This document records significant architectural decisions and notable changes to
 
 ---
 
+### **[2.24.0] - 2025-12-03**
+
+#### **Entity Extraction & Thread Visualization**
+
+**Status:** Complete - 10,000 social posts processed, threading infrastructure deployed
+
+##### **Overview**
+
+Completed full-scale entity extraction from social media posts and implemented Bluesky thread reconstruction with visualization components. This session delivered the entity extraction pipeline at scale and added thread viewing capabilities to the archive.
+
+##### **Key Accomplishments**
+
+**1. Full-Scale Entity Extraction**
+- Processed 10,000 prioritized social media posts (Twitter + Bluesky)
+- 5-worker parallel processing (reduced 7 hours → 91 minutes)
+- **Results**: 25,972 entities and 16,197 relationships extracted
+- Fixed CSV field handling to support variable schema from Gemini
+- Cost: ~$50 within budget
+
+**2. Error Analysis & Validation**
+- Analyzed all 988 "errors" (9.88% error rate)
+- **Finding**: 99.8% legitimate (posts with no extractable entities)
+- Only 2 actual failures (0.02%) - minor JSON formatting from Gemini
+- Created comprehensive error categorization tool
+
+**3. Bluesky Thread Reconstruction**
+- Parsed 3,071 Bluesky posts using AT Protocol URIs
+- Built thread hierarchies with 171 parent-child connections
+- Identified 1,907 orphaned replies (replies to other users' posts)
+- Max thread depth: 32 levels, largest thread: 33 posts
+
+**4. Thread Visualization Components**
+- Created `ThreadModal.js` - React component with depth-based styling
+- Color-coded thread depth (sky→green→amber→pink)
+- Nested indentation showing reply structure
+- Auto-detection in `RecordModal.js` for THREAD-* IDs
+
+**5. Archive Integration**
+- Generated 10 THREAD-* records for largest Bluesky threads
+- Merged thread records into main archive (859 → 869 records)
+- Created 342 thread relationships (REPLIES_TO, PART_OF_THREAD)
+- Regenerated frontend data with thread_data field
+
+##### **Technical Achievements**
+
+**Pipeline Fixes**
+- Discovered Google Sheets dependency in old extraction code
+- Created CSV-native extraction scripts
+- Fixed field collection to handle variable entity types
+- Implemented proper error logging with debug dumps
+
+**Parallel Processing**
+- 5-worker ProcessPoolExecutor with spawn method
+- Per-worker rate limiting (2s between calls)
+- Effective throughput: ~2.5 posts/second (all workers)
+- Progress tracking across all workers
+
+**Thread Mapping**
+- AT Protocol URI parsing and validation
+- Circular reference detection
+- Depth calculation with max_depth protection
+- Full thread hierarchy serialization to JSON
+
+##### **Files Created**
+
+**Backend Scripts (8 new)**
+- `extract_entities_csv_batch.py` - CSV batch processor
+- `extract_entities_full_parallel.py` - Parallel extraction orchestrator
+- `analyze_extraction_errors.py` - Error categorization
+- `reconstruct_bluesky_threads.py` - Thread hierarchy builder
+- `generate_thread_records.py` - Archive record generator
+- `generate_thread_relationships.py` - Relationship mapping
+- `merge_thread_records.py` - Schema alignment and merge
+- `reconstruct_twitter_threads.py` - Twitter thread support (ready)
+
+**Frontend Components (2 files)**
+- `ThreadModal.js` (new) - Thread visualization
+- `RecordModal.js` (modified) - Thread detection logic
+
+**Data Files**
+- `bluesky_thread_mappings.json` - Full hierarchy (959KB)
+- `thread_records.csv` - 10 archive records
+- `thread_relationships.csv` - 342 relationships
+- `entities.csv` - 25,972 entities
+- `relationships.csv` - 16,197 relationships
+
+##### **Archive Data Status**
+
+- **Total Records**: 869 (659 articles + 10 threads + 200 new imports)
+- **Social Posts**: 29,187 (with 10,000 entity-extracted)
+- **Entity Coverage**: 90.1% success rate on extraction
+- **Thread Records**: 10 major Bluesky threads visualized
+- **Relationships**: 16,539 total (16,197 entities + 342 threads)
+
+---
+
+### **[2.23.0] - 2025-12-03**
+
+#### **Data Quality & Taxonomy Consolidation**
+
+**Status:** Complete - 659 records cleaned, 8-era taxonomy deployed
+
+_(Previous entry content continues below...)_
+
+---
+
 ### **[2.21.0] - 2025-12-03**
 
 #### **Data Pipeline Optimization & Analytics Features**
