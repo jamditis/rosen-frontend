@@ -2,11 +2,73 @@
 
 ## Session Overview
 
-Major work on data pipeline optimization, entity extraction improvements, and frontend analytics capabilities.
+**Part 1:** Data pipeline optimization, entity extraction improvements, and frontend analytics capabilities.
+**Part 2 (Continued):** Tumblr archive import and newspaper clipping OCR processing with traditional tesseract approach.
 
 ---
 
-## Completed Work
+## Completed Work (Part 2 - Continued Session)
+
+### 7. Tumblr Archive Import
+
+**Goal:** Import and process 138 Tumblr posts from Studio 20 NYU blog.
+
+**What was done:**
+- User copied Tumblr export to `backend/tumblr_export/studio20nyu-rosen-account/`
+- Fixed `tumblr_processor.py` bugs:
+  - Dates weren't extracting - fixed to parse `<time datetime="">` tags
+  - Titles weren't extracting - fixed to get `<h2>` tags
+- Successfully processed all 138 posts
+- Generated `tumblr_records.json` with:
+  - Post IDs (TUMBLR-00001 through TUMBLR-00138)
+  - Titles, dates, URLs, content
+  - Post types (text, quote, link, photo, etc.)
+
+**Files created/modified:**
+- `backend/src/rosen_scraper/processors/tumblr_processor.py` - Bug fixes
+- `backend/tumblr_records.json` - 138 processed posts
+
+### 8. Newspaper Clipping OCR (Multi-Approach Testing)
+
+**Goal:** Extract Jay Rosen mentions from 84 newspaper clipping PDFs.
+
+**Problem:** User hand-selected 84 PDFs with Jay Rosen mentions, but OCR kept missing them.
+
+**Approaches tried:**
+1. **Gemini Vision OCR** - Processed 84 PDFs, found content in 58, missed 26
+2. **Claude Vision OCR** - Also missed small text mentions even with quadrant approach
+3. **Traditional Tesseract OCR** ✅ - Successfully found mentions AI vision missed
+
+**Root cause:** AI vision models struggle with small text (8-10pt) in compressed full-page newspaper scans.
+
+**Final solution:**
+- Created `traditional_ocr_processor.py` using tesseract
+- Multi-pass OCR approach:
+  - Pass 1: Full page scan at 300 DPI
+  - Pass 2: 4 overlapping quadrants for small text
+- Pattern matching for "Jay Rosen", "J. Rosen", "Professor Rosen", etc.
+- Metadata extraction from filenames and PDF text layer
+- newspapers.com URL extraction for source attribution
+- Fair use compliance: storing excerpts only, linking to sources
+
+**Files created:**
+- `backend/src/rosen_scraper/processors/traditional_ocr_processor.py` - Tesseract OCR
+- `backend/src/rosen_scraper/processors/claude_ocr_processor.py` - Claude vision (archived)
+- `backend/reprocess_missed_clippings.py` - Batch reprocessing script
+- `backend/clipping_ocr_results.json` - Gemini results (58 records)
+- `backend/tesseract_reprocess_results.json` - Tesseract results (in progress)
+
+**Dependencies added:**
+- `pytesseract` - Python tesseract wrapper
+- `PyMuPDF` (fitz) - PDF rendering
+- `anthropic` - Claude API
+- Tesseract OCR engine (via Homebrew)
+
+**Status:** Batch processing 26 missed PDFs with tesseract currently running.
+
+---
+
+## Completed Work (Part 1 - Original Session)
 
 ### 1. Frontend Data Loading Optimization
 

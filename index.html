@@ -5,15 +5,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Jay Rosen Digital Archive</title>
-    <link rel="icon" href="/wp-content/rosen-archive/favicon.ico" />
-    
+    <link rel="icon" href="./favicon.ico" />
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
 
     <!-- Prefetch archive data for faster loading (core data loads first, details lazy-loaded) -->
-    <link rel="prefetch" href="/wp-content/rosen-archive/data/archive-core.json" as="fetch">
+    <link rel="prefetch" href="./data/archive-data.json" as="fetch">
 
     <!-- External CSS (versioned for cache busting) -->
     <link rel="stylesheet" href="./frontend/index.css?v=2.0.2" />
@@ -44,7 +44,7 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/wp-content/rosen-archive/frontend/sw.js')
+          navigator.serviceWorker.register('./frontend/sw.js')
             .then(registration => {
               console.log('SW registered:', registration.scope);
             })

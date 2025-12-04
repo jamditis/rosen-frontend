@@ -391,39 +391,73 @@ class TumblrProcessor:
         """
         soup = BeautifulSoup(content, 'html.parser')
 
-        # Extract post body
-        body = soup.find('div', class_='post-body')
-        if not body:
-            body = soup.find('article')
-        if not body:
-            body = soup.body or soup
+        # Extract post body from article tag
+        article = soup.find('article')
+        body = article if article else soup.body or soup
 
         # Generate archive ID
         archive_id = f"TUMBLR-{post_id:05d}"
 
-        # Extract date from filename or content
-        date_match = re.search(r'(\d{4})-(\d{2})-(\d{2})', filename)
-        pub_date = f"{date_match.group(2)}/{date_match.group(3)}/{date_match.group(1)}" if date_match else ''
+        # Extract date from <time datetime="..."> tag first
+        pub_date = ''
+        time_tag = soup.find('time')
+        if time_tag:
+            datetime_attr = time_tag.get('datetime', '')
+            if datetime_attr:
+                # Parse ISO format: 2014-08-20T21:24:05Z
+                iso_match = re.match(r'(\d{4})-(\d{2})-(\d{2})', datetime_attr)
+                if iso_match:
+                    pub_date = f"{iso_match.group(2)}/{iso_match.group(3)}/{iso_match.group(1)}"
+
+        # Fallback: extract date from filename
+        if not pub_date:
+            date_match = re.search(r'(\d{4})-(\d{2})-(\d{2})', filename)
+            if date_match:
+                pub_date = f"{date_match.group(2)}/{date_match.group(3)}/{date_match.group(1)}"
+
+        # Extract title from h2 tag (common in tumblr-utils exports)
+        title = ''
+        h2_tag = soup.find('h2')
+        if h2_tag:
+            title = h2_tag.get_text().strip()
+        if not title:
+            title = self._extract_html_title(soup)
+
+        # Extract URL from tmblr.co link or article id
+        url = ''
+        tmblr_link = soup.find('a', href=re.compile(r'tmblr\.co'))
+        if tmblr_link:
+            url = tmblr_link.get('href', '')
+        if not url and article:
+            post_tumblr_id = article.get('id', '').replace('p-', '')
+            if post_tumblr_id:
+                url = f"https://studio20nyu.tumblr.com/post/{post_tumblr_id}"
+
+        # Determine blog from export directory
+        blog_name = 'studio20nyu'  # Default for this export
+        if 'jayrosen' in str(self.export_dir).lower():
+            blog_name = 'jayrosen_nyu'
 
         record = {
             'id': archive_id,
-            'url': '',  # May be in HTML metadata
-            'title': self._extract_html_title(soup),
-            'author': 'Jay Rosen',
+            'url': url,
+            'title': title or f"Post {post_id}",
+            'author': 'Jay Rosen / Studio 20',
             'publication_date': pub_date,
             'original_publication': 'Tumblr',
-            'publisher': 'jayrosen_nyu.tumblr.com',
+            'publisher': f'{blog_name}.tumblr.com',
             'platform': 'tumblr',
             'content_type': 'Article',
             'format': 'text',
             'raw_text': self._clean_html(str(body)),
-            'notes': f"Processed from HTML file: {filename}"
+            'notes': f"Studio 20 Tumblr post. Source file: {filename}"
         }
 
-        # Extract URL from meta tags or links
-        canonical = soup.find('link', rel='canonical')
-        if canonical:
-            record['url'] = canonical.get('href', '')
+        # Extract URL from meta tags or links (fallback)
+        if not record['url']:
+            canonical = soup.find('link', rel='canonical')
+            if canonical:
+                record['url'] = canonical.get('href', '')
 
         # Extract tags
         tags_meta = soup.find('meta', {'name': 'keywords'})
