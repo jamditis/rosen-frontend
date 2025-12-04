@@ -39,7 +39,7 @@ export const FEATURED_WORKS = [
     title: 'The Impossible Press (1986)',
     description: 'Rosen\'s PhD dissertation exploring the decline of the "public" as a social group and the rise of the mass audience. It contrasts the democratic ideal of a "universal town meeting" with the realities of modern communication.',
     image: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&q=80&w=800',
-    link: '/wp-content/rosen-archive/features/dissertation-reader/',
+    link: 'https://pressthink.org/wp-content/rosen-archive/features/dissertation-reader/',
     type: 'PhD Dissertation'
   },
   {
@@ -79,7 +79,7 @@ export const FEATURED_WORKS = [
     title: 'Audience Atomization',
     description: 'The theory that the broadcast era treated the audience as disconnected individuals, which the internet disrupted.',
     image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&q=80&w=800',
-    link: 'https://pressthink.org/2006/06/the-people-formerly-known-as-the-audience/',
+    link: 'http://archive.pressthink.org/2006/06/27/ppl_frmr.html',
     type: 'Key Concept'
   }
 ];
