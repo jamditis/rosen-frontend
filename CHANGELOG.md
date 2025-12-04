@@ -2,6 +2,95 @@
 
 ---
 
+*Session Date: December 4, 2025*
+
+## [2.25.0] Dissertation Launch Site & Reader Enhancements
+
+### Dissertation Launch Site (`/labs/dissertation-launch/`)
+
+**Landing Page**
+- Created comprehensive landing page for "The Impossible Press" dissertation
+- Hero section with typewriter-style title and key quote
+- "Why This Dissertation Matters" section with three key insight cards
+- Navigation grid linking to: Full Text Reader, 3D Concept Map, Key Thinkers (coming soon), Glossary
+- About Jay Rosen section with photo and bio
+- Coming soon teaser for full Jay Rosen Digital Archive
+
+**3D Concept Sphere Visualization**
+- Interactive Three.js force-directed 3D graph of dissertation concepts
+- Color-coded nodes by type (root, part, chapter, concept, thinker, theme)
+- Custom node rendering with colored spheres, glowing rings, and text labels
+- Word-wrapped labels with bounding boxes
+- Scene lighting (ambient + directional) for proper 3D depth
+- Click-to-focus with smooth camera transitions
+- Info panel showing node details and summaries
+- Back button navigation to landing page
+
+### Dissertation Reader Enhancements
+
+**Bug Fixes**
+- Fixed duplicate chapter IDs (notes section used same IDs as chapters)
+- Renamed notes section IDs to `notes-chapter-X` format
+- TOC now correctly navigates to chapter content instead of notes
+
+**Dark Mode Fixes**
+- Fixed settings modal text color in dark mode
+- Updated `.settings-label` and `.settings-option` to use `var(--color-text)`
+
+**New Header Buttons**
+- Added "Download PDF" button with download icon
+- Added "NotebookLM" button linking to Google NotebookLM
+- Buttons appear alongside existing Archive button
+
+**New Footer Button**
+- Added "Open in NotebookLM" button in footer actions
+
+**Text Selection Context Menu** (New Feature)
+- Context menu appears when selecting 10+ characters in reader content
+- Three actions:
+  - **Share**: Opens modal with quote preview, editable share text, copy/download options
+  - **Cite**: Copies academic citation with current chapter reference
+  - **Copy**: Copies selected text to clipboard
+- Share modal features:
+  - Visual preview of quote with styled dark background
+  - Editable textarea with pre-formatted share text including URL
+  - Copy Text button
+  - Download Image button (generates 1200x630px PNG for social media)
+- Character limit (500) for image generation
+  - Long selections hide Download Image button
+  - Shows informative note about character limit
+- Canvas-based PNG generation with:
+  - Dark background (#1a1a1a)
+  - Blue accent bar
+  - Italic quote text with word wrapping
+  - Citation footer
+
+### Standardization
+
+**Favicon**
+- Standardized favicon across all pages using relative paths
+- Updated: dissertation-reader, landing-page, info-sphere
+
+**PDF Path Updates**
+- Updated all references to use new PDF filename
+- Old: `rosen-impossible-press-dissertation-1986.pdf`
+- New: `THE_IMPOSSIBLE_PRESS_NYU_ROSEN-JAY-1986.pdf`
+
+### Files Created/Modified
+
+**New Files**
+- `labs/dissertation-launch/landing-page/index.html`
+- `labs/dissertation-launch/3d-concepts/info-sphere/index.html`
+
+**Modified Files**
+- `features/dissertation-reader/index.html` - Header/footer buttons, favicon, PDF path, ID fixes
+- `features/dissertation-reader/src/css/layout.css` - Dark mode text fixes
+- `features/dissertation-reader/src/js/reader.js` - Selection menu feature
+- `features/dissertation-reader/src/templates/shell.html` - Template updates
+- `features/dissertation-reader/README.md` - Documentation update
+
+---
+
 *Session Date: December 3, 2025 (Continued)*
 
 ## [2.24.0] Entity Extraction & Thread Visualization
