@@ -65,9 +65,42 @@ All development work for the December 2025 dissertation release is complete. The
 ## 🔄 CURRENT SESSION STATUS (December 4, 2025)
 
 **Branch:** main
-**Last PR Merged:** #93 (taxonomy-consolidation-dec3)
+**Version:** 2.25.0
+**Last PR Merged:** Dissertation Launch Site & Reader Enhancements
 
-### ✅ COMPLETED WORK (December 3-4, 2025)
+### ✅ COMPLETED WORK (December 4, 2025)
+
+**Dissertation Launch Site (v2.25.0)**
+
+1. **Landing Page** - `labs/dissertation-launch/landing-page/`
+   - Hero section with typewriter-style title and key quote
+   - "Why This Dissertation Matters" section with three insight cards
+   - Navigation grid linking to reader, 3D concept map, glossary
+   - About Jay Rosen section with bio and external links
+   - Responsive design with Special Elite and Roboto Mono fonts
+
+2. **3D Concept Sphere** - `labs/dissertation-launch/3d-concepts/info-sphere/`
+   - Three.js force-directed graph with 45+ concepts
+   - 6 color-coded categories (Core Concepts, Movements, Thinkers, etc.)
+   - Interactive click-to-focus with smooth camera transitions
+   - Info panel showing node details and summaries
+   - Custom node rendering with colored spheres and word-wrapped labels
+
+3. **Dissertation Reader Enhancements** - `features/dissertation-reader/`
+   - **Text Selection Context Menu**: Highlight text → Share/Cite/Copy buttons
+   - **Shareable Quote PNG**: Canvas-generated 1200x630px images for social media
+   - **Character limit (500)** for image generation with user feedback
+   - **Dark mode fix**: Settings modal text now visible
+   - **New header buttons**: PDF download, NotebookLM, Archive
+   - **New footer button**: NotebookLM link
+
+4. **Standardization**
+   - Unified favicon across all dissertation pages
+   - Consolidated PDFs to single file: `THE_IMPOSSIBLE_PRESS_NYU_ROSEN-JAY-1986.pdf`
+
+**GitHub CLI Installed**: `gh` is now available for PR creation
+
+### ✅ PREVIOUS WORK (December 3-4, 2025)
 
 **Archive Status:**
 - Total records: 869 (659 original + 138 Tumblr + 62 clippings + 10 threads)
@@ -81,36 +114,19 @@ All development work for the December 2025 dissertation release is complete. The
    - Consolidated 14 overlapping eras → 8 clean eras
    - Added: "COVID-19 Era (2020-2021)" and "Trump II & Beyond (2025-Present)"
    - Normalized 2,992 tag instances (862 case variations fixed)
-   - Fixed 8 key_concepts case variations
    - Result: 650/659 records updated (98.6%), 100% schema compliant
 
 2. **Content Imports Completed**
-   - Tumblr: 138 posts from studio20nyu.tumblr.com export (TUMBLR-00001 to TUMBLR-00138)
-   - Newspaper Clippings: 62 OCR-processed clippings (CLIP-00001 to CLIP-00062)
-   - All 200 new records merged with validation, proper era assignment, date formatting
+   - Tumblr: 138 posts from studio20nyu.tumblr.com
+   - Newspaper Clippings: 62 OCR-processed clippings
 
 3. **Full-Scale Entity Extraction**
    - Processed 10,000 prioritized social media posts
    - 5-worker parallel processing (91.6 min vs 7 hours sequential)
-   - Schema v3.0 with record context awareness (prevents self-referential entities)
-   - Error analysis: 99.8% of "errors" were legitimate (no entities in post)
 
 4. **Bluesky Thread Reconstruction & Visualization**
    - Parsed 3,071 Bluesky posts into thread hierarchies
-   - 171 parent-child connections identified, max depth 32 levels
-   - Created 10 THREAD-* archive records for major threads
-   - Built ThreadModal.js with depth-based color coding (sky/green/amber/pink)
-   - Integrated into RecordModal with auto-detection
-
-5. **Thread Display Bug Fix** ✅ JUST FIXED
-   - **Issue:** ThreadModal was calling `JSON.parse()` on already-parsed thread_data object
-   - **Fix:** Removed JSON.parse() call since thread_data is already an object from JSON file
-   - **Files updated:**
-     - [frontend/components/ThreadModal.js](frontend/components/ThreadModal.js) - Line 80
-     - [data/export-archive-data.js](data/export-archive-data.js) - Lines 99-110, 343-362
-     - [index.html](index.html) - Fixed WordPress paths to local relative paths
-     - [frontend/constants.js](frontend/constants.js) - Fixed DATA_CONFIG paths
-   - **Status:** Thread visualization now fully functional (hard refresh required: Cmd+Shift+R)
+   - Built ThreadModal.js with depth-based color coding
 
 **Key Scripts Created:**
 - [backend/scripts/merge_new_records.py](backend/scripts/merge_new_records.py) - Main merge script
@@ -256,7 +272,12 @@ The `index.html` loads the JS version. When editing, ensure changes are reflecte
 │   ├── timeline/                 # Dissertation → later work timeline
 │   ├── annotated-excerpts/       # Key passages with commentary
 │   ├── faq/                      # FAQ interface (Ask the Dissertation)
-│   └── dissertation-reader/      # Dissertation PDF viewer
+│   └── dissertation-reader/      # Full text reader with selection sharing
+│
+├── labs/                         # Experimental/prototype features
+│   └── dissertation-launch/      # Dissertation launch site (v2.25.0)
+│       ├── landing-page/         # Main landing page
+│       └── 3d-concepts/          # 3D concept sphere visualization
 │
 ├── data/                         # Archive data files
 │   ├── archive-data.json         # Main archive data (25MB)
