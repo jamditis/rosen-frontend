@@ -96,15 +96,28 @@ function processRecord(row, index, type, relationshipsMap) {
                      (row.verified || row.Verified) === true ||
                      type === 'social';
 
-  // Extract thread_data from notes for THREAD records
+  // Extract thread_data for THREAD records
+  // Check if thread_data column exists directly (from merged records)
   let threadData = null;
-  if (rawId.startsWith('THREAD-') && row.notes) {
-    const match = row.notes.match(/thread_data:\s*(\{.*\})/);
-    if (match) {
+  if (rawId.startsWith('THREAD-')) {
+    if (row.thread_data) {
       try {
-        threadData = JSON.parse(match[1]);
+        threadData = typeof row.thread_data === 'string'
+          ? JSON.parse(row.thread_data)
+          : row.thread_data;
       } catch (e) {
-        console.warn(`Failed to parse thread_data for ${rawId}:`, e);
+        console.warn(`Failed to parse thread_data column for ${rawId}:`, e);
+      }
+    }
+    // Fallback: try notes field (legacy format)
+    if (!threadData && row.notes) {
+      const match = row.notes.match(/thread_data:\s*(\{.*\})/);
+      if (match) {
+        try {
+          threadData = JSON.parse(match[1]);
+        } catch (e) {
+          console.warn(`Failed to parse thread_data from notes for ${rawId}:`, e);
+        }
       }
     }
   }
@@ -260,6 +273,67 @@ async function main() {
 
   // Combine all records
   let allRecords = [...mainRecords, ...socialRecords];
+
+  // Build lookup map for social post content (id -> raw_text)
+  const socialContentMap = new Map();
+  socialPostsData.forEach(row => {
+    const id = row.id || row.ID;
+    const content = row.raw_text || row.content || row.excerpt || '';
+    if (id && content) {
+      socialContentMap.set(id, content);
+    }
+  });
+
+  // Enrich thread_data with content from social posts
+  console.log('\n🧵 Enriching thread data with post content...');
+  let enrichedThreads = 0;
+  let enrichedPosts = 0;
+  let titlesGenerated = 0;
+
+  allRecords.forEach(record => {
+    if (record.thread_data && record.thread_data.posts) {
+      let threadEnriched = false;
+      record.thread_data.posts.forEach(post => {
+        // If post has no content, try to look it up
+        if (!post.content || post.content.trim() === '') {
+          const content = socialContentMap.get(post.id);
+          if (content) {
+            post.content = content;
+            enrichedPosts++;
+            threadEnriched = true;
+          }
+        }
+      });
+      if (threadEnriched) enrichedThreads++;
+
+      // Generate better title from first post content
+      if (record.title === '[Bluesky Thread]' || record.title.startsWith('[Bluesky Thread]')) {
+        const firstPost = record.thread_data.posts[0];
+        if (firstPost && firstPost.content) {
+          // Get first sentence or first 80 chars
+          let titleText = firstPost.content.trim();
+          // Remove URLs
+          titleText = titleText.replace(/https?:\/\/\S+/g, '').trim();
+          // Remove @mentions at start
+          titleText = titleText.replace(/^(@\S+\s*)+/, '').trim();
+          // Take first sentence or truncate
+          const sentenceEnd = titleText.search(/[.!?]\s/);
+          if (sentenceEnd > 0 && sentenceEnd < 100) {
+            titleText = titleText.substring(0, sentenceEnd + 1);
+          } else if (titleText.length > 80) {
+            titleText = titleText.substring(0, 80).trim() + '...';
+          }
+          if (titleText.length > 10) {
+            record.title = titleText;
+            titlesGenerated++;
+          }
+        }
+      }
+    }
+  });
+
+  console.log(`  - Enriched ${enrichedPosts} posts across ${enrichedThreads} threads`);
+  console.log(`  - Generated ${titlesGenerated} thread titles from content`);
 
   // Add dissertation record
   allRecords.push({ ...DISSERTATION_RECORD, relatedIds: [] });

@@ -55,7 +55,7 @@ export const FEATURED_WORKS = [
     title: 'What Are Journalists For?',
     description: 'Rosen\'s influential book exploring the Public Journalism movement of the 1990s, arguing for a press that helps communities solve their own problems.',
     image: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&q=80&w=800',
-    link: 'https://yalebooks.yale.edu/book/9780300089072/what-are-journalists-for/',
+    link: 'https://yalebooks.yale.edu/book/9780300089073/what-are-journalists-for/',
     type: 'Book'
   },
   {
@@ -71,7 +71,7 @@ export const FEATURED_WORKS = [
     title: 'The Church of the Savvy',
     description: 'A critique of political journalism that focuses on strategy, optics, and "who\'s winning" rather than the substance of policy.',
     image: 'https://effectivechurch.com/wp-content/uploads/2014/12/ChurchSmall.jpg',
-    link: 'https://pressthink.org/2011/06/the-church-of-the-savvy/',
+    link: 'https://pressthink.org/2010/06/clowns-to-the-left-of-me-jokers-to-the-right-on-the-actual-ideology-of-the-american-press/',
     type: 'Key Concept'
   },
   {
