@@ -10,8 +10,42 @@
 const CACHE_NAME = 'jrda-cache-v1';
 const DATA_CACHE_NAME = 'jrda-data-v1';
 
+// Detect if we're running on localhost
+const IS_LOCAL = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
+
+// Base path depends on environment
+const BASE_PATH = IS_LOCAL ? '/frontend' : '/wp-content/rosen-archive';
+const DATA_PATH = IS_LOCAL ? '/data' : '/wp-content/rosen-archive/data';
+
 // Static assets to pre-cache on install
-const STATIC_ASSETS = [
+const STATIC_ASSETS = IS_LOCAL ? [
+  // Local development paths
+  '/frontend/',
+  '/frontend/index.html',
+  '/frontend/index.js',
+  '/frontend/App.js',
+  '/frontend/html.js',
+  '/frontend/constants.js',
+  '/frontend/index.css',
+  '/frontend/dist/tailwind.css',
+  '/frontend/services/archiveService.js',
+  '/frontend/components/Sidebar.js',
+  '/frontend/components/RecordModal.js',
+  '/frontend/components/FeaturedSection.js',
+  '/frontend/components/Explorer.js',
+  '/frontend/components/WelcomeModal.js',
+  '/frontend/components/DissertationPage.js',
+  '/frontend/components/MindMap.js',
+  '/frontend/components/DetailPanel.js',
+  '/frontend/components/dissertationData.js',
+  '/frontend/components/ToolsModal.js',
+  '/frontend/components/LoadingQuotes.js',
+  '/frontend/components/WorkInProgressBanner.js',
+  '/frontend/components/AnalyticsDashboard.js',
+  '/frontend/components/QueryBuilder.js',
+  '/frontend/services/sqliteService.js'
+] : [
+  // Production WordPress paths
   '/wp-content/rosen-archive/',
   '/wp-content/rosen-archive/index.html',
   '/wp-content/rosen-archive/frontend/index.js',
@@ -39,11 +73,17 @@ const STATIC_ASSETS = [
 ];
 
 // Data files to cache with stale-while-revalidate
-const DATA_URLS = [
+const DATA_URLS = IS_LOCAL ? [
+  '/data/archive-core.json',
+  '/data/archive-details.json',
+  '/data/archive-entities.json'
+] : [
   '/wp-content/rosen-archive/data/archive-core.json',
   '/wp-content/rosen-archive/data/archive-details.json',
   '/wp-content/rosen-archive/data/archive-entities.json'
 ];
+
+console.log('[SW] Environment:', IS_LOCAL ? 'local development' : 'production');
 
 // Install event - pre-cache static assets
 self.addEventListener('install', event => {
@@ -117,22 +157,29 @@ self.addEventListener('fetch', event => {
 
 // Check if URL is a data file
 function isDataFile(pathname) {
-  return pathname.endsWith('.json') &&
-         pathname.includes('/data/') &&
-         pathname.includes('rosen-archive');
+  if (!pathname.endsWith('.json')) return false;
+  if (!pathname.includes('/data/')) return false;
+  // Match both local and production paths
+  return IS_LOCAL || pathname.includes('rosen-archive');
 }
 
 // Check if URL is a static asset
 function isStaticAsset(pathname) {
-  return pathname.includes('rosen-archive') && (
-    pathname.endsWith('.js') ||
+  const isAssetType = pathname.endsWith('.js') ||
     pathname.endsWith('.css') ||
     pathname.endsWith('.html') ||
     pathname.endsWith('.ico') ||
     pathname.endsWith('.png') ||
     pathname.endsWith('.jpg') ||
-    pathname.endsWith('.svg')
-  );
+    pathname.endsWith('.svg');
+
+  if (!isAssetType) return false;
+
+  // Match both local and production paths
+  if (IS_LOCAL) {
+    return pathname.startsWith('/frontend/') || pathname.startsWith('/data/');
+  }
+  return pathname.includes('rosen-archive');
 }
 
 /**

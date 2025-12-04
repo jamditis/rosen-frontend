@@ -4,6 +4,10 @@ import { html } from './html.js?v=2.0.2';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3 } from 'lucide-react';
 import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=2.0.2';
 import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=2.0.2';
+
+// Detect environment for path generation
+const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const FEATURES_PATH = IS_LOCAL ? '../features' : '/wp-content/rosen-archive/features';
 import Sidebar from './components/Sidebar.js?v=2.0.2';
 import WelcomeModal from './components/WelcomeModal.js?v=2.0.2';
 import RecordModal from './components/RecordModal.js?v=2.0.2';
@@ -398,53 +402,48 @@ const App = () => {
                 <div>
                     <!-- Tools Section (above Featured Works) - always visible even while loading -->
                     ${!filters.search && !filters.era && !filters.year && filters.categories.length === 0 && html`
-                        <section className="mb-8 py-6 border-b border-stone-200">
-                            <div className="mb-4">
-                                <h2 className="font-display text-lg text-stone-800">Explore the archive</h2>
-                                <p className="text-xs text-stone-500 mt-1">Interactive tools for exploring the archive</p>
-                            </div>
-                            <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
+                        <section className="mb-6 pb-4 border-b border-stone-200">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <span className="text-xs text-stone-500 mr-1">Tools:</span>
                                 <button
                                     onClick=${navigateToDissertation}
-                                    className="flex flex-col items-center p-4 bg-white rounded-lg border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all group"
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
                                 >
-                                    <${BookOpen} className="w-6 h-6 text-stone-500 group-hover:text-stone-700 mb-2" />
-                                    <span className="text-xs font-medium text-stone-700">Mind Map</span>
+                                    <${BookOpen} className="w-3.5 h-3.5" />
+                                    Mind Map
                                 </button>
                                 <button
                                     onClick=${() => setViewMode('explorer')}
-                                    className="flex flex-col items-center p-4 bg-white rounded-lg border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all group"
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
                                 >
-                                    <${Network} className="w-6 h-6 text-stone-500 group-hover:text-stone-700 mb-2" />
-                                    <span className="text-xs font-medium text-stone-700">Network</span>
+                                    <${Network} className="w-3.5 h-3.5" />
+                                    Network
                                 </button>
                                 <button
                                     onClick=${() => setAnalyticsOpen(true)}
-                                    className="flex flex-col items-center p-4 bg-white rounded-lg border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all group"
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
                                 >
-                                    <${BarChart3} className="w-6 h-6 text-stone-500 group-hover:text-stone-700 mb-2" />
-                                    <span className="text-xs font-medium text-stone-700">Analytics</span>
+                                    <${BarChart3} className="w-3.5 h-3.5" />
+                                    Analytics
                                 </button>
                                 <a
-                                    href="/wp-content/rosen-archive/features/comparison-tool/"
-                                    className="flex flex-col items-center p-4 bg-white rounded-lg border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all group"
+                                    href=${`${FEATURES_PATH}/comparison-tool/`}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
                                 >
-                                    <span className="text-xl mb-1">⚡</span>
-                                    <span className="text-xs font-medium text-stone-700">Then & Now</span>
+                                    ⚡ Then & Now
                                 </a>
                                 <a
-                                    href="/wp-content/rosen-archive/features/glossary/"
-                                    className="flex flex-col items-center p-4 bg-white rounded-lg border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all group"
+                                    href=${`${FEATURES_PATH}/glossary/`}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
                                 >
-                                    <span className="text-xl mb-1">📚</span>
-                                    <span className="text-xs font-medium text-stone-700">Glossary</span>
+                                    📚 Glossary
                                 </a>
                                 <button
                                     onClick=${() => setToolsModalOpen(true)}
-                                    className="flex flex-col items-center p-4 bg-stone-50 rounded-lg border border-stone-200 hover:border-stone-400 hover:shadow-md transition-all group"
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-200 transition-all text-xs font-medium text-stone-500 hover:text-stone-700"
                                 >
-                                    <${Compass} className="w-6 h-6 text-stone-400 group-hover:text-stone-600 mb-2" />
-                                    <span className="text-xs font-medium text-stone-500 group-hover:text-stone-700">More tools</span>
+                                    <${Compass} className="w-3.5 h-3.5" />
+                                    More
                                 </button>
                             </div>
                         </section>

@@ -10,7 +10,8 @@
  * - Analytics and aggregation queries
  */
 
-import initSqlJs from 'sql.js';
+// sql.js is loaded dynamically to ensure JS and WASM are from the same source
+// The import map version can have WASM binary mismatches
 
 // Database instance
 let db = null;
@@ -19,6 +20,36 @@ let dbInitPromise = null;
 
 // Track if data has been loaded
 let dataLoaded = false;
+
+// sql.js module cache
+let initSqlJs = null;
+
+/**
+ * Load sql.js dynamically from CDN
+ * This ensures the JS and WASM binary are compatible
+ */
+const loadSqlJs = async () => {
+  if (initSqlJs) return initSqlJs;
+
+  // Use a script tag to load the UMD bundle which handles WASM loading properly
+  return new Promise((resolve, reject) => {
+    // Check if already loaded globally
+    if (window.initSqlJs) {
+      initSqlJs = window.initSqlJs;
+      resolve(initSqlJs);
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.min.js';
+    script.onload = () => {
+      initSqlJs = window.initSqlJs;
+      resolve(initSqlJs);
+    };
+    script.onerror = () => reject(new Error('Failed to load sql.js'));
+    document.head.appendChild(script);
+  });
+};
 
 /**
  * Initialize the SQLite database
@@ -36,9 +67,12 @@ export const initDatabase = async () => {
     console.log('[SQLite] Initializing database...');
 
     try {
-      // Initialize sql.js with WASM from CDN
-      const SQL = await initSqlJs({
-        locateFile: file => `https://sql.js.org/dist/${file}`
+      // Load sql.js dynamically
+      const sqlJsInit = await loadSqlJs();
+
+      // Initialize sql.js with WASM from the same CDN source
+      const SQL = await sqlJsInit({
+        locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${file}`
       });
 
       db = new SQL.Database();

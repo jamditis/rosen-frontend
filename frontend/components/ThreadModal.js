@@ -97,43 +97,13 @@ export const ThreadModal = ({ record }) => {
 
     return html`
         <div className="thread-viewer">
-            <!-- Thread Stats -->
-            <div className="bg-stone-50 border border-stone-200 rounded-lg p-4 mb-6">
-                <div className="grid grid-cols-3 gap-4 text-center">
-                    <div>
-                        <div className="text-2xl font-bold text-stone-800">${total_posts}</div>
-                        <div className="text-xs text-stone-500 uppercase tracking-wide">Posts</div>
-                    </div>
-                    <div>
-                        <div className="text-2xl font-bold text-stone-800">${max_depth}</div>
-                        <div className="text-xs text-stone-500 uppercase tracking-wide">Max Depth</div>
-                    </div>
-                    <div>
-                        <div className="text-2xl font-bold text-stone-800">Bluesky</div>
-                        <div className="text-xs text-stone-500 uppercase tracking-wide">Platform</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Depth Legend -->
-            <div className="flex items-center gap-4 mb-6 text-xs">
-                <span className="text-stone-500 font-semibold">Depth:</span>
-                <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-sky-500 rounded"></div>
-                    <span className="text-stone-600">Root (0)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-green-500 rounded"></div>
-                    <span className="text-stone-600">Level 1</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-amber-500 rounded"></div>
-                    <span className="text-stone-600">Level 2</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-pink-500 rounded"></div>
-                    <span className="text-stone-600">Level 3+</span>
-                </div>
+            <!-- Thread Stats - compact inline version -->
+            <div className="flex items-center gap-4 text-xs text-stone-500 mb-4 pb-3 border-b border-stone-200">
+                <span><strong className="text-stone-700">${total_posts}</strong> posts</span>
+                <span>·</span>
+                <span><strong className="text-stone-700">${max_depth}</strong> levels deep</span>
+                <span>·</span>
+                <span>Bluesky thread</span>
             </div>
 
             <!-- Thread Posts -->
