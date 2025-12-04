@@ -4,6 +4,107 @@ This document records significant architectural decisions and notable changes to
 
 ---
 
+### **[2.25.0] - 2025-12-04**
+
+#### **Dissertation Launch Site & Reader Enhancements**
+
+**Status:** Complete - Landing page, 3D visualization, and reader UX improvements
+
+##### **Overview**
+
+Created a dedicated dissertation launch site with a compelling landing page and interactive 3D concept visualization. Also enhanced the dissertation reader with dark mode fixes, shareable quote generation, and improved navigation.
+
+##### **Key Accomplishments**
+
+**1. Dissertation Landing Page**
+- Created `labs/dissertation-launch/landing-page/index.html`
+- Hero section with dissertation title, subtitle, and key quote
+- "Why This Dissertation Matters" section with three stake cards
+- Navigation grid linking to reader, concept map, glossary
+- About Jay Rosen section with bio and external links
+- Responsive design with Special Elite and Roboto Mono fonts
+
+**2. 3D Concept Sphere Visualization**
+- Created `labs/dissertation-launch/3d-concepts/info-sphere/index.html`
+- Three.js force-directed graph with 45+ concepts
+- 6 color-coded categories: Core Concepts, Movements, Thinkers, Institutions, Events, Themes
+- Interactive node exploration with hover tooltips
+- Connection lines showing concept relationships
+- Animated floating particles background
+- Category filtering with clickable legend
+
+**3. Dissertation Reader Dark Mode Fix**
+- Fixed invisible text in settings modal
+- Added `color: var(--color-text)` to `.settings-label` and `.settings-option`
+- Settings now readable in both light and dark themes
+
+**4. Text Selection Context Menu**
+- Context menu appears on text selections (10+ characters)
+- **Share button**: Opens modal with editable quote preview
+- **Cite button**: Copies APA-format citation with chapter info
+- **Copy button**: Copies selected text to clipboard
+- Canvas-based PNG generation (1200x630px social media format)
+- 500-character limit for image generation (longer selections show copy-only options)
+- Proper chapter detection from DOM structure
+
+**5. Header & Footer Enhancements**
+- Added "Download PDF" button in header (links to correct dissertation file)
+- Added "NotebookLM" button in header and footer
+- Buttons styled consistently with existing Archive button
+
+**6. Standardization & Bug Fixes**
+- Unified favicon across all dissertation pages
+- Updated all PDF references to use `THE_IMPOSSIBLE_PRESS_NYU_ROSEN-JAY-1986.pdf`
+- Fixed context menu positioning (visibility trick for dimension measurement)
+- Fixed duplicate chapter IDs in notes section causing ToC jump issues
+
+##### **Technical Details**
+
+**Context Menu Implementation:**
+```javascript
+// Visibility trick for measuring hidden elements
+menu.style.visibility = 'hidden';
+menu.classList.add('is-visible');
+const menuHeight = menu.offsetHeight || 44;
+menu.style.visibility = '';
+```
+
+**PNG Quote Generation:**
+- Canvas dimensions: 1200x630px (social media optimized)
+- Dark gradient background with quote mark decoration
+- Automatic text wrapping with line height calculation
+- Citation footer with dissertation title and year
+
+##### **Files Created**
+
+- `labs/dissertation-launch/landing-page/index.html`
+- `labs/dissertation-launch/3d-concepts/info-sphere/index.html`
+- `labs/dissertation-launch/3d-concepts/info-sphere/data.js`
+
+##### **Files Modified**
+
+- `features/dissertation-reader/index.html` - Header/footer buttons, favicon, PDF paths
+- `features/dissertation-reader/src/css/layout.css` - Dark mode text fix
+- `features/dissertation-reader/src/js/reader.js` - Text selection context menu (~500 lines)
+- `features/dissertation-reader/src/templates/shell.html` - Favicon, PDF paths
+- `CHANGELOG.md` - Version 2.25.0 entry
+
+##### **Impact**
+
+**For Users:**
+- Compelling entry point for dissertation discovery
+- Visual exploration of 40 years of ideas that shaped the work
+- Easy sharing of quotes on social media
+- Proper citations for academic use
+- Consistent experience across all dissertation pages
+
+**For the Archive:**
+- Professional presentation ready for public launch
+- Interactive tools that demonstrate the dissertation's relevance
+- Foundation for additional launch materials
+
+---
+
 ### **[2.24.0] - 2025-12-03**
 
 #### **Entity Extraction & Thread Visualization**

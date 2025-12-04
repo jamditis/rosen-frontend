@@ -13,6 +13,11 @@ This reader converts the dissertation markdown (`/frontend/web/95/impossible-pre
 - **Accessibility**: WCAG 2.1 AA compliant, screen reader optimized
 - **Progress**: Reading position saved, resume functionality
 - **Offline**: Works offline via Service Worker (after first load)
+- **Text Selection Menu**: Highlight text to share, cite, or copy
+  - **Share**: Generate social media-ready PNG with quote and citation
+  - **Cite**: Copy APA-format citation with chapter reference
+  - **Copy**: Quick copy selected text to clipboard
+- **Quick Actions**: Header buttons for PDF download, NotebookLM, and Archive access
 
 ## Directory Structure
 
