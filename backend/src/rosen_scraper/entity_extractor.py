@@ -21,7 +21,7 @@ from rosen_scraper.rate_limiter import rate_limited_gemini_call
 
 # Configuration
 ENTITY_DEBUG_DIR = Path("logs/entity_extraction")
-ENTITY_SCHEMA_FILE = Path(__file__).parent.parent.parent / "entity_extraction_schema.json"
+ENTITY_SCHEMA_FILE = Path(__file__).parent.parent.parent / "entity_extraction_schema_v3.json"
 
 
 def load_entity_schema() -> Dict[str, Any]:
@@ -217,7 +217,10 @@ def _call_gemini_for_entity_extraction(model, prompt):
 def extract_entities_and_relationships(
     text_content: str,
     record_id: str,
-    schema: Optional[Dict[str, Any]] = None
+    schema: Optional[Dict[str, Any]] = None,
+    record_title: Optional[str] = None,
+    record_author: Optional[str] = None,
+    record_publication: Optional[str] = None
 ) -> Optional[Dict[str, Any]]:
     """
     Extract named entities and relationships from text using Google Gemini AI.
@@ -231,6 +234,9 @@ def extract_entities_and_relationships(
         text_content: The raw text to analyze
         record_id: The ID of the record being processed (for tracking/debugging)
         schema: Optional entity extraction schema (loaded automatically if not provided)
+        record_title: The title of the record being analyzed (for context awareness)
+        record_author: The author of the record (to prevent self-referential entities)
+        record_publication: The publication source (to prevent self-referential entities)
 
     Returns:
         dict: A dictionary containing:
@@ -274,6 +280,21 @@ def extract_entities_and_relationships(
         for rtype, info in relationship_types.items()
     ])
 
+    # Build record context section
+    record_context = f"""
+**RECORD CONTEXT (The article you are analyzing):**
+- Record ID: {record_id}
+- Title: {record_title or 'N/A'}
+- Author: {record_author or 'N/A'}
+- Publication: {record_publication or 'N/A'}
+
+**CRITICAL RULES:**
+1. DO NOT create a Work entity for THIS record (ID: {record_id}). It is already in the archive.
+2. DO NOT create "Founded By" or "Authored By" relationships for THIS record. Authorship is already captured in metadata.
+3. ONLY extract OTHER works that are REFERENCED or CITED within the text.
+4. Use "Authored By" when someone WROTE a work. Use "Founded" ONLY for organizations/publications (NOT individual articles).
+"""
+
     # Construct the AI prompt
     prompt = f"""
 **INSTRUCTIONS:**
@@ -282,6 +303,8 @@ You are a specialized entity extraction AI for the Jay Rosen Digital Archive. Yo
 2. Relationships between these entities
 
 Focus on entities relevant to journalism, media criticism, and political coverage.
+
+{record_context}
 
 **ENTITY TYPES TO EXTRACT:**
 {entity_types_desc}
@@ -294,11 +317,12 @@ Focus on entities relevant to journalism, media criticism, and political coverag
 - {guidelines.get('context_required', 'Include disambiguating context')}
 - {guidelines.get('relationship_evidence', 'Base relationships on explicit evidence')}
 - {guidelines.get('entity_normalization', 'Standardize entity names')}
+- {guidelines.get('record_awareness', 'Remember: You are analyzing an existing archive record. Do not create entities for the record itself.')}
 
 **FOCUS AREAS:**
 {', '.join(guidelines.get('focus_areas', []))}
 
-**TEXT TO ANALYZE (Record ID: {record_id}):**
+**TEXT TO ANALYZE:**
 ---
 {text_content[:15000]}
 ---

@@ -62,139 +62,109 @@ All development work for the December 2025 dissertation release is complete. The
 
 ---
 
-## 🔄 CURRENT SESSION STATUS (December 3, 2025)
+## 🔄 CURRENT SESSION STATUS (December 4, 2025)
 
 **Branch:** main
 **Last PR Merged:** #93 (taxonomy-consolidation-dec3)
 
-### ✅ Recently Completed (Dec 3)
+### ✅ COMPLETED WORK (December 3-4, 2025)
+
+**Archive Status:**
+- Total records: 869 (659 original + 138 Tumblr + 62 clippings + 10 threads)
+- Entity extraction: 25,972 entities from 10,000 social posts (90.1% success rate)
+- Thread records: 10 THREAD-* records with full visualization
+- Relationships: 16,539 total (16,197 entity + 342 thread)
+
+**Major Accomplishments:**
+
 1. **Taxonomy Consolidation** - PR #93 MERGED
-   - Consolidated 14 overlapping eras → 8 clean eras (added COVID-19 2020-2021 and Trump II 2025-Present)
+   - Consolidated 14 overlapping eras → 8 clean eras
+   - Added: "COVID-19 Era (2020-2021)" and "Trump II & Beyond (2025-Present)"
    - Normalized 2,992 tag instances (862 case variations fixed)
    - Fixed 8 key_concepts case variations
-   - Removed colQ_changes column (schema violation)
-   - Fixed 31 content_type records, 5 scope records
-   - **Result:** 650/659 records updated (98.6%), 100% schema compliant
-   - Files: [archive_records-public.csv](data/archive_records-public.csv)
+   - Result: 650/659 records updated (98.6%), 100% schema compliant
 
-2. **Tumblr Import** - 138 posts processed
-   - Source: studio20nyu.tumblr.com export
-   - Format: JSON with full metadata
-   - IDs: TUMBLR-00001 to TUMBLR-00138
-   - File: [backend/tumblr_records.json](backend/tumblr_records.json)
+2. **Content Imports Completed**
+   - Tumblr: 138 posts from studio20nyu.tumblr.com export (TUMBLR-00001 to TUMBLR-00138)
+   - Newspaper Clippings: 62 OCR-processed clippings (CLIP-00001 to CLIP-00062)
+   - All 200 new records merged with validation, proper era assignment, date formatting
 
-3. **Newspaper Clipping OCR** - 62 clippings processed
-   - Gemini Flash 2.0: 58/84 success
-   - Tesseract fallback: 16 additional (74/84 total)
-   - IDs: CLIP-00001 to CLIP-00062
-   - File: [backend/clipping_records.json](backend/clipping_records.json)
+3. **Full-Scale Entity Extraction**
+   - Processed 10,000 prioritized social media posts
+   - 5-worker parallel processing (91.6 min vs 7 hours sequential)
+   - Schema v3.0 with record context awareness (prevents self-referential entities)
+   - Error analysis: 99.8% of "errors" were legitimate (no entities in post)
 
-4. **Entity Extraction Schema v3.0**
-   - Added record context awareness
-   - Prevents self-referential entities
-   - Updated [backend/entity_extraction_schema_v3.json](backend/entity_extraction_schema_v3.json)
+4. **Bluesky Thread Reconstruction & Visualization**
+   - Parsed 3,071 Bluesky posts into thread hierarchies
+   - 171 parent-child connections identified, max depth 32 levels
+   - Created 10 THREAD-* archive records for major threads
+   - Built ThreadModal.js with depth-based color coding (sky/green/amber/pink)
+   - Integrated into RecordModal with auto-detection
 
-### ✅ RECENTLY COMPLETED (Dec 3 - Session 2)
-**Merge new records into main archive CSV - COMPLETED**
+5. **Thread Display Bug Fix** ✅ JUST FIXED
+   - **Issue:** ThreadModal was calling `JSON.parse()` on already-parsed thread_data object
+   - **Fix:** Removed JSON.parse() call since thread_data is already an object from JSON file
+   - **Files updated:**
+     - [frontend/components/ThreadModal.js](frontend/components/ThreadModal.js) - Line 80
+     - [data/export-archive-data.js](data/export-archive-data.js) - Lines 99-110, 343-362
+     - [index.html](index.html) - Fixed WordPress paths to local relative paths
+     - [frontend/constants.js](frontend/constants.js) - Fixed DATA_CONFIG paths
+   - **Status:** Thread visualization now fully functional (hard refresh required: Cmd+Shift+R)
 
-**Accomplished:**
-1. ✅ Created `backend/scripts/merge_new_records.py` with full validation
-2. ✅ Successfully merged 138 Tumblr + 62 clipping records
-3. ✅ All 200 new records properly transformed (dates, eras, word counts)
-4. ✅ Backup created: `archive_records-public_backup_20251202_221548.csv`
-5. ✅ Merge report generated: `backend/merge_report_20251202_221548.json`
-6. ✅ Backfilled 2 missing publication dates (book records set to 1999-01-01)
-7. ✅ **Final result:** 859 total records, 859 valid, 0 errors
-
-**Files created:**
+**Key Scripts Created:**
 - [backend/scripts/merge_new_records.py](backend/scripts/merge_new_records.py) - Main merge script
-- [backend/scripts/backfill_missing_dates.py](backend/scripts/backfill_missing_dates.py) - Date backfill utility
-
-### ✅ JUST COMPLETED (Dec 3 - Session 3)
-**Bluesky Thread Viewer Implementation - COMPLETE**
-
-**Accomplished:**
-1. ✅ Reconstructed Bluesky thread hierarchies (3,071 posts analyzed)
-   - 171 posts (5.6%) successfully linked to parents
-   - 1,907 orphaned replies (parent not in dataset - expected)
-   - Max depth: 32 levels
-   - Top thread: 33 posts (retirement announcement)
-
-2. ✅ Generated 10 thread archive records
-   - IDs: THREAD-00001 through THREAD-00010
-   - Each includes structured JSON with full thread hierarchy
-   - Compatible with main archive schema (36 columns)
-
-3. ✅ Built frontend ThreadModal component
-   - Depth-based color coding (sky/green/amber/pink)
-   - Thread statistics display
-   - Post indentation by depth
-   - Links to original Bluesky posts
-
-4. ✅ Integrated into RecordModal
-   - Auto-detects THREAD-* records
-   - Renders thread view instead of standard summary
-   - Maintains modal features (navigation, sharing, citation)
-
-5. ✅ Created Twitter thread reconstruction script
-   - Multi-strategy heuristics (time proximity, numbering, mentions)
-   - Ready for Twitter data when available
-   - Note: No Twitter posts in current dataset (social_posts.csv only has Bluesky)
-
-**Files created:**
 - [backend/scripts/reconstruct_bluesky_threads.py](backend/scripts/reconstruct_bluesky_threads.py) - Thread hierarchy builder
 - [backend/scripts/generate_thread_records.py](backend/scripts/generate_thread_records.py) - Archive record generator
-- [backend/scripts/reconstruct_twitter_threads.py](backend/scripts/reconstruct_twitter_threads.py) - Twitter thread detection (ready for data)
+- [backend/scripts/extract_entities_csv_batch.py](backend/scripts/extract_entities_csv_batch.py) - Parallel entity extraction
+- [backend/scripts/analyze_extraction_errors.py](backend/scripts/analyze_extraction_errors.py) - Error categorization
 - [frontend/components/ThreadModal.js](frontend/components/ThreadModal.js) - Thread visualization component
-- [backend/output/bluesky_thread_mappings.json](backend/output/bluesky_thread_mappings.json) - Full thread hierarchy (959KB)
-- [backend/output/thread_records.csv](backend/output/thread_records.csv) - 10 thread archive records
-- [backend/output/twitter_thread_mappings.json](backend/output/twitter_thread_mappings.json) - Ready for Twitter data
-- [docs/narrative/BLUESKY_THREAD_VIEWER_IMPLEMENTATION.md](docs/narrative/BLUESKY_THREAD_VIEWER_IMPLEMENTATION.md) - Full documentation
 
-### 🚧 NEXT IMMEDIATE TASK
-**Entity Extraction & Relationship Mapping**
+### 🔄 LOCAL DEVELOPMENT SETUP
 
-**Current state:**
-- Main archive: 859 records
-- Social posts: 3,071 Bluesky (Twitter data not yet available)
-- Thread records: 10 major Bluesky threads
-- Threading complete: Bluesky ✅, Twitter (script ready, no data)
+**HTTP Server:**
+```bash
+# Start server on port 8000
+python3 -m http.server 8000
 
-**What needs to happen next:**
-1. Run entity extraction on ~15K substantive posts (7+ words, $50 budget)
-2. Generate thread relationships (REPLIES_TO, PART_OF_THREAD)
-3. Generate topical relationships (DISCUSSES_SAME_TOPIC)
-4. Link social posts to archive records (REFERENCES, RELATED_TO)
-5. Merge all into unified `all_relationships.csv`
-6. Merge 10 thread records into main archive CSV
-7. Regenerate frontend data files
+# If port conflict, kill process and restart
+lsof -ti:8000 | xargs kill -9
+python3 -m http.server 8000 > /tmp/http_server.log 2>&1 &
+```
 
-**Key reference:**
-- [backend/UNIFIED_THREADING_AND_RELATIONSHIPS_ROADMAP.md](backend/UNIFIED_THREADING_AND_RELATIONSHIPS_ROADMAP.md) - Full implementation plan
+**Path Configuration:**
+- Local development uses relative paths (`./data/`, `./frontend/`)
+- Production (WordPress) uses absolute paths (`/wp-content/rosen-archive/`)
+- Files configured: `index.html`, `frontend/constants.js`
 
-### 📋 Remaining Tasks (After Merge)
-1. Test entity extraction on sample records (v3.0 schema)
-2. Run batch entity extraction on all 200 new records
-3. Regenerate frontend data files
+**Data Regeneration:**
+```bash
+# Regenerate split data files from CSV
+npm install  # if needed
+node data/export-archive-data.js
+```
+
+### ⚠️ KNOWN ISSUES TO ADDRESS
+
+1. **Twitter Thread Reconstruction Not Run**
+   - Script created: [backend/scripts/reconstruct_twitter_threads.py](backend/scripts/reconstruct_twitter_threads.py)
+   - Status: Ready but no Twitter posts in current dataset (social_posts.csv only has Bluesky)
+   - Action needed: Run when Twitter data becomes available
+
+2. **Generic Thread Titles**
+   - Current: Threads have placeholder titles like "[Bluesky Thread]"
+   - Needed: Content-based titles from first post or thread summary
+   - Script to update: [backend/scripts/generate_thread_records.py](backend/scripts/generate_thread_records.py)
+
+3. **Background Entity Extraction Jobs**
+   - Multiple background Python processes still running (check with BashOutput tool)
+   - May need cleanup or monitoring
 
 ### 📊 Documentation Updated
-- [CHANGELOG.md](CHANGELOG.md) - Added [2.23.0] entry
-- [docs/narrative/PROGRESS_UPDATE_2025-12-03-part2.md](docs/narrative/PROGRESS_UPDATE_2025-12-03-part2.md) - Full session narrative
-- [docs/narrative/PROJECT_LOG.md](docs/narrative/PROJECT_LOG.md) - Added [2.23.0] entry
-- [backend/TAXONOMY_ANALYSIS_SUMMARY.md](backend/TAXONOMY_ANALYSIS_SUMMARY.md) - Era consolidation analysis
-
-### 🔧 Key Scripts Created
-- [backend/scripts/analyze_taxonomy.py](backend/scripts/analyze_taxonomy.py) - Deep taxonomy analysis
-- [backend/scripts/analyze_csv_schema.py](backend/scripts/analyze_csv_schema.py) - Schema validation
-- [backend/scripts/analyze_data_standardization.py](backend/scripts/analyze_data_standardization.py) - Format checking
-- [backend/scripts/consolidate_taxonomy.py](backend/scripts/consolidate_taxonomy.py) - Main consolidation (USED)
-
-### ⚠️ Important Notes for Next Session
-1. DO NOT re-run consolidate_taxonomy.py - changes already applied and merged
-2. When creating merge script, preserve the 8-era structure exactly
-3. Tumblr dates use M/D/YYYY format (e.g., "09/24/2011")
-4. Clipping dates use MM/DD/YYYY format (e.g., "09/14/1991")
-5. Both JSON files have compatible field names with CSV schema
+- [CHANGELOG.md](CHANGELOG.md) - Multiple version entries
+- [docs/narrative/PROGRESS_UPDATE_2025-12-03-part2.md](docs/narrative/PROGRESS_UPDATE_2025-12-03-part2.md)
+- [docs/narrative/BLUESKY_THREAD_VIEWER_IMPLEMENTATION.md](docs/narrative/BLUESKY_THREAD_VIEWER_IMPLEMENTATION.md)
+- [backend/TAXONOMY_ANALYSIS_SUMMARY.md](backend/TAXONOMY_ANALYSIS_SUMMARY.md)
 
 ---
 
@@ -417,57 +387,18 @@ The `index.html` loads the JS version. When editing, ensure changes are reflecte
 
 ## Common Tasks
 
-### Adding a New Comparison (comparison-tool)
-Edit `features/comparison-tool/data.js`:
-```javascript
-{
-  id: 'unique-id',
-  theme: 'Display Theme Name',
-  then: {
-    year: 1986,
-    chapter: 'Chapter N: Title',
-    pages: 'XXX-YYY',
-    quote: 'Direct quote from dissertation...',
-    context: 'Explanation of the 1986 context...'
-  },
-  now: {
-    year: 2025,
-    headline: 'Short headline',
-    observation: 'Current reality description...',
-    examples: ['Example 1', 'Example 2', 'Example 3']
-  },
-  connection: 'How 1986 insight connects to 2025 reality...'
-}
-```
-
-### Adding Dissertation Content
-Edit `frontend/components/dissertationData.js`:
-- Add nodes to `DISSERTATION_NODES` array
-- Add quotes to `NOTABLE_QUOTATIONS`
-- Add themes to `KEY_THEMES`
-
-### Updating Archive Data
-1. Update the source data and regenerate `/data/archive-data.json`
-2. Wait for cache to expire (1 hour) OR
-3. Increment `CACHE_VERSION` in `frontend/services/archiveService.js`
-
 ### Local Development
 ```bash
-# Start local server (Python)
-python -m http.server 8000
-
-# Or with Node
-npx serve .
-
-# Open http://localhost:8000
+python3 -m http.server 8000  # Open http://localhost:8000
 ```
 
+### Updating Archive Data
+1. Edit CSV: `data/archive_records-public.csv`
+2. Regenerate JSON: `node data/export-archive-data.js`
+3. Cache busting: Increment `CACHE_VERSION` in `frontend/services/archiveService.js`
+
 ### Deployment
-1. Upload `index.html`, `shared-styles.css`, `favicon.ico` from root
-2. Upload entire `frontend/` directory
-3. Upload entire `features/` directory
-4. Upload `data/` directory with archive data
-5. Ensure server serves `.js` with MIME type `application/javascript`
+Deploy via FTP: `index.html`, `frontend/`, `features/`, `data/` directories to WordPress subdirectory.
 
 ---
 
@@ -475,32 +406,7 @@ npx serve .
 
 **STATUS: ALL TOOLS COMPLETE AND VALIDATED**
 
-The dissertation is being released publicly with multiple presentation formats:
-
-### Implemented and Ready
-1. **Interactive Mind Map** - Tree visualization of dissertation structure (in main archive)
-2. **"Then and Now" Comparison Tool** - 7 side-by-side 1986 vs 2025 comparisons (`/features/comparison-tool/`)
-3. **Glossary** - 16 key concepts, filterable, with detail panel (`/features/glossary/`)
-4. **1986 in Journalism** - Historical context, media landscape, what didn't exist (`/features/context-1986/`)
-5. **Timeline** - 14 entries from dissertation to 2025, filterable by type (`/features/timeline/`)
-6. **Annotated Excerpts** - 12 key passages with 2025 commentary (`/features/annotated-excerpts/`)
-7. **FAQ / Ask the Dissertation** - 46 Q&A pairs, searchable, NotebookLM integration (`/features/faq/`)
-8. **Dissertation Reader** - Landing page with PDF download, ToC, citation info (`/features/dissertation-reader/`)
-9. **Network Explorer** - Canvas visualization of archive record relationships (in main archive)
-
-### Archived (developed but not active)
-10. **BYOK Chat Interface** - Interactive Claude chat using user's own API key (`/archived/byok-chat/`)
-
-### Future Development (requires external content)
-- Audio commentary / office hours (requires Jay to record)
-- "What I got wrong" essay (requires Jay to write)
-- "The chapter I'd add today" essay (requires Jay to write)
-- Reading group format with discussion prompts
-- Collaborative annotation (Hypothesis integration)
-- Video essay (requires video production)
-
-### Pre-Publication Report
-See `release-assets/documentation/pre-publication-report.md` for the full status report.
+9 dissertation presentation tools implemented in `/features/` directory. See `release-assets/documentation/pre-publication-report.md` for full status.
 
 ---
 
@@ -555,37 +461,9 @@ python tools/diagnostics/data_deduper.py    # Clean data
 python tools/backfill/backfill_worker.py    # Fill missing fields
 ```
 
-### NEW: Content Type Processors (Dec 1, 2025)
+### Content Type Processors
 
-The backend now supports three additional content types beyond articles and videos:
-
-**Processors Location:** `backend/src/rosen_scraper/processors/`
-
-1. **Twitter/X Processor** (`twitter_processor.py`)
-   - Extracts threads and individual tweets
-   - Nitter proxy with 4 fallback instances + Playwright fallback
-   - Handles both `twitter.com` and `x.com` URLs
-   - Full thread extraction with numbering and quote tweets
-
-2. **Tumblr Processor** (`tumblr_processor.py`)
-   - Processes Tumblr export files (JSON, HTML) and live URLs
-   - Supports 8 post types: text, quote, link, photo, video, audio, answer, chat
-   - OCR-ready for archive exports
-   - Generates `TUMBLR-XXXXX` IDs
-
-3. **Newspaper Clipping Processor** (`clipping_processor.py`)
-   - OCR text cleanup (artifacts, line breaks, hyphenation)
-   - Metadata extraction (publication, date, author, page)
-   - Supports 12 major publications (NYT, WSJ, WP, LAT, etc.)
-   - Generates publication-specific IDs (`NYT-XXXXX`, `WSJ-XXXXX`, `CLIP-XXXXX`)
-   - Confidence scoring for extracted metadata
-
-**Dispatcher Integration:**
-- `dispatcher.py` automatically routes URLs to appropriate processors
-- All new processors integrated with AI analysis pipeline
-- Schema updated with "Tumblr Post" and "Newspaper Clipping" content formats
-
-**Status:** ✅ Backend fully operational. Can process Twitter, Tumblr, and PDF content. Frontend display updates pending.
+Backend supports: Articles, Videos, Twitter/X, Tumblr, Newspaper Clippings (PDFs with OCR). See `backend/src/rosen_scraper/processors/` for implementations.
 
 ---
 
@@ -605,31 +483,7 @@ All workflows run automatically on pull requests to ensure code quality before m
 
 ## GitHub Issues & Labels
 
-When creating GitHub issues, always apply appropriate labels:
-
-### Available Labels
-| Label | Color | Description |
-|-------|-------|-------------|
-| `backend` | Purple (#5319E7) | Backend Python pipeline |
-| `frontend` | Green (#0E8A16) | Frontend React/JS application |
-| `bug` | Red (default) | Something isn't working |
-| `enhancement` | Blue (default) | New feature or request |
-| `documentation` | Blue (default) | Improvements or additions to documentation |
-
-### Labeling Guidelines
-- **Always label issues** - Every issue should have at least one label
-- **Use component labels** - Add `backend` or `frontend` to indicate which part of the codebase
-- **Use type labels** - Add `bug`, `enhancement`, or `documentation`
-- **Multiple labels are good** - e.g., `backend, bug` for a backend bug
-
-### Creating Issues via CLI
-```bash
-# Good - with labels
-gh issue create --title "Fix broken import" --body "..." --label "backend,bug"
-
-# If labels don't exist yet, create them first
-gh label create "backend" --description "Backend Python pipeline" --color "5319E7"
-```
+Available labels: `backend`, `frontend`, `bug`, `enhancement`, `documentation`. Always label issues appropriately.
 
 ---
 

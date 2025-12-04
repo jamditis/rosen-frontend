@@ -23,7 +23,7 @@ The clipping processor will:
 1. Extract/clean OCR text (for PDFs)
 2. Detect publication from content
 3. Extract metadata (date, author, headline)
-4. Generate appropriate IDs (NYT-00001, WSJ-00001, etc.)
+4. Generate appropriate IDs (CLIP-00001, CLIP-02231, etc.)
 
 Run with:
 ```bash

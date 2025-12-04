@@ -3,16 +3,16 @@
 export const DATA_CONFIG = {
     // Split data loading for optimized performance
     // Core data: lightweight records for card display (~8MB, loads first)
-    archive_core: '/wp-content/rosen-archive/data/archive-core.json',
+    archive_core: './data/archive-core.json',
 
     // Details: full summaries, quotes, concepts, tags (~11MB, loads on demand)
-    archive_details: '/wp-content/rosen-archive/data/archive-details.json',
+    archive_details: './data/archive-details.json',
 
     // Entities: for Explorer network visualization (~1MB, loads on demand)
-    archive_entities: '/wp-content/rosen-archive/data/archive-entities.json',
+    archive_entities: './data/archive-entities.json',
 
     // Full data file (backward compatible, for fallback)
-    archive_json: '/wp-content/rosen-archive/data/archive-data.json'
+    archive_json: './data/archive-data.json'
 };
 
 export const ITEMS_PER_PAGE = 24;

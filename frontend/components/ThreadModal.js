@@ -76,15 +76,16 @@ const ThreadPost = ({ post, totalPosts }) => {
  * Parses thread_data JSON and displays posts in threaded format.
  */
 export const ThreadModal = ({ record }) => {
-    // Parse thread data from record
-    let threadData = null;
-    try {
-        threadData = record.thread_data ? JSON.parse(record.thread_data) : null;
-    } catch (e) {
-        console.error('Failed to parse thread_data:', e);
-    }
+    // Get thread data from record (already parsed as object)
+    const threadData = record.thread_data;
 
     if (!threadData || !threadData.posts) {
+        console.log('[ThreadModal] Missing thread data:', {
+            has_thread_data: !!record.thread_data,
+            has_posts: threadData?.posts ? threadData.posts.length : 0,
+            thread_data_type: typeof record.thread_data,
+            record_id: record.id
+        });
         return html`
             <div className="text-center text-stone-500 py-8">
                 <p>Thread data not available</p>

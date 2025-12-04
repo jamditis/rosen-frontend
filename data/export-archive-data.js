@@ -92,10 +92,24 @@ function processRecord(row, index, type, relationshipsMap) {
   const directRelIds = relationshipsMap[rawId] || [];
   const isVerified = (row.verified || row.Verified) === 'TRUE' ||
                      (row.verified || row.Verified) === 'true' ||
+                     (row.verified || row.Verified) === 'Yes' ||
                      (row.verified || row.Verified) === true ||
                      type === 'social';
 
-  return {
+  // Extract thread_data from notes for THREAD records
+  let threadData = null;
+  if (rawId.startsWith('THREAD-') && row.notes) {
+    const match = row.notes.match(/thread_data:\s*(\{.*\})/);
+    if (match) {
+      try {
+        threadData = JSON.parse(match[1]);
+      } catch (e) {
+        console.warn(`Failed to parse thread_data for ${rawId}:`, e);
+      }
+    }
+  }
+
+  const record = {
     id: rawId,
     title: displayTitle,
     author: author,
@@ -113,6 +127,13 @@ function processRecord(row, index, type, relationshipsMap) {
     type: type,
     relatedIds: directRelIds
   };
+
+  // Add thread_data if present
+  if (threadData) {
+    record.thread_data = threadData;
+  }
+
+  return record;
 }
 
 function buildRelationshipsMap(relationshipsData) {
@@ -322,7 +343,7 @@ async function main() {
   // 2. Details data - full content, loaded on demand
   const detailsMap = {};
   allRecords.forEach(r => {
-    detailsMap[r.id] = {
+    const details = {
       summary: r.summary,
       quote: r.quote,
       concepts: r.concepts,
@@ -331,6 +352,13 @@ async function main() {
       author: r.author,
       relatedIds: r.relatedIds
     };
+
+    // Add thread_data for THREAD records
+    if (r.thread_data) {
+      details.thread_data = r.thread_data;
+    }
+
+    detailsMap[r.id] = details;
   });
 
   const detailsOutput = {
