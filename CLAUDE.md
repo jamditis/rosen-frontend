@@ -110,23 +110,64 @@ All development work for the December 2025 dissertation release is complete. The
 - [backend/scripts/merge_new_records.py](backend/scripts/merge_new_records.py) - Main merge script
 - [backend/scripts/backfill_missing_dates.py](backend/scripts/backfill_missing_dates.py) - Date backfill utility
 
+### ✅ JUST COMPLETED (Dec 3 - Session 3)
+**Bluesky Thread Viewer Implementation - COMPLETE**
+
+**Accomplished:**
+1. ✅ Reconstructed Bluesky thread hierarchies (3,071 posts analyzed)
+   - 171 posts (5.6%) successfully linked to parents
+   - 1,907 orphaned replies (parent not in dataset - expected)
+   - Max depth: 32 levels
+   - Top thread: 33 posts (retirement announcement)
+
+2. ✅ Generated 10 thread archive records
+   - IDs: THREAD-00001 through THREAD-00010
+   - Each includes structured JSON with full thread hierarchy
+   - Compatible with main archive schema (36 columns)
+
+3. ✅ Built frontend ThreadModal component
+   - Depth-based color coding (sky/green/amber/pink)
+   - Thread statistics display
+   - Post indentation by depth
+   - Links to original Bluesky posts
+
+4. ✅ Integrated into RecordModal
+   - Auto-detects THREAD-* records
+   - Renders thread view instead of standard summary
+   - Maintains modal features (navigation, sharing, citation)
+
+5. ✅ Created Twitter thread reconstruction script
+   - Multi-strategy heuristics (time proximity, numbering, mentions)
+   - Ready for Twitter data when available
+   - Note: No Twitter posts in current dataset (social_posts.csv only has Bluesky)
+
+**Files created:**
+- [backend/scripts/reconstruct_bluesky_threads.py](backend/scripts/reconstruct_bluesky_threads.py) - Thread hierarchy builder
+- [backend/scripts/generate_thread_records.py](backend/scripts/generate_thread_records.py) - Archive record generator
+- [backend/scripts/reconstruct_twitter_threads.py](backend/scripts/reconstruct_twitter_threads.py) - Twitter thread detection (ready for data)
+- [frontend/components/ThreadModal.js](frontend/components/ThreadModal.js) - Thread visualization component
+- [backend/output/bluesky_thread_mappings.json](backend/output/bluesky_thread_mappings.json) - Full thread hierarchy (959KB)
+- [backend/output/thread_records.csv](backend/output/thread_records.csv) - 10 thread archive records
+- [backend/output/twitter_thread_mappings.json](backend/output/twitter_thread_mappings.json) - Ready for Twitter data
+- [docs/narrative/BLUESKY_THREAD_VIEWER_IMPLEMENTATION.md](docs/narrative/BLUESKY_THREAD_VIEWER_IMPLEMENTATION.md) - Full documentation
+
 ### 🚧 NEXT IMMEDIATE TASK
-**Social Media Threading & Relationship Mapping**
+**Entity Extraction & Relationship Mapping**
 
 **Current state:**
-- Main archive: 859 records (newly merged)
-- Social posts: 29,187 (26,116 Twitter + 3,071 Bluesky)
-- Existing relationships: 7,500 (incomplete, main archive only)
-- Threading: Bluesky 67.7%, Twitter 0%
+- Main archive: 859 records
+- Social posts: 3,071 Bluesky (Twitter data not yet available)
+- Thread records: 10 major Bluesky threads
+- Threading complete: Bluesky ✅, Twitter (script ready, no data)
 
-**What needs to happen:**
-1. Reconstruct Bluesky threads (parse AT protocol URIs)
-2. Reconstruct Twitter threads (multi-strategy heuristic)
-3. Run entity extraction on ~15K substantive posts (7+ words, $50 budget)
-4. Generate thread relationships (REPLIES_TO, PART_OF_THREAD)
-5. Generate topical relationships (DISCUSSES_SAME_TOPIC)
-6. Link social posts to archive records (REFERENCES, RELATED_TO)
-7. Merge all into unified `all_relationships.csv`
+**What needs to happen next:**
+1. Run entity extraction on ~15K substantive posts (7+ words, $50 budget)
+2. Generate thread relationships (REPLIES_TO, PART_OF_THREAD)
+3. Generate topical relationships (DISCUSSES_SAME_TOPIC)
+4. Link social posts to archive records (REFERENCES, RELATED_TO)
+5. Merge all into unified `all_relationships.csv`
+6. Merge 10 thread records into main archive CSV
+7. Regenerate frontend data files
 
 **Key reference:**
 - [backend/UNIFIED_THREADING_AND_RELATIONSHIPS_ROADMAP.md](backend/UNIFIED_THREADING_AND_RELATIONSHIPS_ROADMAP.md) - Full implementation plan
