@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Impossible Press | Jay Rosen's 1986 Dissertation</title>
+  <meta name="description" content="Explore 'The Impossible Press: American Journalism and the Decline of Public Life' - Jay Rosen's groundbreaking 1986 PhD dissertation on the relationship between press and public.">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="The Impossible Press | Jay Rosen (1986)">
+  <meta property="og:description" content="A critical examination of journalism's foundational assumption that 'the press informs the public.'">
+  <meta property="og:type" content="website">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Roboto+Mono:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --color-stone-50: #fafaf9;
+      --color-stone-100: #f5f5f4;
+      --color-stone-200: #e7e5e4;
+      --color-stone-300: #d6d3d1;
+      --color-stone-400: #a8a29e;
+      --color-stone-500: #78716c;
+      --color-stone-600: #57534e;
+      --color-stone-700: #44403c;
+      --color-stone-800: #292524;
+      --color-stone-900: #1c1917;
+      --color-sky-500: #0ea5e9;
+      --color-sky-600: #0284c7;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Roboto Mono', monospace;
+      background: var(--color-stone-100);
+      color: var(--color-stone-800);
+      line-height: 1.7;
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+      position: relative;
+      background: linear-gradient(180deg, var(--color-stone-900) 0%, var(--color-stone-800) 100%);
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: 0.5;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--color-stone-500);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title {
+      font-family: 'Special Elite', 'Courier New', monospace;
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      color: var(--color-stone-100);
+      margin-bottom: 1rem;
+      letter-spacing: 0.02em;
+    }
+
+    .hero-subtitle {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(1.25rem, 3vw, 1.75rem);
+      font-weight: 400;
+      font-style: italic;
+      color: var(--color-stone-400);
+      margin-bottom: 2rem;
+    }
+
+    .hero-meta {
+      font-size: 0.85rem;
+      color: var(--color-stone-500);
+      margin-bottom: 3rem;
+    }
+
+    .hero-meta strong {
+      color: var(--color-stone-300);
+    }
+
+    .hero-quote {
+      max-width: 700px;
+      margin: 0 auto 3rem;
+      padding: 1.5rem 2rem;
+      border-left: 3px solid var(--color-sky-500);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .hero-quote p {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--color-stone-300);
+      line-height: 1.8;
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--color-stone-500);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(10px); }
+    }
+
+    /* Sections */
+    section {
+      padding: 6rem 2rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-title {
+      font-family: 'Special Elite', 'Courier New', monospace;
+      font-size: 1.5rem;
+      color: var(--color-stone-800);
+      margin-bottom: 2rem;
+      letter-spacing: 0.02em;
+    }
+
+    .section-title::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 2px;
+      background: var(--color-sky-500);
+      margin-top: 0.75rem;
+    }
+
+    /* Stakes Section */
+    .stakes {
+      background: var(--color-stone-50);
+    }
+
+    .stakes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .stake-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .stake-card h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--color-stone-700);
+      margin-bottom: 0.75rem;
+    }
+
+    .stake-card p {
+      font-size: 0.85rem;
+      color: var(--color-stone-600);
+      line-height: 1.7;
+    }
+
+    /* Navigation Cards */
+    .explore {
+      background: var(--color-stone-800);
+      color: var(--color-stone-200);
+    }
+
+    .explore .section-title {
+      color: var(--color-stone-100);
+    }
+
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .nav-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .nav-card:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: var(--color-sky-500);
+      transform: translateY(-2px);
+    }
+
+    .nav-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-stone-100);
+      margin-bottom: 0.5rem;
+    }
+
+    .nav-card p {
+      font-size: 0.8rem;
+      color: var(--color-stone-400);
+      line-height: 1.6;
+    }
+
+    .nav-card .arrow {
+      display: inline-block;
+      margin-top: 1rem;
+      color: var(--color-sky-500);
+      font-size: 0.85rem;
+    }
+
+    /* About Section */
+    .about {
+      background: var(--color-stone-100);
+    }
+
+    .about-content {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    @media (max-width: 768px) {
+      .about-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .about-image {
+      width: 100%;
+      max-width: 200px;
+      height: auto;
+      border-radius: 8px;
+      background: var(--color-stone-300);
+      object-fit: cover;
+    }
+
+    .about-text h3 {
+      font-family: 'Special Elite', 'Courier New', monospace;
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+      color: var(--color-stone-800);
+    }
+
+    .about-text .credentials {
+      font-size: 0.8rem;
+      color: var(--color-stone-500);
+      margin-bottom: 1rem;
+    }
+
+    .about-text p {
+      font-size: 0.9rem;
+      color: var(--color-stone-600);
+      margin-bottom: 1rem;
+    }
+
+    .about-links {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .about-link {
+      font-size: 0.8rem;
+      color: var(--color-sky-600);
+      text-decoration: none;
+    }
+
+    .about-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Coming Soon Teaser */
+    .teaser {
+      background: linear-gradient(135deg, var(--color-stone-900) 0%, #1e293b 100%);
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+
+    .teaser-content {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .teaser p {
+      font-size: 0.85rem;
+      color: var(--color-stone-400);
+      margin-bottom: 1rem;
+    }
+
+    .teaser strong {
+      color: var(--color-stone-200);
+      font-family: 'Special Elite', 'Courier New', monospace;
+    }
+
+    .teaser .subtitle {
+      font-size: 0.75rem;
+      color: var(--color-stone-500);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--color-stone-900);
+      padding: 2rem;
+      text-align: center;
+    }
+
+    footer p {
+      font-size: 0.75rem;
+      color: var(--color-stone-500);
+    }
+
+    footer a {
+      color: var(--color-stone-400);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <p class="hero-eyebrow">A 1986 PhD Dissertation by</p>
+      <h1 class="hero-title">The Impossible Press</h1>
+      <p class="hero-subtitle">American Journalism and the Decline of Public Life</p>
+      <p class="hero-meta">
+        <strong>Jay Rosen</strong> &middot; Ph.D., New York University, 1986<br>
+        Committee: Neil Postman (Chair), Christine Nystrom, Henry Perkinson
+      </p>
+
+      <div class="hero-quote">
+        <p>"Journalism is not an activity conducted solely by journalists; or, to put it another way, journalism is communication and communication is something that takes place between people. It is not an action but a transaction."</p>
+      </div>
+    </div>
+
+    <div class="scroll-indicator">Scroll to explore</div>
+  </section>
+
+  <!-- The Stakes -->
+  <section class="stakes">
+    <div class="container">
+      <h2 class="section-title">Why This Dissertation Matters</h2>
+
+      <div class="stakes-grid">
+        <div class="stake-card">
+          <h3>The Central Question</h3>
+          <p>What does it really mean when we say "the press informs the public"? Rosen argues this foundational phrase obscures far more than it reveals&mdash;and understanding why is essential to grasping journalism's democratic role.</p>
+        </div>
+
+        <div class="stake-card">
+          <h3>Ahead of Its Time</h3>
+          <p>Written in 1986, this dissertation anticipated many of today's debates about media, democracy, and public life&mdash;before the internet, social media, or the current crisis of journalism.</p>
+        </div>
+
+        <div class="stake-card">
+          <h3>An Ecological View</h3>
+          <p>Rather than focusing on individual journalists or news organizations, Rosen proposes understanding the press-public relationship as an ecosystem shaped by technology, economics, and culture.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Explore -->
+  <section class="explore">
+    <div class="container">
+      <h2 class="section-title">Explore the Dissertation</h2>
+
+      <div class="nav-grid">
+        <a href="../../../features/dissertation-reader/" class="nav-card">
+          <h3>Read the Full Text</h3>
+          <p>The complete dissertation, transcribed and formatted for online reading with chapter navigation.</p>
+          <span class="arrow">&rarr; Enter Reading Room</span>
+        </a>
+
+        <a href="../3d-concepts/info-sphere/" class="nav-card">
+          <h3>Concept Map</h3>
+          <p>Explore the dissertation's ideas visually through an interactive 3D network of concepts and thinkers.</p>
+          <span class="arrow">&rarr; Launch Visualization</span>
+        </a>
+
+        <a href="#" class="nav-card">
+          <h3>Key Thinkers</h3>
+          <p>Meet the scholars whose ideas shaped this work: Lippmann, Dewey, Park, Tarde, and more.</p>
+          <span class="arrow">&rarr; Coming Soon</span>
+        </a>
+
+        <a href="../../../features/glossary/" class="nav-card">
+          <h3>Glossary of Concepts</h3>
+          <p>Definitions and explanations of key terms: stereotype, pseudo-environment, mobilized privacy, and more.</p>
+          <span class="arrow">&rarr; View Glossary</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about">
+    <div class="container">
+      <h2 class="section-title">About Jay Rosen</h2>
+
+      <div class="about-content">
+        <img src="https://journalism.nyu.edu/wp-content/uploads/2020/02/photo-jay-rosen.jpg" alt="Jay Rosen" class="about-image" />
+
+        <div class="about-text">
+          <h3>Jay Rosen</h3>
+          <p class="credentials">Professor of Journalism, New York University</p>
+
+          <p>Jay Rosen has been on the faculty at NYU since 1986, the same year he completed this dissertation under Neil Postman's supervision. He is one of the country's leading press critics and has written extensively about the relationship between journalism and democracy.</p>
+
+          <p>His blog, PressThink, has been exploring these themes since 2003. He was a key figure in the public journalism movement of the 1990s, which drew directly on ideas developed in this dissertation.</p>
+
+          <div class="about-links">
+            <a href="https://pressthink.org" target="_blank" rel="noopener" class="about-link">PressThink Blog</a>
+            <a href="https://journalism.nyu.edu/faculty/jay-rosen/" target="_blank" rel="noopener" class="about-link">NYU Faculty Page</a>
+            <a href="https://bsky.app/profile/jayrosen.bsky.social" target="_blank" rel="noopener" class="about-link">Bluesky</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Coming Soon Teaser -->
+  <section class="teaser">
+    <div class="teaser-content">
+      <p class="subtitle">Coming Soon</p>
+      <p>This dissertation launch is part of a larger project: <strong>The Jay Rosen Digital Archive</strong>&mdash;a comprehensive collection spanning four decades of writing, speaking, and thinking about journalism, democracy, and public life.</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>Curated by <a href="mailto:jamditis@gmail.com">Joe Amditis</a> &middot; 2024</p>
+  </footer>
+
+</body>
+</html>
