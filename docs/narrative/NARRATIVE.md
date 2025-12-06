@@ -738,6 +738,77 @@ This experience demonstrates the importance of rigorous data quality assurance i
 
 ---
 
+### Data Architecture Migration: From Google Sheets Runtime to Static Files (December 2025)
+
+A significant architectural shift occurred in preparation for the public launch: the frontend migrated from fetching data directly from Google Sheets at runtime to loading pre-processed static JSON files.
+
+#### The Problem with Google Sheets as Runtime Data Source
+
+The original architecture fetched data from Google Sheets via the Google Sheets API every time a user loaded the archive:
+
+- **Latency**: 800-1500ms per page load depending on Google's servers
+- **CORS overhead**: Required preflight requests adding delays
+- **Availability dependency**: Archive availability tied to Google's uptime
+- **Multiple requests**: 3 separate network calls (records, entities, relationships)
+- **Rate limits**: Risk of 429 errors during traffic spikes
+
+#### The New Architecture
+
+The solution was a build-time export system:
+
+**Data Flow:**
+```
+Google Sheets (source of truth for curation)
+    ↓
+CSV exports (archive_records-public.csv, social_posts.csv, extracted_entities.csv, extracted_relationships.csv)
+    ↓
+Node.js export script (export-archive-data.js)
+    ↓
+Static JSON file (archive-data.json, ~25MB)
+    ↓
+WordPress deployment via FTP
+    ↓
+Frontend loads JSON directly (~100-200ms)
+```
+
+**Key Changes:**
+
+1. **CSV as Intermediate Format**: Data is exported from Google Sheets as CSV files stored in the repository's `/data/` directory. This provides version control for data changes and enables offline development.
+
+2. **JSON Generation**: A Node.js script (`data/export-archive-data.js`) processes the CSV files and generates a single optimized JSON file containing:
+   - All archive records (~30k including social posts)
+   - Named entities (~5k)
+   - Facets for filtering (categories, eras, publications, entity types)
+   - Pre-computed autocomplete index (~35k terms)
+
+3. **Static Deployment**: The JSON file is uploaded to WordPress via FTP at `/wp-content/rosen-archive/data/archive-data.json`. No server-side processing required.
+
+4. **Frontend Simplification**: The archive service (`frontend/services/archiveService.js`) now fetches a single JSON file instead of making multiple Google Sheets API calls.
+
+#### Benefits
+
+| Metric | Before (Google Sheets) | After (Static JSON) |
+|--------|------------------------|---------------------|
+| Load time | 800-1500ms | 100-200ms |
+| Network requests | 3 | 1 |
+| External dependencies | Google API | None |
+| Offline development | Not possible | Fully supported |
+| Version control | None | Git-tracked CSVs |
+
+#### Workflow for Data Updates
+
+The new workflow separates curation from deployment:
+
+1. **Curate** in Google Sheets (add/edit records)
+2. **Export** CSVs from Google Sheets
+3. **Replace** CSV files in `/data/` directory
+4. **Generate** JSON: `npm run export-data`
+5. **Deploy** JSON file to WordPress via FTP
+
+This architecture maintains Google Sheets as the curator-friendly editing interface while eliminating runtime dependencies and improving performance by 4-8x.
+
+---
+
 This project is a continuous effort, but the foundation is strong. It is a useful and practical tool for preserving an important body of work, and it serves as a solid model for future digital archival projects.
 
 For questions or to get in touch, please contact **Joe Amditis** at [jamditis@gmail.com](mailto:jamditis@gmail.com).
