@@ -25,7 +25,7 @@ While the backend pipeline handles the heavy lifting of data processing, a separ
 
 The initial goal was to create a clean, modern, and user-friendly HTML interface that could display the records from the Google Sheet. However, the project quickly adopted a more distinct "journalistic" or "typewriter" aesthetic, using specific fonts and a muted, paper-like color palette to give the archive a unique character.
 
-A significant challenge emerged from the data itself. The raw data exported from the Google Sheet contained inconsistent formatting, particularly in fields that held lists of tags or categories. Some were formatted as JSON arrays, others as semicolon-separated strings, and some were a mix of both. This required the development of a robust client-side data cleaning pipeline. This pipeline now intelligently parses these mixed-format strings, standardizes dates to a YYYY-MM-DD format, cleans up titles, and filters out any incomplete records, ensuring a clean and consistent user experience regardless of the underlying data's state.
+A significant challenge emerged from the data itself. The raw data exported from the Google Sheet contained inconsistent formatting, particularly in fields that held lists of tags or categories. Some were formatted as JSON arrays, others as semicolon-separated strings, and some were a mix of both. This required the development of a client-side data cleaning pipeline. This pipeline now intelligently parses these mixed-format strings, standardizes dates to a YYYY-MM-DD format, cleans up titles, and filters out any incomplete records, ensuring a clean and consistent user experience regardless of the underlying data's state.
 
 The user interface evolved through a series of refinements:
 
@@ -37,7 +37,7 @@ This iterative process of building, testing, and refining has resulted in a high
 
 ## **Data Quality and Maintenance**
 
-Ensuring the quality and consistency of the archived data is as important as the public-facing interface. To that end, a comprehensive suite of data maintenance tools was developed:
+Ensuring the quality and consistency of the archived data is as important as the public-facing interface. To that end, a suite of data maintenance tools was developed:
 
 ### **Core Data Quality Tools**
 
@@ -46,17 +46,17 @@ Ensuring the quality and consistency of the archived data is as important as the
 *   **`scripts/diagnostics/data_improver.py`:** This script re-processes existing raw text through the AI analysis pipeline. This is particularly useful for updating metadata or classifications without having to re-scrape the original (and potentially ephemeral) URL.
 *   **`scripts/diagnostics/data_deduper.py`:** A cost-effective, non-AI script that programmatically cleans and deduplicates data in columns that contain lists (like 'tags' or 'key_concepts'). It handles various formatting inconsistencies, merges different separators, and ensures all list-based data is stored in a clean, comma-separated format. It also automatically cross-references the `test_runs` and `entities` sheets to track where each entity is mentioned.
 
-### **Comprehensive Analysis & Quality Control Framework (2025)**
+### **Analysis & Quality Control Framework (2025)**
 
-The project has evolved to include a sophisticated data analysis and improvement system:
+The project has evolved to include a data analysis and improvement system:
 
-*   **`csv_analyzer.py`:** A comprehensive analysis framework that evaluates the entire 610-record archive across 39 fields. This tool provides data quality assessment, content categorization analysis, entity relationship tracking, temporal analysis spanning 32+ years, and AI analysis quality evaluation. It generates both executive summaries and detailed breakdowns for ongoing archive management.
+*   **`csv_analyzer.py`:** An analysis framework that evaluates the entire 610-record archive across 39 fields. This tool provides data quality assessment, content categorization analysis, entity relationship tracking, temporal analysis spanning 32+ years, and AI analysis quality evaluation. It generates both executive summaries and detailed breakdowns for ongoing archive management.
 
 *   **`data_completeness_analyzer.py`:** A specialized gap analysis tool that identifies missing data with a priority scoring system. It categorizes improvements as critical, important, or nice-to-have, analyzes duplicate URLs and processing failures, and provides actionable recommendations for systematic improvements.
 
 *   **`data_completeness_improver.py`:** An automated enhancement system that achieved dramatic improvements in data completeness:
     - **Publisher Data Enhancement:** Improved from 7.9% to 94.3% completeness by intelligently mapping original_publication to publisher fields
-    - **Influence Relationship System:** Built a comprehensive relationship tracking system achieving 21.6% coverage through content mining and pattern recognition
+    - **Influence Relationship System:** Built a relationship tracking system achieving 21.6% coverage through content mining and pattern recognition
     - **Content Relationship Expansion:** Enhanced responds_to relationships to 69.5% and related_to connections to 33.4% through automated content analysis
     - **Series Classification:** Enhanced series identification with pattern matching for major works like "What Are Journalists For?" and "The People Formerly Known as the Audience"
 
@@ -66,26 +66,26 @@ The project has evolved to include a sophisticated data analysis and improvement
 
 ### **Schema Optimization & Workflow Consolidation (October 2025)**
 
-After months of iterative development across multiple versions, the project underwent comprehensive consolidation and optimization:
+After months of iterative development across multiple versions, the project underwent consolidation and optimization:
 
 *   **Workflow Task Completion:** Successfully completed the final tasks (07 & 09) from the 9-task optimization plan:
     - **Cross-Reference Analysis System (`cross_reference_analyzer.py`):** Built intelligent relationship discovery system with dual functionality: multi-factor similarity analysis for thematic connections (`related_to`) and explicit mention detection for discourse mapping (`responds_to` field tracks which archive records directly reference each other)
-    - **Advanced Error Management (`logger.py`, `poison_pill_handler.py`):** Implemented comprehensive logging system with session summaries and sophisticated poison pill detection
+    - **Advanced Error Management (`logger.py`, `poison_pill_handler.py`):** Implemented logging system with session summaries and poison pill detection
 
 *   **Architecture Cleanup:** Systematically consolidated overlapping components by moving 12 legacy files to an `archive/` directory, reducing the active codebase from 42 to ~25 files for improved maintainability and eliminated redundant workflows.
 
-*   **Data Format Modernization:** Created comprehensive format conversion system (`format_converter.py`) transforming CSV strings into structured JSON arrays for frontend compatibility:
+*   **Data Format Modernization:** Created format conversion system (`format_converter.py`) transforming CSV strings into structured JSON arrays for frontend compatibility:
     - Enhanced thematic_categories, key_concepts, tags with proper JSON formatting
     - Upgraded relationship fields (related_to, responds_to) to structured objects with confidence scoring
     - Improved entity tracking with structured entity objects containing names, types, and confidence levels
 
 *   **Schema Enhancement:** Updated schema with 5 new strategic fields (platform, collection_id, permissions, transcript_filepath, verified, notes) and built automated population system (`populate_new_fields.py`) with intelligent domain-based platform detection and permission classification.
 
-*   **Real Data Analysis:** Conducted comprehensive analysis of 598 actual records revealing excellent data quality (96%+ completion for core fields) while identifying strategic optimization opportunities. The `influence` field (currently 0% populated) is specifically designed for future web search operations to track citations and usage of Rosen's concepts in other works, demonstrating the impact of his journalism theory and media criticism on the wider industry.
+*   **Real Data Analysis:** Analyzed 598 actual records, revealing excellent data quality (96%+ completion for core fields) while identifying optimization opportunities. The `influence` field (currently 0% populated) is specifically designed for future web search operations to track citations and usage of Rosen's concepts in other works, demonstrating the impact of his journalism theory and media criticism on the wider industry.
 
 ### **Production-Ready Workflow & Data Quality Resolution (October 2025)**
 
-The final major milestone before launch involved comprehensive user testing and resolution of critical data quality issues:
+The final milestone before launch involved user testing and resolution of data quality issues:
 
 *   **User-Identified Quality Issues:** Live testing revealed four critical problems with the processing pipeline:
     - **Incorrect ID Generation:** System was generating generic HTTPSWWW-00001 IDs instead of publication-based prefixes (CJR-00001, NATION-00001)
@@ -94,10 +94,10 @@ The final major milestone before launch involved comprehensive user testing and 
     - **Date Format Inconsistency:** Dates not standardized to requested MM/DD/YYYY format
     - **PDF Accessibility Problems:** Generated PDFs appearing as single blocks of text without paragraph breaks or formatting
 
-*   **Comprehensive Quality Resolution:** Implemented systematic fixes addressing each identified issue:
+*   **Quality Resolution:** Implemented fixes addressing each identified issue:
     - **Publication-Based ID System:** Complete rewrite of ID generation with domain-to-publication mapping (www.cjr.org → Columbia Journalism Review → CJR-00001) ensuring accurate attribution across all major publications
     - **Enhanced Author Extraction:** Multi-strategy author detection including domain-specific logic (pressthink.org → Jay Rosen), byline pattern matching, and content analysis
-    - **Real Content Scraping:** Built robust content extraction system with proper text cleaning, meaningful excerpt generation, and pull quote extraction from actual article content
+    - **Real Content Scraping:** Built content extraction system with proper text cleaning, meaningful excerpt generation, and pull quote extraction from actual article content
     - **Date Format Standardization:** Universal MM/DD/YYYY converter handling multiple input formats (YYYY-MM-DD, MM/DD/YYYY, YYYY-MM-DD HH:MM:SS)
 
 *   **Enhanced PDF Generation System:** Complete overhaul of PDF formatting addressing accessibility and usability concerns:
@@ -106,45 +106,45 @@ The final major milestone before launch involved comprehensive user testing and 
     - **WCAG Accessibility Compliance:** Document structure, readable fonts, adequate spacing, and hierarchical organization meeting accessibility standards
     - **Fallback Integration:** New formatter as primary with automatic degradation to basic generator for reliability
 
-*   **Production Deployment System:** Built comprehensive bulk processing system for final archive creation:
+*   **Production Deployment System:** Built bulk processing system for final archive creation:
     - **Bulk Reprocessor (`bulk_reprocessor.py`):** Complete pipeline capable of processing all 601 URLs with corrected workflow
     - **Source Sheet Status Tracking:** Automated updates to "urls_to_scrape" sheet with processing timestamps and notes (columns C & D)
-    - **Batch Processing with Error Handling:** Processes URLs in batches of 10 with comprehensive error logging and progress tracking
+    - **Batch Processing with Error Handling:** Processes URLs in batches of 10 with error logging and progress tracking
     - **Final Sheet Creation:** Automated creation of "final" tab in Google Sheets containing clean, corrected dataset ready for frontend integration
 
-*   **Production Readiness Verification:** Comprehensive testing confirming all corrections working properly:
+*   **Production Readiness Verification:** Testing confirmed all corrections working properly:
     - ID generation producing correct publication prefixes across all major domains
     - Date formatting successfully converting all common formats to MM/DD/YYYY
     - Enhanced PDF formatter generating properly structured, accessible documents
     - Content extraction producing meaningful excerpts and pull quotes from real article text
     - Bulk processing system ready for full 601-URL production run with expected 2-3 hour completion time
 
-This phase represents the transition from development to production readiness, with all user-identified issues resolved and a comprehensive deployment system in place for creating the final, clean dataset that will power the public archive.
+This phase represents the transition from development to production readiness, with all user-identified issues resolved and a deployment system in place for creating the final, clean dataset that will power the public archive.
 
 ### **Full Production Deployment Completion (October 2025)**
 
 The final milestone was achieved with successful completion of the full production run:
 
 *   **Complete Dataset Creation:** Successfully processed all 765 URLs from the "urls_to_scrape" tab using the incremental bulk processing system, creating a complete, clean dataset in the "final" tab of the Google Sheet.
-*   **Publication Date Resolution:** Addressed critical missing publication date issue (100% empty) by developing and deploying comprehensive date extraction systems:
+*   **Publication Date Resolution:** Addressed critical missing publication date issue (100% empty) by developing date extraction systems:
     - `scripts/backfill/simple_date_backfill.py`: Extracted 680 dates (93.8% success) from URL patterns, particularly effective for PressThink URLs with embedded date structures (/YYYY/MM/DD/ format)
     - `scripts/backfill/enhanced_date_backfill.py`: Advanced metadata extraction from OpenGraph tags, RSS feeds, JSON-LD structured data, and video platform APIs, successfully extracting 144 additional dates (75% of remaining empty dates), including perfect YouTube video publication date extraction
 *   **Incremental Processing Architecture:** Successfully implemented safer incremental writing approach that writes each batch of 10 processed URLs to the final sheet immediately, eliminating the risk of data loss and enabling real-time progress monitoring.
-*   **Production-Grade Error Handling:** Resolved Unicode encoding issues and Google Sheets cell size limits (50K character truncation) ensuring robust processing of large content fields without failures.
-*   **Quality Metrics:** Achieved 100% processing completion rate with proper publication-based ID generation (PRESSTH-00001, ARCHIVEP-00001, etc.), enhanced PDF creation, and comprehensive source sheet status tracking.
+*   **Production-Grade Error Handling:** Resolved Unicode encoding issues and Google Sheets cell size limits (50K character truncation) ensuring reliable processing of large content fields without failures.
+*   **Quality Metrics:** Achieved 100% processing completion rate with proper publication-based ID generation (PRESSTH-00001, ARCHIVEP-00001, etc.), enhanced PDF creation, and source sheet status tracking.
 
-The Jay Rosen Digital Archive now contains a complete, production-ready dataset of 765 processed records with 97% publication date coverage (824 successful extractions), enhanced PDFs with professional formatting, and comprehensive metadata analysis, ready for frontend integration and public launch.
+The Jay Rosen Digital Archive now contains a complete, production-ready dataset of 765 processed records with 97% publication date coverage (824 successful extractions), enhanced PDFs with professional formatting, and full metadata analysis, ready for frontend integration and public launch.
 
 ### **Key Concepts Analysis System (October 2025)**
 
-A critical enhancement to the archive's semantic richness was the development of a comprehensive key concepts analysis system:
+A key enhancement to the archive's semantic richness was the development of a key concepts analysis system:
 
 *   **Schema Expansion & Authority Weighting:** The key concepts taxonomy was expanded from 8 to 13 Jay Rosen journalism concepts through a two-phase approach:
     - **Data Analysis Phase:** Analysis of 601 rows revealed 90 unique concepts (inconsistent!), leading to the addition of "Horse-race journalism" and "False balance" based on frequency in existing data
     - **HIGH AUTHORITY Phase:** Direct review of Jay Rosen's own notes on his themes and clusters led to adding "The Citizens' Agenda," "Not the odds but the stakes," and "Mindcasting" - concepts Jay himself identifies as important in his work
     - **Authority Weighting Principle:** Jay Rosen's identified concepts > Data analysis patterns, ensuring the schema reflects his actual body of work
 
-*   **Production Processing System (`key_concepts_updater.py`):** Built comprehensive AI-powered analysis system with three intelligent processing modes:
+*   **Production Processing System (`key_concepts_updater.py`):** Built AI-powered analysis system with three processing modes:
     - Empty key_concepts field → AI fills with identified concepts from the 13-concept schema
     - Existing key_concepts data → Provides concise recommendations ("N/A" or exact comma-separated list ready for copy/paste)
     - No raw text → Explanatory note documenting why the row was skipped
@@ -159,11 +159,11 @@ A critical enhancement to the archive's semantic richness was the development of
 
 *   **Data Quality Transformation:** Before improvements, the system had 90 unique concepts with capitalization inconsistencies and non-schema concepts appearing. After improvements, strict enforcement of 13 schema concepts with case-insensitive normalization eliminated the chaos and created consistent, meaningful categorization.
 
-This enhancement represents a significant improvement in the archive's research value, enabling more sophisticated analysis of Jay Rosen's journalism criticism themes while ensuring the taxonomy reflects his own identification of his important conceptual contributions to the field.
+This improvement increases the archive's research value by allowing better analysis of Jay Rosen's journalism criticism themes while ensuring the taxonomy reflects his own identification of his important conceptual contributions.
 
 ### **Smart Data Corrector: From Theory to Production (October 2025)**
 
-After developing the comprehensive Smart Data Corrector system with its sophisticated cost optimization and intelligent caching strategies, the next critical step was production validation: testing the system on real archive data to ensure it could handle the messy, unpredictable nature of actual content.
+After developing the Smart Data Corrector system with its cost optimization and caching strategies, the next step was production validation: testing the system on real archive data to ensure it could handle the messy, unpredictable nature of actual content.
 
 #### **The Testing Phase: Confronting Reality**
 
@@ -187,7 +187,7 @@ This was the most dramatic discovery. Rows 31-38 (7 YouTube videos) revealed tha
 
 Investigation revealed the root cause: the youtube-transcript-api library had updated to version 1.2.3, changing from class methods to instance methods and introducing new FetchedTranscript and FetchedTranscriptSnippet object types. The YouTube processor code was using the old API, leading to improper text extraction that preserved all the repetition and metadata.
 
-The fix required a comprehensive overhaul of the YouTube processor, including:
+The fix required an overhaul of the YouTube processor, including:
 - Migration to the new API pattern (creating YouTubeTranscriptApi instances)
 - Development of an advanced deduplication algorithm that detects and removes 3x consecutive word/phrase repetitions
 - Metadata line filtering to remove "Kind:", "Language:", and similar format strings
@@ -213,7 +213,7 @@ Row 42 exhibited a peculiar behavior: the quality validator returned a score of 
 
 #### **Systematic Documentation: The Edge Case Library**
 
-Rather than treating these edge cases as isolated bugs to patch, the project took a systematic approach. The comprehensive `EDGE_CASES_AND_SOLUTIONS.md` document (490+ lines) was created, serving as an encyclopedia of edge case knowledge:
+Rather than treating these edge cases as isolated bugs to patch, we took a systematic approach. The `EDGE_CASES_AND_SOLUTIONS.md` document (490+ lines) was created, serving as an encyclopedia of edge case knowledge:
 
 - **Detailed Analysis:** Each edge case type is thoroughly documented with real examples, root cause analysis, and frequency estimates
 - **Multiple Solutions:** For each edge case, the document presents multiple solution approaches with code examples, cost/benefit analysis, and recommendations
@@ -238,14 +238,14 @@ The testing phase transformed the Smart Data Corrector from a theoretical system
 
 **System Robustness:**
 - Before testing: Theoretical capability with unknown edge cases
-- After testing: Production-ready system with comprehensive edge case framework and documented solutions
+- After testing: Production-ready system with edge case framework and documented solutions
 
 **Edge Case Resolution:**
 - All 6 edge case types identified, analyzed, and systematically addressed
 - Reusable fix scripts created (`fix_youtube_rows.py`, `fix_remaining_edge_cases.py`)
-- Comprehensive documentation ensuring institutional knowledge preservation
+- Documentation ensuring institutional knowledge preservation
 
-The testing phase proved that encountering edge cases isn't failure—it's the essential process of hardening a system for production use. Every edge case discovered and resolved makes the Smart Data Corrector more robust and capable of handling the messy reality of digital archival work. The system is now ready for deployment on the full 629-row dataset, armed with proven strategies for handling whatever challenges the data presents.
+Encountering edge cases hardens a system for production use. The Smart Data Corrector is now ready for deployment on the full 629-row dataset with proven strategies for handling whatever challenges the data presents.
 
 ## **Frontend Enhancements (October 2025)**
 - Modularised the main explorer (`frontend/main/`) with ES modules, design tokens, and archived the previous single-file build for historical reference.
@@ -257,7 +257,7 @@ The testing phase proved that encountering edge cases isn't failure—it's the e
 
 Building this system involved overcoming several significant technical hurdles:
 
-* **The Scraping Arms Race**: The biggest ongoing challenge is web scraping. Many major news sites use sophisticated anti-bot detection that can identify and block even advanced tools like Playwright. This resulted in frequent net::ERR\_HTTP2\_PROTOCOL\_ERROR and timeout errors. The solution was to implement the "scraping cascade" and integrate the playwright-stealth library to make the automated browser behave more like a human user. In August 2025, the integration of Google's URL Context tool as the first stage of the cascade provided a significant breakthrough, allowing the system to leverage Google's infrastructure for content retrieval and bypass many anti-bot measures entirely. This remains an evolving area of development.  
+* **The Scraping Arms Race**: The biggest ongoing challenge is web scraping. Many major news sites use anti-bot detection that can identify and block even advanced tools like Playwright. This resulted in frequent net::ERR\_HTTP2\_PROTOCOL\_ERROR and timeout errors. The solution was to implement the "scraping cascade" and integrate the playwright-stealth library to make the automated browser behave more like a human user. In August 2025, the integration of Google's URL Context tool as the first stage of the cascade provided a significant breakthrough, allowing the system to leverage Google's infrastructure for content retrieval and bypass many anti-bot measures entirely. This remains an evolving area of development.  
 * **API Rate Limiting**: During batch processing, the application made too many requests to the Google Sheets API in a short time, causing 429 RESOURCE\_EXHAUSTED errors. The initial, inefficient approach of checking for duplicate IDs by reading from the sheet for every single URL was the primary culprit. This was solved by refactoring the code to read all existing IDs into an in-memory set at the start of the script, dramatically reducing API calls.  
 * **Silent Failures and Debugging**: Early in development, the main Python script would often fail silently without any error messages. This required a deep-dive debugging session involving adding print statements, running the script with verbose flags, and finally discovering the root causes: a critical NameError from a bad refactor and, in another instance, an invalid API key caused by using curly quotes (”) instead of straight quotes (") in the .env file.  
 * **Architectural Pivot**: The project was initially designed with a disconnect between a backend that wrote to Google Sheets and a frontend that was intended to use a separate database (Supabase). Recognizing the long-term costs and complexity, a deliberate decision was made to pivot. The architecture was redesigned to use Google Sheets as the single source of truth, with a new, secure Google Cloud Function acting as the API layer between the frontend and the data.  
@@ -275,7 +275,7 @@ The goal is to make the archive publicly available by the end of September 2025\
 ### **Key Features of the Public Frontend**
 
 * **Public-Facing Website**: The current dashboard is for curation, but a polished, read-only, public-facing website has been developed to present the archive to the world.  
-* **Full-Text Search**: The next major step is to implement a more robust search engine (likely using a tool like Elasticsearch or a cloud-based search service) to allow users to perform full-text searches across the entire archive of articles and transcripts.  
+* **Full-Text Search**: The next step is to implement a better search engine (likely Elasticsearch or a cloud-based search service) to allow users to perform full-text searches across the entire archive of articles and transcripts.  
 * **Data Visualization**: A planned feature is a dedicated section on the public site with data visualizations, such as a timeline of publications, a map of key concepts, or a network graph of influential figures mentioned in the work.  
 * **Citation Tools**: Another planned feature is the integration of tools to allow researchers and students to easily export citations for archived items in common academic formats (MLA, APA, Chicago).
 
@@ -291,16 +291,16 @@ The goal is to make the archive publicly available by the end of September 2025\
 * Rebuilt the internal relationship explorer (`web/int/`) with a sticky header, collapsible colour key, and responsive control chips that mirror the public-facing aesthetic.
 * Split explorer assets into `assets/css/data-explorer.css` and `assets/js/data-explorer.js`, simplifying future maintenance while preserving the existing canvas interaction model.
 * Upgraded PNG exports so each snapshot clones the canvas, adds a caption band, and prints the primary record’s title/ID for context.
-* Added an “Influence” route to the web shell leveraging `assets/js/content/influence.js`, `data/dataStore.js`, `data/archiveIndex.js`, and `search/searchIndex.js` to present concept narratives and archived provenance.
+* Added an "Influence" route to the web shell using `assets/js/content/influence.js`, `data/dataStore.js`, `data/archiveIndex.js`, and `search/searchIndex.js` to present concept narratives and archived provenance.
 * Logged the session in `web/int/CHANGELOG-2025-10-15.md` to provide timestamped checkpoints for future collaborators.
 
 ### **Entity Extraction & Knowledge Graph Infrastructure (October 2025)**
 
-One of the most transformative phases of the project was the development and deployment of a comprehensive entity extraction system that converts the archive from a flat collection of records into a rich, interconnected knowledge graph.
+A major phase of the project was the development and deployment of an entity extraction system that converts the archive from a flat collection of records into an interconnected knowledge graph.
 
 #### **The Challenge: From Records to Relationships**
 
-While the archive contained 480 processed records with detailed content and AI-powered analysis, the data structure remained fundamentally flat. Each record existed in isolation with no systematic way to answer questions like:
+While the archive contained 480 processed records with detailed content and AI-powered analysis, the data structure remained flat. Each record existed in isolation with no systematic way to answer questions like:
 
 - What are all the articles where Jay Rosen discusses *The New York Times*?
 - Which people and organizations appear together most frequently?
@@ -338,14 +338,14 @@ The full-scale entity extraction batch processor was run over approximately 8 ho
   - 5% Events (conferences, media events)
   - 4% Locations (cities, countries)
 
-The batch processor featured comprehensive progress tracking with JSON state files saved every 5 records, enabling graceful resumption after any interruption. Built-in validation detected invalid relationship types and logged them for review, ensuring data quality throughout the extraction process.
+The batch processor featured progress tracking with JSON state files saved every 5 records, enabling graceful resumption after any interruption. Built-in validation detected invalid relationship types and logged them for review, ensuring data quality throughout the extraction process.
 
 #### **Data Structure: Entities and Relationships**
 
 The extracted data is organized into two complementary Google Sheets tabs:
 
 **`extracted_entities` Tab:**
-Each entity receives a comprehensive profile including:
+Each entity receives a profile including:
 - `entity_id`: Canonical identifier (P-00052, O-00032, etc.)
 - `entity_type`: Person, Organization, Concept, Work, Event, or Location
 - `entity_name`: Display name
@@ -373,7 +373,7 @@ This dual-sheet structure enables both entity-centric queries ("Show me everythi
 
 #### **Verification and Quality Assurance**
 
-A comprehensive verification script (`verify_extraction_sheets.py`) was developed to validate the extraction results. The verification confirmed:
+A verification script (`verify_extraction_sheets.py`) was developed to validate the extraction results. The verification confirmed:
 - Both Google Sheets tabs properly populated with data
 - Entity type distribution showing expected patterns
 - Relationship type diversity across multiple categories
@@ -384,7 +384,7 @@ A minor discrepancy was noted between the sheet row counts (4,477 entities, 5,08
 
 #### **Visualization System Planning: Making the Graph Accessible**
 
-With the knowledge graph infrastructure complete, the next phase focused on designing systems to make this data accessible to researchers, students, and the general public. Extensive research into modern archive explorer interfaces informed the creation of five comprehensive Product Requirements Documents (PRDs):
+With the knowledge graph infrastructure complete, the next phase focused on designing systems to make this data accessible to researchers, students, and the general public. Research into modern archive explorer interfaces informed the creation of five Product Requirements Documents (PRDs):
 
 **1. Interactive Network Graph Explorer**
 - D3.js force-directed visualization showing the full entity relationship network
@@ -416,7 +416,7 @@ With the knowledge graph infrastructure complete, the next phase focused on desi
 - Tracks how ideas evolved through response and critique over years
 - Citation network analysis for scholarly research
 
-Each PRD includes detailed technical specifications, implementation timelines (5-10 weeks per system), success metrics, accessibility requirements (WCAG 2.1 AA compliance), and cross-system integration hooks. The five systems are designed to work together seamlessly, sharing a common data format (JSON exports from Google Sheets), unified design system with consistent entity type colors, and common interaction patterns.
+Each PRD includes technical specifications, implementation timelines (5-10 weeks per system), success metrics, accessibility requirements (WCAG 2.1 AA compliance), and cross-system integration hooks. The five systems are designed to work together, sharing a common data format (JSON exports from Google Sheets), unified design system with consistent entity type colors, and common interaction patterns.
 
 The recommended implementation priority spans three phases:
 - **Phase 1 (3-4 months):** Entity-Centric Explorer + Timeline Explorer (immediate research value)
@@ -425,15 +425,15 @@ The recommended implementation priority spans three phases:
 
 #### **Impact and Future Direction**
 
-This milestone fundamentally transforms the archive's research capabilities. What was previously a searchable collection of records has become a rich knowledge graph enabling:
+This milestone changes the archive's research capabilities. What was previously a searchable collection of records has become a knowledge graph enabling:
 
-- **Scholarly Research:** Comprehensive bibliographies for dissertation research on specific entities
+- **Scholarly Research:** Bibliographies for dissertation research on specific entities
 - **Discovery:** Visual exploration revealing unexpected connections between concepts and institutions
 - **Temporal Analysis:** Understanding how Jay Rosen's discussions evolved across 32+ years
 - **Network Analysis:** Mapping the discourse structure of journalism criticism
 - **Citation Tracking:** Building influence maps showing idea propagation
 
-The 4,724 entities and 5,455 relationships provide the foundation for sophisticated visualization and navigation systems that will serve journalism students, media studies scholars, and researchers investigating the evolution of journalism criticism in the digital age.
+The 4,724 entities and 5,455 relationships provide the foundation for visualization and navigation systems that will serve journalism students, media studies scholars, and researchers investigating the evolution of journalism criticism in the digital age.
 
 The Entity Registry architecture and batch processing system are now production-proven and can be extended to:
 - Re-process records as the archive grows
@@ -445,11 +445,11 @@ This marks a conceptual shift: from preserving individual works to mapping the i
 
 ### **RStudio Analysis & Visualization System (November 2025)**
 
-With the knowledge graph infrastructure complete and containing 5,160 entities and 7,499 relationships extracted from 534 processed records, the next phase focused on creating sophisticated research and visualization tools to make this rich data accessible to scholars, journalists, and researchers.
+With the knowledge graph infrastructure complete and containing 5,160 entities and 7,499 relationships extracted from 534 processed records, the next phase focused on creating research and visualization tools to make this data accessible to scholars, journalists, and researchers.
 
 #### **The Challenge: Making the Knowledge Graph Research-Ready**
 
-While the extracted entities and relationships data existed in Google Sheets, there was no comprehensive system for analyzing patterns, identifying trends, or visualizing the intellectual network Jay Rosen's work represents. Key research questions remained unanswered:
+While the extracted entities and relationships data existed in Google Sheets, there was no system for analyzing patterns, identifying trends, or visualizing the intellectual network Jay Rosen's work represents. Key research questions remained unanswered:
 
 - What concepts did Jay Rosen pioneer and how widely were they adopted?
 - What is his relationship with media organizations—is he primarily a critic or a builder?
@@ -458,7 +458,7 @@ While the extracted entities and relationships data existed in Google Sheets, th
 
 #### **The RStudio Solution: R-Based Statistical Analysis**
 
-The solution was to develop a comprehensive suite of R scripts using RStudio, leveraging R's powerful data analysis and visualization capabilities. The system was designed to be accessible to researchers with varying levels of technical expertise, from copy-paste commands for beginners to customizable analysis scripts for advanced users.
+The solution was to develop a suite of R scripts using RStudio, using R's data analysis and visualization capabilities. The system was designed to be accessible to researchers with varying levels of technical expertise, from copy-paste commands for beginners to customizable analysis scripts for advanced users.
 
 **Core Infrastructure:**
 - **Google Sheets Integration:** Direct data access via `googlesheets4` package with OAuth2 authentication
@@ -477,7 +477,7 @@ RStudio/
 
 #### **Four Specialized Analysis Systems**
 
-The project developed four comprehensive analysis scripts, each targeting specific research questions:
+The project developed four analysis scripts, each targeting specific research questions:
 
 **1. Jay Rosen Concept Map Analysis (`jay_rosen_concept_map.R`)**
 - Maps the 8 concepts Jay Rosen pioneered
@@ -513,7 +513,7 @@ The project developed four comprehensive analysis scripts, each targeting specif
 
 #### **Research Outputs: Publication-Quality Materials**
 
-The analysis system generates comprehensive research outputs:
+The analysis system generates research outputs:
 
 **21 PNG Visualizations (300 DPI):**
 - Concept prominence rankings and adoption patterns
@@ -526,7 +526,7 @@ The analysis system generates comprehensive research outputs:
 **1 CSV Data Export:**
 - `paradigm_comparison_table.csv` - Quantitative paradigm analysis ready for statistical software
 
-**Comprehensive Documentation:**
+**Documentation:**
 - `OUTPUT_REVIEW.md` (400+ lines) - Detailed findings analysis
 - `SPECIALIZED_ANALYSES.md` (17 sections) - Complete technical documentation
 - `RSTUDIO_BEGINNER_GUIDE.md` - Step-by-step tutorials for new users
@@ -535,7 +535,7 @@ The analysis system generates comprehensive research outputs:
 
 #### **Major Discoveries from Data Analysis**
 
-The RStudio analyses revealed five transformative insights about Jay Rosen's intellectual contributions:
+The RStudio analyses revealed five insights about Jay Rosen's intellectual contributions:
 
 **1. Builder-Critic Profile**
 - Founded many organizations and projects
@@ -646,7 +646,7 @@ The RStudio system provides a foundation for additional analyses:
 
 #### **Documentation and Knowledge Preservation**
 
-The RStudio work is comprehensively documented across multiple files:
+The RStudio work is documented across multiple files:
 
 **Project History:**
 - `narrative/PROJECT_LOG.md` - Entry [2.16.0] (400+ lines documenting implementation)
@@ -665,7 +665,7 @@ The RStudio work is comprehensively documented across multiple files:
 
 #### **Impact on the Jay Rosen Digital Archive**
 
-The RStudio analysis system represents a major milestone in the archive's evolution from a content preservation project to a comprehensive research platform:
+The RStudio analysis system marks a milestone in the archive's evolution from a content preservation project to a research platform:
 
 **Before RStudio Analysis:**
 - 5,160 entities and 7,499 relationships existed in Google Sheets
@@ -681,7 +681,7 @@ The RStudio analysis system represents a major milestone in the archive's evolut
 - Generated publication-ready visualizations and citation-ready statistics
 - Created reusable analysis infrastructure for ongoing research
 
-The system transforms the archive from a digital preservation project into an active research platform, enabling scholars to generate new insights about journalism criticism, intellectual influence, and the evolution of alternative journalism models. The combination of comprehensive entity extraction, relationship mapping, and sophisticated statistical analysis positions the Jay Rosen Digital Archive as a model for digital humanities research infrastructure.
+The system turns the archive from a digital preservation project into an active research platform, allowing scholars to generate new insights about journalism criticism, intellectual influence, and the evolution of alternative journalism models. The combination of entity extraction, relationship mapping, and statistical analysis positions the Jay Rosen Digital Archive as a model for digital humanities research infrastructure.
 
 ---
 
@@ -693,7 +693,7 @@ A review of statistical claims in the archive documentation revealed a systemati
 
 #### **Problem Identified**
 
-The `media_industry_analysis.R` script was combining two fundamentally different relationship types:
+The `media_industry_analysis.R` script was combining two different relationship types:
 
 - **"Founded By"** - Organization was founded by person (institutional action)
 - **"Pioneered"** - Person was first to develop concept (intellectual contribution)
