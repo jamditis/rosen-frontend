@@ -15,10 +15,11 @@ This monorepo contains:
 |-----------|-------------|
 | **`/frontend`** | Zero-build React application (React, HTM, Tailwind via CDN) |
 | **`/features`** | Standalone feature tools (comparison-tool, glossary, timeline, etc.) |
-| **`/data`** | Archive data files (JSON, CSV exports) |
+| **`/labs`** | Experimental features (dissertation launch site, 3D concept sphere) |
+| **`/data`** | Archive data files (CSV sources, generated JSON) |
 | **`/backend`** | Python data pipeline for scraping, AI analysis, and archiving |
 | **`/dissertation`** | Full dissertation PDFs (stored via Git LFS) and transcribed markdown |
-| **`/tools`** | Development tools (dataexplorer, dataviz) and analysis scripts |
+| **`/tools`** | Development tools (dataexplorer, dataviz) and RStudio analysis scripts |
 | **`/archived`** | Legacy code and archived features for reference |
 | **`/docs`** | Documentation, agent personas, and project narrative |
 | **`/release-assets`** | Promotional materials and release documentation |
@@ -41,6 +42,29 @@ The frontend uses a **zero-build static architecture** designed for simple deplo
 *   WordPress compatible. Can be deployed to any WordPress domain by uploading to a subdirectory.
 *   Universal hosting. Works on any static web host.
 
+#### Frontend Data Flow
+```mermaid
+flowchart TB
+    subgraph "Data Source"
+        A[archive-data.json<br/>~25MB static file]
+    end
+
+    subgraph "Service Layer"
+        A --> B[archiveService.js]
+        B --> C[localStorage Cache<br/>1-hour TTL]
+    end
+
+    subgraph "React Components"
+        B --> D[App.js]
+        D --> E[Sidebar<br/>Filters & Search]
+        D --> F[Timeline<br/>Year Visualization]
+        D --> G[FeaturedSection<br/>Curated Works]
+        D --> H[RecordModal<br/>Detail View]
+        D --> I[Explorer<br/>Network Graph]
+        D --> J[MindMap<br/>Dissertation Tree]
+    end
+```
+
 ### 🌟 Key Features
 
 #### 🗂️ Browsing & Discovery
@@ -53,16 +77,23 @@ The frontend uses a **zero-build static architecture** designed for simple deplo
 *   **Manhattan Routing:** Aesthetic connection paths inspired by subway maps
 *   **Export Capabilities:** Generate and download high-resolution PNG cards
 
-#### 📜 Dissertation Presentation Tools (9 Tools)
-*   **Interactive Mind Map:** Left-to-right tree visualization with auto-fit zooming, keyboard navigation, and touch support (in main archive)
-*   **Network Explorer:** Canvas-based visualization of relationships between archive records (in main archive)
+#### 📜 Dissertation Presentation Tools (8 in `/features/`)
 *   **"Then and Now" Comparison Tool:** 7 side-by-side 1986 vs 2025 comparisons (`/features/comparison-tool/`)
 *   **Glossary:** 16 key concepts with definitions and contemporary relevance (`/features/glossary/`)
 *   **1986 in Journalism:** Historical context—the media landscape when the dissertation was written (`/features/context-1986/`)
 *   **Timeline:** 14 entries tracking intellectual evolution from 1986 to 2025 (`/features/timeline/`)
 *   **Annotated Excerpts:** 12 key passages with 2025 commentary (`/features/annotated-excerpts/`)
 *   **FAQ / Ask the Dissertation:** 46 Q&A pairs, searchable, with NotebookLM integration (`/features/faq/`)
-*   **Dissertation Reader:** Landing page with PDF download, table of contents, citation info (`/features/dissertation-reader/`)
+*   **Dissertation Reader:** Full text reader with selection sharing and quote image generation (`/features/dissertation-reader/`)
+*   **Network Effect:** Entity relationship visualization for the archive (`/features/network-effect/`)
+
+#### 🚀 Dissertation Launch Site (`/labs/dissertation-launch/`)
+*   **Landing Page:** Hero section, navigation grid, about section
+*   **3D Concept Sphere:** Three.js force-directed graph with 45+ concepts
+
+#### 🧭 Main Archive Components
+*   **Interactive Mind Map:** Left-to-right tree visualization with auto-fit zooming and keyboard navigation
+*   **Network Explorer:** Canvas-based visualization of relationships between archive records
 
 #### ♿ Accessibility
 *   **Keyboard Navigation:** Full keyboard support (arrow keys, +/-, ESC)
@@ -83,18 +114,68 @@ Located in `/backend`, the Python pipeline automatically fetches, processes, and
 - **Data Management:** Google Sheets integration for storage and tracking
 
 ### Architecture
+
+#### Content Processing Pipeline
 ```mermaid
-graph LR
-    A[Google Sheets] -->|URLs| B(Workflow Orchestrator)
-    B --> C{Dispatcher}
-    C -->|Article| D[Article Processor]
-    C -->|Video| E[Video Processor]
-    D --> F[Scraper & Content Extractor]
-    E --> G[YouTube DL & Speech-to-Text]
-    F --> H[Gemini AI Analysis]
-    G --> H
-    H --> I[PDF Generator]
-    I --> J[Results -> Google Sheets]
+flowchart TB
+    subgraph Input
+        A[Google Sheets<br/>urls_to_scrape]
+    end
+
+    subgraph Orchestration
+        A -->|Fetch URLs| B[Workflow Orchestrator]
+        B --> C{Content Dispatcher}
+    end
+
+    subgraph Processing
+        C -->|Article| D[Article Processor]
+        C -->|Video| E[Video Processor]
+        C -->|Audio| F[Audio Processor]
+
+        D --> G[Scraping Cascade]
+        G --> G1[URL Context API]
+        G1 -->|Fail| G2[HTTP Fetch]
+        G2 -->|Fail| G3[Playwright Browser]
+
+        E --> H[yt-dlp + Captions]
+        F --> I[Speech-to-Text API]
+    end
+
+    subgraph Analysis
+        G3 --> J[Gemini AI Analysis]
+        H --> J
+        I --> J
+        J --> K[Classification & Summarization]
+    end
+
+    subgraph Output
+        K --> L[PDF Generator]
+        K --> M[Google Sheets<br/>test_runs]
+    end
+```
+
+#### Entity Extraction Pipeline
+```mermaid
+flowchart LR
+    subgraph Source
+        A[Archive Records<br/>~30k records]
+    end
+
+    subgraph Extraction
+        A --> B[Gemini API<br/>Entity Analysis]
+        B --> C[Entity Registry<br/>Deduplication]
+    end
+
+    subgraph "Knowledge Graph"
+        C --> D[(Entities<br/>~5k unique)]
+        C --> E[(Relationships<br/>~16k connections)]
+    end
+
+    subgraph Analysis
+        D --> F[RStudio Scripts]
+        E --> F
+        F --> G[Visualizations<br/>PNG exports]
+    end
 ```
 
 ### Setup
@@ -143,6 +224,10 @@ git lfs install
 git clone https://github.com/jamditis/rosen-frontend.git
 cd rosen-frontend
 
+# (Optional) Regenerate JSON data from CSV sources
+npm install
+npm run export-data
+
 # Start a static server
 python -m http.server 8000
 
@@ -188,11 +273,20 @@ python src/workflow.py
 │   ├── timeline/                # Intellectual evolution timeline
 │   ├── annotated-excerpts/      # Key passages with commentary
 │   ├── faq/                     # FAQ (Ask the Dissertation)
-│   └── dissertation-reader/     # Dissertation PDF viewer
+│   ├── dissertation-reader/     # Full text reader with sharing
+│   └── network-effect/          # Entity relationship visualization
+│
+├── labs/                        # Experimental features
+│   └── dissertation-launch/     # Dissertation launch site
+│       ├── landing-page/        # Main landing page
+│       └── 3d-concepts/         # 3D concept sphere (Three.js)
 │
 ├── data/                        # Archive data files
-│   ├── archive-data.json        # Main archive data
-│   └── *.csv                    # CSV exports
+│   ├── archive-data.json        # Generated JSON for frontend
+│   ├── archive_records-public.csv
+│   ├── social_posts.csv
+│   ├── extracted_entities.csv
+│   └── extracted_relationships.csv
 │
 ├── backend/                     # Python data pipeline
 │   ├── src/                     # Core source code
@@ -207,7 +301,9 @@ python src/workflow.py
 │
 ├── tools/                       # Development & analysis tools
 │   ├── active/                  # Active tools (dataexplorer, dataviz)
-│   └── analysis/                # R scripts and planning docs
+│   └── analysis/
+│       ├── RStudio/             # R analysis scripts and visualizations
+│       └── planning/            # Project planning docs
 │
 ├── archived/                    # Legacy and archived code
 │   ├── archive-v1/              # Original archive version
@@ -236,7 +332,49 @@ python src/workflow.py
 
 ## 📊 Data Management
 
-The frontend content is populated via CSV exports from Google Sheets.
+### Data Architecture
+
+The frontend loads pre-processed static JSON rather than fetching from Google Sheets at runtime:
+
+```mermaid
+flowchart LR
+    subgraph Curation
+        A[Google Sheets] -->|Human editing| B[Archive Records]
+    end
+
+    subgraph "Version Control"
+        B -->|CSV Export| C[/data/*.csv/]
+    end
+
+    subgraph Build
+        C -->|npm run export-data| D[archive-data.json]
+    end
+
+    subgraph Deployment
+        D -->|FTP Upload| E[WordPress Server]
+        E --> F[Static Frontend]
+    end
+```
+
+**Workflow:**
+1. **Curate** content in Google Sheets
+2. **Export** CSV files to `/data/` directory
+3. **Generate** JSON: `npm run export-data`
+4. **Deploy** `archive-data.json` to WordPress via FTP
+
+**Performance:** ~100-200ms load time (vs. 800-1500ms from Google Sheets API)
+
+### Data Files
+
+| File | Description |
+|------|-------------|
+| `archive_records-public.csv` | Main archive records |
+| `social_posts.csv` | Bluesky and Twitter posts |
+| `extracted_entities.csv` | Named entities (~5k) |
+| `extracted_relationships.csv` | Entity relationships |
+| `archive-data.json` | Generated file for frontend (~25MB) |
+
+### Record Schema
 
 | Column Header | Description |
 |---------------|-------------|
@@ -284,12 +422,14 @@ All workflows run automatically on pull requests to ensure code quality.
 ## 🛠️ Deployment
 
 ### Frontend (Static Hosting)
-1. Upload `index.html`, `shared-styles.css`, and `favicon.ico` from root
-2. Upload entire `frontend/` directory
-3. Upload entire `features/` directory
-4. Upload `data/` directory with archive data
-5. For WordPress: upload to a subdirectory via FTP
-6. Ensure server serves `.js` with MIME type `application/javascript`
+1. Generate fresh data: `npm run export-data`
+2. Upload `index.html`, `shared-styles.css`, and `favicon.ico` from root
+3. Upload entire `frontend/` directory
+4. Upload entire `features/` directory
+5. Upload entire `labs/` directory
+6. Upload `data/archive-data.json` to `/wp-content/rosen-archive/data/`
+7. For WordPress: upload to `/wp-content/rosen-archive/` via FTP
+8. Ensure server serves `.js` with MIME type `application/javascript`
 
 ### Backend (Server)
 1. Set up Python 3.10+ environment with Poetry

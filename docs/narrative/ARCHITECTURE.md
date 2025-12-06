@@ -4,11 +4,29 @@ This document provides a detailed overview of the technical architecture of the 
 
 ## High-Level Overview
 
-The project is a Python-based data pipeline designed to automate the archiving of digital content. The system reads URLs from Google Sheets, processes the content, and writes results back to the sheets.
+The project consists of three main components:
+
+1. **Backend Pipeline**: Python-based system for scraping, processing, and analyzing content
+2. **Data Layer**: CSV files exported from Google Sheets, converted to JSON for deployment
+3. **Frontend**: Zero-build React application loading static JSON data
 
 ```
-[ Google Sheet ] <--> [ Backend Pipeline ]
+[ Google Sheets ] --> [ CSV Export ] --> [ JSON Generation ] --> [ Static Frontend ]
+      (curation)        (version control)    (build step)         (deployment)
+                              ↓
+                    [ Backend Pipeline ]
+                    (scraping, AI analysis)
 ```
+
+### Data Architecture (December 2025)
+
+The frontend loads data from static JSON files rather than fetching from Google Sheets at runtime:
+
+- **Source of truth**: Google Sheets (for human curation)
+- **Version control**: CSV files in `/data/` directory
+- **Build step**: `npm run export-data` generates `archive-data.json`
+- **Deployment**: Static JSON uploaded to WordPress via FTP
+- **Performance**: ~100-200ms load time (vs. 800-1500ms from Google Sheets API)
 
 ## 1. Backend Data Pipeline
 
@@ -559,15 +577,46 @@ source("scripts/SUPPRESS_WARNINGS.R")  # Suppress many-to-many join warnings
 
 This RStudio analysis system transforms the archive from a content preservation project into a comprehensive research platform, enabling scholars to generate quantitative insights about journalism criticism, intellectual influence, and the evolution of alternative journalism models. The combination of entity extraction, relationship mapping, and sophisticated statistical analysis positions the Jay Rosen Digital Archive as a model for digital humanities research infrastructure.
 
-## Frontend Presentation Layer (2025-10-13 Update)
+## Frontend Presentation Layer (December 2025)
 
-- **Primary Explorer (`frontend/main/`)**
-  - Modular ES module architecture (`index.html`, `assets/css`, `assets/js`) replaces the legacy single-file prototype now archived under `frontend/main/legacy/`.
-  - Record detail modal mirrors the legacy experience: metadata grid, pull quote/excerpt, YouTube embed for video records, related/responds chips, influence/resource links, notes.
-  - CSV normalisation covers the full archive schema, enabling accurate display of publication, platform, verification, and relationship fields.
-  - Data pipeline: published Google Sheet CSV (primary) → automatic fallback to `sample-data.csv` (first 25 rows of `RosenArchivedataset-TEST-DATA.csv`) for offline work.
-- **Relationship Explorer (`frontend/dataexplorer/`)**
-  - Canvas-based grid that now shares the same remote→local fallback (uses `RosenArchivedataset-TEST-DATA.csv` when the Google Sheet is unavailable).
-- **Shared Guidance**
-  - All prototypes should be served via a static server (`python -m http.server`) to avoid CORS restrictions on ES modules.
-  - Design tokens and reusable chip/filter patterns keep styling consistent across explorer variants.
+### Data Loading Architecture
+
+The frontend loads data from static JSON files deployed to WordPress:
+
+```
+/wp-content/rosen-archive/data/archive-data.json
+    ↓
+frontend/services/archiveService.js
+    ↓
+React components
+```
+
+**Data Source**: Pre-generated JSON file (~25MB) containing:
+- Archive records (~30k including social posts)
+- Named entities (~5k)
+- Facets for filtering
+- Autocomplete index
+
+**Fallback**: Local sample data for offline development
+
+### Frontend Components
+
+- **Primary Explorer (`frontend/`)**
+  - Zero-build React application using HTM for JSX-like syntax
+  - ES modules loaded via CDN (React, Tailwind, PapaParse, Lucide)
+  - Modular architecture with components in `frontend/components/`
+  - Data service in `frontend/services/archiveService.js`
+
+- **Dissertation Features (`features/`)**
+  - Standalone tools: reader, glossary, timeline, FAQ, comparisons
+  - Each feature is self-contained with its own HTML/CSS/JS
+
+- **Launch Site (`labs/dissertation-launch/`)**
+  - Landing page with hero and navigation
+  - 3D concept sphere using Three.js
+
+### Shared Guidance
+
+- Serve via static server (`python -m http.server`) for local development
+- All paths configured for WordPress deployment at `/wp-content/rosen-archive/`
+- Design tokens ensure consistent styling across components
