@@ -1,15 +1,11 @@
 # Jay Rosen Digital Archive (JRDA)
-
-[![Frontend Validation](https://github.com/jamditis/rosen-frontend/actions/workflows/frontend-validation.yml/badge.svg)](https://github.com/jamditis/rosen-frontend/actions/workflows/frontend-validation.yml)
-[![Backend Tests](https://github.com/jamditis/rosen-frontend/actions/workflows/backend-tests.yml/badge.svg)](https://github.com/jamditis/rosen-frontend/actions/workflows/backend-tests.yml)
+![Archive Preview](https://i.imgur.com/pwU0BYb.png)
 
 **Status: Ready for Publication (December 2025)**
 
 A comprehensive digital archive project for NYU Professor Jay Rosen's work, including an interactive frontend application, a Python-based data pipeline for content processing, and supporting tools for analysis and visualization.
 
 This archive includes the public release of Jay Rosen's 1986 doctoral dissertation, *The Impossible Press: American Journalism and the Decline of Public Life*, with 9 interactive presentation tools for exploring the dissertation and its contemporary relevance.
-
-![Archive Preview](https://i.imgur.com/pwU0BYb.png)
 
 ## 📦 Repository Structure
 
