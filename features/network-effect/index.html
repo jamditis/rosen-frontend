@@ -131,6 +131,82 @@
     .hero-dark {
       background: linear-gradient(180deg, #1c1917 0%, #292524 100%);
     }
+
+    /* Full commentary section */
+    .full-commentary {
+      background: #fafaf9;
+      border: 1px solid #e7e5e4;
+      border-radius: 0.75rem;
+      margin-top: 3rem;
+    }
+
+    .full-commentary summary {
+      padding: 1.25rem 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 500;
+      color: #44403c;
+      list-style: none;
+      transition: background 0.2s ease;
+    }
+
+    .full-commentary summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .full-commentary summary:hover {
+      background: #f5f5f4;
+    }
+
+    .full-commentary[open] summary {
+      border-bottom: 1px solid #e7e5e4;
+    }
+
+    .full-commentary .chevron {
+      transition: transform 0.2s ease;
+    }
+
+    .full-commentary[open] .chevron {
+      transform: rotate(180deg);
+    }
+
+    .full-commentary-content {
+      padding: 2rem;
+    }
+
+    .full-commentary-content p {
+      font-size: 0.95rem;
+      color: #57534e;
+      line-height: 1.9;
+      margin-bottom: 1.5rem;
+    }
+
+    .full-commentary-content p:last-child {
+      margin-bottom: 0;
+    }
+
+    .full-commentary-content a {
+      color: var(--color-1986);
+      text-decoration: underline;
+    }
+
+    .full-commentary-content a:hover {
+      color: #0369a1;
+    }
+
+    .commentary-author {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e7e5e4;
+      font-size: 0.85rem;
+      color: #78716c;
+    }
+
+    .commentary-author strong {
+      color: #44403c;
+    }
   </style>
 </head>
 
@@ -332,6 +408,32 @@
               &mdash; Samuel Earle (2025)
             </footer>
           </blockquote>
+
+          <!-- Full Commentary -->
+          <details class="full-commentary">
+            <summary>
+              <span>Read Samuel Earle's Full Commentary</span>
+              <svg class="chevron w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </summary>
+            <div class="full-commentary-content">
+              <p>As we try to make sense of our confounding moment, maybe there is nothing new to say, just new ways of rearranging old ideas. In my own PhD work, I have found myself increasingly drawn to the late 19th century, when there emerged a new discourse about crowds, known as crowd psychology, that bears a striking resemblance to how we think of people online: people in a crowd, they said (with lots of pseudo-scientific jargon), were full of feeling, blind to truth, contagious in their emotions and ideas, unpredictable, intensely partisan and incapable of constructive conversation. How to explain this affinity: is it one of history's rhymes, or one of its rarer repetitions? Given how much we talk about social media in the language of crowds&mdash;online mobs, witch-hunts, pile-ons&mdash;it seems at the very least an analogy worthy of more attention.</p>
+
+              <p>It was therefore with some surprise when, in a chance encounter with Jay Rosen recently, as I fumbled my way through a summary of my dissertation topic, he replied promptly: you should read my PhD thesis. Upon reception, many things immediately marked it out as a dated artefact: the typeface, the typos (sorry, Jay), and the signature of his supervisor, the great Neil Postman. But inside was something more current. The questions young Rosen was trying to answer&mdash;or at least ask&mdash;are similar to those that riddle us today, not only about the role of journalism in society, but about what types of society media technologies make possible. Most interestingly, for my purposes at least, he identified a specific turning point in the history of audiences: the rise of crowd psychology. "In the analysis of the crowd there was also the dim recognition of a great historical change in the making, not so much the rise of a new society&mdash;although it was phrased that way&mdash;but a change in the character of the social bond itself," he wrote. And at the heart of that historical change, Rosen saw, was the rise of a new mass media&mdash;the first mass media: the newspaper.</p>
+
+              <p>Right now, it seems we are living amid another change in the character of the social bond: how we relate to each other, what we want from our media and our journalism, and what they want from us, are undergoing a new historical shift which coincides with the rise of a new mass media. The internet did not necessarily initiate this shift&mdash;even in Rosen's dissertation we see early signs of it&mdash;but it probably gave it a bigger push than anything else. Consider this passage from Rosen, when he considers <em>Network</em> (1976), a movie where, he writes:</p>
+
+              <p>"Peter Finch plays a crazed TV newsman [Howard Beale] who urges his audience to go to the window and shout, 'I'm mad as hell and I'm not going to take it anymore!' As the film shows people from all over a city neighborhood opening their windows and shouting the same thing, a sense of the audience's bulk, its bigness, and the weird para-social connection its members share, comes over the viewer. Note that it is speech that makes palpable the existence of the mass audience; for Finch's followers to begin realizing their strength as a group they have to turn away from the television set and open the windows of their private homes. The space between the buildings where their shouts meet recalls a lost public realm, a space which mass communication has made obsolete."</p>
+
+              <p>The scene can be watched <a href="https://www.youtube.com/watch?v=_RujOFCHsxo" target="_blank" rel="noopener">here</a>. It is hard not to see in this image&mdash;people hurling their anger into a common courtyard, gathered by a talented media entertainer-cum-provocateur, as their shouts reverberate off the walls, and corporate bosses lap up the engagement&mdash;a portent of our present moment. Like Howard Beale, the news anchor, social media has smashed the traditional isolation of audiences that was assumed by newspapers, radio and television, where their collective existence relied on work of the imagination. Like Beale, social media has given people the license to speak, and even the means to be heard. But the speech that follows is not aspirational democratic discussion. What we find is anger and reaction&mdash;the acclamation of crowds&mdash;alongside booming profits for the tech platforms that mediate this new social bond. The situation itself isn't entirely new and, as Rosen's dissertation reminds us, the tools to understand it won't be either.</p>
+
+              <div class="commentary-author">
+                <strong>Samuel Earle</strong><br>
+                PhD Candidate &middot; December 2025
+              </div>
+            </div>
+          </details>
         </div>
       </div>
     </section>
