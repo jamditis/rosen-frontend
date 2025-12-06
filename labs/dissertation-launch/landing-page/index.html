@@ -182,9 +182,15 @@
 
     .stakes-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 2rem;
       margin-top: 2rem;
+    }
+
+    @media (max-width: 600px) {
+      .stakes-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .stake-card {
@@ -219,9 +225,21 @@
 
     .nav-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 1.5rem;
       margin-top: 2rem;
+    }
+
+    @media (min-width: 900px) {
+      .nav-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .nav-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     .nav-card {
@@ -687,7 +705,7 @@
   <!-- Hero -->
   <section class="hero">
     <div class="hero-content">
-      <p class="hero-eyebrow">A 1986 PhD Dissertation by</p>
+      <p class="hero-eyebrow">A 1986 PhD Dissertation</p>
       <h1 class="hero-title">The Impossible Press</h1>
       <p class="hero-subtitle">American Journalism and the Decline of Public Life</p>
       <p class="hero-meta">
@@ -706,22 +724,27 @@
   <!-- The Stakes -->
   <section class="stakes">
     <div class="container">
-      <h2 class="section-title">Why This Dissertation Matters</h2>
+      <h2 class="section-title">Why this dissertation matters</h2>
 
       <div class="stakes-grid">
         <div class="stake-card">
-          <h3>The Central Question</h3>
+          <h3>The central question</h3>
           <p>What does it really mean when we say "the press informs the public"? Rosen argues this foundational phrase obscures far more than it reveals&mdash;and understanding why is essential to grasping journalism's democratic role.</p>
         </div>
 
         <div class="stake-card">
-          <h3>Ahead of Its Time</h3>
+          <h3>Ahead of its time</h3>
           <p>Written in 1986, this dissertation anticipated many of today's debates about media, democracy, and public life&mdash;before the internet, social media, or the current crisis of journalism.</p>
         </div>
 
         <div class="stake-card">
-          <h3>An Ecological View</h3>
+          <h3>An ecological view</h3>
           <p>Rather than focusing on individual journalists or news organizations, Rosen proposes understanding the press-public relationship as an ecosystem shaped by technology, economics, and culture.</p>
+        </div>
+
+        <div class="stake-card">
+          <h3>A foundation for change</h3>
+          <p>These ideas became the intellectual basis for the public journalism movement of the 1990s&mdash;and remain essential reading for anyone trying to reimagine journalism today.</p>
         </div>
       </div>
     </div>
@@ -730,31 +753,55 @@
   <!-- Explore -->
   <section class="explore">
     <div class="container">
-      <h2 class="section-title">Explore the Dissertation</h2>
+      <h2 class="section-title">Explore the dissertation</h2>
 
       <div class="nav-grid">
         <a href="../../../features/dissertation-reader/" class="nav-card">
-          <h3>Read the Full Text</h3>
+          <h3>Read the full text</h3>
           <p>The complete dissertation, transcribed and formatted for online reading with chapter navigation.</p>
-          <span class="arrow">&rarr; Enter Reading Room</span>
+          <span class="arrow">&rarr; Enter reading room</span>
         </a>
 
         <a href="../3d-concepts/info-sphere/" class="nav-card">
-          <h3>Concept Map</h3>
+          <h3>Concept map</h3>
           <p>Explore the dissertation's ideas visually through an interactive 3D network of concepts and thinkers.</p>
-          <span class="arrow">&rarr; Launch Visualization</span>
-        </a>
-
-        <a href="#" class="nav-card">
-          <h3>Key Thinkers</h3>
-          <p>Meet the scholars whose ideas shaped this work: Lippmann, Dewey, Park, Tarde, and more.</p>
-          <span class="arrow">&rarr; Coming Soon</span>
+          <span class="arrow">&rarr; Launch visualization</span>
         </a>
 
         <a href="../../../features/glossary/" class="nav-card">
-          <h3>Glossary of Concepts</h3>
-          <p>Definitions and explanations of key terms: stereotype, pseudo-environment, mobilized privacy, and more.</p>
-          <span class="arrow">&rarr; View Glossary</span>
+          <h3>Glossary and key figures</h3>
+          <p>Definitions of key terms and profiles of the thinkers who shaped this work: Lippmann, Dewey, Park, Tarde, and more.</p>
+          <span class="arrow">&rarr; View glossary</span>
+        </a>
+
+        <a href="../../../features/comparison-tool/" class="nav-card">
+          <h3>Then &amp; now</h3>
+          <p>Side-by-side comparisons of Rosen's 1986 insights with how they apply to journalism in 2025.</p>
+          <span class="arrow">&rarr; Compare eras</span>
+        </a>
+
+        <a href="../../../features/annotated-excerpts/" class="nav-card">
+          <h3>Annotated excerpts</h3>
+          <p>Key passages from the dissertation with commentary explaining their significance and context.</p>
+          <span class="arrow">&rarr; Read excerpts</span>
+        </a>
+
+        <a href="../../../features/timeline/" class="nav-card">
+          <h3>Ideas timeline</h3>
+          <p>Follow the evolution of Rosen's key concepts from 1986 through four decades of writing.</p>
+          <span class="arrow">&rarr; Explore timeline</span>
+        </a>
+
+        <a href="../../../features/context-1986/" class="nav-card">
+          <h3>1986 context</h3>
+          <p>The media landscape when this dissertation was written: Reagan era, network TV, and pre-internet journalism.</p>
+          <span class="arrow">&rarr; View context</span>
+        </a>
+
+        <a href="../../../features/faq/" class="nav-card">
+          <h3>FAQ</h3>
+          <p>Common questions about the dissertation, its arguments, and its relevance to contemporary debates.</p>
+          <span class="arrow">&rarr; Read FAQ</span>
         </a>
       </div>
     </div>
@@ -789,7 +836,7 @@
   <!-- Scholars Respond -->
   <section class="scholars">
     <div class="container">
-      <h2 class="section-title">Scholars Respond</h2>
+      <h2 class="section-title">Scholars respond</h2>
       <p class="scholars-intro">
         As the dissertation becomes available publicly for the first time, scholars are discovering its uncanny relevance to today's media landscape.
       </p>
@@ -800,7 +847,7 @@
             <img src="https://pressthink.org/wp-content/uploads/2025/12/1625229316026.jpeg" alt="Samuel Earle" class="scholar-headshot" />
             <div class="scholar-info">
               <div class="scholar-name">Samuel Earle</div>
-              <div class="scholar-title">PhD Candidate, University of Cambridge</div>
+              <div class="scholar-title">PhD Candidate, Columbia Journalism School</div>
               <div class="scholar-badge">
                 <svg style="width: 12px; height: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
@@ -875,6 +922,17 @@
   <footer>
     <p>Curated by <a href="mailto:jamditis@gmail.com">Joe Amditis</a> &middot; 2025</p>
   </footer>
+
+  <!-- Text Selection Sharing Tool -->
+  <script type="module">
+    import { TextSelectionTool } from '../../../features/shared/text-selection.js';
+    const tool = new TextSelectionTool({
+      contentSelector: 'main',
+      source: 'Jay Rosen, "The Impossible Press" (1986)',
+      imageTheme: 'light'
+    });
+    tool.init();
+  </script>
 
 </body>
 </html>

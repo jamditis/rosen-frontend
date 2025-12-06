@@ -1,6 +1,23 @@
 import { html } from '../html.js?v=2.0.2';
 import { ExternalLink } from 'lucide-react';
 
+// Convert URLs in text to clickable links
+const linkifyText = (text) => {
+  if (!text) return null;
+  // URL regex pattern
+  const urlPattern = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/g;
+  const parts = text.split(urlPattern);
+
+  return parts.map((part, i) => {
+    if (urlPattern.test(part)) {
+      // Reset regex lastIndex
+      urlPattern.lastIndex = 0;
+      return html`<a key=${i} href=${part} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 hover:underline break-all">${part}</a>`;
+    }
+    return part;
+  });
+};
+
 /**
  * ThreadPost - Individual post in a thread
  */
@@ -48,7 +65,7 @@ const ThreadPost = ({ post, totalPosts }) => {
 
             ${post.content ? html`
                 <div className="text-sm text-stone-800 leading-relaxed mb-2 whitespace-pre-wrap">
-                    ${post.content}
+                    ${linkifyText(post.content)}
                 </div>
             ` : html`
                 <div className="text-sm text-stone-400 italic mb-2">

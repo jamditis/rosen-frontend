@@ -29,12 +29,12 @@
       <div class="max-w-5xl mx-auto px-4 py-3">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <a href="/wp-content/rosen-archive/" class="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-md transition-colors" aria-label="Back to archive">
+            <a href="/wp-content/rosen-archive/dissertation-launch/" class="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-md transition-colors" aria-label="Back to dissertation">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
               </svg>
             </a>
-            <a href="/wp-content/rosen-archive/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <a href="/wp-content/rosen-archive/dissertation-launch/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <div class="bg-stone-900 text-white p-1.5">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
@@ -61,7 +61,7 @@
       <div class="max-w-3xl mx-auto">
         <div class="year-marker mx-auto mb-6 text-3xl w-20 h-20">1986</div>
         <h2 class="font-display text-2xl md:text-3xl text-stone-850 mb-4">
-          The Media Landscape When It Was Written
+          The media landscape when it was written
         </h2>
         <p class="text-stone-600 leading-relaxed">
           To understand the arguments in <em><a href="/wp-content/rosen-archive/features/dissertation-reader/" class="text-stone-700 hover:text-stone-900 underline">The Impossible Press</a></em>, it helps to understand the media environment in which they were made.
@@ -73,10 +73,10 @@
     <!-- Table of Contents -->
     <nav class="sticky top-16 z-40 bg-paper/95 backdrop-blur-sm border-b border-stone-100 py-3 px-4 overflow-x-auto">
       <div class="max-w-5xl mx-auto flex gap-2 text-xs">
-        <a href="#landscape" class="toc-link pill">Media Landscape</a>
-        <a href="#didnt-exist" class="toc-link pill">What Didn't Exist</a>
-        <a href="#events" class="toc-link pill">Key Events</a>
-        <a href="#context" class="toc-link pill">Dissertation Context</a>
+        <a href="#landscape" class="toc-link pill">Media landscape</a>
+        <a href="#didnt-exist" class="toc-link pill">What didn't exist</a>
+        <a href="#events" class="toc-link pill">Key events</a>
+        <a href="#context" class="toc-link pill">Dissertation context</a>
       </div>
     </nav>
 
@@ -84,7 +84,7 @@
     <main class="max-w-5xl mx-auto px-4 py-12">
       <!-- Media Landscape -->
       <section id="landscape" class="mb-16">
-        <h2 class="font-display text-2xl text-stone-850 mb-8">The Media Landscape</h2>
+        <h2 class="font-display text-2xl text-stone-850 mb-8">The media landscape</h2>
         <div id="landscape-grid" class="grid gap-6 md:grid-cols-2">
           <!-- Populated by JavaScript -->
         </div>
@@ -92,7 +92,7 @@
 
       <!-- What Didn't Exist -->
       <section id="didnt-exist" class="mb-16 py-12 px-8 bg-stone-100 rounded-lg -mx-4 md:mx-0">
-        <h2 class="font-display text-2xl text-stone-850 mb-4">What Didn't Exist</h2>
+        <h2 class="font-display text-2xl text-stone-850 mb-4">What didn't exist</h2>
         <p class="text-stone-600 mb-8">Technologies and media forms that would transform journalism — none existed when Rosen was writing.</p>
         <div id="didnt-exist-grid" class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <!-- Populated by JavaScript -->
@@ -101,7 +101,7 @@
 
       <!-- Key Events -->
       <section id="events" class="mb-16">
-        <h2 class="font-display text-2xl text-stone-850 mb-8">Key Events of 1986</h2>
+        <h2 class="font-display text-2xl text-stone-850 mb-8">Key events of 1986</h2>
         <div id="events-list" class="space-y-4">
           <!-- Populated by JavaScript -->
         </div>
@@ -109,7 +109,7 @@
 
       <!-- Dissertation Context -->
       <section id="context" class="mb-16">
-        <h2 class="font-display text-2xl text-stone-850 mb-8">The Dissertation's Context</h2>
+        <h2 class="font-display text-2xl text-stone-850 mb-8">The dissertation's context</h2>
         <div id="context-content" class="card p-8">
           <!-- Populated by JavaScript -->
         </div>
@@ -129,5 +129,16 @@
     </footer>
 
     <script type="module" src="./script.js"></script>
+
+    <!-- Text Selection Sharing Tool -->
+    <script type="module">
+      import { TextSelectionTool } from '../shared/text-selection.js';
+      const tool = new TextSelectionTool({
+        contentSelector: 'main',
+        source: 'Jay Rosen, "The Impossible Press" (1986)',
+        imageTheme: 'light'
+      });
+      tool.init();
+    </script>
   </body>
 </html>
