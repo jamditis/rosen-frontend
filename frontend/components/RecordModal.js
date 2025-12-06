@@ -5,6 +5,23 @@ import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share
 import { fetchRecordDetails } from '../services/archiveService.js?v=2.0.2';
 import { ThreadModal } from './ThreadModal.js?v=2.0.2';
 
+// Convert URLs in text to clickable links
+const linkifyText = (text) => {
+  if (!text) return null;
+  // URL regex pattern
+  const urlPattern = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/g;
+  const parts = text.split(urlPattern);
+
+  return parts.map((part, i) => {
+    if (urlPattern.test(part)) {
+      // Reset regex lastIndex
+      urlPattern.lastIndex = 0;
+      return html`<a key=${i} href=${part} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 hover:underline break-all">${part}</a>`;
+    }
+    return part;
+  });
+};
+
 const TagGroup = ({title, tags}) => {
     if (!tags || tags.length === 0) return null;
     return html`
@@ -221,7 +238,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
               <${ThreadModal} record=${displayRecord} />
             ` : html`
               <div className="prose prose-stone max-w-none">
-                <p className="text-lg text-stone-800 leading-relaxed">${displayRecord.summary || displayRecord.summaryPreview || ''}</p>
+                <p className="text-lg text-stone-800 leading-relaxed">${linkifyText(displayRecord.summary || displayRecord.summaryPreview || '')}</p>
               </div>
             `}
 

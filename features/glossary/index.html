@@ -112,12 +112,12 @@
       <div class="max-w-7xl mx-auto px-4 py-3">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <a href="/wp-content/rosen-archive/" class="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-md transition-colors" aria-label="Back to archive">
+            <a href="/wp-content/rosen-archive/dissertation-launch/" class="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-md transition-colors" aria-label="Back to dissertation">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
               </svg>
             </a>
-            <a href="/wp-content/rosen-archive/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <a href="/wp-content/rosen-archive/dissertation-launch/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <div class="bg-stone-900 text-white p-1.5">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
@@ -168,11 +168,11 @@
 
         <!-- Category Filters -->
         <div class="flex flex-wrap gap-2 mt-6">
-          <button class="pill active" data-filter="all">All Concepts</button>
-          <button class="pill" data-filter="epistemology">How We Know</button>
-          <button class="pill" data-filter="public-sphere">The Public</button>
-          <button class="pill" data-filter="press-criticism">Press Criticism</button>
-          <button class="pill" data-filter="structure">Structural Forces</button>
+          <button class="pill active" data-filter="all">All concepts</button>
+          <button class="pill" data-filter="epistemology">How we know</button>
+          <button class="pill" data-filter="public-sphere">The public</button>
+          <button class="pill" data-filter="press-criticism">Press criticism</button>
+          <button class="pill" data-filter="structure">Structural forces</button>
         </div>
       </section>
 
@@ -212,7 +212,7 @@
 
       <!-- Key Figures Section -->
       <section class="mt-16 pt-12 border-t border-stone-200">
-        <h2 class="font-display text-2xl text-stone-850 mb-8">Key Figures</h2>
+        <h2 class="font-display text-2xl text-stone-850 mb-8">Key figures</h2>
         <div id="figures-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <!-- Populated by JavaScript -->
         </div>
@@ -232,5 +232,16 @@
     </footer>
 
     <script type="module" src="./script.js"></script>
+
+    <!-- Text Selection Sharing Tool -->
+    <script type="module">
+      import { TextSelectionTool } from '../shared/text-selection.js';
+      const tool = new TextSelectionTool({
+        contentSelector: 'main',
+        source: 'Jay Rosen, "The Impossible Press" (1986)',
+        imageTheme: 'light'
+      });
+      tool.init();
+    </script>
   </body>
 </html>

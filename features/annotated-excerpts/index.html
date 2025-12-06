@@ -56,12 +56,12 @@
       <div class="max-w-4xl mx-auto px-4 py-3">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <a href="/wp-content/rosen-archive/" class="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-md transition-colors" aria-label="Back to archive">
+            <a href="/wp-content/rosen-archive/dissertation-launch/" class="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-md transition-colors" aria-label="Back to dissertation">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
               </svg>
             </a>
-            <a href="/wp-content/rosen-archive/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <a href="/wp-content/rosen-archive/dissertation-launch/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <div class="bg-stone-900 text-white p-1.5">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
@@ -87,7 +87,7 @@
     <section class="py-12 md:py-16 px-4 border-b border-stone-200">
       <div class="max-w-3xl mx-auto text-center">
         <h2 class="font-display text-2xl md:text-3xl text-stone-850 mb-4">
-          The Most Prescient Passages
+          The most prescient passages
         </h2>
         <p class="text-stone-600 leading-relaxed mb-4">
           These passages represent some of the most prescient and provocative moments in <em><a href="/wp-content/rosen-archive/features/dissertation-reader/" class="text-stone-700 hover:text-stone-900 underline">The Impossible Press</a></em>.
@@ -102,11 +102,11 @@
     <!-- Navigation -->
     <nav class="sticky top-16 z-40 bg-paper/95 backdrop-blur-sm border-b border-stone-100 py-3 px-4 overflow-x-auto no-print">
       <div class="max-w-4xl mx-auto flex gap-2">
-        <button class="pill active" data-filter="all">All Excerpts</button>
+        <button class="pill active" data-filter="all">All excerpts</button>
         <button class="pill" data-filter="foundational">Foundational</button>
         <button class="pill" data-filter="prescient">Prescient</button>
         <button class="pill" data-filter="epistemology">Epistemology</button>
-        <button class="pill" data-filter="public-sphere">Public Sphere</button>
+        <button class="pill" data-filter="public-sphere">Public sphere</button>
       </div>
     </nav>
 
@@ -148,11 +148,22 @@
         </p>
         <a href="/wp-content/rosen-archive/features/dissertation-reader/"
            class="inline-block text-sm bg-stone-800 text-white px-6 py-2 rounded hover:bg-stone-700 transition-colors">
-          Read the Full Dissertation
+          Read the full dissertation
         </a>
       </div>
     </footer>
 
     <script type="module" src="./script.js"></script>
+
+    <!-- Text Selection Sharing Tool -->
+    <script type="module">
+      import { TextSelectionTool } from '../shared/text-selection.js';
+      const tool = new TextSelectionTool({
+        contentSelector: 'main',
+        source: 'Jay Rosen, "The Impossible Press" (1986)',
+        imageTheme: 'light'
+      });
+      tool.init();
+    </script>
   </body>
 </html>
