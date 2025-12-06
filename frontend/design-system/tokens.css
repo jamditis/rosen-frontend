@@ -1,0 +1,786 @@
+/**
+ * JAY ROSEN DIGITAL ARCHIVE - DESIGN SYSTEM TOKENS
+ *
+ * Centralized design tokens using CSS custom properties.
+ * This file defines the visual language of the archive with a typewriter/paper aesthetic.
+ *
+ * Usage: Import this file at the top of your CSS, then reference tokens via var(--token-name)
+ * Example: color: var(--color-text-primary);
+ */
+
+/* ============================================================================
+   COLOR PALETTE
+   Vintage archive aesthetic - newsprint, typewriter ink, manila folders
+   ============================================================================ */
+
+:root {
+  /* Base Colors - Aged Paper & Archival Materials */
+  --color-paper: #f5f1e8;           /* Aged newsprint - warm yellow undertone */
+  --color-card: #fdfcf9;            /* Cream card stock - not pure white */
+  --color-surface-muted: #eae6dc;   /* Deeper aged paper for contrast */
+
+  /* Text Colors - Typewriter & Ink */
+  --color-text-primary: #0a0908;    /* Deep ink black - richer than stone */
+  --color-text-secondary: #2b2826;  /* Faded ink from old documents */
+  --color-text-tertiary: #5a5654;   /* Ghost text from carbon copies */
+  --color-text-muted: #8e8b87;      /* Barely visible pencil marks */
+
+  /* Border & Divider Colors - Filing Systems */
+  --color-border-subtle: #ebe7dd;   /* Lightest divider - manila folder edge */
+  --color-border-light: #d9d3c7;    /* Light filing separator */
+  --color-border-medium: #c4bcae;   /* Visible folder divider */
+  --color-border-dark: #928c82;     /* Strong divider - metal file cabinet */
+  --color-border-darkest: #5a5654;  /* Darkest - oxidized metal edge */
+
+  /* Accent Colors - Vintage Archive Palette (NO BRIGHT COLORS) */
+  --color-accent-sky: #2c5f82;      /* Faded blue ink from newspapers */
+  --color-accent-sky-light: #d4e4ed; /* Aged blue manila */
+  --color-accent-sky-dark: #1a3a4d; /* Deep microfiche blue */
+
+  --color-accent-green: #3a5f3f;    /* Library card catalog green */
+  --color-accent-green-light: #dde8de; /* Faded green folder */
+  --color-accent-green-dark: #1f3322; /* Deep library binding */
+
+  --color-accent-amber: #d4a574;    /* Classic manila folder */
+  --color-accent-amber-light: #f5ede0; /* Aged manila background */
+  --color-accent-amber-dark: #8b6f3e; /* Old leather binding */
+
+  --color-accent-pink: #b8757e;     /* Faded red stamp pad ink */
+  --color-accent-pink-light: #f0dfe1; /* Pink carbon copy paper */
+  --color-accent-pink-dark: #6b3a3f; /* Deep burgundy seal */
+
+  --color-accent-violet: #6b5b7a;   /* Purple carbon paper */
+  --color-accent-violet-light: #e3dfe8; /* Aged violet document */
+  --color-accent-violet-dark: #3d3447; /* Deep archive purple */
+
+  --color-accent-orange: #c17a3a;   /* Rust from metal cabinet */
+  --color-accent-orange-light: #ede3d6; /* Aged rust stain */
+  --color-accent-orange-dark: #7a4a23; /* Oxidized metal */
+
+  --color-accent-emerald: #4a7c59;  /* Banker's lamp green */
+  --color-accent-emerald-light: #dce8e1; /* Aged mint folder */
+  --color-accent-emerald-dark: #2a4733; /* Deep reference green */
+
+  --color-accent-rose: #a65d66;     /* Faded typewriter ribbon red */
+  --color-accent-rose-light: #ecdfe1; /* Aged rose document */
+  --color-accent-rose-dark: #5f3439; /* Deep wine seal wax */
+
+  /* Semantic Colors */
+  --color-link: #2563eb;            /* Link blue - blue-600 */
+  --color-link-hover: #1d4ed8;      /* Link hover - blue-700 */
+  --color-focus: #0284c7;           /* Focus ring - sky-600 */
+  --color-error: #dc2626;           /* Error - red-600 */
+  --color-success: #16a34a;         /* Success - green-600 */
+  --color-warning: #ea580c;         /* Warning - orange-600 */
+  --color-info: #0891b2;            /* Info - cyan-600 */
+
+  /* Selection & Highlight */
+  --color-selection-bg: #fef08a;    /* Text selection background - yellow-200 */
+  --color-selection-text: #1c1917;  /* Text selection text - stone-900 */
+
+  /* Scrollbar */
+  --color-scrollbar: #a8a29e;       /* Scrollbar thumb - stone-400 */
+  --color-scrollbar-hover: #78716c; /* Scrollbar thumb hover - stone-500 */
+}
+
+
+/* ============================================================================
+   TYPOGRAPHY
+   Special Elite (display) + Roboto Mono (body) for typewriter aesthetic
+   ============================================================================ */
+
+:root {
+  /* Font Families */
+  --font-display: 'Special Elite', cursive;
+  --font-body: 'Roboto Mono', monospace;
+  --font-fallback: ui-monospace, 'Courier New', monospace;
+
+  /* Font Sizes - Modular scale based on 16px base */
+  --font-size-xs: 0.75rem;      /* 12px */
+  --font-size-sm: 0.875rem;     /* 14px */
+  --font-size-base: 1rem;       /* 16px */
+  --font-size-lg: 1.125rem;     /* 18px */
+  --font-size-xl: 1.25rem;      /* 20px */
+  --font-size-2xl: 1.5rem;      /* 24px */
+  --font-size-3xl: 1.875rem;    /* 30px */
+  --font-size-4xl: 2.25rem;     /* 36px */
+  --font-size-5xl: 3rem;        /* 48px */
+  --font-size-6xl: 3.75rem;     /* 60px */
+
+  /* Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+
+  /* Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --font-weight-black: 900;
+
+  /* Letter Spacing */
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+  --letter-spacing-widest: 0.1em;
+}
+
+
+/* ============================================================================
+   SPACING SCALE
+   Consistent spacing using 4px base unit (Tailwind-compatible)
+   ============================================================================ */
+
+:root {
+  --space-0: 0;
+  --space-px: 1px;
+  --space-0-5: 0.125rem;    /* 2px */
+  --space-1: 0.25rem;       /* 4px */
+  --space-1-5: 0.375rem;    /* 6px */
+  --space-2: 0.5rem;        /* 8px */
+  --space-2-5: 0.625rem;    /* 10px */
+  --space-3: 0.75rem;       /* 12px */
+  --space-3-5: 0.875rem;    /* 14px */
+  --space-4: 1rem;          /* 16px */
+  --space-5: 1.25rem;       /* 20px */
+  --space-6: 1.5rem;        /* 24px */
+  --space-7: 1.75rem;       /* 28px */
+  --space-8: 2rem;          /* 32px */
+  --space-9: 2.25rem;       /* 36px */
+  --space-10: 2.5rem;       /* 40px */
+  --space-11: 2.75rem;      /* 44px */
+  --space-12: 3rem;         /* 48px */
+  --space-14: 3.5rem;       /* 56px */
+  --space-16: 4rem;         /* 64px */
+  --space-20: 5rem;         /* 80px */
+  --space-24: 6rem;         /* 96px */
+  --space-32: 8rem;         /* 128px */
+}
+
+
+/* ============================================================================
+   SHADOWS
+   Layered shadows for depth, includes signature offset shadow
+   ============================================================================ */
+
+:root {
+  /* Standard Shadows */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+  /* Signature Offset Shadow - Typewriter aesthetic */
+  --shadow-offset: 8px 8px 0 rgba(0, 0, 0, 0.1);
+  --shadow-offset-hover: 12px 12px 0 rgba(0, 0, 0, 0.15);
+
+  /* Inner Shadows */
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+
+  /* No Shadow */
+  --shadow-none: none;
+}
+
+
+/* ============================================================================
+   BORDER RADIUS
+   Subtle rounded corners matching the design system
+   ============================================================================ */
+
+:root {
+  --radius-none: 0;
+  --radius-sm: 0.125rem;    /* 2px */
+  --radius-base: 0.25rem;   /* 4px */
+  --radius-md: 0.375rem;    /* 6px */
+  --radius-lg: 0.5rem;      /* 8px */
+  --radius-xl: 0.75rem;     /* 12px */
+  --radius-2xl: 1rem;       /* 16px */
+  --radius-3xl: 1.5rem;     /* 24px */
+  --radius-full: 9999px;    /* Fully rounded (pills, circles) */
+}
+
+
+/* ============================================================================
+   TRANSITIONS & ANIMATIONS
+   Consistent timing for micro-interactions
+   ============================================================================ */
+
+:root {
+  /* Durations */
+  --duration-instant: 0ms;
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-medium: 300ms;
+  --duration-slow: 500ms;
+  --duration-slower: 700ms;
+
+  /* Easing Functions */
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* Common Transitions */
+  --transition-colors: color var(--duration-normal) var(--ease-out),
+                       background-color var(--duration-normal) var(--ease-out),
+                       border-color var(--duration-normal) var(--ease-out);
+  --transition-opacity: opacity var(--duration-normal) var(--ease-out);
+  --transition-transform: transform var(--duration-normal) var(--ease-out);
+  --transition-all: all var(--duration-normal) var(--ease-out);
+  --transition-shadow: box-shadow var(--duration-normal) var(--ease-out);
+}
+
+
+/* ============================================================================
+   Z-INDEX SCALE
+   Layering system for stacking contexts
+   ============================================================================ */
+
+:root {
+  --z-base: 0;
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-fixed: 30;
+  --z-modal-backdrop: 40;
+  --z-modal: 50;
+  --z-popover: 60;
+  --z-tooltip: 70;
+  --z-notification: 80;
+  --z-max: 9999;
+}
+
+
+/* ============================================================================
+   BREAKPOINTS (for reference in media queries)
+   Note: Use these values in @media queries, not as CSS custom properties
+   ============================================================================ */
+
+/*
+  --breakpoint-xs: 0px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+*/
+
+
+/* ============================================================================
+   BUTTON UTILITY CLASSES
+   Reusable button styles matching the archive aesthetic
+   ============================================================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  font-family: var(--font-display);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  text-align: center;
+  white-space: nowrap;
+  border: 2px solid transparent;
+  border-radius: var(--radius-none);
+  cursor: pointer;
+  transition: var(--transition-all);
+  text-decoration: none;
+  user-select: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Primary Button - Prominent actions (more muted) */
+.btn-primary {
+  background-color: var(--color-text-primary);
+  color: white;
+  border-color: var(--color-text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-text-secondary);
+  border-color: var(--color-text-secondary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Secondary Button - Subtle actions */
+.btn-secondary {
+  background-color: var(--color-text-primary);
+  color: white;
+  border-color: var(--color-text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-text-secondary);
+  border-color: var(--color-text-secondary);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-secondary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Ghost Button - Transparent, text only */
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border-color: transparent;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background-color: var(--color-surface-muted);
+  color: var(--color-text-primary);
+}
+
+.btn-ghost:active:not(:disabled) {
+  background-color: var(--color-border-light);
+}
+
+/* Outline Button - Bordered, hollow */
+.btn-outline {
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border-color: var(--color-border-dark);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: var(--color-text-primary);
+  color: white;
+  border-color: var(--color-text-primary);
+}
+
+/* Danger Button - Destructive actions */
+.btn-danger {
+  background-color: var(--color-error);
+  color: white;
+  border-color: var(--color-error);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: #b91c1c; /* red-700 */
+  border-color: #b91c1c;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-danger:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Button Sizes */
+.btn-sm {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-sm);
+}
+
+.btn-lg {
+  padding: var(--space-4) var(--space-8);
+  font-size: var(--font-size-lg);
+}
+
+/* Icon-only Button */
+.btn-icon {
+  padding: var(--space-2);
+  width: var(--space-10);
+  height: var(--space-10);
+}
+
+
+/* ============================================================================
+   CARD UTILITY CLASSES
+   Reusable card containers with paper aesthetic
+   ============================================================================ */
+
+.card {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: var(--transition-shadow), var(--transition-transform);
+  position: relative;
+}
+
+/* Subtle aged paper texture on cards */
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 31px,
+    rgba(42, 40, 38, 0.015) 31px,
+    rgba(42, 40, 38, 0.015) 32px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.card-hover {
+  cursor: pointer;
+}
+
+.card-hover:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--color-border-medium);
+}
+
+.card-hover:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Card with offset shadow (typewriter/index card aesthetic) */
+.card-offset {
+  background-color: var(--color-card);
+  border: 2px solid var(--color-text-primary);
+  border-radius: var(--radius-none);
+  box-shadow: var(--shadow-offset);
+  transition: var(--transition-shadow), var(--transition-transform);
+  position: relative;
+}
+
+/* Corner dog-ear effect for offset cards */
+.card-offset::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 16px 16px 0;
+  border-color: transparent var(--color-surface-muted) transparent transparent;
+  filter: drop-shadow(-1px 1px 1px rgba(0,0,0,0.1));
+}
+
+.card-offset:hover {
+  box-shadow: var(--shadow-offset-hover);
+  transform: translate(-2px, -2px);
+}
+
+/* Card Sections */
+.card-header {
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--color-border-light);
+  background-color: var(--color-surface-muted);
+}
+
+.card-body {
+  padding: var(--space-6);
+}
+
+.card-footer {
+  padding: var(--space-6);
+  border-top: 1px solid var(--color-border-light);
+  background-color: var(--color-surface-muted);
+}
+
+
+/* ============================================================================
+   MODAL UTILITY CLASSES
+   Consistent modal/dialog patterns
+   ============================================================================ */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal-backdrop);
+  background-color: rgba(28, 25, 23, 0.6); /* stone-900 with 60% opacity */
+  backdrop-filter: blur(4px);
+  animation: fadeIn var(--duration-medium) var(--ease-out);
+}
+
+.modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: var(--z-modal);
+  background-color: var(--color-paper);
+  border: 1px solid var(--color-border-medium);
+  box-shadow: var(--shadow-2xl);
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: auto;
+  animation: scaleIn var(--duration-medium) var(--ease-out);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--color-border-light);
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.modal-body {
+  padding: var(--space-8);
+  font-family: var(--font-body);
+  line-height: var(--line-height-relaxed);
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--color-border-light);
+  background-color: var(--color-surface-muted);
+}
+
+/* Modal Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+
+/* ============================================================================
+   BADGE UTILITY CLASSES
+   Small colored indicators for categories and tags
+   ============================================================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  border: 1px solid currentColor;
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+/* Filing tab notch effect on badges */
+.badge::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 8px;
+  width: 12px;
+  height: 3px;
+  background-color: currentColor;
+  opacity: 0.3;
+}
+
+.badge-amber {
+  background-color: var(--color-accent-amber-light);
+  color: var(--color-accent-amber-dark);
+}
+
+.badge-sky {
+  background-color: var(--color-accent-sky-light);
+  color: var(--color-accent-sky-dark);
+}
+
+.badge-emerald {
+  background-color: var(--color-accent-emerald-light);
+  color: var(--color-accent-emerald-dark);
+}
+
+.badge-violet {
+  background-color: var(--color-accent-violet-light);
+  color: var(--color-accent-violet-dark);
+}
+
+.badge-rose {
+  background-color: var(--color-accent-rose-light);
+  color: var(--color-accent-rose-dark);
+}
+
+.badge-stone {
+  background-color: var(--color-surface-muted);
+  color: var(--color-text-secondary);
+}
+
+.badge-pink {
+  background-color: var(--color-accent-pink-light);
+  color: var(--color-accent-pink-dark);
+}
+
+.badge-orange {
+  background-color: var(--color-accent-orange-light);
+  color: var(--color-accent-orange-dark);
+}
+
+
+/* ============================================================================
+   PILL/TAG UTILITY CLASSES
+   Interactive tags and filter pills
+   ============================================================================ */
+
+.pill {
+  display: inline-block;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  background-color: var(--color-surface-muted);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: var(--transition-all);
+  user-select: none;
+}
+
+.pill:hover {
+  background-color: var(--color-border-light);
+  border-color: var(--color-border-medium);
+  color: var(--color-text-primary);
+}
+
+.pill.active {
+  background-color: var(--color-text-primary);
+  border-color: var(--color-text-primary);
+  color: white;
+  font-weight: var(--font-weight-bold);
+}
+
+
+/* ============================================================================
+   UTILITY CLASSES
+   Common helper classes for layout and accessibility
+   ============================================================================ */
+
+/* Screen reader only - accessible but visually hidden */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Fade-in animation utility */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity var(--duration-slow) var(--ease-out),
+              transform var(--duration-slow) var(--ease-out);
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Truncate text with ellipsis */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Responsive visibility */
+.hide-mobile {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .hide-mobile {
+    display: block;
+  }
+  .hide-tablet {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hide-tablet {
+    display: block;
+  }
+  .hide-desktop {
+    display: none;
+  }
+}
+
+/* Print utilities */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
