@@ -50,11 +50,19 @@
       margin-bottom: 4px;
     }
 
-    .back-button {
+    /* Legacy .back-button styles - now using .nav-links container */
+
+    .nav-links {
       position: absolute;
       top: 100px;
       right: 24px;
       z-index: 101;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-link {
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -70,15 +78,20 @@
       backdrop-filter: blur(10px);
     }
 
-    .back-button:hover {
+    .nav-link:hover {
       background: rgba(30, 41, 59, 0.95);
       border-color: #60a5fa;
       color: #60a5fa;
     }
 
-    .back-button svg {
+    .nav-link svg {
       width: 16px;
       height: 16px;
+    }
+
+    .nav-link--accent:hover {
+      border-color: #8c2f00;
+      color: #f59e0b;
     }
 
     .header p {
@@ -219,12 +232,20 @@
   <div id="app">
     <div class="loading">Loading concept sphere...</div>
 
-    <a href="../../landing-page/" class="back-button">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M19 12H5M12 19l-7-7 7-7"/>
-      </svg>
-      Back to Overview
-    </a>
+    <div class="nav-links">
+      <a href="../../foreword/" class="nav-link nav-link--accent">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+        </svg>
+        Author's Foreword
+      </a>
+      <a href="../../landing-page/" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Back to Overview
+      </a>
+    </div>
 
     <div class="header">
       <h1>The Impossible Press</h1>

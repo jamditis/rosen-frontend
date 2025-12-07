@@ -131,6 +131,26 @@
       line-height: 1.9;
     }
 
+    .hero-cta {
+      display: inline-block;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--color-stone-100);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 0.85rem 1.75rem;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .hero-cta:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--color-sky-500);
+      color: white;
+      transform: translateY(-2px);
+    }
+
     .scroll-indicator {
       position: absolute;
       bottom: 2rem;
@@ -276,6 +296,20 @@
       margin-top: 1rem;
       color: var(--color-sky-500);
       font-size: 0.85rem;
+    }
+
+    .nav-card-featured {
+      background: rgba(140, 47, 0, 0.08);
+      border-color: rgba(140, 47, 0, 0.3);
+    }
+
+    .nav-card-featured:hover {
+      background: rgba(140, 47, 0, 0.15);
+      border-color: #8c2f00;
+    }
+
+    .nav-card-featured .arrow {
+      color: #8c2f00;
     }
 
     /* About Section */
@@ -716,6 +750,10 @@
       <div class="hero-quote">
         <p>"Journalism is not an activity conducted solely by journalists; or, to put it another way, journalism is communication and communication is something that takes place between people. It is not an action but a transaction."</p>
       </div>
+
+      <a href="../foreword/" class="hero-cta">
+        Read the Author's Foreword &rarr;
+      </a>
     </div>
 
     <div class="scroll-indicator">Scroll to explore</div>
@@ -756,6 +794,12 @@
       <h2 class="section-title">Explore the dissertation</h2>
 
       <div class="nav-grid">
+        <a href="../foreword/" class="nav-card nav-card-featured">
+          <h3>Author's foreword</h3>
+          <p>Jay Rosen reflects on writing this dissertation in 1986 and what it means to share it publicly today.</p>
+          <span class="arrow">&rarr; Read foreword</span>
+        </a>
+
         <a href="../../../features/dissertation-reader/" class="nav-card">
           <h3>Read the full text</h3>
           <p>The complete dissertation, transcribed and formatted for online reading with chapter navigation.</p>

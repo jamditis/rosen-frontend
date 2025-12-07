@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foreword | The Impossible Press | Jay Rosen</title>
+  <link rel="icon" href="../../../favicon.ico" />
+  <meta name="description" content="Jay Rosen's foreword to his 1986 PhD dissertation, 'The Impossible Press: American Journalism and the Decline of Public Life.'">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Foreword | The Impossible Press | Jay Rosen">
+  <meta property="og:description" content="In the summer of 1980 I moved to New York City to become a press critic. I was 24. I had no connections.">
+  <meta property="og:type" content="article">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Roboto+Mono:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --color-paper: #fdfbf7;
+      --color-paper-dark: #f5f3ef;
+      --color-ink: #1c1917;
+      --color-ink-light: #44403c;
+      --color-ink-muted: #78716c;
+      --color-accent: #8c2f00;
+      --color-accent-light: rgba(140, 47, 0, 0.1);
+      --color-stone-100: #f5f5f4;
+      --color-stone-200: #e7e5e4;
+      --color-stone-300: #d6d3d1;
+      --color-stone-400: #a8a29e;
+      --color-stone-500: #78716c;
+      --color-stone-600: #57534e;
+      --color-stone-700: #44403c;
+      --color-stone-800: #292524;
+      --color-stone-900: #1c1917;
+      --color-sky-500: #0ea5e9;
+      --color-sky-600: #0284c7;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      background: var(--color-paper);
+      color: var(--color-ink);
+      line-height: 1.85;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+      min-height: 100vh;
+    }
+
+    /* Navigation Bar */
+    .nav-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(253, 251, 247, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--color-stone-200);
+      z-index: 100;
+      padding: 0.75rem 1.5rem;
+    }
+
+    .nav-content {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--color-stone-600);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .nav-back:hover {
+      color: var(--color-accent);
+    }
+
+    .nav-title {
+      font-family: 'Special Elite', 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: var(--color-stone-700);
+      letter-spacing: 0.02em;
+    }
+
+    .nav-cta {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--color-sky-600);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .nav-cta:hover {
+      color: var(--color-accent);
+    }
+
+    /* Main Article */
+    .article {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 7rem 1.5rem 5rem;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 4rem;
+      animation: fadeIn 0.8s ease-out;
+    }
+
+    .header-label {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--color-stone-500);
+      margin-bottom: 1.5rem;
+    }
+
+    .header-title {
+      font-family: 'Special Elite', 'Courier New', monospace;
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      color: var(--color-stone-900);
+      margin-bottom: 1rem;
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+    }
+
+    .header-divider {
+      width: 3rem;
+      height: 3px;
+      background: var(--color-accent);
+      margin: 1.5rem auto;
+      border-radius: 2px;
+    }
+
+    .header-subtitle {
+      font-size: 1.35rem;
+      font-style: italic;
+      color: var(--color-stone-600);
+      font-weight: 400;
+    }
+
+    .header-byline {
+      margin-top: 2rem;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--color-stone-500);
+    }
+
+    .header-byline strong {
+      color: var(--color-stone-700);
+    }
+
+    /* Content */
+    .content {
+      font-size: 1.25rem;
+      color: var(--color-ink-light);
+    }
+
+    .content p {
+      margin-bottom: 1.75rem;
+      animation: fadeInUp 0.6s ease-out backwards;
+    }
+
+    .content p:nth-child(1) { animation-delay: 0.1s; }
+    .content p:nth-child(2) { animation-delay: 0.15s; }
+    .content p:nth-child(3) { animation-delay: 0.2s; }
+    .content p:nth-child(4) { animation-delay: 0.25s; }
+    .content p:nth-child(5) { animation-delay: 0.3s; }
+
+    /* Drop cap */
+    .drop-cap::first-letter {
+      float: left;
+      font-family: 'Special Elite', 'Courier New', monospace;
+      font-size: 4.5rem;
+      line-height: 0.8;
+      padding-right: 0.75rem;
+      padding-top: 0.35rem;
+      color: var(--color-accent);
+    }
+
+    /* Links */
+    .content a {
+      color: var(--color-ink);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(140, 47, 0, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .content a:hover {
+      color: var(--color-accent);
+      border-bottom-color: var(--color-accent);
+      background: var(--color-accent-light);
+    }
+
+    /* Section divider */
+    .ornament {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 3rem 0;
+      color: var(--color-stone-400);
+      font-size: 1.5rem;
+    }
+
+    .ornament::before,
+    .ornament::after {
+      content: '';
+      height: 1px;
+      width: 3rem;
+      background: var(--color-stone-300);
+      margin: 0 1rem;
+    }
+
+    /* Pull quote */
+    .pull-quote {
+      position: relative;
+      padding: 2rem 2.5rem;
+      margin: 2.5rem 0;
+      background: #fffdf8;
+      border-left: 3px solid var(--color-accent);
+      font-style: italic;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .pull-quote::before {
+      content: '"';
+      position: absolute;
+      top: -0.5rem;
+      right: 1.5rem;
+      font-family: 'Special Elite', 'Courier New', monospace;
+      font-size: 5rem;
+      opacity: 0.08;
+      color: var(--color-ink);
+      line-height: 1;
+    }
+
+    .pull-quote p {
+      margin-bottom: 0 !important;
+      font-size: 1.15rem;
+      line-height: 1.9;
+      color: var(--color-stone-700);
+    }
+
+    .pull-quote cite {
+      display: block;
+      text-align: right;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.75rem;
+      font-style: normal;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-stone-500);
+      margin-top: 1.25rem;
+    }
+
+    /* List */
+    .audience-list {
+      list-style: none;
+      padding: 0;
+      margin: 2rem 0;
+    }
+
+    .audience-list li {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      font-size: 1.15rem;
+    }
+
+    .audience-list .bullet {
+      color: var(--color-accent);
+      margin-right: 0.75rem;
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 0.25rem;
+    }
+
+    /* Footer */
+    .article-footer {
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--color-stone-200);
+      text-align: center;
+    }
+
+    .footer-date {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--color-stone-400);
+      margin-bottom: 1.5rem;
+    }
+
+    .footer-nav {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--color-stone-600);
+      text-decoration: none;
+      padding: 0.75rem 1.25rem;
+      border: 1px solid var(--color-stone-200);
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .footer-link:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+      background: var(--color-accent-light);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .article {
+        padding: 6rem 1.25rem 3rem;
+      }
+
+      .content {
+        font-size: 1.1rem;
+      }
+
+      .drop-cap::first-letter {
+        font-size: 3.5rem;
+      }
+
+      .pull-quote {
+        padding: 1.5rem;
+        margin: 2rem -0.5rem;
+      }
+
+      .footer-nav {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .nav-title {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav-bar">
+    <div class="nav-content">
+      <a href="../landing-page/" class="nav-back">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Back
+      </a>
+      <span class="nav-title">The Impossible Press</span>
+      <a href="../../../features/dissertation-reader/" class="nav-cta">Read Full Text &rarr;</a>
+    </div>
+  </nav>
+
+  <!-- Article -->
+  <article class="article">
+
+    <!-- Header -->
+    <header class="header">
+      <p class="header-label">Foreword</p>
+      <h1 class="header-title">The Impossible Press</h1>
+      <div class="header-divider"></div>
+      <p class="header-subtitle">About Jay Rosen's 1986 PhD dissertation</p>
+      <p class="header-byline">By <strong>Jay Rosen</strong> &middot; December 2025</p>
+    </header>
+
+    <!-- Content -->
+    <div class="content">
+
+      <p class="drop-cap">
+        In the summer of 1980 I moved to New York City to become a press critic. I was 24. I had no connections.
+      </p>
+
+      <p>
+        In their place were these advantages:
+      </p>
+
+      <p>
+        I thought I was a good enough writer, but I also knew that I was poorly read. Basically nothing about the world beyond the newspapers and magazines that I was then scouring. (Remember: no internet.) I call this an advantage because the thrills of discovery made it easy for me to read and take notes all day and all night.
+      </p>
+
+      <p>
+        NYU had a masters and PhD program called "Media Ecology." Perfect! I could solve my "poorly read" problem with NYU professors as a guide. "Media ecology" felt exactly right for what I wanted to do as a writer.
+      </p>
+
+      <p>
+        I had a strategy that turned out to be the right one. Instead of becoming an academic or a journalist I would try to find my voice between these identities, friendly to both, but with some distance as well.
+      </p>
+
+      <p>
+        I had a good way to get started. "Take as many courses as you can from Neil Postman."
+      </p>
+
+      <p>
+        Postman! Founder of the Media Ecology program at NYU and one of our best cultural critics, then working on <em>Amusing Ourselves to Death</em>, his best and most famous book, translated into 16 languages. He became a model for me as a teacher, speaker, writer, and public figure. (You can read about Neil and I, teacher and student, <a href="https://pressthink.org/2003/10/the-postman-is-dead/" target="_blank" rel="noopener">here</a>.)
+      </p>
+
+      <p>
+        Of course they won't give you a PhD just for taking courses, reading a lot of books to catch up, and drinking wine with your teachers after class. You have to make an original contribution. You have to research and write a work of your own, and it has to meet your professors' standards. Ideally these are high, but not unreachable.
+      </p>
+
+      <p>
+        Here I gave myself a further goal, again inspired by Postman. It was to write for what used to be called the "common reader," a phrase rarely heard these days. Roughly it means, "No need to learn a new language to understand the book." Basic literacy will suffice.
+      </p>
+
+      <p>
+        Normal dissertations are not like that. They exist within a scholarly discourse divided into sub disciplines that are built to handle small but (we hope...) meaningful advances in our knowledge.
+      </p>
+
+      <p>
+        I wanted to try something else. My first serious work of press criticism would be spread across a big landscape, from why we needed journalists in the first place (the answer lies in the scale at which modern life is lived) to prospects for an informed public in the crowded media environment of today.
+      </p>
+
+      <div class="ornament">&#10022;</div>
+
+      <p>
+        The dissertation I submitted to NYU began to emerge for me when I came across a now famous exchange between Walter Lippmann in his classic book, <em>Public Opinion</em> (1922), and John Dewey in his classic reply, <em>The Public and its Problems</em> (1927).
+      </p>
+
+      <p>
+        Lippmann doubted there could be a news-reading public in the way we normally thought: a public consuming quality journalism to inform itself and make sound decisions. We have to abandon those expectations, he said. Among the factors they failed to reckon with: the attention market and all the distractions it comes with.
+      </p>
+
+      <p>
+        John Dewey took the point about attention, but drew a different conclusion. Discard any hope for an informed and engaged public and you run the risk of ditching democracy altogether. Are you sure you want to do that? We have to keep trying with the tools we have, Dewey thought. If the press can't help us then we need a better press!
+      </p>
+
+      <p>
+        By careful study of this debate I got the idea for my dissertation. It would be the history of an idea: The press informs the public and that makes democracy work. Where did this idea come from? Does it still apply? What work does it do? And who was right: Lippmann or Dewey?
+      </p>
+
+      <p>
+        I chose the title, <em>The Impossible Press</em>, to underline key observations like this:
+      </p>
+
+      <blockquote class="pull-quote">
+        <p>
+          "With every improvement in the delivery of information comes a new level of difficulty for citizens seeking to understand their world. No doubt this is one reason why we so often seem to have more information and yet be less informed."
+        </p>
+        <cite>The Impossible Press, p. 390</cite>
+      </blockquote>
+
+      <p>
+        To wrap up. Today I am putting my dissertation online, with the help of web producer Joe Amditis, who built the site with all of its features, and Samuel Earle, PhD candidate at Columbia Journalism School, who is currently writing his own dissertation about our renewed interest in crowds. You can find his essay, comparing his work to mine, <a href="../../../features/network-effect/">here</a>.
+      </p>
+
+      <p>
+        Putting "The Impossible Press" online is part of a much larger project, The Jay Rosen Digital Archive, which Joe Amditis and I plan to release in February, 2026. These are the kinds of things I imagined doing when I retired from NYU earlier this year.
+      </p>
+
+      <p>
+        I have been publishing my work online since 1996. So I know that a dissertation from some 40 years ago is not going to have a huge or immediate audience. But that does not bother me. People who might have an interest in what we did here include...
+      </p>
+
+      <ul class="audience-list">
+        <li>
+          <span class="bullet">&#10022;</span>
+          <span>Fans of my writing over the years. There are some.</span>
+        </li>
+        <li>
+          <span class="bullet">&#10022;</span>
+          <span>PhD students who are working on dissertations themselves, or who finished one recently.</span>
+        </li>
+        <li>
+          <span class="bullet">&#10022;</span>
+          <span>Professors who want (or already have) a digital archive of their own.</span>
+        </li>
+        <li>
+          <span class="bullet">&#10022;</span>
+          <span>Web developers working with academics.</span>
+        </li>
+      </ul>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="article-footer">
+      <p class="footer-date">December 2025 &middot; New York City</p>
+      <div class="footer-nav">
+        <a href="../../../features/dissertation-reader/" class="footer-link">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+          </svg>
+          Read Full Dissertation
+        </a>
+        <a href="../landing-page/" class="footer-link">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+          </svg>
+          Dissertation Home
+        </a>
+      </div>
+    </footer>
+
+  </article>
+
+  <!-- Text Selection Sharing Tool -->
+  <script type="module">
+    import { TextSelectionTool } from '../../../features/shared/text-selection.js';
+    const tool = new TextSelectionTool({
+      contentSelector: '.content',
+      source: 'Jay Rosen, Foreword to "The Impossible Press" (2025)',
+      imageTheme: 'light'
+    });
+    tool.init();
+  </script>
+
+</body>
+</html>
