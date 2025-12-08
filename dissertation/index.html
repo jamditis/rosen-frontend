@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Impossible Press | Jay Rosen's 1986 Dissertation</title>
-  <link rel="icon" href="../favicon.ico" />
+  <link rel="icon" href="/j/rosen-archive/favicon.ico" />
   <meta name="description" content="Explore 'The Impossible Press: American Journalism and the Decline of Public Life' - Jay Rosen's groundbreaking 1986 PhD dissertation on the relationship between press and public.">
 
   <!-- Open Graph -->
@@ -245,20 +245,14 @@
 
     .nav-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr;
       gap: 1.5rem;
       margin-top: 2rem;
     }
 
-    @media (min-width: 900px) {
+    @media (min-width: 700px) {
       .nav-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    @media (max-width: 600px) {
-      .nav-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, 1fr);
       }
     }
 
@@ -312,9 +306,84 @@
       color: #8c2f00;
     }
 
+    .nav-card-full {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav-card-full .nav-card-content p {
+      max-width: 600px;
+    }
+
+    @media (max-width: 600px) {
+      .nav-card-full {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+
+    /* How to Explore Section */
+    .how-to {
+      background: var(--color-stone-100);
+      border-top: 1px solid var(--color-stone-200);
+    }
+
+    .how-to-intro {
+      font-size: 1rem;
+      color: var(--color-stone-600);
+      max-width: 700px;
+      margin-bottom: 2rem;
+      line-height: 1.7;
+    }
+
+    .how-to-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 700px) {
+      .how-to-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .how-to-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .how-to-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--color-stone-800);
+      margin-bottom: 0.75rem;
+    }
+
+    .how-to-card p {
+      font-size: 0.85rem;
+      color: var(--color-stone-600);
+      line-height: 1.7;
+      margin-bottom: 0.75rem;
+    }
+
+    .how-to-card p:last-child {
+      margin-bottom: 0;
+    }
+
+    .how-to-card strong {
+      color: var(--color-stone-700);
+    }
+
     /* About Section */
     .about {
-      background: var(--color-stone-100);
+      background: var(--color-stone-50);
+      border-top: 1px solid var(--color-stone-200);
     }
 
     .about-content {
@@ -717,6 +786,41 @@
       text-transform: uppercase;
     }
 
+    /* Site Navigation */
+    .site-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      background: rgba(28, 25, 23, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .site-nav__link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--color-stone-400);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .site-nav__link:hover {
+      color: var(--color-stone-100);
+    }
+
+    .site-nav__link svg {
+      opacity: 0.7;
+    }
+
     /* Footer */
     footer {
       background: var(--color-stone-900);
@@ -732,9 +836,39 @@
     footer a {
       color: var(--color-stone-400);
     }
+
+    footer a:hover {
+      color: var(--color-stone-200);
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links span {
+      color: var(--color-stone-600);
+    }
   </style>
 </head>
 <body>
+
+  <!-- Site Navigation -->
+  <nav class="site-nav">
+    <a href="https://pressthink.org" class="site-nav__link">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+      PressThink
+    </a>
+    <a href="/j/rosen-archive/" class="site-nav__link">
+      Jay Rosen Archive
+    </a>
+  </nav>
 
   <!-- Hero -->
   <section class="hero">
@@ -751,12 +885,78 @@
         <p>"Journalism is not an activity conducted solely by journalists; or, to put it another way, journalism is communication and communication is something that takes place between people. It is not an action but a transaction."</p>
       </div>
 
-      <a href="./foreword/" class="hero-cta">
-        Read the Author's Foreword &rarr;
+      <a href="https://pressthink.org/2025/10/jay-rosen-1986-dissertation-launch-blog-post/" class="hero-cta">
+        Read the Announcement &rarr;
       </a>
     </div>
 
     <div class="scroll-indicator">Scroll to explore</div>
+  </section>
+
+  <!-- How to Explore -->
+  <section class="how-to">
+    <div class="container">
+      <h2 class="section-title">How to explore this dissertation</h2>
+      <p class="how-to-intro">This site offers several ways to engage with "The Impossible Press," whether you want to read the full text or explore key ideas in smaller pieces.</p>
+
+      <div class="how-to-grid">
+        <div class="how-to-card">
+          <h3>📖 The reader</h3>
+          <p>The full dissertation is available in a custom reading interface with chapter navigation and a progress bar that tracks where you are. The reader remembers your place, so you can pick up where you left off.</p>
+          <p><strong>Special feature:</strong> Highlight any text to reveal a menu that lets you copy a citation, share the quote, or download a shareable image with the passage and its citation&mdash;perfect for social media.</p>
+        </div>
+
+        <div class="how-to-card">
+          <h3>📥 PDF and AI tools</h3>
+          <p>Prefer to read offline? Download the original PDF from NYU's archives. You can also explore the dissertation through NotebookLM, Google's AI research tool, which includes video explainers and an interactive chat about the text.</p>
+        </div>
+
+        <div class="how-to-card">
+          <h3>❓ FAQ</h3>
+          <p>Not sure where to start? The FAQ answers 46 common questions about the dissertation&mdash;from "Who is Jay Rosen?" to "What is the impossible press?" to "How do these ideas apply today?" Search or browse by category.</p>
+        </div>
+
+        <div class="how-to-card">
+          <h3>✏️ Annotated excerpts</h3>
+          <p>Key passages from the dissertation paired with context from 1986 and reflections from 2025. A good way to sample the argument without reading all 400 pages.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Explore -->
+  <section class="explore">
+    <div class="container">
+      <h2 class="section-title">Explore the dissertation</h2>
+
+      <div class="nav-grid">
+        <a href="https://pressthink.org/2025/10/jay-rosen-1986-dissertation-launch-blog-post/" class="nav-card nav-card-featured nav-card-full">
+          <div class="nav-card-content">
+            <h3>Read the announcement</h3>
+            <p>Jay Rosen reflects on writing this dissertation in 1986 and what it means to share it publicly today. "In the summer of 1980 I moved to New York City to become a press critic. I was 24. I had no connections."</p>
+          </div>
+          <span class="arrow">&rarr; Read post</span>
+        </a>
+
+        <a href="/j/rosen-archive/dissertation/reader/" class="nav-card">
+          <h3>Read the full text</h3>
+          <p>The complete dissertation, transcribed and formatted for online reading with chapter navigation.</p>
+          <span class="arrow">&rarr; Enter reading room</span>
+        </a>
+
+        <a href="/j/rosen-archive/dissertation/faq/" class="nav-card">
+          <h3>FAQ</h3>
+          <p>Common questions about the dissertation, its arguments, and its relevance to contemporary debates.</p>
+          <span class="arrow">&rarr; Read FAQ</span>
+        </a>
+
+        <a href="/j/rosen-archive/dissertation/excerpts/" class="nav-card">
+          <h3>Annotated excerpts</h3>
+          <p>Key passages from the dissertation with commentary explaining their significance and context.</p>
+          <span class="arrow">&rarr; Read excerpts</span>
+        </a>
+      </div>
+    </div>
   </section>
 
   <!-- The Stakes -->
@@ -783,95 +983,6 @@
         <div class="stake-card">
           <h3>A foundation for change</h3>
           <p>These ideas became the intellectual basis for the public journalism movement of the 1990s&mdash;and remain essential reading for anyone trying to reimagine journalism today.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Explore -->
-  <section class="explore">
-    <div class="container">
-      <h2 class="section-title">Explore the dissertation</h2>
-
-      <div class="nav-grid">
-        <a href="./foreword/" class="nav-card nav-card-featured">
-          <h3>Author's foreword</h3>
-          <p>Jay Rosen reflects on writing this dissertation in 1986 and what it means to share it publicly today.</p>
-          <span class="arrow">&rarr; Read foreword</span>
-        </a>
-
-        <a href="./reader/" class="nav-card">
-          <h3>Read the full text</h3>
-          <p>The complete dissertation, transcribed and formatted for online reading with chapter navigation.</p>
-          <span class="arrow">&rarr; Enter reading room</span>
-        </a>
-
-        <a href="./concepts/" class="nav-card">
-          <h3>Concept map</h3>
-          <p>Explore the dissertation's ideas visually through an interactive 3D network of concepts and thinkers.</p>
-          <span class="arrow">&rarr; Launch visualization</span>
-        </a>
-
-        <a href="./glossary/" class="nav-card">
-          <h3>Glossary and key figures</h3>
-          <p>Definitions of key terms and profiles of the thinkers who shaped this work: Lippmann, Dewey, Park, Tarde, and more.</p>
-          <span class="arrow">&rarr; View glossary</span>
-        </a>
-
-        <a href="./comparison/" class="nav-card">
-          <h3>Then &amp; now</h3>
-          <p>Side-by-side comparisons of Rosen's 1986 insights with how they apply to journalism in 2025.</p>
-          <span class="arrow">&rarr; Compare eras</span>
-        </a>
-
-        <a href="./excerpts/" class="nav-card">
-          <h3>Annotated excerpts</h3>
-          <p>Key passages from the dissertation with commentary explaining their significance and context.</p>
-          <span class="arrow">&rarr; Read excerpts</span>
-        </a>
-
-        <a href="./timeline/" class="nav-card">
-          <h3>Ideas timeline</h3>
-          <p>Follow the evolution of Rosen's key concepts from 1986 through four decades of writing.</p>
-          <span class="arrow">&rarr; Explore timeline</span>
-        </a>
-
-        <a href="./context/" class="nav-card">
-          <h3>1986 context</h3>
-          <p>The media landscape when this dissertation was written: Reagan era, network TV, and pre-internet journalism.</p>
-          <span class="arrow">&rarr; View context</span>
-        </a>
-
-        <a href="./faq/" class="nav-card">
-          <h3>FAQ</h3>
-          <p>Common questions about the dissertation, its arguments, and its relevance to contemporary debates.</p>
-          <span class="arrow">&rarr; Read FAQ</span>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- About -->
-  <section class="about">
-    <div class="container">
-      <h2 class="section-title">About Jay Rosen</h2>
-
-      <div class="about-content">
-        <img src="https://journalism.nyu.edu/wp-content/uploads/2020/02/photo-jay-rosen.jpg" alt="Jay Rosen" class="about-image" />
-
-        <div class="about-text">
-          <h3>Jay Rosen</h3>
-          <p class="credentials">Professor of Journalism, New York University</p>
-
-          <p>Jay Rosen has been on the faculty at NYU since 1986, the same year he completed this dissertation under Neil Postman's supervision. He is one of the country's leading press critics and has written extensively about the relationship between journalism and democracy.</p>
-
-          <p>His blog, PressThink, has been exploring these themes since 2003. He was a key figure in the public journalism movement of the 1990s, which drew directly on ideas developed in this dissertation.</p>
-
-          <div class="about-links">
-            <a href="https://pressthink.org" target="_blank" rel="noopener" class="about-link">PressThink Blog</a>
-            <a href="https://journalism.nyu.edu/faculty/jay-rosen/" target="_blank" rel="noopener" class="about-link">NYU Faculty Page</a>
-            <a href="https://bsky.app/profile/jayrosen.bsky.social" target="_blank" rel="noopener" class="about-link">Bluesky</a>
-          </div>
         </div>
       </div>
     </div>
@@ -918,7 +1029,7 @@
             </a>
           </div>
 
-          <a href="./network-effect/" class="scholar-cta">
+          <a href="/j/rosen-archive/dissertation/network-effect/" class="scholar-cta">
             <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
             </svg>
@@ -954,6 +1065,32 @@
     </div>
   </section>
 
+  <!-- About -->
+  <section class="about">
+    <div class="container">
+      <h2 class="section-title">About Jay Rosen</h2>
+
+      <div class="about-content">
+        <img src="https://journalism.nyu.edu/wp-content/uploads/2020/02/photo-jay-rosen.jpg" alt="Jay Rosen" class="about-image" />
+
+        <div class="about-text">
+          <h3>Jay Rosen</h3>
+          <p class="credentials">Professor of Journalism, New York University (retired)</p>
+
+          <p>Jay Rosen has been on the faculty at NYU since 1986, the same year he completed this dissertation under Neil Postman's supervision. He is one of the country's leading press critics and has written extensively about the relationship between journalism and democracy.</p>
+
+          <p>His blog, PressThink, has been exploring these themes since 2003. He was a key figure in the public journalism movement of the 1990s, which drew directly on ideas developed in this dissertation.</p>
+
+          <div class="about-links">
+            <a href="https://pressthink.org" target="_blank" rel="noopener" class="about-link">PressThink Blog</a>
+            <a href="https://journalism.nyu.edu/faculty/jay-rosen/" target="_blank" rel="noopener" class="about-link">NYU Faculty Page</a>
+            <a href="https://bsky.app/profile/jayrosen.bsky.social" target="_blank" rel="noopener" class="about-link">Bluesky</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Coming Soon Teaser -->
   <section class="teaser">
     <div class="teaser-content">
@@ -964,12 +1101,19 @@
 
   <!-- Footer -->
   <footer>
+    <div class="footer-links">
+      <a href="https://pressthink.org">PressThink</a>
+      <span>&middot;</span>
+      <a href="/j/rosen-archive/">Jay Rosen Archive</a>
+      <span>&middot;</span>
+      <a href="https://journalism.nyu.edu/faculty/jay-rosen/">NYU Faculty Page</a>
+    </div>
     <p>Curated by <a href="mailto:jamditis@gmail.com">Joe Amditis</a> &middot; 2025</p>
   </footer>
 
   <!-- Text Selection Sharing Tool -->
   <script type="module">
-    import { TextSelectionTool } from '../features/shared/text-selection.js';
+    import { TextSelectionTool } from '/j/rosen-archive/features/shared/text-selection.js';
     const tool = new TextSelectionTool({
       contentSelector: 'main',
       source: 'Jay Rosen, "The Impossible Press" (1986)',
