@@ -64,42 +64,48 @@ All development work for the December 2025 dissertation release is complete. The
 
 ## 🔄 CURRENT SESSION STATUS (December 8, 2025)
 
-**Branch:** claude/dissertation-launch-restructure
-**Version:** 2.26.0 (Path Standardization & Navigation)
-**Status:** Path fixes and PressThink navigation complete - READY TO COMMIT
+**Branch:** main (merged via PR #107)
+**Version:** 2.27.0 (Phase 1 Launch Implementation)
+**Status:** ✅ MERGED TO MAIN - Ready for deployment
 
 ### ✅ COMPLETED WORK (December 8, 2025)
 
-**Path Standardization for pressthink.org/j/rosen-archive/ Deployment**
+**Phase 1 Launch Implementation (per Jay Rosen prep call)**
 
-All dissertation pages updated to use absolute paths rooted at `/j/rosen-archive/`:
+Implemented stripped-down Phase 1 launch based on December 8, 2025 prep call with Jay Rosen.
 
-1. **Files Updated (12 total):**
-   - `dissertation/index.html` - favicon, 10 nav links, text-selection import
-   - `dissertation/reader/index.html` - favicon, PDF links (2), added shared-styles.css
-   - `dissertation/foreword/index.html` - favicon, nav links, footer links, text-selection
-   - `dissertation/concepts/index.html` - favicon, nav links
-   - `dissertation/glossary/index.html` - tailwind, shared-styles, text-selection
-   - `dissertation/comparison/index.html` - tailwind, text-selection
-   - `dissertation/context/index.html` - tailwind, shared-styles, text-selection
-   - `dissertation/timeline/index.html` - tailwind, shared-styles, text-selection
-   - `dissertation/excerpts/index.html` - tailwind, shared-styles, text-selection
-   - `dissertation/faq/index.html` - tailwind, shared-styles, text-selection
-   - `dissertation/network-effect/index.html` - tailwind, shared-styles, text-selection
-   - `dissertation/reader/src/templates/shell.html` - favicon, PDF link
+1. **Section Reordering:**
+   - New order: Hero → How to explore → Explore tools → Why it matters → Scholars respond → About Jay Rosen → Coming soon
 
-2. **PressThink Navigation Added:**
-   - `dissertation/index.html` - Fixed top nav bar with PressThink + Archive links, footer links
-   - `dissertation/reader/index.html` - PressThink button in header
-   - `dissertation/foreword/index.html` - PressThink in nav and footer
+2. **Stripped Down to Core Features:**
+   - Read the announcement (links to `https://pressthink.org/2025/10/jay-rosen-1986-dissertation-launch-blog-post/`)
+   - Read the full text (dissertation reader)
+   - FAQ (46 questions)
+   - Annotated excerpts
 
-3. **shared-styles.css:**
-   - Added to dissertation reader (was missing)
+3. **Removed for Phase 2:**
+   - Concept map (3D visualization)
+   - Glossary and key figures
+   - Then & now comparison
+   - Ideas timeline
+   - 1986 context
+
+4. **Other Changes:**
+   - Renamed "Author's foreword" → "Read the announcement"
+   - Updated Jay's bio to "Professor of Journalism, New York University (retired)"
+   - Added "How to explore this dissertation" guide section
+   - Fixed grid to 3 columns for proper alignment
+   - Fixed PDF download links to `/j/rosen-archive/dissertation/reader/THE_IMPOSSIBLE_PRESS_NYU_ROSEN-JAY-1986.pdf`
+   - Updated foreword featured image path to `/j/rosen-archive/rosen-dissertation-feat.png`
+
+**PRs Merged:**
+- PR #106: Path standardization for /j/rosen-archive/ deployment
+- PR #107: Phase 1 launch implementation
 
 **Next Steps:**
-- Commit these changes
-- Test on local server to verify all paths work
 - Deploy to pressthink.org/j/rosen-archive/
+- Jay to finalize blog post and publish
+- Monitor for any issues post-launch
 
 ---
 
