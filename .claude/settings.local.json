@@ -4,7 +4,10 @@
       "Bash(git fetch:*)",
       "Bash(git checkout:*)",
       "Bash(npx playwright:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(python -m http.server:*)",
+      "Bash(git mv:*)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []
