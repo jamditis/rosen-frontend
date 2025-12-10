@@ -131,6 +131,15 @@
       line-height: 1.9;
     }
 
+    .hero-quote a {
+      color: var(--color-sky-500);
+      text-decoration: none;
+    }
+
+    .hero-quote a:hover {
+      text-decoration: underline;
+    }
+
     .hero-cta {
       display: inline-block;
       font-family: 'Roboto Mono', monospace;
@@ -149,6 +158,22 @@
       border-color: var(--color-sky-500);
       color: white;
       transform: translateY(-2px);
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .hero-cta-secondary {
+      background: transparent;
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .hero-cta-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
     }
 
     .scroll-indicator {
@@ -923,12 +948,17 @@
       </p>
 
       <div class="hero-quote">
-        <p>"Journalism is not an activity conducted solely by journalists; or, to put it another way, journalism is communication and communication is something that takes place between people. It is not an action but a transaction."</p>
+        <p>Jay Rosen has been one of the major thinkers in journalism since the 1990s. Younger followers may think of him mainly as a media critic, and there's no doubting his influence in that field. Through his blog, <a href="https://pressthink.org/" target="_blank" rel="noopener">PressThink</a>, and his social media presence (especially back in Twitter's heyday), Rosen showed an uncanny ability to frame issues in a way that made a lot of us think about what we were doing.</p>
       </div>
 
-      <a href="https://pressthink.org/2025/10/jay-rosen-1986-dissertation-launch-blog-post/" class="hero-cta">
-        Read the Announcement &rarr;
-      </a>
+      <div class="hero-buttons">
+        <a href="https://pressthink.org/2025/10/jay-rosen-1986-dissertation-launch-blog-post/" class="hero-cta">
+          Read the Announcement &rarr;
+        </a>
+        <a href="#about-jay-rosen" class="hero-cta hero-cta-secondary">
+          Read Full Bio &darr;
+        </a>
+      </div>
     </div>
 
     <div class="scroll-indicator">Scroll to explore</div>
@@ -1107,7 +1137,7 @@
   </section>
 
   <!-- About -->
-  <section class="about">
+  <section class="about" id="about-jay-rosen">
     <div class="container">
       <h2 class="section-title">About Jay Rosen</h2>
 
