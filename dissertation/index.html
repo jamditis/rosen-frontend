@@ -106,13 +106,14 @@
     }
 
     .hero-meta {
-      font-size: 0.85rem;
-      color: var(--color-stone-500);
+      font-size: 0.95rem;
+      color: var(--color-stone-300);
       margin-bottom: 3rem;
+      font-weight: 400;
     }
 
     .hero-meta strong {
-      color: var(--color-stone-300);
+      color: var(--color-stone-100);
     }
 
     .hero-quote {
@@ -353,7 +354,8 @@
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
       text-decoration: none;
-      display: block;
+      display: flex;
+      flex-direction: column;
       transition: all 0.2s ease;
       border: 1px solid transparent;
     }
@@ -384,6 +386,24 @@
 
     .how-to-card strong {
       color: var(--color-stone-700);
+    }
+
+    .how-to-cta {
+      display: inline-block;
+      margin-top: auto;
+      padding: 0.6rem 1.2rem;
+      padding-top: calc(0.6rem + 1rem);
+      background: var(--color-sky-600);
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: 6px;
+      transition: background 0.2s ease;
+      align-self: flex-start;
+    }
+
+    a.how-to-card:hover .how-to-cta {
+      background: #0369a1;
     }
 
     /* About Section */
@@ -919,12 +939,12 @@
 
       <div class="hero-quote">
         <p>Jay Rosen has been one of the major thinkers in journalism since the 1990s. Younger followers may think of him mainly as a media critic, and there's no doubting his influence in that field. Through his blog, <a href="https://pressthink.org/" target="_blank" rel="noopener">PressThink</a>, and his social media presence (especially back in Twitter's heyday), Rosen showed an uncanny ability to frame issues in a way that made a lot of us think about what we were doing.</p>
-        <p class="hero-quote-attribution">&mdash;Dan Kennedy, <a href="https://dankennedy.net/2025/10/16/public-journalism-redux-post-academia-jay-rosen-returns-to-where-he-started/" target="_blank" rel="noopener">Media Nation</a></p>
+        <p class="hero-quote-attribution">&mdash;Dan Kennedy, Media Nation, <a href="https://dankennedy.net/2025/10/16/public-journalism-redux-post-academia-jay-rosen-returns-to-where-he-started/" target="_blank" rel="noopener">read the rest</a></p>
       </div>
 
       <div class="hero-buttons">
         <a href="https://pressthink.org/2025/10/jay-rosen-1986-dissertation-launch-blog-post/" class="hero-cta">
-          Read the Announcement &rarr;
+          Read Jay's Essay &rarr;
         </a>
         <a href="#about-jay-rosen" class="hero-cta hero-cta-secondary">
           Read Full Bio &darr;
@@ -933,6 +953,21 @@
     </div>
 
     <div class="scroll-indicator">Scroll to explore</div>
+  </section>
+
+  <!-- Start Reading -->
+  <section style="background: var(--color-stone-800); padding: 3rem 2rem; text-align: center;">
+    <div class="container">
+      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+        <a href="/j/rosen-archive/dissertation/reader/" style="display: inline-block; font-family: 'Special Elite', monospace; font-size: 1.25rem; color: white; background: var(--color-sky-600); padding: 1rem 2.5rem; border-radius: 8px; text-decoration: none; transition: all 0.2s ease;" onmouseover="this.style.background='#0369a1'; this.style.transform='translateY(-2px)';" onmouseout="this.style.background='#0284c7'; this.style.transform='translateY(0)';">
+          Read the Dissertation &rarr;
+        </a>
+        <a href="#scholars-respond" style="display: inline-block; font-family: 'Roboto Mono', monospace; font-size: 1rem; color: var(--color-stone-400); background: transparent; border: 1px solid var(--color-stone-600); padding: 1rem 1.5rem; border-radius: 8px; text-decoration: none; transition: all 0.2s ease;" onmouseover="this.style.borderColor='var(--color-stone-400)'; this.style.color='var(--color-stone-200)';" onmouseout="this.style.borderColor='var(--color-stone-600)'; this.style.color='var(--color-stone-400)';">
+          Scholars respond &darr;
+        </a>
+      </div>
+      <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--color-stone-400);">Jump straight into the full text</p>
+    </div>
   </section>
 
   <!-- How to Explore -->
@@ -946,39 +981,20 @@
           <h3>📖 The reader</h3>
           <p>The full dissertation is available in a custom reading interface with chapter navigation and a progress bar that tracks where you are. The reader remembers your place, so you can pick up where you left off.</p>
           <p><strong>Special feature:</strong> Highlight any text to reveal a menu that lets you copy a citation, share the quote, or download a shareable image with the passage and its citation&mdash;perfect for social media.</p>
+          <span class="how-to-cta">Open the Reader &rarr;</span>
         </a>
 
         <a href="https://notebooklm.google.com/notebook/d26d326e-20ec-46dc-b9b4-2c752b90e607" target="_blank" rel="noopener" class="how-to-card">
           <h3>📥 PDF and AI tools</h3>
           <p>Prefer to read offline? Download the original PDF from NYU's archives. You can also explore the dissertation through NotebookLM, Google's AI research tool, which includes video explainers and an interactive chat about the text.</p>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Explore the dissertation -->
-  <section class="explore">
-    <div class="container">
-      <h2 class="section-title">Explore the dissertation</h2>
-
-      <div class="nav-grid" style="grid-template-columns: repeat(2, 1fr);">
-        <a href="https://pressthink.org/2025/10/jay-rosen-1986-dissertation-launch-blog-post/" class="nav-card nav-card-featured">
-          <h3>Read the announcement</h3>
-          <p>Jay Rosen reflects on writing this dissertation in 1986 and what it means to share it publicly today. "In the summer of 1980 I moved to New York City to become a press critic. I was 24. I had no connections."</p>
-          <span class="arrow">&rarr; Read post</span>
-        </a>
-
-        <a href="/j/rosen-archive/dissertation/network-effect/" class="nav-card">
-          <h3>A scholar reacts to reading chapter 4</h3>
-          <p>Samuel Earle, PhD candidate at Columbia Journalism School, responds to "From Crowd to Public"&mdash;finding in a 1976 film scene, analyzed in 1986, a portent of our present moment.</p>
-          <span class="arrow">&rarr; Read response</span>
+          <span class="how-to-cta">Open NotebookLM &rarr;</span>
         </a>
       </div>
     </div>
   </section>
 
   <!-- Scholars Respond -->
-  <section class="scholars">
+  <section class="scholars" id="scholars-respond">
     <div class="container">
       <h2 class="section-title">Scholars respond</h2>
       <p class="scholars-intro">
