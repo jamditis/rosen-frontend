@@ -356,6 +356,16 @@
       padding: 1.5rem;
       border-radius: 8px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      text-decoration: none;
+      display: block;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    a.how-to-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      border-color: var(--color-sky-500);
+      transform: translateY(-2px);
     }
 
     .how-to-card h3 {
@@ -931,26 +941,26 @@
       <p class="how-to-intro">This site offers several ways to engage with "The Impossible Press," whether you want to read the full text or explore key ideas in smaller pieces.</p>
 
       <div class="how-to-grid">
-        <div class="how-to-card">
+        <a href="/j/rosen-archive/dissertation/reader/" class="how-to-card">
           <h3>📖 The reader</h3>
           <p>The full dissertation is available in a custom reading interface with chapter navigation and a progress bar that tracks where you are. The reader remembers your place, so you can pick up where you left off.</p>
           <p><strong>Special feature:</strong> Highlight any text to reveal a menu that lets you copy a citation, share the quote, or download a shareable image with the passage and its citation&mdash;perfect for social media.</p>
-        </div>
+        </a>
 
-        <div class="how-to-card">
+        <a href="https://notebooklm.google.com/notebook/d26d326e-20ec-46dc-b9b4-2c752b90e607" target="_blank" rel="noopener" class="how-to-card">
           <h3>📥 PDF and AI tools</h3>
           <p>Prefer to read offline? Download the original PDF from NYU's archives. You can also explore the dissertation through NotebookLM, Google's AI research tool, which includes video explainers and an interactive chat about the text.</p>
-        </div>
+        </a>
 
-        <div class="how-to-card">
+        <a href="/j/rosen-archive/dissertation/faq/" class="how-to-card">
           <h3>❓ FAQ</h3>
           <p>Not sure where to start? The FAQ answers 46 common questions about the dissertation&mdash;from "Who is Jay Rosen?" to "What is the impossible press?" to "How do these ideas apply today?" Search or browse by category.</p>
-        </div>
+        </a>
 
-        <div class="how-to-card">
+        <a href="/j/rosen-archive/dissertation/excerpts/" class="how-to-card">
           <h3>✏️ Annotated excerpts</h3>
           <p>Key passages from the dissertation paired with context from 1986 and reflections from 2025. A good way to sample the argument without reading all 400 pages.</p>
-        </div>
+        </a>
       </div>
     </div>
   </section>
