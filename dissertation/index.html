@@ -229,44 +229,6 @@
       margin-top: 0.75rem;
     }
 
-    /* Stakes Section */
-    .stakes {
-      background: var(--color-stone-50);
-    }
-
-    .stakes-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2rem;
-      margin-top: 2rem;
-    }
-
-    @media (max-width: 600px) {
-      .stakes-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .stake-card {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-
-    .stake-card h3 {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--color-stone-700);
-      margin-bottom: 0.75rem;
-    }
-
-    .stake-card p {
-      font-size: 0.85rem;
-      color: var(--color-stone-600);
-      line-height: 1.7;
-    }
-
     /* Navigation Cards */
     .explore {
       background: var(--color-stone-800);
@@ -948,12 +910,11 @@
   <!-- Hero -->
   <section class="hero">
     <div class="hero-content">
-      <p class="hero-eyebrow">A 1986 PhD Dissertation</p>
       <h1 class="hero-title">The Impossible Press</h1>
       <p class="hero-subtitle">American Journalism and the Decline of Public Life</p>
       <p class="hero-meta">
-        <strong>Jay Rosen</strong> &middot; Ph.D., New York University, 1986<br>
-        Committee: Neil Postman (Chair), Christine Nystrom, Henry Perkinson
+        Jay Rosen's 1986 PhD Dissertation at New York University<br>
+        Committee: Professors Neil Postman (Chair), Christine Nystrom, Henry Perkinson
       </p>
 
       <div class="hero-quote">
@@ -991,80 +952,27 @@
           <h3>📥 PDF and AI tools</h3>
           <p>Prefer to read offline? Download the original PDF from NYU's archives. You can also explore the dissertation through NotebookLM, Google's AI research tool, which includes video explainers and an interactive chat about the text.</p>
         </a>
-
-        <a href="/j/rosen-archive/dissertation/faq/" class="how-to-card">
-          <h3>❓ FAQ</h3>
-          <p>Not sure where to start? The FAQ answers 46 common questions about the dissertation&mdash;from "Who is Jay Rosen?" to "What is the impossible press?" to "How do these ideas apply today?" Search or browse by category.</p>
-        </a>
-
-        <a href="/j/rosen-archive/dissertation/excerpts/" class="how-to-card">
-          <h3>✏️ Annotated excerpts</h3>
-          <p>Key passages from the dissertation paired with context from 1986 and reflections from 2025. A good way to sample the argument without reading all 400 pages.</p>
-        </a>
       </div>
     </div>
   </section>
 
-  <!-- Explore -->
+  <!-- Explore the dissertation -->
   <section class="explore">
     <div class="container">
       <h2 class="section-title">Explore the dissertation</h2>
 
-      <div class="nav-grid">
-        <a href="https://pressthink.org/2025/10/jay-rosen-1986-dissertation-launch-blog-post/" class="nav-card nav-card-featured nav-card-full">
-          <div class="nav-card-content">
-            <h3>Read the announcement</h3>
-            <p>Jay Rosen reflects on writing this dissertation in 1986 and what it means to share it publicly today. "In the summer of 1980 I moved to New York City to become a press critic. I was 24. I had no connections."</p>
-          </div>
+      <div class="nav-grid" style="grid-template-columns: repeat(2, 1fr);">
+        <a href="https://pressthink.org/2025/10/jay-rosen-1986-dissertation-launch-blog-post/" class="nav-card nav-card-featured">
+          <h3>Read the announcement</h3>
+          <p>Jay Rosen reflects on writing this dissertation in 1986 and what it means to share it publicly today. "In the summer of 1980 I moved to New York City to become a press critic. I was 24. I had no connections."</p>
           <span class="arrow">&rarr; Read post</span>
         </a>
 
-        <a href="/j/rosen-archive/dissertation/reader/" class="nav-card">
-          <h3>Read the full text</h3>
-          <p>The complete dissertation, transcribed and formatted for online reading with chapter navigation.</p>
-          <span class="arrow">&rarr; Enter reading room</span>
+        <a href="/j/rosen-archive/dissertation/network-effect/" class="nav-card">
+          <h3>A scholar reacts to reading chapter 4</h3>
+          <p>Samuel Earle, PhD candidate at Columbia Journalism School, responds to "From Crowd to Public"&mdash;finding in a 1976 film scene, analyzed in 1986, a portent of our present moment.</p>
+          <span class="arrow">&rarr; Read response</span>
         </a>
-
-        <a href="/j/rosen-archive/dissertation/faq/" class="nav-card">
-          <h3>FAQ</h3>
-          <p>Common questions about the dissertation, its arguments, and its relevance to contemporary debates.</p>
-          <span class="arrow">&rarr; Read FAQ</span>
-        </a>
-
-        <a href="/j/rosen-archive/dissertation/excerpts/" class="nav-card">
-          <h3>Annotated excerpts</h3>
-          <p>Key passages from the dissertation with commentary explaining their significance and context.</p>
-          <span class="arrow">&rarr; Read excerpts</span>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- The Stakes -->
-  <section class="stakes">
-    <div class="container">
-      <h2 class="section-title">Why this dissertation matters</h2>
-
-      <div class="stakes-grid">
-        <div class="stake-card">
-          <h3>The central question</h3>
-          <p>What does it really mean when we say "the press informs the public"? Rosen argues this foundational phrase obscures far more than it reveals&mdash;and understanding why is essential to grasping journalism's democratic role.</p>
-        </div>
-
-        <div class="stake-card">
-          <h3>Ahead of its time</h3>
-          <p>Written in 1986, this dissertation anticipated many of today's debates about media, democracy, and public life&mdash;before the internet, social media, or the current crisis of journalism.</p>
-        </div>
-
-        <div class="stake-card">
-          <h3>An ecological view</h3>
-          <p>Rather than focusing on individual journalists or news organizations, Rosen proposes understanding the press-public relationship as an ecosystem shaped by technology, economics, and culture.</p>
-        </div>
-
-        <div class="stake-card">
-          <h3>A foundation for change</h3>
-          <p>These ideas became the intellectual basis for the public journalism movement of the 1990s&mdash;and remain essential reading for anyone trying to reimagine journalism today.</p>
-        </div>
       </div>
     </div>
   </section>
