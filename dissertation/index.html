@@ -170,6 +170,19 @@
       transform: translateY(-2px);
     }
 
+    .hero-cta-primary {
+      background: rgba(14, 165, 233, 0.3);
+      border-color: rgba(14, 165, 233, 0.6);
+      color: white;
+      animation: pulse-blue 2s ease-in-out infinite;
+    }
+
+    .hero-cta-primary:hover {
+      background: rgba(14, 165, 233, 0.5);
+      border-color: var(--color-sky-500);
+      animation: none;
+    }
+
     .hero-buttons {
       display: flex;
       gap: 1rem;
@@ -290,17 +303,30 @@
     }
 
     .nav-card-featured {
-      background: rgba(140, 47, 0, 0.08);
-      border-color: rgba(140, 47, 0, 0.3);
+      background: rgba(14, 165, 233, 0.15);
+      border-color: rgba(14, 165, 233, 0.4);
+      animation: pulse-blue 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-blue {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4);
+        border-color: rgba(14, 165, 233, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 20px 4px rgba(14, 165, 233, 0.3);
+        border-color: rgba(14, 165, 233, 0.8);
+      }
     }
 
     .nav-card-featured:hover {
-      background: rgba(140, 47, 0, 0.15);
-      border-color: #8c2f00;
+      background: rgba(14, 165, 233, 0.25);
+      border-color: var(--color-sky-500);
+      animation: none;
     }
 
     .nav-card-featured .arrow {
-      color: #8c2f00;
+      color: var(--color-sky-500);
     }
 
     .nav-card-full {
@@ -389,21 +415,55 @@
     }
 
     .how-to-cta {
-      display: inline-block;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       margin-top: auto;
-      padding: 0.6rem 1.2rem;
-      padding-top: calc(0.6rem + 1rem);
+      padding: 0.85rem 1.2rem;
       background: var(--color-sky-600);
       color: white;
       font-size: 0.85rem;
       font-weight: 500;
       border-radius: 6px;
       transition: background 0.2s ease;
-      align-self: flex-start;
+      text-align: center;
+      width: 100%;
+      border: 1px solid rgba(14, 165, 233, 0.6);
+      animation: pulse-blue-light 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-blue-light {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 15px 3px rgba(14, 165, 233, 0.5);
+      }
     }
 
     a.how-to-card:hover .how-to-cta {
       background: #0369a1;
+      animation: none;
+    }
+
+    .how-to-cta-alt {
+      background: #7c3aed;
+      border-color: rgba(124, 58, 237, 0.6);
+      animation: pulse-purple 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-purple {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 15px 3px rgba(124, 58, 237, 0.5);
+      }
+    }
+
+    a.how-to-card:hover .how-to-cta-alt {
+      background: #6d28d9;
+      animation: none;
     }
 
     /* About Section */
@@ -943,7 +1003,7 @@
       </div>
 
       <div class="hero-buttons">
-        <a href="https://pressthink.org/2025/10/jay-rosen-1986-dissertation-launch-blog-post/" class="hero-cta">
+        <a href="https://pressthink.org/2025/10/jay-rosen-1986-dissertation-launch-blog-post/" class="hero-cta hero-cta-primary">
           Read Jay's Essay &rarr;
         </a>
         <a href="#about-jay-rosen" class="hero-cta hero-cta-secondary">
@@ -987,7 +1047,8 @@
         <a href="https://notebooklm.google.com/notebook/d26d326e-20ec-46dc-b9b4-2c752b90e607" target="_blank" rel="noopener" class="how-to-card">
           <h3>📥 PDF and AI tools</h3>
           <p>Prefer to read offline? Download the original PDF from NYU's archives. You can also explore the dissertation through NotebookLM, Google's AI research tool, which includes video explainers and an interactive chat about the text.</p>
-          <span class="how-to-cta">Open NotebookLM &rarr;</span>
+          <p style="font-size: 0.75rem; color: var(--color-stone-500); font-style: italic; margin-top: 0.5rem;">Requires a Google account to use NotebookLM.</p>
+          <span class="how-to-cta how-to-cta-alt">Open NotebookLM &rarr;</span>
         </a>
       </div>
     </div>
