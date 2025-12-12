@@ -66,9 +66,17 @@ body {
   padding: 0 var(--space-4);
 }
 
+.reader-header__left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0; /* Allow flex child to shrink */
+  flex: 1;
+}
+
 .reader-header__title {
   font-family: var(--font-heading);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text);
   margin: 0;
@@ -78,15 +86,25 @@ body {
 }
 
 .reader-header__subtitle {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  margin-left: var(--space-2);
+  display: none; /* Hidden on mobile */
 }
 
 .reader-header__actions {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+/* Hide secondary action buttons on mobile - show only Back button */
+.reader-header__actions .btn--secondary {
+  display: none;
+}
+
+.reader-header__actions .btn--secondary[title="Back to dissertation home"] {
+  display: inline-flex;
+  padding: var(--space-2);
+  font-size: var(--font-size-xs);
 }
 
 /* Menu toggle (mobile) */
@@ -449,6 +467,52 @@ body {
 }
 
 /* ========================================
+   SMALL MOBILE (under 375px)
+   ======================================== */
+@media (max-width: 374px) {
+  .reader-header__title {
+    max-width: 120px;
+  }
+
+  .reader-content {
+    padding-left: var(--space-3);
+    padding-right: var(--space-3);
+  }
+
+  .reader-header__actions .btn--secondary[title="Back to dissertation home"] {
+    padding: var(--space-1) var(--space-2);
+  }
+}
+
+/* ========================================
+   TABLET LAYOUT (768px+)
+   ======================================== */
+@media (min-width: 768px) {
+  .reader-header__title {
+    font-size: var(--font-size-sm);
+  }
+
+  .reader-header__subtitle {
+    display: inline; /* Show subtitle on tablet+ */
+  }
+
+  .reader-header__actions {
+    gap: var(--space-2);
+  }
+
+  /* Show more buttons on tablet */
+  .reader-header__actions .btn--secondary[title="Download PDF"],
+  .reader-header__actions .btn--secondary[title="Back to dissertation home"] {
+    display: inline-flex;
+  }
+
+  .reader-header__actions .btn--secondary[title="Back to dissertation home"] {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-size-sm);
+  }
+}
+
+/* ========================================
    DESKTOP LAYOUT (1024px+)
    ======================================== */
 @media (min-width: 1024px) {
@@ -474,6 +538,15 @@ body {
   .reader-content {
     padding-left: var(--space-8);
     padding-right: var(--space-8);
+  }
+
+  /* Show all header buttons on desktop */
+  .reader-header__actions .btn--secondary {
+    display: inline-flex;
+  }
+
+  .reader-header__title {
+    font-size: var(--font-size-base);
   }
 }
 
