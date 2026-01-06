@@ -222,7 +222,7 @@ RECORD-00027_REL_002,RECORD-00027,P0109,Soledad O'Brien,Affiliated With,O0015,CN
 RECORD-00027_REL_003,RECORD-00027,P0110,Nikole Hannah-Jones,Affiliated With,O0063,Center for Journalism & Democracy,She now runs the Center for Journalism & Democracy at Howard University,1.0,2025-10-22
 RECORD-00027_REL_004,RECORD-00027,P0110,Nikole Hannah-Jones,Affiliated With,O0062,Howard University,Center for Journalism & Democracy at Howard University,1.0,2025-10-22
 RECORD-00027_REL_005,RECORD-00027,P0094,Greg Sargent,Affiliated With,O0023,The Washington Post,Greg Sargent...reported opinion column for the Washington Post,1.0,2025-10-22
-RECORD-00027_REL_006,RECORD-00027,P0005,Jay Rosen,Affiliated With,O0049,New York University,"Jay Rosen, the NYU journalism professor",1.0,2025-10-22
+RECORD-00027_REL_006,RECORD-00027,P0005,Jay Rosen,Affiliated With,O0049,NYU,"Jay Rosen, the NYU journalism professor",1.0,2025-10-22
 RECORD-00027_REL_007,RECORD-00027,P0005,Jay Rosen,Originated By,C0004,View from Nowhere,"Jay Rosen, the NYU journalism professor who has coined many of the phrases that are central to progressive press criticism – the “view from nowhere",1.0,2025-10-22
 RECORD-00027_REL_008,RECORD-00027,P0005,Jay Rosen,Originated By,C0014,Savvy Style,Jay Rosen... the “savvy style“,1.0,2025-10-22
 RECORD-00027_REL_009,RECORD-00027,O0002,The New York Times,Mentions,C0005,C005,garbage like a front-page New York Times story,0.8,2025-10-22
@@ -3568,8 +3568,8 @@ RECORD-00349_REL_012,RECORD-00349,P0005,Jay Rosen,Mentions,P0460,Howard Dean,I n
 RECORD-00350_REL_001,RECORD-00350,O0838,Watertown TAB,Affiliated With,O0839,GateHouse Media,The TAB is owned by GateHouse Media,1.0,2025-10-22
 RECORD-00350_REL_002,RECORD-00350,O0839,GateHouse Media,Discusses,C0445,Creative Commons license,GateHouse is rolling out Creative Commons licenses,0.9,2025-10-22
 RECORD-00350_REL_003,RECORD-00350,P1412,Howard Owens,Affiliated With,O0839,GateHouse Media,"Howard Owens, director of digital publishing for Gatehouse",1.0,2025-10-22
-RECORD-00350_REL_004,RECORD-00350,P1413,Mia Garlick,Affiliated With,C0394,Creative Commons Foundation,"Mia Garlick, chief council of the Creative Commons Foundation",1.0,2025-10-22
-RECORD-00350_REL_005,RECORD-00350,P1098,Dan Kennedy,Affiliated With,O1308,Northeastern University,Dan Kennedy teaches journalism at Northeastern University,1.0,2025-10-22
+RECORD-00350_REL_004,RECORD-00350,P1413,Mia Garlick,Affiliated With,O1309,Creative Commons Foundation,"Mia Garlick, chief council of the Creative Commons Foundation",1.0,2025-10-22
+RECORD-00350_REL_005,RECORD-00350,P1098,Dan Kennedy,Affiliated With,O1021,UN,Dan Kennedy teaches journalism at Northeastern University,1.0,2025-10-22
 RECORD-00350_REL_006,RECORD-00350,P1098,Dan Kennedy,Discusses,C0445,Creative Commons license,"Kennedy says, 'For newspapers to give up copyright is a remarkable step'",0.8,2025-10-22
 RECORD-00350_REL_007,RECORD-00350,O0839,GateHouse Media,Discusses,C0446,User-generated content,The CC badge appeared on the company’s TownOnline sites this weekend as part of a sweeping overhaul whose main objective is to move the sites firmly into the two=way web.,0.8,2025-10-22
 RECORD-00350_REL_008,RECORD-00350,O0839,GateHouse Media,Affiliated With,O0840,TownOnline,The newspapers now under CC licensing are gathered together under the umbrella of TownOnline.com,0.9,2025-10-22
@@ -6136,7 +6136,7 @@ RECORD-00610_REL_005,RECORD-00610,P0005,Jay Rosen,Discusses,C0520,Authority of t
 RECORD-00610_REL_006,RECORD-00610,O0028,Los Angeles Times,Affiliated With,P0569,David Shaw,"David Shaw, the paper’s media critic",1.0,2025-10-28
 RECORD-00610_REL_007,RECORD-00610,P0501,John Carroll,Affiliated With,O0028,Los Angeles Times,"The editor who killed it, John Carroll",1.0,2025-10-28
 RECORD-00610_REL_008,RECORD-00610,E0222,Rathergate Affair,Mentions,O0419,CBS News,when CBS News aired a story based on forged documents,0.8,2025-10-28
-RECORD-00610_REL_009,RECORD-00610,P0005,Jay Rosen,Affiliated With,O0049,New York University,Jay Rosen,0.7,2025-10-28
+RECORD-00610_REL_009,RECORD-00610,P0005,Jay Rosen,Affiliated With,O0049,NYU,Jay Rosen,0.7,2025-10-28
 RECORD-00611_REL_001,RECORD-00611,P0005,Jay Rosen,Mentions,P0820,Will Bunch,Jay Rosen quotes a post from Will Bunch.,1.0,2025-10-28
 RECORD-00611_REL_002,RECORD-00611,P0820,Will Bunch,Discusses,C0368,Gaffe,Will Bunch argues Trump's comments weren't just a gaffe.,0.8,2025-10-28
 RECORD-00611_REL_003,RECORD-00611,P0820,Will Bunch,Discusses,C0652,Cognitive decline,Will Bunch suggests Trump's comments are a sign of cognitive decline.,0.8,2025-10-28

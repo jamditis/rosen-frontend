@@ -1,0 +1,55 @@
+======================================================================
+ARCHIVE RECORD VALIDATION REPORT
+Generated: 2026-01-06 21:45:36
+======================================================================
+
+## SUMMARY
+
+Total records reviewed: 869
+Dry run mode: False
+
+### Repairs Made
+  categories: 10
+  concepts: 59
+  era: 107
+  verification: 210
+  TOTAL: 386
+
+## POST-VALIDATION STATISTICS
+
+### Era Distribution
+  ✓  288: Peak Blogging & Citizen Journalism (2005-2009)
+  ✓  267: Blogging Launch & Digital Disruption (2000-2004)
+  ✓  158: Social Media & Financial Crisis (2010-2015)
+  ✓   75: Platform Transition & Future Models (2021-Present)
+  ✓   51: Early Career & Public Journalism (1990-1999)
+  ✓   29: Trump Era & Democratic Crisis (2016-2020)
+  ✗    1: [EMPTY]
+
+### Category Distribution (empty: 202)
+  ✓  620: Press & Media Criticism
+  ✓  455: Politics & Democracy
+  ✓  417: Technology & Digital Media
+  ✓  410: Journalism Theory & Practice
+  ✓  124: Audience & Public Engagement
+  ✓   27: Journalism Education
+  ✗    1: 
+
+### Concept Distribution (empty: 335)
+  ✓  318: The People Formerly Known as the Audience
+  ✓  168: View from Nowhere
+  ✓  134: He said/she said journalism
+  ✓  128: Audience atomization overcome
+  ✓  125: The Production of Innocence
+  ✓  103: False balance
+  ✓   57: Verification in reverse
+  ✓   46: Church of the Savvy
+  ✓   37: Horse-race journalism
+  ✓   25: Parity Product
+  ✓   18: The Citizens' Agenda
+  ✓   18: Mindcasting
+  ✓   15: Not the odds but the stakes
+
+### Verification Status
+   640: TRUE
+   229: FALSE

@@ -1,0 +1,49 @@
+======================================================================
+ENTITY RELATIONSHIP FIX REPORT
+Generated: 2026-01-06T21:52:25.681879
+======================================================================
+
+## SUMMARY
+
+Total fixes applied:        4
+New entities created:       3
+
+## NEW ENTITIES CREATED
+
+  P2214: Paul DiMaggio and Walter Powell (Person)
+    Role: Sociologists
+    Source: RECORD-00097
+
+  O1309: Creative Commons Foundation (Organization)
+    Role: Non-profit organization
+    Source: RECORD-00350
+
+  O1310: Routledge (Organization)
+    Role: Academic Publisher
+    Source: RECORD-00414
+
+## RELATIONSHIP FIXES
+
+  RECORD-00027_REL_006
+    Before: target_entity_id = 'O0049'
+    After:  target_entity_id = 'O0049'
+    Reason: Mapped organization name to proper entity ID
+
+  RECORD-00350_REL_004
+    Before: target_entity_id = 'C0394'
+    After:  target_entity_id = 'O1309'
+    Reason: Mapped organization name to new entity ID
+
+  RECORD-00350_REL_005
+    Before: target_entity_id = 'O1308'
+    After:  target_entity_id = 'O1021'
+    Reason: Mapped organization name to proper entity ID
+
+  RECORD-00610_REL_009
+    Before: target_entity_id = 'O0049'
+    After:  target_entity_id = 'O0049'
+    Reason: Mapped organization name to proper entity ID
+
+======================================================================
+PROCESS COMPLETE
+======================================================================

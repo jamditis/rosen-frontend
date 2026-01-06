@@ -1,0 +1,222 @@
+================================================================================
+COMPREHENSIVE ARCHIVE DATA QUALITY REPORT
+Generated: 2026-01-06 21:53:18
+================================================================================
+
+## EXECUTIVE SUMMARY
+
+Total records:           869
+Verified records:        640 (73.6%)
+Categorized records:     667 (76.8%)
+Total entities:          5736
+Total relationships:     7489
+
+## DATA QUALITY METRICS
+
+| Metric                  | Count | Percentage |
+|-------------------------|-------|------------|
+| Missing categories      |   202 |   23.2%    |
+| Missing concepts        |   335 |   38.6%    |
+| Missing summary         |    10 |    1.2%    |
+| Unverified records      |   229 |   26.4%    |
+| Missing era             |     1 |    0.1%    |
+
+## ERA DISTRIBUTION
+
+   288 ( 33.1%) ████████████████ Peak Blogging & Citizen Journalism (2005-2009)
+   267 ( 30.7%) ███████████████ Blogging Launch & Digital Disruption (2000-2004)
+   158 ( 18.2%) █████████ Social Media & Financial Crisis (2010-2015)
+    75 (  8.6%) ████ Platform Transition & Future Models (2021-Present)
+    51 (  5.9%) ██ Early Career & Public Journalism (1990-1999)
+    29 (  3.3%) █ Trump Era & Democratic Crisis (2016-2020)
+     1 (  0.1%)  [EMPTY]
+
+## CATEGORY DISTRIBUTION
+
+   620 ( 71.3%) ███████████████████████████████████ Press & Media Criticism
+   455 ( 52.4%) ██████████████████████████ Politics & Democracy
+   417 ( 48.0%) ███████████████████████ Technology & Digital Media
+   410 ( 47.2%) ███████████████████████ Journalism Theory & Practice
+   124 ( 14.3%) ███████ Audience & Public Engagement
+    27 (  3.1%) █ Journalism Education
+     1 (  0.1%)  
+
+## CONTENT TYPE DISTRIBUTION
+
+   829 ( 95.4%): Article
+    19 (  2.2%): Interview (Audio/Video)
+    10 (  1.2%): Social Media Thread
+     6 (  0.7%): Tweet/Thread
+     2 (  0.2%): Book Chapter
+     1 (  0.1%): Video
+     1 (  0.1%): Panel Discussion
+     1 (  0.1%): Lecture/Presentation
+
+================================================================================
+RECORDS REQUIRING MANUAL REVIEW
+================================================================================
+
+### Records Missing Categories (Top 50)
+
+These records have no thematic categories assigned:
+
+  RECORD-00067: Getting the Connections Right: Public Journalism a
+     Type: Book Chapter, URL: https://www.amazon.com/Getting-Connections-Right-Journalism-Perspectives/dp/0870
+  RECORD-00637: The Digital Divide: Exploring the Gap in Internet 
+     Type: Article, URL: https://publicnotebook.wordpress.com/2010/12/04/julian-assange-ducks-the-questio
+  TUMBLR-00001: Tracking the success of My Water's on Fire Tonight
+     Type: Article, URL: https://tmblr.co/ZCJQUy9ug2dE
+  TUMBLR-00002: Studio 20
+     Type: Article, URL: https://tmblr.co/ZCJQUy9uleNy
+  TUMBLR-00003: ExplainerNet
+     Type: Article, URL: https://tmblr.co/ZCJQUy9upGcZ
+  TUMBLR-00004: Studio 20
+     Type: Article, URL: https://tmblr.co/ZCJQUy9upkNv
+  TUMBLR-00005: Studio 20
+     Type: Article, URL: https://tmblr.co/ZCJQUy9urvwH
+  TUMBLR-00006: Photos from "Building A Better Explainer" Presenta
+     Type: Article, URL: https://tmblr.co/ZCJQUy9wi4k9
+  TUMBLR-00007: The Local East Village to Launch September 13
+     Type: Article, URL: https://tmblr.co/ZCJQUy10m_47
+  TUMBLR-00008: Jay Rosen's Advice to the Next Generation of Journ
+     Type: Article, URL: https://tmblr.co/ZCJQUy114teW
+  TUMBLR-00009: Studio 20
+     Type: Article, URL: https://tmblr.co/ZCJQUy11VVoH
+  TUMBLR-00010: Studio 20 Speakers Series
+     Type: Article, URL: https://tmblr.co/ZCJQUyAWfZbJ
+  TUMBLR-00011: Class of 2011 - Studio III Projects and Summer Gig
+     Type: Article, URL: https://tmblr.co/ZCJQUyAYiTqx
+  TUMBLR-00012: Studio 20 Profiled as a Unique Approach to Journal
+     Type: Article, URL: https://tmblr.co/ZCJQUy14j4hk
+  TUMBLR-00013: Studio 20 Summer: Focus on Lesley Messer
+     Type: Article, URL: https://tmblr.co/ZCJQUy15dyMy
+  TUMBLR-00014: Studio 20 at the Arthur L. Carter Journalism Insti
+     Type: Article, URL: https://tmblr.co/ZCJQUyAwdymk
+  TUMBLR-00015: Studio 20 students are Designing Conversational Sp
+     Type: Article, URL: https://tmblr.co/ZCJQUyAwl1AN
+  TUMBLR-00016: The Redistricting Remix
+     Type: Article, URL: https://tmblr.co/ZCJQUyBVYTrk
+  TUMBLR-00017: Studio 20
+     Type: Article, URL: https://tmblr.co/ZCJQUy1Au0cf
+  TUMBLR-00018: Studio 20 Profile: Focus on James Matthews
+     Type: Article, URL: https://tmblr.co/ZCJQUy1DsomA
+  TUMBLR-00019: Introducing... Zoe Fraade-Blanar
+     Type: Article, URL: https://tmblr.co/ZCJQUyCVlZZq
+  TUMBLR-00020: The Studio 20 @ NYU Explainer
+     Type: Article, URL: https://tmblr.co/ZCJQUyCi4YTA
+  TUMBLR-00021: Studio 20
+     Type: Article, URL: https://tmblr.co/ZCJQUyCw4r1o
+  TUMBLR-00022: Open Studio: An Open Invitation
+     Type: Article, URL: https://tmblr.co/ZCJQUyCxXc-M
+  TUMBLR-00023: Studio 20 Will Collaborate With The Guardian on Ho
+     Type: Article, URL: https://tmblr.co/ZCJQUyDIsJfc
+  TUMBLR-00024: Studio 20
+     Type: Article, URL: https://tmblr.co/ZCJQUyE6An_m
+  TUMBLR-00025: Studio 20 Liveblogs the NYC Marathon
+     Type: Article, URL: https://tmblr.co/ZCJQUy1QWMt1
+  TUMBLR-00026: Studio 20's Niel Bekker Publishes Post about Disru
+     Type: Article, URL: https://tmblr.co/ZCJQUy1R0I6Z
+  TUMBLR-00027: Studio 20 Students Push a Variety of Envelopes wit
+     Type: Article, URL: https://tmblr.co/ZCJQUy1Z4C06
+  TUMBLR-00028: Studio 20 Grads Settle into their New Jobs!
+     Type: Article, URL: https://tmblr.co/ZCJQUyFqIJTj
+  TUMBLR-00029: (More) Studio 20 Grads Settle into their New Jobs!
+     Type: Article, URL: https://tmblr.co/ZCJQUyGoksuI
+  TUMBLR-00030: The Citizens’ Agenda Round 1: #unasked Questions i
+     Type: Article, URL: https://tmblr.co/ZCJQUyHB1AUo
+  TUMBLR-00031: Professor Samuels at SXSW: Black in America/Silico
+     Type: Article, URL: https://tmblr.co/ZCJQUyI4CAP4
+  TUMBLR-00032: The Man Behind the News Songs
+     Type: Article, URL: https://tmblr.co/ZCJQUyIO3Yx4
+  TUMBLR-00033: Studio 20 Collaborates with ProPublica to Build a 
+     Type: Article, URL: https://tmblr.co/ZCJQUy1wsFuZ
+  TUMBLR-00034: First Year Studio 20-er Anjali Mullany Makes Moves
+     Type: Article, URL: https://tmblr.co/ZCJQUyJO5cGZ
+  TUMBLR-00035: Maybe your site should be home to a Studio 20 proj
+     Type: Article, URL: https://tmblr.co/ZCJQUyJTrUWO
+  TUMBLR-00036: Studio 20
+     Type: Article, URL: https://tmblr.co/ZCJQUy1-9d6B
+  TUMBLR-00037: How to Apply
+     Type: Article, URL: https://tmblr.co/ZCJQUyDMhkv
+  TUMBLR-00038: Studio 20
+     Type: Article, URL: https://tmblr.co/ZCJQUyDMoNG
+  TUMBLR-00039: Professor Jay Rosen on BlogTalkRadio
+     Type: Article, URL: https://tmblr.co/ZCJQUyDMwnP
+  TUMBLR-00040: Listen to Rebooting the News
+     Type: Article, URL: https://tmblr.co/ZCJQUyDMxT5
+  TUMBLR-00041: Media and Music
+     Type: Article, URL: https://tmblr.co/ZCJQUyDM-LA
+  TUMBLR-00042: Studio 20
+     Type: Article, URL: https://tmblr.co/ZCJQUyDN2kT
+  TUMBLR-00043: National Explainer: A Job for Journalists on the D
+     Type: Article, URL: https://tmblr.co/ZCJQUyDN7d0
+  TUMBLR-00044: Tweet This
+     Type: Article, URL: https://tmblr.co/ZCJQUyDN9OG
+  TUMBLR-00045: Studio 20
+     Type: Article, URL: https://tmblr.co/ZCJQUyDN9s7
+  TUMBLR-00046: On Twitter, mindcasting is the new lifecasting
+     Type: Article, URL: https://tmblr.co/ZCJQUyDNBID
+  TUMBLR-00047: NPR Interviews Studio 20 Professor
+     Type: Article, URL: https://tmblr.co/ZCJQUyDNDvc
+  TUMBLR-00048: Studio 20
+     Type: Article, URL: https://tmblr.co/ZCJQUyDVPS8
+
+  ... and 152 more
+
+### Records Missing Summary (Top 20)
+
+  TUMBLR-00003: ExplainerNet
+     URL: https://tmblr.co/ZCJQUy9upGcZ
+  TUMBLR-00006: Photos from "Building A Better Explainer" Presenta
+     URL: https://tmblr.co/ZCJQUy9wi4k9
+  TUMBLR-00056: Studio 20
+     URL: https://tmblr.co/ZCJQUyDxNSa
+  TUMBLR-00063: Studio 20
+     URL: https://tmblr.co/ZCJQUyEzqxy
+  TUMBLR-00080: Studio 20
+     URL: https://tmblr.co/ZCJQUyI-ml8
+  TUMBLR-00112: Studio 20
+     URL: https://tmblr.co/ZCJQUyPY7Z7
+  TUMBLR-00122: Studio 20
+     URL: https://tmblr.co/ZCJQUyVC6-x
+  TUMBLR-00127: Studio 20
+     URL: https://tmblr.co/ZCJQUyXIWoY
+  TUMBLR-00128: Studio 20
+     URL: https://tmblr.co/ZCJQUyXJRSU
+  TUMBLR-00129: Studio 20
+     URL: https://tmblr.co/ZCJQUyZ6DAG
+
+================================================================================
+ENTITY & RELATIONSHIP STATISTICS
+================================================================================
+
+### Entity Types
+
+   2214: Person
+   1310: Organization
+    931: Concept
+    858: Work
+    224: Event
+    199: Location
+
+### Relationship Types (Top 15)
+
+   2136: Affiliated With
+   1662: Discusses
+   1126: Mentions
+    569: Founded By
+    511: Criticizes
+    312: Published In
+    295: Pioneered
+    222: Inspired By
+    160: Originated By
+    138: Owned By
+    116: Owns
+     90: Occurred At
+     60: Supports
+     53: Cites
+     39: Expands On
+
+================================================================================
+END OF REPORT
+================================================================================
