@@ -1,0 +1,53 @@
+============================================================
+ROSEN ARCHIVE ENTITY VALIDATION REPORT
+Generated: 2026-01-06T19:27:43.104231
+============================================================
+
+## SUMMARY
+
+Zero-padding fixes:         53
+Name-as-ID fixes:           13
+Stub entities created:     573
+Unfixable issues:           14
+Total repairs made:        784
+
+## UNFIXABLE ISSUES (require manual review)
+
+  RECORD-00027_REL_006: target_entity_id='New York University' (name: New York University)
+  RECORD-00046_REL_006: target_entity_id='O000' (name: O000)
+  RECORD-00046_REL_010: target_entity_id='O000' (name: O000)
+  RECORD-00046_REL_012: target_entity_id='O000' (name: O000)
+  RECORD-00097_REL_005: target_entity_id='Unspecified' (name: Unspecified)
+  RECORD-00243_REL_002: target_entity_id='O000' (name: O000)
+  RECORD-00272_REL_003: target_entity_id='Concept' (name: Concept)
+  RECORD-00350_REL_004: target_entity_id='Creative Commons Foundation' (name: Creative Commons Foundation)
+  RECORD-00350_REL_005: target_entity_id='Northeastern University' (name: Northeastern University)
+  RECORD-00413_REL_014: target_entity_id='N/A' (name: N/A)
+  RECORD-00413_REL_015: target_entity_id='N/A' (name: N/A)
+  RECORD-00414_REL_010: target_entity_id='O000' (name: O000)
+  RECORD-00547_REL_008: target_entity_id='O000' (name: O000)
+  RECORD-00610_REL_009: target_entity_id='New York University' (name: New York University)
+
+## STUB ENTITIES CREATED (need review)
+
+  C0654: Concept of newsrooms becoming explicitly pro-democracy (Concept)
+  W0666: The Education of Henry Adams (Work)
+  C0655: smart crowds (Concept)
+  C0656: the herd of independent minds (Concept)
+  C0657: T.R. (narrator character) (Concept)
+  P2183: so many other bloggers (Person)
+  P2184: Other bloggers (Person)
+  W0667: The Education of Henry Adams (Work)
+  W0668: The Beast Without a Brain: Why Horse Race Journalism Works for Journalists and Fails Us (Work)
+  P2185: Harold Rosenberg (Person)
+  W0669: An Attractively Against-the-Grain Enterprise… (Work)
+  W0670: TomDispatch.com (Work)
+  O1239: 62 stations (Organization)
+  O1240: affiliates (Organization)
+  O1241: Friends of the Congressional Glaucoma Caucus Foundation (Organization)
+  W0671: The Page (Work)
+  C0658: PressThink (Concept)
+  W0672: A View from Nowhere (Work)
+  O1242: Conservative media world (Organization)
+  P2186: Dan Gilmore (Person)
+  ... and 553 more
