@@ -588,3 +588,20 @@ Available labels: `backend`, `frontend`, `bug`, `enhancement`, `documentation`. 
 - **Archive Curator:** Joe Amditis
 - **Subject:** Jay Rosen, NYU Professor of Journalism
 - **Repository:** jamditis/rosen-frontend
+
+
+---
+
+## Multi-machine workflow
+
+This repo is developed across multiple machines (MacBook, work Windows PC, home Windows PC). GitHub is the source of truth.
+
+**Before switching machines:**
+```bash
+git add . && git commit -m "WIP" && git push
+```
+
+**After switching machines:**
+```bash
+git pull
+```
