@@ -65,3 +65,6 @@ known_entities.json
 # Playwright
 test-results/
 playwright-report/
+
+# Claude local settings
+.claude/settings.local.json

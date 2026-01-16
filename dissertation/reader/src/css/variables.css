@@ -149,3 +149,31 @@
 [data-line-height="relaxed"] {
   --line-height-body: 1.9;
 }
+
+/* ========================================
+   MARGIN WIDTH VARIANTS
+   ======================================== */
+[data-margin="narrow"] {
+  --content-max-width: 560px;
+  --content-padding: var(--space-4);
+}
+
+[data-margin="wide"] {
+  --content-max-width: 820px;
+  --content-padding: var(--space-8);
+}
+
+/* Desktop default padding override */
+@media (min-width: 1024px) {
+  :root {
+    --content-padding: var(--space-8);
+  }
+
+  [data-margin="narrow"] {
+    --content-padding: var(--space-5);
+  }
+
+  [data-margin="wide"] {
+    --content-padding: var(--space-10);
+  }
+}
