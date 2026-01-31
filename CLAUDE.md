@@ -62,7 +62,40 @@ All development work for the December 2025 dissertation release is complete. The
 
 ---
 
-## 🔄 CURRENT SESSION STATUS (December 8, 2025)
+## 🔄 CURRENT SESSION STATUS (January 31, 2026)
+
+**Branch:** claude/archive-optimization-validation-EGyYZ
+**Status:** Entity extraction pipeline in progress (5.8% complete)
+
+### 🔄 IN PROGRESS: Social post entity extraction
+
+Processing 23,416 social posts (Twitter + Bluesky) to extract entities and relationships.
+
+**Progress:**
+- Posts processed: 1,350 / 23,416 (5.8%)
+- New entities: 425
+- Relationships: 492
+- Deduplication: Against 5,160 existing entities
+
+**Key files:**
+- Pipeline script: `backend/scripts/unified_entity_processor.py`
+- SQLite database: `data/social_import/extraction.db`
+- Batch results: `data/social_import/batch_*_results.json`
+
+**To resume:**
+```bash
+cd /home/jamditis/projects/rosen-frontend/backend
+PYTHONPATH=src python3 scripts/unified_entity_processor.py --status --data-dir ../data/social_import
+# Then start Ralph Loop: /ralph-loop
+```
+
+**Entity types being extracted:**
+- Person (148), Organization (117), Concept (90)
+- Location (41), Event (19), Work (10)
+
+---
+
+## Previous session: December 8, 2025
 
 **Branch:** main (merged via PR #107)
 **Version:** 2.27.0 (Phase 1 Launch Implementation)
