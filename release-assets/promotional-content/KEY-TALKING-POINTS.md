@@ -121,7 +121,7 @@ Jay decided to release it as part of a broader reflection on his career. The tim
 
 ### Why "zero-build" architecture?
 
-Archives need to last decades. Dependencies rot—node_modules from 2024 may not work in 2034. Static files served via CDN will work as long as browsers support JavaScript. Simplicity beats sophistication for longevity.
+Archives need to last decades. Dependencies rot—node_modules from 2024 may not work in 2034. Static files served via CDN will work as long as browsers support JavaScript. Simplicity wins for longevity.
 
 ### What can researchers do with this?
 

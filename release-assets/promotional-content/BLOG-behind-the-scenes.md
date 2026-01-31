@@ -56,7 +56,7 @@ The frontend (`rosen-frontend`) was a React application for exploring the archiv
 
 ## Phase 2: The Zero-Build Decision (November 29, 2025)
 
-Ten days into development, we made a critical architectural pivot. The commit message reads simply:
+Ten days into development, we made an architectural pivot. The commit message reads simply:
 
 > "Convert to vanilla JS, remove Vite build system"
 
@@ -68,7 +68,7 @@ This "zero-build philosophy" became a core principle:
 - Works on any static web host
 - No dependency rot over decades
 
-It's counterintuitive in 2025 to abandon build tools. But for a scholarly archive meant to last, simplicity beats sophistication.
+It's counterintuitive in 2025 to abandon build tools. But for a scholarly archive meant to last, simplicity wins.
 
 ---
 
@@ -84,7 +84,7 @@ The dissertation launch deadline was approaching (December 2025). Having everyth
 - Co-location of frontend, backend, data, and documentation
 - Easier onboarding
 
-From this point forward, the project accelerated dramatically.
+From this point forward, the project accelerated.
 
 ---
 
@@ -185,7 +185,7 @@ This wasn't a developer building in isolation. It was collaboration between the 
 
 ### 1. Zero-Build Has Real Benefits
 
-For archives meant to last decades, simplicity beats sophistication. Dependencies rot. CDN-loaded React via esm.sh will work as long as browsers support ES modules—which is to say, indefinitely.
+For archives meant to last decades, simplicity wins. Dependencies rot. CDN-loaded React via esm.sh will work as long as browsers support ES modules—which is to say, indefinitely.
 
 ### 2. Human-AI Collaboration Works
 
