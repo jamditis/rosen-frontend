@@ -65,3 +65,4 @@ known_entities.json
 # Playwright
 test-results/
 playwright-report/
+data/social_import/

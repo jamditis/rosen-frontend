@@ -42,7 +42,50 @@ class CSVDataService:
 
         # Output directory for new/updated records
         self.output_dir = self.csv_dir / 'output'
+        if self.csv_dir.exists():
+            self.output_dir.mkdir(exist_ok=True)
+
+    def set_data_dir(self, data_dir: Path):
+        """
+        Override the default data directory paths.
+
+        This allows using a custom directory structure for imports
+        (e.g., data/social_import/ instead of csv/).
+
+        Args:
+            data_dir: Path to the data directory containing CSV files
+        """
+        data_dir = Path(data_dir)
+        self.csv_dir = data_dir
+
+        # Update file paths to look in the new directory
+        # Support both naming conventions (with and without 'rosen_' prefix)
+        self.urls_file = data_dir / 'urls_to_scrape.csv'
+        self.records_file = data_dir / 'archive_records-public.csv'
+
+        # Social posts - check both naming conventions
+        social_prefixed = data_dir / 'rosen_social_posts.csv'
+        social_standard = data_dir / 'social_posts.csv'
+        self.social_file = social_prefixed if social_prefixed.exists() else social_standard
+
+        # Entities - check both naming conventions
+        entities_prefixed = data_dir / 'rosen_extracted_entities.csv'
+        entities_standard = data_dir / 'extracted_entities.csv'
+        self.entities_file = entities_prefixed if entities_prefixed.exists() else entities_standard
+
+        # Relationships - check both naming conventions
+        relationships_prefixed = data_dir / 'rosen_extracted_relationships.csv'
+        relationships_standard = data_dir / 'extracted_relationships.csv'
+        self.relationships_file = relationships_prefixed if relationships_prefixed.exists() else relationships_standard
+
+        # Output directory
+        self.output_dir = data_dir / 'output'
         self.output_dir.mkdir(exist_ok=True)
+
+        print(f"[CSV SERVICE] Data directory set to: {data_dir}")
+        print(f"[CSV SERVICE] Social posts: {self.social_file.name}")
+        print(f"[CSV SERVICE] Entities: {self.entities_file.name}")
+        print(f"[CSV SERVICE] Relationships: {self.relationships_file.name}")
 
     def get_urls_to_process(self, start_row: int = 0, end_row: Optional[int] = None,
                             skip_processed: bool = True) -> List[Dict[str, str]]:

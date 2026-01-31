@@ -6,9 +6,11 @@ Manages entity ID assignment and deduplication using a normalized name lookup sy
 Prevents duplicate entity IDs by checking against existing entities before assigning new IDs.
 """
 
+import csv
 import re
 from collections import defaultdict
-from typing import Dict, List, Tuple, Set
+from pathlib import Path
+from typing import Dict, List, Tuple, Set, Optional
 
 
 class EntityRegistry:
@@ -122,6 +124,75 @@ class EntityRegistry:
 
         print(f"[REGISTRY] Loaded {len(self.name_to_id)} entities from sheet")
         print(f"[REGISTRY] ID counters: {dict(self.id_counters)}")
+
+    def load_from_csv(self, csv_path: Path) -> int:
+        """
+        Load existing entities from a CSV file.
+
+        The CSV should have columns: entity_id, entity_type, entity_name,
+        and optionally: normalized_name, role_or_description, affiliation, etc.
+
+        Args:
+            csv_path: Path to the CSV file
+
+        Returns:
+            Number of entities loaded
+        """
+        csv_path = Path(csv_path)
+        if not csv_path.exists():
+            print(f"[REGISTRY] WARNING: CSV file not found: {csv_path}")
+            return 0
+
+        loaded_count = 0
+
+        with open(csv_path, 'r', encoding='utf-8-sig') as f:
+            reader = csv.DictReader(f)
+
+            for row in reader:
+                entity_id = row.get('entity_id', '')
+                entity_type = row.get('entity_type', '')
+                entity_name = row.get('entity_name', '')
+
+                if not entity_id or not entity_type or not entity_name:
+                    continue
+
+                # Normalize the name
+                normalized = self.normalize_entity_name(entity_name, entity_type)
+
+                # Store in lookup
+                key = (normalized, entity_type)
+                self.name_to_id[key] = entity_id
+
+                # Store full entity data
+                self.entities[entity_id] = {
+                    'entity_id': entity_id,
+                    'entity_type': entity_type,
+                    'entity_name': entity_name,
+                    'normalized_name': normalized,
+                    'role_or_description': row.get('role_or_description', ''),
+                    'affiliation': row.get('affiliation', ''),
+                    'prominence_score': row.get('prominence_score', ''),
+                    'first_mention_record_id': row.get('first_mention_record_id', ''),
+                    'total_mentions': row.get('total_mentions', '1'),
+                    'related_entities': row.get('related_entities', ''),
+                    'notes': row.get('notes', '')
+                }
+
+                # Update ID counter
+                prefix = entity_id[0]  # P, O, C, etc.
+                try:
+                    id_num = int(entity_id[1:])
+                    if id_num > self.id_counters[prefix]:
+                        self.id_counters[prefix] = id_num
+                except (ValueError, IndexError):
+                    pass
+
+                loaded_count += 1
+
+        print(f"[REGISTRY] Loaded {loaded_count} entities from CSV: {csv_path.name}")
+        print(f"[REGISTRY] ID counters: {dict(self.id_counters)}")
+
+        return loaded_count
 
     def get_or_create_entity_id(self, entity_name: str, entity_type: str) -> Tuple[str, bool]:
         """
