@@ -2,6 +2,14 @@
 
 This file provides context for Claude Code when working on this repository.
 
+## Bug-fixing workflow
+
+When a bug is reported, don't immediately attempt to fix it. Instead:
+
+1. **Write a failing test first** that reproduces the bug
+2. **Launch subagents** to work on fixing the bug
+3. **Verify the fix** by running the test — a passing test proves the bug is fixed
+
 ---
 
 ## 🔄 Resuming Work on This Repository
@@ -62,25 +70,26 @@ All development work for the December 2025 dissertation release is complete. The
 
 ---
 
-## 🔄 CURRENT SESSION STATUS (January 31, 2026)
+## 🔄 CURRENT SESSION STATUS (February 2, 2026)
 
 **Branch:** claude/archive-optimization-validation-EGyYZ
-**Status:** Entity extraction pipeline in progress (5.8% complete)
+**Status:** Entity extraction pipeline in progress (24.8% complete)
 
 ### 🔄 IN PROGRESS: Social post entity extraction
 
 Processing 23,416 social posts (Twitter + Bluesky) to extract entities and relationships.
 
-**Progress:**
-- Posts processed: 1,350 / 23,416 (5.8%)
-- New entities: 425
-- Relationships: 492
+**Progress (as of February 2, 2026):**
+- Posts processed: 5,800 / 23,416 (24.8%)
+- New entities: 784
+- Relationships: 3,288
 - Deduplication: Against 5,160 existing entities
 
 **Key files:**
 - Pipeline script: `backend/scripts/unified_entity_processor.py`
 - SQLite database: `data/social_import/extraction.db`
 - Batch results: `data/social_import/batch_*_results.json`
+- Documentation: `docs/ENTITY_EXTRACTION_PIPELINE.md`
 
 **To resume:**
 ```bash
@@ -89,9 +98,9 @@ PYTHONPATH=src python3 scripts/unified_entity_processor.py --status --data-dir .
 # Then start Ralph Loop: /ralph-loop
 ```
 
-**Entity types being extracted:**
-- Person (148), Organization (117), Concept (90)
-- Location (41), Event (19), Work (10)
+**Entity types extracted so far:**
+- Person (308), Organization (206), Concept (143)
+- Location (60), Work (34), Event (33)
 
 ---
 
