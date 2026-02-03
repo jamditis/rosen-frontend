@@ -73,42 +73,54 @@ All development work for the December 2025 dissertation release is complete. The
 ## 🔄 CURRENT SESSION STATUS (February 2, 2026)
 
 **Branch:** claude/archive-optimization-validation-EGyYZ
-**Status:** Entity extraction pipeline in progress (26.0% complete)
+**Status:** Entity extraction pipeline paused at 26.0% - quality checkpoint complete
 
-### 🔄 IN PROGRESS: Social post entity extraction
+### Social post entity extraction progress
 
-Processing 29,187 social posts (Twitter + Bluesky) to extract entities and relationships.
+Processing 23,416 substantive social posts (filtered from 29,187 total) to extract entities and relationships.
 
 **Progress (as of February 2, 2026):**
-- Posts processed: 7,600 / 29,187 (26.0%)
-- Remaining: 21,587 posts
-- Total entities: 1,471
-- Total relationships: 3,581
+- Posts processed: 7,600 / 23,416 (32.5% of substantive posts)
+- Remaining: 15,816 posts
 - Batches completed: 143
 
-**Quality metrics:**
-- Posts with entities: 82.7%
-- Avg entities per post (when present): 2.23
-- Twitter posts: 2.08 entities/post avg
-- Bluesky posts: 1.20 entities/post avg (many short replies)
+**Database stats (after cleanup):**
+- Entities in extraction.db: 1,387
+- Relationships: 3,581
+- Entity registry total: 5,160
 
 **Entity type distribution:**
-- Person: 473 (32.2%)
-- Organization: 434 (29.5%)
-- Concept: 349 (23.7%)
-- Work: 104 (7.1%)
-- Location: 72 (4.9%)
-- Event: 39 (2.7%)
+- Person: 417 (30.1%)
+- Concept: 458 (33.0%)
+- Organization: 343 (24.7%)
+- Work: 63 (4.5%)
+- Location: 70 (5.0%)
+- Event: 36 (2.6%)
 
-**Top entities (by frequency):**
-- New York Times (32x), PressThink (24x), Washington Post (13x)
-- Bluesky (12x), CNN (9x), The Guardian (8x), Donald Trump (8x)
+**25% milestone cleanup completed:**
+- Merged 150 duplicate entity groups (345 duplicates removed)
+- Normalized relationship types: 420 variants -> 344 canonical
+- Fixed normalized_name field for all entities
+- Added 266 missing entity references from relationships
+- Orphan rate reduced: 62.2% -> 39.9%
+
+**Quality tools created:**
+- `data/social_import/cleanup_extraction_db.py` - Entity deduplication and normalization
+- `data/social_import/milestone_analysis.py` - Reusable 25%/50%/75%/100% checkpoint analysis
 
 **Key files:**
 - SQLite database: `data/social_import/extraction.db`
 - Batch results: `data/social_import/batch_*_results.json`
+- Milestone report: `data/social_import/milestone_25_report.json`
 
-**To resume:** Use `/ralph-loop` with prompt: "Extract entities from social posts batch - process 50 posts at a time, save to extraction.db, repeat for 10 iterations then compact context"
+**To resume extraction:**
+```bash
+cd backend
+PYTHONPATH=src python scripts/unified_entity_processor.py --status --data-dir ../data/social_import
+# Then use /ralph-loop to continue batch processing
+```
+
+**Next milestone:** Run `milestone_analysis.py --milestone 50` at 50% completion
 
 ---
 
