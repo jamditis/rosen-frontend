@@ -517,26 +517,26 @@ class UnifiedEntityProcessor:
         print("ENTITY EXTRACTION STATUS")
         print("=" * 60)
 
-        print(f"\n📊 Progress:")
+        print(f"\n[PROGRESS]")
         print(f"   Total posts:     {status['total_posts']:,}")
         print(f"   Processed:       {status['processed_posts']:,}")
         print(f"   Remaining:       {status['remaining_posts']:,}")
         print(f"   Progress:        {status['progress_pct']}%")
 
-        print(f"\n📦 Database:")
+        print(f"\n[DATABASE]")
         print(f"   Entities:        {status['entities_in_db']:,}")
         print(f"   Relationships:   {status['relationships_in_db']:,}")
 
-        print(f"\n🔗 Registry:")
+        print(f"\n[REGISTRY]")
         print(f"   Total entities:  {status['entities_in_registry']:,}")
 
         if status.get('entities_by_type'):
-            print(f"\n📁 Entities by type:")
+            print(f"\n[ENTITIES BY TYPE]")
             for etype, count in sorted(status['entities_by_type'].items()):
                 print(f"   {etype}: {count:,}")
 
         if status.get('failed_posts', 0) > 0:
-            print(f"\n⚠️  Failed posts: {status['failed_posts']}")
+            print(f"\n[WARNING] Failed posts: {status['failed_posts']}")
 
         print("\n" + "=" * 60)
 
@@ -624,7 +624,7 @@ def main():
         batch = processor.prepare_batch(args.batch_size, args.tier)
         if batch:
             output = processor.export_batch_for_claude(batch, args.output)
-            print(f"\n✅ Ready for Claude extraction!")
+            print(f"\n[SUCCESS] Ready for Claude extraction!")
             print(f"   File: {output}")
             print(f"   Posts: {len(batch)}")
 
@@ -634,7 +634,7 @@ def main():
             return 1
 
         posts, entities, rels = processor.import_json_results(args.process_results)
-        print(f"\n✅ Processed {posts} posts")
+        print(f"\n[SUCCESS] Processed {posts} posts")
         print(f"   Entities saved: {entities}")
         print(f"   Relationships saved: {rels}")
 

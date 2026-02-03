@@ -73,34 +73,42 @@ All development work for the December 2025 dissertation release is complete. The
 ## 🔄 CURRENT SESSION STATUS (February 2, 2026)
 
 **Branch:** claude/archive-optimization-validation-EGyYZ
-**Status:** Entity extraction pipeline in progress (24.8% complete)
+**Status:** Entity extraction pipeline in progress (26.0% complete)
 
 ### 🔄 IN PROGRESS: Social post entity extraction
 
-Processing 23,416 social posts (Twitter + Bluesky) to extract entities and relationships.
+Processing 29,187 social posts (Twitter + Bluesky) to extract entities and relationships.
 
 **Progress (as of February 2, 2026):**
-- Posts processed: 5,800 / 23,416 (24.8%)
-- New entities: 784
-- Relationships: 3,288
-- Deduplication: Against 5,160 existing entities
+- Posts processed: 7,600 / 29,187 (26.0%)
+- Remaining: 21,587 posts
+- Total entities: 1,471
+- Total relationships: 3,581
+- Batches completed: 143
+
+**Quality metrics:**
+- Posts with entities: 82.7%
+- Avg entities per post (when present): 2.23
+- Twitter posts: 2.08 entities/post avg
+- Bluesky posts: 1.20 entities/post avg (many short replies)
+
+**Entity type distribution:**
+- Person: 473 (32.2%)
+- Organization: 434 (29.5%)
+- Concept: 349 (23.7%)
+- Work: 104 (7.1%)
+- Location: 72 (4.9%)
+- Event: 39 (2.7%)
+
+**Top entities (by frequency):**
+- New York Times (32x), PressThink (24x), Washington Post (13x)
+- Bluesky (12x), CNN (9x), The Guardian (8x), Donald Trump (8x)
 
 **Key files:**
-- Pipeline script: `backend/scripts/unified_entity_processor.py`
 - SQLite database: `data/social_import/extraction.db`
 - Batch results: `data/social_import/batch_*_results.json`
-- Documentation: `docs/ENTITY_EXTRACTION_PIPELINE.md`
 
-**To resume:**
-```bash
-cd /home/jamditis/projects/rosen-frontend/backend
-PYTHONPATH=src python3 scripts/unified_entity_processor.py --status --data-dir ../data/social_import
-# Then start Ralph Loop: /ralph-loop
-```
-
-**Entity types extracted so far:**
-- Person (308), Organization (206), Concept (143)
-- Location (60), Work (34), Event (33)
+**To resume:** Use `/ralph-loop` with prompt: "Extract entities from social posts batch - process 50 posts at a time, save to extraction.db, repeat for 10 iterations then compact context"
 
 ---
 
