@@ -10,7 +10,6 @@ RECORD-00002_REL_008,RECORD-00002,P0001,Eric Nelson,Mentions,O0005,O05,"With blo
 RECORD-00002_REL_009,RECORD-00002,P0001,Eric Nelson,Mentions,O0006,Blogdex,"With blog-tracking tools like Daypop, Blogdex, Technorati, and even The New York Times most-emailed rss feeds",1.0,2025-10-22
 RECORD-00002_REL_010,RECORD-00002,P0001,Eric Nelson,Mentions,O0007,Technorati,"With blog-tracking tools like Daypop, Blogdex, Technorati, and even The New York Times most-emailed rss feeds",1.0,2025-10-22
 RECORD-00002_REL_011,RECORD-00002,P0001,Eric Nelson,Mentions,P0004,Kevin Drum,"I started reading Kevin Drum, Digby, Jay Rosen, Daniel Radosh, Ruy Teixiera",1.0,2025-10-22
-RECORD-00002_REL_012,RECORD-00002,P0001,Eric Nelson,Mentions,P0002,Digby,"I started reading Kevin Drum, Digby, Jay Rosen, Daniel Radosh, Ruy Teixiera",1.0,2025-10-22
 RECORD-00002_REL_013,RECORD-00002,P0001,Eric Nelson,Mentions,P0005,Jay Rosen,"I started reading Kevin Drum, Digby, Jay Rosen, Daniel Radosh, Ruy Teixiera",1.0,2025-10-22
 RECORD-00002_REL_014,RECORD-00002,P0001,Eric Nelson,Mentions,P0006,Daniel Radosh,"I started reading Kevin Drum, Digby, Jay Rosen, Daniel Radosh, Ruy Teixiera",1.0,2025-10-22
 RECORD-00002_REL_015,RECORD-00002,P0001,Eric Nelson,Mentions,P0007,Ruy Teixiera,"I started reading Kevin Drum, Digby, Jay Rosen, Daniel Radosh, Ruy Teixiera",1.0,2025-10-22
@@ -19,7 +18,6 @@ RECORD-00002_REL_017,RECORD-00002,P0008,Josh Marshall,Affiliated With,O0008,The 
 RECORD-00002_REL_018,RECORD-00002,P0001,Eric Nelson,Discusses,C0002,Press Release Journalism,"They don’t fall into press release journalism, or at least not the blogs we all actually read.",0.9,2025-10-22
 RECORD-00002_REL_019,RECORD-00002,P0001,Eric Nelson,Mentions,P0009,Andrew Sullivan,"If Andrew Sullivan and Jeff Jarvis, two former major magazine editors, aren’t the mainstream media, then I don’t know what that term means.",1.0,2025-10-22
 RECORD-00002_REL_020,RECORD-00002,P0001,Eric Nelson,Mentions,P0010,Jeff Jarvis,"If Andrew Sullivan and Jeff Jarvis, two former major magazine editors, aren’t the mainstream media, then I don’t know what that term means.",1.0,2025-10-22
-RECORD-00002_REL_021,RECORD-00002,P0001,Eric Nelson,Mentions,P0002,Digby,"That said, Digby, if you’re reading this, send me an e-mail.",1.0,2025-10-22
 RECORD-00002_REL_022,RECORD-00002,P0011,Ken Smith,Affiliated With,O0009,Weblogs in Higher Education,"Ken Smith, at Weblogs in Higher Education, responds to this post.",1.0,2025-10-22
 RECORD-00002_REL_023,RECORD-00002,P0012,Mark Glaser,Affiliated With,O0010,Online Journalism Review,"Mark Glaser, columnist for Online Journalism Review",1.0,2025-10-22
 RECORD-00002_REL_024,RECORD-00002,P0012,Mark Glaser,Affiliated With,O0011,About.com,"Mark Glaser, columnist for Online Journalism Review, About.com CEO",1.0,2025-10-22
@@ -28,7 +26,6 @@ RECORD-00002_REL_026,RECORD-00002,O0002,The New York Times,Mentions,O0011,About.
 RECORD-00002_REL_027,RECORD-00002,O0002,The New York Times,Discusses,O0012,Dow Jones,The New York Times is a news company...More than one person in this room saw the About.com and the Dow Jones/Marketplace deals as very important for the future of old media,1.0,2025-10-22
 RECORD-00002_REL_028,RECORD-00002,O0002,The New York Times,Discusses,O0013,Marketplace,The New York Times is a news company...More than one person in this room saw the About.com and the Dow Jones/Marketplace deals as very important for the future of old media,1.0,2025-10-22
 RECORD-00002_REL_029,RECORD-00002,P0001,Eric Nelson,Expands On,C0003,Age of Insight,"One idea I’m always pitching to Jay, and anyone else who will listen, is that we’ve moved from the “Information Age” to the “Age of Insight.",0.9,2025-10-22
-RECORD-00002_REL_030,RECORD-00002,P0001,Eric Nelson,Mentions,P0005,Jay Rosen,"One idea I’m always pitching to Jay, and anyone else who will listen",1.0,2025-10-22
 RECORD-00002_REL_031,RECORD-00002,P0001,Eric Nelson,Mentions,P0014,George W. Bush,When Bush announced his budget,1.0,2025-10-22
 RECORD-00003_REL_001,RECORD-00003,O0014,Fox News,Occurred At,L0001,New York City,Fox News Headquarters in New York City,1.0,2025-10-22
 RECORD-00003_REL_002,RECORD-00003,E0001,Republican National Convention,Occurred At,L0001,New York City,As we get closer to the convention countdown in New York.,0.9,2025-10-22
@@ -93,9 +90,7 @@ RECORD-00006_REL_010,RECORD-00006,P0001,Eric Nelson,Mentions,P0003,Paul Krugman,
 RECORD-00006_REL_011,RECORD-00006,P0001,Eric Nelson,Mentions,O0005,Daypop,With blog-tracking tools like Daypop...,1.0,2025-10-22
 RECORD-00006_REL_012,RECORD-00006,P0001,Eric Nelson,Mentions,O0006,Blogdex,...Blogdex...,1.0,2025-10-22
 RECORD-00006_REL_013,RECORD-00006,P0001,Eric Nelson,Mentions,O0007,Technorati,...Technorati...,1.0,2025-10-22
-RECORD-00006_REL_014,RECORD-00006,P0001,Eric Nelson,Mentions,O0002,The New York Times,...and even The New York Times most-emailed rss feeds...,1.0,2025-10-22
 RECORD-00006_REL_015,RECORD-00006,P0001,Eric Nelson,Mentions,P0004,Kevin Drum,I started reading Kevin Drum...,1.0,2025-10-22
-RECORD-00006_REL_016,RECORD-00006,P0001,Eric Nelson,Mentions,P0002,Digby,...Digby...,1.0,2025-10-22
 RECORD-00006_REL_017,RECORD-00006,P0001,Eric Nelson,Mentions,P0005,Jay Rosen,...Jay Rosen...,1.0,2025-10-22
 RECORD-00006_REL_018,RECORD-00006,P0001,Eric Nelson,Mentions,P0006,Daniel Radosh,...Daniel Radosh...,1.0,2025-10-22
 RECORD-00006_REL_019,RECORD-00006,P0001,Eric Nelson,Mentions,P0007,Ruy Teixiera,...Ruy Teixiera...,1.0,2025-10-22
@@ -113,7 +108,6 @@ RECORD-00006_REL_030,RECORD-00006,P0013,Len Apcar,Mentions,O0011,About.com,Len A
 RECORD-00006_REL_031,RECORD-00006,P0013,Len Apcar,Mentions,O0012,Dow Jones,More than one person in this room saw the About.com and the Dow Jones/Marketplace deals as very important for the future of old media,1.0,2025-10-22
 RECORD-00006_REL_032,RECORD-00006,P0013,Len Apcar,Mentions,O0013,Marketplace,More than one person in this room saw the About.com and the Dow Jones/Marketplace deals as very important for the future of old media,1.0,2025-10-22
 RECORD-00006_REL_033,RECORD-00006,P0001,Eric Nelson,Discusses,C0003,Age of Insight,"One idea I’m always pitching to Jay, and anyone else who will listen, is that we’ve moved from the “Information Age” to the “Age of Insight.”",1.0,2025-10-22
-RECORD-00006_REL_034,RECORD-00006,P0001,Eric Nelson,Mentions,P0005,Jay Rosen,"One idea I’m always pitching to Jay, and anyone else who will listen, is that we’ve moved from the “Information Age” to the “Age of Insight.”",1.0,2025-10-22
 RECORD-00006_REL_035,RECORD-00006,P0001,Eric Nelson,Mentions,E0005,Bush announced his budget,"When Bush announced his budget, for instance, you could get that information from any one of thousands of sources.",1.0,2025-10-22
 RECORD-00019_REL_001,RECORD-00019,O0002,The New York Times,Discusses,W0010,Obama’s youthful drug use,“vetting” stories that went awry at the New York Times: Obama’s youthful drug use,0.9,2025-10-22
 RECORD-00019_REL_002,RECORD-00019,O0002,The New York Times,Discusses,W0011,Hillary’s marriage as Topic A among prominent Democrats,“vetting” stories that went awry at the New York Times: Hillary’s marriage,0.9,2025-10-22
@@ -258,7 +252,6 @@ RECORD-00029_REL_014,RECORD-00029,P0123,Bryan Curtis,Affiliated With,O0072,The R
 RECORD-00029_REL_015,RECORD-00029,P0008,Josh Marshall,Affiliated With,O0073,Talking Points Memo,Josh Marshall of Talking Points Memo.,1.0,2025-10-22
 RECORD-00029_REL_016,RECORD-00029,C0034,Technical Debt,Originated By,P0008,Josh Marshall,Technical debt (is Ward Cunningham’s concept.),1.0,2025-10-22
 RECORD-00029_REL_017,RECORD-00029,P0126,Lester Holt,Affiliated With,O0065,NBC,If Donald Trump calls NBC’s Lester Holt a Democrat...,1.0,2025-10-22
-RECORD-00029_REL_018,RECORD-00029,P0005,Jay Rosen,Discusses,P0073,Donald Trump,"Again and again with Trump, journalists find themselves in this position: persisting with familiar practices that don’t really make sense because the premise behind them",0.9,2025-10-22
 RECORD-00030_REL_001,RECORD-00030,P0128,Dan Gillmor,Affiliated With,O0074,San Jose Mercury News,Dan Gillmor was a reporter for the San Jose Mercury News,1.0,2025-10-22
 RECORD-00030_REL_002,RECORD-00030,C0037,Crowdsourcing,Discusses,O0075,Twitter,Use Twitter to ask simple questions,0.8,2025-10-22
 RECORD-00030_REL_003,RECORD-00030,C0037,Crowdsourcing,Discusses,O0076,Facebook,Simple Facebook groups can often be very effective,0.8,2025-10-22
@@ -579,7 +572,6 @@ RECORD-00063_REL_006,RECORD-00063,P0280,Jim Lehrer,Affiliated With,O0003,PBS,Jim
 RECORD-00063_REL_007,RECORD-00063,C0090,Vanishing Moderator,Originated By,P0280,Jim Lehrer,Jim Lehrer of PBS tried the Vanishing Moderator method. That's my term for it.,0.9,2025-10-22
 RECORD-00063_REL_008,RECORD-00063,P0280,Jim Lehrer,Discusses,C0090,Vanishing Moderator,Jim Lehrer of PBS tried the Vanishing Moderator method.,0.8,2025-10-22
 RECORD-00063_REL_009,RECORD-00063,P0281,Martha Raddatz,Discusses,P0280,Jim Lehrer,"Thank you for your service, Jim Lehrer! I will not be taking your approach.",0.8,2025-10-22
-RECORD-00063_REL_010,RECORD-00063,P0279,Candy Crowley,Discusses,O0188,Commission on Public Debates,The debate she will moderate Tuesday night is described in the agreement between the campaigns as the audience participation ('Town Hall') format,0.7,2025-10-22
 RECORD-00064_REL_001,RECORD-00064,P0283,Matthew Green,Criticizes,O0027,National Security Agency,"Professor Green wrote a post highly critical of the National Security Agency, whose reckless behavior in attacking online security astonished him.",0.9,2025-10-22
 RECORD-00064_REL_002,RECORD-00064,P0283,Matthew Green,Affiliated With,O0189,Johns Hopkins University,A professor in the computer science department at Johns Hopkins,1.0,2025-10-22
 RECORD-00064_REL_003,RECORD-00064,O0190,Applied Physics Laboratory,Affiliated With,O0191,Department of Defense,a research institute with longstanding ties to the Department of Defense,0.8,2025-10-22
@@ -702,7 +694,6 @@ RECORD-00076_REL_006,RECORD-00076,P0005,Jay Rosen,Discusses,C0004,View from Nowh
 RECORD-00076_REL_007,RECORD-00076,C0004,View from Nowhere,Originated By,P0312,Thomas Nagel,"The philosopher Thomas Nagel, who wrote a very important book with that title.",1.0,2025-10-22
 RECORD-00076_REL_008,RECORD-00076,P0005,Jay Rosen,Criticizes,C0004,View from Nowhere,You are very critical of the View from Nowhere in journalism. It’s almost a derisive term for you.,0.9,2025-10-22
 RECORD-00076_REL_009,RECORD-00076,O0071,MSNBC,Criticizes,P0313,Keith Olbermann,When MSNBC suspends Keith Olbermann for donating without company permission to candidates he supports,0.9,2025-10-22
-RECORD-00076_REL_010,RECORD-00076,O0031,NPR,Criticizes,P0311,Juan Williams,When NPR forbids its “news analysts” from expressing a view on matters they are empowered to analyze,0.9,2025-10-22
 RECORD-00076_REL_011,RECORD-00076,O0023,The Washington Post,Mentions,P0256,Dave Weigel,"During the episode in which a fine young reporter, Dave Weigel, lost his job at the Washington Post because he was perceived as insufficiently uncommitted",1.0,2025-10-22
 RECORD-00076_REL_012,RECORD-00076,P0209,Ben Smith,Supports,C0050,Objectivity,Ben Smith stood up for this kind of pluralism: “My personal view is that ideological and neutral journalism can flourish side by side,0.8,2025-10-22
 RECORD-00076_REL_013,RECORD-00076,P0226,David Weinberger,Mentions,C0006,Transparency,David Weinberger tried to capture it with his phrase: transparency is the new objectivity.,0.9,2025-10-22
@@ -851,7 +842,6 @@ RECORD-00091_REL_004,RECORD-00091,P0350,Jack Dorsey,Discusses,P0005,Jay Rosen,Do
 RECORD-00091_REL_005,RECORD-00091,P0005,Jay Rosen,Mentions,O0075,Twitter,Jay Rosen is a Twitter power user.,0.7,2025-10-22
 RECORD-00091_REL_006,RECORD-00091,O0283,Recode Media,Discusses,P0350,Jack Dorsey,Dorsey interview featured on Recode Media with Peter Kafka.,0.8,2025-10-22
 RECORD-00091_REL_007,RECORD-00091,P0005,Jay Rosen,Mentions,O0283,Recode Media,Jay Rosen on Recode Media.,0.6,2025-10-22
-RECORD-00091_REL_008,RECORD-00091,P0350,Jack Dorsey,Discusses,O0075,Twitter,Concerns about bias at Twitter,0.7,2025-10-22
 RECORD-00091_REL_009,RECORD-00091,P0350,Jack Dorsey,Discusses,P0185,Rush Limbaugh,Dorsey's dad was on the radio with Rush Limbaugh,0.6,2025-10-22
 RECORD-00091_REL_010,RECORD-00091,P0350,Jack Dorsey,Discusses,P0248,Sean Hannity,Dorsey's dad was on the radio with Sean Hannity,0.6,2025-10-22
 RECORD-00091_REL_011,RECORD-00091,P0353,Adam Sharp,Affiliated With,O0075,Twitter,Adam Sharp was the head of news for Twitter,1.0,2025-10-22
@@ -1400,7 +1390,6 @@ RECORD-00149_REL_010,RECORD-00149,P0517,Bill O'Reilly,Affiliated With,W0126,Insi
 RECORD-00149_REL_011,RECORD-00149,P0466,Richard Hofstadter,Discusses,C0003,C003,"Historian Richard Hofstadter on the paranoid style in American politics, for that is where O’Reilly comes from",0.8,2025-10-22
 RECORD-00149_REL_012,RECORD-00149,O0002,The New York Times,Discusses,W0127,Who's Looking Out for You?,"Suppose—to move to another front—the New York Times reviewed his latest, chart-topping book, Who’s Looking Out for You?",0.7,2025-10-22
 RECORD-00150_REL_001,RECORD-00150,P0557,Jeff Sharlet,Affiliated With,O0033,PressThink,Guest commentator in PressThink,0.9,2025-10-22
-RECORD-00150_REL_002,RECORD-00150,P0557,Jeff Sharlet,Affiliated With,O0033,PressThink,Publisher of new web journal,0.8,2025-10-22
 RECORD-00150_REL_003,RECORD-00150,P0557,Jeff Sharlet,Discusses,P0559,Gregg Easterbrook,Sharlet comments on the Gregg Easterbrook incident.,0.9,2025-10-22
 RECORD-00150_REL_004,RECORD-00150,P0559,Gregg Easterbrook,Affiliated With,O0394,The New Republic,"Easterbrook, writing as part of the New Republic site",0.9,2025-10-22
 RECORD-00150_REL_005,RECORD-00150,P0559,Gregg Easterbrook,Criticizes,P0245,Michael Eisner,"is it right for Jewish executives to worship money above everything, naming Michael Eisner and Harvey Weinstein as two who ought to know",0.8,2025-10-22
@@ -1446,7 +1435,6 @@ RECORD-00154_REL_001,RECORD-00154,P0570,Hunter S. Thompson,Discusses,C0093,Objec
 RECORD-00154_REL_002,RECORD-00154,P0570,Hunter S. Thompson,Affiliated With,W0131,Fear and Loathing on the Campaign Trail,Author of 'Fear and Loathing on the Campaign Trail',0.9,2025-10-22
 RECORD-00154_REL_003,RECORD-00154,P0571,Jean Bethke Elshtain,Discusses,C0092,Bias,Elshtain's distinction relates to whether actions are 'political' or 'politicized.',0.8,2025-10-22
 RECORD-00154_REL_004,RECORD-00154,P0571,Jean Bethke Elshtain,Affiliated With,W0132,Democracy on Trial,Author of 'Democracy on Trial',0.9,2025-10-22
-RECORD-00154_REL_005,RECORD-00154,P0571,Jean Bethke Elshtain,Discusses,C0092,Bias,Elshtain's work discusses the concept of being 'political' versus 'politicized',0.7,2025-10-22
 RECORD-00154_REL_006,RECORD-00154,C0004,View From Nowhere,Discusses,O0023,The Washington Post,The author mentions that The Washington Post claims a position outside of politics.,0.7,2025-10-22
 RECORD-00154_REL_007,RECORD-00154,P0314,Leonard Downie,Affiliated With,O0023,The Washington Post,"Leonard Downie, editor of the Washington Post",1.0,2025-10-22
 RECORD-00154_REL_008,RECORD-00154,P0314,Leonard Downie,Supports,C0004,View From Nowhere,Downie claims to be an outsider to society.,0.7,2025-10-22
@@ -1549,8 +1537,6 @@ RECORD-00165_REL_003,RECORD-00165,P0618,Sander Thoenes,Occurred At,L0065,East Ti
 RECORD-00165_REL_004,RECORD-00165,P0618,Sander Thoenes,Discusses,C0236,Open society,Sander Thoenes believed in the concept of an open society,0.8,2025-10-22
 RECORD-00165_REL_005,RECORD-00165,P0005,Jay Rosen,Affiliated With,O0418,Hampshire College,Professor James Miller from Hampshire College asked Jay Rosen to speak.,1.0,2025-10-22
 RECORD-00165_REL_006,RECORD-00165,P0618,Sander Thoenes,Discusses,C0237,Dutch Colonialism,Sander Thoenes felt connected to Indonesia's fate due to Dutch colonialism.,0.8,2025-10-22
-RECORD-00165_REL_007,RECORD-00165,P0618,Sander Thoenes,Affiliated With,O0165,Financial Times,"Quentin Peel, his editor at the Financial Times.",1.0,2025-10-22
-RECORD-00165_REL_008,RECORD-00165,P0005,Jay Rosen,Affiliated With,O0418,Hampshire College,When Professor James Miller called to ask if I would speak here today,1.0,2025-10-22
 RECORD-00166_REL_001,RECORD-00166,P0003,Paul Krugman,Affiliated With,O0002,The New York Times,Paul Krugman is a columnist for The New York Times.,1.0,2025-10-22
 RECORD-00166_REL_002,RECORD-00166,P0003,Paul Krugman,Criticizes,O0002,The New York Times,Krugman jeers at the press's performance in holding the Bush government accountable.,0.8,2025-10-22
 RECORD-00166_REL_003,RECORD-00166,P0003,Paul Krugman,Discusses,P0014,George W. Bush,Krugman has been advancing a view of the world in direct opposition to Bush Administration policy.,0.9,2025-10-22
@@ -1650,9 +1636,7 @@ RECORD-00176_REL_003,RECORD-00176,O0438,MediaChannel.org,Discusses,P0280,Jim Leh
 RECORD-00176_REL_004,RECORD-00176,P0280,Jim Lehrer,Discusses,L0002,Iraq,amount of attention paid to Iraq,0.6,2025-10-22
 RECORD-00176_REL_005,RECORD-00176,P0480,John Kerry,Mentions,P0014,George W. Bush,the comparison he drew between the priorities of going after Osama bin Laden and going after Saddam Hussein?,0.8,2025-10-22
 RECORD-00176_REL_006,RECORD-00176,P0280,Jim Lehrer,Discusses,P0480,John Kerry,"To Kerry: Colossal misjudgments, what colossal misjudgments, in your opinion, has President Bush made in these areas?",0.7,2025-10-22
-RECORD-00176_REL_007,RECORD-00176,P0280,Jim Lehrer,Discusses,L0002,Iraq,on Iraq and international terrorism,0.7,2025-10-22
 RECORD-00176_REL_008,RECORD-00176,P0005,Jay Rosen,Discusses,P0280,Jim Lehrer,My favorite was his question about genocide and the Sudan.,0.8,2025-10-22
-RECORD-00176_REL_009,RECORD-00176,P0280,Jim Lehrer,Discusses,P0480,John Kerry,To Kerry: Do you believe you could do a better job than President Bush in preventing another 9/11-type terrorist attack on the United States?,0.7,2025-10-22
 RECORD-00176_REL_010,RECORD-00176,P0280,Jim Lehrer,Discusses,P0014,George W. Bush,To Bush: Do you believe the election of Senator Kerry on Nov. 2 would increase the chances of the U.S. being hit by another 9/11-type terrorist attack?,0.7,2025-10-22
 RECORD-00177_REL_001,RECORD-00177,P0005,Jay Rosen,Criticizes,O0159,Mother Jones,Rosen criticizes Mother Jones' framing of the Politics 2.0 package,0.9,2025-10-22
 RECORD-00177_REL_002,RECORD-00177,P0005,Jay Rosen,Discusses,W0156,Politics 2.0 package,Rosen analyzes the Politics 2.0 package from Mother Jones,0.8,2025-10-22
@@ -1832,7 +1816,6 @@ RECORD-00192_REL_003,RECORD-00192,P0612,Frank Rich,Discusses,E0045,White House C
 RECORD-00192_REL_004,RECORD-00192,P0762,David Carr,Discusses,E0045,White House Correspondents Association Dinner,David Carr wrote in a Times column...The dinner itself “only seemed to emphasize the distance between Washington and the rest of the country.”,0.8,2025-10-22
 RECORD-00192_REL_005,RECORD-00192,P0255,Jim Rutenberg,Affiliated With,O0002,The New York Times,"Jim Rutenberg, a Times correspondent",1.0,2025-10-22
 RECORD-00192_REL_006,RECORD-00192,P0255,Jim Rutenberg,Mentions,P0005,Jay Rosen,Jim Rutenberg interviewed me about the upcoming Correspondents dinner,0.9,2025-10-22
-RECORD-00192_REL_007,RECORD-00192,P0014,George W. Bush,Criticizes,O0002,The New York Times,"Bush told reporters the same thing at an August 2003 barbeque in Texas: “You’re assuming that you represent the public,” he said, “I don’t accept that.”",0.8,2025-10-22
 RECORD-00192_REL_008,RECORD-00192,P0765,Lowell Bergman,Affiliated With,O0481,Frontline,Lowell Bergman...correspondent...,1.0,2025-10-22
 RECORD-00192_REL_009,RECORD-00192,P0005,Jay Rosen,Affiliated With,O0049,New York University,"Jay Rosen, a journalism professor at New York University",1.0,2025-10-22
 RECORD-00193_REL_001,RECORD-00193,C0042,Citizens Agenda,Discusses,C0041,Horse Race Journalism,Citizens agenda substitutes for horse race journalism.,0.9,2025-10-22
@@ -1865,7 +1848,6 @@ RECORD-00194_REL_018,RECORD-00194,O0482,Unity: Journalists of Color,Affiliated W
 RECORD-00194_REL_019,RECORD-00194,O0482,Unity: Journalists of Color,Affiliated With,O0485,Native American Journalists Association,Unity is a coalition: the Native American Journalists Association,1.0,2025-10-22
 RECORD-00194_REL_020,RECORD-00194,O0482,Unity: Journalists of Color,Affiliated With,O0486,Asian American Journalists Association,Unity is a coalition: the Asian American Journalists Association,1.0,2025-10-22
 RECORD-00194_REL_021,RECORD-00194,P0452,Jack Shafer,Criticizes,O0023,The Washington Post,"Jack Shafer in Slate, Aug. 5: If This Is Unity, Give Me Division. On the Washington Post’s “fawning coverage.”",0.9,2025-10-22
-RECORD-00194_REL_022,RECORD-00194,E0086,Unity Convention,Occurred At,L0004,Washington D.C.,Unity opened with a mix of pride in the big numbers of journalists who made their way to the Washington Convention Center,0.9,2025-10-22
 RECORD-00195_REL_001,RECORD-00195,E0058,BloggerCon,Occurred At,O0488,Stanford Law School,BloggerCon III shifted to Stanford Law School,0.9,2025-10-22
 RECORD-00195_REL_002,RECORD-00195,E0058,BloggerCon,Occurred At,L0086,Silicon Valley,"Stanford Law School, in the heart of Silicon Valley",0.8,2025-10-22
 RECORD-00195_REL_003,RECORD-00195,P0290,Dave Winer,Originated By,E0058,BloggerCon,"BloggerCon, the series begun by Dave Winer",0.9,2025-10-22
@@ -1953,7 +1935,6 @@ RECORD-00202_REL_001,RECORD-00202,P0827,Weldon Berger,Discusses,C0278,Moral Valu
 RECORD-00202_REL_002,RECORD-00202,P0827,Weldon Berger,Discusses,E0091,2004 Election,Weldon Berger discusses the importance of 'moral values' to the outcome of the 2004 election.,0.8,2025-10-22
 RECORD-00202_REL_003,RECORD-00202,O0050,Press,Criticizes,C0278,Moral Values,"The press have missed a lot of big stories in recent years, and were misled regarding the impact of moral values.",0.7,2025-10-22
 RECORD-00202_REL_004,RECORD-00202,P0671,Howard Fineman,Affiliated With,O0029,Newsweek,Howard Fineman from Newsweek.,0.9,2025-10-22
-RECORD-00202_REL_005,RECORD-00202,P0671,Howard Fineman,Affiliated With,O0029,Newsweek,Howard Fineman from Newsweek and MSNBC.,0.9,2025-10-22
 RECORD-00202_REL_006,RECORD-00202,P0671,Howard Fineman,Discusses,L0104,Red America,"Journalists 'don't understand red-state America,' says Newsweek's Howard Fineman.",0.8,2025-10-22
 RECORD-00202_REL_007,RECORD-00202,P0005,Jay Rosen,Discusses,C0278,Moral Values,Jay Rosen's comments on Richard Morin's analysis of 'moral values' as a frame.,0.9,2025-10-22
 RECORD-00202_REL_008,RECORD-00202,P0700,John Roberts,Affiliated With,O0048,CBS,John Roberts from CBS.,0.9,2025-10-22
@@ -2452,7 +2433,6 @@ RECORD-00252_REL_001,RECORD-00252,O0648,Backfence,Discusses,C0102,Citizen Journa
 RECORD-00252_REL_002,RECORD-00252,P0897,Mark Potts,Affiliated With,O0023,The Washington Post,Potts was co-founder of WashingtonPost.com,0.9,2025-10-22
 RECORD-00252_REL_003,RECORD-00252,P0897,Mark Potts,Affiliated With,O0648,Backfence,Potts is co-founder of Backfence,1.0,2025-10-22
 RECORD-00252_REL_004,RECORD-00252,P0899,Susan DeFife,Affiliated With,O0648,Backfence,DeFife is co-founder of Backfence,1.0,2025-10-22
-RECORD-00252_REL_005,RECORD-00252,P0899,Susan DeFife,Affiliated With,O0648,Backfence,DeFife was CEO and founder of womenCONNECT.com,0.9,2025-10-22
 RECORD-00252_REL_006,RECORD-00252,O0648,Backfence,Occurred At,L0125,McLean,Backfence community exists in McLean,0.9,2025-10-22
 RECORD-00252_REL_007,RECORD-00252,O0648,Backfence,Occurred At,L0109,"Reston, VA",Backfence community exists in Reston,0.9,2025-10-22
 RECORD-00252_REL_008,RECORD-00252,O0648,Backfence,Occurred At,L0126,"Bethesda, MD",Backfence community exists in Bethesda,0.9,2025-10-22
@@ -2867,7 +2847,6 @@ RECORD-00286_REL_016,RECORD-00286,P0739,Dick Cheney,Discusses,E0049,Vietnam War,
 RECORD-00286_REL_017,RECORD-00286,P0739,Dick Cheney,Discusses,E0006,Watergate Scandal,Dick Cheney’s conviction that executive power was eroded after ... and Watergate,0.8,2025-10-22
 RECORD-00287_REL_001,RECORD-00287,P0443,Michelle Nicolosi,Affiliated With,O0010,Online Journalism Review,Michelle Nicolosi is the editor of Online Journalism Review,1.0,2025-10-22
 RECORD-00287_REL_002,RECORD-00287,P0443,Michelle Nicolosi,Affiliated With,O0331,Japan Media Review,Michelle Nicolosi is the founder of Japan Media Review,1.0,2025-10-22
-RECORD-00287_REL_003,RECORD-00287,P0443,Michelle Nicolosi,Affiliated With,O0010,Online Journalism Review,Michelle Nicolosi is editor of Online Journalism Review,1.0,2025-10-22
 RECORD-00287_REL_004,RECORD-00287,O0010,Online Journalism Review,Discusses,C0170,Interactive Journalism,Discusses emerging forms of journalism you would call interactive,0.8,2025-10-22
 RECORD-00287_REL_005,RECORD-00287,P0443,Michelle Nicolosi,Discusses,C0171,Participatory Journalism,"As technology makes more interaction possible, I think we’re going to see more of what people are calling “participatory journalism",0.8,2025-10-22
 RECORD-00287_REL_006,RECORD-00287,O0176,The Seattle Times,Mentions,C0170,Interactive Journalism,The Seattle Times recently invited readers to balance Washington’s budget.,0.7,2025-10-22
@@ -3032,9 +3011,7 @@ RECORD-00305_REL_003,RECORD-00305,O0751,OffTheBus.Net,Discusses,W0163,Assignment
 RECORD-00305_REL_004,RECORD-00305,P0005,Jay Rosen,Discusses,W0163,Assignment Zero,My Q and A with Len Witt explains more.,0.9,2025-10-22
 RECORD-00305_REL_005,RECORD-00305,P0005,Jay Rosen,Affiliated With,O0033,PressThink,"NewAssignment.Net, born one year ago in a post at PressThink.",0.9,2025-10-22
 RECORD-00305_REL_006,RECORD-00305,O0043,Wired,Published In,W0163,Assignment Zero,Assignment Zero concluded its run with publication of a final package at Wired.com,0.9,2025-10-22
-RECORD-00305_REL_007,RECORD-00305,P0005,Jay Rosen,Discusses,W0163,Assignment Zero,My own “what I learned” post about Assignment Zero,0.9,2025-10-22
 RECORD-00305_REL_008,RECORD-00305,P0731,Len Witt,Affiliated With,O0599,PJNet,"Leonard Witt of PJNet, a contributor and chronicler of Assignment Zero",1.0,2025-10-22
-RECORD-00305_REL_009,RECORD-00305,P0005,Jay Rosen,Discusses,W0163,Assignment Zero,"As I told Witt, the most important lessons from Assignment Zero",0.9,2025-10-22
 RECORD-00305_REL_010,RECORD-00305,P0005,Jay Rosen,Discusses,C0395,Gift economy for news,“Can there be a gift economy for news?” was one of the questions I asked in launching NewAssignment.Net.,0.9,2025-10-22
 RECORD-00305_REL_011,RECORD-00305,P0005,Jay Rosen,Discusses,O0515,Wikipedia,I am on the Wikipedia advisory board,0.9,2025-10-22
 RECORD-00305_REL_012,RECORD-00305,P0005,Jay Rosen,Discusses,P0842,Jimmy Wales,I asked him why did Wikipedia work,0.9,2025-10-22
@@ -3077,7 +3054,6 @@ RECORD-00309_REL_003,RECORD-00309,W0340,Weekend Note on Eason Jordan,Mentions,P0
 RECORD-00309_REL_004,RECORD-00309,P0984,Richard Sambrook,Affiliated With,O0197,BBC,See also Richard Sambrook of the BBC,1.0,2025-10-22
 RECORD-00309_REL_005,RECORD-00309,W0341,What Eason Jordan Said in Davos,Mentions,P0630,Eason Jordan,See also Richard Sambrook of the BBC: What Eason Jordan Said in Davos,1.0,2025-10-22
 RECORD-00309_REL_006,RECORD-00309,O0015,CNN,Discusses,C0400,Propaganda of the deed,"TV news can be used for the propaganda of the word, and often is, but so much more effectively it sends the propaganda of the deed",0.8,2025-10-22
-RECORD-00309_REL_007,RECORD-00309,P0630,Eason Jordan,Discusses,O0015,CNN,"It is Eason Jordan who has to “get CNN into Baghdad,”",0.9,2025-10-22
 RECORD-00309_REL_008,RECORD-00309,P0630,Eason Jordan,Discusses,E0101,World Economic Forum,"he has to speak with a diplomat’s tongue, in all situations, and certainly the World Economic Forum is one.",0.8,2025-10-22
 RECORD-00309_REL_009,RECORD-00309,P0406,Hugh Hewitt,Mentions,P0630,Eason Jordan,Hugh Hewitt replies: 'No one is about to ‘stone’ Eason Jordan,1.0,2025-10-22
 RECORD-00309_REL_010,RECORD-00309,P0625,Rebecca MacKinnon,Discusses,O0015,CNN,See this by (former CNN-er) Rebecca MacKinnon on CNN’s “American” identity,0.8,2025-10-22
@@ -3263,7 +3239,6 @@ RECORD-00326_REL_001,RECORD-00326,O0589,Sunlight Foundation,Supports,O0456,NewAs
 RECORD-00326_REL_002,RECORD-00326,P0108,Craig Newmark,Supports,O0456,NewAssignment.Net,matching the gift by Craig Newmark that got us started.,1.0,2025-10-22
 RECORD-00326_REL_003,RECORD-00326,P1172,Ellen Miller,Discusses,O0456,NewAssignment.Net,to explain how NewAssignment.Net fit into the Foundation’s agenda.,0.9,2025-10-22
 RECORD-00326_REL_004,RECORD-00326,O0589,Sunlight Foundation,Discusses,C0103,Open Source Journalism,As we came to understand the open source journalism world we began to see how its practice might likely achieve those goals more effectively than the traditional media.,0.8,2025-10-22
-RECORD-00326_REL_005,RECORD-00326,P1172,Ellen Miller,Discusses,O0456,NewAssignment.Net,Miller also said that other work Sunlight is funding and initiating will “provide fuel and ideas for the kind of work envisioned by NewAssignment.Net.”,0.9,2025-10-22
 RECORD-00326_REL_006,RECORD-00326,P0875,Micah Sifry,Affiliated With,O0589,Sunlight Foundation,"Micah Sifry, who has been consulting on technology for Sunlight and is also advising me on NewAssignment.Net",1.0,2025-10-22
 RECORD-00326_REL_007,RECORD-00326,P0875,Micah Sifry,Affiliated With,O0456,NewAssignment.Net,"Micah Sifry, who has been consulting on technology for Sunlight and is also advising me on NewAssignment.Net",1.0,2025-10-22
 RECORD-00326_REL_008,RECORD-00326,P0875,Micah Sifry,Discusses,O0456,NewAssignment.Net,NADN and Sunlight are born out of a common sensibility,0.8,2025-10-22
@@ -3621,7 +3596,6 @@ RECORD-00352_REL_024,RECORD-00352,P1434,Rebecca Dana,Affiliated With,O0018,New Y
 RECORD-00352_REL_025,RECORD-00352,P1435,David Verdi,Affiliated With,O0221,NBC News,"David Verdi, a senior vice president for NBC News",1.0,2025-10-22
 RECORD-00352_REL_026,RECORD-00352,P1436,Shepard Smith,Affiliated With,O0014,Fox News,Fox’s Shepard Smith shouted questions,1.0,2025-10-22
 RECORD-00352_REL_027,RECORD-00352,P1257,Nick Lemann,Affiliated With,O0032,The New Yorker,"The New Yorker’s press critic is Nick Lemann, who’s from New Orleans.",1.0,2025-10-22
-RECORD-00352_REL_028,RECORD-00352,P1148,Anderson Cooper,Affiliated With,O0015,CNN,"Aaron Brown turned his langorous gaze to the camera and tried to ask a correspondent whether we — CNN, reporters, all of journalism",0.9,2025-10-22
 RECORD-00353_REL_001,RECORD-00353,P0470,Dan Weintraub,Discusses,C0452,White House press corps,"Wants an aggressive, curious and analytical press corps...fact-checking the snot out of the White House",0.9,2025-10-22
 RECORD-00353_REL_002,RECORD-00353,P0068,Howard Kurtz,Affiliated With,O0023,The Washington Post,Howard Kurtz of the Washington Post,1.0,2025-10-22
 RECORD-00353_REL_003,RECORD-00353,P0068,Howard Kurtz,Discusses,C0452,White House press corps,Kurtz thinks real reporting on the White House doesn’t come from reporters on the surreal White House beat.,0.9,2025-10-22
@@ -3714,7 +3688,6 @@ RECORD-00359_REL_006,RECORD-00359,P0005,Jay Rosen,Discusses,C0455,Religion of Jo
 RECORD-00359_REL_007,RECORD-00359,P0005,Jay Rosen,Mentions,P1463,Lee C. Bollinger,I wrote about Bollinger’s moves here,0.9,2025-10-22
 RECORD-00359_REL_008,RECORD-00359,P1463,Lee C. Bollinger,Affiliated With,O0064,Columbia University,President Lee C. Bollinger,1.0,2025-10-22
 RECORD-00359_REL_009,RECORD-00359,P1257,Nick Lemann,Affiliated With,O0064,Columbia University,Finally he named New Yorker writer Nick Lemann as Dean,1.0,2025-10-22
-RECORD-00359_REL_010,RECORD-00359,P1257,Nick Lemann,Affiliated With,O0064,Columbia University,New Yorker writer Nick Lemann,1.0,2025-10-22
 RECORD-00359_REL_011,RECORD-00359,O0358,Columbia Journalism Review,Mentions,O0064,Columbia University,I think of CJR and the J-School as sort of the ‘high church’ of our craft,1.0,2025-10-22
 RECORD-00359_REL_012,RECORD-00359,P0566,Bill Moyers,Mentions,O0358,Columbia Journalism Review,Bill Moyers once said this while moderating an event at Columbia,1.0,2025-10-22
 RECORD-00359_REL_013,RECORD-00359,P1464,Walter Williams,Affiliated With,O0871,University of Missouri's Journalism School,"written by Walter Williams, Dean of the University of Missouri’s Journalism School",1.0,2025-10-22
@@ -4702,7 +4675,6 @@ RECORD-00445_REL_006,RECORD-00445,P1789,Ray Kotcher,Affiliated With,O0470,Ketchu
 RECORD-00445_REL_007,RECORD-00445,P1368,Richard Edelman,Affiliated With,O1029,Edelman,"Richard Edelman, head of Edelman",1.0,2025-10-22
 RECORD-00445_REL_008,RECORD-00445,P1790,Julia Hood,Affiliated With,O1030,PR Week,"Julia Hood, editor in chief of PR Week",1.0,2025-10-22
 RECORD-00445_REL_009,RECORD-00445,P1791,Stuart Elliott,Affiliated With,O0002,The New York Times,"Stuart Elliott's advertising column is a clear case of the opposite: Bloggers behind, Big Journalism and the trade press out in front.",0.9,2025-10-22
-RECORD-00445_REL_010,RECORD-00445,O0470,Ketchum,Criticizes,O0470,Ketchum,Ketchum is criticized for a bizarrely evasive op-ed.,0.8,2025-10-22
 RECORD-00445_REL_011,RECORD-00445,P0128,Dan Gillmor,Discusses,O0470,Ketchum,Dan Gillmor found Ketchum’s defense not credible,0.8,2025-10-22
 RECORD-00445_REL_012,RECORD-00445,P1792,Lorraine Thelian,Affiliated With,O0813,Omnicom,"Lorraine Thelian, senior partner in charge of North American operations for the Omnicom agency",1.0,2025-10-22
 RECORD-00445_REL_013,RECORD-00445,P1792,Lorraine Thelian,Affiliated With,O0470,Ketchum,"Lorraine Thelian, senior partner in charge of North American operations for the Omnicom agency",0.8,2025-10-22
@@ -4788,7 +4760,6 @@ RECORD-00451_REL_012,RECORD-00451,O0015,O015,Affiliated With,P0016,Joe Hagan,Thi
 RECORD-00452_REL_001,RECORD-00452,O0015,CNN,Discusses,C0004,View from Nowhere,Ditch the View from Nowhere but don't go aping your rivals.,0.9,2025-10-22
 RECORD-00452_REL_002,RECORD-00452,P1803,Michael Calderone,Discusses,O0015,CNN,See How to Fix CNN by The Politico’s Michael Calderone.,0.8,2025-10-22
 RECORD-00452_REL_003,RECORD-00452,O0015,CNN,Mentions,P1148,Anderson Cooper,"Anderson Cooper, currently the face of the brand, sometimes loses in the ratings",0.9,2025-10-22
-RECORD-00452_REL_004,RECORD-00452,O0015,CNN,Discusses,C0004,View from Nowhere,Almost every time I see this subject addressed CNN is placed in a mental lock box by media reporters who share a component of its ideology but of course don’t acknowledge that. The shared component is,0.9,2025-10-22
 RECORD-00452_REL_005,RECORD-00452,P1148,Anderson Cooper,Discusses,C0529,Keeping ‘em honest’ journalism,Maybe what Anderson Cooper calls “keeping ‘em honest” journalism has failed at CNN,0.8,2025-10-22
 RECORD-00452_REL_006,RECORD-00452,P0051,Jon Stewart,Discusses,C0530,Leave it there’ journalism,"… the way the network operates most of the time it practices “leave it there” journalism, as Jon Stewart so brilliantly explained.",0.8,2025-10-22
 RECORD-00452_REL_007,RECORD-00452,O0015,CNN,Discusses,O0071,MSNBC,Now that’s a line-up that doesn’t pretend the View from Nowhere is superior and doesn’t turn CNN into MSNBC or Fox.,0.8,2025-10-22
@@ -4816,7 +4787,6 @@ RECORD-00454_REL_009,RECORD-00454,O0002,The New York Times,Discusses,C0532,Searc
 RECORD-00454_REL_010,RECORD-00454,P0513,John Markoff,Criticizes,C0531,Conversation,John Markoff’s snooty verdict in 2003 “…it’s not clear yet whether blogging is anything more than CB radio…”.,0.8,2025-10-22
 RECORD-00454_REL_011,RECORD-00454,P0003,Paul Krugman,Affiliated With,O0002,The New York Times,Paul Krugman has debuted his blog: Conscience of a Liberal.,0.9,2025-10-22
 RECORD-00454_REL_012,RECORD-00454,O0002,The New York Times,Mentions,O0057,The Wall Street Journal,If one faction wanted to go the Wall Street Journal’s pay wall route.,0.7,2025-10-22
-RECORD-00454_REL_013,RECORD-00454,O0002,The New York Times,Mentions,O0023,The Washington Post,Another wanted to remain free like the Post.,0.7,2025-10-22
 RECORD-00454_REL_014,RECORD-00454,P1816,Scott Karp,Affiliated With,O0698,NYTimes.com,Scott Karp at Publishing 2.0 says NYTimes.com is ahead of other sites.,0.9,2025-10-22
 RECORD-00454_REL_015,RECORD-00454,O0698,NYTimes.com,Mentions,O0011,About.com,When the Times bought About.com it brought an open-to-search mentality into its organization.,0.8,2025-10-22
 RECORD-00454_REL_016,RECORD-00454,P0932,Simon Waldman,Affiliated With,O0223,Guardian Media Group,"Simon Waldman, as the director of digital strategy and development for the Guardian Media Group.",1.0,2025-10-22
@@ -5010,7 +4980,6 @@ RECORD-00469_REL_007,RECORD-00469,P1144,Deborah Howell,Affiliated With,O0023,The
 RECORD-00469_REL_008,RECORD-00469,O0023,The Washington Post,Published In,W0330,White House Briefing,Dan Froomkin’s White House Briefing,0.9,2025-10-22
 RECORD-00469_REL_009,RECORD-00469,P0270,Jim Brady,Discusses,C0551,Civility,the issue here was civility.,0.9,2025-10-22
 RECORD-00469_REL_010,RECORD-00469,P1144,Deborah Howell,Discusses,P1886,Jack Abramoff,people were angry at Deborah’s column...complaints... Jack Abramoff,0.8,2025-10-22
-RECORD-00469_REL_011,RECORD-00469,P0270,Jim Brady,Discusses,C0006,Transparency,So you could say that our attempt to be more transparent is what got us in trouble here.,0.9,2025-10-22
 RECORD-00470_REL_001,RECORD-00470,P0483,Jeffrey Dvorkin,Affiliated With,O0031,NPR,NPR ombudsman Jeffrey A. Dvorkin,1.0,2025-10-22
 RECORD-00470_REL_002,RECORD-00470,P0483,Jeffrey Dvorkin,Discusses,C0552,Fairness and Neutrality in Journalism,"Dvorkin’s key division is between giving information (good) and expressing an opinion (fine for others, bad for NPR).",0.9,2025-10-22
 RECORD-00470_REL_003,RECORD-00470,P0483,Jeffrey Dvorkin,Discusses,C0184,Fact-based Reporting,NPR is—and should be seen to be—about providing fact-based reporting.,0.8,2025-10-22
@@ -5410,7 +5379,6 @@ RECORD-00541_REL_003,RECORD-00541,W0594,Blogged down in Web fantasy,Published In
 RECORD-00541_REL_004,RECORD-00541,P0483,Jeffrey Dvorkin,Affiliated With,O0031,NPR,"NPR's ombudsman, Jeffrey Dvorkin",1.0,2025-10-28
 RECORD-00541_REL_005,RECORD-00541,P0627,Nick Coleman,Mentions,O0612,PowerLine,"Coleman, who has the boys from PowerLine in his district.",0.7,2025-10-28
 RECORD-00541_REL_006,RECORD-00541,P0483,Jeffrey Dvorkin,Discusses,C0244,Bloggers,"“First, we must acknowledge that the blogs have truly arrived,” said Dvorkin",0.8,2025-10-28
-RECORD-00541_REL_007,RECORD-00541,P0627,Nick Coleman,Criticizes,C0244,Bloggers,"To him, blogs “are to journalism what ticks are to elephants.”",0.9,2025-10-28
 RECORD-00542_REL_001,RECORD-00542,P0310,Clay Shirky,Discusses,C0574,Commons-based peer production,Discusses Shirky's depiction of the loss of reality inside newspaper companies.,0.8,2025-10-28
 RECORD-00542_REL_002,RECORD-00542,P1458,Paul Starr,Discusses,W0596,Goodbye to the Age of Newspapers (Hello to a New Era of Corruption),Discusses Starr's view that the crisis in newspapers is a crisis for American democracy.,0.8,2025-10-28
 RECORD-00542_REL_003,RECORD-00542,P1323,Yochai Benkler,Discusses,W0597,A New Era of Corruption?,Discusses Benkler's argument that we may be losing capacity in the commercial press but gaining it on the commons.,0.8,2025-10-28
@@ -5633,7 +5601,6 @@ RECORD-00559_REL_011,RECORD-00559,P0005,Jay Rosen,Mentions,P0112,Matthew Sheffie
 RECORD-00559_REL_012,RECORD-00559,P0005,Jay Rosen,Mentions,W0627,The CBS Rathergate Report,Jim Lindgren at the Volokh Conspiracy: The CBS Rathergate Report,0.9,2025-10-28
 RECORD-00559_REL_013,RECORD-00559,P0005,Jay Rosen,Mentions,P0514,Daniel Okrent,Public Editor Daniel Okrent urges the New York Times editors,0.9,2025-10-28
 RECORD-00559_REL_014,RECORD-00559,P0005,Jay Rosen,Mentions,P1950,Bryan Keefer,We Call It “Journalism.” Bryan Keefer’s inspired rant,0.9,2025-10-28
-RECORD-00559_REL_015,RECORD-00559,P0005,Jay Rosen,Mentions,P0407,Eric Alterman,Nation writer Eric Alterman with Paul McLeary,0.9,2025-10-28
 RECORD-00559_REL_016,RECORD-00559,P0407,Eric Alterman,Mentions,P0005,Jay Rosen,"as Jay Rosen, chair of the Journalism department at NYU recently pointed out.",0.9,2025-10-28
 RECORD-00559_REL_017,RECORD-00559,P0005,Jay Rosen,Mentions,O0049,New York University,chair of the Journalism department at NYU,0.9,2025-10-28
 RECORD-00559_REL_018,RECORD-00559,P0128,Dan Gillmor,Affiliated With,O0074,San Jose Mercury News,Dan Gillmor is leaving the San Jose Mercury News ,0.9,2025-10-28
@@ -6167,8 +6134,6 @@ RECORD-00002_REL_001,RECORD-00002,P0005,Jay Rosen,Inspired By,P2183,so many othe
 RECORD-00004_REL_001,RECORD-00004,P0005,Jay Rosen,Founded By,W0002,PressThink,"The article is titled 'PressThink: ...' and written by 'I' (Jay Rosen), strongly implying Jay Rosen founded this influential blog and platform for his media criticism.",0.9,2025-10-28
 RECORD-00006_REL_001,RECORD-00006,W0002,PressThink,Inspired By,P2184,Other bloggers,"I started reading Kevin Drum, Digby, Jay Rosen, Daniel Radosh, Ruy Teixiera and others because so many other bloggers said they were good (and good every day)",0.8,2025-10-28
 RECORD-00008_REL_001,RECORD-00008,O0026,National Review Online,Owns,W0666,new media blog,National Review Online has a new media blog,0.8,2025-10-28
-RECORD-00008_REL_002,RECORD-00008,P0026,Alan Feuer,Founded By,W0001,Over There: From the Bronx to Baghdad,"Alan Feuer’s book, Over There: From the Bronx to Baghdad",0.9,2025-10-28
-RECORD-00008_REL_003,RECORD-00008,P0026,Alan Feuer,Inspired By,P1341,Norman Mailer,Feuer is said to have been inspired by Norman Mailer,0.9,2025-10-28
 RECORD-00008_REL_004,RECORD-00008,P1341,Norman Mailer,Inspired By,W0667,The Education of Henry Adams,"Norman Mailer, who was said to have been inspired by The Education of Henry Adams (1918)",0.9,2025-10-28
 RECORD-00008_REL_005,RECORD-00008,P0026,Alan Feuer,Pioneered,C0654,T.R.,Feuer invents a new character T.R.,0.9,2025-10-28
 RECORD-00010_REL_001,RECORD-00010,W0084,NewAssignment.Net,Inspired By,C0103,open source journalism,"That’s the experiment I plan to launch next year with others who think there is something to the idea of open source journalism, where people collaborate peer-to-peer",0.9,2025-10-28
@@ -6585,7 +6550,6 @@ RECORD-00228_REL_001,RECORD-00228,W0002,PressThink,Founded By,P0005,Jay Rosen,"A
 RECORD-00230_REL_001,RECORD-00230,P0180,Neil Postman,Pioneered,C0740,Postman's method as a critic and teacher,"Neil’s method as a critic, and also a teacher, was to disturb your understanding before he shared his.",0.7,2025-10-28
 RECORD-00230_REL_002,RECORD-00230,P0180,Neil Postman,Pioneered,C0741,philosophy of unlearning things,"It went along with his philosophy of unlearning things, which he said was education.",0.7,2025-10-28
 RECORD-00230_REL_003,RECORD-00230,P0005,Jay Rosen,Inspired By,P0180,Neil Postman,"I was a student of his, and I am so today.",0.9,2025-10-28
-RECORD-00230_REL_004,RECORD-00230,P0005,Jay Rosen,Inspired By,P0180,Neil Postman,"Neil says to me: 'Jay, you’re basically a political writer...' And that was the day I went from crayons to perfume, as a writer. I started teaching myself political philosophy on the side, so as to ca",0.9,2025-10-28
 RECORD-00231_REL_001,RECORD-00231,P1010,Paul Bass,Inspired By,W0722,Baristanet,"Inspired by Baristanet, he decided to start a news site in his own town.",1,2025-10-28
 RECORD-00231_REL_002,RECORD-00231,W0723,New Haven Independent,Inspired By,W0722,Baristanet,"Inspired by Baristanet, he decided to start a news site in his own town.",0.8,2025-10-28
 RECORD-00231_REL_003,RECORD-00231,W0723,New Haven Independent,Founded By,P1010,Paul Bass,he decided to start a news site in his own town.,1,2025-10-28

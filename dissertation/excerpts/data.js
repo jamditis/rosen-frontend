@@ -200,6 +200,150 @@ export const EXCERPTS = [
       connection: 'Rosen consistently emphasizes the importance of local journalism as closer to the scale where democracy can function.'
     },
     tags: ['scale', 'local-news', 'democracy']
+  },
+  {
+    id: 'news-from-distance',
+    title: 'News Arises from Distance',
+    chapter: 'Chapter 1: Democracy and Distance',
+    pages: '13-41',
+    originalText: 'News arrives from a distance. It crosses the space between individuals and events.',
+    context1986: 'The need for journalism exists only because events occur beyond the range of direct experience. In small communities, citizens can observe public affairs firsthand. Once the community exceeds a certain scale, citizens depend on mediators to learn what is happening. This distance is the origin of news — and the origin of all the problems that follow.',
+    reflection2025: 'Distance now takes new forms. Geographic distance has been collapsed by technology, but social distance, experiential distance, and epistemic distance have widened. A factory worker and a tech executive may live in the same city and inhabit entirely different informational worlds. The press still struggles to bridge these gaps.',
+    contemporaryExample: 'Social media creates the illusion that distance has been eliminated. Everyone is "connected." But connection is not the same as understanding. A viral video from a protest gives you images, not context. The distance between seeing an event and understanding it remains vast.',
+    laterWork: {
+      title: 'PressThink on the collapse of local news',
+      year: 2018,
+      connection: 'When local news disappears, the distance between citizens and their governance becomes unbridgeable.'
+    },
+    tags: ['foundational', 'scale', 'epistemology']
+  },
+  {
+    id: 'newspaper-dissolving',
+    title: 'The Newspaper\'s Dissolving Tendency',
+    chapter: 'Chapter 4: The Newspaper and the Public',
+    pages: '117-151',
+    originalText: 'As a way of tying people together the newspaper has a dissolving as well as a connecting tendency.',
+    context1986: 'The mass circulation newspaper creates a new kind of social bond — between strangers who read the same paper but share no actual community. At the same time, it weakens local, face-to-face ties by directing attention outward to distant events and abstract concerns. The newspaper connects people abstractly while dissolving the concrete bonds that sustain community.',
+    reflection2025: 'Social media amplified this tendency to an extreme. Platforms connect billions of people while systematically undermining local community. Your neighbor is invisible; a stranger\'s outrage is algorithmically amplified. The dissolving tendency has overwhelmed the connecting tendency.',
+    contemporaryExample: 'Nextdoor promised to be the neighborhood newspaper. Instead, it became a venue for surveillance, complaints, and tribal conflict. The attempt to recreate local connection through digital media keeps running into the dissolving tendency Rosen described.',
+    laterWork: {
+      title: 'Analysis of social media\'s effects on community',
+      year: 2016,
+      connection: 'Social media platforms connect at scale while dissolving at the local level — the newspaper\'s paradox multiplied.'
+    },
+    tags: ['public-sphere', 'community', 'structural']
+  },
+  {
+    id: 'yellow-journalism-structural',
+    title: 'Yellow Journalism\'s Structural Lesson',
+    chapter: 'Chapter 6: The Impossible Press',
+    pages: '198-267',
+    originalText: 'Yellow journalism put a sharper edge on the conflict between private profits and public duties.',
+    context1986: 'Rosen treats the yellow journalism era not as a moral failure but as a structural revelation. When Pulitzer and Hearst competed for readers in the 1890s, they exposed a tension that had been latent since the newspaper became a commercial product: the press serves private interests (owners, advertisers) while claiming a public function. Professionalization was the attempt to manage this tension. It didn\'t resolve it.',
+    reflection2025: 'The conflict between private profits and public duties never went away. It just changed form. Hedge fund ownership of newspapers, the pivot to engagement metrics, layoffs for profitability — these are the yellow journalism of our era. The structural tension Rosen identified in 1986 is as sharp as ever.',
+    contemporaryExample: 'When Alden Global Capital acquires newspapers and cuts staff to maximize short-term profit, it\'s the same structural conflict. When Facebook optimizes for engagement over accurate information, it\'s Hearst and Pulitzer in algorithmic form.',
+    laterWork: {
+      title: 'PressThink on media business models',
+      year: 2017,
+      connection: 'The shift to subscription models represents the latest attempt to reconcile private business with public duty.'
+    },
+    tags: ['press-criticism', 'structural', 'media-criticism']
+  },
+  {
+    id: 'searchlight-darkness',
+    title: 'The Searchlight and the Darkness',
+    chapter: 'Chapter 7: The Myth of the Omnicompetent Citizen',
+    pages: '268-329',
+    originalText: 'The press is like the beam of a searchlight that moves restlessly about, bringing one episode and then another out of darkness into vision. Men cannot do the work of the world by this light alone.',
+    context1986: 'Quoting Lippmann, Rosen uses this metaphor to capture the structural limits of press coverage. The searchlight can only illuminate a few things at a time. Vast areas of public life remain in darkness. Citizens cannot be informed about everything; the beam moves on, and yesterday\'s crisis fades. This is not a failure of journalism — it\'s a feature of the medium.',
+    reflection2025: 'The searchlight metaphor is more relevant than ever. The news cycle moves faster, the beam more restless. Climate change, democratic erosion, inequality — these slow-moving crises cannot be sustained in the searchlight\'s beam. The press illuminates one emergency after another while systemic problems persist in darkness.',
+    contemporaryExample: 'The news cycle\'s inability to sustain attention on any issue — COVID fatigue, Ukraine coverage dropping off, climate coverage spiking around disasters then vanishing — is the searchlight in action. "News cycle amnesia" is the structural condition Lippmann described.',
+    laterWork: {
+      title: 'Critique of "breaking news" obsession',
+      year: 2014,
+      connection: 'The 24-hour news cycle speeds up the searchlight without widening its beam.'
+    },
+    tags: ['lippmann', 'structural', 'prescient']
+  },
+  {
+    id: 'omnicompetent-citizen',
+    title: 'The Myth of the Omnicompetent Citizen',
+    chapter: 'Chapter 7: The Myth of the Omnicompetent Citizen',
+    pages: '268-329',
+    originalText: 'One could free all the facts in the world and still not be informing the public, for the important question was not what was released into the environment, but what took shape in the beliefs and behavior of the average citizen.',
+    context1986: 'The democratic ideal assumes citizens who can form intelligent opinions on all public questions. Lippmann called this "the omnicompetent citizen" and argued it was a myth. Rosen agrees: no amount of press coverage can make citizens informed about everything. The problem is not the supply of information but the capacity of citizens to use it.',
+    reflection2025: 'The internet gave us infinite information and proved Lippmann right. People are not more informed; they are more overwhelmed. "Do your own research" has become a mandate that leads to conspiracy theories, not enlightenment. The omnicompetent citizen remains impossible — and the infrastructure of modern media makes the impossibility more visible.',
+    contemporaryExample: '"Do your own research" on vaccines, elections, or climate change leads not to omnicompetence but to motivated reasoning. More information has not produced a more informed public. It has produced a more confused one.',
+    laterWork: {
+      title: 'Analysis of misinformation and the informed citizen ideal',
+      year: 2020,
+      connection: 'The pandemic tested the omnicompetent citizen ideal and found it wanting. Citizens were asked to evaluate complex scientific evidence in real time.'
+    },
+    tags: ['lippmann', 'epistemology', 'prescient']
+  },
+  {
+    id: 'great-community',
+    title: 'The Great Community',
+    chapter: 'Chapter 8: The Art and Science of Forming a Public',
+    pages: '330-373',
+    originalText: 'Till the Great Society is converted into a Great Community, the Public will remain in eclipse.',
+    context1986: 'Dewey\'s answer to Lippmann. The Great Society — the vast, interconnected modern world — has overwhelmed the small-scale democracy of the past. The remedy is not better experts (Lippmann\'s answer) but the reconstruction of community at every level. Communication must become an art: careful, contextual, aimed at enabling shared action rather than merely distributing facts.',
+    reflection2025: 'We have a greater society than ever and less community than ever. The reconstruction Dewey called for has not happened. Instead, we have substituted connectivity for community, engagement for participation, and virality for shared understanding. The public remains in eclipse.',
+    contemporaryExample: 'Community journalism, mutual aid networks, and local civic organizations represent small-scale attempts to build the Great Community. But they operate against the tide of a media environment designed to atomize and engage, not to connect and empower.',
+    laterWork: {
+      title: 'Public journalism and community-centered reporting',
+      year: 1993,
+      connection: 'The public journalism movement was Rosen\'s attempt to help journalism contribute to forming the Great Community.'
+    },
+    tags: ['dewey', 'public-sphere', 'solutions']
+  },
+  {
+    id: 'more-communication',
+    title: 'More Communication, More Difficulty',
+    chapter: 'Chapter 3: The Universal Town Meeting',
+    pages: '90-116',
+    originalText: 'Improvements in communication also make communication more difficult because they ensure that there will be more to communicate about.',
+    context1986: 'Each advance in communication technology expands the volume of events, issues, and perspectives competing for attention. The telegraph didn\'t simplify public discourse; it made it more complex. More channels meant more content, more content meant more competition for attention, and more competition meant less depth on any single topic.',
+    reflection2025: 'This is arguably the single most prescient line in the dissertation. The internet, social media, and AI have created communication abundance that has made communication harder in exactly the way Rosen predicted. Information overload is not a bug of the digital age; it\'s the structural consequence of improving communication technology.',
+    contemporaryExample: 'The average American encounters thousands of media messages daily. News organizations compete with TikTok, podcasts, newsletters, and AI-generated content. The improvement in communication technology has made the task of informing the public exponentially harder.',
+    laterWork: {
+      title: 'Analysis of information overload and attention',
+      year: 2015,
+      connection: 'The attention economy is the direct consequence of improvements in communication creating more to communicate about.'
+    },
+    tags: ['prescient', 'technology', 'attention']
+  },
+  {
+    id: 'propaganda-journalism',
+    title: 'Propaganda and Professional Journalism',
+    chapter: 'Chapter 6: The Impossible Press',
+    pages: '198-267',
+    originalText: 'The same conditions which make citizens dependent on the press for information have other consequences as well... It is no accident that the beginning of professional propaganda began with the beginnings of professional journalism.',
+    context1986: 'Professional journalism and professional propaganda emerged simultaneously. This is not coincidental — both are responses to the same conditions: a mass public dependent on mediated information. If citizens rely on the press for their picture of the world, then controlling the press becomes the most efficient way to shape public opinion.',
+    reflection2025: 'The relationship between journalism and propaganda has only tightened. State-sponsored disinformation campaigns, corporate communications, and political messaging operations all exploit the same channels and audiences that journalism serves. The professionalization of propaganda has accelerated alongside the deprofessionalization of journalism.',
+    contemporaryExample: 'Russian troll farms, corporate astroturfing, and political dark money ads all target the same information ecosystem that journalism inhabits. Propaganda has been industrialized while journalism has been decimated. The structural connection Rosen identified has shifted decisively in propaganda\'s favor.',
+    laterWork: {
+      title: 'Analysis of disinformation and press manipulation',
+      year: 2016,
+      connection: 'Foreign interference in the 2016 election demonstrated how propaganda exploits the same media infrastructure that journalism relies on.'
+    },
+    tags: ['structural', 'press-criticism', 'prescient']
+  },
+  {
+    id: 'five-factors',
+    title: 'Five Factors Between Press and Public',
+    chapter: 'Conclusion',
+    pages: '374-415',
+    originalText: 'Understanding journalism requires examining five interacting factors — scale, social bonds, media structure, language and symbols, and professional attitudes — not just the conduct of journalists.',
+    context1986: 'The dissertation\'s concluding framework. Rosen argues that the press-public relationship is shaped by five structural factors that conventional press criticism ignores: (1) the scale of the political community, (2) the nature of social bonds, (3) the structure of available media, (4) the language and symbols used in public discourse, and (5) the professional attitudes of journalists. Focusing only on factor five — as most press criticism does — misses the larger picture.',
+    reflection2025: 'This ecological framework remains the dissertation\'s most practical contribution. When journalists and critics focus only on professional conduct — "be more accurate, be less biased, be more transparent" — they ignore the four structural factors that determine whether journalism can function. The crisis of journalism is not primarily a crisis of professionalism.',
+    contemporaryExample: 'The debate about objectivity vs. advocacy journalism focuses entirely on factor five. Meanwhile, factor one (scale — local news deserts), factor two (social bonds — community erosion), factor three (media structure — algorithmic platforms), and factor four (language — post-truth discourse) are reshaping the landscape beneath journalists\' feet.',
+    laterWork: {
+      title: 'The ecological view in all subsequent work',
+      year: 2003,
+      connection: 'PressThink consistently analyzes structural factors rather than individual journalist behavior.'
+    },
+    tags: ['foundational', 'structural', 'conclusion']
   }
 ];
 

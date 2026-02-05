@@ -86,6 +86,45 @@ export const MEDIA_LANDSCAPE = [
       'Strong union presence in major newsrooms'
     ],
     contrast2025: 'Trust in media is at historic lows. Journalism jobs have been decimated. The professional consensus has fractured. The model Rosen critiqued has visibly failed.'
+  },
+  {
+    id: 'academic-landscape',
+    category: 'Academia',
+    title: 'The Academic Landscape',
+    description: 'Rosen wrote within the Media Ecology program at NYU, founded by Neil Postman and influenced by Marshall McLuhan. Communication theory in 1986 was dominated by transmission models — the idea that media sends messages to passive receivers. Postman\'s ecological approach, which treated media as environments that reshape thought and culture, was a minority position.',
+    details: [
+      'Neil Postman had just published Amusing Ourselves to Death (1985)',
+      'Media ecology was a small, interdisciplinary field at NYU',
+      'Dominant communication theory still used sender-receiver models',
+      'Cultural studies and critical theory were gaining ground but not yet mainstream'
+    ],
+    contrast2025: 'Media ecology is now mainstream — everyone talks about how platforms shape behavior. But in 1986, treating media as environments rather than channels was considered unconventional.'
+  },
+  {
+    id: 'no-public-journalism',
+    category: 'The Profession',
+    title: 'Public Journalism Didn\'t Exist Yet',
+    description: 'The idea that journalists should actively help communities identify and solve their own problems had not been articulated in 1986. The dissertation diagnoses the failure of professional journalism to connect with the public but does not yet propose the solution Rosen would develop in the 1990s. Public journalism would emerge as Rosen\'s answer to the problems identified here.',
+    details: [
+      'The term "public journalism" wouldn\'t appear until the early 1990s',
+      'Journalism reform in 1986 focused on accuracy and ethics, not civic engagement',
+      'The Kettering Foundation\'s civic research was just beginning',
+      'Rosen hadn\'t yet connected with Davis "Buzz" Mercer or the Wichita Eagle experiments'
+    ],
+    contrast2025: 'Public journalism emerged in the 1990s, was declared dead by critics in the 2000s, and has been reborn under new names — engagement journalism, solutions journalism, community-centered reporting.'
+  },
+  {
+    id: 'what-couldnt-predict',
+    category: 'The Future',
+    title: 'What the Dissertation Couldn\'t Predict',
+    description: 'The dissertation analyzes the press-public relationship under broadcast-era conditions. It could not anticipate the internet, social media, the collapse of the newspaper business model, or the rise of global disinformation. What\'s remarkable is how well the analysis holds up anyway. The structural problems Rosen identified — scale, attention, absent community — were made worse, not better, by the technologies that followed.',
+    details: [
+      'The internet destroyed the advertising model that funded professional journalism',
+      'Social media gave audiences publishing power but not the civic connections Dewey wanted',
+      'Algorithmic curation industrialized the pseudo-environment Lippmann described',
+      'Global disinformation campaigns weaponized the structural weaknesses the dissertation mapped'
+    ],
+    contrast2025: 'The dissertation\'s analysis predates every technology we now blame for journalism\'s crisis. This suggests the crisis is structural, not technological — exactly as Rosen argued.'
   }
 ];
 

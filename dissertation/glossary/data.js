@@ -193,6 +193,66 @@ export const CONCEPTS = [
     relatedConcepts: ['scale-of-democracy', 'communication-without-community'],
     keyFigure: 'Henry David Thoreau',
     contemporary: 'Social media utopianism, Web3 promises, AI will save journalism'
+  },
+  {
+    id: 'lippmann-dewey-debate',
+    term: 'The Lippmann-Dewey Debate',
+    shortDef: 'The foundational disagreement about whether democracy can survive modern conditions.',
+    fullDef: 'The intellectual core of the dissertation. Walter Lippmann argued in Public Opinion (1922) and The Phantom Public (1925) that the average citizen cannot possibly be informed enough to govern. John Dewey responded in The Public and Its Problems (1927) that the answer is not expert rule but the reconstruction of community. They agreed on the diagnosis — the omnicompetent citizen is a myth — but disagreed on the remedy. This tension structures the entire dissertation and much of Rosen\'s later work.',
+    chapter: 'Chapters 7-8',
+    pages: '268-373',
+    quote: 'The trouble lies deeper than the press, and so does the remedy.',
+    relatedConcepts: ['omnicompetent-citizen', 'great-community', 'public-formation'],
+    keyFigure: 'Walter Lippmann, John Dewey',
+    contemporary: 'Expertise vs. populism, "trust the science" debates, technocratic governance'
+  },
+  {
+    id: 'eclipse-of-public',
+    term: 'The Eclipse of the Public',
+    shortDef: 'Dewey\'s diagnosis that the public has been overwhelmed and rendered incapable of finding itself.',
+    fullDef: 'Drawing on Dewey, Rosen describes how the public has been "eclipsed" — not destroyed but rendered unable to recognize itself as a public or to act on shared problems. The sheer scale of modern society, the complexity of its systems, and the inadequacy of communication have left citizens unable to identify common interests. The public exists in theory but cannot form in practice.',
+    chapter: 'Chapter 8: The Art and Science of Forming a Public',
+    pages: '330-373',
+    quote: 'Till the Great Society is converted into a Great Community, the Public will remain in eclipse.',
+    relatedConcepts: ['great-community', 'public-formation', 'making-public'],
+    keyFigure: 'John Dewey',
+    contemporary: 'Voter apathy, political disengagement, "nothing I do matters" fatalism'
+  },
+  {
+    id: 'yellow-journalism',
+    term: 'Yellow Journalism',
+    shortDef: 'The structural crisis that forced journalism to professionalize — and to promise more than it could deliver.',
+    fullDef: 'Rosen treats yellow journalism not as a moral failing but as a structural consequence of the newspaper becoming a mass-market business. When Pulitzer and Hearst competed for readers in the 1890s, they exposed the conflict between private profits and public duties that had been latent in the press since its commercialization. The professionalization movement of the early 1900s was a direct response — an attempt to reconcile business and democracy through professional standards. This is where "the impossible press" was born.',
+    chapter: 'Chapter 6: The Impossible Press',
+    pages: '198-267',
+    quote: 'Yellow journalism put a sharper edge on the conflict between private profits and public duties.',
+    relatedConcepts: ['impossible-press', 'professional-attitude'],
+    keyFigure: 'Joseph Pulitzer, William Randolph Hearst',
+    contemporary: 'Clickbait, engagement-driven content, the attention economy\'s effect on editorial standards'
+  },
+  {
+    id: 'searchlight-metaphor',
+    term: 'The Searchlight Metaphor',
+    shortDef: 'Lippmann\'s image of the press as a narrow beam that cannot illuminate the whole world.',
+    fullDef: 'Lippmann compared the press to a searchlight that moves restlessly about, bringing one episode after another out of darkness into vision. The beam cannot illuminate everything at once. It cannot do the work of a lamp — providing steady, even light. The press can only attend to a few things at a time, which means vast areas of public life remain in darkness. This metaphor captures the structural limits of news coverage that no amount of professional effort can overcome.',
+    chapter: 'Chapter 7: The Myth of the Omnicompetent Citizen',
+    pages: '268-329',
+    quote: 'The press is like the beam of a searchlight that moves restlessly about, bringing one episode and then another out of darkness into vision. Men cannot do the work of the world by this light alone.',
+    relatedConcepts: ['omnicompetent-citizen', 'pseudo-environment', 'impossible-press'],
+    keyFigure: 'Walter Lippmann',
+    contemporary: 'News cycle amnesia, "breaking news" obsession, the inability to sustain coverage of slow-moving crises'
+  },
+  {
+    id: 'great-community',
+    term: 'The Great Community',
+    shortDef: 'Dewey\'s vision of a revitalized public life built on genuine community, not just communication.',
+    fullDef: 'Dewey\'s answer to the eclipse of the public. The Great Society — the vast, interconnected, interdependent modern world — has overwhelmed the small-scale democracy of the past. The remedy is not better information delivery but the reconstruction of community at every level. Communication must become an art, not merely a transmission system. Seeds must be planted so they can take root, not scattered at random. The press cannot create this community, but it can help or hinder its formation.',
+    chapter: 'Chapter 8: The Art and Science of Forming a Public',
+    pages: '330-373',
+    quote: 'Seeds are sown not by being thrown out at random, but by being so distributed as to take root and have a chance of growth.',
+    relatedConcepts: ['eclipse-of-public', 'public-formation', 'lippmann-dewey-debate'],
+    keyFigure: 'John Dewey',
+    contemporary: 'Community journalism, engagement journalism, solutions journalism, mutual aid networks'
   }
 ];
 

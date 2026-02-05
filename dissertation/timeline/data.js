@@ -183,6 +183,96 @@ export const TIMELINE_ENTRIES = [
     description: 'Nearly 40 years after its completion, "The Impossible Press" is made publicly available for the first time, allowing readers to see the intellectual foundations of Rosen\'s later work.',
     dissertationConnection: 'The origin document becomes available, revealing how much of the later work was already present in embryonic form.',
     link: '/j/rosen-archive/dissertation/reader/'
+  },
+  {
+    id: 'media-ecology',
+    year: 1983,
+    type: 'career',
+    title: 'Enters Media Ecology at NYU',
+    subtitle: 'Studying under Neil Postman',
+    description: 'Rosen enters NYU\'s Media Ecology doctoral program, founded by Neil Postman. The program applies Marshall McLuhan\'s insight that media are not neutral channels but environments that restructure thought and culture. Postman is completing "Amusing Ourselves to Death" (1985) while advising Rosen\'s dissertation.',
+    dissertationConnection: 'Media ecology provides the theoretical framework for the dissertation\'s argument that the relationship between press and public is shaped by the structure of media itself, not just by journalist conduct.'
+  },
+  {
+    id: 'assignment-zero',
+    year: 2007,
+    type: 'milestone',
+    title: 'Assignment Zero',
+    subtitle: 'Crowdsourced journalism experiment',
+    description: 'Rosen partners with Wired to launch Assignment Zero, an ambitious experiment in "crowdsourced journalism" — using volunteer contributors to report a story collectively. The project is partially successful and partially a learning experience about the gap between idealism and execution.',
+    keyIdeas: [
+      'Audiences can be collaborators, not just consumers',
+      'Open participation requires structure and editing',
+      'The tools exist but the methods need invention'
+    ],
+    dissertationConnection: 'A direct attempt to transform the press-public relationship from transaction to collaboration. Tests what happens when "the people formerly known as the audience" try to do journalism.'
+  },
+  {
+    id: 'citizens-agenda',
+    year: 2011,
+    type: 'concept',
+    title: 'The Citizens\' Agenda',
+    subtitle: 'Reforming election coverage',
+    description: 'Rosen proposes that election coverage should start with what citizens want candidates to address, not with horse-race strategy and polling. The "citizens\' agenda" approach asks voters what they need to hear about and then holds candidates accountable to those issues.',
+    keyIdeas: [
+      'Election coverage should start with citizen concerns',
+      'Horse-race coverage serves journalists, not voters',
+      'The press should set agendas that serve public deliberation'
+    ],
+    dissertationConnection: 'Extends the dissertation\'s critique of news as drama. Horse-race coverage turns elections into spectacle; the citizens\' agenda tries to reconnect coverage to citizen action.'
+  },
+  {
+    id: 'winter-is-coming',
+    year: 2015,
+    type: 'publication',
+    title: '"Winter Is Coming"',
+    subtitle: 'Asymmetric polarization and the press',
+    description: 'Rosen argues that the American press was built for a symmetric political environment and cannot function when one party has moved toward post-truth politics. "Both sides" journalism fails when the sides are not symmetrically committed to factual reality.',
+    keyIdeas: [
+      'The press assumes symmetric political actors',
+      'Asymmetric polarization breaks professional conventions',
+      'Objectivity norms cannot handle bad-faith political actors'
+    ],
+    dissertationConnection: 'A specific instance of the impossible press: professional standards assume conditions that no longer hold. The structural critique from 1986 meets the political crisis of the 2010s.',
+    link: 'https://pressthink.org/2015/05/campaign-coverage-for-what-and-whom/'
+  },
+  {
+    id: 'send-the-interns',
+    year: 2019,
+    type: 'concept',
+    title: '"Send the Interns"',
+    subtitle: 'Rethinking White House coverage',
+    description: 'Rosen proposes that major news organizations should send their most junior reporters to White House press briefings and redeploy senior talent to accountability reporting. The briefings had become performative events where the administration sets the agenda.',
+    keyIdeas: [
+      'Press briefings serve the administration, not the public',
+      'Performative access is not the same as accountability',
+      'News organizations should choose where to deploy attention'
+    ],
+    dissertationConnection: 'The professional attitude in action: journalists attend briefings because "that\'s what journalists do," not because it informs the public. Form has overtaken function.'
+  },
+  {
+    id: 'nyu-retirement',
+    year: 2024,
+    type: 'career',
+    title: 'Retirement from NYU',
+    subtitle: 'After 38 years on the faculty',
+    description: 'Rosen retires from NYU after a career spanning the entire arc from the dissertation to the current media crisis. He continues writing and teaching through PressThink, social media, and the archive project.',
+    dissertationConnection: 'The career that began with the dissertation comes full circle. Rosen spent 38 years working on the problems he identified in 1986. The problems remain unsolved.'
+  },
+  {
+    id: 'freedom-from-fact',
+    year: 2025,
+    type: 'publication',
+    title: 'Trump, Truth, and "Freedom from Fact"',
+    subtitle: 'The impossible press meets impossible politics',
+    description: 'Rosen\'s analysis of how "freedom from fact" — the political strategy of treating factual reality as optional — represents the logical endpoint of the trends the dissertation identified. When a political movement rejects the premise that shared facts enable shared governance, the entire framework connecting press to public collapses.',
+    keyIdeas: [
+      '"Freedom from fact" as a political strategy',
+      'The collapse of shared epistemic ground',
+      'Professional journalism has no answer for this'
+    ],
+    dissertationConnection: 'The ultimate test of the impossible press thesis. If the public cannot agree on basic facts, then informing the public is not just difficult but conceptually incoherent.',
+    link: 'https://pressthink.org/2025/01/trump-truth-and-freedom-from-fact/'
   }
 ];
 
