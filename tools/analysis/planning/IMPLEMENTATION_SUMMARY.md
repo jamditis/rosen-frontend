@@ -390,4 +390,4 @@ click==8.1.7                    # CLI framework
 **Status:** PRD Complete, Ready for Implementation Approval
 **Author:** Claude Code
 **Date:** 2025-10-22
-**Project:** Jay Rosen Digital Archive
+**Project:** Jay Rosen Internet Archive

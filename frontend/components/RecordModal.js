@@ -1,8 +1,8 @@
 
 import { useEffect, useState } from 'react';
 import { html } from '../html.js?v=2.0.2';
-import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2 } from 'lucide-react';
-import { fetchRecordDetails } from '../services/archiveService.js?v=2.0.2';
+import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2, Users, Building2, Lightbulb, BookOpen } from 'lucide-react';
+import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=2.0.2';
 import { ThreadModal } from './ThreadModal.js?v=2.0.2';
 
 // Convert URLs in text to clickable links
@@ -87,25 +87,51 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
     }
   }, [isOpen, record?.id]);
 
-  // Find related works based on loaded details
+  // Find related works based on shared entities
   useEffect(() => {
-    if (fullRecord && allRecords) {
-      let related = [];
-      if (fullRecord.relatedIds && fullRecord.relatedIds.length > 0) {
-          related = allRecords.filter(r => fullRecord.relatedIds.includes(r.id));
+    if (!fullRecord || !allRecords) return;
+
+    const findRelated = async () => {
+      // Ensure entity data is loaded
+      if (!areEntitiesLoaded()) {
+        await fetchEntitiesData();
       }
 
-      if (related.length < 4) {
-          const more = allRecords.filter(r =>
-            r.id !== fullRecord.id &&
-            !related.some(rel => rel.id === r.id) &&
-            (r.categories || []).some(c => (fullRecord.categories || []).includes(c))
-          ).slice(0, 4 - related.length);
-          related = [...related, ...more];
+      // Calculate entity-based connections to all other article records
+      const connections = [];
+      const candidateRecords = allRecords.filter(r =>
+        r.id !== fullRecord.id && r.type !== 'social'
+      );
+
+      for (const candidate of candidateRecords) {
+        const result = calculateEntityConnectionStrength(fullRecord.id, candidate.id);
+        if (result.strength > 0) {
+          connections.push({
+            ...candidate,
+            connectionStrength: result.strength,
+            prominenceScore: result.prominenceScore,
+            sharedEntities: result.sharedEntities
+          });
+        }
+      }
+
+      // Sort by connection strength, take top 6
+      connections.sort((a, b) => b.connectionStrength - a.connectionStrength || b.prominenceScore - a.prominenceScore);
+      let related = connections.slice(0, 6);
+
+      // Fallback: if no entity connections, use category matching
+      if (related.length === 0) {
+        related = allRecords.filter(r =>
+          r.id !== fullRecord.id &&
+          r.type !== 'social' &&
+          (r.categories || []).some(c => (fullRecord.categories || []).includes(c))
+        ).slice(0, 4);
       }
 
       setRelatedWorks(related);
-    }
+    };
+
+    findRelated();
   }, [fullRecord, allRecords]);
 
   useEffect(() => {
@@ -258,20 +284,39 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
             ${relatedWorks.length > 0 && html`
                 <div className="border-t border-stone-200 pt-8">
                     <h3 className="text-xl font-display font-bold text-stone-900 mb-4 flex items-center gap-2">
-                        <${Link} className="w-5 h-5 text-stone-400" /> Related Works
+                        <${Link} className="w-5 h-5 text-stone-400" /> Related records
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         ${relatedWorks.map(rel => html`
-                            <button 
+                            <button
                                 key=${rel.id}
                                 onClick=${() => onSelectRecord(rel.id)}
                                 className="text-left p-4 bg-stone-50 border border-stone-200 hover:border-stone-400 hover:shadow-sm transition-all rounded-sm group w-full"
                             >
-                                <div className="text-xs font-bold text-stone-400 mb-1 uppercase tracking-wider">${rel.date}</div>
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">${rel.date}</span>
+                                  ${rel.connectionStrength > 0 && html`
+                                    <span className="text-[10px] font-mono px-1.5 py-0.5 bg-stone-200 text-stone-600 rounded">
+                                      ${rel.connectionStrength} shared
+                                    </span>
+                                  `}
+                                </div>
                                 <h4 className="text-sm font-bold text-stone-800 group-hover:text-blue-800 leading-tight mb-1 line-clamp-2">
                                     ${rel.title}
                                 </h4>
-                                <div className="text-xs text-stone-500 truncate">${rel.pub}</div>
+                                <div className="text-xs text-stone-500 truncate mb-2">${rel.pub}</div>
+                                ${rel.sharedEntities && rel.sharedEntities.length > 0 && html`
+                                  <div className="flex flex-wrap gap-1">
+                                    ${rel.sharedEntities.slice(0, 3).map(entity => html`
+                                      <span key=${entity.id || entity.name} className="text-[10px] px-1.5 py-0.5 bg-white border border-stone-200 rounded text-stone-500 truncate max-w-[120px]">
+                                        ${entity.name}
+                                      </span>
+                                    `)}
+                                    ${rel.sharedEntities.length > 3 && html`
+                                      <span className="text-[10px] text-stone-400">+${rel.sharedEntities.length - 3}</span>
+                                    `}
+                                  </div>
+                                `}
                             </button>
                         `)}
                     </div>

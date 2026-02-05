@@ -1,4 +1,4 @@
-# **A Narrative of the Jay Rosen Digital Archive Project**
+# **A Narrative of the Jay Rosen Internet Archive Project**
 
 ## **The Goal: Creating a Central Archive**
 
@@ -133,7 +133,7 @@ The final milestone was achieved with successful completion of the full producti
 *   **Production-Grade Error Handling:** Resolved Unicode encoding issues and Google Sheets cell size limits (50K character truncation) ensuring reliable processing of large content fields without failures.
 *   **Quality Metrics:** Achieved 100% processing completion rate with proper publication-based ID generation (PRESSTH-00001, ARCHIVEP-00001, etc.), enhanced PDF creation, and source sheet status tracking.
 
-The Jay Rosen Digital Archive now contains a complete, production-ready dataset of 765 processed records with 97% publication date coverage (824 successful extractions), enhanced PDFs with professional formatting, and full metadata analysis, ready for frontend integration and public launch.
+The Jay Rosen Internet Archive now contains a complete, production-ready dataset of 765 processed records with 97% publication date coverage (824 successful extractions), enhanced PDFs with professional formatting, and full metadata analysis, ready for frontend integration and public launch.
 
 ### **Key Concepts Analysis System (October 2025)**
 
@@ -663,7 +663,7 @@ The RStudio work is documented across multiple files:
 - `RStudio/output/` - 21 PNG visualizations + 1 CSV export
 - `RStudio/WHATS_NEW.md` - Quick summary of new capabilities
 
-#### **Impact on the Jay Rosen Digital Archive**
+#### **Impact on the Jay Rosen Internet Archive**
 
 The RStudio analysis system marks a milestone in the archive's evolution from a content preservation project to a research platform:
 
@@ -681,7 +681,7 @@ The RStudio analysis system marks a milestone in the archive's evolution from a 
 - Generated publication-ready visualizations and citation-ready statistics
 - Created reusable analysis infrastructure for ongoing research
 
-The system turns the archive from a digital preservation project into an active research platform, allowing scholars to generate new insights about journalism criticism, intellectual influence, and the evolution of alternative journalism models. The combination of entity extraction, relationship mapping, and statistical analysis positions the Jay Rosen Digital Archive as a model for digital humanities research infrastructure.
+The system turns the archive from a digital preservation project into an active research platform, allowing scholars to generate new insights about journalism criticism, intellectual influence, and the evolution of alternative journalism models. The combination of entity extraction, relationship mapping, and statistical analysis positions the Jay Rosen Internet Archive as a model for digital humanities research infrastructure.
 
 ---
 

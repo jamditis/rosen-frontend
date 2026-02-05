@@ -246,7 +246,7 @@ The FAQ already has 46 questions. Forcing them into exactly 21 categories create
 
 ## Naming update
 
-Jay wants to rename the project from "Jay Rosen Digital Archive" to "Jay Rosen Internet Archive." This affects:
+Jay wants to rename the project from "Jay Rosen Internet Archive" to "Jay Rosen Internet Archive." This affects:
 
 - Landing page title and hero text
 - README.md

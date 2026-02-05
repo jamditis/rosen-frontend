@@ -1,17 +1,17 @@
-# About Page Content: Jay Rosen Digital Archive
+# About Page Content: Jay Rosen Internet Archive
 
 **Status:** COMPLETE
 
 ---
 
 ## Page Title
-About the Jay Rosen Digital Archive
+About the Jay Rosen Internet Archive
 
 ---
 
 ## Mission Statement
 
-The Jay Rosen Digital Archive preserves, organizes, and makes accessible 36 years of journalism criticism, media commentary, and public engagement by one of the field's most influential voices.
+The Jay Rosen Internet Archive preserves, organizes, and makes accessible 36 years of journalism criticism, media commentary, and public engagement by one of the field's most influential voices.
 
 Our goals:
 - **Preservation:** Ensure this body of work survives platform changes, link rot, and digital decay
@@ -120,7 +120,7 @@ Joe Amditis is the Director of Strategic Initiatives at the Center for Cooperati
 
 At CCM, Joe works on collaborative journalism projects, industry research, and media innovation initiatives. His background includes work in product development, audience engagement, and digital strategy for news organizations of all sizes.
 
-Joe created the Jay Rosen Digital Archive as both a preservation project and a research tool—an attempt to ensure that four decades of important journalism criticism remain accessible and useful for future scholars, students, and journalists.
+Joe created the Jay Rosen Internet Archive as both a preservation project and a research tool—an attempt to ensure that four decades of important journalism criticism remain accessible and useful for future scholars, students, and journalists.
 
 **Contact:** jamditis@gmail.com | [@jsamditis](https://twitter.com/jsamditis)
 
@@ -128,7 +128,7 @@ Joe created the Jay Rosen Digital Archive as both a preservation project and a r
 
 The Center for Cooperative Media at Montclair State University works to grow and strengthen local journalism. Through research, collaborative projects, and support programs, CCM helps news organizations find sustainable paths forward.
 
-The Jay Rosen Digital Archive is hosted by the Center for Cooperative Media as part of its commitment to preserving and advancing journalism knowledge.
+The Jay Rosen Internet Archive is hosted by the Center for Cooperative Media as part of its commitment to preserving and advancing journalism knowledge.
 
 **Learn more:** [centerforcooperativemedia.org](https://centerforcooperativemedia.org)
 

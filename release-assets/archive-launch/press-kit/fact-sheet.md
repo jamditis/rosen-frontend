@@ -1,4 +1,4 @@
-# Fact Sheet: Jay Rosen Digital Archive
+# Fact Sheet: Jay Rosen Internet Archive
 
 **Status:** COMPLETE
 

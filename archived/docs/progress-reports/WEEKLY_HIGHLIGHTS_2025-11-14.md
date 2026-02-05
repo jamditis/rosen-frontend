@@ -1,6 +1,6 @@
 # Weekly Highlights: November 8-14, 2025
 
-## Jay Rosen Digital Archive - Six Major Achievements
+## Jay Rosen Internet Archive - Six Major Achievements
 
 ### ✅ 1. Tumblr Archive Exported & Parsing Started
 - Complete Tumblr archive data successfully exported from your account

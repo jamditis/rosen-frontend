@@ -1,5 +1,5 @@
 /**
- * Jay Rosen Digital Archive - Service Worker
+ * Jay Rosen Internet Archive - Service Worker
  *
  * Caching strategy:
  * - Data files (JSON): Stale-while-revalidate (show cached, update in background)

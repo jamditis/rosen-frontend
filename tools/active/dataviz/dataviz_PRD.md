@@ -6,7 +6,7 @@ Version: 1.0
 
 ### **1\. Introduction**
 
-This document outlines the product requirements for the "Enhanced data dashboard," a web-based, interactive tool for the exploration and analysis of the Jay Rosen Digital Archive. The archive contains a curated collection of writings, interviews, and other works by journalism professor Jay Rosen.
+This document outlines the product requirements for the "Enhanced data dashboard," a web-based, interactive tool for the exploration and analysis of the Jay Rosen Internet Archive. The archive contains a curated collection of writings, interviews, and other works by journalism professor Jay Rosen.
 
 This dashboard serves as a powerful research and academic tool, transforming the flat data of the archive into an interactive experience. It allows users to filter, visualize, and analyze trends, topics, and publication patterns within the archive's extensive dataset.
 

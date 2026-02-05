@@ -204,7 +204,7 @@ function generateRSSFeed(records) {
   const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
-    <title>Jay Rosen Digital Archive</title>
+    <title>Jay Rosen Internet Archive</title>
     <link>https://pressthink.org/j/rosen-archive/</link>
     <description>Archive of Jay Rosen's journalism scholarship</description>
     ${records.slice(0, 100).map(r => `
@@ -297,4 +297,4 @@ function generateOPML(records) {
 ---
 
 *Document generated: January 31, 2026*
-*For the Jay Rosen Digital Archive project*
+*For the Jay Rosen Internet Archive project*

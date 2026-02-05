@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { html } from '../html.js?v=2.0.2';
 import { ExternalLink, RefreshCw, Download, Settings2, Network, Users, Building2, Lightbulb, Globe, Tags } from 'lucide-react';
 import { COLORS } from '../constants.js?v=2.0.2';
-import { calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=2.0.2';
+import { calculateEntityConnectionStrength, getEntitiesByRecord, fetchEntitiesData, areEntitiesLoaded } from '../services/archiveService.js?v=2.0.2';
 
 // Connection mode configurations
 const CONNECTION_MODES = {
@@ -37,6 +37,7 @@ const Explorer = ({ records }) => {
   const containerRef = useRef(null);
   const reqRef = useRef(null);
 
+  const [entitiesReady, setEntitiesReady] = useState(false);
   const [nodes, setNodes] = useState([]);
 
   const [selectedId, setSelectedId] = useState(null);
@@ -52,6 +53,15 @@ const Explorer = ({ records }) => {
     showSettings: false,
     sortByProminence: true  // Sort by prominence score vs count
   });
+
+  // Load entity data on mount
+  useEffect(() => {
+    if (!areEntitiesLoaded()) {
+      fetchEntitiesData().then(() => setEntitiesReady(true));
+    } else {
+      setEntitiesReady(true);
+    }
+  }, []);
 
   // Filter records based on settings
   const filteredRecords = useMemo(() => {
@@ -469,7 +479,7 @@ const Explorer = ({ records }) => {
           ctx.fillStyle = '#78716c';
           ctx.fillText(`${node.date} • ${node.pub}`, x + padding, cursorY);
 
-          const brandText = "Jay Rosen Digital Archive";
+          const brandText = "Jay Rosen Internet Archive";
           ctx.font = '14px "Special Elite", cursive';
           ctx.fillStyle = '#d6d3d1';
           ctx.textAlign = 'right';
@@ -511,7 +521,14 @@ const Explorer = ({ records }) => {
 
   return html`
     <div className="relative flex flex-col w-full" style=${{ minHeight: '80vh' }} ref=${containerRef}>
-        
+
+        ${!entitiesReady && html`
+          <div className="absolute top-4 left-4 z-20 bg-white border border-stone-200 rounded px-3 py-2 shadow-sm flex items-center gap-2 text-sm text-stone-600">
+            <div className="animate-spin w-4 h-4 border-2 border-stone-300 border-t-stone-800 rounded-full"></div>
+            Loading entity data...
+          </div>
+        `}
+
         <div className="absolute top-4 right-4 z-20 flex flex-col gap-2 items-end">
             <div className="flex gap-2">
                 <button 

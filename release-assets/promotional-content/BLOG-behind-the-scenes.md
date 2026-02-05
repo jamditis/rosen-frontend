@@ -1,4 +1,4 @@
-# How We Built the Jay Rosen Digital Archive: A Behind-the-Scenes Story
+# How We Built the Jay Rosen Internet Archive: A Behind-the-Scenes Story
 
 *From scattered beginnings to a 30,000-record research platform in 49 days*
 
@@ -10,7 +10,7 @@ Jay Rosen has been writing about journalism since before the internet existed. H
 
 Links decay. Platforms disappear. Paywalls go up. The challenge was clear: how do you preserve and make accessible 40 years of journalism criticism before it fragments into digital ephemera?
 
-The answer became the Jay Rosen Digital Archive.
+The answer became the Jay Rosen Internet Archive.
 
 ---
 
@@ -209,7 +209,7 @@ Everything else—the pipeline, the visualization, the design system—supports 
 
 ## The Archive Today
 
-As of January 2026, the Jay Rosen Digital Archive contains:
+As of January 2026, the Jay Rosen Internet Archive contains:
 
 - **869 archive records** spanning articles, social posts, threads, and the dissertation
 - **29,187 social media posts** with full-text search
@@ -235,11 +235,11 @@ The impossible press remains impossible. But understanding why is now possible f
 
 ---
 
-*Joe Amditis is the curator of the Jay Rosen Digital Archive. The archive was built with assistance from Claude (Anthropic) and GitHub Copilot.*
+*Joe Amditis is the curator of the Jay Rosen Internet Archive. The archive was built with assistance from Claude (Anthropic) and GitHub Copilot.*
 
 ---
 
 **Links:**
-- [Jay Rosen Digital Archive](https://pressthink.org/j/rosen-archive/)
+- [Jay Rosen Internet Archive](https://pressthink.org/j/rosen-archive/)
 - [The Impossible Press: Full Text](https://pressthink.org/j/rosen-archive/dissertation/reader/)
 - [GitHub Repository](https://github.com/jamditis/rosen-frontend)

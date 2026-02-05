@@ -1,6 +1,6 @@
 # RStudio Analysis Tools for Jay Rosen Archive
 
-This directory contains R scripts and documentation for analyzing the entity extraction and relationship data from the Jay Rosen Digital Archive.
+This directory contains R scripts and documentation for analyzing the entity extraction and relationship data from the Jay Rosen Internet Archive.
 
 **Created:** 2025-11-07
 **Purpose:** Statistical analysis, network analysis, and visualization of extracted entities and relationships from Google Sheets data

@@ -1,6 +1,6 @@
-# Jay Rosen Digital Archive - Design System
+# Jay Rosen Internet Archive - Design System
 
-This directory contains the unified design system for the Jay Rosen Digital Archive, providing centralized design tokens and utility classes for consistent styling across the entire application.
+This directory contains the unified design system for the Jay Rosen Internet Archive, providing centralized design tokens and utility classes for consistent styling across the entire application.
 
 ## Overview
 

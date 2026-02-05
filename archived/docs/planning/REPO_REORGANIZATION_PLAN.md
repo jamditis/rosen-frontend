@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document outlines a comprehensive plan to reorganize the Jay Rosen Digital Archive repository before transitioning from private to public. The goal is to create a clean, professional, well-documented open-source project.
+This document outlines a comprehensive plan to reorganize the Jay Rosen Internet Archive repository before transitioning from private to public. The goal is to create a clean, professional, well-documented open-source project.
 
 ---
 

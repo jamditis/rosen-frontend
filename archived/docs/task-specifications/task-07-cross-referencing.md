@@ -6,7 +6,7 @@
 **Estimated Time:** 4-5 hours
 
 ## Overview
-Implement intelligent cross-referencing system that identifies relationships between archived content, tracks entity mentions across records, and creates a network of connections within the Jay Rosen digital archive.
+Implement intelligent cross-referencing system that identifies relationships between archived content, tracks entity mentions across records, and creates a network of connections within the Jay Rosen Internet Archive.
 
 ## Current Implementation Status
 - ✅ Entity mention tracking via `data_deduper.py`

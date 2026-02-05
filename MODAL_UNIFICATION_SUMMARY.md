@@ -1,7 +1,7 @@
 # Modal Unification Summary
 
 ## Overview
-Unified all modal patterns across the Jay Rosen Digital Archive frontend to ensure consistent behavior, accessibility, and user experience.
+Unified all modal patterns across the Jay Rosen Internet Archive frontend to ensure consistent behavior, accessibility, and user experience.
 
 ## Changes Made
 

@@ -306,4 +306,4 @@ The collapse of local news represents the final abandonment of the scale problem
 ---
 
 *Document prepared for review, December 2025*
-*Jay Rosen Digital Archive*
+*Jay Rosen Internet Archive*

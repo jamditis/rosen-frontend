@@ -41,10 +41,10 @@ const Header = ({
                 <${Newspaper} className="w-5 h-5" />
               </div>
               <span className="text-sm font-display font-bold text-stone-900 hidden sm:inline">
-                Jay Rosen Digital Archive
+                Jay Rosen Internet Archive
               </span>
               <span className="text-sm font-display font-bold text-stone-900 sm:hidden">
-                JRDA
+                JRIA
               </span>
             </a>
 

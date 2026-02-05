@@ -6,7 +6,7 @@
 
 ## Overview
 
-The Jay Rosen Digital Archive is a research platform containing 869 curated records and 29,187 social media posts spanning 40 years of journalism criticism. This post covers the technical architecture, focusing on three challenges:
+The Jay Rosen Internet Archive is a research platform containing 869 curated records and 29,187 social media posts spanning 40 years of journalism criticism. This post covers the technical architecture, focusing on three challenges:
 
 1. **Entity extraction at scale** - Processing 10,000 posts with Gemini API
 2. **Knowledge graph construction** - Building 16,539 relationships
@@ -402,4 +402,4 @@ The complete codebase is available at:
 
 ---
 
-*Joe Amditis built the Jay Rosen Digital Archive with Claude (Anthropic) and GitHub Copilot. The archive processes 869 curated records and 29,187 social posts into an interconnected knowledge graph.*
+*Joe Amditis built the Jay Rosen Internet Archive with Claude (Anthropic) and GitHub Copilot. The archive processes 869 curated records and 29,187 social posts into an interconnected knowledge graph.*

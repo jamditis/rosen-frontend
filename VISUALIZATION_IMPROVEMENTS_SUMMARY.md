@@ -306,6 +306,6 @@ If issues arise, revert commits for:
 
 ## Acknowledgments
 
-This work completes the data visualization component improvements for the Jay Rosen Digital Archive frontend unification project. All three major visualization components now adhere to WCAG 2.1 AA accessibility standards and consistently use the centralized design system.
+This work completes the data visualization component improvements for the Jay Rosen Internet Archive frontend unification project. All three major visualization components now adhere to WCAG 2.1 AA accessibility standards and consistently use the centralized design system.
 
 **Next Agent:** 2.4 (Modal/Panel Standardization)

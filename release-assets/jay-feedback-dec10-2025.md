@@ -97,7 +97,7 @@ To:
 3. **How to explore** - Two cards with CTA buttons: Reader and NotebookLM
 4. **Scholars respond** - Samuel Earle's full commentary card with timeline visualization
 5. **About Jay Rosen** - Bio section with photo and Dan Kennedy text
-6. **Coming Soon** - Teaser for the full Jay Rosen Digital Archive
+6. **Coming Soon** - Teaser for the full Jay Rosen Internet Archive
 7. **Footer** - Links and attribution
 
 ---

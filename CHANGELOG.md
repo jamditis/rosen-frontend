@@ -1,4 +1,4 @@
-# Changelog - Jay Rosen Digital Archive
+# Changelog - Jay Rosen Internet Archive
 
 ---
 
@@ -175,7 +175,7 @@ Created 6 production-ready reusable components:
 - "Why This Dissertation Matters" section with three key insight cards
 - Navigation grid linking to: Full Text Reader, 3D Concept Map, Key Thinkers (coming soon), Glossary
 - About Jay Rosen section with photo and bio
-- Coming soon teaser for full Jay Rosen Digital Archive
+- Coming soon teaser for full Jay Rosen Internet Archive
 
 **3D Concept Sphere Visualization**
 - Interactive Three.js force-directed 3D graph of dissertation concepts
@@ -780,7 +780,7 @@ The following PRs were merged and closed:
   - Possessive forms rephrased for clarity
 
 ### Branding Consistency
-- **Header Standardization**: Updated all standalone tools to use "Jay Rosen Digital Archive" branding
+- **Header Standardization**: Updated all standalone tools to use "Jay Rosen Internet Archive" branding
   - FAQ, Glossary, Timeline, Comparison Tool, Annotated Excerpts, 1986 Context pages
   - Consistent logo, title, and subtitle across all entry points
 
@@ -975,7 +975,7 @@ Merged the `jamditis/rosen-archive` repository into this monorepo for unified de
 
 *Session Date: November 19, 2025*
 ## 15:34 - Initial Build & Core Infrastructure
-- Investigate and fix the "No records found" display error occurring when filtering for Twitter/X or Bluesky records in the Jay Rosen Digital Archive. Ensure these records display correctly, and that the filters for social media types return the expected results.
+- Investigate and fix the "No records found" display error occurring when filtering for Twitter/X or Bluesky records in the Jay Rosen Internet Archive. Ensure these records display correctly, and that the filters for social media types return the expected results.
 
 *Session Date: November 18, 2025*
 

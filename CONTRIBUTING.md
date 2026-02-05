@@ -1,6 +1,6 @@
-# Contributing to Jay Rosen Digital Archive
+# Contributing to Jay Rosen Internet Archive
 
-Thank you for your interest in contributing to the Jay Rosen Digital Archive (JRDA)! This guide will help you get started with development, understand our code standards, and submit contributions.
+Thank you for your interest in contributing to the Jay Rosen Internet Archive (JRDA)! This guide will help you get started with development, understand our code standards, and submit contributions.
 
 ## 📋 Table of Contents
 
@@ -528,4 +528,4 @@ This project values:
 
 ---
 
-Thank you for contributing to the Jay Rosen Digital Archive! 🎉
+Thank you for contributing to the Jay Rosen Internet Archive! 🎉

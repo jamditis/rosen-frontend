@@ -352,4 +352,4 @@ This glossary defines 16 key concepts from the dissertation. Each entry includes
 ---
 
 *Document prepared for review, December 2025*
-*Jay Rosen Digital Archive*
+*Jay Rosen Internet Archive*

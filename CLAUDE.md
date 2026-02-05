@@ -1,4 +1,4 @@
-# CLAUDE.md - Jay Rosen Digital Archive
+# CLAUDE.md - Jay Rosen Internet Archive
 
 This file provides context for Claude Code when working on this repository.
 
@@ -261,7 +261,7 @@ node data/export-archive-data.js
 
 ## Project Overview
 
-The **Jay Rosen Digital Archive (JRDA)** is a comprehensive monorepo containing:
+The **Jay Rosen Internet Archive (JRDA)** is a comprehensive monorepo containing:
 1. **Frontend Application** - Zero-build React app for exploring Jay Rosen's work
 2. **Backend Data Pipeline** - Python system for scraping, AI analysis, and archiving content
 3. **Dissertation Materials** - Full PDFs and transcription of the 1986 dissertation

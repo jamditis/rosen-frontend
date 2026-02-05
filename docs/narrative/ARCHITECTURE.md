@@ -1,6 +1,6 @@
 # Project Architecture
 
-This document provides a detailed overview of the technical architecture of the Jay Rosen Digital Archive project.
+This document provides a detailed overview of the technical architecture of the Jay Rosen Internet Archive project.
 
 ## High-Level Overview
 
@@ -575,7 +575,7 @@ source("scripts/SUPPRESS_WARNINGS.R")  # Suppress many-to-many join warnings
 -   Most influential concept representing core mission
 -   Redefines journalist-audience relationship fundamentally
 
-This RStudio analysis system transforms the archive from a content preservation project into a comprehensive research platform, enabling scholars to generate quantitative insights about journalism criticism, intellectual influence, and the evolution of alternative journalism models. The combination of entity extraction, relationship mapping, and sophisticated statistical analysis positions the Jay Rosen Digital Archive as a model for digital humanities research infrastructure.
+This RStudio analysis system transforms the archive from a content preservation project into a comprehensive research platform, enabling scholars to generate quantitative insights about journalism criticism, intellectual influence, and the evolution of alternative journalism models. The combination of entity extraction, relationship mapping, and sophisticated statistical analysis positions the Jay Rosen Internet Archive as a model for digital humanities research infrastructure.
 
 ## Frontend Presentation Layer (December 2025)
 

@@ -1,7 +1,7 @@
 # PRD: Interactive Network Graph Explorer
 
 ## Executive Summary
-An interactive force-directed network graph visualization that allows users to explore relationships between entities (people, organizations, concepts, works) across the Jay Rosen Digital Archive. Users can click, drag, filter, and explore the interconnected web of journalism scholarship.
+An interactive force-directed network graph visualization that allows users to explore relationships between entities (people, organizations, concepts, works) across the Jay Rosen Internet Archive. Users can click, drag, filter, and explore the interconnected web of journalism scholarship.
 
 ## Problem Statement
 The archive contains 600+ records with potentially thousands of entities and relationships. Users need a way to:
@@ -224,7 +224,7 @@ D3.js force simulation
 ### Main View
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ Jay Rosen Digital Archive          [Search entities...]  🔍 │
+│ Jay Rosen Internet Archive          [Search entities...]  🔍 │
 ├─────────────────────────────────────────────────────────────┤
 │                                                               │
 │  Filters:                         [NETWORK GRAPH AREA]       │

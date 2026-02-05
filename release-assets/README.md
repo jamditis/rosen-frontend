@@ -4,7 +4,7 @@
 
 This directory contains all assets needed for the public release of:
 1. **"The Impossible Press"** - Jay Rosen's 1986 dissertation
-2. **Jay Rosen Digital Archive** - The comprehensive 36-year archive
+2. **Jay Rosen Internet Archive** - The comprehensive 36-year archive
 
 ## Pre-Publication Report
 

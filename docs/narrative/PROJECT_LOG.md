@@ -1,6 +1,6 @@
 # **Project Log**
 
-This document records significant architectural decisions and notable changes to the Jay Rosen Digital Archive project.
+This document records significant architectural decisions and notable changes to the Jay Rosen Internet Archive project.
 
 ---
 
@@ -1439,7 +1439,7 @@ RStudio/
 
 ##### **Overview**
 
-Created a complete RStudio analysis environment for statistical analysis, network analysis, and visualization of the entity extraction and relationship data from the Jay Rosen Digital Archive. This enables researchers to analyze the knowledge graph using R's powerful data science ecosystem.
+Created a complete RStudio analysis environment for statistical analysis, network analysis, and visualization of the entity extraction and relationship data from the Jay Rosen Internet Archive. This enables researchers to analyze the knowledge graph using R's powerful data science ecosystem.
 
 ##### **What Was Created**
 
@@ -3332,7 +3332,7 @@ This system transforms data quality maintenance from manual, expensive reprocess
 
 #### **Entity Extraction & Knowledge Graph System**
 
-**Overview:** Built comprehensive entity extraction and relationship tracking system to create a structured knowledge graph from the Jay Rosen Digital Archive, enabling advanced analysis of people, organizations, concepts, and their interconnections across 600+ records.
+**Overview:** Built comprehensive entity extraction and relationship tracking system to create a structured knowledge graph from the Jay Rosen Internet Archive, enabling advanced analysis of people, organizations, concepts, and their interconnections across 600+ records.
 
 ##### **Entity Extraction Architecture**
 
@@ -3494,7 +3494,7 @@ This system transforms data quality maintenance from manual, expensive reprocess
 
 ##### **Impact on Archive Quality**
 
-This enhancement transforms the Jay Rosen Digital Archive from a collection of isolated records into a structured knowledge graph:
+This enhancement transforms the Jay Rosen Internet Archive from a collection of isolated records into a structured knowledge graph:
 
 *   **Research Value:** Enables network analysis of Jay Rosen's intellectual influences and discourse
 *   **Discoverability:** Entities provide rich facets for search and exploration
@@ -3695,7 +3695,7 @@ This enhancement transforms the Jay Rosen Digital Archive from a collection of i
 
 ##### **Impact on Archive Quality**
 
-This enhancement represents a significant improvement in the semantic richness of the Jay Rosen Digital Archive:
+This enhancement represents a significant improvement in the semantic richness of the Jay Rosen Internet Archive:
 
 *   **Research Value:** Expanded concept taxonomy enables more sophisticated analysis of Jay's journalism criticism themes
 *   **Searchability:** 13 well-defined concepts improve discoverability of related content

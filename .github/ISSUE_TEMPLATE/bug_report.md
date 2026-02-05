@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Report a bug in the Jay Rosen Digital Archive
+about: Report a bug in the Jay Rosen Internet Archive
 title: '[Bug] '
 labels: bug
 assignees: ''

@@ -1,5 +1,5 @@
 # Content Themes Summary
-## Jay Rosen Digital Archive Promotional Strategy
+## Jay Rosen Internet Archive Promotional Strategy
 
 ---
 
@@ -35,7 +35,7 @@
 **Use For:** Digital humanities audiences, researchers, data journalists
 
 **Sample Copy:**
-> "869 records. 29,187 social posts. 25,972 entities. 16,539 relationships. The Jay Rosen Digital Archive isn't a collection—it's a knowledge graph of four decades of journalism criticism."
+> "869 records. 29,187 social posts. 25,972 entities. 16,539 relationships. The Jay Rosen Internet Archive isn't a collection—it's a knowledge graph of four decades of journalism criticism."
 
 ---
 
@@ -257,4 +257,4 @@
 
 ---
 
-*Content themes summary prepared for Jay Rosen Digital Archive launch, January 2026*
+*Content themes summary prepared for Jay Rosen Internet Archive launch, January 2026*

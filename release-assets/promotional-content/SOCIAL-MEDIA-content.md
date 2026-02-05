@@ -1,5 +1,5 @@
 # Social Media Content Package
-## Jay Rosen Digital Archive Launch
+## Jay Rosen Internet Archive Launch
 
 ---
 
@@ -221,7 +221,7 @@ So we redesigned everything around 1980s research libraries: aged paper, manila 
 The archive should feel like walking into a library, not a startup.
 
 ### Post 3: The Stats
-The Jay Rosen Digital Archive by the numbers:
+The Jay Rosen Internet Archive by the numbers:
 
 - 869 curated records
 - 29,187 social posts processed
@@ -243,7 +243,7 @@ Written before the internet. Before social media. Before the current media crisi
 Now available to read in full: pressthink.org/j/rosen-archive/dissertation/reader/
 
 ### Post 5: Human-AI Collaboration
-275 commits to build the Jay Rosen Digital Archive:
+275 commits to build the Jay Rosen Internet Archive:
 - 51% human (me)
 - 31% Claude
 - 18% Copilot
@@ -256,7 +256,7 @@ The future of building is collaborative.
 
 ## LINKEDIN POST
 
-**Building the Jay Rosen Digital Archive: Lessons in Human-AI Collaboration**
+**Building the Jay Rosen Internet Archive: Lessons in Human-AI Collaboration**
 
 For the past two months, I've been building a digital archive of Jay Rosen's 40 years of journalism criticism—869 curated records, 29,187 social media posts, and his 1986 dissertation "The Impossible Press."
 
@@ -392,4 +392,4 @@ pressthink.org/j/rosen-archive/
 
 ---
 
-*Content package prepared for Jay Rosen Digital Archive launch, January 2026*
+*Content package prepared for Jay Rosen Internet Archive launch, January 2026*

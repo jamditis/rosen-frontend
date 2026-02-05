@@ -301,4 +301,4 @@ Rosen's distinction between making things public and making a public has never b
 ---
 
 *Document prepared for review, December 2025*
-*Jay Rosen Digital Archive*
+*Jay Rosen Internet Archive*

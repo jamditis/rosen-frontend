@@ -1,4 +1,4 @@
-# Press Release: Jay Rosen Digital Archive Launch
+# Press Release: Jay Rosen Internet Archive Launch
 
 **Status:** COMPLETE - Ready for Review
 
@@ -12,13 +12,13 @@
 
 ---
 
-## Jay Rosen Digital Archive Launches with 36 Years of Journalism Criticism, Including Never-Before-Published 1986 Dissertation
+## Jay Rosen Internet Archive Launches with 36 Years of Journalism Criticism, Including Never-Before-Published 1986 Dissertation
 
 *Comprehensive searchable archive preserves four decades of influential media criticism; dissertation anticipates today's media crisis*
 
 ---
 
-**NEW YORK, NY** — The Jay Rosen Digital Archive, a comprehensive collection of journalism criticism spanning 36 years (1986-2025), launches today at https://pressthink.org/wp-content/rosen-archive/index.html. The archive includes over 849 records—articles, essays, blog posts, social media content, and videos—along with the first public release of Rosen's 1986 doctoral dissertation, "The Impossible Press: American Journalism and the Decline of Public Life."
+**NEW YORK, NY** — The Jay Rosen Internet Archive, a comprehensive collection of journalism criticism spanning 36 years (1986-2025), launches today at https://pressthink.org/wp-content/rosen-archive/index.html. The archive includes over 849 records—articles, essays, blog posts, social media content, and videos—along with the first public release of Rosen's 1986 doctoral dissertation, "The Impossible Press: American Journalism and the Decline of Public Life."
 
 Jay Rosen, professor of journalism at New York University since 1986, is one of the most widely read critics of the American press. His concepts, including "the view from nowhere," "the people formerly known as the audience," and "church of the savvy," have shaped how journalists, scholars, and the public understand media's role in democracy.
 
@@ -62,7 +62,7 @@ His concepts have entered the vocabulary of media criticism:
 
 ### About the Archive
 
-The Jay Rosen Digital Archive was created by [Joe Amditis](https://twitter.com/jsamditis). It uses automated processing with Google's Gemini AI, human curation and verification, and sophisticated entity extraction to preserve and make accessible Rosen's complete digital record.
+The Jay Rosen Internet Archive was created by [Joe Amditis](https://twitter.com/jsamditis). It uses automated processing with Google's Gemini AI, human curation and verification, and sophisticated entity extraction to preserve and make accessible Rosen's complete digital record.
 
 The archive is designed for:
 - **Researchers** seeking primary sources on media criticism and journalism history

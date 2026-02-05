@@ -61,7 +61,7 @@ A visually engaging infographic displaying key archive statistics for use in soc
 │ • ~50 videos          │
 │ • 1 dissertation      │
 ├────────────────────────┤
-│ Jay Rosen Digital Archive │
+│ Jay Rosen Internet Archive │
 │ pressthink.org/wp-content/rosen-archive │
 └────────────────────────┘
 ```
@@ -115,14 +115,14 @@ Use archive color palette:
 ## Accessibility
 
 - Sufficient color contrast (WCAG AA)
-- Alt text: "Jay Rosen Digital Archive statistics: 849+ records spanning 36 years (1986-2025), 5,160+ entities, 7,499+ relationships, 13 key concepts tracked"
+- Alt text: "Jay Rosen Internet Archive statistics: 849+ records spanning 36 years (1986-2025), 5,160+ entities, 7,499+ relationships, 13 key concepts tracked"
 - Don't rely solely on color to convey information
 
 ---
 
 ## Source Attribution
 
-Include: "Jay Rosen Digital Archive | pressthink.org/wp-content/rosen-archive"
+Include: "Jay Rosen Internet Archive | pressthink.org/wp-content/rosen-archive"
 
 ---
 

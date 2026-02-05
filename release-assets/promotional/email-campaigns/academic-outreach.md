@@ -7,7 +7,7 @@
 ## Email Details
 
 **Subject Line Options:**
-1. "New Resource: Jay Rosen Digital Archive + Teaching Materials"
+1. "New Resource: Jay Rosen Internet Archive + Teaching Materials"
 2. "Jay Rosen's 1986 Dissertation Now Available for Teaching"
 3. "36 Years of Journalism Criticism—Searchable and Citable"
 
@@ -22,7 +22,7 @@
 
 Dear [Name/Title],
 
-I'm writing to share a new resource that may be valuable for your research and teaching: the **Jay Rosen Digital Archive**.
+I'm writing to share a new resource that may be valuable for your research and teaching: the **Jay Rosen Internet Archive**.
 
 ---
 

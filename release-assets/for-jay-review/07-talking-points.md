@@ -1,4 +1,4 @@
-# Talking Points: Jay Rosen Digital Archive
+# Talking Points: Jay Rosen Internet Archive
 
 **Status:** COMPLETE
 
@@ -10,7 +10,7 @@ Prepared talking points for interviews, podcasts, and media appearances about th
 
 ### Opening Pitch (30 seconds)
 
-"We just launched the Jay Rosen Digital Archive—a searchable collection of 36 years of journalism criticism. It includes 849 records spanning articles, essays, blog posts, Twitter threads, and videos. But the headline is probably the dissertation: Jay Rosen's 1986 PhD thesis, 'The Impossible Press,' which has never been publicly available until now. It was written before the internet, before social media, before the current trust crisis—and it reads like it was written yesterday."
+"We just launched the Jay Rosen Internet Archive—a searchable collection of 36 years of journalism criticism. It includes 849 records spanning articles, essays, blog posts, Twitter threads, and videos. But the headline is probably the dissertation: Jay Rosen's 1986 PhD thesis, 'The Impossible Press,' which has never been publicly available until now. It was written before the internet, before social media, before the current trust crisis—and it reads like it was written yesterday."
 
 ### Why Build This Archive?
 

@@ -1,6 +1,6 @@
 # Frontend Design Unification Plan
 
-## Jay Rosen Digital Archive - Systematic UI/UX Review & Improvement
+## Jay Rosen Internet Archive - Systematic UI/UX Review & Improvement
 
 **Branch:** `feature/frontend-design-unification`
 **Created:** December 5, 2025
@@ -10,7 +10,7 @@
 
 ## Executive Summary
 
-This plan outlines a systematic approach to review, improve, and unify every frontend page, modal, navigation element, and component across the Jay Rosen Digital Archive. The goal is to achieve a cohesive, production-grade design system that maintains the archive's distinctive typewriter aesthetic while ensuring accessibility, responsiveness, and maintainability.
+This plan outlines a systematic approach to review, improve, and unify every frontend page, modal, navigation element, and component across the Jay Rosen Internet Archive. The goal is to achieve a cohesive, production-grade design system that maintains the archive's distinctive typewriter aesthetic while ensuring accessibility, responsiveness, and maintainability.
 
 ---
 

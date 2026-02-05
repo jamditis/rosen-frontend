@@ -1,7 +1,7 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { html } from './html.js?v=2.0.2';
-import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3 } from 'lucide-react';
+import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users } from 'lucide-react';
 import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=2.0.2';
 import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=2.0.2';
 
@@ -18,6 +18,7 @@ import ToolsModal from './components/ToolsModal.js?v=2.0.2';
 import LoadingQuotes from './components/LoadingQuotes.js?v=2.0.2';
 import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=2.0.2';
 import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=2.0.2';
+import EntityBrowser from './components/EntityBrowser.js?v=2.0.2';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
@@ -120,6 +121,8 @@ const App = () => {
       setCurrentView('dissertation');
     } else if (action === 'explorer') {
       setViewMode('explorer');
+    } else if (action === 'entities') {
+      setViewMode('entities');
     }
   }, []);
 
@@ -277,6 +280,7 @@ const App = () => {
   const selectedRecordIndex = filteredRecords.findIndex(r => r.id === selectedRecordId);
 
   const isExplorer = viewMode === 'explorer';
+  const isEntityBrowser = viewMode === 'entities';
 
   // Calculate active filter count
   const activeFilterCount = (filters.search ? 1 : 0) +
@@ -334,9 +338,9 @@ const App = () => {
                     <${Newspaper} className="w-5 h-5" />
                 </div>
                 <h1 className="text-lg md:text-xl font-display font-bold text-stone-900 tracking-tight hidden sm:block">
-                    Jay Rosen Digital Archive
+                    Jay Rosen Internet Archive
                 </h1>
-                <h1 className="text-lg font-display font-bold text-stone-900 sm:hidden">JRDA</h1>
+                <h1 className="text-lg font-display font-bold text-stone-900 sm:hidden">JRIA</h1>
             </button>
 
             <div className="hidden md:flex items-center gap-6 text-xs text-stone-500 border-l border-r border-stone-200 px-6 h-full">
@@ -363,7 +367,7 @@ const App = () => {
                 <a href="https://twitter.com/jsamditis" target="_blank" rel="noreferrer" className="text-stone-500 hover:text-stone-900 transition-colors text-xs hidden md:inline-block">
                     Curated by Joe Amditis
                 </a>
-                ${!isExplorer && html`
+                ${!isExplorer && !isEntityBrowser && html`
                     <button
                     onClick=${() => setSidebarOpen(true)}
                     className="lg:hidden p-2 text-stone-800 hover:bg-stone-100 rounded-md border border-stone-300 relative"
@@ -382,9 +386,9 @@ const App = () => {
 
       <${WorkInProgressBanner} onNavigateToDissertation=${navigateToDissertation} />
 
-      <div className=${`flex-grow container mx-auto px-4 py-6 flex gap-8 ${isExplorer ? 'justify-center' : ''}`}>
-         
-         ${!isExplorer && html`
+      <div className=${`flex-grow container mx-auto px-4 py-6 flex gap-8 ${isExplorer || isEntityBrowser ? 'justify-center' : ''}`}>
+
+         ${!isExplorer && !isEntityBrowser && html`
              <${Sidebar} 
                 facets=${facets}
                 filters=${filters}
@@ -398,7 +402,7 @@ const App = () => {
 
          <main className="flex-grow min-w-0 flex flex-col">
             
-            ${!isExplorer && html`
+            ${!isExplorer && !isEntityBrowser && html`
                 <div>
                     <!-- Tools Section (above Featured Works) - always visible even while loading -->
                     ${!filters.search && !filters.era && !filters.year && filters.categories.length === 0 && html`
@@ -418,6 +422,13 @@ const App = () => {
                                 >
                                     <${Network} className="w-3.5 h-3.5" />
                                     Network
+                                </button>
+                                <button
+                                    onClick=${() => setViewMode('entities')}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
+                                >
+                                    <${Users} className="w-3.5 h-3.5" />
+                                    Entities
                                 </button>
                                 <button
                                     onClick=${() => setAnalyticsOpen(true)}
@@ -457,8 +468,10 @@ const App = () => {
 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-stone-200 pb-4 scroll-mt-24" ref=${recordsRef}>
                 <div className="font-display text-stone-500 text-sm">
-                    ${isExplorer 
-                        ? "Interactive relationship explorer" 
+                    ${isExplorer
+                        ? "Interactive relationship explorer"
+                        : isEntityBrowser
+                        ? "Browse entities and their connections"
                         : (loading ? 'Loading archive...' : `${filteredRecords.length} records found`)
                     }
                 </div>
@@ -480,7 +493,7 @@ const App = () => {
                         </button>
                     </div>
 
-                    ${!isExplorer && html`
+                    ${!isExplorer && !isEntityBrowser && html`
                         <div class="flex items-center">
                             <label htmlFor="sort-select" className="text-xs font-bold text-stone-500 uppercase hidden sm:inline mr-2">Sort:</label>
                             <select 
@@ -502,7 +515,11 @@ const App = () => {
                 <${Explorer} records=${records} />
             `}
 
-            ${!isExplorer && html`
+            ${isEntityBrowser && !loading && html`
+                <${EntityBrowser} records=${records} onSelectRecord=${setSelectedRecordId} />
+            `}
+
+            ${!isExplorer && !isEntityBrowser && html`
                 <div>
                     ${error && html`
                     <div className="text-center py-20 border-2 border-red-200 rounded-lg bg-red-50 mx-4">

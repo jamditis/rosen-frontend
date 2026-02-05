@@ -2,7 +2,7 @@
 ## Tailored Approaches for Jay Rosen's Intellectual & Professional Impact
 
 **Date:** October 29, 2025
-**Context:** Jay Rosen Digital Archive - Entity & Relationship Data Visualization
+**Context:** Jay Rosen Internet Archive - Entity & Relationship Data Visualization
 **Data:** 5,482 entities, 6,600+ relationships across 6 entity types and 15 relationship types
 
 ---
@@ -588,5 +588,5 @@ User Browsers
 
 **Document Created By:** Claude Code
 **Date:** October 29, 2025
-**For:** Jay Rosen Digital Archive Project
+**For:** Jay Rosen Internet Archive Project
 **Related:** `KNOWLEDGE_GRAPH_VISUALIZATION_RESEARCH.md`

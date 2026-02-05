@@ -1,5 +1,5 @@
 # Key Talking Points
-## Jay Rosen Digital Archive Launch
+## Jay Rosen Internet Archive Launch
 
 ---
 
@@ -169,4 +169,4 @@ Yes. The complete codebase is at github.com/jamditis/rosen-frontend. MIT license
 
 ---
 
-*Talking points prepared for Jay Rosen Digital Archive launch, January 2026*
+*Talking points prepared for Jay Rosen Internet Archive launch, January 2026*

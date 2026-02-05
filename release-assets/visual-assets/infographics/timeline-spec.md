@@ -59,7 +59,7 @@ A visual timeline showing Jay Rosen's career and the archive's coverage from 198
 - **"Church of the Savvy"** concept gains prominence
 
 ### 2025
-- **Jay Rosen Digital Archive launches**
+- **Jay Rosen Internet Archive launches**
 
 ---
 

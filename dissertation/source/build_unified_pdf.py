@@ -27,7 +27,7 @@ METADATA = {
     "/Author": "Jay Rosen",
     "/Subject": "Doctoral Dissertation, New York University, 1986",
     "/Keywords": "journalism, press, democracy, public life, media criticism, Neil Postman",
-    "/Creator": "Jay Rosen Digital Archive",
+    "/Creator": "Jay Rosen Internet Archive",
     "/Producer": "pypdf",
 }
 
