@@ -95,7 +95,9 @@ const Explorer = ({ records }) => {
     for (let i = 0; i < totalSlots; i++) {
       if (i < sorted.length) {
         const r = sorted[i];
-        const primaryVal = r.categories[0] || 'Other';
+        const cats = r.categories || [];
+        const cons = r.concepts || [];
+        const primaryVal = cats[0] || 'Other';
         const hash = primaryVal.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
         const colorTheme = COLORS[hash % COLORS.length] || COLORS[0];
 
@@ -108,7 +110,7 @@ const Explorer = ({ records }) => {
           baseRadius: baseDotRadius,
           currentRadius: baseDotRadius,
           isPlaceholder: false,
-          aggregateConnectionCount: r.concepts.length + r.categories.length
+          aggregateConnectionCount: cons.length + cats.length
         });
       } else {
         processed.push({

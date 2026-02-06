@@ -14,8 +14,8 @@ const DATA_CACHE_NAME = 'jrda-data-v1';
 const IS_LOCAL = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
 
 // Base path depends on environment
-const BASE_PATH = IS_LOCAL ? '/frontend' : '/wp-content/rosen-archive';
-const DATA_PATH = IS_LOCAL ? '/data' : '/wp-content/rosen-archive/data';
+const BASE_PATH = IS_LOCAL ? '/frontend' : '/j/rosen-archive';
+const DATA_PATH = IS_LOCAL ? '/data' : '/j/rosen-archive/data';
 
 // Static assets to pre-cache on install
 const STATIC_ASSETS = IS_LOCAL ? [
@@ -46,30 +46,30 @@ const STATIC_ASSETS = IS_LOCAL ? [
   '/frontend/services/sqliteService.js'
 ] : [
   // Production WordPress paths
-  '/wp-content/rosen-archive/',
-  '/wp-content/rosen-archive/index.html',
-  '/wp-content/rosen-archive/frontend/index.js',
-  '/wp-content/rosen-archive/frontend/App.js',
-  '/wp-content/rosen-archive/frontend/html.js',
-  '/wp-content/rosen-archive/frontend/constants.js',
-  '/wp-content/rosen-archive/frontend/index.css',
-  '/wp-content/rosen-archive/frontend/dist/tailwind.css',
-  '/wp-content/rosen-archive/frontend/services/archiveService.js',
-  '/wp-content/rosen-archive/frontend/components/Sidebar.js',
-  '/wp-content/rosen-archive/frontend/components/RecordModal.js',
-  '/wp-content/rosen-archive/frontend/components/FeaturedSection.js',
-  '/wp-content/rosen-archive/frontend/components/Explorer.js',
-  '/wp-content/rosen-archive/frontend/components/WelcomeModal.js',
-  '/wp-content/rosen-archive/frontend/components/DissertationPage.js',
-  '/wp-content/rosen-archive/frontend/components/MindMap.js',
-  '/wp-content/rosen-archive/frontend/components/DetailPanel.js',
-  '/wp-content/rosen-archive/frontend/components/dissertationData.js',
-  '/wp-content/rosen-archive/frontend/components/ToolsModal.js',
-  '/wp-content/rosen-archive/frontend/components/LoadingQuotes.js',
-  '/wp-content/rosen-archive/frontend/components/WorkInProgressBanner.js',
-  '/wp-content/rosen-archive/frontend/components/AnalyticsDashboard.js',
-  '/wp-content/rosen-archive/frontend/components/QueryBuilder.js',
-  '/wp-content/rosen-archive/frontend/services/sqliteService.js'
+  '/j/rosen-archive/',
+  '/j/rosen-archive/index.html',
+  '/j/rosen-archive/frontend/index.js',
+  '/j/rosen-archive/frontend/App.js',
+  '/j/rosen-archive/frontend/html.js',
+  '/j/rosen-archive/frontend/constants.js',
+  '/j/rosen-archive/frontend/index.css',
+  '/j/rosen-archive/frontend/dist/tailwind.css',
+  '/j/rosen-archive/frontend/services/archiveService.js',
+  '/j/rosen-archive/frontend/components/Sidebar.js',
+  '/j/rosen-archive/frontend/components/RecordModal.js',
+  '/j/rosen-archive/frontend/components/FeaturedSection.js',
+  '/j/rosen-archive/frontend/components/Explorer.js',
+  '/j/rosen-archive/frontend/components/WelcomeModal.js',
+  '/j/rosen-archive/frontend/components/DissertationPage.js',
+  '/j/rosen-archive/frontend/components/MindMap.js',
+  '/j/rosen-archive/frontend/components/DetailPanel.js',
+  '/j/rosen-archive/frontend/components/dissertationData.js',
+  '/j/rosen-archive/frontend/components/ToolsModal.js',
+  '/j/rosen-archive/frontend/components/LoadingQuotes.js',
+  '/j/rosen-archive/frontend/components/WorkInProgressBanner.js',
+  '/j/rosen-archive/frontend/components/AnalyticsDashboard.js',
+  '/j/rosen-archive/frontend/components/QueryBuilder.js',
+  '/j/rosen-archive/frontend/services/sqliteService.js'
 ];
 
 // Data files to cache with stale-while-revalidate
@@ -78,9 +78,9 @@ const DATA_URLS = IS_LOCAL ? [
   '/data/archive-details.json',
   '/data/archive-entities.json'
 ] : [
-  '/wp-content/rosen-archive/data/archive-core.json',
-  '/wp-content/rosen-archive/data/archive-details.json',
-  '/wp-content/rosen-archive/data/archive-entities.json'
+  '/j/rosen-archive/data/archive-core.json',
+  '/j/rosen-archive/data/archive-details.json',
+  '/j/rosen-archive/data/archive-entities.json'
 ];
 
 console.log('[SW] Environment:', IS_LOCAL ? 'local development' : 'production');

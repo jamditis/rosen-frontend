@@ -10,7 +10,7 @@ const DissertationPage = ({ onBack }) => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [detailPanelOpen, setDetailPanelOpen] = useState(false);
 
-  const dissertationPdfUrl = '/wp-content/rosen-archive/features/dissertation-reader/';
+  const dissertationPdfUrl = '/j/rosen-archive/dissertation/reader/';
 
   const handleNodeSelect = (node) => {
     if (node) {

@@ -7,7 +7,7 @@ import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=2.0.2';
 
 // Detect environment for path generation
 const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const FEATURES_PATH = IS_LOCAL ? '../features' : '/wp-content/rosen-archive/features';
+const FEATURES_PATH = IS_LOCAL ? '../dissertation' : '/j/rosen-archive/dissertation';
 import Sidebar from './components/Sidebar.js?v=2.0.2';
 import WelcomeModal from './components/WelcomeModal.js?v=2.0.2';
 import RecordModal from './components/RecordModal.js?v=2.0.2';
@@ -438,7 +438,7 @@ const App = () => {
                                     Analytics
                                 </button>
                                 <a
-                                    href=${`${FEATURES_PATH}/comparison-tool/`}
+                                    href=${`${FEATURES_PATH}/comparison/`}
                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
                                 >
                                     ⚡ Then & Now

@@ -39,7 +39,7 @@ export const FEATURED_WORKS = [
     title: 'The Impossible Press (1986)',
     description: 'Rosen\'s PhD dissertation exploring the decline of the "public" as a social group and the rise of the mass audience. It contrasts the democratic ideal of a "universal town meeting" with the realities of modern communication.',
     image: 'https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&q=80&w=800',
-    link: 'https://pressthink.org/wp-content/rosen-archive/features/dissertation-reader/',
+    link: 'https://pressthink.org/j/rosen-archive/dissertation/reader/',
     type: 'PhD Dissertation'
   },
   {
@@ -86,7 +86,7 @@ export const FEATURED_WORKS = [
     id: 'feat-6',
     title: 'Public Journalism: A Case for Public Scholarship (1995)',
     description: 'An early argument for academics to engage with practitioners and the public, not just other scholars. Rosen makes the case that journalism reform requires intellectual work done in the open.',
-    image: 'https://images.unsplash.com/photo-1523050854058-8df90110c476?auto=format&fit=crop&q=80&w=800',
+    image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&q=80&w=800',
     link: 'https://berks.psu.edu/sites/berks/files/campus/rosen.pdf',
     type: 'Essay'
   },
