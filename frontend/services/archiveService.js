@@ -183,7 +183,7 @@ const DISSERTATION_RECORD = {
 
 // Cache configuration
 const CACHE_TTL_MS = 1000 * 60 * 60; // 1 hour cache
-const CACHE_VERSION = 'v4'; // Increment to invalidate all caches
+const CACHE_VERSION = 'v5'; // Increment to invalidate all caches
 
 const getCacheKey = (url) => {
   // Use djb2 hash algorithm for cache keys to avoid encoding issues with non-ASCII URLs
