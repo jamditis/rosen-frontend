@@ -56,56 +56,62 @@ Only clone the repository again if:
 
 ## Project Status
 
-**STATUS: READY FOR PUBLICATION (December 2025)**
+**STATUS: LIVE at pressthink.org/j/rosen-archive/ (February 2026)**
 
-All development work for the December 2025 dissertation release is complete. The archive has been fully validated and is ready for deployment to the production WordPress site.
+The archive is deployed and live. Dissertation tools launched December 2025. Full archive (29,745 records) deployed via FTP to WordPress. Ongoing data quality improvements in progress.
 
 ---
 
-## 🔄 CURRENT SESSION STATUS (December 8, 2025)
+## 🔄 CURRENT SESSION STATUS (February 6, 2026)
 
-**Branch:** main (merged via PR #107)
-**Version:** 2.27.0 (Phase 1 Launch Implementation)
-**Status:** ✅ MERGED TO MAIN - Ready for deployment
+**Branch:** main
+**Version:** v2.2.0 (import version) / CACHE_VERSION v6
+**Status:** ✅ Data quality fixes deployed and verified live
 
-### ✅ COMPLETED WORK (December 8, 2025)
+### ✅ COMPLETED WORK (February 6, 2026)
+
+**Data quality audit and fixes**
+
+Conducted live site testing of archive records (not dissertation features). Discovered and fixed 4 data quality issues affecting social media records (29,187 Twitter/X and Bluesky posts).
+
+1. **RecordModal content type fix** (`frontend/components/RecordModal.js:204`)
+   - Social records now show "Twitter/X" or "Bluesky" instead of generic "Article" in modal header
+   - Also handles "Dissertation" type correctly
+
+2. **Quote fallback for social records** (`data/export-archive-data.js:135`)
+   - Added `excerpt` and `raw_text` field fallbacks when `pull_quote` is empty
+   - Affects 4,433 social records that previously showed no post text
+
+3. **Category normalization** (`data/social_posts.csv`)
+   - Fixed 9 records with non-standard category values ("Journalism Practice" and "Journalism Practice & Theory" → "Journalism Theory & Practice")
+   - Reduced sidebar categories from 12 to 10
+
+4. **Entity deduplication** (`data/extracted_entities.csv`, `data/extracted_relationships.csv`)
+   - Merged: PressThink Blog + Press Think → PressThink (total_mentions: 64)
+   - Merged: ABC → ABC News (total_mentions: 32)
+   - Merged: CBS → CBS News (total_mentions: 55)
+   - Updated 117 relationship references
+
+5. **Version bump and cache busting**
+   - All JS imports bumped from `?v=2.1.0` to `?v=2.2.0`
+   - Service worker cache bumped from v2 to v3
+   - archiveService CACHE_VERSION bumped from v5 to v6
+
+**Archive stats:** 29,745 records, 5,127 entities, 10 categories, 147 publications
+
+**Known remaining issues:**
+- 29,187 social media records still have generic titles ("Tweet by Jay Rosen", "Post by Jay Rosen") — would require AI-based title generation from post content to fix
+- Browser storage full warnings on live site (cache disabled, archive works but without caching)
+
+---
+
+### ✅ PREVIOUS WORK (December 8, 2025)
 
 **Phase 1 Launch Implementation (per Jay Rosen prep call)**
 
-Implemented stripped-down Phase 1 launch based on December 8, 2025 prep call with Jay Rosen.
+Implemented stripped-down Phase 1 launch based on December 8, 2025 prep call with Jay Rosen. Deployed to pressthink.org/j/rosen-archive/.
 
-1. **Section Reordering:**
-   - New order: Hero → How to explore → Explore tools → Why it matters → Scholars respond → About Jay Rosen → Coming soon
-
-2. **Stripped Down to Core Features:**
-   - Read the announcement (links to `https://pressthink.org/2025/10/jay-rosen-1986-dissertation-launch-blog-post/`)
-   - Read the full text (dissertation reader)
-   - FAQ (46 questions)
-   - Annotated excerpts
-
-3. **Removed for Phase 2:**
-   - Concept map (3D visualization)
-   - Glossary and key figures
-   - Then & now comparison
-   - Ideas timeline
-   - 1986 context
-
-4. **Other Changes:**
-   - Renamed "Author's foreword" → "Read the announcement"
-   - Updated Jay's bio to "Professor of Journalism, New York University (retired)"
-   - Added "How to explore this dissertation" guide section
-   - Fixed grid to 3 columns for proper alignment
-   - Fixed PDF download links to `/j/rosen-archive/dissertation/reader/THE_IMPOSSIBLE_PRESS_NYU_ROSEN-JAY-1986.pdf`
-   - Updated foreword featured image path to `/j/rosen-archive/rosen-dissertation-feat.png`
-
-**PRs Merged:**
-- PR #106: Path standardization for /j/rosen-archive/ deployment
-- PR #107: Phase 1 launch implementation
-
-**Next Steps:**
-- Deploy to pressthink.org/j/rosen-archive/
-- Jay to finalize blog post and publish
-- Monitor for any issues post-launch
+PRs Merged: #106 (path standardization), #107 (Phase 1 launch)
 
 ---
 
