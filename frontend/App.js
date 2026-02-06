@@ -1,24 +1,24 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=2.1.0';
+import { html } from './html.js?v=2.2.0';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=2.1.0';
-import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=2.1.0';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=2.2.0';
+import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=2.2.0';
 
 // Detect environment for path generation
 const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const FEATURES_PATH = IS_LOCAL ? '../dissertation' : '/j/rosen-archive/dissertation';
-import Sidebar from './components/Sidebar.js?v=2.1.0';
-import WelcomeModal from './components/WelcomeModal.js?v=2.1.0';
-import RecordModal from './components/RecordModal.js?v=2.1.0';
-import FeaturedSection from './components/FeaturedSection.js?v=2.1.0';
-import Explorer from './components/Explorer.js?v=2.1.0';
-import DissertationPage from './components/DissertationPage.js?v=2.1.0';
-import ToolsModal from './components/ToolsModal.js?v=2.1.0';
-import LoadingQuotes from './components/LoadingQuotes.js?v=2.1.0';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=2.1.0';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=2.1.0';
-import EntityBrowser from './components/EntityBrowser.js?v=2.1.0';
+import Sidebar from './components/Sidebar.js?v=2.2.0';
+import WelcomeModal from './components/WelcomeModal.js?v=2.2.0';
+import RecordModal from './components/RecordModal.js?v=2.2.0';
+import FeaturedSection from './components/FeaturedSection.js?v=2.2.0';
+import Explorer from './components/Explorer.js?v=2.2.0';
+import DissertationPage from './components/DissertationPage.js?v=2.2.0';
+import ToolsModal from './components/ToolsModal.js?v=2.2.0';
+import LoadingQuotes from './components/LoadingQuotes.js?v=2.2.0';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=2.2.0';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=2.2.0';
+import EntityBrowser from './components/EntityBrowser.js?v=2.2.0';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {

@@ -151,7 +151,7 @@ RECORD-00021_REL_012,RECORD-00021,P0090,Steve Bannon,Discusses,O0002,The New Yor
 RECORD-00021_REL_013,RECORD-00021,P0090,Steve Bannon,Discusses,O0023,The Washington Post,"In 2018, he said something really important, which is the Democrats don't matter. The real opposition is the media.",0.8,2025-10-22
 RECORD-00021_REL_014,RECORD-00021,O0002,The New York Times,Mentions,P0073,Donald Trump,"And I've heard you talking on a panel about the way in which the big newspapers in New York and Washington will be created by and read by progressives, read by Democrats. So even if they attempt to ho",0.7,2025-10-22
 RECORD-00021_REL_015,RECORD-00021,O0023,The Washington Post,Mentions,P0073,Donald Trump,"And I've heard you talking on a panel about the way in which the big newspapers in New York and Washington will be created by and read by progressives, read by Democrats. So even if they attempt to ho",0.7,2025-10-22
-RECORD-00022_REL_001,RECORD-00022,O0048,CBS,Mentions,P0086,Joe Biden,Democratic presidential nominee Joe Biden was confronted by a CBS reporter,0.9,2025-10-22
+RECORD-00022_REL_001,RECORD-00022,O0419,CBS News,Mentions,P0086,Joe Biden,Democratic presidential nominee Joe Biden was confronted by a CBS reporter,0.9,2025-10-22
 RECORD-00022_REL_002,RECORD-00022,P0092,Rudy Giuliani,Affiliated With,O0021,New York Post,"story the reporter was referencing, which was peddled to the Post by Rudy Giuliani",0.8,2025-10-22
 RECORD-00022_REL_003,RECORD-00022,P0090,Steve Bannon,Originated By,C0012,Flood the zone with shit,a strategy that Steve Bannon colorfully dubbed “flooding the zone with shit.”,1.0,2025-10-22
 RECORD-00022_REL_004,RECORD-00022,P0073,Donald Trump,Discusses,C0012,Flood the zone with shit,"Trump, or operators working on his behalf, flood the zone with shit and the media responds",0.9,2025-10-22
@@ -160,7 +160,7 @@ RECORD-00022_REL_006,RECORD-00022,P0005,Jay Rosen,Affiliated With,O0049,NYU,"Jay
 RECORD-00022_REL_007,RECORD-00022,P0005,Jay Rosen,Discusses,C0011,The journalist's code,You wrote recently that Trump has exposed the weaknesses in “the journalist’s code.”,0.9,2025-10-22
 RECORD-00022_REL_008,RECORD-00022,P0095,Glenn Kessler,Affiliated With,O0023,The Washington Post,"Glenn Kessler, the Washington Post fact-checker",1.0,2025-10-22
 RECORD-00022_REL_009,RECORD-00022,P0005,Jay Rosen,Originated By,C0014,Savvy style,I call it the savvy style in political journalism,1.0,2025-10-22
-RECORD-00022_REL_010,RECORD-00022,P0097,Les Moonves,Affiliated With,O0048,CBS,"the words of Les Moonves, the former CEO of CBS",1.0,2025-10-22
+RECORD-00022_REL_010,RECORD-00022,P0097,Les Moonves,Affiliated With,O0419,CBS News,"the words of Les Moonves, the former CEO of CBS",1.0,2025-10-22
 RECORD-00022_REL_011,RECORD-00022,P0098,Dean Baquet,Affiliated With,O0002,The New York Times,"Dean Baquet, the editor of the New York Times",1.0,2025-10-22
 RECORD-00022_REL_012,RECORD-00022,P0099,Peter Baker,Affiliated With,O0002,The New York Times,those on the front lines like [the Times’s] Peter Baker,1.0,2025-10-22
 RECORD-00022_REL_013,RECORD-00022,O0002,The New York Times,Mentions,P0073,Donald Trump,"big investigations of Donald Trump that they’ve done for five years, and to his taxes especially.",0.9,2025-10-22
@@ -343,15 +343,15 @@ RECORD-00039_REL_006,RECORD-00039,O0023,The Washington Post,Mentions,P0073,Donal
 RECORD-00039_REL_007,RECORD-00039,P0005,Jay Rosen,Published In,W0002,PressThink,Jay is... the author of the PressThink blog,1.0,2025-10-22
 RECORD-00039_REL_008,RECORD-00039,P0170,George Lakoff,Originated By,C0049,Truth Sandwich,The truth sandwich is something originally suggested by George Lakoff,1.0,2025-10-22
 RECORD-00042_REL_001,RECORD-00042,P0097,Les Moonves,Criticizes,P0073,Donald Trump,"Les Moonves said, 'Well, Donald Trump isn't good for America'",0.8,2025-10-22
-RECORD-00042_REL_002,RECORD-00042,P0097,Les Moonves,Supports,O0048,CBS,"Les Moonves said, '...but he's good for CBS'",0.7,2025-10-22
+RECORD-00042_REL_002,RECORD-00042,P0097,Les Moonves,Supports,O0419,CBS News,"Les Moonves said, '...but he's good for CBS'",0.7,2025-10-22
 RECORD-00042_REL_003,RECORD-00042,P0172,Jeff Zucker,Supports,O0015,CNN,Jeff Zucker kind of said the same thing for CNN (as Moonves),0.7,2025-10-22
 RECORD-00042_REL_004,RECORD-00042,P0073,Donald Trump,Criticizes,P0173,Cesar Sayoc,Trump unleashes violence by targeting journalists...Cesar Sayoc—people forget this—had a hit list based on Trump's critics,0.9,2025-10-22
-RECORD-00042_REL_005,RECORD-00042,O0048,CBS,Mentions,O0111,Republicans,"CBS co-president...saying, 'We think Republicans are going to win the midterms, so we need to court them.'",0.8,2025-10-22
+RECORD-00042_REL_005,RECORD-00042,O0419,CBS News,Mentions,O0111,Republicans,"CBS co-president...saying, 'We think Republicans are going to win the midterms, so we need to court them.'",0.8,2025-10-22
 RECORD-00042_REL_006,RECORD-00042,O0015,CNN,Mentions,O0111,Republicans,"CNN now, you know, the new president, Chris Licht, and the shareholder John Malone saying, 'We need to court more Republicans and go down the middle.'",0.8,2025-10-22
 RECORD-00042_REL_007,RECORD-00042,P0176,Jonathan Karl,Affiliated With,O0055,ABC News,"Jonathan Karl, who is ABC White House correspondent",1.0,2025-10-22
 RECORD-00042_REL_008,RECORD-00042,P0176,Jonathan Karl,Affiliated With,O0112,White House Correspondents' Association,"also very important, a past president of the White House Correspondents' Association",1.0,2025-10-22
 RECORD-00042_REL_009,RECORD-00042,P0176,Jonathan Karl,Discusses,P0073,Donald Trump,And he said some really blunt things about how challenging it was going to be to report on this guy.,0.9,2025-10-22
-RECORD-00042_REL_010,RECORD-00042,P0005,Jay Rosen,Originated By,C0053,Pressthink,My suggestions are more at the level of what I call 'pressthink',1.0,2025-10-22
+RECORD-00042_REL_010,RECORD-00042,P0005,Jay Rosen,Originated By,O0033,PressThink,My suggestions are more at the level of what I call 'pressthink',1.0,2025-10-22
 RECORD-00042_REL_011,RECORD-00042,O0111,Republicans,Criticizes,C0054,Guardrails of democracy,Republicans are trying to break the system,0.9,2025-10-22
 RECORD-00042_REL_012,RECORD-00042,O0111,Republicans,Mentions,O0052,Democrats,"Republicans are trying to break the system, the Democrats are trying to win within it",0.8,2025-10-22
 RECORD-00043_REL_001,RECORD-00043,P0005,Jay Rosen,Affiliated With,O0049,NYU,Jay Rosen teaches journalism at NYU,1.0,2025-10-22
@@ -406,8 +406,8 @@ RECORD-00047_REL_005,RECORD-00047,P0194,Mark Halperin,Mentions,C0014,Savvy style
 RECORD-00047_REL_006,RECORD-00047,P0197,Chris Matthews,Mentions,P0195,Ronald Reagan,Chris Matthews -- wrote a book about it (Reagan and O'Neill),0.8,2025-10-22
 RECORD-00047_REL_007,RECORD-00047,P0197,Chris Matthews,Mentions,P0196,Tip O'Neill,Chris Matthews -- wrote a book about it (Reagan and O'Neill),0.8,2025-10-22
 RECORD-00047_REL_008,RECORD-00047,P0119,Thomas Mann,Mentions,P0201,Norm Ornstein,"In 2012, two solid members of the Washington establishment, Thomas Mann and Norm Ornstein, tried to warn them:",0.9,2025-10-22
-RECORD-00048_REL_001,RECORD-00048,P0073,Donald Trump,Mentions,O0048,CBS,the infamous quip from CBS Chairman Les Moonves,0.7,2025-10-22
-RECORD-00048_REL_002,RECORD-00048,P0097,Les Moonves,Affiliated With,O0048,CBS,CBS Chairman Les Moonves,1.0,2025-10-22
+RECORD-00048_REL_001,RECORD-00048,P0073,Donald Trump,Mentions,O0419,CBS News,the infamous quip from CBS Chairman Les Moonves,0.7,2025-10-22
+RECORD-00048_REL_002,RECORD-00048,P0097,Les Moonves,Affiliated With,O0419,CBS News,CBS Chairman Les Moonves,1.0,2025-10-22
 RECORD-00048_REL_003,RECORD-00048,P0073,Donald Trump,Mentions,O0015,CNN,As a division of a larger company (now AT&T) CNN has generated more than $1 billion,0.7,2025-10-22
 RECORD-00048_REL_004,RECORD-00048,O0015,CNN,Affiliated With,O0122,AT&T,As a division of a larger company (now AT&T) CNN has generated more than $1 billion,1.0,2025-10-22
 RECORD-00048_REL_005,RECORD-00048,P0202,Masha Gessen,Discusses,C0064,Autocratic attempt,Masha Gessen calls an 'autocratic attempt',0.9,2025-10-22
@@ -470,7 +470,7 @@ RECORD-00053_REL_002,RECORD-00053,O0023,The Washington Post,Mentions,P0073,Donal
 RECORD-00053_REL_003,RECORD-00053,P0098,Dean Baquet,Discusses,E0009,2016 Presidential Election,"Dean Baquet, New York Times, looking back on the 2016 election",0.9,2025-10-22
 RECORD-00053_REL_004,RECORD-00053,P0097,Les Moonves,Discusses,P0073,Donald Trump,"Les Moonves, CEO of CBS, in Feb. 2016: ""It may not be good for America, but it's damn good for CBS.""",0.9,2025-10-22
 RECORD-00053_REL_005,RECORD-00053,P0172,Jeff Zucker,Discusses,P0073,Donald Trump,"Jeff Zucker in Oct. 2016: ""If we made any mistake last year, it's that we probably did put on too many of his campaign rallies in those early months and let them run.""",0.9,2025-10-22
-RECORD-00053_REL_006,RECORD-00053,P0108,Craig Newmark,Discusses,C0073,Press Think,"When social scientists study newsrooms they look not at personalities but routines... routines of the mind: the way journalists imagine, explain, defend and legitimate their work, another term for whi",0.9,2025-10-22
+RECORD-00053_REL_006,RECORD-00053,P0108,Craig Newmark,Discusses,O0033,PressThink,"When social scientists study newsrooms they look not at personalities but routines... routines of the mind: the way journalists imagine, explain, defend and legitimate their work, another term for whi",0.9,2025-10-22
 RECORD-00053_REL_007,RECORD-00053,P0176,Jonathan Karl,Discusses,P0073,Donald Trump,"As ABC's Jonathan Karl said about the prospect that Trump could run in 2024: ""You're covering somebody running in a system that is trying to undermine that very system.""",0.9,2025-10-22
 RECORD-00053_REL_008,RECORD-00053,P0238,Margaret Sullivan,Mentions,C0025,Disinformation,"Far more care has to be taken by news organizations to avoid amplifying disinformation... throughout what Margaret Sullivan calls the ""reality based press.""",0.9,2025-10-22
 RECORD-00054_REL_001,RECORD-00054,P0239,Mark Jacob,Affiliated With,O0145,Chicago Tribune,Mark Jacob was a former editor at the Chicago Tribune,1.0,2025-10-22
@@ -494,7 +494,7 @@ RECORD-00055_REL_005,RECORD-00055,P0005,Jay Rosen,Criticizes,O0076,Facebook,"But
 RECORD-00056_REL_001,RECORD-00056,W0002,PressThink,Affiliated With,O0148,Arthur L. Carter Journalism Institute,PressThink is a project of the Arthur L. Carter Journalism Institute at New York University,1.0,2025-10-22
 RECORD-00056_REL_002,RECORD-00056,W0002,PressThink,Published In,O0148,Arthur L. Carter Journalism Institute,PressThink is a project of the Arthur L. Carter Journalism Institute,1.0,2025-10-22
 RECORD-00056_REL_003,RECORD-00056,P0005,Jay Rosen,Affiliated With,O0148,Arthur L. Carter Journalism Institute,Jay Rosen... taught at NYU since 1986.,1.0,2025-10-22
-RECORD-00056_REL_004,RECORD-00056,P0005,Jay Rosen,Originated By,C0053,Pressthink,I call this blog PressThink because that's the kind of work I do.,1.0,2025-10-22
+RECORD-00056_REL_004,RECORD-00056,P0005,Jay Rosen,Originated By,O0033,PressThink,I call this blog PressThink because that's the kind of work I do.,1.0,2025-10-22
 RECORD-00056_REL_005,RECORD-00056,P0245,Michael Eisner,Affiliated With,O0149,Disney,Disney boss Michael Eisner,1.0,2025-10-22
 RECORD-00056_REL_006,RECORD-00056,O0149,Disney,Mentions,O0151,Kansas City Star,"In 1996, when Disney bought ABC, it came into possession of a few daily newspapers, which were owned by Capital Cities, which owned ABC. One of them was the Kansas City Star.",1.0,2025-10-22
 RECORD-00056_REL_007,RECORD-00056,O0149,Disney,Mentions,O0152,Fort Worth Star,"A year later, Dinsey sold the Star, the Fort Worth Star- and two smaller newspapers.",1.0,2025-10-22
@@ -612,9 +612,9 @@ RECORD-00070_REL_006,RECORD-00070,P0288,Mark Thompson,Affiliated With,O0197,BBC,
 RECORD-00070_REL_007,RECORD-00070,P0291,Tom Glocer,Affiliated With,O0068,Reuters,"Tom Glocer, head of your Reuters",1.0,2025-10-22
 RECORD-00070_REL_008,RECORD-00070,P0292,John Fithian,Affiliated With,O0198,National Association of Theater Owners,"John Fithian, president of the National Association of Theater Owners",1.0,2025-10-22
 RECORD-00070_REL_009,RECORD-00070,P0293,Ann Kirschner,Affiliated With,O0199,National Football League,"Ann Kirschner, vice president for programming and media development for the National Football League",1.0,2025-10-22
-RECORD-00071_REL_001,RECORD-00071,P0005,Jay Rosen,Originated By,C0053,Pressthink,My field of study is what I call “pressthink”,1.0,2025-10-22
+RECORD-00071_REL_001,RECORD-00071,P0005,Jay Rosen,Originated By,O0033,PressThink,My field of study is what I call “pressthink”,1.0,2025-10-22
 RECORD-00071_REL_002,RECORD-00071,P0005,Jay Rosen,Discusses,C0099,Wicked Problems,And that’s what I have for you today: a really juicy puzzle. It begins with a distinction that I have found useful. The distinction is between tame and wicked problems.,1.0,2025-10-22
-RECORD-00071_REL_003,RECORD-00071,P0005,Jay Rosen,Discusses,C0053,Pressthink,"My field of study is what I call “pressthink,” which is sort of like groupthink– but for people in journalism.",1.0,2025-10-22
+RECORD-00071_REL_003,RECORD-00071,P0005,Jay Rosen,Discusses,O0033,PressThink,"My field of study is what I call “pressthink,” which is sort of like groupthink– but for people in journalism.",1.0,2025-10-22
 RECORD-00071_REL_004,RECORD-00071,P0005,Jay Rosen,Mentions,P0294,William James,Williams James,1.0,2025-10-22
 RECORD-00071_REL_005,RECORD-00071,P0005,Jay Rosen,Mentions,P0164,John Dewey,John Dewey,1.0,2025-10-22
 RECORD-00071_REL_006,RECORD-00071,P0005,Jay Rosen,Mentions,P0295,Jonah Lehrer,Jonah Lehrer,1.0,2025-10-22
@@ -714,7 +714,7 @@ RECORD-00078_REL_007,RECORD-00078,P0320,Edward Snowden,Mentions,O0002,The New Yo
 RECORD-00078_REL_008,RECORD-00078,P0321,Bob Woodward,Affiliated With,O0023,The Washington Post,Bob Woodward of the Washington Post,0.9,2025-10-22
 RECORD-00078_REL_009,RECORD-00078,O0023,The Washington Post,Mentions,P0186,Richard Nixon,"the symbolic high point is the resignation of Richard Nixon in August 1974, in part because of the Post’s relentless reporting.",0.8,2025-10-22
 RECORD-00078_REL_010,RECORD-00078,C0112,New Testament Journalism,Discusses,O0197,BBC,the imperative of “impartiality” encoded into the BBC in Britain,0.7,2025-10-22
-RECORD-00078_REL_011,RECORD-00078,C0112,New Testament Journalism,Discusses,O0066,ABC,the imperative of “impartiality” encoded into the ABC in Australia,0.7,2025-10-22
+RECORD-00078_REL_011,RECORD-00078,C0112,New Testament Journalism,Discusses,O0055,ABC News,the imperative of “impartiality” encoded into the ABC in Australia,0.7,2025-10-22
 RECORD-00078_REL_012,RECORD-00078,E0004,Iraq War,Mentions,O0002,The New York Times,the failure to detect a faulty case for war in Iraq in 2003,0.7,2025-10-22
 RECORD-00079_REL_001,RECORD-00079,P0300,Pierre Omidyar,Affiliated With,O0222,eBay,"Pierre Omidyar, the founder of eBay...",1.0,2025-10-22
 RECORD-00079_REL_002,RECORD-00079,P0300,Pierre Omidyar,Discusses,O0205,First Look Media,Pierre Omidyar is injecting his first $50m into the new journalism venture he is setting up,1.0,2025-10-22
@@ -724,7 +724,7 @@ RECORD-00079_REL_005,RECORD-00079,P0318,Glenn Greenwald,Discusses,E0037,Edward S
 RECORD-00079_REL_006,RECORD-00079,E0037,Edward Snowden leaks,Mentions,O0027,National Security Agency,Edward Snowden leaks of National Security Agency documents,0.9,2025-10-22
 RECORD-00079_REL_007,RECORD-00079,P0005,Jay Rosen,Affiliated With,O0049,NYU,"Jay Rosen, a New York University professor",1.0,2025-10-22
 RECORD-00079_REL_008,RECORD-00079,P0005,Jay Rosen,Affiliated With,O0205,First Look Media,who is acting as adviser to First Look Media,1.0,2025-10-22
-RECORD-00079_REL_009,RECORD-00079,P0005,Jay Rosen,Published In,C0073,Press Think,in his blog Press Think,1.0,2025-10-22
+RECORD-00079_REL_009,RECORD-00079,P0005,Jay Rosen,Published In,O0033,PressThink,in his blog Press Think,1.0,2025-10-22
 RECORD-00079_REL_010,RECORD-00079,P0005,Jay Rosen,Discusses,O0223,Guardian Media Group,compared the nonprofit / profit duality of the venture to the structure of the Guardian Media Group,0.9,2025-10-22
 RECORD-00079_REL_011,RECORD-00079,P0005,Jay Rosen,Discusses,O0224,Bloomberg News,compared it to Bloomberg News,0.9,2025-10-22
 RECORD-00079_REL_012,RECORD-00079,P0322,Laura Poitras,Discusses,E0037,Edward Snowden leaks,heavily involved in coverage of the Snowden leaks,0.9,2025-10-22
@@ -779,7 +779,7 @@ RECORD-00084_REL_008,RECORD-00084,P0005,Jay Rosen,Affiliated With,O0049,NYU,"Jay
 RECORD-00085_REL_001,RECORD-00085,P0005,Jay Rosen,Affiliated With,O0049,NYU,Jay Rosen has been on the faculty at NYU for 25 years.,1.0,2025-10-22
 RECORD-00085_REL_002,RECORD-00085,P0308,Ethan Zuckerman,Affiliated With,O0258,MIT,Ethan Zuckerman is the director of the center for civic media at MIT,1.0,2025-10-22
 RECORD-00085_REL_003,RECORD-00085,P0308,Ethan Zuckerman,Affiliated With,O0259,MIT Media Lab,principal research scientist at the MIT media lab,1.0,2025-10-22
-RECORD-00085_REL_004,RECORD-00085,C0073,Press Think,Originated By,P0005,Jay Rosen,J Rosen is the author of press think blog,1.0,2025-10-22
+RECORD-00085_REL_004,RECORD-00085,O0033,PressThink,Originated By,P0005,Jay Rosen,J Rosen is the author of press think blog,1.0,2025-10-22
 RECORD-00085_REL_005,RECORD-00085,P0005,Jay Rosen,Discusses,C0125,Adapting journalism to the web,adapting journalism to the web is something I've been writing and thinking and talking about,1.0,2025-10-22
 RECORD-00085_REL_006,RECORD-00085,P0005,Jay Rosen,Mentions,P0341,Hannah Arendt,one of my intellectual Heroes uh Hannah arent used to do this constantly in her work,1.0,2025-10-22
 RECORD-00086_REL_001,RECORD-00086,P0005,Jay Rosen,Affiliated With,O0049,NYU,Jay Rosen is a professor at New York University.,1.0,2025-10-22
@@ -940,9 +940,9 @@ RECORD-00101_REL_001,RECORD-00101,P0398,Amygdala,Mentions,W0078,All the News tha
 RECORD-00101_REL_002,RECORD-00101,O0014,Fox News,Originated By,C0209,Fair and Balanced,"Now the newsy slogan of choice is Fox’s ever-insidious, “Fair and Balanced”",1.0,2025-10-22
 RECORD-00101_REL_003,RECORD-00101,O0014,Fox News,Criticizes,P0399,Al Franken,Fox decided to sue comedian Al Franken over rights to the words “fair” and “balanced”,0.9,2025-10-22
 RECORD-00101_REL_004,RECORD-00101,P0400,Neil Pollack,Mentions,C0209,Fair and Balanced,The writer Neil Pollack’s clever call for “Fair and Balanced Friday”,0.8,2025-10-22
-RECORD-00101_REL_005,RECORD-00101,O0014,Fox News,Mentions,O0066,ABC,"more fair, more balanced than ABC, NBC, CBS and CNN",0.7,2025-10-22
+RECORD-00101_REL_005,RECORD-00101,O0014,Fox News,Mentions,O0055,ABC News,"more fair, more balanced than ABC, NBC, CBS and CNN",0.7,2025-10-22
 RECORD-00101_REL_006,RECORD-00101,O0014,Fox News,Mentions,O0065,NBC,"more fair, more balanced than ABC, NBC, CBS and CNN",0.7,2025-10-22
-RECORD-00101_REL_007,RECORD-00101,O0014,Fox News,Mentions,O0048,CBS,"more fair, more balanced than ABC, NBC, CBS and CNN",0.7,2025-10-22
+RECORD-00101_REL_007,RECORD-00101,O0014,Fox News,Mentions,O0419,CBS News,"more fair, more balanced than ABC, NBC, CBS and CNN",0.7,2025-10-22
 RECORD-00101_REL_008,RECORD-00101,O0014,Fox News,Mentions,O0015,CNN,"more fair, more balanced than ABC, NBC, CBS and CNN",0.7,2025-10-22
 RECORD-00101_REL_009,RECORD-00101,O0014,Fox News,Criticizes,C0209,Fair and Balanced,"Fox has somehow built the ‘yeah, right” into itself thorugh its style of screw you sloganeering.",0.8,2025-10-22
 RECORD-00102_REL_001,RECORD-00102,C0016,Political Journalism,Discusses,P0073,Donald Trump,Discusses the conflict between what political journalists have to report about Trump and what they have to respect,0.9,2025-10-22
@@ -989,9 +989,9 @@ RECORD-00107_REL_003,RECORD-00107,P0005,Jay Rosen,Affiliated With,O0049,NYU,who 
 RECORD-00107_REL_004,RECORD-00107,P0005,Jay Rosen,Affiliated With,W0002,PressThink,and runs the PressThink blog,1.0,2025-10-22
 RECORD-00107_REL_005,RECORD-00107,P0005,Jay Rosen,Discusses,C0159,Open-Source Methods,The site uses open-source methods to develop good assignments,0.9,2025-10-22
 RECORD-00107_REL_006,RECORD-00107,W0084,NewAssignment.net,Discusses,C0102,Citizen Journalism,"An experiment in citizen journalism has just gotten a big boost from the pros. Reuters has given $100,000 to NewAssignment.net, a new site that hopes to have amateur and professional journalists work ",0.9,2025-10-22
-RECORD-00108_REL_001,RECORD-00108,P0005,Jay Rosen,Discusses,C0053,Pressthink,I call this blog PressThink because that’s the kind of work I do.,1.0,2025-10-22
+RECORD-00108_REL_001,RECORD-00108,P0005,Jay Rosen,Discusses,O0033,PressThink,I call this blog PressThink because that’s the kind of work I do.,1.0,2025-10-22
 RECORD-00108_REL_002,RECORD-00108,P0245,Michael Eisner,Affiliated With,O0149,Disney,Disney boss Michael Eisner,1.0,2025-10-22
-RECORD-00108_REL_003,RECORD-00108,O0149,Disney,Affiliated With,O0066,ABC,Disney bought ABC,1.0,2025-10-22
+RECORD-00108_REL_003,RECORD-00108,O0149,Disney,Affiliated With,O0055,ABC News,Disney bought ABC,1.0,2025-10-22
 RECORD-00108_REL_004,RECORD-00108,O0149,Disney,Affiliated With,O0151,Kansas City Star,"Disney came into possession of a few daily newspapers, which were owned by Capital Cities, which owned ABC.",0.9,2025-10-22
 RECORD-00108_REL_005,RECORD-00108,P0245,Michael Eisner,Discusses,O0151,Kansas City Star,Eisner went to Kansas City to speak to the Star staff,0.9,2025-10-22
 RECORD-00108_REL_006,RECORD-00108,O0149,Disney,Mentions,O0313,Fort Worth Star-Telegram,"A year later, Dinsey sold the Star, the Fort Worth Star-Telegram and two smaller newspapers.",0.9,2025-10-22
@@ -1007,8 +1007,8 @@ RECORD-00109_REL_001,RECORD-00109,P0420,Charlie Reina,Affiliated With,O0014,Fox 
 RECORD-00109_REL_002,RECORD-00109,W0086,The Memo,Discusses,C0092,Bias,The memo is presented as a tool for instilling bias.,0.9,2025-10-22
 RECORD-00109_REL_003,RECORD-00109,O0014,Fox News,Discusses,W0086,The Memo,The Memo guiding producers and reporters at Fox News.,1.0,2025-10-22
 RECORD-00109_REL_004,RECORD-00109,O0014,Fox News,Criticizes,O0015,CNN,"Fox is trying to de-legitmate others: CNN, especially...",0.8,2025-10-22
-RECORD-00109_REL_005,RECORD-00109,O0014,Fox News,Criticizes,O0066,ABC,Fox is trying to de-legitmate others: ... but also ABC...,0.8,2025-10-22
-RECORD-00109_REL_006,RECORD-00109,O0014,Fox News,Criticizes,O0048,CBS,Fox is trying to de-legitmate others: ... CBS...,0.8,2025-10-22
+RECORD-00109_REL_005,RECORD-00109,O0014,Fox News,Criticizes,O0055,ABC News,Fox is trying to de-legitmate others: ... but also ABC...,0.8,2025-10-22
+RECORD-00109_REL_006,RECORD-00109,O0014,Fox News,Criticizes,O0419,CBS News,Fox is trying to de-legitmate others: ... CBS...,0.8,2025-10-22
 RECORD-00109_REL_007,RECORD-00109,O0014,Fox News,Criticizes,O0065,NBC,Fox is trying to de-legitmate others: ... NBC...,0.8,2025-10-22
 RECORD-00109_REL_008,RECORD-00109,O0014,Fox News,Criticizes,O0003,PBS,Fox is trying to de-legitmate others: ... PBS...,0.8,2025-10-22
 RECORD-00109_REL_009,RECORD-00109,O0014,Fox News,Criticizes,O0031,NPR,Fox is trying to de-legitmate others: ... NPR,0.8,2025-10-22
@@ -1175,7 +1175,7 @@ RECORD-00127_REL_002,RECORD-00127,P0470,Dan Weintraub,Affiliated With,O0329,Sacr
 RECORD-00127_REL_003,RECORD-00127,P0469,Michael Falcone,Discusses,P0470,Dan Weintraub,Falcone is writing about the big buzz generated when the Bee decided to edit previously unedited blogger Dan Weintraub.,0.9,2025-10-22
 RECORD-00127_REL_004,RECORD-00127,O0002,The New York Times,Published In,P0469,Michael Falcone,A passing sentence in a New York Times article,1.0,2025-10-22
 RECORD-00127_REL_005,RECORD-00127,P0469,Michael Falcone,Discusses,C0050,Objectivity,He mentions Cyberjournalist.net and its list of journalists who maintain weblogs: ...avoid taking sides.,0.7,2025-10-22
-RECORD-00127_REL_006,RECORD-00127,C0073,Press Think,Mentions,O0002,The New York Times,"doesn’t fit case, does fit press think. So it goes by.",0.9,2025-10-22
+RECORD-00127_REL_006,RECORD-00127,O0033,PressThink,Mentions,O0002,The New York Times,"doesn’t fit case, does fit press think. So it goes by.",0.9,2025-10-22
 RECORD-00127_REL_007,RECORD-00127,P0470,Dan Weintraub,Published In,W0092,California Insider,Daniel Weintraub's California Insider,1.0,2025-10-22
 RECORD-00128_REL_001,RECORD-00128,E0051,2000 Presidential Election,Occurred At,L0053,Florida,the fight in Florida about the numbers,0.8,2025-10-22
 RECORD-00128_REL_002,RECORD-00128,P0475,Matthew Miller,Discusses,C0001,Handsell Book,"Matthew Miller comes a little closer when he talks of a “game of inches,”’ where “both sides jockey and pander for the few extra votes that can turn elections.”",0.7,2025-10-22
@@ -1274,8 +1274,8 @@ RECORD-00138_REL_005,RECORD-00138,O0014,Fox News,Criticizes,O0015,CNN,"Fox, at a
 RECORD-00138_REL_006,RECORD-00138,P0385,Roger Ailes,Criticizes,C0203,Neutral professionalism,"Ailes tried literally to unseat the liberal media by a.) not hiring it, and b.) preying on every weakness he could find.",0.9,2025-10-22
 RECORD-00138_REL_007,RECORD-00138,P0385,Roger Ailes,Criticizes,C0202,Non-partisan reporting,"In redefining the genre, national news, and changing around what scholars call existing professional norms, Ailes made a crucial decision. And that was to publicly describe his creation—indeed, order ",0.9,2025-10-22
 RECORD-00138_REL_008,RECORD-00138,O0014,Fox News,Mentions,O0065,NBC,"CBS and ABC had defined as “sports television,” (and hiring John Madden did that) in the domain of news Fox decided not to match but to redefine what network news could be.",0.6,2025-10-22
-RECORD-00138_REL_009,RECORD-00138,O0014,Fox News,Mentions,O0048,CBS,"CBS and ABC had defined as “sports television,” (and hiring John Madden did that) in the domain of news Fox decided not to match but to redefine what network news could be.",0.6,2025-10-22
-RECORD-00138_REL_010,RECORD-00138,O0014,Fox News,Mentions,O0066,ABC,"CBS and ABC had defined as “sports television,” (and hiring John Madden did that) in the domain of news Fox decided not to match but to redefine what network news could be.",0.6,2025-10-22
+RECORD-00138_REL_009,RECORD-00138,O0014,Fox News,Mentions,O0419,CBS News,"CBS and ABC had defined as “sports television,” (and hiring John Madden did that) in the domain of news Fox decided not to match but to redefine what network news could be.",0.6,2025-10-22
+RECORD-00138_REL_010,RECORD-00138,O0014,Fox News,Mentions,O0055,ABC News,"CBS and ABC had defined as “sports television,” (and hiring John Madden did that) in the domain of news Fox decided not to match but to redefine what network news could be.",0.6,2025-10-22
 RECORD-00138_REL_011,RECORD-00138,O0014,Fox News,Mentions,O0071,MSNBC,"Ailes is an ironist, like all great media manipulators. The Fox News slogan, Fair and Balanced, has always been ironic because it is meant to say: “Ha! We’re the conservative alternative and yet more ",0.6,2025-10-22
 RECORD-00138_REL_012,RECORD-00138,O0014,Fox News,Mentions,O0031,NPR,"For the occasional guest from NPR, a chance to feel outnumbered.",0.7,2025-10-22
 RECORD-00138_REL_013,RECORD-00138,P0517,Bill O'Reilly,Mentions,P0518,Terry Gross,"About his brutal spat with Terry Gross, host of Fresh Air on NPR",0.8,2025-10-22
@@ -1287,7 +1287,7 @@ RECORD-00139_REL_004,RECORD-00139,P0520,Jon Fleischman,Criticizes,O0028,Los Ange
 RECORD-00139_REL_005,RECORD-00139,P0517,Bill O'Reilly,Criticizes,O0028,Los Angeles Times,Bill O'Reilly says 'There’s no question the Times used its vast resources to try and keep Gray Davis in office.',0.9,2025-10-22
 RECORD-00139_REL_006,RECORD-00139,P0501,John Carroll,Discusses,C0204,Investigative Reporting,Carroll defends the genre of investigative reporting.,0.8,2025-10-22
 RECORD-00139_REL_007,RECORD-00139,O0028,Los Angeles Times,Mentions,O0376,Premiere magazine,Schwarzenegger's reputation with women was the subject of reporting in Premiere magazine.,0.7,2025-10-22
-RECORD-00139_REL_008,RECORD-00139,P0501,John Carroll,Discusses,C0073,Press Think,Carroll shows the dangerous insularity of standard press think.,0.7,2025-10-22
+RECORD-00139_REL_008,RECORD-00139,P0501,John Carroll,Discusses,O0033,PressThink,Carroll shows the dangerous insularity of standard press think.,0.7,2025-10-22
 RECORD-00140_REL_001,RECORD-00140,P0180,Neil Postman,Affiliated With,O0049,NYU,NYU professor,0.9,2025-10-22
 RECORD-00140_REL_002,RECORD-00140,P0180,Neil Postman,Discusses,C0206,Media Ecology,Professor of Media Ecology,0.8,2025-10-22
 RECORD-00140_REL_003,RECORD-00140,P0180,Neil Postman,Criticizes,C0003,Age of Insight,resented being controlled by technology,0.7,2025-10-22
@@ -1356,8 +1356,8 @@ RECORD-00146_REL_008,RECORD-00146,P0548,Walter Shapiro,Affiliated With,O0067,USA
 RECORD-00146_REL_009,RECORD-00146,E0058,Bloggercon,Occurred At,L0064,Harvard University Law School,"Blogger.con, conference of webloggers, journalists, thinkers. Harvard University Law School, Oct. 4-5.",1.0,2025-10-22
 RECORD-00147_REL_001,RECORD-00147,P0549,Cole Campbell,Affiliated With,O0320,St. Louis Post-Dispatch,Former editor of the St. Louis Post-Dispatch,1.0,2025-10-22
 RECORD-00147_REL_002,RECORD-00147,P0549,Cole Campbell,Affiliated With,O0110,Norfolk Virginian-Pilot,Former editor of the Norfolk Virginian-Pilot,1.0,2025-10-22
-RECORD-00147_REL_003,RECORD-00147,P0549,Cole Campbell,Criticizes,C0073,Press Think,Cole Campbell often rejects standard press think,0.8,2025-10-22
-RECORD-00147_REL_004,RECORD-00147,P0549,Cole Campbell,Discusses,C0073,Press Think,So is press think different in different places?,0.7,2025-10-22
+RECORD-00147_REL_003,RECORD-00147,P0549,Cole Campbell,Criticizes,O0033,PressThink,Cole Campbell often rejects standard press think,0.8,2025-10-22
+RECORD-00147_REL_004,RECORD-00147,P0549,Cole Campbell,Discusses,O0033,PressThink,So is press think different in different places?,0.7,2025-10-22
 RECORD-00147_REL_005,RECORD-00147,P0413,Roy Peter Clark,Affiliated With,W0123,The Values and Craft of American Journalism,Campbell is is the co-editor with Roy Peter Clark of The Values and Craft of American Journalism,1.0,2025-10-22
 RECORD-00147_REL_006,RECORD-00147,P0549,Cole Campbell,Affiliated With,W0123,The Values and Craft of American Journalism,Campbell is is the co-editor with Roy Peter Clark of The Values and Craft of American Journalism,1.0,2025-10-22
 RECORD-00147_REL_007,RECORD-00147,W0123,The Values and Craft of American Journalism,Published In,O0387,University Press of Florida,"The Values and Craft of American Journalism (University Press of Florida, 2002)",1.0,2025-10-22
@@ -1378,7 +1378,7 @@ RECORD-00149_REL_005,RECORD-00149,P0517,Bill O'Reilly,Affiliated With,O0014,Fox 
 RECORD-00149_REL_006,RECORD-00149,C0153,Liberal bias,Mentions,O0031,NPR,"confirm the belief, held by some, in NPR’s liberal media bias.",0.7,2025-10-22
 RECORD-00149_REL_007,RECORD-00149,P0517,Bill O'Reilly,Discusses,C0153,Liberal bias,liberal bias is a way of life at many media organizations,0.8,2025-10-22
 RECORD-00149_REL_008,RECORD-00149,P0517,Bill O'Reilly,Mentions,W0125,The Paranoid Style in American Politics,"that is where O’Reilly comes from, by way of Network, by way of Fox",0.6,2025-10-22
-RECORD-00149_REL_009,RECORD-00149,P0517,Bill O'Reilly,Affiliated With,O0066,ABC,"In 1989, Bill O’Reilly quit ABC",0.9,2025-10-22
+RECORD-00149_REL_009,RECORD-00149,P0517,Bill O'Reilly,Affiliated With,O0055,ABC News,"In 1989, Bill O’Reilly quit ABC",0.9,2025-10-22
 RECORD-00149_REL_010,RECORD-00149,P0517,Bill O'Reilly,Affiliated With,W0126,Inside Edition,became host of Inside Edition,0.9,2025-10-22
 RECORD-00149_REL_011,RECORD-00149,P0466,Richard Hofstadter,Discusses,C0003,Age of Insight,"Historian Richard Hofstadter on the paranoid style in American politics, for that is where O’Reilly comes from",0.8,2025-10-22
 RECORD-00149_REL_012,RECORD-00149,O0002,The New York Times,Discusses,W0127,Who's Looking Out for You?,"Suppose—to move to another front—the New York Times reviewed his latest, chart-topping book, Who’s Looking Out for You?",0.7,2025-10-22
@@ -1920,16 +1920,16 @@ RECORD-00201_REL_001,RECORD-00201,P0848,Wolf Blitzer,Discusses,P0849,Dennis Kuci
 RECORD-00201_REL_002,RECORD-00201,O0015,CNN,Affiliated With,P0848,Wolf Blitzer,CNN's Wolf Blitzer,1.0,2025-10-22
 RECORD-00201_REL_003,RECORD-00201,P0848,Wolf Blitzer,Criticizes,P0849,Dennis Kucinich,Blitzer was showing he could be 'tough' with Kucinich about the uncomfortable but critical issue of unexplained loserhood.,0.8,2025-10-22
 RECORD-00201_REL_004,RECORD-00201,P0162,Ted Koppel,Criticizes,P0849,Dennis Kucinich,Koppel then voiced his apparent disdain for Kucinich,0.8,2025-10-22
-RECORD-00201_REL_005,RECORD-00201,O0066,ABC,Affiliated With,P0162,Ted Koppel,Ted Koppel of ABC,1.0,2025-10-22
-RECORD-00201_REL_006,RECORD-00201,P0194,Mark Halperin,Affiliated With,O0066,ABC,"Mark Halperin, ABC News political director",1.0,2025-10-22
-RECORD-00201_REL_007,RECORD-00201,O0066,ABC,Published In,W0188,The Note,"Read The Note, from ABC News",1.0,2025-10-22
+RECORD-00201_REL_005,RECORD-00201,O0055,ABC News,Affiliated With,P0162,Ted Koppel,Ted Koppel of ABC,1.0,2025-10-22
+RECORD-00201_REL_006,RECORD-00201,P0194,Mark Halperin,Affiliated With,O0055,ABC News,"Mark Halperin, ABC News political director",1.0,2025-10-22
+RECORD-00201_REL_007,RECORD-00201,O0055,ABC News,Published In,W0188,The Note,"Read The Note, from ABC News",1.0,2025-10-22
 RECORD-00202_REL_001,RECORD-00202,P0827,Weldon Berger,Discusses,C0278,Moral Values,Weldon Berger examines the brief life of 'moral values' as the election factor the press was said to have missed.,0.9,2025-10-22
 RECORD-00202_REL_002,RECORD-00202,P0827,Weldon Berger,Discusses,E0091,2004 Election,Weldon Berger discusses the importance of 'moral values' to the outcome of the 2004 election.,0.8,2025-10-22
 RECORD-00202_REL_003,RECORD-00202,O0050,The press,Criticizes,C0278,Moral Values,"The press have missed a lot of big stories in recent years, and were misled regarding the impact of moral values.",0.7,2025-10-22
 RECORD-00202_REL_004,RECORD-00202,P0671,Howard Fineman,Affiliated With,O0029,Newsweek,Howard Fineman from Newsweek.,0.9,2025-10-22
 RECORD-00202_REL_006,RECORD-00202,P0671,Howard Fineman,Discusses,L0104,Red America,"Journalists 'don't understand red-state America,' says Newsweek's Howard Fineman.",0.8,2025-10-22
 RECORD-00202_REL_007,RECORD-00202,P0005,Jay Rosen,Discusses,C0278,Moral Values,Jay Rosen's comments on Richard Morin's analysis of 'moral values' as a frame.,0.9,2025-10-22
-RECORD-00202_REL_008,RECORD-00202,P0700,John Roberts,Affiliated With,O0048,CBS,John Roberts from CBS.,0.9,2025-10-22
+RECORD-00202_REL_008,RECORD-00202,P0700,John Roberts,Affiliated With,O0419,CBS News,John Roberts from CBS.,0.9,2025-10-22
 RECORD-00203_REL_001,RECORD-00203,P0854,Judy Miller,Affiliated With,O0002,The New York Times,"Judy Miller, reporter for the New York Times",1.0,2025-10-22
 RECORD-00203_REL_002,RECORD-00203,P0855,Jonathan Landman,Affiliated With,O0002,The New York Times,"Jonathan Landman, deputy managing editor for the New York Times",1.0,2025-10-22
 RECORD-00203_REL_003,RECORD-00203,P0856,Adam Liptak,Affiliated With,O0002,The New York Times,"Adam Liptak, reporter for the New York Times",1.0,2025-10-22
@@ -2015,9 +2015,9 @@ RECORD-00210_REL_008,RECORD-00210,P0014,George W. Bush,Discusses,E0004,Iraq War,
 RECORD-00210_REL_009,RECORD-00210,P0918,Dick Polman,Discusses,C0292,Rollback,Dick Polman adds his testimony to Rollback.,0.8,2025-10-22
 RECORD-00211_REL_001,RECORD-00211,O0557,Sinclair Broadcast Group,Discusses,E0061,2004 Presidential Election,Sinclair wants something to do with who wins in November.,0.8,2025-10-22
 RECORD-00211_REL_002,RECORD-00211,O0557,Sinclair Broadcast Group,Published In,O0403,Fox,With its heavy concentration of Fox affiliates...,0.7,2025-10-22
-RECORD-00211_REL_003,RECORD-00211,O0557,Sinclair Broadcast Group,Published In,O0066,ABC,Sinclair distributes ... eight ABC stations...,0.7,2025-10-22
+RECORD-00211_REL_003,RECORD-00211,O0557,Sinclair Broadcast Group,Published In,O0055,ABC News,Sinclair distributes ... eight ABC stations...,0.7,2025-10-22
 RECORD-00211_REL_004,RECORD-00211,O0557,Sinclair Broadcast Group,Published In,O0065,NBC,Sinclair distributes ... four NBC...,0.7,2025-10-22
-RECORD-00211_REL_005,RECORD-00211,O0557,Sinclair Broadcast Group,Published In,O0048,CBS,Sinclair distributes ... three CBS,0.7,2025-10-22
+RECORD-00211_REL_005,RECORD-00211,O0557,Sinclair Broadcast Group,Published In,O0419,CBS News,Sinclair distributes ... three CBS,0.7,2025-10-22
 RECORD-00211_REL_006,RECORD-00211,O0557,Sinclair Broadcast Group,Mentions,W0205,Stolen Honor: Wounds That Never Heal,Sinclair Broadcast’s inexact plan to air Stolen Honor in the weeks before the election is an unprecedented move,0.9,2025-10-22
 RECORD-00211_REL_007,RECORD-00211,P0919,David Smith,Affiliated With,O0557,Sinclair Broadcast Group,CEO David Smith,1.0,2025-10-22
 RECORD-00211_REL_008,RECORD-00211,P0920,Mark Hyman,Affiliated With,O0557,Sinclair Broadcast Group,Mark Hyman...Vice President for Corporate Relations,1.0,2025-10-22
@@ -2237,7 +2237,7 @@ RECORD-00233_REL_004,RECORD-00233,P0438,John Ashcroft,Affiliated With,O0335,Just
 RECORD-00233_REL_005,RECORD-00233,P0068,Howard Kurtz,Affiliated With,O0023,The Washington Post,That’s via Howard Kurtz of the Washington Post.,1.0,2025-10-22
 RECORD-00233_REL_006,RECORD-00233,O0335,Justice Department,Criticizes,O0023,The Washington Post,Comstock indicated unhappiness with some print reporters who have raised civil liberties concerns about the expanded police powers provided by the 2001 law,0.8,2025-10-22
 RECORD-00233_REL_007,RECORD-00233,P0438,John Ashcroft,Criticizes,O0023,The Washington Post,But he is not talking to print. Only talking to television.,0.9,2025-10-22
-RECORD-00233_REL_008,RECORD-00233,P0438,John Ashcroft,Mentions,C0073,Press Think,"Therefore she—which means Ashcroft, the boss—must be engaged in some press think.",0.7,2025-10-22
+RECORD-00233_REL_008,RECORD-00233,P0438,John Ashcroft,Mentions,O0033,PressThink,"Therefore she—which means Ashcroft, the boss—must be engaged in some press think.",0.7,2025-10-22
 RECORD-00234_REL_001,RECORD-00234,P0005,Jay Rosen,Mentions,O0035,Romenesko,Jay Rosen's letter to Romenesko.,0.9,2025-10-22
 RECORD-00234_REL_002,RECORD-00234,P0005,Jay Rosen,Discusses,C0235,Journalism ethics,Jay Rosen discusses journalism ethics regarding journalist's political expression.,0.8,2025-10-22
 RECORD-00234_REL_003,RECORD-00234,P1011,Linda Picone,Mentions,C0312,Journalistic Credibility,Linda Picone questions journalistic credibility resting on secrecy.,0.9,2025-10-22
@@ -2263,9 +2263,9 @@ RECORD-00235_REL_012,RECORD-00235,P0452,Jack Shafer,Criticizes,C0175,Solutions J
 RECORD-00235_REL_013,RECORD-00235,P0452,Jack Shafer,Discusses,P0453,Matt Miller,Shafer’s immediate purpose in ridiculing the public journalism “crusade” is to associate it with another “horrible idea”—columnist Matt Miller’s “two-percent solution” for America’s domestic problems,0.6,2025-10-22
 RECORD-00235_REL_014,RECORD-00235,P0452,Jack Shafer,Discusses,W0094,two-percent solution,Shafer’s immediate purpose in ridiculing the public journalism “crusade” is to associate it with another “horrible idea”—columnist Matt Miller’s “two-percent solution” for America’s domestic problems,0.6,2025-10-22
 RECORD-00236_REL_001,RECORD-00236,O0014,Fox News,Originated By,C0209,Fair and Balanced,"Fox's ever-insidious, “Fair and Balanced”",1.0,2025-10-22
-RECORD-00236_REL_002,RECORD-00236,O0014,Fox News,Criticizes,O0066,ABC,"more fair, more balanced than ABC, NBC, CBS and CNN, where they claim to have no ideology at all.",0.9,2025-10-22
+RECORD-00236_REL_002,RECORD-00236,O0014,Fox News,Criticizes,O0055,ABC News,"more fair, more balanced than ABC, NBC, CBS and CNN, where they claim to have no ideology at all.",0.9,2025-10-22
 RECORD-00236_REL_003,RECORD-00236,O0014,Fox News,Criticizes,O0065,NBC,"more fair, more balanced than ABC, NBC, CBS and CNN, where they claim to have no ideology at all.",0.9,2025-10-22
-RECORD-00236_REL_004,RECORD-00236,O0014,Fox News,Criticizes,O0048,CBS,"more fair, more balanced than ABC, NBC, CBS and CNN, where they claim to have no ideology at all.",0.9,2025-10-22
+RECORD-00236_REL_004,RECORD-00236,O0014,Fox News,Criticizes,O0419,CBS News,"more fair, more balanced than ABC, NBC, CBS and CNN, where they claim to have no ideology at all.",0.9,2025-10-22
 RECORD-00236_REL_005,RECORD-00236,O0014,Fox News,Criticizes,O0015,CNN,"more fair, more balanced than ABC, NBC, CBS and CNN, where they claim to have no ideology at all.",0.9,2025-10-22
 RECORD-00236_REL_006,RECORD-00236,O0014,Fox News,Criticizes,P0399,Al Franken,Fox decided to sue comedian Al Franken over rights to the words “fair” and “balanced”,0.8,2025-10-22
 RECORD-00236_REL_007,RECORD-00236,O0002,The New York Times,Published In,W0078,All the News that’s Fit to Print,"“All the News that’s Fit to Print,” from the New York Times.",1.0,2025-10-22
@@ -2325,7 +2325,7 @@ RECORD-00242_REL_007,RECORD-00242,O0557,Sinclair Broadcast Group,Mentions,O0558,
 RECORD-00242_REL_008,RECORD-00242,O0557,Sinclair Broadcast Group,Affiliated With,P0920,Mark Hyman,"Vice President for Corporate Relations Mark Hyman, who has a daily commentary slot on all Sinclair stations",0.9,2025-10-22
 RECORD-00242_REL_009,RECORD-00242,P1041,Jon Leiberman,Mentions,P1042,Paula Zahn,Sinclair fired Leiberman and had him escorted from the building and explaining to Paula Zahn on CNN what happened.,0.8,2025-10-22
 RECORD-00242_REL_010,RECORD-00242,P1041,Jon Leiberman,Mentions,O0015,CNN,Sinclair fired Leiberman and had him escorted from the building and explaining to Paula Zahn on CNN what happened.,0.8,2025-10-22
-RECORD-00242_REL_011,RECORD-00242,O0640,WGME,Affiliated With,O0048,CBS,"Adam Lee, owner of 10 auto dealerships in Portland Me (and active in Democratic politics.) He took all his advertising off the CBS affiliate, WGME.",0.9,2025-10-22
+RECORD-00242_REL_011,RECORD-00242,O0640,WGME,Affiliated With,O0419,CBS News,"Adam Lee, owner of 10 auto dealerships in Portland Me (and active in Democratic politics.) He took all his advertising off the CBS affiliate, WGME.",0.9,2025-10-22
 RECORD-00243_REL_001,RECORD-00243,P0438,John Ashcroft,Criticizes,O0338,United States Department of Justice,refused to speak to print reporters...prefers audiences of handpicked enthusiasts,0.9,2025-10-22
 RECORD-00243_REL_003,RECORD-00243,P0438,John Ashcroft,Discusses,E0106,War in Iraq,on the verge of war in Iraq,0.7,2025-10-22
 RECORD-00243_REL_004,RECORD-00243,P0438,John Ashcroft,Criticizes,O0055,ABC News,dominate credulous local television,0.8,2025-10-22
@@ -2368,8 +2368,8 @@ RECORD-00247_REL_004,RECORD-00247,P0014,George W. Bush,Mentions,O0015,CNN,CNN ha
 RECORD-00247_REL_005,RECORD-00247,P0014,George W. Bush,Mentions,O0065,NBC,"CNN has the biggest presence in the sky overhead, followed by NBC and MSNBC",0.7,2025-10-22
 RECORD-00247_REL_006,RECORD-00247,P0014,George W. Bush,Mentions,O0071,MSNBC,"CNN has the biggest presence in the sky overhead, followed by NBC and MSNBC",0.7,2025-10-22
 RECORD-00247_REL_007,RECORD-00247,P0014,George W. Bush,Mentions,O0403,Fox,"followed by NBC and MSNBC, and Fox’s two spaces",0.7,2025-10-22
-RECORD-00247_REL_008,RECORD-00247,P0014,George W. Bush,Mentions,O0066,ABC,ABC and CBS are distinctly smaller operations,0.7,2025-10-22
-RECORD-00247_REL_009,RECORD-00247,P0014,George W. Bush,Mentions,O0048,CBS,ABC and CBS are distinctly smaller operations,0.7,2025-10-22
+RECORD-00247_REL_008,RECORD-00247,P0014,George W. Bush,Mentions,O0055,ABC News,ABC and CBS are distinctly smaller operations,0.7,2025-10-22
+RECORD-00247_REL_009,RECORD-00247,P0014,George W. Bush,Mentions,O0419,CBS News,ABC and CBS are distinctly smaller operations,0.7,2025-10-22
 RECORD-00247_REL_010,RECORD-00247,P0014,George W. Bush,Mentions,O0646,Al Jazeera,Al Jazeera has a skybox.,0.7,2025-10-22
 RECORD-00247_REL_011,RECORD-00247,L0114,Madison Square Garden,Occurred At,E0108,2004 Republican Convention,"They started the convention a day early, and now the GOP has four days to do its own thing.",0.8,2025-10-22
 RECORD-00247_REL_012,RECORD-00247,P1052,Rod O’Connor,Affiliated With,O0645,Fleet Center,"When I took PressThink to Boston and interviewed the CEO of the convention, Rod O’Connor",1.0,2025-10-22
@@ -2976,7 +2976,7 @@ RECORD-00303_REL_006,RECORD-00303,P1258,Michael Schrage,Affiliated With,O0259,MI
 RECORD-00303_REL_007,RECORD-00303,P1258,Michael Schrage,Affiliated With,O0023,The Washington Post,Michael Schrage of MIT’s Media Lab,0.8,2025-10-22
 RECORD-00303_REL_008,RECORD-00303,P1258,Michael Schrage,Criticizes,O0002,The New York Times,What I see and read today are so-called ‘professional’ journalists operating from a defensive crouch and the breathtaking (to me) arrogance that competition from ‘amateurs’ and responses by reader/vie,0.9,2025-10-22
 RECORD-00303_REL_009,RECORD-00303,P1258,Michael Schrage,Criticizes,O0057,The Wall Street Journal,What I see and read today are so-called ‘professional’ journalists operating from a defensive crouch and the breathtaking (to me) arrogance that competition from ‘amateurs’ and responses by reader/vie,0.9,2025-10-22
-RECORD-00303_REL_010,RECORD-00303,P1258,Michael Schrage,Criticizes,O0048,CBS,What I see and read today are so-called ‘professional’ journalists operating from a defensive crouch and the breathtaking (to me) arrogance that competition from ‘amateurs’ and responses by reader/vie,0.9,2025-10-22
+RECORD-00303_REL_010,RECORD-00303,P1258,Michael Schrage,Criticizes,O0419,CBS News,What I see and read today are so-called ‘professional’ journalists operating from a defensive crouch and the breathtaking (to me) arrogance that competition from ‘amateurs’ and responses by reader/vie,0.9,2025-10-22
 RECORD-00303_REL_011,RECORD-00303,P1258,Michael Schrage,Criticizes,O0015,CNN,What I see and read today are so-called ‘professional’ journalists operating from a defensive crouch and the breathtaking (to me) arrogance that competition from ‘amateurs’ and responses by reader/vie,0.9,2025-10-22
 RECORD-00303_REL_012,RECORD-00303,P1258,Michael Schrage,Criticizes,O0709,Time,What I see and read today are so-called ‘professional’ journalists operating from a defensive crouch and the breathtaking (to me) arrogance that competition from ‘amateurs’ and responses by reader/vie,0.9,2025-10-22
 RECORD-00303_REL_013,RECORD-00303,P1258,Michael Schrage,Criticizes,O0194,LA Times,What I see and read today are so-called ‘professional’ journalists operating from a defensive crouch and the breathtaking (to me) arrogance that competition from ‘amateurs’ and responses by reader/vie,0.9,2025-10-22
@@ -3058,7 +3058,7 @@ RECORD-00310_REL_006,RECORD-00310,O0149,Disney,Mentions,O0153,"Knight Ridder, In
 RECORD-00310_REL_007,RECORD-00310,P0245,Michael Eisner,Discusses,C0160,Freedom of speech,Ghost of democracy in the media machine. That's the press today. My sense is that Michael Eisner knew that.,0.6,2025-10-22
 RECORD-00310_REL_008,RECORD-00310,P0246,Walt Disney,Affiliated With,O0151,Kansas City Star,Walt Disney himself once delivered papers for the Kanas City Star,0.8,2025-10-22
 RECORD-00310_REL_009,RECORD-00310,P0246,Walt Disney,Affiliated With,O0149,Disney,Walt Disney himself once delivered papers for the Kanas City Star,0.9,2025-10-22
-RECORD-00310_REL_010,RECORD-00310,C0053,Pressthink,Discusses,C0078,Absolute Commercialization,"Another source of strain, of course, is the gradual state of tending toward Absolute Commercialization",0.7,2025-10-22
+RECORD-00310_REL_010,RECORD-00310,O0033,PressThink,Discusses,C0078,Absolute Commercialization,"Another source of strain, of course, is the gradual state of tending toward Absolute Commercialization",0.7,2025-10-22
 RECORD-00310_REL_011,RECORD-00310,O0154,TomPaine.com,Mentions,P0419,Thomas Paine,"Among many sites I admire, I admire TomPaine.com on this particular point. It leaves the arrow pointing backward to Paine the troublemaking democrat and political journalist",0.8,2025-10-22
 RECORD-00310_REL_012,RECORD-00310,C0079,Freedom of the Press,Mentions,C0160,Freedom of speech,"Today, it echoes with “freedom of the press,” which is connected to free speech, which is basic to free citizens.",0.9,2025-10-22
 RECORD-00311_REL_001,RECORD-00311,O0002,The New York Times,Discusses,P0411,Jayson Blair,Times internal investigation after Jayson Blair,0.9,2025-10-22
@@ -3250,10 +3250,10 @@ RECORD-00327_REL_004,RECORD-00327,P1327,David Westin,Affiliated With,O0055,ABC N
 RECORD-00327_REL_005,RECORD-00327,O0055,ABC News,Discusses,E0001,Republican National Convention,"ABC News, wrote about it",0.8,2025-10-22
 RECORD-00327_REL_006,RECORD-00327,O0015,CNN,Discusses,E0100,Democratic National Convention,CNN negotiated with the Democratic Party for a special broadcast platform,0.9,2025-10-22
 RECORD-00328_REL_001,RECORD-00328,P1328,Tom Bettag,Discusses,C0417,Public Trust,Bettag discusses how public trust is the real commodity network news deals in.,0.9,2025-10-22
-RECORD-00328_REL_002,RECORD-00328,P1328,Tom Bettag,Criticizes,O0048,CBS,Bettag implies CBS and other networks failed to prioritize news over profit during the 1980s.,0.8,2025-10-22
+RECORD-00328_REL_002,RECORD-00328,P1328,Tom Bettag,Criticizes,O0419,CBS News,Bettag implies CBS and other networks failed to prioritize news over profit during the 1980s.,0.8,2025-10-22
 RECORD-00328_REL_003,RECORD-00328,P1328,Tom Bettag,Discusses,E0111,September 11th Attacks,Bettag discusses the network response to 9/11 and how they regained public trust.,0.9,2025-10-22
 RECORD-00328_REL_004,RECORD-00328,P0363,Edward R. Murrow,Originated By,C0420,Gospel of Murrow,The gospel of Murrow.,1.0,2025-10-22
-RECORD-00328_REL_005,RECORD-00328,P1329,Fred Friendly,Affiliated With,O0048,CBS,"Fred Friendly, former president of CBS News.",1.0,2025-10-22
+RECORD-00328_REL_005,RECORD-00328,P1329,Fred Friendly,Affiliated With,O0419,CBS News,"Fred Friendly, former president of CBS News.",1.0,2025-10-22
 RECORD-00328_REL_006,RECORD-00328,P1328,Tom Bettag,Mentions,P0363,Edward R. Murrow,The once-mighty tribe of Edward R. Murrow was gathered.,1.0,2025-10-22
 RECORD-00328_REL_007,RECORD-00328,P1328,Tom Bettag,Discusses,E0133,Summer of Condit,Bettag recalled the Summer of Condit as self-defeat.,0.9,2025-10-22
 RECORD-00328_REL_008,RECORD-00328,W0255,Nightline,Affiliated With,P1328,Tom Bettag,Tom Bettag (Nightline's producer),0.9,2025-10-22
@@ -3519,8 +3519,8 @@ RECORD-00348_REL_022,RECORD-00348,P1172,Ellen Miller,Affiliated With,O0589,Sunli
 RECORD-00348_REL_023,RECORD-00348,P1411,John Bracken,Affiliated With,O0836,MacArthur Foundation,John Bracken of MacArthur Foundation,1.0,2025-10-22
 RECORD-00348_REL_024,RECORD-00348,O0829,Examiner Newspapers,Discusses,E0138,Exposing Earmarks Project,The Examiner invites readers to help uncover which members of Congress sponsored earmarks.,0.8,2025-10-22
 RECORD-00349_REL_001,RECORD-00349,P0005,Jay Rosen,Affiliated With,O0033,PressThink,The person who thought it up and does it.,1.0,2025-10-22
-RECORD-00349_REL_002,RECORD-00349,P0005,Jay Rosen,Discusses,C0073,Press Think,"Press think is what I do myself, as a critic and writer. I’m engaged in it when I operate this blog.",1.0,2025-10-22
-RECORD-00349_REL_003,RECORD-00349,O0033,PressThink,Discusses,C0073,Press Think,The blog is 'about' press think; it’s also a contraption for making more press think.,1.0,2025-10-22
+RECORD-00349_REL_002,RECORD-00349,P0005,Jay Rosen,Discusses,O0033,PressThink,"Press think is what I do myself, as a critic and writer. I’m engaged in it when I operate this blog.",1.0,2025-10-22
+RECORD-00349_REL_003,RECORD-00349,O0033,PressThink,Discusses,O0033,PressThink,The blog is 'about' press think; it’s also a contraption for making more press think.,1.0,2025-10-22
 RECORD-00349_REL_004,RECORD-00349,P0005,Jay Rosen,Cites,P0631,Rebecca Blood,observe what author Rebecca Blood said about the ethic of transparency,1.0,2025-10-22
 RECORD-00349_REL_005,RECORD-00349,P0005,Jay Rosen,Discusses,C0047,Public Journalism,"From 1989 to 2000 or so, I was devoting much of my energies to the public journalism movement",1.0,2025-10-22
 RECORD-00349_REL_006,RECORD-00349,P0005,Jay Rosen,Mentions,O0194,LA Times,A blogger ransacks. If the managing editor of the LA Times gives a “don’t kill the messenger” speech about his newspaper’s bitterly-contested coverage of the California recall election in 2003,0.8,2025-10-22
@@ -3542,8 +3542,8 @@ RECORD-00350_REL_009,RECORD-00350,O0839,GateHouse Media,Affiliated With,O0841,Wi
 RECORD-00350_REL_010,RECORD-00350,O0838,Watertown TAB,Occurred At,L0146,"Watertown, Massachusetts","Watertown TAB of Watertown, Massachusetts",1.0,2025-10-22
 RECORD-00350_REL_011,RECORD-00350,P0656,Lisa Williams,Affiliated With,L0146,"Watertown, Massachusetts","Lisa Williams runs H2otown.info, a news and community site for Watertown, Massachusetts.",1.0,2025-10-22
 RECORD-00350_REL_012,RECORD-00350,P1414,Charlene Li,Affiliated With,O0840,TownOnline,"Charlene Li, VP and Principal Analyst at Forrester Research, responds to the CC licensing of TownOnline sites. She’s got a special perspective, since she was one of the principal architects of the Tow",0.7,2025-10-22
-RECORD-00351_REL_001,RECORD-00351,O0048,CBS,Mentions,W0409,CSI: NY,CBS wrapped in tape to advertise CSI: NY,0.9,2025-10-22
-RECORD-00351_REL_002,RECORD-00351,O0048,CBS,Occurred At,L0001,New York City,CBS Building is located in New York City,0.8,2025-10-22
+RECORD-00351_REL_001,RECORD-00351,O0419,CBS News,Mentions,W0409,CSI: NY,CBS wrapped in tape to advertise CSI: NY,0.9,2025-10-22
+RECORD-00351_REL_002,RECORD-00351,O0419,CBS News,Occurred At,L0001,New York City,CBS Building is located in New York City,0.8,2025-10-22
 RECORD-00351_REL_003,RECORD-00351,P0226,David Weinberger,Discusses,C0273,Blogging,David Weinberger mentioned as one of the bloggers at the roundtable discussion,0.9,2025-10-22
 RECORD-00351_REL_004,RECORD-00351,P0226,David Weinberger,Discusses,C0015,Journalism,David Weinberger mentioned as one of the bloggers at the roundtable discussion,0.9,2025-10-22
 RECORD-00351_REL_005,RECORD-00351,P0010,Jeff Jarvis,Discusses,C0273,Blogging,Jeff Jarvis writes about blogging,0.8,2025-10-22
@@ -3566,9 +3566,9 @@ RECORD-00352_REL_004,RECORD-00352,O0857,U.S. media,Criticizes,P0014,George W. Bu
 RECORD-00352_REL_005,RECORD-00352,P0800,Alessandra Stanley,Discusses,O0857,U.S. media,Reporters Turn From Deference to Outrage.,0.7,2025-10-22
 RECORD-00352_REL_006,RECORD-00352,P0068,Howard Kurtz,Discusses,O0857,U.S. media,Journalism seems to have recovered its reason for being,0.7,2025-10-22
 RECORD-00352_REL_007,RECORD-00352,P1148,Anderson Cooper,Affiliated With,O0015,CNN,CNN's Anderson Cooper,1.0,2025-10-22
-RECORD-00352_REL_008,RECORD-00352,P1427,Robin Roberts,Affiliated With,O0066,ABC,ABC’s Robin Roberts,1.0,2025-10-22
+RECORD-00352_REL_008,RECORD-00352,P1427,Robin Roberts,Affiliated With,O0055,ABC News,ABC’s Robin Roberts,1.0,2025-10-22
 RECORD-00352_REL_009,RECORD-00352,P1428,Jeanne Meserve,Affiliated With,O0015,CNN,CNN’s Jeanne Meserve,1.0,2025-10-22
-RECORD-00352_REL_010,RECORD-00352,P1429,Bob Schieffer,Affiliated With,O0048,CBS,CBS’s Bob Schieffer,1.0,2025-10-22
+RECORD-00352_REL_010,RECORD-00352,P1429,Bob Schieffer,Affiliated With,O0419,CBS News,CBS’s Bob Schieffer,1.0,2025-10-22
 RECORD-00352_REL_011,RECORD-00352,P0800,Alessandra Stanley,Affiliated With,O0002,The New York Times,"In the New York Times, a review of TV coverage by Alessandra Stanley",1.0,2025-10-22
 RECORD-00352_REL_012,RECORD-00352,P0762,David Carr,Affiliated With,O0002,The New York Times,"David Carr, media columnist for the business section of the Times",1.0,2025-10-22
 RECORD-00352_REL_013,RECORD-00352,P1430,Peter Johnson,Affiliated With,O0067,USA Today,Peter Johnson in USA Today,1.0,2025-10-22
@@ -3650,7 +3650,7 @@ RECORD-00357_REL_003,RECORD-00357,P0186,Richard Nixon,Discusses,E0142,Chicago 19
 RECORD-00357_REL_004,RECORD-00357,E0144,Primary System,Discusses,O0419,CBS News,The primary system depended on the broadcasting system,0.8,2025-10-22
 RECORD-00357_REL_005,RECORD-00357,P0117,Bill Clinton,Discusses,E0145,1988 Democratic Convention,Bill Clinton bombed during his debut on the national stage,0.7,2025-10-22
 RECORD-00357_REL_006,RECORD-00357,P1458,Paul Starr,Discusses,E0146,1992 Republican Convention in Houston,Paul Starr of American Prospect called the Houston convention a PR disaster,0.8,2025-10-22
-RECORD-00357_REL_007,RECORD-00357,O0066,ABC,Discusses,E0141,Political Conventions,ABC cut away from conventions,0.7,2025-10-22
+RECORD-00357_REL_007,RECORD-00357,O0055,ABC News,Discusses,E0141,Political Conventions,ABC cut away from conventions,0.7,2025-10-22
 RECORD-00357_REL_008,RECORD-00357,O0015,CNN,Discusses,E0141,Political Conventions,Howard Kurtz summarizes situation on CNN,0.8,2025-10-22
 RECORD-00357_REL_009,RECORD-00357,P0162,Ted Koppel,Discusses,E0147,1996 Republican Convention,Ted Koppel walked out of the 1996 Republican Convention,0.8,2025-10-22
 RECORD-00357_REL_010,RECORD-00357,O0023,The Washington Post,Published In,E0141,Political Conventions,Article in the Washington Post disclosed Parties to Allow Bloggers to Cover Conventions for First Time.,0.8,2025-10-22
@@ -4018,17 +4018,17 @@ RECORD-00390_REL_007,RECORD-00390,P1603,Jim Newton,Affiliated With,O0028,Los Ang
 RECORD-00390_REL_008,RECORD-00390,P1606,Chris Vallance,Affiliated With,O0939,BBC Radio,Host Chris Vallance did an interview,1.0,2025-10-22
 RECORD-00390_REL_009,RECORD-00390,P1607,Oliver Kamm,Affiliated With,O0158,The Guardian,Oliver Kamm in The Guardian,1.0,2025-10-22
 RECORD-00390_REL_010,RECORD-00390,P0426,Chris Allbritton,Affiliated With,O0070,Time magazine,Chris Allbritton says: “I am not a blogger... I was in Iraq for TIME Magazine.,1.0,2025-10-22
-RECORD-00391_REL_001,RECORD-00391,P0555,Dan Rather,Affiliated With,O0048,CBS,Dan Rather was the anchor for CBS News.,1.0,2025-10-22
-RECORD-00391_REL_002,RECORD-00391,P0555,Dan Rather,Criticizes,O0048,CBS,Rather's suit against CBS suggests criticism of the organization's actions regarding the Killian memos.,0.9,2025-10-22
+RECORD-00391_REL_001,RECORD-00391,P0555,Dan Rather,Affiliated With,O0419,CBS News,Dan Rather was the anchor for CBS News.,1.0,2025-10-22
+RECORD-00391_REL_002,RECORD-00391,P0555,Dan Rather,Criticizes,O0419,CBS News,Rather's suit against CBS suggests criticism of the organization's actions regarding the Killian memos.,0.9,2025-10-22
 RECORD-00391_REL_003,RECORD-00391,P0555,Dan Rather,Discusses,E0160,Rathergate,"Rather is re-reporting the Killian Memos, which is at the center of Rathergate.",0.9,2025-10-22
 RECORD-00391_REL_004,RECORD-00391,P0555,Dan Rather,Discusses,P0014,George W. Bush,"It’s not about about one man’s legacy, or the money, he said last night. It’s about reporters who won’t cave in to big government and big corporations. Despite all the obstacles they find—“Larry, some",0.9,2025-10-22
-RECORD-00391_REL_005,RECORD-00391,P0699,Mary Mapes,Affiliated With,O0048,CBS,"Mary Mapes, Rather’s collaborator back then, writes as if none of this had ever happened.",1.0,2025-10-22
-RECORD-00391_REL_006,RECORD-00391,P1616,Katie Couric,Affiliated With,O0048,CBS,"CBS had an opportunity to underscore this after the fall of Rather, but chose to go the other way, elevating yet another celebrity – Katie Couric – to the outmoded anchor chair",1.0,2025-10-22
-RECORD-00392_REL_001,RECORD-00392,P0549,Cole Campbell,Criticizes,C0073,Press Think,who often rejects standard press think.,0.8,2025-10-22
+RECORD-00391_REL_005,RECORD-00391,P0699,Mary Mapes,Affiliated With,O0419,CBS News,"Mary Mapes, Rather’s collaborator back then, writes as if none of this had ever happened.",1.0,2025-10-22
+RECORD-00391_REL_006,RECORD-00391,P1616,Katie Couric,Affiliated With,O0419,CBS News,"CBS had an opportunity to underscore this after the fall of Rather, but chose to go the other way, elevating yet another celebrity – Katie Couric – to the outmoded anchor chair",1.0,2025-10-22
+RECORD-00392_REL_001,RECORD-00392,P0549,Cole Campbell,Criticizes,O0033,PressThink,who often rejects standard press think.,0.8,2025-10-22
 RECORD-00392_REL_002,RECORD-00392,P0549,Cole Campbell,Affiliated With,O0320,St. Louis Post-Dispatch,the former editor of the St. Louis Post Dispatch,1.0,2025-10-22
 RECORD-00392_REL_003,RECORD-00392,P0549,Cole Campbell,Affiliated With,O0110,Norfolk Virginian-Pilot,the top editor at the Norfolk Virginian-Pilot,1.0,2025-10-22
-RECORD-00392_REL_004,RECORD-00392,P0549,Cole Campbell,Discusses,C0073,Press Think,So is press think different in different places?,0.8,2025-10-22
-RECORD-00392_REL_005,RECORD-00392,P0549,Cole Campbell,Originated By,C0073,Press Think,falling back on these norms can lead to press think en masse,0.6,2025-10-22
+RECORD-00392_REL_004,RECORD-00392,P0549,Cole Campbell,Discusses,O0033,PressThink,So is press think different in different places?,0.8,2025-10-22
+RECORD-00392_REL_005,RECORD-00392,P0549,Cole Campbell,Originated By,O0033,PressThink,falling back on these norms can lead to press think en masse,0.6,2025-10-22
 RECORD-00392_REL_006,RECORD-00392,P0550,Esther Thorson,Affiliated With,O0391,University of Missouri,"A team from the University of Missouri journalism school, led by Esther Thorson",1.0,2025-10-22
 RECORD-00392_REL_007,RECORD-00392,O0391,University of Missouri,Discusses,O0320,St. Louis Post-Dispatch,audit of the St. Louis Post-Dispatch,0.9,2025-10-22
 RECORD-00392_REL_008,RECORD-00392,P0551,John Danforth,Affiliated With,L0060,St. Louis,"key political, professional and civic figure in St. Louis",0.9,2025-10-22
@@ -4130,8 +4130,8 @@ RECORD-00401_REL_013,RECORD-00401,P0674,Austin Bay,Mentions,P0059,Glenn Reynolds
 RECORD-00402_REL_001,RECORD-00402,C0494,"He said, she said, we said",Originated By,P1643,Susan Stranahan,"Campaign Desk’s Susan Stranahan wrote in May. “Given the amount of spin this election year, the old rules don’t apply any more,” she said. “Campaign Desk herewith proposes a new ground rule: ‘He said/",1.0,2025-10-22
 RECORD-00402_REL_002,RECORD-00402,P1641,Douglas Fisher,Affiliated With,O0968,Common Sense Journalism,writes Douglas Fisher at Common Sense Journalism,1.0,2025-10-22
 RECORD-00402_REL_003,RECORD-00402,P0059,Glenn Reynolds,Affiliated With,O0384,Instapundit,"That’s what Glenn Reynolds, the Instapundit, said",1.0,2025-10-22
-RECORD-00402_REL_004,RECORD-00402,C0289,Legacy media,Mentions,O0048,CBS,The “old” media (CBS is a good example) hang on to their legacy.,0.8,2025-10-22
-RECORD-00402_REL_005,RECORD-00402,C0289,Legacy media,Discusses,O0048,CBS,"Many people at CBS News—including, unfortunately, the President of the division—did not know that a story based on questionable documents could be taken apart in hours on the Web",0.8,2025-10-22
+RECORD-00402_REL_004,RECORD-00402,C0289,Legacy media,Mentions,O0419,CBS News,The “old” media (CBS is a good example) hang on to their legacy.,0.8,2025-10-22
+RECORD-00402_REL_005,RECORD-00402,C0289,Legacy media,Discusses,O0419,CBS News,"Many people at CBS News—including, unfortunately, the President of the division—did not know that a story based on questionable documents could be taken apart in hours on the Web",0.8,2025-10-22
 RECORD-00402_REL_006,RECORD-00402,P1645,Steven R. Weisman,Affiliated With,O0002,The New York Times,"Steven R. Weisman, chief diplomatic correspondent for The New York Times and former editorial writer",1.0,2025-10-22
 RECORD-00402_REL_007,RECORD-00402,P0514,Daniel Okrent,Affiliated With,O0002,The New York Times,"Daniel Okrent, public editor of the New York Times",1.0,2025-10-22
 RECORD-00402_REL_008,RECORD-00402,P1646,Brent Cunningham,Affiliated With,O0348,CJR,he told Brent Cunningham of CJR,1.0,2025-10-22
@@ -4186,7 +4186,7 @@ RECORD-00407_REL_001,RECORD-00407,P0005,Jay Rosen,Affiliated With,O0497,Knight-R
 RECORD-00407_REL_002,RECORD-00407,P0005,Jay Rosen,Discusses,E0001,Republican National Convention,"During the Republican National Convention, I will be a contributing writer...",1.0,2025-10-22
 RECORD-00407_REL_003,RECORD-00407,P0005,Jay Rosen,Mentions,O0065,NBC,I see the network sky boxes with their blazing logos—NBC...,1.0,2025-10-22
 RECORD-00407_REL_004,RECORD-00407,P0005,Jay Rosen,Mentions,O0055,ABC News,I see the network sky boxes with their blazing logos—...ABC...,1.0,2025-10-22
-RECORD-00407_REL_005,RECORD-00407,P0005,Jay Rosen,Mentions,O0048,CBS,I see the network sky boxes with their blazing logos—...CBS...,1.0,2025-10-22
+RECORD-00407_REL_005,RECORD-00407,P0005,Jay Rosen,Mentions,O0419,CBS News,I see the network sky boxes with their blazing logos—...CBS...,1.0,2025-10-22
 RECORD-00407_REL_006,RECORD-00407,P0005,Jay Rosen,Mentions,O0015,CNN,I see the network sky boxes with their blazing logos—...CNN...,1.0,2025-10-22
 RECORD-00407_REL_007,RECORD-00407,P0005,Jay Rosen,Mentions,O0014,Fox News,I see the network sky boxes with their blazing logos—...Fox...,1.0,2025-10-22
 RECORD-00407_REL_008,RECORD-00407,P0005,Jay Rosen,Mentions,O0071,MSNBC,I see the network sky boxes with their blazing logos—...MSNBC...,1.0,2025-10-22
@@ -4206,7 +4206,7 @@ RECORD-00408_REL_002,RECORD-00408,P0555,Dan Rather,Mentions,P0068,Howard Kurtz,R
 RECORD-00408_REL_003,RECORD-00408,O0071,MSNBC,Mentions,E0165,Transfer of Sovereignty in Baghdad,MSNBC had it first... at 2:23 am in Washington,0.7,2025-10-22
 RECORD-00408_REL_004,RECORD-00408,O0403,Fox,Mentions,E0165,Transfer of Sovereignty in Baghdad,followed by Fox at 2:30,0.7,2025-10-22
 RECORD-00408_REL_005,RECORD-00408,O0015,CNN,Mentions,E0165,Transfer of Sovereignty in Baghdad,CNN at 2:33,0.7,2025-10-22
-RECORD-00408_REL_006,RECORD-00408,O0048,CBS,Mentions,E0165,Transfer of Sovereignty in Baghdad,Rather and his CBS crew weighed in at 2:43,0.7,2025-10-22
+RECORD-00408_REL_006,RECORD-00408,O0419,CBS News,Mentions,E0165,Transfer of Sovereignty in Baghdad,Rather and his CBS crew weighed in at 2:43,0.7,2025-10-22
 RECORD-00408_REL_007,RECORD-00408,P0464,Peter Jennings,Mentions,E0165,Transfer of Sovereignty in Baghdad,Peter Jennings at 2:52 with an eyewitness account.,0.7,2025-10-22
 RECORD-00408_REL_008,RECORD-00408,P0556,Tom Brokaw,Mentions,O0065,NBC,Tom Brokaw figured NBC was already on it with its cable division,0.8,2025-10-22
 RECORD-00408_REL_009,RECORD-00408,P1661,Mark Lukasiewicz,Affiliated With,O0065,NBC,"Mark Lukasiewicz, chief of special events coverage for NBC News",1.0,2025-10-22
@@ -4248,7 +4248,7 @@ RECORD-00412_REL_003,RECORD-00412,P1045,Rod Dreher,Affiliated With,O0386,Dallas 
 RECORD-00412_REL_004,RECORD-00412,P1045,Rod Dreher,Affiliated With,O0020,National Review,"Dreher at National Review’s weblog, The Corner",1.0,2025-10-22
 RECORD-00412_REL_005,RECORD-00412,P0010,Jeff Jarvis,Affiliated With,O0255,Time Inc.,Jeff Jarvis...former Time Inc. editor who got awakened,1.0,2025-10-22
 RECORD-00412_REL_006,RECORD-00412,P0580,Jonah Goldberg,Affiliated With,O0020,National Review,Jonah Goldberg of National Review,1.0,2025-10-22
-RECORD-00412_REL_007,RECORD-00412,P0580,Jonah Goldberg,Criticizes,O0048,CBS,"Jonah Goldberg of National Review writes, “When shocking images might stir Americans to favor war, the Serious Journalists show great restraint...CBS should be ashamed for running those photos.”",0.9,2025-10-22
+RECORD-00412_REL_007,RECORD-00412,P0580,Jonah Goldberg,Criticizes,O0419,CBS News,"Jonah Goldberg of National Review writes, “When shocking images might stir Americans to favor war, the Serious Journalists show great restraint...CBS should be ashamed for running those photos.”",0.9,2025-10-22
 RECORD-00412_REL_008,RECORD-00412,P0396,Mickey Kaus,Affiliated With,O0038,Slate,"See also Mickey Kaus in Slate, who agrees, and Howard Kurtz, who doesn’t.",0.8,2025-10-22
 RECORD-00412_REL_009,RECORD-00412,P0059,Glenn Reynolds,Discusses,E0169,Abu Ghraib prison abuse scandal,Reynolds (go here and here) writes: “the big media leaders seem almost desperate to keep the story on Abu Ghraib,0.7,2025-10-22
 RECORD-00412_REL_010,RECORD-00412,P1679,Rich Marotti,Affiliated With,O0987,Seldom Sober,Rich Maritt’s Seldom Sober was one of the blogs that found the video and “ran” it—or sections of it—for users to download,1.0,2025-10-22
@@ -4289,26 +4289,26 @@ RECORD-00414_REL_015,RECORD-00414,P1688,Josh Devon,Affiliated With,O0990,SITE In
 RECORD-00414_REL_016,RECORD-00414,O0732,Al Qaeda,Mentions,C0046,Terrorism,strategy for Al Qaeda and other terrorist groups,0.8,2025-10-22
 RECORD-00414_REL_017,RECORD-00414,P1690,Tom Ridge,Affiliated With,O0993,Homeland Security,information that led Homeland Security Secretary Tom Ridge to announce,1.0,2025-10-22
 RECORD-00414_REL_018,RECORD-00414,O0080,American Press,Discusses,C0046,Terrorism,"the press a participant in the war on terror, or does observer-hood still tell the right story for journalists after 09/11",0.9,2025-10-22
-RECORD-00415_REL_001,RECORD-00415,P1429,Bob Schieffer,Affiliated With,O0048,CBS,Bob Schieffer is an anchor at CBS.,0.9,2025-10-22
-RECORD-00415_REL_002,RECORD-00415,O0048,CBS,Discusses,C0001,Handsell Book,CBS had to claim that it had no politics at all.,0.8,2025-10-22
-RECORD-00415_REL_003,RECORD-00415,P0555,Dan Rather,Affiliated With,O0048,CBS,Dan Rather is an anchor at CBS.,0.9,2025-10-22
+RECORD-00415_REL_001,RECORD-00415,P1429,Bob Schieffer,Affiliated With,O0419,CBS News,Bob Schieffer is an anchor at CBS.,0.9,2025-10-22
+RECORD-00415_REL_002,RECORD-00415,O0419,CBS News,Discusses,C0001,Handsell Book,CBS had to claim that it had no politics at all.,0.8,2025-10-22
+RECORD-00415_REL_003,RECORD-00415,P0555,Dan Rather,Affiliated With,O0419,CBS News,Dan Rather is an anchor at CBS.,0.9,2025-10-22
 RECORD-00415_REL_004,RECORD-00415,P1691,Bob Lee,Affiliated With,O0994,WBDJ-TV,Bob Lee is general manager of WBDJ-TV.,0.9,2025-10-22
 RECORD-00415_REL_005,RECORD-00415,P1691,Bob Lee,Affiliated With,O0995,CBS Affiliates Association,Bob Lee is president of CBS Affiliates Association.,0.9,2025-10-22
 RECORD-00415_REL_006,RECORD-00415,P0068,Howard Kurtz,Affiliated With,O0023,The Washington Post,"Howard Kurtz, Washington Post",0.9,2025-10-22
-RECORD-00415_REL_007,RECORD-00415,O0048,CBS,Discusses,W0487,Sept. 8 report anchored by Dan Rather,"problems first emerged, to Sep. 20, when CBS announced that it no longer had confidence in the report it aired on President Bush",0.8,2025-10-22
-RECORD-00415_REL_008,RECORD-00415,P1692,Richard Thornburgh,Affiliated With,O0048,CBS,"Richard Thornburgh, appointed to CBS truth commission",0.9,2025-10-22
+RECORD-00415_REL_007,RECORD-00415,O0419,CBS News,Discusses,W0487,Sept. 8 report anchored by Dan Rather,"problems first emerged, to Sep. 20, when CBS announced that it no longer had confidence in the report it aired on President Bush",0.8,2025-10-22
+RECORD-00415_REL_008,RECORD-00415,P1692,Richard Thornburgh,Affiliated With,O0419,CBS News,"Richard Thornburgh, appointed to CBS truth commission",0.9,2025-10-22
 RECORD-00415_REL_009,RECORD-00415,P1693,Louis D. Boccardi,Affiliated With,O0024,Associated Press,"Louis D. Boccardi, former chief executive of the Associated Press",0.9,2025-10-22
-RECORD-00415_REL_010,RECORD-00415,P1693,Louis D. Boccardi,Affiliated With,O0048,CBS,"Louis D. Boccardi, appointed to CBS truth commission",0.9,2025-10-22
+RECORD-00415_REL_010,RECORD-00415,P1693,Louis D. Boccardi,Affiliated With,O0419,CBS News,"Louis D. Boccardi, appointed to CBS truth commission",0.9,2025-10-22
 RECORD-00415_REL_011,RECORD-00415,P0411,Jayson Blair,Affiliated With,O0002,The New York Times,"Jayson Blair, former reporter, The New York Times",0.9,2025-10-22
-RECORD-00415_REL_012,RECORD-00415,O0048,CBS,Discusses,C0002,Press Release Journalism,"CBS was in political danger because of something that had gone wrong with its journalism. It had to fight a war for legitimacy and reputation, and that’s a political struggle, but since the news divis",0.8,2025-10-22
-RECORD-00415_REL_013,RECORD-00415,P0821,Andrew Heyward,Affiliated With,O0048,CBS,"Andrew Heyward, president of CBS News",0.9,2025-10-22
+RECORD-00415_REL_012,RECORD-00415,O0419,CBS News,Discusses,C0002,Press Release Journalism,"CBS was in political danger because of something that had gone wrong with its journalism. It had to fight a war for legitimacy and reputation, and that’s a political struggle, but since the news divis",0.8,2025-10-22
+RECORD-00415_REL_013,RECORD-00415,P0821,Andrew Heyward,Affiliated With,O0419,CBS News,"Andrew Heyward, president of CBS News",0.9,2025-10-22
 RECORD-00415_REL_014,RECORD-00415,P1699,Leslie Moonves,Affiliated With,O0941,Viacom,"Leslie Moonves, chairman of CBS Television and co-president of the CBS parent, Viacom",0.9,2025-10-22
 RECORD-00415_REL_015,RECORD-00415,P1701,Adam Penenberg,Affiliated With,O0043,Wired,"Adam Penenberg, writing in Wired",0.9,2025-10-22
 RECORD-00415_REL_016,RECORD-00415,P0413,Roy Peter Clark,Affiliated With,O0266,Poynter Institute for Media Studies,Roy Peter Clark of Poynter,0.9,2025-10-22
 RECORD-00415_REL_017,RECORD-00415,P0771,Bob Steele,Affiliated With,O0266,Poynter Institute for Media Studies,"Bob Steele, a member of the ethics faculty at the Poynter Institute for Media Studies",0.9,2025-10-22
 RECORD-00415_REL_018,RECORD-00415,P1692,Richard Thornburgh,Affiliated With,P0195,Ronald Reagan,Thornburgh served as attorney general under President Ronald Reagan,0.9,2025-10-22
 RECORD-00415_REL_019,RECORD-00415,P1692,Richard Thornburgh,Affiliated With,P1156,George H.W. Bush,Thornburgh served as attorney general under President George H.W. Bush,0.9,2025-10-22
-RECORD-00415_REL_020,RECORD-00415,O0048,CBS,Discusses,E0061,2004 Presidential Election,"CBS said last night that the report on the war would not run before Nov. 2. “We now believe it would be inappropriate to air the report so close to the presidential election,” the spokeswoman, Kelli E",0.8,2025-10-22
+RECORD-00415_REL_020,RECORD-00415,O0419,CBS News,Discusses,E0061,2004 Presidential Election,"CBS said last night that the report on the war would not run before Nov. 2. “We now believe it would be inappropriate to air the report so close to the presidential election,” the spokeswoman, Kelli E",0.8,2025-10-22
 RECORD-00415_REL_021,RECORD-00415,P0014,George W. Bush,Mentions,W0487,Sept. 8 report anchored by Dan Rather,"problems first emerged, to Sep. 20, when CBS announced that it no longer had confidence in the report it aired on President Bush",0.7,2025-10-22
 RECORD-00416_REL_001,RECORD-00416,P0318,Glenn Greenwald,Criticizes,O0055,ABC News,"Glenn Greenwald's post led to the thought that ""ABC News has to respond.""",0.8,2025-10-22
 RECORD-00416_REL_002,RECORD-00416,P0128,Dan Gillmor,Discusses,W0488,Vital unresolved anthrax questions and ABC News,Dan Gillmor and I read Glenn Greenwald's post.,0.9,2025-10-22
@@ -4345,9 +4345,9 @@ RECORD-00418_REL_004,RECORD-00418,O0014,Fox News,Discusses,E0050,September 11th,
 RECORD-00418_REL_005,RECORD-00418,P0385,Roger Ailes,Affiliated With,O0014,Fox News,"Roger Ailes, chairman of Fox News Channel, a man with a background in political campaigns",0.9,2025-10-22
 RECORD-00418_REL_006,RECORD-00418,P0385,Roger Ailes,Criticizes,C0203,Neutral professionalism,"Ailes tried literally to unseat the liberal media by a.) not hiring it, and b.) preying on every weakness he could find.",0.8,2025-10-22
 RECORD-00418_REL_007,RECORD-00418,P0385,Roger Ailes,Supports,O0014,Fox News,"And that was to publicly describe his creation—indeed, order Fox to hype it—as nothing more than neutral professionalism",0.7,2025-10-22
-RECORD-00418_REL_008,RECORD-00418,P0385,Roger Ailes,Criticizes,O0066,ABC,"We’re the conservative alternative and yet more fair, more balanced than ABC, NBC, CBS, CNN, MSBNC, Newsweek, the Washington Post and the holy New York Times",0.8,2025-10-22
+RECORD-00418_REL_008,RECORD-00418,P0385,Roger Ailes,Criticizes,O0055,ABC News,"We’re the conservative alternative and yet more fair, more balanced than ABC, NBC, CBS, CNN, MSBNC, Newsweek, the Washington Post and the holy New York Times",0.8,2025-10-22
 RECORD-00418_REL_009,RECORD-00418,P0385,Roger Ailes,Criticizes,O0065,NBC,"We’re the conservative alternative and yet more fair, more balanced than ABC, NBC, CBS, CNN, MSBNC, Newsweek, the Washington Post and the holy New York Times",0.8,2025-10-22
-RECORD-00418_REL_010,RECORD-00418,P0385,Roger Ailes,Criticizes,O0048,CBS,"We’re the conservative alternative and yet more fair, more balanced than ABC, NBC, CBS, CNN, MSBNC, Newsweek, the Washington Post and the holy New York Times",0.8,2025-10-22
+RECORD-00418_REL_010,RECORD-00418,P0385,Roger Ailes,Criticizes,O0419,CBS News,"We’re the conservative alternative and yet more fair, more balanced than ABC, NBC, CBS, CNN, MSBNC, Newsweek, the Washington Post and the holy New York Times",0.8,2025-10-22
 RECORD-00418_REL_011,RECORD-00418,P0385,Roger Ailes,Criticizes,O0015,CNN,"We’re the conservative alternative and yet more fair, more balanced than ABC, NBC, CBS, CNN, MSBNC, Newsweek, the Washington Post and the holy New York Times",0.8,2025-10-22
 RECORD-00418_REL_012,RECORD-00418,P0385,Roger Ailes,Criticizes,O0071,MSNBC,"We’re the conservative alternative and yet more fair, more balanced than ABC, NBC, CBS, CNN, MSBNC, Newsweek, the Washington Post and the holy New York Times",0.8,2025-10-22
 RECORD-00418_REL_013,RECORD-00418,P0385,Roger Ailes,Criticizes,O0029,Newsweek,"We’re the conservative alternative and yet more fair, more balanced than ABC, NBC, CBS, CNN, MSBNC, Newsweek, the Washington Post and the holy New York Times",0.8,2025-10-22
@@ -4444,7 +4444,7 @@ RECORD-00424_REL_002,RECORD-00424,P0712,Jim VandeHei,Affiliated With,O0023,The W
 RECORD-00424_REL_003,RECORD-00424,P0916,John Harris,Affiliated With,O1009,Allbritton Communications,John Harris starting a new operation bankrolled by Allbritton Communications,0.9,2025-10-22
 RECORD-00424_REL_004,RECORD-00424,P0712,Jim VandeHei,Affiliated With,O1009,Allbritton Communications,Jim VandeHei starting a new operation bankrolled by Allbritton Communications,0.9,2025-10-22
 RECORD-00424_REL_005,RECORD-00424,P1740,Frederick J. Ryan Jr.,Affiliated With,O1009,Allbritton Communications,"Frederick J. Ryan Jr., the president of Allbritton",1.0,2025-10-22
-RECORD-00424_REL_006,RECORD-00424,P0916,John Harris,Discusses,C0053,Pressthink,"In your own way, you are an example of this with PressThink",0.8,2025-10-22
+RECORD-00424_REL_006,RECORD-00424,P0916,John Harris,Discusses,O0033,PressThink,"In your own way, you are an example of this with PressThink",0.8,2025-10-22
 RECORD-00424_REL_007,RECORD-00424,O1009,Allbritton Communications,Supports,P0916,John Harris,Allbritton invested into new venture by Harris & VandeHei.,0.9,2025-10-22
 RECORD-00424_REL_008,RECORD-00424,O1009,Allbritton Communications,Supports,P0712,Jim VandeHei,Allbritton invested into new venture by Harris & VandeHei.,0.9,2025-10-22
 RECORD-00424_REL_009,RECORD-00424,P0916,John Harris,Mentions,P0601,Len Downie,Harris says leaving the Post should not be seen as a criticism of ... Len Downie as a boss.,0.8,2025-10-22
@@ -4664,7 +4664,7 @@ RECORD-00445_REL_009,RECORD-00445,P1791,Stuart Elliott,Affiliated With,O0002,The
 RECORD-00445_REL_011,RECORD-00445,P0128,Dan Gillmor,Discusses,O0470,Ketchum,Dan Gillmor found Ketchum’s defense not credible,0.8,2025-10-22
 RECORD-00445_REL_012,RECORD-00445,P1792,Lorraine Thelian,Affiliated With,O0813,Omnicom,"Lorraine Thelian, senior partner in charge of North American operations for the Omnicom agency",1.0,2025-10-22
 RECORD-00445_REL_013,RECORD-00445,P1792,Lorraine Thelian,Affiliated With,O0470,Ketchum,"Lorraine Thelian, senior partner in charge of North American operations for the Omnicom agency",0.8,2025-10-22
-RECORD-00445_REL_014,RECORD-00445,O0048,CBS,Mentions,P0555,Dan Rather,Dan Rather statements were dead on arrival when his 60 Minutes story was threatened,0.8,2025-10-22
+RECORD-00445_REL_014,RECORD-00445,O0419,CBS News,Mentions,P0555,Dan Rather,Dan Rather statements were dead on arrival when his 60 Minutes story was threatened,0.8,2025-10-22
 RECORD-00445_REL_015,RECORD-00445,O0470,Ketchum,Affiliated With,P1792,Lorraine Thelian,"Lorraine Thelian, senior partner in charge of North American operations for the Omnicom agency.",1.0,2025-10-22
 RECORD-00446_REL_001,RECORD-00446,P0726,David Cohn,Affiliated With,O1032,Beatblogging.org,David Cohn is the editor of Beatblogging.org,1.0,2025-10-22
 RECORD-00446_REL_002,RECORD-00446,P1794,Patrick Thornton,Affiliated With,O1032,Beatblogging.org,Patrick Thornton is replacing David Cohn at beatblogging.org,1.0,2025-10-22
@@ -4731,15 +4731,15 @@ RECORD-00450_REL_009,RECORD-00450,O0023,The Washington Post,Mentions,E0003,Water
 RECORD-00450_REL_010,RECORD-00450,O0023,The Washington Post,Mentions,P0894,Ben Bradlee,the flagship of the press was parked in Washington and Ben Bradlee ran it,0.7,2025-10-22
 RECORD-00450_REL_011,RECORD-00450,O0023,The Washington Post,Mentions,E0181,Saturday Night Massacre,The dramatic high point...is the Saturday Night Massacre,0.7,2025-10-22
 RECORD-00450_REL_012,RECORD-00450,E0181,Saturday Night Massacre,Mentions,P0186,Richard Nixon,is fired by Nixon in a classic abuse of political power.,0.8,2025-10-22
-RECORD-00451_REL_001,RECORD-00451,P0555,Dan Rather,Affiliated With,O0048,CBS,Dan Rather is a CBS News Anchor and Reporter.,1.0,2025-10-22
+RECORD-00451_REL_001,RECORD-00451,P0555,Dan Rather,Affiliated With,O0419,CBS News,Dan Rather is a CBS News Anchor and Reporter.,1.0,2025-10-22
 RECORD-00451_REL_002,RECORD-00451,P0555,Dan Rather,Discusses,P0186,Richard Nixon,"After Mr. Rather posed a question to Nixon at a National Association of Broadcasters convention in 1974, Nixon asked pointedly, “Are you running for something?”",0.9,2025-10-22
 RECORD-00451_REL_003,RECORD-00451,P0555,Dan Rather,Criticizes,O0419,CBS News,"Here I take a crack at explaining why Dan Rather and CBS News have disappointed their colleagues, enraged their critics, compounded their losses, endangered the CBS brand and mystified so many observe",0.7,2025-10-22
-RECORD-00451_REL_004,RECORD-00451,O0048,CBS,Published In,W0524,60 Minutes,hours after 60 Minutes carried a report on President Bush’s record with the Texas Air National Guard.,1.0,2025-10-22
+RECORD-00451_REL_004,RECORD-00451,O0419,CBS News,Published In,W0524,60 Minutes,hours after 60 Minutes carried a report on President Bush’s record with the Texas Air National Guard.,1.0,2025-10-22
 RECORD-00451_REL_005,RECORD-00451,W0524,60 Minutes,Discusses,P0014,George W. Bush,60 Minutes carried a report on President Bush’s record with the Texas Air National Guard.,0.9,2025-10-22
 RECORD-00451_REL_006,RECORD-00451,W0524,60 Minutes,Discusses,O1035,Texas Air National Guard,60 Minutes carried a report on President Bush’s record with the Texas Air National Guard.,0.9,2025-10-22
-RECORD-00451_REL_007,RECORD-00451,P1797,Susan Tifft,Discusses,O0048,CBS,"CBS and Dan Rather in particular are really sort of the poster children for all the charges of bias, left-wing bias in the media",0.9,2025-10-22
+RECORD-00451_REL_007,RECORD-00451,P1797,Susan Tifft,Discusses,O0419,CBS News,"CBS and Dan Rather in particular are really sort of the poster children for all the charges of bias, left-wing bias in the media",0.9,2025-10-22
 RECORD-00451_REL_008,RECORD-00451,P1797,Susan Tifft,Discusses,P0555,Dan Rather,"CBS and Dan Rather in particular are really sort of the poster children for all the charges of bias, left-wing bias in the media",0.9,2025-10-22
-RECORD-00451_REL_009,RECORD-00451,P0346,Bill Kovach,Criticizes,O0048,CBS,"“They have not convinced me they properly nailed it,” Bill Kovach, chairman of the Committee of Concerned Journalists, said of CBS.",0.8,2025-10-22
+RECORD-00451_REL_009,RECORD-00451,P0346,Bill Kovach,Criticizes,O0419,CBS News,"“They have not convinced me they properly nailed it,” Bill Kovach, chairman of the Committee of Concerned Journalists, said of CBS.",0.8,2025-10-22
 RECORD-00451_REL_010,RECORD-00451,P0068,Howard Kurtz,Discusses,P0555,Dan Rather,"“Rather has always taken pride in unchaining himself from the anchor desk to cover wars, political campaigns and various other crises,” wrote Howard Kurtz this week.",0.9,2025-10-22
 RECORD-00451_REL_011,RECORD-00451,P0016,Joe Hagan,Affiliated With,O0018,The New York Observer,This is from the New York Observer’s Joe Hagan:,1.0,2025-10-22
 RECORD-00451_REL_012,RECORD-00451,O0015,CNN,Affiliated With,P0016,Joe Hagan,This is from the New York Observer’s Joe Hagan:,1.0,2025-10-22
@@ -4923,17 +4923,17 @@ RECORD-00466_REL_004,RECORD-00466,P0821,Andrew Heyward,Affiliated With,O0419,CBS
 RECORD-00466_REL_005,RECORD-00466,P0555,Dan Rather,Discusses,P0676,Saddam Hussein,In talking with the New York Observer Rather made much of his interview with Saddam Hussein before the 2003 war.,0.9,2025-10-22
 RECORD-00466_REL_006,RECORD-00466,P0555,Dan Rather,Discusses,C0546,Bigfoot,"Rather's sins were the sins of a celebrity journalist, a star, also known as a bigfoot",0.9,2025-10-22
 RECORD-00466_REL_007,RECORD-00466,P0555,Dan Rather,Affiliated With,W0503,Sixty Minutes,Rather and his 60 Minutes team,0.9,2025-10-22
-RECORD-00467_REL_001,RECORD-00467,O0048,CBS,Criticizes,O0048,CBS,A massive institutional failure at CBS,0.8,2025-10-22
+RECORD-00467_REL_001,RECORD-00467,O0419,CBS News,Criticizes,O0419,CBS News,A massive institutional failure at CBS,0.8,2025-10-22
 RECORD-00467_REL_002,RECORD-00467,P0555,Dan Rather,Affiliated With,O0419,CBS News,Dan Rather is an anchor at CBS News,1.0,2025-10-22
-RECORD-00467_REL_003,RECORD-00467,O0419,CBS News,Affiliated With,O0048,CBS,CBS News is a news division of CBS,1.0,2025-10-22
+RECORD-00467_REL_003,RECORD-00467,O0419,CBS News,Affiliated With,O0419,CBS News,CBS News is a news division of CBS,1.0,2025-10-22
 RECORD-00467_REL_004,RECORD-00467,P0821,Andrew Heyward,Affiliated With,O0419,CBS News,Andrew Heyward is President of CBS News,1.0,2025-10-22
-RECORD-00467_REL_005,RECORD-00467,P0084,Spiro Agnew,Mentions,O0048,CBS,"In that speech, which mentions CBS, Agnew said, “The views of this fraternity do not represent the views of America.”",0.9,2025-10-22
+RECORD-00467_REL_005,RECORD-00467,P0084,Spiro Agnew,Mentions,O0419,CBS News,"In that speech, which mentions CBS, Agnew said, “The views of this fraternity do not represent the views of America.”",0.9,2025-10-22
 RECORD-00467_REL_006,RECORD-00467,P0604,Tim Rutten,Affiliated With,O0028,Los Angeles Times,Tim Rutten in the Los Angeles Times,1.0,2025-10-22
 RECORD-00467_REL_007,RECORD-00467,P0699,Mary Mapes,Affiliated With,O0419,CBS News,CBS producer Mary Mapes,1.0,2025-10-22
 RECORD-00467_REL_008,RECORD-00467,P0534,Scott Rosenberg,Affiliated With,O0030,Salon,Salon's Scott Rosenberg,1.0,2025-10-22
 RECORD-00467_REL_009,RECORD-00467,P0452,Jack Shafer,Affiliated With,O0038,Slate,Slate's Jack Shafer,1.0,2025-10-22
-RECORD-00467_REL_010,RECORD-00467,P0010,Jeff Jarvis,Discusses,O0048,CBS,Jeff Jarvis ... writes at Buzzmachine when he gets back,0.7,2025-10-22
-RECORD-00467_REL_011,RECORD-00467,O0048,CBS,Discusses,E0061,2004 Presidential Election,complicated not only by the roaring campaign for president,0.6,2025-10-22
+RECORD-00467_REL_010,RECORD-00467,P0010,Jeff Jarvis,Discusses,O0419,CBS News,Jeff Jarvis ... writes at Buzzmachine when he gets back,0.7,2025-10-22
+RECORD-00467_REL_011,RECORD-00467,O0419,CBS News,Discusses,E0061,2004 Presidential Election,complicated not only by the roaring campaign for president,0.6,2025-10-22
 RECORD-00468_REL_001,RECORD-00468,P1028,Tony Snow,Affiliated With,O0126,White House,Tony Snow was the White House Press Secretary.,1.0,2025-10-22
 RECORD-00468_REL_002,RECORD-00468,P0764,Scott McClellan,Affiliated With,O0126,White House,Scott McClellan was the former White House Press Secretary.,1.0,2025-10-22
 RECORD-00468_REL_003,RECORD-00468,P1028,Tony Snow,Affiliated With,O0014,Fox News,"Snow, a former Fox News presenter",1.0,2025-10-22
@@ -4943,8 +4943,8 @@ RECORD-00468_REL_006,RECORD-00468,O0023,The Washington Post,Mentions,P1028,Tony 
 RECORD-00468_REL_007,RECORD-00468,P0710,Dana Milbank,Affiliated With,O0023,The Washington Post,Dana Milbank is in the Washington Post,1.0,2025-10-22
 RECORD-00468_REL_008,RECORD-00468,O1070,Daily Variety,Mentions,P1028,Tony Snow,"William Triplett, Daily Variety compared Snow and McClellan.",0.8,2025-10-22
 RECORD-00468_REL_009,RECORD-00468,P1882,William Triplett,Affiliated With,O1070,Daily Variety,William Triplett is in the Daily Variety,1.0,2025-10-22
-RECORD-00468_REL_010,RECORD-00468,O0048,CBS,Mentions,P1028,Tony Snow,Vaughn Ververs at CBS commented on Snow.,0.8,2025-10-22
-RECORD-00468_REL_011,RECORD-00468,P0701,Vaughn Ververs,Affiliated With,O0048,CBS,Vaughn Ververs is affiliated with CBS Public Eye.,1.0,2025-10-22
+RECORD-00468_REL_010,RECORD-00468,O0419,CBS News,Mentions,P1028,Tony Snow,Vaughn Ververs at CBS commented on Snow.,0.8,2025-10-22
+RECORD-00468_REL_011,RECORD-00468,P0701,Vaughn Ververs,Affiliated With,O0419,CBS News,Vaughn Ververs is affiliated with CBS Public Eye.,1.0,2025-10-22
 RECORD-00468_REL_012,RECORD-00468,O0030,Salon,Mentions,P1028,Tony Snow,Michael Scherer in Salon commented on Snow.,0.8,2025-10-22
 RECORD-00468_REL_013,RECORD-00468,P0053,Michael Scherer,Affiliated With,O0030,Salon,Michael Scherer is affiliated with Salon.,1.0,2025-10-22
 RECORD-00468_REL_014,RECORD-00468,P0014,George W. Bush,Affiliated With,O0126,White House,Bush Administration at The White House,1.0,2025-10-22
@@ -4971,7 +4971,7 @@ RECORD-00470_REL_002,RECORD-00470,P0483,Jeffrey Dvorkin,Discusses,C0552,Fairness
 RECORD-00470_REL_003,RECORD-00470,P0483,Jeffrey Dvorkin,Discusses,C0184,Fact-based reporting,NPR is—and should be seen to be—about providing fact-based reporting.,0.8,2025-10-22
 RECORD-00470_REL_004,RECORD-00470,P0483,Jeffrey Dvorkin,Discusses,C0185,Opinion and commentary,Opinions and commentaries on NPR newsmagazines are always provided by non-NPR journalists or other outsiders.,0.8,2025-10-22
 RECORD-00470_REL_005,RECORD-00470,P0484,Daniel Schorr,Affiliated With,O0031,NPR,Daniel Schorr...senior news analyst for NPR,1.0,2025-10-22
-RECORD-00470_REL_006,RECORD-00470,P0484,Daniel Schorr,Affiliated With,O0048,CBS,"Daniel Schorr, the last of Edward R. Murrow’s legendary CBS team",1.0,2025-10-22
+RECORD-00470_REL_006,RECORD-00470,P0484,Daniel Schorr,Affiliated With,O0419,CBS News,"Daniel Schorr, the last of Edward R. Murrow’s legendary CBS team",1.0,2025-10-22
 RECORD-00471_REL_001,RECORD-00471,P1418,Martin Nisenholtz,Affiliated With,O0002,The New York Times,"Martin Nisenholtz, Senior Vice President for Digital Operations at the New York Times",1.0,2025-10-22
 RECORD-00471_REL_002,RECORD-00471,O0002,The New York Times,Discusses,C0553,Search Engine Optimization,Why is the New York Times Company interested in acquiring this expertise with search engines that About.com is said to have?,0.8,2025-10-22
 RECORD-00471_REL_003,RECORD-00471,O0002,The New York Times,Affiliated With,P1889,Stuart Elliot,"Stuart Elliot’s Advertising column, published the same day in the New York Times",1.0,2025-10-22
@@ -5114,7 +5114,7 @@ RECORD-00517_REL_002,RECORD-00517,W0571,New York Times article (on Sacramento Be
 RECORD-00517_REL_003,RECORD-00517,P0470,Dan Weintraub,Affiliated With,W0092,California Insider,Daniel Weintraub’s California Insider,1.0,2025-10-28
 RECORD-00517_REL_004,RECORD-00517,P0469,Michael Falcone,Discusses,P0470,Dan Weintraub,"Falcone, is a smart journalist too (I have talked to him by phone)— smart enough to figure out that the only reason anyone cares about Weintraub’s “take” on things is that he really knows politics",0.9,2025-10-28
 RECORD-00517_REL_005,RECORD-00517,W0092,California Insider,Discusses,C0562,News/Opinion Distinction,"the cool thing about Weintraub’s weblog is that it overrides and overcomes this distinction, bypassing it to generate authority another way.",0.9,2025-10-28
-RECORD-00517_REL_006,RECORD-00517,W0571,New York Times article (on Sacramento Bee case),Discusses,C0073,Press Think,does fit press think. So it goes by.,0.9,2025-10-28
+RECORD-00517_REL_006,RECORD-00517,W0571,New York Times article (on Sacramento Bee case),Discusses,O0033,PressThink,does fit press think. So it goes by.,0.9,2025-10-28
 RECORD-00517_REL_007,RECORD-00517,C0562,News/Opinion Distinction,Discusses,C0050,Objectivity,Will reporters’ weblogs violate the paper’s objectivity and the journalist’s code of neutrality?,0.8,2025-10-28
 RECORD-00517_REL_008,RECORD-00517,O0002,The New York Times,Discusses,O0329,Sacramento Bee,Falcone’s generally fine summary of the Sacramento Bee case in the New York Times.,0.9,2025-10-28
 RECORD-00518_REL_001,RECORD-00518,P0010,Jeff Jarvis,Affiliated With,W0095,Buzzmachine,"Jeff Jarvis holds court at his weblog, Buzzmachine.",1.0,2025-10-28
@@ -5202,16 +5202,16 @@ RECORD-00525_REL_010,RECORD-00525,P0916,John Harris,Affiliated With,O0023,The Wa
 RECORD-00525_REL_011,RECORD-00525,P0099,Peter Baker,Affiliated With,O0023,The Washington Post,Post White House reporter Peter Baker,1.0,2025-10-28
 RECORD-00525_REL_012,RECORD-00525,P0030,Bill Keller,Affiliated With,O0002,The New York Times,"Bill Keller, executive editor of the Times",1.0,2025-10-28
 RECORD-00525_REL_013,RECORD-00525,P1949,Donald Graham,Affiliated With,O0023,The Washington Post,"Donald Graham, CEO of the Washington Post Company",1.0,2025-10-28
-RECORD-00526_REL_001,RECORD-00526,P0010,Jeff Jarvis,Criticizes,O0048,CBS,“calling for more commissions and committees and all that” just “puts yet more distance between the journalists and the public they are supposed to serve.”,0.8,2025-10-28
-RECORD-00526_REL_002,RECORD-00526,O0048,CBS,Discusses,E0198,Air National Guard story controversy,The article discusses the Air National Guard story controversy and its impact on CBS.,0.9,2025-10-28
+RECORD-00526_REL_001,RECORD-00526,P0010,Jeff Jarvis,Criticizes,O0419,CBS News,“calling for more commissions and committees and all that” just “puts yet more distance between the journalists and the public they are supposed to serve.”,0.8,2025-10-28
+RECORD-00526_REL_002,RECORD-00526,O0419,CBS News,Discusses,E0198,Air National Guard story controversy,The article discusses the Air National Guard story controversy and its impact on CBS.,0.9,2025-10-28
 RECORD-00526_REL_003,RECORD-00526,P0821,Andrew Heyward,Affiliated With,O0419,CBS News,Andrew Heyward is the President of CBS News.,1.0,2025-10-28
 RECORD-00526_REL_004,RECORD-00526,P0555,Dan Rather,Affiliated With,O0419,CBS News,Dan Rather is the star of CBS News,1.0,2025-10-28
-RECORD-00526_REL_005,RECORD-00526,O0048,CBS,Discusses,C0006,Transparency,The text suggests CBS needs to become more transparent,0.8,2025-10-28
-RECORD-00526_REL_006,RECORD-00526,O0048,CBS,Discusses,C0082,Accountability journalism,Suggests accountability journalism,0.7,2025-10-28
-RECORD-00526_REL_007,RECORD-00526,O0048,CBS,Mentions,P0673,Linda Mason,"Linda Mason, the new Vice President for standards at CBS",0.9,2025-10-28
-RECORD-00526_REL_008,RECORD-00526,O0048,CBS,Mentions,O0435,Sixty Minutes,Sixty Minutes could publish on the Internet,0.9,2025-10-28
+RECORD-00526_REL_005,RECORD-00526,O0419,CBS News,Discusses,C0006,Transparency,The text suggests CBS needs to become more transparent,0.8,2025-10-28
+RECORD-00526_REL_006,RECORD-00526,O0419,CBS News,Discusses,C0082,Accountability journalism,Suggests accountability journalism,0.7,2025-10-28
+RECORD-00526_REL_007,RECORD-00526,O0419,CBS News,Mentions,P0673,Linda Mason,"Linda Mason, the new Vice President for standards at CBS",0.9,2025-10-28
+RECORD-00526_REL_008,RECORD-00526,O0419,CBS News,Mentions,O0435,Sixty Minutes,Sixty Minutes could publish on the Internet,0.9,2025-10-28
 RECORD-00526_REL_009,RECORD-00526,P1950,Bryan Keefer,Affiliated With,O0426,CJR Daily,Bryan Keefer at CJR Daily,0.9,2025-10-28
-RECORD-00526_REL_010,RECORD-00526,O0048,CBS,Discusses,C0103,Open Source Journalism,CBS didn’t know then about the powers of distributed journalism.,0.7,2025-10-28
+RECORD-00526_REL_010,RECORD-00526,O0419,CBS News,Discusses,C0103,Open Source Journalism,CBS didn’t know then about the powers of distributed journalism.,0.7,2025-10-28
 RECORD-00526_REL_011,RECORD-00526,P0555,Dan Rather,Mentions,W0580,Report of the Independent Review Panel,"Dan Rather releases a statement: I have read the report, I take it seriously, and I shall keep its lessons well in mind.",0.9,2025-10-28
 RECORD-00527_REL_001,RECORD-00527,P0180,Neil Postman,Affiliated With,O0049,NYU,NYU professor,0.9,2025-10-28
 RECORD-00527_REL_002,RECORD-00527,P0180,Neil Postman,Criticizes,C0003,Age of Insight,Postman resented being controlled by technology,0.8,2025-10-28
@@ -5407,7 +5407,7 @@ RECORD-00544_REL_016,RECORD-00544,P0012,Mark Glaser,Affiliated With,O0010,Online
 RECORD-00544_REL_017,RECORD-00544,P1418,Martin Nisenholtz,Affiliated With,O0002,The New York Times,"Martin Nisenholtz, the dean of online publishers as CEO of New York Times Digital",0.9,2025-10-28
 RECORD-00545_REL_001,RECORD-00545,P1998,Bob Dole,Mentions,O0113,Media,Bob Dole said the biggest loser in the presidential election was “the so-called mainstream media.”,0.9,2025-10-28
 RECORD-00545_REL_002,RECORD-00545,O0113,Media,Discusses,E0061,2004 Presidential Election,The real loser in '04 was The Media,0.8,2025-10-28
-RECORD-00545_REL_003,RECORD-00545,P1999,Brett Rogers,Mentions,O0048,CBS,"blogger Brett Rogers: CBS, the biggest loser by far.",0.9,2025-10-28
+RECORD-00545_REL_003,RECORD-00545,P1999,Brett Rogers,Mentions,O0419,CBS News,"blogger Brett Rogers: CBS, the biggest loser by far.",0.9,2025-10-28
 RECORD-00545_REL_004,RECORD-00545,O0002,The New York Times,Mentions,P0014,George W. Bush,journalists at the New York Times ... saw themselves not as conveyors of facts but as truth-squadders ... of the Bush administration,0.7,2025-10-28
 RECORD-00545_REL_005,RECORD-00545,O0023,The Washington Post,Mentions,P0014,George W. Bush,journalists at the Washington Post ... saw themselves not as conveyors of facts but as truth-squadders ... of the Bush administration,0.7,2025-10-28
 RECORD-00545_REL_006,RECORD-00545,O1140,Investor's Business Daily,Criticizes,O0113,Media,"the big media, fearful of another four years for President Bush, have basically become an unpaid adjunct to the Kerry campaign.",0.8,2025-10-28
@@ -5418,8 +5418,8 @@ RECORD-00545_REL_010,RECORD-00545,P2003,Vincent Fiore,Mentions,O0419,CBS News,th
 RECORD-00545_REL_011,RECORD-00545,P2008,Gordon Sawyer,Mentions,O0002,The New York Times,newspapers like the New York Times,0.8,2025-10-28
 RECORD-00545_REL_012,RECORD-00545,P2008,Gordon Sawyer,Mentions,O0023,The Washington Post,newspapers like ... the Washington Post,0.8,2025-10-28
 RECORD-00545_REL_013,RECORD-00545,P2008,Gordon Sawyer,Mentions,O1147,Atlanta Journal Constitution,newspapers like ... the Atlanta Journal Constitution,0.8,2025-10-28
-RECORD-00545_REL_014,RECORD-00545,P2008,Gordon Sawyer,Mentions,O0066,ABC,"the three old-line television networks, ABC",0.8,2025-10-28
-RECORD-00545_REL_015,RECORD-00545,P2008,Gordon Sawyer,Mentions,O0048,CBS,"the three old-line television networks, CBS",0.8,2025-10-28
+RECORD-00545_REL_014,RECORD-00545,P2008,Gordon Sawyer,Mentions,O0055,ABC News,"the three old-line television networks, ABC",0.8,2025-10-28
+RECORD-00545_REL_015,RECORD-00545,P2008,Gordon Sawyer,Mentions,O0419,CBS News,"the three old-line television networks, CBS",0.8,2025-10-28
 RECORD-00545_REL_016,RECORD-00545,P2008,Gordon Sawyer,Mentions,O0065,NBC,"the three old-line television networks, NBC",0.8,2025-10-28
 RECORD-00545_REL_017,RECORD-00545,P2009,John McIntyre,Criticizes,O0002,The New York Times,This was the equivalent of The Alamo for the mainstream media. CBS News and the New York Times ... exhausted themselves in a near-pathological desire to remove George W. Bush from office.,0.8,2025-10-28
 RECORD-00546_REL_001,RECORD-00546,P0420,Charlie Reina,Affiliated With,O0014,Fox News,Charlie Reina served six years as a producer at Fox News.,1.0,2025-10-28
@@ -5574,7 +5574,7 @@ RECORD-00558_REL_015,RECORD-00558,P1200,Matt Bai,Mentions,E0004,Iraq War,Almost 
 RECORD-00558_REL_016,RECORD-00558,P1200,Matt Bai,Discusses,W0624,The Argument,"It also helps that he has a book coming out this month titled, ” Billionaires, Bloggers, and the Battle to Remake Democratic Politics.” Actually that’s the subtitle. The title is… The Argument",0.9,2025-10-28
 RECORD-00559_REL_001,RECORD-00559,P1430,Peter Johnson,Affiliated With,O0067,USA Today,Peter Johnson writes about media for USA Today,1.0,2025-10-28
 RECORD-00559_REL_002,RECORD-00559,P1430,Peter Johnson,Discusses,P0555,Dan Rather,"With Dan Rather leaving the anchor's desk is there an opportunity for CBS to break away, and do something different?",0.9,2025-10-28
-RECORD-00559_REL_003,RECORD-00559,P0005,Jay Rosen,Discusses,O0048,CBS,"Yes, there is one thing they could do. Before they decide who gets the anchor chair, or what happens with CBS News...",0.9,2025-10-28
+RECORD-00559_REL_003,RECORD-00559,P0005,Jay Rosen,Discusses,O0419,CBS News,"Yes, there is one thing they could do. Before they decide who gets the anchor chair, or what happens with CBS News...",0.9,2025-10-28
 RECORD-00559_REL_004,RECORD-00559,P0005,Jay Rosen,Discusses,C0595,Public Listening,"they could engage in an extraordinary, one-of-a-kind, national act of public listening",0.9,2025-10-28
 RECORD-00559_REL_005,RECORD-00559,P1430,Peter Johnson,Mentions,P0005,Jay Rosen,And he did mention some of what I wrote here,0.8,2025-10-28
 RECORD-00559_REL_006,RECORD-00559,P1430,Peter Johnson,Published In,O0067,USA Today,Peter Johnson of USA Today published a column about CBS News,1.0,2025-10-28
@@ -5771,8 +5771,8 @@ RECORD-00574_REL_007,RECORD-00574,P0005,Jay Rosen,Discusses,P0555,Dan Rather,Dis
 RECORD-00574_REL_008,RECORD-00574,P0005,Jay Rosen,Discusses,P2110,Octavio Paz,Discusses Octavio Paz's Nobel Prize lecture,0.9,2025-10-28
 RECORD-00574_REL_009,RECORD-00574,P0005,Jay Rosen,Discusses,W0029,What Are Journalists For?,"Wrote in the title of my book, What Are Journalists For, anyway?",0.9,2025-10-28
 RECORD-00574_REL_010,RECORD-00574,P0314,Leonard Downie,Affiliated With,O0023,The Washington Post,"the new executive editor of the paper, Leonard Downie.",0.9,2025-10-28
-RECORD-00574_REL_011,RECORD-00574,P0555,Dan Rather,Affiliated With,O0048,CBS,"Dan Rather, for all of us here at CBS News",0.9,2025-10-28
-RECORD-00574_REL_012,RECORD-00574,P0222,Walter Cronkite,Affiliated With,O0048,CBS,Walter Cronkite's famous closer at CBS,0.9,2025-10-28
+RECORD-00574_REL_011,RECORD-00574,P0555,Dan Rather,Affiliated With,O0419,CBS News,"Dan Rather, for all of us here at CBS News",0.9,2025-10-28
+RECORD-00574_REL_012,RECORD-00574,P0222,Walter Cronkite,Affiliated With,O0419,CBS News,Walter Cronkite's famous closer at CBS,0.9,2025-10-28
 RECORD-00575_REL_001,RECORD-00575,P0005,Jay Rosen,Discusses,O0029,Newsweek,"I did an unusually large number of interviews, all concerning the Newsweek fallout.",0.9,2025-10-28
 RECORD-00575_REL_002,RECORD-00575,P0005,Jay Rosen,Discusses,C0610,Trust-Me Journalism,"But they have not, I think, confronted the weaknesses in Trust-Me Journalism",0.8,2025-10-28
 RECORD-00575_REL_003,RECORD-00575,P0005,Jay Rosen,Discusses,P1208,Christopher Hitchens,"And I went over the Newsweek crash sight with Hitchens and the BBC, as best we could in five to seven minutes",0.9,2025-10-28
@@ -5849,7 +5849,7 @@ RECORD-00583_REL_008,RECORD-00583,P2124,Adam Ragusea,Discusses,P0005,Jay Rosen,I
 RECORD-00583_REL_009,RECORD-00583,P2124,Adam Ragusea,Discusses,L0020,New York,I argue that the podcasting industry is becoming dangerously concentrated in New York,0.8,2025-10-28
 RECORD-00583_REL_010,RECORD-00583,P2130,Jim Zarroli,Mentions,P0005,Jay Rosen,As one of the reporters cited by Professor Rosen I want to clarify a few things.,0.7,2025-10-28
 RECORD-00584_REL_001,RECORD-00584,P0005,Jay Rosen,Affiliated With,O0049,NYU,Jay teaches at NYU,1.0,2025-10-28
-RECORD-00584_REL_002,RECORD-00584,P0005,Jay Rosen,Published In,C0073,Press Think,Jay writes a legendary blog called Press Think,1.0,2025-10-28
+RECORD-00584_REL_002,RECORD-00584,P0005,Jay Rosen,Published In,O0033,PressThink,Jay writes a legendary blog called Press Think,1.0,2025-10-28
 RECORD-00584_REL_003,RECORD-00584,P2131,Taylor Owen,Mentions,P2132,Joe Rogan,"Shift of trust from journalists to influencers, like Joe Rogan.",0.8,2025-10-28
 RECORD-00584_REL_004,RECORD-00584,P0005,Jay Rosen,Discusses,C0627,Savvy Style of Political Journalism,Jay got interested in “the savvy style of political journalism” some years ago,0.9,2025-10-28
 RECORD-00584_REL_005,RECORD-00584,P0005,Jay Rosen,Discusses,C0004,View from Nowhere,Taylor asks Jay about another term he often uses: the view from nowhere,0.9,2025-10-28
@@ -5965,7 +5965,7 @@ RECORD-00596_REL_004,RECORD-00596,P0005,Jay Rosen,Originated By,C0010,Verificati
 RECORD-00596_REL_005,RECORD-00596,P0073,Donald Trump,Mentions,O0076,Facebook,Tech platforms especially Facebook which is how efficient they are surfacing the man,0.7,2025-10-28
 RECORD-00596_REL_006,RECORD-00596,P0073,Donald Trump,Discusses,C0637,Flooding the Zone,Steve Bannon is not a wise man but this was a smart statement about Trump's political style which turns journalists into hate objects overwhelms the new system with controversy and persuades supporter,0.8,2025-10-28
 RECORD-00596_REL_007,RECORD-00596,P0073,Donald Trump,Mentions,O0023,The Washington Post,"In 1,000 170 days president Trump has made 18,000 false or misleading claims this was a recent headline at the Washington Post",0.7,2025-10-28
-RECORD-00596_REL_008,RECORD-00596,P0097,Les Moonves,Affiliated With,O0048,CBS,Les Moonves CEO of CBS one of our biggest television networks,0.9,2025-10-28
+RECORD-00596_REL_008,RECORD-00596,P0097,Les Moonves,Affiliated With,O0419,CBS News,Les Moonves CEO of CBS one of our biggest television networks,0.9,2025-10-28
 RECORD-00596_REL_009,RECORD-00596,P0097,Les Moonves,Mentions,P0073,Donald Trump,It may not be good for America but it's damn good for CBS les Moonves CEO of CBS one of our biggest television networks said that on February 29th 2016 about eight months before Trump was elected this,0.8,2025-10-28
 RECORD-00596_REL_010,RECORD-00596,P0090,Steve Bannon,Mentions,P0073,Donald Trump,The Democrats don't matter Steve Bannon said in 2018 the real opposition is the media and way to deal with them is to flood the zone Lewis Bannon is not a wise man but this was a smart statement about,0.7,2025-10-28
 RECORD-00596_REL_011,RECORD-00596,P0090,Steve Bannon,Mentions,O0014,Fox News,It permits both Fox News and Trump's presidency to be about his fights with the media,0.7,2025-10-28
@@ -6151,9 +6151,9 @@ RECORD-00056_REL_001,RECORD-00056,W0002,PressThink,Founded By,P0005,Jay Rosen,Pr
 RECORD-00056_REL_002,RECORD-00056,W0002,PressThink,Founded By,O0148,Arthur L. Carter Journalism Institute,PressThink is a project of the Arthur L. Carter Journalism Institute,0.8,2025-10-28
 RECORD-00056_REL_003,RECORD-00056,W0002,PressThink,Owned By,O0148,Arthur L. Carter Journalism Institute,PressThink is a project of the Arthur L. Carter Journalism Institute at New York University.,0.8,2025-10-28
 RECORD-00056_REL_004,RECORD-00056,O0148,Arthur L. Carter Journalism Institute,Owned By,O0049,NYU,Arthur L. Carter Journalism Institute at New York University.,0.9,2025-10-28
-RECORD-00056_REL_005,RECORD-00056,W0002,PressThink,Inspired By,C0053,Pressthink,I call this blog PressThink because that's the kind of work I do. The title points to forms of thought that identify 'journalism' to itself,0.9,2025-10-28
-RECORD-00056_REL_006,RECORD-00056,O0149,Disney,Owns,O0066,ABC,"In 1996, when Disney bought ABC",0.9,2025-10-28
-RECORD-00056_REL_007,RECORD-00056,O0066,ABC,Owned By,O0149,Disney,when Disney bought ABC,0.9,2025-10-28
+RECORD-00056_REL_005,RECORD-00056,W0002,PressThink,Inspired By,O0033,PressThink,I call this blog PressThink because that's the kind of work I do. The title points to forms of thought that identify 'journalism' to itself,0.9,2025-10-28
+RECORD-00056_REL_006,RECORD-00056,O0149,Disney,Owns,O0055,ABC News,"In 1996, when Disney bought ABC",0.9,2025-10-28
+RECORD-00056_REL_007,RECORD-00056,O0055,ABC News,Owned By,O0149,Disney,when Disney bought ABC,0.9,2025-10-28
 RECORD-00058_REL_001,RECORD-00058,P0005,Jay Rosen,Founded By,W0002,PressThink,"The article is titled 'Prospects for the American press under Trump, part two - PressThink' and is from the 'Jay Rosen Digital Archive'. Jay Rosen is the author of the article, implying he created/fou",0.9,2025-10-28
 RECORD-00058_REL_002,RECORD-00058,W0002,PressThink,Owned By,P0005,Jay Rosen,"The article is titled 'Prospects for the American press under Trump, part two - PressThink' and is from the 'Jay Rosen Digital Archive'. This strongly implies PressThink is owned or controlled by Jay ",0.9,2025-10-28
 RECORD-00059_REL_002,RECORD-00059,P0005,Jay Rosen,Founded By,O0164,Membership Puzzle Project,"That's why Membership Puzzle Project studied churches, Burning Man camps, citizen science projects, and other member-driven movements for clues to survival.",0.9,2025-10-28
@@ -6170,7 +6170,7 @@ RECORD-00066_REL_003,RECORD-00066,P0005,Jay Rosen,Founded By,W0029,What Are Jour
 RECORD-00067_REL_001,RECORD-00067,P0005,Jay Rosen,Pioneered,C0047,Public Journalism,Jay Rosen makes the case that journalists can avoid succumbing to these worrisome trends by practicing what is increasingly being called 'public journalism.',0.85,2025-10-28
 RECORD-00069_REL_001,RECORD-00069,W0029,What Are Journalists For?,Founded By,P0005,Jay Rosen,"In this book, public journalism advocate Jay Rosen recalls the history of the movement and explains how its innovations offer an opportunity to revitalize the press and improve civic life.",1,2025-10-28
 RECORD-00070_REL_001,RECORD-00070,P0005,Jay Rosen,Pioneered,C0098,The people formerly known as the audience,That's what I call them.,1,2025-10-28
-RECORD-00071_REL_001,RECORD-00071,P0005,Jay Rosen,Pioneered,C0053,Pressthink,"My field of study is what I call “pressthink,” which is sort of like groupthink– but for people in journalism.",1,2025-10-28
+RECORD-00071_REL_001,RECORD-00071,P0005,Jay Rosen,Pioneered,O0033,PressThink,"My field of study is what I call “pressthink,” which is sort of like groupthink– but for people in journalism.",1,2025-10-28
 RECORD-00071_REL_002,RECORD-00071,P0005,Jay Rosen,Inspired By,C0183,Pragmatism,"Intellectually, I am a pragmatist.",1,2025-10-28
 RECORD-00071_REL_003,RECORD-00071,P0005,Jay Rosen,Inspired By,P0294,William James,"William James and John Dewey are the heroes of the discipline, and two big ideas animate us.",0.9,2025-10-28
 RECORD-00071_REL_004,RECORD-00071,P0005,Jay Rosen,Inspired By,P0164,John Dewey,"William James and John Dewey are the heroes of the discipline, and two big ideas animate us.",0.9,2025-10-28
@@ -6178,7 +6178,7 @@ RECORD-00072_REL_001,RECORD-00072,P0005,Jay Rosen,Founded By,W0002,PressThink,"H
 RECORD-00073_REL_001,RECORD-00073,P0005,Jay Rosen,Pioneered,C0103,Open Source Journalism,what journalists now need to do is to work with bloggers to create a new form of Open Source Journalism.,0.9,2025-10-28
 RECORD-00077_REL_001,RECORD-00077,P0005,Jay Rosen,Pioneered,C0004,View from Nowhere,"The view from nowhere - that's the name Rosen gives to what he says is the media's true ideology, a way of falsely advertising that they can be trusted because they don't have any dog in the fight.",0.9,2025-10-28
 RECORD-00078_REL_001,RECORD-00078,P0317,Tom Paine,Pioneered,C0111,Old Testament Journalism,"A representative figure from the eighteen century would be the great pamphleteer Tom Paine, the trouble-making democrat who tried to rouse public opinion against arbitrary power... Old testament journ",0.8,2025-10-28
-RECORD-00079_REL_001,RECORD-00079,C0073,Press Think,Founded By,P0005,Jay Rosen,Jay Rosen... gave his interpretation of the business structure in his blog Press Think.,1,2025-10-28
+RECORD-00079_REL_001,RECORD-00079,O0033,PressThink,Founded By,P0005,Jay Rosen,Jay Rosen... gave his interpretation of the business structure in his blog Press Think.,1,2025-10-28
 RECORD-00079_REL_002,RECORD-00079,O0223,Guardian Media Group,Owns,O0158,The Guardian,He compared... to the structure of the Guardian Media Group – a profit-making business that... channels its earnings to support the independent journalism of the Guardian.,0.8,2025-10-28
 RECORD-00080_REL_001,RECORD-00080,P0005,Jay Rosen,Founded By,W0002,PressThink,"Jay Rosen, a professor of journalism at New York University and the author of the PressThink blog.",0.9,2025-10-28
 RECORD-00080_REL_002,RECORD-00080,P0005,Jay Rosen,Pioneered,C0004,View from Nowhere,"One is that the press is still very much in the grip of what I call the ""view from nowhere,"" this idea that they have to be objective and balanced and not take sides.",0.9,2025-10-28
@@ -6208,7 +6208,7 @@ RECORD-00106_REL_003,RECORD-00106,O0205,First Look Media,Owned By,P0300,Pierre O
 RECORD-00106_REL_004,RECORD-00106,P0005,Jay Rosen,Founded By,W0002,PressThink,"As I previously explained to readers of PressThink, I am an adviser to Omidyar’s company...",0.8,2025-10-28
 RECORD-00107_REL_001,RECORD-00107,O0456,NewAssignment.Net,Founded By,P0005,Jay Rosen,The site was created by Jay Rosen,1,2025-10-28
 RECORD-00108_REL_001,RECORD-00108,P0005,Jay Rosen,Founded By,W0002,PressThink,I call this blog PressThink because that’s the kind of work I do.,1,2025-10-28
-RECORD-00108_REL_002,RECORD-00108,P0005,Jay Rosen,Pioneered,C0053,Pressthink,I call this blog PressThink because that’s the kind of work I do. The title points to forms of thought that identify “journalism” to itself— but also to the habit of not thinking about certain things.,0.9,2025-10-28
+RECORD-00108_REL_002,RECORD-00108,P0005,Jay Rosen,Pioneered,O0033,PressThink,I call this blog PressThink because that’s the kind of work I do. The title points to forms of thought that identify “journalism” to itself— but also to the habit of not thinking about certain things.,0.9,2025-10-28
 RECORD-00109_REL_001,RECORD-00109,P0005,Jay Rosen,Founded By,W0002,PressThink,I have argued at PressThink,0.9,2025-10-28
 RECORD-00111_REL_003,RECORD-00111,W0002,PressThink,Founded By,P0005,Jay Rosen,PressThink is a publication from the Jay Rosen Digital Archive.,0.95,2025-10-28
 RECORD-00113_REL_001,RECORD-00113,O0327,Louisville Courier Journal,Pioneered,C0167,Ombudsman,"First ombudsman is 1967, Louisville Courier Journal.",1,2025-10-28
@@ -6402,7 +6402,7 @@ RECORD-00279_REL_001,RECORD-00279,P0005,Jay Rosen,Founded By,W0002,PressThink,"T
 RECORD-00280_REL_001,RECORD-00280,P0713,Doug McGill,Founded By,W0161,The Fading Mystique of an Objective Press,Doug McGill...wrote “The Fading Mystique of an Objective Press” for PressThink,1,2025-10-28
 RECORD-00280_REL_002,RECORD-00280,P0713,Doug McGill,Founded By,W0308,Local Man: Global Journalism,"Now he has a new weblog, Local Man: Global Journalism",1,2025-10-28
 RECORD-00280_REL_004,RECORD-00280,P0713,Doug McGill,Pioneered,C0356,Glocal Journalism,"McGill has a better idea than anything we conferencers ever came up with: “glocal journalism,”",0.9,2025-10-28
-RECORD-00282_REL_001,RECORD-00282,P0005,Jay Rosen,Founded By,C0053,Pressthink,Article Title: PressThink: The Terms of Authority Are Shifting by Jay Rosen,0.9,2025-10-28
+RECORD-00282_REL_001,RECORD-00282,P0005,Jay Rosen,Founded By,O0033,PressThink,Article Title: PressThink: The Terms of Authority Are Shifting by Jay Rosen,0.9,2025-10-28
 RECORD-00283_REL_001,RECORD-00283,W0002,PressThink,Founded By,P0005,Jay Rosen,"The article is titled 'PressThink' and is from the 'Jay Rosen Digital Archive,' strongly implying Jay Rosen as its founder.",0.95,2025-10-28
 RECORD-00287_REL_001,RECORD-00287,P0443,Michelle Nicolosi,Founded By,O0331,Japan Media Review,Michelle Nicolosi is...the founder of Japan Media Review.,1,2025-10-28
 RECORD-00288_REL_001,RECORD-00288,P0005,Jay Rosen,Founded By,W0002,PressThink,The article is from the Jay Rosen Digital Archive and titled 'PressThink: Hype Busting at Mother Jones Goes Bust'.,0.9,2025-10-28
@@ -6585,7 +6585,7 @@ RECORD-00411_REL_004,RECORD-00411,O0103,Congress,Owns,O0982,General Accounting O
 RECORD-00412_REL_001,RECORD-00412,P0059,Glenn Reynolds,Founded By,W0376,Instapundit,"Led by Glenn Reynolds of Instapundit, perhaps the most “watched” weblog in these matters",0.9,2025-10-29
 RECORD-00413_REL_001,RECORD-00413,W0002,PressThink,Founded By,P0005,Jay Rosen,"The article is from the 'Jay Rosen Digital Archive' and its title starts with 'PressThink:', indicating PressThink is Jay Rosen's platform.",1,2025-10-29
 RECORD-00414_REL_001,RECORD-00414,W0002,PressThink,Founded By,P0005,Jay Rosen,"PressThink: What if Everything Changed for American Journalists on September 11th? My Speculations. (The article is a 'PressThink' post, and 'My Speculations' refers to Jay Rosen, the author.)",0.9,2025-10-29
-RECORD-00415_REL_001,RECORD-00415,O0419,CBS News,Owned By,O0048,CBS,It is the ruling fiction at a network news division... Spokeswoman Kelli Edwards on Sep. 21: “It is obviously against CBS News standards...,0.9,2025-10-29
+RECORD-00415_REL_001,RECORD-00415,O0419,CBS News,Owned By,O0419,CBS News,It is the ruling fiction at a network news division... Spokeswoman Kelli Edwards on Sep. 21: “It is obviously against CBS News standards...,0.9,2025-10-29
 RECORD-00416_REL_001,RECORD-00416,W0504,Three Vital Questions for ABC News About its Anthrax Reporting in 2001,Inspired By,W0488,Vital unresolved anthrax questions and ABC News,They arise from two columns by Salon’s Glenn Greenwald... Vital unresolved anthrax questions and ABC News...,0.9,2025-10-29
 RECORD-00416_REL_002,RECORD-00416,W0504,Three Vital Questions for ABC News About its Anthrax Reporting in 2001,Inspired By,W0489,"Journalists, their lying sources, and the anthrax investigation","They arise from two columns by Salon’s Glenn Greenwald... Journalists, their lying sources, and the anthrax investigation...",0.9,2025-10-29
 RECORD-00416_REL_003,RECORD-00416,W0488,Vital unresolved anthrax questions and ABC News,Founded By,P0318,Glenn Greenwald,two columns by Salon’s Glenn Greenwald... Vital unresolved anthrax questions and ABC News...,0.9,2025-10-29
@@ -6634,7 +6634,7 @@ RECORD-00449_REL_001,RECORD-00449,P0005,Jay Rosen,Founded By,O0447,OffTheBus,"Of
 RECORD-00449_REL_002,RECORD-00449,P0183,Arianna Huffington,Founded By,O0447,OffTheBus,"OffTheBus itself, the site I started with Arianna Huffington last year.",1,2025-10-29
 RECORD-00449_REL_003,RECORD-00449,O0034,The Huffington Post,Owns,O0447,OffTheBus,"Huffington Post’s pro-am campaign coverage site, OffTheBus",0.9,2025-10-29
 RECORD-00449_REL_004,RECORD-00449,O0447,OffTheBus,Owned By,O0034,The Huffington Post,"Huffington Post’s pro-am campaign coverage site, OffTheBus",0.9,2025-10-29
-RECORD-00451_REL_001,RECORD-00451,O0419,CBS News,Owned By,O0048,CBS,CBS has to understand that its news division has become protagonist,0.95,2025-10-29
+RECORD-00451_REL_001,RECORD-00451,O0419,CBS News,Owned By,O0419,CBS News,CBS has to understand that its news division has become protagonist,0.95,2025-10-29
 RECORD-00454_REL_003,RECORD-00454,O0002,The New York Times,Founded By,W0419,TimesSelect,The New York Times was to have its own strategy; this became Times-Select.,0.9,2025-10-29
 RECORD-00454_REL_004,RECORD-00454,P0289,Rupert Murdoch,Owns,O0057,The Wall Street Journal,He thinks Murdoch will tear down the pay wall at the once-mighty Wall Street Journal,0.85,2025-10-29
 RECORD-00455_REL_001,RECORD-00455,P0005,Jay Rosen,Founded By,W0002,PressThink,"The article is titled 'PressThink: An American Journalist is Murdered in Russia: Paul Klebnikov, 1963-2004' and is from the Jay Rosen Digital Archive.",1,2025-10-29
@@ -6652,7 +6652,7 @@ RECORD-00462_REL_003,RECORD-00462,P1859,Adam Davidson,Owned By,O0031,NPR,"NPR, w
 RECORD-00464_REL_004,RECORD-00464,P0005,Jay Rosen,Owns,O0033,PressThink,PressThink: Politics in a Different Key,1,2025-10-29
 RECORD-00465_REL_001,RECORD-00465,W0002,PressThink,Founded By,P0005,Jay Rosen,"The article is titled 'PressThink' and is from the 'Jay Rosen Digital Archive,' with Jay Rosen ('I') as the author.",0.9,2025-10-29
 RECORD-00466_REL_001,RECORD-00466,P0005,Jay Rosen,Founded By,W0002,PressThink,"The article is from the 'Jay Rosen Digital Archive', titled 'PressThink', and 'I' (Jay Rosen) is the author. The quote is attributed to 'PressThink'.",1,2025-10-29
-RECORD-00466_REL_002,RECORD-00466,O0048,CBS,Owns,W0524,60 Minutes,Rather and his 60 Minutes team in a story about Bush’s National Guard service. (See the New York Times account. Here’s the CBS announcement.),0.9,2025-10-29
+RECORD-00466_REL_002,RECORD-00466,O0419,CBS News,Owns,W0524,60 Minutes,Rather and his 60 Minutes team in a story about Bush’s National Guard service. (See the New York Times account. Here’s the CBS announcement.),0.9,2025-10-29
 RECORD-00467_REL_001,RECORD-00467,P0005,Jay Rosen,Founded By,W0002,PressThink,"The article title 'PressThink: Did the President of CBS News Have Anyone in Charge of Reading the Internet and Sending Alerts?' indicates the article is from PressThink, a publication founded by Jay R",1,2025-10-29
 RECORD-00468_REL_001,RECORD-00468,P0005,Jay Rosen,Founded By,W0002,PressThink,The article is from the 'PressThink' blog within the 'Jay Rosen Digital Archive'.,0.9,2025-10-29
 RECORD-00468_REL_002,RECORD-00468,P0005,Jay Rosen,Pioneered,C0376,Strategic non-communication,McClellan’s style—a few posts ago I called it “strategic non-communication”—was the big loser in press accounts of Snow’s debut.,0.9,2025-10-29
@@ -6694,7 +6694,7 @@ RECORD-00522_REL_001,RECORD-00522,P0039,Arthur Sulzberger Jr.,Owns,O0002,The New
 RECORD-00524_REL_001,RECORD-00524,P1940,William Drentell,Founded By,O0525,Design Observer,Design Observer is probably the leading design blog out there. It was co-founded by William Drentell...,1,2025-10-29
 RECORD-00524_REL_002,RECORD-00524,O0525,Design Observer,Inspired By,W0084,NewAssignment.net,"Design Observer, inspired by Jay Rosen’s NewAssignment.Net, is looking for a design story...",1,2025-10-29
 RECORD-00524_REL_003,RECORD-00524,P0005,Jay Rosen,Founded By,W0084,NewAssignment.net,"Design Observer, inspired by Jay Rosen’s NewAssignment.Net...",0.9,2025-10-29
-RECORD-00526_REL_001,RECORD-00526,W0503,Sixty Minutes,Owned By,O0048,CBS,Sixty Minutes could publish on the Internet... CBS would be creating more value by publishing more source material...,0.8,2025-10-29
+RECORD-00526_REL_001,RECORD-00526,W0503,Sixty Minutes,Owned By,O0419,CBS News,Sixty Minutes could publish on the Internet... CBS would be creating more value by publishing more source material...,0.8,2025-10-29
 RECORD-00526_REL_003,RECORD-00526,P0005,Jay Rosen,Inspired By,P0010,Jeff Jarvis,I like Jeff Jarvis’s take— that “calling for more commissions and committees and all that” just “puts yet more distance between the journalists and the public they are supposed to serve.”,0.75,2025-10-29
 RECORD-00527_REL_001,RECORD-00527,P0180,Neil Postman,Inspired By,P0005,Jay Rosen,"He would teach you this angry eye, and that was one reason I hung around NYU and got a Ph.D.",0.9,2025-10-29
 RECORD-00527_REL_002,RECORD-00527,P0180,Neil Postman,Inspired By,C0003,Age of Insight,Among those I heard him talk about most often were Bertrand Russell...,0.7,2025-10-29
@@ -6775,7 +6775,7 @@ RECORD-00582_REL_003,RECORD-00582,W0650,This is NPR. And these are the standards
 RECORD-00582_REL_004,RECORD-00582,W0650,This is NPR. And these are the standards of our journalism.,Founded By,P0767,Mark Memmott,He co-wrote the handbook with Mark Memmott of NPR.,0.9,2025-10-29
 RECORD-00582_REL_005,RECORD-00582,W0002,PressThink,Founded By,P0005,Jay Rosen,earlier posts at PressThink about the troubles at NPR. (Implied by Jay Rosen's authorship and the article being from his archive.),0.9,2025-10-29
 RECORD-00583_REL_001,RECORD-00583,P0005,Jay Rosen,Pioneered,C0004,View from Nowhere,Rosen is famous for applying the paradoxical phrase “the view from nowhere” to the conventionally impartial journalism,0.9,2025-10-29
-RECORD-00584_REL_001,RECORD-00584,P0005,Jay Rosen,Founded By,C0073,Press Think,Jay teaches at NYU and writes a legendary blog called Press Think,0.9,2025-10-29
+RECORD-00584_REL_001,RECORD-00584,P0005,Jay Rosen,Founded By,O0033,PressThink,Jay teaches at NYU and writes a legendary blog called Press Think,0.9,2025-10-29
 RECORD-00586_REL_001,RECORD-00586,W0002,PressThink,Founded By,P0005,Jay Rosen,"As Jay Rosen, of PressThink, says about NPR's new ""Ethics Handbook""",0.9,2025-10-29
 RECORD-00586_REL_002,RECORD-00586,O0031,NPR,Pioneered,C0626,Fair to the truth,"It introduces a new and potentially powerful concept of fairness: being ""fair to the truth,""",0.9,2025-10-29
 RECORD-00588_REL_001,RECORD-00588,P0005,Jay Rosen,Pioneered,C0636,Not the odds but the stakes,"NYU journalism professor Jay Rosen exhorted political reporters to resist the lure of horse race coverage and shift their focus: “Not the odds, but the stakes.” It became a mantra...",0.9,2025-10-29
@@ -6808,6 +6808,6 @@ RECORD-00627_REL_003,RECORD-00627,C0098,The people formerly known as the audienc
 RECORD-00628_REL_003,RECORD-00628,P0957,Tom Scocca,Pioneered,C0004,View from Nowhere,The political writer Tom Scocca had a great term for this a few years back: the view from nowhere.,1,2025-10-29
 RECORD-00636_REL_001,RECORD-00636,P0005,Jay Rosen,Founded By,W0002,PressThink,"A placeholder for a future PressThink post... This is a big deal in my book, and I am almost ready to write about it.",0.9,2025-10-29
 RECORD-00651_REL_002,RECORD-00651,P0005,Jay Rosen,Pioneered,C0098,The people formerly known as the audience,"The entire article, attributed to Jay Rosen, elaborates on this core concept, which is widely recognized as his intellectual contribution.",0.9,2025-10-29
-RECORD-00651_REL_004,RECORD-00651,P0005,Jay Rosen,Owns,C0073,Press Think,"Read the whole text at Jay Rosen’s blog, Press Think",1,2025-10-29
+RECORD-00651_REL_004,RECORD-00651,P0005,Jay Rosen,Owns,O0033,PressThink,"Read the whole text at Jay Rosen’s blog, Press Think",1,2025-10-29
 RECORD-00654_REL_004,RECORD-00654,P0005,Jay Rosen,Pioneered,C0006,Transparency,"Third pillar: transparency, also called disclosure, so we know where you’re coming from and what your stake is in the matter under review, if any.",0.7,2025-10-29
 RECORD-00660_REL_001,RECORD-00660,O1234,News Creator Corps,Inspired By,P0005,Jay Rosen,"Rosen wrote in a blog post laying out the thinking behind his new position... This is the foundational idea behind NCC: the way people get their information has changed, and the way to make sure they’",0.9,2025-10-29

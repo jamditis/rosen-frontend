@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { html } from '../html.js?v=2.1.0';
+import { html } from '../html.js?v=2.2.0';
 import { ChevronDown, ChevronRight, ZoomIn, ZoomOut, Maximize2, Focus, HelpCircle } from 'lucide-react';
 
 // Enhanced node type styles with gradients and shadows

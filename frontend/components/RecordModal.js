@@ -1,9 +1,9 @@
 
 import { useEffect, useState } from 'react';
-import { html } from '../html.js?v=2.1.0';
+import { html } from '../html.js?v=2.2.0';
 import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2, Users, Building2, Lightbulb, BookOpen } from 'lucide-react';
-import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=2.1.0';
-import { ThreadModal } from './ThreadModal.js?v=2.1.0';
+import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=2.2.0';
+import { ThreadModal } from './ThreadModal.js?v=2.2.0';
 
 // Convert URLs in text to clickable links
 const linkifyText = (text) => {
@@ -201,7 +201,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
             <div className="flex items-center gap-2 text-xs font-bold uppercase text-stone-400 tracking-widest">
               <span>${displayRecord.date}</span>
               <span>•</span>
-              <span>${isVideo ? 'Video' : 'Article'}</span>
+              <span>${isVideo ? 'Video' : displayRecord.type === 'social' ? (displayRecord.pub || 'Social Media') : displayRecord.type === 'Dissertation' ? 'Dissertation' : 'Article'}</span>
               ${loadingDetails && html`
                 <span className="ml-2 flex items-center gap-1 text-stone-500">
                   <${Loader2} className="w-3 h-3 animate-spin" /> Loading...

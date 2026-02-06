@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { html } from '../html.js?v=2.1.0';
+import { html } from '../html.js?v=2.2.0';
 import { X, FileText, Quote, BookOpen, Lightbulb, User } from 'lucide-react';
 
 // Type labels for display

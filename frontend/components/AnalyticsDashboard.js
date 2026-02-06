@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { html } from '../html.js?v=2.1.0';
+import { html } from '../html.js?v=2.2.0';
 import {
   BarChart3,
   TrendingUp,
@@ -29,7 +29,7 @@ import {
   getCategoryCoOccurrence,
   getSqliteStats,
   queryAsObjects
-} from '../services/archiveService.js?v=2.1.0';
+} from '../services/archiveService.js?v=2.2.0';
 import QueryBuilder from './QueryBuilder.js';
 
 // Simple bar chart component

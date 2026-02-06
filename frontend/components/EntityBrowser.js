@@ -1,9 +1,9 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { html } from '../html.js?v=2.1.0';
+import { html } from '../html.js?v=2.2.0';
 import { Users, Building2, Lightbulb, BookOpen, MapPin, Calendar, Search, ArrowUpDown, ChevronDown, ChevronRight, X, ExternalLink } from 'lucide-react';
-import { fetchEntitiesData, getRecordsByEntity, getEntityById, areEntitiesLoaded } from '../services/archiveService.js?v=2.1.0';
-import { COLORS } from '../constants.js?v=2.1.0';
+import { fetchEntitiesData, getRecordsByEntity, getEntityById, areEntitiesLoaded } from '../services/archiveService.js?v=2.2.0';
+import { COLORS } from '../constants.js?v=2.2.0';
 
 const TYPE_CONFIG = {
   Person: { icon: Users, color: '#075985', bg: '#e0f2fe', label: 'People' },

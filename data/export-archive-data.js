@@ -132,7 +132,7 @@ function processRecord(row, index, type, relationshipsMap) {
     pub: pub,
     url: rawUrl,
     summary: (row.summary || row.Summary || title),
-    quote: (row.pull_quote || row.Pull_Quote || ''),
+    quote: (row.pull_quote || row.Pull_Quote || row.excerpt || row.raw_text || ''),
     categories: cats,
     concepts: concepts,
     tags: tags,
