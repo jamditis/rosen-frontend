@@ -1,9 +1,9 @@
 
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { html } from '../html.js?v=2.0.2';
+import { html } from '../html.js?v=2.1.0';
 import { ExternalLink, RefreshCw, Download, Settings2, Network, Users, Building2, Lightbulb, Globe, Tags } from 'lucide-react';
-import { COLORS } from '../constants.js?v=2.0.2';
-import { calculateEntityConnectionStrength, getEntitiesByRecord, fetchEntitiesData, areEntitiesLoaded } from '../services/archiveService.js?v=2.0.2';
+import { COLORS } from '../constants.js?v=2.1.0';
+import { calculateEntityConnectionStrength, getEntitiesByRecord, fetchEntitiesData, areEntitiesLoaded } from '../services/archiveService.js?v=2.1.0';
 
 // Connection mode configurations
 const CONNECTION_MODES = {

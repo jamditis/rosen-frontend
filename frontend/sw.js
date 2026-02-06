@@ -7,8 +7,8 @@
  * - External resources: Network-first with cache fallback
  */
 
-const CACHE_NAME = 'jrda-cache-v1';
-const DATA_CACHE_NAME = 'jrda-data-v1';
+const CACHE_NAME = 'jrda-cache-v2';
+const DATA_CACHE_NAME = 'jrda-data-v2';
 
 // Detect if we're running on localhost
 const IS_LOCAL = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';

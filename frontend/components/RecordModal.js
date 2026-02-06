@@ -1,9 +1,9 @@
 
 import { useEffect, useState } from 'react';
-import { html } from '../html.js?v=2.0.2';
+import { html } from '../html.js?v=2.1.0';
 import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2, Users, Building2, Lightbulb, BookOpen } from 'lucide-react';
-import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=2.0.2';
-import { ThreadModal } from './ThreadModal.js?v=2.0.2';
+import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=2.1.0';
+import { ThreadModal } from './ThreadModal.js?v=2.1.0';
 
 // Convert URLs in text to clickable links
 const linkifyText = (text) => {

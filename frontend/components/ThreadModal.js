@@ -1,4 +1,4 @@
-import { html } from '../html.js?v=2.0.2';
+import { html } from '../html.js?v=2.1.0';
 import { ExternalLink } from 'lucide-react';
 
 // Convert URLs in text to clickable links
