@@ -6,7 +6,7 @@
 
 ## Purpose
 
-A comprehensive collection exploring Jay Rosen's most influential concept: "the view from nowhere." This collection traces the concept's development, applications, and impact on media criticism.
+A collection exploring Jay Rosen's most influential concept: "the view from nowhere." This collection traces the concept's development, applications, and impact on media criticism.
 
 ---
 

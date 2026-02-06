@@ -34,7 +34,7 @@ In the 1990s, Rosen became a leading figure in the public journalism movement, w
 
 In 2003, Rosen launched PressThink.org, one of the earliest blogs dedicated to press criticism. Over two decades, PressThink has served as a platform for developing and testing ideas that have become central to media criticism. The blog pioneered the use of long-form analysis in the blogosphere and attracted a readership of journalists, academics, and citizens interested in how the press works—and how it fails.
 
-At NYU, Rosen has trained hundreds of journalism students, many of whom have gone on to leadership positions in newsrooms and media organizations. He created Studio 20, an innovative graduate program focused on building new forms of journalism for the digital age.
+At NYU, Rosen has trained hundreds of journalism students, many of whom have gone on to leadership positions in newsrooms and media organizations. He created Studio 20, a graduate program focused on building new forms of journalism for the digital age.
 
 His work has been featured in *The New York Times*, *The Washington Post*, *The Guardian*, *Columbia Journalism Review*, and countless other publications. He maintains an active presence on social media, where his analysis of press behavior during major political events reaches hundreds of thousands of readers.
 
@@ -94,7 +94,7 @@ The archive aims to include all publicly available writing and media by Jay Rose
 ### Data & Methodology
 
 **Content Collection:**
-The archive systematically collects publicly available content through a multi-stage process. URLs are identified through known publication venues, citation tracking, and comprehensive search. A Python-based scraping pipeline fetches content using a cascade approach: first attempting API-based extraction, then falling back to browser-based rendering for JavaScript-heavy sites.
+The archive systematically collects publicly available content through a multi-stage process. URLs are identified through known publication venues, citation tracking, and web search. A Python-based scraping pipeline fetches content using a cascade approach: first attempting API-based extraction, then falling back to browser-based rendering for JavaScript-heavy sites.
 
 **AI-Assisted Analysis:**
 Each record is processed through Google's Gemini AI to extract metadata (publication date, author, publication) and generate classifications. The system assigns thematic categories from a predefined taxonomy, identifies key concepts from Jay Rosen's theoretical vocabulary, and generates summaries and excerpts.
@@ -103,7 +103,7 @@ Each record is processed through Google's Gemini AI to extract metadata (publica
 A dedicated entity extraction pipeline identifies people, organizations, concepts, works, events, and locations mentioned in each record. An entity registry ensures consistent naming (e.g., "The New York Times," "NY Times," and "NYT" all resolve to a single canonical entity). Relationships between entities are mapped to enable network analysis.
 
 **Quality Assurance:**
-Human curation verifies AI-generated metadata. Quality scores flag records needing review. Regular audits check for data accuracy and consistency. A comprehensive logging system tracks processing status and identifies issues.
+Human curation verifies AI-generated metadata. Quality scores flag records needing review. Regular audits check for data accuracy and consistency. A logging system tracks processing status and identifies issues.
 
 **Archival Preservation:**
 Each record generates an archival PDF for long-term preservation. Original source links are maintained where available. The archive is designed to survive platform changes and link rot.

@@ -16,19 +16,21 @@ Landing page framing:
 
 ---
 
-## Current state vs. target
+## Current state (updated February 6, 2026)
 
-| Feature | Current | Target | Gap | Difficulty |
-|---------|---------|--------|-----|------------|
-| Key themes | 7 | 21 | +14 | Easy — drafts ready |
-| Quotations | 9 | 21 | +12 | Easy — drafts ready |
-| Featured works | 6 | 21 | +15 | Easy — drafts ready with record IDs |
-| Glossary | 16 | 21 | +5 | Easy |
-| Timeline | 13 | 21 | +8 | Medium |
-| Excerpts | 12 | 21 | +9 | Medium — needs excerpt text from PDF |
-| Context 1986 | 18 | 21 | +3 | Easy |
-| FAQ | 46 | 21 categories | Regroup | Medium — UI change |
-| Comparisons | 7 | 21 | +14 | Hard — most new content needed |
+| Feature | Count | Target | Status |
+|---------|-------|--------|--------|
+| Key themes | 21 | 21 | Done |
+| Quotations | 21 | 21 | Done |
+| Featured works | 21 | 21 | Done (Feb 6, 2026) |
+| Glossary | 29 | 21+ | Done (exceeds target) |
+| Timeline | 21 | 21 | Done |
+| Excerpts | 21 | 21 | Done |
+| Context 1986 | 21 | 21 | Done (9+4+8 across three arrays) |
+| FAQ | 46 | 46 | Skipped — works better at 46 |
+| Comparisons | 21 | 21 | Done |
+
+**All 21-item expansions are complete.** Remaining work: landing page "21" branding and UI presentation design.
 
 ---
 

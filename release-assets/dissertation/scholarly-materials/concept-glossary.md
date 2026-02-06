@@ -35,7 +35,7 @@ This glossary defines key terms and concepts introduced or developed in Jay Rose
 
 **Evolution in Later Work:**
 - Foundation for systems-level analysis of media
-- Informs PressThink's holistic approach to press criticism
+- Informs PressThink's ecological approach to press criticism
 
 ---
 

@@ -14,11 +14,11 @@
 
 ## Jay Rosen Internet Archive Launches with 36 Years of Journalism Criticism, Including Never-Before-Published 1986 Dissertation
 
-*Comprehensive searchable archive preserves four decades of influential media criticism; dissertation anticipates today's media crisis*
+*Searchable archive preserves four decades of media criticism; dissertation anticipates today's media crisis*
 
 ---
 
-**NEW YORK, NY** — The Jay Rosen Internet Archive, a comprehensive collection of journalism criticism spanning 36 years (1986-2025), launches today at https://pressthink.org/wp-content/rosen-archive/index.html. The archive includes over 849 records—articles, essays, blog posts, social media content, and videos—along with the first public release of Rosen's 1986 doctoral dissertation, "The Impossible Press: American Journalism and the Decline of Public Life."
+**NEW YORK, NY** — The Jay Rosen Internet Archive, a searchable collection of journalism criticism spanning 36 years (1986-2025), launches today at https://pressthink.org/wp-content/rosen-archive/index.html. The archive includes over 849 records—articles, essays, blog posts, social media content, and videos—along with the first public release of Rosen's 1986 doctoral dissertation, "The Impossible Press: American Journalism and the Decline of Public Life."
 
 Jay Rosen, professor of journalism at New York University since 1986, is one of the most widely read critics of the American press. His concepts, including "the view from nowhere," "the people formerly known as the audience," and "church of the savvy," have shaped how journalists, scholars, and the public understand media's role in democracy.
 
@@ -36,10 +36,12 @@ Nearly four decades later, with trust in media at historic lows and the business
 
 **The Dissertation:** The complete text of "The Impossible Press," now searchable and freely available, with chapter guides, discussion questions, and teaching materials.
 
-**Comprehensive Coverage:** The archive includes:
+**What's included:**
 - 765+ web articles, essays, and blog posts from PressThink, CJR, and dozens of other publications
 - 84 newspaper clippings spanning 1989-2023
 - Complete Twitter archive preserving key threads and commentary
+- Bluesky posts and threads
+- Tumblr posts from Studio 20
 - YouTube lectures and interviews with full transcripts
 - Complete PressThink blog archive (2003-present)
 
@@ -62,7 +64,7 @@ His concepts have entered the vocabulary of media criticism:
 
 ### About the Archive
 
-The Jay Rosen Internet Archive was created by [Joe Amditis](https://twitter.com/jsamditis). It uses automated processing with Google's Gemini AI, human curation and verification, and sophisticated entity extraction to preserve and make accessible Rosen's complete digital record.
+The Jay Rosen Internet Archive was created by [Joe Amditis](https://twitter.com/jsamditis). It uses automated processing with Google's Gemini AI, human curation and verification, and entity extraction to preserve and make accessible Rosen's complete digital record.
 
 The archive is designed for:
 - **Researchers** seeking primary sources on media criticism and journalism history

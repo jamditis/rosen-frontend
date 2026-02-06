@@ -45,7 +45,7 @@ Rosen's most influential concept. "The view from nowhere" describes the ideology
 
 **3. "The People Formerly Known as the Audience" (2006)**
 
-A defining statement on how the internet transformed the relationship between journalists and citizens. Rosen argues that the passive "audience" of the mass media era no longer exists—people now have the tools to produce, publish, and distribute their own content. This fundamentally changes what journalism is and who gets to do it.
+A defining statement on how the internet transformed the relationship between journalists and citizens. Rosen argues that the passive "audience" of the mass media era no longer exists—people now have the tools to produce, publish, and distribute their own content. This changes what journalism is and who gets to do it.
 
 **Key passage:** "The people formerly known as the audience wish to inform media people of our existence, and of a shift in power that goes with the platform shift you've all heard about."
 

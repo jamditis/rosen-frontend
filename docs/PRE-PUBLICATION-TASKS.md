@@ -85,15 +85,15 @@ Jay's job is simple: use the archive, tell us what's broken, and make editorial 
 
 Jay's idea. We build it. See `docs/21-STRUCTURE-PROPOSAL.md` for the full plan.
 
-- [ ] **Expand key themes from 7 to 21** — Draft complete, needs implementation in `dissertationData.js`
-- [ ] **Expand notable quotations from 9 to 21** — Draft complete, needs implementation in `dissertationData.js`
-- [ ] **Expand featured works from 6 to 21** — Draft complete with record IDs and URLs, needs implementation in `constants.js`
-- [ ] **Expand glossary from 16 to 21** (+5) — Easiest expansion
-- [ ] **Expand timeline from 13 to 21** (+8)
-- [ ] **Expand comparisons from 7 to 21** (+14) — Hardest expansion, most new content needed
-- [ ] **Expand annotated excerpts from 12 to 21** (+9)
-- [ ] **Group FAQ into 21 categories** — Or leave at 46 and skip this one
-- [ ] **Expand context 1986 from 18 to 21** (+3) — Easy
+- [x] **Expand key themes from 7 to 21** — Done. 21 themes in `dissertationData.js` KEY_THEMES array.
+- [x] **Expand notable quotations from 9 to 21** — Done. 21 quotations in `dissertationData.js` NOTABLE_QUOTATIONS array.
+- [x] **Expand featured works from 6 to 21** — Done (Feb 6, 2026). 21 works in `constants.js` FEATURED_WORKS array. Spans 1986-2025, covers all major Rosen concepts.
+- [x] **Expand glossary from 16 to 21** — Done. 29 terms in `dissertation/glossary/data.js` (exceeds target).
+- [x] **Expand timeline from 13 to 21** — Done. 21 milestones in `dissertation/timeline/data.js`.
+- [x] **Expand comparisons from 7 to 21** — Done. 21 comparisons in `dissertation/comparison/data.js`.
+- [x] **Expand annotated excerpts from 12 to 21** — Done. 21 excerpts in `dissertation/excerpts/data.js`.
+- [x] **FAQ stays at 46** — Skipped per recommendation in 21-STRUCTURE-PROPOSAL.md. 46 Q&A pairs, no forced regrouping.
+- [x] **Expand context 1986 to 21** — Done. 9 media landscape + 4 key events + 8 "what didn't exist" = 21 items across three arrays in `dissertation/context/data.js`.
 - [ ] **Update landing page** with "21" branding and framing
 - [ ] **Design the presentation** — How do the 21-item lists display in the UI?
 

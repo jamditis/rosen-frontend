@@ -29,7 +29,7 @@
 
 ### Opening
 
-Today, I'm excited to announce the launch of the **Jay Rosen Internet Archive**—a comprehensive, searchable collection of 36 years of journalism criticism.
+Today, I'm excited to announce the launch of the **Jay Rosen Internet Archive**—a searchable collection of 36 years of journalism criticism.
 
 The archive includes **849+ records** spanning 1986 to 2025: articles, essays, blog posts, Twitter threads, videos, and more.
 
@@ -46,6 +46,8 @@ The archive preserves Jay Rosen's complete digital record:
 - **765+ web articles, essays, and blog posts** from PressThink, CJR, and dozens of other publications
 - **84 newspaper clippings** from 1989-2023
 - **Twitter threads and posts** preserving his social media commentary
+- **Bluesky posts and threads**
+- **Tumblr posts** from Studio 20
 - **YouTube lectures and interviews**
 - **The complete 1986 dissertation**—never before publicly available
 

@@ -7,7 +7,7 @@
 ## General Questions
 
 ### What is the Jay Rosen Internet Archive?
-The Jay Rosen Internet Archive is a comprehensive, searchable collection of journalism criticism, media commentary, and public engagement by Jay Rosen spanning 36 years (1986-2025). It includes articles, blog posts, social media content, videos, newspaper clippings, and his 1986 doctoral dissertation.
+The Jay Rosen Internet Archive is a searchable collection of journalism criticism, media commentary, and public engagement by Jay Rosen spanning 36 years (1986-2025). It includes articles, blog posts, social media content, videos, newspaper clippings, and his 1986 doctoral dissertation.
 
 ### Who is Jay Rosen?
 Jay Rosen is a professor of journalism at New York University who has been teaching and writing about the press since 1986. He is one of the most influential critics of American journalism, known for concepts like "the view from nowhere" and "the people formerly known as the audience." He founded PressThink.org and has been a leading voice on press criticism, journalism education, and the relationship between media and democracy.

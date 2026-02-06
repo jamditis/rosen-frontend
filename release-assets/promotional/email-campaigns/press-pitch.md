@@ -28,7 +28,7 @@ On December 2, we're publicly releasing Jay Rosen's 1986 doctoral dissertation, 
 
 **The hook:** Written under Neil Postman before the internet, before social media, before the current trust crisis—it diagnoses structural problems in press-public relations that feel remarkably current. Passages about "the competition for attention" and "communication outrunning community" read like they were written last week.
 
-**The package:** The dissertation is being released as part of the new Jay Rosen Internet Archive, which includes 849+ records spanning 36 years of Rosen's journalism criticism—articles, essays, PressThink posts, Twitter threads, and more—all searchable and structured for research.
+**The package:** The dissertation is being released as part of the new Jay Rosen Internet Archive, which includes 849+ records spanning 36 years of Rosen's journalism criticism—articles, essays, PressThink posts, Twitter threads, Bluesky posts, and more—all searchable and structured for research.
 
 **Why now:** With trust in media at historic lows and the business model of journalism in crisis, the dissertation's analysis of the fundamental tensions between commercial imperatives and public service feels urgent.
 

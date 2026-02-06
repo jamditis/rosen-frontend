@@ -18,7 +18,7 @@
 
 ### The Archive Is Live
 
-Today we're launching the [Jay Rosen Internet Archive](https://pressthink.org/wp-content/rosen-archive/index.html)—a comprehensive, searchable collection of 36 years of journalism criticism.
+Today we're launching the [Jay Rosen Internet Archive](https://pressthink.org/wp-content/rosen-archive/index.html)—a searchable collection of 36 years of journalism criticism.
 
 The archive contains 849+ records spanning 1986 to 2025: articles, essays, blog posts, Twitter threads, videos, and more. Every piece is searchable, categorized, and connected to the people, organizations, and concepts it discusses.
 

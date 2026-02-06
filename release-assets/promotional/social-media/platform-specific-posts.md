@@ -153,7 +153,7 @@ https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 Today, we're launching a project I've been working on for the past several months: the Jay Rosen Internet Archive.
 
 **What it is:**
-A comprehensive, searchable archive of journalism criticism by Jay Rosen, NYU professor and one of the most influential voices in media criticism for the past four decades.
+A searchable archive of journalism criticism by Jay Rosen, NYU professor and one of the most influential voices in media criticism for the past four decades.
 
 **What's included:**
 • 849+ records spanning 1986-2025
