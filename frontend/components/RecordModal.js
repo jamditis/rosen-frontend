@@ -1,9 +1,9 @@
 
 import { useEffect, useState } from 'react';
-import { html } from '../html.js?v=2.2.0';
+import { html } from '../html.js?v=3.0.1';
 import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2, Users, Building2, Lightbulb, BookOpen } from 'lucide-react';
-import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=2.2.0';
-import { ThreadModal } from './ThreadModal.js?v=2.2.0';
+import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.0.2';
+import { ThreadModal } from './ThreadModal.js?v=3.0.1';
 
 // Convert URLs in text to clickable links
 const linkifyText = (text) => {
@@ -22,23 +22,27 @@ const linkifyText = (text) => {
   });
 };
 
-const TagGroup = ({title, tags}) => {
+const TagGroup = ({title, tags, onClick}) => {
     if (!tags || tags.length === 0) return null;
     return html`
         <div className="mb-6">
             <h5 className="text-xs font-bold uppercase text-stone-400 mb-2">${title}</h5>
             <div className="flex flex-wrap gap-2">
                 ${tags.map(t => html`
-                    <span key=${t} className="bg-stone-100 text-stone-700 px-2 py-1 rounded text-xs border border-stone-200">
+                    <button
+                      key=${t}
+                      onClick=${onClick ? () => onClick(t) : undefined}
+                      className=${`bg-stone-100 text-stone-700 px-2 py-1 rounded text-xs border border-stone-200 ${onClick ? 'hover:bg-stone-800 hover:text-white hover:border-stone-800 cursor-pointer transition-colors' : ''}`}
+                    >
                         ${t}
-                    </span>
+                    </button>
                 `)}
             </div>
         </div>
     `;
 }
 
-const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSelectRecord, hasPrev, hasNext, currentIndex, total }) => {
+const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSelectRecord, onFilterCategory, onFilterSearch, hasPrev, hasNext, currentIndex, total }) => {
   const [isClosing, setIsClosing] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -268,19 +272,6 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
               </div>
             `}
 
-            <hr className="my-8 border-stone-200" />
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-               <${TagGroup} title="Thematic categories" tags=${displayRecord.categories} />
-               <${TagGroup} title="Tags" tags=${displayRecord.tags} />
-               <${TagGroup} title="Key concepts" tags=${displayRecord.concepts} />
-
-               <div>
-                  <h5 className="text-xs font-bold uppercase text-stone-400 mb-2">Era</h5>
-                  <span className="inline-block px-3 py-1 bg-stone-800 text-white text-xs font-bold rounded">${displayRecord.era}</span>
-               </div>
-            </div>
-            
             ${relatedWorks.length > 0 && html`
                 <div className="border-t border-stone-200 pt-8">
                     <h3 className="text-xl font-display font-bold text-stone-900 mb-4 flex items-center gap-2">
@@ -297,7 +288,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
                                   <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">${rel.date}</span>
                                   ${rel.connectionStrength > 0 && html`
                                     <span className="text-[10px] font-mono px-1.5 py-0.5 bg-stone-200 text-stone-600 rounded">
-                                      ${rel.connectionStrength} shared
+                                      ${rel.connectionStrength} shared ${rel.connectionStrength === 1 ? 'entity' : 'entities'}
                                     </span>
                                   `}
                                 </div>
@@ -307,13 +298,13 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
                                 <div className="text-xs text-stone-500 truncate mb-2">${rel.pub}</div>
                                 ${rel.sharedEntities && rel.sharedEntities.length > 0 && html`
                                   <div className="flex flex-wrap gap-1">
-                                    ${rel.sharedEntities.slice(0, 3).map(entity => html`
-                                      <span key=${entity.id || entity.name} className="text-[10px] px-1.5 py-0.5 bg-white border border-stone-200 rounded text-stone-500 truncate max-w-[120px]">
+                                    ${rel.sharedEntities.slice(0, 4).map(entity => html`
+                                      <span key=${entity.id || entity.name} className="text-[10px] px-1.5 py-0.5 bg-white border border-stone-200 rounded text-stone-500">
                                         ${entity.name}
                                       </span>
                                     `)}
-                                    ${rel.sharedEntities.length > 3 && html`
-                                      <span className="text-[10px] text-stone-400">+${rel.sharedEntities.length - 3}</span>
+                                    ${rel.sharedEntities.length > 4 && html`
+                                      <span className="text-[10px] text-stone-400">+${rel.sharedEntities.length - 4}</span>
                                     `}
                                   </div>
                                 `}
@@ -322,6 +313,19 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
                     </div>
                 </div>
             `}
+
+            <hr className="my-8 border-stone-200" />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+               <${TagGroup} title="Thematic categories" tags=${displayRecord.categories} onClick=${onFilterCategory ? (cat) => { handleClose(); onFilterCategory(cat); } : undefined} />
+               <${TagGroup} title="Tags" tags=${displayRecord.tags} onClick=${onFilterSearch ? (tag) => { handleClose(); onFilterSearch(tag); } : undefined} />
+               <${TagGroup} title="Key concepts" tags=${displayRecord.concepts} onClick=${onFilterSearch ? (concept) => { handleClose(); onFilterSearch(concept); } : undefined} />
+
+               <div>
+                  <h5 className="text-xs font-bold uppercase text-stone-400 mb-2">Era</h5>
+                  <span className="inline-block px-3 py-1 bg-stone-800 text-white text-xs font-bold rounded">${displayRecord.era}</span>
+               </div>
+            </div>
           </div>
 
           <div className="p-4 border-t border-stone-200 bg-stone-50 flex justify-between items-center text-sm">

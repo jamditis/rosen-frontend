@@ -1,24 +1,27 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=2.2.0';
-import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=2.2.0';
-import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=2.2.0';
+import { html } from './html.js?v=3.0.1';
+import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Github } from 'lucide-react';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.0.2';
+import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.0.1';
+import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.0.1';
 
 // Detect environment for path generation
 const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const FEATURES_PATH = IS_LOCAL ? '../dissertation' : '/j/rosen-archive/dissertation';
-import Sidebar from './components/Sidebar.js?v=2.2.0';
-import WelcomeModal from './components/WelcomeModal.js?v=2.2.0';
-import RecordModal from './components/RecordModal.js?v=2.2.0';
-import FeaturedSection from './components/FeaturedSection.js?v=2.2.0';
-import Explorer from './components/Explorer.js?v=2.2.0';
-import DissertationPage from './components/DissertationPage.js?v=2.2.0';
-import ToolsModal from './components/ToolsModal.js?v=2.2.0';
-import LoadingQuotes from './components/LoadingQuotes.js?v=2.2.0';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=2.2.0';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=2.2.0';
-import EntityBrowser from './components/EntityBrowser.js?v=2.2.0';
+import Sidebar from './components/Sidebar.js?v=3.0.1';
+import WelcomeModal from './components/WelcomeModal.js?v=3.0.1';
+import RecordModal from './components/RecordModal.js?v=3.0.1';
+import FeaturedSection from './components/FeaturedSection.js?v=3.0.1';
+import Explorer from './components/Explorer.js?v=3.0.3';
+import DissertationPage from './components/DissertationPage.js?v=3.0.1';
+import ToolsModal from './components/ToolsModal.js?v=3.0.1';
+import LoadingQuotes from './components/LoadingQuotes.js?v=3.0.1';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.0.1';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.0.1';
+import EntityBrowser from './components/EntityBrowser.js?v=3.0.1';
+import Timeline from './components/Timeline.js?v=3.0.1';
+import AboutPage from './components/AboutPage.js?v=3.0.1';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
@@ -26,7 +29,7 @@ const Highlight = ({ text, term }) => {
   const parts = text.split(new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
   return html`
     <span>
-      ${parts.map((part, i) => 
+      ${parts.map((part, i) =>
         part.toLowerCase() === term.toLowerCase() ? html`<mark key=${i}>${part}</mark>` : part
       )}
     </span>
@@ -40,15 +43,13 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [viewMode, setViewMode] = useState('grid');
+  const [currentRoute, setCurrentRoute] = useState(() => getCurrentRoute());
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('date-asc');
   const [isScrolled, setIsScrolled] = useState(false);
   const [selectedRecordId, setSelectedRecordId] = useState(null);
-  const [currentView, setCurrentView] = useState('archive'); // 'archive' or 'dissertation'
   const [toolsModalOpen, setToolsModalOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [analyticsOpen, setAnalyticsOpen] = useState(false);
 
   const [filters, setFilters] = useState({
     search: '',
@@ -64,69 +65,73 @@ const App = () => {
   const resultsRef = useRef(null);
   const recordsRef = useRef(null);
 
-  // Check URL for view param on mount and handle browser back/forward
+  // Migrate legacy ?view= URLs on mount, then sync hash state
   useEffect(() => {
-    const handleURLChange = () => {
-      const params = new URLSearchParams(window.location.search);
-      const viewParam = params.get('view');
-      const recordParam = params.get('record');
+    migrateLegacyUrl();
 
-      if (viewParam === 'dissertation') {
-        setCurrentView('dissertation');
+    const syncRoute = () => {
+      const route = getCurrentRoute();
+      setCurrentRoute(route);
+
+      const recordId = getRecordIdFromUrl();
+      if (recordId && records.length > 0) {
+        const target = records.find(r => r.id === recordId);
+        setSelectedRecordId(target ? recordId : null);
+      } else if (!recordId) {
         setSelectedRecordId(null);
-      } else {
-        setCurrentView('archive');
-        if (recordParam && records.length > 0) {
-          const target = records.find(r => r.id === recordParam);
-          if (target) {
-            setSelectedRecordId(recordParam);
-          } else {
-            setSelectedRecordId(null);
-          }
-        } else {
-          setSelectedRecordId(null);
-        }
       }
     };
 
-    // Handle initial URL state
-    handleURLChange();
-
-    // Listen for browser back/forward navigation
-    window.addEventListener('popstate', handleURLChange);
-    return () => window.removeEventListener('popstate', handleURLChange);
+    syncRoute();
+    window.addEventListener('hashchange', syncRoute);
+    window.addEventListener('popstate', syncRoute);
+    return () => {
+      window.removeEventListener('hashchange', syncRoute);
+      window.removeEventListener('popstate', syncRoute);
+    };
   }, [records]);
 
-  // Update URL when view changes
+  // Update URL when record selected (without changing route)
   useEffect(() => {
     const url = new URL(window.location.href);
-    if (currentView === 'dissertation') {
-      url.searchParams.set('view', 'dissertation');
-      url.searchParams.delete('record');
+    if (selectedRecordId) {
+      url.searchParams.set('record', selectedRecordId);
     } else {
-      url.searchParams.delete('view');
+      url.searchParams.delete('record');
     }
     try {
-      window.history.pushState({}, '', url);
+      window.history.replaceState({}, '', url);
     } catch(e) { console.warn("History update blocked"); }
-  }, [currentView]);
+  }, [selectedRecordId]);
 
-  // Navigation handlers
-  const navigateToDissertation = () => setCurrentView('dissertation');
-  const navigateToArchive = () => setCurrentView('archive');
+  // Navigation helpers
+  const goTo = useCallback((route) => {
+    navigateTo(route);
+  }, []);
+
+  // Tag click handlers (from RecordModal) — go to archive and filter
+  const handleFilterCategory = useCallback((cat) => {
+    setFilters(prev => ({ ...prev, categories: [cat] }));
+    navigateTo(ROUTES.archive);
+  }, []);
+
+  const handleFilterSearch = useCallback((term) => {
+    setFilters(prev => ({ ...prev, search: term }));
+    navigateTo(ROUTES.archive);
+  }, []);
 
   // Tool selection handler
   const handleToolSelect = useCallback((action) => {
     if (action === 'mindmap') {
-      setCurrentView('dissertation');
+      navigateTo(ROUTES.dissertation);
     } else if (action === 'explorer') {
-      setViewMode('explorer');
+      navigateTo(ROUTES.explorer);
     } else if (action === 'entities') {
-      setViewMode('entities');
+      navigateTo(ROUTES.entities);
     }
   }, []);
 
-  // Load Data (optimized: core data first, details preloaded in background)
+  // Load Data
   useEffect(() => {
     fetchCoreData()
       .then((data) => {
@@ -134,9 +139,6 @@ const App = () => {
         setFacets(data.facets);
         setAutocompleteIndex(data.autocompleteIndex);
         setLoading(false);
-
-        // Preload details in background after initial render
-        // This ensures modal opens instantly even on first click
         setTimeout(() => preloadDetails(), 1000);
       })
       .catch(err => {
@@ -145,19 +147,6 @@ const App = () => {
         setLoading(false);
       });
   }, []);
-
-  // Update URL when record selected
-  useEffect(() => {
-      const url = new URL(window.location.href);
-      if (selectedRecordId) {
-          url.searchParams.set('record', selectedRecordId);
-      } else {
-          url.searchParams.delete('record');
-      }
-      try {
-        window.history.pushState({}, '', url);
-      } catch(e) { console.warn("History update blocked"); }
-  }, [selectedRecordId]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -172,7 +161,6 @@ const App = () => {
   const filteredRecords = useMemo(() => {
     const term = filters.search.toLowerCase();
     let res = records.filter(r => {
-      // Use summaryPreview for search (available in core data)
       const summary = r.summaryPreview || r.summary || '';
       const matchesSearch = !term ||
         r.title.toLowerCase().includes(term) ||
@@ -190,19 +178,16 @@ const App = () => {
       } else if (filters.era) {
         if (r.era !== filters.era) return false;
       }
-      
+
       if (filters.type === 'article') {
-         // Articles are non-social content
          if (r.type === 'social') return false;
       } else if (filters.type) {
-         // Specific social platform types
          if (r.type !== 'social') return false;
          const platform = filters.type;
          if (platform === 'twitter' && !r.pub.toLowerCase().includes('twitter') && !r.pub.toLowerCase().includes('x.com')) return false;
          if (platform === 'bluesky' && !r.pub.toLowerCase().includes('bluesky')) return false;
       }
 
-      // Hide social media replies by default (they flood the archive with low-value content)
       if (!filters.includeReplies && r.type === 'social' && r.title.toLowerCase().includes('reply')) {
         return false;
       }
@@ -223,9 +208,14 @@ const App = () => {
     setCurrentPage(1);
   }, [filters, sortBy]);
 
+  // Derive viewMode from route for backward-compatible logic
+  const viewMode = currentRoute === ROUTES.folders ? 'folder' : 'grid';
+
   useEffect(() => {
-    if ((filters.search || filters.year) && viewMode === 'folder') setViewMode('grid');
-  }, [filters.search, filters.year, viewMode]);
+    if ((filters.search || filters.year) && currentRoute === ROUTES.folders) {
+      navigateTo(ROUTES.archive);
+    }
+  }, [filters.search, filters.year, currentRoute]);
 
   const totalPages = Math.ceil(filteredRecords.length / ITEMS_PER_PAGE);
   const paginatedRecords = filteredRecords.slice(
@@ -239,22 +229,22 @@ const App = () => {
       r.categories.forEach(c => counts[c] = (counts[c] || 0) + 1);
     });
     return Object.keys(counts)
-      .filter(cat => counts[cat] >= 10) // Only show categories with 10+ records
+      .filter(cat => counts[cat] >= 10)
       .sort((a, b) => counts[b] - counts[a])
-      .slice(0, 6) // Limit to top 6 folders
+      .slice(0, 6)
       .map(cat => ({ name: cat, count: counts[cat] }));
   }, [filteredRecords]);
 
   const handleFolderClick = (category) => {
     setFilters(prev => ({ ...prev, categories: [category] }));
-    setViewMode('grid');
+    navigateTo(ROUTES.archive);
   };
 
   const handleModalNav = (direction) => {
     if (!selectedRecordId) return;
     const idx = filteredRecords.findIndex(r => r.id === selectedRecordId);
     if (idx === -1) return;
-    
+
     if (direction === 'next' && idx < filteredRecords.length - 1) {
       setSelectedRecordId(filteredRecords[idx + 1].id);
     } else if (direction === 'prev' && idx > 0) {
@@ -264,13 +254,16 @@ const App = () => {
 
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-    // Scroll to top of records grid instead of top of page
     if (recordsRef.current) {
-        const offset = 100; // Header buffer
+        const offset = 100;
         const top = recordsRef.current.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top, behavior: 'smooth' });
     }
   };
+
+  const handleYearSelect = useCallback((year) => {
+    setFilters(prev => ({ ...prev, year, era: null }));
+  }, []);
 
   const years = records.map(r => parseInt(r.year)).filter(y => !isNaN(y));
   const minYear = years.length ? Math.min(...years) : 0;
@@ -279,19 +272,56 @@ const App = () => {
   const selectedRecord = records.find(r => r.id === selectedRecordId) || null;
   const selectedRecordIndex = filteredRecords.findIndex(r => r.id === selectedRecordId);
 
-  const isExplorer = viewMode === 'explorer';
-  const isEntityBrowser = viewMode === 'entities';
+  const isExplorer = currentRoute === ROUTES.explorer;
+  const isEntityBrowser = currentRoute === ROUTES.entities;
+  const isAnalytics = currentRoute === ROUTES.analytics;
+  const isArchiveGrid = currentRoute === ROUTES.archive || currentRoute === ROUTES.folders;
 
-  // Calculate active filter count
   const activeFilterCount = (filters.search ? 1 : 0) +
     filters.categories.length +
     (filters.era ? 1 : 0) +
     (filters.year ? 1 : 0) +
     (filters.type ? 1 : 0);
 
-  // If viewing dissertation, render the dissertation page
-  if (currentView === 'dissertation') {
-    return html`<${DissertationPage} onBack=${navigateToArchive} />`;
+  // Full-page routes: dissertation, about, analytics
+  if (currentRoute === ROUTES.dissertation) {
+    return html`<${DissertationPage} onBack=${() => goTo(ROUTES.archive)} />`;
+  }
+
+  if (currentRoute === ROUTES.about) {
+    return html`<${AboutPage} onBack=${() => goTo(ROUTES.archive)} records=${records} />`;
+  }
+
+  if (isAnalytics) {
+    return html`<${AnalyticsDashboard} onBack=${() => goTo(ROUTES.archive)} />`;
+  }
+
+  // Explorer gets its own full-width layout (no sidebar, no archive chrome)
+  if (isExplorer) {
+    return html`
+      <div className="min-h-screen flex flex-col">
+        <${WelcomeModal} />
+        <${RecordModal}
+          record=${selectedRecord}
+          allRecords=${records}
+          isOpen=${!!selectedRecordId}
+          onClose=${() => setSelectedRecordId(null)}
+          onNext=${() => handleModalNav('next')}
+          onPrev=${() => handleModalNav('prev')}
+          onSelectRecord=${setSelectedRecordId}
+          onFilterCategory=${handleFilterCategory}
+          onFilterSearch=${handleFilterSearch}
+          hasPrev=${selectedRecordIndex > 0}
+          hasNext=${selectedRecordIndex < filteredRecords.length - 1}
+          currentIndex=${selectedRecordIndex}
+          total=${filteredRecords.length}
+        />
+        ${!loading && html`
+          <${Explorer} records=${records} onBack=${() => goTo(ROUTES.archive)} />
+        `}
+        ${loading && html`<${LoadingQuotes} />`}
+      </div>
+    `;
   }
 
   return html`
@@ -304,12 +334,7 @@ const App = () => {
         onSelectTool=${handleToolSelect}
       />
 
-      <${AnalyticsDashboard}
-        isOpen=${analyticsOpen}
-        onClose=${() => setAnalyticsOpen(false)}
-      />
-
-      <${RecordModal} 
+      <${RecordModal}
         record=${selectedRecord}
         allRecords=${records}
         isOpen=${!!selectedRecordId}
@@ -317,6 +342,8 @@ const App = () => {
         onNext=${() => handleModalNav('next')}
         onPrev=${() => handleModalNav('prev')}
         onSelectRecord=${setSelectedRecordId}
+        onFilterCategory=${handleFilterCategory}
+        onFilterSearch=${handleFilterSearch}
         hasPrev=${selectedRecordIndex > 0}
         hasNext=${selectedRecordIndex < filteredRecords.length - 1}
         currentIndex=${selectedRecordIndex}
@@ -324,13 +351,13 @@ const App = () => {
       />
 
       <header className=${`sticky top-0 z-50 w-full border-b transition-all duration-300 ${
-          isScrolled 
-            ? 'bg-paper border-stone-300 shadow-sm' 
+          isScrolled
+            ? 'bg-paper border-stone-300 shadow-sm'
             : 'bg-paper/80 backdrop-blur-md border-stone-200'
       }`}>
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
             <button
-              onClick=${navigateToArchive}
+              onClick=${() => goTo(ROUTES.archive)}
               className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
               aria-label="Return to archive home"
             >
@@ -356,7 +383,6 @@ const App = () => {
             </div>
 
             <div className="flex items-center gap-4">
-                <!-- Mobile-only Tools Button (shows when tools section isn't visible) -->
                 <button
                   onClick=${() => setToolsModalOpen(true)}
                   className="sm:hidden p-2 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-md border border-stone-200"
@@ -364,10 +390,18 @@ const App = () => {
                 >
                     <${Compass} className="w-5 h-5" />
                 </button>
-                <a href="https://twitter.com/jsamditis" target="_blank" rel="noreferrer" className="text-stone-500 hover:text-stone-900 transition-colors text-xs hidden md:inline-block">
+                <button
+                  onClick=${() => goTo(ROUTES.about)}
+                  className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-md transition-colors hidden md:flex items-center gap-1 text-xs"
+                  aria-label="About"
+                >
+                    <${Info} className="w-4 h-4" />
+                    <span>About</span>
+                </button>
+                <a href="https://github.com/jamditis" target="_blank" rel="noreferrer" className="text-stone-500 hover:text-stone-900 transition-colors text-xs hidden md:inline-block">
                     Curated by Joe Amditis
                 </a>
-                ${!isExplorer && !isEntityBrowser && html`
+                ${isArchiveGrid && html`
                     <button
                     onClick=${() => setSidebarOpen(true)}
                     className="lg:hidden p-2 text-stone-800 hover:bg-stone-100 rounded-md border border-stone-300 relative"
@@ -384,12 +418,12 @@ const App = () => {
         </div>
       </header>
 
-      <${WorkInProgressBanner} onNavigateToDissertation=${navigateToDissertation} />
+      <${WorkInProgressBanner} />
 
-      <div className=${`flex-grow container mx-auto px-4 py-6 flex gap-8 ${isExplorer || isEntityBrowser ? 'justify-center' : ''}`}>
+      <div className=${`flex-grow container mx-auto px-4 py-6 flex gap-8 ${isEntityBrowser ? 'justify-center' : ''}`}>
 
-         ${!isExplorer && !isEntityBrowser && html`
-             <${Sidebar} 
+         ${isArchiveGrid && html`
+             <${Sidebar}
                 facets=${facets}
                 filters=${filters}
                 setFilters=${setFilters}
@@ -401,37 +435,36 @@ const App = () => {
          `}
 
          <main className="flex-grow min-w-0 flex flex-col">
-            
-            ${!isExplorer && !isEntityBrowser && html`
+
+            ${isArchiveGrid && html`
                 <div>
-                    <!-- Tools Section (above Featured Works) - always visible even while loading -->
                     ${!filters.search && !filters.era && !filters.year && filters.categories.length === 0 && html`
                         <section className="mb-6 pb-4 border-b border-stone-200">
                             <div className="flex flex-wrap items-center gap-2">
                                 <span className="text-xs text-stone-500 mr-1">Tools:</span>
                                 <button
-                                    onClick=${navigateToDissertation}
+                                    onClick=${() => goTo(ROUTES.dissertation)}
                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
                                 >
                                     <${BookOpen} className="w-3.5 h-3.5" />
                                     Mind Map
                                 </button>
                                 <button
-                                    onClick=${() => setViewMode('explorer')}
+                                    onClick=${() => goTo(ROUTES.explorer)}
                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
                                 >
                                     <${Network} className="w-3.5 h-3.5" />
                                     Network
                                 </button>
                                 <button
-                                    onClick=${() => setViewMode('entities')}
+                                    onClick=${() => goTo(ROUTES.entities)}
                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
                                 >
                                     <${Users} className="w-3.5 h-3.5" />
                                     Entities
                                 </button>
                                 <button
-                                    onClick=${() => setAnalyticsOpen(true)}
+                                    onClick=${() => goTo(ROUTES.analytics)}
                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
                                 >
                                     <${BarChart3} className="w-3.5 h-3.5" />
@@ -441,13 +474,13 @@ const App = () => {
                                     href=${`${FEATURES_PATH}/comparison/`}
                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
                                 >
-                                    ⚡ Then & Now
+                                    Then & Now
                                 </a>
                                 <a
                                     href=${`${FEATURES_PATH}/glossary/`}
                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
                                 >
-                                    📚 Glossary
+                                    Glossary
                                 </a>
                                 <button
                                     onClick=${() => setToolsModalOpen(true)}
@@ -463,68 +496,75 @@ const App = () => {
                     ${!loading && !filters.search && !filters.era && !filters.year && filters.categories.length === 0 && html`
                         <${FeaturedSection} />
                     `}
+
+                    ${!loading && !filters.search && !filters.era && filters.categories.length === 0 && html`
+                        <${Timeline}
+                          records=${records}
+                          selectedYear=${filters.year}
+                          onSelectYear=${handleYearSelect}
+                        />
+                    `}
                 </div>
             `}
 
+            ${isArchiveGrid && html`
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-stone-200 pb-4 scroll-mt-24" ref=${recordsRef}>
                 <div className="font-display text-stone-500 text-sm">
-                    ${isExplorer
-                        ? "Interactive relationship explorer"
-                        : isEntityBrowser
-                        ? "Browse entities and their connections"
-                        : (loading ? 'Loading archive...' : `${filteredRecords.length} records found`)
-                    }
+                    ${loading ? 'Loading archive...' : `${filteredRecords.length} records found`}
                 </div>
                 <div className="flex items-center gap-3">
                    <div className="flex bg-stone-200 p-1 rounded mr-4">
-                        <button 
-                          onClick=${() => setViewMode('grid')}
-                          className=${`flex items-center justify-center gap-2 py-1.5 px-3 text-xs font-medium rounded shadow-sm transition-all ${viewMode === 'grid' ? 'bg-white text-stone-900' : 'text-stone-600 hover:bg-stone-100'}`}
+                        <button
+                          onClick=${() => goTo(ROUTES.archive)}
+                          className=${`flex items-center justify-center gap-2 py-1.5 px-3 text-xs font-medium rounded shadow-sm transition-all ${currentRoute === ROUTES.archive ? 'bg-white text-stone-900' : 'text-stone-600 hover:bg-stone-100'}`}
                           title="Grid View"
                         >
                             <${LayoutGrid} className="w-3 h-3" /> <span className="hidden sm:inline">Cards</span>
                         </button>
                         <button
-                          onClick=${() => setViewMode('folder')}
-                          className=${`flex items-center justify-center gap-2 py-1.5 px-3 text-xs font-medium rounded shadow-sm transition-all ${viewMode === 'folder' ? 'bg-white text-stone-900' : 'text-stone-600 hover:bg-stone-100'}`}
+                          onClick=${() => goTo(ROUTES.folders)}
+                          className=${`flex items-center justify-center gap-2 py-1.5 px-3 text-xs font-medium rounded shadow-sm transition-all ${currentRoute === ROUTES.folders ? 'bg-white text-stone-900' : 'text-stone-600 hover:bg-stone-100'}`}
                           title="Folder View"
                         >
                             <${Folder} className="w-3 h-3" /> <span className="hidden sm:inline">Folders</span>
                         </button>
                     </div>
 
-                    ${!isExplorer && !isEntityBrowser && html`
-                        <div class="flex items-center">
-                            <label htmlFor="sort-select" className="text-xs font-bold text-stone-500 uppercase hidden sm:inline mr-2">Sort:</label>
-                            <select 
-                            id="sort-select" 
-                            value=${sortBy}
-                            onChange=${(e) => setSortBy(e.target.value)}
-                            className="bg-transparent border-b border-stone-300 text-sm font-bold text-stone-800 focus:outline-none focus:border-stone-800 py-1 pr-8 cursor-pointer"
-                            >
-                                <option value="date-desc">Newest first</option>
-                                <option value="date-asc">Oldest first</option>
-                                <option value="title-asc">Title (A-Z)</option>
-                            </select>
-                        </div>
-                    `}
+                    <div class="flex items-center">
+                        <label htmlFor="sort-select" className="text-xs font-bold text-stone-500 uppercase hidden sm:inline mr-2">Sort:</label>
+                        <select
+                        id="sort-select"
+                        value=${sortBy}
+                        onChange=${(e) => setSortBy(e.target.value)}
+                        className="bg-transparent border-b border-stone-300 text-sm font-bold text-stone-800 focus:outline-none focus:border-stone-800 py-1 pr-8 cursor-pointer"
+                        >
+                            <option value="date-desc">Newest first</option>
+                            <option value="date-asc">Oldest first</option>
+                            <option value="title-asc">Title (A-Z)</option>
+                        </select>
+                    </div>
                 </div>
             </div>
+            `}
 
-            ${isExplorer && !loading && html`
-                <${Explorer} records=${records} />
+            ${isEntityBrowser && html`
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-stone-200 pb-4 scroll-mt-24">
+                <div className="font-display text-stone-500 text-sm">
+                    Browse entities and their connections
+                </div>
+            </div>
             `}
 
             ${isEntityBrowser && !loading && html`
                 <${EntityBrowser} records=${records} onSelectRecord=${setSelectedRecordId} />
             `}
 
-            ${!isExplorer && !isEntityBrowser && html`
+            ${isArchiveGrid && html`
                 <div>
                     ${error && html`
                     <div className="text-center py-20 border-2 border-red-200 rounded-lg bg-red-50 mx-4">
                         <${AlertCircle} className="w-12 h-12 mx-auto text-red-500 mb-4" />
-                        <h3 className="font-display text-xl text-red-700 mb-2">Error Loading Archive</h3>
+                        <h3 className="font-display text-xl text-red-700 mb-2">Error loading archive</h3>
                         <p className="text-red-600 text-sm mb-6">${error}</p>
                         <button
                             onClick=${() => window.location.reload()}
@@ -544,7 +584,7 @@ const App = () => {
                         <${SearchX} className="w-12 h-12 mx-auto text-stone-300 mb-4" />
                         <h3 className="font-display text-xl text-stone-700 mb-2">No records found</h3>
                         <p className="text-stone-500 text-sm mb-6">Try adjusting your search terms or filters.</p>
-                        <button 
+                        <button
                             onClick=${() => setFilters({ search: '', categories: [], era: null, year: null, publication: [], type: null, includeReplies: false })}
                             className="text-sm border-b-2 border-stone-800 pb-0.5 hover:text-stone-600 transition-colors font-bold"
                         >
@@ -559,9 +599,9 @@ const App = () => {
                             const primaryCat = item.categories[0] || 'Uncategorized';
                             const colorIdx = hashString(primaryCat) % COLORS.length;
                             const theme = COLORS[colorIdx];
-                            
+
                             return html`
-                            <div 
+                            <div
                                 key=${item.id}
                                 onClick=${() => setSelectedRecordId(item.id)}
                                 className="break-inside-avoid mb-6 bg-white border border-stone-200 hover:border-stone-400 hover:shadow-lg transition-all duration-300 rounded-sm flex flex-col group cursor-pointer overflow-hidden relative"
@@ -572,15 +612,15 @@ const App = () => {
                                         <span className="text-xs font-bold uppercase tracking-wider text-stone-400">${item.pub}</span>
                                         <span className="text-xs text-stone-400 font-mono border border-stone-200 px-1 rounded">${item.date}</span>
                                     </div>
-                                    
+
                                     <h3 className="text-lg font-display font-bold text-stone-900 leading-tight mb-3 group-hover:text-stone-600 transition-colors">
                                         <${Highlight} text=${item.title} term=${filters.search} />
                                     </h3>
-                                    
+
                                     <p className="text-stone-600 text-sm leading-relaxed mb-4 flex-grow font-body">
                                         <${Highlight} text=${item.summaryPreview || item.summary || ''} term=${filters.search} />
                                     </p>
-            
+
                                     <div className="mt-auto pt-4 border-t border-stone-100 flex flex-wrap gap-2">
                                         ${item.categories.slice(0, 2).map(c => html`
                                             <span key=${c} className="text-[10px] uppercase font-bold px-2 py-1 rounded bg-stone-100 text-stone-600 tracking-wide border border-stone-200">
@@ -600,18 +640,18 @@ const App = () => {
                         ${folderGroups.map(group => {
                             const colorIdx = hashString(group.name) % COLORS.length;
                             const theme = COLORS[colorIdx];
-                            
+
                             return html`
-                            <button 
+                            <button
                                 key=${group.name}
                                 onClick=${() => handleFolderClick(group.name)}
                                 className="text-left group relative flex flex-col h-40 transition-transform hover:-translate-y-1 focus:outline-none"
                             >
-                                <div 
+                                <div
                                     className="folder-tab-shape w-1/2 h-8 border-t border-l border-r relative z-10 translate-y-[1px] ml-0"
                                     style=${{ backgroundColor: theme.bg, borderColor: theme.border }}
                                 >
-                                    <span 
+                                    <span
                                         className="px-4 py-2 text-[10px] font-bold uppercase block truncate"
                                         style=${{ color: theme.text }}
                                     >
@@ -623,7 +663,7 @@ const App = () => {
                                     <h3 className="text-lg font-display font-bold text-stone-800 group-hover:underline decoration-stone-300 underline-offset-4">
                                         ${group.name}
                                     </h3>
-                                    <${FolderOpen} className="w-6 h-6 ml-auto text-stone-300 group-hover:text-stone-500 transition-colors" style=${{ color: `group-hover:${theme.text}` }} />
+                                    <${FolderOpen} className="w-6 h-6 ml-auto text-stone-300 group-hover:text-stone-500 transition-colors" />
                                 </div>
                             </button>
                             `;
@@ -633,7 +673,7 @@ const App = () => {
 
                     ${!loading && viewMode === 'grid' && totalPages > 1 && html`
                         <div className="mt-12 flex justify-center items-center gap-4">
-                            <button 
+                            <button
                             onClick=${() => handlePageChange(currentPage - 1)}
                             disabled=${currentPage === 1}
                             className="p-2 border border-stone-300 rounded hover:bg-stone-100 disabled:opacity-30 transition-all"
@@ -641,7 +681,7 @@ const App = () => {
                                 <${ChevronLeft} className="w-5 h-5" />
                             </button>
                             <span className="font-display text-stone-600">Page ${currentPage} of ${totalPages}</span>
-                            <button 
+                            <button
                             onClick=${() => handlePageChange(currentPage + 1)}
                             disabled=${currentPage === totalPages}
                             className="p-2 border border-stone-300 rounded hover:bg-stone-100 disabled:opacity-30 transition-all"
@@ -664,6 +704,39 @@ const App = () => {
         </button>
       `}
       </div>
+
+      <footer className="border-t border-stone-200 bg-stone-50 mt-auto">
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-sm text-stone-600">
+            <div>
+              <h4 className="font-display font-bold text-stone-900 mb-2">Jay Rosen Internet Archive</h4>
+              <p className="text-xs leading-relaxed">
+                A curated public collection of the works, critiques, and teachings of Jay Rosen, professor of journalism at New York University.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-display font-bold text-stone-900 mb-2">Explore</h4>
+              <div className="space-y-1 text-xs">
+                <button onClick=${() => goTo(ROUTES.archive)} className="block hover:text-stone-900 transition-colors">Browse archive</button>
+                <button onClick=${() => goTo(ROUTES.dissertation)} className="block hover:text-stone-900 transition-colors">Dissertation mind map</button>
+                <button onClick=${() => goTo(ROUTES.explorer)} className="block hover:text-stone-900 transition-colors">Network explorer</button>
+                <button onClick=${() => goTo(ROUTES.entities)} className="block hover:text-stone-900 transition-colors">Entity browser</button>
+                <button onClick=${() => goTo(ROUTES.analytics)} className="block hover:text-stone-900 transition-colors">Analytics dashboard</button>
+                <button onClick=${() => goTo(ROUTES.about)} className="block hover:text-stone-900 transition-colors">About this archive</button>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-display font-bold text-stone-900 mb-2">Credits</h4>
+              <p className="text-xs leading-relaxed mb-2">
+                Curated by <a href="https://github.com/jamditis" target="_blank" rel="noreferrer" className="text-stone-900 font-bold hover:underline">Joe Amditis</a>
+              </p>
+              <p className="text-xs text-stone-400">
+                ${records.length} records | ${minYear}–${maxYear}
+              </p>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   `;
 }

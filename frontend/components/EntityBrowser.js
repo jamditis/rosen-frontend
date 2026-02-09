@@ -1,18 +1,26 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { html } from '../html.js?v=2.2.0';
+import { html } from '../html.js?v=3.0.1';
 import { Users, Building2, Lightbulb, BookOpen, MapPin, Calendar, Search, ArrowUpDown, ChevronDown, ChevronRight, X, ExternalLink } from 'lucide-react';
-import { fetchEntitiesData, getRecordsByEntity, getEntityById, areEntitiesLoaded } from '../services/archiveService.js?v=2.2.0';
-import { COLORS } from '../constants.js?v=2.2.0';
+import { fetchEntitiesData, getRecordsByEntity, getEntityById, areEntitiesLoaded } from '../services/archiveService.js?v=3.0.2';
+import { COLORS, ENTITY_TYPE_CONFIG } from '../constants.js?v=3.0.1';
 
-const TYPE_CONFIG = {
-  Person: { icon: Users, color: '#075985', bg: '#e0f2fe', label: 'People' },
-  Organization: { icon: Building2, color: '#166534', bg: '#f0fdf4', label: 'Organizations' },
-  Concept: { icon: Lightbulb, color: '#92400e', bg: '#fffbeb', label: 'Concepts' },
-  Work: { icon: BookOpen, color: '#9d174d', bg: '#fdf2f8', label: 'Works' },
-  Event: { icon: Calendar, color: '#5b21b6', bg: '#f5f3ff', label: 'Events' },
-  Location: { icon: MapPin, color: '#9a3412', bg: '#fff7ed', label: 'Locations' }
+// Add icons to shared config
+const TYPE_ICONS = {
+  Person: Users,
+  Organization: Building2,
+  Concept: Lightbulb,
+  Work: BookOpen,
+  Event: Calendar,
+  Location: MapPin
 };
+
+const TYPE_CONFIG = Object.fromEntries(
+  Object.entries(ENTITY_TYPE_CONFIG).map(([type, cfg]) => [
+    type,
+    { ...cfg, icon: TYPE_ICONS[type] || Lightbulb }
+  ])
+);
 
 const EntityBrowser = ({ records, onSelectRecord }) => {
   const [entities, setEntities] = useState([]);

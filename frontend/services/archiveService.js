@@ -182,31 +182,55 @@ const DISSERTATION_RECORD = {
 };
 
 // Cache configuration
-const CACHE_TTL_MS = 1000 * 60 * 60; // 1 hour cache
-const CACHE_VERSION = 'v6'; // Increment to invalidate all caches
+const CACHE_VERSION = 'v7'; // Increment to invalidate all caches
+const CACHE_TTL_MS = 1000 * 60 * 30; // 30 min for entity data (small)
+
+// Size threshold: don't use localStorage for data over 5MB
+const MAX_LOCALSTORAGE_SIZE = 5 * 1024 * 1024;
 
 const getCacheKey = (url) => {
-  // Use djb2 hash algorithm for cache keys to avoid encoding issues with non-ASCII URLs
-  // and reduce collision probability. Different from hashString() which is used for UI colors.
   let hash = 5381;
   for (let i = 0; i < url.length; i++) {
-    hash = ((hash << 5) + hash) + url.charCodeAt(i); // hash * 33 + c
+    hash = ((hash << 5) + hash) + url.charCodeAt(i);
   }
-  return `archive_json_${Math.abs(hash >>> 0)}`; // Convert to unsigned 32-bit integer
+  return `archive_json_${Math.abs(hash >>> 0)}`;
+};
+
+/**
+ * Check version.json on the server. If the version has changed,
+ * clear all caches so users get fresh data after deploys.
+ */
+let versionChecked = false;
+const checkVersion = async () => {
+  if (versionChecked) return;
+  versionChecked = true;
+  try {
+    const resp = await fetch('./version.json?t=' + Date.now());
+    if (resp.ok) {
+      const { version } = await resp.json();
+      const stored = localStorage.getItem('jrda_deploy_version');
+      if (stored && stored !== version) {
+        console.log('[Cache] Deploy version changed, clearing caches');
+        clearArchiveCache();
+      }
+      localStorage.setItem('jrda_deploy_version', version);
+    }
+  } catch { /* version.json not available, skip */ }
 };
 
 const getCachedData = (url) => {
   try {
     const cacheKey = getCacheKey(url);
-    const cached = localStorage.getItem(cacheKey);
+    // Try sessionStorage first (for large data), then localStorage
+    let cached = sessionStorage.getItem(cacheKey) || localStorage.getItem(cacheKey);
     if (!cached) return null;
 
     const entry = JSON.parse(cached);
     const now = Date.now();
 
-    // Check if cache is still valid
     if (entry.version !== CACHE_VERSION || (now - entry.timestamp) > CACHE_TTL_MS) {
-      localStorage.removeItem(cacheKey);
+      try { sessionStorage.removeItem(cacheKey); } catch {}
+      try { localStorage.removeItem(cacheKey); } catch {}
       return null;
     }
 
@@ -225,25 +249,31 @@ const setCachedData = (url, data) => {
     version: CACHE_VERSION
   };
 
-  const trySetItem = () => {
-    localStorage.setItem(cacheKey, JSON.stringify(entry));
-  };
-
   try {
-    trySetItem();
+    const serialized = JSON.stringify(entry);
+
+    // Large data goes to sessionStorage (cleared on tab close, avoids quota pressure)
+    if (serialized.length > MAX_LOCALSTORAGE_SIZE) {
+      try {
+        sessionStorage.setItem(cacheKey, serialized);
+        return;
+      } catch {
+        // sessionStorage also full — just skip caching
+        console.warn('Session cache full, skipping cache for', url);
+        return;
+      }
+    }
+
+    // Small data goes to localStorage (persists across sessions)
+    localStorage.setItem(cacheKey, serialized);
   } catch (e) {
     if (e.name === 'QuotaExceededError' || e.code === 22) {
-      // Storage is full - clear old archive caches and retry
       console.log('Cache storage full, clearing old archive caches...');
       try {
-        const keys = Object.keys(localStorage);
-        const archiveCacheKeys = keys.filter(key => key.startsWith('archive_json_') || key.startsWith('archive_csv_'));
-        archiveCacheKeys.forEach(key => localStorage.removeItem(key));
-        trySetItem(); // Retry after clearing
-        console.log('Cache cleared and data stored successfully');
-      } catch (retryError) {
-        // Still failing - storage may be consumed by other data
-        console.warn('Cache disabled: browser storage is full. The archive will work but without caching.');
+        clearArchiveCache();
+        localStorage.setItem(cacheKey, JSON.stringify(entry));
+      } catch {
+        console.warn('Cache disabled: browser storage is full.');
       }
     } else {
       console.warn('Cache write error:', e);
@@ -251,13 +281,15 @@ const setCachedData = (url, data) => {
   }
 };
 
-// Export function to manually clear all archive caches
+// Clear all archive caches from both localStorage and sessionStorage
 export const clearArchiveCache = () => {
   try {
-    const keys = Object.keys(localStorage);
-    const archiveCacheKeys = keys.filter(key => key.startsWith('archive_json_') || key.startsWith('archive_csv_'));
-    archiveCacheKeys.forEach(key => localStorage.removeItem(key));
-    console.log(`Cleared ${archiveCacheKeys.length} cache entries`);
+    for (const storage of [localStorage, sessionStorage]) {
+      const keys = Object.keys(storage);
+      const archiveKeys = keys.filter(key => key.startsWith('archive_json_') || key.startsWith('archive_csv_'));
+      archiveKeys.forEach(key => storage.removeItem(key));
+    }
+    console.log('Archive caches cleared');
   } catch (e) {
     console.warn('Error clearing cache:', e);
   }
@@ -269,6 +301,9 @@ export const clearArchiveCache = () => {
  */
 export const fetchCoreData = async () => {
   const dataUrl = DATA_CONFIG.archive_core;
+
+  // Check deploy version (clears caches if version changed)
+  checkVersion();
 
   // Check cache first
   const cached = getCachedData(dataUrl);
@@ -435,7 +470,13 @@ export const fetchEntitiesData = async () => {
     if (cached) {
       console.log('Using cached entities data');
       entitiesCache = cached;
-      buildEntityMaps(cached);
+      buildEntityMaps({
+        entities: cached.entities,
+        records: cached.records || Object.entries(cached.recordEntityMap || {}).map(([id, relatedIds]) => ({
+          id,
+          relatedIds
+        }))
+      });
       return cached;
     }
 

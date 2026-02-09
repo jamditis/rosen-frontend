@@ -397,8 +397,8 @@ async function main() {
     categories: r.categories,
     type: r.type,
     verified: r.verified,
-    // Include truncated summary for card preview
-    summaryPreview: r.summary.length > 180 ? r.summary.substring(0, 180) + '...' : r.summary
+    // Include truncated summary for card preview (120 chars saves ~2MB vs 180)
+    summaryPreview: r.summary.length > 120 ? r.summary.substring(0, 120) + '...' : r.summary
   }));
 
   const coreOutput = {

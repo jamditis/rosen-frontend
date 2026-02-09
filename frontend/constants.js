@@ -26,6 +26,16 @@ export const COLORS = [
     { bg: '#fff7ed', text: '#9a3412', border: '#ffedd5' }  // Orange
 ];
 
+// Shared entity type configuration (used by Explorer, EntityBrowser, RecordModal)
+export const ENTITY_TYPE_CONFIG = {
+  Person: { color: '#075985', bg: '#e0f2fe', label: 'People' },
+  Organization: { color: '#166534', bg: '#f0fdf4', label: 'Organizations' },
+  Concept: { color: '#92400e', bg: '#fffbeb', label: 'Concepts' },
+  Work: { color: '#9d174d', bg: '#fdf2f8', label: 'Works' },
+  Event: { color: '#5b21b6', bg: '#f5f3ff', label: 'Events' },
+  Location: { color: '#9a3412', bg: '#fff7ed', label: 'Locations' }
+};
+
 export const ERAS = [
   "Public Journalism (90s)",
   "Web & Blogging (00s)",
