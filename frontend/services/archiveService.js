@@ -182,7 +182,7 @@ const DISSERTATION_RECORD = {
 };
 
 // Cache configuration
-const CACHE_VERSION = 'v8'; // Increment to invalidate all caches
+const CACHE_VERSION = 'v9'; // Increment to invalidate all caches
 const CACHE_TTL_MS = 1000 * 60 * 30; // 30 min for entity data (small)
 
 // Size threshold: don't use localStorage for data over 5MB

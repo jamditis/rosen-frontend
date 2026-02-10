@@ -161,7 +161,7 @@ describe('thread member filtering', () => {
 // ============================================
 
 describe('short reply filtering', () => {
-  const GENERIC_TITLE_PATTERN = /^(Reply|Tweet|Post|Quote) by/i;
+  const GENERIC_TITLE_PATTERN = /^(Reply|Tweet|Post|Quote|Quoted|Retweet|RT) by/i;
 
   it('no generic-titled records with very short content remain', () => {
     const genericShort = fullData.records.filter(r => {

@@ -250,11 +250,19 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
                </div>
             `}
 
-            ${!youtubeId && displayRecord.quote && html`
-               <blockquote className="border-l-4 border-stone-800 pl-6 py-2 my-8 italic text-xl text-stone-700 font-display bg-stone-50/50 rounded-r-lg">
-                  "${displayRecord.quote}"
-               </blockquote>
-            `}
+            ${(() => {
+              // Show quote block only if it adds information beyond the title
+              if (youtubeId || !displayRecord.quote) return null;
+              const quoteText = displayRecord.quote.trim();
+              const titleText = (displayRecord.title || '').replace(/\.\.\.$/,'').trim();
+              // Skip if quote is effectively the same as the title
+              if (titleText.length > 10 && (quoteText === titleText || quoteText.startsWith(titleText) || titleText.startsWith(quoteText.substring(0, titleText.length)))) return null;
+              return html`
+                <blockquote className="border-l-4 border-stone-800 pl-6 py-2 my-8 italic text-xl text-stone-700 font-display bg-stone-50/50 rounded-r-lg">
+                  "${quoteText}"
+                </blockquote>
+              `;
+            })()}
 
             ${/* Check if this is a thread record - display ThreadModal or standard summary */
               (() => {

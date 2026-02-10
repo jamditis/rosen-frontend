@@ -131,7 +131,7 @@ function processRecord(row, index, type, relationshipsMap) {
     era: getEra(date),
     pub: pub,
     url: rawUrl,
-    summary: (row.summary || row.Summary || title),
+    summary: (row.summary || row.Summary || ''),
     quote: (row.pull_quote || row.Pull_Quote || row.excerpt || row.raw_text || ''),
     categories: cats,
     concepts: concepts,
@@ -261,6 +261,19 @@ async function main() {
 
   const socialRecords = socialPostsData.map((row, i) => {
     const record = processRecord(row, i, 'social', relationshipsMap);
+
+    // Generate a useful summary for social records (CSV has no summary column).
+    // Without this, summary would be empty and the modal would show nothing useful.
+    if (!record.summary) {
+      const platform = record.pub || 'social media';
+      const dateStr = record.date || '';
+      const catList = record.categories.length > 0 ? record.categories.join(', ') : '';
+      const parts = [`A ${platform} post by ${record.author || 'Jay Rosen'}`];
+      if (dateStr) parts[0] += ` from ${dateStr}`;
+      parts[0] += '.';
+      if (catList) parts.push(`Topics: ${catList}.`);
+      record.summary = parts.join(' ');
+    }
 
     record.categories.forEach(c => { categories.add(c); searchTerms.add(c); });
     record.concepts.forEach(c => searchTerms.add(c));
@@ -432,13 +445,22 @@ async function main() {
   console.log(`  - New THREAD records generated: ${generatedThreadRecords.length}`);
   console.log(`  - Total thread member posts: ${threadMemberIds.size}`);
 
-  // Step 7: Filter social records — remove thread members and short replies
+  // Step 7: Filter social records — remove thread members, reposts, and short replies
+  const REPOST_TITLE_PATTERN = /^(Quoted|Retweet|RT) by/i;
   const GENERIC_TITLE_PATTERN = /^(Reply|Tweet|Post|Quote) by/i;
   const beforeSocialCount = socialRecords.length;
+  let repostCount = 0;
+  let shortReplyCount = 0;
 
   const filteredSocialRecords = socialRecords.filter(r => {
     // Remove individual posts that belong to threads (shown via THREAD container)
     if (threadMemberIds.has(r.id)) return false;
+
+    // Remove all reposts/quotes of others' content entirely (not Rosen's own words)
+    if (REPOST_TITLE_PATTERN.test(r.title)) {
+      repostCount++;
+      return false;
+    }
 
     // Remove short replies with generic titles
     if (GENERIC_TITLE_PATTERN.test(r.title)) {
@@ -449,7 +471,10 @@ async function main() {
         .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
         .replace(/\s+/g, ' ')
         .trim();
-      if (text.length < 10) return false;
+      if (text.length < 10) {
+        shortReplyCount++;
+        return false;
+      }
     }
 
     return true;
@@ -457,7 +482,7 @@ async function main() {
 
   const threadFiltered = beforeSocialCount - filteredSocialRecords.length;
   console.log(`  - Social records before filtering: ${beforeSocialCount}`);
-  console.log(`  - Filtered out (thread members + short replies): ${threadFiltered}`);
+  console.log(`  - Filtered: ${threadFiltered} total (${threadMemberIds.size} thread members, ${repostCount} reposts, ${shortReplyCount} short replies)`);
   console.log(`  - Social records after filtering: ${filteredSocialRecords.length}`);
 
   // Combine all records: main + filtered social + generated threads
