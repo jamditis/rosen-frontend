@@ -44,6 +44,8 @@ build/
 !.vscode/extensions.json
 .idea
 .DS_Store
+desktop.ini
+nul
 *.suo
 *.ntvs*
 *.njsproj
@@ -65,5 +67,6 @@ known_entities.json
 # Playwright
 test-results/
 playwright-report/
+
+# Entity extraction working data
 data/social_import/
-desktop.ini

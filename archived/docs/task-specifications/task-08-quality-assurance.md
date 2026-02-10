@@ -6,7 +6,7 @@
 **Estimated Time:** 6-8 hours
 
 ## Overview
-Implement comprehensive data quality assurance and maintenance system that ensures data integrity, consistency, and completeness across the entire Jay Rosen digital archive through automated cleaning, validation, and improvement processes.
+Implement comprehensive data quality assurance and maintenance system that ensures data integrity, consistency, and completeness across the entire Jay Rosen Internet Archive through automated cleaning, validation, and improvement processes.
 
 ## Current Implementation Status
 - ✅ Data deduplication system (`data_deduper.py`)

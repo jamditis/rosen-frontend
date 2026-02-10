@@ -1,4 +1,4 @@
-# Jay Rosen Digital Archive: Master Release Plan
+# Jay Rosen Internet Archive: Master Release Plan
 
 **Version:** 1.0
 **Date:** November 24, 2025
@@ -11,7 +11,7 @@
 
 This document provides a comprehensive, phased plan for:
 1. **Preparing, presenting, and promoting** the public release of Jay Rosen's 1986 dissertation "The Impossible Press"
-2. **Launching the full Jay Rosen Digital Archive** as a publicly accessible research resource
+2. **Launching the full Jay Rosen Internet Archive** as a publicly accessible research resource
 3. **Completing remaining data processing work** (Tumblr, Twitter, newspaper clippings, and other unprocessed content)
 
 The plan is organized into three major phases with specific milestones, deliverables, and dependencies.
@@ -356,7 +356,7 @@ Currently three separate systems contain archive data:
    - Create unified, high-quality PDF from 5 source files
    - Add bookmarked table of contents
    - Ensure accessibility compliance (PDF/UA)
-   - Add watermark: "Jay Rosen Digital Archive"
+   - Add watermark: "Jay Rosen Internet Archive"
 
 3. **HTML Reading Experience:**
    - Convert markdown to styled HTML
@@ -421,7 +421,7 @@ Currently three separate systems contain archive data:
 ### Promotional Messaging:
 
 **Core Narrative:**
-> "In 1986, before the internet transformed journalism, Jay Rosen wrote a dissertation that anticipated the crisis of public life and professional press that would unfold over the next four decades. Now, for the first time, 'The Impossible Press' is publicly available as part of the comprehensive Jay Rosen Digital Archive."
+> "In 1986, before the internet transformed journalism, Jay Rosen wrote a dissertation that anticipated the crisis of public life and professional press that would unfold over the next four decades. Now, for the first time, 'The Impossible Press' is publicly available as part of the comprehensive Jay Rosen Internet Archive."
 
 **Key Angles:**
 1. **Historical Significance:** "The intellectual foundation for 40 years of journalism criticism"
@@ -478,7 +478,7 @@ Currently three separate systems contain archive data:
 ### Positioning:
 
 **The Story:**
-> "The Jay Rosen Digital Archive preserves and makes accessible 36 years of journalism criticism, from a 1986 NYU dissertation through 2025 social media posts. It's not just a collection—it's an intellectual biography, a record of one of journalism's most persistent and prescient critics."
+> "The Jay Rosen Internet Archive preserves and makes accessible 36 years of journalism criticism, from a 1986 NYU dissertation through 2025 social media posts. It's not just a collection—it's an intellectual biography, a record of one of journalism's most persistent and prescient critics."
 
 ### Key Statistics for Launch:
 

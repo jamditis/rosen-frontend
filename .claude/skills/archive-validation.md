@@ -5,7 +5,7 @@ description: Validate archive data quality, schema compliance, and content integ
 
 # Archive Data Validation
 
-Ensure data quality and schema compliance for the Jay Rosen Digital Archive. This skill covers validation patterns for CSV sources, JSON exports, and entity relationships.
+Ensure data quality and schema compliance for the Jay Rosen Internet Archive. This skill covers validation patterns for CSV sources, JSON exports, and entity relationships.
 
 ## When to Activate
 

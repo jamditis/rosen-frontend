@@ -512,7 +512,7 @@ class EntityExtractionProcessor:
 def main():
     """Main entry point for the batch processor."""
     parser = argparse.ArgumentParser(
-        description="Extract entities and relationships from Jay Rosen Digital Archive"
+        description="Extract entities and relationships from Jay Rosen Internet Archive"
     )
     parser.add_argument(
         "--batch-size",

@@ -1,4 +1,4 @@
-# Jay Rosen Digital Archive - Analysis Report
+# Jay Rosen Internet Archive - Analysis Report
 
 *Last Updated: September 24, 2025*
 *Data Improvements Applied: September 24, 2025*
@@ -27,7 +27,7 @@
 
 ## Executive Summary (Historical - September 24, 2025)
 
-The Jay Rosen Digital Archive contains **610 records** spanning **32.4 years** (1993-2025) with **39 data fields**. This comprehensive analysis reveals a high-quality, AI-enhanced digital collection with strong metadata completeness and rich content analysis.
+The Jay Rosen Internet Archive contains **610 records** spanning **32.4 years** (1993-2025) with **39 data fields**. This comprehensive analysis reveals a high-quality, AI-enhanced digital collection with strong metadata completeness and rich content analysis.
 
 **Note:** This analysis is from September 2025. The archive has grown since then (now 765+ records).
 
@@ -289,4 +289,4 @@ These concepts represent Jay Rosen's core intellectual contributions to journali
 
 ---
 
-*This analysis was generated using the comprehensive CSV analysis framework developed for the Jay Rosen Digital Archive project. For technical details, see `csv_analyzer.py` and related data quality tools.*
+*This analysis was generated using the comprehensive CSV analysis framework developed for the Jay Rosen Internet Archive project. For technical details, see `csv_analyzer.py` and related data quality tools.*

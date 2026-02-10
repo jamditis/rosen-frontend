@@ -1,6 +1,6 @@
 # LLM Instructions for the Rosen Digital Archive Project
 
-**Objective:** Hand-off guidance for an LLM contributor resuming backend and data-quality work on the Jay Rosen Digital Archive.
+**Objective:** Hand-off guidance for an LLM contributor resuming backend and data-quality work on the Jay Rosen Internet Archive.
 
 ---
 

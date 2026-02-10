@@ -1,6 +1,6 @@
 # **Rosen Digital Archive: Analysis & Sustainable Architecture Plan**
 
-This document provides a comprehensive analysis of the Jay Rosen Digital Archive project, based on the provided project plans and code. It identifies a key architectural challenge and proposes a revised, sustainable, and cost-effective solution that leverages the Google Cloud ecosystem.
+This document provides a comprehensive analysis of the Jay Rosen Internet Archive project, based on the provided project plans and code. It identifies a key architectural challenge and proposes a revised, sustainable, and cost-effective solution that leverages the Google Cloud ecosystem.
 
 ## **Part 1: Initial Analysis & Code Review**
 

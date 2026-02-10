@@ -11,7 +11,7 @@
 Track completion status of all release assets.
 
 ### Pre-Publication Report
-See `pre-publication-report.md` for the comprehensive technical validation report.
+See `pre-publication-report.md` for the full technical validation report.
 
 **Legend:**
 - ✅ Complete

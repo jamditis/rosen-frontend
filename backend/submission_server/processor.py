@@ -1,0 +1,313 @@
+# -*- coding: utf-8 -*-
+"""
+Batch processor for queued submissions.
+
+Reuses the existing rosen_scraper pipeline:
+  - dispatcher.dispatch_url() for scraping + AI categorization
+  - workflow.generate_source_based_id() for unique IDs
+  - workflow.enrich_data() for metadata enrichment
+  - entity_resolver for publication/platform resolution
+"""
+
+import csv
+import json
+import logging
+import subprocess
+import sys
+import shutil
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, Any, Optional, Set
+
+from .config import (
+    BACKEND_DIR, PROJECT_ROOT, DATA_DIR,
+    CSV_FILE, SCHEMA_FILE, KNOWN_ENTITIES_FILE,
+    EXPORT_SCRIPT, FTP_STAGING_DIR,
+)
+from . import db
+
+# Add the backend src directory to Python path so rosen_scraper imports work
+src_dir = str(BACKEND_DIR / 'src')
+if src_dir not in sys.path:
+    sys.path.insert(0, src_dir)
+
+logger = logging.getLogger('submission_server.processor')
+
+
+def _load_schema() -> Optional[Dict[str, Any]]:
+    """Load the classification schema."""
+    try:
+        with open(SCHEMA_FILE, 'r', encoding='utf-8-sig') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        logger.error(f"Could not load schema: {e}")
+        return None
+
+
+def _load_known_entities() -> Optional[Dict[str, Any]]:
+    """Load known entities for publication resolution."""
+    try:
+        with open(KNOWN_ENTITIES_FILE, 'r', encoding='utf-8-sig') as f:
+            return json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        logger.warning(f"Could not load known entities (non-fatal): {e}")
+        return None
+
+
+def _get_existing_ids() -> Set[str]:
+    """Read all existing record IDs from the main CSV."""
+    ids = set()
+    if CSV_FILE.exists():
+        with open(CSV_FILE, 'r', encoding='utf-8-sig') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                record_id = row.get('id', '')
+                if record_id:
+                    ids.add(record_id)
+    return ids
+
+
+def _get_existing_urls() -> Set[str]:
+    """Read all existing URLs from the main CSV."""
+    urls = set()
+    if CSV_FILE.exists():
+        with open(CSV_FILE, 'r', encoding='utf-8-sig') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                url = row.get('url', '')
+                if url:
+                    urls.add(url.strip())
+    return urls
+
+
+def _get_csv_headers() -> list:
+    """Read the column headers from the main CSV."""
+    if not CSV_FILE.exists():
+        return []
+    with open(CSV_FILE, 'r', encoding='utf-8-sig') as f:
+        reader = csv.reader(f)
+        return next(reader, [])
+
+
+def _append_to_csv(record: Dict[str, Any], headers: list) -> bool:
+    """Append a single record to the main archive CSV."""
+    try:
+        with open(CSV_FILE, 'a', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=headers, extrasaction='ignore')
+            writer.writerow(record)
+        return True
+    except Exception as e:
+        logger.error(f"Failed to append record to CSV: {e}")
+        return False
+
+
+def _regenerate_json() -> bool:
+    """Run the export script to regenerate JSON files from CSV."""
+    try:
+        result = subprocess.run(
+            ['node', str(EXPORT_SCRIPT)],
+            cwd=str(DATA_DIR),
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+        if result.returncode != 0:
+            logger.error(f"Export script failed: {result.stderr}")
+            return False
+        logger.info(f"JSON regenerated: {result.stdout[-200:]}")
+        return True
+    except subprocess.TimeoutExpired:
+        logger.error("Export script timed out after 120s")
+        return False
+    except FileNotFoundError:
+        logger.error("Node.js not found — cannot run export script")
+        return False
+
+
+def _stage_for_ftp() -> bool:
+    """Copy regenerated JSON files to the FTP staging directory."""
+    if not FTP_STAGING_DIR.exists():
+        FTP_STAGING_DIR.mkdir(parents=True, exist_ok=True)
+
+    files_to_copy = [
+        'archive-data.json',
+        'archive-core.json',
+        'archive-details.json',
+        'archive-entities.json',
+    ]
+
+    copied = 0
+    for filename in files_to_copy:
+        src = DATA_DIR / filename
+        dst = FTP_STAGING_DIR / filename
+        if src.exists():
+            shutil.copy2(str(src), str(dst))
+            copied += 1
+        else:
+            logger.warning(f"Expected file not found: {src}")
+
+    logger.info(f"Staged {copied}/{len(files_to_copy)} files for FTP")
+    return copied > 0
+
+
+def process_single_url(url: str, schema: Dict[str, Any],
+                       known_entities: Optional[Dict[str, Any]],
+                       existing_ids: Set[str],
+                       user_overrides: Dict[str, str] = None) -> Optional[Dict[str, Any]]:
+    """
+    Process a single URL through the scraper pipeline.
+
+    Returns the enriched record dict if successful, None on failure.
+    """
+    from rosen_scraper import dispatcher, entity_resolver
+    from rosen_scraper.workflow import generate_source_based_id, enrich_data
+
+    try:
+        processed_data = dispatcher.dispatch_url(url, schema)
+    except Exception as e:
+        logger.error(f"Dispatch failed for {url}: {e}")
+        return None
+
+    if not processed_data:
+        logger.warning(f"No data returned for {url}")
+        return None
+
+    # Apply user overrides (title, publication, date) if provided
+    if user_overrides:
+        if user_overrides.get('title'):
+            processed_data['title'] = user_overrides['title']
+        if user_overrides.get('publication'):
+            processed_data['original_publication'] = user_overrides['publication']
+        if user_overrides.get('date_published'):
+            processed_data['publication_date'] = user_overrides['date_published']
+        if user_overrides.get('categories'):
+            processed_data['thematic_categories'] = user_overrides['categories']
+
+    # Generate unique ID
+    publication = processed_data.get('original_publication', '')
+    item_id = generate_source_based_id(publication, existing_ids)
+    processed_data['id'] = item_id
+    processed_data['url'] = url
+
+    # Standardize date field name
+    if 'date' in processed_data and 'publication_date' not in processed_data:
+        processed_data['publication_date'] = processed_data.pop('date')
+
+    # Resolve publication name
+    publication = entity_resolver.resolve_publication(
+        processed_data.get('original_publication'), url, known_entities
+    )
+    processed_data['original_publication'] = publication
+
+    # Enrich with derived fields
+    processed_data = enrich_data(processed_data, url, known_entities)
+
+    # Mark as verified (submitted by Jay himself)
+    processed_data['verified'] = True
+    processed_data['notes'] = f"Submitted via web form"
+
+    return processed_data
+
+
+def process_batch(trigger: str = 'manual') -> Dict[str, Any]:
+    """
+    Process all pending submissions.
+
+    Returns a summary dict with counts of processed/succeeded/failed.
+    """
+    started_at = datetime.now().isoformat()
+
+    # Load pipeline dependencies
+    schema = _load_schema()
+    if not schema:
+        return {'error': 'Could not load schema', 'processed': 0, 'succeeded': 0, 'failed': 0}
+
+    known_entities = _load_known_entities()
+    headers = schema.get('output_headers', [])
+    if not headers:
+        headers = _get_csv_headers()
+
+    existing_ids = _get_existing_ids()
+    existing_urls = _get_existing_urls()
+
+    # Get pending submissions
+    pending = db.get_pending_submissions()
+    if not pending:
+        return {'processed': 0, 'succeeded': 0, 'failed': 0, 'message': 'No pending submissions'}
+
+    succeeded = 0
+    failed = 0
+
+    for submission in pending:
+        sub_id = submission['id']
+        url = submission['url']
+
+        # Check for duplicate URL in existing archive
+        if url in existing_urls:
+            db.update_submission_status(sub_id, 'duplicate',
+                                        error_message='URL already exists in archive')
+            failed += 1
+            continue
+
+        # Mark as processing
+        db.update_submission_status(sub_id, 'processing')
+
+        # Build user overrides from form fields
+        overrides = {
+            'title': submission.get('title', ''),
+            'publication': submission.get('publication', ''),
+            'date_published': submission.get('date_published', ''),
+            'categories': submission.get('categories', ''),
+        }
+
+        try:
+            record = process_single_url(url, schema, known_entities,
+                                        existing_ids, overrides)
+        except Exception as e:
+            logger.error(f"Error processing submission {sub_id} ({url}): {e}")
+            db.update_submission_status(sub_id, 'failed', error_message=str(e))
+            failed += 1
+            continue
+
+        if record:
+            # Append to main CSV
+            success = _append_to_csv(record, headers)
+            if success:
+                existing_ids.add(record['id'])
+                existing_urls.add(url)
+                db.update_submission_status(sub_id, 'completed', record_id=record['id'])
+                succeeded += 1
+                logger.info(f"Processed submission {sub_id}: {record['id']} — {url}")
+            else:
+                db.update_submission_status(sub_id, 'failed',
+                                            error_message='Failed to write to CSV')
+                failed += 1
+        else:
+            db.update_submission_status(sub_id, 'failed',
+                                        error_message='Processing returned no data')
+            failed += 1
+
+    # Regenerate JSON files if any records succeeded
+    if succeeded > 0:
+        logger.info("Regenerating JSON files...")
+        json_ok = _regenerate_json()
+        if json_ok:
+            _stage_for_ftp()
+
+    completed_at = datetime.now().isoformat()
+    processed = succeeded + failed
+
+    # Log the run
+    db.log_processing_run(started_at, completed_at, trigger,
+                          processed, succeeded, failed)
+
+    summary = {
+        'processed': processed,
+        'succeeded': succeeded,
+        'failed': failed,
+        'trigger': trigger,
+        'started_at': started_at,
+        'completed_at': completed_at,
+    }
+    logger.info(f"Batch complete: {summary}")
+    return summary

@@ -9,7 +9,7 @@
 ### Launch Thread (Main)
 
 **Tweet 1:**
-TODAY: Launching the Jay Rosen Digital Archive—36 years of journalism criticism in one searchable place.
+TODAY: Launching the Jay Rosen Internet Archive—36 years of journalism criticism in one searchable place.
 
 Plus: The first-ever public release of his 1986 dissertation, "The Impossible Press."
 
@@ -107,7 +107,7 @@ https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 **Archive Quote 1:**
 > "The people formerly known as the audience wish to inform media people of our existence, and of a shift in power that goes with the platform shift you've all heard about."
 
-From 2006. One of 849+ records in the Jay Rosen Digital Archive: https://pressthink.org/wp-content/rosen-archive/index.html
+From 2006. One of 849+ records in the Jay Rosen Internet Archive: https://pressthink.org/wp-content/rosen-archive/index.html
 
 ---
 
@@ -121,7 +121,7 @@ From 2010. Explore the full "View from Nowhere" collection: https://pressthink.o
 ## Bluesky
 
 ### Launch Post
-TODAY: Launching the Jay Rosen Digital Archive.
+TODAY: Launching the Jay Rosen Internet Archive.
 
 36 years of journalism criticism. 849+ records. First-ever public release of his 1986 dissertation.
 
@@ -148,12 +148,12 @@ https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 
 ### Launch Post (Long-form)
 
-**Headline:** Announcing the Jay Rosen Digital Archive: 36 Years of Journalism Criticism, Now Searchable
+**Headline:** Announcing the Jay Rosen Internet Archive: 36 Years of Journalism Criticism, Now Searchable
 
-Today, we're launching a project I've been working on for the past several months: the Jay Rosen Digital Archive.
+Today, we're launching a project I've been working on for the past several months: the Jay Rosen Internet Archive.
 
 **What it is:**
-A comprehensive, searchable archive of journalism criticism by Jay Rosen, NYU professor and one of the most influential voices in media criticism for the past four decades.
+A searchable archive of journalism criticism by Jay Rosen, NYU professor and one of the most influential voices in media criticism for the past four decades.
 
 **What's included:**
 • 849+ records spanning 1986-2025
@@ -184,12 +184,12 @@ One searchable archive.
 
 Plus: Jay Rosen's 1986 dissertation, public for the first time.
 
-The Jay Rosen Digital Archive is live. https://pressthink.org/wp-content/rosen-archive/index.html
+The Jay Rosen Internet Archive is live. https://pressthink.org/wp-content/rosen-archive/index.html
 
 ---
 
 ### Visual Post (with infographic)
-The numbers behind the Jay Rosen Digital Archive:
+The numbers behind the Jay Rosen Internet Archive:
 
 📚 849+ records
 📅 36 years (1986-2025)

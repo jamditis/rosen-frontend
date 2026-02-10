@@ -16,7 +16,7 @@ const routes = {
         id: "home",
         render: () => `
             <section class="hero">
-                <h1>Jay Rosen Digital Archive</h1>
+                <h1>Jay Rosen Internet Archive</h1>
                 <p class="hero-tagline">An open research library of journalism, ideas, and teaching.</p>
                 <div class="hero-actions">
                     <button class="button button-primary" data-route="search">Search the archive</button>
@@ -85,7 +85,7 @@ const routes = {
         render: () => `
             <section class="hero">
                 <h1>About the Archive</h1>
-                <p class="hero-tagline">Origin story, objectives, and guidance for using the Jay Rosen Digital Archive.</p>
+                <p class="hero-tagline">Origin story, objectives, and guidance for using the Jay Rosen Internet Archive.</p>
                 <div class="info-grid">
                     <article class="info-card">
                         <h2>About Jay Rosen</h2>

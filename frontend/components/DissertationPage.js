@@ -1,16 +1,16 @@
 
 import { useState } from 'react';
-import { html } from '../html.js?v=2.0.2';
+import { html } from '../html.js?v=3.1.0';
 import { BookOpen, ExternalLink, ArrowLeft, Calendar, GraduationCap } from 'lucide-react';
-import MindMap from './MindMap.js?v=2.0.2';
-import DetailPanel from './DetailPanel.js?v=2.0.2';
-import { DISSERTATION_NODES } from './dissertationData.js?v=2.0.2';
+import MindMap from './MindMap.js?v=3.1.0';
+import DetailPanel from './DetailPanel.js?v=3.1.0';
+import { DISSERTATION_NODES } from './dissertationData.js?v=3.1.0';
 
 const DissertationPage = ({ onBack }) => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [detailPanelOpen, setDetailPanelOpen] = useState(false);
 
-  const dissertationPdfUrl = '/wp-content/rosen-archive/features/dissertation-reader/';
+  const dissertationPdfUrl = '/j/rosen-archive/dissertation/reader/';
 
   const handleNodeSelect = (node) => {
     if (node) {
@@ -142,7 +142,7 @@ const DissertationPage = ({ onBack }) => {
       <footer className="bg-stone-50 border-t border-stone-200 py-2 flex-shrink-0">
         <div className="container mx-auto px-4 flex items-center justify-between text-xs text-stone-400">
           <div>
-            Part of the <span className="font-semibold text-stone-600">Jay Rosen Digital Archive</span>
+            Part of the <span className="font-semibold text-stone-600">Jay Rosen Internet Archive</span>
           </div>
           <div className="flex items-center gap-3">
             <a

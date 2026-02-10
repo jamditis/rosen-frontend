@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document outlines the plan for integrating the full transcribed dissertation text (`FINAL-ROSEN_DISSERTATION_THE-IMPOSSIBLE-PRESS_TRANSCRIBED.md`) into the Jay Rosen Digital Archive tools and features.
+This document outlines the plan for integrating the full transcribed dissertation text (`FINAL-ROSEN_DISSERTATION_THE-IMPOSSIBLE-PRESS_TRANSCRIBED.md`) into the Jay Rosen Internet Archive tools and features.
 
 ---
 

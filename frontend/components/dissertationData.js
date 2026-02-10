@@ -864,6 +864,66 @@ export const NOTABLE_QUOTATIONS = [
     quote: 'Seeds are sown not by being thrown out at random, but by being so distributed as to take root and have a chance of growth.',
     context: 'Dewey on the art of communication',
     pageRef: 'Chapter 8, p. 345'
+  },
+  {
+    quote: 'News arrives from a distance. It crosses the space between individuals and events.',
+    context: 'On the spatial origins of journalism and the fundamental role of distance in creating the need for news',
+    pageRef: 'Chapter 1, p. 13'
+  },
+  {
+    quote: 'The journalist becomes a dramatist; the audience becomes spectators rather than participants.',
+    context: 'On how the human interest story transforms the press-public relationship from information exchange into theater',
+    pageRef: 'Chapter 2, p. 72'
+  },
+  {
+    quote: 'Improvements in communication also make communication more difficult because they ensure that there will be more to communicate about.',
+    context: 'On the paradox that each advance in communication technology expands the volume of information competing for attention',
+    pageRef: 'Chapter 3, p. 95'
+  },
+  {
+    quote: 'As a way of tying people together the newspaper has a dissolving as well as a connecting tendency.',
+    context: 'On how mass circulation newspapers weaken local community bonds while creating abstract connections among strangers',
+    pageRef: 'Chapter 4, p. 140'
+  },
+  {
+    quote: 'When there is an indefinite supply of available information, attention is scarce. The battle for attention is then the very substance of communication.',
+    context: 'On the emergence of the attention economy and its consequences for public discourse',
+    pageRef: 'Chapter 5, p. 180'
+  },
+  {
+    quote: 'An impossible press was born, one which sought to solve the whole problem of public life simply by controlling the conduct of journalists.',
+    context: 'On how professionalization attempted to address structural failures in the press-public relationship through individual behavior',
+    pageRef: 'Chapter 6, p. 220'
+  },
+  {
+    quote: 'Yellow journalism put a sharper edge on the conflict between private profits and public duties.',
+    context: 'On the structural tension between journalism as commerce and journalism as public service',
+    pageRef: 'Chapter 6, p. 240'
+  },
+  {
+    quote: 'One could free all the facts in the world and still not be informing the public, for the important question was not what was released into the environment, but what took shape in the beliefs and behavior of the average citizen.',
+    context: 'On the gap between publishing facts and actually creating public understanding',
+    pageRef: 'Chapter 7, p. 280'
+  },
+  {
+    quote: 'The stereotype is a form of perception that works from private belief toward reality: we define first and then see.',
+    context: 'On how pre-existing mental categories filter and distort the reception of new information',
+    pageRef: 'Chapter 7, p. 282'
+  },
+  {
+    quote: 'The trouble lies deeper than the press, and so does the remedy.',
+    context: 'On why press reform alone cannot fix problems rooted in the structure of modern public life',
+    pageRef: 'Chapter 7, p. 320'
+  },
+  {
+    quote: 'Till the Great Society is converted into a Great Community, the Public will remain in eclipse.',
+    context: 'Dewey\'s argument that rebuilding community is the prerequisite for a functioning public, not better journalism',
+    pageRef: 'Chapter 8, p. 340'
+  },
+  {
+    quote: 'Providing information is not all there is to informing the public.',
+    context: 'On the distinction between distributing facts and creating the conditions under which people can make use of them',
+    pageRef: 'Conclusion, p. 380'
   }
 ];
 
@@ -896,6 +956,62 @@ export const KEY_THEMES = [
   {
     theme: 'The professional attitude obscures fundamental problems',
     description: 'By focusing exclusively on accuracy and fairness, journalism criticism misses the structural factors that determine whether the press can inform the public.'
+  },
+  {
+    theme: 'News arises from distance',
+    description: 'The need for journalism only exists when events unfold beyond direct experience. News crosses the space between individuals and events, and this distance is not merely geographic but social and experiential.'
+  },
+  {
+    theme: 'The public is not found but formed',
+    description: 'There is no pre-existing public waiting to be informed. A public must be actively created through shared understanding of common problems, and this requires more than just distributing facts.'
+  },
+  {
+    theme: 'Each new medium inspires and then disappoints',
+    description: 'Every communication technology follows the same arc: utopian hopes that it will restore small-scale democratic participation, followed by the realization that technology cannot solve social problems.'
+  },
+  {
+    theme: 'The newspaper both connects and dissolves',
+    description: 'Mass circulation newspapers create abstract bonds between strangers while weakening the local, face-to-face ties that sustain genuine community.'
+  },
+  {
+    theme: 'Mobilized privacy replaces public life',
+    description: 'Modern communication is addressed not to the public but to private individuals consuming messages in isolation. We have evolved a radical form of mobilized privacy: individuals hooked into long lines of communication from remote sources.'
+  },
+  {
+    theme: 'News as drama turns citizens into spectators',
+    description: 'The human interest story transforms the reader from a participant who acts on information into a spectator who merely watches. The journalist becomes a dramatist, and public affairs become entertainment.'
+  },
+  {
+    theme: 'We respond to pictures in our heads, not reality',
+    description: 'People act not on the world as it is but on representations of the world constructed from stereotypes, media images, and prior beliefs. We define first and then see.'
+  },
+  {
+    theme: 'More communication creates more to communicate about',
+    description: 'Improvements in communication do not simplify the task of informing the public. They expand the volume of events, issues, and perspectives that demand attention, making the problem harder, not easier.'
+  },
+  {
+    theme: 'Media-created publics are inherently unstable',
+    description: 'Publics assembled by mass media form around events and dissolve when attention shifts. Unlike communities bound by shared experience and obligation, media publics lack the stability required for sustained democratic action.'
+  },
+  {
+    theme: 'The conflict between commerce and public duty is structural',
+    description: 'Journalism operates as a business that claims a public function. Yellow journalism exposed this contradiction, and professionalization was an attempt to manage it, but the tension cannot be eliminated by professional standards alone.'
+  },
+  {
+    theme: 'Making things public does not make a public',
+    description: 'Publication and publicity are not the same as creating an informed, engaged citizenry. Releasing information into the world accomplishes nothing if the conditions for public understanding and action do not exist.'
+  },
+  {
+    theme: 'Communication is an art, not merely transmission',
+    description: 'Effective public communication requires understanding audiences and contexts, not just sending out facts. Like seeds, ideas must be distributed so they can take root and grow, not scattered at random.'
+  },
+  {
+    theme: 'The press structures events to its own demands',
+    description: 'Mass media does not passively reflect the world; it reshapes events according to its own requirements for drama, conflict, brevity, and consumability. Form shapes content, and the medium biases the message.'
+  },
+  {
+    theme: 'The press-public relationship requires ecological thinking',
+    description: 'Understanding journalism requires examining five interacting factors: scale, social bonds, media structure, language and symbols, and professional attitudes. Press and public exist within a larger system where changes in one element affect all others.'
   }
 ];
 

@@ -128,7 +128,7 @@ Traditional archive interfaces force users to manually search through hundreds o
 - **PDF report**: Entity profile summary + mentions list
 
 #### Citation Generation
-- **Per-entity citation**: "Rosen, Jay. Mentions across Jay Rosen Digital Archive."
+- **Per-entity citation**: "Rosen, Jay. Mentions across Jay Rosen Internet Archive."
 - **Per-mention citation**: Auto-generate MLA/APA/Chicago for each record
 - **Copy to clipboard** quick action
 
@@ -287,7 +287,7 @@ Vue renders profile + mentions + related entities
 ### Entity Profile Header
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│  Jay Rosen Digital Archive                        [Search]   │
+│  Jay Rosen Internet Archive                        [Search]   │
 ├──────────────────────────────────────────────────────────────┤
 │                                                                │
 │  👤 Person                                          ID: P0001  │

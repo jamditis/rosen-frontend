@@ -386,4 +386,4 @@ Rosen argues this is both impossible and misleading:
 ---
 
 *Document prepared for review, December 2025*
-*Jay Rosen Digital Archive*
+*Jay Rosen Internet Archive*

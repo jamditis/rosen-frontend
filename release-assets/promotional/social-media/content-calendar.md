@@ -19,7 +19,7 @@
 
 ### Day -14: Teaser #1
 **All Platforms:**
-> Something big is coming to the Jay Rosen Digital Archive. 36 years of journalism criticism. Searchable. Preserved. Stay tuned.
+> Something big is coming to the Jay Rosen Internet Archive. 36 years of journalism criticism. Searchable. Preserved. Stay tuned.
 
 **Visual:** Archive logo or mysterious visual
 
@@ -70,14 +70,14 @@ Rosen's answer, written before the internet, before social media, before the cur
 **Thread/Post 3:**
 > Read it here: https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 
-Part of the new Jay Rosen Digital Archive, which preserves 36 years of journalism criticism in one searchable place. [3/X]
+Part of the new Jay Rosen Internet Archive, which preserves 36 years of journalism criticism in one searchable place. [3/X]
 
 ---
 
 **Afternoon - Full Archive Announcement:**
 
 **Thread/Post 1:**
-> Also launching today: The complete Jay Rosen Digital Archive.
+> Also launching today: The complete Jay Rosen Internet Archive.
 
 849+ records spanning 36 years (1986-2025). Full-text search. Entity mapping. Concept tracking.
 
@@ -103,7 +103,7 @@ Full dissertation: https://pressthink.org/wp-content/rosen-archive/index.html#di
 ### Day +2: Key Concept Spotlight
 
 **Thread:**
-> The most prominent concept in the Jay Rosen Digital Archive: "The people formerly known as the audience."
+> The most prominent concept in the Jay Rosen Internet Archive: "The people formerly known as the audience."
 
 Here's how it evolved from 2006 to today: 🧵
 
@@ -136,7 +136,7 @@ Read the full dissertation: https://pressthink.org/wp-content/rosen-archive/inde
 ### Day +6: Weekly Roundup
 
 **Post:**
-> This week we launched the Jay Rosen Digital Archive with:
+> This week we launched the Jay Rosen Internet Archive with:
 
 ✓ 849+ searchable records
 ✓ First-ever public release of his 1986 dissertation

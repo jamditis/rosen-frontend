@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Entity Extraction System is an AI-powered module for the Jay Rosen Digital Archive that automatically identifies and extracts named entities (people, organizations, works, concepts, events, locations) and their relationships from archived content.
+The Entity Extraction System is an AI-powered module for the Jay Rosen Internet Archive that automatically identifies and extracts named entities (people, organizations, works, concepts, events, locations) and their relationships from archived content.
 
 ## Key Features
 
@@ -370,4 +370,4 @@ For issues or questions:
 
 ## License
 
-This module is part of the Jay Rosen Digital Archive project.
+This module is part of the Jay Rosen Internet Archive project.

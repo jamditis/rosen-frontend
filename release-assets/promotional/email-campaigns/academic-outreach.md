@@ -7,7 +7,7 @@
 ## Email Details
 
 **Subject Line Options:**
-1. "New Resource: Jay Rosen Digital Archive + Teaching Materials"
+1. "New Resource: Jay Rosen Internet Archive + Teaching Materials"
 2. "Jay Rosen's 1986 Dissertation Now Available for Teaching"
 3. "36 Years of Journalism Criticism—Searchable and Citable"
 
@@ -22,15 +22,15 @@
 
 Dear [Name/Title],
 
-I'm writing to share a new resource that may be valuable for your research and teaching: the **Jay Rosen Digital Archive**.
+I'm writing to share a new resource that may be valuable for your research and teaching: the **Jay Rosen Internet Archive**.
 
 ---
 
 ### What It Is
 
-The archive is a comprehensive, searchable collection of Jay Rosen's journalism criticism spanning 36 years (1986-2025). It includes:
+The archive is a searchable collection of Jay Rosen's journalism criticism spanning 36 years (1986-2025). It includes:
 
-- **849+ records:** Articles, essays, blog posts, Twitter threads, and videos
+- **849+ records:** Articles, essays, blog posts, Twitter threads, Bluesky posts, Tumblr posts, and videos
 - **The 1986 dissertation:** "The Impossible Press," publicly available for the first time
 - **Full metadata:** Categorization, extracted entities, and relationship mapping
 - **Research tools:** Citation information, archival PDFs, and data export

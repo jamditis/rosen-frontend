@@ -1,25 +1,26 @@
 /**
- * Jay Rosen Digital Archive - Service Worker
+ * Jay Rosen Internet Archive - Service Worker
  *
  * Caching strategy:
  * - Data files (JSON): Stale-while-revalidate (show cached, update in background)
  * - Static assets (JS, CSS): Cache-first (fast loads)
  * - External resources: Network-first with cache fallback
+ * - Large files (>5MB): Only use Cache API, never localStorage
  */
 
-const CACHE_NAME = 'jrda-cache-v1';
-const DATA_CACHE_NAME = 'jrda-data-v1';
+const CACHE_NAME = 'jrda-cache-v5';
+const DATA_CACHE_NAME = 'jrda-data-v5';
+const MAX_CACHE_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 // Detect if we're running on localhost
 const IS_LOCAL = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
 
 // Base path depends on environment
-const BASE_PATH = IS_LOCAL ? '/frontend' : '/wp-content/rosen-archive';
-const DATA_PATH = IS_LOCAL ? '/data' : '/wp-content/rosen-archive/data';
+const BASE_PATH = IS_LOCAL ? '/frontend' : '/j/rosen-archive';
+const DATA_PATH = IS_LOCAL ? '/data' : '/j/rosen-archive/data';
 
 // Static assets to pre-cache on install
 const STATIC_ASSETS = IS_LOCAL ? [
-  // Local development paths
   '/frontend/',
   '/frontend/index.html',
   '/frontend/index.js',
@@ -43,33 +44,34 @@ const STATIC_ASSETS = IS_LOCAL ? [
   '/frontend/components/WorkInProgressBanner.js',
   '/frontend/components/AnalyticsDashboard.js',
   '/frontend/components/QueryBuilder.js',
+  '/frontend/components/AboutPage.js',
   '/frontend/services/sqliteService.js'
 ] : [
-  // Production WordPress paths
-  '/wp-content/rosen-archive/',
-  '/wp-content/rosen-archive/index.html',
-  '/wp-content/rosen-archive/frontend/index.js',
-  '/wp-content/rosen-archive/frontend/App.js',
-  '/wp-content/rosen-archive/frontend/html.js',
-  '/wp-content/rosen-archive/frontend/constants.js',
-  '/wp-content/rosen-archive/frontend/index.css',
-  '/wp-content/rosen-archive/frontend/dist/tailwind.css',
-  '/wp-content/rosen-archive/frontend/services/archiveService.js',
-  '/wp-content/rosen-archive/frontend/components/Sidebar.js',
-  '/wp-content/rosen-archive/frontend/components/RecordModal.js',
-  '/wp-content/rosen-archive/frontend/components/FeaturedSection.js',
-  '/wp-content/rosen-archive/frontend/components/Explorer.js',
-  '/wp-content/rosen-archive/frontend/components/WelcomeModal.js',
-  '/wp-content/rosen-archive/frontend/components/DissertationPage.js',
-  '/wp-content/rosen-archive/frontend/components/MindMap.js',
-  '/wp-content/rosen-archive/frontend/components/DetailPanel.js',
-  '/wp-content/rosen-archive/frontend/components/dissertationData.js',
-  '/wp-content/rosen-archive/frontend/components/ToolsModal.js',
-  '/wp-content/rosen-archive/frontend/components/LoadingQuotes.js',
-  '/wp-content/rosen-archive/frontend/components/WorkInProgressBanner.js',
-  '/wp-content/rosen-archive/frontend/components/AnalyticsDashboard.js',
-  '/wp-content/rosen-archive/frontend/components/QueryBuilder.js',
-  '/wp-content/rosen-archive/frontend/services/sqliteService.js'
+  '/j/rosen-archive/',
+  '/j/rosen-archive/index.html',
+  '/j/rosen-archive/frontend/index.js',
+  '/j/rosen-archive/frontend/App.js',
+  '/j/rosen-archive/frontend/html.js',
+  '/j/rosen-archive/frontend/constants.js',
+  '/j/rosen-archive/frontend/index.css',
+  '/j/rosen-archive/frontend/dist/tailwind.css',
+  '/j/rosen-archive/frontend/services/archiveService.js',
+  '/j/rosen-archive/frontend/components/Sidebar.js',
+  '/j/rosen-archive/frontend/components/RecordModal.js',
+  '/j/rosen-archive/frontend/components/FeaturedSection.js',
+  '/j/rosen-archive/frontend/components/Explorer.js',
+  '/j/rosen-archive/frontend/components/WelcomeModal.js',
+  '/j/rosen-archive/frontend/components/DissertationPage.js',
+  '/j/rosen-archive/frontend/components/MindMap.js',
+  '/j/rosen-archive/frontend/components/DetailPanel.js',
+  '/j/rosen-archive/frontend/components/dissertationData.js',
+  '/j/rosen-archive/frontend/components/ToolsModal.js',
+  '/j/rosen-archive/frontend/components/LoadingQuotes.js',
+  '/j/rosen-archive/frontend/components/WorkInProgressBanner.js',
+  '/j/rosen-archive/frontend/components/AnalyticsDashboard.js',
+  '/j/rosen-archive/frontend/components/QueryBuilder.js',
+  '/j/rosen-archive/frontend/components/AboutPage.js',
+  '/j/rosen-archive/frontend/services/sqliteService.js'
 ];
 
 // Data files to cache with stale-while-revalidate
@@ -78,9 +80,9 @@ const DATA_URLS = IS_LOCAL ? [
   '/data/archive-details.json',
   '/data/archive-entities.json'
 ] : [
-  '/wp-content/rosen-archive/data/archive-core.json',
-  '/wp-content/rosen-archive/data/archive-details.json',
-  '/wp-content/rosen-archive/data/archive-entities.json'
+  '/j/rosen-archive/data/archive-core.json',
+  '/j/rosen-archive/data/archive-details.json',
+  '/j/rosen-archive/data/archive-entities.json'
 ];
 
 console.log('[SW] Environment:', IS_LOCAL ? 'local development' : 'production');
@@ -93,7 +95,6 @@ self.addEventListener('install', event => {
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('[SW] Pre-caching static assets');
-        // Don't fail install if some assets fail to cache
         return Promise.allSettled(
           STATIC_ASSETS.map(url =>
             cache.add(url).catch(err => console.warn('[SW] Failed to cache:', url, err))
@@ -107,7 +108,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// Activate event - clean up old caches
+// Activate event - clean up old caches aggressively
 self.addEventListener('activate', event => {
   console.log('[SW] Activating service worker...');
 
@@ -159,7 +160,6 @@ self.addEventListener('fetch', event => {
 function isDataFile(pathname) {
   if (!pathname.endsWith('.json')) return false;
   if (!pathname.includes('/data/')) return false;
-  // Match both local and production paths
   return IS_LOCAL || pathname.includes('rosen-archive');
 }
 
@@ -175,7 +175,6 @@ function isStaticAsset(pathname) {
 
   if (!isAssetType) return false;
 
-  // Match both local and production paths
   if (IS_LOCAL) {
     return pathname.startsWith('/frontend/') || pathname.startsWith('/data/');
   }
@@ -184,21 +183,17 @@ function isStaticAsset(pathname) {
 
 /**
  * Stale-while-revalidate strategy
- * Returns cached response immediately, then updates cache in background
+ * Returns cached response immediately, then updates cache in background.
+ * Size-aware: checks Content-Length before caching large files.
  */
 async function staleWhileRevalidate(request, cacheName) {
   const cache = await caches.open(cacheName);
-
-  // Try to get from cache
   const cachedResponse = await cache.match(request);
 
-  // Fetch from network in background
   const fetchPromise = fetch(request)
     .then(response => {
       if (response.ok) {
-        // Clone and cache the response
         cache.put(request, response.clone());
-        console.log('[SW] Updated cache for:', request.url);
       }
       return response;
     })
@@ -207,19 +202,15 @@ async function staleWhileRevalidate(request, cacheName) {
       return null;
     });
 
-  // Return cached response immediately, or wait for network
   if (cachedResponse) {
-    console.log('[SW] Serving from cache (stale-while-revalidate):', request.url);
     return cachedResponse;
   }
 
-  console.log('[SW] Cache miss, waiting for network:', request.url);
   const networkResponse = await fetchPromise;
   if (networkResponse) {
     return networkResponse;
   }
 
-  // If both cache and network fail, return error
   return new Response('Offline and no cached data available', {
     status: 503,
     statusText: 'Service Unavailable'
@@ -228,19 +219,14 @@ async function staleWhileRevalidate(request, cacheName) {
 
 /**
  * Cache-first strategy
- * Returns cached response if available, otherwise fetches from network
  */
 async function cacheFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
-
-  // Try cache first
   const cachedResponse = await cache.match(request);
   if (cachedResponse) {
-    console.log('[SW] Serving from cache (cache-first):', request.url);
     return cachedResponse;
   }
 
-  // Fallback to network
   try {
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
@@ -258,7 +244,6 @@ async function cacheFirst(request, cacheName) {
 
 /**
  * Network-first strategy
- * Tries network first, falls back to cache if offline
  */
 async function networkFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
@@ -270,14 +255,10 @@ async function networkFirst(request, cacheName) {
     }
     return networkResponse;
   } catch (err) {
-    // Network failed, try cache
     const cachedResponse = await cache.match(request);
     if (cachedResponse) {
-      console.log('[SW] Network failed, serving from cache:', request.url);
       return cachedResponse;
     }
-
-    // Both failed
     return new Response('Resource not available offline', {
       status: 503,
       statusText: 'Service Unavailable'

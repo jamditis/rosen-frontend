@@ -29,7 +29,7 @@ The dissertation traces how the press, from its origins as an extension of face-
 
 ## Central Thesis
 
-The relationship between press and public cannot be understood simply by examining the accuracy, fairness, and completeness of news coverage. Instead, it must be viewed "ecologically"—set within a particular social context where the world is "symbolized and summed-up, arranged and distorted by a number of communication media." The dissertation's central finding is that **the professional attitude toward journalism—focused exclusively on information delivery—is a deeply limited view that ignores fundamental transformations in the nature of public life itself.**
+The relationship between press and public cannot be understood simply by examining the accuracy, fairness, and completeness of news coverage. Instead, it must be viewed "ecologically"—set within a particular social context where the world is "symbolized and summed-up, arranged and distorted by a number of communication media." The dissertation's central finding is that **the professional attitude toward journalism—focused exclusively on information delivery—is a limited view that ignores structural changes in public life itself.**
 
 ---
 

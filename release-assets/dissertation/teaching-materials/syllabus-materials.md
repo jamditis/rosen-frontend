@@ -267,7 +267,7 @@ Students should come prepared to identify one contemporary example that illustra
 |-----------|---------------|----------|----------------|
 | **Textual engagement** | Directly quotes and analyzes specific passages; demonstrates close reading | References specific concepts accurately; shows familiarity with text | General references to ideas; limited textual evidence |
 | **Critical thinking** | Raises original questions; identifies tensions and contradictions; synthesizes across chapters | Explains and applies concepts correctly; makes reasonable inferences | Summarizes without analysis; accepts claims uncritically |
-| **Contemporary application** | Draws sophisticated connections to current events; uses Rosen's framework to generate new insights | Makes relevant contemporary connections; applies concepts appropriately | Limited or superficial connections to contemporary issues |
+| **Contemporary application** | Draws specific connections to current events; uses Rosen's framework to generate new insights | Makes relevant contemporary connections; applies concepts appropriately | Limited or superficial connections to contemporary issues |
 | **Engagement with peers** | Builds on others' ideas; asks probing questions; advances the discussion | Responds substantively to peers; participates consistently | Minimal interaction; contributions don't advance discussion |
 
 ### Written Work

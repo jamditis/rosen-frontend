@@ -189,4 +189,4 @@ export const TESTIMONIALS = [
 ---
 
 *Proposed December 1, 2025*
-*Jay Rosen Digital Archive*
+*Jay Rosen Internet Archive*

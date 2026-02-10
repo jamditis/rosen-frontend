@@ -351,7 +351,7 @@ Users need a **unified navigation system** that lets them:
 ### Main Navigation Hub
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│  Jay Rosen Digital Archive - Knowledge Navigator              │
+│  Jay Rosen Internet Archive - Knowledge Navigator              │
 │                                                                │
 │  [Search for records, entities, concepts, topics...]    🔍    │
 │                                                                │

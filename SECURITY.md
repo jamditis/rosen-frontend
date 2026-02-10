@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-The Jay Rosen Digital Archive takes security seriously. If you discover a security vulnerability, please follow responsible disclosure practices:
+The Jay Rosen Internet Archive takes security seriously. If you discover a security vulnerability, please follow responsible disclosure practices:
 
 ### How to Report
 

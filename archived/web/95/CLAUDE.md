@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **Windows 95-themed retro interface** for exploring the Jay Rosen Digital Archive. Built as a nostalgic web application, it combines a vintage OS aesthetic with modern data visualization techniques to provide an engaging way to browse Professor Jay Rosen's body of work on journalism, politics, and media criticism.
+This is a **Windows 95-themed retro interface** for exploring the Jay Rosen Internet Archive. Built as a nostalgic web application, it combines a vintage OS aesthetic with modern data visualization techniques to provide an engaging way to browse Professor Jay Rosen's body of work on journalism, politics, and media criticism.
 
 **Location:** `C:\Users\amdit\OneDrive\Desktop\Crimes\playground\rosen-scraper\web\95\`
 **Live Deployment:** https://centerforcooperativemedia.org/wp-content/amditis/rosen/95/

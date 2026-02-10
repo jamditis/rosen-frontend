@@ -6,7 +6,7 @@
 
 ## Overview
 
-This document tracks the status of data processing for the Jay Rosen Digital Archive Phase 1 release.
+This document tracks the status of data processing for the Jay Rosen Internet Archive Phase 1 release.
 
 ---
 

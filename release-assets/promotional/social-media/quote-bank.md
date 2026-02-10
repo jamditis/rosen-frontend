@@ -251,4 +251,4 @@ Longer passages that work well as Twitter/Bluesky threads.
 
 ---
 
-*Prepared for the Jay Rosen Digital Archive, December 2025*
+*Prepared for the Jay Rosen Internet Archive, December 2025*

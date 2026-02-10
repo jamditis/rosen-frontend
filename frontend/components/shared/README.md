@@ -1,6 +1,6 @@
 # Shared Components
 
-A collection of reusable UI components for the Jay Rosen Digital Archive. These components follow the archive's design system (Special Elite/Roboto Mono fonts, stone color palette, 2px borders, 8px shadows) and work with the zero-build React architecture.
+A collection of reusable UI components for the Jay Rosen Internet Archive. These components follow the archive's design system (Special Elite/Roboto Mono fonts, stone color palette, 2px borders, 8px shadows) and work with the zero-build React architecture.
 
 ## Components
 

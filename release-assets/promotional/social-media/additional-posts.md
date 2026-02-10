@@ -13,7 +13,7 @@ Supplemental posts beyond the launch day content. Use for ongoing promotion, rea
 **Quote 4:**
 > "The professional attitude framed a structural conflict as a matter of personal conduct, obscuring the fundamental tension between commercial imperatives and public service."
 
-1986. Still true. The Jay Rosen Digital Archive: https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
+1986. Still true. The Jay Rosen Internet Archive: https://pressthink.org/wp-content/rosen-archive/index.html#dissertation
 
 ---
 
@@ -117,7 +117,7 @@ Read the full text, now public for the first time: https://pressthink.org/wp-con
 ### "Concept Evolution" Thread
 
 **Post 1:**
-One thing the Jay Rosen Digital Archive lets you do: trace how concepts evolve.
+One thing the Jay Rosen Internet Archive lets you do: trace how concepts evolve.
 
 Take "the view from nowhere"—one of Rosen's most influential ideas.
 
@@ -152,7 +152,7 @@ The archive lets you trace this evolution from dissertation to present: https://
 ### "For Researchers" Thread
 
 **Post 1:**
-For researchers and graduate students: the Jay Rosen Digital Archive isn't just a reading list.
+For researchers and graduate students: the Jay Rosen Internet Archive isn't just a reading list.
 
 It's a structured dataset designed for serious analysis.
 
@@ -237,7 +237,7 @@ When Rosen's concepts are relevant to ongoing discussions:
 
 Mastodon post (500 char limit):
 
-The Jay Rosen Digital Archive is live.
+The Jay Rosen Internet Archive is live.
 
 36 years of journalism criticism. 849+ records. First public release of his 1986 dissertation.
 
@@ -255,7 +255,7 @@ https://pressthink.org/wp-content/rosen-archive/index.html
 
 For cross-posting to Substack Notes:
 
-Launching today: The Jay Rosen Digital Archive
+Launching today: The Jay Rosen Internet Archive
 
 If you write about media, journalism, or press criticism, this might be useful. 36 years of Jay Rosen's work—articles, essays, Twitter threads, and his never-before-published 1986 dissertation—all searchable in one place.
 
@@ -267,12 +267,12 @@ Free and open: https://pressthink.org/wp-content/rosen-archive/index.html
 
 ### Reddit (r/journalism, r/media_criticism)
 
-**Title:** Jay Rosen Digital Archive launches with 36 years of journalism criticism + first public release of his 1986 dissertation
+**Title:** Jay Rosen Internet Archive launches with 36 years of journalism criticism + first public release of his 1986 dissertation
 
 **Body:**
 For those interested in press criticism and journalism history:
 
-The Jay Rosen Digital Archive just launched. It's a searchable collection of 849+ records spanning 1986-2025—articles, essays, blog posts, Twitter threads, and more.
+The Jay Rosen Internet Archive just launched. It's a searchable collection of 849+ records spanning 1986-2025—articles, essays, blog posts, Twitter threads, and more.
 
 The main draw is probably the 1986 dissertation, "The Impossible Press," which has never been publicly available. Written under Neil Postman, it's a structural critique of American journalism that feels remarkably current.
 

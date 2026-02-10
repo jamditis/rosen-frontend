@@ -1,6 +1,6 @@
-# **Master Prompt for Building the Jay Rosen Digital Archive**
+# **Master Prompt for Building the Jay Rosen Internet Archive**
 
-**Objective**: To construct the complete, end-to-end Jay Rosen Digital Archive system by directing a team of specialized AI agents.
+**Objective**: To construct the complete, end-to-end Jay Rosen Internet Archive system by directing a team of specialized AI agents.
 
 **To the Project Lead (Human Operator)**: This document is your master plan. Your function is to guide the construction of the project by assigning the tasks outlined below to the appropriate AI specialist agent. Use the persona documents to interact with each agent according to its function.
 

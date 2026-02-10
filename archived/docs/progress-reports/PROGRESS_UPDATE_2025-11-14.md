@@ -1,4 +1,4 @@
-# Jay Rosen Digital Archive - Progress Update
+# Jay Rosen Internet Archive - Progress Update
 **Period:** November 8-14, 2025
 **To:** Professor Jay Rosen
 **From:** Joe Amditis & Development Team

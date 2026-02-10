@@ -98,4 +98,4 @@ See `/release-assets/dissertation/digital-presentation/html-reader-architecture.
 ## License
 
 The dissertation content is &copy; 1986 Jay Rosen.
-The reader code is part of the Jay Rosen Digital Archive project.
+The reader code is part of the Jay Rosen Internet Archive project.

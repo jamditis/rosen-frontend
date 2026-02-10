@@ -1,6 +1,6 @@
 # Future Libraries Documentation
 
-This document describes libraries installed for future use in the Jay Rosen Digital Archive project.
+This document describes libraries installed for future use in the Jay Rosen Internet Archive project.
 
 ---
 

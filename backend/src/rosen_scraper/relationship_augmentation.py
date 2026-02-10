@@ -148,7 +148,7 @@ class RelationshipAugmenter:
     def extract_new_relationships(self, record: Dict) -> List[Dict]:
         """Extract ONLY new relationship types from record"""
 
-        prompt = f"""You are analyzing an article from the Jay Rosen Digital Archive.
+        prompt = f"""You are analyzing an article from the Jay Rosen Internet Archive.
 
 IMPORTANT: Extract ONLY these 5 relationship types:
 1. "Pioneered" - Person pioneered/invented/was first to develop a concept/work/practice

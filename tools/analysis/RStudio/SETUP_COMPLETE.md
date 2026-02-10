@@ -7,7 +7,7 @@
 
 ## 📊 What Was Created
 
-A complete RStudio analysis environment for analyzing the Jay Rosen Digital Archive's entity extraction and relationship data.
+A complete RStudio analysis environment for analyzing the Jay Rosen Internet Archive's entity extraction and relationship data.
 
 ### Directory Structure
 
@@ -280,7 +280,7 @@ RStudio/
 
 ## 🎉 Success!
 
-Your RStudio analysis environment is ready to use. You now have a complete toolkit for exploring the 5,160 entities and 7,499 relationships in the Jay Rosen Digital Archive.
+Your RStudio analysis environment is ready to use. You now have a complete toolkit for exploring the 5,160 entities and 7,499 relationships in the Jay Rosen Internet Archive.
 
 **Get started:** Open `docs/QUICK_START_R.md` and follow the 5-minute guide!
 
@@ -288,5 +288,5 @@ Your RStudio analysis environment is ready to use. You now have a complete toolk
 
 **Created by:** Claude Code
 **Date:** 2025-11-07
-**Project:** Jay Rosen Digital Archive
+**Project:** Jay Rosen Internet Archive
 **Version:** [2.15.0]

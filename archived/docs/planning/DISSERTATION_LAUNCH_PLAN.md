@@ -7,7 +7,7 @@
 
 ## Executive Summary
 
-This plan outlines the creation of a standalone dissertation launch site that serves as a "soft launch" before the main Jay Rosen Digital Archive goes live. The site will present Jay Rosen's 1986 dissertation "The Impossible Press" as an immersive, explorable digital experience that invites academic and general audiences to engage with foundational ideas about journalism, democracy, and the public sphere.
+This plan outlines the creation of a standalone dissertation launch site that serves as a "soft launch" before the main Jay Rosen Internet Archive goes live. The site will present Jay Rosen's 1986 dissertation "The Impossible Press" as an immersive, explorable digital experience that invites academic and general audiences to engage with foundational ideas about journalism, democracy, and the public sphere.
 
 ---
 

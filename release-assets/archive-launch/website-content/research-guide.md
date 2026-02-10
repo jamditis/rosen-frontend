@@ -1,4 +1,4 @@
-# Research Guide: Jay Rosen Digital Archive
+# Research Guide: Jay Rosen Internet Archive
 
 **Status:** COMPLETE
 
@@ -6,7 +6,7 @@
 
 ## Introduction
 
-This guide helps researchers, students, and journalists effectively use the Jay Rosen Digital Archive for academic research, teaching, and professional work.
+This guide helps researchers, students, and journalists effectively use the Jay Rosen Internet Archive for academic research, teaching, and professional work.
 
 ---
 
@@ -217,7 +217,7 @@ See [Citations page](/release-assets/dissertation/scholarly-materials/citations.
 ### Citing the Archive Itself
 
 ```
-Jay Rosen Digital Archive. Created by Joe Amditis. Center for Cooperative
+Jay Rosen Internet Archive. Created by Joe Amditis. Center for Cooperative
     Media, 2025. https://[archive-url].
 ```
 

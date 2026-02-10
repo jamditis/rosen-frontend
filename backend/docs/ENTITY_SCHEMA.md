@@ -2,7 +2,7 @@
 
 ## Overview
 
-The entity extraction system uses Google Gemini AI to automatically identify and categorize named entities (people, organizations, works, concepts, events, locations) and their relationships from text content in the Jay Rosen Digital Archive.
+The entity extraction system uses Google Gemini AI to automatically identify and categorize named entities (people, organizations, works, concepts, events, locations) and their relationships from text content in the Jay Rosen Internet Archive.
 
 **Version:** 2.1  
 **Schema File:** `backend/entity_extraction_schema.json`  

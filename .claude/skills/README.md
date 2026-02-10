@@ -1,6 +1,6 @@
-# Claude Code Skills for Jay Rosen Digital Archive
+# Claude Code Skills for Jay Rosen Internet Archive
 
-This directory contains specialized skills for Claude Code to assist with development, deployment, and maintenance of the Jay Rosen Digital Archive.
+This directory contains specialized skills for Claude Code to assist with development, deployment, and maintenance of the Jay Rosen Internet Archive.
 
 ## Available Skills
 

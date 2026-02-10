@@ -1,7 +1,7 @@
 # PRD: Discourse Mapping & Conversation Explorer
 
 ## Executive Summary
-A specialized visualization system that maps intellectual conversations and discourse threads across the Jay Rosen Digital Archive. By leveraging the `responds_to` and `related_to` relationship fields, this tool reveals how ideas, critiques, and discussions evolved through direct citation, response, and debate over 25+ years of journalism criticism.
+A specialized visualization system that maps intellectual conversations and discourse threads across the Jay Rosen Internet Archive. By leveraging the `responds_to` and `related_to` relationship fields, this tool reveals how ideas, critiques, and discussions evolved through direct citation, response, and debate over 25+ years of journalism criticism.
 
 ## Problem Statement
 Journalism scholarship is fundamentally conversational—ideas build on, critique, and extend previous work. The archive contains rich `responds_to` relationships (Record A responds to Record B) but no interface to:

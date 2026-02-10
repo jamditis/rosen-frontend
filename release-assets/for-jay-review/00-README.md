@@ -155,4 +155,4 @@ Contact Joe Amditis: jamditis@gmail.com
 ---
 
 *Folder created December 1, 2025*
-*Jay Rosen Digital Archive*
+*Jay Rosen Internet Archive*

@@ -1,7 +1,7 @@
 # Product Requirements Document: Smart Data Corrector
 **Version:** 1.0
 **Date:** 2025-10-22
-**Project:** Jay Rosen Digital Archive
+**Project:** Jay Rosen Internet Archive
 **Script Name:** `tools/diagnostics/smart_data_corrector.py`
 
 ---

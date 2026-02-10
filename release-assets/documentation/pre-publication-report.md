@@ -1,4 +1,4 @@
-# Jay Rosen Digital Archive — Pre-Publication Report
+# Jay Rosen Internet Archive — Pre-Publication Report
 
 **Report Date:** December 1, 2025
 **Prepared for:** Jay Rosen
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-The Jay Rosen Digital Archive is complete and ready for the December 2025 public release of *The Impossible Press*. All technical components have been validated, documentation is in place, and the archive is prepared for deployment to your WordPress site.
+The Jay Rosen Internet Archive is complete and ready for the December 2025 public release of *The Impossible Press*. All technical components have been validated, documentation is in place, and the archive is prepared for deployment to your WordPress site.
 
 This report summarizes what has been built, what's included, and what remains for future development.
 
@@ -201,4 +201,4 @@ The archive is ready. The impossible press remains impossible. But now readers c
 ---
 
 *Report generated December 1, 2025*
-*Jay Rosen Digital Archive — jamditis/rosen-frontend*
+*Jay Rosen Internet Archive — jamditis/rosen-frontend*

@@ -185,4 +185,4 @@ Create Option 3 (smart_data_corrector.py) with the PRD above.
 
 **Last Updated:** 2025-10-22
 **Author:** Analysis by Claude Code
-**Project:** Jay Rosen Digital Archive
+**Project:** Jay Rosen Internet Archive

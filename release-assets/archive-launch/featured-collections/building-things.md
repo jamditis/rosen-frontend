@@ -28,7 +28,7 @@ This collection highlights Jay Rosen's work as a builder of journalism infrastru
 
 ### Studio 20 at NYU (2010-present)
 
-**What it is:** An innovative graduate program at NYU's Arthur L. Carter Journalism Institute focused on digital journalism innovation. Rather than teaching traditional journalism skills, Studio 20 trains students to build new forms of journalism for the digital age.
+**What it is:** A graduate program at NYU's Arthur L. Carter Journalism Institute focused on digital journalism innovation. Rather than teaching traditional journalism skills, Studio 20 trains students to build new forms of journalism for the digital age.
 
 **Why it matters:** Studio 20 represents Rosen's commitment to building the future of journalism through education. The program has trained hundreds of students who have gone on to leadership roles in digital media and journalism organizations.
 

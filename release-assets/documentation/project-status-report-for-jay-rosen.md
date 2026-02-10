@@ -1,4 +1,4 @@
-# Jay Rosen Digital Archive & Dissertation Launch
+# Jay Rosen Internet Archive & Dissertation Launch
 ## Project Status Report — December 1, 2025
 
 **Prepared for:** Jay Rosen
@@ -300,4 +300,4 @@ The backend can now process additional content types (Twitter threads, Tumblr po
 ---
 
 *Report generated December 1, 2025*
-*Jay Rosen Digital Archive — jamditis/rosen-frontend*
+*Jay Rosen Internet Archive — jamditis/rosen-frontend*

@@ -24,7 +24,7 @@ const Header = ({
 }) => {
   // Detect environment for path generation
   const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  const DEFAULT_BACK = IS_LOCAL ? '../../index.html' : '/wp-content/rosen-archive/index.html';
+  const DEFAULT_BACK = IS_LOCAL ? '../../index.html' : '/j/rosen-archive/index.html';
   const finalBackLink = backLink || DEFAULT_BACK;
 
   return html`
@@ -41,10 +41,10 @@ const Header = ({
                 <${Newspaper} className="w-5 h-5" />
               </div>
               <span className="text-sm font-display font-bold text-stone-900 hidden sm:inline">
-                Jay Rosen Digital Archive
+                Jay Rosen Internet Archive
               </span>
               <span className="text-sm font-display font-bold text-stone-900 sm:hidden">
-                JRDA
+                JRIA
               </span>
             </a>
 

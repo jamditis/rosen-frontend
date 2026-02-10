@@ -1,4 +1,4 @@
-# Landing Page Content: Jay Rosen Digital Archive
+# Landing Page Content: Jay Rosen Internet Archive
 
 **Status:** COMPLETE
 
@@ -79,7 +79,7 @@ Every article generates an archival PDF. Original sources linked. Fully citable.
 
 ## About Section (Brief)
 
-The Jay Rosen Digital Archive preserves and makes accessible the complete digital record of Jay Rosen's journalism criticism, media commentary, and public engagement.
+The Jay Rosen Internet Archive preserves and makes accessible the complete digital record of Jay Rosen's journalism criticism, media commentary, and public engagement.
 
 **Who is Jay Rosen?**
 Professor of Journalism at NYU since 1986. Author of "What Are Journalists For?" Founder of PressThink. Pioneered concepts like "the view from nowhere" and "the people formerly known as the audience."
@@ -136,7 +136,7 @@ Built by Joe Amditis
 
 ## SEO Metadata
 
-**Title:** Jay Rosen Digital Archive | 36 Years of Journalism Criticism
+**Title:** Jay Rosen Internet Archive | 36 Years of Journalism Criticism
 
 **Description:** Searchable archive of Jay Rosen's journalism criticism from 1986 to present. Includes dissertation, PressThink blog, Twitter threads, and 849+ records spanning press, democracy, and public life.
 

@@ -1,4 +1,4 @@
-# Entity extraction pipeline for Jay Rosen Digital Archive
+# Entity extraction pipeline for Jay Rosen Internet Archive
 
 This document explains the process of extracting entities (people, organizations, concepts, etc.) and relationships from Jay Rosen's social media posts for the digital archive.
 
@@ -6,7 +6,7 @@ This document explains the process of extracting entities (people, organizations
 
 ## What we're doing (plain language)
 
-The Jay Rosen Digital Archive contains ~60,000 social media posts from Twitter/X and Bluesky. To make this content searchable and interconnected, we need to identify:
+The Jay Rosen Internet Archive contains ~60,000 social media posts from Twitter/X and Bluesky. To make this content searchable and interconnected, we need to identify:
 
 1. **Who** is mentioned (people like journalists, politicians, media figures)
 2. **What organizations** are discussed (news outlets, political parties, tech companies)

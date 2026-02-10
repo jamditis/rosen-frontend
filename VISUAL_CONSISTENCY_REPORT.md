@@ -6,7 +6,7 @@
 
 ## Executive Summary
 
-All dissertation launch materials maintain strong visual consistency with both the **main Jay Rosen Digital Archive** and **PressThink.org**. The quote font accessibility fix (Playfair Display → Georgia) has been applied and improves readability while maintaining the scholarly aesthetic.
+All dissertation launch materials maintain strong visual consistency with both the **main Jay Rosen Internet Archive** and **PressThink.org**. The quote font accessibility fix (Playfair Display → Georgia) has been applied and improves readability while maintaining the scholarly aesthetic.
 
 **Overall Assessment: ✅ PASS - Ready for publication**
 
@@ -31,7 +31,7 @@ All dissertation launch materials maintain strong visual consistency with both t
 - **Overall vibe:** Academic blog, serious journalism criticism
 
 ### Key Style Elements from Main Archive
-- **Header:** Warm paper texture, "Jay Rosen Digital Archive" in monospace
+- **Header:** Warm paper texture, "Jay Rosen Internet Archive" in monospace
 - **Body font:** Roboto Mono for UI, serif for content
 - **Accent:** Sky blue for links/buttons
 - **Layout:** Card-based, filterable, data-rich

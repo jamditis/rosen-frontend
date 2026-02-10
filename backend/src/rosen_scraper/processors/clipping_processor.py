@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Newspaper Clipping Processor
-Processes OCR'd newspaper clippings for the Jay Rosen Digital Archive.
+Processes OCR'd newspaper clippings for the Jay Rosen Internet Archive.
 
 This processor handles:
 - OCR text cleanup (artifacts, line breaks, hyphenation)

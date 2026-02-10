@@ -1,4 +1,4 @@
-# Blog Post: Jay Rosen Digital Archive Launch Announcement
+# Blog Post: Jay Rosen Internet Archive Launch Announcement
 
 **Status:** COMPLETE
 
@@ -8,9 +8,9 @@
 
 ## Title Options
 
-1. "Launching the Jay Rosen Digital Archive: 36 Years of Journalism Criticism, Now Searchable"
-2. "The Impossible Press, Now Public: Introducing the Jay Rosen Digital Archive"
-3. "Preserving Four Decades of Press Criticism: The Jay Rosen Digital Archive"
+1. "Launching the Jay Rosen Internet Archive: 36 Years of Journalism Criticism, Now Searchable"
+2. "The Impossible Press, Now Public: Introducing the Jay Rosen Internet Archive"
+3. "Preserving Four Decades of Press Criticism: The Jay Rosen Internet Archive"
 
 ---
 
@@ -18,7 +18,7 @@
 
 ### The Archive Is Live
 
-Today we're launching the [Jay Rosen Digital Archive](https://pressthink.org/wp-content/rosen-archive/index.html)—a comprehensive, searchable collection of 36 years of journalism criticism.
+Today we're launching the [Jay Rosen Internet Archive](https://pressthink.org/wp-content/rosen-archive/index.html)—a searchable collection of 36 years of journalism criticism.
 
 The archive contains 849+ records spanning 1986 to 2025: articles, essays, blog posts, Twitter threads, videos, and more. Every piece is searchable, categorized, and connected to the people, organizations, and concepts it discusses.
 
@@ -117,15 +117,15 @@ Questions or feedback? Contact jamditis@gmail.com.
 
 ## Author Bio
 
-**Joe Amditis** is the Director of Products and Events at the Center for Cooperative Media at Montclair State University. He created the Jay Rosen Digital Archive to preserve and make accessible four decades of influential journalism criticism.
+**Joe Amditis** is the Director of Products and Events at the Center for Cooperative Media at Montclair State University. He created the Jay Rosen Internet Archive to preserve and make accessible four decades of influential journalism criticism.
 
 ---
 
 ## Social Sharing
 
-**Twitter/X:** "Today we're launching the Jay Rosen Digital Archive—36 years of journalism criticism, now searchable. Plus: his 1986 dissertation, public for the first time. [LINK]"
+**Twitter/X:** "Today we're launching the Jay Rosen Internet Archive—36 years of journalism criticism, now searchable. Plus: his 1986 dissertation, public for the first time. [LINK]"
 
-**LinkedIn:** "Announcing the Jay Rosen Digital Archive: 849+ records spanning 1986-2025, including the first-ever public release of his doctoral dissertation. Free and open for research, teaching, and exploration. [LINK]"
+**LinkedIn:** "Announcing the Jay Rosen Internet Archive: 849+ records spanning 1986-2025, including the first-ever public release of his doctoral dissertation. Free and open for research, teaching, and exploration. [LINK]"
 
 ---
 

@@ -1,8 +1,8 @@
-# Jay Rosen Digital Archive - Visualization & Navigation PRDs
+# Jay Rosen Internet Archive - Visualization & Navigation PRDs
 
 ## Overview
 
-This directory contains Product Requirements Documents (PRDs) for five distinct visualization and navigation systems designed to make the Jay Rosen Digital Archive's entity and relationship data accessible, discoverable, and valuable for researchers, students, and the general public.
+This directory contains Product Requirements Documents (PRDs) for five distinct visualization and navigation systems designed to make the Jay Rosen Internet Archive's entity and relationship data accessible, discoverable, and valuable for researchers, students, and the general public.
 
 Each PRD represents a complete, standalone interface that can be implemented independently, though they are designed to integrate seamlessly with each other for a comprehensive exploration experience.
 
@@ -278,7 +278,7 @@ These PRDs are informed by:
 - **Modern Archive Interfaces**: NYU TimesMachine, ProQuest historical archives
 - **Knowledge Graph Visualization**: Neo4j, Cytoscape.js, D3.js force layouts
 - **Journalism Studies Needs**: Identified through user persona research
-- **Current Archive Goals**: Aligned with existing Jay Rosen Digital Archive mission
+- **Current Archive Goals**: Aligned with existing Jay Rosen Internet Archive mission
 
 ---
 

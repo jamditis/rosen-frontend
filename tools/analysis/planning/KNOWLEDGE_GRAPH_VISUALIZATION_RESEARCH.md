@@ -1,5 +1,5 @@
 # Knowledge Graph Visualization Research Report
-## Modern Approaches, Theory, and Design Inspiration for the Jay Rosen Digital Archive
+## Modern Approaches, Theory, and Design Inspiration for the Jay Rosen Internet Archive
 
 **Date:** October 29, 2025
 **Purpose:** Research modern knowledge graph visualization approaches to inform design decisions for visualizing entity and relationship data from the Rosen Archive
@@ -485,4 +485,4 @@ Nodes (Entities) ←→ Links (Relationships)
 
 **Report compiled by:** Claude Code
 **Date:** October 29, 2025
-**For:** Jay Rosen Digital Archive Project
+**For:** Jay Rosen Internet Archive Project

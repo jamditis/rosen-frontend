@@ -262,4 +262,4 @@ Nearly 40 years after its completion, "The Impossible Press" is made publicly av
 ---
 
 *Document prepared for review, December 2025*
-*Jay Rosen Digital Archive*
+*Jay Rosen Internet Archive*

@@ -1,11 +1,11 @@
 ---
 name: zero-build-frontend
-description: Develop React components for the Jay Rosen Digital Archive's zero-build architecture. Use when creating components, modifying frontend code, or troubleshooting import issues.
+description: Develop React components for the Jay Rosen Internet Archive's zero-build architecture. Use when creating components, modifying frontend code, or troubleshooting import issues.
 ---
 
 # Zero-Build Frontend Development
 
-The Jay Rosen Digital Archive uses a **zero-build static deployment** architecture. This is NOT a typical React/Node project - there is no webpack, vite, or bundler. All dependencies load via CDN.
+The Jay Rosen Internet Archive uses a **zero-build static deployment** architecture. This is NOT a typical React/Node project - there is no webpack, vite, or bundler. All dependencies load via CDN.
 
 ## When to Activate
 

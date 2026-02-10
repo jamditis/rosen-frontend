@@ -28,7 +28,7 @@ On December 2, we're publicly releasing Jay Rosen's 1986 doctoral dissertation, 
 
 **The hook:** Written under Neil Postman before the internet, before social media, before the current trust crisis—it diagnoses structural problems in press-public relations that feel remarkably current. Passages about "the competition for attention" and "communication outrunning community" read like they were written last week.
 
-**The package:** The dissertation is being released as part of the new Jay Rosen Digital Archive, which includes 849+ records spanning 36 years of Rosen's journalism criticism—articles, essays, PressThink posts, Twitter threads, and more—all searchable and structured for research.
+**The package:** The dissertation is being released as part of the new Jay Rosen Internet Archive, which includes 849+ records spanning 36 years of Rosen's journalism criticism—articles, essays, PressThink posts, Twitter threads, Bluesky posts, and more—all searchable and structured for research.
 
 **Why now:** With trust in media at historic lows and the business model of journalism in crisis, the dissertation's analysis of the fundamental tensions between commercial imperatives and public service feels urgent.
 
@@ -60,7 +60,7 @@ That student was Jay Rosen, who went on to become one of the most influential cr
 
 **It's never been publicly available. Until now.**
 
-On December 2, we're releasing the full text as part of the new Jay Rosen Digital Archive. Reading it in 2025 is striking—not because Rosen predicted specific technologies, but because he identified tensions that have only intensified.
+On December 2, we're releasing the full text as part of the new Jay Rosen Internet Archive. Reading it in 2025 is striking—not because Rosen predicted specific technologies, but because he identified tensions that have only intensified.
 
 Some passages that hit differently now:
 
@@ -93,7 +93,7 @@ Hi [Name],
 
 Quick heads-up on something launching December 2:
 
-**What:** The Jay Rosen Digital Archive—a searchable collection of 36 years of journalism criticism (849+ records), plus the first public release of his 1986 dissertation.
+**What:** The Jay Rosen Internet Archive—a searchable collection of 36 years of journalism criticism (849+ records), plus the first public release of his 1986 dissertation.
 
 **Why it matters:** The dissertation, written under Neil Postman, argues that journalism's problems are structural, not just professional. Feels very current.
 
@@ -115,11 +115,11 @@ Hi [Name],
 
 Love [Newsletter Name]—thanks for covering [recent topic they wrote about].
 
-Quick ask: We're launching the Jay Rosen Digital Archive on December 2. It's a searchable collection of 36 years of his journalism criticism, plus his never-before-public 1986 dissertation.
+Quick ask: We're launching the Jay Rosen Internet Archive on December 2. It's a searchable collection of 36 years of his journalism criticism, plus his never-before-public 1986 dissertation.
 
 If you're looking for items for your next edition, here's a one-liner:
 
-> "The Jay Rosen Digital Archive launches with 849+ records spanning 1986-2025, including the first public release of his doctoral dissertation, 'The Impossible Press.' Free and searchable at [URL]."
+> "The Jay Rosen Internet Archive launches with 849+ records spanning 1986-2025, including the first public release of his doctoral dissertation, 'The Impossible Press.' Free and searchable at [URL]."
 
 No pressure—just thought it might fit your coverage.
 
@@ -136,7 +136,7 @@ Joe
 
 Hi [Name],
 
-Just following up on my note about the Jay Rosen Digital Archive launch.
+Just following up on my note about the Jay Rosen Internet Archive launch.
 
 The embargo lifts December 2. If you'd like early access or have any questions, I'm happy to help.
 
@@ -151,7 +151,7 @@ Joe
 
 Hi [Name],
 
-Just wanted to say thanks for covering the Jay Rosen Digital Archive in [Publication]. We really appreciate the attention.
+Just wanted to say thanks for covering the Jay Rosen Internet Archive in [Publication]. We really appreciate the attention.
 
 If you ever need additional context or want to do a follow-up piece, don't hesitate to reach out.
 

@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
-import { html } from '../html.js?v=2.0.2';
-import { Construction, X, BookOpen } from 'lucide-react';
+import { html } from '../html.js?v=3.1.0';
+import { Sparkles, X } from 'lucide-react';
 
-const BANNER_DISMISSED_KEY = 'jrda_wip_banner_dismissed';
+const BANNER_DISMISSED_KEY = 'jrda_announce_banner_dismissed';
 
-const WorkInProgressBanner = ({ onNavigateToDissertation }) => {
+const WorkInProgressBanner = () => {
   const [dismissed, setDismissed] = useState(true); // Start hidden to prevent flash
 
   useEffect(() => {
-    // Check if banner was previously dismissed
     const wasDismissed = localStorage.getItem(BANNER_DISMISSED_KEY);
     if (!wasDismissed) {
       setDismissed(false);
@@ -23,29 +22,21 @@ const WorkInProgressBanner = ({ onNavigateToDissertation }) => {
   if (dismissed) return null;
 
   return html`
-    <div className="bg-amber-50 border-b border-amber-200">
+    <div className="bg-sky-50 border-b border-sky-200">
       <div className="container mx-auto px-4 py-3">
-        <div className="flex items-start gap-3">
-          <${Construction} className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+        <div className="flex items-center gap-3">
+          <${Sparkles} className="w-5 h-5 text-sky-600 flex-shrink-0" />
           <div className="flex-grow">
-            <p className="text-sm text-amber-800 font-medium">
-              This archive is a work in progress
+            <p className="text-sm text-sky-800 font-medium">
+              The Jay Rosen Internet Archive is now publicly available.
             </p>
-            <p className="text-xs text-amber-700 mt-1">
-              The full archive launches in 2026. In the meantime, explore
-              <button
-                onClick=${onNavigateToDissertation}
-                className="inline-flex items-center gap-1 mx-1 text-amber-900 font-bold hover:underline"
-              >
-                <${BookOpen} className="w-3 h-3" />
-                Jay Rosen's 1986 dissertation
-              </button>
-              and its companion tools, which are available now.
+            <p className="text-xs text-sky-700 mt-0.5">
+              29,000+ records spanning four decades of journalism criticism, media theory, and public life.
             </p>
           </div>
           <button
             onClick=${handleDismiss}
-            className="p-1 text-amber-600 hover:text-amber-800 hover:bg-amber-100 rounded transition-colors flex-shrink-0"
+            className="p-1 text-sky-600 hover:text-sky-800 hover:bg-sky-100 rounded transition-colors flex-shrink-0"
             aria-label="Dismiss banner"
           >
             <${X} className="w-4 h-4" />
