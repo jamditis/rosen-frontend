@@ -70,3 +70,4 @@ playwright-report/
 
 # Entity extraction working data
 data/social_import/
+.firecrawl/
