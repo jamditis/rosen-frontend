@@ -1,27 +1,27 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.0.1';
+import { html } from './html.js?v=3.1.0';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Github } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.0.2';
-import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.0.1';
-import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.0.1';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.1.0';
+import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.1.0';
+import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.1.0';
 
 // Detect environment for path generation
 const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const FEATURES_PATH = IS_LOCAL ? '../dissertation' : '/j/rosen-archive/dissertation';
-import Sidebar from './components/Sidebar.js?v=3.0.1';
-import WelcomeModal from './components/WelcomeModal.js?v=3.0.1';
-import RecordModal from './components/RecordModal.js?v=3.0.1';
-import FeaturedSection from './components/FeaturedSection.js?v=3.0.1';
-import Explorer from './components/Explorer.js?v=3.0.3';
-import DissertationPage from './components/DissertationPage.js?v=3.0.1';
-import ToolsModal from './components/ToolsModal.js?v=3.0.1';
-import LoadingQuotes from './components/LoadingQuotes.js?v=3.0.1';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.0.1';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.0.1';
-import EntityBrowser from './components/EntityBrowser.js?v=3.0.1';
-import Timeline from './components/Timeline.js?v=3.0.1';
-import AboutPage from './components/AboutPage.js?v=3.0.1';
+import Sidebar from './components/Sidebar.js?v=3.1.0';
+import WelcomeModal from './components/WelcomeModal.js?v=3.1.0';
+import RecordModal from './components/RecordModal.js?v=3.1.0';
+import FeaturedSection from './components/FeaturedSection.js?v=3.1.0';
+import Explorer from './components/Explorer.js?v=3.1.0';
+import DissertationPage from './components/DissertationPage.js?v=3.1.0';
+import ToolsModal from './components/ToolsModal.js?v=3.1.0';
+import LoadingQuotes from './components/LoadingQuotes.js?v=3.1.0';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.1.0';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.1.0';
+import EntityBrowser from './components/EntityBrowser.js?v=3.1.0';
+import Timeline from './components/Timeline.js?v=3.1.0';
+import AboutPage from './components/AboutPage.js?v=3.1.0';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
@@ -188,9 +188,8 @@ const App = () => {
          if (platform === 'bluesky' && !r.pub.toLowerCase().includes('bluesky')) return false;
       }
 
-      if (!filters.includeReplies && r.type === 'social' && r.title.toLowerCase().includes('reply')) {
-        return false;
-      }
+      // Note: Short reply posts and thread members are now filtered during data export.
+      // No need for title-based reply filtering here.
 
       return true;
     });

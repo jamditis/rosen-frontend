@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { html } from '../html.js?v=3.0.1';
+import { html } from '../html.js?v=3.1.0';
 import { X, Search, XCircle, ChevronDown, ChevronUp, MessageSquare } from 'lucide-react';
 
 const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, autocompleteIndex }) => {
@@ -220,19 +220,7 @@ const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, a
                 </label>
               `)}
             </div>
-            <div className="mt-4 pt-3 border-t border-stone-100">
-              <label className="flex items-center gap-2 cursor-pointer group bg-stone-50 p-2 rounded border border-stone-200 hover:border-stone-300 transition-colors">
-                <input
-                  type="checkbox"
-                  checked=${filters.includeReplies}
-                  onChange=${() => setFilters(prev => ({ ...prev, includeReplies: !prev.includeReplies }))}
-                  className="w-4 h-4 accent-stone-900 border-stone-300 rounded focus:ring-stone-900"
-                />
-                <${MessageSquare} className="w-3.5 h-3.5 text-stone-400" />
-                <span className="text-sm text-stone-600 group-hover:text-stone-900 font-medium">Include replies</span>
-              </label>
-              <p className="text-xs text-stone-400 mt-1 ml-1">Social media replies are hidden by default</p>
-            </div>
+            ${/* Reply filtering is now handled during data export — short replies and thread members are excluded */''}
           </div>
 
           <button

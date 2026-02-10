@@ -271,8 +271,10 @@ async function main() {
     return record;
   });
 
-  // Combine all records
-  let allRecords = [...mainRecords, ...socialRecords];
+  // ============================================
+  // THREAD DETECTION AND FILTERING
+  // ============================================
+  console.log('\n🧵 Detecting threads...');
 
   // Build lookup map for social post content (id -> raw_text)
   const socialContentMap = new Map();
@@ -284,6 +286,183 @@ async function main() {
     }
   });
 
+  // Step 1: Map Bluesky post URLs to rkeys for thread chain detection
+  const rkeyToRow = new Map();   // rkey -> raw CSV row
+  const idToRkey = new Map();    // post ID -> rkey
+  socialPostsData.forEach(row => {
+    if (row.platform === 'Bluesky' && row.url) {
+      const rkey = row.url.split('/').pop();
+      if (rkey) {
+        rkeyToRow.set(rkey, row);
+        idToRkey.set(row.id || row.ID, rkey);
+      }
+    }
+  });
+
+  // Step 2: Build parent-child relationships from responds_to AT URIs
+  const childrenOfRkey = new Map();  // parentRkey -> [childRow, ...]
+  const postParentId = new Map();    // childId -> parentId
+  socialPostsData.forEach(row => {
+    if (row.responds_to && row.responds_to.trim()) {
+      const parentRkey = row.responds_to.split('/').pop();
+      if (parentRkey && rkeyToRow.has(parentRkey)) {
+        if (!childrenOfRkey.has(parentRkey)) childrenOfRkey.set(parentRkey, []);
+        childrenOfRkey.get(parentRkey).push(row);
+        const parentRow = rkeyToRow.get(parentRkey);
+        postParentId.set(row.id || row.ID, parentRow.id || parentRow.ID);
+      }
+    }
+  });
+
+  // Step 3: Calculate chain sizes and collect thread posts
+  function getChainSize(rkey) {
+    let size = 1;
+    const kids = childrenOfRkey.get(rkey) || [];
+    for (const kid of kids) {
+      const kidRkey = idToRkey.get(kid.id || kid.ID);
+      if (kidRkey) size += getChainSize(kidRkey);
+    }
+    return size;
+  }
+
+  function collectChainPosts(rkey, depth = 0) {
+    const row = rkeyToRow.get(rkey);
+    if (!row) return [];
+    const result = [{ row, depth }];
+    const kids = (childrenOfRkey.get(rkey) || [])
+      .sort((a, b) => (a.publication_date || '').localeCompare(b.publication_date || ''));
+    for (const kid of kids) {
+      const kidRkey = idToRkey.get(kid.id || kid.ID);
+      if (kidRkey) result.push(...collectChainPosts(kidRkey, depth + 1));
+    }
+    return result;
+  }
+
+  // Step 4: Find thread roots (chains of 3+ posts)
+  const allRkeys = new Set([...rkeyToRow.keys()]);
+  const threadRoots = [];
+  for (const [rkey, row] of rkeyToRow) {
+    const isRoot = !row.responds_to || !row.responds_to.trim() ||
+                   !allRkeys.has(row.responds_to.split('/').pop());
+    if (isRoot) {
+      const size = getChainSize(rkey);
+      if (size >= 3) threadRoots.push({ rkey, row, size });
+    }
+  }
+  threadRoots.sort((a, b) => b.size - a.size);
+
+  // Step 5: Collect post IDs covered by existing THREAD records
+  const existingThreadRecords = mainRecords.filter(r => r.id.startsWith('THREAD-'));
+  const existingThreadPostIds = new Set();
+  existingThreadRecords.forEach(r => {
+    if (r.thread_data && r.thread_data.posts) {
+      r.thread_data.posts.forEach(p => existingThreadPostIds.add(p.id));
+    }
+  });
+
+  // Step 6: Generate new THREAD records and collect all thread member IDs
+  const threadMemberIds = new Set([...existingThreadPostIds]);
+  let nextThreadNum = existingThreadRecords.length + 1;
+  const generatedThreadRecords = [];
+
+  for (const root of threadRoots) {
+    const posts = collectChainPosts(root.rkey);
+    const postIds = posts.map(p => (p.row.id || p.row.ID));
+
+    // Check if already covered by an existing THREAD record
+    const alreadyCovered = postIds.some(id => existingThreadPostIds.has(id));
+
+    // Mark all posts as thread members regardless
+    postIds.forEach(id => threadMemberIds.add(id));
+
+    if (alreadyCovered) continue;
+
+    // Generate a new THREAD record
+    const threadId = `THREAD-${String(nextThreadNum).padStart(5, '0')}`;
+    nextThreadNum++;
+
+    const firstRow = posts[0].row;
+    let titleText = (firstRow.raw_text || firstRow.excerpt || '').trim();
+    titleText = titleText.replace(/https?:\/\/\S+/g, '').replace(/^(@\S+\s*)+/, '').trim();
+    const sentEnd = titleText.search(/[.!?]\s/);
+    if (sentEnd > 0 && sentEnd < 100) {
+      titleText = titleText.substring(0, sentEnd + 1);
+    } else if (titleText.length > 80) {
+      titleText = titleText.substring(0, 80).trim() + '...';
+    }
+    if (titleText.length < 10) titleText = `Bluesky thread (${posts.length} posts)`;
+
+    const threadDate = formatDate(firstRow.publication_date);
+    generatedThreadRecords.push({
+      id: threadId,
+      title: titleText,
+      author: 'Jay Rosen',
+      date: threadDate,
+      year: threadDate ? threadDate.split('-')[0] : '',
+      era: getEra(threadDate),
+      pub: 'Bluesky',
+      url: firstRow.url || '#',
+      summary: `A ${posts.length}-post Bluesky thread by Jay Rosen.`,
+      quote: (firstRow.raw_text || '').substring(0, 200),
+      categories: cleanTags(firstRow.thematic_categories || ''),
+      concepts: cleanTags(firstRow.key_concepts || ''),
+      tags: cleanTags(firstRow.tags || ''),
+      verified: true,
+      type: 'social',
+      relatedIds: [],
+      thread_data: {
+        thread_id: firstRow.id || firstRow.ID,
+        total_posts: posts.length,
+        max_depth: Math.max(...posts.map(p => p.depth)),
+        posts: posts.map((p, i) => ({
+          number: i + 1,
+          id: p.row.id || p.row.ID,
+          content: p.row.raw_text || p.row.excerpt || '',
+          date: p.row.publication_date || '',
+          url: p.row.url || '',
+          depth: p.depth,
+          parent_id: postParentId.get(p.row.id || p.row.ID) || null
+        }))
+      }
+    });
+  }
+
+  console.log(`  - Detected ${threadRoots.length} threads (3+ posts)`);
+  console.log(`  - Existing THREAD records: ${existingThreadRecords.length}`);
+  console.log(`  - New THREAD records generated: ${generatedThreadRecords.length}`);
+  console.log(`  - Total thread member posts: ${threadMemberIds.size}`);
+
+  // Step 7: Filter social records — remove thread members and short replies
+  const GENERIC_TITLE_PATTERN = /^(Reply|Tweet|Post|Quote) by/i;
+  const beforeSocialCount = socialRecords.length;
+
+  const filteredSocialRecords = socialRecords.filter(r => {
+    // Remove individual posts that belong to threads (shown via THREAD container)
+    if (threadMemberIds.has(r.id)) return false;
+
+    // Remove short replies with generic titles
+    if (GENERIC_TITLE_PATTERN.test(r.title)) {
+      const text = (r.quote || '')
+        .replace(/https?:\/\/\S+/g, '')
+        .replace(/^(\s*@\S+\s*)+/, '')
+        .replace(/@\S+/g, '')
+        .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (text.length < 10) return false;
+    }
+
+    return true;
+  });
+
+  const threadFiltered = beforeSocialCount - filteredSocialRecords.length;
+  console.log(`  - Social records before filtering: ${beforeSocialCount}`);
+  console.log(`  - Filtered out (thread members + short replies): ${threadFiltered}`);
+  console.log(`  - Social records after filtering: ${filteredSocialRecords.length}`);
+
+  // Combine all records: main + filtered social + generated threads
+  let allRecords = [...mainRecords, ...filteredSocialRecords, ...generatedThreadRecords];
+
   // Enrich thread_data with content from social posts
   console.log('\n🧵 Enriching thread data with post content...');
   let enrichedThreads = 0;
@@ -294,7 +473,6 @@ async function main() {
     if (record.thread_data && record.thread_data.posts) {
       let threadEnriched = false;
       record.thread_data.posts.forEach(post => {
-        // If post has no content, try to look it up
         if (!post.content || post.content.trim() === '') {
           const content = socialContentMap.get(post.id);
           if (content) {
@@ -306,17 +484,13 @@ async function main() {
       });
       if (threadEnriched) enrichedThreads++;
 
-      // Generate better title from first post content
+      // Generate better title from first post content (for legacy [Bluesky Thread] titles)
       if (record.title === '[Bluesky Thread]' || record.title.startsWith('[Bluesky Thread]')) {
         const firstPost = record.thread_data.posts[0];
         if (firstPost && firstPost.content) {
-          // Get first sentence or first 80 chars
           let titleText = firstPost.content.trim();
-          // Remove URLs
           titleText = titleText.replace(/https?:\/\/\S+/g, '').trim();
-          // Remove @mentions at start
           titleText = titleText.replace(/^(@\S+\s*)+/, '').trim();
-          // Take first sentence or truncate
           const sentenceEnd = titleText.search(/[.!?]\s/);
           if (sentenceEnd > 0 && sentenceEnd < 100) {
             titleText = titleText.substring(0, sentenceEnd + 1);

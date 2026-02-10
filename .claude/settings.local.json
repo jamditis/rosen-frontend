@@ -7,7 +7,8 @@
       "Bash(git add:*)",
       "Bash(python -m http.server:*)",
       "Bash(git mv:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(powershell -Command:*)"
     ],
     "deny": [],
     "ask": []
