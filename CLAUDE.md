@@ -115,25 +115,25 @@ Conducted live site testing of archive records (not dissertation features). Disc
 
 ### Social post entity extraction progress (branch: claude/archive-optimization-validation-EGyYZ)
 
-Processing 23,416 substantive social posts (filtered from 29,187 total) to extract entities and relationships. Pipeline paused at 26.0% for quality checkpoint.
+Processing 23,416 substantive social posts (filtered from 29,187 total) to extract entities and relationships.
 
-**Progress (as of February 2, 2026):**
-- Posts processed: 7,600 / 23,416 (32.5% of substantive posts)
-- Remaining: 15,816 posts
-- Batches completed: 143
+**Progress (as of February 10, 2026):**
+- Posts processed: 9,850 / 23,416 (42.1% of substantive posts)
+- Remaining: 14,060 posts
+- Batches completed: 188
 
-**Database stats (after cleanup):**
-- Entities in extraction.db: 1,387
-- Relationships: 3,581
-- Entity registry total: 5,160
+**Database stats:**
+- Entities in extraction.db: 1,470
+- Relationships: 3,880
+- Entity registry total: 5,159
 
 **Entity type distribution:**
-- Person: 417 (30.1%)
-- Concept: 458 (33.0%)
-- Organization: 343 (24.7%)
-- Work: 63 (4.5%)
-- Location: 70 (5.0%)
-- Event: 36 (2.6%)
+- Person: 456 (31.0%)
+- Concept: 469 (31.9%)
+- Organization: 369 (25.1%)
+- Work: 66 (4.5%)
+- Location: 72 (4.9%)
+- Event: 38 (2.6%)
 
 **25% milestone cleanup completed:**
 - Merged 150 duplicate entity groups (345 duplicates removed)
