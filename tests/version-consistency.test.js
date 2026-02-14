@@ -118,7 +118,7 @@ describe('import path validity', () => {
   it('all local imports in App.js reference existing files', () => {
     const content = fs.readFileSync(path.join(frontendDir, 'App.js'), 'utf-8');
 
-    // Match import patterns like: from './components/Sidebar.js?v=3.1.0'
+    // Match import patterns like: from './components/Sidebar.js?v=3.2.0'
     const importPattern = /from\s+['"](\.\/.+?)(?:\?v=[^'"]+)?['"]/g;
     const missingFiles = [];
 

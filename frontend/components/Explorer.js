@@ -1,9 +1,9 @@
 
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { html } from '../html.js?v=3.1.0';
+import { html } from '../html.js?v=3.2.0';
 import { ExternalLink, RefreshCw, Download, Settings2, Network, Users, Building2, Lightbulb, Globe, Tags, Search, ChevronDown, ChevronUp, ArrowLeft, X } from 'lucide-react';
-import { COLORS } from '../constants.js?v=3.1.0';
-import { calculateEntityConnectionStrength, getEntitiesByRecord, fetchEntitiesData, areEntitiesLoaded, fetchRecordDetails } from '../services/archiveService.js?v=3.1.0';
+import { COLORS } from '../constants.js?v=3.2.0';
+import { calculateEntityConnectionStrength, getEntitiesByRecord, fetchEntitiesData, areEntitiesLoaded, fetchRecordDetails } from '../services/archiveService.js?v=3.2.0';
 
 // Connection mode configurations
 const CONNECTION_MODES = {
@@ -15,22 +15,20 @@ const CONNECTION_MODES = {
   categories: { label: 'Categories (Legacy)', icon: Tags, filter: 'legacy_categories', description: 'Connect via thematic categories' }
 };
 
-// Grid size presets
-const GRID_PRESETS = [
-  { value: 441, label: '21x21 (441)', description: 'Compact view' },
-  { value: 625, label: '25x25 (625)', description: 'Default - fits entity records' },
-  { value: 900, label: '30x30 (900)', description: 'Medium density' },
-  { value: 1600, label: '40x40 (1,600)', description: 'High density' },
-  { value: 2500, label: '50x50 (2,500)', description: 'Maximum density' }
-];
+// Maximum grid slots for usability (dots become too small to click beyond this)
+const MAX_GRID_SLOTS = 2500;
 
 const CANVAS_WIDTH = 1200;
 const CANVAS_HEIGHT = 1200;
 const DOT_RADIUS = 5;
-const HOVER_SPEED = 0.1;
+const HOVER_SPEED = 0.15;
 const PULSE_SPEED = 0.003;
-const MIN_ANIMATION_DURATION = 1200;
-const MAX_ANIMATION_DURATION = 2800;
+const IDLE_DRIFT_SPEED = 0.0008;
+const IDLE_DRIFT_AMOUNT = 1.5;
+const MIN_ANIMATION_DURATION = 800;
+const MAX_ANIMATION_DURATION = 3200;
+const TRAVELER_SPEED = 0.0004;
+const CONNECTION_STAGGER_MS = 60;
 
 const Explorer = ({ records, onBack }) => {
   const canvasRef = useRef(null);
@@ -53,7 +51,6 @@ const Explorer = ({ records, onBack }) => {
   const [config, setConfig] = useState({
     connectionMode: 'entities',
     maxConnections: 30,
-    gridSize: 625,
     recordFilter: 'articles',
     sortByProminence: true
   });
@@ -107,13 +104,32 @@ const Explorer = ({ records, onBack }) => {
     all: { label: 'All Records', description: 'Including social posts' }
   };
 
+  // Auto-compute grid to fit all filtered records (capped at MAX_GRID_SLOTS)
+  const gridInfo = useMemo(() => {
+    const count = Math.min(filteredRecords.length, MAX_GRID_SLOTS);
+    const cols = Math.ceil(Math.sqrt(count));
+    const rows = Math.ceil(count / cols);
+    const totalSlots = cols * rows;
+    const capped = filteredRecords.length > MAX_GRID_SLOTS;
+    return { count, cols, rows, totalSlots, capped };
+  }, [filteredRecords.length]);
+
   const processData = useCallback(() => {
-    const sorted = [...filteredRecords].sort((a, b) => a.date.localeCompare(b.date));
+    // Sort by entity connections (most connected first) so important records
+    // are always visible when the set is capped
+    let sorted;
+    if (gridInfo.capped) {
+      sorted = [...filteredRecords].sort((a, b) => {
+        const aEntities = entitiesReady ? getEntitiesByRecord(a.id).length : 0;
+        const bEntities = entitiesReady ? getEntitiesByRecord(b.id).length : 0;
+        return bEntities - aEntities || a.date.localeCompare(b.date);
+      }).slice(0, gridInfo.count);
+    } else {
+      sorted = [...filteredRecords].sort((a, b) => a.date.localeCompare(b.date));
+    }
 
-    const totalSlots = config.gridSize;
+    const { cols, totalSlots } = gridInfo;
     const processed = [];
-
-    const cols = Math.ceil(Math.sqrt(totalSlots));
     const baseDotRadius = Math.max(2, Math.min(DOT_RADIUS, 600 / cols));
 
     for (let i = 0; i < totalSlots; i++) {
@@ -124,7 +140,13 @@ const Explorer = ({ records, onBack }) => {
         const primaryVal = cats[0] || 'Other';
         const hash = primaryVal.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
         const colorTheme = COLORS[hash % COLORS.length] || COLORS[0];
-        const hasEntities = entitiesReady && getEntitiesByRecord(r.id).length > 0;
+        const entityList = entitiesReady ? getEntitiesByRecord(r.id) : [];
+        const hasEntities = entityList.length > 0;
+        const entityCount = entityList.length;
+        const entityTypeCounts = entityList.reduce((acc, e) => {
+          acc[e.type] = (acc[e.type] || 0) + 1;
+          return acc;
+        }, {});
 
         processed.push({
           ...r,
@@ -136,18 +158,22 @@ const Explorer = ({ records, onBack }) => {
           currentRadius: hasEntities ? baseDotRadius : baseDotRadius * 0.7,
           isPlaceholder: false,
           hasEntities,
+          entityCount,
+          entityTypeCounts,
+          idleSeed: Math.random() * Math.PI * 2,
           aggregateConnectionCount: cons.length + cats.length
         });
       } else {
+        // Partial last row — fill remaining cells as placeholders
         processed.push({
           id: `placeholder-${i}`,
-          title: 'Empty Slot',
+          title: '',
           author: '',
           numericId: i,
           x: 0, y: 0,
-          color: '#e5e7eb',
-          baseRadius: baseDotRadius * 0.6,
-          currentRadius: baseDotRadius * 0.6,
+          color: 'transparent',
+          baseRadius: 0,
+          currentRadius: 0,
           isPlaceholder: true,
           aggregateConnectionCount: 0,
           verified: false,
@@ -161,8 +187,8 @@ const Explorer = ({ records, onBack }) => {
     const padding = 40;
     const effectiveWidth = CANVAS_WIDTH - (padding * 2);
     const effectiveHeight = CANVAS_HEIGHT - (padding * 2);
-    const stepX = effectiveWidth / (cols - 1);
-    const stepY = effectiveHeight / (cols - 1);
+    const stepX = cols > 1 ? effectiveWidth / (cols - 1) : 0;
+    const stepY = gridInfo.rows > 1 ? effectiveHeight / (gridInfo.rows - 1) : 0;
 
     processed.forEach((node, i) => {
       const col = i % cols;
@@ -172,7 +198,7 @@ const Explorer = ({ records, onBack }) => {
     });
 
     setNodes(processed);
-  }, [filteredRecords, config.gridSize]);
+  }, [filteredRecords, gridInfo, entitiesReady]);
 
   useEffect(() => {
     processData();
@@ -257,7 +283,13 @@ const Explorer = ({ records, onBack }) => {
     } else {
       newConnections.sort((a, b) => b.strength - a.strength);
     }
-    setConnections(newConnections.slice(0, config.maxConnections));
+
+    // Stagger start times for cascade animation effect
+    const sliced = newConnections.slice(0, config.maxConnections);
+    sliced.forEach((conn, i) => {
+      conn.startTime = now + i * CONNECTION_STAGGER_MS;
+    });
+    setConnections(sliced);
   };
 
   const draw = useCallback(() => {
@@ -269,44 +301,100 @@ const Explorer = ({ records, onBack }) => {
     const now = Date.now();
     const isLocked = selectedId !== null;
 
+    // --- Draw connections with staggered cascade and traveling dots ---
     if (selectedId !== null && connections.length > 0) {
       const source = nodes[selectedId];
 
-      ctx.lineWidth = 1.5;
       ctx.lineCap = 'round';
 
       connections.forEach(conn => {
         const target = nodes[conn.targetId];
         const elapsed = now - conn.startTime;
-        const progress = Math.min(1, elapsed / conn.duration);
+        if (elapsed < 0) return; // hasn't started yet (stagger)
 
+        const progress = Math.min(1, elapsed / conn.duration);
+        const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+
+        // Compute Manhattan path points
+        let p1, p2;
+        if (conn.horizontalFirst) {
+          const midX = source.x + (target.x - source.x) * conn.midPointRatio;
+          p1 = { x: midX, y: source.y };
+          p2 = { x: midX, y: target.y };
+        } else {
+          const midY = source.y + (target.y - source.y) * conn.midPointRatio;
+          p1 = { x: source.x, y: midY };
+          p2 = { x: target.x, y: midY };
+        }
+
+        // Draw the path up to the current animated progress
+        const segments = [
+          { from: { x: source.x, y: source.y }, to: p1 },
+          { from: p1, to: p2 },
+          { from: p2, to: { x: target.x, y: target.y } }
+        ];
+
+        // Calculate total path length
+        const segLengths = segments.map(s =>
+          Math.sqrt(Math.pow(s.to.x - s.from.x, 2) + Math.pow(s.to.y - s.from.y, 2))
+        );
+        const totalLen = segLengths.reduce((a, b) => a + b, 0);
+        const drawLen = eased * totalLen;
+
+        // Thicker lines for stronger connections
+        const lineWidth = Math.min(2.5, 1 + conn.strength * 0.3);
+        ctx.lineWidth = lineWidth;
         ctx.strokeStyle = conn.color;
-        ctx.globalAlpha = 0.6;
+        ctx.globalAlpha = 0.4 + eased * 0.4;
+
         ctx.beginPath();
         ctx.moveTo(source.x, source.y);
 
-        let p1 = { x: 0, y: 0 };
-        let p2 = { x: 0, y: 0 };
-
-        if (conn.horizontalFirst) {
-            const midX = source.x + (target.x - source.x) * conn.midPointRatio;
-            p1 = { x: midX, y: source.y };
-            p2 = { x: midX, y: target.y };
-        } else {
-            const midY = source.y + (target.y - source.y) * conn.midPointRatio;
-            p1 = { x: source.x, y: midY };
-            p2 = { x: target.x, y: midY };
+        let remaining = drawLen;
+        for (const seg of segments) {
+          const segLen = Math.sqrt(Math.pow(seg.to.x - seg.from.x, 2) + Math.pow(seg.to.y - seg.from.y, 2));
+          if (remaining >= segLen) {
+            ctx.lineTo(seg.to.x, seg.to.y);
+            remaining -= segLen;
+          } else if (remaining > 0) {
+            const t = remaining / segLen;
+            ctx.lineTo(seg.from.x + (seg.to.x - seg.from.x) * t, seg.from.y + (seg.to.y - seg.from.y) * t);
+            remaining = 0;
+          }
         }
-
-        ctx.lineTo(p1.x, p1.y);
-        ctx.lineTo(p2.x, p2.y);
-        ctx.lineTo(target.x, target.y);
-
-        ctx.globalAlpha = progress;
         ctx.stroke();
+
+        // Traveling dot along completed connections
+        if (progress >= 1) {
+          const travelerT = ((now * TRAVELER_SPEED + conn.targetId * 0.3) % 1);
+          const travelerLen = travelerT * totalLen;
+          let tRemaining = travelerLen;
+          let tx = source.x, ty = source.y;
+
+          for (const seg of segments) {
+            const segLen = Math.sqrt(Math.pow(seg.to.x - seg.from.x, 2) + Math.pow(seg.to.y - seg.from.y, 2));
+            if (tRemaining >= segLen) {
+              tRemaining -= segLen;
+              tx = seg.to.x;
+              ty = seg.to.y;
+            } else {
+              const st = tRemaining / segLen;
+              tx = seg.from.x + (seg.to.x - seg.from.x) * st;
+              ty = seg.from.y + (seg.to.y - seg.from.y) * st;
+              break;
+            }
+          }
+
+          ctx.globalAlpha = 0.9;
+          ctx.fillStyle = conn.color;
+          ctx.beginPath();
+          ctx.arc(tx, ty, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
       });
     }
 
+    // --- Draw nodes with ambient idle animation ---
     let hoveredNode = null;
 
     nodes.forEach(node => {
@@ -316,26 +404,48 @@ const Explorer = ({ records, onBack }) => {
 
       if (isHovered) hoveredNode = node;
 
+      // Ambient drift when idle (no selection)
+      let drawX = node.x;
+      let drawY = node.y;
+      if (!isLocked && !node.isPlaceholder) {
+        const seed = node.idleSeed || 0;
+        drawX += Math.sin(now * IDLE_DRIFT_SPEED + seed) * IDLE_DRIFT_AMOUNT;
+        drawY += Math.cos(now * IDLE_DRIFT_SPEED * 0.7 + seed * 1.3) * IDLE_DRIFT_AMOUNT;
+      }
+
       let targetR = node.baseRadius;
-      if (isSelected) targetR = node.baseRadius * 1.5;
-      else if (isHovered) targetR = node.baseRadius * 2.5;
+      if (isSelected) targetR = node.baseRadius * 2;
+      else if (isHovered) targetR = node.baseRadius * 3;
       else if (isConnected) {
-          const pulse = Math.sin(now * PULSE_SPEED + node.numericId) * 2;
-          targetR = node.baseRadius * 1.5 + pulse;
+        const pulse = Math.sin(now * PULSE_SPEED + node.numericId) * 2;
+        targetR = node.baseRadius * 1.8 + pulse;
       } else if (isLocked) {
-          targetR = node.baseRadius * 0.8;
+        targetR = node.baseRadius * 0.6;
+      } else if (node.hasEntities) {
+        // Subtle breathing for entity-bearing dots
+        const breath = Math.sin(now * 0.002 + (node.idleSeed || 0)) * 0.5;
+        targetR = node.baseRadius + breath;
       }
 
       node.currentRadius += (targetR - node.currentRadius) * HOVER_SPEED;
 
       let alpha = 1;
-      if (node.isPlaceholder) alpha = 0.2;
-      else if (isLocked && !isSelected && !isConnected) alpha = 0.15;
+      if (node.isPlaceholder) alpha = 0.15;
+      else if (isLocked && !isSelected && !isConnected) alpha = 0.1;
+
+      // Glow effect for hovered and selected nodes
+      if ((isHovered || isSelected) && !node.isPlaceholder) {
+        ctx.globalAlpha = alpha * 0.25;
+        ctx.fillStyle = node.color;
+        ctx.beginPath();
+        ctx.arc(drawX, drawY, node.currentRadius * 2.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       ctx.globalAlpha = alpha;
       ctx.fillStyle = node.color;
       ctx.beginPath();
-      ctx.arc(node.x, node.y, node.currentRadius, 0, Math.PI * 2);
+      ctx.arc(drawX, drawY, node.currentRadius, 0, Math.PI * 2);
       ctx.fill();
 
       if (isSelected) {
@@ -343,37 +453,90 @@ const Explorer = ({ records, onBack }) => {
         ctx.lineWidth = 2;
         ctx.stroke();
       }
+
+      // Small inner ring for nodes with entities (when idle)
+      if (!isLocked && node.hasEntities && !node.isPlaceholder && node.currentRadius > 3) {
+        ctx.globalAlpha = alpha * 0.3;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.arc(drawX, drawY, node.currentRadius * 0.5, 0, Math.PI * 2);
+        ctx.stroke();
+      }
     });
 
-    // Draw Tooltip
+    // --- Enhanced tooltip with entity info ---
     if (hoveredNode && !hoveredNode.isPlaceholder) {
-        const padding = 8;
-        const x = hoveredNode.x + 15;
-        const y = hoveredNode.y - 15;
+      const pad = 10;
+      const lineH = 16;
 
-        ctx.font = 'bold 12px "Roboto Mono", monospace';
-        const titleWidth = ctx.measureText(hoveredNode.title).width;
-        const yearWidth = ctx.measureText(hoveredNode.year).width;
-        const width = Math.max(titleWidth, yearWidth) + padding * 2;
-        const height = 40;
+      ctx.font = 'bold 12px "Roboto Mono", monospace';
+      const titleText = hoveredNode.title?.length > 50
+        ? hoveredNode.title.substring(0, 47) + '...'
+        : (hoveredNode.title || 'Untitled');
+      const titleWidth = ctx.measureText(titleText).width;
 
-        let finalX = x;
-        if (x + width > CANVAS_WIDTH) finalX = hoveredNode.x - width - 15;
+      ctx.font = 'normal 10px "Roboto Mono", monospace';
+      const metaText = `${hoveredNode.year || ''}  ·  ${hoveredNode.pub || ''}`;
+      const metaWidth = ctx.measureText(metaText).width;
 
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = 'rgba(28, 25, 23, 0.9)';
-        ctx.beginPath();
-        if(ctx.roundRect) ctx.roundRect(finalX, y, width, height, 4);
-        else ctx.rect(finalX, y, width, height);
-        ctx.fill();
+      const entityText = hoveredNode.entityCount > 0
+        ? `${hoveredNode.entityCount} entities`
+        : 'No entities extracted';
+      const entityWidth = ctx.measureText(entityText).width;
 
-        ctx.fillStyle = '#ffffff';
-        ctx.textBaseline = 'top';
-        ctx.fillText(hoveredNode.title, finalX + padding, y + padding);
+      // Type breakdown line
+      const typeEntries = Object.entries(hoveredNode.entityTypeCounts || {});
+      const typeText = typeEntries.length > 0
+        ? typeEntries.map(([t, c]) => `${c} ${t}`).join('  ·  ')
+        : '';
+      const typeWidth = typeText ? ctx.measureText(typeText).width : 0;
 
-        ctx.font = 'normal 10px "Roboto Mono", monospace';
+      const lines = typeText ? 4 : 3;
+      const width = Math.max(titleWidth, metaWidth, entityWidth, typeWidth) + pad * 2;
+      const height = pad * 2 + lines * lineH;
+
+      let tx = hoveredNode.x + 18;
+      let ty = hoveredNode.y - height - 5;
+      if (tx + width > CANVAS_WIDTH - 10) tx = hoveredNode.x - width - 18;
+      if (ty < 10) ty = hoveredNode.y + 18;
+
+      ctx.globalAlpha = 0.95;
+      ctx.fillStyle = 'rgba(28, 25, 23, 0.92)';
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(tx, ty, width, height, 6);
+      else ctx.rect(tx, ty, width, height);
+      ctx.fill();
+
+      // Accent bar
+      ctx.fillStyle = hoveredNode.color;
+      ctx.fillRect(tx, ty, 3, height);
+
+      let cursorY = ty + pad;
+      ctx.textBaseline = 'top';
+
+      // Title
+      ctx.font = 'bold 12px "Roboto Mono", monospace';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(titleText, tx + pad + 4, cursorY);
+      cursorY += lineH;
+
+      // Meta (year + pub)
+      ctx.font = 'normal 10px "Roboto Mono", monospace';
+      ctx.fillStyle = '#a8a29e';
+      ctx.fillText(metaText, tx + pad + 4, cursorY);
+      cursorY += lineH;
+
+      // Entity count
+      ctx.fillStyle = hoveredNode.entityCount > 0 ? '#86efac' : '#78716c';
+      ctx.fillText(entityText, tx + pad + 4, cursorY);
+      cursorY += lineH;
+
+      // Type breakdown
+      if (typeText) {
         ctx.fillStyle = '#d6d3d1';
-        ctx.fillText(hoveredNode.year, finalX + padding, y + padding + 16);
+        ctx.fillText(typeText, tx + pad + 4, cursorY);
+      }
     }
 
     reqRef.current = requestAnimationFrame(draw);
@@ -566,7 +729,7 @@ const Explorer = ({ records, onBack }) => {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-stone-500 bg-stone-100 px-2 py-1 rounded border border-stone-200 hidden sm:inline-block">
-              ${filteredRecords.length} records
+              ${gridInfo.capped ? `${gridInfo.count.toLocaleString()} of ${filteredRecords.length.toLocaleString()}` : filteredRecords.length.toLocaleString()} records
             </span>
             <button
               onClick=${processData}
@@ -633,31 +796,24 @@ const Explorer = ({ records, onBack }) => {
             <p className="text-xs text-stone-400 mt-2 italic">${currentModeConfig.description}</p>
           </div>
 
-          <!-- Grid density -->
+          <!-- Grid info -->
           <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-2">Grid density</label>
-            <div className="space-y-1">
-              ${GRID_PRESETS.map(preset => html`
-                <button
-                  key=${preset.value}
-                  onClick=${() => setConfig({...config, gridSize: preset.value})}
-                  className=${`w-full text-left px-3 py-1.5 rounded flex items-center justify-between transition-colors ${
-                    config.gridSize === preset.value
-                      ? 'bg-stone-800 text-white'
-                      : 'bg-stone-50 text-stone-700 hover:bg-stone-100'
-                  }`}
-                >
-                  <span>${preset.label}</span>
-                  <span className="text-xs opacity-75">${preset.description}</span>
-                </button>
-              `)}
+            <label className="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-2">Grid layout</label>
+            <div className="bg-stone-50 rounded px-3 py-2 text-xs text-stone-600 space-y-1">
+              <div className="flex justify-between">
+                <span>Grid</span>
+                <span className="font-mono">${gridInfo.cols} x ${gridInfo.rows}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Records shown</span>
+                <span className="font-mono">${gridInfo.count}</span>
+              </div>
+              ${gridInfo.capped && html`
+                <p className="text-amber-600 text-xs mt-1">
+                  Showing ${gridInfo.count.toLocaleString()} of ${filteredRecords.length.toLocaleString()} (most connected first)
+                </p>
+              `}
             </div>
-            <p className="text-xs text-stone-400 mt-2">
-              ${filteredRecords.length > config.gridSize
-                ? `${filteredRecords.length - config.gridSize} records won't fit`
-                : `${config.gridSize - filteredRecords.length} empty slots`
-              }
-            </p>
           </div>
 
           <!-- Record filter -->
@@ -680,7 +836,7 @@ const Explorer = ({ records, onBack }) => {
               `)}
             </div>
             <p className="text-xs text-stone-400 mt-2">
-              Showing ${filteredRecords.length} records
+              ${filteredRecords.length.toLocaleString()} records → ${gridInfo.cols}x${gridInfo.rows} grid
             </p>
           </div>
 
@@ -745,6 +901,11 @@ const Explorer = ({ records, onBack }) => {
             <div className="bg-white/90 backdrop-blur-sm border border-stone-200 rounded px-3 py-2 shadow-sm flex items-center gap-2 text-sm text-stone-600">
               <div className="animate-spin w-4 h-4 border-2 border-stone-300 border-t-stone-800 rounded-full"></div>
               Loading entity data...
+            </div>
+          `}
+          ${entitiesReady && selectedId === null && html`
+            <div className="bg-white/90 backdrop-blur-sm border border-stone-200 rounded px-3 py-2 shadow-sm text-xs text-stone-500 max-w-[220px] leading-relaxed">
+              <span className="font-bold text-stone-700">Click any dot</span> to discover which records share people, organizations, and concepts. Larger dots have more entity connections.
             </div>
           `}
           <div className="relative">
