@@ -46,37 +46,70 @@ Ensure data quality and schema compliance for the Jay Rosen Internet Archive. Th
 | `THREAD-` | Social media threads |
 | `DISS-` | Dissertation content |
 | `SOCIAL-` | Social media posts |
+| `TWTR-` | Twitter/X posts |
 
-### Approved Eras (8 total)
+### Approved Eras
+
+Archive records and social posts use different era taxonomies.
 
 ```javascript
-const VALID_ERAS = [
-    "Dissertation Era (1982-1986)",
-    "Public Journalism Era (1990-2000)",
-    "Early Internet Era (1999-2004)",
-    "Blogging Revolution (2004-2010)",
-    "Social Media Era (2010-2016)",
-    "Trump Era (2016-2020)",
-    "COVID-19 Era (2020-2021)",
-    "Trump II & Beyond (2025-Present)"
+// Archive record eras (from archive_records-public.csv)
+const VALID_ARCHIVE_ERAS = [
+    "Early Career & Public Journalism (1990-1999)",
+    "Public Journalism (90s)",
+    "Blogging Launch & Digital Disruption (2000-2004)",
+    "Web & Blogging (00s)",
+    "Web & Blogging (2000s)",
+    "Peak Blogging & Citizen Journalism (2005-2009)",
+    "Social Media & Financial Crisis (2010-2015)",
+    "View from Nowhere (10s)",
+    "View From Nowhere (2010s)",
+    "Trump Era & Democratic Crisis (2016-2020)",
+    "Democracy in Crisis (20s)",
+    "Platform Transition & Future Models (2021-Present)"
+];
+
+// Social post eras (from social_posts.csv)
+const VALID_SOCIAL_ERAS = [
+    "Post-Trump & Future of News (2022-Present)"
+];
+
+// Frontend display eras (short-form, used in constants.js)
+const FRONTEND_ERAS = [
+    "Public Journalism (90s)",
+    "Web & Blogging (00s)",
+    "View from Nowhere (10s)",
+    "Democracy in Crisis (20s)"
 ];
 ```
 
 ### Approved Categories
 
+Archive records and social posts share a thematic category taxonomy.
+
 ```javascript
+// Thematic categories (from both archive_records and social_posts)
 const VALID_CATEGORIES = [
-    "Academic Work",
-    "Blog Post",
-    "Book Chapter",
-    "Conference Paper",
-    "Interview",
-    "Journalism",
-    "Media Criticism",
-    "Opinion",
-    "PressThink Blog",
-    "Social Media",
-    "Video"
+    "Academic & Institutional",
+    "Audience & Public Engagement",
+    "Democracy & Public Life",
+    "Digital Media & Innovation",
+    "Digital Media & Technology",
+    "Education & Academia",
+    "Journalism Education",
+    "Journalism Theory & Practice",
+    "Media & Technology",
+    "Media Business & Economics",
+    "Media Ethics",
+    "Media Theory",
+    "Political Communication",
+    "Politics & Democracy",
+    "Press & Media Criticism",
+    "Press Criticism",
+    "Public Journalism Movement",
+    "Public Life",
+    "Technology & Digital Media",
+    "Trump & Authoritarianism"
 ];
 ```
 
