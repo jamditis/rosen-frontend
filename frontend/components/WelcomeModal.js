@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { html } from '../html.js?v=3.1.0';
+import { html } from '../html.js?v=3.2.0';
 import { Archive, ArrowRight, Search, Network, BookOpen } from 'lucide-react';
 
 const WelcomeModal = () => {

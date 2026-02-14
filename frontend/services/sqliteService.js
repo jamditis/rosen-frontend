@@ -279,20 +279,34 @@ export const loadArchiveData = async (data) => {
       insertEntity.free();
     }
 
-    // Insert record-entity relationships if provided
-    if (data.recordEntityMap) {
-      const insertRelation = db.prepare(`
-        INSERT OR IGNORE INTO record_entities VALUES (?, ?)
-      `);
+    // Insert record-entity relationships
+    // Source 1: explicit recordEntityMap (from archive-entities.json format)
+    // Source 2: relatedIds on each record (from archive-data.json format)
+    const insertRelation = db.prepare(`
+      INSERT OR IGNORE INTO record_entities VALUES (?, ?)
+    `);
 
+    let reCount = 0;
+
+    if (data.recordEntityMap) {
       for (const [recordId, entityIds] of Object.entries(data.recordEntityMap)) {
         for (const entityId of entityIds) {
           insertRelation.run([recordId, entityId]);
+          reCount++;
         }
       }
-
-      insertRelation.free();
+    } else {
+      // Fall back to relatedIds embedded in each record
+      for (const record of (data.records || [])) {
+        for (const entityId of (record.relatedIds || [])) {
+          insertRelation.run([record.id, entityId]);
+          reCount++;
+        }
+      }
     }
+
+    insertRelation.free();
+    console.log(`[SQLite] Loaded ${reCount} record-entity relationships`);
 
     db.run('COMMIT');
     dataLoaded = true;
@@ -405,8 +419,12 @@ export const getRecordCountByPublication = (limit = 20) => {
  * Get most mentioned entities
  */
 export const getMostMentionedEntities = (entityType = null, limit = 20) => {
+  // Use the greater of: junction table count or entity's own totalMentions field.
+  // The totalMentions field is pre-computed from the full dataset and is more
+  // complete than the junction table (which only covers records with relatedIds).
   let sql = `
-    SELECT e.name, e.type, COUNT(re.record_id) as mentions
+    SELECT e.name, e.type,
+      MAX(COALESCE(e.total_mentions, 0), COUNT(re.record_id)) as mentions
     FROM entities e
     LEFT JOIN record_entities re ON e.id = re.entity_id
   `;

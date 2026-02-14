@@ -94,7 +94,8 @@ function processRecord(row, index, type, relationshipsMap) {
                      (row.verified || row.Verified) === 'true' ||
                      (row.verified || row.Verified) === 'Yes' ||
                      (row.verified || row.Verified) === true ||
-                     type === 'social';
+                     type === 'social' ||
+                     rawId.startsWith('CLIP-');
 
   // Extract thread_data for THREAD records
   // Check if thread_data column exists directly (from merged records)
