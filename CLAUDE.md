@@ -2,6 +2,38 @@
 
 Context for Claude Code when working on this repository.
 
+## Bug-fixing workflow
+
+When a bug is reported, don't immediately attempt to fix it. Instead:
+
+1. **Write a failing test first** that reproduces the bug
+2. **Launch subagents** to work on fixing the bug
+3. **Verify the fix** by running the test — a passing test proves the bug is fixed
+
+---
+
+## Social post entity extraction (in progress)
+
+**Branch:** `claude/archive-optimization-validation-EGyYZ`
+
+Processing 23,416 substantive social posts (filtered from 29,187 total) to extract entities and relationships.
+
+- **Progress:** 9,850 / 23,416 posts (42.1%), batch 188
+- **Database:** `data/social_import/extraction.db` (1,470 entities, 3,880 relationships)
+- **Entity distribution:** Person 31%, Concept 32%, Organization 25%, Work 4.5%, Location 5%, Event 2.6%
+
+**To resume extraction:**
+```bash
+cd backend
+PYTHONPATH=src python scripts/unified_entity_processor.py --status --data-dir ../data/social_import
+```
+
+**Quality tools:**
+- `data/social_import/cleanup_extraction_db.py` — Entity deduplication and normalization
+- `data/social_import/milestone_analysis.py` — Checkpoint analysis at 25%/50%/75%/100%
+
+---
+
 ## Project overview
 
 The **Jay Rosen Internet Archive** is a public collection of the works, critiques, and teachings of Jay Rosen, NYU professor of journalism. It covers four decades of journalism criticism, media theory, and public life.
