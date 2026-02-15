@@ -1,4 +1,4 @@
-# Jay Rosen Internet Archive (JRDA)
+# Jay Rosen Internet Archive (JRIA)
 ![Archive Preview](https://i.imgur.com/pwU0BYb.png)
 
 **Status: Ready for Publication (December 2025)**
