@@ -73,6 +73,21 @@ TYPE_SPECIFIC_ROLE_FIELDS = {
     "description",   # Fallback
 }
 
+PROVIDER_DEFAULTS = {
+    "anthropic": {
+        "model": "claude-sonnet-4-5-20250929",
+        "max_tokens": 4096,
+    },
+    "openai": {
+        "model": "gpt-4o-mini",
+        "max_tokens": 4096,
+    },
+    "gemini": {
+        "model": "gemini-2.5-flash",
+        "max_tokens": 4096,
+    },
+}
+
 DEFAULT_MODEL = "claude-sonnet-4-5-20250929"
 DEFAULT_MAX_TOKENS = 4096
 DEFAULT_POLL_INTERVAL = 30  # seconds
@@ -185,6 +200,73 @@ def format_post_for_extraction(
                 {"role": "user", "content": prompt}
             ],
         },
+    }
+
+
+def format_post_for_extraction_openai(
+    post: Dict,
+    model: str = "gpt-4o-mini",
+    max_tokens: int = DEFAULT_MAX_TOKENS,
+) -> Dict:
+    """
+    Format a social post into an OpenAI Batch API JSONL request line.
+
+    OpenAI batch format:
+    {"custom_id": "...", "method": "POST", "url": "/v1/chat/completions",
+     "body": {"model": "...", "max_tokens": ..., "messages": [...]}}
+    """
+    post_id = post.get("id", "UNKNOWN")
+    raw_text = post.get("raw_text", "")
+    pub_date = post.get("publication_date", "")
+    likes = post.get("likes", "0")
+    reposts = post.get("reposts", "0")
+
+    context = f"[Date: {pub_date} | Likes: {likes} | Reposts: {reposts}]"
+    full_text = f"{context}\n{raw_text}"
+    prompt = build_extraction_prompt(full_text, post_id)
+
+    return {
+        "custom_id": post_id,
+        "method": "POST",
+        "url": "/v1/chat/completions",
+        "body": {
+            "model": model,
+            "max_tokens": max_tokens,
+            "messages": [
+                {"role": "user", "content": prompt}
+            ],
+        },
+    }
+
+
+def format_post_for_extraction_gemini(
+    post: Dict,
+) -> Dict:
+    """
+    Format a social post into a Gemini inline batch request.
+
+    Gemini inline format:
+    {"contents": [{"parts": [{"text": "..."}], "role": "user"}],
+     "config": {"response_modalities": ["text"]}}
+
+    The custom_id is stored separately since Gemini uses positional ordering
+    or the 'key' field in JSONL mode.
+    """
+    post_id = post.get("id", "UNKNOWN")
+    raw_text = post.get("raw_text", "")
+    pub_date = post.get("publication_date", "")
+    likes = post.get("likes", "0")
+    reposts = post.get("reposts", "0")
+
+    context = f"[Date: {pub_date} | Likes: {likes} | Reposts: {reposts}]"
+    full_text = f"{context}\n{raw_text}"
+    prompt = build_extraction_prompt(full_text, post_id)
+
+    return {
+        "contents": [
+            {"parts": [{"text": prompt}], "role": "user"}
+        ],
+        "config": {"response_modalities": ["TEXT"]},
     }
 
 
@@ -334,17 +416,39 @@ class BatchEntityExtractor:
             print(f"[BATCH] No existing entities file found at {entities_file}")
 
     def _get_client(self):
-        """Get or create the Anthropic API client."""
+        """Get or create the API client for the configured provider."""
         if self._client is None:
-            try:
-                from anthropic import Anthropic
-                self._client = Anthropic()
-            except ImportError:
-                print("[BATCH] ERROR: anthropic package not installed.")
-                print("[BATCH] Run: pip install anthropic")
-                sys.exit(1)
-            except Exception as e:
-                print(f"[BATCH] ERROR: Failed to create Anthropic client: {e}")
+            if self.provider == "anthropic":
+                try:
+                    from anthropic import Anthropic
+                    self._client = Anthropic()
+                except ImportError:
+                    print("[BATCH] ERROR: anthropic package not installed. Run: pip install anthropic")
+                    sys.exit(1)
+            elif self.provider == "openai":
+                try:
+                    from openai import OpenAI
+                    api_key = os.environ.get("OPENAI_API_KEY")
+                    if not api_key:
+                        print("[BATCH] ERROR: OPENAI_API_KEY not set")
+                        sys.exit(1)
+                    self._client = OpenAI(api_key=api_key)
+                except ImportError:
+                    print("[BATCH] ERROR: openai package not installed. Run: pip install openai")
+                    sys.exit(1)
+            elif self.provider == "gemini":
+                try:
+                    from google import genai
+                    api_key = os.environ.get("GEMINI_API_KEY")
+                    if not api_key:
+                        print("[BATCH] ERROR: GEMINI_API_KEY not set")
+                        sys.exit(1)
+                    self._client = genai.Client(api_key=api_key)
+                except ImportError:
+                    print("[BATCH] ERROR: google-genai package not installed. Run: pip install google-genai")
+                    sys.exit(1)
+            else:
+                print(f"[BATCH] ERROR: Unknown provider: {self.provider}")
                 sys.exit(1)
         return self._client
 
@@ -461,7 +565,7 @@ class BatchEntityExtractor:
         posts: List[Dict],
     ) -> str:
         """
-        Submit a batch of posts to the Anthropic Batch API.
+        Submit a batch of posts to the configured provider's Batch API.
 
         Args:
             posts: List of post dicts to process.
@@ -471,24 +575,86 @@ class BatchEntityExtractor:
         """
         client = self._get_client()
 
-        # Format all posts into batch requests
+        print(f"[BATCH] Submitting {len(posts)} requests to {self.provider} Batch API...")
+
+        if self.provider == "anthropic":
+            return self._submit_batch_anthropic(client, posts)
+        elif self.provider == "openai":
+            return self._submit_batch_openai(client, posts)
+        elif self.provider == "gemini":
+            return self._submit_batch_gemini(client, posts)
+        else:
+            raise ValueError(f"Unknown provider: {self.provider}")
+
+    def _submit_batch_anthropic(self, client, posts: List[Dict]) -> str:
+        """Submit batch via Anthropic Batch API."""
         requests = [
             format_post_for_extraction(post, model=self.model)
             for post in posts
         ]
-
-        print(f"[BATCH] Submitting {len(requests)} requests to Anthropic Batch API...")
-
         batch = client.messages.batches.create(requests=requests)
-
         batch_id = batch.id
-        status = batch.processing_status
-
-        print(f"[BATCH] Batch created: {batch_id}")
-        print(f"[BATCH] Status: {status}")
-
-        # Save tracking info
+        print(f"[BATCH] Batch created: {batch_id} (status: {batch.processing_status})")
         self._save_batch_tracking(batch_id, len(posts), posts)
+        return batch_id
+
+    def _submit_batch_openai(self, client, posts: List[Dict]) -> str:
+        """Submit batch via OpenAI Batch API (upload JSONL → create batch)."""
+        import tempfile
+        import io
+
+        requests = [
+            format_post_for_extraction_openai(post, model=self.model)
+            for post in posts
+        ]
+
+        # Write JSONL to a temp file
+        jsonl_content = "\n".join(json.dumps(r) for r in requests)
+        jsonl_bytes = jsonl_content.encode("utf-8")
+
+        # Upload the file
+        print(f"[BATCH] Uploading {len(jsonl_bytes):,} bytes JSONL to OpenAI...")
+        uploaded_file = client.files.create(
+            file=io.BytesIO(jsonl_bytes),
+            purpose="batch",
+        )
+        print(f"[BATCH] File uploaded: {uploaded_file.id}")
+
+        # Create batch
+        batch = client.batches.create(
+            input_file_id=uploaded_file.id,
+            endpoint="/v1/chat/completions",
+            completion_window="24h",
+        )
+        batch_id = batch.id
+        print(f"[BATCH] Batch created: {batch_id} (status: {batch.status})")
+        self._save_batch_tracking(batch_id, len(posts), posts)
+        return batch_id
+
+    def _submit_batch_gemini(self, client, posts: List[Dict]) -> str:
+        """Submit batch via Gemini Batch API (inline requests)."""
+        requests = [
+            format_post_for_extraction_gemini(post)
+            for post in posts
+        ]
+
+        # Store post_id order for result mapping (Gemini uses positional ordering)
+        post_ids = [p.get("id") for p in posts]
+
+        batch = client.batches.create(
+            model=self.model,
+            src=requests,
+        )
+        batch_id = batch.name
+        print(f"[BATCH] Batch created: {batch_id} (state: {batch.state})")
+
+        # Save tracking with post_ids for positional mapping
+        self._save_batch_tracking(batch_id, len(posts), posts)
+        tracking = self._load_batch_tracking()
+        if batch_id in tracking:
+            tracking[batch_id]["post_ids_ordered"] = post_ids
+            with open(self.batch_tracking_file, "w", encoding="utf-8") as f:
+                json.dump(tracking, f, indent=2)
 
         return batch_id
 
@@ -529,18 +695,30 @@ class BatchEntityExtractor:
             batch_id: The batch ID to check.
 
         Returns:
-            Dict with status info.
+            Dict with normalized status info. The 'status' field is normalized:
+            - "ended" / "completed" = done successfully
+            - "in_progress" / "processing" = still running
+            - "failed" / "canceled" / "expired" = terminal failure
         """
         client = self._get_client()
-        batch = client.messages.batches.retrieve(batch_id)
 
+        if self.provider == "anthropic":
+            return self._check_status_anthropic(client, batch_id)
+        elif self.provider == "openai":
+            return self._check_status_openai(client, batch_id)
+        elif self.provider == "gemini":
+            return self._check_status_gemini(client, batch_id)
+        else:
+            raise ValueError(f"Unknown provider: {self.provider}")
+
+    def _check_status_anthropic(self, client, batch_id: str) -> Dict:
+        batch = client.messages.batches.retrieve(batch_id)
         result = {
             "batch_id": batch.id,
             "status": batch.processing_status,
             "created_at": str(getattr(batch, "created_at", "")),
+            "provider": "anthropic",
         }
-
-        # Access request counts if available
         if hasattr(batch, "request_counts"):
             counts = batch.request_counts
             result["succeeded"] = getattr(counts, "succeeded", 0)
@@ -548,7 +726,54 @@ class BatchEntityExtractor:
             result["expired"] = getattr(counts, "expired", 0)
             result["canceled"] = getattr(counts, "canceled", 0)
             result["processing"] = getattr(counts, "processing", 0)
+        return result
 
+    def _check_status_openai(self, client, batch_id: str) -> Dict:
+        batch = client.batches.retrieve(batch_id)
+        # Normalize OpenAI status to match our expected values
+        # OpenAI statuses: validating, failed, in_progress, finalizing, completed, expired, cancelling, cancelled
+        status_map = {
+            "completed": "ended",
+            "failed": "failed",
+            "expired": "expired",
+            "cancelled": "canceled",
+            "cancelling": "canceled",
+        }
+        raw_status = batch.status
+        normalized = status_map.get(raw_status, raw_status)
+
+        result = {
+            "batch_id": batch.id,
+            "status": normalized,
+            "created_at": str(getattr(batch, "created_at", "")),
+            "provider": "openai",
+            "raw_status": raw_status,
+        }
+        if hasattr(batch, "request_counts") and batch.request_counts:
+            counts = batch.request_counts
+            result["succeeded"] = getattr(counts, "completed", 0)
+            result["errored"] = getattr(counts, "failed", 0)
+            result["processing"] = getattr(counts, "total", 0) - getattr(counts, "completed", 0) - getattr(counts, "failed", 0)
+        return result
+
+    def _check_status_gemini(self, client, batch_id: str) -> Dict:
+        batch = client.batches.get(name=batch_id)
+        # Normalize Gemini state
+        # Gemini states: JOB_STATE_SUCCEEDED, JOB_STATE_FAILED, JOB_STATE_CANCELLED, JOB_STATE_RUNNING, etc.
+        state = str(batch.state) if batch.state else "unknown"
+        status_map = {
+            "JOB_STATE_SUCCEEDED": "ended",
+            "JOB_STATE_FAILED": "failed",
+            "JOB_STATE_CANCELLED": "canceled",
+        }
+        normalized = status_map.get(state, "in_progress")
+
+        result = {
+            "batch_id": batch.name,
+            "status": normalized,
+            "provider": "gemini",
+            "raw_state": state,
+        }
         return result
 
     # ----- Result processing -----
@@ -565,80 +790,67 @@ class BatchEntityExtractor:
         """
         client = self._get_client()
 
-        print(f"[BATCH] Downloading results for batch {batch_id}...")
+        print(f"[BATCH] Downloading results for batch {batch_id} ({self.provider})...")
 
-        result_stream = client.messages.batches.results(batch_id)
+        if self.provider == "anthropic":
+            return self._process_results_anthropic(client, batch_id)
+        elif self.provider == "openai":
+            return self._process_results_openai(client, batch_id)
+        elif self.provider == "gemini":
+            return self._process_results_gemini(client, batch_id)
+        else:
+            raise ValueError(f"Unknown provider: {self.provider}")
 
-        total_posts = 0
-        total_entities = 0
-        total_relationships = 0
+    def _save_entity_results(
+        self,
+        post_id: str,
+        response_text: str,
+    ) -> Tuple[int, int]:
+        """
+        Parse response text and save entities/relationships to the DB.
 
-        for entry in result_stream:
-            post_id = entry.custom_id
+        Returns (entity_count, relationship_count).
+        """
+        entities, relationships = parse_extraction_response(response_text, post_id)
 
-            if entry.result.type != "succeeded":
-                error_msg = str(getattr(entry.result, "error", "Unknown error"))
-                print(f"[BATCH] FAILED: {post_id} — {error_msg}")
-                self.db.mark_processed(
-                    post_id,
-                    status="failed",
-                    error_msg=error_msg,
-                )
-                continue
+        if entities:
+            updated_entities, id_mapping, existing_count, new_count = \
+                self.registry.reassign_entity_ids(entities)
 
-            # Extract text content from the message
-            message = entry.result.message
-            response_text = ""
-            for block in message.content:
-                if block.type == "text":
-                    response_text += block.text
-
-            # Parse the extraction response
-            entities, relationships = parse_extraction_response(
-                response_text, post_id
+            updated_relationships = self.registry.update_relationship_ids(
+                relationships, id_mapping
             )
 
-            # Run through entity registry for deduplication
-            if entities:
-                updated_entities, id_mapping, existing_count, new_count = \
-                    self.registry.reassign_entity_ids(entities)
+            for entity in updated_entities:
+                if not entity.get("first_mention_record_id"):
+                    entity["first_mention_record_id"] = post_id
 
-                # Update relationship IDs
-                updated_relationships = self.registry.update_relationship_ids(
-                    relationships, id_mapping
-                )
+            self.db.save_entities(updated_entities)
 
-                # Set first_mention_record_id on entities
-                for entity in updated_entities:
-                    if not entity.get("first_mention_record_id"):
-                        entity["first_mention_record_id"] = post_id
+            if updated_relationships:
+                self.db.save_relationships(updated_relationships)
 
-                # Save to database
-                self.db.save_entities(updated_entities)
-                total_entities += len(updated_entities)
-
-                if updated_relationships:
-                    self.db.save_relationships(updated_relationships)
-                    total_relationships += len(updated_relationships)
-            else:
-                updated_entities = []
-                updated_relationships = []
-
-            # Mark post as processed
             self.db.mark_processed(
                 post_id,
                 entity_count=len(updated_entities),
                 relationship_count=len(updated_relationships),
             )
-            total_posts += 1
+            return len(updated_entities), len(updated_relationships)
+        else:
+            self.db.mark_processed(post_id, entity_count=0, relationship_count=0)
+            return 0, 0
 
-            if total_posts % 100 == 0:
-                print(f"[BATCH] Processed {total_posts} posts...")
-
+    def _finalize_tracking(
+        self,
+        batch_id: str,
+        total_posts: int,
+        total_entities: int,
+        total_relationships: int,
+    ):
+        """Update tracking file after processing."""
         print(f"[BATCH] Done: {total_posts} posts, "
               f"{total_entities} entities, {total_relationships} relationships")
 
-        # Update tracking
         tracking = self._load_batch_tracking()
         if batch_id in tracking:
             tracking[batch_id]["status"] = "processed"
@@ -651,6 +863,171 @@ class BatchEntityExtractor:
             with open(self.batch_tracking_file, "w", encoding="utf-8") as f:
                 json.dump(tracking, f, indent=2)
 
+    def _process_results_anthropic(self, client, batch_id: str) -> Tuple[int, int, int]:
+        """Process results from Anthropic Batch API."""
+        result_stream = client.messages.batches.results(batch_id)
+
+        total_posts = 0
+        total_entities = 0
+        total_relationships = 0
+
+        for entry in result_stream:
+            post_id = entry.custom_id
+
+            if entry.result.type != "succeeded":
+                error_msg = str(getattr(entry.result, "error", "Unknown error"))
+                print(f"[BATCH] FAILED: {post_id} — {error_msg}")
+                self.db.mark_processed(post_id, status="failed", error_msg=error_msg)
+                continue
+
+            message = entry.result.message
+            response_text = ""
+            for block in message.content:
+                if block.type == "text":
+                    response_text += block.text
+
+            ent_count, rel_count = self._save_entity_results(post_id, response_text)
+            total_entities += ent_count
+            total_relationships += rel_count
+            total_posts += 1
+
+            if total_posts % 100 == 0:
+                print(f"[BATCH] Processed {total_posts} posts...")
+
+        self._finalize_tracking(batch_id, total_posts, total_entities, total_relationships)
+        return total_posts, total_entities, total_relationships
+
+    def _process_results_openai(self, client, batch_id: str) -> Tuple[int, int, int]:
+        """Process results from OpenAI Batch API."""
+        batch = client.batches.retrieve(batch_id)
+
+        if not batch.output_file_id:
+            print(f"[BATCH] ERROR: No output file for batch {batch_id}")
+            return 0, 0, 0
+
+        # Download output file content
+        file_content = client.files.content(batch.output_file_id)
+        lines = file_content.text.strip().split("\n")
+
+        total_posts = 0
+        total_entities = 0
+        total_relationships = 0
+
+        for line in lines:
+            if not line.strip():
+                continue
+
+            try:
+                entry = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+
+            post_id = entry.get("custom_id", "UNKNOWN")
+            response = entry.get("response", {})
+            status_code = response.get("status_code", 0)
+
+            if status_code != 200:
+                error_msg = str(response.get("body", {}).get("error", "API error"))
+                print(f"[BATCH] FAILED: {post_id} — {error_msg}")
+                self.db.mark_processed(post_id, status="failed", error_msg=error_msg)
+                continue
+
+            # Extract text from OpenAI response format
+            body = response.get("body", {})
+            choices = body.get("choices", [])
+            if not choices:
+                self.db.mark_processed(post_id, entity_count=0, relationship_count=0)
+                total_posts += 1
+                continue
+
+            response_text = choices[0].get("message", {}).get("content", "")
+
+            ent_count, rel_count = self._save_entity_results(post_id, response_text)
+            total_entities += ent_count
+            total_relationships += rel_count
+            total_posts += 1
+
+            if total_posts % 100 == 0:
+                print(f"[BATCH] Processed {total_posts} posts...")
+
+        self._finalize_tracking(batch_id, total_posts, total_entities, total_relationships)
+        return total_posts, total_entities, total_relationships
+
+    def _process_results_gemini(self, client, batch_id: str) -> Tuple[int, int, int]:
+        """Process results from Gemini Batch API."""
+        # Get the batch job to access results
+        batch = client.batches.get(name=batch_id)
+
+        # Load post_ids from tracking for positional mapping
+        tracking = self._load_batch_tracking()
+        post_ids = tracking.get(batch_id, {}).get("post_ids_ordered", [])
+
+        if not post_ids:
+            # Fall back to regular post_ids
+            post_ids = tracking.get(batch_id, {}).get("post_ids", [])
+
+        if not post_ids:
+            print(f"[BATCH] ERROR: No post IDs found in tracking for {batch_id}")
+            return 0, 0, 0
+
+        total_posts = 0
+        total_entities = 0
+        total_relationships = 0
+
+        # Gemini batch results come from the destination
+        # For inline batches, results are accessible via the batch response object
+        dest = batch.dest
+        if dest and isinstance(dest, str) and dest.startswith("gs://"):
+            print(f"[BATCH] GCS output: {dest}")
+            print("[BATCH] GCS result download not implemented — use inline batches")
+            return 0, 0, 0
+
+        # For inline results, iterate through response
+        if hasattr(batch, "responses") and batch.responses:
+            for idx, response in enumerate(batch.responses):
+                if idx >= len(post_ids):
+                    break
+                post_id = post_ids[idx]
+
+                try:
+                    # Extract text from Gemini response
+                    response_text = ""
+                    if hasattr(response, "candidates") and response.candidates:
+                        for candidate in response.candidates:
+                            if hasattr(candidate, "content") and candidate.content:
+                                for part in candidate.content.parts:
+                                    if hasattr(part, "text"):
+                                        response_text += part.text
+
+                    if not response_text:
+                        self.db.mark_processed(post_id, entity_count=0, relationship_count=0)
+                        total_posts += 1
+                        continue
+
+                    ent_count, rel_count = self._save_entity_results(post_id, response_text)
+                    total_entities += ent_count
+                    total_relationships += rel_count
+                    total_posts += 1
+                except Exception as e:
+                    print(f"[BATCH] FAILED: {post_id} — {e}")
+                    self.db.mark_processed(post_id, status="failed", error_msg=str(e))
+
+                if total_posts % 100 == 0:
+                    print(f"[BATCH] Processed {total_posts} posts...")
+        else:
+            # Try to get results from dest file or list approach
+            print(f"[BATCH] Batch {batch_id} has no inline responses.")
+            print(f"[BATCH] Batch state: {batch.state}, dest: {getattr(batch, 'dest', 'N/A')}")
+            # For file-based results, we'd need to download from GCS
+            # For now, try listing results if the API supports it
+            try:
+                results_list = list(client.batches.list())
+                print(f"[BATCH] Found {len(results_list)} batch jobs total")
+            except Exception:
+                pass
+            return 0, 0, 0
+
+        self._finalize_tracking(batch_id, total_posts, total_entities, total_relationships)
         return total_posts, total_entities, total_relationships
 
     # ----- Auto mode -----
@@ -772,15 +1149,15 @@ def main():
     parser.add_argument(
         "--provider",
         type=str,
-        choices=["anthropic"],
+        choices=["anthropic", "openai", "gemini"],
         default="anthropic",
         help="API provider (default: anthropic)",
     )
     parser.add_argument(
         "--model",
         type=str,
-        default=DEFAULT_MODEL,
-        help=f"Model to use (default: {DEFAULT_MODEL})",
+        default=None,
+        help="Model to use (default: provider-specific)",
     )
     parser.add_argument(
         "--tier",
@@ -795,16 +1172,76 @@ def main():
         default=DEFAULT_POLL_INTERVAL,
         help=f"Seconds between status polls (default: {DEFAULT_POLL_INTERVAL})",
     )
+    parser.add_argument(
+        "--parallel-submit",
+        action="store_true",
+        help="Submit batches to all 3 providers in parallel (splits posts evenly)",
+    )
 
     args = parser.parse_args()
+
+    # Resolve model: explicit --model > provider default
+    model = args.model or PROVIDER_DEFAULTS.get(args.provider, {}).get("model", DEFAULT_MODEL)
 
     extractor = BatchEntityExtractor(
         data_dir=args.data_dir,
         provider=args.provider,
-        model=args.model,
+        model=model,
     )
 
-    if args.submit:
+    if args.parallel_submit:
+        # Submit to all 3 providers, splitting posts evenly
+        providers = ["anthropic", "openai", "gemini"]
+        total_batch = args.batch_size * len(providers)
+
+        # Load posts using the configured extractor (just for loading)
+        posts = extractor.load_unprocessed_posts(total_batch, args.tier)
+        if not posts:
+            print("[BATCH] No unprocessed posts to submit.")
+            return 0
+
+        # Split into chunks
+        chunk_size = len(posts) // len(providers)
+        remainder = len(posts) % len(providers)
+        chunks = []
+        start = 0
+        for i, prov in enumerate(providers):
+            end = start + chunk_size + (1 if i < remainder else 0)
+            chunks.append((prov, posts[start:end]))
+            start = end
+
+        print(f"\n[BATCH] Parallel submit: {len(posts)} posts across {len(providers)} providers")
+        for prov, chunk in chunks:
+            print(f"  {prov}: {len(chunk)} posts")
+        print()
+
+        batch_ids = {}
+        for prov, chunk in chunks:
+            if not chunk:
+                continue
+            prov_model = PROVIDER_DEFAULTS.get(prov, {}).get("model", DEFAULT_MODEL)
+            prov_extractor = BatchEntityExtractor(
+                data_dir=args.data_dir,
+                provider=prov,
+                model=prov_model,
+            )
+            try:
+                bid = prov_extractor.submit_batch(chunk)
+                batch_ids[prov] = bid
+                print(f"[BATCH] {prov}: submitted batch {bid}")
+            except Exception as e:
+                print(f"[BATCH] {prov}: FAILED to submit — {e}")
+
+        print(f"\n[BATCH] Submitted {len(batch_ids)} batches:")
+        for prov, bid in batch_ids.items():
+            print(f"  {prov}: {bid}")
+        print(f"\n[BATCH] Check status:")
+        for prov, bid in batch_ids.items():
+            print(f"  python {__file__} --status --batch-id {bid} --provider {prov}")
+
+        return 0
+
+    elif args.submit:
         posts = extractor.load_unprocessed_posts(args.batch_size, args.tier)
         if posts:
             batch_id = extractor.submit_batch(posts)

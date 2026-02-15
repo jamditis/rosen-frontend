@@ -301,8 +301,15 @@ class EntityRegistry:
             target_id = rel.get('target_entity_id', '')
 
             # Map to canonical IDs
-            rel['source_entity_id'] = id_mapping.get(source_id, source_id)
-            rel['target_entity_id'] = id_mapping.get(target_id, target_id)
+            mapped_source = id_mapping.get(source_id, source_id)
+            mapped_target = id_mapping.get(target_id, target_id)
+
+            # Skip relationships with missing entity IDs
+            if not mapped_source or not mapped_target:
+                continue
+
+            rel['source_entity_id'] = mapped_source
+            rel['target_entity_id'] = mapped_target
 
             updated_relationships.append(rel)
 
