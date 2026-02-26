@@ -1,0 +1,144 @@
+================================================================================
+JAY ROSEN CONCEPT SCHEMA UPDATE
+================================================================================
+Date: 2025-10-12
+Source: narrative/Jay's notes on themes and clusters.md
+
+BACKGROUND:
+-----------
+After analyzing existing key concepts data, we reviewed Jay Rosen's own notes on
+his themes and clusters. These concepts are weighted MORE HEAVILY than data analysis
+since they come directly from Jay himself.
+
+JAY'S IDENTIFIED KEY CONCEPTS:
+------------------------------
+From Jay's notes, these concepts were already in our schema:
+✓ "The people formerly known as the audience"
+✓ "The View from Nowhere"
+✓ "The Savvy Style" / "The Church of the Savvy"
+✓ "The Production of Innocence" (offshoot of View from Nowhere)
+✓ "Verification in reverse"
+
+NEW CONCEPTS ADDED FROM JAY'S NOTES:
+------------------------------------
+
+1. "The Citizens' Agenda"
+   - Jay's note: "Much discussion of this online"
+   - Provided Google search link showing extensive coverage
+   - Definition: Election coverage prioritizing voter concerns over candidate strategy
+   - Related to public journalism and Jay's early work
+   - Importance: HIGH (Jay emphasizes extensive online discussion)
+
+2. "Not the odds but the stakes"
+   - Jay's note: Recent framework heavily discussed
+   - CNN interview: https://www.cnn.com/2023/11/15/media/2024-election-horse-race-stakes-nyu-professor
+   - Margaret Sullivan coverage: https://margaretsullivan.substack.com/p/a-media-critic-urged-not-the-odds
+   - Definition: Focusing on election consequences rather than polling/predictions
+   - Directly counters horse-race journalism
+   - Importance: HIGH (active current framework, Jay promoting actively)
+
+3. "Mindcasting"
+   - Jay's note: "Defining the form, spreading the meme"
+   - Tumblr post: https://jayrosen.tumblr.com/post/110043432/mindcasting-defining-the-form-spreading-the-meme
+   - Definition: Broadcasting one's thought process and knowledge-gathering
+   - Related to blogging and transparency in journalism
+   - Importance: MEDIUM (early concept, may appear in blog posts)
+
+CONCEPTS CONSIDERED BUT NOT ADDED:
+-----------------------------------
+
+"The truth sandwich"
+- Jay explicitly notes: "not Jay Rosen's phrase, it's from Brian Stelter and George Lakoff"
+- Jay explained and spread it, but attributes it to others
+- Decision: Do not add (not a Jay Rosen concept)
+
+"Why political coverage is broken"
+- This is a speech/blog post title, not a concept
+- Very important work, but not a named concept like the others
+- Decision: Do not add as concept (it's a work/speech)
+
+"What could political journalists do NOW"
+- This is a list/framework, not a named concept
+- Decision: Do not add as concept
+
+UPDATED SCHEMA TOTAL:
+---------------------
+Total key concepts: 13 (was 10, was 8 originally)
+
+Complete list:
+1. View from Nowhere
+2. Church of the Savvy
+3. The People Formerly Known as the Audience
+4. Parity Product
+5. Verification in reverse
+6. He said/she said journalism
+7. Audience atomization overcome
+8. The Production of Innocence
+9. Horse-race journalism (added from data analysis)
+10. False balance (added from data analysis)
+11. The Citizens' Agenda (added from Jay's notes) ★
+12. Not the odds but the stakes (added from Jay's notes) ★
+13. Mindcasting (added from Jay's notes) ★
+
+CHANGES TO key_concepts_updater.py:
+------------------------------------
+Updated both AI prompts to include:
+- Definitions for all 3 new concepts
+- Emphasis that these are Jay Rosen concepts
+- Maintained CRITICAL instruction for exact matching only
+
+EXPECTED IMPACT:
+----------------
+When script is re-run:
+
+1. "The Citizens' Agenda" will be captured in:
+   - Public journalism era posts
+   - Election coverage critiques
+   - Posts about voter-focused journalism
+
+2. "Not the odds but the stakes" will be captured in:
+   - Recent election coverage posts (2023-2024)
+   - Posts critiquing horse-race journalism
+   - Stakes-based journalism advocacy
+
+3. "Mindcasting" will be captured in:
+   - Early blogging posts (2000s era)
+   - Posts about transparency and process
+   - Meta-journalism discussions
+
+VALIDATION NEEDED:
+------------------
+After next run, check:
+- How many posts reference "The Citizens' Agenda"
+- Whether recent posts capture "Not the odds but the stakes"
+- If early blog posts show "Mindcasting"
+- Any false positives or concepts being missed
+
+LINKS TO JAY'S ORIGINAL SOURCES:
+---------------------------------
+The Citizens' Agenda:
+  https://www.google.com/search?q=jay+rosen+pressthink+citizens+agenda
+
+Not the odds but the stakes:
+  https://www.cnn.com/2023/11/15/media/2024-election-horse-race-stakes-nyu-professor
+  https://margaretsullivan.substack.com/p/a-media-critic-urged-not-the-odds
+
+Mindcasting:
+  https://jayrosen.tumblr.com/post/110043432/mindcasting-defining-the-form-spreading-the-meme
+
+The Citizens' Agenda (Jay's most important):
+  See Jay's Google search showing extensive discussion
+
+FILES MODIFIED:
+---------------
+- schema.json (added 3 concepts from Jay's notes)
+- src/key_concepts_updater.py (updated prompts with definitions)
+- jay_rosen_schema_update.txt (this documentation)
+
+================================================================================
+AUTHORITY WEIGHTING:
+Jay Rosen's own identified concepts > Data analysis patterns
+
+This update prioritizes concepts Jay himself identifies as important themes
+in his work, ensuring the schema aligns with his actual body of work.
+================================================================================

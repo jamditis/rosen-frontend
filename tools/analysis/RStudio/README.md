@@ -1,0 +1,288 @@
+# RStudio Analysis Tools for Jay Rosen Archive
+
+This directory contains R scripts and documentation for analyzing the entity extraction and relationship data from the Jay Rosen Internet Archive.
+
+**Created:** 2025-11-07
+**Purpose:** Statistical analysis, network analysis, and visualization of extracted entities and relationships from Google Sheets data
+
+---
+
+## 📁 Directory Structure
+
+```
+RStudio/
+├── scripts/          # R analysis scripts
+├── docs/            # Documentation and guides
+├── output/          # Generated visualizations (PNG files)
+└── README.md        # This file
+```
+
+---
+
+## 🚀 Quick Start
+
+### 1. Set Working Directory in RStudio
+
+```r
+setwd("C:/Users/amdit/OneDrive/Desktop/Crimes/playground/rosen-scraper/RStudio/scripts")
+```
+
+### 2. Install Required Packages (First Time Only)
+
+```r
+install.packages(c("googlesheets4", "dplyr", "ggplot2", "tidyr"))
+```
+
+### 3. Load Data
+
+```r
+source("load_data.R")
+```
+
+This connects to Google Sheets and loads:
+- **entities** - 5,160 entities (People, Organizations, Concepts, Works, Events, Locations)
+- **relationships** - 7,499 relationships between entities
+
+---
+
+## 📊 Available Scripts
+
+### Core Scripts (in `scripts/`)
+
+**Data Loading:**
+- `load_data.R` - Simple data loader from Google Sheets (run this first!)
+- `inspect_data.R` - Inspect data structure and column names
+
+**General Analysis Scripts:**
+- `example_queries_fixed.R` - 14 example analyses (entity types, top mentions, relationships)
+- `analyze_entities_fixed.R` - Full analysis with 7 visualizations (PNG files)
+- `jay_rosen_analysis.R` - Deep dive into Jay Rosen's network and concepts (15 analyses)
+- `explore_entities.R` - Interactive entity search tool (7 customizable sections)
+
+**🆕 Specialized Analysis Scripts (NEW - 2025-11-07):**
+- `jay_rosen_concept_map.R` - Maps Rosen's 8 pioneered concepts, adoption patterns, co-occurrence (3 visualizations)
+- `media_industry_analysis.R` - Rosen vs mainstream/alternative media, criticism patterns (4 visualizations)
+- `public_journalism_movement.R` - Public journalism network, key figures, evolution (4 visualizations)
+- `journalism_paradigm_comparison.R` - Compare alternative/traditional/digital paradigms (5 visualizations + CSV)
+- `run_all_analyses.R` - Master runner for all 4 specialized analyses (14 visualizations total)
+
+**Legacy Scripts:**
+- `example_queries.R` - Original version (use `_fixed` version instead)
+- `analyze_entities.R` - Original version (use `_fixed` version instead)
+
+---
+
+## 📚 Documentation (in `docs/`)
+
+1. **`QUICK_START_R.md`** ⭐ **Start here!**
+   - 5-minute quick start guide
+   - Copy-paste commands to get going fast
+
+2. **`RSTUDIO_BEGINNER_GUIDE.md`** 📖
+   - Complete beginner's tutorial with step-by-step instructions
+   - Troubleshooting section
+   - Understanding RStudio interface
+
+3. **`COPY_PASTE_COMMANDS.md`** 📋
+   - 60+ ready-to-use commands organized by category
+   - Quick searches, exports, visualizations
+   - Keep this open as a reference!
+
+4. **`R_ANALYSIS_GUIDE.md`** 🔬
+   - Advanced usage and examples
+   - Network analysis code
+   - Custom visualization techniques
+
+5. **`SPECIALIZED_ANALYSES.md`** 🆕 **NEW!**
+   - Detailed guide to 4 specialized analyses
+   - Research questions each analysis answers
+   - Customization options
+   - Academic research applications
+
+---
+
+## 🎯 Common Workflows
+
+### Workflow 1: Quick Data Exploration
+
+```r
+# Load data
+source("load_data.R")
+
+# View in spreadsheet
+View(entities)
+View(relationships)
+
+# Run example queries
+source("example_queries_fixed.R")
+```
+
+### Workflow 2: Jay Rosen Deep Dive
+
+```r
+# Load data
+source("load_data.R")
+
+# Run comprehensive Jay Rosen analysis
+source("jay_rosen_analysis.R")
+
+# Browse output
+shell.exec("../output")  # Open output folder
+```
+
+### Workflow 3: Generate All Visualizations
+
+```r
+# Load data and create 7 PNG charts
+source("analyze_entities_fixed.R")
+
+# Charts saved to output/ folder:
+# - entity_type_distribution.png
+# - top_entities.png
+# - top_people.png
+# - top_organizations.png
+# - relationship_type_distribution.png
+# - most_connected_entities.png
+# - prominence_distribution.png
+```
+
+### Workflow 4: Custom Search & Export
+
+```r
+# Load data
+source("load_data.R")
+
+# Search for specific entity
+results <- entities %>%
+  filter(grepl("Trump", entity_name, ignore.case = TRUE))
+
+# Export to CSV
+write.csv(results, "../output/trump_entities.csv", row.names = FALSE)
+```
+
+### Workflow 5: Specialized Analyses (NEW!)
+
+```r
+# Load data
+source("load_data.R")
+
+# Run individual specialized analysis
+source("jay_rosen_concept_map.R")           # Rosen's intellectual contributions
+source("media_industry_analysis.R")         # Media criticism patterns
+source("public_journalism_movement.R")      # Public journalism network
+source("journalism_paradigm_comparison.R")  # Paradigm comparison
+
+# OR run all 4 at once
+source("run_all_analyses.R")               # Generates 14 visualizations
+```
+
+---
+
+## 📊 Output Files (in `output/`)
+
+Visualizations generated by the analysis scripts:
+- `entity_type_distribution.png` - Distribution of 6 entity types
+- `top_entities.png` - Top 20 most mentioned entities
+- `top_people.png` - Top 15 people in archive
+- `top_organizations.png` - Top 15 organizations
+- `relationship_type_distribution.png` - 15 relationship types
+- `most_connected_entities.png` - Network connectivity (degree centrality)
+- `prominence_distribution.png` - Prominence scores by entity type
+- `jay_rosen_relationships.png` - Jay Rosen's relationship patterns
+
+---
+
+## 🔍 Key Findings
+
+### Archive Statistics (as of 2025-11-07):
+- **5,160 unique entities** across 534 records
+- **7,499 relationships** between entities
+- **9.66 entities per record** on average
+- **12.06 relationships per record** on average
+
+### Entity Type Breakdown:
+1. **Person** - 2,182 entities (42.3%)
+2. **Organization** - 1,239 entities (24.0%)
+3. **Work** - 665 entities (12.9%)
+4. **Concept** - 653 entities (12.7%)
+5. **Event** - 222 entities (4.3%)
+6. **Location** - 199 entities (3.9%)
+
+### Top 5 Connected Entities:
+1. **Jay Rosen** - 1,428 total connections
+2. **The New York Times** - 550 connections
+3. **PressThink** - 343 connections
+4. **The Washington Post** - 222 connections
+5. **CNN** - 122 connections
+
+### Most Common Relationships:
+1. **Affiliated With** - 2,138 instances (28.5%)
+2. **Discusses** - 1,663 instances (22.2%)
+3. **Mentions** - 1,128 instances (15.0%)
+4. **Founded By** - 569 instances (7.6%)
+5. **Criticizes** - 514 instances (6.9%)
+
+---
+
+## 🔗 Integration with Main Project
+
+### Data Source:
+- **Google Sheets:** "📎Rosen Archive URL List"
+- **Sheet ID:** `1Q_Fik5KQXdkZ4dujEN8H_47K5oldLkv6-hxERuBAdpg`
+- **Tabs Used:**
+  - `extracted_entities` - Entity data
+  - `extracted_relationships` - Relationship data
+
+### Generated By:
+- Python entity extraction: `src/entity_extraction_batch_processor.py`
+- Backend pipeline: Main rosen-scraper Python codebase
+- Entity extraction schema: `src/entity_extraction_schema.json`
+
+### Related Project Files:
+- Entity extraction schema: `../src/entity_extraction_schema.json`
+- Verification tools: `../tools/verify_extraction_sheets.py`
+- Project documentation: `../narrative/PROJECT_LOG.md`
+
+---
+
+## 💡 Tips for RStudio Users
+
+1. **Set working directory** to `scripts/` folder for easy sourcing
+2. **Keep `docs/COPY_PASTE_COMMANDS.md` open** as a reference
+3. **Use `View()` function** to browse data in spreadsheet style
+4. **Export interesting findings** to CSV for sharing
+5. **Modify scripts** to customize for your research questions
+
+---
+
+## 🆘 Troubleshooting
+
+### Data Not Loading?
+1. Check internet connection
+2. Verify Google authentication: `gs4_auth()`
+3. Ensure access to the Google Sheet
+
+### Scripts Not Found?
+Make sure working directory is set:
+```r
+setwd("C:/Users/amdit/OneDrive/Desktop/Crimes/playground/rosen-scraper/RStudio/scripts")
+```
+
+### Packages Missing?
+Install required packages:
+```r
+install.packages(c("googlesheets4", "dplyr", "ggplot2", "tidyr"))
+```
+
+---
+
+## 📖 Next Steps
+
+1. **Start with docs/QUICK_START_R.md** - Get running in 5 minutes
+2. **Run jay_rosen_analysis.R** - Comprehensive analysis of Jay Rosen's network
+3. **Explore with custom queries** - Use docs/COPY_PASTE_COMMANDS.md as reference
+4. **Create custom visualizations** - Modify existing scripts for your needs
+
+---
+
+**For questions or issues:** See main project documentation in `../narrative/` or `../CLAUDE.md`

@@ -1,0 +1,259 @@
+================================================================================
+KEY CONCEPTS ANALYSIS REPORT
+================================================================================
+
+Total rows analyzed: 601
+Rows with key concepts: 409
+Rows with recommendations: 61
+
+================================================================================
+SECTION 1: CURRENT KEY CONCEPTS USAGE
+================================================================================
+
+Total concept instances: 1002
+Unique concepts used: 90
+
+Concept frequency (sorted by count):
+--------------------------------------------------------------------------------
+   284 ( 28.3%) - The People Formerly Known as the Audience
+   137 ( 13.7%) - View from Nowhere
+   134 ( 13.4%) - He said/she said journalism
+   121 ( 12.1%) - The Production of Innocence
+   101 ( 10.1%) - Audience atomization overcome
+    49 (  4.9%) - Verification in reverse
+    26 (  2.6%) - Parity Product
+    24 (  2.4%) - Church of the Savvy
+     9 (  0.9%) - Citizen Journalism
+     6 (  0.6%) - View From Nowhere
+     4 (  0.4%) - Media Bias
+     4 (  0.4%) - Public Journalism
+     4 (  0.4%) - Civic Journalism
+     4 (  0.4%) - The People Formerly Known as the Audience'
+     3 (  0.3%) - Audience Engagement
+     3 (  0.3%) - Accountability journalism
+     3 (  0.3%) - Open Source Journalism
+     2 (  0.2%) - User-as-Producer
+     2 (  0.2%) - Disinformation
+     2 (  0.2%) - Horse-race journalism
+     2 (  0.2%) - Verification
+     2 (  0.2%) - Legacy Media
+     2 (  0.2%) - Objectivity
+     2 (  0.2%) - Normalization
+     2 (  0.2%) - Master Narrative
+     2 (  0.2%) - Death of the Gatekeeper
+     2 (  0.2%) - pro-am reporting
+     2 (  0.2%) - Networked Journalism
+     2 (  0.2%) - Pack journalism
+     2 (  0.2%) - Trust-Me Journalism
+     1 (  0.1%) - Citizens Agenda
+     1 (  0.1%) - Flooding the
+     1 (  0.1%) - Information assymetry
+     1 (  0.1%) - Amplification
+     1 (  0.1%) - Univision News
+Jay Rosen
+     1 (  0.1%) - User-generated content
+     1 (  0.1%) - ad watches.
+     1 (  0.1%) - that's false
+     1 (  0.1%) - that's a lie
+     1 (  0.1%) - Go with what you got.
+     1 (  0.1%) - Go with what you got
+     1 (  0.1%) - he says
+     1 (  0.1%) - view from nowhere
+     1 (  0.1%) - Civic journalism
+     1 (  0.1%) - Public service press
+     1 (  0.1%) - Transparency is the new objectivity
+     1 (  0.1%) - Transparency
+     1 (  0.1%) - Climate Change Denialism
+     1 (  0.1%) - View from Somewhere
+     1 (  0.1%) - Participatory Journalism
+     1 (  0.1%) - Press Priesthood
+     1 (  0.1%) - Audience empowerment
+     1 (  0.1%) - Gatekeepers
+     1 (  0.1%) - Spin
+     1 (  0.1%) - The Production of Innocence'
+     1 (  0.1%) - Producerist
+     1 (  0.1%) - Elite Journalism
+     1 (  0.1%) - PressThink
+     1 (  0.1%) - We Media
+     1 (  0.1%) - user-generated content
+     1 (  0.1%) - Answer Journalism
+     1 (  0.1%) - Terms of Authority
+     1 (  0.1%) - Political fictions
+     1 (  0.1%) - Objectivity in journalism
+     1 (  0.1%) - Peer Production
+     1 (  0.1%) - Press sphere
+     1 (  0.1%) - Pro-am journalism
+     1 (  0.1%) - pro-am journalism
+     1 (  0.1%) - False balance
+     1 (  0.1%) - Opposition Press
+     1 (  0.1%) - The Contraption
+     1 (  0.1%) - Rollback
+     1 (  0.1%) - The Wisdom of Crowds
+     1 (  0.1%) - Citizen journalism
+     1 (  0.1%) - Transparent Newsroom
+     1 (  0.1%) - Fortress Journalism
+     1 (  0.1%) - Production of Innocence
+     1 (  0.1%) - Newsroom Religion
+     1 (  0.1%) - Distributed Knowledge
+     1 (  0.1%) - Spin Alley
+     1 (  0.1%) - The Church of the Savvy
+     1 (  0.1%) - Horserace Journalism
+     1 (  0.1%) - Election Coverage
+     1 (  0.1%) - Media Criticism
+     1 (  0.1%) - Democratic Journalism
+     1 (  0.1%) - Public Interest
+     1 (  0.1%) - Civic Engagement
+     1 (  0.1%) - Digital Journalism
+     1 (  0.1%) - Technology Impact
+     1 (  0.1%) - Future of News
+
+================================================================================
+SECTION 2: CONCEPTS MENTIONED IN RECOMMENDATIONS
+================================================================================
+
+These concepts appear in AI recommendations, suggesting they may be
+relevant but are not currently in the schema or not being captured:
+
+    33 mentions - View from Nowhere
+    19 mentions - The People Formerly Known as the Audience
+    16 mentions - The Production of Innocence
+    15 mentions - He said/she said journalism
+    12 mentions - objectivity
+    11 mentions - Church of the Savvy
+     8 mentions - Audience atomization overcome
+     4 mentions - Verification in reverse
+     3 mentions - false balance
+     3 mentions - both sides
+     2 mentions - horse-race journalism
+     1 mentions - neutrality
+     1 mentions - citizens agenda
+     1 mentions - public journalism
+
+================================================================================
+SECTION 3: CONCEPTS WITH FREQUENT RECOMMENDATIONS
+================================================================================
+
+Concepts that frequently have recommendations for changes:
+
+
+View from Nowhere - 23 recommendations
+--------------------------------------------------------------------------------
+  Row 2: Looks good. The text directly challenges the "View from Nowhere" ideal, arguing for explicitly pro-democracy journalism. It also alludes to the dangers of simplistic, 'he said/she said' approaches by 
+  Row 12: The text explicitly critiques horse-race journalism, which is heavily reliant on 'he said/she said' approaches to create 'balance' and often prioritizes strategy and the 'insiders' moods' - aligning w
+  Row 15: The text highlights instances where journalistic outlets appear to prioritize their own image and attempt to appear 'fair-minded' without necessarily pursuing truth (View from Nowhere). Furthermore, t
+
+The People Formerly Known as the Audience - 19 recommendations
+--------------------------------------------------------------------------------
+  Row 3: Looks good. The text explicitly discusses how blogs have empowered readers (People Formerly Known as the Audience) and fostered connected audiences (Audience Atomization Overcome). There is no explici
+  Row 5: The current assignment correctly includes 'The People Formerly Known as the Audience'. However, the text also discusses the idea of journalistic objectivity and skepticism, aligning with the 'View fro
+  Row 6: The text directly references the audience's need for explanation and transparency, aligning with 'The People Formerly Known as the Audience.'  It also discusses the Times' reluctance to be forthcoming
+
+The Production of Innocence - 17 recommendations
+--------------------------------------------------------------------------------
+  Row 4: Looks good. The text focuses heavily on the media's fear of being seen as a cause of disruption or violence, their efforts to avoid drawing attention to themselves (unmarked vehicles, hesitance to bro
+  Row 8: Looks good. The text heavily focuses on the media's self-preservation and avoidance of being seen as a cause or instigator of events, which aligns perfectly with the concept of 'The Production of Inno
+  Row 14: Further analysis could explore how the text relates to 'View from Nowhere' as Sinclair's actions challenge traditional journalistic norms of impartiality.
+
+He said/she said journalism - 11 recommendations
+--------------------------------------------------------------------------------
+  Row 2: Looks good. The text directly challenges the "View from Nowhere" ideal, arguing for explicitly pro-democracy journalism. It also alludes to the dangers of simplistic, 'he said/she said' approaches by 
+  Row 12: The text explicitly critiques horse-race journalism, which is heavily reliant on 'he said/she said' approaches to create 'balance' and often prioritizes strategy and the 'insiders' moods' - aligning w
+  Row 17: The text discusses how journalists prioritize the 'horse race' aspect of campaigns, focusing on strategy, insider opinions, and predictions, which can be seen as an example of the 'Church of the Savvy
+
+Church of the Savvy - 7 recommendations
+--------------------------------------------------------------------------------
+  Row 12: The text explicitly critiques horse-race journalism, which is heavily reliant on 'he said/she said' approaches to create 'balance' and often prioritizes strategy and the 'insiders' moods' - aligning w
+  Row 14: Further analysis could explore how the text relates to 'View from Nowhere' as Sinclair's actions challenge traditional journalistic norms of impartiality.
+  Row 17: The text discusses how journalists prioritize the 'horse race' aspect of campaigns, focusing on strategy, insider opinions, and predictions, which can be seen as an example of the 'Church of the Savvy
+
+Audience atomization overcome - 4 recommendations
+--------------------------------------------------------------------------------
+  Row 3: Looks good. The text explicitly discusses how blogs have empowered readers (People Formerly Known as the Audience) and fostered connected audiences (Audience Atomization Overcome). There is no explici
+  Row 7: Looks good. The text directly addresses how blogs empower the audience and foster connections, aligning with 'Audience atomization overcome' and 'The People Formerly Known as the Audience'.  The text 
+  Row 22: The text directly discusses the 'View from Nowhere' in the context of a media bias, and how this approach is overcome by Trump's followers who discard facts from mainstream media. The discussion of Tr
+
+Verification in reverse - 3 recommendations
+--------------------------------------------------------------------------------
+  Row 22: The text directly discusses the 'View from Nowhere' in the context of a media bias, and how this approach is overcome by Trump's followers who discard facts from mainstream media. The discussion of Tr
+  Row 53: The text explicitly discusses the 'Church of the Savvy' at length, detailing the focus on political strategy over substance. It also touches on the 'View from Nowhere' through the discussion of object
+  Row 55: The text strongly supports all three of the currently assigned concepts: "He said/she said journalism" is discussed directly in terms of equal time for opposing viewpoints, "Verification in reverse" i
+
+Citizen Journalism - 2 recommendations
+--------------------------------------------------------------------------------
+  Row 31: The provided key concepts assignment of 'Audience Engagement', 'Citizen Journalism', and 'User-as-Producer' align very well with the analysis. The text explicitly discusses how journalists are seeking
+  Row 35: The text focuses on journalism at risk and includes discussion of balance and potential bias, but it does not explicitly show examples to suggest either He said/she said journalism or View from Nowher
+
+Media Bias - 2 recommendations
+--------------------------------------------------------------------------------
+  Row 35: The text focuses on journalism at risk and includes discussion of balance and potential bias, but it does not explicitly show examples to suggest either He said/she said journalism or View from Nowher
+  Row 38: No Jay Rosen concepts found in this text. The text discusses topics related to journalism, national security, and the publication of classified information, but does not explicitly or implicitly refer
+
+Accountability journalism - 2 recommendations
+--------------------------------------------------------------------------------
+  Row 36: The text explicitly mentions 'user-generated content and verification', which relates directly to the assigned concept of 'User-generated content' and 'Verification'. The text also implicitly touches 
+  Row 38: No Jay Rosen concepts found in this text. The text discusses topics related to journalism, national security, and the publication of classified information, but does not explicitly or implicitly refer
+
+================================================================================
+SECTION 4: SAMPLE RECOMMENDATIONS FOR REVIEW
+================================================================================
+
+Row 2 - Current: View from Nowhere | He said/she said journalism
+Recommendation: Looks good. The text directly challenges the "View from Nowhere" ideal, arguing for explicitly pro-democracy journalism. It also alludes to the dangers of simplistic, 'he said/she said' approaches by highlighting the inadequacy of simply covering the threats to democracy without taking a more forcef
+--------------------------------------------------------------------------------
+Row 3 - Current: The People Formerly Known as the Audience | Audience atomization overcome
+Recommendation: Looks good. The text explicitly discusses how blogs have empowered readers (People Formerly Known as the Audience) and fostered connected audiences (Audience Atomization Overcome). There is no explicit mention of any other of the given concepts.
+--------------------------------------------------------------------------------
+Row 4 - Current: The Production of Innocence
+Recommendation: Looks good. The text focuses heavily on the media's fear of being seen as a cause of disruption or violence, their efforts to avoid drawing attention to themselves (unmarked vehicles, hesitance to broadcast protests), and their desire to avoid making editorial decisions that could be perceived as en
+--------------------------------------------------------------------------------
+Row 5 - Current: The People Formerly Known as the Audience
+Recommendation: The current assignment correctly includes 'The People Formerly Known as the Audience'. However, the text also discusses the idea of journalistic objectivity and skepticism, aligning with the 'View from Nowhere' concept. Additionally, the criticism of Feuer's book and the NYT spokeswoman's response s
+--------------------------------------------------------------------------------
+Row 6 - Current: The People Formerly Known as the Audience
+Recommendation: The text directly references the audience's need for explanation and transparency, aligning with 'The People Formerly Known as the Audience.'  It also discusses the Times' reluctance to be forthcoming, which can be seen as a form of 'The Production of Innocence' (avoiding accountability for actions 
+--------------------------------------------------------------------------------
+Row 7 - Current: Audience atomization overcome, The People Formerly Known as the Audience
+Recommendation: Looks good. The text directly addresses how blogs empower the audience and foster connections, aligning with 'Audience atomization overcome' and 'The People Formerly Known as the Audience'.  The text implicitly critiques traditional media's limitations and champions the role of bloggers in shaping p
+--------------------------------------------------------------------------------
+Row 8 - Current: The Production of Innocence
+Recommendation: Looks good. The text heavily focuses on the media's self-preservation and avoidance of being seen as a cause or instigator of events, which aligns perfectly with the concept of 'The Production of Innocence'.
+--------------------------------------------------------------------------------
+Row 12 - Current: He said/she said journalism, Church of the Savvy, View from Nowhere
+Recommendation: The text explicitly critiques horse-race journalism, which is heavily reliant on 'he said/she said' approaches to create 'balance' and often prioritizes strategy and the 'insiders' moods' - aligning with 'Church of the Savvy'. The text’s discussion of the 'herd of independent minds', the media's ina
+--------------------------------------------------------------------------------
+Row 14 - Current: Church of the Savvy, The Production of Innocence
+Recommendation: Further analysis could explore how the text relates to 'View from Nowhere' as Sinclair's actions challenge traditional journalistic norms of impartiality.
+--------------------------------------------------------------------------------
+Row 15 - Current: View from Nowhere, The Production of Innocence
+Recommendation: The text highlights instances where journalistic outlets appear to prioritize their own image and attempt to appear 'fair-minded' without necessarily pursuing truth (View from Nowhere). Furthermore, the analysis suggests that certain editorial decisions are made to avoid potential criticism, thus sh
+--------------------------------------------------------------------------------
+Row 17 - Current: View from Nowhere, Church of the Savvy, He said/she said journalism, The Production of Innocence
+Recommendation: The text discusses how journalists prioritize the 'horse race' aspect of campaigns, focusing on strategy, insider opinions, and predictions, which can be seen as an example of the 'Church of the Savvy.' It critiques the media's focus on being objective and avoiding bias. The text implicitly critique
+--------------------------------------------------------------------------------
+Row 18 - Current: 
+Recommendation: Error parsing AI response
+--------------------------------------------------------------------------------
+Row 19 - Current: Church of the Savvy, The Production of Innocence
+Recommendation: The text implicitly criticizes a "Church of the Savvy" approach by highlighting Sinclair's focus on political maneuvering and partisan agendas over traditional journalistic principles and audience interests. The actions of Sinclair also suggest an avoidance of accountability for their actions, fitti
+--------------------------------------------------------------------------------
+Row 22 - Current: View from Nowhere, The People Formerly Known as the Audience, Verification in reverse, Audience atomization overcome
+Recommendation: The text directly discusses the 'View from Nowhere' in the context of a media bias, and how this approach is overcome by Trump's followers who discard facts from mainstream media. The discussion of Trump's communication strategy and the fragmentation of the media world reflects aspects of 'The Peopl
+--------------------------------------------------------------------------------
+Row 23 - Current: Church of the Savvy, Citizens Agenda,Flooding the 
+Recommendation: The text explicitly critiques the media's focus on covering a story (even a false one) simply because it exists, reflecting 'Church of the Savvy' behavior. The discussion of 'false balance' (though not explicitly named) is also implicit. The text also critiques journalistic practices and codes of ne
+--------------------------------------------------------------------------------
+Row 24 - Current: View from Nowhere, He said/she said journalism
+Recommendation: The text implicitly critiques 'View from Nowhere' by highlighting the inherent conflict between objective reporting and a political party actively operating on counterfactuals. The potential for 'He said/she said journalism' is also implied, as the text focuses on the differing viewpoints of the two
+--------------------------------------------------------------------------------
+Row 25 - Current: Information assymetry
+Recommendation: The text directly criticizes the traditional journalistic approach of treating both political parties as equal (implicitly referencing 'He said/she said journalism') and also hints at the 'View from Nowhere' when discussing the need for journalists to take a pro-democracy stance. The current assignm
+--------------------------------------------------------------------------------
+Row 26 - Current: He said/she said journalism, 
+Recommendation: The current assignment includes 'He said/she said journalism' which is correct. The article implicitly discusses the 'View from Nowhere' concept with the emphasis on journalists striving for objectivity and the challenges of bias. It also touches on 'The People Formerly Known as the Audience' as rea
+--------------------------------------------------------------------------------
+Row 28 - Current: View from Nowhere
+Recommendation: The text explicitly discusses the 'view from nowhere' and 'he said/she said journalism'. The current assignment of 'View from Nowhere' is accurate. No additions or subtractions are needed.
+--------------------------------------------------------------------------------
+Row 29 - Current: Church of the Savvy, He said/she said journalism, The Production of Innocence
+Recommendation: This text touches on several key concepts related to journalism, highlighting a focus on strategy, the pitfalls of 'both sides' reporting, and a reluctance to fully inform the public. Further analysis could examine the economics of modern journalism mentioned in the text, and the impact of audience 
+--------------------------------------------------------------------------------
