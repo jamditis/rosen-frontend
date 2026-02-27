@@ -453,6 +453,8 @@ async function main() {
   let repostCount = 0;
   let shortReplyCount = 0;
 
+  let nonRosenCount = 0;
+
   const filteredSocialRecords = socialRecords.filter(r => {
     // Remove individual posts that belong to threads (shown via THREAD container)
     if (threadMemberIds.has(r.id)) return false;
@@ -460,6 +462,12 @@ async function main() {
     // Remove all reposts/quotes of others' content entirely (not Rosen's own words)
     if (REPOST_TITLE_PATTERN.test(r.title)) {
       repostCount++;
+      return false;
+    }
+
+    // Remove posts by non-Rosen authors (e.g., quoted Bluesky posts stored with original author)
+    if (r.author && r.author !== 'Jay Rosen') {
+      nonRosenCount++;
       return false;
     }
 
@@ -483,7 +491,7 @@ async function main() {
 
   const threadFiltered = beforeSocialCount - filteredSocialRecords.length;
   console.log(`  - Social records before filtering: ${beforeSocialCount}`);
-  console.log(`  - Filtered: ${threadFiltered} total (${threadMemberIds.size} thread members, ${repostCount} reposts, ${shortReplyCount} short replies)`);
+  console.log(`  - Filtered: ${threadFiltered} total (${threadMemberIds.size} thread members, ${repostCount} reposts, ${nonRosenCount} non-Rosen authors, ${shortReplyCount} short replies)`);
   console.log(`  - Social records after filtering: ${filteredSocialRecords.length}`);
 
   // Combine all records: main + filtered social + generated threads

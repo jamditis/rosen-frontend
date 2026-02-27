@@ -1,0 +1,304 @@
+CONTENT ACCURACY REVIEW REPORT
+Jay Rosen Internet Archive
+Date: 2026-02-27
+Reviewer: Automated spot-check via Claude Code
+Source: data/archive_records-public.csv (49,455 rows + header)
+
+========================================================================
+EXECUTIVE SUMMARY
+========================================================================
+
+Sampled high-visibility records across THREAD, CLIP, TUMBLR, key-concept,
+and major-publication categories. The archive is generally well-curated.
+Found 12 issues ranging from low to high severity. Most are data-entry
+anomalies rather than factual errors.
+
+SEVERITY KEY:
+  [HIGH]   - Visible to users, factually incorrect or broken link
+  [MEDIUM] - Data quality issue that affects display or filtering
+  [LOW]    - Minor cosmetic or metadata issue
+
+========================================================================
+1. FEATURED_WORKS (constants.js) vs CSV RECORDS
+========================================================================
+
+Checked all 21 FEATURED_WORKS entries against CSV URLs.
+
+RESULT: 15 of 16 content URLs found in CSV. 1 missing.
+
+[HIGH] ISSUE #1: Featured work "People Formerly Known as the Audience"
+  (feat-11) link does not match any CSV record URL.
+
+  Featured URL: https://pressthink.org/2006/06/the-people-formerly-known-as-the-audience/
+
+  CSV records for the same piece:
+    RECORD-00191: http://archive.pressthink.org/2006/06/27/ppl_frmr_p.html  (PressThink)
+    RECORD-00607: https://pressthink.org/2006/06/27/ppl_frmr.html          (PressThink)
+    RECORD-00070: https://www.huffpost.com/entry/the-people-formerly-known_b_24113 (HuffPost)
+
+  None match the featured URL exactly. The featured URL appears to be
+  a WordPress pretty-permalink that may redirect to one of the above.
+
+  Impact: Featured works open in a new tab (target="_blank"), so the
+  link will still work if pressthink.org redirects properly. However,
+  there is no way for the archive to highlight this record when users
+  click it, since the URL-to-record lookup would fail.
+
+  Recommendation: Update the featured URL to match RECORD-00191 or
+  add RECORD-00191's URL as a ?record= deep link instead.
+
+[LOW] ISSUE #2: Featured works link externally, not to archive records.
+  The FeaturedSection.js component opens all links in a new tab. Users
+  leave the archive when clicking featured works. Consider linking to
+  the archive record modal instead (e.g., ?record=RECORD-00191).
+
+[LOW] NOTE: The 5 non-CSV featured entries (dissertation reader,
+  PressThink blog, Yale Books link, berks.psu.edu PDF, church of the
+  savvy) are external URLs that correctly do not need CSV records.
+
+========================================================================
+2. DATE ANOMALIES
+========================================================================
+
+[HIGH] ISSUE #3: RECORD-00029 date is wrong.
+  Title: "Asymmetry between the major parties fries the circuits of
+         the mainstream press"
+  CSV date: 2015-11-29
+  URL path: pressthink.org/2016/09/... (implies September 2016)
+  Summary: References "the 2016 US presidential election campaign"
+
+  The article was published in September 2016, not November 2015.
+  The URL clearly contains /2016/09/. The date 2015-11-29 is almost
+  a year too early.
+
+  Impact: This is a FEATURED_WORK (feat-16). It will appear in the
+  wrong year in timeline filters and be assigned era "View from
+  Nowhere (10s)" instead of "Democracy in Crisis (20s)" if 2016 is
+  in the 2020s era boundary. Actually, with the export script's
+  getEra() logic, 2016 maps to "View from Nowhere (10s)" which is
+  correct for a 2016 article -- but 2015 also maps there, so the era
+  is coincidentally correct. The year display is still wrong.
+
+[MEDIUM] ISSUE #4: RECORD-00076 date/URL month mismatch.
+  Title: "The View from Nowhere: Questions and Answers"
+  CSV date: 2010-10-21 (October)
+  URL path: pressthink.org/2010/11/... (implies November)
+
+  Minor discrepancy -- the URL says November but the CSV says October.
+  Could be a WordPress scheduling issue or a data-entry error.
+
+========================================================================
+3. AUTHOR FIELD FORMATTING
+========================================================================
+
+[HIGH] ISSUE #5: Python list syntax in 3 author fields.
+  These records have author values that appear to be malformed Python
+  list serializations:
+
+  RECORD-00060: "Jay Rosen', 'Amanda Michel"
+    (Should be: "Jay Rosen, Amanda Michel" or "Jay Rosen; Amanda Michel")
+
+  RECORD-00092: "Jay Rosen', 'Conor Friedersdorf"
+    (Should be: "Jay Rosen, Conor Friedersdorf")
+
+  RECORD-00513: "Jay Rosen', 'Lisa Williams"
+    (Should be: "Jay Rosen, Lisa Williams")
+
+  These will display verbatim in the UI with the stray quote marks
+  and commas. RECORD-00060 is a FEATURED_WORK (feat-15, The Guardian).
+  RECORD-00092 is a key "View from Nowhere" record in The Atlantic.
+
+========================================================================
+4. PUBLISHER FIELD FORMATTING
+========================================================================
+
+[MEDIUM] ISSUE #6: 5 records have raw quoted-list publisher values.
+  The export script does pub = rawPub.trim() without cleaning quotes.
+
+  RECORD-00010: pub = "PressThink", "Comment is Free"
+  RECORD-00011: pub = "Tomdispatch.com", "Salon.com"
+  RECORD-00012: pub = "Romenesko", "Huffington Post"
+  RECORD-00013: pub = "TomDispatch.com", "Mother Jones", "Alternet", "Lew Rockwell"
+  RECORD-00014: pub = "PressThink", "Huffington Post", "Romenesko", "Brad DeLong's blog"
+
+  These display as raw strings with embedded quote marks in the
+  archive UI. The first publication should be used as the primary,
+  or the cleanTags() function should be applied to the publisher field.
+
+[MEDIUM] ISSUE #7: 16 PressThink-URL records have non-PressThink publishers.
+  Records with pressthink.org URLs but publisher listed as the
+  syndication target (e.g., HuffPost, Salon, TomDispatch) rather
+  than PressThink. This is arguably correct if the piece was
+  originally syndicated, but is confusing when the URL points to
+  pressthink.org. Examples:
+
+  RECORD-00011: URL=archive.pressthink.org, pub="Tomdispatch.com", "Salon.com"
+  RECORD-00289: URL=archive.pressthink.org, pub=TomPaine.com
+  RECORD-00441: URL=archive.pressthink.org, pub=Columbia Journalism Review
+
+========================================================================
+5. DUPLICATE AND NEAR-DUPLICATE RECORDS
+========================================================================
+
+[MEDIUM] ISSUE #8: "The People Formerly Known as the Audience" has 3 records.
+  RECORD-00070: HuffPost version (2006-06-30) - verified, has URL
+  RECORD-00191: PressThink version (2006-06-27) - verified, has URL
+  RECORD-00683: HuffPost version (2006-06-01) - NOT verified, no URL
+
+  RECORD-00683 is unverified and has no URL. It will be filtered out
+  by the export (verified=false), so no duplicate appears in the
+  archive. However, it wastes space in the CSV.
+
+  RECORD-00070 and RECORD-00191 are legitimately different (different
+  publishers, different URLs), so they are not true duplicates.
+
+[LOW] ISSUE #9: "CNN's Impossible Dilemma" appears twice.
+  RECORD-00740: pub=(empty), date=2023-06-09, WNYC URL
+  RECORD-00771: pub=WNYC On the Media, date=2016-01-01, similar WNYC URL
+
+  Both are On the Media segments. URLs are slightly different
+  (one says "cnns-impossible-dilemma", the other "cnn-impossible-dilemma").
+  These may be the same segment re-published, or genuinely different
+  segments from different years. The date gap (2016 vs 2023) suggests
+  they might be different episodes covering the same topic.
+
+[LOW] ISSUE #10: 60 Tumblr records have the generic title "Studio 20".
+  These are posts from the Studio 20 Tumblr blog where the title
+  was not extracted from the content. Each has a unique URL and date,
+  and their summaries contain the actual content. But in the archive,
+  60 cards all titled "Studio 20" is unhelpful for browsing.
+
+========================================================================
+6. THREAD RECORDS
+========================================================================
+
+[MEDIUM] ISSUE #11: All 10 THREAD records have identical category.
+  Every THREAD record has thematic_categories = "Technology & Digital Media".
+  This is a generic fallback, not a meaningful categorization.
+
+  Examples that should have different categories:
+  - THREAD-00001 (Retirement reflections) -> Journalism Education
+  - THREAD-00002 (Key Concepts) -> Journalism Theory & Practice
+  - THREAD-00005 (Election Coverage) -> Politics & Democracy
+  - THREAD-00009 (Denialism) -> Press & Media Criticism
+
+  The THREAD records also have no thread_data in the CSV itself (all
+  are False). The export script handles this by detecting thread
+  chains from social_posts.csv responds_to fields. This is a correct
+  design -- the export script will find and populate thread_data at
+  build time. However, the categories issue remains.
+
+========================================================================
+7. CLIP (NEWSPAPER CLIPPING) RECORDS
+========================================================================
+
+[MEDIUM] ISSUE #12: 57 of 83 CLIP records use the newspaper name as author.
+  Rather than identifying the journalist who wrote the article, these
+  records list the publication name (e.g., "Albany Democrat-Herald",
+  "Asbury Park Press") as the author. This is typical for OCR'd
+  newspaper clippings where the byline was not extracted.
+
+  The export script force-verifies all CLIP- records (line 98:
+  rawId.startsWith('CLIP-')). All 83 CLIPs are also marked verified
+  in the CSV itself, so this is consistent.
+
+  Date range is plausible: 1989-02-03 to 2023-12-15. Two records from
+  the 2020s (CLIP-00036 dated 2022, CLIP-00008 dated 2023) are slightly
+  unusual for "newspaper clippings" but could be digital newspaper
+  archives.
+
+========================================================================
+8. EXPORT FILTERING LOGIC REVIEW (export-archive-data.js)
+========================================================================
+
+Reviewed the full export pipeline. Key observations:
+
+CORRECT BEHAVIORS:
+  - Records with verified=false are filtered out (line 548)
+  - Records with title < 5 chars or "Untitled" are filtered out (line 549)
+  - Records with no date AND url='#' are filtered out (line 550)
+  - CLIP- records are force-verified (line 98) -- all 83 are also
+    verified in CSV, so this is redundant but not harmful
+  - Social records are force-verified (line 97) -- correct
+  - Thread member posts are removed from social records to avoid
+    duplication with THREAD container records
+  - Reposts/RTs are filtered out
+  - Short replies with generic titles are filtered out
+  - Dissertation record is manually added (hardcoded, line 539)
+
+POTENTIAL EDGE CASES:
+
+  a) Publisher field not cleaned (line 85: pub = rawPub.trim())
+     Multi-value publisher strings with embedded quotes display
+     verbatim. See Issue #6 above.
+
+  b) Author field not cleaned (line 79: author = .trim())
+     Python list syntax in author fields displays verbatim.
+     See Issue #5 above.
+
+  c) The getEra() function uses hard-coded decade boundaries:
+       < 2000 -> "Public Journalism (90s)"
+       < 2010 -> "Web & Blogging (00s)"
+       < 2020 -> "View from Nowhere (10s)"
+       >= 2020 -> "Democracy in Crisis (20s)"
+
+     The CSV itself has 12 different era values (some overlapping)
+     which are ignored by the export. This is by design -- the export
+     computes eras from dates. However, articles before 1990 (like
+     the 1989 CLIP records) still get placed in "Public Journalism
+     (90s)" which is slightly inaccurate.
+
+  d) Category delimiter inconsistency: CSV uses both commas and
+     semicolons as category delimiters. The cleanTags() function
+     handles both (splits on [;,]), so this is correctly handled.
+
+  e) 17 unverified records (all with empty URLs) will be filtered
+     out. These include some notable titles:
+       - "The People Formerly Known as the Audience" (RECORD-00683)
+       - "Audience Atomization Overcome" (RECORD-00699)
+       - "He Said, She Said Journalism" (RECORD-00700)
+     These are duplicate entries without URLs that already have
+     verified counterparts with URLs, so filtering them is correct.
+
+========================================================================
+9. SUMMARY OF FINDINGS
+========================================================================
+
+HIGH SEVERITY (3):
+  #1  Featured work "People Formerly Known" URL doesn't match any CSV record
+  #3  RECORD-00029 (Asymmetry article) date is wrong by ~10 months
+  #5  3 records have Python list syntax in author field ("Jay Rosen', 'Name")
+
+MEDIUM SEVERITY (5):
+  #4  RECORD-00076 (View from Nowhere) date/URL month mismatch
+  #6  5 records have raw quoted-list strings in publisher field
+  #7  16 PressThink-URL records attributed to syndication publishers
+  #8  Duplicate "People Formerly Known" entries (unverified ones filtered)
+  #11 All 10 THREAD records have generic "Technology & Digital Media" category
+  #12 57 CLIP records use newspaper name as author instead of byline
+
+LOW SEVERITY (3):
+  #2  Featured works link externally rather than to archive record modals
+  #9  "CNN's Impossible Dilemma" may be duplicate (different years)
+  #10 60 Tumblr records have generic "Studio 20" title
+
+========================================================================
+10. RECOMMENDED FIXES (priority order)
+========================================================================
+
+1. Fix RECORD-00029 date from 2015-11-29 to 2016-09-XX (check article).
+2. Fix author fields on RECORD-00060, RECORD-00092, RECORD-00513 to
+   remove Python list syntax (replace "', '" with ", ").
+3. Update feat-11 URL in constants.js to match RECORD-00191 URL, or
+   add ?record=RECORD-00191 deep link.
+4. Clean publisher fields on RECORD-00010 through RECORD-00014 to
+   use a single primary publisher or semicolon-delimited list.
+5. Update THREAD record categories to be content-appropriate rather
+   than all "Technology & Digital Media".
+6. Consider fixing RECORD-00076 date to November to match URL.
+7. Generate descriptive titles for the 60 "Studio 20" Tumblr posts
+   from their summary content.
+
+========================================================================
+END OF REPORT
+========================================================================

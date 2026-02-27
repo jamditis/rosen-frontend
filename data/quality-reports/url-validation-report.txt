@@ -1,0 +1,159 @@
+================================================================================
+URL VALIDATION REPORT -- Jay Rosen Internet Archive
+Generated: 2026-02-27
+================================================================================
+
+================================================================================
+SECTION 1: archive_records-public.csv
+================================================================================
+
+Total records parsed: 932
+
+------------------------------------------------------------
+1.1  URL field summary
+------------------------------------------------------------
+  Valid URLs:          916
+  Empty/missing:       16
+  Hash (#) only:       0
+  Placeholder values:  0
+  Malformed:           0
+  Contains spaces:     0
+  Localhost/internal:  0
+
+------------------------------------------------------------
+1.2  Records with empty/missing URL (16)
+------------------------------------------------------------
+  Note: These records have no source URL and no gdrive links.
+  They may need URLs sourced manually or may be offline-only content.
+
+  RECORD-00673  [Article]  Blogging and credibility
+  RECORD-00681  [Article]  The Retreat from Empiricism
+  RECORD-00685  [Article]  Karl Rove and the Cult of the Insider
+  RECORD-00692  [Article]  Hype Busters at Mother Jones
+  RECORD-00693  [Article]  Love Affair: McCain and the Press
+  RECORD-00694  [Article]  For the New York Times: An Assignment
+  RECORD-00695  [Article]  Obama Tells the Best Political Story
+  RECORD-00696  [Article]  The Uncharted: From Off The Bus to Meet the Press
+  RECORD-00699  [Article]  Audience Atomization Overcome
+  RECORD-00700  [Article]  "He Said, She Said" Journalism: Are We Done With That Yet?
+  RECORD-00701  [Article]  The Politics of the New Huffington Post at AOL
+  RECORD-00663  [Article]  Pistols for two: coffee with Jay Rosen
+  RECORD-00664  [Article]  The awayness problem
+  RECORD-00665  [Article]  The digital revolution
+  RECORD-00666  [Article]  What are journalists for?
+  RECORD-00667  [Article]  Civic leadership and the press
+
+------------------------------------------------------------
+1.8  Duplicate URLs (0 URLs shared by multiple records)
+------------------------------------------------------------
+  No duplicate URLs found.
+
+------------------------------------------------------------
+1.9  Top 30 domains by record count
+------------------------------------------------------------
+     420  archive.pressthink.org
+     138  tmblr.co
+      83  www.newspapers.com
+      28  pressthink.org
+      26  publicnotebook.wordpress.com
+      19  www.huffingtonpost.com
+      14  youtu.be
+      11  www.niemanlab.org
+      10  bsky.app
+       9  www.wnycstudios.org
+       7  medium.com
+       7  www.theguardian.com
+       5  www.youtube.com
+       5  www.pbs.org
+       4  www.npr.org
+       4  journalism.nyu.edu
+       4  thecorrespondent.com
+       3  www.vox.com
+       3  soundcloud.com
+       3  mediashift.org
+       3  www.theatlantic.com
+       3  www.poynter.org
+       3  dankennedy.net
+       3  www.cjr.org
+       3  x.com
+       3  www.salon.com
+       3  www.washingtonpost.com
+       2  www.nybooks.com
+       2  www.cnn.com
+       2  presswatchers.org
+
+------------------------------------------------------------
+1.10 Google Drive link summary
+------------------------------------------------------------
+
+  gdrive_pdf_link:
+    Valid:   501
+    Missing: 431
+    Malformed: 0
+
+  gdrive_raw_file_link:
+    Valid:   1
+    Missing: 930
+    Malformed: 1
+    Note: Non-URL values suggest CSV column misalignment for these records.
+      RECORD-00080: RELIABLE-0001-The jobs crisis merits even more news coverage.mp4
+
+  gdrive_transcript_link:
+    Valid:   1
+    Missing: 930
+    Malformed: 1
+    Note: Non-URL values suggest CSV column misalignment for these records.
+      RECORD-00040: Jay Rosen, Public Radio's Loyal Critic
+
+================================================================================
+SECTION 2: social_posts.csv
+================================================================================
+
+Total records parsed: 29132
+
+------------------------------------------------------------
+2.1  Platform breakdown
+------------------------------------------------------------
+   26116  Twitter/X
+    3016  Bluesky
+
+------------------------------------------------------------
+2.2  URL field summary
+------------------------------------------------------------
+  Valid URLs:          29132
+  Empty/missing:       0
+  Placeholder values:  0
+  Malformed:           0
+  Contains spaces:     0
+
+------------------------------------------------------------
+2.7  Duplicate URLs (0 URLs shared by multiple posts)
+------------------------------------------------------------
+  No duplicate URLs found.
+
+------------------------------------------------------------
+2.8  Top 20 domains by post count
+------------------------------------------------------------
+   26116  x.com
+    3016  bsky.app
+
+================================================================================
+SUMMARY
+================================================================================
+
+archive_records-public.csv:
+  Total records:         932
+  Valid URLs:            916  (98.3%)
+  URL issues:            16  (1.7%)
+  Duplicate URL groups:  0
+  GDrive link issues:    2 malformed
+
+social_posts.csv:
+  Total records:         29132
+  Valid URLs:            29132  (100.0%)
+  URL issues:            0  (0.0%)
+  Duplicate URL groups:  0
+
+================================================================================
+END OF REPORT
+================================================================================

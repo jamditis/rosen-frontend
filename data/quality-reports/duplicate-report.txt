@@ -1,0 +1,382 @@
+DUPLICATE DETECTION REPORT
+Jay Rosen Internet Archive - Data Quality Review
+Generated: 2026-02-27
+Archive records analyzed: 940 (from archive_records-public.csv)
+Social posts analyzed: 29,132 (from social_posts.csv)
+
+================================================================================
+EXECUTIVE SUMMARY
+================================================================================
+
+Total confirmed duplicate issues requiring action:     22
+Total false positives (same title, different content):  2 groups
+Total cross-dataset overlaps to review:                12
+
+Breakdown:
+  Archive records - true URL duplicates:                2 pairs
+  Archive records - same content, different URLs:       5 pairs
+  Archive records - false positives (distinct works):   3 groups
+  Social posts - true content duplicates:               4 groups (accidental reposts)
+  Social posts - intentional repeated phrases:         99 groups (not actionable)
+  Cross-dataset overlaps (archive + social):           12 records
+
+================================================================================
+1. EXACT URL DUPLICATES IN ARCHIVE RECORDS
+================================================================================
+
+No exact URL duplicates found. All 940 archive records have unique URLs.
+
+No normalized URL duplicates found (checking for http/https, www/non-www, trailing
+slash differences).
+
+================================================================================
+2. NEAR-TITLE DUPLICATES IN ARCHIVE RECORDS
+================================================================================
+
+8 groups of records share identical normalized titles. After investigation, these
+fall into three categories:
+
+--- CATEGORY A: FALSE POSITIVES (distinct works sharing a title) ---
+
+These are NOT duplicates. They are different works that happen to share a title.
+No action needed.
+
+Group 2A-1: "Studio 20" (60 records)
+  VERDICT: FALSE POSITIVE - NOT DUPLICATES
+  All 60 Tumblr records (TUMBLR-00002 through TUMBLR-00133) have unique URLs,
+  unique publication dates, and unique content. "Studio 20" was the name of Jay
+  Rosen's NYU graduate program, and these are individual blog posts from the
+  Studio 20 Tumblr. The title field reflects the blog name, not the post title.
+  RECOMMENDATION: Consider generating unique titles from post content for these
+  60 records (e.g., "Studio 20: [first line of content]").
+
+Group 2A-2: "What Are Journalists For?" (3 records)
+  VERDICT: FALSE POSITIVE - NOT DUPLICATES
+  These are three distinct works that share the title of Rosen's 1999 book:
+    RECORD-00068: Goodreads listing for the book (1999)
+    RECORD-00066: Amazon listing / Yale University Press edition (2004)
+    RECORD-00038: American Prospect essay with same title (2001)
+  All have different URLs, publishers, and content.
+  RECOMMENDATION: No action needed. These are legitimately different records.
+
+Group 2A-3: "Open Source Journalism" (2 records)
+  VERDICT: FALSE POSITIVE - NOT DUPLICATES
+    RECORD-00073: Interview on Poynder's Blog (2006-03-28)
+    RECORD-00339: PressThink essay (2004-12-28)
+  Different URLs, publishers, dates, and content.
+  RECOMMENDATION: No action needed.
+
+--- CATEGORY B: TRUE DUPLICATES (same content, different records) ---
+
+Group 2B-1: "The People Formerly Known as the Audience" (3 records)
+  VERDICT: PARTIAL DUPLICATE
+    RECORD-00191: PressThink original (2006-06-27) [PRIMARY]
+      url: http://archive.pressthink.org/2006/06/27/ppl_frmr_p.html
+    RECORD-00070: HuffPost republication (2006-06-30)
+      url: https://www.huffpost.com/entry/the-people-formerly-known_b_24113
+    RECORD-00683: HuffPost (no URL, 2006-06-01)
+      url: (empty)
+  RECOMMENDATION:
+  - RECORD-00191 and RECORD-00070 are legitimate: original and republication.
+    Keep both.
+  - RECORD-00683 is a duplicate of RECORD-00070 (same publisher, same title,
+    no URL). REMOVE RECORD-00683, or merge its data into RECORD-00070 if it
+    has any fields RECORD-00070 lacks.
+
+Group 2B-2: "America's Press and the Asymmetric War for Truth" (2 records)
+  VERDICT: TRUE DUPLICATE (same article, two URLs)
+    RECORD-00098: PressThink URL (2020-11-01) [PRIMARY - completeness: 35]
+      url: https://pressthink.org/2020/11/the-coming-confrontation.../
+    RECORD-00023: NY Review of Books URL (2020-11-01) [completeness: 33]
+      url: https://www.nybooks.com/online/2020/11/01/americas-press-and.../
+  Both published same day. Likely the same piece published in both venues.
+  RECOMMENDATION: Keep both as distinct publication records (legitimate
+  cross-publication). Add cross-reference in related_to fields.
+
+Group 2B-3: "CNN's impossible dilemma" (2 records)
+  VERDICT: TRUE DUPLICATE (different episodes, same title, URL variant)
+    RECORD-00740: (2023-06-09) about Chris Licht firing
+      url: .../cnns-impossible-dilemma-on-the-media
+    RECORD-00771: (2016-01-01) about Trump coverage
+      url: .../cnn-impossible-dilemma-on-the-media
+  NOTE: URLs differ by one character ("cnns" vs "cnn"). These appear to be
+  two different On the Media segments from different years. The summaries
+  describe different topics.
+  RECOMMENDATION: FALSE POSITIVE on closer inspection. Keep both. These are
+  different episodes with the same segment title. Add year to title to
+  disambiguate: "CNN's impossible dilemma (2023)" and "CNN's impossible
+  dilemma (2016)".
+
+Group 2B-4: "Sources of subsidy in the production of news: a list" (2 records)
+  VERDICT: TRUE DUPLICATE (same content, different URLs)
+    RECORD-00662: Full Tumblr URL (2009-11-14) [PRIMARY - completeness: 31]
+      url: https://jayrosen.tumblr.com/post/243813457/...
+    TUMBLR-00062: Short Tumblr URL (2009-11-19) [completeness: 28]
+      url: https://tmblr.co/ZCJQUyEsFnE
+  Same Tumblr post, captured twice with different URL formats and slightly
+  different dates.
+  RECOMMENDATION: REMOVE TUMBLR-00062. Preserve any unique data from
+  TUMBLR-00062 into RECORD-00662 first.
+
+Group 2B-5: "Why Trump Is Winning and the Press Is Losing" (2 records)
+  VERDICT: TRUE DUPLICATE (same article, URL variant)
+    RECORD-00046: (2018-04-25, pub: NY Review of Books) [PRIMARY - completeness: 33]
+      url: https://www.nybooks.com/daily/2018/04/25/why-trump-is-winning.../
+    RECORD-00719: (2018-04-25, pub: empty) [completeness: 29]
+      url: https://www.nybooks.com/online/2018/04/25/why-trump-is-winning.../
+  Same article, same date. URLs differ only in path segment ("/daily/" vs
+  "/online/"). NYBOOKS changed their URL structure.
+  RECOMMENDATION: REMOVE RECORD-00719. Its data is a subset of RECORD-00046.
+  Transfer the publication field if needed.
+
+================================================================================
+3. SAME-DAY SAME-PUBLICATION DUPLICATES IN ARCHIVE RECORDS
+================================================================================
+
+7 pairs of records were published on the same day from the same publication
+with similar titles. After investigation:
+
+--- TRUE DUPLICATES (same content, archive + current PressThink URLs) ---
+
+Pair 3-1: "PressThink: An Introduction" (2003-09-01, PressThink)
+    RECORD-00056: url=https://pressthink.org/about/ [PRIMARY - completeness: 35]
+    RECORD-00108: url=http://archive.pressthink.org/2003/09/01/...
+      Title has redundant prefix: "PressThink: PressThink: An Introduction"
+  VERDICT: TRUE DUPLICATE. Same content at current and archived PressThink URLs.
+  RECOMMENDATION: REMOVE RECORD-00108 or merge. The double "PressThink:" prefix
+  in RECORD-00108's title is a data entry error.
+
+Pair 3-2: "Blog Storm Troopers or Pack Journalism at its Best?" (2005-02-10, PressThink)
+    RECORD-00429: url=pressthink.org/... [PRIMARY - completeness: 34]
+    RECORD-00570: url=archive.pressthink.org/...
+      Title has redundant "PressThink:" prefix
+  VERDICT: TRUE DUPLICATE. Current + archived PressThink URLs.
+  RECOMMENDATION: REMOVE RECORD-00570.
+
+Pair 3-3: "Audience Atomization Overcome" (2009-01-12, PressThink)
+    RECORD-00340: url=archive.pressthink.org/... [PRIMARY - completeness: 35]
+      Title includes "PressThink:" prefix
+    RECORD-00610: url=pressthink.org/... [completeness: 29]
+  VERDICT: TRUE DUPLICATE. Current + archived PressThink URLs.
+  RECOMMENDATION: REMOVE RECORD-00610 (less complete). Preserve data from
+  RECORD-00610 that RECORD-00340 lacks.
+
+Pair 3-4: "Big Wigs From the Blogging & Journalism Conference" (2005-01-26, PressThink)
+    RECORD-00200: [PRIMARY - completeness: 37]
+    RECORD-00521: Title has "PressThink:" prefix [completeness: 35]
+  VERDICT: TRUE DUPLICATE. Same pattern as above.
+  RECOMMENDATION: REMOVE RECORD-00521.
+
+Pair 3-5: "The journalism that bloggers actually do" (2007-08-22, LA Times)
+    RECORD-00105: Standard title [completeness: 31]
+    RECORD-00390: Title has "Blowback:" prefix [PRIMARY - completeness: 35]
+  VERDICT: LIKELY DUPLICATE. Same article, one has the column name prefix.
+  RECOMMENDATION: Keep RECORD-00390 (more complete). REMOVE RECORD-00105.
+  Consider keeping "Blowback:" prefix as it identifies the column.
+
+Pair 3-6: "He Said, She Said Journalism" (2009-04-12, PressThink)
+    RECORD-00387: url=archive.pressthink.org/... [PRIMARY - completeness: 35]
+      Title has "PressThink:" prefix and slightly different formatting
+    RECORD-00606: url=pressthink.org/... [completeness: 29]
+  VERDICT: TRUE DUPLICATE. Current + archived PressThink URLs.
+  RECOMMENDATION: REMOVE RECORD-00606 (less complete).
+
+Pair 3-7: Tumblr posts about Rosen and Shirky (2009-12-04, Tumblr)
+    TUMBLR-00068: "Jay Rosen and Clay Shirky on new media" [completeness: 28]
+    TUMBLR-00069: "Mediabistro on Rosen and Shirky" [completeness: 27]
+  VERDICT: FALSE POSITIVE. Different posts about the same event on the same day.
+  Different titles, different content.
+  RECOMMENDATION: Keep both. No action needed.
+
+================================================================================
+4. EXACT URL DUPLICATES IN SOCIAL POSTS
+================================================================================
+
+No exact URL duplicates found. All 29,132 social posts have unique URLs.
+
+================================================================================
+5. EXACT CONTENT DUPLICATES IN SOCIAL POSTS
+================================================================================
+
+103 groups of social posts share identical raw_text content (251 total records).
+
+After analysis, these fall into two categories:
+
+--- CATEGORY A: INTENTIONAL REPEATED PHRASES (not actionable) ---
+
+The vast majority (99 groups) are short, common conversational replies that
+Jay Rosen naturally posted multiple times across years and platforms:
+  - "Recommended thread." (9 copies, 2019-2023)
+  - "Not the odds, but the stakes." (8 copies, 2023-2024) -- his signature phrase
+  - "Thanks, John." (6 copies, 2024-2025)
+  - "Recommended." (5 copies, 2020-2025)
+  - "Yes, it is." (5 copies, 2024-2025)
+  - "Good point." (3 copies)
+  - "Fair question." (3 copies)
+  - "Good question." (3 copies)
+  - And 90 more similar short-reply groups
+
+These are genuine, separate social media posts. Each has a unique URL, unique
+timestamp, and often responds to different people/conversations.
+RECOMMENDATION: No action needed. These are not duplicates.
+
+--- CATEGORY B: TRUE DUPLICATES (accidental reposts) ---
+
+Group 5B-1: "Fixed it, thanks." (4 copies within 48 seconds)
+    BSKY-02179: 2024-09-14 14:00:51, responds_to: ...3l44mzezzud2v
+    BSKY-02180: 2024-09-14 14:00:38, responds_to: ...3l44mzezzud2v [SAME parent]
+    BSKY-02181: 2024-09-14 14:00:24, responds_to: ...3l44mvpedyn2d
+    BSKY-02182: 2024-09-14 14:00:03, responds_to: ...3l44mv3i2lx2g
+  VERDICT: BSKY-02179 and BSKY-02180 respond to the SAME post -- one is an
+  accidental double-post. BSKY-02181 and BSKY-02182 respond to different people.
+  RECOMMENDATION: REMOVE BSKY-02180 (duplicate reply to same parent post).
+  Keep BSKY-02179, BSKY-02181, BSKY-02182.
+
+Group 5B-2: "Elections preceded by a fact-based discussion..." (3 copies within 2 min)
+    TWTR-11664: 2019-12-08 13:37:00
+    TWTR-11665: 2019-12-08 13:36:35
+    TWTR-11666: 2019-12-08 13:35:42
+  VERDICT: Three tweets within 78 seconds with identical content. Likely a
+  Twitter threading/posting glitch.
+  RECOMMENDATION: Keep TWTR-11664 (latest, most likely the "final" version).
+  REMOVE TWTR-11665 and TWTR-11666.
+
+Group 5B-3: "Readers [not equal to] subscribers." (2 copies within 4 minutes)
+    BSKY-00663: 2025-07-09 01:48:45
+    BSKY-00664: 2025-07-09 01:45:00
+  VERDICT: Two posts within 4 minutes with same content. Likely accidental
+  double-post.
+  RECOMMENDATION: Keep BSKY-00663 (later post). REMOVE BSKY-00664.
+
+Group 5B-4: "So if it's not objectivity it must be MAGA propaganda..." (2 copies within 46 min)
+    BSKY-00641: 2025-07-10 15:38:53
+    BSKY-00645: 2025-07-10 14:52:35
+  VERDICT: Two posts within 46 minutes. May be intentional re-post or accidental.
+  RECOMMENDATION: Review manually. If they respond to different conversations,
+  keep both.
+
+--- CATEGORY C: CROSS-PLATFORM REPOSTS (intentional, not actionable) ---
+
+Many content duplicates are the same text posted to both Twitter/X and Bluesky,
+especially visible in longer substantive posts. Examples:
+
+  - "Three of the most powerful words in journalism: 'help us investigate.'"
+    Posted on Bluesky (2025) and Twitter (2019, 2022) -- Jay's recurring theme
+  - "In grad school I learned to distinguish between 'ritual' and 'transmission'
+    views of human communication..." -- Posted on both platforms
+  - Thread about news industry economics (posts 2/ through 10/) -- Cross-posted
+    from Twitter to Bluesky on 2024-01-28
+
+These represent intentional cross-platform sharing and should be kept.
+RECOMMENDATION: No action needed. Consider adding a "cross_posted_from" or
+"also_posted_as" field to link cross-platform versions.
+
+================================================================================
+6. CROSS-CHECK: ARCHIVE RECORDS ALSO IN SOCIAL POSTS (BY URL)
+================================================================================
+
+12 archive records have URLs that also appear in social_posts.csv.
+
+All 12 are social media threads that were promoted to archive records:
+  2 Twitter/X threads (RECORD-00602, RECORD-00613)
+  10 Bluesky threads (THREAD-00001 through THREAD-00010)
+
+Detail:
+
+  RECORD-00602: "I have a new job: president of News Creator Corps."
+    Archive type: Tweet/Thread
+    Also in social: TWTR-15441 (Twitter/X)
+    This is a curated thread that was given an archive record.
+
+  RECORD-00613: "The 'real work of journalism' begins..."
+    Archive type: Tweet/Thread
+    Also in social: TWTR-15437 (Twitter/X)
+
+  THREAD-00001: "Reflections on 39 Years at NYU: A Retirement Thread"
+    Also in social: BSKY-00993
+
+  THREAD-00002: "'When in Doubt, Draw a Distinction': Key Concepts in My Work"
+    Also in social: BSKY-01325
+
+  THREAD-00003: "Explaining the News Industry Downturn"
+    Also in social: BSKY-02571
+
+  THREAD-00004: "NBC's 'Pivot' Headline and Horse Race Journalism"
+    Also in social: BSKY-02467
+
+  THREAD-00005: "'Not the Odds, But the Stakes': Election Coverage in 2024"
+    Also in social: BSKY-02844
+
+  THREAD-00006: "Reviewing NBC's Meet the Press Trump Interview"
+    Also in social: BSKY-02905
+
+  THREAD-00007: "On the Washington Post's Jim Jordan Profile"
+    Also in social: BSKY-02797
+
+  THREAD-00008: "On CNN's Abby Phillip and Asymmetrical Fact-Checking"
+    Also in social: BSKY-02198
+
+  THREAD-00009: "Denialism as an Area of Study"
+    Also in social: BSKY-00585
+
+  THREAD-00010: "Colorado Newsrooms Adopt Citizens Agenda Model"
+    Also in social: BSKY-02377
+
+VERDICT: These are intentional cross-references. The archive records represent
+curated threads elevated to "archival" status with enriched metadata (titles,
+summaries). The social_posts entries are the raw source posts.
+
+RECOMMENDATION: No removal needed. Consider adding a field to social_posts
+records that links to their archive THREAD-* record (e.g., "archive_record_id"),
+and vice versa, to make the relationship explicit.
+
+================================================================================
+SUMMARY OF ACTIONABLE FINDINGS
+================================================================================
+
+RECORDS TO REMOVE (7 records):
+  From archive_records-public.csv:
+    1. RECORD-00683  - Duplicate of RECORD-00070 ("People Formerly Known as the Audience", HuffPost, no URL)
+    2. RECORD-00719  - Duplicate of RECORD-00046 ("Why Trump Is Winning", NYBOOKS URL variant)
+    3. RECORD-00108  - Duplicate of RECORD-00056 ("PressThink: An Introduction", archive URL)
+    4. RECORD-00570  - Duplicate of RECORD-00429 ("Blog Storm Troopers", archive URL)
+    5. RECORD-00610  - Duplicate of RECORD-00340 ("Audience Atomization Overcome", current URL)
+    6. RECORD-00521  - Duplicate of RECORD-00200 ("Big Wigs From Blogging Conference", archive URL)
+    7. RECORD-00105  - Duplicate of RECORD-00390 ("The journalism that bloggers actually do", LA Times)
+  From social_posts.csv:
+    (none confirmed -- see merge recommendations below)
+
+RECORDS TO MERGE BEFORE REMOVAL:
+  Before removing the above, check these fields in the duplicate and copy any
+  non-empty values to the primary that the primary lacks:
+    - summary, excerpt, raw_text, thematic_categories, key_concepts
+    - gdrive_pdf_link, gdrive_raw_file_link, gdrive_transcript_link
+    - pull_quote, related_to, tags
+
+RECORDS TO REVIEW MANUALLY:
+  From social_posts.csv:
+    1. BSKY-02180 - Likely accidental double reply (same parent as BSKY-02179)
+    2. TWTR-11665, TWTR-11666 - Likely posting glitch duplicates of TWTR-11664
+    3. BSKY-00664 - Likely double-post of BSKY-00663
+    4. BSKY-00641 vs BSKY-00645 - May be intentional re-reply
+
+TITLE IMPROVEMENTS RECOMMENDED:
+    1. 60 "Studio 20" Tumblr records need unique titles derived from content
+    2. RECORD-00108: Remove duplicate "PressThink:" prefix from title
+    3. Consider disambiguating RECORD-00740/RECORD-00771 "CNN's impossible
+       dilemma" with year suffixes
+
+DATA QUALITY NOTES:
+    - TUMBLR-00062 URL (tmblr.co short URL) resolves to same content as
+      RECORD-00662 (full jayrosen.tumblr.com URL). This is the only
+      archive-to-Tumblr-import true duplicate found.
+    - The PressThink archive/current URL pattern (archive.pressthink.org vs
+      pressthink.org) accounts for 5 of the 7 archive duplicates. A
+      deduplication pass targeting this URL pattern would catch these
+      systematically.
+    - Cross-platform content reposts (Twitter to Bluesky) are extensive but
+      intentional. No automated deduplication recommended.
+
+================================================================================
+END OF REPORT
+================================================================================
