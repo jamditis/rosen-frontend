@@ -12,35 +12,13 @@ When a bug is reported, don't immediately attempt to fix it. Instead:
 
 ---
 
-## Social post entity extraction (in progress)
-
-**Branch:** `claude/archive-optimization-validation-EGyYZ`
-
-Processing 23,416 substantive social posts (filtered from 29,187 total) to extract entities and relationships.
-
-- **Progress:** 9,850 / 23,416 posts (42.1%), batch 188
-- **Database:** `data/social_import/extraction.db` (1,470 entities, 3,880 relationships)
-- **Entity distribution:** Person 31%, Concept 32%, Organization 25%, Work 4.5%, Location 5%, Event 2.6%
-
-**To resume extraction:**
-```bash
-cd backend
-PYTHONPATH=src python scripts/unified_entity_processor.py --status --data-dir ../data/social_import
-```
-
-**Quality tools:**
-- `data/social_import/cleanup_extraction_db.py` — Entity deduplication and normalization
-- `data/social_import/milestone_analysis.py` — Checkpoint analysis at 25%/50%/75%/100%
-
----
-
 ## Project overview
 
 The **Jay Rosen Internet Archive** is a public collection of the works, critiques, and teachings of Jay Rosen, NYU professor of journalism. It covers four decades of journalism criticism, media theory, and public life.
 
 - **Live URL:** https://pressthink.org/j/rosen-archive/
 - **Repository:** github.com/jamditis/rosen-frontend
-- **Current version:** v3.2.0
+- **Current version:** v3.3.0
 - **Archive curator:** Joe Amditis
 
 ### About Jay Rosen
@@ -73,7 +51,7 @@ Professor of Journalism at NYU since 1986. Creator of PressThink blog. Known for
 
 ### Version/cache busting
 
-All JS imports use `?v=3.2.0` query parameters. When changing code, bump the version string across all imports. Use the `/check-versions` skill to find version mismatches.
+All JS imports use `?v=3.3.0` query parameters. When changing code, bump the version string across all imports. Use the `/check-versions` skill to find version mismatches.
 
 ### Path configuration
 
@@ -89,21 +67,21 @@ Data is split into three files for performance, with a full fallback:
 
 | File | Size | Contents | Loads |
 |------|------|----------|-------|
-| `data/archive-core.json` | 11 MB | Lightweight record cards | On page load |
-| `data/archive-details.json` | 12 MB | Full summaries, quotes, concepts | On demand |
-| `data/archive-entities.json` | 1.1 MB | Entity graph for Explorer | On demand |
-| `data/archive-data.json` | 26 MB | Full combined data (fallback) | Only if split files fail |
+| `data/archive-core.json` | 10.8 MB | Lightweight record cards | On page load |
+| `data/archive-details.json` | 11.6 MB | Full summaries, quotes, concepts | On demand |
+| `data/archive-entities.json` | 1.0 MB | Entity graph for Explorer | On demand |
+| `data/archive-data.json` | 25.9 MB | Full combined data (fallback) | Only if split files fail |
 
 Configured in `frontend/constants.js` via `DATA_CONFIG`.
 
 ### Source CSV files
 
-| File | Rows | Contents |
-|------|------|----------|
-| `data/archive_records-public.csv` | ~49,400 | All archive records |
-| `data/social_posts.csv` | ~58,400 | Twitter/X and Bluesky posts |
-| `data/extracted_entities.csv` | ~5,100 | Named entities (people, orgs, concepts) |
-| `data/extracted_relationships.csv` | ~6,800 | Entity-to-record relationships |
+| File | Records | Contents |
+|------|---------|----------|
+| `data/archive_records-public.csv` | 940 | Non-social archive records (709 RECORD, 138 TUMBLR, 83 CLIP, 10 THREAD). Line count is high (~49k) due to multi-line text fields. |
+| `data/social_posts.csv` | ~29,100 | Twitter/X and Bluesky posts |
+| `data/extracted_entities.csv` | ~5,061 | Named entities (people, orgs, concepts) |
+| `data/extracted_relationships.csv` | ~5,084 | Entity-to-record relationships |
 
 ### Regenerating JSON from CSV
 
@@ -301,14 +279,15 @@ npm run test:frontend      # Version consistency + frontend structure
 
 ### Production: WordPress FTP
 
-Upload these directories to `pressthink.org/j/rosen-archive/`:
-- `index.html`
-- `frontend/`
-- `dissertation/`
-- `features/`
-- `data/` (JSON files only — do not upload CSVs or backup files)
-- `shared-styles.css`
-- `favicon.ico`
+The `ftp-upload/` folder at the repo root contains a pre-assembled deployment package. Upload its contents to `pressthink.org/j/rosen-archive/`.
+
+To refresh the package before uploading:
+1. Edit source files as needed
+2. Regenerate JSON: `node data/export-archive-data.js`
+3. Bump the version in `index.html`, `version.json`, and all `?v=` import strings
+4. Copy updated files into `ftp-upload/`
+
+Do not upload CSVs, backup files, screenshots, or the `ftp-upload/` folder itself — only its contents. The `dissertation/` and `tools/` directories in `ftp-upload/` are already present on the server and only need re-uploading if changed.
 
 After upload, increment `?v=` query parameters on all JS/CSS imports to bust CloudFlare cache.
 
@@ -351,8 +330,8 @@ Supports: Articles, Videos, Twitter/X, Tumblr, Newspaper Clippings (PDF OCR).
 1. **No build step for frontend.** Never suggest npm/webpack/vite for the production frontend. The only npm usage is `node data/export-archive-data.js` for data generation and `npm test` for testing.
 2. **Match the design system.** Use Roboto Mono body text, Special Elite for display headings, paper texture background. Follow `constants.js` color definitions.
 3. **Dissertation content is sacred.** Quotes and content in `dissertationData.js` are verified citations. Do not modify, paraphrase, or fabricate quotes.
-4. **Use HTM, not JSX.** All components use the `html` tagged template from `./html.js`. Import it as `import { html } from '../html.js?v=3.2.0'`.
-5. **Version all imports.** Every `.js` import must include the `?v=3.2.0` query parameter. Check `index.html` for the current version.
+4. **Use HTM, not JSX.** All components use the `html` tagged template from `./html.js`. Import it as `import { html } from '../html.js?v=3.3.0'`.
+5. **Version all imports.** Every `.js` import must include the `?v=3.3.0` query parameter. Check `index.html` for the current version.
 6. **Standalone pages go in `/dissertation/` or `/features/`.** Each gets its own subdirectory with an `index.html`.
 7. **Keep data regeneration working.** If you modify CSV structure, update `data/export-archive-data.js` to match.
 8. **Backend uses Poetry.** Not pip directly. Run commands with `poetry run python ...`.
@@ -362,6 +341,10 @@ Supports: Articles, Videos, Twitter/X, Tumblr, Newspaper Clippings (PDF OCR).
 
 ## Known issues
 
-- Social media records (29,000+) have generic titles ("Tweet by Jay Rosen", "Post by Jay Rosen"). Fixing this would require AI-based title generation from post content.
+- Social media records (~29,000) have generic titles ("Tweet by Jay Rosen", "Post by Jay Rosen"). Fixing this would require AI-based title generation from post content.
 - Browser localStorage can fill up on the live site due to data size. Caching is disabled as a workaround.
 - Thread records have placeholder titles ("[Bluesky Thread]") — needs content-based title generation.
+- 138 TUMBLR records are all `verified=FALSE` and excluded from the public export. They contain real content but have not been reviewed for accuracy.
+- 6 records have no recoverable URL: RECORD-00663, 00667, 00673, 00693, 00694, 00700. Jay Rosen may know the original publication.
+- `archive.pressthink.org` subdomain has a TLS certificate issue. Records using that subdomain correctly use `http://` URLs — browsers handle these fine but HTTPS fetch will fail.
+- Bluesky thread links use `embed.bsky.app` (unauthenticated) rather than `bsky.app`. If Bluesky changes the embed subdomain, update `ThreadModal.js` and `RecordModal.js`.
