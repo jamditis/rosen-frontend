@@ -31,7 +31,7 @@ const WorkInProgressBanner = () => {
               The Jay Rosen Internet Archive is now publicly available.
             </p>
             <p className="text-xs text-sky-700 mt-0.5">
-              29,000+ records spanning four decades of journalism criticism, media theory, and public life.
+              25,000+ records spanning four decades of journalism criticism, media theory, and public life.
             </p>
           </div>
           <button

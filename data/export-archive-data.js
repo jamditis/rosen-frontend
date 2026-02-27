@@ -37,7 +37,7 @@ const DISSERTATION_RECORD = {
   url: '/j/rosen-archive/dissertation/reader/',
   summary: 'Rosen\'s doctoral dissertation traces the history of the idea that the function of the press is to inform the public. It argues that the rise of the mass circulation newspaper, while creating a technical ability to reach everyone, actually undermined the conditions necessary for a "universal town meeting." Drawing heavily on Walter Lippmann and John Dewey, it suggests that the professionalization of journalism ("objectivity") was a retreat from the problem of creating a genuine public life in a complex society. It contrasts news as "symptom" vs. news as "symbol" and explores how the press creates a "pseudo-environment" of public opinion.',
   quote: 'An impossible press was born, one which sought to solve the whole problem of public life simply by controlling the conduct of journalists.',
-  categories: ['Journalism History', 'Democratic Theory', 'Press Criticism', 'Public Life'],
+  categories: ['Journalism Theory & Practice', 'Politics & Democracy', 'Press & Media Criticism', 'Audience & Public Engagement'],
   concepts: ['Public Sphere', 'Omnicompetent Citizen', 'Objectivity', 'Mass Society', 'Professionalism', 'Communication vs Community', 'Democracy and Distance'],
   tags: ['Walter Lippmann', 'John Dewey', 'James Gordon Bennett', 'Joseph Pulitzer', 'Penny Press', 'Yellow Journalism', 'Robert Park', 'Tocqueville'],
   verified: true,
@@ -446,20 +446,31 @@ async function main() {
   console.log(`  - New THREAD records generated: ${generatedThreadRecords.length}`);
   console.log(`  - Total thread member posts: ${threadMemberIds.size}`);
 
-  // Step 7: Filter social records — remove thread members, reposts, and short replies
+  // Step 7: Filter social records — remove thread members, reposts, non-Rosen posts, and short replies
   const REPOST_TITLE_PATTERN = /^(Quoted|Retweet|RT) by/i;
   const GENERIC_TITLE_PATTERN = /^(Reply|Tweet|Post|Quote) by/i;
   const beforeSocialCount = socialRecords.length;
+  let threadMemberFilterCount = 0;
   let repostCount = 0;
+  let nonRosenCount = 0;
   let shortReplyCount = 0;
 
   const filteredSocialRecords = socialRecords.filter(r => {
     // Remove individual posts that belong to threads (shown via THREAD container)
-    if (threadMemberIds.has(r.id)) return false;
+    if (threadMemberIds.has(r.id)) {
+      threadMemberFilterCount++;
+      return false;
+    }
 
     // Remove all reposts/quotes of others' content entirely (not Rosen's own words)
     if (REPOST_TITLE_PATTERN.test(r.title)) {
       repostCount++;
+      return false;
+    }
+
+    // Remove posts by non-Rosen authors (e.g., quoted Bluesky posts stored with original author)
+    if (r.author && r.author.toLowerCase().trim() !== 'jay rosen') {
+      nonRosenCount++;
       return false;
     }
 
@@ -483,7 +494,7 @@ async function main() {
 
   const threadFiltered = beforeSocialCount - filteredSocialRecords.length;
   console.log(`  - Social records before filtering: ${beforeSocialCount}`);
-  console.log(`  - Filtered: ${threadFiltered} total (${threadMemberIds.size} thread members, ${repostCount} reposts, ${shortReplyCount} short replies)`);
+  console.log(`  - Filtered: ${threadFiltered} total (${threadMemberFilterCount} thread members, ${repostCount} reposts, ${nonRosenCount} non-Rosen authors, ${shortReplyCount} short replies)`);
   console.log(`  - Social records after filtering: ${filteredSocialRecords.length}`);
 
   // Combine all records: main + filtered social + generated threads

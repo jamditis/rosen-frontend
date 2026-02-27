@@ -1,6 +1,12 @@
 import { html } from '../html.js?v=3.2.0';
 import { ExternalLink } from 'lucide-react';
 
+// Convert a bsky.app URL to the unauthenticated embed.bsky.app equivalent
+const toEmbedUrl = (url) => {
+  if (!url) return url;
+  return url.replace('//bsky.app', '//embed.bsky.app');
+};
+
 // Convert URLs in text to clickable links
 const linkifyText = (text) => {
   if (!text) return null;
@@ -74,7 +80,7 @@ const ThreadPost = ({ post, totalPosts }) => {
             `}
 
             <a
-                href=${post.url}
+                href=${toEmbedUrl(post.url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-xs text-sky-600 hover:text-sky-700 transition-colors"

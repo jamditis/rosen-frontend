@@ -38,11 +38,12 @@ const Timeline = ({ records, selectedYear, onSelectYear }) => {
   if (timelineData.length === 0) return null;
 
   const maxCount = Math.max(...timelineData.map(d => d.count));
+  const logMax = maxCount > 0 ? Math.log(maxCount + 1) : 1;
 
   return html`
     <div className="mb-10 select-none animate-fade-in">
       <div className="flex justify-between items-end mb-4 border-b border-stone-200 pb-2">
-         <button 
+         <button
             onClick=${() => setIsExpanded(!isExpanded)}
             className="flex items-center gap-2 group focus:outline-none"
          >
@@ -55,7 +56,7 @@ const Timeline = ({ records, selectedYear, onSelectYear }) => {
             </div>
          </button>
          ${selectedYear && html`
-            <button 
+            <button
                 onClick=${() => onSelectYear(null)}
                 className="text-xs text-red-600 hover:text-red-800 font-bold flex items-center gap-1 transition-colors bg-red-50 px-2 py-1 rounded"
             >
@@ -63,13 +64,13 @@ const Timeline = ({ records, selectedYear, onSelectYear }) => {
             </button>
          `}
       </div>
-      
+
       ${isExpanded && html`
         <div className="relative w-full bg-stone-50/50 border border-stone-200/60 rounded-lg p-4 sm:px-6 animate-fade-in">
             <div className="flex h-32 gap-[2px] sm:gap-1 w-full overflow-x-auto pb-8 pt-4 scrollbar-thin px-1">
                 ${timelineData.map((data) => {
-                const heightPercent = maxCount > 0 
-                    ? (data.count > 0 ? Math.max((data.count / maxCount) * 100, 8) : 0) 
+                const heightPercent = maxCount > 0
+                    ? (data.count > 0 ? Math.max((Math.log(data.count + 1) / logMax) * 100, 8) : 0)
                     : 0;
                 
                 const isSelected = selectedYear === data.year;
