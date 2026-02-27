@@ -3,9 +3,9 @@ import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
 
 // Resolve paths (Windows drive letter fix for import.meta.url)
-const entitiesPath = new URL('../extracted_entities.csv', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1');
-const relationshipsPath = new URL('../extracted_relationships.csv', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1');
-const recordsPath = new URL('../archive_records-public.csv', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1');
+const entitiesPath = decodeURIComponent(new URL('../extracted_entities.csv', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1'));
+const relationshipsPath = decodeURIComponent(new URL('../extracted_relationships.csv', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1'));
+const recordsPath = decodeURIComponent(new URL('../archive_records-public.csv', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1'));
 
 // Load all three CSVs
 const entities = parse(readFileSync(entitiesPath, 'utf-8'), { columns: true, skip_empty_lines: true });

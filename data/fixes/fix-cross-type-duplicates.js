@@ -3,8 +3,8 @@ import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
 
 // --- File paths ---
-const ENTITIES_PATH = new URL('../extracted_entities.csv', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1');
-const RELATIONSHIPS_PATH = new URL('../extracted_relationships.csv', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1');
+const ENTITIES_PATH = decodeURIComponent(new URL('../extracted_entities.csv', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1'));
+const RELATIONSHIPS_PATH = decodeURIComponent(new URL('../extracted_relationships.csv', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1'));
 
 // --- Rules for consolidation ---
 // Format: { name: keep_types[] } — any type NOT listed gets deleted

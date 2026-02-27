@@ -234,7 +234,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
                 </div>
 
                 ${displayRecord.url && displayRecord.url !== '#' && html`
-                  <a href=${displayRecord.url} target="_blank" rel="noreferrer" className="text-blue-700 hover:underline font-bold text-sm inline-flex items-center gap-1 mb-6">
+                  <a href=${displayRecord.url.replace('//bsky.app', '//embed.bsky.app')} target="_blank" rel="noreferrer" className="text-blue-700 hover:underline font-bold text-sm inline-flex items-center gap-1 mb-6">
                     Read on ${displayRecord.pub} <${ExternalLink} className="w-3 h-3" />
                   </a>
                 `}

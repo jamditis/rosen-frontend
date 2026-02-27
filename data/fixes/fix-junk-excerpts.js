@@ -14,7 +14,7 @@ import { stringify } from 'csv-stringify/sync';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 
-const csvPath = new URL('../archive_records-public.csv', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1');
+const csvPath = decodeURIComponent(new URL('../archive_records-public.csv', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1'));
 const raw = readFileSync(csvPath, 'utf-8');
 const records = parse(raw, { columns: true, relax_column_count: true });
 

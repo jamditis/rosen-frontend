@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync } from 'fs';
 import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
 
-const CSV_PATH = new URL('../extracted_relationships.csv', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1');
+const CSV_PATH = decodeURIComponent(new URL('../extracted_relationships.csv', import.meta.url).pathname.replace(/^\/([A-Z]:)/, '$1'));
 
 const raw = readFileSync(CSV_PATH, 'utf-8');
 const records = parse(raw, { columns: true, skip_empty_lines: true });
