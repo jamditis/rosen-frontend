@@ -125,6 +125,39 @@ Note: CLAUDE.md already documents 6 records with no recoverable URL: RECORD-0066
 
 ---
 
-## Iterations 21-25 — Relationships + final sweep (2026-03-01)
+## Iterations 21-25 — Relationships + tags + final sweep (2026-03-01) ✓
 
-*Planned*
+**Relationships:**
+- Removed 10 duplicate relationship entries + 2 self-references (Fox News/NYT)
+- Relationships: 5,048 → 5,036 | Referential integrity: 100%
+- Confidence scores: range 0.50-1.00, mean 0.878 (high quality)
+- 15 relationship types all valid
+
+**Archive records completeness (audit only, no AI backfill in this pass):**
+- Summary: 100% ✓ (all 931 records)
+- Excerpt: 92.3% ✓
+- Pull quote: 67.1% — 306 missing, primarily articles (future pipeline work)
+- Key concepts: 63.7% — 338 missing; social threads 0% (out of scope)
+- Tags: 73% coverage
+
+**Tags normalization:**
+- Stripped quote characters from all tag values
+- Unified case variants to title case (e.g., "citizen journalism" → "Citizen Journalism")
+- Deduplicated within rows
+- 670 records updated; 0 remaining quote issues
+- Autocomplete terms: 57,334 → 57,806 (title-cased variants unified for facet search)
+
+**Final state:**
+- Archive records: 931 (started 932, removed 1 confirmed duplicate)
+- Social posts: 29,130 (started 29,132, removed 2 bad entries)
+- Entities: 5,046 (started 5,055, removed 9 duplicates)
+- Relationships: 5,036 (started 5,048, removed 12 duplicates/self-refs)
+- 54/54 data tests pass throughout
+- ftp-upload/ fully synced with all JSON files
+
+**Known remaining issues (require human or pipeline work):**
+- 16 archive records with no URL (6 confirmed unrecoverable per CLAUDE.md)
+- 306 records missing pull_quote (requires AI extraction pipeline)
+- 338 records missing key_concepts (requires AI extraction pipeline)
+- 4 Bluesky posts with empty raw_text (unrecoverable — failed imports)
+- 21 entity near-duplicates flagged for editorial review (see ENTITY_AUDIT_REPORT.md)

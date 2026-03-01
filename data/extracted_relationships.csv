@@ -1078,7 +1078,6 @@ RECORD-00133_REL_010,RECORD-00133,P0500,Gordon Russell,Affiliated With,O0367,NYU
 RECORD-00134_REL_001,RECORD-00134,P0503,Matt Gross,Criticizes,O0014,Fox News,"Gross recalls hearing to ""Seek out stories that cater to angry, middle-aged white men who listen to talk radio and yell at their televisions.""",0.9,2025-10-22
 RECORD-00134_REL_002,RECORD-00134,P0503,Matt Gross,Affiliated With,O0014,Fox News,"Matt Gross used to work at Fox, but on the website, not in the field.",1.0,2025-10-22
 RECORD-00134_REL_003,RECORD-00134,P0503,Matt Gross,Affiliated With,O0300,New York Magazine,"Matt Gross, now an assistant editor at New York magazine",1.0,2025-10-22
-RECORD-00134_REL_004,RECORD-00134,O0014,Fox News,Mentions,O0014,Fox News,an executive from Fox News Channel came to talk to the online troops,0.8,2025-10-22
 RECORD-00134_REL_005,RECORD-00134,O0014,Fox News,Discusses,C0092,Bias,"This gives Fox a different feel, an edge, and the edge is the subject of Gross’s letter. Simply by running a provocative story. Almost all Murdoch properties identify themselves to us by means of the ",0.7,2025-10-22
 RECORD-00134_REL_006,RECORD-00134,O0368,Twentieth Century Fox,Mentions,O0014,Fox News,It’s imagery handed down from Twentieth Century Fox,0.7,2025-10-22
 RECORD-00134_REL_007,RECORD-00134,O0014,Fox News,Mentions,P0504,Al Sharpton,Which network is most likely to have Al Sharpton on the air? Fox. He’s pro-excitement too.,0.6,2025-10-22
@@ -1169,7 +1168,6 @@ RECORD-00145_REL_002,RECORD-00145,P0013,Len Apcar,Discusses,E0058,Bloggercon,Apc
 RECORD-00145_REL_003,RECORD-00145,O0002,The New York Times,Mentions,W0121,Kristof Responds,"The Times had only one weblog, Kristof Responds",0.9,2025-10-22
 RECORD-00145_REL_004,RECORD-00145,P0545,Nicholas Kristof,Published In,O0002,The New York Times,"Kristof, opinion columnist",0.8,2025-10-22
 RECORD-00145_REL_005,RECORD-00145,W0121,Kristof Responds,Originated By,P0545,Nicholas Kristof,Kristof Responds by opinion columnist Nicholas Kristof,0.8,2025-10-22
-RECORD-00145_REL_006,RECORD-00145,P0534,Scott Rosenberg,Affiliated With,O0030,Salon,"Scott Rosenberg, the managing editor of Salon.com",1.0,2025-10-22
 RECORD-00145_REL_007,RECORD-00145,P0544,James Taranto,Affiliated With,O0057,The Wall Street Journal,"James Taranto, who does the Best of the Web Today for Opinion Journal. That’s the Wall Street Journal’s online forum",1.0,2025-10-22
 RECORD-00145_REL_008,RECORD-00145,W0119,Best of the Web Today,Published In,O0057,The Wall Street Journal,"James Taranto, who does the Best of the Web Today for Opinion Journal.",1.0,2025-10-22
 RECORD-00145_REL_009,RECORD-00145,P0013,Len Apcar,Mentions,W0101,The Boys on the Bus,"In thinking about how to do that, he remain impressed with what Timothy Crouse achieved in his 1972 classic, The Boys on the Bus",0.8,2025-10-22
@@ -2408,7 +2406,6 @@ RECORD-00282_REL_009,RECORD-00282,P0432,Mitchell Stephens,Cites,W0089,A History 
 RECORD-00282_REL_010,RECORD-00282,P0430,Jason Blair,Affiliated With,O0002,The New York Times,Jason Blair was a reporter for The New York Times,1.0,2025-10-22
 RECORD-00282_REL_011,RECORD-00282,P0431,Rick Bragg,Affiliated With,O0002,The New York Times,Rick Bragg was a reporter for The New York Times,1.0,2025-10-22
 RECORD-00282_REL_012,RECORD-00282,E0119,Jason Blair crisis,Occurred At,O0002,The New York Times,The Jason Blair crisis affected The New York Times,0.9,2025-10-22
-RECORD-00282_REL_016,RECORD-00282,W0088,Siegal Report,Published In,O0002,The New York Times,The Siegal Report is an internal document from The New York Times,0.9,2025-10-22
 RECORD-00283_REL_001,RECORD-00283,P0452,Jack Shafer,Criticizes,P0010,Jeff Jarvis,"Shafer ridiculed the participants in the recent conference of Big Wigs on Blogging and Journalism—naming me, Jeff Jarvis and Dave Winer.",0.8,2025-10-22
 RECORD-00283_REL_002,RECORD-00283,P0452,Jack Shafer,Criticizes,P0290,Dave Winer,"Shafer ridiculed the participants in the recent conference of Big Wigs on Blogging and Journalism—naming me, Jeff Jarvis and Dave Winer.",0.8,2025-10-22
 RECORD-00283_REL_003,RECORD-00283,P0452,Jack Shafer,Discusses,C0361,Web Revolutionizing Journalism,"But the rhetoric of transformation by Web—and of the Internet revolutionizing journalism for the better—isn’t really foreign to Jack Shafer. Not long ago, he was speaking it.",0.9,2025-10-22
@@ -2533,7 +2530,6 @@ RECORD-00301_REL_003,RECORD-00301,P0572,James W. Carey,Discusses,C0223,Public Co
 RECORD-00301_REL_004,RECORD-00301,W0331,Inventing the People: The Rise of Popular Sovereignty in England and America,Discusses,C0387,Political fictions,Inventing the People is about political fictions.,0.9,2025-10-22
 RECORD-00301_REL_005,RECORD-00301,W0332,Imagined Communities: Reflections on the Origin and Spread of Nationalism,Discusses,C0388,Imagined community,Imagined Communities is about the concept of imagined communities.,0.9,2025-10-22
 RECORD-00301_REL_006,RECORD-00301,W0333,"A Republic, if You Can Keep It",Discusses,C0223,Public Conversation,"A Republic, if You Can Keep It emphasizes public conversation.",0.9,2025-10-22
-RECORD-00302_REL_005,RECORD-00302,P0385,Roger Ailes,Affiliated With,O0014,Fox News,"Roger Ailes, head of Fox News channel",1.0,2025-10-22
 RECORD-00302_REL_006,RECORD-00302,P0385,Roger Ailes,Criticizes,O0194,LA Times,"Roger Ailes, head of Fox News channel, takes on the editor of the LA Times, whom he calls “Elite, Arrogant, Condescending … ”",0.9,2025-10-22
 RECORD-00302_REL_007,RECORD-00302,P1256,Cal Thomas,Affiliated With,O0014,Fox News,"Cal Thomas, who has a contract with Fox",1.0,2025-10-22
 RECORD-00303_REL_002,RECORD-00303,P0452,Jack Shafer,Mentions,O0165,The Financial Times,Breathlessly but in perfect lockstop with Shafer...,0.7,2025-10-22
@@ -3086,7 +3082,6 @@ RECORD-00355_REL_012,RECORD-00355,P0916,John Harris,Mentions,P0324,Dan Froomkin,
 RECORD-00355_REL_013,RECORD-00355,P0916,John Harris,Criticizes,P0324,Dan Froomkin,What irked me about Froomkin’s reply to the ombudsman was his pompous suggestion that he is a lonely truth-teller at the Washington Post,0.7,2025-10-22
 RECORD-00356_REL_001,RECORD-00356,O0002,The New York Times,Discusses,W0419,TimesSelect,The launch of TimesSelect is a big part of “being tested.”,0.8,2025-10-22
 RECORD-00356_REL_002,RECORD-00356,P1204,Alex S. Jones,Affiliated With,O0002,The New York Times,"Alex S. Jones, former reporter, New York Times",1.0,2025-10-22
-RECORD-00356_REL_003,RECORD-00356,P0039,Arthur Sulzberger Jr.,Affiliated With,O0002,The New York Times,"Arthur Sulzberger, Jr. ... Times Publisher",1.0,2025-10-22
 RECORD-00356_REL_004,RECORD-00356,P1441,Janet Robinson,Affiliated With,O0002,The New York Times,Janet Robinson ... CEO New York Times Company,1.0,2025-10-22
 RECORD-00356_REL_005,RECORD-00356,P0898,Steve Outing,Affiliated With,O0025,Editor & Publisher,"Steve Outing, writes Editor & Publisher",1.0,2025-10-22
 RECORD-00356_REL_006,RECORD-00356,P1418,Martin Nisenholtz,Affiliated With,O0002,The New York Times,"Martin Nisenholtz, president of New York Times Digital",1.0,2025-10-22
@@ -3338,7 +3333,6 @@ RECORD-00384_REL_011,RECORD-00384,O0388,Greensboro News & Record,Mentions,O0931,
 RECORD-00384_REL_012,RECORD-00384,O0388,Greensboro News & Record,Mentions,O0567,Spokesman-Review,"So among local news companies that reject “glacial,” there’s the News Record in Greensboro, NC, Lawrence.com in Kansas, the previously known examples of Northwest Voice in Bakersfield, CA and the Spok",0.6,2025-10-22
 RECORD-00384_REL_013,RECORD-00384,O0388,Greensboro News & Record,Mentions,C0047,Public Journalism,"That reminds me of where public journalism was ten years ago, 1993-94.",0.6,2025-10-22
 RECORD-00384_REL_014,RECORD-00384,P0068,Howard Kurtz,Mentions,O0538,Backfence.com,"Howard Kurtz on Backfence.com in his Media Notes column, Dec. 13:",0.7,2025-10-22
-RECORD-00384_REL_015,RECORD-00384,P0128,Dan Gillmor,Affiliated With,O0074,San Jose Mercury News,"Tech columnist, blogger and We the Media author Dan Gillmore is leaving the San Jose Mercury News for a citizen journalism start-up!",1.0,2025-10-22
 RECORD-00385_REL_001,RECORD-00385,P0005,Jay Rosen,Discusses,C0479,De-certifying the press,Jay Rosen writes about de-certifying the press.,0.9,2025-10-22
 RECORD-00385_REL_002,RECORD-00385,P0005,Jay Rosen,Criticizes,P0068,Howard Kurtz,In my view Kurtz’s judgment on this is wrong— very wrong for a beat reporter with his experience.,0.9,2025-10-22
 RECORD-00385_REL_003,RECORD-00385,P0068,Howard Kurtz,Criticizes,C0479,De-certifying the press,Are the Bushies at ‘war’ with the Fourth Estate? I wouldn’t go that far.,0.7,2025-10-22
@@ -3861,7 +3855,6 @@ RECORD-00440_REL_001,RECORD-00440,P0005,Jay Rosen,Affiliated With,O1024,Times Bo
 RECORD-00440_REL_002,RECORD-00440,W0509,Gatekeepers Without Gates,Published In,O1024,Times Books,publishing Gatekeepers Without Gates... is a co-venture between Henry Holt and the New York Times Company.,1.0,2025-10-22
 RECORD-00440_REL_003,RECORD-00440,O1024,Times Books,Affiliated With,O0002,The New York Times,Times Books is a joint venture between the New York Times... and Henry Holt,1.0,2025-10-22
 RECORD-00440_REL_004,RECORD-00440,O1024,Times Books,Affiliated With,O1025,Henry Holt,Times Books is a joint venture between the New York Times... and Henry Holt,1.0,2025-10-22
-RECORD-00440_REL_006,RECORD-00440,O0002,The New York Times,Published In,O0002,The New York Times,"The Times Company publishes the New York Times, the Boston Globe...",1.0,2025-10-22
 RECORD-00440_REL_007,RECORD-00440,O0002,The New York Times,Published In,O0161,Boston Globe,"The Times Company publishes the New York Times, the Boston Globe...",1.0,2025-10-22
 RECORD-00440_REL_008,RECORD-00440,P1777,Paul Golob,Affiliated With,O1024,Times Books,The editorial director of Times Books is Paul Golob,1.0,2025-10-22
 RECORD-00440_REL_009,RECORD-00440,P1778,Robin Dennis,Affiliated With,O1024,Times Books,"Most especially there is Paul Golob, editorial director, and Robin Dennis, my editor.",1.0,2025-10-22
@@ -3882,14 +3875,12 @@ RECORD-00442_REL_006,RECORD-00442,O0014,Fox News,Supports,O1027,U.S. Government,
 RECORD-00442_REL_007,RECORD-00442,P0498,Ed Cone,Discusses,E0111,September 11th Attacks,“I’m a little tired of the ‘I was there’ argument on 9/11.,0.8,2025-10-22
 RECORD-00442_REL_008,RECORD-00442,P1165,Michael Powell,Discusses,C0050,Objectivity,"At one level, the cult of objectivity always has struck me as fundamentally immature as an intellectual position.",0.8,2025-10-22
 RECORD-00442_REL_009,RECORD-00442,P1165,Michael Powell,Published In,O0023,The Washington Post,He sent me a piece he wrote two Sundays ago for the Post’s Outlook Section,0.9,2025-10-22
-RECORD-00443_REL_001,RECORD-00443,P0517,Bill O'Reilly,Affiliated With,O0014,Fox News,O'Reilly is the public face of Fox News Channel,1.0,2025-10-22
 RECORD-00443_REL_005,RECORD-00443,O0014,Fox News,Mentions,P0517,Bill O'Reilly,Fox is trying to de-legitimate others. Others are trying to de-legitimate Fox,0.9,2025-10-22
 RECORD-00443_REL_008,RECORD-00443,P0517,Bill O'Reilly,Mentions,W0126,Inside Edition,"In 1989, Bill O’Reilly quit ABC and became host of Inside Edition",0.9,2025-10-22
 RECORD-00443_REL_009,RECORD-00443,P0517,Bill O'Reilly,Discusses,W0125,The Paranoid Style in American Politics,"They should have been reading historian Richard Hofstadter on the paranoid style in American politics, for that is where O’Reilly comes from",0.8,2025-10-22
 RECORD-00443_REL_010,RECORD-00443,P0517,Bill O'Reilly,Mentions,W0067,Network,One obvious reference point for O’Reilly’s success is Sidney Lumet’s Network,0.8,2025-10-22
 RECORD-00443_REL_011,RECORD-00443,P0466,Richard Hofstadter,Originated By,C0003,Age of Insight,"Historian Richard Hofstadter, “The Paranoid Style in American Politics” (1964)",1.0,2025-10-22
 RECORD-00443_REL_012,RECORD-00443,C0133,Resentment News,Mentions,P0517,Bill O'Reilly,O'Reilly's genre—resentment news—demands,0.9,2025-10-22
-RECORD-00443_REL_013,RECORD-00443,O0014,Fox News,Mentions,O0055,ABC News,Jennings is the face of ABC News and Lehrer the embodiment of PBS.,0.9,2025-10-22
 RECORD-00443_REL_014,RECORD-00443,O0014,Fox News,Mentions,O0003,PBS,Jennings is the face of ABC News and Lehrer the embodiment of PBS.,0.9,2025-10-22
 RECORD-00444_REL_001,RECORD-00444,P0005,Jay Rosen,Discusses,P0982,Bill Gates,Jay Rosen writes an open letter to Bill Gates advising him on starting a blog.,0.9,2025-10-22
 RECORD-00444_REL_002,RECORD-00444,O0176,The Seattle Times,Mentions,P0982,Bill Gates,The Seattle Times broke the story about Bill Gates potentially starting a blog.,0.8,2025-10-22
@@ -3995,7 +3986,6 @@ RECORD-00454_REL_009,RECORD-00454,O0002,The New York Times,Discusses,C0532,Searc
 RECORD-00454_REL_010,RECORD-00454,P0513,John Markoff,Criticizes,C0531,Conversation,John Markoff’s snooty verdict in 2003 “…it’s not clear yet whether blogging is anything more than CB radio…”.,0.8,2025-10-22
 RECORD-00454_REL_012,RECORD-00454,O0002,The New York Times,Mentions,O0057,The Wall Street Journal,If one faction wanted to go the Wall Street Journal’s pay wall route.,0.7,2025-10-22
 RECORD-00454_REL_014,RECORD-00454,P1816,Scott Karp,Affiliated With,O0002,The New York Times,Scott Karp at Publishing 2.0 says NYTimes.com is ahead of other sites.,0.9,2025-10-22
-RECORD-00454_REL_015,RECORD-00454,O0002,The New York Times,Mentions,O0011,About.com,When the Times bought About.com it brought an open-to-search mentality into its organization.,0.8,2025-10-22
 RECORD-00454_REL_016,RECORD-00454,P0932,Simon Waldman,Affiliated With,O0223,Guardian Media Group,"Simon Waldman, as the director of digital strategy and development for the Guardian Media Group.",1.0,2025-10-22
 RECORD-00455_REL_001,RECORD-00455,P1817,Paul Klebnikov,Affiliated With,O1039,Forbes,Paul Klebnikov of Forbes,1.0,2025-10-22
 RECORD-00455_REL_002,RECORD-00455,P1817,Paul Klebnikov,Discusses,P1820,Boris Berezovsky,"Klebnikov investigated rich, corrupt and dangerous people, ruthless billionaires in Russia",0.8,2025-10-22
@@ -4147,7 +4137,6 @@ RECORD-00470_REL_002,RECORD-00470,P0483,Jeffrey Dvorkin,Discusses,C0552,Fairness
 RECORD-00470_REL_003,RECORD-00470,P0483,Jeffrey Dvorkin,Discusses,C0184,Fact-based reporting,NPR is—and should be seen to be—about providing fact-based reporting.,0.8,2025-10-22
 RECORD-00470_REL_004,RECORD-00470,P0483,Jeffrey Dvorkin,Discusses,C0185,Opinion and commentary,Opinions and commentaries on NPR newsmagazines are always provided by non-NPR journalists or other outsiders.,0.8,2025-10-22
 RECORD-00470_REL_006,RECORD-00470,P0484,Daniel Schorr,Affiliated With,O0419,CBS News,"Daniel Schorr, the last of Edward R. Murrow’s legendary CBS team",1.0,2025-10-22
-RECORD-00471_REL_001,RECORD-00471,P1418,Martin Nisenholtz,Affiliated With,O0002,The New York Times,"Martin Nisenholtz, Senior Vice President for Digital Operations at the New York Times",1.0,2025-10-22
 RECORD-00471_REL_002,RECORD-00471,O0002,The New York Times,Discusses,C0553,Search Engine Optimization,Why is the New York Times Company interested in acquiring this expertise with search engines that About.com is said to have?,0.8,2025-10-22
 RECORD-00471_REL_003,RECORD-00471,O0002,The New York Times,Affiliated With,P1889,Stuart Elliot,"Stuart Elliot’s Advertising column, published the same day in the New York Times",1.0,2025-10-22
 RECORD-00471_REL_005,RECORD-00471,P0932,Simon Waldman,Published In,O0158,The Guardian,"Simon Waldman, head of The Guardian online",1.0,2025-10-22
@@ -4601,7 +4590,6 @@ RECORD-00558_REL_008,RECORD-00558,W0622,"Online, GOP Is Playing Catch-Up",Publis
 RECORD-00558_REL_010,RECORD-00558,W0623,The Revolt of the Elites,Discusses,C0594,Netroots,"I kept thinking about a famous passage from Christopher Lasch...In the Revolt of the Elites, he said we learn more from argument than from information...",0.9,2025-10-28
 RECORD-00558_REL_011,RECORD-00558,O0492,Daily Kos,Mentions,O1172,Open Left,"read-write communities like Daily Kos, Open Left",0.8,2025-10-28
 RECORD-00558_REL_012,RECORD-00558,O0492,Daily Kos,Mentions,O0823,RedState.com,"read-write communities like Daily Kos, Redstate.com",0.8,2025-10-28
-RECORD-00558_REL_013,RECORD-00558,P1200,Matt Bai,Affiliated With,O0002,The New York Times,"Matt Bai, who writes about politics for the New York Times Magazine",1.0,2025-10-28
 RECORD-00558_REL_015,RECORD-00558,P1200,Matt Bai,Mentions,E0004,Iraq War,Almost every political journalist will by now concede that the press failed in its duty during the run-up to the Iraq war.,0.8,2025-10-28
 RECORD-00558_REL_016,RECORD-00558,P1200,Matt Bai,Discusses,W0624,The Argument,"It also helps that he has a book coming out this month titled, ” Billionaires, Bloggers, and the Battle to Remake Democratic Politics.” Actually that’s the subtitle. The title is… The Argument",0.9,2025-10-28
 RECORD-00559_REL_002,RECORD-00559,P1430,Peter Johnson,Discusses,P0555,Dan Rather,"With Dan Rather leaving the anchor's desk is there an opportunity for CBS to break away, and do something different?",0.9,2025-10-28
