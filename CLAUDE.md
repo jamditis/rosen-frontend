@@ -173,8 +173,7 @@ Record deep links: `?record=RECORD_ID` opens a record modal on any route.
 │
 ├── features/                        # Standalone feature pages
 │   ├── shared/                      # Shared feature assets
-│   ├── status-report/               # Archive status report generator
-│   └── thread-viewer/               # Social media thread viewer
+│   └── status-report/               # Archive status report generator
 │
 ├── data/                            # Archive data files + export scripts
 │   ├── archive-data.json            # Full combined JSON (26 MB)
@@ -257,12 +256,7 @@ Record deep links: `?record=RECORD_ID` opens a record modal on any route.
 python3 -m http.server 8000   # Serve from repo root, open http://localhost:8000
 ```
 
-No build step needed. The app runs directly from source files via ES module imports.
-
-To rebuild Tailwind CSS (if modifying styles):
-```bash
-npm run build:css
-```
+No build step needed. The app runs directly from source files via ES module imports. Tailwind CSS is pre-built at `frontend/dist/tailwind.css`.
 
 ## Testing
 
@@ -279,17 +273,15 @@ npm run test:frontend      # Version consistency + frontend structure
 
 ### Production: WordPress FTP
 
-The `ftp-upload/` folder at the repo root contains a pre-assembled deployment package. Upload its contents to `pressthink.org/j/rosen-archive/`.
+The site is hosted at `pressthink.org/j/rosen-archive/`. Deploy by uploading changed files via FTP.
 
-To refresh the package before uploading:
+To deploy:
 1. Edit source files as needed
-2. Regenerate JSON: `node data/export-archive-data.js`
+2. Regenerate JSON if data changed: `node data/export-archive-data.js`
 3. Bump the version in `index.html`, `version.json`, and all `?v=` import strings
-4. Copy updated files into `ftp-upload/`
+4. Upload changed files via FTP
 
-Do not upload CSVs, backup files, screenshots, or the `ftp-upload/` folder itself — only its contents. The `dissertation/` and `tools/` directories in `ftp-upload/` are already present on the server and only need re-uploading if changed.
-
-After upload, increment `?v=` query parameters on all JS/CSS imports to bust CloudFlare cache.
+Do not upload CSVs, backup files, screenshots, or the entire repo — only the files that changed. After upload, increment `?v=` query parameters on all JS/CSS imports to bust CloudFlare cache.
 
 ### Updating archive data
 
