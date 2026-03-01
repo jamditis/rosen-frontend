@@ -157,7 +157,17 @@ Note: CLAUDE.md already documents 6 records with no recoverable URL: RECORD-0066
 
 **Known remaining issues (require human or pipeline work):**
 - 16 archive records with no URL (6 confirmed unrecoverable per CLAUDE.md)
-- 306 records missing pull_quote (requires AI extraction pipeline)
-- 338 records missing key_concepts (requires AI extraction pipeline)
+- 10 records missing pull_quote (unresolvable: 9 THREAD records with metadata-only summaries, 1 TV listings clipping)
+- 0 records missing key_concepts (all 328 eligible records filled; 10 Social Media Threads out of scope)
 - 4 Bluesky posts with empty raw_text (unrecoverable — failed imports)
 - 21 entity near-duplicates flagged for editorial review (see ENTITY_AUDIT_REPORT.md)
+
+---
+
+## Post-verification enrichment (2026-03-01) ✓
+
+- Category normalization committed (all variants mapped to 6 canonical names)
+- Entity near-dedup: 5,046 → 5,036 (10 additional merges)
+- Pull quotes: 296 of 306 missing records filled using claude -p pipeline
+- Key concepts: 328 of 328 eligible records filled using claude -p pipeline
+- ftp-upload/data/ synced, all changes pushed to remote
