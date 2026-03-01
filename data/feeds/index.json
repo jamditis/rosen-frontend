@@ -1,0 +1,82 @@
+{
+  "version": "1.0.0",
+  "generated": "2026-01-31T20:51:16.650Z",
+  "baseUrl": "https://pressthink.org/j/rosen-archive",
+  "feeds": [
+    {
+      "name": "rss",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/rss.xml",
+      "path": "./data/feeds/rss.xml"
+    },
+    {
+      "name": "articles",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/articles.xml",
+      "path": "./data/feeds/articles.xml"
+    },
+    {
+      "name": "categories - press-media-criticism",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/press-media-criticism.xml",
+      "path": "./data/feeds/categories/press-media-criticism.xml"
+    },
+    {
+      "name": "categories - technology-digital-media",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/technology-digital-media.xml",
+      "path": "./data/feeds/categories/technology-digital-media.xml"
+    },
+    {
+      "name": "categories - journalism-theory-practice",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-theory-practice.xml",
+      "path": "./data/feeds/categories/journalism-theory-practice.xml"
+    },
+    {
+      "name": "categories - audience-public-engagement",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/audience-public-engagement.xml",
+      "path": "./data/feeds/categories/audience-public-engagement.xml"
+    },
+    {
+      "name": "categories - journalism-education",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-education.xml",
+      "path": "./data/feeds/categories/journalism-education.xml"
+    },
+    {
+      "name": "categories - politics-democracy",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/politics-democracy.xml",
+      "path": "./data/feeds/categories/politics-democracy.xml"
+    },
+    {
+      "name": "categories - journalism-practice",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-practice.xml",
+      "path": "./data/feeds/categories/journalism-practice.xml"
+    },
+    {
+      "name": "eras - democracy-in-crisis-20s-",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/eras/democracy-in-crisis-20s-.xml",
+      "path": "./data/feeds/eras/democracy-in-crisis-20s-.xml"
+    },
+    {
+      "name": "eras - view-from-nowhere-10s-",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/eras/view-from-nowhere-10s-.xml",
+      "path": "./data/feeds/eras/view-from-nowhere-10s-.xml"
+    },
+    {
+      "name": "eras - web-blogging-00s-",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/eras/web-blogging-00s-.xml",
+      "path": "./data/feeds/eras/web-blogging-00s-.xml"
+    },
+    {
+      "name": "eras - public-journalism-90s-",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/eras/public-journalism-90s-.xml",
+      "path": "./data/feeds/eras/public-journalism-90s-.xml"
+    }
+  ],
+  "opml": [
+    {
+      "name": "Archive Structure",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/archive.opml"
+    },
+    {
+      "name": "RSS Subscriptions",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/subscriptions.opml"
+    }
+  ]
+}

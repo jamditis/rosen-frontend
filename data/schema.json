@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pressthink.org/j/rosen-archive/data/schema.json",
+  "title": "Jay Rosen Digital Archive Schema",
+  "description": "Schema for the Jay Rosen Digital Archive data format",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "Schema version"
+    },
+    "generated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Generation timestamp"
+    },
+    "records": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/record" }
+    },
+    "entities": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/entity" }
+    },
+    "facets": { "$ref": "#/$defs/facets" },
+    "autocompleteIndex": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "required": ["version", "generated", "records"],
+  "$defs": {
+    "record": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^(RECORD|THREAD|SOCIAL|dissertation)-[0-9a-zA-Z-]+$",
+          "description": "Unique record identifier"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Title of the work"
+        },
+        "author": {
+          "type": "string",
+          "description": "Author name"
+        },
+        "date": {
+          "type": "string",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+          "description": "Publication date (YYYY-MM-DD)"
+        },
+        "year": {
+          "type": "string",
+          "pattern": "^[0-9]{4}$",
+          "description": "Publication year"
+        },
+        "era": {
+          "type": "string",
+          "enum": [
+            "Public Journalism (90s)",
+            "Web & Blogging (00s)",
+            "View from Nowhere (10s)",
+            "Democracy in Crisis (20s)"
+          ],
+          "description": "Time period classification"
+        },
+        "pub": {
+          "type": "string",
+          "description": "Original publication or platform"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to original content"
+        },
+        "summary": {
+          "type": "string",
+          "description": "Description or excerpt"
+        },
+        "quote": {
+          "type": "string",
+          "description": "Notable pull quote"
+        },
+        "categories": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Thematic categories"
+        },
+        "concepts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Key concepts"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Associated tags"
+        },
+        "verified": {
+          "type": "boolean",
+          "description": "Data quality verified"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["article", "social", "Dissertation"],
+          "description": "Record type"
+        },
+        "relatedIds": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Related record/entity IDs"
+        },
+        "thread_data": {
+          "$ref": "#/$defs/threadData",
+          "description": "Thread structure for THREAD records"
+        }
+      },
+      "required": ["id", "title", "author", "date", "url"]
+    },
+    "entity": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique entity identifier"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["Person", "Organization", "Concept", "Work", "Event", "Location"],
+          "description": "Entity type"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name"
+        },
+        "normalizedName": {
+          "type": "string",
+          "description": "Normalized name for matching"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role or description"
+        },
+        "affiliation": {
+          "type": "string",
+          "description": "Associated organization"
+        },
+        "prominence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Prominence score"
+        },
+        "firstMentionRecordId": {
+          "type": "string",
+          "description": "First record mentioning entity"
+        },
+        "totalMentions": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total mention count"
+        }
+      },
+      "required": ["id", "type", "name"]
+    },
+    "threadData": {
+      "type": "object",
+      "properties": {
+        "platform": {
+          "type": "string",
+          "enum": ["bluesky", "twitter"],
+          "description": "Social platform"
+        },
+        "root_post_id": {
+          "type": "string",
+          "description": "Root post identifier"
+        },
+        "post_count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of posts in thread"
+        },
+        "posts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "depth": { "type": "integer", "minimum": 0 },
+              "content": { "type": "string" },
+              "created_at": { "type": "string", "format": "date-time" },
+              "reply_to": { "type": ["string", "null"] }
+            },
+            "required": ["id", "depth"]
+          }
+        }
+      },
+      "required": ["platform", "posts"]
+    },
+    "facets": {
+      "type": "object",
+      "properties": {
+        "categories": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Available categories"
+        },
+        "eras": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Available eras"
+        },
+        "publications": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Available publications"
+        },
+        "entityTypes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Available entity types"
+        }
+      }
+    }
+  }
+}

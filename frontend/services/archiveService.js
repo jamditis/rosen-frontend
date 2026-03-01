@@ -588,6 +588,109 @@ export {
 };
 
 // ============================================
+// DATA EXPORT FUNCTIONS (Dave Winer Open Data)
+// ============================================
+
+/**
+ * Trigger browser download of data
+ */
+const downloadFile = (content, filename, mimeType) => {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
+/**
+ * Export records as JSON file
+ * @param {Array} records - Records to export (filtered or all)
+ * @param {string} filename - Output filename
+ */
+export const exportAsJSON = (records, filename = 'jay-rosen-archive.json') => {
+  const exportData = {
+    exported: new Date().toISOString(),
+    source: 'Jay Rosen Digital Archive',
+    url: 'https://pressthink.org/j/rosen-archive/',
+    license: 'CC BY 4.0',
+    recordCount: records.length,
+    records: records.map(r => ({
+      id: r.id,
+      title: r.title,
+      author: r.author || 'Jay Rosen',
+      date: r.date,
+      year: r.year,
+      era: r.era,
+      pub: r.pub,
+      url: r.url,
+      summary: r.summary || r.summaryPreview,
+      categories: r.categories,
+      type: r.type
+    }))
+  };
+
+  downloadFile(JSON.stringify(exportData, null, 2), filename, 'application/json');
+};
+
+/**
+ * Export records as CSV file
+ * @param {Array} records - Records to export
+ * @param {string} filename - Output filename
+ */
+export const exportAsCSV = (records, filename = 'jay-rosen-archive.csv') => {
+  const headers = ['id', 'title', 'author', 'date', 'year', 'era', 'pub', 'url', 'categories', 'type'];
+
+  const escapeCSV = (value) => {
+    if (value === null || value === undefined) return '';
+    const str = String(value);
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
+  const rows = records.map(r => [
+    r.id,
+    r.title,
+    r.author || 'Jay Rosen',
+    r.date,
+    r.year,
+    r.era,
+    r.pub,
+    r.url,
+    (r.categories || []).join('; '),
+    r.type || 'article'
+  ].map(escapeCSV).join(','));
+
+  const csv = [headers.join(','), ...rows].join('\n');
+  downloadFile(csv, filename, 'text/csv;charset=utf-8');
+};
+
+/**
+ * Get URLs for open data resources
+ */
+export const getOpenDataURLs = () => {
+  const basePath = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? '.'
+    : '/wp-content/rosen-archive';
+
+  return {
+    json: `${basePath}/data/archive-data.json`,
+    csv: `${basePath}/data/archive_records-public.csv`,
+    rss: `${basePath}/data/feeds/rss.xml`,
+    articlesRss: `${basePath}/data/feeds/articles.xml`,
+    opml: `${basePath}/data/feeds/archive.opml`,
+    subscriptions: `${basePath}/data/feeds/subscriptions.opml`,
+    schema: `${basePath}/data/schema.json`,
+    schemaDoc: `${basePath}/data/SCHEMA.md`
+  };
+};
+
+// ============================================
 // LEGACY: Full data fetch (backward compatible)
 // ============================================
 

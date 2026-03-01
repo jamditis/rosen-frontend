@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+  <head>
+    <title>Jay Rosen Digital Archive</title>
+    <dateCreated>Sat, 31 Jan 2026 20:51:16 GMT</dateCreated>
+    <dateModified>Sat, 31 Jan 2026 20:51:16 GMT</dateModified>
+    <ownerName>Joe Amditis</ownerName>
+    <docs>http://opml.org/spec2.opml</docs>
+  </head>
+  <body>
+    <outline text="By Era">
+      <outline text="Public Journalism (90s)" type="category">
+        <outline text="First Chapter: &apos;What Are Journalists For?&apos;" type="link" url="https://archive.nytimes.com/www.nytimes.com/books/99/11/14/reviews/991114.14goldstt.html" created="1999-11-04"/>
+        <outline text="Public Journalism A Case for Public Scholarship" type="link" url="https://berks.psu.edu/sites/berks/files/campus/rosen.pdf" created="1995-05-01"/>
+        <outline text="I Am Not Optimistic But I Do Have Hope: The Future of Journalism in A Media Age" type="link" url="http://archive.pressthink.org/2004/01/28/cowles_speech_p.html" created="1993-04-08"/>
+        <outline text="Rereading America: Cultural contexts for critical thinking and writing" type="link" url="https://archive.org/details/rereadingamerica00" created="1989-01-01"/>
+        <outline text="The Impossible Press: American Journalism and the Decline of Public Life" type="link" url="https://pressthink.org/j/rosen-archive/wp-content/rosen-archive/features/dissertation-reader/" created="1986-01-01"/>
+      </outline>
+      <outline text="Web &amp; Blogging (00s)" type="category">
+        <outline text="My simple fix for the messed up Sunday Shows" type="link" url="https://publicnotebook.wordpress.com/2009/12/28/my-simple-fix-for-the-messed-up-sunday-shows/" created="2009-12-28"/>
+        <outline text="How to Know If You Are Behaving Ethically as a Journalist: Jay Rosen’s Checklist" type="link" url="https://publicnotebook.wordpress.com/2009/12/11/how-to-know-if-you-are-behaving-ethically-as-a-journalist-jay-rosens-checklist/" created="2009-12-11"/>
+        <outline text="Why I Don’t Trust a Thing the Church of the Savvy Says About Candidate Obama’s Call for Transparency" type="link" url="https://publicnotebook.wordpress.com/2009/12/07/why-i-dont-trust-a-thing-the-church-of-the-savvy-says-about-candidate-obamas-call-for-transparency/" created="2009-12-07"/>
+        <outline text="What I Told the Man from Politics Daily" type="link" url="https://publicnotebook.wordpress.com/2009/12/06/what-i-told-the-man-from-politics-daily/" created="2009-12-06"/>
+        <outline text="Is &quot;He Said, She Said, We&apos;re Clueless&quot; Coverage Dying?" type="link" url="https://www.discovermagazine.com/the-sciences/is-he-said-she-said-were-clueless-coverage-dying" created="2009-04-13"/>
+        <outline text="PressThink: he said/she said Journalism: Lame Formula in the Land of the Active User" type="link" url="http://archive.pressthink.org/2009/04/12/hesaid_shesaid_p.html" created="2009-04-12"/>
+        <outline text="He Said, She Said Journalism: Lame Formula in the Land of the Active User" type="link" url="https://pressthink.org/2009/04/12/he-said-she-said-journalism-lame-formula-in-the-land-of-the-active-user/" created="2009-04-12"/>
+        <outline text="“He Said/She Said” Journalism: Lame Formula in the Land of the Active User" type="link" url="https://pressthink.org/2009/04/12/he-said-she-said-journalism-lame-formula-in-the-land-of-the-active-user/" created="2009-04-12"/>
+        <outline text="PressThink: Introducing the new Huffington Post Investigative Fund (And My Own Role in It)" type="link" url="http://archive.pressthink.org/2009/03/30/huffpost_fnd_p.html" created="2009-03-30"/>
+        <outline text="Flying Seminar on the Future of News" type="link" url="http://archive.pressthink.org/2009/03/26/flying_seminar_p.html" created="2009-03-26"/>
+        <outline text="PressThink: It Took 23 Years, But I Finally Got to Give My View of the National Press on National Television" type="link" url="http://archive.pressthink.org/2009/02/06/took_moyers_p.html" created="2009-02-06"/>
+        <outline text="Write it yourself" type="link" url="http://archive.pressthink.org/2009/01/20/write_self_p.html" created="2009-01-20"/>
+        <outline text="PressThink: Audience Atomization Overcome: Why the Internet Weakens the Authority of the Press" type="link" url="http://archive.pressthink.org/2009/01/12/atomization_p.html" created="2009-01-12"/>
+        <outline text="Audience Atomization Overcome: Why the Internet Weakens the Authority of the Press" type="link" url="https://pressthink.org/2009/01/12/audience-atomization-overcome-why-the-internet-weakens-the-authority-of-the-press/" created="2009-01-12"/>
+        <outline text="Audience Atomization Overcome: Why the Internet Weakens the Authority of the Press" type="link" url="https://pressthink.org/2009/01/12/audience-atomization-overcome-why-the-internet-weakens-the-authority-of-the-press/" created="2009-01-12"/>
+        <outline text="Why I Write 400 Words a Day and Put Them on Twitter" type="link" url="http://archive.pressthink.org/2009/01/04/chronicle_hlp_p.html" created="2009-01-04"/>
+        <outline text="PressThink: Make Something Valuable to Journalism and Give it Away: Stanford Re-Deploys its Journalism Fellows" type="link" url="http://archive.pressthink.org/2008/12/30/bettinger_qa_p.html" created="2008-12-30"/>
+        <outline text="If Bloggers Had No Ethics Blogging Would Have Failed, But it Didn’t. So Let’s Get a Clue." type="link" url="http://archive.pressthink.org/2008/09/18/because_we_have_p.html" created="2008-09-18"/>
+        <outline text="PressThink: The Palin Convention and the Culture War Option" type="link" url="http://archive.pressthink.org/2008/09/03/mccain_strategy_p.html" created="2008-09-03"/>
+        <outline text="PressThink: Hype Busting at Mother Jones Goes Bust" type="link" url="http://archive.pressthink.org/2008/08/20/motherjones_hype_p.html" created="2008-08-20"/>
+        <outline text="National Explainer" type="link" url="http://archive.pressthink.org/2008/08/13/national_explain_p.html" created="2008-08-13"/>
+        <outline text="&quot;The Whole Anthrax Case Would Make For a Good Journalism Class.&quot; Brian Ross Responds." type="link" url="http://archive.pressthink.org/2008/08/07/ross_replies_p.html" created="2008-08-07"/>
+        <outline text="Three Vital Questions for ABC News About its Anthrax Reporting in 2001" type="link" url="http://archive.pressthink.org/2008/08/04/abcnews_qs_p.html" created="2008-08-04"/>
+        <outline text="A Most Useful Definition" type="link" url="http://archive.pressthink.org/2008/07/14/a_most_useful_d_p.html" created="2008-07-14"/>
+        <outline text="PressThink: Big Daddy Newspaper Has Gone and Left Journalism" type="link" url="http://archive.pressthink.org/2008/07/08/big_daddy_left_p.html" created="2008-07-08"/>
+        <outline text="PressThink: Migration Point for the Press Tribe" type="link" url="http://archive.pressthink.org/2008/06/26/pdf_p.html" created="2008-06-26"/>
+        <outline text="Update on Beatblogging.org Six Months In" type="link" url="http://archive.pressthink.org/2008/06/19/beatblog_update_p.html" created="2008-06-19"/>
+        <outline text="The McCain News Hunt" type="link" url="http://archive.pressthink.org/2008/06/16/mccain_news_hun_p.html" created="2008-06-16"/>
+        <outline text="PressThink: When Mayhill Fowler Met Bill Clinton at the Rope Line" type="link" url="http://archive.pressthink.org/2008/06/09/fowler_clinton_p.html" created="2008-06-09"/>
+        <outline text="PressThink: The Jerk at the Podium: Scott McClellan Steps Away" type="link" url="http://archive.pressthink.org/2006/04/20/mcl_rlbk_p.html" created="2008-05-29"/>
+        <outline text="PressThink: What Happened to Scott McClellan in Longer Perspective: 100 Years of the White House Press" type="link" url="http://archive.pressthink.org/2008/05/29/mcclellan_regrets_p.html" created="2008-05-29"/>
+        <outline text="Looking for the Mouse in Media: Clay Shirky on Deploying the Cognitive Surplus for Public Good" type="link" url="http://archive.pressthink.org/2008/05/06/mouse_media_p.html" created="2008-05-06"/>
+        <outline text="PressThink: The Presses Stop But the Press Goes On: Capital Times Lives on the Web" type="link" url="http://archive.pressthink.org/2008/04/28/madison_newsps_p.html" created="2008-04-28"/>
+        <outline text="Newspapers and the Net: Where’s the Business Model, People?" type="link" url="http://archive.pressthink.org/2008/04/22/business_model_p.html" created="2008-04-22"/>
+        <outline text="Mayhill Fowler and the Uncharted Territory of Citizen Journalism" type="link" url="http://archive.pressthink.org/2008/04/15/mayhill_fowler_p.html" created="2008-04-15"/>
+        <outline text="PressThink: The Love Affair Between McCain and the Press Sprains the Brain of the Liberal Blogosphere" type="link" url="http://archive.pressthink.org/2008/03/31/developing_as_m_p.html" created="2008-03-31"/>
+        <outline text="The News about the news: Jay Rosen" type="link" url="https://radioopensource.org/the-news-about-the-news-jay-rosen/" created="2008-03-28"/>
+        <outline text="PressThink: Just How Did John McCain Obtain What He Has in the Bank with the Press?" type="link" url="http://archive.pressthink.org/2008/03/26/mccain_bank_p.html" created="2008-03-26"/>
+        <outline text="PressThink: Obama tells the Best Political Team on Television: You Have a Choice" type="link" url="http://archive.pressthink.org/2008/03/18/obama_to_the_be_p.html" created="2008-03-18"/>
+        <outline text="Pincus, Neutrality, and the Politics of News" type="link" url="http://archive.pressthink.org/2008/03/14/pincus_neutrality_p.html" created="2008-03-14"/>
+        <outline text="PressThink: &quot;An Attractively Against-the-Grain Enterprise...&quot;" type="link" url="http://archive.pressthink.org/2008/03/04/three_stories_f_p.html" created="2008-03-05"/>
+        <outline text="Three Stories That Went Awry" type="link" url="http://archive.pressthink.org/2008/03/04/three_stories_f_p.html" created="2008-03-05"/>
+        <outline text="PressThink: Three Vetting Stories Went Awry at the New York Times: Find the Pattern." type="link" url="http://archive.pressthink.org/2008/02/28/three_bizarre_v_p.html" created="2008-02-28"/>
+        <outline text="PressThink: Three Vetting Stories Went Awry at the New York Times: Find the Pattern." type="link" url="http://archive.pressthink.org/2008/02/28/three_bizarre_v_p.html" created="2008-02-28"/>
+        <outline text="Cliff Notes Ver." type="link" url="http://archive.pressthink.org/2008/02/25/cliff_notes_ver_p.html" created="2008-02-25"/>
+        <outline text="PressThink: Public Editor to Bill Keller: &quot;You Haven&apos;t Got it.&quot;" type="link" url="http://archive.pressthink.org/2008/02/25/hoyt_keller_p.html" created="2008-02-25"/>
+        <outline text="For the New York Times, Too, Self-Confidence on Ethics Poses Risks" type="link" url="http://archive.pressthink.org/2008/02/21/some_riddles_qu_p.html" created="2008-02-21"/>
+        <outline text="The Beast Without a Brain: Why Horse Race Journalism Works for Journalists and Fails Us" type="link" url="http://archive.pressthink.org/2008/01/20/the_campaign_pr_p.html" created="2008-01-20"/>
+        <outline text="The Beast Without a Brain: Why Horse Race Journalism Works for Journalists and Fails Us" type="link" url="http://archive.pressthink.org/2008/01/20/the_campaign_pr_p.html" created="2008-01-20"/>
+        <outline text="PressThink: &quot;Most of them are not ideologically driven; they just want to get on the front page.&quot;" type="link" url="http://archive.pressthink.org/2007/12/29/conservative_el_p.html" created="2007-12-29"/>
+      </outline>
+      <outline text="View from Nowhere (10s)" type="category">
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212510972423933953" created="2020-01-01"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212505368007450624" created="2020-01-01"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212500058429677568" created="2020-01-01"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212498161534672897" created="2020-01-01"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212494328519626752" created="2020-01-01"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212484231219339264" created="2020-01-01"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212480763230375936" created="2020-01-01"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212452766288883713" created="2020-01-01"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212433439812734982" created="2020-01-01"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212433042373001217" created="2020-01-01"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212429327029211138" created="2020-01-01"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212427367844634625" created="2020-01-01"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212427188026392579" created="2020-01-01"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212427184742244356" created="2020-01-01"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212427183916044289" created="2020-01-01"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212419119011770368" created="2020-01-01"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212416666652565504" created="2020-01-01"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212165446008541192" created="2020-01-01"/>
+        <outline text="Quoted by Ben Casselman" type="link" url="https://x.com/bencasselman/status/1212049721138851840" created="2019-12-31"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212157238518910978" created="2019-12-31"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212152068200390658" created="2019-12-31"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212144726427734016" created="2019-12-31"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212136855094910978" created="2019-12-31"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212134941284294656" created="2019-12-31"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212087746174562305" created="2019-12-31"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212071289722212355" created="2019-12-31"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212064159514419200" created="2019-12-31"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212053287526191104" created="2019-12-31"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212052647445962752" created="2019-12-31"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212046420427059203" created="2019-12-31"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212046113747935232" created="2019-12-31"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212034897646424067" created="2019-12-31"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1212024068175732736" created="2019-12-31"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1211884432694661122" created="2019-12-31"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1211863860598185984" created="2019-12-31"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1211857430197526528" created="2019-12-31"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1211769382860443649" created="2019-12-30"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1211753163059007488" created="2019-12-30"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1211737352705589253" created="2019-12-30"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1211732774928949249" created="2019-12-30"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1211723694860570625" created="2019-12-30"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1211718135453306880" created="2019-12-30"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1211708880750813184" created="2019-12-30"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1211705051871404034" created="2019-12-30"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1211700981572022273" created="2019-12-30"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1211506918193344513" created="2019-12-30"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1211505167570546688" created="2019-12-30"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1211503439609503745" created="2019-12-30"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1211485397030588416" created="2019-12-30"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1211476940433039360" created="2019-12-30"/>
+      </outline>
+      <outline text="Democracy in Crisis (20s)" type="category">
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4g3gxkoxs2r" created="2025-10-30"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p" created="2025-10-30"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4ecwzqx322p" created="2025-10-30"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e6y3jkhk2p" created="2025-10-29"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e3rgesbk24" created="2025-10-29"/>
+        <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/" created="2025-10-28"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m427cx62jk2b" created="2025-10-26"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zx27endk23" created="2025-10-25"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zwt5x2es23" created="2025-10-25"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zvjrplq22z" created="2025-10-25"/>
+        <outline text="Quote by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3ztmvffm22z" created="2025-10-25"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3znyozkvs25" created="2025-10-25"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3yb45dou22d" created="2025-10-25"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1982135603136287148" created="2025-10-25"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1981890331957514719" created="2025-10-25"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xm3cs7kk2s" created="2025-10-24"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xi736ch22h" created="2025-10-24"/>
+        <outline text="Quote by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xhrbm5fs2u" created="2025-10-24"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xh7blxdc2u" created="2025-10-24"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xh2dpcr22u" created="2025-10-24"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xfl3lwbk2v" created="2025-10-24"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1981775674089386176" created="2025-10-24"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3t3yzegtk2v" created="2025-10-23"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3siutkwos2v" created="2025-10-22"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3shynfzys2x" created="2025-10-22"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3sfytnjh22v" created="2025-10-22"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3s5wsddck2x" created="2025-10-22"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1981021320079896971" created="2025-10-22"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3n33q3xbk2i" created="2025-10-20"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3n32dugfk2u" created="2025-10-20"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1980317607694856351" created="2025-10-20"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3igwrxmks23" created="2025-10-18"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3i6g4eopc2b" created="2025-10-18"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3i5elvxic2b" created="2025-10-18"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3ggaui4xs2h" created="2025-10-18"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3gek6c3mc2k" created="2025-10-18"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1979656077978558781" created="2025-10-18"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1979620139093115071" created="2025-10-18"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3fm2epscs26" created="2025-10-17"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3fkot3kac2k" created="2025-10-17"/>
+        <outline text="Quote by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3d2t6wu4k26" created="2025-10-16"/>
+        <outline text="Quote by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3d2t6wu4k26" created="2025-10-16"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3brl6oyfk2j" created="2025-10-16"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3bmiuqzlc2n" created="2025-10-16"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3bm3dbqps2n" created="2025-10-16"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3bk7tcxik2u" created="2025-10-16"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3aq4v2qes25" created="2025-10-15"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3aq26rnv225" created="2025-10-15"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3apoxbkzk25" created="2025-10-15"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3aodqqwtc25" created="2025-10-15"/>
+      </outline>
+    </outline>
+    <outline text="By Category">
+      <outline text="Press &amp; Media Criticism (19952)" type="category">
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4g3gxkoxs2r"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4ecwzqx322p"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e6y3jkhk2p"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e3rgesbk24"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m427cx62jk2b"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zx27endk23"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zwt5x2es23"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zvjrplq22z"/>
+        <outline text="Quote by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3ztmvffm22z"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3znyozkvs25"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3yb45dou22d"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1982135603136287148"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1981890331957514719"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xm3cs7kk2s"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xi736ch22h"/>
+        <outline text="Quote by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xhrbm5fs2u"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xh7blxdc2u"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xh2dpcr22u"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xfl3lwbk2v"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1981775674089386176"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3t3yzegtk2v"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3siutkwos2v"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3sfytnjh22v"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3s5wsddck2x"/>
+      </outline>
+      <outline text="Journalism Theory &amp; Practice (8060)" type="category">
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e3rgesbk24"/>
+        <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zx27endk23"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zwt5x2es23"/>
+        <outline text="Quote by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3ztmvffm22z"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3znyozkvs25"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3yb45dou22d"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3siutkwos2v"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3igwrxmks23"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3i5elvxic2b"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3ggaui4xs2h"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3gek6c3mc2k"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1979620139093115071"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3fkot3kac2k"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3brl6oyfk2j"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3bmiuqzlc2n"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3bm3dbqps2n"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3aq4v2qes25"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3apoxbkzk25"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3aodqqwtc25"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3alfgyhgc23"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m36wsxwvus2h"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m36vxdyewk2q"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m35ykm4hp22j"/>
+      </outline>
+      <outline text="Politics &amp; Democracy (7652)" type="category">
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1981890331957514719"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3s5wsddck2x"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1981021320079896971"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3n33q3xbk2i"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1980317607694856351"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3fm2epscs26"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3bk7tcxik2u"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m375ykxdoc2h"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m36qy2sr4k2h"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m34nq6fuf226"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m34thhlrm226"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m34nq6fuf226"/>
+        <outline text="Post by Perry Bacon" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m343zi5wns2w"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2zxjnnpm22i"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1977082925209342351"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2tuucwzpk2b"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2scs43lcs2y"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2sadau5bk2i"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2psfdh4x22t"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2n4umspb22m"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2n25egjsc2m"/>
+        <outline text="Quote by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2cekri4c22r"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2cjoon5ck2t"/>
+        <outline text="Quote by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2cekri4c22r"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2auohw35k2i"/>
+      </outline>
+      <outline text="Audience &amp; Public Engagement (3839)" type="category">
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4ecwzqx322p"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e6y3jkhk2p"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m427cx62jk2b"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xm3cs7kk2s"/>
+        <outline text="Quote by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xhrbm5fs2u"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3shynfzys2x"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3sfytnjh22v"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3i6g4eopc2b"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1979656077978558781"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m36gxcpdsk2v"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m35vskmbps2j"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m35tsihysk2j"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m34tjpewfc26"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m34agfbpl226"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m33icpthok23"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m33hyrbqhk23"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2ze2ni42c2c"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2z5hsdiu22m"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2xkbenfwc24"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2xalolpfc2c"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2xahcrjks2c"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2x7yrjeo22c"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2x5fr77dc2c"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2x5cuspvs2c"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2wzjqumzc2c"/>
+      </outline>
+      <outline text="Technology &amp; Digital Media (2566)" type="category">
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4g3gxkoxs2r"/>
+        <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zvjrplq22z"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1982135603136287148"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xi736ch22h"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xh7blxdc2u"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xh2dpcr22u"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xfl3lwbk2v"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1981775674089386176"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3t3yzegtk2v"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3shynfzys2x"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3n32dugfk2u"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3aq26rnv225"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m35te6nmck2j"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m34kylkiec2j"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m33i2mjmgk23"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2zwhglync2i"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2wso76r7k2i"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1977079042567442658"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2u5fdpg2c2q"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2sav5fcmk2i"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2sajzk2222i"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2rfv26rmc2t"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1976300493132423189"/>
+        <outline text="News Consumers are Content Creators in an AI-Driven World" type="link" url="https://newscreatorcorps.org/2025/10/news-consumers-content-creators/"/>
+      </outline>
+      <outline text="Journalism Education (339)" type="category">
+        <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/"/>
+        <outline text="Quote by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3d2t6wu4k26"/>
+        <outline text="Quote by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3d2t6wu4k26"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2rfv26rmc2t"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1976300493132423189"/>
+        <outline text="News Consumers and Content Creators" type="link" url="https://newscreatorcorps.org/2025/10/news-consumers-content-creators/"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2pcnuva2k2i"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1976007582629400626"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1975999179282579507"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1975945649146548275"/>
+        <outline text="Some more personal news: October 2025" type="link" url="https://pressthink.org/2025/10/some-more-personal-news-october-2025/"/>
+        <outline text="Some More Personal News, October 2025" type="link" url="https://pressthink.org/2025/10/some-more-personal-news-october-2025/"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lzpgizwcy22a"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lytdnn4egs2y"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lyjasqjyak2a"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lyazlmiu5k2h"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lxifig4pk22n"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lx3ao6xhvs24"/>
+        <outline text="Post by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lwysp72igk2z"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lwczmmd4wk2k"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3ltzapbands2w"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3ltzapbamek2w"/>
+        <outline text="Post by Karen Attiah" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3ltwlrzhejs2w"/>
+        <outline text="Quote by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3ltg3kot3xc2k"/>
+        <outline text="Quote by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lsvwo7smas2x"/>
+      </outline>
+      <outline text="Journalism Practice (8)" type="category">
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1803455752830333266"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1371117427606568962"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1364604954447671299"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1353123052784152577"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1295860639194329088"/>
+        <outline text="Tweet by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1219091440971788295"/>
+        <outline text="Reply by Jay Rosen" type="link" url="https://x.com/jayrosen_nyu/status/1164551425189449729"/>
+        <outline text="Quoted by Joanne Lipman" type="link" url="https://x.com/joannelipman/status/1163429594797678592"/>
+      </outline>
+    </outline>
+    <outline text="RSS Feeds" type="include">
+      <outline text="Main Feed" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/rss.xml"/>
+      <outline text="Articles Only" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/articles.xml"/>
+    </outline>
+  </body>
+</opml>

@@ -13,6 +13,8 @@ import fs from 'fs';
 import path from 'path';
 import { parse } from 'csv-parse/sync';
 import { fileURLToPath } from 'url';
+import { generateAllFeeds } from './lib/rss-generator.js';
+import { generateOPML, generateSubscriptionOPML } from './lib/opml-generator.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -690,6 +692,81 @@ async function main() {
   console.log(`  - archive-details.json (modal): ${detailsSizeMB} MB`);
   console.log(`  - archive-entities.json (explorer): ${entitiesSizeMB} MB`);
   console.log(`\n📍 Output directory: ${__dirname}`);
+
+  // ============================================
+  // RSS & OPML FEED GENERATION (Dave Winer Alignment)
+  // ============================================
+  console.log('\n📡 Generating RSS feeds (Dave Winer alignment)...');
+
+  // Base URL for production - update this for deployment
+  const BASE_URL = 'https://pressthink.org/j/rosen-archive';
+
+  // Generate all RSS feeds
+  const rssFeeds = generateAllFeeds(allRecords, BASE_URL);
+
+  // Create feeds directory structure
+  const feedsDir = path.join(__dirname, 'feeds');
+  const categoriesDir = path.join(feedsDir, 'categories');
+  const erasDir = path.join(feedsDir, 'eras');
+
+  if (!fs.existsSync(feedsDir)) fs.mkdirSync(feedsDir, { recursive: true });
+  if (!fs.existsSync(categoriesDir)) fs.mkdirSync(categoriesDir, { recursive: true });
+  if (!fs.existsSync(erasDir)) fs.mkdirSync(erasDir, { recursive: true });
+
+  // Write RSS feeds
+  let feedCount = 0;
+  for (const [filename, content] of Object.entries(rssFeeds)) {
+    const feedPath = path.join(feedsDir, filename);
+    const feedDir = path.dirname(feedPath);
+    if (!fs.existsSync(feedDir)) fs.mkdirSync(feedDir, { recursive: true });
+    fs.writeFileSync(feedPath, content);
+    feedCount++;
+  }
+
+  console.log(`  - Generated ${feedCount} RSS feeds`);
+
+  // Generate OPML files
+  console.log('\n📋 Generating OPML files...');
+
+  const archiveOpml = generateOPML({
+    title: 'Jay Rosen Digital Archive',
+    ownerName: 'Joe Amditis',
+    records: allRecords,
+    facets: output.facets,
+    baseUrl: BASE_URL
+  });
+
+  const subscriptionsOpml = generateSubscriptionOPML(BASE_URL, rssFeeds);
+
+  fs.writeFileSync(path.join(feedsDir, 'archive.opml'), archiveOpml);
+  fs.writeFileSync(path.join(feedsDir, 'subscriptions.opml'), subscriptionsOpml);
+
+  console.log('  - Generated archive.opml (full archive structure)');
+  console.log('  - Generated subscriptions.opml (RSS subscription list)');
+
+  // Generate feeds index
+  const feedsIndex = {
+    version: '1.0.0',
+    generated: new Date().toISOString(),
+    baseUrl: BASE_URL,
+    feeds: Object.keys(rssFeeds).map(name => ({
+      name: name.replace('.xml', '').replace(/\//g, ' - '),
+      url: `${BASE_URL}/data/feeds/${name}`,
+      path: `./data/feeds/${name}`
+    })),
+    opml: [
+      { name: 'Archive Structure', url: `${BASE_URL}/data/feeds/archive.opml` },
+      { name: 'RSS Subscriptions', url: `${BASE_URL}/data/feeds/subscriptions.opml` }
+    ]
+  };
+
+  fs.writeFileSync(path.join(feedsDir, 'index.json'), JSON.stringify(feedsIndex, null, 2));
+  console.log('  - Generated feeds/index.json');
+
+  console.log(`\n✅ Dave Winer alignment complete!`);
+  console.log(`   RSS feeds: ${feedCount}`);
+  console.log(`   OPML files: 2`);
+  console.log(`   Feed directory: ${feedsDir}`);
 }
 
 main().catch(err => {

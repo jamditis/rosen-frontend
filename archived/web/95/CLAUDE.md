@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Bug-fixing workflow
+
+When a bug is reported, don't immediately attempt to fix it. Instead:
+
+1. **Write a failing test first** that reproduces the bug
+2. **Launch subagents** to work on fixing the bug
+3. **Verify the fix** by running the test — a passing test proves the bug is fixed
+
+---
+
 ## Project Overview
 
 This is a **Windows 95-themed retro interface** for exploring the Jay Rosen Internet Archive. Built as a nostalgic web application, it combines a vintage OS aesthetic with modern data visualization techniques to provide an engaging way to browse Professor Jay Rosen's body of work on journalism, politics, and media criticism.
