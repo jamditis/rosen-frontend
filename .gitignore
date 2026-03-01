@@ -79,3 +79,4 @@ data/social_import/
 # Internal Claude session files
 .claude/phase4-*
 .claude/plan.md
+.claude/settings.local.json

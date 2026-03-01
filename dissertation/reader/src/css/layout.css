@@ -56,19 +56,30 @@ body {
 .reader-header {
   position: sticky;
   top: 0;
-  height: var(--header-height);
+  min-height: var(--header-height);
   background-color: var(--color-bg);
   border-bottom: 1px solid var(--color-border);
   z-index: var(--z-sticky);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  padding-top: max(var(--space-2), env(safe-area-inset-top, 0));
+  padding-left: max(var(--space-3), env(safe-area-inset-left, 0));
+  padding-right: max(var(--space-3), env(safe-area-inset-right, 0));
+}
+
+.reader-header__left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0; /* Allow flex child to shrink */
+  flex: 1;
 }
 
 .reader-header__title {
   font-family: var(--font-heading);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text);
   margin: 0;
@@ -78,15 +89,25 @@ body {
 }
 
 .reader-header__subtitle {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  margin-left: var(--space-2);
+  display: none; /* Hidden on mobile */
 }
 
 .reader-header__actions {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+/* Hide secondary action buttons on mobile - show only Back button */
+.reader-header__actions .btn--secondary {
+  display: none;
+}
+
+.reader-header__actions .btn--secondary[title="Back to dissertation home"] {
+  display: inline-flex;
+  padding: var(--space-2);
+  font-size: var(--font-size-xs);
 }
 
 /* Menu toggle (mobile) */
@@ -94,17 +115,18 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  background: none;
-  border: none;
+  width: 44px;
+  height: 44px;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
   cursor: pointer;
   color: var(--color-text);
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--border-radius-md);
+  flex-shrink: 0;
 }
 
 .menu-toggle:hover {
-  background-color: var(--color-bg-secondary);
+  background-color: var(--color-border);
 }
 
 .menu-toggle:focus {
@@ -449,6 +471,52 @@ body {
 }
 
 /* ========================================
+   SMALL MOBILE (under 375px)
+   ======================================== */
+@media (max-width: 374px) {
+  .reader-header__title {
+    max-width: 120px;
+  }
+
+  .reader-content {
+    padding-left: var(--space-3);
+    padding-right: var(--space-3);
+  }
+
+  .reader-header__actions .btn--secondary[title="Back to dissertation home"] {
+    padding: var(--space-1) var(--space-2);
+  }
+}
+
+/* ========================================
+   TABLET LAYOUT (768px+)
+   ======================================== */
+@media (min-width: 768px) {
+  .reader-header__title {
+    font-size: var(--font-size-sm);
+  }
+
+  .reader-header__subtitle {
+    display: inline; /* Show subtitle on tablet+ */
+  }
+
+  .reader-header__actions {
+    gap: var(--space-2);
+  }
+
+  /* Show more buttons on tablet */
+  .reader-header__actions .btn--secondary[title="Download PDF"],
+  .reader-header__actions .btn--secondary[title="Back to dissertation home"] {
+    display: inline-flex;
+  }
+
+  .reader-header__actions .btn--secondary[title="Back to dissertation home"] {
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-size-sm);
+  }
+}
+
+/* ========================================
    DESKTOP LAYOUT (1024px+)
    ======================================== */
 @media (min-width: 1024px) {
@@ -472,8 +540,17 @@ body {
   }
 
   .reader-content {
-    padding-left: var(--space-8);
-    padding-right: var(--space-8);
+    padding-left: var(--content-padding);
+    padding-right: var(--content-padding);
+  }
+
+  /* Show all header buttons on desktop */
+  .reader-header__actions .btn--secondary {
+    display: inline-flex;
+  }
+
+  .reader-header__title {
+    font-size: var(--font-size-base);
   }
 }
 

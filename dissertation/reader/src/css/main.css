@@ -3,8 +3,8 @@
  * The Impossible Press - Dissertation Reader
  */
 
-@import 'variables.css';
-@import 'typography.css';
-@import 'layout.css';
+@import 'variables.css?v=4';
+@import 'typography.css?v=4';
+@import 'layout.css?v=4';
 
 /* Additional component-specific styles can be added here */

@@ -9,6 +9,7 @@ const DEFAULT_SETTINGS = {
   theme: 'system',       // 'light' | 'dark' | 'system'
   fontSize: 'medium',    // 'small' | 'medium' | 'large'
   lineHeight: 'normal',  // 'compact' | 'normal' | 'relaxed'
+  margin: 'normal',      // 'narrow' | 'normal' | 'wide'
 };
 
 class ReaderSettings {
@@ -71,6 +72,7 @@ class ReaderSettings {
     this.applyTheme();
     this.applyFontSize();
     this.applyLineHeight();
+    this.applyMargin();
   }
 
   /**
@@ -160,6 +162,29 @@ class ReaderSettings {
   }
 
   /**
+   * Apply margin setting
+   */
+  applyMargin() {
+    const html = document.documentElement;
+    html.removeAttribute('data-margin');
+
+    if (this.state.margin !== 'normal') {
+      html.setAttribute('data-margin', this.state.margin);
+    }
+  }
+
+  /**
+   * Set margin/column width
+   * @param {'narrow' | 'normal' | 'wide'} margin
+   */
+  setMargin(margin) {
+    this.state.margin = margin;
+    this.applyMargin();
+    this.save();
+    this.updatePanelUI();
+  }
+
+  /**
    * Setup the settings panel in the DOM
    */
   setupPanel() {
@@ -184,6 +209,13 @@ class ReaderSettings {
     this.panelEl.querySelectorAll('[data-lineheight-option]').forEach(btn => {
       btn.addEventListener('click', () => {
         this.setLineHeight(btn.dataset.lineheightOption);
+      });
+    });
+
+    // Margin/column width options
+    this.panelEl.querySelectorAll('[data-margin-option]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.setMargin(btn.dataset.marginOption);
       });
     });
 
@@ -266,6 +298,11 @@ class ReaderSettings {
     // Update line height buttons
     this.panelEl.querySelectorAll('[data-lineheight-option]').forEach(btn => {
       btn.classList.toggle('is-selected', btn.dataset.lineheightOption === this.state.lineHeight);
+    });
+
+    // Update margin/column width buttons
+    this.panelEl.querySelectorAll('[data-margin-option]').forEach(btn => {
+      btn.classList.toggle('is-selected', btn.dataset.marginOption === this.state.margin);
     });
   }
 }
