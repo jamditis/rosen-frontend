@@ -137,7 +137,7 @@ export const FEATURED_WORKS = [
     title: 'The People Formerly Known as the Audience (2006)',
     description: 'One of Rosen\'s most widely read pieces. A manifesto written from the perspective of the audience, declaring that people once treated as passive consumers of news are now active participants.',
     image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&q=80&w=800',
-    link: 'https://pressthink.org/2006/06/the-people-formerly-known-as-the-audience/',
+    link: 'http://archive.pressthink.org/2006/06/27/ppl_frmr_p.html',
     type: 'Blog Post'
   },
   {

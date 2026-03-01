@@ -1,0 +1,696 @@
+================================================================================
+ENTITY EXTRACTION QUALITY REPORT
+Jay Rosen Internet Archive
+Generated: 2026-02-27
+================================================================================
+
+EXECUTIVE SUMMARY
+-----------------
+This report audits the quality of extracted entities and relationships in
+the Jay Rosen Internet Archive. The extraction covers 5,061 entities and
+5,085 relationships across 571 archive records. Overall data quality is
+good, with zero orphan references, zero malformed IDs, and complete
+coverage of required fields. The main areas for improvement are: entity
+deduplication (82 likely-duplicate person entries, 28+ organization
+duplicates), 78 intra-record duplicate relationships, and 36 self-
+referencing relationships.
+
+FILES REVIEWED
+--------------
+  - data/extracted_entities.csv    (5,061 entity rows + header)
+  - data/extracted_relationships.csv (5,085 relationship rows + header)
+
+EXTRACTION DATES
+----------------
+  2025-10-22: 4,222 relationships (83.0%)
+  2025-10-28:   836 relationships (16.4%)
+  2025-10-29:    26 relationships  (0.5%)
+
+
+================================================================================
+SECTION 1: ENTITY QUALITY
+================================================================================
+
+1.1 ENTITY TYPE DISTRIBUTION
+-----------------------------
+  Person:       2,183 (43.1%)
+  Organization: 1,225 (24.2%)
+  Concept:        650 (12.8%)
+  Work:           585 (11.6%)
+  Event:          220  (4.3%)
+  Location:       198  (3.9%)
+  TOTAL:        5,061
+
+Assessment: Distribution is reasonable for a journalism archive. Persons
+dominate as expected. The Concept count (12.8%) is healthy, reflecting Jay
+Rosen's theoretical contributions. Works at 11.6% capture referenced
+articles, books, and blog posts.
+
+
+1.2 ENTITY COMPLETENESS (MISSING FIELDS)
+-----------------------------------------
+  entity_id:              0 empty (0.0%)   -- PASS
+  entity_type:            0 empty (0.0%)   -- PASS
+  entity_name:            0 empty (0.0%)   -- PASS
+  normalized_name:        0 empty (0.0%)   -- PASS
+  role_or_description: 1,580 empty (31.2%) -- NOTE
+  affiliation:         3,000 empty (59.3%) -- NOTE
+  prominence_score:       0 empty (0.0%)   -- PASS
+  first_mention_record_id: 0 empty (0.0%)  -- PASS
+  total_mentions:         0 empty (0.0%)   -- PASS
+
+Assessment: All required identification fields are 100% complete. The
+role_or_description field is 31.2% empty, which is acceptable for entities
+that are mentioned briefly (many single-mention entities). The affiliation
+field at 59.3% empty is expected -- concepts, locations, events, and many
+works do not have meaningful affiliations.
+
+Additional notes:
+  - All 5,061 entity IDs are unique (no duplicate IDs).
+  - Only 4 entities have normalized_name differing from entity_name.
+  - Zero names have leading/trailing whitespace.
+  - 3 entities have very short names (2 chars): UK, US, UN. These are
+    acceptable abbreviations.
+
+
+1.3 ENTITY ID PREFIX CONSISTENCY
+---------------------------------
+All entity IDs use correct prefixes for their declared type:
+  P = Person, O = Organization, C = Concept,
+  W = Work, E = Event, L = Location
+
+Mismatches: 0 -- PASS
+
+
+1.4 PROMINENCE SCORE DISTRIBUTION
+-----------------------------------
+  Score range: 1 - 10
+  Mean: 5.45
+
+  Score  1:     2  (0.0%)
+  Score  2:   132  (2.6%)
+  Score  3:   628 (12.4%)
+  Score  4:   987 (19.5%)
+  Score  5: 1,029 (20.3%)
+  Score  6:   865 (17.1%)
+  Score  7:   681 (13.5%)
+  Score  8:   371  (7.3%)
+  Score  9:   241  (4.8%)
+  Score 10:   125  (2.5%)
+
+Assessment: Distribution forms a reasonable bell curve centered at 5,
+slightly left-skewed. This is appropriate -- most entities should have
+moderate prominence, with fewer at the extremes.
+
+CONCERN: 125 entities have prominence score 10, but many of these have
+only 1 total mention. A single-mention entity should not typically receive
+the maximum prominence score. Examples of score-10, single-mention entities:
+  - C0086 "Membership (in news)" (1 mention)
+  - C0099 "Wicked Problems" (1 mention)
+  - C0278 "Moral Values" (1 mention)
+  - C0459 "Event Blogging" (1 mention)
+  - E0043 "September 11, 2001 Attacks" (1 mention)
+  - P0072 "Jeff Bezos" (1 mention)
+
+Some of these (e.g., September 11 attacks, Jeff Bezos) are legitimately
+prominent in the broader world even if mentioned only once. However, others
+(Event Blogging, Moral Values) seem overscored for a single mention.
+
+Recommendation: Review all score-10 entities with total_mentions <= 2.
+Consider whether prominence should reflect importance to the archive
+(mention frequency) or importance in the broader world.
+
+
+1.5 TOTAL MENTIONS DISTRIBUTION
+---------------------------------
+  Range: 1 - 377
+  Mean: 1.92
+  Median: 1
+
+  Entities with exactly 1 mention: 4,020 (79.4%)
+
+Top 20 most-mentioned entities:
+  P0005 "Jay Rosen":              377 mentions
+  O0033 "PressThink":             251 mentions
+  O0002 "The New York Times":     190 mentions
+  O0023 "The Washington Post":    146 mentions
+  O0049 "NYU":                     71 mentions
+  O0015 "CNN":                     68 mentions
+  P0014 "George W. Bush":          66 mentions
+  P0010 "Jeff Jarvis":             65 mentions
+  O0419 "CBS News":                55 mentions
+  O0028 "Los Angeles Times":       53 mentions
+  C0004 "View from Nowhere":       47 mentions
+  P0073 "Donald Trump":            43 mentions
+  O0031 "NPR":                     39 mentions
+  O0014 "Fox News":                38 mentions
+  P0128 "Dan Gillmor":             35 mentions
+  P0030 "Bill Keller":             34 mentions
+  O0055 "ABC News":                32 mentions
+  C0102 "Citizen Journalism":      27 mentions
+  O0057 "The Wall Street Journal": 27 mentions
+  P0068 "Howard Kurtz":            27 mentions
+
+Assessment: The long tail is very heavy -- 79.4% of entities appear only
+once. This is common in entity extraction from a large corpus, but it
+means the archive may benefit from a minimum-mention threshold for public
+display (e.g., showing only entities with 2+ mentions in browse views).
+
+Entity coverage: 1,905 entities (37.6%) have NO relationships at all,
+including 55 with prominence score >= 8. These "orphan entities" exist in
+the entity list but are not connected to anything in the relationship
+graph.
+
+
+1.6 DUPLICATE ENTITIES
+------------------------
+
+1.6a. EXACT NAME DUPLICATES (21 cases)
+Most are cross-type duplicates where the same name legitimately represents
+different entity types:
+
+  Legitimate cross-type (keep both):
+    "Iowa" -- Event (Iowa caucus) vs Location
+    "Vietnam" -- Event (Vietnam War) vs Location
+    "White House" -- Location vs Organization
+    "World Economic Forum" -- Event vs Organization
+    "Watergate Scandal" -- Event vs Work
+
+  Ambiguous (review recommended):
+    "Free Press" -- Concept (free press ideal) vs Organization (Free Press advocacy group)
+    "The Nation" -- Concept vs Organization (The Nation magazine)
+    "Open Source" -- Concept vs Organization vs Work (3 entries)
+    "Romenesko" -- Organization (the site) vs Person (Jim Romenesko)
+    "Wonkette" -- Organization (the blog) vs Person (Ana Marie Cox)
+    "Republican Convention" -- Event vs Organization (mistyped)
+
+  Website/org duplicates (should merge):
+    "back-to-iraq.com" -- Organization O0580 vs Work W0087
+    "beatblogging.org" -- Organization O1032 vs Work W0415
+    "Blog for America" -- Organization O0683 vs Work W0585
+    "h2otown.info" -- Organization O0936 vs Work W0407
+    "NewAssignment.net" -- Organization O0456 vs Work W0084
+    "nytimes.com" -- Organization O0698 vs Work W0528
+    "On the Media" -- Organization O0441 vs Work W0253
+    "paidcontent.org" -- Organization O0864 vs Work W0531
+    "tompaine.com" -- Organization O0154 vs Work W0169
+    "2024 election" -- Event E0217 vs Event E0220 (true duplicate)
+
+
+1.6b. LIKELY-SAME PERSON DUPLICATES (82 cases)
+These are entries that almost certainly refer to the same person under
+different name forms (nickname vs. full name, with/without middle initial):
+
+  HIGH PRIORITY (commonly referenced persons):
+    P0008 "Josh Marshall" / P1673 "Joshua Micah Marshall" / P2095 "Joshua Marshall"
+    P0035 "John F. Kerry" / P0480 "John Kerry"
+    P0120 "Norman Ornstein" / P0201 "Norm Ornstein"
+    P0545 "Nicholas Kristof" / P1198 "Nick Kristof" / P1443 "Nicholas D. Kristof"
+    P0514 "Daniel Okrent" / P1007 "Dan Okrent"
+    P0854 "Judy Miller" / P1043 "Judith Miller"
+    P0041 "Al Siegal" / P0568 "Allan M. Siegal" / P1285 "Allan Siegal"
+    P0052 "Malcom Gladwell" / P1668 "Malcolm Gladwell" (spelling error)
+    P0059 "Glenn Reynolds" / P0455 "Glen Reynolds" (spelling error)
+    P0166 "James Carey" / P0572 "James W. Carey"
+    P0226 "David Weinberger" / P0940 "Dave Weinberger"
+    P0489 "Chris Lydon" / P1970 "Christopher Lydon"
+    P0969 "Philip Meyer" / P1552 "Phil Meyer"
+    P1206 "Nicholas Lemann" / P1257 "Nick Lemann"
+
+  REQUIRES VERIFICATION (different middle names/initials):
+    P0014 "George W. Bush" / P1156 "George H.W. Bush" -- DIFFERENT PEOPLE
+    P0039 "Arthur Sulzberger Jr." / P0151 "Arthur Schlesinger, Jr." -- DIFFERENT PEOPLE
+    P0705 "Roger L. Simon" / P1275 "Roger Simon" -- may be different people
+    P0685 "Daniel Glover" / P1362 "Danny Glover" -- likely different (journalist vs actor)
+
+  SPELLING ERRORS in person names:
+    P0052 "Malcom Gladwell" -- should be "Malcolm Gladwell"
+    P0059 "Glenn Reynolds" vs P0455 "Glen Reynolds" -- inconsistent spelling
+    P1069 "Jody Wilgoren" vs P1119 "Jodi Wilgoren" -- inconsistent spelling
+    P1071 "Brit Hume" vs P1076 "Britt Hume" -- inconsistent spelling
+    P1585 "Elizabeth Bumiller" vs P1748 "Elisabeth Bumiller" -- inconsistent spelling
+    P0411 "Jayson Blair" vs P0430 "Jason Blair" -- Note: may be same person
+      (Jayson Blair is the actual name of the NYT fabricator)
+
+  Full list of 82 likely-same pairs available on request.
+
+
+1.6c. ORGANIZATION NEAR-DUPLICATES (28+ cases)
+Organizations appearing under multiple names, typically the website and
+the parent org, or with/without ".com":
+
+  HIGH CONFIDENCE DUPLICATES (should merge):
+    O0033 "PressThink" / O0147 "PressThink.org"
+    O0030 "Salon" / O0383 "Salon.com"
+    O0043 "Wired" / O0413 "Wired.com"
+    O0058 "Politico" / O0785 "Politico.com"
+    O0067 "USA Today" / O0855 "USA Today.com"
+    O0071 "MSNBC" / O0349 "MSNBC.com"
+    O0115 "ProPublica" / O0183 "ProPublica.org"
+    O0249 "ESPN" / O0923 "ESPN.com"
+    O0270 "FactCheck" / O0901 "FactCheck.org"
+    O0272 "PolitiFact" / O0281 "Politifact.com"
+    O0334 "Slashdot.org" / O0818 "Slashdot"
+    O0438 "MediaChannel.org" / O1189 "MediaChannel"
+    O0447 "OffTheBus" / O0751 "OffTheBus.Net"
+    O0452 "Greensboro101" / O0658 "Greensboro101.com"
+    O0535 "Baristanet.net" / O0616 "Baristanet" / O0761 "Baristanet.com"
+    O0538 "Backfence.com" / O0648 "Backfence"
+    O0699 "DailyKos" / O1107 "DailyKos.com"
+    O0752 "Redstate" / O0823 "RedState.com"
+    O0758 "TomDispatch" / O1193 "tomdispatch.com"
+    O0910 "Forbes.com" / O1039 "Forbes"
+
+  RELATED BUT DISTINCT (may be intentional):
+    O0002 "The New York Times" / O0397 "The New York Times Company" /
+    O0534 "New York Times Co." / O0491 "The New York Times Magazine" /
+    O0698 "NYTimes.com" / O0854 "New York Times Digital"
+    O0523 "MeetUp.com" / O1003 "Meetup.org"
+    O0627 "Al Jazerra" / O0646 "Al Jazeera" (spelling error)
+    O0375 "Philadelphia Inquirer" / O0552 "Philly Inquirer" (informal name)
+    O0516 "Encyclopedia Britannica" / O0705 "Encyclopedia Brittanica" (spelling error)
+
+  SPELLING ERRORS in organization names:
+    O0627 "Al Jazerra" -- should be "Al Jazeera" (duplicate of O0646)
+    O0705 "Encyclopedia Brittanica" -- should be "Encyclopedia Britannica" (dup of O0516)
+    O0552 "Philly Inquirer" -- informal; duplicate of O0375 "Philadelphia Inquirer"
+
+
+1.6d. CONCEPT NEAR-DUPLICATES (semantic overlap)
+Several concept entries describe the same or very similar ideas:
+
+    C0014 "Savvy style" / C0405 "Savviness" / C0625 "Savvy Journalism" /
+    C0627 "Savvy Style of Political Journalism"
+
+    C0041 "Horse race journalism" / C0051 "Horse-race journalism" /
+    C0491 "Horserace Coverage" / C0521 "Horse race handicapper"
+
+    C0021 "Journalistic Bias" / C0224 "Bias in the media" /
+    C0563 "Mainstream Media Bias"
+
+    C0028 "Both-sidesism" / C0029 "False Equivalence" /
+    C0030 "Both Sides Journalism" / C0052 "Both-sides journalism"
+
+    C0102 "Citizen Journalism" / C0103 "Open Source Journalism" /
+    C0325 "Open-source journalism" / C0448 "Citizens Journalism"
+
+    C0231 "He Said, She Said Journalism" / C0494 "He said, she said, we said" /
+    C0558 "He said/she said journalism"
+
+    C0022 "Misinformation" / C0025 "Disinformation" /
+    C0629 "Mis- and disinformation"
+
+Note: Some conceptual overlap may be intentional. Jay Rosen distinguishes
+between related but distinct concepts (e.g., "view from nowhere" vs
+"both-sidesism"). However, entries like "Horse race journalism" vs
+"Horse-race journalism" vs "Horserace Coverage" are clearly the same
+concept under different names.
+
+
+1.7 ENTITY TYPE ACCURACY
+--------------------------
+Spot-check results:
+
+  a) Persons flagged as possibly organizations: NONE found.
+     All Person entities have plausible person names. PASS.
+
+  b) Organizations that look like 2-word person names: 308 flagged.
+     On review, these are all legitimate organizations (e.g., "Fox News",
+     "Denver Post", "White House"). The 2-word name pattern is common
+     for media organizations. PASS.
+
+  c) Concepts that might be organizations/works: 11 flagged.
+     "The Nation" (C0390) -- should be Organization (the magazine) or
+       consolidated with O0225. REVIEW.
+     "The Contraption" (C0329) -- a Jay Rosen coinage, legitimate concept.
+     Others appear to be legitimate concepts. MOSTLY PASS.
+
+  d) Works flagged as possibly organizations: 17 website-named Works.
+     These are websites classified as Works rather than Organizations.
+     Examples: W0169 "tompaine.com", W0528 "nytimes.com"
+     Many of these already have Organization counterparts (see section 1.6a).
+     Recommendation: Consolidate website entities into their Organization
+     counterparts.
+
+  e) One entity with a first-name-only entry:
+     P1490 "Mary" (prominence=8, mentions=1) -- insufficient for identification.
+
+
+1.8 JAY ROSEN REPRESENTATION
+------------------------------
+  Entity ID: P0005
+  Name: Jay Rosen
+  Type: Person
+  Prominence score: 6
+  Total mentions: 377
+  Description: Professor, Media Critic
+
+  Relationships as source: 564
+  Relationships as target: 71
+  Total relationships involving Jay: 635 (12.5% of all relationships)
+
+  Relationship type breakdown:
+    Discusses: 253
+    Mentions: 182
+    Affiliated With: 51
+    Criticizes: 51
+    Originated By: 34
+    Cites: 19
+    Published In: 15
+    Founded By: 8
+    Expands On: 7
+    Pioneered: 7
+    Supports: 3
+    Inspired By: 2
+    Others: 3
+
+Assessment: Jay Rosen appears in 12.5% of all relationships, which is
+significant but reasonable given that he is the author/subject of the
+archive. His prominence score of 6 (out of 10) seems deliberately
+moderate, which is appropriate -- as the archive author, his presence is
+implicit and he should not dominate the entity graph.
+
+CONCERN: With 377 mentions, Jay Rosen has nearly double the mentions of
+the next most-mentioned entity (PressThink at 251). If the entity
+explorer is meant to highlight the people/concepts in Rosen's work
+(rather than Rosen himself), consider deprioritizing Jay Rosen in
+browse/explore interfaces or filtering him from default views.
+
+
+================================================================================
+SECTION 2: RELATIONSHIP QUALITY
+================================================================================
+
+2.1 RELATIONSHIP TYPE DISTRIBUTION
+------------------------------------
+  Affiliated With:  1,477 (29.1%)
+  Discusses:        1,474 (29.0%)
+  Mentions:         1,015 (20.0%)
+  Criticizes:         440  (8.7%)
+  Published In:       281  (5.5%)
+  Originated By:      137  (2.7%)
+  Occurred At:         85  (1.7%)
+  Supports:            51  (1.0%)
+  Cites:               50  (1.0%)
+  Expands On:          39  (0.8%)
+  Founded By:          14  (0.3%)
+  Pioneered:            9  (0.2%)
+  Inspired By:          5  (0.1%)
+  Owns:                 4  (0.1%)
+  Owned By:             3  (0.1%)
+
+Assessment: 15 distinct relationship types. The top 3 (Affiliated With,
+Discusses, Mentions) account for 78.0% of all relationships. This
+distribution is reasonable. "Criticizes" at 8.7% reflects the critical
+nature of much journalism commentary.
+
+
+2.2 RELATIONSHIP COMPLETENESS
+-------------------------------
+  All 10 fields are 100% populated across all 5,085 relationships.
+  Zero missing values in any column. PASS.
+
+
+2.3 CONFIDENCE SCORE DISTRIBUTION
+-----------------------------------
+  Score range: 0.5 - 1.0
+  Mean: 0.88
+
+  0.5:     3  (0.1%)
+  0.6:    75  (1.5%)
+  0.7:   667 (13.1%)
+  0.8: 1,189 (23.4%)
+  0.9: 1,490 (29.3%)
+  1.0: 1,660 (32.7%)
+
+Assessment: Confidence scores are generally high, with 85.4% at 0.8 or
+above. Only 78 relationships (1.5%) fall below 0.7. The minimum score is
+0.5 (not 0.0), which suggests a threshold was applied during extraction.
+
+Low-confidence sample (score < 0.7, 78 total):
+  These are mostly reasonable but less certain connections, e.g.:
+  - "Jeff Bezos -> View from Nowhere (Criticizes, 0.6)" -- indirect
+  - "Vaclav Havel -> Aaron Sorkin (Discusses, 0.6)" -- tenuous connection
+  - "Iraq -> George W. Bush (Mentions, 0.6)" -- entity direction questionable
+
+
+2.4 ORPHAN RELATIONSHIPS
+--------------------------
+  Orphan source entity IDs: 0 -- PASS
+  Orphan target entity IDs: 0 -- PASS
+
+  Every entity ID referenced in the relationship table exists in the
+  entity table. Zero broken references.
+
+
+2.5 RECORD ID INTEGRITY
+-------------------------
+  Unique record IDs in entities: 533
+  Unique record IDs in relationships: 571
+  Record IDs in both tables: 533
+  Record IDs only in relationships: 38
+  Malformed record IDs: 0
+
+Assessment: 38 record IDs appear in relationships but not as
+first_mention_record_id for any entity. This is expected -- a record can
+generate relationships between existing entities without introducing new
+entities. All record IDs follow the RECORD-NNNNN format. PASS.
+
+
+2.6 ENTITY NAME CONSISTENCY BETWEEN TABLES
+--------------------------------------------
+Only 2 entity name mismatches found between the entity CSV and
+relationship CSV:
+
+  1. E0029: "2016" in relationships vs "2016 Election" in entities
+  2. E0085: "1992" in relationships vs "1992 Election" in entities
+
+These are minor but should be corrected to maintain data consistency.
+The entity table has the more descriptive (correct) names.
+
+
+2.7 DUPLICATE RELATIONSHIPS
+-----------------------------
+  Total unique source-target pairs: 4,760
+  Pairs appearing more than once: 270
+  Total excess duplicate rows: 324
+
+  Most of these (270 pairs) represent the same entity pair appearing
+  in DIFFERENT records with DIFFERENT relationship types. This is
+  expected and generally acceptable -- Jay Rosen discusses The New York
+  Times in many different articles with different relationship contexts.
+
+  CONCERN: 78 exact duplicates exist where the same source, target,
+  AND record appear more than once with different relationship types.
+
+  Examples of intra-record duplicates:
+    RECORD-00005: Bill Keller -> The New York Times (3x: Affiliated With,
+      Discusses, Criticizes)
+    RECORD-00003: Fox News -> New York City (2x: Occurred At, Mentions)
+    RECORD-00020: Jeff Bezos -> View from Nowhere (2x: Discusses, Criticizes)
+    RECORD-00038: Jay Rosen -> Public Journalism (2x: Discusses, Originated By)
+
+  Assessment: Some of these are arguably valid -- a person can be both
+  "Affiliated With" and "Discusses" an organization in the same article.
+  However, having multiple rows for the same entity pair within one record
+  creates redundancy in the graph. Consider whether these should be
+  consolidated into a single relationship with multiple types.
+
+
+2.8 SELF-REFERENCING RELATIONSHIPS
+------------------------------------
+  Total: 36 relationships where source_entity_id == target_entity_id
+
+  Examples:
+    The Guardian -> The Guardian (Published In)
+    The New York Times -> The New York Times (Published In)
+    View from Nowhere -> View from Nowhere (Discusses)
+    Horse race journalism -> Horse race journalism (Discusses)
+    Firedoglake -> Firedoglake (Mentions)
+
+  Assessment: These are data errors. An entity cannot have a meaningful
+  "Discusses" or "Published In" relationship with itself. These 36
+  relationships should be reviewed and either corrected or removed.
+
+
+2.9 RELATIONSHIP TYPE vs ENTITY TYPE VALIDATION
+-------------------------------------------------
+  "Affiliated With" patterns (1,477 relationships):
+    Person -> Organization:     1,167 (79.0%) -- expected
+    Organization -> Person:       103  (7.0%) -- acceptable
+    Organization -> Organization:  82  (5.6%) -- acceptable
+    Person -> Work:                46  (3.1%) -- acceptable
+    Person -> Person:              32  (2.2%) -- unusual but OK
+    Other patterns:                47  (3.2%)
+    Concept -> Organization:        1  (0.1%) -- unusual
+    Organization -> Concept:        1  (0.1%) -- unusual
+
+  "Occurred At" targets (85 relationships):
+    Location:     71 (83.5%) -- expected
+    Organization:  8  (9.4%) -- UNUSUAL
+    Event:         5  (5.9%) -- UNUSUAL
+    Person:        1  (1.2%) -- ERROR
+
+  The 14 non-Location targets for "Occurred At" should be reviewed.
+  An event "occurring at" an Organization or Person does not make
+  semantic sense and likely indicates misclassification.
+
+
+2.10 CONTEXT SNIPPET QUALITY
+-------------------------------
+  Minimum length: 5 characters
+  Maximum length: 200 characters
+  Mean length: 76 characters
+  Snippets > 500 chars: 0
+  Snippets < 10 chars: 2
+
+Assessment: Context snippets are well-bounded and informative. The 200-
+character maximum suggests a deliberate truncation policy was applied.
+PASS.
+
+
+2.11 RELATIONSHIP QUALITY SAMPLE (20 random relationships)
+------------------------------------------------------------
+Manual review of 20 randomly sampled relationships:
+
+  ACCURATE (18/20):
+    - Geneva Overholser affiliated with The Washington Post -- correct
+    - Jay Rosen discusses View from Nowhere -- correct, with context
+    - Charles Murray affiliated with The Corner -- correct
+    - Jeff Jarvis mentions Eric Foley -- correct, with context
+    - Ken Doctor affiliated with Nieman Lab -- correct
+    - Fox News discusses 2020 election -- correct
+    - Jay Rosen affiliated with The Correspondent -- correct
+    - World Economic Forum occurred at Davos -- correct
+    - Janet Coats affiliated with Tampa Tribune -- correct
+    (and 9 more accurate relationships)
+
+  QUESTIONABLE (2/20):
+    - Crowdsourcing (Concept) -> Twitter (Organization): "Discusses"
+      The direction seems inverted; the article discusses using Twitter
+      for crowdsourcing, not the other way around.
+    - Republican Party -> Arizona: "Discusses"
+      A political party does not "discuss" a location. The relationship
+      direction and type are awkward.
+
+  Estimated accuracy: ~90% based on this sample.
+
+
+2.12 ENTITY AND RECORD COVERAGE
+----------------------------------
+  Total entities: 5,061
+  Entities with at least 1 relationship: 3,156 (62.4%)
+  Entities with no relationships: 1,905 (37.6%)
+
+  Total unique records: 571
+  Relationships per record: min=1, max=28, mean=8.9
+  Records with 1 relationship: 23
+  Records with > 20 relationships: 10
+
+Assessment: 37.6% of entities having no relationships is notable. These
+entities are extracted and stored but not connected in the graph. For
+the Entity Explorer network visualization, only the 3,156 connected
+entities will be useful. The 1,905 disconnected entities could still
+appear in the Entity Browser for search/browse purposes.
+
+
+================================================================================
+SECTION 3: SUMMARY OF ISSUES
+================================================================================
+
+SEVERITY: HIGH (should fix before release)
+-------------------------------------------
+1. 82 likely-duplicate person entries representing ~40-45 unique
+   individuals under multiple name forms. Inflates entity count and
+   fragments the relationship graph. Key examples: Josh Marshall (3
+   entries), Nicholas Kristof (3 entries), Al Siegal (3 entries).
+
+2. 28+ organization near-duplicates where website URLs and org names
+   create separate entries (e.g., "Salon" vs "Salon.com", "PressThink"
+   vs "PressThink.org").
+
+3. 36 self-referencing relationships (entity -> itself). These are
+   data errors and should be removed.
+
+4. 3 spelling errors in prominent entity names:
+   - O0627 "Al Jazerra" (should be "Al Jazeera")
+   - O0705 "Encyclopedia Brittanica" (should be "Encyclopedia Britannica")
+   - P0052 "Malcom Gladwell" (should be "Malcolm Gladwell")
+
+5. 2 entity name mismatches between the entity and relationship tables
+   (E0029 and E0085).
+
+
+SEVERITY: MEDIUM (should address)
+------------------------------------
+6. 78 intra-record duplicate relationships (same source, target, and
+   record with different relationship types). Consider consolidating
+   or documenting as intentional.
+
+7. 14 "Occurred At" relationships pointing to non-Location entities.
+
+8. 1,905 entities (37.6%) with no relationships -- these are
+   disconnected from the graph.
+
+9. Concept deduplication needed: at least 6 concept clusters contain
+   2-4 near-identical entries (e.g., "Horse race journalism" appears
+   as 4 variants).
+
+10. P1490 "Mary" -- a first-name-only person entity with prominence 8
+    and 1 mention. Insufficient for identification.
+
+
+SEVERITY: LOW (nice to fix)
+-----------------------------
+11. 10 website entities exist as both Organization and Work types.
+    Consider standardizing classification.
+
+12. 4,020 entities (79.4%) have only 1 mention. Consider whether these
+    add value to the public-facing archive or add noise.
+
+13. Some prominence score 10 entities have only 1 mention, creating
+    an inconsistency between prominence and actual archive presence.
+
+14. 270 cross-record duplicate source-target pairs (same entities,
+    different records). Not errors per se, but may inflate relationship
+    counts in visualizations.
+
+15. Jay Rosen appears in 12.5% of all relationships. Consider whether
+    he should be de-emphasized in the entity explorer to highlight
+    other entities.
+
+16. "Republican Convention" (E0088 Event vs O1020 Organization) --
+    the Organization entry appears to be a type error.
+
+
+================================================================================
+SECTION 4: RECOMMENDATIONS
+================================================================================
+
+1. DEDUPLICATION PASS: Run entity deduplication targeting the 82 person
+   duplicates and 28 organization duplicates identified. The existing
+   tool at data/social_import/cleanup_extraction_db.py may be adaptable.
+   After merging entities, update all relationship references.
+
+2. REMOVE SELF-REFERENCES: Delete the 36 self-referencing relationships.
+
+3. FIX SPELLING: Correct the 3 identified spelling errors and the 2
+   name mismatches between tables.
+
+4. CONCEPT CONSOLIDATION: Merge the 6 identified concept clusters into
+   canonical forms (e.g., standardize on "horse race journalism").
+
+5. TYPE REVIEW: Review the 14 "Occurred At" non-Location targets and
+   the 10 cross-type website duplicates.
+
+6. PROMINENCE CALIBRATION: Consider recalibrating prominence scores to
+   correlate with mention frequency, or document the scoring methodology.
+
+7. MINIMUM DISPLAY THRESHOLD: For public-facing entity browse/explore
+   views, consider filtering to entities with 2+ mentions or at least
+   1 relationship to reduce noise from the 79.4% single-mention tail.
+
+
+================================================================================
+END OF REPORT
+================================================================================

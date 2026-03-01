@@ -1,0 +1,508 @@
+================================================================================
+Social Post Data Quality Report
+Jay Rosen Internet Archive
+================================================================================
+Generated: 2026-02-27
+Source file: data/social_posts.csv
+Total rows: 29,132
+Platforms: Twitter/X (26,116), Bluesky (3,016)
+================================================================================
+
+TABLE OF CONTENTS
+  1. Executive summary
+  2. Posts with no thematic categories (8,945)
+  3. Posts with very short content (2,114)
+  4. Generic title filtering
+  5. Repost filtering (1,717)
+  6. Category distribution analysis
+  7. Platform-specific checks
+  8. Additional data quality findings
+  9. Recommendations
+
+================================================================================
+1. EXECUTIVE SUMMARY
+================================================================================
+
+The social_posts.csv contains 29,132 social media posts. The export script
+(data/export-archive-data.js) applies multiple filtering passes before these
+reach the public archive. After filtering (reposts, short replies, thread
+consolidation, and quality gates), approximately 25,288 posts survive -- though
+thread consolidation in the actual export would reduce this further.
+
+Key findings:
+
+  GOOD:
+  - Zero duplicate IDs or duplicate URLs
+  - Zero posts missing publication dates
+  - All 1,434 non-Rosen Twitter posts are reposts and ARE correctly filtered out
+  - All 571 "Tweet by" and 4 "Post by" generic titles ARE correctly filtered out
+    (all have short content that trips the short-reply filter)
+  - Repost filtering correctly catches all 1,717 "Quoted by" posts
+
+  CONCERNS:
+  - 8,945 posts (30.7%) have no thematic categories, concentrated in 2022 (100%
+    uncategorized) and 2023 (89% uncategorized)
+  - 54 Bluesky posts by non-Rosen authors survive all filters and will appear
+    in the public archive attributed to other people
+  - Category taxonomy is extremely narrow (only 6 categories) with "Press &
+    Media Criticism" appearing in 95.6% of all categorized posts
+  - Only 448 posts (1.5%) have key_concepts populated
+  - 4 Bluesky posts have completely empty raw_text
+
+================================================================================
+2. POSTS WITH NO THEMATIC CATEGORIES (8,945 posts, 30.7%)
+================================================================================
+
+Platform breakdown:
+  Twitter/X:  8,941 (99.96%)
+  Bluesky:        4 (0.04%)
+
+Nearly all uncategorized posts are on Twitter/X. This is not random -- it is
+concentrated by year:
+
+  Year   Categorized / Total   Coverage
+  ----   -------------------   --------
+  2019   4,156 / 4,157         100%
+  2020   8,981 / 9,019         100%
+  2021   2,238 / 3,883          58%
+  2022       0 / 3,832           0%    <-- ZERO categories assigned
+  2023     417 / 3,830          11%
+  2024   2,529 / 2,541         100%
+  2025   1,857 / 1,861         100%
+
+FINDING: 2022 is a complete gap. All 3,832 posts from 2022 have zero
+categories. 2021 has 42% missing and 2023 has 89% missing. This looks like
+a batch processing gap where the categorization pipeline skipped or failed for
+these date ranges.
+
+CAN CATEGORIES BE INFERRED FROM CONTENT?
+
+Of the 8,945 uncategorized posts, 8,941 have raw_text available. Using keyword
+matching against the existing 6-category taxonomy:
+
+  Could infer from keywords:     5,078 (56.8%)
+  No keyword match:              3,863 (43.2%)
+
+Inferable category distribution:
+  Press & Media Criticism:           2,835
+  Technology & Digital Media:        2,451
+  Politics & Democracy:              1,592
+  Audience & Public Engagement:        823
+  Journalism Theory & Practice:        545
+  Journalism Education:                396
+
+The "no keyword match" posts (3,863) are largely:
+  - Short conversational replies (e.g., "@username thanks, tanya.")
+  - Posts with only @mentions and URLs stripped of context
+  - Personal or off-topic posts that may not fit existing categories
+
+RECOMMENDATION: The 5,078 inferable posts could be backfilled with categories
+using keyword matching as a baseline, then refined with AI classification. The
+2022 gap is the most urgent -- 3,832 public-facing posts with zero topic
+metadata is a significant gap in the archive's browsability.
+
+================================================================================
+3. POSTS WITH VERY SHORT CONTENT (2,114 posts)
+================================================================================
+
+Posts with fewer than 10 characters after stripping URLs and @mentions:
+
+  Classification            Count    Percentage
+  ----------------------   ------   ----------
+  Empty after stripping       374       17.7%
+  Emoji only                  651       30.8%
+  Affirmation words           620       29.3%
+  Other short                 469       22.2%
+  TOTAL                     2,114      100.0%
+
+Platform distribution:
+  Twitter/X:  1,880 / 26,116  (7.2%)
+  Bluesky:      234 / 3,016   (7.8%)
+
+EMPTY AFTER STRIPPING (374 posts):
+  These are posts that consist entirely of URLs and/or @mentions. After
+  stripping, nothing remains.
+  Examples:
+    BSKY-00262: empty raw_text, title "Post by Jay Rosen"
+    BSKY-03011: raw_text is just "https://blueskyweb.xyz/reports/2023-07-22-letter"
+
+EMOJI ONLY (651 posts):
+  The vast majority are the sunglasses emoji. Examples:
+    BSKY-00001: raw_text is just a sunglasses emoji
+    BSKY-00006: same
+    BSKY-00054: same
+  Jay Rosen appears to frequently reply with a sunglasses emoji as
+  acknowledgment.
+
+AFFIRMATION WORDS (620 posts):
+  Common patterns: "Yes.", "Thanks.", "Exactly.", "Agreed.", "Yep.",
+  "Thanks!", "Nope.", "Right.", "Sure.", "Absolutely."
+  These are all replies ("Reply by Jay Rosen" titles).
+
+OTHER SHORT (469 posts):
+  Short but not purely affirmative: "How so?", "Me too.", "Noted.",
+  "Will do.", "Say more.", "Smiles", "2009", single letters like "A"
+
+FILTERING STATUS: All 2,114 of these posts have generic titles ("Reply by",
+"Tweet by", "Post by") and the export script's short-reply filter removes ALL
+of them. None of these appear in the public archive. The filtering is working
+correctly for this class of posts.
+
+RECOMMENDATION: While filtering handles visibility, these 2,114 rows still
+occupy 7.3% of the CSV. Consider whether they should remain in the source data
+or be moved to a separate "low-signal" file to reduce processing overhead and
+clarify the canonical dataset.
+
+================================================================================
+4. GENERIC TITLE FILTERING
+================================================================================
+
+The export script uses two regex patterns:
+  REPOST_TITLE_PATTERN = /^(Quoted|Retweet|RT) by/i
+  GENERIC_TITLE_PATTERN = /^(Reply|Tweet|Post|Quote) by/i
+
+Generic title counts in source CSV:
+  "Quoted by":   1,717  (handled by REPOST pattern -- removed entirely)
+  "Reply by":    1,551  (handled by GENERIC pattern -- removed if short)
+  "Tweet by":      571  (handled by GENERIC pattern -- removed if short)
+  "Post by":         4  (handled by GENERIC pattern -- removed if short)
+  "Quote by":        1  (handled by GENERIC pattern -- removed if short)
+  TOTAL:         3,844
+
+FILTERING RESULTS:
+  - All 1,717 "Quoted by" reposts: removed by REPOST filter
+  - All 2,127 "Reply/Tweet/Post/Quote by" posts with short content: removed
+  - Posts with generic titles but substantive content (>=10 chars): 0
+
+FINDING: Zero generic-titled posts survive both filters. This is because every
+post with a "Reply by", "Tweet by", "Post by", or "Quote by" title also has
+short content (<10 chars after URL/mention/emoji stripping). The filtering is
+comprehensive and sound.
+
+EDGE CASE CHECKED: The "Quote by" pattern (1 post) is distinct from "Quoted by"
+(1,717 posts). "Quoted by" is a repost. "Quote by" is caught by the generic
+title pattern. Both are filtered, but through different code paths. This is
+correct behavior.
+
+================================================================================
+5. REPOST FILTERING (1,717 posts)
+================================================================================
+
+All 1,717 reposts match the pattern "Quoted by [Author Name]" and are
+exclusively from the Twitter/X platform.
+
+Author distribution of reposts (top 10):
+  Brian Stelter:                      59
+  Dan Froomkin (PressWatchers.org):   28
+  Greg Sargent:                       26
+  Oliver Darcy:                       23
+  Maggie Haberman:                    17
+  Aaron Rupar:                        14
+  ErikWemple:                         13
+  Daniel Dale:                        13
+  Mark Lukasiewicz:                   12
+  (and 300+ other authors)
+
+FILTERING STATUS: All 1,717 are removed by the REPOST_TITLE_PATTERN. None
+reach the public archive.
+
+NOTABLE: 64.2% of reposts (1,102 / 1,717) have thematic categories assigned.
+This means categories were applied to content not authored by Jay Rosen. This
+is not harmful since reposts are filtered before export, but it does indicate
+the categorization pipeline ran on reposts without distinguishing them from
+original content.
+
+RECOMMENDATION: No action needed. The repost filter is working correctly.
+The only minor concern is that the repost pattern only checks the title, not
+a dedicated "is_repost" field. If a repost were titled differently (e.g., by
+a future import), it would slip through. Consider adding a structural
+is_repost flag in the CSV.
+
+================================================================================
+6. CATEGORY DISTRIBUTION ANALYSIS
+================================================================================
+
+The taxonomy uses exactly 6 categories:
+
+  Category                          Count    % of Categorized
+  -------------------------------- ------   ----------------
+  Press & Media Criticism           19,305       95.6%
+  Journalism Theory & Practice       7,662       38.0%
+  Politics & Democracy               7,188       35.6%
+  Audience & Public Engagement       3,716       18.4%
+  Technology & Digital Media         2,151       10.7%
+  Journalism Education                 312        1.5%
+
+Posts with categories: 20,187 / 29,132 (69.3%)
+
+CATEGORY CO-OCCURRENCE:
+  99.8% of categorized posts have exactly 2 categories (20,147 posts).
+  Only 40 posts (0.2%) have a single category.
+
+  Most common combinations:
+    Press & Media Criticism + Journalism Theory & Practice:        7,232
+    Press & Media Criticism + Politics & Democracy:                7,081
+    Press & Media Criticism + Audience & Public Engagement:        3,045
+    Press & Media Criticism + Technology & Digital Media:          1,811
+    Audience & Public Engagement + Journalism Theory & Practice:     264
+    Audience & Public Engagement + Technology & Digital Media:       252
+
+FINDING: "Press & Media Criticism" appears in 95.6% of all categorized posts.
+This is so dominant that it provides almost no discriminatory value as a filter.
+Every post is effectively tagged with it, making it more of a global label than
+a useful category.
+
+FINDING: Nearly all posts have exactly 2 categories. This rigid structure
+(always one primary + Press & Media Criticism) suggests the categorization was
+done programmatically with a fixed rule: assign "Press & Media Criticism" plus
+one other category. This reduces the value of multi-category filtering.
+
+FINDING: "Journalism Education" is severely underrepresented at 1.5%. Given
+that Jay Rosen is a professor who frequently discusses teaching, this suggests
+the categorization pipeline may not adequately detect education-related content.
+
+RECOMMENDATION:
+  - Consider whether "Press & Media Criticism" should be treated as an implicit
+    global tag rather than a filter category. Removing it from the category
+    system would make the remaining 5 categories more meaningful for browsing.
+  - Consider expanding the taxonomy with more specific categories (e.g.,
+    "Election Coverage", "Trump/Media Dynamics", "Platform Criticism").
+  - Investigate whether the 2-category-per-post pattern is a pipeline
+    artifact or intentional.
+
+================================================================================
+7. PLATFORM-SPECIFIC CHECKS
+================================================================================
+
+--- TWITTER/X (26,116 posts) ---
+
+Author analysis:
+  Jay Rosen:     24,682 (94.5%)
+  Non-Rosen:      1,434 (5.5%)
+
+All 1,434 non-Rosen Twitter posts have "Quoted by [Author]" titles and are
+correctly filtered out by the repost pattern. Zero non-Rosen Twitter posts
+survive to the public archive.
+
+Content completeness:
+  Posts without raw_text: 0 (all have content)
+  Posts without URLs: 0
+
+Date range: Full coverage of Twitter era.
+
+FINDING: Twitter data is clean. Author attribution is accurate. All non-Rosen
+content is properly handled.
+
+--- BLUESKY (3,016 posts) ---
+
+Author analysis:
+  Jay Rosen:    2,961 (98.2%)
+  Non-Rosen:       55 (1.8%)
+
+Date range: 2023-05-15 to 2025-10-30
+
+Content completeness:
+  Posts without raw_text:    4  (BSKY-00262, BSKY-00719, BSKY-00873, BSKY-01381)
+  Posts without URLs:        0
+  Posts with responds_to: 2,078 / 3,016 (68.9% are replies)
+
+NON-ROSEN BLUESKY POSTS -- CRITICAL ISSUE:
+
+55 Bluesky posts are attributed to authors other than Jay Rosen. Unlike
+Twitter, these are NOT reposts -- they have substantive titles derived from
+their content. 54 of these 55 survive all export filters and will appear in
+the public archive.
+
+The 1 filtered non-Rosen Bluesky post is:
+  BSKY-01381 by "Coach Finstock" -- title "Quote by Coach Finstock" (empty
+  raw_text, caught by generic title + short content filter)
+
+The 54 surviving non-Rosen Bluesky posts include content by:
+  Josh Marshall (3), Brendan Nyhan (3), Brian Stelter (2), Marisa Kabas (2),
+  Mike Masnick (2), Tiger Elephant Giraffe Hat (2), Perry Bacon (1),
+  Kate Starbird (1), Brian Klaas (1), Karen Attiah (1), Ben Mullin (1),
+  Seth Cotlar (1), Ana Marie Cox (1), Dave Weigel (1), Brandy Zadrozny (1),
+  Philip Gourevitch (1), Mark Jacob (1), Pauline Stafford (1), Kevin Elliott (1),
+  and others.
+
+These appear to be posts by other people that Jay Rosen quoted, replied to, or
+otherwise interacted with -- but they are stored with the other author's name
+and content rather than as Jay Rosen's interaction.
+
+IMPACT: In the public archive, these will appear as standalone posts by other
+journalists, which is confusing in a "Jay Rosen Archive." A user browsing the
+archive will see "Perry Bacon" and "Karen Attiah" posts with no context about
+why they appear in Rosen's archive.
+
+RECOMMENDATION: These 55 posts should either be:
+  (a) Filtered out by adding a non-Rosen author check to the export script
+  (b) Re-attributed as "Quoted by [Author]" to match the Twitter convention
+      and let the repost filter handle them
+  (c) Kept but flagged with context ("Jay Rosen interacted with this post")
+
+================================================================================
+8. ADDITIONAL DATA QUALITY FINDINGS
+================================================================================
+
+DATA INTEGRITY:
+  - Duplicate IDs: 0 (clean)
+  - Duplicate URLs: 0 (clean)
+  - Missing publication_date: 0 (clean)
+  - Missing raw_text: 4 (all Bluesky, minimal impact)
+
+KEY CONCEPTS FIELD:
+  Posts with key_concepts: 448 / 29,132 (1.5%)
+  This field is nearly empty. When populated, it contains Rosen-specific
+  terminology:
+    The Citizens Agenda:              96
+    Horse-race journalism:            86
+    False balance:                    45
+    Not the odds but the stakes:      42
+    View from Nowhere:                41
+    He said/she said journalism:      32
+    People Formerly Known as Audience: 11
+    Verification in reverse:          10
+
+  FINDING: key_concepts is a high-value field that maps directly to Rosen's
+  signature ideas, but coverage at 1.5% is far too low. This field could
+  significantly enhance the archive's intellectual navigation if backfilled.
+
+TAGS FIELD:
+  Posts with tags: 20,218 / 29,132 (69.4%)
+  Much better coverage than key_concepts.
+
+ENGAGEMENT METRICS:
+  Likes: max=294,295, median=6, mean=441.9
+  Posts with 0 likes:    4,476 (15.4%)
+  Posts with 100+ likes: 6,237 (21.4%)
+  Posts with 1000+ likes: 1,365 (4.7%)
+
+  The engagement data is present and appears reliable. The max of 294K likes
+  is plausible for a viral Rosen tweet.
+
+WORD COUNT:
+  Min: 0, Max: 2,418, Median: 20
+  Posts with 0 words:     4
+  Posts with 1-5 words: 4,781 (16.4%)
+  Posts with 50+ words: 2,041 (7.0%)
+  Posts with 100+ words:    5 (0.02%)
+
+  Social posts are naturally short. The 4,781 posts with 1-5 words overlap
+  significantly with the short-content findings in Section 3.
+
+================================================================================
+9. RECOMMENDATIONS (prioritized)
+================================================================================
+
+PRIORITY 1 -- Data gaps requiring action before public release:
+
+  (a) BACKFILL 2022 CATEGORIES: All 3,832 posts from 2022 have zero
+      categories. This is a batch processing gap. Run the categorization
+      pipeline on the 2021-2023 date range to fill this gap. Estimated
+      impact: reduces uncategorized posts from 30.7% to approximately 17%.
+
+  (b) FILTER NON-ROSEN BLUESKY POSTS: 54 posts by other authors will appear
+      in the public archive. Add an author check to the export script:
+        if (record.author !== 'Jay Rosen' && !record.id.startsWith('THREAD-'))
+          return false;
+      Or re-title them as "Quoted by [Author]" to let existing repost
+      filtering handle them.
+
+PRIORITY 2 -- Quality improvements:
+
+  (c) KEYWORD-BASED CATEGORY INFERENCE: 5,078 uncategorized posts can have
+      categories inferred from content keywords. This is a quick win using
+      simple text matching before investing in AI classification.
+
+  (d) BACKFILL KEY_CONCEPTS: At 1.5% coverage, this high-value field is
+      nearly unused. A targeted pass using Rosen's known concepts as search
+      terms could populate this for thousands of posts.
+
+  (e) RECONSIDER "PRESS & MEDIA CRITICISM" DOMINANCE: At 95.6% coverage,
+      this category provides almost no filtering value. Consider making it
+      implicit and expanding the taxonomy.
+
+PRIORITY 3 -- Structural improvements (non-blocking):
+
+  (f) ADD is_repost FLAG: The current repost detection relies on title
+      patterns. A structural boolean field would be more robust.
+
+  (g) MOVE LOW-SIGNAL POSTS: The 2,114 emoji/affirmation/empty posts are
+      correctly filtered from the public archive but still add processing
+      overhead. Consider a separate table or CSV.
+
+  (h) INVESTIGATE 2-CATEGORY PATTERN: The rigid 2-categories-per-post
+      structure (99.8% of categorized posts) suggests a pipeline artifact.
+      Verify this is intentional.
+
+================================================================================
+APPENDIX A: FILTERING PIPELINE SUMMARY
+================================================================================
+
+The export script (data/export-archive-data.js) applies these filters
+sequentially:
+
+  Step 1: Thread consolidation
+    - Bluesky threads (3+ posts with responds_to chains) are consolidated
+      into single THREAD records
+    - Individual thread member posts are removed from the social feed
+    - Existing THREAD records from archive_records-public.csv are preserved
+
+  Step 2: Repost removal (REPOST_TITLE_PATTERN)
+    - Pattern: /^(Quoted|Retweet|RT) by/i
+    - Removes: 1,717 posts (all Twitter/X)
+    - Result: Correct. All are non-Rosen content.
+
+  Step 3: Short reply removal (GENERIC_TITLE_PATTERN + content check)
+    - Pattern: /^(Reply|Tweet|Post|Quote) by/i
+    - Then checks: content < 10 chars after stripping URLs, @mentions, emoji
+    - Removes: 2,127 posts
+    - Result: Correct. Catches all 571 "Tweet by" and 1,551 "Reply by" etc.
+
+  Step 4: Final quality gate
+    - Removes unverified records (social posts are auto-verified, so N/A)
+    - Removes titles < 5 chars or "Untitled"
+    - Removes records with no date AND no URL
+    - Removes: 0 additional social posts
+
+  Net result: ~25,288 social posts survive (before thread consolidation).
+
+  GAP IN FILTERING: No author check. 54 non-Rosen Bluesky posts pass through.
+
+================================================================================
+APPENDIX B: YEAR-BY-YEAR OVERVIEW
+================================================================================
+
+  Year    Total Posts   Categorized   Coverage   Platform
+  ------  ----------   -----------   --------   --------
+  2019     4,157        4,156         100%       Twitter/X
+  2020     9,019        8,981         100%       Twitter/X
+  2021     3,883        2,238          58%       Twitter/X
+  2022     3,832            0           0%       Twitter/X
+  2023     3,830          417          11%       Twitter/X + Bluesky
+  2024     2,541        2,529         100%       Twitter/X + Bluesky
+  2025     1,861        1,857         100%       Bluesky
+
+  Note: 2023 is the transition year when Bluesky posts begin (May 2023).
+
+================================================================================
+APPENDIX C: COMPLETE CATEGORY TAXONOMY
+================================================================================
+
+  Category                         Count    Pairings
+  -------------------------------- ------   ---------------------------------
+  Press & Media Criticism          19,305   Paired with every other category
+  Journalism Theory & Practice      7,662   Mostly paired with PMC
+  Politics & Democracy              7,188   Mostly paired with PMC
+  Audience & Public Engagement      3,716   Mostly paired with PMC
+  Technology & Digital Media        2,151   Mostly paired with PMC
+  Journalism Education                312   Mostly paired with PMC or JTP
+
+  Top 3 pairings:
+    PMC + Journalism Theory:          7,232 (35.8% of categorized posts)
+    PMC + Politics & Democracy:       7,081 (35.1%)
+    PMC + Audience & Public Eng.:     3,045 (15.1%)
+
+================================================================================
+END OF REPORT
+================================================================================
