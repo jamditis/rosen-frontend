@@ -82,9 +82,20 @@ Note: CLAUDE.md already documents 6 records with no recoverable URL: RECORD-0066
 
 ---
 
-## Iterations 6-10 — Social posts categorization (2026-03-01)
+## Iterations 6-10 — Social posts categorization + entity dedup (2026-03-01) ✓
 
-*Planned: keyword-based categorization for 8,941 uncategorized Twitter/X posts*
+- Categorized all 8,941 uncategorized Twitter/X posts via keyword matching
+  - Press & Media Criticism: 7,102 (79.4%) — Jay Rosen's dominant topic
+  - Politics & Democracy: 1,370 (15.3%)
+  - Journalism Theory & Practice: 937 (10.5%)
+  - Technology & Digital Media: 619 (6.9%)
+  - Audience & Public Engagement: 564 (6.3%)
+  - Journalism Education: 256 (2.9%)
+- 4 Bluesky posts remain uncategorized (empty raw_text, unrecoverable)
+- Removed 2 duplicate entities: Malcolm Gladwell (P0052) and Encyclopedia Britannica (O0705)
+- Relationship references updated to kept entity IDs
+- Entities: 5,055 → 5,053 | Relationships: 5,048 (unchanged)
+- Re-exported JSON, 54/54 data tests pass, ftp-upload synced
 
 ---
 

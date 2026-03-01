@@ -79,7 +79,7 @@ RECORD-00005_REL_018,RECORD-00005,W0008,Does the New York Times Have a Learning 
 RECORD-00005_REL_019,RECORD-00005,P0030,Bill Keller,Mentions,P0049,Charlie Rose,"whether you are a reader in Chelsea, a reporter for Salon, or Charlie Rose",0.7,2025-10-22
 RECORD-00006_REL_004,RECORD-00006,P0001,Eric Nelson,Mentions,P0050,Jose Canseco,Think Jose Canseco...,1.0,2025-10-22
 RECORD-00006_REL_005,RECORD-00006,P0001,Eric Nelson,Mentions,P0051,Jon Stewart,...Jon Stewart...,1.0,2025-10-22
-RECORD-00006_REL_006,RECORD-00006,P0001,Eric Nelson,Mentions,P0052,Malcom Gladwell,...and Malcom Gladwell.,1.0,2025-10-22
+RECORD-00006_REL_006,RECORD-00006,P0001,Eric Nelson,Mentions,P1668,Malcom Gladwell,...and Malcom Gladwell.,1.0,2025-10-22
 RECORD-00006_REL_027,RECORD-00006,P0012,Mark Glaser,Mentions,O0011,About.com,"Mark Glaser... explains why NYT spent $410 million to buy site. How About.com trains and uses its “guides,”...",1.0,2025-10-22
 RECORD-00006_REL_028,RECORD-00006,P0012,Mark Glaser,Mentions,O0002,The New York Times,"explains why NYT spent $410 million to buy site. How About.com trains and uses its “guides,”...",1.0,2025-10-22
 RECORD-00006_REL_030,RECORD-00006,P0013,Len Apcar,Mentions,O0011,About.com,Len Apcar...said he is “ecstatic we bought About.com because it says the New York Times is not a newspaper company.”,1.0,2025-10-22
@@ -2301,7 +2301,7 @@ RECORD-00271_REL_010,RECORD-00271,P0488,Karl Rove,Affiliated With,O0029,Newsweek
 RECORD-00272_REL_001,RECORD-00272,P1161,Rick Kaplan,Affiliated With,O0071,MSNBC,"Rick Kaplan, head of MSNBC",1.0,2025-10-22
 RECORD-00272_REL_002,RECORD-00272,P1161,Rick Kaplan,Discusses,C0048,Civic Journalism,Kaplan's thinking related to civic journalists in the 1990s,0.7,2025-10-22
 RECORD-00272_REL_005,RECORD-00272,P0842,Jimmy Wales,Criticizes,O0002,The New York Times,Wales says that the business model of The New York Times is not sustainable,0.8,2025-10-22
-RECORD-00272_REL_006,RECORD-00272,O0515,Wikipedia,Discusses,O0705,Encyclopedia Brittanica,Wikipedia is kicking its butt without having a single employee,0.7,2025-10-22
+RECORD-00272_REL_006,RECORD-00272,O0515,Wikipedia,Discusses,O0516,Encyclopedia Brittanica,Wikipedia is kicking its butt without having a single employee,0.7,2025-10-22
 RECORD-00272_REL_007,RECORD-00272,P0147,Jill Abramson,Affiliated With,O0002,The New York Times,Jill Abramson of The New York Times,1.0,2025-10-22
 RECORD-00272_REL_008,RECORD-00272,P0796,John Hinderaker,Affiliated With,O0612,Powerline,John Hinderaker of Powerline,1.0,2025-10-22
 RECORD-00272_REL_010,RECORD-00272,W0296,Bloggers vs. Journalists is Over,Published In,P0005,Jay Rosen,"Bloggers vs. Journalists is Over (Jan. 15, 2004, rev. Jan. 21.)",0.9,2025-10-22
