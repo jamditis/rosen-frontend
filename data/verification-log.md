@@ -99,15 +99,29 @@ Note: CLAUDE.md already documents 6 records with no recoverable URL: RECORD-0066
 
 ---
 
-## Iterations 11-15 — Social posts URL + content audit (2026-03-01)
+## Iterations 11-15 — Social posts URL + content audit (2026-03-01) ✓
 
-*Planned*
+- URL liveness: 154 URLs sampled (53 Twitter/X + 101 Bluesky) — 100% alive
+- Social post datetime format: ALL posts store full datetime — intentional; export
+  script strips to YYYY-MM-DD via .toISOString().split('T')[0]; no fix needed
+- Removed TWTR-10010 (author="Name cannot be blank") and TWTR-08286 ("Quoted by Joe Amditis")
+- Content completeness: 99.99% of posts have raw_text and excerpt; 4 unrecoverable (empty content)
+- Era field: perfect — all 29,132 posts correctly set to "Post-Trump & Future of News (2022-Present)"
+- Engagement data: 90.1% of posts have engagement data; top post: 294,295 likes (TWTR-06651)
+- Social posts: 29,132 → 29,130 after cleanup; 54/54 data tests pass
 
 ---
 
-## Iterations 16-20 — Entities deep audit (2026-03-01)
+## Iterations 16-20 — Entities deep audit (2026-03-01) ✓
 
-*Planned*
+- Merged 7 additional entity duplicates:
+  - "Dan Gillmore" → "Dan Gillmor" (spelling fix)
+  - "Fox News Channel" → "Fox News"
+  - 4 NYT subsidiary variants → "The New York Times" (16 relationships redirected)
+  - "The Washington Post Company" → "The Washington Post"
+- 31 relationships redirected, entity count: 5,053 → 5,046
+- 21 additional near-duplicates flagged for human review (conflicting type classifications,
+  organizational variants, blog/domain disambiguation) — see data/ENTITY_AUDIT_REPORT.md
 
 ---
 
