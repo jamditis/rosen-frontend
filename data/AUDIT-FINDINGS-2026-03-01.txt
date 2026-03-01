@@ -1,0 +1,233 @@
+AUDIT SUMMARY: Jay Rosen Internet Archive Data Quality
+Generated: 2026-03-01
+========================================================================
+
+TASK 1: FIX 4 BLUESKY POSTS WITH MISSING THEMATIC_CATEGORIES
+========================================================================
+
+FINDINGS:
+  - Located 4 Bluesky posts (BSKY-00262, BSKY-00719, BSKY-00873, BSKY-01381)
+  - ALL 4 have completely EMPTY raw_text fields
+  - Cannot infer categories without content
+
+POSTS IDENTIFIED:
+  1. BSKY-00262: "Post by Jay Rosen" - empty raw_text, empty excerpt
+  2. BSKY-00719: "Reply by Jay Rosen" - empty raw_text, empty excerpt
+  3. BSKY-00873: "Reply by Jay Rosen" - empty raw_text, empty excerpt
+  4. BSKY-01381: "Quote by Coach Finstock" - empty raw_text, empty excerpt
+     (Note: This one is by a non-Rosen author)
+
+ACTION TAKEN:
+  ✗ Cannot assign categories - no content to analyze
+  ✓ Documented limitation in this report
+  ✓ Identified as data integrity issue (same as quality report finding)
+
+IMPACT:
+  - 4 posts = 0.04% of Bluesky records (minimal)
+  - These posts are effectively invisible (empty content)
+  - Already flagged as quality issue in social-quality-report.txt (line 305)
+
+RECOMMENDATION:
+  - Option A: Remove from CSV (no value, takes up space)
+  - Option B: Recover raw_text from original Bluesky URLs
+  - Option C: Leave blank - filtering logic will exclude them from public archive
+
+STATUS: CANNOT FIX (missing source data)
+
+
+TASK 2: SOCIAL QUALITY REPORT SUMMARY
+========================================================================
+
+KEY FINDINGS:
+
+GOOD:
+  ✓ Zero duplicate IDs or URLs
+  ✓ Zero missing publication dates
+  ✓ All 1,434 non-Rosen Twitter posts correctly filtered as reposts
+  ✓ All 2,114 short-reply posts correctly filtered by export script
+  ✓ Repost filtering working perfectly (1,717 "Quoted by" posts removed)
+
+CONCERNS:
+  ✗ 8,945 posts (30.7%) have no thematic_categories
+     - Concentrated in 2022 (100% uncategorized) and 2023 (89% uncategorized)
+     - Indicates batch processing gap in categorization pipeline
+     - 56.8% could be inferred from content keywords (5,078 posts)
+     - Twitter/X: 8,941 missing categories
+     - Bluesky: 4 missing categories (THIS TASK - cannot fix due to empty content)
+
+  ✗ 54 non-Rosen Bluesky posts survive all filters
+     - These will appear in public archive attributed to other authors
+     - By: Josh Marshall, Brendan Nyhan, Brian Stelter, Kate Starbird, etc.
+     - Creates confusion in a "Jay Rosen Archive"
+     - Recommendation: Add author check to export script
+
+  ✗ Category taxonomy is extremely narrow
+     - Only 6 categories total
+     - "Press & Media Criticism" in 95.6% of all categorized posts
+     - Provides almost no discriminatory value as a filter
+     - Suggests a fixed pipeline rule: always assign "Press & Media Criticism"
+     - "Journalism Education" severely underrepresented at 1.5%
+
+  ✗ 2,114 posts with very short content (emoji, affirmations, URLs only)
+     - All correctly filtered from public archive by export script
+     - Still occupy 7.3% of CSV - consider separate "low-signal" file
+
+ACTIONABLE ISSUES:
+
+Priority 1 (must fix before public release):
+  [a] BACKFILL 2022 CATEGORIES
+      All 3,832 posts from 2022 have zero categories - batch processing gap
+      Estimated impact: reduce uncategorized from 30.7% to ~17%
+
+  [b] FILTER NON-ROSEN BLUESKY POSTS
+      Add author check to export script to prevent 54 non-Rosen posts
+      from appearing in public archive
+
+Priority 2 (quality improvements):
+  [c] KEYWORD-BASED CATEGORY INFERENCE
+      5,078 uncategorized posts can be auto-tagged from content
+      Quick win before investing in AI classification
+
+  [d] BACKFILL KEY_CONCEPTS FIELD
+      Only 1.5% populated - high-value field for archive navigation
+      Maps to Rosen's signature ideas (Citizens Agenda, False Balance, etc.)
+
+  [e] RECONSIDER "PRESS & MEDIA CRITICISM" DOMINANCE
+      At 95.6%, makes it a global label not a useful filter
+      Consider removing from category system
+
+Priority 3 (structural improvements):
+  [f] ADD is_repost FLAG - title pattern detection could miss cases
+  [g] MOVE LOW-SIGNAL POSTS - separate CSV for emoji/affirmation posts
+  [h] INVESTIGATE 2-CATEGORY PATTERN - 99.8% have exactly 2 categories
+
+
+TASK 3: CONTENT ACCURACY REPORT SUMMARY
+========================================================================
+
+KEY FINDINGS:
+
+SAMPLE REVIEW: Spot-checked high-visibility records across THREAD, CLIP,
+  TUMBLR, key-concept, and major-publication categories
+
+OVERALL: Archive is well-curated. 12 issues found, mostly data-entry
+  anomalies rather than factual errors.
+
+HIGH SEVERITY ISSUES (3):
+
+  #1  FEATURED_WORK URL MISMATCH
+      - Featured URL: https://pressthink.org/2006/06/the-people-formerly-known-as-the-audience/
+      - Does not match any CSV record URL exactly
+      - CSV has 3 versions: archive.pressthink.org, pressthink.org, HuffPost
+      - Impact: Featured works link externally, users leave archive
+      - Fix: Update to match RECORD-00191 URL or add ?record= deep link
+
+  #3  RECORD-00029 DATE IS WRONG
+      - Title: "Asymmetry between major parties fries the circuits..."
+      - CSV date: 2015-11-29 (November 2015)
+      - URL path: pressthink.org/2016/09/... (September 2016)
+      - Off by almost 10 months
+      - This is a FEATURED_WORK (feat-16) - visible to users
+      - Fix: Change to 2016-09-XX
+
+  #5  PYTHON LIST SYNTAX IN AUTHOR FIELDS (3 records)
+      - RECORD-00060: "Jay Rosen', 'Amanda Michel" (should be: "Jay Rosen, Amanda Michel")
+      - RECORD-00092: "Jay Rosen', 'Conor Friedersdorf"
+      - RECORD-00513: "Jay Rosen', 'Lisa Williams"
+      - Will display with stray quotes in UI
+      - RECORD-00060 is FEATURED_WORK (feat-15) - visible to users
+      - Fix: Replace "', '" with ", "
+
+MEDIUM SEVERITY ISSUES (5):
+
+  #4  RECORD-00076 DATE/URL MONTH MISMATCH
+      - CSV date: 2010-10-21 (October)
+      - URL: pressthink.org/2010/11/... (November)
+      - Minor discrepancy
+
+  #6  PUBLISHER FIELD HAS QUOTED LIST STRINGS (5 records)
+      - RECORD-00010 through RECORD-00014
+      - Publish as raw strings with embedded quotes in UI
+      - Fix: Clean or use semicolon delimiter
+
+  #7  PRESSTHINK URLs WITH WRONG PUBLISHERS (16 records)
+      - Archive.pressthink.org URLs but publisher=syndication target
+      - Confusing but arguably correct if syndicated
+      - Example: pressthink.org URL but published as "TomDispatch.com"
+
+  #8  DUPLICATE RECORDS - "PEOPLE FORMERLY KNOWN"
+      - RECORD-00070: HuffPost version (2006-06-30)
+      - RECORD-00191: PressThink version (2006-06-27)
+      - RECORD-00683: HuffPost version (2006-06-01) - UNVERIFIED, no URL
+      - RECORD-00683 filtered out by export, no public duplicate
+
+  #11 THREAD RECORDS HAVE GENERIC CATEGORY
+      - All 10 THREAD records = "Technology & Digital Media"
+      - Generic fallback, not meaningful
+      - Should vary: Education, Theory, Politics, etc.
+
+  #12 CLIP RECORDS - NEWSPAPER NAME AS AUTHOR (57 of 83)
+      - Rather than byline author, uses publication name
+      - Typical for OCR'd clippings
+      - Consistent with export script force-verification
+      - All 83 marked verified in CSV
+
+LOW SEVERITY ISSUES (3):
+
+  #2  FEATURED WORKS LINK EXTERNALLY
+      - Opens in new tab (target="_blank")
+      - Users leave archive
+      - Consider linking to ?record= modals instead
+
+  #9  "CNN'S IMPOSSIBLE DILEMMA" - POSSIBLE DUPLICATE
+      - Two different URLs/dates (2016, 2023)
+      - May be different episodes or re-publication
+
+  #10 60 TUMBLR RECORDS - GENERIC "STUDIO 20" TITLE
+      - All have generic title, not extracted from content
+      - Unhelpful for browsing
+
+EXPORT FILTERING STATUS:
+  ✓ Records with verified=false filtered correctly
+  ✓ Reposts/RTs filtered correctly
+  ✓ Short replies filtered correctly
+  ✓ CLIP- records force-verified (all 83 also verified in CSV)
+  ✓ Social records force-verified
+  ✓ Thread member posts removed to avoid duplication
+
+ACTIONABLE FIXES (priority order):
+
+1. Fix RECORD-00029 date: 2015-11-29 → 2016-09-XX
+2. Fix author fields (RECORD-00060, 00092, 00513): remove Python list syntax
+3. Update feat-11 URL in constants.js to RECORD-00191 URL or add ?record=
+4. Clean publisher fields (RECORD-00010 to 00014): semicolon or single value
+5. Update THREAD categories: replace "Technology & Digital Media" with content-appropriate
+6. Fix RECORD-00076 date: 2010-10-21 → 2010-11-XX
+7. Generate descriptive titles for 60 "Studio 20" Tumblr posts
+
+
+OVERALL ARCHIVE STATUS
+========================================================================
+
+Data quality: GOOD (well-curated, mostly data-entry issues)
+Total records: 29,132 social posts + 940 archive records
+Public-facing: ~25,288 posts after filtering
+
+BLOCKING ISSUES (before public release):
+  ✗ 54 non-Rosen Bluesky posts in archive (add author filter)
+  ✗ 3 author fields with Python list syntax (visible in featured works)
+  ✗ 1 featured work date wrong by 10 months (featured work is BSKY-00029)
+  ✗ Featured work URL doesn't match CSV record
+
+QUALITY IMPROVEMENTS NEEDED:
+  - Backfill 2022 categories (3,832 posts)
+  - Keyword-based category inference (5,078 posts)
+  - Backfill key_concepts field (high-value, only 1.5% populated)
+  - Clean publisher/author fields
+  - Update THREAD categories
+
+LOW-PRIORITY FIXES:
+  - Remove 60 generic "Studio 20" titles
+  - Verify/remove low-signal emoji posts
+  - Add is_repost structural flag
+
