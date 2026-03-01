@@ -72,3 +72,10 @@ playwright-report/
 data/social_import/
 .firecrawl/
 .kanban/
+
+# Cloudflare Workers dev artifacts
+.wrangler/
+
+# Internal Claude session files
+.claude/phase4-*
+.claude/plan.md
