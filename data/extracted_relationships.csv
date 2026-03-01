@@ -604,8 +604,8 @@ RECORD-00076_REL_011,RECORD-00076,O0023,The Washington Post,Mentions,P0256,Dave 
 RECORD-00076_REL_012,RECORD-00076,P0209,Ben Smith,Supports,C0050,Objectivity,Ben Smith stood up for this kind of pluralism: “My personal view is that ideological and neutral journalism can flourish side by side,0.8,2025-10-22
 RECORD-00076_REL_014,RECORD-00076,P0312,Thomas Nagel,Expands On,C0050,Objectivity,"If it means trying to see things in that fuller perspective Thomas Nagel talked about–pulling the camera back, revealing our previous position as only one of many–I second the motion.",0.7,2025-10-22
 RECORD-00077_REL_001,RECORD-00077,P0045,David Folkenflik,Discusses,P0005,Jay Rosen,David Folkenflik brings us an influential media critic who argues that mainstream American journalists do cling to their own ideology,0.9,2025-10-22
-RECORD-00077_REL_003,RECORD-00077,P0314,Leonard Downie,Criticizes,C0004,View from Nowhere,"For much of the conventional press that is, of course, crazy talk.",0.8,2025-10-22
-RECORD-00077_REL_004,RECORD-00077,P0314,Leonard Downie,Affiliated With,O0023,The Washington Post,"That's Leonard Downie, the Post's former executive editor",1.0,2025-10-22
+RECORD-00077_REL_003,RECORD-00077,P0485,Leonard Downie Jr.,Criticizes,C0004,View from Nowhere,"For much of the conventional press that is, of course, crazy talk.",0.8,2025-10-22
+RECORD-00077_REL_004,RECORD-00077,P0485,Leonard Downie Jr.,Affiliated With,O0023,The Washington Post,"That's Leonard Downie, the Post's former executive editor",1.0,2025-10-22
 RECORD-00077_REL_005,RECORD-00077,P0313,Keith Olbermann,Affiliated With,O0071,MSNBC,Keith Olbermann (MSNBC),1.0,2025-10-22
 RECORD-00077_REL_006,RECORD-00077,P0315,Joe Scarborough,Affiliated With,O0221,NBC News,NBC News suspended opinion hosts Keith Olbermann and Joe Scarborough,1.0,2025-10-22
 RECORD-00077_REL_007,RECORD-00077,P0311,Juan Williams,Affiliated With,O0220,NPR News,NPR terminated the contract of former news analyst Juan Williams,1.0,2025-10-22
@@ -1247,7 +1247,7 @@ RECORD-00154_REL_001,RECORD-00154,P0570,Hunter S. Thompson,Discusses,C0093,Objec
 RECORD-00154_REL_002,RECORD-00154,P0570,Hunter S. Thompson,Affiliated With,W0131,Fear and Loathing on the Campaign Trail,Author of 'Fear and Loathing on the Campaign Trail',0.9,2025-10-22
 RECORD-00154_REL_003,RECORD-00154,P0571,Jean Bethke Elshtain,Discusses,C0092,Bias,Elshtain's distinction relates to whether actions are 'political' or 'politicized.',0.8,2025-10-22
 RECORD-00154_REL_004,RECORD-00154,P0571,Jean Bethke Elshtain,Affiliated With,W0132,Democracy on Trial,Author of 'Democracy on Trial',0.9,2025-10-22
-RECORD-00154_REL_008,RECORD-00154,P0314,Leonard Downie,Supports,C0004,View from Nowhere,Downie claims to be an outsider to society.,0.7,2025-10-22
+RECORD-00154_REL_008,RECORD-00154,P0485,Leonard Downie Jr.,Supports,C0004,View from Nowhere,Downie claims to be an outsider to society.,0.7,2025-10-22
 RECORD-00154_REL_009,RECORD-00154,C0222,Press Criticism,Discusses,C0092,Bias,Bias criticism is the most popular form of press think.,0.8,2025-10-22
 RECORD-00154_REL_010,RECORD-00154,P0572,James W. Carey,Mentions,C0223,Public Conversation,The author cites James W. Carey on the importance of public conversation.,0.7,2025-10-22
 RECORD-00154_REL_011,RECORD-00154,O0403,Fox,Discusses,C0092,Bias,The author questions 'should the others follow Fox?' in regards to partisan bias,0.6,2025-10-22
@@ -2140,7 +2140,7 @@ RECORD-00255_REL_011,RECORD-00255,P0440,Geneva Overholser,Criticizes,O0014,Fox N
 RECORD-00255_REL_012,RECORD-00255,P0440,Geneva Overholser,Discusses,O0014,Fox News,Let’s talk about Fox.,0.8,2025-10-22
 RECORD-00255_REL_013,RECORD-00255,P1071,Brit Hume,Affiliated With,O0014,Fox News,Fox News anchor Brit Hume,1.0,2025-10-22
 RECORD-00255_REL_014,RECORD-00255,P1072,Jim Bettinger,Affiliated With,O0661,Stanford University,director of the Knight Fellows program at Stanford University.,1.0,2025-10-22
-RECORD-00255_REL_015,RECORD-00255,P0314,Leonard Downie,Discusses,C0004,View from Nowhere,Reasoning like this is an example of what Gopnik meant by a vacuum,0.7,2025-10-22
+RECORD-00255_REL_015,RECORD-00255,P0485,Leonard Downie Jr.,Discusses,C0004,View from Nowhere,Reasoning like this is an example of what Gopnik meant by a vacuum,0.7,2025-10-22
 RECORD-00256_REL_001,RECORD-00256,P0739,Dick Cheney,Criticizes,O0002,The New York Times,Cheney does not grant legitimacy to the large news organizations with brand names who think of themselves as proxies for the public.,0.8,2025-10-22
 RECORD-00256_REL_002,RECORD-00256,P1073,Marlin Fitzwater,Criticizes,P0739,Dick Cheney,"Fitzwater was livid. “It is all Cheney,” he told Editor & Publisher.",0.9,2025-10-22
 RECORD-00256_REL_003,RECORD-00256,P0014,George W. Bush,Affiliated With,P0739,Dick Cheney,executive power has grown more illegible under Bush,0.8,2025-10-22
@@ -2712,7 +2712,7 @@ RECORD-00323_REL_013,RECORD-00323,P1315,James Poniewozik,Affiliated With,O0709,T
 RECORD-00323_REL_014,RECORD-00323,P0010,Jeff Jarvis,Affiliated With,O0158,The Guardian,"Jeff Jarvis, writing for The Guardian",1.0,2025-10-22
 RECORD-00323_REL_015,RECORD-00323,P0600,Walter Pincus,Affiliated With,O0023,The Washington Post,Walter Pincus at the Washington Post,1.0,2025-10-22
 RECORD-00323_REL_016,RECORD-00323,P0600,Walter Pincus,Discusses,C0413,Neutrality,Pincus describes the rise of neutrality as a loss of rights,0.8,2025-10-22
-RECORD-00323_REL_018,RECORD-00323,P0600,Walter Pincus,Mentions,P0314,Leonard Downie,"Leonard Downie, executive editor of the Post, would probably blanch.",0.6,2025-10-22
+RECORD-00323_REL_018,RECORD-00323,P0600,Walter Pincus,Mentions,P0485,Leonard Downie Jr.,"Leonard Downie, executive editor of the Post, would probably blanch.",0.6,2025-10-22
 RECORD-00323_REL_019,RECORD-00323,P1316,Lou Dobbs,Affiliated With,O0015,CNN,Lou Dobbs ... a ratings hit for CNN,0.8,2025-10-22
 RECORD-00323_REL_020,RECORD-00323,P0582,Michael Deaver,Mentions,P0195,Ronald Reagan,Michael Deaver started it during the Reagan Years,0.7,2025-10-22
 RECORD-00323_REL_021,RECORD-00323,P0582,Michael Deaver,Mentions,O0023,The Washington Post,Eroded the independent judgment in the press,0.7,2025-10-22
@@ -2944,7 +2944,7 @@ RECORD-00345_REL_005,RECORD-00345,O0476,Washingtonpost.com,Published In,O0023,Th
 RECORD-00345_REL_006,RECORD-00345,P1144,Deborah Howell,Affiliated With,O0023,The Washington Post,Now the Post’s ombudsman,1.0,2025-10-22
 RECORD-00345_REL_008,RECORD-00345,P1144,Deborah Howell,Criticizes,P0133,Ben Domenech,“I can’t defend it. It’s a f****in’ disaster.”,0.9,2025-10-22
 RECORD-00345_REL_009,RECORD-00345,P0133,Ben Domenech,Published In,O0823,RedState.com,RedState.com,1.0,2025-10-22
-RECORD-00345_REL_010,RECORD-00345,O0476,Washingtonpost.com,Affiliated With,O0824,WPNI (Washington Post Newsweek Interactive),"But while the folks at washingtonpost.com understand my position and are convinced by my arguments on many of these issues, they also feel that the firestorm here will only serve to damage us all, and",0.9,2025-10-22
+RECORD-00345_REL_010,RECORD-00345,O0476,Washingtonpost.com,Affiliated With,O0697,Washington Post-Newsweek Interactive (WPNI),"But while the folks at washingtonpost.com understand my position and are convinced by my arguments on many of these issues, they also feel that the firestorm here will only serve to damage us all, and",0.9,2025-10-22
 RECORD-00345_REL_011,RECORD-00345,P1400,Sean-Paul Kelley,Discusses,C0442,Red State/Blue State meme,"On March 21, Sean-Paul Kelley at The Agonist wrote that hiring Domench was dubious because “the whole Red State/Blue State meme is on the way out.”",0.9,2025-10-22
 RECORD-00345_REL_012,RECORD-00345,P0270,Jim Brady,Discusses,P0133,Ben Domenech,"Brady said of the selection process. “We didn’t have anybody on the site who is on a consistent basis discussing issues of conservatives, someone who’s loyal to the cause of conservatism and not the a",0.9,2025-10-22
 RECORD-00346_REL_003,RECORD-00346,P0010,Jeff Jarvis,Discusses,P0460,Howard Dean,Jeff Jarvis wants to cool down some of the passions for Dean’s distributed model of campaigning,0.8,2025-10-22
@@ -3481,7 +3481,7 @@ RECORD-00401_REL_004,RECORD-00401,P0674,Austin Bay,Expands On,C0406,Press Rollba
 RECORD-00401_REL_005,RECORD-00401,P0674,Austin Bay,Discusses,O0732,Al Qaeda,A quick review of Al Qaeda’s information warfare capabilities helps put the White House’s biggest challenge in perspective.,0.7,2025-10-22
 RECORD-00401_REL_006,RECORD-00401,P0674,Austin Bay,Criticizes,O0002,The New York Times,The NY-DC-LA (Nid-Claw) axis that dominated American political and cultural information from the late 1920s to the mid-1990s.,0.7,2025-10-22
 RECORD-00401_REL_007,RECORD-00401,P0674,Austin Bay,Discusses,E0003,Watergate,Two great gotcha successes drive the national press: Vietnam and Watergate.,0.8,2025-10-22
-RECORD-00401_REL_008,RECORD-00401,P0674,Austin Bay,Discusses,E0162,Vietnam,Two great gotcha successes drive the national press: Vietnam and Watergate.,0.8,2025-10-22
+RECORD-00401_REL_008,RECORD-00401,P0674,Austin Bay,Discusses,L0171,Vietnam,Two great gotcha successes drive the national press: Vietnam and Watergate.,0.8,2025-10-22
 RECORD-00401_REL_009,RECORD-00401,P0674,Austin Bay,Published In,O0436,The Weekly Standard,"Weekly Standard article that appeared July 22, 2005",0.9,2025-10-22
 RECORD-00401_REL_010,RECORD-00401,P0005,Jay Rosen,Originated By,C0406,Press Rollback,"Jay selects an interesting term—a frame, really—to describe what he calls the current Bush Administration’s “press strategy.”",0.7,2025-10-22
 RECORD-00401_REL_011,RECORD-00401,O0436,The Weekly Standard,Mentions,E0004,Iraq War,Iraq War vet,0.6,2025-10-22
@@ -4746,8 +4746,8 @@ RECORD-00573_REL_008,RECORD-00573,P0645,Anil Dash,Affiliated With,O0430,Six Apar
 RECORD-00573_REL_009,RECORD-00573,P0645,Anil Dash,Discusses,C0207,Gift Economy,The weblog comes out of the gift economy,0.7,2025-10-28
 RECORD-00573_REL_010,RECORD-00573,P0783,Atrios,Mentions,C0608,Blogistan,"On top of the Web sits the weblog and its mini public-sphere, (which Atrios and others call Blogistan)",0.9,2025-10-28
 RECORD-00573_REL_011,RECORD-00573,P0423,Trent Lott,Mentions,O1199,Kennedy School at Harvard,"(For more on Atrios, see this case study about blogs and the fate of Trent Lott from the Kennedy School at Harvard.)",0.8,2025-10-28
-RECORD-00574_REL_003,RECORD-00574,P0314,Leonard Downie,Discusses,C0077,Democracy,What is the proper relationship between journalism and citizenship?,0.8,2025-10-28
-RECORD-00574_REL_005,RECORD-00574,P0005,Jay Rosen,Discusses,P0314,Leonard Downie,Discusses Leonard Downie's decision not to vote,0.9,2025-10-28
+RECORD-00574_REL_003,RECORD-00574,P0485,Leonard Downie Jr.,Discusses,C0077,Democracy,What is the proper relationship between journalism and citizenship?,0.8,2025-10-28
+RECORD-00574_REL_005,RECORD-00574,P0005,Jay Rosen,Discusses,P0485,Leonard Downie Jr.,Discusses Leonard Downie's decision not to vote,0.9,2025-10-28
 RECORD-00574_REL_007,RECORD-00574,P0005,Jay Rosen,Discusses,P0555,Dan Rather,Discusses Dan Rather's sign-off 'part of our world',0.9,2025-10-28
 RECORD-00574_REL_008,RECORD-00574,P0005,Jay Rosen,Discusses,P2110,Octavio Paz,Discusses Octavio Paz's Nobel Prize lecture,0.9,2025-10-28
 RECORD-00575_REL_001,RECORD-00575,P0005,Jay Rosen,Discusses,O0029,Newsweek,"I did an unusually large number of interviews, all concerning the Newsweek fallout.",0.9,2025-10-28
@@ -4771,7 +4771,7 @@ RECORD-00576_REL_009,RECORD-00576,P0310,Clay Shirky,Mentions,O0515,Wikipedia,"Cl
 RECORD-00577_REL_001,RECORD-00577,W0029,What Are Journalists For?,Discusses,C0047,Public Journalism,"This book describes the 10-year history of a hotly debated if slightly fuzzy experiment, variously called public or civic journalism.",0.9,2025-10-28
 RECORD-00577_REL_002,RECORD-00577,P0164,John Dewey,Expands On,C0047,Public Journalism,Rosen translated these ideas into public journalism,0.8,2025-10-28
 RECORD-00577_REL_003,RECORD-00577,P2118,Jürgen Habermas,Expands On,C0047,Public Journalism,Rosen translated these ideas into public journalism,0.8,2025-10-28
-RECORD-00577_REL_004,RECORD-00577,P0314,Leonard Downie,Criticizes,C0047,Public Journalism,Leonard Downie... has argued that public journalism oversteps the bounds of good reporting,0.9,2025-10-28
+RECORD-00577_REL_004,RECORD-00577,P0485,Leonard Downie Jr.,Criticizes,C0047,Public Journalism,Leonard Downie... has argued that public journalism oversteps the bounds of good reporting,0.9,2025-10-28
 RECORD-00577_REL_005,RECORD-00577,P0429,Howell Raines,Criticizes,W0093,Breaking the News,"Howell Raines...said James Fallows's much-discussed 1996 book, ''Breaking the News,'' posed an ''insidious danger, and that is that reporters and editors become public policy missionaries with a purit",0.9,2025-10-28
 RECORD-00577_REL_006,RECORD-00577,O1201,The Akron Beacon Journal,Supports,C0047,Public Journalism,"In another example of public journalism, The Akron Beacon Journal, after reporting on the racial divide in its community, aggressively asked readers to do something to help solve the problem.",0.9,2025-10-28
 RECORD-00577_REL_007,RECORD-00577,P0005,Jay Rosen,Discusses,E0211,1988 election,"Following the depressing 1988 election, the audience for serious journalism seemed to be shrinking and Rosen was among those who felt politics had become a slick, cynical spectacle, taken over by the ",0.7,2025-10-28
