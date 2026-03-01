@@ -155,29 +155,27 @@ describe('social_posts.csv', () => {
   });
 
   it('categories use normalized values', () => {
-    const knownCategories = new Set([
-      // Bluesky post categories
-      'Press Criticism', 'Media Theory', 'Public Life', 'Democratic Theory',
-      'Journalism History', 'Journalism Theory & Practice', 'Digital Media & Technology',
-      'Political Communication', 'Trump & Authoritarianism', 'Education & Academia',
-      // Twitter post categories
-      'Press & Media Criticism', 'Technology & Digital Media',
-      'Audience & Public Engagement', 'Politics & Democracy', 'Journalism Education'
+    const CANONICAL = new Set([
+      'Audience & Public Engagement',
+      'Journalism Education',
+      'Journalism Theory & Practice',
+      'Politics & Democracy',
+      'Press & Media Criticism',
+      'Technology & Digital Media',
     ]);
 
     const unknownCats = new Set();
-    for (const row of socialPosts) {
-      const cats = (row.thematic_categories || '').replace(/[\[\]"']/g, '').split(/[;,]/);
+
+    for (const row of [...archiveRecords, ...socialPosts]) {
+      const raw = (row.thematic_categories || '');
+      const cats = raw.replace(/[\[\]"']/g, '').split(/[;,]/).map(s => s.trim()).filter(Boolean);
       for (const cat of cats) {
-        const trimmed = cat.trim();
-        if (trimmed && !knownCategories.has(trimmed)) {
-          unknownCats.add(trimmed);
-        }
+        if (!CANONICAL.has(cat)) unknownCats.add(cat);
       }
     }
 
     assert.strictEqual(unknownCats.size, 0,
-      `Found ${unknownCats.size} unknown categories: ${[...unknownCats].join(', ')}`);
+      `Non-canonical categories found: ${[...unknownCats].sort().join(', ')}`);
   });
 });
 

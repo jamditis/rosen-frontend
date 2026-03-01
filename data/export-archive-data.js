@@ -457,8 +457,6 @@ async function main() {
   let nonRosenCount = 0;
   let shortReplyCount = 0;
 
-  let nonRosenCount = 0;
-
   const filteredSocialRecords = socialRecords.filter(r => {
     // Remove individual posts that belong to threads (shown via THREAD container)
     if (threadMemberIds.has(r.id)) {
