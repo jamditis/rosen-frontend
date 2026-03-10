@@ -1,0 +1,19 @@
+name: Assign Copilot to issue
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  assign-copilot:
+    if: github.event.label.name == 'copilot'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Assign to Copilot
+        run: |
+          gh issue edit ${{ github.event.issue.number }} --assignee app/copilot
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
