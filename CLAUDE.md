@@ -1,17 +1,6 @@
 # CLAUDE.md - Jay Rosen Internet Archive
 
 
-## GitHub Actions suspended (account-wide)
-
-GitHub Actions are disabled on the entire `jamditis` GitHub account until further notice. This means:
-- **No CI/CD pipelines will run** — builds, tests, deploys all fail silently
-- **GitHub Pages deploys won't work** — even "legacy" static deploys that used Actions under the hood
-- **No automated workflows** — PR checks, scheduled jobs, release automation are all dead
-
-**For any project that previously deployed via GitHub Actions or GitHub Pages, you must use an alternative** (manual deploy, Cloudflare Pages, Firebase Hosting, direct FTP, etc.). Do not create or rely on `.github/workflows/` files.
-
-Context for Claude Code when working on this repository.
-
 ## Bug-fixing workflow
 
 When a bug is reported, don't immediately attempt to fix it. Instead:
@@ -225,8 +214,19 @@ Record deep links: `?record=RECORD_ID` opens a record modal on any route.
 │   └── academic-testimonials/       # Archived testimonials
 │
 ├── docs/                            # Project documentation
-│   ├── agent-personas/              # AI persona definitions
-│   └── narrative/                   # Session logs and history
+│   ├── agent-personas/              # Contributor role definitions
+│   │   ├── contributor-guide.md     # Project overview + how to contribute
+│   │   ├── data-pipeline-engineer.md # Python backend, scraping, AI analysis
+│   │   ├── frontend-developer.md    # React/HTM components, design system
+│   │   ├── data-curator.md          # Archive records, CSV, data quality
+│   │   └── code-reviewer.md         # Review standards + project conventions
+│   └── narrative/                   # Project history and reference docs
+│       ├── project-history.md       # Linear narrative of the project
+│       ├── architecture.md          # Current technical architecture
+│       ├── data-pipeline.md         # Pipeline contributor guide + warnings
+│       └── changelog.md             # Version history (v0.0.1 through v4.0.0)
+│
+├── DEPLOYMENT.md                    # FTP deploy manifest (what to upload)
 │
 ├── .github/workflows/               # CI/CD
 │   ├── frontend-validation.yml      # HTML/JS syntax, CDN link checks

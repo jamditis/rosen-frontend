@@ -41,8 +41,9 @@ jobs:
             --arg by "$ACTOR" \
             --arg sha "$SHA" \
             '{repo: $repo, pr_number: $pr, title: $title, merged_by: $by, sha: $sha}')
+          # Replace YOUR_WEBHOOK_URL with your dashboard endpoint
           curl -sf \
-            -X POST "https://pi.amditis.tech/api/webhooks/github-merge" \
+            -X POST "YOUR_WEBHOOK_URL" \
             -H "X-Webhook-Secret: ${{ secrets.WEBHOOK_SECRET }}" \
             -H "Content-Type: application/json" \
             -d "$PAYLOAD" || echo "Dashboard notify failed (non-fatal)"
