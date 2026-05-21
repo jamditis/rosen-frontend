@@ -81,7 +81,7 @@ def process_with_smart_corrector(limit=25, dry_run=False):
     twitter = TwitterProcessor(playwright_fallback=True)
 
     # Initialize PDF generator
-    SmartCorrectorPDFGenerator(output_dir="smart_corrector_pdfs_25")
+    _ = SmartCorrectorPDFGenerator(output_dir="smart_corrector_pdfs_25")
 
     # Connect to sheet
     print("[1/4] Connecting to Google Sheets...")

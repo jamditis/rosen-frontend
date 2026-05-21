@@ -514,8 +514,8 @@ def main():
     )
 
     print("\n[*] Script complete!")
-    print("[*] To continue processing, run: python src/key_concepts_updater.py")
-    print("[*] To start over, run: python src/key_concepts_updater.py --reset-progress")
+    print("[*] To continue processing, run: poetry run python -m rosen_scraper.key_concepts_updater")
+    print("[*] To start over, run: poetry run python -m rosen_scraper.key_concepts_updater --reset-progress")
 
 
 if __name__ == "__main__":

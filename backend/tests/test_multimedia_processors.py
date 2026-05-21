@@ -37,10 +37,10 @@ def test_processors():
 
     # Initialize processors
     audio_optimizer = AudioOptimizer(speed_factor=2.0)
-    SoundCloudProcessor(audio_optimizer=audio_optimizer)
+    _ = SoundCloudProcessor(audio_optimizer=audio_optimizer)
     youtube = YouTubeEnhancedProcessor()
-    CSpanProcessor()
-    TwitterProcessor(playwright_fallback=True)
+    _ = CSpanProcessor()
+    _ = TwitterProcessor(playwright_fallback=True)
 
     print("\n[1/4] Testing YouTube Processor (FREE caption extraction)")
     print("-" * 80)

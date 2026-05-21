@@ -64,14 +64,14 @@ def process_from_offset(limit_param=50, batch_size=25, resume=True):
     # Initialize components
     detector = ContentDetector()
     validator = QualityValidator()
-    CostTracker(max_budget=50.0)
+    _ = CostTracker(max_budget=50.0)
 
     # Initialize processors
     audio_optimizer = AudioOptimizer(speed_factor=2.0)
-    SoundCloudProcessor(audio_optimizer=audio_optimizer)
-    CSpanProcessor()
-    YouTubeEnhancedProcessor()
-    TwitterProcessor(playwright_fallback=True)
+    _ = SoundCloudProcessor(audio_optimizer=audio_optimizer)
+    _ = CSpanProcessor()
+    _ = YouTubeEnhancedProcessor()
+    _ = TwitterProcessor(playwright_fallback=True)
 
     # Connect to sheet
     print("[1/4] Connecting to Google Sheets...")
