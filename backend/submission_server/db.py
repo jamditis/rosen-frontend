@@ -90,15 +90,33 @@ def get_pending_count() -> int:
         return row['cnt']
 
 
+# Statuses that mean processing has finished. processed_at is stamped only on
+# these, so an in-flight 'processing' row keeps a NULL processed_at until it
+# actually completes. See issue #150.
+_TERMINAL_STATUSES = ('completed', 'failed', 'duplicate')
+
+
 def update_submission_status(submission_id: int, status: str,
                              record_id: str = None, error_message: str = None):
-    """Update the status of a submission."""
+    """Update a submission's status.
+
+    Only ``status`` is overwritten unconditionally. ``record_id`` and
+    ``error_message`` are left untouched when not supplied — COALESCE keeps the
+    stored value — so a later transition cannot erase context recorded by an
+    earlier one. ``processed_at`` is stamped only when the submission reaches a
+    terminal status, not on intermediate transitions such as 'processing'.
+    """
+    processed_at = (datetime.now().isoformat()
+                    if status in _TERMINAL_STATUSES else None)
     with get_db() as conn:
         conn.execute(
             """UPDATE submissions
-               SET status = ?, processed_at = ?, record_id = ?, error_message = ?
+               SET status = ?,
+                   processed_at = COALESCE(?, processed_at),
+                   record_id = COALESCE(?, record_id),
+                   error_message = COALESCE(?, error_message)
                WHERE id = ?""",
-            (status, datetime.now().isoformat(), record_id, error_message, submission_id)
+            (status, processed_at, record_id, error_message, submission_id)
         )
 
 

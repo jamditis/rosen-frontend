@@ -13,23 +13,20 @@ import csv
 import json
 import logging
 import subprocess
-import sys
 import shutil
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, Optional, Set
 
+from rosen_scraper import dispatcher, entity_resolver
+from rosen_scraper.workflow import generate_source_based_id, enrich_data
+
 from .config import (
-    BACKEND_DIR, PROJECT_ROOT, DATA_DIR,
+    DATA_DIR,
     CSV_FILE, SCHEMA_FILE, KNOWN_ENTITIES_FILE,
     EXPORT_SCRIPT, FTP_STAGING_DIR,
 )
 from . import db
-
-# Add the backend src directory to Python path so rosen_scraper imports work
-src_dir = str(BACKEND_DIR / 'src')
-if src_dir not in sys.path:
-    sys.path.insert(0, src_dir)
 
 logger = logging.getLogger('submission_server.processor')
 
@@ -89,12 +86,58 @@ def _get_csv_headers() -> list:
         return next(reader, [])
 
 
+# A spreadsheet treats a cell beginning with one of these as a formula, so a
+# scraped page or form field starting with one is prefixed with a single quote.
+_CSV_FORMULA_TRIGGERS = ('=', '+', '-', '@')
+
+# Upper bound on any single CSV cell. Generous for legitimate titles and
+# summaries, but stops a hostile submission writing an unbounded blob.
+_MAX_FIELD_LENGTH = 10000
+
+
+def _sanitize_cell(value: str) -> str:
+    """Length-bound and CSV-formula-escape a single string cell.
+
+    Neutralizes CSV formula injection (a value starting with =, +, -, @ is
+    prefixed with the spreadsheet-recognized single-quote escape) and caps the
+    length so neither scraped content nor user form input can inject a formula
+    or write an oversized blob into the shared archive CSV. See issue #143.
+    """
+    text = value.strip()
+    # Escape before bounding length. A value already at _MAX_FIELD_LENGTH that
+    # starts with a formula trigger would otherwise end up one char over the
+    # cap once the single-quote escape is prepended. Truncation chops only the
+    # tail, so the leading escape always survives.
+    if text and text[0] in _CSV_FORMULA_TRIGGERS:
+        text = "'" + text
+    if len(text) > _MAX_FIELD_LENGTH:
+        text = text[:_MAX_FIELD_LENGTH]
+    return text
+
+
+def _sanitize_record(record: Dict[str, Any]) -> Dict[str, Any]:
+    """Return a copy of ``record`` with every string field sanitized.
+
+    Non-string values (booleans, None) are passed through untouched — formula
+    injection only applies to text cells. The original dict is not mutated.
+    """
+    return {
+        key: _sanitize_cell(value) if isinstance(value, str) else value
+        for key, value in record.items()
+    }
+
+
 def _append_to_csv(record: Dict[str, Any], headers: list) -> bool:
-    """Append a single record to the main archive CSV."""
+    """Append a single record to the main archive CSV.
+
+    Every string field is sanitized first so neither scraped page content nor
+    user-supplied form overrides can inject a spreadsheet formula or an
+    unbounded blob into the published data. See issue #143.
+    """
     try:
         with open(CSV_FILE, 'a', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=headers, extrasaction='ignore')
-            writer.writerow(record)
+            writer.writerow(_sanitize_record(record))
         return True
     except Exception as e:
         logger.error(f"Failed to append record to CSV: {e}")
@@ -159,9 +202,6 @@ def process_single_url(url: str, schema: Dict[str, Any],
 
     Returns the enriched record dict if successful, None on failure.
     """
-    from rosen_scraper import dispatcher, entity_resolver
-    from rosen_scraper.workflow import generate_source_based_id, enrich_data
-
     try:
         processed_data = dispatcher.dispatch_url(url, schema)
     except Exception as e:

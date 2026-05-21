@@ -13,6 +13,9 @@ import re
 from collections import defaultdict
 from pathlib import Path
 
+from csv_safe_write import atomic_csv_write
+from prune_orphan_references import prune_orphan_references
+
 CSV_PATH = Path(__file__).parent / "archive_records-public.csv"
 
 
@@ -95,10 +98,12 @@ def main():
         if not related:
             continue
         original = related
-        for rid in remove_ids:
-            related = related.replace(f', {rid}', '').replace(f'{rid}, ', '').replace(rid, '')
-        # Clean up any double commas or trailing commas
-        related = re.sub(r',\s*,', ',', related).strip().strip(',').strip()
+        # Tokenize on commas and keep only exact-match IDs. A bare
+        # `related.replace(rid, '')` is a substring match, so removing
+        # RECORD-0001 would also mangle RECORD-00012. See issue #146.
+        kept = [token for token in (part.strip() for part in related.split(','))
+                if token and token not in remove_ids]
+        related = ', '.join(kept)
         if related != original:
             row['related_to'] = related
             removed_refs += 1
@@ -124,10 +129,19 @@ def main():
         print(f"    {ids}: {title} ({platforms})")
 
     print(f"\n  Writing {CSV_PATH}...")
-    with open(CSV_PATH, "w", encoding="utf-8", newline="") as f:
+    with atomic_csv_write(CSV_PATH) as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
+
+    # Records were removed above, so prune the entity and relationship
+    # extractions that referenced them — otherwise archive-entities.json
+    # ends up with dead "first mentioned in" links. See issue #144.
+    print("\n  Pruning orphaned entity/relationship references...")
+    orphan_summary = prune_orphan_references()
+    print(f"    Relationship rows pruned: {orphan_summary['pruned_relationships']}")
+    print(f"    Entity refs repointed:    {orphan_summary['repointed_entities']}")
+    print(f"    Entity refs cleared:      {orphan_summary['nulled_entities']}")
 
     print("  Done!")
 

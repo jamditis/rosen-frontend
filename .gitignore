@@ -65,6 +65,13 @@ output/
 data/*.backup
 data/*_backup_*.csv
 
+# Atomic-write artifacts from data/csv_safe_write.py (see issue #145)
+data/*.csv.bak
+data/*.csv.tmp
+
+# Submission server runtime SQLite database (created on first request)
+backend/submission_server/submissions.db
+
 # Project Specific
 known_entities.json
 
