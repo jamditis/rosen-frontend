@@ -10,9 +10,8 @@ routing and recovery strategies.
 import re
 import time
 from urllib.parse import urlparse
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, Optional, Tuple, Any
 from dataclasses import dataclass
-from enum import Enum
 
 from rosen_scraper.logger import PoisonPillType, get_logger
 

@@ -53,5 +53,5 @@ def process_audio(url: str) -> Dict[str, Any]:
             In future: structured data matching the archive schema.
     """
     print(f"  [Processor] Audio processing for {url} is not yet implemented.")
-    print(f"  [Processor] For SoundCloud URLs, use scripts/diagnostics/smart_corrector/")
+    print("  [Processor] For SoundCloud URLs, use scripts/diagnostics/smart_corrector/")
     return {"url": url, "status": "Audio processing not yet implemented"}

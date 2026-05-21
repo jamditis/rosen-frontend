@@ -14,7 +14,6 @@ The processor includes:
 """
 
 import os
-import sys
 import json
 import time
 import argparse
@@ -25,16 +24,12 @@ from typing import Dict, List, Optional, Set
 import gspread
 from dotenv import load_dotenv
 
-
-
 from rosen_scraper import entity_extractor
 from rosen_scraper.entity_registry import EntityRegistry
+from rosen_scraper.path_utils import find_project_root
 
 # Load environment variables
 load_dotenv()
-
-# Import shared path utility
-from rosen_scraper.path_utils import find_project_root
 
 # Configuration
 BASE_DIR = find_project_root()

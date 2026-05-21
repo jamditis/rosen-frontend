@@ -11,7 +11,6 @@ Purpose: Investigate the source of the incorrect "120+ organizations" claim.
 import os
 import sys
 from collections import Counter
-from typing import Dict, List
 import gspread
 from google.oauth2.service_account import Credentials
 from dotenv import load_dotenv

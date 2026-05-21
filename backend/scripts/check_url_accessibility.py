@@ -27,11 +27,10 @@ import csv
 import json
 import asyncio
 import aiohttp
-import ssl
-from collections import Counter, defaultdict
+from collections import Counter
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple
 from urllib.parse import urlparse
 import time
 
@@ -450,7 +449,7 @@ async def main():
     with open(REPORT_FILE, 'w', encoding='utf-8') as f:
         f.write(report)
 
-    print(f"\n✓ Report saved to:")
+    print("\n✓ Report saved to:")
     print(f"  {REPORT_FILE}")
 
     # Export broken URLs
@@ -462,7 +461,7 @@ async def main():
     # Cleanup progress file
     if PROGRESS_FILE.exists():
         PROGRESS_FILE.unlink()
-        print(f"\n✓ Cleaned up progress file")
+        print("\n✓ Cleaned up progress file")
 
     print("\n✓ Done!")
 

@@ -5,7 +5,6 @@ This module resolves entities against a known list of publications and platforms
 
 from typing import Optional, Dict, Any
 import json
-import os
 from urllib.parse import urlparse
 
 def load_known_entities(schema_file: str) -> Optional[Dict[str, Any]]:

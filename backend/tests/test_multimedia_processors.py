@@ -37,10 +37,10 @@ def test_processors():
 
     # Initialize processors
     audio_optimizer = AudioOptimizer(speed_factor=2.0)
-    soundcloud = SoundCloudProcessor(audio_optimizer=audio_optimizer)
+    SoundCloudProcessor(audio_optimizer=audio_optimizer)
     youtube = YouTubeEnhancedProcessor()
-    cspan = CSpanProcessor()
-    twitter = TwitterProcessor(playwright_fallback=True)
+    CSpanProcessor()
+    TwitterProcessor(playwright_fallback=True)
 
     print("\n[1/4] Testing YouTube Processor (FREE caption extraction)")
     print("-" * 80)
@@ -53,7 +53,7 @@ def test_processors():
             print(f"  Status: {result.get('status')}")
 
             if result.get('status') == 'success':
-                print(f"  [OK] SUCCESS - Free captions extracted!")
+                print("  [OK] SUCCESS - Free captions extracted!")
                 print(f"    Source: {result.get('source')}")
                 print(f"    Transcript Type: {result.get('transcript_type')}")
                 print(f"    Title: {result.get('title', 'N/A')[:60]}")
@@ -70,7 +70,7 @@ def test_processors():
                 smart_cost = 0.05  # Just AI analysis
                 savings = traditional_cost - smart_cost
 
-                print(f"    [COST SAVINGS]:")
+                print("    [COST SAVINGS]:")
                 print(f"       Traditional (transcribe): ${traditional_cost:.2f}")
                 print(f"       Smart Corrector (free): ${smart_cost:.2f}")
                 print(f"       Savings: ${savings:.2f} ({(savings/traditional_cost*100):.0f}%)")

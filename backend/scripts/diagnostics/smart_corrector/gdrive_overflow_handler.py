@@ -5,11 +5,10 @@ Handles transcripts/text that exceed Google Sheets 50K char limit
 """
 
 import os
-from pathlib import Path
 from datetime import datetime
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload, MediaIoBaseUpload
+from googleapiclient.http import MediaIoBaseUpload
 from io import BytesIO
 
 

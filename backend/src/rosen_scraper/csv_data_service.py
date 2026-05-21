@@ -13,7 +13,6 @@ Usage:
 """
 
 import csv
-import os
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Set
 from datetime import datetime

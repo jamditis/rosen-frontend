@@ -162,9 +162,6 @@ def _validate_entity_extraction(
 
         valid_entities.append(entity)
 
-    # Create entity ID lookup for relationship validation
-    entity_ids = {e["entity_id"] for e in valid_entities}
-
     # Validate relationships
     for relationship in relationships:
         rel_type = relationship.get("relationship_type")

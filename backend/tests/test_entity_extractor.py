@@ -1,9 +1,8 @@
 """
 Tests for the entity extractor module.
 """
-import pytest
 import json
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch, MagicMock
 from rosen_scraper import entity_extractor
 
 

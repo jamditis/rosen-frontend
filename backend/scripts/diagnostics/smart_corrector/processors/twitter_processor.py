@@ -7,7 +7,7 @@ Extracts threads and tweets using Nitter proxy and Playwright fallback.
 import re
 import time
 import requests
-from typing import Dict, Optional, List
+from typing import Dict, Optional
 from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
 
@@ -63,14 +63,14 @@ class TwitterProcessor:
 
         # Strategy 2: Playwright fallback (slower, more reliable)
         if self.playwright_fallback:
-            print(f"  [TWITTER] Nitter failed, trying Playwright fallback...")
+            print("  [TWITTER] Nitter failed, trying Playwright fallback...")
             result = self._try_playwright_extraction(normalized_url)
             if result['status'] == 'success':
                 print(f"  [TWITTER] Playwright extraction successful ({len(result['raw_text'])} chars)")
                 return result
 
         # All strategies failed
-        print(f"  [TWITTER] All extraction methods failed")
+        print("  [TWITTER] All extraction methods failed")
         return {
             'status': 'failed',
             'error': 'Could not extract tweet content with any method',
@@ -282,9 +282,9 @@ class TwitterProcessor:
                         try:
                             button.click(timeout=2000)
                             time.sleep(0.5)
-                        except:
+                        except Exception:
                             continue
-                except:
+                except Exception:
                     pass
 
                 # Extract page content

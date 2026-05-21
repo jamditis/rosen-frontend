@@ -63,3 +63,12 @@ desbordante = ">=2.4.1,<3.0.0"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src", "."]
+
+# Ruff keeps its default rule set (E4/E7/E9/F); only per-file ignores are set.
+[tool.ruff.lint.per-file-ignores]
+# Standalone scripts and test harnesses are run directly (e.g.
+# `python scripts/foo.py`), so they extend sys.path before importing the
+# rosen_scraper package. That makes E402 (module-import-not-at-top) both
+# unavoidable and intentional in these trees — every other rule still applies.
+"scripts/**" = ["E402"]
+"tests/**" = ["E402"]

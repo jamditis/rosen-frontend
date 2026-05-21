@@ -3,8 +3,6 @@
 Fix YouTube rows 31-38 with clean, deduplicated transcripts
 """
 
-import sys
-from pathlib import Path
 from datetime import datetime
 
 
@@ -74,23 +72,23 @@ def fix_youtube_rows():
                     print(f"  Quality: {uniqueness:.2f} uniqueness")
 
                     if uniqueness < 0.70:
-                        print(f"  [WARN] Still has repetition, skipping")
+                        print("  [WARN] Still has repetition, skipping")
                         stats['failed'] += 1
                         continue
 
                     # Update sheet
-                    print(f"  Updating column AH (raw_text)...")
+                    print("  Updating column AH (raw_text)...")
                     worksheet.update_cell(row_num, col_ah_idx, new_text)
 
                     # Update notes
                     note = f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Fixed by YouTube processor | Clean transcript ({len(new_text)} chars, {uniqueness:.2f} quality)"
                     worksheet.update_cell(row_num, col_aj_idx, note)
 
-                    print(f"  [OK] Updated successfully!")
+                    print("  [OK] Updated successfully!")
                     stats['fixed'] += 1
 
                 else:
-                    print(f"  [ERROR] No text extracted")
+                    print("  [ERROR] No text extracted")
                     stats['failed'] += 1
 
             else:

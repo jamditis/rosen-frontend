@@ -49,7 +49,7 @@ class YouTubeEnhancedProcessor:
         metadata = self._get_metadata(url)
 
         if not TRANSCRIPT_API_AVAILABLE:
-            print(f"  [YOUTUBE] Transcript API not available, using metadata only")
+            print("  [YOUTUBE] Transcript API not available, using metadata only")
             return {
                 'status': 'partial',
                 'source': 'youtube_metadata',
@@ -314,5 +314,5 @@ class YouTubeEnhancedProcessor:
 
         try:
             return f"{date_str[0:4]}-{date_str[4:6]}-{date_str[6:8]}"
-        except:
+        except Exception:
             return date_str

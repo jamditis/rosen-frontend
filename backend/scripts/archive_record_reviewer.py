@@ -10,9 +10,7 @@ Usage:
 """
 
 import csv
-import json
 import sys
-import os
 from datetime import datetime
 from pathlib import Path
 from collections import Counter, defaultdict
@@ -439,9 +437,6 @@ class ArchiveRecordReviewer:
         if self.dry_run:
             print(f"\n[DRY RUN] Would save to: {output_path}")
             return
-
-        # Create backup
-        backup_path = str(self.csv_path).replace('.csv', f'_backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.csv')
 
         with open(output_path, 'w', encoding='utf-8', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=self.fieldnames)

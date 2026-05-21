@@ -82,7 +82,7 @@ def test_multimedia():
                 print(f"Source: {result.get('source')}")
 
                 if result.get('status') == 'success':
-                    print(f"\n[SUCCESS] Extracted content!")
+                    print("\n[SUCCESS] Extracted content!")
                     print(f"  Title: {result.get('title', 'N/A')[:60]}")
                     print(f"  Author: {result.get('author', 'N/A')}")
                     print(f"  Content: {len(result.get('raw_text', ''))} chars")
@@ -92,7 +92,7 @@ def test_multimedia():
                         print(f"  Preview: {preview}...")
 
                 elif result.get('status') == 'needs_transcription':
-                    print(f"\n[INFO] Audio transcription needed")
+                    print("\n[INFO] Audio transcription needed")
                     print(f"  Duration: {result.get('metadata', {}).get('duration', 0)/60:.1f} min")
                     print(f"  Estimated cost: ${result.get('estimated_cost', 0):.4f}")
                     print(f"  (With 2x speed optimization: ${result.get('estimated_cost', 0):.4f})")
@@ -118,7 +118,7 @@ def test_multimedia():
                 print(f"Source: {result.get('source')}")
 
                 if result.get('status') == 'success':
-                    print(f"\n[SUCCESS] FREE captions extracted!")
+                    print("\n[SUCCESS] FREE captions extracted!")
                     print(f"  Transcript Type: {result.get('transcript_type')}")
                     print(f"  Title: {result.get('title', 'N/A')[:60]}")
                     print(f"  Duration: {result.get('duration_seconds', 0)/60:.1f} min")
@@ -130,14 +130,14 @@ def test_multimedia():
                     smart_cost = 0.05  # Just AI analysis
                     savings = traditional_cost - smart_cost
 
-                    print(f"\n  [COST SAVINGS]")
+                    print("\n  [COST SAVINGS]")
                     print(f"    Traditional (download + transcribe): ${traditional_cost:.2f}")
                     print(f"    Smart Corrector (free captions): ${smart_cost:.2f}")
                     print(f"    Savings: ${savings:.2f} ({(savings/traditional_cost*100) if traditional_cost > 0 else 0:.0f}%)")
 
                 else:
                     print(f"\n[WARN] {result.get('error', 'Unknown error')}")
-                    print(f"  Would need to download and transcribe audio")
+                    print("  Would need to download and transcribe audio")
 
             except Exception as e:
                 print(f"\n[ERROR] {e}")

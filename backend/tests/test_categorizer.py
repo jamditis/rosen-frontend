@@ -1,9 +1,8 @@
 """
 Tests for the categorizer module.
 """
-import pytest
 import json
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch, MagicMock
 from rosen_scraper import categorizer
 
 

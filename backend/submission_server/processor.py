@@ -15,7 +15,6 @@ import logging
 import subprocess
 import shutil
 from datetime import datetime
-from pathlib import Path
 from typing import Dict, Any, Optional, Set
 
 from rosen_scraper import dispatcher, entity_resolver
@@ -244,7 +243,7 @@ def process_single_url(url: str, schema: Dict[str, Any],
 
     # Mark as verified (submitted by Jay himself)
     processed_data['verified'] = True
-    processed_data['notes'] = f"Submitted via web form"
+    processed_data['notes'] = "Submitted via web form"
 
     return processed_data
 

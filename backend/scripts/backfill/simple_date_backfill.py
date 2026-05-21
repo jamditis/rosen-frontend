@@ -109,14 +109,14 @@ class SimpleDateBackfiller:
                     updates = []
                     time.sleep(1)  # Rate limiting
             else:
-                print(f"  [SKIP] No date pattern in URL")
+                print("  [SKIP] No date pattern in URL")
 
         # Final batch update
         if updates:
             print(f"\\n[FINAL UPDATE] Updating {len(updates)} records...")
             self.final_ws.batch_update(updates)
 
-        print(f"\\n=== BACKFILL COMPLETE ===")
+        print("\\n=== BACKFILL COMPLETE ===")
         print(f"Successfully filled: {success_count}")
         print(f"Already had dates: {skipped_count}")
         print(f"No date found: {len(rows) - success_count - skipped_count}")

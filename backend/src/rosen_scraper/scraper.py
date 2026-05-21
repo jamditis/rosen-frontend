@@ -16,7 +16,7 @@ import os
 from html import escape
 from urllib.parse import urljoin
 from google import genai
-from google.genai.types import Tool, GenerateContentConfig
+from google.genai.types import GenerateContentConfig
 from rosen_scraper.rate_limiter import rate_limited_gemini_call
 from rosen_scraper.url_safety import is_safe_public_url
 

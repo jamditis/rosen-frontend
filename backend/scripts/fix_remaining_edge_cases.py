@@ -3,8 +3,6 @@
 Fix remaining edge cases: Row 35 and Row 42
 """
 
-import sys
-from pathlib import Path
 from datetime import datetime
 import re
 
@@ -117,7 +115,7 @@ def fix_row_35():
         note = f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Fixed via advanced cleaning | {len(cleaned)} chars | Q:{quality:.2f}"
         worksheet.update_cell(35, col_aj_idx, note)
 
-        print(f"  [UPDATED] Row 35 fixed!")
+        print("  [UPDATED] Row 35 fixed!")
         return True
 
     # If cleaning didn't work, try re-fetching
@@ -140,7 +138,7 @@ def fix_row_35():
         note = f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Re-fetched from YouTube | {len(new_text)} chars | Q:{quality:.2f}"
         worksheet.update_cell(35, col_aj_idx, note)
 
-        print(f"  [UPDATED] Row 35 fixed!")
+        print("  [UPDATED] Row 35 fixed!")
         return True
 
     else:
@@ -198,7 +196,7 @@ def fix_row_42():
             note = f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Extracted SoundCloud description | {len(new_text)} chars"
             worksheet.update_cell(42, col_aj_idx, note)
 
-            print(f"  [UPDATED] Row 42 fixed!")
+            print("  [UPDATED] Row 42 fixed!")
             return True
         else:
             print(f"  [WARN] Content too short ({len(new_text)} chars)")
@@ -206,18 +204,18 @@ def fix_row_42():
             note = f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] [NEEDS_TRANSCRIPTION] Description too short - audio transcription needed (~$0.30)"
             worksheet.update_cell(42, col_aj_idx, note)
 
-            print(f"  [FLAGGED] Marked for audio transcription")
+            print("  [FLAGGED] Marked for audio transcription")
             return False
 
     elif result.get('status') == 'needs_transcription':
-        print(f"  [INFO] Audio transcription needed")
+        print("  [INFO] Audio transcription needed")
         print(f"  Duration: {result.get('metadata', {}).get('duration', 0)/60:.1f} min")
         print(f"  Estimated cost: ${result.get('estimated_cost', 0):.2f}")
 
         note = f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] [NEEDS_TRANSCRIPTION] Est. cost: ${result.get('estimated_cost', 0):.2f}"
         worksheet.update_cell(42, col_aj_idx, note)
 
-        print(f"  [FLAGGED] Marked for batch transcription")
+        print("  [FLAGGED] Marked for batch transcription")
         return False
 
     else:

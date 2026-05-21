@@ -18,7 +18,6 @@ To update the archive:
 
 from typing import Optional, Dict, Any, List, Set
 from rosen_scraper import dispatcher
-from rosen_scraper.processors import article_processor
 from rosen_scraper.csv_data_service import get_csv_service, CSVDataService
 import os
 import json
@@ -368,7 +367,6 @@ def main() -> None:
                 processed_data = enrich_data(processed_data, url, known_entities)
 
                 # Generate PDF or Transcript with logging
-                file_generated = False
                 if processed_data.get('format') in ['video', 'audio']:
                     transcript_filepath = transcript_saver.save_transcript(processed_data)
                     if not transcript_filepath:
@@ -376,7 +374,6 @@ def main() -> None:
                     else:
                         processed_data['transcript_filepath'] = transcript_filepath
                         logger.logger.info(f"Created local transcript: {transcript_filepath}")
-                        file_generated = True
                 else:
                     pdf_filepath = pdf_generator.create_article_pdf(processed_data)
                     if not pdf_filepath:
@@ -387,10 +384,8 @@ def main() -> None:
                         try:
                             file_size = os.path.getsize(pdf_filepath) if os.path.exists(pdf_filepath) else None
                             logger.log_pdf_generation(item_id, pdf_filepath, True, file_size)
-                            file_generated = True
-                        except Exception as e:
+                        except Exception:
                             logger.log_pdf_generation(item_id, pdf_filepath, True)
-                            file_generated = True
 
                 # Write the final, enriched record to CSV.
                 success = append_record_to_csv(csv_service, processed_data, headers, logger)

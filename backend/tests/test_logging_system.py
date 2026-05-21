@@ -4,7 +4,6 @@ Test script for the new logging and poison pill detection system.
 """
 
 import sys
-import os
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
@@ -12,7 +11,7 @@ SRC_DIR = ROOT_DIR / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.append(str(SRC_DIR))
 
-from logger import init_logger, PoisonPillType
+from logger import init_logger
 from poison_pill_handler import get_poison_pill_manager
 
 def test_logging_system():

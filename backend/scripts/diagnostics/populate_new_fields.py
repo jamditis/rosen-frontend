@@ -19,7 +19,7 @@ SRC_DIR = ROOT_DIR / "src"
 if str(SRC_DIR) not in sys.path:
     sys.path.append(str(SRC_DIR))
 
-from src.logger import get_logger, init_logger
+from src.logger import init_logger
 from src.entity_resolver import load_known_entities, resolve_platform
 
 load_dotenv()
@@ -298,10 +298,10 @@ def main():
     stats = populate_new_fields(dry_run=not args.live)
 
     if stats:
-        print(f"\n[+] Process completed successfully!")
+        print("\n[+] Process completed successfully!")
         print(f"Total records processed: {stats['processed']}")
     else:
-        print(f"\n[-] Process failed - check logs for details")
+        print("\n[-] Process failed - check logs for details")
 
 if __name__ == "__main__":
     main()

@@ -10,7 +10,6 @@ import os
 import json
 import sys
 from pathlib import Path
-from urllib.parse import urlparse
 from dotenv import load_dotenv
 import time
 from datetime import datetime # Import datetime for timestamped notes
@@ -140,9 +139,11 @@ def main():
 
     # --- 3. Load Schema and Known Entities ---
     schema = get_schema(SCHEMA_FILE)
-    if not schema: return
+    if not schema:
+        return
     known_entities = entity_resolver.load_known_entities(str(KNOWN_ENTITIES_FILE))
-    if not known_entities: return
+    if not known_entities:
+        return
 
     # --- 4. Process Each Row ---
     for i, row in enumerate(data):
@@ -155,7 +156,7 @@ def main():
         row_data = dict(zip(header, row))
         url = row_data.get('url')
         if not url:
-            test_worksheet.update_cell(row_index, NOTES_COL, f"Skipped: No URL in row.")
+            test_worksheet.update_cell(row_index, NOTES_COL, "Skipped: No URL in row.")
             continue
 
         print(f"--- Analyzing Row {row_index}: {url} ---")
@@ -175,8 +176,8 @@ def main():
                 if not processed_data:
                     final_note = f"Improvement failed: Could not reprocess existing text on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}."
             except AttributeError:
-                final_note = f"Improvement failed: `dispatcher.reprocess_text` not implemented."
-            except Exception as e:
+                final_note = "Improvement failed: `dispatcher.reprocess_text` not implemented."
+            except Exception:
                 final_note = f"Improvement failed: Error during text reprocessing on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}."
         else:
             print("  [INFO] Raw text not found. Processing URL from scratch.")

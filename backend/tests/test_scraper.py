@@ -4,7 +4,7 @@ Tests the scraping cascade: URL Context -> Requests -> Playwright
 """
 import pytest
 import requests
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 from rosen_scraper import scraper
 
 

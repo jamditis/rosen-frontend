@@ -17,13 +17,12 @@ Features:
 import re
 import html
 import unicodedata
-from typing import List, Dict, Optional, Tuple
+from typing import Dict
 import gspread
 import os
 import sys
 from dotenv import load_dotenv
 import time
-from datetime import datetime
 
 # Set UTF-8 encoding for Windows console
 if sys.platform.startswith('win'):
@@ -589,7 +588,7 @@ class TextCleaningWorkflow:
             else:
                 spreadsheet = gc.open(spreadsheet_name)
             
-            print(f"Successfully connected to spreadsheet")
+            print("Successfully connected to spreadsheet")
             return spreadsheet
             
         except Exception as e:
@@ -675,7 +674,7 @@ class TextCleaningWorkflow:
             print(f"High quality text (>70 score): {analysis_results['high_quality_text']}")
             
             if analysis_results['sample_issues']:
-                print(f"\nSample issues found:")
+                print("\nSample issues found:")
                 for issue in analysis_results['sample_issues']:
                     print(f"  - {issue['record_id']}: {issue['title']}")
                     print(f"    Quality: {issue['quality_score']}/100, Improvement potential: {issue['improvement_potential']:.1f}%")
@@ -758,7 +757,7 @@ class TextCleaningWorkflow:
                         print(f"    [IMPROVED] by {cleaning_result['improvement_percentage']:.1f}% "
                               f"(Quality: {cleaning_result['quality_score']}/100)")
                     else:
-                        print(f"    [NO CHANGE] No significant improvement needed")
+                        print("    [NO CHANGE] No significant improvement needed")
                     
                     results_summary['processed'] += 1
                     
@@ -779,7 +778,7 @@ class TextCleaningWorkflow:
                 print("No updates needed")
             
             # Print summary
-            print(f"\n" + "="*50)
+            print("\n" + "="*50)
             print("CLEANING BATCH RESULTS")
             print("="*50)
             print(f"Records processed: {results_summary['processed']}")

@@ -363,7 +363,7 @@ class TaxonomyAnalyzer:
         high_frequency = [(c, count) for c, count in concept_counts.most_common(30) if count > 50]
 
         if high_frequency:
-            print(f"\n⚠️  Potentially too generic (>50 occurrences):")
+            print("\n⚠️  Potentially too generic (>50 occurrences):")
             for concept, count in high_frequency:
                 print(f"  - '{concept}': {count} occurrences")
 
@@ -378,7 +378,7 @@ class TaxonomyAnalyzer:
         low_frequency = [(c, count) for c, count in concept_counts.items() if count == 1]
 
         print(f"\n📊 Single-occurrence concepts: {len(low_frequency)}")
-        print(f"   (May be highly specific or potential errors)")
+        print("   (May be highly specific or potential errors)")
 
         # Show top concepts
         print("\n" + "-"*80)

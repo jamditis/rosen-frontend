@@ -1,8 +1,7 @@
 """
 Tests for the article processor module.
 """
-import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch
 from rosen_scraper.processors import article_processor
 
 

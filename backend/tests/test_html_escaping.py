@@ -7,7 +7,7 @@ This test ensures that user content is properly escaped to prevent XSS vulnerabi
 
 import sys
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 # Add project root to path
 ROOT_DIR = Path(__file__).resolve().parents[1]
@@ -58,10 +58,10 @@ def test_html_escaping_in_mock_html():
         assert 'Test &amp; Author' in result, "Escaped ampersand in author should be present"
         
         print("✓ HTML special characters are properly escaped")
-        print(f"✓ Script tags are neutralized")
-        print(f"✓ Ampersands are escaped")
-        print(f"✓ Quotes are escaped")
-        print(f"✓ Angle brackets are escaped")
+        print("✓ Script tags are neutralized")
+        print("✓ Ampersands are escaped")
+        print("✓ Quotes are escaped")
+        print("✓ Angle brackets are escaped")
 
 
 def test_normal_content_still_works():

@@ -69,12 +69,12 @@ def test_first_25_rows(dry_run=True):
     # Initialize processors
     audio_optimizer = AudioOptimizer(speed_factor=2.0)
     soundcloud = SoundCloudProcessor(audio_optimizer=audio_optimizer)
-    cspan = CSpanProcessor()
+    CSpanProcessor()
     youtube = YouTubeEnhancedProcessor()
     twitter = TwitterProcessor(playwright_fallback=True)
 
     # Initialize PDF generator
-    pdf_gen = SmartCorrectorPDFGenerator(output_dir="test_pdfs_25_rows")
+    SmartCorrectorPDFGenerator(output_dir="test_pdfs_25_rows")
 
     # Connect to Google Sheets
     print("[1/5] Connecting to Google Sheets...")

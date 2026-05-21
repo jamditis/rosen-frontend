@@ -324,7 +324,6 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
         print(f"   - {concept}")
 
     # Determine range
-    header_row = all_rows[0]
     data_rows = all_rows[start_row-1:]  # Convert to 0-indexed
 
     if limit:
@@ -377,7 +376,7 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
                     worksheet.update(values=[[recommendations]], range_name=f"AK{row_number}")
                     updates_made += 1
                 else:
-                    print(f"  [OK] N/A - Current assignment looks good")
+                    print("  [OK] N/A - Current assignment looks good")
                     # Update colAK with N/A
                     worksheet.update(values=[["N/A"]], range_name=f"AK{row_number}")
                     updates_made += 1
@@ -410,7 +409,7 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
             # If there are recommendations, add to colAK
             if recommendations:
                 worksheet.update(values=[[recommendations]], range_name=f"AK{row_number}")
-                print(f"  [NOTE] Added recommendations to colAK")
+                print("  [NOTE] Added recommendations to colAK")
 
             processed_count += 1
 
@@ -437,14 +436,14 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
     print(f"[OK] Key concepts filled/updated: {updates_made}")
     print(f"[SKIP] Reviewed (had existing concepts): {skipped}")
     print(f"[ERROR] Errors: {errors}")
-    print(f"\n[*] Overall Progress:")
+    print("\n[*] Overall Progress:")
     print(f"Total rows processed across all runs: {progress['total_processed']}")
     print(f"Total updates made across all runs: {progress['total_updated']}")
     print(f"Last processed row: {progress['last_processed_row']}")
-    print(f"\n[*] Notes:")
-    print(f"  - Rows with no raw text: Notes added to column AJ")
-    print(f"  - Rows with existing concepts: Recommendations added to column AK")
-    print(f"  - Rows with empty concepts: Filled column Q, recommendations in AK")
+    print("\n[*] Notes:")
+    print("  - Rows with no raw text: Notes added to column AJ")
+    print("  - Rows with existing concepts: Recommendations added to column AK")
+    print("  - Rows with empty concepts: Filled column Q, recommendations in AK")
 
 
 def main():
@@ -515,8 +514,8 @@ def main():
     )
 
     print("\n[*] Script complete!")
-    print(f"[*] To continue processing, run: python src/key_concepts_updater.py")
-    print(f"[*] To start over, run: python src/key_concepts_updater.py --reset-progress")
+    print("[*] To continue processing, run: python src/key_concepts_updater.py")
+    print("[*] To start over, run: python src/key_concepts_updater.py --reset-progress")
 
 
 if __name__ == "__main__":

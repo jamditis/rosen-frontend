@@ -16,10 +16,8 @@ Implements intelligent cross-referencing with dual relationship detection:
 """
 
 import re
-import json
-import math
-from datetime import datetime, timedelta
-from typing import Dict, List, Tuple, Set, Any, Optional
+from datetime import datetime
+from typing import Dict, List, Tuple, Any, Optional
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 
