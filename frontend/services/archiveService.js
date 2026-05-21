@@ -1,5 +1,5 @@
 
-import { DATA_CONFIG, ERAS } from '../constants.js';
+import { DATA_CONFIG, ERAS } from '../constants.js?v=3.3.0';
 import {
   initDatabase,
   loadArchiveData as loadSqliteData,
@@ -13,7 +13,7 @@ import {
   getCategoryCoOccurrence,
   searchRecords as sqlSearchRecords,
   getStats as getSqliteStats
-} from './sqliteService.js';
+} from './sqliteService.js?v=3.3.0';
 
 // Simple hash function for UI color selection (djb1 variant)
 // Used by App.js to deterministically assign colors to categories

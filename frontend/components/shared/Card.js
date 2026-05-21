@@ -1,5 +1,5 @@
 // Card.js - Universal card component
-import { html } from '../../html.js';
+import { html } from '../../html.js?v=3.3.0';
 
 /**
  * Universal card component

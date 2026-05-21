@@ -1,4 +1,4 @@
-import { html } from '../html.js?v=3.2.0';
+import { html } from '../html.js?v=3.3.0';
 import { ExternalLink } from 'lucide-react';
 
 // Convert a bsky.app URL to the unauthenticated embed.bsky.app equivalent

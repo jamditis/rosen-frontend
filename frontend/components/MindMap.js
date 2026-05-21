@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { html } from '../html.js?v=3.2.0';
+import { html } from '../html.js?v=3.3.0';
 import { ChevronDown, ChevronRight, ZoomIn, ZoomOut, Maximize2, Focus, HelpCircle } from 'lucide-react';
 
 // Enhanced node type styles with gradients and shadows
@@ -679,6 +679,18 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedNodeId, handleDeselectNode]);
+
+  // Cancel any in-flight fit-to-view animation on unmount. animateToFit
+  // re-schedules requestAnimationFrame until the tween finishes; without this,
+  // unmounting mid-tween (navigating away during the 400ms fit) leaves the
+  // loop calling setZoom/setPan on an unmounted component. See issue #152.
+  useEffect(() => {
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, []);
 
   // Expand all nodes function
   const expandAll = useCallback(() => {

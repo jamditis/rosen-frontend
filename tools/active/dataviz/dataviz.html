@@ -4,17 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jay Rosen Archive - Enhanced Data Dashboard</title>
-    <!-- Tailwind CSS for styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="description" content="An interactive dashboard for exploring the Jay Rosen Internet Archive. Filter, chart, and visualize four decades of records." />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../../../favicon.svg" />
+    <link rel="icon" href="../../../favicon.ico" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Enhanced data dashboard - Jay Rosen Internet Archive" />
+    <meta property="og:description" content="An interactive dashboard for exploring the Jay Rosen Internet Archive. Filter, chart, and visualize four decades of records." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://pressthink.org/j/rosen-archive/tools/active/dataviz/dataviz.html" />
+    <meta property="og:image" content="https://pressthink.org/j/rosen-archive/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Enhanced data dashboard - Jay Rosen Internet Archive" />
+    <meta name="twitter:description" content="An interactive dashboard for exploring the Jay Rosen Internet Archive. Filter, chart, and visualize four decades of records." />
+    <meta name="twitter:image" content="https://pressthink.org/j/rosen-archive/og-image.png" />
+    <!-- Tailwind CSS (pre-built locally; cdn.tailwindcss.com is the JIT dev
+         build and cannot carry an integrity hash). See issue #151. -->
+    <link rel="stylesheet" href="../tailwind.css">
     <!-- PapaParse for CSV parsing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <!-- Chart.js for data visualization -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"
+            integrity="sha384-6kRQDsV2kVYRSENnw7WnekWKCx8/Lmv7rFKpDuR2AoIbjlBShlYcs3x0QlE3kuRh"
+            crossorigin="anonymous"></script>
+    <!-- Chart.js for data visualization (pinned so the payload can be hashed) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"
+            integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ"
+            crossorigin="anonymous"></script>
     <!-- Chart.js Treemap Plugin -->
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@2.3.0/dist/chartjs-chart-treemap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-treemap@2.3.0/dist/chartjs-chart-treemap.min.js"
+            integrity="sha384-nr2GTsyDh6Kjn1H+dqXUUJpoNTdiOr8swo074Cg0uOwPSRFx27UcVV98yi4LFw3H"
+            crossorigin="anonymous"></script>
     <!-- noUiSlider for range slider -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"
+            integrity="sha384-/gBUOLHADjY2rp6bHB0IyW9AC28q4OsnirJScje4l1crgYW7Qarx3dH8zcqcUgmy"
+            crossorigin="anonymous"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css" rel="stylesheet"
+          integrity="sha384-PSZaVsyG9jDu8hFaSJev5s/9poIJlX7cuxSGdqCgXRHpo2DzIaZAyCd2rG/DJJmV"
+          crossorigin="anonymous">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
