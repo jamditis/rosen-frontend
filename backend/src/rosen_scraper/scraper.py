@@ -17,6 +17,7 @@ from html import escape
 from google import genai
 from google.genai.types import Tool, GenerateContentConfig
 from rosen_scraper.rate_limiter import rate_limited_gemini_call
+from rosen_scraper.url_safety import is_safe_public_url
 
 
 # A list of common user agents to rotate through for both requests and Playwright.
@@ -152,6 +153,13 @@ def fetch_article_content(url: str) -> Optional[str]:
         str: The HTML content of the page as a string, or None if all
              fetching methods fail.
     """
+    # SSRF guard: refuse URLs that resolve to private/loopback/link-local
+    # addresses or use a non-http(s) scheme before any network request runs.
+    ok, reason = is_safe_public_url(url)
+    if not ok:
+        print(f"Refusing to fetch unsafe URL ({reason}): {url}")
+        return None
+
     # Attempt 1: URL Context for fastest structured extraction
     url_context_data = fetch_with_url_context(url)
     if url_context_data and url_context_data.get('text'):
@@ -242,6 +250,12 @@ def fetch_article_content_enhanced(url: str) -> Tuple[Optional[Any], bool]:
         tuple: (content, is_structured) where content is either HTML string or 
                structured dict, and is_structured is a boolean indicating the type.
     """
+    # SSRF guard (see fetch_article_content): reject unsafe URLs up front.
+    ok, reason = is_safe_public_url(url)
+    if not ok:
+        print(f"Refusing to fetch unsafe URL ({reason}): {url}")
+        return None, False
+
     # Attempt 1: URL Context for fastest structured extraction
     url_context_data = fetch_with_url_context(url)
     if url_context_data and url_context_data.get('text'):
