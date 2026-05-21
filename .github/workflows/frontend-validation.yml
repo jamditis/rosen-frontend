@@ -4,32 +4,22 @@ on:
   push:
     branches: [ main ]
     paths:
-      - '*.js'
-      - '*.html'
-      - '*.css'
-      - 'components/**'
-      - 'services/**'
-      - 'comparison-tool/**'
-      - 'glossary/**'
-      - 'context-1986/**'
-      - 'timeline/**'
-      - 'annotated-excerpts/**'
-      - 'faq/**'
+      - 'frontend/**'
+      - 'index.html'
+      - 'shared-styles.css'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/frontend-validation.yml'
   pull_request:
     branches: [ main ]
     paths:
-      - '*.js'
-      - '*.html'
-      - '*.css'
-      - 'components/**'
-      - 'services/**'
-      - 'comparison-tool/**'
-      - 'glossary/**'
-      - 'context-1986/**'
-      - 'timeline/**'
-      - 'annotated-excerpts/**'
-      - 'faq/**'
+      - 'frontend/**'
+      - 'index.html'
+      - 'shared-styles.css'
+      - 'tests/**'
+      - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/frontend-validation.yml'
 
 jobs:
@@ -37,57 +27,80 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-      
-      - name: Check HTML files for syntax errors
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check JavaScript syntax
         run: |
-          echo "Checking HTML files..."
-          for file in $(find . -name "*.html" -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./backend/*" -not -path "./tools/*"); do
-            echo "Validating: $file"
-            # Basic check that HTML files can be parsed
-            if ! grep -q "<html" "$file" && ! grep -q "<!DOCTYPE" "$file"; then
-              echo "Warning: $file may not be a complete HTML document"
+          echo "Checking JavaScript files with node --check..."
+          status=0
+          while IFS= read -r file; do
+            if node --check "$file"; then
+              echo "ok: $file"
+            else
+              echo "::error file=$file::JavaScript syntax error"
+              status=1
             fi
-          done
-      
-      - name: Check for JavaScript syntax errors
-        run: |
-          echo "Checking JavaScript files..."
-          for file in $(find . -name "*.js" -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./backend/*" -not -path "./tools/web/*"); do
-            echo "Checking: $file"
-            # Basic syntax check - just try to parse the file
-            node --check "$file" || echo "Warning: Syntax issue in $file"
-          done
-      
-      - name: Check for broken CDN links
-        run: |
-          echo "Checking for CDN links in HTML files..."
-          for file in $(find . -name "*.html" -not -path "./node_modules/*" -not -path "./.git/*" -not -path "./backend/*"); do
-            echo "Checking CDN links in: $file"
-            # Check for common CDN domains using standard grep
-            grep -o 'https\?://[^"'\'']*' "$file" 2>/dev/null | grep -E '(esm\.sh|unpkg\.com|cdn\.)' | head -5 || true
-          done
-      
+          done < <(find . -name '*.js' \
+            -not -path './node_modules/*' \
+            -not -path './.git/*' \
+            -not -path './backend/*' \
+            -not -path './archived/*')
+          exit $status
+
       - name: Verify main entry points exist
         run: |
           echo "Verifying main entry points..."
-          test -f index.html && echo "✓ index.html exists"
-          test -f index.js && echo "✓ index.js exists"
-          test -f App.js && echo "✓ App.js exists"
-          test -f constants.js && echo "✓ constants.js exists"
-          test -d components && echo "✓ components/ directory exists"
-          test -d services && echo "✓ services/ directory exists"
-      
+          for f in index.html frontend/index.js frontend/App.js frontend/constants.js; do
+            if [ ! -f "$f" ]; then
+              echo "::error::Missing required file: $f"
+              exit 1
+            fi
+            echo "ok: $f"
+          done
+          for d in frontend/components frontend/services; do
+            if [ ! -d "$d" ]; then
+              echo "::error::Missing required directory: $d"
+              exit 1
+            fi
+            echo "ok: $d/"
+          done
+
+      - name: Run frontend test suite
+        run: npm run test:frontend
+
+      - name: Check HTML documents are well-formed
+        run: |
+          echo "Checking HTML files..."
+          for file in $(find . -name '*.html' -not -path './node_modules/*' -not -path './.git/*' -not -path './backend/*'); do
+            if ! grep -q '<html' "$file" && ! grep -q '<!DOCTYPE' "$file"; then
+              echo "Warning: $file may not be a complete HTML document"
+            fi
+          done
+
+      - name: List external CDN references
+        run: |
+          echo "External CDN references in HTML files:"
+          for file in $(find . -name '*.html' -not -path './node_modules/*' -not -path './.git/*' -not -path './backend/*'); do
+            grep -oE 'https?://[^"'\''[:space:]]*' "$file" 2>/dev/null \
+              | grep -E '(esm\.sh|unpkg\.com|cdn\.)' | sed "s|^|  $file: |" || true
+          done
+
       - name: Check for TODO and FIXME comments
         run: |
-          echo "Checking for TODO/FIXME comments..."
-          grep -r "TODO\|FIXME" --include="*.js" --include="*.html" --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=backend --exclude-dir=tools | head -10 || echo "No TODO/FIXME found"
+          echo "Scanning for TODO/FIXME comments..."
+          grep -rn 'TODO\|FIXME' --include='*.js' --include='*.html' \
+            --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=backend --exclude-dir=archived \
+            | head -20 || echo "No TODO/FIXME found"
         continue-on-error: true
