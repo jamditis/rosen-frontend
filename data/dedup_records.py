@@ -14,6 +14,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from csv_safe_write import atomic_csv_write
+from prune_orphan_references import prune_orphan_references
 
 CSV_PATH = Path(__file__).parent / "archive_records-public.csv"
 
@@ -132,6 +133,15 @@ def main():
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
+
+    # Records were removed above, so prune the entity and relationship
+    # extractions that referenced them — otherwise archive-entities.json
+    # ends up with dead "first mentioned in" links. See issue #144.
+    print("\n  Pruning orphaned entity/relationship references...")
+    orphan_summary = prune_orphan_references()
+    print(f"    Relationship rows pruned: {orphan_summary['pruned_relationships']}")
+    print(f"    Entity refs repointed:    {orphan_summary['repointed_entities']}")
+    print(f"    Entity refs cleared:      {orphan_summary['nulled_entities']}")
 
     print("  Done!")
 
