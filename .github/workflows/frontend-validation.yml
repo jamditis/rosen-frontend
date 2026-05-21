@@ -5,6 +5,9 @@ on:
     branches: [ main ]
     paths:
       - 'frontend/**'
+      - 'tools/**'
+      - 'dissertation/**'
+      - 'features/**'
       - 'index.html'
       - 'shared-styles.css'
       - 'tests/**'
@@ -15,6 +18,9 @@ on:
     branches: [ main ]
     paths:
       - 'frontend/**'
+      - 'tools/**'
+      - 'dissertation/**'
+      - 'features/**'
       - 'index.html'
       - 'shared-styles.css'
       - 'tests/**'
@@ -27,6 +33,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    # playwright is a repo dependency; its postinstall downloads ~hundreds of
+    # MB of browser binaries that this validation job never uses.
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
 
     steps:
       - name: Checkout repository
@@ -94,7 +104,7 @@ jobs:
           echo "External CDN references in HTML files:"
           for file in $(find . -name '*.html' -not -path './node_modules/*' -not -path './.git/*' -not -path './backend/*'); do
             grep -oE 'https?://[^"'\''[:space:]]*' "$file" 2>/dev/null \
-              | grep -E '(esm\.sh|unpkg\.com|cdn\.)' | sed "s|^|  $file: |" || true
+              | grep -E '(esm\.sh|unpkg\.com|jsdelivr\.net|cdnjs\.cloudflare\.com|cdn\.)' | sed "s|^|  $file: |" || true
           done
 
       - name: Check for TODO and FIXME comments

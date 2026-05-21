@@ -74,10 +74,12 @@ export const initDatabase = async () => {
       // Load sql.js dynamically
       const sqlJsInit = await loadSqlJs();
 
-      // Initialize sql.js with WASM from the same CDN source. The version is
-      // pinned to match the SRI-verified loader script above; sql.js fetches
-      // the .wasm itself through locateFile, which exposes no SRI hook, so the
-      // version pin is the integrity guarantee available for the binary.
+      // Initialize sql.js with WASM from the same CDN and version as the
+      // SRI-verified loader script above. sql.js fetches the .wasm itself
+      // through locateFile, which exposes no SRI hook, so the binary is
+      // version-pinned but not integrity-checked — a compromised CDN could
+      // still serve a different .wasm at this path. Self-hosting the binary
+      // and verifying its hash before use would close that gap.
       const SQL = await sqlJsInit({
         locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${file}`
       });
