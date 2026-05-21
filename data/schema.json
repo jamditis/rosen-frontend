@@ -35,7 +35,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "pattern": "^(RECORD|THREAD|SOCIAL|dissertation)-[0-9a-zA-Z-]+$",
+          "pattern": "^(RECORD|THREAD|BSKY|TWTR|TUMBLR|CLIP|dissertation)-[0-9a-zA-Z-]+$",
           "description": "Unique record identifier"
         },
         "title": {
@@ -125,7 +125,8 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique entity identifier"
+          "pattern": "^[A-Z][0-9]+$",
+          "description": "Unique entity identifier (e.g. P0001, C0042)"
         },
         "type": {
           "type": "string",

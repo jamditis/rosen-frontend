@@ -61,6 +61,10 @@ raw_media_files/
 tmp/
 output/
 
+# Backup copies of data files - git history is the backup; don't track manual copies
+data/*.backup
+data/*_backup_*.csv
+
 # Project Specific
 known_entities.json
 

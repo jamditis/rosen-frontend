@@ -28,7 +28,7 @@ Each record in the archive represents a piece of Jay Rosen's work.
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `id` | string | ✓ | Unique identifier (e.g., `RECORD-00001`, `THREAD-00005`) |
+| `id` | string | ✓ | Unique identifier. Prefix marks the source: `RECORD-`, `THREAD-`, `BSKY-`, `TWTR-`, `TUMBLR-`, `CLIP-`, `dissertation-` (e.g., `RECORD-00001`, `TWTR-15437`) |
 | `title` | string | ✓ | Title of the work |
 | `author` | string | ✓ | Author name (usually "Jay Rosen") |
 | `date` | string | ✓ | Publication date (ISO 8601: `YYYY-MM-DD`) |
@@ -65,7 +65,7 @@ Each record in the archive represents a piece of Jay Rosen's work.
   "tags": ["objectivity debate", "journalism ethics"],
   "verified": true,
   "type": "article",
-  "relatedIds": ["ENT-001", "ENT-042"]
+  "relatedIds": ["P0001", "C0042"]
 }
 ```
 
@@ -82,8 +82,6 @@ Each record in the archive represents a piece of Jay Rosen's work.
 
 - Audience & Public Engagement
 - Journalism Education
-- Journalism History
-- Journalism Practice
 - Journalism Theory & Practice
 - Politics & Democracy
 - Press & Media Criticism
@@ -99,7 +97,7 @@ Entities represent people, organizations, concepts, and other named items extrac
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `id` | string | Unique entity ID (e.g., `ENT-00001`) |
+| `id` | string | Unique entity ID. First letter marks the type (e.g., `P0001` person, `C0042` concept, `O0734` organization) |
 | `type` | string | Entity type |
 | `name` | string | Display name |
 | `normalizedName` | string | Normalized form for matching |
@@ -122,7 +120,7 @@ Entities represent people, organizations, concepts, and other named items extrac
 
 ```json
 {
-  "id": "ENT-00001",
+  "id": "P0001",
   "type": "Person",
   "name": "Jay Rosen",
   "normalizedName": "jay rosen",
@@ -144,10 +142,16 @@ Relationships connect records to entities.
 
 | Column | Description |
 |--------|-------------|
-| `source_record_id` | Record ID |
-| `target_entity_id` | Entity ID |
+| `relationship_id` | Unique relationship identifier |
+| `source_record_id` | Record the relationship was extracted from |
+| `source_entity_id` | Source entity ID |
+| `source_entity_name` | Source entity display name |
 | `relationship_type` | Type of relationship |
-| `context` | Context/excerpt |
+| `target_entity_id` | Target entity ID |
+| `target_entity_name` | Target entity display name |
+| `context_snippet` | Context/excerpt |
+| `confidence_score` | Extraction confidence (0-1) |
+| `extracted_date` | Date the relationship was extracted |
 
 ### Relationship Types
 

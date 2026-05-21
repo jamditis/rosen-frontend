@@ -8,8 +8,12 @@
  * - Large files (>5MB): Only use Cache API, never localStorage
  */
 
-const CACHE_NAME = 'jrda-cache-v5';
-const DATA_CACHE_NAME = 'jrda-data-v5';
+// Cache version is tied to the app version in version.json. Bumping it on every
+// deploy (alongside index.html and the ?v= import strings) makes the activate
+// handler below drop every stale cache, so returning visitors never run old code.
+const CACHE_VERSION = '3.3.0';
+const CACHE_NAME = `jrda-cache-${CACHE_VERSION}`;
+const DATA_CACHE_NAME = `jrda-data-${CACHE_VERSION}`;
 const MAX_CACHE_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 // Detect if we're running on localhost
@@ -222,7 +226,9 @@ async function staleWhileRevalidate(request, cacheName) {
  */
 async function cacheFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
-  const cachedResponse = await cache.match(request);
+  // ignoreSearch so a `?v=` cache-busting query still matches the pre-cached
+  // asset. Freshness across deploys is handled by CACHE_VERSION, not the query.
+  const cachedResponse = await cache.match(request, { ignoreSearch: true });
   if (cachedResponse) {
     return cachedResponse;
   }
