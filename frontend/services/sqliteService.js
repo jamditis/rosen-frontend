@@ -42,6 +42,10 @@ const loadSqlJs = async () => {
 
     const script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.min.js';
+    // Subresource Integrity: pin the CDN payload so a hijacked or compromised
+    // CDN cannot inject arbitrary JS into the main app. See issue #151.
+    script.integrity = 'sha384-upXEZ8BUrRTJ5jBg9rLYXxwca56l9U3ymkbtFghF69ivmL1U7I9t07Hd1v7g/Pim';
+    script.crossOrigin = 'anonymous';
     script.onload = () => {
       initSqlJs = window.initSqlJs;
       resolve(initSqlJs);
@@ -70,7 +74,10 @@ export const initDatabase = async () => {
       // Load sql.js dynamically
       const sqlJsInit = await loadSqlJs();
 
-      // Initialize sql.js with WASM from the same CDN source
+      // Initialize sql.js with WASM from the same CDN source. The version is
+      // pinned to match the SRI-verified loader script above; sql.js fetches
+      // the .wasm itself through locateFile, which exposes no SRI hook, so the
+      // version pin is the integrity guarantee available for the binary.
       const SQL = await sqlJsInit({
         locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${file}`
       });
