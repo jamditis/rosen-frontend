@@ -104,10 +104,14 @@ def _sanitize_cell(value: str) -> str:
     or write an oversized blob into the shared archive CSV. See issue #143.
     """
     text = value.strip()
-    if len(text) > _MAX_FIELD_LENGTH:
-        text = text[:_MAX_FIELD_LENGTH]
+    # Escape before bounding length. A value already at _MAX_FIELD_LENGTH that
+    # starts with a formula trigger would otherwise end up one char over the
+    # cap once the single-quote escape is prepended. Truncation chops only the
+    # tail, so the leading escape always survives.
     if text and text[0] in _CSV_FORMULA_TRIGGERS:
         text = "'" + text
+    if len(text) > _MAX_FIELD_LENGTH:
+        text = text[:_MAX_FIELD_LENGTH]
     return text
 
 

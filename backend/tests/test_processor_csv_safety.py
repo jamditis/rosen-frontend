@@ -30,6 +30,16 @@ class TestSanitizeCell:
         result = processor._sanitize_cell("x" * (processor._MAX_FIELD_LENGTH + 500))
         assert len(result) == processor._MAX_FIELD_LENGTH
 
+    def test_formula_trigger_at_max_length_still_respects_cap(self):
+        # A value exactly at the cap that starts with a formula trigger must
+        # not exceed the cap once the single-quote escape is prepended.
+        at_cap = "=" + "A" * (processor._MAX_FIELD_LENGTH - 1)
+        assert len(at_cap) == processor._MAX_FIELD_LENGTH
+        result = processor._sanitize_cell(at_cap)
+        assert len(result) <= processor._MAX_FIELD_LENGTH
+        # The escape must survive — truncation only chops the tail.
+        assert result.startswith("'=")
+
     def test_value_is_stripped(self):
         assert processor._sanitize_cell("  spaced  ") == "spaced"
 
