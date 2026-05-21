@@ -12,6 +12,7 @@ Routes:
 """
 
 import functools
+import hmac
 import logging
 import threading
 from flask import Flask, render_template, request, redirect, url_for, jsonify, abort
@@ -49,11 +50,22 @@ def _supplied_token():
             or '')
 
 
+def _token_matches(candidate):
+    """Constant-time comparison of a request-supplied token to the secret.
+
+    hmac.compare_digest avoids the early-exit timing side-channel a plain `==`
+    on the secret would leak. Both operands are encoded to bytes so a token
+    containing non-ASCII characters cannot raise TypeError.
+    """
+    return hmac.compare_digest((candidate or '').encode('utf-8'),
+                               SUBMISSION_AUTH_TOKEN.encode('utf-8'))
+
+
 def require_auth(view):
     """Gate a route behind SUBMISSION_AUTH_TOKEN when one is configured."""
     @functools.wraps(view)
     def wrapped(*args, **kwargs):
-        if SUBMISSION_AUTH_TOKEN and _supplied_token() != SUBMISSION_AUTH_TOKEN:
+        if SUBMISSION_AUTH_TOKEN and not _token_matches(_supplied_token()):
             abort(401)
         return view(*args, **kwargs)
     return wrapped
@@ -64,8 +76,11 @@ def _persist_token(response):
     """Store a valid token in a cookie so browser navigation keeps working."""
     if SUBMISSION_AUTH_TOKEN:
         offered = request.headers.get('X-Auth-Token') or request.values.get('token')
-        if offered == SUBMISSION_AUTH_TOKEN and request.cookies.get(_AUTH_COOKIE) != offered:
-            response.set_cookie(_AUTH_COOKIE, offered, httponly=True, samesite='Lax')
+        if offered and _token_matches(offered) and request.cookies.get(_AUTH_COOKIE) != offered:
+            # Mark the cookie Secure on HTTPS requests so a valid token is never
+            # replayed over plaintext HTTP if the server is fronted by TLS.
+            response.set_cookie(_AUTH_COOKIE, offered, httponly=True,
+                                samesite='Lax', secure=request.is_secure)
     return response
 
 

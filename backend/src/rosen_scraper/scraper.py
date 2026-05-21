@@ -14,6 +14,7 @@ from playwright.sync_api import sync_playwright
 from playwright_stealth import Stealth
 import os
 from html import escape
+from urllib.parse import urljoin
 from google import genai
 from google.genai.types import Tool, GenerateContentConfig
 from rosen_scraper.rate_limiter import rate_limited_gemini_call
@@ -27,6 +28,42 @@ USER_AGENTS = [
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
 ]
+
+# Cap on redirect hops followed manually. requests' own default is 30; an
+# article URL that needs more than a handful of hops is almost always wrong.
+_MAX_REDIRECTS = 5
+
+
+def _requests_get_safe(url: str, headers: Dict[str, str], timeout: int) -> requests.Response:
+    """GET ``url``, re-validating every redirect hop against the SSRF guard.
+
+    requests follows redirects automatically, so a URL that passes the
+    entry-point safety check is still free to redirect to a private, loopback,
+    or link-local host (for example a cloud metadata endpoint) and have the
+    server fetch it anyway. To close that bypass we disable automatic
+    redirects and re-check each Location target before following it, so no
+    request is ever issued to an unsafe host.
+
+    Raises:
+        requests.RequestException: if a hop is unsafe or the redirect chain
+            is longer than ``_MAX_REDIRECTS``.
+    """
+    current = url
+    for _ in range(_MAX_REDIRECTS + 1):
+        ok, reason = is_safe_public_url(current)
+        if not ok:
+            raise requests.RequestException(f"unsafe redirect target ({reason}): {current}")
+        response = requests.get(current, headers=headers, timeout=timeout,
+                                allow_redirects=False)
+        if response.is_redirect or response.is_permanent_redirect:
+            location = response.headers.get('Location')
+            if not location:
+                return response
+            current = urljoin(current, location)
+            continue
+        return response
+    raise requests.RequestException(f"exceeded {_MAX_REDIRECTS} redirects starting from {url}")
+
 
 @rate_limited_gemini_call
 def _call_gemini_url_context(client, model_id, prompt, tools):
@@ -188,8 +225,9 @@ def fetch_article_content(url: str) -> Optional[str]:
     headers = {'User-Agent': random.choice(USER_AGENTS)}
     
     try:
-        # Attempt 2: Fast, direct request using the requests library.
-        response = requests.get(url, headers=headers, timeout=15)
+        # Attempt 2: Fast, direct request. Redirects are followed manually so
+        # each hop is re-checked by the SSRF guard (see _requests_get_safe).
+        response = _requests_get_safe(url, headers, timeout=15)
         response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
         
         # Check if the response contains a reasonable amount of content and no JS errors.
@@ -216,6 +254,20 @@ def fetch_article_content(url: str) -> Optional[str]:
                 user_agent=random.choice(USER_AGENTS),
                 java_script_enabled=True,
             )
+
+            # SSRF guard for the browser path: Playwright follows redirects
+            # internally, so re-check every request it makes — including a
+            # redirected main-frame navigation — and abort any that targets a
+            # private/loopback/link-local host.
+            def _block_unsafe_requests(route):
+                is_ok, _ = is_safe_public_url(route.request.url)
+                if is_ok:
+                    route.continue_()
+                else:
+                    route.abort()
+
+            context.route("**/*", _block_unsafe_requests)
+
             page = context.new_page()
             Stealth().apply_stealth_sync(page)
             
