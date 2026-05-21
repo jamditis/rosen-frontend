@@ -42,16 +42,15 @@ SUBMISSION_AUTH_TOKEN = os.environ.get('SUBMISSION_AUTH_TOKEN', '')
 QUEUE_THRESHOLD = int(os.environ.get('QUEUE_THRESHOLD', '5'))
 DAILY_PROCESS_HOUR = int(os.environ.get('DAILY_PROCESS_HOUR', '0'))  # midnight
 
-# The 10 thematic categories currently in the archive
+# The six canonical thematic categories. This list MUST stay in sync with
+# `facets.categories` in data/archive-data.json and the "Category Values"
+# section of data/SCHEMA.md. A form submission tagged with any other category
+# would not group, filter, or facet on the live site. See issue #173.
 THEMATIC_CATEGORIES = [
     'Audience & Public Engagement',
-    'Democratic Theory',
     'Journalism Education',
-    'Journalism History',
     'Journalism Theory & Practice',
     'Politics & Democracy',
     'Press & Media Criticism',
-    'Press Criticism',
-    'Public Life',
     'Technology & Digital Media',
 ]

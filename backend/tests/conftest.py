@@ -1,16 +1,11 @@
 """
 Pytest configuration and fixtures for backend tests.
-"""
-import sys
-import os
-from pathlib import Path
-import pytest
 
-# Add src directory to path for imports
-backend_dir = Path(__file__).resolve().parents[1]
-src_dir = backend_dir / "src"
-if str(src_dir) not in sys.path:
-    sys.path.insert(0, str(src_dir))
+Import paths (src/ for rosen_scraper, the backend root for submission_server)
+are set via [tool.pytest.ini_options] pythonpath in pyproject.toml, so this
+file no longer needs to mutate sys.path. See issue #156.
+"""
+import pytest
 
 
 @pytest.fixture
