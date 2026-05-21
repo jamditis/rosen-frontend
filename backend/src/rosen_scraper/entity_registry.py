@@ -10,7 +10,7 @@ import csv
 import re
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Tuple, Set, Optional
+from typing import Dict, List, Tuple
 
 
 class EntityRegistry:

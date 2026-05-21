@@ -62,7 +62,7 @@ class SoundCloudProcessor:
 
         # Step 3: Need to transcribe audio
         if self.audio_optimizer:
-            print(f"  [SOUNDCLOUD] Transcription needed (optimized 2x speed)")
+            print("  [SOUNDCLOUD] Transcription needed (optimized 2x speed)")
             # This would integrate with audio transcription
             # For now, return metadata indicating transcription needed
             return {

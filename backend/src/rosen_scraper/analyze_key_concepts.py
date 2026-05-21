@@ -11,9 +11,8 @@ Usage:
 """
 
 import os
-import json
 from collections import Counter, defaultdict
-from typing import Dict, List, Set
+from typing import List, Set
 from dotenv import load_dotenv
 import gspread
 from google.oauth2.service_account import Credentials
@@ -241,9 +240,9 @@ def analyze_key_concepts(spreadsheet: gspread.Spreadsheet):
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
         f.write(report_text)
 
-    print(f"\n[*] Analysis complete!")
+    print("\n[*] Analysis complete!")
     print(f"[*] Report saved to: {OUTPUT_FILE}")
-    print(f"\n[*] Summary:")
+    print("\n[*] Summary:")
     print(f"  - {rows_with_concepts} rows have key concepts")
     print(f"  - {rows_with_recommendations} rows have recommendations")
     print(f"  - {len(concept_counts)} unique concepts in use")

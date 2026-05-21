@@ -1,8 +1,7 @@
 """
 Tests for the video processor module.
 """
-import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch, MagicMock
 from rosen_scraper.processors import video_processor
 
 

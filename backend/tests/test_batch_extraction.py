@@ -10,8 +10,6 @@ Tests verify:
 
 import json
 import importlib
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 from pathlib import Path
 import sys
 

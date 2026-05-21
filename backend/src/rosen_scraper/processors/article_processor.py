@@ -9,7 +9,6 @@ from typing import Optional, Dict, Any
 from rosen_scraper import scraper
 import json
 from rosen_scraper import categorizer
-import os
 
 def _run_scraping(url: str) -> Optional[Dict[str, Any]]:
     """
@@ -39,13 +38,13 @@ def _run_scraping(url: str) -> Optional[Dict[str, Any]]:
         try:
             article_data = json.loads(extracted_json)
         except json.JSONDecodeError:
-            print(f"  [Processor] FAILED: Could not parse JSON from trafilatura.")
+            print("  [Processor] FAILED: Could not parse JSON from trafilatura.")
             return None
         
         print("  [Processor] Step 1 SUCCESS: Content fetched and extracted via HTML scraping.")
 
     if not article_data.get('text'):
-        print(f"  [Processor] FAILED: Extracted data is missing the main 'text' body.")
+        print("  [Processor] FAILED: Extracted data is missing the main 'text' body.")
         return None
     
     # Ensure raw_text is available for further processing

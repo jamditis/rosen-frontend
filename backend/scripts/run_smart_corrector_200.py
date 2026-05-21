@@ -19,8 +19,7 @@ from diagnostics.smart_corrector import (
     ContentDetector,
     QualityValidator,
     AudioOptimizer,
-    CostTracker,
-    SmartCorrectorPDFGenerator
+    CostTracker
 )
 from diagnostics.smart_corrector.processors import (
     SoundCloudProcessor,
@@ -208,14 +207,14 @@ def process_with_smart_corrector(limit=200, batch_size=25, resume=True):
             is_valid = False
             quality_score = 0.0
             issues = ['No raw_text found']
-            print(f"           Existing Quality: MISSING")
+            print("           Existing Quality: MISSING")
 
         # Determine processing strategy
         needs_reprocess = not is_valid or quality_score < 0.7
 
         if not needs_reprocess:
             # Use cached content - just re-analyze with AI
-            print(f"           Strategy: USE CACHE (quality good)")
+            print("           Strategy: USE CACHE (quality good)")
 
             note = f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Smart Corrector: Used cached text (Q:{quality_score:.2f})"
 
@@ -262,7 +261,7 @@ def process_with_smart_corrector(limit=200, batch_size=25, resume=True):
 
         else:
             # Need to reprocess from source
-            print(f"           Strategy: REPROCESS from source")
+            print("           Strategy: REPROCESS from source")
             print(f"           Issues: {', '.join(issues[:2])}")
 
             result = None
@@ -270,22 +269,22 @@ def process_with_smart_corrector(limit=200, batch_size=25, resume=True):
             try:
                 # Route to appropriate processor
                 if content_type == 'audio' and 'soundcloud' in url.lower():
-                    print(f"           Processor: SoundCloud")
+                    print("           Processor: SoundCloud")
                     result = soundcloud.process(url)
                     stats['soundcloud'] += 1
 
                 elif content_type == 'video':
                     if 'youtube' in url.lower() or 'youtu.be' in url.lower():
-                        print(f"           Processor: YouTube (FREE captions)")
+                        print("           Processor: YouTube (FREE captions)")
                         result = youtube.process(url)
                         stats['youtube_free'] += 1
                     elif 'c-span' in url.lower():
-                        print(f"           Processor: C-SPAN")
+                        print("           Processor: C-SPAN")
                         result = cspan.process(url)
 
                 elif content_type == 'social':
                     if 'twitter.com' in url.lower() or 'x.com' in url.lower():
-                        print(f"           Processor: Twitter")
+                        print("           Processor: Twitter")
                         result = twitter.process(url)
 
                 if result and result.get('status') == 'success':
@@ -302,7 +301,7 @@ def process_with_smart_corrector(limit=200, batch_size=25, resume=True):
 
                         # Update sheet
                         worksheet.update_cell(row_num, col_ah_idx, new_raw_text)
-                        print(f"           [UPDATED] Column AH (raw_text)")
+                        print("           [UPDATED] Column AH (raw_text)")
 
                         note = f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Smart Corrector: Reprocessed via {result.get('source')} | {len(new_raw_text)} chars"
 
@@ -348,14 +347,14 @@ def process_with_smart_corrector(limit=200, batch_size=25, resume=True):
                         cost = 0.02  # Estimate
                     else:
                         note = f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Smart Corrector: Processing returned no content"
-                        print(f"           [WARN] No content extracted")
+                        print("           [WARN] No content extracted")
                         stats['errors'] += 1
                         stats['edge_cases']['missing_content'] += 1
                         cost = 0.0
 
                 elif result and result.get('status') == 'needs_transcription':
                     note = f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] [NEEDS_TRANSCRIPTION] {result.get('error', 'Requires audio transcription')}"
-                    print(f"           [FLAGGED] Needs transcription")
+                    print("           [FLAGGED] Needs transcription")
                     stats['edge_cases']['no_captions'] += 1
                     cost = 0.0
 
@@ -375,7 +374,7 @@ def process_with_smart_corrector(limit=200, batch_size=25, resume=True):
         # Update notes column (AJ)
         try:
             worksheet.update_cell(row_num, col_aj_idx, note)
-            print(f"           [UPDATED] Column AJ (notes)")
+            print("           [UPDATED] Column AJ (notes)")
         except Exception as e:
             print(f"           [WARN] Could not update notes: {e}")
 
@@ -407,14 +406,14 @@ def process_with_smart_corrector(limit=200, batch_size=25, resume=True):
     print(f"    - YouTube (free captions): {stats['youtube_free']}")
     print(f"    - SoundCloud: {stats['soundcloud']}")
     print(f"  - Errors: {stats['errors']}")
-    print(f"\nEdge Cases Encountered:")
+    print("\nEdge Cases Encountered:")
     print(f"  - No captions available: {stats['edge_cases']['no_captions']}")
     print(f"  - Cell limit exceeded: {stats['edge_cases']['cell_limit']}")
     print(f"  - Missing content: {stats['edge_cases']['missing_content']}")
     print(f"\nTotal Cost: ${stats['total_cost']:.2f}")
     print(f"Budget Remaining: ${cost_tracker.max_budget - stats['total_cost']:.2f}")
-    print(f"\n[COMPLETE] All updates written to Google Sheets!")
-    print(f"Check column AJ for processing notes on each row.")
+    print("\n[COMPLETE] All updates written to Google Sheets!")
+    print("Check column AJ for processing notes on each row.")
 
     return stats
 

@@ -25,7 +25,7 @@ try:
     entities_sheet = spreadsheet.worksheet("extracted_entities")
     entities_data = entities_sheet.get_all_values()
 
-    print(f"[OK] Sheet found: extracted_entities")
+    print("[OK] Sheet found: extracted_entities")
     print(f"  Total rows: {len(entities_data)}")
     print(f"  Data rows (excl. header): {len(entities_data) - 1}")
 
@@ -34,7 +34,7 @@ try:
         print(f"  Columns: {', '.join(headers)}")
 
         # Sample first 5 data rows
-        print(f"\n  Sample data (first 5 entities):")
+        print("\n  Sample data (first 5 entities):")
         for i, row in enumerate(entities_data[1:6], 1):
             entity_id = row[0] if len(row) > 0 else "N/A"
             entity_name = row[1] if len(row) > 1 else "N/A"
@@ -58,7 +58,7 @@ try:
                 etype = row[2]
                 entity_types[etype] = entity_types.get(etype, 0) + 1
 
-        print(f"\n  Entities by type:")
+        print("\n  Entities by type:")
         for etype, count in sorted(entity_types.items(), key=lambda x: x[1], reverse=True):
             print(f"    {etype}: {count}")
 
@@ -71,7 +71,7 @@ try:
     rels_sheet = spreadsheet.worksheet("extracted_relationships")
     rels_data = rels_sheet.get_all_values()
 
-    print(f"[OK] Sheet found: extracted_relationships")
+    print("[OK] Sheet found: extracted_relationships")
     print(f"  Total rows: {len(rels_data)}")
     print(f"  Data rows (excl. header): {len(rels_data) - 1}")
 
@@ -80,7 +80,7 @@ try:
         print(f"  Columns: {', '.join(headers)}")
 
         # Sample first 5 data rows
-        print(f"\n  Sample data (first 5 relationships):")
+        print("\n  Sample data (first 5 relationships):")
         for i, row in enumerate(rels_data[1:6], 1):
             source = row[0] if len(row) > 0 else "N/A"
             rel_type = row[1] if len(row) > 1 else "N/A"
@@ -95,7 +95,7 @@ try:
                 rtype = row[1]
                 rel_types[rtype] = rel_types.get(rtype, 0) + 1
 
-        print(f"\n  Relationships by type:")
+        print("\n  Relationships by type:")
         for rtype, count in sorted(rel_types.items(), key=lambda x: x[1], reverse=True):
             print(f"    {rtype}: {count}")
 
@@ -108,7 +108,7 @@ try:
     with open('logs/entity_extraction_progress.json', 'r') as f:
         progress = json.load(f)
 
-    print(f"[OK] Progress file found")
+    print("[OK] Progress file found")
     print(f"  Records processed: {progress['total_processed']}")
     print(f"  Entities extracted: {progress['entities_extracted']}")
     print(f"  Relationships extracted: {progress['relationships_extracted']}")

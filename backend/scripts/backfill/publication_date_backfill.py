@@ -18,7 +18,6 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from dotenv import load_dotenv
 import google.generativeai as genai
-from urllib.parse import urlparse
 
 # Load environment variables
 load_dotenv()
@@ -267,14 +266,14 @@ class PublicationDateBackfiller:
                     updates = []
                     time.sleep(1)  # Rate limiting
             else:
-                print(f"  [FAILED] No date found")
+                print("  [FAILED] No date found")
 
         # Final batch update
         if updates:
             print(f"\\n⚡ Final batch updating {len(updates)} records...")
             self.final_ws.batch_update(updates)
 
-        print(f"\\n=== BACKFILL COMPLETE ===")
+        print("\\n=== BACKFILL COMPLETE ===")
         print(f"Successfully filled {success_count}/{end_row} publication dates")
         print(f"Success rate: {success_count/end_row*100:.1f}%")
 

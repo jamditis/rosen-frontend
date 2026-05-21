@@ -7,9 +7,7 @@ tab of the Google Sheet for rows where this information is missing.
 import gspread
 import os
 import json
-import sys
 from pathlib import Path
-from urllib.parse import urlparse
 from dotenv import load_dotenv
 
 
@@ -67,9 +65,11 @@ def main():
 
     # --- 3. Load Schema and Known Entities ---
     schema = get_schema(SCHEMA_FILE)
-    if not schema: return
+    if not schema:
+        return
     known_entities = entity_resolver.load_known_entities(str(KNOWN_ENTITIES_FILE))
-    if not known_entities: return
+    if not known_entities:
+        return
 
     # --- 4. Process Each Row ---
     for i, row in enumerate(data):

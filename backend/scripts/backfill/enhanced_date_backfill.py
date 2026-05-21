@@ -16,7 +16,6 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 from dotenv import load_dotenv
-from urllib.parse import urlparse
 
 # Load environment variables
 load_dotenv()
@@ -268,7 +267,7 @@ class EnhancedDateBackfiller:
                     print(f"    [SUCCESS-WEB] {extracted_date}")
                     web_success += 1
                 else:
-                    print(f"    [FAILED] No date found")
+                    print("    [FAILED] No date found")
 
             if extracted_date:
                 # Update the cell
@@ -291,7 +290,7 @@ class EnhancedDateBackfiller:
             print(f"\\n[FINAL UPDATE] Updating {len(updates)} records...")
             self.final_ws.batch_update(updates)
 
-        print(f"\\n=== ENHANCED BACKFILL COMPLETE ===")
+        print("\\n=== ENHANCED BACKFILL COMPLETE ===")
         print(f"Successfully filled: {success_count}")
         print(f"  - URL extraction: {url_success}")
         print(f"  - Web scraping: {web_success}")

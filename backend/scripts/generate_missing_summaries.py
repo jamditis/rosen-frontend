@@ -69,8 +69,6 @@ class SummaryGenerator:
         """Generate a summary based on available record content."""
         title = record.get('title', '').strip()
         raw_text = record.get('raw_text', '').strip()
-        excerpt = record.get('excerpt', '').strip()
-        content_type = record.get('content_type', '').strip()
         platform = record.get('platform', '').strip()
         publication_date = record.get('publication_date', '').strip()
 
@@ -120,7 +118,7 @@ class SummaryGenerator:
                 # Parse the date and extract year
                 year = publication_date.split('-')[0]
                 summary_parts.append(f"Published in {year}.")
-            except:
+            except Exception:
                 pass
 
         # Add platform attribution
@@ -231,8 +229,8 @@ class SummaryGenerator:
             "SUMMARY",
             "=" * 80,
             f"✓ Successfully generated {len(self.updates)} summaries",
-            f"✓ CSV backup created",
-            f"✓ CSV updated with new summaries",
+            "✓ CSV backup created",
+            "✓ CSV updated with new summaries",
             ""
         ])
 

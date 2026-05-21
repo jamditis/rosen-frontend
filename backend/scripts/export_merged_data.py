@@ -30,7 +30,6 @@ backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir))
 
 from rosen_scraper.extraction_db import ExtractionDB
-from rosen_scraper.entity_registry import EntityRegistry
 
 
 # Expected schema for entities
@@ -445,10 +444,10 @@ class DataExporter:
         print("\n" + "=" * 60)
         print("EXPORT COMPLETE")
         print("=" * 60)
-        print(f"\n📦 Output files:")
+        print("\n📦 Output files:")
         print(f"   Entities: {entities_path}")
         print(f"   Relationships: {relationships_path}")
-        print(f"\n📊 Counts:")
+        print("\n📊 Counts:")
         print(f"   Entities: {entity_count:,}")
         print(f"   Relationships: {rel_count:,}")
 
@@ -464,7 +463,7 @@ class DataExporter:
         csv_entities = self.load_existing_entities()
         csv_relationships = self.load_existing_relationships()
 
-        print(f"\n📄 CSV Files:")
+        print("\n📄 CSV Files:")
         print(f"   Entities: {len(csv_entities):,}")
         print(f"   Relationships: {len(csv_relationships):,}")
 
@@ -472,7 +471,7 @@ class DataExporter:
             type_counts = defaultdict(int)
             for e in csv_entities:
                 type_counts[e.get('entity_type', 'Unknown')] += 1
-            print(f"   By type:")
+            print("   By type:")
             for t, c in sorted(type_counts.items()):
                 print(f"      {t}: {c:,}")
 
@@ -481,17 +480,17 @@ class DataExporter:
             db = ExtractionDB(self.db_path)
             db_stats = db.get_stats()
 
-            print(f"\n💾 SQLite Database:")
+            print("\n💾 SQLite Database:")
             print(f"   Entities: {db_stats.get('total_entities', 0):,}")
             print(f"   Relationships: {db_stats.get('total_relationships', 0):,}")
             print(f"   Processed records: {db_stats.get('total_processed', 0):,}")
 
             if db_stats.get('entities_by_type'):
-                print(f"   By type:")
+                print("   By type:")
                 for t, c in sorted(db_stats['entities_by_type'].items()):
                     print(f"      {t}: {c:,}")
         else:
-            print(f"\n💾 SQLite Database: Not found")
+            print("\n💾 SQLite Database: Not found")
 
         print("\n" + "=" * 60)
 

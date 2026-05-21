@@ -27,12 +27,11 @@ Date: 2025-01-31
 """
 
 import argparse
-import csv
 import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Optional, Tuple
 
 # Add backend to path
 backend_dir = Path(__file__).parent.parent
@@ -352,7 +351,7 @@ class UnifiedEntityProcessor:
         for result in results:
             post_id = result.get('post_id')
             if not post_id:
-                print(f"[PROCESSOR] WARNING: Result missing post_id, skipping")
+                print("[PROCESSOR] WARNING: Result missing post_id, skipping")
                 continue
 
             entities = result.get('entities', [])
@@ -517,21 +516,21 @@ class UnifiedEntityProcessor:
         print("ENTITY EXTRACTION STATUS")
         print("=" * 60)
 
-        print(f"\n[PROGRESS]")
+        print("\n[PROGRESS]")
         print(f"   Total posts:     {status['total_posts']:,}")
         print(f"   Processed:       {status['processed_posts']:,}")
         print(f"   Remaining:       {status['remaining_posts']:,}")
         print(f"   Progress:        {status['progress_pct']}%")
 
-        print(f"\n[DATABASE]")
+        print("\n[DATABASE]")
         print(f"   Entities:        {status['entities_in_db']:,}")
         print(f"   Relationships:   {status['relationships_in_db']:,}")
 
-        print(f"\n[REGISTRY]")
+        print("\n[REGISTRY]")
         print(f"   Total entities:  {status['entities_in_registry']:,}")
 
         if status.get('entities_by_type'):
-            print(f"\n[ENTITIES BY TYPE]")
+            print("\n[ENTITIES BY TYPE]")
             for etype, count in sorted(status['entities_by_type'].items()):
                 print(f"   {etype}: {count:,}")
 
@@ -624,7 +623,7 @@ def main():
         batch = processor.prepare_batch(args.batch_size, args.tier)
         if batch:
             output = processor.export_batch_for_claude(batch, args.output)
-            print(f"\n[SUCCESS] Ready for Claude extraction!")
+            print("\n[SUCCESS] Ready for Claude extraction!")
             print(f"   File: {output}")
             print(f"   Posts: {len(batch)}")
 

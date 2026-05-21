@@ -14,7 +14,6 @@ import os
 import sys
 import json
 from datetime import datetime
-from pathlib import Path
 
 # Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -93,7 +92,7 @@ class AccessibilityIntegration:
                     results['generation_results']['generated_files'].append(pdf_path)
                     
                     # Evaluate accessibility
-                    print(f"  Evaluating accessibility...")
+                    print("  Evaluating accessibility...")
                     evaluation = self.checker.evaluate_pdf_accessibility(pdf_path)
                     
                     if evaluation:
@@ -117,10 +116,10 @@ class AccessibilityIntegration:
                         print(f"    Accessibility score: {evaluation['accessibility_score']}/100")
                         print(f"    Compliance: {evaluation['compliance_level']}")
                     else:
-                        print(f"  ⚠ Generated but failed accessibility evaluation")
+                        print("  ⚠ Generated but failed accessibility evaluation")
                 else:
                     results['generation_results']['failed_generations'] += 1
-                    print(f"  ✗ Failed to generate PDF")
+                    print("  ✗ Failed to generate PDF")
                     
             except Exception as e:
                 results['generation_results']['failed_generations'] += 1
@@ -362,7 +361,7 @@ def main():
             max_records=num_records
         )
         
-        print(f"\n=== GENERATION AND EVALUATION COMPLETE ===")
+        print("\n=== GENERATION AND EVALUATION COMPLETE ===")
         print(f"Generated: {results['generation_results']['successful_generations']}/{results['generation_results']['total_attempted']} PDFs")
         print(f"Average accessibility score: {results['accessibility_results']['average_score']:.1f}/100")
         
@@ -370,7 +369,7 @@ def main():
         directory = sys.argv[2] if len(sys.argv) > 2 else "processed_pdf_library"
         summary = integration.evaluate_existing_pdfs(directory)
         
-        print(f"\n=== EVALUATION COMPLETE ===")
+        print("\n=== EVALUATION COMPLETE ===")
         print(f"Evaluated: {summary['evaluated_files']}/{summary['total_files']} PDFs")
         print(f"Average accessibility score: {summary['average_score']:.1f}/100")
         
@@ -387,7 +386,7 @@ def main():
             return
         
         num_records = int(sys.argv[2]) if len(sys.argv) > 2 else 5
-        comparison = integration.compare_generators(records, num_records)
+        integration.compare_generators(records, num_records)
         
     else:
         print(f"Unknown command: {command}")

@@ -9,7 +9,7 @@ for Gemini API calls to prevent API throttling and service disruption.
 import os
 import time
 import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 from pathlib import Path
 import sys
 
@@ -21,9 +21,7 @@ if str(SRC_DIR) not in sys.path:
 
 from rosen_scraper.rate_limiter import (
     rate_limited_gemini_call,
-    get_rate_limit_info,
-    API_RATE_LIMIT_CALLS,
-    API_RATE_LIMIT_PERIOD
+    get_rate_limit_info
 )
 
 

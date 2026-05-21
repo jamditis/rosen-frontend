@@ -4,7 +4,6 @@ Test script for the data format converter.
 """
 
 import sys
-import os
 import json
 from pathlib import Path
 
@@ -62,21 +61,21 @@ def test_format_converter():
     # Test CSV to array
     csv_test = "Press & Media Criticism, Journalism Theory & Practice, Technology & Digital Media"
     array_result = converter.convert_csv_to_array(csv_test)
-    print(f"\nCSV to Array:")
+    print("\nCSV to Array:")
     print(f"  Input:  {csv_test}")
     print(f"  Output: {array_result}")
 
     # Test entity conversion
     entities_test = "New York Times, Twitter, Congress, Unknown Entity"
     entities_result = converter.convert_entities_to_structured(entities_test)
-    print(f"\nEntities to Structured:")
+    print("\nEntities to Structured:")
     print(f"  Input:  {entities_test}")
     print(f"  Output: {json.dumps(entities_result, indent=2)}")
 
     # Test relationship conversion
     relations_test = "NYT-00123, WAPO-00456, CNN-00789"
     relations_result = converter.convert_relationships_to_structured(relations_test, "related_to")
-    print(f"\nRelationships to Structured:")
+    print("\nRelationships to Structured:")
     print(f"  Input:  {relations_test}")
     print(f"  Output: {json.dumps(relations_result, indent=2)}")
 

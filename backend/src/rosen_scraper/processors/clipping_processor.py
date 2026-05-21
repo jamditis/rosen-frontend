@@ -15,13 +15,12 @@ Expected input formats:
 - Directory of clipping files
 """
 
-import os
 import re
 import json
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
-from dataclasses import dataclass, asdict
+from typing import Dict, List, Optional
+from dataclasses import dataclass
 
 
 @dataclass
@@ -531,11 +530,11 @@ def main():
 
     elif args.directory:
         # Process directory
-        records = processor.process_directory(args.output)
+        processor.process_directory(args.output)
         if not args.output:
             # Print summary
             stats = processor.get_stats()
-            print(f"\n[CLIPPING] Summary:")
+            print("\n[CLIPPING] Summary:")
             print(f"  Processed: {stats['processed']}")
             print(f"  Errors: {stats['errors']}")
             print(f"  By publication: {stats['publications']}")

@@ -7,7 +7,7 @@ Captures parent post information for replies to enable threading.
 
 import re
 import requests
-from typing import Dict, Optional, List
+from typing import Dict, Optional
 from datetime import datetime
 
 
@@ -139,7 +139,7 @@ class BlueskyProcessor:
                 try:
                     error_data = response.json()
                     print(f"  [BLUESKY] Error: {error_data.get('message', 'Unknown error')}")
-                except:
+                except Exception:
                     pass
                 return None
         except requests.RequestException as e:
@@ -181,7 +181,7 @@ class BlueskyProcessor:
                 try:
                     dt = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
                     pub_date = dt.strftime('%Y-%m-%d')
-                except:
+                except Exception:
                     pub_date = created_at[:10] if len(created_at) >= 10 else None
 
             # Determine if this is a reply and get parent info
@@ -288,7 +288,7 @@ class BlueskyProcessor:
             try:
                 dt = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
                 parent_date = dt.strftime('%Y-%m-%d')
-            except:
+            except Exception:
                 parent_date = created_at[:10] if len(created_at) >= 10 else None
 
         return {

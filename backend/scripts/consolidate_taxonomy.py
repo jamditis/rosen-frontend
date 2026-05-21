@@ -22,7 +22,6 @@ import shutil
 from pathlib import Path
 from datetime import datetime
 from collections import Counter, defaultdict
-import re
 
 
 class TaxonomyConsolidator:
@@ -58,7 +57,6 @@ class TaxonomyConsolidator:
 
         # Key concepts canonical forms (from schema.json)
         self.key_concepts_canonical = {
-            "view from nowhere": "View from Nowhere",
             "view from nowhere": "View from Nowhere",
             "church of the savvy": "Church of the Savvy",
             "the people formerly known as the audience": "The People Formerly Known as the Audience",
@@ -331,7 +329,7 @@ class TaxonomyConsolidator:
         tag_map = self.build_tag_normalization_map(records)
 
         # Clean records
-        print(f"\n🔧 Cleaning records...")
+        print("\n🔧 Cleaning records...")
         cleaned_records = [self.clean_record(record, tag_map) for record in records]
 
         print(f"✅ Cleaned {len(cleaned_records)} records")
@@ -339,7 +337,7 @@ class TaxonomyConsolidator:
         # Remove colQ_changes from fieldnames if it exists
         if 'colQ_changes' in fieldnames:
             fieldnames.remove('colQ_changes')
-            print(f"✅ Removed 'colQ_changes' column from schema")
+            print("✅ Removed 'colQ_changes' column from schema")
 
         print(f"\n💾 Writing cleaned data to: {output_file}")
 
@@ -348,7 +346,7 @@ class TaxonomyConsolidator:
             writer.writeheader()
             writer.writerows(cleaned_records)
 
-        print(f"✅ Written successfully")
+        print("✅ Written successfully")
 
     def print_change_summary(self):
         """Print summary of changes made."""
@@ -357,7 +355,7 @@ class TaxonomyConsolidator:
         print("="*80)
 
         print(f"\nTotal records with changes: {len(self.changes)}")
-        print(f"\nChanges by type:")
+        print("\nChanges by type:")
         print(f"  - Eras reassigned: {self.stats['era_reassigned']}")
         print(f"  - Tags normalized: {self.stats['tags_normalized']}")
         print(f"  - Key concepts normalized: {self.stats['key_concepts_normalized']}")
@@ -366,7 +364,7 @@ class TaxonomyConsolidator:
         print(f"  - Columns removed: {self.stats['column_removed']}")
 
         if self.changes:
-            print(f"\n" + "-"*80)
+            print("\n" + "-"*80)
             print("DETAILED CHANGES (first 30 records)")
             print("-"*80)
 
@@ -401,7 +399,7 @@ def main():
         return
 
     # Create backup
-    print(f"\n🔒 Creating backup...")
+    print("\n🔒 Creating backup...")
     consolidator = TaxonomyConsolidator(data_dir)
     backup_file = consolidator.create_backup(csv_file)
     print(f"✅ Backup created: {backup_file}")
@@ -419,7 +417,7 @@ def main():
         f.write(f"Taxonomy Consolidation Changes - {datetime.now().isoformat()}\n")
         f.write("="*80 + "\n\n")
         f.write(f"Total records with changes: {len(consolidator.changes)}\n\n")
-        f.write(f"Changes by type:\n")
+        f.write("Changes by type:\n")
         f.write(f"  - Eras reassigned: {consolidator.stats['era_reassigned']}\n")
         f.write(f"  - Tags normalized: {consolidator.stats['tags_normalized']}\n")
         f.write(f"  - Key concepts normalized: {consolidator.stats['key_concepts_normalized']}\n")
@@ -440,11 +438,11 @@ def main():
     print("="*80)
     print(f"\n1. Review the cleaned file: {cleaned_file}")
     print(f"2. Review the change log: {change_log}")
-    print(f"3. If satisfied, replace the original:")
+    print("3. If satisfied, replace the original:")
     print(f"   mv {cleaned_file} {csv_file}")
-    print(f"\n4. If NOT satisfied, discard the cleaned file:")
+    print("\n4. If NOT satisfied, discard the cleaned file:")
     print(f"   rm {cleaned_file}")
-    print(f"\n5. Backup is available if needed:")
+    print("\n5. Backup is available if needed:")
     print(f"   {backup_file}")
     print("\n" + "="*80)
     print()

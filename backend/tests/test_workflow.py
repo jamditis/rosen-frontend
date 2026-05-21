@@ -1,9 +1,7 @@
 """
 Tests for the workflow module.
 """
-import pytest
 import json
-from unittest.mock import Mock, patch, MagicMock
 from rosen_scraper import workflow
 
 

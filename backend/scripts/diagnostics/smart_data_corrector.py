@@ -11,7 +11,6 @@ import os
 import sys
 from pathlib import Path
 from typing import Dict, List, Optional
-from datetime import datetime
 import gspread
 from dotenv import load_dotenv
 
@@ -189,7 +188,7 @@ class SmartDataCorrector:
 
             # Check budget
             if not self.cost_tracker.can_afford(estimated_cost):
-                print(f"  ⛔ Budget limit reached. Stopping.")
+                print("  ⛔ Budget limit reached. Stopping.")
                 return {'status': 'budget_exceeded'}
 
             # Reprocess cached text through AI (cheap)
@@ -222,7 +221,7 @@ class SmartDataCorrector:
                 if length_seconds:
                     try:
                         duration = float(length_seconds) / 60.0  # Convert to minutes
-                    except:
+                    except Exception:
                         duration = 30  # Default 30 minutes
 
             estimated_cost = self.cost_tracker.estimate_cost(
@@ -234,7 +233,7 @@ class SmartDataCorrector:
 
             # Check budget
             if not self.cost_tracker.can_afford(estimated_cost):
-                print(f"  ⛔ Budget limit reached. Stopping.")
+                print("  ⛔ Budget limit reached. Stopping.")
                 return {'status': 'budget_exceeded'}
 
             # Process from source
@@ -393,7 +392,7 @@ class SmartDataCorrector:
         print(f"  Reprocessed:  {self.stats['reprocessed']}")
         print(f"Failed:         {self.stats['failed']}")
         print(f"Skipped:        {self.stats['skipped']}")
-        print(f"\nBy Content Type:")
+        print("\nBy Content Type:")
         for ctype, count in self.stats['by_content_type'].items():
             print(f"  {ctype:10s}  {count}")
 

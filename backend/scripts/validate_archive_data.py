@@ -15,7 +15,6 @@ Run with: python scripts/validate_archive_data.py
 """
 
 import csv
-import json
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path

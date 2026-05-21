@@ -58,20 +58,20 @@ def process_from_offset(limit_param=50, batch_size=25, resume=True):
     print("=" * 80)
     print(f"SMART DATA CORRECTOR - Rows {start_row} to {start_row + limit_param - 1}")
     print("=" * 80)
-    print(f"[FIXED VERSION] - AI analysis WILL be written to sheet")
+    print("[FIXED VERSION] - AI analysis WILL be written to sheet")
     print()
 
     # Initialize components
     detector = ContentDetector()
     validator = QualityValidator()
-    cost_tracker = CostTracker(max_budget=50.0)
+    _ = CostTracker(max_budget=50.0)
 
     # Initialize processors
     audio_optimizer = AudioOptimizer(speed_factor=2.0)
-    soundcloud = SoundCloudProcessor(audio_optimizer=audio_optimizer)
-    cspan = CSpanProcessor()
-    youtube = YouTubeEnhancedProcessor()
-    twitter = TwitterProcessor(playwright_fallback=True)
+    _ = SoundCloudProcessor(audio_optimizer=audio_optimizer)
+    _ = CSpanProcessor()
+    _ = YouTubeEnhancedProcessor()
+    _ = TwitterProcessor(playwright_fallback=True)
 
     # Connect to sheet
     print("[1/4] Connecting to Google Sheets...")
@@ -127,7 +127,7 @@ def process_from_offset(limit_param=50, batch_size=25, resume=True):
     }
 
     # Process
-    print(f"\n[3/4] Processing...")
+    print("\n[3/4] Processing...")
     print("-" * 80)
 
     for i, record in enumerate(records):
@@ -153,14 +153,13 @@ def process_from_offset(limit_param=50, batch_size=25, resume=True):
         else:
             is_valid = False
             quality_score = 0.0
-            issues = ['No raw_text found']
-            print(f"           Existing Quality: MISSING")
+            print("           Existing Quality: MISSING")
 
         needs_reprocess = not is_valid or quality_score < 0.7
 
         if not needs_reprocess:
             # Use cached - AI re-analyze WITH WRITING
-            print(f"           Strategy: USE CACHE (quality good)")
+            print("           Strategy: USE CACHE (quality good)")
             note = f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Smart Corrector: Used cached text (Q:{quality_score:.2f})"
 
             try:
@@ -205,7 +204,7 @@ def process_from_offset(limit_param=50, batch_size=25, resume=True):
             cost = 0.006
 
         else:
-            print(f"           Strategy: REPROCESS from source")
+            print("           Strategy: REPROCESS from source")
             note = f"[{datetime.now().strftime('%Y-%m-%d %H:%M')}] Smart Corrector: Needs reprocessing"
             stats['errors'] += 1
             cost = 0.0

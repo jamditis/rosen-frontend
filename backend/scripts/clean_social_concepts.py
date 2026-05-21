@@ -233,7 +233,7 @@ def process_csv(csv_path, write_mode=False, verbose=False):
 
         print("Done. CSV updated.")
     else:
-        print(f"\nDry run — no changes written. Use --write to apply.")
+        print("\nDry run — no changes written. Use --write to apply.")
 
     return {
         "total_rows": total_rows,

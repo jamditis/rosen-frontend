@@ -630,7 +630,7 @@ def batch_evaluate_accessibility(pdf_directory, output_directory="accessibility_
     with open(summary_path, 'w', encoding='utf-8') as f:
         json.dump(summary, f, indent=2, ensure_ascii=False)
     
-    print(f"\nAccessibility evaluation complete!")
+    print("\nAccessibility evaluation complete!")
     print(f"Evaluated {summary['evaluated_files']}/{summary['total_files']} files")
     print(f"Average accessibility score: {summary['average_score']:.1f}/100")
     print(f"Reports saved to: {output_directory}")

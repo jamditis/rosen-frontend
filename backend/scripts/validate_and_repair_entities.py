@@ -251,7 +251,7 @@ def write_repaired_files(entities, stubs, rel_rows, entity_fieldnames, rel_field
         writer.writeheader()
         writer.writerows(rel_rows)
 
-    print(f"\n✓ Files written successfully:")
+    print("\n✓ Files written successfully:")
     print(f"  - {ENTITIES_FILE}")
     print(f"  - {RELATIONSHIPS_FILE}")
     print(f"  - Backups created with suffix .bak.{backup_suffix}")

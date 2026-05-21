@@ -93,7 +93,7 @@ def test_audio_optimizer():
         chain_2_0x = optimizer._build_atempo_chain(2.0)
         chain_2_5x = optimizer._build_atempo_chain(2.5)
 
-        print(f"\n  Atempo chains:")
+        print("\n  Atempo chains:")
         print(f"    1.5x: {chain_1_5x}")
         print(f"    2.0x: {chain_2_0x}")
         print(f"    2.5x: {chain_2_5x}")
@@ -118,7 +118,7 @@ def test_cost_tracker():
     video_cost = tracker.estimate_cost('video', duration=20)
     social_cost = tracker.estimate_cost('social')
 
-    print(f"Estimated costs:")
+    print("Estimated costs:")
     print(f"  Article:      ${article_cost:.4f}")
     print(f"  Audio (30m):  ${audio_cost:.4f}")
     print(f"  Video (20m):  ${video_cost:.4f}")
@@ -129,7 +129,7 @@ def test_cost_tracker():
     tracker.record_cost('speech_to_text', 0.36, 'Test transcription')
 
     summary = tracker.get_summary()
-    print(f"\nTracking Summary:")
+    print("\nTracking Summary:")
     print(f"  Total cost:    ${summary['total_cost']:.2f}")
     print(f"  Budget used:   {summary['budget_used_percent']:.1f}%")
     print(f"  Operations:    {summary['operations_count']}")

@@ -5,7 +5,6 @@ Quick script to delete test relationship rows 6161-6170 from Google Sheets
 
 import gspread
 from google.oauth2.service_account import Credentials
-import os
 
 # Configuration
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']

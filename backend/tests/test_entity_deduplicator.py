@@ -1,8 +1,7 @@
 """
 Tests for the entity deduplicator module.
 """
-import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch, MagicMock
 from rosen_scraper.entity_deduplicator import EntityDeduplicator
 
 

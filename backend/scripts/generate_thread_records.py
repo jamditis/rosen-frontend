@@ -274,7 +274,7 @@ def main():
     output_csv = output_dir / "thread_records.csv"
     thread_json = output_dir / "thread_details.json"
 
-    count = generate_thread_records(output_csv, thread_json)
+    generate_thread_records(output_csv, thread_json)
 
     print()
     print("NEXT STEPS:")

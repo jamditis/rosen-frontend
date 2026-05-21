@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 import argparse
 import csv
-from typing import List, Dict, Optional
+from typing import Optional
 from datetime import datetime
 
 # Add parent directory to path for imports
@@ -207,7 +207,7 @@ def backfill_summaries(
             text_source = 'excerpt'
 
         if not text:
-            print(f"  ⚠️  No text available - skipping")
+            print("  ⚠️  No text available - skipping")
             skipped_count += 1
             continue
 
@@ -224,7 +224,7 @@ def backfill_summaries(
             df.at[idx, 'summary'] = summary
             updated_count += 1
         else:
-            print(f"  ⚠️  Failed to generate summary")
+            print("  ⚠️  Failed to generate summary")
             skipped_count += 1
 
     print()

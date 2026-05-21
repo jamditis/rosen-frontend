@@ -229,7 +229,6 @@ class DataStandardizationAnalyzer:
 
         # Look for potential issues
         multi_author_patterns = Counter()
-        name_format_issues = []
 
         for author in authors.keys():
             # Check for multiple authors with different delimiters

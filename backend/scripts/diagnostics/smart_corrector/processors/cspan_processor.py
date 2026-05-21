@@ -96,7 +96,7 @@ class CSpanProcessor:
             }
 
         # No transcript found
-        print(f"  [C-SPAN] No transcript found, would need audio transcription")
+        print("  [C-SPAN] No transcript found, would need audio transcription")
         return {
             'status': 'needs_transcription',
             'metadata': self._extract_metadata(url),

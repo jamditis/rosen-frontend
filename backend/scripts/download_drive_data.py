@@ -5,7 +5,6 @@ Download entity extraction data from Google Drive shared folder.
 Uses gcloud application default credentials to authenticate.
 """
 
-import os
 import io
 from pathlib import Path
 from google.oauth2.credentials import Credentials

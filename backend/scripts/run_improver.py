@@ -5,7 +5,6 @@ Wrapper script to run data_improver with proper path setup.
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add project root to path
