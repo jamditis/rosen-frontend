@@ -14,6 +14,8 @@ import csv
 import re
 from pathlib import Path
 
+from csv_safe_write import atomic_csv_write
+
 CSV_PATH = Path(__file__).parent / "archive_records-public.csv"
 
 # Patterns to fix in summary and excerpt fields
@@ -105,7 +107,7 @@ def main():
             print(f"      NEW: {new}")
 
     print(f"\n  Writing {CSV_PATH}...")
-    with open(CSV_PATH, "w", encoding="utf-8", newline="") as f:
+    with atomic_csv_write(CSV_PATH) as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)

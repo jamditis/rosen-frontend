@@ -7,6 +7,8 @@ import csv
 import re
 from pathlib import Path
 
+from csv_safe_write import atomic_csv_write
+
 CSV_PATH = Path(__file__).parent / "archive_records-public.csv"
 
 FIELDS_TO_FIX = ['summary', 'excerpt']
@@ -69,7 +71,7 @@ def main():
 
     if total_changes > 0:
         print(f"\n  Writing {CSV_PATH}...")
-        with open(CSV_PATH, "w", encoding="utf-8", newline="") as f:
+        with atomic_csv_write(CSV_PATH) as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows(rows)
