@@ -23,7 +23,7 @@ import re
 from pathlib import Path
 from collections import defaultdict
 from datetime import datetime
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Tuple
 import argparse
 
 
@@ -506,10 +506,10 @@ def main():
     print("=" * 80)
     print("AUTO-CATEGORIZATION SCRIPT")
     print("=" * 80)
-    print(f"\nConfiguration:")
+    print("\nConfiguration:")
     print(f"  Confidence threshold: {args.confidence_threshold}")
     print(f"  Dry run: {args.dry_run}")
-    print(f"\nLoading data...")
+    print("\nLoading data...")
 
     # Load data
     record_ids_to_categorize = load_records_needing_categories(records_needing_categories)
@@ -519,7 +519,7 @@ def main():
     print(f"  Total records in archive: {len(all_records)}")
 
     # Process records
-    print(f"\nProcessing records...")
+    print("\nProcessing records...")
     categorizer = RecordCategorizer(confidence_threshold=args.confidence_threshold)
     categorizations = categorizer.process_records(record_ids_to_categorize, all_records)
 
@@ -542,10 +542,10 @@ def main():
     else:
         print("\n✓ Categories have been assigned to records")
         print(f"✓ Detailed report saved to: {report_path}")
-        print(f"\nNext steps:")
+        print("\nNext steps:")
         print(f"  1. Review the {categorizer.stats['needs_review']} records marked for manual review")
         print(f"  2. Check the categorization report at: {report_path}")
-        print(f"  3. Manually categorize remaining records as needed")
+        print("  3. Manually categorize remaining records as needed")
 
 
 if __name__ == "__main__":

@@ -249,7 +249,7 @@ class RelationshipBuilder:
                 print(f"  Processed {i}/{len(self.records)} records...")
 
         avg_relationships = total_relationships / len(self.records) if self.records else 0
-        print(f"\nRelationship building complete!")
+        print("\nRelationship building complete!")
         print(f"  Total relationships: {total_relationships}")
         print(f"  Average per record: {avg_relationships:.2f}")
 

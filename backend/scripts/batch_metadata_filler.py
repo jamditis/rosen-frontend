@@ -386,12 +386,12 @@ class BatchMetadataFiller:
         print(f"[FILL] Missing key_concepts: {len(missing_concepts)}")
 
         if missing_categories:
-            print(f"\n[FILL] Sample records missing categories:")
+            print("\n[FILL] Sample records missing categories:")
             for r in missing_categories[:5]:
                 print(f"  - {r['id']}: {r.get('title', '(no title)')}")
 
         if missing_concepts:
-            print(f"\n[FILL] Sample records missing key_concepts:")
+            print("\n[FILL] Sample records missing key_concepts:")
             for r in missing_concepts[:5]:
                 print(f"  - {r['id']}: {r.get('title', '(no title)')}")
 
@@ -615,7 +615,7 @@ class BatchMetadataFiller:
         sample_size = max(1, int(len(pool) * sample_pct / 100))
         sample = random.sample(pool, min(sample_size, len(pool)))
 
-        print(f"\n[FILL] === Spot-check report ===")
+        print("\n[FILL] === Spot-check report ===")
         print(f"[FILL] Pool size: {len(pool)}")
         print(f"[FILL] Sample size: {len(sample)} ({sample_pct}%)")
         if batch_id:

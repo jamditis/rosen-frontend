@@ -7,10 +7,8 @@ for deduplicated entities by analyzing their first mention in the source text.
 """
 
 import os
-import sys
 import time
 from typing import Dict, List, Optional
-from pathlib import Path
 
 import gspread
 from dotenv import load_dotenv
@@ -168,7 +166,7 @@ If the information is not in the text, leave fields empty and set confidence to 
 
             # Check if response is valid
             if not response:
-                print(f"  [WARNING] No response from AI")
+                print("  [WARNING] No response from AI")
                 return {
                     'role_or_description': '',
                     'affiliation': '',
@@ -191,7 +189,7 @@ If the information is not in the text, leave fields empty and set confidence to 
             try:
                 result_text = response.text
                 if not result_text:
-                    print(f"  [WARNING] Empty text in response")
+                    print("  [WARNING] Empty text in response")
                     if hasattr(response, 'candidates') and response.candidates:
                         print(f"  [DEBUG] Candidates: {len(response.candidates)}")
                         if hasattr(response.candidates[0], 'finish_reason'):
@@ -238,7 +236,7 @@ If the information is not in the text, leave fields empty and set confidence to 
 
     def supplement_with_web_search(self, entity_name: str, entity_type: str, existing_metadata: Dict) -> Dict:
         """Use web search to supplement low-confidence metadata."""
-        print(f"    [WEB SEARCH] Low confidence - searching for additional context...")
+        print("    [WEB SEARCH] Low confidence - searching for additional context...")
 
         # Check if googlesearch is available
         try:
@@ -311,7 +309,7 @@ Only provide information that is clearly evident from the search results."""
                 'text_evidence': existing_metadata.get('text_evidence', '') + ' [supplemented with web search]'
             }
 
-            print(f"    [WEB SEARCH] Enhanced metadata")
+            print("    [WEB SEARCH] Enhanced metadata")
             return merged
 
         except Exception as e:

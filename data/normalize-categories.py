@@ -11,6 +11,8 @@ import csv
 import os
 import re
 
+from csv_safe_write import atomic_csv_write
+
 CANONICAL = {
     # Identity (already correct)
     'Audience & Public Engagement':   'Audience & Public Engagement',
@@ -74,7 +76,7 @@ def normalize_file(filepath: str) -> None:
             row['thematic_categories'] = normalized
             changed += 1
 
-    with open(filepath, 'w', newline='', encoding='utf-8') as f:
+    with atomic_csv_write(filepath) as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)

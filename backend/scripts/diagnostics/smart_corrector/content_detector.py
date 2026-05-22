@@ -5,7 +5,7 @@ Automatically detects content type from URL patterns.
 """
 
 import re
-from typing import Dict, Optional
+from typing import Dict
 from urllib.parse import urlparse
 
 
@@ -109,7 +109,7 @@ class ContentDetector:
         try:
             parsed = urlparse(url)
             return parsed.netloc.lower().replace('www.', '')
-        except:
+        except Exception:
             return ''
 
     def get_metadata(self, url: str) -> Dict[str, str]:

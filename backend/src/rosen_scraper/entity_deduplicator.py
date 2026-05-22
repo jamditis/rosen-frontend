@@ -10,11 +10,9 @@ This script resolves duplicate entities in the extracted_entities sheet by:
 """
 
 import os
-import json
 import re
 from collections import defaultdict
-from datetime import datetime
-from typing import Dict, List, Tuple, Set
+from typing import Dict, List
 
 import gspread
 from dotenv import load_dotenv
@@ -108,7 +106,6 @@ class EntityDeduplicator:
             print("[DEDUP] No entities found")
             return []
 
-        headers = all_values[0]
         rows = all_values[1:]
 
         entities = []
@@ -243,9 +240,6 @@ class EntityDeduplicator:
     def replace_extracted_entities_sheet(self, canonical_registry: Dict):
         """Replace the extracted_entities sheet with deduplicated data."""
         print("[DEDUP] Replacing extracted_entities sheet with deduplicated data...")
-
-        # Get the original headers from the sheet
-        headers = self.entities_sheet.row_values(1)
 
         # Prepare deduplicated rows matching the original schema
         rows = []

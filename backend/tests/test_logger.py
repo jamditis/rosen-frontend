@@ -1,10 +1,8 @@
 """
 Tests for the logger module.
 """
-import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import patch, MagicMock
 from rosen_scraper.logger import init_logger, get_logger, PoisonPillType
-import os
 
 
 class TestLoggerModule:
@@ -18,7 +16,6 @@ class TestLoggerModule:
 
     def test_init_logger(self, tmp_path, monkeypatch):
         """Test logger initialization."""
-        log_dir = tmp_path / "logs"
         monkeypatch.chdir(tmp_path)
         
         logger = init_logger(run_id="test_run")
@@ -39,7 +36,6 @@ class TestLoggerModule:
 
     def test_logger_has_handlers(self, tmp_path, monkeypatch):
         """Test that initialized logger has handlers."""
-        log_dir = tmp_path / "logs"
         monkeypatch.chdir(tmp_path)
         
         logger = init_logger(run_id="test_run_2")
@@ -49,7 +45,6 @@ class TestLoggerModule:
 
     def test_logger_can_log_messages(self, tmp_path, monkeypatch):
         """Test that logger can log messages."""
-        log_dir = tmp_path / "logs"
         monkeypatch.chdir(tmp_path)
         
         logger = init_logger(run_id="test_run_3")
@@ -76,7 +71,6 @@ class TestLoggerModule:
     @patch('rosen_scraper.logger.gspread.service_account')
     def test_logger_with_sheets_logging(self, mock_gspread, tmp_path, monkeypatch, mock_env_vars):
         """Test logger initialization with Google Sheets logging."""
-        log_dir = tmp_path / "logs"
         monkeypatch.chdir(tmp_path)
         
         # Mock the gspread client

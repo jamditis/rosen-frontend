@@ -270,9 +270,6 @@ def deduplicate(dry_run: bool = False):
     # ── Step 5: Update relationships ──────────────────────────
     print("Step 5: Updating relationship entity IDs...")
 
-    # Also map junk entity IDs (they won't have a canonical, so we'll filter them out)
-    valid_ids = set(e["entity_id"] for e in final_entities)
-
     updated_rels = []
     removed_junk_refs = 0
     updated_id_count = 0
@@ -366,7 +363,6 @@ def deduplicate(dry_run: bool = False):
     print("  Top 20 entities by cross-record mentions:")
     for e in by_mentions[:20]:
         mentions = int(e["total_mentions"])
-        records = entity_records.get(e["entity_id"], set())
         print(f"    {e['entity_name']} ({e['entity_type']}): {mentions} records -{e['entity_id']}")
     print()
 
@@ -390,7 +386,7 @@ def deduplicate(dry_run: bool = False):
 
         shutil.copy2(ENTITIES_CSV, entities_backup)
         shutil.copy2(RELATIONSHIPS_CSV, rels_backup)
-        print(f"  Backed up to:")
+        print("  Backed up to:")
         print(f"    {entities_backup.name}")
         print(f"    {rels_backup.name}")
 

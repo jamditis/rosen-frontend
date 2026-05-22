@@ -4,8 +4,7 @@ Analyze actual test_runs data to identify schema optimization opportunities.
 """
 
 import pandas as pd
-import json
-from collections import Counter, defaultdict
+from collections import Counter
 import re
 
 def analyze_test_runs_data():
@@ -37,7 +36,7 @@ def analyze_test_runs_data():
         non_empty = df_sample[col].notna().sum()
         completeness[col] = (non_empty / len(df_sample)) * 100
 
-    print(f"\nField Completeness (% of records with data):")
+    print("\nField Completeness (% of records with data):")
     for field, pct in sorted(completeness.items(), key=lambda x: x[1], reverse=True):
         print(f"  {field:<25}: {pct:5.1f}%")
 
@@ -54,7 +53,7 @@ def analyze_test_runs_data():
                 all_themes.extend(theme_list)
 
         theme_counts = Counter(all_themes)
-        print(f"\nThematic Categories Usage (top 10):")
+        print("\nThematic Categories Usage (top 10):")
         for theme, count in theme_counts.most_common(10):
             print(f"  {theme:<35}: {count:3d} times")
 
@@ -68,20 +67,20 @@ def analyze_test_runs_data():
                 all_concepts.extend(concept_list)
 
         concept_counts = Counter(all_concepts)
-        print(f"\nKey Concepts Usage (top 10):")
+        print("\nKey Concepts Usage (top 10):")
         for concept, count in concept_counts.most_common(10):
             print(f"  {concept:<40}: {count:3d} times")
 
     # Analyze content types and formats
     if 'content_type' in df_sample.columns:
         content_types = df_sample['content_type'].value_counts()
-        print(f"\nContent Types:")
+        print("\nContent Types:")
         for ctype, count in content_types.items():
             print(f"  {ctype:<20}: {count:3d} records")
 
     if 'format' in df_sample.columns:
         formats = df_sample['format'].value_counts()
-        print(f"\nContent Formats:")
+        print("\nContent Formats:")
         for fmt, count in formats.items():
             print(f"  {fmt:<20}: {count:3d} records")
 
@@ -99,7 +98,7 @@ def analyze_test_runs_data():
                     domains.append(domain_match.group(1))
 
         domain_counts = Counter(domains)
-        print(f"\nSource Domains (top 15):")
+        print("\nSource Domains (top 15):")
         for domain, count in domain_counts.most_common(15):
             print(f"  {domain:<30}: {count:3d} records")
 
@@ -108,7 +107,7 @@ def analyze_test_runs_data():
 
     if 'era' in df_sample.columns:
         eras = df_sample['era'].value_counts()
-        print(f"\nEra Distribution:")
+        print("\nEra Distribution:")
         for era, count in eras.items():
             if pd.notna(era):
                 print(f"  {era:<45}: {count:3d} records")
@@ -116,7 +115,7 @@ def analyze_test_runs_data():
     # === SCOPE ANALYSIS ===
     if 'scope' in df_sample.columns:
         scopes = df_sample['scope'].value_counts()
-        print(f"\nScope Distribution:")
+        print("\nScope Distribution:")
         for scope, count in scopes.items():
             if pd.notna(scope):
                 print(f"  {scope:<25}: {count:3d} records")
@@ -165,15 +164,15 @@ def analyze_test_runs_data():
             min_length = min(text_lengths)
             max_length = max(text_lengths)
 
-            print(f"Raw Text Statistics:")
+            print("Raw Text Statistics:")
             print(f"  Records with text: {len(text_lengths)}")
             print(f"  Average length: {avg_length:,.0f} characters")
             print(f"  Min length: {min_length:,} characters")
             print(f"  Max length: {max_length:,} characters")
 
             # Quality flags
-            short_texts = len([l for l in text_lengths if l < 500])
-            long_texts = len([l for l in text_lengths if l > 10000])
+            short_texts = len([length for length in text_lengths if length < 500])
+            long_texts = len([length for length in text_lengths if length > 10000])
 
             print(f"  Short texts (<500 chars): {short_texts}")
             print(f"  Long texts (>10k chars): {long_texts}")
@@ -224,11 +223,11 @@ def analyze_test_runs_data():
         print(f"{i}. {rec}")
 
     # Show additional insights
-    print(f"\nAdditional Insights:")
+    print("\nAdditional Insights:")
     print(f"• Most content is from PressThink ({domain_counts.get('pressthink.org', 0)} records)")
-    print(f"• Primary era is 'The Rise of the Web & Blogging' if available")
-    print(f"• Content is primarily articles with text format")
-    print(f"• Thematic categories are well-distributed across Jay Rosen's focus areas")
+    print("• Primary era is 'The Rise of the Web & Blogging' if available")
+    print("• Content is primarily articles with text format")
+    print("• Thematic categories are well-distributed across Jay Rosen's focus areas")
 
     return {
         'total_records': len(df_sample),

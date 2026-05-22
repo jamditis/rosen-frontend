@@ -20,12 +20,9 @@ import re
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
+from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.lib.colors import black, grey
 from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from reportlab.platypus.doctemplate import PageTemplate, BaseDocTemplate
-from reportlab.platypus.frames import Frame
 
 class AccessiblePDFGenerator:
     """
@@ -62,13 +59,8 @@ class AccessiblePDFGenerator:
         # --- 1. Extract and Prepare Data ---
         title = record_data.get('title', 'Untitled Article') or 'Untitled Article'
         author = record_data.get('author', '') or ''
-        publication_date = record_data.get('publication_date', '') or ''
         original_publication = record_data.get('original_publication', '') or ''
-        url = record_data.get('url', '') or ''
-        pull_quote = record_data.get('pull_quote', '') or ''
-        raw_text = record_data.get('raw_text', '') or ''
         item_id = record_data.get('id', 'NO-ID') or 'NO-ID'
-        summary = record_data.get('summary', '') or ''
         
         # Prepare accessibility metadata
         self.accessibility_metadata.update({
@@ -233,7 +225,7 @@ class AccessiblePDFGenerator:
         
         if metadata_parts:
             metadata_text = " | ".join(metadata_parts)
-            story.append(Paragraph(f'<h2>Article Information</h2>', metadata_style))
+            story.append(Paragraph('<h2>Article Information</h2>', metadata_style))
             story.append(Paragraph(self._escape_xml(metadata_text), metadata_style))
             story.append(Spacer(1, 0.1 * inch))
         

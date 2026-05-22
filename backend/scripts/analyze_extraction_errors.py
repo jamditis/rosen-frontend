@@ -134,13 +134,13 @@ def main():
         min_words = min(word_counts)
         max_words = max(word_counts)
 
-        print(f"Word count statistics:")
+        print("Word count statistics:")
         print(f"  Average: {avg_words:.1f} words")
         print(f"  Range: {min_words} - {max_words} words")
         print()
 
     # Platform breakdown
-    print(f"Platform breakdown:")
+    print("Platform breakdown:")
     for platform, count in platforms.most_common():
         pct = (count / len(no_entity_posts)) * 100
         print(f"  {platform:10s}: {count:4d} ({pct:5.1f}%)")

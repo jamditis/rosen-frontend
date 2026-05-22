@@ -13,6 +13,8 @@ import json
 import os
 import glob
 
+from csv_safe_write import atomic_csv_write
+
 CSV_PATH = os.path.join(os.path.dirname(__file__), 'archive_records-public.csv')
 RESULTS_DIR = os.path.join(os.path.dirname(__file__), '_extract_tmp')
 
@@ -57,7 +59,7 @@ def main():
                 row['key_concepts'] = concept
                 kc_applied += 1
 
-    with open(CSV_PATH, 'w', newline='', encoding='utf-8') as f:
+    with atomic_csv_write(CSV_PATH) as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)

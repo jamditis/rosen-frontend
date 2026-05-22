@@ -11,11 +11,11 @@ This module creates visually appealing, well-structured PDFs with:
 
 import os
 import re
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
-from reportlab.lib.colors import black, gray, darkblue
+from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
+from reportlab.lib.colors import gray, darkblue
 
 class EnhancedPDFFormatter:
     """Enhanced PDF formatter with proper text structure and styling."""

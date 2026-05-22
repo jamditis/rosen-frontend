@@ -17,13 +17,12 @@ This processor handles all post types:
 - Audio posts → Flag for transcription
 """
 
-import os
 import re
 import json
 import html
 from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional
 from bs4 import BeautifulSoup
 
 
@@ -649,13 +648,13 @@ def main():
         print(f"[TUMBLR] Wrote {len(records)} records to {args.output}")
     else:
         # Print summary
-        print(f"\n[TUMBLR] Processing complete:")
+        print("\n[TUMBLR] Processing complete:")
         print(f"  Total records: {len(records)}")
         print(f"  Content types: {set(r['content_type'] for r in records)}")
 
         # Show sample record
         if records:
-            print(f"\n  Sample record:")
+            print("\n  Sample record:")
             sample = records[0]
             for key in ['id', 'title', 'publication_date', 'content_type', 'url']:
                 print(f"    {key}: {sample.get(key, '')}")

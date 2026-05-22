@@ -28,7 +28,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Dict, List, Tuple
 
 # Add backend to path
 backend_dir = Path(__file__).parent.parent
@@ -600,7 +600,6 @@ class BatchEntityExtractor:
 
     def _submit_batch_openai(self, client, posts: List[Dict]) -> str:
         """Submit batch via OpenAI Batch API (upload JSONL → create batch)."""
-        import tempfile
         import io
 
         requests = [
@@ -1088,7 +1087,7 @@ class BatchEntityExtractor:
         entities = stats.get("total_entities", 0)
         relationships = stats.get("total_relationships", 0)
 
-        print(f"\n[BATCH] === Progress ===")
+        print("\n[BATCH] === Progress ===")
         print(f"[BATCH] Processed:     {processed:,}")
         print(f"[BATCH] Entities:      {entities:,}")
         print(f"[BATCH] Relationships: {relationships:,}")
@@ -1235,7 +1234,7 @@ def main():
         print(f"\n[BATCH] Submitted {len(batch_ids)} batches:")
         for prov, bid in batch_ids.items():
             print(f"  {prov}: {bid}")
-        print(f"\n[BATCH] Check status:")
+        print("\n[BATCH] Check status:")
         for prov, bid in batch_ids.items():
             print(f"  python {__file__} --status --batch-id {bid} --provider {prov}")
 

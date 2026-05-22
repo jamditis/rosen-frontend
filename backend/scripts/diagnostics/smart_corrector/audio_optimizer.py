@@ -7,9 +7,7 @@ Speeds up audio to 2x before transcription to reduce costs by 50%.
 import os
 import subprocess
 import tempfile
-import math
 from typing import Optional, Dict
-from pathlib import Path
 
 
 class AudioOptimizer:

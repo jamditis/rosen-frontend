@@ -21,9 +21,9 @@ project_root = Path(__file__).resolve().parent.parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
-from backend.submission_server.config import QUEUE_THRESHOLD, DAILY_PROCESS_HOUR
-from backend.submission_server import db
-from backend.submission_server.processor import process_batch
+from backend.submission_server.config import QUEUE_THRESHOLD, DAILY_PROCESS_HOUR  # noqa: E402
+from backend.submission_server import db  # noqa: E402
+from backend.submission_server.processor import process_batch  # noqa: E402
 
 logging.basicConfig(
     level=logging.INFO,

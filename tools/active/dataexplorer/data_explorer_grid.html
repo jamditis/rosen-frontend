@@ -4,10 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Record relationship explorer</title>
-    <!-- Load Tailwind CSS for utility styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="description" content="An interactive explorer for the relationships between records in the Jay Rosen Internet Archive." />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="../../../favicon.svg" />
+    <link rel="icon" href="../../../favicon.ico" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Record relationship explorer - Jay Rosen Internet Archive" />
+    <meta property="og:description" content="An interactive explorer for the relationships between records in the Jay Rosen Internet Archive." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://pressthink.org/j/rosen-archive/tools/active/dataexplorer/data_explorer_grid.html" />
+    <meta property="og:image" content="https://pressthink.org/j/rosen-archive/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Record relationship explorer - Jay Rosen Internet Archive" />
+    <meta name="twitter:description" content="An interactive explorer for the relationships between records in the Jay Rosen Internet Archive." />
+    <meta name="twitter:image" content="https://pressthink.org/j/rosen-archive/og-image.png" />
+    <!-- Tailwind CSS (pre-built locally; cdn.tailwindcss.com is the JIT dev
+         build and cannot carry an integrity hash). See issue #151. -->
+    <link rel="stylesheet" href="../tailwind.css">
     <!-- Load PapaParse for robust CSV data parsing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"
+            integrity="sha384-6kRQDsV2kVYRSENnw7WnekWKCx8/Lmv7rFKpDuR2AoIbjlBShlYcs3x0QlE3kuRh"
+            crossorigin="anonymous"></script>
     <style>
         /* Custom styles for the interactive elements */
         :root {
@@ -177,19 +200,9 @@
             pointer-events: none;
         }
     </style>
-    <script>
-        // --- Tailwind Configuration ---
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary-blue': '#3b82f6', /* Blue used for primary highlight/buttons */
-                        'secondary-gray': '#f3f4f6', /* Light gray background */
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Tailwind theme (custom colors primary-blue, secondary-gray) is baked
+         into the pre-built tools/active/tailwind.css. The cdn.tailwindcss.com
+         runtime config global is no longer available. See issue #151. -->
 </head>
 <body class="bg-secondary-gray min-h-screen">
 

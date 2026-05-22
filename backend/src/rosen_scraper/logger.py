@@ -11,12 +11,11 @@ Provides comprehensive logging capabilities including:
 """
 
 import logging
-import os
 import json
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any
 from enum import Enum
 
 class LogLevel(Enum):

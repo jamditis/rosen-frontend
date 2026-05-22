@@ -10,6 +10,7 @@ requires-python = ">=3.10, <4.0"
 dependencies = [
     "trafilatura (==2.0.0)",
     "requests (==2.32.5)",
+    "flask (==3.1.0)",
     "playwright (==1.55.0)",
     "playwright-stealth (==2.0.0)",
     "beautifulsoup4 (==4.14.2)",
@@ -24,13 +25,9 @@ dependencies = [
     "yt-dlp (==2025.9.26)",
     "python-dotenv (==1.1.1)",
     "ratelimit (==2.2.1)",
-    "desbordante (>=2.4.1,<3.0.0)",
     "sumy (>=0.11.0,<0.12.0)",
-    "webargs (>=8.7.1,<9.0.0)",
-    "thumbor (>=7.7.7,<8.0.0)",
     "pandas (>=2.3.3,<3.0.0)",
-    "aiohttp (>=3.13.3,<4.0.0)",
-    "aiofiles (>=25.1.0,<26.0.0)"
+    "aiohttp (>=3.13.3,<4.0.0)"
 ]
 
 
@@ -38,11 +35,44 @@ dependencies = [
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[dependency-groups]
-dev = [
-    "pytest (==8.4.2)",
-    "pytest-mock (==3.15.1)",
-    "mypy (==1.13.0)",
-    "types-requests (>=2.32.0)",
-    "pytest-cov (>=7.0.0,<8.0.0)"
-]
+# The importable package lives under src/. Declaring it explicitly lets
+# `poetry install` install rosen_scraper editable, so runtime code and tests
+# import it as a real package instead of mutating sys.path. See issue #156.
+[tool.poetry]
+packages = [{ include = "rosen_scraper", from = "src" }]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "==8.4.2"
+pytest-mock = "==3.15.1"
+mypy = "==1.13.0"
+types-requests = ">=2.32.0"
+pytest-cov = ">=7.0.0,<8.0.0"
+# ruff and black are pinned here so the backend-linting workflow installs them
+# through `poetry install` — this file is the single source of tool versions.
+ruff = "==0.15.12"
+black = "==24.4.2"
+
+# desbordante is a C++ extension used only by scripts/analyze_archive_patterns.py
+# and ships no ARM64 wheels. Keeping it in an optional group means the default
+# `poetry install` stays portable; run `poetry install --with analysis` to get
+# it. See issue #149.
+[tool.poetry.group.analysis]
+optional = true
+
+[tool.poetry.group.analysis.dependencies]
+desbordante = ">=2.4.1,<3.0.0"
+
+# pytest resolves imports via pythonpath instead of per-file sys.path hacks:
+# src/ exposes rosen_scraper, the backend root exposes submission_server.
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+
+# Ruff keeps its default rule set (E4/E7/E9/F); only per-file ignores are set.
+[tool.ruff.lint.per-file-ignores]
+# Standalone scripts and test harnesses are run directly (e.g.
+# `poetry run python scripts/foo.py`), so they extend sys.path before importing
+# the rosen_scraper package. That makes E402 (module-import-not-at-top) both
+# unavoidable and intentional in these trees — every other rule still applies.
+"scripts/**" = ["E402"]
+"tests/**" = ["E402"]

@@ -220,9 +220,8 @@ If no high-quality relationships of these types exist, return: {{"relationships"
         all_records = self.test_runs_sheet.get_all_records()
         print(f"[SCAN] Found {len(all_records)} total records")
 
-        # Get existing relationship IDs to avoid duplicates
+        # Existing relationship rows, used later for the final sheet-size tally
         existing_rels = self.relationships_sheet.get_all_values()
-        next_rel_id = len(existing_rels)  # Start after existing relationships
 
         new_relationships = []
 

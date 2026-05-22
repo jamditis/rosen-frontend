@@ -20,32 +20,56 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       
       - name: Set up Python 3.13
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.13'
       
-      - name: Install linting tools
+      - name: Install Poetry
         run: |
-          python -m pip install --upgrade pip
-          pip install ruff==0.6.2 black==24.4.2 mypy==1.10.0
-      
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Configure Poetry
+        run: |
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
+
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v5
+        with:
+          path: backend/.venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('backend/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      # ruff, black, and mypy versions are pinned in backend/pyproject.toml's
+      # dev-dependency group, so CI always matches local tooling — no second
+      # place for tool versions to drift.
+      - name: Install dependencies
+        working-directory: backend
+        run: poetry install --with dev
+
+      # Ruff gates the build: a finding fails the job. The scope covers every
+      # backend Python tree, and per-file E402 ignores live in pyproject.toml.
       - name: Run Ruff
         working-directory: backend
-        run: |
-          ruff check src/ tests/
-        continue-on-error: true
-      
+        run: poetry run ruff check src/ tests/ submission_server/ scripts/
+
+      # Black is not yet enforced — the backend predates any black pass, so this
+      # step reports diffs without failing. Drop continue-on-error once the
+      # codebase has been reformatted.
       - name: Check Black formatting
         working-directory: backend
-        run: |
-          black --check src/ tests/
+        run: poetry run black --check src/ tests/
         continue-on-error: true
-      
+
+      # MyPy is not yet enforced — the codebase is not fully type-annotated
+      # (see mypy.ini: disallow_untyped_defs = False). Drop continue-on-error
+      # once annotations are complete.
       - name: Run MyPy type checking
         working-directory: backend
-        run: |
-          mypy src/
+        run: poetry run mypy src/
         continue-on-error: true

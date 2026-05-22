@@ -197,7 +197,7 @@ class CostTracker:
         print(f"Total Cost:        ${summary['total_cost']:.2f}")
         print(f"Budget Remaining:  ${summary['budget_remaining']:.2f}")
         print(f"Budget Used:       {summary['budget_used_percent']:.1f}%")
-        print(f"\nBreakdown:")
+        print("\nBreakdown:")
         print(f"  Gemini AI:       ${summary['breakdown']['gemini_ai']:.2f}")
         print(f"  Transcription:   ${summary['breakdown']['transcription']:.2f}")
         print(f"  URL Context:     ${summary['breakdown']['url_context']:.2f}")

@@ -1,8 +1,7 @@
 """
 Tests for the dispatcher module.
 """
-import pytest
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 from rosen_scraper import dispatcher
 
 

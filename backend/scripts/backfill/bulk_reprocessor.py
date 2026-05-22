@@ -291,7 +291,7 @@ class BulkReprocessor:
         ai_analysis = {}
         if text and len(text.strip()) > 100:  # Only run AI on substantial content
             try:
-                print(f"  [AI] Running categorization analysis...")
+                print("  [AI] Running categorization analysis...")
                 ai_analysis = summarize_and_classify(text, self.schema) or {}
                 print(f"  [AI] Analysis complete: {len(ai_analysis)} fields")
             except Exception as e:
@@ -536,7 +536,6 @@ def main():
         print("Auto-proceeding with full reprocessing...")
 
         # Auto-confirm for production run
-        response = "yes"
 
         # Initialize final sheet with headers
         print("Initializing final sheet...")

@@ -4,8 +4,6 @@ Test script for the updated schema with new fields.
 """
 
 import sys
-import os
-import json
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
@@ -83,7 +81,7 @@ def test_updated_schema():
             print(f"  {field}: {value}")
 
     # Test schema compliance
-    print(f"\n--- Schema Compliance Test ---")
+    print("\n--- Schema Compliance Test ---")
     sample_record = test_records[0]
     enriched_sample = enrich_data(sample_record.copy(), sample_record['url'], known_entities)
 
@@ -98,14 +96,14 @@ def test_updated_schema():
         print("✓ All schema fields present in enriched record")
 
     # Show final enriched record structure
-    print(f"\n--- Sample Enriched Record (First 10 fields) ---")
+    print("\n--- Sample Enriched Record (First 10 fields) ---")
     for i, header in enumerate(schema['output_headers'][:10]):
         value = enriched_sample.get(header, '')
         if isinstance(value, str) and len(value) > 50:
             value = value[:50] + "..."
         print(f"  {header}: {value}")
 
-    print(f"\nSchema testing completed!")
+    print("\nSchema testing completed!")
     print(f"Total fields in updated schema: {len(schema['output_headers'])}")
 
 if __name__ == "__main__":

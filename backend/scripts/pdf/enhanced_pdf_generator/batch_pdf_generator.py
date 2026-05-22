@@ -128,7 +128,7 @@ def generate_pdfs_for_all_records(records, output_dir="batch_generated_pdfs", ma
                 print(f"  ✓ Success: {os.path.basename(pdf_path)}")
             else:
                 error_count += 1
-                print(f"  ✗ Failed to generate PDF")
+                print("  ✗ Failed to generate PDF")
                 
             # Add small delay to avoid overwhelming the system
             time.sleep(0.1)
@@ -138,7 +138,7 @@ def generate_pdfs_for_all_records(records, output_dir="batch_generated_pdfs", ma
             print(f"  ✗ Error processing record {i}: {e}")
             continue
     
-    print(f"\n--- PDF Generation Complete ---")
+    print("\n--- PDF Generation Complete ---")
     print(f"Total records processed: {len(records)}")
     print(f"Successful PDFs: {success_count}")
     print(f"Errors: {error_count}")
@@ -176,7 +176,7 @@ def generate_sample_pdfs(num_records=5):
     )
     
     if files:
-        print(f"\nSample PDFs generated in 'processed_pdf_library' directory:")
+        print("\nSample PDFs generated in 'processed_pdf_library' directory:")
         for file_path in files[:3]:  # Show first 3
             print(f"  - {os.path.basename(file_path)}")
         if len(files) > 3:

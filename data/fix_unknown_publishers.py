@@ -9,6 +9,8 @@ import re
 from pathlib import Path
 from urllib.parse import urlparse
 
+from csv_safe_write import atomic_csv_write
+
 CSV_PATH = Path(__file__).parent / "archive_records-public.csv"
 
 # Map URL domains to publisher names
@@ -160,7 +162,7 @@ def main():
 
     if fixed > 0:
         print(f"\n  Writing {CSV_PATH}...")
-        with open(CSV_PATH, "w", encoding="utf-8", newline="") as f:
+        with atomic_csv_write(CSV_PATH) as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows(rows)

@@ -325,7 +325,7 @@ class EntityRelationshipFixer:
         print("=" * 70)
         print(f"Total fixes applied:        {len(self.fixes_applied)}")
         print(f"New entities created:       {len(self.new_entities)}")
-        print(f"Backup files created:       2")
+        print("Backup files created:       2")
         print(f"Report file:                {report_file.name}")
         print("=" * 70)
 

@@ -11,11 +11,14 @@ Routes:
     POST /process  — manually trigger batch processing
 """
 
+import functools
+import hmac
 import logging
 import threading
-from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import Flask, render_template, request, redirect, url_for, jsonify, abort
 
-from .config import SERVER_PORT, SERVER_HOST, THEMATIC_CATEGORIES
+from .config import (SERVER_PORT, SERVER_HOST, THEMATIC_CATEGORIES,
+                     SUBMISSION_AUTH_TOKEN)
 from . import db
 from .processor import process_batch
 
@@ -32,6 +35,55 @@ _processing_lock = threading.Lock()
 _is_processing = False
 
 
+# --- Authentication -------------------------------------------------------
+# The server has no transport-level access control. When SUBMISSION_AUTH_TOKEN
+# is set, every request must present it; when it is empty the server relies on
+# binding to localhost (see config.SERVER_HOST). See issue #136.
+_AUTH_COOKIE = 'submission_token'
+
+
+def _supplied_token():
+    """Return the auth token offered by the current request, if any."""
+    return (request.headers.get('X-Auth-Token')
+            or request.values.get('token')
+            or request.cookies.get(_AUTH_COOKIE)
+            or '')
+
+
+def _token_matches(candidate):
+    """Constant-time comparison of a request-supplied token to the secret.
+
+    hmac.compare_digest avoids the early-exit timing side-channel a plain `==`
+    on the secret would leak. Both operands are encoded to bytes so a token
+    containing non-ASCII characters cannot raise TypeError.
+    """
+    return hmac.compare_digest((candidate or '').encode('utf-8'),
+                               SUBMISSION_AUTH_TOKEN.encode('utf-8'))
+
+
+def require_auth(view):
+    """Gate a route behind SUBMISSION_AUTH_TOKEN when one is configured."""
+    @functools.wraps(view)
+    def wrapped(*args, **kwargs):
+        if SUBMISSION_AUTH_TOKEN and not _token_matches(_supplied_token()):
+            abort(401)
+        return view(*args, **kwargs)
+    return wrapped
+
+
+@app.after_request
+def _persist_token(response):
+    """Store a valid token in a cookie so browser navigation keeps working."""
+    if SUBMISSION_AUTH_TOKEN:
+        offered = request.headers.get('X-Auth-Token') or request.values.get('token')
+        if offered and _token_matches(offered) and request.cookies.get(_AUTH_COOKIE) != offered:
+            # Mark the cookie Secure on HTTPS requests so a valid token is never
+            # replayed over plaintext HTTP if the server is fronted by TLS.
+            response.set_cookie(_AUTH_COOKIE, offered, httponly=True,
+                                samesite='Lax', secure=request.is_secure)
+    return response
+
+
 @app.before_request
 def ensure_db():
     """Initialize database on first request."""
@@ -41,6 +93,7 @@ def ensure_db():
 
 
 @app.route('/')
+@require_auth
 def form():
     """Render the submission form."""
     pending_count = db.get_pending_count()
@@ -50,6 +103,7 @@ def form():
 
 
 @app.route('/submit', methods=['POST'])
+@require_auth
 def submit():
     """Accept a URL submission."""
     url = request.form.get('url', '').strip()
@@ -63,6 +117,16 @@ def submit():
     # Basic URL validation
     if not url.startswith(('http://', 'https://')):
         url = 'https://' + url
+
+    # SSRF guard: reject URLs that point at private/loopback/link-local hosts
+    # before the URL is ever queued and fetched server-side. See issue #137.
+    from rosen_scraper.url_safety import is_safe_public_url
+    url_ok, url_reason = is_safe_public_url(url)
+    if not url_ok:
+        return render_template('form.html',
+                               categories=THEMATIC_CATEGORIES,
+                               pending_count=db.get_pending_count(),
+                               error=f'That URL cannot be accepted: {url_reason}.')
 
     # Check for duplicate in queue
     existing = db.get_submission_by_url(url)
@@ -103,6 +167,7 @@ def submit():
 
 
 @app.route('/status')
+@require_auth
 def status():
     """Render the status dashboard."""
     stats = db.get_queue_stats()
@@ -117,6 +182,7 @@ def status():
 
 
 @app.route('/queue')
+@require_auth
 def queue_api():
     """JSON API for monitoring."""
     stats = db.get_queue_stats()
@@ -129,6 +195,7 @@ def queue_api():
 
 
 @app.route('/process', methods=['POST'])
+@require_auth
 def trigger_process():
     """Manually trigger batch processing."""
     global _is_processing

@@ -55,7 +55,7 @@ def test_url_context():
     print("\n3. Testing traditional scraper:")
     html_content = scraper.fetch_article_content(test_url)
     if html_content:
-        print(f"✓ Traditional scraper successful")
+        print("✓ Traditional scraper successful")
         print(f"  - HTML content length: {len(html_content)}")
     else:
         print("✗ Traditional scraper failed")

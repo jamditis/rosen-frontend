@@ -1,5 +1,5 @@
 // Header.js - Universal header for feature pages
-import { html } from '../../html.js';
+import { html } from '../../html.js?v=3.3.0';
 import { ArrowLeft, Newspaper } from 'lucide-react';
 
 /**

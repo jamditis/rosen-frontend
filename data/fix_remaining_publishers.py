@@ -4,6 +4,8 @@ import csv
 from pathlib import Path
 from urllib.parse import urlparse
 
+from csv_safe_write import atomic_csv_write
+
 CSV_PATH = Path(__file__).parent / "archive_records-public.csv"
 
 EXTRA_DOMAINS = {
@@ -60,7 +62,7 @@ def main():
     print(f"  Fixed {fixed} more publishers")
 
     if fixed > 0:
-        with open(CSV_PATH, "w", encoding="utf-8", newline="") as f:
+        with atomic_csv_write(CSV_PATH) as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             writer.writerows(rows)

@@ -10,11 +10,8 @@ Tests verify:
 """
 
 import json
-import csv
-import io
 import importlib
 import importlib.util
-import pytest
 from pathlib import Path
 import sys
 

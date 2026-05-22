@@ -4,7 +4,6 @@ Test script for the cross-reference analysis system.
 """
 
 import sys
-import os
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
@@ -14,7 +13,7 @@ for path in (SRC_DIR, DIAGNOSTICS_DIR):
     if str(path) not in sys.path:
         sys.path.append(str(path))
 
-from cross_reference_analyzer import get_cross_reference_manager, ContentSimilarityAnalyzer
+from cross_reference_analyzer import ContentSimilarityAnalyzer
 
 def test_cross_reference_system():
     """Test the cross-reference analysis system with sample data."""
@@ -68,7 +67,7 @@ def test_cross_reference_system():
             print(f"  Overall Score: {relationship.similarity_score:.3f}")
             print(f"  Type: {relationship.relationship_type}")
             print(f"  Confidence: {relationship.confidence:.3f}")
-            print(f"  Evidence:")
+            print("  Evidence:")
             for key, value in relationship.evidence.items():
                 if key == 'shared_keywords':
                     print(f"    {key}: {value[:5]}")  # Show first 5 keywords
