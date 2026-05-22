@@ -118,8 +118,8 @@ class SummaryGenerator:
                 # Parse the date and extract year
                 year = publication_date.split('-')[0]
                 summary_parts.append(f"Published in {year}.")
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"  Could not parse publication date '{publication_date}': {e}")
 
         # Add platform attribution
         if platform == "tumblr":

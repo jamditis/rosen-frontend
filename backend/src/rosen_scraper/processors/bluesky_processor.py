@@ -139,8 +139,8 @@ class BlueskyProcessor:
                 try:
                     error_data = response.json()
                     print(f"  [BLUESKY] Error: {error_data.get('message', 'Unknown error')}")
-                except Exception:
-                    pass
+                except Exception as e:
+                    print(f"  [BLUESKY] Could not parse error response body: {e}")
                 return None
         except requests.RequestException as e:
             print(f"  [BLUESKY] Thread fetch error: {e}")

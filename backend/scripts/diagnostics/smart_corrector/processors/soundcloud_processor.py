@@ -137,8 +137,8 @@ class SoundCloudProcessor:
                     'duration': self._parse_duration(data.get('duration')),
                     'url': data.get('url')
                 }
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"  [SOUNDCLOUD] Could not extract metadata from JSON-LD: {e}")
 
         return None
 
@@ -173,8 +173,8 @@ class SoundCloudProcessor:
                                     'stream_url': self._get_stream_url(sound_data),
                                     'permalink_url': sound_data.get('permalink_url')
                                 }
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"  [SOUNDCLOUD] Could not extract metadata from hydration data: {e}")
 
         return None
 
@@ -200,8 +200,8 @@ class SoundCloudProcessor:
             transcodings = sound_data.get('media', {}).get('transcodings', [])
             if transcodings:
                 return transcodings[0].get('url')
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"  [SOUNDCLOUD] Could not extract stream URL: {e}")
 
         return None
 
@@ -217,8 +217,8 @@ class SoundCloudProcessor:
                 minutes = int(match.group(1) or 0)
                 seconds = int(match.group(2) or 0)
                 return minutes * 60 + seconds
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"  [SOUNDCLOUD] Could not parse duration: {e}")
 
         return 1800
 

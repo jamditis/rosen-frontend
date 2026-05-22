@@ -165,8 +165,8 @@ class CSpanProcessor:
                     return f"https://www.c-span.org{href}"
                 return href
 
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"  [C-SPAN] Could not extract transcript link: {e}")
 
         return None
 
@@ -260,8 +260,8 @@ class CSpanProcessor:
             if youtube_link:
                 return youtube_link['href']
 
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"  [C-SPAN] Could not extract YouTube link: {e}")
 
         return None
 
