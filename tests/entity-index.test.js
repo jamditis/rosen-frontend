@@ -180,3 +180,15 @@ describe('Query.types()', () => {
     assert.deepEqual(q.types(), []);
   });
 });
+
+describe('createInMemoryLoader port conformance', () => {
+  it('shares one Promise across calls (single-flight, as the port documents)', async () => {
+    const loader = createInMemoryLoader(fixture());
+    assert.equal(
+      loader.loadEntityData(),
+      loader.loadEntityData(),
+      'every loadEntityData call must return the same Promise, matching httpCachedLoader',
+    );
+    await loader.loadEntityData();
+  });
+});

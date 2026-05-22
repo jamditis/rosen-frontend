@@ -16,7 +16,12 @@ export const createInMemoryLoader = (fixture = {}) => {
     entities: fixture.entities ?? [],
     records: fixture.records ?? [],
   };
+  // The port documents single-flight: concurrent calls share one Promise.
+  // The fixture is already in memory, so one resolved Promise reused for
+  // every call satisfies that contract and lets tests exercise the port
+  // exactly as production code does against httpCachedLoader.
+  const settled = Promise.resolve(payload);
   return {
-    loadEntityData: async () => payload,
+    loadEntityData: () => settled,
   };
 };

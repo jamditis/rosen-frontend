@@ -69,11 +69,13 @@ export const createEntityIndex = async ({ loader }) => {
     const aIds = recordToEntities.get(a);
     const bIds = recordToEntities.get(b);
     if (!aIds || !bIds) return [];
-    const bSet = aIds.length > bIds.length ? new Set(aIds) : new Set(bIds);
-    const probe = aIds.length > bIds.length ? bIds : aIds;
+    // Build the lookup Set from the longer list and iterate the shorter
+    // one, so the scan is bounded by min(|aIds|, |bIds|).
+    const largerSet = aIds.length > bIds.length ? new Set(aIds) : new Set(bIds);
+    const smallerIds = aIds.length > bIds.length ? bIds : aIds;
     const out = [];
-    for (const id of probe) {
-      if (!bSet.has(id)) continue;
+    for (const id of smallerIds) {
+      if (!largerSet.has(id)) continue;
       const e = entityById.get(id);
       if (!e) continue;
       if (opts.type && e.type !== opts.type) continue;

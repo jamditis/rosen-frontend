@@ -159,7 +159,18 @@ const writeCache = ({ localStorage, sessionStorage }, key, data, now) => {
   }
 
   if (serialized.length > MAX_LOCALSTORAGE_SIZE) {
-    // Large payload: sessionStorage only. If it is also full, skip caching.
+    // Large payload: sessionStorage only. Evict any localStorage entry
+    // under this key first. sessionStorage is per-tab, so a stale smaller
+    // payload left in the shared localStorage would otherwise be served
+    // by readCache in a new tab — or in this tab if the sessionStorage
+    // write below fails — masking the fresh data for the rest of the TTL.
+    if (localStorage) {
+      try {
+        localStorage.removeItem(key);
+      } catch {
+        // Eviction is best-effort.
+      }
+    }
     if (sessionStorage) {
       try {
         sessionStorage.setItem(key, serialized);
@@ -206,9 +217,11 @@ const withTimeout = (promise, ms, fallback) =>
       clearTimeout(timer);
       resolve(value);
     };
+    // The timer is left ref'd on purpose. An unref'd timer that is the
+    // only pending work never fires — the loop idles past it — so a hung
+    // version.json would never time out. finish() clears the timer as soon
+    // as either side settles, so it never outlives the bounded wait.
     const timer = setTimeout(() => finish(fallback), ms);
-    // Don't let the timeout timer hold the Node event loop open.
-    if (typeof timer?.unref === 'function') timer.unref();
     promise.then(finish, () => finish(fallback));
   });
 

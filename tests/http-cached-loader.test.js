@@ -388,6 +388,50 @@ describe('httpCachedLoader: Web Storage cache', () => {
     assert.equal(archiveKeys(localStorage).length, 0, 'large payload must skip localStorage');
     assert.equal(archiveKeys(sessionStorage).length, 1, 'large payload must use sessionStorage');
   });
+
+  it('evicts a stale localStorage entry when the payload is written sessionStorage-only', async () => {
+    // The cache key is shared with the legacy archiveService during the
+    // migration. If a small entry is written to localStorage under that key
+    // while a >5MB payload is in flight, the large-payload write (which
+    // goes to sessionStorage only) must still evict the localStorage entry.
+    // sessionStorage is per-tab, so a leftover localStorage entry would be
+    // served stale to a new tab within the TTL.
+    const localStorage = makeStorage();
+
+    // Learn the entities cache key by caching a small payload once.
+    const warm = createHttpCachedLoader({
+      entitiesUrl: ENTITIES_URL,
+      deps: { fetch: routedFetch(), localStorage, sessionStorage: makeStorage(), now: () => 1000 },
+    });
+    await warm.loadEntityData();
+    const cacheKey = archiveKeys(localStorage)[0];
+    assert.ok(cacheKey, 'a small payload caches under the entities cache key');
+
+    // Drop it so the next loader misses the cache and fetches. During that
+    // fetch, simulate the legacy archiveService re-populating the same key.
+    localStorage.removeItem(cacheKey);
+    const big = rawPayload();
+    big.entities[0].name = 'x'.repeat(6 * 1024 * 1024); // forces serialised size > 5MB
+    const racingFetch = makeFetch((url) => {
+      if (url.includes('version.json')) return okJson({ version: 'deploy-1' });
+      localStorage.setItem(
+        cacheKey,
+        JSON.stringify({ data: rawPayload(), timestamp: 1000 }),
+      );
+      return okJson(big);
+    });
+    const large = createHttpCachedLoader({
+      entitiesUrl: ENTITIES_URL,
+      deps: { fetch: racingFetch, localStorage, sessionStorage: makeStorage(), now: () => 1000 },
+    });
+    await large.loadEntityData();
+
+    assert.equal(
+      localStorage.getItem(cacheKey),
+      null,
+      'the >5MB write must evict the stale localStorage entry under the cache key',
+    );
+  });
 });
 
 // ---- version.json invalidation ------------------------------------------
@@ -442,18 +486,19 @@ describe('httpCachedLoader: version.json invalidation', () => {
   });
 
   it('does not stall the load when version.json is slow to respond', async () => {
-    // version.json takes 60ms; the load runs on the 5ms versionTimeoutMs
-    // path and must finish long before the manifest settles. The 60ms
-    // timer is left live so the version request settles cleanly within
-    // the test run rather than dangling.
+    // version.json is backed by a manually-resolved Promise: it stays
+    // pending across the whole load and is resolved only after the
+    // assertions. This proves the load did not wait for it, with no
+    // wall-clock race between a delay timer and the load to flake on a
+    // slow CI runner.
     let versionSettled = false;
+    let resolveVersion;
+    const versionResponse = new Promise((resolve) => { resolveVersion = resolve; });
     const fetch = makeFetch((url) => {
       if (url.includes('version.json')) {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            versionSettled = true;
-            resolve(okJson({ version: 'deploy-1' }));
-          }, 60);
+        return versionResponse.then((value) => {
+          versionSettled = true;
+          return value;
         });
       }
       return okJson(rawPayload());
@@ -466,6 +511,13 @@ describe('httpCachedLoader: version.json invalidation', () => {
     const { entities } = await loader.loadEntityData();
     assert.equal(entities.length, 2, 'a slow version.json must not block the entity load');
     assert.equal(versionSettled, false, 'the load must not have waited on version.json');
+
+    // Resolve version.json, then hold the event loop open with a live
+    // (non-unref'd) timer while checkDeployVersion's continuation settles.
+    // Without that slack node:test flags its awaited fetch as a Promise
+    // still pending when the loop idles.
+    resolveVersion(okJson({ version: 'deploy-1' }));
+    await new Promise((resolve) => { setTimeout(resolve, 50); });
   });
 
   it('retries the deploy-version check after a transient version.json failure', async () => {
