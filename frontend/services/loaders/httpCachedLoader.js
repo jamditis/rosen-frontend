@@ -3,8 +3,10 @@
  *
  * Fetches the Archive entity payload over HTTP and serves it through the
  * browser's Web Storage cache. The Entity Index never sees any of this:
- * it depends only on the port (see ./entityDataLoader.js), and this
- * adapter is wired in at the composition root (App.js).
+ * it depends only on the port (see ./entityDataLoader.js); this adapter
+ * is the implementation a composition root (App.js) will wire in once the
+ * live app migrates onto the port. Nothing wires it yet — this PR is
+ * groundwork for that later migration step.
  *
  * Behaviour ported verbatim from archiveService.js (issue #130, step 1):
  *   - sessionStorage for payloads over 5MB, localStorage otherwise
