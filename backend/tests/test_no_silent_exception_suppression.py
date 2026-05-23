@@ -41,7 +41,10 @@ def _find_silent_handlers() -> list[str]:
         for path in sorted((BACKEND_ROOT / sub).rglob("*.py")):
             if "__pycache__" in path.parts:
                 continue
-            tree = ast.parse(path.read_text(encoding="utf-8", errors="replace"))
+            tree = ast.parse(
+                path.read_text(encoding="utf-8", errors="replace"),
+                filename=str(path),
+            )
             for node in ast.walk(tree):
                 if not isinstance(node, ast.ExceptHandler):
                     continue
