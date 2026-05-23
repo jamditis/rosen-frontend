@@ -62,8 +62,15 @@ _MIN_SEMANTIC_REGION_CHARS = 100
 # <noscript> is deliberately kept: most only carry an "enable JavaScript"
 # message (far below the length threshold), but some sites ship a full
 # readable article fallback there that the fast path should still use.
-_NON_CONTENT_TAGS = ('script', 'style', 'template',
-                     'nav', 'header', 'footer', 'aside')
+#
+# Two passes are needed because <header>/<footer>/<aside> appear both as page
+# chrome AND as the article's own byline/section markup nested inside
+# <article>/<main>. Stripping them globally drops the article's own title and
+# byline from the semantic-region text count and pushes short, fully-rendered
+# WordPress-style posts (<article><header class="entry-header">…</header>…)
+# below the threshold, forcing an unneeded Playwright fallback.
+_NON_CONTENT_TAGS_GLOBAL = ('script', 'style', 'template', 'nav')
+_NON_CONTENT_TAGS_CHROME_ONLY = ('header', 'footer', 'aside')
 # ARIA-role equivalents of the same chrome — cookie consent popups in
 # particular tend to be untagged <div>s carrying role="dialog".
 _NON_CONTENT_ROLES = ('navigation', 'banner', 'contentinfo',
@@ -117,6 +124,9 @@ def _get_with_retry(url: str, headers: Dict[str, str],
             backoff = _RETRY_BACKOFF_BASE_SECONDS * (2 ** attempt)
             print(f"  [retry] HTTP {response.status_code} from {url}; "
                   f"retrying in {backoff:.1f}s")
+            # Return the socket to requests' connection pool before sleeping
+            # so retry-heavy runs do not stack idle connections until GC.
+            response.close()
             time.sleep(backoff)
             continue
         return response
@@ -161,8 +171,16 @@ def _looks_like_rendered_content(html: str) -> bool:
     # Drop non-content regions so site chrome and boilerplate text never
     # counts toward the article-body length. The tag selector and find_all
     # return materialised lists, so decomposing while iterating is safe.
-    for tag in soup(list(_NON_CONTENT_TAGS)):
+    for tag in soup(list(_NON_CONTENT_TAGS_GLOBAL)):
         tag.decompose()
+    # <header>/<footer>/<aside> are stripped only when they are page chrome
+    # (no <article>/<main> ancestor). The same tags inside an <article> are
+    # the article's own title block / byline / pull-quote and must count
+    # toward Signal 1, or short WordPress-style posts get pushed below
+    # _MIN_SEMANTIC_REGION_CHARS and forced onto Playwright.
+    for tag in soup(list(_NON_CONTENT_TAGS_CHROME_ONLY)):
+        if tag.find_parent(['article', 'main']) is None:
+            tag.decompose()
     for element in soup.find_all(attrs={'role': list(_NON_CONTENT_ROLES)}):
         element.decompose()
 

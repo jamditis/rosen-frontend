@@ -290,6 +290,42 @@ class TestRenderedContentHeuristic:
         assert scraper._looks_like_rendered_content('') is False
         assert scraper._looks_like_rendered_content('   \n  ') is False
 
+    def test_article_with_nested_header_byline_is_rendered(self):
+        """Copilot finding (PR #195): a short <article> whose semantic region
+        includes a nested <header> byline must be detected as rendered.
+
+        Stripping <header>/<footer>/<aside> globally — including inside
+        <article>/<main> — drops the article's own title block from the
+        semantic-region text count and pushes short WordPress-style posts
+        (<article><header class="entry-header">…</header>…) below
+        _MIN_SEMANTIC_REGION_CHARS, forcing an unneeded Playwright fallback.
+        """
+        html = (
+            '<html><body><article>'
+            '<header class="entry-header">'
+            '<h1>Reflections on objectivity in the modern American press</h1>'
+            '<p class="byline">By Jay Rosen, posted June 2024.</p>'
+            '</header>'
+            '<p>The public is a real audience, not an abstraction.</p>'
+            '</article></body></html>')
+        assert scraper._looks_like_rendered_content(html) is True
+
+    def test_chrome_header_outside_article_is_still_stripped(self):
+        """A page-chrome <header> with no <article>/<main> ancestor is removed.
+
+        Counterpart to the nested-header test: the chrome-only filter must
+        still strip site headers that are NOT nested inside an article, or
+        an SPA shell with a verbose site header would look like a rendered
+        article and skip Playwright.
+        """
+        chrome = ('Home About Archive Subscribe Newsletter Sign in '
+                  'Search Categories Tags Topics Authors Issues ') * 12
+        html = ('<html><body>'
+                f'<header>{chrome}</header>'
+                '<div id="root"></div>'
+                '</body></html>')
+        assert scraper._looks_like_rendered_content(html) is False
+
 
 class TestRequestsRetry:
     """Transient-error retry/backoff in _get_with_retry (issue #159).
@@ -422,3 +458,34 @@ class TestRequestsRetry:
 
         assert result is final
         assert mock_get.call_count == 2
+
+    @patch('rosen_scraper.scraper.time.sleep')
+    @patch('rosen_scraper.scraper.requests.get')
+    def test_transient_response_is_closed_before_sleep(
+        self, mock_get, mock_sleep
+    ):
+        """Copilot finding (PR #195): a retried transient response is closed
+        before sleeping so the underlying socket returns to requests'
+        connection pool instead of waiting for GC during retry-heavy runs.
+        """
+        busy = Mock(status_code=503)
+        ok = Mock(status_code=200)
+        mock_get.side_effect = [busy, ok]
+
+        scraper._get_with_retry(
+            'https://example.com', headers={}, timeout=5)
+
+        busy.close.assert_called_once()
+
+    @patch('rosen_scraper.scraper.time.sleep')
+    @patch('rosen_scraper.scraper.requests.get')
+    def test_returned_response_is_not_closed(self, mock_get, mock_sleep):
+        """The successful response stays open so the caller can read .content."""
+        ok = Mock(status_code=200)
+        mock_get.return_value = ok
+
+        result = scraper._get_with_retry(
+            'https://example.com', headers={}, timeout=5)
+
+        assert result is ok
+        ok.close.assert_not_called()
