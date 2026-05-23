@@ -284,8 +284,8 @@ class TwitterProcessor:
                             time.sleep(0.5)
                         except Exception:
                             continue
-                except Exception:
-                    pass
+                except Exception as e:
+                    print(f"  [TWITTER] Could not expand 'Show more' buttons: {e}")
 
                 # Extract page content
                 html = page.content()

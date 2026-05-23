@@ -1022,8 +1022,8 @@ class BatchEntityExtractor:
             try:
                 results_list = list(client.batches.list())
                 print(f"[BATCH] Found {len(results_list)} batch jobs total")
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"[BATCH] Could not list batch jobs: {e}")
             return 0, 0, 0
 
         self._finalize_tracking(batch_id, total_posts, total_entities, total_relationships)

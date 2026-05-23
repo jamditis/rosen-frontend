@@ -109,8 +109,10 @@ class URLChecker:
                 if elapsed < self.domain_delay:
                     await asyncio.sleep(self.domain_delay - elapsed)
             self.domain_last_request[domain] = time.time()
-        except Exception:
-            pass  # If parsing fails, skip rate limiting
+        except Exception as e:
+            # Rate limiting is best-effort; skip it if the URL cannot be parsed.
+            # ``domain`` may be unbound if urlparse itself raised, so log ``url``.
+            print(f"⚠ Could not apply per-domain rate limiting for {url}: {e}")
 
     async def check_url(
         self,
