@@ -329,7 +329,7 @@
             </div>
             
             <!-- View Source Button -->
-            <a id="viewSourceButton" href="#" target="_blank" class="hidden text-center px-3 py-1 bg-primary-blue hover:bg-blue-600 text-white text-sm font-semibold rounded-lg shadow-md transition duration-150 ease-in-out whitespace-nowrap">
+            <a id="viewSourceButton" href="#" target="_blank" rel="noopener noreferrer" class="hidden text-center px-3 py-1 bg-primary-blue hover:bg-blue-600 text-white text-sm font-semibold rounded-lg shadow-md transition duration-150 ease-in-out whitespace-nowrap">
                 View record source
             </a>
         </div>
@@ -380,6 +380,7 @@
          * | 2.4.0 | 2025-10-12 | Feature/UI | **Line Hover Dimming:** Implemented visual dimming (25% opacity) of all non-hovered lines/dots when the user hovers over an active connection path. |
          * | 2.4.1 | 2025-10-12 | Fix/Bug | **Animation Loop Stability:** Fixed bug where line hover effects stopped working after the path animation completed by forcing the `animate()` loop to run continuously while in Exploration Mode. |
          * | 2.4.2 | 2025-10-12 | Fix/Bug | Fixed error where line hovering stopped working after path animation completion by keeping the `animate()` loop active as long as the view is in exploration mode (`isViewLocked`). |
+         * | 2.4.3 | 2026-05-22 | Security | Escaped CSV-derived values before innerHTML interpolation; validated record URLs (http/https only); added rel="noopener noreferrer" to target="_blank" anchors. (issue #157) |
          */
         // --- CONFIGURATION CONSTANTS (Adjust these values to change the visualization) ---
         
@@ -407,6 +408,43 @@
         const MIN_ANIMATION_DURATION = 1200; // Minimum time in ms for path animation.
         const MAX_ANIMATION_DURATION = 2800; // Maximum time in ms for path animation.
         const DIMMED_OPACITY = 0.25; // New constant for dimmed opacity when line is hovered
+
+
+        // --- SECURITY HELPERS (issue #157) ---
+
+        /**
+         * Escapes a value for safe interpolation into innerHTML text contexts.
+         * The CSV is curator-controlled today, so this is defense in depth: it
+         * stops a malicious scraped title, tag, or summary from executing if
+         * the data source is ever tampered with.
+         */
+        function escapeHtml(value) {
+            if (value === null || value === undefined) return '';
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        /**
+         * Validates a record URL before it is placed in an href. Only http
+         * and https links pass; javascript:, data:, and unparseable values
+         * collapse to '#' so they cannot execute when clicked.
+         */
+        function sanitizeUrl(value) {
+            if (!value) return '#';
+            try {
+                const parsed = new URL(String(value).trim(), window.location.href);
+                if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+                    return parsed.href;
+                }
+            } catch (e) {
+                // Not a parseable URL -- fall through to the safe default.
+            }
+            return '#';
+        }
 
 
         // Columns retained from the CSV.
@@ -763,14 +801,14 @@
                     infoPanel.classList.add('is-visible');
                     // Reset header to ID view
                     if (currentRecord) {
-                         dynamicHeaderContent.innerHTML = `<h2 id="detailsHeader" class="text-lg sm:text-xl font-extrabold text-gray-900 truncate">ID: ${currentRecord.id}</h2>`;
+                         dynamicHeaderContent.innerHTML = `<h2 id="detailsHeader" class="text-lg sm:text-xl font-extrabold text-gray-900 truncate">ID: ${escapeHtml(currentRecord.id)}</h2>`;
                     }
                     break;
                 case 'minimized':
                     infoPanel.classList.add('is-visible', 'is-minimized');
                     // Swap header to Title view for minimized state
                     if (currentRecord) {
-                         dynamicHeaderContent.innerHTML = `<h2 id="detailsHeader" class="text-xs sm:text-sm font-semibold text-gray-800 truncate px-4">${currentRecord.title || 'Record details'}</h2>`;
+                         dynamicHeaderContent.innerHTML = `<h2 id="detailsHeader" class="text-xs sm:text-sm font-semibold text-gray-800 truncate px-4">${escapeHtml(currentRecord.title || 'Record details')}</h2>`;
                     }
                     break;
                 case 'maximized':
@@ -778,7 +816,7 @@
                     document.body.classList.add('modal-open');
                     // Reset header to ID view
                     if (currentRecord) {
-                         dynamicHeaderContent.innerHTML = `<h2 id="detailsHeader" class="text-lg sm:text-xl font-extrabold text-gray-900 truncate">ID: ${currentRecord.id}</h2>`;
+                         dynamicHeaderContent.innerHTML = `<h2 id="detailsHeader" class="text-lg sm:text-xl font-extrabold text-gray-900 truncate">ID: ${escapeHtml(currentRecord.id)}</h2>`;
                     }
                     break;
             }
@@ -1144,12 +1182,12 @@
             // Format date as DD-MM-YYYY (assuming input is YYYY-MM-DD)
             const formattedDate = dateParts.length === 3 ? `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}` : date;
 
-            const tagsHtml = tags.map(t => `<div class="text-[10px] text-gray-400 leading-tight">${t}</div>`).join('');
+            const tagsHtml = tags.map(t => `<div class="text-[10px] text-gray-400 leading-tight">${escapeHtml(t)}</div>`).join('');
 
             return `
                 <div class="flex flex-col text-left p-1">
-                    <div class="text-[10px] text-gray-400 font-medium tracking-wider mb-0.5">${formattedDate}</div> 
-                    <div class="text-xs font-bold text-white leading-tight mb-1">${title}</div>
+                    <div class="text-[10px] text-gray-400 font-medium tracking-wider mb-0.5">${escapeHtml(formattedDate)}</div> 
+                    <div class="text-xs font-bold text-white leading-tight mb-1">${escapeHtml(title)}</div>
                     ${tagsHtml}
                 </div>
             `;
@@ -1160,7 +1198,7 @@
          */
         function renderLineTooltipContent(connection) {
             const colorSourceLabel = connectionField === 'key_concepts' ? 'Shared concept' : 'Shared thematic category';
-            return `<div class="text-xs font-semibold">${colorSourceLabel}: ${connection.sharedValue}</div>`;
+            return `<div class="text-xs font-semibold">${colorSourceLabel}: ${escapeHtml(connection.sharedValue)}</div>`;
         }
 
         /** Renders the color key content for the external collapsible panel. */
@@ -1248,7 +1286,7 @@
             recordCountText.textContent = `(ID ${record.id} connections shown)`;
             
             // Update the main header bar with the ID (Request 2)
-            dynamicHeaderContent.innerHTML = `<h2 id="detailsHeader" class="text-lg sm:text-xl font-extrabold text-gray-900 truncate">ID: ${record.id}</h2>`;
+            dynamicHeaderContent.innerHTML = `<h2 id="detailsHeader" class="text-lg sm:text-xl font-extrabold text-gray-900 truncate">ID: ${escapeHtml(record.id)}</h2>`;
 
             const primaryId = record.numericId;
             const primaryConnectionField = connectionField;
@@ -1336,10 +1374,10 @@
             // Set header content based on current panel state (Request 2)
             if (panelState === 'minimized') {
                  // Minimized state uses Title
-                 dynamicHeaderContent.innerHTML = `<h2 id="detailsHeader" class="text-xs sm:text-sm font-semibold text-gray-800 truncate px-4">${record.title || 'Record details'}</h2>`;
+                 dynamicHeaderContent.innerHTML = `<h2 id="detailsHeader" class="text-xs sm:text-sm font-semibold text-gray-800 truncate px-4">${escapeHtml(record.title || 'Record details')}</h2>`;
             } else {
                  // Default/Maximized states use ID
-                 dynamicHeaderContent.innerHTML = `<h2 id="detailsHeader" class="text-lg sm:text-xl font-extrabold text-gray-900 truncate">ID: ${record.id}</h2>`;
+                 dynamicHeaderContent.innerHTML = `<h2 id="detailsHeader" class="text-lg sm:text-xl font-extrabold text-gray-900 truncate">ID: ${escapeHtml(record.id)}</h2>`;
             }
             
             // Status Badge (Updated to show only Primary/Connected)
@@ -1352,38 +1390,39 @@
             }
 
             // View Source Button 
-            viewSourceButton.href = record.url || '#';
-            viewSourceButton.classList.toggle('hidden', !record.url);
+            const safeSourceUrl = sanitizeUrl(record.url);
+            viewSourceButton.href = safeSourceUrl;
+            viewSourceButton.classList.toggle('hidden', safeSourceUrl === '#');
 
             // --- 2. Full Panel Content (Request 3: New structure) ---
             
             const dateParts = date.split('-');
             const formattedDate = dateParts.length === 3 ? `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}` : date; 
             
-            const tagPills = tags.map(tag => `<span class="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full font-medium">${tag}</span>`).join('');
-            const keyConceptPills = keyConcepts.map(kc => `<span class="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full font-medium">${kc}</span>`).join('');
-            const categoryPills = thematicCategories.map(cat => `<span class="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style="background-color: ${COLOR_MAP[cat] || COLOR_MAP['Other']};">${cat}</span>`).join('');
+            const tagPills = tags.map(tag => `<span class="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full font-medium">${escapeHtml(tag)}</span>`).join('');
+            const keyConceptPills = keyConcepts.map(kc => `<span class="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full font-medium">${escapeHtml(kc)}</span>`).join('');
+            const categoryPills = thematicCategories.map(cat => `<span class="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style="background-color: ${COLOR_MAP[cat] || COLOR_MAP['Other']};">${escapeHtml(cat)}</span>`).join('');
             
             let contentHtml = `
                 <!-- Title (colB - large text) -->
-                <p class="text-2xl font-extrabold text-gray-900 mb-2">${fullTitle}</p>
+                <p class="text-2xl font-extrabold text-gray-900 mb-2">${escapeHtml(fullTitle)}</p>
                 
                 <!-- By Author | Date | Source (colD, colE, colF) -->
                 <p class="text-sm mb-4 text-gray-500">
-                    <span class="font-bold text-gray-700">by ${record.author || 'Unknown author'}</span> | 
-                    ${formattedDate} | 
-                    ${record.original_publication || 'Unknown publication'}
+                    <span class="font-bold text-gray-700">by ${escapeHtml(record.author || 'Unknown author')}</span> | 
+                    ${escapeHtml(formattedDate)} |
+                    ${escapeHtml(record.original_publication || 'Unknown publication')}
                 </p>
 
                 <div class="space-y-4">
                     
                     <!-- Key quote / Excerpt (colN) -->
-                    ${record.pull_quote ? `<div class="pt-2 border-t mt-2"><h4 class="font-semibold text-gray-700 mb-2">Key quote / excerpt</h4><p class="text-gray-700 text-sm italic border-l-4 border-gray-300 pl-3">"${record.pull_quote}"</p></div>` : ''}
+                    ${record.pull_quote ? `<div class="pt-2 border-t mt-2"><h4 class="font-semibold text-gray-700 mb-2">Key quote / excerpt</h4><p class="text-gray-700 text-sm italic border-l-4 border-gray-300 pl-3">"${escapeHtml(record.pull_quote)}"</p></div>` : ''}
 
                     <!-- Era (colS) and Thematic Categories (colP) -->
                     <div class="pt-1">
                         <p class="text-sm mb-2">
-                            <span class="font-semibold text-gray-700">Era:</span> ${record.era || 'Unknown era'} 
+                            <span class="font-semibold text-gray-700">Era:</span> ${escapeHtml(record.era || 'Unknown era')}
                             <!-- Removed the 'Verified' pill here, per user request: ${record.isVerified ? '<span class="ml-2 px-2 py-0.5 rounded-full text-xs font-bold text-green-600 bg-green-100">Verified</span>' : ''} -->
                         </p>
                         <span class="font-semibold text-gray-700 block mb-1">Thematic categories:</span>
@@ -1393,7 +1432,7 @@
                     <!-- Summary (colO) -->
                     <div class="pt-4 border-t mt-4">
                         <h4 class="font-semibold text-gray-700 mb-2">Summary</h4>
-                        <p class="text-gray-600 text-sm italic">${record.summary || 'No summary provided.'}</p>
+                        <p class="text-gray-600 text-sm italic">${escapeHtml(record.summary || 'No summary provided.')}</p>
                     </div>
 
                     <!-- Key Concepts (colQ) -->
@@ -1422,14 +1461,14 @@
                     const crDateParts = (cr.publication_date || 'N/a').split('-');
                     // Format date as DD-MM-YYYY
                     const crFormattedDate = crDateParts.length === 3 ? `${crDateParts[2]}-${crDateParts[1]}-${crDateParts[0]}` : cr.publication_date || 'N/a';
-                    const urlLink = cr.url ? `<a href="${cr.url}" target="_blank" class="text-primary-blue hover:text-blue-700 font-medium text-xs ml-3 whitespace-nowrap">View source &rarr;</a>` : '';
+                    const urlLink = cr.url ? `<a href="${escapeHtml(sanitizeUrl(cr.url))}" target="_blank" rel="noopener noreferrer" class="text-primary-blue hover:text-blue-700 font-medium text-xs ml-3 whitespace-nowrap">View source &rarr;</a>` : '';
 
                     return `
                         <!-- onclick removed and cursor-pointer removed to disable row click (Request 2 & 3) -->
                         <div class="py-2 px-2 border-b border-gray-200 last:border-b-0 flex items-center justify-between transition-colors duration-150 rounded-md">
                             <div class="flex flex-col flex-grow truncate">
-                                <span class="text-sm font-bold text-gray-800 truncate">${cr.title}</span>
-                                <span class="text-xs text-gray-500">ID: ${cr.id} | ${crFormattedDate}</span>
+                                <span class="text-sm font-bold text-gray-800 truncate">${escapeHtml(cr.title)}</span>
+                                <span class="text-xs text-gray-500">ID: ${escapeHtml(cr.id)} | ${escapeHtml(crFormattedDate)}</span>
                             </div>
                             ${urlLink}
                         </div>
