@@ -88,12 +88,20 @@ describe('data explorer — injection sinks routed through helpers', () => {
 });
 
 describe('data explorer — tabnabbing protection', () => {
-  it('every target="_blank" anchor carries rel="noopener noreferrer"', () => {
-    const blankCount = (html.match(/target="_blank"/g) || []).length;
-    const relCount = (html.match(/rel="noopener noreferrer"/g) || []).length;
-    assert.ok(blankCount > 0, 'expected target="_blank" anchors to exist');
-    assert.strictEqual(relCount, blankCount,
-      `every target="_blank" (${blankCount}) needs rel="noopener noreferrer" ` +
-      `(found ${relCount})`);
+  it('every <a target="_blank"> anchor carries rel="noopener noreferrer"', () => {
+    // Match opening <a> tags directly. The previous count-equality check
+    // counted raw ``target="_blank"`` substrings across the whole file —
+    // including changelog comments and string-literal documentation — so a
+    // bare changelog mention of ``target="_blank"`` could mask a real
+    // anchor that had lost its rel attribute.
+    const anchorOpenings = html.match(/<a\b[^>]*>/g) || [];
+    const blankAnchors = anchorOpenings.filter(
+      tag => /\btarget="_blank"/.test(tag));
+    assert.ok(blankAnchors.length > 0,
+      'expected at least one <a target="_blank"> anchor to test');
+    const unsafe = blankAnchors.filter(
+      tag => !/\brel="noopener noreferrer"/.test(tag));
+    assert.deepStrictEqual(unsafe, [],
+      'every <a target="_blank"> anchor must carry rel="noopener noreferrer"');
   });
 });
