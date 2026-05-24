@@ -33,6 +33,10 @@ htmlcov/
 build/
 *.egg-info/
 
+# Pipeline scratch (one-off extraction/recovery work)
+data/_extract_tmp/
+data/_recovery_tmp/
+
 # R
 .Rproj.user
 .Rhistory

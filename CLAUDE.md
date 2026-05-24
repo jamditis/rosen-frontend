@@ -346,6 +346,6 @@ Supports: Articles, Videos, Twitter/X, Tumblr, Newspaper Clippings (PDF OCR).
 - Social media records (~29,000) have generic titles ("Tweet by Jay Rosen", "Post by Jay Rosen"). Fixing this would require AI-based title generation from post content.
 - Browser localStorage can fill up on the live site due to data size. Caching is disabled as a workaround.
 - Thread records have placeholder titles ("[Bluesky Thread]") — needs content-based title generation.
-- 6 records have no recoverable URL: RECORD-00663, 00667, 00673, 00693, 00694, 00700. Jay Rosen may know the original publication.
+- 5 records have no recoverable URL: RECORD-00663, 00667, 00673, 00693, 00694. Jay Rosen may know the original publication. (RECORD-00700 was backfilled to PressThink in PR #206.) See issues #199 and #207.
 - `archive.pressthink.org` subdomain has a TLS certificate issue. Records using that subdomain correctly use `http://` URLs — browsers handle these fine but HTTPS fetch will fail.
 - Bluesky thread links use `embed.bsky.app` (unauthenticated) rather than `bsky.app`. If Bluesky changes the embed subdomain, update `ThreadModal.js` and `RecordModal.js`.
