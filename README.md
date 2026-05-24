@@ -8,7 +8,7 @@ A public collection of the works, critiques, and teachings of Jay Rosen, NYU pro
 
 The archive has two main parts:
 
-1. **The archive browser** — a searchable, filterable interface for ~940 records (articles, videos, blog posts, threads) plus ~29,000 social media posts
+1. **The archive browser** — a searchable, filterable interface for 932 records (articles, videos, blog posts, threads) plus ~29,130 social media posts, indexed by 5,036 named entities and 4,666 relationships
 2. **The dissertation tools** — 9 interactive tools for exploring Jay's 1986 doctoral dissertation, *The Impossible Press*
 
 Everything runs as a static site with no server-side code. The frontend loads JSON data files directly in the browser.
@@ -35,10 +35,10 @@ The site reads from JSON files that are generated from CSV source files:
 
 | Source file | What it contains |
 |-------------|-----------------|
-| `data/archive_records-public.csv` | Main archive records (940 records) |
-| `data/social_posts.csv` | Twitter/X and Bluesky posts (~29,100) |
-| `data/extracted_entities.csv` | Named entities (~5,061) |
-| `data/extracted_relationships.csv` | Entity relationships (~5,084) |
+| `data/archive_records-public.csv` | Main archive records (932 records) |
+| `data/social_posts.csv` | Twitter/X and Bluesky posts (~29,130) |
+| `data/extracted_entities.csv` | Named entities (5,036) |
+| `data/extracted_relationships.csv` | Entity relationships (4,666) |
 
 To regenerate the JSON after editing a CSV:
 

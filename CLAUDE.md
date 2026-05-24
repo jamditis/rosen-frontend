@@ -77,10 +77,10 @@ Configured in `frontend/constants.js` via `DATA_CONFIG`.
 
 | File | Records | Contents |
 |------|---------|----------|
-| `data/archive_records-public.csv` | 931 | Non-social archive records (701 RECORD, 137 TUMBLR, 83 CLIP, 10 THREAD). Line count is high (~49k) due to multi-line text fields. |
-| `data/social_posts.csv` | ~29,100 | Twitter/X and Bluesky posts |
-| `data/extracted_entities.csv` | ~5,061 | Named entities (people, orgs, concepts) |
-| `data/extracted_relationships.csv` | ~5,084 | Entity-to-record relationships |
+| `data/archive_records-public.csv` | 932 | Non-social archive records (702 RECORD, 137 TUMBLR, 83 CLIP, 10 THREAD). Line count is high (~49k) due to multi-line text fields. |
+| `data/social_posts.csv` | ~29,130 | Twitter/X and Bluesky posts |
+| `data/extracted_entities.csv` | 5,036 | Named entities (people, orgs, concepts) |
+| `data/extracted_relationships.csv` | 4,666 | Entity-to-record relationships |
 
 ### Regenerating JSON from CSV
 

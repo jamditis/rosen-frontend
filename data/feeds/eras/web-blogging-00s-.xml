@@ -5,7 +5,7 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records from the Web &amp; Blogging (00s) era</description>
     <language>en-us</language>
-    <lastBuildDate>Sun, 01 Mar 2026 22:04:24 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 24 May 2026 19:37:22 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/eras/web-blogging-00s-.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen Digital Archive RSS Generator</generator>
   <item>
@@ -423,6 +423,14 @@
     <category>Press &amp; Media Criticism</category>
   </item>
   <item>
+    <title>&quot;He Said, She Said&quot; Journalism: Are We Done With That Yet?</title>
+    <link>https://pressthink.org/2009/04/he-said-she-said-journalism-lame-formula-in-the-land-of-the-active-user/</link>
+    <guid isPermaLink="true">https://pressthink.org/2009/04/he-said-she-said-journalism-lame-formula-in-the-land-of-the-active-user/</guid>
+    <pubDate>Sun, 12 Apr 2009 00:00:00 GMT</pubDate>
+    <description>Rosen critiques &quot;he said, she said&quot; journalism — the practice of presenting two opposing claims without assessing their truth — arguing that this form of false balance fails the public and should be abandoned.</description>
+    <category>Press &amp; Media Criticism</category>
+  </item>
+  <item>
     <title>PressThink: Introducing the new Huffington Post Investigative Fund (And My Own Role in It)</title>
     <link>http://archive.pressthink.org/2009/03/30/huffpost_fnd_p.html</link>
     <guid isPermaLink="true">http://archive.pressthink.org/2009/03/30/huffpost_fnd_p.html</guid>
@@ -443,16 +451,6 @@
     <category>Technology &amp; Digital Media</category>
     <category>Journalism Theory &amp; Practice</category>
     <category>Press &amp; Media Criticism</category>
-  </item>
-  <item>
-    <title>Web site arranges funding for freelancers</title>
-    <link>https://www.newspapers.com/image/1247609095/</link>
-    <guid isPermaLink="true">https://www.newspapers.com/image/1247609095/</guid>
-    <pubDate>Tue, 17 Mar 2009 00:00:00 GMT</pubDate>
-    <description>This article discusses the website Spot.Us and its efforts to provide funding for freelance journalists, mentioning Jay Rosen as a figure involved in citizen journalism and related projects.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Politics &amp; Democracy</category>
-    <category>Technology &amp; Digital Media</category>
   </item>
   </channel>
 </rss>
