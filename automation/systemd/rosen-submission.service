@@ -1,0 +1,35 @@
+[Unit]
+Description=Rosen Archive submission server (Pillar 3 authoring workflow)
+Documentation=https://github.com/jamditis/rosen-frontend/blob/main/docs/plans/2026-05-24-pillar3-authoring-workflow-design.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=jamditis
+Group=jamditis
+WorkingDirectory=/home/jamditis/projects/rosen-frontend/backend
+EnvironmentFile=/etc/rosen-submission.env
+# gunicorn lives in the Poetry venv created by `poetry install` against
+# backend/pyproject.toml. Path resolves on houseofjawn after poetry install.
+ExecStart=/home/jamditis/.cache/pypoetry/virtualenvs/rosen-scraper-UoJJNUxE-py3.13/bin/gunicorn \
+    submission_server.app:app \
+    --bind 127.0.0.1:8084 \
+    --workers 2 \
+    --timeout 60 \
+    --access-logfile - \
+    --error-logfile -
+Restart=on-failure
+RestartSec=5
+# Submission server only listens on loopback; Cloudflare tunnel fronts it.
+# Hardening: no privilege escalation, read-only system view, private /tmp.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/jamditis/projects/rosen-frontend/data
+ReadWritePaths=/home/jamditis/projects/rosen-frontend/backend/submission_server
+ReadWritePaths=/home/jamditis/projects/rosen-frontend/ftp-upload
+
+[Install]
+WantedBy=multi-user.target
