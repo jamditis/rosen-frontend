@@ -236,3 +236,32 @@ This is the right next step after the Wednesday Jay call confirms.
 - Started the era code fix; discovered the scope is 8 files and would silently break the QueryBuilder if shipped unilaterally — reverted and updated #197 with full scope
 - Branch `fix/safe-data-quality-sweeps-2026-05-24` holds the docs (no committed code changes); nothing risky pending
 - **Natural compact point reached:** all findings are persisted in GitHub issues (#196-#204), this progress doc, and the questions doc. Next mechanical fixes (SCHEMA relationship types, doc count refresh) are safe to continue with after compact. The bigger decisions (era taxonomy fix Option 1 vs Option 2, deploy mechanism, reactivating the URL queue) need Joe's input.
+
+### 2026-05-24 — Session continued (after compact)
+
+**Pillar 1 (verify):**
+- Fixed `clean_scraped_text.py` over-truncation bug (slug-Jaccard heading detector + 500-char safety floor) — issue #208 area
+- Backfilled raw_text for 114 records via Firecrawl + Wayback fallback. Coverage 81.4% → 93.7% (873/932)
+- Wayback CDX-recovered URLs for 3 of the 5 historically-unrecoverable records (RECORD-00673 Nation, 00693 + 00694 HuffPost). Coverage 93.7% → 94.0% (876/932)
+- Scrubbed misleading "Source file: <name>.md" notes from all 5 historically-unrecoverable records (no such files existed in any git branch — the notes were aspirational from an abandoned Feb 2026 recovery plan)
+- Updated SCHEMA.md relationship taxonomy (4 → 15 types with counts) — closes #196
+- Updated CLAUDE.md unrecoverable-URL list: 5 → 2 (RECORD-00663 Baffler #12 print-only, RECORD-00667 Pew Center print monograph)
+- Found 10 title-duplicate groups across 22 records (mix of intentional cross-posts and real URL-variant duplicates) — filed #210
+- Audited `claude/gap-fill-early-2000s` stale branch: all 15 branch-unique records already exist on main under different IDs/URL variants. Zero net-new content to import. Task #8 closes.
+
+**Pillar 2 (sweep):**
+- HuffPost CDX wildcard sweep surfaced 106 unique Jay Rosen posts; archive has 22; **84 missing**. Filed #209 with the full URL list and the cross-post strategy question.
+- Verified external outlets (NYT/LA Times/Guardian/Atlantic/CJR/Nieman/Salon/Slate) use article-slug URLs, not author-prefixed URLs — CDX wildcards return empty for those. Current archive coverage (1+1+7+3+3+11+3+0 = 29 records across these venues) looks proportionate for guest pieces. Task #23 closes; expanded sweep would need per-outlet author-page parsing, not blanket wildcards.
+- Still open (waiting on Jay): Facebook + LinkedIn archive exports.
+
+**Pillar 3 (authoring workflow):**
+- Re-confirmed: design is decided (Sheets + Apps Script, Nov 14 2025 decision). Implementation is the pending work — #200 (auto-deploy), #201 (storage architecture), #202 (ADDING-RECORDS.md rewrite). All blocked on Wednesday call for final approval on the live-preview tension Jay raised March 26.
+- Joe owes Jay a working system per April 7 commitment.
+
+**Pillar 4 (handoff):**
+- Filed #211: 204 records have 0 extracted relationships. Root cause likely "extraction ran before raw_text was backfilled." Fix path documented.
+- #203 (stale branch audit), #204 (HANDOFF.md) still open.
+
+**PR #206 status:** 3 commits this session. Title + body updated to reflect actual scope. Awaiting Joe's "merge" call.
+
+**Issues filed this session:** #209 (HuffPost gap), #210 (dups + URL policy), #211 (204 zero-rel).
