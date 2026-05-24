@@ -253,11 +253,17 @@ async function main() {
   const mainRecords = archiveRecordsData.map((row, i) => {
     const record = processRecord(row, i, 'article', relationshipsMap);
 
-    record.categories.forEach(c => { categories.add(c); searchTerms.add(c); });
-    record.concepts.forEach(c => searchTerms.add(c));
-    record.tags.forEach(t => searchTerms.add(t));
-    if (record.pub && record.pub.length > 2) { publications.add(record.pub); searchTerms.add(record.pub); }
-    if (record.title.length > 3) searchTerms.add(record.title);
+    // Only contribute to facets/autocomplete if the record will survive the
+    // verified filter below. Unverified rows can carry stub or 404-chrome
+    // titles (e.g. HuffPost "Not Found" placeholders) that must not leak
+    // into searchTerms or publications.
+    if (record.verified) {
+      record.categories.forEach(c => { categories.add(c); searchTerms.add(c); });
+      record.concepts.forEach(c => searchTerms.add(c));
+      record.tags.forEach(t => searchTerms.add(t));
+      if (record.pub && record.pub.length > 2) { publications.add(record.pub); searchTerms.add(record.pub); }
+      if (record.title.length > 3) searchTerms.add(record.title);
+    }
 
     return record;
   });
@@ -278,11 +284,13 @@ async function main() {
       record.summary = parts.join(' ');
     }
 
-    record.categories.forEach(c => { categories.add(c); searchTerms.add(c); });
-    record.concepts.forEach(c => searchTerms.add(c));
-    record.tags.forEach(t => searchTerms.add(t));
-    if (record.pub && record.pub.length > 2) { publications.add(record.pub); searchTerms.add(record.pub); }
-    if (record.title.length > 3) searchTerms.add(record.title);
+    if (record.verified) {
+      record.categories.forEach(c => { categories.add(c); searchTerms.add(c); });
+      record.concepts.forEach(c => searchTerms.add(c));
+      record.tags.forEach(t => searchTerms.add(t));
+      if (record.pub && record.pub.length > 2) { publications.add(record.pub); searchTerms.add(record.pub); }
+      if (record.title.length > 3) searchTerms.add(record.title);
+    }
 
     return record;
   });
