@@ -44,14 +44,47 @@ Cross-reference: `docs/JAY_ROSEN_HANDOFF_GOAL_PROGRESS.md` for the broader plan.
 24. **Comments / reactions:** any interest in adding a comment or "respond" feature, or stays read-only forever?
 25. **Newsletter from the archive:** any interest in a "new in the archive this month" RSS feed or email digest? The RSS infrastructure already exists.
 
-## TODO for Joe before the Wednesday call
+## Facts recovered from the two Joe-Jay Fathom calls (loaded via Playwright 2026-05-24)
 
-Two Joe-Jay calls exist in Fathom but their transcripts are not in Drive (only metadata). They almost certainly contain answers to many questions below — Joe should grab them manually via the Fathom UI and either paste the relevant bits into this doc or update `docs/JAY_ROSEN_HANDOFF_GOAL_PROGRESS.md`.
+The summaries from these two calls answered (or partially answered) many of the questions originally on this list. The full transcripts are available behind the Fathom UI if more detail is needed.
 
-- **Nov 8 2025, ~1h 50min:** "Jay Rosen Archive check in call (11/8/25)" — https://fathom.video/share/nxXDedW1_oBqUykTojzNsw_qLidTggw9 — longest, most handoff-relevant
-- **Dec 8 2025, ~29min:** "Jay Rosen dissertation launch final prep call" — https://fathom.video/share/zdfnoeQSZro_TajSBSYNF43EVy_oiong
+### From the Nov 8, 2025 check-in (110 min) — https://fathom.video/share/nxXDedW1_oBqUykTojzNsw_qLidTggw9
 
-Without these, every question below stays open and may be redundant with answers Jay already gave.
+Jay's stated preferences from that meeting:
+
+- **AI hallucinations are a concern.** Jay wanted a chatbot that "answers questions using only the archive's content, preventing hallucinations." Decision: NotebookLM (Google, free) or custom embed.
+- **A $10/mo budget cap is acceptable** for the custom AI chatbot, with per-user query limits to prevent abuse. (This **contradicts** the "zero recurring cost" framing from the March 1 Joe-Rafi call — Jay himself agreed to a bounded recurring cost.)
+- **Visual aesthetic preference: "dusty library"** — distinct from the modern PressThink theme, to reflect the archive's historical nature.
+- **Open-source ambition:** "out-of-the-box tool for others to replicate" — Jay wants the project to serve as a model for other scholars' legacies (matches the March 1 framing).
+- **"Citizen of the web" documentation framing** — Jay specifically wanted the docs to address ethical use of content.
+
+Action items from Nov 8 that may STILL be open:
+
+- Jay was to **export Facebook and LinkedIn archives.** Repo has Twitter (26,114), Bluesky (3,016), Tumblr (137). No FB or LinkedIn. Worth asking Wednesday whether he still has those exports.
+- Jay was to **contact NYU for digitized dissertation copy** to fill missing pages. Dissertation was published Dec 14 — likely resolved, worth confirming.
+
+Beta testers / potential collaborators named:
+- A **Columbia PhD student** received early dissertation PDF access (name not in summary)
+- **Sam Earle** wrote a "Scholar's Response" commentary for the archive
+
+### From the Dec 8, 2025 launch-prep call (29 min) — https://fathom.video/share/zdfnoeQSZro_TajSBSYNF43EVy_oiong
+
+- **Phased rollout was the launch strategy:** Phase 1 = reader/FAQ/annotated excerpts; Phase 2+ = Concept Explorer / Then & Now / advanced tools added over time.
+- **Editorial feedback workflow:** "single Google Doc with tabs" — Jay's preferred mechanism, replacing scattered emails. Jay adds notes and screenshots to a "Jay's notes on website" tab.
+- **Headline SEO preference:** plain descriptive headlines like "About Jay Rosen's 1986 PhD dissertation" optimized for search-engine discovery.
+- **Shareable quote PNGs** with embedded chapter citation = key feature decision (already shipped).
+- **URL pattern:** `pressthink.org/jay/dissertation` (single-letter folder for clean URLs — same convention as `/j/rosen-archive/`).
+- **NotebookLM integration** was the chosen AI chatbot approach.
+
+### What this changes for the handoff plan
+
+- "Zero recurring cost" is wrong — the working constraint is "hard budget cap, abuse-proof." This **opens up** more deploy options (Cloudflare paid tier, scheduled compute, etc.).
+- "Jay is nontechnical" overstates it — Jay engaged with tech tradeoffs in the Nov 8 call (NotebookLM vs custom embed, budget caps, etc.). He's a technically curious lay user, not totally uncomfortable with the choices.
+- The "Google Doc with tabs" editorial workflow is **already proven** — that's Jay's preferred input mode, not a hypothetical.
+- "Beta tester / Columbia PhD student / Sam Earle" are potential backup-curator candidates — worth naming on the call.
+- The Facebook + LinkedIn exports being open is a **concrete content sweep target**.
+
+## Updated questions (post-Fathom review) — what's actually open
 
 ## Questions surfaced by the Fathom-transcript review (2026-05-24 agent run)
 

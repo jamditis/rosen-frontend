@@ -28,7 +28,11 @@ Living document tracking the multi-session goal of making the archive self-susta
 - Source code lives at github.com/jamditis/rosen-frontend (public; unmetered Actions; Joe-owned but transferable).
 - **Successor maintainer: Rafi Rosen (Jay's son).** Per March 1, 2026 Joe-Rafi meeting in Fathom (folder `1QSsudlskRi8VlybTyBu_Z8E5xL53U1xK`, file `91252984-Impromptu Zoom Meeting-2026-03-01`). Rafi handles the technical pipeline. Jay handles editorial input. Joe committed to remaining available for support post-handoff.
 - **Project goals as Joe stated them to Rafi:** (1) collect all of Jay's online work accessible via URL, (2) easy access, (3) protect against link rot, (4) highlight key works, (5) serve as a model for other scholars' digital legacies.
-- **Stated architectural rationale:** zero-build, zero recurring cost. Any handoff design that introduces recurring cost violates the original premise.
+- **Stated architectural rationale:** zero-build, low-build, BOUNDED recurring cost. (Per Nov 8 2025 Joe-Jay Fathom call, Jay explicitly agreed to a $10/mo budget cap for the AI chatbot. So the working constraint is "hard budget cap, abuse-proof," not "zero recurring cost" as the March 1 Joe-Rafi call framed it.)
+- **Editorial workflow proven:** Jay's preferred input mode for site content/feedback is a single Google Doc with tabs (per Dec 8 2025 Fathom call). This is already established practice, not hypothetical.
+- **Visual aesthetic:** Jay explicitly wanted a "dusty library" look distinct from the modern PressThink theme.
+- **Beta testers / potential backup curators named in prior calls:** a Columbia PhD student (name to recover) received early dissertation PDF access; Sam Earle wrote a "Scholar's Response" commentary on the archive.
+- **Open content sweep target Jay himself flagged Nov 8:** Facebook + LinkedIn archive exports. Repo currently has Twitter/Bluesky/Tumblr only.
 
 ## Baseline (2026-05-24, main @ 40d8188)
 
