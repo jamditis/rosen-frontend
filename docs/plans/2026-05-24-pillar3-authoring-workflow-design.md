@@ -2,7 +2,6 @@
 
 **Status**: Draft — awaiting Joe's review
 **Date**: 2026-05-24
-**Author**: Joe (via Claude)
 **Goal**: Build the working post-handoff workflow Jay uses to add new content. Phase 1 demoable for Wednesday May 27 call.
 
 ---
@@ -43,9 +42,9 @@ Two hard constraints from that sentence:
 - No status-callback path from server → sheet.
 
 ### Infrastructure inventory
-- **houseofjawn** runs Cloudflare tunnel `901f6cfd-...` with 13+ existing routes (pi/dashboard/cjs/share/etc.). Adding a new `rosen-submit.amditis.tech` route is one ingress entry.
-- **Live site**: `pressthink.org/j/rosen-archive/` on Bluehost-shared WordPress. WP-admin creds in `pass` at `claude/rosen/wp-admin`. SFTP available per `pass claude/rosen/wp-admin` notes (verify).
-- **brain-sync.sh** keeps code in sync houseofjawn ↔ officejawn.
+- A Cloudflare tunnel already fronts the operator's services; adding a new `rosen-submit.<domain>` route is one ingress entry. Tunnel UUID and the full route map are kept in the operator's private notes, not committed.
+- **Live site**: `pressthink.org/j/rosen-archive/` on Bluehost-shared WordPress. WP-admin + SFTP credentials live in the operator's local password store, not committed.
+- A code-sync helper keeps the working tree in sync across the operator's machines.
 
 ### Apps Script constraints worth knowing
 - `onEdit` simple triggers: 30s execution limit, no auth scopes beyond the spreadsheet itself.

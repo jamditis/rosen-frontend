@@ -35,7 +35,7 @@ Living document tracking the multi-session goal of making the archive self-susta
 - **Open content sweep target Jay himself flagged Nov 8:** Facebook + LinkedIn archive exports. Repo currently has Twitter/Bluesky/Tumblr only.
 - **Social scope is settled (Jay, Oct 27 2025 email):** "I think we can limit it to X and BlueSky." → no Mastodon, no Substack. FB and LinkedIn were on the import list but never delivered; whether Jay still wants them is the open question.
 - **Hali Rosen (Jay's wife) is the SECOND authorized submitter** — per Nov 16 email Jay specified the Google Form should be "only you, me, and my wife, Hali." Hali also enforces deadlines on Jay.
-- **Rafi Rosen contact:** `rosen.raphie@gmail.com`, based in Berlin.
+- **Rafi Rosen contact:** kept in Joe's private contacts. Based in Berlin.
 - **Authoring surface decision was made Nov 14:** Google Apps Script inside the archive spreadsheet, "operates entirely within Google Sheets — no external servers needed — and will operate in perpetuity." That Nov 14 intent (Apps-Script-only, no external servers) is **superseded** by the 2026-05-24 Pillar 3 design (`docs/plans/2026-05-24-pillar3-authoring-workflow-design.md`), which adds a Phase 1 bridge through houseofjawn for scrape + Wayback-fallback + SFTP deploy, then migrates Phase 2 to a Cloudflare Worker so the Nov 14 "no Joe machine, free, forever" constraint is met post-handoff. Apps Script still owns input + queueing + status writeback — the change is what runs server-side, not what Jay touches.
 - **The April 7 2026 commitment Joe owes Jay:** "automated system that lets you add new records to the archive and have them automatically tagged, categorized, and added to the live archive site." Jay quoted this back to Joe on May 6 — it's the explicit deliverable expected at Wednesday's call.
 - **Live concern Jay flagged twice (Jan 28 + May 23, the day before our call):** Internet Archive's AI-scraping policy. Joe answered "nah I figured out a way around that" in Jan; Jay resent the link in May. Needs a real mitigation answer.
@@ -45,14 +45,14 @@ Living document tracking the multi-session goal of making the archive self-susta
 | Name | Role | Contact | Where they fit |
 |---|---|---|---|
 | Hali Rosen | Jay's wife | (via Jay) | authorized submitter; deadline enforcer |
-| Raphie/Rafi Rosen | Jay's son | rosen.raphie@gmail.com (Berlin) | designated technical successor; March 1 Joe-Rafi handoff meeting captured |
+| Raphie/Rafi Rosen | Jay's son | (Joe's private contacts; Berlin) | designated technical successor; March 1 Joe-Rafi handoff meeting captured |
 | Marla Supnick | family friend, Unified Field founder | (joined Wednesday call) | design endorser; museum-interactive specialist |
 | Eli Kuslansky | Marla's partner at Unified Field | (joined Wednesday call) | brings their own design proposals |
-| Alesandra Tejeda | NYU j-school grad researcher | alesandra.c.tejeda@gmail.com | summer 2025 researcher |
-| Edgar Alonso Castillo | NYU Journalism digital assets keeper | edgar.castillo@nyu.edu | source of WP access for Joe |
-| Joyce White | NYU admin | jpw7436@nyu.edu | invoice processing |
-| Whitney Lee | NYU librarian | whitney.lee@nyu.edu | dissertation digitization |
-| Samuel "Sam" Earle | Columbia grad student | s.earle@columbia.edu | wrote Scholar's Response; received early dissertation access |
+| Alesandra Tejeda | NYU j-school grad researcher | (Joe's private contacts) | summer 2025 researcher |
+| Edgar Alonso Castillo | NYU Journalism digital assets keeper | (NYU directory) | source of WP access for Joe |
+| Joyce White | NYU admin | (NYU directory) | invoice processing |
+| Whitney Lee | NYU librarian | (NYU directory) | dissertation digitization |
+| Samuel "Sam" Earle | Columbia grad student | (Columbia directory) | wrote Scholar's Response; received early dissertation access |
 | Marty Halo | CCM colleague | (Joe's contact) | fixed CCM WordPress custom-block issue |
 
 ## Naming correction
@@ -91,7 +91,7 @@ The handoff plan frames Jay as "editorial input only" — submits content via sh
 
 > "I really need to be in the presence of the archive as I am revising and editing the different descriptions... I have no feel for my audience. I can't tell what the users are going to be doing. The archive is an abstraction for me as I try to edit what's in it."
 
-Jay apologized for the framing on May 6 ("the email... should never have been sent. It was a product of my own confusion, created by health problems and other things, like being 70 years old."), but the underlying workflow signal is real: **for prose revisions Jay wants to see the archive rendered while editing.** Sheets is fine for *adding URLs to the queue*. Revising descriptions/intros needs a different surface — minimum, a live preview.
+Jay later retracted the framing as a moment of frustration, but the underlying workflow signal is real: **for prose revisions Jay wants to see the archive rendered while editing.** Sheets is fine for *adding URLs to the queue*. Revising descriptions/intros needs a different surface — minimum, a live preview.
 
 ## Baseline (2026-05-24, main @ 40d8188)
 

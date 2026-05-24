@@ -155,7 +155,7 @@ Relationships connect records to entities.
 
 ### Relationship Types
 
-Fifteen relationship types are in active use. Counts reflect the current `extracted_relationships.csv`.
+Fifteen relationship types are in active use. The counts below are a snapshot of `extracted_relationships.csv` as of 2026-05-24 — they will drift as the archive grows. Treat the *list* of types as the contract; treat the counts as illustrative. Re-derive with `cut -d, -f3 data/extracted_relationships.csv | sort | uniq -c | sort -rn` when an exact figure matters.
 
 | Type | Count | Meaning |
 |------|------:|---------|

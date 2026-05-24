@@ -56,9 +56,9 @@ Cross-reference: `docs/JAY_ROSEN_HANDOFF_GOAL_PROGRESS.md` for the broader plan.
 
 ## Facts recovered from the two Joe-Jay Fathom calls (loaded via Playwright 2026-05-24)
 
-The summaries from these two calls answered (or partially answered) many of the questions originally on this list. The full transcripts are available behind the Fathom UI if more detail is needed.
+The summaries from these two calls answered (or partially answered) many of the questions originally on this list. The full transcripts are kept privately by Joe; share links are not committed here.
 
-### From the Nov 8, 2025 check-in (110 min) — https://fathom.video/share/nxXDedW1_oBqUykTojzNsw_qLidTggw9
+### From the Nov 8, 2025 check-in (110 min)
 
 Jay's stated preferences from that meeting:
 
@@ -77,7 +77,7 @@ Beta testers / potential collaborators named:
 - A **Columbia PhD student** received early dissertation PDF access (name not in summary)
 - **Sam Earle** wrote a "Scholar's Response" commentary for the archive
 
-### From the Dec 8, 2025 launch-prep call (29 min) — https://fathom.video/share/zdfnoeQSZro_TajSBSYNF43EVy_oiong
+### From the Dec 8, 2025 launch-prep call (29 min)
 
 - **Phased rollout was the launch strategy:** Phase 1 = reader/FAQ/annotated excerpts; Phase 2+ = Concept Explorer / Then & Now / advanced tools added over time.
 - **Editorial feedback workflow:** "single Google Doc with tabs" — Jay's preferred mechanism, replacing scattered emails. Jay adds notes and screenshots to a "Jay's notes on website" tab.
