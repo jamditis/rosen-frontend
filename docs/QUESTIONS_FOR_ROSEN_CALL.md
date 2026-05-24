@@ -44,9 +44,18 @@ Cross-reference: `docs/JAY_ROSEN_HANDOFF_GOAL_PROGRESS.md` for the broader plan.
 24. **Comments / reactions:** any interest in adding a comment or "respond" feature, or stays read-only forever?
 25. **Newsletter from the archive:** any interest in a "new in the archive this month" RSS feed or email digest? The RSS infrastructure already exists.
 
+## TODO for Joe before the Wednesday call
+
+Two Joe-Jay calls exist in Fathom but their transcripts are not in Drive (only metadata). They almost certainly contain answers to many questions below — Joe should grab them manually via the Fathom UI and either paste the relevant bits into this doc or update `docs/JAY_ROSEN_HANDOFF_GOAL_PROGRESS.md`.
+
+- **Nov 8 2025, ~1h 50min:** "Jay Rosen Archive check in call (11/8/25)" — https://fathom.video/share/nxXDedW1_oBqUykTojzNsw_qLidTggw9 — longest, most handoff-relevant
+- **Dec 8 2025, ~29min:** "Jay Rosen dissertation launch final prep call" — https://fathom.video/share/zdfnoeQSZro_TajSBSYNF43EVy_oiong
+
+Without these, every question below stays open and may be redundant with answers Jay already gave.
+
 ## Questions surfaced by the Fathom-transcript review (2026-05-24 agent run)
 
-The only Rosen-related transcript in Fathom is the March 1 Joe-Rafi handoff meeting — there are no direct Joe-Jay recordings. Everything below is genuinely new info we need from Jay himself:
+Only the March 1 Joe-Rafi handoff was directly extractable. There are no direct Joe-Jay recordings in Drive (the Nov 8 + Dec 8 calls are there as metadata only — see TODO above). Everything below is genuinely new info we need from Jay himself:
 
 26. **Editorial scope vetoes:** are there categories of content you want excluded? (Guest posts on others' sites, podcast guest spots, classroom-lecture recordings.) The current ~1,000-item corpus was curated by Joe's judgment, not yours.
 27. **Social posts permanence:** ~27,000 Bluesky/Tumblr/Twitter posts are a first-class part of the archive today. Do you want them to stay there, or moved into a separate "social" view?

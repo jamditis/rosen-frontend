@@ -107,6 +107,36 @@ Doing in this order; each is a separate PR for Copilot review per global CLAUDE.
 3. **Content sweep:** firecrawl + WebSearch pass for any Jay Rosen content not in the archive; produce a candidate list in `data/CANDIDATE_ADDITIONS_<date>.json` with provenance; do NOT merge into the canonical CSV without curator review.
 4. **Design docs:** Detailed write-ups for the storage architecture (#201), auto-deploy (#200), and HANDOFF.md (#204). These are design docs, not implementation — implementation waits on Joe's approval of D1/D2.
 
+## Canonical sheet diff (2026-05-24)
+
+The original sheet (`1Q_Fik5KQXdkZ4dujEN8H_47K5oldLkv6-hxERuBAdpg`) has 20 tabs. The `archive_records` tab (gid=928818664) is the curator's source-of-truth for records. Diff against repo `data/archive_records-public.csv`:
+
+| Bucket | Count | Action |
+|---|---|---|
+| Sheet records (RECORD-*) | 659 | source of truth |
+| Repo records (RECORD-* + TUMBLR + CLIP + THREAD) | 931 | superset (TUMBLR/CLIP/THREAD added post-sheet) |
+| Sheet IDs not in repo | 93 | investigate |
+| → URL also in repo under different ID | 25 | already handled (dedup re-ID) |
+| → URL truly not in repo | 68 | investigate further |
+| → → `_p.html` print versions of records in repo | 62 | correctly removed by `dedup_records.py` |
+| → → `_p.html` print-orphans (regular .html ALSO missing) | 3 | recover via Wayback |
+| → → Real content gaps | 5 | add or URL-backfill |
+
+**Real content gaps (5 records, all PressThink/LA Times 2007-2009):**
+
+1. LA Times op-ed "The journalism that bloggers actually do" (2007-08-22) — net new record to add
+2. URL backfill for repo RECORD-00699 "Audience Atomization Overcome" — sheet has the URL
+3. URL backfill for repo RECORD-00700 "He Said, She Said Journalism" — sheet has the URL
+4-5. Curly-quote/straight-quote duplicate entries in the sheet itself (same content)
+
+**Print-orphan recovery (3 records, all PressThink 2003-2005):**
+
+- RECORD-00310 Introduction: Ghost (2003-09-01)
+- RECORD-00521 Big Wigs From the Blogging & Journalism Conference (2005-01-26)
+- RECORD-00570 Blog Storm Troopers or Pack Journalism at its Best (2005-02-10)
+
+Both pursuits captured in task #13. Entities/relationships gap (sheet has 7,153/8,341 vs repo 5,036/4,666) is largely explained by the removed records but needs a second-pass diff to confirm.
+
 ## Original input-queue sheet (discovered 2026-05-24 from Joe)
 
 `https://docs.google.com/spreadsheets/d/1Q_Fik5KQXdkZ4dujEN8H_47K5oldLkv6-hxERuBAdpg/edit?gid=0#gid=0` — the original ingestion queue. Publicly accessible CSV export.
