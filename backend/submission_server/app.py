@@ -102,17 +102,49 @@ def form():
                            pending_count=pending_count)
 
 
+def _submission_payload():
+    """Return form-or-JSON values for /submit so Apps Script and the HTML form
+    can hit the same endpoint. Apps Script posts JSON; the legacy form posts
+    multipart. ``getlist`` is form-only, so JSON callers pass categories as a
+    list or comma string."""
+    if request.is_json:
+        body = request.get_json(silent=True) or {}
+        cats = body.get('categories', '')
+        if isinstance(cats, list):
+            cats_list = cats
+        else:
+            cats_list = [c.strip() for c in str(cats).split(',') if c.strip()]
+        return body, cats_list
+    return request.form, request.form.getlist('categories')
+
+
+def _json_or_html(success: bool, **payload):
+    """Return JSON for Apps Script callers, rendered HTML for browser callers.
+
+    ``success`` is the canonical pass/fail flag; payload kwargs are merged in
+    for both shapes. The form template reads ``success`` as a Jinja flag.
+    """
+    if request.is_json or request.headers.get('Accept', '').startswith('application/json'):
+        return jsonify({'ok': success, **payload})
+    return render_template('form.html',
+                           categories=THEMATIC_CATEGORIES,
+                           pending_count=db.get_pending_count(),
+                           success=success,
+                           **payload)
+
+
 @app.route('/submit', methods=['POST'])
 @require_auth
 def submit():
-    """Accept a URL submission."""
-    url = request.form.get('url', '').strip()
+    """Accept a URL submission. Supports both the HTML form and JSON callers
+    (Apps Script). When the caller provides ``sheet_id``/``sheet_tab``/
+    ``sheet_row``, those round-trip into the queue so the status writeback
+    can update the right row of the right sheet."""
+    body, selected_cats = _submission_payload()
+    url = (body.get('url') or '').strip()
 
     if not url:
-        return render_template('form.html',
-                               categories=THEMATIC_CATEGORIES,
-                               pending_count=db.get_pending_count(),
-                               error='URL is required.')
+        return _json_or_html(False, error='URL is required.')
 
     # Basic URL validation
     if not url.startswith(('http://', 'https://')):
@@ -123,28 +155,28 @@ def submit():
     from rosen_scraper.url_safety import is_safe_public_url
     url_ok, url_reason = is_safe_public_url(url)
     if not url_ok:
-        return render_template('form.html',
-                               categories=THEMATIC_CATEGORIES,
-                               pending_count=db.get_pending_count(),
-                               error=f'That URL cannot be accepted: {url_reason}.')
+        return _json_or_html(False, error=f'That URL cannot be accepted: {url_reason}.')
 
     # Check for duplicate in queue
     existing = db.get_submission_by_url(url)
     if existing and existing['status'] in ('pending', 'processing'):
-        return render_template('form.html',
-                               categories=THEMATIC_CATEGORIES,
-                               pending_count=db.get_pending_count(),
-                               error=f'This URL is already in the queue (status: {existing["status"]}).')
+        return _json_or_html(
+            False,
+            error=f'This URL is already in the queue (status: {existing["status"]}).')
 
-    # Collect optional fields
-    title = request.form.get('title', '').strip()
-    publication = request.form.get('publication', '').strip()
-    date_published = request.form.get('date_published', '').strip()
-    notes = request.form.get('notes', '').strip()
-
-    # Collect selected categories
-    selected_cats = request.form.getlist('categories')
+    title = (body.get('title') or '').strip()
+    publication = (body.get('publication') or '').strip()
+    date_published = (body.get('date_published') or '').strip()
+    notes = (body.get('notes') or '').strip()
     categories_str = ', '.join(selected_cats)
+
+    sheet_id = (body.get('sheet_id') or '').strip()
+    sheet_tab = (body.get('sheet_tab') or '').strip()
+    sheet_row_raw = body.get('sheet_row')
+    try:
+        sheet_row = int(sheet_row_raw) if sheet_row_raw not in (None, '') else None
+    except (TypeError, ValueError):
+        sheet_row = None
 
     sub_id = db.add_submission(
         url=url,
@@ -153,17 +185,18 @@ def submit():
         date_published=date_published,
         categories=categories_str,
         notes=notes,
+        sheet_id=sheet_id,
+        sheet_tab=sheet_tab,
+        sheet_row=sheet_row,
     )
 
     pending_count = db.get_pending_count()
     logger.info(f"New submission #{sub_id}: {url} (queue: {pending_count})")
 
-    return render_template('form.html',
-                           categories=THEMATIC_CATEGORIES,
-                           pending_count=pending_count,
-                           success=True,
-                           submitted_url=url,
-                           submission_id=sub_id)
+    # _json_or_html re-reads pending_count for the HTML branch; the JSON branch
+    # surfaces it from the local in case callers want the post-submit count.
+    return _json_or_html(True, submitted_url=url,
+                         submission_id=sub_id, queue_size=pending_count)
 
 
 @app.route('/status')

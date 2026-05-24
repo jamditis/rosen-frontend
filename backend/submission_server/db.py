@@ -13,7 +13,13 @@ from .config import DATABASE_PATH
 
 
 def init_db():
-    """Create the database tables if they don't exist."""
+    """Create the database tables if they don't exist.
+
+    Also runs additive ALTER TABLE migrations for installs predating the
+    Pillar 3 Sheets-callback columns (``sheet_id``/``sheet_tab``/``sheet_row``).
+    SQLite's ``ADD COLUMN`` is fast and lock-free, so this is safe to run on
+    every startup.
+    """
     with get_db() as conn:
         conn.executescript("""
             CREATE TABLE IF NOT EXISTS submissions (
@@ -28,7 +34,10 @@ def init_db():
                 submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 processed_at TIMESTAMP,
                 record_id TEXT,
-                error_message TEXT
+                error_message TEXT,
+                sheet_id TEXT,
+                sheet_tab TEXT,
+                sheet_row INTEGER
             );
 
             CREATE TABLE IF NOT EXISTS processing_runs (
@@ -41,6 +50,16 @@ def init_db():
                 submissions_failed INTEGER
             );
         """)
+        # Migrate existing installs. sqlite_master is the schema table.
+        existing_cols = {row['name'] for row in conn.execute(
+            "PRAGMA table_info(submissions)").fetchall()}
+        for col, ddl in (
+            ('sheet_id', 'TEXT'),
+            ('sheet_tab', 'TEXT'),
+            ('sheet_row', 'INTEGER'),
+        ):
+            if col not in existing_cols:
+                conn.execute(f'ALTER TABLE submissions ADD COLUMN {col} {ddl}')
 
 
 @contextmanager
@@ -60,14 +79,22 @@ def get_db():
 
 def add_submission(url: str, title: str = '', publication: str = '',
                    date_published: str = '', categories: str = '',
-                   notes: str = '') -> int:
-    """Add a new submission to the queue. Returns the submission ID."""
+                   notes: str = '', sheet_id: str = '',
+                   sheet_tab: str = '', sheet_row: Optional[int] = None) -> int:
+    """Add a new submission to the queue. Returns the submission ID.
+
+    Sheet round-trip params are optional — submissions from the legacy web
+    form (no sheet of origin) omit them and the status-writeback step becomes
+    a no-op for those rows.
+    """
     with get_db() as conn:
         cursor = conn.execute(
-            """INSERT INTO submissions (url, title, publication, date_published, categories, notes)
-               VALUES (?, ?, ?, ?, ?, ?)""",
+            """INSERT INTO submissions (url, title, publication, date_published,
+                                        categories, notes, sheet_id, sheet_tab, sheet_row)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (url.strip(), title.strip(), publication.strip(),
-             date_published.strip(), categories.strip(), notes.strip())
+             date_published.strip(), categories.strip(), notes.strip(),
+             (sheet_id or '').strip(), (sheet_tab or '').strip(), sheet_row)
         )
         return cursor.lastrowid
 
