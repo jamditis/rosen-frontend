@@ -6,7 +6,14 @@ the row index round-trips through ``submissions.db`` (sheet_id + sheet_row
 columns) so this module can write the result to the right row.
 
 Per the Pillar 3 architecture, only three cells are touched:
-    F (col 6) — status:    queued | processing | live | duplicate | error
+    F (col 6) — status. Values actually written:
+        - 'submitted'  — Apps Script accepted the row and POSTed it
+        - 'archived'   — server scraped + appended to CSV, live deploy pending
+        - 'live'       — JSON regenerated and SFTP'd to pressthink.org
+        - 'duplicate'  — URL was already in the archive
+        - 'error'      — scrape / CSV / network failure (see H)
+        - 'no URL'     — Apps Script: column B empty
+        - 'invalid URL'— Apps Script: column B not http(s)
     G (col 7) — record_id: e.g. RECORD-00933 on success
     H (col 8) — error:     short error string on failure
 
@@ -39,6 +46,19 @@ _COL_RECORD_ID = 'G'
 _COL_ERROR = 'H'
 
 _SHEETS_SCOPE = ['https://www.googleapis.com/auth/spreadsheets']
+
+
+def _quote_tab(name: str) -> str:
+    """Return an A1-safe sheet-tab reference.
+
+    Google Sheets A1 notation requires a sheet name to be wrapped in single
+    quotes if it contains anything other than letters, digits, and underscores,
+    and any internal apostrophe must be doubled. Always quoting is simpler and
+    accepted even for plain names — pays a few bytes per range to avoid a 400
+    when Jay's sheet is named "Archive Queue" or "Joe's URLs".
+    """
+    safe = (name or 'Sheet1').replace("'", "''")
+    return f"'{safe}'"
 
 
 def _load_credentials():
@@ -89,7 +109,7 @@ def update_row(sheet_id: str, sheet_tab: str, row: int, status: str,
         return {'ok': False, 'skipped': False,
                 'error': 'google-api-python-client not installed'}
 
-    tab = sheet_tab or 'Sheet1'
+    tab = _quote_tab(sheet_tab)
     # batchUpdate is one round-trip instead of three; also atomic from the
     # reader's perspective so Jay never sees status=live + record_id=blank.
     body = {

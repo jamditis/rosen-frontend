@@ -62,9 +62,12 @@ before the first deploy or every SFTP push fails.
 sudo -u jamditis ssh-keyscan -p 22 <ROSEN_SFTP_HOST> >> ~jamditis/.ssh/known_hosts
 ```
 
-### 4. Install the systemd unit
+### 4. Install the systemd unit + wrapper
 
 ```bash
+sudo install -m 755 \
+  automation/systemd/rosen-submission-exec.sh \
+  /usr/local/sbin/rosen-submission-exec
 sudo install -m 644 \
   automation/systemd/rosen-submission.service \
   /etc/systemd/system/rosen-submission.service
@@ -72,6 +75,10 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now rosen-submission.service
 sudo systemctl status rosen-submission.service
 ```
+
+The wrapper resolves the Poetry venv path at start time (`poetry env info -p`),
+so the service keeps working after `poetry env remove` / `poetry install` / a
+Python upgrade — all of which change the venv's hash-based directory name.
 
 Sanity check:
 

@@ -83,7 +83,8 @@ class TestSuccessfulWriteback:
         batch.assert_called_once()
         body = batch.call_args.kwargs['body']
         ranges = [d['range'] for d in body['data']]
-        assert ranges == ['Queue!F42', 'Queue!G42', 'Queue!H42']
+        # Always-quoted per A1 notation safety (codex/Copilot finding on #212).
+        assert ranges == ["'Queue'!F42", "'Queue'!G42", "'Queue'!H42"]
         values = [d['values'][0][0] for d in body['data']]
         assert values == ['live', 'RECORD-00933', '']
 
@@ -101,7 +102,8 @@ class TestSuccessfulWriteback:
                 sheet_id='SHEET1', sheet_tab='', row=1, status='queued')
 
         ranges = [d['range'] for d in batch.call_args.kwargs['body']['data']]
-        assert all(r.startswith('Sheet1!') for r in ranges)
+        # Always-quoted, including the Sheet1 default.
+        assert all(r.startswith("'Sheet1'!") for r in ranges)
 
 
 class TestHttpErrorReporting:

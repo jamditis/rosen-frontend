@@ -55,9 +55,18 @@ def _read_env() -> Optional[Dict[str, Any]]:
     if not (host and user and remote and (password or key_path)):
         return None
 
+    # A malformed port value used to ValueError up through process_batch and
+    # crash the whole submission run. Treat it as unconfigured instead so the
+    # batch keeps going and the row gets a clear "skipped" signal.
+    try:
+        port = int(os.environ.get('ROSEN_SFTP_PORT', '22'))
+    except (TypeError, ValueError):
+        logger.warning("ROSEN_SFTP_PORT is not an integer; treating as unconfigured")
+        return None
+
     return {
         'host': host,
-        'port': int(os.environ.get('ROSEN_SFTP_PORT', '22')),
+        'port': port,
         'user': user,
         'remote_path': remote.rstrip('/'),
         'password': password or None,

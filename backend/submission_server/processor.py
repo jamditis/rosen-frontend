@@ -168,20 +168,24 @@ def _regenerate_json() -> bool:
         return False
 
 
+# Single source of truth for the canonical JSON artifact set. Also referenced
+# by _staging_has_content so a divergence can't silently desync staging and
+# the SFTP retry gate.
+_STAGED_JSON_FILES = (
+    'archive-data.json',
+    'archive-core.json',
+    'archive-details.json',
+    'archive-entities.json',
+)
+
+
 def _stage_for_ftp() -> bool:
     """Copy regenerated JSON files to the FTP staging directory."""
     if not FTP_STAGING_DIR.exists():
         FTP_STAGING_DIR.mkdir(parents=True, exist_ok=True)
 
-    files_to_copy = [
-        'archive-data.json',
-        'archive-core.json',
-        'archive-details.json',
-        'archive-entities.json',
-    ]
-
     copied = 0
-    for filename in files_to_copy:
+    for filename in _STAGED_JSON_FILES:
         src = DATA_DIR / filename
         dst = FTP_STAGING_DIR / filename
         if src.exists():
@@ -190,8 +194,19 @@ def _stage_for_ftp() -> bool:
         else:
             logger.warning(f"Expected file not found: {src}")
 
-    logger.info(f"Staged {copied}/{len(files_to_copy)} files for FTP")
+    logger.info(f"Staged {copied}/{len(_STAGED_JSON_FILES)} files for FTP")
     return copied > 0
+
+
+def _staging_has_content() -> bool:
+    """True iff every canonical JSON file is present in the staging dir.
+
+    SFTP push is gated on this so a previously-failed deploy gets retried on
+    the next batch, even when the new batch has zero successful submissions.
+    """
+    if not FTP_STAGING_DIR.exists():
+        return False
+    return all((FTP_STAGING_DIR / f).exists() for f in _STAGED_JSON_FILES)
 
 
 def process_single_url(url: str, schema: Dict[str, Any],
@@ -352,32 +367,47 @@ def process_batch(trigger: str = 'manual') -> Dict[str, Any]:
                            error='Scrape returned no data (URL may be unreachable)')
             failed += 1
 
-    # Regenerate JSON files if any records succeeded
-    push_result = None
+    # Regen JSON only when there's new content to flatten. Empty regen runs
+    # would just rewrite identical files for no benefit.
+    json_ok = True
     if succeeded > 0:
         logger.info("Regenerating JSON files...")
         json_ok = _regenerate_json()
         if json_ok:
             _stage_for_ftp()
-            push_result = sftp_push.push_to_production()
-            if push_result.get('ok'):
-                logger.info(f"SFTP push ok: {push_result.get('files_pushed')} files")
-            elif push_result.get('skipped'):
-                logger.info("SFTP push skipped (no creds configured)")
-            else:
-                logger.error(f"SFTP push failed: {push_result.get('error')}")
-        # Promote 'archived' → 'live' (or annotate retry state) for sheet rows.
-        for entry in writebacks:
-            if entry['status'] != 'archived':
-                continue
-            if push_result is None or push_result.get('skipped'):
-                entry['status'] = 'archived'
-                entry['error'] = 'Staged; live deploy not configured on this server'
-            elif push_result.get('ok'):
-                entry['status'] = 'live'
-            else:
-                entry['error'] = (f"Archived; live push will retry next batch "
-                                  f"({push_result.get('error', 'unknown error')})")
+
+    # SFTP push runs whenever staging has content — even if this batch added
+    # no new rows. SFTP overwrites are idempotent, so a pure-dup/failure batch
+    # still gives a previously-failed deploy a chance to recover. Codex P1 on
+    # #212: prior gating left prod indefinitely stale.
+    push_result = None
+    if _staging_has_content():
+        push_result = sftp_push.push_to_production()
+        if push_result.get('ok'):
+            logger.info(f"SFTP push ok: {push_result.get('files_pushed')} files")
+        elif push_result.get('skipped'):
+            logger.info("SFTP push skipped (no creds configured)")
+        else:
+            logger.error(f"SFTP push failed: {push_result.get('error')}")
+
+    # Promote 'archived' → 'live' (or annotate retry state) for sheet rows.
+    # Distinguishes the three failure modes so the operator looks in the
+    # right place: regen failed (rebuild the JSON), deploy unconfigured
+    # (set the SFTP env), or live push failed (transient network).
+    for entry in writebacks:
+        if entry['status'] != 'archived':
+            continue
+        if not json_ok:
+            entry['error'] = 'JSON regen failed; staged files not updated'
+        elif push_result is None:
+            entry['error'] = 'Staged; no live deploy attempted (nothing in staging)'
+        elif push_result.get('skipped'):
+            entry['error'] = 'Staged; live deploy not configured on this server'
+        elif push_result.get('ok'):
+            entry['status'] = 'live'
+        else:
+            entry['error'] = (f"Archived; live push will retry next batch "
+                              f"({push_result.get('error', 'unknown error')})")
 
     # Sheet writebacks are best-effort — never raise into the batch summary.
     for entry in writebacks:

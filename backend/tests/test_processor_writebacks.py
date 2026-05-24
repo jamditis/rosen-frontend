@@ -48,6 +48,10 @@ def _patch_pipeline(monkeypatch, pending, scrape_result=None,
                         lambda *a, **kw: csv_append_ok)
     monkeypatch.setattr(processor, '_regenerate_json', lambda: regen_ok)
     monkeypatch.setattr(processor, '_stage_for_ftp', lambda: True)
+    # The post-stage push gate: after the codex-fix refactor, the push fires
+    # whenever staging has content. Default to True so existing tests that
+    # exercise the success path still drive the push.
+    monkeypatch.setattr(processor, '_staging_has_content', lambda: True)
     push_mock = MagicMock(return_value=(push_result or
                                         {'ok': True, 'skipped': False,
                                          'files_pushed': 4, 'error': None}))

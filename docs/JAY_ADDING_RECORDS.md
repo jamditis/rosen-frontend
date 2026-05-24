@@ -29,13 +29,31 @@ change to `live` and **Column G** will show the new record ID
 (`RECORD-00xxx`). At that point the piece is in the archive and visible
 on `summit.pressthink.org/j/rosen-archive/`.
 
-## What if something goes wrong?
+## What the status column can say
 
-If Column F shows `error`, Column H will tell you why in plain English:
+You'll usually see `submitted` → `live`. Anything else is a signal:
 
-- `URL must start with http:// or https://` — fix the URL in Column B,
-  untick the checkbox, then re-tick it.
+- **`submitted`** — Apps Script accepted the row and sent it to the
+  server. Normal early state.
+- **`archived`** — the piece is in the archive's underlying data, but
+  the live site hasn't been pushed yet. Usually a transient state; the
+  next batch updates the live site. If it sticks here for more than an
+  hour, check Column H or ask Joe.
+- **`live`** — visible on the public site. Done.
+- **`duplicate`** — the URL was already in the archive. No action needed.
+- **`error`** — something went wrong. Column H has the reason.
+- **`no URL`** — Column B is empty. Fill it in and re-tick the checkbox.
+- **`invalid URL`** — what's in Column B doesn't look like a URL. Make
+  sure it starts with `http://` or `https://`.
+
+## What if Column F says `error`?
+
+Column H will tell you why in plain English:
+
 - `URL already exists in archive` — already in there; no action needed.
+- `That URL cannot be accepted: ...` — the server rejected the URL for
+  safety reasons (private IP, malformed). Double-check it's a real
+  public URL.
 - `Network: ...` — the server was unreachable. Untick the checkbox, wait
   a minute, re-tick.
 - `Scrape returned no data (URL may be unreachable)` — the original page

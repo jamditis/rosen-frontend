@@ -118,14 +118,19 @@ def _submission_payload():
     return request.form, request.form.getlist('categories')
 
 
-def _json_or_html(success: bool, **payload):
+def _json_or_html(success: bool, status_code: int = 200, **payload):
     """Return JSON for Apps Script callers, rendered HTML for browser callers.
 
-    ``success`` is the canonical pass/fail flag; payload kwargs are merged in
-    for both shapes. The form template reads ``success`` as a Jinja flag.
+    ``status_code`` controls the JSON response code (caller picks 400/409/422
+    for validation/dedup/SSRF). HTML responses stay at 200 because the template
+    renders the error inline — flipping that to 4xx would change form UX.
+
+    The Apps Script client at automation/apps-script/Code.gs keys off the HTTP
+    status code; returning 200 on an error body silently strands the row at
+    'submitted' with no feedback to Jay. Codex + Copilot finding on PR #212.
     """
     if request.is_json or request.headers.get('Accept', '').startswith('application/json'):
-        return jsonify({'ok': success, **payload})
+        return jsonify({'ok': success, **payload}), status_code
     return render_template('form.html',
                            categories=THEMATIC_CATEGORIES,
                            pending_count=db.get_pending_count(),
@@ -144,7 +149,7 @@ def submit():
     url = (body.get('url') or '').strip()
 
     if not url:
-        return _json_or_html(False, error='URL is required.')
+        return _json_or_html(False, status_code=400, error='URL is required.')
 
     # Basic URL validation
     if not url.startswith(('http://', 'https://')):
@@ -155,13 +160,14 @@ def submit():
     from rosen_scraper.url_safety import is_safe_public_url
     url_ok, url_reason = is_safe_public_url(url)
     if not url_ok:
-        return _json_or_html(False, error=f'That URL cannot be accepted: {url_reason}.')
+        return _json_or_html(False, status_code=422,
+                             error=f'That URL cannot be accepted: {url_reason}.')
 
     # Check for duplicate in queue
     existing = db.get_submission_by_url(url)
     if existing and existing['status'] in ('pending', 'processing'):
         return _json_or_html(
-            False,
+            False, status_code=409,
             error=f'This URL is already in the queue (status: {existing["status"]}).')
 
     title = (body.get('title') or '').strip()

@@ -10,15 +10,10 @@ User=jamditis
 Group=jamditis
 WorkingDirectory=/home/jamditis/projects/rosen-frontend/backend
 EnvironmentFile=/etc/rosen-submission.env
-# gunicorn lives in the Poetry venv created by `poetry install` against
-# backend/pyproject.toml. Path resolves on houseofjawn after poetry install.
-ExecStart=/home/jamditis/.cache/pypoetry/virtualenvs/rosen-scraper-UoJJNUxE-py3.13/bin/gunicorn \
-    submission_server.app:app \
-    --bind 127.0.0.1:8084 \
-    --workers 2 \
-    --timeout 60 \
-    --access-logfile - \
-    --error-logfile -
+# Wrapper resolves the Poetry venv path at start time, so the unit keeps
+# working after env recreation / Python upgrade. Install to
+# /usr/local/sbin/rosen-submission-exec — see automation/SETUP.md.
+ExecStart=/usr/local/sbin/rosen-submission-exec
 Restart=on-failure
 RestartSec=5
 # Submission server only listens on loopback; Cloudflare tunnel fronts it.
