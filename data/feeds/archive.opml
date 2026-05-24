@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen Digital Archive</title>
-    <dateCreated>Sun, 24 May 2026 20:23:45 GMT</dateCreated>
-    <dateModified>Sun, 24 May 2026 20:23:45 GMT</dateModified>
+    <dateCreated>Sun, 24 May 2026 20:47:20 GMT</dateCreated>
+    <dateModified>Sun, 24 May 2026 20:47:20 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -219,7 +219,7 @@
       </outline>
     </outline>
     <outline text="By Category">
-      <outline text="Press &amp; Media Criticism (23404)" type="category">
+      <outline text="Press &amp; Media Criticism (23407)" type="category">
         <outline text="Jay Rosen on the digital revolution that wasn&apos;t" type="link" url="https://www.cjr.org/kicker/jay-rosen-digital-revolution-that-wasnt.php"/>
         <outline text="I send my questions about that to" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p"/>
         <outline text="Many of you, I know, receive a lot of national news, but care a lot about local" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4ecwzqx322p"/>
@@ -273,7 +273,7 @@
         <outline text="&quot;Why I&apos;m handing in my Pentagon press pass&quot; by Tom Bowman of NPR" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m35ykm4hp22j"/>
         <outline text="The basic reason is the Pentagon reporters want information" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m35vkye2gk2j"/>
       </outline>
-      <outline text="Politics &amp; Democracy (7657)" type="category">
+      <outline text="Politics &amp; Democracy (7658)" type="category">
         <outline text="&quot;There are positive developments in local news but they’re being swamped by the..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3s5wsddck2x"/>
         <outline text="&quot;There are positive developments in local news but they’re being swamped by the..." type="link" url="https://x.com/jayrosen_nyu/status/1981021320079896971"/>
         <outline text="&quot;If you had enough money to buy ads, you could reach the voters you wanted to..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3n33q3xbk2i"/>
@@ -327,7 +327,7 @@
         <outline text="Miss it this week?" type="link" url="https://x.com/jayrosen_nyu/status/1977079042567442658"/>
         <outline text="Thank you!" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2phhcovqs2t"/>
       </outline>
-      <outline text="Technology &amp; Digital Media (2828)" type="category">
+      <outline text="Technology &amp; Digital Media (2829)" type="category">
         <outline text="Jay Rosen on the digital revolution that wasn&apos;t" type="link" url="https://www.cjr.org/kicker/jay-rosen-digital-revolution-that-wasnt.php"/>
         <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/"/>
         <outline text="Sarah Longwell" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zvjrplq22z"/>
