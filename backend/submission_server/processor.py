@@ -26,6 +26,8 @@ from .config import (
     EXPORT_SCRIPT, FTP_STAGING_DIR,
 )
 from . import db
+from . import sftp_push
+from . import sheets_callback
 
 logger = logging.getLogger('submission_server.processor')
 
@@ -166,20 +168,24 @@ def _regenerate_json() -> bool:
         return False
 
 
+# Single source of truth for the canonical JSON artifact set. Also referenced
+# by _staging_has_content so a divergence can't silently desync staging and
+# the SFTP retry gate.
+_STAGED_JSON_FILES = (
+    'archive-data.json',
+    'archive-core.json',
+    'archive-details.json',
+    'archive-entities.json',
+)
+
+
 def _stage_for_ftp() -> bool:
     """Copy regenerated JSON files to the FTP staging directory."""
     if not FTP_STAGING_DIR.exists():
         FTP_STAGING_DIR.mkdir(parents=True, exist_ok=True)
 
-    files_to_copy = [
-        'archive-data.json',
-        'archive-core.json',
-        'archive-details.json',
-        'archive-entities.json',
-    ]
-
     copied = 0
-    for filename in files_to_copy:
+    for filename in _STAGED_JSON_FILES:
         src = DATA_DIR / filename
         dst = FTP_STAGING_DIR / filename
         if src.exists():
@@ -188,8 +194,19 @@ def _stage_for_ftp() -> bool:
         else:
             logger.warning(f"Expected file not found: {src}")
 
-    logger.info(f"Staged {copied}/{len(files_to_copy)} files for FTP")
+    logger.info(f"Staged {copied}/{len(_STAGED_JSON_FILES)} files for FTP")
     return copied > 0
+
+
+def _staging_has_content() -> bool:
+    """True iff every canonical JSON file is present in the staging dir.
+
+    SFTP push is gated on this so a previously-failed deploy gets retried on
+    the next batch, even when the new batch has zero successful submissions.
+    """
+    if not FTP_STAGING_DIR.exists():
+        return False
+    return all((FTP_STAGING_DIR / f).exists() for f in _STAGED_JSON_FILES)
 
 
 def process_single_url(url: str, schema: Dict[str, Any],
@@ -276,6 +293,22 @@ def process_batch(trigger: str = 'manual') -> Dict[str, Any]:
 
     succeeded = 0
     failed = 0
+    # Per-submission writeback entries. Populated in the loop so the post-loop
+    # SFTP step can mutate ``status`` from 'archived' → 'live' (or → 'archived
+    # (push pending)' on failure) without re-querying the DB.
+    writebacks = []
+
+    def _add_writeback(sub, status, record_id='', error=''):
+        if not sub.get('sheet_id') or not sub.get('sheet_row'):
+            return
+        writebacks.append({
+            'sheet_id': sub['sheet_id'],
+            'sheet_tab': sub.get('sheet_tab') or 'Sheet1',
+            'sheet_row': sub['sheet_row'],
+            'status': status,
+            'record_id': record_id,
+            'error': error,
+        })
 
     for submission in pending:
         sub_id = submission['id']
@@ -285,6 +318,8 @@ def process_batch(trigger: str = 'manual') -> Dict[str, Any]:
         if url in existing_urls:
             db.update_submission_status(sub_id, 'duplicate',
                                         error_message='URL already exists in archive')
+            _add_writeback(submission, 'duplicate',
+                           error='URL already exists in archive')
             failed += 1
             continue
 
@@ -305,6 +340,7 @@ def process_batch(trigger: str = 'manual') -> Dict[str, Any]:
         except Exception as e:
             logger.error(f"Error processing submission {sub_id} ({url}): {e}")
             db.update_submission_status(sub_id, 'failed', error_message=str(e))
+            _add_writeback(submission, 'error', error=str(e)[:200])
             failed += 1
             continue
 
@@ -315,23 +351,77 @@ def process_batch(trigger: str = 'manual') -> Dict[str, Any]:
                 existing_ids.add(record['id'])
                 existing_urls.add(url)
                 db.update_submission_status(sub_id, 'completed', record_id=record['id'])
+                # Tentatively 'archived'; bumped to 'live' after SFTP push.
+                _add_writeback(submission, 'archived', record_id=record['id'])
                 succeeded += 1
                 logger.info(f"Processed submission {sub_id}: {record['id']} — {url}")
             else:
                 db.update_submission_status(sub_id, 'failed',
                                             error_message='Failed to write to CSV')
+                _add_writeback(submission, 'error', error='CSV write failed')
                 failed += 1
         else:
             db.update_submission_status(sub_id, 'failed',
                                         error_message='Processing returned no data')
+            _add_writeback(submission, 'error',
+                           error='Scrape returned no data (URL may be unreachable)')
             failed += 1
 
-    # Regenerate JSON files if any records succeeded
+    # Regen JSON only when there's new content to flatten. Empty regen runs
+    # would just rewrite identical files for no benefit.
+    json_ok = True
     if succeeded > 0:
         logger.info("Regenerating JSON files...")
         json_ok = _regenerate_json()
         if json_ok:
             _stage_for_ftp()
+
+    # SFTP push runs whenever staging has content — even if this batch added
+    # no new rows. SFTP overwrites are idempotent, so a pure-dup/failure batch
+    # still gives a previously-failed deploy a chance to recover. Codex P1 on
+    # #212: prior gating left prod indefinitely stale.
+    push_result = None
+    if _staging_has_content():
+        push_result = sftp_push.push_to_production()
+        if push_result.get('ok'):
+            logger.info(f"SFTP push ok: {push_result.get('files_pushed')} files")
+        elif push_result.get('skipped'):
+            logger.info("SFTP push skipped (no creds configured)")
+        else:
+            logger.error(f"SFTP push failed: {push_result.get('error')}")
+
+    # Promote 'archived' → 'live' (or annotate retry state) for sheet rows.
+    # Distinguishes the three failure modes so the operator looks in the
+    # right place: regen failed (rebuild the JSON), deploy unconfigured
+    # (set the SFTP env), or live push failed (transient network).
+    for entry in writebacks:
+        if entry['status'] != 'archived':
+            continue
+        if not json_ok:
+            entry['error'] = 'JSON regen failed; staged files not updated'
+        elif push_result is None:
+            entry['error'] = 'Staged; no live deploy attempted (nothing in staging)'
+        elif push_result.get('skipped'):
+            entry['error'] = 'Staged; live deploy not configured on this server'
+        elif push_result.get('ok'):
+            entry['status'] = 'live'
+        else:
+            entry['error'] = (f"Archived; live push will retry next batch "
+                              f"({push_result.get('error', 'unknown error')})")
+
+    # Sheet writebacks are best-effort — never raise into the batch summary.
+    for entry in writebacks:
+        try:
+            sheets_callback.update_row(
+                sheet_id=entry['sheet_id'],
+                sheet_tab=entry['sheet_tab'],
+                row=entry['sheet_row'],
+                status=entry['status'],
+                record_id=entry['record_id'],
+                error=entry['error'],
+            )
+        except Exception as exc:  # noqa: BLE001 — best-effort
+            logger.error(f"sheets_callback failed for row {entry['sheet_row']}: {exc}")
 
     completed_at = datetime.now().isoformat()
     processed = succeeded + failed
