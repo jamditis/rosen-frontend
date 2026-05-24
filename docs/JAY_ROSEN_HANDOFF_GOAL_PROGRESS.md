@@ -36,7 +36,7 @@ Living document tracking the multi-session goal of making the archive self-susta
 - **Social scope is settled (Jay, Oct 27 2025 email):** "I think we can limit it to X and BlueSky." → no Mastodon, no Substack. FB and LinkedIn were on the import list but never delivered; whether Jay still wants them is the open question.
 - **Hali Rosen (Jay's wife) is the SECOND authorized submitter** — per Nov 16 email Jay specified the Google Form should be "only you, me, and my wife, Hali." Hali also enforces deadlines on Jay.
 - **Rafi Rosen contact:** `rosen.raphie@gmail.com`, based in Berlin.
-- **Authoring surface decision was made Nov 14:** Google Apps Script inside the archive spreadsheet, "operates entirely within Google Sheets — no external servers needed — and will operate in perpetuity." This IS the architecture that satisfies Joe's "no Actions budget, no machine, free, forever" constraints.
+- **Authoring surface decision was made Nov 14:** Google Apps Script inside the archive spreadsheet, "operates entirely within Google Sheets — no external servers needed — and will operate in perpetuity." That Nov 14 intent (Apps-Script-only, no external servers) is **superseded** by the 2026-05-24 Pillar 3 design (`docs/plans/2026-05-24-pillar3-authoring-workflow-design.md`), which adds a Phase 1 bridge through houseofjawn for scrape + Wayback-fallback + SFTP deploy, then migrates Phase 2 to a Cloudflare Worker so the Nov 14 "no Joe machine, free, forever" constraint is met post-handoff. Apps Script still owns input + queueing + status writeback — the change is what runs server-side, not what Jay touches.
 - **The April 7 2026 commitment Joe owes Jay:** "automated system that lets you add new records to the archive and have them automatically tagged, categorized, and added to the live archive site." Jay quoted this back to Joe on May 6 — it's the explicit deliverable expected at Wednesday's call.
 - **Live concern Jay flagged twice (Jan 28 + May 23, the day before our call):** Internet Archive's AI-scraping policy. Joe answered "nah I figured out a way around that" in Jan; Jay resent the link in May. Needs a real mitigation answer.
 
@@ -211,14 +211,11 @@ Workflow it implemented:
 2. Backend scraper reads new rows, processes each URL, writes status back into `Notes` (SUCCESS / FAILED with reason)
 3. Successfully scraped records get added to the main archive CSV with an assigned ID (e.g., PRESSTH-00001)
 
-**This IS the Jay input surface.** Way simpler than the Sheet-of-records design I was sketching:
+**The URL-paste pattern this sheet uses is the Jay input surface.** Way simpler than the Sheet-of-records design I was sketching:
 - Jay pastes URLs (zero schema knowledge required)
-- Rafi runs the backend pipeline (already documented in `docs/ENTITY_EXTRACTION_PIPELINE.md`)
-- Pipeline handles ID assignment, AI categorization, entity extraction, JSON regen, deploy
+- The backend pipeline handles ID assignment, AI categorization, entity extraction, JSON regen, deploy (already documented in `docs/ENTITY_EXTRACTION_PIPELINE.md`)
 
-Reactivating this requires: (a) confirming the sheet is shared with Jay edit access, (b) updating the backend `unified_entity_processor.py` to read from the live sheet again, (c) writing the simple "Add URL to this sheet" one-pager for Jay.
-
-This is the right next step after the Wednesday Jay call confirms.
+**As of 2026-05-24 this is the design that shipped in PR #212** — `docs/plans/2026-05-24-pillar3-authoring-workflow-design.md` is the source of truth. It uses a fresh "Rosen Archive URL List" sheet with the same URL-paste-then-checkbox shape (not the original 2017 ingest sheet), and Apps Script posts new rows to a Flask submission server on houseofjawn that runs the pipeline + SFTP-deploys to PressThink. Phase 2 swaps houseofjawn for a Cloudflare Worker so the post-handoff stack is free + machine-independent. Earlier passages in this doc dated before 2026-05-24 that describe an Apps-Script-only or "reactivate the 2017 backend reading from this sheet" plan are superseded.
 
 ## Session log
 
@@ -255,8 +252,10 @@ This is the right next step after the Wednesday Jay call confirms.
 - Still open (waiting on Jay): Facebook + LinkedIn archive exports.
 
 **Pillar 3 (authoring workflow):**
-- Re-confirmed: design is decided (Sheets + Apps Script, Nov 14 2025 decision). Implementation is the pending work — #200 (auto-deploy), #201 (storage architecture), #202 (ADDING-RECORDS.md rewrite). All blocked on Wednesday call for final approval on the live-preview tension Jay raised March 26.
-- Joe owes Jay a working system per April 7 commitment.
+- Design + implementation shipped in PR #212 — see `docs/plans/2026-05-24-pillar3-authoring-workflow-design.md` for the locked decisions. Phase 1: Apps Script onEdit trigger → Flask submission server on houseofjawn (`backend/submission_server/`) → SFTP deploy → status writeback to columns F/G/H of the sheet. Phase 2 post-handoff: replace houseofjawn with a Cloudflare Worker (free tier) so the stack stays free + machine-independent.
+- Jay-facing one-pager: `docs/JAY_ADDING_RECORDS.md`. Operator runbook: `automation/SETUP.md`.
+- Still open: deploy on houseofjawn (env, systemd unit, Cloudflare tunnel ingress); #200 auto-deploy and #201 storage-architecture issues are now superseded by the PR #212 design and can be closed once that PR merges.
+- Joe owes Jay a working system per April 7 commitment — PR #212 satisfies the commitment pending deploy + Wednesday-call sign-off on the live-preview tension Jay raised March 26.
 
 **Pillar 4 (handoff):**
 - Filed #211: 204 records have 0 extracted relationships. Root cause likely "extraction ran before raw_text was backfilled." Fix path documented.

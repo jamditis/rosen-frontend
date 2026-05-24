@@ -16,7 +16,7 @@ Cross-reference: `docs/JAY_ROSEN_HANDOFF_GOAL_PROGRESS.md` for the broader plan.
 
 ## Editorial / curation
 
-1. **Records with no recoverable URL** (CLAUDE.md L349 + issue #199): are RECORD-00663, 00667, 00673, 00693, 00694, 00700 truly unrecoverable, or does Jay have backups (Dropbox, hard drive, old email) of the original publications?
+1. **Records with no recoverable URL** (CLAUDE.md L349 + issue #199): RECORD-00673 (The Nation), 00693, 00694 (HuffPost), and 00700 (PressThink) were URL-recovered via Wayback CDX earlier in this PR. The two still without a recoverable URL are RECORD-00663 (The Baffler issue 12, March 1999 — print-only) and RECORD-00667 (Pew Center for Civic Journalism, ~2000 — defunct in 2003). Does Jay have backups (Dropbox, hard drive, old email) of those two original publications?
 2. **Gap-fill recoveries:** the stale branch `claude/gap-fill-early-2000s` has 39 articles recovered from Wayback / Firecrawl that lost their original URLs. Is Jay OK with the recovered text being published with a "recovered, original URL unknown" annotation, or should those records stay out of the archive until URLs are confirmed?
 3. **Entity classification edits** (issue #199 + ENTITY_AUDIT_REPORT.md §2.1): "iowa", "vietnam", "white house", "world economic forum", "2024 election" are duplicate-classified (Event vs Location, Event vs Organization). Does Jay have a preference, or should we just pick one based on the dominant usage in the records?
 4. **Romenesko** (ENTITY_AUDIT_REPORT.md §2.3): is "Romenesko" the person (Jim) or the blog/organization? Both are currently in the data as separate entities. Should we merge or keep distinct?
