@@ -34,7 +34,7 @@ from __future__ import annotations
 import json
 import logging
 import os
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 logger = logging.getLogger('submission_server.sheets_callback')
 

@@ -8,7 +8,7 @@ their own tests.
 """
 import sys
 import pathlib
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 
 import pytest
 
