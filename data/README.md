@@ -18,7 +18,7 @@ This export system generates a single pre-processed JSON file that loads in ~100
 |------|---------|
 | `IMPLEMENTATION_PLAN.md` | Detailed migration plan and architecture |
 | `export-archive-data.js` | Node.js script to generate JSON |
-| `archive-data.json` | Generated data file (~25MB, ~30k records, ~5k entities) |
+| `archive-data.json` | Generated data file (~27MB, ~30k records, 5,036 entities) |
 | `archive_records-public.csv` | Main archive records (articles, essays) |
 | `social_posts.csv` | Social media posts (Bluesky, Twitter) |
 | `extracted_relationships.csv` | Entity relationships between records |

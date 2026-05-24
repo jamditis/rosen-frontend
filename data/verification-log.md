@@ -171,3 +171,40 @@ Note: CLAUDE.md already documents 6 records with no recoverable URL: RECORD-0066
 - Pull quotes: 296 of 306 missing records filled using claude -p pipeline
 - Key concepts: 328 of 328 eligible records filled using claude -p pipeline
 - ftp-upload/data/ synced, all changes pushed to remote
+
+---
+
+## Canonical-sheet diff and URL backfill pass (2026-05-24)
+
+Compared `data/archive_records-public.csv` against the canonical maintainer-side Google Sheet (`1Q_Fik5KQXdkZ4dujEN8H_47K5oldLkv6-hxERuBAdpg`, tab `archive_records` gid=928818664). Diff produced 93 RECORD-* IDs in the sheet not in the repo. Classification:
+
+| Bucket | Count | Disposition |
+|---|---|---|
+| URL also in repo under different ID (dedup re-ID) | 25 | already handled |
+| `_p.html` print versions whose regular `.html` IS in repo | 62 | **correctly removed by `data/dedup_records.py`** — do not re-import |
+| `_p.html` print-orphans (regular `.html` also missing) | 3 | recover via Wayback in a future pass |
+| Real content gaps (5 sheet-only with non-_p URLs) | 5 | 2 are repo URL backfills, 1 is a net-new record, 2 are sheet-side curly/straight quote duplicates |
+
+### Documenting the `_p.html` dedup pattern (so future audits don't re-discover it)
+
+PressThink in the 2000s served every post in two URL variants: the regular `.html` and a print-friendly `_p.html`. The canonical sheet historically tracked both as separate records. `data/dedup_records.py::is_pressthink_print()` correctly identifies and removes the `_p.html` version whenever the regular `.html` exists. The 62 records visible only in the sheet (not the repo) ARE these intentional removals. **Future verification passes will hit the same 62-record discovery — they should match against this log and stop, not re-investigate.**
+
+### Backfills applied this pass
+
+- `RECORD-00699` "Audience Atomization Overcome" — URL backfilled to `https://pressthink.org/2009/01/audience-atomization-overcome-why-the-internet-weakens-the-authority-of-the-press/`; publication_date corrected from placeholder 2009-01-01 to canonical 2009-01-12; verified set to TRUE.
+- `RECORD-00700` "He Said, She Said Journalism" — URL backfilled to `https://pressthink.org/2009/04/he-said-she-said-journalism-lame-formula-in-the-land-of-the-active-user/`; publication_date corrected from 2009-04-01 to canonical 2009-04-12; verified set to TRUE. (Note: sheet had pre-redirect URL; live site canonicalizes to the `-user`-suffix form. Final URL captured.)
+- `RECORD-00803` (new) "The journalism that bloggers actually do" — LA Times op-ed (2007-08-22); previously sheet-only as RECORD-00105 (taken in repo) so reassigned. All fields populated from the sheet record.
+
+### Still open
+
+- 3 `_p.html` print-orphans (RECORD-00310, 00521, 00570 in sheet) need Wayback recovery — captured in task #13 / issue #199.
+- Sheet-side duplicate entries (curly vs straight quotes in RECORD-00606/00616 and RECORD-00628) are sheet-cleanup, not repo work.
+- Entities/relationships counts: sheet has 7,153 / 8,341 vs repo 5,036 / 4,666. Difference is largely the entities/relationships tied to the 62 removed `_p.html` records (which the sheet retains for historical reasons). A second-pass diff is queued to confirm there are no real entity/relationship gaps tied to records that ARE in both.
+
+### Counts after this pass
+
+- Archive records: 931 → **932** (+1 LA Times op-ed)
+- Social posts: 29,130 (unchanged)
+- Entities: 5,036 (unchanged)
+- Relationships: 4,666 (unchanged)
+- Test suite: 331/331 pass (verified)

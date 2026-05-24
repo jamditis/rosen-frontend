@@ -155,10 +155,30 @@ Relationships connect records to entities.
 
 ### Relationship Types
 
-- `mentions` - Record mentions entity
-- `authored_by` - Record authored by person
-- `discusses` - Record discusses concept
-- `references` - Record references work
+Fifteen relationship types are in active use. The counts below are a snapshot of `extracted_relationships.csv` as of 2026-05-24 — they will drift as the archive grows. Treat the *list* of types as the contract; treat the counts as illustrative. Re-derive with `cut -d, -f3 data/extracted_relationships.csv | sort | uniq -c | sort -rn` when an exact figure matters.
+
+| Type | Count | Meaning |
+|------|------:|---------|
+| `Affiliated With` | 1,413 | Entity has a stable association with another (person↔organization, organization↔organization) |
+| `Discusses` | 1,330 | Record discusses the entity as a topic |
+| `Mentions` | 913 | Record mentions the entity in passing |
+| `Criticizes` | 398 | Record makes a critical assessment of the entity |
+| `Published In` | 252 | Record was published in the named outlet |
+| `Originated By` | 128 | Concept or term originated with the entity |
+| `Occurred At` | 79 | Event took place at a location |
+| `Supports` | 47 | Record argues in favor of the entity / its position |
+| `Cites` | 46 | Record formally cites the entity |
+| `Expands On` | 37 | Record builds on a prior idea by the entity |
+| `Founded By` | 9 | Organization was founded by the named person |
+| `Pioneered` | 5 | Entity pioneered a movement / method |
+| `Owns` | 3 | Entity owns the target |
+| `Owned By` | 3 | Inverse of `Owns` |
+| `Inspired By` | 3 | Entity was inspired by the target |
+
+Notes:
+- Types are Title Case in the data — they are display strings, not enum identifiers.
+- The long tail (`Owns`, `Owned By`, `Inspired By`, `Pioneered`) is small enough that future cleanup may consolidate them. Don't introduce new types without a corresponding update here.
+- All relationship rows pass referential integrity (every source/target entity ID exists in `extracted_entities.csv`).
 
 ---
 

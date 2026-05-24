@@ -1,0 +1,266 @@
+# Jay Rosen handoff goal — progress and decisions
+
+Living document tracking the multi-session goal of making the archive self-sustaining for Jay Rosen after Joe stops curating. Updated by autonomous work sessions; survives context compaction because it is committed to the repo.
+
+**Goal verbatim:** "all of the records, relationships, and entities in the jamditis/rosen-frontend repo are verified, validated, correct, and integrated into the archive and we have done additional comprehensive sweeps/scrapes/research (with firecrawl or any other tools we have) to make sure all of Jay Rosen's digital content and output are included in the archive and we have a working and efficient process for jay rosen (very nontechnical person) to add and process additional content, articles, posts and/or examples of his work and digital output for inclusion in the archive once i am no longer working on the Jay Rosen Internet Archive project (without costing me any money)"
+
+## Four pillars
+
+1. **Verify** every record / relationship / entity already in the archive.
+2. **Sweep** the open web for any Jay Rosen content not yet in the archive.
+3. **Build** a nontechnical authoring workflow Jay can drive solo.
+4. **Hand off** the operating manual so it survives Joe stepping away.
+
+## Hard constraints (from Joe, 2026-05-24)
+
+- Auto-deploy must NOT consume Joe's GitHub Actions budget.
+- Auto-deploy must NOT run on Joe's machines or network.
+- Weekly cadence is acceptable — does not need to be per-commit.
+- Storage architecture is open (SQLite welcome, not required).
+- All decisions get documented here; all problems get filed as GitHub issues so they survive context compaction.
+- **Joe is the ultimate decision maker for the archive.** Jay is the eventual end user the handoff serves; design choices and deploy mechanisms are Joe's call, not Jay's preference vote.
+
+## Operating model (post-handoff target)
+
+- Jay Rosen owns the WordPress account at pressthink.org.
+- Joe has admin access via shared logins (stored in Joe's `pass` at `claude/rosen/wp-admin` and `claude/rosen/wp-parent-admin`); these are interim and should be rotated after handoff.
+- Long-term deploy automation uses a dedicated credential (WP application password or host SFTP) that does NOT belong to Joe personally.
+- Source code lives at github.com/jamditis/rosen-frontend (public; unmetered Actions; Joe-owned but transferable).
+- **Successor maintainer: Rafi Rosen (Jay's son).** Per March 1, 2026 Joe-Rafi meeting in Fathom (folder `1QSsudlskRi8VlybTyBu_Z8E5xL53U1xK`, file `91252984-Impromptu Zoom Meeting-2026-03-01`). Rafi handles the technical pipeline. Jay handles editorial input. Joe committed to remaining available for support post-handoff.
+- **Project goals as Joe stated them to Rafi:** (1) collect all of Jay's online work accessible via URL, (2) easy access, (3) protect against link rot, (4) highlight key works, (5) serve as a model for other scholars' digital legacies.
+- **Stated architectural rationale:** zero-build, low-build, BOUNDED recurring cost. (Per Nov 8 2025 Joe-Jay Fathom call, Jay explicitly agreed to a $10/mo budget cap for the AI chatbot. So the working constraint is "hard budget cap, abuse-proof," not "zero recurring cost" as the March 1 Joe-Rafi call framed it.)
+- **Editorial workflow proven:** Jay's preferred input mode for site content/feedback is a single Google Doc with tabs (per Dec 8 2025 Fathom call). This is already established practice, not hypothetical.
+- **Visual aesthetic:** Jay explicitly wanted a "dusty library" look distinct from the modern PressThink theme.
+- **Beta testers / potential backup curators named in prior calls:** a Columbia PhD student (name to recover) received early dissertation PDF access; Sam Earle wrote a "Scholar's Response" commentary on the archive.
+- **Open content sweep target Jay himself flagged Nov 8:** Facebook + LinkedIn archive exports. Repo currently has Twitter/Bluesky/Tumblr only.
+- **Social scope is settled (Jay, Oct 27 2025 email):** "I think we can limit it to X and BlueSky." → no Mastodon, no Substack. FB and LinkedIn were on the import list but never delivered; whether Jay still wants them is the open question.
+- **Hali Rosen (Jay's wife) is the SECOND authorized submitter** — per Nov 16 email Jay specified the Google Form should be "only you, me, and my wife, Hali." Hali also enforces deadlines on Jay.
+- **Rafi Rosen contact:** kept in Joe's private contacts. Based in Berlin.
+- **Authoring surface decision was made Nov 14:** Google Apps Script inside the archive spreadsheet, "operates entirely within Google Sheets — no external servers needed — and will operate in perpetuity." That Nov 14 intent (Apps-Script-only, no external servers) is **superseded** by the 2026-05-24 Pillar 3 design (`docs/plans/2026-05-24-pillar3-authoring-workflow-design.md`), which adds a Phase 1 bridge through houseofjawn for scrape + Wayback-fallback + SFTP deploy, then migrates Phase 2 to a Cloudflare Worker so the Nov 14 "no Joe machine, free, forever" constraint is met post-handoff. Apps Script still owns input + queueing + status writeback — the change is what runs server-side, not what Jay touches.
+- **The April 7 2026 commitment Joe owes Jay:** "automated system that lets you add new records to the archive and have them automatically tagged, categorized, and added to the live archive site." Jay quoted this back to Joe on May 6 — it's the explicit deliverable expected at Wednesday's call.
+- **Live concern Jay flagged twice (Jan 28 + May 23, the day before our call):** Internet Archive's AI-scraping policy. Joe answered "nah I figured out a way around that" in Jan; Jay resent the link in May. Needs a real mitigation answer.
+
+## People in the post-handoff network
+
+| Name | Role | Contact | Where they fit |
+|---|---|---|---|
+| Hali Rosen | Jay's wife | (via Jay) | authorized submitter; deadline enforcer |
+| Raphie/Rafi Rosen | Jay's son | (Joe's private contacts; Berlin) | designated technical successor; March 1 Joe-Rafi handoff meeting captured |
+| Marla Supnick | family friend, Unified Field founder | (joined Wednesday call) | design endorser; museum-interactive specialist |
+| Eli Kuslansky | Marla's partner at Unified Field | (joined Wednesday call) | brings their own design proposals |
+| Alesandra Tejeda | NYU j-school grad researcher | (Joe's private contacts) | summer 2025 researcher |
+| Edgar Alonso Castillo | NYU Journalism digital assets keeper | (NYU directory) | source of WP access for Joe |
+| Joyce White | NYU admin | (NYU directory) | invoice processing |
+| Whitney Lee | NYU librarian | (NYU directory) | dissertation digitization |
+| Samuel "Sam" Earle | Columbia grad student | (Columbia directory) | wrote Scholar's Response; received early dissertation access |
+| Marty Halo | CCM colleague | (Joe's contact) | fixed CCM WordPress custom-block issue |
+
+## Naming correction
+
+Archive is **"The Jay Rosen Internet Archive"** (Jay locked this in Jan 31 2026: "There are subtle differences between 'digital' and 'internet' and it's a bit more musical."). Some docs still say "Digital Archive" — update on the next safe doc-refresh pass.
+
+## Wednesday May 27 call composition
+
+Per Eli Kuslansky's May 22 email: not a 1:1 handoff call. Attendees include Joe + Jay + Marla Supnick + Eli Kuslansky. Eli said they've done "initial thinking, strategizing, and design work to facilitate discussions." Joe needs to walk in with a clear position on whether Unified Field's design takes over or stays out of the deploy/handoff plumbing.
+
+## Jay's canonical themes list (Aug 8 2025 email — VERIFY against current data)
+
+This is Jay's own ranked list of works he considers central. Cross-check `frontend/constants.js` FEATURED_WORKS and the `key_concepts` field distribution against this list before Wednesday so we can report parity.
+
+1. The people formerly known as the audience
+2. Mindcasting
+3. The view from nowhere
+4. The savvy style / Church of the savvy
+5. Production of innocence
+6. Citizens agenda
+7. Why political coverage is broken
+8. Truth sandwich
+9. Not the odds but the stakes
+10. Verification in reverse
+11. What political journalists could do NOW
+12. Sources of subsidy in the production of news
+13. Notes on membership
+
+## Jay's launch-anchor quote (Dec 8 2025)
+
+"It should be obvious here that I am trying to extend my life span, even as I know that the odds favor eclipse." — perfect anchor for the HANDOFF.md / About-page framing.
+
+## Editorial workflow contradiction Joe should resolve before Wednesday
+
+The handoff plan frames Jay as "editorial input only" — submits content via sheet/email, Rafi handles the rest. But Jay's March 26 email said:
+
+> "I really need to be in the presence of the archive as I am revising and editing the different descriptions... I have no feel for my audience. I can't tell what the users are going to be doing. The archive is an abstraction for me as I try to edit what's in it."
+
+Jay later retracted the framing as a moment of frustration, but the underlying workflow signal is real: **for prose revisions Jay wants to see the archive rendered while editing.** Sheets is fine for *adding URLs to the queue*. Revising descriptions/intros needs a different surface — minimum, a live preview.
+
+## Baseline (2026-05-24, main @ 40d8188)
+
+- 331/331 tests pass
+- 931 archive records (701 RECORD, 137 TUMBLR, 83 CLIP, 10 THREAD); 0 duplicate IDs, 0 bad dates
+- 29,130 social posts (26,114 Twitter + 3,016 Bluesky)
+- 5,036 entities, 4,666 relationships; **referential integrity perfect** (0 orphan refs, 0 self-refs, 0 dangling record refs)
+- 16 records still verified=false with no URL — matches recovered content on stale branch `claude/gap-fill-early-2000s` (issue #199)
+- 96 records carry stale era values predating 2025-12 taxonomy (issue #197)
+- 9 issues filed this session: #196-#204
+
+## Open issues opened by this goal
+
+| # | Pillar | Type | Status |
+|---|---|---|---|
+| #196 | 1 | SCHEMA.md relationship-types list out of date (4 listed, 15 in use) | open |
+| #197 | 1 | Era taxonomy drift — 96 records on stale eras | open |
+| #198 | 1 | README/CLAUDE.md/data-README cite stale entity/relationship counts | open |
+| #199 | 1+2 | 16 records verified=false with no URL — harvest from gap-fill branch | open |
+| #200 | 3a | Design free weekly auto-deploy to pressthink.org | open |
+| #201 | 3 | Storage architecture proposal (CSV+SQLite+JSON+Sheets) | open |
+| #202 | 3 | Rewrite ADDING-RECORDS.md for nontechnical curator | open |
+| #203 | 4 | Audit stale branches | open |
+| #204 | 4 | Write HANDOFF.md | open |
+
+## Decisions made this session
+
+### D1 — Storage architecture (recommendation, awaiting Joe's approval)
+
+Four-layer composition, no big-bang rewrite:
+
+| Layer | Format | Role | Lives in |
+|---|---|---|---|
+| Authoring | Google Sheet | Where Jay edits | Jay's Google account |
+| Source of truth | CSV | Diffable, PR-reviewable | git repo (unchanged) |
+| Validation gate | SQLite | FK + CHECK constraints; reject bad data at write time | regenerated in pipeline |
+| Runtime artifact | JSON (already split) | What the static site loads | git + WP hosting (unchanged) |
+
+Filed as #201. The validator step is additive and reversible. Sheets only as authoring (not runtime — the project tried Sheets-at-runtime and abandoned it for latency).
+
+### D2 — Auto-deploy (recommendation, awaiting Joe's approval)
+
+Primary user flow: **Option C — a "Publish" button Jay clicks**. Backup: weekly cron via Option A (GitHub Actions on the public repo, unmetered). Filed as #200.
+
+### D3 — PR #176's 370-row drop (RESOLVED, not a regression)
+
+Confirmed via commit message: 73 source records had been removed; PR #176 pruned the resulting orphans (370 relationships + 172 entity first-mention refs). This was correct cleanup. Documented for posterity in #198 (counts in docs need refresh).
+
+### D4 — Persistence approach for this work
+
+- All findings filed as GitHub issues (survive compaction).
+- Working notes consolidated in this doc, also in the repo (survives compaction).
+- Telegram updates to Joe on milestone changes.
+- Never `gh pr merge` without Joe's explicit go-ahead per global CLAUDE.md.
+
+## Questions for Wednesday call with Rosen
+
+Maintained as a separate doc: `docs/QUESTIONS_FOR_ROSEN_CALL.md`. Joe leads the call; this is the cheat sheet. Background prep also includes mining the prior Fathom transcripts of Joe-Rosen meetings — that work runs in parallel and lands in the questions doc when complete.
+
+## Decisions still needed from Joe
+
+- [ ] Pick auto-deploy mechanism (#200)
+- [ ] Approve adding SQLite validator step (#201)
+- [ ] Approve Google Sheets as Jay's authoring surface (#201)
+- [ ] Identify who owns/pays WordPress hosting and Cloudflare account (#204)
+- [ ] Identify who Jay should escalate to if Joe is unreachable (#204)
+- [ ] Decide whether to transfer the repo to Jay's account or add Jay as collaborator (#204)
+- [ ] Approve mechanical era-migration PR (#197) — autonomous-safe but worth a sanity check
+
+## Work plan for the autonomous session
+
+Doing in this order; each is a separate PR for Copilot review per global CLAUDE.md PR workflow.
+
+1. **Mechanical-safe fix PR:** SCHEMA.md update (#196), era migration (#197), stale doc-counts refresh (#198). All deterministic, no judgment calls.
+2. **Stale-branch harvest PR(s):** SEO scaffolding from `claude/gap-fill-early-2000s` as one focused PR. Data recoveries as a follow-up PR after URL re-verification.
+3. **Content sweep:** firecrawl + WebSearch pass for any Jay Rosen content not in the archive; produce a candidate list in `data/CANDIDATE_ADDITIONS_<date>.json` with provenance; do NOT merge into the canonical CSV without curator review.
+4. **Design docs:** Detailed write-ups for the storage architecture (#201), auto-deploy (#200), and HANDOFF.md (#204). These are design docs, not implementation — implementation waits on Joe's approval of D1/D2.
+
+## Canonical sheet diff (2026-05-24)
+
+The original sheet (`1Q_Fik5KQXdkZ4dujEN8H_47K5oldLkv6-hxERuBAdpg`) has 20 tabs. The `archive_records` tab (gid=928818664) is the curator's source-of-truth for records. Diff against repo `data/archive_records-public.csv`:
+
+| Bucket | Count | Action |
+|---|---|---|
+| Sheet records (RECORD-*) | 659 | source of truth |
+| Repo records (RECORD-* + TUMBLR + CLIP + THREAD) | 931 | superset (TUMBLR/CLIP/THREAD added post-sheet) |
+| Sheet IDs not in repo | 93 | investigate |
+| → URL also in repo under different ID | 25 | already handled (dedup re-ID) |
+| → URL truly not in repo | 68 | investigate further |
+| → → `_p.html` print versions of records in repo | 62 | correctly removed by `dedup_records.py` |
+| → → `_p.html` print-orphans (regular .html ALSO missing) | 3 | recover via Wayback |
+| → → Real content gaps | 5 | add or URL-backfill |
+
+**Real content gaps (5 records, all PressThink/LA Times 2007-2009):**
+
+1. LA Times op-ed "The journalism that bloggers actually do" (2007-08-22) — net new record to add
+2. URL backfill for repo RECORD-00699 "Audience Atomization Overcome" — sheet has the URL
+3. URL backfill for repo RECORD-00700 "He Said, She Said Journalism" — sheet has the URL
+4-5. Curly-quote/straight-quote duplicate entries in the sheet itself (same content)
+
+**Print-orphan recovery (3 records, all PressThink 2003-2005):**
+
+- RECORD-00310 Introduction: Ghost (2003-09-01)
+- RECORD-00521 Big Wigs From the Blogging & Journalism Conference (2005-01-26)
+- RECORD-00570 Blog Storm Troopers or Pack Journalism at its Best (2005-02-10)
+
+Both pursuits captured in task #13. Entities/relationships gap (sheet has 7,153/8,341 vs repo 5,036/4,666) is largely explained by the removed records but needs a second-pass diff to confirm.
+
+## Original input-queue sheet (discovered 2026-05-24 from Joe)
+
+`https://docs.google.com/spreadsheets/d/1Q_Fik5KQXdkZ4dujEN8H_47K5oldLkv6-hxERuBAdpg/edit?gid=0#gid=0` — the original ingestion queue. Publicly accessible CSV export.
+
+Columns: `id`, `url`, `processed_on`, `Notes`.
+
+Workflow it implemented:
+1. Curator pastes a URL into a new row
+2. Backend scraper reads new rows, processes each URL, writes status back into `Notes` (SUCCESS / FAILED with reason)
+3. Successfully scraped records get added to the main archive CSV with an assigned ID (e.g., PRESSTH-00001)
+
+**The URL-paste pattern this sheet uses is the Jay input surface.** Way simpler than the Sheet-of-records design I was sketching:
+- Jay pastes URLs (zero schema knowledge required)
+- The backend pipeline handles ID assignment, AI categorization, entity extraction, JSON regen, deploy (already documented in `docs/ENTITY_EXTRACTION_PIPELINE.md`)
+
+**As of 2026-05-24 this is the design that shipped in PR #212** — `docs/plans/2026-05-24-pillar3-authoring-workflow-design.md` is the source of truth. It uses a fresh "Rosen Archive URL List" sheet with the same URL-paste-then-checkbox shape (not the original 2017 ingest sheet), and Apps Script posts new rows to a Flask submission server on houseofjawn that runs the pipeline + SFTP-deploys to PressThink. Phase 2 swaps houseofjawn for a Cloudflare Worker so the post-handoff stack is free + machine-independent. Earlier passages in this doc dated before 2026-05-24 that describe an Apps-Script-only or "reactivate the 2017 backend reading from this sheet" plan are superseded.
+
+## Session log
+
+### 2026-05-24 — Session started
+
+- Pulled origin/main, repo at 40d8188, clean
+- Ran test suite: 331/331 pass
+- Read all docs (CLAUDE.md, README, ADDING-RECORDS, CONTEXT, AGENTS, data/SCHEMA, data/AUDIT_REPORT, data/ENTITY_AUDIT_REPORT, data/verification-log, docs/ENTITY_EXTRACTION_PIPELINE, DEPLOYMENT, data/README, changelog)
+- Inventoried data; integrity is perfect for FKs but era taxonomy and doc counts have drifted
+- Filed #196-#204
+- Acknowledged Joe's deploy constraints and storage flexibility
+- Stored credentials in `pass` (claude/rosen/wp-admin and claude/rosen/wp-parent-admin)
+- Dispatched background agent to mine Fathom transcripts → discovered no direct Joe-Jay meetings, but a March 1 Joe-Rafi handoff transcript that changes the entire framing (Rafi is the technical successor; Jay is editorial input only)
+- Joe shared the original URL-queue sheet ID; verified it's still accessible as a public CSV export
+- Started the era code fix; discovered the scope is 8 files and would silently break the QueryBuilder if shipped unilaterally — reverted and updated #197 with full scope
+- Branch `fix/safe-data-quality-sweeps-2026-05-24` holds the docs (no committed code changes); nothing risky pending
+- **Natural compact point reached:** all findings are persisted in GitHub issues (#196-#204), this progress doc, and the questions doc. Next mechanical fixes (SCHEMA relationship types, doc count refresh) are safe to continue with after compact. The bigger decisions (era taxonomy fix Option 1 vs Option 2, deploy mechanism, reactivating the URL queue) need Joe's input.
+
+### 2026-05-24 — Session continued (after compact)
+
+**Pillar 1 (verify):**
+- Fixed `clean_scraped_text.py` over-truncation bug (slug-Jaccard heading detector + 500-char safety floor) — issue #208 area
+- Backfilled raw_text for 114 records via Firecrawl + Wayback fallback. Coverage 81.4% → 93.7% (873/932)
+- Wayback CDX-recovered URLs for 3 of the 5 historically-unrecoverable records (RECORD-00673 Nation, 00693 + 00694 HuffPost). Coverage 93.7% → 94.0% (876/932)
+- Scrubbed misleading "Source file: <name>.md" notes from all 5 historically-unrecoverable records (no such files existed in any git branch — the notes were aspirational from an abandoned Feb 2026 recovery plan)
+- Updated SCHEMA.md relationship taxonomy (4 → 15 types with counts) — closes #196
+- Updated CLAUDE.md unrecoverable-URL list: 5 → 2 (RECORD-00663 Baffler #12 print-only, RECORD-00667 Pew Center print monograph)
+- Found 10 title-duplicate groups across 22 records (mix of intentional cross-posts and real URL-variant duplicates) — filed #210
+- Audited `claude/gap-fill-early-2000s` stale branch: all 15 branch-unique records already exist on main under different IDs/URL variants. Zero net-new content to import. Task #8 closes.
+
+**Pillar 2 (sweep):**
+- HuffPost CDX wildcard sweep surfaced 106 unique Jay Rosen posts; archive has 22; **84 missing**. Filed #209 with the full URL list and the cross-post strategy question.
+- Verified external outlets (NYT/LA Times/Guardian/Atlantic/CJR/Nieman/Salon/Slate) use article-slug URLs, not author-prefixed URLs — CDX wildcards return empty for those. Current archive coverage (1+1+7+3+3+11+3+0 = 29 records across these venues) looks proportionate for guest pieces. Task #23 closes; expanded sweep would need per-outlet author-page parsing, not blanket wildcards.
+- Still open (waiting on Jay): Facebook + LinkedIn archive exports.
+
+**Pillar 3 (authoring workflow):**
+- Design + implementation shipped in PR #212 — see `docs/plans/2026-05-24-pillar3-authoring-workflow-design.md` for the locked decisions. Phase 1: Apps Script onEdit trigger → Flask submission server on houseofjawn (`backend/submission_server/`) → SFTP deploy → status writeback to columns F/G/H of the sheet. Phase 2 post-handoff: replace houseofjawn with a Cloudflare Worker (free tier) so the stack stays free + machine-independent.
+- Jay-facing one-pager: `docs/JAY_ADDING_RECORDS.md`. Operator runbook: `automation/SETUP.md`.
+- Still open: deploy on houseofjawn (env, systemd unit, Cloudflare tunnel ingress); #200 auto-deploy and #201 storage-architecture issues are now superseded by the PR #212 design and can be closed once that PR merges.
+- Joe owes Jay a working system per April 7 commitment — PR #212 satisfies the commitment pending deploy + Wednesday-call sign-off on the live-preview tension Jay raised March 26.
+
+**Pillar 4 (handoff):**
+- Filed #211: 204 records have 0 extracted relationships. Root cause likely "extraction ran before raw_text was backfilled." Fix path documented.
+- #203 (stale branch audit), #204 (HANDOFF.md) still open.
+
+**PR #206 status:** 3 commits this session. Title + body updated to reflect actual scope. Awaiting Joe's "merge" call.
+
+**Issues filed this session:** #209 (HuffPost gap), #210 (dups + URL policy), #211 (204 zero-rel).

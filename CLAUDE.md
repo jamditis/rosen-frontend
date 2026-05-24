@@ -77,10 +77,10 @@ Configured in `frontend/constants.js` via `DATA_CONFIG`.
 
 | File | Records | Contents |
 |------|---------|----------|
-| `data/archive_records-public.csv` | 931 | Non-social archive records (701 RECORD, 137 TUMBLR, 83 CLIP, 10 THREAD). Line count is high (~49k) due to multi-line text fields. |
-| `data/social_posts.csv` | ~29,100 | Twitter/X and Bluesky posts |
-| `data/extracted_entities.csv` | ~5,061 | Named entities (people, orgs, concepts) |
-| `data/extracted_relationships.csv` | ~5,084 | Entity-to-record relationships |
+| `data/archive_records-public.csv` | 932 | Non-social archive records (702 RECORD, 137 TUMBLR, 83 CLIP, 10 THREAD). Line count is high (~49k) due to multi-line text fields. |
+| `data/social_posts.csv` | ~29,130 | Twitter/X and Bluesky posts |
+| `data/extracted_entities.csv` | 5,036 | Named entities (people, orgs, concepts) |
+| `data/extracted_relationships.csv` | 4,666 | Entity-to-record relationships |
 
 ### Regenerating JSON from CSV
 
@@ -346,6 +346,6 @@ Supports: Articles, Videos, Twitter/X, Tumblr, Newspaper Clippings (PDF OCR).
 - Social media records (~29,000) have generic titles ("Tweet by Jay Rosen", "Post by Jay Rosen"). Fixing this would require AI-based title generation from post content.
 - Browser localStorage can fill up on the live site due to data size. Caching is disabled as a workaround.
 - Thread records have placeholder titles ("[Bluesky Thread]") — needs content-based title generation.
-- 6 records have no recoverable URL: RECORD-00663, 00667, 00673, 00693, 00694, 00700. Jay Rosen may know the original publication.
+- 2 records have no recoverable URL or digital copy: RECORD-00663 (The Baffler issue 12, March 1999 — print-only; Baffler's web archive only goes back to ~2010) and RECORD-00667 (Pew Center for Civic Journalism, ~2000 — defunct in 2003; speeches/research/civic catalog indexes enumerated May 2026 with no Rosen entries; likely a print monograph). Recovery would need library microfilm or contact with the publications. RECORD-00673 (The Nation), 00693, 00694 (HuffPost) were URL-recovered via Wayback CDX search in May 2026. See issues #199 and #207.
 - `archive.pressthink.org` subdomain has a TLS certificate issue. Records using that subdomain correctly use `http://` URLs — browsers handle these fine but HTTPS fetch will fail.
 - Bluesky thread links use `embed.bsky.app` (unauthenticated) rather than `bsky.app`. If Bluesky changes the embed subdomain, update `ThreadModal.js` and `RecordModal.js`.
