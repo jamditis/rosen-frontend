@@ -15,6 +15,11 @@ import {
   getStats as getSqliteStats
 } from './sqliteService.js?v=3.3.0';
 
+// Routine cache-hit / fetch-start logs are silent in production. Set
+// `localStorage.jrda_debug = '1'` in DevTools and reload to opt in (#170).
+const DEBUG = typeof localStorage !== 'undefined' && localStorage.getItem('jrda_debug') === '1';
+const debug = DEBUG ? console.log.bind(console) : () => {};
+
 // Simple hash function for UI color selection (djb1 variant)
 // Used by App.js to deterministically assign colors to categories
 export const hashString = (str) => {
@@ -335,11 +340,11 @@ export const fetchCoreData = async () => {
   // Check cache first
   const cached = getCachedData(dataUrl);
   if (cached) {
-    console.log('Using cached core data');
+    debug('Using cached core data');
     return cached;
   }
 
-  console.log('Fetching core data from:', dataUrl);
+  debug('Fetching core data from:', dataUrl);
 
   try {
     const response = await fetch(dataUrl);
@@ -445,12 +450,12 @@ const loadDetailsCache = async () => {
     // Check cache first
     const cached = getCachedData(dataUrl);
     if (cached) {
-      console.log('Using cached details data');
+      debug('Using cached details data');
       detailsCache = cached.details;
       return;
     }
 
-    console.log('Fetching details data from:', dataUrl);
+    debug('Fetching details data from:', dataUrl);
 
     try {
       const response = await fetch(dataUrl);
@@ -495,7 +500,7 @@ export const fetchEntitiesData = async () => {
     // Check cache first
     const cached = getCachedData(dataUrl);
     if (cached) {
-      console.log('Using cached entities data');
+      debug('Using cached entities data');
       entitiesCache = cached;
       buildEntityMaps({
         entities: cached.entities,
@@ -507,7 +512,7 @@ export const fetchEntitiesData = async () => {
       return cached;
     }
 
-    console.log('Fetching entities data from:', dataUrl);
+    debug('Fetching entities data from:', dataUrl);
 
     try {
       const response = await fetch(dataUrl);
@@ -575,7 +580,7 @@ export const initSqlite = async () => {
     let fullData = getCachedData(fullDataUrl);
 
     if (!fullData) {
-      console.log('[SQLite] Fetching full archive data for SQL database...');
+      debug('[SQLite] Fetching full archive data for SQL database...');
       const response = await fetch(fullDataUrl);
       if (response.ok) {
         fullData = await response.json();
@@ -585,7 +590,7 @@ export const initSqlite = async () => {
 
     if (fullData) {
       await loadSqliteData(fullData);
-      console.log('[SQLite] Database ready for queries');
+      debug('[SQLite] Database ready for queries');
       return true;
     }
 
@@ -727,13 +732,13 @@ export const fetchArchiveData = async () => {
   // Check cache first
   const cached = getCachedData(dataUrl);
   if (cached) {
-    console.log('Using cached archive data');
+    debug('Using cached archive data');
     // Build entity maps from cached data
     buildEntityMaps(cached);
     return cached;
   }
 
-  console.log('Fetching archive data from:', dataUrl);
+  debug('Fetching archive data from:', dataUrl);
 
   try {
     const response = await fetch(dataUrl);
