@@ -27,12 +27,13 @@ import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
-ROOT_DIR = Path(__file__).resolve().parents[2]
-SRC_DIR = ROOT_DIR / "src"
-if str(SRC_DIR) not in sys.path:
-    sys.path.append(str(SRC_DIR))
+# Ensure backend/src is importable for CLI invocations
+# (pytest already exposes it via [tool.pytest.ini_options] pythonpath).
+BACKEND_SRC = Path(__file__).resolve().parents[2] / "src"
+if str(BACKEND_SRC) not in sys.path:
+    sys.path.append(str(BACKEND_SRC))
 
-from src.logger import get_logger
+from rosen_scraper.logger import get_logger
 
 load_dotenv()
 

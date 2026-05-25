@@ -98,7 +98,9 @@ class TestCategorizerModule:
     @patch('rosen_scraper.categorizer.genai.GenerativeModel')
     def test_summarize_and_classify_success(self, mock_model, sample_article_data, sample_schema):
         """Test successful article analysis."""
-        # Mock AI response
+        # Mock AI response. Note: _validate_ai_payload requires len(tags) >= 3,
+        # all category/concept/era/scope values to be in the schema's allowlists,
+        # and the response NOT to match UNIFORM_RESPONSE_SIGNATURE. See #185.
         mock_response = MagicMock()
         mock_response.text = json.dumps({
             'summary': 'Test summary of the article',
@@ -106,7 +108,7 @@ class TestCategorizerModule:
             'key_concepts': ['objectivity', 'transparency'],
             'era': 'Digital Age',
             'scope': 'Media Analysis',
-            'tags': ['journalism', 'media']
+            'tags': ['journalism', 'media', 'press criticism']
         })
         
         mock_instance = MagicMock()
@@ -160,7 +162,10 @@ class TestCategorizerModule:
     @patch('rosen_scraper.categorizer.genai.GenerativeModel')
     def test_summarize_and_classify_normalizes_output(self, mock_model, sample_article_data, sample_schema):
         """Test that article analysis normalizes output fields."""
-        # Mock AI response with various formats
+        # Mock AI response with various formats. Note: 'Journalism Theory' is
+        # intentionally absent from the fixture's thematic_categories — after
+        # _validate_ai_payload filters, only 'Press & Media Criticism' should
+        # survive, exercising the list-normalization path. Tag count >= 3 (#185).
         mock_response = MagicMock()
         mock_response.text = json.dumps({
             'summary': 'Test summary',
@@ -168,7 +173,7 @@ class TestCategorizerModule:
             'key_concepts': ['objectivity'],
             'era': 'Digital Age',
             'scope': 'Media Analysis',
-            'tags': ['journalism']
+            'tags': ['journalism', 'media', 'objectivity']
         })
         
         mock_instance = MagicMock()

@@ -111,10 +111,18 @@ class TestArticleProcessor:
         
         url = "https://example.com/test"
         result = article_processor.process_article(url, sample_schema)
-        
+
+        # process_article merges AI analysis keys at the TOP LEVEL of the
+        # returned dict — conditional merge: each ai_analysis_data key is
+        # copied to article_data ONLY if article_data doesn't already have a
+        # truthy value at that key (see article_processor.process_article:
+        # `if not article_data.get(key): article_data[key] = value`). There
+        # is no 'content' wrapper. Issue #185 — the old assertion targeted a
+        # wrapper shape the code never produced.
         assert result is not None
-        assert result.get('content') is not None
-        assert result.get('content').get('summary') is not None
+        assert result.get('summary') is not None
+        assert result.get('categories') is not None
+        assert result.get('text') is not None
 
     @patch('rosen_scraper.processors.article_processor._run_scraping')
     def test_process_article_scraping_failure(self, mock_scrape, sample_schema):
