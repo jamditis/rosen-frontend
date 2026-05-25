@@ -17,7 +17,16 @@ import {
 
 // Routine cache-hit / fetch-start logs are silent in production. Set
 // `localStorage.jrda_debug = '1'` in DevTools and reload to opt in (#170).
-const DEBUG = typeof localStorage !== 'undefined' && localStorage.getItem('jrda_debug') === '1';
+// Wrapped in try/catch because localStorage access can throw SecurityError
+// in privacy modes or when storage is blocked by browser policy; a throw
+// here would prevent this module (and therefore the whole app) from loading.
+const DEBUG = (() => {
+  try {
+    return typeof localStorage !== 'undefined' && localStorage.getItem('jrda_debug') === '1';
+  } catch {
+    return false;
+  }
+})();
 const debug = DEBUG ? console.log.bind(console) : () => {};
 
 // Simple hash function for UI color selection (djb1 variant)
