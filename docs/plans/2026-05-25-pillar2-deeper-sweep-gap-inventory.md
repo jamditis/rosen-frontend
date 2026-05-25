@@ -10,23 +10,29 @@ A cross-reference of what's currently in the archive vs what exists on platforms
 
 This is an inventory + recommendation. Issues only get filed for the categories Joe picks; not every line below becomes a backlog item.
 
-## Cross-reference summary
+## Correction — 2026-05-25 (post-merge audit)
 
-| Category | In archive | Exists | Gap | Method to backfill | Priority call |
+The first version of this doc undercounted what's in the archive because it only audited `archive_records-public.csv` (1,007 records). The actual archive also includes `data/social_posts.csv` (58,385 rows — the granular social-platform corpus that the main CSV's THREAD-NNNNN records reference but don't enumerate). Numbers below are corrected.
+
+Lesson captured for future inventory work: audit every file in `data/`, not just the main records CSV.
+
+## Cross-reference summary (corrected)
+
+| Category | In archive (main + social) | Exists | Gap | Method to backfill | Priority call |
 |---|---|---|---|---|---|
-| Bluesky posts | 10 | 4,235 | **4,225 (99.8%)** | Public AT Proto API, paginated, no auth | TBD |
-| Mastodon statuses | 10 | 535 | **525 (98.1%)** | Public mastodon.social API | TBD |
-| Threads posts | 0 | ~291 | **291 (100%)** | Web scrape (no public API without Meta dev account) | TBD |
+| Bluesky posts | 3,052 (10 thread records + 3,042 social_posts) | 4,235 | **~1,183 (~28%)** | Public AT Proto API, paginated, no auth | TBD |
+| Mastodon statuses | ~28 (10 in main + 18 in social_posts) | 535 | **~507 (~95%)** | Public mastodon.social API | TBD |
+| Threads posts | 2 (0 in main + 2 in social_posts) | ~291 | **~289 (~99%)** | Web scrape (no public API without Meta dev account) | TBD |
 | Substack posts | 4 records | **0 published** | NOT a gap | n/a — confirmed reader-only account | Close as confirmed-empty |
 | Podcast guest appearances | ~28 audio records | 27+ verified candidates | Unknown overlap; needs URL dedup | Manual sweep + Wayback for old hosts | TBD |
 | YouTube talks (Jay as speaker) | 19 URL refs | 25+ verified candidates | Unknown overlap; needs URL dedup | Mostly self-curated at `pressthink.org/talks/` | TBD |
 | Rebooting The News (Jay as co-host) | Unknown — likely 0 | ~90 episodes 2009-2011 | Likely 100% | Sequential scrape of `rebootnews.wordpress.com` | TBD — different content shape from guest appearances |
 | LinkedIn Pulse articles | 0 | 1 visible publicly | 1 missing; total behind login wall | Manual capture | Low — single article |
-| X recent posts (post-cutoff) | 3 legacy records | Unknown (HTTP 402 on unauthenticated fetch) | Unknown — depends on archive cutoff date | Paid X API or authenticated scraper | Investigate cutoff first |
+| X recent posts (post-cutoff) | 26,240 (3 main + 26,237 social_posts) | Unknown — paywalled fetch | Cutoff appears later than initial estimate; gap is smaller than first claimed | Investigate cutoff date in social_posts before deciding | Investigate cutoff first |
 
 ## Detailed findings per category
 
-### Bluesky — highest-yield single-platform gap
+### Bluesky — differential backfill (corrected)
 
 - Account: `@jayrosen.bsky.social` (https://bsky.app/profile/jayrosen.bsky.social)
 - 4,235 posts as of 2026-05-24; 229,805 followers; active through 2026-05-24
@@ -35,11 +41,12 @@ This is an inventory + recommendation. Issues only get filed for the categories 
 - Verification: confirmed via AT Proto API `https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile?actor=jayrosen.bsky.social`
 - Content shape: press criticism + political/media commentary + short replies/reposts
 - **Backfill method**: `https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?actor=jayrosen.bsky.social` — cursor-paginated, no auth, no rate-limit friction at 10 req/s
+- **Dedup**: 3,042 posts already in `social_posts.csv`; backfill adds the ~1,183 missing (post date later than the existing corpus's most recent date, OR post not in the existing URL set)
 - **Era mapping**: all posts fall in "Platform Transition & Future Models (2021-Present)" — no era taxonomy work needed
 - **Estimated effort**: ~2 hours for the scraper + ~1 hour for dedup + CSV append + JSON regen + test
-- **Estimated archive growth**: ~4,225 new records ≈ 4.2x current total
+- **Estimated archive growth**: ~1,183 new social_posts.csv rows (~2% growth on the ~58k-row social corpus, not a 4x change)
 
-### Mastodon — second-priority addition
+### Mastodon — meaningful gap
 
 - Account: `@jayrosen_nyu@mastodon.social` (https://mastodon.social/@jayrosen_nyu)
 - 535 statuses; 52,886 followers
@@ -48,6 +55,7 @@ This is an inventory + recommendation. Issues only get filed for the categories 
 - Verification: confirmed via mastodon.social API `/api/v1/accounts/lookup`
 - Lower volume than Bluesky — appears largely dormant relative to Bluesky activity since mid-2023
 - **Backfill method**: `https://mastodon.social/api/v1/accounts/{id}/statuses` — paginated
+- **Dedup**: ~28 posts in archive vs 535 actual = ~507 missing (~95%). Most of the archive's existing 28 are likely older / less recent posts; backfill catches the bulk.
 - **Era mapping**: same as Bluesky
 - **Estimated effort**: same shape as Bluesky scraper, smaller volume
 
@@ -150,18 +158,20 @@ The inventory subagent found that 13% of existing records (131) use non-canonica
 
 **Recommendation**: don't block the social platform backfill on era cleanup, but do block the Rebooting The News + older-podcast backfill on it.
 
-## Recommended issues (priority-ordered)
+## Recommended issues (priority-ordered, corrected)
 
 If Joe agrees with the priority calls, these are the issues to file:
 
-1. **[P0] Bluesky backfill** — 4,225 missing posts via free AT Proto API. ~4x archive growth. Mechanically trivial.
-2. **[P1] Mastodon backfill** — 525 missing via free public API. Same shape as Bluesky.
-3. **[P1] Rebooting The News (Jay as host) backfill** — ~90 episodes 2009-2011. Different content shape but high signal density. Blocked on era taxonomy fix (#11).
+1. **[P1] Mastodon backfill** — ~507 missing via free public API. ~95% miss rate is the largest by percentage on a non-trivial gap. Captures Jay's immediate post-Musk-exodus voice. Easiest backfill to ship (small absolute count).
+2. **[P1] Rebooting The News (Jay as host) backfill** — ~90 episodes 2009-2011. Different content shape but high signal density. Blocked on era taxonomy fix (#11).
+3. **[P2] Bluesky differential backfill** — ~1,183 missing posts via free AT Proto API. Existing 3,042-post corpus needs differential top-up, not bulk import. Routine maintenance shape, matches PR #213's HuffPost differential.
 4. **[P2] Podcast guest appearances backfill** — 27 verified candidates + sweep sources for more. Includes Playwright pass on WNYC OTM people page.
 5. **[P2] YouTube talks backfill** — 25 verified candidates + sweep sources for more. Lots of self-curated source material at `pressthink.org/talks/`.
-6. **[P3] Threads backfill** — 291 posts. Lower priority due to API access friction + lower volume.
-7. **[P3] X recent posts gap investigation** — first determine the social CSV cutoff date; then decide whether to invest in paid X API or alternative scraper.
+6. **[P3] Threads backfill** — ~289 posts. Lower priority due to API access friction. Higher percentage miss but smaller absolute volume than Bluesky.
+7. **[P3] X recent posts gap investigation** — social_posts.csv already has 26,237 X/Twitter posts; first determine the actual cutoff date before investing in paid X API for any further backfill.
 8. **[Close] Substack non-gap** — confirm/document that Substack is NOT in scope; close any future re-investigation.
+
+Priority shift from the first draft: Mastodon moved from P1 to P1 (unchanged); Bluesky moved from P0 to P2 (the corrected ~28% miss rate doesn't justify P0 urgency); Threads stayed P3. The story is now "differential maintenance backfill" not "the archive is missing huge swaths of Jay's voice."
 
 ## What's NOT in this inventory
 
