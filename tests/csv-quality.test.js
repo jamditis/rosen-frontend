@@ -192,6 +192,40 @@ describe('social_posts.csv', () => {
     assert.strictEqual(unknownCats.size, 0,
       `Non-canonical categories found: ${[...unknownCats].sort().join(', ')}`);
   });
+
+  it('no URL collides with a non-thread archive_records URL (#163)', () => {
+    // Cross-source dedup: a URL that lives as a regular article record (RECORD-*,
+    // TUMBLR-*, CLIP-*) should not also appear as a social post — otherwise the
+    // archive shows the same content twice. THREAD-* records are excluded by
+    // design: a thread record's url field is its root social post's URL, and
+    // the constituent social posts are intentionally kept in social_posts.csv
+    // so thread-detection can reconstruct the conversation.
+    //
+    // KNOWN_EXCEPTIONS: pending #235. RECORD-00602 and RECORD-00613 carry
+    // X.com URLs pointing at Oct 8, 2025 tweets but their date/title/summary
+    // fields are misaligned (June 2025 / Oct 2024 respectively). The social
+    // rows TWTR-15441 / TWTR-15437 are legitimate distinct tweets, NOT
+    // duplicates of the article records' actual content. Once #235 corrects
+    // the article-record URLs, drop these exceptions.
+    const KNOWN_EXCEPTIONS = new Set(['TWTR-15437', 'TWTR-15441']);
+    const id = (r) => r.id || r.ID || '';
+    const url = (r) => (r.url || r.URL || '').trim();
+    const nonThreadArticleUrls = new Set(
+      archiveRecords
+        .filter(r => !id(r).startsWith('THREAD-'))
+        .map(url)
+        .filter(u => u && u !== '#')
+    );
+    const collisions = socialPosts
+      .filter(s => {
+        const u = url(s);
+        return u && u !== '#' && nonThreadArticleUrls.has(u);
+      })
+      .map(id)
+      .filter(sid => !KNOWN_EXCEPTIONS.has(sid));
+    assert.strictEqual(collisions.length, 0,
+      `${collisions.length} social posts share a URL with a non-thread article record: ${collisions.slice(0, 5).join(', ')}`);
+  });
 });
 
 // ============================================
