@@ -55,6 +55,22 @@
     # Prevent MIME type sniffing
     Header set X-Content-Type-Options "nosniff"
 
+    # Clickjacking protection
+    Header set X-Frame-Options "SAMEORIGIN"
+
+    # Referrer leakage control
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Block unused browser capabilities by default
+    Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+
+    # Content Security Policy
+    # 'unsafe-inline' for styles is required because frontend components set inline styles.
+    # esm.sh is the React/HTM/Lucide/sql.js CDN per index.html import map.
+    # embed.bsky.app is the Bluesky thread embed used by ThreadModal/RecordModal.
+    # Verify HSTS at the Cloudflare/host layer before adding here (avoid duplicate header).
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://esm.sh; frame-src https://embed.bsky.app; img-src 'self' data: https:; object-src 'none'; base-uri 'self'; form-action 'self'"
+
     # Add cache control headers for data files
     <FilesMatch "\.(json)$">
         Header set Cache-Control "public, max-age=3600"

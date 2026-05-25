@@ -8,6 +8,8 @@
 
 > **Architecture assumption**: this doc describes the post-handoff state, which assumes Pillar 3a (Apps Script → GitHub App → GitHub Action ingestion, designed in `docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md`) is deployed and the era taxonomy normalization (PR #218) is merged. **Until Pillar 3a is built**, the live system is still Pillar 3: Apps Script POSTs to a Flask submission server running on houseofjawn, with credentials wired via `SUBMISSION_URL` / `SUBMISSION_TOKEN`. The day-to-day failure modes and recovery steps in this doc only apply once Pillar 3a is in production — if a problem hits before then, see `automation/SETUP.md` for the current (Pillar 3) operational guide.
 
+> **Legacy submission limit**: while the Flask submission server is in use, `/submit` is rate-limited by client IP and supplied token. Defaults are 5 submissions per minute and 30 submissions per hour. Override only if Jay's real submission volume needs it with `SUBMISSION_RATE_LIMIT_PER_MINUTE` and `SUBMISSION_RATE_LIMIT_PER_HOUR`.
+
 ---
 
 ## TL;DR for Jay

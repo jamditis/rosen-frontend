@@ -37,6 +37,7 @@ build/
 # Pipeline scratch (one-off extraction/recovery work)
 data/_extract_tmp/
 data/_recovery_tmp/
+data/drive_downloads/
 
 # R
 .Rproj.user
