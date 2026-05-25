@@ -307,4 +307,26 @@ describe('archive-data.json (full)', () => {
     assert.strictEqual(unverified.length, 0,
       `${unverified.length} records are not verified`);
   });
+
+  it('no thread member post survives in published JSON when its THREAD container is also present (#233)', () => {
+    // The export pipeline (data/export-archive-data.js:475-510) filters social
+    // posts that appear in any THREAD record's thread_data.posts. This pins
+    // that invariant so a future refactor of the social-records filter can't
+    // silently regress it — which would surface the same Bluesky/Twitter
+    // thread twice in the UI (once as the THREAD container, once as the loose
+    // root post).
+    const recordsById = new Map(fullData.records.map(r => [r.id, r]));
+    const threadRecords = fullData.records.filter(r => r.id.startsWith('THREAD-'));
+    const duplicateRoots = [];
+    for (const thread of threadRecords) {
+      const posts = (thread.thread_data && thread.thread_data.posts) || [];
+      for (const post of posts) {
+        if (post.id && recordsById.has(post.id)) {
+          duplicateRoots.push(`${post.id} (member of ${thread.id})`);
+        }
+      }
+    }
+    assert.strictEqual(duplicateRoots.length, 0,
+      `${duplicateRoots.length} thread member posts also exist as standalone records in the published JSON: ${duplicateRoots.slice(0, 5).join(', ')}`);
+  });
 });
