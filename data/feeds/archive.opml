@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen Digital Archive</title>
-    <dateCreated>Mon, 25 May 2026 14:40:15 GMT</dateCreated>
-    <dateModified>Mon, 25 May 2026 14:40:15 GMT</dateModified>
+    <dateCreated>Mon, 25 May 2026 15:32:27 GMT</dateCreated>
+    <dateModified>Mon, 25 May 2026 15:32:27 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -94,7 +94,7 @@
         <outline text="PressThink: Sinclair Goes to Air Friday Night: Notes and Comment on &quot;A POW Story&quot;" type="link" url="http://archive.pressthink.org/2004/10/21/air_sbg_p.html" created="2004-10-21"/>
         <outline text="PressThink: &quot;Call it Commentary, Call it Editorial, Call it Programming, but Don&apos;t Call it News.&quot; Sinclair Fires Jonathan Leiberman" type="link" url="http://archive.pressthink.org/2004/10/19/more_sbg_p.html" created="2004-10-19"/>
         <outline text="PressThink: Sinclair Broadcast Group: What Are They Doing in the Middle of Our Election?" type="link" url="http://archive.pressthink.org/2004/10/16/sinclair_ctd_p.html" created="2004-10-16"/>
-        <outline text="Sinclair Broadcast Group: What Are They Doing in the Middle of Our Election?" type="link" url="http://archive.pressthink.org/2004/10/13/sinclair_acts_p.html" created="2004-10-15"/>
+        <outline text="Agnew with TV Stations: Sinclair Broadcasting Takes On John Kerry and The Liberal Media" type="link" url="http://archive.pressthink.org/2004/10/13/sinclair_acts_p.html" created="2004-10-15"/>
         <outline text="PressThink: John Kerry Should Accept Sinclair Broadcasting&apos;s Offer" type="link" url="http://archive.pressthink.org/2004/10/09/kerry_deal_p.html" created="2004-10-09"/>
         <outline text="The Best Approximation of Accuracy Possible in a Given Moment" type="link" url="http://archive.pressthink.org/2004/10/08/cs_respond_p.html" created="2004-10-08"/>
         <outline text="PressThink: Authorized Knower: Farnaz Fassihi&apos;s Accidental Baghdad Dispatch" type="link" url="http://archive.pressthink.org/2004/10/08/e_fassihi_p.html" created="2004-10-08"/>
@@ -380,7 +380,7 @@
       </outline>
     </outline>
     <outline text="By Category">
-      <outline text="Press &amp; Media Criticism (23431)" type="category">
+      <outline text="Press &amp; Media Criticism (23437)" type="category">
         <outline text="Jay Rosen on the digital revolution that wasn&apos;t" type="link" url="https://www.cjr.org/kicker/jay-rosen-digital-revolution-that-wasnt.php"/>
         <outline text="I send my questions about that to" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p"/>
         <outline text="Many of you, I know, receive a lot of national news, but care a lot about local" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4ecwzqx322p"/>
@@ -434,7 +434,7 @@
         <outline text="&quot;Why I&apos;m handing in my Pentagon press pass&quot; by Tom Bowman of NPR" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m35ykm4hp22j"/>
         <outline text="The basic reason is the Pentagon reporters want information" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m35vkye2gk2j"/>
       </outline>
-      <outline text="Politics &amp; Democracy (7667)" type="category">
+      <outline text="Politics &amp; Democracy (7670)" type="category">
         <outline text="&quot;There are positive developments in local news but they’re being swamped by the..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3s5wsddck2x"/>
         <outline text="&quot;There are positive developments in local news but they’re being swamped by the..." type="link" url="https://x.com/jayrosen_nyu/status/1981021320079896971"/>
         <outline text="&quot;If you had enough money to buy ads, you could reach the voters you wanted to..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3n33q3xbk2i"/>
