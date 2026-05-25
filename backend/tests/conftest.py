@@ -45,28 +45,44 @@ def sample_article_data():
 
 @pytest.fixture
 def sample_schema():
-    """Sample schema for testing."""
+    """Sample schema mirroring the production `taxonomy` shape consumed by
+    rosen_scraper.categorizer._validate_ai_payload. See issue #185 — the
+    pre-refactor flat `{categories, concepts, publications}` shape no longer
+    matches what the validator reads from `schema['taxonomy']`.
+
+    Values are chosen to satisfy the validator's allowlists for the mock AI
+    responses in tests/test_categorizer.py (era='Digital Age',
+    scope='Media Analysis', etc.).
+    """
     return {
-        'categories': [
-            'Press Criticism',
-            'Public Journalism',
-            'Media Theory',
-            'Digital Media',
-            'Politics'
-        ],
-        'concepts': [
-            'view from nowhere',
-            'audience atomization',
-            'press think',
-            'objectivity',
-            'transparency'
-        ],
-        'publications': [
-            'PressThink',
-            'New York Times',
-            'Columbia Journalism Review',
-            'The Guardian'
-        ]
+        'taxonomy': {
+            'thematic_categories': [
+                {'name': 'Press & Media Criticism',
+                 'description': 'Analysis of press behavior and norms'},
+                {'name': 'Journalism Theory & Practice',
+                 'description': 'Theoretical and practical frameworks for journalism'},
+                {'name': 'Technology & Digital Media',
+                 'description': 'Digital media and platform shifts'},
+            ],
+            'key_concepts': [
+                'View from Nowhere',
+                'audience atomization',
+                'objectivity',
+                'transparency',
+                'press think',
+            ],
+            'era': [
+                {'name': 'Digital Age',
+                 'description': 'Test fixture era value used by categorizer tests'},
+                {'name': 'Peak Blogging & Citizen Journalism (2005-2009)',
+                 'description': 'Blogging-era taxonomy value present in real schema.json'},
+            ],
+            'scope': [
+                'Media Analysis',
+                'Theoretical',
+                'Commentary/Critique',
+            ],
+        }
     }
 
 
