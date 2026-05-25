@@ -256,7 +256,7 @@ Pillar 3 (Flask on houseofjawn) and Pillar 3a can coexist during migration:
 
 1. Build `submit-record.yml` + `sweep-stuck-rows.yml` + GitHub App + repo secrets — without changing the production Apps Script
 2. Create a TEST sheet with TEST Apps Script that points at the new GitHub App
-3. End-to-end smoke test against the test sheet (5 fake URLs: `test@example.com`-style)
+3. End-to-end smoke test against the test sheet (5 reserved-domain URLs: `https://example.com/test-rosen-archive-YYYY-MM-DD` style — `example.com` is reserved for documentation per RFC 2606 and won't hit a real publisher)
 4. Once green: update the PRODUCTION Apps Script script properties to point at the new GitHub App (or replace the Code.gs entirely)
 5. Run both Pillar 3 and Pillar 3a in parallel for one week (Flask continues to work for any test traffic; new sheet ticks hit Action)
 6. Decommission `rosen-submission.service` on houseofjawn (`sudo systemctl disable --now rosen-submission`)
@@ -329,7 +329,7 @@ After step 7, nothing on Joe's machines, Cloudflare account, or Gmail account is
 
 1. Branch off main: `feat/pillar3a-free-auto-deploy` (separate from this design-doc branch)
 2. Build pieces 1–8 from the table above (order: 4 + 5 first so the Action-facing entry point is testable, then 2 + 3 for the workflows, then 1 for the Apps Script v2, then 6 + 7 + 8 for the ops/handoff docs)
-3. End-to-end smoke test with a TEST sheet + 5 fake URLs (`test@example.com`-style) before pointing the production sheet at it
+3. End-to-end smoke test with a TEST sheet + 5 reserved-domain URLs (`https://example.com/test-rosen-archive-YYYY-MM-DD` style — RFC 2606 reserved, won't hit a real publisher) before pointing the production sheet at it
 4. Demo to Joe (handoff dry-run) once everything is green
 5. Schedule the actual handoff with Jay or Hali
 
