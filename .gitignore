@@ -92,6 +92,9 @@ data/social_import/
 # Cloudflare Workers dev artifacts
 .wrangler/
 
+# FTP deploy staging (derived artifacts; see DEPLOYMENT.md)
+ftp-upload/
+
 # Internal Claude session files
 .claude/phase4-*
 .claude/plan.md
