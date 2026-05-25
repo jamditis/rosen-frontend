@@ -89,6 +89,21 @@ describe('archive_records-public.csv', () => {
     assert.strictEqual(badDates.length, 0,
       `${badDates.length} records have invalid dates: ${JSON.stringify(badDates.slice(0, 3))}`);
   });
+
+  it('raw_text has no CP1252-mojibake or replacement-char artifacts (#162)', () => {
+    // CP1252-mojibake: UTF-8 bytes misread as CP1252 then re-encoded as UTF-8.
+    // Visual signatures: "Â£" (£), "â€" prefix (smart quotes/dashes/ellipsis),
+    // "Ã" prefix (accented latin), "ï¿½" (a multi-char rendering of U+FFFD
+    // that arises when the same double-encode happens to a replacement char),
+    // and the literal replacement character U+FFFD itself (the residue when
+    // a char was lost upstream and there's nothing to recover).
+    const MOJIBAKE_RE = /Â[£¢¥§°]|â€|Ã[©¨ àáóñ]|ï¿½|�/u;
+    const bad = archiveRecords
+      .filter(r => MOJIBAKE_RE.test(r.raw_text || ''))
+      .map(r => r.id || r.ID);
+    assert.strictEqual(bad.length, 0,
+      `${bad.length} records contain mojibake in raw_text: ${bad.slice(0, 5).join(', ')}`);
+  });
 });
 
 // ============================================
