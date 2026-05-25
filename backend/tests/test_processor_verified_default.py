@@ -4,13 +4,12 @@
 Regression test for #160. Before the fix, process_single_url forced
 ``verified=True`` on every record on the theory that "Jay submitted it."
 The submission server's auth is a shared token (see issue #136) so the
-constant misrepresents who submitted the row and what review it received.
+constant misrepresented who submitted the row and what review it received.
 
-Records coming through the submission server should default to
-``verified=False`` (matching ``enrich_data``'s documented setdefault in
-``workflow.py``) and be flipped to True only by an actual curator review.
-
-Receipt token: wake-20260525T0705-a0b4a3
+Records coming through the submission server should default to the
+CSV-style string ``'FALSE'`` (which is what ``generate_review_report.py``
+reads — see ``archive_record_reviewer.validate_verification``) and be
+flipped to ``'TRUE'`` only by an actual curator review.
 """
 from __future__ import annotations
 
