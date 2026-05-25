@@ -11,10 +11,11 @@
 
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
-import { extname, resolve, normalize, sep } from 'node:path';
+import { extname, resolve, normalize, relative, isAbsolute, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const PORT = Number(process.env.PREVIEW_PORT || 8000);
+const HOST = process.env.PREVIEW_HOST || '127.0.0.1';
 const ROOT = resolve(fileURLToPath(import.meta.url), '..', '..');
 
 const MIME = {
@@ -39,10 +40,19 @@ const MIME = {
 
 function safeResolve(urlPath) {
   // Strip query/fragment, decode, normalize, then verify the resolved
-  // path stays inside ROOT to defeat ../ traversal.
-  const clean = decodeURIComponent(urlPath.split('?')[0].split('#')[0]);
+  // path stays inside ROOT to defeat ../ traversal. The relative()/isAbsolute()
+  // pattern is the canonical sanitizer CodeQL recognizes for js/path-injection.
+  // decodeURIComponent throws on malformed percent-encoding (e.g. bare '%'),
+  // which would otherwise crash the request handler — treat as Forbidden.
+  let clean;
+  try {
+    clean = decodeURIComponent(urlPath.split('?')[0].split('#')[0]);
+  } catch {
+    return null;
+  }
   const joined = resolve(ROOT, '.' + normalize(clean));
-  if (joined !== ROOT && !joined.startsWith(ROOT + sep)) return null;
+  const rel = relative(ROOT, joined);
+  if (rel.startsWith('..') || isAbsolute(rel)) return null;
   return joined;
 }
 
@@ -59,13 +69,18 @@ const server = createServer(async (req, res) => {
   try {
     const s = await stat(filePath);
     if (s.isDirectory()) {
-      // Match python3 -m http.server / Apache behavior: redirect a directory
-      // request without trailing slash to the slashed form before serving
-      // index.html. Otherwise relative URLs in standalone pages (e.g.
-      // /features/status-report → ./assets/foo) resolve against the wrong base.
-      const [pathOnly, ...rest] = rawUrl.split(/(?=[?#])/);
-      if (!pathOnly.endsWith('/')) {
-        res.writeHead(301, { Location: pathOnly + '/' + rest.join('') });
+      // Redirect bare-directory requests to the slashed form so relative URLs
+      // in standalone pages (e.g. /features/status-report → ./assets/foo)
+      // resolve against the right base. Build Location entirely from the
+      // already-validated absolute path (via relative(ROOT, requested)) rather
+      // than echoing the raw URL — this breaks the user-input → Location data
+      // flow that CodeQL's open-redirect check tracks. Query/fragment are
+      // dropped on dir-redirect; the SPA hash routes live on '/' which is
+      // already slashed and never hits this branch.
+      const relFromRoot = relative(ROOT, requested).split(sep).join('/');
+      const pathOnly = '/' + relFromRoot;
+      if (!rawUrl.split(/[?#]/)[0].endsWith('/')) {
+        res.writeHead(301, { Location: pathOnly + '/' });
         res.end();
         return;
       }
@@ -84,8 +99,10 @@ const server = createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, () => {
-  console.log(`Preview server: http://localhost:${PORT}/`);
+// Bind to 127.0.0.1 by default so the preview is not exposed on the LAN.
+// Override with PREVIEW_HOST=0.0.0.0 if intentional LAN access is needed.
+server.listen(PORT, HOST, () => {
+  console.log(`Preview server: http://${HOST}:${PORT}/`);
   console.log(`Serving:        ${ROOT}`);
   console.log(`Stop:           Ctrl-C`);
 });

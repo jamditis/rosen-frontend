@@ -269,7 +269,7 @@ npm run preview                       # Node-based static server at http://local
 python3 -m http.server 8000           # Equivalent — Python option, no Node required
 ```
 
-Override the port with `PREVIEW_PORT=8765 npm run preview`. No build step needed; the app runs directly from source files via ES module imports. Tailwind CSS is pre-built at `frontend/dist/tailwind.css`.
+Override the port with `PREVIEW_PORT=8765 npm run preview`. The server binds to `127.0.0.1` by default so it is not exposed on the LAN; override with `PREVIEW_HOST=0.0.0.0 npm run preview` when LAN access is intentional. No build step needed; the app runs directly from source files via ES module imports. Tailwind CSS is pre-built at `frontend/dist/tailwind.css`.
 
 ### Preview audit (WCAG 2.1 AA)
 

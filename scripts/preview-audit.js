@@ -42,6 +42,10 @@ async function startServer() {
   });
   await new Promise((ok, fail) => {
     const t = setTimeout(() => fail(new Error('preview server did not start in 8s')), 8000);
+    // spawn() emits 'error' (not 'exit') when the executable is missing or
+    // permission-denied — without this listener the audit would hang until
+    // the 8s timeout instead of failing fast with a clear message.
+    proc.on('error', (err) => { clearTimeout(t); fail(new Error(`preview server spawn failed: ${err.message}`)); });
     proc.stdout.on('data', (chunk) => {
       if (String(chunk).includes('Preview server')) { clearTimeout(t); ok(); }
     });
@@ -77,6 +81,15 @@ async function auditOne(page, route, viewport) {
     incomplete: result.incomplete.length,
   };
 }
+
+// HTML-escape every interpolated value in the report. Without this, an axe
+// rule id, help URL, sample selector, or surfaced error message containing
+// '<', '&', or quotes can break rendering or inject markup. err.message in
+// particular originates from runtime exceptions (Playwright timeouts include
+// the user-controlled URL) and is the most likely culprit.
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => (
+  { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+));
 
 function renderReport(rows) {
   const totalViolations = rows.reduce((s, r) => s + r.violations.length, 0);
@@ -117,15 +130,15 @@ function renderReport(rows) {
     <thead><tr><th>Route</th><th>Viewport</th><th>Violations</th><th>Passes</th><th>Screenshot</th></tr></thead>
     <tbody>
       ${rows.map(r => `<tr>
-        <td><code>${r.url}</code><br><span class="badge">${r.route}</span></td>
-        <td>${r.viewport}</td>
+        <td><code>${esc(r.url)}</code><br><span class="badge">${esc(r.route)}</span></td>
+        <td>${esc(r.viewport)}</td>
         <td>${r.violations.length === 0 ? '<span class="v-minor">0</span>' : r.violations.map(v => `
-          <details><summary class="v-${v.impact || 'minor'}">${v.impact || 'minor'}: ${v.help} (${v.nodes} nodes)</summary>
-            <div>Rule: <code>${v.id}</code> &middot; <a href="${v.helpUrl}">help</a></div>
-            <div>Sample selector: <code>${v.sample.replace(/</g, '&lt;')}</code></div>
+          <details><summary class="v-${esc(v.impact || 'minor')}">${esc(v.impact || 'minor')}: ${esc(v.help)} (${esc(v.nodes)} nodes)</summary>
+            <div>Rule: <code>${esc(v.id)}</code> &middot; <a href="${esc(v.helpUrl)}">help</a></div>
+            <div>Sample selector: <code>${esc(v.sample)}</code></div>
           </details>`).join('')}</td>
-        <td>${r.passes}</td>
-        <td><a class="shot-link" href="screenshots/${r.viewport}/${r.route}.png">view</a></td>
+        <td>${esc(r.passes)}</td>
+        <td><a class="shot-link" href="screenshots/${encodeURIComponent(r.viewport)}/${encodeURIComponent(r.route)}.png">view</a></td>
       </tr>`).join('')}
     </tbody>
   </table>
