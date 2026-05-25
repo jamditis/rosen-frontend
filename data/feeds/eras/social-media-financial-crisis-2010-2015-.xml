@@ -5,7 +5,7 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records from the Social Media &amp; Financial Crisis (2010-2015) era</description>
     <language>en-us</language>
-    <lastBuildDate>Mon, 25 May 2026 12:18:42 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 25 May 2026 14:40:15 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/eras/social-media-financial-crisis-2010-2015-.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen Digital Archive RSS Generator</generator>
   <item>
@@ -192,6 +192,14 @@
     <description>A Johns Hopkins professor&apos;s blog post criticizing the NSA was requested to be taken down by the university&apos;s dean, raising concerns about academic freedom. The request, seemingly originating from the university&apos;s Applied Physics Laboratory with ties to the NSA, was later retracted after media attention, highlighting the vulnerability of academic freedom to government pressure and the university&apos;s initial failure to uphold its principles.</description>
     <category>Technology &amp; Digital Media</category>
     <category>Politics &amp; Democracy</category>
+    <category>Press &amp; Media Criticism</category>
+  </item>
+  <item>
+    <title>The awayness problem</title>
+    <link>https://www.cjr.org/cover_story/the_awayness_problem.php</link>
+    <guid isPermaLink="true">https://www.cjr.org/cover_story/the_awayness_problem.php</guid>
+    <pubDate>Tue, 03 Sep 2013 00:00:00 GMT</pubDate>
+    <description>An analysis of what Rosen calls &quot;the awayness problem&quot; in journalism — how the press can be physically present yet intellectually absent from the stories it covers. Published in Columbia Journalism Review.</description>
     <category>Press &amp; Media Criticism</category>
   </item>
   <item>
@@ -464,18 +472,6 @@
     <pubDate>Sun, 01 Jan 2012 00:00:00 GMT</pubDate>
     <description>¶ ● A student reflects on her time at Studio 20. Shortly after, she wrote this post: My Time in Studio 20. “With newly established programs, you can either come out of it with a type of education no one has had before, or you can have an awful experience of a program that’s not well thought out.” Read the rest .</description>
     <category>Journalism Education</category>
-  </item>
-  <item>
-    <title>Studio 20 Will Collaborate With The Guardian on How to Improve Election Coverage</title>
-    <link>https://tmblr.co/ZCJQUyDIsJfc</link>
-    <guid isPermaLink="true">https://tmblr.co/ZCJQUyDIsJfc</guid>
-    <pubDate>Thu, 15 Dec 2011 00:00:00 GMT</pubDate>
-    <description>It won’t be a single issue, of course, but a basket of top concerns broadly shared by respondents – six to ten, or perhaps as many as a dozen priorities that originate not with journalists or campaign managers, but with voters. That course, taught by Jay Rosen, will have a technologist and newsroom developer as part of the team, Matt Terenzio . “Together, we will arrive at the picture of how people want journalists to cover the election through a number of traditional and non-traditional methods, including sampling science, internet polling, web forms, social media, old fashioned reporting, discussions and debates, experimental features, plus staff and user-generated content.” The announcement was covered by Nieman Lab, where Megan Garber wrote: Studio 20′s role in the project, Rosen told me, will be in part to act as an interactive team that will help with the inflow and engagement of users; students in the program will also conduct research and analysis and think through — perhaps even invent — features and tools that can foster that engagement in new ways, testing them out on The Guardian’s U.S. site.</description>
-    <category>Journalism Education</category>
-    <category>Technology &amp; Digital Media</category>
-    <category>Audience &amp; Public Engagement</category>
-    <category>Press &amp; Media Criticism</category>
-    <category>Politics &amp; Democracy</category>
   </item>
   </channel>
 </rss>
