@@ -7,12 +7,12 @@ import sys
 import json
 from pathlib import Path
 
-ROOT_DIR = Path(__file__).resolve().parents[2]
-SRC_DIR = ROOT_DIR / "src"
-DIAGNOSTICS_DIR = ROOT_DIR / "tools" / "diagnostics"
-for path in (SRC_DIR, DIAGNOSTICS_DIR):
-    if str(path) not in sys.path:
-        sys.path.append(str(path))
+# format_converter lives in backend/scripts/diagnostics/ (not packaged).
+# Pytest's pythonpath in pyproject.toml exposes backend/ and backend/src/, but
+# diagnostics scripts need a per-file sys.path append.
+DIAGNOSTICS_DIR = Path(__file__).resolve().parents[1] / "scripts" / "diagnostics"
+if str(DIAGNOSTICS_DIR) not in sys.path:
+    sys.path.append(str(DIAGNOSTICS_DIR))
 
 from format_converter import get_format_converter
 
