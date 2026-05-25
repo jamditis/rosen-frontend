@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen Digital Archive</title>
-    <dateCreated>Mon, 25 May 2026 02:35:09 GMT</dateCreated>
-    <dateModified>Mon, 25 May 2026 02:35:09 GMT</dateModified>
+    <dateCreated>Mon, 25 May 2026 02:42:08 GMT</dateCreated>
+    <dateModified>Mon, 25 May 2026 02:42:08 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -168,6 +168,7 @@
       <outline text="Social Media &amp; Financial Crisis (2010-2015)" type="category">
         <outline text="Asymmetry between the major parties fries the circuits of the mainstream press - PressThink" type="link" url="https://pressthink.org/2016/09/asymmetry-between-the-major-parties-fries-the-circuits-of-the-mainstream-press/" created="2016-09-29"/>
         <outline text="So I will try to explain why the Trump candidacy has been so confounding to our political press. - PressThink" type="link" url="https://pressthink.org/2015/11/i-will-try-to-explain-why-the-trump-candidacy-has-been-so-confounding-to-our-political-press/" created="2015-11-30"/>
+        <outline text="The Pub #43: Why public media are sponsoring polls, and how a CBC video went viral" type="link" url="https://current.org/2015/11/the-pub-43-why-public-media-are-sponsoring-polls%E2%80%8B-and-how-a-cbc-video-went-viral/" created="2015-11-05"/>
         <outline text="Adapting Journalism to the Digital Space" type="link" url="https://journalism.nyu.edu/graduate/programs/studio-20-digital-first" created="2015-06-26"/>
         <outline text="Verstehen, was den Journalismus derzeit verändert" type="link" url="https://publicnotebook.wordpress.com/2014/11/26/verstehen-was-den-journalismus-derzeit-verandert/" created="2014-11-26"/>
         <outline text="Comment être au courant de ce qui change le journalisme ?" type="link" url="https://publicnotebook.wordpress.com/2014/11/18/comment-etre-au-courant-de-ce-qui-change-le-journalisme/" created="2014-11-18"/>
@@ -215,7 +216,6 @@
         <outline text="A Brief Theory of the Republican Party (2012)" type="link" url="https://publicnotebook.wordpress.com/2012/01/18/a-brief-theory-of-the-republican-party-2012/" created="2012-01-18"/>
         <outline text="Studio 20" type="link" url="https://tmblr.co/ZCJQUyE6An_m" created="2012-01-01"/>
         <outline text="Studio 20 Will Collaborate With The Guardian on How to Improve Election Coverage" type="link" url="https://tmblr.co/ZCJQUyDIsJfc" created="2011-12-15"/>
-        <outline text="The citizens agenda: making election coverage more useful | Jay Rosen and Amanda Michel | The Guardian" type="link" url="https://www.theguardian.com/commentisfree/cifamerica/2011/dec/08/citizens-agenda-election-coverage" created="2011-12-08"/>
       </outline>
       <outline text="View from Nowhere (10s)" type="category">
         <outline text="A call for radically different campaign coverage" type="link" url="https://medium.com/we-are-hearken/a-call-for-radically-different-campaign-coverage-85e62401d0c6" created="2019-06-12"/>
@@ -278,6 +278,7 @@
         <outline text="Has Trump Changed the Media?" type="link" url="https://youtu.be/gU-DpoxGmfU" created="2019-02-28"/>
         <outline text="Jay Rosen at IRE discussing the importance of crowdsourcing" type="link" url="https://youtu.be/n8PtTFGl6hg" created="2019-02-14"/>
         <outline text="Trump&apos;s attacks on journalists could incite violence, study warns" type="link" url="https://www.politico.com/story/2019/01/31/trump-attacks-journalists-study-1139510" created="2019-01-31"/>
+        <outline text="NYU&apos;s Jay Rosen says 2020&apos;s political journalism will be even worse than 2016&apos;s" type="link" url="https://www.vox.com/2019/1/24/18195097/jay-rosen-trump-politics-media-horse-race-recode-podcast-2020-predictions" created="2019-01-24"/>
         <outline text="Radical Rethink: 2014 Journalism Ethics Conference" type="link" url="https://youtu.be/BdJAL-wWAZU" created="2019-01-22"/>
         <outline text="Creating a Space for Ad-Free Journalism with The Correspondent" type="link" url="https://youtu.be/xzNCOW_DEPU" created="2018-12-09"/>
         <outline text="Jay Rosen pitches the English-language Correspondent on The Daily Show" type="link" url="https://www.niemanlab.org/2018/12/jay-rosen-pitches-the-english-language-correspondent-on-the-daily-show/" created="2018-12-08"/>
@@ -379,7 +380,7 @@
       </outline>
     </outline>
     <outline text="By Category">
-      <outline text="Press &amp; Media Criticism (23407)" type="category">
+      <outline text="Press &amp; Media Criticism (23419)" type="category">
         <outline text="Jay Rosen on the digital revolution that wasn&apos;t" type="link" url="https://www.cjr.org/kicker/jay-rosen-digital-revolution-that-wasnt.php"/>
         <outline text="I send my questions about that to" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p"/>
         <outline text="Many of you, I know, receive a lot of national news, but care a lot about local" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4ecwzqx322p"/>
@@ -406,7 +407,7 @@
         <outline text="&quot;There are positive developments in local news but they’re being swamped by the..." type="link" url="https://x.com/jayrosen_nyu/status/1981021320079896971"/>
         <outline text="&quot;If you had enough money to buy ads, you could reach the voters you wanted to..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3n33q3xbk2i"/>
       </outline>
-      <outline text="Journalism Theory &amp; Practice (8328)" type="category">
+      <outline text="Journalism Theory &amp; Practice (8331)" type="category">
         <outline text="I send my questions about that to" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p"/>
         <outline text="I have a lurid fascination with interviews that become trainwrecks" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e3rgesbk24"/>
         <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/"/>
@@ -433,7 +434,7 @@
         <outline text="&quot;Why I&apos;m handing in my Pentagon press pass&quot; by Tom Bowman of NPR" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m35ykm4hp22j"/>
         <outline text="The basic reason is the Pentagon reporters want information" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m35vkye2gk2j"/>
       </outline>
-      <outline text="Politics &amp; Democracy (7658)" type="category">
+      <outline text="Politics &amp; Democracy (7667)" type="category">
         <outline text="&quot;There are positive developments in local news but they’re being swamped by the..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3s5wsddck2x"/>
         <outline text="&quot;There are positive developments in local news but they’re being swamped by the..." type="link" url="https://x.com/jayrosen_nyu/status/1981021320079896971"/>
         <outline text="&quot;If you had enough money to buy ads, you could reach the voters you wanted to..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3n33q3xbk2i"/>
@@ -460,7 +461,7 @@
         <outline text="Thanks, Adam" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m26hqasqdc2b"/>
         <outline text="Here&apos;s a key point about the Pentagon&apos;s new policy for handing the press: check..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m22rw2vlak2w"/>
       </outline>
-      <outline text="Audience &amp; Public Engagement (3741)" type="category">
+      <outline text="Audience &amp; Public Engagement (3742)" type="category">
         <outline text="Many of you, I know, receive a lot of national news, but care a lot about local" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4ecwzqx322p"/>
         <outline text="Thanks, Casey" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e6y3jkhk2p"/>
         <outline text="You make good points" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xm3cs7kk2s"/>
@@ -487,7 +488,7 @@
         <outline text="Miss it this week?" type="link" url="https://x.com/jayrosen_nyu/status/1977079042567442658"/>
         <outline text="Thank you!" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2phhcovqs2t"/>
       </outline>
-      <outline text="Technology &amp; Digital Media (2829)" type="category">
+      <outline text="Technology &amp; Digital Media (2831)" type="category">
         <outline text="Jay Rosen on the digital revolution that wasn&apos;t" type="link" url="https://www.cjr.org/kicker/jay-rosen-digital-revolution-that-wasnt.php"/>
         <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/"/>
         <outline text="Sarah Longwell" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zvjrplq22z"/>

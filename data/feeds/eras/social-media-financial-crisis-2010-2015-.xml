@@ -5,7 +5,7 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records from the Social Media &amp; Financial Crisis (2010-2015) era</description>
     <language>en-us</language>
-    <lastBuildDate>Mon, 25 May 2026 02:35:09 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 25 May 2026 02:42:08 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/eras/social-media-financial-crisis-2010-2015-.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen Digital Archive RSS Generator</generator>
   <item>
@@ -28,6 +28,15 @@
     <category>Technology &amp; Digital Media</category>
     <category>Journalism Theory &amp; Practice</category>
     <category>Press &amp; Media Criticism</category>
+  </item>
+  <item>
+    <title>The Pub #43: Why public media are sponsoring polls, and how a CBC video went viral</title>
+    <link>https://current.org/2015/11/the-pub-43-why-public-media-are-sponsoring-polls%E2%80%8B-and-how-a-cbc-video-went-viral/</link>
+    <guid isPermaLink="true">https://current.org/2015/11/the-pub-43-why-public-media-are-sponsoring-polls%E2%80%8B-and-how-a-cbc-video-went-viral/</guid>
+    <pubDate>Thu, 05 Nov 2015 00:00:00 GMT</pubDate>
+    <description>The Pub podcast episode opens with Rosen&apos;s Twitter critique of WBUR for sponsoring horse-race polls and asks how polling fits with public media&apos;s mission. WBUR&apos;s Sam Fleming responds to Rosen&apos;s argument; the episode also features Marketplace host Kai Ryssdal.</description>
+    <category>Press &amp; Media Criticism</category>
+    <category>Politics &amp; Democracy</category>
   </item>
   <item>
     <title>Adapting Journalism to the Digital Space</title>
@@ -467,16 +476,6 @@
     <category>Audience &amp; Public Engagement</category>
     <category>Press &amp; Media Criticism</category>
     <category>Politics &amp; Democracy</category>
-  </item>
-  <item>
-    <title>The citizens agenda: making election coverage more useful | Jay Rosen and Amanda Michel | The Guardian</title>
-    <link>https://www.theguardian.com/commentisfree/cifamerica/2011/dec/08/citizens-agenda-election-coverage</link>
-    <guid isPermaLink="true">https://www.theguardian.com/commentisfree/cifamerica/2011/dec/08/citizens-agenda-election-coverage</guid>
-    <pubDate>Thu, 08 Dec 2011 00:00:00 GMT</pubDate>
-    <description>The article discusses an effort by Guardian US and NYU&apos;s Studio 20 program to create a &quot;citizens agenda&quot; for the 2012 election coverage. This approach aims to shift the focus from the strategic game of who&apos;s going to win to what voters want the candidates to be discussing. It describes a project involving the public and local news organizations to identify key issues and hold candidates accountable to those priorities. The ultimate goal is to make campaign coverage more relevant and useful to the public.</description>
-    <category>Politics &amp; Democracy</category>
-    <category>Audience &amp; Public Engagement</category>
-    <category>Journalism Theory &amp; Practice</category>
   </item>
   </channel>
 </rss>
