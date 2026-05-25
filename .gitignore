@@ -97,6 +97,9 @@ data/social_import/
 # Cloudflare Workers dev artifacts
 .wrangler/
 
+# Git worktrees
+.worktrees/
+
 # FTP deploy staging (derived artifacts; see DEPLOYMENT.md)
 ftp-upload/
 
