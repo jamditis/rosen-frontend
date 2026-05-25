@@ -4,21 +4,16 @@ import { html } from '../html.js?v=3.3.0';
 import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2, Users, Building2, Lightbulb, BookOpen } from 'lucide-react';
 import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.3.0';
 import { ThreadModal } from './ThreadModal.js?v=3.3.0';
+import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.3.0';
 
-// Convert URLs in text to clickable links
 const linkifyText = (text) => {
-  if (!text) return null;
-  // URL regex pattern
-  const urlPattern = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/g;
-  const parts = text.split(urlPattern);
-
+  const parts = splitUrlsForLinkify(text);
+  if (parts === null) return null;
   return parts.map((part, i) => {
-    if (urlPattern.test(part)) {
-      // Reset regex lastIndex
-      urlPattern.lastIndex = 0;
-      return html`<a key=${i} href=${part} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 hover:underline break-all">${part}</a>`;
+    if (part.type === 'url') {
+      return html`<a key=${i} href=${part.value} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 hover:underline break-all">${part.value}</a>`;
     }
-    return part;
+    return part.value;
   });
 };
 
