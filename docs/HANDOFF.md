@@ -6,6 +6,8 @@
 
 **Last updated**: 2026-05-25
 
+> **Architecture assumption**: this doc describes the post-handoff state, which assumes Pillar 3a (Apps Script → GitHub App → GitHub Action ingestion, designed in `docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md`) is deployed and the era taxonomy normalization (PR #218) is merged. **Until Pillar 3a is built**, the live system is still Pillar 3: Apps Script POSTs to a Flask submission server running on houseofjawn, with credentials wired via `SUBMISSION_URL` / `SUBMISSION_TOKEN`. The day-to-day failure modes and recovery steps in this doc only apply once Pillar 3a is in production — if a problem hits before then, see `automation/SETUP.md` for the current (Pillar 3) operational guide.
+
 ---
 
 ## TL;DR for Jay
@@ -79,10 +81,12 @@ If you only read one paragraph: the archive is at `pressthink.org/j/rosen-archiv
 ### GitHub Action fails on every submission
 
 1. Most common cause: a repo secret expired or got rotated
-2. Check repo Settings → Secrets and variables → Actions. Required secrets:
-   - `ROSEN_SFTP_HOST`, `ROSEN_SFTP_USER`, `ROSEN_SFTP_KEY`, `ROSEN_SFTP_REMOTE_PATH`, `ROSEN_SFTP_KNOWN_HOSTS` (Bluehost credentials)
+2. Check repo Settings → Secrets and variables → Actions. Required secrets (names match `backend/submission_server/sheets_callback.py` and `sftp_push.py`):
+   - `ROSEN_SFTP_HOST`, `ROSEN_SFTP_USER`, `ROSEN_SFTP_REMOTE_PATH`, `ROSEN_SFTP_KNOWN_HOSTS` (Bluehost endpoint info)
+   - one of: `ROSEN_SFTP_PASSWORD` (password auth) OR `ROSEN_SFTP_KEY_PATH` (private-key file, preferred)
+   - optional: `ROSEN_SFTP_KEY_PASSPHRASE` (only when the private key is encrypted)
    - `GEMINI_API_KEY` (for categorization)
-   - `SHEETS_SA_KEY` (service account JSON for sheet writeback)
+   - one of: `ROSEN_SHEETS_SA_KEY` (path to service-account JSON file) OR `ROSEN_SHEETS_SA_KEY_JSON` (inline JSON content), for sheet writeback
 3. Rotate any that expired; Hali can do this with values from Jay's Bluehost cPanel + Jay's Gemini key
 
 ### The GitHub App private key leaks or is suspected compromised
@@ -94,7 +98,7 @@ If you only read one paragraph: the archive is at `pressthink.org/j/rosen-archiv
 ### Bluehost rotates the SFTP password
 
 1. New password lands in Jay's Bluehost cPanel
-2. Hali updates the `ROSEN_SFTP_KEY` (or password) repo secret to match
+2. Hali updates the `ROSEN_SFTP_PASSWORD` repo secret to match (or `ROSEN_SFTP_KEY_PATH` if Bluehost rotated to key-only auth)
 3. Next submission deploys cleanly; until then submissions land as `archived` in Column F
 
 ### Categorization (Gemini) starts failing
@@ -141,9 +145,9 @@ This timeline is intentionally not a contract — slide it later or earlier base
 
 This handoff doc does NOT cover:
 
-- **Pillar 3a operational details** beyond the framework above — those live in the design spec at `docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md` and the eventual implementation. When Pillar 3a is implemented, update the relevant sections of this doc (the "Failure modes" section especially).
+- **Pillar 3a operational details** beyond the framework above — those live in the design spec at `docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md` (which lands in this repo when PR #214 merges) and the eventual implementation. When Pillar 3a is implemented, update the relevant sections of this doc (the "Failure modes" section especially).
 - **Hand-editing records via PR** — that's the normal GitHub PR workflow; if Hali isn't comfortable with PRs yet, ask Joe for a 30-min walkthrough during the parallel-run period.
-- **Adding new categorization themes / eras** — the existing 8 canonical eras and 6 categories (in `data/SCHEMA.md`) cover Jay's existing work. Adding new ones is a separate scope decision that needs Jay's editorial judgment + a PR.
+- **Adding new categorization themes / eras** — the existing 8 canonical eras and 6 categories (in `data/SCHEMA.md`, established by PR #218) cover Jay's existing work. Adding new ones is a separate scope decision that needs Jay's editorial judgment + a PR.
 - **What to do if Bluehost goes away or rates rise unacceptably** — that's a "redesign X" conversation; call Joe.
 - **What to do if GitHub starts charging for public-repo Actions** — currently unmetered per the 2026 pricing announcement; if that changes, call Joe.
 
