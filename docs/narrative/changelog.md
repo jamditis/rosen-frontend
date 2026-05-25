@@ -2,9 +2,11 @@
 
 Project version history for the Jay Rosen Internet Archive.
 
-This is an archival record condensed from the full PROJECT_LOG.md (4,797 lines). Each entry preserves what was built, why decisions were made, what challenges arose, and key metrics and outcomes. Code snippets, file lists, bash commands, and session continuation instructions have been removed -- the git history and PROJECT_LOG.md contain those details.
+This is an archival record condensed from session notes. Each entry preserves what was built, why decisions were made, what challenges arose, and key metrics and outcomes. Code snippets, file lists, bash commands, and session continuation instructions have been removed — the git history contains those details.
 
-Versions are listed in reverse chronological order within major version groups. The project began as a Python data pipeline (v0.0.1, June 2025) and grew into a static React frontend with 940 archive records, 9 dissertation presentation tools, 29,000+ social media posts, and a knowledge graph of 25,000+ entities spanning four decades of journalism criticism.
+Versions are listed in reverse chronological order within major version groups. The project began as a Python data pipeline (v0.0.1, June 2025) and grew into a static React frontend with 1,030 archive records, 3 live dissertation presentation surfaces (with 7 earlier tools retired to `archived/dissertation-tools/` alongside a non-tool source bundle), ~29,700 social media posts, and a knowledge graph of 5,036 named entities and 4,666 relationships spanning four decades of journalism criticism.
+
+A note on versioning: the cache-bust version embedded in `index.html` and `version.json` (currently `v3.3.0`) increments per static-bundle change. The release versions below (e.g. `[4.0.0]`) track milestones in the project's evolution. These are two related but distinct versioning schemes, intentionally separate.
 
 Key milestones in the project's evolution:
 - v0.0.1 to v1.0.0 (June-July 2025): Core pipeline construction. Scraping, AI analysis, PDF generation, Google Sheets integration.
@@ -14,6 +16,41 @@ Key milestones in the project's evolution:
 - v2.18.0 to v2.25.0 (November-December 2025): Launch preparation. Content type expansion, UX polish, repository reorganization, thread visualization.
 - v3.0.0 (November 2025): Backend restructuring. Poetry migration, proper Python packaging.
 - v4.0.0 (December 2025): Pre-publication release. CI/CD, validation, dissertation tools finalized.
+- v4.1.x (January-May 2026): Post-launch maintenance and authoring infrastructure. Three-pillar program: data quality and verification (Pillar 1), archive sweep and gap-fill (Pillar 2), submission and authoring workflow (Pillar 3). Local preview server and accessibility audit tooling proposed in PR #257 (in flight as of 2026-05-25).
+
+---
+
+### [4.1.x] - 2026-01 through 2026-05 — Post-launch maintenance and authoring infrastructure
+
+Five months of work after the December 2025 public launch. No single version bump captures it -- this is a rolling description of the post-launch era as of 2026-05-25. Specific PR and issue numbers below refer to `jamditis/rosen-frontend` unless noted.
+
+**Headline numbers shifting between Dec 2025 and 2026-05-25:**
+
+| Metric | Dec 2025 | May 2026 |
+|--------|----------|----------|
+| Archive records | ~940 total | 1,030 total (800 RECORD + 137 TUMBLR + 83 CLIP + 10 THREAD) |
+| Social media posts | ~29,100 | ~29,700 |
+| Named entities | ~5,061 | 5,036 (some duplicates collapsed during quality work) |
+| Entity relationships | ~5,084 | 4,666 (post-cleanup; false relationships removed) |
+| Live dissertation surfaces | 9 tools | 3 surfaces (reader, foreword, network-effect); 7 of the rest moved to `archived/dissertation-tools/` as standalone tools, with a separate `source/` bundle (PDF + markdown + build helper) archived alongside |
+| CI/CD workflows | 5 | 9 (added CodeQL, post-merge dashboard sync, Pillar 3a submit-record + sweep-stuck-rows, Claude review) |
+
+**Pillar 1 -- data quality and verification.** Series of focused PRs against the CSV source of truth and the supporting tests. Highlights: PR #235/#236 fixed wrong-overlay URLs on RECORD-00602/00613 and introduced a hedging-language guard that flags AI-guesswork summaries before they ship; PR #244 and #253 recovered 7 of the original 16 `verified=false` records via Wayback CDX search, with issue #242 tracking the next 9-record batch; PR #233 added a thread-dedup test; PR #210 / #254 fixed 4 title-drift bugs and produced a curator-decisions findings doc (`docs/issue-210-duplicate-findings.md`). The "raw_text is sacred" rule was reinforced as a hard invariant -- any edit that shortens or removes `raw_text` on existing rows is treated as a defect.
+
+**Pillar 2 -- archive sweep.** Discovery work in May 2026 inventoried what the archive was still missing. Three research writeups in `docs/research/2026-05-25-pillar2-*` enumerate the gaps: ~146 PressThink posts (issue #208), 84 HuffPost posts (issue #209), and candidates surfaced on podcast/YouTube and social/Substack channels. A separate finding (issues #207 and #211): ~200 records have zero extracted relationships because their `raw_text` column is empty -- the entity extraction can be rerun once the raw_text gap-fill lands.
+
+**Pillar 3 -- submission and authoring workflow.** The infrastructure spine, Pillar 3a, took the form of a Flask submission server at `backend/submission_server/` plus two GitHub Actions workflows (`submit-record.yml` and `sweep-stuck-rows.yml`) that pick up submissions, push CSV updates back through SFTP, and reconcile stuck rows. Pillar 3b -- the authoring surface that a non-technical curator would actually use, designed so they never touch a CSV or an FTP client -- is in design (`docs/plans/2026-05-24-pillar3-authoring-workflow-design.md`) and blocked on credentials and final UX decisions.
+
+**Local preview and accessibility tooling (PR #257, in flight as of 2026-05-25 -- not yet on main).** Once merged, this PR will add `scripts/preview-server.js` (~90-line pure-Node static server, no npm deps) plus `scripts/preview-audit.js` (Playwright + axe-core walker that hits the key routes at mobile 375x812 and desktop 1440x900, screenshots each route, and writes a single HTML report). Exposed via two new package scripts (`preview` and `preview:audit`). The intent is to close the "did I just break the live site?" loop without an FTP round-trip. During PR development the audit produced a baseline of 40 WCAG 2.1 AA violations across 7 rules (color-contrast 684 nodes, button-name 16, select-name 8, scrollable-region-focusable 4, label 4, link-in-text-block 2) -- the inventory is the starting point for the remediation work. Until #257 merges, none of those commands or files exist on main; this entry will be updated to "shipped" then.
+
+**Workflow shifts that became durable rules.** Most are externalized in `CLAUDE.md` and `.github/copilot-instructions.md` so both human and agent contributors operate by the same standards:
+- PR workflow, no exceptions: branch -> PR -> Copilot review -> human "merge" instruction -> merge. Agents never self-merge.
+- The Copilot PR-bot reviews once per PR. Pushing fixes refreshes CI but does not re-trigger Copilot, which keeps GitHub Actions usage predictable. Manual re-triggers stay the human's call.
+- Substantive multi-file PRs run `codex exec review --uncommitted` locally before `gh pr create`. Findings that would have cost an Actions burn become free fixes pre-open.
+- Bundle related PRs. Five PRs that touch the same files become one PR. "Slow is smooth, smooth is fast."
+- Empirically verify documentation. When a doc says "the system does X," check that the system actually does X before relying on the doc. This sweep itself is an instance of that rule.
+
+**Documentation sweep (this entry).** A retroactive doc sweep against the actual repo state on 2026-05-25 reconciled drift in `README.md`, `CLAUDE.md`, `ADDING-RECORDS.md`, and the narrative docs. Major drift items corrected: record counts (claimed 932, actual 1,030), dissertation tool count (claimed 9, actual 3 live + 7 archived tools + a source bundle), CI workflow count (claimed 5, actual 9), and the next-available record ID in the curator guide (`RECORD-00803` -> `RECORD-00902`). The sweep was driven by direct CSV inspection and `ls`/`grep` of the actual tree rather than trust in the prior docs. Codex review of the doc-sweep diff caught two would-be regressions before they shipped (a partial empirical check that misread the dependency split, and an "added" framing for the not-yet-merged preview tooling) — those got fixed in the same PR.
 
 ---
 

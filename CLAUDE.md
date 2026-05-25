@@ -62,30 +62,32 @@ All JS imports use `?v=3.3.0` query parameters. When changing code, bump the ver
 
 ### Archive data (split loading)
 
-Data is split into three files for performance, with a full fallback:
+Data is split into three files for performance, with a full fallback. Sizes drift as records are added — these are accurate as of 2026-05-25:
 
 | File | Size | Contents | Loads |
 |------|------|----------|-------|
-| `data/archive-core.json` | 10.8 MB | Lightweight record cards | On page load |
-| `data/archive-details.json` | 11.6 MB | Full summaries, quotes, concepts | On demand |
-| `data/archive-entities.json` | 1.0 MB | Entity graph for Explorer | On demand |
-| `data/archive-data.json` | 25.9 MB | Full combined data (fallback) | Only if split files fail |
+| `data/archive-core.json` | ~13 MB | Lightweight record cards | On page load |
+| `data/archive-details.json` | ~13 MB | Full summaries, quotes, concepts | On demand |
+| `data/archive-entities.json` | ~1.1 MB | Entity graph for Explorer | On demand |
+| `data/archive-data.json` | ~28 MB | Full combined data (fallback) | Only if split files fail |
 
 Configured in `frontend/constants.js` via `DATA_CONFIG`.
 
 ### Source CSV files
 
+Counts verified against current `data/` on 2026-05-25:
+
 | File | Records | Contents |
 |------|---------|----------|
-| `data/archive_records-public.csv` | 932 | Non-social archive records (702 RECORD, 137 TUMBLR, 83 CLIP, 10 THREAD). Line count is high (~49k) due to multi-line text fields. |
-| `data/social_posts.csv` | ~29,130 | Twitter/X and Bluesky posts |
+| `data/archive_records-public.csv` | 1,030 | Non-social archive records (800 RECORD, 137 TUMBLR, 83 CLIP, 10 THREAD). Line count is high (~50k+) due to multi-line text fields. Max record id is `RECORD-00901`; next ID for new records is `RECORD-00902`. |
+| `data/social_posts.csv` | ~29,700 | Twitter/X and Bluesky posts. Max BSKY id is `BSKY-03121`. |
 | `data/extracted_entities.csv` | 5,036 | Named entities (people, orgs, concepts) |
 | `data/extracted_relationships.csv` | 4,666 | Entity-to-record relationships |
 
 ### Regenerating JSON from CSV
 
 ```bash
-npm install          # first time only (csv-parse, csv-stringify)
+npm install          # first time only — installs runtime deps (csv-stringify, playwright) and dev deps (csv-parse). csv-stringify is also imported by the data/fixes/*.js maintenance scripts; playwright is used by the WCAG audit + the dissertation reader validator
 node data/export-archive-data.js
 ```
 
@@ -111,12 +113,21 @@ Record deep links: `?record=RECORD_ID` opens a record modal on any route.
 
 ## Directory structure
 
+Verified against repo state on 2026-05-25. Component, test, and workflow lists are not enumerated exhaustively — run `ls` for the current set.
+
 ```
 /
 ├── index.html                       # Entry point (import map, React mount)
 ├── shared-styles.css                # Common CSS for standalone tools
 ├── favicon.ico
-├── package.json                     # Node scripts (test, export-data, build:css)
+├── version.json                     # Version metadata (matches index.html ?v=)
+├── package.json                     # Node scripts: test, test:data, test:pipeline, test:frontend, export-data
+├── README.md                        # Project intro, quick-start, key directories
+├── CLAUDE.md                        # This file — agent context, architecture, conventions
+├── AGENTS.md                        # Short, generic repo conventions for ambient agents
+├── CONTEXT.md                       # Domain vocabulary (Archive, Record, Entity, etc.)
+├── ADDING-RECORDS.md                # Non-technical curator guide for adding records
+├── DEPLOYMENT.md                    # FTP deploy manifest (what to upload, what to exclude)
 │
 ├── frontend/                        # Main React application
 │   ├── index.js                     # React root mount
@@ -124,121 +135,95 @@ Record deep links: `?record=RECORD_ID` opens a record modal on any route.
 │   ├── App.js                       # Main app component + routing
 │   ├── constants.js                 # Data URLs, featured works, colors, entity types
 │   ├── html.js                      # HTM/React binding
+│   ├── sw.js                        # Service worker (cache strategy)
 │   ├── tailwind.config.js           # Tailwind config
-│   ├── dist/tailwind.css            # Pre-built Tailwind output
-│   ├── components/
-│   │   ├── AboutPage.js             # About the archive
-│   │   ├── AnalyticsDashboard.js    # Archive statistics charts
-│   │   ├── DetailPanel.js           # Dissertation node detail sidebar
-│   │   ├── dissertationData.js      # Dissertation content (70+ nodes)
-│   │   ├── DissertationPage.js      # Dissertation view container
-│   │   ├── EntityBrowser.js         # Entity search and browse
-│   │   ├── Explorer.js              # Canvas network visualization
-│   │   ├── FeaturedSection.js       # Curated works carousel
-│   │   ├── LoadingQuotes.js         # Loading screen with rotating quotes
-│   │   ├── MindMap.js               # Interactive dissertation tree
-│   │   ├── QueryBuilder.js          # Advanced search query builder
-│   │   ├── RecordModal.js           # Record detail modal
-│   │   ├── Sidebar.js               # Filters, search, autocomplete
-│   │   ├── ThreadModal.js           # Social media thread visualization
-│   │   ├── Timeline.js              # Year-based bar chart filter
-│   │   ├── ToolsModal.js            # Dissertation tools launcher
-│   │   ├── WelcomeModal.js          # First-visit intro overlay
-│   │   ├── WorkInProgressBanner.js  # WIP notice banner
-│   │   └── shared/                  # Reusable UI primitives
-│   │       ├── Button.js
-│   │       ├── Card.js
-│   │       ├── ErrorState.js
-│   │       ├── Header.js
-│   │       ├── index.js             # Barrel export
-│   │       ├── LoadingState.js
-│   │       └── Modal.js
-│   └── services/
-│       ├── archiveService.js        # Data loading, entity maps, search
-│       ├── router.js                # Hash-based routing
-│       └── sqliteService.js         # sql.js SQLite queries
+│   ├── dist/tailwind.css            # Pre-built Tailwind output (~40 KB)
+│   ├── components/                  # ~20 top-level React components (cards, modals, sidebar, dissertation views, analytics, explorer, query builder)
+│   │   └── shared/                  # Reusable UI primitives (Button, Card, Header, Modal, LoadingState, ErrorState, barrel index)
+│   ├── services/
+│   │   ├── archiveService.js        # Data loading, entity maps, search
+│   │   ├── router.js                # Hash-based routing
+│   │   └── sqliteService.js         # sql.js SQLite queries
+│   ├── utils/                       # Design tokens and small helpers
+│   └── design-system/               # CSS tokens and demo pages
 │
-├── dissertation/                    # Dissertation presentation tools (9 tools)
+├── dissertation/                    # Dissertation presentation tools (3 live)
 │   ├── index.html                   # Dissertation landing page
 │   ├── reader/                      # Full text reader with selection sharing
-│   ├── glossary/                    # Interactive concept glossary
-│   ├── comparison/                  # "Then and Now" 1986 vs 2025
-│   ├── context/                     # Historical context page
-│   ├── excerpts/                    # Annotated key passages
-│   ├── faq/                         # "Ask the Dissertation" FAQ
-│   ├── concepts/                    # 3D concept sphere (Three.js)
 │   ├── foreword/                    # Foreword page
 │   └── network-effect/              # Network film analysis
+│   # Note: an earlier set of 7 standalone tools (comparison, concepts,
+│   # context, excerpts, faq, glossary, timeline) was retired and now lives
+│   # in archived/dissertation-tools/ for reference, alongside a non-tool
+│   # source/ bundle (dissertation PDF + transcribed markdown + helper).
+│
+├── dissertation-launch/             # Standalone dissertation launch landing page
 │
 ├── features/                        # Standalone feature pages
-│   ├── shared/                      # Shared feature assets
+│   ├── shared/                      # Shared feature assets (text-selection.js)
 │   └── status-report/               # Archive status report generator
 │
 ├── data/                            # Archive data files + export scripts
-│   ├── archive-data.json            # Full combined JSON (26 MB)
-│   ├── archive-core.json            # Lightweight records (11 MB)
-│   ├── archive-details.json         # Full details (12 MB)
-│   ├── archive-entities.json        # Entity graph (1.1 MB)
-│   ├── archive_records-public.csv   # Source records
-│   ├── social_posts.csv             # Social media posts
-│   ├── extracted_entities.csv       # Named entities
-│   ├── extracted_relationships.csv  # Entity relationships
+│   ├── archive-data.json            # Full combined JSON (~28 MB)
+│   ├── archive-core.json            # Lightweight records (~13 MB)
+│   ├── archive-details.json         # Full details (~13 MB)
+│   ├── archive-entities.json        # Entity graph (~1.1 MB)
+│   ├── archive_records-public.csv   # Source records (1,030 rows)
+│   ├── social_posts.csv             # Social media posts (~29,700 rows)
+│   ├── extracted_entities.csv       # Named entities (5,036 rows)
+│   ├── extracted_relationships.csv  # Entity relationships (4,666 rows)
 │   ├── export-archive-data.js       # JSON generator script
+│   ├── schema.json                  # Data schema
 │   └── README.md                    # Data dictionary
 │
-├── backend/                         # Python data pipeline
+├── backend/                         # Python data pipeline (Poetry-managed)
 │   ├── src/                         # Scraper, processors, categorizer
 │   ├── scripts/                     # Maintenance scripts
-│   ├── tests/                       # Python test suite
+│   ├── tests/                       # Python test suite (pytest)
+│   ├── submission_server/           # Pillar 3a: Flask submission server + scheduler + SFTP push
+│   ├── docs/                        # Backend-specific docs
 │   ├── pyproject.toml               # Poetry dependencies
-│   └── schema.json                  # Data schema
+│   ├── schema.json                  # Backend data schema
+│   ├── README.md                    # Backend pipeline overview
+│   └── (various report JSONs, taxonomy analyses, integrate/update scripts)
 │
 ├── tools/active/                    # Development tools
 │   ├── dataexplorer/                # Tabular data explorer
 │   └── dataviz/                     # Data visualization tool
 │
-├── tests/                           # Frontend/data test suite (Node.js)
-│   ├── csv-quality.test.js
-│   ├── data-integrity.test.js
-│   ├── data-pipeline.test.js
-│   ├── frontend-structure.test.js
-│   ├── process-record.test.js
-│   ├── thread-algorithm.test.js
-│   ├── thread-detection.test.js
-│   └── version-consistency.test.js
+├── tests/                           # Frontend/data test suite — Node.js built-in runner (16 *.test.js files plus a validate-dissertation-page.js helper script; 17 files total)
 │
 ├── archived/                        # Legacy code (reference only)
 │   ├── archive-v1/                  # Original archive interface
 │   ├── web/                         # Win95-themed promotional site
 │   ├── byok-chat/                   # Archived BYOK Claude chat
-│   └── academic-testimonials/       # Archived testimonials
+│   ├── academic-testimonials/       # Archived testimonials
+│   ├── dissertation-tools/          # 7 retired dissertation tools (comparison, concepts, context, excerpts, faq, glossary, timeline) + a source/ bundle (PDF + markdown + helper script)
+│   └── docs/                        # Older docs (legacy designs, plans)
 │
 ├── docs/                            # Project documentation
-│   ├── agent-personas/              # Contributor role definitions
-│   │   ├── contributor-guide.md     # Project overview + how to contribute
-│   │   ├── data-pipeline-engineer.md # Python backend, scraping, AI analysis
-│   │   ├── frontend-developer.md    # React/HTM components, design system
-│   │   ├── data-curator.md          # Archive records, CSV, data quality
-│   │   └── code-reviewer.md         # Review standards + project conventions
-│   └── narrative/                   # Project history and reference docs
-│       ├── project-history.md       # Linear narrative of the project
-│       ├── architecture.md          # Current technical architecture
-│       ├── data-pipeline.md         # Pipeline contributor guide + warnings
-│       └── changelog.md             # Version history (v0.0.1 through v4.0.0)
+│   ├── agent-personas/              # Contributor role definitions (5 personas)
+│   ├── narrative/                   # Project history (project-history, architecture, data-pipeline, changelog)
+│   ├── plans/                       # Dated design + implementation plans
+│   ├── research/                    # Dated discovery/inventory writeups (e.g. Pillar 2 sweeps)
+│   ├── archived/                    # Older one-off audits/designs kept for reference
+│   ├── screenshots/                 # PNGs referenced from other docs
+│   └── (top-level audits: DATA_QUALITY_AUDIT_*, ENTITY_EXTRACTION_PIPELINE, HANDOFF, JAY_ADDING_RECORDS, JAY_ROSEN_HANDOFF_GOAL_PROGRESS, LAUNCH_VALIDATION_REPORT, QUESTIONS_FOR_ROSEN_CALL, issue-210-duplicate-findings)
 │
-├── DEPLOYMENT.md                    # FTP deploy manifest (what to upload)
-│
-├── .github/workflows/               # CI/CD
+├── .github/workflows/               # CI/CD (9 workflows)
 │   ├── frontend-validation.yml      # HTML/JS syntax, CDN link checks
 │   ├── backend-tests.yml            # pytest
 │   ├── backend-linting.yml          # ruff, black, mypy
+│   ├── codeql.yml                   # CodeQL security scan
+│   ├── post-merge.yml               # Post-merge dashboard sync
+│   ├── submit-record.yml            # Pillar 3a — submit record
+│   ├── sweep-stuck-rows.yml         # Pillar 3a — sweep stuck submission rows
 │   ├── claude-code-review.yml       # Claude code review
 │   └── claude.yml                   # Claude integration
 │
 └── .claude/
-    ├── settings.local.json          # Claude Code settings
-    ├── commands/                     # Slash commands
-    └── skills/                      # Domain skills (7 skills)
+    ├── commands/                    # Slash commands
+    └── skills/                      # Domain skills
 ```
 
 ## Design system
@@ -281,10 +266,10 @@ Spawns the preview server, walks 9 key routes (archive, explorer, entities, abou
 
 ## Testing
 
-Tests use Node.js built-in test runner (`node --test`):
+Tests use Node.js built-in test runner (`node --test`). The suite under `tests/` currently spans 16 files covering data integrity, CSV quality, pipeline, thread algorithm/detection, frontend structure, view-state, linkify, entity-index, service-worker cache, HTTP cached loader, fetch error handling, schema BOM, data-explorer security, version consistency, and process-record:
 
 ```bash
-npm test                   # Run all 8 test files
+npm test                   # Run the full suite
 npm run test:data          # Data integrity + CSV quality
 npm run test:pipeline      # Data pipeline + thread detection
 npm run test:frontend      # Version consistency + frontend structure
@@ -292,24 +277,16 @@ npm run test:frontend      # Version consistency + frontend structure
 
 ## Deployment
 
-### Production: WordPress FTP
+The site is hosted at `pressthink.org/j/rosen-archive/`. Deploy by uploading changed files via FTP to `/wp-content/rosen-archive/`. The complete file-by-file deploy manifest (what to upload, what to exclude) lives in `DEPLOYMENT.md`. The end-to-end record-add workflow for non-technical curators lives in `ADDING-RECORDS.md`.
 
-The site is hosted at `pressthink.org/j/rosen-archive/`. Deploy by uploading changed files via FTP.
+Short version:
 
-To deploy:
-1. Edit source files as needed
-2. Regenerate JSON if data changed: `node data/export-archive-data.js`
-3. Bump the version in `index.html`, `version.json`, and all `?v=` import strings
-4. Upload changed files via FTP
+1. Edit source files as needed.
+2. Regenerate JSON if data changed: `node data/export-archive-data.js`.
+3. Bump the version in `index.html`, `version.json`, and all `?v=` import strings to bust the Cloudflare cache.
+4. Upload only the files that changed via FTP.
 
-Do not upload CSVs, backup files, screenshots, or the entire repo — only the files that changed. After upload, increment `?v=` query parameters on all JS/CSS imports to bust CloudFlare cache.
-
-### Updating archive data
-
-1. Edit source CSV: `data/archive_records-public.csv`
-2. Regenerate JSON: `node data/export-archive-data.js`
-3. Upload updated JSON files via FTP
-4. Bump version strings for cache busting
+Pillar 3a (in-flight) automates this for record submissions via `backend/submission_server/` and the `submit-record.yml` / `sweep-stuck-rows.yml` workflows — see those files for the current state.
 
 ## Backend data pipeline
 
@@ -354,9 +331,10 @@ Supports: Articles, Videos, Twitter/X, Tumblr, Newspaper Clippings (PDF OCR).
 
 ## Known issues
 
-- Social media records (~29,000) have generic titles ("Tweet by Jay Rosen", "Post by Jay Rosen"). Fixing this would require AI-based title generation from post content.
+- Social media records (~29,700) have generic titles ("Tweet by Jay Rosen", "Post by Jay Rosen"). Fixing this would require AI-based title generation from post content.
 - Browser localStorage can fill up on the live site due to data size. Caching is disabled as a workaround.
 - Thread records have placeholder titles ("[Bluesky Thread]") — needs content-based title generation.
-- 2 records have no recoverable URL or digital copy: RECORD-00663 (The Baffler issue 12, March 1999 — print-only; Baffler's web archive only goes back to ~2010) and RECORD-00667 (Pew Center for Civic Journalism, ~2000 — defunct in 2003; speeches/research/civic catalog indexes enumerated May 2026 with no Rosen entries; likely a print monograph). Recovery would need library microfilm or contact with the publications. RECORD-00673 (The Nation), 00693, 00694 (HuffPost) were URL-recovered via Wayback CDX search in May 2026. See issues #199 and #207.
+- Roughly 200 records have zero extracted relationships, most because their `raw_text` column is empty (issues #207 / #211). Extraction can be rerun once the raw_text gap-fill in issue #208 (PressThink sweep) and #209 (HuffPost sweep) lands.
+- 16 records still have `verified=false`. Recovery work is tracked in issue #199 (sub-batches in issue #242 and PR #244/#253). A small set is genuinely unrecoverable — print-only or vanished publications (e.g. The Baffler issue 12 from 1999; the defunct Pew Center for Civic Journalism's print monograph from ~2000).
 - `archive.pressthink.org` subdomain has a TLS certificate issue. Records using that subdomain correctly use `http://` URLs — browsers handle these fine but HTTPS fetch will fail.
 - Bluesky thread links use `embed.bsky.app` (unauthenticated) rather than `bsky.app`. If Bluesky changes the embed subdomain, update `ThreadModal.js` and `RecordModal.js`.

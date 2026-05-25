@@ -570,32 +570,67 @@ The initial development in June 2025 was plagued by environment issues beyond th
 
 ## Current state
 
-As of December 2025, the archive contains:
+As of 2026-05-25, the archive contains:
 
 | Metric | Value |
 |--------|-------|
-| Archive records (articles, essays, etc.) | 940 |
-| Social media posts (Twitter + Bluesky) | ~29,100 |
-| Tumblr posts | 138 |
-| Newspaper clippings | 83 |
-| Thread records | 10 |
-| Named entities | ~5,061 |
-| Entity relationships | ~5,084 |
-| Dissertation tools | 9 |
-| CI/CD pipelines | 5 |
+| Archive records (articles, essays, etc.) | 1,030 (800 RECORD, 137 TUMBLR, 83 CLIP, 10 THREAD) |
+| Social media posts (Twitter + Bluesky) | ~29,700 |
+| Named entities | 5,036 |
+| Entity relationships | 4,666 |
+| Dissertation tools (live) | 3 (reader, foreword, network-effect) |
+| Dissertation tools (retired to `archived/dissertation-tools/`) | 8 (comparison, concepts, context, excerpts, faq, glossary, source, timeline) |
+| CI/CD workflows | 9 |
 | Era classifications | 8 (non-overlapping) |
 | Key concept taxonomy | 13 concepts |
 
-The archive is live at `pressthink.org/j/rosen-archive/`, hosted as static files on WordPress. The frontend uses zero-build React via CDN with hash-based SPA routing. The backend is a Poetry-managed Python package. Data flows from Google Sheets through CSV to static JSON. CI/CD runs on GitHub Actions with frontend validation, backend tests, and backend linting pipelines.
+The archive is live at `pressthink.org/j/rosen-archive/`, hosted as static files on WordPress. The frontend uses zero-build React via CDN with hash-based SPA routing. The backend is a Poetry-managed Python package. Data flows from Google Sheets through CSV to static JSON. CI/CD runs on GitHub Actions with workflows for frontend validation, backend tests, backend linting, CodeQL security scanning, post-merge dashboard sync, two Pillar 3a record-submission workflows, and Claude code review.
 
 The frontend provides seven routes: the main archive view with record cards and filters, a folder view for browsing by category, the network explorer for entity visualization, an entity browser for search, the dissertation mind map and detail panel, an about page, and an analytics dashboard. Record deep links (`?record=RECORD_ID`) open modals on any route.
 
-The archive data spans four decades (1986-2025) across 36 years of publication history. The 8-era classification system maps the arc from early career and public journalism through the blogging era, social media transformation, Trump-era democratic crisis, COVID-19 misinformation challenges, and the current moment.
+The archive data spans 1986 through 2026 — 41 years total, anchored at the early end by the 1986 dissertation and at the late end by 2026 social posts. The bulk of the non-dissertation material runs from 1989 (the earliest record in `archive_records-public.csv`) onward, a 38-year window. The 8-era classification system maps the arc from early career and public journalism through the blogging era, social media transformation, Trump-era democratic crisis, COVID-19 misinformation challenges, and the current moment.
 
-Known issues remain: social media records (~29,000) have generic titles needing AI-based title generation, browser localStorage can fill up on the live site, thread records have placeholder titles, 138 Tumblr records await review for public export, 6 records have no recoverable URL, and the `archive.pressthink.org` subdomain has a TLS certificate issue.
+Known issues remain: social media records (~29,700) have generic titles needing AI-based title generation; browser localStorage can fill up on the live site; thread records have placeholder titles; ~200 records have zero extracted relationships because their `raw_text` is empty (issues #207/#211); 16 records still carry `verified=false`, a handful of which (e.g. The Baffler issue 12 from 1999 and the defunct Pew Center for Civic Journalism monograph from ~2000) are genuinely print-only and unrecoverable without library microfilm; and the `archive.pressthink.org` subdomain has a TLS certificate issue.
 
 The raw text content for each record was manually extracted by the project maintainer and is treated as sacred -- any data processing must preserve the `raw_text` field intact. CSV data must always be parsed with Python's `csv` module, not bash tools (grep, cut, awk), which cannot handle quoted fields with embedded commas. These are two rules learned through experience that apply to any future work on the archive.
 
 The dissertation content in `dissertationData.js` is similarly protected -- all quotes and attributions were verified against the original 1986 text and must not be modified, paraphrased, or fabricated.
+
+---
+
+## After the launch: post-publication infrastructure (January-May 2026)
+
+The December 2025 launch did not end the project. The five months that followed reshaped how the archive is maintained, expanded, and reasoned about.
+
+### Three pillars
+
+Post-launch work organized itself into three pillars that emerged from the actual gaps the December launch exposed.
+
+**Pillar 1 -- data quality and verification.** The launch shipped with roughly 800 archive records. By late May 2026 that grew to 1,030, largely from systematic recovery work. Pillar 1 covered URL fixes (e.g. RECORD-00602 and RECORD-00613 were pointing at the wrong overlay), title-drift bugs, hedging-language guards to flag AI-guesswork summaries, atomization decisions for compound records, thread-deduplication, and an ongoing reduction of the `verified=false` set from 16 down through batched Wayback CDX recoveries (issues #199, #242, #244, #253). The "raw_text is sacred" rule was reinforced repeatedly -- any data edit that destroys raw_text on existing rows is treated as a defect.
+
+**Pillar 2 -- archive sweep.** Discovery work in May 2026 inventoried what the archive was still missing: 146 PressThink posts (issue #208), 84 HuffPost posts (issue #209), additional candidates on podcast/YouTube and social/Substack surfaces (documented in `docs/research/2026-05-25-pillar2-*`). Roughly 200 records carry zero extracted relationships because their `raw_text` is empty (issues #207, #211); the entity extraction can be rerun once the raw_text gap-fill lands.
+
+**Pillar 3 -- submission and authoring.** The goal is a Jay-operable record submission workflow that does not require him to touch a CSV or an FTP client. Pillar 3a is the infrastructure spine: a Flask submission server at `backend/submission_server/` plus two GitHub Actions workflows (`submit-record.yml` and `sweep-stuck-rows.yml`) that pick up submissions, push CSV updates back through SFTP, and reconcile stuck rows. Pillar 3b (in design) is the authoring surface itself.
+
+### Workflow shifts
+
+The post-launch period crystallized a set of workflow rules that govern how new code lands. Most are externalized in `CLAUDE.md` and the `.github/copilot-instructions.md` file so both human and agent contributors operate by the same standards:
+
+- **PR workflow, no exceptions.** Every change goes through a branch, a PR, and Copilot review. Merges wait for an explicit human "merge" -- agents never self-merge. The Copilot PR-bot reviews once per PR; pushing fixes refreshes CI but does not re-trigger Copilot, which keeps GitHub Actions usage predictable.
+- **Pre-PR Codex review.** Substantive multi-file PRs run `codex exec review --uncommitted` locally before `gh pr create`. Findings that would have cost an Actions burn become free fixes pre-open.
+- **Bundle related PRs.** Five PRs that touch the same files become one PR. The phrase that captures it is "slow is smooth, smooth is fast."
+- **Empirically verify documentation.** When a doc says "the system does X," check that the system actually does X before relying on the doc.
+
+### Tooling around the editing
+
+A local preview server (`scripts/preview-server.js`) and a companion accessibility audit (`scripts/preview-audit.js`, Playwright + axe-core) are in flight in PR #257 so the archive can be reviewed at production fidelity without an FTP round-trip. The audit walks the live routes at mobile and desktop viewports, screenshots each, and writes a per-route HTML report. Together they shorten the "did I just break the live site?" loop from minutes to seconds. This section will be updated to reflect shipped state once #257 merges.
+
+### What the post-launch period revealed
+
+The launch made the archive's structure visible to outside readers for the first time. That surfaced two categories of work that had been invisible: factual drift in claims about the archive (counts, tool inventories, devDep lists in docs) and structural drift in the data itself (records with empty raw_text, URL pairs pointing at the wrong overlay, threads with placeholder titles). Both categories had been growing in the background throughout 2025; the December launch exposed them and the May 2026 sweep made them quantifiable.
+
+The post-launch infrastructure is, in that sense, the archive learning to look at itself.
+
+---
 
 The project represents an ongoing effort to preserve and make accessible four decades of journalism criticism. It serves as both a practical research tool and a model for digital archival projects that combine human curation with AI-powered analysis. The combination of entity extraction, relationship mapping, statistical analysis, and interactive tools positions it as a working example of digital humanities infrastructure -- one that moved from preserving individual works to mapping an intellectual landscape.
