@@ -48,8 +48,7 @@ def get_sheet():
         'https://www.googleapis.com/auth/drive'
     ]
 
-    creds_path = project_root / 'google_credentials.json'
-    creds = Credentials.from_service_account_file(str(creds_path), scopes=scopes)
+    creds = Credentials.from_service_account_file(str(CREDS_PATH), scopes=scopes)
     client = gspread.authorize(creds)
 
     # Get the spreadsheet
