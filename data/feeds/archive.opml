@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen Digital Archive</title>
-    <dateCreated>Mon, 25 May 2026 03:28:39 GMT</dateCreated>
-    <dateModified>Mon, 25 May 2026 03:28:39 GMT</dateModified>
+    <dateCreated>Mon, 25 May 2026 12:12:55 GMT</dateCreated>
+    <dateModified>Mon, 25 May 2026 12:12:55 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -380,7 +380,7 @@
       </outline>
     </outline>
     <outline text="By Category">
-      <outline text="Press &amp; Media Criticism (23430)" type="category">
+      <outline text="Press &amp; Media Criticism (23429)" type="category">
         <outline text="Jay Rosen on the digital revolution that wasn&apos;t" type="link" url="https://www.cjr.org/kicker/jay-rosen-digital-revolution-that-wasnt.php"/>
         <outline text="I send my questions about that to" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p"/>
         <outline text="Many of you, I know, receive a lot of national news, but care a lot about local" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4ecwzqx322p"/>
@@ -407,7 +407,7 @@
         <outline text="&quot;There are positive developments in local news but they’re being swamped by the..." type="link" url="https://x.com/jayrosen_nyu/status/1981021320079896971"/>
         <outline text="&quot;If you had enough money to buy ads, you could reach the voters you wanted to..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3n33q3xbk2i"/>
       </outline>
-      <outline text="Journalism Theory &amp; Practice (8342)" type="category">
+      <outline text="Journalism Theory &amp; Practice (8340)" type="category">
         <outline text="I send my questions about that to" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p"/>
         <outline text="I have a lurid fascination with interviews that become trainwrecks" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e3rgesbk24"/>
         <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/"/>
@@ -515,14 +515,13 @@
         <outline text="Please understand the point Dylan Byers made here" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2f4fa6e7s2n"/>
         <outline text="It&apos;s in the body of the first post" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2chjow4a22t"/>
       </outline>
-      <outline text="Journalism Education (676)" type="category">
+      <outline text="Journalism Education (675)" type="category">
         <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/"/>
         <outline text="Thanks to Dan Kennedy for this post about my next gig after retiring from NYU&apos;s..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3d2t6wu4k26"/>
         <outline text="From a new post of mind, explaining the role I am taking in News Creator Corps" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2rfv26rmc2t"/>
         <outline text="From a new post of mind, explaining the role I am taking in News Creator Corps" type="link" url="https://x.com/jayrosen_nyu/status/1976300493132423189"/>
         <outline text="From my new post" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2pcnuva2k2i"/>
         <outline text="Thank you, Matthieu" type="link" url="https://x.com/jayrosen_nyu/status/1976007582629400626"/>
-        <outline text="From my new post" type="link" url="https://x.com/jayrosen_nyu/status/1975999179282579507"/>
         <outline text="Congrats, Lawrence! And relax" type="link" url="https://x.com/jayrosen_nyu/status/1975945649146548275"/>
         <outline text="Some more personal news: October 2025" type="link" url="https://pressthink.org/2025/10/some-more-personal-news-october-2025/"/>
         <outline text="Now that&apos;s pedagogical" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lzpgizwcy22a"/>
@@ -541,6 +540,7 @@
         <outline text="Thanks, Ryan" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lrizoqu2gs27"/>
         <outline text="To my academic friends" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lrixnfu7q22m"/>
         <outline text="Wow. So many things I left out. That&apos;s one of them. For a couple years I was..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lrix52tx6k2m"/>
+        <outline text="Oh, I am so glad you got to see one of those nights" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lrhfy7dlfs2p"/>
       </outline>
     </outline>
     <outline text="RSS Feeds" type="include">

@@ -177,6 +177,30 @@ describe('social_posts.csv', () => {
     assert.strictEqual(unknownCats.size, 0,
       `Non-canonical categories found: ${[...unknownCats].sort().join(', ')}`);
   });
+
+  it('no URL collides with a non-thread archive_records URL (#163)', () => {
+    // Cross-source dedup: a URL that lives as a regular article record (RECORD-*,
+    // TUMBLR-*, CLIP-*) should not also appear as a social post — otherwise the
+    // archive shows the same content twice. THREAD-* records are excluded by
+    // design: a thread record's url field is its root social post's URL, and
+    // the constituent social posts are intentionally kept in social_posts.csv
+    // so thread-detection can reconstruct the conversation.
+    const id = (r) => r.id || r.ID || '';
+    const nonThreadArticleUrls = new Set(
+      archiveRecords
+        .filter(r => !id(r).startsWith('THREAD-'))
+        .map(r => (r.url || '').trim())
+        .filter(Boolean)
+    );
+    const collisions = socialPosts
+      .filter(s => {
+        const u = (s.url || '').trim();
+        return u && nonThreadArticleUrls.has(u);
+      })
+      .map(id);
+    assert.strictEqual(collisions.length, 0,
+      `${collisions.length} social posts share a URL with a non-thread article record: ${collisions.slice(0, 5).join(', ')}`);
+  });
 });
 
 // ============================================
