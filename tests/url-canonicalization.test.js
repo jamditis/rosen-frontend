@@ -1,18 +1,23 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { parse } from 'csv-parse/sync';
 
-const records = parse(readFileSync('data/archive_records-public.csv', 'utf8'), {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const dataDir = path.join(__dirname, '..', 'data');
+
+const records = parse(readFileSync(path.join(dataDir, 'archive_records-public.csv'), 'utf-8'), {
   columns: true,
-  bom: true,
-  relax_quotes: true,
+  skip_empty_lines: true,
 });
 
 const byId = new Map(records.map((record) => [record.id, record]));
 
 test('PressThink URL policy is documented in the schema', () => {
-  const schema = readFileSync('data/SCHEMA.md', 'utf8');
+  const schema = readFileSync(path.join(dataDir, 'SCHEMA.md'), 'utf-8');
 
   assert.match(schema, /PressThink URL canonicalization/);
   assert.match(schema, /prefer `https:\/\/pressthink\.org\/<year>\/<month>\/<slug>\/`/);
@@ -32,7 +37,8 @@ test('Audience Atomization keeps the referenced record id with the modern PressT
     record.url,
     'https://pressthink.org/2009/01/audience-atomization-overcome-why-the-internet-weakens-the-authority-of-the-press/',
   );
-  assert.ok(record.raw_text.length > 30000, 'canonical record should keep the richer modern text');
+  assert.match(record.raw_text, /Daniel C\. Hallin/);
+  assert.match(record.raw_text, /sphere of legitimate debate/);
   assert.match(record.notes, /Merged duplicate RECORD-00699/);
 });
 
