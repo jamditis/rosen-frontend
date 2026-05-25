@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "generated": "2026-05-25T02:30:30.028Z",
+  "generated": "2026-05-25T02:35:09.379Z",
   "baseUrl": "https://pressthink.org/j/rosen-archive",
   "feeds": [
     {
@@ -44,14 +44,14 @@
       "path": "./data/feeds/categories/politics-democracy.xml"
     },
     {
-      "name": "eras - democracy-in-crisis-20s-",
-      "url": "https://pressthink.org/j/rosen-archive/data/feeds/eras/democracy-in-crisis-20s-.xml",
-      "path": "./data/feeds/eras/democracy-in-crisis-20s-.xml"
-    },
-    {
       "name": "eras - platform-transition-future-models-2021-present-",
       "url": "https://pressthink.org/j/rosen-archive/data/feeds/eras/platform-transition-future-models-2021-present-.xml",
       "path": "./data/feeds/eras/platform-transition-future-models-2021-present-.xml"
+    },
+    {
+      "name": "eras - democracy-in-crisis-20s-",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/eras/democracy-in-crisis-20s-.xml",
+      "path": "./data/feeds/eras/democracy-in-crisis-20s-.xml"
     },
     {
       "name": "eras - trump-era-democratic-crisis-2016-2020-",
