@@ -69,14 +69,20 @@ Each record in the archive represents a piece of Jay Rosen's work.
 }
 ```
 
-### Era Values
+### Era Values (canonical 8)
 
 | Era | Years | Description |
 |-----|-------|-------------|
 | Public Journalism (90s) | 1986-1999 | Public/civic journalism movement |
-| Web & Blogging (00s) | 2000-2009 | Rise of blogs and online journalism |
-| View from Nowhere (10s) | 2010-2019 | Critiques of false balance |
-| Democracy in Crisis (20s) | 2020-present | Post-truth, platform power |
+| Blogging Launch & Digital Disruption (2000-2004) | 2000-2004 | Early blogosphere; PressThink founding (2003) |
+| Peak Blogging & Citizen Journalism (2005-2009) | 2005-2009 | Networked press, citizen journalism, NewAssignment.net |
+| Social Media & Financial Crisis (2010-2015) | 2010-2015 | Twitter dominance, news industry contraction, audience atomization |
+| View from Nowhere (10s) | 2010-2019 | Critiques of false balance and journalistic neutrality |
+| Trump Era & Democratic Crisis (2016-2020) | 2016-2020 | Press under direct political attack, emergency-mode coverage |
+| Democracy in Crisis (20s) | 2020-present | Post-truth, platform power, election denialism |
+| Platform Transition & Future Models (2021-Present) | 2021-present | Twitter exodus, Bluesky/Mastodon, subscription / membership models |
+
+The four "decade-bucket" eras (Public Journalism (90s), View from Nowhere (10s), Democracy in Crisis (20s), and the implicit-bucket coverage from the more granular eras) overlap with the four event-grouped eras (Blogging Launch, Peak Blogging, Trump Era, Platform Transition). Records can use whichever taxonomy best fits their content; both sets are canonical. Records covering the 2000s use the granular two-era split (2000-2004 vs 2005-2009) rather than a single 'Web & Blogging' bucket — drift-fix PR landed this normalization (task #11).
 
 ### Category Values
 
