@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen Digital Archive</title>
-    <dateCreated>Mon, 25 May 2026 12:18:42 GMT</dateCreated>
-    <dateModified>Mon, 25 May 2026 12:18:42 GMT</dateModified>
+    <dateCreated>Mon, 25 May 2026 13:44:39 GMT</dateCreated>
+    <dateModified>Mon, 25 May 2026 13:44:39 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -380,7 +380,7 @@
       </outline>
     </outline>
     <outline text="By Category">
-      <outline text="Press &amp; Media Criticism (23430)" type="category">
+      <outline text="Press &amp; Media Criticism (23429)" type="category">
         <outline text="Jay Rosen on the digital revolution that wasn&apos;t" type="link" url="https://www.cjr.org/kicker/jay-rosen-digital-revolution-that-wasnt.php"/>
         <outline text="I send my questions about that to" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p"/>
         <outline text="Many of you, I know, receive a lot of national news, but care a lot about local" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4ecwzqx322p"/>
@@ -407,7 +407,7 @@
         <outline text="&quot;There are positive developments in local news but they’re being swamped by the..." type="link" url="https://x.com/jayrosen_nyu/status/1981021320079896971"/>
         <outline text="&quot;If you had enough money to buy ads, you could reach the voters you wanted to..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3n33q3xbk2i"/>
       </outline>
-      <outline text="Journalism Theory &amp; Practice (8342)" type="category">
+      <outline text="Journalism Theory &amp; Practice (8340)" type="category">
         <outline text="I send my questions about that to" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p"/>
         <outline text="I have a lurid fascination with interviews that become trainwrecks" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e3rgesbk24"/>
         <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/"/>
@@ -461,7 +461,7 @@
         <outline text="Thanks, Adam" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m26hqasqdc2b"/>
         <outline text="Here&apos;s a key point about the Pentagon&apos;s new policy for handing the press: check..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m22rw2vlak2w"/>
       </outline>
-      <outline text="Audience &amp; Public Engagement (3742)" type="category">
+      <outline text="Audience &amp; Public Engagement (3741)" type="category">
         <outline text="Many of you, I know, receive a lot of national news, but care a lot about local" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4ecwzqx322p"/>
         <outline text="Thanks, Casey" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e6y3jkhk2p"/>
         <outline text="You make good points" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xm3cs7kk2s"/>
@@ -488,7 +488,7 @@
         <outline text="Miss it this week?" type="link" url="https://x.com/jayrosen_nyu/status/1977079042567442658"/>
         <outline text="Thank you!" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2phhcovqs2t"/>
       </outline>
-      <outline text="Technology &amp; Digital Media (2842)" type="category">
+      <outline text="Technology &amp; Digital Media (2841)" type="category">
         <outline text="Jay Rosen on the digital revolution that wasn&apos;t" type="link" url="https://www.cjr.org/kicker/jay-rosen-digital-revolution-that-wasnt.php"/>
         <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/"/>
         <outline text="Sarah Longwell" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zvjrplq22z"/>
