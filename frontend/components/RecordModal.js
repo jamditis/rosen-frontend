@@ -259,15 +259,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
               `;
             })()}
 
-            ${/* Check if this is a thread record - display ThreadModal or standard summary */
-              (() => {
-                if (displayRecord.id?.startsWith('THREAD-')) {
-                  console.log('[RecordModal] THREAD record detected:', displayRecord.id);
-                  console.log('[RecordModal] Has thread_data:', !!displayRecord.thread_data);
-                  console.log('[RecordModal] thread_data keys:', displayRecord.thread_data ? Object.keys(displayRecord.thread_data) : 'none');
-                }
-                return displayRecord.id?.startsWith('THREAD-') && displayRecord.thread_data;
-              })() ? html`
+            ${displayRecord.id?.startsWith('THREAD-') && displayRecord.thread_data ? html`
               <${ThreadModal} record=${displayRecord} />
             ` : html`
               <div className="prose prose-stone max-w-none">
