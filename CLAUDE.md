@@ -87,7 +87,7 @@ Counts verified against current `data/` on 2026-05-25:
 ### Regenerating JSON from CSV
 
 ```bash
-npm install          # first time only — installs csv-stringify (dependencies) and csv-parse (devDependencies); csv-stringify is also imported by the data/fixes/*.js maintenance scripts
+npm install          # first time only — installs runtime deps (csv-stringify, playwright) and dev deps (csv-parse). csv-stringify is also imported by the data/fixes/*.js maintenance scripts; playwright is used by the WCAG audit + the dissertation reader validator
 node data/export-archive-data.js
 ```
 
@@ -152,9 +152,10 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── reader/                      # Full text reader with selection sharing
 │   ├── foreword/                    # Foreword page
 │   └── network-effect/              # Network film analysis
-│   # Note: an earlier set of 8 standalone tools (comparison, concepts,
-│   # context, excerpts, faq, glossary, source, timeline) was retired and
-│   # now lives in archived/dissertation-tools/ for reference.
+│   # Note: an earlier set of 7 standalone tools (comparison, concepts,
+│   # context, excerpts, faq, glossary, timeline) was retired and now lives
+│   # in archived/dissertation-tools/ for reference, alongside a non-tool
+│   # source/ bundle (dissertation PDF + transcribed markdown + helper).
 │
 ├── dissertation-launch/             # Standalone dissertation launch landing page
 │
@@ -197,7 +198,7 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── web/                         # Win95-themed promotional site
 │   ├── byok-chat/                   # Archived BYOK Claude chat
 │   ├── academic-testimonials/       # Archived testimonials
-│   ├── dissertation-tools/          # 8 retired dissertation tools (comparison, concepts, context, excerpts, faq, glossary, source, timeline)
+│   ├── dissertation-tools/          # 7 retired dissertation tools (comparison, concepts, context, excerpts, faq, glossary, timeline) + a source/ bundle (PDF + markdown + helper script)
 │   └── docs/                        # Older docs (legacy designs, plans)
 │
 ├── docs/                            # Project documentation

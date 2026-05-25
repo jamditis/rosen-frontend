@@ -26,7 +26,7 @@ Open http://localhost:8000. That's it — no build step, no `npm install` needed
 - `index.html` is the entry point. It loads React, HTM, and other libraries from `esm.sh` CDN via an import map.
 - `frontend/` contains the React app. All components use HTM tagged templates (`` html`...` ``) instead of JSX.
 - `data/` contains the archive data as JSON files, generated from CSV source files.
-- `dissertation/` contains 9 standalone tools for the dissertation (reader, glossary, comparison, etc.), each in its own subdirectory with an `index.html`.
+- `dissertation/` contains 3 live presentation tools (`reader/`, `foreword/`, `network-effect/`), each in its own subdirectory with an `index.html`. An earlier set of 7 tools (comparison, concepts, context, excerpts, faq, glossary, timeline) is retired to `archived/dissertation-tools/`; that path also holds a `source/` bundle (PDF + transcribed markdown + a build helper), which is not a standalone tool.
 - `frontend/dist/tailwind.css` is a pre-built Tailwind CSS file. No build needed unless you change styles.
 
 ## Updating the archive data
@@ -59,7 +59,7 @@ The site is hosted at `pressthink.org/j/rosen-archive/` via FTP to a WordPress s
 
 1. Edit source files as needed.
 2. If data changed: `npm install` (first time only), then `node data/export-archive-data.js`.
-3. Bump the version string in `index.html`, `version.json`, and all `?v=` import parameters across JS files (this busts Cloudflare cache).
+3. Bump the version string in `index.html`, `version.json`, and every `?v=` query parameter on versioned imports — both JS (`./frontend/index.js?v=…`) and CSS (`./frontend/index.css?v=…`, `./frontend/dist/tailwind.css?v=…`). `tests/version-consistency.test.js` enforces a single shared `?v=` only across `index.html` and `frontend/**.js`; it does NOT scan the dissertation subpages, archived tools, or feature pages. Stale `?v=` values outside that scope will pass CI but leave cached assets live in production, so sweep the whole tree by hand on a version bump.
 4. Upload only the files that changed via FTP to `/wp-content/rosen-archive/`.
 
 **Do not upload:** CSVs, backup files, screenshots, the `backend/`, `tests/`, `docs/`, `archived/`, `.github/`, `.claude/`, or `node_modules/` trees. See `DEPLOYMENT.md` for the full exclusion list.
@@ -84,7 +84,7 @@ frontend/                     React application
   services/                   Data loading, routing, SQLite
   dist/tailwind.css           Pre-built styles
 data/                         CSV sources + generated JSON
-dissertation/                 9 standalone dissertation tools
+dissertation/                 3 live dissertation tools (7 earlier ones, plus a source bundle, in archived/dissertation-tools/)
 features/                     Standalone feature pages
 backend/                      Python data pipeline (scraping, AI analysis)
 tools/active/                 Dev tools (data explorer, data viz)

@@ -2,9 +2,9 @@
 
 Project version history for the Jay Rosen Internet Archive.
 
-This is an archival record condensed from the full PROJECT_LOG.md (4,797 lines). Each entry preserves what was built, why decisions were made, what challenges arose, and key metrics and outcomes. Code snippets, file lists, bash commands, and session continuation instructions have been removed -- the git history and PROJECT_LOG.md contain those details.
+This is an archival record condensed from session notes. Each entry preserves what was built, why decisions were made, what challenges arose, and key metrics and outcomes. Code snippets, file lists, bash commands, and session continuation instructions have been removed — the git history contains those details.
 
-Versions are listed in reverse chronological order within major version groups. The project began as a Python data pipeline (v0.0.1, June 2025) and grew into a static React frontend with 1,030 archive records, 3 live dissertation presentation surfaces (with 8 earlier tools retired to `archived/dissertation-tools/`), ~29,700 social media posts, and a knowledge graph of 5,036 named entities and 4,666 relationships spanning four decades of journalism criticism.
+Versions are listed in reverse chronological order within major version groups. The project began as a Python data pipeline (v0.0.1, June 2025) and grew into a static React frontend with 1,030 archive records, 3 live dissertation presentation surfaces (with 7 earlier tools retired to `archived/dissertation-tools/` alongside a non-tool source bundle), ~29,700 social media posts, and a knowledge graph of 5,036 named entities and 4,666 relationships spanning four decades of journalism criticism.
 
 A note on versioning: the cache-bust version embedded in `index.html` and `version.json` (currently `v3.3.0`) increments per static-bundle change. The release versions below (e.g. `[4.0.0]`) track milestones in the project's evolution. These are two related but distinct versioning schemes, intentionally separate.
 
@@ -32,7 +32,7 @@ Five months of work after the December 2025 public launch. No single version bum
 | Social media posts | ~29,100 | ~29,700 |
 | Named entities | ~5,061 | 5,036 (some duplicates collapsed during quality work) |
 | Entity relationships | ~5,084 | 4,666 (post-cleanup; false relationships removed) |
-| Live dissertation surfaces | 9 tools | 3 surfaces (reader, foreword, network-effect); the other 8 moved to `archived/dissertation-tools/` |
+| Live dissertation surfaces | 9 tools | 3 surfaces (reader, foreword, network-effect); 7 of the rest moved to `archived/dissertation-tools/` as standalone tools, with a separate `source/` bundle (PDF + markdown + build helper) archived alongside |
 | CI/CD workflows | 5 | 9 (added CodeQL, post-merge dashboard sync, Pillar 3a submit-record + sweep-stuck-rows, Claude review) |
 
 **Pillar 1 -- data quality and verification.** Series of focused PRs against the CSV source of truth and the supporting tests. Highlights: PR #235/#236 fixed wrong-overlay URLs on RECORD-00602/00613 and introduced a hedging-language guard that flags AI-guesswork summaries before they ship; PR #244 and #253 recovered 7 of the original 16 `verified=false` records via Wayback CDX search, with issue #242 tracking the next 9-record batch; PR #233 added a thread-dedup test; PR #210 / #254 fixed 4 title-drift bugs and produced a curator-decisions findings doc (`docs/issue-210-duplicate-findings.md`). The "raw_text is sacred" rule was reinforced as a hard invariant -- any edit that shortens or removes `raw_text` on existing rows is treated as a defect.
@@ -50,7 +50,7 @@ Five months of work after the December 2025 public launch. No single version bum
 - Bundle related PRs. Five PRs that touch the same files become one PR. "Slow is smooth, smooth is fast."
 - Empirically verify documentation. When a doc says "the system does X," check that the system actually does X before relying on the doc. This sweep itself is an instance of that rule.
 
-**Documentation sweep (this entry).** A retroactive doc sweep against the actual repo state on 2026-05-25 reconciled drift in `README.md`, `CLAUDE.md`, `ADDING-RECORDS.md`, and the narrative docs. Major drift items corrected: record counts (claimed 932, actual 1,030), dissertation tool count (claimed 9, actual 3 live + 8 archived), CI workflow count (claimed 5, actual 9), and the next-available record ID in the curator guide (`RECORD-00803` -> `RECORD-00902`). The sweep was driven by direct CSV inspection and `ls`/`grep` of the actual tree rather than trust in the prior docs. Codex review of the doc-sweep diff caught two would-be regressions before they shipped (a partial empirical check that misread the dependency split, and an "added" framing for the not-yet-merged preview tooling) — those got fixed in the same PR.
+**Documentation sweep (this entry).** A retroactive doc sweep against the actual repo state on 2026-05-25 reconciled drift in `README.md`, `CLAUDE.md`, `ADDING-RECORDS.md`, and the narrative docs. Major drift items corrected: record counts (claimed 932, actual 1,030), dissertation tool count (claimed 9, actual 3 live + 7 archived tools + a source bundle), CI workflow count (claimed 5, actual 9), and the next-available record ID in the curator guide (`RECORD-00803` -> `RECORD-00902`). The sweep was driven by direct CSV inspection and `ls`/`grep` of the actual tree rather than trust in the prior docs. Codex review of the doc-sweep diff caught two would-be regressions before they shipped (a partial empirical check that misread the dependency split, and an "added" framing for the not-yet-merged preview tooling) — those got fixed in the same PR.
 
 ---
 
