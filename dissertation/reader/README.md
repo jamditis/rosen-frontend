@@ -2,7 +2,7 @@
 
 A clean, accessible HTML reading experience for Jay Rosen's 1986 doctoral dissertation.
 
-> **Build pipeline disabled (see issue #229).** `index.html` is the canonical source. The `src/templates/shell.html` + `build-reader.py` pipeline below documents the original build, but the committed `index.html` has diverged with production features that aren't in the template. `build-reader.py` aborts with an error if run. Edit `index.html` directly; `src/css/` and `src/js/` are loaded by it at runtime and remain in active use.
+> **Build pipeline disabled (see issue #229).** `index.html` is the canonical source. The legacy `src/templates/shell.html` + `build-reader.py` pipeline has been disabled — `build-reader.py` aborts with an error if run — because the committed `index.html` has diverged with production features that are not in the template. Edit `index.html` directly; `src/css/` and `src/js/` are loaded by it at runtime and remain in active use.
 
 ## Overview
 

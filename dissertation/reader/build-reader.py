@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Build script for dissertation reader.
-Converts markdown to HTML and creates the final dist/index.html.
+Converts markdown to HTML and writes dissertation/reader/index.html.
 
 DO NOT RUN. The committed dissertation/reader/index.html has diverged from
 src/templates/shell.html. A rebuild would silently delete production features
