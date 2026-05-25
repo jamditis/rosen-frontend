@@ -1,13 +1,12 @@
-#!/usr/bin/env python3
 """
 Mastodon differential backfill for the Rosen archive.
 
-Mirrors the shape and conventions of ``bluesky_feed_backfill.py``. Walks Jay
-Rosen's Mastodon statuses on mastodon.social and appends new own-original
-posts to ``data/social_posts.csv``. Reblogs of other accounts are dropped on
-the same grounds as Bluesky reposts: if we ingested them they would be
+Walks Jay Rosen's Mastodon statuses on mastodon.social and appends new
+own-original posts to ``data/social_posts.csv``. Reblogs of other accounts
+are dropped on attribution grounds: if we ingested them they would be
 misattributed to Jay (his URL + his author tag, but the original words belong
-to someone else).
+to someone else). Same shape as other social-platform differential backfill
+scripts in this directory.
 
 Mechanism:
 - Page ``/api/v1/accounts/{id}/statuses?limit=40&max_id=<id>``, newest first.
@@ -22,15 +21,15 @@ Mechanism:
 
 Designed to be re-run safely (idempotent — already-present URLs are skipped).
 
-Usage:
+Usage (run via Poetry per backend convention):
     # Sample first run for review:
-    python backend/scripts/mastodon_feed_backfill.py --sample 20
+    poetry run python backend/scripts/mastodon_feed_backfill.py --sample 20
 
     # Full differential backfill:
-    python backend/scripts/mastodon_feed_backfill.py --all
+    poetry run python backend/scripts/mastodon_feed_backfill.py --all
 
     # Dry-run (fetch + show what would change, no write):
-    python backend/scripts/mastodon_feed_backfill.py --all --dry-run
+    poetry run python backend/scripts/mastodon_feed_backfill.py --all --dry-run
 
 Public Mastodon API, no auth required. Rate limit is 300 req per 5 min
 window per IP — at 40 statuses per page and ~535 statuses, ~14 requests
@@ -395,6 +394,16 @@ def main():
                 f"  Only in script: {sorted(diff_only_in_script)}\n"
                 f"Fix SCHEMA_FIELDS in this script before writing."
             )
+        # Same columns, different order — DictWriter would rewrite the
+        # whole file with reordered columns, silently breaking downstream
+        # column-position-dependent consumers. Refuse and let the human
+        # decide whether to reorder the CSV or the script.
+        raise SystemExit(
+            f"Schema column ORDER mismatch (same set, different order):\n"
+            f"  CSV header order:    {fieldnames}\n"
+            f"  Script SCHEMA_FIELDS: {SCHEMA_FIELDS}\n"
+            f"Reorder one to match the other before writing."
+        )
 
     with atomic_csv_write(SOCIAL_POSTS_CSV) as out:
         writer = csv.DictWriter(out, fieldnames=fieldnames,
