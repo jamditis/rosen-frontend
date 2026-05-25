@@ -14,7 +14,15 @@ This is an inventory + recommendation. Issues only get filed for the categories 
 
 The first version of this doc undercounted what's in the archive because it only audited `archive_records-public.csv` (1,007 records). The actual archive also includes `data/social_posts.csv` (58,385 rows — the granular social-platform corpus that the main CSV's THREAD-NNNNN records reference but don't enumerate). Numbers below are corrected.
 
-Lesson captured for future inventory work: audit every file in `data/`, not just the main records CSV.
+The first version also overestimated implementation effort because it didn't audit `backend/src/rosen_scraper/processors/` and `backend/scripts/`. A canonical Bluesky pipeline already exists:
+- `backend/src/rosen_scraper/processors/bluesky_processor.py` — per-post scraper
+- `backend/scripts/reconstruct_bluesky_threads.py` — rebuilds thread hierarchies from raw posts
+- `backend/scripts/generate_thread_records.py` — produces the THREAD-NNNNN main-CSV records
+- `backend/scripts/generate_thread_relationships.py` — produces extracted_relationships entries
+
+Backfill is therefore "re-run the existing pipeline against fresh data" plus dedup, NOT "build a new scraper." Effort estimates per category are reduced accordingly.
+
+Lesson captured for future inventory work: audit every file in `data/` AND `backend/src/rosen_scraper/processors/` AND `backend/scripts/`, not just the main records CSV.
 
 ## Cross-reference summary (corrected)
 
@@ -43,7 +51,8 @@ Lesson captured for future inventory work: audit every file in `data/`, not just
 - **Backfill method**: `https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?actor=jayrosen.bsky.social` — cursor-paginated, no auth, no rate-limit friction at 10 req/s
 - **Dedup**: 3,042 posts already in `social_posts.csv`; backfill adds the ~1,183 missing (post date later than the existing corpus's most recent date, OR post not in the existing URL set)
 - **Era mapping**: all posts fall in "Platform Transition & Future Models (2021-Present)" — no era taxonomy work needed
-- **Estimated effort**: ~2 hours for the scraper + ~1 hour for dedup + CSV append + JSON regen + test
+- **Pipeline**: re-run existing `bluesky_processor.py` + `reconstruct_bluesky_threads.py` + `generate_thread_records.py` + `generate_thread_relationships.py`. NOT a from-scratch build.
+- **Estimated effort**: ~1 hour to wire up the differential entry point + run + verify + regen + test
 - **Estimated archive growth**: ~1,183 new social_posts.csv rows (~2% growth on the ~58k-row social corpus, not a 4x change)
 
 ### Mastodon — meaningful gap
