@@ -2,7 +2,7 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen Digital Archive - RSS Subscriptions</title>
-    <dateCreated>Mon, 25 May 2026 00:52:59 GMT</dateCreated>
+    <dateCreated>Mon, 25 May 2026 02:27:11 GMT</dateCreated>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
   <body>
@@ -15,8 +15,12 @@
     <outline text="Categories: Journalism education" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-education.xml"/>
     <outline text="Categories: Politics democracy" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/categories/politics-democracy.xml"/>
     <outline text="Eras: Democracy in crisis 20s " type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/eras/democracy-in-crisis-20s-.xml"/>
+    <outline text="Eras: Platform transition future models 2021 present " type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/eras/platform-transition-future-models-2021-present-.xml"/>
+    <outline text="Eras: Trump era democratic crisis 2016 2020 " type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/eras/trump-era-democratic-crisis-2016-2020-.xml"/>
     <outline text="Eras: View from nowhere 10s " type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/eras/view-from-nowhere-10s-.xml"/>
-    <outline text="Eras: Web blogging 00s " type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/eras/web-blogging-00s-.xml"/>
+    <outline text="Eras: Social media financial crisis 2010 2015 " type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/eras/social-media-financial-crisis-2010-2015-.xml"/>
+    <outline text="Eras: Peak blogging citizen journalism 2005 2009 " type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/eras/peak-blogging-citizen-journalism-2005-2009-.xml"/>
+    <outline text="Eras: Blogging launch digital disruption 2000 2004 " type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/eras/blogging-launch-digital-disruption-2000-2004-.xml"/>
     <outline text="Eras: Public journalism 90s " type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/eras/public-journalism-90s-.xml"/>
   </body>
 </opml>

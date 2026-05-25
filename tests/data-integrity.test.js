@@ -81,9 +81,13 @@ describe('archive-core.json', () => {
   it('all records have valid era values', () => {
     const validEras = new Set([
       "Public Journalism (90s)",
-      "Web & Blogging (00s)",
+      "Blogging Launch & Digital Disruption (2000-2004)",
+      "Peak Blogging & Citizen Journalism (2005-2009)",
+      "Social Media & Financial Crisis (2010-2015)",
       "View from Nowhere (10s)",
-      "Democracy in Crisis (20s)"
+      "Trump Era & Democratic Crisis (2016-2020)",
+      "Democracy in Crisis (20s)",
+      "Platform Transition & Future Models (2021-Present)"
     ]);
     for (const record of coreData.records) {
       assert.ok(validEras.has(record.era), `Record ${record.id} has invalid era: ${record.era}`);

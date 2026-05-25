@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "generated": "2026-05-25T00:52:59.366Z",
+  "generated": "2026-05-25T02:27:11.286Z",
   "baseUrl": "https://pressthink.org/j/rosen-archive",
   "feeds": [
     {
@@ -49,14 +49,34 @@
       "path": "./data/feeds/eras/democracy-in-crisis-20s-.xml"
     },
     {
+      "name": "eras - platform-transition-future-models-2021-present-",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/eras/platform-transition-future-models-2021-present-.xml",
+      "path": "./data/feeds/eras/platform-transition-future-models-2021-present-.xml"
+    },
+    {
+      "name": "eras - trump-era-democratic-crisis-2016-2020-",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/eras/trump-era-democratic-crisis-2016-2020-.xml",
+      "path": "./data/feeds/eras/trump-era-democratic-crisis-2016-2020-.xml"
+    },
+    {
       "name": "eras - view-from-nowhere-10s-",
       "url": "https://pressthink.org/j/rosen-archive/data/feeds/eras/view-from-nowhere-10s-.xml",
       "path": "./data/feeds/eras/view-from-nowhere-10s-.xml"
     },
     {
-      "name": "eras - web-blogging-00s-",
-      "url": "https://pressthink.org/j/rosen-archive/data/feeds/eras/web-blogging-00s-.xml",
-      "path": "./data/feeds/eras/web-blogging-00s-.xml"
+      "name": "eras - social-media-financial-crisis-2010-2015-",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/eras/social-media-financial-crisis-2010-2015-.xml",
+      "path": "./data/feeds/eras/social-media-financial-crisis-2010-2015-.xml"
+    },
+    {
+      "name": "eras - peak-blogging-citizen-journalism-2005-2009-",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/eras/peak-blogging-citizen-journalism-2005-2009-.xml",
+      "path": "./data/feeds/eras/peak-blogging-citizen-journalism-2005-2009-.xml"
+    },
+    {
+      "name": "eras - blogging-launch-digital-disruption-2000-2004-",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/eras/blogging-launch-digital-disruption-2000-2004-.xml",
+      "path": "./data/feeds/eras/blogging-launch-digital-disruption-2000-2004-.xml"
     },
     {
       "name": "eras - public-journalism-90s-",

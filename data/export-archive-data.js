@@ -22,9 +22,13 @@ const __dirname = path.dirname(__filename);
 // Era definitions (matching constants.js)
 const ERAS = [
   "Public Journalism (90s)",
-  "Web & Blogging (00s)",
+  "Blogging Launch & Digital Disruption (2000-2004)",
+  "Peak Blogging & Citizen Journalism (2005-2009)",
+  "Social Media & Financial Crisis (2010-2015)",
   "View from Nowhere (10s)",
-  "Democracy in Crisis (20s)"
+  "Trump Era & Democratic Crisis (2016-2020)",
+  "Democracy in Crisis (20s)",
+  "Platform Transition & Future Models (2021-Present)"
 ];
 
 // Dissertation record (matching archiveService.js)
@@ -62,10 +66,13 @@ function formatDate(str) {
 
 function getEra(dateStr) {
   const y = new Date(dateStr).getFullYear();
-  if (y < 2000) return ERAS[0];
-  if (y < 2010) return ERAS[1];
-  if (y < 2020) return ERAS[2];
-  return ERAS[3];
+  if (!y || Number.isNaN(y)) return '';
+  if (y < 2000) return 'Public Journalism (90s)';
+  if (y < 2005) return 'Blogging Launch & Digital Disruption (2000-2004)';
+  if (y < 2010) return 'Peak Blogging & Citizen Journalism (2005-2009)';
+  if (y < 2016) return 'Social Media & Financial Crisis (2010-2015)';
+  if (y < 2021) return 'Trump Era & Democratic Crisis (2016-2020)';
+  return 'Platform Transition & Future Models (2021-Present)';
 }
 
 function processRecord(row, index, type, relationshipsMap) {
@@ -131,7 +138,7 @@ function processRecord(row, index, type, relationshipsMap) {
     author: author,
     date: date,
     year: date ? date.split('-')[0] : '',
-    era: getEra(date),
+    era: ((row.era || row.Era || '').trim() || getEra(date)),
     pub: pub,
     url: rawUrl,
     summary: (row.summary || row.Summary || ''),

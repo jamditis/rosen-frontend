@@ -5,7 +5,7 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records from the Public Journalism (90s) era</description>
     <language>en-us</language>
-    <lastBuildDate>Mon, 25 May 2026 00:52:59 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 25 May 2026 02:27:11 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/eras/public-journalism-90s-.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen Digital Archive RSS Generator</generator>
   <item>
@@ -40,7 +40,7 @@
     <link>https://www.goodreads.com/book/show/139644.What_Are_Journalists_For_</link>
     <guid isPermaLink="true">https://www.goodreads.com/book/show/139644.What_Are_Journalists_For_</guid>
     <pubDate>Fri, 01 Jan 1999 00:00:00 GMT</pubDate>
-    <description>The Goodreads listing for Jay Rosen&apos;s 1999 book &quot;What Are Journalists For?&quot; published by Yale University Press. The book recounts the history of the public journalism movement, which emerged after the 1988 presidential election as a response to declining trust in the news media and public disillusionment with politics.</description>
+    <description>Jay Rosen&apos;s 1999 book (Yale University Press) on the public-journalism movement. Cleared raw_text 2026-05-25: Goodreads book ID 139644 was rebound upstream to a different title (Marie M. Clay), so the previously-scraped body was wrong-book content. Re-scrape from a stable source (publisher / library catalog) deferred to follow-up.</description>
     <category>Journalism Theory &amp; Practice</category>
     <category>Politics &amp; Democracy</category>
     <category>Press &amp; Media Criticism</category>

@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen Digital Archive</title>
-    <dateCreated>Mon, 25 May 2026 00:52:59 GMT</dateCreated>
-    <dateModified>Mon, 25 May 2026 00:52:59 GMT</dateModified>
+    <dateCreated>Mon, 25 May 2026 02:27:11 GMT</dateCreated>
+    <dateModified>Mon, 25 May 2026 02:27:11 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -61,7 +61,59 @@
         <outline text="Dems hope to shine with glitzy convention" type="link" url="https://www.newspapers.com/image/1144546575/" created="1992-07-08"/>
         <outline text="Who should the newspaper be published for?" type="link" url="https://www.newspapers.com/image/1125898881/" created="1992-01-29"/>
       </outline>
-      <outline text="Web &amp; Blogging (00s)" type="category">
+      <outline text="Blogging Launch &amp; Digital Disruption (2000-2004)" type="category">
+        <outline text="News Turns From a Lecture to a Conversation" type="link" url="http://archive.pressthink.org/2004/12/29/tp04_lctr_p.html" created="2004-12-29"/>
+        <outline text="My advice for the News &amp; Record" type="link" url="http://archive.pressthink.org/2004/12/28/zack_grnsbr_p.html" created="2004-12-28"/>
+        <outline text="Open Source Journalism" type="link" url="http://archive.pressthink.org/2004/12/28/tptn04_opsc_p.html" created="2004-12-28"/>
+        <outline text="PressThink: PressThink&apos;s Top Ten Ideas for 2004: Introduction" type="link" url="http://archive.pressthink.org/2004/12/26/tptn04_intro_p.html" created="2004-12-26"/>
+        <outline text="PressThink: Greensboro Newspaper Goes Open Source: A Follow Up" type="link" url="http://archive.pressthink.org/2004/12/21/grnsbr_flw_p.html" created="2004-12-21"/>
+        <outline text="PressThink: More Undercurrent: Action in Greensboro on Open Source Journalism" type="link" url="http://archive.pressthink.org/2004/12/18/grns_nr_p.html" created="2004-12-18"/>
+        <outline text="PressThink: Undercurrent: Nation, Region, Weblog, Home" type="link" url="http://archive.pressthink.org/2004/12/15/berk_olav_p.html" created="2004-12-15"/>
+        <outline text="Kind of a Drag: A Short History of Spin Alley and the Press" type="link" url="http://archive.pressthink.org/2004/12/09/spn_stone_p.html" created="2004-12-09"/>
+        <outline text="PressThink: The Big Listen Option for CBS News After Rather" type="link" url="http://archive.pressthink.org/2004/12/10/cbs_lstn_p.html" created="2004-12-09"/>
+        <outline text="PressThink: What is the Internet Doing to Political Journalism and its Public?" type="link" url="http://archive.pressthink.org/2004/12/07/bkmn_cfc_p.html" created="2004-12-07"/>
+        <outline text="PressThink: Notes and Comment on The Media Company I Want to Work For" type="link" url="http://archive.pressthink.org/2004/12/02/rect_glsr_p.html" created="2004-12-02"/>
+        <outline text="The Media Company I Want to Work For" type="link" url="http://archive.pressthink.org/2004/12/01/glaser_co_p.html" created="2004-12-01"/>
+        <outline text="Writer Says Media is Election&apos;s Big Loser: 21 Times" type="link" url="http://archive.pressthink.org/2004/11/29/loser_bgmd_p.html" created="2004-11-29"/>
+        <outline text="Reaching for Moral Values in the Post Election Debris" type="link" url="http://archive.pressthink.org/2004/11/23/weldn_mv_p.html" created="2004-11-23"/>
+        <outline text="PressThink: Dan Rather: Park Avenue Ordinary" type="link" url="http://archive.pressthink.org/2004/11/23/rather_exit_p.html" created="2004-11-23"/>
+        <outline text="A Reply to David Shaw: Are We Headed for an Opposition Press?" type="link" url="http://archive.pressthink.org/2004/11/17/shaw_rply_p.html" created="2004-11-17"/>
+        <outline text="PressThink: Off the Charts: Sinclair Broadcast Group&apos;s Political Vision" type="link" url="http://archive.pressthink.org/2004/11/16/snclr_vision_p.html" created="2004-11-16"/>
+        <outline text="PressThink: How Do You Blog Ideas into Events? PressThink Tries to Find Out" type="link" url="http://archive.pressthink.org/2004/11/13/ona_live_p.html" created="2004-11-13"/>
+        <outline text="NYT committee to study ways to improve paper’s credibility" type="link" url="http://archive.pressthink.org/2004/11/11/siegal_mem_p.html" created="2004-11-11"/>
+        <outline text="PressThink: Matt Welch on Shifting Terms of Authority in the Newspaper Press" type="link" url="http://archive.pressthink.org/2004/11/09/welch_react_p.html" created="2004-11-09"/>
+        <outline text="PressThink: Not Up to It" type="link" url="http://archive.pressthink.org/2004/11/08/ijj_la_p.html" created="2004-11-08"/>
+        <outline text="PressThink: BloggerCon III: Notes and Observations on the People of Moore&apos;s Law" type="link" url="http://archive.pressthink.org/2004/11/07/con_stanford_p.html" created="2004-11-07"/>
+        <outline text="PressThink: PressThink is Looking for a Second Author (Maybe) and a Donor (Definitely)" type="link" url="http://archive.pressthink.org/2004/11/06/ntc_cont_p.html" created="2004-11-06"/>
+        <outline text="Are We Headed for an Opposition Press?" type="link" url="http://archive.pressthink.org/2004/11/03/op_press_p.html" created="2004-11-03"/>
+        <outline text="PressThink: People, Nation, Republic: Reflections for Election Night" type="link" url="http://archive.pressthink.org/2004/11/02/qts_ed_p.html" created="2004-11-02"/>
+        <outline text="No Longer Do the Newsies Decide" type="link" url="http://archive.pressthink.org/2004/11/01/wein_traub_p.html" created="2004-11-01"/>
+        <outline text="PressThink: The Coming Apart of An Ordered World: Bloggers Notebook, Election Eve" type="link" url="http://archive.pressthink.org/2004/10/31/elec_wknd_p.html" created="2004-10-31"/>
+        <outline text="The Fading Mystique of an Objective Press" type="link" url="http://archive.pressthink.org/2004/10/29/mcgill_essay_p.html" created="2004-10-29"/>
+        <outline text="PressThink: Too Much Reality: Is There Such a Thing?" type="link" url="http://archive.pressthink.org/2004/10/23/strain_pol_p.html" created="2004-10-23"/>
+        <outline text="PressThink: Sinclair Goes to Air Friday Night: Notes and Comment on &quot;A POW Story&quot;" type="link" url="http://archive.pressthink.org/2004/10/21/air_sbg_p.html" created="2004-10-21"/>
+        <outline text="PressThink: &quot;Call it Commentary, Call it Editorial, Call it Programming, but Don&apos;t Call it News.&quot; Sinclair Fires Jonathan Leiberman" type="link" url="http://archive.pressthink.org/2004/10/19/more_sbg_p.html" created="2004-10-19"/>
+        <outline text="PressThink: Sinclair Broadcast Group: What Are They Doing in the Middle of Our Election?" type="link" url="http://archive.pressthink.org/2004/10/16/sinclair_ctd_p.html" created="2004-10-16"/>
+        <outline text="Sinclair Broadcast Group: What Are They Doing in the Middle of Our Election?" type="link" url="http://archive.pressthink.org/2004/10/13/sinclair_acts_p.html" created="2004-10-15"/>
+        <outline text="PressThink: John Kerry Should Accept Sinclair Broadcasting&apos;s Offer" type="link" url="http://archive.pressthink.org/2004/10/09/kerry_deal_p.html" created="2004-10-09"/>
+        <outline text="The Best Approximation of Accuracy Possible in a Given Moment" type="link" url="http://archive.pressthink.org/2004/10/08/cs_respond_p.html" created="2004-10-08"/>
+        <outline text="PressThink: Authorized Knower: Farnaz Fassihi&apos;s Accidental Baghdad Dispatch" type="link" url="http://archive.pressthink.org/2004/10/08/e_fassihi_p.html" created="2004-10-08"/>
+        <outline text="PressThink: Political Jihad and the American Blog: Chris Satullo Raises the Stakes" type="link" url="http://archive.pressthink.org/2004/10/04/satullo_view_p.html" created="2004-10-04"/>
+        <outline text="Nick Coleman&apos;s Blogged Down in Web Fantasy" type="link" url="http://archive.pressthink.org/2004/10/02/coleman_hit_p.html" created="2004-10-02"/>
+        <outline text="PressThink: You Watched. Tell Me What You Saw in Jim Lehrer&apos;s Performance." type="link" url="http://archive.pressthink.org/2004/10/01/lehrer_deb_p.html" created="2004-10-01"/>
+        <outline text="PressThink: Nagourney&apos;s Challenge: Quit Spin Alley" type="link" url="http://archive.pressthink.org/2004/09/29/spun_miami_p.html" created="2004-09-29"/>
+        <outline text="PressThink: Every Four Years Journalism" type="link" url="http://archive.pressthink.org/2004/09/28/four_years_p.html" created="2004-09-28"/>
+        <outline text="PressThink: Does CBS News Have a Political Future in This State?" type="link" url="http://archive.pressthink.org/2004/09/24/cbs_comm_p.html" created="2004-09-24"/>
+        <outline text="Philip Gourevitch: Campaign Reporting as Foreign Beat" type="link" url="http://archive.pressthink.org/2004/09/22/gour_talk_p.html" created="2004-09-22"/>
+        <outline text="PressThink: Did the President of CBS News Have Anyone in Charge of Reading the Internet and Sending Alerts?" type="link" url="http://archive.pressthink.org/2004/09/20/rather_bulletin_p.html" created="2004-09-20"/>
+        <outline text="PressThink: Rather&apos;s Satisfaction: Mystifying Troubles at CBS" type="link" url="http://archive.pressthink.org/2004/09/18/cbs_theatre_p.html" created="2004-09-18"/>
+        <outline text="PressThink: Campaign Puzzler: How the Press Comes Out with a Win" type="link" url="http://archive.pressthink.org/2004/09/15/get_win_p.html" created="2004-09-15"/>
+        <outline text="PressThink: Stark Message for the Legacy Media" type="link" url="http://archive.pressthink.org/2004/09/14/legacy_time_p.html" created="2004-09-14"/>
+        <outline text="Weekend Notes With &quot;Forgery&quot; Swirling in the Air" type="link" url="http://archive.pressthink.org/2004/09/11/cbs_docs_p.html" created="2004-09-11"/>
+        <outline text="Herald RulesTom Fiedler&apos;s Rock Concert Credibility Blues" type="link" url="http://archive.pressthink.org/2004/09/10/herald_rules_p.html" created="2004-09-10"/>
+        <outline text="PressThink: &quot;Turn to Fox News for Exclusive Coverage of the Republican National Convention.&quot;" type="link" url="http://archive.pressthink.org/2004/09/02/rnc_2008_p.html" created="2004-09-02"/>
+      </outline>
+      <outline text="Peak Blogging &amp; Citizen Journalism (2005-2009)" type="category">
         <outline text="Studio 20 Professor Named Executive Producer of State of the Union live coverage" type="link" url="https://tmblr.co/ZCJQUyIGwU9" created="2009-12-29"/>
         <outline text="My simple fix for the messed up Sunday Shows" type="link" url="https://publicnotebook.wordpress.com/2009/12/28/my-simple-fix-for-the-messed-up-sunday-shows/" created="2009-12-28"/>
         <outline text="Rosen: &quot;Journalism&quot; and &quot;the media&quot; are not synonymous" type="link" url="https://tmblr.co/ZCJQUyHkKxe" created="2009-12-23"/>
@@ -113,60 +165,167 @@
         <outline text="PressThink: Introducing the new Huffington Post Investigative Fund (And My Own Role in It)" type="link" url="http://archive.pressthink.org/2009/03/30/huffpost_fnd_p.html" created="2009-03-30"/>
         <outline text="Flying Seminar on the Future of News" type="link" url="http://archive.pressthink.org/2009/03/26/flying_seminar_p.html" created="2009-03-26"/>
       </outline>
+      <outline text="Social Media &amp; Financial Crisis (2010-2015)" type="category">
+        <outline text="Asymmetry between the major parties fries the circuits of the mainstream press - PressThink" type="link" url="https://pressthink.org/2016/09/asymmetry-between-the-major-parties-fries-the-circuits-of-the-mainstream-press/" created="2016-09-29"/>
+        <outline text="So I will try to explain why the Trump candidacy has been so confounding to our political press. - PressThink" type="link" url="https://pressthink.org/2015/11/i-will-try-to-explain-why-the-trump-candidacy-has-been-so-confounding-to-our-political-press/" created="2015-11-30"/>
+        <outline text="Adapting Journalism to the Digital Space" type="link" url="https://journalism.nyu.edu/graduate/programs/studio-20-digital-first" created="2015-06-26"/>
+        <outline text="Verstehen, was den Journalismus derzeit verändert" type="link" url="https://publicnotebook.wordpress.com/2014/11/26/verstehen-was-den-journalismus-derzeit-verandert/" created="2014-11-26"/>
+        <outline text="Comment être au courant de ce qui change le journalisme ?" type="link" url="https://publicnotebook.wordpress.com/2014/11/18/comment-etre-au-courant-de-ce-qui-change-le-journalisme/" created="2014-11-18"/>
+        <outline text="The Studio 2.0 Program at NYU (directed by Jay Rosen and Clay Shirky) once again presents Open Studio Night!" type="link" url="https://publicnotebook.wordpress.com/2014/11/17/the-studio-20-program-at-nyu-directed-by-jay-rosen-and-clay-shirky-once-again-presents-open-studio-night/" created="2014-11-17"/>
+        <outline text="Rosen&apos;s Trust Puzzler: What Explains Falling Confidence in the Press? - PressThink" type="link" url="https://pressthink.org/2012/04/rosens-trust-puzzler-what-explains-falling-confidence-in-the-press/" created="2014-09-17"/>
+        <outline text="Open Studio Night, 2013: where our students present their final projects" type="link" url="https://tmblr.co/ZCJQUy1Om-Dri" created="2014-08-20"/>
+        <outline text="When quoting both sides and leaving it there is the riskier call" type="link" url="https://pressthink.org/2014/08/when-quoting-both-sides-and-leaving-it-there-is-the-riskier-call/" created="2014-08-19"/>
+        <outline text="This is just a stub for a PressThink post" type="link" url="https://publicnotebook.wordpress.com/2014/05/10/this-is-just-a-stub-for-a-pressthink-post/" created="2014-05-10"/>
+        <outline text="Pierre Omidyar plunges first $50m into media venture with Glenn Greenwald" type="link" url="https://www.theguardian.com/media/2013/dec/19/pierre-omidyar-first-50m-media-venture-glenn-greenwald" created="2013-12-19"/>
+        <outline text="A First Look at NewCo&apos;s structure - PressThink" type="link" url="https://pressthink.org/2013/12/a-first-look-at-newcos-structure/" created="2013-12-19"/>
+        <outline text="A News Organization That Rejects the View From Nowhere" type="link" url="https://www.theatlantic.com/politics/archive/2013/12/a-news-organization-that-rejects-the-view-from-nowhere/281979/" created="2013-12-03"/>
+        <outline text="Studio 20" type="link" url="https://tmblr.co/ZCJQUy104FLlo" created="2013-12-02"/>
+        <outline text="Open Studio night: Dec. 12, 6 to 8 pm at NYU. Would you like to come?" type="link" url="https://tmblr.co/ZCJQUy_KG8YG" created="2013-11-13"/>
+        <outline text="Old testament and new testament journalism - PressThink" type="link" url="https://pressthink.org/2013/11/old-testament-and-new-testament-journalism/" created="2013-11-03"/>
+        <outline text="Studio 20" type="link" url="https://tmblr.co/ZCJQUywcD9ho" created="2013-10-02"/>
+        <outline text="The NSA&apos;s next move: silencing university professors?" type="link" url="https://www.theguardian.com/commentisfree/2013/sep/10/nsa-matthew-green-takedown-blog-post-johns-hopkins" created="2013-09-10"/>
+        <outline text="Studio 20 gets an assignment from Quartz News" type="link" url="https://tmblr.co/ZCJQUykusWfa" created="2013-05-13"/>
+        <outline text="Studio 20&apos;s Networked Reporting Project" type="link" url="https://tmblr.co/ZCJQUykvAgeB" created="2013-05-13"/>
+        <outline text="Studio 20" type="link" url="https://tmblr.co/ZCJQUyZKApP2" created="2012-12-14"/>
+        <outline text="Open Studio Night: An Invitation." type="link" url="https://tmblr.co/ZCJQUyYVwnIL" created="2012-12-02"/>
+        <outline text="Lewis Dvorkin fields some good questions from Studio 20" type="link" url="https://tmblr.co/ZCJQUyVi2VTh" created="2012-10-21"/>
+        <outline text="Ungovernable reality, not Candy Crowley, threatens Obama and Romney" type="link" url="https://www.theguardian.com/commentisfree/2012/oct/16/us-presidential-debates-us-elections-2012-candy-crowley-obama-romney" created="2012-10-16"/>
+        <outline text="Final projects for Studio 20 students: they&apos;re all about incremental innovation. All have media partners." type="link" url="https://tmblr.co/ZCJQUyUhMBam" created="2012-10-05"/>
+        <outline text="Studio 20" type="link" url="https://tmblr.co/ZCJQUyURKQR1" created="2012-10-01"/>
+        <outline text="Kevin Convey brings innovation from the newsroom to the classroom" type="link" url="https://tmblr.co/ZCJQUyToZmhS" created="2012-09-21"/>
+        <outline text="Studio 20 prof brings us &apos;Obama Revealed&apos;" type="link" url="https://tmblr.co/ZCJQUyShr8jh" created="2012-09-03"/>
+        <outline text="This Year&apos;s Studio 20 Summer Gigs" type="link" url="https://tmblr.co/ZCJQUyQP4epJ" created="2012-07-30"/>
+        <outline text="David Holmes explains it all -- in song" type="link" url="https://tmblr.co/ZCJQUyQ1WnhJ" created="2012-07-24"/>
+        <outline text="Covering Wicked Problems - PressThink" type="link" url="http://pressthink.org/2012/06/covering-wicked-problems/" created="2012-06-25"/>
+        <outline text="Four Types of Scoops" type="link" url="https://publicnotebook.wordpress.com/2012/04/20/four-types-of-scoops/" created="2012-04-20"/>
+        <outline text="Verification in reverse&apos;: A chat with Jay Rosen" type="link" url="https://grist.org/media/verification-in-reverse-a-chat-with-jay-rosen/" created="2012-04-16"/>
+        <outline text="Maybe your site should be home to a Studio 20 project" type="link" url="https://tmblr.co/ZCJQUyJTrUWO" created="2012-04-11"/>
+        <outline text="Anatomy of a Facebook Fail (mine)" type="link" url="https://publicnotebook.wordpress.com/2012/04/09/anatomy-of-a-facebook-fail-mine/" created="2012-04-09"/>
+        <outline text="First Year Studio 20-er Anjali Mullany Makes Moves" type="link" url="https://tmblr.co/ZCJQUyJO5cGZ" created="2012-04-09"/>
+        <outline text="Adapting Journalism to the Web" type="link" url="https://web.mit.edu/comm-forum/legacy/forums/journalism_internet.html" created="2012-04-05"/>
+        <outline text="The Man Behind the News Songs" type="link" url="https://tmblr.co/ZCJQUyIO3Yx4" created="2012-03-22"/>
+        <outline text="Professor Samuels at SXSW: Black in America/Silicon Valley, the Aftermath" type="link" url="https://tmblr.co/ZCJQUyI4CAP4" created="2012-03-16"/>
+        <outline text="NPR Tackles &apos;False Equivalence&apos;" type="link" url="https://www.theatlantic.com/national/archive/2012/03/npr-tackles-false-equivalence/253712/" created="2012-03-01"/>
+        <outline text="Did the Citizens Agenda influence the GOP debate in Arizona?" type="link" url="https://www.theguardian.com/world/2012/feb/28/citizens-agenda-gop-debate-arizona" created="2012-02-28"/>
+        <outline text="The Citizens’ Agenda Round 1: #unasked Questions in GOP Debates" type="link" url="https://tmblr.co/ZCJQUyHB1AUo" created="2012-02-28"/>
+        <outline text="NPR Tries to Get its Pressthink Right" type="link" url="https://pressthink.org/2012/02/npr-tries-to-get-its-pressthink-right/" created="2012-02-26"/>
+        <outline text="(More) Studio 20 Grads Settle into their New Jobs!" type="link" url="https://tmblr.co/ZCJQUyGoksuI" created="2012-02-21"/>
+        <outline text="Have the 839 GOP debate questions reflected the &apos;citizens agenda&apos;?" type="link" url="https://www.theguardian.com/world/2012/feb/16/gop-debate-questions-citizens-agenda" created="2012-02-16"/>
+        <outline text="Studio 20 Grads Settle into their New Jobs!" type="link" url="https://tmblr.co/ZCJQUyFqIJTj" created="2012-02-03"/>
+        <outline text="A Brief Theory of the Republican Party (2012)" type="link" url="https://publicnotebook.wordpress.com/2012/01/18/a-brief-theory-of-the-republican-party-2012/" created="2012-01-18"/>
+        <outline text="Studio 20" type="link" url="https://tmblr.co/ZCJQUyE6An_m" created="2012-01-01"/>
+        <outline text="Studio 20 Will Collaborate With The Guardian on How to Improve Election Coverage" type="link" url="https://tmblr.co/ZCJQUyDIsJfc" created="2011-12-15"/>
+        <outline text="The citizens agenda: making election coverage more useful | Jay Rosen and Amanda Michel | The Guardian" type="link" url="https://www.theguardian.com/commentisfree/cifamerica/2011/dec/08/citizens-agenda-election-coverage" created="2011-12-08"/>
+      </outline>
       <outline text="View from Nowhere (10s)" type="category">
-        <outline text="It&apos;s not that we shouldn&apos;t look back, only forward" type="link" url="https://x.com/jayrosen_nyu/status/1212510972423933953" created="2020-01-01"/>
-        <outline text="Personally I think this is a silly game, but many people on Twitter LOVE it" type="link" url="https://x.com/jayrosen_nyu/status/1212505368007450624" created="2020-01-01"/>
-        <outline text="Okay, no problem" type="link" url="https://x.com/jayrosen_nyu/status/1212500058429677568" created="2020-01-01"/>
-        <outline text="Anything I say that has a &quot;since&quot; mention is now corrected instantly by people..." type="link" url="https://x.com/jayrosen_nyu/status/1212498161534672897" created="2020-01-01"/>
-        <outline text="&quot;The practices common to political journalism have premises to them" type="link" url="https://x.com/jayrosen_nyu/status/1212494328519626752" created="2020-01-01"/>
-        <outline text="Oh, sorry. Sloppy of me." type="link" url="https://x.com/jayrosen_nyu/status/1212484231219339264" created="2020-01-01"/>
-        <outline text="Good for you and Cory" type="link" url="https://x.com/jayrosen_nyu/status/1212480763230375936" created="2020-01-01"/>
-        <outline text="&quot;My party, the Democratic Party, was utterly unprepared for the carnival of..." type="link" url="https://x.com/jayrosen_nyu/status/1212452766288883713" created="2020-01-01"/>
-        <outline text="Thread: A New York Times reporter reports back to us on the diversity of..." type="link" url="https://x.com/jayrosen_nyu/status/1212433439812734982" created="2020-01-01"/>
-        <outline text="There are a hundred and one problems with it" type="link" url="https://x.com/jayrosen_nyu/status/1212433042373001217" created="2020-01-01"/>
-        <outline text="The Harvard project was led by Adam Moss, the former editor of New York..." type="link" url="https://x.com/jayrosen_nyu/status/1212429327029211138" created="2020-01-01"/>
-        <outline text="Thank you." type="link" url="https://x.com/jayrosen_nyu/status/1212427367844634625" created="2020-01-01"/>
-        <outline text="I spoke to this group about the &quot;citizens agenda&quot; style of election coverage" type="link" url="https://x.com/jayrosen_nyu/status/1212427188026392579" created="2020-01-01"/>
-        <outline text="They said they kept coming back to the larger cultural problem" type="link" url="https://x.com/jayrosen_nyu/status/1212427184742244356" created="2020-01-01"/>
-        <outline text="Thought experiment: A group of Harvard students came up with &quot;a prototype of an..." type="link" url="https://x.com/jayrosen_nyu/status/1212427183916044289" created="2020-01-01"/>
-        <outline text="I am pessimistic, but thank you" type="link" url="https://x.com/jayrosen_nyu/status/1212419119011770368" created="2020-01-01"/>
-        <outline text="Agreed. Meaning" type="link" url="https://x.com/jayrosen_nyu/status/1212416666652565504" created="2020-01-01"/>
-        <outline text="Key sentence" type="link" url="https://x.com/jayrosen_nyu/status/1212165446008541192" created="2020-01-01"/>
-        <outline text="If you can show me what I said that gave you that impression, I will comment on..." type="link" url="https://x.com/jayrosen_nyu/status/1212157238518910978" created="2019-12-31"/>
-        <outline text="When you say I gave Lack good marks, what are you referring to?" type="link" url="https://x.com/jayrosen_nyu/status/1212152068200390658" created="2019-12-31"/>
-        <outline text="Ben has blocked me for years" type="link" url="https://x.com/jayrosen_nyu/status/1212144726427734016" created="2019-12-31"/>
-        <outline text="People ask me quite often what they can do to support journalism, the genuine..." type="link" url="https://x.com/jayrosen_nyu/status/1212136855094910978" created="2019-12-31"/>
-        <outline text="Thank you, Greg" type="link" url="https://x.com/jayrosen_nyu/status/1212134941284294656" created="2019-12-31"/>
-        <outline text="Indeed. Klein is not heard from much anymore. Broder is dead. Meacham does..." type="link" url="https://x.com/jayrosen_nyu/status/1212087746174562305" created="2019-12-31"/>
-        <outline text="No. Marty Baron said on Meet the Press this week that a priority for Post..." type="link" url="https://x.com/jayrosen_nyu/status/1212071289722212355" created="2019-12-31"/>
-        <outline text="This is what I wrote three years ago, Dec" type="link" url="https://x.com/jayrosen_nyu/status/1212064159514419200" created="2019-12-31"/>
-        <outline text="Another fantasy element, you mean" type="link" url="https://x.com/jayrosen_nyu/status/1212053287526191104" created="2019-12-31"/>
-        <outline text="&quot;Not hearing from witnesses with direct knowledge of Trump’s extortion scheme..." type="link" url="https://x.com/jayrosen_nyu/status/1212052647445962752" created="2019-12-31"/>
-        <outline text="Happy New Year to you, sir" type="link" url="https://x.com/jayrosen_nyu/status/1212046420427059203" created="2019-12-31"/>
-        <outline text="It is absolutely amazing that this sentence appeared in the news pages of the..." type="link" url="https://x.com/jayrosen_nyu/status/1212046113747935232" created="2019-12-31"/>
-        <outline text="But not different standards.." type="link" url="https://x.com/jayrosen_nyu/status/1212024068175732736" created="2019-12-31"/>
-        <outline text="You&apos;re welcome" type="link" url="https://x.com/jayrosen_nyu/status/1211884432694661122" created="2019-12-31"/>
-        <outline text="Thank you. But not much I can do about that. Either you get the call or you..." type="link" url="https://x.com/jayrosen_nyu/status/1211863860598185984" created="2019-12-31"/>
-        <outline text="I have never had an op-ed piece published by the Times" type="link" url="https://x.com/jayrosen_nyu/status/1211857430197526528" created="2019-12-31"/>
-        <outline text="&quot;McConnell badly needs the media’s both-sidesing instincts to hold firm against..." type="link" url="https://x.com/jayrosen_nyu/status/1211769382860443649" created="2019-12-30"/>
-        <outline text="This column by speaks for me" type="link" url="https://x.com/jayrosen_nyu/status/1211753163059007488" created="2019-12-30"/>
-        <outline text="This was a clip CBS News put together and promoted as a highlight from the..." type="link" url="https://x.com/jayrosen_nyu/status/1211732774928949249" created="2019-12-30"/>
-        <outline text="Ivanka Trump’s interview on Face the Nation could have aired on Fox News" type="link" url="https://x.com/jayrosen_nyu/status/1211723694860570625" created="2019-12-30"/>
-        <outline text="Well, Nancy, is it a convention of written English that these phrases are not..." type="link" url="https://x.com/jayrosen_nyu/status/1211718135453306880" created="2019-12-30"/>
-        <outline text="This year, 2019, was &quot;the darkest yet for journalists in the Trump era.&quot; Now I..." type="link" url="https://x.com/jayrosen_nyu/status/1211708880750813184" created="2019-12-30"/>
-        <outline text="The questions Ivanka Trump should have been asked" type="link" url="https://x.com/jayrosen_nyu/status/1211700981572022273" created="2019-12-30"/>
-        <outline text="Thank you. It draws that distinction between mis- and disinformation." type="link" url="https://x.com/jayrosen_nyu/status/1211506918193344513" created="2019-12-30"/>
-        <outline text="Not sure what you are asking" type="link" url="https://x.com/jayrosen_nyu/status/1211505167570546688" created="2019-12-30"/>
-        <outline text="You need to read this, Christine" type="link" url="https://x.com/jayrosen_nyu/status/1211503439609503745" created="2019-12-30"/>
-        <outline text="Have a look at this example" type="link" url="https://x.com/jayrosen_nyu/status/1211485397030588416" created="2019-12-30"/>
-        <outline text="Unearned is a key term for this subject" type="link" url="https://x.com/jayrosen_nyu/status/1211476940433039360" created="2019-12-30"/>
-        <outline text="A distinction of importance to opinion editors like is between writers who are..." type="link" url="https://x.com/jayrosen_nyu/status/1211461478798254080" created="2019-12-30"/>
-        <outline text="I wasn&apos;t aware of the distinction, but it&apos;s obvious that I should be" type="link" url="https://x.com/jayrosen_nyu/status/1211455865313779712" created="2019-12-30"/>
-        <outline text="I am waiting for a clip and transcript of the full interview" type="link" url="https://x.com/jayrosen_nyu/status/1211453761731862528" created="2019-12-30"/>
-        <outline text="I think it was the other way around" type="link" url="https://x.com/jayrosen_nyu/status/1211448974768517120" created="2019-12-30"/>
+        <outline text="A call for radically different campaign coverage" type="link" url="https://medium.com/we-are-hearken/a-call-for-radically-different-campaign-coverage-85e62401d0c6" created="2019-06-12"/>
+        <outline text="Is your organization thinking about membership? Take some ideas and maybe some money from the Membership Puzzle Project" type="link" url="https://www.niemanlab.org/2019/05/is-your-organization-thinking-about-membership-take-some-ideas-and-maybe-some-money-from-the-membership-puzzle-project/" created="2019-05-09"/>
+        <outline text="The Correspondent&apos;s editor-in-chief talks about what U.S. expansion means and doesn&apos;t" type="link" url="https://www.niemanlab.org/2019/03/the-correspondents-editor-in-chief-talks-about-what-u-s-expansion-means-and-doesnt-an-office/" created="2019-03-27"/>
+        <outline text="Stand Up! with Pete Dominick: Episode 861 - Journalism Professor Jay Rosen" type="link" url="https://standupwithpete.libsyn.com/861-journalism-professor-jay-rosen" created="2019-01-01"/>
+        <outline text="Speaking the hard truth to journalism (Center for Media at Risk podcast)" type="link" url="https://ascmediarisk.org/2018/12/episode-08-speaking-the-hard-truth-to-journalism" created="2018-12-01"/>
+        <outline text="A roundup of trends that are changing journalism" type="link" url="https://ijnet.org/en/story/roundup-trends-are-changing-journalism" created="2018-10-30"/>
+        <outline text="The public service veto: How The Correspondent protects itself from profit maximization" type="link" url="https://medium.com/de-correspondent/how-the-correspondent-protects-itself-from-profit-maximization-df7b316e8ab7" created="2018-10-18"/>
+        <outline text="What The Correspondent will add to the American press" type="link" url="https://medium.com/de-correspondent/what-the-correspondent-adds-to-the-american-press-7a83eaaa7b92" created="2018-09-26"/>
+        <outline text="Center for Media at Risk launch symposium" type="link" url="https://www.asc.upenn.edu/news-events/events/center-media-risk-roundtable-amy-siskind-jay-rosen-leah-wright-rigueur" created="2018-04-21"/>
+        <outline text="Optimizing journalism for trust" type="link" url="https://medium.com/de-correspondent/optimizing-journalism-for-trust-1c67e81c123" created="2018-04-14"/>
+        <outline text="Jay Rosen on our media malaise: Who will tell the people?" type="link" url="https://radioopensource.org/jay-rosen-on-our-media-malaise-who-will-tell-the-people/" created="2018-01-01"/>
+        <outline text="Jay Rosen (ONA17 speaker profile)" type="link" url="https://ona17.journalists.org/speaker/jay-rosen/" created="2017-10-01"/>
+        <outline text="What are journalists for in the age of Trump?" type="link" url="https://www.salon.com/2017/09/14/what-are-journalists-for-in-the-age-of-trump/" created="2017-09-14"/>
+        <outline text="Is trust-based journalism the future? Jay Rosen thinks so" type="link" url="https://www.wgbh.org/news/commentary/2017-04-05/is-trust-based-journalism-the-future-jay-rosen-thinks-so" created="2017-04-05"/>
+        <outline text="Jay Rosen: This is what a news organization built on reader trust looks like" type="link" url="https://www.niemanlab.org/2017/03/jay-rosen-this-is-what-a-news-organization-built-on-reader-trust-looks-like/" created="2017-03-28"/>
+        <outline text="NYU to launch Membership Puzzle Project" type="link" url="https://knightfoundation.org/press/releases/new-york-university-to-launch-membership-puzzle-project-to-advance-sustainability-and-trust-in-journalism-with-515-000-in-new-funding/" created="2017-03-28"/>
+        <outline text="NYU Journalism launches Membership Puzzle Project led by Prof. Jay Rosen" type="link" url="https://journalism.nyu.edu/about-us/news-post/2017/03/28/nyu-journalism-launches-membership-puzzle-project-led-by-prof-jay-rosen/" created="2017-03-28"/>
+        <outline text="After the Agora: Jay Rosen: Rebuilding trust in media" type="link" url="https://liberalarts.tamu.edu/blog/2017/03/24/after-the-agora-jay-rosen-rebuilding-trust-in-media/" created="2017-03-24"/>
+        <outline text="Jay Rosen on the hazards of journalism-as-usual under the Trump administration" type="link" url="https://www.poynter.org/reporting-editing/2017/jay-rosen-on-the-hazards-of-journalism-as-usual-under-the-trump-administration/" created="2017-03-10"/>
+        <outline text="Full transcript: Jay Rosen on Recode Media" type="link" url="https://www.vox.com/2017/2/3/14503050/full-transcript-new-york-university-journalism-professor-jay-rosen-trump-facts" created="2017-02-03"/>
+        <outline text="Maximize trust: Jay Rosen on covering the Trump administration" type="link" url="https://www.vermontpublic.org/vpr-news/2017-02-01/maximize-trust-media-critic-jay-rosen-on-covering-the-trump-administration" created="2017-02-01"/>
+        <outline text="Jay Rosen addresses journalism&apos;s changing landscape" type="link" url="https://www.smcvt.edu/about-smc/news/2017/february/jay-rosen-addresses-journalisms-changing-landscape/" created="2017-02-01"/>
+        <outline text="New reality (On the Media episode)" type="link" url="http://www.wnyc.org/story/on-the-media-2017-01-27/" created="2017-01-27"/>
+        <outline text="How the press can save itself in the age of Trump (Recode Media podcast)" type="link" url="https://www.recode.net/2017/1/19/14304322/jay-rosen-nyu-pressthink-donald-trump-journalism-survival" created="2017-01-19"/>
+        <outline text="Journalists should stop interviewing Kellyanne Conway (Recode Media clip)" type="link" url="https://www.recode.net/2017/1/19/14304862/jay-rosen-nyu-pressthink-donald-trump-kellyanne-conway-recode-podcast" created="2017-01-19"/>
+        <outline text="Why the view from nowhere is a harmful myth" type="link" url="https://www.wnycstudios.org/podcasts/otm/segments/view-nowhere-on-the-media" created="2017-01-01"/>
+        <outline text="NYU and De Correspondent launch new laboratory for community supported investigative news" type="link" url="https://medium.com/@jcstearns/nyu-and-de-correspondent-launch-new-laboratory-for-community-supported-investigative-news-92186cfd889b" created="2017-01-01"/>
+        <outline text="Jay Rosen on the view from nowhere" type="link" url="https://stoweboyd.medium.com/jay-rosen-on-the-view-from-nowhere-cc0105443109" created="2017-01-01"/>
+        <outline text="The thin legitimacy of social media as a news source" type="link" url="https://www.pbs.org/newshour/show/thin-legitimacy-social-media-news-source" created="2016-12-08"/>
+        <outline text="Brief but Spectacular: Jay Rosen on the state of journalism in the age of Facebook" type="link" url="https://www.pbs.org/newshour/brief/200771/jay-rosen" created="2016-12-08"/>
+        <outline text="Media critic Jay Rosen on 2016 campaign coverage and the rise of Trump: &quot;That&apos;s the way authoritarian societies work&quot;" type="link" url="https://www.salon.com/2016/11/06/media-critic-jay-rosen-on-2016-campaign-coverage-and-the-rise-of-trump-thats-the-way-authoritarian-societies-work/" created="2016-11-06"/>
+        <outline text="Civic journalism, engaged journalism: Tracing the connections" type="link" url="https://democracyfund.org/idea/civic-journalism-engaged-journalism-tracing-the-connections/" created="2016-08-03"/>
+        <outline text="Donald Trump is crashing the system. Journalists need to build a new one." type="link" url="https://www.washingtonpost.com/news/in-theory/wp/2016/07/13/donald-trump-is-crashing-the-system-journalists-need-to-build-a-new-one/" created="2016-07-13"/>
+        <outline text="Jay Rosen&apos;s NYU students dig deeper into disruption of news business" type="link" url="https://mediashift.org/2016/05/jay-rosens-nyu-students-dig-deeper-into-disruption-of-news-business/" created="2016-05-01"/>
+        <outline text="The Pub #62: Jay Rosen on his love-hate relationship with public media" type="link" url="https://current.org/2016/04/the-pub-62-jay-rosen-on-his-love-hate-relationship-with-public-media/" created="2016-04-22"/>
+        <outline text="CNN&apos;s impossible dilemma" type="link" url="https://www.wnycstudios.org/podcasts/otm/segments/cnn-impossible-dilemma-on-the-media" created="2016-01-01"/>
+        <outline text="Tech is eating media" type="link" url="https://medium.com/@jayrosen_nyu/tech-is-eating-media-540c0f2adf25" created="2015-11-09"/>
+        <outline text="Misinterpreting Williams&apos; misremembering" type="link" url="https://www.newspapers.com/image/1247062202/" created="2015-02-24"/>
+        <outline text="Journalism Professor Rosen on changing nature of news" type="link" url="http://www.smcvt.edu/Events/2015/February/journalism-professor-rosen-on-changing-nature-of-news.aspx" created="2015-02-01"/>
+        <outline text="NYU professor Jay Rosen&apos;s roadmap for understanding the media landscape" type="link" url="http://blog.bleacherreport.com/2014/11/11/nyu-professor-jay-rosens-roadmap-for-understanding-the-media-landscape/" created="2014-11-11"/>
+        <outline text="Journalists need a point of view if they want to stay relevant" type="link" url="https://theconversation.com/journalists-need-a-point-of-view-if-they-want-to-stay-relevant-33216" created="2014-10-24"/>
+        <outline text="Blogging and the new public intellectual" type="link" url="https://hac.bard.edu/amor-mundi/blogging-and-the-new-public-intellectual-jay-rosen-megan-garber-2014-02-18" created="2014-02-18"/>
+        <outline text="ISOJ 2014/2019 speaker: Jay Rosen" type="link" url="https://isoj.org/speakers-2019/jay-rosen/" created="2014-01-01"/>
+        <outline text="A first look at NewCo&apos;s business, journalism structure" type="link" url="https://www.commondreams.org/views/2013/12/19/first-look-newcos-business-journalism-structure" created="2013-12-19"/>
+        <outline text="Jay Rosen, the view from nowhere, and &apos;arrogance born of monopoly&apos;" type="link" url="https://www.niemanlab.org/2013/11/jay-rosen-the-view-from-nowhere-and-arrogance-born-of-monopoly/" created="2013-11-05"/>
+        <outline text="Summer reading 2013: Getting the connections right" type="link" url="https://www.niemanlab.org/2013/08/summer-reading-2013-getting-the-connections-right-public-journalism-and-the-troubles-in-the-press-by-jay-rosen-1996/" created="2013-08-09"/>
+        <outline text="Defining journalists - and their rights" type="link" url="https://www.newspapers.com/image/1248301573/" created="2013-07-06"/>
+        <outline text="Press Publish 3: Jay Rosen on the public, how the press thinks, and the production of innocence" type="link" url="https://www.niemanlab.org/2013/01/press-publish-3-jay-rosen-on-the-public-how-the-press-thinks-and-the-production-of-innocence/" created="2013-01-23"/>
+        <outline text="Don&apos;t bust bogus &quot;hype&quot;" type="link" url="https://www.salon.com/2012/07/25/dont_bust_bogus_hype/" created="2012-07-25"/>
+        <outline text="How polarization undermined the press" type="link" url="https://www.washingtonpost.com/blogs/wonkblog/post/how-polarization-undermined-the-press/2012/04/23/gIQAnsTQcT_blog.html" created="2012-04-23"/>
+      </outline>
+      <outline text="Trump Era &amp; Democratic Crisis (2016-2020)" type="category">
+        <outline text="NYU Professor Jay Rosen Tears Chuck Todd Over Trump Lies" type="link" url="https://www.mediaite.com/media/tv/nyu-professor-jay-rosen-tears-chuck-todd/" created="2019-12-26"/>
+        <outline text="Peabody adds six new members to board of directors" type="link" url="https://news.uga.edu/peabody-appoints-six-new-members-to-board/" created="2019-12-12"/>
+        <outline text="Industry leaders provide expert counsel - The Peabody Awards" type="link" url="https://peabodyawards.com/stories/industry-leaders-provide-expert-counsel-peabody/" created="2019-12-11"/>
+        <outline text="Bad headline, small changes at the New York Times - PressThink" type="link" url="https://pressthink.org/2019/08/bad-headline-small-changes-at-the-new-york-times/" created="2019-08-17"/>
+        <outline text="How journalists and the public shape our democracy: From social media and &apos;fake news&apos; to reporting &apos;just the facts&apos;" type="link" url="https://www.georgiahumanities.org/wp-content/uploads/2019/03/Quick-Guide_Media-Literacy.pdf" created="2019-03-01"/>
+        <outline text="Has Trump Changed the Media?" type="link" url="https://youtu.be/gU-DpoxGmfU" created="2019-02-28"/>
+        <outline text="Jay Rosen at IRE discussing the importance of crowdsourcing" type="link" url="https://youtu.be/n8PtTFGl6hg" created="2019-02-14"/>
+        <outline text="Trump&apos;s attacks on journalists could incite violence, study warns" type="link" url="https://www.politico.com/story/2019/01/31/trump-attacks-journalists-study-1139510" created="2019-01-31"/>
+        <outline text="Radical Rethink: 2014 Journalism Ethics Conference" type="link" url="https://youtu.be/BdJAL-wWAZU" created="2019-01-22"/>
+        <outline text="Creating a Space for Ad-Free Journalism with The Correspondent" type="link" url="https://youtu.be/xzNCOW_DEPU" created="2018-12-09"/>
+        <outline text="Jay Rosen pitches the English-language Correspondent on The Daily Show" type="link" url="https://www.niemanlab.org/2018/12/jay-rosen-pitches-the-english-language-correspondent-on-the-daily-show/" created="2018-12-08"/>
+        <outline text="Letter to My Network: Join The Correspondent - PressThink" type="link" url="https://pressthink.org/2018/11/letter-to-my-network-join-the-correspondent/" created="2018-11-14"/>
+        <outline text="Twitter CEO Jack Dorsey interviewed by NYU professor Jay Rosen; podcast, transcript | Vox" type="link" url="https://www.vox.com/2018/9/14/17857486/twitter-jack-dorsey-nyu-jay-rosen-bias-neutrality-presence-politics-recode-media-podcast" created="2018-09-14"/>
+        <outline text="Center for Media at Risk Launch Symposium, Panel 4: Journalism" type="link" url="https://youtu.be/TsnVBVMijVY" created="2018-05-23"/>
+        <outline text="Why Trump Is Winning and the Press Is Losing" type="link" url="https://www.nybooks.com/daily/2018/04/25/why-trump-is-winning-and-the-press-is-losing/" created="2018-04-25"/>
+        <outline text="Journalism’s perfect storm? Confronting rising global threats from “f*ke news” to censorship, surveillance, and the killing of journalists with impunity" type="link" url="https://cpj.org/events/international-journalism-festival-panel-discussion-journalisms-perfect-storm/" created="2018-04-13"/>
+        <outline text="Normalizing Trump: An incredibly brief explainer - PressThink" type="link" url="https://pressthink.org/2017/09/normalizing-trump-incredibly-brief-explainer/" created="2017-09-17"/>
+        <outline text="DATELINE-SAIGON Panel: Jay Rosen on the distinctions between “journalism” and “the media" type="link" url="https://www.youtube.com/watch?v=Ik3ryiYZoj8" created="2017-05-05"/>
+        <outline text="Prospects for the American press under Trump, part two - PressThink" type="link" url="https://pressthink.org/2016/12/prospects-american-press-trump-part-two/" created="2016-12-30"/>
+        <outline text="Winter is coming: prospects for the American press under Trump - PressThink" type="link" url="https://pressthink.org/2016/12/winter-coming-prospects-american-press-trump/" created="2016-12-29"/>
+        <outline text="Journalism: Where we went wrong and what we can do about it" type="link" url="https://youtu.be/o_SzPrd2RNw" created="2016-11-18"/>
+        <outline text="Newspapers shouldn&apos;t apologize for telling the truth about Donald Trump" type="link" url="https://www.theguardian.com/commentisfree/2016/nov/01/newspapers-should-tell-truth-about-donald-trump-jay-rosen" created="2016-11-01"/>
+        <outline text="Jay Rosen, Public Radio&apos;s Loyal Critic" type="link" url="https://soundcloud.com/currentpubmedia/jay-rosen-public-radios-loyal-critic" created="2016-04-22"/>
+        <outline text="Too Much Of Podcasting Is In New York" type="link" url="https://soundcloud.com/currentpubmedia/too-much-of-podcasting-is-in-new-york" created="2016-04-22"/>
       </outline>
       <outline text="Democracy in Crisis (20s)" type="category">
         <outline text="Jay Rosen on the digital revolution that wasn&apos;t" type="link" url="https://www.cjr.org/kicker/jay-rosen-digital-revolution-that-wasnt.php" created="2025-12-29"/>
+        <outline text="Public journalism redux: Post-academia, Jay Rosen returns to where he started" type="link" url="https://dankennedy.net/2025/10/16/public-journalism-redux-post-academia-jay-rosen-returns-to-where-he-started/" created="2025-10-16"/>
+        <outline text="Q&amp;A with Jay Rosen: How Trump nullifies reality" type="link" url="https://www.stopthepresses.news/p/q-and-a-with-jay-rosen-how-trump" created="2025-08-11"/>
+        <outline text="36 thoughts on the 2024 campaign" type="link" url="https://www.offmessage.net/p/36-thoughts-on-the-2024-campaign" created="2024-11-05"/>
+        <outline text="A media critic urged &apos;not the odds, but the stakes.&apos; Did it work?" type="link" url="https://margaretsullivan.substack.com/p/a-media-critic-urged-not-the-odds" created="2024-11-04"/>
+        <outline text="The nonstop, dangerous Trump &apos;liestream&apos; is same as it ever was" type="link" url="https://revkin.substack.com/p/the-nonstop-dangerous-trump-liestream" created="2024-09-26"/>
+        <outline text="The political economy of normalization" type="link" url="https://www.offmessage.net/p/the-political-economy-of-normalization" created="2024-03-27"/>
+        <outline text="Lessons on how to cover politics in 2024" type="link" url="https://www.wnycstudios.org/podcasts/otm/segments/year-threat-democracy-on-the-media" created="2023-12-29"/>
+        <outline text="Journalists tackle political puzzle for 2024" type="link" url="https://www.newspapers.com/image/1254405332/" created="2023-12-15"/>
+        <outline text="CNN&apos;s impossible dilemma" type="link" url="https://www.wnycstudios.org/podcasts/otm/segments/cnns-impossible-dilemma-on-the-media" created="2023-06-09"/>
+        <outline text="Fallout from Trump town hall: Jay Rosen on the tightrope news outlets face" type="link" url="https://www.msnbc.com/11th-hour/watch/fallout-from-trump-town-hall-174063173939" created="2023-05-11"/>
+        <outline text="One-on-one with Jay Rosen: Trump, conservative media, and the Ohio derailment" type="link" url="https://www.msnbc.com/11th-hour/watch/one-on-one-with-jay-rosen-163866693833" created="2023-02-22"/>
+        <outline text="Jay Rosen on the mess at CNN and the perils of &quot;both sides&quot; journalism" type="link" url="https://www.publicnotice.co/p/jay-rosen-both-sides-journalism-cnn" created="2022-09-12"/>
+        <outline text="Brutal, reassuring and unvarnished" type="link" url="https://www.newspapers.com/image/1049755607/" created="2022-06-13"/>
+        <outline text="What does constructive journalism construct?" type="link" url="https://www.bonn-institute.org/news/what-does-constructive-journalism-construct" created="2022-04-27"/>
+        <outline text="Jay Rosen says news outlets should be &apos;pro-democracy&apos;" type="link" url="https://www.cnn.com/2021/12/12/media/jay-rosen-reliable-sources-political-coverage-democracy/index.html" created="2021-12-12"/>
+        <outline text="Journalists also have an obligation to fix democracy" type="link" url="https://www.washingtonpost.com/opinions/2021/11/15/journalists-also-have-an-obligation-fix-democracy/" created="2021-11-15"/>
+        <outline text="How to cover the ongoing siege on democracy" type="link" url="https://www.wnycstudios.org/podcasts/otm/segments/how-cover-ongoing-siege-democracy-on-the-media" created="2021-06-11"/>
+        <outline text="Jay Rosen looks at what happened to journalism norms during the Trump years" type="link" url="https://www.minnpost.com/eric-black-ink/2021/05/jay-rosen-looks-at-what-happened-to-journalism-norms-during-the-trump-years/" created="2021-05-14"/>
+        <outline text="Lucid Interview: Jay Rosen" type="link" url="https://lucid.substack.com/p/lucid-interview-jay-rosen" created="2021-05-12"/>
+        <outline text="What the press have and should have learned from the Trump era" type="link" url="https://www.wnycstudios.org/podcasts/otm/segments/what-press-have-and-should-have-learned-trump-era" created="2021-01-22"/>
+        <outline text="To protect democracy, journalists need to learn to think like hackers and spies" type="link" url="https://thecorrespondent.com/770/to-protect-democracy-journalists-need-to-learn-to-think-like-hackers-and-spies/6717828040-347f3503" created="2020-10-28"/>
+        <outline text="Four radical ways the media can protect US democracy from Trump" type="link" url="https://thecorrespondent.com/757/four-radical-ways-the-media-can-protect-us-democracy-from-trump/6604410164-cc78b53c" created="2020-10-20"/>
+        <outline text="Journalists should be in &apos;emergency&apos; mode" type="link" url="https://www.wnycstudios.org/podcasts/otm/segments/journalists-should-be-emergency-mode-on-the-media" created="2020-10-16"/>
+        <outline text="Don&apos;t let Trump be the protagonist of the pandemic (and four other ways the media can improve how it covers the coronavirus)" type="link" url="https://thecorrespondent.com/734/dont-let-trump-be-the-protagonist-of-the-pandemic-and-four-other-ways-the-media-can-improve-how-it-covers-the-coronavirus/6403747768-dd747b6e" created="2020-10-07"/>
+        <outline text="In the 2020 US election, journalists need an agenda: defending democracy" type="link" url="https://thecorrespondent.com/717/in-the-2020-us-election-journalists-need-an-agenda-defending-democracy/6255432084-fd0a31dd" created="2020-09-29"/>
+        <outline text="What newsrooms can learn from threat modeling at Facebook" type="link" url="https://www.theverge.com/21435639/threat-modeling-facebook-alex-stamos-newsroom-security" created="2020-09-14"/>
+        <outline text="The plan is to have no plan" type="link" url="https://www.adbusters.org/article/the-plan-is-to-have-no-plan" created="2020-05-04"/>
+      </outline>
+      <outline text="Platform Transition &amp; Future Models (2021-Present)" type="category">
         <outline text="I send my questions about that to" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p" created="2025-10-30"/>
         <outline text="Many of you, I know, receive a lot of national news, but care a lot about local" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4ecwzqx322p" created="2025-10-30"/>
         <outline text="Thanks, Casey" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e6y3jkhk2p" created="2025-10-29"/>
@@ -203,7 +362,6 @@
         <outline text="Columbia Journalism Review has a new editor-in-chief, Betsy Morais" type="link" url="https://x.com/jayrosen_nyu/status/1979620139093115071" created="2025-10-18"/>
         <outline text="The New York Times published the new rules imposed on journalists by The..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3fm2epscs26" created="2025-10-17"/>
         <outline text="Kinda handy when these people sign the papers and identify themselves, don&apos;t..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3fkot3kac2k" created="2025-10-17"/>
-        <outline text="Public journalism redux: Post-academia, Jay Rosen returns to where he started" type="link" url="https://dankennedy.net/2025/10/16/public-journalism-redux-post-academia-jay-rosen-returns-to-where-he-started/" created="2025-10-16"/>
         <outline text="Thanks to Dan Kennedy for this post about my next gig after retiring from NYU&apos;s..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3d2t6wu4k26" created="2025-10-16"/>
         <outline text="This is a very good paragraph" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3bm3dbqps2n" created="2025-10-16"/>
         <outline text="After initially appearing to come out against the rules, Donald Trump seemed to..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3bk7tcxik2u" created="2025-10-16"/>
@@ -216,6 +374,8 @@
         <outline text="Ask He wrote the post" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m36wsxwvus2h" created="2025-10-15"/>
         <outline text="&quot;People often ask me what journalism I trust" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m36vxdyewk2q" created="2025-10-15"/>
         <outline text="&quot;People often ask me what journalism I trust" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m36qy2sr4k2h" created="2025-10-15"/>
+        <outline text="From my latest post" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m36gxcpdsk2v" created="2025-10-14"/>
+        <outline text="&quot;Why I&apos;m handing in my Pentagon press pass&quot; by Tom Bowman of NPR" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m35ykm4hp22j" created="2025-10-14"/>
       </outline>
     </outline>
     <outline text="By Category">
