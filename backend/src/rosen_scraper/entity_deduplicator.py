@@ -39,15 +39,16 @@ class EntityDeduplicator:
         """Connect to Google Sheets."""
         try:
             credentials_path = os.environ.get(
-                "GOOGLE_APPLICATION_CREDENTIALS",
-                "google_credentials.json"
+                "GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json"
             )
 
             print("[DEDUP] Connecting to Google Sheets...")
             self.gc = gspread.service_account(filename=credentials_path)
             self.spreadsheet = self.gc.open(self.spreadsheet_name)
             self.entities_sheet = self.spreadsheet.worksheet("extracted_entities")
-            self.relationships_sheet = self.spreadsheet.worksheet("extracted_relationships")
+            self.relationships_sheet = self.spreadsheet.worksheet(
+                "extracted_relationships"
+            )
             print("[DEDUP] Successfully connected")
             return True
         except Exception as e:
@@ -71,26 +72,26 @@ class EntityDeduplicator:
         normalized = name.lower().strip()
 
         # Remove common articles at the start
-        normalized = re.sub(r'^(the|a|an)\s+', '', normalized)
+        normalized = re.sub(r"^(the|a|an)\s+", "", normalized)
 
         # Remove punctuation but keep spaces
-        normalized = re.sub(r'[^\w\s]', '', normalized)
+        normalized = re.sub(r"[^\w\s]", "", normalized)
 
         # Collapse multiple spaces
-        normalized = re.sub(r'\s+', ' ', normalized).strip()
+        normalized = re.sub(r"\s+", " ", normalized).strip()
 
         # Handle common abbreviations (organization specific)
         if entity_type == "Organization":
             abbrev_map = {
-                'nyt': 'new york times',
-                'wapo': 'washington post',
-                'nyu': 'new york university',
-                'npr': 'national public radio',
-                'pbs': 'public broadcasting service',
-                'cnn': 'cable news network',
-                'bbc': 'british broadcasting corporation',
-                'ap': 'associated press',
-                'wsj': 'wall street journal'
+                "nyt": "new york times",
+                "wapo": "washington post",
+                "nyu": "new york university",
+                "npr": "national public radio",
+                "pbs": "public broadcasting service",
+                "cnn": "cable news network",
+                "bbc": "british broadcasting corporation",
+                "ap": "associated press",
+                "wsj": "wall street journal",
             }
             if normalized in abbrev_map:
                 normalized = abbrev_map[normalized]
@@ -114,18 +115,18 @@ class EntityDeduplicator:
                 continue
 
             entity = {
-                'row_number': row_idx + 2,  # +2 for header and 0-indexing
-                'entity_id': row[0],
-                'entity_type': row[1] if len(row) > 1 else "",
-                'entity_name': row[2] if len(row) > 2 else "",
-                'normalized_name': row[3] if len(row) > 3 else "",
-                'role_or_description': row[4] if len(row) > 4 else "",
-                'affiliation': row[5] if len(row) > 5 else "",
-                'prominence_score': row[6] if len(row) > 6 else "",
-                'first_mention_record_id': row[7] if len(row) > 7 else "",
-                'total_mentions': row[8] if len(row) > 8 else "",
-                'related_entities': row[9] if len(row) > 9 else "",
-                'notes': row[10] if len(row) > 10 else ""
+                "row_number": row_idx + 2,  # +2 for header and 0-indexing
+                "entity_id": row[0],
+                "entity_type": row[1] if len(row) > 1 else "",
+                "entity_name": row[2] if len(row) > 2 else "",
+                "normalized_name": row[3] if len(row) > 3 else "",
+                "role_or_description": row[4] if len(row) > 4 else "",
+                "affiliation": row[5] if len(row) > 5 else "",
+                "prominence_score": row[6] if len(row) > 6 else "",
+                "first_mention_record_id": row[7] if len(row) > 7 else "",
+                "total_mentions": row[8] if len(row) > 8 else "",
+                "related_entities": row[9] if len(row) > 9 else "",
+                "notes": row[10] if len(row) > 10 else "",
             }
             entities.append(entity)
 
@@ -144,8 +145,8 @@ class EntityDeduplicator:
         entity_groups = defaultdict(list)
 
         for entity in entities:
-            entity_type = entity['entity_type']
-            entity_name = entity['entity_name']
+            entity_type = entity["entity_type"]
+            entity_name = entity["entity_name"]
 
             if not entity_name or not entity_type:
                 continue
@@ -154,7 +155,9 @@ class EntityDeduplicator:
             key = (normalized, entity_type)
             entity_groups[key].append(entity)
 
-        print(f"[DEDUP] Found {len(entity_groups)} unique entities (after normalization)")
+        print(
+            f"[DEDUP] Found {len(entity_groups)} unique entities (after normalization)"
+        )
 
         # Create canonical registry
         canonical_registry = {}
@@ -163,13 +166,13 @@ class EntityDeduplicator:
         for (normalized_name, entity_type), group in entity_groups.items():
             # Determine canonical ID
             prefix = {
-                'Person': 'P',
-                'Organization': 'O',
-                'Work': 'W',
-                'Concept': 'C',
-                'Event': 'E',
-                'Location': 'L'
-            }.get(entity_type, 'X')
+                "Person": "P",
+                "Organization": "O",
+                "Work": "W",
+                "Concept": "C",
+                "Event": "E",
+                "Location": "L",
+            }.get(entity_type, "X")
 
             entity_type_counters[prefix] += 1
             canonical_id = f"{prefix}{entity_type_counters[prefix]:04d}"
@@ -177,60 +180,77 @@ class EntityDeduplicator:
             # Choose best entity name (most common or longest)
             name_counts = defaultdict(int)
             for entity in group:
-                name_counts[entity['entity_name']] += 1
+                name_counts[entity["entity_name"]] += 1
 
             # Pick most frequent name, or longest if tie
-            canonical_name = max(name_counts.keys(),
-                               key=lambda n: (name_counts[n], len(n)))
+            canonical_name = max(
+                name_counts.keys(), key=lambda n: (name_counts[n], len(n))
+            )
 
             # Collect all record IDs where this entity appears
             record_ids = set()
             for entity in group:
-                if entity['first_mention_record_id']:
-                    record_ids.add(entity['first_mention_record_id'])
+                first_mention_record_id = entity.get("first_mention_record_id")
+                if first_mention_record_id:
+                    record_ids.add(first_mention_record_id)
 
             # Get earliest mention
-            first_mention = min([e['first_mention_record_id'] for e in group
-                               if e['first_mention_record_id']], default="")
+            first_mention = min(
+                [
+                    e.get("first_mention_record_id", "")
+                    for e in group
+                    if e.get("first_mention_record_id")
+                ],
+                default="",
+            )
 
             # Aggregate prominence (take max)
-            prominence_scores = [int(e['prominence_score']) for e in group
-                               if e['prominence_score'] and e['prominence_score'].isdigit()]
+            prominence_scores = [
+                int(e.get("prominence_score", ""))
+                for e in group
+                if e.get("prominence_score", "").isdigit()
+            ]
             max_prominence = max(prominence_scores) if prominence_scores else 5
 
             # Aggregate role_or_description (most common non-empty)
             role_counts = defaultdict(int)
             for entity in group:
-                if entity.get('role_or_description'):
-                    role_counts[entity['role_or_description']] += 1
-            canonical_role = max(role_counts.keys(), key=role_counts.get) if role_counts else ""
+                if entity.get("role_or_description"):
+                    role_counts[entity["role_or_description"]] += 1
+            canonical_role = (
+                max(role_counts.keys(), key=role_counts.get) if role_counts else ""
+            )
 
             # Aggregate affiliation (most common non-empty)
             affiliation_counts = defaultdict(int)
             for entity in group:
-                if entity.get('affiliation'):
-                    affiliation_counts[entity['affiliation']] += 1
-            canonical_affiliation = max(affiliation_counts.keys(), key=affiliation_counts.get) if affiliation_counts else ""
+                if entity.get("affiliation"):
+                    affiliation_counts[entity["affiliation"]] += 1
+            canonical_affiliation = (
+                max(affiliation_counts.keys(), key=affiliation_counts.get)
+                if affiliation_counts
+                else ""
+            )
 
             # Store canonical entity
             canonical_registry[canonical_id] = {
-                'canonical_id': canonical_id,
-                'entity_type': entity_type,
-                'canonical_name': canonical_name,
-                'normalized_name': normalized_name,
-                'role_or_description': canonical_role,
-                'affiliation': canonical_affiliation,
-                'total_mentions': len(group),
-                'mentioned_in_records': len(record_ids),
-                'first_mention': first_mention,
-                'prominence_score': max_prominence,
-                'original_ids': [e['entity_id'] for e in group],
-                'name_variations': list(set([e['entity_name'] for e in group]))
+                "canonical_id": canonical_id,
+                "entity_type": entity_type,
+                "canonical_name": canonical_name,
+                "normalized_name": normalized_name,
+                "role_or_description": canonical_role,
+                "affiliation": canonical_affiliation,
+                "total_mentions": len(group),
+                "mentioned_in_records": len(record_ids),
+                "first_mention": first_mention,
+                "prominence_score": max_prominence,
+                "original_ids": [e["entity_id"] for e in group],
+                "name_variations": list(set([e["entity_name"] for e in group])),
             }
 
             # Build ID mapping (old_id -> canonical_id)
             for entity in group:
-                self.id_mapping[entity['entity_id']] = canonical_id
+                self.id_mapping[entity["entity_id"]] = canonical_id
 
         print(f"[DEDUP] Created {len(canonical_registry)} canonical entities")
         print(f"[DEDUP] ID mapping has {len(self.id_mapping)} entries")
@@ -248,17 +268,19 @@ class EntityDeduplicator:
 
             # Match the original schema format
             row = [
-                entity['canonical_id'],                      # entity_id
-                entity['entity_type'],                       # entity_type
-                entity['canonical_name'],                    # entity_name
-                entity['normalized_name'],                   # normalized_name
-                entity.get('role_or_description', ''),       # role_or_description (most common)
-                entity.get('affiliation', ''),               # affiliation (most common)
-                str(entity['prominence_score']),             # prominence_score
-                entity['first_mention'],                     # first_mention_record_id
-                str(entity['total_mentions']),               # total_mentions
-                '',                                          # related_entities (skip)
-                f"Canonical entity (from {len(entity['original_ids'])} mentions: {'; '.join(entity['name_variations'][:3])})"  # notes
+                entity["canonical_id"],  # entity_id
+                entity["entity_type"],  # entity_type
+                entity["canonical_name"],  # entity_name
+                entity["normalized_name"],  # normalized_name
+                entity.get(
+                    "role_or_description", ""
+                ),  # role_or_description (most common)
+                entity.get("affiliation", ""),  # affiliation (most common)
+                str(entity["prominence_score"]),  # prominence_score
+                entity["first_mention"],  # first_mention_record_id
+                str(entity["total_mentions"]),  # total_mentions
+                "",  # related_entities (skip)
+                f"Canonical entity (from {len(entity['original_ids'])} mentions: {'; '.join(entity['name_variations'][:3])})",  # notes
             ]
             rows.append(row)
 
@@ -274,11 +296,13 @@ class EntityDeduplicator:
         print(f"[DEDUP] Writing {len(rows)} deduplicated entities...")
         if rows:
             for i in range(0, len(rows), 100):
-                batch = rows[i:i+100]
+                batch = rows[i : i + 100]
                 self.entities_sheet.append_rows(batch)
                 print(f"[DEDUP] Wrote {len(batch)} rows...")
 
-        print(f"[DEDUP] Successfully replaced extracted_entities with {len(rows)} canonical entities")
+        print(
+            f"[DEDUP] Successfully replaced extracted_entities with {len(rows)} canonical entities"
+        )
         return self.entities_sheet
 
     def create_deduplicated_sheet(self, canonical_registry: Dict):
@@ -305,13 +329,13 @@ class EntityDeduplicator:
             "prominence_score",
             "name_variations",
             "original_ids",
-            "notes"
+            "notes",
         ]
 
         dedup_sheet = self.spreadsheet.add_worksheet(
             title="entities_deduplicated",
             rows=len(canonical_registry) + 1,
-            cols=len(headers)
+            cols=len(headers),
         )
 
         # Write headers
@@ -323,24 +347,24 @@ class EntityDeduplicator:
             entity = canonical_registry[canonical_id]
 
             row = [
-                entity['canonical_id'],
-                entity['entity_type'],
-                entity['canonical_name'],
-                entity['normalized_name'],
-                str(entity['total_mentions']),
-                str(entity['mentioned_in_records']),
-                entity['first_mention'],
-                str(entity['prominence_score']),
-                '; '.join(entity['name_variations'][:5]),  # First 5 variations
-                '; '.join(entity['original_ids'][:10]),  # First 10 original IDs
-                f"Deduplicated from {len(entity['original_ids'])} original mentions"
+                entity["canonical_id"],
+                entity["entity_type"],
+                entity["canonical_name"],
+                entity["normalized_name"],
+                str(entity["total_mentions"]),
+                str(entity["mentioned_in_records"]),
+                entity["first_mention"],
+                str(entity["prominence_score"]),
+                "; ".join(entity["name_variations"][:5]),  # First 5 variations
+                "; ".join(entity["original_ids"][:10]),  # First 10 original IDs
+                f"Deduplicated from {len(entity['original_ids'])} original mentions",
             ]
             rows.append(row)
 
         # Batch write
         if rows:
             for i in range(0, len(rows), 100):
-                batch = rows[i:i+100]
+                batch = rows[i : i + 100]
                 dedup_sheet.append_rows(batch)
                 print(f"[DEDUP] Wrote {len(batch)} rows...")
 
@@ -387,21 +411,25 @@ class EntityDeduplicator:
                 # Update this row
                 row_number = row_idx + 2  # +2 for header and 0-indexing
 
-                updates.append({
-                    'range': f'{gspread.utils.rowcol_to_a1(row_number, source_id_col + 1)}',
-                    'values': [[new_source_id]]
-                })
-                updates.append({
-                    'range': f'{gspread.utils.rowcol_to_a1(row_number, target_id_col + 1)}',
-                    'values': [[new_target_id]]
-                })
+                updates.append(
+                    {
+                        "range": f"{gspread.utils.rowcol_to_a1(row_number, source_id_col + 1)}",
+                        "values": [[new_source_id]],
+                    }
+                )
+                updates.append(
+                    {
+                        "range": f"{gspread.utils.rowcol_to_a1(row_number, target_id_col + 1)}",
+                        "values": [[new_target_id]],
+                    }
+                )
                 updated_count += 1
 
         # Batch update
         if updates:
             print(f"[DEDUP] Applying {len(updates)} updates to relationships...")
             for i in range(0, len(updates), 100):
-                batch = updates[i:i+100]
+                batch = updates[i : i + 100]
                 self.relationships_sheet.batch_update(batch)
                 print(f"[DEDUP] Updated {min(i+100, len(updates))}/{len(updates)}...")
 
@@ -409,14 +437,18 @@ class EntityDeduplicator:
 
     def generate_report(self, canonical_registry: Dict):
         """Generate deduplication report."""
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("ENTITY DEDUPLICATION REPORT")
-        print("="*80)
+        print("=" * 80)
 
         # Overall stats
         total_canonical = len(canonical_registry)
-        total_original = sum(e['total_mentions'] for e in canonical_registry.values())
-        reduction = ((total_original - total_canonical) / total_original * 100) if total_original > 0 else 0
+        total_original = sum(e["total_mentions"] for e in canonical_registry.values())
+        reduction = (
+            ((total_original - total_canonical) / total_original * 100)
+            if total_original > 0
+            else 0
+        )
 
         print(f"Original entity rows: {total_original}")
         print(f"Canonical entities: {total_canonical}")
@@ -424,36 +456,46 @@ class EntityDeduplicator:
 
         # By type
         print("\nBy Entity Type:")
-        type_stats = defaultdict(lambda: {'count': 0, 'original': 0})
+        type_stats = defaultdict(lambda: {"count": 0, "original": 0})
         for entity in canonical_registry.values():
-            etype = entity['entity_type']
-            type_stats[etype]['count'] += 1
-            type_stats[etype]['original'] += entity['total_mentions']
+            etype = entity["entity_type"]
+            type_stats[etype]["count"] += 1
+            type_stats[etype]["original"] += entity["total_mentions"]
 
         for etype in sorted(type_stats.keys()):
             stats = type_stats[etype]
-            print(f"  {etype}: {stats['count']} canonical (from {stats['original']} original)")
+            print(
+                f"  {etype}: {stats['count']} canonical (from {stats['original']} original)"
+            )
 
         # Top entities by mentions
         print("\nTop 10 Most Mentioned Entities:")
-        top_entities = sorted(canonical_registry.values(),
-                            key=lambda e: e['total_mentions'], reverse=True)[:10]
+        top_entities = sorted(
+            canonical_registry.values(), key=lambda e: e["total_mentions"], reverse=True
+        )[:10]
 
         for entity in top_entities:
-            print(f"  {entity['canonical_id']} - {entity['canonical_name']} "
-                  f"({entity['entity_type']}): {entity['total_mentions']} mentions")
+            print(
+                f"  {entity['canonical_id']} - {entity['canonical_name']} "
+                f"({entity['entity_type']}): {entity['total_mentions']} mentions"
+            )
 
         # Name variations
         print("\nEntities with Most Name Variations:")
-        top_variations = sorted(canonical_registry.values(),
-                               key=lambda e: len(e['name_variations']), reverse=True)[:10]
+        top_variations = sorted(
+            canonical_registry.values(),
+            key=lambda e: len(e["name_variations"]),
+            reverse=True,
+        )[:10]
 
         for entity in top_variations:
-            if len(entity['name_variations']) > 1:
-                print(f"  {entity['canonical_name']}: {len(entity['name_variations'])} variations")
+            if len(entity["name_variations"]) > 1:
+                print(
+                    f"  {entity['canonical_name']}: {len(entity['name_variations'])} variations"
+                )
                 print(f"    {', '.join(entity['name_variations'][:5])}")
 
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
     def run(self, update_relationships: bool = True, replace_original: bool = False):
         """Run the complete deduplication process.
@@ -462,9 +504,9 @@ class EntityDeduplicator:
             update_relationships: Whether to update relationships with canonical IDs
             replace_original: If True, replace extracted_entities sheet; if False, create new sheet
         """
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("STARTING ENTITY DEDUPLICATION")
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         # Connect
         if not self.connect_to_sheets():
@@ -494,9 +536,13 @@ class EntityDeduplicator:
         print("[DEDUP] Deduplication complete!")
         print("\nResults:")
         if replace_original:
-            print("  - Original 'extracted_entities' sheet replaced with clean canonical data")
+            print(
+                "  - Original 'extracted_entities' sheet replaced with clean canonical data"
+            )
         else:
-            print("  - New sheet 'entities_deduplicated' created with canonical entities")
+            print(
+                "  - New sheet 'entities_deduplicated' created with canonical entities"
+            )
             print("  - Original 'extracted_entities' sheet preserved for reference")
         if update_relationships:
             print("  - Relationships updated with canonical entity IDs")
@@ -510,18 +556,18 @@ def main():
     parser.add_argument(
         "--skip-relationships",
         action="store_true",
-        help="Skip updating relationships sheet"
+        help="Skip updating relationships sheet",
     )
     parser.add_argument(
         "--spreadsheet",
         type=str,
         default=None,
-        help="Google Sheet name (default: from environment)"
+        help="Google Sheet name (default: from environment)",
     )
     parser.add_argument(
         "--replace-original",
         action="store_true",
-        help="Replace the original extracted_entities sheet instead of creating a new one"
+        help="Replace the original extracted_entities sheet instead of creating a new one",
     )
 
     args = parser.parse_args()
@@ -529,7 +575,7 @@ def main():
     deduplicator = EntityDeduplicator(spreadsheet_name=args.spreadsheet)
     deduplicator.run(
         update_relationships=not args.skip_relationships,
-        replace_original=args.replace_original
+        replace_original=args.replace_original,
     )
 
 
