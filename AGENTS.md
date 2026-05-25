@@ -8,6 +8,8 @@ This directory is primarily a Node-based project. Start with `archived/`, `backe
 
 - `npm install` installs dependencies.
 - `npm test` runs the project test suite.
+- `npm run preview` serves the static bundle at `http://localhost:8000/` for a production-fidelity preview (same code paths as `pressthink.org/j/rosen-archive/`, with relative URLs auto-selected by `App.js` on localhost). Override the port with `PREVIEW_PORT=8765 npm run preview`.
+- `npm run preview:audit` spawns the preview server, walks the key routes at mobile (375x812) and desktop (1440x900) viewports, runs `axe-core` for WCAG 2.1 AA, and writes `preview-audit-results/axe-report.html` + per-route screenshots. Exits non-zero if any violations are found.
 
 ## Coding style and naming conventions
 

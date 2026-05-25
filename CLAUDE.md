@@ -262,11 +262,22 @@ Record deep links: `?record=RECORD_ID` opens a record modal on any route.
 
 ## Local development
 
+Two options for serving the static bundle locally — both give the same production-fidelity preview (relative URLs are auto-selected by `App.js` when `window.location.hostname === 'localhost'`):
+
 ```bash
-python3 -m http.server 8000   # Serve from repo root, open http://localhost:8000
+npm run preview                       # Node-based static server at http://localhost:8000/
+python3 -m http.server 8000           # Equivalent — Python option, no Node required
 ```
 
-No build step needed. The app runs directly from source files via ES module imports. Tailwind CSS is pre-built at `frontend/dist/tailwind.css`.
+Override the port with `PREVIEW_PORT=8765 npm run preview`. No build step needed; the app runs directly from source files via ES module imports. Tailwind CSS is pre-built at `frontend/dist/tailwind.css`.
+
+### Preview audit (WCAG 2.1 AA)
+
+```bash
+npm run preview:audit                 # Mobile + desktop, key routes, axe-core scan
+```
+
+Spawns the preview server, walks 9 key routes (archive, explorer, entities, about, analytics, record modal, dissertation, dissertation reader, status report) at 375x812 and 1440x900 viewports, runs `axe-core` for WCAG 2.1 AA, and writes `preview-audit-results/axe-report.html` plus per-route screenshots under `preview-audit-results/screenshots/{viewport}/`. Exits non-zero if any violations are found.
 
 ## Testing
 

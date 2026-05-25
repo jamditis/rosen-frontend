@@ -85,6 +85,9 @@ known_entities.json
 test-results/
 playwright-report/
 
+# Preview audit output (npm run preview:audit)
+preview-audit-results/
+
 # Entity extraction working data
 data/social_import/
 .firecrawl/
