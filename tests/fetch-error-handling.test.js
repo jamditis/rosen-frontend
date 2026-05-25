@@ -25,7 +25,7 @@ describe('fetch error handling (#171)', () => {
     // between `fetch(csvUrl)` and `response.text()`. Doing this with a
     // structured search instead of a brittle regex on the whole file.
     const fetchIdx = src.indexOf('await fetch(csvUrl)');
-    assert.ok(fetchIdx > 0, 'expected `await fetch(csvUrl)` in dataviz.html');
+    assert.ok(fetchIdx >= 0, 'expected `await fetch(csvUrl)` in dataviz.html');
     const textIdx = src.indexOf('response.text()', fetchIdx);
     assert.ok(textIdx > fetchIdx, 'expected `response.text()` to follow fetch(csvUrl)');
 
@@ -44,21 +44,40 @@ describe('fetch error handling (#171)', () => {
     // Find the fetchCoreData definition; verify `await checkVersion()`
     // appears before the first `getCachedData(` call inside it.
     const fnIdx = src.indexOf('export const fetchCoreData');
-    assert.ok(fnIdx > 0, 'expected `export const fetchCoreData` in archiveService.js');
+    assert.ok(fnIdx >= 0, 'expected `export const fetchCoreData` in archiveService.js');
 
     // Body is everything up to the next top-level `export ` (the next
     // exported binding starts a sibling definition).
     const bodyEnd = src.indexOf('\nexport ', fnIdx + 1);
-    const body = src.slice(fnIdx, bodyEnd > 0 ? bodyEnd : src.length);
+    const body = src.slice(fnIdx, bodyEnd >= 0 ? bodyEnd : src.length);
 
     const cacheReadIdx = body.indexOf('getCachedData(');
-    assert.ok(cacheReadIdx > 0, 'expected getCachedData(...) call inside fetchCoreData');
+    assert.ok(cacheReadIdx >= 0, 'expected getCachedData(...) call inside fetchCoreData');
 
     const beforeCacheRead = body.slice(0, cacheReadIdx);
     assert.match(
       beforeCacheRead,
-      /await\s+checkVersion\s*\(/,
-      'fetchCoreData must `await checkVersion()` before reading the cache'
+      /await\s+withVersionTimeout\s*\(\s*checkVersion\s*\(/,
+      'fetchCoreData must `await` a bounded `checkVersion()` before reading the cache so a slow version.json cannot stall the load'
+    );
+  });
+
+  it('checkVersion releases its memoised Promise on settle so a hung check does not poison future calls', () => {
+    const file = path.join(rootDir, 'frontend', 'services', 'archiveService.js');
+    const src = fs.readFileSync(file, 'utf-8');
+
+    const defIdx = src.indexOf('const checkVersion');
+    assert.ok(defIdx >= 0, 'expected `const checkVersion` in archiveService.js');
+    const defEnd = src.indexOf('\n};', defIdx);
+    const def = src.slice(defIdx, defEnd >= 0 ? defEnd : src.length);
+
+    // After the Promise settles, clear versionCheckPromise so the next call
+    // can retry. Without this a single hung version.json would freeze every
+    // future load in the session.
+    assert.match(
+      def,
+      /\.finally\s*\([^}]*versionCheckPromise\s*=\s*null/s,
+      'checkVersion must reset versionCheckPromise on settle'
     );
   });
 
@@ -71,9 +90,9 @@ describe('fetch error handling (#171)', () => {
     const src = fs.readFileSync(file, 'utf-8');
 
     const defIdx = src.indexOf('const checkVersion');
-    assert.ok(defIdx > 0, 'expected `const checkVersion` in archiveService.js');
+    assert.ok(defIdx >= 0, 'expected `const checkVersion` in archiveService.js');
     const defEnd = src.indexOf('\n};', defIdx);
-    const def = src.slice(defIdx, defEnd > 0 ? defEnd : src.length);
+    const def = src.slice(defIdx, defEnd >= 0 ? defEnd : src.length);
 
     // Either the function body returns/awaits a cached Promise variable,
     // OR it sets a sync flag AFTER the await (so concurrent callers can't

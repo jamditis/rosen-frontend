@@ -201,11 +201,12 @@ const getCacheKey = (url) => {
  * clear all caches so users get fresh data after deploys.
  */
 // Memoise the in-flight Promise so concurrent callers all await the same
-// fetch instead of racing past a sync boolean (#171).
+// fetch instead of racing past a sync boolean (#171). Released on settle
+// so a hung or failed check doesn't poison every future call in the session.
 let versionCheckPromise = null;
 const checkVersion = () => {
   if (versionCheckPromise) return versionCheckPromise;
-  versionCheckPromise = (async () => {
+  const pending = (async () => {
     try {
       const resp = await fetch('./version.json?t=' + Date.now());
       if (resp.ok) {
@@ -219,8 +220,29 @@ const checkVersion = () => {
       }
     } catch { /* version.json not available, skip */ }
   })();
-  return versionCheckPromise;
+  versionCheckPromise = pending;
+  pending.finally(() => {
+    if (versionCheckPromise === pending) versionCheckPromise = null;
+  });
+  return pending;
 };
+
+// Bound the wait at the call site so a slow or hung version.json can't
+// stall a load a good cache could satisfy. The check stays in flight in
+// the background and clears the cache if it eventually returns.
+const VERSION_CHECK_TIMEOUT_MS = 4000;
+const withVersionTimeout = (promise) =>
+  new Promise((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      resolve();
+    };
+    const timer = setTimeout(finish, VERSION_CHECK_TIMEOUT_MS);
+    promise.then(finish, finish);
+  });
 
 const getCachedData = (url) => {
   try {
@@ -306,8 +328,9 @@ export const clearArchiveCache = () => {
 export const fetchCoreData = async () => {
   const dataUrl = DATA_CONFIG.archive_core;
 
-  // Check deploy version (clears caches if version changed)
-  await checkVersion();
+  // Check deploy version (clears caches if version changed), bounded so a
+  // slow version.json doesn't stall a load a good cache could satisfy.
+  await withVersionTimeout(checkVersion());
 
   // Check cache first
   const cached = getCachedData(dataUrl);
