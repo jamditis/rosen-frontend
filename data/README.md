@@ -75,6 +75,26 @@ The generated `archive-data.json` contains:
 }
 ```
 
+## Canonical CSVs vs `social_import/`
+
+The CSVs in `data/` (`archive_records-public.csv`, `social_posts.csv`,
+`extracted_entities.csv`, `extracted_relationships.csv`) are the **canonical
+inputs** for `export-archive-data.js`. Regenerate `archive-data.json` only
+from these.
+
+`data/social_import/` is the gitignored working directory for the backend
+entity-extraction pipeline. Three scripts default `--data-dir` to it:
+
+- `backend/scripts/unified_entity_processor.py`
+- `backend/scripts/batch_entity_extraction.py`
+- `backend/scripts/export_merged_data.py`
+
+A frozen copy of `rosen_social_posts.csv` and ~200 `batch_*` artifacts live
+there. That CSV may share a header with `social_posts.csv` but is older
+pipeline output, not the live data — **do not regenerate the published JSON
+from anything under `social_import/`**. If you need to refresh
+`data/social_posts.csv`, pull from Google Sheets (see Workflow above).
+
 ## See Also
 
 - `IMPLEMENTATION_PLAN.md` for full technical details
