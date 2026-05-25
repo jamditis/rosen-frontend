@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen Digital Archive</title>
-    <dateCreated>Mon, 25 May 2026 12:18:42 GMT</dateCreated>
-    <dateModified>Mon, 25 May 2026 12:18:42 GMT</dateModified>
+    <dateCreated>Mon, 25 May 2026 14:40:15 GMT</dateCreated>
+    <dateModified>Mon, 25 May 2026 14:40:15 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -185,6 +185,7 @@
         <outline text="Old testament and new testament journalism - PressThink" type="link" url="https://pressthink.org/2013/11/old-testament-and-new-testament-journalism/" created="2013-11-03"/>
         <outline text="Studio 20" type="link" url="https://tmblr.co/ZCJQUywcD9ho" created="2013-10-02"/>
         <outline text="The NSA&apos;s next move: silencing university professors?" type="link" url="https://www.theguardian.com/commentisfree/2013/sep/10/nsa-matthew-green-takedown-blog-post-johns-hopkins" created="2013-09-10"/>
+        <outline text="The awayness problem" type="link" url="https://www.cjr.org/cover_story/the_awayness_problem.php" created="2013-09-03"/>
         <outline text="Studio 20 gets an assignment from Quartz News" type="link" url="https://tmblr.co/ZCJQUykusWfa" created="2013-05-13"/>
         <outline text="Studio 20&apos;s Networked Reporting Project" type="link" url="https://tmblr.co/ZCJQUykvAgeB" created="2013-05-13"/>
         <outline text="Studio 20" type="link" url="https://tmblr.co/ZCJQUyZKApP2" created="2012-12-14"/>
@@ -215,7 +216,6 @@
         <outline text="Studio 20 Grads Settle into their New Jobs!" type="link" url="https://tmblr.co/ZCJQUyFqIJTj" created="2012-02-03"/>
         <outline text="A Brief Theory of the Republican Party (2012)" type="link" url="https://publicnotebook.wordpress.com/2012/01/18/a-brief-theory-of-the-republican-party-2012/" created="2012-01-18"/>
         <outline text="Studio 20" type="link" url="https://tmblr.co/ZCJQUyE6An_m" created="2012-01-01"/>
-        <outline text="Studio 20 Will Collaborate With The Guardian on How to Improve Election Coverage" type="link" url="https://tmblr.co/ZCJQUyDIsJfc" created="2011-12-15"/>
       </outline>
       <outline text="View from Nowhere (10s)" type="category">
         <outline text="A call for radically different campaign coverage" type="link" url="https://medium.com/we-are-hearken/a-call-for-radically-different-campaign-coverage-85e62401d0c6" created="2019-06-12"/>
@@ -380,7 +380,7 @@
       </outline>
     </outline>
     <outline text="By Category">
-      <outline text="Press &amp; Media Criticism (23430)" type="category">
+      <outline text="Press &amp; Media Criticism (23431)" type="category">
         <outline text="Jay Rosen on the digital revolution that wasn&apos;t" type="link" url="https://www.cjr.org/kicker/jay-rosen-digital-revolution-that-wasnt.php"/>
         <outline text="I send my questions about that to" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p"/>
         <outline text="Many of you, I know, receive a lot of national news, but care a lot about local" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4ecwzqx322p"/>
