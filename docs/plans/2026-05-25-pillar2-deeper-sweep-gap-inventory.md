@@ -161,9 +161,14 @@ Highest-confidence finds:
 
 ## Era taxonomy implication
 
-The inventory subagent found that 13% of existing records (131) use non-canonical era labels (variants like "Web & Blogging (2000s)" vs the canonical "Blogging Launch & Digital Disruption (2000-2004)"). This is task #11 in the backlog.
+The inventory pass found two distinct era-drift surfaces:
 
-**Implication for Pillar 2 backfill**: any new Bluesky/Mastodon/Threads records map cleanly to "Platform Transition & Future Models (2021-Present)" — no taxonomy work needed for those. But the Rebooting The News and pre-2015 podcast/YouTube backfills will land in eras affected by the drift, and would either (a) inherit the drifted labels by accident or (b) need the canonical-era cleanup to happen first.
+- **Curated archive**: 131 of the 1,007 records in `data/archive_records-public.csv` (13% of the main CSV — NOT 13% of the full corpus) use non-canonical era labels like "Web & Blogging (2000s)" vs the canonical "Blogging Launch & Digital Disruption (2000-2004)". Twelve variants drifted across ~10 years of hand-curation.
+- **Social posts**: 29,130 rows in `data/social_posts.csv` all use a single non-canonical label "Post-Trump & Future of News (2022-Present)" that competes with the canonical "Platform Transition & Future Models (2021-Present)". 100% drift on this side, but uniform — caused by a single import pipeline using one consistent off-canonical label, not by multi-variant creep.
+
+Both drift cases are task #11 in the backlog; PR #218 addresses both (curated cleanup + social-post normalization).
+
+**Implication for Pillar 2 backfill**: any new Bluesky/Mastodon/Threads records map cleanly to "Platform Transition & Future Models (2021-Present)" — no taxonomy work needed for those. But the Rebooting The News and pre-2015 podcast/YouTube backfills will land in eras affected by the curated-side drift, and would either (a) inherit the drifted labels by accident or (b) need the canonical-era cleanup to happen first.
 
 **Recommendation**: don't block the social platform backfill on era cleanup, but do block the Rebooting The News + older-podcast backfill on it.
 
@@ -192,9 +197,8 @@ Priority shift from the first draft: Mastodon moved from P1 to P1 (unchanged); B
 
 ## Source documents
 
-The full subagent reports backing this inventory are at:
-- `/tmp/pillar2-inventory.md` — archive content-type inventory
-- `/tmp/pillar2-social-substack-candidates.md` — Bluesky / Mastodon / Threads / Substack verification
-- `/tmp/pillar2-podcast-youtube-candidates.md` — podcast + YouTube candidate list
+The full inventory pass reports backing this document are committed under `docs/research/`:
 
-These are scratch files — if Joe wants them durably committed, say so and I'll move them to `docs/research/` or similar.
+- [`docs/research/2026-05-25-pillar2-archive-inventory.md`](../research/2026-05-25-pillar2-archive-inventory.md) — archive content-type inventory
+- [`docs/research/2026-05-25-pillar2-social-substack-candidates.md`](../research/2026-05-25-pillar2-social-substack-candidates.md) — Bluesky / Mastodon / Threads / Substack verification
+- [`docs/research/2026-05-25-pillar2-podcast-youtube-candidates.md`](../research/2026-05-25-pillar2-podcast-youtube-candidates.md) — podcast + YouTube candidate list
