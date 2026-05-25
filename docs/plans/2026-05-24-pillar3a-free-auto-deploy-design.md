@@ -36,7 +36,7 @@ Three parallel research subagents 2026-05-24 verified the design's load-bearing 
 - The current `dispatcher.dispatch_url()` uses Google's URL Context API (via the Gemini SDK) as the **primary** scraper, NOT Wayback. Trafilatura/Playwright are fallbacks. `backend/src/rosen_scraper/dispatcher.py:16–79`, `scraper.py:482–515`.
 - AI categorization is a direct `genai` library call (`backend/src/rosen_scraper/categorizer.py:1–80`). Survives unchanged in the Action.
 - `node data/export-archive-data.js` produces ~50 MB of JSON (archive-data: 26 MB, archive-core: 11 MB, archive-details: 12 MB, archive-entities: 1 MB) in ~10–30s. Too large for a Cloudflare Worker (10ms CPU/req); fits comfortably in a GitHub Action.
-- `.github/workflows/post-merge.yml` is a placeholder webhook that does nothing — repurpose-able as the SFTP-on-merge job.
+- `.github/workflows/post-merge.yml` already runs on `push: main` and notifies a dashboard webhook. The SFTP-on-merge job should be added as a sibling job in the same workflow (or a new `submit-record.yml`-internal step) — NOT a replacement, since the dashboard notify is in active use.
 
 ### Platform realities (2026)
 - Cloudflare Workers free tier: 100k req/day, **10ms CPU per request**, 50 subrequests per invocation. The 10ms CPU cap rules out HTML parsing inside the Worker — confirms the Worker would be a thin proxy with little value-add. ([Workers limits](https://developers.cloudflare.com/workers/platform/limits/))
@@ -141,12 +141,12 @@ End-to-end latency: ~10–15 min. Breakdown: GitHub Action queue + cold-runner ~
 |---|---|---|---|
 | `url` | yes | Sheet column B | Validated `http(s)://` in Apps Script AND in workflow (defense in depth) |
 | `title` | no | Sheet column C | Jay's optional override; falls back to scraper title |
-| `notes` | no | Sheet column D | Internal-only; not published |
+| `notes` | no | Sheet column D | Stored in the record's `notes` field. **NOT private** — `workflow_dispatch` inputs are visible in the public repo's Action run history. Treat as published-when-submitted; if Jay needs a private scratchpad, add a separate non-dispatched column to the sheet. |
 | `sheet_id` | yes | `SpreadsheetApp.getActiveSpreadsheet().getId()` | For writeback target |
 | `sheet_tab` | yes | active sheet name | For writeback target |
 | `sheet_row` | yes | row number | For writeback target |
 
-The workflow's run history IS the audit log — every dispatch shows up with inputs visible.
+The workflow's run history IS the audit log AND a public record — every dispatch shows up with every input visible on the public repo's Actions tab. The `JAY_ADDING_RECORDS.md` doc must call this out so neither Jay nor Hali ever pastes a story tip, contact name, or unpublished source into the notes column.
 
 ---
 
@@ -157,7 +157,7 @@ The workflow's run history IS the audit log — every dispatch shows up with inp
 | `submitted` | Apps Script | Dispatched to GitHub; Action picking up |
 | `processing` | Action (step 1) | Action acquired the workflow run |
 | `live` | Action (step 12) | Committed to repo AND SFTP'd to pressthink.org |
-| `archived` | Action (step 10) | Committed to git but SFTP push failed; auto-retry on next submission |
+| `archived` | Action (step 10) | Committed to git but SFTP push failed. Auto-recovered on the next successful submission: the next Action run checks out fresh main (which already has the archived row) and its SFTP step pushes the full canonical JSON set, so the prior row goes live alongside the new one. No sweeper involvement needed for SFTP retry. |
 | `duplicate` | Action (step 2) | URL already in archive; G holds existing RECORD-NNNNN |
 | `error` | Action (any failure) | Couldn't process; H has the reason in plain English |
 | `no URL` / `invalid URL` | Apps Script | Validation failed pre-dispatch |
@@ -215,21 +215,26 @@ All seven are GitHub repo secrets, NOT environment secrets — repo secrets pers
 | CSV append + JSON regen fails | `error` + H="Internal pipeline error: …" + link to Action run log | Check Action log; usually transient (Gemini rate-limit, dispatcher edge case) |
 | Test suite fails (step 9) | `error` + H="Tests failed after CSV write; row not committed. See: <run URL>" | The CSV append happens in the runner's workspace only — no commit means no live impact. Open a normal PR to fix the data, then resubmit. |
 | Git push fails | `error` + H="Could not commit to repo: …" | Check Action log; usually a force-push race or branch-protection misconfig |
-| SFTP push fails | `archived` + H="Live push failed; will retry next submission" | Auto-retry on next submission (SFTP push is idempotent — see sftp_push.py atomic-tmp-rename pattern) |
+| SFTP push fails | `archived` + H="Live push failed; will retry next submission" | Auto-retry on the next successful submission. The next Action run starts from fresh main (which already has the archived row's CSV write) and SFTP-pushes the full canonical JSON set, so the archived record goes live alongside the new submission. SFTP push is idempotent (sftp_push.py atomic-tmp-rename pattern). If no further submissions arrive for an extended period, the sweeper (next section) catches `archived > 24hr` and re-dispatches a no-op submission to force the SFTP push. |
 | Sheet writeback fails (Sheets API down) | Status stays at previous value | Action retries writeback once; final state visible in Action run log |
 
 ---
 
 ## Stuck-row sweeper
 
-`sweep-stuck-rows.yml` runs on cron `0 */6 * * *` (every 6 hours).
+`sweep-stuck-rows.yml` runs on cron `*/30 * * * *` (every 30 minutes — matches the 30-min stale-detection threshold so worst-case recovery is ~60 min, not 6h+).
 
-Reads the sheet via the service account, finds rows where `Status='submitted'` and `submitted_at > 30 min ago`, re-dispatches `submit-record.yml` for each. Catches:
-- Apps Script POSTs that never reached GitHub (rare but possible)
-- Workflow runs that died mid-flight (runner OOM, GitHub outage)
-- Any class of "stuck" failure not enumerated above
+Reads the sheet via the service account and re-dispatches `submit-record.yml` for any of these stuck states:
 
-Cheap on a public repo (unmetered Actions), bounded (~4 sweep runs/day idle, more when there's work), idempotent (the dedup check at step 2 of `submit-record.yml` prevents double-processing).
+| Status | Age threshold | Why it could happen |
+|---|---|---|
+| `submitted` | > 30 min | Apps Script POST never reached GitHub, or workflow_dispatch dropped silently |
+| `processing` | > 1 hr | Action started but died mid-flight (runner OOM, GitHub outage, hang in dispatcher) |
+| `archived` | > 24 hr | SFTP failed and no subsequent submission has come along to trigger the implicit retry. Sweeper dispatches a no-op submission (URL = sentinel, dedup short-circuits, but the SFTP step still runs and pushes the canonical JSONs). |
+
+Cheap on a public repo (unmetered Actions), bounded (~48 sweep runs/day idle, more when there's work), idempotent (the dedup check at step 2 of `submit-record.yml` prevents double-processing; the SFTP step is idempotent by atomic-tmp-rename).
+
+The 24-hour threshold on `archived` is intentionally loose — most archived rows recover via the implicit "next submission" path inside 24h. The sweeper only kicks in when there's a true gap in normal submission traffic.
 
 ---
 
@@ -296,7 +301,7 @@ After step 7, nothing on Joe's machines, Cloudflare account, or Gmail account is
 1. **What happens if Jay's Google account is deleted post-handoff?** The Sheet survives (Jay's). The bound Apps Script does not (depends on the same account). Workaround: have Hali also be Owner of the Sheet AND maintain a backup copy of the Apps Script code in her account. Document in `HANDOFF.md`.
 2. **What happens if the GitHub App's private key leaks?** Revoke + regenerate from the App settings, update Apps Script script property. ~5 min recovery. Document in `HANDOFF.md`.
 3. **What happens if Bluehost rotates SFTP creds without telling whoever owns the repo secret?** Deploys silently break (Action shows `archived` status instead of `live`). Sweep job catches it. Hali updates the repo secret. Document in `HANDOFF.md`.
-4. **Should `sweep-stuck-rows.yml` also catch `processing` rows that never reached `live`?** Yes — extend the sweeper to also handle `processing > 1hr` (the Action should never take that long; if it does, something hung). Spec'd into `sweep_stuck.py`.
+4. **Sweep coverage** (resolved in "Stuck-row sweeper" above): sweeper handles `submitted > 30min`, `processing > 1hr`, and `archived > 24hr`. The Bluehost-creds-rotated case from issue 3 above lands in the `archived > 24hr` bucket once no new submissions roll the staging forward.
 
 ---
 
