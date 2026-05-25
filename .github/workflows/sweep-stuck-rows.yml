@@ -1,0 +1,80 @@
+name: Pillar 3a — sweep stuck submission rows
+
+# Cron job that reads the Pillar 3a queue sheet, classifies every row by
+# status + age, and re-fires submit-record.yml for rows stuck past their
+# threshold (submitted >30min, processing >1hr, archived >24hr).
+#
+# Terminal statuses (live / error / duplicate / "no URL" / "invalid URL")
+# are never touched regardless of age.
+#
+# The dedup check inside process_submission.py guarantees re-dispatches
+# are safe — a row whose Action eventually did finish will short-circuit
+# as "duplicate" on retry.
+#
+# Design: docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md
+#         section "Stuck-row sweeper".
+
+on:
+  schedule:
+    # Every 30 minutes. UTC. GitHub Actions cron drift can be 5-15 min
+    # under load — sweep thresholds are tolerant of that.
+    - cron: '*/30 * * * *'
+  workflow_dispatch: {}
+
+# A long-running sweep getting overtaken by the next tick is fine — the
+# newer pass sees the same sheet state plus any rows the older pass had
+# already moved. Cancelling the older one avoids piling up.
+concurrency:
+  group: pillar3a-sweep
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  actions: write   # so the script can workflow_dispatch submit-record.yml
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Configure Poetry
+        run: |
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
+
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v5
+        with:
+          path: backend/.venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('backend/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: poetry install --with dev
+
+      - name: Sweep stuck rows
+        working-directory: backend
+        env:
+          ROSEN_SHEETS_SA_KEY_JSON: ${{ secrets.ROSEN_SHEETS_SA_KEY_JSON }}
+          SHEET_ID: ${{ secrets.ROSEN_QUEUE_SHEET_ID }}
+          SHEET_TAB: ${{ secrets.ROSEN_QUEUE_SHEET_TAB }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO: ${{ github.repository }}
+          GITHUB_REF: ${{ github.ref_name }}
+          GITHUB_WORKFLOW_FILENAME: submit-record.yml
+        run: poetry run python scripts/sweep_stuck.py
