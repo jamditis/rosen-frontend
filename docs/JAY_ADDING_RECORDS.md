@@ -18,16 +18,29 @@ That's it. No software to install, nothing to log into beyond Google.
 4. **Column C** (optional): if you'd like to override the title the
    scraper would otherwise pick, type your preferred title here. Leave
    blank to let the scraper choose.
-5. **Column D** (optional): any notes. These don't appear in the public
-   archive — they're just for your own reference.
+5. **Column D** (optional): any notes about the piece — context, why
+   you chose it, what to highlight. **Treat these as published**: under
+   Pillar 3a (the post-handoff system), notes land in the GitHub
+   Action's public run history and stay there permanently. Don't paste
+   anything you wouldn't put in the archive itself — no contact names,
+   no unpublished tips, no private commentary. If you need a private
+   scratchpad, keep it in a separate Google Doc.
 6. **Column E:** click the checkbox. **This is the trigger** — nothing
    happens until you tick this.
 
-Within a few seconds, **Column F** will show `submitted`. A few minutes
-later (longer if a lot of items are queued ahead of yours), it will
-change to `live` and **Column G** will show the new record ID
-(`RECORD-00xxx`). At that point the piece is in the archive and visible
-on `summit.pressthink.org/j/rosen-archive/`.
+Within a few seconds, **Column F** will show `submitted`. About 10-15
+minutes later (longer if a lot of items are queued ahead of yours,
+since the system processes one row at a time), it will change to `live`
+and **Column G** will show the new record ID (`RECORD-00xxx`). At that
+point the piece is in the archive and visible on
+`summit.pressthink.org/j/rosen-archive/`.
+
+> The 10-15 minute wait covers GitHub starting up a fresh processing
+> environment, scraping the page, asking Gemini to categorize it,
+> running the test suite, committing to the repo, and uploading the
+> JSON to the live site. Nothing is broken if it takes 20 minutes;
+> something probably is broken if it sits on `submitted` for more than
+> an hour (in that case, check Column H or ask Hali).
 
 ## What the status column can say
 
