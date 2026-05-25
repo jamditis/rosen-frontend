@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen Digital Archive</title>
-    <dateCreated>Mon, 25 May 2026 15:39:56 GMT</dateCreated>
-    <dateModified>Mon, 25 May 2026 15:39:56 GMT</dateModified>
+    <dateCreated>Mon, 25 May 2026 22:12:55 GMT</dateCreated>
+    <dateModified>Mon, 25 May 2026 22:12:55 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -252,7 +252,6 @@
         <outline text="Donald Trump is crashing the system. Journalists need to build a new one." type="link" url="https://www.washingtonpost.com/news/in-theory/wp/2016/07/13/donald-trump-is-crashing-the-system-journalists-need-to-build-a-new-one/" created="2016-07-13"/>
         <outline text="Jay Rosen&apos;s NYU students dig deeper into disruption of news business" type="link" url="https://mediashift.org/2016/05/jay-rosens-nyu-students-dig-deeper-into-disruption-of-news-business/" created="2016-05-01"/>
         <outline text="The Pub #62: Jay Rosen on his love-hate relationship with public media" type="link" url="https://current.org/2016/04/the-pub-62-jay-rosen-on-his-love-hate-relationship-with-public-media/" created="2016-04-22"/>
-        <outline text="CNN&apos;s impossible dilemma" type="link" url="https://www.wnycstudios.org/podcasts/otm/segments/cnn-impossible-dilemma-on-the-media" created="2016-01-01"/>
         <outline text="Tech is eating media" type="link" url="https://medium.com/@jayrosen_nyu/tech-is-eating-media-540c0f2adf25" created="2015-11-09"/>
         <outline text="Misinterpreting Williams&apos; misremembering" type="link" url="https://www.newspapers.com/image/1247062202/" created="2015-02-24"/>
         <outline text="Journalism Professor Rosen on changing nature of news" type="link" url="http://www.smcvt.edu/Events/2015/February/journalism-professor-rosen-on-changing-nature-of-news.aspx" created="2015-02-01"/>
@@ -268,6 +267,7 @@
         <outline text="Don&apos;t bust bogus &quot;hype&quot;" type="link" url="https://www.salon.com/2012/07/25/dont_bust_bogus_hype/" created="2012-07-25"/>
         <outline text="How polarization undermined the press" type="link" url="https://www.washingtonpost.com/blogs/wonkblog/post/how-polarization-undermined-the-press/2012/04/23/gIQAnsTQcT_blog.html" created="2012-04-23"/>
         <outline text="Jay Rosen on our media malaise: Who will tell the people?" type="link" url="https://radioopensource.org/jay-rosen-on-our-media-malaise-who-will-tell-the-people/" created="2012-04-13"/>
+        <outline text="Civic journalism 2.0: The Guardian and NYU launch a citizens agenda for 2012" type="link" url="https://www.niemanlab.org/2011/12/civic-journalism-2-0-the-guardian-and-nyu-launch-a-citizens-agenda-for-2012/" created="2011-12-08"/>
       </outline>
       <outline text="Trump Era &amp; Democratic Crisis (2016-2020)" type="category">
         <outline text="NYU Professor Jay Rosen Tears Chuck Todd Over Trump Lies" type="link" url="https://www.mediaite.com/media/tv/nyu-professor-jay-rosen-tears-chuck-todd/" created="2019-12-26"/>
@@ -306,7 +306,7 @@
         <outline text="The political economy of normalization" type="link" url="https://www.offmessage.net/p/the-political-economy-of-normalization" created="2024-03-27"/>
         <outline text="Lessons on how to cover politics in 2024" type="link" url="https://www.wnycstudios.org/podcasts/otm/segments/year-threat-democracy-on-the-media" created="2023-12-29"/>
         <outline text="Journalists tackle political puzzle for 2024" type="link" url="https://www.newspapers.com/image/1254405332/" created="2023-12-15"/>
-        <outline text="CNN&apos;s impossible dilemma" type="link" url="https://www.wnycstudios.org/podcasts/otm/segments/cnns-impossible-dilemma-on-the-media" created="2023-06-09"/>
+        <outline text="CNN&apos;s impossible dilemma" type="link" url="https://www.wnycstudios.org/podcasts/otm/segments/cnn-impossible-dilemma-on-the-media" created="2023-06-09"/>
         <outline text="Fallout from Trump town hall: Jay Rosen on the tightrope news outlets face" type="link" url="https://www.msnbc.com/11th-hour/watch/fallout-from-trump-town-hall-174063173939" created="2023-05-11"/>
         <outline text="One-on-one with Jay Rosen: Trump, conservative media, and the Ohio derailment" type="link" url="https://www.msnbc.com/11th-hour/watch/one-on-one-with-jay-rosen-163866693833" created="2023-02-22"/>
         <outline text="Jay Rosen on the mess at CNN and the perils of &quot;both sides&quot; journalism" type="link" url="https://www.publicnotice.co/p/jay-rosen-both-sides-journalism-cnn" created="2022-09-12"/>
@@ -380,7 +380,7 @@
       </outline>
     </outline>
     <outline text="By Category">
-      <outline text="Press &amp; Media Criticism (23436)" type="category">
+      <outline text="Press &amp; Media Criticism (23434)" type="category">
         <outline text="Jay Rosen on the digital revolution that wasn&apos;t" type="link" url="https://www.cjr.org/kicker/jay-rosen-digital-revolution-that-wasnt.php"/>
         <outline text="I send my questions about that to" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p"/>
         <outline text="Many of you, I know, receive a lot of national news, but care a lot about local" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4ecwzqx322p"/>
@@ -434,7 +434,7 @@
         <outline text="&quot;Why I&apos;m handing in my Pentagon press pass&quot; by Tom Bowman of NPR" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m35ykm4hp22j"/>
         <outline text="The basic reason is the Pentagon reporters want information" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m35vkye2gk2j"/>
       </outline>
-      <outline text="Politics &amp; Democracy (7670)" type="category">
+      <outline text="Politics &amp; Democracy (7669)" type="category">
         <outline text="&quot;There are positive developments in local news but they’re being swamped by the..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3s5wsddck2x"/>
         <outline text="&quot;There are positive developments in local news but they’re being swamped by the..." type="link" url="https://x.com/jayrosen_nyu/status/1981021320079896971"/>
         <outline text="&quot;If you had enough money to buy ads, you could reach the voters you wanted to..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3n33q3xbk2i"/>
@@ -488,7 +488,7 @@
         <outline text="Miss it this week?" type="link" url="https://x.com/jayrosen_nyu/status/1977079042567442658"/>
         <outline text="Thank you!" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2phhcovqs2t"/>
       </outline>
-      <outline text="Technology &amp; Digital Media (2841)" type="category">
+      <outline text="Technology &amp; Digital Media (2840)" type="category">
         <outline text="Jay Rosen on the digital revolution that wasn&apos;t" type="link" url="https://www.cjr.org/kicker/jay-rosen-digital-revolution-that-wasnt.php"/>
         <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/"/>
         <outline text="Sarah Longwell" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zvjrplq22z"/>

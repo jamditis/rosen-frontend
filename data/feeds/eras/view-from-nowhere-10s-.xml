@@ -5,7 +5,7 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records from the View from Nowhere (10s) era</description>
     <language>en-us</language>
-    <lastBuildDate>Mon, 25 May 2026 12:18:42 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 25 May 2026 22:12:55 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/eras/view-from-nowhere-10s-.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen Digital Archive RSS Generator</generator>
   <item>
@@ -320,15 +320,6 @@
     <category>Technology &amp; Digital Media</category>
   </item>
   <item>
-    <title>CNN&apos;s impossible dilemma</title>
-    <link>https://www.wnycstudios.org/podcasts/otm/segments/cnn-impossible-dilemma-on-the-media</link>
-    <guid isPermaLink="true">https://www.wnycstudios.org/podcasts/otm/segments/cnn-impossible-dilemma-on-the-media</guid>
-    <pubDate>Fri, 01 Jan 2016 00:00:00 GMT</pubDate>
-    <description>On the Media discusses CNN&apos;s dilemma in covering Trump with Rosen, examining how the network&apos;s business model of live event coverage and panel debates conflicted with its journalistic obligations to verify claims and hold candidates accountable.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Politics &amp; Democracy</category>
-  </item>
-  <item>
     <title>Tech is eating media</title>
     <link>https://medium.com/@jayrosen_nyu/tech-is-eating-media-540c0f2adf25</link>
     <guid isPermaLink="true">https://medium.com/@jayrosen_nyu/tech-is-eating-media-540c0f2adf25</guid>
@@ -460,6 +451,15 @@
     <pubDate>Fri, 13 Apr 2012 00:00:00 GMT</pubDate>
     <description>Rosen joins Christopher Lydon on Open Source Radio to discuss the media malaise in America, the crisis of trust in journalism, and the structural challenges preventing the press from fulfilling its democratic role. The conversation explores who can inform the public when the press itself is under siege.</description>
     <category>Press &amp; Media Criticism</category>
+    <category>Politics &amp; Democracy</category>
+  </item>
+  <item>
+    <title>Civic journalism 2.0: The Guardian and NYU launch a citizens agenda for 2012</title>
+    <link>https://www.niemanlab.org/2011/12/civic-journalism-2-0-the-guardian-and-nyu-launch-a-citizens-agenda-for-2012/</link>
+    <guid isPermaLink="true">https://www.niemanlab.org/2011/12/civic-journalism-2-0-the-guardian-and-nyu-launch-a-citizens-agenda-for-2012/</guid>
+    <pubDate>Thu, 08 Dec 2011 00:00:00 GMT</pubDate>
+    <description>Nieman Lab covers the launch of a citizens agenda project between The Guardian and NYU&apos;s Studio 20, led by Rosen and Amanda Michel. The project applies civic journalism principles to the 2012 election, asking voters what issues matter most rather than following the horse race. Digital First Media partners to tailor findings to local coverage.</description>
+    <category>Journalism Theory &amp; Practice</category>
     <category>Politics &amp; Democracy</category>
   </item>
   </channel>
