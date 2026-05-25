@@ -46,23 +46,37 @@ class TestEntityExtractor:
     def test_normalize_entity_list_with_list(self):
         """Test normalizing entity list from list input."""
         entities_data = [
-            {"entity_id": "ENT-001", "name": "Jay Rosen", "type": "Person"},
-            {"entity_id": "ENT-002", "name": "NYU", "type": "Organization"},
+            {
+                "entity_id": "ENT-001",
+                "entity_name": "Jay Rosen",
+                "entity_type": "Person",
+            },
+            {
+                "entity_id": "ENT-002",
+                "entity_name": "NYU",
+                "entity_type": "Organization",
+            },
         ]
 
         result = entity_extractor._normalize_entity_list(entities_data)
 
         assert len(result) == 2
         assert result[0]["entity_id"] == "ENT-001"
+        assert result[0]["entity_name"] == "Jay Rosen"
 
     def test_normalize_entity_list_with_dict(self):
         """Test normalizing entity list from dict input."""
-        entities_data = {"entity_id": "ENT-001", "name": "Jay Rosen", "type": "Person"}
+        entities_data = {
+            "entity_id": "ENT-001",
+            "entity_name": "Jay Rosen",
+            "entity_type": "Person",
+        }
 
         result = entity_extractor._normalize_entity_list(entities_data)
 
         assert len(result) == 1
         assert result[0]["entity_id"] == "ENT-001"
+        assert result[0]["entity_type"] == "Person"
 
     def test_normalize_entity_list_with_none(self):
         """Test normalizing entity list with None input."""
@@ -79,14 +93,22 @@ class TestEntityExtractor:
     def test_normalize_relationship_list_with_list(self):
         """Test normalizing relationship list from list input."""
         relationships_data = [
-            {"source": "ENT-001", "target": "ENT-002", "type": "works_at"},
-            {"source": "ENT-001", "target": "ENT-003", "type": "authored"},
+            {
+                "source_entity_id": "ENT-001",
+                "target_entity_id": "ENT-002",
+                "relationship_type": "Affiliated With",
+            },
+            {
+                "source_entity_id": "ENT-001",
+                "target_entity_id": "ENT-003",
+                "relationship_type": "Authored By",
+            },
         ]
 
         result = entity_extractor._normalize_relationship_list(relationships_data)
 
         assert len(result) == 2
-        assert result[0]["type"] == "works_at"
+        assert result[0]["relationship_type"] == "Affiliated With"
 
     def test_normalize_relationship_list_with_none(self):
         """Test normalizing relationship list with None input."""

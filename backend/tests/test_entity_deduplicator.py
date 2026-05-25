@@ -46,23 +46,42 @@ class TestEntityDeduplicator:
                 "entity_id": "ENT-001",
                 "entity_name": "Jay Rosen",
                 "entity_type": "Person",
+                "first_mention_record_id": "RECORD-001",
+                "prominence_score": "8",
             },
             {
                 "entity_id": "ENT-002",
                 "entity_name": "jay rosen",
                 "entity_type": "Person",
+                "first_mention_record_id": "RECORD-002",
+                "prominence_score": "6",
             },
             {
                 "entity_id": "ENT-003",
                 "entity_name": "Dan Rather",
                 "entity_type": "Person",
+                "first_mention_record_id": "RECORD-003",
+                "prominence_score": "7",
             },
         ]
 
         registry = deduper.build_canonical_registry(entities)
 
-        # Should have created a registry
-        assert isinstance(registry, dict)
+        assert len(registry) == 2
+
+        jay_entity = next(
+            entity
+            for entity in registry.values()
+            if entity["normalized_name"] == "jay rosen"
+        )
+        assert jay_entity["total_mentions"] == 2
+        assert jay_entity["mentioned_in_records"] == 2
+        assert jay_entity["first_mention"] == "RECORD-001"
+        assert jay_entity["prominence_score"] == 8
+        assert set(jay_entity["original_ids"]) == {"ENT-001", "ENT-002"}
+        assert deduper.id_mapping["ENT-001"] == jay_entity["canonical_id"]
+        assert deduper.id_mapping["ENT-002"] == jay_entity["canonical_id"]
+        assert deduper.id_mapping["ENT-003"] != jay_entity["canonical_id"]
 
     def test_load_entities_without_connection(self):
         """Test that load_entities requires connection."""

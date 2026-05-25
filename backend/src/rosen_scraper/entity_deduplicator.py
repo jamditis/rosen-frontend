@@ -245,7 +245,7 @@ class EntityDeduplicator:
                 "first_mention": first_mention,
                 "prominence_score": max_prominence,
                 "original_ids": [e["entity_id"] for e in group],
-                "name_variations": list(set([e["entity_name"] for e in group])),
+                "name_variations": sorted(set(e["entity_name"] for e in group)),
             }
 
             # Build ID mapping (old_id -> canonical_id)
