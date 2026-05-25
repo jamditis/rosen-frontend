@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen Digital Archive</title>
-    <dateCreated>Mon, 25 May 2026 02:50:36 GMT</dateCreated>
-    <dateModified>Mon, 25 May 2026 02:50:36 GMT</dateModified>
+    <dateCreated>Mon, 25 May 2026 03:28:39 GMT</dateCreated>
+    <dateModified>Mon, 25 May 2026 03:28:39 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -133,6 +133,7 @@
         <outline text="You can still apply..." type="link" url="https://tmblr.co/ZCJQUyFj9Ov" created="2009-11-30"/>
         <outline text="Studio 20" type="link" url="https://tmblr.co/ZCJQUyEzqxy" created="2009-11-20"/>
         <outline text="Sources of subsidy in the production of news: a list" type="link" url="https://jayrosen.tumblr.com/post/243813457/sources-of-subsidy-in-the-production-of-news-a" created="2009-11-14"/>
+        <outline text="Rebooting the News #32" type="link" url="https://rebootnews.wordpress.com/2009/11/12/rebooting-the-news-32/" created="2009-11-12"/>
         <outline text="Get with the times, Jay Rosen tells journos" type="link" url="https://tmblr.co/ZCJQUyEGH-x" created="2009-11-10"/>
         <outline text="Studio 20" type="link" url="https://tmblr.co/ZCJQUyEGSg1" created="2009-11-10"/>
         <outline text="Mark your calendar for Nov. 15" type="link" url="https://tmblr.co/ZCJQUyEHm-v" created="2009-11-10"/>
@@ -158,12 +159,11 @@
         <outline text="Studio 20" type="link" url="https://tmblr.co/ZCJQUyDN9s7" created="2009-10-26"/>
         <outline text="On Twitter, mindcasting is the new lifecasting" type="link" url="https://tmblr.co/ZCJQUyDNBID" created="2009-10-26"/>
         <outline text="NPR Interviews Studio 20 Professor" type="link" url="https://tmblr.co/ZCJQUyDNDvc" created="2009-10-26"/>
+        <outline text="Rebooting the News #24" type="link" url="https://rebootnews.wordpress.com/2009/09/08/rebooting-the-news-24/" created="2009-09-08"/>
+        <outline text="Rebooting the News #15" type="link" url="https://rebootnews.wordpress.com/2009/07/06/rebooting-the-news-15/" created="2009-07-06"/>
         <outline text="Modern media madness: Brooke Gladstone and Jay Rosen on Bill Moyers Journal" type="link" url="https://www.pbs.org/moyers/journal/06052009/profile2.html" created="2009-06-05"/>
+        <outline text="Rebooting the News #7" type="link" url="https://rebootnews.wordpress.com/2009/04/26/rebooting-the-news-7/" created="2009-04-26"/>
         <outline text="Is &quot;He Said, She Said, We&apos;re Clueless&quot; Coverage Dying?" type="link" url="https://www.discovermagazine.com/the-sciences/is-he-said-she-said-were-clueless-coverage-dying" created="2009-04-13"/>
-        <outline text="PressThink: he said/she said Journalism: Lame Formula in the Land of the Active User" type="link" url="http://archive.pressthink.org/2009/04/12/hesaid_shesaid_p.html" created="2009-04-12"/>
-        <outline text="&quot;He Said, She Said&quot; Journalism: Are We Done With That Yet?" type="link" url="https://pressthink.org/2009/04/he-said-she-said-journalism-lame-formula-in-the-land-of-the-active-user/" created="2009-04-12"/>
-        <outline text="PressThink: Introducing the new Huffington Post Investigative Fund (And My Own Role in It)" type="link" url="http://archive.pressthink.org/2009/03/30/huffpost_fnd_p.html" created="2009-03-30"/>
-        <outline text="Flying Seminar on the Future of News" type="link" url="http://archive.pressthink.org/2009/03/26/flying_seminar_p.html" created="2009-03-26"/>
       </outline>
       <outline text="Social Media &amp; Financial Crisis (2010-2015)" type="category">
         <outline text="Asymmetry between the major parties fries the circuits of the mainstream press - PressThink" type="link" url="https://pressthink.org/2016/09/asymmetry-between-the-major-parties-fries-the-circuits-of-the-mainstream-press/" created="2016-09-29"/>
@@ -380,7 +380,7 @@
       </outline>
     </outline>
     <outline text="By Category">
-      <outline text="Press &amp; Media Criticism (23419)" type="category">
+      <outline text="Press &amp; Media Criticism (23430)" type="category">
         <outline text="Jay Rosen on the digital revolution that wasn&apos;t" type="link" url="https://www.cjr.org/kicker/jay-rosen-digital-revolution-that-wasnt.php"/>
         <outline text="I send my questions about that to" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p"/>
         <outline text="Many of you, I know, receive a lot of national news, but care a lot about local" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4ecwzqx322p"/>
@@ -407,7 +407,7 @@
         <outline text="&quot;There are positive developments in local news but they’re being swamped by the..." type="link" url="https://x.com/jayrosen_nyu/status/1981021320079896971"/>
         <outline text="&quot;If you had enough money to buy ads, you could reach the voters you wanted to..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3n33q3xbk2i"/>
       </outline>
-      <outline text="Journalism Theory &amp; Practice (8331)" type="category">
+      <outline text="Journalism Theory &amp; Practice (8342)" type="category">
         <outline text="I send my questions about that to" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p"/>
         <outline text="I have a lurid fascination with interviews that become trainwrecks" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e3rgesbk24"/>
         <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/"/>
@@ -488,7 +488,7 @@
         <outline text="Miss it this week?" type="link" url="https://x.com/jayrosen_nyu/status/1977079042567442658"/>
         <outline text="Thank you!" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2phhcovqs2t"/>
       </outline>
-      <outline text="Technology &amp; Digital Media (2831)" type="category">
+      <outline text="Technology &amp; Digital Media (2842)" type="category">
         <outline text="Jay Rosen on the digital revolution that wasn&apos;t" type="link" url="https://www.cjr.org/kicker/jay-rosen-digital-revolution-that-wasnt.php"/>
         <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/"/>
         <outline text="Sarah Longwell" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zvjrplq22z"/>

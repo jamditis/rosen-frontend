@@ -5,7 +5,7 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records from the Peak Blogging &amp; Citizen Journalism (2005-2009) era</description>
     <language>en-us</language>
-    <lastBuildDate>Mon, 25 May 2026 02:50:36 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 25 May 2026 03:28:39 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/eras/peak-blogging-citizen-journalism-2005-2009-.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen Digital Archive RSS Generator</generator>
   <item>
@@ -175,6 +175,16 @@
 </description>
     <category>Journalism Theory &amp; Practice</category>
     <category>Press &amp; Media Criticism</category>
+  </item>
+  <item>
+    <title>Rebooting the News #32</title>
+    <link>https://rebootnews.wordpress.com/2009/11/12/rebooting-the-news-32/</link>
+    <guid isPermaLink="true">https://rebootnews.wordpress.com/2009/11/12/rebooting-the-news-32/</guid>
+    <pubDate>Thu, 12 Nov 2009 00:00:00 GMT</pubDate>
+    <description>Episode 32, posted with a brief note from Dave about the delay in publishing. Show notes for this episode are unusually short, so the canonical record is the audio file; the rebootnews.wordpress.com post serves as the index entry.</description>
+    <category>Press &amp; Media Criticism</category>
+    <category>Technology &amp; Digital Media</category>
+    <category>Journalism Theory &amp; Practice</category>
   </item>
   <item>
     <title>Get with the times, Jay Rosen tells journos</title>
@@ -395,6 +405,26 @@
     <category>Press &amp; Media Criticism</category>
   </item>
   <item>
+    <title>Rebooting the News #24</title>
+    <link>https://rebootnews.wordpress.com/2009/09/08/rebooting-the-news-24/</link>
+    <guid isPermaLink="true">https://rebootnews.wordpress.com/2009/09/08/rebooting-the-news-24/</guid>
+    <pubDate>Tue, 08 Sep 2009 00:00:00 GMT</pubDate>
+    <description>Episode 24, recorded 9 AM Pacific. The week&apos;s news includes WordPress&apos;s revenue milestones (per ReadWriteWeb) and other stories from the open-publishing / social-web beat that Rosen and Winer regularly cover.</description>
+    <category>Press &amp; Media Criticism</category>
+    <category>Technology &amp; Digital Media</category>
+    <category>Journalism Theory &amp; Practice</category>
+  </item>
+  <item>
+    <title>Rebooting the News #15</title>
+    <link>https://rebootnews.wordpress.com/2009/07/06/rebooting-the-news-15/</link>
+    <guid isPermaLink="true">https://rebootnews.wordpress.com/2009/07/06/rebooting-the-news-15/</guid>
+    <pubDate>Mon, 06 Jul 2009 00:00:00 GMT</pubDate>
+    <description>Episode 15. Dave reports back from the Reboot conference in Copenhagen; Jay leads the show-notes write-up. The conversation surveys the European context for the kinds of news experiments Rebooting The News has been chronicling on the US side.</description>
+    <category>Press &amp; Media Criticism</category>
+    <category>Technology &amp; Digital Media</category>
+    <category>Journalism Theory &amp; Practice</category>
+  </item>
+  <item>
     <title>Modern media madness: Brooke Gladstone and Jay Rosen on Bill Moyers Journal</title>
     <link>https://www.pbs.org/moyers/journal/06052009/profile2.html</link>
     <guid isPermaLink="true">https://www.pbs.org/moyers/journal/06052009/profile2.html</guid>
@@ -404,51 +434,21 @@
     <category>Politics &amp; Democracy</category>
   </item>
   <item>
+    <title>Rebooting the News #7</title>
+    <link>https://rebootnews.wordpress.com/2009/04/26/rebooting-the-news-7/</link>
+    <guid isPermaLink="true">https://rebootnews.wordpress.com/2009/04/26/rebooting-the-news-7/</guid>
+    <pubDate>Sun, 26 Apr 2009 00:00:00 GMT</pubDate>
+    <description>Episode 7 of the weekly Rebooting The News podcast, an open conversation between NYU journalism professor Jay Rosen and software developer / blogger Dave Winer about the future of news in the post-print, social-web era. Show notes are minimal; the canonical archive is the rebootnews.wordpress.com post.</description>
+    <category>Press &amp; Media Criticism</category>
+    <category>Technology &amp; Digital Media</category>
+    <category>Journalism Theory &amp; Practice</category>
+  </item>
+  <item>
     <title>Is &quot;He Said, She Said, We&apos;re Clueless&quot; Coverage Dying?</title>
     <link>https://www.discovermagazine.com/the-sciences/is-he-said-she-said-were-clueless-coverage-dying</link>
     <guid isPermaLink="true">https://www.discovermagazine.com/the-sciences/is-he-said-she-said-were-clueless-coverage-dying</guid>
     <pubDate>Mon, 13 Apr 2009 00:00:00 GMT</pubDate>
     <description>The author critiques Jay Rosen&apos;s optimistic view on the decline of &quot;he said, she said&quot; journalism.  While acknowledging that sophisticated journalists recognize the flaws of false balance, the author argues that economic pressures in the media industry, including job cuts and the loss of specialized journalists, make the lazy shortcut of &quot;he said, she said&quot; reporting even more prevalent. The author concludes that the blogosphere&apos;s ability to counteract this trend is limited due to the underlying economic realities of the media business.</description>
-    <category>Journalism Theory &amp; Practice</category>
-    <category>Press &amp; Media Criticism</category>
-  </item>
-  <item>
-    <title>PressThink: he said/she said Journalism: Lame Formula in the Land of the Active User</title>
-    <link>http://archive.pressthink.org/2009/04/12/hesaid_shesaid_p.html</link>
-    <guid isPermaLink="true">http://archive.pressthink.org/2009/04/12/hesaid_shesaid_p.html</guid>
-    <pubDate>Sun, 12 Apr 2009 00:00:00 GMT</pubDate>
-    <description>Rosen critiques the &quot;he said, she said&quot; style of journalism, arguing that it often fails to assess competing truth claims and instead offers a false sense of balance.  Rosen contends that this approach, while seemingly a quick and easy solution to reporting deadlines and the complexity of verifying information, ultimately hinders truth-telling.  The rise of the internet and readily available information sources have made this style of reporting increasingly untenable, as readily available evidence allows for a more nuanced and accurate presentation of facts, moving beyond a simple recitation of opposing viewpoints.</description>
-    <category>Journalism Theory &amp; Practice</category>
-    <category>Politics &amp; Democracy</category>
-    <category>Press &amp; Media Criticism</category>
-  </item>
-  <item>
-    <title>&quot;He Said, She Said&quot; Journalism: Are We Done With That Yet?</title>
-    <link>https://pressthink.org/2009/04/he-said-she-said-journalism-lame-formula-in-the-land-of-the-active-user/</link>
-    <guid isPermaLink="true">https://pressthink.org/2009/04/he-said-she-said-journalism-lame-formula-in-the-land-of-the-active-user/</guid>
-    <pubDate>Sun, 12 Apr 2009 00:00:00 GMT</pubDate>
-    <description>Rosen critiques &quot;he said, she said&quot; journalism — the practice of presenting two opposing claims without assessing their truth — arguing that this form of false balance fails the public and should be abandoned.</description>
-    <category>Press &amp; Media Criticism</category>
-  </item>
-  <item>
-    <title>PressThink: Introducing the new Huffington Post Investigative Fund (And My Own Role in It)</title>
-    <link>http://archive.pressthink.org/2009/03/30/huffpost_fnd_p.html</link>
-    <guid isPermaLink="true">http://archive.pressthink.org/2009/03/30/huffpost_fnd_p.html</guid>
-    <pubDate>Mon, 30 Mar 2009 00:00:00 GMT</pubDate>
-    <description>The Huffington Post launches the Huffington Post Investigative Fund, a non-profit initiative funded by The Huffington Post and The Atlantic Philanthropies, aimed at producing investigative journalism. Jay Rosen, a senior advisor to the project, discusses its goals, including the use of open-source and distributed reporting methods, collaboration between professional and amateur journalists, and the importance of high verification standards. The Fund aims to &apos;report once, run anywhere,&apos; making its content freely available for republication. The initiative sparks discussions about the future of investigative journalism, particularly its role in smaller communities.</description>
-    <category>Journalism Theory &amp; Practice</category>
-    <category>Politics &amp; Democracy</category>
-    <category>Press &amp; Media Criticism</category>
-    <category>Technology &amp; Digital Media</category>
-  </item>
-  <item>
-    <title>Flying Seminar on the Future of News</title>
-    <link>http://archive.pressthink.org/2009/03/26/flying_seminar_p.html</link>
-    <guid isPermaLink="true">http://archive.pressthink.org/2009/03/26/flying_seminar_p.html</guid>
-    <pubDate>Thu, 26 Mar 2009 00:00:00 GMT</pubDate>
-    <description>Rosen curates a collection of essays and blog posts from March 2009, forming a &apos;flying seminar&apos; on the future of news in the face of the newspaper industry&apos;s crisis.  The pieces explore various perspectives, from the sociological implications of the decline of the traditional press (Paul Starr, Yochai Benkler) to the internal struggles of news organizations (Clay Shirky) and the potential of new media ecosystems (Steven Berlin Johnson).  The authors discuss the changing production models of news, the potential for citizen journalism, and the challenges of adapting to a rapidly evolving media landscape.</description>
-    <category>Politics &amp; Democracy</category>
-    <category>Technology &amp; Digital Media</category>
     <category>Journalism Theory &amp; Practice</category>
     <category>Press &amp; Media Criticism</category>
   </item>
