@@ -66,7 +66,7 @@ Same essay, two URL variants. Both verified live (HTTP 200):
 | 00340 | `http://archive.pressthink.org/2009/01/12/atomization_p.html` | 20,450 chars | Movable Type era, `http://` only (TLS issue per CLAUDE.md), title prefix `PressThink:` |
 | 00699 | `https://pressthink.org/2009/01/audience-atomization-overcome-...` | 38,301 chars | Modern WordPress, full HTTPS, clean title |
 
-**Recommendation:** Keep RECORD-00699 as canonical, delete RECORD-00340. The modern URL has nearly 2x raw_text and is HTTPS-clean. Move any curator-added metadata (`notes`, taxonomy assignments) from 00340 into 00699 before deletion. **Why this needs Joe:** record deletion changes IDs in the published archive; verify nothing links to RECORD-00340 specifically.
+**Recommendation:** Keep RECORD-00699 as canonical, delete RECORD-00340. The modern URL has nearly 2x raw_text and is HTTPS-clean. Move any curator-added metadata (`notes`, taxonomy assignments) from 00340 into 00699 before deletion. **Why this needs Joe:** deletion removes RECORD-00340 from the published archive; verify nothing (links, citations, downstream tooling) references that ID specifically.
 
 ### RECORD-00740 + RECORD-00771 — "CNN's Impossible Dilemma"
 
