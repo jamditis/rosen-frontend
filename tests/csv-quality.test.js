@@ -127,7 +127,7 @@ describe('social_posts.csv', () => {
   });
 
   it('all platforms are recognized values', () => {
-    const validPlatforms = new Set(['Twitter', 'Bluesky', 'twitter', 'bluesky', 'Twitter/X']);
+    const validPlatforms = new Set(['Twitter', 'Bluesky', 'twitter', 'bluesky', 'Twitter/X', 'Mastodon']);
     const badPlatforms = [];
     for (const row of socialPosts) {
       const platform = row.platform || '';
