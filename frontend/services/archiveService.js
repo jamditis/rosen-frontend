@@ -200,22 +200,26 @@ const getCacheKey = (url) => {
  * Check version.json on the server. If the version has changed,
  * clear all caches so users get fresh data after deploys.
  */
-let versionChecked = false;
-const checkVersion = async () => {
-  if (versionChecked) return;
-  versionChecked = true;
-  try {
-    const resp = await fetch('./version.json?t=' + Date.now());
-    if (resp.ok) {
-      const { version } = await resp.json();
-      const stored = localStorage.getItem('jrda_deploy_version');
-      if (stored && stored !== version) {
-        console.log('[Cache] Deploy version changed, clearing caches');
-        clearArchiveCache();
+// Memoise the in-flight Promise so concurrent callers all await the same
+// fetch instead of racing past a sync boolean (#171).
+let versionCheckPromise = null;
+const checkVersion = () => {
+  if (versionCheckPromise) return versionCheckPromise;
+  versionCheckPromise = (async () => {
+    try {
+      const resp = await fetch('./version.json?t=' + Date.now());
+      if (resp.ok) {
+        const { version } = await resp.json();
+        const stored = localStorage.getItem('jrda_deploy_version');
+        if (stored && stored !== version) {
+          console.log('[Cache] Deploy version changed, clearing caches');
+          clearArchiveCache();
+        }
+        localStorage.setItem('jrda_deploy_version', version);
       }
-      localStorage.setItem('jrda_deploy_version', version);
-    }
-  } catch { /* version.json not available, skip */ }
+    } catch { /* version.json not available, skip */ }
+  })();
+  return versionCheckPromise;
 };
 
 const getCachedData = (url) => {
@@ -303,7 +307,7 @@ export const fetchCoreData = async () => {
   const dataUrl = DATA_CONFIG.archive_core;
 
   // Check deploy version (clears caches if version changed)
-  checkVersion();
+  await checkVersion();
 
   // Check cache first
   const cached = getCachedData(dataUrl);
