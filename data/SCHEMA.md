@@ -93,6 +93,17 @@ The four "decade-bucket" eras (Public Journalism (90s), View from Nowhere (10s),
 - Press & Media Criticism
 - Technology & Digital Media
 
+### PressThink URL canonicalization
+
+PressThink records may have both an original Movable Type URL and a modern
+WordPress URL. Use the reader-facing modern URL when it exists, but do not
+rewrite working archive URLs without evidence that the modern page resolves.
+
+- For 2009-or-later PressThink posts, prefer `https://pressthink.org/<year>/<month>/<slug>/` after verifying the URL returns HTTP 200.
+- For 2003-2008 PressThink posts, keep `http://archive.pressthink.org/<year>/<month>/<day>/<slug>.html` unless a modern URL is verified.
+- When a modern URL replaces an archive URL, preserve the archive URL in `notes` as historical provenance.
+- When backfilling missing URLs, try the modern form first and fall back to `archive.pressthink.org` only when the modern page does not resolve.
+
 ---
 
 ## Entity Schema
