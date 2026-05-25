@@ -1,3 +1,15 @@
+import pytest
+
+# This file is a development-time exploration script, not a CI-safe test:
+# - hardcoded Windows .env path (C:/Users/amdit/...)
+# - raises ValueError at import if GEMINI_API_KEY / MODEL_NAME unset
+# - depends on selenium + webdriver_manager + langextract + googlesearch
+# See issue #184. Skipped at module load so it never trips a clean CI run.
+pytest.skip(
+    "langextract test_extractor.py is a legacy dev-time script; see #184",
+    allow_module_level=True,
+)
+
 import os
 import csv
 import json
