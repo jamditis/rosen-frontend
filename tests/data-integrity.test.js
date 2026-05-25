@@ -317,16 +317,19 @@ describe('archive-data.json (full)', () => {
     // root post).
     const recordsById = new Map(fullData.records.map(r => [r.id, r]));
     const threadRecords = fullData.records.filter(r => r.id.startsWith('THREAD-'));
-    const duplicateRoots = [];
+    assert.ok(threadRecords.length > 0,
+      'no THREAD-* records found in published JSON — the dedup invariant cannot be checked without thread containers');
+    const duplicateMembers = [];
     for (const thread of threadRecords) {
-      const posts = (thread.thread_data && thread.thread_data.posts) || [];
-      for (const post of posts) {
+      assert.ok(thread.thread_data && Array.isArray(thread.thread_data.posts),
+        `THREAD record ${thread.id} is missing thread_data.posts — the export schema would need to change to remove it, which would itself be a regression of the dedup contract`);
+      for (const post of thread.thread_data.posts) {
         if (post.id && recordsById.has(post.id)) {
-          duplicateRoots.push(`${post.id} (member of ${thread.id})`);
+          duplicateMembers.push(`${post.id} (member of ${thread.id})`);
         }
       }
     }
-    assert.strictEqual(duplicateRoots.length, 0,
-      `${duplicateRoots.length} thread member posts also exist as standalone records in the published JSON: ${duplicateRoots.slice(0, 5).join(', ')}`);
+    assert.strictEqual(duplicateMembers.length, 0,
+      `${duplicateMembers.length} thread member posts also exist as standalone records in the published JSON: ${duplicateMembers.slice(0, 5).join(', ')}`);
   });
 });
