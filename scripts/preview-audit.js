@@ -15,7 +15,21 @@ import { chromium } from 'playwright';
 import { AxeBuilder } from '@axe-core/playwright';
 
 const PORT = Number(process.env.PREVIEW_PORT || 8765);
-const BASE = `http://localhost:${PORT}`;
+// Pick a connect target for Playwright that's always routable, regardless
+// of what PREVIEW_HOST the server is bound to. Wildcard binds (0.0.0.0 in
+// IPv4, :: and ::0 in IPv6) are accept-any-interface addresses, NOT connect
+// destinations — translate each to its same-family loopback. Other PREVIEW_HOST
+// values pass through unchanged. IPv6 literals get bracketed for URL syntax
+// (`http://[::1]:8765`, not `http://::1:8765`). Hard-coding 'localhost' would
+// silently fail on IPv6-first systems where it resolves to ::1 while the
+// server only listens on IPv4.
+const SERVER_HOST = process.env.PREVIEW_HOST || '127.0.0.1';
+const WILDCARD_TO_LOOPBACK = { '0.0.0.0': '127.0.0.1', '::': '::1', '::0': '::1' };
+const CLIENT_HOST = WILDCARD_TO_LOOPBACK[SERVER_HOST] || SERVER_HOST;
+const URL_HOST = CLIENT_HOST.includes(':') && !CLIENT_HOST.startsWith('[')
+  ? `[${CLIENT_HOST}]`
+  : CLIENT_HOST;
+const BASE = `http://${URL_HOST}:${PORT}`;
 const OUT_DIR = resolve(fileURLToPath(import.meta.url), '..', '..', 'preview-audit-results');
 
 const ROUTES = [

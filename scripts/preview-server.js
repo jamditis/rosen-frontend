@@ -102,7 +102,9 @@ const server = createServer(async (req, res) => {
 // Bind to 127.0.0.1 by default so the preview is not exposed on the LAN.
 // Override with PREVIEW_HOST=0.0.0.0 if intentional LAN access is needed.
 server.listen(PORT, HOST, () => {
-  console.log(`Preview server: http://${HOST}:${PORT}/`);
+  // IPv6 literals need brackets in URLs: `http://[::1]:8000/` not `http://::1:8000/`.
+  const urlHost = HOST.includes(':') && !HOST.startsWith('[') ? `[${HOST}]` : HOST;
+  console.log(`Preview server: http://${urlHost}:${PORT}/`);
   console.log(`Serving:        ${ROOT}`);
   console.log(`Stop:           Ctrl-C`);
 });
