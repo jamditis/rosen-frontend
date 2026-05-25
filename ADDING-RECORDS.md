@@ -43,7 +43,7 @@ Add a new row at the **bottom** of the file. The most important columns are:
 
 | Column | What to put |
 |--------|-------------|
-| `id` | Next available ID — currently `RECORD-00803`, then `RECORD-00804`, etc. |
+| `id` | Next available ID — currently `RECORD-00902` (the current max is `RECORD-00901`). Always go one past the current max; don't fill gaps. |
 | `title` | Title of the article or post |
 | `url` | Link to the original |
 | `author` | `Jay Rosen` |
@@ -72,7 +72,7 @@ You can combine them: `Press & Media Criticism, Politics & Democracy`
 ### Example row (what a new 2026 PressThink post looks like)
 
 ```
-RECORD-00803,The Citizens' Agenda in 2026,https://pressthink.org/2026/03/citizens-agenda-2026/,Jay Rosen,2026-03-15,PressThink,PressThink,,Article,text,,,,Summary of the post goes here.,,Press & Media Criticism,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,,,,,,,,,,TRUE,
+RECORD-00902,The Citizens' Agenda in 2026,https://pressthink.org/2026/03/citizens-agenda-2026/,Jay Rosen,2026-03-15,PressThink,PressThink,,Article,text,,,,Summary of the post goes here.,,Press & Media Criticism,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,,,,,,,,,,TRUE,
 ```
 
 ---
@@ -94,14 +94,7 @@ npm install
 node data/export-archive-data.js
 ```
 
-This takes about 30–60 seconds and produces updated JSON files in the `data/` folder. You'll see output like:
-
-```
-Loaded 803 main records
-Writing archive-core.json...
-Writing archive-data.json...
-Done.
-```
+This takes about 30–60 seconds and produces updated JSON files in the `data/` folder. The script prints progress as it goes: starting the export, reading each CSV file (with a row count for each), processing records, building entities and relationships, and finally writing the four JSON output files. If the run finishes without errors, the updated JSON files are ready to upload.
 
 ---
 
@@ -119,7 +112,7 @@ The site will show the new records immediately — no cache clearing needed.
 
 ## Adding social posts (Bluesky, Twitter)
 
-If you want to add posts from Jay's Bluesky account after retirement, use `data/social_posts.csv` instead. The columns are similar, but the `id` field uses a `BSKY-` prefix (e.g. `BSKY-09001`) and the `content_type` should be `Social Media Post`.
+If you want to add posts from Jay's Bluesky account after retirement, use `data/social_posts.csv` instead. The columns are similar, but the `id` field uses a `BSKY-` prefix. The current max BSKY id is `BSKY-03121`, so the next ID is `BSKY-03122`. The `content_type` should be `Social Media Post`.
 
 That file doesn't need to be updated as often — articles and essays are more important for the archive.
 
