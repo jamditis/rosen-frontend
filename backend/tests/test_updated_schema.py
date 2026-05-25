@@ -6,13 +6,18 @@ Test script for the updated schema with new fields.
 import sys
 from pathlib import Path
 
-ROOT_DIR = Path(__file__).resolve().parents[2]
-SRC_DIR = ROOT_DIR / "src"
-if str(SRC_DIR) not in sys.path:
-    sys.path.append(str(SRC_DIR))
+BACKEND_ROOT = Path(__file__).resolve().parents[1]
+SRC_DIR = BACKEND_ROOT / "src" / "rosen_scraper"
 
-from src.workflow import enrich_data, get_schema
-from src.entity_resolver import load_known_entities
+# Pytest exposes backend/src via [tool.pytest.ini_options] pythonpath, but the
+# `python tests/test_updated_schema.py` standalone entrypoint needs its own
+# bootstrap.
+BACKEND_SRC = BACKEND_ROOT / "src"
+if str(BACKEND_SRC) not in sys.path:
+    sys.path.insert(0, str(BACKEND_SRC))
+
+from rosen_scraper.workflow import enrich_data, get_schema
+from rosen_scraper.entity_resolver import load_known_entities
 
 def test_updated_schema():
     """Test the updated schema and field population logic."""
@@ -20,7 +25,7 @@ def test_updated_schema():
     print("=" * 50)
 
     # Load schema
-    schema_file = ROOT_DIR / 'schema.json'
+    schema_file = BACKEND_ROOT / 'schema.json'
     schema = get_schema(str(schema_file))
     if not schema:
         print("ERROR: Could not load schema")

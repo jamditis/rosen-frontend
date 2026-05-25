@@ -307,4 +307,29 @@ describe('archive-data.json (full)', () => {
     assert.strictEqual(unverified.length, 0,
       `${unverified.length} records are not verified`);
   });
+
+  it('no thread member post survives in published JSON when its THREAD container is also present (#233)', () => {
+    // The export pipeline (data/export-archive-data.js:475-510) filters social
+    // posts that appear in any THREAD record's thread_data.posts. This pins
+    // that invariant so a future refactor of the social-records filter can't
+    // silently regress it — which would surface the same Bluesky/Twitter
+    // thread twice in the UI (once as the THREAD container, once as the loose
+    // root post).
+    const recordsById = new Map(fullData.records.map(r => [r.id, r]));
+    const threadRecords = fullData.records.filter(r => r.id.startsWith('THREAD-'));
+    assert.ok(threadRecords.length > 0,
+      'no THREAD-* records found in published JSON — the dedup invariant cannot be checked without thread containers');
+    const duplicateMembers = [];
+    for (const thread of threadRecords) {
+      assert.ok(thread.thread_data && Array.isArray(thread.thread_data.posts),
+        `THREAD record ${thread.id} is missing thread_data.posts — the export schema would need to change to remove it, which would itself be a regression of the dedup contract`);
+      for (const post of thread.thread_data.posts) {
+        if (post.id && recordsById.has(post.id)) {
+          duplicateMembers.push(`${post.id} (member of ${thread.id})`);
+        }
+      }
+    }
+    assert.strictEqual(duplicateMembers.length, 0,
+      `${duplicateMembers.length} thread member posts also exist as standalone records in the published JSON: ${duplicateMembers.slice(0, 5).join(', ')}`);
+  });
 });

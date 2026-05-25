@@ -9,17 +9,20 @@ class TestWorkflowModule:
     """Tests for workflow orchestration functionality."""
 
     def test_get_schema_success(self, tmp_path, sample_schema):
-        """Test successful schema loading."""
+        """Test successful schema loading. Verifies JSON round-trip preserves
+        the taxonomy structure that downstream callers (categorizer) depend on.
+        """
         # Create a temporary schema file
         schema_file = tmp_path / "schema.json"
         with open(schema_file, 'w') as f:
             json.dump(sample_schema, f)
-        
+
         result = workflow.get_schema(str(schema_file))
-        
+
         assert result is not None
-        assert 'categories' in result
-        assert 'concepts' in result
+        assert result == sample_schema
+        assert 'taxonomy' in result
+        assert 'thematic_categories' in result['taxonomy']
 
     def test_get_schema_file_not_found(self, tmp_path):
         """Test schema loading with non-existent file."""
@@ -148,6 +151,8 @@ class TestWorkflowModule:
         """Test that determine_permissions function exists."""
         assert hasattr(workflow, 'determine_permissions')
 
-    def test_append_record_to_sheet_exists(self):
-        """Test that append_record_to_sheet function exists."""
-        assert hasattr(workflow, 'append_record_to_sheet')
+    def test_append_record_to_csv_exists(self):
+        """Test that append_record_to_csv function exists. The pipeline moved
+        off Google Sheets writes to CSV writes; the function was renamed from
+        append_record_to_sheet to append_record_to_csv (see issue #185)."""
+        assert hasattr(workflow, 'append_record_to_csv')

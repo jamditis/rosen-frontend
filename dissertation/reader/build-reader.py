@@ -1,11 +1,26 @@
 #!/usr/bin/env python3
 """
 Build script for dissertation reader.
-Converts markdown to HTML and creates the final dist/index.html.
+Converts markdown to HTML and writes dissertation/reader/index.html.
+
+DO NOT RUN. The committed dissertation/reader/index.html has diverged from
+src/templates/shell.html. A rebuild would silently delete production features
+(header buttons, column-width settings, settings localStorage, viewport-fit
+meta, cache-busted stylesheet links). See issue #229 for the resolution
+decision (back-port template vs retire the build).
 """
 
 import re
 import os
+import sys
+
+sys.stderr.write(
+    'build-reader.py is disabled pending issue #229.\n'
+    'The committed reader/index.html has diverged from src/templates/shell.html;\n'
+    'running this script would silently delete production features.\n'
+    'See: https://github.com/jamditis/rosen-frontend/issues/229\n'
+)
+sys.exit(1)
 
 # Paths
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))

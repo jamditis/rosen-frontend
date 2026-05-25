@@ -3,11 +3,26 @@
 Test Smart Data Corrector on first 25 rows
 """
 
+import os
 import sys
 from pathlib import Path
 
-# Add project root to path
+import pytest
+
+# Integration test against live Google Sheets. Skip cleanly in any environment
+# missing the optional deps OR the service-account credentials (see #184).
+gspread = pytest.importorskip("gspread")
+service_account = pytest.importorskip("google.oauth2.service_account")
+Credentials = service_account.Credentials
+
 project_root = Path(__file__).resolve().parent.parent  # Go to backend root
+CREDS_PATH = project_root / 'google_credentials.json'
+if not CREDS_PATH.exists():
+    pytest.skip(
+        f"google_credentials.json absent at {CREDS_PATH}; integration test requires live Sheets access (see #184)",
+        allow_module_level=True,
+    )
+
 sys.path.insert(0, str(project_root / 'scripts'))
 sys.path.insert(0, str(project_root / 'scripts' / 'diagnostics'))
 
@@ -25,10 +40,6 @@ from diagnostics.smart_corrector.processors import (
     TwitterProcessor
 )
 
-import gspread
-from google.oauth2.service_account import Credentials
-import os
-
 # Setup Google Sheets connection
 def get_sheet():
     """Connect to Google Sheets."""
@@ -37,8 +48,7 @@ def get_sheet():
         'https://www.googleapis.com/auth/drive'
     ]
 
-    creds_path = project_root / 'google_credentials.json'
-    creds = Credentials.from_service_account_file(str(creds_path), scopes=scopes)
+    creds = Credentials.from_service_account_file(str(CREDS_PATH), scopes=scopes)
     client = gspread.authorize(creds)
 
     # Get the spreadsheet

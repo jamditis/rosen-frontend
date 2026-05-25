@@ -1,85 +1,78 @@
 """
-Tests for the logger module.
+Tests for the rosen_scraper.logger module.
+
+These tests target the current ArchiveLogger API (see issue #181 for the
+realignment from a pre-refactor logger shape that no longer exists).
 """
-from unittest.mock import patch, MagicMock
-from rosen_scraper.logger import init_logger, get_logger, PoisonPillType
+from rosen_scraper.logger import (
+    ArchiveLogger,
+    PoisonPillType,
+    get_logger,
+    init_logger,
+)
 
 
-class TestLoggerModule:
-    """Tests for logging functionality."""
+class TestPoisonPillTypeEnum:
+    """PoisonPillType is the public enum used across the scraping pipeline."""
 
-    def test_poison_pill_type_enum(self):
-        """Test that PoisonPillType enum exists and has expected values."""
-        assert hasattr(PoisonPillType, 'PAYWALL')
-        assert hasattr(PoisonPillType, 'ERROR')
-        assert hasattr(PoisonPillType, 'TIMEOUT')
+    def test_has_expected_members(self):
+        # Pin the public members so adding/removing one is an intentional change.
+        expected = {
+            'CONTENT_TOO_SHORT',
+            'PAYWALL_DETECTED',
+            'JAVASCRIPT_HEAVY',
+            'DEAD_LINK',
+            'ANTI_BOT',
+            'MALFORMED_CONTENT',
+            'API_FAILURE',
+        }
+        actual = {m.name for m in PoisonPillType}
+        assert actual == expected, f"PoisonPillType members drifted: {actual ^ expected}"
 
-    def test_init_logger(self, tmp_path, monkeypatch):
-        """Test logger initialization."""
+
+class TestInitLogger:
+    """init_logger() creates an ArchiveLogger and wires it as the global instance."""
+
+    def test_returns_archive_logger(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
-        
-        logger = init_logger(run_id="test_run")
-        
-        assert logger is not None
-        assert logger.name == 'rosen_scraper'
+        logger = init_logger(log_dir=str(tmp_path / "logs"))
+        assert isinstance(logger, ArchiveLogger)
 
-    def test_get_logger_without_init(self):
-        """Test getting logger without initialization."""
-        # Reset any existing logger
-        import logging
-        logging.getLogger('rosen_scraper').handlers.clear()
-        
+    def test_underlying_stdlib_logger_is_named_archive_pipeline(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        logger = init_logger(log_dir=str(tmp_path / "logs"))
+        assert logger.logger.name == 'archive_pipeline'
+
+    def test_underlying_stdlib_logger_has_handlers(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        logger = init_logger(log_dir=str(tmp_path / "logs"))
+        assert len(logger.logger.handlers) > 0
+
+    def test_can_log_messages_via_underlying_logger(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        logger = init_logger(log_dir=str(tmp_path / "logs"))
+        # ArchiveLogger exposes the stdlib Logger at .logger for normal logging
+        # calls; structured pipeline events go through log_processing_start etc.
+        logger.logger.info("info message")
+        logger.logger.warning("warning message")
+        logger.logger.error("error message")
+
+    def test_log_processing_start_does_not_raise(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        logger = init_logger(log_dir=str(tmp_path / "logs"))
+        logger.log_processing_start("https://example.com", "TEST-001")
+
+
+class TestGetLogger:
+    """get_logger() returns the same global instance across calls."""
+
+    def test_returns_archive_logger(self, tmp_path, monkeypatch):
+        monkeypatch.chdir(tmp_path)
+        init_logger(log_dir=str(tmp_path / "logs"))
         logger = get_logger()
-        
-        # Should still return a logger object
-        assert logger is not None
+        assert isinstance(logger, ArchiveLogger)
 
-    def test_logger_has_handlers(self, tmp_path, monkeypatch):
-        """Test that initialized logger has handlers."""
+    def test_returns_same_instance_across_calls(self, tmp_path, monkeypatch):
         monkeypatch.chdir(tmp_path)
-        
-        logger = init_logger(run_id="test_run_2")
-        
-        # Should have at least one handler
-        assert len(logger.handlers) > 0
-
-    def test_logger_can_log_messages(self, tmp_path, monkeypatch):
-        """Test that logger can log messages."""
-        monkeypatch.chdir(tmp_path)
-        
-        logger = init_logger(run_id="test_run_3")
-        
-        # Should not raise exceptions
-        logger.info("Test info message")
-        logger.warning("Test warning message")
-        logger.error("Test error message")
-
-    def test_get_logger_returns_same_logger(self):
-        """Test that get_logger returns the same logger instance."""
-        logger1 = get_logger()
-        logger2 = get_logger()
-        
-        assert logger1 is logger2
-        assert logger1.name == logger2.name
-
-    def test_logger_default_name(self):
-        """Test that logger has correct default name."""
-        logger = get_logger()
-        
-        assert logger.name == 'rosen_scraper'
-
-    @patch('rosen_scraper.logger.gspread.service_account')
-    def test_logger_with_sheets_logging(self, mock_gspread, tmp_path, monkeypatch, mock_env_vars):
-        """Test logger initialization with Google Sheets logging."""
-        monkeypatch.chdir(tmp_path)
-        
-        # Mock the gspread client
-        mock_gc = MagicMock()
-        mock_spreadsheet = MagicMock()
-        mock_gc.open.return_value = mock_spreadsheet
-        mock_gspread.return_value = mock_gc
-        
-        # Initialize logger
-        logger = init_logger(run_id="test_run_sheets")
-        
-        assert logger is not None
+        init_logger(log_dir=str(tmp_path / "logs"))
+        assert get_logger() is get_logger()
