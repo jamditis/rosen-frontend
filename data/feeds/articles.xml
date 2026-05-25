@@ -5,7 +5,7 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Articles and essays from Jay Rosen&apos;s journalism scholarship</description>
     <language>en-us</language>
-    <lastBuildDate>Mon, 25 May 2026 14:47:34 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 25 May 2026 15:39:56 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/articles.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen Digital Archive RSS Generator</generator>
   <item>
@@ -76,15 +76,6 @@
     <description>A 4-post Bluesky thread by Jay Rosen. Thread depth: 3 levels. </description>
     <category>Press &amp; Media Criticism</category>
     <category>Politics &amp; Democracy</category>
-  </item>
-  <item>
-    <title>I have a new job: president of News Creator Corps.</title>
-    <link>https://x.com/jayrosen_nyu/status/1975933807455875187</link>
-    <guid isPermaLink="true">https://x.com/jayrosen_nyu/status/1975933807455875187</guid>
-    <pubDate>Fri, 13 Jun 2025 00:00:00 GMT</pubDate>
-    <description>Rosen announces he has taken a new position as president of News Creator Corps, a nonprofit startup working to reach news consumers through the platforms and creators they already follow. The move follows his retirement from a 39-year career as a professor of journalism at NYU.</description>
-    <category>Journalism Theory &amp; Practice</category>
-    <category>Audience &amp; Public Engagement</category>
   </item>
   <item>
     <title>ABC goes too far in pushing out Terry Moran; plus, Google’s AI assault, and Jay Rosen moves on</title>
@@ -233,17 +224,6 @@
     <category>Politics &amp; Democracy</category>
     <category>Press &amp; Media Criticism</category>
     <category>Journalism Theory &amp; Practice</category>
-  </item>
-  <item>
-    <title>Jay Rosen (@jayrosen_nyu): The &quot;real work of journalism&quot; began after the initial news broke.</title>
-    <link>https://x.com/jayrosen_nyu/status/1975999179282579507</link>
-    <guid isPermaLink="true">https://x.com/jayrosen_nyu/status/1975999179282579507</guid>
-    <pubDate>Tue, 22 Oct 2024 00:00:00 GMT</pubDate>
-    <description>Jay Rosen&apos;s tweet provides an example of his commentary on journalism or media. It likely addresses a crucial issue, such as press coverage of an event or the changing role of the press in the digital age. He frequently offers perspectives on transparency, accountability, and the public&apos;s view of news organizations. The tweet garnered a moderate amount of engagement, including replies, reposts, likes, and views.
-</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Journalism Theory &amp; Practice</category>
-    <category>Technology &amp; Digital Media</category>
   </item>
   <item>
     <title>The nonstop, dangerous Trump &apos;liestream&apos; is same as it ever was</title>
@@ -978,6 +958,25 @@
     <pubDate>Wed, 11 Dec 2019 00:00:00 GMT</pubDate>
     <description>Peabody Awards announced new members to its bicoastal board of directors. The new board members, representing diverse backgrounds in media and entertainment from both the East and West Coasts, will provide expert counsel and help extend Peabody&apos;s reach through new partnerships and public engagement.</description>
     <category>Press &amp; Media Criticism</category>
+  </item>
+  <item>
+    <title>Bad headline, small changes at the New York Times - PressThink</title>
+    <link>https://pressthink.org/2019/08/bad-headline-small-changes-at-the-new-york-times/</link>
+    <guid isPermaLink="true">https://pressthink.org/2019/08/bad-headline-small-changes-at-the-new-york-times/</guid>
+    <pubDate>Sat, 17 Aug 2019 00:00:00 GMT</pubDate>
+    <description>Rosen analyzes the internal tensions at the New York Times regarding its coverage of Donald Trump. Rosen, a self-described Times loyalist, highlights the growing disconnect between the paper&apos;s editorial decisions and the expectations of its core readership, particularly concerning the portrayal of Trump&apos;s racism and the handling of the 2016 election coverage. The article notes a generational divide within the Times newsroom, with younger journalists advocating for a more aggressive stance against Trump, while older journalists prefer a more traditional approach. The absence of a public editor is criticized, and Rosen questions the paper&apos;s ability to adapt to the changing media landscape and its evolving relationship with its audience.</description>
+    <category>Audience &amp; Public Engagement</category>
+    <category>Politics &amp; Democracy</category>
+    <category>Press &amp; Media Criticism</category>
+  </item>
+  <item>
+    <title>A call for radically different campaign coverage</title>
+    <link>https://medium.com/we-are-hearken/a-call-for-radically-different-campaign-coverage-85e62401d0c6</link>
+    <guid isPermaLink="true">https://medium.com/we-are-hearken/a-call-for-radically-different-campaign-coverage-85e62401d0c6</guid>
+    <pubDate>Wed, 12 Jun 2019 00:00:00 GMT</pubDate>
+    <description>Rosen and Brandel call on newsrooms to adopt a &apos;citizens agenda&apos; model for campaign coverage, centering voters&apos; information needs rather than horse race narratives. They announce a partnership between Hearken and the Membership Puzzle Project to support newsrooms willing to rethink election coverage.</description>
+    <category>Journalism Theory &amp; Practice</category>
+    <category>Politics &amp; Democracy</category>
   </item>
   </channel>
 </rss>

@@ -200,14 +200,6 @@ describe('social_posts.csv', () => {
     // design: a thread record's url field is its root social post's URL, and
     // the constituent social posts are intentionally kept in social_posts.csv
     // so thread-detection can reconstruct the conversation.
-    //
-    // KNOWN_EXCEPTIONS: pending #235. RECORD-00602 and RECORD-00613 carry
-    // X.com URLs pointing at Oct 8, 2025 tweets but their date/title/summary
-    // fields are misaligned (June 2025 / Oct 2024 respectively). The social
-    // rows TWTR-15441 / TWTR-15437 are legitimate distinct tweets, NOT
-    // duplicates of the article records' actual content. Once #235 corrects
-    // the article-record URLs, drop these exceptions.
-    const KNOWN_EXCEPTIONS = new Set(['TWTR-15437', 'TWTR-15441']);
     const id = (r) => r.id || r.ID || '';
     const url = (r) => (r.url || r.URL || '').trim();
     const nonThreadArticleUrls = new Set(
@@ -221,10 +213,36 @@ describe('social_posts.csv', () => {
         const u = url(s);
         return u && u !== '#' && nonThreadArticleUrls.has(u);
       })
-      .map(id)
-      .filter(sid => !KNOWN_EXCEPTIONS.has(sid));
+      .map(id);
     assert.strictEqual(collisions.length, 0,
       `${collisions.length} social posts share a URL with a non-thread article record: ${collisions.slice(0, 5).join(', ')}`);
+  });
+
+  it('no published summary uses AI-guesswork hedging language (#236)', () => {
+    // When the scraper can't reach a source URL, the summary generator falls
+    // back on generic, hedging descriptors instead of grounded content. These
+    // signatures detect that fallback. Scoped to verified=TRUE rows: the CSV
+    // is the curator's working surface, and verified=FALSE rows are already
+    // parked for re-sourcing (see #235). This test guards the *published*
+    // surface, not the queue.
+    const HEDGING_PATTERNS = [
+      /provides an example of/i,
+      /addresses a crucial issue/i,
+      /likely (addresses|discusses|covers|involves)/i,
+      /specific details would be helpful/i,
+      /appears to (discuss|argue|cover)/i,
+      /it likely [a-z]+/i,
+    ];
+    const isVerified = (r) => {
+      const v = r.verified || r.Verified || '';
+      return v === 'TRUE' || v === 'true' || v === 'Yes' || v === true;
+    };
+    const offenders = archiveRecords
+      .filter(isVerified)
+      .filter(r => HEDGING_PATTERNS.some(p => p.test(r.summary || '')))
+      .map(r => r.id);
+    assert.strictEqual(offenders.length, 0,
+      `${offenders.length} published records have AI-guesswork hedging summaries (re-scrape or set verified=FALSE): ${offenders.slice(0, 5).join(', ')}`);
   });
 });
 
