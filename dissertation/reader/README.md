@@ -2,6 +2,8 @@
 
 A clean, accessible HTML reading experience for Jay Rosen's 1986 doctoral dissertation.
 
+> **Build pipeline disabled (see issue #229).** `index.html` is the canonical source. The `src/templates/shell.html` + `build-reader.py` pipeline below documents the original build, but the committed `index.html` has diverged with production features that aren't in the template. `build-reader.py` aborts with an error if run. Edit `index.html` directly; `src/css/` and `src/js/` are loaded by it at runtime and remain in active use.
+
 ## Overview
 
 This reader converts the dissertation markdown (`/frontend/web/95/impossible-press.md`) into a styled, navigable web application with features optimized for extended reading.
