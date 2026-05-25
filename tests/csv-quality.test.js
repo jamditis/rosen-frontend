@@ -97,7 +97,7 @@ describe('archive_records-public.csv', () => {
     // that arises when the same double-encode happens to a replacement char),
     // and the literal replacement character U+FFFD itself (the residue when
     // a char was lost upstream and there's nothing to recover).
-    const MOJIBAKE_RE = /Â[£¢¥§°]|â€|Ã[©¨ àáóñ]|ï¿½|�/u;
+    const MOJIBAKE_RE = /Â[£¢¥§°]|â€|Ã[©¨ àáóñ]|ï¿½|�/u;
     const bad = archiveRecords
       .filter(r => MOJIBAKE_RE.test(r.raw_text || ''))
       .map(r => r.id || r.ID);
