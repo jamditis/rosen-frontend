@@ -29,7 +29,7 @@ Lesson captured for future inventory work: audit every file in `data/` AND `back
 | Category | In archive (main + social) | Exists | Gap | Method to backfill | Priority call |
 |---|---|---|---|---|---|
 | Bluesky posts | 3,052 (10 thread records + 3,042 social_posts) | 4,235 | **~1,183 (~28%)** | Public AT Proto API, paginated, no auth | TBD |
-| Mastodon statuses | ~28 (10 in main + 18 in social_posts) | 535 | **~507 (~95%)** | Public mastodon.social API | TBD |
+| Mastodon statuses | **0 actual** (the "~28" in the initial pass was a substring grep that matched Twitter posts MENTIONING Mastodon; PR #221 found zero Mastodon-platform records existed) | 531 (API; profile says 535 — 4 hidden/deleted) | **531 — 100% gap, all backfilled in PR #221 as 516 own-original posts** | Public mastodon.social API | **Done in PR #221** |
 | Threads posts | 2 (0 in main + 2 in social_posts) | ~291 | **~289 (~99%)** | Web scrape (no public API without Meta dev account) | TBD |
 | Substack posts | 4 records | **0 published** | NOT a gap | n/a — confirmed reader-only account | Close as confirmed-empty |
 | Podcast guest appearances | ~28 audio records | 27+ verified candidates | Unknown overlap; needs URL dedup | Manual sweep + Wayback for old hosts | TBD |
