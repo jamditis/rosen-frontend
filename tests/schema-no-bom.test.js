@@ -18,7 +18,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.join(__dirname, '..');
 
-describe('backend JSON files have no UTF-8 BOM (#174)', () => {
+describe('backend/schema.json has no UTF-8 BOM (#174)', () => {
   it('backend/schema.json does not start with EF BB BF', () => {
     const file = path.join(rootDir, 'backend', 'schema.json');
     const head = fs.readFileSync(file).subarray(0, 3);
