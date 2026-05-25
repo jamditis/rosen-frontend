@@ -238,6 +238,9 @@
             async function fetchData() {
                 try {
                     const response = await fetch(csvUrl);
+                    if (!response.ok) {
+                        throw new Error(`Failed to load archive CSV: HTTP ${response.status}`);
+                    }
                     const csvText = await response.text();
                     Papa.parse(csvText, {
                         header: true, skipEmptyLines: true, transformHeader: normalizeHeader,
