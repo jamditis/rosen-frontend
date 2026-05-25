@@ -5,7 +5,7 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records from the View from Nowhere (10s) era</description>
     <language>en-us</language>
-    <lastBuildDate>Mon, 25 May 2026 02:42:08 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 25 May 2026 02:50:36 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/eras/view-from-nowhere-10s-.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen Digital Archive RSS Generator</generator>
   <item>
@@ -98,15 +98,6 @@
     <description>Rosen argues that news organizations should be optimized for trust rather than clicks or scoops, proposing that trust must be designed into journalism. He unpacks what &apos;optimizing for trust&apos; means in practice, from transparent data policies to showing your work, and explains why he is helping De Correspondent expand to English-language publishing.</description>
     <category>Journalism Theory &amp; Practice</category>
     <category>Technology &amp; Digital Media</category>
-  </item>
-  <item>
-    <title>Jay Rosen on our media malaise: Who will tell the people?</title>
-    <link>https://radioopensource.org/jay-rosen-on-our-media-malaise-who-will-tell-the-people/</link>
-    <guid isPermaLink="true">https://radioopensource.org/jay-rosen-on-our-media-malaise-who-will-tell-the-people/</guid>
-    <pubDate>Mon, 01 Jan 2018 00:00:00 GMT</pubDate>
-    <description>Rosen joins Christopher Lydon on Open Source Radio to discuss the media malaise in America, the crisis of trust in journalism, and the structural challenges preventing the press from fulfilling its democratic role. The conversation explores who can inform the public when the press itself is under siege.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Politics &amp; Democracy</category>
   </item>
   <item>
     <title>Jay Rosen (ONA17 speaker profile)</title>
@@ -459,6 +450,15 @@
     <guid isPermaLink="true">https://www.washingtonpost.com/blogs/wonkblog/post/how-polarization-undermined-the-press/2012/04/23/gIQAnsTQcT_blog.html</guid>
     <pubDate>Mon, 23 Apr 2012 00:00:00 GMT</pubDate>
     <description>A Wonkblog post by Rosen about how political polarization has undermined the press. The original content is no longer available at this URL.</description>
+    <category>Press &amp; Media Criticism</category>
+    <category>Politics &amp; Democracy</category>
+  </item>
+  <item>
+    <title>Jay Rosen on our media malaise: Who will tell the people?</title>
+    <link>https://radioopensource.org/jay-rosen-on-our-media-malaise-who-will-tell-the-people/</link>
+    <guid isPermaLink="true">https://radioopensource.org/jay-rosen-on-our-media-malaise-who-will-tell-the-people/</guid>
+    <pubDate>Fri, 13 Apr 2012 00:00:00 GMT</pubDate>
+    <description>Rosen joins Christopher Lydon on Open Source Radio to discuss the media malaise in America, the crisis of trust in journalism, and the structural challenges preventing the press from fulfilling its democratic role. The conversation explores who can inform the public when the press itself is under siege.</description>
     <category>Press &amp; Media Criticism</category>
     <category>Politics &amp; Democracy</category>
   </item>
