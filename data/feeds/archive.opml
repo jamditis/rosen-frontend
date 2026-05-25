@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen Digital Archive</title>
-    <dateCreated>Mon, 25 May 2026 02:42:08 GMT</dateCreated>
-    <dateModified>Mon, 25 May 2026 02:42:08 GMT</dateModified>
+    <dateCreated>Mon, 25 May 2026 02:50:36 GMT</dateCreated>
+    <dateModified>Mon, 25 May 2026 02:50:36 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -228,7 +228,6 @@
         <outline text="What The Correspondent will add to the American press" type="link" url="https://medium.com/de-correspondent/what-the-correspondent-adds-to-the-american-press-7a83eaaa7b92" created="2018-09-26"/>
         <outline text="Center for Media at Risk launch symposium" type="link" url="https://www.asc.upenn.edu/news-events/events/center-media-risk-roundtable-amy-siskind-jay-rosen-leah-wright-rigueur" created="2018-04-21"/>
         <outline text="Optimizing journalism for trust" type="link" url="https://medium.com/de-correspondent/optimizing-journalism-for-trust-1c67e81c123" created="2018-04-14"/>
-        <outline text="Jay Rosen on our media malaise: Who will tell the people?" type="link" url="https://radioopensource.org/jay-rosen-on-our-media-malaise-who-will-tell-the-people/" created="2018-01-01"/>
         <outline text="Jay Rosen (ONA17 speaker profile)" type="link" url="https://ona17.journalists.org/speaker/jay-rosen/" created="2017-10-01"/>
         <outline text="What are journalists for in the age of Trump?" type="link" url="https://www.salon.com/2017/09/14/what-are-journalists-for-in-the-age-of-trump/" created="2017-09-14"/>
         <outline text="Is trust-based journalism the future? Jay Rosen thinks so" type="link" url="https://www.wgbh.org/news/commentary/2017-04-05/is-trust-based-journalism-the-future-jay-rosen-thinks-so" created="2017-04-05"/>
@@ -268,6 +267,7 @@
         <outline text="Press Publish 3: Jay Rosen on the public, how the press thinks, and the production of innocence" type="link" url="https://www.niemanlab.org/2013/01/press-publish-3-jay-rosen-on-the-public-how-the-press-thinks-and-the-production-of-innocence/" created="2013-01-23"/>
         <outline text="Don&apos;t bust bogus &quot;hype&quot;" type="link" url="https://www.salon.com/2012/07/25/dont_bust_bogus_hype/" created="2012-07-25"/>
         <outline text="How polarization undermined the press" type="link" url="https://www.washingtonpost.com/blogs/wonkblog/post/how-polarization-undermined-the-press/2012/04/23/gIQAnsTQcT_blog.html" created="2012-04-23"/>
+        <outline text="Jay Rosen on our media malaise: Who will tell the people?" type="link" url="https://radioopensource.org/jay-rosen-on-our-media-malaise-who-will-tell-the-people/" created="2012-04-13"/>
       </outline>
       <outline text="Trump Era &amp; Democratic Crisis (2016-2020)" type="category">
         <outline text="NYU Professor Jay Rosen Tears Chuck Todd Over Trump Lies" type="link" url="https://www.mediaite.com/media/tv/nyu-professor-jay-rosen-tears-chuck-todd/" created="2019-12-26"/>
