@@ -255,11 +255,15 @@ def process_single_url(url: str, schema: Dict[str, Any],
     )
     processed_data['original_publication'] = publication
 
-    # Enrich with derived fields
+    # Enrich with derived fields. Submission-server records default to
+    # `verified='FALSE'` until a curator reviews them — the shared-token
+    # auth (issue #136) cannot prove who actually submitted the row, so a
+    # constant `verified=True` here would misrepresent the data-quality
+    # signal. The string form matches the CSV convention used by the rest
+    # of the archive (see archive_record_reviewer.validate_verification)
+    # and is what generate_review_report.py reads. See issue #160.
     processed_data = enrich_data(processed_data, url, known_entities)
-
-    # Mark as verified (submitted by Jay himself)
-    processed_data['verified'] = True
+    processed_data['verified'] = 'FALSE'
     processed_data['notes'] = "Submitted via web form"
 
     return processed_data
