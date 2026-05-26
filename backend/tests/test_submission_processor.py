@@ -325,7 +325,8 @@ class TestAppendToCsv:
                   "title": "Hello", "extras": "ignored"}
         assert processor._append_to_csv(record, headers) is True
 
-        rows = list(csv.DictReader(open(csv_path, encoding="utf-8")))
+        with open(csv_path, encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
         assert len(rows) == 1
         assert rows[0] == {"id": "RECORD-1", "url": "https://example.com/",
                            "title": "Hello"}
@@ -341,5 +342,6 @@ class TestAppendToCsv:
                   "title": "=HYPERLINK()"}
         assert processor._append_to_csv(record, headers) is True
 
-        rows = list(csv.DictReader(open(csv_path, encoding="utf-8")))
+        with open(csv_path, encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
         assert rows[0]["title"].startswith("'=")
