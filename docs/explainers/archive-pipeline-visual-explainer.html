@@ -1,0 +1,1632 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jay Rosen Internet Archive | Record pipeline explainer</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;500;600;700;800&display=swap");
+
+    :root {
+      --paper: #f6efe2;
+      --cream: #fffaf1;
+      --ink: #171514;
+      --muted: #625b52;
+      --line: #d8c8b5;
+      --red: #9f3030;
+      --red-dark: #6f2424;
+      --blue: #255d7d;
+      --blue-soft: #dceaf0;
+      --green: #346b59;
+      --green-soft: #deebe4;
+      --gold: #b3742f;
+      --gold-soft: #f1e3cb;
+      --violet: #645178;
+      --violet-soft: #e8e0ee;
+      --gray-soft: #ece4d8;
+      --shadow: 0 18px 60px rgba(35, 24, 12, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      background: #292725;
+      color: var(--ink);
+      font-family: "Source Sans 3", Arial, sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.35;
+    }
+
+    body {
+      padding: 24px 0;
+    }
+
+    @page {
+      size: 11in 8.5in;
+      margin: 0;
+    }
+
+    @media print {
+      html,
+      body {
+        background: #fff;
+        padding: 0;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      .page {
+        margin: 0 !important;
+        box-shadow: none !important;
+        page-break-after: always;
+      }
+    }
+
+    .page {
+      width: 11in;
+      height: 8.5in;
+      margin: 0 auto 24px;
+      padding: 0.34in 0.46in 0.26in;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 0.16in;
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, rgba(159, 48, 48, 0.045) 1px, transparent 1px) 0 0 / 0.28in 0.28in,
+        linear-gradient(0deg, rgba(37, 93, 125, 0.035) 1px, transparent 1px) 0 0 / 0.28in 0.28in,
+        var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .cover {
+      background:
+        radial-gradient(circle at 78% 23%, rgba(159, 48, 48, 0.24), transparent 29%),
+        radial-gradient(circle at 20% 84%, rgba(37, 93, 125, 0.18), transparent 28%),
+        linear-gradient(135deg, #fff5e7 0%, #f2e4d4 47%, #dce9ed 100%);
+    }
+
+    .page-header,
+    .page-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .page-header {
+      padding-bottom: 0.11in;
+      border-bottom: 1px solid rgba(23, 21, 20, 0.16);
+    }
+
+    .page-footer {
+      padding-top: 0.08in;
+      border-top: 1px solid rgba(23, 21, 20, 0.16);
+      color: var(--muted);
+      font-size: 8pt;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+    }
+
+    .mark {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border: 2px solid var(--red);
+      border-radius: 50%;
+      color: var(--red);
+      background: var(--cream);
+      font-family: "Libre Baskerville", Georgia, serif;
+      font-weight: 700;
+    }
+
+    .kicker {
+      color: var(--red);
+      font-size: 7.8pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      letter-spacing: 0;
+    }
+
+    h1,
+    h2 {
+      font-family: "Libre Baskerville", Georgia, serif;
+      font-weight: 700;
+    }
+
+    h1 {
+      max-width: 7.4in;
+      font-size: 42pt;
+      line-height: 1.03;
+    }
+
+    h2 {
+      font-size: 28pt;
+      line-height: 1.08;
+    }
+
+    h3 {
+      font-size: 12.3pt;
+      line-height: 1.12;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .page-no {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: rgba(255, 250, 241, 0.82);
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 9pt;
+    }
+
+    .content {
+      overflow: hidden;
+      display: grid;
+      gap: 0.16in;
+    }
+
+    .cover-content {
+      grid-template-columns: 1.05fr 0.95fr;
+      align-items: stretch;
+      gap: 0.28in;
+    }
+
+    .cover-title {
+      display: grid;
+      align-content: center;
+      gap: 0.16in;
+    }
+
+    .subtitle {
+      max-width: 6.2in;
+      font-size: 15.4pt;
+      line-height: 1.42;
+      color: #2e2924;
+    }
+
+    .cover-map {
+      display: grid;
+      grid-template-rows: 1fr auto;
+      gap: 0.16in;
+    }
+
+    .record-sheet {
+      padding: 0.24in;
+      border: 1px solid rgba(23, 21, 20, 0.18);
+      border-radius: 10px;
+      background: rgba(255, 250, 241, 0.78);
+      box-shadow: 0 14px 36px rgba(67, 45, 20, 0.12);
+      display: grid;
+      grid-template-rows: auto auto auto 1fr;
+      gap: 0.12in;
+    }
+
+    .record-sheet h3 {
+      font-family: "Libre Baskerville", Georgia, serif;
+      font-size: 22pt;
+    }
+
+    .sheet-grid {
+      display: grid;
+      grid-template-columns: 0.9fr 1.2fr;
+      gap: 0.08in;
+    }
+
+    .sheet-label {
+      color: var(--red-dark);
+      font-size: 8pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .sheet-value {
+      color: #332e29;
+      font-size: 9.2pt;
+      font-weight: 600;
+    }
+
+    .cover-checklist {
+      align-self: end;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.08in;
+      padding-top: 0.12in;
+      border-top: 1px solid var(--line);
+    }
+
+    .cover-check {
+      min-height: 0.78in;
+      padding: 0.09in;
+      border: 1px solid rgba(23, 21, 20, 0.14);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.56);
+    }
+
+    .cover-check b {
+      display: block;
+      margin-bottom: 0.04in;
+      color: var(--red-dark);
+      font-size: 8.5pt;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .cover-check span {
+      color: var(--muted);
+      font-size: 8.4pt;
+      line-height: 1.3;
+    }
+
+    .cover-rail {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.045in;
+      padding: 0.1in 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .cover-rail span {
+      min-height: 0.44in;
+      display: grid;
+      place-items: center;
+      padding: 0.05in;
+      border-radius: 7px;
+      background: var(--gray-soft);
+      color: #3d362f;
+      font-size: 7.1pt;
+      font-weight: 800;
+      text-align: center;
+      line-height: 1.1;
+      text-transform: uppercase;
+      letter-spacing: 0.045em;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.08in;
+    }
+
+    .stat {
+      min-height: 0.62in;
+      padding: 0.1in;
+      border: 1px solid rgba(23, 21, 20, 0.15);
+      border-radius: 8px;
+      background: rgba(255, 250, 241, 0.76);
+    }
+
+    .stat b {
+      display: block;
+      color: var(--red-dark);
+      font-size: 17pt;
+      line-height: 1;
+    }
+
+    .stat span {
+      display: block;
+      margin-top: 0.04in;
+      color: var(--muted);
+      font-size: 7.5pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .flow-board {
+      grid-template-rows: auto 1fr;
+    }
+
+    .lede {
+      max-width: 9.35in;
+      font-size: 13.5pt;
+      line-height: 1.42;
+      color: #2c2824;
+    }
+
+    .macro-flow {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 0.12in;
+      align-items: stretch;
+    }
+
+    .macro-step {
+      position: relative;
+      min-height: 2.28in;
+      display: grid;
+      grid-template-columns: 0.36in 1fr;
+      grid-template-rows: auto auto 1fr auto;
+      column-gap: 0.1in;
+      row-gap: 0.075in;
+      padding: 0.13in;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--cream);
+    }
+
+    .macro-step::after {
+      content: "";
+      position: absolute;
+      top: 46%;
+      right: -0.1in;
+      width: 0;
+      height: 0;
+      border-top: 9px solid transparent;
+      border-bottom: 9px solid transparent;
+      border-left: 12px solid var(--red-dark);
+      z-index: 2;
+      display: none;
+    }
+
+    .macro-step:last-child::after {
+      display: none;
+    }
+
+    .step-num {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--red);
+      color: white;
+      font-weight: 800;
+      font-size: 9pt;
+    }
+
+    .macro-step h3 {
+      align-self: center;
+    }
+
+    .macro-step p {
+      grid-column: 1 / 3;
+      font-size: 9.5pt;
+      line-height: 1.42;
+    }
+
+    .stage-detail {
+      grid-column: 1 / 3;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.055in;
+      margin-top: 0.02in;
+      padding: 0.075in;
+      border-radius: 8px;
+      background: rgba(236, 228, 216, 0.72);
+    }
+
+    .stage-detail div {
+      display: grid;
+      gap: 0.035in;
+      align-content: start;
+      align-items: start;
+      min-width: 0;
+    }
+
+    .stage-detail b {
+      color: var(--red-dark);
+      font-size: 7.3pt;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .stage-detail span {
+      color: #3b352f;
+      font-size: 7.9pt;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .mini-list {
+      grid-column: 1 / 3;
+      align-self: end;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.06in;
+    }
+
+    .mini-list span {
+      display: block;
+      padding: 0.045in 0.065in;
+      border-radius: 999px;
+      background: var(--gray-soft);
+      color: #3a342e;
+      font-size: 7.6pt;
+      font-weight: 800;
+    }
+
+    .lane-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.16in;
+      min-height: 5.72in;
+    }
+
+    .lane {
+      display: grid;
+      grid-template-rows: auto repeat(5, 1fr);
+      gap: 0.08in;
+    }
+
+    .lane-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 0.45in;
+      padding: 0.1in 0.12in;
+      border-radius: 8px;
+      color: white;
+      background: var(--red-dark);
+      font-weight: 800;
+    }
+
+    .lane-title.pipeline {
+      background: var(--blue);
+    }
+
+    .task {
+      display: grid;
+      grid-template-columns: 0.35in 1fr;
+      gap: 0.08in;
+      align-items: start;
+      padding: 0.1in;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 250, 241, 0.84);
+    }
+
+    .task b {
+      display: block;
+      margin-bottom: 0.03in;
+      color: var(--ink);
+      font-size: 10pt;
+    }
+
+    .task p {
+      font-size: 8.5pt;
+      line-height: 1.32;
+    }
+
+    .task-meta {
+      display: flex;
+      gap: 0.04in;
+      flex-wrap: wrap;
+      margin-top: 0.06in;
+    }
+
+    .task-meta span {
+      padding: 0.025in 0.055in;
+      border-radius: 999px;
+      background: var(--gray-soft);
+      color: #514940;
+      font-size: 7pt;
+      font-weight: 800;
+    }
+
+    .task-icon {
+      display: grid;
+      place-items: center;
+      width: 0.3in;
+      height: 0.3in;
+      border-radius: 50%;
+      background: var(--gold-soft);
+      color: var(--gold);
+      font-weight: 800;
+      font-size: 9pt;
+    }
+
+    .classification-grid {
+      display: grid;
+      grid-template-columns: 1.07fr 0.93fr;
+      gap: 0.18in;
+      min-height: 5.72in;
+    }
+
+    .catalog-card {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 0.13in;
+      padding: 0.18in;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255, 250, 241, 0.84);
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.08in;
+    }
+
+    .field {
+      min-height: 0.85in;
+      padding: 0.1in;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fffdf8;
+    }
+
+    .field b {
+      display: block;
+      color: var(--red-dark);
+      font-size: 8.6pt;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 0.04in;
+    }
+
+    .field span {
+      color: var(--muted);
+      font-size: 8.5pt;
+    }
+
+    .field::after {
+      content: "";
+      display: block;
+      width: 0.34in;
+      height: 2px;
+      margin-top: 0.13in;
+      background: rgba(159, 48, 48, 0.24);
+    }
+
+    .taxonomy {
+      display: grid;
+      gap: 0.09in;
+    }
+
+    .tax-row {
+      display: grid;
+      grid-template-columns: 0.3in 1fr;
+      gap: 0.08in;
+      padding: 0.105in;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--cream);
+    }
+
+    .tax-row:nth-child(2n) .task-icon {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .tax-row:nth-child(3n) .task-icon {
+      background: var(--green-soft);
+      color: var(--green);
+    }
+
+    .tax-row b {
+      display: block;
+      margin-bottom: 0.03in;
+      font-size: 9.8pt;
+    }
+
+    .tax-row p {
+      font-size: 8.4pt;
+    }
+
+    .meaning-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0.12in;
+      min-height: 5.72in;
+    }
+
+    .meaning-card {
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 0.12in;
+      padding: 0.16in;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255, 250, 241, 0.86);
+    }
+
+    .meaning-card:nth-child(1) { background: linear-gradient(180deg, var(--cream), var(--blue-soft)); }
+    .meaning-card:nth-child(2) { background: linear-gradient(180deg, var(--cream), var(--gold-soft)); }
+    .meaning-card:nth-child(3) { background: linear-gradient(180deg, var(--cream), var(--green-soft)); }
+
+    .meaning-card p {
+      font-size: 10.1pt;
+      line-height: 1.45;
+    }
+
+    .example-box {
+      padding: 0.11in;
+      border: 1px solid rgba(23, 21, 20, 0.14);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.62);
+      color: #332e29;
+      font-size: 8.3pt;
+      line-height: 1.35;
+    }
+
+    .meaning-flow {
+      align-self: stretch;
+      display: grid;
+      grid-template-rows: repeat(3, 1fr);
+      gap: 0.07in;
+      align-content: stretch;
+    }
+
+    .meaning-flow div {
+      display: grid;
+      align-content: center;
+      padding: 0.08in 0.09in;
+      border: 1px solid rgba(23, 21, 20, 0.12);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.48);
+    }
+
+    .meaning-flow b {
+      display: block;
+      margin-bottom: 0.025in;
+      color: var(--red-dark);
+      font-size: 7.4pt;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+
+    .meaning-flow span {
+      color: #413a33;
+      font-size: 8.55pt;
+      line-height: 1.3;
+    }
+
+    .graph-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: 4.18in 1.38in;
+      gap: 0.14in;
+      min-height: 5.72in;
+    }
+
+    .graph-stage {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background:
+        linear-gradient(90deg, rgba(37, 93, 125, 0.045) 1px, transparent 1px) 0 0 / 0.24in 0.24in,
+        linear-gradient(0deg, rgba(159, 48, 48, 0.035) 1px, transparent 1px) 0 0 / 0.24in 0.24in,
+        rgba(255, 250, 241, 0.8);
+    }
+
+    .node {
+      position: absolute;
+      display: grid;
+      place-items: center;
+      width: 1.16in;
+      height: 1.16in;
+      padding: 0.08in;
+      border-radius: 50%;
+      border: 2px solid white;
+      text-align: center;
+      font-size: 8.4pt;
+      font-weight: 800;
+      line-height: 1.14;
+      box-shadow: 0 10px 24px rgba(40, 30, 20, 0.15);
+    }
+
+    .record-node {
+      left: 2.82in;
+      top: 2.14in;
+      width: 1.42in;
+      height: 1.42in;
+      color: white;
+      background: var(--red-dark);
+    }
+
+    .person-node { left: 0.55in; top: 0.55in; color: var(--blue); background: var(--blue-soft); }
+    .org-node { right: 0.55in; top: 0.58in; color: var(--green); background: var(--green-soft); }
+    .concept-node { left: 0.78in; bottom: 0.58in; color: var(--gold); background: var(--gold-soft); }
+    .work-node { right: 0.68in; bottom: 0.58in; color: var(--violet); background: var(--violet-soft); }
+
+    .edge {
+      position: absolute;
+      height: 2px;
+      transform-origin: left center;
+      background: rgba(23, 21, 20, 0.32);
+    }
+
+    .edge-label {
+      position: absolute;
+      padding: 0.035in 0.065in;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: white;
+      color: var(--muted);
+      font-size: 7.3pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .e1 { left: 1.54in; top: 1.24in; width: 1.95in; transform: rotate(28deg); }
+    .e2 { left: 4.02in; top: 2.36in; width: 1.82in; transform: rotate(-33deg); }
+    .e3 { left: 1.78in; bottom: 1.42in; width: 1.66in; transform: rotate(-31deg); }
+    .e4 { left: 4.03in; top: 3.44in; width: 1.85in; transform: rotate(42deg); }
+    .l1 { left: 2.17in; top: 1.38in; }
+    .l2 { right: 1.9in; top: 1.58in; }
+    .l3 { left: 2.1in; bottom: 1.65in; }
+    .l4 { right: 2.2in; bottom: 1.92in; }
+
+    .graph-svg {
+      width: 100%;
+      height: 100%;
+      min-height: 4.08in;
+      display: block;
+    }
+
+    .graph-edge {
+      stroke: rgba(23, 21, 20, 0.34);
+      stroke-width: 3.2;
+      stroke-linecap: round;
+    }
+
+    .graph-chip rect {
+      fill: #fffdf8;
+      stroke: #d3c4b4;
+      stroke-width: 1.2;
+    }
+
+    .graph-chip text {
+      fill: #625b52;
+      font-family: "Source Sans 3", Arial, sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+
+    .graph-node circle {
+      stroke: #fff;
+      stroke-width: 4;
+      filter: drop-shadow(0 10px 14px rgba(40, 30, 20, 0.16));
+    }
+
+    .graph-node text {
+      font-family: "Source Sans 3", Arial, sans-serif;
+      font-weight: 800;
+      font-size: 17px;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .record-svg circle { fill: var(--red-dark); }
+    .record-svg text { fill: #fff; }
+    .person-svg circle { fill: var(--blue-soft); }
+    .person-svg text { fill: var(--blue); }
+    .org-svg circle { fill: var(--green-soft); }
+    .org-svg text { fill: var(--green); }
+    .concept-svg circle { fill: var(--gold-soft); }
+    .concept-svg text { fill: var(--gold); }
+    .work-svg circle { fill: var(--violet-soft); }
+    .work-svg text { fill: var(--violet); }
+
+    .graph-caption {
+      position: absolute;
+      left: 0.14in;
+      right: 0.14in;
+      top: 0.14in;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.06in;
+      pointer-events: none;
+    }
+
+    .graph-caption span {
+      padding: 0.055in 0.07in;
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.62);
+      border: 1px solid rgba(23, 21, 20, 0.11);
+      color: #514940;
+      font-size: 7.5pt;
+      font-weight: 800;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .graph-notes {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.09in;
+    }
+
+    .note-card {
+      padding: 0.105in;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--cream);
+    }
+
+    .note-card b {
+      display: block;
+      margin-bottom: 0.035in;
+      font-size: 9.8pt;
+      color: var(--red-dark);
+    }
+
+    .note-card p {
+      font-size: 8.1pt;
+      line-height: 1.25;
+    }
+
+    .note-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.04in;
+      margin-top: 0.08in;
+    }
+
+    .note-tags span {
+      padding: 0.035in 0.06in;
+      border-radius: 999px;
+      background: var(--gray-soft);
+      color: #3b352f;
+      font-size: 7.1pt;
+      font-weight: 800;
+    }
+
+    .frontend-layout {
+      display: grid;
+      grid-template-columns: 0.82fr 1.18fr;
+      gap: 0.17in;
+      min-height: 5.72in;
+    }
+
+    .stack {
+      display: grid;
+      gap: 0.08in;
+    }
+
+    .stack-step {
+      display: grid;
+      grid-template-columns: 0.34in 1fr;
+      gap: 0.08in;
+      padding: 0.1in;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--cream);
+    }
+
+    .browser {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      border: 1px solid rgba(23, 21, 20, 0.18);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fffdf7;
+    }
+
+    .browser-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 0.38in;
+      padding: 0 0.12in;
+      border-bottom: 1px solid var(--line);
+      background: #eee4d7;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--red);
+    }
+
+    .dot:nth-child(2) { background: var(--gold); }
+    .dot:nth-child(3) { background: var(--green); }
+
+    .browser-body {
+      padding: 0.14in;
+      display: grid;
+      grid-template-columns: 0.95fr 1.25fr;
+      grid-template-rows: auto 1fr;
+      gap: 0.12in;
+    }
+
+    .facet-panel,
+    .record-panel,
+    .network-panel,
+    .entity-panel {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      padding: 0.12in;
+      background: var(--blue-soft);
+    }
+
+    .record-panel {
+      background: var(--gold-soft);
+    }
+
+    .network-panel {
+      grid-column: 1 / 3;
+      min-height: 2.4in;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 0.1in;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f9efe0, #e5eef0);
+    }
+
+    .archive-search {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.08in;
+      align-items: center;
+      padding: 0.08in 0.1in;
+      border: 1px solid rgba(23, 21, 20, 0.12);
+      border-radius: 7px;
+      background: rgba(255, 253, 248, 0.78);
+    }
+
+    .archive-search b {
+      color: #3a332d;
+      font-size: 8.5pt;
+    }
+
+    .archive-search span {
+      padding: 0.035in 0.07in;
+      border-radius: 999px;
+      background: var(--red-dark);
+      color: white;
+      font-size: 7pt;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .archive-surface {
+      display: grid;
+      grid-template-columns: 0.86fr 1.12fr 0.88fr;
+      gap: 0.1in;
+      min-height: 0;
+    }
+
+    .archive-column,
+    .selected-record {
+      min-width: 0;
+      padding: 0.09in;
+      border: 1px solid rgba(23, 21, 20, 0.12);
+      border-radius: 7px;
+      background: rgba(255, 253, 248, 0.66);
+    }
+
+    .archive-column h4,
+    .selected-record h4 {
+      margin: 0 0 0.06in;
+      color: #2f2924;
+      font-size: 8.4pt;
+      line-height: 1.1;
+    }
+
+    .result-row,
+    .entity-row {
+      padding: 0.06in 0;
+      border-top: 1px solid rgba(23, 21, 20, 0.11);
+      color: #4b433b;
+      font-size: 7.2pt;
+      line-height: 1.18;
+    }
+
+    .result-row:first-of-type,
+    .entity-row:first-of-type {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .record-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.04in;
+      margin: 0.07in 0;
+    }
+
+    .record-chip-row span {
+      padding: 0.032in 0.055in;
+      border-radius: 999px;
+      background: rgba(159, 48, 48, 0.12);
+      color: var(--red-dark);
+      font-size: 6.7pt;
+      font-weight: 800;
+    }
+
+    .record-lines {
+      display: grid;
+      gap: 0.045in;
+      margin-top: 0.06in;
+    }
+
+    .record-lines span {
+      display: block;
+      height: 0.07in;
+      border-radius: 999px;
+      background: rgba(23, 21, 20, 0.13);
+    }
+
+    .record-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.055in;
+      margin-top: 0.075in;
+    }
+
+    .record-meta-grid div,
+    .drawer-note {
+      border-radius: 6px;
+      border: 1px solid rgba(23, 21, 20, 0.1);
+      background: rgba(255, 253, 248, 0.55);
+      padding: 0.055in;
+      color: #5a5148;
+      font-size: 6.7pt;
+      line-height: 1.18;
+    }
+
+    .record-meta-grid b,
+    .drawer-note b {
+      display: block;
+      margin-bottom: 0.018in;
+      color: var(--red-dark);
+      font-size: 6.2pt;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .relationship-mini {
+      margin-top: 0.08in;
+      height: 0.86in;
+      border: 1px solid rgba(23, 21, 20, 0.11);
+      border-radius: 7px;
+      background: rgba(255, 250, 241, 0.65);
+      overflow: hidden;
+    }
+
+    .relationship-mini svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .panel-title {
+      margin-bottom: 0.08in;
+      color: var(--ink);
+      font-size: 10pt;
+      font-weight: 800;
+    }
+
+    .panel-line {
+      height: 0.08in;
+      margin-bottom: 0.06in;
+      border-radius: 999px;
+      background: rgba(23, 21, 20, 0.15);
+    }
+
+    .handoff-layout {
+      grid-template-columns: 1fr 1.1fr;
+      align-items: stretch;
+      gap: 0.2in;
+    }
+
+    .talk-track {
+      display: grid;
+      gap: 0.1in;
+    }
+
+    .talk-item {
+      display: grid;
+      grid-template-columns: 0.42in 1fr;
+      gap: 0.1in;
+      padding: 0.12in;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: rgba(255, 250, 241, 0.86);
+    }
+
+    .talk-item b {
+      display: block;
+      margin-bottom: 0.035in;
+      font-size: 10.8pt;
+    }
+
+    .talk-item p {
+      font-size: 9.1pt;
+      line-height: 1.38;
+    }
+
+    .big-close {
+      display: grid;
+      align-content: center;
+      gap: 0.18in;
+      padding: 0.26in;
+      border-radius: 12px;
+      color: white;
+      background: linear-gradient(135deg, var(--red-dark), var(--blue));
+    }
+
+    .big-close h2 {
+      color: white;
+      font-size: 31pt;
+    }
+
+    .big-close p {
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 14pt;
+      line-height: 1.46;
+    }
+  </style>
+</head>
+<body>
+  <section class="page cover">
+    <header class="page-header">
+      <div class="brand"><span class="mark">JR</span><span>Jay Rosen Internet Archive</span></div>
+      <div class="kicker">Pipeline explainer | May 2026</div>
+    </header>
+
+    <main class="content cover-content">
+      <div class="cover-title">
+        <div class="kicker">From source evidence to public Archive</div>
+        <h1>How a Record becomes searchable, classified, and connected</h1>
+        <p class="subtitle">A landscape briefing deck for explaining intake, classification, tagging, entity extraction, relationship mapping, and the static frontend delivery path.</p>
+      </div>
+
+      <div class="cover-map">
+        <div class="record-sheet">
+          <h3>Canonical Record</h3>
+          <div class="sheet-grid">
+            <div class="sheet-label">Identity</div><div class="sheet-value">id, title, URL, author, date</div>
+            <div class="sheet-label">Placement</div><div class="sheet-value">Record type, era, publication, categories</div>
+            <div class="sheet-label">Meaning</div><div class="sheet-value">summary, pull quote, concepts, notes</div>
+            <div class="sheet-label">Connections</div><div class="sheet-value">Entities, typed relationships, relatedIds</div>
+            <div class="sheet-label">Delivery</div><div class="sheet-value">CSV to JSON to Loader to Entity Index</div>
+          </div>
+          <div class="cover-rail">
+            <span>Intake</span>
+            <span>Normalize</span>
+            <span>Classify</span>
+            <span>Tag</span>
+            <span>Map</span>
+            <span>Publish</span>
+          </div>
+          <div class="cover-checklist">
+            <div class="cover-check"><b>Curator control</b><span>CSV row, verification, canonical URL, source notes, and final judgment.</span></div>
+            <div class="cover-check"><b>AI assistance</b><span>Drafted summaries, concept suggestions, entity extraction, and relationship proposals.</span></div>
+            <div class="cover-check"><b>Quality gates</b><span>Schema checks, deduplication, referential integrity, and source recovery tracking.</span></div>
+            <div class="cover-check"><b>Public surfaces</b><span>Search, Facets, Record modal, Explorer, Entity Browser, and Analytics.</span></div>
+          </div>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat"><b>1,030</b><span>Archive Records</span></div>
+          <div class="stat"><b>29,696</b><span>Social posts</span></div>
+          <div class="stat"><b>5,036</b><span>Entities</span></div>
+          <div class="stat"><b>4,666</b><span>Relationships</span></div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="page-footer">
+      <span>Prepared for review with Jay Rosen</span>
+      <span>Source docs: README, CONTEXT, data schema, backend pipeline docs</span>
+    </footer>
+  </section>
+
+  <section class="page">
+    <header class="page-header">
+      <div>
+        <div class="kicker">System overview</div>
+        <h2>Six stages for every Record</h2>
+      </div>
+      <div class="page-no">01</div>
+    </header>
+
+    <main class="content flow-board">
+      <p class="lede">Each source moves through a fixed chain: capture the evidence, normalize the Record, classify it for browsing, add interpretive fields, map Entities and relationships, then publish static data for the frontend.</p>
+
+      <div class="macro-flow">
+        <div class="macro-step">
+          <div class="step-num">1</div>
+          <h3>Intake</h3>
+          <p>Capture URL, clipping, thread, transcript, Tumblr post, or source file. Record provenance and recovery status.</p>
+          <div class="stage-detail"><div><b>Input</b><span>Source evidence</span></div><div><b>Check</b><span>Recoverability and verification</span></div><div><b>Output</b><span>Candidate Record row</span></div></div>
+          <div class="mini-list"><span>source URL</span><span>raw text</span><span>verified status</span></div>
+        </div>
+        <div class="macro-step">
+          <div class="step-num">2</div>
+          <h3>Normalize</h3>
+          <p>Convert messy source material into the canonical Record shape used by the Archive data files.</p>
+          <div class="stage-detail"><div><b>Input</b><span>Extracted metadata</span></div><div><b>Check</b><span>ID and date format</span></div><div><b>Output</b><span>Clean Record fields</span></div></div>
+          <div class="mini-list"><span>id</span><span>date</span><span>publication</span></div>
+        </div>
+        <div class="macro-step">
+          <div class="step-num">3</div>
+          <h3>Classify</h3>
+          <p>Assign the browsing fields that place the Record by format, time period, publication, and category.</p>
+          <div class="stage-detail"><div><b>Input</b><span>Record text and source</span></div><div><b>Check</b><span>Taxonomy spelling</span></div><div><b>Output</b><span>Facet-ready fields</span></div></div>
+          <div class="mini-list"><span>Record type</span><span>era</span><span>categories</span></div>
+        </div>
+        <div class="macro-step">
+          <div class="step-num">4</div>
+          <h3>Tag</h3>
+          <p>Add the readable editorial layer: summary, pull quote, concepts, notes, and legacy tags.</p>
+          <div class="stage-detail"><div><b>Input</b><span>Raw text and context</span></div><div><b>Check</b><span>Curator review</span></div><div><b>Output</b><span>Readable detail view</span></div></div>
+          <div class="mini-list"><span>summary</span><span>pull quote</span><span>concepts</span></div>
+        </div>
+        <div class="macro-step">
+          <div class="step-num">5</div>
+          <h3>Map</h3>
+          <p>Extract named Entities, deduplicate them, and attach typed relationships to the Record.</p>
+          <div class="stage-detail"><div><b>Input</b><span>Record text</span></div><div><b>Check</b><span>Entity registry match</span></div><div><b>Output</b><span>Graph connections</span></div></div>
+          <div class="mini-list"><span>people</span><span>organizations</span><span>relationships</span></div>
+        </div>
+        <div class="macro-step">
+          <div class="step-num">6</div>
+          <h3>Publish</h3>
+          <p>Generate static JSON. The frontend Loader builds Facets, search, modals, Explorer, and the Entity Index.</p>
+          <div class="stage-detail"><div><b>Input</b><span>Canonical CSVs</span></div><div><b>Check</b><span>Export and data tests</span></div><div><b>Output</b><span>Static Archive data</span></div></div>
+          <div class="mini-list"><span>archive-core</span><span>archive-details</span><span>archive-entities</span></div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="page-footer">
+      <span>One Record, six processing stages</span>
+      <span>01</span>
+    </footer>
+  </section>
+
+  <section class="page">
+    <header class="page-header">
+      <div>
+        <div class="kicker">Intake and normalization</div>
+        <h2>Evidence capture and canonical fields</h2>
+      </div>
+      <div class="page-no">02</div>
+    </header>
+
+    <main class="content lane-grid">
+      <div class="lane">
+        <div class="lane-title"><span>Curator lane</span><span>CSV source of truth</span></div>
+        <div class="task"><span class="task-icon">1</span><div><b>Choose the source</b><p>PressThink essay, external article, Tumblr archive, social thread, audio/video transcript, or clipping.</p><div class="task-meta"><span>source</span><span>scope</span></div></div></div>
+        <div class="task"><span class="task-icon">2</span><div><b>Create the Record ID</b><p>Use the next canonical ID, such as RECORD-00902 for a new main Record or BSKY-03122 for a new Bluesky post.</p><div class="task-meta"><span>ID policy</span><span>sequence</span></div></div></div>
+        <div class="task"><span class="task-icon">3</span><div><b>Enter baseline metadata</b><p>Title, URL, author, publication date, original publication, content type, format, and platform.</p><div class="task-meta"><span>metadata</span><span>CSV row</span></div></div></div>
+        <div class="task"><span class="task-icon">4</span><div><b>Record provenance</b><p>Verification flag, source notes, canonical URL choice, recovery status, and any constraints around the original.</p><div class="task-meta"><span>verified</span><span>notes</span></div></div></div>
+        <div class="task"><span class="task-icon">5</span><div><b>Save the canonical row</b><p>The CSVs under data/ remain the version-controlled input for the static Archive export.</p><div class="task-meta"><span>canonical</span><span>versioned</span></div></div></div>
+      </div>
+
+      <div class="lane">
+        <div class="lane-title pipeline"><span>Pipeline lane</span><span>Extraction and repair</span></div>
+        <div class="task"><span class="task-icon">1</span><div><b>Route by source type</b><p>Article, audio, video, Twitter/X, Bluesky, Tumblr, and clipping processors use source-specific strategies.</p><div class="task-meta"><span>dispatcher</span><span>processor</span></div></div></div>
+        <div class="task"><span class="task-icon">2</span><div><b>Extract usable text</b><p>Gemini URL Context is the first path for web articles. Fallbacks include requests, BeautifulSoup, Playwright, transcripts, and OCR.</p><div class="task-meta"><span>raw_text</span><span>fallbacks</span></div></div></div>
+        <div class="task"><span class="task-icon">3</span><div><b>Clean and structure</b><p>Remove boilerplate, preserve paragraphs, capture raw_text, and keep source-specific fields available for later analysis.</p><div class="task-meta"><span>clean text</span><span>fields</span></div></div></div>
+        <div class="task"><span class="task-icon">4</span><div><b>Backfill gaps</b><p>Date backfills, publisher normalization, raw text recovery, pull quote extraction, and content quality scoring improve older Records.</p><div class="task-meta"><span>repair</span><span>quality</span></div></div></div>
+        <div class="task"><span class="task-icon">5</span><div><b>Validate the row</b><p>Checks catch bad IDs, missing dates, duplicate URLs, broken references, empty raw text, and schema drift.</p><div class="task-meta"><span>tests</span><span>schema</span></div></div></div>
+      </div>
+    </main>
+
+    <footer class="page-footer">
+      <span>Intake creates a traceable Record before downstream interpretation</span>
+      <span>02</span>
+    </footer>
+  </section>
+
+  <section class="page">
+    <header class="page-header">
+      <div>
+        <div class="kicker">Classification and browsing</div>
+        <h2>The shelves, facets, and historical placement</h2>
+      </div>
+      <div class="page-no">03</div>
+    </header>
+
+    <main class="content classification-grid">
+      <div class="catalog-card">
+        <div>
+          <h3>Record catalog fields</h3>
+          <p style="margin-top:0.06in;">These fields drive sorting, filters, cards, deep links, and editorial review.</p>
+        </div>
+        <div class="field-grid">
+          <div class="field"><b>Record type</b><span>RECORD, TUMBLR, CLIP, THREAD, Dissertation.</span></div>
+          <div class="field"><b>Content type</b><span>Article, essay, interview, lecture, social media post, and related forms.</span></div>
+          <div class="field"><b>Format</b><span>Text, audio, video, clipping, transcript, or thread structure.</span></div>
+          <div class="field"><b>Publication</b><span>PressThink, external outlets, platforms, and source domains.</span></div>
+          <div class="field"><b>Era</b><span>Historical period used for browsing and narrative context.</span></div>
+          <div class="field"><b>Categories</b><span>One or more thematic labels used as Facets.</span></div>
+          <div class="field"><b>Verified</b><span>Curator confirmation of source quality and Archive readiness.</span></div>
+          <div class="field"><b>Canonical URL</b><span>Modern URL, archive URL, or recovered source path.</span></div>
+          <div class="field"><b>Related IDs</b><span>Record and Entity references used by detail views.</span></div>
+        </div>
+      </div>
+
+      <div class="taxonomy">
+        <div class="tax-row"><span class="task-icon">A</span><div><b>Press & Media Criticism</b><p>Coverage of journalism performance, press behavior, media institutions, and public trust.</p></div></div>
+        <div class="tax-row"><span class="task-icon">B</span><div><b>Journalism Theory & Practice</b><p>Core professional concepts, methods, norms, and debates about how journalism works.</p></div></div>
+        <div class="tax-row"><span class="task-icon">C</span><div><b>Politics & Democracy</b><p>Records connecting journalism to elections, publics, civic life, legitimacy, and democratic practice.</p></div></div>
+        <div class="tax-row"><span class="task-icon">D</span><div><b>Technology & Digital Media</b><p>Blogging, platforms, networks, audience change, social media, and digital publishing.</p></div></div>
+        <div class="tax-row"><span class="task-icon">E</span><div><b>Audience & Public Engagement</b><p>Citizens, participation, listening, public knowledge, and audience relationships.</p></div></div>
+        <div class="tax-row"><span class="task-icon">F</span><div><b>Journalism Education</b><p>Teaching, curriculum, student-facing work, and Rosen's NYU role.</p></div></div>
+      </div>
+    </main>
+
+    <footer class="page-footer">
+      <span>Classification fields become Facets in the browser</span>
+      <span>03</span>
+    </footer>
+  </section>
+
+  <section class="page">
+    <header class="page-header">
+      <div>
+        <div class="kicker">Tagging and editorial meaning</div>
+        <h2>Summary, pull quote, concepts, and notes</h2>
+      </div>
+      <div class="page-no">04</div>
+    </header>
+
+    <main class="content meaning-layout">
+      <div class="meaning-card">
+        <h3>Summary</h3>
+        <p>A short explanation of the Record's argument, context, or role in the Archive. This supports scan-friendly cards, modals, and editorial QA.</p>
+        <div class="meaning-flow">
+          <div><b>Source</b><span>raw_text, title, date, publication, source notes.</span></div>
+          <div><b>Processing</b><span>AI draft plus curator tightening for specificity and tone.</span></div>
+          <div><b>Frontend use</b><span>Record cards, search context, modal lead text, review scans.</span></div>
+        </div>
+        <div class="example-box"><b>Use:</b> Tell Jay what this Record contributes in one tight paragraph, with enough specificity to distinguish it from nearby Records.</div>
+      </div>
+
+      <div class="meaning-card">
+        <h3>Pull quote</h3>
+        <p>A representative excerpt that carries the Record's voice. It helps readers recognize the source and gives the modal a strong entry point.</p>
+        <div class="meaning-flow">
+          <div><b>Source</b><span>verified source text, transcript, OCR, or recovered article body.</span></div>
+          <div><b>Processing</b><span>Exact excerpt selection, quote hygiene, length control.</span></div>
+          <div><b>Frontend use</b><span>Detail modal, featured Records, editorial review, share copy.</span></div>
+        </div>
+        <div class="example-box"><b>Use:</b> Preserve exact wording when quoting source text. Keep the quote attached to source provenance and review status.</div>
+      </div>
+
+      <div class="meaning-card">
+        <h3>Concept strings</h3>
+        <p>Record-level idea labels: View from Nowhere, Citizens' Agenda, Mindcasting, Audience Atomization Overcome, The Production of Innocence, and related Rosen vocabulary.</p>
+        <div class="meaning-flow">
+          <div><b>Source</b><span>Record argument, recurring Rosen vocabulary, dissertation-era themes.</span></div>
+          <div><b>Processing</b><span>Schema-constrained concept assignment and normalization.</span></div>
+          <div><b>Frontend use</b><span>Modal context, filtering candidates, future concept pages.</span></div>
+        </div>
+        <div class="example-box"><b>Use:</b> Keep these labels distinct from structured Concept Entities. The labels describe the Record; Entities power the graph.</div>
+      </div>
+    </main>
+
+    <footer class="page-footer">
+      <span>Tagging provides editorial meaning while the source fields preserve provenance</span>
+      <span>04</span>
+    </footer>
+  </section>
+
+  <section class="page">
+    <header class="page-header">
+      <div>
+        <div class="kicker">Entity and relationship mapping</div>
+        <h2>The knowledge graph layer</h2>
+      </div>
+      <div class="page-no">05</div>
+    </header>
+
+    <main class="content graph-layout">
+      <div class="graph-stage" aria-label="Record connected to four Entity types">
+        <div class="graph-caption">
+          <span>Record-centered</span>
+          <span>Typed relationships</span>
+          <span>Bidirectional index</span>
+        </div>
+        <svg class="graph-svg" viewBox="0 0 760 560" role="img" aria-labelledby="graph-title graph-desc">
+          <title id="graph-title">Record to Entity relationship graph</title>
+          <desc id="graph-desc">A central Record node connects to Person, Organization, Concept Entity, and Work nodes using typed relationship edges.</desc>
+
+          <line class="graph-edge" x1="380" y1="282" x2="120" y2="126"></line>
+          <line class="graph-edge" x1="380" y1="282" x2="640" y2="126"></line>
+          <line class="graph-edge" x1="380" y1="282" x2="120" y2="455"></line>
+          <line class="graph-edge" x1="380" y1="282" x2="640" y2="455"></line>
+
+          <g class="graph-chip" transform="translate(201 189)">
+            <rect width="98" height="30" rx="15"></rect>
+            <text x="49" y="20">Mentions</text>
+          </g>
+          <g class="graph-chip" transform="translate(458 189)">
+            <rect width="104" height="30" rx="15"></rect>
+            <text x="52" y="20">Criticizes</text>
+          </g>
+          <g class="graph-chip" transform="translate(200 354)">
+            <rect width="100" height="30" rx="15"></rect>
+            <text x="50" y="20">Discusses</text>
+          </g>
+          <g class="graph-chip" transform="translate(476 354)">
+            <rect width="68" height="30" rx="15"></rect>
+            <text x="34" y="20">Cites</text>
+          </g>
+
+          <g class="graph-node record-svg" transform="translate(380 282)">
+            <circle r="82"></circle>
+            <text y="-4">RECORD-00902</text>
+          </g>
+          <g class="graph-node person-svg" transform="translate(120 126)">
+            <circle r="68"></circle>
+            <text>Person</text>
+          </g>
+          <g class="graph-node org-svg" transform="translate(640 126)">
+            <circle r="68"></circle>
+            <text>Organization</text>
+          </g>
+          <g class="graph-node concept-svg" transform="translate(120 455)">
+            <circle r="68"></circle>
+            <text>Concept Entity</text>
+          </g>
+          <g class="graph-node work-svg" transform="translate(640 455)">
+            <circle r="68"></circle>
+            <text>Work</text>
+          </g>
+        </svg>
+      </div>
+
+      <div class="graph-notes">
+        <div class="note-card"><b>Extract</b><p>Identify people, organizations, concepts, works, events, and locations in the Record text.</p><div class="note-tags"><span>Person</span><span>Organization</span><span>Concept</span></div></div>
+        <div class="note-card"><b>Resolve</b><p>Normalize names and reuse existing IDs when the Entity already exists in the registry.</p><div class="note-tags"><span>dedupe</span><span>canonical name</span><span>ID reuse</span></div></div>
+        <div class="note-card"><b>Relate</b><p>Attach relationship types such as Mentions, Discusses, Criticizes, Supports, Cites, Founded By, and Expands On.</p><div class="note-tags"><span>typed edge</span><span>confidence</span><span>source Record</span></div></div>
+        <div class="note-card"><b>Index</b><p>The Entity Index supports both directions: Record to Entities and Entity to Records.</p><div class="note-tags"><span>Explorer</span><span>Entity Browser</span><span>Record modal</span></div></div>
+      </div>
+    </main>
+
+    <footer class="page-footer">
+      <span>Entity types include Person, Organization, Concept, Work, Event, and Location</span>
+      <span>05</span>
+    </footer>
+  </section>
+
+  <section class="page">
+    <header class="page-header">
+      <div>
+        <div class="kicker">Static publishing and frontend surfaces</div>
+        <h2>CSV to JSON to Archive experience</h2>
+      </div>
+      <div class="page-no">06</div>
+    </header>
+
+    <main class="content frontend-layout">
+      <div class="stack">
+        <div class="stack-step"><span class="task-icon">1</span><div><h3>Canonical CSVs</h3><p>archive_records-public.csv, social_posts.csv, extracted_entities.csv, extracted_relationships.csv.</p></div></div>
+        <div class="stack-step"><span class="task-icon">2</span><div><h3>Export script</h3><p>node data/export-archive-data.js builds processed Records, Entities, Facets, and autocomplete terms.</p></div></div>
+        <div class="stack-step"><span class="task-icon">3</span><div><h3>Split JSON</h3><p>archive-core loads first. archive-details and archive-entities load on demand. archive-data remains the fallback.</p></div></div>
+        <div class="stack-step"><span class="task-icon">4</span><div><h3>Loader</h3><p>The frontend fetches static JSON over HTTP and handles browser caching.</p></div></div>
+        <div class="stack-step"><span class="task-icon">5</span><div><h3>Public views</h3><p>Archive browser, Record modal, Entity Browser, Explorer, Analytics, and Dissertation tools.</p></div></div>
+      </div>
+
+      <div class="browser">
+        <div class="browser-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+        <div class="browser-body">
+          <div class="facet-panel">
+            <div class="panel-title">Facets</div>
+            <div class="panel-line"></div>
+            <div class="panel-line" style="width:78%;"></div>
+            <div class="panel-line" style="width:62%;"></div>
+            <div class="panel-line" style="width:88%;"></div>
+          </div>
+          <div class="record-panel">
+            <div class="panel-title">Record modal</div>
+            <div class="panel-line"></div>
+            <div class="panel-line" style="width:86%;"></div>
+            <div class="panel-line" style="width:70%;"></div>
+          </div>
+          <div class="network-panel">
+            <div class="archive-search"><b>Search: public journalism, authority, trust</b><span>static JSON</span></div>
+            <div class="archive-surface">
+              <div class="archive-column">
+                <h4>Record list</h4>
+                <div class="result-row"><b>RECORD-00902</b><br>PressThink essay</div>
+                <div class="result-row"><b>TUMBLR-03122</b><br>Short post with source URL</div>
+                <div class="result-row"><b>CLIP-00418</b><br>Interview transcript</div>
+                <div class="result-row"><b>THREAD-00177</b><br>Conversation excerpt</div>
+                <div class="result-row"><b>NOTE-00044</b><br>Curator annotation</div>
+              </div>
+              <div class="selected-record">
+                <h4>Selected Record</h4>
+                <div class="record-chip-row"><span>Press criticism</span><span>2000s</span><span>Essay</span></div>
+                <div class="record-lines"><span></span><span style="width: 84%;"></span><span style="width: 68%;"></span></div>
+                <div class="record-meta-grid">
+                  <div><b>Facets</b>Essay, 2000s</div>
+                  <div><b>Entity hits</b>4 resolved</div>
+                  <div><b>Source</b>Verified URL</div>
+                  <div><b>Export</b>archive-details</div>
+                </div>
+                <div class="relationship-mini">
+                  <svg viewBox="0 0 240 96" aria-hidden="true">
+                    <line x1="120" y1="48" x2="48" y2="24" stroke="rgba(23,21,20,.28)" stroke-width="2.4" stroke-linecap="round"></line>
+                    <line x1="120" y1="48" x2="194" y2="24" stroke="rgba(23,21,20,.28)" stroke-width="2.4" stroke-linecap="round"></line>
+                    <line x1="120" y1="48" x2="58" y2="75" stroke="rgba(23,21,20,.28)" stroke-width="2.4" stroke-linecap="round"></line>
+                    <line x1="120" y1="48" x2="184" y2="75" stroke="rgba(23,21,20,.28)" stroke-width="2.4" stroke-linecap="round"></line>
+                    <circle cx="120" cy="48" r="11" fill="#9f3030"></circle>
+                    <circle cx="48" cy="24" r="7" fill="#255d7d"></circle>
+                    <circle cx="194" cy="24" r="7" fill="#346b59"></circle>
+                    <circle cx="58" cy="75" r="7" fill="#b3742f"></circle>
+                    <circle cx="184" cy="75" r="7" fill="#645178"></circle>
+                  </svg>
+                </div>
+              </div>
+              <div class="archive-column">
+                <h4>Entity drawer</h4>
+                <div class="entity-row"><b>Person</b><br>Jay Rosen</div>
+                <div class="entity-row"><b>Organization</b><br>NYU Journalism</div>
+                <div class="entity-row"><b>Concept</b><br>Citizens' agenda</div>
+                <div class="entity-row"><b>Work</b><br>PressThink</div>
+                <div class="drawer-note"><b>Index view</b>Each entity links back to matching Records and relationship types.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="page-footer">
+      <span>The public site remains a zero-build static frontend</span>
+      <span>06</span>
+    </footer>
+  </section>
+
+  <section class="page">
+    <header class="page-header">
+      <div>
+        <div class="kicker">Briefing close</div>
+        <h2>Talk track for Jay</h2>
+      </div>
+      <div class="page-no">07</div>
+    </header>
+
+    <main class="content handoff-layout">
+      <div class="talk-track">
+        <div class="talk-item"><span class="task-icon">1</span><div><b>Start with the Record</b><p>The Record is the stable archival unit. Every feature starts from that row: evidence, metadata, classification, editorial fields, and relationships.</p></div></div>
+        <div class="talk-item"><span class="task-icon">2</span><div><b>Separate fields by job</b><p>Identity fields cite the source. Classification fields power browsing. Tagging fields explain meaning. Entity fields create cross-Archive connections.</p></div></div>
+        <div class="talk-item"><span class="task-icon">3</span><div><b>Use AI as processing support</b><p>AI drafts categories, summaries, concepts, and extractions. Schema validation, deduplication, and curator review keep the Archive coherent.</p></div></div>
+        <div class="talk-item"><span class="task-icon">4</span><div><b>Show the frontend payoff</b><p>Static JSON gives the browser enough structure to support search, Facets, Record modals, the Entity Browser, and network exploration.</p></div></div>
+      </div>
+
+      <div class="big-close">
+        <h2>Each Record carries evidence, interpretation, and connections.</h2>
+        <p>The Archive workflow turns source material into a durable public reference point, then links that reference point to the larger map of Rosen's people, institutions, ideas, works, and eras.</p>
+      </div>
+    </main>
+
+    <footer class="page-footer">
+      <span>Ready for review</span>
+      <span>07</span>
+    </footer>
+  </section>
+</body>
+</html>
