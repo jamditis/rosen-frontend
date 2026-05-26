@@ -24,9 +24,9 @@ Verified 2026-05-26 against `https://www.huffpost.com/entry/the-production-of-in
 (see jamditis/rosen-frontend#209). Live URL returned 29 paragraphs / 10170 chars
 where Firecrawl returned ~90k chars of nav chrome.
 
-Usage:
-    python3 playwright_dom_recover.py --url <URL>
-    python3 playwright_dom_recover.py --huffpost-gap data/_recovery_tmp/huffpost_gap.json --limit 5
+Usage (from the backend/ directory):
+    poetry run python scripts/recover_articles_playwright.py --url <URL>
+    poetry run python scripts/recover_articles_playwright.py --huffpost-gap ../data/_recovery_tmp/huffpost_gap.json --limit 5
 """
 from __future__ import annotations
 import argparse
@@ -77,9 +77,14 @@ SITE_OVERRIDES = {
 
 
 def pick_overrides(url: str) -> dict:
-    host = urllib.parse.urlparse(url).netloc.lower().lstrip("www.")
+    # removeprefix, not lstrip — lstrip("www.") strips any leading char in
+    # the set {'w', '.'} and corrupts hosts like "www.weather.com" to
+    # "eather.com".
+    host = urllib.parse.urlparse(url).netloc.lower().removeprefix("www.")
     for domain, cfg in SITE_OVERRIDES.items():
-        if domain in host:
+        # Exact match or proper subdomain match. `domain in host` would
+        # treat "not-huffpost.com" as a match for "huffpost.com".
+        if host == domain or host.endswith("." + domain):
             return cfg
     return {}
 
@@ -166,9 +171,17 @@ def recover(page, url: str, fallback_timestamp: str | None = None) -> dict:
         page.wait_for_timeout(2500)
         extracted = extract_article(page, url)  # use original URL's overrides
         result.update(extracted)
-        result["source"] = "wayback"
         result["wayback_url"] = wb
-        result["error"] = None
+        # Mirror the live-path length check — Wayback can also return a stub.
+        if extracted["body_char_count"] >= MIN_OK_LEN:
+            result["source"] = "wayback"
+            result["error"] = None
+        else:
+            result["source"] = "neither"
+            result["error"] = (
+                f"both live and wayback bodies too short "
+                f"(wayback {extracted['body_char_count']} chars)"
+            )
     except Exception as e:
         result["error"] = f"wayback navigation failed: {e}"
     return result
