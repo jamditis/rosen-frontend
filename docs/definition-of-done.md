@@ -20,7 +20,7 @@ All seven hash-based routes are wired and render: Archive (`/`), Folders (`#fold
 
 ### 2. Dissertation tools — Partial (live coverage doesn't match repo structure)
 
-**What's actually live at `pressthink.org/j/rosen-archive/dissertation/`:** reader, foreword, network-effect, glossary, comparison, context, excerpts, faq, concepts — verified by HTTP fetch on 2026-05-25.
+**What's actually live at `pressthink.org/j/rosen-archive/dissertation/`:** reader, foreword, network-effect, glossary, comparison, context, excerpts, faq, concepts, timeline — verified by HTTP fetch on 2026-05-25.
 
 **What's in the repo's `dissertation/` directory (actively maintained):** reader, foreword, network-effect (3 of 10).
 
@@ -32,7 +32,7 @@ All seven hash-based routes are wired and render: Archive (`/`), Folders (`#fold
 
 **Foreword "February 2026" line** (`dissertation/foreword/index.html:533`): this is primary-source text from Rosen's December 2025 foreword. CLAUDE.md rule 3 forbids editing. Leave alone or add an editorial footnote noting the writing date.
 
-**Gap-closing action:** decide the "retired tools" question (3 options, in [decisions-pending.md](./decisions-pending.md)): (a) restore to `dissertation/` and resume active maintenance, (b) leave on the live server and accept they drift, (c) remove from the live server too.
+**Gap-closing action:** decide the "retired tools" question (4 options, in [decisions-pending.md](./decisions-pending.md)): restore all to `dissertation/`, leave them archived and accept drift, remove them from production, or restore a high-value subset and retire the rest.
 
 ---
 
@@ -141,7 +141,7 @@ Design doc only: `docs/plans/2026-05-24-pillar3-authoring-workflow-design.md`. Z
 
 In execution order. Joe owns step 1; everything else flows from his decisions.
 
-1. **Joe resolves five architectural decisions.** See [decisions-pending.md](./decisions-pending.md). URL canonicalization, Pillar 3a deploy mechanism, Pillar 3b scope, social-platform backfill priority, SQLite-validator timing. AskUserQuestion-ready, single sitting.
+1. **Joe resolves six architectural decisions.** See [decisions-pending.md](./decisions-pending.md). URL canonicalization, Pillar 3a deploy mechanism, Pillar 3b scope, social-platform backfill priority, SQLite-validator timing, and dissertation tools restoration. AskUserQuestion-ready, single sitting.
 
 2. **Pillar 3a credentials + smoke test.** Issue #226. Joe creates the GitHub App, adds the 11 secrets, runs three smoke tests (scrape-fail, dedup, full success). ~30 min after approval.
 
@@ -178,7 +178,7 @@ Defer until v4.0 ships. None block "complete."
 
 The Archive is "shipped" when all seven hold:
 
-1. **Pillar 1 (existing records) verified.** All 932 records have verified URLs or documented unrecoverable status. Zero orphaned records. Relationships + entities pass FK integrity.
+1. **Pillar 1 (existing records) verified.** All 1,030 current Archive records (800 RECORD, 137 TUMBLR, 83 CLIP, 10 THREAD) have verified URLs or documented unrecoverable status. Zero orphaned records. Relationships + entities pass FK integrity.
 2. **Pillar 2 (gap-fill) >95% coverage of accessible Rosen content.** HuffPost 84/84, PressThink 146/146, Wayback recoveries done, 204 zero-relationship records re-extracted. Bluesky + Twitter current; Mastodon + Threads per Joe's decision.
 3. **Pillar 3a live and tested.** GitHub App installed, 11 secrets in place, smoke tests pass, Jay's first new record propagates Sheet → live in 2–5 minutes. Rate limiting in place.
 4. **Security baseline.** .htaccess hardened (CSP + 4 standard headers). Actions pinned to SHAs. SFTP creds off Joe's personal accounts. No leaked secrets in git history.
