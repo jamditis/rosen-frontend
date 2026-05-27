@@ -90,6 +90,9 @@ jobs:
       - name: Run frontend test suite
         run: npm run test:frontend
 
+      - name: Run data integrity test suite
+        run: npm run test:data
+
       - name: Check HTML documents are well-formed
         run: |
           echo "Checking HTML files..."
