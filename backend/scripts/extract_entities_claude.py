@@ -8,8 +8,10 @@ Workflow for each record id passed on the command line:
      batch_entity_extraction (so prompt shape stays in lockstep with the
      existing Anthropic/OpenAI/Gemini batch paths).
   3. Pipe the prompt into `claude -p` via stdin (NOT argv) to dodge the
-     128KB argv cap (MAX_ARG_STRLEN); see ~/.claude memory
-     reference_claude_p_arg_max_128kb_e2big.
+     kernel's per-argument cap (MAX_ARG_STRLEN, typically 128KB on Linux),
+     which a multi-tens-of-KB raw_text + prompt scaffold would otherwise
+     blow past, producing an E2BIG with the literal "Argument list too
+     long" in stderr.
   4. Parse the JSON, dedup entities by normalized_name against the existing
      extracted_entities.csv space, allocate new entity_ids in the
      <Prefix><4digit> format that matches the existing data (P0001 etc).
@@ -26,7 +28,7 @@ Required: `claude` on $PATH (the Claude Code CLI). No env vars needed; the
 CLI uses Joe's existing subscription.
 
 Usage:
-  python3 backend/scripts/extract_entities_claude.py \
+  cd backend && poetry run python scripts/extract_entities_claude.py \
       RECORD-00535 RECORD-00837 RECORD-00644 RECORD-00756 RECORD-00746
 
 Flags:
@@ -87,7 +89,7 @@ RELATIONSHIPS_HEADER = [
 # ---------------------------------------------------------------------------
 
 
-def normalize_name(name: str) -> str:
+def normalize_name(name: Optional[str]) -> str:
     """Normalize entity names for dedup matching.
 
     Existing CSV uses a light normalization: trimmed whitespace and a single
@@ -234,8 +236,9 @@ def invoke_claude_p(
 ) -> str:
     """Pipe the prompt into `claude -p` via stdin and return stdout.
 
-    Stdin is used to avoid the 128KB argv cap (MAX_ARG_STRLEN); see
-    reference_claude_p_arg_max_128kb_e2big in ~/.claude memory.
+    Stdin is used to avoid the kernel's per-argument cap (MAX_ARG_STRLEN,
+    typically 128KB on Linux); a multi-tens-of-KB raw_text + prompt scaffold
+    would otherwise blow past it and exec would fail with E2BIG.
     """
     proc = subprocess.run(
         [claude_bin, "-p"],
@@ -333,9 +336,12 @@ def process_record(
                 "entity_id": canonical_id,
                 "entity_type": normalized["entity_type"],
                 "entity_name": normalized["entity_name"],
-                # Store the canonical lowercase form so future dedup tools
-                # can match on the column directly without re-normalizing.
-                "normalized_name": normalized_name_key,
+                # Mirror entity_name's display case to match the existing CSV
+                # convention (5033/5078 rows have normalized_name == entity_name).
+                # The dedup KEY is lowercased via normalize_name() above; the
+                # stored COLUMN preserves case so data/export-archive-data.js
+                # doesn't add lowercase autocomplete duplicates for every entity.
+                "normalized_name": normalized["entity_name"],
                 "role_or_description": normalized["role_or_description"],
                 "affiliation": normalized["affiliation"],
                 "prominence_score": normalized["prominence_score"],

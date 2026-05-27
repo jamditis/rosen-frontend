@@ -288,9 +288,12 @@ def test_process_record_allocates_new_id_when_name_matches_but_type_differs(monk
     assert new_ents[0]["entity_id"] != "C0318"
 
 
-def test_process_record_writes_lowercased_normalized_name(monkeypatch):
-    """New rows should store the lowercased name in the normalized_name
-    column so future dedup tools can match on it directly."""
+def test_process_record_preserves_display_case_in_normalized_name(monkeypatch):
+    """normalized_name should mirror entity_name's display case to match the
+    existing CSV convention (5033/5078 rows have normalized_name == entity_name).
+    The dedup KEY is lowercased internally, but the stored COLUMN preserves
+    case so data/export-archive-data.js doesn't add lowercase duplicates to
+    the autocomplete index for every new entity."""
     existing_entities = []
     next_seq = _mod.next_entity_ids_by_prefix(existing_entities)
 
@@ -309,7 +312,7 @@ def test_process_record_writes_lowercased_normalized_name(monkeypatch):
         max_input_chars=10000, today="2026-05-27",
     )
     assert new_ents[0]["entity_name"] == "Jay Rosen"
-    assert new_ents[0]["normalized_name"] == "jay rosen"
+    assert new_ents[0]["normalized_name"] == "Jay Rosen"
 
 
 def test_process_record_dedups_within_batch(monkeypatch):
