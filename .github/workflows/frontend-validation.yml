@@ -11,6 +11,7 @@ on:
       - 'index.html'
       - 'shared-styles.css'
       - 'tests/**'
+      - 'data/**'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/frontend-validation.yml'
@@ -24,6 +25,7 @@ on:
       - 'index.html'
       - 'shared-styles.css'
       - 'tests/**'
+      - 'data/**'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/frontend-validation.yml'
@@ -89,6 +91,12 @@ jobs:
 
       - name: Run frontend test suite
         run: npm run test:frontend
+
+      - name: Run data integrity test suite
+        run: npm run test:data
+
+      - name: Run extraction coverage check
+        run: npm run test:data:extraction-coverage
 
       - name: Check HTML documents are well-formed
         run: |
