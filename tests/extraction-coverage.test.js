@@ -2,8 +2,9 @@
  * Extraction coverage invariant (issue #207).
  *
  * Locks in: every RECORD-* whose raw_text is long enough to be a real article
- * (>= 500 chars, matching firecrawl_scrape.py MIN_OK_LEN) must appear at least
- * once as source_record_id in extracted_relationships.csv.
+ * (>= 500 chars, matching backend/scripts/recover_articles_playwright.py:44
+ * MIN_OK_LEN so test and recovery pipeline share one notion of "real article")
+ * must appear at least once as source_record_id in extracted_relationships.csv.
  *
  * Goes RED when entity extraction has been skipped for records that already have
  * scrapable content. Goes GREEN as those records are re-extracted. If a record

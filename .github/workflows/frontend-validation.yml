@@ -95,6 +95,9 @@ jobs:
       - name: Run data integrity test suite
         run: npm run test:data
 
+      - name: Run extraction coverage check
+        run: npm run test:data:extraction-coverage
+
       - name: Check HTML documents are well-formed
         run: |
           echo "Checking HTML files..."
