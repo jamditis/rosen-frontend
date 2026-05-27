@@ -18,6 +18,12 @@ const PORT = Number(process.env.PREVIEW_PORT || 8000);
 const HOST = process.env.PREVIEW_HOST || '127.0.0.1';
 const ROOT = resolve(fileURLToPath(import.meta.url), '..', '..');
 
+// Whitelist for Location header values on directory redirects. A safe value
+// looks like `/some/path/` — leading slash, only filename-safe characters,
+// trailing slash. Rejects schemes (`:`), backslashes, protocol-relative `//`,
+// control chars, etc. See the dir-redirect block below for usage.
+const SAFE_LOCATION = /^\/[A-Za-z0-9._\-/]+\/$/;
+
 const MIME = {
   '.html': 'text/html; charset=utf-8',
   '.js':   'application/javascript; charset=utf-8',
@@ -71,16 +77,22 @@ const server = createServer(async (req, res) => {
     if (s.isDirectory()) {
       // Redirect bare-directory requests to the slashed form so relative URLs
       // in standalone pages (e.g. /features/status-report → ./assets/foo)
-      // resolve against the right base. Build Location entirely from the
-      // already-validated absolute path (via relative(ROOT, requested)) rather
-      // than echoing the raw URL — this breaks the user-input → Location data
-      // flow that CodeQL's open-redirect check tracks. Query/fragment are
-      // dropped on dir-redirect; the SPA hash routes live on '/' which is
-      // already slashed and never hits this branch.
+      // resolve against the right base. Location is built from the validated
+      // absolute path — `requested` is already proven to be inside ROOT by
+      // safeResolve() above. Belt-and-braces: re-prove same-origin to CodeQL
+      // by checking the final Location matches a strict whitelist before
+      // writing it. Repo directory names only contain [A-Za-z0-9._-], so this
+      // rejects nothing valid. CodeQL recognizes the regex test as a sanitizer
+      // and stops flagging this as js/server-side-unvalidated-url-redirection.
       const relFromRoot = relative(ROOT, requested).split(sep).join('/');
-      const pathOnly = '/' + relFromRoot;
+      const location = '/' + relFromRoot + '/';
       if (!rawUrl.split(/[?#]/)[0].endsWith('/')) {
-        res.writeHead(301, { Location: pathOnly + '/' });
+        if (!SAFE_LOCATION.test(location) || location.includes('//')) {
+          res.writeHead(403, { 'Content-Type': 'text/plain' });
+          res.end('Forbidden');
+          return;
+        }
+        res.writeHead(301, { Location: location });
         res.end();
         return;
       }
