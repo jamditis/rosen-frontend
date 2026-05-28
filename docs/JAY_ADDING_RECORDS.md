@@ -49,7 +49,9 @@ point the piece is in the archive and visible on
 The numbered callouts map to the columns you'll touch. You only type in
 **B** (and optionally **C** and **D**), then tick the checkbox in **E** to
 start. Columns **F**, **G**, and **H** fill in on their own as the system
-works. The example rows above are illustrative — your sheet starts empty.
+works. The figure above is an illustrative reference, not a screenshot of
+the live sheet — the example rows are made up, and your own sheet starts
+empty.
 
 ## What the status column can say
 
