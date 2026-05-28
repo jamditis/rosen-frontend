@@ -1,6 +1,7 @@
 // Header.js - Universal header for feature pages
 import { html } from '../../html.js?v=3.3.0';
 import { ArrowLeft, Newspaper } from 'lucide-react';
+import { IS_LOCAL, BASE_PATH } from '../../utils/pathResolver.js?v=3.3.0';
 
 /**
  * Universal header component for feature pages
@@ -22,9 +23,7 @@ const Header = ({
   sticky = true,
   showLogo = true
 }) => {
-  // Detect environment for path generation
-  const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  const DEFAULT_BACK = IS_LOCAL ? '../../index.html' : '/j/rosen-archive/index.html';
+  const DEFAULT_BACK = IS_LOCAL ? '../../index.html' : `${BASE_PATH}/index.html`;
   const finalBackLink = backLink || DEFAULT_BACK;
 
   return html`
