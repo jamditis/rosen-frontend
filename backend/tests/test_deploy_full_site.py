@@ -181,6 +181,98 @@ class TestCollectLocalFiles:
         assert 'data/feeds/leaked.csv' not in rels
 
 
+class TestEntryPointsUploadedLast:
+    """Cross-file consistency: entry points (index.html, version.json) must
+    upload AFTER every asset they reference. If index.html ships before
+    frontend/App.js, a visitor mid-deploy fetches the new index.html (which
+    has ?v=3.4.0 imports), then fetches App.js?v=3.4.0 — origin still
+    serves old content, CDN caches old-under-new-URL, stale page sticks
+    until TTL or manual purge.
+    """
+
+    def test_entry_points_appear_at_end_of_file_list(self, tmp_path):
+        (tmp_path / 'index.html').write_text('<html>')
+        (tmp_path / 'version.json').write_text('{}')
+        (tmp_path / 'favicon.ico').write_text('')
+        (tmp_path / 'frontend').mkdir()
+        (tmp_path / 'frontend' / 'App.js').write_text('//')
+        (tmp_path / 'data').mkdir()
+        (tmp_path / 'data' / 'archive-core.json').write_text('[]')
+
+        files = deploy_full_site.collect_local_files(
+            tmp_path,
+            top_files=('index.html', 'favicon.ico', 'version.json'),
+            dirs=('frontend',),
+            data_files=('data/archive-core.json',),
+            entry_points=('index.html', 'version.json'),
+        )
+        names = [f.relative_to(tmp_path).as_posix() for f in files]
+        # Entry points are last, in the order declared.
+        assert names[-2:] == ['index.html', 'version.json']
+        # Everything else comes before — favicon, App.js, archive-core all
+        # rendered before the entry points flip live.
+        for asset in ('favicon.ico', 'frontend/App.js',
+                      'data/archive-core.json'):
+            assert names.index(asset) < names.index('index.html')
+
+    def test_default_manifest_puts_index_and_version_last(self):
+        # Smoke check the real production manifest (no synthetic repo) —
+        # the actual deploy must follow the rule, not just the test fixture.
+        files = deploy_full_site.collect_local_files(_REPO_ROOT)
+        names = [f.relative_to(_REPO_ROOT).as_posix() for f in files]
+        assert names[-2:] == ['index.html', 'version.json']
+
+
+class TestKnownHostsHandling:
+    """The ROSEN_SFTP_KNOWN_HOSTS secret can hold a path OR raw host-key
+    content. The script must accept both: empty host-keys + RejectPolicy
+    would otherwise fail every connect.
+    """
+
+    def test_path_value_is_loaded_directly(self, monkeypatch, tmp_path):
+        kh_file = tmp_path / 'kh'
+        kh_file.write_text('pressthink.org ssh-ed25519 AAAA\n')
+        _set_env(monkeypatch, ROSEN_SFTP_KNOWN_HOSTS=str(kh_file))
+        (tmp_path / 'index.html').write_text('<html>')
+
+        with patch('paramiko.SSHClient') as mock_client_cls:
+            mock_client = MagicMock()
+            mock_client.open_sftp.return_value = MagicMock()
+            mock_client_cls.return_value = mock_client
+
+            deploy_full_site.push_files(
+                [tmp_path / 'index.html'],
+                repo_root=tmp_path,
+                cfg=deploy_full_site._read_env(),
+            )
+
+        # The real path was passed straight to load_host_keys.
+        mock_client.load_host_keys.assert_called_once_with(str(kh_file))
+
+    def test_content_value_is_materialized_to_tempfile(self, monkeypatch, tmp_path):
+        host_key_content = 'pressthink.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5'
+        _set_env(monkeypatch, ROSEN_SFTP_KNOWN_HOSTS=host_key_content)
+        (tmp_path / 'index.html').write_text('<html>')
+
+        with patch('paramiko.SSHClient') as mock_client_cls:
+            mock_client = MagicMock()
+            mock_client.open_sftp.return_value = MagicMock()
+            mock_client_cls.return_value = mock_client
+
+            deploy_full_site.push_files(
+                [tmp_path / 'index.html'],
+                repo_root=tmp_path,
+                cfg=deploy_full_site._read_env(),
+            )
+
+        # load_host_keys was called with a temp-file path (not the raw
+        # content) — the content was materialized.
+        assert mock_client.load_host_keys.call_count == 1
+        loaded_path = mock_client.load_host_keys.call_args.args[0]
+        assert loaded_path != host_key_content
+        assert loaded_path.endswith('.known_hosts')
+
+
 class TestDryRun:
     """--dry-run must report the plan without opening any network connection."""
 

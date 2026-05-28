@@ -82,6 +82,17 @@ _DEPLOY_DATA_FILES: Tuple[str, ...] = (
 _EXCLUDE_NAMES: frozenset = frozenset({'__pycache__', '.DS_Store', '.gitkeep'})
 _EXCLUDE_SUFFIXES: Tuple[str, ...] = ('.pyc', '.test.js', '.spec.js', '.csv')
 
+# Entry-point files that must upload AFTER everything else they reference.
+# Atomic per-file rename protects each file individually, but cross-file
+# consistency needs ordering: a visitor mid-deploy must never load a new
+# index.html pointing at ?v=3.4.0/App.js while App.js is still serving v3.3.0
+# content. CDNs will cache the stale-under-new-URL pair until TTL expiry.
+# Order within the tuple: index.html before version.json so that if a client
+# load races the very last rename, they pin to the still-old version.json
+# rather than the still-old index.html (the former is just a refresh signal,
+# the latter is the whole page).
+_ENTRY_POINTS: Tuple[str, ...] = ('index.html', 'version.json')
+
 
 # ---------- Config ----------------------------------------------------------
 
@@ -137,15 +148,21 @@ def collect_local_files(
     top_files: Iterable[str] = _DEPLOY_FILES,
     dirs: Iterable[str] = _DEPLOY_DIRS,
     data_files: Iterable[str] = _DEPLOY_DATA_FILES,
+    entry_points: Iterable[str] = _ENTRY_POINTS,
 ) -> List[Path]:
-    """Walk the manifest and return every file to upload, in stable order.
+    """Walk the manifest and return every file to upload, ordered so that
+    entry-point files (index.html, version.json) come LAST.
 
     Skips entries that don't exist on disk (the existence tests catch
     those at PR time — at deploy time we keep going so a missing optional
     file doesn't block the rest of the push).
+
+    The entry-points-last ordering is the cross-file consistency hinge for
+    version-bump deploys: see the _ENTRY_POINTS comment for why.
     """
     files: List[Path] = []
     seen: Set[Path] = set()
+    entry_set = set(entry_points)
 
     def _add(p: Path) -> None:
         rp = p.resolve()
@@ -153,7 +170,10 @@ def collect_local_files(
             seen.add(rp)
             files.append(p)
 
+    # First: every top-level deploy file EXCEPT entry points.
     for relpath in top_files:
+        if relpath in entry_set:
+            continue
         p = repo_root / relpath
         if p.is_file():
             _add(p)
@@ -171,6 +191,12 @@ def collect_local_files(
                 _add(sub)
 
     for relpath in data_files:
+        p = repo_root / relpath
+        if p.is_file():
+            _add(p)
+
+    # LAST: entry points, in the order declared.
+    for relpath in entry_points:
         p = repo_root / relpath
         if p.is_file():
             _add(p)
@@ -223,12 +249,33 @@ def push_files(
     pushed = 0
     error: Optional[str] = None
     dir_cache: Set[str] = set()
+    tmp_known_hosts: Optional[str] = None
     client = paramiko.SSHClient()
 
     try:
-        known_hosts_path = Path(cfg['known_hosts']).expanduser()
-        if known_hosts_path.exists():
+        # The ROSEN_SFTP_KNOWN_HOSTS secret can hold either a path on disk
+        # OR the raw host-key content. Detect by checking is_file(); if it
+        # isn't a real path but the value looks like host-key content
+        # ('ssh-' marker or '|' hashed-host marker), materialize it to a
+        # temp file so paramiko can load it. Otherwise we'd hit RejectPolicy
+        # with an empty host-key store and every connect would fail.
+        # Sibling backend/submission_server/sftp_push.py has the older
+        # path-only pattern; see follow-up issue for backporting this fix.
+        known_hosts_raw = cfg['known_hosts']
+        known_hosts_path = Path(known_hosts_raw).expanduser()
+        if known_hosts_path.is_file():
             client.load_host_keys(str(known_hosts_path))
+        elif known_hosts_raw and ('ssh-' in known_hosts_raw
+                                  or known_hosts_raw.startswith('|')):
+            import tempfile
+            with tempfile.NamedTemporaryFile(
+                mode='w', delete=False, suffix='.known_hosts',
+            ) as f:
+                f.write(known_hosts_raw)
+                if not known_hosts_raw.endswith('\n'):
+                    f.write('\n')
+                tmp_known_hosts = f.name
+            client.load_host_keys(tmp_known_hosts)
         client.set_missing_host_key_policy(paramiko.RejectPolicy())
 
         connect_kwargs = {
@@ -277,6 +324,11 @@ def push_files(
         logger.error(error)
     finally:
         client.close()
+        if tmp_known_hosts:
+            try:
+                os.unlink(tmp_known_hosts)
+            except OSError:
+                pass
 
     return {
         'ok': error is None and pushed == len(files),
