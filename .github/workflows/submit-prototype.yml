@@ -1,0 +1,152 @@
+name: pillar 3b — submit prototype record
+
+# Fired by Apps Script (the queue-sheet "Process new submissions" button) via
+# the GitHub API workflow_dispatch endpoint. Runs backend/scripts/process_submission.py
+# end-to-end for one row: scrape, categorize, append CSV, regen JSONs, npm test,
+# git push to main, SFTP push to pressthink.org, sheet writeback.
+#
+# Design: docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md
+#
+# All workflow_dispatch inputs are sheet-controlled and not directly user-typed,
+# but they ARE attacker-influenceable (a malicious URL or title would still flow
+# in). They MUST be passed via the env: block, never inlined into a run: command
+# via ${{ inputs.X }} — that pattern is shell-command-injection-prone because
+# the expression is substituted before the shell parses quoting.
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Submission URL to scrape and archive'
+        required: true
+        type: string
+      title:
+        description: 'Optional human-provided title (falls back to scraped title)'
+        required: false
+        type: string
+        default: ''
+      notes:
+        description: 'Optional human-provided notes (free text, stored on record)'
+        required: false
+        type: string
+        default: ''
+      sheet_id:
+        description: 'Google Sheets spreadsheet id holding the queue row'
+        required: true
+        type: string
+      sheet_tab:
+        description: 'Queue tab name (defaults to "Sheet1")'
+        required: false
+        type: string
+        default: 'Sheet1'
+      sheet_row:
+        description: 'Queue row number (1-indexed) for writeback'
+        required: true
+        type: string
+
+# Share the production submit concurrency group so prototype and production
+# runs serialize on the same queue rather than racing for the next CSV id.
+# _git_commit_and_push has no fetch/rebase/retry on non-fast-forward yet —
+# until that lands in the shared library, two parallel allocators would
+# collide. Drop back to a dedicated group once the retry logic is in place.
+concurrency:
+  group: pillar3a-submit-record
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Mint GitHub App installation token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.ROSEN_GH_APP_ID }}
+          private-key: ${{ secrets.ROSEN_GH_APP_PRIVATE_KEY }}
+
+      - name: Checkout main
+        uses: actions/checkout@v6
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Configure Poetry
+        run: |
+          poetry config virtualenvs.create true
+          poetry config virtualenvs.in-project true
+
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v5
+        with:
+          path: backend/.venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('backend/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: poetry install --with dev
+
+      - name: Install Playwright browsers
+        working-directory: backend
+        run: poetry run playwright install --with-deps chromium
+
+      - name: Install root npm dependencies
+        run: npm ci
+
+      - name: Configure git identity
+        run: |
+          git config user.name "rosen-archive-bot[bot]"
+          git config user.email "rosen-archive-bot[bot]@users.noreply.github.com"
+
+      - name: Process submission
+        working-directory: backend
+        env:
+          # Sheet-controlled inputs — never interpolated into the shell command
+          # text; the shell reads them as env vars and our own quoting protects
+          # against argument splitting.
+          URL: ${{ inputs.url }}
+          TITLE: ${{ inputs.title }}
+          NOTES: ${{ inputs.notes }}
+          SHEET_ID: ${{ inputs.sheet_id }}
+          SHEET_TAB: ${{ inputs.sheet_tab }}
+          SHEET_ROW: ${{ inputs.sheet_row }}
+          # Auth + integration secrets. Prototype mode skips SFTP entirely
+          # (process_submission.py --prototype-mode short-circuits the push),
+          # so the ROSEN_SFTP_* secrets are intentionally absent — least
+          # privilege: a workflow that doesn't push to production has no
+          # business holding production SFTP credentials in its env.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ROSEN_SHEETS_SA_KEY_JSON: ${{ secrets.ROSEN_SHEETS_SA_KEY_JSON }}
+          # process_submission.py reads these for the git commit identity
+          GIT_BOT_NAME: rosen-archive-bot
+          GIT_BOT_EMAIL: "rosen-archive-bot[bot]@users.noreply.github.com"
+        run: |
+          poetry run python scripts/process_submission.py \
+            --url "$URL" \
+            --title "$TITLE" \
+            --notes "$NOTES" \
+            --sheet-id "$SHEET_ID" \
+            --sheet-tab "$SHEET_TAB" \
+            --sheet-row "$SHEET_ROW" \
+            --prototype-mode

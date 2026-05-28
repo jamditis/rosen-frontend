@@ -65,6 +65,10 @@ for _candidate in (_BACKEND, _BACKEND / 'src'):
 # Re-exported so tests can monkeypatch a single import surface per module.
 from rosen_scraper.dispatcher import dispatch_url as _dispatch_url  # noqa: E402
 from rosen_scraper.categorizer import summarize_and_classify as _categorize  # noqa: E402
+from rosen_scraper.entity_extractor import (  # noqa: E402
+    extract_entities_and_relationships as _extract_entities,
+)
+from rosen_scraper import entity_csv_writer  # noqa: E402
 from rosen_scraper.workflow import (  # noqa: E402
     enrich_data,
     generate_source_based_id,
@@ -90,6 +94,7 @@ from submission_server.processor import (  # noqa: E402
 # in a test reroutes the call cleanly.
 dispatch_url = _dispatch_url
 categorize = _categorize
+extract_entities_and_relationships = _extract_entities
 
 # Tests override CSV_FILE to point at a tmp file. Defaults to the canonical
 # archive CSV when the script runs in CI.
@@ -244,7 +249,10 @@ def _short_title(title: str, width: int = 60) -> str:
 def _git_commit_and_push(record_id: str, title: str,
                          relative_csv_path: str) -> Optional[str]:
     """Stage explicit paths, commit, push. Returns None on success, error string."""
-    paths = [relative_csv_path] + [f'data/{f}' for f in _STAGED_JSON_FILES]
+    paths = ([relative_csv_path,
+              'data/extracted_entities.csv',
+              'data/extracted_relationships.csv']
+             + [f'data/{f}' for f in _STAGED_JSON_FILES])
     short = _short_title(title) or 'auto-submit'
     message = f'data: add {record_id} via auto-submit ({short})'
     try:
@@ -295,7 +303,8 @@ def _is_sentinel(url: str) -> bool:
 
 def process_one(url: str, title: str = '', notes: str = '',
                 sheet_id: str = '', sheet_tab: str = '',
-                sheet_row: Optional[int] = None) -> Dict[str, Any]:
+                sheet_row: Optional[int] = None,
+                prototype_mode: bool = False) -> Dict[str, Any]:
     """Run the 12-step pipeline for one submission. Returns a result dict.
 
     Keys: ``status`` (live/archived/duplicate/error/noop), ``record_id``,
@@ -463,6 +472,59 @@ def process_one(url: str, title: str = '', notes: str = '',
         return {'status': 'error', 'record_id': record_id,
                 'error': msg, 'exit_code': 1}
 
+    # --- Step 8.5: extract entities (best-effort, degrade on fail). -------
+    # Skip when text is too short to extract anything useful; a Gemini timeout
+    # or quota hit must not abort the submission (same model as the step-4
+    # categorization degrade). Mirror step-4's raw_text/text fallback so a
+    # dispatcher that returns ``text`` but no ``raw_text`` still gets
+    # entity-extracted instead of silently skipped.
+    raw_text = (scrape.get('raw_text', '')
+                or scrape.get('text', '')
+                or '')
+    if len(raw_text.strip()) >= 500:
+        extraction = None
+        try:
+            extraction = extract_entities_and_relationships(
+                text_content=raw_text,
+                record_id=record_id,
+                record_title=scrape.get('title'),
+                record_author=scrape.get('author'),
+                record_publication=scrape.get('original_publication'),
+            )
+        except Exception as exc:  # noqa: BLE001 — degrade like categorization
+            logger.warning(f'Entity extraction failed (degrading): {exc}')
+
+        stats = None
+        if extraction:
+            try:
+                stats = entity_csv_writer.append_entities_and_relationships(
+                    extraction,
+                    entities_csv=DATA_DIR / 'extracted_entities.csv',
+                    relationships_csv=DATA_DIR / 'extracted_relationships.csv',
+                    record_id=record_id,
+                )
+                logger.info(f'Entities: +{stats["entities_added"]} / '
+                            f'+{stats["relationships_added"]}')
+            except Exception as exc:  # noqa: BLE001 — degrade like categorization
+                logger.warning(f'Entity writer failed (degrading): {exc}')
+
+        # Re-regen JSONs only if writer appended rows. NOT best-effort: the
+        # CSV change is already committed; a regen failure here would let
+        # stale JSONs ship in step 10's commit alongside the new entity rows.
+        # Let it raise to abort the submission.
+        if stats and (stats['entities_added'] or stats['relationships_added']):
+            try:
+                subprocess.run(['node', str(EXPORT_SCRIPT)],
+                               cwd=str(DATA_DIR), check=True,
+                               capture_output=True, text=True)
+            except Exception as exc:  # noqa: BLE001
+                msg = f'JSON regen (post-entity) failed: {exc}'
+                logger.error(msg)
+                _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
+                                status='error', record_id=record_id, error=msg)
+                return {'status': 'error', 'record_id': record_id,
+                        'error': msg, 'exit_code': 1}
+
     # --- Step 9: node test suite. -----------------------------------------
     try:
         subprocess.run(['npm', 'test'],
@@ -495,18 +557,23 @@ def process_one(url: str, title: str = '', notes: str = '',
                 'error': msg, 'exit_code': 1}
 
     # --- Step 11: SFTP push. ----------------------------------------------
-    _stage_for_ftp()
-    push = sftp_push.push_to_production()
-    if not (push.get('ok') and not push.get('skipped')):
-        if push.get('skipped'):
-            note = 'Live push not configured on this runner'
-        else:
-            note = (f"Live push failed; will retry next submission "
-                    f"({push.get('error', 'unknown error')})")
-        _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
-                        status='archived', record_id=record_id, error=note)
-        return {'status': 'archived', 'record_id': record_id,
-                'error': note, 'exit_code': 0}
+    # Prototype mode skips SFTP entirely: the prototype surface is served by
+    # GitHub Pages off main, so the step-10 push already deployed it.
+    if prototype_mode:
+        logger.info('Prototype mode: skipping SFTP push to production')
+    else:
+        _stage_for_ftp()
+        push = sftp_push.push_to_production()
+        if not (push.get('ok') and not push.get('skipped')):
+            if push.get('skipped'):
+                note = 'Live push not configured on this runner'
+            else:
+                note = (f"Live push failed; will retry next submission "
+                        f"({push.get('error', 'unknown error')})")
+            _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
+                            status='archived', record_id=record_id, error=note)
+            return {'status': 'archived', 'record_id': record_id,
+                    'error': note, 'exit_code': 0}
 
     # --- Step 12: final sheet writeback. Retry once. ----------------------
     ok = _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
@@ -540,6 +607,10 @@ def _parse_args(argv):
     p.add_argument('--sheet-id', dest='sheet_id', default='')
     p.add_argument('--sheet-tab', dest='sheet_tab', default='')
     p.add_argument('--sheet-row', dest='sheet_row', type=int, default=0)
+    p.add_argument('--prototype-mode', dest='prototype_mode',
+                   action='store_true', default=False,
+                   help='Skip SFTP push to PressThink (GH Pages auto-deploy '
+                        'handles the prototype surface).')
     return p.parse_args(argv)
 
 
@@ -549,6 +620,7 @@ def main(argv=None) -> int:
         url=args.url, title=args.title, notes=args.notes,
         sheet_id=args.sheet_id, sheet_tab=args.sheet_tab,
         sheet_row=args.sheet_row,
+        prototype_mode=args.prototype_mode,
     )
     logger.info(f'Result: status={result["status"]} '
                 f'record_id={result["record_id"]} error={result["error"]}')
