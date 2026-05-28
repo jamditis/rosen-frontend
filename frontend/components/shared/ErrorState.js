@@ -1,5 +1,5 @@
 // ErrorState.js - Universal error display component
-import { html } from '../../html.js?v=3.3.0';
+import { html } from '../../html.js?v=3.4.0';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 
 /**

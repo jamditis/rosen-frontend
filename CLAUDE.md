@@ -17,7 +17,7 @@ The **Jay Rosen Internet Archive** is a public collection of the works, critique
 
 - **Live URL:** https://pressthink.org/j/rosen-archive/
 - **Repository:** github.com/jamditis/rosen-frontend
-- **Current version:** v3.3.0
+- **Current version:** v3.4.0
 - **Archive curator:** Joe Amditis
 
 ### About Jay Rosen
