@@ -35,23 +35,35 @@ Critical invariants (do not break without updating both call sites):
 from __future__ import annotations
 
 import csv
+import json
 import os
 import re
 import tempfile
 from datetime import date
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, FrozenSet, Iterable, List, Optional, Tuple
 
 # ---------------------------------------------------------------------------
-# Schema constants — kept in sync with scripts/batch_entity_extraction.py.
-# These are the canonical entity/relationship type sets the project supports.
-# If batch_entity_extraction.py changes either set, mirror the change here
-# (and update the test fixtures that depend on the prefix map).
+# Schema constants — derived from backend/entity_extraction_schema_v3.json
+# at import time so the writer can never silently drop new schema-valid
+# entity/relationship types (or accept ones the schema no longer lists).
+# Earlier versions hardcoded these and drifted: dropped Authored By, Founded,
+# Interviewed, Quoted, Responds To and accepted Founded By / Owned By, which
+# the schema has never had.
 # ---------------------------------------------------------------------------
 
-VALID_ENTITY_TYPES = {
-    "Person", "Organization", "Work", "Concept", "Event", "Location",
-}
+_SCHEMA_PATH = Path(__file__).resolve().parents[2] / "entity_extraction_schema_v3.json"
+
+
+def _load_schema_types() -> Tuple[FrozenSet[str], FrozenSet[str]]:
+    with _SCHEMA_PATH.open("r", encoding="utf-8") as f:
+        schema = json.load(f)
+    entities = frozenset(schema.get("entity_types", {}).keys())
+    relationships = frozenset(schema.get("relationship_types", {}).keys())
+    return entities, relationships
+
+
+VALID_ENTITY_TYPES, VALID_RELATIONSHIP_TYPES = _load_schema_types()
 
 ENTITY_TYPE_PREFIXES = {
     "Person": "P",
@@ -60,13 +72,6 @@ ENTITY_TYPE_PREFIXES = {
     "Concept": "C",
     "Event": "E",
     "Location": "L",
-}
-
-VALID_RELATIONSHIP_TYPES = {
-    "Mentions", "Criticizes", "Cites", "Discusses", "Expands On",
-    "Affiliated With", "Published In", "Originated By", "Occurred At",
-    "Supports", "Owns", "Owned By", "Founded By", "Pioneered",
-    "Inspired By",
 }
 
 # Type-specific fields that map to role_or_description in the CSV.

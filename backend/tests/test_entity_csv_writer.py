@@ -15,9 +15,39 @@ to write).
 
 import csv
 import importlib
+import json
 from pathlib import Path
 
 ecw = importlib.import_module("rosen_scraper.entity_csv_writer")
+
+
+# ---------------------------------------------------------------------------
+# Schema-derived constants must stay in lockstep with entity_extraction_schema_v3.json
+# ---------------------------------------------------------------------------
+
+_SCHEMA_PATH = (Path(__file__).resolve().parents[1]
+                / "entity_extraction_schema_v3.json")
+
+
+def _load_schema():
+    with _SCHEMA_PATH.open("r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def test_valid_relationship_types_matches_schema():
+    """The hardcoded set drifted from the canonical schema (missing 5 valid
+    types, contains 1 type not in the schema). Derive from the schema so the
+    two cannot drift again."""
+    schema = _load_schema()
+    expected = frozenset(schema["relationship_types"].keys())
+    assert frozenset(ecw.VALID_RELATIONSHIP_TYPES) == expected
+
+
+def test_valid_entity_types_matches_schema():
+    """Same lockstep guarantee for entity types."""
+    schema = _load_schema()
+    expected = frozenset(schema["entity_types"].keys())
+    assert frozenset(ecw.VALID_ENTITY_TYPES) == expected
 
 
 # ---------------------------------------------------------------------------

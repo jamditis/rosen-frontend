@@ -473,11 +473,16 @@ def process_one(url: str, title: str = '', notes: str = '',
                 'error': msg, 'exit_code': 1}
 
     # --- Step 8.5: extract entities (best-effort, degrade on fail). -------
-    # Skip when raw_text is too short to extract anything useful; a Gemini
-    # timeout or quota hit must not abort the submission (same model as the
-    # step-4 categorization degrade).
-    raw_text = scrape.get('raw_text', '') or ''
+    # Skip when text is too short to extract anything useful; a Gemini timeout
+    # or quota hit must not abort the submission (same model as the step-4
+    # categorization degrade). Mirror step-4's raw_text/text fallback so a
+    # dispatcher that returns ``text`` but no ``raw_text`` still gets
+    # entity-extracted instead of silently skipped.
+    raw_text = (scrape.get('raw_text', '')
+                or scrape.get('text', '')
+                or '')
     if len(raw_text.strip()) >= 500:
+        extraction = None
         try:
             extraction = extract_entities_and_relationships(
                 text_content=raw_text,
@@ -486,7 +491,12 @@ def process_one(url: str, title: str = '', notes: str = '',
                 record_author=scrape.get('author'),
                 record_publication=scrape.get('original_publication'),
             )
-            if extraction:
+        except Exception as exc:  # noqa: BLE001 — degrade like categorization
+            logger.warning(f'Entity extraction failed (degrading): {exc}')
+
+        stats = None
+        if extraction:
+            try:
                 stats = entity_csv_writer.append_entities_and_relationships(
                     extraction,
                     entities_csv=DATA_DIR / 'extracted_entities.csv',
@@ -495,12 +505,25 @@ def process_one(url: str, title: str = '', notes: str = '',
                 )
                 logger.info(f'Entities: +{stats["entities_added"]} / '
                             f'+{stats["relationships_added"]}')
-                if stats['entities_added'] or stats['relationships_added']:
-                    subprocess.run(['node', str(EXPORT_SCRIPT)],
-                                   cwd=str(DATA_DIR), check=True,
-                                   capture_output=True, text=True)
-        except Exception as exc:  # noqa: BLE001 — degrade like categorization
-            logger.warning(f'Entity extraction failed (degrading): {exc}')
+            except Exception as exc:  # noqa: BLE001 — degrade like categorization
+                logger.warning(f'Entity writer failed (degrading): {exc}')
+
+        # Re-regen JSONs only if writer appended rows. NOT best-effort: the
+        # CSV change is already committed; a regen failure here would let
+        # stale JSONs ship in step 10's commit alongside the new entity rows.
+        # Let it raise to abort the submission.
+        if stats and (stats['entities_added'] or stats['relationships_added']):
+            try:
+                subprocess.run(['node', str(EXPORT_SCRIPT)],
+                               cwd=str(DATA_DIR), check=True,
+                               capture_output=True, text=True)
+            except Exception as exc:  # noqa: BLE001
+                msg = f'JSON regen (post-entity) failed: {exc}'
+                logger.error(msg)
+                _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
+                                status='error', record_id=record_id, error=msg)
+                return {'status': 'error', 'record_id': record_id,
+                        'error': msg, 'exit_code': 1}
 
     # --- Step 9: node test suite. -----------------------------------------
     try:

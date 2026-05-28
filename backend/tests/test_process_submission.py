@@ -735,6 +735,95 @@ class TestEntityExtraction:
         assert 'data/extracted_entities.csv' in staged_paths
         assert 'data/extracted_relationships.csv' in staged_paths
 
+    def test_extraction_uses_text_fallback_when_raw_text_empty(self, monkeypatch,
+                                                               csv_with_headers):
+        """Dispatchers may populate ``text`` instead of ``raw_text``. Step 4
+        (categorize) already falls back to ``text`` — step 8.5 (entity
+        extraction) must do the same or those records get categorized but
+        never entity-extracted."""
+        _stub_schema(monkeypatch)
+        body = _long_text()
+        # Dispatcher returns text but NOT raw_text — exactly the asymmetric
+        # case the bug fix targets.
+        _stub_dispatcher_ok(monkeypatch, raw_text='', text=body)
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+        extract_mock = _stub_entity_extractor(
+            monkeypatch,
+            return_value={
+                'entities': [{'name': 'Jay Rosen', 'type': 'person'}],
+                'relationships': [],
+                'record_id': 'PRESSTH-00100',
+                'extraction_date': '2026-05-28',
+            })
+        _stub_entity_writer(
+            monkeypatch,
+            return_value={'entities_added': 1, 'relationships_added': 0})
+
+        result = _run(monkeypatch, csv_with_headers)
+
+        assert result['status'] == 'live'
+        extract_mock.assert_called_once()
+        # The extractor must have been handed the ``text`` body.
+        call_kwargs = extract_mock.call_args.kwargs
+        assert call_kwargs.get('text_content') == body
+
+    def test_regen_failure_after_writer_aborts_submission(self, monkeypatch,
+                                                          csv_with_headers):
+        """If the entity writer appended rows but the post-write JSON regen
+        fails, the submission must abort. Otherwise step 10 commits stale
+        JSONs alongside the new entity CSV rows — divergent state."""
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch, raw_text=_long_text())
+        _stub_sheets(monkeypatch)
+        sftp_mock = _stub_sftp(monkeypatch)
+        _stub_entity_extractor(
+            monkeypatch,
+            return_value={
+                'entities': [{'name': 'Jay Rosen', 'type': 'person'}],
+                'relationships': [{'subject': 'a', 'predicate': 'b',
+                                   'object': 'c'}],
+                'record_id': 'PRESSTH-00100',
+                'extraction_date': '2026-05-28',
+            })
+        _stub_entity_writer(
+            monkeypatch,
+            return_value={'entities_added': 3, 'relationships_added': 2})
+
+        # Fail ONLY the second ``node export-archive-data.js`` invocation
+        # (step 8.5's re-regen). Step 8's first regen and everything else
+        # must succeed so we isolate the regen-after-writer failure mode.
+        node_export_calls = {'count': 0}
+
+        def _fake_run(cmd, *args, **kwargs):
+            rc = 0
+            stderr = ''
+            if (cmd[:1] == ['node']
+                    and len(cmd) > 1 and 'export-archive-data' in cmd[1]):
+                node_export_calls['count'] += 1
+                if node_export_calls['count'] == 2:
+                    rc = 1
+                    stderr = 'export-archive-data.js: OOM'
+            result = subprocess.CompletedProcess(
+                args=cmd, returncode=rc, stdout='', stderr=stderr)
+            if kwargs.get('check') and rc != 0:
+                raise subprocess.CalledProcessError(
+                    rc, cmd, output='', stderr=stderr)
+            return result
+
+        monkeypatch.setattr(process_submission.subprocess, 'run',
+                            MagicMock(side_effect=_fake_run))
+
+        result = _run(monkeypatch, csv_with_headers)
+
+        # The re-regen failure must surface as an error, not be swallowed.
+        assert result['status'] == 'error', (
+            'post-writer regen failure must abort the submission, '
+            'not silently continue past it')
+        # And the submission must not have proceeded to SFTP/commit.
+        sftp_mock.assert_not_called()
+
 
 # ---------- Prototype mode --------------------------------------------------
 

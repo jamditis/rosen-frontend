@@ -44,8 +44,13 @@ on:
         required: true
         type: string
 
+# Share the production submit concurrency group so prototype and production
+# runs serialize on the same queue rather than racing for the next CSV id.
+# _git_commit_and_push has no fetch/rebase/retry on non-fast-forward yet —
+# until that lands in the shared library, two parallel allocators would
+# collide. Drop back to a dedicated group once the retry logic is in place.
 concurrency:
-  group: pillar3b-submit-prototype
+  group: pillar3a-submit-record
   cancel-in-progress: false
 
 permissions:
@@ -126,17 +131,13 @@ jobs:
           SHEET_ID: ${{ inputs.sheet_id }}
           SHEET_TAB: ${{ inputs.sheet_tab }}
           SHEET_ROW: ${{ inputs.sheet_row }}
-          # Auth + integration secrets
+          # Auth + integration secrets. Prototype mode skips SFTP entirely
+          # (process_submission.py --prototype-mode short-circuits the push),
+          # so the ROSEN_SFTP_* secrets are intentionally absent — least
+          # privilege: a workflow that doesn't push to production has no
+          # business holding production SFTP credentials in its env.
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ROSEN_SHEETS_SA_KEY_JSON: ${{ secrets.ROSEN_SHEETS_SA_KEY_JSON }}
-          ROSEN_SFTP_HOST: ${{ secrets.ROSEN_SFTP_HOST }}
-          ROSEN_SFTP_USER: ${{ secrets.ROSEN_SFTP_USER }}
-          ROSEN_SFTP_PASSWORD: ${{ secrets.ROSEN_SFTP_PASSWORD }}
-          ROSEN_SFTP_REMOTE_PATH: ${{ secrets.ROSEN_SFTP_REMOTE_PATH }}
-          ROSEN_SFTP_PORT: ${{ secrets.ROSEN_SFTP_PORT }}
-          ROSEN_SFTP_KEY_PATH: ${{ secrets.ROSEN_SFTP_KEY_PATH }}
-          ROSEN_SFTP_KEY_PASSPHRASE: ${{ secrets.ROSEN_SFTP_KEY_PASSPHRASE }}
-          ROSEN_SFTP_KNOWN_HOSTS: ${{ secrets.ROSEN_SFTP_KNOWN_HOSTS }}
           # process_submission.py reads these for the git commit identity
           GIT_BOT_NAME: rosen-archive-bot
           GIT_BOT_EMAIL: "rosen-archive-bot[bot]@users.noreply.github.com"
