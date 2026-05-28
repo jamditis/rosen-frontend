@@ -191,7 +191,16 @@ Settings → Secrets and variables → Actions → "New repository secret" for e
 
 ### Optional: rotating away from password auth later
 
-If you ever generate an SSH keypair for the deploy account (`ssh-keygen -t ed25519 -f rosen_deploy -N ''`), upload the public key in cPanel under "SSH Access", then set `ROSEN_SFTP_KEY_PATH` (and `ROSEN_SFTP_KEY_PASSPHRASE` if encrypted) instead of `ROSEN_SFTP_PASSWORD`. `sftp_push.py:130` honors the key path when set.
+Key-based auth is a possible future improvement but is **not safe to enable today** — the current `submit-record.yml` doesn't materialize a private key onto the runner. `sftp_push.py:53` reads `ROSEN_SFTP_KEY_PATH` as an existing path on disk, so setting that secret alone makes Smoke 3 fail with a missing-key-file error.
+
+Making key-auth work would mean:
+
+1. Generate a keypair: `ssh-keygen -t ed25519 -f rosen_deploy -N ''`. Upload the public key in cPanel under "SSH Access".
+2. Add a new repository secret `ROSEN_SFTP_KEY_CONTENT` holding the **body** of the private key file (the contents of `rosen_deploy`, not a path).
+3. Patch `submit-record.yml` to write that secret to a temp file with `chmod 600` before the "Process submission" step runs (e.g. `echo "$ROSEN_SFTP_KEY_CONTENT" > "$RUNNER_TEMP/rosen_deploy" && chmod 600 "$RUNNER_TEMP/rosen_deploy"`).
+4. Set `ROSEN_SFTP_KEY_PATH` to that temp path (and `ROSEN_SFTP_KEY_PASSPHRASE` if encrypted) instead of `ROSEN_SFTP_PASSWORD` in the env: block.
+
+Until step 3 lands in the workflow, password auth is the only supported path — don't set `ROSEN_SFTP_KEY_PATH`.
 
 ---
 
