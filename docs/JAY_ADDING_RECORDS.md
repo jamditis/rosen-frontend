@@ -42,6 +42,15 @@ point the piece is in the archive and visible on
 > something probably is broken if it sits on `submitted` for more than
 > an hour (in that case, check Column H or ask Hali).
 
+## The columns at a glance
+
+![Annotated reference of the Rosen Archive URL List sheet: columns B through H with example rows for the live, submitted, and error states.](images/jay-adding-records-sheet.png)
+
+The numbered callouts map to the columns you'll touch. You only type in
+**B** (and optionally **C** and **D**), then tick the checkbox in **E** to
+start. Columns **F**, **G**, and **H** fill in on their own as the system
+works. The example rows above are illustrative — your sheet starts empty.
+
 ## What the status column can say
 
 You'll usually see `submitted` → `live`. Anything else is a signal:
