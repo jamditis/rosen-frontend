@@ -25,6 +25,16 @@ const dataDir = path.join(__dirname, '..', 'data');
 
 const RAW_TEXT_MIN = 500;
 
+// Records whose raw_text is >= 500 chars but contains scraped junk rather than
+// the article body — the scraper captured a nav/listing page, or the URL has
+// link-rotted to a squatted domain. Claude correctly returns zero entities for
+// these. Tracked for Wayback recovery in issue #294; remove from this set
+// after raw_text is replaced and extraction is re-run.
+const ALLOWLIST = new Set([
+  'RECORD-00740', // wnycstudios.org returned the shows-listing nav, not the OTM segment transcript
+  'RECORD-00783', // fora.tv domain was squatted; raw_text is Vietnamese sports-streaming spam
+]);
+
 let records, relationships;
 
 before(() => {
@@ -47,6 +57,7 @@ describe('extraction coverage (#207)', () => {
       .filter(r => r.id.startsWith('RECORD-'))
       .filter(r => (r.raw_text || '').trim().length >= RAW_TEXT_MIN)
       .filter(r => !haveRel.has(r.id))
+      .filter(r => !ALLOWLIST.has(r.id))
       .map(r => r.id);
     assert.strictEqual(
       offenders.length,
