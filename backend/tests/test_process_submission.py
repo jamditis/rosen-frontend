@@ -546,3 +546,258 @@ class TestCodexReviewFindings:
         error_calls = [c for c in sheets_mock.call_args_list
                        if c.kwargs.get('status') == 'error']
         assert error_calls, 'must writeback error status on dispatcher failure'
+
+
+# ---------- Entity extraction (step 8.5) ------------------------------------
+
+
+def _long_text(min_chars: int = 600) -> str:
+    """Build a body string at least ``min_chars`` long for the extractor gate."""
+    seed = ('Jay Rosen on the press, the public, and audience atomization. '
+            'PressThink covers media, criticism, and journalism reform. ')
+    out = seed
+    while len(out) < min_chars:
+        out += seed
+    return out
+
+
+def _stub_entity_extractor(monkeypatch, return_value=None, side_effect=None):
+    """Replace process_submission.extract_entities_and_relationships."""
+    mock = MagicMock(return_value=return_value)
+    if side_effect is not None:
+        mock.side_effect = side_effect
+    monkeypatch.setattr(process_submission,
+                        'extract_entities_and_relationships', mock)
+    return mock
+
+
+def _stub_entity_writer(monkeypatch, return_value=None):
+    """Replace entity_csv_writer.append_entities_and_relationships."""
+    mock = MagicMock(return_value=(return_value or
+                                   {'entities_added': 0,
+                                    'relationships_added': 0}))
+    monkeypatch.setattr(process_submission.entity_csv_writer,
+                        'append_entities_and_relationships', mock)
+    return mock
+
+
+class TestEntityExtraction:
+
+    def test_extraction_runs_when_raw_text_long_enough(self, monkeypatch,
+                                                       csv_with_headers):
+        _stub_schema(monkeypatch)
+        body = _long_text()
+        _stub_dispatcher_ok(monkeypatch, raw_text=body)
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+        extract_mock = _stub_entity_extractor(
+            monkeypatch,
+            return_value={
+                'entities': [{'name': 'Jay Rosen', 'type': 'person'}],
+                'relationships': [{'subject': 'Jay Rosen',
+                                   'predicate': 'discusses',
+                                   'object': 'PressThink'}],
+                'record_id': 'PRESSTH-00100',
+                'extraction_date': '2026-05-28',
+            })
+        writer_mock = _stub_entity_writer(
+            monkeypatch,
+            return_value={'entities_added': 3, 'relationships_added': 2})
+
+        result = _run(monkeypatch, csv_with_headers)
+
+        assert result['status'] == 'live'
+        extract_mock.assert_called_once()
+        # raw_text was forwarded to the extractor.
+        call_kwargs = extract_mock.call_args.kwargs
+        assert call_kwargs.get('text_content') == body
+        assert call_kwargs.get('record_id') == result['record_id']
+        # Writer was handed the extractor's result dict.
+        writer_mock.assert_called_once()
+        passed_result = writer_mock.call_args.args[0]
+        assert passed_result['entities'][0]['name'] == 'Jay Rosen'
+
+    def test_extraction_skipped_when_raw_text_short(self, monkeypatch,
+                                                    csv_with_headers):
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch, raw_text='too short')
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+        extract_mock = _stub_entity_extractor(monkeypatch, return_value=None)
+        writer_mock = _stub_entity_writer(monkeypatch)
+
+        result = _run(monkeypatch, csv_with_headers)
+
+        assert result['status'] == 'live'
+        extract_mock.assert_not_called()
+        writer_mock.assert_not_called()
+
+    def test_extraction_failure_degrades_gracefully(self, monkeypatch,
+                                                    csv_with_headers, caplog):
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch, raw_text=_long_text())
+        sheets_mock = _stub_sheets(monkeypatch)
+        sftp_mock = _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+        _stub_entity_extractor(
+            monkeypatch,
+            side_effect=RuntimeError('gemini quota exhausted'))
+        writer_mock = _stub_entity_writer(monkeypatch)
+
+        with caplog.at_level('WARNING', logger='process_submission'):
+            result = _run(monkeypatch, csv_with_headers)
+
+        # Extractor blowing up must not strand the submission.
+        assert result['status'] == 'live'
+        sftp_mock.assert_called_once()
+        writer_mock.assert_not_called()
+        final = sheets_mock.call_args_list[-1].kwargs
+        assert final['status'] == 'live'
+        # The degrade left a warning trail.
+        msgs = ' '.join(rec.message for rec in caplog.records)
+        assert 'entity extraction failed' in msgs.lower()
+
+    def test_extraction_none_result_logged_but_not_fatal(self, monkeypatch,
+                                                         csv_with_headers):
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch, raw_text=_long_text())
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+        extract_mock = _stub_entity_extractor(monkeypatch, return_value=None)
+        writer_mock = _stub_entity_writer(monkeypatch)
+
+        result = _run(monkeypatch, csv_with_headers)
+
+        assert result['status'] == 'live'
+        extract_mock.assert_called_once()
+        # Extractor returned None — writer must not be touched.
+        writer_mock.assert_not_called()
+
+    def test_extraction_zero_entities_does_not_re_regen_jsons(self, monkeypatch,
+                                                              csv_with_headers):
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch, raw_text=_long_text())
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+        _stub_entity_extractor(
+            monkeypatch,
+            return_value={
+                'entities': [],
+                'relationships': [],
+                'record_id': 'PRESSTH-00100',
+                'extraction_date': '2026-05-28',
+            })
+        _stub_entity_writer(
+            monkeypatch,
+            return_value={'entities_added': 0, 'relationships_added': 0})
+
+        result = _run(monkeypatch, csv_with_headers)
+
+        assert result['status'] == 'live'
+        # Step 8 fires `node export-archive-data.js` once. With zero added
+        # entities, step 8.5 must NOT re-fire it.
+        node_calls = [c for c in process_submission.subprocess.run.call_args_list
+                      if (c.args[0][:1] == ['node']
+                          and 'export-archive-data' in c.args[0][1])]
+        assert len(node_calls) == 1, (
+            f'expected exactly one node export call, got {len(node_calls)}')
+
+    def test_entity_csvs_staged_in_commit(self, monkeypatch, csv_with_headers):
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch, raw_text=_long_text())
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+        _stub_entity_extractor(
+            monkeypatch,
+            return_value={
+                'entities': [{'name': 'Jay Rosen', 'type': 'person'}],
+                'relationships': [],
+                'record_id': 'PRESSTH-00100',
+                'extraction_date': '2026-05-28',
+            })
+        _stub_entity_writer(
+            monkeypatch,
+            return_value={'entities_added': 1, 'relationships_added': 0})
+
+        _run(monkeypatch, csv_with_headers)
+
+        # The `git add` invocation must include both entity CSV paths so they
+        # ride along with the archive_records-public.csv commit.
+        add_calls = [c for c in process_submission.subprocess.run.call_args_list
+                     if c.args[0][:2] == ['git', 'add']]
+        assert add_calls, 'expected a git add invocation'
+        staged_paths = add_calls[0].args[0][2:]
+        assert 'data/extracted_entities.csv' in staged_paths
+        assert 'data/extracted_relationships.csv' in staged_paths
+
+
+# ---------- Prototype mode --------------------------------------------------
+
+
+class TestPrototypeMode:
+
+    def test_prototype_mode_skips_sftp_push(self, monkeypatch, csv_with_headers):
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch)
+        sheets_mock = _stub_sheets(monkeypatch)
+        sftp_mock = _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        monkeypatch.setattr(process_submission, 'CSV_FILE', csv_with_headers)
+        result = process_submission.process_one(
+            url='https://example.com/proto', title='Proto piece',
+            sheet_id='SHEET', sheet_tab='Queue', sheet_row=5,
+            prototype_mode=True,
+        )
+
+        assert result['status'] == 'live'
+        sftp_mock.assert_not_called()
+        # Final sheet writeback still fires with status='live'.
+        final = sheets_mock.call_args_list[-1].kwargs
+        assert final['status'] == 'live'
+        assert final['record_id'] == result['record_id']
+
+    def test_prototype_mode_still_commits_to_main(self, monkeypatch,
+                                                  csv_with_headers):
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch)
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        monkeypatch.setattr(process_submission, 'CSV_FILE', csv_with_headers)
+        process_submission.process_one(
+            url='https://example.com/proto-commit',
+            sheet_id='SHEET', sheet_tab='Queue', sheet_row=6,
+            prototype_mode=True,
+        )
+
+        git_calls = [c for c in process_submission.subprocess.run.call_args_list
+                     if c.args[0][:2] == ['git', 'commit']]
+        assert git_calls, 'prototype mode must still commit to main'
+        push_calls = [c for c in process_submission.subprocess.run.call_args_list
+                      if c.args[0][:2] == ['git', 'push']]
+        assert push_calls, 'prototype mode must still push to main'
+
+    def test_prototype_mode_flag_threads_from_cli(self, monkeypatch,
+                                                   csv_with_headers):
+        """The --prototype-mode CLI flag must flow into process_one."""
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch)
+        _stub_sheets(monkeypatch)
+        sftp_mock = _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        monkeypatch.setattr(process_submission, 'CSV_FILE', csv_with_headers)
+        rc = process_submission.main([
+            '--url', 'https://example.com/cli-proto',
+            '--sheet-id', 'SHEET', '--sheet-tab', 'Queue', '--sheet-row', '7',
+            '--prototype-mode',
+        ])
+        assert rc == 0
+        sftp_mock.assert_not_called()
