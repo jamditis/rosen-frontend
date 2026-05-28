@@ -249,8 +249,21 @@ class TestKnownHostsHandling:
         # The real path was passed straight to load_host_keys.
         mock_client.load_host_keys.assert_called_once_with(str(kh_file))
 
-    def test_content_value_is_materialized_to_tempfile(self, monkeypatch, tmp_path):
-        host_key_content = 'pressthink.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5'
+    @pytest.mark.parametrize('host_key_content', [
+        # ssh-prefixed algorithms
+        'pressthink.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5',
+        'pressthink.org ssh-rsa AAAAB3NzaC1yc2EAAAADAQAB',
+        # ECDSA algorithms — these do NOT start with 'ssh-' and would have
+        # been silently dropped by an allowlist-style content check, leaving
+        # the deploy connect to fail under RejectPolicy with empty host keys.
+        'pressthink.org ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTY',
+        'pressthink.org ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQ',
+        # Hashed-host prefix
+        '|1|F1E2D3C4|ssh-ed25519 AAAAC3NzaC1lZDI1NTE5',
+    ], ids=['ed25519', 'rsa', 'ecdsa256', 'ecdsa384', 'hashed'])
+    def test_content_value_is_materialized_to_tempfile(
+        self, monkeypatch, tmp_path, host_key_content,
+    ):
         _set_env(monkeypatch, ROSEN_SFTP_KNOWN_HOSTS=host_key_content)
         (tmp_path / 'index.html').write_text('<html>')
 
@@ -266,7 +279,7 @@ class TestKnownHostsHandling:
             )
 
         # load_host_keys was called with a temp-file path (not the raw
-        # content) — the content was materialized.
+        # content) — the content was materialized regardless of algorithm.
         assert mock_client.load_host_keys.call_count == 1
         loaded_path = mock_client.load_host_keys.call_args.args[0]
         assert loaded_path != host_key_content

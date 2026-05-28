@@ -254,19 +254,21 @@ def push_files(
 
     try:
         # The ROSEN_SFTP_KNOWN_HOSTS secret can hold either a path on disk
-        # OR the raw host-key content. Detect by checking is_file(); if it
-        # isn't a real path but the value looks like host-key content
-        # ('ssh-' marker or '|' hashed-host marker), materialize it to a
-        # temp file so paramiko can load it. Otherwise we'd hit RejectPolicy
-        # with an empty host-key store and every connect would fail.
-        # Sibling backend/submission_server/sftp_push.py has the older
-        # path-only pattern; see follow-up issue for backporting this fix.
+        # OR the raw host-key content. Disambiguation: if the value resolves
+        # to an existing file, treat it as a path; otherwise (any non-empty
+        # value) treat it as raw content and materialize to a tempfile so
+        # paramiko can load it. The is_file/content split avoids an
+        # algorithm allowlist — OpenSSH supports ssh-rsa, ssh-ed25519,
+        # ssh-dss, ecdsa-sha2-nistp{256,384,521}, hashed-host '|1|', plus
+        # whatever ships next — and a malformed content blob will raise
+        # cleanly from load_host_keys rather than failing later under
+        # RejectPolicy. Sibling backend/submission_server/sftp_push.py
+        # has the older path-only pattern; see follow-up issue for backport.
         known_hosts_raw = cfg['known_hosts']
         known_hosts_path = Path(known_hosts_raw).expanduser()
         if known_hosts_path.is_file():
             client.load_host_keys(str(known_hosts_path))
-        elif known_hosts_raw and ('ssh-' in known_hosts_raw
-                                  or known_hosts_raw.startswith('|')):
+        elif known_hosts_raw and known_hosts_raw.strip():
             import tempfile
             with tempfile.NamedTemporaryFile(
                 mode='w', delete=False, suffix='.known_hosts',
