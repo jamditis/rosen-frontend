@@ -5,10 +5,7 @@ import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, 
 import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.3.0';
 import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.3.0';
 import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.3.0';
-
-// Detect environment for path generation
-const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const FEATURES_PATH = IS_LOCAL ? '../dissertation' : '/j/rosen-archive/dissertation';
+import { IS_LOCAL, BASE_PATH } from './utils/pathResolver.js?v=3.3.0';
 import Sidebar from './components/Sidebar.js?v=3.3.0';
 import WelcomeModal from './components/WelcomeModal.js?v=3.3.0';
 import RecordModal from './components/RecordModal.js?v=3.3.0';
@@ -22,6 +19,11 @@ import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.3.0';
 import EntityBrowser from './components/EntityBrowser.js?v=3.3.0';
 import Timeline from './components/Timeline.js?v=3.3.0';
 import AboutPage from './components/AboutPage.js?v=3.3.0';
+
+// FEATURES_PATH points to the dissertation directory at the current deploy surface.
+// Local serves the repo at the root, so relative `../dissertation` is correct;
+// GH Pages and PressThink both nest the archive under BASE_PATH.
+const FEATURES_PATH = IS_LOCAL ? '../dissertation' : `${BASE_PATH}/dissertation`;
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {

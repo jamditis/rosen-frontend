@@ -16,14 +16,23 @@ const CACHE_NAME = `jrda-cache-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `jrda-data-${CACHE_VERSION}`;
 const MAX_CACHE_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-// Detect if we're running on localhost
-const IS_LOCAL = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
+// Detect deploy surface. Keep in sync with frontend/utils/pathResolver.js —
+// sw.js is registered as a classic worker (see index.html), so it cannot
+// `import` from the shared resolver and duplicates this logic inline.
+const HOST = self.location.hostname;
+const IS_LOCAL = HOST === 'localhost' || HOST === '127.0.0.1';
+const IS_GITHUB_PAGES = HOST.endsWith('.github.io');
 
-// Base path depends on environment
-const BASE_PATH = IS_LOCAL ? '/frontend' : '/j/rosen-archive';
-const DATA_PATH = IS_LOCAL ? '/data' : '/j/rosen-archive/data';
+const BASE_PATH = IS_LOCAL ? '/frontend'
+  : IS_GITHUB_PAGES ? '/rosen-frontend'
+  : '/j/rosen-archive';
+const DATA_PATH = IS_LOCAL ? '/data'
+  : IS_GITHUB_PAGES ? '/rosen-frontend/data'
+  : '/j/rosen-archive/data';
 
-// Static assets to pre-cache on install
+// Static assets to pre-cache on install. The local layout serves source
+// files at /frontend/<path>, while deployed surfaces serve a top-level
+// index.html at BASE_PATH and the source files under BASE_PATH/frontend/.
 const STATIC_ASSETS = IS_LOCAL ? [
   '/frontend/',
   '/frontend/index.html',
@@ -51,45 +60,44 @@ const STATIC_ASSETS = IS_LOCAL ? [
   '/frontend/components/AboutPage.js',
   '/frontend/services/sqliteService.js'
 ] : [
-  '/j/rosen-archive/',
-  '/j/rosen-archive/index.html',
-  '/j/rosen-archive/frontend/index.js',
-  '/j/rosen-archive/frontend/App.js',
-  '/j/rosen-archive/frontend/html.js',
-  '/j/rosen-archive/frontend/constants.js',
-  '/j/rosen-archive/frontend/index.css',
-  '/j/rosen-archive/frontend/dist/tailwind.css',
-  '/j/rosen-archive/frontend/services/archiveService.js',
-  '/j/rosen-archive/frontend/components/Sidebar.js',
-  '/j/rosen-archive/frontend/components/RecordModal.js',
-  '/j/rosen-archive/frontend/components/FeaturedSection.js',
-  '/j/rosen-archive/frontend/components/Explorer.js',
-  '/j/rosen-archive/frontend/components/WelcomeModal.js',
-  '/j/rosen-archive/frontend/components/DissertationPage.js',
-  '/j/rosen-archive/frontend/components/MindMap.js',
-  '/j/rosen-archive/frontend/components/DetailPanel.js',
-  '/j/rosen-archive/frontend/components/dissertationData.js',
-  '/j/rosen-archive/frontend/components/ToolsModal.js',
-  '/j/rosen-archive/frontend/components/LoadingQuotes.js',
-  '/j/rosen-archive/frontend/components/WorkInProgressBanner.js',
-  '/j/rosen-archive/frontend/components/AnalyticsDashboard.js',
-  '/j/rosen-archive/frontend/components/QueryBuilder.js',
-  '/j/rosen-archive/frontend/components/AboutPage.js',
-  '/j/rosen-archive/frontend/services/sqliteService.js'
+  `${BASE_PATH}/`,
+  `${BASE_PATH}/index.html`,
+  `${BASE_PATH}/frontend/index.js`,
+  `${BASE_PATH}/frontend/App.js`,
+  `${BASE_PATH}/frontend/html.js`,
+  `${BASE_PATH}/frontend/constants.js`,
+  `${BASE_PATH}/frontend/index.css`,
+  `${BASE_PATH}/frontend/dist/tailwind.css`,
+  `${BASE_PATH}/frontend/services/archiveService.js`,
+  `${BASE_PATH}/frontend/components/Sidebar.js`,
+  `${BASE_PATH}/frontend/components/RecordModal.js`,
+  `${BASE_PATH}/frontend/components/FeaturedSection.js`,
+  `${BASE_PATH}/frontend/components/Explorer.js`,
+  `${BASE_PATH}/frontend/components/WelcomeModal.js`,
+  `${BASE_PATH}/frontend/components/DissertationPage.js`,
+  `${BASE_PATH}/frontend/components/MindMap.js`,
+  `${BASE_PATH}/frontend/components/DetailPanel.js`,
+  `${BASE_PATH}/frontend/components/dissertationData.js`,
+  `${BASE_PATH}/frontend/components/ToolsModal.js`,
+  `${BASE_PATH}/frontend/components/LoadingQuotes.js`,
+  `${BASE_PATH}/frontend/components/WorkInProgressBanner.js`,
+  `${BASE_PATH}/frontend/components/AnalyticsDashboard.js`,
+  `${BASE_PATH}/frontend/components/QueryBuilder.js`,
+  `${BASE_PATH}/frontend/components/AboutPage.js`,
+  `${BASE_PATH}/frontend/services/sqliteService.js`
 ];
 
 // Data files to cache with stale-while-revalidate
-const DATA_URLS = IS_LOCAL ? [
-  '/data/archive-core.json',
-  '/data/archive-details.json',
-  '/data/archive-entities.json'
-] : [
-  '/j/rosen-archive/data/archive-core.json',
-  '/j/rosen-archive/data/archive-details.json',
-  '/j/rosen-archive/data/archive-entities.json'
+const DATA_URLS = [
+  `${DATA_PATH}/archive-core.json`,
+  `${DATA_PATH}/archive-details.json`,
+  `${DATA_PATH}/archive-entities.json`
 ];
 
-console.log('[SW] Environment:', IS_LOCAL ? 'local development' : 'production');
+console.log('[SW] Environment:',
+  IS_LOCAL ? 'local development'
+  : IS_GITHUB_PAGES ? 'github pages'
+  : 'production');
 
 // Install event - pre-cache static assets
 self.addEventListener('install', event => {
@@ -164,7 +172,9 @@ self.addEventListener('fetch', event => {
 function isDataFile(pathname) {
   if (!pathname.endsWith('.json')) return false;
   if (!pathname.includes('/data/')) return false;
-  return IS_LOCAL || pathname.includes('rosen-archive');
+  // Tight prefix check on local mirrors isStaticAsset below; on deployed
+  // surfaces BASE_PATH narrows the match to our archive subtree.
+  return IS_LOCAL ? pathname.startsWith('/data/') : pathname.includes(BASE_PATH);
 }
 
 // Check if URL is a static asset
@@ -182,7 +192,7 @@ function isStaticAsset(pathname) {
   if (IS_LOCAL) {
     return pathname.startsWith('/frontend/') || pathname.startsWith('/data/');
   }
-  return pathname.includes('rosen-archive');
+  return pathname.includes(BASE_PATH);
 }
 
 /**
