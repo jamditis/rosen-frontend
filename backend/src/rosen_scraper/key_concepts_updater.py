@@ -310,13 +310,21 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
     gemini_calls = 0
 
     def _write(range_name: str, value, field: str):
-        """Write one cell, or log it under dry-run. Always counts the write."""
-        writes_by_field[field] += 1
+        """Write one cell, or log it under dry-run.
+
+        Counts only writes that actually land: under dry-run the would-write is
+        counted (the guard ignores dry runs), and live the counter is bumped
+        ONLY after worksheet.update() returns. A failed Sheets write therefore
+        leaves the counter at zero, so the zero-write guard can't be fooled into
+        reporting success when Gemini ran but nothing was saved.
+        """
         if dry_run:
             print(f"  [DRY-RUN] would write {field} -> {range_name}: "
                   f"{str(value)[:60]}")
+            writes_by_field[field] += 1
             return
         worksheet.update(values=[[value]], range_name=range_name)
+        writes_by_field[field] += 1
 
     # Load progress
     progress = load_progress()

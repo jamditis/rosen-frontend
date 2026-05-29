@@ -20,14 +20,17 @@ _NCOLS = 37
 
 
 class _FakeWorksheet:
-    def __init__(self, values):
+    def __init__(self, values, fail_writes=False):
         self._values = values
+        self._fail_writes = fail_writes
         self.updates = []
 
     def get_all_values(self):
         return self._values
 
     def update(self, values=None, range_name=None):
+        if self._fail_writes:
+            raise RuntimeError("sheet write failed")
         self.updates.append((range_name, values))
 
 
@@ -90,6 +93,23 @@ def test_live_run_writes_the_cell(monkeypatch):
     assert summary["writes"] >= 1
     written_ranges = [r for r, _ in ws.updates]
     assert any(r.startswith("Q") for r in written_ranges)  # filled key_concepts
+
+
+def test_failed_writes_do_not_count(monkeypatch):
+    # Gemini runs but every Sheets write raises. The write counter must stay 0
+    # so the zero-write guard fires -- it counts saved cells, not attempts.
+    monkeypatch.setattr(kc, "analyze_key_concepts",
+                        lambda model, rt, kcl, cur="": {
+                            "concepts": ["Mindcasting"], "recommendations": ""})
+    ws = _FakeWorksheet([["h"] * _NCOLS, _row_needing_fill()], fail_writes=True)
+    summary = kc.process_rows(
+        _FakeSpreadsheet(ws), model=object(),
+        schema={"taxonomy": {"key_concepts": ["Mindcasting"]}},
+        start_row=2, limit=1, resume=False, dry_run=False)
+
+    assert summary["gemini_calls"] == 1     # the AI call happened (and cost money)
+    assert summary["writes"] == 0           # but nothing landed -> guard must fire
+    assert ws.updates == []
 
 
 def _stub_main_deps(monkeypatch, summary):
