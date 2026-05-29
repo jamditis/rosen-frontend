@@ -23,9 +23,11 @@ None of these is wired into `.github/workflows/` today. Post-handoff, Jay and Ha
 
 ## Locked decisions (Joe, 2026-05-29)
 
-1. **Sheet→CSV sync**: add a `sync_to_archive` job to the runner (option 1 below). The master sheet stays the enrichment surface; an automated, additive merge carries results into the repo CSV and out to the live site.
+1. **Sheet→CSV sync**: add a `sync_to_archive` job to the runner (option 1 below). The master sheet stays the enrichment surface; an automated, additive merge carries results into the repo CSV.
 2. **Entity extraction**: rewire to a headless `claude -p` / `gemini -p` CLI call so the backlog can grind down unattended on the free tier — respects the "CLI tools, not direct LLM API" rule and the $0 constraint. Build deferred until the safe jobs prove the runner; the interactive Codespaces path stays available for hand-tuned passes. (Option B below; option C / paid batch API is rejected.)
 3. **v1 scope**: ship `key_concepts` + `dedup` + `sync_to_archive` first, prove the runner and the deploy tail end-to-end, then add backfill and entity extraction in follow-ups.
+
+**Revision (Joe, 2026-05-29, at implementation):** `sync_to_archive` opens a **pull request** instead of pushing the merge directly to `main` and SFTP-pushing. A human reviews the enrichment diff (and its CI) before it lands; the live push is the existing `deploy.yml` (Pillar 3c) run after the PR merges. This adds a review gate the original direct-push design lacked, and means the sync job no longer needs the SFTP secrets or a branch-protection bypass — it only needs the App's `Pull requests: write`. The CSV merge, JSON regen, and `npm test` gate are unchanged.
 
 The sections below are written to these decisions; the original option menus are kept for context.
 
@@ -97,14 +99,14 @@ Actions tab → "Run maintenance job" → pick:
   dry_run: boolean (default true)      ← first run of any job is a no-write rehearsal
 ```
 
-The workflow reuses the Pillar 3a runner setup (Python 3.13 + Poetry + Node 22 + `npm ci`) and the same repo secrets: `GEMINI_API_KEY`, `ROSEN_SHEETS_SA_KEY_JSON`, `SPREADSHEET_NAME`, plus the `ROSEN_SFTP_*` set for the `sync_to_archive` job. It enforces the data-pipeline safety rules that were learned the hard way (`docs/narrative/data-pipeline.md`):
+The workflow reuses the Pillar 3a runner setup (Python 3.13 + Poetry + Node 22 + `npm ci`) and the same repo secrets: `GEMINI_API_KEY`, `ROSEN_SHEETS_SA_KEY_JSON`, `SPREADSHEET_NAME`, plus the `rosen-archive-bot` App token for the `sync_to_archive` job's PR (per the revision above, the SFTP secrets are no longer in this workflow — the live push is the separate `deploy.yml`). It enforces the data-pipeline safety rules that were learned the hard way (`docs/narrative/data-pipeline.md`):
 
 - `dry_run: true` default — the job logs what it *would* write and a per-field counter, writes nothing.
 - Small `limit` default — the 5 → 25 → 100 escalation, not straight to full.
 - Verify-writes counter in the job summary — the "$0.53 wasted, AI ran but nothing was written" incident must be impossible to repeat silently. A run that calls Gemini but writes zero fields fails loudly.
 - The categorizer's existing uniform-response guard stays in force.
 
-`sync_to_archive` is the tail from "the structural gap" above: sheet → repo CSV merge by `id` → `node data/export-archive-data.js` → test suite → commit (bot identity) → SFTP. It is the only Track-1 job that writes the repo and the live site; the enrichment jobs only touch the sheet.
+`sync_to_archive` is the tail from "the structural gap" above: sheet → repo CSV merge by `id` → `node data/export-archive-data.js` → test suite → commit to a fresh branch → **open a PR** (bot identity). It is the only Track-1 job that writes the repo; per the revision above, it does not push to `main` or to the live site directly — a human merges the PR, then runs `deploy.yml` (Pillar 3c) to go live. The enrichment jobs only touch the sheet.
 
 ### Track 2 — Codespaces devcontainer for interactive + break-glass
 

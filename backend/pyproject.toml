@@ -52,6 +52,9 @@ pytest-cov = ">=7.0.0,<8.0.0"
 # through `poetry install` — this file is the single source of tool versions.
 ruff = "==0.15.12"
 black = "==24.4.2"
+# pyyaml backs tests/test_maintenance_workflow.py, which parses the maintenance
+# workflow so a YAML error can't ship silently (see the batch-runner design).
+pyyaml = "^6.0"
 
 # desbordante is a C++ extension used only by scripts/analyze_archive_patterns.py
 # and ships no ARM64 wheels. Keeping it in an optional group means the default
