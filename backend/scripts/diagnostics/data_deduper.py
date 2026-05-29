@@ -8,11 +8,22 @@ This script performs two main functions:
 This script operates without using any AI services and uses batch updates for efficiency.
 """
 
+import argparse
 import gspread
 import os
 import re
+import sys
 import time
+from pathlib import Path
 from dotenv import load_dotenv
+
+# This diagnostic script runs directly (poetry run python scripts/.../data_deduper.py),
+# so put backend/src on the path before importing the shared Sheets client.
+_SRC = Path(__file__).resolve().parents[2] / "src"
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
+
+from rosen_scraper.sheets_client import get_gspread_client
 
 # --- Configuration ---
 COLUMNS_TO_DEDUPE = [
@@ -36,9 +47,14 @@ def clean_and_dedupe_cell(cell_value):
     unique_items = sorted(list(set(cleaned_items)))
     return ", ".join(unique_items)
 
-def update_entity_mentions(sh, test_runs_data, test_runs_header):
-    """Finds and updates entity mentions in the 'entities' sheet using batch updates."""
-    print("--- Starting Entity Mention Update Process ---")
+def update_entity_mentions(sh, test_runs_data, test_runs_header, dry_run=False):
+    """Finds and updates entity mentions in the 'entities' sheet using batch updates.
+
+    When ``dry_run`` is True the queued changes are counted and logged but no
+    ``batch_update`` is sent. Returns the number of entity rows changed.
+    """
+    print("--- Starting Entity Mention Update Process"
+          + (" (DRY RUN)" if dry_run else "") + " ---")
     try:
         entities_worksheet = sh.worksheet("entities")
         entities_data = entities_worksheet.get_all_values()
@@ -90,6 +106,11 @@ def update_entity_mentions(sh, test_runs_data, test_runs_header):
             print(f"  [QUEUED] Update for entity: '{entity_name}'")
 
             if len(batch_updates) >= BATCH_SIZE:
+                if dry_run:
+                    print(f"  [DRY-RUN] would send batch of {len(batch_updates)} updates to 'entities'")
+                    total_updates += len(batch_updates)
+                    batch_updates = []
+                    continue
                 try:
                     print(f"  [INFO] Sending batch of {len(batch_updates)} updates to 'entities' sheet...")
                     entities_worksheet.batch_update(batch_updates)
@@ -102,20 +123,31 @@ def update_entity_mentions(sh, test_runs_data, test_runs_header):
                     return total_updates
 
     if batch_updates:
-        try:
-            print(f"  [INFO] Sending final batch of {len(batch_updates)} updates to 'entities' sheet...")
-            entities_worksheet.batch_update(batch_updates)
+        if dry_run:
+            print(f"  [DRY-RUN] would send final batch of {len(batch_updates)} updates to 'entities'")
             total_updates += len(batch_updates)
-            print("  [SUCCESS] Final batch complete.")
-        except Exception as e:
-            print(f"  [FAIL] Final batch update for 'entities' sheet failed. Error: {e}")
-    
-    print(f"--- Entity Mention Process Complete. Total entities updated: {total_updates} ---")
+        else:
+            try:
+                print(f"  [INFO] Sending final batch of {len(batch_updates)} updates to 'entities' sheet...")
+                entities_worksheet.batch_update(batch_updates)
+                total_updates += len(batch_updates)
+                print("  [SUCCESS] Final batch complete.")
+            except Exception as e:
+                print(f"  [FAIL] Final batch update for 'entities' sheet failed. Error: {e}")
+
+    label = "would update" if dry_run else "updated"
+    print(f"--- Entity Mention Process Complete. Total entities {label}: {total_updates} ---")
     return total_updates
 
-def run_deduplication(worksheet, data, header):
-    """Runs the deduplication process on the test_runs sheet using batch updates."""
-    print("--- Starting Data Deduplication and Cleaning Process ---")
+def run_deduplication(worksheet, data, header, dry_run=False):
+    """Runs the deduplication process on the test_runs sheet using batch updates.
+
+    When ``dry_run`` is True the queued changes are counted and logged but no
+    ``batch_update`` is sent. Returns the number of cells changed (or that would
+    have changed under a dry run).
+    """
+    print("--- Starting Data Deduplication and Cleaning Process"
+          + (" (DRY RUN)" if dry_run else "") + " ---")
     try:
         col_indices_to_process = [header.index(col_name) for col_name in COLUMNS_TO_DEDUPE]
     except ValueError as e:
@@ -138,6 +170,11 @@ def run_deduplication(worksheet, data, header):
                     print(f"  [QUEUED] Update for Row {sheet_row_index}, Column '{header[col_index]}'")
 
                     if len(batch_updates) >= BATCH_SIZE:
+                        if dry_run:
+                            print(f"  [DRY-RUN] would send batch of {len(batch_updates)} updates to 'test_runs'")
+                            total_updates += len(batch_updates)
+                            batch_updates = []
+                            continue
                         try:
                             print(f"  [INFO] Sending batch of {len(batch_updates)} updates to 'test_runs' sheet...")
                             worksheet.batch_update(batch_updates)
@@ -150,39 +187,80 @@ def run_deduplication(worksheet, data, header):
                             return total_updates
 
     if batch_updates:
-        try:
-            print(f"  [INFO] Sending final batch of {len(batch_updates)} updates to 'test_runs' sheet...")
-            worksheet.batch_update(batch_updates)
+        if dry_run:
+            print(f"  [DRY-RUN] would send final batch of {len(batch_updates)} updates to 'test_runs'")
             total_updates += len(batch_updates)
-            print("  [SUCCESS] Final batch complete.")
-        except Exception as e:
-            print(f"  [FAIL] Final batch update for 'test_runs' sheet failed. Error: {e}")
+        else:
+            try:
+                print(f"  [INFO] Sending final batch of {len(batch_updates)} updates to 'test_runs' sheet...")
+                worksheet.batch_update(batch_updates)
+                total_updates += len(batch_updates)
+                print("  [SUCCESS] Final batch complete.")
+            except Exception as e:
+                print(f"  [FAIL] Final batch update for 'test_runs' sheet failed. Error: {e}")
 
-    print(f"--- Deduplication Process Complete. Total cells updated: {total_updates} ---")
+    label = "would update" if dry_run else "updated"
+    print(f"--- Deduplication Process Complete. Total cells {label}: {total_updates} ---")
     return total_updates
 
-def main():
-    """The main function to run the script."""
+def _parse_args(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Normalize multi-value columns and recompute entity mentions "
+                    "on the master sheet (deterministic, no AI)."
+    )
+    parser.add_argument(
+        '--dry-run', action='store_true',
+        help='Rehearse only: count and log the cells that would change, write nothing'
+    )
+    parser.add_argument(
+        '--limit', type=int, default=0,
+        help='Cap how many test_runs rows the dedup pass touches (0 = all). The '
+             'entity-mention recompute always uses every row so valid mentions '
+             'are never dropped.'
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv=None):
+    """The main function to run the script. Returns a process exit code."""
+    args = _parse_args(argv)
     try:
         load_dotenv()
         credentials_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json"))
-        gc = gspread.service_account(filename=credentials_path)
+        gc = get_gspread_client(credentials_path)
         sh = gc.open(os.environ.get("SPREADSHEET_NAME", "Rosen Archive URL List"))
         test_runs_worksheet = sh.worksheet("test_runs")
         print("  [INFO] Successfully connected to Google Sheet.")
     except Exception as e:
         print(f"  [FATAL] Error connecting to Google Sheets: {e}")
-        return
+        return 1
 
     test_runs_values = test_runs_worksheet.get_all_values()
     if len(test_runs_values) < 2:
         print("  [INFO] No data in 'test_runs' to process.")
-        return
+        return 0
     test_runs_header = test_runs_values[0]
     test_runs_data = test_runs_values[1:]
 
-    run_deduplication(test_runs_worksheet, test_runs_data, test_runs_header)
-    update_entity_mentions(sh, test_runs_data, test_runs_header)
+    dedup_data = test_runs_data
+    if args.limit and args.limit > 0 and len(test_runs_data) > args.limit:
+        dedup_data = test_runs_data[:args.limit]
+        print(f"  [INFO] --limit {args.limit}: deduplicating the first {args.limit} "
+              f"of {len(test_runs_data)} data rows.")
+
+    dedup_writes = run_deduplication(
+        test_runs_worksheet, dedup_data, test_runs_header, dry_run=args.dry_run)
+    mention_writes = update_entity_mentions(
+        sh, test_runs_data, test_runs_header, dry_run=args.dry_run)
+
+    verb = "would change" if args.dry_run else "changed"
+    print(f"  [SUMMARY] {verb} {dedup_writes} test_runs cell(s) + "
+          f"{mention_writes} entity row(s).")
+    # Deterministic job: zero changes means the sheet is already clean, which is
+    # a valid success -- unlike the AI jobs, there is no "spent money, wrote
+    # nothing" failure mode to guard against here.
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
