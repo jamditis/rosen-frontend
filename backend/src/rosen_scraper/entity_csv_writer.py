@@ -390,7 +390,10 @@ def process_extraction_result(
                    or raw_rel.get("context")
                    or raw_rel.get("evidence")
                    or "")
-        snippet = snippet[:200] if snippet else ""
+        # Escape before truncating so a trigger-led snippet at the cap keeps its
+        # leading apostrophe and still fits in 200 chars (matches _sanitize_cell);
+        # the write-boundary sanitize then no-ops on the already-escaped value.
+        snippet = sanitize_csv_value(snippet)[:200] if snippet else ""
 
         confidence = raw_rel.get("confidence_score", "")
         try:

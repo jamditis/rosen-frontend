@@ -793,3 +793,28 @@ def test_escaped_entity_dedups_against_raw_reextraction(tmp_path):
     after_second = mc2_rows()
     assert len(after_second) == 1  # no duplicate allocated
     assert after_second[0]["entity_id"] == first_id
+
+
+def test_relationship_snippet_stays_within_cap_after_escaping(tmp_path):
+    # A trigger-led context_snippet at the 200-char cap must not exceed it once
+    # the formula escape is prepended (escape-then-truncate, like _sanitize_cell).
+    entities_csv, relationships_csv = _seed_csvs(tmp_path)
+    result = {
+        "entities": [
+            {"entity_id": "P001", "entity_type": "Person", "entity_name": "Jay Rosen"},
+            {"entity_id": "O001", "entity_type": "Organization", "entity_name": "NYU"},
+        ],
+        "relationships": [
+            {"source_entity_id": "P001", "target_entity_id": "O001",
+             "relationship_type": "Affiliated With",
+             "context_snippet": "=" + ("A" * 250),
+             "confidence_score": 1.0},
+        ],
+        "record_id": "RECORD-CAP",
+    }
+    ecw.append_entities_and_relationships(
+        result, entities_csv, relationships_csv, today="2026-05-31")
+    with relationships_csv.open("r", encoding="utf-8", newline="") as f:
+        snippet = list(csv.DictReader(f))[-1]["context_snippet"]
+    assert snippet.startswith("'=")  # still neutralized
+    assert len(snippet) <= 200       # cap preserved after escaping

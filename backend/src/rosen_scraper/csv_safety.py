@@ -5,8 +5,8 @@ return) is evaluated as a formula when the CSV is opened in Excel or Google
 Sheets. Prefixing a single quote neutralizes the trigger while keeping the
 displayed text intact.
 
-This lives in the rosen_scraper package rather than reusing backend/data/
-csv_safe_write.py because the package is self-contained: backend/data is not on
+This lives in the rosen_scraper package rather than reusing data/
+csv_safe_write.py because the package is self-contained: the data/ tree is not on
 its import path, but rosen_scraper is importable from both the package modules
 and the maintenance scripts (e.g. scripts/sync_sheet_to_archive.py) that need
 this helper.
