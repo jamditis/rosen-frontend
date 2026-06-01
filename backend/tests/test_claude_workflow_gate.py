@@ -48,3 +48,21 @@ def test_claude_job_requires_trusted_author_association(wf):
     assert "github.event.comment.author_association" in gate
     assert "github.event.review.author_association" in gate
     assert "github.event.issue.author_association" in gate
+
+
+def test_every_trigger_branch_couples_mention_and_association(wf):
+    # The checks above only prove the guard strings appear somewhere in the
+    # expression. Because two branches share github.event.comment.author_association,
+    # a branch could drop its trust check and those checks would still pass.
+    # Split on the per-event marker so each branch's clause is isolated, then
+    # require every branch to couple the @claude mention AND an author_association
+    # guard. Splitting on "github.event_name ==" survives the issues branch's
+    # internal body-or-title `||`; the fragment before the first marker is dropped.
+    gate = wf["jobs"]["claude"]["if"]
+    branches = gate.split("github.event_name ==")[1:]
+    assert len(branches) == 4, (
+        f"expected 4 individually gated trigger branches, found {len(branches)}")
+    for clause in branches:
+        assert "@claude" in clause, f"branch missing @claude mention check: {clause!r}"
+        assert "author_association" in clause, (
+            f"branch missing author_association trust guard: {clause!r}")
