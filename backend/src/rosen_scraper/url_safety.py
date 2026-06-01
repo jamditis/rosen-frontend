@@ -236,4 +236,9 @@ def chromium_host_resolver_rules(host, ips):
     # on IPv4-only runners even though the site is reachable over its A record.
     ipv4 = [ip for ip in ips if ":" not in str(ip)]
     chosen = ipv4[0] if ipv4 else ips[0]
-    return [f"--host-resolver-rules=MAP {host} {chosen}"]
+    # Chromium connects to the IDNA/punycode spelling of an internationalized
+    # domain, so the MAP rule has to name that same form or it silently fails to
+    # apply -- reopening the rebinding window for IDN hosts. Canonicalize here for
+    # parity with pinned_resolution, which pins the same canonical host.
+    target = _canonical_host(host)
+    return [f"--host-resolver-rules=MAP {target} {chosen}"]

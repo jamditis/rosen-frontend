@@ -155,6 +155,15 @@ def test_chromium_host_resolver_rules_ipv6_only_still_pins():
     assert args == ["--host-resolver-rules=MAP example.com 2001:db8::1"]
 
 
+def test_chromium_host_resolver_rules_canonicalizes_idn_host():
+    # Chromium connects to the IDNA/punycode form of an internationalized
+    # domain, so a MAP rule naming the raw Unicode host silently fails to apply,
+    # reopening the rebinding window for IDN hosts. The rule must name the same
+    # punycode host the browser will resolve (parity with pinned_resolution).
+    args = chromium_host_resolver_rules("münchen.test", ["203.0.113.5"])
+    assert args == ["--host-resolver-rules=MAP xn--mnchen-3ya.test 203.0.113.5"]
+
+
 # ---------- DNS-rebinding hardening of pinned_resolution / resolve_and_validate
 
 
