@@ -69,6 +69,7 @@ from rosen_scraper.entity_extractor import (  # noqa: E402
     extract_entities_and_relationships as _extract_entities,
 )
 from rosen_scraper import entity_csv_writer  # noqa: E402
+from rosen_scraper.url_safety import is_safe_public_url  # noqa: E402
 from rosen_scraper.workflow import (  # noqa: E402
     enrich_data,
     generate_source_based_id,
@@ -347,6 +348,20 @@ def process_one(url: str, title: str = '', notes: str = '',
                            'error': f"sentinel sweep no-op; SFTP retry: "
                                     f"{push.get('error', 'unknown')}"})
         return result
+
+    # --- Step 0b: SSRF guard. ---------------------------------------------
+    # Reject private/loopback/link-local or non-http(s) URLs before any sheet,
+    # dispatch, or network work. The scraper guards its own fetch too, but this
+    # secret-bearing entry point must not reach the dispatcher with an unsafe
+    # target (defense in depth / parity with the scraper entry point).
+    safe, ssrf_reason = is_safe_public_url(url)
+    if not safe:
+        msg = f'Unsafe URL refused: {ssrf_reason}'
+        logger.warning(msg)
+        _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
+                        status='error', error=msg)
+        return {'status': 'error', 'record_id': '', 'error': msg,
+                'exit_code': 1}
 
     # --- Step 1: sheet ack (best-effort). ---------------------------------
     _safe_writeback(sheet_id, sheet_tab, sheet_row or 0, status='processing')

@@ -890,3 +890,35 @@ class TestPrototypeMode:
         ])
         assert rc == 0
         sftp_mock.assert_not_called()
+
+
+class TestSsrfGuard:
+
+    def test_unsafe_url_refused_before_dispatch(self, monkeypatch,
+                                                csv_with_headers):
+        """An unsafe URL is rejected before the dispatcher (and its secrets) run.
+
+        The scraper guards its own fetch, but this Action-facing entry point
+        holds the deploy/SFTP/Sheets secrets, so it must refuse a private/
+        loopback/link-local URL up front - parity with the scraper's
+        is_safe_public_url gate - rather than rely on a downstream dispatcher.
+        """
+        _stub_schema(monkeypatch)
+        calls = {'n': 0}
+
+        def _track(*a, **k):
+            calls['n'] += 1
+            return {'status': 'ok', 'title': 'T', 'raw_text': 'body'}
+
+        monkeypatch.setattr(process_submission, 'dispatch_url', _track)
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        result = _run(monkeypatch, csv_with_headers,
+                      url='http://169.254.169.254/latest/meta-data/')
+
+        assert result['status'] == 'error'
+        assert result['exit_code'] == 1
+        assert 'unsafe' in result['error'].lower()
+        assert calls['n'] == 0  # the dispatcher was never reached

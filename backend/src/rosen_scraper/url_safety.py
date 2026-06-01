@@ -11,10 +11,18 @@ services - cloud metadata endpoints, localhost ports, internal admin panels.
 plain http/https request whose host resolves exclusively to public IP
 addresses. It is pure standard library so it can run anywhere the scraper or the
 submission server runs.
+
+Resolving in the guard and then letting ``requests``/Chromium resolve again at
+connect time leaves a DNS-rebinding window: a low-TTL record can answer with a
+public IP for the check and a private one for the fetch. ``resolve_and_validate``
+returns the validated IPs, and ``pinned_resolution`` (in-process, for requests)
+and ``chromium_host_resolver_rules`` (launch args, for the browser) pin the
+connection to one of those addresses so check and connect agree.
 """
 
 import ipaddress
 import socket
+from contextlib import contextmanager
 from urllib.parse import urlparse
 
 # Schemes the scraper is allowed to fetch. Anything else (file:, ftp:, gopher:,
@@ -43,24 +51,32 @@ def _is_public_address(ip_str):
     return True
 
 
-def is_safe_public_url(url):
-    """Check whether ``url`` is safe for the server to fetch.
+def resolve_and_validate(url):
+    """Check ``url`` for SSRF safety and return the validated IP addresses.
 
-    Returns an ``(ok, reason)`` tuple. ``ok`` is True only when the URL is an
-    http/https request whose host resolves exclusively to public IP addresses.
-    ``reason`` explains the rejection when ``ok`` is False.
+    Returns an ``(ok, reason, ips)`` tuple. ``ok`` is True only when the URL is
+    an http/https request whose host resolves exclusively to public IP
+    addresses; ``ips`` is then the list of those validated addresses (a single
+    entry for a literal-IP URL). On rejection ``ok`` is False, ``reason``
+    explains why, and ``ips`` is an empty list.
+
+    Callers pin the real connection to one of ``ips`` (see ``pinned_resolution``
+    and ``chromium_host_resolver_rules``) so a low-TTL DNS record cannot rebind
+    the host to a private address between this check and the fetch.
     """
     if not url or not isinstance(url, str):
-        return False, "empty URL"
+        return False, "empty URL", []
 
     parsed = urlparse(url.strip())
 
     if parsed.scheme.lower() not in ALLOWED_SCHEMES:
-        return False, f"scheme '{parsed.scheme}' is not allowed (use http/https)"
+        return (False,
+                f"scheme '{parsed.scheme}' is not allowed (use http/https)",
+                [])
 
     host = parsed.hostname
     if not host:
-        return False, "URL has no host"
+        return False, "URL has no host", []
 
     # A literal IP address in the URL still has to be public.
     try:
@@ -69,8 +85,8 @@ def is_safe_public_url(url):
         literal_ip = None
     if literal_ip is not None:
         if not _is_public_address(str(literal_ip)):
-            return False, f"host {host} is not a public address"
-        return True, "ok"
+            return False, f"host {host} is not a public address", []
+        return True, "ok", [str(literal_ip)]
 
     # Hostname: resolve it and require every resolved address to be public.
     # Requiring all of them blocks a DNS result that mixes a public and a
@@ -78,13 +94,103 @@ def is_safe_public_url(url):
     try:
         addresses = _addresses_for_host(host)
     except socket.gaierror:
-        return False, f"host {host} could not be resolved"
+        return False, f"host {host} could not be resolved", []
 
     if not addresses:
-        return False, f"host {host} resolved to no addresses"
+        return False, f"host {host} resolved to no addresses", []
 
     for addr in addresses:
         if not _is_public_address(addr):
-            return False, f"host {host} resolves to a non-public address ({addr})"
+            return (False,
+                    f"host {host} resolves to a non-public address ({addr})",
+                    [])
 
-    return True, "ok"
+    return True, "ok", sorted(addresses)
+
+
+def is_safe_public_url(url):
+    """Check whether ``url`` is safe for the server to fetch.
+
+    Returns an ``(ok, reason)`` tuple. ``ok`` is True only when the URL is an
+    http/https request whose host resolves exclusively to public IP addresses.
+    ``reason`` explains the rejection when ``ok`` is False. This is the
+    boolean-only view of ``resolve_and_validate``; callers that need to pin the
+    connection use that function instead.
+    """
+    ok, reason, _ips = resolve_and_validate(url)
+    return ok, reason
+
+
+@contextmanager
+def pinned_resolution(host, ips):
+    """Force ``host`` to resolve to exactly ``ips`` for the duration of the block.
+
+    The scraper validates a URL's resolved IPs and then lets ``requests`` /
+    urllib3 fetch it, which resolves DNS again - a window an attacker's low-TTL
+    record can use to rebind ``host`` to a private address (DNS-rebinding
+    TOCTOU). Wrapping the fetch in this context manager makes
+    ``socket.getaddrinfo`` hand back the pre-validated ``ips`` for ``host``, so
+    the connection lands on an address that was actually checked. Any other host
+    resolves normally, and the original resolver is always restored on exit.
+
+    The override is process-global for the duration of the block. The scraper
+    fetch path processes one URL at a time (the one-shot submission processor),
+    so a scoped global override is safe here; it is not meant for concurrent
+    use.
+    """
+    original = socket.getaddrinfo
+    pinned = [str(ip) for ip in ips]
+
+    def _patched(node, port, family=0, socktype=0, proto=0, flags=0):
+        if node != host or not pinned:
+            return original(node, port, family, socktype, proto, flags)
+        normalized_port = port if isinstance(port, int) else 0
+        results = []
+        for ip in pinned:
+            addr = ipaddress.ip_address(ip)
+            if addr.version == 6:
+                if family not in (0, socket.AF_INET6):
+                    continue
+                results.append((socket.AF_INET6, socket.SOCK_STREAM,
+                                socket.IPPROTO_TCP, "",
+                                (ip, normalized_port, 0, 0)))
+            else:
+                if family not in (0, socket.AF_INET):
+                    continue
+                results.append((socket.AF_INET, socket.SOCK_STREAM,
+                                socket.IPPROTO_TCP, "",
+                                (ip, normalized_port)))
+        if not results:
+            return original(node, port, family, socktype, proto, flags)
+        return results
+
+    socket.getaddrinfo = _patched
+    try:
+        yield
+    finally:
+        socket.getaddrinfo = original
+
+
+def chromium_host_resolver_rules(host, ips):
+    """Build Chromium ``--host-resolver-rules`` args that pin ``host`` to an IP.
+
+    Chromium resolves DNS in its own process, so ``pinned_resolution`` (which
+    patches this process's resolver) cannot reach it. Launching the browser with
+    ``--host-resolver-rules=MAP <host> <ip>`` forces the main navigation to
+    connect to the pre-validated address instead of re-resolving and possibly
+    rebinding to a private host.
+
+    Returns a single-element ``--host-resolver-rules`` arg list, or an empty
+    list when there is nothing to pin (no host/ips, or a literal-IP URL whose
+    host is already an address), so the caller can splat it into
+    ``chromium.launch(args=...)``.
+    """
+    if not host or not ips:
+        return []
+    try:
+        ipaddress.ip_address(host)
+    except ValueError:
+        pass
+    else:
+        return []  # host is already a literal IP; nothing to remap
+    return [f"--host-resolver-rules=MAP {host} {ips[0]}"]
