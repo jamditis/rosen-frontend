@@ -131,6 +131,35 @@ def test_limit_caps_rows_changed():
         "Mindcasting", "Mindcasting", "", "", ""]
 
 
+def test_merge_enrichment_sanitizes_formula_injection_in_enrichment():
+    # Enrichment values are sheet-editor controlled; a leading formula trigger
+    # must be neutralized before it lands in the committed archive CSV.
+    rows = [{"id": "R1", "key_concepts": "", "thematic_categories": "",
+             "raw_text": "", "publication_date": "", "notes": ""}]
+    sheet = {"R1": {"key_concepts": '=HYPERLINK("http://evil.example","x")',
+                    "thematic_categories": "@SUM(1+1)"}}
+    merged, _ = sync.merge_enrichment(rows, sheet, FIELDS)
+    assert merged[0]["key_concepts"] == "'=HYPERLINK(\"http://evil.example\",\"x\")"
+    assert merged[0]["thematic_categories"] == "'@SUM(1+1)"
+
+
+def test_merge_enrichment_sanitizes_formula_injection_in_fill_only():
+    # Fill-only columns (raw_text) are sheet-sourced too and must be neutralized.
+    rows = [{"id": "R1", "key_concepts": "", "thematic_categories": "",
+             "raw_text": "", "publication_date": "", "notes": ""}]
+    sheet = {"R1": {"raw_text": "=2+5+cmd|'/c calc'!A0"}}
+    merged, _ = sync.merge_enrichment(rows, sheet, FIELDS)
+    assert merged[0]["raw_text"] == "'=2+5+cmd|'/c calc'!A0"
+
+
+def test_merge_enrichment_does_not_over_escape_safe_values():
+    rows = [{"id": "R1", "key_concepts": "", "thematic_categories": "",
+             "raw_text": "", "publication_date": "", "notes": ""}]
+    sheet = {"R1": {"key_concepts": "View from Nowhere"}}
+    merged, _ = sync.merge_enrichment(rows, sheet, FIELDS)
+    assert merged[0]["key_concepts"] == "View from Nowhere"
+
+
 # ---------- CSV round trip --------------------------------------------------
 
 

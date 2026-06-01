@@ -43,6 +43,8 @@ from datetime import date
 from pathlib import Path
 from typing import Dict, FrozenSet, Iterable, List, Optional, Tuple
 
+from .csv_safety import sanitize_csv_value, unescape_csv_value
+
 # ---------------------------------------------------------------------------
 # Schema constants — derived from backend/entity_extraction_schema_v3.json
 # at import time so the writer can never silently drop new schema-valid
@@ -108,8 +110,12 @@ def normalize_name(name: Optional[str]) -> str:
 
     Trim, collapse whitespace, lowercase. The stored normalized_name column
     preserves display case; this function is only used for dedup KEYS.
+
+    Reverse any CSV-formula escape first: a name like ``=mc2`` is stored as
+    ``'=mc2`` on disk, so without this a fresh extraction of ``=mc2`` would
+    miss the existing row and allocate a duplicate id on every re-run.
     """
-    return " ".join((name or "").strip().split()).lower()
+    return " ".join(unescape_csv_value((name or "").strip()).split()).lower()
 
 
 def load_existing_entities(entities_csv: Path) -> List[Dict]:
@@ -384,7 +390,10 @@ def process_extraction_result(
                    or raw_rel.get("context")
                    or raw_rel.get("evidence")
                    or "")
-        snippet = snippet[:200] if snippet else ""
+        # Escape before truncating so a trigger-led snippet at the cap keeps its
+        # leading apostrophe and still fits in 200 chars (matches _sanitize_cell);
+        # the write-boundary sanitize then no-ops on the already-escaped value.
+        snippet = sanitize_csv_value(snippet)[:200] if snippet else ""
 
         confidence = raw_rel.get("confidence_score", "")
         try:
@@ -454,7 +463,11 @@ def _atomic_append_rows(
             for r in existing_rows:
                 writer.writerow(r)
             for r in new_rows:
-                writer.writerow(r)
+                # Neutralize CSV/spreadsheet formula injection at the write
+                # boundary: entity_name / role_or_description / affiliation and
+                # relationship context originate from LLM extraction over
+                # scraped pages. Already-persisted existing rows are left as-is.
+                writer.writerow({k: sanitize_csv_value(v) for k, v in r.items()})
         os.replace(tmp_path, str(csv_path))
     except Exception:
         if os.path.exists(tmp_path):

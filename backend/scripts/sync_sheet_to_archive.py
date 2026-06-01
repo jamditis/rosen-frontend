@@ -62,6 +62,7 @@ for _candidate in (_BACKEND, _BACKEND / "src"):
         sys.path.insert(0, str(_candidate))
 
 from rosen_scraper.sheets_client import open_spreadsheet  # noqa: E402
+from rosen_scraper.csv_safety import sanitize_csv_value  # noqa: E402
 from submission_server.config import (  # noqa: E402
     CSV_FILE as _DEFAULT_CSV_FILE,
     DATA_DIR,
@@ -184,9 +185,11 @@ def merge_enrichment(
         sheet = sheet_by_id[rid]
         changed = False
 
-        # Enrichment: a non-empty sheet value wins. Never blank the CSV.
+        # Enrichment: a non-empty sheet value wins. Never blank the CSV. Sheet
+        # values are editor-controlled, so neutralize CSV/spreadsheet formula
+        # triggers before they reach the committed archive.
         for col in enrich_cols:
-            new = (sheet.get(col) or "").strip()
+            new = sanitize_csv_value((sheet.get(col) or "").strip())
             if new and new != (row.get(col) or ""):
                 row[col] = new
                 writes_by_field[col] += 1
@@ -195,7 +198,7 @@ def merge_enrichment(
         # Fill-only: write only into an empty CSV cell. raw_text is never
         # overwritten or shortened here.
         for col in fill_cols:
-            new = (sheet.get(col) or "").strip()
+            new = sanitize_csv_value((sheet.get(col) or "").strip())
             old = (row.get(col) or "").strip()
             if new and not old:
                 row[col] = new
