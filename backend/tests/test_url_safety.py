@@ -151,8 +151,20 @@ def test_chromium_host_resolver_rules_prefers_ipv4():
 
 
 def test_chromium_host_resolver_rules_ipv6_only_still_pins():
+    # Chromium MAP parses the replacement port off the last colon, so an IPv6
+    # literal must be bracketed or "2001:db8::1" is misparsed as host
+    # "2001:db8:" + port "1" and the pin silently fails to apply.
     args = chromium_host_resolver_rules("example.com", ["2001:db8::1"])
-    assert args == ["--host-resolver-rules=MAP example.com 2001:db8::1"]
+    assert args == ["--host-resolver-rules=MAP example.com [2001:db8::1]"]
+
+
+def test_chromium_host_resolver_rules_brackets_chosen_ipv6():
+    # When the validated set is IPv6-only the chosen replacement must be
+    # bracketed; an IPv4 replacement must not be.
+    assert chromium_host_resolver_rules("h.test", ["::1"]) == [
+        "--host-resolver-rules=MAP h.test [::1]"]
+    assert chromium_host_resolver_rules("h.test", ["203.0.113.9"]) == [
+        "--host-resolver-rules=MAP h.test 203.0.113.9"]
 
 
 def test_chromium_host_resolver_rules_canonicalizes_idn_host():

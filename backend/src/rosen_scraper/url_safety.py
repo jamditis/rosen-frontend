@@ -241,4 +241,8 @@ def chromium_host_resolver_rules(host, ips):
     # apply -- reopening the rebinding window for IDN hosts. Canonicalize here for
     # parity with pinned_resolution, which pins the same canonical host.
     target = _canonical_host(host)
-    return [f"--host-resolver-rules=MAP {target} {chosen}"]
+    # Chromium parses the replacement port off the last colon, so a bare IPv6
+    # literal ("2001:db8::1") is misread as host "2001:db8:" + port "1" and the
+    # pin never applies. IPv6 replacements must be bracketed; IPv4 must not be.
+    replacement = f"[{chosen}]" if ":" in str(chosen) else str(chosen)
+    return [f"--host-resolver-rules=MAP {target} {replacement}"]
