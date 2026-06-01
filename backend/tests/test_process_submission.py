@@ -922,3 +922,37 @@ class TestSsrfGuard:
         assert result['exit_code'] == 1
         assert 'unsafe' in result['error'].lower()
         assert calls['n'] == 0  # the dispatcher was never reached
+
+    def test_duplicate_url_short_circuits_before_ssrf_guard(self, monkeypatch,
+                                                            tmp_path):
+        """A URL already in the archive dedups even if it would now fail the
+        SSRF guard.
+
+        The guard runs only for URLs we are about to fetch. If it ran before the
+        dedup check, resubmitting an already-archived record whose host has since
+        gone away or now resolves privately would return 'error' instead of the
+        existing 'duplicate' record id.
+        """
+        _stub_schema(monkeypatch)
+        dispatch_mock = MagicMock()
+        monkeypatch.setattr(process_submission, 'dispatch_url', dispatch_mock)
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        # Seed an existing row whose URL the SSRF guard would also reject.
+        unsafe_dup = 'http://169.254.169.254/latest/meta-data/'
+        csv_path = tmp_path / 'archive_records-public.csv'
+        with csv_path.open('w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=CSV_HEADERS,
+                                    extrasaction='ignore')
+            writer.writeheader()
+            writer.writerow({'id': 'PRESSTH-00042', 'title': 'Seeded',
+                             'url': unsafe_dup,
+                             'original_publication': 'PressThink'})
+
+        result = _run(monkeypatch, csv_path, url=unsafe_dup)
+
+        assert result['status'] == 'duplicate'
+        assert result['record_id'] == 'PRESSTH-00042'
+        dispatch_mock.assert_not_called()

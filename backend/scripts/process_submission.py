@@ -349,20 +349,6 @@ def process_one(url: str, title: str = '', notes: str = '',
                                     f"{push.get('error', 'unknown')}"})
         return result
 
-    # --- Step 0b: SSRF guard. ---------------------------------------------
-    # Reject private/loopback/link-local or non-http(s) URLs before any sheet,
-    # dispatch, or network work. The scraper guards its own fetch too, but this
-    # secret-bearing entry point must not reach the dispatcher with an unsafe
-    # target (defense in depth / parity with the scraper entry point).
-    safe, ssrf_reason = is_safe_public_url(url)
-    if not safe:
-        msg = f'Unsafe URL refused: {ssrf_reason}'
-        logger.warning(msg)
-        _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
-                        status='error', error=msg)
-        return {'status': 'error', 'record_id': '', 'error': msg,
-                'exit_code': 1}
-
     # --- Step 1: sheet ack (best-effort). ---------------------------------
     _safe_writeback(sheet_id, sheet_tab, sheet_row or 0, status='processing')
 
@@ -378,6 +364,22 @@ def process_one(url: str, title: str = '', notes: str = '',
                         error='URL already in archive')
         return {'status': 'duplicate', 'record_id': existing_id,
                 'error': 'URL already in archive', 'exit_code': 0}
+
+    # --- Step 2b: SSRF guard. ---------------------------------------------
+    # Run after the dedup short-circuit (a URL already in the archive needs no
+    # fetch, so a host that has since gone away or now resolves privately should
+    # still dedup, not error) but before the dispatcher and its deploy/SFTP/
+    # Sheets secrets. Reject private/loopback/link-local or non-http(s) targets
+    # so this secret-bearing entry point never fetches an unsafe URL (parity with
+    # the scraper's own gate).
+    safe, ssrf_reason = is_safe_public_url(url)
+    if not safe:
+        msg = f'Unsafe URL refused: {ssrf_reason}'
+        logger.warning(msg)
+        _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
+                        status='error', error=msg)
+        return {'status': 'error', 'record_id': '', 'error': msg,
+                'exit_code': 1}
 
     # --- Step 3: scrape. --------------------------------------------------
     schema = _load_schema()

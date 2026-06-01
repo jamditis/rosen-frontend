@@ -51,6 +51,24 @@ def _is_public_address(ip_str):
     return True
 
 
+def _canonical_host(host):
+    """Canonicalize a hostname for pin matching.
+
+    requests/urllib3 connect using the IDNA (punycode) form of a host, while the
+    guard pins the Unicode form from urlparse. Lowercasing, stripping a trailing
+    dot, and IDNA-encoding both sides makes them compare equal, so the pin still
+    applies under either spelling instead of falling back to live DNS. Non-string
+    or un-encodable hosts fall back to the lowercased value.
+    """
+    if not isinstance(host, str):
+        return host
+    h = host.strip().rstrip(".").lower()
+    try:
+        return h.encode("idna").decode("ascii")
+    except (UnicodeError, ValueError):
+        return h
+
+
 def resolve_and_validate(url):
     """Check ``url`` for SSRF safety and return the validated IP addresses.
 
@@ -67,14 +85,20 @@ def resolve_and_validate(url):
     if not url or not isinstance(url, str):
         return False, "empty URL", []
 
-    parsed = urlparse(url.strip())
+    # urlparse and especially .hostname raise ValueError on malformed input
+    # (e.g. an unterminated IPv6 bracket like "http://[::1"). Reject rather than
+    # let the exception escape and crash the caller.
+    try:
+        parsed = urlparse(url.strip())
+        host = parsed.hostname
+    except ValueError:
+        return False, "URL could not be parsed", []
 
     if parsed.scheme.lower() not in ALLOWED_SCHEMES:
         return (False,
                 f"scheme '{parsed.scheme}' is not allowed (use http/https)",
                 [])
 
-    host = parsed.hostname
     if not host:
         return False, "URL has no host", []
 
@@ -93,7 +117,10 @@ def resolve_and_validate(url):
     # private address to slip an internal target past the check.
     try:
         addresses = _addresses_for_host(host)
-    except socket.gaierror:
+    except (socket.gaierror, UnicodeError):
+        # gaierror: name does not resolve. UnicodeError: an invalid IDNA
+        # hostname that the resolver cannot even encode. Either way it is
+        # unfetchable, so reject instead of propagating.
         return False, f"host {host} could not be resolved", []
 
     if not addresses:
@@ -140,9 +167,13 @@ def pinned_resolution(host, ips):
     """
     original = socket.getaddrinfo
     pinned = [str(ip) for ip in ips]
+    target = _canonical_host(host)
 
     def _patched(node, port, family=0, socktype=0, proto=0, flags=0):
-        if node != host or not pinned:
+        # Compare canonicalized hosts so the pin still matches when urllib3
+        # connects using the punycode spelling of an IDN we pinned by its
+        # Unicode name.
+        if _canonical_host(node) != target or not pinned:
             return original(node, port, family, socktype, proto, flags)
         normalized_port = port if isinstance(port, int) else 0
         results = []
@@ -161,7 +192,13 @@ def pinned_resolution(host, ips):
                                 socket.IPPROTO_TCP, "",
                                 (ip, normalized_port)))
         if not results:
-            return original(node, port, family, socktype, proto, flags)
+            # This is the pinned host but no validated address matches the
+            # requested family. Fail closed: falling back to the live resolver
+            # here would re-resolve this very host and reopen the DNS-rebinding
+            # window the pin exists to close.
+            raise socket.gaierror(
+                socket.EAI_NONAME,
+                "no pinned address for host in the requested family")
         return results
 
     socket.getaddrinfo = _patched
@@ -193,4 +230,10 @@ def chromium_host_resolver_rules(host, ips):
         pass
     else:
         return []  # host is already a literal IP; nothing to remap
-    return [f"--host-resolver-rules=MAP {host} {ips[0]}"]
+    # resolve_and_validate sorts addresses lexicographically, which can place an
+    # IPv6 address first. MAP takes a single target, so prefer a validated IPv4
+    # address when one exists -- pinning to an IPv6-only MAP would break scraping
+    # on IPv4-only runners even though the site is reachable over its A record.
+    ipv4 = [ip for ip in ips if ":" not in str(ip)]
+    chosen = ipv4[0] if ipv4 else ips[0]
+    return [f"--host-resolver-rules=MAP {host} {chosen}"]

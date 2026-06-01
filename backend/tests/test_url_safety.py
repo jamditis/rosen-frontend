@@ -139,3 +139,76 @@ def test_chromium_host_resolver_rules_empty_for_literal_ip():
 def test_chromium_host_resolver_rules_empty_when_nothing_to_pin():
     assert chromium_host_resolver_rules("", []) == []
     assert chromium_host_resolver_rules("example.com", []) == []
+
+
+def test_chromium_host_resolver_rules_prefers_ipv4():
+    # resolve_and_validate sorts addresses lexicographically, which can put an
+    # IPv6 address first; pinning Chromium to an IPv6-only MAP breaks scraping on
+    # IPv4-only runners. Prefer an IPv4 address when the validated set has one.
+    args = chromium_host_resolver_rules(
+        "example.com", ["2001:db8::1", "93.184.216.34"])
+    assert args == ["--host-resolver-rules=MAP example.com 93.184.216.34"]
+
+
+def test_chromium_host_resolver_rules_ipv6_only_still_pins():
+    args = chromium_host_resolver_rules("example.com", ["2001:db8::1"])
+    assert args == ["--host-resolver-rules=MAP example.com 2001:db8::1"]
+
+
+# ---------- DNS-rebinding hardening of pinned_resolution / resolve_and_validate
+
+
+def test_pinned_resolution_no_live_fallback_on_family_mismatch(monkeypatch):
+    # A host validated to an IPv6-only public set must NOT fall back to the live
+    # resolver when an IPv4 (AF_INET) connection is requested -- re-resolving
+    # there would reopen the rebinding window. Fail closed instead.
+    called = {"n": 0}
+
+    def _orig(*a, **k):
+        called["n"] += 1
+        return [(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP,
+                 "", ("10.0.0.5", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _orig)
+    with pinned_resolution("example.com", ["2001:db8::1"]):
+        with pytest.raises(socket.gaierror):
+            socket.getaddrinfo("example.com", 443, family=socket.AF_INET)
+    assert called["n"] == 0  # the pinned host never reached the live resolver
+
+
+def test_pinned_resolution_matches_punycode_connect_host(monkeypatch):
+    # urllib3 connects using the IDNA (punycode) host while the guard pinned the
+    # Unicode host from urlparse. The pin must still apply under either spelling
+    # instead of falling back to live DNS for the "different" host.
+    unicode_host = "münchen.test"  # münchen.test
+    puny = unicode_host.encode("idna").decode("ascii")
+
+    def _rebind(*a, **k):
+        return [(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP,
+                 "", ("10.0.0.5", 0))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", _rebind)
+    with pinned_resolution(unicode_host, ["93.184.216.34"]):
+        infos = socket.getaddrinfo(puny, 443)
+    assert {info[4][0] for info in infos} == {"93.184.216.34"}
+
+
+def test_resolve_and_validate_handles_malformed_ipv6_url():
+    # Accessing .hostname on a malformed bracketed IPv6 URL raises ValueError;
+    # the guard must catch it and reject rather than crash the caller.
+    ok, reason, ips = resolve_and_validate("http://[::1")
+    assert ok is False
+    assert ips == []
+    assert reason
+
+
+def test_resolve_and_validate_handles_resolution_unicode_error(monkeypatch):
+    # Invalid IDNA hostnames raise UnicodeError from getaddrinfo (not gaierror);
+    # the guard must treat that as unresolvable, not propagate it.
+    def _boom(host):
+        raise UnicodeError("invalid IDNA label")
+
+    monkeypatch.setattr(url_safety, "_addresses_for_host", _boom)
+    ok, reason, ips = resolve_and_validate("http://bad-idna.example/")
+    assert ok is False
+    assert ips == []
