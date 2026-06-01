@@ -737,3 +737,59 @@ def test_append_does_not_over_escape_safe_values(tmp_path):
     new = rows[-1]
     assert new["entity_name"] == "NYU"
     assert new["entity_type"] == "Organization"
+
+
+# ---------------------------------------------------------------------------
+# Escaping a formula-trigger name on write must not break dedup on re-runs.
+# The name is stored as "'=foo" but a fresh extraction sees the raw "=foo";
+# the dedup KEY has to treat them as the same entity or every re-run allocates
+# a new id for it.
+# ---------------------------------------------------------------------------
+
+
+def test_normalize_name_unescapes_formula_escape_for_dedup():
+    assert ecw.normalize_name("'=Open Source") == ecw.normalize_name("=Open Source")
+    assert ecw.normalize_name("'@home") == ecw.normalize_name("@home")
+    assert ecw.normalize_name("'-30-") == ecw.normalize_name("-30-")
+
+
+def test_normalize_name_keeps_legitimate_leading_apostrophe():
+    # A real leading apostrophe (not an escape) must not be stripped.
+    assert ecw.normalize_name("'Tis") == "'tis"
+
+
+def test_escaped_entity_dedups_against_raw_reextraction(tmp_path):
+    entities_csv, relationships_csv = _seed_csvs(tmp_path)
+    # First pass: a concept whose name triggers the formula escape on write.
+    first = {
+        "entities": [
+            {"entity_id": "C001", "entity_type": "Concept", "entity_name": "=mc2"},
+        ],
+        "relationships": [],
+        "record_id": "RECORD-1",
+    }
+    ecw.append_entities_and_relationships(
+        first, entities_csv, relationships_csv, today="2026-05-31")
+
+    def mc2_rows():
+        with entities_csv.open("r", encoding="utf-8", newline="") as f:
+            return [r for r in csv.DictReader(f) if r["entity_name"] == "'=mc2"]
+
+    after_first = mc2_rows()
+    assert len(after_first) == 1  # escaped on disk
+    first_id = after_first[0]["entity_id"]
+
+    # Second pass: the same concept re-extracted (raw "=mc2") must dedup to the
+    # existing row, not append a second one with a fresh id.
+    second = {
+        "entities": [
+            {"entity_id": "C002", "entity_type": "Concept", "entity_name": "=mc2"},
+        ],
+        "relationships": [],
+        "record_id": "RECORD-2",
+    }
+    ecw.append_entities_and_relationships(
+        second, entities_csv, relationships_csv, today="2026-05-31")
+    after_second = mc2_rows()
+    assert len(after_second) == 1  # no duplicate allocated
+    assert after_second[0]["entity_id"] == first_id

@@ -43,7 +43,7 @@ from datetime import date
 from pathlib import Path
 from typing import Dict, FrozenSet, Iterable, List, Optional, Tuple
 
-from .csv_safety import sanitize_csv_value
+from .csv_safety import sanitize_csv_value, unescape_csv_value
 
 # ---------------------------------------------------------------------------
 # Schema constants — derived from backend/entity_extraction_schema_v3.json
@@ -110,8 +110,12 @@ def normalize_name(name: Optional[str]) -> str:
 
     Trim, collapse whitespace, lowercase. The stored normalized_name column
     preserves display case; this function is only used for dedup KEYS.
+
+    Reverse any CSV-formula escape first: a name like ``=mc2`` is stored as
+    ``'=mc2`` on disk, so without this a fresh extraction of ``=mc2`` would
+    miss the existing row and allocate a duplicate id on every re-run.
     """
-    return " ".join((name or "").strip().split()).lower()
+    return " ".join(unescape_csv_value((name or "").strip()).split()).lower()
 
 
 def load_existing_entities(entities_csv: Path) -> List[Dict]:

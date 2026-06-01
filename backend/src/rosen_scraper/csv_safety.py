@@ -14,8 +14,10 @@ this helper.
 
 from __future__ import annotations
 
-# OWASP CSV-injection prefixes; see the module docstring.
-CSV_INJECTION_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
+# OWASP CSV-injection prefixes; see the module docstring. Tab, carriage return,
+# and line feed are leading control characters that spreadsheet importers strip
+# or treat as formula starts, so a value led by any of them is neutralized too.
+CSV_INJECTION_PREFIXES = ("=", "+", "-", "@", "\t", "\r", "\n")
 
 
 def sanitize_csv_value(value: object) -> object:
@@ -28,4 +30,20 @@ def sanitize_csv_value(value: object) -> object:
         return value
     if value[0] in CSV_INJECTION_PREFIXES:
         return "'" + value
+    return value
+
+
+def unescape_csv_value(value: object) -> object:
+    """Reverse ``sanitize_csv_value`` for equality/dedup keys.
+
+    Strips a single leading apostrophe only when it directly precedes a formula
+    trigger -- exactly the escape ``sanitize_csv_value`` would have added -- so
+    a value stored escaped on disk and the same value freshly extracted compare
+    equal. A legitimate leading apostrophe (one not followed by a trigger) is
+    left intact, and non-strings pass through.
+    """
+    if not isinstance(value, str) or len(value) < 2:
+        return value
+    if value[0] == "'" and value[1] in CSV_INJECTION_PREFIXES:
+        return value[1:]
     return value
