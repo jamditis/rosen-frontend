@@ -662,3 +662,78 @@ def test_append_handles_empty_result(tmp_path):
     with relationships_csv.open("r", encoding="utf-8", newline="") as f:
         rrows = list(csv.DictReader(f))
     assert rrows == []
+
+
+# ---------------------------------------------------------------------------
+# CSV/spreadsheet formula injection — entity_name, role_or_description, and
+# relationship context all originate from LLM extraction over scraped page
+# text, so an attacker whose page is scraped can plant a formula. The writer
+# must neutralize the trigger before it reaches the committed CSV.
+# ---------------------------------------------------------------------------
+
+
+def test_append_sanitizes_formula_injection_in_entity_fields(tmp_path):
+    entities_csv, relationships_csv = _seed_csvs(tmp_path)
+    result = {
+        "entities": [
+            {"entity_id": "P001", "entity_type": "Person",
+             "entity_name": '=HYPERLINK("http://evil.example","x")',
+             "role": "@SUM(1+1)"},
+        ],
+        "relationships": [],
+        "record_id": "RECORD-31337",
+    }
+    ecw.append_entities_and_relationships(
+        result, entities_csv, relationships_csv, today="2026-05-31",
+    )
+    with entities_csv.open("r", encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+    new = rows[-1]
+    assert new["entity_name"] == "'=HYPERLINK(\"http://evil.example\",\"x\")"
+    assert new["role_or_description"] == "'@SUM(1+1)"
+
+
+def test_append_sanitizes_formula_injection_in_relationship_context(tmp_path):
+    entities_csv, relationships_csv = _seed_csvs(tmp_path)
+    result = {
+        "entities": [
+            {"entity_id": "P001", "entity_type": "Person",
+             "entity_name": "Jay Rosen", "role": "Professor"},
+            {"entity_id": "O001", "entity_type": "Organization",
+             "entity_name": "NYU", "org_type": "University"},
+        ],
+        "relationships": [
+            {"source_entity_id": "P001", "target_entity_id": "O001",
+             "relationship_type": "Affiliated With",
+             "context_snippet": "=cmd|'/c calc'!A1",
+             "confidence_score": 1.0},
+        ],
+        "record_id": "RECORD-31338",
+    }
+    ecw.append_entities_and_relationships(
+        result, entities_csv, relationships_csv, today="2026-05-31",
+    )
+    with relationships_csv.open("r", encoding="utf-8", newline="") as f:
+        rrows = list(csv.DictReader(f))
+    assert rrows[-1]["context_snippet"] == "'=cmd|'/c calc'!A1"
+
+
+def test_append_does_not_over_escape_safe_values(tmp_path):
+    # Ordinary text must stay byte-for-byte unchanged (no spurious leading ').
+    entities_csv, relationships_csv = _seed_csvs(tmp_path)
+    result = {
+        "entities": [
+            {"entity_id": "O001", "entity_type": "Organization",
+             "entity_name": "NYU", "org_type": "University"},
+        ],
+        "relationships": [],
+        "record_id": "RECORD-31339",
+    }
+    ecw.append_entities_and_relationships(
+        result, entities_csv, relationships_csv, today="2026-05-31",
+    )
+    with entities_csv.open("r", encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+    new = rows[-1]
+    assert new["entity_name"] == "NYU"
+    assert new["entity_type"] == "Organization"

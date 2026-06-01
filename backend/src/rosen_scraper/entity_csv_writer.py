@@ -43,6 +43,8 @@ from datetime import date
 from pathlib import Path
 from typing import Dict, FrozenSet, Iterable, List, Optional, Tuple
 
+from .csv_safety import sanitize_csv_value
+
 # ---------------------------------------------------------------------------
 # Schema constants — derived from backend/entity_extraction_schema_v3.json
 # at import time so the writer can never silently drop new schema-valid
@@ -454,7 +456,11 @@ def _atomic_append_rows(
             for r in existing_rows:
                 writer.writerow(r)
             for r in new_rows:
-                writer.writerow(r)
+                # Neutralize CSV/spreadsheet formula injection at the write
+                # boundary: entity_name / role_or_description / affiliation and
+                # relationship context originate from LLM extraction over
+                # scraped pages. Already-persisted existing rows are left as-is.
+                writer.writerow({k: sanitize_csv_value(v) for k, v in r.items()})
         os.replace(tmp_path, str(csv_path))
     except Exception:
         if os.path.exists(tmp_path):
