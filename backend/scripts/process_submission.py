@@ -104,12 +104,15 @@ CSV_FILE = _DEFAULT_CSV_FILE
 # fetch or parse a URL. Some hosts (Medium, paywalled or login-walled pages,
 # heavily JS-rendered sites) block automated scraping. The submitter can paste
 # the article body to bypass the fetch — the AI still tags the pasted text.
+# The text rides the workflow's raw_text input today (a maintainer fills it in
+# the Actions UI). The self-serve sheet column that would let a submitter do
+# this without help is Phase 3, tracked in #353 — so this hint names the
+# raw_text field, not a sheet column that does not exist yet.
 SCRAPE_FAILED_PASTE_HINT = (
     "Couldn't fetch or parse this URL automatically ({reason}). Some sites "
     "(Medium, paywalled, or login-walled pages) block automated scraping. To "
-    "submit it anyway, paste the article's full text into the 'raw text' "
-    "column and re-submit — the pipeline will read and tag the pasted text "
-    "for you."
+    "archive it anyway, re-submit with the article's full text in the raw text "
+    "field — the pipeline skips the fetch and tags the pasted text directly."
 )
 
 SENTINEL_URL_PREFIX = 'https://example.com/sweep-noop-'

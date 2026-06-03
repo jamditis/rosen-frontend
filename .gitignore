@@ -80,8 +80,13 @@ data/*.csv.tmp
 backend/submission_server/submissions.db
 
 # Project Specific
-# known_entities.json is committed as reference data (publication + platform
-# name -> host-alias map) so resolve_publication works in CI and local runs.
+# known_entities.json (publication + platform name -> host-alias map) is
+# committed as reference data so the submission pipeline can resolve
+# publications in CI and local runs. Every submission-path loader resolves it
+# to backend/known_entities.json (submission_server.config, process_submission,
+# rosen_scraper.workflow via find_project_root). Some diagnostic/backfill
+# scripts still read it from divergent paths (backend/src/, cwd) and miss it —
+# tracked for consolidation in #354.
 
 # Playwright
 test-results/
