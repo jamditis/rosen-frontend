@@ -54,6 +54,7 @@ CSV_HEADERS = [
     'license', 'permissions', 'date_processed', 'gdrive_pdf_link',
     'gdrive_raw_file_link', 'gdrive_transcript_link', 'transcript_filepath',
     'pull_quote', 'raw_text', 'verified', 'notes', 'low_confidence',
+    'needs_review',
 ]
 
 
@@ -1197,3 +1198,80 @@ class TestManualRawTextFallback:
         ])
         assert rc == 0
         dispatch_mock.assert_not_called()
+
+
+class TestReviewGate:
+    """Hybrid 'live but flagged' model: auto-submissions publish immediately
+    (verified=True) so the submitter sees the record appear, but carry
+    needs_review=true so a human can vet the AI-generated metadata before it's
+    treated as final."""
+
+    def test_auto_submission_is_verified_true(self, monkeypatch,
+                                              csv_with_headers):
+        """Regression: enrich_data() setdefaults verified=False, which used to
+        defeat the submission path's intended default-True. The record must land
+        verified so the public exporter (which drops verified=False rows) keeps
+        it."""
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch)
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        result = _run(monkeypatch, csv_with_headers,
+                      url='https://example.com/verify-me')
+        assert result['status'] == 'live'
+
+        with csv_with_headers.open() as f:
+            row = next(csv.DictReader(f))
+        assert row['verified'].lower() in ('true', '1', 'yes'), (
+            f"auto-submission must be verified so it survives the public "
+            f"exporter filter; got {row['verified']!r}")
+
+    def test_auto_submission_flagged_needs_review(self, monkeypatch,
+                                                  csv_with_headers):
+        """Every auto-submission is AI-generated and unreviewed, so it must be
+        flagged needs_review=true for the audit trail and the frontend badge."""
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch)
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        result = _run(monkeypatch, csv_with_headers,
+                      url='https://example.com/flag-me')
+        assert result['status'] == 'live'
+
+        with csv_with_headers.open() as f:
+            row = next(csv.DictReader(f))
+        assert row['needs_review'].lower() == 'true', (
+            f"auto-submission must be flagged for human review; "
+            f"got {row['needs_review']!r}")
+
+    def test_manual_paste_submission_also_flagged_needs_review(
+            self, monkeypatch, csv_with_headers):
+        """The paste-the-text fallback is just as unreviewed as a scrape, so it
+        must be flagged too — and still publish (verified)."""
+        _stub_schema(monkeypatch)
+        monkeypatch.setattr(process_submission, 'dispatch_url', MagicMock())
+        monkeypatch.setattr(process_submission, 'categorize', MagicMock(
+            return_value={'title': 'Pasted piece',
+                          'publication_date': '2026-03-01',
+                          'thematic_categories': ['Press & Media Criticism'],
+                          'era': 'Platform Transition & Future Models '
+                                 '(2021-Present)'}))
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        monkeypatch.setattr(process_submission, 'CSV_FILE', csv_with_headers)
+        result = process_submission.process_one(
+            url='https://medium.com/@jayrosen/pasted',
+            raw_text='A long pasted article body that the scraper could not '
+                     'reach because Medium blocks automated access.')
+        assert result['status'] == 'live'
+
+        with csv_with_headers.open() as f:
+            row = next(csv.DictReader(f))
+        assert row['needs_review'].lower() == 'true'
+        assert row['verified'].lower() in ('true', '1', 'yes')

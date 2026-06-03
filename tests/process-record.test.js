@@ -109,6 +109,8 @@ function processRecord(row, index, type, relationshipsMap) {
     concepts: concepts,
     tags: tags,
     verified: isVerified,
+    needsReview: (row.needs_review || row.Needs_Review || '').toString()
+      .trim().toLowerCase() === 'true',
     type: type,
     relatedIds: directRelIds
   };
@@ -281,6 +283,33 @@ describe('processRecord: verified field', () => {
   it('uses Verified (capitalized) column name', () => {
     const row = { id: 'R8', title: 'T', Verified: 'TRUE', publication_date: '2020-06-15' };
     assert.strictEqual(processRecord(row, 0, 'article', {}).verified, true);
+  });
+});
+
+describe('processRecord: needsReview field', () => {
+  it('needs_review=true flags the record for review', () => {
+    const row = { id: 'R1', title: 'T', publication_date: '2020-06-15', needs_review: 'true' };
+    assert.strictEqual(processRecord(row, 0, 'article', {}).needsReview, true);
+  });
+
+  it('is case-insensitive and trims whitespace', () => {
+    const row = { id: 'R2', title: 'T', publication_date: '2020-06-15', needs_review: '  TRUE  ' };
+    assert.strictEqual(processRecord(row, 0, 'article', {}).needsReview, true);
+  });
+
+  it('empty needs_review is not flagged (existing curated records)', () => {
+    const row = { id: 'R3', title: 'T', publication_date: '2020-06-15', needs_review: '' };
+    assert.strictEqual(processRecord(row, 0, 'article', {}).needsReview, false);
+  });
+
+  it('missing needs_review column is not flagged', () => {
+    const row = { id: 'R4', title: 'T', publication_date: '2020-06-15' };
+    assert.strictEqual(processRecord(row, 0, 'article', {}).needsReview, false);
+  });
+
+  it('a non-true value (e.g. false) is not flagged', () => {
+    const row = { id: 'R5', title: 'T', publication_date: '2020-06-15', needs_review: 'false' };
+    assert.strictEqual(processRecord(row, 0, 'article', {}).needsReview, false);
   });
 });
 

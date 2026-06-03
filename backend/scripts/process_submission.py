@@ -536,7 +536,18 @@ def process_one(url: str, title: str = '', notes: str = '',
         logger.warning(f'enrich_data failed (continuing): {exc}')
     if low_confidence:
         scrape['low_confidence'] = 'true'
-    scrape['verified'] = scrape.get('verified', True)
+    # Hybrid 'live but flagged' model. Auto-submissions publish immediately so
+    # the submitter sees the record appear, then carry needs_review=true so a
+    # human can vet the AI-generated metadata before it's treated as final.
+    #
+    # verified must be forced True here, not defaulted: enrich_data() above runs
+    # `data.setdefault('verified', False)` (a conservative default for legacy or
+    # broken rows), so `scrape.get('verified', True)` would always read back that
+    # False and the public exporter — which drops verified=False rows — would
+    # silently hide every submission. These records have been scraped, date-
+    # normalized, and publication-resolved above, so they are publishable.
+    scrape['verified'] = True
+    scrape['needs_review'] = 'true'
 
     # Sanitize string fields explicitly via _sanitize_record (called inside
     # _atomic_append_row), but also pre-sanitize the user-controlled overrides
