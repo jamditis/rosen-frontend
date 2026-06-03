@@ -223,7 +223,8 @@ def summarize_and_classify(text_content: str, schema: Dict[str, Any]) -> Optiona
     # Configure the generative AI model with the retrieved API key.
     genai.configure(api_key=api_key)
     # Initialize the specific Gemini model to be used for content generation.
-    model = genai.GenerativeModel('gemini-2.0-flash')
+    # gemini-2.0-flash was retired by Google; 2.5-flash is the current default.
+    model = genai.GenerativeModel('gemini-2.5-flash')
 
     # Extract the taxonomy from the provided schema to guide the AI's classification.
     taxonomy = schema.get("taxonomy", {})

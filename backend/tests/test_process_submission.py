@@ -890,3 +890,114 @@ class TestPrototypeMode:
         ])
         assert rc == 0
         sftp_mock.assert_not_called()
+
+
+# ---------- Real-world scrape shape (field normalization) -------------------
+#
+# Every _stub_dispatcher_ok above hands process_one the ALREADY-CORRECT key
+# names ('publication_date', a correct 'original_publication'). The real
+# dispatcher does not: trafilatura's article path emits 'date' (not
+# 'publication_date'), and the AI categorizer can hallucinate a publication
+# that has nothing to do with the URL. These tests feed that real shape and
+# assert the normalization step fixes it before the CSV write / ID assignment.
+
+
+class TestRealWorldScrapeShape:
+
+    def test_trafilatura_date_key_maps_to_publication_date(self, monkeypatch,
+                                                           csv_with_headers):
+        """trafilatura emits 'date'; the schema column is 'publication_date'.
+        Without the rename the value is dropped by the CSV writer's
+        extrasaction='ignore' and the column writes empty."""
+        _stub_schema(monkeypatch)
+        # Real article-scraper shape: a 'date' key, NO 'publication_date'.
+        scrape = {
+            'title': 'A real scraped title',
+            'author': 'Jay Rosen',
+            'date': '2026-04-15',
+            'original_publication': 'PressThink',
+            'thematic_categories': ['Press & Media Criticism'],
+            'era': 'Platform Transition & Future Models (2021-Present)',
+            'raw_text': 'Body text.',
+        }
+        monkeypatch.setattr(process_submission, 'dispatch_url',
+                            MagicMock(return_value=scrape))
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        result = _run(monkeypatch, csv_with_headers,
+                      url='https://pressthink.org/2026/04/a-piece/')
+
+        assert result['status'] == 'live'
+        with csv_with_headers.open() as f:
+            rows = list(csv.DictReader(f))
+        assert len(rows) == 1
+        # The scraped date landed in the publication_date column.
+        assert rows[0]['publication_date'] == '2026-04-15'
+
+    def test_ai_publication_date_kept_when_no_trafilatura_date(self, monkeypatch,
+                                                              csv_with_headers):
+        """When the scrape has no 'date' (e.g. only the AI categorizer supplied
+        a 'publication_date'), the rename must NOT clobber it with empty."""
+        _stub_schema(monkeypatch)
+        scrape = {
+            'title': 'AI-dated piece',
+            'author': 'Jay Rosen',
+            'publication_date': '2026-01-01',  # AI-provided, no trafilatura date
+            'original_publication': 'PressThink',
+            'thematic_categories': ['Press & Media Criticism'],
+            'era': 'Platform Transition & Future Models (2021-Present)',
+            'raw_text': 'Body text.',
+        }
+        monkeypatch.setattr(process_submission, 'dispatch_url',
+                            MagicMock(return_value=scrape))
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        result = _run(monkeypatch, csv_with_headers,
+                      url='https://pressthink.org/2026/01/b-piece/')
+
+        assert result['status'] == 'live'
+        with csv_with_headers.open() as f:
+            rows = list(csv.DictReader(f))
+        assert rows[0]['publication_date'] == '2026-01-01'
+
+    def test_hallucinated_publication_resolved_before_id(self, monkeypatch,
+                                                         csv_with_headers):
+        """A hallucinated 'original_publication' (AI guessing 'Talking Points
+        Memo' for a pressthink.org URL) must be resolved against the URL host
+        BEFORE the ID is generated, so it leaks into neither the publisher
+        field nor the ID prefix."""
+        _stub_schema(monkeypatch)
+        # Known-entities data that resolve_publication can match on the host.
+        monkeypatch.setattr(
+            process_submission, '_load_known_entities',
+            lambda: {'publications': [
+                {'correct_name': 'PressThink', 'aliases': ['pressthink']}]})
+        scrape = {
+            'title': 'Subscribers and members',
+            'author': 'Jay Rosen',
+            'date': '2026-04-15',
+            'original_publication': 'Talking Points Memo',  # hallucinated
+            'thematic_categories': ['Press & Media Criticism'],
+            'era': 'Platform Transition & Future Models (2021-Present)',
+            'raw_text': 'Body text.',
+        }
+        monkeypatch.setattr(process_submission, 'dispatch_url',
+                            MagicMock(return_value=scrape))
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        result = _run(monkeypatch, csv_with_headers,
+                      url='https://pressthink.org/2026/04/subscribers/')
+
+        assert result['status'] == 'live'
+        # ID prefix derives from the RESOLVED publication, not the hallucination.
+        assert result['record_id'].startswith('PRESSTH-'), result['record_id']
+        with csv_with_headers.open() as f:
+            rows = list(csv.DictReader(f))
+        assert rows[0]['original_publication'] == 'PressThink'
+        assert rows[0]['publisher'] == 'PressThink'

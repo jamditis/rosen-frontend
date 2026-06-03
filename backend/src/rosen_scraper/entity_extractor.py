@@ -258,7 +258,8 @@ def extract_entities_and_relationships(
 
     # Configure Gemini
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-2.0-flash')
+    # gemini-2.0-flash was retired by Google; 2.5-flash is the current default.
+    model = genai.GenerativeModel('gemini-2.5-flash')
 
     # Extract schema components
     entity_types = schema.get("entity_types", {})

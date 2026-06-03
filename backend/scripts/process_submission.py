@@ -69,6 +69,7 @@ from rosen_scraper.entity_extractor import (  # noqa: E402
     extract_entities_and_relationships as _extract_entities,
 )
 from rosen_scraper import entity_csv_writer  # noqa: E402
+from rosen_scraper import entity_resolver  # noqa: E402
 from rosen_scraper.workflow import (  # noqa: E402
     enrich_data,
     generate_source_based_id,
@@ -415,6 +416,27 @@ def process_one(url: str, title: str = '', notes: str = '',
     if low_confidence or not scrape.get('thematic_categories'):
         scrape['thematic_categories'] = ['uncategorized']
         low_confidence = True
+
+    # --- Step 4.5: normalize fields before ID/enrichment. -----------------
+    # The article scraper (trafilatura) emits a 'date' key, but the schema and
+    # the rest of the pipeline (and the export script) use 'publication_date'.
+    # The CSV writer drops unknown keys (extrasaction='ignore'), so without
+    # this rename the scraped date is silently lost. Mirrors workflow.main();
+    # trafilatura's date wins when present, else the AI's publication_date is
+    # kept.
+    scraped_date = scrape.pop('date', None)
+    if scraped_date:
+        scrape['publication_date'] = scraped_date
+
+    # Resolve the publication against known entities + the URL host BEFORE
+    # generating the ID, so a hallucinated 'original_publication' (e.g. an AI
+    # guess of 'Talking Points Memo' for a pressthink.org URL) can't leak into
+    # both the publisher field and the ID prefix. resolve_publication is a
+    # no-op when known_entities is empty, so it never makes things worse.
+    resolved_pub = entity_resolver.resolve_publication(
+        scrape.get('original_publication'), url, known_entities)
+    if resolved_pub:
+        scrape['original_publication'] = resolved_pub
 
     # --- Step 5: assign ID. -----------------------------------------------
     publication = scrape.get('original_publication') or ''
