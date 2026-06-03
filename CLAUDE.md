@@ -328,6 +328,7 @@ Supports: Articles, Videos, Twitter/X, Tumblr, Newspaper Clippings (PDF OCR).
 9. **Git LFS for PDFs.** Large PDF files in `dissertation/` are managed via Git LFS.
 10. **Don't modify archived code.** `/archived/` is reference only.
 11. **Sentence case everywhere.** Never use Title Case in UI text, comments, or documentation.
+12. **Skip `do-not-automate` issues.** Issues labeled `do-not-automate` are tracked for human visibility only. Enumerate candidate work with `gh issue list --search 'is:open -label:"do-not-automate"'` so they never enter selection. Never select, work on, or open a pull request against one, and never change its state; stop if you have already opened one (each also carries a "DO NOT AUTOMATE" banner).
 
 ## Known issues
 

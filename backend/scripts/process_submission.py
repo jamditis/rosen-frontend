@@ -18,10 +18,11 @@ Behavior (12-step pipeline from the design's "Architecture" diagram):
 
     1.  Sheet writeback F='processing'              (best-effort)
     2.  Dedup vs current archive_records-public.csv (short-circuit on hit)
-    3.  dispatcher.dispatch_url(url)                (scrape)
+   2b.  SSRF guard via is_safe_public_url(url)      (reject private/non-http)
+    3.  dispatcher.dispatch_url(url)                (scrape, or pasted raw text)
     4.  categorize(...)                             (Gemini; degrade on fail)
-    5.  generate_source_based_id()                  (next RECORD-NNNNN)
-    6.  enrich_data() + _sanitize_cell()            (mimic Pillar 3)
+    5.  assign id: keep processor CLIP-/NYT-/WSJ-,  (else next RECORD-NNNNN)
+    6.  enrich_data() + _sanitize_cell()            (mimic Pillar 3; flag review)
     7.  Append to data/archive_records-public.csv   (atomic tmp+rename)
     8.  node data/export-archive-data.js            (regen JSONs)
     9.  npm test                                    (abort commit on fail)
@@ -70,6 +71,7 @@ from rosen_scraper.entity_extractor import (  # noqa: E402
 )
 from rosen_scraper import entity_csv_writer  # noqa: E402
 from rosen_scraper import entity_resolver  # noqa: E402
+from rosen_scraper.url_safety import is_safe_public_url  # noqa: E402
 from rosen_scraper.workflow import enrich_data  # noqa: E402
 from submission_server import sftp_push, sheets_callback  # noqa: E402
 from submission_server.config import (  # noqa: E402
@@ -417,6 +419,24 @@ def process_one(url: str, title: str = '', notes: str = '',
                         error='URL already in archive')
         return {'status': 'duplicate', 'record_id': existing_id,
                 'error': 'URL already in archive', 'exit_code': 0}
+
+    # --- Step 2b: SSRF guard. ---------------------------------------------
+    # Run after the dedup short-circuit (a URL already in the archive needs no
+    # fetch, so a host that has since gone away or now resolves privately should
+    # still dedup, not error) but before the dispatcher and its deploy/SFTP/
+    # Sheets secrets. Reject private/loopback/link-local or non-http(s) targets
+    # so this secret-bearing entry point never fetches an unsafe URL (parity with
+    # the scraper's own gate). Runs even on the manual paste path below: a
+    # legitimate paste target (Medium, paywalled) is still a public http(s) URL,
+    # and a private/non-http URL should not be archived as a record regardless.
+    safe, ssrf_reason = is_safe_public_url(url)
+    if not safe:
+        msg = f'Unsafe URL refused: {ssrf_reason}'
+        logger.warning(msg)
+        _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
+                        status='error', error=msg)
+        return {'status': 'error', 'record_id': '', 'error': msg,
+                'exit_code': 1}
 
     # --- Step 3: scrape (or use manually-pasted text). --------------------
     schema = _load_schema()

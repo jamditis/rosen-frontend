@@ -22,6 +22,14 @@ When fixing bugs:
 3. Run the targeted test, then the relevant broader test command.
 4. Only claim the bug is fixed after verification passes.
 
+## Issue selection
+
+Some issues are tracked for human visibility only and are not engineering tasks.
+
+- Enumerate candidate work with `gh issue list --search 'is:open -label:"do-not-automate"'` so these issues never enter selection. Skip any `do-not-automate` issue you reach another way.
+- Never select, work on, or open a pull request against a `do-not-automate` issue, and never change its state.
+- These issues also open with a "DO NOT AUTOMATE" banner in the body. If you have already opened one, stop and move on.
+
 ## Key commands
 
 ```bash

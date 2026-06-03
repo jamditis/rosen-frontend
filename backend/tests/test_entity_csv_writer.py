@@ -662,3 +662,159 @@ def test_append_handles_empty_result(tmp_path):
     with relationships_csv.open("r", encoding="utf-8", newline="") as f:
         rrows = list(csv.DictReader(f))
     assert rrows == []
+
+
+# ---------------------------------------------------------------------------
+# CSV/spreadsheet formula injection — entity_name, role_or_description, and
+# relationship context all originate from LLM extraction over scraped page
+# text, so an attacker whose page is scraped can plant a formula. The writer
+# must neutralize the trigger before it reaches the committed CSV.
+# ---------------------------------------------------------------------------
+
+
+def test_append_sanitizes_formula_injection_in_entity_fields(tmp_path):
+    entities_csv, relationships_csv = _seed_csvs(tmp_path)
+    result = {
+        "entities": [
+            {"entity_id": "P001", "entity_type": "Person",
+             "entity_name": '=HYPERLINK("http://evil.example","x")',
+             "role": "@SUM(1+1)"},
+        ],
+        "relationships": [],
+        "record_id": "RECORD-31337",
+    }
+    ecw.append_entities_and_relationships(
+        result, entities_csv, relationships_csv, today="2026-05-31",
+    )
+    with entities_csv.open("r", encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+    new = rows[-1]
+    assert new["entity_name"] == "'=HYPERLINK(\"http://evil.example\",\"x\")"
+    assert new["role_or_description"] == "'@SUM(1+1)"
+
+
+def test_append_sanitizes_formula_injection_in_relationship_context(tmp_path):
+    entities_csv, relationships_csv = _seed_csvs(tmp_path)
+    result = {
+        "entities": [
+            {"entity_id": "P001", "entity_type": "Person",
+             "entity_name": "Jay Rosen", "role": "Professor"},
+            {"entity_id": "O001", "entity_type": "Organization",
+             "entity_name": "NYU", "org_type": "University"},
+        ],
+        "relationships": [
+            {"source_entity_id": "P001", "target_entity_id": "O001",
+             "relationship_type": "Affiliated With",
+             "context_snippet": "=cmd|'/c calc'!A1",
+             "confidence_score": 1.0},
+        ],
+        "record_id": "RECORD-31338",
+    }
+    ecw.append_entities_and_relationships(
+        result, entities_csv, relationships_csv, today="2026-05-31",
+    )
+    with relationships_csv.open("r", encoding="utf-8", newline="") as f:
+        rrows = list(csv.DictReader(f))
+    assert rrows[-1]["context_snippet"] == "'=cmd|'/c calc'!A1"
+
+
+def test_append_does_not_over_escape_safe_values(tmp_path):
+    # Ordinary text must stay byte-for-byte unchanged (no spurious leading ').
+    entities_csv, relationships_csv = _seed_csvs(tmp_path)
+    result = {
+        "entities": [
+            {"entity_id": "O001", "entity_type": "Organization",
+             "entity_name": "NYU", "org_type": "University"},
+        ],
+        "relationships": [],
+        "record_id": "RECORD-31339",
+    }
+    ecw.append_entities_and_relationships(
+        result, entities_csv, relationships_csv, today="2026-05-31",
+    )
+    with entities_csv.open("r", encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+    new = rows[-1]
+    assert new["entity_name"] == "NYU"
+    assert new["entity_type"] == "Organization"
+
+
+# ---------------------------------------------------------------------------
+# Escaping a formula-trigger name on write must not break dedup on re-runs.
+# The name is stored as "'=foo" but a fresh extraction sees the raw "=foo";
+# the dedup KEY has to treat them as the same entity or every re-run allocates
+# a new id for it.
+# ---------------------------------------------------------------------------
+
+
+def test_normalize_name_unescapes_formula_escape_for_dedup():
+    assert ecw.normalize_name("'=Open Source") == ecw.normalize_name("=Open Source")
+    assert ecw.normalize_name("'@home") == ecw.normalize_name("@home")
+    assert ecw.normalize_name("'-30-") == ecw.normalize_name("-30-")
+
+
+def test_normalize_name_keeps_legitimate_leading_apostrophe():
+    # A real leading apostrophe (not an escape) must not be stripped.
+    assert ecw.normalize_name("'Tis") == "'tis"
+
+
+def test_escaped_entity_dedups_against_raw_reextraction(tmp_path):
+    entities_csv, relationships_csv = _seed_csvs(tmp_path)
+    # First pass: a concept whose name triggers the formula escape on write.
+    first = {
+        "entities": [
+            {"entity_id": "C001", "entity_type": "Concept", "entity_name": "=mc2"},
+        ],
+        "relationships": [],
+        "record_id": "RECORD-1",
+    }
+    ecw.append_entities_and_relationships(
+        first, entities_csv, relationships_csv, today="2026-05-31")
+
+    def mc2_rows():
+        with entities_csv.open("r", encoding="utf-8", newline="") as f:
+            return [r for r in csv.DictReader(f) if r["entity_name"] == "'=mc2"]
+
+    after_first = mc2_rows()
+    assert len(after_first) == 1  # escaped on disk
+    first_id = after_first[0]["entity_id"]
+
+    # Second pass: the same concept re-extracted (raw "=mc2") must dedup to the
+    # existing row, not append a second one with a fresh id.
+    second = {
+        "entities": [
+            {"entity_id": "C002", "entity_type": "Concept", "entity_name": "=mc2"},
+        ],
+        "relationships": [],
+        "record_id": "RECORD-2",
+    }
+    ecw.append_entities_and_relationships(
+        second, entities_csv, relationships_csv, today="2026-05-31")
+    after_second = mc2_rows()
+    assert len(after_second) == 1  # no duplicate allocated
+    assert after_second[0]["entity_id"] == first_id
+
+
+def test_relationship_snippet_stays_within_cap_after_escaping(tmp_path):
+    # A trigger-led context_snippet at the 200-char cap must not exceed it once
+    # the formula escape is prepended (escape-then-truncate, like _sanitize_cell).
+    entities_csv, relationships_csv = _seed_csvs(tmp_path)
+    result = {
+        "entities": [
+            {"entity_id": "P001", "entity_type": "Person", "entity_name": "Jay Rosen"},
+            {"entity_id": "O001", "entity_type": "Organization", "entity_name": "NYU"},
+        ],
+        "relationships": [
+            {"source_entity_id": "P001", "target_entity_id": "O001",
+             "relationship_type": "Affiliated With",
+             "context_snippet": "=" + ("A" * 250),
+             "confidence_score": 1.0},
+        ],
+        "record_id": "RECORD-CAP",
+    }
+    ecw.append_entities_and_relationships(
+        result, entities_csv, relationships_csv, today="2026-05-31")
+    with relationships_csv.open("r", encoding="utf-8", newline="") as f:
+        snippet = list(csv.DictReader(f))[-1]["context_snippet"]
+    assert snippet.startswith("'=")  # still neutralized
+    assert len(snippet) <= 200       # cap preserved after escaping

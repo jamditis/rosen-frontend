@@ -16,11 +16,16 @@ from playwright.sync_api import sync_playwright
 from playwright_stealth import Stealth
 import os
 from html import escape
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 from google import genai
 from google.genai.types import GenerateContentConfig
 from rosen_scraper.rate_limiter import rate_limited_gemini_call
-from rosen_scraper.url_safety import is_safe_public_url
+from rosen_scraper.url_safety import (
+    chromium_host_resolver_rules,
+    is_safe_public_url,
+    pinned_resolution,
+    resolve_and_validate,
+)
 
 
 # A list of common user agents to rotate through for both requests and Playwright.
@@ -220,10 +225,15 @@ def _requests_get_safe(url: str, headers: Dict[str, str], timeout: int) -> reque
     """
     current = url
     for _ in range(_MAX_REDIRECTS + 1):
-        ok, reason = is_safe_public_url(current)
+        ok, reason, ips = resolve_and_validate(current)
         if not ok:
             raise requests.RequestException(f"unsafe redirect target ({reason}): {current}")
-        response = _get_with_retry(current, headers, timeout)
+        # Pin the connection to a validated IP so a low-TTL DNS record cannot
+        # rebind this host to a private address between the check above and
+        # requests' own resolution (DNS-rebinding TOCTOU).
+        host = urlparse(current).hostname
+        with pinned_resolution(host, ips):
+            response = _get_with_retry(current, headers, timeout)
         if response.is_redirect or response.is_permanent_redirect:
             location = response.headers.get('Location')
             if not location:
@@ -416,9 +426,20 @@ def fetch_article_content(url: str) -> Optional[str]:
     # This is slower but can handle pages that rely heavily on JavaScript.
     print(f"Attempting full browser scrape with Playwright for: {url}")
     try:
+        # Re-validate immediately before launch and pin Chromium's resolver to a
+        # validated IP. Chromium resolves DNS in its own process, so the
+        # in-process pin used by the requests path cannot reach it; the
+        # --host-resolver-rules launch arg closes the same DNS-rebinding TOCTOU
+        # for the main navigation. Subresource/redirect hosts stay covered by
+        # the per-request route guard below.
+        ok, reason, ips = resolve_and_validate(url)
+        if not ok:
+            print(f"Refusing to fetch unsafe URL ({reason}): {url}")
+            return None
+        launch_args = chromium_host_resolver_rules(urlparse(url).hostname, ips)
         with sync_playwright() as p:
             # Launch a headless Chromium browser instance.
-            browser = p.chromium.launch(headless=True)
+            browser = p.chromium.launch(headless=True, args=launch_args)
             # Create a new browser context with a random user agent.
             context = browser.new_context(
                 user_agent=random.choice(USER_AGENTS),

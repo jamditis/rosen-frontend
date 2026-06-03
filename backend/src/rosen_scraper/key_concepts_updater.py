@@ -42,6 +42,7 @@ Progress Tracking:
 """
 
 import os
+import sys
 import json
 import time
 import argparse
@@ -49,17 +50,14 @@ from typing import Dict, List, Optional
 from datetime import datetime
 from dotenv import load_dotenv
 import gspread
-from google.oauth2.service_account import Credentials
 import google.generativeai as genai
+
+from rosen_scraper.sheets_client import get_gspread_client
 
 # Load environment variables
 load_dotenv()
 
 # Configuration
-SCOPES = [
-    'https://www.googleapis.com/auth/spreadsheets',
-    'https://www.googleapis.com/auth/drive'
-]
 CREDENTIALS_FILE = "google_credentials.json"
 SPREADSHEET_NAME = os.getenv("SPREADSHEET_NAME", "📎Rosen Archive URL List")
 SHEET_NAME = "test_runs"
@@ -107,14 +105,14 @@ def load_schema() -> Dict:
 
 
 def setup_google_sheets() -> gspread.Spreadsheet:
-    """Initialize Google Sheets connection"""
-    creds = Credentials.from_service_account_file(
-        CREDENTIALS_FILE,
-        scopes=SCOPES
-    )
-    client = gspread.authorize(creds)
-    spreadsheet = client.open(SPREADSHEET_NAME)
-    return spreadsheet
+    """Initialize Google Sheets connection (env-or-file credentials).
+
+    Credentials resolve via rosen_scraper.sheets_client: the CI secret
+    ROSEN_SHEETS_SA_KEY_JSON first, then ROSEN_SHEETS_SA_KEY, then the local
+    google_credentials.json fallback this script has always used.
+    """
+    client = get_gspread_client(CREDENTIALS_FILE)
+    return client.open(SPREADSHEET_NAME)
 
 
 def setup_gemini() -> genai.GenerativeModel:
@@ -281,7 +279,8 @@ Return format (JSON object):
 
 def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
                  schema: Dict, start_row: Optional[int] = None, limit: Optional[int] = None,
-                 resume: bool = True, force_reprocess: bool = False):
+                 resume: bool = True, force_reprocess: bool = False,
+                 dry_run: bool = False) -> Dict:
     """
     Process rows from test_runs sheet and update key concepts.
 
@@ -293,8 +292,39 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
         limit: Optional limit on number of rows to process (defaults to BATCH_SIZE)
         resume: If True, resume from saved progress
         force_reprocess: If True, reprocess even rows with existing data
+        dry_run: If True, log the cells that would be written but write nothing
+                 and do not advance the saved progress cursor
+
+    Returns:
+        Summary dict: ``{processed, writes, gemini_calls, dry_run, by_field}``.
+        Callers use ``gemini_calls`` + ``writes`` to enforce the "AI ran but
+        wrote nothing" guard.
     """
     worksheet = spreadsheet.worksheet(SHEET_NAME)
+
+    # Per-field write counter. Counts the cells we wrote -- or, under --dry-run,
+    # would have written -- so the run summary can prove work happened. A live
+    # run that calls Gemini but writes zero cells is the "$0.53 wasted, AI ran
+    # but nothing was saved" failure the data-pipeline rules guard against.
+    writes_by_field = {'key_concepts': 0, 'recommendations': 0, 'notes': 0}
+    gemini_calls = 0
+
+    def _write(range_name: str, value, field: str):
+        """Write one cell, or log it under dry-run.
+
+        Counts only writes that actually land: under dry-run the would-write is
+        counted (the guard ignores dry runs), and live the counter is bumped
+        ONLY after worksheet.update() returns. A failed Sheets write therefore
+        leaves the counter at zero, so the zero-write guard can't be fooled into
+        reporting success when Gemini ran but nothing was saved.
+        """
+        if dry_run:
+            print(f"  [DRY-RUN] would write {field} -> {range_name}: "
+                  f"{str(value)[:60]}")
+            writes_by_field[field] += 1
+            return
+        worksheet.update(values=[[value]], range_name=range_name)
+        writes_by_field[field] += 1
 
     # Load progress
     progress = load_progress()
@@ -315,7 +345,8 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
 
     if len(all_rows) < 2:
         print("No data rows found in sheet")
-        return
+        return {'processed': 0, 'writes': 0, 'gemini_calls': 0,
+                'dry_run': dry_run, 'by_field': writes_by_field}
 
     # Get key concepts from schema
     key_concepts_list = schema['taxonomy']['key_concepts']
@@ -354,7 +385,7 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
             if not raw_text or len(raw_text.strip()) < 100:
                 print(f"Row {row_number}: [NOTE] No raw text or too short - adding note to colAJ")
                 note = "Skipped: No raw text or content too short (< 100 chars)"
-                worksheet.update(values=[[note]], range_name=f"AJ{row_number}")
+                _write(f"AJ{row_number}", note, 'notes')
                 skipped += 1
                 processed_count += 1
                 time.sleep(DELAY_BETWEEN_UPDATES)
@@ -366,6 +397,7 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
                 print(f"  Raw text length: {len(raw_text)} chars")
 
                 # Analyze and provide recommendations
+                gemini_calls += 1
                 analysis = analyze_key_concepts(model, raw_text, key_concepts_list, current_concepts)
 
                 recommendations = analysis.get('recommendations', '')
@@ -373,12 +405,12 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
                 if recommendations and recommendations != "N/A":
                     print(f"  [RECOMMENDATION] {recommendations}")
                     # Update colAK with recommendations
-                    worksheet.update(values=[[recommendations]], range_name=f"AK{row_number}")
+                    _write(f"AK{row_number}", recommendations, 'recommendations')
                     updates_made += 1
                 else:
                     print("  [OK] N/A - Current assignment looks good")
                     # Update colAK with N/A
-                    worksheet.update(values=[["N/A"]], range_name=f"AK{row_number}")
+                    _write(f"AK{row_number}", "N/A", 'recommendations')
                     updates_made += 1
 
                 skipped += 1
@@ -391,6 +423,7 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
             print(f"  Raw text length: {len(raw_text)} chars")
 
             # Analyze with Gemini
+            gemini_calls += 1
             analysis = analyze_key_concepts(model, raw_text, key_concepts_list, current_concepts)
             identified_concepts = analysis.get('concepts', [])
             recommendations = analysis.get('recommendations', '')
@@ -402,13 +435,13 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
 
             # Update the cell in colQ
             cell_address = f"Q{row_number}"
-            worksheet.update(values=[[new_concepts_str]], range_name=cell_address)
+            _write(cell_address, new_concepts_str, 'key_concepts')
             print(f"  [OK] Updated: {cell_address}")
             updates_made += 1
 
             # If there are recommendations, add to colAK
             if recommendations:
-                worksheet.update(values=[[recommendations]], range_name=f"AK{row_number}")
+                _write(f"AK{row_number}", recommendations, 'recommendations')
                 print("  [NOTE] Added recommendations to colAK")
 
             processed_count += 1
@@ -422,20 +455,27 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
             processed_count += 1
             continue
 
-    # Update progress
-    progress["last_processed_row"] = start_row + processed_count - 1
-    progress["total_processed"] = progress.get("total_processed", 0) + processed_count
-    progress["total_updated"] = progress.get("total_updated", 0) + updates_made
-    save_progress(progress)
+    total_writes = sum(writes_by_field.values())
+
+    # Update progress -- but never advance the cursor on a dry run, or the next
+    # real run would skip the rows this rehearsal only pretended to process.
+    if not dry_run:
+        progress["last_processed_row"] = start_row + processed_count - 1
+        progress["total_processed"] = progress.get("total_processed", 0) + processed_count
+        progress["total_updated"] = progress.get("total_updated", 0) + updates_made
+        save_progress(progress)
 
     # Summary
     print("\n" + "=" * 80)
-    print("[*] BATCH COMPLETE")
+    print("[*] BATCH COMPLETE" + (" (DRY RUN -- nothing written)" if dry_run else ""))
     print("=" * 80)
     print(f"Rows in this batch: {processed_count}")
     print(f"[OK] Key concepts filled/updated: {updates_made}")
     print(f"[SKIP] Reviewed (had existing concepts): {skipped}")
     print(f"[ERROR] Errors: {errors}")
+    print(f"Gemini calls: {gemini_calls}")
+    print(f"Cells {'that would be ' if dry_run else ''}written: {total_writes} "
+          f"({writes_by_field})")
     print("\n[*] Overall Progress:")
     print(f"Total rows processed across all runs: {progress['total_processed']}")
     print(f"Total updates made across all runs: {progress['total_updated']}")
@@ -444,6 +484,14 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
     print("  - Rows with no raw text: Notes added to column AJ")
     print("  - Rows with existing concepts: Recommendations added to column AK")
     print("  - Rows with empty concepts: Filled column Q, recommendations in AK")
+
+    return {
+        'processed': processed_count,
+        'writes': total_writes,
+        'gemini_calls': gemini_calls,
+        'dry_run': dry_run,
+        'by_field': writes_by_field,
+    }
 
 
 def main():
@@ -478,6 +526,11 @@ def main():
         action='store_true',
         help='Reset progress file and start from beginning'
     )
+    parser.add_argument(
+        '--dry-run',
+        action='store_true',
+        help='Rehearse only: log the cells that would be written, write nothing'
+    )
 
     args = parser.parse_args()
 
@@ -503,20 +556,30 @@ def main():
 
     # Process rows
     resume = not args.no_resume
-    process_rows(
+    summary = process_rows(
         spreadsheet,
         model,
         schema,
         start_row=args.start,
         limit=args.limit,
         resume=resume,
-        force_reprocess=args.force_reprocess
+        force_reprocess=args.force_reprocess,
+        dry_run=args.dry_run,
     )
 
     print("\n[*] Script complete!")
     print("[*] To continue processing, run: poetry run python -m rosen_scraper.key_concepts_updater")
     print("[*] To start over, run: poetry run python -m rosen_scraper.key_concepts_updater --reset-progress")
 
+    # The "$0.53 wasted" guard: a live run that spent Gemini calls but wrote
+    # zero cells means the AI ran and nothing was saved. Fail loudly so the
+    # Action shows red instead of a green run that quietly changed nothing.
+    if not summary['dry_run'] and summary['gemini_calls'] > 0 and summary['writes'] == 0:
+        print(f"\n[FATAL] Made {summary['gemini_calls']} Gemini call(s) but wrote 0 cells "
+              "-- refusing to report success.")
+        return 1
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
