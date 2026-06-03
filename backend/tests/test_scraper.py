@@ -15,10 +15,22 @@ class TestScraperModule:
         """Test basic article extraction from HTML."""
         url = "https://example.com/test"
         result = scraper.extract_article_data(sample_article_html, url)
-        
+
         assert result is not None
         # Result should be JSON string
         assert isinstance(result, str)
+
+    def test_extract_article_data_includes_metadata(self, sample_article_html):
+        """trafilatura JSON must carry title/date/author metadata, not just the
+        body text. Without with_metadata=True these come back null and scraped
+        records land with an empty title and publication_date."""
+        import json
+        result = scraper.extract_article_data(sample_article_html,
+                                              "https://example.com/test")
+        data = json.loads(result)
+        assert data.get('title') == 'Test Article Title'
+        assert data.get('date') == '2024-01-15'
+        assert data.get('author') == 'John Doe'
 
     @patch('rosen_scraper.scraper.fetch_with_url_context')
     def test_fetch_article_content_enhanced_url_context_success(

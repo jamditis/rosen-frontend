@@ -194,6 +194,24 @@ def _next_record_id(existing_ids: Set[str], prefix: str = 'RECORD') -> str:
     return f"{prefix}-{highest + 1:05d}"
 
 
+def _clean_title(title: str, publication: str) -> str:
+    """Strip a trailing ' - <publication>' site suffix from a scraped title.
+
+    trafilatura builds the title from the page ``<title>`` tag, which usually
+    carries the site name (e.g. 'Headline - PressThink'). Drop it when the tail
+    matches the resolved publication so records get a clean headline.
+    """
+    title = (title or '').strip()
+    pub = (publication or '').strip()
+    if not title or not pub:
+        return title
+    for sep in (' - ', ' | ', ' – ', ' — '):
+        suffix = f"{sep}{pub}"
+        if title.endswith(suffix):
+            return title[:-len(suffix)].strip()
+    return title
+
+
 def _atomic_append_row(csv_path: pathlib.Path, row: Dict[str, Any],
                        headers: list) -> None:
     """Append one row to ``csv_path`` via tmp+rename.
@@ -492,6 +510,13 @@ def process_one(url: str, title: str = '', notes: str = '',
         scrape.get('original_publication'), url, known_entities)
     if resolved_pub:
         scrape['original_publication'] = resolved_pub
+
+    # Drop a trailing ' - <publication>' suffix trafilatura pulls from the page
+    # <title> (e.g. 'Headline - PressThink'). A submitter-supplied title (step
+    # 6, below) is applied after this and is left untouched.
+    if scrape.get('title'):
+        scrape['title'] = _clean_title(scrape['title'],
+                                       scrape.get('original_publication'))
 
     # --- Step 5: assign ID. -----------------------------------------------
     # New records continue the canonical RECORD-NNNNN sequence; the resolved

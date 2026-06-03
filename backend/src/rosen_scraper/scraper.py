@@ -506,11 +506,15 @@ def extract_article_data(html_content: str, url: str) -> Optional[str]:
     try:
         # Use trafilatura to intelligently parse the HTML and extract the core article.
         # It's configured to exclude comments and tables and to output structured JSON.
+        # with_metadata=True is required: without it trafilatura's JSON contains
+        # only {text, comments} and drops title/date/author, so scraped records
+        # land with an empty title and publication_date.
         return trafilatura.extract(
             html_content,
             include_comments=False,
             include_tables=False,
             output_format='json',
+            with_metadata=True,
             url=url
         )
     except Exception as e:

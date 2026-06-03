@@ -1004,6 +1004,42 @@ class TestRealWorldScrapeShape:
         assert rows[0]['original_publication'] == 'PressThink'
         assert rows[0]['publisher'] == 'PressThink'
 
+    def test_title_site_suffix_stripped(self, monkeypatch, csv_with_headers):
+        """trafilatura builds the title from the page <title>, which carries the
+        site name (e.g. 'Headline - PressThink'). The resolved-publication
+        suffix must be stripped so the record gets a clean headline. Also
+        confirms the date rename + resolve all run together."""
+        _stub_schema(monkeypatch)
+        monkeypatch.setattr(
+            process_submission, '_load_known_entities',
+            lambda: {'publications': [
+                {'correct_name': 'PressThink', 'aliases': ['pressthink']}]})
+        scrape = {
+            'title': 'Subscribers buy a product. Members join the cause. '
+                     '- PressThink',
+            'author': 'Jay Rosen',
+            'date': '2026-04-22',
+            'original_publication': 'PressThink',
+            'thematic_categories': ['Press & Media Criticism'],
+            'era': 'Platform Transition & Future Models (2021-Present)',
+            'raw_text': 'Body text.',
+        }
+        monkeypatch.setattr(process_submission, 'dispatch_url',
+                            MagicMock(return_value=scrape))
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        result = _run(monkeypatch, csv_with_headers,
+                      url='https://pressthink.org/2026/04/subscribers/')
+
+        assert result['status'] == 'live'
+        with csv_with_headers.open() as f:
+            rows = list(csv.DictReader(f))
+        assert rows[0]['title'] == ('Subscribers buy a product. '
+                                    'Members join the cause.')
+        assert rows[0]['publication_date'] == '2026-04-22'
+
     def test_record_id_continues_sequence(self, monkeypatch, tmp_path):
         """New records continue the canonical RECORD-NNNNN sequence: seed a CSV
         whose max id is RECORD-00901 and the next submission must be
