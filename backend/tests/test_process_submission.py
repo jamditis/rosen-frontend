@@ -1290,9 +1290,14 @@ class TestReviewGate:
 
         with csv_with_headers.open() as f:
             row = next(csv.DictReader(f))
-        assert row['verified'].lower() in ('true', '1', 'yes'), (
-            f"auto-submission must be verified so it survives the public "
-            f"exporter filter; got {row['verified']!r}")
+        # Exact-string contract: data/export-archive-data.js (isVerified) counts
+        # only 'TRUE'/'true'/'Yes' (or a real boolean) as verified. A Python bool
+        # True serializes through csv.DictWriter as 'True', which the exporter
+        # drops -- so assert the exact accepted set, not a lowercased/truthy match
+        # that would mask the case bug.
+        assert row['verified'] in ('TRUE', 'true', 'Yes'), (
+            f"auto-submission must be verified with an exporter-accepted string "
+            f"so it survives the public filter; got {row['verified']!r}")
 
     def test_auto_submission_flagged_needs_review(self, monkeypatch,
                                                   csv_with_headers):
@@ -1340,7 +1345,8 @@ class TestReviewGate:
         with csv_with_headers.open() as f:
             row = next(csv.DictReader(f))
         assert row['needs_review'].lower() == 'true'
-        assert row['verified'].lower() in ('true', '1', 'yes')
+        # Exact exporter contract (see test_auto_submission_is_verified_true).
+        assert row['verified'] in ('TRUE', 'true', 'Yes')
 
     def test_processor_assigned_id_preserved(self, monkeypatch,
                                              csv_with_headers):
@@ -1376,9 +1382,13 @@ class TestReviewGate:
 
     def test_processor_unverified_state_respected(self, monkeypatch,
                                                   csv_with_headers):
-        """A processor that deliberately marks a record unverified (the clipping
-        processor uses verified='false' for low-confidence OCR'd PDFs) must not
-        be force-published — its verification gate stays intact."""
+        """A processor's explicit verified value is preserved, not overwritten:
+        the clipping processor stamps verified='false' on OCR'd PDFs as an "OCR
+        needs a human check" signal. The submission path keeps that value (and
+        still flags needs_review). Note this does not hide the clipping -- the
+        exporter surfaces CLIP- ids via a dedicated allowance, so it goes
+        live-but-flagged; unifying that allowance with the verified/needs_review
+        model is tracked in issue #352."""
         _stub_schema(monkeypatch)
         _stub_dispatcher_ok(monkeypatch, id='CLIP-00043', verified='false')
         _stub_sheets(monkeypatch)
@@ -1394,3 +1404,33 @@ class TestReviewGate:
             f"survive the submission path; got {row['verified']!r}")
         # Still flagged for review like every auto-submission.
         assert row['needs_review'].lower() == 'true'
+
+    def test_titleless_submission_gets_visible_provisional_title(
+            self, monkeypatch, csv_with_headers):
+        """A manual paste with no title whose AI categorization returns no title
+        would commit a titleless record; the public exporter drops records with
+        an empty/'Untitled'/<5-char title, so the workflow would write back
+        'live' while nothing appears. The pipeline must synthesize a visible
+        provisional title (flagged for review)."""
+        _stub_schema(monkeypatch)
+        monkeypatch.setattr(process_submission, 'dispatch_url', MagicMock())
+        # Categorizer degrades and returns no usable metadata (no title).
+        monkeypatch.setattr(process_submission, 'categorize',
+                            MagicMock(return_value={}))
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        monkeypatch.setattr(process_submission, 'CSV_FILE', csv_with_headers)
+        result = process_submission.process_one(
+            url='https://medium.com/@jayrosen/untitled-paste',
+            raw_text='The first line becomes the provisional title.\n'
+                     'More body text follows after it.')
+        assert result['status'] == 'live'
+
+        with csv_with_headers.open() as f:
+            row = next(csv.DictReader(f))
+        title = row['title'].strip()
+        assert title and title.lower() != 'untitled' and len(title) >= 5, (
+            f"a titleless submission must get a visible provisional title so it "
+            f"survives the exporter's title filter; got {title!r}")

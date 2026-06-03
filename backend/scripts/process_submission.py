@@ -576,12 +576,38 @@ def process_one(url: str, title: str = '', notes: str = '',
     # broken rows), so `scrape.get('verified', True)` would always read back that
     # False and the public exporter — which drops verified=False rows — would
     # silently hide every submission. Article scrapes leave verified unset, so
-    # they publish. A processor that deliberately marks a record unverified
-    # (clipping_processor sets 'false' for low-confidence OCR'd PDFs) is
-    # respected — its verification gate stays intact.
+    # they publish. A processor's explicit verified value is preserved: the
+    # clipping processor stamps 'false' on every OCR'd PDF as an "OCR needs a
+    # human check" signal, not a hide flag. That clipping still goes
+    # live-but-flagged — the exporter surfaces CLIP- ids via a dedicated
+    # allowance, and needs_review below marks it for the OCR review pass. (For a
+    # non-CLIP record an explicit 'false' does gate it, since the exporter drops
+    # verified=false rows without that allowance.) Unifying the CLIP- allowance
+    # with this verified/needs_review model is tracked in issue #352.
     if processor_verified is None:
-        scrape['verified'] = True
+        # Write the string 'TRUE', not a Python bool. csv.DictWriter serializes
+        # True as the string 'True', but data/export-archive-data.js treats only
+        # the exact strings 'TRUE'/'true'/'Yes' (or a real boolean) as verified —
+        # 'True' round-trips through the CSV and is then dropped, silently hiding
+        # the record. 'TRUE' matches the existing column convention.
+        scrape['verified'] = 'TRUE'
     scrape['needs_review'] = 'true'
+
+    # Guarantee an exporter-visible title. The public exporter drops any record
+    # whose title is empty, 'Untitled', or under 5 chars, so a manual paste with
+    # no title and a failed/degraded AI categorization would commit, deploy and
+    # write back 'live' yet never appear. Synthesize a provisional title from the
+    # best available signal; needs_review is already set, so the human review
+    # pass fixes it.
+    _title = (scrape.get('title') or '').strip()
+    if not _title or _title.lower() == 'untitled' or len(_title) < 5:
+        _text = (scrape.get('raw_text') or scrape.get('text') or '').strip()
+        _first_line = next(
+            (ln.strip() for ln in _text.splitlines() if ln.strip()), '')
+        _provisional = _first_line[:80].strip() or url
+        logger.warning('No usable title; using provisional title pending '
+                       f'review: {_provisional!r}')
+        scrape['title'] = _provisional
 
     # Sanitize string fields explicitly via _sanitize_record (called inside
     # _atomic_append_row), but also pre-sanitize the user-controlled overrides
