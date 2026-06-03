@@ -149,7 +149,8 @@ function processRecord(row, index, type, relationshipsMap) {
     verified: isVerified,
     // Auto-submitted records publish immediately but are flagged for a human
     // pass (the 'live but flagged' model in backend/scripts/process_submission.py).
-    // The frontend uses this to show a subtle "needs review" marker.
+    // Persisted here so review/curator tooling can find flagged records; the UI
+    // marker that surfaces this to readers is tracked in issue #350.
     needsReview: (row.needs_review || row.Needs_Review || '').toString()
       .trim().toLowerCase() === 'true',
     type: type,
