@@ -519,9 +519,15 @@ def process_one(url: str, title: str = '', notes: str = '',
                                        scrape.get('original_publication'))
 
     # --- Step 5: assign ID. -----------------------------------------------
-    # New records continue the canonical RECORD-NNNNN sequence; the resolved
-    # publication feeds the publisher field (above), not the ID.
-    record_id = _next_record_id(existing_ids)
+    # Preserve a processor-assigned source id when one is present: the clipping
+    # processor emits CLIP-/NYT-/WSJ- ids that downstream tooling keys off
+    # (backend/update_clippings.py only touches CLIP- rows), and the social and
+    # video processors set their own. Only mint a new RECORD-NNNNN id when the
+    # processor left it unset — the article path, which is the common submission
+    # and the case Joe's "continue the RECORD- sequence" decision targeted. The
+    # resolved publication feeds the publisher field (above), not the ID.
+    processor_id = (scrape.get('id') or '').strip()
+    record_id = processor_id or _next_record_id(existing_ids)
     scrape['id'] = record_id
     scrape['url'] = url
 
@@ -530,6 +536,11 @@ def process_one(url: str, title: str = '', notes: str = '',
         scrape['title'] = title
     if notes:
         scrape['notes'] = notes
+    # Capture any verified value a processor set BEFORE enrich_data runs its
+    # `data.setdefault('verified', False)` — after that call the key always
+    # exists, so this is the only point where "processor set it" and "processor
+    # left it unset" are still distinguishable.
+    processor_verified = scrape.get('verified')
     try:
         scrape = enrich_data(scrape, url, known_entities)
     except Exception as exc:  # noqa: BLE001 — enrichment is non-critical
@@ -540,13 +551,16 @@ def process_one(url: str, title: str = '', notes: str = '',
     # the submitter sees the record appear, then carry needs_review=true so a
     # human can vet the AI-generated metadata before it's treated as final.
     #
-    # verified must be forced True here, not defaulted: enrich_data() above runs
+    # Force verified True only when no processor set it: enrich_data() above runs
     # `data.setdefault('verified', False)` (a conservative default for legacy or
     # broken rows), so `scrape.get('verified', True)` would always read back that
     # False and the public exporter — which drops verified=False rows — would
-    # silently hide every submission. These records have been scraped, date-
-    # normalized, and publication-resolved above, so they are publishable.
-    scrape['verified'] = True
+    # silently hide every submission. Article scrapes leave verified unset, so
+    # they publish. A processor that deliberately marks a record unverified
+    # (clipping_processor sets 'false' for low-confidence OCR'd PDFs) is
+    # respected — its verification gate stays intact.
+    if processor_verified is None:
+        scrape['verified'] = True
     scrape['needs_review'] = 'true'
 
     # Sanitize string fields explicitly via _sanitize_record (called inside

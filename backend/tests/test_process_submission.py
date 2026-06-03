@@ -1275,3 +1275,56 @@ class TestReviewGate:
             row = next(csv.DictReader(f))
         assert row['needs_review'].lower() == 'true'
         assert row['verified'].lower() in ('true', '1', 'yes')
+
+    def test_processor_assigned_id_preserved(self, monkeypatch,
+                                             csv_with_headers):
+        """A processor that emits a source id (clipping -> CLIP-/NYT-/WSJ-)
+        keeps it instead of being overwritten with RECORD-NNNNN; downstream
+        tooling like backend/update_clippings.py keys off those prefixes."""
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch, id='CLIP-00042')
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        result = _run(monkeypatch, csv_with_headers,
+                      url='https://example.com/clip.pdf')
+        assert result['record_id'] == 'CLIP-00042'
+        with csv_with_headers.open() as f:
+            row = next(csv.DictReader(f))
+        assert row['id'] == 'CLIP-00042'
+
+    def test_article_without_processor_id_gets_record_sequence(
+            self, monkeypatch, csv_with_headers):
+        """The article path (no processor id) still continues the RECORD-
+        sequence — the case Joe's ID-convention decision targeted."""
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch)  # no id override
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        result = _run(monkeypatch, csv_with_headers,
+                      url='https://example.com/article')
+        assert result['record_id'].startswith('RECORD-')
+
+    def test_processor_unverified_state_respected(self, monkeypatch,
+                                                  csv_with_headers):
+        """A processor that deliberately marks a record unverified (the clipping
+        processor uses verified='false' for low-confidence OCR'd PDFs) must not
+        be force-published — its verification gate stays intact."""
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch, id='CLIP-00043', verified='false')
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        _run(monkeypatch, csv_with_headers,
+             url='https://example.com/clip2.pdf')
+        with csv_with_headers.open() as f:
+            row = next(csv.DictReader(f))
+        assert row['verified'].lower() == 'false', (
+            "an explicit processor verified='false' (low-confidence OCR) must "
+            f"survive the submission path; got {row['verified']!r}")
+        # Still flagged for review like every auto-submission.
+        assert row['needs_review'].lower() == 'true'
