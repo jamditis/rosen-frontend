@@ -98,6 +98,18 @@ extract_entities_and_relationships = _extract_entities
 # archive CSV when the script runs in CI.
 CSV_FILE = _DEFAULT_CSV_FILE
 
+# Shown to the submitter (via the sheet error column) when the scraper can't
+# fetch or parse a URL. Some hosts (Medium, paywalled or login-walled pages,
+# heavily JS-rendered sites) block automated scraping. The submitter can paste
+# the article body to bypass the fetch — the AI still tags the pasted text.
+SCRAPE_FAILED_PASTE_HINT = (
+    "Couldn't fetch or parse this URL automatically ({reason}). Some sites "
+    "(Medium, paywalled, or login-walled pages) block automated scraping. To "
+    "submit it anyway, paste the article's full text into the 'raw text' "
+    "column and re-submit — the pipeline will read and tag the pasted text "
+    "for you."
+)
+
 SENTINEL_URL_PREFIX = 'https://example.com/sweep-noop-'
 
 logging.basicConfig(
@@ -321,11 +333,17 @@ def _is_sentinel(url: str) -> bool:
 def process_one(url: str, title: str = '', notes: str = '',
                 sheet_id: str = '', sheet_tab: str = '',
                 sheet_row: Optional[int] = None,
-                prototype_mode: bool = False) -> Dict[str, Any]:
+                prototype_mode: bool = False,
+                raw_text: str = '') -> Dict[str, Any]:
     """Run the 12-step pipeline for one submission. Returns a result dict.
 
     Keys: ``status`` (live/archived/duplicate/error/noop), ``record_id``,
     ``error``, ``exit_code``.
+
+    ``raw_text``: manual fallback. When provided, the network scrape is
+    skipped and the AI categorizer tags the pasted article body directly. Use
+    it for hosts the scraper can't fetch (Medium, paywalled or login-walled
+    pages). The submitter only pastes text; the pipeline still tags it.
     """
     result: Dict[str, Any] = {'status': 'error', 'record_id': '',
                               'error': '', 'exit_code': 1}
@@ -333,6 +351,7 @@ def process_one(url: str, title: str = '', notes: str = '',
     url = (url or '').strip()
     title = title or ''
     notes = notes or ''
+    raw_text = raw_text or ''
 
     # --- Sentinel handling: no-op submission that only runs the SFTP step. -
     if _is_sentinel(url):
@@ -381,34 +400,54 @@ def process_one(url: str, title: str = '', notes: str = '',
         return {'status': 'duplicate', 'record_id': existing_id,
                 'error': 'URL already in archive', 'exit_code': 0}
 
-    # --- Step 3: scrape. --------------------------------------------------
+    # --- Step 3: scrape (or use manually-pasted text). --------------------
     schema = _load_schema()
     known_entities = _load_known_entities()
-    try:
-        scrape = dispatch_url(url, schema)
-    except Exception as exc:  # noqa: BLE001
-        logger.error(f'Dispatcher raised: {exc}')
-        scrape = None
-    # The existing platform dispatchers (Bluesky, Twitter, article scraper,
-    # etc.) sometimes report failures via a truthy dict like
-    # ``{'status': 'failed', 'error': '...'}`` instead of returning None.
-    # Treat any non-success status as a scrape failure so we don't commit
-    # a broken record and deploy it.
-    scrape_failed = (
-        not scrape
-        or (isinstance(scrape, dict)
-            and str(scrape.get('status', '')).lower() in {'failed', 'error'})
-    )
-    if scrape_failed:
-        reason = ''
-        if isinstance(scrape, dict):
-            reason = str(scrape.get('error') or '').strip()
-        msg = (f'Scrape failed: {reason}'
-               if reason
-               else 'Scrape returned no content (URL may be unreachable)')
-        _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
-                        status='error', error=msg)
-        return {'status': 'error', 'record_id': '', 'error': msg, 'exit_code': 1}
+
+    manual_text = raw_text.strip()
+    if manual_text:
+        # Manual fallback: the submitter pasted the article body because the
+        # scraper can't reach this host (e.g. Medium, paywalled, JS-rendered).
+        # Skip the network fetch and let the AI categorizer (step 4) tag the
+        # pasted text, so the submitter only provides text — not the tedious
+        # metadata. This is viable here because submissions are one at a time,
+        # unlike the bulk-processing pipeline.
+        logger.info(f'Manual raw-text submission ({len(manual_text)} chars); '
+                    'skipping scrape and tagging the pasted text.')
+        scrape = {'raw_text': manual_text, 'text': manual_text}
+        if title:
+            scrape['title'] = title
+    else:
+        try:
+            scrape = dispatch_url(url, schema)
+        except Exception as exc:  # noqa: BLE001
+            logger.error(f'Dispatcher raised: {exc}')
+            scrape = None
+        # The existing platform dispatchers (Bluesky, Twitter, article scraper,
+        # etc.) sometimes report failures via a truthy dict like
+        # ``{'status': 'failed', 'error': '...'}`` instead of returning None.
+        # Treat any non-success status as a scrape failure so we don't commit
+        # a broken record and deploy it.
+        scrape_failed = (
+            not scrape
+            or (isinstance(scrape, dict)
+                and str(scrape.get('status', '')).lower() in {'failed', 'error'})
+        )
+        if scrape_failed:
+            reason = ''
+            if isinstance(scrape, dict):
+                reason = str(scrape.get('error') or '').strip()
+            # Actionable: tell the submitter exactly how to recover — paste the
+            # text. The scrape failure is logged above; this is the human-facing
+            # message that lands in the sheet's error column.
+            msg = SCRAPE_FAILED_PASTE_HINT.format(
+                reason=reason or 'page unreachable or unparseable')
+            logger.warning(f'Scrape failed for {url}: '
+                           f'{reason or "no content"}')
+            _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
+                            status='error', error=msg)
+            return {'status': 'error', 'record_id': '', 'error': msg,
+                    'exit_code': 1}
 
     # --- Step 4: categorize. ----------------------------------------------
     # If the scrape result already carries categorization fields (the existing
@@ -650,6 +689,10 @@ def _parse_args(argv):
                    action='store_true', default=False,
                    help='Skip SFTP push to PressThink (GH Pages auto-deploy '
                         'handles the prototype surface).')
+    p.add_argument('--raw-text', dest='raw_text', default='',
+                   help='Manual fallback: paste the article body to skip the '
+                        'network scrape (for hosts the scraper cannot fetch, '
+                        'e.g. Medium or paywalled pages). The AI still tags it.')
     return p.parse_args(argv)
 
 
@@ -660,6 +703,7 @@ def main(argv=None) -> int:
         sheet_id=args.sheet_id, sheet_tab=args.sheet_tab,
         sheet_row=args.sheet_row,
         prototype_mode=args.prototype_mode,
+        raw_text=args.raw_text,
     )
     logger.info(f'Result: status={result["status"]} '
                 f'record_id={result["record_id"]} error={result["error"]}')

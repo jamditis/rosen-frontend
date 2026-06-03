@@ -1033,3 +1033,131 @@ class TestRealWorldScrapeShape:
                       url='https://pressthink.org/2026/04/new-one/')
 
         assert result['record_id'] == 'RECORD-00902', result['record_id']
+
+
+# ---------- Manual raw-text fallback ----------------------------------------
+#
+# Some hosts (Medium, paywalled / login-walled pages, heavy JS) can't be
+# scraped. The submitter pastes the article body instead; the pipeline skips
+# the network fetch and lets the AI categorizer tag the pasted text, so the
+# submitter only provides text — not the tedious metadata. When a scrape DOES
+# fail and no text was pasted, the error must tell the submitter how to recover.
+
+
+class TestManualRawTextFallback:
+
+    def test_manual_raw_text_skips_scrape_and_tags(self, monkeypatch,
+                                                   csv_with_headers):
+        _stub_schema(monkeypatch)
+        # The scraper must NOT be called when text is pasted.
+        dispatch_mock = MagicMock()
+        monkeypatch.setattr(process_submission, 'dispatch_url', dispatch_mock)
+        # The AI tags the pasted body (this is what spares the submitter the
+        # tedious metadata entry).
+        monkeypatch.setattr(process_submission, 'categorize', MagicMock(
+            return_value={
+                'title': 'Subscribers and members (on Medium)',
+                'publication_date': '2026-03-01',
+                'original_publication': 'Medium',
+                'summary': 'A summary',
+                'excerpt': 'An excerpt',
+                'thematic_categories': ['Press & Media Criticism'],
+                'key_concepts': ['membership'],
+                'era': 'Platform Transition & Future Models (2021-Present)',
+                'scope': 'Commentary/Critique',
+                'tags': ['media'],
+            }))
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        monkeypatch.setattr(process_submission, 'CSV_FILE', csv_with_headers)
+        # Short body keeps the step-8.5 entity extractor (gated at >=500 chars)
+        # out of this routing test.
+        body = 'Pasted article body about subscribers and members.'
+        result = process_submission.process_one(
+            url='https://medium.com/@jayrosen/some-piece',
+            raw_text=body, sheet_id='SHEET', sheet_tab='Queue', sheet_row=3)
+
+        assert result['status'] == 'live'
+        dispatch_mock.assert_not_called()  # no network scrape attempted
+        with csv_with_headers.open() as f:
+            rows = list(csv.DictReader(f))
+        assert len(rows) == 1
+        row = rows[0]
+        # The pasted text was stored and the AI tags landed.
+        assert row['raw_text'].startswith('Pasted article body')
+        assert row['title'] == 'Subscribers and members (on Medium)'
+        assert row['publication_date'] == '2026-03-01'
+        assert row['id'].startswith('RECORD-')
+
+    def test_pasted_title_override_wins_over_ai(self, monkeypatch,
+                                                csv_with_headers):
+        """If the submitter supplies a title alongside pasted text, it must be
+        kept (the AI fills only what the submitter left blank)."""
+        _stub_schema(monkeypatch)
+        monkeypatch.setattr(process_submission, 'dispatch_url', MagicMock())
+        monkeypatch.setattr(process_submission, 'categorize', MagicMock(
+            return_value={'title': 'AI guessed title',
+                          'publication_date': '2026-03-01',
+                          'thematic_categories': ['Press & Media Criticism'],
+                          'era': 'Platform Transition & Future Models '
+                                 '(2021-Present)'}))
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        monkeypatch.setattr(process_submission, 'CSV_FILE', csv_with_headers)
+        process_submission.process_one(
+            url='https://medium.com/@jayrosen/p',
+            title='Submitter-supplied title',
+            raw_text='Pasted body text here.',
+            sheet_id='SHEET', sheet_tab='Queue', sheet_row=3)
+
+        with csv_with_headers.open() as f:
+            rows = list(csv.DictReader(f))
+        assert rows[0]['title'] == 'Submitter-supplied title'
+
+    def test_scrape_failure_error_tells_submitter_to_paste(self, monkeypatch,
+                                                           csv_with_headers):
+        """When the scrape fails and no text was pasted, the human-facing error
+        must tell the submitter to paste the article's raw text."""
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_empty(monkeypatch)  # returns None -> scrape failure
+        sheets_mock = _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        result = _run(monkeypatch, csv_with_headers,
+                      url='https://medium.com/@jayrosen/blocked')
+
+        assert result['status'] == 'error'
+        err = result['error'].lower()
+        assert 'paste' in err and 'raw text' in err
+        # The same actionable message reaches the sheet's error column.
+        final = sheets_mock.call_args_list[-1].kwargs
+        assert 'paste' in final['error'].lower()
+
+    def test_manual_raw_text_flag_threads_from_cli(self, monkeypatch,
+                                                   csv_with_headers):
+        """--raw-text must flow through main() into process_one."""
+        _stub_schema(monkeypatch)
+        dispatch_mock = MagicMock()
+        monkeypatch.setattr(process_submission, 'dispatch_url', dispatch_mock)
+        monkeypatch.setattr(process_submission, 'categorize', MagicMock(
+            return_value={'title': 'T', 'publication_date': '2026-03-01',
+                          'thematic_categories': ['Press & Media Criticism'],
+                          'era': 'Platform Transition & Future Models '
+                                 '(2021-Present)'}))
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        monkeypatch.setattr(process_submission, 'CSV_FILE', csv_with_headers)
+        rc = process_submission.main([
+            '--url', 'https://medium.com/@jayrosen/cli',
+            '--raw-text', 'Pasted body from the CLI.',
+            '--sheet-id', 'SHEET', '--sheet-tab', 'Queue', '--sheet-row', '4',
+        ])
+        assert rc == 0
+        dispatch_mock.assert_not_called()
