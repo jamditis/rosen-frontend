@@ -1,0 +1,36 @@
+{
+  "publications": [
+    { "correct_name": "PressThink", "aliases": ["pressthink"] },
+    { "correct_name": "HuffPost", "aliases": ["huffpost", "huffingtonpost"] },
+    { "correct_name": "Public Notebook", "aliases": ["publicnotebook"] },
+    { "correct_name": "Rebooting the News", "aliases": ["rebootnews"] },
+    { "correct_name": "Nieman Lab", "aliases": ["niemanlab"] },
+    { "correct_name": "WNYC", "aliases": ["nycstudios", "wnyc"] },
+    { "correct_name": "The Guardian", "aliases": ["theguardian"] },
+    { "correct_name": "Columbia Journalism Review", "aliases": ["cjr.org"] },
+    { "correct_name": "The Correspondent", "aliases": ["thecorrespondent"] },
+    { "correct_name": "Recode", "aliases": ["recode.net"] },
+    { "correct_name": "NYU Journalism", "aliases": ["journalism.nyu.edu"] },
+    { "correct_name": "The Atlantic", "aliases": ["theatlantic"] },
+    { "correct_name": "Poynter", "aliases": ["poynter"] },
+    { "correct_name": "Media Nation", "aliases": ["dankennedy.net"] },
+    { "correct_name": "Salon", "aliases": ["salon.com"] },
+    { "correct_name": "MediaShift", "aliases": ["mediashift"] },
+    { "correct_name": "The New York Times", "aliases": ["nytimes"] },
+    { "correct_name": "The Washington Post", "aliases": ["washingtonpost"] },
+    { "correct_name": "The Nation", "aliases": ["thenation.com"] },
+    { "correct_name": "Vox", "aliases": ["vox.com"] },
+    { "correct_name": "NPR", "aliases": ["npr.org"] },
+    { "correct_name": "PBS", "aliases": ["pbs.org"] }
+  ],
+  "platforms": [
+    { "correct_name": "Tumblr", "aliases": ["tmblr.co", "tumblr.com"] },
+    { "correct_name": "Bluesky", "aliases": ["bsky.app"] },
+    { "correct_name": "YouTube", "aliases": ["youtube.com", "youtu.be"] },
+    { "correct_name": "Twitter", "aliases": ["twitter.com"] },
+    { "correct_name": "Substack", "aliases": ["substack.com"] },
+    { "correct_name": "Medium", "aliases": ["medium.com"] },
+    { "correct_name": "SoundCloud", "aliases": ["soundcloud.com"] },
+    { "correct_name": "Apple Podcasts", "aliases": ["podcasts.apple.com"] }
+  ]
+}

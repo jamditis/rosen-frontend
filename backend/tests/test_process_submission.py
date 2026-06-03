@@ -184,7 +184,8 @@ class TestHappyPath:
                       sheet_row=3)
 
         assert result['status'] == 'live'
-        assert result['record_id'].startswith('PRESSTH-')
+        # New records continue the canonical RECORD-NNNNN sequence.
+        assert result['record_id'].startswith('RECORD-')
         # CSV now has the new row
         with csv_with_headers.open() as f:
             rows = list(csv.DictReader(f))
@@ -995,9 +996,40 @@ class TestRealWorldScrapeShape:
                       url='https://pressthink.org/2026/04/subscribers/')
 
         assert result['status'] == 'live'
-        # ID prefix derives from the RESOLVED publication, not the hallucination.
-        assert result['record_id'].startswith('PRESSTH-'), result['record_id']
+        # IDs are sequential RECORD-NNNNN, independent of publication.
+        assert result['record_id'].startswith('RECORD-'), result['record_id']
         with csv_with_headers.open() as f:
             rows = list(csv.DictReader(f))
+        # The hallucinated publisher was replaced by the resolved one.
         assert rows[0]['original_publication'] == 'PressThink'
         assert rows[0]['publisher'] == 'PressThink'
+
+    def test_record_id_continues_sequence(self, monkeypatch, tmp_path):
+        """New records continue the canonical RECORD-NNNNN sequence: seed a CSV
+        whose max id is RECORD-00901 and the next submission must be
+        RECORD-00902 (not a source-based prefix)."""
+        csv_path = tmp_path / 'archive_records-public.csv'
+        with csv_path.open('w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=CSV_HEADERS,
+                                    extrasaction='ignore')
+            writer.writeheader()
+            writer.writerow({'id': 'RECORD-00901',
+                             'title': 'An existing record',
+                             'url': 'https://pressthink.org/old/',
+                             'original_publication': 'PressThink'})
+            # A source-prefixed id from the legacy path must not raise the
+            # RECORD counter.
+            writer.writerow({'id': 'PRESSTH-00050',
+                             'title': 'Legacy source-prefixed',
+                             'url': 'https://pressthink.org/legacy/',
+                             'original_publication': 'PressThink'})
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch)
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        result = _run(monkeypatch, csv_path,
+                      url='https://pressthink.org/2026/04/new-one/')
+
+        assert result['record_id'] == 'RECORD-00902', result['record_id']

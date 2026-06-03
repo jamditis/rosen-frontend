@@ -80,7 +80,8 @@ data/*.csv.tmp
 backend/submission_server/submissions.db
 
 # Project Specific
-known_entities.json
+# known_entities.json is committed as reference data (publication + platform
+# name -> host-alias map) so resolve_publication works in CI and local runs.
 
 # Playwright
 test-results/

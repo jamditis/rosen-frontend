@@ -70,10 +70,7 @@ from rosen_scraper.entity_extractor import (  # noqa: E402
 )
 from rosen_scraper import entity_csv_writer  # noqa: E402
 from rosen_scraper import entity_resolver  # noqa: E402
-from rosen_scraper.workflow import (  # noqa: E402
-    enrich_data,
-    generate_source_based_id,
-)
+from rosen_scraper.workflow import enrich_data  # noqa: E402
 from submission_server import sftp_push, sheets_callback  # noqa: E402
 from submission_server.config import (  # noqa: E402
     CSV_FILE as _DEFAULT_CSV_FILE,
@@ -164,6 +161,25 @@ def _read_existing(csv_path: pathlib.Path):
             if url and rid:
                 url_to_id[url] = rid
     return urls, ids, url_to_id
+
+
+def _next_record_id(existing_ids: Set[str], prefix: str = 'RECORD') -> str:
+    """Return the next sequential ``RECORD-NNNNN`` id.
+
+    New submissions continue the canonical ``RECORD-`` sequence used by the
+    ~800 existing article records (and documented in CLAUDE.md), rather than
+    the source-based prefixes (``PRESSTH-``, ``CJR-``) that
+    ``generate_source_based_id`` produces for the legacy batch pipeline. Scans
+    ``existing_ids`` for the highest ``<prefix>-<number>`` and increments.
+    """
+    highest = 0
+    for rid in existing_ids:
+        if rid.startswith(prefix + '-'):
+            # Guard against relationship-style suffixes (RECORD-00027_REL_001).
+            num_part = rid[len(prefix) + 1:].split('_', 1)[0]
+            if num_part.isdigit():
+                highest = max(highest, int(num_part))
+    return f"{prefix}-{highest + 1:05d}"
 
 
 def _atomic_append_row(csv_path: pathlib.Path, row: Dict[str, Any],
@@ -428,19 +444,20 @@ def process_one(url: str, title: str = '', notes: str = '',
     if scraped_date:
         scrape['publication_date'] = scraped_date
 
-    # Resolve the publication against known entities + the URL host BEFORE
-    # generating the ID, so a hallucinated 'original_publication' (e.g. an AI
-    # guess of 'Talking Points Memo' for a pressthink.org URL) can't leak into
-    # both the publisher field and the ID prefix. resolve_publication is a
-    # no-op when known_entities is empty, so it never makes things worse.
+    # Resolve the publication against known entities + the URL host so a
+    # hallucinated 'original_publication' (e.g. an AI guess of 'Talking Points
+    # Memo' for a pressthink.org URL) doesn't become the publisher. enrich_data
+    # derives the publisher field from this. resolve_publication is a no-op
+    # when known_entities is empty, so it never makes things worse.
     resolved_pub = entity_resolver.resolve_publication(
         scrape.get('original_publication'), url, known_entities)
     if resolved_pub:
         scrape['original_publication'] = resolved_pub
 
     # --- Step 5: assign ID. -----------------------------------------------
-    publication = scrape.get('original_publication') or ''
-    record_id = generate_source_based_id(publication, existing_ids)
+    # New records continue the canonical RECORD-NNNNN sequence; the resolved
+    # publication feeds the publisher field (above), not the ID.
+    record_id = _next_record_id(existing_ids)
     scrape['id'] = record_id
     scrape['url'] = url
 
