@@ -1434,3 +1434,59 @@ class TestReviewGate:
         assert title and title.lower() != 'untitled' and len(title) >= 5, (
             f"a titleless submission must get a visible provisional title so it "
             f"survives the exporter's title filter; got {title!r}")
+
+
+class TestProcessorIdCollision:
+    """A processor-assigned id (CLIP-/NYT-/...) is preserved, but never at the
+    cost of a duplicate id — the exporter and tests require id uniqueness."""
+
+    def test_colliding_processor_id_is_reminted_in_same_prefix(
+            self, monkeypatch, tmp_path):
+        # Archive already holds CLIP-00042 (a different url).
+        csv_path = tmp_path / 'archive_records-public.csv'
+        with csv_path.open('w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=CSV_HEADERS,
+                                    extrasaction='ignore')
+            writer.writeheader()
+            writer.writerow({
+                'id': 'CLIP-00042',
+                'title': 'An archived clipping',
+                'url': 'https://example.com/clip-a',
+                'verified': 'false',
+            })
+
+        _stub_schema(monkeypatch)
+        # The clipping processor re-emits an id that already exists (a restarted
+        # counter) for a NEW url.
+        _stub_dispatcher_ok(monkeypatch, id='CLIP-00042', verified='false')
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        result = _run(monkeypatch, csv_path, url='https://example.com/clip-b')
+
+        assert result['status'] == 'live'
+        # Re-minted to the next free id in the SAME prefix, not a duplicate.
+        assert result['record_id'] == 'CLIP-00043'
+
+        with csv_path.open() as f:
+            rows = list(csv.DictReader(f))
+        ids = [r['id'] for r in rows]
+        assert len(ids) == len(set(ids)), f'duplicate ids written: {ids}'
+        by_id = {r['id']: r['url'] for r in rows}
+        assert by_id['CLIP-00042'] == 'https://example.com/clip-a'
+        assert by_id['CLIP-00043'] == 'https://example.com/clip-b'
+
+    def test_unique_processor_id_is_preserved(
+            self, monkeypatch, csv_with_headers):
+        # A non-colliding CLIP- id must survive untouched so prefix-keyed
+        # tooling (update_clippings.py) still matches it.
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch, id='CLIP-00500', verified='false')
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        result = _run(monkeypatch, csv_with_headers,
+                      url='https://example.com/clip-new')
+        assert result['record_id'] == 'CLIP-00500'

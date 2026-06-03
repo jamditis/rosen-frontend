@@ -31,7 +31,7 @@ on:
         type: string
         default: ''
       raw_text:
-        description: 'Optional pasted article text — used when the URL cannot be scraped (Medium, paywalled, bot-walled). When set, the network scrape is skipped and this text is processed directly.'
+        description: 'Optional pasted article text — used when the URL cannot be scraped (Medium, paywalled, bot-walled). When set, the network scrape is skipped and this text is processed directly. GitHub caps total workflow_dispatch inputs at 65,535 chars, so a body near that limit will fail to dispatch; Phase 3 (#353) moves large bodies to the queue sheet.'
         required: false
         type: string
         default: ''

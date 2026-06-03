@@ -550,6 +550,19 @@ def process_one(url: str, title: str = '', notes: str = '',
     # and the case Joe's "continue the RECORD- sequence" decision targeted. The
     # resolved publication feeds the publisher field (above), not the ID.
     processor_id = (scrape.get('id') or '').strip()
+    if processor_id and processor_id in existing_ids:
+        # A processor returned an id already in the archive (e.g. a clipping
+        # processor whose counter restarted, or a re-run that re-emits an
+        # archived id). Preserving it would write a duplicate id, which the
+        # exporter and tests forbid. Mint the next free id in the SAME prefix
+        # so downstream tooling keyed off the prefix (update_clippings.py only
+        # touches CLIP- rows) still matches. URL-level duplicates were already
+        # short-circuited in step 2; this guards an id collision on a new URL.
+        prefix = processor_id.rsplit('-', 1)[0] or 'RECORD'
+        deduped = _next_record_id(existing_ids, prefix=prefix)
+        logger.warning(f'Processor id {processor_id!r} already in archive; '
+                       f'using {deduped!r} to avoid a duplicate id.')
+        processor_id = deduped
     record_id = processor_id or _next_record_id(existing_ids)
     scrape['id'] = record_id
     scrape['url'] = url
