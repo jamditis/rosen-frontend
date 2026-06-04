@@ -6,7 +6,7 @@ A clean, accessible HTML reading experience for Jay Rosen's 1986 doctoral disser
 
 ## Overview
 
-This reader converts the dissertation markdown (`/frontend/web/95/impossible-press.md`) into a styled, navigable web application with features optimized for extended reading.
+This reader converts the dissertation markdown (`src/impossible-press.md`) into a styled, navigable web application with features optimized for extended reading.
 
 ## Features
 
@@ -27,6 +27,7 @@ This reader converts the dissertation markdown (`/frontend/web/95/impossible-pre
 dissertation-reader/
 ├── build/                    # Build scripts
 ├── src/
+│   ├── impossible-press.md   # Dissertation source markdown (build input)
 │   ├── css/
 │   │   ├── variables.css     # CSS custom properties
 │   │   ├── typography.css    # Reading-optimized type styles
