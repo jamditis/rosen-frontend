@@ -13,6 +13,18 @@
 // sql.js is loaded dynamically to ensure JS and WASM are from the same source
 // The import map version can have WASM binary mismatches
 
+import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.4.0';
+
+// Self-hosted sql.js WASM binary (#291). The loader JS below is pinned with
+// SRI, but sql.js exposes no SRI hook for the .wasm it fetches via locateFile,
+// so a cdnjs compromise could swap arbitrary WebAssembly. Serving the binary
+// from our own pinned-deploy bundle removes that single-CDN trust. Path mirrors
+// sw.js: locally the frontend dir is served at /frontend; on GH Pages and
+// PressThink the archive is nested under BASE_PATH and frontend sits beneath it.
+const SQL_WASM_PATH = IS_LOCAL
+  ? '/frontend/vendor/sql-wasm-1.10.3.wasm'
+  : `${BASE_PATH}/frontend/vendor/sql-wasm-1.10.3.wasm`;
+
 // Database instance
 let db = null;
 let dbInitializing = false;
@@ -74,14 +86,13 @@ export const initDatabase = async () => {
       // Load sql.js dynamically
       const sqlJsInit = await loadSqlJs();
 
-      // Initialize sql.js with WASM from the same CDN and version as the
-      // SRI-verified loader script above. sql.js fetches the .wasm itself
-      // through locateFile, which exposes no SRI hook, so the binary is
-      // version-pinned but not integrity-checked — a compromised CDN could
-      // still serve a different .wasm at this path. Self-hosting the binary
-      // and verifying its hash before use would close that gap.
+      // Point sql.js at the self-hosted, version-pinned .wasm (#291) rather
+      // than re-fetching it from cdnjs. The loader JS above is SRI-verified,
+      // but locateFile has no integrity hook, so a CDN-served binary would be
+      // unverified. The committed copy is part of the FTP-deployed bundle and
+      // its bytes are pinned by a SHA-384 regression test.
       const SQL = await sqlJsInit({
-        locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${file}`
+        locateFile: () => SQL_WASM_PATH
       });
 
       db = new SQL.Database();
