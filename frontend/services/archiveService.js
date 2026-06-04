@@ -393,28 +393,14 @@ export const fetchCoreData = async () => {
 
     return data;
   } catch (error) {
+    // Propagate the failure. Returning a DISSERTATION_RECORD-only fallback
+    // here would mask a real outage (archive-core.json 404/503/parse error,
+    // partial deploy) as a successful load of a 1-record archive — visitors
+    // and monitors could not tell it apart from the real one. App.js's
+    // .catch renders the explicit "Unable to load archive" error state
+    // instead. Mirrors httpCachedLoader.js, which forbids the same masking.
     console.error('Error fetching core data:', error);
-    // Return empty structure on error
-    return {
-      records: [{
-        id: DISSERTATION_RECORD.id,
-        title: DISSERTATION_RECORD.title,
-        date: DISSERTATION_RECORD.date,
-        year: DISSERTATION_RECORD.year,
-        era: DISSERTATION_RECORD.era,
-        pub: DISSERTATION_RECORD.pub,
-        categories: DISSERTATION_RECORD.categories,
-        type: DISSERTATION_RECORD.type,
-        verified: DISSERTATION_RECORD.verified,
-        summaryPreview: DISSERTATION_RECORD.summary.substring(0, 180) + '...'
-      }],
-      facets: {
-        categories: DISSERTATION_RECORD.categories.sort(),
-        eras: ERAS,
-        publications: [DISSERTATION_RECORD.pub]
-      },
-      autocompleteIndex: [...DISSERTATION_RECORD.categories, ...DISSERTATION_RECORD.concepts, ...DISSERTATION_RECORD.tags, DISSERTATION_RECORD.title].sort()
-    };
+    throw error;
   }
 };
 
