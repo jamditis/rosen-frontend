@@ -24,7 +24,7 @@ sys.exit(1)
 
 # Paths
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-MD_SOURCE = os.path.join(SCRIPT_DIR, '../../archived/web/95/impossible-press.md')
+MD_SOURCE = os.path.join(SCRIPT_DIR, 'src/impossible-press.md')
 TEMPLATE = os.path.join(SCRIPT_DIR, 'src/templates/shell.html')
 OUTPUT = os.path.join(SCRIPT_DIR, 'index.html')  # Output directly to dissertation-reader root
 
