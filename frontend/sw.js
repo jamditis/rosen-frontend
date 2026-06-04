@@ -91,7 +91,8 @@ const STATIC_ASSETS = IS_LOCAL ? [
 const DATA_URLS = [
   `${DATA_PATH}/archive-core.json`,
   `${DATA_PATH}/archive-details.json`,
-  `${DATA_PATH}/archive-entities.json`
+  `${DATA_PATH}/archive-entities.json`,
+  `${DATA_PATH}/archive-analytics.json`
 ];
 
 console.log('[SW] Environment:',

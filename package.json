@@ -9,14 +9,15 @@
     "test:data": "node --test tests/data-integrity.test.js tests/csv-quality.test.js",
     "test:data:extraction-coverage": "node --test tests/extraction-coverage.test.js",
     "test:pipeline": "node --test tests/data-pipeline.test.js tests/thread-detection.test.js tests/process-record.test.js tests/thread-algorithm.test.js",
-    "test:frontend": "node --test tests/version-consistency.test.js tests/frontend-structure.test.js",
+    "test:frontend": "node --test tests/version-consistency.test.js tests/frontend-structure.test.js tests/archive-analytics.test.js",
     "export-data": "node data/export-archive-data.js",
     "preview": "node scripts/preview-server.js",
     "preview:audit": "node scripts/preview-audit.js"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
-    "csv-parse": "^5.6.0"
+    "csv-parse": "^5.6.0",
+    "sql.js": "1.10.3"
   },
   "dependencies": {
     "csv-stringify": "^6.6.0",

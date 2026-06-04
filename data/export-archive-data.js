@@ -15,6 +15,7 @@ import { parse } from 'csv-parse/sync';
 import { fileURLToPath } from 'url';
 import { generateAllFeeds } from './lib/rss-generator.js';
 import { generateOPML, generateSubscriptionOPML } from './lib/opml-generator.js';
+import { computeAnalytics } from './compute-analytics.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -614,6 +615,21 @@ async function main() {
 
   const fileSizeBytes = fs.statSync(outputPath).size;
   const fileSizeMB = (fileSizeBytes / 1024 / 1024).toFixed(2);
+
+  // ============================================
+  // PREBUILT ANALYTICS AGGREGATES
+  // ============================================
+  // The Analytics dashboard renders its six charts + stat counts from this
+  // tiny precomputed file instead of loading the full data into in-browser
+  // SQLite. Same engine (sql.js) as the runtime query path, so the aggregates
+  // match what the live queries would return. tests/archive-analytics.test.js
+  // locks this file to computeAnalytics(archive-data.json).
+  console.log('\n📊 Computing analytics aggregates...');
+  const analytics = await computeAnalytics(output);
+  const analyticsOutputPath = path.join(__dirname, 'archive-analytics.json');
+  fs.writeFileSync(analyticsOutputPath, JSON.stringify(analytics));
+  const analyticsSizeKB = (fs.statSync(analyticsOutputPath).size / 1024).toFixed(1);
+  console.log(`  - Wrote archive-analytics.json (${analyticsSizeKB} KB)`);
 
   // ============================================
   // SPLIT DATA FILES FOR OPTIMIZED LOADING

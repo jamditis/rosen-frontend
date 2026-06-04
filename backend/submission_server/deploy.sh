@@ -18,7 +18,7 @@ mkdir -p "$FTP_DIR"
 
 echo "Staging data files for FTP upload..."
 
-for f in archive-data.json archive-core.json archive-details.json archive-entities.json; do
+for f in archive-data.json archive-core.json archive-details.json archive-entities.json archive-analytics.json; do
     if [ -f "$DATA_DIR/$f" ]; then
         cp "$DATA_DIR/$f" "$FTP_DIR/$f"
         echo "  copied $f"

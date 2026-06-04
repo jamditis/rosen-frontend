@@ -76,6 +76,7 @@ _DEPLOY_DATA_FILES: Tuple[str, ...] = (
     'data/archive-data.json',
     'data/archive-details.json',
     'data/archive-entities.json',
+    'data/archive-analytics.json',
 )
 
 # Walking _DEPLOY_DIRS, prune these.

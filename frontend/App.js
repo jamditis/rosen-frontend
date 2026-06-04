@@ -134,7 +134,15 @@ const App = () => {
   }, []);
 
   // Load Data
+  // Gate the ~13MB core fetch so a cold deep-link straight into #analytics
+  // doesn't fetch and parse data that route never renders (it draws from the
+  // prebuilt aggregates instead). The ref makes this fire once; depending on
+  // currentRoute means navigating away from analytics back-fills the data.
+  const coreFetchStarted = useRef(false);
   useEffect(() => {
+    if (coreFetchStarted.current) return;
+    if (currentRoute === ROUTES.analytics) return;
+    coreFetchStarted.current = true;
     fetchCoreData()
       .then((data) => {
         setRecords(data.records);
@@ -148,7 +156,7 @@ const App = () => {
         setError('Failed to load archive data. Please refresh the page or try again later.');
         setLoading(false);
       });
-  }, []);
+  }, [currentRoute]);
 
   useEffect(() => {
     const handleScroll = () => {
