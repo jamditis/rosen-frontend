@@ -24,6 +24,7 @@ frontend/                           # React application
   components/shared/                # Reusable UI primitives
   services/                         # archiveService, router, sqliteService
   utils/                            # Design tokens
+  vendor/                           # Self-hosted sql.js wasm (sql-wasm-1.10.3.wasm)
   design-system/                    # CSS tokens, demo
 
 data/                               # Archive data (JSON only)
