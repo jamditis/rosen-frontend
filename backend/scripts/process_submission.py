@@ -18,10 +18,11 @@ Behavior (12-step pipeline from the design's "Architecture" diagram):
 
     1.  Sheet writeback F='processing'              (best-effort)
     2.  Dedup vs current archive_records-public.csv (short-circuit on hit)
-    3.  dispatcher.dispatch_url(url)                (scrape)
+   2b.  SSRF guard via is_safe_public_url(url)      (reject private/non-http)
+    3.  dispatcher.dispatch_url(url)                (scrape, or pasted raw text)
     4.  categorize(...)                             (Gemini; degrade on fail)
-    5.  generate_source_based_id()                  (next RECORD-NNNNN)
-    6.  enrich_data() + _sanitize_cell()            (mimic Pillar 3)
+    5.  assign id: keep processor CLIP-/NYT-/WSJ-,  (else next RECORD-NNNNN)
+    6.  enrich_data() + _sanitize_cell()            (mimic Pillar 3; flag review)
     7.  Append to data/archive_records-public.csv   (atomic tmp+rename)
     8.  node data/export-archive-data.js            (regen JSONs)
     9.  npm test                                    (abort commit on fail)
@@ -69,11 +70,9 @@ from rosen_scraper.entity_extractor import (  # noqa: E402
     extract_entities_and_relationships as _extract_entities,
 )
 from rosen_scraper import entity_csv_writer  # noqa: E402
+from rosen_scraper import entity_resolver  # noqa: E402
 from rosen_scraper.url_safety import is_safe_public_url  # noqa: E402
-from rosen_scraper.workflow import (  # noqa: E402
-    enrich_data,
-    generate_source_based_id,
-)
+from rosen_scraper.workflow import enrich_data  # noqa: E402
 from submission_server import sftp_push, sheets_callback  # noqa: E402
 from submission_server.config import (  # noqa: E402
     CSV_FILE as _DEFAULT_CSV_FILE,
@@ -100,6 +99,21 @@ extract_entities_and_relationships = _extract_entities
 # Tests override CSV_FILE to point at a tmp file. Defaults to the canonical
 # archive CSV when the script runs in CI.
 CSV_FILE = _DEFAULT_CSV_FILE
+
+# Shown to the submitter (via the sheet error column) when the scraper can't
+# fetch or parse a URL. Some hosts (Medium, paywalled or login-walled pages,
+# heavily JS-rendered sites) block automated scraping. The submitter can paste
+# the article body to bypass the fetch — the AI still tags the pasted text.
+# The text rides the workflow's raw_text input today (a maintainer fills it in
+# the Actions UI). The self-serve sheet column that would let a submitter do
+# this without help is Phase 3, tracked in #353 — so this hint names the
+# raw_text field, not a sheet column that does not exist yet.
+SCRAPE_FAILED_PASTE_HINT = (
+    "Couldn't fetch or parse this URL automatically ({reason}). Some sites "
+    "(Medium, paywalled, or login-walled pages) block automated scraping. To "
+    "archive it anyway, re-submit with the article's full text in the raw text "
+    "field — the pipeline skips the fetch and tags the pasted text directly."
+)
 
 SENTINEL_URL_PREFIX = 'https://example.com/sweep-noop-'
 
@@ -164,6 +178,43 @@ def _read_existing(csv_path: pathlib.Path):
             if url and rid:
                 url_to_id[url] = rid
     return urls, ids, url_to_id
+
+
+def _next_record_id(existing_ids: Set[str], prefix: str = 'RECORD') -> str:
+    """Return the next sequential ``RECORD-NNNNN`` id.
+
+    New submissions continue the canonical ``RECORD-`` sequence used by the
+    ~800 existing article records (and documented in CLAUDE.md), rather than
+    the source-based prefixes (``PRESSTH-``, ``CJR-``) that
+    ``generate_source_based_id`` produces for the legacy batch pipeline. Scans
+    ``existing_ids`` for the highest ``<prefix>-<number>`` and increments.
+    """
+    highest = 0
+    for rid in existing_ids:
+        if rid.startswith(prefix + '-'):
+            # Guard against relationship-style suffixes (RECORD-00027_REL_001).
+            num_part = rid[len(prefix) + 1:].split('_', 1)[0]
+            if num_part.isdigit():
+                highest = max(highest, int(num_part))
+    return f"{prefix}-{highest + 1:05d}"
+
+
+def _clean_title(title: str, publication: str) -> str:
+    """Strip a trailing ' - <publication>' site suffix from a scraped title.
+
+    trafilatura builds the title from the page ``<title>`` tag, which usually
+    carries the site name (e.g. 'Headline - PressThink'). Drop it when the tail
+    matches the resolved publication so records get a clean headline.
+    """
+    title = (title or '').strip()
+    pub = (publication or '').strip()
+    if not title or not pub:
+        return title
+    for sep in (' - ', ' | ', ' – ', ' — '):
+        suffix = f"{sep}{pub}"
+        if title.endswith(suffix):
+            return title[:-len(suffix)].strip()
+    return title
 
 
 def _atomic_append_row(csv_path: pathlib.Path, row: Dict[str, Any],
@@ -305,11 +356,17 @@ def _is_sentinel(url: str) -> bool:
 def process_one(url: str, title: str = '', notes: str = '',
                 sheet_id: str = '', sheet_tab: str = '',
                 sheet_row: Optional[int] = None,
-                prototype_mode: bool = False) -> Dict[str, Any]:
+                prototype_mode: bool = False,
+                raw_text: str = '') -> Dict[str, Any]:
     """Run the 12-step pipeline for one submission. Returns a result dict.
 
     Keys: ``status`` (live/archived/duplicate/error/noop), ``record_id``,
     ``error``, ``exit_code``.
+
+    ``raw_text``: manual fallback. When provided, the network scrape is
+    skipped and the AI categorizer tags the pasted article body directly. Use
+    it for hosts the scraper can't fetch (Medium, paywalled or login-walled
+    pages). The submitter only pastes text; the pipeline still tags it.
     """
     result: Dict[str, Any] = {'status': 'error', 'record_id': '',
                               'error': '', 'exit_code': 1}
@@ -317,6 +374,7 @@ def process_one(url: str, title: str = '', notes: str = '',
     url = (url or '').strip()
     title = title or ''
     notes = notes or ''
+    raw_text = raw_text or ''
 
     # --- Sentinel handling: no-op submission that only runs the SFTP step. -
     if _is_sentinel(url):
@@ -371,7 +429,9 @@ def process_one(url: str, title: str = '', notes: str = '',
     # still dedup, not error) but before the dispatcher and its deploy/SFTP/
     # Sheets secrets. Reject private/loopback/link-local or non-http(s) targets
     # so this secret-bearing entry point never fetches an unsafe URL (parity with
-    # the scraper's own gate).
+    # the scraper's own gate). Runs even on the manual paste path below: a
+    # legitimate paste target (Medium, paywalled) is still a public http(s) URL,
+    # and a private/non-http URL should not be archived as a record regardless.
     safe, ssrf_reason = is_safe_public_url(url)
     if not safe:
         msg = f'Unsafe URL refused: {ssrf_reason}'
@@ -381,34 +441,54 @@ def process_one(url: str, title: str = '', notes: str = '',
         return {'status': 'error', 'record_id': '', 'error': msg,
                 'exit_code': 1}
 
-    # --- Step 3: scrape. --------------------------------------------------
+    # --- Step 3: scrape (or use manually-pasted text). --------------------
     schema = _load_schema()
     known_entities = _load_known_entities()
-    try:
-        scrape = dispatch_url(url, schema)
-    except Exception as exc:  # noqa: BLE001
-        logger.error(f'Dispatcher raised: {exc}')
-        scrape = None
-    # The existing platform dispatchers (Bluesky, Twitter, article scraper,
-    # etc.) sometimes report failures via a truthy dict like
-    # ``{'status': 'failed', 'error': '...'}`` instead of returning None.
-    # Treat any non-success status as a scrape failure so we don't commit
-    # a broken record and deploy it.
-    scrape_failed = (
-        not scrape
-        or (isinstance(scrape, dict)
-            and str(scrape.get('status', '')).lower() in {'failed', 'error'})
-    )
-    if scrape_failed:
-        reason = ''
-        if isinstance(scrape, dict):
-            reason = str(scrape.get('error') or '').strip()
-        msg = (f'Scrape failed: {reason}'
-               if reason
-               else 'Scrape returned no content (URL may be unreachable)')
-        _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
-                        status='error', error=msg)
-        return {'status': 'error', 'record_id': '', 'error': msg, 'exit_code': 1}
+
+    manual_text = raw_text.strip()
+    if manual_text:
+        # Manual fallback: the submitter pasted the article body because the
+        # scraper can't reach this host (e.g. Medium, paywalled, JS-rendered).
+        # Skip the network fetch and let the AI categorizer (step 4) tag the
+        # pasted text, so the submitter only provides text — not the tedious
+        # metadata. This is viable here because submissions are one at a time,
+        # unlike the bulk-processing pipeline.
+        logger.info(f'Manual raw-text submission ({len(manual_text)} chars); '
+                    'skipping scrape and tagging the pasted text.')
+        scrape = {'raw_text': manual_text, 'text': manual_text}
+        if title:
+            scrape['title'] = title
+    else:
+        try:
+            scrape = dispatch_url(url, schema)
+        except Exception as exc:  # noqa: BLE001
+            logger.error(f'Dispatcher raised: {exc}')
+            scrape = None
+        # The existing platform dispatchers (Bluesky, Twitter, article scraper,
+        # etc.) sometimes report failures via a truthy dict like
+        # ``{'status': 'failed', 'error': '...'}`` instead of returning None.
+        # Treat any non-success status as a scrape failure so we don't commit
+        # a broken record and deploy it.
+        scrape_failed = (
+            not scrape
+            or (isinstance(scrape, dict)
+                and str(scrape.get('status', '')).lower() in {'failed', 'error'})
+        )
+        if scrape_failed:
+            reason = ''
+            if isinstance(scrape, dict):
+                reason = str(scrape.get('error') or '').strip()
+            # Actionable: tell the submitter exactly how to recover — paste the
+            # text. The scrape failure is logged above; this is the human-facing
+            # message that lands in the sheet's error column.
+            msg = SCRAPE_FAILED_PASTE_HINT.format(
+                reason=reason or 'page unreachable or unparseable')
+            logger.warning(f'Scrape failed for {url}: '
+                           f'{reason or "no content"}')
+            _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
+                            status='error', error=msg)
+            return {'status': 'error', 'record_id': '', 'error': msg,
+                    'exit_code': 1}
 
     # --- Step 4: categorize. ----------------------------------------------
     # If the scrape result already carries categorization fields (the existing
@@ -433,9 +513,57 @@ def process_one(url: str, title: str = '', notes: str = '',
         scrape['thematic_categories'] = ['uncategorized']
         low_confidence = True
 
+    # --- Step 4.5: normalize fields before ID/enrichment. -----------------
+    # The article scraper (trafilatura) emits a 'date' key, but the schema and
+    # the rest of the pipeline (and the export script) use 'publication_date'.
+    # The CSV writer drops unknown keys (extrasaction='ignore'), so without
+    # this rename the scraped date is silently lost. Mirrors workflow.main();
+    # trafilatura's date wins when present, else the AI's publication_date is
+    # kept.
+    scraped_date = scrape.pop('date', None)
+    if scraped_date:
+        scrape['publication_date'] = scraped_date
+
+    # Resolve the publication against known entities + the URL host so a
+    # hallucinated 'original_publication' (e.g. an AI guess of 'Talking Points
+    # Memo' for a pressthink.org URL) doesn't become the publisher. enrich_data
+    # derives the publisher field from this. resolve_publication is a no-op
+    # when known_entities is empty, so it never makes things worse.
+    resolved_pub = entity_resolver.resolve_publication(
+        scrape.get('original_publication'), url, known_entities)
+    if resolved_pub:
+        scrape['original_publication'] = resolved_pub
+
+    # Drop a trailing ' - <publication>' suffix trafilatura pulls from the page
+    # <title> (e.g. 'Headline - PressThink'). A submitter-supplied title (step
+    # 6, below) is applied after this and is left untouched.
+    if scrape.get('title'):
+        scrape['title'] = _clean_title(scrape['title'],
+                                       scrape.get('original_publication'))
+
     # --- Step 5: assign ID. -----------------------------------------------
-    publication = scrape.get('original_publication') or ''
-    record_id = generate_source_based_id(publication, existing_ids)
+    # Preserve a processor-assigned source id when one is present: the clipping
+    # processor emits CLIP-/NYT-/WSJ- ids that downstream tooling keys off
+    # (backend/update_clippings.py only touches CLIP- rows), and the social and
+    # video processors set their own. Only mint a new RECORD-NNNNN id when the
+    # processor left it unset — the article path, which is the common submission
+    # and the case Joe's "continue the RECORD- sequence" decision targeted. The
+    # resolved publication feeds the publisher field (above), not the ID.
+    processor_id = (scrape.get('id') or '').strip()
+    if processor_id and processor_id in existing_ids:
+        # A processor returned an id already in the archive (e.g. a clipping
+        # processor whose counter restarted, or a re-run that re-emits an
+        # archived id). Preserving it would write a duplicate id, which the
+        # exporter and tests forbid. Mint the next free id in the SAME prefix
+        # so downstream tooling keyed off the prefix (update_clippings.py only
+        # touches CLIP- rows) still matches. URL-level duplicates were already
+        # short-circuited in step 2; this guards an id collision on a new URL.
+        prefix = processor_id.rsplit('-', 1)[0] or 'RECORD'
+        deduped = _next_record_id(existing_ids, prefix=prefix)
+        logger.warning(f'Processor id {processor_id!r} already in archive; '
+                       f'using {deduped!r} to avoid a duplicate id.')
+        processor_id = deduped
+    record_id = processor_id or _next_record_id(existing_ids)
     scrape['id'] = record_id
     scrape['url'] = url
 
@@ -444,13 +572,58 @@ def process_one(url: str, title: str = '', notes: str = '',
         scrape['title'] = title
     if notes:
         scrape['notes'] = notes
+    # Capture any verified value a processor set BEFORE enrich_data runs its
+    # `data.setdefault('verified', False)` — after that call the key always
+    # exists, so this is the only point where "processor set it" and "processor
+    # left it unset" are still distinguishable.
+    processor_verified = scrape.get('verified')
     try:
         scrape = enrich_data(scrape, url, known_entities)
     except Exception as exc:  # noqa: BLE001 — enrichment is non-critical
         logger.warning(f'enrich_data failed (continuing): {exc}')
     if low_confidence:
         scrape['low_confidence'] = 'true'
-    scrape['verified'] = scrape.get('verified', True)
+    # Hybrid 'live but flagged' model. Auto-submissions publish immediately so
+    # the submitter sees the record appear, then carry needs_review=true so a
+    # human can vet the AI-generated metadata before it's treated as final.
+    #
+    # Force verified True only when no processor set it: enrich_data() above runs
+    # `data.setdefault('verified', False)` (a conservative default for legacy or
+    # broken rows), so `scrape.get('verified', True)` would always read back that
+    # False and the public exporter — which drops verified=False rows — would
+    # silently hide every submission. Article scrapes leave verified unset, so
+    # they publish. A processor's explicit verified value is preserved: the
+    # clipping processor stamps 'false' on every OCR'd PDF as an "OCR needs a
+    # human check" signal, not a hide flag. That clipping still goes
+    # live-but-flagged — the exporter surfaces CLIP- ids via a dedicated
+    # allowance, and needs_review below marks it for the OCR review pass. (For a
+    # non-CLIP record an explicit 'false' does gate it, since the exporter drops
+    # verified=false rows without that allowance.) Unifying the CLIP- allowance
+    # with this verified/needs_review model is tracked in issue #352.
+    if processor_verified is None:
+        # Write the string 'TRUE', not a Python bool. csv.DictWriter serializes
+        # True as the string 'True', but data/export-archive-data.js treats only
+        # the exact strings 'TRUE'/'true'/'Yes' (or a real boolean) as verified —
+        # 'True' round-trips through the CSV and is then dropped, silently hiding
+        # the record. 'TRUE' matches the existing column convention.
+        scrape['verified'] = 'TRUE'
+    scrape['needs_review'] = 'true'
+
+    # Guarantee an exporter-visible title. The public exporter drops any record
+    # whose title is empty, 'Untitled', or under 5 chars, so a manual paste with
+    # no title and a failed/degraded AI categorization would commit, deploy and
+    # write back 'live' yet never appear. Synthesize a provisional title from the
+    # best available signal; needs_review is already set, so the human review
+    # pass fixes it.
+    _title = (scrape.get('title') or '').strip()
+    if not _title or _title.lower() == 'untitled' or len(_title) < 5:
+        _text = (scrape.get('raw_text') or scrape.get('text') or '').strip()
+        _first_line = next(
+            (ln.strip() for ln in _text.splitlines() if ln.strip()), '')
+        _provisional = _first_line[:80].strip() or url
+        logger.warning('No usable title; using provisional title pending '
+                       f'review: {_provisional!r}')
+        scrape['title'] = _provisional
 
     # Sanitize string fields explicitly via _sanitize_record (called inside
     # _atomic_append_row), but also pre-sanitize the user-controlled overrides
@@ -628,6 +801,10 @@ def _parse_args(argv):
                    action='store_true', default=False,
                    help='Skip SFTP push to PressThink (GH Pages auto-deploy '
                         'handles the prototype surface).')
+    p.add_argument('--raw-text', dest='raw_text', default='',
+                   help='Manual fallback: paste the article body to skip the '
+                        'network scrape (for hosts the scraper cannot fetch, '
+                        'e.g. Medium or paywalled pages). The AI still tags it.')
     return p.parse_args(argv)
 
 
@@ -638,6 +815,7 @@ def main(argv=None) -> int:
         sheet_id=args.sheet_id, sheet_tab=args.sheet_tab,
         sheet_row=args.sheet_row,
         prototype_mode=args.prototype_mode,
+        raw_text=args.raw_text,
     )
     logger.info(f'Result: status={result["status"]} '
                 f'record_id={result["record_id"]} error={result["error"]}')

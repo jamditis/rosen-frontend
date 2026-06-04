@@ -30,6 +30,11 @@ on:
         required: false
         type: string
         default: ''
+      raw_text:
+        description: 'Optional pasted article text — used when the URL cannot be scraped (Medium, paywalled, bot-walled). When set, the network scrape is skipped and this text is processed directly. GitHub caps total workflow_dispatch inputs at 65,535 chars, so a body near that limit will fail to dispatch; Phase 3 (#353) moves large bodies to the queue sheet.'
+        required: false
+        type: string
+        default: ''
       sheet_id:
         description: 'Google Sheets spreadsheet id holding the queue row'
         required: true
@@ -128,6 +133,7 @@ jobs:
           URL: ${{ inputs.url }}
           TITLE: ${{ inputs.title }}
           NOTES: ${{ inputs.notes }}
+          RAW_TEXT: ${{ inputs.raw_text }}
           SHEET_ID: ${{ inputs.sheet_id }}
           SHEET_TAB: ${{ inputs.sheet_tab }}
           SHEET_ROW: ${{ inputs.sheet_row }}
@@ -146,6 +152,7 @@ jobs:
             --url "$URL" \
             --title "$TITLE" \
             --notes "$NOTES" \
+            --raw-text "$RAW_TEXT" \
             --sheet-id "$SHEET_ID" \
             --sheet-tab "$SHEET_TAB" \
             --sheet-row "$SHEET_ROW" \

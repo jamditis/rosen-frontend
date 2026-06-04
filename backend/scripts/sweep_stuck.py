@@ -241,6 +241,12 @@ def sweep() -> Dict[str, int]:
             # short-circuits before the dedup check).
             dispatch_url = f'{SENTINEL_URL_PREFIX}{int(time.time())}'
             title = title or f'(sweep-noop for row {sheet_row})'
+        # raw_text is intentionally absent: the queue sheet has no raw_text
+        # column yet (fetch_rows reads only A:H), so a row originally submitted
+        # with pasted text can't carry it through an automated retry. Adding the
+        # column + carry is Phase 3, tracked in #353. Until then a stuck
+        # paste-submission re-runs against its URL — same behaviour as before
+        # the raw_text fallback existed, so no regression, just no carry.
         inputs = {
             'url': dispatch_url, 'title': title, 'notes': notes,
             'sheet_id': sheet_id, 'sheet_tab': sheet_tab,

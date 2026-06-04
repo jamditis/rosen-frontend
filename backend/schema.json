@@ -125,6 +125,8 @@
     "pull_quote",
     "raw_text",
     "verified",
-    "notes"
+    "notes",
+    "low_confidence",
+    "needs_review"
   ]
 }

@@ -18,6 +18,26 @@ def load_known_entities(schema_file: str) -> Optional[Dict[str, Any]]:
         print(f"Could not load known entities. Error: {e}")
         return None
 
+def _host_matches_alias(host: str, alias: str) -> bool:
+    """True when ``alias`` identifies ``host`` on a DNS-label boundary.
+
+    Avoids the substring trap where ``alias in host`` lets ``notpressthink.org``
+    or ``pressthink.example.com`` resolve to the ``pressthink`` entity. A
+    full-domain alias (one containing a dot, e.g. ``cjr.org``) matches the host
+    or any subdomain of it; a bare-label alias (e.g. ``pressthink``) matches
+    only the host's second-level label, so it won't match a different
+    registrable domain that merely embeds the token.
+    """
+    host = (host or '').lower().split(':', 1)[0].rstrip('.')
+    alias = (alias or '').lower().strip()
+    if not host or not alias:
+        return False
+    if '.' in alias:
+        return host == alias or host.endswith('.' + alias)
+    labels = host.split('.')
+    return len(labels) >= 2 and labels[-2] == alias
+
+
 def resolve_publication(publication: str, url: str, known_entities: Optional[Dict[str, Any]]) -> str:
     """
     Resolves the publication name against a list of known entities.
@@ -26,10 +46,10 @@ def resolve_publication(publication: str, url: str, known_entities: Optional[Dic
         return publication
 
     domain = urlparse(url).netloc
-    
+
     for entity in known_entities.get('publications', []):
         for alias in entity.get('aliases', []):
-            if alias in domain:
+            if _host_matches_alias(domain, alias):
                 return entity.get('correct_name')
 
     return publication
@@ -42,10 +62,10 @@ def resolve_platform(url: str, known_entities: Optional[Dict[str, Any]]) -> Opti
         return None
 
     domain = urlparse(url).netloc
-    
+
     for entity in known_entities.get('platforms', []):
         for alias in entity.get('aliases', []):
-            if alias in domain:
+            if _host_matches_alias(domain, alias):
                 return entity.get('correct_name')
 
     return None
