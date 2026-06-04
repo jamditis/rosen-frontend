@@ -5,6 +5,7 @@ import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share
 import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.4.0';
 import { ThreadModal } from './ThreadModal.js?v=3.4.0';
 import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.4.0';
+import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.4.0';
 
 const linkifyText = (text) => {
   const parts = splitUrlsForLinkify(text);
@@ -229,7 +230,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
                 </div>
 
                 ${displayRecord.url && displayRecord.url !== '#' && html`
-                  <a href=${displayRecord.url.replace('//bsky.app', '//embed.bsky.app')} target="_blank" rel="noreferrer" className="text-blue-700 hover:underline font-bold text-sm inline-flex items-center gap-1 mb-6">
+                  <a href=${sanitizeHref(displayRecord.url.replace('//bsky.app', '//embed.bsky.app'))} target="_blank" rel="noreferrer" className="text-blue-700 hover:underline font-bold text-sm inline-flex items-center gap-1 mb-6">
                     Read on ${displayRecord.pub} <${ExternalLink} className="w-3 h-3" />
                   </a>
                 `}
