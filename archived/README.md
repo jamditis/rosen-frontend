@@ -1,27 +1,28 @@
-# Future Features
+# archived/
 
-This directory contains features that have been developed but are not currently active in the production archive. These are preserved for potential future implementation.
+Reference-only code kept out of the production deploy (see the "do not upload"
+list in [`DEPLOYMENT.md`](../DEPLOYMENT.md)). Not part of the live static site.
 
-## BYOK Chat (`/byok-chat/`)
+## What's here
 
-**Status:** Archived (December 2025)
+- `dissertation-tools/` — 7 earlier standalone dissertation tools (comparison,
+  concepts, context, excerpts, faq, glossary, timeline) plus a `source/` bundle
+  (the dissertation PDF, a transcribed markdown copy, and a build helper). The
+  3 maintained surfaces (reader, foreword, network-effect) live in
+  `dissertation/` instead.
 
-An interactive chat interface that allows users to explore Jay Rosen's dissertation using their own Claude API key (BYOK = Bring Your Own Key).
+## Why these are still tracked
 
-### Files
-- `chat.html` - Chat interface page
-- `chat.js` - Chat functionality and Claude API integration
+The 7 tools were uploaded to WordPress once and are still served on production,
+even though the FTP deploy manifest no longer includes them — so this is the
+only editable source for those live pages. Whether to fold them back into the
+maintained `dissertation/` directory or leave them here is an open call; see the
+dissertation-tools entry in [`docs/decisions-pending.md`](../docs/decisions-pending.md).
+They were left in place
+when the rest of `archived/` (archive-v1, the Win95 promo site, the BYOK chat,
+old web snapshots, and legacy docs) was pruned in #166.
 
-### Why Archived
-This feature was removed from the active FAQ section to simplify the user experience for the initial December 2025 dissertation release. The BYOK approach requires users to have their own Anthropic API key, which limits accessibility.
+## Rule
 
-### To Reactivate
-1. Move `chat.html` and `chat.js` back to `/faq/`
-2. Restore the BYOK modal HTML to `/faq/index.html`
-3. Restore the BYOK JavaScript handlers to `/faq/script.js`
-4. Update documentation in CLAUDE.md and README.md
-
-### Notes
-- The chat functionality works with Claude Sonnet and includes a system prompt with dissertation context
-- API calls go directly from the browser to Anthropic's API (client-side only)
-- User API keys are stored in localStorage
+Do not edit code under `archived/`. An edit here does not reach production via
+the current deploy workflow.
