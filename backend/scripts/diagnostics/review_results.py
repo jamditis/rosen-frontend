@@ -6,18 +6,25 @@ This script reviews the results of a test run and evaluates the outputs.
 import gspread
 import os
 import json
+from pathlib import Path
 from urllib.parse import urlparse
 from dotenv import load_dotenv
 
 # Load environment variables from a .env file for secure configuration management.
 load_dotenv()
 
+# Anchored to backend/ via the script's own location, so the curated
+# known_entities.json and credentials resolve regardless of the working directory.
+ROOT_DIR = Path(__file__).resolve().parents[2]
+KNOWN_ENTITIES_FILE = ROOT_DIR / 'known_entities.json'
+
 def main():
     """The main function for the review script."""
     # --- 1. Connect to Google Sheets ---
     try:
-        credentials_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json"))
-        gc = gspread.service_account(filename=credentials_path)
+        credentials_filename = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+        credentials_path = ROOT_DIR / credentials_filename
+        gc = gspread.service_account(filename=str(credentials_path))
         sh = gc.open(os.environ.get("SPREADSHEET_NAME", "Rosen Archive URL List"))
         test_worksheet = sh.worksheet("test_runs")
     except Exception as e:
@@ -35,7 +42,7 @@ def main():
 
     # --- 3. Load Known Entities ---
     try:
-        with open('known_entities.json', 'r', encoding='utf-8-sig') as f:
+        with open(KNOWN_ENTITIES_FILE, 'r', encoding='utf-8-sig') as f:
             known_entities = json.load(f)
     except (FileNotFoundError, json.JSONDecodeError) as e:
         print(f"Could not load known entities. Error: {e}")

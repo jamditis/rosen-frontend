@@ -82,11 +82,15 @@ backend/submission_server/submissions.db
 # Project Specific
 # known_entities.json (publication + platform name -> host-alias map) is
 # committed as reference data so the submission pipeline can resolve
-# publications in CI and local runs. Every submission-path loader resolves it
-# to backend/known_entities.json (submission_server.config, process_submission,
-# rosen_scraper.workflow via find_project_root). Some diagnostic/backfill
-# scripts still read it from divergent paths (backend/src/, cwd) and miss it —
-# tracked for consolidation in #354.
+# publications in CI and local runs. Every loader now resolves it to the single
+# curated backend/known_entities.json (submission_server.config,
+# process_submission, rosen_scraper.workflow via find_project_root, and the
+# diagnostic/backfill scripts anchored via Path(__file__) — #354).
+# schema_builder.py rebuilds the schema to a staging file by default and only
+# overwrites the curated file under --write-canonical (keeping a .bak); the
+# staging file and that backup are generated artifacts, not tracked.
+backend/known_entities.discovered.json
+backend/known_entities.json.bak
 
 # Playwright
 test-results/

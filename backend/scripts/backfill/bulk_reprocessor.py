@@ -7,7 +7,6 @@ with corrected IDs, proper author attribution, accurate content extraction,
 and consistent formatting.
 """
 
-import sys
 import os
 import time
 from pathlib import Path
@@ -18,16 +17,16 @@ from datetime import datetime
 from urllib.parse import urlparse
 from dotenv import load_dotenv
 
-ROOT_DIR = Path(__file__).resolve().parents[2]
-SRC_DIR = ROOT_DIR / "src"
-if str(ROOT_DIR) not in sys.path:
-    sys.path.append(str(ROOT_DIR))
+from rosen_scraper.workflow import get_schema, enrich_data, generate_source_based_id, format_date_mmddyyyy
+from rosen_scraper.entity_resolver import load_known_entities
+from rosen_scraper.enhanced_pdf_formatter import EnhancedPDFFormatter
+from rosen_scraper.logger import init_logger
+from rosen_scraper.categorizer import summarize_and_classify
 
-from src.workflow import get_schema, enrich_data, generate_source_based_id, format_date_mmddyyyy
-from src.entity_resolver import load_known_entities
-from src.enhanced_pdf_formatter import EnhancedPDFFormatter
-from src.logger import init_logger
-from src.categorizer import summarize_and_classify
+# Anchored to backend/ via the script's own location, so the curated
+# known_entities.json resolves correctly regardless of the working directory.
+ROOT_DIR = Path(__file__).resolve().parents[2]
+KNOWN_ENTITIES_FILE = ROOT_DIR / "known_entities.json"
 
 load_dotenv()
 
@@ -38,7 +37,7 @@ class BulkReprocessor:
         """Initialize the bulk reprocessor."""
         self.logger = init_logger("bulk_reprocessing")
         self.schema = get_schema(str(ROOT_DIR / 'schema.json'))
-        self.known_entities = load_known_entities(str(SRC_DIR / 'known_entities.json'))
+        self.known_entities = load_known_entities(str(KNOWN_ENTITIES_FILE))
         self.processed_count = 0
         self.success_count = 0
         self.error_count = 0

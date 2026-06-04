@@ -6,7 +6,6 @@ This script populates the newly added fields (platform, collection_id, permissio
 transcript_filepath, verified, notes) for existing records in the Google Sheet.
 """
 
-import sys
 import os
 import re
 from pathlib import Path
@@ -14,20 +13,19 @@ from urllib.parse import urlparse
 from dotenv import load_dotenv
 import gspread
 
-ROOT_DIR = Path(__file__).resolve().parents[2]
-SRC_DIR = ROOT_DIR / "src"
-if str(SRC_DIR) not in sys.path:
-    sys.path.append(str(SRC_DIR))
+from rosen_scraper.logger import init_logger
+from rosen_scraper.entity_resolver import load_known_entities, resolve_platform
 
-from src.logger import init_logger
-from src.entity_resolver import load_known_entities, resolve_platform
+# Anchored to backend/ via the script's own location, so the curated
+# known_entities.json resolves correctly regardless of the working directory.
+ROOT_DIR = Path(__file__).resolve().parents[2]
+KNOWN_ENTITIES_FILE = ROOT_DIR / "known_entities.json"
+TRANSCRIPTS_DIR = ROOT_DIR / "processed_transcripts"
 
 load_dotenv()
 
 # Configuration
 PAYWALLED_DOMAINS = ["www.washingtonpost.com", "www.nytimes.com", "www.wsj.com"]
-KNOWN_ENTITIES_FILE = SRC_DIR / 'known_entities.json'
-TRANSCRIPTS_DIR = SRC_DIR / 'processed_transcripts'
 
 def generate_collection_id(record):
     """Generate collection ID based on content patterns."""
@@ -122,11 +120,9 @@ def populate_new_fields(dry_run=True):
             return
 
         # Connect to Google Sheets
-        credentials_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
-        )
-        gc = gspread.service_account(filename=credentials_path)
+        credentials_filename = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+        credentials_path = ROOT_DIR / credentials_filename
+        gc = gspread.service_account(filename=str(credentials_path))
         sh = gc.open(os.environ.get("SPREADSHEET_NAME", "Rosen Archive URL List"))
         worksheet = sh.worksheet("test_runs")
 
