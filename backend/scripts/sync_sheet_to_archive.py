@@ -74,15 +74,19 @@ from submission_server.config import (  # noqa: E402
 CSV_FILE = _DEFAULT_CSV_FILE
 DEFAULT_SHEET_TAB = "test_runs"
 
-# The four canonical JSON artifacts `node export-archive-data.js` regenerates.
+# The canonical JSON artifacts `node export-archive-data.js` regenerates.
 # These are committed alongside the CSV so the PR carries a consistent data set
-# and main stays self-consistent. Keep in sync with sftp_push._PUSH_FILES (the
-# deploy-time contract) and export-archive-data.js (the producer).
+# and main stays self-consistent. archive-analytics.json must be here too, or a
+# sheet-sync PR commits updated data but stale analytics and the parity test in
+# tests/archive-analytics.test.js fails in CI. Keep in sync with
+# sftp_push._PUSH_FILES (the deploy-time contract) and export-archive-data.js
+# (the producer).
 _DEPLOY_JSON_FILES = (
     "archive-data.json",
     "archive-core.json",
     "archive-details.json",
     "archive-entities.json",
+    "archive-analytics.json",
 )
 
 # Columns the enrichment jobs produce. On sync the sheet's non-empty value wins

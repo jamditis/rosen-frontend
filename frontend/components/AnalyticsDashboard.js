@@ -21,13 +21,7 @@ import {
 import {
   initSqlite,
   isSqliteReady,
-  getRecordCountByYear,
-  getRecordCountByCategory,
-  getRecordCountByEra,
-  getMostMentionedEntities,
-  getMostCommonConcepts,
-  getCategoryCoOccurrence,
-  getSqliteStats,
+  fetchAnalytics,
   queryAsObjects
 } from '../services/archiveService.js?v=3.4.0';
 import QueryBuilder from './QueryBuilder.js?v=3.4.0';
@@ -90,32 +84,26 @@ const AnalyticsDashboard = ({ onBack }) => {
   const [coOccurrence, setCoOccurrence] = useState([]);
   const [customQueryResult, setCustomQueryResult] = useState(null);
   const [customQuery, setCustomQuery] = useState('SELECT year, COUNT(*) as count FROM records GROUP BY year ORDER BY count DESC LIMIT 10');
+  // Tracks the lazy SQLite load triggered by the raw-SQL box (the charts above
+  // render from the prebuilt aggregates and never need SQLite).
+  const [sqlLoading, setSqlLoading] = useState(false);
 
-  // Initialize SQLite and load data
+  // Load the prebuilt analytics aggregates. This is a ~1KB fetch, not the
+  // ~28MB SQLite source — SQLite only loads when a user runs a custom query.
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        if (!isSqliteReady()) {
-          console.log('[Analytics] Initializing SQLite...');
-          const success = await initSqlite();
-          if (!success) {
-            throw new Error('Failed to initialize SQLite database');
-          }
-        }
-
-        console.log('[Analytics] Loading analytics data...');
-
-        setStats(getSqliteStats());
-        setByYear(getRecordCountByYear());
-        setByCategory(getRecordCountByCategory());
-        setByEra(getRecordCountByEra());
-        setTopPeople(getMostMentionedEntities('Person', 10));
-        setTopConcepts(getMostCommonConcepts(10));
-        setCoOccurrence(getCategoryCoOccurrence(10));
-
+        const analytics = await fetchAnalytics();
+        setStats(analytics.stats);
+        setByYear(analytics.byYear);
+        setByCategory(analytics.byCategory);
+        setByEra(analytics.byEra);
+        setTopPeople(analytics.topPeople);
+        setTopConcepts(analytics.topConcepts);
+        setCoOccurrence(analytics.coOccurrence);
         setLoading(false);
       } catch (err) {
         console.error('[Analytics] Error:', err);
@@ -127,12 +115,23 @@ const AnalyticsDashboard = ({ onBack }) => {
     loadData();
   }, []);
 
-  // Run custom query
-  const runCustomQuery = () => {
+  // Run a raw SQL query. SQLite is loaded on demand here (and in the Query
+  // Builder) rather than on page load, so the first query pays the load cost.
+  const runCustomQuery = async () => {
     try {
+      if (!isSqliteReady()) {
+        setSqlLoading(true);
+        const ready = await initSqlite();
+        setSqlLoading(false);
+        if (!ready) {
+          setCustomQueryResult({ success: false, error: 'Could not load the query database. Please try again.' });
+          return;
+        }
+      }
       const result = queryAsObjects(customQuery);
       setCustomQueryResult({ success: true, data: result });
     } catch (err) {
+      setSqlLoading(false);
       setCustomQueryResult({ success: false, error: err.message });
     }
   };
@@ -164,8 +163,7 @@ const AnalyticsDashboard = ({ onBack }) => {
         ${loading && html`
           <div className="flex flex-col items-center justify-center h-64">
             <${Loader2} className="w-8 h-8 text-stone-400 animate-spin mb-4" />
-            <p className="text-stone-500">Initializing SQLite database...</p>
-            <p className="text-xs text-stone-400 mt-2">Loading ~25MB of archive data</p>
+            <p className="text-stone-500">Loading analytics...</p>
           </div>
         `}
 
@@ -298,12 +296,17 @@ const AnalyticsDashboard = ({ onBack }) => {
                 <div className="flex items-center gap-4">
                   <button
                     onClick=${runCustomQuery}
-                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors font-bold text-sm flex items-center gap-2"
+                    disabled=${sqlLoading}
+                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors font-bold text-sm flex items-center gap-2 disabled:opacity-60"
                   >
-                    <${RefreshCw} className="w-4 h-4" /> Run Query
+                    ${sqlLoading
+                      ? html`<${Loader2} className="w-4 h-4 animate-spin" /> Loading database...`
+                      : html`<${RefreshCw} className="w-4 h-4" /> Run Query`}
                   </button>
                   <span className="text-xs text-stone-500">
-                    Tables: records, record_categories, record_concepts, entities, record_entities
+                    ${sqlLoading
+                      ? 'First query loads the full archive into SQLite (~28MB, one time)'
+                      : 'Tables: records, record_categories, record_concepts, entities, record_entities'}
                   </span>
                 </div>
 

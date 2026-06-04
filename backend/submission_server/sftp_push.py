@@ -34,13 +34,14 @@ from .config import FTP_STAGING_DIR
 
 logger = logging.getLogger('submission_server.sftp_push')
 
-# These match the four files _stage_for_ftp() copies. Keep in sync with
-# processor.py:_stage_for_ftp — a divergence would silently ship stale JSON.
+# These match the files _stage_for_ftp() copies. Keep in sync with
+# processor.py:_STAGED_JSON_FILES — a divergence would silently ship stale JSON.
 _PUSH_FILES = (
     'archive-data.json',
     'archive-core.json',
     'archive-details.json',
     'archive-entities.json',
+    'archive-analytics.json',
 )
 
 

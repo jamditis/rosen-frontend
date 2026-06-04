@@ -577,38 +577,87 @@ export const preloadDetails = () => {
 };
 
 /**
+ * Fetch prebuilt analytics aggregates (~1KB).
+ *
+ * Powers the default Analytics dashboard view without loading the ~28MB source
+ * into in-browser SQLite. Throws on a failed fetch so the dashboard can render
+ * its explicit error state rather than a misleading empty view (mirrors the
+ * fetchCoreData throw contract, issue #290).
+ */
+export const fetchAnalytics = async () => {
+  const dataUrl = DATA_CONFIG.archive_analytics;
+
+  // Run the same deploy-version gate as core data. A cold #analytics deep-link
+  // skips fetchCoreData, so without this a stale cache could survive a deploy.
+  await withVersionTimeout(checkVersion());
+
+  const cached = getCachedData(dataUrl);
+  if (cached) {
+    debug('Using cached analytics data');
+    return cached;
+  }
+
+  debug('Fetching analytics data from:', dataUrl);
+
+  const response = await fetch(dataUrl);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  const data = await response.json();
+  setCachedData(dataUrl, data);
+  return data;
+};
+
+/**
  * Initialize SQLite database with full archive data (optional)
  * Call this to enable SQL queries for advanced analytics
  */
+// Memoise the in-flight init so the two query surfaces (the raw-SQL box and the
+// Query Builder) that may both trigger a first load don't each fetch and parse
+// the ~28MB source. Released on a failed/false result so a later retry can run.
+let sqliteInitPromise = null;
 export const initSqlite = async () => {
-  try {
-    // Initialize the database
-    await initDatabase();
+  if (sqliteInitPromise) return sqliteInitPromise;
 
-    // Load full data if we have it cached, otherwise fetch it
-    const fullDataUrl = DATA_CONFIG.archive_json;
-    let fullData = getCachedData(fullDataUrl);
+  const pending = (async () => {
+    try {
+      // Initialize the database
+      await initDatabase();
 
-    if (!fullData) {
-      debug('[SQLite] Fetching full archive data for SQL database...');
-      const response = await fetch(fullDataUrl);
-      if (response.ok) {
-        fullData = await response.json();
-        setCachedData(fullDataUrl, fullData);
+      // Load full data if we have it cached, otherwise fetch it
+      const fullDataUrl = DATA_CONFIG.archive_json;
+      let fullData = getCachedData(fullDataUrl);
+
+      if (!fullData) {
+        debug('[SQLite] Fetching full archive data for SQL database...');
+        const response = await fetch(fullDataUrl);
+        if (response.ok) {
+          fullData = await response.json();
+          setCachedData(fullDataUrl, fullData);
+        }
       }
-    }
 
-    if (fullData) {
-      await loadSqliteData(fullData);
-      debug('[SQLite] Database ready for queries');
-      return true;
-    }
+      if (fullData) {
+        await loadSqliteData(fullData);
+        debug('[SQLite] Database ready for queries');
+        return true;
+      }
 
-    return false;
-  } catch (error) {
-    console.error('[SQLite] Failed to initialize:', error);
-    return false;
-  }
+      return false;
+    } catch (error) {
+      console.error('[SQLite] Failed to initialize:', error);
+      return false;
+    }
+  })();
+
+  sqliteInitPromise = pending;
+  // Keep the memo only for a successful load; drop it on false/throw so the
+  // next query attempt re-tries instead of resolving the cached failure.
+  pending.then(
+    (ok) => { if (!ok && sqliteInitPromise === pending) sqliteInitPromise = null; },
+    () => { if (sqliteInitPromise === pending) sqliteInitPromise = null; }
+  );
+  return pending;
 };
 
 /**

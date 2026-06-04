@@ -1,0 +1,174 @@
+/**
+ * Analytics aggregates parity + lazy-load wiring tests (#338)
+ *
+ * The Analytics dashboard renders its six charts from a prebuilt
+ * data/archive-analytics.json instead of loading the ~28MB source into
+ * in-browser SQLite. The parity test runs computeAnalytics for real (sql.js,
+ * Node) and locks the committed artifact to its source data. The wiring tests
+ * are source-text checks — the runtime behaviour lives in browser-only React
+ * components, so a static check guards the regression without a jsdom harness
+ * (same approach as fetch-error-handling.test.js).
+ */
+
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { computeAnalytics } from '../data/compute-analytics.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const rootDir = path.join(__dirname, '..');
+const readSrc = (...p) => fs.readFileSync(path.join(rootDir, ...p), 'utf-8');
+
+describe('analytics aggregates artifact (#338)', () => {
+  it('archive-analytics.json matches computeAnalytics(archive-data.json)', async () => {
+    const data = JSON.parse(readSrc('data', 'archive-data.json'));
+    const committed = JSON.parse(readSrc('data', 'archive-analytics.json'));
+    const computed = await computeAnalytics(data);
+    assert.deepEqual(
+      committed,
+      computed,
+      'data/archive-analytics.json is stale — regenerate with `node data/export-archive-data.js`'
+    );
+  });
+
+  it('has the four stat counts the dashboard reads', () => {
+    const a = JSON.parse(readSrc('data', 'archive-analytics.json'));
+    for (const key of ['records', 'categories', 'concepts', 'entities']) {
+      assert.equal(typeof a.stats[key], 'number', `stats.${key} must be a number`);
+      assert.ok(a.stats[key] > 0, `stats.${key} should be > 0`);
+    }
+  });
+
+  it('caps the top-N charts at 10 rows (matches dashboard limits)', () => {
+    const a = JSON.parse(readSrc('data', 'archive-analytics.json'));
+    assert.ok(a.topPeople.length <= 10, 'topPeople must be <= 10');
+    assert.ok(a.topConcepts.length <= 10, 'topConcepts must be <= 10');
+    assert.ok(a.coOccurrence.length <= 10, 'coOccurrence must be <= 10');
+  });
+
+  it('chart rows carry the keys the dashboard renders', () => {
+    const a = JSON.parse(readSrc('data', 'archive-analytics.json'));
+    assert.deepEqual(Object.keys(a.byYear[0]).sort(), ['count', 'year']);
+    assert.deepEqual(Object.keys(a.byCategory[0]).sort(), ['category', 'count']);
+    assert.deepEqual(Object.keys(a.byEra[0]).sort(), ['count', 'era']);
+    assert.deepEqual(Object.keys(a.topPeople[0]).sort(), ['mentions', 'name', 'type']);
+    assert.deepEqual(Object.keys(a.topConcepts[0]).sort(), ['concept', 'count']);
+    assert.deepEqual(Object.keys(a.coOccurrence[0]).sort(), ['category1', 'category2', 'co_occurrences']);
+  });
+
+  it('payload stays tiny (well under the multi-MB source data)', () => {
+    const bytes = fs.statSync(path.join(rootDir, 'data', 'archive-analytics.json')).size;
+    assert.ok(bytes < 50 * 1024, `archive-analytics.json should be < 50KB, was ${bytes} bytes`);
+  });
+});
+
+describe('analytics lazy-load wiring (#338)', () => {
+  it('AnalyticsDashboard renders from fetchAnalytics, not live SQLite, on mount', () => {
+    const src = readSrc('frontend', 'components', 'AnalyticsDashboard.js');
+    assert.match(src, /fetchAnalytics\s*\(/, 'dashboard must call fetchAnalytics()');
+    assert.doesNotMatch(src, /getSqliteStats\s*\(/, 'dashboard must not call getSqliteStats on mount');
+    assert.doesNotMatch(src, /getRecordCountByYear\s*\(/, 'dashboard must not run the live year query on mount');
+  });
+
+  it('raw SQL box lazy-inits SQLite on first run', () => {
+    const src = readSrc('frontend', 'components', 'AnalyticsDashboard.js');
+    const fnIdx = src.indexOf('const runCustomQuery');
+    assert.ok(fnIdx >= 0, 'expected runCustomQuery');
+    const body = src.slice(fnIdx, fnIdx + 900);
+    assert.match(body, /isSqliteReady\s*\(/, 'runCustomQuery must check isSqliteReady');
+    assert.match(body, /await\s+initSqlite\s*\(/, 'runCustomQuery must await initSqlite when not ready');
+  });
+
+  it('QueryBuilder lazy-inits SQLite instead of erroring when not ready', () => {
+    const src = readSrc('frontend', 'components', 'QueryBuilder.js');
+    const fnIdx = src.indexOf('const runQuery');
+    assert.ok(fnIdx >= 0, 'expected runQuery');
+    const body = src.slice(fnIdx, fnIdx + 900);
+    assert.match(body, /await\s+initSqlite\s*\(/, 'runQuery must await initSqlite');
+    assert.doesNotMatch(body, /Database is not ready\. Please wait/, 'the old not-ready bail-out must be gone');
+  });
+
+  it('initSqlite is memoised against concurrent first loads', () => {
+    const src = readSrc('frontend', 'services', 'archiveService.js');
+    assert.match(src, /let\s+sqliteInitPromise\s*=\s*null/, 'expected the sqliteInitPromise memo');
+    const fnIdx = src.indexOf('export const initSqlite');
+    const body = src.slice(fnIdx, fnIdx + 300);
+    assert.match(
+      body,
+      /if\s*\(\s*sqliteInitPromise\s*\)\s*return\s+sqliteInitPromise/,
+      'initSqlite must return the in-flight promise when one exists'
+    );
+  });
+
+  it('fetchAnalytics throws on a failed response (no silent fallback)', () => {
+    const src = readSrc('frontend', 'services', 'archiveService.js');
+    const fnIdx = src.indexOf('export const fetchAnalytics');
+    assert.ok(fnIdx >= 0, 'expected fetchAnalytics export');
+    const bodyEnd = src.indexOf('\nexport ', fnIdx + 1);
+    const body = src.slice(fnIdx, bodyEnd >= 0 ? bodyEnd : fnIdx + 1500);
+    assert.match(body, /if\s*\(\s*!response\.ok\s*\)/, 'fetchAnalytics must check response.ok');
+    assert.match(body, /throw new Error/, 'fetchAnalytics must throw on a failed fetch');
+  });
+
+  it('App.js skips the core fetch on a cold #analytics deep-link', () => {
+    const src = readSrc('frontend', 'App.js');
+    assert.match(src, /coreFetchStarted/, 'expected the coreFetchStarted ref guard');
+    assert.match(
+      src,
+      /currentRoute\s*===\s*ROUTES\.analytics\)\s*return/,
+      'the load effect must early-return on the analytics route'
+    );
+  });
+
+  it('constants.js defines a relative archive_analytics path', () => {
+    const src = readSrc('frontend', 'constants.js');
+    assert.match(
+      src,
+      /archive_analytics:\s*'\.\/data\/archive-analytics\.json'/,
+      'archive_analytics must be a relative path — JSON fetches do not route through pathResolver'
+    );
+  });
+
+  it('index.html no longer eagerly prefetches the full archive data', () => {
+    const src = readSrc('index.html');
+    assert.doesNotMatch(src, /prefetch[^>]*archive-data\.json/, 'the eager archive-data.json prefetch must be removed');
+  });
+
+  it('service worker caches archive-analytics.json', () => {
+    assert.match(readSrc('frontend', 'sw.js'), /archive-analytics\.json/, 'sw.js DATA_URLS must include archive-analytics.json');
+  });
+
+  // archive-analytics.json is regenerated by export-archive-data.js, so EVERY
+  // deploy surface that ships the other data JSON files must ship it too —
+  // otherwise a record update through one path leaves the dashboard serving
+  // stale analytics. There are four manifests; missing one is the bug class
+  // Codex caught (deploy_full_site covered, submission-server path was not).
+  it('every deploy manifest ships archive-analytics.json alongside the other data files', () => {
+    const manifests = [
+      ['backend', 'scripts', 'deploy_full_site.py'],
+      ['backend', 'scripts', 'sync_sheet_to_archive.py'],
+      ['backend', 'submission_server', 'processor.py'],
+      ['backend', 'submission_server', 'sftp_push.py'],
+      ['backend', 'submission_server', 'deploy.sh'],
+    ];
+    for (const m of manifests) {
+      const src = readSrc(...m);
+      // Sanity: confirm this really is a data-file manifest before asserting.
+      assert.match(src, /archive-core\.json/, `${m.join('/')} should list the core data file`);
+      assert.match(
+        src,
+        /archive-analytics\.json/,
+        `${m.join('/')} ships data JSON but is missing archive-analytics.json — the dashboard will serve stale analytics after a deploy through this path`
+      );
+    }
+  });
+
+  it('export pipeline regenerates the aggregates', () => {
+    const src = readSrc('data', 'export-archive-data.js');
+    assert.match(src, /computeAnalytics\s*\(/, 'export-archive-data.js must call computeAnalytics');
+    assert.match(src, /archive-analytics\.json/, 'export-archive-data.js must write archive-analytics.json');
+  });
+});

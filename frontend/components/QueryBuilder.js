@@ -14,9 +14,10 @@ import {
   RotateCcw,
   ChevronDown,
   Sparkles,
-  HelpCircle
+  HelpCircle,
+  Loader2
 } from 'lucide-react';
-import { queryAsObjects, isSqliteReady } from '../services/archiveService.js?v=3.4.0';
+import { queryAsObjects, isSqliteReady, initSqlite } from '../services/archiveService.js?v=3.4.0';
 
 // Query template definitions
 const QUERY_TEMPLATES = [
@@ -476,6 +477,8 @@ const QueryBuilder = () => {
   const [error, setError] = useState(null);
   const [showSql, setShowSql] = useState(false);
   const [resultCount, setResultCount] = useState(0);
+  // SQLite loads on first query rather than on dashboard mount (issue #338).
+  const [dbLoading, setDbLoading] = useState(false);
 
   const selectedTemplate = QUERY_TEMPLATES.find(t => t.id === selectedTemplateId);
 
@@ -496,19 +499,29 @@ const QueryBuilder = () => {
     setFieldValues(prev => ({ ...prev, [fieldName]: value }));
   };
 
-  const runQuery = () => {
-    if (!isSqliteReady()) {
-      setError('Database is not ready. Please wait for it to load.');
-      return;
-    }
-
+  const runQuery = async () => {
     try {
+      // Load SQLite on demand. The dashboard no longer initializes it on mount,
+      // so the first query in either query surface pays the one-time load.
+      if (!isSqliteReady()) {
+        setDbLoading(true);
+        const ready = await initSqlite();
+        setDbLoading(false);
+        if (!ready) {
+          setError('Could not load the query database. Please try again.');
+          setResults(null);
+          setResultCount(0);
+          return;
+        }
+      }
+
       const sql = selectedTemplate.buildSql(fieldValues);
       const queryResults = queryAsObjects(sql);
       setResults(queryResults);
       setResultCount(queryResults.length);
       setError(null);
     } catch (err) {
+      setDbLoading(false);
       setError(err.message);
       setResults(null);
       setResultCount(0);
@@ -568,10 +581,12 @@ const QueryBuilder = () => {
         <div className="flex flex-wrap items-center gap-3 mt-6 pt-4 border-t border-stone-200">
           <button
             onClick=${runQuery}
-            className="flex items-center gap-2 px-5 py-2.5 bg-stone-900 text-white rounded-lg hover:bg-stone-800 transition-colors font-bold"
+            disabled=${dbLoading}
+            className="flex items-center gap-2 px-5 py-2.5 bg-stone-900 text-white rounded-lg hover:bg-stone-800 transition-colors font-bold disabled:opacity-60"
           >
-            <${Play} className="w-4 h-4" />
-            Run Query
+            ${dbLoading
+              ? html`<${Loader2} className="w-4 h-4 animate-spin" /> Loading database...`
+              : html`<${Play} className="w-4 h-4" /> Run Query`}
           </button>
           <button
             onClick=${resetQuery}

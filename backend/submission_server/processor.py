@@ -176,6 +176,7 @@ _STAGED_JSON_FILES = (
     'archive-core.json',
     'archive-details.json',
     'archive-entities.json',
+    'archive-analytics.json',
 )
 
 

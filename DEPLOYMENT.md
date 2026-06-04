@@ -31,6 +31,7 @@ data/                               # Archive data (JSON only)
   archive-details.json              # Full summaries (loads on demand)
   archive-data.json                 # Combined fallback
   archive-entities.json             # Entity graph
+  archive-analytics.json            # Prebuilt analytics aggregates (~1KB, loads on analytics view)
   feeds/                            # RSS/OPML feeds
     rss.xml
     articles.xml
@@ -83,6 +84,7 @@ If you've added records to the CSV and regenerated JSON, only upload:
 - `data/archive-core.json`
 - `data/archive-data.json`
 - `data/archive-details.json`
+- `data/archive-analytics.json`
 
 Other files only change when the site code changes.
 
