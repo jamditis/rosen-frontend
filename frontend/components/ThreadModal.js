@@ -1,5 +1,6 @@
 import { html } from '../html.js?v=3.4.0';
 import { ExternalLink } from 'lucide-react';
+import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.4.0';
 
 // Convert a bsky.app URL to the unauthenticated embed.bsky.app equivalent
 const toEmbedUrl = (url) => {
@@ -80,7 +81,7 @@ const ThreadPost = ({ post, totalPosts }) => {
             `}
 
             <a
-                href=${toEmbedUrl(post.url)}
+                href=${sanitizeHref(toEmbedUrl(post.url))}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-xs text-sky-600 hover:text-sky-700 transition-colors"

@@ -4,6 +4,7 @@ import { html } from '../html.js?v=3.4.0';
 import { ExternalLink, RefreshCw, Download, Settings2, Network, Users, Building2, Lightbulb, Globe, Tags, Search, ChevronDown, ChevronUp, ArrowLeft, X } from 'lucide-react';
 import { COLORS } from '../constants.js?v=3.4.0';
 import { calculateEntityConnectionStrength, getEntitiesByRecord, fetchEntitiesData, areEntitiesLoaded, fetchRecordDetails } from '../services/archiveService.js?v=3.4.0';
+import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.4.0';
 
 // Connection mode configurations
 const CONNECTION_MODES = {
@@ -986,7 +987,7 @@ const Explorer = ({ records, onBack }) => {
               </h3>
             </div>
             ${selectedNode.url && html`
-              <a href=${selectedNode.url} target="_blank" rel="noreferrer"
+              <a href=${sanitizeHref(selectedNode.url)} target="_blank" rel="noreferrer"
                  className="text-xs text-blue-600 hover:underline flex items-center gap-1 shrink-0 ml-2"
                  onClick=${(e) => e.stopPropagation()}>
                 View source <${ExternalLink} className="w-3 h-3" />
