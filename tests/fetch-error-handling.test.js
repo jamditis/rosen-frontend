@@ -105,3 +105,37 @@ describe('fetch error handling (#171)', () => {
     );
   });
 });
+
+describe('fetchCoreData failure propagation (#290)', () => {
+  it('re-throws on fetch failure instead of masking it as a 1-record archive', () => {
+    const file = path.join(rootDir, 'frontend', 'services', 'archiveService.js');
+    const src = fs.readFileSync(file, 'utf-8');
+
+    const fnIdx = src.indexOf('export const fetchCoreData');
+    assert.ok(fnIdx >= 0, 'expected `export const fetchCoreData` in archiveService.js');
+    const bodyEnd = src.indexOf('\nexport ', fnIdx + 1);
+    const body = src.slice(fnIdx, bodyEnd >= 0 ? bodyEnd : src.length);
+
+    // Inspect only the catch block — the try block legitimately throws on
+    // !response.ok, which we want to propagate, not swallow.
+    const catchIdx = body.indexOf('catch (error)');
+    assert.ok(catchIdx >= 0, 'expected a `catch (error)` block in fetchCoreData');
+    const catchBlock = body.slice(catchIdx);
+
+    // Must propagate the failure so App.js's .catch can render its error state.
+    assert.match(
+      catchBlock,
+      /throw\s+error/,
+      'fetchCoreData must re-throw on failure so App.js renders its error state (#290)'
+    );
+
+    // Must NOT swallow it by returning a synthetic records fallback — that
+    // ships visitors a near-empty archive labelled as the real one, hiding a
+    // CDN/JSON/deploy outage from users and monitors alike.
+    assert.doesNotMatch(
+      catchBlock,
+      /return\s*\{/,
+      'fetchCoreData catch must not return a fallback object — it masks an outage as a 1-record archive (#290)'
+    );
+  });
+});
