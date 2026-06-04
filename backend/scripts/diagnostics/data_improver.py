@@ -8,25 +8,21 @@ and leaves notes after processing.
 import gspread
 import os
 import json
-import sys
 from pathlib import Path
 from dotenv import load_dotenv
 import time
 from datetime import datetime # Import datetime for timestamped notes
 
-ROOT_DIR = Path(__file__).resolve().parents[2]
-SRC_DIR = ROOT_DIR / "src"
-if str(SRC_DIR) not in sys.path:
-    sys.path.append(str(SRC_DIR))
-
-from src import entity_resolver, dispatcher
+from rosen_scraper import entity_resolver, dispatcher
 
 # Load environment variables from a .env file for secure configuration management.
 load_dotenv()
 
-# Define key file paths relative to the repository root.
+# Anchored to backend/ via the script's own location, so schema.json and the
+# curated known_entities.json resolve regardless of the working directory.
+ROOT_DIR = Path(__file__).resolve().parents[2]
 SCHEMA_FILE = ROOT_DIR / 'schema.json'
-KNOWN_ENTITIES_FILE = SRC_DIR / 'known_entities.json'
+KNOWN_ENTITIES_FILE = ROOT_DIR / 'known_entities.json'
 
 # Define column indices for clarity (using 1-based indexing for gspread)
 RAW_TEXT_COL_INDEX = 31 # Column AF (zero-based index for list access)
@@ -120,8 +116,9 @@ def main():
     """The main function for the data improver."""
     # --- 1. Connect to Google Sheets ---
     try:
-        credentials_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json"))
-        gc = gspread.service_account(filename=credentials_path)
+        credentials_filename = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+        credentials_path = ROOT_DIR / credentials_filename
+        gc = gspread.service_account(filename=str(credentials_path))
         sh = gc.open(os.environ.get("SPREADSHEET_NAME", "Rosen Archive URL List"))
         test_worksheet = sh.worksheet("test_runs")
     except Exception as e:
