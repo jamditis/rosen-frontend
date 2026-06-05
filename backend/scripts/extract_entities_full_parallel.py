@@ -25,65 +25,7 @@ backend_dir = Path(__file__).parent.parent
 sys.path.insert(0, str(backend_dir))
 
 from rosen_scraper import entity_extractor
-
-
-def load_social_posts(csv_path: Path, min_words: int = 7) -> List[Dict]:
-    """Load social posts from CSV with filtering."""
-    posts = []
-
-    with open(csv_path, 'r', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            word_count = int(row.get('word_count', 0) or 0)
-            if word_count < min_words:
-                continue
-
-            content = row.get('raw_text', '').strip()
-            if not content or len(content) < 20:
-                continue
-
-            posts.append(row)
-
-    return posts
-
-
-def prioritize_posts(posts: List[Dict], max_posts: int = 10000) -> List[Dict]:
-    """Prioritize posts by engagement and recency."""
-    if len(posts) <= max_posts:
-        return posts
-
-    scored_posts = []
-    for post in posts:
-        score = 0
-
-        # Engagement
-        likes = int(post.get('likes', 0) or 0)
-        reposts = int(post.get('reposts', 0) or 0)
-        score += min(likes + (reposts * 2), 100)
-
-        # Recency
-        try:
-            year = int(post.get('publication_date', '')[:4])
-            if year >= 2023:
-                score += 50
-            elif year >= 2020:
-                score += 25
-        except (ValueError, IndexError):
-            pass
-
-        # Length
-        word_count = int(post.get('word_count', 0) or 0)
-        if word_count > 100:
-            score += 25
-        elif word_count > 50:
-            score += 15
-        elif word_count > 20:
-            score += 5
-
-        scored_posts.append((score, post))
-
-    scored_posts.sort(key=lambda x: x[0], reverse=True)
-    return [post for score, post in scored_posts[:max_posts]]
+from rosen_scraper.post_loader import load_social_posts, prioritize_posts
 
 
 def extract_from_post(post: Dict) -> Dict:
