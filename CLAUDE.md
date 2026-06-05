@@ -193,13 +193,8 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │
 ├── tests/                           # Frontend/data test suite — Node.js built-in runner (16 *.test.js files plus a validate-dissertation-page.js helper script; 17 files total)
 │
-├── archived/                        # Legacy code (reference only)
-│   ├── archive-v1/                  # Original archive interface
-│   ├── web/                         # Win95-themed promotional site
-│   ├── byok-chat/                   # Archived BYOK Claude chat
-│   ├── academic-testimonials/       # Archived testimonials
-│   ├── dissertation-tools/          # 7 retired dissertation tools (comparison, concepts, context, excerpts, faq, glossary, timeline) + a source/ bundle (PDF + markdown + helper script)
-│   └── docs/                        # Older docs (legacy designs, plans)
+├── archived/                        # Reference only, not deployed (see DEPLOYMENT.md)
+│   └── dissertation-tools/          # 7 retired dissertation tools (comparison, concepts, context, excerpts, faq, glossary, timeline) + a source/ bundle (PDF + markdown + helper script); kept pending the decisions-pending.md call. The rest of archived/ was pruned in #166.
 │
 ├── docs/                            # Project documentation
 │   ├── agent-personas/              # Contributor role definitions (5 personas)
