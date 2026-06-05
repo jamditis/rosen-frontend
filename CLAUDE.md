@@ -191,7 +191,7 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── dataexplorer/                # Tabular data explorer
 │   └── dataviz/                     # Data visualization tool
 │
-├── tests/                           # Frontend/data test suite — Node.js built-in runner (16 *.test.js files plus a validate-dissertation-page.js helper script; 17 files total)
+├── tests/                           # Frontend/data test suite — Node.js built-in runner (24 *.test.js files plus a validate-dissertation-page.js helper script; 25 files total)
 │
 ├── archived/                        # Reference only, not deployed (see DEPLOYMENT.md)
 │   └── dissertation-tools/          # 7 retired dissertation tools (comparison, concepts, context, excerpts, faq, glossary, timeline) + a source/ bundle (PDF + markdown + helper script); kept pending the decisions-pending.md call. The rest of archived/ was pruned in #166.
@@ -261,7 +261,7 @@ Spawns the preview server, walks 9 key routes (archive, explorer, entities, abou
 
 ## Testing
 
-Tests use Node.js built-in test runner (`node --test`). The suite under `tests/` currently spans 16 files covering data integrity, CSV quality, pipeline, thread algorithm/detection, frontend structure, view-state, linkify, entity-index, service-worker cache, HTTP cached loader, fetch error handling, schema BOM, data-explorer security, version consistency, and process-record:
+Tests use Node.js built-in test runner (`node --test`). The suite under `tests/` currently spans 24 files covering data integrity, CSV quality, pipeline, thread algorithm/detection, frontend structure, view-state, route vocabulary, linkify, entity-index, service-worker cache, HTTP cached loader, fetch error handling, schema BOM, data-explorer security, version consistency, and process-record:
 
 ```bash
 npm test                   # Run the full suite
