@@ -156,4 +156,3 @@ This is expected for older websites. The script disables SSL verification to han
 
 - `validate_archive_data.py` - Validates data schema and completeness
 - `analyze_archive_patterns.py` - Analyzes content patterns
-- `merge_new_records.py` - Merges new records into the archive
