@@ -1,11 +1,29 @@
 name: Post-merge dashboard sync
 
+# Notifies the archive's publish target when a PR merges to main. The intended
+# use is to sync the live WordPress copy of the archive
+# (pressthink.org/j/rosen-archive/) on merge; that sync endpoint does not exist
+# yet (see issue #154).
+#
+# Until it does, leave the DASHBOARD_WEBHOOK_URL *repository variable* unset:
+# the whole job is gated on it, so an unconfigured repo starts no runner and
+# spends no Actions minutes. To wire it in later, set DASHBOARD_WEBHOOK_URL as a
+# repository variable (NOT an environment variable — a job-level "if:" is
+# evaluated before the job reaches a runner, so it cannot see environment-scoped
+# vars and the guard would stay false forever) and add the WEBHOOK_SECRET secret
+# under the "main" environment. No code edit needed.
+
 on:
   push:
     branches: [main, master]
 
 jobs:
   notify-dashboard:
+    # Skip the whole job while no endpoint is configured. Gating here, not just
+    # on the curl step, means an unconfigured repo spins up no runner at all.
+    # Use a repository variable (not an environment one) so it resolves in this
+    # job-level condition.
+    if: vars.DASHBOARD_WEBHOOK_URL != ''
     runs-on: ubuntu-latest
     environment: main
     permissions:
@@ -32,8 +50,11 @@ jobs:
           REPO: ${{ github.repository }}
           ACTOR: ${{ github.actor }}
           SHA: ${{ github.sha }}
+          WEBHOOK_URL: ${{ vars.DASHBOARD_WEBHOOK_URL }}
+          WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
         run: |
-          # Use jq to build JSON safely — PR titles can contain quotes and special chars
+          # Build JSON with jq so a PR title containing quotes or special chars
+          # can't break the payload or inject shell.
           PAYLOAD=$(jq -n \
             --arg repo "$REPO" \
             --arg pr "$PR_NUMBER" \
@@ -41,9 +62,10 @@ jobs:
             --arg by "$ACTOR" \
             --arg sha "$SHA" \
             '{repo: $repo, pr_number: $pr, title: $title, merged_by: $by, sha: $sha}')
-          # Replace YOUR_WEBHOOK_URL with your dashboard endpoint
+          # URL and secret come from env (set above), never inlined into the
+          # command, matching the injection-safe pattern used for the payload.
           curl -sf \
-            -X POST "YOUR_WEBHOOK_URL" \
-            -H "X-Webhook-Secret: ${{ secrets.WEBHOOK_SECRET }}" \
+            -X POST "$WEBHOOK_URL" \
+            -H "X-Webhook-Secret: $WEBHOOK_SECRET" \
             -H "Content-Type: application/json" \
             -d "$PAYLOAD" || echo "Dashboard notify failed (non-fatal)"
