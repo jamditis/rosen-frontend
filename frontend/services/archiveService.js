@@ -167,17 +167,6 @@ export const calculateEntityConnectionStrength = (recordId1, recordId2, entityTy
   };
 };
 
-/**
- * Get all entity types present in the data
- */
-export const getEntityTypes = () => {
-  const types = new Set();
-  entityById.forEach(entity => {
-    if (entity.type) types.add(entity.type);
-  });
-  return Array.from(types).sort();
-};
-
 const DISSERTATION_RECORD = {
   id: 'dissertation-1986',
   title: 'The Impossible Press: American Journalism and the Decline of Public Life',
