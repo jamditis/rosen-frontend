@@ -7,10 +7,17 @@ Focuses on URL-based date extraction which works very well for PressThink URLs.
 
 import gspread
 import os
-import re
+import sys
 import time
-from datetime import datetime
+from pathlib import Path
+
 from dotenv import load_dotenv
+
+# Anchor to this script's directory so the shared helper resolves whether the
+# script is run directly, loaded by file path (tests), or imported via the
+# `backfill` namespace package (run_date_backfill.py). See issue #189.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from date_extraction import extract_date_from_url
 
 # Load environment variables
 load_dotenv()
@@ -22,40 +29,8 @@ class SimpleDateBackfiller:
         self.final_ws = self.sh.worksheet('final')
 
     def extract_date_from_url(self, url):
-        """Extract publication date from URL patterns."""
-        # Pattern 1: PressThink URLs like /2020/11/ or /2003/08/25/
-        pressthink_match = re.search(r'/(\d{4})/(\d{2})/(?:(\d{2})/)?', url)
-        if pressthink_match:
-            year, month = pressthink_match.groups()[:2]
-            day = pressthink_match.group(3) or '01'  # Default to 1st if no day
-            try:
-                date = datetime(int(year), int(month), int(day))
-                return date.strftime('%m/%d/%Y')
-            except ValueError:
-                pass
-
-        # Pattern 2: Other date patterns in URLs
-        date_patterns = [
-            r'(\d{4})-(\d{2})-(\d{2})',  # YYYY-MM-DD
-            r'(\d{2})-(\d{2})-(\d{4})',  # MM-DD-YYYY
-            r'(\d{4})/(\d{2})/(\d{2})',  # YYYY/MM/DD
-        ]
-
-        for pattern in date_patterns:
-            match = re.search(pattern, url)
-            if match:
-                try:
-                    if pattern == r'(\d{2})-(\d{2})-(\d{4})':  # MM-DD-YYYY
-                        month, day, year = match.groups()
-                    else:  # YYYY-MM-DD or YYYY/MM/DD
-                        year, month, day = match.groups()
-
-                    date = datetime(int(year), int(month), int(day))
-                    return date.strftime('%m/%d/%Y')
-                except ValueError:
-                    continue
-
-        return None
+        """Extract a publication date from URL patterns (shared, see #189)."""
+        return extract_date_from_url(url)
 
     def backfill_publication_dates(self):
         """Backfill missing publication dates focusing on URL extraction."""
