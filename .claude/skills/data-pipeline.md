@@ -114,45 +114,7 @@ cd ../data
 node export-archive-data.js
 ```
 
-### Workflow 2: Import Tumblr Content
-
-```bash
-cd backend
-source venv/bin/activate
-
-# 1. Run Tumblr import
-python scripts/import_tumblr.py
-
-# 2. Merge into main archive
-python scripts/merge_new_records.py --source tumblr
-
-# 3. Extract entities
-python scripts/extract_entities_csv_batch.py --source tumblr
-
-# 4. Regenerate JSON
-cd ../data && node export-archive-data.js
-```
-
-### Workflow 3: Process Thread Data
-
-```bash
-cd backend
-source venv/bin/activate
-
-# 1. Reconstruct thread hierarchies from social posts
-python scripts/reconstruct_bluesky_threads.py
-
-# 2. Generate THREAD-* archive records
-python scripts/generate_thread_records.py
-
-# 3. Merge into archive
-python scripts/merge_new_records.py --source threads
-
-# 4. Regenerate JSON
-cd ../data && node export-archive-data.js
-```
-
-### Workflow 4: Data Quality Audit
+### Workflow 2: Data Quality Audit
 
 ```bash
 cd backend
@@ -174,7 +136,7 @@ python scripts/backfill/backfill_worker.py --field concepts
 python scripts/validate_schema.py
 ```
 
-### Workflow 5: Regenerate Frontend Data
+### Workflow 3: Regenerate Frontend Data
 
 ```bash
 # After any CSV changes

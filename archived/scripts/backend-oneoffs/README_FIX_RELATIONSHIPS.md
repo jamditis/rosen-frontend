@@ -1,18 +1,20 @@
 # Entity Relationship Fix Script - Quick Start
 
+> **Archived 2026-06-05 (rosen-frontend #190).** This documents a completed one-off migration. The script it describes (`fix_entity_relationships.py`) ran once on 2026-01-06 against `extracted_relationships.csv` and now lives in `archived/scripts/backend-oneoffs/` for provenance only — it is not part of the active pipeline and is not meant to be re-run. The companion `RELATIONSHIP_FIX_PLAN.md` it references is in `archived/docs/backend/` (and in the repo's git history). The full archive index is `README.md` in this directory.
+
 ## Purpose
 Fixes the 14 unfixable entity relationship issues identified in the validation report by creating proper entity IDs or mapping to existing entities.
 
 ## Files Created
-- **Main Script:** `/home/user/rosen-frontend/backend/scripts/fix_entity_relationships.py`
-- **Fix Plan:** `/home/user/rosen-frontend/backend/scripts/RELATIONSHIP_FIX_PLAN.md`
-- **This Guide:** `/home/user/rosen-frontend/backend/scripts/README_FIX_RELATIONSHIPS.md`
+- **Main Script:** `archived/scripts/backend-oneoffs/fix_entity_relationships.py` (originally `backend/scripts/`)
+- **Fix Plan:** `archived/docs/backend/RELATIONSHIP_FIX_PLAN.md`
+- **This Guide:** `archived/scripts/backend-oneoffs/README_FIX_RELATIONSHIPS.md` (originally `backend/scripts/`)
 
 ## Quick Start
 
-### Run the Script
+### How it was originally run
 ```bash
-cd /home/user/rosen-frontend
+# from the repo root, when the script lived at backend/scripts/ (now archived, do not re-run)
 python3 backend/scripts/fix_entity_relationships.py
 ```
 
@@ -68,4 +70,4 @@ cp extracted_relationships.csv.backup_* extracted_relationships.csv
 ```
 
 ## Questions?
-See the detailed fix plan in `RELATIONSHIP_FIX_PLAN.md` for full context on each fix.
+The detailed fix plan is `archived/docs/backend/RELATIONSHIP_FIX_PLAN.md` — full context on each fix lives there (and in the repo's git history).
