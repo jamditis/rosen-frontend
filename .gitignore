@@ -117,3 +117,12 @@ ftp-upload/
 .claude/phase4-*
 .claude/plan.md
 .claude/settings.local.json
+
+# Generated PDF test artifacts — not pytest fixtures, and no test reads them.
+# test_pdf_output/ and test_accessible_output/ hold output from the PDF generators
+# (enhanced_pdf_generator.py, accessible_pdf_generator.py), produced when they were
+# run from this directory. test_pdfs/ holds older sample PDFs with no current writer.
+# Committed copies were untracked in issue #169.
+backend/tests/test_pdf_output/
+backend/tests/test_accessible_output/
+backend/tests/test_pdfs/
