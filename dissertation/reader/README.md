@@ -2,86 +2,52 @@
 
 A clean, accessible HTML reading experience for Jay Rosen's 1986 doctoral dissertation.
 
-> **Build pipeline disabled (see issue #229).** `index.html` is the canonical source. The legacy `src/templates/shell.html` + `build-reader.py` pipeline has been disabled — `build-reader.py` aborts with an error if run — because the committed `index.html` has diverged with production features that are not in the template. Edit `index.html` directly; `src/css/` and `src/js/` are loaded by it at runtime and remain in active use.
+> `index.html` is the canonical source — edit it directly. There is no build step: the legacy `build-reader.py` + `src/templates/shell.html` generator was retired in #229 because the committed `index.html` had diverged with production features the template never had. `src/css/` and `src/js/` are loaded by `index.html` at runtime.
 
 ## Overview
 
-This reader converts the dissertation markdown (`src/impossible-press.md`) into a styled, navigable web application with features optimized for extended reading.
+The reader presents Jay Rosen's dissertation as a styled, navigable web application optimized for extended reading. The source text lives in `src/impossible-press.md`; the served page is the hand-maintained `index.html`.
 
 ## Features
 
 - **Navigation**: Sticky table of contents, smooth scroll, keyboard navigation
-- **Reading Experience**: Adjustable text size, dark mode, print-friendly
+- **Reading experience**: Adjustable text size, dark mode, print-friendly
 - **Accessibility**: WCAG 2.1 AA compliant, screen reader optimized
 - **Progress**: Reading position saved, resume functionality
 - **Offline**: Works offline via Service Worker (after first load)
-- **Text Selection Menu**: Highlight text to share, cite, or copy
+- **Text selection menu**: Highlight text to share, cite, or copy
   - **Share**: Generate social media-ready PNG with quote and citation
   - **Cite**: Copy APA-format citation with chapter reference
   - **Copy**: Quick copy selected text to clipboard
-- **Quick Actions**: Header buttons for PDF download, NotebookLM, and Archive access
+- **Quick actions**: Header buttons for PDF download, NotebookLM, and Archive access
 
-## Directory Structure
+## Directory structure
 
 ```
-dissertation-reader/
-├── build/                    # Build scripts
+dissertation/reader/
+├── index.html                # The reader (canonical source — edit directly)
 ├── src/
-│   ├── impossible-press.md   # Dissertation source markdown (build input)
+│   ├── impossible-press.md    # Dissertation source text
 │   ├── css/
-│   │   ├── variables.css     # CSS custom properties
-│   │   ├── typography.css    # Reading-optimized type styles
-│   │   ├── layout.css        # Responsive layout
-│   │   └── main.css          # Entry point
-│   ├── js/
-│   │   ├── settings.js       # Theme, font size, preferences
-│   │   ├── navigation.js     # ToC, scroll tracking
-│   │   ├── progress.js       # Reading progress
-│   │   └── reader.js         # Main entry point
-│   ├── fonts/                # Self-hosted fonts
-│   └── templates/
-│       └── shell.html        # HTML template
-├── dist/                     # Built output
+│   │   ├── variables.css      # CSS custom properties
+│   │   ├── typography.css     # Reading-optimized type styles
+│   │   ├── layout.css         # Responsive layout
+│   │   └── main.css           # Entry point (loaded by index.html)
+│   └── js/
+│       ├── settings.js        # Theme, font size, preferences
+│       ├── navigation.js      # ToC, scroll tracking
+│       ├── progress.js        # Reading progress
+│       └── reader.js          # Main entry point (loaded by index.html)
 └── README.md
 ```
 
-## Development
+## Editing
 
-### Prerequisites
+`index.html` is the canonical, hand-maintained source — edit it directly. The styles in `src/css/` and the scripts in `src/js/` are loaded by `index.html` at runtime with a cache-busting `?v=` query string, so bump that string when you change them. There is no build or bundle step.
 
-- Node.js 18+
-- npm or yarn
+To preview locally, run `npm run preview` from the repository root and open `http://localhost:8000/dissertation/reader/` — the preview server serves the repo root with the same path layout as production.
 
-### Setup
-
-```bash
-cd frontend/dissertation-reader
-npm install
-```
-
-### Build
-
-```bash
-npm run build
-```
-
-This will:
-1. Process the dissertation markdown
-2. Bundle CSS and JS
-3. Generate the final HTML
-4. Copy to `dist/`
-
-### Development Server
-
-```bash
-npm run dev
-```
-
-## Architecture
-
-See `/release-assets/dissertation/digital-presentation/html-reader-architecture.md` for detailed technical documentation.
-
-## Keyboard Shortcuts
+## Keyboard shortcuts
 
 | Key | Action |
 |-----|--------|
@@ -91,7 +57,7 @@ See `/release-assets/dissertation/digital-presentation/html-reader-architecture.
 | `Ctrl + End` | Go to bottom |
 | `Escape` | Close menu/settings |
 
-## Browser Support
+## Browser support
 
 - Chrome 90+
 - Firefox 88+
