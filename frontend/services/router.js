@@ -1,17 +1,16 @@
-// Hash-based router for the archive SPA
-// Maps view names to URL hash values
+// Hash-based router for the archive SPA: the window-touching navigation layer.
+//
+// The route vocabulary (ROUTES / DEFAULT_ROUTE) is owned by viewState.js, the
+// single source of truth for view state called for in issue #133. This module
+// imports it rather than keeping a second copy — two hand-maintained ROUTES
+// objects could silently drift — and re-exports ROUTES so existing importers
+// (App.js) keep working unchanged. The pure URL serialisation lives in
+// viewState.js too; what remains here is the imperative, window-bound
+// navigation helpers.
 
-export const ROUTES = {
-  archive: 'archive',
-  folders: 'folders',
-  explorer: 'explorer',
-  entities: 'entities',
-  dissertation: 'dissertation',
-  about: 'about',
-  analytics: 'analytics'
-};
+import { ROUTES, DEFAULT_ROUTE } from './viewState.js?v=3.4.0';
 
-const DEFAULT_ROUTE = ROUTES.archive;
+export { ROUTES };
 
 /**
  * Read the current hash and return the matching route name.
