@@ -8,7 +8,7 @@ import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyU
 import { IS_LOCAL, BASE_PATH } from './utils/pathResolver.js?v=3.4.0';
 import Sidebar from './components/Sidebar.js?v=3.4.0';
 import WelcomeModal from './components/WelcomeModal.js?v=3.4.0';
-import RecordModal from './components/RecordModal.js?v=3.4.0';
+import RecordView from './components/RecordView.js?v=3.4.0';
 import FeaturedSection from './components/FeaturedSection.js?v=3.4.0';
 import Explorer from './components/Explorer.js?v=3.4.0';
 import DissertationPage from './components/DissertationPage.js?v=3.4.0';
@@ -278,8 +278,23 @@ const App = () => {
   const minYear = years.length ? Math.min(...years) : 0;
   const maxYear = years.length ? Math.max(...years) : 0;
 
-  const selectedRecord = records.find(r => r.id === selectedRecordId) || null;
-  const selectedRecordIndex = filteredRecords.findIndex(r => r.id === selectedRecordId);
+  // One <RecordView> element, shared by the Explorer and default archive
+  // routes (only one of them renders per pass). RecordView owns the
+  // selected-record lookup and prev/next nav math that App.js used to compute
+  // inline and pass to two identical <RecordModal> call sites. #134 Step B.
+  const recordView = html`
+    <${RecordView}
+      records=${records}
+      filteredRecords=${filteredRecords}
+      selectedRecordId=${selectedRecordId}
+      onClose=${() => setSelectedRecordId(null)}
+      onNext=${() => handleModalNav('next')}
+      onPrev=${() => handleModalNav('prev')}
+      onSelectRecord=${setSelectedRecordId}
+      onFilterCategory=${handleFilterCategory}
+      onFilterSearch=${handleFilterSearch}
+    />
+  `;
 
   const isExplorer = currentRoute === ROUTES.explorer;
   const isEntityBrowser = currentRoute === ROUTES.entities;
@@ -310,21 +325,7 @@ const App = () => {
     return html`
       <div className="min-h-screen flex flex-col">
         <${WelcomeModal} />
-        <${RecordModal}
-          record=${selectedRecord}
-          allRecords=${records}
-          isOpen=${!!selectedRecordId}
-          onClose=${() => setSelectedRecordId(null)}
-          onNext=${() => handleModalNav('next')}
-          onPrev=${() => handleModalNav('prev')}
-          onSelectRecord=${setSelectedRecordId}
-          onFilterCategory=${handleFilterCategory}
-          onFilterSearch=${handleFilterSearch}
-          hasPrev=${selectedRecordIndex > 0}
-          hasNext=${selectedRecordIndex < filteredRecords.length - 1}
-          currentIndex=${selectedRecordIndex}
-          total=${filteredRecords.length}
-        />
+        ${recordView}
         ${!loading && html`
           <${Explorer} records=${records} onBack=${() => goTo(ROUTES.archive)} />
         `}
@@ -343,21 +344,7 @@ const App = () => {
         onSelectTool=${handleToolSelect}
       />
 
-      <${RecordModal}
-        record=${selectedRecord}
-        allRecords=${records}
-        isOpen=${!!selectedRecordId}
-        onClose=${() => setSelectedRecordId(null)}
-        onNext=${() => handleModalNav('next')}
-        onPrev=${() => handleModalNav('prev')}
-        onSelectRecord=${setSelectedRecordId}
-        onFilterCategory=${handleFilterCategory}
-        onFilterSearch=${handleFilterSearch}
-        hasPrev=${selectedRecordIndex > 0}
-        hasNext=${selectedRecordIndex < filteredRecords.length - 1}
-        currentIndex=${selectedRecordIndex}
-        total=${filteredRecords.length}
-      />
+      ${recordView}
 
       <header className=${`sticky top-0 z-50 w-full border-b transition-all duration-300 ${
           isScrolled
