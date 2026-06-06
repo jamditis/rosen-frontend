@@ -10,6 +10,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { ERAS } from '../data/eras.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -78,8 +79,12 @@ describe('archive-core.json', () => {
     }
   });
 
-  it('all records have valid era values', () => {
-    const validEras = new Set([
+  it('the canonical era list matches the 8 shipped eras', () => {
+    // Drift guard: the canonical list lives only in data/eras.js. Any edit to
+    // it must be a deliberate edit to this golden list too (and, if values
+    // change, a matching data migration). The order is the published
+    // facets.eras order.
+    assert.deepEqual(ERAS, [
       "Public Journalism (90s)",
       "Blogging Launch & Digital Disruption (2000-2004)",
       "Peak Blogging & Citizen Journalism (2005-2009)",
@@ -89,6 +94,12 @@ describe('archive-core.json', () => {
       "Democracy in Crisis (20s)",
       "Platform Transition & Future Models (2021-Present)"
     ]);
+  });
+
+  it('all records have valid era values', () => {
+    // validEras is built from the same canonical list the exporter imports
+    // (data/eras.js), so this check can no longer drift from the exporter.
+    const validEras = new Set(ERAS);
     for (const record of coreData.records) {
       assert.ok(validEras.has(record.era), `Record ${record.id} has invalid era: ${record.era}`);
     }
