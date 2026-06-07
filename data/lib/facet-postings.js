@@ -27,13 +27,14 @@
 // matched against the record's publication string. Mirrors App.js:197-198.
 //
 // `pub` is a free-text publication label (lowercased by the caller), not a URL
-// or hostname. This is content-facet bucketing, not URL sanitization, so the
-// 'x.com' substring test carries no security boundary - it reproduces App.js's
-// r.pub.toLowerCase().includes('x.com') filter verbatim. The codeql suppression
-// records that the incomplete-url-substring-sanitization heuristic does not
-// apply here (no host is being validated); it does not weaken a real check.
+// or hostname, so the 'x.com' substring test is content-facet bucketing, not
+// URL sanitization - it carries no security boundary and reproduces App.js's
+// r.pub.toLowerCase().includes('x.com') filter verbatim. CodeQL's
+// js/incomplete-url-substring-sanitization heuristic still flags it (the same
+// alert is already open on main against the App.js line this mirrors); it is a
+// false positive in this non-URL context, tracked for a repo-wide dismissal
+// rather than worked around by diverging from the live filter.
 const PLATFORM_MATCHERS = [
-  // codeql[js/incomplete-url-substring-sanitization]
   { value: 'twitter', matches: (pub) => pub.includes('twitter') || pub.includes('x.com') },
   { value: 'bluesky', matches: (pub) => pub.includes('bluesky') },
 ];
