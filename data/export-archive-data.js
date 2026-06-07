@@ -16,21 +16,10 @@ import { fileURLToPath } from 'url';
 import { generateAllFeeds } from './lib/rss-generator.js';
 import { generateOPML, generateSubscriptionOPML } from './lib/opml-generator.js';
 import { computeAnalytics } from './compute-analytics.js';
+import { ERAS } from './eras.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// Era definitions (matching constants.js)
-const ERAS = [
-  "Public Journalism (90s)",
-  "Blogging Launch & Digital Disruption (2000-2004)",
-  "Peak Blogging & Citizen Journalism (2005-2009)",
-  "Social Media & Financial Crisis (2010-2015)",
-  "View from Nowhere (10s)",
-  "Trump Era & Democratic Crisis (2016-2020)",
-  "Democracy in Crisis (20s)",
-  "Platform Transition & Future Models (2021-Present)"
-];
 
 // Dissertation record (matching archiveService.js)
 const DISSERTATION_RECORD = {
