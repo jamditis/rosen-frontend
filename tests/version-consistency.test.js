@@ -170,6 +170,7 @@ describe('import path validity', () => {
       'FeaturedSection.js',
       'Timeline.js',
       'RecordModal.js',
+      'RecordView.js',
       'Explorer.js',
       'WelcomeModal.js',
       'DissertationPage.js',
