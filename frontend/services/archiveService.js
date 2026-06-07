@@ -15,6 +15,7 @@ import {
   getStats as getSqliteStats
 } from './sqliteService.js?v=3.4.0';
 import { IS_LOCAL, IS_GITHUB_PAGES, BASE_PATH } from '../utils/pathResolver.js?v=3.4.0';
+import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.4.0';
 
 // Routine cache-hit / fetch-start logs are silent in production. Set
 // `localStorage.jrda_debug = '1'` in DevTools and reload to opt in (#170).
@@ -323,7 +324,31 @@ export const clearArchiveCache = () => {
   } catch (e) {
     console.warn('Error clearing cache:', e);
   }
+  // Also drop the IndexedDB core-data store. Fire-and-forget: idbClear never
+  // rejects (it resolves false on failure), and the version-namespaced key
+  // (coreIdbKey) already prevents a stale read, so callers needn't await this.
+  idbClear();
 };
+
+// IndexedDB cache key for the core payload. Namespaced by the manual
+// CACHE_VERSION knob and the deploy version (version.json, stored by
+// checkVersion), so a deploy or a cache-version bump addresses a fresh key —
+// a stale blob is never read, by construction, without relying on a racy
+// async clear. clearArchiveCache additionally wipes the store to bound growth.
+const readDeployVersion = () => {
+  try {
+    return localStorage.getItem('jrda_deploy_version') || 'novers';
+  } catch {
+    return 'novers';
+  }
+};
+const coreIdbKey = () => `archive-core::${CACHE_VERSION}::${readDeployVersion()}`;
+const makeCoreEntry = (data) => ({ data, timestamp: Date.now(), version: CACHE_VERSION });
+const isFreshEntry = (entry) =>
+  !!entry &&
+  entry.version === CACHE_VERSION &&
+  typeof entry.timestamp === 'number' &&
+  (Date.now() - entry.timestamp) <= CACHE_TTL_MS;
 
 /**
  * Fetch core archive data (lightweight, for initial page load)
@@ -336,10 +361,25 @@ export const fetchCoreData = async () => {
   // slow version.json doesn't stall a load a good cache could satisfy.
   await withVersionTimeout(checkVersion());
 
-  // Check cache first
+  const idbKey = coreIdbKey();
+
+  // 1. IndexedDB cache — structured-clones the object on read, skipping the
+  // JSON.parse of the ~13 MB blob, and persists across tab close (the blob
+  // exceeds localStorage's ~5 MB cap, so the Web Storage fallback below lands
+  // in sessionStorage, which a fresh tab never sees). See idbCache.js (#275).
+  const idbEntry = await idbGet(idbKey);
+  if (isFreshEntry(idbEntry)) {
+    debug('Using IndexedDB-cached core data');
+    return idbEntry.data;
+  }
+
+  // 2. Web Storage cache — covers browsers where IndexedDB is blocked (Safari
+  // Private, Firefox strict tracking protection). Promote a hit into
+  // IndexedDB, best-effort and unawaited, so the next read skips the parse.
   const cached = getCachedData(dataUrl);
   if (cached) {
-    debug('Using cached core data');
+    debug('Using Web Storage-cached core data');
+    idbSet(idbKey, makeCoreEntry(cached));
     return cached;
   }
 
@@ -377,8 +417,13 @@ export const fetchCoreData = async () => {
       data.facets.categories.sort();
     }
 
-    // Cache the result
-    setCachedData(dataUrl, data);
+    // Cache the result. IndexedDB first; fall back to Web Storage only when
+    // IndexedDB is unavailable, so capable browsers skip the redundant ~13 MB
+    // sessionStorage write (and its JSON.stringify) entirely.
+    const storedInIdb = await idbSet(idbKey, makeCoreEntry(data));
+    if (!storedInIdb) {
+      setCachedData(dataUrl, data);
+    }
 
     return data;
   } catch (error) {
