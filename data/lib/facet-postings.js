@@ -25,7 +25,15 @@
 
 // Platform values the "content type" facet exposes for social records, each
 // matched against the record's publication string. Mirrors App.js:197-198.
+//
+// `pub` is a free-text publication label (lowercased by the caller), not a URL
+// or hostname. This is content-facet bucketing, not URL sanitization, so the
+// 'x.com' substring test carries no security boundary - it reproduces App.js's
+// r.pub.toLowerCase().includes('x.com') filter verbatim. The codeql suppression
+// records that the incomplete-url-substring-sanitization heuristic does not
+// apply here (no host is being validated); it does not weaken a real check.
 const PLATFORM_MATCHERS = [
+  // codeql[js/incomplete-url-substring-sanitization]
   { value: 'twitter', matches: (pub) => pub.includes('twitter') || pub.includes('x.com') },
   { value: 'bluesky', matches: (pub) => pub.includes('bluesky') },
 ];
