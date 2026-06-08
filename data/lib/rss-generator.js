@@ -79,7 +79,7 @@ ${categories}
     <language>en-us</language>
     <lastBuildDate>${lastBuildDate}</lastBuildDate>
     <atom:link href="${escapeXml(feedUrl)}" rel="self" type="application/rss+xml"/>
-    <generator>Jay Rosen Digital Archive RSS Generator</generator>
+    <generator>Jay Rosen Internet Archive RSS Generator</generator>
 ${itemsXml}
   </channel>
 </rss>`;
@@ -102,7 +102,7 @@ export function generateAllFeeds(records, baseUrl) {
 
   // 1. Main feed - 100 most recent items
   feeds['rss.xml'] = generateRSS({
-    title: 'Jay Rosen Digital Archive',
+    title: 'Jay Rosen Internet Archive',
     link: baseUrl,
     description: 'Archive of Jay Rosen\'s journalism scholarship, including articles, essays, social posts, and the 1986 dissertation "The Impossible Press"',
     feedUrl: `${baseUrl}/data/feeds/rss.xml`,
@@ -113,7 +113,7 @@ export function generateAllFeeds(records, baseUrl) {
   // 2. Articles only (exclude social posts)
   const articles = sortedRecords.filter(r => r.type === 'article' || r.type === 'Dissertation');
   feeds['articles.xml'] = generateRSS({
-    title: 'Jay Rosen Digital Archive - Articles',
+    title: 'Jay Rosen Internet Archive - Articles',
     link: baseUrl,
     description: 'Articles and essays from Jay Rosen\'s journalism scholarship',
     feedUrl: `${baseUrl}/data/feeds/articles.xml`,
@@ -133,7 +133,7 @@ export function generateAllFeeds(records, baseUrl) {
     if (categoryRecords.length >= 5) { // Only create feed if 5+ records
       const slug = category.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-');
       feeds[`categories/${slug}.xml`] = generateRSS({
-        title: `Jay Rosen Digital Archive - ${category}`,
+        title: `Jay Rosen Internet Archive - ${category}`,
         link: baseUrl,
         description: `Archive records in the "${category}" category`,
         feedUrl: `${baseUrl}/data/feeds/categories/${slug}.xml`,
@@ -150,7 +150,7 @@ export function generateAllFeeds(records, baseUrl) {
     const eraRecords = sortedRecords.filter(r => r.era === era);
     const slug = era.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-');
     feeds[`eras/${slug}.xml`] = generateRSS({
-      title: `Jay Rosen Digital Archive - ${era}`,
+      title: `Jay Rosen Internet Archive - ${era}`,
       link: baseUrl,
       description: `Archive records from the ${era} era`,
       feedUrl: `${baseUrl}/data/feeds/eras/${slug}.xml`,
