@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Jay Rosen Digital Archive - Blogging Launch &amp; Digital Disruption (2000-2004)</title>
+    <title>Jay Rosen Internet Archive - Blogging Launch &amp; Digital Disruption (2000-2004)</title>
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records from the Blogging Launch &amp; Digital Disruption (2000-2004) era</description>
     <language>en-us</language>
     <lastBuildDate>Wed, 27 May 2026 23:34:39 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/eras/blogging-launch-digital-disruption-2000-2004-.xml" rel="self" type="application/rss+xml"/>
-    <generator>Jay Rosen Digital Archive RSS Generator</generator>
+    <generator>Jay Rosen Internet Archive RSS Generator</generator>
   <item>
     <title>News Turns From a Lecture to a Conversation</title>
     <link>http://archive.pressthink.org/2004/12/29/tp04_lctr_p.html</link>
