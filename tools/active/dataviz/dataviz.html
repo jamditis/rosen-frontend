@@ -294,7 +294,12 @@
             // --- DATA HANDLING ---
             async function fetchData() {
                 try {
-                    const [coreRes, entRes] = await Promise.all([fetch(CORE_URL), fetch(ENTITIES_URL)]);
+                    // Entities are optional, so its fetch must never reject the
+                    // core load — a network error on it falls back to null.
+                    const [coreRes, entRes] = await Promise.all([
+                        fetch(CORE_URL),
+                        fetch(ENTITIES_URL).catch(() => null)
+                    ]);
                     if (!coreRes.ok) throw new Error(`Failed to load core data: HTTP ${coreRes.status}`);
                     const core = await coreRes.json();
                     // Entities power the optional "Top key concepts" chart. A
@@ -303,7 +308,7 @@
                     // other charts — so parse it in its own guard.
                     let conceptNameById = {}, recordEntityMap = {};
                     try {
-                        if (entRes.ok) {
+                        if (entRes && entRes.ok) {
                             const ent = await entRes.json();
                             (ent.entities || []).forEach(e => { if (e.type === 'Concept') conceptNameById[e.id] = e.name; });
                             recordEntityMap = ent.recordEntityMap || {};
@@ -348,7 +353,7 @@
                     loadFullSummaries();
                 } catch (err) {
                     console.error('Failed to fetch or process data:', err);
-                    loadingState.innerHTML = `<p class="text-center" style="color: #b8757e;">Could not load archive data.<br><span class="text-sm" style="color: var(--color-text-tertiary);">${err.message}</span></p>`;
+                    loadingState.innerHTML = `<p class="text-center" style="color: #b8757e;">Could not load archive data.<br><span class="text-sm" style="color: var(--color-text-tertiary);">${escapeHtml(err.message)}</span></p>`;
                 }
             }
 
@@ -387,14 +392,24 @@
             function initializeDashboard() {
                 const years = [...new Set(state.allRecords.map(r => r.year))].sort((a, b) => a - b);
                 const minYear = years[0], maxYear = years[years.length - 1];
-                noUiSlider.create(dateSliderEl, { start: [minYear, maxYear], connect: true, step: 1, range: { 'min': minYear, 'max': maxYear }, format: { to: v => Math.round(v), from: v => Math.round(v) } });
+                state.minYear = minYear;
+                state.maxYear = maxYear;
+                // The range slider also comes from a CDN; guard it so the rest of
+                // the dashboard (search, category/publication filters, table) still
+                // works if it fails to load. Without it the full year range applies.
+                if (typeof noUiSlider !== 'undefined') {
+                    noUiSlider.create(dateSliderEl, { start: [minYear, maxYear], connect: true, step: 1, range: { 'min': minYear, 'max': maxYear }, format: { to: v => Math.round(v), from: v => Math.round(v) } });
+                    dateSliderEl.noUiSlider.on('update', (values) => { dateSliderStart.textContent = values[0]; dateSliderEnd.textContent = values[1]; });
+                    dateSliderEl.noUiSlider.on('change', updateDashboard);
+                } else {
+                    dateSliderStart.textContent = minYear;
+                    dateSliderEnd.textContent = maxYear;
+                }
 
                 const createCheckboxes = (items, container) => { container.innerHTML = items.map(c => `<label class="filter-row"><input type="checkbox" value="${escapeHtml(c)}"><span>${escapeHtml(c)}</span></label>`).join(''); };
                 createCheckboxes(state.uniqueCategories, categoryFilters);
                 createCheckboxes(state.topPublications, publicationFilters);
 
-                dateSliderEl.noUiSlider.on('update', (values) => { dateSliderStart.textContent = values[0]; dateSliderEnd.textContent = values[1]; });
-                dateSliderEl.noUiSlider.on('change', updateDashboard);
                 [categoryFilters, publicationFilters].forEach(el => el.addEventListener('change', updateDashboard));
                 searchInput.addEventListener('input', debounce(updateDashboard, 300));
 
@@ -405,7 +420,7 @@
                 });
 
                 resetFiltersBtn.addEventListener('click', () => {
-                    dateSliderEl.noUiSlider.set([minYear, maxYear]);
+                    if (dateSliderEl.noUiSlider) dateSliderEl.noUiSlider.set([minYear, maxYear]);
                     [...categoryFilters.querySelectorAll('input'), ...publicationFilters.querySelectorAll('input')].forEach(i => i.checked = false);
                     searchInput.value = '';
                     updateDashboard();
@@ -417,7 +432,7 @@
             }
 
             function updateDashboard() {
-                const [startYear, endYear] = dateSliderEl.noUiSlider.get();
+                const [startYear, endYear] = dateSliderEl.noUiSlider ? dateSliderEl.noUiSlider.get() : [state.minYear, state.maxYear];
                 const selectedCategories = [...categoryFilters.querySelectorAll('input:checked')].map(el => el.value);
                 const selectedPublications = [...publicationFilters.querySelectorAll('input:checked')].map(el => el.value);
                 const searchTerm = searchInput.value.toLowerCase().trim();
@@ -448,12 +463,19 @@
             }
 
             // --- CHARTING FUNCTIONS ---
-            // Shared archival defaults so chart chrome (fonts, axes, legends) matches the archive.
-            Chart.defaults.font.family = "'Roboto Mono', monospace";
-            Chart.defaults.color = INK_TERTIARY;
-            Chart.defaults.borderColor = GRID;
+            // Charts come from a CDN; if it is blocked or down, the stat cards,
+            // filters, and data table must still work. Guard on Chart's presence
+            // and no-op every chart update when it is unavailable.
+            const chartsAvailable = typeof Chart !== 'undefined';
+            if (chartsAvailable) {
+                // Shared archival defaults so chart chrome (fonts, axes, legends) matches the archive.
+                Chart.defaults.font.family = "'Roboto Mono', monospace";
+                Chart.defaults.color = INK_TERTIARY;
+                Chart.defaults.borderColor = GRID;
+            }
 
             function updateAllCharts() {
+                if (!chartsAvailable) return;
                 updateThematicFocusChart();
                 updatePublicationsTreemap();
                 updateTopConceptsChart();
