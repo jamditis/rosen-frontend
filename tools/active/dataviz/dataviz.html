@@ -259,6 +259,7 @@
             const DATA_BASE = '../../../data/';
             const CORE_URL = DATA_BASE + 'archive-core.json';
             const ENTITIES_URL = DATA_BASE + 'archive-entities.json';
+            const DETAILS_URL = DATA_BASE + 'archive-details.json';
             const TOP_PUBLICATION_COUNT = 10;
             // Archival accent palette (faded inks from frontend/design-system/tokens.css)
             const COLOR_PALETTE = ['#2c5f82', '#3a5f3f', '#c17a3a', '#b8757e', '#6b5b7a', '#4a7c59', '#a65d66', '#8b6f3e', '#1a3a4d', '#5f3439', '#3d3447', '#7a4a23'];
@@ -296,12 +297,20 @@
                     const [coreRes, entRes] = await Promise.all([fetch(CORE_URL), fetch(ENTITIES_URL)]);
                     if (!coreRes.ok) throw new Error(`Failed to load core data: HTTP ${coreRes.status}`);
                     const core = await coreRes.json();
-                    // Entities power the "Top key concepts" chart; degrade gracefully if absent.
+                    // Entities power the optional "Top key concepts" chart. A
+                    // missing, non-OK, or malformed/partially-deployed entity
+                    // graph must not take down the records, filters, table, or
+                    // other charts — so parse it in its own guard.
                     let conceptNameById = {}, recordEntityMap = {};
-                    if (entRes.ok) {
-                        const ent = await entRes.json();
-                        (ent.entities || []).forEach(e => { if (e.type === 'Concept') conceptNameById[e.id] = e.name; });
-                        recordEntityMap = ent.recordEntityMap || {};
+                    try {
+                        if (entRes.ok) {
+                            const ent = await entRes.json();
+                            (ent.entities || []).forEach(e => { if (e.type === 'Concept') conceptNameById[e.id] = e.name; });
+                            recordEntityMap = ent.recordEntityMap || {};
+                        }
+                    } catch (entErr) {
+                        console.warn('Entity graph unavailable; the key concepts chart will be empty.', entErr);
+                        conceptNameById = {}; recordEntityMap = {};
                     }
 
                     // The dashboard is about archive records (articles, clips, the
@@ -332,9 +341,35 @@
                     loadingState.classList.add('hidden');
                     dashboardMain.classList.remove('hidden');
                     initializeDashboard();
+                    // The core feed carries only a ~120-char summary preview.
+                    // Pull the full summaries in the background so the dashboard
+                    // is interactive immediately and keyword search + CSV export
+                    // upgrade to full text once the heavier file lands.
+                    loadFullSummaries();
                 } catch (err) {
                     console.error('Failed to fetch or process data:', err);
                     loadingState.innerHTML = `<p class="text-center" style="color: #b8757e;">Could not load archive data.<br><span class="text-sm" style="color: var(--color-text-tertiary);">${err.message}</span></p>`;
+                }
+            }
+
+            // Full summaries live in archive-details.json (the same on-demand
+            // file the main app loads). Fetched after first paint; on arrival we
+            // patch summaries in place and only re-filter when a search is active,
+            // so the user's current view is left untouched otherwise.
+            async function loadFullSummaries() {
+                try {
+                    const res = await fetch(DETAILS_URL);
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    const details = data.details || {};
+                    let patched = 0;
+                    state.allRecords.forEach(r => {
+                        const full = details[r.id] && details[r.id].summary;
+                        if (full && full !== r.summary) { r.summary = full; patched++; }
+                    });
+                    if (patched && searchInput.value.trim()) updateDashboard();
+                } catch (err) {
+                    console.warn('Full summaries unavailable; search and export will use the preview text.', err);
                 }
             }
 

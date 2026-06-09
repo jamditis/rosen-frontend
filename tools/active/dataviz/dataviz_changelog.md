@@ -13,13 +13,14 @@ This version reconnects the dashboard to the live archive and brings its visual 
 * **Live data source:** The dashboard now reads the same local archive JSON the main site uses (`data/archive-core.json` for records, `data/archive-entities.json` for concepts) instead of a frozen Google Sheet snapshot. Charts and stats now reflect the current archive — records through 2025 — and stay in sync automatically when the data is regenerated.
 * **Faster loads:** Dropped the slow, multi-line Google Sheets CSV fetch and PapaParse. The local JSON gzips to roughly 1.6 MB, is service-worker cached, and parses with native `JSON.parse`, so the dashboard is interactive almost immediately.
 * **Matched archive theme:** Restyled to the archive design tokens — aged-paper background with the shared paper-texture, cream card stock, ink text, Special Elite / Roboto Mono type, and the archival faded-ink accent palette for every chart. noUiSlider, buttons, tables, and scrollbars were recolored to match.
+* **Full-text search and export:** The core feed carries only a short summary preview, so after first paint the dashboard fetches `data/archive-details.json` in the background and upgrades keyword search and CSV export to the full summaries once it lands — keeping the initial load fast while restoring full-text fidelity.
 * **Live "Top key concepts":** Concepts are now derived from the archive entity graph rather than a sheet column.
 * **Dynamic top publications:** The publications filter is computed from the data (top 10 by record count) instead of a hardcoded list.
 
 #### **🐛 Hardening**
 
 * Record and concept text is HTML-escaped before injection into the table and filter lists.
-* The dashboard degrades gracefully if the entity graph is unavailable (concepts chart simply empties).
+* The dashboard degrades gracefully if the entity graph or details file is missing, non-OK, or malformed — records, filters, table, and other charts still load; only the affected feature (concepts chart, or full-text search/export) quietly falls back.
 * A loading state and a readable error state replace the previous silent failure.
 
 ### **Version 2.0: The Enhanced Data Dashboard**
