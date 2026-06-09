@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jay Rosen Archive - Enhanced Data Dashboard</title>
+    <title>Jay Rosen Internet Archive - data dashboard</title>
     <meta name="description" content="An interactive dashboard for exploring the Jay Rosen Internet Archive. Filter, chart, and visualize four decades of records." />
 
     <!-- Favicon -->
@@ -11,7 +11,7 @@
     <link rel="icon" href="../../../favicon.ico" />
 
     <!-- Open Graph -->
-    <meta property="og:title" content="Enhanced data dashboard - Jay Rosen Internet Archive" />
+    <meta property="og:title" content="Data dashboard - Jay Rosen Internet Archive" />
     <meta property="og:description" content="An interactive dashboard for exploring the Jay Rosen Internet Archive. Filter, chart, and visualize four decades of records." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://pressthink.org/j/rosen-archive/tools/active/dataviz/dataviz.html" />
@@ -21,16 +21,13 @@
 
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Enhanced data dashboard - Jay Rosen Internet Archive" />
+    <meta name="twitter:title" content="Data dashboard - Jay Rosen Internet Archive" />
     <meta name="twitter:description" content="An interactive dashboard for exploring the Jay Rosen Internet Archive. Filter, chart, and visualize four decades of records." />
     <meta name="twitter:image" content="https://pressthink.org/j/rosen-archive/og-image.png" />
+
     <!-- Tailwind CSS (pre-built locally; cdn.tailwindcss.com is the JIT dev
          build and cannot carry an integrity hash). See issue #151. -->
     <link rel="stylesheet" href="../tailwind.css">
-    <!-- PapaParse for CSV parsing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"
-            integrity="sha384-6kRQDsV2kVYRSENnw7WnekWKCx8/Lmv7rFKpDuR2AoIbjlBShlYcs3x0QlE3kuRh"
-            crossorigin="anonymous"></script>
     <!-- Chart.js for data visualization (pinned so the payload can be hashed) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"
             integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ"
@@ -49,95 +46,155 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Special+Elite&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
+
     <style>
+        /* Archive design tokens (mirrors frontend/design-system/tokens.css) */
+        :root {
+            --color-paper: #f5f1e8;
+            --color-card: #fdfcf9;
+            --color-surface-muted: #eae6dc;
+            --color-text-primary: #0a0908;
+            --color-text-secondary: #2b2826;
+            --color-text-tertiary: #5a5654;
+            --color-text-muted: #8e8b87;
+            --color-border-subtle: #ebe7dd;
+            --color-border-light: #d9d3c7;
+            --color-border-medium: #c4bcae;
+            --color-border-dark: #928c82;
+            --color-accent-amber: #d4a574;
+            --color-accent-rust: #c17a3a;
+            --color-scrollbar: #a8a29e;
+            --color-scrollbar-hover: #78716c;
+        }
+
         html, body { height: 100%; margin: 0; padding: 0; }
-        body { background-color: #f9f6f1 !important; font-family: 'Roboto Mono', monospace !important; color: #2d2d2d; }
-        h1, h2, h3, h4, .font-display { font-family: 'Special Elite', cursive !important; }
-        
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #e4e0d8; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #a89974; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #5a5a5a; }
-
-        /* Custom styles for the enhanced dashboard */
-        .chart-container {
-            position: relative;
-            height: 40vh;
-            min-height: 300px;
+        body {
+            font-family: 'Roboto Mono', monospace;
+            color: var(--color-text-primary);
+            background-color: var(--color-paper);
+            /* Layered textures: paper grain + aged stains (matches index.css) */
+            background-image:
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E"),
+                radial-gradient(ellipse at 15% 20%, rgba(219, 192, 150, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 85% 80%, rgba(180, 150, 120, 0.03) 0%, transparent 50%);
         }
+        h1, h2, h3, h4, .font-display { font-family: 'Special Elite', cursive; color: var(--color-text-primary); }
 
-        .data-table th {
-            cursor: pointer;
-            position: relative;
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--color-scrollbar); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--color-scrollbar-hover); }
 
-        .data-table th:hover {
-            background-color: #f0ebe5;
-        }
+        /* Surfaces */
+        .archive-card { background: var(--color-card); border: 1px solid var(--color-border-light); border-radius: 0.5rem; }
+        .archive-surface { background: var(--color-surface-muted); border: 1px solid var(--color-border-medium); }
+        .archive-inset { background: var(--color-card); border: 1px solid var(--color-border-light); border-radius: 0.375rem; }
 
-        .data-table th .sort-arrow {
-            opacity: 0.3;
-            transition: opacity 0.2s;
+        /* Buttons */
+        .btn-ink {
+            background: var(--color-text-primary); color: var(--color-paper);
+            border: 1px solid var(--color-text-primary); border-radius: 0.375rem;
+            transition: background 0.15s, color 0.15s;
         }
-        
-        .data-table th:hover .sort-arrow {
-            opacity: 1;
+        .btn-ink:hover { background: var(--color-text-secondary); }
+        .btn-ink:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-outline {
+            background: var(--color-card); color: var(--color-text-secondary);
+            border: 1px solid var(--color-border-medium); border-radius: 0.375rem;
+            transition: background 0.15s, border-color 0.15s;
         }
+        .btn-outline:hover { background: var(--color-surface-muted); border-color: var(--color-border-dark); }
 
-        .data-table th .sort-arrow.active {
-            opacity: 1;
-            color: #2d2d2d;
+        /* Form controls */
+        .archive-input {
+            width: 100%; font-size: 0.875rem; color: var(--color-text-primary);
+            background: var(--color-card); border: 1px solid var(--color-border-medium);
+            border-radius: 0.375rem; padding: 0.5rem 0.625rem;
         }
+        .archive-input:focus { outline: none; border-color: var(--color-accent-rust); box-shadow: 0 0 0 2px rgba(193, 122, 58, 0.2); }
 
-        /* noUiSlider custom styles */
-        .noUi-target { background: #e4e0d8; border: 1px solid #c7bca1; box-shadow: none; }
-        .noUi-connect { background: #a89974; }
-        .noUi-handle { border: 1px solid #2d2d2d; border-radius: 50%; background: #fbf5e8; box-shadow: none; }
+        .chart-container { position: relative; height: 40vh; min-height: 300px; }
+
+        /* Data table */
+        .data-table th { cursor: pointer; position: relative; color: var(--color-text-secondary); }
+        .data-table thead { background: var(--color-surface-muted); }
+        .data-table tbody tr { border-bottom: 1px solid var(--color-border-subtle); }
+        .data-table tbody tr:hover { background: var(--color-surface-muted); }
+        .data-table th:hover { background: var(--color-border-light); }
+        .data-table th .sort-arrow { opacity: 0.3; transition: opacity 0.2s; }
+        .data-table th:hover .sort-arrow { opacity: 1; }
+        .data-table th .sort-arrow.active { opacity: 1; color: var(--color-text-primary); }
+
+        /* Checkbox filter rows */
+        .filter-row { display: flex; align-items: center; font-size: 0.875rem; font-weight: 400; padding: 0.125rem 0; }
+        .filter-row input[type="checkbox"] { accent-color: var(--color-accent-rust); width: 1rem; height: 1rem; }
+        .filter-row span { margin-left: 0.5rem; color: var(--color-text-secondary); }
+
+        /* noUiSlider — recolored to the archival palette */
+        .noUi-target { background: var(--color-surface-muted); border: 1px solid var(--color-border-medium); box-shadow: none; }
+        .noUi-connect { background: var(--color-accent-rust); }
+        .noUi-handle { border: 1px solid var(--color-text-primary); border-radius: 50%; background: var(--color-card); box-shadow: none; }
         .noUi-handle:after, .noUi-handle:before { display: none; }
-        .noUi-pips-horizontal { font-size: 10px; color: #5a5a5a; }
+
+        /* Loading + error states */
+        .spinner {
+            width: 2.5rem; height: 2.5rem; border: 3px solid var(--color-border-medium);
+            border-top-color: var(--color-accent-rust); border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="antialiased">
     <div id="dashboard-wrapper" class="flex flex-col h-full">
-        <header class="bg-[#f9f6f1] border-b-2 border-gray-700 flex-shrink-0 p-4">
-            <div class="container mx-auto">
-                <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 text-center">Enhanced data dashboard</h1>
-                <p class="text-center text-gray-600 mt-1">An interactive tool for exploring the Jay Rosen Internet Archive</p>
+        <header class="flex-shrink-0 p-4" style="background: var(--color-paper); border-bottom: 2px solid var(--color-border-dark);">
+            <div class="container mx-auto flex items-center justify-between gap-4">
+                <a href="../../../" class="text-sm whitespace-nowrap" style="color: var(--color-text-tertiary);" title="Back to the archive">&larr; archive</a>
+                <div class="text-center">
+                    <h1 class="text-2xl sm:text-3xl font-bold">Data dashboard</h1>
+                    <p class="text-sm mt-1" style="color: var(--color-text-tertiary);">An interactive tool for exploring the Jay Rosen Internet Archive</p>
+                </div>
+                <span class="text-sm whitespace-nowrap hidden sm:inline" style="visibility: hidden;">&larr; archive</span>
             </div>
         </header>
 
-        <main class="flex-grow min-h-0">
+        <!-- Loading overlay -->
+        <div id="loading-state" class="flex-grow flex flex-col items-center justify-center gap-4 p-8">
+            <div class="spinner"></div>
+            <p style="color: var(--color-text-tertiary);">Loading archive records&hellip;</p>
+        </div>
+
+        <main id="dashboard-main" class="flex-grow min-h-0 hidden">
             <div class="flex flex-col lg:flex-row gap-6 h-full p-4 sm:p-6">
                 <!-- Controls sidebar -->
-                <aside class="w-full lg:w-80 flex-shrink-0 p-4 bg-gray-50 rounded-lg border overflow-y-auto">
+                <aside class="w-full lg:w-80 flex-shrink-0 p-4 archive-surface rounded-lg overflow-y-auto">
                     <h3 class="font-display text-xl mb-4">Controls and filters</h3>
                     <div class="space-y-6">
                         <div>
-                            <label for="dashboard-search" class="block text-sm font-medium text-gray-700 mb-1">Keyword search</label>
-                            <input type="text" id="dashboard-search" class="w-full text-sm border-gray-300 rounded-md shadow-sm" placeholder="Filter visualized data...">
+                            <label for="dashboard-search" class="block text-sm font-medium mb-1" style="color: var(--color-text-secondary);">Keyword search</label>
+                            <input type="text" id="dashboard-search" class="archive-input" placeholder="Filter visualized data...">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Date range</label>
+                            <label class="block text-sm font-medium mb-2" style="color: var(--color-text-secondary);">Date range</label>
                             <div id="date-slider" class="mx-2"></div>
-                            <div class="flex justify-between text-xs mt-1">
+                            <div class="flex justify-between text-xs mt-2" style="color: var(--color-text-tertiary);">
                                 <span id="date-slider-start"></span>
                                 <span id="date-slider-end"></span>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Thematic categories</label>
-                            <div id="dashboard-category-filters" class="max-h-40 overflow-y-auto space-y-1 pr-2 mt-1 border p-2 rounded-md bg-white"></div>
+                            <label class="block text-sm font-medium mb-1" style="color: var(--color-text-secondary);">Thematic categories</label>
+                            <div id="dashboard-category-filters" class="max-h-40 overflow-y-auto space-y-1 pr-2 mt-1 archive-inset p-2"></div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Top publications</label>
-                            <div id="dashboard-publication-filters" class="max-h-40 overflow-y-auto space-y-1 pr-2 mt-1 border p-2 rounded-md bg-white"></div>
+                            <label class="block text-sm font-medium mb-1" style="color: var(--color-text-secondary);">Top publications</label>
+                            <div id="dashboard-publication-filters" class="max-h-40 overflow-y-auto space-y-1 pr-2 mt-1 archive-inset p-2"></div>
                         </div>
                     </div>
-                    <div class="mt-6 pt-6 border-t">
-                        <button id="dashboard-reset-filters" class="w-full text-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-600 hover:bg-gray-700">Reset all filters</button>
-                        <button id="export-csv-btn" class="w-full text-center mt-2 py-2 px-4 border border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">Export filtered data (CSV)</button>
+                    <div class="mt-6 pt-6" style="border-top: 1px solid var(--color-border-light);">
+                        <button id="dashboard-reset-filters" class="btn-ink w-full text-center py-2 px-4 text-sm font-medium">Reset all filters</button>
+                        <button id="export-csv-btn" class="btn-outline w-full text-center mt-2 py-2 px-4 text-sm font-medium">Export filtered data (CSV)</button>
                     </div>
                 </aside>
 
@@ -145,39 +202,39 @@
                 <div class="flex-grow min-w-0 flex flex-col gap-6 overflow-y-auto">
                     <!-- Stat cards -->
                     <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                         <div class="p-4 bg-white rounded-lg border text-center"><p class="text-xs uppercase text-gray-500">Filtered records</p><p id="stat-total-records" class="text-2xl font-bold">--</p></div>
-                         <div class="p-4 bg-white rounded-lg border text-center"><p class="text-xs uppercase text-gray-500">Years covered</p><p id="stat-years-covered" class="text-2xl font-bold">--</p></div>
-                         <div class="p-4 bg-white rounded-lg border text-center"><p class="text-xs uppercase text-gray-500">Publications</p><p id="stat-publications" class="text-2xl font-bold">--</p></div>
-                         <div class="p-4 bg-white rounded-lg border text-center"><p class="text-xs uppercase text-gray-500">Most active year</p><p id="stat-active-year" class="text-2xl font-bold">--</p></div>
+                         <div class="p-4 archive-card text-center"><p class="text-xs uppercase tracking-wider" style="color: var(--color-text-muted);">Filtered records</p><p id="stat-total-records" class="text-2xl font-bold mt-1">--</p></div>
+                         <div class="p-4 archive-card text-center"><p class="text-xs uppercase tracking-wider" style="color: var(--color-text-muted);">Years covered</p><p id="stat-years-covered" class="text-2xl font-bold mt-1">--</p></div>
+                         <div class="p-4 archive-card text-center"><p class="text-xs uppercase tracking-wider" style="color: var(--color-text-muted);">Publications</p><p id="stat-publications" class="text-2xl font-bold mt-1">--</p></div>
+                         <div class="p-4 archive-card text-center"><p class="text-xs uppercase tracking-wider" style="color: var(--color-text-muted);">Most active year</p><p id="stat-active-year" class="text-2xl font-bold mt-1">--</p></div>
                     </section>
-                    
+
                     <!-- Charts -->
                     <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white p-4 rounded-lg border flex flex-col">
+                        <div class="archive-card p-4 flex flex-col">
                             <h4 class="font-display text-center text-lg flex-shrink-0 mb-2">Thematic focus over time</h4>
                             <div class="chart-container"><canvas id="thematic-focus-chart"></canvas></div>
                         </div>
-                        <div class="bg-white p-4 rounded-lg border flex flex-col">
+                        <div class="archive-card p-4 flex flex-col">
                             <h4 class="font-display text-center text-lg flex-shrink-0 mb-2">Top publications</h4>
                             <div class="chart-container"><canvas id="publications-treemap-chart"></canvas></div>
                         </div>
-                        <div class="bg-white p-4 rounded-lg border flex flex-col">
+                        <div class="archive-card p-4 flex flex-col">
                             <h4 class="font-display text-center text-lg flex-shrink-0 mb-2">Top key concepts</h4>
                             <div class="chart-container"><canvas id="top-concepts-chart"></canvas></div>
                         </div>
-                        <div class="bg-white p-4 rounded-lg border flex flex-col">
+                        <div class="archive-card p-4 flex flex-col">
                             <h4 class="font-display text-center text-lg flex-shrink-0 mb-2">Yearly activity</h4>
                             <div class="chart-container"><canvas id="yearly-activity-chart"></canvas></div>
                         </div>
                     </section>
 
                     <!-- Data Table -->
-                    <section class="bg-white p-4 rounded-lg border">
+                    <section class="archive-card p-4">
                         <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4 gap-2">
                             <h4 class="font-display text-lg">Filtered data records</h4>
                             <div class="flex items-center text-sm self-end sm:self-center">
-                                <label for="rows-per-page-select" class="mr-2 whitespace-nowrap">Rows per page:</label>
-                                <select id="rows-per-page-select" class="w-full text-sm border-gray-300 rounded-md shadow-sm">
+                                <label for="rows-per-page-select" class="mr-2 whitespace-nowrap" style="color: var(--color-text-secondary);">Rows per page:</label>
+                                <select id="rows-per-page-select" class="archive-input" style="width: auto;">
                                     <option value="10" selected>10</option>
                                     <option value="25">25</option>
                                     <option value="50">50</option>
@@ -186,7 +243,7 @@
                             </div>
                         </div>
                         <div id="data-table-container" class="overflow-x-auto"></div>
-                        <div id="table-pagination-controls" class="mt-4 flex flex-col sm:flex-row justify-between items-center text-sm gap-2"></div>
+                        <div id="table-pagination-controls" class="mt-4 flex flex-col sm:flex-row justify-between items-center text-sm gap-2" style="color: var(--color-text-secondary);"></div>
                     </section>
                 </div>
             </div>
@@ -196,12 +253,20 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // --- CONFIGURATION ---
-            const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-XqQXvMJNaBXVWlmXu1EyOpa_Cc6ur-pklWX1mbrWIFybZjmbE6UTIteSoCSvf0a7j5r8A6earp3H/pub?gid=928818664&single=true&output=csv';
-            const ALLOWED_COLUMNS = ['id', 'title', 'publication_date', 'original_publication', 'thematic_categories', 'key_concepts', 'summary', 'verified'];
-            const TOP_PUBLICATIONS = ["PressThink", "The Guardian", "Vox", "Los Angeles Times", "The Atlantic", "NPR", "Columbia Journalism Review"];
-            const COLOR_PALETTE = ['#e0f2fe', '#dcfce7', '#fef9c3', '#ffe4e6', '#f3e8ff', '#fff7ed', '#e0e7ff', '#d1fae5', '#fee2e2', '#cffafe', '#e5e7eb', '#fbcfe8'];
+            // Live archive data (same files the main site loads). Relative paths
+            // resolve identically in local dev and in production under
+            // /j/rosen-archive/, so no hostname detection is needed.
+            const DATA_BASE = '../../../data/';
+            const CORE_URL = DATA_BASE + 'archive-core.json';
+            const ENTITIES_URL = DATA_BASE + 'archive-entities.json';
+            const TOP_PUBLICATION_COUNT = 10;
+            // Archival accent palette (faded inks from frontend/design-system/tokens.css)
+            const COLOR_PALETTE = ['#2c5f82', '#3a5f3f', '#c17a3a', '#b8757e', '#6b5b7a', '#4a7c59', '#a65d66', '#8b6f3e', '#1a3a4d', '#5f3439', '#3d3447', '#7a4a23'];
+            const INK = '#0a0908', INK_TERTIARY = '#5a5654', GRID = '#d9d3c7';
 
             // --- DOM ELEMENTS ---
+            const loadingState = document.getElementById('loading-state');
+            const dashboardMain = document.getElementById('dashboard-main');
             const searchInput = document.getElementById('dashboard-search');
             const dateSliderEl = document.getElementById('date-slider'), dateSliderStart = document.getElementById('date-slider-start'), dateSliderEnd = document.getElementById('date-slider-end');
             const categoryFilters = document.getElementById('dashboard-category-filters');
@@ -214,80 +279,85 @@
             const dataTableContainer = document.getElementById('data-table-container');
             const tablePaginationControls = document.getElementById('table-pagination-controls');
             const rowsPerPageSelect = document.getElementById('rows-per-page-select');
-            
+
             // --- STATE ---
             const state = {
                 allRecords: [],
                 dashboardData: [],
                 uniqueCategories: [],
+                topPublications: [],
                 charts: {},
-                table: {
-                    currentPage: 1,
-                    rowsPerPage: 10,
-                    sortColumn: 'publication_date',
-                    sortDirection: 'desc'
-                }
+                table: { currentPage: 1, rowsPerPage: 10, sortColumn: 'publication_date', sortDirection: 'desc' }
             };
-            
-            // --- DATA HANDLING & CLEANING ---
-            function normalizeHeader(h) { return h.toLowerCase().trim().replace(/[^a-z0-9_]/g, ''); }
-            function cleanTitle(t) { if (typeof t !== 'string') return ''; const d = /\s(—|-|\|)/; const m = t.match(d); return m ? t.substring(0, m.index).trim() : t.trim(); }
-            function standardizeDate(d) { if (!d || typeof d !== 'string' || !d.trim()) return ''; const dt = new Date(d); if (isNaN(dt.getTime())) return ''; const y = dt.getUTCFullYear(); const m = String(dt.getUTCMonth() + 1).padStart(2, '0'); const day = String(dt.getUTCDate()).padStart(2, '0'); return `${y}-${m}-${day}`; }
-            function parseAndCleanTags(v) { if (typeof v !== 'string' || !v.trim() || v.trim() === '[]' || v.startsWith('=')) return []; const r = /['"]([^'"]*?)['"]/g; let i = []; let m; while ((m = r.exec(v)) !== null) { if (m[1].length < 100 && !m[1].startsWith('=')) i.push(m[1]); } const c = v.replace(/\[.*?\]/g, '').replace(/['"]/g, ''); const rem = c.split(/[;,]/).map(item => item.trim()).filter(item => item && item.length < 100 && !item.startsWith('=')); return [...new Set([...i, ...rem].map(item => item.trim()).filter(Boolean))]; }
-            
+
+            // --- DATA HANDLING ---
             async function fetchData() {
                 try {
-                    const response = await fetch(csvUrl);
-                    if (!response.ok) {
-                        throw new Error(`Failed to load archive CSV: HTTP ${response.status}`);
+                    const [coreRes, entRes] = await Promise.all([fetch(CORE_URL), fetch(ENTITIES_URL)]);
+                    if (!coreRes.ok) throw new Error(`Failed to load core data: HTTP ${coreRes.status}`);
+                    const core = await coreRes.json();
+                    // Entities power the "Top key concepts" chart; degrade gracefully if absent.
+                    let conceptNameById = {}, recordEntityMap = {};
+                    if (entRes.ok) {
+                        const ent = await entRes.json();
+                        (ent.entities || []).forEach(e => { if (e.type === 'Concept') conceptNameById[e.id] = e.name; });
+                        recordEntityMap = ent.recordEntityMap || {};
                     }
-                    const csvText = await response.text();
-                    Papa.parse(csvText, {
-                        header: true, skipEmptyLines: true, transformHeader: normalizeHeader,
-                        complete: (res) => {
-                            if (res.errors.length > 0) { throw new Error('CSV parsing error'); }
-                            const cleanedData = res.data
-                                .map(raw => {
-                                    const f = {};
-                                    ALLOWED_COLUMNS.forEach(c => {
-                                        const n = normalizeHeader(c);
-                                        let v = raw[n] || '';
-                                        if (c === 'title') v = cleanTitle(v);
-                                        else if (c === 'publication_date') v = standardizeDate(v);
-                                        else if (['thematic_categories', 'key_concepts'].includes(c)) v = parseAndCleanTags(v);
-                                        f[c] = v;
-                                    });
-                                    return f;
-                                })
-                                .filter(rec => rec.verified === 'TRUE' && rec.id && rec.title.trim() !== '' && rec.publication_date.trim() !== '');
-                            
-                            state.allRecords = cleanedData.map(r => ({...r, year: new Date(r.publication_date).getFullYear()}));
-                            const catSet = new Set(state.allRecords.flatMap(rec => rec.thematic_categories));
-                            state.uniqueCategories = [...catSet].sort();
-                            initializeDashboard();
-                        }
-                    });
+
+                    // The dashboard is about archive records (articles, clips, the
+                    // dissertation) — not the ~25k social posts, which carry no
+                    // thematic categories or publications and would swamp the charts.
+                    state.allRecords = (core.records || [])
+                        .filter(r => r.type !== 'social')
+                        .map(r => {
+                            const conceptIds = recordEntityMap[r.id] || [];
+                            const concepts = conceptIds.map(id => conceptNameById[id]).filter(Boolean);
+                            const year = parseInt(r.year, 10) || (r.date ? new Date(r.date).getUTCFullYear() : NaN);
+                            return {
+                                id: r.id,
+                                title: (r.title || '').trim(),
+                                publication_date: r.date || '',
+                                year,
+                                original_publication: (r.pub || 'Unknown').trim(),
+                                thematic_categories: Array.isArray(r.categories) ? r.categories : [],
+                                key_concepts: concepts,
+                                summary: r.summaryPreview || ''
+                            };
+                        })
+                        .filter(r => r.id && r.title && Number.isFinite(r.year));
+
+                    state.uniqueCategories = [...new Set(state.allRecords.flatMap(r => r.thematic_categories))].sort();
+                    state.topPublications = computeTopPublications(state.allRecords, TOP_PUBLICATION_COUNT);
+
+                    loadingState.classList.add('hidden');
+                    dashboardMain.classList.remove('hidden');
+                    initializeDashboard();
                 } catch (err) {
-                    console.error("Failed to fetch or process data:", err);
-                    dataTableContainer.innerHTML = `<p class="text-red-600">Could not load archive data. Please try again later.</p>`;
+                    console.error('Failed to fetch or process data:', err);
+                    loadingState.innerHTML = `<p class="text-center" style="color: #b8757e;">Could not load archive data.<br><span class="text-sm" style="color: var(--color-text-tertiary);">${err.message}</span></p>`;
                 }
+            }
+
+            function computeTopPublications(records, n) {
+                const counts = records.reduce((acc, r) => { acc[r.original_publication] = (acc[r.original_publication] || 0) + 1; return acc; }, {});
+                return Object.entries(counts).sort(([, a], [, b]) => b - a).slice(0, n).map(([pub]) => pub);
             }
 
             // --- UTILITY ---
             function debounce(func, delay) { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); }; }
             function stringToHash(str) { let h = 0; for (let i = 0; i < str.length; i++) { h = (h << 5) - h + str.charCodeAt(i); h |= 0; } return Math.abs(h); }
+            function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
             // --- DASHBOARD INITIALIZATION & UPDATES ---
             function initializeDashboard() {
-                const years = [...new Set(state.allRecords.map(r => r.year))].sort();
+                const years = [...new Set(state.allRecords.map(r => r.year))].sort((a, b) => a - b);
                 const minYear = years[0], maxYear = years[years.length - 1];
                 noUiSlider.create(dateSliderEl, { start: [minYear, maxYear], connect: true, step: 1, range: { 'min': minYear, 'max': maxYear }, format: { to: v => Math.round(v), from: v => Math.round(v) } });
-                
-                const createCheckboxes = (items, container) => { container.innerHTML = items.map(c => `<label class="flex items-center text-sm font-normal"><input type="checkbox" value="${c}" class="h-4 w-4 text-gray-800 border-gray-400 focus:ring-gray-700 rounded"><span class="ml-2">${c}</span></label>`).join(''); };
-                createCheckboxes(state.uniqueCategories, categoryFilters);
-                createCheckboxes(TOP_PUBLICATIONS, publicationFilters);
 
-                // Add event listeners
+                const createCheckboxes = (items, container) => { container.innerHTML = items.map(c => `<label class="filter-row"><input type="checkbox" value="${escapeHtml(c)}"><span>${escapeHtml(c)}</span></label>`).join(''); };
+                createCheckboxes(state.uniqueCategories, categoryFilters);
+                createCheckboxes(state.topPublications, publicationFilters);
+
                 dateSliderEl.noUiSlider.on('update', (values) => { dateSliderStart.textContent = values[0]; dateSliderEnd.textContent = values[1]; });
                 dateSliderEl.noUiSlider.on('change', updateDashboard);
                 [categoryFilters, publicationFilters].forEach(el => el.addEventListener('change', updateDashboard));
@@ -310,7 +380,7 @@
 
                 updateDashboard();
             }
-            
+
             function updateDashboard() {
                 const [startYear, endYear] = dateSliderEl.noUiSlider.get();
                 const selectedCategories = [...categoryFilters.querySelectorAll('input:checked')].map(el => el.value);
@@ -324,25 +394,30 @@
                     const inSearch = searchTerm === '' || (r.title.toLowerCase().includes(searchTerm) || r.summary.toLowerCase().includes(searchTerm) || r.key_concepts.join(' ').toLowerCase().includes(searchTerm));
                     return inDateRange && inCategory && inPublication && inSearch;
                 });
-                
+
                 updateStatCards();
                 updateAllCharts();
-                state.table.currentPage = 1; // Reset to first page on filter change
+                state.table.currentPage = 1;
                 renderDataTable();
             }
 
             function updateStatCards() {
-                statTotalRecords.textContent = state.dashboardData.length;
-                const years = [...new Set(state.dashboardData.map(r => r.year))].sort();
+                statTotalRecords.textContent = state.dashboardData.length.toLocaleString();
+                const years = [...new Set(state.dashboardData.map(r => r.year))].sort((a, b) => a - b);
                 statYearsCovered.textContent = years.length ? `${years[0]} - ${years[years.length - 1]}` : 'N/A';
                 statPublications.textContent = [...new Set(state.dashboardData.map(r => r.original_publication))].length;
-                
+
                 const yearCounts = state.dashboardData.reduce((acc, r) => { acc[r.year] = (acc[r.year] || 0) + 1; return acc; }, {});
-                const mostActive = Object.entries(yearCounts).sort(([,a],[,b]) => b-a)[0];
+                const mostActive = Object.entries(yearCounts).sort(([, a], [, b]) => b - a)[0];
                 statActiveYear.textContent = mostActive ? mostActive[0] : 'N/A';
             }
 
             // --- CHARTING FUNCTIONS ---
+            // Shared archival defaults so chart chrome (fonts, axes, legends) matches the archive.
+            Chart.defaults.font.family = "'Roboto Mono', monospace";
+            Chart.defaults.color = INK_TERTIARY;
+            Chart.defaults.borderColor = GRID;
+
             function updateAllCharts() {
                 updateThematicFocusChart();
                 updatePublicationsTreemap();
@@ -351,63 +426,57 @@
             }
 
             const getChartContext = (id) => document.getElementById(id).getContext('2d');
-            
-            const baseChartOptions = { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } } };
+            const baseChartOptions = { maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 10 }, color: INK_TERTIARY } } } };
 
             function updateThematicFocusChart() {
-                const topCats = Object.entries(state.dashboardData.flatMap(r => r.thematic_categories).reduce((acc, cat) => { acc[cat] = (acc[cat] || 0) + 1; return acc; }, {})).sort(([,a],[,b]) => b-a).slice(0, 5).map(([label]) => label);
-                const years = [...new Set(state.dashboardData.map(r => r.year))].sort();
+                const topCats = Object.entries(state.dashboardData.flatMap(r => r.thematic_categories).reduce((acc, cat) => { acc[cat] = (acc[cat] || 0) + 1; return acc; }, {})).sort(([, a], [, b]) => b - a).slice(0, 5).map(([label]) => label);
+                const years = [...new Set(state.dashboardData.map(r => r.year))].sort((a, b) => a - b);
                 const datasets = topCats.map((cat, i) => ({
                     label: cat,
                     data: years.map(year => state.dashboardData.filter(r => r.year === year && r.thematic_categories.includes(cat)).length),
-                    backgroundColor: COLOR_PALETTE[i % COLOR_PALETTE.length],
+                    backgroundColor: COLOR_PALETTE[i % COLOR_PALETTE.length] + 'cc',
                     borderColor: COLOR_PALETTE[i % COLOR_PALETTE.length],
-                    tension: 0.1,
+                    tension: 0.2,
                     fill: true,
                 }));
 
                 if (state.charts.thematicFocus) state.charts.thematicFocus.destroy();
-                state.charts.thematicFocus = new Chart(getChartContext('thematic-focus-chart'), { type: 'line', data: { labels: years, datasets }, options: { ...baseChartOptions, scales: { y: { stacked: true } } } });
+                state.charts.thematicFocus = new Chart(getChartContext('thematic-focus-chart'), { type: 'line', data: { labels: years, datasets }, options: { ...baseChartOptions, scales: { y: { stacked: true, grid: { color: GRID } }, x: { grid: { color: GRID } } } } });
             }
 
             function updatePublicationsTreemap() {
-                const pubCounts = state.dashboardData.reduce((acc, r) => { const pub = r.original_publication || "Unknown"; acc[pub] = (acc[pub] || 0) + 1; return acc; }, {});
+                const pubCounts = state.dashboardData.reduce((acc, r) => { const pub = r.original_publication || 'Unknown'; acc[pub] = (acc[pub] || 0) + 1; return acc; }, {});
                 const treemapData = Object.entries(pubCounts).map(([pub, count]) => ({ name: pub, value: count }));
-                
+
                 if (state.charts.pubTreemap) state.charts.pubTreemap.destroy();
                 state.charts.pubTreemap = new Chart(getChartContext('publications-treemap-chart'), {
                     type: 'treemap',
-                    data: { 
-                        datasets: [{ 
-                            tree: treemapData, 
-                            key: 'value', 
-                            groups: ['name'], 
-                            backgroundColor: (ctx) => {
-                                // If the context has a raw value with a group name (the publication name), calculate the color from that name.
-                                if (ctx.raw?.g) {
-                                    const publicationName = ctx.raw.g;
-                                    return COLOR_PALETTE[stringToHash(publicationName) % COLOR_PALETTE.length];
-                                }
-                                // Otherwise, return a default color.
-                                return 'grey';
-                            }, 
-                            labels: { display: true, formatter: (c) => c.raw.g } 
-                        }] 
+                    data: {
+                        datasets: [{
+                            tree: treemapData,
+                            key: 'value',
+                            groups: ['name'],
+                            spacing: 1,
+                            borderWidth: 1,
+                            borderColor: '#fdfcf9',
+                            backgroundColor: (ctx) => ctx.raw?.g ? COLOR_PALETTE[stringToHash(ctx.raw.g) % COLOR_PALETTE.length] : '#928c82',
+                            labels: { display: true, color: '#fdfcf9', font: { family: "'Roboto Mono', monospace", size: 11 }, formatter: (c) => c.raw.g }
+                        }]
                     },
-                    options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { displayColors: false, callbacks: { title: () => '', label: (c) => `${c.raw.g}: ${c.raw.v} articles` } } } }
+                    options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { displayColors: false, callbacks: { title: () => '', label: (c) => `${c.raw.g}: ${c.raw.v} records` } } } }
                 });
             }
 
             function updateTopConceptsChart() {
-                const conceptCounts = Object.entries(state.dashboardData.flatMap(r => r.key_concepts).reduce((acc, c) => { acc[c] = (acc[c] || 0) + 1; return acc; }, {})).sort(([,a],[,b]) => b-a).slice(0, 10);
+                const conceptCounts = Object.entries(state.dashboardData.flatMap(r => r.key_concepts).reduce((acc, c) => { acc[c] = (acc[c] || 0) + 1; return acc; }, {})).sort(([, a], [, b]) => b - a).slice(0, 10);
                 const labels = conceptCounts.map(([label]) => label);
-                const data = conceptCounts.map(([,count]) => count);
+                const data = conceptCounts.map(([, count]) => count);
 
                 if (state.charts.topConcepts) state.charts.topConcepts.destroy();
                 state.charts.topConcepts = new Chart(getChartContext('top-concepts-chart'), {
                     type: 'bar',
                     data: { labels, datasets: [{ label: 'Mentions', data, backgroundColor: COLOR_PALETTE }] },
-                    options: { ...baseChartOptions, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { y: { ticks: { font: { size: 10 } } } } }
+                    options: { ...baseChartOptions, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { y: { ticks: { font: { size: 10 } }, grid: { color: GRID } }, x: { grid: { color: GRID } } } }
                 });
             }
 
@@ -419,8 +488,8 @@
                 if (state.charts.yearlyActivity) state.charts.yearlyActivity.destroy();
                 state.charts.yearlyActivity = new Chart(getChartContext('yearly-activity-chart'), {
                     type: 'bar',
-                    data: { labels, datasets: [{ label: 'Articles per year', data, backgroundColor: '#a89974' }] },
-                    options: { ...baseChartOptions, plugins: { legend: { display: false } } }
+                    data: { labels, datasets: [{ label: 'Records per year', data, backgroundColor: '#c17a3a' }] },
+                    options: { ...baseChartOptions, plugins: { legend: { display: false } }, scales: { y: { grid: { color: GRID } }, x: { grid: { color: GRID } } } }
                 });
             }
 
@@ -428,15 +497,13 @@
             function renderDataTable() {
                 const { currentPage, rowsPerPage, sortColumn, sortDirection } = state.table;
                 const sortedData = [...state.dashboardData].sort((a, b) => {
-                    const valA = a[sortColumn];
-                    const valB = b[sortColumn];
+                    const valA = a[sortColumn], valB = b[sortColumn];
                     if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
                     if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
                     return 0;
                 });
-                
+
                 const paginatedData = sortedData.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-                
                 const headers = [
                     { key: 'publication_date', label: 'Date' },
                     { key: 'title', label: 'Title' },
@@ -446,22 +513,22 @@
                 const createSortArrow = (headerKey) => {
                     if (headerKey !== sortColumn) return '<span class="sort-arrow ml-1">↕</span>';
                     return sortDirection === 'asc' ? '<span class="sort-arrow active ml-1">↑</span>' : '<span class="sort-arrow active ml-1">↓</span>';
-                }
+                };
 
                 dataTableContainer.innerHTML = `
-                    <table class="w-full text-sm text-left text-gray-700 data-table">
-                        <thead class="text-xs text-gray-800 uppercase bg-gray-100">
+                    <table class="w-full text-sm text-left data-table" style="color: var(--color-text-secondary);">
+                        <thead class="text-xs uppercase">
                             <tr>${headers.map(h => `<th scope="col" class="px-6 py-3" data-sort="${h.key}">${h.label} ${createSortArrow(h.key)}</th>`).join('')}</tr>
                         </thead>
                         <tbody>${paginatedData.map(row => `
-                            <tr class="bg-white border-b hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap">${row.publication_date}</td>
-                                <th scope="row" class="px-6 py-4 font-medium text-gray-900">${row.title}</th>
-                                <td class="px-6 py-4">${row.original_publication}</td>
-                            </tr>`).join('') || `<tr><td colspan="${headers.length}" class="text-center py-8">No data available for the selected filters.</td></tr>`}
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">${escapeHtml(row.publication_date)}</td>
+                                <th scope="row" class="px-6 py-4 font-medium" style="color: var(--color-text-primary);">${escapeHtml(row.title)}</th>
+                                <td class="px-6 py-4">${escapeHtml(row.original_publication)}</td>
+                            </tr>`).join('') || `<tr><td colspan="${headers.length}" class="text-center py-8" style="color: var(--color-text-tertiary);">No data available for the selected filters.</td></tr>`}
                         </tbody>
                     </table>`;
-                
+
                 renderTablePagination(sortedData.length);
             }
 
@@ -472,21 +539,18 @@
                 const endRow = Math.min(currentPage * rowsPerPage, totalRows);
 
                 if (totalRows <= rowsPerPage && currentPage === 1) {
-                    tablePaginationControls.innerHTML = `<span>Showing <span class="font-semibold">${totalRows}</span> results</span>`;
-                    if (totalRows === 0) {
-                       tablePaginationControls.innerHTML = '';
-                    }
+                    tablePaginationControls.innerHTML = totalRows === 0 ? '' : `<span>Showing <span class="font-semibold">${totalRows}</span> results</span>`;
                     return;
                 }
 
                 tablePaginationControls.innerHTML = `
                     <span>Showing <span class="font-semibold">${startRow}</span> to <span class="font-semibold">${endRow}</span> of <span class="font-semibold">${totalRows}</span> results</span>
                     <div class="inline-flex">
-                        <button id="table-prev-btn" class="px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-l hover:bg-gray-900 ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}">Prev</button>
-                        <button id="table-next-btn" class="px-4 py-2 text-sm font-medium text-white bg-gray-800 border-0 border-l border-gray-700 rounded-r hover:bg-gray-900 ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}">Next</button>
+                        <button id="table-prev-btn" class="btn-ink px-4 py-2 text-sm font-medium" style="border-top-right-radius:0;border-bottom-right-radius:0;" ${currentPage === 1 ? 'disabled' : ''}>Prev</button>
+                        <button id="table-next-btn" class="btn-ink px-4 py-2 text-sm font-medium" style="border-top-left-radius:0;border-bottom-left-radius:0;border-left:1px solid var(--color-border-dark);" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>
                     </div>`;
             }
-            
+
             dataTableContainer.addEventListener('click', (e) => {
                 const header = e.target.closest('th[data-sort]');
                 if (!header) return;
@@ -503,14 +567,8 @@
 
             tablePaginationControls.addEventListener('click', (e) => {
                 const totalPages = Math.ceil(state.dashboardData.length / state.table.rowsPerPage);
-                if (e.target.id === 'table-prev-btn' && state.table.currentPage > 1) {
-                    state.table.currentPage--;
-                    renderDataTable();
-                }
-                if (e.target.id === 'table-next-btn' && state.table.currentPage < totalPages) {
-                    state.table.currentPage++;
-                    renderDataTable();
-                }
+                if (e.target.id === 'table-prev-btn' && state.table.currentPage > 1) { state.table.currentPage--; renderDataTable(); }
+                if (e.target.id === 'table-next-btn' && state.table.currentPage < totalPages) { state.table.currentPage++; renderDataTable(); }
             });
 
             // --- DATA EXPORT ---
@@ -520,7 +578,7 @@
                     return;
                 }
                 const headers = ['id', 'publication_date', 'title', 'original_publication', 'summary', 'key_concepts', 'thematic_categories'];
-                const csvData = state.dashboardData.map(row => 
+                const csvData = state.dashboardData.map(row =>
                     headers.map(header => {
                         const cell = row[header];
                         const value = Array.isArray(cell) ? cell.join('|') : cell;
@@ -528,7 +586,7 @@
                     }).join(',')
                 );
                 csvData.unshift(headers.join(','));
-                
+
                 const blob = new Blob([csvData.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
                 const url = URL.createObjectURL(blob);
@@ -538,6 +596,7 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+                URL.revokeObjectURL(url);
             }
 
             // --- INITIALIZATION ---
@@ -546,5 +605,3 @@
     </script>
 </body>
 </html>
-
-

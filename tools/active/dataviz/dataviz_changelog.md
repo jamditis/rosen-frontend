@@ -2,6 +2,26 @@
 
 This document tracks the development history, feature additions, and bug fixes for the data dashboard component of the Jay Rosen Internet Archive.
 
+### **Version 3.0: Live data and archive theme**
+
+**Date:** June 9, 2026
+
+This version reconnects the dashboard to the live archive and brings its visual language in line with the rest of the site.
+
+#### **✨ Improvements**
+
+* **Live data source:** The dashboard now reads the same local archive JSON the main site uses (`data/archive-core.json` for records, `data/archive-entities.json` for concepts) instead of a frozen Google Sheet snapshot. Charts and stats now reflect the current archive — records through 2025 — and stay in sync automatically when the data is regenerated.
+* **Faster loads:** Dropped the slow, multi-line Google Sheets CSV fetch and PapaParse. The local JSON gzips to roughly 1.6 MB, is service-worker cached, and parses with native `JSON.parse`, so the dashboard is interactive almost immediately.
+* **Matched archive theme:** Restyled to the archive design tokens — aged-paper background with the shared paper-texture, cream card stock, ink text, Special Elite / Roboto Mono type, and the archival faded-ink accent palette for every chart. noUiSlider, buttons, tables, and scrollbars were recolored to match.
+* **Live "Top key concepts":** Concepts are now derived from the archive entity graph rather than a sheet column.
+* **Dynamic top publications:** The publications filter is computed from the data (top 10 by record count) instead of a hardcoded list.
+
+#### **🐛 Hardening**
+
+* Record and concept text is HTML-escaped before injection into the table and filter lists.
+* The dashboard degrades gracefully if the entity graph is unavailable (concepts chart simply empties).
+* A loading state and a readable error state replace the previous silent failure.
+
 ### **Version 2.0: The Enhanced Data Dashboard**
 
 **Date:** October 13, 2025
