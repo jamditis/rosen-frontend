@@ -33,24 +33,30 @@ const BarChart = ({ data, labelKey, valueKey, maxBars = 10, color = '#1c1917' })
   const displayData = data.slice(0, maxBars);
   const maxValue = Math.max(...displayData.map(d => d[valueKey]));
 
+  // Label sits above each bar so every bar shares the same left baseline and
+  // full width, regardless of how long the label is. A fixed-width label
+  // column would either misalign the bars or truncate long names (e.g. the
+  // era labels), which made the charts hard to compare.
   return html`
-    <div className="space-y-2">
+    <div className="space-y-3">
       ${displayData.map((item, i) => html`
-        <div key=${i} className="flex items-center gap-3">
-          <div className="w-28 text-xs text-stone-600 truncate" title=${item[labelKey]}>
-            ${item[labelKey]}
+        <div key=${i}>
+          <div className="flex items-start justify-between gap-2 mb-1">
+            <span className="text-xs text-stone-600 min-w-0 break-words leading-tight">
+              ${item[labelKey]}
+            </span>
+            <span className="text-xs text-stone-500 font-mono flex-shrink-0">
+              ${item[valueKey].toLocaleString()}
+            </span>
           </div>
-          <div className="flex-grow h-5 bg-stone-100 rounded overflow-hidden">
+          <div className="h-3 bg-stone-100 rounded overflow-hidden">
             <div
               className="h-full rounded transition-all duration-500"
               style=${{
-                width: `${(item[valueKey] / maxValue) * 100}%`,
+                width: `${maxValue ? (item[valueKey] / maxValue) * 100 : 0}%`,
                 backgroundColor: color
               }}
             />
-          </div>
-          <div className="w-12 text-xs text-stone-500 text-right font-mono">
-            ${item[valueKey].toLocaleString()}
           </div>
         </div>
       `)}
