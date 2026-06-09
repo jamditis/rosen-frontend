@@ -17,23 +17,25 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.join(__dirname, '..');
 
 describe('fetch error handling (#171)', () => {
-  it('dataviz.html checks response.ok before reading the CSV body', () => {
+  it('dataviz.html checks response.ok before reading the core JSON body', () => {
     const file = path.join(rootDir, 'tools', 'active', 'dataviz', 'dataviz.html');
     const src = fs.readFileSync(file, 'utf-8');
 
-    // Locate the fetchData() function body and assert the ok-check appears
-    // between `fetch(csvUrl)` and `response.text()`. Doing this with a
-    // structured search instead of a brittle regex on the whole file.
-    const fetchIdx = src.indexOf('await fetch(csvUrl)');
-    assert.ok(fetchIdx >= 0, 'expected `await fetch(csvUrl)` in dataviz.html');
-    const textIdx = src.indexOf('response.text()', fetchIdx);
-    assert.ok(textIdx > fetchIdx, 'expected `response.text()` to follow fetch(csvUrl)');
+    // The dashboard now loads the live archive JSON (CORE_URL) instead of the
+    // old Google Sheets CSV. Assert the ok-check appears between the core
+    // fetch and the `coreRes.json()` body read, so a non-OK response (CDN
+    // outage, 404 deploy gap) surfaces as an error instead of throwing on a
+    // non-JSON body. Structured search instead of a brittle whole-file regex.
+    const fetchIdx = src.indexOf('fetch(CORE_URL)');
+    assert.ok(fetchIdx >= 0, 'expected `fetch(CORE_URL)` in dataviz.html');
+    const jsonIdx = src.indexOf('coreRes.json()', fetchIdx);
+    assert.ok(jsonIdx > fetchIdx, 'expected `coreRes.json()` to follow fetch(CORE_URL)');
 
-    const between = src.slice(fetchIdx, textIdx);
+    const between = src.slice(fetchIdx, jsonIdx);
     assert.match(
       between,
-      /response\.ok/,
-      'dataviz.html must check `response.ok` between fetch(csvUrl) and response.text()'
+      /coreRes\.ok/,
+      'dataviz.html must check `coreRes.ok` between fetch(CORE_URL) and coreRes.json()'
     );
   });
 

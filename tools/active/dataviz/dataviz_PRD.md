@@ -23,10 +23,12 @@ The primary audience for this tool includes students, academic researchers, jour
 
 #### **3.1. Data source and processing**
 
-* **Source:** The dashboard will pull data from a publicly accessible Google Sheet, served as a CSV file.  
-  * URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vT-XqQXvMJNaBXVWlmXu1EyOpa\_Cc6ur-pklWX1mbrWIFybZjmbE6UTIteSoCSvf0a7j5r8A6earp3H/pub?gid=928818664\&single=true\&output=csv  
-* **Data ingestion:** The application will use PapaParse to fetch and parse the CSV data directly in the browser.  
-* **Data cleaning:** Upon ingestion, the data will be cleaned and standardized. This includes normalizing headers, standardizing date formats, cleaning text fields, and parsing tag-based fields (like thematic\_categories) into arrays. Only records marked as verified in the CSV will be used.
+* **Source:** As of v3.0 the dashboard reads the live local archive JSON — the same files the main site loads — instead of a frozen Google Sheet snapshot.  
+  * Records: `data/archive-core.json` (relative path `../../../data/archive-core.json`, which resolves identically in local dev and in production under `/j/rosen-archive/`).  
+  * Concepts: `data/archive-entities.json` (the entity graph, used to populate the "Top key concepts" chart).  
+* **Data ingestion:** The application fetches both files in parallel and parses them with native `JSON.parse`. The JSON gzips to ~1.6 MB and is service-worker cached, so loads are fast and stay in sync whenever the data is regenerated.  
+* **Scope:** The dashboard visualizes archive records (articles, clips, the dissertation). The ~25k social posts in the archive are excluded because they carry no thematic categories or publications and would swamp the charts.  
+* **Field mapping:** Core fields are mapped to the dashboard's working shape — `date → publication_date`, `pub → original_publication`, `categories → thematic_categories`, `summaryPreview → summary`, and entity-graph Concept names → `key_concepts`.
 
 #### **3.2. Controls and filters panel**
 
@@ -35,7 +37,7 @@ A persistent sidebar will contain all user-facing controls for manipulating the 
 * **Keyword search:** A text input field that filters the data in real-time based on matches in the title, summary, and key\_concepts fields. The search is debounced to prevent excessive updates while typing.  
 * **Date range slider:** An interactive dual-handle slider (noUiSlider) that allows users to filter records by their publication year.  
 * **Thematic category filter:** A multi-select checklist of all unique thematic categories found in the dataset. Users can select multiple categories to view records that belong to *any* of the selected categories.  
-* **Top publications filter:** A multi-select checklist of the most frequent publication sources.  
+* **Top publications filter:** A multi-select checklist of the most frequent publication sources, computed dynamically from the data (top 10 by record count).  
 * **Reset filters button:** A button to clear all active filters (search, date range, categories, publications) and return the dashboard to its default, unfiltered state.  
 * **Export data button:** A button that allows users to export the currently filtered dataset as a CSV file.
 
@@ -53,7 +55,7 @@ A series of "stat cards" at the top of the main content area will display high-l
 The dashboard will feature a 2x2 grid of interactive charts that update in real-time with the filtered data.
 
 * **Thematic focus over time (Line chart):** A stacked line chart showing the publication frequency of the top 5 thematic categories over the selected date range.  
-* **Top publications (Treemap chart):** A treemap visualizing the relative volume of articles from different publications. Each publication is color-coded for clarity.  
+* **Top publications (Treemap chart):** A treemap visualizing the relative volume of records from different publications. Each publication is color-coded for clarity.  
 * **Top key concepts (Horizontal bar chart):** A bar chart displaying the top 10 most frequent "key concepts" in the filtered dataset.  
 * **Yearly activity (Bar chart):** A bar chart showing the total number of records published per year over the selected date range.
 
