@@ -41,8 +41,8 @@ const BarChart = ({ data, labelKey, valueKey, maxBars = 10, color = '#1c1917' })
     <div className="space-y-3">
       ${displayData.map((item, i) => html`
         <div key=${i}>
-          <div className="flex items-center justify-between gap-2 mb-1">
-            <span className="text-xs text-stone-600 truncate" title=${item[labelKey]}>
+          <div className="flex items-start justify-between gap-2 mb-1">
+            <span className="text-xs text-stone-600 min-w-0 break-words leading-tight">
               ${item[labelKey]}
             </span>
             <span className="text-xs text-stone-500 font-mono flex-shrink-0">
