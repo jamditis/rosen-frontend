@@ -61,6 +61,25 @@ SUBMISSION_RATE_LIMIT_PER_HOUR = _positive_int_from_env(
 QUEUE_THRESHOLD = int(os.environ.get("QUEUE_THRESHOLD", "5"))
 DAILY_PROCESS_HOUR = int(os.environ.get("DAILY_PROCESS_HOUR", "0"))  # midnight
 
+# Writeback target pinning. The status writeback uses a service-account key that
+# can write to every spreadsheet (and every tab within it) shared with the SA,
+# so a /submit caller must not be able to redirect that write by naming a
+# different target. The writeback target is (sheet_id, sheet_tab, row); pin all
+# three. ALLOWED_SHEET_ID pins the spreadsheet, ALLOWED_SHEET_TAB pins the tab
+# inside it, and MAX_SHEET_ROW bounds the row. Both allowlists are empty by
+# default so dev and the current single-sheet deploy are unrestricted — but to
+# actually pin the writeback in production set BOTH, since pinning the
+# spreadsheet alone still lets a caller redirect the write to another tab in it.
+# See issue #285.
+ALLOWED_SHEET_ID = os.environ.get("ROSEN_ALLOWED_SHEET_ID", "").strip()
+ALLOWED_SHEET_TAB = os.environ.get("ROSEN_ALLOWED_SHEET_TAB", "").strip()
+
+# Upper bound for a 1-based sheet row. A real queue sheet has at most a few
+# thousand rows; anything outside [1, MAX_SHEET_ROW] is treated as absent rather
+# than passed through to the Sheets API. The bound is generous on purpose — it
+# only rejects nonsense, not legitimate rows.
+MAX_SHEET_ROW = _positive_int_from_env("ROSEN_MAX_SHEET_ROW", 5_000_000)
+
 # The six canonical thematic categories. This list MUST stay in sync with
 # `facets.categories` in data/archive-data.json and the "Category Values"
 # section of data/SCHEMA.md. A form submission tagged with any other category
