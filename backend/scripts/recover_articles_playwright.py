@@ -28,6 +28,7 @@ Usage (from the backend/ directory):
     poetry run python scripts/recover_articles_playwright.py --url <URL>
     poetry run python scripts/recover_articles_playwright.py --huffpost-gap ../data/_recovery_tmp/huffpost_gap.json --limit 5
 """
+
 from __future__ import annotations
 import argparse
 import json
@@ -40,15 +41,42 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
+# Lay the package roots on sys.path so the script is runnable both via
+# `python backend/scripts/recover_articles_playwright.py` and via a
+# `cd backend && python scripts/...` invocation, mirroring process_submission.py.
+_BACKEND = Path(__file__).resolve().parents[1]
+for _candidate in (_BACKEND, _BACKEND / "src"):
+    if str(_candidate) not in sys.path:
+        sys.path.insert(0, str(_candidate))
+
+from rosen_scraper.url_safety import is_safe_public_url  # noqa: E402
+
 
 MIN_OK_LEN = 500
 USER_AGENT = "rosen-archive-recovery/1.0 (+https://github.com/jamditis/rosen-frontend)"
 
 NAV_NOISE_PREFIXES = (
-    "Skip to", "Power Our", "SUPPORT THE", "Log In", "Sign Up", "Subscribe",
-    "Share this", "Share on", "© ", "Privacy Policy", "Terms of Service",
-    "Already a member", "We Demand", "DEMAND THE TRUTH", "Click here", "BREAKING",
-    "Advertisement", "Read More", "MORE FROM", "Follow us", "Cookie",
+    "Skip to",
+    "Power Our",
+    "SUPPORT THE",
+    "Log In",
+    "Sign Up",
+    "Subscribe",
+    "Share this",
+    "Share on",
+    "© ",
+    "Privacy Policy",
+    "Terms of Service",
+    "Already a member",
+    "We Demand",
+    "DEMAND THE TRUTH",
+    "Click here",
+    "BREAKING",
+    "Advertisement",
+    "Read More",
+    "MORE FROM",
+    "Follow us",
+    "Cookie",
 )
 
 
@@ -146,10 +174,48 @@ def wayback_closest(url: str, yyyymmdd: str | None) -> str | None:
         return None
 
 
+def _block_unsafe_request(route, request) -> None:
+    """Playwright route handler that aborts http(s) requests to non-public hosts.
+
+    The pre-navigation check in recover() only sees the initial URL; a redirect
+    or a subresource can still reach a private/loopback/link-local host. This
+    re-checks every request at fire time and aborts the unsafe ones, covering
+    redirects and subresources the entry check can't.
+
+    Only http/https are SSRF-checked. data:, blob:, and about: carry no network
+    request to an internal host, so they pass through — aborting them would
+    break rendering of pages with inline images or fonts (is_safe_public_url
+    rejects every non-http scheme outright, so they must be excluded here).
+    """
+    scheme = urllib.parse.urlparse(request.url).scheme.lower()
+    if scheme in ("http", "https"):
+        ok, _reason = is_safe_public_url(request.url)
+        if not ok:
+            route.abort()
+            return
+    route.continue_()
+
+
 def recover(page, url: str, fallback_timestamp: str | None = None) -> dict:
     """Try live URL first; on short body or HTTP error, try Wayback snapshot."""
-    result = {"input_url": url, "source": "live", "live_url_status": None,
-              "wayback_url": None, "error": None}
+    result = {
+        "input_url": url,
+        "source": "live",
+        "live_url_status": None,
+        "wayback_url": None,
+        "error": None,
+    }
+
+    # SSRF guard: never navigate to a private/loopback/link-local target. The
+    # URL can come from an operator-supplied --url or an untrusted gap JSON
+    # file, and recovery runs on a host with internal services on localhost and
+    # Tailscale (#287). Reject before launching any navigation.
+    safe, reason = is_safe_public_url(url)
+    if not safe:
+        result["source"] = "rejected"
+        result["error"] = f"unsafe target: {reason}"
+        return result
+
     try:
         resp = page.goto(url, wait_until="domcontentloaded", timeout=45000)
         result["live_url_status"] = resp.status if resp else None
@@ -165,6 +231,13 @@ def recover(page, url: str, fallback_timestamp: str | None = None) -> dict:
     wb = wayback_closest(url, fallback_timestamp)
     if not wb:
         result["source"] = "neither"
+        return result
+    # The Wayback URL is normally archive.org, but it comes back from an
+    # external API and feeds another page.goto — re-validate before navigating.
+    wb_safe, wb_reason = is_safe_public_url(wb)
+    if not wb_safe:
+        result["source"] = "neither"
+        result["error"] = f"unsafe wayback target: {wb_reason}"
         return result
     try:
         resp = page.goto(wb, wait_until="domcontentloaded", timeout=60000)
@@ -191,7 +264,9 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--url", help="Single URL to recover")
     ap.add_argument("--huffpost-gap", help="Path to huffpost_gap.json for bulk run")
-    ap.add_argument("--limit", type=int, default=0, help="Limit bulk run count (0 = all)")
+    ap.add_argument(
+        "--limit", type=int, default=0, help="Limit bulk run count (0 = all)"
+    )
     ap.add_argument("--output", choices=["json", "text"], default="json")
     args = ap.parse_args()
 
@@ -204,20 +279,26 @@ def main() -> int:
     if args.huffpost_gap:
         data = json.loads(Path(args.huffpost_gap).read_text())
         for post in data.get("missing_posts", []):
-            targets.append({
-                "url": post["modern_url"],
-                "timestamp": post.get("earliest_ts"),
-                "post_id": post.get("post_id"),
-            })
+            targets.append(
+                {
+                    "url": post["modern_url"],
+                    "timestamp": post.get("earliest_ts"),
+                    "post_id": post.get("post_id"),
+                }
+            )
     if args.limit:
         targets = targets[: args.limit]
 
     results = []
     with sync_playwright() as p:
         browser = p.firefox.launch(headless=True)
-        ctx = browser.new_context(viewport={"width": 1280, "height": 1800},
-                                  user_agent=USER_AGENT)
+        ctx = browser.new_context(
+            viewport={"width": 1280, "height": 1800}, user_agent=USER_AGENT
+        )
         page = ctx.new_page()
+        # Abort any redirect or subresource that resolves to a non-public host,
+        # covering the navigation paths the per-URL entry check can't see (#287).
+        page.route("**/*", _block_unsafe_request)
         for i, t in enumerate(targets, 1):
             print(f"[{i}/{len(targets)}] {t['url']}", file=sys.stderr)
             r = recover(page, t["url"], t.get("timestamp"))
@@ -231,11 +312,13 @@ def main() -> int:
         print(json.dumps(results, ensure_ascii=False, indent=2))
     else:
         for r in results:
-            print(f"== {r.get('title','?')} ({r.get('source')}) ==")
+            print(f"== {r.get('title', '?')} ({r.get('source')}) ==")
             print(f"  url: {r['input_url']}")
-            print(f"  author: {r.get('author','')}")
-            print(f"  date: {r.get('date','')}")
-            print(f"  body: {r.get('body_char_count',0)} chars / {r.get('body_paragraph_count',0)} paragraphs")
+            print(f"  author: {r.get('author', '')}")
+            print(f"  date: {r.get('date', '')}")
+            print(
+                f"  body: {r.get('body_char_count', 0)} chars / {r.get('body_paragraph_count', 0)} paragraphs"
+            )
             if r.get("error"):
                 print(f"  error: {r['error']}")
             if r.get("wayback_url"):
