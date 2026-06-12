@@ -15,7 +15,7 @@ import json
 import sys
 import time
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, NamedTuple
 from datetime import datetime
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import multiprocessing
@@ -30,11 +30,11 @@ from rosen_scraper.post_loader import load_social_posts, prioritize_posts
 
 def extract_from_post(post: Dict) -> Dict:
     """Extract entities and relationships from a single post."""
-    record_id = post['id']
-    text_content = post.get('raw_text', '')
-    record_title = post.get('title', 'Untitled Post')
-    record_author = post.get('author', 'Unknown')
-    record_publication = post.get('platform', 'Unknown')
+    record_id = post["id"]
+    text_content = post.get("raw_text", "")
+    record_title = post.get("title", "Untitled Post")
+    record_author = post.get("author", "Unknown")
+    record_publication = post.get("platform", "Unknown")
 
     try:
         result = entity_extractor.extract_entities_and_relationships(
@@ -42,20 +42,20 @@ def extract_from_post(post: Dict) -> Dict:
             record_id=record_id,
             record_title=record_title,
             record_author=record_author,
-            record_publication=record_publication
+            record_publication=record_publication,
         )
 
         if result:
             return {
-                'success': True,
-                'entities': result.get('entities', []),
-                'relationships': result.get('relationships', [])
+                "success": True,
+                "entities": result.get("entities", []),
+                "relationships": result.get("relationships", []),
             }
         else:
-            return {'success': False, 'entities': [], 'relationships': []}
+            return {"success": False, "entities": [], "relationships": []}
 
     except Exception as e:
-        return {'success': False, 'entities': [], 'relationships': [], 'error': str(e)}
+        return {"success": False, "entities": [], "relationships": [], "error": str(e)}
 
 
 def process_batch_worker(args):
@@ -71,7 +71,9 @@ def process_batch_worker(args):
     """
     worker_id, posts_batch, rate_limit_delay, total_workers = args
 
-    print(f"[Worker {worker_id}/{total_workers}] Starting batch of {len(posts_batch)} posts...")
+    print(
+        f"[Worker {worker_id}/{total_workers}] Starting batch of {len(posts_batch)} posts..."
+    )
 
     worker_entities = []
     worker_relationships = []
@@ -85,21 +87,23 @@ def process_batch_worker(args):
         # Extract
         result = extract_from_post(post)
 
-        if result['success']:
-            worker_entities.extend(result['entities'])
-            worker_relationships.extend(result['relationships'])
+        if result["success"]:
+            worker_entities.extend(result["entities"])
+            worker_relationships.extend(result["relationships"])
 
             if i % 10 == 0:
                 elapsed = time.time() - start_time
                 avg_time = elapsed / i
                 remaining = len(posts_batch) - i
                 eta_minutes = (remaining * avg_time) / 60
-                print(f"[Worker {worker_id}] {i}/{len(posts_batch)} posts | "
-                      f"{len(worker_entities)} entities, {len(worker_relationships)} rels | "
-                      f"ETA: {eta_minutes:.1f}m")
+                print(
+                    f"[Worker {worker_id}] {i}/{len(posts_batch)} posts | "
+                    f"{len(worker_entities)} entities, {len(worker_relationships)} rels | "
+                    f"ETA: {eta_minutes:.1f}m"
+                )
         else:
-            error_msg = result.get('error', 'Unknown error')
-            worker_errors.append({'post_id': post['id'], 'error': error_msg})
+            error_msg = result.get("error", "Unknown error")
+            worker_errors.append({"post_id": post["id"], "error": error_msg})
 
         # Rate limiting (but don't sleep after last post)
         if i < len(posts_batch):
@@ -110,20 +114,24 @@ def process_batch_worker(args):
 
     duration = time.time() - start_time
 
-    print(f"[Worker {worker_id}] COMPLETE! {len(posts_batch)} posts in {duration/60:.1f}m | "
-          f"{len(worker_entities)} entities, {len(worker_relationships)} relationships")
+    print(
+        f"[Worker {worker_id}] COMPLETE! {len(posts_batch)} posts in {duration / 60:.1f}m | "
+        f"{len(worker_entities)} entities, {len(worker_relationships)} relationships"
+    )
 
     return {
-        'worker_id': worker_id,
-        'posts_processed': len(posts_batch),
-        'entities': worker_entities,
-        'relationships': worker_relationships,
-        'errors': worker_errors,
-        'duration': duration
+        "worker_id": worker_id,
+        "posts_processed": len(posts_batch),
+        "entities": worker_entities,
+        "relationships": worker_relationships,
+        "errors": worker_errors,
+        "duration": duration,
     }
 
 
-def save_results_to_csv(entities: List[Dict], relationships: List[Dict], output_dir: Path):
+def save_results_to_csv(
+    entities: List[Dict], relationships: List[Dict], output_dir: Path
+):
     """Save extraction results to CSV files with ALL fields."""
 
     # Save entities
@@ -135,8 +143,8 @@ def save_results_to_csv(entities: List[Dict], relationships: List[Dict], output_
             fieldnames.update(entity.keys())
         fieldnames = sorted(list(fieldnames))
 
-        with open(entities_csv, 'w', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction='ignore')
+        with open(entities_csv, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
             writer.writeheader()
             writer.writerows(entities)
 
@@ -151,22 +159,92 @@ def save_results_to_csv(entities: List[Dict], relationships: List[Dict], output_
             fieldnames.update(rel.keys())
         fieldnames = sorted(list(fieldnames))
 
-        with open(relationships_csv, 'w', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction='ignore')
+        with open(relationships_csv, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
             writer.writeheader()
             writer.writerows(relationships)
 
         print(f"✓ Saved {len(relationships)} relationships to {relationships_csv.name}")
 
 
+class _WorkerResults(NamedTuple):
+    """Aggregated output of the worker pool, with a hard-failure count (#292)."""
+
+    entities: List[Dict]
+    relationships: List[Dict]
+    errors: List
+    total_processed: int
+    worker_failures: int
+
+
+def _collect_worker_results(future_to_worker) -> "_WorkerResults":
+    """Aggregate finished worker futures, counting hard worker failures.
+
+    A worker that raises — as opposed to returning soft per-post errors in its
+    result dict — is a hard failure the caller must surface as a non-zero exit.
+    Before #292 such failures were printed and swallowed, so a run where every
+    worker died still returned 0 and looked successful.
+    """
+    entities: List[Dict] = []
+    relationships: List[Dict] = []
+    errors: List = []
+    total_processed = 0
+    worker_failures = 0
+
+    for future in as_completed(future_to_worker):
+        worker_id = future_to_worker[future]
+        try:
+            result = future.result()
+            entities.extend(result["entities"])
+            relationships.extend(result["relationships"])
+            errors.extend(result["errors"])
+            total_processed += result["posts_processed"]
+
+            print()
+            print(f"✓ Worker {result['worker_id']} finished!")
+            print(
+                f"  Running total: {total_processed} posts | "
+                f"{len(entities)} entities | {len(relationships)} relationships"
+            )
+            print()
+        except Exception as e:
+            worker_failures += 1
+            print(f"✗ Worker {worker_id} failed with error: {e}")
+
+    return _WorkerResults(
+        entities, relationships, errors, total_processed, worker_failures
+    )
+
+
 def main():
     """Main execution."""
     import argparse
+
     parser = argparse.ArgumentParser()
-    parser.add_argument('--yes', '-y', action='store_true', help='Auto-confirm without prompting')
-    parser.add_argument('--workers', '-w', type=int, default=5, help='Number of parallel workers (default: 5)')
-    parser.add_argument('--max-posts', '-m', type=int, default=10000, help='Maximum posts to process (default: 10000)')
-    parser.add_argument('--rate-limit', '-r', type=float, default=2.0, help='Seconds between API calls per worker (default: 2.0)')
+    parser.add_argument(
+        "--yes", "-y", action="store_true", help="Auto-confirm without prompting"
+    )
+    parser.add_argument(
+        "--workers",
+        "-w",
+        type=int,
+        default=5,
+        help="Number of parallel workers (default: 5)",
+    )
+    parser.add_argument(
+        "--max-posts",
+        "-m",
+        type=int,
+        default=10000,
+        help="Maximum posts to process (default: 10000)",
+    )
+    parser.add_argument(
+        "--rate-limit",
+        "-r",
+        type=float,
+        default=2.0,
+        help="Seconds between API calls per worker (default: 2.0)",
+    )
     args = parser.parse_args()
 
     print("=" * 80)
@@ -207,7 +285,9 @@ def main():
     print(f"Number of workers: {NUM_WORKERS}")
     print(f"Posts per worker: ~{posts_per_worker}")
     print(f"Rate limit: {RATE_LIMIT_DELAY}s between calls (per worker)")
-    print(f"Effective rate: ~{NUM_WORKERS / RATE_LIMIT_DELAY:.1f} posts/second (all workers)")
+    print(
+        f"Effective rate: ~{NUM_WORKERS / RATE_LIMIT_DELAY:.1f} posts/second (all workers)"
+    )
     print(f"Estimated cost: ${len(posts_to_process) * 0.005:.2f}")
 
     # Calculate time estimate
@@ -216,16 +296,22 @@ def main():
     estimated_time_minutes = estimated_time_seconds / 60
     estimated_time_hours = estimated_time_minutes / 60
 
-    print(f"Estimated time: ~{estimated_time_hours:.1f} hours ({estimated_time_minutes:.0f} minutes)")
+    print(
+        f"Estimated time: ~{estimated_time_hours:.1f} hours ({estimated_time_minutes:.0f} minutes)"
+    )
     print()
 
     # Confirm
     if not args.yes:
-        print("⚠️  This will run for several hours and cost ~${:.2f}".format(len(posts_to_process) * 0.005))
+        print(
+            "⚠️  This will run for several hours and cost ~${:.2f}".format(
+                len(posts_to_process) * 0.005
+            )
+        )
         print("⚠️  Make sure you have stable power and internet connection!")
         print()
         response = input("Continue with extraction? (yes/no): ").strip().lower()
-        if response != 'yes':
+        if response != "yes":
             print("Extraction cancelled.")
             return 0
     else:
@@ -252,34 +338,21 @@ def main():
     # Process batches in parallel
     overall_start_time = datetime.now()
 
-    all_entities = []
-    all_relationships = []
-    all_errors = []
-    total_processed = 0
-
     with ProcessPoolExecutor(max_workers=NUM_WORKERS) as executor:
         # Submit all workers
-        future_to_worker = {executor.submit(process_batch_worker, batch): batch[0]
-                           for batch in worker_batches}
+        future_to_worker = {
+            executor.submit(process_batch_worker, batch): batch[0]
+            for batch in worker_batches
+        }
 
-        # Collect results as they complete
-        for future in as_completed(future_to_worker):
-            worker_id = future_to_worker[future]
-            try:
-                result = future.result()
-                all_entities.extend(result['entities'])
-                all_relationships.extend(result['relationships'])
-                all_errors.extend(result['errors'])
-                total_processed += result['posts_processed']
+        # Collect results as they complete, counting hard worker failures (#292)
+        collected = _collect_worker_results(future_to_worker)
 
-                print()
-                print(f"✓ Worker {result['worker_id']} finished!")
-                print(f"  Running total: {total_processed}/{len(posts_to_process)} posts | "
-                      f"{len(all_entities)} entities | {len(all_relationships)} relationships")
-                print()
-
-            except Exception as e:
-                print(f"✗ Worker {worker_id} failed with error: {e}")
+    all_entities = collected.entities
+    all_relationships = collected.relationships
+    all_errors = collected.errors
+    total_processed = collected.total_processed
+    worker_failures = collected.worker_failures
 
     overall_end_time = datetime.now()
     duration = (overall_end_time - overall_start_time).total_seconds()
@@ -288,11 +361,14 @@ def main():
     print("=" * 80)
     print("PARALLEL EXTRACTION COMPLETE")
     print("=" * 80)
-    print(f"Duration: {duration:.1f} seconds ({duration/60:.1f} minutes / {duration/3600:.1f} hours)")
+    print(
+        f"Duration: {duration:.1f} seconds ({duration / 60:.1f} minutes / {duration / 3600:.1f} hours)"
+    )
     print(f"Posts processed: {total_processed:,}")
     print(f"Entities extracted: {len(all_entities):,}")
     print(f"Relationships extracted: {len(all_relationships):,}")
     print(f"Errors: {len(all_errors)}")
+    print(f"Worker failures: {worker_failures}")
     print()
 
     # Save results
@@ -301,17 +377,18 @@ def main():
 
     # Save summary
     summary = {
-        'timestamp': datetime.now().isoformat(),
-        'duration_seconds': duration,
-        'num_workers': NUM_WORKERS,
-        'posts_processed': total_processed,
-        'entities_extracted': len(all_entities),
-        'relationships_extracted': len(all_relationships),
-        'errors': all_errors
+        "timestamp": datetime.now().isoformat(),
+        "duration_seconds": duration,
+        "num_workers": NUM_WORKERS,
+        "posts_processed": total_processed,
+        "entities_extracted": len(all_entities),
+        "relationships_extracted": len(all_relationships),
+        "worker_failures": worker_failures,
+        "errors": all_errors,
     }
 
     summary_json = output_dir / "extraction_summary.json"
-    with open(summary_json, 'w', encoding='utf-8') as f:
+    with open(summary_json, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2)
 
     print(f"✓ Saved summary: {summary_json.name}")
@@ -320,10 +397,13 @@ def main():
     print()
     print("🎉 All done!")
 
+    if worker_failures:
+        print(f"⚠ {worker_failures} worker(s) raised — exiting non-zero (#292).")
+        return 1
     return 0
 
 
 if __name__ == "__main__":
     # Set multiprocessing start method
-    multiprocessing.set_start_method('spawn', force=True)
+    multiprocessing.set_start_method("spawn", force=True)
     sys.exit(main())

@@ -9,9 +9,8 @@ from typing import Optional, Dict, Any
 import re
 from rosen_scraper.processors import article_processor, video_processor
 from rosen_scraper.processors.twitter_processor import TwitterProcessor
-from rosen_scraper.processors.tumblr_processor import TumblrProcessor
-from rosen_scraper.processors.clipping_processor import ClippingProcessor
 from rosen_scraper.processors.bluesky_processor import BlueskyProcessor
+
 
 def dispatch_url(url: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
@@ -37,9 +36,9 @@ def dispatch_url(url: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         processor = TwitterProcessor()
         result = processor.process(url)
         # If processing succeeded, add schema for AI analysis
-        if result.get('status') == 'success' and result.get('raw_text'):
+        if result.get("status") == "success" and result.get("raw_text"):
             # Run AI analysis on the extracted text
-            ai_result = article_processor._run_ai_analysis(result['raw_text'], schema)
+            ai_result = article_processor._run_ai_analysis(result["raw_text"], schema)
             if ai_result:
                 result.update(ai_result)
         return result
@@ -48,35 +47,24 @@ def dispatch_url(url: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     elif re.search(r"bsky\.app/profile/.*/post/", url):
         processor = BlueskyProcessor()
         result = processor.process(url)
-        if result.get('status') == 'success' and result.get('raw_text'):
-            ai_result = article_processor._run_ai_analysis(result['raw_text'], schema)
-            if ai_result:
-                result.update(ai_result)
-        return result
-
-    # Tumblr posts
-    elif re.search(r"\.tumblr\.com", url):
-        processor = TumblrProcessor()
-        result = processor.process(url)
-        if result.get('status') == 'success' and result.get('raw_text'):
-            ai_result = article_processor._run_ai_analysis(result['raw_text'], schema)
-            if ai_result:
-                result.update(ai_result)
-        return result
-
-    # PDF newspaper clippings
-    elif url.lower().endswith('.pdf') or 'pdf' in url.lower():
-        processor = ClippingProcessor()
-        result = processor.process(url)
-        if result.get('status') == 'success' and result.get('raw_text'):
-            ai_result = article_processor._run_ai_analysis(result['raw_text'], schema)
+        if result.get("status") == "success" and result.get("raw_text"):
+            ai_result = article_processor._run_ai_analysis(result["raw_text"], schema)
             if ai_result:
                 result.update(ai_result)
         return result
 
     else:
-        # If the URL is not a video or special content type, default to the article processor.
+        # Default path. The article cascade (URL Context -> trafilatura ->
+        # Playwright) handles live HTML pages — including Tumblr posts — and the
+        # URL Context scraper can read PDFs; an extraction failure degrades to
+        # None (sheet status 'error'), never a crash. The old Tumblr and PDF
+        # branches were removed in #286: they built TumblrProcessor() (which
+        # needs an export dir and has no .process(url)) and called
+        # ClippingProcessor().process(url) (no such method), so every live
+        # Tumblr/PDF submission raised on the first call. Those processors are
+        # still used by the offline export/clipping batch paths.
         return article_processor.process_article(url, schema)
+
 
 def reprocess_text(raw_text: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
