@@ -32,26 +32,26 @@ from typing import Dict, Any, Optional
 
 from .config import FTP_STAGING_DIR
 
-logger = logging.getLogger('submission_server.sftp_push')
+logger = logging.getLogger("submission_server.sftp_push")
 
 # These match the files _stage_for_ftp() copies. Keep in sync with
 # processor.py:_STAGED_JSON_FILES — a divergence would silently ship stale JSON.
 _PUSH_FILES = (
-    'archive-data.json',
-    'archive-core.json',
-    'archive-details.json',
-    'archive-entities.json',
-    'archive-analytics.json',
+    "archive-data.json",
+    "archive-core.json",
+    "archive-details.json",
+    "archive-entities.json",
+    "archive-analytics.json",
 )
 
 
 def _read_env() -> Optional[Dict[str, Any]]:
     """Return SFTP config from env, or None when required vars are missing."""
-    host = os.environ.get('ROSEN_SFTP_HOST', '').strip()
-    user = os.environ.get('ROSEN_SFTP_USER', '').strip()
-    remote = os.environ.get('ROSEN_SFTP_REMOTE_PATH', '').strip()
-    password = os.environ.get('ROSEN_SFTP_PASSWORD', '')
-    key_path = os.environ.get('ROSEN_SFTP_KEY_PATH', '').strip()
+    host = os.environ.get("ROSEN_SFTP_HOST", "").strip()
+    user = os.environ.get("ROSEN_SFTP_USER", "").strip()
+    remote = os.environ.get("ROSEN_SFTP_REMOTE_PATH", "").strip()
+    password = os.environ.get("ROSEN_SFTP_PASSWORD", "")
+    key_path = os.environ.get("ROSEN_SFTP_KEY_PATH", "").strip()
 
     if not (host and user and remote and (password or key_path)):
         return None
@@ -60,21 +60,22 @@ def _read_env() -> Optional[Dict[str, Any]]:
     # crash the whole submission run. Treat it as unconfigured instead so the
     # batch keeps going and the row gets a clear "skipped" signal.
     try:
-        port = int(os.environ.get('ROSEN_SFTP_PORT', '22'))
+        port = int(os.environ.get("ROSEN_SFTP_PORT", "22"))
     except (TypeError, ValueError):
         logger.warning("ROSEN_SFTP_PORT is not an integer; treating as unconfigured")
         return None
 
     return {
-        'host': host,
-        'port': port,
-        'user': user,
-        'remote_path': remote.rstrip('/'),
-        'password': password or None,
-        'key_path': key_path or None,
-        'key_passphrase': os.environ.get('ROSEN_SFTP_KEY_PASSPHRASE') or None,
-        'known_hosts': os.environ.get('ROSEN_SFTP_KNOWN_HOSTS',
-                                      str(Path.home() / '.ssh' / 'known_hosts')),
+        "host": host,
+        "port": port,
+        "user": user,
+        "remote_path": remote.rstrip("/"),
+        "password": password or None,
+        "key_path": key_path or None,
+        "key_passphrase": os.environ.get("ROSEN_SFTP_KEY_PASSPHRASE") or None,
+        "known_hosts": os.environ.get(
+            "ROSEN_SFTP_KNOWN_HOSTS", str(Path.home() / ".ssh" / "known_hosts")
+        ),
     }
 
 
@@ -88,51 +89,89 @@ def push_to_production(staging_dir: Optional[Path] = None) -> Dict[str, Any]:
     cfg = _read_env()
     if cfg is None:
         logger.warning("SFTP env vars not set — skipping production push")
-        return {'ok': True, 'skipped': True, 'files_pushed': 0, 'error': None}
+        return {"ok": True, "skipped": True, "files_pushed": 0, "error": None}
 
     src_dir = Path(staging_dir) if staging_dir else FTP_STAGING_DIR
     if not src_dir.exists():
-        return {'ok': False, 'skipped': False, 'files_pushed': 0,
-                'error': f'Staging dir does not exist: {src_dir}'}
+        return {
+            "ok": False,
+            "skipped": False,
+            "files_pushed": 0,
+            "error": f"Staging dir does not exist: {src_dir}",
+        }
 
     missing = [f for f in _PUSH_FILES if not (src_dir / f).exists()]
     if missing:
-        return {'ok': False, 'skipped': False, 'files_pushed': 0,
-                'error': f'Staged files missing: {missing}'}
+        return {
+            "ok": False,
+            "skipped": False,
+            "files_pushed": 0,
+            "error": f"Staged files missing: {missing}",
+        }
 
     try:
         import paramiko
     except ImportError:
-        return {'ok': False, 'skipped': False, 'files_pushed': 0,
-                'error': 'paramiko not installed'}
+        return {
+            "ok": False,
+            "skipped": False,
+            "files_pushed": 0,
+            "error": "paramiko not installed",
+        }
 
     pushed = 0
     error = None
+    tmp_known_hosts = None
     client = paramiko.SSHClient()
 
     try:
         # Strict host-key checking. RejectPolicy means an unknown host raises
         # rather than silently trusting whatever's on the other end — required
         # for a writeable production deploy step.
-        known_hosts_path = Path(cfg['known_hosts']).expanduser()
-        if known_hosts_path.exists():
+        #
+        # ROSEN_SFTP_KNOWN_HOSTS can hold either a path on disk OR the raw
+        # host-key content. A GitHub Actions secret can only carry the inline
+        # ssh-keyscan output, not a runner path, so the old path-only handling
+        # silently skipped load_host_keys for that shape and RejectPolicy then
+        # blocked every push (#298/#304). Disambiguate: an existing file is a
+        # path; any other non-empty value is content, materialized to a tempfile
+        # so paramiko can load it. The is_file/content split avoids an algorithm
+        # allowlist, and a malformed blob raises cleanly from load_host_keys
+        # rather than failing later under RejectPolicy. Mirrors the logic in
+        # backend/scripts/deploy_full_site.py — keep the two in sync.
+        known_hosts_raw = cfg["known_hosts"]
+        known_hosts_path = Path(known_hosts_raw).expanduser()
+        if known_hosts_path.is_file():
             client.load_host_keys(str(known_hosts_path))
+        elif known_hosts_raw and known_hosts_raw.strip():
+            import tempfile
+
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                delete=False,
+                suffix=".known_hosts",
+            ) as f:
+                f.write(known_hosts_raw)
+                if not known_hosts_raw.endswith("\n"):
+                    f.write("\n")
+                tmp_known_hosts = f.name
+            client.load_host_keys(tmp_known_hosts)
         client.set_missing_host_key_policy(paramiko.RejectPolicy())
 
         connect_kwargs = {
-            'hostname': cfg['host'],
-            'port': cfg['port'],
-            'username': cfg['user'],
-            'timeout': 30,
-            'allow_agent': False,
-            'look_for_keys': False,
+            "hostname": cfg["host"],
+            "port": cfg["port"],
+            "username": cfg["user"],
+            "timeout": 30,
+            "allow_agent": False,
+            "look_for_keys": False,
         }
-        if cfg['key_path']:
-            connect_kwargs['key_filename'] = cfg['key_path']
-            if cfg['key_passphrase']:
-                connect_kwargs['passphrase'] = cfg['key_passphrase']
+        if cfg["key_path"]:
+            connect_kwargs["key_filename"] = cfg["key_path"]
+            if cfg["key_passphrase"]:
+                connect_kwargs["passphrase"] = cfg["key_passphrase"]
         else:
-            connect_kwargs['password'] = cfg['password']
+            connect_kwargs["password"] = cfg["password"]
 
         client.connect(**connect_kwargs)
         sftp = client.open_sftp()
@@ -160,17 +199,22 @@ def push_to_production(staging_dir: Optional[Path] = None) -> Dict[str, Any]:
         finally:
             sftp.close()
     except paramiko.SSHException as exc:
-        error = f'SSH error: {exc}'
+        error = f"SSH error: {exc}"
         logger.error(error)
     except (IOError, OSError) as exc:
-        error = f'Transfer error: {exc}'
+        error = f"Transfer error: {exc}"
         logger.error(error)
     finally:
         client.close()
+        if tmp_known_hosts:
+            try:
+                os.unlink(tmp_known_hosts)
+            except OSError:
+                pass
 
     return {
-        'ok': error is None and pushed == len(_PUSH_FILES),
-        'skipped': False,
-        'files_pushed': pushed,
-        'error': error,
+        "ok": error is None and pushed == len(_PUSH_FILES),
+        "skipped": False,
+        "files_pushed": pushed,
+        "error": error,
     }
