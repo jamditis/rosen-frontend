@@ -35,9 +35,16 @@ from .config import (
     SUBMISSION_AUTH_TOKEN,
     SUBMISSION_RATE_LIMIT_PER_MINUTE,
     SUBMISSION_RATE_LIMIT_PER_HOUR,
+    ALLOWED_SHEET_ID,
+    ALLOWED_SHEET_TAB,
+    MAX_SHEET_ROW,
 )
 from . import db
 from .processor import process_batch
+
+# Canonical category set for O(1) membership checks at the /submit boundary.
+# Built once from THEMATIC_CATEGORIES so it stays in sync with the schema.
+_VALID_CATEGORIES = set(THEMATIC_CATEGORIES)
 
 app = Flask(__name__)
 
@@ -264,13 +271,59 @@ def submit():
             False, status_code=422, error=f"That URL cannot be accepted: {url_reason}."
         )
 
+    # Validate categories against the canonical schema before persistence (#293).
+    # JSON callers can send any string; an off-schema label is written to the CSV
+    # but never groups, filters, or facets on the live site, so it silently
+    # disappears. Normalize whitespace first so a padded-but-canonical value
+    # auto-corrects, then reject anything still off-schema with a clear 422.
+    selected_cats = [c.strip() for c in selected_cats if c and c.strip()]
+    unknown_cats = sorted({c for c in selected_cats if c not in _VALID_CATEGORIES})
+    if unknown_cats:
+        return _json_or_html(
+            False,
+            status_code=422,
+            error=(
+                f"Unknown categories: {unknown_cats}. Allowed: {THEMATIC_CATEGORIES}."
+            ),
+        )
+
+    # Pin the writeback target server-side (#285). The service account can write
+    # any tab of any spreadsheet shared with it, so the target — (sheet_id,
+    # sheet_tab, row) — must be pinned, not just the spreadsheet id. When the
+    # allowlists are configured, a token holder cannot redirect the write to a
+    # different spreadsheet (ALLOWED_SHEET_ID) or to a different tab within the
+    # pinned spreadsheet (ALLOWED_SHEET_TAB). Empty allowlists (the default)
+    # leave the current single-sheet deploy unrestricted.
+    requested_sheet_id = (body.get("sheet_id") or "").strip()
+    if (
+        ALLOWED_SHEET_ID
+        and requested_sheet_id
+        and requested_sheet_id != ALLOWED_SHEET_ID
+    ):
+        return _json_or_html(
+            False,
+            status_code=422,
+            error="That sheet_id is not allowed for this submission server.",
+        )
+    requested_sheet_tab = (body.get("sheet_tab") or "").strip()
+    if (
+        ALLOWED_SHEET_TAB
+        and requested_sheet_tab
+        and requested_sheet_tab != ALLOWED_SHEET_TAB
+    ):
+        return _json_or_html(
+            False,
+            status_code=422,
+            error="That sheet_tab is not allowed for this submission server.",
+        )
+
     # Check for duplicate in queue
     existing = db.get_submission_by_url(url)
     if existing and existing["status"] in ("pending", "processing"):
         return _json_or_html(
             False,
             status_code=409,
-            error=f'This URL is already in the queue (status: {existing["status"]}).',
+            error=f"This URL is already in the queue (status: {existing['status']}).",
         )
 
     title = (body.get("title") or "").strip()
@@ -279,12 +332,25 @@ def submit():
     notes = (body.get("notes") or "").strip()
     categories_str = ", ".join(selected_cats)
 
-    sheet_id = (body.get("sheet_id") or "").strip()
-    sheet_tab = (body.get("sheet_tab") or "").strip()
+    sheet_id = requested_sheet_id
+    sheet_tab = requested_sheet_tab
+    # When the tab is pinned, force the recorded writeback tab to the pinned
+    # value rather than trusting (or requiring) the caller's. Omitting sheet_tab
+    # would otherwise persist "" and let processor._add_writeback fall back to
+    # 'Sheet1' — an unpinned tab — so rejecting only non-empty mismatches above
+    # is not enough. Only applies when a writeback target is recorded (sheet_id
+    # present); the form path sends neither and records no writeback (#285).
+    if ALLOWED_SHEET_TAB and sheet_id:
+        sheet_tab = ALLOWED_SHEET_TAB
     sheet_row_raw = body.get("sheet_row")
     try:
         sheet_row = int(sheet_row_raw) if sheet_row_raw not in (None, "") else None
     except (TypeError, ValueError):
+        sheet_row = None
+    # A sheet row is a positive 1-based index; an out-of-range value (negative,
+    # zero, or absurdly large) is treated as absent rather than passed through
+    # to the Sheets writeback (#285).
+    if sheet_row is not None and not (1 <= sheet_row <= MAX_SHEET_ROW):
         sheet_row = None
 
     sub_id = db.add_submission(

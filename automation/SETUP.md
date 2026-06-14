@@ -51,6 +51,11 @@ Fill in:
 - `ROSEN_SHEETS_SA_KEY` — path to the service-account JSON. Extract from
   `pass show claude/rosen/rosen-service-account-full > /etc/rosen-sa.json &&
   sudo chmod 640 /etc/rosen-sa.json && sudo chown root:jamditis /etc/rosen-sa.json`.
+- `ROSEN_ALLOWED_SHEET_ID` and `ROSEN_ALLOWED_SHEET_TAB` — the queue
+  spreadsheet's id and tab name. Set BOTH (#285): the service account can write
+  any tab of any spreadsheet shared with it, so pinning the id alone still lets
+  a caller redirect the write to another tab. A `/submit` whose `sheet_id` or
+  `sheet_tab` differs is then rejected with 422.
 
 ### 3. Seed the SFTP host key
 
