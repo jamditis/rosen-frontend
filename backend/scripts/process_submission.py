@@ -53,7 +53,7 @@ import pathlib
 import subprocess
 import sys
 import tempfile
-from typing import Any, Dict, Optional, Set
+from typing import Any, Dict, NamedTuple, Optional, Set
 
 # Lay the package roots on sys.path so the script is runnable both via
 # `python backend/scripts/process_submission.py` and via the workflow's
@@ -116,6 +116,50 @@ SCRAPE_FAILED_PASTE_HINT = (
 )
 
 SENTINEL_URL_PREFIX = 'https://example.com/sweep-noop-'
+
+# Step 10 push retry (issue #303). The submit-record workflow serializes runs
+# via a concurrency group, but a manual commit to main — or any non-Action
+# push — can still advance main between this run's checkout and its push,
+# rejecting it non-fast-forward. On that rejection we reset onto the advanced
+# main and replay the record's working-tree changes (re-keying to a free id),
+# bounded to this many push attempts so a persistent race can't loop forever.
+MAX_PUSH_ATTEMPTS = 3
+
+
+class _PushResult(NamedTuple):
+    """Outcome of one commit+push. ``non_ff`` flags a non-fast-forward push
+    rejection specifically, so the caller retries only that case (a genuine
+    auth/network failure should fail fast, not loop)."""
+    ok: bool
+    non_ff: bool
+    error: Optional[str]
+
+
+class _ReplayDuplicate(Exception):
+    """Raised mid-replay when the reset onto the advanced main reveals the
+    submission's URL already archived — a concurrent identical submission won
+    the race, so the record is a duplicate, not a new id to reallocate."""
+
+    def __init__(self, existing_id: str):
+        super().__init__(f'URL already archived as {existing_id or "?"}')
+        self.existing_id = existing_id
+
+
+# git prints these on a rejected push; matched case-insensitively against stderr.
+_NON_FF_MARKERS = ('non-fast-forward', 'fetch first', 'updates were rejected')
+
+
+def _is_non_fast_forward(stderr: str) -> bool:
+    """True when a failed ``git push`` was rejected because main moved ahead.
+
+    Distinguishes the retriable race from auth/network failures, which carry
+    none of these markers and should not trigger a reset-and-replay.
+    """
+    s = (stderr or '').lower()
+    if any(marker in s for marker in _NON_FF_MARKERS):
+        return True
+    # Belt-and-suspenders: the rejection banner without an explicit reason tag.
+    return '[rejected]' in s and 'failed to push' in s
 
 logging.basicConfig(
     level=os.environ.get('LOG_LEVEL', 'INFO'),
@@ -299,8 +343,13 @@ def _short_title(title: str, width: int = 60) -> str:
 
 
 def _git_commit_and_push(record_id: str, title: str,
-                         relative_csv_path: str) -> Optional[str]:
-    """Stage explicit paths, commit, push. Returns None on success, error string."""
+                         relative_csv_path: str) -> _PushResult:
+    """Stage explicit paths, commit, push. Returns a _PushResult.
+
+    ``ok`` is True when the push lands. On failure ``error`` holds the git
+    stderr; ``non_ff`` is True only when a ``git push`` was rejected because
+    main advanced — the one failure the caller retries via reset-and-replay.
+    """
     paths = ([relative_csv_path,
               'data/extracted_entities.csv',
               'data/extracted_relationships.csv']
@@ -333,10 +382,123 @@ def _git_commit_and_push(record_id: str, title: str,
             ['git', 'push', 'origin', 'HEAD:main'],
             cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True,
         )
+        return _PushResult(ok=True, non_ff=False, error=None)
+    except subprocess.CalledProcessError as exc:
+        stderr = (exc.stderr or '').strip()
+        cmd = exc.cmd if isinstance(exc.cmd, (list, tuple)) else []
+        is_push = list(cmd[:2]) == ['git', 'push']
+        non_ff = is_push and _is_non_fast_forward(stderr)
+        return _PushResult(ok=False, non_ff=non_ff,
+                           error=f'git op failed: {stderr or exc}')
+
+
+def _fetch_and_reset_main() -> Optional[str]:
+    """Hard-reset onto the freshly-fetched main tip, discarding the local commit
+    and working-tree changes from a rejected push.
+
+    Returns None on success, an error string on failure. After this the archive
+    CSV and the entity CSVs reflect the advanced main, so the caller can replay
+    the record on top of it.
+
+    Resets to FETCH_HEAD, not ``origin/main``: ``git fetch origin main`` always
+    writes the fetched tip to FETCH_HEAD, but only opportunistically updates the
+    ``refs/remotes/origin/main`` tracking ref (it depends on the remote's fetch
+    refspec, which actions/checkout scopes per-branch). Resetting to a stale
+    ``origin/main`` would replay onto the original base, so every retry would
+    keep non-fast-forwarding and the recovery would never converge.
+    """
+    try:
+        subprocess.run(['git', 'fetch', 'origin', 'main'],
+                       cwd=str(PROJECT_ROOT), check=True,
+                       capture_output=True, text=True)
+        subprocess.run(['git', 'reset', '--hard', 'FETCH_HEAD'],
+                       cwd=str(PROJECT_ROOT), check=True,
+                       capture_output=True, text=True)
         return None
     except subprocess.CalledProcessError as exc:
         stderr = (exc.stderr or '').strip()
-        return f'git op failed: {stderr or exc}'
+        return f'git reset failed: {stderr or exc}'
+
+
+def _replay_record_onto_main(scrape: Dict[str, Any],
+                             extraction: Optional[Dict[str, Any]],
+                             csv_path: pathlib.Path,
+                             headers: list,
+                             record_id: str) -> str:
+    """Re-apply this record's writes (steps 7, 8, 8.5) on top of the freshly
+    reset main tip and return the id to commit.
+
+    The caller must have run _fetch_and_reset_main() first, so csv_path and the
+    entity CSVs now reflect the advanced main. Keeps ``record_id`` when it's
+    still free; if a sibling submission took it while main advanced, reallocates
+    the next free id in the SAME prefix. The entity extraction is reused as-is —
+    append_entities_and_relationships re-keys every row off the record_id we
+    pass, so no second Gemini call is needed. Raises _ReplayDuplicate if the
+    advanced main already archived this URL.
+    """
+    url = (scrape.get('url') or '').strip()
+    existing_urls, existing_ids, url_to_id = _read_existing(csv_path)
+    if url and url in existing_urls:
+        # A concurrent identical submission landed on main; this is now a dup.
+        raise _ReplayDuplicate(url_to_id.get(url, ''))
+
+    if record_id in existing_ids:
+        prefix = record_id.rsplit('-', 1)[0] or 'RECORD'
+        new_id = _next_record_id(existing_ids, prefix=prefix)
+        logger.warning(f'Push race: {record_id!r} taken on the advanced main; '
+                       f'replaying as {new_id!r}')
+        record_id = new_id
+    scrape['id'] = record_id
+
+    # Re-read headers from the post-reset CSV in case the advancing commit was
+    # the first-ever write that created the header; fall back to ours.
+    headers = _read_csv_headers(csv_path) or headers
+
+    # Step 7 (replay): append the record row to the now-advanced CSV.
+    _atomic_append_row(csv_path, scrape, headers)
+
+    # Step 8 (replay): regenerate the JSONs off the merged CSV.
+    subprocess.run(['node', str(EXPORT_SCRIPT)],
+                   cwd=str(DATA_DIR), check=True,
+                   capture_output=True, text=True)
+
+    # Step 8.5 (replay): re-write the entity/relationship rows keyed to the
+    # (possibly new) id. No re-extraction — `extraction` was captured on the
+    # first pass; the writer dedups against the advanced entity CSVs.
+    if extraction:
+        stats = entity_csv_writer.append_entities_and_relationships(
+            extraction,
+            entities_csv=DATA_DIR / 'extracted_entities.csv',
+            relationships_csv=DATA_DIR / 'extracted_relationships.csv',
+            record_id=record_id,
+        )
+        if stats and (stats['entities_added'] or stats['relationships_added']):
+            subprocess.run(['node', str(EXPORT_SCRIPT)],
+                           cwd=str(DATA_DIR), check=True,
+                           capture_output=True, text=True)
+
+    return record_id
+
+
+def _run_test_gate() -> Optional[str]:
+    """Run the node test suite. Returns None on pass, an error string on fail.
+
+    Shared by step 9 and the reset-and-replay retry: a replay rebuilds the
+    commit on top of a main that may have advanced with new tests or export
+    invariants, so the merged tree must clear the SAME gate before its push —
+    otherwise a record built against the old schema could land a red main.
+    """
+    try:
+        subprocess.run(['npm', 'test'],
+                       cwd=str(PROJECT_ROOT), check=True,
+                       capture_output=True, text=True)
+        return None
+    except subprocess.CalledProcessError as exc:
+        combined = (exc.stderr or '') + (exc.stdout or '')
+        truncated = combined[-500:].strip() or 'tests failed (no output)'
+        return f'Tests failed; commit aborted. {truncated}'
+    except Exception as exc:  # noqa: BLE001
+        return f'Tests failed to run: {exc}'
 
 
 def _csv_relpath(csv_path: pathlib.Path) -> str:
@@ -671,8 +833,9 @@ def process_one(url: str, title: str = '', notes: str = '',
     raw_text = (scrape.get('raw_text', '')
                 or scrape.get('text', '')
                 or '')
+    # Hoisted so step 10's reset-and-replay can reuse it without re-extracting.
+    extraction: Optional[Dict[str, Any]] = None
     if len(raw_text.strip()) >= 500:
-        extraction = None
         try:
             extraction = extract_entities_and_relationships(
                 text_content=raw_text,
@@ -716,31 +879,58 @@ def process_one(url: str, title: str = '', notes: str = '',
                         'error': msg, 'exit_code': 1}
 
     # --- Step 9: node test suite. -----------------------------------------
-    try:
-        subprocess.run(['npm', 'test'],
-                       cwd=str(PROJECT_ROOT), check=True,
-                       capture_output=True, text=True)
-    except subprocess.CalledProcessError as exc:
-        combined = (exc.stderr or '') + (exc.stdout or '')
-        truncated = combined[-500:].strip() or 'tests failed (no output)'
-        msg = f'Tests failed; commit aborted. {truncated}'
+    test_err = _run_test_gate()
+    if test_err:
         _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
-                        status='error', record_id=record_id, error=msg)
+                        status='error', record_id=record_id, error=test_err)
         return {'status': 'error', 'record_id': record_id,
-                'error': msg, 'exit_code': 1}
-    except Exception as exc:  # noqa: BLE001
-        msg = f'Tests failed to run: {exc}'
-        _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
-                        status='error', record_id=record_id, error=msg)
-        return {'status': 'error', 'record_id': record_id,
-                'error': msg, 'exit_code': 1}
+                'error': test_err, 'exit_code': 1}
 
-    # --- Step 10: git commit + push. --------------------------------------
+    # --- Step 10: git commit + push (reset-and-replay on a race, #303). ----
+    # The push targets main directly. If main advanced since checkout the push
+    # is rejected non-fast-forward; reset onto the advanced main, replay this
+    # record's writes (re-keying to a free id), re-run the test gate against the
+    # merged tree, and retry. Bounded to MAX_PUSH_ATTEMPTS so a persistent racer
+    # can't loop forever.
     rel_csv = _csv_relpath(csv_path)
-    push_err = _git_commit_and_push(record_id, scrape.get('title') or title,
+    push = _PushResult(ok=False, non_ff=False, error='not attempted')
+    for attempt in range(1, MAX_PUSH_ATTEMPTS + 1):
+        push = _git_commit_and_push(record_id, scrape.get('title') or title,
                                     rel_csv)
-    if push_err:
-        msg = f'Could not commit to repo: {push_err}'
+        if push.ok or not push.non_ff or attempt == MAX_PUSH_ATTEMPTS:
+            break
+        # Non-fast-forward with attempts left: reset onto the advanced main and
+        # replay before retrying the push.
+        reset_err = _fetch_and_reset_main()
+        if reset_err:
+            push = _PushResult(ok=False, non_ff=False, error=reset_err)
+            break
+        try:
+            record_id = _replay_record_onto_main(
+                scrape, extraction, csv_path, headers, record_id)
+        except _ReplayDuplicate as dup:
+            logger.info(f'Push race resolved as duplicate → {dup.existing_id}')
+            _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
+                            status='duplicate', record_id=dup.existing_id,
+                            error='URL already in archive')
+            return {'status': 'duplicate', 'record_id': dup.existing_id,
+                    'error': 'URL already in archive', 'exit_code': 0}
+        except Exception as exc:  # noqa: BLE001 — replay is best-effort
+            push = _PushResult(ok=False, non_ff=False,
+                               error=f'replay failed: {exc}')
+            break
+        # Re-run the test gate against the merged tree: the advanced main may
+        # carry new tests or export invariants the first-pass run never saw.
+        test_err = _run_test_gate()
+        if test_err:
+            _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
+                            status='error', record_id=record_id, error=test_err)
+            return {'status': 'error', 'record_id': record_id,
+                    'error': test_err, 'exit_code': 1}
+        rel_csv = _csv_relpath(csv_path)
+
+    if not push.ok:
+        msg = f'Could not commit to repo: {push.error}'
         _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
                         status='error', record_id=record_id, error=msg)
         return {'status': 'error', 'record_id': record_id,

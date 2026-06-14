@@ -359,6 +359,203 @@ class TestSftpFailure:
                'next submission' in final['error'].lower()
 
 
+class TestPushRaceRetry:
+    """#303: a non-fast-forward push (main advanced mid-run) must reset onto
+    the new main, reallocate the next free id past whatever sibling took ours,
+    replay the working-tree changes, and re-push — instead of stranding the
+    record on a dead local commit."""
+
+    @staticmethod
+    def _non_ff_error(cmd):
+        return subprocess.CalledProcessError(
+            1, cmd, output='',
+            stderr=' ! [rejected]        HEAD -> main (non-fast-forward)\n'
+                   'error: failed to push some refs to origin')
+
+    @staticmethod
+    def _write_csv(csv_path, rows):
+        with csv_path.open('w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=CSV_HEADERS,
+                                    extrasaction='ignore')
+            writer.writeheader()
+            for row in rows:
+                writer.writerow(row)
+
+    def test_non_ff_push_resets_reallocates_and_repushes(
+            self, monkeypatch, csv_with_headers):
+        """First push is rejected non-ff; a sibling has taken RECORD-00001 on
+        the advanced main. The retry resets, reallocates RECORD-00002, and the
+        second push succeeds — the record lands live, not lost."""
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch)
+        sheets_mock = _stub_sheets(monkeypatch)
+        sftp_mock = _stub_sftp(monkeypatch)
+
+        state = {'pushes': 0, 'resets': 0}
+        sibling = {'id': 'RECORD-00001', 'title': 'Sibling',
+                   'url': 'https://example.com/sibling', 'verified': 'TRUE'}
+
+        def _fake_run(cmd, *args, **kwargs):
+            if cmd[:2] == ['git', 'push']:
+                state['pushes'] += 1
+                if state['pushes'] == 1:
+                    raise self._non_ff_error(cmd)
+                return subprocess.CompletedProcess(cmd, 0, '', '')
+            if cmd[:3] == ['git', 'reset', '--hard']:
+                # `git reset --hard FETCH_HEAD` drops our un-pushed local row
+                # and pulls in the sibling that beat us to RECORD-00001.
+                state['resets'] += 1
+                self._write_csv(csv_with_headers, [sibling])
+                return subprocess.CompletedProcess(cmd, 0, '', '')
+            return subprocess.CompletedProcess(cmd, 0, '', '')
+
+        monkeypatch.setattr(process_submission.subprocess, 'run',
+                            MagicMock(side_effect=_fake_run))
+
+        result = _run(monkeypatch, csv_with_headers,
+                      url='https://example.com/new', title='New piece')
+
+        assert result['status'] == 'live'
+        # Reallocated past the sibling that took RECORD-00001.
+        assert result['record_id'] == 'RECORD-00002'
+        with csv_with_headers.open() as f:
+            rows = list(csv.DictReader(f))
+        assert {r['id'] for r in rows} == {'RECORD-00001', 'RECORD-00002'}
+        assert 'https://example.com/new' in {r['url'] for r in rows}
+        # Two push attempts (rejected, then post-reset), one hard reset.
+        assert state['pushes'] == 2
+        assert state['resets'] == 1
+        final = sheets_mock.call_args_list[-1].kwargs
+        assert final['status'] == 'live'
+        assert final['record_id'] == 'RECORD-00002'
+        sftp_mock.assert_called_once()
+
+    def test_non_ff_push_keeps_id_when_still_free_after_reset(
+            self, monkeypatch, csv_with_headers):
+        """Main advanced for an unrelated reason (no sibling took our id). The
+        reset reveals RECORD-00001 still free, so the replay keeps it rather
+        than skipping a number."""
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch)
+        _stub_sheets(monkeypatch)
+        _stub_sftp(monkeypatch)
+
+        state = {'pushes': 0}
+        unrelated = {'id': 'CLIP-00007', 'title': 'Unrelated clipping',
+                     'url': 'https://example.com/clip', 'verified': 'TRUE'}
+
+        def _fake_run(cmd, *args, **kwargs):
+            if cmd[:2] == ['git', 'push']:
+                state['pushes'] += 1
+                if state['pushes'] == 1:
+                    raise self._non_ff_error(cmd)
+                return subprocess.CompletedProcess(cmd, 0, '', '')
+            if cmd[:3] == ['git', 'reset', '--hard']:
+                # Advanced main carries a CLIP- row, leaving RECORD-00001 free.
+                self._write_csv(csv_with_headers, [unrelated])
+                return subprocess.CompletedProcess(cmd, 0, '', '')
+            return subprocess.CompletedProcess(cmd, 0, '', '')
+
+        monkeypatch.setattr(process_submission.subprocess, 'run',
+                            MagicMock(side_effect=_fake_run))
+
+        result = _run(monkeypatch, csv_with_headers,
+                      url='https://example.com/new')
+
+        assert result['status'] == 'live'
+        assert result['record_id'] == 'RECORD-00001'
+        with csv_with_headers.open() as f:
+            ids = {r['id'] for r in csv.DictReader(f)}
+        assert ids == {'CLIP-00007', 'RECORD-00001'}
+
+    def test_non_ff_push_gives_up_after_bounded_attempts(
+            self, monkeypatch, csv_with_headers):
+        """Every push is rejected non-ff. The retry is bounded — after the cap
+        the submission fails with the push error instead of looping forever."""
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch)
+        sheets_mock = _stub_sheets(monkeypatch)
+        sftp_mock = _stub_sftp(monkeypatch)
+
+        state = {'pushes': 0}
+
+        def _fake_run(cmd, *args, **kwargs):
+            if cmd[:2] == ['git', 'push']:
+                state['pushes'] += 1
+                raise self._non_ff_error(cmd)
+            if cmd[:3] == ['git', 'reset', '--hard']:
+                # Each reset hands us a fresh sibling on the advancing main, so
+                # the id keeps getting taken and every push stays rejected.
+                self._write_csv(csv_with_headers, [
+                    {'id': f'RECORD-{state["pushes"]:05d}',
+                     'title': 'Sibling', 'url': f'https://example.com/s{state["pushes"]}',
+                     'verified': 'TRUE'}])
+                return subprocess.CompletedProcess(cmd, 0, '', '')
+            return subprocess.CompletedProcess(cmd, 0, '', '')
+
+        monkeypatch.setattr(process_submission.subprocess, 'run',
+                            MagicMock(side_effect=_fake_run))
+
+        result = _run(monkeypatch, csv_with_headers,
+                      url='https://example.com/new')
+
+        assert result['status'] == 'error'
+        assert 'commit' in result['error'].lower()
+        # Bounded: exactly MAX_PUSH_ATTEMPTS pushes, no infinite loop.
+        assert state['pushes'] == process_submission.MAX_PUSH_ATTEMPTS
+        sftp_mock.assert_not_called()
+        final = sheets_mock.call_args_list[-1].kwargs
+        assert final['status'] == 'error'
+
+
+    def test_replay_reruns_test_gate_and_aborts_if_advanced_main_fails(
+            self, monkeypatch, csv_with_headers):
+        """The merged tree must clear the test gate before its push. If main
+        advanced with a stricter test, the post-replay `npm test` fails and the
+        submission errors out instead of pushing a record that reds main."""
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch)
+        sheets_mock = _stub_sheets(monkeypatch)
+        sftp_mock = _stub_sftp(monkeypatch)
+
+        state = {'pushes': 0, 'npm_tests': 0}
+        sibling = {'id': 'RECORD-00001', 'title': 'Sibling',
+                   'url': 'https://example.com/sibling', 'verified': 'TRUE'}
+
+        def _fake_run(cmd, *args, **kwargs):
+            if cmd[:2] == ['npm', 'test']:
+                state['npm_tests'] += 1
+                # Step 9 passes against the old checkout; the post-replay run
+                # against the advanced main fails a newly-added invariant.
+                if state['npm_tests'] >= 2:
+                    raise subprocess.CalledProcessError(
+                        1, cmd, output='', stderr='new export invariant failed')
+                return subprocess.CompletedProcess(cmd, 0, '', '')
+            if cmd[:2] == ['git', 'push']:
+                state['pushes'] += 1
+                raise self._non_ff_error(cmd)
+            if cmd[:3] == ['git', 'reset', '--hard']:
+                self._write_csv(csv_with_headers, [sibling])
+                return subprocess.CompletedProcess(cmd, 0, '', '')
+            return subprocess.CompletedProcess(cmd, 0, '', '')
+
+        monkeypatch.setattr(process_submission.subprocess, 'run',
+                            MagicMock(side_effect=_fake_run))
+
+        result = _run(monkeypatch, csv_with_headers,
+                      url='https://example.com/new')
+
+        assert result['status'] == 'error'
+        assert 'test' in result['error'].lower()
+        # The gate ran a second time (post-replay), and the bad commit never
+        # re-pushed: only the first, rejected push happened.
+        assert state['npm_tests'] == 2
+        assert state['pushes'] == 1
+        sftp_mock.assert_not_called()
+        final = sheets_mock.call_args_list[-1].kwargs
+        assert final['status'] == 'error'
+
+
 class TestFormulaInjectionSanitize:
 
     def test_formula_injection_in_title_sanitized(self, monkeypatch, csv_with_headers):
