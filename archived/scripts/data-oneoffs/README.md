@@ -1,16 +1,16 @@
 # Data one-off scripts (archived)
 
-These eight scripts were one-off data repairs that ran against the archive CSVs
+These seven scripts were one-off data repairs that ran against the archive CSVs
 in `data/` and were never meant to recur. They were moved here from `data/` on
 2026-06-16 as part of [#380](https://github.com/jamditis/rosen-frontend/issues/380)
 — the follow-up that extended the [#190](https://github.com/jamditis/rosen-frontend/issues/190)
 `backend/scripts/` audit into the `data/` directory.
 
 Audit verdict: each takes no arguments, is guarded by `if __name__ == "__main__"`,
-and targets a specific, already-completed repair (named records, a fixed count of
-rows, or a one-time merge). None parameterizes a recurring behavior, so there was
-nothing to fold into a shared module. They are retained for provenance — to record
-how the archive data reached its current state — not for reuse. Do not run them.
+and targets a specific, already-completed repair (named records or a fixed count of
+rows). None parameterizes a recurring behavior, so there was nothing to fold into a
+shared module. They are retained for provenance — to record how the archive data
+reached its current state — not for reuse. Do not run them.
 
 They were hardened to be safe to re-run in [#176](https://github.com/jamditis/rosen-frontend/issues/176)
 (atomic CSV writes via `csv_safe_write.atomic_csv_write`), but the data states they
@@ -27,7 +27,6 @@ targeted are part of the committed archive, so re-running them is unnecessary.
 | `fix_sidebar_summaries.py` | `data/archive_records-public.csv` | Rebuilt summaries/excerpts for the 44 records whose summary was the PressThink sidebar boilerplate ("This collection of blog posts"), pulling the first few sentences from `raw_text` instead. |
 | `fix_unknown_publishers.py` | `data/archive_records-public.csv` | Filled "Unknown" publisher fields from URL domain patterns via a domain→publisher map. |
 | `fix_remaining_publishers.py` | `data/archive_records-public.csv` | Follow-up to `fix_unknown_publishers.py`: filled the remaining unknown publishers the first domain map missed (an extended domain map). |
-| `merge_extractions.py` | `data/archive_records-public.csv` | Merged parallel-agent extraction output (`_extract_tmp/pull_quotes_*.json`, `_extract_tmp/key_concepts_*.json`) back into the archive CSV. |
 
 ## Why they can't simply be re-run
 

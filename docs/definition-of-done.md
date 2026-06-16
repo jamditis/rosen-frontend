@@ -26,7 +26,7 @@ All six hash-based routes are wired and render: Archive (`/`), Folders (`#folder
 
 **What's in the repo's `archived/dissertation-tools/`:** comparison, concepts, context, excerpts, glossary, timeline + a source bundle (6 retired tools + 1 source bundle).
 
-**The mismatch:** the seven "retired" tools were uploaded to WordPress once (when they were active) and are still served because nothing has overwritten them. They function in browsers — `context/script.js` and `faq/script.js` populate JS-empty divs at runtime — but they live in `archived/` in the repo, which means the deploy manifest (`DEPLOYMENT.md`) doesn't include them. Any edit in `archived/` won't reach production via the current FTP workflow.
+**The mismatch:** the six "retired" tools were uploaded to WordPress once (when they were active) and are still served because nothing has overwritten them. They function in browsers — `context/script.js`, for example, populates JS-empty divs at runtime — but they live in `archived/` in the repo, which means the deploy manifest (`DEPLOYMENT.md`) doesn't include them. Any edit in `archived/` won't reach production via the current FTP workflow. (`faq` is the exception: it was restored to `dissertation/faq/` in #411, so it is live and on the deploy manifest, not archived.)
 
 **False positives from the live-site scan agent:** WebFetch reported `/dissertation/context/` as "empty outline" and `/faq/` as "blank default view." Both are JS-populated SPAs and work fine in a real browser. The agent couldn't run JavaScript. Issue #260 has been updated to reflect this.
 
