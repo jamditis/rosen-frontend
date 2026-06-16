@@ -386,8 +386,7 @@
         
         // Data source
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT-XqQXvMJNaBXVWlmXu1EyOpa_Cc6ur-pklWX1mbrWIFybZjmbE6UTIteSoCSvf0a7j5r8A6earp3H/pub?gid=928818664&single=true&output=csv';
-        const localCsvUrl = './RosenArchivedataset-TEST-DATA.csv';
-        
+
         // Grid size parameters
         const MIN_RECORDS_TO_DISPLAY = 441; // Starting grid size (21x21). Must be a perfect square.
         const MAX_RECORDS_TO_DISPLAY = 625; // Expanded grid size (25x25). Must be a perfect square.
@@ -648,7 +647,7 @@
                 return;
             }
 
-            const loadDataset = (url, isFallback = false) => {
+            const loadDataset = (url) => {
                 Papa.parse(url, {
                     download: true,
                     header: true,
@@ -657,22 +656,12 @@
                     complete: (results) => {
                         if (results.errors.length > 0) {
                             console.warn('[Data Explorer] Parse error:', results.errors[0]);
-                            if (!isFallback) {
-                                console.warn('[Data Explorer] Falling back to local dataset.');
-                                loadDataset(localCsvUrl, true);
-                            } else {
-                                handleError(results.errors[0].message);
-                            }
+                            handleError(results.errors[0].message);
                             return;
                         }
 
                         if (!results.data || results.data.length === 0) {
-                            if (!isFallback) {
-                                console.warn('[Data Explorer] Remote dataset empty, using local dataset instead.');
-                                loadDataset(localCsvUrl, true);
-                            } else {
-                                handleError('No records found in dataset.');
-                            }
+                            handleError('No records found in dataset.');
                             return;
                         }
 
@@ -697,12 +686,7 @@
                             .filter(r => r.isVerified && r.id && r.title.trim());
 
                         if (verifiedMasterRecords.length === 0) {
-                            if (!isFallback) {
-                                console.warn('[Data Explorer] No verified records found in remote dataset, using local dataset.');
-                                loadDataset(localCsvUrl, true);
-                            } else {
-                                handleError('No verified records found in dataset.');
-                            }
+                            handleError('No verified records found in dataset.');
                             return;
                         }
 
@@ -725,12 +709,7 @@
                     },
                     error: (err) => {
                         console.error('[Data Explorer] Error fetching or parsing CSV:', err);
-                        if (!isFallback) {
-                            console.warn('[Data Explorer] Attempting local dataset fallback.');
-                            loadDataset(localCsvUrl, true);
-                        } else {
-                            handleError(err.message || 'Unknown error occurred.');
-                        }
+                        handleError(err.message || 'Unknown error occurred.');
                     }
                 });
             };

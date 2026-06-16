@@ -578,8 +578,8 @@ As of 2026-05-25, the archive contains:
 | Social media posts (Twitter + Bluesky) | ~29,700 |
 | Named entities | 5,036 |
 | Entity relationships | 4,666 |
-| Dissertation tools (live) | 3 (reader, foreword, network-effect) |
-| Dissertation tools (retired to `archived/dissertation-tools/`) | 8 (comparison, concepts, context, excerpts, faq, glossary, source, timeline) |
+| Dissertation tools (live) | 4 (reader, foreword, network-effect, faq) |
+| Dissertation tools (retired to `archived/dissertation-tools/`) | 6 tools (comparison, concepts, context, excerpts, glossary, timeline) + a source bundle |
 | CI/CD workflows | 9 |
 | Era classifications | 8 (non-overlapping) |
 | Key concept taxonomy | 13 concepts |

@@ -9,7 +9,7 @@ A public collection of the works, critiques, and teachings of Jay Rosen, NYU pro
 The archive has two main parts:
 
 1. **The archive browser** — a searchable, filterable interface for 1,030 records (800 articles, 137 Tumblr posts, 83 newspaper clippings, 10 social-media threads) plus ~29,700 social media posts, indexed by 5,036 named entities and 4,666 relationships
-2. **The dissertation tools** — 3 interactive surfaces for exploring Jay's 1986 doctoral dissertation, *The Impossible Press*: the reader, the foreword, and the network-effect film analysis (an earlier set of 8 tools — comparison, concepts, context, excerpts, faq, glossary, source, timeline — was retired and lives in `archived/dissertation-tools/` for reference)
+2. **The dissertation tools** — 4 interactive surfaces for exploring Jay's 1986 doctoral dissertation, *The Impossible Press*: the reader, the foreword, the network-effect film analysis, and the FAQ (an earlier set of 6 tools — comparison, concepts, context, excerpts, glossary, timeline — was retired and lives in `archived/dissertation-tools/` for reference, alongside a separate `source/` bundle that is not a standalone tool)
 
 Everything runs as a static site with no server-side code. The frontend loads JSON data files directly in the browser.
 
@@ -26,7 +26,7 @@ Open http://localhost:8000. That's it — no build step, no `npm install` needed
 - `index.html` is the entry point. It loads React, HTM, and other libraries from `esm.sh` CDN via an import map.
 - `frontend/` contains the React app. All components use HTM tagged templates (`` html`...` ``) instead of JSX.
 - `data/` contains the archive data as JSON files, generated from CSV source files.
-- `dissertation/` contains 3 live presentation tools (`reader/`, `foreword/`, `network-effect/`), each in its own subdirectory with an `index.html`. An earlier set of 7 tools (comparison, concepts, context, excerpts, faq, glossary, timeline) is retired to `archived/dissertation-tools/`; that path also holds a `source/` bundle (PDF + transcribed markdown + a build helper), which is not a standalone tool.
+- `dissertation/` contains 4 live presentation tools (`reader/`, `foreword/`, `network-effect/`, `faq/`), each in its own subdirectory with an `index.html`. An earlier set of 6 tools (comparison, concepts, context, excerpts, glossary, timeline) is retired to `archived/dissertation-tools/`; that path also holds a `source/` bundle (PDF + transcribed markdown + a build helper), which is not a standalone tool.
 - `frontend/dist/tailwind.css` is a pre-built Tailwind CSS file. No build needed unless you change styles.
 
 ## Updating the archive data
@@ -84,7 +84,7 @@ frontend/                     React application
   services/                   Data loading, routing, SQLite
   dist/tailwind.css           Pre-built styles
 data/                         CSV sources + generated JSON
-dissertation/                 3 live dissertation tools (7 earlier ones, plus a source bundle, in archived/dissertation-tools/)
+dissertation/                 4 live dissertation tools (6 earlier ones, plus a source bundle, in archived/dissertation-tools/)
 features/                     Standalone feature pages
 backend/                      Python data pipeline (scraping, AI analysis)
 tools/active/                 Dev tools (data explorer, data viz)
