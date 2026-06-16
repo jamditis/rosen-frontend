@@ -387,6 +387,16 @@
             function debounce(func, delay) { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); }; }
             function stringToHash(str) { let h = 0; for (let i = 0; i < str.length; i++) { h = (h << 5) - h + str.charCodeAt(i); h |= 0; } return Math.abs(h); }
             function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+            // Neutralize CSV formula injection (#423): prefix a leading ' when the
+            // first char is a spreadsheet formula trigger, then RFC-4180 quote.
+            // Quoting alone does not protect -- a consuming spreadsheet strips the
+            // quotes and evaluates a cell starting with = + - @ tab CR LF as a formula.
+            function escapeCsvCell(value) {
+                let str = value == null ? '' : String(value);
+                if (str && '=+-@\t\r\n'.includes(str[0])) { str = "'" + str; }
+                if (/[",\n\r]/.test(str)) { str = '"' + str.replace(/"/g, '""') + '"'; }
+                return str;
+            }
 
             // --- DASHBOARD INITIALIZATION & UPDATES ---
             function initializeDashboard() {
@@ -639,10 +649,10 @@
                     headers.map(header => {
                         const cell = row[header];
                         const value = Array.isArray(cell) ? cell.join('|') : cell;
-                        return `"${String(value || '').replace(/"/g, '""')}"`;
+                        return escapeCsvCell(value);
                     }).join(',')
                 );
-                csvData.unshift(headers.join(','));
+                csvData.unshift(headers.map(escapeCsvCell).join(','));
 
                 const blob = new Blob([csvData.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
