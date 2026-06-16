@@ -1,5 +1,5 @@
 // Button.js - Universal button component
-import { html } from '../../html.js?v=3.4.0';
+import { html } from '../../html.js?v=3.4.1';
 import { Loader2 } from 'lucide-react';
 
 /**

@@ -40,7 +40,7 @@
 const CACHE_VERSION = 'v9';
 
 // Entity data is small (~1MB), so a short TTL is cheap and keeps the
-// Explorer current without a hard reload.
+// entity browser current without a hard reload.
 const CACHE_TTL_MS = 1000 * 60 * 30; // 30 minutes
 
 // localStorage quota is ~5MB; anything larger goes to sessionStorage,

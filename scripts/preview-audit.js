@@ -34,7 +34,6 @@ const OUT_DIR = resolve(fileURLToPath(import.meta.url), '..', '..', 'preview-aud
 
 const ROUTES = [
   { slug: 'home-archive',       url: '/' },
-  { slug: 'explorer',           url: '/#explorer' },
   { slug: 'entities',           url: '/#entities' },
   { slug: 'about',              url: '/#about' },
   { slug: 'analytics',          url: '/#analytics' },

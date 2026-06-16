@@ -1,12 +1,12 @@
-import { html } from '../html.js?v=3.4.0';
-import RecordModal from './RecordModal.js?v=3.4.0';
+import { html } from '../html.js?v=3.4.1';
+import RecordModal from './RecordModal.js?v=3.4.1';
 
 /**
  * Single owner for "render the selected record."
  *
- * App.js used to carry two byte-identical <RecordModal> call sites — one on
- * the Explorer route, one on the default archive route — each with the same
- * 13-prop spread and the same inline derivations (which record is selected,
+ * App.js used to carry two byte-identical <RecordModal> call sites on separate
+ * routes, each with the same 13-prop spread and the same inline derivations
+ * (which record is selected,
  * its index in the filtered list, and the resulting prev/next nav flags).
  * RecordView holds that knowledge in one place, so adding or changing a modal
  * prop is a one-site edit instead of a two-site edit that can drift.

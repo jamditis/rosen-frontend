@@ -89,7 +89,7 @@ describe('parseViewState', () => {
   });
 
   it('strips a stray ?suffix from the hash defensively', () => {
-    assert.strictEqual(parseViewState(`${BASE}#explorer?stale=1`).route, ROUTES.explorer);
+    assert.strictEqual(parseViewState(`${BASE}#about?stale=1`).route, ROUTES.about);
   });
 });
 
@@ -100,7 +100,7 @@ describe('viewStateToUrl', () => {
   });
 
   it('emits the route as a hash, except the default route', () => {
-    assert.ok(viewStateToUrl({ route: ROUTES.explorer }, BASE).endsWith('#explorer'));
+    assert.ok(viewStateToUrl({ route: ROUTES.entities }, BASE).endsWith('#entities'));
     assert.strictEqual(viewStateToUrl({ route: DEFAULT_ROUTE }, BASE).includes('#'), false);
   });
 
@@ -143,7 +143,7 @@ describe('round-trip', () => {
       selectedRecord: null,
     },
     'fully populated state': {
-      route: ROUTES.explorer,
+      route: ROUTES.entities,
       filters: {
         search: 'audience atomization',
         categories: ['Criticism', 'Media theory'],
@@ -185,7 +185,7 @@ describe('migrateLegacyHref', () => {
   });
 
   it('leaves a URL with no legacy view param unchanged', () => {
-    assert.strictEqual(migrateLegacyHref(`${BASE}#explorer`), `${BASE}#explorer`);
+    assert.strictEqual(migrateLegacyHref(`${BASE}#entities`), `${BASE}#entities`);
   });
 
   it('does not migrate an unrecognised legacy view value', () => {

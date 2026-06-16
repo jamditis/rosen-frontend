@@ -5,7 +5,7 @@
  * exposes no SRI hook for the .wasm it fetches through locateFile. Fetching
  * that binary from cdnjs left it version-pinned but not integrity-verified —
  * a single-CDN compromise could swap in arbitrary WebAssembly that runs in
- * any session touching Analytics or Explorer. We now serve the binary from
+ * any session touching the analytics dashboard. We now serve the binary from
  * our own deploy bundle and pin its bytes here.
  *
  * These checks guard two things: that the committed binary is the genuine,

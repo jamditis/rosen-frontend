@@ -1,23 +1,22 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.4.0';
-import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Github } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.4.0';
-import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.4.0';
-import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.4.0';
-import Sidebar from './components/Sidebar.js?v=3.4.0';
-import WelcomeModal from './components/WelcomeModal.js?v=3.4.0';
-import RecordView from './components/RecordView.js?v=3.4.0';
-import FeaturedSection from './components/FeaturedSection.js?v=3.4.0';
-import Explorer from './components/Explorer.js?v=3.4.0';
-import DissertationPage from './components/DissertationPage.js?v=3.4.0';
-import ToolsModal from './components/ToolsModal.js?v=3.4.0';
-import LoadingQuotes from './components/LoadingQuotes.js?v=3.4.0';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.4.0';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.4.0';
-import EntityBrowser from './components/EntityBrowser.js?v=3.4.0';
-import Timeline from './components/Timeline.js?v=3.4.0';
-import AboutPage from './components/AboutPage.js?v=3.4.0';
+import { html } from './html.js?v=3.4.1';
+import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Github } from 'lucide-react';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.4.1';
+import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.4.1';
+import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.4.1';
+import Sidebar from './components/Sidebar.js?v=3.4.1';
+import WelcomeModal from './components/WelcomeModal.js?v=3.4.1';
+import RecordView from './components/RecordView.js?v=3.4.1';
+import FeaturedSection from './components/FeaturedSection.js?v=3.4.1';
+import DissertationPage from './components/DissertationPage.js?v=3.4.1';
+import ToolsModal from './components/ToolsModal.js?v=3.4.1';
+import LoadingQuotes from './components/LoadingQuotes.js?v=3.4.1';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.4.1';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.4.1';
+import EntityBrowser from './components/EntityBrowser.js?v=3.4.1';
+import Timeline from './components/Timeline.js?v=3.4.1';
+import AboutPage from './components/AboutPage.js?v=3.4.1';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
@@ -120,8 +119,6 @@ const App = () => {
   const handleToolSelect = useCallback((action) => {
     if (action === 'mindmap') {
       navigateTo(ROUTES.dissertation);
-    } else if (action === 'explorer') {
-      navigateTo(ROUTES.explorer);
     } else if (action === 'entities') {
       navigateTo(ROUTES.entities);
     }
@@ -272,8 +269,7 @@ const App = () => {
   const minYear = years.length ? Math.min(...years) : 0;
   const maxYear = years.length ? Math.max(...years) : 0;
 
-  // One <RecordView> element, shared by the Explorer and default archive
-  // routes (only one of them renders per pass). RecordView owns the
+  // One <RecordView> element for the default archive route. RecordView owns the
   // selected-record lookup and prev/next nav math that App.js used to compute
   // inline and pass to two identical <RecordModal> call sites. #134 Step B.
   const recordView = html`
@@ -290,7 +286,6 @@ const App = () => {
     />
   `;
 
-  const isExplorer = currentRoute === ROUTES.explorer;
   const isEntityBrowser = currentRoute === ROUTES.entities;
   const isAnalytics = currentRoute === ROUTES.analytics;
   const isArchiveGrid = currentRoute === ROUTES.archive || currentRoute === ROUTES.folders;
@@ -314,19 +309,6 @@ const App = () => {
     return html`<${AnalyticsDashboard} onBack=${() => goTo(ROUTES.archive)} />`;
   }
 
-  // Explorer gets its own full-width layout (no sidebar, no archive chrome)
-  if (isExplorer) {
-    return html`
-      <div className="min-h-screen flex flex-col">
-        <${WelcomeModal} />
-        ${recordView}
-        ${!loading && html`
-          <${Explorer} records=${records} onBack=${() => goTo(ROUTES.archive)} />
-        `}
-        ${loading && html`<${LoadingQuotes} />`}
-      </div>
-    `;
-  }
 
   return html`
     <div className="min-h-screen flex flex-col">
@@ -438,13 +420,6 @@ const App = () => {
                                 >
                                     <${BookOpen} className="w-3.5 h-3.5" />
                                     Mind Map
-                                </button>
-                                <button
-                                    onClick=${() => goTo(ROUTES.explorer)}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
-                                >
-                                    <${Network} className="w-3.5 h-3.5" />
-                                    Network
                                 </button>
                                 <button
                                     onClick=${() => goTo(ROUTES.entities)}
@@ -697,7 +672,6 @@ const App = () => {
               <div className="space-y-1 text-xs">
                 <button onClick=${() => goTo(ROUTES.archive)} className="block hover:text-stone-900 transition-colors">Browse archive</button>
                 <button onClick=${() => goTo(ROUTES.dissertation)} className="block hover:text-stone-900 transition-colors">Dissertation mind map</button>
-                <button onClick=${() => goTo(ROUTES.explorer)} className="block hover:text-stone-900 transition-colors">Network explorer</button>
                 <button onClick=${() => goTo(ROUTES.entities)} className="block hover:text-stone-900 transition-colors">Entity browser</button>
                 <button onClick=${() => goTo(ROUTES.analytics)} className="block hover:text-stone-900 transition-colors">Analytics dashboard</button>
                 <button onClick=${() => goTo(ROUTES.about)} className="block hover:text-stone-900 transition-colors">About this archive</button>

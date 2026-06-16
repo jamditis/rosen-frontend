@@ -56,7 +56,6 @@ describe('route vocabulary single source of truth', () => {
       'archive',
       'dissertation',
       'entities',
-      'explorer',
       'folders',
     ]);
   });

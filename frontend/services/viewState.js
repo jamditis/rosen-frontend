@@ -18,7 +18,6 @@
 export const ROUTES = {
   archive: 'archive',
   folders: 'folders',
-  explorer: 'explorer',
   entities: 'entities',
   dissertation: 'dissertation',
   about: 'about',

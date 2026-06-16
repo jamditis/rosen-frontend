@@ -1,7 +1,7 @@
 /**
  * Unit tests for sanitizeHref (#322).
  *
- * record/thread/explorer link hrefs render attacker-controllable record URLs
+ * record/thread link hrefs render attacker-controllable record URLs
  * straight into an <a href> via HTM, which does not strip dangerous schemes.
  * sanitizeHref allowlists http/https/mailto (plus scheme-less relative URLs,
  * which the archive uses for the dissertation reader link) and collapses

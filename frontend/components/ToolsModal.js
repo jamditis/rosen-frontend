@@ -1,7 +1,7 @@
 // ToolsModal.js - Modal with icons for exploring dissertation tools
 import { useEffect, useRef, useCallback } from 'react';
-import { html } from '../html.js?v=3.4.0';
-import { X, Map, BookOpen, HelpCircle, Network, BarChart3, BookMarked } from 'lucide-react';
+import { html } from '../html.js?v=3.4.1';
+import { X, Map, BookOpen, HelpCircle, BarChart3, BookMarked } from 'lucide-react';
 
 // Tool definitions with categories
 const TOOLS = {
@@ -32,14 +32,6 @@ const TOOLS = {
     }
   ],
   data: [
-    {
-      id: 'explorer',
-      name: 'Network Explorer',
-      description: 'Visual record connections',
-      icon: Network,
-      action: 'explorer', // in-page action
-      status: 'ready'
-    },
     {
       id: 'dataviz',
       name: 'Data Visualization',
