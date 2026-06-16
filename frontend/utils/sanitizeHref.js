@@ -1,6 +1,6 @@
 // Scheme allowlist for link hrefs (#322).
 //
-// Record, thread, and explorer views render archive-supplied URLs straight into
+// Record and thread views render archive-supplied URLs straight into
 // an <a href> via HTM, which (unlike React's DOM sink) does not strip dangerous
 // schemes. A record whose url is `javascript:...` would then execute on click.
 //

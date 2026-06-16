@@ -314,7 +314,6 @@ Hash-based SPA routing via `router.js`:
 |-------|------|-----------|
 | Archive | (default) | `App.js` main view |
 | Folders | `#folders` | `App.js` folder view |
-| Explorer | `#explorer` | `Explorer.js` |
 | Entities | `#entities` | `EntityBrowser.js` |
 | Dissertation | `#dissertation` | `DissertationPage.js` |
 | About | `#about` | `AboutPage.js` |

@@ -8,7 +8,7 @@ export const DATA_CONFIG = {
     // Details: full summaries, quotes, concepts, tags (~11MB, loads on demand)
     archive_details: './data/archive-details.json',
 
-    // Entities: for Explorer network visualization (~1MB, loads on demand)
+    // Entities: for the entity browser and record connections (~1MB, loads on demand)
     archive_entities: './data/archive-entities.json',
 
     // Full data file (backward compatible, for fallback)
@@ -30,7 +30,7 @@ export const COLORS = [
     { bg: '#fff7ed', text: '#9a3412', border: '#ffedd5' }  // Orange
 ];
 
-// Shared entity type configuration (used by Explorer, EntityBrowser, RecordModal)
+// Shared entity type configuration (used by EntityBrowser, RecordModal)
 export const ENTITY_TYPE_CONFIG = {
   Person: { color: '#075985', bg: '#e0f2fe', label: 'People' },
   Organization: { color: '#166534', bg: '#f0fdf4', label: 'Organizations' },

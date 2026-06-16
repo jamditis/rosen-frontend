@@ -91,8 +91,9 @@ export const getAccentColors = () => {
 };
 
 /**
- * Get category color mapping from COLORS constant
- * Uses the same hash algorithm as Explorer.js
+ * Get category color mapping from COLORS constant.
+ * Hashes the category name (char-code sum) to a stable color index so the same
+ * category always maps to the same swatch.
  */
 export const getCategoryColorFromHash = (categoryName, colorArray) => {
   const hash = categoryName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);

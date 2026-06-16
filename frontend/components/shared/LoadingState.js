@@ -1,6 +1,6 @@
 // LoadingState.js - Universal loading component
 import { useState, useEffect } from 'react';
-import { html } from '../../html.js?v=3.4.0';
+import { html } from '../../html.js?v=3.4.1';
 import { BookOpen } from 'lucide-react';
 
 // Curated quotes from the dissertation for loading states

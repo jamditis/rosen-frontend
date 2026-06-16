@@ -1,5 +1,5 @@
 
-import { DATA_CONFIG, ERAS } from '../constants.js?v=3.4.0';
+import { DATA_CONFIG, ERAS } from '../constants.js?v=3.4.1';
 import {
   initDatabase,
   loadArchiveData as loadSqliteData,
@@ -13,9 +13,9 @@ import {
   getCategoryCoOccurrence,
   searchRecords as sqlSearchRecords,
   getStats as getSqliteStats
-} from './sqliteService.js?v=3.4.0';
-import { IS_LOCAL, IS_GITHUB_PAGES, BASE_PATH } from '../utils/pathResolver.js?v=3.4.0';
-import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.4.0';
+} from './sqliteService.js?v=3.4.1';
+import { IS_LOCAL, IS_GITHUB_PAGES, BASE_PATH } from '../utils/pathResolver.js?v=3.4.1';
+import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.4.1';
 
 // Routine cache-hit / fetch-start logs are silent in production. Set
 // `localStorage.jrda_debug = '1'` in DevTools and reload to opt in (#170).
@@ -510,7 +510,7 @@ const loadDetailsCache = async () => {
 };
 
 /**
- * Fetch entities data (on-demand, when Explorer opens)
+ * Fetch entities data (on-demand, when the entity browser opens)
  */
 export const fetchEntitiesData = async () => {
   // Return from cache if already loaded
@@ -553,7 +553,7 @@ export const fetchEntitiesData = async () => {
       const data = await response.json();
       entitiesCache = data;
 
-      // Build entity maps for Explorer
+      // Build entity maps for the entity browser
       buildEntityMaps({
         entities: data.entities,
         records: Object.entries(data.recordEntityMap).map(([id, relatedIds]) => ({
@@ -840,7 +840,7 @@ export const fetchArchiveData = async () => {
       data.facets.categories.sort();
     }
 
-    // Build entity lookup maps for Explorer connections
+    // Build entity lookup maps for entity connections
     buildEntityMaps(data);
 
     // Cache the result

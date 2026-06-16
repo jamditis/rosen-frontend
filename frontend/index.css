@@ -50,8 +50,3 @@ mark {
     transform: translateX(0);
   }
 }
-
-/* Explorer detail panel elevated shadow */
-.explorer-detail-panel {
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
-}

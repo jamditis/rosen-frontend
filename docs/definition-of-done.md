@@ -12,7 +12,7 @@ This doc is the input for the next desk session. Read it, decide the open archit
 
 ### 1. Frontend SPA — Complete
 
-All seven hash-based routes are wired and render: Archive (`/`), Folders (`#folders`), Explorer (`#explorer`), Entities (`#entities`), Dissertation (`#dissertation`), About (`#about`), Analytics (`#analytics`). Services are wired (`archiveService.js` for data loading + entity maps, `router.js` for hash routing, `sqliteService.js` for in-browser SQL). QueryBuilder (`frontend/components/QueryBuilder.js:638`) actually exports and runs 10+ query templates — issue #135's "dead-end" framing is about result composability with the main filter state, not "doesn't work." No TODO/FIXME markers in component files.
+All six hash-based routes are wired and render: Archive (`/`), Folders (`#folders`), Entities (`#entities`), Dissertation (`#dissertation`), About (`#about`), Analytics (`#analytics`). Services are wired (`archiveService.js` for data loading + entity maps, `router.js` for hash routing, `sqliteService.js` for in-browser SQL). QueryBuilder (`frontend/components/QueryBuilder.js:638`) actually exports and runs 10+ query templates — issue #135's "dead-end" framing is about result composability with the main filter state, not "doesn't work." No TODO/FIXME markers in component files.
 
 **Open hygiene work (not blocking):** #133 (unify URL routing + filter state), #134 (consolidate record-modal flow), #135 (QueryBuilder composability), #130 (Entity Index caller migration). All are internal architecture polish.
 

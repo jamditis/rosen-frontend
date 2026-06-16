@@ -17,7 +17,7 @@ The **Jay Rosen Internet Archive** is a public collection of the works, critique
 
 - **Live URL:** https://pressthink.org/j/rosen-archive/
 - **Repository:** github.com/jamditis/rosen-frontend
-- **Current version:** v3.4.0
+- **Current version:** v3.4.1
 - **Archive curator:** Joe Amditis
 
 ### About Jay Rosen
@@ -103,7 +103,6 @@ Hash-based SPA routing (`frontend/services/router.js`):
 |-------|------|-----------|-------------|
 | Archive | (default) | `App.js` main view | Record cards with filters |
 | Folders | `#folders` | `App.js` folder view | Browse by category folders |
-| Explorer | `#explorer` | `Explorer.js` | Network visualization of entities |
 | Entities | `#entities` | `EntityBrowser.js` | Browse/search extracted entities |
 | Dissertation | `#dissertation` | `DissertationPage.js` | Mind map + detail panel |
 | About | `#about` | `AboutPage.js` | About the archive |
