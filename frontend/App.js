@@ -42,7 +42,11 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('date-asc');
   const [isScrolled, setIsScrolled] = useState(false);
-  const [selectedRecordId, setSelectedRecordId] = useState(null);
+  // Initialise from ?record= so a deep-linked load survives mount. The URL-sync
+  // effect below runs on mount with this value already set, so it preserves the
+  // param instead of deleting it; the [records] effect then validates the id
+  // once the archive data finishes loading (clearing it if no record matches).
+  const [selectedRecordId, setSelectedRecordId] = useState(() => getRecordIdFromUrl());
   const [toolsModalOpen, setToolsModalOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
 
