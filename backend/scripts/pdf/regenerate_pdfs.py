@@ -6,7 +6,7 @@ This script regenerates PDFs for a specified range of rows in the 'test_runs' sh
 import gspread
 import os
 from dotenv import load_dotenv
-import pdf_generator
+from rosen_scraper import pdf_generator
 
 # --- Configuration ---
 START_ROW = 2  # The row to start processing from (2 is the first data row)
