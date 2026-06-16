@@ -45,6 +45,7 @@ data/                               # Archive data (JSON only)
 dissertation/                       # Dissertation tools
   index.html                        # Landing page
   reader/                           # Full text reader
+  faq/                              # FAQ (linked from the Explore Tools menu)
   foreword/                         # Foreword page
   network-effect/                   # Network film analysis
 

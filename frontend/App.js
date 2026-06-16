@@ -5,7 +5,6 @@ import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, 
 import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.4.0';
 import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.4.0';
 import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.4.0';
-import { IS_LOCAL, BASE_PATH } from './utils/pathResolver.js?v=3.4.0';
 import Sidebar from './components/Sidebar.js?v=3.4.0';
 import WelcomeModal from './components/WelcomeModal.js?v=3.4.0';
 import RecordView from './components/RecordView.js?v=3.4.0';
@@ -19,11 +18,6 @@ import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.4.0';
 import EntityBrowser from './components/EntityBrowser.js?v=3.4.0';
 import Timeline from './components/Timeline.js?v=3.4.0';
 import AboutPage from './components/AboutPage.js?v=3.4.0';
-
-// FEATURES_PATH points to the dissertation directory at the current deploy surface.
-// Local serves the repo at the root, so relative `../dissertation` is correct;
-// GH Pages and PressThink both nest the archive under BASE_PATH.
-const FEATURES_PATH = IS_LOCAL ? '../dissertation' : `${BASE_PATH}/dissertation`;
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
@@ -466,18 +460,6 @@ const App = () => {
                                     <${BarChart3} className="w-3.5 h-3.5" />
                                     Analytics
                                 </button>
-                                <a
-                                    href=${`${FEATURES_PATH}/comparison/`}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
-                                >
-                                    Then & Now
-                                </a>
-                                <a
-                                    href=${`${FEATURES_PATH}/glossary/`}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
-                                >
-                                    Glossary
-                                </a>
                                 <button
                                     onClick=${() => setToolsModalOpen(true)}
                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-200 transition-all text-xs font-medium text-stone-500 hover:text-stone-700"
