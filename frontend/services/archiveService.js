@@ -252,7 +252,8 @@ const withVersionTimeout = (promise) =>
 const getCachedData = (url) => {
   try {
     const cacheKey = getCacheKey(url);
-    // Try sessionStorage first (for large data), then localStorage
+    // localStorage is the only writer now (#337); still read a legacy
+    // sessionStorage entry first so caches from older builds expire cleanly.
     let cached = sessionStorage.getItem(cacheKey) || localStorage.getItem(cacheKey);
     if (!cached) return null;
 
@@ -283,16 +284,16 @@ const setCachedData = (url, data) => {
   try {
     const serialized = JSON.stringify(entry);
 
-    // Large data goes to sessionStorage (cleared on tab close, avoids quota pressure)
+    // Web Storage gives localStorage and sessionStorage a ~5 MB quota each, so a
+    // payload too large for localStorage will not fit sessionStorage either. The
+    // old overflow-to-sessionStorage attempt therefore threw QuotaExceededError on
+    // every load for the large data dumps (archive-core ~13 MB, archive-details
+    // ~13 MB, archive-data ~30 MB) and cached nothing. Skip it: archive-core also
+    // has an IndexedDB cache (fetchCoreData, far larger quota), and all of these
+    // payloads are served from the service-worker Cache Storage on refetch
+    // (sw.js stale-while-revalidate), so Web Storage is redundant for them. (#337)
     if (serialized.length > MAX_LOCALSTORAGE_SIZE) {
-      try {
-        sessionStorage.setItem(cacheKey, serialized);
-        return;
-      } catch {
-        // sessionStorage also full — just skip caching
-        console.warn('Session cache full, skipping cache for', url);
-        return;
-      }
+      return;
     }
 
     // Small data goes to localStorage (persists across sessions)
