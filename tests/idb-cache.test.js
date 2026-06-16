@@ -64,6 +64,54 @@ describe('idbCache fail-safe contract (#275)', () => {
 });
 
 // ============================================
+// idb-keyval import is bounded by a timeout (#392)
+// ============================================
+
+describe('idbCache import timeout (#392)', () => {
+  it('withTimeout resolves with the thunk value when it settles in time', async () => {
+    assert.equal(await idbCache.withTimeout(() => Promise.resolve('ok'), 1000), 'ok');
+  });
+
+  it('withTimeout rejects with the thunk error (not a timeout) when it rejects in time', async () => {
+    const boom = new Error('boom');
+    await assert.rejects(
+      idbCache.withTimeout(() => Promise.reject(boom), 1000),
+      (err) => err === boom,
+    );
+  });
+
+  it('withTimeout rejects with a timeout error when the thunk never settles', async () => {
+    await assert.rejects(
+      idbCache.withTimeout(() => new Promise(() => {}), 20),
+      /timed out/,
+    );
+  });
+
+  it('a settle arriving after the timeout is a harmless no-op', async () => {
+    let resolveLate;
+    const late = new Promise((r) => { resolveLate = r; });
+    const raced = idbCache.withTimeout(() => late, 20);
+    await assert.rejects(raced, /timed out/);
+    // Resolving after the race already rejected must not double-settle or throw.
+    resolveLate('too late');
+    await new Promise((r) => setTimeout(r, 10));
+  });
+
+  it('getKeyval races the idb-keyval import against a positive timeout', () => {
+    const src = fs.readFileSync(
+      path.join(rootDir, 'frontend', 'services', 'idbCache.js'), 'utf-8');
+    assert.match(
+      src,
+      /withTimeout\(\s*\(\)\s*=>\s*import\(['"]idb-keyval['"]\)/,
+      'getKeyval must race the idb-keyval import, not await it bare',
+    );
+    const m = src.match(/IMPORT_TIMEOUT_MS\s*=\s*(\d+)/);
+    assert.ok(m, 'must define a numeric IMPORT_TIMEOUT_MS');
+    assert.ok(Number(m[1]) > 0, 'IMPORT_TIMEOUT_MS must be positive');
+  });
+});
+
+// ============================================
 // archiveService wiring
 // ============================================
 
