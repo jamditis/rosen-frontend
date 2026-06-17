@@ -65,7 +65,7 @@ A comprehensive audit of the Jay Rosen Digital Archive identified **12 critical 
 
 **Issues:** Invalid `target_entity_id` values like `'O000'`, `'N/A'`, organization names as IDs
 
-**Solution:** Run `python backend/scripts/fix_entity_relationships.py`
+**Solution:** Ran `fix_entity_relationships.py` (since archived to `archived/scripts/backend-oneoffs/` as a completed one-off — see #190)
 
 ---
 
@@ -170,7 +170,8 @@ python3 backend/scripts/validate_and_repair_entities.py --dry-run
 python3 backend/scripts/validate_and_repair_entities.py
 
 # Step 3: Fix 14 relationship issues
-python3 backend/scripts/fix_entity_relationships.py
+#   Applied once as a one-off; the script was since archived to
+#   archived/scripts/backend-oneoffs/ (provenance only — do not run).
 
 # Step 4: Auto-categorize records
 python3 backend/scripts/auto_categorize_records.py --dry-run
@@ -235,7 +236,7 @@ python3 -m http.server 8000
 |--------|---------|---------|
 | `validate_archive_data.py` | Full data validation | `python scripts/validate_archive_data.py` |
 | `validate_and_repair_entities.py` | Fix entity IDs | `python scripts/validate_and_repair_entities.py --dry-run` |
-| `fix_entity_relationships.py` | Fix 14 relationship issues | `python scripts/fix_entity_relationships.py` |
+| `fix_entity_relationships.py` | Fix 14 relationship issues (one-off, applied once) | archived to `archived/scripts/backend-oneoffs/` — provenance only, do not run |
 | `auto_categorize_records.py` | Categorize 76 records | `python scripts/auto_categorize_records.py --dry-run` |
 | `check_url_accessibility.py` | Verify external URLs | `python scripts/check_url_accessibility.py` |
 | `build_record_relationships.py` | Build relationship network | `python scripts/build_record_relationships.py --dry-run` |
