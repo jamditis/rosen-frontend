@@ -88,11 +88,25 @@ _EXCLUDE_SUFFIXES: Tuple[str, ...] = ('.pyc', '.test.js', '.spec.js', '.csv')
 # consistency needs ordering: a visitor mid-deploy must never load a new
 # index.html pointing at ?v=3.4.0/App.js while App.js is still serving v3.3.0
 # content. CDNs will cache the stale-under-new-URL pair until TTL expiry.
-# Order within the tuple: index.html before version.json so that if a client
-# load races the very last rename, they pin to the still-old version.json
-# rather than the still-old index.html (the former is just a refresh signal,
-# the latter is the whole page).
-_ENTRY_POINTS: Tuple[str, ...] = ('index.html', 'version.json')
+#
+# Order within the tuple is earliest-flips-first:
+#   index.html      — the page itself. It flips first in this group; the JS/CSS
+#     bundle it references already uploaded in the dir walk above, so index.html
+#     plus that bundle are all live before sw.js flips.
+#   frontend/sw.js  — flips AFTER index.html. On install the worker PRECACHES
+#     index.html and the JS/CSS bundle (cache.add) and then serves .html/.js/.css
+#     cache-first, so it snapshots whatever is live at install time. If sw.js
+#     flipped first, a client that registered the new worker before index.html
+#     renamed would precache the OLD index.html and pin it under the new
+#     CACHE_VERSION until the next deploy. Flipping sw.js last among precached
+#     files makes the new worker snapshot an all-new tree — that is what its
+#     CACHE_VERSION bump fixes (the #430 stale-deploy class) without trading it
+#     for a stale-HTML pin.
+#   version.json    — the refresh signal; not precached (served network-first),
+#     so it flips LAST as the least-harmful stale state: a client racing the
+#     final rename pins the old version.json (a missed update nudge) rather than
+#     any asset the worker would cache.
+_ENTRY_POINTS: Tuple[str, ...] = ('index.html', 'frontend/sw.js', 'version.json')
 
 
 # ---------- Config ----------------------------------------------------------
@@ -152,7 +166,7 @@ def collect_local_files(
     entry_points: Iterable[str] = _ENTRY_POINTS,
 ) -> List[Path]:
     """Walk the manifest and return every file to upload, ordered so that
-    entry-point files (index.html, version.json) come LAST.
+    entry-point files (index.html, frontend/sw.js, version.json) come LAST.
 
     Skips entries that don't exist on disk (the existence tests catch
     those at PR time — at deploy time we keep going so a missing optional
@@ -188,6 +202,11 @@ def collect_local_files(
                 # Also prune anything under an excluded-dir name anywhere
                 # in the path (e.g. frontend/foo/__pycache__/bar.pyc).
                 if any(part in _EXCLUDE_NAMES for part in sub.parts):
+                    continue
+                # Entry points living inside a walked dir (e.g. frontend/sw.js)
+                # are appended LAST for cross-file consistency; skip them here so
+                # _add()'s dedup doesn't pin them to this early walk position.
+                if sub.relative_to(repo_root).as_posix() in entry_set:
                     continue
                 _add(sub)
 
