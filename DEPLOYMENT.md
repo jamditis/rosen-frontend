@@ -92,7 +92,7 @@ Other files only change when the site code changes.
 
 ## Version cache busting
 
-After uploading, bump the `?v=X.X.X` query parameter on all JS/CSS imports in `index.html` to bust the Cloudflare cache. Update `version.json` to match.
+After uploading, bump the `?v=X.X.X` query parameter on all JS/CSS imports in `index.html` to bust the Cloudflare cache. Update `version.json` to match, and bump `frontend/sw.js` `CACHE_VERSION` to the same value. The service worker serves static JS cache-first with `ignoreSearch: true`, so the `?v=` bump alone does not invalidate it — only a `CACHE_VERSION` change drops the stale service-worker cache, so returning visitors keep running old JS until it bumps. `tests/version-consistency.test.js` enforces that the three stay in lockstep.
 
 ## FTP credentials
 

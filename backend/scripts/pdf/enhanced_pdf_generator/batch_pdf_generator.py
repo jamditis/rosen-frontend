@@ -7,6 +7,7 @@ enhanced PDFs for all records using the new layout format.
 import gspread
 import os
 import sys
+from pathlib import Path
 from dotenv import load_dotenv
 import time
 
@@ -21,8 +22,14 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from enhanced_pdf_generator import create_enhanced_pdf
 
-# Load environment variables from project root
-load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env'))
+# Anchor the backend root by literal depth: this file lives at
+# backend/scripts/pdf/enhanced_pdf_generator/, so parents[3] == backend/. It is
+# run standalone and only puts the pdf/ dir on sys.path for the sibling import
+# above, so it can't import the rosen_scraper helper the diagnostics use.
+_BACKEND_ROOT = Path(__file__).resolve().parents[3]
+
+# Load environment variables from the backend root regardless of cwd.
+load_dotenv(_BACKEND_ROOT / '.env')
 
 def connect_to_google_sheets():
     """
@@ -32,8 +39,11 @@ def connect_to_google_sheets():
         gspread.Spreadsheet: The connected spreadsheet object
     """
     try:
-        # Use service account credentials (path relative to project root)
-        credentials_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'google_credentials.json')
+        # Service-account credentials, anchored to the backend root so the path
+        # is correct from any cwd or nesting depth. Honors an absolute
+        # GOOGLE_APPLICATION_CREDENTIALS (a / b discards a when b is absolute).
+        credentials_filename = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+        credentials_path = str(_BACKEND_ROOT / credentials_filename)
         gc = gspread.service_account(filename=credentials_path)
         
         # Open the spreadsheet by name from environment variable

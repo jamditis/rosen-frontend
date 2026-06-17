@@ -24,6 +24,7 @@ if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
 from rosen_scraper.sheets_client import get_gspread_client
+from rosen_scraper.path_utils import find_project_root
 
 # --- Configuration ---
 COLUMNS_TO_DEDUPE = [
@@ -226,7 +227,8 @@ def main(argv=None):
     args = _parse_args(argv)
     try:
         load_dotenv()
-        credentials_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json"))
+        credentials_filename = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+        credentials_path = str(find_project_root() / credentials_filename)
         gc = get_gspread_client(credentials_path)
         sh = gc.open(os.environ.get("SPREADSHEET_NAME", "Rosen Archive URL List"))
         test_runs_worksheet = sh.worksheet("test_runs")

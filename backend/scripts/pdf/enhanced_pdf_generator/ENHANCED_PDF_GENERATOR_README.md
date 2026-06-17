@@ -108,7 +108,7 @@ You can specify any custom directory when calling the functions directly
 
 ## Sample Output
 
-A test PDF has been generated at: `test_pdf_output/Sample Article Title for Testing PDF Generation - TEST-001.pdf`
+Running the generator writes a sample PDF under `test_pdf_output/` (named after the record title and id). That directory is not committed — the file is generated on each run.
 
 ## Troubleshooting
 

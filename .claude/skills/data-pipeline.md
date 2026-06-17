@@ -81,10 +81,13 @@ Place Google Cloud credentials in `backend/google_credentials.json`.
 
 | Script | Purpose | Source |
 |--------|---------|--------|
-| `scripts/import_tumblr.py` | Import Tumblr posts | studio20nyu.tumblr.com |
-| `scripts/import_clippings.py` | Import newspaper clippings | PDF scans with OCR |
 | `scripts/reconstruct_bluesky_threads.py` | Build thread hierarchies | social_posts.csv |
 | `scripts/generate_thread_records.py` | Create THREAD-* records | Thread data |
+
+The Tumblr posts and newspaper clippings were imported once by the now-archived
+`merge_new_records.py` (see `archived/scripts/backend-oneoffs/`), not by standing
+`import_*` scripts — the earlier `scripts/import_tumblr.py` and
+`scripts/import_clippings.py` rows named scripts that never existed at those paths.
 
 ### Export Scripts
 

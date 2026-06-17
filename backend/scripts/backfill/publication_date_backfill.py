@@ -22,8 +22,8 @@ from dotenv import load_dotenv
 import google.generativeai as genai
 
 # Anchor to this script's directory so the shared helper resolves whether the
-# script is run directly, loaded by file path (tests), or imported via the
-# `backfill` namespace package (run_date_backfill.py). See issue #189.
+# script is run directly, loaded by file path (tests), or imported as part of
+# the `backfill` namespace package by a wrapper script. See issue #189.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from date_extraction import extract_date_from_url
 

@@ -42,7 +42,11 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('date-asc');
   const [isScrolled, setIsScrolled] = useState(false);
-  const [selectedRecordId, setSelectedRecordId] = useState(null);
+  // Initialise from ?record= so a deep-linked load survives mount. The URL-sync
+  // effect below runs on mount with this value already set, so it preserves the
+  // param instead of deleting it; the [records] effect then validates the id
+  // once the archive data finishes loading (clearing it if no record matches).
+  const [selectedRecordId, setSelectedRecordId] = useState(() => getRecordIdFromUrl());
   const [toolsModalOpen, setToolsModalOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
 
@@ -309,6 +313,23 @@ const App = () => {
     return html`<${AnalyticsDashboard} onBack=${() => goTo(ROUTES.archive)} />`;
   }
 
+  // Shared fail-loud panel for the record-backed routes. fetchCoreData throws
+  // on a core-data outage (#290), so both the archive grid and the entity
+  // browser depend on the same load; render the same error on each instead of
+  // letting the entity route show an empty browser with no explanation (#369).
+  const errorPanel = error && html`
+    <div className="text-center py-20 border-2 border-red-200 rounded-lg bg-red-50 mx-4">
+        <${AlertCircle} className="w-12 h-12 mx-auto text-red-500 mb-4" />
+        <h3 className="font-display text-xl text-red-700 mb-2">Error loading archive</h3>
+        <p className="text-red-600 text-sm mb-6">${error}</p>
+        <button
+            onClick=${() => window.location.reload()}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors font-bold text-sm"
+        >
+            Reload Page
+        </button>
+    </div>
+  `;
 
   return html`
     <div className="min-h-screen flex flex-col">
@@ -508,25 +529,15 @@ const App = () => {
             </div>
             `}
 
-            ${isEntityBrowser && !loading && html`
+            ${isEntityBrowser && errorPanel}
+
+            ${isEntityBrowser && !loading && !error && html`
                 <${EntityBrowser} records=${records} onSelectRecord=${setSelectedRecordId} />
             `}
 
             ${isArchiveGrid && html`
                 <div>
-                    ${error && html`
-                    <div className="text-center py-20 border-2 border-red-200 rounded-lg bg-red-50 mx-4">
-                        <${AlertCircle} className="w-12 h-12 mx-auto text-red-500 mb-4" />
-                        <h3 className="font-display text-xl text-red-700 mb-2">Error loading archive</h3>
-                        <p className="text-red-600 text-sm mb-6">${error}</p>
-                        <button
-                            onClick=${() => window.location.reload()}
-                            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors font-bold text-sm"
-                        >
-                            Reload Page
-                        </button>
-                    </div>
-                    `}
+                    ${errorPanel}
 
                     ${!error && loading && html`
                     <${LoadingQuotes} />

@@ -9,7 +9,7 @@ A public collection of the works, critiques, and teachings of Jay Rosen, NYU pro
 The archive has two main parts:
 
 1. **The archive browser** — a searchable, filterable interface for 1,030 records (800 articles, 137 Tumblr posts, 83 newspaper clippings, 10 social-media threads) plus ~29,700 social media posts, indexed by 5,036 named entities and 4,666 relationships
-2. **The dissertation tools** — 3 interactive surfaces for exploring Jay's 1986 doctoral dissertation, *The Impossible Press*: the reader, the foreword, and the network-effect film analysis (an earlier set of 8 tools — comparison, concepts, context, excerpts, faq, glossary, source, timeline — was retired and lives in `archived/dissertation-tools/` for reference)
+2. **The dissertation tools** — 4 interactive surfaces for exploring Jay's 1986 doctoral dissertation, *The Impossible Press*: the reader, the foreword, the network-effect film analysis, and the FAQ (an earlier set of 6 tools — comparison, concepts, context, excerpts, glossary, timeline — was retired and lives in `archived/dissertation-tools/` for reference, alongside a separate `source/` bundle that is not a standalone tool)
 
 Everything runs as a static site with no server-side code. The frontend loads JSON data files directly in the browser.
 
@@ -26,7 +26,7 @@ Open http://localhost:8000. That's it — no build step, no `npm install` needed
 - `index.html` is the entry point. It loads React, HTM, and other libraries from `esm.sh` CDN via an import map.
 - `frontend/` contains the React app. All components use HTM tagged templates (`` html`...` ``) instead of JSX.
 - `data/` contains the archive data as JSON files, generated from CSV source files.
-- `dissertation/` contains 3 live presentation tools (`reader/`, `foreword/`, `network-effect/`), each in its own subdirectory with an `index.html`. An earlier set of 7 tools (comparison, concepts, context, excerpts, faq, glossary, timeline) is retired to `archived/dissertation-tools/`; that path also holds a `source/` bundle (PDF + transcribed markdown + a build helper), which is not a standalone tool.
+- `dissertation/` contains 4 live presentation tools (`reader/`, `foreword/`, `network-effect/`, `faq/`), each in its own subdirectory with an `index.html`. An earlier set of 6 tools (comparison, concepts, context, excerpts, glossary, timeline) is retired to `archived/dissertation-tools/`; that path also holds a `source/` bundle (PDF + transcribed markdown + a build helper), which is not a standalone tool.
 - `frontend/dist/tailwind.css` is a pre-built Tailwind CSS file. No build needed unless you change styles.
 
 ## Updating the archive data
@@ -59,7 +59,7 @@ The site is hosted at `pressthink.org/j/rosen-archive/` via FTP to a WordPress s
 
 1. Edit source files as needed.
 2. If data changed: `npm install` (first time only), then `node data/export-archive-data.js`.
-3. Bump the version string in `index.html`, `version.json`, and every `?v=` query parameter on versioned imports — both JS (`./frontend/index.js?v=…`) and CSS (`./frontend/index.css?v=…`, `./frontend/dist/tailwind.css?v=…`). `tests/version-consistency.test.js` enforces a single shared `?v=` only across `index.html` and `frontend/**.js`; it does NOT scan the dissertation subpages, archived tools, or feature pages. Stale `?v=` values outside that scope will pass CI but leave cached assets live in production, so sweep the whole tree by hand on a version bump.
+3. Bump the version string in `index.html`, `version.json`, `frontend/sw.js` `CACHE_VERSION`, and every `?v=` query parameter on versioned imports — both JS (`./frontend/index.js?v=…`) and CSS (`./frontend/index.css?v=…`, `./frontend/dist/tailwind.css?v=…`). The service worker serves static JS cache-first with `ignoreSearch: true`, so a `?v=` bump alone does not invalidate it — only a `CACHE_VERSION` change drops the stale service-worker cache. `tests/version-consistency.test.js` enforces that `sw.js` `CACHE_VERSION` matches `version.json` and the `index.html` `?v=`, but it checks the shared `?v=` only across `index.html` and `frontend/**.js`; it does NOT scan the dissertation subpages, archived tools, or feature pages. Stale `?v=` values outside that scope will pass CI but leave cached assets live in production, so sweep the whole tree by hand on a version bump.
 4. Upload only the files that changed via FTP to `/wp-content/rosen-archive/`.
 
 **Do not upload:** CSVs, backup files, screenshots, the `backend/`, `tests/`, `docs/`, `archived/`, `.github/`, `.claude/`, or `node_modules/` trees. See `DEPLOYMENT.md` for the full exclusion list.
@@ -84,7 +84,7 @@ frontend/                     React application
   services/                   Data loading, routing, SQLite
   dist/tailwind.css           Pre-built styles
 data/                         CSV sources + generated JSON
-dissertation/                 3 live dissertation tools (7 earlier ones, plus a source bundle, in archived/dissertation-tools/)
+dissertation/                 4 live dissertation tools (6 earlier ones, plus a source bundle, in archived/dissertation-tools/)
 features/                     Standalone feature pages
 backend/                      Python data pipeline (scraping, AI analysis)
 tools/active/                 Dev tools (data explorer, data viz)

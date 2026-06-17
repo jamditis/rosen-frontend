@@ -4,7 +4,7 @@ Project version history for the Jay Rosen Internet Archive.
 
 This is an archival record condensed from session notes. Each entry preserves what was built, why decisions were made, what challenges arose, and key metrics and outcomes. Code snippets, file lists, bash commands, and session continuation instructions have been removed — the git history contains those details.
 
-Versions are listed in reverse chronological order within major version groups. The project began as a Python data pipeline (v0.0.1, June 2025) and grew into a static React frontend with 1,030 archive records, 3 live dissertation presentation surfaces (with 7 earlier tools retired to `archived/dissertation-tools/` alongside a non-tool source bundle), ~29,700 social media posts, and a knowledge graph of 5,036 named entities and 4,666 relationships spanning four decades of journalism criticism.
+Versions are listed in reverse chronological order within major version groups. The project began as a Python data pipeline (v0.0.1, June 2025) and grew into a static React frontend with 1,030 archive records, 4 live dissertation presentation surfaces (with 6 earlier tools retired to `archived/dissertation-tools/` alongside a non-tool source bundle), ~29,700 social media posts, and a knowledge graph of 5,036 named entities and 4,666 relationships spanning four decades of journalism criticism.
 
 A note on versioning: the cache-bust version embedded in `index.html` and `version.json` (currently `v3.3.0`) increments per static-bundle change. The release versions below (e.g. `[4.0.0]`) track milestones in the project's evolution. These are two related but distinct versioning schemes, intentionally separate.
 
