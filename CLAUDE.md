@@ -277,7 +277,7 @@ Short version:
 
 1. Edit source files as needed.
 2. Regenerate JSON if data changed: `node data/export-archive-data.js`.
-3. Bump the version in `index.html`, `version.json`, and all `?v=` import strings to bust the Cloudflare cache.
+3. Bump the version in `index.html`, `version.json`, all `?v=` import strings, and `frontend/sw.js` `CACHE_VERSION` to bust the Cloudflare cache. The service worker serves static JS cache-first with `ignoreSearch: true`, so a `?v=` bump alone does not invalidate it — only a `CACHE_VERSION` change drops the stale service-worker cache. `tests/version-consistency.test.js` enforces that `sw.js` `CACHE_VERSION` matches `version.json`.
 4. Upload only the files that changed via FTP.
 
 Pillar 3a (in-flight) automates this for record submissions via `backend/submission_server/` and the `submit-record.yml` / `sweep-stuck-rows.yml` workflows — see those files for the current state.
