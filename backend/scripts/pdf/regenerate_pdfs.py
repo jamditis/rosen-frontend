@@ -7,7 +7,7 @@ import gspread
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-import pdf_generator
+from rosen_scraper import pdf_generator
 
 # --- Configuration ---
 START_ROW = 2  # The row to start processing from (2 is the first data row)
