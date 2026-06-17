@@ -215,12 +215,63 @@ class TestEntryPointsUploadedLast:
                       'data/archive-core.json'):
             assert names.index(asset) < names.index('index.html')
 
-    def test_default_manifest_puts_index_and_version_last(self):
-        # Smoke check the real production manifest (no synthetic repo) —
-        # the actual deploy must follow the rule, not just the test fixture.
+    def test_default_manifest_entry_point_order(self):
+        # Smoke check the real production manifest (no synthetic repo) — the
+        # actual deploy must follow the rule, not just the test fixture. The
+        # entry group flips index.html, then frontend/sw.js, then version.json
+        # (see _ENTRY_POINTS and TestServiceWorkerEntryPointOrder for why).
         files = deploy_full_site.collect_local_files(_REPO_ROOT)
         names = [f.relative_to(_REPO_ROOT).as_posix() for f in files]
-        assert names[-2:] == ['index.html', 'version.json']
+        # Direct ordering checks give a diagnostic failure if the dir-walk guard
+        # is dropped (sw.js would reappear at its alphabetical walk position).
+        assert names.count('frontend/sw.js') == 1
+        assert names.index('index.html') < names.index('frontend/sw.js')
+        assert names.index('frontend/sw.js') < names.index('version.json')
+        assert names[-3:] == ['index.html', 'frontend/sw.js', 'version.json']
+
+
+class TestServiceWorkerEntryPointOrder:
+    """frontend/sw.js is a version-flipping entry point (#441).
+
+    On install the worker precaches index.html and the JS/CSS bundle (cache.add)
+    and then serves .html/.js/.css cache-first, so it snapshots whatever is live
+    at install time. So sw.js must flip AFTER index.html (and after the JS/CSS
+    bundle, which uploads in the dir walk): if it flipped first, a client that
+    registered the new worker before index.html renamed would precache the OLD
+    index.html and pin it under the new CACHE_VERSION until the next deploy.
+    version.json is not precached (network-first), so it stays last as the
+    least-harmful stale state.
+    """
+
+    def test_sw_js_uploads_after_index_before_version(self, tmp_path):
+        (tmp_path / 'index.html').write_text('<html>')
+        (tmp_path / 'version.json').write_text('{}')
+        fe = tmp_path / 'frontend'
+        fe.mkdir()
+        (fe / 'App.js').write_text('//')
+        # viewState.js sorts AFTER sw.js — without the entry-point skip in the
+        # dir walk, sw.js stays pinned to its early (alphabetical) slot and the
+        # "sw.js after every JS/CSS asset" ordering would not hold.
+        (fe / 'viewState.js').write_text('//')
+        (fe / 'sw.js').write_text('//')
+
+        files = deploy_full_site.collect_local_files(
+            tmp_path,
+            top_files=('index.html', 'version.json'),
+            dirs=('frontend',),
+            data_files=(),
+            entry_points=('index.html', 'frontend/sw.js', 'version.json'),
+        )
+        names = [f.relative_to(tmp_path).as_posix() for f in files]
+
+        assert names.count('frontend/sw.js') == 1, "sw.js must not be uploaded twice"
+        # The JS/CSS bundle the worker precaches uploads before sw.js...
+        assert names.index('frontend/App.js') < names.index('frontend/sw.js')
+        assert names.index('frontend/viewState.js') < names.index('frontend/sw.js')
+        # ...and so does index.html, so the new worker snapshots an all-new tree.
+        assert names.index('index.html') < names.index('frontend/sw.js')
+        # version.json (not precached) flips last.
+        assert names[-3:] == ['index.html', 'frontend/sw.js', 'version.json']
 
 
 class TestKnownHostsHandling:

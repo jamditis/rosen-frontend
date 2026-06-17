@@ -36,7 +36,6 @@ grep -c "?v=" /home/user/rosen-frontend/frontend/App.js
 | `frontend/App.js` | ~15 | Main app, sets the standard |
 | `frontend/index.js` | ~3 | Entry point |
 | `frontend/components/Sidebar.js` | ~5 | Search and filters |
-| `frontend/components/Explorer.js` | ~4 | Network visualization |
 | `frontend/components/MindMap.js` | ~3 | Dissertation tree |
 | `frontend/components/RecordModal.js` | ~4 | Detail view |
 

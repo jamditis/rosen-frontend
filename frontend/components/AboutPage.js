@@ -1,6 +1,6 @@
 
 import { useMemo } from 'react';
-import { html } from '../html.js?v=3.4.0';
+import { html } from '../html.js?v=3.4.1';
 import { ArrowLeft, Archive, BookOpen, Network, Search, ExternalLink, Github, Mail } from 'lucide-react';
 
 const AboutPage = ({ onBack, records }) => {
@@ -113,7 +113,7 @@ const AboutPage = ({ onBack, records }) => {
               </div>
               <div>
                 <h3 className="font-bold text-stone-900 mb-1">Explore connections</h3>
-                <p className="text-sm text-stone-600">The network explorer visualizes how records are connected through shared people, organizations, and concepts. The entity browser lets you search by specific names and institutions.</p>
+                <p className="text-sm text-stone-600">The entity browser shows how records connect through shared people, organizations, and concepts, and lets you search by specific names and institutions.</p>
               </div>
             </div>
             <div className="flex gap-4 items-start">
@@ -122,7 +122,7 @@ const AboutPage = ({ onBack, records }) => {
               </div>
               <div>
                 <h3 className="font-bold text-stone-900 mb-1">Read the dissertation</h3>
-                <p className="text-sm text-stone-600">Jay Rosen's 1986 PhD dissertation, "The Impossible Press," is available in full through the archive's dissertation reader, mind map, glossary, and other tools.</p>
+                <p className="text-sm text-stone-600">Jay Rosen's 1986 PhD dissertation, "The Impossible Press," is available in full through the archive's dissertation reader, mind map, and FAQ.</p>
               </div>
             </div>
           </div>

@@ -34,7 +34,6 @@ const OUT_DIR = resolve(fileURLToPath(import.meta.url), '..', '..', 'preview-aud
 
 const ROUTES = [
   { slug: 'home-archive',       url: '/' },
-  { slug: 'explorer',           url: '/#explorer' },
   { slug: 'entities',           url: '/#entities' },
   { slug: 'about',              url: '/#about' },
   { slug: 'analytics',          url: '/#analytics' },
@@ -94,6 +93,19 @@ async function auditOne(page, route, viewport) {
     passes: result.passes.length,
     incomplete: result.incomplete.length,
   };
+}
+
+async function launchBrowser() {
+  try {
+    return await chromium.launch();
+  } catch (err) {
+    const message = [
+      'Playwright browser is not installed or cannot be launched.',
+      'Run `npx playwright install chromium` and then retry `npm run preview:audit`.',
+      `Original error: ${err.message}`,
+    ].join('\n');
+    throw new Error(message);
+  }
 }
 
 // HTML-escape every interpolated value in the report. Without this, an axe
@@ -161,36 +173,46 @@ function renderReport(rows) {
   return html;
 }
 
-const server = await startServer();
-try {
-  await rm(OUT_DIR, { recursive: true, force: true });
-  await mkdir(OUT_DIR, { recursive: true });
+async function main() {
+  const server = await startServer();
+  try {
+    await rm(OUT_DIR, { recursive: true, force: true });
+    await mkdir(OUT_DIR, { recursive: true });
 
-  const browser = await chromium.launch();
-  const context = await browser.newContext();
-  const page = await context.newPage();
+    const browser = await launchBrowser();
+    try {
+      const context = await browser.newContext();
+      const page = await context.newPage();
 
-  const rows = [];
-  for (const viewport of VIEWPORTS) {
-    for (const route of ROUTES) {
-      console.log(`  ${viewport.name.padEnd(8)} ${route.url}`);
-      try {
-        rows.push(await auditOne(page, route, viewport));
-      } catch (err) {
-        console.error(`  FAILED ${viewport.name} ${route.url}: ${err.message}`);
-        rows.push({ route: route.slug, url: route.url, viewport: viewport.name, violations: [{ id: 'audit-error', impact: 'critical', help: err.message, helpUrl: '', nodes: 0, sample: '' }], passes: 0, incomplete: 0 });
+      const rows = [];
+      for (const viewport of VIEWPORTS) {
+        for (const route of ROUTES) {
+          console.log(`  ${viewport.name.padEnd(8)} ${route.url}`);
+          try {
+            rows.push(await auditOne(page, route, viewport));
+          } catch (err) {
+            console.error(`  FAILED ${viewport.name} ${route.url}: ${err.message}`);
+            rows.push({ route: route.slug, url: route.url, viewport: viewport.name, violations: [{ id: 'audit-error', impact: 'critical', help: err.message, helpUrl: '', nodes: 0, sample: '' }], passes: 0, incomplete: 0 });
+          }
+        }
       }
+
+      await writeFile(resolve(OUT_DIR, 'axe-report.html'), renderReport(rows));
+      await writeFile(resolve(OUT_DIR, 'axe-report.json'), JSON.stringify(rows, null, 2));
+
+      const totalViolations = rows.reduce((s, r) => s + r.violations.length, 0);
+      console.log(`\nReport: ${resolve(OUT_DIR, 'axe-report.html')}`);
+      console.log(`Total violations: ${totalViolations}`);
+      if (totalViolations > 0) process.exitCode = 1;
+    } finally {
+      await browser.close();
     }
+  } finally {
+    server.kill();
   }
-  await browser.close();
-
-  await writeFile(resolve(OUT_DIR, 'axe-report.html'), renderReport(rows));
-  await writeFile(resolve(OUT_DIR, 'axe-report.json'), JSON.stringify(rows, null, 2));
-
-  const totalViolations = rows.reduce((s, r) => s + r.violations.length, 0);
-  console.log(`\nReport: ${resolve(OUT_DIR, 'axe-report.html')}`);
-  console.log(`Total violations: ${totalViolations}`);
-  if (totalViolations > 0) process.exitCode = 1;
-} finally {
-  server.kill();
 }
+
+await main().catch((err) => {
+  console.error(err.message);
+  process.exitCode = 1;
+});

@@ -1,29 +1,22 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.4.0';
-import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, Network, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Github } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.4.0';
-import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.4.0';
-import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.4.0';
-import { IS_LOCAL, BASE_PATH } from './utils/pathResolver.js?v=3.4.0';
-import Sidebar from './components/Sidebar.js?v=3.4.0';
-import WelcomeModal from './components/WelcomeModal.js?v=3.4.0';
-import RecordView from './components/RecordView.js?v=3.4.0';
-import FeaturedSection from './components/FeaturedSection.js?v=3.4.0';
-import Explorer from './components/Explorer.js?v=3.4.0';
-import DissertationPage from './components/DissertationPage.js?v=3.4.0';
-import ToolsModal from './components/ToolsModal.js?v=3.4.0';
-import LoadingQuotes from './components/LoadingQuotes.js?v=3.4.0';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.4.0';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.4.0';
-import EntityBrowser from './components/EntityBrowser.js?v=3.4.0';
-import Timeline from './components/Timeline.js?v=3.4.0';
-import AboutPage from './components/AboutPage.js?v=3.4.0';
-
-// FEATURES_PATH points to the dissertation directory at the current deploy surface.
-// Local serves the repo at the root, so relative `../dissertation` is correct;
-// GH Pages and PressThink both nest the archive under BASE_PATH.
-const FEATURES_PATH = IS_LOCAL ? '../dissertation' : `${BASE_PATH}/dissertation`;
+import { html } from './html.js?v=3.4.1';
+import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Github } from 'lucide-react';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.4.1';
+import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.4.1';
+import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.4.1';
+import Sidebar from './components/Sidebar.js?v=3.4.1';
+import WelcomeModal from './components/WelcomeModal.js?v=3.4.1';
+import RecordView from './components/RecordView.js?v=3.4.1';
+import FeaturedSection from './components/FeaturedSection.js?v=3.4.1';
+import DissertationPage from './components/DissertationPage.js?v=3.4.1';
+import ToolsModal from './components/ToolsModal.js?v=3.4.1';
+import LoadingQuotes from './components/LoadingQuotes.js?v=3.4.1';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.4.1';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.4.1';
+import EntityBrowser from './components/EntityBrowser.js?v=3.4.1';
+import Timeline from './components/Timeline.js?v=3.4.1';
+import AboutPage from './components/AboutPage.js?v=3.4.1';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
@@ -49,7 +42,11 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('date-asc');
   const [isScrolled, setIsScrolled] = useState(false);
-  const [selectedRecordId, setSelectedRecordId] = useState(null);
+  // Initialise from ?record= so a deep-linked load survives mount. The URL-sync
+  // effect below runs on mount with this value already set, so it preserves the
+  // param instead of deleting it; the [records] effect then validates the id
+  // once the archive data finishes loading (clearing it if no record matches).
+  const [selectedRecordId, setSelectedRecordId] = useState(() => getRecordIdFromUrl());
   const [toolsModalOpen, setToolsModalOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
 
@@ -126,8 +123,6 @@ const App = () => {
   const handleToolSelect = useCallback((action) => {
     if (action === 'mindmap') {
       navigateTo(ROUTES.dissertation);
-    } else if (action === 'explorer') {
-      navigateTo(ROUTES.explorer);
     } else if (action === 'entities') {
       navigateTo(ROUTES.entities);
     }
@@ -278,8 +273,7 @@ const App = () => {
   const minYear = years.length ? Math.min(...years) : 0;
   const maxYear = years.length ? Math.max(...years) : 0;
 
-  // One <RecordView> element, shared by the Explorer and default archive
-  // routes (only one of them renders per pass). RecordView owns the
+  // One <RecordView> element for the default archive route. RecordView owns the
   // selected-record lookup and prev/next nav math that App.js used to compute
   // inline and pass to two identical <RecordModal> call sites. #134 Step B.
   const recordView = html`
@@ -296,7 +290,6 @@ const App = () => {
     />
   `;
 
-  const isExplorer = currentRoute === ROUTES.explorer;
   const isEntityBrowser = currentRoute === ROUTES.entities;
   const isAnalytics = currentRoute === ROUTES.analytics;
   const isArchiveGrid = currentRoute === ROUTES.archive || currentRoute === ROUTES.folders;
@@ -320,19 +313,23 @@ const App = () => {
     return html`<${AnalyticsDashboard} onBack=${() => goTo(ROUTES.archive)} />`;
   }
 
-  // Explorer gets its own full-width layout (no sidebar, no archive chrome)
-  if (isExplorer) {
-    return html`
-      <div className="min-h-screen flex flex-col">
-        <${WelcomeModal} />
-        ${recordView}
-        ${!loading && html`
-          <${Explorer} records=${records} onBack=${() => goTo(ROUTES.archive)} />
-        `}
-        ${loading && html`<${LoadingQuotes} />`}
-      </div>
-    `;
-  }
+  // Shared fail-loud panel for the record-backed routes. fetchCoreData throws
+  // on a core-data outage (#290), so both the archive grid and the entity
+  // browser depend on the same load; render the same error on each instead of
+  // letting the entity route show an empty browser with no explanation (#369).
+  const errorPanel = error && html`
+    <div className="text-center py-20 border-2 border-red-200 rounded-lg bg-red-50 mx-4">
+        <${AlertCircle} className="w-12 h-12 mx-auto text-red-500 mb-4" />
+        <h3 className="font-display text-xl text-red-700 mb-2">Error loading archive</h3>
+        <p className="text-red-600 text-sm mb-6">${error}</p>
+        <button
+            onClick=${() => window.location.reload()}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors font-bold text-sm"
+        >
+            Reload Page
+        </button>
+    </div>
+  `;
 
   return html`
     <div className="min-h-screen flex flex-col">
@@ -446,13 +443,6 @@ const App = () => {
                                     Mind Map
                                 </button>
                                 <button
-                                    onClick=${() => goTo(ROUTES.explorer)}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
-                                >
-                                    <${Network} className="w-3.5 h-3.5" />
-                                    Network
-                                </button>
-                                <button
                                     onClick=${() => goTo(ROUTES.entities)}
                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
                                 >
@@ -466,18 +456,6 @@ const App = () => {
                                     <${BarChart3} className="w-3.5 h-3.5" />
                                     Analytics
                                 </button>
-                                <a
-                                    href=${`${FEATURES_PATH}/comparison/`}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
-                                >
-                                    Then & Now
-                                </a>
-                                <a
-                                    href=${`${FEATURES_PATH}/glossary/`}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
-                                >
-                                    Glossary
-                                </a>
                                 <button
                                     onClick=${() => setToolsModalOpen(true)}
                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-200 transition-all text-xs font-medium text-stone-500 hover:text-stone-700"
@@ -551,25 +529,15 @@ const App = () => {
             </div>
             `}
 
-            ${isEntityBrowser && !loading && html`
+            ${isEntityBrowser && errorPanel}
+
+            ${isEntityBrowser && !loading && !error && html`
                 <${EntityBrowser} records=${records} onSelectRecord=${setSelectedRecordId} />
             `}
 
             ${isArchiveGrid && html`
                 <div>
-                    ${error && html`
-                    <div className="text-center py-20 border-2 border-red-200 rounded-lg bg-red-50 mx-4">
-                        <${AlertCircle} className="w-12 h-12 mx-auto text-red-500 mb-4" />
-                        <h3 className="font-display text-xl text-red-700 mb-2">Error loading archive</h3>
-                        <p className="text-red-600 text-sm mb-6">${error}</p>
-                        <button
-                            onClick=${() => window.location.reload()}
-                            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors font-bold text-sm"
-                        >
-                            Reload Page
-                        </button>
-                    </div>
-                    `}
+                    ${errorPanel}
 
                     ${!error && loading && html`
                     <${LoadingQuotes} />
@@ -715,7 +683,6 @@ const App = () => {
               <div className="space-y-1 text-xs">
                 <button onClick=${() => goTo(ROUTES.archive)} className="block hover:text-stone-900 transition-colors">Browse archive</button>
                 <button onClick=${() => goTo(ROUTES.dissertation)} className="block hover:text-stone-900 transition-colors">Dissertation mind map</button>
-                <button onClick=${() => goTo(ROUTES.explorer)} className="block hover:text-stone-900 transition-colors">Network explorer</button>
                 <button onClick=${() => goTo(ROUTES.entities)} className="block hover:text-stone-900 transition-colors">Entity browser</button>
                 <button onClick=${() => goTo(ROUTES.analytics)} className="block hover:text-stone-900 transition-colors">Analytics dashboard</button>
                 <button onClick=${() => goTo(ROUTES.about)} className="block hover:text-stone-900 transition-colors">About this archive</button>

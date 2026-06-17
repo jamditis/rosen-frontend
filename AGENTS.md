@@ -100,7 +100,7 @@ Production deploys by FTP to `pressthink.org/j/rosen-archive/`.
 When deployment files change:
 
 1. Regenerate JSON if data changed.
-2. Bump `index.html`, `version.json`, and all relevant `?v=` import strings.
+2. Bump the version in lockstep across `index.html`, `version.json`, every relevant `?v=` import string, and `frontend/sw.js` `CACHE_VERSION`. The service worker serves static JS cache-first and matches with `ignoreSearch: true`, so a `?v=` bump alone does not invalidate it — only a `CACHE_VERSION` change drops the stale cache. Skip it and returning visitors keep running old JS (security fixes included) until some later deploy happens to bump it.
 3. Upload only changed production files.
 4. Do not upload CSVs, backup files, screenshots, or the whole repo.
 

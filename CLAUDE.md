@@ -17,7 +17,7 @@ The **Jay Rosen Internet Archive** is a public collection of the works, critique
 
 - **Live URL:** https://pressthink.org/j/rosen-archive/
 - **Repository:** github.com/jamditis/rosen-frontend
-- **Current version:** v3.4.0
+- **Current version:** v3.4.1
 - **Archive curator:** Joe Amditis
 
 ### About Jay Rosen
@@ -103,7 +103,6 @@ Hash-based SPA routing (`frontend/services/router.js`):
 |-------|------|-----------|-------------|
 | Archive | (default) | `App.js` main view | Record cards with filters |
 | Folders | `#folders` | `App.js` folder view | Browse by category folders |
-| Explorer | `#explorer` | `Explorer.js` | Network visualization of entities |
 | Entities | `#entities` | `EntityBrowser.js` | Browse/search extracted entities |
 | Dissertation | `#dissertation` | `DissertationPage.js` | Mind map + detail panel |
 | About | `#about` | `AboutPage.js` | About the archive |
@@ -147,13 +146,14 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── utils/                       # Design tokens and small helpers
 │   └── design-system/               # CSS tokens and demo pages
 │
-├── dissertation/                    # Dissertation presentation tools (3 live)
+├── dissertation/                    # Dissertation presentation tools (4 live)
 │   ├── index.html                   # Dissertation landing page
 │   ├── reader/                      # Full text reader with selection sharing
 │   ├── foreword/                    # Foreword page
-│   └── network-effect/              # Network film analysis
-│   # Note: an earlier set of 7 standalone tools (comparison, concepts,
-│   # context, excerpts, faq, glossary, timeline) was retired and now lives
+│   ├── network-effect/              # Network film analysis
+│   └── faq/                         # Dissertation FAQ
+│   # Note: an earlier set of 6 standalone tools (comparison, concepts,
+│   # context, excerpts, glossary, timeline) was retired and now lives
 │   # in archived/dissertation-tools/ for reference, alongside a non-tool
 │   # source/ bundle (dissertation PDF + transcribed markdown + helper).
 │
@@ -194,7 +194,8 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 ├── tests/                           # Frontend/data test suite — Node.js built-in runner (24 *.test.js files plus a validate-dissertation-page.js helper script; 25 files total)
 │
 ├── archived/                        # Reference only, not deployed (see DEPLOYMENT.md)
-│   └── dissertation-tools/          # 7 retired dissertation tools (comparison, concepts, context, excerpts, faq, glossary, timeline) + a source/ bundle (PDF + markdown + helper script); kept pending the decisions-pending.md call. The rest of archived/ was pruned in #166.
+│   ├── dissertation-tools/          # 6 retired dissertation tools (comparison, concepts, context, excerpts, glossary, timeline) + a source/ bundle (PDF + markdown + helper script); kept pending the decisions-pending.md call. The faq tool was restored to dissertation/faq/ in #411.
+│   └── scripts/                     # Provenance-only one-off scripts, broken at import from here by design (each has a README). backend-oneoffs/ (#190) and data-oneoffs/ (#380). The rest of archived/ was pruned in #166.
 │
 ├── docs/                            # Project documentation
 │   ├── agent-personas/              # Contributor role definitions (5 personas)
@@ -278,7 +279,7 @@ Short version:
 
 1. Edit source files as needed.
 2. Regenerate JSON if data changed: `node data/export-archive-data.js`.
-3. Bump the version in `index.html`, `version.json`, and all `?v=` import strings to bust the Cloudflare cache.
+3. Bump the version in `index.html`, `version.json`, all `?v=` import strings, and `frontend/sw.js` `CACHE_VERSION` to bust the Cloudflare cache. The service worker serves static JS cache-first with `ignoreSearch: true`, so a `?v=` bump alone does not invalidate it — only a `CACHE_VERSION` change drops the stale service-worker cache. `tests/version-consistency.test.js` enforces that `sw.js` `CACHE_VERSION` matches `version.json`.
 4. Upload only the files that changed via FTP.
 
 Pillar 3a (in-flight) automates this for record submissions via `backend/submission_server/` and the `submit-record.yml` / `sweep-stuck-rows.yml` workflows — see those files for the current state.

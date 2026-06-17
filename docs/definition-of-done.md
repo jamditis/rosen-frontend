@@ -12,7 +12,7 @@ This doc is the input for the next desk session. Read it, decide the open archit
 
 ### 1. Frontend SPA — Complete
 
-All seven hash-based routes are wired and render: Archive (`/`), Folders (`#folders`), Explorer (`#explorer`), Entities (`#entities`), Dissertation (`#dissertation`), About (`#about`), Analytics (`#analytics`). Services are wired (`archiveService.js` for data loading + entity maps, `router.js` for hash routing, `sqliteService.js` for in-browser SQL). QueryBuilder (`frontend/components/QueryBuilder.js:638`) actually exports and runs 10+ query templates — issue #135's "dead-end" framing is about result composability with the main filter state, not "doesn't work." No TODO/FIXME markers in component files.
+All six hash-based routes are wired and render: Archive (`/`), Folders (`#folders`), Entities (`#entities`), Dissertation (`#dissertation`), About (`#about`), Analytics (`#analytics`). Services are wired (`archiveService.js` for data loading + entity maps, `router.js` for hash routing, `sqliteService.js` for in-browser SQL). QueryBuilder (`frontend/components/QueryBuilder.js:638`) actually exports and runs 10+ query templates — issue #135's "dead-end" framing is about result composability with the main filter state, not "doesn't work." No TODO/FIXME markers in component files.
 
 **Open hygiene work (not blocking):** #133 (unify URL routing + filter state), #134 (consolidate record-modal flow), #135 (QueryBuilder composability), #130 (Entity Index caller migration). All are internal architecture polish.
 
@@ -22,11 +22,11 @@ All seven hash-based routes are wired and render: Archive (`/`), Folders (`#fold
 
 **What's actually live at `pressthink.org/j/rosen-archive/dissertation/`:** reader, foreword, network-effect, glossary, comparison, context, excerpts, faq, concepts, timeline — verified by HTTP fetch on 2026-05-25.
 
-**What's in the repo's `dissertation/` directory (actively maintained):** reader, foreword, network-effect (3 of 10).
+**What's in the repo's `dissertation/` directory (actively maintained):** reader, foreword, network-effect, faq (4 of 10; faq restored in #411).
 
-**What's in the repo's `archived/dissertation-tools/`:** comparison, concepts, context, excerpts, faq, glossary, timeline + a source bundle (7 retired tools + 1 source bundle).
+**What's in the repo's `archived/dissertation-tools/`:** comparison, concepts, context, excerpts, glossary, timeline + a source bundle (6 retired tools + 1 source bundle).
 
-**The mismatch:** the seven "retired" tools were uploaded to WordPress once (when they were active) and are still served because nothing has overwritten them. They function in browsers — `context/script.js` and `faq/script.js` populate JS-empty divs at runtime — but they live in `archived/` in the repo, which means the deploy manifest (`DEPLOYMENT.md`) doesn't include them. Any edit in `archived/` won't reach production via the current FTP workflow.
+**The mismatch:** the six "retired" tools were uploaded to WordPress once (when they were active) and are still served because nothing has overwritten them. They function in browsers — `context/script.js`, for example, populates JS-empty divs at runtime — but they live in `archived/` in the repo, which means the deploy manifest (`DEPLOYMENT.md`) doesn't include them. Any edit in `archived/` won't reach production via the current FTP workflow. (`faq` is the exception: it was restored to `dissertation/faq/` in #411, so it is live and on the deploy manifest, not archived.)
 
 **False positives from the live-site scan agent:** WebFetch reported `/dissertation/context/` as "empty outline" and `/faq/` as "blank default view." Both are JS-populated SPAs and work fine in a real browser. The agent couldn't run JavaScript. Issue #260 has been updated to reflect this.
 
@@ -85,11 +85,10 @@ Design doc only: `docs/plans/2026-05-24-pillar3-authoring-workflow-design.md`. Z
 
 ### 7. CI workflows — Complete
 
-`.github/workflows/` has frontend-validation (HTML/JS syntax + CDN checks + TODO/FIXME scan), backend-tests (pytest), backend-linting (ruff + black + mypy), claude-code-review, claude.yml, post-merge.yml, submit-record.yml (Pillar 3a end-to-end), sweep-stuck-rows.yml (queue maintenance), CodeQL. Frontend Validation was re-enabled by the May 21 era (PR #147) and will close issue #186 on its first live green run.
+`.github/workflows/` has frontend-validation (HTML/JS syntax + CDN checks + TODO/FIXME scan), backend-tests (pytest), backend-linting (ruff + black + mypy), claude-code-review, claude.yml, post-merge.yml, submit-record.yml (Pillar 3a end-to-end), sweep-stuck-rows.yml (queue maintenance), CodeQL. Frontend Validation was re-enabled by the May 21 era (PR #147); issue #186 closed once it ran green.
 
-**Two repo-hygiene calls (low-priority):**
-- #186: re-enable Frontend Validation (likely already auto-closes on next green run; verify and close if so)
-- #154: `post-merge.yml:46` has placeholder webhook URL `YOUR_WEBHOOK_URL` — fails gracefully today, but is dead code until the webhook is wired or removed.
+**One repo-hygiene call (low-priority):**
+- #154: `post-merge.yml` no longer ships a placeholder URL — the whole job is now gated on the `DASHBOARD_WEBHOOK_URL` repository variable, so it spends no Actions minutes until that variable is set. #154 stays open only to track wiring the real sync endpoint.
 
 ---
 

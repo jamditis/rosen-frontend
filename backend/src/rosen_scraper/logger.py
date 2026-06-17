@@ -18,6 +18,8 @@ from pathlib import Path
 from typing import Dict, Any
 from enum import Enum
 
+from rosen_scraper.path_utils import find_project_root
+
 class LogLevel(Enum):
     DEBUG = "DEBUG"
     INFO = "INFO"
@@ -48,7 +50,14 @@ class ArchiveLogger:
         Args:
             log_dir: Directory to store log files
         """
-        self.log_dir = Path(log_dir)
+        # Anchor a relative log_dir to the project root so the log tree lands in
+        # a stable backend-rooted location regardless of cwd (#357). An absolute
+        # path is honored unchanged and never consults the project root, so
+        # callers passing an absolute path keep working in any environment.
+        log_path = Path(log_dir)
+        self.log_dir = (
+            log_path if log_path.is_absolute() else find_project_root() / log_path
+        )
         self.session_id = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.start_time = time.time()
 

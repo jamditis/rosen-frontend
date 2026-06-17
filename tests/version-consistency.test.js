@@ -134,6 +134,41 @@ describe('CACHE_VERSION', () => {
     assert.ok(match, 'CACHE_VERSION not found in archiveService.js');
     assert.ok(match[1].length > 0, 'CACHE_VERSION is empty');
   });
+
+  // #430: the service worker serves static JS cache-first and matches with
+  // `ignoreSearch: true`, so a `?v=` bump does NOT invalidate it — only its
+  // CACHE_VERSION (the cache name) does. The sw.js comment says CACHE_VERSION is
+  // "tied to the app version in version.json", but nothing enforced it, so a
+  // deploy that bumped `?v=` / version.json but forgot sw.js shipped stale JS to
+  // returning visitors. These tests make that lockstep a CI-enforced invariant.
+  // (This is the app-version cache name in sw.js, a separate concept from
+  // archiveService.js's data-cache version, which tracks version.json.cache_version.)
+  const readSwCacheVersion = () => {
+    const sw = fs.readFileSync(path.join(frontendDir, 'sw.js'), 'utf-8');
+    const swMatch = sw.match(/const CACHE_VERSION\s*=\s*['"](.+?)['"]/);
+    assert.ok(swMatch, 'CACHE_VERSION not found in frontend/sw.js');
+    return swMatch[1];
+  };
+
+  it('frontend/sw.js CACHE_VERSION matches version.json version', () => {
+    const swVersion = readSwCacheVersion();
+    const versionJson = JSON.parse(fs.readFileSync(path.join(rootDir, 'version.json'), 'utf-8'));
+    assert.strictEqual(swVersion, versionJson.version,
+      `sw.js CACHE_VERSION (${swVersion}) must match version.json version (${versionJson.version}). ` +
+      'Bump sw.js CACHE_VERSION in lockstep on deploy, or returning visitors keep stale JS.');
+  });
+
+  it('frontend/sw.js CACHE_VERSION matches the index.html import version', () => {
+    const swVersion = readSwCacheVersion();
+    const indexContent = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf-8');
+    const indexVersions = new Set(
+      [...indexContent.matchAll(/\?v=(\d+\.\d+\.\d+)/g)].map((m) => m[1]),
+    );
+    assert.strictEqual(indexVersions.size, 1,
+      `index.html has ${indexVersions.size} different ?v= versions: ${[...indexVersions].join(', ')}`);
+    assert.strictEqual(swVersion, [...indexVersions][0],
+      `sw.js CACHE_VERSION (${swVersion}) must match index.html ?v= version (${[...indexVersions][0]}).`);
+  });
 });
 
 // ============================================
@@ -171,7 +206,6 @@ describe('import path validity', () => {
       'Timeline.js',
       'RecordModal.js',
       'RecordView.js',
-      'Explorer.js',
       'WelcomeModal.js',
       'DissertationPage.js',
       'MindMap.js',

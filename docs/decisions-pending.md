@@ -136,7 +136,9 @@ Order is roughly by how many other things each decision unblocks. Resolve in ord
 
 **Surfaced during 2026-05-25 scans (not yet filed as an issue)**
 **Blocks:** the "dissertation tools" subsystem grade in definition-of-done (currently Partial)
-**Why now:** the live site serves 10 dissertation tools (reader, foreword, network-effect, glossary, comparison, context, excerpts, faq, concepts, timeline) but only 3 are in the maintained `dissertation/` directory. The other 7 live in `archived/dissertation-tools/`, which means edits there don't reach production via the FTP deploy manifest.
+**Why now:** the live site serves 10 dissertation tools (reader, foreword, network-effect, glossary, comparison, context, excerpts, faq, concepts, timeline) but only 4 are in the maintained `dissertation/` directory. The other 6 live in `archived/dissertation-tools/`, which means edits there don't reach production via the FTP deploy manifest.
+
+**Partial action taken (2026-06-16):** faq was restored to the maintained `dissertation/faq/` directory in #411 — a partial option-D move. The remaining six tools are still archived; this decision stays open for them.
 
 **Options:**
 

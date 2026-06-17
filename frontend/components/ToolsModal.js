@@ -1,7 +1,7 @@
 // ToolsModal.js - Modal with icons for exploring dissertation tools
 import { useEffect, useRef, useCallback } from 'react';
-import { html } from '../html.js?v=3.4.0';
-import { X, Map, Zap, BookOpen, Calendar, FileText, Tv, HelpCircle, Network, BarChart3, BookMarked } from 'lucide-react';
+import { html } from '../html.js?v=3.4.1';
+import { X, Map, BookOpen, HelpCircle, BarChart3, BookMarked } from 'lucide-react';
 
 // Tool definitions with categories
 const TOOLS = {
@@ -12,46 +12,6 @@ const TOOLS = {
       description: 'Interactive dissertation structure',
       icon: Map,
       action: 'mindmap', // in-page action
-      status: 'ready'
-    },
-    {
-      id: 'comparison',
-      name: 'Then & Now',
-      description: '1986 vs 2025 comparisons',
-      icon: Zap,
-      href: '/j/rosen-archive/dissertation/comparison/',
-      status: 'ready'
-    },
-    {
-      id: 'glossary',
-      name: 'Glossary',
-      description: 'Key concepts defined',
-      icon: BookOpen,
-      href: '/j/rosen-archive/dissertation/glossary/',
-      status: 'ready'
-    },
-    {
-      id: 'timeline',
-      name: 'Timeline',
-      description: '40 years of ideas',
-      icon: Calendar,
-      href: '/j/rosen-archive/dissertation/timeline/',
-      status: 'ready'
-    },
-    {
-      id: 'excerpts',
-      name: 'Annotated Excerpts',
-      description: 'Key passages with commentary',
-      icon: FileText,
-      href: '/j/rosen-archive/dissertation/excerpts/',
-      status: 'ready'
-    },
-    {
-      id: 'context',
-      name: '1986 Context',
-      description: 'The media landscape then',
-      icon: Tv,
-      href: '/j/rosen-archive/dissertation/context/',
       status: 'ready'
     },
     {
@@ -72,14 +32,6 @@ const TOOLS = {
     }
   ],
   data: [
-    {
-      id: 'explorer',
-      name: 'Network Explorer',
-      description: 'Visual record connections',
-      icon: Network,
-      action: 'explorer', // in-page action
-      status: 'ready'
-    },
     {
       id: 'dataviz',
       name: 'Data Visualization',

@@ -1,5 +1,5 @@
 
-import { DATA_CONFIG, ERAS } from '../constants.js?v=3.4.0';
+import { DATA_CONFIG, ERAS } from '../constants.js?v=3.4.1';
 import {
   initDatabase,
   loadArchiveData as loadSqliteData,
@@ -13,9 +13,10 @@ import {
   getCategoryCoOccurrence,
   searchRecords as sqlSearchRecords,
   getStats as getSqliteStats
-} from './sqliteService.js?v=3.4.0';
-import { IS_LOCAL, IS_GITHUB_PAGES, BASE_PATH } from '../utils/pathResolver.js?v=3.4.0';
-import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.4.0';
+} from './sqliteService.js?v=3.4.1';
+import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.4.1';
+import { escapeCsvCell } from '../utils/csvSafety.js?v=3.4.1';
+import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.4.1';
 
 // Routine cache-hit / fetch-start logs are silent in production. Set
 // `localStorage.jrda_debug = '1'` in DevTools and reload to opt in (#170).
@@ -252,7 +253,8 @@ const withVersionTimeout = (promise) =>
 const getCachedData = (url) => {
   try {
     const cacheKey = getCacheKey(url);
-    // Try sessionStorage first (for large data), then localStorage
+    // localStorage is the only writer now (#337); still read a legacy
+    // sessionStorage entry first so caches from older builds expire cleanly.
     let cached = sessionStorage.getItem(cacheKey) || localStorage.getItem(cacheKey);
     if (!cached) return null;
 
@@ -283,16 +285,16 @@ const setCachedData = (url, data) => {
   try {
     const serialized = JSON.stringify(entry);
 
-    // Large data goes to sessionStorage (cleared on tab close, avoids quota pressure)
+    // Web Storage gives localStorage and sessionStorage a ~5 MB quota each, so a
+    // payload too large for localStorage will not fit sessionStorage either. The
+    // old overflow-to-sessionStorage attempt therefore threw QuotaExceededError on
+    // every load for the large data dumps (archive-core ~13 MB, archive-details
+    // ~13 MB, archive-data ~30 MB) and cached nothing. Skip it: archive-core also
+    // has an IndexedDB cache (fetchCoreData, far larger quota), and all of these
+    // payloads are served from the service-worker Cache Storage on refetch
+    // (sw.js stale-while-revalidate), so Web Storage is redundant for them. (#337)
     if (serialized.length > MAX_LOCALSTORAGE_SIZE) {
-      try {
-        sessionStorage.setItem(cacheKey, serialized);
-        return;
-      } catch {
-        // sessionStorage also full — just skip caching
-        console.warn('Session cache full, skipping cache for', url);
-        return;
-      }
+      return;
     }
 
     // Small data goes to localStorage (persists across sessions)
@@ -510,7 +512,7 @@ const loadDetailsCache = async () => {
 };
 
 /**
- * Fetch entities data (on-demand, when Explorer opens)
+ * Fetch entities data (on-demand, when the entity browser opens)
  */
 export const fetchEntitiesData = async () => {
   // Return from cache if already loaded
@@ -553,7 +555,7 @@ export const fetchEntitiesData = async () => {
       const data = await response.json();
       entitiesCache = data;
 
-      // Build entity maps for Explorer
+      // Build entity maps for the entity browser
       buildEntityMaps({
         entities: data.entities,
         records: Object.entries(data.recordEntityMap).map(([id, relatedIds]) => ({
@@ -755,15 +757,6 @@ export const exportAsJSON = (records, filename = 'jay-rosen-archive.json') => {
 export const exportAsCSV = (records, filename = 'jay-rosen-archive.csv') => {
   const headers = ['id', 'title', 'author', 'date', 'year', 'era', 'pub', 'url', 'categories', 'type'];
 
-  const escapeCSV = (value) => {
-    if (value === null || value === undefined) return '';
-    const str = String(value);
-    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-      return `"${str.replace(/"/g, '""')}"`;
-    }
-    return str;
-  };
-
   const rows = records.map(r => [
     r.id,
     r.title,
@@ -775,7 +768,7 @@ export const exportAsCSV = (records, filename = 'jay-rosen-archive.csv') => {
     r.url,
     (r.categories || []).join('; '),
     r.type || 'article'
-  ].map(escapeCSV).join(','));
+  ].map(escapeCsvCell).join(','));
 
   const csv = [headers.join(','), ...rows].join('\n');
   downloadFile(csv, filename, 'text/csv;charset=utf-8');
@@ -785,9 +778,13 @@ export const exportAsCSV = (records, filename = 'jay-rosen-archive.csv') => {
  * Get URLs for open data resources
  */
 export const getOpenDataURLs = () => {
-  const basePath = IS_LOCAL ? '.'
-    : IS_GITHUB_PAGES ? '/rosen-frontend'
-    : '/wp-content/rosen-archive';
+  // Derive from the shared resolver so open-data links use the same canonical
+  // URL scheme as the rest of the app (#300). The old production branch
+  // hardcoded the WordPress upload root (/wp-content/rosen-archive), which only
+  // resolved via a brittle WP rewrite from the canonical /j/rosen-archive.
+  // BASE_PATH already encodes the github-pages prefix, so the non-local cases
+  // collapse to it; local keeps the relative '.' the static preview servers use.
+  const basePath = IS_LOCAL ? '.' : BASE_PATH;
 
   return {
     json: `${basePath}/data/archive-data.json`,
@@ -840,7 +837,7 @@ export const fetchArchiveData = async () => {
       data.facets.categories.sort();
     }
 
-    // Build entity lookup maps for Explorer connections
+    // Build entity lookup maps for entity connections
     buildEntityMaps(data);
 
     // Cache the result

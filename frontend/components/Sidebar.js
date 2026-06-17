@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { html } from '../html.js?v=3.4.0';
+import { html } from '../html.js?v=3.4.1';
 import { X, Search, XCircle, ChevronDown, ChevronUp, MessageSquare } from 'lucide-react';
 
 const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, autocompleteIndex }) => {

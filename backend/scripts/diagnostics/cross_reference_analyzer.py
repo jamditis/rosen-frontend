@@ -34,6 +34,7 @@ if str(BACKEND_SRC) not in sys.path:
     sys.path.append(str(BACKEND_SRC))
 
 from rosen_scraper.logger import get_logger
+from rosen_scraper.path_utils import find_project_root
 
 load_dotenv()
 
@@ -488,10 +489,8 @@ class CrossReferenceManager:
 
         try:
             # Connect to Google Sheets
-            credentials_path = os.path.join(
-                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
-            )
+            credentials_filename = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+            credentials_path = str(find_project_root() / credentials_filename)
             gc = gspread.service_account(filename=credentials_path)
             sh = gc.open(os.environ.get("SPREADSHEET_NAME", "Rosen Archive URL List"))
             worksheet = sh.worksheet("test_runs")
@@ -553,10 +552,8 @@ class CrossReferenceManager:
 
         try:
             # Connect to Google Sheets
-            credentials_path = os.path.join(
-                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
-            )
+            credentials_filename = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+            credentials_path = str(find_project_root() / credentials_filename)
             gc = gspread.service_account(filename=credentials_path)
             sh = gc.open(os.environ.get("SPREADSHEET_NAME", "Rosen Archive URL List"))
             worksheet = sh.worksheet("test_runs")
