@@ -15,6 +15,7 @@ import {
   getStats as getSqliteStats
 } from './sqliteService.js?v=3.4.1';
 import { IS_LOCAL, IS_GITHUB_PAGES, BASE_PATH } from '../utils/pathResolver.js?v=3.4.1';
+import { escapeCsvCell } from '../utils/csvSafety.js?v=3.4.1';
 import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.4.1';
 
 // Routine cache-hit / fetch-start logs are silent in production. Set
@@ -755,15 +756,6 @@ export const exportAsJSON = (records, filename = 'jay-rosen-archive.json') => {
 export const exportAsCSV = (records, filename = 'jay-rosen-archive.csv') => {
   const headers = ['id', 'title', 'author', 'date', 'year', 'era', 'pub', 'url', 'categories', 'type'];
 
-  const escapeCSV = (value) => {
-    if (value === null || value === undefined) return '';
-    const str = String(value);
-    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-      return `"${str.replace(/"/g, '""')}"`;
-    }
-    return str;
-  };
-
   const rows = records.map(r => [
     r.id,
     r.title,
@@ -775,7 +767,7 @@ export const exportAsCSV = (records, filename = 'jay-rosen-archive.csv') => {
     r.url,
     (r.categories || []).join('; '),
     r.type || 'article'
-  ].map(escapeCSV).join(','));
+  ].map(escapeCsvCell).join(','));
 
   const csv = [headers.join(','), ...rows].join('\n');
   downloadFile(csv, filename, 'text/csv;charset=utf-8');
