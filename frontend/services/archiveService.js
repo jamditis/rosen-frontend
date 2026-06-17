@@ -14,7 +14,7 @@ import {
   searchRecords as sqlSearchRecords,
   getStats as getSqliteStats
 } from './sqliteService.js?v=3.4.1';
-import { IS_LOCAL, IS_GITHUB_PAGES, BASE_PATH } from '../utils/pathResolver.js?v=3.4.1';
+import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.4.1';
 import { escapeCsvCell } from '../utils/csvSafety.js?v=3.4.1';
 import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.4.1';
 
@@ -778,9 +778,13 @@ export const exportAsCSV = (records, filename = 'jay-rosen-archive.csv') => {
  * Get URLs for open data resources
  */
 export const getOpenDataURLs = () => {
-  const basePath = IS_LOCAL ? '.'
-    : IS_GITHUB_PAGES ? '/rosen-frontend'
-    : '/wp-content/rosen-archive';
+  // Derive from the shared resolver so open-data links use the same canonical
+  // URL scheme as the rest of the app (#300). The old production branch
+  // hardcoded the WordPress upload root (/wp-content/rosen-archive), which only
+  // resolved via a brittle WP rewrite from the canonical /j/rosen-archive.
+  // BASE_PATH already encodes the github-pages prefix, so the non-local cases
+  // collapse to it; local keeps the relative '.' the static preview servers use.
+  const basePath = IS_LOCAL ? '.' : BASE_PATH;
 
   return {
     json: `${basePath}/data/archive-data.json`,
