@@ -5,6 +5,7 @@ This script regenerates PDFs for a specified range of rows in the 'test_runs' sh
 
 import gspread
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 import pdf_generator
 
@@ -20,7 +21,13 @@ def main():
 
     # --- 1. Connect to Google Sheets ---
     try:
-        credentials_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json"))
+        credentials_filename = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+        # Anchor credentials to backend/ so the relative default resolves from
+        # any cwd. This script runs standalone and never puts backend/src on
+        # sys.path, so it can't import the rosen_scraper helper the diagnostics
+        # use; the literal hop is correct because the file lives at
+        # backend/scripts/pdf/ (parents[2] == backend/).
+        credentials_path = str(Path(__file__).resolve().parents[2] / credentials_filename)
         gc = gspread.service_account(filename=credentials_path)
         sh = gc.open(os.environ.get("SPREADSHEET_NAME", "Rosen Archive URL List"))
         worksheet = sh.worksheet("test_runs")
