@@ -2,6 +2,9 @@
 Tests for the scraper module.
 Tests the scraping cascade: URL Context -> Requests -> Playwright
 """
+import socket
+from urllib.parse import urlparse
+
 import pytest
 import requests
 from unittest.mock import Mock, patch
@@ -164,6 +167,60 @@ class TestRequestsRedirectSafety:
         with pytest.raises(requests.RequestException, match='redirect'):
             scraper._requests_get_safe(
                 'https://example.com/start', headers={}, timeout=5)
+
+    def test_pins_validated_ip_against_dns_rebind(self, monkeypatch):
+        """The fetch connects to the IP validated at check time, never a private
+        address a low-TTL record rebinds to before connect (#332).
+
+        resolve_and_validate sees a public IP and passes the host; the live
+        resolver is then rebound to a private IP, the way a DNS-rebinding
+        attacker would between check and connect. The fetch reads the resolver
+        exactly where urllib3 would — inside pinned_resolution — so the address
+        it records is the one the real connection would use. This is the
+        requests-path analogue of
+        test_url_safety.test_pinned_resolution_forces_validated_ip, driven
+        through _requests_get_safe rather than the primitive in isolation.
+        """
+        validated_ip = '93.184.216.34'  # public; what validation returns
+        rebind_ip = '10.0.0.5'          # private; what live DNS now hands back
+
+        # Validation time: the host resolves to a public IP and passes the guard.
+        monkeypatch.setattr(
+            scraper, 'resolve_and_validate',
+            lambda url: (True, '', [validated_ip]))
+
+        # Connect time: the live resolver has rebound the host to a private IP.
+        # pinned_resolution captures this as its fallback resolver on enter, so
+        # an unpinned host (or a dropped pin) would resolve here instead.
+        def _rebind(node, port, *args, **kwargs):
+            return [(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP,
+                     '', (rebind_ip, port or 0))]
+        monkeypatch.setattr(socket, 'getaddrinfo', _rebind)
+
+        # The fetch runs inside the pin; record the address it would dial.
+        # Seed with None so a never-called fake_get fails readably (the fetch
+        # was short-circuited) rather than raising a bare KeyError below.
+        seen = {'ip': None}
+
+        def fake_get(url, *args, **kwargs):
+            host = urlparse(url).hostname
+            seen['ip'] = socket.getaddrinfo(host, 443)[0][4][0]
+            resp = Mock()
+            resp.is_redirect = False
+            resp.is_permanent_redirect = False
+            resp.headers = {'content-type': 'text/html'}
+            return resp
+        monkeypatch.setattr(scraper.requests, 'get', fake_get)
+
+        result = scraper._requests_get_safe(
+            'https://example.com/article', headers={}, timeout=5)
+
+        assert result.is_redirect is False
+        assert seen['ip'] is not None, "fake_get was never called"
+        assert seen['ip'] == validated_ip, (
+            f"connection resolved to {seen['ip']}, expected the validated "
+            f"{validated_ip} — the DNS-rebind pin did not hold")
+        assert seen['ip'] != rebind_ip
 
 
 class TestRenderedContentHeuristic:
