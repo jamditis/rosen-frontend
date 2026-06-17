@@ -35,10 +35,55 @@ const STORE_NAME = 'kv';
 // idb-keyval is imported lazily and dynamically: this keeps it off the app's
 // boot path (loaded on first cache access, not at module eval) and lets a CDN
 // failure fall through to the catch below instead of aborting module load.
+//
+// The import is cross-origin (esm.sh) and not service-worker-precached, so a
+// reachable-but-stalled CDN could hang every caller that awaits it —
+// fetchCoreData awaits idbGet() before it ever tries same-origin
+// archive-core.json or the Web Storage cache. A plain catch only handles a
+// reject, not a stall, so the import is raced against a timeout: on a stall the
+// race rejects fast and the caller degrades to the non-IndexedDB path (#392).
+const IMPORT_TIMEOUT_MS = 3000;
+
+/**
+ * Race a promise-returning thunk against a timeout. Mirrors the thunk if it
+ * settles within `ms`; otherwise rejects with a timeout error. A settle that
+ * arrives after the timeout is ignored, so there is no double-settle and no
+ * unhandled rejection. Exported for tests.
+ * @param {() => Promise<T>} thunk
+ * @param {number} ms
+ * @returns {Promise<T>}
+ * @template T
+ */
+export const withTimeout = (thunk, ms) =>
+  new Promise((resolve, reject) => {
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      reject(new Error(`timed out after ${ms}ms`));
+    }, ms);
+    Promise.resolve()
+      .then(thunk)
+      .then(
+        (value) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          resolve(value);
+        },
+        (err) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          reject(err);
+        },
+      );
+  });
+
 let storePromise = null;
 const getKeyval = () => {
   if (!storePromise) {
-    storePromise = import('idb-keyval')
+    storePromise = withTimeout(() => import('idb-keyval'), IMPORT_TIMEOUT_MS)
       .then((kv) => ({ kv, store: kv.createStore(DB_NAME, STORE_NAME) }))
       .catch((err) => {
         storePromise = null; // allow a later call to retry the import
