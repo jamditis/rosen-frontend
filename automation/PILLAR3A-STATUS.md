@@ -6,7 +6,9 @@ Pillar 3a (sheet checkbox → GitHub Action scrapes, categorizes, commits a reco
 writes status back) is written in code but was never stood up: no secrets were
 set, the GitHub App key was never on disk, and the queue sheet had no submission
 tab. This file tracks what is done and what is left. The full install procedure
-is in `automation/SETUP.md`; this is the current-state delta.
+is in `docs/setup/pillar-3a-runbook.md` (the Pillar 3a runbook); this is the
+current-state delta. `automation/SETUP.md` is the superseded Pillar 3 setup
+(Flask submission server + Cloudflare tunnel) and does not describe this flow.
 
 ## Deploy reality: no SFTP
 
@@ -20,31 +22,47 @@ file-explorer plugin (manual upload), not a server account. So:
   (`backend/scripts/process_submission.py` around line 947): the record is
   committed to `main` but not pushed to the live site.
 - Go-live stays manual: after a run commits, upload the changed `data/*.json`
-  (archive-core, archive-details, archive-data, archive-analytics — see
-  `DEPLOYMENT.md` "Deploy after adding records") through the WP file-explorer
-  plugin. The automation still does the slow part (scrape, categorize, regen);
-  only the upload is manual.
+  (archive-core, archive-details, archive-entities, archive-data,
+  archive-analytics — the five files `sftp_push.py` pushes; see `DEPLOYMENT.md`
+  "Deploy after adding records") through the WP file-explorer plugin. The
+  automation still does the slow part (scrape, categorize, regen); only the
+  upload is manual.
 
-### `archived` is not a resting state — the sweeper retries it
+### `archived` is not a resting state — the sweeper auto-promotes it to `live`
 
 `archived` is **not** terminal. `sweep-stuck-rows.yml` runs every 30 minutes and
 `backend/scripts/sweep_stuck.py` re-dispatches any `archived` row older than 24 h
-with a sentinel URL to force an SFTP retry (`_THRESHOLDS['archived'] = 24 * 60 * 60`).
-Its terminal set is `live | error | duplicate | no URL | invalid URL` only. With
-no SFTP the retry can never succeed, so an `archived` row would be re-fired every
-24 h forever — repeated Action runs and re-commits, one per stale row.
+with a sentinel URL (`https://example.com/sweep-noop-<ts>`) to force an SFTP retry
+(`_THRESHOLDS['archived'] = 24 * 60 * 60`); anything outside that thresholds dict
+is terminal.
 
+But the sentinel path in `process_submission.py` (`_is_sentinel`, ~line 542)
+short-circuits scrape/categorize/append, runs only the SFTP step, then checks
+**`push.get('ok')`**. With no SFTP, `push_to_production()` returns
+`{ok: true, skipped: true}`, so `ok` is truthy and the row is promoted
+`archived → live` ("Recovered via sweep retry", ~line 561). So an `archived` row
+is **auto-marked `live` after ~24 h without anything being deployed** — a false
+`live`, not an endless retry, and no re-commit (the sentinel path never appends).
+At most one extra Action run, then the row reads `live`.
+
+Note the asymmetry: a normal no-SFTP submission ends at `archived` (honest —
+committed, not uploaded; `process_submission.py` ~line 954), but the sweeper's
+sentinel retry of that same row marks it `live` (dishonest — still not uploaded).
 Setting `ROSEN_QUEUE_SHEET_ID` + `ROSEN_QUEUE_SHEET_TAB` makes the sweep cron
 functional, so pick a mitigation for the no-SFTP setup:
 
-- **Recommended: after the manual upload, set the row's column F to `live`** (a
-  terminal status). That records it as live and stops the sweeper re-firing it.
-- **Or leave the sweep cron disabled** until SFTP exists. Its only other job is
-  re-firing genuinely stuck `submitted` (>30 min) / `processing` (>1 h) rows, so
-  disabling it is safe while submissions are low-volume and watched.
+- **Recommended while there is no SFTP: leave the sweep cron disabled.** That keeps
+  `archived` meaning "committed, not yet uploaded." Its only other job is re-firing
+  genuinely stuck `submitted` (>30 min) / `processing` (>1 h) rows, so disabling it
+  is safe while submissions are low-volume and watched.
+- **Or, if the cron stays on, upload and set column F to `live` yourself within
+  24 h** of each commit. Setting `live` only after a real upload keeps the status
+  honest and pre-empts the sweeper; miss the window and the sweeper writes a false
+  `live` for you.
 
 A cleaner long-term fix (a code change, out of scope here) is to drop `archived`
-from `sweep_stuck.py`'s thresholds for a deployment that has no SFTP.
+from `sweep_stuck.py`'s thresholds, or make the sentinel path treat a `skipped`
+push as not-yet-live, for a deployment that has no SFTP.
 
 ## GitHub Actions repo secrets
 
@@ -73,7 +91,7 @@ Set on `jamditis/rosen-frontend` → Settings → Secrets and variables → Acti
   | A | submitted_at | Apps Script (timestamp on submit) |
   | B | url | you (paste) |
   | C | title | you (optional) |
-  | D | notes | you (optional; pasted body skips the scrape) |
+  | D | notes | you (optional public note); does not skip the scrape — `raw_text` (the paste-the-body fallback) is a separate `submit-record` Actions input (#353), not this column |
   | E | submit | you (tick the checkbox — this is the trigger) |
   | F | status | written back (submitted / archived / error / ...) |
   | G | record_id | written back (RECORD-NNNNN) |
@@ -95,7 +113,7 @@ Actions: write on rosen-frontend):
 
 ## Apps Script (in the queue sheet)
 
-Extensions → Apps Script. Per `automation/SETUP.md`:
+Extensions → Apps Script. Install the Pillar 3a Apps Script from `automation/apps-script/`:
 
 1. Replace `Code.gs` with `automation/apps-script/Code.gs`; replace
    `appsscript.json` with `automation/apps-script/appsscript.json`.
@@ -110,9 +128,15 @@ Extensions → Apps Script. Per `automation/SETUP.md`:
 - [ ] Set `ROSEN_GH_APP_ID` and `ROSEN_GH_APP_PRIVATE_KEY` Actions secrets.
 - [ ] Install `Code.gs` + `appsscript.json` and the 3 Script Properties in the sheet.
 - [ ] Run `setup` then `verifyAuth` in Apps Script.
-- [ ] Smoke test: paste an `example.com` URL in B of `submissions`, tick E, watch
-      F go to `submitted` then `archived`, confirm the record committed to `main`.
+- [ ] Smoke test per `docs/setup/pillar-3a-runbook.md` Block 3. Start safe: paste a
+      `.invalid` URL (e.g. `https://jay-rosen-test.invalid/smoke-1`) in B, tick E,
+      watch F go to `error` — `is_safe_public_url` rejects it before any fetch, so
+      there is no scrape and no commit. **Do not use an `example.com` URL**: it
+      resolves and serves real HTML, so a successful scrape would commit a bogus
+      record to `main` (only the `sweep-noop-` sentinel prefix is special-cased,
+      not bare `example.com`).
 - [ ] Upload the regenerated `data/*.json` via the WP file-explorer plugin to go live.
 - [ ] Set the row's column F to `live` after uploading so the 30-min sweeper does
-      not re-fire it (see "`archived` is not a resting state").
+      not auto-promote it to a false `live` first (see "`archived` is not a
+      resting state").
 - [ ] Decide whether to keep the `sweep-stuck-rows.yml` cron enabled before SFTP exists.
