@@ -1,9 +1,9 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { html } from '../html.js?v=3.4.2';
+import { html } from '../html.js?v=3.4.3';
 import { Users, Building2, Lightbulb, BookOpen, MapPin, Calendar, Search, ArrowUpDown, ChevronDown, ChevronRight, X, ExternalLink } from 'lucide-react';
-import { fetchEntitiesData, getRecordsByEntity, getEntityById } from '../services/archiveService.js?v=3.4.2';
-import { COLORS, ENTITY_TYPE_CONFIG } from '../constants.js?v=3.4.2';
+import { fetchEntitiesData, getRecordsByEntity, getEntityById } from '../services/archiveService.js?v=3.4.3';
+import { COLORS, ENTITY_TYPE_CONFIG } from '../constants.js?v=3.4.3';
 
 // Add icons to shared config
 const TYPE_ICONS = {

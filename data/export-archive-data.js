@@ -50,12 +50,25 @@ function cleanTags(str) {
 
 function formatDate(str) {
   if (!str) return '';
-  const d = new Date(str);
+  const s = String(str).trim();
+  // Use the calendar date exactly as written in the source (the leading
+  // YYYY-MM-DD). Going through `new Date(str).toISOString()` parses a
+  // space-separated timestamp as local time and re-emits it in UTC, so the
+  // displayed date silently shifts by a day depending on the runtime
+  // timezone (issue: TZ-dependent export). Reading the prefix is stable.
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+  // Fallback for any non-ISO format: normalise via UTC so it stays stable.
+  const d = new Date(s);
   return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
 }
 
 function getEra(dateStr) {
-  const y = new Date(dateStr).getFullYear();
+  // Derive the year from the string directly so it does not depend on the
+  // runtime timezone (new Date('YYYY-MM-DD').getFullYear() can roll to the
+  // previous year in negative-offset zones).
+  const ym = String(dateStr || '').match(/^(\d{4})/);
+  const y = ym ? Number(ym[1]) : NaN;
   if (!y || Number.isNaN(y)) return '';
   if (y < 2000) return 'Public Journalism (90s)';
   if (y < 2005) return 'Blogging Launch & Digital Disruption (2000-2004)';

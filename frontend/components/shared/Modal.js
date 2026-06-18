@@ -1,6 +1,6 @@
 // Modal.js - Universal modal component
 import { useEffect, useRef } from 'react';
-import { html } from '../../html.js?v=3.4.2';
+import { html } from '../../html.js?v=3.4.3';
 import { X } from 'lucide-react';
 
 /**

@@ -8,7 +8,7 @@
 // viewState.js too; what remains here is the imperative, window-bound
 // navigation helpers.
 
-import { ROUTES, DEFAULT_ROUTE } from './viewState.js?v=3.4.2';
+import { ROUTES, DEFAULT_ROUTE } from './viewState.js?v=3.4.3';
 
 export { ROUTES };
 
