@@ -1,5 +1,5 @@
-import { html } from '../html.js?v=3.4.1';
-import RecordModal from './RecordModal.js?v=3.4.1';
+import { html } from '../html.js?v=3.4.2';
+import RecordModal from './RecordModal.js?v=3.4.2';
 
 /**
  * Single owner for "render the selected record."
