@@ -5,9 +5,18 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records in the &quot;Journalism Education&quot; category</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 27 May 2026 23:34:39 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 18 Jun 2026 18:07:05 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-education.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen Internet Archive RSS Generator</generator>
+  <item>
+    <title>I have been there...</title>
+    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3mog5545nsk2d</link>
+    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3mog5545nsk2d</guid>
+    <pubDate>Tue, 16 Jun 2026 00:00:00 GMT</pubDate>
+    <description>A Bluesky post by Jay Rosen from 2026-06-16. Topics: Press &amp; Media Criticism, Journalism Education.</description>
+    <category>Press &amp; Media Criticism</category>
+    <category>Journalism Education</category>
+  </item>
   <item>
     <title>A new fellowship is all about putting the news in news creator</title>
     <link>https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/</link>
@@ -453,15 +462,6 @@
     <description>A Twitter/X post by Jay Rosen from 2024-11-05. Topics: Journalism Education, Audience &amp; Public Engagement.</description>
     <category>Journalism Education</category>
     <category>Audience &amp; Public Engagement</category>
-  </item>
-  <item>
-    <title>I have seen a lot of possible PhD topics float by since I joined this site in...</title>
-    <link>https://x.com/jayrosen_nyu/status/1851326459836522817</link>
-    <guid isPermaLink="true">https://x.com/jayrosen_nyu/status/1851326459836522817</guid>
-    <pubDate>Tue, 29 Oct 2024 00:00:00 GMT</pubDate>
-    <description>A Twitter/X post by Jay Rosen from 2024-10-29. Topics: Journalism Education, Journalism Theory &amp; Practice.</description>
-    <category>Journalism Education</category>
-    <category>Journalism Theory &amp; Practice</category>
   </item>
   </channel>
 </rss>

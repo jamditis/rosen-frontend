@@ -10589,3 +10589,23 @@ RECORD-00875_REL_023,RECORD-00875,P0117,Bill Clinton,Mentions,P2701,Atrios (Dunc
 RECORD-00875_REL_024,RECORD-00875,P0051,Jon Stewart,Criticizes,C0435,Sphere of Legitimate Debate,it gives the opening to Jon Stewart and his kind to exploit that gap I talked about between making news and making sense.,0.8,2026-05-27
 RECORD-00875_REL_025,RECORD-00875,C0651,Audience Atomization Overcome,Expands On,C0435,Sphere of Legitimate Debate,Which is how I got to my three word formlua for understanding the Internet's effects in politics and media: 'audience atomization overcome.',0.9,2026-05-27
 RECORD-00875_REL_026,RECORD-00875,C0108,Echo chamber,Criticizes,C0651,Audience Atomization Overcome,"Journalists call this the 'echo chamber,' which is their way of downgrading it as a reliable source.",0.9,2026-05-27
+RECORD-00902_REL_001,RECORD-00902,P0005,Jay Rosen,Discusses,C0663,Pro-democracy journalism,You have to learn how to become more pro-democracy.,1.0,2026-06-18
+RECORD-00902_REL_002,RECORD-00902,C0636,Not the odds but the stakes,Originated By,P0005,Jay Rosen,I decided to reduce my message to the American press down to ... 'Not the odds but the stakes.',1.0,2026-06-18
+RECORD-00902_REL_003,RECORD-00902,C1325,Enemies of the people,Originated By,P0073,Donald Trump,We have a government that describes journalists as 'enemies of the people.',0.9,2026-06-18
+RECORD-00902_REL_004,RECORD-00902,P0072,Jeff Bezos,Owns,O0023,The Washington Post,Jeff Bezos has been the Post owner since 2013.,1.0,2026-06-18
+RECORD-00902_REL_005,RECORD-00902,P0005,Jay Rosen,Criticizes,O0023,The Washington Post,"The Post has been neglected by its owner, and it's been misdirected by its leadership.",0.85,2026-06-18
+RECORD-00902_REL_006,RECORD-00902,P0005,Jay Rosen,Criticizes,P2702,Bari Weiss,She's there to change the ideology of CBS ... She's got a big job and a little resume.,0.9,2026-06-18
+RECORD-00902_REL_007,RECORD-00902,P2702,Bari Weiss,Affiliated With,O1399,CBS,Being the editor-in-chief of a network like CBS ... That kind of person is no longer in charge of CBS.,0.95,2026-06-18
+RECORD-00902_REL_008,RECORD-00902,P0005,Jay Rosen,Discusses,O1187,Corporation for Public Broadcasting,Congress decided to rescind $1.1 billion in funding to the Corporation for Public Broadcasting.,0.85,2026-06-18
+RECORD-00902_REL_009,RECORD-00902,P0005,Jay Rosen,Published In,O1759,Journal of Political Inquiry,Interview for NYU's Journal of Political Inquiry.,0.9,2026-06-18
+RECORD-00902_REL_010,RECORD-00902,P2703,Pau Torres Pages,Affiliated With,O1759,Journal of Political Inquiry,Interview conducted by Pau Torres Pages.,0.9,2026-06-18
+RECORD-00903_REL_001,RECORD-00903,P0005,Jay Rosen,Affiliated With,O0164,Membership Puzzle Project,"I directed The Membership Puzzle Project, which studied how membership works in the wild.",1.0,2026-06-18
+RECORD-00903_REL_002,RECORD-00903,O0073,Talking Points Memo,Founded By,P0008,Josh Marshall,Josh ... I have been reading and writing about his site since 2004.,0.85,2026-06-18
+RECORD-00903_REL_003,RECORD-00903,P0005,Jay Rosen,Supports,O0073,Talking Points Memo,"I would classify Talking Points Memo as a membership site, one of the best we have.",0.9,2026-06-18
+RECORD-00903_REL_004,RECORD-00903,P0005,Jay Rosen,Discusses,O1758,The Salt Lake Tribune,the Salt Lake Tribune made an announcement: 'We're removing the paywall. Here's how it will work...',0.9,2026-06-18
+RECORD-00903_REL_005,RECORD-00903,C1324,Journalism worth paying for,Originated By,O0002,The New York Times,"the New York Times, which organizes itself ... around 'journalism worth paying for.'",0.9,2026-06-18
+RECORD-00903_REL_006,RECORD-00903,P0005,Jay Rosen,Mentions,O1344,Wall Street Journal,"It works well for the Wall Street Journal, the Financial Times, the New York Times.",0.7,2026-06-18
+RECORD-00903_REL_007,RECORD-00903,P0005,Jay Rosen,Mentions,O1338,Financial Times,"It works well for the Wall Street Journal, the Financial Times, the New York Times.",0.7,2026-06-18
+RECORD-00902_REL_011,RECORD-00902,P0005,Jay Rosen,Discusses,C1325,Enemies of the people,We have a government that describes journalists as 'enemies of the people.',0.85,2026-06-18
+RECORD-00902_REL_012,RECORD-00902,O1759,Journal of Political Inquiry,Affiliated With,P2703,Pau Torres Pages,Interview conducted by Pau Torres Pages for the Journal of Political Inquiry.,0.9,2026-06-18
+RECORD-00903_REL_008,RECORD-00903,P0005,Jay Rosen,Discusses,C1324,Journalism worth paying for,"the New York Times, which organizes itself around 'journalism worth paying for.'",0.85,2026-06-18

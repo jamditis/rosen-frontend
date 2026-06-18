@@ -1,6 +1,6 @@
 // ToolsModal.js - Modal with icons for exploring dissertation tools
 import { useEffect, useRef, useCallback } from 'react';
-import { html } from '../html.js?v=3.4.1';
+import { html } from '../html.js?v=3.4.2';
 import { X, Map, BookOpen, HelpCircle, BarChart3, BookMarked } from 'lucide-react';
 
 // Tool definitions with categories

@@ -1,22 +1,22 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.4.1';
+import { html } from './html.js?v=3.4.2';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Github } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.4.1';
-import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.4.1';
-import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.4.1';
-import Sidebar from './components/Sidebar.js?v=3.4.1';
-import WelcomeModal from './components/WelcomeModal.js?v=3.4.1';
-import RecordView from './components/RecordView.js?v=3.4.1';
-import FeaturedSection from './components/FeaturedSection.js?v=3.4.1';
-import DissertationPage from './components/DissertationPage.js?v=3.4.1';
-import ToolsModal from './components/ToolsModal.js?v=3.4.1';
-import LoadingQuotes from './components/LoadingQuotes.js?v=3.4.1';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.4.1';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.4.1';
-import EntityBrowser from './components/EntityBrowser.js?v=3.4.1';
-import Timeline from './components/Timeline.js?v=3.4.1';
-import AboutPage from './components/AboutPage.js?v=3.4.1';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.4.2';
+import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.4.2';
+import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.4.2';
+import Sidebar from './components/Sidebar.js?v=3.4.2';
+import WelcomeModal from './components/WelcomeModal.js?v=3.4.2';
+import RecordView from './components/RecordView.js?v=3.4.2';
+import FeaturedSection from './components/FeaturedSection.js?v=3.4.2';
+import DissertationPage from './components/DissertationPage.js?v=3.4.2';
+import ToolsModal from './components/ToolsModal.js?v=3.4.2';
+import LoadingQuotes from './components/LoadingQuotes.js?v=3.4.2';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.4.2';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.4.2';
+import EntityBrowser from './components/EntityBrowser.js?v=3.4.2';
+import Timeline from './components/Timeline.js?v=3.4.2';
+import AboutPage from './components/AboutPage.js?v=3.4.2';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {

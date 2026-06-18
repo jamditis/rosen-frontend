@@ -1,6 +1,6 @@
-import { html } from '../html.js?v=3.4.1';
+import { html } from '../html.js?v=3.4.2';
 import { ExternalLink } from 'lucide-react';
-import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.4.1';
+import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.4.2';
 
 // Convert a bsky.app URL to the unauthenticated embed.bsky.app equivalent
 const toEmbedUrl = (url) => {
