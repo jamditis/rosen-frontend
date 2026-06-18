@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen Internet Archive</title>
-    <dateCreated>Wed, 27 May 2026 23:34:39 GMT</dateCreated>
-    <dateModified>Wed, 27 May 2026 23:34:39 GMT</dateModified>
+    <dateCreated>Thu, 18 Jun 2026 17:50:21 GMT</dateCreated>
+    <dateModified>Thu, 18 Jun 2026 17:50:21 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -297,6 +297,7 @@
         <outline text="Too Much Of Podcasting Is In New York" type="link" url="https://soundcloud.com/currentpubmedia/too-much-of-podcasting-is-in-new-york" created="2016-04-22"/>
       </outline>
       <outline text="Democracy in Crisis (20s)" type="category">
+        <outline text="For Jay Rosen, American Press Needs to Become More Pro-Democracy" type="link" url="https://jpinyu.com/2026/02/16/jay-rosen-american-press-become-more-pro-democracy/" created="2026-02-16"/>
         <outline text="Jay Rosen on the digital revolution that wasn&apos;t" type="link" url="https://www.cjr.org/kicker/jay-rosen-digital-revolution-that-wasnt.php" created="2025-12-29"/>
         <outline text="Public journalism redux: Post-academia, Jay Rosen returns to where he started" type="link" url="https://dankennedy.net/2025/10/16/public-journalism-redux-post-academia-jay-rosen-returns-to-where-he-started/" created="2025-10-16"/>
         <outline text="Q&amp;A with Jay Rosen: How Trump nullifies reality" type="link" url="https://www.stopthepresses.news/p/q-and-a-with-jay-rosen-how-trump" created="2025-08-11"/>
@@ -327,87 +328,110 @@
         <outline text="The plan is to have no plan" type="link" url="https://www.adbusters.org/article/the-plan-is-to-have-no-plan" created="2020-05-04"/>
       </outline>
       <outline text="Platform Transition &amp; Future Models (2021-Present)" type="category">
+        <outline text="It was a political hire, cont..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohf75js3k2j" created="2026-06-17"/>
+        <outline text="it&apos;s not a typo, it&apos;s supposed to be an abbreviated form of continued." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohfytcl5s22" created="2026-06-17"/>
+        <outline text="Kara Swisher: “I don’t want to work for the Ellisons, and I don’t want..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3moikloq4r22g" created="2026-06-17"/>
+        <outline text="Finally..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mog4ns5tvk22" created="2026-06-16"/>
+        <outline text="I have been there..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mog5545nsk2d" created="2026-06-16"/>
+        <outline text="Here&apos;s something I wrote about that..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mog65iasnk2h" created="2026-06-16"/>
+        <outline text="One thing to keep your eye on as Paramount takes control:  what happen..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3modgj3bfys2l" created="2026-06-15"/>
+        <outline text="The post says keep an eye on what happens to fact checking at CNN." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3modin76wac22" created="2026-06-15"/>
+        <outline text="Thanks, Craig." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3modpzbxhc222" created="2026-06-15"/>
+        <outline text="How does the app know that a news article maybe need a correction?" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mo53zqc3qk2j" created="2026-06-13"/>
+        <outline text="From @status.news Paramount boss David Ellison also recently took the..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mo3z6kxclk25" created="2026-06-12"/>
+        <outline text="Three of the most powerful words in journalism: 
+
+&quot;Help us investigate..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mo4wo77r722y" created="2026-06-12"/>
+        <outline text="As if there&apos;s only two possibilities..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnxxlkrcp22r" created="2026-06-11"/>
+        <outline text="It was a political hire, continued..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnzhtopyfk2y" created="2026-06-11"/>
+        <outline text="Of course it&apos;s unlikely..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnzjdikjd22b" created="2026-06-11"/>
+        <outline text="It was a political hire..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnwz3int5s2v" created="2026-06-10"/>
+        <outline text="It was a political hire, continued..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnxuigz7p223" created="2026-06-10"/>
+        <outline text="Thanks, Jen..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnvbll3awc2v" created="2026-06-09"/>
+        <outline text="Yes, it is..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnqesmg6ck2w" created="2026-06-08"/>
+        <outline text="Correct." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnqhernbkc25" created="2026-06-08"/>
+        <outline text="Columbia Journalism Review: Why —  exactly why — did 60 Minutes need t..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mns43eqdvc2f" created="2026-06-08"/>
+        <outline text="I  saw that." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mns5z3bknk22" created="2026-06-08"/>
+        <outline text="&quot;CBS News is on fire.&quot;
+
+Scott Pelley answers questions..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnplqvqnk22g" created="2026-06-07"/>
+        <outline text="If Scott Pelley keeps up with &quot;CBS News is on fire&quot; and new management..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnpv2dhp2c2z" created="2026-06-07"/>
+        <outline text="If you have a specific example I might be able to reply." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnpybctxpc2z" created="2026-06-07"/>
+        <outline text="If you follow the mess at CBS, don&apos;t dismiss the possibility that Elli..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnkilkth722l" created="2026-06-05"/>
+        <outline text="Shorthand for the 60 Minutes legacy of great journalism, tough questio..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnkk7ou5v226" created="2026-06-05"/>
+        <outline text="&quot;...Kenneth Weinstein who runs every story by the white house first.&quot;..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mngdegdaks2x" created="2026-06-04"/>
+        <outline text="But also predictable." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mngdh5lh5k2x" created="2026-06-04"/>
+        <outline text="If everything here is normal, then why is the boss
+an opinion writer w..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mni3doq4ec2m" created="2026-06-04"/>
+        <outline text="en.wikipedia.org/wiki/Public_..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnfdxeu7tk2i" created="2026-06-03"/>
+        <outline text="As I said, &quot;it was a political hire.&quot;
+
+We know that because Bari Weiss..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnfg2xw5hs2f" created="2026-06-03"/>
+        <outline text="It was a political hire..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnfik77yqk2x" created="2026-06-03"/>
+        <outline text="Not sure how the old guard would handle that." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnfld4zdks2n" created="2026-06-03"/>
+        <outline text="If that newsroom has a union contract, then it&apos;s possible..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnfo5wa34c2h" created="2026-06-03"/>
+        <outline text="Those pushing back at CBS News, or suppporting the staff, need  to beg..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mncwphofic2l" created="2026-06-02"/>
+        <outline text="She interviewed me for her book (on the record) and I did not get the..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mncxjy26y22j" created="2026-06-02"/>
+        <outline text="&quot;She was brought in to kill it—and she&apos;s doing exactly that.&quot;
+
+@status..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnawjgzxj22l" created="2026-06-01"/>
+        <outline text="www.status.news/p/scott-pell..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnb3zon7ns2n" created="2026-06-01"/>
+        <outline text="It was a political hire, part 12..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mn63dw5fsc2v" created="2026-05-31"/>
+        <outline text="Quick reminder:  
+
+When you see that extremely tired both-sides device..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mn65vpuioc2r" created="2026-05-31"/>
+        <outline text="Also of interest on this subject is Walter Lippmann in 1922, about whi..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mn6g62die22i" created="2026-05-31"/>
+        <outline text="&quot;A political hire.&quot;
+
+Bari Weiss had no experience when she was hired a..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmyvheftqk2d" created="2026-05-29"/>
+        <outline text="Wow..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmw74eltqs2f" created="2026-05-28"/>
+        <outline text="Some 200 current and former journalists, academics, documentary filmma..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmtutpxmak2r" created="2026-05-27"/>
+        <outline text="Thanks, Jim." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmtvjxpp7c2k" created="2026-05-27"/>
+        <outline text="Thank you, Mai." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmu5kstg7c23" created="2026-05-27"/>
+        <outline text="Here&apos;s the letter: &quot;We are current and former journalists, professors..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmu5wufgmc23" created="2026-05-27"/>
         <outline text="Imagine if journalism had a moment like that..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmmfzkhpoc2e" created="2026-05-24"/>
-        <outline text="From 2024:" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmkhncpdp22h" created="2026-05-24"/>
-        <outline text="Well, the new owners of CBS News say they consider her a &quot;generational&quot; talent..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmhhjee5xk27" created="2026-05-22"/>
-        <outline text="Nor is Austin itself..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmhe3netrk27" created="2026-05-22"/>
-        <outline text="Are you familiar with this article..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmhcclgn6c2u" created="2026-05-22"/>
-        <outline text="Good point..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmh7rlssss2x" created="2026-05-22"/>
-        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmg7v7qqx22l" created="2026-05-22"/>
-        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmg7izqzf22l" created="2026-05-22"/>
-        <outline text="Bari Weiss offered Anderson Cooper a bigger role at CBS News, but he chose to le..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmg6sq6p5c2l" created="2026-05-22"/>
-        <outline text="&quot;Our journalists believe it is better to be savvy than it is to be honest or cor..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmfwrvahwc2l" created="2026-05-22"/>
-        <outline text="Yes, that&apos;s well part..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmdidxd24k2t" created="2026-05-21"/>
-        <outline text="Yes, thank you, Sylvia..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmdfwyrfrk2j" created="2026-05-21"/>
-        <outline text="It was a political hire..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmdekrtafs2j" created="2026-05-21"/>
-        <outline text="It was a political hire..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mm7pr3p2oc2s" created="2026-05-19"/>
-        <outline text="I&apos;m sorry, I don&apos;t follow..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mm7maeu6es2s" created="2026-05-19"/>
-        <outline text="I call it a classic..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mm62vusgms23" created="2026-05-19"/>
-        <outline text="Did someone say these moves were cryptic..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mm3vlmurmc23" created="2026-05-18"/>
-        <outline text="It was a political hire..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mm3szbcghk2j" created="2026-05-18"/>
-        <outline text="Thanks, again..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mm2rcsfbmc2n" created="2026-05-17"/>
-        <outline text="Thanks, Gillian..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mm2ojmhtkc2n" created="2026-05-17"/>
-        <outline text="I don&apos;t know the answer to that..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mlyvvijbjs2o" created="2026-05-17"/>
-        <outline text="The media empire built by former Hungarian Prime Minister Viktor Orban&apos;s governm..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mlyvd56hws2o" created="2026-05-17"/>
-        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mlykfeaikk2g" created="2026-05-16"/>
-        <outline text="I&apos;ve been clearing my office at NYU for the last few weeks (at a slow pace) and..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mlyeb6up6223" created="2026-05-16"/>
-        <outline text="I had the same reaction when I read about it..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mlyblo5mt22z" created="2026-05-16"/>
-        <outline text="&quot;Across the media landscape, billionaire owners are plowing cash into low-wattag..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mlyaxdemgk2w" created="2026-05-16"/>
-        <outline text="Not &quot;a&quot; chart, dozens of them..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mlwi4fi2h22k" created="2026-05-16"/>
-        <outline text="Thank you..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mlw7hk4j3s2k" created="2026-05-16"/>
-        <outline text="With mid terms six months away, I&apos;m starting to think about what I can add to..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mlvpo2exxs2c" created="2026-05-15"/>
-        <outline text="The inclusion of donations from readers effectively transfers The Spokesman-Revi..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mltbwqxoqk2q" created="2026-05-14"/>
-        <outline text="When Bari Weiss came to CBS she had almost no experience in broadcast news..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mlqpjveskc2j" created="2026-05-13"/>
-        <outline text="Thanks, Phillpe..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mlqiyy4kh22n" created="2026-05-13"/>
-        <outline text="It was a political hire..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mlo67ikmn22t" created="2026-05-12"/>
-        <outline text="As you probably know, there&apos;s a lone Democrat on the FCC, Anna Gomez..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mlo2yll32k2z" created="2026-05-12"/>
-        <outline text="It&apos;s a key thing to understand: &quot;Trump has made it virtually impossible for Disn..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mlgptyu4gc2p" created="2026-05-09"/>
-        <outline text="If you&apos;re a NFL fan, I don&apos;t know how you get away from reading this..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mle2gr33dk2p" created="2026-05-08"/>
-        <outline text="It was a political hire..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mlclxkuj7s2o" created="2026-05-08"/>
-        <outline text="Reply by Jay Rosen" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3ml7na4viw22o" created="2026-05-07"/>
-        <outline text="I&apos;m reading — well, I&apos;m supposed to be clearing out my office, you know how that..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3ml7lyxjmrc2g" created="2026-05-07"/>
-        <outline text="I send my questions about that to" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p" created="2025-10-30"/>
-        <outline text="Many of you, I know, receive a lot of national news, but care a lot about local" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4ecwzqx322p" created="2025-10-30"/>
-        <outline text="Thanks, Casey" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e6y3jkhk2p" created="2025-10-29"/>
-        <outline text="I have a lurid fascination with interviews that become trainwrecks" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e3rgesbk24" created="2025-10-29"/>
-        <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/" created="2025-10-28"/>
-        <outline text="You will never catch me saying, &quot;it all started with Trump.&quot;" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zx27endk23" created="2025-10-25"/>
-        <outline text="It&apos;s just a re-description that allows us to see other aspects of The Problem" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zwt5x2es23" created="2025-10-25"/>
-        <outline text="Sarah Longwell" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zvjrplq22z" created="2025-10-25"/>
-        <outline text="Another way to say this" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3ztmvffm22z" created="2025-10-25"/>
-        <outline text="One U.S. journalist with a pedigree and tons of experience who can be counted..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3znyozkvs25" created="2025-10-25"/>
-        <outline text="Not exactly on point, but worth sending to you" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3yb45dou22d" created="2025-10-25"/>
+        <outline text="From 2024:" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmkhncpdp22h" created="2026-05-23"/>
       </outline>
     </outline>
     <outline text="By Category">
-      <outline text="Press &amp; Media Criticism (23434)" type="category">
-        <outline text="Jay Rosen on the digital revolution that wasn&apos;t" type="link" url="https://www.cjr.org/kicker/jay-rosen-digital-revolution-that-wasnt.php"/>
-        <outline text="I send my questions about that to" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p"/>
-        <outline text="Many of you, I know, receive a lot of national news, but care a lot about local" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4ecwzqx322p"/>
-        <outline text="Thanks, Casey" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e6y3jkhk2p"/>
-        <outline text="I have a lurid fascination with interviews that become trainwrecks" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e3rgesbk24"/>
-        <outline text="You will never catch me saying, &quot;it all started with Trump.&quot;" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zx27endk23"/>
-        <outline text="It&apos;s just a re-description that allows us to see other aspects of The Problem" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zwt5x2es23"/>
-        <outline text="Sarah Longwell" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zvjrplq22z"/>
-        <outline text="Another way to say this" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3ztmvffm22z"/>
-        <outline text="One U.S. journalist with a pedigree and tons of experience who can be counted..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3znyozkvs25"/>
-        <outline text="Not exactly on point, but worth sending to you" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3yb45dou22d"/>
-        <outline text="Sarah Longwell" type="link" url="https://x.com/jayrosen_nyu/status/1982135603136287148"/>
-        <outline text="You make good points" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xm3cs7kk2s"/>
-        <outline text="Good combination" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xi736ch22h"/>
-        <outline text="Or, how do we persuade content creators that there is power and satisfaction in..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xhrbm5fs2u"/>
-        <outline text="Indeed. www.nytimes.com/subscription..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xh7blxdc2u"/>
-        <outline text="Why are you seeing explosive growth, Alex?" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xh2dpcr22u"/>
-        <outline text="It&apos;s not just the newspapers" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xfl3lwbk2v"/>
-        <outline text="It&apos;s not just the newspapers" type="link" url="https://x.com/jayrosen_nyu/status/1981775674089386176"/>
-        <outline text="&quot;No idea either how to control the flow of information.&quot; That&apos;s it exactly" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3t3yzegtk2v"/>
-        <outline text="Thanks, Marcus" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3siutkwos2v"/>
-        <outline text="Got an example you want to share?" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3sfytnjh22v"/>
-        <outline text="&quot;There are positive developments in local news but they’re being swamped by the..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3s5wsddck2x"/>
-        <outline text="&quot;There are positive developments in local news but they’re being swamped by the..." type="link" url="https://x.com/jayrosen_nyu/status/1981021320079896971"/>
-        <outline text="&quot;If you had enough money to buy ads, you could reach the voters you wanted to..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3n33q3xbk2i"/>
+      <outline text="Press &amp; Media Criticism (23482)" type="category">
+        <outline text="It was a political hire, cont..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohf75js3k2j"/>
+        <outline text="it&apos;s not a typo, it&apos;s supposed to be an abbreviated form of continued." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohfytcl5s22"/>
+        <outline text="Kara Swisher: “I don’t want to work for the Ellisons, and I don’t want..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3moikloq4r22g"/>
+        <outline text="Finally..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mog4ns5tvk22"/>
+        <outline text="I have been there..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mog5545nsk2d"/>
+        <outline text="Here&apos;s something I wrote about that..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mog65iasnk2h"/>
+        <outline text="One thing to keep your eye on as Paramount takes control:  what happen..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3modgj3bfys2l"/>
+        <outline text="The post says keep an eye on what happens to fact checking at CNN." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3modin76wac22"/>
+        <outline text="Thanks, Craig." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3modpzbxhc222"/>
+        <outline text="How does the app know that a news article maybe need a correction?" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mo53zqc3qk2j"/>
+        <outline text="From @status.news Paramount boss David Ellison also recently took the..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mo3z6kxclk25"/>
+        <outline text="Three of the most powerful words in journalism: 
+
+&quot;Help us investigate..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mo4wo77r722y"/>
+        <outline text="As if there&apos;s only two possibilities..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnxxlkrcp22r"/>
+        <outline text="It was a political hire, continued..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnzhtopyfk2y"/>
+        <outline text="Of course it&apos;s unlikely..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnzjdikjd22b"/>
+        <outline text="It was a political hire..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnwz3int5s2v"/>
+        <outline text="It was a political hire, continued..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnxuigz7p223"/>
+        <outline text="Thanks, Jen..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnvbll3awc2v"/>
+        <outline text="Yes, it is..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnqesmg6ck2w"/>
+        <outline text="Correct." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnqhernbkc25"/>
+        <outline text="Columbia Journalism Review: Why —  exactly why — did 60 Minutes need t..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mns43eqdvc2f"/>
+        <outline text="I  saw that." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mns5z3bknk22"/>
+        <outline text="&quot;CBS News is on fire.&quot;
+
+Scott Pelley answers questions..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnplqvqnk22g"/>
+        <outline text="If Scott Pelley keeps up with &quot;CBS News is on fire&quot; and new management..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnpv2dhp2c2z"/>
+        <outline text="If you have a specific example I might be able to reply." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnpybctxpc2z"/>
       </outline>
-      <outline text="Journalism Theory &amp; Practice (8340)" type="category">
+      <outline text="Journalism Theory &amp; Practice (8346)" type="category">
+        <outline text="Finally..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mog4ns5tvk22"/>
+        <outline text="One thing to keep your eye on as Paramount takes control:  what happen..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3modgj3bfys2l"/>
+        <outline text="The post says keep an eye on what happens to fact checking at CNN." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3modin76wac22"/>
+        <outline text="Yes, it is..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnqesmg6ck2w"/>
+        <outline text="Subscribers buy a product. Members join the cause." type="link" url="https://pressthink.org/2026/04/subscribers-buy-a-product-members-join-the-cause/"/>
+        <outline text="For Jay Rosen, American Press Needs to Become More Pro-Democracy" type="link" url="https://jpinyu.com/2026/02/16/jay-rosen-american-press-become-more-pro-democracy/"/>
         <outline text="I send my questions about that to" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p"/>
         <outline text="I have a lurid fascination with interviews that become trainwrecks" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e3rgesbk24"/>
         <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/"/>
@@ -419,22 +443,40 @@
         <outline text="Thanks, Marcus" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3siutkwos2v"/>
         <outline text="Columbia Journalism Review has a new editor-in-chief, Betsy Morais" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3igwrxmks23"/>
         <outline text="How do you figure?" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3i5elvxic2b"/>
+        <outline text="Columbia Journalism Review has a new editor-in-chief, Betsy Morais" type="link" url="https://x.com/jayrosen_nyu/status/1979620139093115071"/>
         <outline text="That&apos;s a when answer to a where question" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3ggaui4xs2h"/>
         <outline text="I&apos;m curious: Where did you get the idea that free meals and free flights was..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3gek6c3mc2k"/>
-        <outline text="Columbia Journalism Review has a new editor-in-chief, Betsy Morais" type="link" url="https://x.com/jayrosen_nyu/status/1979620139093115071"/>
         <outline text="Kinda handy when these people sign the papers and identify themselves, don&apos;t..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3fkot3kac2k"/>
         <outline text="Public journalism redux: Post-academia, Jay Rosen returns to where he started" type="link" url="https://dankennedy.net/2025/10/16/public-journalism-redux-post-academia-jay-rosen-returns-to-where-he-started/"/>
         <outline text="This is a very good paragraph" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3bm3dbqps2n"/>
         <outline text="I agree with that" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3aq4v2qes25"/>
         <outline text="Fair question" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3apoxbkzk25"/>
-        <outline text="&quot;Just becoming partisan is not a long-term strategy" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3aodqqwtc25"/>
-        <outline text="&quot;One of the most striking examples of news media solidarity we&apos;ve seen this..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3alfgyhgc23"/>
-        <outline text="Ask He wrote the post" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m36wsxwvus2h"/>
-        <outline text="&quot;People often ask me what journalism I trust" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m36vxdyewk2q"/>
-        <outline text="&quot;Why I&apos;m handing in my Pentagon press pass&quot; by Tom Bowman of NPR" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m35ykm4hp22j"/>
-        <outline text="The basic reason is the Pentagon reporters want information" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m35vkye2gk2j"/>
       </outline>
-      <outline text="Politics &amp; Democracy (7669)" type="category">
+      <outline text="Politics &amp; Democracy (7687)" type="category">
+        <outline text="It was a political hire, cont..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohf75js3k2j"/>
+        <outline text="Finally..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mog4ns5tvk22"/>
+        <outline text="From @status.news Paramount boss David Ellison also recently took the..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mo3z6kxclk25"/>
+        <outline text="As if there&apos;s only two possibilities..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnxxlkrcp22r"/>
+        <outline text="It was a political hire, continued..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnzhtopyfk2y"/>
+        <outline text="It was a political hire..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnwz3int5s2v"/>
+        <outline text="It was a political hire, continued..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnxuigz7p223"/>
+        <outline text="Columbia Journalism Review: Why —  exactly why — did 60 Minutes need t..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mns43eqdvc2f"/>
+        <outline text="&quot;CBS News is on fire.&quot;
+
+Scott Pelley answers questions..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnplqvqnk22g"/>
+        <outline text="If you follow the mess at CBS, don&apos;t dismiss the possibility that Elli..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnkilkth722l"/>
+        <outline text="As I said, &quot;it was a political hire.&quot;
+
+We know that because Bari Weiss..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnfg2xw5hs2f"/>
+        <outline text="It was a political hire..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnfik77yqk2x"/>
+        <outline text="Those pushing back at CBS News, or suppporting the staff, need  to beg..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mncwphofic2l"/>
+        <outline text="She interviewed me for her book (on the record) and I did not get the..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mncxjy26y22j"/>
+        <outline text="It was a political hire, part 12..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mn63dw5fsc2v"/>
+        <outline text="&quot;A political hire.&quot;
+
+Bari Weiss had no experience when she was hired a..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmyvheftqk2d"/>
+        <outline text="Here&apos;s the letter: &quot;We are current and former journalists, professors..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmu5wufgmc23"/>
+        <outline text="For Jay Rosen, American Press Needs to Become More Pro-Democracy" type="link" url="https://jpinyu.com/2026/02/16/jay-rosen-american-press-become-more-pro-democracy/"/>
         <outline text="&quot;There are positive developments in local news but they’re being swamped by the..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3s5wsddck2x"/>
         <outline text="&quot;There are positive developments in local news but they’re being swamped by the..." type="link" url="https://x.com/jayrosen_nyu/status/1981021320079896971"/>
         <outline text="&quot;If you had enough money to buy ads, you could reach the voters you wanted to..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3n33q3xbk2i"/>
@@ -442,26 +484,11 @@
         <outline text="The New York Times published the new rules imposed on journalists by The..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3fm2epscs26"/>
         <outline text="After initially appearing to come out against the rules, Donald Trump seemed to..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3bk7tcxik2u"/>
         <outline text="First, I am happy to share a similar ranking from those with a different POV—..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m375ykxdoc2h"/>
-        <outline text="&quot;People often ask me what journalism I trust" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m36qy2sr4k2h"/>
-        <outline text="&quot;Journalists have until Tuesday at 5 p.m" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m34nq6fuf226"/>
-        <outline text="Okay, thanks" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2zxjnnpm22i"/>
-        <outline text="Thanks, Jamie" type="link" url="https://x.com/jayrosen_nyu/status/1977082925209342351"/>
-        <outline text="Not a vacuous talking head, true" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2tuucwzpk2b"/>
-        <outline text="What reason would that be?" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2scs43lcs2y"/>
-        <outline text="Any ol&apos; kind of proaganda will do, then?" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2sadau5bk2i"/>
-        <outline text="Thank you for being hopeful" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2psfdh4x22t"/>
-        <outline text="One of the first tests of mettle for Bari Weiss as Editor-in-Chief will be the..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2n4umspb22m"/>
-        <outline text="Have you have been following the Defense Department&apos;s attempt to prevent..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2n25egjsc2m"/>
-        <outline text="Linked to this yesterday, but I am re-upping today because this is the best..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2cekri4c22r"/>
-        <outline text="2/2 If you can deal with its monotony you may find in Mr" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2cjoon5ck2t"/>
-        <outline text="Especially Fox" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2auohw35k2i"/>
-        <outline text="If you are following the story of The Pentagon&apos;s new policy" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m26gr3pe722z"/>
-        <outline text="&quot;If we want different results, we have to abandon standard practice.&quot; YES" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2a2qig6ds2b"/>
-        <outline text="I get why you were concerned by that quote, but I don&apos;t believe it&apos;s a &quot;check..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m26j26guhc2b"/>
-        <outline text="Thanks, Adam" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m26hqasqdc2b"/>
-        <outline text="Here&apos;s a key point about the Pentagon&apos;s new policy for handing the press: check..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m22rw2vlak2w"/>
       </outline>
-      <outline text="Audience &amp; Public Engagement (3741)" type="category">
+      <outline text="Audience &amp; Public Engagement (3744)" type="category">
+        <outline text="en.wikipedia.org/wiki/Public_..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnfdxeu7tk2i"/>
+        <outline text="Wow..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmw74eltqs2f"/>
+        <outline text="Subscribers buy a product. Members join the cause." type="link" url="https://pressthink.org/2026/04/subscribers-buy-a-product-members-join-the-cause/"/>
         <outline text="Many of you, I know, receive a lot of national news, but care a lot about local" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4ecwzqx322p"/>
         <outline text="Thanks, Casey" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e6y3jkhk2p"/>
         <outline text="You make good points" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3xm3cs7kk2s"/>
@@ -484,11 +511,18 @@
         <outline text="Thanks, Zack" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2wzdqghik2c"/>
         <outline text="Thanks, Lora" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2wyfzxrxk2c"/>
         <outline text="Ahead of where we are at the moment, but, yes, that solution comes up lot in..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2wyegf7m22c"/>
-        <outline text="Did you miss it this week?" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2wso76r7k2i"/>
-        <outline text="Miss it this week?" type="link" url="https://x.com/jayrosen_nyu/status/1977079042567442658"/>
-        <outline text="Thank you!" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2phhcovqs2t"/>
       </outline>
-      <outline text="Technology &amp; Digital Media (2840)" type="category">
+      <outline text="Technology &amp; Digital Media (2850)" type="category">
+        <outline text="It was a political hire, cont..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohf75js3k2j"/>
+        <outline text="One thing to keep your eye on as Paramount takes control:  what happen..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3modgj3bfys2l"/>
+        <outline text="How does the app know that a news article maybe need a correction?" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mo53zqc3qk2j"/>
+        <outline text="From @status.news Paramount boss David Ellison also recently took the..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mo3z6kxclk25"/>
+        <outline text="It was a political hire, continued..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnzhtopyfk2y"/>
+        <outline text="It was a political hire, continued..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnxuigz7p223"/>
+        <outline text="If you follow the mess at CBS, don&apos;t dismiss the possibility that Elli..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnkilkth722l"/>
+        <outline text="It was a political hire, part 12..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mn63dw5fsc2v"/>
+        <outline text="Some 200 current and former journalists, academics, documentary filmma..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmtutpxmak2r"/>
+        <outline text="Here&apos;s the letter: &quot;We are current and former journalists, professors..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmu5wufgmc23"/>
         <outline text="Jay Rosen on the digital revolution that wasn&apos;t" type="link" url="https://www.cjr.org/kicker/jay-rosen-digital-revolution-that-wasnt.php"/>
         <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/"/>
         <outline text="Sarah Longwell" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3zvjrplq22z"/>
@@ -504,18 +538,9 @@
         <outline text="Public journalism redux: Post-academia, Jay Rosen returns to where he started" type="link" url="https://dankennedy.net/2025/10/16/public-journalism-redux-post-academia-jay-rosen-returns-to-where-he-started/"/>
         <outline text="Something went awry here: The darkness is your that your story will twisted..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3aq26rnv225"/>
         <outline text="Thanks, Nils" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m33i2mjmgk23"/>
-        <outline text="Sorry, I did not understand that one" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2zwhglync2i"/>
-        <outline text="Did you miss it this week?" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2wso76r7k2i"/>
-        <outline text="Miss it this week?" type="link" url="https://x.com/jayrosen_nyu/status/1977079042567442658"/>
-        <outline text="I don&apos;t get where the cash is coming from" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2sav5fcmk2i"/>
-        <outline text="Huge profit? How does that happen? I don&apos;t see it" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2sajzk2222i"/>
-        <outline text="From a new post of mind, explaining the role I am taking in News Creator Corps" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2rfv26rmc2t"/>
-        <outline text="From a new post of mind, explaining the role I am taking in News Creator Corps" type="link" url="https://x.com/jayrosen_nyu/status/1976300493132423189"/>
-        <outline text="News Consumers are Content Creators in an AI-Driven World" type="link" url="https://newscreatorcorps.org/2025/10/news-consumers-content-creators/"/>
-        <outline text="Please understand the point Dylan Byers made here" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2f4fa6e7s2n"/>
-        <outline text="It&apos;s in the body of the first post" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2chjow4a22t"/>
       </outline>
-      <outline text="Journalism Education (676)" type="category">
+      <outline text="Journalism Education (677)" type="category">
+        <outline text="I have been there..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mog5545nsk2d"/>
         <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/"/>
         <outline text="Thanks to Dan Kennedy for this post about my next gig after retiring from NYU&apos;s..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3d2t6wu4k26"/>
         <outline text="From a new post of mind, explaining the role I am taking in News Creator Corps" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2rfv26rmc2t"/>
@@ -540,7 +565,6 @@
         <outline text="Thank you, Murasaki" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lrlatbodsc2j"/>
         <outline text="Thanks, Ryan" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lrizoqu2gs27"/>
         <outline text="To my academic friends" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lrixnfu7q22m"/>
-        <outline text="Wow. So many things I left out. That&apos;s one of them. For a couple years I was..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lrix52tx6k2m"/>
       </outline>
     </outline>
     <outline text="RSS Feeds" type="include">
