@@ -1,5 +1,6 @@
 import { html } from '../html.js?v=3.4.3';
 import RecordModal from './RecordModal.js?v=3.4.3';
+import { deriveNavFlags } from '../utils/modalNav.js?v=3.4.3';
 
 /**
  * Single owner for "render the selected record."
@@ -27,7 +28,7 @@ export default function RecordView({
   onFilterSearch,
 }) {
   const record = records.find(r => r.id === selectedRecordId) || null;
-  const index = filteredRecords.findIndex(r => r.id === selectedRecordId);
+  const { index, total, hasPrev, hasNext } = deriveNavFlags(filteredRecords, selectedRecordId);
   // isOpen tracks the selected id, not !!record. A deep link to an id with no
   // matching record (?record=BADID) still counts as "open" — RecordModal then
   // returns null because record is null (RecordModal.js: `if (!isOpen ||
@@ -47,10 +48,10 @@ export default function RecordView({
       onSelectRecord=${onSelectRecord}
       onFilterCategory=${onFilterCategory}
       onFilterSearch=${onFilterSearch}
-      hasPrev=${index > 0}
-      hasNext=${index < filteredRecords.length - 1}
+      hasPrev=${hasPrev}
+      hasNext=${hasNext}
       currentIndex=${index}
-      total=${filteredRecords.length}
+      total=${total}
     />
   `;
 }
