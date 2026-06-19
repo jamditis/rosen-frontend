@@ -1,6 +1,9 @@
 name: Backend Tests
 
 on:
+  # Manual trigger so a runner pass can be observed before this gates real PRs
+  # again (it was disabled_manually after the Dec 2025 failures — #444).
+  workflow_dispatch:
   push:
     branches: [ main ]
     paths:
