@@ -6,6 +6,7 @@ import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from '.
 import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.4.3';
 import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.4.3';
 import { openBugReport } from './utils/bugReport.js?v=3.4.3';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.4.3';
 import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.4.3';
 import Sidebar from './components/Sidebar.js?v=3.4.3';
 import WelcomeModal from './components/WelcomeModal.js?v=3.4.3';
@@ -95,11 +96,7 @@ const App = () => {
   // Update URL when record selected (without changing route)
   useEffect(() => {
     const url = new URL(window.location.href);
-    if (selectedRecordId) {
-      url.searchParams.set('record', selectedRecordId);
-    } else {
-      url.searchParams.delete('record');
-    }
+    setRecordParam(url.searchParams, selectedRecordId);
     try {
       window.history.replaceState({}, '', url);
     } catch(e) { console.warn("History update blocked"); }

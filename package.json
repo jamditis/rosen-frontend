@@ -9,7 +9,7 @@
     "test:data": "node --test tests/data-integrity.test.js tests/csv-quality.test.js tests/feed-title.test.js",
     "test:data:extraction-coverage": "node --test tests/extraction-coverage.test.js",
     "test:pipeline": "node --test tests/data-pipeline.test.js tests/thread-detection.test.js tests/process-record.test.js tests/thread-algorithm.test.js",
-    "test:frontend": "node --test tests/version-consistency.test.js tests/frontend-structure.test.js tests/archive-analytics.test.js",
+    "test:frontend": "node --test tests/version-consistency.test.js tests/frontend-structure.test.js tests/archive-analytics.test.js tests/record-deeplink.test.js tests/record-deeplink-behaviour.test.js",
     "export-data": "node data/export-archive-data.js",
     "build-embeddings": "node data/lib/embeddings-builder.js",
     "preview": "node scripts/preview-server.js",
