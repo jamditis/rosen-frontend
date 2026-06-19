@@ -4,8 +4,21 @@ Test Smart Data Corrector Multimedia Processors
 Focus on SoundCloud, YouTube, C-SPAN, and Twitter URLs
 """
 
+import shutil
 import sys
 from pathlib import Path
+
+import pytest
+
+# Integration diagnostic: builds AudioOptimizer (which shells out to ffmpeg) and
+# hits live YouTube. Skip cleanly in any environment without the ffmpeg binary on
+# PATH, e.g. the CI runner — matching how the sibling smart_corrector integration
+# tests skip when their credentials are absent (see #444 / #184).
+if shutil.which("ffmpeg") is None:
+    pytest.skip(
+        "ffmpeg binary absent; multimedia diagnostic requires it for audio optimization (see #444)",
+        allow_module_level=True,
+    )
 
 # Add project root to path
 project_root = Path(__file__).resolve().parent.parent  # Go to backend root
