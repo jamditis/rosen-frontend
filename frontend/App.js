@@ -6,6 +6,7 @@ import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from '.
 import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.4.3';
 import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.4.3';
 import { openBugReport } from './utils/bugReport.js?v=3.4.3';
+import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.4.3';
 import Sidebar from './components/Sidebar.js?v=3.4.3';
 import WelcomeModal from './components/WelcomeModal.js?v=3.4.3';
 import RecordView from './components/RecordView.js?v=3.4.3';
@@ -164,15 +165,15 @@ const App = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Precompute a normalized search blob per record once per data load (#456),
+  // so the per-keystroke filter normalizes only the term and runs one
+  // includes() per record instead of re-normalizing every field every keystroke.
+  const searchIndex = useMemo(() => records.map(buildSearchText), [records]);
+
   const filteredRecords = useMemo(() => {
-    const term = filters.search.toLowerCase();
-    let res = records.filter(r => {
-      const summary = r.summaryPreview || r.summary || '';
-      const matchesSearch = !term ||
-        r.title.toLowerCase().includes(term) ||
-        summary.toLowerCase().includes(term) ||
-        (r.categories || []).some(c => c.toLowerCase().includes(term));
-      if (!matchesSearch) return false;
+    const term = normalizeForSearch(filters.search);
+    let res = records.filter((r, i) => {
+      if (term && !searchIndex[i].includes(term)) return false;
 
       if (filters.categories.length > 0) {
         const hasAll = filters.categories.every(cat => r.categories.includes(cat));
@@ -207,7 +208,7 @@ const App = () => {
     });
 
     return res;
-  }, [records, filters, sortBy]);
+  }, [records, searchIndex, filters, sortBy]);
 
   useEffect(() => {
     setCurrentPage(1);
