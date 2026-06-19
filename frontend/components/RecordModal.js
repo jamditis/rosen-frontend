@@ -6,6 +6,7 @@ import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEnti
 import { ThreadModal } from './ThreadModal.js?v=3.4.3';
 import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.4.3';
 import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.4.3';
+import { recordNeedsReview } from '../utils/needsReview.js?v=3.4.3';
 
 const linkifyText = (text) => {
   const parts = splitUrlsForLinkify(text);
@@ -224,6 +225,19 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
           <div className="overflow-y-auto p-6 sm:p-10 font-body leading-relaxed space-y-8">
             <div>
                 <h2 className="text-3xl sm:text-4xl font-display font-bold text-stone-900 mb-2 leading-tight">${displayRecord.title}</h2>
+
+                <!-- Read needsReview from the core record, not displayRecord:
+                     details merge ({...record, ...details}) lets a stale
+                     details.needsReview overwrite a freshly flagged core record. -->
+                ${recordNeedsReview(record) && html`
+                  <span
+                    className="inline-block px-2 py-0.5 mb-3 rounded text-xs font-body"
+                    style=${{ backgroundColor: '#fffbeb', color: '#b45309' }}
+                    title="Auto-submitted; pending a human review pass"
+                  >
+                    needs review
+                  </span>
+                `}
 
                 <div className="text-lg text-stone-600 mb-4 font-display">
                     By ${displayRecord.author || 'Jay Rosen'}

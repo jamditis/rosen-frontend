@@ -7,6 +7,7 @@ import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.4.3';
 import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.4.3';
 import { openBugReport } from './utils/bugReport.js?v=3.4.3';
 import { setRecordParam } from './utils/recordDeepLink.js?v=3.4.3';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.4.3';
 import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.4.3';
 import Sidebar from './components/Sidebar.js?v=3.4.3';
 import WelcomeModal from './components/WelcomeModal.js?v=3.4.3';
@@ -599,6 +600,15 @@ const App = () => {
                                                 ${c}
                                             </span>
                                         `)}
+                                        ${recordNeedsReview(item) && html`
+                                            <span
+                                                className="text-[10px] uppercase font-bold px-2 py-1 rounded tracking-wide"
+                                                style=${{ backgroundColor: '#fffbeb', color: '#b45309' }}
+                                                title="Auto-submitted; pending a human review pass"
+                                            >
+                                                needs review
+                                            </span>
+                                        `}
                                     </div>
                                 </div>
                             </div>
