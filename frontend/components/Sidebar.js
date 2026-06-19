@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { html } from '../html.js?v=3.4.3';
 import { X, Search, XCircle, ChevronDown, ChevronUp, MessageSquare } from 'lucide-react';
+import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.4.3';
 
 const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, autocompleteIndex }) => {
   const [suggestions, setSuggestions] = useState([]);
@@ -14,8 +15,9 @@ const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, a
     setFilters(prev => ({ ...prev, search: val }));
 
     if (val.length > 1) {
+      const normVal = normalizeForSearch(val);
       const matched = autocompleteIndex
-        .filter(term => term.toLowerCase().includes(val.toLowerCase()))
+        .filter(term => normalizeForSearch(term).includes(normVal))
         .slice(0, 8);
       setSuggestions(matched);
       setShowSuggestions(true);
