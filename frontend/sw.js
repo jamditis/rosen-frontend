@@ -2,10 +2,12 @@
  * Jay Rosen Internet Archive - Service Worker
  *
  * Caching strategy:
+ * - HTML / navigations: Network-first, cache as offline fallback. The page must
+ *   be fetched fresh after a deploy so its ?v= import strings update (#274).
  * - Data files (JSON): Stale-while-revalidate (show cached, update in background)
- * - Static assets (JS, CSS): Cache-first (fast loads)
- * - External resources: Network-first with cache fallback
- * - Large files (>5MB): Only use Cache API, never localStorage
+ * - Static assets (JS, CSS, icons, images): Cache-first (fast loads); freshness
+ *   across deploys comes from CACHE_VERSION dropping the cache, not the query.
+ * - Everything else same-origin: Network-first with cache fallback.
  */
 
 // Cache version is tied to the app version in version.json. Bumping it on every
@@ -14,7 +16,6 @@
 const CACHE_VERSION = '3.4.3';
 const CACHE_NAME = `jrda-cache-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `jrda-data-${CACHE_VERSION}`;
-const MAX_CACHE_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 // Detect deploy surface. Keep in sync with frontend/utils/pathResolver.js —
 // sw.js is registered as a classic worker (see index.html), so it cannot
@@ -87,13 +88,21 @@ const STATIC_ASSETS = IS_LOCAL ? [
   `${BASE_PATH}/frontend/services/sqliteService.js`
 ];
 
-// Data files to cache with stale-while-revalidate
+// Archive data files the worker serves with stale-while-revalidate. The
+// combined ~28 MB archive-data.json fallback is intentionally absent (it is
+// only fetched if the split files fail and must not be pre-warmed). The
+// analytics entry is also part of the #338 lazy-load contract.
 const DATA_URLS = [
   `${DATA_PATH}/archive-core.json`,
   `${DATA_PATH}/archive-details.json`,
   `${DATA_PATH}/archive-entities.json`,
   `${DATA_PATH}/archive-analytics.json`
 ];
+
+// On install we warm only the core file the app loads on every visit (~1.1 MB
+// brotli). The rest of DATA_URLS stays on-demand, cached lazily by SWR on first
+// fetch. Deriving from DATA_URLS keeps the install set in sync with the manifest.
+const INSTALL_PRECACHE_DATA = DATA_URLS.filter(url => url.endsWith('/archive-core.json'));
 
 console.log('[SW] Environment:',
   IS_LOCAL ? 'local development'
@@ -104,21 +113,28 @@ console.log('[SW] Environment:',
 self.addEventListener('install', event => {
   console.log('[SW] Installing service worker...');
 
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('[SW] Pre-caching static assets');
-        return Promise.allSettled(
-          STATIC_ASSETS.map(url =>
-            cache.add(url).catch(err => console.warn('[SW] Failed to cache:', url, err))
-          )
-        );
-      })
-      .then(() => {
-        console.log('[SW] Install complete');
-        return self.skipWaiting();
-      })
-  );
+  event.waitUntil((async () => {
+    const staticCache = await caches.open(CACHE_NAME);
+    console.log('[SW] Pre-caching app shell');
+    await Promise.allSettled(
+      STATIC_ASSETS.map(url =>
+        staticCache.add(url).catch(err => console.warn('[SW] Failed to cache:', url, err))
+      )
+    );
+
+    // Warm the core data file so a return visit renders without a network
+    // round-trip. Tolerant by design: a data fetch failure (offline, quota)
+    // must never block the worker from installing.
+    const dataCache = await caches.open(DATA_CACHE_NAME);
+    await Promise.allSettled(
+      INSTALL_PRECACHE_DATA.map(url =>
+        dataCache.add(url).catch(err => console.warn('[SW] Failed to pre-cache data:', url, err))
+      )
+    );
+
+    console.log('[SW] Install complete');
+    await self.skipWaiting();
+  })());
 });
 
 // Activate event - clean up old caches aggressively
@@ -159,6 +175,14 @@ self.addEventListener('fetch', event => {
     return;
   }
 
+  // Serve HTML and navigations network-first so a deploy's new index.html (and
+  // its updated ?v= imports) reaches returning visitors immediately, with the
+  // cached page only as an offline fallback (#274).
+  if (isHtmlRequest(event.request, url.pathname)) {
+    event.respondWith(networkFirst(event.request, CACHE_NAME));
+    return;
+  }
+
   // Handle static assets with cache-first
   if (isStaticAsset(url.pathname)) {
     event.respondWith(cacheFirst(event.request, CACHE_NAME));
@@ -178,11 +202,17 @@ function isDataFile(pathname) {
   return IS_LOCAL ? pathname.startsWith('/data/') : pathname.includes(BASE_PATH);
 }
 
-// Check if URL is a static asset
+// Check if a request is for HTML: a real navigation, or any .html path. HTML is
+// served network-first (see fetch handler) so a deploy is never served stale.
+function isHtmlRequest(request, pathname) {
+  return request.mode === 'navigate' || pathname.endsWith('.html');
+}
+
+// Check if URL is a static asset. '.html' is deliberately excluded -- HTML is
+// handled by isHtmlRequest/networkFirst, not cache-first.
 function isStaticAsset(pathname) {
   const isAssetType = pathname.endsWith('.js') ||
     pathname.endsWith('.css') ||
-    pathname.endsWith('.html') ||
     pathname.endsWith('.ico') ||
     pathname.endsWith('.png') ||
     pathname.endsWith('.jpg') ||
@@ -197,9 +227,24 @@ function isStaticAsset(pathname) {
 }
 
 /**
- * Stale-while-revalidate strategy
- * Returns cached response immediately, then updates cache in background.
- * Size-aware: checks Content-Length before caching large files.
+ * Wrap cache.put so a failed write (most often a quota error on the large data
+ * cache) is logged and swallowed rather than thrown into an unhandled rejection.
+ * Returns whether the write succeeded (#274).
+ */
+async function safePut(cache, request, response) {
+  try {
+    await cache.put(request, response);
+    return true;
+  } catch (err) {
+    console.warn('[SW] cache.put failed:', request.url, err);
+    return false;
+  }
+}
+
+/**
+ * Stale-while-revalidate strategy.
+ * Returns the cached response immediately when present, and refreshes the cache
+ * from the network in the background. Failed puts are swallowed by safePut.
  */
 async function staleWhileRevalidate(request, cacheName) {
   const cache = await caches.open(cacheName);
@@ -208,7 +253,9 @@ async function staleWhileRevalidate(request, cacheName) {
   const fetchPromise = fetch(request)
     .then(response => {
       if (response.ok) {
-        cache.put(request, response.clone());
+        // Fire-and-forget: safePut self-catches, so the background refresh
+        // never blocks the returned response nor throws an unhandled rejection.
+        safePut(cache, request, response.clone());
       }
       return response;
     })
@@ -247,7 +294,9 @@ async function cacheFirst(request, cacheName) {
   try {
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
-      cache.put(request, networkResponse.clone());
+      // Fire-and-forget so the cache write stays off the response path; safePut
+      // self-catches, so it cannot block the response or reject unhandled.
+      safePut(cache, request, networkResponse.clone());
     }
     return networkResponse;
   } catch (err) {
@@ -268,7 +317,9 @@ async function networkFirst(request, cacheName) {
   try {
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
-      cache.put(request, networkResponse.clone());
+      // Fire-and-forget so the cache write stays off the response path; safePut
+      // self-catches, so it cannot block the response or reject unhandled.
+      safePut(cache, request, networkResponse.clone());
     }
     return networkResponse;
   } catch (err) {
