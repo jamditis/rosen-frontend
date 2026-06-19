@@ -48,7 +48,7 @@ const AboutPage = ({ onBack, records }) => {
             <h1 className="text-4xl font-display font-bold text-stone-900">About this archive</h1>
           </div>
           <p className="text-lg text-stone-600 leading-relaxed font-body">
-            The Jay Rosen Internet Archive is a curated public collection of the works, critiques, and teachings of Jay Rosen, professor of journalism at New York University. It preserves four decades of writing about journalism, democracy, and public life.
+            Jay Rosen's Internet Archive is a curated public collection of the works, critiques, and teachings of Jay Rosen, professor of journalism at New York University. It preserves four decades of writing about journalism, democracy, and public life.
           </p>
         </div>
 

@@ -1,11 +1,13 @@
 /**
  * Regression guard for the locked archive name in RSS/OPML feeds (#346).
  *
- * Jay locked the public name as "Jay Rosen Internet Archive" (not "Digital
- * Archive") on 2026-01-31 ("subtle differences between 'digital' and 'internet'
- * ... a bit more musical"), re-confirmed 2026-06-08. The feed generators and
- * their committed artifacts had drifted back to "Digital Archive". This pins
- * the feed title to the locked name so a future edit can't silently regress it.
+ * Jay locked the public name as "Jay Rosen's Internet Archive" — possessive,
+ * and "Internet" not "Digital". History: "Internet" (not "Digital") was locked
+ * 2026-01-31 ("subtle differences between 'digital' and 'internet' ... a bit
+ * more musical"); the possessive form was added on the 2026-06-19 launch-prep
+ * call ("You want it to be Possessive ... right?" / "I do"). This pins the feed
+ * title to the locked name so a future edit can't silently regress it. Committed
+ * feed artifacts pick up the new name on the next data export.
  */
 
 import { describe, it } from 'node:test';
@@ -16,8 +18,14 @@ import { dirname, join } from 'node:path';
 import { generateRSS, generateAllFeeds } from '../data/lib/rss-generator.js';
 import { generateSubscriptionOPML } from '../data/lib/opml-generator.js';
 
-const LOCKED_NAME = 'Jay Rosen Internet Archive';
+const LOCKED_NAME = "Jay Rosen's Internet Archive";
+// RSS channel titles run through escapeXml, which turns ' into &apos;. The
+// generator tag and OPML title are literal. So the locked name appears in both
+// forms across the feeds; accept either.
+const LOCKED_NAME_XML = 'Jay Rosen&apos;s Internet Archive';
 const STALE_NAME = 'Jay Rosen Digital Archive';
+
+const hasLockedName = (s) => s.includes(LOCKED_NAME) || s.includes(LOCKED_NAME_XML);
 
 const here = dirname(fileURLToPath(import.meta.url));
 const feedsDir = join(here, '..', 'data', 'feeds');
@@ -40,7 +48,7 @@ describe('feed title uses the locked archive name (#346)', () => {
       feedUrl: 'https://example.com/data/feeds/rss.xml',
       records: SAMPLE_RECORDS,
     });
-    assert.match(xml, /<title>Jay Rosen Internet Archive<\/title>/);
+    assert.match(xml, /<title>Jay Rosen&apos;s Internet Archive<\/title>/);
     assert.doesNotMatch(xml, /Digital Archive/);
   });
 
@@ -49,14 +57,14 @@ describe('feed title uses the locked archive name (#346)', () => {
     assert.ok(Object.keys(feeds).length > 0, 'expected at least one feed');
     for (const [name, xml] of Object.entries(feeds)) {
       assert.doesNotMatch(xml, /Digital Archive/, `${name} still contains "Digital Archive"`);
-      assert.match(xml, /Jay Rosen Internet Archive/, `${name} missing the locked name`);
+      assert.ok(hasLockedName(xml), `${name} missing the locked name`);
     }
   });
 
   it('subscription OPML uses the locked name', () => {
     const opml = generateSubscriptionOPML('https://example.com', { 'rss.xml': '' });
     assert.doesNotMatch(opml, /Digital Archive/);
-    assert.match(opml, /Jay Rosen Internet Archive/);
+    assert.ok(hasLockedName(opml), 'OPML missing the locked name');
   });
 
   it('committed feed artifacts contain no "Digital Archive"', () => {

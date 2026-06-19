@@ -137,7 +137,7 @@ export function generateSubscriptionOPML(baseUrl, feeds) {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <opml version="2.0">
   <head>
-    <title>Jay Rosen Internet Archive - RSS Subscriptions</title>
+    <title>Jay Rosen's Internet Archive - RSS Subscriptions</title>
     <dateCreated>${dateCreated}</dateCreated>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
