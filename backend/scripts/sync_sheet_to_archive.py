@@ -235,7 +235,15 @@ def load_csv(csv_path: pathlib.Path) -> Tuple[List[str], List[Dict[str, Any]]]:
 
 def write_csv_atomic(csv_path: pathlib.Path, fieldnames: List[str],
                      rows: List[Dict[str, Any]]) -> None:
-    """Write rows to a sibling tmp then ``os.replace`` -- atomic for readers."""
+    """Write rows to a sibling tmp then ``os.replace`` -- atomic for readers.
+
+    Every cell is formula-injection-sanitized on the way out, not just the cells
+    a sync overwrote: this rewrites the whole file, so a pre-existing trigger cell
+    (e.g. a summary that begins with ``=`` or ``@``) would otherwise be committed
+    raw (#336). The escape is idempotent -- an already-escaped value passes through
+    -- and the site reverses it at export (#335). Rows are copied, so the caller's
+    dicts are not mutated.
+    """
     csv_path.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp_path = tempfile.mkstemp(prefix=".csv_tmp.", dir=str(csv_path.parent))
     os.close(fd)
@@ -243,7 +251,9 @@ def write_csv_atomic(csv_path: pathlib.Path, fieldnames: List[str],
         with open(tmp_path, "w", encoding="utf-8", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
             writer.writeheader()
-            writer.writerows(rows)
+            writer.writerows(
+                {k: sanitize_csv_value(v) for k, v in row.items()} for row in rows
+            )
         os.replace(tmp_path, str(csv_path))
     except Exception:
         if os.path.exists(tmp_path):
