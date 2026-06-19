@@ -28,7 +28,7 @@ const WorkInProgressBanner = () => {
           <${Sparkles} className="w-5 h-5 text-sky-600 flex-shrink-0" />
           <div className="flex-grow">
             <p className="text-sm text-sky-800 font-medium">
-              The Jay Rosen Internet Archive is now publicly available.
+              Jay Rosen's Internet Archive is now publicly available.
             </p>
             <p className="text-xs text-sky-700 mt-0.5">
               25,000+ records spanning four decades of journalism criticism, media theory, and public life.

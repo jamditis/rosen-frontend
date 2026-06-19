@@ -25,7 +25,7 @@ const WelcomeModal = () => {
         <div className="mb-6">
           <${Archive} className="w-12 h-12 mx-auto text-stone-800" />
         </div>
-        <h2 className="text-3xl font-display text-stone-900 mb-4">Jay Rosen Internet Archive</h2>
+        <h2 className="text-3xl font-display text-stone-900 mb-4">Jay Rosen's Internet Archive</h2>
         <p className="text-stone-600 mb-6 leading-relaxed font-body">
           A curated public collection of the works, critiques, and teachings of Jay Rosen, professor of journalism at New York University.
         </p>

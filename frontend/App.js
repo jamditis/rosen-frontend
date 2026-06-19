@@ -359,7 +359,7 @@ const App = () => {
                     <${Newspaper} className="w-5 h-5" />
                 </div>
                 <h1 className="text-lg md:text-xl font-display font-bold text-stone-900 tracking-tight hidden sm:block">
-                    Jay Rosen Internet Archive
+                    Jay Rosen's Internet Archive
                 </h1>
                 <h1 className="text-lg font-display font-bold text-stone-900 sm:hidden">JRIA</h1>
             </button>
@@ -683,7 +683,7 @@ const App = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-sm text-stone-600">
             <div>
-              <h4 className="font-display font-bold text-stone-900 mb-2">Jay Rosen Internet Archive</h4>
+              <h4 className="font-display font-bold text-stone-900 mb-2">Jay Rosen's Internet Archive</h4>
               <p className="text-xs leading-relaxed">
                 A curated public collection of the works, critiques, and teachings of Jay Rosen, professor of journalism at New York University.
               </p>

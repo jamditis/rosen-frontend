@@ -770,7 +770,7 @@ async function main() {
   console.log('\n📋 Generating OPML files...');
 
   const archiveOpml = generateOPML({
-    title: 'Jay Rosen Internet Archive',
+    title: 'Jay Rosen\'s Internet Archive',
     ownerName: 'Joe Amditis',
     records: allRecords,
     facets: output.facets,
