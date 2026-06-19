@@ -9,6 +9,7 @@
 // navigation helpers.
 
 import { ROUTES, DEFAULT_ROUTE } from './viewState.js?v=3.4.3';
+import { parseRecordId, setRecordParam } from '../utils/recordDeepLink.js?v=3.4.3';
 
 export { ROUTES };
 
@@ -33,11 +34,7 @@ export function navigateTo(route, recordId) {
   // Clean up legacy query params
   url.searchParams.delete('view');
 
-  if (recordId) {
-    url.searchParams.set('record', recordId);
-  } else {
-    url.searchParams.delete('record');
-  }
+  setRecordParam(url.searchParams, recordId);
 
   url.hash = route === DEFAULT_ROUTE ? '' : route;
   window.history.pushState({}, '', url);
@@ -48,8 +45,7 @@ export function navigateTo(route, recordId) {
  * Read ?record= from the current URL.
  */
 export function getRecordIdFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get('record') || null;
+  return parseRecordId(window.location.search);
 }
 
 /**
