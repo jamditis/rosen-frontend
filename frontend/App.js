@@ -1,10 +1,11 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { html } from './html.js?v=3.4.3';
-import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Github } from 'lucide-react';
+import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github } from 'lucide-react';
 import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.4.3';
 import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.4.3';
 import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.4.3';
+import { openBugReport } from './utils/bugReport.js?v=3.4.3';
 import Sidebar from './components/Sidebar.js?v=3.4.3';
 import WelcomeModal from './components/WelcomeModal.js?v=3.4.3';
 import RecordView from './components/RecordView.js?v=3.4.3';
@@ -390,6 +391,15 @@ const App = () => {
                 >
                     <${Info} className="w-4 h-4" />
                     <span>About</span>
+                </button>
+                <button
+                  onClick=${openBugReport}
+                  className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-md transition-colors flex items-center gap-1 text-xs"
+                  aria-label="Report a bug"
+                  title="Report a bug"
+                >
+                    <${Bug} className="w-4 h-4" />
+                    <span className="hidden md:inline">Report a bug</span>
                 </button>
                 <a href="https://github.com/jamditis" target="_blank" rel="noreferrer" className="text-stone-500 hover:text-stone-900 transition-colors text-xs hidden md:inline-block">
                     Curated by Joe Amditis
