@@ -150,9 +150,16 @@ describe('service worker safePut (#274)', () => {
   });
 });
 
-describe('service worker dead-declaration cleanup (#274)', () => {
-  it('removes the unused DATA_URLS array', () => {
-    assert.doesNotMatch(SW_SRC, /const\s+DATA_URLS\b/);
+describe('service worker structure (#274)', () => {
+  it('keeps DATA_URLS as the SWR data manifest, including analytics (#338 contract)', () => {
+    // DATA_URLS stays -- it is the stale-while-revalidate manifest and the #338
+    // analytics lazy-load test asserts archive-analytics.json appears in sw.js.
+    assert.match(SW_SRC, /const\s+DATA_URLS\b/);
+    assert.match(SW_SRC, /archive-analytics\.json/);
+  });
+
+  it('derives the install precache as a bounded subset of DATA_URLS', () => {
+    assert.match(SW_SRC, /INSTALL_PRECACHE_DATA\s*=\s*DATA_URLS\.filter/);
   });
 
   it('routes HTML/navigation requests to networkFirst in the fetch handler', () => {

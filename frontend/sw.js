@@ -88,12 +88,21 @@ const STATIC_ASSETS = IS_LOCAL ? [
   `${BASE_PATH}/frontend/services/sqliteService.js`
 ];
 
-// Data files to warm on install. Bounded to the core file the app loads on
-// every visit (~1.1 MB brotli); details, entities, and analytics stay
-// on-demand and are cached lazily by stale-while-revalidate when first fetched.
-const PRECACHE_DATA_URLS = [
-  `${DATA_PATH}/archive-core.json`
+// Archive data files the worker serves with stale-while-revalidate. The
+// combined ~28 MB archive-data.json fallback is intentionally absent (it is
+// only fetched if the split files fail and must not be pre-warmed). The
+// analytics entry is also part of the #338 lazy-load contract.
+const DATA_URLS = [
+  `${DATA_PATH}/archive-core.json`,
+  `${DATA_PATH}/archive-details.json`,
+  `${DATA_PATH}/archive-entities.json`,
+  `${DATA_PATH}/archive-analytics.json`
 ];
+
+// On install we warm only the core file the app loads on every visit (~1.1 MB
+// brotli). The rest of DATA_URLS stays on-demand, cached lazily by SWR on first
+// fetch. Deriving from DATA_URLS keeps the install set in sync with the manifest.
+const INSTALL_PRECACHE_DATA = DATA_URLS.filter(url => url.endsWith('/archive-core.json'));
 
 console.log('[SW] Environment:',
   IS_LOCAL ? 'local development'
@@ -118,7 +127,7 @@ self.addEventListener('install', event => {
     // must never block the worker from installing.
     const dataCache = await caches.open(DATA_CACHE_NAME);
     await Promise.allSettled(
-      PRECACHE_DATA_URLS.map(url =>
+      INSTALL_PRECACHE_DATA.map(url =>
         dataCache.add(url).catch(err => console.warn('[SW] Failed to pre-cache data:', url, err))
       )
     );
