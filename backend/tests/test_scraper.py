@@ -222,6 +222,71 @@ class TestRequestsRedirectSafety:
             f"{validated_ip} — the DNS-rebind pin did not hold")
         assert seen['ip'] != rebind_ip
 
+    def test_repins_per_hop_across_redirect_not_stale_from_hop1(self, monkeypatch):
+        """Across a redirect, hop 2 dials hop 2's own validated IP, never a
+        private address a rebind hands back or a stale hop-1 pin (#439).
+
+        _requests_get_safe re-validates and re-pins every hop, so hop 2 must pin
+        example.org to example.org's validated IP -- not carry hop 1's pin
+        forward, and not fall through to the live resolver. Here hop 1
+        (example.com) validates to one public IP and 302-redirects to a second
+        public host (example.org) that validates to a different public IP, while
+        the live resolver has rebound every name to a private address at connect
+        time. The single-hop pin is covered by
+        test_pins_validated_ip_against_dns_rebind; this locks in that the re-pin
+        is correct on the second hop too (follow-up to #332).
+        """
+        hop1_ip = '93.184.216.34'   # example.com, validated public
+        hop2_ip = '93.184.216.35'   # example.org, validated public (distinct)
+        rebind_ip = '10.0.0.5'      # private; what the live resolver now returns
+
+        # Validation time: each host passes the guard with its own public IP.
+        validated = {'example.com': [hop1_ip], 'example.org': [hop2_ip]}
+        monkeypatch.setattr(
+            scraper, 'resolve_and_validate',
+            lambda url: (True, '', validated[urlparse(url).hostname]))
+
+        # Connect time: the live resolver rebinds every host to a private IP.
+        # pinned_resolution captures this as each hop's fallback resolver, so a
+        # stale or dropped pin on hop 2 would resolve example.org here instead.
+        def _rebind(node, port, *args, **kwargs):
+            return [(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP,
+                     '', (rebind_ip, port or 0))]
+        monkeypatch.setattr(socket, 'getaddrinfo', _rebind)
+
+        # Record the address each hop would dial, read where urllib3 would read
+        # it -- inside that hop's pin. Hop 1 redirects to the second public host.
+        seen = []
+
+        def fake_get(url, *args, **kwargs):
+            host = urlparse(url).hostname
+            seen.append((host, socket.getaddrinfo(host, 443)[0][4][0]))
+            resp = Mock()
+            if host == 'example.com':
+                resp.is_redirect = True
+                resp.is_permanent_redirect = False
+                resp.headers = {'Location': 'https://example.org/final'}
+            else:
+                resp.is_redirect = False
+                resp.is_permanent_redirect = False
+                resp.headers = {'content-type': 'text/html'}
+            return resp
+        monkeypatch.setattr(scraper.requests, 'get', fake_get)
+
+        result = scraper._requests_get_safe(
+            'https://example.com/start', headers={}, timeout=5)
+
+        assert result.is_redirect is False
+        assert len(seen) == 2, f"expected two hops, saw {seen}"
+        (host1, dialed1), (host2, dialed2) = seen
+        assert (host1, dialed1) == ('example.com', hop1_ip)
+        assert host2 == 'example.org'
+        assert dialed2 == hop2_ip, (
+            f"hop 2 dialed {dialed2}, expected hop 2's validated {hop2_ip} -- "
+            f"the per-hop pin was stale or dropped")
+        assert dialed2 != rebind_ip   # never the rebound private address
+        assert dialed2 != hop1_ip     # not hop 1's stale pin
+
 
 class TestRenderedContentHeuristic:
     """The JS-detection heuristic in _looks_like_rendered_content (issue #159).
