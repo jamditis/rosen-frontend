@@ -1,0 +1,58 @@
+name: Bug report
+description: Report a problem with the Jay Rosen Internet Archive
+title: "[bug] "
+labels: ["bug", "user-report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve the archive. Tell us what went wrong below.
+
+        The page, archive version, and browser fields are filled in automatically when you use the "Report a bug" button on the site, so you can leave those as they are.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What went wrong, and what were you doing when it happened?
+      placeholder: I opened a record and the page went blank.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+      placeholder: The record details should have opened.
+    validations:
+      required: false
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: If you can, list the steps that trigger the problem.
+      placeholder: |
+        1. Go to ...
+        2. Click ...
+        3. See ...
+    validations:
+      required: false
+  - type: input
+    id: page-context
+    attributes:
+      label: Page
+      description: The page you were on (filled in automatically).
+    validations:
+      required: false
+  - type: input
+    id: archive-version
+    attributes:
+      label: Archive version
+      description: Filled in automatically.
+    validations:
+      required: false
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      description: Filled in automatically.
+    validations:
+      required: false
