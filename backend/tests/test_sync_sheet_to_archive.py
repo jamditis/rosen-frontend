@@ -36,6 +36,9 @@ def _load_module():
 
 sync = _load_module()
 
+# Share the canonical trigger set with the code under test so the two cannot drift.
+from rosen_scraper.csv_safety import CSV_INJECTION_PREFIXES  # noqa: E402
+
 
 # ---------- sheet_rows_by_id ------------------------------------------------
 
@@ -173,6 +176,58 @@ def test_write_csv_atomic_preserves_header(tmp_path):
         assert reader.fieldnames == fieldnames
         out = list(reader)
     assert out[0]["raw_text"] == "body"
+
+
+# ---------- write boundary sanitizes every cell (#336) ----------------------
+
+
+def test_write_csv_atomic_sanitizes_every_cell_not_just_overwritten(tmp_path):
+    """The whole file is rewritten here, so a pre-existing formula-trigger cell
+    must be escaped on the way out even when this run never touched it (#336).
+
+    This is the gap behind the committed TUMBLR-00011/00022/00073 summaries: the
+    per-field sanitization only covers overwritten cells, but write_csv_atomic
+    commits every cell, so the boundary itself must normalize the whole file.
+    """
+    csv_path = tmp_path / "archive_records-public.csv"
+    fieldnames = ["id", "summary"]
+    rows = [
+        {"id": "TUMBLR-1", "summary": "= reads as a formula"},
+        {"id": "TUMBLR-2", "summary": "@mention leads the cell"},
+        {"id": "TUMBLR-3", "summary": "-1 leads the cell"},
+        {"id": "TUMBLR-4", "summary": "ordinary text"},
+    ]
+    sync.write_csv_atomic(csv_path, fieldnames, rows)
+    by_id = {r["id"]: r for r in sync.load_csv(csv_path)[1]}
+    assert by_id["TUMBLR-1"]["summary"] == "'= reads as a formula"
+    assert by_id["TUMBLR-2"]["summary"] == "'@mention leads the cell"
+    assert by_id["TUMBLR-3"]["summary"] == "'-1 leads the cell"
+    assert by_id["TUMBLR-4"]["summary"] == "ordinary text"
+    # The issue's acceptance: no committed cell starts with a bare trigger.
+    for row in sync.load_csv(csv_path)[1]:
+        for value in row.values():
+            assert not (value and value[0] in CSV_INJECTION_PREFIXES)
+
+
+def test_write_csv_atomic_escape_is_idempotent(tmp_path):
+    """A rewrite of an already-escaped file does not double-escape, so repeated
+    syncs converge instead of stacking apostrophes."""
+    csv_path = tmp_path / "archive_records-public.csv"
+    fieldnames = ["id", "summary"]
+    sync.write_csv_atomic(csv_path, fieldnames, [{"id": "X", "summary": "= once"}])
+    once = sync.load_csv(csv_path)[1]
+    sync.write_csv_atomic(csv_path, fieldnames, once)
+    twice = sync.load_csv(csv_path)[1]
+    assert twice[0]["summary"] == "'= once"  # single apostrophe, not "''= once"
+
+
+def test_write_csv_atomic_does_not_mutate_caller_rows(tmp_path):
+    """Sanitization writes a safe copy; the caller's in-memory rows stay raw, so
+    callers that reuse the rows after writing are not surprised."""
+    csv_path = tmp_path / "archive_records-public.csv"
+    rows = [{"id": "X", "summary": "= still raw in memory"}]
+    sync.write_csv_atomic(csv_path, ["id", "summary"], rows)
+    assert rows[0]["summary"] == "= still raw in memory"
 
 
 # ---------- run() dry-run ---------------------------------------------------
