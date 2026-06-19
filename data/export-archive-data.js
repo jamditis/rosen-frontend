@@ -17,6 +17,7 @@ import { generateAllFeeds } from './lib/rss-generator.js';
 import { generateOPML, generateSubscriptionOPML } from './lib/opml-generator.js';
 import { computeAnalytics } from './compute-analytics.js';
 import { ERAS } from './eras.js';
+import { unescapeRow } from './lib/csv-unescape.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -220,10 +221,13 @@ async function main() {
   const relationshipsCsv = fs.readFileSync(relationshipsPath, 'utf-8');
   const entitiesCsv = fs.readFileSync(entitiesPath, 'utf-8');
 
-  const archiveRecordsData = parse(archiveRecordsCsv, { columns: true, skip_empty_lines: true });
-  const socialPostsData = parse(socialPostsCsv, { columns: true, skip_empty_lines: true });
-  const relationshipsData = parse(relationshipsCsv, { columns: true, skip_empty_lines: true });
-  const entitiesData = parse(entitiesCsv, { columns: true, skip_empty_lines: true });
+  // Unescape the canonical formula-escaping at the read boundary (#335) so a
+  // value stored as '@handle / '=... renders as its original text on the site.
+  // Done once here, before any field mapping, so every consumer sees raw values.
+  const archiveRecordsData = parse(archiveRecordsCsv, { columns: true, skip_empty_lines: true }).map(unescapeRow);
+  const socialPostsData = parse(socialPostsCsv, { columns: true, skip_empty_lines: true }).map(unescapeRow);
+  const relationshipsData = parse(relationshipsCsv, { columns: true, skip_empty_lines: true }).map(unescapeRow);
+  const entitiesData = parse(entitiesCsv, { columns: true, skip_empty_lines: true }).map(unescapeRow);
 
   console.log(`  - Archive records: ${archiveRecordsData.length} rows`);
   console.log(`  - Social posts: ${socialPostsData.length} rows`);
