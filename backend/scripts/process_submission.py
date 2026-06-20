@@ -555,25 +555,28 @@ def process_one(url: str, title: str = '', notes: str = '',
             except Exception as exc:  # noqa: BLE001
                 logger.warning(f'Sentinel regen failed (continuing): {exc}')
         push = sftp_push.push_to_production()
-        if push.get('ok'):
-            # Promote the originally-archived row to 'live' so the sweeper's
-            # `archived > 24hr` query stops re-firing it. Without this the
-            # row stays archived forever and every cron tick re-dispatches.
-            _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
-                            status='live',
-                            error='Recovered via sweep retry')
-            result.update({'status': 'noop', 'exit_code': 0,
-                           'error': 'sentinel sweep no-op; SFTP retry ok'})
-        elif push.get('skipped'):
-            # SFTP isn't configured on this runner, so this sweep -- and every
-            # one after it -- can never make the row live. Promote it to the
-            # terminal 'committed' status so the sweeper stops re-firing the
+        if push.get('skipped'):
+            # A skipped push returns ok=True (a successful no-op), so it must be
+            # matched before the ok branch below or it would fall through to
+            # 'live'. SFTP isn't configured on this runner, so this sweep -- and
+            # every one after it -- can never make the row live. Promote it to
+            # the terminal 'committed' status so the sweeper stops re-firing the
             # sentinel every 24h forever (#414).
             _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
                             status='committed',
                             error='Live push not configured on this runner')
             result.update({'status': 'noop', 'exit_code': 0,
                            'error': 'sentinel sweep no-op; SFTP not configured'})
+        elif push.get('ok'):
+            # Genuine upload succeeded. Promote the originally-archived row to
+            # 'live' so the sweeper's `archived > 24hr` query stops re-firing
+            # it. Without this the row stays archived forever and every cron
+            # tick re-dispatches.
+            _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
+                            status='live',
+                            error='Recovered via sweep retry')
+            result.update({'status': 'noop', 'exit_code': 0,
+                           'error': 'sentinel sweep no-op; SFTP retry ok'})
         else:
             # Genuine push failure: leave the row at 'archived'; the next sweep
             # tick will retry.

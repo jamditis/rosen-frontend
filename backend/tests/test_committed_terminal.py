@@ -63,3 +63,22 @@ def test_skip_path_writes_committed_error_path_keeps_archived():
     # A genuine push failure still writes/keeps archived so it is retried.
     assert "status='archived'" in src
     assert "'status': 'archived'" in src
+
+
+def test_sentinel_branches_on_skipped_before_ok():
+    """The sentinel-sweep path must match a skipped push before the ok branch.
+
+    ``push_to_production()`` returns ``ok=True, skipped=True`` for a successful
+    no-op (SFTP not configured). If the sentinel block checks ``ok`` first, the
+    skipped case writes ``live`` -- marking the row published without an upload,
+    the same #414 bug class as the direct path. The sentinel block is the first
+    ``push_to_production()`` call site; verified structurally because importing
+    process_submission loads gspread / Playwright.
+    """
+    src = (_BACKEND / "scripts" / "process_submission.py").read_text(encoding="utf-8")
+    first = src.index("push_to_production()")
+    block = src[first:first + 1500]
+    skipped_at = block.find("push.get('skipped')")
+    ok_at = block.find("push.get('ok')")
+    assert skipped_at != -1 and ok_at != -1, "sentinel block branches missing"
+    assert skipped_at < ok_at, "sentinel path must branch on skipped before ok (#414)"
