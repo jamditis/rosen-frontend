@@ -35,7 +35,11 @@ genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
 class PublicationDateBackfiller:
     def __init__(self):
-        self.gc = gspread.service_account(filename='google_credentials.json')
+        # Anchor credentials to backend/ so the script runs from any cwd; an
+        # absolute GOOGLE_APPLICATION_CREDENTIALS overrides (pathlib resets to it).
+        credentials_filename = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+        credentials_path = Path(__file__).resolve().parents[2] / credentials_filename
+        self.gc = gspread.service_account(filename=str(credentials_path))
         self.sh = self.gc.open(os.environ.get('SPREADSHEET_NAME', 'Rosen Archive URL List'))
         self.final_ws = self.sh.worksheet('final')
         self.model = genai.GenerativeModel('gemini-1.5-flash')

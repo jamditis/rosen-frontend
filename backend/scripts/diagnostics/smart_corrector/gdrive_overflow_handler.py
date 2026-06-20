@@ -6,6 +6,7 @@ Handles transcripts/text that exceed Google Sheets 50K char limit
 
 import os
 from datetime import datetime
+from pathlib import Path
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
@@ -29,10 +30,13 @@ class GDriveOverflowHandler:
         """
         self.folder_id = folder_id or os.getenv('GDRIVE_FOLDER_ID')
 
-        # Initialize Google Drive API
-        creds_path = 'google_credentials.json'
+        # Initialize Google Drive API. Anchor credentials to backend/ so the
+        # script runs from any cwd; an absolute GOOGLE_APPLICATION_CREDENTIALS
+        # overrides (pathlib resets to it).
+        credentials_filename = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+        creds_path = Path(__file__).resolve().parents[3] / credentials_filename
         scopes = ['https://www.googleapis.com/auth/drive']
-        creds = Credentials.from_service_account_file(creds_path, scopes=scopes)
+        creds = Credentials.from_service_account_file(str(creds_path), scopes=scopes)
         self.drive_service = build('drive', 'v3', credentials=creds)
 
     def handle_large_text(self, text: str, record_id: str, content_type: str = 'transcript') -> dict:
