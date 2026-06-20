@@ -84,7 +84,7 @@ export const FEATURED_WORKS = [
     id: 'feat-4',
     title: 'The Church of the Savvy',
     description: 'A critique of political journalism that focuses on strategy, optics, and "who\'s winning" rather than the substance of policy.',
-    image: 'https://effectivechurch.com/wp-content/uploads/2014/12/ChurchSmall.jpg',
+    image: 'https://images.unsplash.com/photo-1438032005730-c779502df39b?auto=format&fit=crop&q=80&w=800',
     link: 'https://pressthink.org/2010/06/clowns-to-the-left-of-me-jokers-to-the-right-on-the-actual-ideology-of-the-american-press/',
     type: 'Key Concept'
   },
