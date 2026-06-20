@@ -30,7 +30,9 @@ Behavior (12-step pipeline from the design's "Architecture" diagram):
    11.  SFTP push 4 JSONs to pressthink.org         (sftp_push.py)
    12.  Sheet writeback F='live', G=RECORD-NNNNN   (retry once, then exit-non-0)
 
-Status outcomes: ``live | archived | duplicate | error | noop``.
+Status outcomes: ``live | committed | archived | duplicate | error | noop``.
+``committed`` is terminal: the record is appended but live push (SFTP) is not
+configured on this runner, so the sweeper must not retry it.
 
 Critical conventions:
     * NEVER ``git add -A`` — stage explicit paths.
@@ -522,7 +524,7 @@ def process_one(url: str, title: str = '', notes: str = '',
                 raw_text: str = '') -> Dict[str, Any]:
     """Run the 12-step pipeline for one submission. Returns a result dict.
 
-    Keys: ``status`` (live/archived/duplicate/error/noop), ``record_id``,
+    Keys: ``status`` (live/committed/archived/duplicate/error/noop), ``record_id``,
     ``error``, ``exit_code``.
 
     ``raw_text``: manual fallback. When provided, the network scrape is
@@ -562,8 +564,19 @@ def process_one(url: str, title: str = '', notes: str = '',
                             error='Recovered via sweep retry')
             result.update({'status': 'noop', 'exit_code': 0,
                            'error': 'sentinel sweep no-op; SFTP retry ok'})
+        elif push.get('skipped'):
+            # SFTP isn't configured on this runner, so this sweep -- and every
+            # one after it -- can never make the row live. Promote it to the
+            # terminal 'committed' status so the sweeper stops re-firing the
+            # sentinel every 24h forever (#414).
+            _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
+                            status='committed',
+                            error='Live push not configured on this runner')
+            result.update({'status': 'noop', 'exit_code': 0,
+                           'error': 'sentinel sweep no-op; SFTP not configured'})
         else:
-            # Leave the row at 'archived'; the next sweep tick will retry.
+            # Genuine push failure: leave the row at 'archived'; the next sweep
+            # tick will retry.
             result.update({'status': 'noop', 'exit_code': 0,
                            'error': f"sentinel sweep no-op; SFTP retry: "
                                     f"{push.get('error', 'unknown')}"})
@@ -946,10 +959,19 @@ def process_one(url: str, title: str = '', notes: str = '',
         push = sftp_push.push_to_production()
         if not (push.get('ok') and not push.get('skipped')):
             if push.get('skipped'):
+                # SFTP isn't configured on this runner, so retrying never makes
+                # the record live. Write the terminal 'committed' status (data is
+                # appended, just not pushed) instead of 'archived' -- 'archived'
+                # is a sweeper retry status, so the sweep would re-dispatch this
+                # row every 24h forever (#414).
                 note = 'Live push not configured on this runner'
-            else:
-                note = (f"Live push failed; will retry next submission "
-                        f"({push.get('error', 'unknown error')})")
+                _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
+                                status='committed', record_id=record_id, error=note)
+                return {'status': 'committed', 'record_id': record_id,
+                        'error': note, 'exit_code': 0}
+            # Genuine push failure: keep 'archived' so the sweeper retries it.
+            note = (f"Live push failed; will retry next submission "
+                    f"({push.get('error', 'unknown error')})")
             _safe_writeback(sheet_id, sheet_tab, sheet_row or 0,
                             status='archived', record_id=record_id, error=note)
             return {'status': 'archived', 'record_id': record_id,

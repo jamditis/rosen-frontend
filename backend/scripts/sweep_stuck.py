@@ -13,8 +13,10 @@ design.md`` "Stuck-row sweeper"):
     processing  > 1 hr    → re-dispatch with original URL
     archived    > 24 hr   → re-dispatch with sentinel URL (forces SFTP retry)
 
-Terminal statuses (``live``, ``error``, ``duplicate``, ``no URL``,
-``invalid URL``) are never touched regardless of age.
+Terminal statuses (``live``, ``committed``, ``error``, ``duplicate``,
+``no URL``, ``invalid URL``) are never touched regardless of age. ``committed``
+marks a record whose data is appended but whose live push (SFTP) is not
+configured on this runner -- retrying it would never make it live (#414).
 
 The dedup check in ``submit-record.yml`` step 2 guarantees the sweep is
 idempotent — a re-dispatched ``submitted`` row whose Action eventually did
