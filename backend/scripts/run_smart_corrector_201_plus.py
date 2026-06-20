@@ -73,10 +73,14 @@ def process_from_offset(limit_param=50, batch_size=25, resume=True):
     _ = YouTubeEnhancedProcessor()
     _ = TwitterProcessor(playwright_fallback=True)
 
-    # Connect to sheet
+    # Connect to sheet. Anchor credentials to backend/ so the script runs from
+    # any cwd; an absolute GOOGLE_APPLICATION_CREDENTIALS overrides (pathlib
+    # resets to it).
     print("[1/4] Connecting to Google Sheets...")
     scopes = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-    creds = Credentials.from_service_account_file('google_credentials.json', scopes=scopes)
+    credentials_filename = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+    credentials_path = Path(__file__).resolve().parents[1] / credentials_filename
+    creds = Credentials.from_service_account_file(str(credentials_path), scopes=scopes)
     client = gspread.authorize(creds)
 
     sheet_name = os.getenv('SPREADSHEET_NAME', '📎Rosen Archive URL List')

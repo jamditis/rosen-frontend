@@ -21,6 +21,7 @@ from typing import Dict
 import gspread
 import os
 import sys
+from pathlib import Path
 from dotenv import load_dotenv
 import time
 
@@ -572,9 +573,12 @@ class TextCleaningWorkflow:
     def connect_to_spreadsheet(self):
         """Connects to the Google Sheets spreadsheet."""
         try:
-            # Use service account credentials
-            credentials_path = 'google_credentials.json'
-            gc = gspread.service_account(filename=credentials_path)
+            # Use service account credentials, anchored to backend/ so the
+            # script runs from any cwd; an absolute GOOGLE_APPLICATION_CREDENTIALS
+            # overrides (pathlib resets to it).
+            credentials_filename = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+            credentials_path = Path(__file__).resolve().parents[2] / credentials_filename
+            gc = gspread.service_account(filename=str(credentials_path))
             
             # Open spreadsheet
             spreadsheet_name = os.getenv('SPREADSHEET_NAME')

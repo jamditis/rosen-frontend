@@ -5,10 +5,15 @@ Quick verification script to check extracted_entities and extracted_relationship
 import gspread
 from google.oauth2.service_account import Credentials
 import json
+import os
+from pathlib import Path
 
-# Set up credentials
+# Set up credentials, anchored to backend/ so the script runs from any cwd; an
+# absolute GOOGLE_APPLICATION_CREDENTIALS overrides (pathlib resets to it).
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive']
-creds = Credentials.from_service_account_file('google_credentials.json', scopes=SCOPES)
+credentials_filename = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", "google_credentials.json")
+credentials_path = Path(__file__).resolve().parents[1] / credentials_filename
+creds = Credentials.from_service_account_file(str(credentials_path), scopes=SCOPES)
 client = gspread.authorize(creds)
 
 # Open the spreadsheet
