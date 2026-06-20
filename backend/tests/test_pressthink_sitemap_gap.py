@@ -52,6 +52,23 @@ def test_parse_modern_post_url_extracts_year_month_slug():
     assert gap.parse_modern_post_url("https://pressthink.org/") is None
 
 
+def test_parse_modern_post_url_handles_day_based_urls():
+    # Day-based modern URLs (/YYYY/MM/DD/slug/) must parse as posts too; the day
+    # is ignored so the result is still (year, month, slug). Before #393 they
+    # failed the matcher, fell into the non_post bucket, and deflated the post
+    # denominator.
+    assert gap.parse_modern_post_url(
+        "https://pressthink.org/2010/07/07/objectivity-as-persuasion/"
+    ) == (2010, 7, "objectivity-as-persuasion")
+    # a numeric-prefixed slug is not mistaken for a day segment: the day pattern
+    # requires the two digits to be followed by a slash, which "99-problems" is not
+    assert gap.parse_modern_post_url("https://pressthink.org/2010/07/99-problems/") == (
+        2010,
+        7,
+        "99-problems",
+    )
+
+
 def test_exact_url_match_when_archive_holds_modern_url():
     rows = [
         _record(

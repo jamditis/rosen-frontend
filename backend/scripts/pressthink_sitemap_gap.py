@@ -78,10 +78,14 @@ STOPWORDS = frozenset(
     they i how why what when who whom which than then so if not no""".split()
 )
 
-# A modern WordPress post URL: /YYYY/MM/slug/ . Day is absent (that is the
-# legacy Movable Type shape), which is exactly why legacy<->modern cannot be
-# matched on the URL alone.
-_MODERN_POST_RE = re.compile(r"/(\d{4})/(\d{2})/([^/]+)/?$")
+# A modern WordPress post URL is /YYYY/MM/slug/ , or the day-based
+# /YYYY/MM/DD/slug/ variant. The optional day segment is matched but not
+# captured, so either shape yields (year, month, slug) and counts as a post;
+# without this, a day-based URL fell through to the non_post bucket and deflated
+# the post denominator. Legacy Movable Type URLs also carry a day, but legacy and
+# modern still cannot be matched on the URL alone — they agree only on year+month
+# and are reconciled by title.
+_MODERN_POST_RE = re.compile(r"/(\d{4})/(\d{2})/(?:\d{2}/)?([^/]+)/?$")
 
 # Strong-match floor when slug words are not fully contained in the title.
 STRONG_JACCARD = 0.8
