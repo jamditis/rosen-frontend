@@ -84,6 +84,16 @@
 
     <!-- Service Worker Registration (for offline support & fast caching) -->
     <script>
+      // #428: archive-details (~13 MB) and archive-data (~30 MB) are cached only
+      // by the service-worker Cache Storage -- they exceed Web Storage's ~5 MB
+      // quota and the IndexedDB cache holds only archive-core. So whenever the
+      // service worker is unavailable (no support, disabled by policy, or a
+      // failed registration) those large payloads have no client cache and are
+      // refetched on every navigation, regardless of IndexedDB. Surface that
+      // once instead of refetching silently.
+      const noteNoOfflineCache = () => console.info(
+        'Running without the service-worker cache: large archive data (>5 MB) is refetched on each navigation. See issue #428.'
+      );
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('./frontend/sw.js')
@@ -92,8 +102,11 @@
             })
             .catch(err => {
               console.log('SW registration failed:', err);
+              noteNoOfflineCache();
             });
         });
+      } else {
+        noteNoOfflineCache();
       }
     </script>
   </body>
