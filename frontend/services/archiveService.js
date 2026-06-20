@@ -293,6 +293,10 @@ const setCachedData = (url, data) => {
     // has an IndexedDB cache (fetchCoreData, far larger quota), and all of these
     // payloads are served from the service-worker Cache Storage on refetch
     // (sw.js stale-while-revalidate), so Web Storage is redundant for them. (#337)
+    // These files are not in Web Storage and only archive-core is in IndexedDB,
+    // so when the service worker is unavailable they refetch on every
+    // navigation. That residual gap is surfaced once at startup (the
+    // SW-registration block in index.html), not cached here (#428).
     if (serialized.length > MAX_LOCALSTORAGE_SIZE) {
       return;
     }
