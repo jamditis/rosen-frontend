@@ -1,5 +1,5 @@
 
-import { DATA_CONFIG, ERAS } from '../constants.js?v=3.4.3';
+import { DATA_CONFIG, ERAS } from '../constants.js?v=3.4.4';
 import {
   initDatabase,
   loadArchiveData as loadSqliteData,
@@ -13,10 +13,10 @@ import {
   getCategoryCoOccurrence,
   searchRecords as sqlSearchRecords,
   getStats as getSqliteStats
-} from './sqliteService.js?v=3.4.3';
-import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.4.3';
-import { escapeCsvCell } from '../utils/csvSafety.js?v=3.4.3';
-import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.4.3';
+} from './sqliteService.js?v=3.4.4';
+import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.4.4';
+import { escapeCsvCell } from '../utils/csvSafety.js?v=3.4.4';
+import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.4.4';
 
 // Routine cache-hit / fetch-start logs are silent in production. Set
 // `localStorage.jrda_debug = '1'` in DevTools and reload to opt in (#170).
