@@ -144,6 +144,12 @@ const EntityBrowser = ({ records, onSelectRecord }) => {
     `;
   }
 
+  // Resolve the selected entity's type styling once; the detail panel reads
+  // its bg/icon/color below and only renders when selectedEntity is set.
+  const selConfig = selectedEntity
+    ? (TYPE_CONFIG[selectedEntity.type] || TYPE_CONFIG.Concept)
+    : null;
+
   return html`
     <div className="flex flex-col gap-6">
       <!-- Type filter chips -->
@@ -295,11 +301,11 @@ const EntityBrowser = ({ records, onSelectRecord }) => {
                   <div className="flex items-center gap-2">
                     <div
                       className="p-1.5 rounded"
-                      style=${{ backgroundColor: (TYPE_CONFIG[selectedEntity.type] || TYPE_CONFIG.Concept).bg }}
+                      style=${{ backgroundColor: selConfig.bg }}
                     >
-                      <${(TYPE_CONFIG[selectedEntity.type] || TYPE_CONFIG.Concept).icon}
+                      <${selConfig.icon}
                         className="w-4 h-4"
-                        style=${{ color: (TYPE_CONFIG[selectedEntity.type] || TYPE_CONFIG.Concept).color }}
+                        style=${{ color: selConfig.color }}
                       />
                     </div>
                     <span className="text-xs font-bold uppercase tracking-wider text-stone-400">

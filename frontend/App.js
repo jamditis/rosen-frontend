@@ -35,6 +35,19 @@ const Highlight = ({ text, term }) => {
   `;
 };
 
+// One source of truth for the empty filter state. The initial state and both
+// "clear filters" paths spread this, so adding a filter field can't leave a
+// reset path out of sync.
+const DEFAULT_FILTERS = {
+  search: '',
+  categories: [],
+  era: null,
+  year: null,
+  publication: [],
+  type: null,
+  includeReplies: false,
+};
+
 const App = () => {
   const [records, setRecords] = useState([]);
   const [facets, setFacets] = useState({ categories: [], eras: [], publications: [] });
@@ -54,15 +67,7 @@ const App = () => {
   const [toolsModalOpen, setToolsModalOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
 
-  const [filters, setFilters] = useState({
-    search: '',
-    categories: [],
-    era: null,
-    year: null,
-    publication: [],
-    type: null,
-    includeReplies: false
-  });
+  const [filters, setFilters] = useState({ ...DEFAULT_FILTERS });
 
   // Ref for scrolling to results
   const resultsRef = useRef(null);
@@ -431,7 +436,7 @@ const App = () => {
                 setFilters=${setFilters}
                 isOpen=${sidebarOpen}
                 onClose=${() => setSidebarOpen(false)}
-                resetFilters=${() => setFilters({ search: '', categories: [], era: null, year: null, publication: [], type: null, includeReplies: false })}
+                resetFilters=${() => setFilters({ ...DEFAULT_FILTERS })}
                 autocompleteIndex=${autocompleteIndex}
              />
          `}
@@ -558,7 +563,7 @@ const App = () => {
                         <h3 className="font-display text-xl text-stone-700 mb-2">No records found</h3>
                         <p className="text-stone-500 text-sm mb-6">Try adjusting your search terms or filters.</p>
                         <button
-                            onClick=${() => setFilters({ search: '', categories: [], era: null, year: null, publication: [], type: null, includeReplies: false })}
+                            onClick=${() => setFilters({ ...DEFAULT_FILTERS })}
                             className="text-sm border-b-2 border-stone-800 pb-0.5 hover:text-stone-600 transition-colors font-bold"
                         >
                             Clear all filters
