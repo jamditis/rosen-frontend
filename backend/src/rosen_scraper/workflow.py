@@ -38,9 +38,22 @@ from rosen_scraper.path_utils import find_project_root
 load_dotenv()
 
 # --- Configuration ---
-# A list of domains known to be behind a paywall, which are handled separately.
-# Note: This is now also handled by the poison pill detection system
-PAYWALLED_DOMAINS = ["www.washingtonpost.com", "www.nytimes.com", "www.wsj.com"]
+# Subscription/paywalled domains, used by determine_permissions() to set a
+# record's rights label. This is a rights concern and is intentionally distinct
+# from PoisonPillDetector.paywall_domains (poison_pill_handler.py), which answers
+# a scraping concern (did we hit a paywall while fetching?). The two lists
+# overlap but are not the same: medium.com is a member_only paywall for scraping
+# yet stays Open Access for rights (it is in the permissive list below), so it is
+# deliberately absent here. Matched against the exact netloc, hence the www.
+# prefix. Keep in sync with PoisonPillDetector for the shared subscription sites.
+PAYWALLED_DOMAINS = [
+    "www.washingtonpost.com",
+    "www.nytimes.com",
+    "www.wsj.com",
+    "www.ft.com",
+    "www.theatlantic.com",
+    "www.newyorker.com",
+]
 
 # Define key file paths using pathlib for cleaner path handling.
 SCRIPT_DIR = Path(__file__).resolve().parent
