@@ -7,10 +7,14 @@ Prevents duplicate entity IDs by checking against existing entities before assig
 """
 
 import csv
-import re
 from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Tuple
+
+from .entity_normalization import (
+    ENTITY_TYPE_PREFIXES,
+    normalize_entity_name as _normalize_entity_name,
+)
 
 
 class EntityRegistry:
@@ -28,43 +32,12 @@ class EntityRegistry:
         self.id_counters = defaultdict(int)  # {prefix -> next_number}
 
     def normalize_entity_name(self, name: str, entity_type: str) -> str:
+        """Normalize entity name for matching.
+
+        Thin wrapper over the shared normalizer so the registry and the
+        deduplicator can never drift apart.
         """
-        Normalize entity name for matching.
-
-        Uses the same normalization as the deduplicator to ensure consistency.
-        """
-        if not name:
-            return ""
-
-        # Convert to lowercase
-        normalized = name.lower().strip()
-
-        # Remove common articles at the start
-        normalized = re.sub(r'^(the|a|an)\s+', '', normalized)
-
-        # Remove punctuation but keep spaces
-        normalized = re.sub(r'[^\w\s]', '', normalized)
-
-        # Collapse multiple spaces
-        normalized = re.sub(r'\s+', ' ', normalized).strip()
-
-        # Handle common abbreviations (organization specific)
-        if entity_type == "Organization":
-            abbrev_map = {
-                'nyt': 'new york times',
-                'wapo': 'washington post',
-                'nyu': 'new york university',
-                'npr': 'national public radio',
-                'pbs': 'public broadcasting service',
-                'cnn': 'cable news network',
-                'bbc': 'british broadcasting corporation',
-                'ap': 'associated press',
-                'wsj': 'wall street journal'
-            }
-            if normalized in abbrev_map:
-                normalized = abbrev_map[normalized]
-
-        return normalized
+        return _normalize_entity_name(name, entity_type)
 
     def load_from_sheet(self, entities_data: List[List[str]], headers: List[str]):
         """
@@ -215,14 +188,7 @@ class EntityRegistry:
             return self.name_to_id[key], False
 
         # Create new entity ID
-        prefix = {
-            'Person': 'P',
-            'Organization': 'O',
-            'Work': 'W',
-            'Concept': 'C',
-            'Event': 'E',
-            'Location': 'L'
-        }.get(entity_type, 'X')
+        prefix = ENTITY_TYPE_PREFIXES.get(entity_type, 'X')
 
         self.id_counters[prefix] += 1
         new_id = f"{prefix}{self.id_counters[prefix]:04d}"

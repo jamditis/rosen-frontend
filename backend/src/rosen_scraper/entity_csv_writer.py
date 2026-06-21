@@ -44,6 +44,7 @@ from pathlib import Path
 from typing import Dict, FrozenSet, Iterable, List, Optional, Tuple
 
 from .csv_safety import sanitize_csv_value, unescape_csv_value
+from .entity_normalization import ENTITY_TYPE_PREFIXES
 
 # ---------------------------------------------------------------------------
 # Schema constants — derived from backend/entity_extraction_schema_v3.json
@@ -66,15 +67,6 @@ def _load_schema_types() -> Tuple[FrozenSet[str], FrozenSet[str]]:
 
 
 VALID_ENTITY_TYPES, VALID_RELATIONSHIP_TYPES = _load_schema_types()
-
-ENTITY_TYPE_PREFIXES = {
-    "Person": "P",
-    "Organization": "O",
-    "Work": "W",
-    "Concept": "C",
-    "Event": "E",
-    "Location": "L",
-}
 
 # Type-specific fields that map to role_or_description in the CSV.
 TYPE_SPECIFIC_ROLE_FIELDS = (
