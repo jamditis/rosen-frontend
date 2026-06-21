@@ -1,0 +1,298 @@
+[
+  {
+    "id": "RDR-01",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Text load",
+    "feature": "Full dissertation text renders inline",
+    "user_story": "As a reader, I want the full text of \"The Impossible Press\" to appear on one page, so that I can read the entire dissertation in the browser without downloading anything.",
+    "expected_behavior": "The dissertation text is hand-maintained as static HTML inlined inside <main id=\"main-content\" class=\"reader-content\"> in index.html (the comment '<!-- DISSERTATION CONTENT WILL BE INJECTED HERE -->' is a leftover label; nothing is fetched at runtime). src/impossible-press.md is the source-of-truth markdown but is NOT loaded by the page. On load, src/js/reader.js (ES module) instantiates DissertationReader, runs settings.init() before paint, then on DOMContentLoaded inits navigation, progress, citation copy, deep links, and the selection menu, and finally adds the 'reader-ready' class to <body>. Headings carry id attributes (e.g. #introduction, #chapter-1 … #chapter-8, #conclusion, #notes, #works-consulted) used as scroll anchors.",
+    "source_files": [
+      "dissertation/reader/index.html",
+      "dissertation/reader/src/js/reader.js",
+      "dissertation/reader/src/impossible-press.md"
+    ],
+    "test_notes": "Open dissertation/reader/index.html (via `npm run preview` then http://localhost:8000/dissertation/reader/). Confirm the full text from 'Dissertation Committee' through 'WORKS CONSULTED' is present, body class 'reader-ready' is added, and the console logs 'Dissertation Reader initialized'. Verify nothing is fetched over the network for the body text.",
+    "code_smell": "Multiple headings share id=\"conclusion\" (an <h1>, an <h2>, and two lower-level <h4>/<h2> 'Conclusion' subheads). getElementById/anchor jumps and the IntersectionObserver scroll-spy can only ever resolve to the first element with that id, so the TOC 'Conclusion' link and scroll-spy may target the wrong section. Duplicate ids are also invalid HTML."
+  },
+  {
+    "id": "RDR-02",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Navigation",
+    "feature": "Table of contents click-to-scroll",
+    "user_story": "As a reader, I want to click a chapter in the table of contents, so that I jump straight to that section.",
+    "expected_behavior": "ReaderNavigation collects all '.toc-link' anchors in '.reader-nav'. On click it preventDefault()s, reads the target id from the link href (strips the leading '#'), and calls scrollToSection(id): document.getElementById(id).scrollIntoView({behavior:'smooth', block:'start'}), then sets tabindex=-1 on the heading and focuses it (preventScroll:true) for accessibility. If the nav is open (mobile) it closes afterward. The TOC is grouped into 'Part One' / 'Part Two' label rows ('.toc-part') plus links for Acknowledgements, Introduction, chapters 1-8, Conclusion, Notes, and Works Consulted.",
+    "source_files": [
+      "dissertation/reader/index.html",
+      "dissertation/reader/src/js/navigation.js"
+    ],
+    "test_notes": "Open the reader, click each TOC link (e.g. '6. The Impossible Press'). Confirm the page smooth-scrolls so the heading is at the top. Tab once afterward to confirm focus landed on/after the heading.",
+    "code_smell": "TOC link '#conclusion' resolves to the first element with id=conclusion, which is a lower 'Conclusion' subhead inside Chapter 8 (line ~1434), not the top-level CONCLUSION (line ~1887) — duplicate ids make this link land on the wrong place."
+  },
+  {
+    "id": "RDR-03",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Navigation",
+    "feature": "Scroll-spy active-section highlighting + URL hash sync",
+    "user_story": "As a reader, I want the table of contents to highlight the section I'm currently reading and the URL to reflect it, so that I always know where I am and can copy a deep link.",
+    "expected_behavior": "An IntersectionObserver watches every h1[id]/h2[id]/h3[id] inside '.reader-content' with rootMargin '-20% 0px -70% 0px'. When a heading intersects that band, setActiveSection(id) toggles 'is-active' on the matching '.toc-link', calls history.replaceState to update the URL hash to '#id' without scrolling, and dispatches a 'sectionchange' CustomEvent (consumed by the progress tracker). It de-dupes (returns early if the section is unchanged).",
+    "source_files": [
+      "dissertation/reader/src/js/navigation.js"
+    ],
+    "test_notes": "Open the reader and scroll slowly. Confirm the active TOC item changes as different headings cross roughly the top quarter of the viewport, and the address bar hash updates (e.g. to #chapter-3) without the page jumping.",
+    "code_smell": "Scroll-spy observes the same duplicate ids as the TOC; with 3 elements sharing id=conclusion the highlight/hash for 'Conclusion' is ambiguous. Also the observer only sets active on intersecting entries (never clears when none intersect), so a stale highlight can persist between bands."
+  },
+  {
+    "id": "RDR-04",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Navigation",
+    "feature": "Keyboard chapter navigation",
+    "user_story": "As a keyboard user, I want to move between chapters and jump to the start/end with shortcuts, so that I can read without a mouse.",
+    "expected_behavior": "A document keydown handler implements: Alt+ArrowRight = next heading, Alt+ArrowLeft = previous heading (navigateChapter walks the ordered headings array from the current scroll-spy section and scrollToSection()s the neighbor); Ctrl+Home = smooth scroll to top; Ctrl+End = smooth scroll to document bottom; Escape closes the mobile nav (and returns focus to the menu toggle) when open. All four shortcuts call preventDefault().",
+    "source_files": [
+      "dissertation/reader/src/js/navigation.js",
+      "dissertation/reader/README.md"
+    ],
+    "test_notes": "Open the reader, scroll into a chapter, then press Alt+Right / Alt+Left and confirm it moves heading-by-heading. Press Ctrl+Home and Ctrl+End to jump to top/bottom.",
+    "code_smell": "navigateChapter early-returns if this.currentSection is null, which it is until the scroll-spy observer fires at least once; pressing Alt+Arrow before any scroll does nothing. Alt+Arrow stepping is per-heading (h1/h2/h3), not per-TOC-chapter, so it stops on subheadings the TOC doesn't list."
+  },
+  {
+    "id": "RDR-05",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Navigation",
+    "feature": "Mobile table-of-contents drawer",
+    "user_story": "As a mobile reader, I want to open and close the table of contents with the hamburger button, so that the TOC doesn't take up screen space while reading.",
+    "expected_behavior": "Below 1024px the '.reader-nav' is an off-canvas drawer. The '.menu-toggle' hamburger toggles it: openNav() adds 'is-open' to the nav and 'is-visible' to '.nav-overlay', sets body overflow:hidden to lock scroll, and focuses the first TOC link; closeNav() reverses all of that. The drawer also closes on overlay click, on Escape, and after any TOC link click. At >=1024px the menu toggle and overlay are hidden via CSS and the nav becomes a sticky sidebar.",
+    "source_files": [
+      "dissertation/reader/src/js/navigation.js",
+      "dissertation/reader/src/css/layout.css",
+      "dissertation/reader/index.html"
+    ],
+    "test_notes": "Open the reader at a narrow viewport (<=767px). Tap the hamburger to open the TOC drawer, confirm body scroll is locked and overlay appears. Close via overlay tap, Escape, and by tapping a TOC link. Resize to >=1024px and confirm the TOC is a permanent sidebar with no hamburger.",
+    "code_smell": "menu-toggle has aria-expanded=\"false\" in markup but the JS never updates aria-expanded on open/close, so screen readers always report the toggle as collapsed."
+  },
+  {
+    "id": "RDR-06",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Navigation",
+    "feature": "Back-to-top button",
+    "user_story": "As a reader deep in the text, I want a button that returns me to the top, so that I don't have to scroll all the way back manually.",
+    "expected_behavior": "The fixed '.back-to-top' button gets 'is-visible' once window.scrollY exceeds half the viewport height (scroll listener is passive; visibility is also evaluated once on init). Clicking it smooth-scrolls window to top (top:0).",
+    "source_files": [
+      "dissertation/reader/src/js/navigation.js",
+      "dissertation/reader/src/css/layout.css"
+    ],
+    "test_notes": "Open the reader, scroll past half a screen height, confirm the up-arrow button appears bottom-right. Click it and confirm a smooth scroll to the very top.",
+    "code_smell": "It hides via print CSS but there is no debounce; fine in practice given the cheap class toggle."
+  },
+  {
+    "id": "RDR-07",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Progress",
+    "feature": "Reading progress bar",
+    "user_story": "As a reader, I want a thin bar that fills as I scroll, so that I can see how far through the dissertation I am.",
+    "expected_behavior": "ReadingProgress listens to scroll (rAF-throttled, passive) and sets '.progress-bar__fill' width to a 0-100% value computed as scrollY / (scrollHeight - innerHeight), clamped to [0,100]. The bar container has role=progressbar and aria-label 'Reading progress'.",
+    "source_files": [
+      "dissertation/reader/src/js/progress.js",
+      "dissertation/reader/index.html",
+      "dissertation/reader/src/css/layout.css"
+    ],
+    "test_notes": "Open the reader and scroll; confirm the top progress bar fills proportionally and reaches ~100% at the very bottom.",
+    "code_smell": "The progressbar element exposes role/aria-label but never updates aria-valuenow/valuemin/valuemax, so assistive tech gets no numeric progress."
+  },
+  {
+    "id": "RDR-08",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Progress",
+    "feature": "Save and resume reading position",
+    "user_story": "As a returning reader, I want to be offered to continue where I left off, so that I don't lose my place between visits.",
+    "expected_behavior": "Position is persisted to localStorage key 'dissertation-reader-progress' as {sectionId, scrollProgress, scrollY, timestamp}. It saves at most every 5s during scrolling and immediately on each 'sectionchange' event. On load, checkForSavedPosition() shows a resume prompt only if saved progress > 5% AND the save is < 30 days old. The prompt offers 'Continue Reading' (smooth-scrolls to saved scrollY, falling back to a percentage of doc height) or 'Start from Beginning' (clears the saved key). The prompt auto-dismisses after 10 seconds. isComplete() returns true at >=95%.",
+    "source_files": [
+      "dissertation/reader/src/js/progress.js"
+    ],
+    "test_notes": "Open the reader, scroll past ~10%, wait ~6s (or change sections) so a save happens, reload. Confirm a bottom-centered prompt appears with the rounded percentage. Click 'Continue Reading' and confirm it scrolls back; reload again and click 'Start from Beginning' and confirm localStorage 'dissertation-reader-progress' is removed.",
+    "code_smell": "Resume scroll uses the absolute saved scrollY; if font-size/line-height/column-width settings changed between sessions the document height differs and scrollY lands at a different passage. The 10s auto-dismiss can yank the prompt away mid-decision."
+  },
+  {
+    "id": "RDR-09",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Settings",
+    "feature": "Settings panel open/close",
+    "user_story": "As a reader, I want a settings panel for display preferences, so that I can tune the reading experience.",
+    "expected_behavior": "The gear '.settings-toggle' opens/closes the '.settings-panel' by toggling the 'is-open' class. The panel also closes on Escape and on any click outside the panel/toggle. The panel groups four controls: Theme, Text Size, Line Spacing, Column Width, each a row of '.settings-option' buttons; the active option in each group gets the 'is-selected' class reflecting current state.",
+    "source_files": [
+      "dissertation/reader/src/js/settings.js",
+      "dissertation/reader/index.html",
+      "dissertation/reader/src/css/layout.css"
+    ],
+    "test_notes": "Open the reader, click the gear icon, confirm the panel opens with the current options highlighted. Click outside it and press Escape to confirm both close it.",
+    "code_smell": "settings-toggle has static aria-expanded=\"false\" in markup that the JS never syncs with open state."
+  },
+  {
+    "id": "RDR-10",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Settings",
+    "feature": "Theme: light / dark / auto, persisted",
+    "user_story": "As a reader, I want to choose light, dark, or system theme, so that the page is comfortable in my environment and remembers my choice.",
+    "expected_behavior": "Theme buttons set state.theme to 'light' | 'dark' | 'system'. applyTheme() sets data-theme=\"dark\"/\"light\" on <html> for explicit choices and removes the attribute for 'system' (CSS prefers-color-scheme handles it). The choice persists in localStorage 'dissertation-reader-settings'; an inline <head> script re-applies a saved dark/light theme before first paint to prevent a flash. While on 'system', a matchMedia('(prefers-color-scheme: dark)') change listener re-applies the theme live. Light and dark palettes are defined in variables.css.",
+    "source_files": [
+      "dissertation/reader/src/js/settings.js",
+      "dissertation/reader/index.html",
+      "dissertation/reader/src/css/variables.css"
+    ],
+    "test_notes": "Open the reader, in settings click Dark (page darkens), reload (stays dark, no white flash). Click Auto and toggle your OS dark mode to confirm the page follows live.",
+    "code_smell": "The anti-flash inline script handles theme/fontSize/lineHeight/margin but mirrors logic that also lives in settings.js — two copies of the same mapping that must be kept in sync by hand."
+  },
+  {
+    "id": "RDR-11",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Settings",
+    "feature": "Text size control, persisted",
+    "user_story": "As a reader, I want to make the body text smaller or larger, so that it's readable for my eyes/device.",
+    "expected_behavior": "Three buttons (small/medium/large) call setFontSize(). applyFontSize() sets data-font-size on <html> for 'small'/'large' and removes the attribute for the 'medium' default. variables.css adjusts --font-size-base/lg/xl per data-font-size. Persisted in 'dissertation-reader-settings' and re-applied pre-paint by the inline head script.",
+    "source_files": [
+      "dissertation/reader/src/js/settings.js",
+      "dissertation/reader/src/css/variables.css",
+      "dissertation/reader/index.html"
+    ],
+    "test_notes": "Open the reader, click the large 'A', confirm body text grows. Reload and confirm it stays large.",
+    "code_smell": "All three buttons display the same glyph 'A' at the same rendered size (no relative sizing/labels), so the control is hard to tell apart visually and for screen readers (no aria-label distinguishing small/medium/large)."
+  },
+  {
+    "id": "RDR-12",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Settings",
+    "feature": "Line spacing control, persisted",
+    "user_story": "As a reader, I want to adjust line spacing, so that dense passages are easier to track.",
+    "expected_behavior": "Three buttons (compact/normal/relaxed) call setLineHeight(). applyLineHeight() sets data-line-height on <html> for 'compact'/'relaxed' and removes it for the 'normal' default; variables.css maps these to --line-height-body 1.5 / (1.7 default) / 1.9. Persisted in 'dissertation-reader-settings'.",
+    "source_files": [
+      "dissertation/reader/src/js/settings.js",
+      "dissertation/reader/src/css/variables.css"
+    ],
+    "test_notes": "Open the reader, click Relaxed and confirm lines spread out; click Compact and confirm they tighten. Reload to confirm persistence.",
+    "code_smell": ""
+  },
+  {
+    "id": "RDR-13",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Settings",
+    "feature": "Column width control, persisted",
+    "user_story": "As a reader, I want to set the text column narrow, normal, or wide, so that line length suits my reading comfort.",
+    "expected_behavior": "Three buttons (narrow/normal/wide) call setMargin(). applyMargin() sets data-margin on <html> for 'narrow'/'wide' and removes it for the 'normal' default; variables.css maps these to --content-max-width 560 / 680 / 820px (with per-breakpoint padding overrides at >=1024px). Persisted in 'dissertation-reader-settings'.",
+    "source_files": [
+      "dissertation/reader/src/js/settings.js",
+      "dissertation/reader/src/css/variables.css"
+    ],
+    "test_notes": "Open the reader on a wide screen, click Wide and Narrow and confirm the content column changes max width. Reload to confirm persistence.",
+    "code_smell": ""
+  },
+  {
+    "id": "RDR-14",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Selection share",
+    "feature": "Text-selection floating menu",
+    "user_story": "As a reader, I want a small menu to appear when I select a passage, so that I can act on the quote I highlighted.",
+    "expected_behavior": "On mouseup, if the selection is >=10 chars and the selection anchor is inside '.reader-content', a floating '#selection-menu' with Share / Cite / Copy buttons is positioned above the selection (flips below if near the top, clamped into the viewport). It records selectedText and selectedChapter (derived by getCurrentChapter() scanning h1/h2 ids whose top is <=100px for 'chapter'/'introduction'/'conclusion'). The menu hides on Escape, on outside mousedown, and on selections shorter than 10 chars.",
+    "source_files": [
+      "dissertation/reader/src/js/reader.js"
+    ],
+    "test_notes": "Open the reader and drag-select a sentence (>10 chars) in the body. Confirm the Share/Cite/Copy menu appears near the selection. Select <10 chars or click elsewhere and confirm it disappears; press Escape to dismiss.",
+    "code_smell": "getCurrentChapter() returns a loose label ('Introduction'/'Conclusion'/the heading text) by string-matching 'chapter' in heading text; it can mislabel passages in Acknowledgements/Notes/Works Consulted as 'Introduction'. Selection menu only triggers on mouseup (mouse), so keyboard/touch selection won't surface it."
+  },
+  {
+    "id": "RDR-15",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Selection share",
+    "feature": "Copy selected text",
+    "user_story": "As a reader, I want to copy the exact passage I selected, so that I can paste it elsewhere.",
+    "expected_behavior": "The selection menu 'Copy' button writes the raw selected text to the clipboard via navigator.clipboard.writeText, with a hidden-textarea + document.execCommand('copy') fallback for older browsers, then shows a 'Text copied to clipboard' toast and hides the menu.",
+    "source_files": [
+      "dissertation/reader/src/js/reader.js"
+    ],
+    "test_notes": "Select a passage, click Copy in the floating menu, confirm the toast appears and pasting elsewhere yields the exact selected text.",
+    "code_smell": ""
+  },
+  {
+    "id": "RDR-16",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Selection share",
+    "feature": "Copy citation for selection",
+    "user_story": "As a researcher, I want an APA-style citation that includes the chapter I'm quoting, so that I can attribute the passage correctly.",
+    "expected_behavior": "The 'Cite' button copies: 'Rosen, J. (1986). The impossible press: American journalism and the decline of public life [Doctoral dissertation, New York University]. <selectedChapter>.' to the clipboard (clipboard API with textarea fallback), shows a 'Citation copied to clipboard' toast, and hides the menu. The chapter segment comes from getCurrentChapter().",
+    "source_files": [
+      "dissertation/reader/src/js/reader.js"
+    ],
+    "test_notes": "Select a passage in, e.g., Chapter Six, click Cite, confirm the toast and that the pasted citation ends with the chapter label.",
+    "code_smell": "Citation accuracy depends on getCurrentChapter()'s heuristic; for selections outside numbered chapters the appended chapter is often 'Introduction' regardless of actual location."
+  },
+  {
+    "id": "RDR-17",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Selection share",
+    "feature": "Share quote modal (text + downloadable image)",
+    "user_story": "As a reader, I want to turn a highlighted quote into shareable text or a social image, so that I can post it with proper attribution.",
+    "expected_behavior": "The 'Share' button opens '#share-modal' showing a dark quote preview, an editable textarea pre-filled with the quote, '— Jay Rosen, \"The Impossible Press\" (1986)' and 'Read more: <current URL>'. 'Copy Text' copies the (edited) textarea value with a toast. 'Download Image' renders a 1200x630 PNG on a canvas (dark background, blue accent bar, italic Georgia quote wrapped to fit, gray citation line) and downloads it as 'impossible-press-quote.png'. For selections >500 chars the Download Image button is hidden and an explanatory note is shown ('too long for image generation'); display text is truncated to 497 chars + '...'. Modal closes via the X button, clicking the backdrop, or Escape.",
+    "source_files": [
+      "dissertation/reader/src/js/reader.js",
+      "dissertation/reader/README.md"
+    ],
+    "test_notes": "Select a short passage, click Share. Confirm the modal preview, edit the textarea and click Copy Text (toast + edited text on clipboard). Click Download Image and confirm a PNG downloads. Then select a passage >500 chars and confirm the Download Image button is hidden with a note shown.",
+    "code_smell": "Image generation uses Georgia/system fonts (not the reader's Charter body font) so the PNG doesn't match on-screen typography; canvas may render before web fonts load. The 'Read more' URL is window.location.href, which includes the live scroll-spy hash (e.g. #chapter-3) rather than a stable anchor to the quoted passage."
+  },
+  {
+    "id": "RDR-18",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Citation",
+    "feature": "Footer 'Copy citation' button",
+    "user_story": "As a reader, I want a one-click way to copy the full work citation, so that I can cite the dissertation without retyping it.",
+    "expected_behavior": "The footer '.reader-footer__citation' block shows the full APA citation. The 'Copy Citation' button (data-action=copy-citation) copies that block's trimmed textContent to the clipboard (clipboard API, with hidden-textarea fallback) and shows a success or error toast.",
+    "source_files": [
+      "dissertation/reader/src/js/reader.js",
+      "dissertation/reader/index.html"
+    ],
+    "test_notes": "Scroll to the footer, click 'Copy Citation', confirm the toast and that the clipboard holds the full 'Rosen, J. (1986)...' citation.",
+    "code_smell": "Copies textContent including the leading 'Cite this work:' label, so the pasted citation begins with that label."
+  },
+  {
+    "id": "RDR-19",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Deep linking",
+    "feature": "Hash deep links jump to section on load",
+    "user_story": "As someone following a shared link, I want the reader to open at the linked section, so that I land on the relevant passage immediately.",
+    "expected_behavior": "On DOM ready, handleDeepLinks() reads the URL hash; if it matches an element id it scrolls that element into view with behavior:'instant' inside a requestAnimationFrame (so content is laid out first). Combined with the skip-link target #main-content.",
+    "source_files": [
+      "dissertation/reader/src/js/reader.js",
+      "dissertation/reader/index.html"
+    ],
+    "test_notes": "Open dissertation/reader/index.html#chapter-7 directly and confirm the page opens scrolled to Chapter Seven. Try #conclusion to observe the duplicate-id behavior.",
+    "code_smell": "Deep link target resolution uses getElementById, which hits only the first of the duplicate id=conclusion elements; a shared #conclusion link does not land on the top-level CONCLUSION."
+  },
+  {
+    "id": "RDR-20",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Quick actions",
+    "feature": "Header/footer quick-action links (PDF, NotebookLM, Jay's essay, archive, PressThink)",
+    "user_story": "As a reader, I want quick links to the source PDF, NotebookLM, Jay's essay, and the archive, so that I can move between related resources.",
+    "expected_behavior": "Header actions: Download PDF (download attr, absolute pressthink.org PDF URL), NotebookLM (new tab, rel=noopener), Jay's Essay (new tab), Back (../../), PressThink (new tab), plus the settings gear. The footer repeats Copy Citation, Download PDF, Jay's Essay, Back to archive, and NotebookLM. Which header buttons are visible is breakpoint-driven: hamburger only <1024px; secondary buttons progressively shown at 768px and 1024px.",
+    "source_files": [
+      "dissertation/reader/index.html",
+      "dissertation/reader/src/css/layout.css"
+    ],
+    "test_notes": "Open the reader at desktop width and confirm all header buttons show and open the right targets in new tabs. Narrow to mobile and confirm the hamburger appears and secondary buttons collapse per the breakpoints.",
+    "code_smell": "Responsive show/hide rules key off title attributes including title=\"Back to dissertation home\", but no header button actually has that title (the back link's title is 'Back to archive'), so those breakpoint rules match nothing — dead CSS / likely a stale selector."
+  },
+  {
+    "id": "RDR-21",
+    "area": "Dissertation tools",
+    "subarea": "Reader — Reading aids",
+    "feature": "Skip link, print stylesheet, and selection styling",
+    "user_story": "As a keyboard/print user, I want to skip to content, print a clean copy, and see styled selections, so that the reader is usable beyond on-screen mouse reading.",
+    "expected_behavior": "A visually-hidden 'Skip to content' link (focus-visible) jumps to #main-content. @media print hides the header, nav, progress bar, back-to-top, and settings panel and widens content to 100%. ::selection styling and epigraph/dissertation-quote/footnote typography are defined in typography.css.",
+    "source_files": [
+      "dissertation/reader/index.html",
+      "dissertation/reader/src/css/layout.css",
+      "dissertation/reader/src/css/typography.css"
+    ],
+    "test_notes": "Open the reader, press Tab once to reveal the skip link, activate it to jump to content. Use the browser Print preview to confirm chrome is stripped. Select text to see the highlight color.",
+    "code_smell": "typography.css defines a '.footnote-ref' clickable footnote-anchor style, but the inlined text uses plain Unicode superscript glyphs (¹²³…) for note references, so footnote markers are not links and don't jump to the Notes section — the styled-footnote feature is effectively unimplemented in the served HTML."
+  }
+]

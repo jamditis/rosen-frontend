@@ -1,7 +1,7 @@
 // Header.js - Universal header for feature pages
-import { html } from '../../html.js?v=3.4.3';
+import { html } from '../../html.js?v=3.4.4';
 import { ArrowLeft, Newspaper } from 'lucide-react';
-import { IS_LOCAL, BASE_PATH } from '../../utils/pathResolver.js?v=3.4.3';
+import { IS_LOCAL, BASE_PATH } from '../../utils/pathResolver.js?v=3.4.4';
 
 /**
  * Universal header component for feature pages

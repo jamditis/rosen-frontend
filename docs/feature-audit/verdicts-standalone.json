@@ -1,0 +1,134 @@
+{
+  "TOOL-01": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "medium",
+    "notes": "Countdown renders 0/0/0. Launch date hardcoded new Date('2026-02-01') is in the past (today 2026-06-21), so diff<=0 -> shows 0/0/0 with label \"until Feb 1, 2026\". SMELL CONFIRMED: page markets a Feb 2026 launch but the countdown is expired/stale."
+  },
+  "TOOL-02": {
+    "test_status": "partial",
+    "errors_found": "Verified card class=\"text-2xl md:text-3xl font-bold text-amber-600\"; computed color=rgb(217, 119, 6). tailwind.css contains text-amber-600 but NOT text-emerald-600 / text-rose-600 (verified locally).",
+    "severity": "medium",
+    "notes": "4 cards render: [\"Records in archive\",\"Entities extracted\",\"Relationships mapped\",\"Verified\"]. Values: [\"869\",\"5,736\",\"7,489\",\"73.6%\"]. Verified=73.6% sublabel=\"640 records\". SMELL CONFIRMED: dynamic class text-${color}-600 only styles when the class is prebuilt. Current 73.6% -> amber (present, renders OK); had data been >=90% (emerald) or <70% (rose) the number would be unstyled black. Latent bug, not visible at current data."
+  },
+  "TOOL-03": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Renders 11 progress bars (expect 11). Heading \"Field completeness\" appears 1x in DOM. SMELL: static <h4> is replaced by the JS-injected one (innerHTML overwrite), so only one shows. Color classes used: progress-emerald, progress-amber, progress-rose (progress-* defined in inline <style>, render OK)."
+  },
+  "TOOL-04": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "5 rows: [\"Verified records=73.6%\",\"Categorized=76.8%\",\"Has summary=98.8%\",\"Missing categories=23.2%\",\"Missing concepts=38.6%\"]. badge-* classes defined in shared-styles.css (render OK). SMELL CONFIRMED: \"Has summary\"=98.8% is computed as 100 - missingSummaryPercent(1.2), not read directly; derived value, propagates rounding."
+  },
+  "TOOL-05": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "renderBarChart drew entity=6, relationship=10, era=6 rows. First entity label=\"Person\". SMELL CONFIRMED: renderBarChart injects item[labelKey] into title+text via innerHTML with NO escapeHtml (script.js:114), unlike dataexplorer/dataviz which escape. Data is trusted static data.js so no live XSS, but inconsistent with project hardening."
+  },
+  "TOOL-06": {
+    "test_status": "fail",
+    "errors_found": "CATEGORY_DISTRIBUTION imported at script.js:15 but never used; no #category-chart or \"Category distribution\" section in DOM.",
+    "severity": "low",
+    "notes": "SMELL CONFIRMED: dead import. data.js exports CATEGORY_DISTRIBUTION (6 categories) but script.js imports it and never renders it. The Era distribution section uses ERA_DISTRIBUTION instead. No-category-chart-in-DOM check: true. Either wire it up or drop the import."
+  },
+  "TOOL-07": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Checklist rendered 9 items (exp 9), timeline 3 milestones (exp 3). Status icons + dot colors render from CHECKLIST_ITEMS / TIMELINE_MILESTONES."
+  },
+  "TOOL-08": {
+    "test_status": "partial",
+    "errors_found": "Action card bg colors: [\"rgb(255, 255, 255)\",\"rgb(255, 255, 255)\",\"rgb(255, 255, 255)\"]. tailwind.css lacks border-rose-300/bg-rose-50 and border-emerald-300/bg-emerald-50 (only amber present, verified locally) -> high/low priority tints render unstyled/transparent.",
+    "severity": "low",
+    "notes": "3 action cards render; toggleExpand(0) applied .open=true (max-height animation works). Priorities high/medium/low -> high(rose) and low(emerald) background tints are NOT in the prebuilt tailwind.css so they fall back to white/transparent; only medium(amber) tint renders. Sibling of TOOL-02. SMELL (max-height:500px clip) low risk with short descriptions."
+  },
+  "TOOL-09": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "high",
+    "notes": "Remote Google Sheets CSV loaded successfully (HTTP 307 redirect followed by XHR): (441 records in a 441-dot grid). 441 verified records kept (verified===TRUE && id && title.trim()). NOTE a latent DESIGN DEFECT (not a current failure): hardcoded Google Sheets URL is out of sync with the site's data/ JSON pipeline, and despite the changelog claiming a v2.5.0 remote->local fallback the HTML has none and no local CSV exists — a future Sheet outage would take the tool down with no degraded mode."
+  },
+  "TOOL-16": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Tutorial modal dismissed=true once isDataLoaded. handleExploreClick gates dismissal on isDataLoaded; the completed parse auto-clicks the button. SMELL CONFIRMED by source: the auto-dismiss path keys off the literal \"Loading data...\" label string (two coupled locations) — brittle string coupling."
+  },
+  "TOOL-10": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "medium",
+    "notes": "Grid built: \"(441 records in a 441-dot grid)\" — 441 verified dots padded with placeholders to a 441-dot perfect square (21x21). Dots sorted ascending by publication_date. SMELL CONFIRMED in code: dot color = hash(firstConcept/categoryValue charcodes) % (palette-1), not a real category->color map, so the legend's colors are decorative and do not authoritatively match the dots."
+  },
+  "TOOL-12": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "medium",
+    "notes": "Clicking a verified dot entered exploration mode: header=\"(ID RECORD-00086 connections shown)\", badge=\"Primary selected record\", panel title=\"Public Journalism A Case for Public Scholarship\", \"Connected records (15 shown)\". View locked, unrelated dots dimmed, Manhattan paths animated to matches. SMELL CONFIRMED in code: connectedRecordIds = allConnected.slice(0, 15) in array order, NOT ranked by shared-value count, so a record with many connections shows an arbitrary first-15 subset."
+  },
+  "TOOL-14": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Panel state transitions work: maximized=true (header \"ID: RECORD-00086\"), minimized=true, default=true. View-source button hidden=false, href=\"https://berks.psu.edu/sites/berks/files/campus/ros\" (gated by sanitizeUrl http/https only); all text via escapeHtml. SMELL CONFIRMED by source: tutorial modal markup is malformed — orphan </li> (line 285) and unbalanced <b> tags inside a <p> (lines 283-287). Cosmetic."
+  },
+  "TOOL-13": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Dot hover tooltip rendered: \"<div class=\"flex flex-col text-left p-1\"> <div class=\"text-[10px] text-gray-400 font-medium tracking-wider mb-0.5\">01-05\". Content (date DD-MM-YYYY, title, first 3 tags) and line tooltips all escaped via escapeHtml (issue #157). SMELL CONFIRMED in code: date reformat is dateParts.length===3 ? reorder YYYY-MM-DD -> DD-MM-YYYY : leave as-is, so a year-only or non-ISO date is displayed un-reformatted (inconsistent)."
+  },
+  "TOOL-11": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "updateConnectionField switched the color-key heading: \"Dot color is determined by: Thematic categories\" then \"Dot color is determined by: Key concepts\". resetView clears active exploration on change (record count back to \"(441 records in a 441-dot grid)\"). Both connections and dot colors use the same active field (unified)."
+  },
+  "TOOL-15": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "toggleGridSize expanded grid to 625 dots (from 441), label now \"Hide 625 total dots (Click to contract)\". Reuses cached verifiedMasterRecords (isToggle short-circuit, no network refetch). SMELL CONFIRMED: verified count (441) < both grid sizes (441/625), so the surplus slots are non-interactive placeholder filler — most of a 625 grid is empty padding, which can misrepresent archive size."
+  },
+  "TOOL-17": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "high",
+    "notes": "Core archive-core.json loaded relatively (../../../data/), dashboard visible=true. Records mapped, type==='social' excluded, kept if id+title+finite year. Entity graph (archive-entities.json, 1322 Concept entities) loaded in its own guard; archive-details.json patched in background. Stat \"records\"=950."
+  },
+  "TOOL-18": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "medium",
+    "notes": "Search \"press\": 950 -> 493 records. Category checkbox: -> 65. Reset -> 950. 6 category + 10 publication checkboxes (top 10). SMELL CONFIRMED in code: search runs against ~120-char summaryPreview until archive-details.json (~13MB) loads in background, then upgrades silently — early searches can miss matches with no UI indication."
+  },
+  "TOOL-19": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Stat cards: records=950, years=\"1986 - 2026\", publications=213, mostActiveYear=2004. All recompute on filter change."
+  },
+  "TOOL-20": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "medium",
+    "notes": "Chart.js loaded=true; 4 chart canvases present=true. top-concepts label count=10 (entities present: 1322 Concept entities, so chart populates here). updateAllCharts no-ops if Chart undefined; CDN scripts carry SRI. SMELL CONFIRMED in code: if archive-entities.json were missing/empty the top-concepts chart renders empty with only console.warn, no in-UI message."
+  },
+  "TOOL-21": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Table: headers [\"publication_date\",\"title\",\"original_publication\"], default rows=10. Date sort toggled first row \"2026-04-22\" -> \"1986-01-01\"; rows-per-page 10->25 gave 25 rows. Pagination text: \"Showing 1 to 10 of 950 results\n                    \n                        Prev\n                        Next\". SMELL CONFIRMED in code: sort uses raw </> on values; publication_date is ISO so lexical≈chronological, but any non-ISO/empty date sorts wrong and empties drift to one end."
+  },
+  "TOOL-22": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "CSV export: filename=\"rosen_archive_export_2026-06-21.csv\", header=\"id,publication_date,title,original_publication,summary,key_concepts,thematic_categories\", 950 data rows. escapeCsvCell prefixes a leading apostrophe for cells starting with = + - @ tab CR LF (formula-injection guard, issue #423) + RFC-4180 quoting. Empty-set path alerts \"No data to export\". Verified present in code."
+  }
+}

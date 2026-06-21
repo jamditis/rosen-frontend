@@ -1,0 +1,194 @@
+{
+  "ENT-01": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Spinner cleared, list rendered. All (7379); 100 of 7379 shown. Failed-fetch-swallowed-to-empty smell is real in code (catch returns {entities:[]}) but not reproducible against a healthy server; confirmed by source review."
+  },
+  "ENT-02": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "6 type chips render with counts (People (2668), Organizations (1659), Concepts (1322), Works (997), Events (466), Locations (267)). Clicking filters to the type count; clicking active chip toggles back to All. Counts are data-driven (typeCounts from entities) as the smell describes — intended behavior."
+  },
+  "ENT-03": {
+    "test_status": "pass",
+    "errors_found": "No-match search shows \"Showing 0 of 0 entities\" with no dedicated empty-state message (hasNoResultsMsg=false).",
+    "severity": "low",
+    "notes": "Search narrows (7379->20 for 'rosen'); clear (X) empties the field. Confirmed smell: an empty result set renders a blank grid + count of 0, no \"no results found\" message. Minor UX gap, behaves as coded."
+  },
+  "ENT-04": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Sort changes order (mentions first='Jay Rosen', alpha first=''Sanctuary' as battleground'); alphabetical is correctly localeCompare-sorted ('Sanctuary' as battleground, \"Big Media\" Meets the \"Bloggers\", \"Buzz\" Merritt...). Mentions fallback of 1 (unstable ties) is a real but low-impact smell."
+  },
+  "ENT-05": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Cards show icon, name, \"1 record\", and chevron. Pluralization present. The mentions-vs-panel-record-count divergence smell is real (card uses totalMentions, panel uses relationship map) — verified separately in ENT-08."
+  },
+  "ENT-06": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "\"Showing X of Y\" present; Show more grew 100->200 (+100). Button \"Show more (7279 remaining)\"."
+  },
+  "ENT-07": {
+    "test_status": "pass",
+    "errors_found": "No crash observed clicking entity cards.",
+    "severity": "low",
+    "notes": "Card click opens detail panel (Records / Prominence shown); clicking same card toggles it closed. Note: the unguarded b.date.localeCompare sort (smell) would throw only for a record with undefined date; not triggered by current data, but the risk is real in code."
+  },
+  "ENT-08": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Panel shows Records (1); no +more line (<=20), consistent with the 20-cap. Confirmed smell: records beyond 20 are counted but unreachable (no \"show all\")."
+  },
+  "ENT-09": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "\"Often appears with\" renders 15 rows (<=15 cap confirmed); clicking a co-entity re-pivots panel to \"Related records\". Confirmed smell: top 20 computed but only 15 render, so up to 5 silently dropped; clicking does not scroll to the re-pivoted entity."
+  },
+  "ENT-10": {
+    "test_status": "fail",
+    "errors_found": "\"Read Full Text\" href is \"/j/rosen-archive/dissertation/reader/\" (hardcoded production path); fetched locally it returns HTTP 404 (broken link in local/preview).",
+    "severity": "medium",
+    "notes": "Page chrome present: title, subtitle, tags [\"Public Sphere\",\"Objectivity\",\"Lippmann\",\"Dewey\"], footer links [\"https://twitter.com/jayrosen_nyu\",\"https://pressthink.org\"]. Confirmed smell: the Read Full Text href is the absolute prod path /j/rosen-archive/... which does not resolve under localhost (status 404)."
+  },
+  "ENT-11": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Node counts: initial=16, after root click=3, Expand All=170, Collapse All=16. Expand/collapse controls work. Confirmed smell: a single body click both selects (opens panel) and toggles expansion — the two actions are conflated by design (handleNodeClick calls onSelect then onToggle)."
+  },
+  "ENT-12": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Zoom pill: start=106%, after Zoom-in button=127%, after '0'=100% (resets to exactly 100), after '+'=120%. Confirmed smell: '0' sets zoom to 1 but does not recenter pan (Focus button does fit) — two reset behaviors."
+  },
+  "ENT-13": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Arrow keys nudge pan (transform \"translate(561.732283464567, 328) scale(1.2)\" -> \"translate(661.732283464567, 328) scale(1.2)\"). Confirmed smell: pan only initiates when e.target.tagName==='svg'; a drag starting on a node (tagName='rect') silently does nothing instead of panning."
+  },
+  "ENT-14": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Focus button re-fits (transform changed after pan). Auto-fit on layout change is wired (useEffect on bounds). Confirmed smell: auto-fit fires on every bounds change, overriding a user's manual zoom/pan when they expand/collapse — the \"view fights the user\" behavior."
+  },
+  "ENT-15": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Help overlay toggles open/closed via HelpCircle. Confirmed smell: overlay documents +/-/0/arrows/Esc but omits mouse-wheel zoom (documentsWheel=false) and the Focus/Expand All/Collapse All buttons — documented set is incomplete."
+  },
+  "ENT-16": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Detail panel (role=dialog, open) shows type label \"Chapter\", title \"Chapter 2\", and content sections (summary/concepts/figures/quote) (comingSoon=false). Confirmed smell exists in code: displayNode retained for animate-out can briefly show stale content on rapid toggling (not reliably reproducible headless)."
+  },
+  "ENT-17": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Panel closes via Esc (true) and X button (true). Confirmed smell: two independent Esc handlers (DetailPanel + MindMap) both fire on the same keypress — redundant double state update, no user-visible breakage observed."
+  },
+  "ENT-18": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Nodes use 3 distinct fill colors (type encoding); page refs render (true). Confirmed smell: the on-canvas legend documents only Parts/Chapters/Intro-Conclusion (legendParts=true) and omits concept (violet) and figure (green) nodes."
+  },
+  "ENT-19": {
+    "test_status": "partial",
+    "errors_found": "EntityBrowser imports getRecordsByEntity/getEntityById from archiveService.js, NOT from entityIndex.js (frozen prominence-sorted projection). Two parallel relationship implementations coexist and can drift.",
+    "severity": "low",
+    "notes": "Confirmed smell via source: archiveService.buildEntityMaps powers the UI; entityIndex.js (the tested pure projection) is wired into tests only, not the browser. Relationships resolve correctly at runtime (records + co-occurrence render), so functionally OK today, but the duplication is real (browser sorts records by date / co-entities by count; entityIndex sorts by prominence)."
+  },
+  "ANL-01": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Cold deep-link to #analytics fetched archive-analytics.json=true, archive-core.json=false, archive-data.json=false. Core/full data correctly skipped (App.js gate). Confirmed smell: header subtitle \"Powered by sql.js (SQLite in your browser)\" present (true) but the default view renders entirely from prebuilt JSON aggregates and never touches SQLite — misleading."
+  },
+  "ANL-02": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Stat cards: Records=26,615, Categories=6, Concepts=626, Entities=7,379. Confirmed smell: Records (26,615) counts ~29.7k social posts, far larger than the ~1,030 records a visitor browses; a casual reader may conflate the two. Categories=6 is the fixed top-level taxonomy."
+  },
+  "ANL-03": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Records-by-era chart renders 8 bars. Labels: [\"Public Journalism (90s)\",\"View from Nowhere (10s)\",\"Democracy in Crisis (20s)\",\"Blogging Launch & Digital Disruption (2000-2004)\",\"Peak Blogging & Citizen Journalism (2005-2009)\",\"Platform Transition & Future Models (2021-Present)\",\"Social Media & Financial Crisis (2010-2015)\",\"Trump Era & Democratic Crisis (2016-2020)\"]. Confirmed smell: two overlapping era taxonomies are mixed into one flat list (decade-style \"(90s)/(10s)/(20s)\" alongside year-range buckets), so the buckets do not partition the archive cleanly. overlappingDetected=true."
+  },
+  "ANL-04": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Top categories (6 bars), people (10, first=\"Jay Rosen\"), concepts (10, first=\"The People Formerly Known as the Audience\"). Confirmed smell: \"Jay Rosen\" is the #1 most-mentioned person (jayFirst=true) — expected noise in a self-archive, arguably should be filtered."
+  },
+  "ANL-05": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Output-by-year renders 30 bars. Data has 38 years; maxBars=30. Confirmed smell: 8 earliest years are silently dropped with no \"showing N of M\" indicator (hasShowingN=false, silentDrop=true). Social-post-dominated counts also make article-era bars near-invisible."
+  },
+  "ANL-06": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Co-occurrence list renders 10 pill rows (e.g. \"Journalism Theory & Practice + Press & Media Criticism7400\"), maps the full precomputed array with no client slice cap (currently 10 pairs). Confirmed smell: relies entirely on the prebuilt file already being trimmed."
+  },
+  "ANL-07": {
+    "test_status": "pass",
+    "errors_found": "Story claims 14 templates; actual select has 13 (mismatch). No duplicate template ids found.",
+    "severity": "low",
+    "notes": "Query builder works end-to-end: template switching + SQL preview (\"SELECT year, COUNT(*) as count\n      FROM records\n      WHERE year != ''\n      G...\") + lazy SQLite load + ran Count Records returning 10 rows. SQL-injection smell: buildSql interpolates FIELD/YEAR/ERA/TYPE dropdowns unescaped and the count-by-field column name unquoted; dropdowns are constrained so not user-exploitable today, text inputs escape only single quotes. Read-only in-browser DB caps blast radius. Refuted duplicate-id risk (13 unique ids)."
+  },
+  "ANL-08": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Results table renders headers [\"year\",\"count\"] (underscores->spaces, uppercased via CSS) with 10 zebra-striped rows. Columns inferred from first row keys (smell: heterogeneous shapes would drop columns, but SQL rows are uniform)."
+  },
+  "ANL-09": {
+    "test_status": "pass",
+    "errors_found": "Helper text lists record_concepts but not record_tags (helperHasTags=false) — confirmed smell.",
+    "severity": "low",
+    "notes": "Raw SQL box prefilled (\"SELECT year, COUNT(*) as count FROM records GROUP BY year OR...\"), ran and dumped JSON output. Confirmed smell: query() calls db.exec on the raw string with no SELECT-only constraint (DDL/DML allowed); output is raw JSON.stringify not a table. In-memory DB so harmless."
+  },
+  "ANL-10": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "\"Top publications\" example button populated the raw-SQL textarea (changed=true) without auto-running. Confirmed smell: buttons only fill, user must still click Run; a user may expect a click to run. \"Articles about Trump\" example uses title-only LIKE '%Trump%'."
+  },
+  "ANL-11": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "archive-data.json fetched only after query trigger (lazy). Memoized init dedups raw-SQL + builder surfaces."
+  },
+  "ANL-12": {
+    "test_status": "partial",
+    "errors_found": "Two different mention-count strategies coexist: sqliteService.getMostMentionedEntities reconciles MAX(total_mentions, COUNT(record_entities)); the QueryBuilder \"Most Mentioned People\" template (top-people) counts COUNT(re.record_id) via JOIN only, which undercounts entities whose records lack relatedIds. The dashboard \"Most mentioned people\" chart uses the precomputed aggregate (total_mentions-based, e.g. Jay Rosen=377).",
+    "severity": "low",
+    "notes": "Confirmed smell by source: a user comparing the builder \"Most Mentioned People\" result to the dashboard chart for the same person can see different numbers. getMostMentionedEntities is the reconciled path but the builder template does not use it. Not runtime-testable here without SQLite, but the divergence is structural and certain."
+  },
+  "ANL-13": {
+    "test_status": "fail",
+    "errors_found": "RiverOfNews is implemented but imported by no live component (only referenced in tests/needs-review.test.js:70). No route (#) or button reaches it; swept archive, folders, entities, analytics, dissertation, about — \"River of News\" never rendered. The user cannot reach this feature at all.",
+    "severity": "medium",
+    "notes": "Confirmed UNREACHABLE: dead component still shipped (and precached by the service worker), downloaded by every visitor for no user-facing benefit. Its \"Today/Yesterday/5m ago\" time grouping also assumes a live recent feed, which fits the mostly-historical records poorly. Marked fail because the user cannot reach it."
+  }
+}

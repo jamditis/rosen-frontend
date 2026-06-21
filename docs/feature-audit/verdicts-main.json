@@ -1,0 +1,158 @@
+{
+  "MAIN-13": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "count line shows \"26615 records found\"; header/footer show total + year span 1986–2026."
+  },
+  "MAIN-12": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "sort works (oldest->newest, title A-Z verified). SMELL confirmed but cosmetic: default value is date-asc (oldest) while the first/visually-default option is \"Newest first\" (date-desc) — the select correctly renders date-asc, so the dropdown label and actual order are consistent; only the option ORDER may mislead. First cards dated 1986-01-01, 1989-01-01, 1989-02-03."
+  },
+  "MAIN-01": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "cards render in columns layout with accent bar, pub, date chip, title, summary, 2 tag/badge chip(s); click opens record modal."
+  },
+  "MAIN-02": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "recordNeedsReview only treats boolean true / string 'true' as flagged (verified in utils/needsReview.js). With current data no card in the default view shows the amber chip (0 present), matching the story's note that no production record is flagged. Chip markup + title attribute present in App.js card template."
+  },
+  "MAIN-03": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "keyword search filters (all=26615 -> \"press\"=23511); ASCII apostrophe \"rosen's\" returned 74 results (normalization active); helper line present; searching from folders bounced back to archive (onFolders before=true)."
+  },
+  "MAIN-04": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "2+ char term \"press\" produced 9 <mark> highlights; single char \"p\" produced 0 (no highlight, as designed). SMELL is real but cosmetic per code (Highlight matches raw term against raw text while filter uses normalized text) — a normalized-only match would surface unhighlighted; does not break search."
+  },
+  "MAIN-05": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "\"jo\" showed 8 suggestions (<=8); clicking first set search to \"\"#journalism says it’s time to quit journalism...\" is not a good summary of...\". 1-char \"j\" hid dropdown; 2-char no-match \"zzqx\" rendered no dropdown."
+  },
+  "MAIN-06": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "clear (x) button present while search non-empty; clicking it emptied the search and left 1 category filter(s) intact."
+  },
+  "MAIN-07": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "category \"Audience & Public Engagement\" narrowed 26615 -> 3744; adding a 2nd category combined with AND (94 <= 3744). 6 categories (<=10) so no View All/Less toggle renders (correct)."
+  },
+  "MAIN-08": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "era \"Public Journalism (90s)\" narrowed 26615 -> 66; \"All eras\" restored 26615. Era/year mutual exclusion enforced in handleEraChange/handleYearSelect (verified in source)."
+  },
+  "MAIN-09": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Articles=950 (< all 26615, excludes social); Twitter/X=22507; Bluesky=2677; All restored 26615."
+  },
+  "MAIN-10": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "applied search+category+type (120); \"Reset all filters\" restored full 26615 and cleared search box. (Empty-state \"Clear all filters\" uses the same reset object — verified in source; exercised in MAIN-16.)"
+  },
+  "MAIN-14": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "pagination: \"Page 1 of 1109\" (expected 1109 pages for 26615/24); Prev disabled on page 1; Next advanced to page 2; applying a filter reset to page 1."
+  },
+  "MAIN-15": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "folder view: 6 tiles (<=6), counts 23482,8346,7687,3744,2850,677 all >=10 and descending; clicking a folder switched to archive filtered to 1 category."
+  },
+  "MAIN-16": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "nonsense search produced the dashed \"No records found\" panel with hint and a \"Clear all filters\" button; clicking it restored 26615 records."
+  },
+  "MAIN-18": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "timeline renders 43 year bars on default route; hovering a bar showed a \"{count} records\" tooltip (true); applying a search hid the timeline (gated on no search/era/category)."
+  },
+  "MAIN-19": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "clicking a year bar set the year filter (1 records) and showed a red \"Clear filter (1986)\" button; clicking it cleared the year and restored 26615."
+  },
+  "MAIN-20": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Shows 3 cards. Note: FEATURED_WORKS has 21 entries (story says 20) — count mismatch in the story text, not a product bug; carousel logic is count-agnostic. Dot jump changed the active window; chevron collapsed/hid the cards; section disappears when a filter is active."
+  },
+  "MAIN-21": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "clicking a card opened the modal and added ?record= to the URL; ArrowRight navigated to the next filtered record; Escape closed it and removed ?record= from the URL. Deep link ?record=dissertation-1986 opened the modal on cold load; ?record=BADID-NONEXISTENT rendered no modal (isOpen true but record null)."
+  },
+  "MAIN-22": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "choosing category \"Journalism Theory & Practice\" in the record modal closed it and navigated to the archive filtered to that single category (1 checkbox checked). Search-term drill-down (onFilterSearch) confirmed separately in-browser: clicking a modal Tag set the archive search box to that term and stayed on the archive route."
+  },
+  "MAIN-23": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "all hash routes load and survive the hashchange/popstate sync: {\"folders\":true,\"entities\":true,\"dissertation\":true,\"about\":true,\"analytics\":true}; legacy ?view=dissertation migrated to #dissertation. Note: migrateLegacyUrl (router.js) only maps ?view=dissertation and ?view=about — ?view=entities/folders/analytics are NOT migrated (migratedEntities=false); harmless since those are the only legacy URLs that existed, but the story's \"migrates legacy ?view= URLs\" is narrower than it sounds."
+  },
+  "MAIN-24": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "header has logo, Report-a-bug button; inline Tools bar shows Mind Map / Entities / Analytics / More; Mind Map routed to #dissertation; header gained shadow after scrolling past 10px."
+  },
+  "MAIN-25": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "footer Explore column has all 5 links; \"Entity browser\" routed to #entities; Credits show \"26615 records | 1986–2026\"."
+  },
+  "MAIN-26": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "back-to-top hidden near top, appeared after scrolling past 500px, scrolled to top on click (scrollY=0) and hid again."
+  },
+  "MAIN-17": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "aborting the core-data fetch surfaced the red \"Error loading archive\" panel with a \"Reload Page\" button on the archive route, and the same panel on #entities (shared fail-loud per #369). Loading state (\"Loading archive...\" + LoadingQuotes) confirmed during normal cold loads."
+  },
+  "MAIN-11": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "at 390px the header shows the filter toggle (sidebar hidden); applying a search produced a red \"1\" badge; opening the drawer showed the active-filter summary line."
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "RDR-01": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Text is inlined static HTML, not fetched. 1041 <p>, 679746 chars, anchors intro/ch8/notes/works present. The 'WILL BE INJECTED' comment is a harmless leftover label (still present in markup); nothing is loaded at runtime, confirming the smell is cosmetic. src/impossible-press.md is not requested by the page."
+  },
+  "RDR-02": {
+    "test_status": "partial",
+    "errors_found": "TOC '#conclusion' scrolls to the WRONG element: lands on <H4> \"Conclusion\" (a Chapter 8 subhead at DOM-first position), not the top-level CONCLUSION <h1>. Duplicate id=conclusion (4 elements) makes getElementById resolve to the first.",
+    "severity": "high",
+    "notes": "TOC click works for unique ids (#introduction scrolled into view, heading focused=true). Smell CONFIRMED for #conclusion: 4 elements share the id; click lands on the wrong (first) one."
+  },
+  "RDR-03": {
+    "test_status": "partial",
+    "errors_found": "scroll-spy observes 40 headings but the TOC only links 13; 25 observed headings have no TOC link (e.g. [\"the-impossible-press-american-journalism-and-the-d\",\"jay-rosen\",\"journalism-as-a-transaction\",\"part-one\"]). When one of those is the active section, the spy de-highlights every chapter and lights NO link (orphan highlight). It also never clears the active state when nothing intersects.",
+    "severity": "medium",
+    "notes": "Core scroll-spy works: with chapter-4 in the band, active=[], hash=\"#from-crowd-to-public\" (history.replaceState sync, chapterHighlights=false). Smell CONFIRMED structurally: observer watches every h1/h2/h3[id] (40) incl. 25 subheads not in the TOC, so a subhead-active state leaves no TOC link highlighted; also never clears highlight when none intersect; shares the duplicate id=conclusion ambiguity."
+  },
+  "RDR-04": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Alt+Arrow stepping moved the viewport between headings: scrollY 59742->8344 (next) ->1820 (prev). Ctrl+Home returned to top (atTop=true); Ctrl+End reached end region (sy=317034/max~317034, atBottom=true). Smell CONFIRMED: on a fresh page with no prior scroll, currentSection is null (active links=0) so Alt+ArrowRight does NOT navigate to a heading (scrollY stayed 328, noOp=true). Stepping is per-heading (h1/h2/h3 incl. subheads), not per-TOC-chapter."
+  },
+  "RDR-09": {
+    "test_status": "pass",
+    "errors_found": "aria-expanded on .settings-toggle stays 'false' after opening (never synced)",
+    "severity": "low",
+    "notes": "Panel opens on toggle (true), closes on Escape (true) and outside click (true). Smell CONFIRMED: aria-expanded='false' after open (JS never updates it)."
+  },
+  "RDR-10": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Dark sets <html data-theme=\"dark\">, persisted theme=\"dark\", is-selected=true. Anti-flash inline <head> script duplicates the theme/font/line/margin mapping (two copies to keep in sync) — smell confirmed by code, both apply consistently here."
+  },
+  "RDR-11": {
+    "test_status": "pass",
+    "errors_found": "All three size buttons render the same glyph \"A\" at the same size with no aria-label distinguishing small/medium/large",
+    "severity": "low",
+    "notes": "Large sets data-font-size=\"large\" (--font-size-base=1.25rem); medium removes the attribute (=null). Persisted fontSize=\"large\". Smell CONFIRMED: identical \"A\" labels, no aria-label."
+  },
+  "RDR-12": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Relaxed sets data-line-height=\"relaxed\" (--line-height-body=1.9); normal removes attribute (=null). Persisted lineHeight=\"relaxed\"."
+  },
+  "RDR-13": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Wide sets data-margin=\"wide\" (--content-max-width=820px); normal removes attribute (=null). Persisted margin=\"wide\"."
+  },
+  "RDR-07": {
+    "test_status": "pass",
+    "errors_found": "role=progressbar exposes no aria-valuenow/valuemin/valuemax (no numeric progress for assistive tech)",
+    "severity": "low",
+    "notes": "Fill width tracks scroll: top=\"0%\" 40%=\"27.7639%\" bottom=\"86.9393%\" (rAF-throttled). Bar peaks <100% at true scroll bottom because the percent uses documentElement.scrollHeight, which exceeds the clamped max scroll. Smell CONFIRMED: aria-valuenow=null."
+  },
+  "RDR-06": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Hidden at top=true, visible after scroll>0.5vh=true, click returns to top=true."
+  },
+  "RDR-14": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Selecting 107 chars + mouseup shows #selection-menu (visible=true) with buttons [\"share\",\"cite\",\"copy\"]. Smell CONFIRMED at code level: only mouseup triggers it (keyboard/touch selection won't); getCurrentChapter() heuristic mislabels Ack/Notes/Works passages."
+  },
+  "RDR-15": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Copy wrote 182 chars to clipboard (\"Submitted in partial fulfillment of the ...\") and toast=\"Text copied to clipboard\"."
+  },
+  "RDR-16": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Cite copied: \"Rosen, J. (1986). The impossible press: American journalism and the decline of public life [Doctoral dissertat...\". Smell CONFIRMED: the trailing chapter segment comes from getCurrentChapter()'s heuristic, defaulting to 'Introduction' for non-chapter selections. toast=\"Citation copied to clipboard\"."
+  },
+  "RDR-17": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Short (76-char) selection: modal opens (true), prefilled quote \"\"Submitted in partial fulfillm...\", Read-more URL present (true), Download Image visible (true), image generated toast=\"Image downloaded\". Long selection hides Download (true) + shows length note (true). Escape closes (true). Smells CONFIRMED: 'Read more' URL embeds the live scroll-spy hash (hashPresent=true); PNG uses Georgia, not the reader body font."
+  },
+  "RDR-18": {
+    "test_status": "partial",
+    "errors_found": "copied citation begins with the 'Cite this work:' label (textContent includes the heading)",
+    "severity": "low",
+    "notes": "Footer copy captured: \"Cite this work:\n        Rosen, J. (1986). The impossible press: American journal...\", toast=\"Citation copied to clipboard\". Smell CONFIRMED: leading 'Cite this work:' label is included (true)."
+  },
+  "RDR-21": {
+    "test_status": "partial",
+    "errors_found": "footnote markers are plain Unicode superscripts (¹²³); zero <a class=\"footnote-ref\"> and zero links into #notes — footnote jumps are unimplemented, the .footnote-ref CSS is dead",
+    "severity": "medium",
+    "notes": "Skip link href=\"#main-content\" (->#main-content, true). Smell CONFIRMED: footnote-ref anchors=0, note-target links=0, unicode superscripts present=true. typography.css .footnote-ref styling is unused."
+  },
+  "RDR-20": {
+    "test_status": "pass",
+    "errors_found": "CSS targets .btn[title=\"Back to dissertation home\"] (layout.css) but no header button has that title — back link's title is \"Back to archive\", so those breakpoint rules match nothing (dead/stale selector)",
+    "severity": "low",
+    "notes": "Header links present (PDF download=true, NotebookLM target=_blank rel=noopener); footer repeats 4 actions. Smell CONFIRMED: deadTitleMatches=0; back link title=\"Back to archive\"."
+  },
+  "RDR-05": {
+    "test_status": "pass",
+    "errors_found": "menu-toggle aria-expanded stays 'false' when the drawer is open (never synced)",
+    "severity": "low",
+    "notes": "Below 1024px: hamburger visible=true, opens drawer=true + overlay=true, body scroll locked=true, focus moved into nav=true, closes on TOC link=true (body unlocked=true) and overlay click=true. Smell CONFIRMED: aria-expanded='false' while open."
+  },
+  "RDR-08": {
+    "test_status": "partial",
+    "errors_found": "",
+    "severity": "medium",
+    "notes": "Resume prompt shown=true (\"42% complete\"); Continue scrolled to sectionId target (scrollY=0). Save on sectionchange persisted {sectionId:acknowledgements, scrollY:449}. Smell CONFIRMED by code: resume uses absolute saved scrollY (drifts if font/spacing/width changed between sessions); 10s auto-dismiss can remove the prompt mid-decision."
+  },
+  "RDR-19": {
+    "test_status": "partial",
+    "errors_found": "#conclusion deep link lands on <H4> \"Conclusion\" (Chapter 8 subhead, DOM-first), NOT the top-level CONCLUSION <h1> (which sits 69585px from current viewport top)",
+    "severity": "high",
+    "notes": "Unique hash #chapter-5 jumps correctly on load (inView=true, scrollY=103888). Smell CONFIRMED: getElementById('conclusion') resolves to the first of 4 duplicate ids, so #conclusion deep link mis-lands."
+  }
+}

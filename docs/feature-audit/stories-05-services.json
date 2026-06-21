@@ -1,0 +1,248 @@
+[
+  {
+    "id": "SVC-01",
+    "area": "Data & services",
+    "subarea": "Data loading",
+    "feature": "Split-load core data on page load",
+    "user_story": "As a visitor, I want the archive grid to appear quickly, so that I don't wait for the full ~28 MB dataset before browsing.",
+    "expected_behavior": "On load, fetchCoreData() fetches only archive-core.json (~13 MB) from DATA_CONFIG.archive_core ('./data/archive-core.json'). On a successful fetch it parses the JSON, injects the 1986 dissertation card (id 'dissertation-1986') into data.records and its categories into data.facets.categories (sorted) if not already present, then returns the data. archive-details.json, archive-entities.json and the combined archive-data.json are NOT fetched at this point.",
+    "source_files": [
+      "frontend/services/archiveService.js",
+      "frontend/constants.js"
+    ],
+    "test_notes": "Open the app fresh (clear caches first). In the Network tab confirm only archive-core.json loads on first paint; archive-details.json / archive-entities.json / archive-data.json should not appear until you open a record modal or the entities view. Confirm the dissertation card ('The Impossible Press') shows in the grid even though it is not in the CSV-derived JSON."
+  },
+  {
+    "id": "SVC-02",
+    "area": "Data & services",
+    "subarea": "Caching",
+    "feature": "IndexedDB cache for core data persists across reloads",
+    "user_story": "As a returning visitor, I want the archive to load instantly on my second visit, so that I don't re-download or re-parse ~13 MB every time.",
+    "expected_behavior": "fetchCoreData() first calls idbGet(coreIdbKey()). If a fresh entry exists (matching CACHE_VERSION 'v9' and within the 30-minute TTL) it returns the structured-cloned object without any network fetch or JSON.parse. On a network fetch it stores the result via idbSet() (IndexedDB), and only falls back to Web Storage (setCachedData) when idbSet returns false. IndexedDB persists across tab close, so a fresh tab still gets a hit. The IDB key is namespaced by CACHE_VERSION and the stored deploy version, so a deploy or version bump reads a fresh key by construction.",
+    "source_files": [
+      "frontend/services/archiveService.js",
+      "frontend/services/idbCache.js"
+    ],
+    "test_notes": "Load once, then reload within 30 minutes. With localStorage.jrda_debug='1' set, watch the console for 'Using IndexedDB-cached core data'. In Application > IndexedDB look for database 'jrda-archive-cache', store 'kv', a key like 'archive-core::v9::<deployversion>'. Confirm no archive-core.json request fires on the cached reload. Close the tab fully and reopen to confirm persistence (a sessionStorage-only cache would miss here)."
+  },
+  {
+    "id": "SVC-03",
+    "area": "Data & services",
+    "subarea": "Caching",
+    "feature": "Web Storage fallback when IndexedDB is blocked",
+    "user_story": "As a visitor in a privacy mode (Safari Private, Firefox strict tracking), I want caching to still work where possible, so that the archive doesn't break or re-fetch needlessly.",
+    "expected_behavior": "idbCache resolves null/false (never throws) when IndexedDB is absent or blocked, or when the cross-origin idb-keyval import from esm.sh fails or stalls (3s timeout). fetchCoreData then reads the Web Storage cache via getCachedData(); a hit is promoted into IndexedDB best-effort. For the ~13 MB core payload, setCachedData skips writing entirely if serialized size > 5 MB (MAX_LOCALSTORAGE_SIZE), so the core blob is not cached in Web Storage at all there — it relies on IndexedDB and the service-worker data cache instead.",
+    "source_files": [
+      "frontend/services/idbCache.js",
+      "frontend/services/archiveService.js"
+    ],
+    "test_notes": "In a private window or with IndexedDB disabled, load the app. Confirm no uncaught errors and the app still renders. With jrda_debug on, you may see 'Using Web Storage-cached core data' only for sub-5MB payloads. Throttle/block esm.sh to confirm the idb-keyval import timeout degrades gracefully (load still succeeds via network + SW cache).",
+    "code_smell": "For the ~13 MB core file, when IndexedDB is unavailable there is effectively no app-level persistent cache (setCachedData bails over 5 MB), so every fresh tab in private mode re-fetches and re-parses 13 MB unless the service worker cache covers it."
+  },
+  {
+    "id": "SVC-04",
+    "area": "Data & services",
+    "subarea": "Error handling",
+    "feature": "Core data load failure surfaces an explicit error (no masking)",
+    "user_story": "As a visitor, I want a clear error when the archive can't load, so that I'm not shown a misleading near-empty archive that looks intact.",
+    "expected_behavior": "On a failed core fetch (non-OK HTTP status, network error, or JSON parse error), fetchCoreData() logs the error and re-throws — it does NOT return a dissertation-only fallback. App.js's .catch renders the explicit 'Unable to load archive' error state. This deliberately differs from the legacy fetchArchiveData(), which on error returns a 1-record (dissertation-only) structure.",
+    "source_files": [
+      "frontend/services/archiveService.js"
+    ],
+    "test_notes": "In DevTools, block archive-core.json (or set it to return 503) and reload. Confirm the app shows an explicit error state rather than a grid containing only the dissertation. Watch console for 'Error fetching core data:'.",
+    "code_smell": "The legacy fetchArchiveData() (used by initSqlite path / combined fallback) still returns a dissertation-only object on error, the exact masking that fetchCoreData was changed to forbid — inconsistent error contract between the two loaders."
+  },
+  {
+    "id": "SVC-05",
+    "area": "Data & services",
+    "subarea": "Data loading",
+    "feature": "On-demand record details when a modal opens",
+    "user_story": "As a reader, I want full summaries, quotes, concepts and tags when I open a record, so that I get detail without paying for it on the initial grid load.",
+    "expected_behavior": "fetchRecordDetails(recordId) returns the dissertation's hardcoded details immediately for id 'dissertation-1986'. Otherwise it lazy-loads archive-details.json once via loadDetailsCache() (single-flight: concurrent callers share detailsLoadPromise) and returns detailsCache[recordId] or null if that id has no details. A details fetch failure sets detailsCache = {} (so subsequent lookups return null) rather than throwing.",
+    "source_files": [
+      "frontend/services/archiveService.js"
+    ],
+    "test_notes": "Open the first record modal and watch Network for a single archive-details.json fetch; open a second modal and confirm no re-fetch. Open the dissertation card and confirm details render without any details fetch. Block archive-details.json, open a non-dissertation record, and confirm the modal degrades to no detail (null) rather than erroring.",
+    "code_smell": "A details fetch failure is swallowed (detailsCache = {}), so every later record modal silently shows missing details for the rest of the session with no retry and no user-visible error — opposite of the fetchCoreData throw contract."
+  },
+  {
+    "id": "SVC-06",
+    "area": "Data & services",
+    "subarea": "Data loading",
+    "feature": "Background preload of details",
+    "user_story": "As a reader, I want the first record modal to open without a load delay, so that browsing feels instant.",
+    "expected_behavior": "preloadDetails() triggers loadDetailsCache() in the background only if details are neither loaded nor already loading. It is fire-and-forget; the result is ignored. Once it completes, a later fetchRecordDetails uses the in-memory detailsCache with no new fetch.",
+    "source_files": [
+      "frontend/services/archiveService.js"
+    ],
+    "test_notes": "After initial load and whatever idle trigger App.js uses, watch Network for an archive-details.json prefetch before any modal is opened. Then open a record and confirm the modal shows detail with no additional fetch."
+  },
+  {
+    "id": "SVC-07",
+    "area": "Data & services",
+    "subarea": "Data loading",
+    "feature": "On-demand entities for the entity browser",
+    "user_story": "As a researcher, I want the entity graph loaded only when I open the entities view, so that the initial archive load stays light.",
+    "expected_behavior": "fetchEntitiesData() returns entitiesCache if already loaded; otherwise it lazy-loads archive-entities.json once (single-flight via entitiesLoadPromise), builds the entity lookup maps (entityById, entityToRecords, recordToEntities) from data.entities + data.recordEntityMap, caches the result, and returns it. On fetch failure it returns { entities: [], recordEntityMap: {} } (empty, not thrown). It accepts both the network 'recordEntityMap' shape and a cached 'records' array shape.",
+    "source_files": [
+      "frontend/services/archiveService.js"
+    ],
+    "test_notes": "Navigate to #entities and watch Network for a single archive-entities.json fetch. Return to the grid and back to #entities to confirm no re-fetch. Block the file and open #entities to confirm an empty entity browser rather than an error/crash.",
+    "code_smell": "Entities fetch failure resolves to empty arrays — the legacy masking the newer httpCachedLoader port was written to forbid; the entity browser then looks like a genuinely empty graph with no error shown."
+  },
+  {
+    "id": "SVC-08",
+    "area": "Data & services",
+    "subarea": "Deep link",
+    "feature": "Open a record modal via ?record=ID",
+    "user_story": "As someone sharing a record link, I want ?record=ID to open that record's modal on load, so that recipients land directly on the item.",
+    "expected_behavior": "getRecordIdFromUrl() reads ?record from window.location.search via parseRecordId(), returning the id or null. An empty (?record=) or absent param returns null and opens no modal / pins no phantom selection. navigateTo(route, recordId) sets or deletes ?record via setRecordParam (truthy sets, falsy deletes). Deep-link validation against actual data happens in App.js once core data loads.",
+    "source_files": [
+      "frontend/services/router.js",
+      "frontend/utils/recordDeepLink.js"
+    ],
+    "test_notes": "Load with ?record=RECORD-00001 and confirm the modal opens after data loads. Load with ?record= (empty) and confirm no modal opens and no selection is pinned. Open then close a modal and confirm ?record is removed from the URL. Deep-link an unknown id and observe App.js behavior once data is ready (validation happens there)."
+  },
+  {
+    "id": "SVC-09",
+    "area": "Data & services",
+    "subarea": "Routing",
+    "feature": "Hash-based SPA routing with default fallback",
+    "user_story": "As a user, I want each view to have its own URL hash, so that I can bookmark and share #entities, #dissertation, #about, #analytics, #folders.",
+    "expected_behavior": "getCurrentRoute() reads window.location.hash, strips any '?suffix', and returns the matching ROUTES value (archive, folders, entities, dissertation, about, analytics). An empty or unknown hash returns DEFAULT_ROUTE ('archive'). navigateTo() writes the hash ('' for the default archive route), pushes history state, and dispatches a synthetic 'hashchange' event so the app re-renders the new view.",
+    "source_files": [
+      "frontend/services/router.js",
+      "frontend/services/viewState.js"
+    ],
+    "test_notes": "Click between views and confirm the hash updates (#folders, #entities, etc.) and the back/forward buttons move between them. Manually type #garbage and confirm it falls back to the archive grid. Confirm the default archive view shows no hash."
+  },
+  {
+    "id": "SVC-10",
+    "area": "Data & services",
+    "subarea": "Routing",
+    "feature": "Legacy ?view= URL migration",
+    "user_story": "As someone with an old bookmark, I want legacy ?view=dissertation / ?view=about links to still work, so that shared URLs from before the hash routing don't break.",
+    "expected_behavior": "migrateLegacyUrl() (called once on init) reads ?view; if it equals 'dissertation' or 'about' it calls navigateTo(ROUTES[view]), converting the URL to the hash form (#dissertation / #about) and clearing ?view. Other ?view values are left unchanged. The pure migrateLegacyHref() in viewState.js does the same string transform and also deletes the view param.",
+    "source_files": [
+      "frontend/services/router.js",
+      "frontend/services/viewState.js"
+    ],
+    "test_notes": "Load ?view=dissertation and confirm it redirects to #dissertation (and ?view is removed). Repeat for ?view=about. Load ?view=somethingelse and confirm no redirect occurs."
+  },
+  {
+    "id": "SVC-11",
+    "area": "Data & services",
+    "subarea": "Routing",
+    "feature": "Shareable view-state URLs (filters round-trip)",
+    "user_story": "As a researcher, I want a URL that carries my active filters, so that reloading or sharing reproduces the same filtered view.",
+    "expected_behavior": "viewState.js serialises route + filters + selectedRecord to a URL: search via q, era, year, type, replies (=1), repeated cat= and pub= keys, and record=. Only non-default fields are emitted (a pristine view yields a clean URL, default route emits no hash). parseViewState() round-trips any URL back to a complete view state with defaults filled in. year is kept as a string and only accepted if numeric; category/publication values use repeated keys so commas in names don't corrupt the value.",
+    "source_files": [
+      "frontend/services/viewState.js"
+    ],
+    "test_notes": "Apply a search term, an era, a category and a publication; check the URL contains q=, era=, cat=, pub=. Reload and confirm the filters are restored. Use a category name containing a comma and confirm it survives the round-trip (repeated cat= keys). Note: viewState is the pure serializer (Phase 1 of #133); confirm whether App.js actually wires filter persistence yet, since the module header says the React provider is deferred.",
+    "code_smell": "viewState.js documents that the consuming useViewState React provider is intentionally deferred, so filter-in-URL persistence may not be wired into App.js yet despite the serializer existing — observable behavior depends on App.js, outside this file's scope."
+  },
+  {
+    "id": "SVC-12",
+    "area": "Data & services",
+    "subarea": "Caching",
+    "feature": "Deploy-version cache invalidation",
+    "user_story": "As a returning visitor after a new deploy, I want fresh data, so that I'm not served stale cached records from a previous release.",
+    "expected_behavior": "fetchCoreData() and fetchAnalytics() await checkVersion() (bounded to 4s by withVersionTimeout). checkVersion() fetches version.json (cache-busted by ?t=timestamp); if the stored jrda_deploy_version differs from the server version it calls clearArchiveCache() (clearing localStorage/sessionStorage archive_* keys AND the IndexedDB core store), then records the new version. A slow/hung version.json doesn't block the load past 4s — it keeps running in the background and clears caches if it eventually returns. checkVersion is single-flight (memoised in-flight promise, released on settle).",
+    "source_files": [
+      "frontend/services/archiveService.js"
+    ],
+    "test_notes": "Set localStorage.jrda_deploy_version to a fake old value, ensure version.json reports a different version, reload, and watch console for '[Cache] Deploy version changed, clearing caches' and 'Archive caches cleared'. Throttle version.json to >4s and confirm the load is not blocked (it proceeds, caches clear later). Confirm a cold #analytics deep link also runs the version gate."
+  },
+  {
+    "id": "SVC-13",
+    "area": "Data & services",
+    "subarea": "Data loading",
+    "feature": "Analytics dashboard loads prebuilt aggregates",
+    "user_story": "As a user opening #analytics, I want stats to render quickly, so that I don't have to load the full ~28 MB dataset into in-browser SQLite.",
+    "expected_behavior": "fetchAnalytics() runs the deploy-version gate, then returns the Web Storage cached archive-analytics.json if fresh, else fetches it. On a non-OK status it throws (so the dashboard renders its explicit error state rather than an empty/misleading view). Successful fetches are cached via setCachedData. This is separate from the optional SQLite path.",
+    "source_files": [
+      "frontend/services/archiveService.js",
+      "frontend/constants.js"
+    ],
+    "test_notes": "Open #analytics cold (clear cache) and confirm only archive-analytics.json loads (not archive-data.json). Block archive-analytics.json and confirm an explicit dashboard error state. Reopen #analytics within 30 min and confirm a cache hit (no re-fetch)."
+  },
+  {
+    "id": "SVC-14",
+    "area": "Data & services",
+    "subarea": "Data loading",
+    "feature": "Optional SQLite query engine loads the full dataset",
+    "user_story": "As a power user running SQL/Query Builder queries, I want the full archive available for ad-hoc querying, so that I can run advanced analytics.",
+    "expected_behavior": "initSqlite() is single-flight (memoised promise). It initializes sql.js, then loads the full combined archive-data.json (DATA_CONFIG.archive_json) — using the Web Storage cache if present, else fetching and caching it — and loads it into SQLite. Returns true on success, false on failure; the memo is dropped on false/throw so a later query attempt retries. Both query surfaces (raw SQL box and Query Builder) share the one load.",
+    "source_files": [
+      "frontend/services/archiveService.js"
+    ],
+    "test_notes": "Trigger a SQL query / open the Query Builder and watch Network for a single archive-data.json (~28 MB) fetch — this is the only path that loads the combined file. Trigger two query surfaces near-simultaneously and confirm only one fetch. Fail the fetch and confirm a later attempt retries (memo released).",
+    "code_smell": "This is the only normal-operation path that fetches the ~28 MB combined file; on a slow connection the first SQL query downloads 28 MB, which may surprise users who expected the split-load behavior."
+  },
+  {
+    "id": "SVC-15",
+    "area": "Data & services",
+    "subarea": "Offline/SW",
+    "feature": "Service worker offline support for app shell and data",
+    "user_story": "As a user who loses connectivity, I want the archive to still work after I've visited it, so that I can keep browsing offline.",
+    "expected_behavior": "sw.js precaches the app shell (index.html, core JS/CSS components, archiveService, idbCache, etc.) on install and warms only archive-core.json in the data cache. HTML/navigations use network-first (so a deploy's new index.html and ?v= imports reach returning visitors), falling back to cache offline. JSON data files use stale-while-revalidate (cached served immediately, refreshed in background). Other static assets (.js/.css/.ico/.png/.jpg/.svg) use cache-first with ignoreSearch:true so ?v= query bumps still match the precached asset. Only same-origin requests are handled (esm.sh CDN imports are not). When offline with no cache, data requests return a 503 'Offline and no cached data available'.",
+    "source_files": [
+      "frontend/sw.js"
+    ],
+    "test_notes": "Load the app online (let SW install), then go offline (DevTools > Network > Offline) and reload — the shell and core grid should still render from cache. Confirm archive-core.json serves from cache; archive-details.json only if previously fetched. In Application > Cache Storage, confirm caches 'jrda-cache-3.4.3' and 'jrda-data-3.4.3'. Confirm the combined archive-data.json is NOT precached. Confirm cross-origin esm.sh requests bypass the SW.",
+    "code_smell": "Offline mode depends on the cross-origin esm.sh import map (React/HTM/idb-keyval/sql.js), which the SW deliberately does not cache — so a truly offline first-load (or after CDN cache eviction) cannot boot the app even though the shell HTML/JS is cached."
+  },
+  {
+    "id": "SVC-16",
+    "area": "Data & services",
+    "subarea": "Offline/SW",
+    "feature": "Service worker cache versioning drops stale caches on deploy",
+    "user_story": "As a returning visitor after a deploy, I want old cached JS dropped, so that I run the new code, not a stale service-worker copy.",
+    "expected_behavior": "CACHE_VERSION in sw.js ('3.4.3') names the caches (jrda-cache-<v>, jrda-data-<v>). On activate, the SW deletes any cache whose name doesn't match the current versioned names, then claims clients. Because static assets are served cache-first with ignoreSearch:true, a ?v= bump alone does NOT invalidate them — only a CACHE_VERSION bump drops the stale cache. version-consistency.test.js enforces CACHE_VERSION matches version.json.",
+    "source_files": [
+      "frontend/sw.js"
+    ],
+    "test_notes": "After a CACHE_VERSION bump and reload, watch console for '[SW] Deleting old cache: jrda-cache-<oldversion>'. In Application > Cache Storage confirm only the new-version caches remain. Confirm a ?v= bump without a CACHE_VERSION bump still serves the old cached JS (ignoreSearch)."
+  },
+  {
+    "id": "SVC-17",
+    "area": "Data & services",
+    "subarea": "Path resolution",
+    "feature": "Localhost vs github-pages vs production path switching",
+    "user_story": "As a developer or visitor on any host, I want the app to load data and assets from the correct base path, so that it works identically on localhost, GitHub Pages, and pressthink.org.",
+    "expected_behavior": "pathResolver.js detects three environments from the hostname: 'local' (localhost / 127.0.0.1) -> base /frontend, data /data; 'github-pages' (*.github.io) -> /rosen-frontend, /rosen-frontend/data; 'production' (everything else, incl. pressthink.org) -> /j/rosen-archive, /j/rosen-archive/data. The dissertation record url and getOpenDataURLs() use IS_LOCAL ('.') vs BASE_PATH accordingly. sw.js duplicates this same three-way detection inline (it can't ES-import as a classic worker) and must stay in sync.",
+    "source_files": [
+      "frontend/utils/pathResolver.js",
+      "frontend/sw.js",
+      "frontend/services/archiveService.js"
+    ],
+    "test_notes": "Serve locally at localhost:8000 and confirm data loads from /data and the SW logs '[SW] Environment: local development'. Compare to production (pressthink.org) where paths resolve under /j/rosen-archive. Confirm open-data download links (JSON/CSV/RSS/OPML) and the dissertation reader link resolve correctly per host.",
+    "code_smell": "The host-detection logic is duplicated between pathResolver.js and sw.js (classic worker can't import); they can drift, and a mismatch would silently cache/serve data under the wrong base path."
+  },
+  {
+    "id": "SVC-18",
+    "area": "Data & services",
+    "subarea": "Caching",
+    "feature": "Web Storage quota handling and legacy sessionStorage cleanup",
+    "user_story": "As a heavy user whose browser storage is nearly full, I want caching to fail gracefully, so that the archive keeps working when storage is exhausted.",
+    "expected_behavior": "setCachedData skips writing payloads over 5 MB (so the big split files never thrash Web Storage). On a QuotaExceededError it clears all archive_* keys via clearArchiveCache() and retries once; if it still fails it logs 'Cache disabled: browser storage is full' and continues without caching. getCachedData reads a legacy sessionStorage entry before localStorage so older builds' caches expire cleanly, and evicts entries that mismatch CACHE_VERSION or exceed the 30-min TTL. clearArchiveCache also fire-and-forget clears the IndexedDB core store.",
+    "source_files": [
+      "frontend/services/archiveService.js"
+    ],
+    "test_notes": "Fill localStorage near its quota, then trigger a small cacheable fetch (e.g. analytics) and confirm the app still works and logs the quota handling. Confirm archive_* keys are cleared on quota error. Set jrda_debug and observe cache read/eviction behavior on TTL/version mismatch (manually edit a cached entry's version)."
+  },
+  {
+    "id": "SVC-19",
+    "area": "Data & services",
+    "subarea": "Data loading",
+    "feature": "Entity connection lookups between records",
+    "user_story": "As a reader, I want to see related records and shared entities for a record, so that I can explore connections across the archive.",
+    "expected_behavior": "After entity maps are built (buildEntityMaps, run when entities/full data load), getRecordsByEntity, getEntitiesByRecord, findSharedEntities and calculateEntityConnectionStrength resolve relationships from the in-memory maps. findSharedEntities returns shared entities (optionally filtered by type) sorted by prominence descending; connection strength is the count plus a prominence-weighted score. These return empty/zero gracefully when a record/entity is unknown or maps aren't built yet.",
+    "source_files": [
+      "frontend/services/archiveService.js"
+    ],
+    "test_notes": "Open a record modal that shows related records / shared entities; confirm they only populate after entity data has loaded (open #entities or trigger entity load first). Open a modal before entities load and confirm related sections are empty rather than erroring.",
+    "code_smell": "Entity connection features silently return empty when maps aren't built yet (entities loaded on demand), so a record modal opened before entity data loads shows no connections with no indication that the data simply hasn't loaded."
+  }
+]

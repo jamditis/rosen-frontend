@@ -14,9 +14,12 @@ import {
   getEnvironment,
   getBasePath,
   getDataPath,
+  getSiteRoot,
+  resolveSitePath,
   ENVIRONMENT,
   BASE_PATH,
   DATA_PATH,
+  SITE_ROOT,
   IS_LOCAL,
   IS_GITHUB_PAGES,
   IS_PRODUCTION,
@@ -76,6 +79,45 @@ describe('getDataPath(host)', () => {
   });
 });
 
+describe('getSiteRoot(host)', () => {
+  it('resolves to empty string in local (served from web root)', () => {
+    assert.strictEqual(getSiteRoot('localhost'), '');
+  });
+
+  it('resolves to /rosen-frontend on GH Pages', () => {
+    assert.strictEqual(getSiteRoot('jamditis.github.io'), '/rosen-frontend');
+  });
+
+  it('resolves to /j/rosen-archive in production', () => {
+    assert.strictEqual(getSiteRoot('pressthink.org'), '/j/rosen-archive');
+  });
+});
+
+describe('resolveSitePath(rel, host)', () => {
+  it('builds a root-relative path in local', () => {
+    assert.strictEqual(resolveSitePath('dissertation/faq/', 'localhost'), '/dissertation/faq/');
+  });
+
+  it('prefixes the GH Pages root', () => {
+    assert.strictEqual(
+      resolveSitePath('dissertation/reader/', 'jamditis.github.io'),
+      '/rosen-frontend/dissertation/reader/'
+    );
+  });
+
+  it('prefixes the production root', () => {
+    assert.strictEqual(
+      resolveSitePath('tools/active/dataviz/dataviz.html', 'pressthink.org'),
+      '/j/rosen-archive/tools/active/dataviz/dataviz.html'
+    );
+  });
+
+  it('ignores a leading slash on the relative path (no double slash)', () => {
+    assert.strictEqual(resolveSitePath('/dissertation/faq/', 'pressthink.org'), '/j/rosen-archive/dissertation/faq/');
+    assert.strictEqual(resolveSitePath('/dissertation/faq/', 'localhost'), '/dissertation/faq/');
+  });
+});
+
 describe('runtime constants', () => {
   it('exports ENVIRONMENT, BASE_PATH, DATA_PATH as strings', () => {
     assert.strictEqual(typeof ENVIRONMENT, 'string');
@@ -95,6 +137,7 @@ describe('runtime constants', () => {
     assert.strictEqual(ENVIRONMENT, 'production');
     assert.strictEqual(BASE_PATH, '/j/rosen-archive');
     assert.strictEqual(DATA_PATH, '/j/rosen-archive/data');
+    assert.strictEqual(SITE_ROOT, '/j/rosen-archive');
     assert.strictEqual(IS_LOCAL, false);
     assert.strictEqual(IS_GITHUB_PAGES, false);
     assert.strictEqual(IS_PRODUCTION, true);

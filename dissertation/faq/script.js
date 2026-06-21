@@ -89,9 +89,12 @@ function renderFAQItem(item) {
   article.querySelector('.copy-link-btn').addEventListener('click', (e) => {
     e.stopPropagation();
     const url = `${window.location.origin}${window.location.pathname}#${item.id}`;
+    // Capture the button now: e.currentTarget is null once dispatch finishes,
+    // so reading it inside the async .then() callback would throw and report
+    // the successful copy as a failure.
+    const btn = e.currentTarget;
 
     navigator.clipboard.writeText(url).then(() => {
-      const btn = e.currentTarget;
       const originalTitle = btn.title;
       btn.title = 'Link copied!';
       btn.classList.add('text-green-600');

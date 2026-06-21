@@ -1,0 +1,264 @@
+[
+  {
+    "id": "MAIN-01",
+    "area": "Archive browser",
+    "subarea": "Grid view",
+    "feature": "Record card grid",
+    "user_story": "As an archive visitor, I want to browse records as cards in a multi-column masonry grid, so that I can scan many entries at once and pick one to open.",
+    "expected_behavior": "On the default archive route the current page of filtered records renders as cards in a CSS columns layout: 1 column on mobile, 2 at md, 3 at xl, with break-inside-avoid so cards are not split. Each card shows a top accent bar colored by the hash of its first category (item.categories[0] or 'Uncategorized', indexed into the 6-entry COLORS palette), the publication (item.pub) uppercased, the date (item.date) in a monospace bordered chip, the title (with search highlighting), a summary preview (item.summaryPreview || item.summary || ''), and up to the first 2 categories as tag chips. Clicking anywhere on a card sets selectedRecordId and opens the record modal. Cards only render when not loading, not in error, and viewMode is 'grid'.",
+    "source_files": ["frontend/App.js", "frontend/constants.js", "frontend/utils/needsReview.js"],
+    "test_notes": "Load default route (no hash). Observe the multi-column card grid; resize the window to confirm 1/2/3 column breakpoints. Click a card and confirm the record modal opens. Inspect a card's top bar color vs its first category."
+  },
+  {
+    "id": "MAIN-02",
+    "area": "Archive browser",
+    "subarea": "Grid view",
+    "feature": "Needs-review badge on cards",
+    "user_story": "As a curator, I want auto-submitted records that have not had a human review pass to be visibly flagged, so that I can spot entries that still need vetting.",
+    "expected_behavior": "A card shows an amber 'needs review' chip (bg #fffbeb, text #b45309, title 'Auto-submitted; pending a human review pass') when recordNeedsReview(item) is true. recordNeedsReview returns true only when the record's needsReview field is boolean true or the string 'true' (trimmed, case-insensitive); every other value (false, '', a truthy non-true value, missing, null) is treated as not flagged. The chip appears alongside the category tag chips.",
+    "source_files": ["frontend/App.js", "frontend/utils/needsReview.js"],
+    "test_notes": "If a flagged record exists in the data, find its card and confirm the amber 'needs review' chip is present with the hover title. With current production data no record is flagged, so normally no chip appears."
+  },
+  {
+    "id": "MAIN-03",
+    "area": "Archive browser",
+    "subarea": "Search & filter",
+    "feature": "Keyword search box",
+    "user_story": "As an archive visitor, I want to type keywords to find records by title, summary, or category, so that I can locate a piece I remember.",
+    "expected_behavior": "The sidebar search input is bound to filters.search. Each keystroke updates filters.search and resets to page 1. Filtering matches the normalized query against a precomputed normalized blob of each record's title, summary (summaryPreview || summary), and categories joined by a U+0001 field separator, so a match must fall within a single field (a phrase cannot span title-end + summary-start). Normalization lowercases, NFKD-decomposes, folds typographic quotes/apostrophes/primes to ASCII ' , curly double quotes to \", en/em dash/bar to -, ellipsis to ..., drops combining diacritics, and collapses whitespace — so searching ASCII punctuation matches records stored with curly punctuation, and 'cafe' matches an accented 'cafe'. An empty/whitespace term matches all records. A helper line reads 'Searches titles, summaries, and categories'. Searching while on the folders route auto-navigates back to the archive (cards) route.",
+    "source_files": ["frontend/App.js", "frontend/components/Sidebar.js", "frontend/utils/searchNormalize.js"],
+    "test_notes": "Type a known title fragment in the sidebar search; confirm matching cards appear and the results count updates. Try a title that contains a curly apostrophe/dash using straight ASCII punctuation and confirm it still matches. Search while in folder view and confirm it switches to card view."
+  },
+  {
+    "id": "MAIN-04",
+    "area": "Archive browser",
+    "subarea": "Search & filter",
+    "feature": "Search term highlighting",
+    "user_story": "As an archive visitor, I want my search term highlighted in card titles and summaries, so that I can see why a record matched.",
+    "expected_behavior": "Card titles and summary previews wrap text in a Highlight component that, when filters.search is at least 2 characters, splits on a case-insensitive regex of the (regex-escaped) term and wraps matches in <mark>. With a term shorter than 2 characters (or empty) the text renders unhighlighted. Note: highlighting matches the raw typed term against the raw (un-normalized) display text, so a record that matched via normalization (e.g. typed straight quote vs stored curly quote) may show no highlight even though it appears in results.",
+    "source_files": ["frontend/App.js"],
+    "test_notes": "Search a 2+ char term that appears literally in a title; confirm the matched substring is highlighted. Search a term that only matches via punctuation normalization (straight quote vs curly) and observe the card appears but the term is not visibly marked.",
+    "code_smell": "Highlight uses the raw search term against raw text while filtering uses normalized text, so normalized-only matches surface in results with no visible highlight."
+  },
+  {
+    "id": "MAIN-05",
+    "area": "Archive browser",
+    "subarea": "Search & filter",
+    "feature": "Search autocomplete suggestions",
+    "user_story": "As an archive visitor, I want suggestions as I type in the search box, so that I can pick a known term without typing it fully.",
+    "expected_behavior": "When the search input has more than 1 character, suggestions appear: the autocompleteIndex terms whose normalized form contains the normalized typed value, capped at the first 8, shown in a dropdown. Clicking a suggestion sets filters.search to that exact term and closes the dropdown. Re-focusing the input re-opens suggestions only if the current value length is greater than 1. Clicking outside the search container (mousedown) closes the dropdown. With 1 or fewer characters the dropdown is hidden; with more than 1 char but zero matches the dropdown does not render (showSuggestions true but suggestions.length is 0).",
+    "source_files": ["frontend/components/Sidebar.js", "frontend/utils/searchNormalize.js"],
+    "test_notes": "Type 2+ characters of a common term; confirm up to 8 suggestions appear. Click one and confirm the search fills and results filter. Click elsewhere on the page and confirm the dropdown closes. Type a 2-char string with no matches and confirm no dropdown."
+  },
+  {
+    "id": "MAIN-06",
+    "area": "Archive browser",
+    "subarea": "Search & filter",
+    "feature": "Clear search button",
+    "user_story": "As an archive visitor, I want a one-click way to clear my search, so that I can reset the keyword filter without selecting and deleting text.",
+    "expected_behavior": "When filters.search is non-empty an XCircle button appears inside the search input (right side). Clicking it sets filters.search to '' (clearing only the search filter, leaving other filters intact). The button is absent when the search is empty.",
+    "source_files": ["frontend/components/Sidebar.js"],
+    "test_notes": "Type into the search box, confirm the clear (x) icon appears, click it, and confirm only the search text clears while category/era/type selections remain."
+  },
+  {
+    "id": "MAIN-07",
+    "area": "Archive browser",
+    "subarea": "Search & filter",
+    "feature": "Thematic category filter",
+    "user_story": "As an archive visitor, I want to filter records by one or more thematic categories, so that I can narrow the archive to topics I care about.",
+    "expected_behavior": "The sidebar lists category checkboxes from facets.categories, initially showing the first 10. Toggling a checkbox adds/removes that category from filters.categories. Multiple selected categories are combined with AND: a record must include every selected category (filters.categories.every(cat => r.categories.includes(cat))). Selecting filters resets to page 1. When more than 10 categories exist a 'View All (N more)' / 'View Less' toggle expands or collapses the full list.",
+    "source_files": ["frontend/App.js", "frontend/components/Sidebar.js"],
+    "test_notes": "Check one category and confirm the result count drops and only matching cards show. Check a second category and confirm results require both (AND). Click 'View All' to reveal the rest of the categories, then 'View Less'."
+  },
+  {
+    "id": "MAIN-08",
+    "area": "Archive browser",
+    "subarea": "Search & filter",
+    "feature": "Era / timeline radio filter",
+    "user_story": "As an archive visitor, I want to filter records to a named era, so that I can focus on a period of Jay Rosen's work.",
+    "expected_behavior": "The sidebar Timeline section shows an 'All eras' radio plus one radio per facets.eras entry. Selecting an era sets filters.era and clears filters.year (era and exact-year are mutually exclusive). Selecting the same era again via handleEraChange toggles it back to null. 'All eras' is checked only when both era and year are null and clears both. Year takes precedence over era in filtering: if filters.year is set, records are matched by exact year and era is ignored; otherwise records match by r.era === filters.era. A helper line notes you can filter by era or click a year in the timeline bar.",
+    "source_files": ["frontend/App.js", "frontend/components/Sidebar.js"],
+    "test_notes": "Pick an era radio; confirm results narrow to that era and the timeline year filter (if any) clears. Pick 'All eras' to reset. Note re-clicking the same era via the radio re-selects it (radios do not fire onChange when already checked)."
+  },
+  {
+    "id": "MAIN-09",
+    "area": "Archive browser",
+    "subarea": "Search & filter",
+    "feature": "Content type filter",
+    "user_story": "As an archive visitor, I want to filter by content type (articles, Twitter/X, Bluesky), so that I can separate long-form work from social posts.",
+    "expected_behavior": "The sidebar Content type section offers radios: All (null), Articles (article), Twitter/X (twitter), Bluesky (bluesky). 'article' excludes records whose type === 'social'. Any non-null, non-'article' value keeps only social records, then for 'twitter' keeps only records whose pub includes 'twitter' or 'x.com' (case-insensitive) and for 'bluesky' keeps only records whose pub includes 'bluesky'. Selecting a type resets to page 1.",
+    "source_files": ["frontend/App.js", "frontend/components/Sidebar.js"],
+    "test_notes": "Select 'Articles' and confirm social posts disappear. Select 'Twitter/X' and 'Bluesky' and confirm only matching social posts remain. Confirm 'All' restores everything."
+  },
+  {
+    "id": "MAIN-10",
+    "area": "Archive browser",
+    "subarea": "Search & filter",
+    "feature": "Reset all filters",
+    "user_story": "As an archive visitor, I want to clear every filter at once, so that I can start a fresh browse without unchecking each control.",
+    "expected_behavior": "The sidebar 'Reset all filters' button and the empty-state 'Clear all filters' button both set filters back to { search: '', categories: [], era: null, year: null, publication: [], type: null, includeReplies: false }, restoring the full archive and resetting to page 1.",
+    "source_files": ["frontend/App.js", "frontend/components/Sidebar.js"],
+    "test_notes": "Apply several filters, click 'Reset all filters' in the sidebar, confirm all controls clear and the full record count returns. Repeat with the 'Clear all filters' button shown in the no-results state."
+  },
+  {
+    "id": "MAIN-11",
+    "area": "Archive browser",
+    "subarea": "Search & filter",
+    "feature": "Mobile filter drawer",
+    "user_story": "As a mobile visitor, I want filters in a slide-out drawer, so that I can filter without the sidebar taking up the small screen.",
+    "expected_behavior": "Below lg the sidebar is hidden and a SlidersHorizontal button appears in the header (only on archive/folders routes). It carries a red badge with activeFilterCount when greater than 0 (count = has-search + #categories + has-era + has-year + has-type). Tapping it opens the sidebar as a fixed left drawer with a dimmed backdrop; tapping the backdrop or the X closes it. When any filter is active the mobile drawer shows a summary line ('N filter(s) active' plus the search term, categories joined, era, and type). At lg and up the sidebar is always visible and the toggle/drawer chrome is gone.",
+    "source_files": ["frontend/App.js", "frontend/components/Sidebar.js"],
+    "test_notes": "Shrink to a mobile width. Confirm the sidebar is hidden and the header shows a filter toggle. Apply a filter and confirm the red count badge. Tap the toggle to open the drawer, confirm the active-filter summary line, then close via backdrop and via X."
+  },
+  {
+    "id": "MAIN-12",
+    "area": "Archive browser",
+    "subarea": "Sort",
+    "feature": "Sort records",
+    "user_story": "As an archive visitor, I want to sort records by date or title, so that I can read in chronological or alphabetical order.",
+    "expected_behavior": "A sort <select> offers 'Newest first' (date-desc), 'Oldest first' (date-asc), 'Title (A-Z)' (title-asc). date-asc sorts by a.date.localeCompare, title-asc by a.title.localeCompare, and any other value (date-desc) by b.date.localeCompare (descending). Changing sort resets to page 1. The initial sortBy state is 'date-asc' (oldest first), even though the dropdown lists 'Newest first' first.",
+    "source_files": ["frontend/App.js"],
+    "test_notes": "Open the Sort dropdown, switch between the three options, and confirm card order changes accordingly. Note the page initially loads in 'Oldest first' order despite 'Newest first' being the top option.",
+    "code_smell": "Default sortBy is 'date-asc' (oldest first) but the dropdown's first/visually-default option is 'Newest first' (date-desc); the rendered select value still reflects date-asc, so initial order may surprise users expecting newest first."
+  },
+  {
+    "id": "MAIN-13",
+    "area": "Archive browser",
+    "subarea": "Grid view",
+    "feature": "Results count",
+    "user_story": "As an archive visitor, I want to see how many records match my current filters, so that I know how much I'm browsing.",
+    "expected_behavior": "Above the grid a line reads 'Loading archive...' while loading, otherwise '{filteredRecords.length} records found'. The header (md and up) and footer also show the total records.length and the year span minYear–maxYear derived from all records' parsed years (0–0 when no parsable years exist).",
+    "source_files": ["frontend/App.js"],
+    "test_notes": "Watch the count read 'Loading archive...' on cold load, then 'N records found'. Apply a filter and confirm the count drops to the filtered total. Check the header/footer record total and year range."
+  },
+  {
+    "id": "MAIN-14",
+    "area": "Archive browser",
+    "subarea": "Pagination",
+    "feature": "Paginate grid results",
+    "user_story": "As an archive visitor, I want results split into pages, so that the grid stays manageable instead of rendering thousands of cards.",
+    "expected_behavior": "Grid results are paginated at ITEMS_PER_PAGE = 24. Controls render only in grid view, when not loading, and when totalPages > 1: a Prev (ChevronLeft) button, 'Page X of Y' text, and a Next (ChevronRight) button. Prev is disabled on page 1, Next on the last page (disabled buttons dim to 30% opacity). Changing page scrolls smoothly to the results header with a 100px offset. Any filter or sort change resets to page 1. Folder view has no pagination.",
+    "source_files": ["frontend/App.js", "frontend/constants.js"],
+    "test_notes": "With more than 24 results, confirm pagination appears, click Next/Prev, watch the page indicator and the smooth scroll to results. Confirm Prev disabled on page 1 and Next disabled on the last page. Apply a filter and confirm it jumps back to page 1."
+  },
+  {
+    "id": "MAIN-15",
+    "area": "Archive browser",
+    "subarea": "Folder view",
+    "feature": "Browse by category folders",
+    "user_story": "As an archive visitor, I want to browse categories as folder tiles, so that I can jump straight into a topic.",
+    "expected_behavior": "The #folders route renders viewMode 'folder': it counts categories across the current filteredRecords, keeps only categories with at least 10 records, sorts them by descending count, and takes the top 6, rendering each as a folder tile (color from hashString of the name, count shown on the tab, FolderOpen icon). Clicking a folder sets filters.categories to just that category and navigates to the archive (cards) route. The Cards/Folders toggle in the tools bar switches routes. If a search or year filter is active while on folders, the app auto-navigates back to archive. No pagination in folder view.",
+    "source_files": ["frontend/App.js"],
+    "test_notes": "Switch to Folders via the toggle. Confirm at most 6 folder tiles for categories with 10+ records, sorted by count. Click a folder and confirm it switches to cards filtered to that category. From folders, type a search and confirm it bounces back to cards."
+  },
+  {
+    "id": "MAIN-16",
+    "area": "Archive browser",
+    "subarea": "Grid view",
+    "feature": "Empty state (no results)",
+    "user_story": "As an archive visitor, I want a clear message when nothing matches my filters, so that I know to adjust them.",
+    "expected_behavior": "When not loading, not in error, and filteredRecords is empty, a dashed-border panel shows a SearchX icon, 'No records found', the hint 'Try adjusting your search terms or filters.', and a 'Clear all filters' button that resets all filters. This is gated on grid view (the archive grid block).",
+    "source_files": ["frontend/App.js"],
+    "test_notes": "Type a nonsense search string so zero records match; confirm the no-results panel and click 'Clear all filters' to restore results."
+  },
+  {
+    "id": "MAIN-17",
+    "area": "Archive browser",
+    "subarea": "Loading & error",
+    "feature": "Loading and core-data error states",
+    "user_story": "As an archive visitor, I want feedback while the archive loads and a clear recovery path if it fails, so that I'm not left staring at a blank page.",
+    "expected_behavior": "On the archive/entities routes the ~13MB core data is fetched once (gated by a ref; the analytics route is skipped because it draws from prebuilt aggregates, and navigating away from analytics back-fills the data). While loading, the grid area shows a LoadingQuotes component and the count reads 'Loading archive...'. On fetch failure, error is set to a friendly message and a red error panel (AlertCircle, 'Error loading archive', message, 'Reload Page' button that calls window.location.reload) renders on both the archive grid and the entity browser, so the entity route never shows an empty browser with no explanation. After load, preloadDetails() is scheduled ~1s later.",
+    "source_files": ["frontend/App.js"],
+    "test_notes": "On a fresh load watch the loading quotes and 'Loading archive...'. To exercise the error path, block/break the core-data fetch (e.g. offline or rename the data file) and confirm the red error panel with a working Reload button on both the archive and #entities routes."
+  },
+  {
+    "id": "MAIN-18",
+    "area": "Archive browser",
+    "subarea": "Timeline",
+    "feature": "Year histogram scrubber",
+    "user_story": "As an archive visitor, I want a visual histogram of records by year, so that I can see the archive's distribution over time and jump to a year.",
+    "expected_behavior": "On the archive route (hidden once a search or era filter or year is active — it only shows when no search, no era, and no category are set) the Timeline renders one bar per year across [minYear-1 .. maxYear+1] of parsable record years. Bar height is log-scaled (Math.log(count+1)/logMax * 100, min 8% for nonzero counts; zero-count years render no bar). Hovering a bar shows a tooltip with the year and '{count} records'. Year labels show on multiples of 5 plus the first and last year. Clicking a bar sets filters.year to that year (clearing era) and toggles off if the same year is clicked again. The selected year's bar is highlighted with a dot marker. A collapse/expand chevron hides/shows the bar area; the header shows the year range chip. If no records have parsable years the timeline returns null (renders nothing).",
+    "source_files": ["frontend/App.js", "frontend/components/Timeline.js"],
+    "test_notes": "On the default route, hover timeline bars to see year/count tooltips. Click a bar and confirm cards filter to that year and the bar is marked selected. Click it again to clear. Collapse/expand the timeline via its chevron. Apply a search and confirm the timeline disappears."
+  },
+  {
+    "id": "MAIN-19",
+    "area": "Archive browser",
+    "subarea": "Timeline",
+    "feature": "Timeline year filter chip / clear",
+    "user_story": "As an archive visitor, I want a visible indicator and one-click clear when a specific year is selected, so that I can undo a year filter quickly.",
+    "expected_behavior": "When filters.year is set, the Timeline header shows a red 'Clear filter (YEAR)' button that calls onSelectYear(null), clearing the year filter. Selecting a year sets filters.year and clears filters.era (handleYearSelect). Filtering by exact year (when set) takes precedence over era filtering.",
+    "source_files": ["frontend/App.js", "frontend/components/Timeline.js"],
+    "test_notes": "Click a timeline year, confirm the red 'Clear filter (year)' button appears in the timeline header, click it, and confirm the year filter clears and all years return."
+  },
+  {
+    "id": "MAIN-20",
+    "area": "Archive browser",
+    "subarea": "Featured",
+    "feature": "Featured works carousel",
+    "user_story": "As an archive visitor, I want a rotating set of curated featured works, so that I'm introduced to Rosen's key pieces before I start browsing.",
+    "expected_behavior": "On the default archive route (only when not loading and no search, era, year, or category filter is active) a Featured Works section shows 3 of the 20 FEATURED_WORKS as external-link cards (target _blank), each with a type icon/badge, image (grayscale, colorizing on hover), title, an 'Explore' affordance, and a hover tooltip with the description (hidden below sm). It auto-rotates the window by 1 every 6000ms (only while expanded, not paused, and there are more than 3 works). Hovering the section pauses rotation. A row of dot indicators (one per work) shows the active start index and lets you jump directly; the active dot is wider. A header chevron collapses/expands the whole section (collapsing also stops rotation and hides the dots).",
+    "source_files": ["frontend/App.js", "frontend/components/FeaturedSection.js", "frontend/constants.js"],
+    "test_notes": "On the default route, watch the 3 featured cards rotate every ~6s. Hover the section to pause. Click a dot to jump to a window. Collapse via the header chevron and confirm rotation stops and cards hide. Apply any filter and confirm Featured disappears."
+  },
+  {
+    "id": "MAIN-21",
+    "area": "Archive browser",
+    "subarea": "Record modal",
+    "feature": "Open record and navigate prev/next",
+    "user_story": "As an archive visitor, I want to open a record in a modal and step to the previous/next record, so that I can read full details and move through results without returning to the grid.",
+    "expected_behavior": "RecordView owns selected-record rendering: it finds the record by selectedRecordId, derives index/total/hasPrev/hasNext from the filtered list, and renders RecordModal. isOpen tracks the selected id (not the found record), so a deep link to a missing id (?record=BADID) still counts as open but RecordModal renders null because record is null. Prev/Next (handleModalNav) move selectedRecordId to the adjacent record within filteredRecords, clamped at the ends. Closing sets selectedRecordId to null. Selecting a record updates the URL ?record=ID via history.replaceState; clearing it removes the param.",
+    "source_files": ["frontend/App.js", "frontend/components/RecordView.js"],
+    "test_notes": "Click a card to open the modal, use prev/next to walk adjacent filtered records, and confirm it stops at the first/last. Close and confirm ?record= clears from the URL. Visit ?record=RECORD-00001 directly and confirm the modal opens on load; visit ?record=BADID and confirm no modal renders."
+  },
+  {
+    "id": "MAIN-22",
+    "area": "Archive browser",
+    "subarea": "Record modal",
+    "feature": "Tag/search drill-down from a record",
+    "user_story": "As an archive visitor, I want to click a category or term inside a record and have the archive filter to it, so that I can pivot from one record to related ones.",
+    "expected_behavior": "From the record modal, choosing a category (onFilterCategory) sets filters.categories to just that one category and navigates to the archive route; choosing a search term (onFilterSearch) sets filters.search to that term and navigates to the archive route. Both replace prior filter state for that dimension.",
+    "source_files": ["frontend/App.js", "frontend/components/RecordView.js"],
+    "test_notes": "Open a record modal, click a category tag inside it, confirm the modal context switches to the archive filtered to that single category. Repeat with a clickable term to confirm it sets the search."
+  },
+  {
+    "id": "MAIN-23",
+    "area": "Archive browser",
+    "subarea": "Routing & deep links",
+    "feature": "Hash routing and legacy URL migration",
+    "user_story": "As an archive visitor, I want shareable URLs for each view and old links to keep working, so that bookmarks and shared links land me in the right place.",
+    "expected_behavior": "The app derives the current route from the hash (default archive, #folders, #entities, #dissertation, #about, #analytics) and re-syncs on hashchange and popstate. On mount it migrates legacy ?view= URLs. The dissertation, about, and analytics routes render full-page components with a back-to-archive control. ?record=ID is initialized from the URL on mount and validated once records load (cleared if no record matches). Full-page routes (dissertation/about/analytics) return early before the grid chrome renders.",
+    "source_files": ["frontend/App.js"],
+    "test_notes": "Change the hash to #folders, #entities, #dissertation, #about, #analytics and confirm each view loads; use browser back/forward and confirm the view follows. Load a legacy ?view= URL and confirm it migrates. Deep-link ?record=ID on #entities and confirm the record modal opens over the entity browser."
+  },
+  {
+    "id": "MAIN-24",
+    "area": "Archive browser",
+    "subarea": "Header/footer",
+    "feature": "Header navigation and tools bar",
+    "user_story": "As an archive visitor, I want quick access to the home, tools, about, and bug-report from the header and an inline tools bar, so that I can reach other views easily.",
+    "expected_behavior": "The sticky header (adds shadow/solid background once scrolled past 10px) shows the JRIA logo/title (full title at sm+, 'JRIA' below sm) that returns to the archive route, the record total and timeline range (md+), a Compass 'Explore tools' button (below sm, opens ToolsModal), an About button (md+), a 'Report a bug' button (openBugReport), a 'Curated by Joe Amditis' GitHub link (md+), and on archive/folders routes the mobile filter toggle. On the default route (no active filters) an inline Tools bar offers Mind Map, Entities, Analytics, and a 'More' button (opens ToolsModal). The ToolsModal routes to the mindmap or entities view on selection.",
+    "source_files": ["frontend/App.js", "frontend/constants.js"],
+    "test_notes": "Click the logo to return home. On the default route click the inline Mind Map / Entities / Analytics chips and confirm navigation. Open the tools modal via 'More' (and the mobile Compass). Click 'Report a bug' and confirm the bug-report flow opens. Scroll and confirm the header gains a shadow."
+  },
+  {
+    "id": "MAIN-25",
+    "area": "Archive browser",
+    "subarea": "Header/footer",
+    "feature": "Footer explore links",
+    "user_story": "As an archive visitor, I want footer links to every major view, so that I can navigate from the bottom of a long page.",
+    "expected_behavior": "The footer shows an archive blurb, an Explore column with buttons routing to archive, dissertation mind map, entity browser, analytics dashboard, and about, and a Credits column with the curator GitHub link and the record count / year range.",
+    "source_files": ["frontend/App.js"],
+    "test_notes": "Scroll to the footer and click each Explore link, confirming it routes to the matching view. Confirm the Credits show the record total and year span."
+  },
+  {
+    "id": "MAIN-26",
+    "area": "Archive browser",
+    "subarea": "Back to top",
+    "feature": "Back-to-top button",
+    "user_story": "As an archive visitor scrolling a long grid, I want a back-to-top button, so that I can return to the header without manual scrolling.",
+    "expected_behavior": "A floating ChevronUp button (bottom-right, fixed) appears once window.scrollY exceeds 500 and smooth-scrolls to top when clicked. It is hidden near the top of the page.",
+    "source_files": ["frontend/App.js"],
+    "test_notes": "Scroll down more than ~500px and confirm the back-to-top button appears bottom-right; click it and confirm a smooth scroll to the top, then confirm the button hides again near the top."
+  }
+]

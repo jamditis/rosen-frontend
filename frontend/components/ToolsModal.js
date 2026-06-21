@@ -1,7 +1,8 @@
 // ToolsModal.js - Modal with icons for exploring dissertation tools
 import { useEffect, useRef, useCallback } from 'react';
-import { html } from '../html.js?v=3.4.3';
+import { html } from '../html.js?v=3.4.4';
 import { X, Map, BookOpen, HelpCircle, BarChart3, BookMarked } from 'lucide-react';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.4.4';
 
 // Tool definitions with categories
 const TOOLS = {
@@ -19,7 +20,7 @@ const TOOLS = {
       name: 'FAQ',
       description: 'Questions & answers',
       icon: HelpCircle,
-      href: '/j/rosen-archive/dissertation/faq/',
+      href: 'dissertation/faq/',
       status: 'ready'
     },
     {
@@ -27,7 +28,7 @@ const TOOLS = {
       name: 'Dissertation Reader',
       description: 'Read the full text',
       icon: BookMarked,
-      href: '/j/rosen-archive/dissertation/reader/',
+      href: 'dissertation/reader/',
       status: 'beta'
     }
   ],
@@ -37,7 +38,7 @@ const TOOLS = {
       name: 'Data Visualization',
       description: 'Charts and analysis',
       icon: BarChart3,
-      href: '/j/rosen-archive/tools/active/dataviz/dataviz.html',
+      href: 'tools/active/dataviz/dataviz.html',
       status: 'beta'
     }
   ]
@@ -87,8 +88,9 @@ const ToolsModal = ({ isOpen, onClose, onSelectTool }) => {
       onSelectTool(tool.action);
       onClose();
     } else if (tool.href) {
-      // External link
-      window.location.href = tool.href;
+      // Site-root-relative path resolved for the current environment so the
+      // link works in local preview and GitHub Pages, not just production.
+      window.location.href = resolveSitePath(tool.href);
     }
   }, [onSelectTool, onClose]);
 
