@@ -104,12 +104,6 @@ export const ThreadModal = ({ record }) => {
     const threadData = record.thread_data;
 
     if (!threadData || !threadData.posts) {
-        console.log('[ThreadModal] Missing thread data:', {
-            has_thread_data: !!record.thread_data,
-            has_posts: threadData?.posts ? threadData.posts.length : 0,
-            thread_data_type: typeof record.thread_data,
-            record_id: record.id
-        });
         return html`
             <div className="text-center text-stone-500 py-8">
                 <p>Thread data not available</p>

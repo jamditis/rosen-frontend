@@ -422,20 +422,6 @@ export const getRecordCountByEra = () => {
 };
 
 /**
- * Get record count by publication
- */
-export const getRecordCountByPublication = (limit = 20) => {
-  return queryAsObjects(`
-    SELECT pub, COUNT(*) as count
-    FROM records
-    WHERE pub != ''
-    GROUP BY pub
-    ORDER BY count DESC
-    LIMIT ?
-  `, [limit]);
-};
-
-/**
  * Get most mentioned entities
  */
 export const getMostMentionedEntities = (entityType = null, limit = 20) => {
@@ -508,65 +494,6 @@ export const searchRecords = (searchTerm, limit = 50) => {
     ORDER BY date DESC
     LIMIT ?
   `, [term, term, term, limit]);
-};
-
-/**
- * Find records by category
- */
-export const getRecordsByCategory = (category, limit = 100) => {
-  return queryAsObjects(`
-    SELECT r.*
-    FROM records r
-    JOIN record_categories rc ON r.id = rc.record_id
-    WHERE rc.category = ?
-    ORDER BY r.date DESC
-    LIMIT ?
-  `, [category, limit]);
-};
-
-/**
- * Find records mentioning an entity
- */
-export const getRecordsByEntity = (entityName, limit = 50) => {
-  return queryAsObjects(`
-    SELECT DISTINCT r.*
-    FROM records r
-    JOIN record_entities re ON r.id = re.record_id
-    JOIN entities e ON re.entity_id = e.id
-    WHERE e.name LIKE ?
-    ORDER BY r.date DESC
-    LIMIT ?
-  `, [`%${entityName}%`, limit]);
-};
-
-/**
- * Get yearly trends for a category
- */
-export const getCategoryTrend = (category) => {
-  return queryAsObjects(`
-    SELECT r.year, COUNT(*) as count
-    FROM records r
-    JOIN record_categories rc ON r.id = rc.record_id
-    WHERE rc.category = ? AND r.year != ''
-    GROUP BY r.year
-    ORDER BY r.year
-  `, [category]);
-};
-
-/**
- * Get writing output over time
- */
-export const getOutputByMonth = () => {
-  return queryAsObjects(`
-    SELECT
-      substr(date, 1, 7) as month,
-      COUNT(*) as count
-    FROM records
-    WHERE date != ''
-    GROUP BY month
-    ORDER BY month DESC
-    LIMIT 60
-  `);
 };
 
 /**
