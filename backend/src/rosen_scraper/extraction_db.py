@@ -172,6 +172,35 @@ class ExtractionDB:
 
     # ========== Entity Storage ==========
 
+    @staticmethod
+    def _insert_entity(conn, entity: Dict[str, Any]):
+        """Insert (or replace) one entity row on an open connection.
+
+        Shared by save_entity and save_entities so the column list, defaults,
+        and per-row created_at timestamp live in one place.
+        """
+        conn.execute("""
+            INSERT OR REPLACE INTO entities
+            (entity_id, entity_type, entity_name, normalized_name,
+             role_or_description, affiliation, prominence_score,
+             first_mention_record_id, total_mentions, related_entities,
+             notes, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            entity.get('entity_id'),
+            entity.get('entity_type'),
+            entity.get('entity_name'),
+            entity.get('normalized_name'),
+            entity.get('role_or_description', ''),
+            entity.get('affiliation', ''),
+            entity.get('prominence_score', 0),
+            entity.get('first_mention_record_id', ''),
+            entity.get('total_mentions', 1),
+            entity.get('related_entities', ''),
+            entity.get('notes', ''),
+            datetime.now().isoformat()
+        ))
+
     def save_entity(self, entity: Dict[str, Any]):
         """
         Save a single entity to the database.
@@ -180,53 +209,13 @@ class ExtractionDB:
             entity: Entity dictionary with keys matching table columns
         """
         with self._get_connection() as conn:
-            conn.execute("""
-                INSERT OR REPLACE INTO entities
-                (entity_id, entity_type, entity_name, normalized_name,
-                 role_or_description, affiliation, prominence_score,
-                 first_mention_record_id, total_mentions, related_entities,
-                 notes, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                entity.get('entity_id'),
-                entity.get('entity_type'),
-                entity.get('entity_name'),
-                entity.get('normalized_name'),
-                entity.get('role_or_description', ''),
-                entity.get('affiliation', ''),
-                entity.get('prominence_score', 0),
-                entity.get('first_mention_record_id', ''),
-                entity.get('total_mentions', 1),
-                entity.get('related_entities', ''),
-                entity.get('notes', ''),
-                datetime.now().isoformat()
-            ))
+            self._insert_entity(conn, entity)
 
     def save_entities(self, entities: List[Dict[str, Any]]):
         """Save multiple entities in a single transaction."""
         with self._get_connection() as conn:
             for entity in entities:
-                conn.execute("""
-                    INSERT OR REPLACE INTO entities
-                    (entity_id, entity_type, entity_name, normalized_name,
-                     role_or_description, affiliation, prominence_score,
-                     first_mention_record_id, total_mentions, related_entities,
-                     notes, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    entity.get('entity_id'),
-                    entity.get('entity_type'),
-                    entity.get('entity_name'),
-                    entity.get('normalized_name'),
-                    entity.get('role_or_description', ''),
-                    entity.get('affiliation', ''),
-                    entity.get('prominence_score', 0),
-                    entity.get('first_mention_record_id', ''),
-                    entity.get('total_mentions', 1),
-                    entity.get('related_entities', ''),
-                    entity.get('notes', ''),
-                    datetime.now().isoformat()
-                ))
+                self._insert_entity(conn, entity)
 
     def get_all_entities(self) -> List[Dict]:
         """Get all entities from the database."""
@@ -242,6 +231,33 @@ class ExtractionDB:
 
     # ========== Relationship Storage ==========
 
+    @staticmethod
+    def _insert_relationship(conn, relationship: Dict[str, Any]):
+        """Insert one relationship row on an open connection.
+
+        Shared by save_relationship and save_relationships. Relationships have
+        no unique constraint, so a repeated relationship_id appends a row.
+        """
+        conn.execute("""
+            INSERT INTO relationships
+            (relationship_id, source_entity_id, target_entity_id,
+             relationship_type, description, evidence, source_record_id,
+             strength, temporal_context, notes, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            relationship.get('relationship_id'),
+            relationship.get('source_entity_id'),
+            relationship.get('target_entity_id'),
+            relationship.get('relationship_type'),
+            relationship.get('description', ''),
+            relationship.get('evidence', ''),
+            relationship.get('source_record_id', ''),
+            relationship.get('strength', ''),
+            relationship.get('temporal_context', ''),
+            relationship.get('notes', ''),
+            datetime.now().isoformat()
+        ))
+
     def save_relationship(self, relationship: Dict[str, Any]):
         """
         Save a single relationship to the database.
@@ -250,49 +266,13 @@ class ExtractionDB:
             relationship: Relationship dictionary
         """
         with self._get_connection() as conn:
-            conn.execute("""
-                INSERT INTO relationships
-                (relationship_id, source_entity_id, target_entity_id,
-                 relationship_type, description, evidence, source_record_id,
-                 strength, temporal_context, notes, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                relationship.get('relationship_id'),
-                relationship.get('source_entity_id'),
-                relationship.get('target_entity_id'),
-                relationship.get('relationship_type'),
-                relationship.get('description', ''),
-                relationship.get('evidence', ''),
-                relationship.get('source_record_id', ''),
-                relationship.get('strength', ''),
-                relationship.get('temporal_context', ''),
-                relationship.get('notes', ''),
-                datetime.now().isoformat()
-            ))
+            self._insert_relationship(conn, relationship)
 
     def save_relationships(self, relationships: List[Dict[str, Any]]):
         """Save multiple relationships in a single transaction."""
         with self._get_connection() as conn:
             for rel in relationships:
-                conn.execute("""
-                    INSERT INTO relationships
-                    (relationship_id, source_entity_id, target_entity_id,
-                     relationship_type, description, evidence, source_record_id,
-                     strength, temporal_context, notes, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    rel.get('relationship_id'),
-                    rel.get('source_entity_id'),
-                    rel.get('target_entity_id'),
-                    rel.get('relationship_type'),
-                    rel.get('description', ''),
-                    rel.get('evidence', ''),
-                    rel.get('source_record_id', ''),
-                    rel.get('strength', ''),
-                    rel.get('temporal_context', ''),
-                    rel.get('notes', ''),
-                    datetime.now().isoformat()
-                ))
+                self._insert_relationship(conn, rel)
 
     def get_all_relationships(self) -> List[Dict]:
         """Get all relationships from the database."""
