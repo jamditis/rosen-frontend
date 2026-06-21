@@ -4,8 +4,9 @@ This module is responsible for saving raw text transcripts to a file.
 """
 
 from typing import Optional, Dict, Any
-import os
-import re
+
+from rosen_scraper.path_utils import build_output_path
+
 
 def save_transcript(article_data: Dict[str, Any], output_dir: str = "processed_transcripts") -> Optional[str]:
     """
@@ -22,17 +23,10 @@ def save_transcript(article_data: Dict[str, Any], output_dir: str = "processed_t
     title = article_data.get('title') or 'Untitled Transcript'
     item_id = article_data.get('id', 'NO-ID')
 
-    # Sanitize the title to create a valid filename
-    sanitized_title = re.sub(r'[\\/*?:"<>|]',"", title)
-    if not sanitized_title:
-        sanitized_title = "Untitled Transcript"
-        
-    # Construct the final filename
-    transcript_filename = f"{sanitized_title[:60]} - {item_id} - transcript.txt"
-
-    # Ensure the output directory exists
-    os.makedirs(output_dir, exist_ok=True)
-    transcript_filepath = os.path.join(output_dir, transcript_filename)
+    # Build the sanitized output path (shared with the PDF writer).
+    transcript_filepath = build_output_path(
+        title, item_id, "transcript.txt", output_dir, "Untitled Transcript"
+    )
 
     # --- 2. Write Transcript to File ---
     try:
