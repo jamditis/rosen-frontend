@@ -25,7 +25,7 @@
   },
   "RDR-08": {
     "retest_status": "pass",
-    "notes": "chapter-5 rect.top=76px finalScrollY=103888 (max=317214)"
+    "notes": "resume finalScrollY=133230 expected~133230 (max=317214) | malformed-fallback: noNaN=true finite=true chapter-5 top=76px finalY=103888"
   },
   "DIS-01": {
     "retest_status": "pass",

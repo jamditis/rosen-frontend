@@ -1,5 +1,6 @@
 [
   {
+    "id": "ANL-01",
     "area": "Archive browser",
     "subarea": "Analytics",
     "feature": "Open the analytics dashboard",
@@ -10,6 +11,7 @@
     "code_smell": "Header subtitle claims 'Powered by sql.js (SQLite in your browser)', but the entire dashboard view (stat cards + all charts) renders from the prebuilt JSON aggregates and never touches SQLite. SQLite only loads when the user runs a custom/builder query. The subtitle is misleading for the default view."
   },
   {
+    "id": "ANL-02",
     "area": "Archive browser",
     "subarea": "Analytics",
     "feature": "Database overview stat cards",
@@ -20,6 +22,7 @@
     "code_smell": "The 'Records' count (26,615) counts social posts, so it is far larger than the ~1,030 non-social records a visitor sees in the main archive browser. A casual reader may conflate the two. 'Categories' showing only 6 is the fixed top-level taxonomy, which is correct but may surprise."
   },
   {
+    "id": "ANL-03",
     "area": "Archive browser",
     "subarea": "Analytics",
     "feature": "Records-by-era bar chart",
@@ -30,6 +33,7 @@
     "code_smell": "byEra in the data contains two overlapping era taxonomies mixed together (e.g. both 'Public Journalism (90s)' / 'View from Nowhere (10s)' / 'Democracy in Crisis (20s)' AND 'Blogging Launch & Digital Disruption (2000-2004)' / 'Platform Transition & Future Models (2021-Present)' etc.). The chart presents them as one flat list, so era buckets do not partition the archive cleanly and 'Platform Transition...' (25,733) dwarfs everything. Distinct from the 4-era taxonomy hardcoded in QueryBuilder/sqliteService."
   },
   {
+    "id": "ANL-04",
     "area": "Archive browser",
     "subarea": "Analytics",
     "feature": "Top categories, top people, top concepts charts",
@@ -40,6 +44,7 @@
     "code_smell": "'Jay Rosen' himself is the #1 most-mentioned person, which is expected noise for a self-archive but arguably should be filtered from the 'people' chart since it tells the reader nothing."
   },
   {
+    "id": "ANL-05",
     "area": "Archive browser",
     "subarea": "Analytics",
     "feature": "Output-by-year chart",
@@ -50,6 +55,7 @@
     "code_smell": "byYear has 38 entries but maxBars=30, so the 8 earliest years (1986-2000ish) are silently dropped from the chart with no 'showing N of M' indicator. The huge social-post counts also make the article-era bars unreadable; there is no toggle to view article-only output here (that only exists as a raw-SQL example)."
   },
   {
+    "id": "ANL-06",
     "area": "Archive browser",
     "subarea": "Analytics",
     "feature": "Category co-occurrence list",
@@ -60,6 +66,7 @@
     "code_smell": "No explicit limit applied client-side; relies entirely on the precomputed file already being trimmed (currently 10 pairs)."
   },
   {
+    "id": "ANL-07",
     "area": "Archive browser",
     "subarea": "Query builder",
     "feature": "Mad-libs sentence query builder",
@@ -70,6 +77,7 @@
     "code_smell": "SQL injection / correctness: buildSql interpolates FIELD, YEAR, ERA, and TYPE dropdown values straight into SQL with no escaping. Dropdown values are currently constrained so this is not user-exploitable today, but text inputs (SEARCH_TERM, CATEGORY, PERSON_NAME) only escape single quotes via replace(/'/g,\"''\") and nothing else, and the dynamic 'count-by-field' template inserts the chosen column name unquoted. The query runs in a read-only in-browser SQLite with no server, so blast radius is local, but the pattern is fragile if options become user-supplied. Also: the file's QUERY_TEMPLATES has a duplicate-id risk to verify (each id should be unique); find() returns the first match, so any dup id would shadow the later template."
   },
   {
+    "id": "ANL-08",
     "area": "Archive browser",
     "subarea": "Query builder",
     "feature": "Results table rendering",
@@ -80,6 +88,7 @@
     "code_smell": "Columns are inferred only from the first row's keys; if rows had heterogeneous shapes (they won't from SQL, but no guard) later columns would be dropped."
   },
   {
+    "id": "ANL-09",
     "area": "Archive browser",
     "subarea": "SQLite",
     "feature": "Advanced raw SQL query box",
@@ -90,6 +99,7 @@
     "code_smell": "The helper text lists 'record_concepts' but not 'record_tags', and the user can run any DDL/DML (e.g. DROP, UPDATE) against the in-memory DB since query() just calls db.exec on the raw string. Harmless (in-memory, discarded on reload) but not constrained to SELECT. Output is raw JSON.stringify, not a table, so large result sets are hard to read and could be heavy to render."
   },
   {
+    "id": "ANL-10",
     "area": "Archive browser",
     "subarea": "SQLite",
     "feature": "Example query shortcuts",
@@ -100,6 +110,7 @@
     "code_smell": "Buttons only fill the textarea; a user may expect a click to run the example. The 'Articles about Trump' example uses a hardcoded LIKE '%Trump%' on title only."
   },
   {
+    "id": "ANL-11",
     "area": "Archive browser",
     "subarea": "SQLite",
     "feature": "Lazy, deduplicated SQLite initialization",
@@ -110,6 +121,7 @@
     "code_smell": "WASM is loaded by injecting a cdnjs <script> tag with SRI; if cdnjs is unreachable the loader rejects with 'Failed to load sql.js' and the catch returns false, surfacing only the generic 'Could not load the query database' message (no offline/self-hosted JS fallback, unlike the self-hosted .wasm). loadArchiveData has a module-level dataLoaded guard, so a SQLite reset without reloading the page would not re-insert data."
   },
   {
+    "id": "ANL-12",
     "area": "Archive browser",
     "subarea": "SQLite",
     "feature": "Most-mentioned-entity count reconciliation",
@@ -120,6 +132,7 @@
     "code_smell": "Two different mention-count strategies exist: the QueryBuilder 'top-people' template counts via JOIN only (undercounts records without relatedIds), while sqliteService.getMostMentionedEntities reconciles with total_mentions. A user comparing the builder result to the dashboard's 'Most mentioned people' chart (built from the precomputed aggregate) may see different numbers for the same person."
   },
   {
+    "id": "ANL-13",
     "area": "Archive browser",
     "subarea": "River of news",
     "feature": "Reverse-chronological river feed (UNREACHABLE)",

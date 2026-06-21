@@ -2,7 +2,8 @@
 //
 // Source of truth = feature-stories.json (master). This script:
 //   1. Reads the 8 stories-0*.json catalog parts (one per feature area).
-//   2. Assigns stable IDs (area prefix + padded index, by part order).
+//   2. Reads each story's intrinsic "id" (validated unique + prefix-matched);
+//      IDs live in the source, so reordering a part never renumbers siblings.
 //   3. Preserves tracking fields (test/fix/retest) from an existing master,
 //      matching on ID, so re-running after a phase never loses results.
 //   4. Writes feature-stories.json (master) and feature-stories.csv (the
@@ -64,15 +65,24 @@ function loadParts() {
     .filter(f => /^stories-0\d.*\.json$/.test(f))
     .sort();
   const rows = [];
+  const seen = new Set();
   for (const f of files) {
     const prefix = PREFIX[f];
     if (!prefix) throw new Error(`No ID prefix mapped for part file: ${f}`);
     const arr = JSON.parse(readFileSync(join(here, f), 'utf8'));
     if (!Array.isArray(arr)) throw new Error(`${f} is not a JSON array`);
     arr.forEach((s, i) => {
+      // IDs are intrinsic to each story, not derived from array position, so
+      // inserting/reordering/deleting a story cannot renumber its siblings and
+      // mergeTracking() can never re-attach a verdict to the wrong feature.
+      const id = s.id;
+      if (!id) throw new Error(`${f}[${i}] is missing the required "id" field`);
+      if (!id.startsWith(`${prefix}-`)) throw new Error(`${f}[${i}] id "${id}" does not match the part prefix "${prefix}"`);
+      if (seen.has(id)) throw new Error(`duplicate audit id "${id}" (in ${f})`);
+      seen.add(id);
       const src = Array.isArray(s.source_files) ? s.source_files.join('; ') : (s.source_files || '');
       rows.push({
-        id: `${prefix}-${pad(i + 1)}`,
+        id,
         area: areaFor(prefix),
         subarea: s.subarea || '',
         feature: s.feature || '',

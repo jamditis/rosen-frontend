@@ -1,5 +1,6 @@
 [
   {
+    "id": "RDR-01",
     "area": "Dissertation tools",
     "subarea": "Reader — Text load",
     "feature": "Full dissertation text renders inline",
@@ -14,6 +15,7 @@
     "code_smell": "Multiple headings share id=\"conclusion\" (an <h1>, an <h2>, and two lower-level <h4>/<h2> 'Conclusion' subheads). getElementById/anchor jumps and the IntersectionObserver scroll-spy can only ever resolve to the first element with that id, so the TOC 'Conclusion' link and scroll-spy may target the wrong section. Duplicate ids are also invalid HTML."
   },
   {
+    "id": "RDR-02",
     "area": "Dissertation tools",
     "subarea": "Reader — Navigation",
     "feature": "Table of contents click-to-scroll",
@@ -27,6 +29,7 @@
     "code_smell": "TOC link '#conclusion' resolves to the first element with id=conclusion, which is a lower 'Conclusion' subhead inside Chapter 8 (line ~1434), not the top-level CONCLUSION (line ~1887) — duplicate ids make this link land on the wrong place."
   },
   {
+    "id": "RDR-03",
     "area": "Dissertation tools",
     "subarea": "Reader — Navigation",
     "feature": "Scroll-spy active-section highlighting + URL hash sync",
@@ -39,6 +42,7 @@
     "code_smell": "Scroll-spy observes the same duplicate ids as the TOC; with 3 elements sharing id=conclusion the highlight/hash for 'Conclusion' is ambiguous. Also the observer only sets active on intersecting entries (never clears when none intersect), so a stale highlight can persist between bands."
   },
   {
+    "id": "RDR-04",
     "area": "Dissertation tools",
     "subarea": "Reader — Navigation",
     "feature": "Keyboard chapter navigation",
@@ -52,6 +56,7 @@
     "code_smell": "navigateChapter early-returns if this.currentSection is null, which it is until the scroll-spy observer fires at least once; pressing Alt+Arrow before any scroll does nothing. Alt+Arrow stepping is per-heading (h1/h2/h3), not per-TOC-chapter, so it stops on subheadings the TOC doesn't list."
   },
   {
+    "id": "RDR-05",
     "area": "Dissertation tools",
     "subarea": "Reader — Navigation",
     "feature": "Mobile table-of-contents drawer",
@@ -66,6 +71,7 @@
     "code_smell": "menu-toggle has aria-expanded=\"false\" in markup but the JS never updates aria-expanded on open/close, so screen readers always report the toggle as collapsed."
   },
   {
+    "id": "RDR-06",
     "area": "Dissertation tools",
     "subarea": "Reader — Navigation",
     "feature": "Back-to-top button",
@@ -79,6 +85,7 @@
     "code_smell": "It hides via print CSS but there is no debounce; fine in practice given the cheap class toggle."
   },
   {
+    "id": "RDR-07",
     "area": "Dissertation tools",
     "subarea": "Reader — Progress",
     "feature": "Reading progress bar",
@@ -93,6 +100,7 @@
     "code_smell": "The progressbar element exposes role/aria-label but never updates aria-valuenow/valuemin/valuemax, so assistive tech gets no numeric progress."
   },
   {
+    "id": "RDR-08",
     "area": "Dissertation tools",
     "subarea": "Reader — Progress",
     "feature": "Save and resume reading position",
@@ -105,6 +113,7 @@
     "code_smell": "Resume scroll uses the absolute saved scrollY; if font-size/line-height/column-width settings changed between sessions the document height differs and scrollY lands at a different passage. The 10s auto-dismiss can yank the prompt away mid-decision."
   },
   {
+    "id": "RDR-09",
     "area": "Dissertation tools",
     "subarea": "Reader — Settings",
     "feature": "Settings panel open/close",
@@ -119,6 +128,7 @@
     "code_smell": "settings-toggle has static aria-expanded=\"false\" in markup that the JS never syncs with open state."
   },
   {
+    "id": "RDR-10",
     "area": "Dissertation tools",
     "subarea": "Reader — Settings",
     "feature": "Theme: light / dark / auto, persisted",
@@ -133,6 +143,7 @@
     "code_smell": "The anti-flash inline script handles theme/fontSize/lineHeight/margin but mirrors logic that also lives in settings.js — two copies of the same mapping that must be kept in sync by hand."
   },
   {
+    "id": "RDR-11",
     "area": "Dissertation tools",
     "subarea": "Reader — Settings",
     "feature": "Text size control, persisted",
@@ -147,6 +158,7 @@
     "code_smell": "All three buttons display the same glyph 'A' at the same rendered size (no relative sizing/labels), so the control is hard to tell apart visually and for screen readers (no aria-label distinguishing small/medium/large)."
   },
   {
+    "id": "RDR-12",
     "area": "Dissertation tools",
     "subarea": "Reader — Settings",
     "feature": "Line spacing control, persisted",
@@ -160,6 +172,7 @@
     "code_smell": ""
   },
   {
+    "id": "RDR-13",
     "area": "Dissertation tools",
     "subarea": "Reader — Settings",
     "feature": "Column width control, persisted",
@@ -173,6 +186,7 @@
     "code_smell": ""
   },
   {
+    "id": "RDR-14",
     "area": "Dissertation tools",
     "subarea": "Reader — Selection share",
     "feature": "Text-selection floating menu",
@@ -185,6 +199,7 @@
     "code_smell": "getCurrentChapter() returns a loose label ('Introduction'/'Conclusion'/the heading text) by string-matching 'chapter' in heading text; it can mislabel passages in Acknowledgements/Notes/Works Consulted as 'Introduction'. Selection menu only triggers on mouseup (mouse), so keyboard/touch selection won't surface it."
   },
   {
+    "id": "RDR-15",
     "area": "Dissertation tools",
     "subarea": "Reader — Selection share",
     "feature": "Copy selected text",
@@ -197,6 +212,7 @@
     "code_smell": ""
   },
   {
+    "id": "RDR-16",
     "area": "Dissertation tools",
     "subarea": "Reader — Selection share",
     "feature": "Copy citation for selection",
@@ -209,6 +225,7 @@
     "code_smell": "Citation accuracy depends on getCurrentChapter()'s heuristic; for selections outside numbered chapters the appended chapter is often 'Introduction' regardless of actual location."
   },
   {
+    "id": "RDR-17",
     "area": "Dissertation tools",
     "subarea": "Reader — Selection share",
     "feature": "Share quote modal (text + downloadable image)",
@@ -222,6 +239,7 @@
     "code_smell": "Image generation uses Georgia/system fonts (not the reader's Charter body font) so the PNG doesn't match on-screen typography; canvas may render before web fonts load. The 'Read more' URL is window.location.href, which includes the live scroll-spy hash (e.g. #chapter-3) rather than a stable anchor to the quoted passage."
   },
   {
+    "id": "RDR-18",
     "area": "Dissertation tools",
     "subarea": "Reader — Citation",
     "feature": "Footer 'Copy citation' button",
@@ -235,6 +253,7 @@
     "code_smell": "Copies textContent including the leading 'Cite this work:' label, so the pasted citation begins with that label."
   },
   {
+    "id": "RDR-19",
     "area": "Dissertation tools",
     "subarea": "Reader — Deep linking",
     "feature": "Hash deep links jump to section on load",
@@ -248,6 +267,7 @@
     "code_smell": "Deep link target resolution uses getElementById, which hits only the first of the duplicate id=conclusion elements; a shared #conclusion link does not land on the top-level CONCLUSION."
   },
   {
+    "id": "RDR-20",
     "area": "Dissertation tools",
     "subarea": "Reader — Quick actions",
     "feature": "Header/footer quick-action links (PDF, NotebookLM, Jay's essay, archive, PressThink)",
@@ -261,6 +281,7 @@
     "code_smell": "Responsive show/hide rules key off title attributes including title=\"Back to dissertation home\", but no header button actually has that title (the back link's title is 'Back to archive'), so those breakpoint rules match nothing — dead CSS / likely a stale selector."
   },
   {
+    "id": "RDR-21",
     "area": "Dissertation tools",
     "subarea": "Reader — Reading aids",
     "feature": "Skip link, print stylesheet, and selection styling",

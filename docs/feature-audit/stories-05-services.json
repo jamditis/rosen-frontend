@@ -1,5 +1,6 @@
 [
   {
+    "id": "SVC-01",
     "area": "Data & services",
     "subarea": "Data loading",
     "feature": "Split-load core data on page load",
@@ -12,6 +13,7 @@
     "test_notes": "Open the app fresh (clear caches first). In the Network tab confirm only archive-core.json loads on first paint; archive-details.json / archive-entities.json / archive-data.json should not appear until you open a record modal or the entities view. Confirm the dissertation card ('The Impossible Press') shows in the grid even though it is not in the CSV-derived JSON."
   },
   {
+    "id": "SVC-02",
     "area": "Data & services",
     "subarea": "Caching",
     "feature": "IndexedDB cache for core data persists across reloads",
@@ -24,6 +26,7 @@
     "test_notes": "Load once, then reload within 30 minutes. With localStorage.jrda_debug='1' set, watch the console for 'Using IndexedDB-cached core data'. In Application > IndexedDB look for database 'jrda-archive-cache', store 'kv', a key like 'archive-core::v9::<deployversion>'. Confirm no archive-core.json request fires on the cached reload. Close the tab fully and reopen to confirm persistence (a sessionStorage-only cache would miss here)."
   },
   {
+    "id": "SVC-03",
     "area": "Data & services",
     "subarea": "Caching",
     "feature": "Web Storage fallback when IndexedDB is blocked",
@@ -37,6 +40,7 @@
     "code_smell": "For the ~13 MB core file, when IndexedDB is unavailable there is effectively no app-level persistent cache (setCachedData bails over 5 MB), so every fresh tab in private mode re-fetches and re-parses 13 MB unless the service worker cache covers it."
   },
   {
+    "id": "SVC-04",
     "area": "Data & services",
     "subarea": "Error handling",
     "feature": "Core data load failure surfaces an explicit error (no masking)",
@@ -49,6 +53,7 @@
     "code_smell": "The legacy fetchArchiveData() (used by initSqlite path / combined fallback) still returns a dissertation-only object on error, the exact masking that fetchCoreData was changed to forbid — inconsistent error contract between the two loaders."
   },
   {
+    "id": "SVC-05",
     "area": "Data & services",
     "subarea": "Data loading",
     "feature": "On-demand record details when a modal opens",
@@ -61,6 +66,7 @@
     "code_smell": "A details fetch failure is swallowed (detailsCache = {}), so every later record modal silently shows missing details for the rest of the session with no retry and no user-visible error — opposite of the fetchCoreData throw contract."
   },
   {
+    "id": "SVC-06",
     "area": "Data & services",
     "subarea": "Data loading",
     "feature": "Background preload of details",
@@ -72,6 +78,7 @@
     "test_notes": "After initial load and whatever idle trigger App.js uses, watch Network for an archive-details.json prefetch before any modal is opened. Then open a record and confirm the modal shows detail with no additional fetch."
   },
   {
+    "id": "SVC-07",
     "area": "Data & services",
     "subarea": "Data loading",
     "feature": "On-demand entities for the entity browser",
@@ -84,6 +91,7 @@
     "code_smell": "Entities fetch failure resolves to empty arrays — the legacy masking the newer httpCachedLoader port was written to forbid; the entity browser then looks like a genuinely empty graph with no error shown."
   },
   {
+    "id": "SVC-08",
     "area": "Data & services",
     "subarea": "Deep link",
     "feature": "Open a record modal via ?record=ID",
@@ -96,6 +104,7 @@
     "test_notes": "Load with ?record=RECORD-00001 and confirm the modal opens after data loads. Load with ?record= (empty) and confirm no modal opens and no selection is pinned. Open then close a modal and confirm ?record is removed from the URL. Deep-link an unknown id and observe App.js behavior once data is ready (validation happens there)."
   },
   {
+    "id": "SVC-09",
     "area": "Data & services",
     "subarea": "Routing",
     "feature": "Hash-based SPA routing with default fallback",
@@ -108,6 +117,7 @@
     "test_notes": "Click between views and confirm the hash updates (#folders, #entities, etc.) and the back/forward buttons move between them. Manually type #garbage and confirm it falls back to the archive grid. Confirm the default archive view shows no hash."
   },
   {
+    "id": "SVC-10",
     "area": "Data & services",
     "subarea": "Routing",
     "feature": "Legacy ?view= URL migration",
@@ -120,6 +130,7 @@
     "test_notes": "Load ?view=dissertation and confirm it redirects to #dissertation (and ?view is removed). Repeat for ?view=about. Load ?view=somethingelse and confirm no redirect occurs."
   },
   {
+    "id": "SVC-11",
     "area": "Data & services",
     "subarea": "Routing",
     "feature": "Shareable view-state URLs (filters round-trip)",
@@ -132,6 +143,7 @@
     "code_smell": "viewState.js documents that the consuming useViewState React provider is intentionally deferred, so filter-in-URL persistence may not be wired into App.js yet despite the serializer existing — observable behavior depends on App.js, outside this file's scope."
   },
   {
+    "id": "SVC-12",
     "area": "Data & services",
     "subarea": "Caching",
     "feature": "Deploy-version cache invalidation",
@@ -143,6 +155,7 @@
     "test_notes": "Set localStorage.jrda_deploy_version to a fake old value, ensure version.json reports a different version, reload, and watch console for '[Cache] Deploy version changed, clearing caches' and 'Archive caches cleared'. Throttle version.json to >4s and confirm the load is not blocked (it proceeds, caches clear later). Confirm a cold #analytics deep link also runs the version gate."
   },
   {
+    "id": "SVC-13",
     "area": "Data & services",
     "subarea": "Data loading",
     "feature": "Analytics dashboard loads prebuilt aggregates",
@@ -155,6 +168,7 @@
     "test_notes": "Open #analytics cold (clear cache) and confirm only archive-analytics.json loads (not archive-data.json). Block archive-analytics.json and confirm an explicit dashboard error state. Reopen #analytics within 30 min and confirm a cache hit (no re-fetch)."
   },
   {
+    "id": "SVC-14",
     "area": "Data & services",
     "subarea": "Data loading",
     "feature": "Optional SQLite query engine loads the full dataset",
@@ -167,6 +181,7 @@
     "code_smell": "This is the only normal-operation path that fetches the ~28 MB combined file; on a slow connection the first SQL query downloads 28 MB, which may surprise users who expected the split-load behavior."
   },
   {
+    "id": "SVC-15",
     "area": "Data & services",
     "subarea": "Offline/SW",
     "feature": "Service worker offline support for app shell and data",
@@ -179,6 +194,7 @@
     "code_smell": "Offline mode depends on the cross-origin esm.sh import map (React/HTM/idb-keyval/sql.js), which the SW deliberately does not cache — so a truly offline first-load (or after CDN cache eviction) cannot boot the app even though the shell HTML/JS is cached."
   },
   {
+    "id": "SVC-16",
     "area": "Data & services",
     "subarea": "Offline/SW",
     "feature": "Service worker cache versioning drops stale caches on deploy",
@@ -190,6 +206,7 @@
     "test_notes": "After a CACHE_VERSION bump and reload, watch console for '[SW] Deleting old cache: jrda-cache-<oldversion>'. In Application > Cache Storage confirm only the new-version caches remain. Confirm a ?v= bump without a CACHE_VERSION bump still serves the old cached JS (ignoreSearch)."
   },
   {
+    "id": "SVC-17",
     "area": "Data & services",
     "subarea": "Path resolution",
     "feature": "Localhost vs github-pages vs production path switching",
@@ -204,6 +221,7 @@
     "code_smell": "The host-detection logic is duplicated between pathResolver.js and sw.js (classic worker can't import); they can drift, and a mismatch would silently cache/serve data under the wrong base path."
   },
   {
+    "id": "SVC-18",
     "area": "Data & services",
     "subarea": "Caching",
     "feature": "Web Storage quota handling and legacy sessionStorage cleanup",
@@ -215,6 +233,7 @@
     "test_notes": "Fill localStorage near its quota, then trigger a small cacheable fetch (e.g. analytics) and confirm the app still works and logs the quota handling. Confirm archive_* keys are cleared on quota error. Set jrda_debug and observe cache read/eviction behavior on TTL/version mismatch (manually edit a cached entry's version)."
   },
   {
+    "id": "SVC-19",
     "area": "Data & services",
     "subarea": "Data loading",
     "feature": "Entity connection lookups between records",

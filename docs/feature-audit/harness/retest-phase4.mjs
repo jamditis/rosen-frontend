@@ -102,8 +102,10 @@ try {
   }
   await ctx.close();
 
-  // RDR-08: seed a saved position with an absurd scrollY but a real sectionId;
-  // resume must land on the section element, not the (clamped) absolute scrollY.
+  // RDR-08: seed a saved position with an absurd scrollY but a real reading
+  // fraction; resume must restore the fraction (~42% of the live doc height),
+  // NOT the absolute scrollY (which would pin the reader at the bottom) and NOT
+  // the chapter top (which would drop their place mid-chapter).
   const ctx2 = await browser.newContext();
   const page2 = await ctx2.newPage();
   await page2.addInitScript(() => {
@@ -130,18 +132,58 @@ try {
         tick();
       });
       const finalY = await settle();
-      const el = document.getElementById('chapter-5');
-      const rect = el.getBoundingClientRect();
       const maxY = document.documentElement.scrollHeight - window.innerHeight;
-      return { top: Math.round(rect.top), scrollY: finalY, maxY: Math.round(maxY) };
+      return { scrollY: finalY, maxY: Math.round(maxY) };
     });
-    // chapter-5 should be near the top of the viewport, and we must NOT be pinned
-    // at the bottom (which the old absolute-scrollY=9999999 would have forced).
-    resumeOk = Math.abs(r.top) < 200 && r.scrollY < r.maxY - 100;
-    detail = `chapter-5 rect.top=${r.top}px finalScrollY=${r.scrollY} (max=${r.maxY})`;
+    // Must land within ~one screen-line of 42% of the document: scrollTo lands
+    // at the requested pixel, so the only slack is sub-pixel rounding. A tight
+    // absolute tolerance (not a fraction of the full height) keeps the check
+    // able to catch real resume drift instead of waving through a jump that is
+    // several screens off.
+    const expected = 0.42 * r.maxY;
+    resumeOk = Math.abs(r.scrollY - expected) < 50
+      && r.scrollY > 0 && r.scrollY < r.maxY - 100;
+    detail = `resume finalScrollY=${r.scrollY} expected~${Math.round(expected)} (max=${r.maxY})`;
   }
-  rec('RDR-08', resumeOk, detail);
   await ctx2.close();
+
+  // RDR-08 (cont.): a malformed/legacy entry with only a section anchor and no
+  // scrollProgress must NOT yield a "NaN% complete" prompt or a NaN scroll; it
+  // falls back to the section element.
+  const ctx3 = await browser.newContext();
+  const page3 = await ctx3.newPage();
+  await page3.addInitScript(() => {
+    localStorage.setItem('dissertation-reader-progress', JSON.stringify({
+      sectionId: 'chapter-5', scrollY: 123 // intentionally no scrollProgress
+    }));
+  });
+  await page3.goto(BASE + '/dissertation/reader/', { waitUntil: 'networkidle' });
+  await sleep(500);
+  let nanSafe = false, nanDetail = 'no resume prompt for malformed entry';
+  const prompt3 = await page3.$('.resume-prompt');
+  if (prompt3) {
+    const txt = await page3.evaluate(() => document.querySelector('.resume-prompt').textContent || '');
+    const noNaN = !/NaN/.test(txt);
+    await (await page3.$('.resume-prompt [data-action="resume"]')).click();
+    const m = await page3.evaluate(async () => {
+      const settle = () => new Promise(res => {
+        let last = -1, stable = 0;
+        const tick = () => {
+          const y = Math.round(window.scrollY);
+          if (y === last) { if (++stable >= 5) return res(y); } else { stable = 0; last = y; }
+          setTimeout(tick, 100);
+        };
+        tick();
+      });
+      const finalY = await settle();
+      const el = document.getElementById('chapter-5');
+      return { finalY, top: Math.round(el.getBoundingClientRect().top), finite: Number.isFinite(window.scrollY) };
+    });
+    nanSafe = noNaN && m.finite && Math.abs(m.top) < 200;
+    nanDetail = `noNaN=${noNaN} finite=${m.finite} chapter-5 top=${m.top}px finalY=${m.finalY}`;
+  }
+  await ctx3.close();
+  rec('RDR-08', resumeOk && nanSafe, `${detail} | malformed-fallback: ${nanDetail}`);
 } catch (e) {
   ['RDR-02', 'RDR-19', 'RDR-03', 'RDR-18', 'RDR-08'].forEach(id => { if (!results[id]) rec(id, false, 'threw: ' + e.message); });
 }

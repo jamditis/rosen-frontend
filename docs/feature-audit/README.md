@@ -36,6 +36,8 @@ node docs/feature-audit/validate-csv.mjs # confirm the CSV round-trips cleanly
 
 `build.mjs` rebuilds the catalog fields from the 8 `stories-0*.json` parts but **preserves** tracking fields (test/fix/retest) by matching on `id`, so it is safe to re-run after any phase. To record a test result or a fix, edit `feature-stories.json` (or the part files for catalog changes) and re-run `build.mjs`.
 
+Each story's `id` lives in the part file itself (it is not derived from array position), so inserting, reordering, or deleting a story never renumbers its siblings and tracking can never re-attach to the wrong feature. `build.mjs` enforces this: it throws if any story is missing an `id`, carries an `id` whose prefix does not match its part, or duplicates another `id`. A new story needs the next free `id` for its part prefix (`harness/inject-ids.mjs` is the one-off that originally stamped them).
+
 ## Phases
 
 All four phases are complete.

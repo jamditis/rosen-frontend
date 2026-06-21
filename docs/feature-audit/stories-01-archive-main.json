@@ -1,5 +1,6 @@
 [
   {
+    "id": "MAIN-01",
     "area": "Archive browser",
     "subarea": "Grid view",
     "feature": "Record card grid",
@@ -9,6 +10,7 @@
     "test_notes": "Load default route (no hash). Observe the multi-column card grid; resize the window to confirm 1/2/3 column breakpoints. Click a card and confirm the record modal opens. Inspect a card's top bar color vs its first category."
   },
   {
+    "id": "MAIN-02",
     "area": "Archive browser",
     "subarea": "Grid view",
     "feature": "Needs-review badge on cards",
@@ -18,6 +20,7 @@
     "test_notes": "If a flagged record exists in the data, find its card and confirm the amber 'needs review' chip is present with the hover title. With current production data no record is flagged, so normally no chip appears."
   },
   {
+    "id": "MAIN-03",
     "area": "Archive browser",
     "subarea": "Search & filter",
     "feature": "Keyword search box",
@@ -27,6 +30,7 @@
     "test_notes": "Type a known title fragment in the sidebar search; confirm matching cards appear and the results count updates. Try a title that contains a curly apostrophe/dash using straight ASCII punctuation and confirm it still matches. Search while in folder view and confirm it switches to card view."
   },
   {
+    "id": "MAIN-04",
     "area": "Archive browser",
     "subarea": "Search & filter",
     "feature": "Search term highlighting",
@@ -37,6 +41,7 @@
     "code_smell": "Highlight uses the raw search term against raw text while filtering uses normalized text, so normalized-only matches surface in results with no visible highlight."
   },
   {
+    "id": "MAIN-05",
     "area": "Archive browser",
     "subarea": "Search & filter",
     "feature": "Search autocomplete suggestions",
@@ -46,6 +51,7 @@
     "test_notes": "Type 2+ characters of a common term; confirm up to 8 suggestions appear. Click one and confirm the search fills and results filter. Click elsewhere on the page and confirm the dropdown closes. Type a 2-char string with no matches and confirm no dropdown."
   },
   {
+    "id": "MAIN-06",
     "area": "Archive browser",
     "subarea": "Search & filter",
     "feature": "Clear search button",
@@ -55,6 +61,7 @@
     "test_notes": "Type into the search box, confirm the clear (x) icon appears, click it, and confirm only the search text clears while category/era/type selections remain."
   },
   {
+    "id": "MAIN-07",
     "area": "Archive browser",
     "subarea": "Search & filter",
     "feature": "Thematic category filter",
@@ -64,6 +71,7 @@
     "test_notes": "Check one category and confirm the result count drops and only matching cards show. Check a second category and confirm results require both (AND). Click 'View All' to reveal the rest of the categories, then 'View Less'."
   },
   {
+    "id": "MAIN-08",
     "area": "Archive browser",
     "subarea": "Search & filter",
     "feature": "Era / timeline radio filter",
@@ -73,6 +81,7 @@
     "test_notes": "Pick an era radio; confirm results narrow to that era and the timeline year filter (if any) clears. Pick 'All eras' to reset. Note re-clicking the same era via the radio re-selects it (radios do not fire onChange when already checked)."
   },
   {
+    "id": "MAIN-09",
     "area": "Archive browser",
     "subarea": "Search & filter",
     "feature": "Content type filter",
@@ -82,6 +91,7 @@
     "test_notes": "Select 'Articles' and confirm social posts disappear. Select 'Twitter/X' and 'Bluesky' and confirm only matching social posts remain. Confirm 'All' restores everything."
   },
   {
+    "id": "MAIN-10",
     "area": "Archive browser",
     "subarea": "Search & filter",
     "feature": "Reset all filters",
@@ -91,6 +101,7 @@
     "test_notes": "Apply several filters, click 'Reset all filters' in the sidebar, confirm all controls clear and the full record count returns. Repeat with the 'Clear all filters' button shown in the no-results state."
   },
   {
+    "id": "MAIN-11",
     "area": "Archive browser",
     "subarea": "Search & filter",
     "feature": "Mobile filter drawer",
@@ -100,6 +111,7 @@
     "test_notes": "Shrink to a mobile width. Confirm the sidebar is hidden and the header shows a filter toggle. Apply a filter and confirm the red count badge. Tap the toggle to open the drawer, confirm the active-filter summary line, then close via backdrop and via X."
   },
   {
+    "id": "MAIN-12",
     "area": "Archive browser",
     "subarea": "Sort",
     "feature": "Sort records",
@@ -110,6 +122,7 @@
     "code_smell": "Default sortBy is 'date-asc' (oldest first) but the dropdown's first/visually-default option is 'Newest first' (date-desc); the rendered select value still reflects date-asc, so initial order may surprise users expecting newest first."
   },
   {
+    "id": "MAIN-13",
     "area": "Archive browser",
     "subarea": "Grid view",
     "feature": "Results count",
@@ -119,6 +132,7 @@
     "test_notes": "Watch the count read 'Loading archive...' on cold load, then 'N records found'. Apply a filter and confirm the count drops to the filtered total. Check the header/footer record total and year range."
   },
   {
+    "id": "MAIN-14",
     "area": "Archive browser",
     "subarea": "Pagination",
     "feature": "Paginate grid results",
@@ -128,6 +142,7 @@
     "test_notes": "With more than 24 results, confirm pagination appears, click Next/Prev, watch the page indicator and the smooth scroll to results. Confirm Prev disabled on page 1 and Next disabled on the last page. Apply a filter and confirm it jumps back to page 1."
   },
   {
+    "id": "MAIN-15",
     "area": "Archive browser",
     "subarea": "Folder view",
     "feature": "Browse by category folders",
@@ -137,6 +152,7 @@
     "test_notes": "Switch to Folders via the toggle. Confirm at most 6 folder tiles for categories with 10+ records, sorted by count. Click a folder and confirm it switches to cards filtered to that category. From folders, type a search and confirm it bounces back to cards."
   },
   {
+    "id": "MAIN-16",
     "area": "Archive browser",
     "subarea": "Grid view",
     "feature": "Empty state (no results)",
@@ -146,6 +162,7 @@
     "test_notes": "Type a nonsense search string so zero records match; confirm the no-results panel and click 'Clear all filters' to restore results."
   },
   {
+    "id": "MAIN-17",
     "area": "Archive browser",
     "subarea": "Loading & error",
     "feature": "Loading and core-data error states",
@@ -155,6 +172,7 @@
     "test_notes": "On a fresh load watch the loading quotes and 'Loading archive...'. To exercise the error path, block/break the core-data fetch (e.g. offline or rename the data file) and confirm the red error panel with a working Reload button on both the archive and #entities routes."
   },
   {
+    "id": "MAIN-18",
     "area": "Archive browser",
     "subarea": "Timeline",
     "feature": "Year histogram scrubber",
@@ -164,6 +182,7 @@
     "test_notes": "On the default route, hover timeline bars to see year/count tooltips. Click a bar and confirm cards filter to that year and the bar is marked selected. Click it again to clear. Collapse/expand the timeline via its chevron. Apply a search and confirm the timeline disappears."
   },
   {
+    "id": "MAIN-19",
     "area": "Archive browser",
     "subarea": "Timeline",
     "feature": "Timeline year filter chip / clear",
@@ -173,6 +192,7 @@
     "test_notes": "Click a timeline year, confirm the red 'Clear filter (year)' button appears in the timeline header, click it, and confirm the year filter clears and all years return."
   },
   {
+    "id": "MAIN-20",
     "area": "Archive browser",
     "subarea": "Featured",
     "feature": "Featured works carousel",
@@ -182,6 +202,7 @@
     "test_notes": "On the default route, watch the 3 featured cards rotate every ~6s. Hover the section to pause. Click a dot to jump to a window. Collapse via the header chevron and confirm rotation stops and cards hide. Apply any filter and confirm Featured disappears."
   },
   {
+    "id": "MAIN-21",
     "area": "Archive browser",
     "subarea": "Record modal",
     "feature": "Open record and navigate prev/next",
@@ -191,6 +212,7 @@
     "test_notes": "Click a card to open the modal, use prev/next to walk adjacent filtered records, and confirm it stops at the first/last. Close and confirm ?record= clears from the URL. Visit ?record=RECORD-00001 directly and confirm the modal opens on load; visit ?record=BADID and confirm no modal renders."
   },
   {
+    "id": "MAIN-22",
     "area": "Archive browser",
     "subarea": "Record modal",
     "feature": "Tag/search drill-down from a record",
@@ -200,6 +222,7 @@
     "test_notes": "Open a record modal, click a category tag inside it, confirm the modal context switches to the archive filtered to that single category. Repeat with a clickable term to confirm it sets the search."
   },
   {
+    "id": "MAIN-23",
     "area": "Archive browser",
     "subarea": "Routing & deep links",
     "feature": "Hash routing and legacy URL migration",
@@ -209,6 +232,7 @@
     "test_notes": "Change the hash to #folders, #entities, #dissertation, #about, #analytics and confirm each view loads; use browser back/forward and confirm the view follows. Load a legacy ?view= URL and confirm it migrates. Deep-link ?record=ID on #entities and confirm the record modal opens over the entity browser."
   },
   {
+    "id": "MAIN-24",
     "area": "Archive browser",
     "subarea": "Header/footer",
     "feature": "Header navigation and tools bar",
@@ -218,6 +242,7 @@
     "test_notes": "Click the logo to return home. On the default route click the inline Mind Map / Entities / Analytics chips and confirm navigation. Open the tools modal via 'More' (and the mobile Compass). Click 'Report a bug' and confirm the bug-report flow opens. Scroll and confirm the header gains a shadow."
   },
   {
+    "id": "MAIN-25",
     "area": "Archive browser",
     "subarea": "Header/footer",
     "feature": "Footer explore links",
@@ -227,6 +252,7 @@
     "test_notes": "Scroll to the footer and click each Explore link, confirming it routes to the matching view. Confirm the Credits show the record total and year span."
   },
   {
+    "id": "MAIN-26",
     "area": "Archive browser",
     "subarea": "Back to top",
     "feature": "Back-to-top button",

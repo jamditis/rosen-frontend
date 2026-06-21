@@ -1,5 +1,6 @@
 [
   {
+    "id": "TOOL-01",
     "area": "Standalone tools",
     "subarea": "Status report",
     "feature": "Launch countdown timer",
@@ -10,6 +11,7 @@
     "code_smell": "Launch date is hardcoded and already in the past (2026-02-01); the report still markets 'February 2026 launch readiness' so the whole page now reads as stale/expired with a 0/0/0 countdown."
   },
   {
+    "id": "TOOL-02",
     "area": "Standalone tools",
     "subarea": "Status report",
     "feature": "Overview stat cards",
@@ -20,6 +22,7 @@
     "code_smell": "Color class is built with a template string `text-${card.color}-600`; this only renders if Tailwind already includes text-emerald-600/text-amber-600/text-rose-600 in the prebuilt dist/tailwind.css (dynamic class names are not JIT-generated at runtime), so a card color can silently fall back to unstyled."
   },
   {
+    "id": "TOOL-03",
     "area": "Standalone tools",
     "subarea": "Status report",
     "feature": "Field completeness progress bars",
@@ -30,6 +33,7 @@
     "code_smell": "The static markup in index.html already contains an '<h4>Field completeness</h4>' inside #field-completeness, and renderFieldCompleteness prepends another identical <h4> when it sets innerHTML, so the heading appears once but is duplicated in source intent (the JS heading replaces the static one)."
   },
   {
+    "id": "TOOL-04",
     "area": "Standalone tools",
     "subarea": "Status report",
     "feature": "Quality metrics badges",
@@ -40,6 +44,7 @@
     "code_smell": "'Has summary' is computed as 100 - missingSummaryPercent rather than read directly, so any rounding in the precomputed missingSummaryPercent propagates into the displayed completeness figure."
   },
   {
+    "id": "TOOL-05",
     "area": "Standalone tools",
     "subarea": "Status report",
     "feature": "Entity / relationship / era bar charts",
@@ -50,6 +55,7 @@
     "code_smell": "renderBarChart injects item[labelKey] directly into both the title attribute and the row text without escaping. Source data is trusted static data.js, but unlike the data-explorer and dataviz tools this one has no escapeHtml helper, so it is inconsistent with the project's own XSS hardening."
   },
   {
+    "id": "TOOL-06",
     "area": "Standalone tools",
     "subarea": "Status report",
     "feature": "Imported-but-unused category distribution",
@@ -60,6 +66,7 @@
     "code_smell": "Dead import: CATEGORY_DISTRIBUTION is loaded but never used, implying an intended category chart was dropped or never wired up. Either render it or remove the import."
   },
   {
+    "id": "TOOL-07",
     "area": "Standalone tools",
     "subarea": "Status report",
     "feature": "Release checklist and launch timeline",
@@ -70,6 +77,7 @@
     "code_smell": ""
   },
   {
+    "id": "TOOL-08",
     "area": "Standalone tools",
     "subarea": "Status report",
     "feature": "Expandable action items",
@@ -80,6 +88,7 @@
     "code_smell": "Expanded content is capped at max-height:500px in the inline CSS; an action item with a long description would be clipped. Low risk with current short descriptions."
   },
   {
+    "id": "TOOL-09",
     "area": "Standalone tools",
     "subarea": "Data explorer",
     "feature": "Remote CSV load and verified-record filtering",
@@ -90,6 +99,7 @@
     "code_smell": "The data source is a hardcoded Google Sheets published-CSV URL (not the archive's own data/ JSON), so this tool is out of sync with the rest of the site's data pipeline. The changelog claims a v2.5.0 remote->local CSV fallback to RosenArchivedataset-TEST-DATA.csv, but the actual HTML has no fallback logic and no such local file exists — a documented-but-missing feature, so a Google Sheet outage takes the tool fully down."
   },
   {
+    "id": "TOOL-10",
     "area": "Standalone tools",
     "subarea": "Data explorer",
     "feature": "Date-sorted dot grid with placeholder padding",
@@ -100,6 +110,7 @@
     "code_smell": "Dot color is derived from a char-code hash of the first concept/category value modulo the palette size, not from a real category->color mapping, so the legend's category colors do not actually match the dots they describe (the legend is decorative, not authoritative)."
   },
   {
+    "id": "TOOL-11",
     "area": "Standalone tools",
     "subarea": "Data explorer",
     "feature": "Connection field selector (concepts vs categories)",
@@ -110,6 +121,7 @@
     "code_smell": ""
   },
   {
+    "id": "TOOL-12",
     "area": "Standalone tools",
     "subarea": "Data explorer",
     "feature": "Exploration mode: click a dot to draw animated connections",
@@ -120,6 +132,7 @@
     "code_smell": "Connections are derived from at most the first MAX_CONNECTIONS_TO_SHOW matches in array order (slice after filter), not ranked by relevance/shared-value count, so a record with many connections shows an arbitrary subset."
   },
   {
+    "id": "TOOL-13",
     "area": "Standalone tools",
     "subarea": "Data explorer",
     "feature": "Hover tooltips for dots and connection lines",
@@ -130,6 +143,7 @@
     "code_smell": "Date formatting blindly reorders the YYYY-MM-DD parts to DD-MM-YYYY; any non-ISO or partial date (e.g. just a year) is left as-is, producing inconsistent date display across dots."
   },
   {
+    "id": "TOOL-14",
     "area": "Standalone tools",
     "subarea": "Data explorer",
     "feature": "Floating info panel with minimize/maximize and view-source",
@@ -140,6 +154,7 @@
     "code_smell": "The tutorial modal copy contains stray HTML in the bullet list (an orphan </li> and unbalanced <b> tags inside a <p>) — cosmetic, but the markup is malformed."
   },
   {
+    "id": "TOOL-15",
     "area": "Standalone tools",
     "subarea": "Data explorer",
     "feature": "Grid size toggle (441 <-> 625 dots)",
@@ -150,6 +165,7 @@
     "code_smell": "Both grid sizes (441/625) can exceed the verified-record count, so the extra slots are filled with non-interactive placeholder dots; on a small dataset most of the grid is empty filler, which can mislead about archive size."
   },
   {
+    "id": "TOOL-16",
     "area": "Standalone tools",
     "subarea": "Data explorer",
     "feature": "Loading tutorial modal gating",
@@ -160,6 +176,7 @@
     "code_smell": "The auto-click re-dismiss path keys off exploreButton.textContent === 'Loading data...'; if that label string is ever changed in one place but not the other the modal could fail to auto-dismiss — a brittle string-coupling."
   },
   {
+    "id": "TOOL-17",
     "area": "Standalone tools",
     "subarea": "Dataviz",
     "feature": "Load archive JSON with optional entity graph and lazy full summaries",
@@ -170,6 +187,7 @@
     "code_smell": ""
   },
   {
+    "id": "TOOL-18",
     "area": "Standalone tools",
     "subarea": "Dataviz",
     "feature": "Filters: keyword search, year range slider, category and publication checkboxes",
@@ -180,6 +198,7 @@
     "code_smell": "Search only upgrades to full summary text after archive-details.json (~13 MB) finishes loading in the background; until then search runs against the ~120-char preview, so early searches can miss matches with no visible indication that summaries are still partial."
   },
   {
+    "id": "TOOL-19",
     "area": "Standalone tools",
     "subarea": "Dataviz",
     "feature": "Summary stat cards",
@@ -190,6 +209,7 @@
     "code_smell": ""
   },
   {
+    "id": "TOOL-20",
     "area": "Standalone tools",
     "subarea": "Dataviz",
     "feature": "Four interactive charts with CDN-failure resilience",
@@ -200,6 +220,7 @@
     "code_smell": "The 'Top key concepts' chart depends on archive-entities.json; if that file is missing or has no Concept entities the chart renders empty with no in-UI explanation (only a console.warn), so a user may think there are no concepts rather than that the graph failed to load."
   },
   {
+    "id": "TOOL-21",
     "area": "Standalone tools",
     "subarea": "Dataviz",
     "feature": "Sortable, paginated data table",
@@ -210,6 +231,7 @@
     "code_smell": "Sort comparison uses raw < / > on values; for the Date column publication_date is an ISO-ish string so lexical order usually matches chronological order, but any non-ISO or empty date will sort incorrectly and empties drift to one end."
   },
   {
+    "id": "TOOL-22",
     "area": "Standalone tools",
     "subarea": "Dataviz",
     "feature": "Export filtered records to CSV with formula-injection guard",

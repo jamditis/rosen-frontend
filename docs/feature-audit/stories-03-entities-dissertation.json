@@ -1,5 +1,6 @@
 [
   {
+    "id": "ENT-01",
     "area": "Archive browser",
     "subarea": "Entity browser",
     "feature": "Entity data loading and loading state",
@@ -10,6 +11,7 @@
     "code_smell": "A failed fetch is swallowed into an empty-result object, so the user sees a silent empty state indistinguishable from 'no entities exist' rather than any retry or error message."
   },
   {
+    "id": "ENT-02",
     "area": "Archive browser",
     "subarea": "Entity browser",
     "feature": "Filter entities by type",
@@ -20,6 +22,7 @@
     "code_smell": "Type counts (typeCounts) are computed from the raw entities array, so a type chip can be hidden even when ENTITY_TYPE_CONFIG defines it; this is intended but means the visible type set silently depends on the data file."
   },
   {
+    "id": "ENT-03",
     "area": "Archive browser",
     "subarea": "Entity browser",
     "feature": "Search entities by name or role",
@@ -30,6 +33,7 @@
     "code_smell": "No explicit 'no results found' empty state for search; the user only sees a blank grid and a count of 0, which reads as a glitch."
   },
   {
+    "id": "ENT-04",
     "area": "Archive browser",
     "subarea": "Entity browser",
     "feature": "Sort entities",
@@ -40,6 +44,7 @@
     "code_smell": "Default mentions fallback of 1 means entities with missing totalMentions all tie at 1 and sort unstably relative to each other."
   },
   {
+    "id": "ENT-05",
     "area": "Archive browser",
     "subarea": "Entity browser",
     "feature": "Entity card list with metadata",
@@ -50,6 +55,7 @@
     "code_smell": "Mention count uses totalMentions but the count of records shown in the detail panel comes from a separate relationship map, so a card may say 'N records' while the opened panel shows a different number."
   },
   {
+    "id": "ENT-06",
     "area": "Archive browser",
     "subarea": "Entity browser",
     "feature": "Paginated 'Show more' display limit",
@@ -60,6 +66,7 @@
     "code_smell": ""
   },
   {
+    "id": "ENT-07",
     "area": "Archive browser",
     "subarea": "Entity browser",
     "feature": "Select entity to open detail panel (toggle)",
@@ -70,6 +77,7 @@
     "code_smell": "handleEntitySelect dereferences r.date in the sort without guarding; a record whose date is undefined would throw inside localeCompare. Records are looked up via records.find over the full records prop for each id (O(n*m))."
   },
   {
+    "id": "ENT-08",
     "area": "Archive browser",
     "subarea": "Entity browser",
     "feature": "Records-mentioning-entity list in panel",
@@ -80,6 +88,7 @@
     "code_smell": "Records beyond the first 20 are counted but unreachable — there is no 'show all records' affordance for an entity, unlike the entity list's own 'Show more'."
   },
   {
+    "id": "ENT-09",
     "area": "Archive browser",
     "subarea": "Entity browser",
     "feature": "Co-occurring entities ('Often appears with')",
@@ -90,6 +99,7 @@
     "code_smell": "Top 20 are computed but only 15 render, so 5 are silently dropped. Clicking a co-entity does not scroll the panel/list to it, so on small screens the re-pivot can happen off-screen."
   },
   {
+    "id": "ENT-10",
     "area": "Archive browser",
     "subarea": "Dissertation page",
     "feature": "Dissertation page chrome and full-text link",
@@ -100,6 +110,7 @@
     "code_smell": "The 'Read Full Text' href is an absolute production path (/j/rosen-archive/...); in local preview at localhost it will 404 because the app's hostname-based path switching does not apply to this hardcoded link."
   },
   {
+    "id": "ENT-11",
     "area": "Archive browser",
     "subarea": "Mind map",
     "feature": "Expand/collapse mind-map nodes",
@@ -110,6 +121,7 @@
     "code_smell": "A single click on a node both opens the detail panel and toggles expansion, so collapsing a parent by clicking its body also pops open its (now-changing) detail panel — the two actions are conflated."
   },
   {
+    "id": "ENT-12",
     "area": "Archive browser",
     "subarea": "Mind map",
     "feature": "Zoom controls (buttons, wheel, keyboard)",
@@ -120,6 +132,7 @@
     "code_smell": "Keyboard '0' sets zoom to 1 but does not recenter pan, while the Focus button does a fit-to-view; two different 'reset' behaviors for similar intent."
   },
   {
+    "id": "ENT-13",
     "area": "Archive browser",
     "subarea": "Mind map",
     "feature": "Pan the canvas (drag, touch, arrow keys)",
@@ -130,6 +143,7 @@
     "code_smell": "Pan only initiates when e.target.tagName === 'svg'; the inner transformed <g> and node rects are not svg, so a drag that begins on a node or edge silently does nothing instead of panning."
   },
   {
+    "id": "ENT-14",
     "area": "Archive browser",
     "subarea": "Mind map",
     "feature": "Fit / re-center view and auto-fit on layout change",
@@ -140,6 +154,7 @@
     "code_smell": "Auto-fit fires on every bounds change, so manual zoom/pan a user sets is overridden the next time they expand or collapse any node, which can feel like the view 'fights' the user."
   },
   {
+    "id": "ENT-15",
     "area": "Archive browser",
     "subarea": "Mind map",
     "feature": "Keyboard shortcuts help overlay",
@@ -150,6 +165,7 @@
     "code_smell": "The overlay documents +/-/0/arrows/Esc but omits mouse-wheel zoom and the Focus/Expand All/Collapse All buttons, so the documented shortcut set is incomplete."
   },
   {
+    "id": "ENT-16",
     "area": "Archive browser",
     "subarea": "Detail panel",
     "feature": "Node detail panel content",
@@ -160,6 +176,7 @@
     "code_smell": "displayNode is retained after node becomes null so the panel can animate out; if isOpen is toggled rapidly the panel can briefly show stale content from the previously selected node."
   },
   {
+    "id": "ENT-17",
     "area": "Archive browser",
     "subarea": "Detail panel",
     "feature": "Close detail panel (X, Esc, backdrop, empty-space click)",
@@ -170,6 +187,7 @@
     "code_smell": "Two independent Esc handlers (DetailPanel and MindMap) fire on the same keypress; both call close/deselect paths, which is redundant and could double-trigger state updates."
   },
   {
+    "id": "ENT-18",
     "area": "Archive browser",
     "subarea": "Mind map",
     "feature": "Node visual encoding (type colors, page refs, root styling)",
@@ -180,6 +198,7 @@
     "code_smell": "The on-canvas legend only documents Parts/Chapters/Intro-Conclusion, omitting concept (violet) and figure (green) nodes, which are the most numerous once the tree is expanded."
   },
   {
+    "id": "ENT-19",
     "area": "Archive browser",
     "subarea": "Entity browser",
     "feature": "Entity index relationship correctness (data layer)",

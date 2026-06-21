@@ -1,5 +1,6 @@
 [
   {
+    "id": "MODAL-01",
     "area": "Archive browser",
     "subarea": "Record modal",
     "feature": "Open record detail modal",
@@ -10,6 +11,7 @@
     "code_smell": "isVideo/youtubeId are recomputed on every render; type label string logic is duplicated inline and hard to test in isolation."
   },
   {
+    "id": "MODAL-02",
     "area": "Archive browser",
     "subarea": "Record modal",
     "feature": "Lazy-load full record details",
@@ -20,6 +22,7 @@
     "code_smell": "The fetch effect has no error/catch branch — a rejected fetchRecordDetails promise leaves loadingDetails stuck true. The merge {...record, ...details} can let stale detail fields override fresh core fields (the needsReview comment calls this out)."
   },
   {
+    "id": "MODAL-03",
     "area": "Archive browser",
     "subarea": "Record modal",
     "feature": "Related records by shared entities",
@@ -30,6 +33,7 @@
     "code_smell": "findRelated loops calculateEntityConnectionStrength over the entire non-social record set on every open — O(N) synchronous work in an effect, potentially thousands of records."
   },
   {
+    "id": "MODAL-04",
     "area": "Archive browser",
     "subarea": "Record modal",
     "feature": "Prev/next record navigation",
@@ -40,6 +44,7 @@
     "code_smell": "The keydown effect deps include onPrev/onNext/hasPrev/hasNext but not the record itself; handler captures handleClose from outer scope without listing it as a dep."
   },
   {
+    "id": "MODAL-05",
     "area": "Archive browser",
     "subarea": "Record modal",
     "feature": "Close modal (button, backdrop, ESC) with animation",
@@ -50,6 +55,7 @@
     "code_smell": "The 300ms setTimeout in handleClose is not cleared on unmount; closing then quickly navigating could fire onClose after teardown."
   },
   {
+    "id": "MODAL-06",
     "area": "Archive browser",
     "subarea": "Record modal",
     "feature": "Share record deep link",
@@ -60,6 +66,7 @@
     "code_smell": "No catch on the clipboard promise — on browsers/contexts where clipboard write is denied (non-secure origin) nothing happens and no error toast shows; share URL discards any current hash route."
   },
   {
+    "id": "MODAL-07",
     "area": "Archive browser",
     "subarea": "Record modal",
     "feature": "Copy citation",
@@ -70,6 +77,7 @@
     "code_smell": "Retrieved-from URL is window.location.href (could already contain ?record= or other params); no clipboard-failure handling; year/pub/author can be undefined and render as literal 'undefined' in the citation."
   },
   {
+    "id": "MODAL-08",
     "area": "Archive browser",
     "subarea": "Record modal",
     "feature": "Tag, category, and concept click-to-filter",
@@ -80,6 +88,7 @@
     "code_smell": "Categories filter and tags/concepts both labeled distinctly but tags and concepts call the same onFilterSearch path, so a concept and an identically-named tag are indistinguishable downstream."
   },
   {
+    "id": "MODAL-09",
     "area": "Archive browser",
     "subarea": "Record modal",
     "feature": "External 'Read on' link with scheme sanitization and bsky embed rewrite",
@@ -90,6 +99,7 @@
     "code_smell": "Summary-body links built by linkifyText are NOT passed through sanitizeHref (only the 'Read on' header link and thread links are); a javascript: URL embedded in summary text would render as a live href. linkify in RecordModal vs the regex copy inside ThreadModal are two separate implementations."
   },
   {
+    "id": "MODAL-10",
     "area": "Archive browser",
     "subarea": "Record modal",
     "feature": "Embedded YouTube player",
@@ -100,6 +110,7 @@
     "code_smell": "Vimeo is treated as video for the label but never embedded — inconsistent. The YouTube regex is broad and could mis-extract ids from non-watch URLs."
   },
   {
+    "id": "MODAL-11",
     "area": "Archive browser",
     "subarea": "Record modal",
     "feature": "Quote block dedup against title",
@@ -110,6 +121,7 @@
     "code_smell": "The prefix/substring comparison is heuristic and case-sensitive; a quote that differs only in case or punctuation from the title may still display redundantly."
   },
   {
+    "id": "MODAL-12",
     "area": "Archive browser",
     "subarea": "Record modal",
     "feature": "'Needs review' badge",
@@ -119,6 +131,7 @@
     "test_notes": "No flagged records ship in production yet; set needsReview=true (or 'true') on a record fixture and confirm the amber badge appears. Confirm needsReview='false' or absent shows no badge."
   },
   {
+    "id": "MODAL-13",
     "area": "Archive browser",
     "subarea": "Thread modal",
     "feature": "Bluesky thread viewer",
@@ -129,6 +142,7 @@
     "code_smell": "ThreadModal ships its own linkify regex (separate from utils/linkify.js) using a stateful urlPattern.test() with manual lastIndex reset — the documented bug class linkify.js was created to avoid. A console.log diagnostic remains in production code."
   },
   {
+    "id": "MODAL-14",
     "area": "Archive browser",
     "subarea": "Thread modal",
     "feature": "Thread post Bluesky link embed rewrite + sanitization",
@@ -138,6 +152,7 @@
     "test_notes": "In an open thread, hover a 'View on Bluesky' link and confirm it points at embed.bsky.app. Confirm a malformed post url collapses to '#'."
   },
   {
+    "id": "MODAL-15",
     "area": "Dissertation",
     "subarea": "Detail panel",
     "feature": "Dissertation node detail slide-over panel",
@@ -148,6 +163,7 @@
     "code_smell": "displayNode is intentionally never cleared, so after closing, the stale panel content remains mounted (just translated offscreen) and is still in the a11y tree until a new node replaces it."
   },
   {
+    "id": "MODAL-16",
     "area": "Dissertation",
     "subarea": "Tools modal",
     "feature": "Explore tools chooser",
@@ -158,6 +174,7 @@
     "code_smell": "Tool hrefs are hardcoded absolute production paths ('/j/rosen-archive/...'), so on localhost or a different deploy path the FAQ/reader/dataviz links 404. firstToolRef is wired but never used for focus."
   },
   {
+    "id": "MODAL-17",
     "area": "Global UI",
     "subarea": "Welcome modal",
     "feature": "First-visit welcome modal",
@@ -168,6 +185,7 @@
     "code_smell": "No Escape/backdrop dismissal and no role=dialog/aria-modal — the only exit is the single button; a user who blocks localStorage would see it on every load."
   },
   {
+    "id": "MODAL-18",
     "area": "Global UI",
     "subarea": "Announcement banner",
     "feature": "Dismissible work-in-progress / launch banner",
@@ -178,6 +196,7 @@
     "code_smell": "Hardcoded '25,000+ records' copy can drift from the actual record count; no aria-live so the banner's appearance isn't announced."
   },
   {
+    "id": "MODAL-19",
     "area": "Global UI",
     "subarea": "Loading state",
     "feature": "Rotating dissertation-quote loading screen",
@@ -188,6 +207,7 @@
     "code_smell": "Quotes are hardcoded and duplicated from dissertationData rather than sourced from it, risking drift from the verified citations."
   },
   {
+    "id": "MODAL-20",
     "area": "Global UI",
     "subarea": "Deep link",
     "feature": "?record= deep-link parse and URL sync",
@@ -198,6 +218,7 @@
     "code_smell": "parseRecordId does not validate that the id corresponds to a real record — a ?record=garbage value is passed downstream and relies on the lookup returning nothing."
   },
   {
+    "id": "MODAL-21",
     "area": "Global UI",
     "subarea": "Bug report",
     "feature": "Report a bug (prefilled GitHub issue)",

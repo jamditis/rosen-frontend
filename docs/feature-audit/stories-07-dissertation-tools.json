@@ -1,5 +1,6 @@
 [
   {
+    "id": "DIS-01",
     "area": "Dissertation tools",
     "subarea": "Landing",
     "feature": "Hero section with primary/secondary CTAs",
@@ -10,6 +11,7 @@
     "code_smell": "The primary hero CTA 'Read Jay's Essay' has no target=_blank/rel=noopener, so it navigates away from the dissertation page in the same tab, unlike most other external links here which open in a new tab. Minor inconsistency."
   },
   {
+    "id": "DIS-02",
     "area": "Dissertation tools",
     "subarea": "Landing",
     "feature": "Fixed PressThink back-nav bar",
@@ -20,6 +22,7 @@
     "code_smell": "The arrow icon is a left-arrow (back) but the destination is an external blog, not a parent page in this site — slightly misleading affordance."
   },
   {
+    "id": "DIS-03",
     "area": "Dissertation tools",
     "subarea": "Landing",
     "feature": "Reader entry points",
@@ -30,6 +33,7 @@
     "code_smell": "Hover styling is done with inline onmouseover/onmouseout handlers rather than CSS :hover, unlike the rest of the page. Works, but inconsistent and harder to maintain."
   },
   {
+    "id": "DIS-04",
     "area": "Dissertation tools",
     "subarea": "Landing",
     "feature": "How-to-explore cards (Reader + NotebookLM/PDF)",
@@ -40,6 +44,7 @@
     "code_smell": "The card copy promises the reader 'remembers your place' and a highlight-to-share image download — those are reader features, not landing features; verify the reader actually delivers them (out of scope here)."
   },
   {
+    "id": "DIS-05",
     "area": "Dissertation tools",
     "subarea": "Landing",
     "feature": "Explore-the-dissertation nav cards",
@@ -50,6 +55,7 @@
     "code_smell": ""
   },
   {
+    "id": "DIS-06",
     "area": "Dissertation tools",
     "subarea": "Landing",
     "feature": "Scholars-respond card (Samuel Earle) with mini-timeline",
@@ -60,6 +66,7 @@
     "code_smell": "Headshot and the About-section portrait load from remote hosts (pressthink.org, journalism.nyu.edu) with no width/height or onerror fallback — broken/slow if those hosts change or block hotlinking; offline/local testing shows no image."
   },
   {
+    "id": "DIS-07",
     "area": "Dissertation tools",
     "subarea": "Landing",
     "feature": "About Jay Rosen section + external profile links",
@@ -70,6 +77,7 @@
     "code_smell": ""
   },
   {
+    "id": "DIS-08",
     "area": "Dissertation tools",
     "subarea": "Landing",
     "feature": "Text selection sharing tool (landing)",
@@ -80,6 +88,7 @@
     "code_smell": "contentSelector is set to 'main', but dissertation/index.html has NO <main> element (it uses <section> blocks). The selection tool likely binds to nothing, so highlight-to-share is effectively dead on the landing page. Likely bug."
   },
   {
+    "id": "DIS-09",
     "area": "Dissertation tools",
     "subarea": "Landing",
     "feature": "Footer links and curator credit",
@@ -90,6 +99,7 @@
     "code_smell": "Footer PressThink and NYU links lack target=_blank/rel=noopener (other instances of these same links elsewhere on the page do open in new tabs) — inconsistent."
   },
   {
+    "id": "DIS-10",
     "area": "Dissertation tools",
     "subarea": "Foreword",
     "feature": "Foreword article layout with fade-in animations and drop cap",
@@ -100,6 +110,7 @@
     "code_smell": "Paragraph fade-up animation-delays only target nth-child 1–5; later paragraphs still use fadeInUp with animation 'backwards' fill, so on slow loads paragraphs 6+ may briefly render invisible before the (delay-0) animation runs. Minor flash-of-hidden-content risk."
   },
   {
+    "id": "DIS-11",
     "area": "Dissertation tools",
     "subarea": "Foreword",
     "feature": "Foreword navigation (top bar + footer nav)",
@@ -110,6 +121,7 @@
     "code_smell": "The top-bar 'Back' link points to ../../ (the archive root index.html) while the footer 'Dissertation Home' points to ../ (the dissertation landing). Two different 'back' destinations on one page — potentially confusing; verify ../../ resolves to a real page when served at production path."
   },
   {
+    "id": "DIS-12",
     "area": "Dissertation tools",
     "subarea": "Foreword",
     "feature": "Text selection sharing tool (foreword)",
@@ -120,6 +132,7 @@
     "code_smell": ""
   },
   {
+    "id": "DIS-13",
     "area": "Dissertation tools",
     "subarea": "Network-effect",
     "feature": "Embedded Network (1976) film clip",
@@ -130,6 +143,7 @@
     "code_smell": ""
   },
   {
+    "id": "DIS-14",
     "area": "Dissertation tools",
     "subarea": "Network-effect",
     "feature": "Three-decade timeline + scroll fade-in animations",
@@ -140,6 +154,7 @@
     "code_smell": "If JS is disabled, .fade-up elements keep opacity:0 and never become visible — the analysis quotes would be invisible. No CSS fallback for the no-JS case."
   },
   {
+    "id": "DIS-15",
     "area": "Dissertation tools",
     "subarea": "Network-effect",
     "feature": "Expandable full commentary (details/summary accordion)",
@@ -150,6 +165,7 @@
     "code_smell": ""
   },
   {
+    "id": "DIS-16",
     "area": "Dissertation tools",
     "subarea": "Network-effect",
     "feature": "Header/CTA navigation + skip link",
@@ -160,6 +176,7 @@
     "code_smell": "Same dual-destination pattern as foreword: header back-arrow → ../../ (archive root) while the bottom 'Back to Launch Page' → ../ (dissertation landing). Two different 'back' targets."
   },
   {
+    "id": "DIS-17",
     "area": "Dissertation tools",
     "subarea": "Network-effect",
     "feature": "Text selection sharing tool (network-effect)",
@@ -170,6 +187,7 @@
     "code_smell": "Source attribution is hardcoded to the dissertation (1986), but selecting Samuel Earle's 2025 commentary would copy it credited to Rosen's 1986 dissertation — wrong citation for the scholar's own words."
   },
   {
+    "id": "DIS-18",
     "area": "Dissertation tools",
     "subarea": "FAQ",
     "feature": "Accordion FAQ items with permalinks and copy-link",
@@ -180,6 +198,7 @@
     "code_smell": "Expand-all sets every visible item .open, but the single-open toggle logic and openItemId tracking assume one item open; after Expand all, clicking any item collapses all others — internal state (openItemId) and the .open classes can disagree. Also copy-link uses navigator.clipboard which requires a secure context (https/localhost); on plain file:// it will reject and only console.error (silent to the user)."
   },
   {
+    "id": "DIS-19",
     "area": "Dissertation tools",
     "subarea": "FAQ",
     "feature": "Search with multi-word AND matching over keywords",
@@ -190,6 +209,7 @@
     "code_smell": "Search matches against answer HTML (raw markup with <em>, ** markers), so a query like 'em' or partial tag fragments could match formatting rather than content. Also matches are AND across words but there is no result highlighting despite a .search-highlight CSS class existing (defined but never applied)."
   },
   {
+    "id": "DIS-20",
     "area": "Dissertation tools",
     "subarea": "FAQ",
     "feature": "Category pill filtering",
@@ -200,6 +220,7 @@
     "code_smell": "Category mismatch bug: data.js defines a 'figures' (Key Thinkers) category with 5 items (Lippmann, Dewey, Park, Tarde, Jefferson), but index.html has NO 'figures' pill. Those 5 questions are unreachable by category filtering — only via 'All questions' or search. The pills and FAQ_CATEGORIES are out of sync."
   },
   {
+    "id": "DIS-21",
     "area": "Dissertation tools",
     "subarea": "FAQ",
     "feature": "Expand all / collapse all controls",
@@ -210,6 +231,7 @@
     "code_smell": "Expand all leaves openItemId = null while many items are open; a subsequent single-item click then collapses all others, which can feel like the UI 'losing' the expanded set unexpectedly (state model is single-open but bulk-expand violates it)."
   },
   {
+    "id": "DIS-22",
     "area": "Dissertation tools",
     "subarea": "FAQ",
     "feature": "NotebookLM AI tools banner",
@@ -220,6 +242,7 @@
     "code_smell": ""
   },
   {
+    "id": "DIS-23",
     "area": "Dissertation tools",
     "subarea": "FAQ",
     "feature": "FAQ header/skip nav and reader CTA",
@@ -230,6 +253,7 @@
     "code_smell": ""
   },
   {
+    "id": "DIS-24",
     "area": "Dissertation tools",
     "subarea": "FAQ",
     "feature": "Text selection sharing tool (FAQ)",
@@ -240,6 +264,7 @@
     "code_smell": "FAQ answers are paraphrased/AI-grounded explanations, not verbatim dissertation text, yet selecting them attributes the quote to 'Jay Rosen, \"The Impossible Press\" (1986)' — could mislead users into sharing a paraphrase as a direct 1986 quote."
   },
   {
+    "id": "DIS-25",
     "area": "Dissertation tools",
     "subarea": "Launch page",
     "feature": "Standalone launch landing redirect",

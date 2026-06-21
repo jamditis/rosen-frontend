@@ -114,8 +114,14 @@ class ReadingProgress {
     const saved = this.loadPosition();
     if (!saved) return;
 
-    // Only offer resume if progress was significant (>5%)
-    if (saved.scrollProgress < 5) return;
+    // Only offer resume when there is a usable position to return to: a
+    // meaningful reading fraction, or at least a section anchor for a legacy or
+    // partial entry. A non-finite scrollProgress (malformed storage) must not
+    // slip through -- "undefined < 5" is false, which would otherwise surface a
+    // "NaN% complete" prompt.
+    const savedPct = Number(saved.scrollProgress);
+    const hasFraction = Number.isFinite(savedPct) && savedPct >= 5;
+    if (!hasFraction && !saved.sectionId) return;
 
     // Only offer if saved within last 30 days
     const maxAge = 30 * 24 * 60 * 60 * 1000;
@@ -131,9 +137,13 @@ class ReadingProgress {
   showResumePrompt(savedPosition) {
     const prompt = document.createElement('div');
     prompt.className = 'resume-prompt';
+    const pct = Number(savedPosition.scrollProgress);
+    const label = Number.isFinite(pct)
+      ? `Continue reading from where you left off? (${Math.round(pct)}% complete)`
+      : 'Continue reading from where you left off?';
     prompt.innerHTML = `
       <div class="resume-prompt__content">
-        <p>Continue reading from where you left off? (${Math.round(savedPosition.scrollProgress)}% complete)</p>
+        <p>${label}</p>
         <div class="resume-prompt__actions">
           <button class="btn btn--primary" data-action="resume">Continue reading</button>
           <button class="btn btn--secondary" data-action="dismiss">Start from beginning</button>
@@ -212,21 +222,22 @@ class ReadingProgress {
    * @param {Object} savedPosition
    */
   resumeReading(savedPosition) {
-    if (savedPosition.sectionId) {
-      const target = document.getElementById(savedPosition.sectionId);
-      if (target) {
-        // Scroll to the saved section element, not the absolute saved scrollY:
-        // the element is layout-independent, so it stays correct even if font
-        // size, width, or spacing changed since the position was saved.
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        return;
-      }
+    // Restore by reading fraction, not an absolute pixel offset. scrollProgress
+    // is a ratio of the live document height, so it survives reflow (font size,
+    // width, spacing) between sessions and still returns the reader to where
+    // they actually were -- mid-chapter, not the chapter top an element anchor
+    // would snap to. It is also the value the resume prompt reports
+    // ("N% complete"), so the jump matches what the reader was promised.
+    const pct = Number(savedPosition.scrollProgress);
+    if (Number.isFinite(pct)) {
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      window.scrollTo({ top: Math.max(0, (pct / 100) * docHeight), behavior: 'smooth' });
+      return;
     }
-
-    // Fallback: scroll to percentage
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const targetY = (savedPosition.scrollProgress / 100) * docHeight;
-    window.scrollTo({ top: targetY, behavior: 'smooth' });
+    // Malformed or legacy entry with only a section anchor: a coarse jump to the
+    // section beats a NaN scroll that would go nowhere.
+    const target = savedPosition.sectionId && document.getElementById(savedPosition.sectionId);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   /**
