@@ -59,8 +59,8 @@ describe('fetch error handling (#171)', () => {
     const beforeCacheRead = body.slice(0, cacheReadIdx);
     assert.match(
       beforeCacheRead,
-      /await\s+withVersionTimeout\s*\(\s*checkVersion\s*\(/,
-      'fetchCoreData must `await` a bounded `checkVersion()` before reading the cache so a slow version.json cannot stall the load'
+      /await\s+raceTimeout\s*\(\s*checkVersion\s*\(\s*\)\s*,/,
+      'fetchCoreData must `await` a bounded `checkVersion()` (raceTimeout with a timeout arg) before reading the cache so a slow version.json cannot stall the load'
     );
   });
 

@@ -34,19 +34,13 @@
  * @typedef {import('./entityDataLoader.js').EntityDataPayload} EntityDataPayload
  */
 
-// Cache stamp. Shared with archiveService.js so the two caches interop
-// during the migration; bump both together until the legacy entity
-// fetch is deleted (the final step of issue #130).
-const CACHE_VERSION = 'v9';
-
-// Entity data is small (~1MB), so a short TTL is cheap and keeps the
-// entity browser current without a hard reload.
-const CACHE_TTL_MS = 1000 * 60 * 30; // 30 minutes
-
-// localStorage quota is ~5MB; anything larger goes to sessionStorage,
-// which is cleared on tab close and keeps localStorage free for
-// smaller, longer-lived entries.
-const MAX_LOCALSTORAGE_SIZE = 5 * 1024 * 1024;
+import {
+  CACHE_VERSION,
+  CACHE_TTL_MS,
+  MAX_LOCALSTORAGE_SIZE,
+  cacheKeyFor,
+} from '../cacheConfig.js?v=3.4.4';
+import { raceTimeout } from '../../utils/raceTimeout.js?v=3.4.4';
 
 // localStorage key holding the last-seen deploy version.
 const DEPLOY_VERSION_KEY = 'jrda_deploy_version';
@@ -58,20 +52,6 @@ const DISSERTATION_RECORD_ID = 'dissertation-1986';
 // Cache keys this adapter owns or may evict. Kept in sync with
 // archiveService.clearArchiveCache so a quota purge clears the same set.
 const ARCHIVE_CACHE_PREFIXES = ['archive_json_', 'archive_csv_'];
-
-/**
- * djb2 hash of the data URL, namespaced under archive_json_. Identical to
- * archiveService.getCacheKey so both code paths address the same entry.
- * @param {string} url
- * @returns {string}
- */
-const cacheKeyFor = (url) => {
-  let hash = 5381;
-  for (let i = 0; i < url.length; i += 1) {
-    hash = ((hash << 5) + hash) + url.charCodeAt(i);
-  }
-  return `archive_json_${Math.abs(hash >>> 0)}`;
-};
 
 /**
  * True for the browser's storage-quota-exceeded error, across engines.
@@ -197,33 +177,6 @@ const writeCache = ({ localStorage, sessionStorage }, key, data, now) => {
     // Non-quota write errors leave the cache cold; the load still succeeds.
   }
 };
-
-/**
- * Resolve to the Promise's value, or to `fallback` if it rejects or has
- * not settled within `ms`. Never rejects. Bounds the version.json check so
- * a slow manifest request cannot stall an otherwise-cacheable load.
- * @template T
- * @param {Promise<T>} promise
- * @param {number} ms
- * @param {T} fallback
- * @returns {Promise<T>}
- */
-const withTimeout = (promise, ms, fallback) =>
-  new Promise((resolve) => {
-    let settled = false;
-    const finish = (value) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      resolve(value);
-    };
-    // The timer is left ref'd on purpose. An unref'd timer that is the
-    // only pending work never fires — the loop idles past it — so a hung
-    // version.json would never time out. finish() clears the timer as soon
-    // as either side settles, so it never outlives the bounded wait.
-    const timer = setTimeout(() => finish(fallback), ms);
-    promise.then(finish, () => finish(fallback));
-  });
 
 /**
  * Check version.json and clear the archive caches if the deploy version
@@ -377,10 +330,10 @@ export const createHttpCachedLoader = ({
     // load a good cache could satisfy. On timeout or transient failure
     // versionChecked stays false, so a later call retries the check.
     if (!versionChecked) {
-      const checked = await withTimeout(
+      const checked = await raceTimeout(
         checkDeployVersion({ fetch, localStorage, sessionStorage }, versionUrl, now),
         versionTimeoutMs,
-        false,
+        { fallback: false },
       );
       if (checked) versionChecked = true;
     }
