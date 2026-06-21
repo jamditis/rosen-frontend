@@ -1,0 +1,128 @@
+{
+  "MODAL-01": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "role=dialog aria-modal=true, z=80, body overflow=\"hidden\", backdrop=true, title=\"The Impossible Press: American Journalis\". Smell (recomputed isVideo/youtubeId, duplicated type-label string) is a perf/testability nit, not a behavior bug — confirmed render is correct."
+  },
+  "MODAL-12": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Badge absent on first record (depends on record flag). Render path wired; predicate reads core record (RecordModal.js:232 uses recordNeedsReview(record), not displayRecord) — matches story intent."
+  },
+  "MODAL-04": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Next button + ArrowLeft/ArrowRight keys all navigate; Previous disabled on first record (deriveNavFlags hasPrev=index>0). Smell (keydown effect omits record/handleClose from deps) does not manifest: handlers use latest hasPrev/hasNext which ARE in deps; nav stayed correct across 4 steps."
+  },
+  "MODAL-08": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Clicked category \"Journalism Education\": modal closed=true, filtered list \"677 records found\". TagGroups present: categories=true tags=true concepts=true. Smell (tags & concepts share onFilterSearch so an identically-named tag/concept are indistinguishable downstream) CONFIRMED in code (App.js handleFilterSearch sets filters.search for both) — minor, both intentionally route to search; not a bug."
+  },
+  "MODAL-05": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "All three close paths work; body overflow restored=true. Smell (300ms setTimeout in handleClose not cleared on unmount) is real but low-impact: close-then-immediate-teardown could fire onClose after unmount (no crash observed in normal close flows)."
+  },
+  "MODAL-20": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Cold ?record=dissertation-1986 opened modal; URL kept the param; close deleted it (setRecordParam delete branch); ?record=GARBAGE opened no modal (lookup misses -> record null -> RecordModal returns null). Smell (parseRecordId does not validate the id is real) CONFIRMED but harmless — the downstream lookup returning nothing is the intended guard, verified live."
+  },
+  "MODAL-09": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "\"Read on\" link: {\"href\":\"./dissertation/reader/\",\"rel\":\"noreferrer\",\"target\":\"_blank\"} (sanitizeHref + bsky->embed rewrite applied; target=_blank rel=noreferrer). SMELL REFUTED for the stated javascript: risk: utils/linkify.js splitUrlsForLinkify only matches https?:// URLs, so a \"javascript:\" token in summary text is rendered as PLAIN TEXT, never an <a href>. The summary linkify does bypass sanitizeHref, but it can only ever emit http/https hrefs, which are already safe — there is no live-javascript-href path through summary text. No js: href found in modal (true)."
+  },
+  "MODAL-02": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "medium",
+    "notes": "Details resolved (not stuck loading) and summary/thread body rendered=true. SMELL CONFIRMED by code inspection: the fetch effect (RecordModal.js:66) has .then() but NO .catch() — a rejected fetchRecordDetails leaves loadingDetails=true forever (stuck spinner). Not reproducible on the happy path (network served the details), but the missing catch is a real latent defect; severity medium."
+  },
+  "MODAL-03": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Related-records section rendered. Smell (O(N) synchronous calculateEntityConnectionStrength over the full non-social set in an effect) CONFIRMED in code (RecordModal.js:107 loops all candidates each open) — perf risk on large sets; modal still opened responsively in test."
+  },
+  "MODAL-10": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "YouTube embed iframe present=false on this record (only renders for matched youtube ids). Vimeo: label 'Video' but no embed — inconsistency CONFIRMED in code (only youtubeId is extracted; isVideo also true for vimeo). Behavior matches story; flagged as known design gap."
+  },
+  "MODAL-11": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Quote blockquote present=true (suppressed when youtube embed exists or quote ~= title). Dedup heuristic is case-sensitive prefix/substring (RecordModal.js:269) — a case/punctuation-only difference could still show a near-duplicate quote; CONFIRMED as a heuristic limitation, low severity."
+  },
+  "MODAL-06": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Share button wrote \"http://localhost:8000/index.html?record=dissertation-1986\" and toast shown=true. Smell (no catch on clipboard write; share URL discards existing hash/query) CONFIRMED in code (RecordModal.js:169 builds origin+pathname+?record only, .then with no .catch) — on a denied clipboard nothing happens silently; low severity in secure context."
+  },
+  "MODAL-07": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Citation written: \"Jay Rosen (1986). \"The Impossible Press: American Journalism and the Decline of Public Life\". New York University (Ph.D. Dissertation). Retrieved from http://localhost:8000/index.html?record=dissertation-1986\". Smell CONFIRMED: author/year/pub interpolated raw, so missing fields render literal \"undefined\"; Retrieved-from uses window.location.href (carries ?record=). undefinedPresent=false. No clipboard-failure handling."
+  },
+  "MODAL-13": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Thread THREAD-00009: viewer=true stats(posts/levels/Bluesky)=true. Smell CONFIRMED: ThreadModal ships its own stateful-regex linkify (urlPattern.test with manual lastIndex reset — the exact bug class utils/linkify.js exists to avoid) and keeps a console.log diagnostic (ThreadModal.js:107). Functional here but a maintenance/latent-bug smell."
+  },
+  "MODAL-14": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "\"View on Bluesky\" href=\"https://embed.bsky.app/profile/jayrosen.bsky.social/post/3ltz4oceik22w\", target=_blank, rel=noopener noreferrer, embed-rewrite-seen=true, js-scheme=false. sanitizeHref(toEmbedUrl(url)) applied per ThreadModal.js:84."
+  },
+  "MODAL-16": {
+    "test_status": "partial",
+    "errors_found": "Link-tool hrefs are hardcoded to production /j/rosen-archive/... and 404 on localhost/preview: /j/rosen-archive/dissertation/faq/=404, /j/rosen-archive/dissertation/reader/=404, /j/rosen-archive/tools/active/dataviz/dataviz.html=404",
+    "severity": "medium",
+    "notes": "ToolsModal: role=dialog z=100 sections(diss=true,data=true) cards(MindMap=true,FAQ=true,Reader=true,DataViz=true) Beta=true, ESC-close=true, body overflow=\"hidden\". SMELL: hrefs hardcoded to /j/rosen-archive/... (ToolsModal.js:22-41) — confirmed below via HTTP probe; firstToolRef wired but unused for focus (close button gets focus instead). CONFIRMED: all ToolsModal link hrefs 404 on localhost (/j/rosen-archive/dissertation/faq/=404, /j/rosen-archive/dissertation/reader/=404, /j/rosen-archive/tools/active/dataviz/dataviz.html=404) — FAQ/Reader/DataViz links are dead in local dev / any non-/j/rosen-archive deploy."
+  },
+  "MODAL-15": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "DetailPanel opened on node click: role=dialog aria-modal=true on-screen=true close-btn=true. After ESC the panel stays MOUNTED and translates off-screen (afterEsc.stillMounted=true, offScreen=true). SMELL CONFIRMED: displayNode is intentionally never cleared (DetailPanel.js:27), so stale panel content remains in the a11y tree (translated offscreen but still in DOM, aria-modal=true) until a new node replaces it — a real accessibility nit."
+  },
+  "MODAL-17": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "First visit showed welcome modal=true; Enter set jrda_visited=\"true\" and hid it; second visit suppressed=true. SMELL CONFIRMED: no role=dialog/aria-modal, no ESC/backdrop dismissal (only the Enter button); a localStorage-blocked browser would see it every load. Functional but an a11y/edge-case gap."
+  },
+  "MODAL-18": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Banner shown on fresh state=true, X set flag=\"true\" and hid it; reload kept hidden=true. SMELL: hardcoded \"25,000+ records\" (present=true) can drift from the real ~30,700-record total; no aria-live so the banner is not announced. Copy-drift + a11y nit, low severity."
+  },
+  "MODAL-19": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "LoadingQuotes captured during throttled cold load: \"Loading archive...\"/tip=true, \"The Impossible Press, <source>\" cite=true. SMELL: the 9 quotes are hardcoded in LoadingQuotes.js (duplicated from dissertationData, risk of drift from verified citations) — confirmed by source; not a runtime failure. Rotation/random-start/cleanup are in-source per story."
+  },
+  "MODAL-21": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Report-a-bug opened a new tab with prefilled URL. template/labels/page-context/archive-version/browser params all present; feat=\"noopener,noreferrer\". page-context captured the open ?record= deep link=true. Smell (query keys must hand-match bug_report.yml field ids) noted; matching verified as of audit. URL: https://github.com/jamditis/rosen-frontend/issues/new?template=bug_report.yml&labels=bug%2Cuser-report&page-context=http%3A%2F%2Flocalhost%3A8000%2Findex.html%3..."
+  }
+}

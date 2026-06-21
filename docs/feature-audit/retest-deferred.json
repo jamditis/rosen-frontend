@@ -1,0 +1,11 @@
+{
+  "DIS-10": { "retest_status": "n/a", "notes": "not fixed (wontfix: prod-only asset); Phase 2 finding stands, renders in production." },
+  "DIS-25": { "retest_status": "n/a", "notes": "not fixed (deferred: prod WordPress redirect, infra decision); Phase 2 finding stands." },
+  "DIS-11": { "retest_status": "n/a", "notes": "not fixed (wontfix: dual back is by design); Phase 2 finding stands." },
+  "DIS-16": { "retest_status": "n/a", "notes": "not fixed (wontfix: dual back is by design); Phase 2 finding stands." },
+  "ANL-12": { "retest_status": "n/a", "notes": "not fixed (deferred: runtime-correct, dedup later); Phase 2 finding stands." },
+  "ANL-13": { "retest_status": "n/a", "notes": "not fixed (deferred: wire-up/remove is a product decision); Phase 2 finding stands." },
+  "ENT-19": { "retest_status": "n/a", "notes": "not fixed (deferred: runtime-correct, parallel impls); Phase 2 finding stands." },
+  "SVC-11": { "retest_status": "n/a", "notes": "not fixed (deferred by design: view-state URL round-trip); Phase 2 finding stands." },
+  "RDR-21": { "retest_status": "n/a", "notes": "not fixed (deferred: footnote links unimplemented = enhancement); Phase 2 finding stands." }
+}

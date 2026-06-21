@@ -17,6 +17,16 @@ const DATA_PATH_MAP = {
   production: '/j/rosen-archive/data',
 };
 
+// Site root each environment serves from. Standalone surfaces (the dissertation
+// tools, the data tools) live under this root, e.g. `${root}/dissertation/faq/`.
+// Links to them must go through resolveSitePath() so they resolve in local
+// preview and GitHub Pages, not just production.
+const ROOT_PATH_MAP = {
+  local: '',
+  'github-pages': '/rosen-frontend',
+  production: '/j/rosen-archive',
+};
+
 const detectHost = () => {
   // self.location works in both window and service-worker scopes since
   // window extends self. Falls back to '' under node (test runtime).
@@ -36,9 +46,17 @@ export const getBasePath = (host = detectHost()) => BASE_PATH_MAP[getEnvironment
 
 export const getDataPath = (host = detectHost()) => DATA_PATH_MAP[getEnvironment(host)];
 
+export const getSiteRoot = (host = detectHost()) => ROOT_PATH_MAP[getEnvironment(host)];
+
+// Resolve a site-root-relative path (e.g. 'dissertation/faq/') to an absolute
+// path for the current environment. Leading slashes on `rel` are ignored.
+export const resolveSitePath = (rel, host = detectHost()) =>
+  getSiteRoot(host) + '/' + String(rel).replace(/^\/+/, '');
+
 export const ENVIRONMENT = getEnvironment();
 export const BASE_PATH = getBasePath();
 export const DATA_PATH = getDataPath();
+export const SITE_ROOT = getSiteRoot();
 export const IS_LOCAL = ENVIRONMENT === 'local';
 export const IS_GITHUB_PAGES = ENVIRONMENT === 'github-pages';
 export const IS_PRODUCTION = ENVIRONMENT === 'production';

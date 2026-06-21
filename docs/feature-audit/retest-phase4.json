@@ -1,0 +1,58 @@
+{
+  "DIS-18": {
+    "retest_status": "pass",
+    "notes": "success-class=true title=\"Link copied!\" failedLog=false"
+  },
+  "DIS-20": {
+    "retest_status": "pass",
+    "notes": "pill=true filtersToFiguresOnly=true"
+  },
+  "RDR-03": {
+    "retest_status": "pass",
+    "notes": "no duplicate ids in DOM"
+  },
+  "RDR-02": {
+    "retest_status": "pass",
+    "notes": "#conclusion -> <H1> \"CONCLUSION\""
+  },
+  "RDR-19": {
+    "retest_status": "pass",
+    "notes": "deep-link target <H1> \"CONCLUSION\""
+  },
+  "RDR-18": {
+    "retest_status": "pass",
+    "notes": "clipboard starts: \"Rosen, J. (1986). The impossible press: \""
+  },
+  "RDR-08": {
+    "retest_status": "pass",
+    "notes": "chapter-5 rect.top=76px finalScrollY=103888 (max=317214)"
+  },
+  "DIS-01": {
+    "retest_status": "pass",
+    "notes": "target=_blank rel=noopener"
+  },
+  "DIS-08": {
+    "retest_status": "pass",
+    "notes": "main=true shareMenuVisible=true"
+  },
+  "MODAL-16": {
+    "retest_status": "pass",
+    "notes": "faq=/dissertation/faq/(200) reader=/dissertation/reader/(200) dataviz=/tools/active/dataviz/dataviz.html(200)"
+  },
+  "ENT-10": {
+    "retest_status": "pass",
+    "notes": "href=/dissertation/reader/ status=200"
+  },
+  "TOOL-02": {
+    "retest_status": "pass",
+    "notes": "emerald=rgb(5, 150, 105) rose=rgb(225, 29, 72)"
+  },
+  "TOOL-08": {
+    "retest_status": "pass",
+    "notes": "rose-bg=rgb(255, 241, 242) emerald-border=rgb(110, 231, 183)"
+  },
+  "TOOL-06": {
+    "retest_status": "pass",
+    "notes": "clean load (0 console errors)"
+  }
+}

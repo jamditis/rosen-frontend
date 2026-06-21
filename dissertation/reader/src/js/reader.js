@@ -55,7 +55,12 @@ class DissertationReader {
     if (!citationEl || !copyBtn) return;
 
     copyBtn.addEventListener('click', async () => {
-      const citationText = citationEl.textContent.trim();
+      // Copy only the citation, not the "Cite this work:" label. Prefer the
+      // dedicated text span; fall back to stripping the label from textContent.
+      const textEl = citationEl.querySelector('.reader-footer__citation-text');
+      const citationText = (textEl ? textEl.textContent : citationEl.textContent)
+        .replace(/^\s*Cite this work:\s*/i, '')
+        .trim();
 
       try {
         await navigator.clipboard.writeText(citationText);

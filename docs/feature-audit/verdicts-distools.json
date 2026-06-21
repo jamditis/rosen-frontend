@@ -1,0 +1,152 @@
+{
+  "DIS-01": {
+    "test_status": "partial",
+    "errors_found": "Confirmed smell: primary hero CTA \"Read Jay's Essay\" -> https://pressthink.org/2025/10/jay-rosen-1986-dissertation-launch-blog-post/ has NO target=\"_blank\" (navigates away in same tab), while sibling external links use new-tab. Minor inconsistency.",
+    "severity": "low",
+    "notes": "Hero renders title/subtitle/Dan-Kennedy quote, pulsing primary CTA (pulse=true), secondary anchor \"#about-jay-rosen\", scroll indicator (true), html scroll-behavior smooth (true)."
+  },
+  "DIS-02": {
+    "test_status": "pass",
+    "errors_found": "Confirmed smell: nav uses a left-arrow (back) icon but the destination is the external PressThink blog, not a parent page — slightly misleading affordance.",
+    "severity": "low",
+    "notes": "Fixed nav bar (position:fixed) with single link \"PressThink\" -> https://pressthink.org; left-arrow icon present=true."
+  },
+  "DIS-03": {
+    "test_status": "pass",
+    "errors_found": "Confirmed smell: \"Read the Dissertation\" uses inline onmouseover/onmouseout handlers rather than CSS :hover, unlike the rest of the page. reader/ probes HTTP 200.",
+    "severity": "low",
+    "notes": "\"Read the Dissertation\" -> reader/ (inlineHover=true, local status 200); \"Scholars respond\" -> #scholars-respond (in-page anchor)."
+  },
+  "DIS-04": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Two how-to cards: reader card -> reader/ (remembersPlace=true, highlight=true); NotebookLM card -> opens new tab (target=_blank), googleAcctNote=true. Smell noted: reader card promises features (\"remembers your place\", highlight-to-share) that belong to the reader (out of scope here)."
+  },
+  "DIS-05": {
+    "test_status": "pass",
+    "errors_found": "network-effect/ probes HTTP 200.",
+    "severity": "low",
+    "notes": "Two explore cards: \"Read Jay's essay\" (featured=true) -> PressThink new tab (target=_blank); \"A scholar reacts to reading chapter 4\" -> network-effect/ (local status 200)."
+  },
+  "DIS-06": {
+    "test_status": "pass",
+    "errors_found": "Confirmed smell: remote headshot (https://pressthink.org/wp-content/uploads/2025/12/1625229316026.jpeg) has no width/height/onerror fallback (hasDims=false, onerror=false); if pressthink.org blocks hotlinking the image breaks silently. headless load: complete=true naturalWidth=200.",
+    "severity": "low",
+    "notes": "Scholar card: Samuel Earle, First Response badge=true, LinkedIn new tab=_blank, CTA -> network-effect/; timeline dots [\"1976\",\"1986\",\"2025\"]."
+  },
+  "DIS-07": {
+    "test_status": "pass",
+    "errors_found": "Remote NYU portrait (https://journalism.nyu.edu/wp-content/uploads/2020/02/photo-jay-rosen.jpg); headless load complete=true naturalWidth=1200.",
+    "severity": "low",
+    "notes": "About section: 9 external in-text+row links, all new-tab=true; about-links row=[\"PressThink Blog\",\"NYU Faculty Page\",\"Bluesky\"]."
+  },
+  "DIS-08": {
+    "test_status": "fail",
+    "errors_found": "Confirmed BUG: landing page has NO <main> (mainCount=0, uses 7 <section> blocks). TextSelectionTool is configured contentSelector:'main', so handleSelection's document.querySelector('main') returns null and bails (line 455-456). Reproduced: selected 20 chars of hero text, share menu did NOT appear (menuVisible=false). Highlight-to-share is dead on the landing page.",
+    "severity": "medium",
+    "notes": "Tool initialized (menu element present=true) but binds to a non-existent <main>."
+  },
+  "DIS-09": {
+    "test_status": "pass",
+    "errors_found": "Confirmed smell: footer PressThink (target=null) and/or NYU (target=null) links lack target=\"_blank\" while the same links elsewhere on the page open new tabs — inconsistent.",
+    "severity": "low",
+    "notes": "Footer shows PressThink + NYU links + curator mailto (mailto:jamditis@gmail.com), dated 2025=true."
+  },
+  "DIS-10": {
+    "test_status": "partial",
+    "errors_found": "Featured image is hardcoded to the absolute production URL https://pressthink.org/j/rosen-archive/rosen-dissertation-feat.png (absProdPath=true); it FAILED to load in local/preview (complete=true, naturalWidth=0 -> ERR_BLOCKED_BY_ORB). The article's only major visual is broken outside production; a relative path / pathResolver would fix it. Also: fade-up animation-delays target only nth-child 1-5 (20 paras total); paras 6+ use fadeInUp with backwards fill at delay 0 — brief flash-of-hidden risk on slow loads.",
+    "severity": "medium",
+    "notes": "Serif body=true, drop cap on first para=true, ornament divider=true, pull-quote w/ p.390 cite=true, audience list=true."
+  },
+  "DIS-11": {
+    "test_status": "partial",
+    "errors_found": "Confirmed smell: top-bar Back -> ../../ (archive root, HTTP 200) but footer \"Dissertation Home\" -> ../ (landing, HTTP 200) — two different back destinations on one page. \"Read Full Text\"/\"Read Full Dissertation\" -> ../reader/ HTTP 200.",
+    "severity": "low",
+    "notes": "Top bar: Back(../../), PressThink, Read Full Text(../reader/). Footer nav: Read Full Dissertation(../reader/, HTTP 200), Dissertation Home(../), PressThink(new tab=_blank)."
+  },
+  "DIS-12": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "contentSelector '.content' exists (true); selecting text inside surfaces the share menu (visible=true). Source attributed \"Foreword to The Impossible Press (2025)\" — correct for the foreword."
+  },
+  "DIS-13": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "YouTube iframe src=https://www.youtube.com/embed/_RujOFCHsxo?rel=0, title=\"Network (1976) - I'm Mad As Hell scene\", aspect via padding-bottom=504px (56.25% of width). Caption present=true."
+  },
+  "DIS-14": {
+    "test_status": "pass",
+    "errors_found": "Confirmed smell: base .fade-up opacity=0.769428 (hidden); no CSS fallback — with JS disabled the IntersectionObserver never adds .visible, so the analysis quotes stay invisible.",
+    "severity": "low",
+    "notes": "Timeline nodes [\"1976\",\"1986\",\"2025\"]; 3 .fade-up sections, 3 became .visible after scroll (IntersectionObserver works with JS on)."
+  },
+  "DIS-15": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "Native <details> accordion: summary \"Read Samuel Earle's Full Commentary\", chevron present=true (rotates when open, transform=true); opens to reveal full essay (open=true, contentShown=true) incl. YouTube watch link=true + LinkedIn=true (both new tab)."
+  },
+  "DIS-16": {
+    "test_status": "partial",
+    "errors_found": "Confirmed smell: header back-arrow -> ../../ (archive root, HTTP 200) while bottom \"Back to Launch Page\" -> ../ (landing) — two different back targets. Reader links -> ../reader/ HTTP 200.",
+    "severity": "low",
+    "notes": "Skip link -> #main (sr-only). Header: back(../../), logo(../), Read Dissertation(../reader/). Bottom CTA: Read Full Text(../reader/), Back to Launch Page(../)."
+  },
+  "DIS-17": {
+    "test_status": "pass",
+    "errors_found": "Confirmed smell: source is hardcoded 'Jay Rosen, \"The Impossible Press\" (1986)', but <main> also contains Samuel Earle's 2025 commentary (selected Earle text=true, len=266) — sharing his words mis-attributes them to Rosen's 1986 dissertation.",
+    "severity": "low",
+    "notes": "<main> exists (true); selecting text surfaces the share menu (visible=true). Citation attribution is the issue, not the binding."
+  },
+  "DIS-18": {
+    "test_status": "partial",
+    "errors_found": "BUG (script.js:94): copy-link success handler reads e.currentTarget inside the clipboard .then() callback; the DOM nulls currentTarget after dispatch, so btn.title throws \"Cannot read properties of null\", is caught, and logs \"Failed to copy link\" (threw=true) even though the write succeeded (clipboard=\"http://localhost:8000/dissertation/faq/index.html#what-\", wroteHash=true). The green \"Link copied!\" confirmation never appears (green=false). Separately: navigator.clipboard needs a secure context, so on file:// it rejects silently.",
+    "severity": "medium",
+    "notes": "Accordion is correct: open pushes #what-is-dissertation to URL (hash=#what-is-dissertation), answer expands (visible=true); opening a 2nd closes the 1st (single-open, openCount=1, firstClosed=true)."
+  },
+  "DIS-19": {
+    "test_status": "pass",
+    "errors_found": "Confirmed smell: matches against raw answer HTML (incl. ** and <em> markers) so formatting fragments can match; .search-highlight CSS class is defined but never applied (highlightInDom=false).",
+    "severity": "low",
+    "notes": "Search: \"lippmann\"=13, \"lippmann dewey\"(AND)=7, nonsense=0 -> no-results panel=true (\"Showing 0 of 46 questions\"); clear(X) restores 46/46; \"/\" focuses input=true."
+  },
+  "DIS-20": {
+    "test_status": "fail",
+    "errors_found": "Confirmed BUG: data.js defines a 'figures' (Key Thinkers) category with 5 items but index.html has NO 'figures' pill. Pills present: [\"all\",\"basics\",\"concepts\",\"arguments\",\"contemporary\",\"later-work\",\"figures\"]. Item categories present: [\"basics\",\"concepts\",\"arguments\",\"figures\",\"contemporary\",\"later-work\"]. Orphan categories with no pill: []. Those 5 questions are unreachable via category filter (only via \"All\" or search). figuresPillExists=true.",
+    "severity": "medium",
+    "notes": "Pills filter correctly otherwise: clicking \"basics\" showed 7 items, allBasics=true, single active pill=1. The bug is the missing 'figures' pill — pills (6) and FAQ_CATEGORIES (6 incl. figures) are out of sync."
+  },
+  "DIS-21": {
+    "test_status": "pass",
+    "errors_found": "Confirmed smell: after Expand all (46 open, openItemId=null), clicking one item collapses all others (open dropped 46 -> 0) — bulk-expand violates the single-open state model, so the UI \"loses\" the expanded set on the next click.",
+    "severity": "low",
+    "notes": "Expand all -> 46/46 open; Collapse all -> 0 open + cleared hash (\"\")."
+  },
+  "DIS-22": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "low",
+    "notes": "NotebookLM banner link -> https://notebooklm.google.com/notebook/d26d326e-20ec-46dc-b9b4-2c752b90e607 (new tab=_blank). On init the href is overwritten from FAQ_METADATA.notebookLM.dissertation (same URL), guarded with optional chaining — no-op but harmless."
+  },
+  "DIS-23": {
+    "test_status": "pass",
+    "errors_found": "Reader -> ../reader/ HTTP 200.",
+    "severity": "low",
+    "notes": "Skip link -> #faq-container; back-arrow + logo both -> ..//../ (landing); results-count aria-live=\"polite\"."
+  },
+  "DIS-24": {
+    "test_status": "pass",
+    "errors_found": "Confirmed smell: FAQ answers are paraphrased/AI-grounded explanations, but the tool attributes selections to 'Jay Rosen, \"The Impossible Press\" (1986)' — sharing a paraphrase as a verbatim 1986 quote. Selected 247 chars, menu visible=true.",
+    "severity": "low",
+    "notes": "<main> exists (true); selecting answer text surfaces the share menu. Binding works; the citation is the concern."
+  },
+  "DIS-25": {
+    "test_status": "fail",
+    "errors_found": "Confirmed smell: meta-refresh target is the hardcoded absolute production path \"/wp-content/rosen-archive/labs/dissertation-launch/landing-page/\" (HTTP 404 locally) — 404s in local dev and on any host other than pressthink's WP layout. isProdPath=true. Fallback link points to the same path (/wp-content/rosen-archive/labs/dissertation-launch/landing-page/). No <title> beyond \"Redirecting...\", no canonical (false); only the meta-refresh exists, the page has no content of its own. The app has a pathResolver these could use.",
+    "severity": "medium",
+    "notes": "dissertation-launch/ is a bare meta-refresh redirect (content=\"0;url=/wp-content/rosen-archive/labs/dissertation-launch/landing-page/\"). It is the only \"page\" in that directory and is structurally brittle if the WP path moves."
+  }
+}

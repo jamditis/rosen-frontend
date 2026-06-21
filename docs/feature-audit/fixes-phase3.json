@@ -1,0 +1,94 @@
+{
+  "DIS-18": {
+    "fix_status": "fixed",
+    "fix_applied": "dissertation/faq/script.js: capture e.currentTarget into btn before the clipboard .then() callback. currentTarget is null after dispatch, so reading it inside the async callback threw and the successful copy was reported as 'Failed to copy link'."
+  },
+  "DIS-20": {
+    "fix_status": "fixed",
+    "fix_applied": "dissertation/faq/index.html: added the 'Key thinkers' pill (data-category=figures), placed after Core arguments to match data.js order, so the 5 figures FAQs become reachable."
+  },
+  "MODAL-16": {
+    "fix_status": "fixed",
+    "fix_applied": "Fixed at source: added resolveSitePath()/getSiteRoot()/SITE_ROOT to pathResolver.js and routed ToolsModal.js tool hrefs (faq/reader/dataviz) through it. Links now resolve in local, GitHub Pages, and production instead of only the hardcoded /j/rosen-archive prod path."
+  },
+  "ENT-10": {
+    "fix_status": "fixed",
+    "fix_applied": "DissertationPage.js: dissertationPdfUrl now uses resolveSitePath('dissertation/reader/') instead of the hardcoded /j/rosen-archive/dissertation/reader/ path, so 'Read Full Text' works in every environment."
+  },
+  "RDR-02": {
+    "fix_status": "fixed",
+    "fix_applied": "dissertation/reader/index.html: de-duplicated id=conclusion (4 -> 1). Kept id=conclusion only on the top-level CONCLUSION h1; renamed the others to chapter-6-conclusion, toward-an-ecological-view, notes-conclusion. TOC '#conclusion' now resolves to the canonical heading. Guarded by tests/reader-unique-ids.test.js."
+  },
+  "RDR-19": {
+    "fix_status": "fixed",
+    "fix_applied": "Same id de-duplication as RDR-02; the '#conclusion' on-load deep link now lands on the top-level CONCLUSION h1, not the first (chapter-6) duplicate."
+  },
+  "RDR-03": {
+    "fix_status": "fixed",
+    "fix_applied": "dissertation/reader/src/js/navigation.js: collectTocLinks() now runs before collectHeadings(), and the scroll-spy observes only headings the ToC links (falls back to all if none match). Non-linked subheadings no longer blank every highlight; the current chapter stays highlighted while its body is read."
+  },
+  "RDR-18": {
+    "fix_status": "fixed",
+    "fix_applied": "dissertation/reader/index.html: wrapped the citation in span.reader-footer__citation-text. reader.js copies that span (or strips a leading 'Cite this work:' label as a fallback), so the copied citation no longer includes the label."
+  },
+  "RDR-08": {
+    "fix_status": "fixed",
+    "fix_applied": "dissertation/reader/src/js/progress.js: resumeReading now scrolls to the saved section element (layout-independent) instead of the absolute saved scrollY (which drifts on reflow). The 10s auto-dismiss timer was replaced with dismiss-on-first-scroll so the resume prompt can't vanish mid-decision; saved position is kept. Also sentence-cased the two prompt buttons."
+  },
+  "DIS-01": {
+    "fix_status": "fixed",
+    "fix_applied": "dissertation/index.html: added target=_blank rel=noopener to the primary hero CTA ('Read Jay's Essay'), matching the sibling external links that already open in a new tab."
+  },
+  "DIS-08": {
+    "fix_status": "fixed",
+    "fix_applied": "dissertation/index.html: wrapped the 7 content sections in a <main> landmark (between </nav> and <footer>). TextSelectionTool binds contentSelector:'main', which matched nothing before, so highlight-to-share was dead on the landing page. Also supplies the previously-missing main landmark for accessibility."
+  },
+  "TOOL-02": {
+    "fix_status": "fixed",
+    "fix_applied": "features/status-report/index.html: added page-local text-emerald-600 and text-rose-600 utilities (Tailwind default values). The prebuilt tailwind.css ships only text-amber-600, so the verified% stat rendered with no colour for the good/bad states."
+  },
+  "TOOL-08": {
+    "fix_status": "fixed",
+    "fix_applied": "features/status-report/index.html: added page-local border-rose-300/bg-rose-50 and border-emerald-300/bg-emerald-50 utilities so high/low action-item priority tints render (prebuilt CSS had only the amber variants)."
+  },
+  "TOOL-06": {
+    "fix_status": "fixed",
+    "fix_applied": "features/status-report/script.js: removed the unused CATEGORY_DISTRIBUTION import (no #category-chart in the DOM). Export left in data.js."
+  },
+  "DIS-10": {
+    "fix_status": "wontfix",
+    "fix_applied": "The foreword featured image is a production-only asset (rosen-dissertation-feat.png is not in the repo). It renders in production; the 404 is local-preview only. A relative/resolved path cannot help without committing the asset and would risk the working production URL, so left as-is."
+  },
+  "DIS-25": {
+    "fix_status": "deferred",
+    "fix_applied": "The launch stub's meta-refresh targets a production WordPress path (/wp-content/rosen-archive/labs/dissertation-launch/landing-page/) that exists only in prod, where the redirect works. Re-pointing it is an outward-facing infra/product decision for Joe, so documented rather than changed."
+  },
+  "DIS-11": {
+    "fix_status": "wontfix",
+    "fix_applied": "By design: the top-bar Back goes to the archive root and the footer 'Dissertation Home' goes to the dissertation landing. Both return HTTP 200; two affordances at different levels is intended breadcrumb behavior, not an error."
+  },
+  "DIS-16": {
+    "fix_status": "wontfix",
+    "fix_applied": "By design, same as DIS-11: header back-arrow -> archive root, bottom 'Back to Launch Page' -> landing. Both 200. Intended, not a bug."
+  },
+  "ANL-12": {
+    "fix_status": "deferred",
+    "fix_applied": "Runtime-correct: sqliteService.getMostMentionedEntities reconciles MAX(total_mentions, COUNT(record_entities)); the QueryBuilder 'Most Mentioned People' template counts COUNT(re.record_id). Both produce valid results; the divergence is a maintainability risk, not a user-facing error. Deferred (consolidate the two count strategies later)."
+  },
+  "ANL-13": {
+    "fix_status": "deferred",
+    "fix_applied": "RiverOfNews is implemented but reached by no route or button (only tests/needs-review.test.js references it). Wiring it into a route or removing it is a product decision for Joe; not deleting an unfinished component unprompted. Deferred."
+  },
+  "ENT-19": {
+    "fix_status": "deferred",
+    "fix_applied": "EntityBrowser uses archiveService getRecordsByEntity/getEntityById, not the frozen entityIndex.js projection. Both are runtime-correct; the parallel implementations are a drift risk, not an error. Deferred (pick one source of truth later)."
+  },
+  "SVC-11": {
+    "fix_status": "deferred",
+    "fix_applied": "Filters not round-tripping to the URL is deferred by design per the viewState.js comment (useViewState provider not wired). Not a regression; deferred to the planned view-state work."
+  },
+  "RDR-21": {
+    "fix_status": "deferred",
+    "fix_applied": "Footnote jump-links were never implemented: markers are plain Unicode superscripts with no anchors, and the .footnote-ref CSS is unused. Cross-text footnote anchoring is a feature, out of scope for error-fixing. Deferred as an enhancement."
+  }
+}

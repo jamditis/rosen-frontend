@@ -23,8 +23,11 @@ class ReaderNavigation {
 
     if (!this.navEl) return;
 
-    this.collectHeadings();
+    // ToC links first: collectHeadings narrows the scroll-spy set to the
+    // headings the ToC actually links, so a non-linked subheading can't blank
+    // every highlight as it scrolls past.
     this.collectTocLinks();
+    this.collectHeadings();
     this.setupScrollTracking();
     this.setupMobileNav();
     this.setupKeyboardNav();
@@ -32,15 +35,22 @@ class ReaderNavigation {
   }
 
   /**
-   * Collect all section headings from the content
+   * Collect the section headings the scroll-spy tracks. Only headings that the
+   * ToC links are tracked, so the active-section highlight maps 1:1 to a ToC
+   * entry and the last chapter stays highlighted while its body is read
+   * (instead of de-highlighting on every non-linked subheading). Falls back to
+   * all headings if the ToC targets resolve to nothing.
    */
   collectHeadings() {
     const content = document.querySelector('.reader-content');
     if (!content) return;
 
-    this.headings = Array.from(
-      content.querySelectorAll('h1[id], h2[id], h3[id]')
+    const all = Array.from(content.querySelectorAll('h1[id], h2[id], h3[id]'));
+    const tocTargets = new Set(
+      this.tocLinks.map(link => link.getAttribute('href').slice(1))
     );
+    const linked = all.filter(h => tocTargets.has(h.id));
+    this.headings = linked.length ? linked : all;
   }
 
   /**

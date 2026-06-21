@@ -5,12 +5,15 @@ import { BookOpen, ExternalLink, ArrowLeft, Calendar, GraduationCap } from 'luci
 import MindMap from './MindMap.js?v=3.4.3';
 import DetailPanel from './DetailPanel.js?v=3.4.3';
 import { DISSERTATION_NODES } from './dissertationData.js?v=3.4.3';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.4.3';
 
 const DissertationPage = ({ onBack }) => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [detailPanelOpen, setDetailPanelOpen] = useState(false);
 
-  const dissertationPdfUrl = '/j/rosen-archive/dissertation/reader/';
+  // Resolve for the current environment so the link works in local preview and
+  // GitHub Pages, not only production.
+  const dissertationPdfUrl = resolveSitePath('dissertation/reader/');
 
   const handleNodeSelect = (node) => {
     if (node) {

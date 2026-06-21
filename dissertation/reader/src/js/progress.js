@@ -135,8 +135,8 @@ class ReadingProgress {
       <div class="resume-prompt__content">
         <p>Continue reading from where you left off? (${Math.round(savedPosition.scrollProgress)}% complete)</p>
         <div class="resume-prompt__actions">
-          <button class="btn btn--primary" data-action="resume">Continue Reading</button>
-          <button class="btn btn--secondary" data-action="dismiss">Start from Beginning</button>
+          <button class="btn btn--primary" data-action="resume">Continue reading</button>
+          <button class="btn btn--secondary" data-action="dismiss">Start from beginning</button>
         </div>
       </div>
     `;
@@ -197,12 +197,14 @@ class ReadingProgress {
 
     document.body.appendChild(prompt);
 
-    // Auto-dismiss after 10 seconds
-    setTimeout(() => {
-      if (prompt.parentNode) {
-        prompt.remove();
-      }
-    }, 10000);
+    // Dismiss when the reader starts scrolling (an actual decision to read from
+    // here) rather than on a fixed timer that can yank the prompt mid-choice.
+    // Saved position is kept so a later visit can still offer resume.
+    const dismissOnScroll = () => {
+      if (prompt.parentNode) prompt.remove();
+      window.removeEventListener('scroll', dismissOnScroll);
+    };
+    window.addEventListener('scroll', dismissOnScroll, { passive: true, once: true });
   }
 
   /**
@@ -213,11 +215,10 @@ class ReadingProgress {
     if (savedPosition.sectionId) {
       const target = document.getElementById(savedPosition.sectionId);
       if (target) {
-        // Use scrollY for more precise positioning
-        window.scrollTo({
-          top: savedPosition.scrollY || 0,
-          behavior: 'smooth'
-        });
+        // Scroll to the saved section element, not the absolute saved scrollY:
+        // the element is layout-independent, so it stays correct even if font
+        // size, width, or spacing changed since the position was saved.
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         return;
       }
     }

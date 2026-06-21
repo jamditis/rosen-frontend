@@ -1,0 +1,252 @@
+[
+  {
+    "area": "Dissertation tools",
+    "subarea": "Landing",
+    "feature": "Hero section with primary/secondary CTAs",
+    "user_story": "As a visitor arriving at the dissertation site, I want a clear hero with the title, subtitle, committee, a pull-quote, and obvious next actions, so that I immediately understand what this is and how to start.",
+    "expected_behavior": "Full-viewport dark hero shows the title 'The Impossible Press', italic subtitle, committee line, and a Dan Kennedy pull-quote with two links (PressThink, 'read the rest' on dankennedy.net). Two hero buttons: 'Read Jay's Essay' links out to https://pressthink.org/2025/10/jay-rosen-1986-dissertation-launch-blog-post/ (pulsing primary, blue pulse animation), and 'Read Full Bio' is an in-page anchor to #about-jay-rosen. A bouncing 'Scroll to explore' indicator animates at the bottom. html has scroll-behavior: smooth so anchor clicks smooth-scroll.",
+    "source_files": ["dissertation/index.html"],
+    "test_notes": "Open dissertation/index.html. Confirm hero renders, primary CTA pulses, clicking 'Read Full Bio' smooth-scrolls down to the About section, and 'Read Jay's Essay' opens PressThink in same tab (no target=_blank on this hero button).",
+    "code_smell": "The primary hero CTA 'Read Jay's Essay' has no target=_blank/rel=noopener, so it navigates away from the dissertation page in the same tab, unlike most other external links here which open in a new tab. Minor inconsistency."
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "Landing",
+    "feature": "Fixed PressThink back-nav bar",
+    "user_story": "As a reader, I want a persistent link back to PressThink, so that I can leave the standalone page and return to Jay Rosen's main blog.",
+    "expected_behavior": "A fixed top nav bar (blurred dark background) shows a single left-arrow 'PressThink' link to https://pressthink.org. It stays pinned while scrolling.",
+    "source_files": ["dissertation/index.html"],
+    "test_notes": "Open dissertation/index.html, scroll; confirm the bar stays fixed at top and the link points to pressthink.org.",
+    "code_smell": "The arrow icon is a left-arrow (back) but the destination is an external blog, not a parent page in this site — slightly misleading affordance."
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "Landing",
+    "feature": "Reader entry points",
+    "user_story": "As a reader, I want prominent buttons to jump straight into the full dissertation text, so that I can start reading without hunting.",
+    "expected_behavior": "A 'Read the Dissertation' button (inline hover JS changes background/transform on mouseover/mouseout) and a 'How to explore' card both link to reader/ (relative). A secondary 'Scholars respond' button anchors to #scholars-respond and smooth-scrolls down.",
+    "source_files": ["dissertation/index.html"],
+    "test_notes": "Open dissertation/index.html. Click 'Read the Dissertation' — should navigate to dissertation/reader/index.html (exists). Hover the button to confirm inline color/transform change. Click 'Scholars respond' to smooth-scroll to that section.",
+    "code_smell": "Hover styling is done with inline onmouseover/onmouseout handlers rather than CSS :hover, unlike the rest of the page. Works, but inconsistent and harder to maintain."
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "Landing",
+    "feature": "How-to-explore cards (Reader + NotebookLM/PDF)",
+    "user_story": "As a reader choosing how to engage, I want cards describing the reading interface and the AI/PDF options, so that I can pick the format that fits me.",
+    "expected_behavior": "Two cards in a responsive grid (2-up on desktop, 1-up under 700px). 'The reader' card links to reader/ with a blue pulsing CTA. 'PDF and AI tools' card opens NotebookLM (https://notebooklm.google.com/notebook/d26d326e-...) in a new tab with a purple pulsing CTA and a 'Requires a Google account' note. Cards lift on hover (translateY + sky border).",
+    "source_files": ["dissertation/index.html"],
+    "test_notes": "Open dissertation/index.html, scroll to 'How to explore this dissertation'. Confirm both cards render, pulse animations run, reader card → reader/, NotebookLM card opens new tab.",
+    "code_smell": "The card copy promises the reader 'remembers your place' and a highlight-to-share image download — those are reader features, not landing features; verify the reader actually delivers them (out of scope here)."
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "Landing",
+    "feature": "Explore-the-dissertation nav cards",
+    "user_story": "As a reader, I want quick links to Jay's launch essay and the Network Effect analysis, so that I can explore companion pieces.",
+    "expected_behavior": "Two nav cards on a dark section. 'Read Jay's essay' (featured, blue pulse) opens the PressThink launch post in a new tab. 'A scholar reacts to reading chapter 4' links to network-effect/ (relative). Cards lift and gain a sky border on hover.",
+    "source_files": ["dissertation/index.html"],
+    "test_notes": "Open dissertation/index.html, scroll to 'Explore the dissertation'. Click the second card → dissertation/network-effect/index.html (exists). Featured card → new-tab PressThink.",
+    "code_smell": ""
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "Landing",
+    "feature": "Scholars-respond card (Samuel Earle) with mini-timeline",
+    "user_story": "As a reader, I want a featured scholar response with a 1976→1986→2025 visual timeline, so that I grasp the dissertation's contemporary relevance at a glance.",
+    "expected_behavior": "A scholar card shows Earle's headshot (remote pressthink.org image), name/title, a star 'First Response' badge, a pull-quote, context line with a LinkedIn link (new tab), and a 'Explore: The Network Effect' CTA linking to network-effect/. The visual panel renders three colored timeline dots (1976 red / 1986 blue / 2025 violet, the 2025 dot pulse-glows) joined by shimmering connectors. Card and dots have hover transforms.",
+    "source_files": ["dissertation/index.html"],
+    "test_notes": "Open dissertation/index.html at #scholars-respond. Confirm headshot loads from the remote URL, the 2025 dot pulse-glows, connectors shimmer, dots scale on hover, and the CTA → network-effect/.",
+    "code_smell": "Headshot and the About-section portrait load from remote hosts (pressthink.org, journalism.nyu.edu) with no width/height or onerror fallback — broken/slow if those hosts change or block hotlinking; offline/local testing shows no image."
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "Landing",
+    "feature": "About Jay Rosen section + external profile links",
+    "user_story": "As a reader unfamiliar with Jay Rosen, I want a bio with links to his profiles, so that I can learn who he is and follow his work.",
+    "expected_behavior": "Anchored section (#about-jay-rosen) with a circular portrait (remote NYU image), bio paragraphs containing several in-text external links (PressThink, production-of-innocence post, CNN, archive.org, Citizendium — all new tab), and an about-links row (PressThink Blog, NYU Faculty Page, Bluesky) opening in new tabs.",
+    "source_files": ["dissertation/index.html"],
+    "test_notes": "Open dissertation/index.html, click the hero 'Read Full Bio' button to land here, verify the three profile links and inline citation links open correctly in new tabs.",
+    "code_smell": ""
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "Landing",
+    "feature": "Text selection sharing tool (landing)",
+    "user_story": "As a reader, I want to select text and get share/copy/citation actions, so that I can quote passages on social media.",
+    "expected_behavior": "An ES module imports TextSelectionTool from ../features/shared/text-selection.js and initializes it with contentSelector 'main', source 'Jay Rosen, \"The Impossible Press\" (1986)', imageTheme 'light'. Selecting text within the configured content area should surface the selection menu.",
+    "source_files": ["dissertation/index.html", "features/shared/text-selection.js"],
+    "test_notes": "Open dissertation/index.html, select a paragraph and look for the selection popup. Verify the import resolves (../features/shared/text-selection.js exists).",
+    "code_smell": "contentSelector is set to 'main', but dissertation/index.html has NO <main> element (it uses <section> blocks). The selection tool likely binds to nothing, so highlight-to-share is effectively dead on the landing page. Likely bug."
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "Landing",
+    "feature": "Footer links and curator credit",
+    "user_story": "As a reader, I want footer navigation and to know who curated the archive, so that I can reach PressThink/NYU and contact the curator.",
+    "expected_behavior": "Footer shows PressThink and NYU Faculty Page links plus 'Curated by Joe Amditis' as a mailto:jamditis@gmail.com link, dated 2025.",
+    "source_files": ["dissertation/index.html"],
+    "test_notes": "Scroll to the footer of dissertation/index.html; confirm the two links and the mailto link.",
+    "code_smell": "Footer PressThink and NYU links lack target=_blank/rel=noopener (other instances of these same links elsewhere on the page do open in new tabs) — inconsistent."
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "Foreword",
+    "feature": "Foreword article layout with fade-in animations and drop cap",
+    "user_story": "As a reader, I want Jay Rosen's foreword presented as a clean typeset essay, so that I can read his framing of the dissertation comfortably.",
+    "expected_behavior": "Serif (Cormorant Garamond) article on a paper-texture background. Header fades in; first content paragraph has a drop cap; subsequent paragraphs fade up with staggered animation-delays (nth-child 1–5). Includes a featured image (remote pressthink.org png), a star ornament divider, a pull-quote (p. 390 citation), and a styled audience list. Inline links open in new tabs; the link to '../network-effect/' is relative.",
+    "source_files": ["dissertation/foreword/index.html"],
+    "test_notes": "Open dissertation/foreword/index.html. Confirm drop cap on first paragraph, staggered fade-up on paragraphs, ornament + pull-quote render. Click the in-body 'here' link → network-effect/.",
+    "code_smell": "Paragraph fade-up animation-delays only target nth-child 1–5; later paragraphs still use fadeInUp with animation 'backwards' fill, so on slow loads paragraphs 6+ may briefly render invisible before the (delay-0) animation runs. Minor flash-of-hidden-content risk."
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "Foreword",
+    "feature": "Foreword navigation (top bar + footer nav)",
+    "user_story": "As a reader, I want to move from the foreword to the full text, the dissertation home, and PressThink, so that I can keep exploring.",
+    "expected_behavior": "Fixed top bar: 'Back' (../../ to archive root), title, 'PressThink' (pressthink.org), and 'Read Full Text →' (../reader/). Footer nav buttons: 'Read Full Dissertation' (../reader/), 'Dissertation Home' (../), and 'PressThink' (new tab). nav-title hides under 600px.",
+    "source_files": ["dissertation/foreword/index.html"],
+    "test_notes": "Open dissertation/foreword/index.html. Verify top 'Back' → ../../ (repo/site root), 'Read Full Text' → ../reader/, footer 'Dissertation Home' → ../ (dissertation/index.html). Resize below 600px to confirm nav-title hides.",
+    "code_smell": "The top-bar 'Back' link points to ../../ (the archive root index.html) while the footer 'Dissertation Home' points to ../ (the dissertation landing). Two different 'back' destinations on one page — potentially confusing; verify ../../ resolves to a real page when served at production path."
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "Foreword",
+    "feature": "Text selection sharing tool (foreword)",
+    "user_story": "As a reader, I want to select foreword text and share it with a citation, so that I can quote it elsewhere.",
+    "expected_behavior": "Imports TextSelectionTool from ../../features/shared/text-selection.js, contentSelector '.content', source 'Jay Rosen, Foreword to \"The Impossible Press\" (2025)', imageTheme 'light'. The content div exists (.content), so selecting text inside it should surface the share menu.",
+    "source_files": ["dissertation/foreword/index.html", "features/shared/text-selection.js"],
+    "test_notes": "Open dissertation/foreword/index.html, select a sentence inside the article body, confirm the selection popup appears. Unlike the landing page, the selector ('.content') matches a real element here.",
+    "code_smell": ""
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "Network-effect",
+    "feature": "Embedded Network (1976) film clip",
+    "user_story": "As a reader, I want to watch the 'I'm mad as hell' scene, so that I can see the film moment the analysis is built on.",
+    "expected_behavior": "A responsive 16:9 YouTube iframe (embed/_RujOFCHsxo?rel=0) sits in the dark hero with a caption. The container preserves aspect ratio via padding-bottom 56.25%.",
+    "source_files": ["dissertation/network-effect/index.html"],
+    "test_notes": "Open dissertation/network-effect/index.html. Confirm the video embeds and is responsive; needs network access to YouTube.",
+    "code_smell": ""
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "Network-effect",
+    "feature": "Three-decade timeline + scroll fade-in animations",
+    "user_story": "As a reader, I want a 1976→1986→2025 timeline and content that animates in as I scroll, so that the argument's arc is easy to follow.",
+    "expected_behavior": "A horizontal timeline (vertical with rotated arrows under md) with three colored nodes that scale on hover. An IntersectionObserver adds .visible to .fade-up elements (threshold 0.1, rootMargin bottom -50px) to fade/slide them up as they enter the viewport.",
+    "source_files": ["dissertation/network-effect/index.html"],
+    "test_notes": "Open dissertation/network-effect/index.html, scroll down slowly and confirm the quote sections fade/slide in. Resize below md to confirm timeline stacks vertically with down-arrows. Hover nodes to confirm scale.",
+    "code_smell": "If JS is disabled, .fade-up elements keep opacity:0 and never become visible — the analysis quotes would be invisible. No CSS fallback for the no-JS case."
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "Network-effect",
+    "feature": "Expandable full commentary (details/summary accordion)",
+    "user_story": "As a reader, I want to expand Samuel Earle's full commentary, so that I can read the complete essay rather than just the excerpts.",
+    "expected_behavior": "A native <details class='full-commentary'> with a clickable summary ('Read Samuel Earle's Full Commentary') and a chevron that rotates 180deg when open (CSS [open] .chevron). The default marker is hidden; summary hover shades the background. Expands to show full essay paragraphs, including a YouTube watch link (new tab) and a LinkedIn author link (new tab).",
+    "source_files": ["dissertation/network-effect/index.html"],
+    "test_notes": "Open dissertation/network-effect/index.html, scroll to 'The deeper connection', click the summary to expand; confirm chevron rotates and full text appears. Click the embedded watch link / LinkedIn.",
+    "code_smell": ""
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "Network-effect",
+    "feature": "Header/CTA navigation + skip link",
+    "user_story": "As a reader (including keyboard/AT users), I want to skip to content and navigate to the reader and home, so that the page is accessible and easy to leave.",
+    "expected_behavior": "A 'Skip to main content' link (sr-only, visible on focus) targets #main. Sticky header has a back-arrow to ../../, a logo link to ../, and a 'Read Dissertation' button to ../reader/. Bottom CTA section offers 'Read Full Text' (../reader/) and 'Back to Launch Page' (../).",
+    "source_files": ["dissertation/network-effect/index.html"],
+    "test_notes": "Open dissertation/network-effect/index.html, press Tab to reveal the skip link, activate it to jump to #main. Verify header/CTA links resolve (../reader/, ../, ../../).",
+    "code_smell": "Same dual-destination pattern as foreword: header back-arrow → ../../ (archive root) while the bottom 'Back to Launch Page' → ../ (dissertation landing). Two different 'back' targets."
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "Network-effect",
+    "feature": "Text selection sharing tool (network-effect)",
+    "user_story": "As a reader, I want to select and share quotes from this analysis page, so that I can post them with a citation.",
+    "expected_behavior": "Imports TextSelectionTool from ../../features/shared/text-selection.js, contentSelector 'main', source 'Jay Rosen, \"The Impossible Press\" (1986)', imageTheme 'light'. The page has <main id='main'>, so selecting text inside it should surface the share menu.",
+    "source_files": ["dissertation/network-effect/index.html", "features/shared/text-selection.js"],
+    "test_notes": "Open dissertation/network-effect/index.html, select a quote inside the main content, confirm the popup. Selector 'main' matches the real <main> element here.",
+    "code_smell": "Source attribution is hardcoded to the dissertation (1986), but selecting Samuel Earle's 2025 commentary would copy it credited to Rosen's 1986 dissertation — wrong citation for the scholar's own words."
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "FAQ",
+    "feature": "Accordion FAQ items with permalinks and copy-link",
+    "user_story": "As a reader, I want to expand answers, deep-link to a specific question, and copy that link, so that I can read and share individual Q&As.",
+    "expected_behavior": "JS renders FAQ_ITEMS (39 questions) into cards. Clicking a question toggles .open (CSS animates max-height 0→2000px and rotates the chevron); opening one closes others (single-open accordion), pushes #<id> to the URL via history.pushState, and smooth-scrolls the item into view. A per-item copy-link button writes origin+pathname+#id to the clipboard and shows a transient 'Link copied!' green state. On load, handleUrlHash opens the item matching window.location.hash.",
+    "source_files": ["dissertation/faq/index.html", "dissertation/faq/script.js", "dissertation/faq/data.js"],
+    "test_notes": "Open dissertation/faq/index.html. Click a question — it expands, others collapse, URL gains #id, page scrolls to it. Click the copy icon (without toggling) — clipboard gets the permalink, tooltip flips to 'Link copied!'. Reload with a #id in the URL to confirm that item auto-opens.",
+    "code_smell": "Expand-all sets every visible item .open, but the single-open toggle logic and openItemId tracking assume one item open; after Expand all, clicking any item collapses all others — internal state (openItemId) and the .open classes can disagree. Also copy-link uses navigator.clipboard which requires a secure context (https/localhost); on plain file:// it will reject and only console.error (silent to the user)."
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "FAQ",
+    "feature": "Search with multi-word AND matching over keywords",
+    "user_story": "As a reader, I want to type to filter questions, so that I can find the answer I need quickly.",
+    "expected_behavior": "Typing in #search-input filters items: each space-separated word must appear in the combined text (question + answer + per-id FAQ_KEYWORDS). A clear (X) button appears while typing and resets the search. Pressing '/' anywhere (when not already in the box) focuses the search input. Results count updates ('Showing N of 39 questions'); a no-results panel with a 'Clear filters' button shows when nothing matches.",
+    "source_files": ["dissertation/faq/index.html", "dissertation/faq/script.js", "dissertation/faq/data.js"],
+    "test_notes": "Open dissertation/faq/index.html. Type 'lippmann' → only matching Qs show, count updates. Type gibberish → no-results panel with clear button. Press '/' to focus search. Click the X to clear.",
+    "code_smell": "Search matches against answer HTML (raw markup with <em>, ** markers), so a query like 'em' or partial tag fragments could match formatting rather than content. Also matches are AND across words but there is no result highlighting despite a .search-highlight CSS class existing (defined but never applied)."
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "FAQ",
+    "feature": "Category pill filtering",
+    "user_story": "As a reader, I want to filter questions by category, so that I can browse a topic area.",
+    "expected_behavior": "Six pills (All, The basics, Key concepts, Core arguments, Today's relevance, Later developments) set activeCategory; clicking toggles the .active class and re-filters. Category and search filters combine (AND).",
+    "source_files": ["dissertation/faq/index.html", "dissertation/faq/script.js", "dissertation/faq/data.js"],
+    "test_notes": "Open dissertation/faq/index.html, click 'Key concepts' — only concepts items show. Combine with a search term to confirm AND behavior.",
+    "code_smell": "Category mismatch bug: data.js defines a 'figures' (Key Thinkers) category with 5 items (Lippmann, Dewey, Park, Tarde, Jefferson), but index.html has NO 'figures' pill. Those 5 questions are unreachable by category filtering — only via 'All questions' or search. The pills and FAQ_CATEGORIES are out of sync."
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "FAQ",
+    "feature": "Expand all / collapse all controls",
+    "user_story": "As a reader, I want to open or close every visible question at once, so that I can scan all answers or reset the view.",
+    "expected_behavior": "'Expand all' adds .open to every item whose display !== 'none' (i.e. currently filtered-in). 'Collapse all' removes .open from all items, clears openItemId, and clears the URL hash via pushState.",
+    "source_files": ["dissertation/faq/index.html", "dissertation/faq/script.js"],
+    "test_notes": "Open dissertation/faq/index.html, click 'Expand all' (only visible items open), then 'Collapse all' (all close, URL hash cleared). Filter to a category first, then Expand all, to confirm it only opens the filtered subset.",
+    "code_smell": "Expand all leaves openItemId = null while many items are open; a subsequent single-item click then collapses all others, which can feel like the UI 'losing' the expanded set unexpectedly (state model is single-open but bulk-expand violates it)."
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "FAQ",
+    "feature": "NotebookLM AI tools banner",
+    "user_story": "As a reader wanting deeper research, I want a link to the NotebookLM notebook, so that I can ask the AI questions about the dissertation.",
+    "expected_behavior": "A gradient banner links to NotebookLM in a new tab. On init the link href is overwritten from FAQ_METADATA.notebookLM.dissertation (same URL as the hardcoded href), guarding with optional chaining.",
+    "source_files": ["dissertation/faq/index.html", "dissertation/faq/script.js", "dissertation/faq/data.js"],
+    "test_notes": "Open dissertation/faq/index.html, click 'Open NotebookLM' — opens the notebook in a new tab. Confirm script.js does not error if the metadata key were missing.",
+    "code_smell": ""
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "FAQ",
+    "feature": "FAQ header/skip nav and reader CTA",
+    "user_story": "As a reader (incl. keyboard users), I want to skip to questions and reach the dissertation and reader, so that the page is accessible and navigable.",
+    "expected_behavior": "A skip link (sr-only, visible on focus) targets #faq-container. Sticky header has a back-arrow and logo to ../ (dissertation landing) and a 'Read Dissertation' button to ../reader/. results-count uses aria-live='polite' for screen-reader announcements.",
+    "source_files": ["dissertation/faq/index.html", "dissertation/faq/script.js"],
+    "test_notes": "Open dissertation/faq/index.html, Tab to reveal skip link → jumps to #faq-container. Verify header links → ../ and ../reader/. Use a screen reader to hear the live results count.",
+    "code_smell": ""
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "FAQ",
+    "feature": "Text selection sharing tool (FAQ)",
+    "user_story": "As a reader, I want to select FAQ answer text and share it, so that I can quote it with a citation.",
+    "expected_behavior": "Imports TextSelectionTool from ../../features/shared/text-selection.js, contentSelector 'main', source 'Jay Rosen, \"The Impossible Press\" (1986)', imageTheme 'light'. The page has <main>, so selecting answer text should surface the menu.",
+    "source_files": ["dissertation/faq/index.html", "features/shared/text-selection.js"],
+    "test_notes": "Open dissertation/faq/index.html, expand an answer, select text inside it, confirm the share popup.",
+    "code_smell": "FAQ answers are paraphrased/AI-grounded explanations, not verbatim dissertation text, yet selecting them attributes the quote to 'Jay Rosen, \"The Impossible Press\" (1986)' — could mislead users into sharing a paraphrase as a direct 1986 quote."
+  },
+  {
+    "area": "Dissertation tools",
+    "subarea": "Launch page",
+    "feature": "Standalone launch landing redirect",
+    "user_story": "As a visitor hitting the launch URL, I want to be sent to the live dissertation landing, so that I reach the real content.",
+    "expected_behavior": "A meta-refresh (content='0;url=...') immediately redirects to /wp-content/rosen-archive/labs/dissertation-launch/landing-page/, with a fallback text link to the same path for users where meta-refresh is blocked.",
+    "source_files": ["dissertation-launch/index.html"],
+    "test_notes": "Open dissertation-launch/index.html. It attempts an instant redirect. Locally the target path will 404; on production it should resolve to the launch landing page.",
+    "code_smell": "Hardcoded absolute production path (/wp-content/rosen-archive/labs/dissertation-launch/landing-page/) that 404s in local dev and on any host other than pressthink's WordPress layout. No <title> beyond 'Redirecting...', no canonical/OG tags, and the redirect target is a different directory tree than the dissertation/ tools — brittle if the WP path moves. This is the only 'page' in dissertation-launch/ and it has no actual content of its own."
+  }
+]

@@ -1,0 +1,210 @@
+[
+  {
+    "area": "Archive browser",
+    "subarea": "Record modal",
+    "feature": "Open record detail modal",
+    "user_story": "As a reader, I want to click a record and see its full detail in a modal, so that I can read the summary, quote, and metadata without leaving the grid.",
+    "expected_behavior": "When isOpen and a record are present, a centered dialog (role=dialog, aria-modal=true, z-[80]) renders over a blurred dark backdrop. body scroll is locked (document.body.style.overflow='hidden') on open and restored on close/unmount. The header shows date, a type label (Video if url contains youtube/vimeo, else the social pub or 'Social Media' for type==='social', 'Dissertation' for type==='Dissertation', otherwise 'Article'), title, author (defaults to 'Jay Rosen' if missing), and an external 'Read on <pub>' link only when url exists and is not '#'. Footer shows 'N of total' (hidden on mobile) and Previous/Next buttons. If !isOpen or !record, renders null.",
+    "source_files": ["frontend/components/RecordModal.js"],
+    "test_notes": "Click any card in the archive grid. Confirm the modal opens, body behind it does not scroll, and the header/type label match the record. Close and confirm page scroll returns.",
+    "code_smell": "isVideo/youtubeId are recomputed on every render; type label string logic is duplicated inline and hard to test in isolation."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Record modal",
+    "feature": "Lazy-load full record details",
+    "user_story": "As a reader, I want the heavy details (summary, quote, concepts, related ids) fetched only when I open a record, so that the grid stays fast.",
+    "expected_behavior": "On open, if the record already has summary and url it is used directly (no fetch). Otherwise loadingDetails=true, a 'Loading...' chip with a spinning Loader2 appears in the header, and fetchRecordDetails(record.id) runs. On success the result is merged ({...record, ...details}). On a falsy result a fallback record is built from summaryPreview||title, empty quote/concepts/tags, url='#', author=record.author||'Jay Rosen', relatedIds=[]. Display always uses fullRecord||record. The effect re-runs on record.id change.",
+    "source_files": ["frontend/components/RecordModal.js", "frontend/services/archiveService.js"],
+    "test_notes": "Open a card whose detail isn't preloaded (cold load) and watch for the 'Loading...' chip, then the summary/quote/tags appearing. Open a record id known to have no details row to confirm the fallback renders title as summary.",
+    "code_smell": "The fetch effect has no error/catch branch — a rejected fetchRecordDetails promise leaves loadingDetails stuck true. The merge {...record, ...details} can let stale detail fields override fresh core fields (the needsReview comment calls this out)."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Record modal",
+    "feature": "Related records by shared entities",
+    "user_story": "As a researcher, I want to see records connected to the current one, so that I can follow conceptual threads through the archive.",
+    "expected_behavior": "After fullRecord loads, entity data is fetched if not already loaded, then connection strength is computed against every non-social record (r.type!=='social') except the current one. Records with strength>0 are sorted by strength then prominenceScore and the top 6 kept. If none have entity connections, it falls back to up to 4 records sharing a category. Each related card shows date, a 'N shared entity/entities' chip (singular/plural), title, pub, and up to 4 shared-entity name chips with a '+N' overflow. Clicking a related card calls onSelectRecord(rel.id) to swap the open record. Section hidden when relatedWorks is empty.",
+    "source_files": ["frontend/components/RecordModal.js", "frontend/services/archiveService.js"],
+    "test_notes": "Open an article-type record with known entities and confirm a 'Related records' grid appears with shared-entity chips. Click a related card and confirm the modal swaps to that record. Open a sparse record to exercise the category fallback.",
+    "code_smell": "findRelated loops calculateEntityConnectionStrength over the entire non-social record set on every open — O(N) synchronous work in an effect, potentially thousands of records."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Record modal",
+    "feature": "Prev/next record navigation",
+    "user_story": "As a reader, I want to page through records with buttons or arrow keys, so that I can browse sequentially without returning to the grid.",
+    "expected_behavior": "Previous/Next footer buttons call onPrev/onNext and are disabled (opacity-30, cursor-not-allowed) when hasPrev/hasNext are false. ArrowLeft/ArrowRight keydown also fire onPrev/onNext but only when the corresponding hasPrev/hasNext is true. hasPrev/hasNext are derived by deriveNavFlags: hasPrev = index>0, hasNext = index>=0 && index<length-1. A deep-linked record filtered out of the list has index -1, so both flags are false and both buttons are correctly disabled (the #421 fix).",
+    "source_files": ["frontend/components/RecordModal.js", "frontend/utils/modalNav.js"],
+    "test_notes": "Open a record and press ArrowLeft/ArrowRight; confirm it moves and the buttons grey out at the list ends. Deep-link (?record=) to a record that is filtered out, then confirm both nav buttons are disabled rather than clickable-but-inert.",
+    "code_smell": "The keydown effect deps include onPrev/onNext/hasPrev/hasNext but not the record itself; handler captures handleClose from outer scope without listing it as a dep."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Record modal",
+    "feature": "Close modal (button, backdrop, ESC) with animation",
+    "user_story": "As a reader, I want multiple ways to dismiss the modal, so that closing feels natural on any device.",
+    "expected_behavior": "Clicking the X button, the dark backdrop, or pressing Escape calls handleClose, which sets isClosing=true (triggering a 300ms scale/opacity fade-out) and after a 300ms setTimeout calls onClose and resets isClosing. The inner panel has pointer-events-auto inside a pointer-events-none wrapper so only the panel and backdrop are interactive. ESC handling is gated on isOpen.",
+    "source_files": ["frontend/components/RecordModal.js"],
+    "test_notes": "Open a record, then close via X, via clicking the dimmed background, and via Escape. Confirm a short fade-out plays each time before the modal disappears.",
+    "code_smell": "The 300ms setTimeout in handleClose is not cleared on unmount; closing then quickly navigating could fire onClose after teardown."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Record modal",
+    "feature": "Share record deep link",
+    "user_story": "As a reader, I want to copy a shareable link to the exact record, so that I can send it to someone who lands on the same modal.",
+    "expected_behavior": "The Share2 button builds `${origin}${pathname}?record=${record.id}` (no existing query/hash carried over), writes it to the clipboard via navigator.clipboard.writeText, and on success shows a 3-second toast 'Link copied to clipboard' (a stone-800 pill with a green CheckCircle that slides up and fades). Uses record (not fullRecord), so it works even before details finish loading.",
+    "source_files": ["frontend/components/RecordModal.js", "frontend/utils/recordDeepLink.js"],
+    "test_notes": "Open a record, click the share icon, confirm the toast appears and the clipboard holds a ?record=ID URL. Paste that URL in a fresh tab and confirm the same record opens.",
+    "code_smell": "No catch on the clipboard promise — on browsers/contexts where clipboard write is denied (non-secure origin) nothing happens and no error toast shows; share URL discards any current hash route."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Record modal",
+    "feature": "Copy citation",
+    "user_story": "As a researcher, I want a one-click formatted citation, so that I can cite an archive record without hand-formatting it.",
+    "expected_behavior": "The Quote button builds `${author} (${year}). \"${title}\". ${pub}. Retrieved from ${window.location.href}` from fullRecord and copies it to the clipboard, then shows the 3-second 'Citation copied to clipboard' toast. No-ops if fullRecord is null (details not yet loaded).",
+    "source_files": ["frontend/components/RecordModal.js"],
+    "test_notes": "Open a record, wait for details to load, click the quote icon, and paste to verify the citation string includes author, year, title, pub, and the current page URL.",
+    "code_smell": "Retrieved-from URL is window.location.href (could already contain ?record= or other params); no clipboard-failure handling; year/pub/author can be undefined and render as literal 'undefined' in the citation."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Record modal",
+    "feature": "Tag, category, and concept click-to-filter",
+    "user_story": "As a reader, I want to click a category/tag/concept chip, so that I jump to the archive filtered by that term.",
+    "expected_behavior": "Three TagGroups render: Thematic categories (onFilterCategory), Tags (onFilterSearch), Key concepts (onFilterSearch). Each chip is a button; clicking calls handleClose() then the relevant filter callback with the term. Chips are only interactive (hover/cursor styling) when a callback is provided; without one they render as static labels. A TagGroup with no tags renders null. The Era is shown as a single non-clickable dark badge.",
+    "source_files": ["frontend/components/RecordModal.js"],
+    "test_notes": "Open a record with categories and tags. Click a category chip and confirm the modal closes and the grid filters to that category; repeat for a tag and a concept (which both run a search).",
+    "code_smell": "Categories filter and tags/concepts both labeled distinctly but tags and concepts call the same onFilterSearch path, so a concept and an identically-named tag are indistinguishable downstream."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Record modal",
+    "feature": "External 'Read on' link with scheme sanitization and bsky embed rewrite",
+    "user_story": "As a reader, I want a safe outbound link to the original source, so that I can read the full piece without exposure to malicious URLs.",
+    "expected_behavior": "When url exists and is not '#', a 'Read on <pub>' link renders with target=_blank rel=noreferrer. The href is passed through sanitizeHref after rewriting '//bsky.app' to '//embed.bsky.app'. sanitizeHref allows only http/https/mailto and scheme-less relative/protocol-relative URLs, returning '#' for anything else (e.g. javascript:, including obfuscated 'java\\tscript:' that the URL parser collapses). Summary body text is linkified: bare http(s) URLs become target=_blank rel=noopener noreferrer links, other text rendered as-is.",
+    "source_files": ["frontend/components/RecordModal.js", "frontend/utils/sanitizeHref.js", "frontend/utils/linkify.js"],
+    "test_notes": "Open a record with a bsky.app source URL and confirm the link points at embed.bsky.app. Manually craft a record with url='javascript:alert(1)' and confirm the link href is '#'. Open a record whose summary contains a URL and confirm it renders as a clickable link.",
+    "code_smell": "Summary-body links built by linkifyText are NOT passed through sanitizeHref (only the 'Read on' header link and thread links are); a javascript: URL embedded in summary text would render as a live href. linkify in RecordModal vs the regex copy inside ThreadModal are two separate implementations."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Record modal",
+    "feature": "Embedded YouTube player",
+    "user_story": "As a reader, I want video records to play inline, so that I can watch without opening YouTube.",
+    "expected_behavior": "If the url matches a YouTube id pattern, an aspect-video iframe loads https://www.youtube.com/embed/<id> with allowFullScreen. When a YouTube id is present the quote block is suppressed. Vimeo urls set isVideo (type label 'Video') but do not get an embedded player (only youtube ids are extracted).",
+    "source_files": ["frontend/components/RecordModal.js"],
+    "test_notes": "Open a record whose url is a youtube.com/watch?v= or youtu.be link and confirm the inline player renders and the quote block is hidden. Open a vimeo record and confirm it shows the 'Video' label but no embedded player.",
+    "code_smell": "Vimeo is treated as video for the label but never embedded — inconsistent. The YouTube regex is broad and could mis-extract ids from non-watch URLs."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Record modal",
+    "feature": "Quote block dedup against title",
+    "user_story": "As a reader, I want the pull-quote shown only when it adds information, so that I am not shown the title twice.",
+    "expected_behavior": "The italic blockquote renders only if there is no YouTube embed and a quote exists, AND the quote is meaningfully different from the title. It is suppressed when the trimmed title (>10 chars, trailing '...' stripped) equals the quote, the quote starts with the title, or the title starts with the leading slice of the quote. Otherwise the quote renders in a left-bordered blockquote.",
+    "source_files": ["frontend/components/RecordModal.js"],
+    "test_notes": "Open a record whose quote duplicates its title and confirm no blockquote shows; open one whose quote differs and confirm the blockquote appears.",
+    "code_smell": "The prefix/substring comparison is heuristic and case-sensitive; a quote that differs only in case or punctuation from the title may still display redundantly."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Record modal",
+    "feature": "'Needs review' badge",
+    "user_story": "As a curator, I want auto-submitted records that haven't had a human pass flagged in the modal, so that I know the content is provisional.",
+    "expected_behavior": "A 'needs review' amber badge (with a 'pending a human review pass' tooltip) renders under the title when recordNeedsReview(record) is true. The predicate is read from the core record (not displayRecord) deliberately, so a stale details.needsReview cannot overwrite a freshly flagged core record. recordNeedsReview returns true for boolean true or the trimmed/case-insensitive string 'true', false for everything else (false, '', other strings, null, absent).",
+    "source_files": ["frontend/components/RecordModal.js", "frontend/utils/needsReview.js"],
+    "test_notes": "No flagged records ship in production yet; set needsReview=true (or 'true') on a record fixture and confirm the amber badge appears. Confirm needsReview='false' or absent shows no badge."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Thread modal",
+    "feature": "Bluesky thread viewer",
+    "user_story": "As a reader, I want a threaded social-media post rendered in reading order with reply nesting, so that I can follow a Bluesky conversation inside the archive.",
+    "expected_behavior": "Inside RecordModal, if the record id starts with 'THREAD-' and thread_data exists, ThreadModal renders instead of the plain summary. It shows a stats bar (total_posts posts, max_depth levels deep, 'Bluesky thread') and a scrollable (max-h-600px) list of posts. Each post shows 'Post number/totalPosts', a locale-formatted date (falls back to the raw string on parse error), content (whitespace-pre-wrap, URLs linkified) or '[No content]' when empty, and a 'View on Bluesky' link. Reply depth sets a left margin (min(depth,5)*16px) and a colored left border by depth (sky/green/amber/pink for 0/1/2/3+). If thread_data or thread_data.posts is missing, it logs a diagnostic and renders 'Thread data not available'.",
+    "source_files": ["frontend/components/ThreadModal.js", "frontend/components/RecordModal.js"],
+    "test_notes": "Open a THREAD- record with thread_data and confirm posts render nested with depth colors, the stats bar counts, and Bluesky links. Open a THREAD- record whose thread_data is missing/unparsed and confirm the 'Thread data not available' message.",
+    "code_smell": "ThreadModal ships its own linkify regex (separate from utils/linkify.js) using a stateful urlPattern.test() with manual lastIndex reset — the documented bug class linkify.js was created to avoid. A console.log diagnostic remains in production code."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Thread modal",
+    "feature": "Thread post Bluesky link embed rewrite + sanitization",
+    "user_story": "As a reader, I want each thread post's outbound link to be safe and load without a Bluesky login, so that I can view the original post.",
+    "expected_behavior": "Each post's 'View on Bluesky' href is the post url with '//bsky.app' rewritten to '//embed.bsky.app', then run through sanitizeHref (http/https/mailto/relative allowed, else '#'). Opens target=_blank rel=noopener noreferrer.",
+    "source_files": ["frontend/components/ThreadModal.js", "frontend/utils/sanitizeHref.js"],
+    "test_notes": "In an open thread, hover a 'View on Bluesky' link and confirm it points at embed.bsky.app. Confirm a malformed post url collapses to '#'."
+  },
+  {
+    "area": "Dissertation",
+    "subarea": "Detail panel",
+    "feature": "Dissertation node detail slide-over panel",
+    "user_story": "As a reader of the dissertation, I want a node's details to slide in from the side, so that I can read its summary, quote, concepts, and figures without losing the mind map.",
+    "expected_behavior": "A right-edge panel (full width on mobile, 420px on >=sm, capped at calc(100vw-16px)) slides in/out via translate based on isOpen. role=dialog, aria-modal, aria-labelledby=detail-panel-title. On open the close button is focused after a 100ms delay; Escape closes (listener only attached while open). On mobile a semi-transparent backdrop (sm:hidden) closes on click. The last node is retained in displayNode so the panel can animate out with content (never cleared to null on close). Header shows a TYPE_LABELS label (root/intro/part/chapter/conclusion/concept/figure, else 'Section'). Body conditionally shows subtitle, page reference (pageRef or 'Pages start[-end|+]'), pull quote, summary, key concepts (violet chips), key figures (green chips). If none of summary/pullQuote/keyConcepts/keyFigures exist, shows a 'Detailed content coming soon' empty state. Renders null only if a node has never been set.",
+    "source_files": ["frontend/components/DetailPanel.js", "frontend/components/dissertationData.js"],
+    "test_notes": "On #dissertation, click a mind-map node and confirm the panel slides in with the right label and sections. Press Escape and click outside (mobile width) to close. Click a node with no detail fields and confirm the 'coming soon' state.",
+    "code_smell": "displayNode is intentionally never cleared, so after closing, the stale panel content remains mounted (just translated offscreen) and is still in the a11y tree until a new node replaces it."
+  },
+  {
+    "area": "Dissertation",
+    "subarea": "Tools modal",
+    "feature": "Explore tools chooser",
+    "user_story": "As a reader, I want a menu of ways to explore the dissertation and data, so that I can pick mind map, FAQ, reader, or data viz.",
+    "expected_behavior": "A centered dialog (z-[100], role=dialog, aria-modal, aria-labelledby) over a blurred backdrop. Body scroll locked while open and restored on close/unmount. Close button focused 100ms after open; Escape closes; clicking the backdrop (target===currentTarget) closes. Two sections: Dissertation Tools (Mind Map in-page action, FAQ link, Dissertation Reader link [beta]) and Data Tools (Data Visualization link [beta]). Each card is a button; 'beta' cards show an amber Beta pill. Clicking an action tool calls onSelectTool(action) then onClose; clicking a link tool navigates via window.location.href = tool.href. Footer explains the Beta marker. Renders null when closed.",
+    "source_files": ["frontend/components/ToolsModal.js"],
+    "test_notes": "Trigger the tools modal, confirm focus lands on the close button, Escape and backdrop-click both close it, the Mind Map card runs the in-page action and closes, and link cards navigate to the dissertation/faq/reader/dataviz URLs.",
+    "code_smell": "Tool hrefs are hardcoded absolute production paths ('/j/rosen-archive/...'), so on localhost or a different deploy path the FAQ/reader/dataviz links 404. firstToolRef is wired but never used for focus."
+  },
+  {
+    "area": "Global UI",
+    "subarea": "Welcome modal",
+    "feature": "First-visit welcome modal",
+    "user_story": "As a first-time visitor, I want a one-time intro to the archive, so that I understand what it is before I start browsing.",
+    "expected_behavior": "On mount it reads localStorage 'jrda_visited'; if absent, the modal becomes visible (full-screen dark overlay, z-[70]). It introduces the archive with three feature hints (browse records, explore connections, read the dissertation). Clicking 'Enter archive' sets localStorage 'jrda_visited'='true' and hides the modal. Once visited, it never shows again. No close button other than the Enter button, and no Escape handler.",
+    "source_files": ["frontend/components/WelcomeModal.js"],
+    "test_notes": "Clear localStorage key jrda_visited and reload to see the modal; click 'Enter archive' and reload to confirm it does not reappear. Confirm Escape does NOT dismiss it.",
+    "code_smell": "No Escape/backdrop dismissal and no role=dialog/aria-modal — the only exit is the single button; a user who blocks localStorage would see it on every load."
+  },
+  {
+    "area": "Global UI",
+    "subarea": "Announcement banner",
+    "feature": "Dismissible work-in-progress / launch banner",
+    "user_story": "As a returning visitor, I want to dismiss the launch announcement, so that it doesn't take space on every visit.",
+    "expected_behavior": "Starts hidden (dismissed=true) to avoid a flash, then on mount reads localStorage 'jrda_announce_banner_dismissed'; if not set, the banner shows (sky-tinted bar announcing public availability and '25,000+ records'). Clicking the X sets dismissed=true and persists the localStorage flag so it stays hidden on future loads. Renders null when dismissed.",
+    "source_files": ["frontend/components/WorkInProgressBanner.js"],
+    "test_notes": "Clear localStorage key jrda_announce_banner_dismissed and reload to see the banner; click the X and reload to confirm it stays gone.",
+    "code_smell": "Hardcoded '25,000+ records' copy can drift from the actual record count; no aria-live so the banner's appearance isn't announced."
+  },
+  {
+    "area": "Global UI",
+    "subarea": "Loading state",
+    "feature": "Rotating dissertation-quote loading screen",
+    "user_story": "As a visitor waiting for the archive to load, I want a branded loading screen, so that the wait feels intentional and on-theme.",
+    "expected_behavior": "Shows a pulsing BookOpen in a spinning ring, a quote from a fixed set of 9 dissertation quotes attributed to 'The Impossible Press, <source>', three bouncing dots, 'Loading archive...', and a 'Records are cached for faster loading next time' tip. The starting quote is random; every 4 seconds it fades out (300ms), advances to the next quote (wrapping), and fades back in. Interval is cleared on unmount.",
+    "source_files": ["frontend/components/LoadingQuotes.js"],
+    "test_notes": "Load the archive cold (or throttle the network) and confirm the quote rotates every ~4s with a fade, the spinner animates, and the tip text shows.",
+    "code_smell": "Quotes are hardcoded and duplicated from dissertationData rather than sourced from it, risking drift from the verified citations."
+  },
+  {
+    "area": "Global UI",
+    "subarea": "Deep link",
+    "feature": "?record= deep-link parse and URL sync",
+    "user_story": "As a reader following a shared link, I want ?record=ID to open that record directly, so that links land on the exact item.",
+    "expected_behavior": "parseRecordId reads the 'record' query param from any search string ('?record=ID', 'record=ID', or a full search with other params), returning the id or null when absent or present-but-empty (an empty id must not open a modal). setRecordParam sets ?record= for a truthy id and deletes it for any falsy id (null/undefined/''), returning the same params for chaining. Both router.js and App.js delegate here so the read and the set/delete rule have a single definition. A record id outside the current filtered list still opens (looked up in the full set) but yields disabled prev/next via deriveNavFlags.",
+    "source_files": ["frontend/utils/recordDeepLink.js", "frontend/utils/modalNav.js", "frontend/services/router.js"],
+    "test_notes": "Open a record and confirm the URL gains ?record=ID; close it and confirm the param is removed. Load a URL with ?record= (empty) and confirm no modal opens. Load ?record=<id-not-in-current-filter> and confirm the modal opens with disabled nav.",
+    "code_smell": "parseRecordId does not validate that the id corresponds to a real record — a ?record=garbage value is passed downstream and relies on the lookup returning nothing."
+  },
+  {
+    "area": "Global UI",
+    "subarea": "Bug report",
+    "feature": "Report a bug (prefilled GitHub issue)",
+    "user_story": "As a user who hits a problem, I want a one-click bug report that already includes my context, so that I can report without typing my page URL, version, or user agent.",
+    "expected_behavior": "openBugReport reads live context at click time and opens, in a new tab (noopener,noreferrer), a github.com new-issue URL prefilled via query params that map to bug_report.yml field ids: page-context=window.location.href (so any open ?record= is captured), archive-version=ARCHIVE_VERSION (the ?v= cache-buster this module was imported with, else 'unknown'), browser=navigator.userAgent, plus template=bug_report.yml and labels=bug,user-report. buildBugReportUrl is pure (context passed in) for testing.",
+    "source_files": ["frontend/utils/bugReport.js", ".github/ISSUE_TEMPLATE/bug_report.yml"],
+    "test_notes": "Click the report-a-bug control and confirm a new tab opens GitHub's new-issue form with Page, Archive version, and Browser fields prefilled. Open a record first and confirm the page-context includes ?record=ID.",
+    "code_smell": "The page-context/archive-version/browser query keys must stay in sync with the template field ids by hand; a rename in bug_report.yml silently drops the prefill (verified matching as of this audit)."
+  }
+]

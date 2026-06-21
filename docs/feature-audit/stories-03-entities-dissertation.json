@@ -1,0 +1,192 @@
+[
+  {
+    "area": "Archive browser",
+    "subarea": "Entity browser",
+    "feature": "Entity data loading and loading state",
+    "user_story": "As a researcher, I want the entity index to load when I open #entities, so that I can browse extracted people, organizations, and concepts.",
+    "expected_behavior": "On mount, EntityBrowser calls fetchEntitiesData() and shows a centered spinner with the text 'Loading entity data...' while loading is true. When the fetch resolves with data.entities, the list renders; data.recordEntityMap is stored for co-occurrence math. If the fetch fails, archiveService returns { entities: [], recordEntityMap: {} }, so the spinner clears and the browser renders with zero entities (All (0) chip, empty grid, 'Showing 0 of 0 entities') rather than an error. Subsequent visits use the in-memory entitiesCache.",
+    "source_files": ["frontend/components/EntityBrowser.js", "frontend/services/archiveService.js"],
+    "test_notes": "Open #entities. Confirm the spinner appears briefly, then the chip row and entity grid render. Throttle/block /data/archive-entities.json in devtools and reload to confirm it degrades to an empty list with no thrown error.",
+    "code_smell": "A failed fetch is swallowed into an empty-result object, so the user sees a silent empty state indistinguishable from 'no entities exist' rather than any retry or error message."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Entity browser",
+    "feature": "Filter entities by type",
+    "user_story": "As a researcher, I want to filter entities by type (People, Organizations, Concepts, etc.), so that I can narrow the list to one category.",
+    "expected_behavior": "A chip row renders an 'All (N)' chip (N = total entities) plus one chip per type from ENTITY_TYPE_CONFIG that has count > 0; each shows its icon, label, and per-type count. Clicking a type chip filters the grid to that type and highlights the chip in the type's color; clicking the active chip again toggles the filter off (back to All). Clicking 'All' clears the type filter. Types with zero entities render no chip. Changing the type resets the display limit to 100.",
+    "source_files": ["frontend/components/EntityBrowser.js", "frontend/constants.js"],
+    "test_notes": "Open #entities, click 'People' — grid shows only Person entities and chip turns blue. Click it again to deselect. Confirm a type with no entities (e.g. Event/Location if absent) shows no chip.",
+    "code_smell": "Type counts (typeCounts) are computed from the raw entities array, so a type chip can be hidden even when ENTITY_TYPE_CONFIG defines it; this is intended but means the visible type set silently depends on the data file."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Entity browser",
+    "feature": "Search entities by name or role",
+    "user_story": "As a researcher, I want to type a query and have the entity list filter live, so that I can find a specific person or concept quickly.",
+    "expected_behavior": "Typing in the search box (onInput) filters entities whose normalized name OR normalized role contains the normalized term (normalizeForSearch handles case/diacritics). Filtering combines with the active type filter and chosen sort. A clear (X) button appears only when searchTerm is non-empty and empties the field on click. Changing the search term resets the display limit to 100. An empty result set renders an empty grid and 'Showing 0 of 0 entities' (no dedicated 'no matches' message).",
+    "source_files": ["frontend/components/EntityBrowser.js", "frontend/utils/searchNormalize.js"],
+    "test_notes": "Open #entities, type 'lippmann' — list narrows. Type gibberish to confirm an empty grid plus 'Showing 0 of 0'. Click the X to clear. Combine search with a type chip to confirm both apply.",
+    "code_smell": "No explicit 'no results found' empty state for search; the user only sees a blank grid and a count of 0, which reads as a glitch."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Entity browser",
+    "feature": "Sort entities",
+    "user_story": "As a researcher, I want to sort entities by mentions, prominence, or alphabetically, so that I can surface the most significant entities first.",
+    "expected_behavior": "A select offers 'Most mentioned' (default, sorts by totalMentions desc, falling back to 1), 'Highest prominence' (prominence desc, falling back to 0), and 'Alphabetical' (name localeCompare asc). Changing sort re-orders the grid immediately and resets the display limit to 100. Sort applies after type and search filtering.",
+    "source_files": ["frontend/components/EntityBrowser.js"],
+    "test_notes": "Open #entities, switch the sort dropdown between the three options and confirm the first cards change order. With 'Alphabetical', confirm A-Z ordering.",
+    "code_smell": "Default mentions fallback of 1 means entities with missing totalMentions all tie at 1 and sort unstably relative to each other."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Entity browser",
+    "feature": "Entity card list with metadata",
+    "user_story": "As a researcher, I want each entity shown as a card with its type icon, name, role, mention count, and prominence, so that I can scan and assess entities at a glance.",
+    "expected_behavior": "Each card shows a type-colored icon badge, bold display-font name (truncated), the role line only when role exists and is not 'None', a mono 'N record(s)' count (pluralized when mentions !== 1), and 'P:<prominence>' only when prominence > 0. A ChevronRight is shown when the card is not selected and ChevronDown when selected; a selected card gets a dark border and shaded background. The grid is one column on mobile, two columns at md width.",
+    "source_files": ["frontend/components/EntityBrowser.js", "frontend/constants.js"],
+    "test_notes": "Open #entities and inspect a card: verify the icon color matches the type, role hides for entities with role 'None', and the record-count pluralization (e.g. '1 record' vs '2 records').",
+    "code_smell": "Mention count uses totalMentions but the count of records shown in the detail panel comes from a separate relationship map, so a card may say 'N records' while the opened panel shows a different number."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Entity browser",
+    "feature": "Paginated 'Show more' display limit",
+    "user_story": "As a researcher, I want the list capped at 100 entities with a 'Show more' button, so that the page stays fast on a large entity set.",
+    "expected_behavior": "Only the first displayLimit (initially 100) of filteredEntities render. A counter line reads 'Showing X of Y entities'. When more entities exist than are shown, a full-width 'Show more (Z remaining)' button appends 100 more per click. The limit resets to 100 whenever the type, search, or sort changes. The button disappears once all filtered entities are shown.",
+    "source_files": ["frontend/components/EntityBrowser.js"],
+    "test_notes": "Open #entities with no filter (large set), scroll to the bottom, click 'Show more' and confirm 100 more cards appear and the remaining count drops. Apply a filter and confirm the limit resets to 100.",
+    "code_smell": ""
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Entity browser",
+    "feature": "Select entity to open detail panel (toggle)",
+    "user_story": "As a researcher, I want to click an entity to open a side panel about it, so that I can see which records mention it and what it co-occurs with.",
+    "expected_behavior": "Clicking a card selects the entity and opens a right-side detail panel (sticky on lg) with a type badge, name, role (if not 'None'), '<n> records' and 'Prominence: <p>'. Clicking the same card again, or the panel's X button, deselects and clears records and co-occurring lists. On selection the component resolves the entity's record IDs via getRecordsByEntity, maps them to record objects, drops any not found, and sorts them by date descending (b.date.localeCompare(a.date)).",
+    "source_files": ["frontend/components/EntityBrowser.js", "frontend/services/archiveService.js"],
+    "test_notes": "Open #entities, click an entity — panel opens on the right. Click the same card again to close. Reopen and use the panel X to close. Confirm record list is newest-first.",
+    "code_smell": "handleEntitySelect dereferences r.date in the sort without guarding; a record whose date is undefined would throw inside localeCompare. Records are looked up via records.find over the full records prop for each id (O(n*m))."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Entity browser",
+    "feature": "Records-mentioning-entity list in panel",
+    "user_story": "As a researcher, I want the detail panel to list the records that mention the selected entity and let me open one, so that I can jump from an entity to its source archive entries.",
+    "expected_behavior": "The panel's 'Records (<n>)' section lists up to the first 20 matched records (date desc), each a button showing the record title (truncated) and a 'date | pub' mono line. If more than 20 exist, a '+N more records' line is shown (the rest are not reachable from here). Clicking a record button stops propagation and calls onSelectRecord(record.id), which opens the record modal (deep-link ?record=ID). The scroll area is capped at max-h-64.",
+    "source_files": ["frontend/components/EntityBrowser.js"],
+    "test_notes": "Open a high-mention entity, confirm at most 20 records list with a '+N more' line, then click one record and confirm a record modal opens.",
+    "code_smell": "Records beyond the first 20 are counted but unreachable — there is no 'show all records' affordance for an entity, unlike the entity list's own 'Show more'."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Entity browser",
+    "feature": "Co-occurring entities ('Often appears with')",
+    "user_story": "As a researcher, I want to see which other entities frequently appear in the same records, so that I can explore the network around an entity.",
+    "expected_behavior": "On selection, the browser tallies every other entity appearing in the selected entity's records (via recordEntityMap), excludes the selected entity, sorts by co-occurrence count desc, and keeps the top 20 (the panel section then renders the top 15). Each row shows the co-entity's type icon, name (truncated), and an 'Nx' count. Clicking a co-entity row calls handleEntitySelect on it, re-pivoting the whole panel to that entity. The section is hidden entirely when there are no co-occurring entities.",
+    "source_files": ["frontend/components/EntityBrowser.js"],
+    "test_notes": "Open a central figure (e.g. Lippmann), confirm the 'Often appears with' list, then click a co-entity and confirm the panel re-centers on it with its own records and co-occurrences.",
+    "code_smell": "Top 20 are computed but only 15 render, so 5 are silently dropped. Clicking a co-entity does not scroll the panel/list to it, so on small screens the re-pivot can happen off-screen."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Dissertation page",
+    "feature": "Dissertation page chrome and full-text link",
+    "user_story": "As a reader, I want a header identifying the dissertation with a link to the full text and a way back to the archive, so that I have context and can read or exit.",
+    "expected_behavior": "DissertationPage renders a full-screen layout: header with an optional 'Back to Archive' button (only when onBack is provided; label hidden on mobile) and back navigation, the title 'The Impossible Press / PhD Dissertation, 1986', author and 'New York University, 1986' (hidden below md), and a 'Read Full Text' button linking to /j/rosen-archive/dissertation/reader/ in a new tab. A sub-banner shows the full title, subtitle, and the tag chips Public Sphere, Objectivity, Lippmann, Dewey. A footer links to @jayrosen_nyu and PressThink in new tabs.",
+    "source_files": ["frontend/components/DissertationPage.js"],
+    "test_notes": "Open #dissertation. Click 'Read Full Text' and confirm it opens the reader in a new tab. Click 'Back to Archive' and confirm it returns. Resize narrow to confirm the back label and author metadata hide.",
+    "code_smell": "The 'Read Full Text' href is an absolute production path (/j/rosen-archive/...); in local preview at localhost it will 404 because the app's hostname-based path switching does not apply to this hardcoded link."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Mind map",
+    "feature": "Expand/collapse mind-map nodes",
+    "user_story": "As a reader, I want to click a dissertation node to expand its children, so that I can drill into parts, chapters, concepts, and figures progressively.",
+    "expected_behavior": "Only the root is expanded initially. Clicking a node both selects it (opens the detail panel) and, if it has children, toggles its expansion. Collapsing a node recursively removes all of its descendants from the expanded set so they re-collapse too. A collapsed parent shows a child-count pill; an expand/collapse circle button (ChevronRight/ChevronDown) on the node's right edge toggles expansion only (without opening the panel). 'Expand All' expands every node; 'Collapse All' returns to only-root expanded.",
+    "source_files": ["frontend/components/MindMap.js", "frontend/components/dissertationData.js"],
+    "test_notes": "Open #dissertation. Click 'Part One' to expand its chapters; click the chevron circle to collapse without opening the panel. Use Expand All / Collapse All and confirm the tree fully opens / returns to root-only.",
+    "code_smell": "A single click on a node both opens the detail panel and toggles expansion, so collapsing a parent by clicking its body also pops open its (now-changing) detail panel — the two actions are conflated."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Mind map",
+    "feature": "Zoom controls (buttons, wheel, keyboard)",
+    "user_story": "As a reader, I want to zoom the mind map in and out, so that I can read node labels or see the whole structure.",
+    "expected_behavior": "Zoom-in/out buttons multiply/divide zoom by 1.2, clamped to [0.3, 3]. Mouse wheel zooms (0.9/1.1 factor, same clamp) and preventDefault stops page scroll. Keyboard '+'/'=' zoom in, '-' zooms out, '0' resets zoom to exactly 1 (note: not a fit). A live-region pill shows the current zoom percentage (round(zoom*100)%). Keyboard handlers are ignored while focus is in an INPUT or TEXTAREA.",
+    "source_files": ["frontend/components/MindMap.js"],
+    "test_notes": "Open #dissertation. Click +/- and watch the % pill. Scroll the wheel over the canvas. Press +, -, 0 and arrow keys with the canvas focused. Confirm zoom clamps at 30% and 300%.",
+    "code_smell": "Keyboard '0' sets zoom to 1 but does not recenter pan, while the Focus button does a fit-to-view; two different 'reset' behaviors for similar intent."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Mind map",
+    "feature": "Pan the canvas (drag, touch, arrow keys)",
+    "user_story": "As a reader, I want to drag or use arrow keys to move around the mind map, so that I can navigate large expanded trees.",
+    "expected_behavior": "Pressing on empty SVG starts a grab-pan that follows the cursor until mouse up or leave; the cursor switches between grab and grabbing. Single-finger touch on empty SVG pans on touchmove (preventDefault to avoid page scroll). Arrow keys nudge pan by 50px in the pressed direction. Pan starts only on the SVG element itself, not on nodes, so dragging over a node does not pan.",
+    "source_files": ["frontend/components/MindMap.js"],
+    "test_notes": "Open #dissertation, drag empty space to pan. On a touch device, drag with one finger. Focus the canvas and press arrow keys to nudge. Confirm dragging starting on a node does not pan.",
+    "code_smell": "Pan only initiates when e.target.tagName === 'svg'; the inner transformed <g> and node rects are not svg, so a drag that begins on a node or edge silently does nothing instead of panning."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Mind map",
+    "feature": "Fit / re-center view and auto-fit on layout change",
+    "user_story": "As a reader, I want the map to auto-fit and a button to re-center, so that the visible nodes always stay in frame.",
+    "expected_behavior": "On first mount (after a 50ms delay for container sizing) the map fits all visible nodes without animation. When the visible bounds change (expanding/collapsing nodes), it animates a fit to the new bounds (400ms ease-out). The Focus button re-fits to all nodes. Fit caps zoom at 1.5 and centers content. Selecting a node instead fits to that node's cluster (node + parent + children, zoom capped at 1.2). Deselecting fits back to full bounds. An in-flight fit animation is cancelled on unmount (issue #152 fix).",
+    "source_files": ["frontend/components/MindMap.js"],
+    "test_notes": "Open #dissertation and confirm the tree is framed on load. Expand a deep branch and watch it animate to refit. Click Focus to re-center. Select a node and confirm it zooms to the local cluster, then press Esc and confirm it zooms back out.",
+    "code_smell": "Auto-fit fires on every bounds change, so manual zoom/pan a user sets is overridden the next time they expand or collapse any node, which can feel like the view 'fights' the user."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Mind map",
+    "feature": "Keyboard shortcuts help overlay",
+    "user_story": "As a reader, I want a shortcuts panel, so that I can learn how to zoom, pan, and close the panel via keyboard.",
+    "expected_behavior": "A HelpCircle button toggles a centered overlay listing shortcuts: '+' zoom in, '-' zoom out, '0' reset zoom, arrow keys pan, Esc close panel, plus a note 'Click nodes to expand/collapse - Drag to pan'. The overlay has its own X close button and toggles closed on a second HelpCircle click.",
+    "source_files": ["frontend/components/MindMap.js"],
+    "test_notes": "Open #dissertation, click the help (?) button bottom-left, confirm the overlay lists shortcuts, close it via X and via the help button again.",
+    "code_smell": "The overlay documents +/-/0/arrows/Esc but omits mouse-wheel zoom and the Focus/Expand All/Collapse All buttons, so the documented shortcut set is incomplete."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Detail panel",
+    "feature": "Node detail panel content",
+    "user_story": "As a reader, I want a slide-in panel describing the selected node, so that I can read its summary, pull quote, page reference, key concepts, and key figures.",
+    "expected_behavior": "Selecting a node opens a right slide-in panel (full width on mobile, 420px on sm+) showing a type label (Dissertation/Introduction/Part/Chapter/Conclusion/Key Concept/Key Figure), the label, optional subtitle, a page reference (pageRef if present, else 'Pages start-end' or 'start+' when no end), an optional pull quote in a styled blockquote, an optional summary, optional Key Concepts chips (violet), and optional Key Figures chips (green). When a node has none of summary/pullQuote/keyConcepts/keyFigures, it shows a 'Detailed content coming soon' empty state.",
+    "source_files": ["frontend/components/DetailPanel.js", "frontend/components/dissertationData.js"],
+    "test_notes": "Open #dissertation, click the root then various nodes. Confirm chapters show summary + quote + concepts + figures; click a leaf 'figure' node with only a summary; find a node that triggers 'Detailed content coming soon'.",
+    "code_smell": "displayNode is retained after node becomes null so the panel can animate out; if isOpen is toggled rapidly the panel can briefly show stale content from the previously selected node."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Detail panel",
+    "feature": "Close detail panel (X, Esc, backdrop, empty-space click)",
+    "user_story": "As a reader, I want multiple ways to dismiss the detail panel, so that I can get it out of the way easily on any device.",
+    "expected_behavior": "The panel closes via its X button, the Escape key (handled both in DetailPanel and in MindMap, which also deselects the node and re-fits the view), a click on the mobile backdrop (shown only below sm via a fixed translucent overlay), or a click on empty SVG space in the map (handleSvgClick deselects when a node is selected). On open, focus moves to the close button after ~100ms for accessibility; the panel uses role=dialog and aria-modal.",
+    "source_files": ["frontend/components/DetailPanel.js", "frontend/components/MindMap.js", "frontend/components/DissertationPage.js"],
+    "test_notes": "Open a node's panel. Close it with X, then reopen and press Esc, then on mobile width tap the dim backdrop, then click empty map space. Confirm focus lands on the close button when opened.",
+    "code_smell": "Two independent Esc handlers (DetailPanel and MindMap) fire on the same keypress; both call close/deselect paths, which is redundant and could double-trigger state updates."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Mind map",
+    "feature": "Node visual encoding (type colors, page refs, root styling)",
+    "user_story": "As a reader, I want nodes color-coded by type with page numbers, so that I can distinguish parts, chapters, concepts, and figures and locate them in the text.",
+    "expected_behavior": "Each node renders with a type-specific fill/border/shadow (root dark, part amber, chapter sky, concept violet, figure green, intro/conclusion stone). The root uses a typewriter font and larger text. Non-root nodes with pageStart show 'pp. start-end' (or 'start+' when no end). Hover lightens the fill and thickens the border; selection adds a dashed outline ring and a stronger border. The legend in the toolbar maps Parts (amber), Chapters (sky), and Intro/Conclusion (stone).",
+    "source_files": ["frontend/components/MindMap.js", "frontend/components/DissertationPage.js", "frontend/components/dissertationData.js"],
+    "test_notes": "Open #dissertation, expand to reveal each node type, and confirm colors match the legend. Hover a node to see the lighten/border change; select one to see the dashed ring and page range.",
+    "code_smell": "The on-canvas legend only documents Parts/Chapters/Intro-Conclusion, omitting concept (violet) and figure (green) nodes, which are the most numerous once the tree is expanded."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Entity browser",
+    "feature": "Entity index relationship correctness (data layer)",
+    "user_story": "As a researcher, I want entity-to-record and record-to-entity lookups to be accurate, so that the records and co-occurrences I see actually reflect the archive.",
+    "expected_behavior": "EntityBrowser wires getRecordsByEntity/getEntityById from archiveService.js, whose maps are built in buildEntityMaps from each record's relatedIds. recordEntityMap (record id -> entity ids) is also returned to the browser for the co-occurrence tally. getRecordsByEntity returns an array of record IDs (deduplicated via a Set) for an entity, or an empty array when the entity has no relationships. The separate entityIndex.js factory provides a frozen, sorted-by-prominence Query (entitiesOf, recordsOf, shared, strength, types) that is the tested pure projection of the same relationships.",
+    "source_files": ["frontend/components/EntityBrowser.js", "frontend/services/archiveService.js", "frontend/services/entityIndex.js"],
+    "test_notes": "Open #entities, pick an entity and verify the records listed in the panel genuinely reference that entity by opening one. Cross-check the panel's '<n> records' against the card's mention count. There is no direct UI surface for entityIndex.js — it is exercised by tests/entity-index.test.js.",
+    "code_smell": "The UI consumes archiveService.js's hand-rolled entity maps while entityIndex.js (the frozen, tested, prominence-sorted projection) is not wired into EntityBrowser, so two parallel implementations of the same relationship logic can drift; entityIndex sorts results by prominence whereas the browser sorts records by date and co-entities by count."
+  }
+]

@@ -1,0 +1,132 @@
+[
+  {
+    "area": "Archive browser",
+    "subarea": "Analytics",
+    "feature": "Open the analytics dashboard",
+    "user_story": "As an archive visitor, I want to open a dedicated analytics page, so that I can see archive-wide statistics and trends without reading individual records.",
+    "expected_behavior": "Navigating to the #analytics hash mounts AnalyticsDashboard (App.js:313). On mount it calls fetchAnalytics(), which fetches the small data/archive-analytics.json aggregate file (DATA_CONFIG.archive_analytics) rather than the ~13MB archive-core.json. App.js explicitly skips the core fetch when currentRoute === ROUTES.analytics (App.js:139), so a cold deep-link straight to #analytics never downloads core data. While loading, a spinning Loader2 with 'Loading analytics...' shows. A sticky header reads 'Archive analytics' with subtitle 'Powered by sql.js (SQLite in your browser)' and an 'Archive' back button that calls onBack (returns to ROUTES.archive). fetchAnalytics also runs the deploy-version gate (withVersionTimeout(checkVersion())) before fetching, and uses the in-memory data cache.",
+    "source_files": ["frontend/components/AnalyticsDashboard.js", "frontend/services/archiveService.js", "frontend/App.js", "data/archive-analytics.json"],
+    "test_notes": "Reachable. Load the site, then set the URL hash to #analytics (or deep-link directly). Confirm the dashboard renders and that the network tab shows archive-analytics.json fetched but NOT archive-core.json on a cold #analytics load. Click the 'Archive' back button to confirm it returns to the default view.",
+    "code_smell": "Header subtitle claims 'Powered by sql.js (SQLite in your browser)', but the entire dashboard view (stat cards + all charts) renders from the prebuilt JSON aggregates and never touches SQLite. SQLite only loads when the user runs a custom/builder query. The subtitle is misleading for the default view."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Analytics",
+    "feature": "Database overview stat cards",
+    "user_story": "As an archive visitor, I want top-line counts of records, categories, concepts, and entities, so that I can gauge the size and shape of the archive at a glance.",
+    "expected_behavior": "Four StatCards render from analytics.stats: Records (stats.records, locale-formatted), Categories (stats.categories), Concepts (stats.concepts), Entities (stats.entities, locale-formatted). Each shows an icon, an uppercase label, and the value. Missing values fall back to '0'. In the current archive-analytics.json these read records=26,615, categories=6, concepts=626, entities=7,379. Grid is 2 columns on mobile, 4 on sm+.",
+    "source_files": ["frontend/components/AnalyticsDashboard.js", "data/archive-analytics.json"],
+    "test_notes": "Reachable at #analytics. After load, verify all four cards display non-zero numbers and that Records and Entities use thousands separators.",
+    "code_smell": "The 'Records' count (26,615) counts social posts, so it is far larger than the ~1,030 non-social records a visitor sees in the main archive browser. A casual reader may conflate the two. 'Categories' showing only 6 is the fixed top-level taxonomy, which is correct but may surprise."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Analytics",
+    "feature": "Records-by-era bar chart",
+    "user_story": "As a researcher, I want to see how Jay Rosen's output distributes across journalism eras, so that I can understand which periods are most represented.",
+    "expected_behavior": "A BarChart renders analytics.byEra with labelKey='era', valueKey='count', green bars (#059669). Labels sit above each bar so long era names wrap without misaligning bars. Bars are scaled to the max value in the set; shows up to maxBars (default 10). Empty data renders 'No data available'.",
+    "source_files": ["frontend/components/AnalyticsDashboard.js", "data/archive-analytics.json"],
+    "test_notes": "Reachable at #analytics. Verify the 'Records by era' card shows multiple labeled bars with counts.",
+    "code_smell": "byEra in the data contains two overlapping era taxonomies mixed together (e.g. both 'Public Journalism (90s)' / 'View from Nowhere (10s)' / 'Democracy in Crisis (20s)' AND 'Blogging Launch & Digital Disruption (2000-2004)' / 'Platform Transition & Future Models (2021-Present)' etc.). The chart presents them as one flat list, so era buckets do not partition the archive cleanly and 'Platform Transition...' (25,733) dwarfs everything. Distinct from the 4-era taxonomy hardcoded in QueryBuilder/sqliteService."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Analytics",
+    "feature": "Top categories, top people, top concepts charts",
+    "user_story": "As a researcher, I want ranked bar charts of the most common categories, most-mentioned people, and most-discussed concepts, so that I can spot the dominant themes and figures in the archive.",
+    "expected_behavior": "Three BarCharts in a responsive grid: Top categories (analytics.byCategory, labelKey='category', valueKey='count', sky #0284c7); Most mentioned people (analytics.topPeople, labelKey='name', valueKey='mentions', violet #7c3aed); Most common concepts (analytics.topConcepts, labelKey='concept', valueKey='count', red #dc2626). Each capped at maxBars=10 and scaled to its own max. topPeople currently leads with 'Jay Rosen' (377 mentions); topConcepts leads with 'The People Formerly Known as the Audience' (344).",
+    "source_files": ["frontend/components/AnalyticsDashboard.js", "data/archive-analytics.json"],
+    "test_notes": "Reachable at #analytics. Confirm all three cards render ranked bars with counts and that bars are visually proportional within each card.",
+    "code_smell": "'Jay Rosen' himself is the #1 most-mentioned person, which is expected noise for a self-archive but arguably should be filtered from the 'people' chart since it tells the reader nothing."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Analytics",
+    "feature": "Output-by-year chart",
+    "user_story": "As a researcher, I want a year-by-year bar chart of output, so that I can see how prolific Jay Rosen was over four decades.",
+    "expected_behavior": "A full-width BarChart of analytics.byYear (labelKey='year', valueKey='count', stone #1c1917) with maxBars=30, wrapped in an overflow-x-auto container. Years span 1986 to 2026. Counts are dominated by the social-media years (2019=3,708; 2020=7,816), so pre-2019 years render as near-invisible bars by comparison.",
+    "source_files": ["frontend/components/AnalyticsDashboard.js", "data/archive-analytics.json"],
+    "test_notes": "Reachable at #analytics. Scroll to 'Output by year' and confirm up to 30 year bars render; note that early years are visually flattened.",
+    "code_smell": "byYear has 38 entries but maxBars=30, so the 8 earliest years (1986-2000ish) are silently dropped from the chart with no 'showing N of M' indicator. The huge social-post counts also make the article-era bars unreadable; there is no toggle to view article-only output here (that only exists as a raw-SQL example)."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Analytics",
+    "feature": "Category co-occurrence list",
+    "user_story": "As a researcher, I want to see which subject categories tend to appear together on the same record, so that I can understand how Rosen's themes interrelate.",
+    "expected_behavior": "Renders analytics.coOccurrence as a 1-2 column grid of pill rows, each showing 'category1 + category2' and the co_occurrences count. Data is precomputed (top pairs first); e.g. 'Journalism Theory & Practice + Press & Media Criticism' = 7,400. Unlike the charts, this maps over the full coOccurrence array with no slice cap.",
+    "source_files": ["frontend/components/AnalyticsDashboard.js", "data/archive-analytics.json"],
+    "test_notes": "Reachable at #analytics. Confirm the 'Categories that appear together' grid lists pairs with monospace counts.",
+    "code_smell": "No explicit limit applied client-side; relies entirely on the precomputed file already being trimmed (currently 10 pairs)."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Query builder",
+    "feature": "Mad-libs sentence query builder",
+    "user_story": "As a non-technical visitor, I want to build database queries by completing plain-English sentences with dropdowns and inputs, so that I can explore the archive without knowing SQL.",
+    "expected_behavior": "QueryBuilder renders inside the analytics dashboard (AnalyticsDashboard.js:287). A top 'I want to:' selector chooses among 14 templates (Count Records, Search Titles, Records from Year, Records by Era, Top Categories, Records in Category, Top Publications, Most Mentioned People, Most Common Concepts, Records Mentioning Person, Yearly Output, Compare Eras, Related Categories, plus the duplicate-id note below). Switching template resets field values to defaults and clears prior results/errors. Each template renders a sentence with inline color-coded controls: amber dropdowns, sky number inputs (clamped via min/max with parseInt fallback to min), green text inputs. 'Run Query' lazy-loads SQLite on first use (initSqlite, ~28MB) showing 'Loading database...'; on success it builds SQL via the template's buildSql(fieldValues), runs queryAsObjects, and renders a ResultsTable with an 'N rows returned' count. 'Reset' restores defaults and clears results. 'Show/Hide SQL' toggles a live preview of the generated SQL. A color legend explains the field types. If SQLite fails to load it shows 'Could not load the query database. Please try again.'; query errors render 'Error: <message>'.",
+    "source_files": ["frontend/components/QueryBuilder.js", "frontend/components/AnalyticsDashboard.js", "frontend/services/archiveService.js", "frontend/services/sqliteService.js"],
+    "test_notes": "Reachable: embedded in the #analytics page (no standalone route). Scroll to the 'Query builder' section. Pick a template, adjust fields, click 'Run Query' (first run downloads ~28MB and may take seconds), confirm a results table appears with a row count. Toggle 'Show SQL' to verify the preview matches the template.",
+    "code_smell": "SQL injection / correctness: buildSql interpolates FIELD, YEAR, ERA, and TYPE dropdown values straight into SQL with no escaping. Dropdown values are currently constrained so this is not user-exploitable today, but text inputs (SEARCH_TERM, CATEGORY, PERSON_NAME) only escape single quotes via replace(/'/g,\"''\") and nothing else, and the dynamic 'count-by-field' template inserts the chosen column name unquoted. The query runs in a read-only in-browser SQLite with no server, so blast radius is local, but the pattern is fragile if options become user-supplied. Also: the file's QUERY_TEMPLATES has a duplicate-id risk to verify (each id should be unique); find() returns the first match, so any dup id would shadow the later template."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "Query builder",
+    "feature": "Results table rendering",
+    "user_story": "As a visitor, I want query results shown as a readable table, so that I can scan rows without reading raw JSON.",
+    "expected_behavior": "ResultsTable derives columns from the keys of the first result row, renders a header (underscores replaced with spaces, uppercased) and zebra-striped rows. Cells truncate at maxWidth 300px; null/undefined cells render an em dash. Empty results show 'No results found' (italic). The results container is scrollable (max-h-96) and the row count is shown in the header ('N row'/'N rows').",
+    "source_files": ["frontend/components/QueryBuilder.js"],
+    "test_notes": "Reachable inside #analytics query builder. Run a template that returns rows (e.g. Top Publications) and confirm the table headers, striping, and count. Run 'Search Titles' with a nonsense term to confirm 'No results found'.",
+    "code_smell": "Columns are inferred only from the first row's keys; if rows had heterogeneous shapes (they won't from SQL, but no guard) later columns would be dropped."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "SQLite",
+    "feature": "Advanced raw SQL query box",
+    "user_story": "As a power user, I want to type arbitrary SQL against the archive database in my browser, so that I can run analyses the prebuilt charts and builder don't cover.",
+    "expected_behavior": "A dark 'Advanced: raw SQL query' textarea prefilled with 'SELECT year, COUNT(*) ... GROUP BY year ...'. 'Run Query' lazy-initializes SQLite if not ready (initSqlite), showing 'Loading database...' and the note 'First query loads the full archive into SQLite (~28MB, one time)'; otherwise it lists available tables (records, record_categories, record_concepts, entities, record_entities). On success it runs queryAsObjects and dumps the result as pretty-printed JSON in a green monospace block; on failure it shows the error in a red block. If SQLite can't load it sets {success:false, error:'Could not load the query database. Please try again.'}. The schema (sqliteService.createTables) exposes records, record_categories, record_concepts, record_tags, entities, record_entities with indexes.",
+    "source_files": ["frontend/components/AnalyticsDashboard.js", "frontend/services/sqliteService.js", "frontend/services/archiveService.js"],
+    "test_notes": "Reachable inside #analytics, below the query builder. Edit the SQL, click 'Run Query' (first run downloads ~28MB), confirm JSON output. Try an invalid query to confirm the red error block.",
+    "code_smell": "The helper text lists 'record_concepts' but not 'record_tags', and the user can run any DDL/DML (e.g. DROP, UPDATE) against the in-memory DB since query() just calls db.exec on the raw string. Harmless (in-memory, discarded on reload) but not constrained to SELECT. Output is raw JSON.stringify, not a table, so large result sets are hard to read and could be heavy to render."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "SQLite",
+    "feature": "Example query shortcuts",
+    "user_story": "As a visitor unsure where to start, I want one-click example queries, so that I can see what the SQL box can do and learn the schema.",
+    "expected_behavior": "Four buttons (Top publications; Articles vs social by year; Top organizations; Articles about Trump) each call setCustomQuery(...) to load a ready SQL string into the raw-SQL textarea. They populate the box but do NOT auto-run; the user still clicks 'Run Query'. Each button shows a title and a one-line plain-English description.",
+    "source_files": ["frontend/components/AnalyticsDashboard.js"],
+    "test_notes": "Reachable inside #analytics. Click each example, confirm the SQL textarea updates with the corresponding query, then click 'Run Query' to execute.",
+    "code_smell": "Buttons only fill the textarea; a user may expect a click to run the example. The 'Articles about Trump' example uses a hardcoded LIKE '%Trump%' on title only."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "SQLite",
+    "feature": "Lazy, deduplicated SQLite initialization",
+    "user_story": "As a visitor, I want the heavy query database to load only when I actually run a query, so that browsing analytics charts stays fast and cheap.",
+    "expected_behavior": "SQLite is NOT initialized on dashboard mount (issue #338). The first query from either the raw-SQL box or the Query Builder triggers initSqlite(), which: loads sql.js via an SRI-pinned cdnjs script (issue #151), points locateFile at the self-hosted, SHA-384-pinned sql-wasm-1.10.3.wasm (issue #291, not the CDN binary), creates the schema, then fetches archive-data.json (~28MB, reusing the in-memory cache if present) and bulk-inserts records, categories, concepts, tags, entities, and record-entity relations inside a transaction. initSqlite memoizes the in-flight promise so the two query surfaces don't double-fetch/parse; the memo is dropped on a false/failed result so a later retry re-runs. Returns true on success, false if full data couldn't load.",
+    "source_files": ["frontend/services/archiveService.js", "frontend/services/sqliteService.js"],
+    "test_notes": "Reachable indirectly via either query surface at #analytics. Open devtools network, confirm archive-data.json is fetched only after the first 'Run Query', not on page load. Run a builder query then a raw-SQL query and confirm the 28MB file is fetched once, not twice.",
+    "code_smell": "WASM is loaded by injecting a cdnjs <script> tag with SRI; if cdnjs is unreachable the loader rejects with 'Failed to load sql.js' and the catch returns false, surfacing only the generic 'Could not load the query database' message (no offline/self-hosted JS fallback, unlike the self-hosted .wasm). loadArchiveData has a module-level dataLoaded guard, so a SQLite reset without reloading the page would not re-insert data."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "SQLite",
+    "feature": "Most-mentioned-entity count reconciliation",
+    "user_story": "As a researcher running entity queries, I want mention counts that reflect the full dataset, so that rankings aren't undercounted by sparse relationship data.",
+    "expected_behavior": "getMostMentionedEntities (sqliteService) computes mentions as MAX(entity.total_mentions, COUNT(record_entities)) so it uses the precomputed total_mentions field when the junction table is incomplete (only records with relatedIds populate it). Optionally filters by entity type and limits results. Other analytics helpers (by year/category/era/publication, concepts, co-occurrence, category trend, output-by-month, search, records-by-category, records-by-entity) are exported for SQL-backed views.",
+    "source_files": ["frontend/services/sqliteService.js", "frontend/services/archiveService.js"],
+    "test_notes": "Reachable via the raw-SQL box or builder 'Most Mentioned People' template (which uses its own JOIN COUNT, not getMostMentionedEntities). To exercise getMostMentionedEntities directly, call it from console after a query loads SQLite, or note it backs the precomputed topPeople aggregate.",
+    "code_smell": "Two different mention-count strategies exist: the QueryBuilder 'top-people' template counts via JOIN only (undercounts records without relatedIds), while sqliteService.getMostMentionedEntities reconciles with total_mentions. A user comparing the builder result to the dashboard's 'Most mentioned people' chart (built from the precomputed aggregate) may see different numbers for the same person."
+  },
+  {
+    "area": "Archive browser",
+    "subarea": "River of news",
+    "feature": "Reverse-chronological river feed (UNREACHABLE)",
+    "user_story": "As a visitor, I want a time-grouped, infinite-scroll stream of records newest-first, so that I can browse the archive like a news river (Dave Winer style).",
+    "expected_behavior": "RiverOfNews(records, onSelectRecord, fetchDetails) sorts records by date descending, buckets them into time groups (Today, Yesterday, This Week, This Month, then Month Year, then Year) and renders collapsible sections (Today/Yesterday/This Week expanded by default). Each item shows relative time, title (2-line clamp), optional summary preview, publication, a deterministic hash-colored primary-category pill, and an external-link icon on hover for http(s) URLs. Clicking an item calls fetchDetails(id) if the record has no summary, then onSelectRecord(id). Infinite scroll via IntersectionObserver grows visibleCount by 30 (initial 50) until all records show, then renders an 'End of river' marker. Group headers are accessible (aria-expanded/aria-controls).",
+    "source_files": ["frontend/components/RiverOfNews.js"],
+    "test_notes": "NOT reachable in the running app. grep confirms RiverOfNews is imported nowhere (only its own file, the sw.js precache list, and tests/needs-review.test.js which documents that it is imported nowhere). There is no #river route in router.js/CLAUDE.md and App.js never renders it. To exercise, a developer would have to wire it into a route or render it manually.",
+    "code_smell": "Dead component: fully implemented but never mounted, yet still shipped (and precached by the service worker), so it is downloaded by every visitor for no user-facing benefit. Its time grouping ('Today'/'Yesterday'/relative '5m ago') assumes a live feed of recent items, which fits social posts poorly and the mostly-historical non-social records not at all. Reachability problem flagged in tests/needs-review.test.js:70."
+  }
+]

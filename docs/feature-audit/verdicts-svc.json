@@ -1,0 +1,116 @@
+{
+  "SVC-01": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Split-load at page-load completion: archive-core.json x1, details x0, entities x0, combined archive-data.json x0, analytics x0. 202726615 records found. Dissertation card injected into DOM=true. Only core is fetched during the split-load as specified (archive-details.json is then fetched ~1s later by the separate SVC-06 background preload — verified in SVC-06)."
+  },
+  "SVC-02": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "After load 1, IndexedDB jrda-archive-cache/kv keys=[\"archive-core::v9::3.4.3\"] (core key present=true). With SW+CacheStorage cleared, a 3rd tab in same context refetched archive-core.json 0x and still showed 202726615 records — served from IndexedDB (no network) as specified."
+  },
+  "SVC-03": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "localStorage archive_json_* keys=[] (sizes []). The ~13MB core blob is NOT written to localStorage (setCachedData bails >5MB), confirming the documented smell: when IndexedDB is unavailable there is no app-level persistent cache for core — it relies on IDB + SW data cache. Fallback-on-IDB-blocked branch (getCachedData read) is internal: covered by unit suite tests/idb-cache.test.js + tests/session-cache-overflow.test.js."
+  },
+  "SVC-15": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "navigator.serviceWorker registrations={\"count\":1,\"active\":true,\"scope\":\"http://localhost:8000/frontend/\",\"scriptURL\":\"http://localhost:8000/frontend/sw.js\"} (SW registers, scriptURL .../frontend/sw.js, reaches active=true). Cache Storage names=[\"jrda-cache-3.4.3\",\"jrda-data-3.4.3\"]. After SW active a reload still renders the archive (records found=true); pageerrors=[]. Offline-no-cache 503 path + cross-origin esm.sh non-caching are internal (the esm.sh import map is deliberately NOT cached — offline cold-boot smell confirmed by code: sw.js only handles same-origin requests, so a truly offline first-load can't fetch React/HTM/idb-keyval/sql.js). SWR/network-first/cache-first strategy details covered by unit suite tests/service-worker-cache.test.js + tests/service-worker-routing.test.js."
+  },
+  "SVC-16": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Cache names present=[\"jrda-cache-3.4.3\",\"jrda-data-3.4.3\"]; current versioned caches (3.4.3)=[\"jrda-cache-3.4.3\",\"jrda-data-3.4.3\"]. CACHE_VERSION '3.4.3' names the caches and the activate handler deletes any non-matching name (drop-stale-on-deploy + version-consistency enforcement covered by unit suite tests/version-consistency.test.js)."
+  },
+  "SVC-09": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Hash routing: #entities->true, #about->true, back to default (#'')->archive grid=true, #dissertation->true, unknown #bogusroute->archive default=true. hashchange/popstate sync via App.js syncRoute listeners."
+  },
+  "SVC-10": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "?view=dissertation -> hash=#dissertation, search=\"\" (view cleared=true), rendered=true. ?view=about -> hash=#about, rendered=true. ?view=zzz left as {\"hash\":\"\",\"search\":\"?view=zzz\",\"archive\":true} (unrecognized view not migrated; archive default rendered=true)."
+  },
+  "SVC-08": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Cold ?record=dissertation-1986 opened a modal=true. Invalid ?record=NOPE-99999: modal=false (no-op as specified), param after validation=\"null\". App.js [records] effect validates the id once core data loads and clears non-matches."
+  },
+  "SVC-17": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "On localhost, core fetch resolved to http://localhost:8000/data/archive-core.json (relative ./data/ -> /data/), data loaded (202726615 records). pathResolver.js maps localhost->local (BASE /frontend, DATA /data). Duplicated host detection between pathResolver.js and sw.js (the documented smell) is real: sw.js lines 23-32 re-implement the same three-way map inline because a classic worker can't ES-import; verified both use the same localhost/127.0.0.1 + .github.io rules. Drift risk confirmed; cross-checked: both currently agree. github-pages/production branches covered by unit suite (path map is pure)."
+  },
+  "SVC-04": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "With archive-core.json aborted: archive route shows \"Error loading archive\" panel=true + Reload button=true; #entities route shows same panel=true + Reload=true. fetchCoreData re-throws (no dissertation-only masking) and App.js renders the shared fail-loud panel on both record-backed routes (#290/#369). SMELL confirmed inconsistency: the LEGACY fetchArchiveData() (archiveService.js lines 847-859, used by initSqlite/combined fallback path) STILL returns a dissertation-only object on error — the exact masking fetchCoreData forbids. Not on the normal load path, so no user-visible impact unless SQLite path hits it."
+  },
+  "SVC-07": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "#entities lazy-loaded archive-entities.json x1 (on-demand, single-flight) and rendered entity UI=true. buildEntityMaps runs from data.entities + recordEntityMap; accepts both network 'recordEntityMap' and cached 'records' shapes. SMELL confirmed by code: on fetch failure fetchEntitiesData resolves { entities: [], recordEntityMap: {} } (archiveService.js line 573) and EntityBrowser.js line 42 treats the empty array as success (setLoading(false), no error) — a failed entities fetch shows an empty graph with no error, the legacy masking the throw-contract was meant to forbid. Failure-masking branch is non-trivial to trigger in-browser without SW serving cache; confirmed via source + unit suite tests/http-cached-loader.test.js + tests/fetch-error-handling.test.js."
+  },
+  "SVC-05": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "archive-details.json fetched x1 via background preload (App.js fires preloadDetails ~1s post-load), x1 total after opening a modal (single-flight loadDetailsCache shares detailsLoadPromise — no duplicate fetch). Modal showed full detail content=true. fetchRecordDetails returns dissertation hardcoded details immediately for dissertation-1986. SMELL confirmed by code: a details fetch failure sets detailsCache={} (line 505) so every later modal silently shows missing details with no retry/error — opposite of the fetchCoreData throw contract."
+  },
+  "SVC-06": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Background preload: archive-details.json was fetched x1 BEFORE any modal opened (App.js setTimeout(preloadDetails,1000) after core load). Fire-and-forget; result ignored; later fetchRecordDetails reuses in-memory detailsCache (no new fetch — total stayed 1)."
+  },
+  "SVC-13": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Cold #analytics: fetched archive-analytics.json x1, did NOT fetch archive-core.json (x0, split-load gate in App.js skips core for analytics route) and did NOT fetch combined archive-data.json. Dashboard rendered aggregates=true. fetchAnalytics throws on non-OK so the dashboard shows its explicit error state instead of an empty view (#290)."
+  },
+  "SVC-12": {
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Deploy-version gate observable: version.json (cache-busted ?t=) fetched x1 during the load (fetchCoreData + fetchAnalytics both await withVersionTimeout(checkVersion), 4s bound). On a version mismatch checkVersion calls clearArchiveCache (localStorage/sessionStorage archive_* + IndexedDB core store). Single-flight memoisation, the 4s timeout, and the version-mismatch clear branch are internal/timing: covered by unit suite tests/fetch-error-handling.test.js + tests/idb-cache.test.js (cache key namespacing by version)."
+  },
+  "SVC-11": {
+    "test_status": "partial",
+    "errors_found": "filters do not round-trip to URL on the live app (useViewState provider deferred per viewState.js comment)",
+    "severity": "low",
+    "notes": "viewState.js serializer (viewStateToUrl/parseViewState) exists and is pure. On the live app, typing a search filter (typed=true) produced URL \"\" — filter NOT reflected in URL (filterInUrl=false), confirming the documented deferral: the consuming useViewState React provider is not wired into App.js yet, so filter-in-URL persistence is not active despite the serializer existing. Pure round-trip (q/era/year/type/replies/repeated cat=/pub=/record=, year-as-string, default omission) covered by unit suite tests/view-state.test.js + tests/route-vocabulary.test.js."
+  },
+  "SVC-14": {
+    "test_status": "n/a",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Optional SQLite engine: initSqlite() is single-flight and lazy-loads the ~28MB combined archive-data.json into sql.js only when a SQL query surface (raw SQL box / Query Builder) is used. Not exercised on the normal load path (and not reached by the SVC routing/data stories). Memo-drop-on-failure-for-retry and shared-load behavior are internal. SMELL confirmed by code: this is the only normal-operation path that fetches the ~28MB combined file (archiveService.js initSqlite line 655) — a first SQL query downloads 28MB. Covered by unit suite for loader internals; behavioral SQL UI belongs to the analytics/query-builder story set."
+  },
+  "SVC-18": {
+    "test_status": "n/a",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Web Storage quota handling + legacy sessionStorage cleanup: setCachedData skips >5MB payloads (verified observably in SVC-03 — no >5MB archive blob in localStorage); QuotaExceededError -> clearArchiveCache + single retry, then \"Cache disabled\" log; getCachedData reads legacy sessionStorage before localStorage and evicts on CACHE_VERSION mismatch or 30-min TTL; clearArchiveCache also fire-and-forget clears the IndexedDB core store. Quota/eviction/TTL branches are internal and not reliably triggerable in headless chromium without synthetic quota pressure: covered by unit suite tests/session-cache-overflow.test.js + tests/idb-cache.test.js."
+  },
+  "SVC-19": {
+    "test_status": "n/a",
+    "errors_found": "",
+    "severity": "",
+    "notes": "Entity connection lookups (getRecordsByEntity/getEntitiesByRecord/findSharedEntities/calculateEntityConnectionStrength) resolve from in-memory maps built by buildEntityMaps after entities/full data load; return empty/zero when a record/entity is unknown or maps not built. These are pure map functions not directly invoked by the SVC routing/data path (RecordModal/EntityBrowser consume them — those are ENT/MODAL stories). SMELL confirmed by code: features silently return empty when maps are not built yet (entities load on demand), so a record modal opened before entity data loads shows no connections with no \"not loaded yet\" indication. Map-building + lookup logic covered by unit suite (entity-index / archiveService map tests)."
+  }
+}

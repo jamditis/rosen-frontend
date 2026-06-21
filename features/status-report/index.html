@@ -191,6 +191,18 @@
       .expandable-content.open {
         max-height: 500px;
       }
+
+      /* Tailwind colour utilities this page builds dynamically (text-${color}-600,
+         border-${color}-300, bg-${color}-50 for emerald/amber/rose). The prebuilt
+         tailwind.css only ships the amber variants, so the emerald (good) and rose
+         (bad) states rendered with no colour. Supplied here so the status colour
+         coding works without a Tailwind rebuild. Values are Tailwind defaults. */
+      .text-emerald-600 { color: #059669; }
+      .text-rose-600 { color: #e11d48; }
+      .border-emerald-300 { border-color: #6ee7b7; }
+      .bg-emerald-50 { background-color: #ecfdf5; }
+      .border-rose-300 { border-color: #fda4af; }
+      .bg-rose-50 { background-color: #fff1f2; }
     </style>
   </head>
 
