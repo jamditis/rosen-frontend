@@ -352,17 +352,4 @@ class EnhancedPDFFormatter:
         text = re.sub(r'\*([^\*]+)\*', r'<i>\1</i>', text)      # *italic*
         text = re.sub(r'_([^_]+)_', r'<i>\1</i>', text)         # _italic_
 
-        # Handle quotes
-        text = text.replace('"', '"').replace('"', '"')
-        text = text.replace(''', "'").replace(''', "'")
-
         return text
-
-# Convenience function to maintain compatibility
-def create_article_pdf(article_data, output_dir="processed_pdf_library"):
-    """
-    Create an enhanced PDF using the new formatter.
-    Maintains compatibility with existing code.
-    """
-    formatter = EnhancedPDFFormatter()
-    return formatter.create_formatted_pdf(article_data, output_dir)
