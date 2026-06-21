@@ -138,7 +138,6 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── tailwind.config.js           # Tailwind config
 │   ├── dist/tailwind.css            # Pre-built Tailwind output (~40 KB)
 │   ├── components/                  # ~20 top-level React components (cards, modals, sidebar, dissertation views, analytics, explorer, query builder)
-│   │   └── shared/                  # Reusable UI primitives (Button, Card, Header, Modal, LoadingState, ErrorState, barrel index)
 │   ├── services/
 │   │   ├── archiveService.js        # Data loading, entity maps, search
 │   │   ├── router.js                # Hash-based routing

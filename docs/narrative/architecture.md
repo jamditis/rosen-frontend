@@ -298,9 +298,6 @@ All `.js` files use HTM's `html` tagged template instead of JSX. Every import in
 - `ToolsModal.js` -- dissertation tools launcher
 - `WorkInProgressBanner.js` -- WIP notice
 
-**Shared primitives (`components/shared/`):**
-Button, Card, ErrorState, Header, LoadingState, Modal
-
 **Services:**
 - `archiveService.js` -- data loading, entity maps, search
 - `router.js` -- hash-based SPA routing
