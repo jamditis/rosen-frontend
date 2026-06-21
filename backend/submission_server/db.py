@@ -191,24 +191,21 @@ def get_last_processing_run() -> Optional[Dict[str, Any]]:
 
 
 def get_queue_stats() -> Dict[str, Any]:
-    """Get summary stats about the queue."""
-    with get_db() as conn:
-        pending = conn.execute(
-            "SELECT COUNT(*) as cnt FROM submissions WHERE status = 'pending'"
-        ).fetchone()['cnt']
-        completed = conn.execute(
-            "SELECT COUNT(*) as cnt FROM submissions WHERE status = 'completed'"
-        ).fetchone()['cnt']
-        failed = conn.execute(
-            "SELECT COUNT(*) as cnt FROM submissions WHERE status = 'failed'"
-        ).fetchone()['cnt']
-        total = conn.execute(
-            "SELECT COUNT(*) as cnt FROM submissions"
-        ).fetchone()['cnt']
+    """Get summary stats about the queue.
 
-        return {
-            'pending': pending,
-            'completed': completed,
-            'failed': failed,
-            'total': total,
-        }
+    One grouped query instead of four separate COUNTs. ``total`` sums every
+    status bucket, so it still counts all rows (including 'processing' and
+    'duplicate', which are not broken out here).
+    """
+    with get_db() as conn:
+        rows = conn.execute(
+            "SELECT status, COUNT(*) as cnt FROM submissions GROUP BY status"
+        ).fetchall()
+
+    counts = {row['status']: row['cnt'] for row in rows}
+    return {
+        'pending': counts.get('pending', 0),
+        'completed': counts.get('completed', 0),
+        'failed': counts.get('failed', 0),
+        'total': sum(counts.values()),
+    }

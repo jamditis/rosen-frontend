@@ -53,6 +53,8 @@ for _candidate in (_BACKEND, _BACKEND / 'src'):
     if str(_candidate) not in sys.path:
         sys.path.insert(0, str(_candidate))
 
+from rosen_scraper.sheets_a1 import quote_tab  # noqa: E402 — after sys.path setup
+
 logging.basicConfig(
     level=os.environ.get('LOG_LEVEL', 'INFO'),
     format='%(asctime)s %(levelname)s %(message)s',
@@ -74,11 +76,6 @@ SENTINEL_URL_PREFIX = 'https://example.com/sweep-noop-'
 
 
 # ---------- Sheet ingestion -------------------------------------------------
-
-
-def _quote_tab(name: str) -> str:
-    safe = (name or 'Sheet1').replace("'", "''")
-    return f"'{safe}'"
 
 
 def _load_sheets_credentials():
@@ -113,7 +110,7 @@ def fetch_rows() -> List[Dict[str, Any]]:
     creds = _load_sheets_credentials()
     from googleapiclient.discovery import build
     service = build('sheets', 'v4', credentials=creds, cache_discovery=False)
-    range_a1 = f'{_quote_tab(sheet_tab)}!A1:H'
+    range_a1 = f'{quote_tab(sheet_tab)}!A1:H'
     resp = service.spreadsheets().values().get(
         spreadsheetId=sheet_id, range=range_a1).execute()
     values = resp.get('values') or []
