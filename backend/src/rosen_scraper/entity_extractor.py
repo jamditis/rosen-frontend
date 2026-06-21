@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import google.generativeai as genai
+from rosen_scraper.gemini_json import strip_gemini_fence
 from rosen_scraper.rate_limiter import rate_limited_gemini_call
 
 # Configuration
@@ -377,7 +378,7 @@ Focus on entities relevant to journalism, media criticism, and political coverag
         response = _call_gemini_for_entity_extraction(model, prompt)
 
         # Clean up the response
-        cleaned_response = response.text.strip().replace('```json', '').replace('```', '').strip()
+        cleaned_response = strip_gemini_fence(response.text)
 
         # Parse JSON
         extraction_data = json.loads(cleaned_response)

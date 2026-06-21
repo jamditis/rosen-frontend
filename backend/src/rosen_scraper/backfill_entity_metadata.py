@@ -14,6 +14,7 @@ import gspread
 from dotenv import load_dotenv
 import google.generativeai as genai
 
+from rosen_scraper.gemini_json import parse_gemini_json
 from rosen_scraper.path_utils import find_project_root
 
 load_dotenv()
@@ -23,6 +24,20 @@ BASE_DIR = find_project_root()
 
 # Rate limiting
 RATE_LIMIT_DELAY = 2  # seconds between API calls
+
+
+def _empty_metadata() -> Dict:
+    """Return a fresh blank metadata dict for the extraction failure paths.
+
+    A new dict on every call so a caller may mutate the result without
+    affecting any other failure branch.
+    """
+    return {
+        'role_or_description': '',
+        'affiliation': '',
+        'confidence': 0.0,
+        'text_evidence': '',
+    }
 
 
 class EntityMetadataBackfiller:
@@ -167,23 +182,13 @@ If the information is not in the text, leave fields empty and set confidence to 
             # Check if response is valid
             if not response:
                 print("  [WARNING] No response from AI")
-                return {
-                    'role_or_description': '',
-                    'affiliation': '',
-                    'confidence': 0.0,
-                    'text_evidence': ''
-                }
+                return _empty_metadata()
 
             # Check for safety ratings or blocked content
             if hasattr(response, 'prompt_feedback') and response.prompt_feedback:
                 if hasattr(response.prompt_feedback, 'block_reason') and response.prompt_feedback.block_reason:
                     print(f"  [WARNING] Content blocked: {response.prompt_feedback.block_reason}")
-                    return {
-                        'role_or_description': '',
-                        'affiliation': '',
-                        'confidence': 0.0,
-                        'text_evidence': ''
-                    }
+                    return _empty_metadata()
 
             # Try to access response.text safely
             try:
@@ -194,30 +199,14 @@ If the information is not in the text, leave fields empty and set confidence to 
                         print(f"  [DEBUG] Candidates: {len(response.candidates)}")
                         if hasattr(response.candidates[0], 'finish_reason'):
                             print(f"  [DEBUG] Finish reason: {response.candidates[0].finish_reason}")
-                    return {
-                        'role_or_description': '',
-                        'affiliation': '',
-                        'confidence': 0.0,
-                        'text_evidence': ''
-                    }
+                    return _empty_metadata()
                 result_text = result_text.strip()
             except AttributeError as ae:
                 print(f"  [WARNING] Could not access response.text: {ae}")
-                return {
-                    'role_or_description': '',
-                    'affiliation': '',
-                    'confidence': 0.0,
-                    'text_evidence': ''
-                }
+                return _empty_metadata()
 
-            # Extract JSON from response
-            if "```json" in result_text:
-                result_text = result_text.split("```json")[1].split("```")[0].strip()
-            elif "```" in result_text:
-                result_text = result_text.split("```")[1].split("```")[0].strip()
-
-            import json
-            result = json.loads(result_text)
+            # Extract JSON from response (strips any markdown code fence)
+            result = parse_gemini_json(result_text)
 
             return {
                 'role_or_description': result.get('role_or_description', '').strip(),
@@ -227,12 +216,7 @@ If the information is not in the text, leave fields empty and set confidence to 
             }
         except Exception as e:
             print(f"  [ERROR] AI extraction failed for {entity_name}: {e}")
-            return {
-                'role_or_description': '',
-                'affiliation': '',
-                'confidence': 0.0,
-                'text_evidence': ''
-            }
+            return _empty_metadata()
 
     def supplement_with_web_search(self, entity_name: str, entity_type: str, existing_metadata: Dict) -> Dict:
         """Use web search to supplement low-confidence metadata."""
@@ -292,14 +276,8 @@ Only provide information that is clearly evident from the search results."""
             response = self.model.generate_content(supplement_prompt)
             result_text = response.text.strip()
 
-            # Extract JSON
-            if "```json" in result_text:
-                result_text = result_text.split("```json")[1].split("```")[0].strip()
-            elif "```" in result_text:
-                result_text = result_text.split("```")[1].split("```")[0].strip()
-
-            import json
-            web_result = json.loads(result_text)
+            # Extract JSON (strips any markdown code fence)
+            web_result = parse_gemini_json(result_text)
 
             # Merge with existing, preferring text-based info
             merged = {

@@ -109,7 +109,7 @@ Google's URL Context tool (via Gemini API) is the primary extraction method. It 
 | `key_concepts_updater.py` | Identifies Jay Rosen journalism concepts in content using Gemini 2.0 Flash Lite. |
 | `entity_extractor.py` | Extracts named entities and relationships from content via Gemini API. |
 | `entity_extraction_batch_processor.py` | Batch wrapper for entity extraction across the full archive. |
-| `relationship_augmentation.py` | Secondary extraction pass for high-value relationships. |
+| `relationship_augmentation.py` | Secondary extraction pass for high-value relationships. Archived 2026-06-21 (#491) — never wired into the pipeline; see `archived/scripts/backend-oneoffs/`. |
 | `entity_registry.py` | Maintains normalized entity registry for deduplication. |
 | `entity_resolver.py` | Resolves and standardizes publication and platform names. |
 | `entity_deduplicator.py` | Deduplicates entities across extraction batches. |
@@ -149,7 +149,7 @@ entity_extractor.py (Gemini API)
 Google Sheets (extracted_entities + extracted_relationships)
     |
     v
-relationship_augmentation.py (secondary pass for high-value relationships)
+relationship_augmentation.py (secondary pass — archived 2026-06-21, #491; never wired in)
     |
     v
 CSV export for frontend
