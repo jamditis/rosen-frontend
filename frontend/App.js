@@ -1,26 +1,27 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.4.4';
+import { html } from './html.js?v=3.4.5';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.4.4';
-import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.4.4';
-import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.4.4';
-import { openBugReport } from './utils/bugReport.js?v=3.4.4';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.4.4';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.4.4';
-import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.4.4';
-import Sidebar from './components/Sidebar.js?v=3.4.4';
-import WelcomeModal from './components/WelcomeModal.js?v=3.4.4';
-import RecordView from './components/RecordView.js?v=3.4.4';
-import FeaturedSection from './components/FeaturedSection.js?v=3.4.4';
-import DissertationPage from './components/DissertationPage.js?v=3.4.4';
-import ToolsModal from './components/ToolsModal.js?v=3.4.4';
-import LoadingQuotes from './components/LoadingQuotes.js?v=3.4.4';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.4.4';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.4.4';
-import EntityBrowser from './components/EntityBrowser.js?v=3.4.4';
-import Timeline from './components/Timeline.js?v=3.4.4';
-import AboutPage from './components/AboutPage.js?v=3.4.4';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.4.5';
+import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.4.5';
+import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.4.5';
+import { openBugReport } from './utils/bugReport.js?v=3.4.5';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.4.5';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.4.5';
+import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.4.5';
+import Sidebar from './components/Sidebar.js?v=3.4.5';
+import WelcomeModal from './components/WelcomeModal.js?v=3.4.5';
+import RecordView from './components/RecordView.js?v=3.4.5';
+import FeaturedSection from './components/FeaturedSection.js?v=3.4.5';
+import DissertationPage from './components/DissertationPage.js?v=3.4.5';
+import ToolsModal from './components/ToolsModal.js?v=3.4.5';
+import LoadingQuotes from './components/LoadingQuotes.js?v=3.4.5';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.4.5';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.4.5';
+import EntityBrowser from './components/EntityBrowser.js?v=3.4.5';
+import Timeline from './components/Timeline.js?v=3.4.5';
+import AboutPage from './components/AboutPage.js?v=3.4.5';
+import WikiPage from './components/WikiPage.js?v=3.4.5';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
@@ -130,18 +131,20 @@ const App = () => {
       navigateTo(ROUTES.dissertation);
     } else if (action === 'entities') {
       navigateTo(ROUTES.entities);
+    } else if (action === 'wiki') {
+      navigateTo(ROUTES.wiki);
     }
   }, []);
 
   // Load Data
-  // Gate the ~13MB core fetch so a cold deep-link straight into #analytics
-  // doesn't fetch and parse data that route never renders (it draws from the
-  // prebuilt aggregates instead). The ref makes this fire once; depending on
-  // currentRoute means navigating away from analytics back-fills the data.
+  // Gate the ~13MB core fetch so cold deep-links into non-record routes do
+  // not fetch and parse archive data those routes never render. The ref makes
+  // this fire once; depending on currentRoute means navigating back to a
+  // record-backed route back-fills the data.
   const coreFetchStarted = useRef(false);
   useEffect(() => {
     if (coreFetchStarted.current) return;
-    if (currentRoute === ROUTES.analytics) return;
+    if (currentRoute === ROUTES.analytics || currentRoute === ROUTES.wiki) return;
     coreFetchStarted.current = true;
     fetchCoreData()
       .then((data) => {
@@ -296,6 +299,7 @@ const App = () => {
   `;
 
   const isEntityBrowser = currentRoute === ROUTES.entities;
+  const isWiki = currentRoute === ROUTES.wiki;
   const isAnalytics = currentRoute === ROUTES.analytics;
   const isArchiveGrid = currentRoute === ROUTES.archive || currentRoute === ROUTES.folders;
 
@@ -427,7 +431,7 @@ const App = () => {
 
       <${WorkInProgressBanner} />
 
-      <div className=${`flex-grow container mx-auto px-4 py-6 flex gap-8 ${isEntityBrowser ? 'justify-center' : ''}`}>
+      <div className=${`flex-grow container mx-auto px-4 py-6 flex gap-8 ${isEntityBrowser || isWiki ? 'justify-center' : ''}`}>
 
          ${isArchiveGrid && html`
              <${Sidebar}
@@ -471,6 +475,13 @@ const App = () => {
                                     Analytics
                                 </button>
                                 <button
+                                    onClick=${() => goTo(ROUTES.wiki)}
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
+                                >
+                                    <${BookOpen} className="w-3.5 h-3.5" />
+                                    Wiki
+                                </button>
+                                <button
                                     onClick=${() => setToolsModalOpen(true)}
                                     className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-200 transition-all text-xs font-medium text-stone-500 hover:text-stone-700"
                                 >
@@ -493,6 +504,10 @@ const App = () => {
                         />
                     `}
                 </div>
+            `}
+
+            ${isWiki && html`
+                <${WikiPage} />
             `}
 
             ${isArchiveGrid && html`
@@ -708,6 +723,7 @@ const App = () => {
                 <button onClick=${() => goTo(ROUTES.dissertation)} className="block hover:text-stone-900 transition-colors">Dissertation mind map</button>
                 <button onClick=${() => goTo(ROUTES.entities)} className="block hover:text-stone-900 transition-colors">Entity browser</button>
                 <button onClick=${() => goTo(ROUTES.analytics)} className="block hover:text-stone-900 transition-colors">Analytics dashboard</button>
+                <button onClick=${() => goTo(ROUTES.wiki)} className="block hover:text-stone-900 transition-colors">Archive wiki</button>
                 <button onClick=${() => goTo(ROUTES.about)} className="block hover:text-stone-900 transition-colors">About this archive</button>
               </div>
             </div>

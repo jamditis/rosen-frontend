@@ -118,8 +118,8 @@ describe('analytics lazy-load wiring (#338)', () => {
     assert.match(src, /coreFetchStarted/, 'expected the coreFetchStarted ref guard');
     assert.match(
       src,
-      /currentRoute\s*===\s*ROUTES\.analytics\)\s*return/,
-      'the load effect must early-return on the analytics route'
+      /currentRoute\s*===\s*ROUTES\.analytics\s*\|\|\s*currentRoute\s*===\s*ROUTES\.wiki\)\s*return/,
+      'the load effect must early-return on analytics and wiki routes'
     );
   });
 

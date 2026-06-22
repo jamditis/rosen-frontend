@@ -14,6 +14,8 @@
 // consumes it is intentionally deferred until the entity-index hook
 // conventions land (#130 / PR #180), so both hooks share one shape.
 
+import { parseWikiHash, wikiPageHref } from './wikiService.js?v=3.4.5';
+
 /** Hash route names. The default route renders with no hash at all. */
 export const ROUTES = {
   archive: 'archive',
@@ -22,6 +24,7 @@ export const ROUTES = {
   dissertation: 'dissertation',
   about: 'about',
   analytics: 'analytics',
+  wiki: 'wiki',
 };
 
 export const DEFAULT_ROUTE = ROUTES.archive;
@@ -74,7 +77,13 @@ export function parseViewState(href) {
   // Hash carries the route. Strip a stray "?suffix" defensively even though
   // navigateTo() never produces one (search params sit before the hash).
   const hash = url.hash.replace(/^#/, '').split('?')[0];
-  const route = Object.values(ROUTES).includes(hash) ? hash : DEFAULT_ROUTE;
+  const wikiHash = parseWikiHash(hash);
+  const route = wikiHash.route === ROUTES.wiki
+    ? ROUTES.wiki
+    : Object.values(ROUTES).includes(hash) ? hash : DEFAULT_ROUTE;
+  const routeParams = wikiHash.route === ROUTES.wiki && wikiHash.slug
+    ? { wikiSlug: wikiHash.slug }
+    : {};
 
   const params = url.searchParams;
   const filters = defaultFilters();
@@ -103,7 +112,7 @@ export function parseViewState(href) {
 
   const selectedRecord = params.get(PARAM.record) || null;
 
-  return { route, filters, selectedRecord };
+  return { route, routeParams, filters, selectedRecord };
 }
 
 /**
@@ -111,7 +120,7 @@ export function parseViewState(href) {
  * pathname of baseHref. Only non-default fields are emitted, so a pristine
  * view produces a clean URL with no query string and no hash.
  *
- * @param {{route?: string, filters?: object, selectedRecord?: string|null}} viewState
+ * @param {{route?: string, routeParams?: object, filters?: object, selectedRecord?: string|null}} viewState
  * @param {string} baseHref - a URL whose origin and pathname are reused.
  */
 export function viewStateToUrl(viewState, baseHref) {
@@ -146,7 +155,10 @@ export function viewStateToUrl(viewState, baseHref) {
   }
 
   url.search = params.toString();
-  url.hash = route === DEFAULT_ROUTE ? '' : route;
+  const wikiSlug = viewState.routeParams?.wikiSlug;
+  url.hash = route === DEFAULT_ROUTE ? ''
+    : route === ROUTES.wiki && wikiSlug ? wikiPageHref(wikiSlug).slice(1)
+    : route;
   return url.toString();
 }
 
