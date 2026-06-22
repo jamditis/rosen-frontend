@@ -16,7 +16,7 @@ from typing import Dict, List
 import gspread
 from dotenv import load_dotenv
 
-from .entity_normalization import (
+from rosen_scraper.entity_normalization import (
     ENTITY_TYPE_PREFIXES,
     normalize_entity_name as _normalize_entity_name,
 )

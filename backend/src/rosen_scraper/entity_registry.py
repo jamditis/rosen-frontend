@@ -11,7 +11,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-from .entity_normalization import (
+from rosen_scraper.entity_normalization import (
     ENTITY_TYPE_PREFIXES,
     normalize_entity_name as _normalize_entity_name,
 )
