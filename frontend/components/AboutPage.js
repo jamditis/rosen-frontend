@@ -48,7 +48,7 @@ const AboutPage = ({ onBack, records }) => {
             <h1 className="text-4xl font-display font-bold text-stone-900">About this archive</h1>
           </div>
           <p className="text-lg text-stone-600 leading-relaxed font-body">
-            Jay Rosen's Internet Archive is a curated public collection of the works, critiques, and teachings of Jay Rosen, professor of journalism at New York University. It preserves four decades of writing about journalism, democracy, and public life.
+            The Jay Rosen Internet Archive is a curated public collection of the works, critiques, and teachings of Jay Rosen, professor of journalism at New York University. It preserves four decades of writing about journalism, democracy, and public life.
           </p>
         </div>
 
@@ -62,7 +62,7 @@ const AboutPage = ({ onBack, records }) => {
               In the 1990s, Rosen became one of the leading advocates of public journalism (also called civic journalism), a movement that argued the press should help communities participate in democratic life rather than simply report on events. His 1999 book <em>What Are Journalists For?</em> remains the definitive account of that movement.
             </p>
             <p>
-              Since 2003, Rosen has written the blog <a href="https://pressthink.org" target="_blank" rel="noreferrer" className="text-blue-700 hover:underline font-bold">PressThink</a>, where he has developed a body of criticism that includes concepts like "the view from nowhere," "audience atomization overcome," "the church of the savvy," and "the production of innocence." These ideas have shaped how journalists, scholars, and the public think about the role of the press in democracy.
+              Since 2003, Rosen has written the blog <a href="https://pressthink.org" target="_blank" rel="noreferrer" className="text-blue-700 hover:underline font-bold">PressThink</a>, where he has developed a body of criticism that includes key concepts like "the view from nowhere," "the people formerly known as the audience," "the church of the savvy," and "not the odds, but the stakes." These ideas have shaped how journalists, scholars, and the public think about the role of the press in democracy.
             </p>
             <p>
               His work spans articles, books, blog posts, lectures, interviews, and social media commentary across platforms including Twitter/X and Bluesky.
