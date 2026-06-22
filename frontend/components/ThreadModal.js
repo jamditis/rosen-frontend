@@ -1,27 +1,19 @@
 import { html } from '../html.js?v=3.4.4';
 import { ExternalLink } from 'lucide-react';
 import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.4.4';
+import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.4.4';
+import { toEmbedUrl } from '../utils/bskyEmbed.js?v=3.4.4';
 
-// Convert a bsky.app URL to the unauthenticated embed.bsky.app equivalent
-const toEmbedUrl = (url) => {
-  if (!url) return url;
-  return url.replace('//bsky.app', '//embed.bsky.app');
-};
-
-// Convert URLs in text to clickable links
+// Convert URLs in text to clickable links. Shares the linkify split with
+// RecordModal so the two stay consistent and neither carries a stateful regex.
 const linkifyText = (text) => {
-  if (!text) return null;
-  // URL regex pattern
-  const urlPattern = /(https?:\/\/[^\s<>"{}|\\^`\[\]]+)/g;
-  const parts = text.split(urlPattern);
-
+  const parts = splitUrlsForLinkify(text);
+  if (parts === null) return null;
   return parts.map((part, i) => {
-    if (urlPattern.test(part)) {
-      // Reset regex lastIndex
-      urlPattern.lastIndex = 0;
-      return html`<a key=${i} href=${part} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 hover:underline break-all">${part}</a>`;
+    if (part.type === 'url') {
+      return html`<a key=${i} href=${part.value} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 hover:underline break-all">${part.value}</a>`;
     }
-    return part;
+    return part.value;
   });
 };
 

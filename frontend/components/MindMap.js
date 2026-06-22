@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { html } from '../html.js?v=3.4.4';
-import { ChevronDown, ChevronRight, ZoomIn, ZoomOut, Maximize2, Focus, HelpCircle } from 'lucide-react';
+import { ChevronDown, ChevronRight, ZoomIn, ZoomOut, Maximize2, Focus, HelpCircle, X } from 'lucide-react';
 
 // Enhanced node type styles with gradients and shadows
 const NODE_STYLES = {
@@ -814,9 +814,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
               className="text-stone-400 hover:text-stone-600 transition-colors"
               aria-label="Close shortcuts panel"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
+              <${X} className="w-4 h-4" />
             </button>
           </div>
           <div className="space-y-2 text-xs">
