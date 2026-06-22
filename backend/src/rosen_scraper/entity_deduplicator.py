@@ -10,12 +10,16 @@ This script resolves duplicate entities in the extracted_entities sheet by:
 """
 
 import os
-import re
 from collections import defaultdict
 from typing import Dict, List
 
 import gspread
 from dotenv import load_dotenv
+
+from rosen_scraper.entity_normalization import (
+    ENTITY_TYPE_PREFIXES,
+    normalize_entity_name as _normalize_entity_name,
+)
 
 load_dotenv()
 
@@ -56,47 +60,12 @@ class EntityDeduplicator:
             return False
 
     def normalize_entity_name(self, name: str, entity_type: str) -> str:
+        """Normalize entity name for matching.
+
+        Thin wrapper over the shared normalizer so the deduplicator and the
+        registry can never drift apart.
         """
-        Normalize entity name for matching.
-
-        Handles:
-        - Case normalization
-        - Article removal (The, A, An)
-        - Punctuation normalization
-        - Common abbreviations
-        """
-        if not name:
-            return ""
-
-        # Convert to lowercase
-        normalized = name.lower().strip()
-
-        # Remove common articles at the start
-        normalized = re.sub(r"^(the|a|an)\s+", "", normalized)
-
-        # Remove punctuation but keep spaces
-        normalized = re.sub(r"[^\w\s]", "", normalized)
-
-        # Collapse multiple spaces
-        normalized = re.sub(r"\s+", " ", normalized).strip()
-
-        # Handle common abbreviations (organization specific)
-        if entity_type == "Organization":
-            abbrev_map = {
-                "nyt": "new york times",
-                "wapo": "washington post",
-                "nyu": "new york university",
-                "npr": "national public radio",
-                "pbs": "public broadcasting service",
-                "cnn": "cable news network",
-                "bbc": "british broadcasting corporation",
-                "ap": "associated press",
-                "wsj": "wall street journal",
-            }
-            if normalized in abbrev_map:
-                normalized = abbrev_map[normalized]
-
-        return normalized
+        return _normalize_entity_name(name, entity_type)
 
     def load_entities(self) -> List[Dict]:
         """Load all entities from the sheet."""
@@ -165,14 +134,7 @@ class EntityDeduplicator:
 
         for (normalized_name, entity_type), group in entity_groups.items():
             # Determine canonical ID
-            prefix = {
-                "Person": "P",
-                "Organization": "O",
-                "Work": "W",
-                "Concept": "C",
-                "Event": "E",
-                "Location": "L",
-            }.get(entity_type, "X")
+            prefix = ENTITY_TYPE_PREFIXES.get(entity_type, "X")
 
             entity_type_counters[prefix] += 1
             canonical_id = f"{prefix}{entity_type_counters[prefix]:04d}"
