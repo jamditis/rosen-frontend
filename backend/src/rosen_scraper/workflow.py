@@ -33,27 +33,14 @@ from rosen_scraper import entity_resolver
 from rosen_scraper.logger import get_logger, init_logger, PoisonPillType, ArchiveLogger
 from rosen_scraper.poison_pill_handler import get_poison_pill_manager, PoisonPillManager
 from rosen_scraper.path_utils import find_project_root
+from rosen_scraper.permissions_config import PAYWALLED_DOMAINS
 
 # Load environment variables from a .env file for secure configuration management.
 load_dotenv()
 
 # --- Configuration ---
-# Subscription/paywalled domains, used by determine_permissions() to set a
-# record's rights label. This is a rights concern and is intentionally distinct
-# from PoisonPillDetector.paywall_domains (poison_pill_handler.py), which answers
-# a scraping concern (did we hit a paywall while fetching?). The two lists
-# overlap but are not the same: medium.com is a member_only paywall for scraping
-# yet stays Open Access for rights (it is in the permissive list below), so it is
-# deliberately absent here. Matched against the exact netloc, hence the www.
-# prefix. Keep in sync with PoisonPillDetector for the shared subscription sites.
-PAYWALLED_DOMAINS = [
-    "www.washingtonpost.com",
-    "www.nytimes.com",
-    "www.wsj.com",
-    "www.ft.com",
-    "www.theatlantic.com",
-    "www.newyorker.com",
-]
+# PAYWALLED_DOMAINS is the shared rights list in permissions_config.py, used by
+# determine_permissions() below and by the populate_new_fields.py backfill.
 
 # Define key file paths using pathlib for cleaner path handling.
 SCRIPT_DIR = Path(__file__).resolve().parent
