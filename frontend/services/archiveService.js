@@ -1,5 +1,5 @@
 
-import { DATA_CONFIG, ERAS } from '../constants.js?v=3.4.4';
+import { DATA_CONFIG } from '../constants.js?v=3.4.4';
 import {
   initDatabase,
   loadArchiveData as loadSqliteData,
@@ -61,7 +61,7 @@ let recordToEntities = new Map();  // record_id -> Set of entity ids
 
 /**
  * Build entity lookup maps from loaded archive data
- * Called after fetchArchiveData completes
+ * Called after archive data is fetched
  */
 export const buildEntityMaps = (data) => {
   entityById.clear();
@@ -584,11 +584,6 @@ export const fetchEntitiesData = async () => {
 };
 
 /**
- * Check if details are loaded
- */
-export const areDetailsLoaded = () => detailsCache !== null;
-
-/**
  * Check if entities are loaded
  */
 export const areEntitiesLoaded = () => entitiesCache !== null;
@@ -800,65 +795,4 @@ export const getOpenDataURLs = () => {
     schema: `${basePath}/data/schema.json`,
     schemaDoc: `${basePath}/data/SCHEMA.md`
   };
-};
-
-// ============================================
-// LEGACY: Full data fetch (backward compatible)
-// ============================================
-
-export const fetchArchiveData = async () => {
-  const dataUrl = DATA_CONFIG.archive_json;
-
-  // Check cache first
-  const cached = getCachedData(dataUrl);
-  if (cached) {
-    debug('Using cached archive data');
-    // Build entity maps from cached data
-    buildEntityMaps(cached);
-    return cached;
-  }
-
-  debug('Fetching archive data from:', dataUrl);
-
-  try {
-    const response = await fetch(dataUrl);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    // Inject dissertation record if not present
-    if (!data.records.find(r => r.id === 'dissertation-1986')) {
-      data.records.push({ ...DISSERTATION_RECORD, relatedIds: [] });
-
-      // Also add dissertation facets if missing
-      DISSERTATION_RECORD.categories.forEach(c => {
-        if (!data.facets.categories.includes(c)) {
-          data.facets.categories.push(c);
-        }
-      });
-      data.facets.categories.sort();
-    }
-
-    // Build entity lookup maps for entity connections
-    buildEntityMaps(data);
-
-    // Cache the result
-    setCachedData(dataUrl, data);
-
-    return data;
-  } catch (error) {
-    console.error('Error fetching archive data:', error);
-    // Return empty structure on error
-    return {
-      records: [{ ...DISSERTATION_RECORD, relatedIds: [] }],
-      facets: {
-        categories: DISSERTATION_RECORD.categories.sort(),
-        eras: ERAS,
-        publications: [DISSERTATION_RECORD.pub]
-      },
-      autocompleteIndex: [...DISSERTATION_RECORD.categories, ...DISSERTATION_RECORD.concepts, ...DISSERTATION_RECORD.tags, DISSERTATION_RECORD.title].sort()
-    };
-  }
 };
