@@ -8,8 +8,8 @@
 // viewState.js too; what remains here is the imperative, window-bound
 // navigation helpers.
 
-import { ROUTES, DEFAULT_ROUTE } from './viewState.js?v=3.4.4';
-import { parseRecordId, setRecordParam } from '../utils/recordDeepLink.js?v=3.4.4';
+import { ROUTES, DEFAULT_ROUTE } from './viewState.js?v=3.4.5';
+import { parseRecordId, setRecordParam } from '../utils/recordDeepLink.js?v=3.4.5';
 
 export { ROUTES };
 
@@ -20,6 +20,7 @@ export { ROUTES };
 export function getCurrentRoute() {
   const hash = window.location.hash.replace('#', '').split('?')[0];
   if (!hash) return DEFAULT_ROUTE;
+  if (hash === ROUTES.wiki || hash.startsWith(`${ROUTES.wiki}/`)) return ROUTES.wiki;
   const match = Object.values(ROUTES).find(r => r === hash);
   return match || DEFAULT_ROUTE;
 }

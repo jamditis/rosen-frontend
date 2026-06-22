@@ -55,6 +55,11 @@ describe('parseViewState', () => {
     }
   });
 
+  it('parses nested wiki hashes as the wiki route', () => {
+    const state = parseViewState('https://example.com/archive/#wiki/concept/public-journalism');
+    assert.equal(state.route, ROUTES.wiki);
+  });
+
   it('falls back to the default route for an unknown hash', () => {
     assert.strictEqual(parseViewState(`${BASE}#bogus`).route, DEFAULT_ROUTE);
   });

@@ -13,7 +13,7 @@
 // Cache version is tied to the app version in version.json. Bumping it on every
 // deploy (alongside index.html and the ?v= import strings) makes the activate
 // handler below drop every stale cache, so returning visitors never run old code.
-const CACHE_VERSION = '3.4.4';
+const CACHE_VERSION = '3.4.5';
 const CACHE_NAME = `jrda-cache-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `jrda-data-${CACHE_VERSION}`;
 
@@ -59,6 +59,8 @@ const STATIC_ASSETS = IS_LOCAL ? [
   '/frontend/components/AnalyticsDashboard.js',
   '/frontend/components/QueryBuilder.js',
   '/frontend/components/AboutPage.js',
+  '/frontend/components/WikiPage.js',
+  '/frontend/services/wikiService.js',
   '/frontend/services/sqliteService.js'
 ] : [
   `${BASE_PATH}/`,
@@ -85,6 +87,8 @@ const STATIC_ASSETS = IS_LOCAL ? [
   `${BASE_PATH}/frontend/components/AnalyticsDashboard.js`,
   `${BASE_PATH}/frontend/components/QueryBuilder.js`,
   `${BASE_PATH}/frontend/components/AboutPage.js`,
+  `${BASE_PATH}/frontend/components/WikiPage.js`,
+  `${BASE_PATH}/frontend/services/wikiService.js`,
   `${BASE_PATH}/frontend/services/sqliteService.js`
 ];
 
@@ -96,7 +100,8 @@ const DATA_URLS = [
   `${DATA_PATH}/archive-core.json`,
   `${DATA_PATH}/archive-details.json`,
   `${DATA_PATH}/archive-entities.json`,
-  `${DATA_PATH}/archive-analytics.json`
+  `${DATA_PATH}/archive-analytics.json`,
+  `${DATA_PATH}/wiki-seed.json`
 ];
 
 // On install we warm only the core file the app loads on every visit (~1.1 MB

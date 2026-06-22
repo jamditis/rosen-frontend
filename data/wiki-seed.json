@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-06-21",
+  "status": "seed",
+  "pages": [
+    {
+      "id": "wiki-concept-public-journalism",
+      "slug": "concept/public-journalism",
+      "kind": "concept",
+      "title": "Public journalism",
+      "summary": "A journalism reform movement associated with Jay Rosen that argues journalists should help public life work, not only observe it from a distance.",
+      "aliases": ["Civic journalism"],
+      "body": [
+        {
+          "heading": "Why it matters here",
+          "text": "This concept is a key path into the archive because it connects Rosen's scholarship, teaching, and public criticism across decades. The wiki should use it as an example of a page that explains an idea while linking readers back to primary archive records."
+        },
+        {
+          "heading": "Editorial stance",
+          "text": "Wiki prose should summarize what archive records and reliable sources say. It should not settle scholarly disputes, publish new interpretations, or turn community notes into unsourced claims."
+        }
+      ],
+      "relatedConcepts": ["concept/press-public-relationship", "concept/audience-relationship"],
+      "relatedEntities": ["entity/jay-rosen"],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "Issue 499: Community wiki for archive records, concepts and entities",
+          "url": "https://github.com/jamditis/rosen-frontend/issues/499"
+        }
+      ],
+      "contributors": ["archive maintainers"],
+      "lastUpdated": "2026-06-21",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-entity-jay-rosen",
+      "slug": "entity/jay-rosen",
+      "kind": "entity",
+      "title": "Jay Rosen",
+      "summary": "Jay Rosen is the central subject of the archive: a journalism professor, critic, author, and public thinker whose work spans press criticism, public journalism, blogging, social media, and the press-public relationship.",
+      "aliases": ["Jay Rosen", "Jay", "Pressthink"],
+      "body": [
+        {
+          "heading": "Role in the archive",
+          "text": "Entity pages should help readers move from a name to the records, concepts, publications, and debates connected to that name. For the launch scaffold, this page demonstrates entity structure without enabling public edits yet."
+        }
+      ],
+      "relatedConcepts": ["concept/public-journalism", "concept/press-public-relationship"],
+      "relatedEntities": [],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "Jay Rosen's Internet Archive",
+          "url": "https://pressthink.org/j/rosen-archive/"
+        }
+      ],
+      "contributors": ["archive maintainers"],
+      "lastUpdated": "2026-06-21",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-press-public-relationship",
+      "slug": "concept/press-public-relationship",
+      "kind": "concept",
+      "title": "Press-public relationship",
+      "summary": "A recurring frame for understanding how journalism imagines, addresses, serves, ignores, or learns from the public.",
+      "aliases": ["Press-public", "Public life"],
+      "body": [
+        {
+          "heading": "Use as a bridge page",
+          "text": "This page should become a bridge between dissertation material, archive records, and entity pages. It is also a good candidate for stricter sourcing rules because it is interpretive and central to the collection."
+        }
+      ],
+      "relatedConcepts": ["concept/public-journalism", "concept/audience-relationship"],
+      "relatedEntities": ["entity/jay-rosen"],
+      "relatedRecords": [],
+      "references": [],
+      "contributors": ["archive maintainers"],
+      "lastUpdated": "2026-06-21",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    }
+  ]
+}

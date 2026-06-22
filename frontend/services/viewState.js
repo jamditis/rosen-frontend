@@ -22,6 +22,7 @@ export const ROUTES = {
   dissertation: 'dissertation',
   about: 'about',
   analytics: 'analytics',
+  wiki: 'wiki',
 };
 
 export const DEFAULT_ROUTE = ROUTES.archive;
@@ -74,7 +75,9 @@ export function parseViewState(href) {
   // Hash carries the route. Strip a stray "?suffix" defensively even though
   // navigateTo() never produces one (search params sit before the hash).
   const hash = url.hash.replace(/^#/, '').split('?')[0];
-  const route = Object.values(ROUTES).includes(hash) ? hash : DEFAULT_ROUTE;
+  const route = hash === ROUTES.wiki || hash.startsWith(`${ROUTES.wiki}/`)
+    ? ROUTES.wiki
+    : Object.values(ROUTES).includes(hash) ? hash : DEFAULT_ROUTE;
 
   const params = url.searchParams;
   const filters = defaultFilters();
