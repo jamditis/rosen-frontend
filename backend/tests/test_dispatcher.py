@@ -4,6 +4,8 @@ Tests for the dispatcher module.
 
 from unittest.mock import patch
 from rosen_scraper import dispatcher
+from rosen_scraper.processors.twitter_processor import TwitterProcessor
+from rosen_scraper.processors.bluesky_processor import BlueskyProcessor
 
 
 class TestDispatcherModule:
@@ -183,3 +185,71 @@ class TestDispatcherModule:
 
         assert result == expected_result
         mock_process_article.assert_called_once_with(url, sample_schema)
+
+
+class TestDispatcherSocial:
+    """Twitter/Bluesky dispatch via the shared _process_social path (#490).
+
+    These pin the class-based social branches the if/elif chain used to spell
+    out twice; there was no coverage before the table collapse. The class's
+    process() method is patched (not the dispatcher name) because
+    _SOCIAL_PROCESSORS captures the class objects at import.
+    """
+
+    @patch("rosen_scraper.dispatcher.article_processor._run_ai_analysis")
+    @patch.object(TwitterProcessor, "process")
+    def test_twitter_success_merges_ai(self, mock_process, mock_ai, sample_schema):
+        url = "https://twitter.com/jayrosen_nyu/status/123"
+        mock_process.return_value = {
+            "status": "success",
+            "raw_text": "tweet body",
+            "author": "Jay Rosen",
+        }
+        mock_ai.return_value = {"summary": "a summary", "categories": ["Press Criticism"]}
+
+        result = dispatcher.dispatch_url(url, sample_schema)
+
+        mock_process.assert_called_once_with(url)
+        mock_ai.assert_called_once_with("tweet body", sample_schema)
+        # clobber merge: AI fields land alongside the envelope, author preserved
+        assert result["status"] == "success"
+        assert result["summary"] == "a summary"
+        assert result["categories"] == ["Press Criticism"]
+        assert result["author"] == "Jay Rosen"
+
+    @patch("rosen_scraper.dispatcher.article_processor._run_ai_analysis")
+    @patch.object(BlueskyProcessor, "process")
+    def test_bluesky_success_merges_ai(self, mock_process, mock_ai, sample_schema):
+        url = "https://bsky.app/profile/jayrosen.bsky.social/post/abc123"
+        mock_process.return_value = {"status": "success", "raw_text": "skeet body"}
+        mock_ai.return_value = {"summary": "sky summary"}
+
+        result = dispatcher.dispatch_url(url, sample_schema)
+
+        mock_process.assert_called_once_with(url)
+        mock_ai.assert_called_once_with("skeet body", sample_schema)
+        assert result["summary"] == "sky summary"
+
+    @patch("rosen_scraper.dispatcher.article_processor._run_ai_analysis")
+    @patch.object(TwitterProcessor, "process")
+    def test_failed_status_skips_analysis(self, mock_process, mock_ai, sample_schema):
+        url = "https://x.com/jayrosen_nyu/status/999"
+        mock_process.return_value = {"status": "failed", "error": "nitter down"}
+
+        result = dispatcher.dispatch_url(url, sample_schema)
+
+        mock_ai.assert_not_called()
+        assert result == {"status": "failed", "error": "nitter down"}
+
+    @patch("rosen_scraper.dispatcher.article_processor._run_ai_analysis")
+    @patch.object(TwitterProcessor, "process")
+    def test_success_without_raw_text_skips_analysis(
+        self, mock_process, mock_ai, sample_schema
+    ):
+        url = "https://x.com/jayrosen_nyu/status/1000"
+        mock_process.return_value = {"status": "success", "raw_text": ""}
+
+        result = dispatcher.dispatch_url(url, sample_schema)
+
+        mock_ai.assert_not_called()
+        assert result == {"status": "success", "raw_text": ""}
