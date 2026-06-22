@@ -17,6 +17,8 @@ import {
 import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.4.4';
 import { escapeCsvCell } from '../utils/csvSafety.js?v=3.4.4';
 import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.4.4';
+import { CACHE_VERSION, CACHE_TTL_MS, MAX_LOCALSTORAGE_SIZE, cacheKeyFor } from './cacheConfig.js?v=3.4.4';
+import { raceTimeout } from '../utils/raceTimeout.js?v=3.4.4';
 
 // Routine cache-hit / fetch-start logs are silent in production. Set
 // `localStorage.jrda_debug = '1'` in DevTools and reload to opt in (#170).
@@ -187,20 +189,9 @@ const DISSERTATION_RECORD = {
   type: 'Dissertation'
 };
 
-// Cache configuration
-const CACHE_VERSION = 'v9'; // Increment to invalidate all caches
-const CACHE_TTL_MS = 1000 * 60 * 30; // 30 min for entity data (small)
-
-// Size threshold: don't use localStorage for data over 5MB
-const MAX_LOCALSTORAGE_SIZE = 5 * 1024 * 1024;
-
-const getCacheKey = (url) => {
-  let hash = 5381;
-  for (let i = 0; i < url.length; i++) {
-    hash = ((hash << 5) + hash) + url.charCodeAt(i);
-  }
-  return `archive_json_${Math.abs(hash >>> 0)}`;
-};
+// Cache configuration (CACHE_VERSION / CACHE_TTL_MS / MAX_LOCALSTORAGE_SIZE
+// and the cacheKeyFor hash) is shared with loaders/httpCachedLoader.js via
+// cacheConfig.js so the two cache paths cannot drift.
 
 /**
  * Check version.json on the server. If the version has changed,
@@ -237,22 +228,10 @@ const checkVersion = () => {
 // stall a load a good cache could satisfy. The check stays in flight in
 // the background and clears the cache if it eventually returns.
 const VERSION_CHECK_TIMEOUT_MS = 4000;
-const withVersionTimeout = (promise) =>
-  new Promise((resolve) => {
-    let settled = false;
-    const finish = () => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      resolve();
-    };
-    const timer = setTimeout(finish, VERSION_CHECK_TIMEOUT_MS);
-    promise.then(finish, finish);
-  });
 
 const getCachedData = (url) => {
   try {
-    const cacheKey = getCacheKey(url);
+    const cacheKey = cacheKeyFor(url);
     // localStorage is the only writer now (#337); still read a legacy
     // sessionStorage entry first so caches from older builds expire cleanly.
     let cached = sessionStorage.getItem(cacheKey) || localStorage.getItem(cacheKey);
@@ -275,7 +254,7 @@ const getCachedData = (url) => {
 };
 
 const setCachedData = (url, data) => {
-  const cacheKey = getCacheKey(url);
+  const cacheKey = cacheKeyFor(url);
   const entry = {
     data,
     timestamp: Date.now(),
@@ -365,7 +344,7 @@ export const fetchCoreData = async () => {
 
   // Check deploy version (clears caches if version changed), bounded so a
   // slow version.json doesn't stall a load a good cache could satisfy.
-  await withVersionTimeout(checkVersion());
+  await raceTimeout(checkVersion(), VERSION_CHECK_TIMEOUT_MS);
 
   const idbKey = coreIdbKey();
 
@@ -516,6 +495,20 @@ const loadDetailsCache = async () => {
 };
 
 /**
+ * Project an entity payload into the records list buildEntityMaps expects.
+ * Prefer an explicit `records` array; otherwise derive it from
+ * `recordEntityMap`. The `|| {}` guard keeps a payload missing
+ * recordEntityMap from throwing. Used by both the cache-hit and network
+ * branches of fetchEntitiesData so they shape the input identically.
+ * @param {{ records?: Array, recordEntityMap?: Object }} payload
+ */
+export const toRecords = (payload) =>
+  payload.records || Object.entries(payload.recordEntityMap || {}).map(([id, relatedIds]) => ({
+    id,
+    relatedIds
+  }));
+
+/**
  * Fetch entities data (on-demand, when the entity browser opens)
  */
 export const fetchEntitiesData = async () => {
@@ -540,10 +533,7 @@ export const fetchEntitiesData = async () => {
       entitiesCache = cached;
       buildEntityMaps({
         entities: cached.entities,
-        records: cached.records || Object.entries(cached.recordEntityMap || {}).map(([id, relatedIds]) => ({
-          id,
-          relatedIds
-        }))
+        records: toRecords(cached)
       });
       return cached;
     }
@@ -562,10 +552,7 @@ export const fetchEntitiesData = async () => {
       // Build entity maps for the entity browser
       buildEntityMaps({
         entities: data.entities,
-        records: Object.entries(data.recordEntityMap).map(([id, relatedIds]) => ({
-          id,
-          relatedIds
-        }))
+        records: toRecords(data)
       });
 
       // Cache the result
@@ -610,7 +597,7 @@ export const fetchAnalytics = async () => {
 
   // Run the same deploy-version gate as core data. A cold #analytics deep-link
   // skips fetchCoreData, so without this a stale cache could survive a deploy.
-  await withVersionTimeout(checkVersion());
+  await raceTimeout(checkVersion(), VERSION_CHECK_TIMEOUT_MS);
 
   const cached = getCachedData(dataUrl);
   if (cached) {

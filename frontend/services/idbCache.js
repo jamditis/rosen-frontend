@@ -27,6 +27,8 @@
  * is unaffected.
  */
 
+import { raceTimeout } from '../utils/raceTimeout.js?v=3.4.4';
+
 // A dedicated database/store so idbClear() only ever wipes this cache, never
 // some other consumer's idb-keyval default store.
 const DB_NAME = 'jrda-archive-cache';
@@ -46,39 +48,18 @@ const IMPORT_TIMEOUT_MS = 3000;
 
 /**
  * Race a promise-returning thunk against a timeout. Mirrors the thunk if it
- * settles within `ms`; otherwise rejects with a timeout error. A settle that
- * arrives after the timeout is ignored, so there is no double-settle and no
- * unhandled rejection. Exported for tests.
+ * settles within `ms`; otherwise rejects with a timeout error. Defers the
+ * thunk to a microtask so a synchronous throw becomes a rejection, then races
+ * it in reject-mode through the shared raceTimeout helper. A settle that
+ * arrives after the timeout is ignored (raceTimeout settles once). Exported
+ * for tests.
  * @param {() => Promise<T>} thunk
  * @param {number} ms
  * @returns {Promise<T>}
  * @template T
  */
 export const withTimeout = (thunk, ms) =>
-  new Promise((resolve, reject) => {
-    let settled = false;
-    const timer = setTimeout(() => {
-      if (settled) return;
-      settled = true;
-      reject(new Error(`timed out after ${ms}ms`));
-    }, ms);
-    Promise.resolve()
-      .then(thunk)
-      .then(
-        (value) => {
-          if (settled) return;
-          settled = true;
-          clearTimeout(timer);
-          resolve(value);
-        },
-        (err) => {
-          if (settled) return;
-          settled = true;
-          clearTimeout(timer);
-          reject(err);
-        },
-      );
-  });
+  raceTimeout(Promise.resolve().then(thunk), ms, { rejectOnTimeout: true });
 
 let storePromise = null;
 const getKeyval = () => {
