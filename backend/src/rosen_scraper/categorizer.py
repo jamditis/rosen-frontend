@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import google.generativeai as genai
+from rosen_scraper.gemini_json import strip_gemini_fence
 from rosen_scraper.rate_limiter import rate_limited_gemini_call
 
 AI_DEBUG_DIR = Path("logs/ai_responses")
@@ -300,8 +301,8 @@ def summarize_and_classify(text_content: str, schema: Dict[str, Any]) -> Optiona
         response = _call_gemini_for_classification(model, prompt)
         
         # Clean up the response text to ensure it's valid JSON.
-        # This involves removing markdown code block delimiters.
-        cleaned_response = response.text.strip().replace('```json', '').replace('```', '').strip()
+        # This strips any markdown code fence around the JSON body.
+        cleaned_response = strip_gemini_fence(response.text)
         
         # Parse the cleaned JSON string into a Python dictionary.
         ai_data = json.loads(cleaned_response)

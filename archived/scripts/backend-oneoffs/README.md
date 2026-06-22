@@ -12,6 +12,11 @@ reuse. Do not run them.
 The current archive is 1,028 records in `data/archive_records-public.csv`; the
 merges below brought it to 859, so they are long superseded.
 
+A further file, `relationship_augmentation.py`, was archived later (2026-06-21,
+[#491](https://github.com/jamditis/rosen-frontend/issues/491)) for a different
+reason: it was an abandoned, broken tool rather than a one-off data repair. See
+"Superseded tool" at the end of this file.
+
 ## What each script did
 
 | File | Ran | Against | What it addressed |
@@ -41,3 +46,22 @@ hardcoded sheet row range (6162-6171) and authenticates with the retired
 local-file pattern (`Credentials.from_service_account_file('google_credentials.json')`)
 that `sheets_client.py` was written to replace. The test rows it targeted are
 long gone, so running it now would delete live data.
+
+## Superseded tool: `relationship_augmentation.py`
+
+Unlike the data repairs above, this was a Gemini-backed tool meant to augment
+`data/extracted_relationships.csv` with additional relationship types. It is
+archived (moved from `backend/src/rosen_scraper/` on 2026-06-21) because it was
+abandoned and broken:
+
+- It opens `src/entity_extraction_schema.json` — a path that does not exist. The
+  schema lives at the backend root (`entity_extraction_schema.json` and
+  `entity_extraction_schema_v3.json`), so the constructor raised
+  `FileNotFoundError` before doing any work.
+- It imports `EntityRegistry` via a `sys.path.insert` hack rather than the
+  `rosen_scraper.entity_registry` package path every live module uses.
+- It is imported nowhere in the codebase and runs only as a standalone
+  `__main__` script.
+
+Taken together, it could not have run successfully in a long time. Kept for
+provenance, not reuse. Do not run it.

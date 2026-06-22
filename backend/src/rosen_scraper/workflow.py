@@ -71,7 +71,6 @@ def generate_source_based_id(publication: str, existing_ids: Set[str]) -> str:
 
     # Handle URL input by extracting domain first
     if publication.startswith('http'):
-        from urllib.parse import urlparse
         domain = urlparse(publication).netloc
         # Map domains to proper publication names
         domain_to_pub = {
@@ -122,7 +121,6 @@ def format_date_mmddyyyy(date_str: str) -> str:
         return ""
 
     # Handle common formats
-    from datetime import datetime
     formats = [
         '%Y-%m-%d',      # 2024-03-15
         '%m/%d/%Y',      # 03/15/2024

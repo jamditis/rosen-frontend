@@ -24,6 +24,20 @@ from rosen_scraper.entity_normalization import (
 load_dotenv()
 
 
+def _safe_int(value, default=None):
+    """Parse value as an int, returning default when it is not a valid integer.
+
+    Tolerant replacement for the str.isdigit() guard: it accepts ints and
+    whitespace-padded strings, where isdigit() raised on non-str values and
+    rejected padded ones. The entities CSV holds only bare 1-10 strings, so the
+    parsed prominence scores are unchanged on real data.
+    """
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
 class EntityDeduplicator:
     """Deduplicates entities and assigns canonical IDs."""
 
@@ -168,9 +182,9 @@ class EntityDeduplicator:
 
             # Aggregate prominence (take max)
             prominence_scores = [
-                int(e.get("prominence_score", ""))
-                for e in group
-                if e.get("prominence_score", "").isdigit()
+                score
+                for score in (_safe_int(e.get("prominence_score", "")) for e in group)
+                if score is not None
             ]
             max_prominence = max(prominence_scores) if prominence_scores else 5
 

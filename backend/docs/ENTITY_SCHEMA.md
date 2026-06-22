@@ -10,7 +10,7 @@ The entity extraction system uses Google Gemini AI to automatically identify and
 - `entity_extractor.py` - AI-powered entity and relationship extraction
 - `entity_deduplicator.py` - Entity normalization and deduplication
 - `entity_registry.py` - Entity ID assignment and lookup
-- `relationship_augmentation.py` - Targeted relationship extraction
+- `relationship_augmentation.py` - Targeted relationship extraction (archived 2026-06-21, #491 — never wired in; see `archived/scripts/backend-oneoffs/`)
 
 ---
 
@@ -826,6 +826,11 @@ print(f"ID counters: {stats['id_counters']}")
 ```
 
 ### Relationship Augmentation
+
+> Archived 2026-06-21 (#491). `relationship_augmentation.py` moved to
+> `archived/scripts/backend-oneoffs/` — it was never wired into the pipeline and
+> reads a schema path that does not exist. The example below is kept for
+> historical reference; the import no longer resolves. Do not run it.
 
 ```python
 from rosen_scraper.relationship_augmentation import RelationshipAugmenter

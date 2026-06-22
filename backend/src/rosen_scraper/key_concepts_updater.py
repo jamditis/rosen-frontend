@@ -52,6 +52,7 @@ from dotenv import load_dotenv
 import gspread
 import google.generativeai as genai
 
+from rosen_scraper.gemini_json import strip_gemini_fence
 from rosen_scraper.sheets_client import get_gspread_client
 
 # Load environment variables
@@ -236,13 +237,8 @@ Return format (JSON object):
 
     try:
         response = model.generate_content(prompt)
-        result_text = response.text.strip()
-
-        # Clean up response - extract JSON
-        if result_text.startswith('```json'):
-            result_text = result_text.replace('```json', '').replace('```', '').strip()
-        elif result_text.startswith('```'):
-            result_text = result_text.replace('```', '').strip()
+        # Strip any markdown code fence; result_text is reused below on error.
+        result_text = strip_gemini_fence(response.text)
 
         # Parse JSON response
         result = json.loads(result_text)
