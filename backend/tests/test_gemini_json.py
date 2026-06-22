@@ -2,7 +2,9 @@
 
 parse_gemini_json replaces six near-identical inline "unfence then json.loads"
 snippets across the scraper. These cases cover every fence shape those snippets
-handled, plus the documented edge where a value containing literal ``` raises.
+handled, plus shapes they broke on: a value containing a literal ``` (fenced and
+unfenced) and a fenced block followed by trailing prose. raw_decode locates the
+JSON value by grammar, so the embedded ticks survive and the trailing bytes drop.
 """
 
 import json
@@ -50,11 +52,30 @@ def test_invalid_json_raises():
         parse_gemini_json("not json at all")
 
 
-def test_value_with_literal_backticks_raises():
-    # Documented edge: a value containing ``` is treated as a fence and raises,
-    # rather than being silently corrupted as the old replace('```','') did.
-    with pytest.raises(json.JSONDecodeError):
-        parse_gemini_json('{"note": "use ```code``` here"}')
+def test_unfenced_value_with_literal_backticks():
+    # An unfenced body whose value contains ``` parses verbatim: raw_decode reads
+    # the whole value, ticks included. The old replace('```','') snippets parsed
+    # it only by silently deleting the backticks from the value.
+    obj = {"note": "use ```code``` here"}
+    assert parse_gemini_json(json.dumps(obj)) == obj
+
+
+def test_fenced_value_with_literal_backticks():
+    # A fenced body whose value contains ``` survives: raw_decode stops at the end
+    # of the value, so the ``` inside it is kept and only the closing fence after
+    # it is dropped. The old split('```') snippets truncated at the first tick.
+    obj = {"note": "use ```code``` here"}
+    assert parse_gemini_json(f"```json\n{json.dumps(obj)}\n```") == obj
+
+
+def test_fenced_then_trailing_prose():
+    # A fenced block followed by commentary parses: raw_decode ends at the closing
+    # brace and ignores the closing fence and the prose after it.
+    assert parse_gemini_json(f"```json\n{BODY}\n```\nLet me know if you need more.") == PAYLOAD
+
+
+def test_bare_fenced_then_trailing_prose():
+    assert parse_gemini_json(f"```\n{BODY}\n```\nThanks!") == PAYLOAD
 
 
 def test_strip_returns_cleaned_body():
