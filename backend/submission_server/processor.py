@@ -18,6 +18,7 @@ from datetime import datetime
 from typing import Dict, Any, Optional, Set
 
 from rosen_scraper import dispatcher, entity_resolver
+from rosen_scraper.csv_safety import sanitize_csv_value
 from rosen_scraper.workflow import generate_source_based_id, enrich_data
 
 from .config import (
@@ -87,10 +88,6 @@ def _get_csv_headers() -> list:
         return next(reader, [])
 
 
-# A spreadsheet treats a cell beginning with one of these as a formula, so a
-# scraped page or form field starting with one is prefixed with a single quote.
-_CSV_FORMULA_TRIGGERS = ('=', '+', '-', '@')
-
 # Upper bound on any single CSV cell. Generous for legitimate titles and
 # summaries, but stops a hostile submission writing an unbounded blob.
 _MAX_FIELD_LENGTH = 10000
@@ -103,14 +100,17 @@ def _sanitize_cell(value: str) -> str:
     prefixed with the spreadsheet-recognized single-quote escape) and caps the
     length so neither scraped content nor user form input can inject a formula
     or write an oversized blob into the shared archive CSV. See issue #143.
+
+    The escape itself is the pipeline-wide one in
+    ``rosen_scraper.csv_safety.sanitize_csv_value``. ``value`` is stripped
+    first, which removes any leading tab/CR/LF, so that helper's wider trigger
+    set collapses to exactly the =, +, -, @ this server has always escaped.
     """
-    text = value.strip()
     # Escape before bounding length. A value already at _MAX_FIELD_LENGTH that
     # starts with a formula trigger would otherwise end up one char over the
     # cap once the single-quote escape is prepended. Truncation chops only the
     # tail, so the leading escape always survives.
-    if text and text[0] in _CSV_FORMULA_TRIGGERS:
-        text = "'" + text
+    text = sanitize_csv_value(value.strip())
     if len(text) > _MAX_FIELD_LENGTH:
         text = text[:_MAX_FIELD_LENGTH]
     return text
