@@ -9,6 +9,7 @@ from typing import Optional, Dict, Any
 from rosen_scraper import scraper
 import json
 from rosen_scraper import categorizer
+from rosen_scraper.processors import base
 
 def _run_scraping(url: str) -> Optional[Dict[str, Any]]:
     """
@@ -81,10 +82,8 @@ def process_article(url: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]
     if not ai_analysis_data:
         return None
     
-    # Intelligently merge the data
-    for key, value in ai_analysis_data.items():
-        if not article_data.get(key):
-            article_data[key] = value
-    
+    # Merge AI fields without clobbering scraped values
+    base.merge_ai_fields(article_data, ai_analysis_data, clobber=False)
+
     print(f"  [Processor] Finished processing article: {url}")
     return article_data
