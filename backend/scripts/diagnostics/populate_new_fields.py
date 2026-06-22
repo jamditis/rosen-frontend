@@ -15,6 +15,7 @@ import gspread
 
 from rosen_scraper.logger import init_logger
 from rosen_scraper.entity_resolver import load_known_entities, resolve_platform
+from rosen_scraper.permissions_config import PAYWALLED_DOMAINS
 
 # Anchored to backend/ via the script's own location, so the curated
 # known_entities.json resolves correctly regardless of the working directory.
@@ -23,9 +24,6 @@ KNOWN_ENTITIES_FILE = ROOT_DIR / "known_entities.json"
 TRANSCRIPTS_DIR = ROOT_DIR / "processed_transcripts"
 
 load_dotenv()
-
-# Configuration
-PAYWALLED_DOMAINS = ["www.washingtonpost.com", "www.nytimes.com", "www.wsj.com"]
 
 def generate_collection_id(record):
     """Generate collection ID based on content patterns."""

@@ -151,6 +151,47 @@ class TestWorkflowModule:
         """Test that determine_permissions function exists."""
         assert hasattr(workflow, 'determine_permissions')
 
+    def test_determine_permissions_subscription_sites(self):
+        """ft.com, theatlantic.com, and newyorker.com are labeled premium.
+
+        They are subscription sites in the same class as the NYT/WSJ/Washington
+        Post entries already in PAYWALLED_DOMAINS. Before #492 they fell through
+        to "Standard Copyright" because the rights list had drifted from
+        PoisonPillDetector's scraping list. They carry the www. prefix because
+        determine_permissions matches the netloc exactly.
+        """
+        for url in (
+            "https://www.ft.com/content/x",
+            "https://www.theatlantic.com/ideas/x/",
+            "https://www.newyorker.com/news/x",
+        ):
+            assert workflow.determine_permissions({}, url) == "Premium/Subscription Required", url
+
+    def test_determine_permissions_existing_premium_unchanged(self):
+        """The original three premium domains keep their label (no regression)."""
+        for url in (
+            "https://www.washingtonpost.com/x",
+            "https://www.nytimes.com/x",
+            "https://www.wsj.com/x",
+        ):
+            assert workflow.determine_permissions({}, url) == "Premium/Subscription Required", url
+
+    def test_determine_permissions_medium_stays_open_access(self):
+        """medium.com stays Open Access by design.
+
+        It is a member_only paywall in PoisonPillDetector.paywall_domains (a
+        scraping concern) but Open Access in determine_permissions' permissive
+        list (a rights concern). The permissive check runs first, so the two
+        lists answer different questions; #492 leaves the rights label intact.
+        """
+        assert workflow.determine_permissions({}, "https://medium.com/@jayrosen/x") == "Open Access"
+
+    def test_determine_permissions_other_branches(self):
+        """Lock the permissive, educational, and default branches."""
+        assert workflow.determine_permissions({}, "https://pressthink.org/x") == "Open Access"
+        assert workflow.determine_permissions({}, "https://example.edu/x") == "Educational Use"
+        assert workflow.determine_permissions({}, "https://example.com/x") == "Standard Copyright"
+
     def test_append_record_to_csv_exists(self):
         """Test that append_record_to_csv function exists. The pipeline moved
         off Google Sheets writes to CSV writes; the function was renamed from

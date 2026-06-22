@@ -33,14 +33,14 @@ from rosen_scraper import entity_resolver
 from rosen_scraper.logger import get_logger, init_logger, PoisonPillType, ArchiveLogger
 from rosen_scraper.poison_pill_handler import get_poison_pill_manager, PoisonPillManager
 from rosen_scraper.path_utils import find_project_root
+from rosen_scraper.permissions_config import PAYWALLED_DOMAINS
 
 # Load environment variables from a .env file for secure configuration management.
 load_dotenv()
 
 # --- Configuration ---
-# A list of domains known to be behind a paywall, which are handled separately.
-# Note: This is now also handled by the poison pill detection system
-PAYWALLED_DOMAINS = ["www.washingtonpost.com", "www.nytimes.com", "www.wsj.com"]
+# PAYWALLED_DOMAINS is the shared rights list in permissions_config.py, used by
+# determine_permissions() below and by the populate_new_fields.py backfill.
 
 # Define key file paths using pathlib for cleaner path handling.
 SCRIPT_DIR = Path(__file__).resolve().parent

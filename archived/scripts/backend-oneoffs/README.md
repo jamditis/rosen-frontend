@@ -1,7 +1,8 @@
 # Backend one-off scripts (archived)
 
-These five scripts were one-off data migrations and repairs that ran once against
-the archive CSVs and were never meant to recur. They were moved here from
+These one-off data migrations and repairs ran once against the archive CSVs (and,
+for `delete_test_relationships.py`, the source Google Sheet) and were never meant
+to recur. Most were moved here from
 `backend/scripts/` on 2026-06-05 as part of [#190](https://github.com/jamditis/rosen-frontend/issues/190)
 (audit verdict under [#132](https://github.com/jamditis/rosen-frontend/issues/132):
 these are completed one-offs, not parameterizable modules). They are retained for
@@ -20,6 +21,7 @@ merges below brought it to 859, so they are long superseded.
 | `fix_entity_relationships.py` | 2026-01-06 | `data/extracted_relationships.csv` | Repaired the 14 unfixable entity-ID issues from the validation report (org names used as IDs, the placeholder `O000`, `N/A`, and `Concept`). Created 8 new entities and mapped 6 to existing ones. Companion guide: `README_FIX_RELATIONSHIPS.md`. |
 | `fix_youtube_rows.py` | one-off | Google Sheet rows 31–38 | Replaced YouTube transcripts for a hardcoded row range with clean, deduplicated text. |
 | `fix_remaining_edge_cases.py` | one-off | Google Sheet rows 35 and 42 | Cleaned up two leftover YouTube/SoundCloud transcript edge cases by hardcoded row. |
+| `delete_test_relationships.py` | one-off | Google Sheet `extracted_relationships` rows 6162-6171 | Deleted 10 test relationship rows by hardcoded range. Destructive — moved here from `src/rosen_scraper/` in #492. |
 
 ## Why they can't simply be re-run
 
@@ -33,3 +35,9 @@ behavior, so there was nothing to fold into a shared module.
 
 The data states they targeted are part of the committed archive, so the scripts
 are kept as history rather than as tools.
+
+`delete_test_relationships.py` is destructive and must not be run: it deletes a
+hardcoded sheet row range (6162-6171) and authenticates with the retired
+local-file pattern (`Credentials.from_service_account_file('google_credentials.json')`)
+that `sheets_client.py` was written to replace. The test rows it targeted are
+long gone, so running it now would delete live data.

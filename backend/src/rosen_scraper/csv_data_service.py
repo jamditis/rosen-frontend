@@ -249,22 +249,6 @@ class CSVDataService:
             print(f"ERROR: Failed to log URL status: {e}")
             return False
 
-    def read_all_records(self) -> List[Dict[str, str]]:
-        """
-        Read all records from the archive records file.
-
-        Returns:
-            List of record dictionaries
-        """
-        records = []
-
-        if self.records_file.exists():
-            with open(self.records_file, 'r', encoding='utf-8-sig') as f:
-                reader = csv.DictReader(f)
-                records.extend(list(reader))
-
-        return records
-
     def read_social_posts(self) -> List[Dict[str, str]]:
         """
         Read all social posts from the social posts file.
@@ -278,100 +262,6 @@ class CSVDataService:
         with open(self.social_file, 'r', encoding='utf-8-sig') as f:
             reader = csv.DictReader(f)
             return list(reader)
-
-    def read_entities(self) -> List[Dict[str, str]]:
-        """
-        Read all extracted entities.
-
-        Returns:
-            List of entity dictionaries
-        """
-        if not self.entities_file.exists():
-            return []
-
-        with open(self.entities_file, 'r', encoding='utf-8-sig') as f:
-            reader = csv.DictReader(f)
-            return list(reader)
-
-    def read_relationships(self) -> List[Dict[str, str]]:
-        """
-        Read all extracted relationships.
-
-        Returns:
-            List of relationship dictionaries
-        """
-        if not self.relationships_file.exists():
-            return []
-
-        with open(self.relationships_file, 'r', encoding='utf-8-sig') as f:
-            reader = csv.DictReader(f)
-            return list(reader)
-
-    def write_entities(self, entities: List[Dict[str, Any]], append: bool = True) -> bool:
-        """
-        Write entities to the output directory.
-
-        Args:
-            entities: List of entity dictionaries
-            append: If True, append to existing file
-
-        Returns:
-            True if successful
-        """
-        output_file = self.output_dir / f'entities_{datetime.now().strftime("%Y%m%d")}.csv'
-
-        if not entities:
-            return True
-
-        headers = list(entities[0].keys())
-        file_exists = output_file.exists() and append
-
-        try:
-            mode = 'a' if append else 'w'
-            with open(output_file, mode, newline='', encoding='utf-8') as f:
-                writer = csv.DictWriter(f, fieldnames=headers, extrasaction='ignore')
-
-                if not file_exists or not append:
-                    writer.writeheader()
-
-                writer.writerows(entities)
-            return True
-        except Exception as e:
-            print(f"ERROR: Failed to write entities: {e}")
-            return False
-
-    def write_relationships(self, relationships: List[Dict[str, Any]], append: bool = True) -> bool:
-        """
-        Write relationships to the output directory.
-
-        Args:
-            relationships: List of relationship dictionaries
-            append: If True, append to existing file
-
-        Returns:
-            True if successful
-        """
-        output_file = self.output_dir / f'relationships_{datetime.now().strftime("%Y%m%d")}.csv'
-
-        if not relationships:
-            return True
-
-        headers = list(relationships[0].keys())
-        file_exists = output_file.exists() and append
-
-        try:
-            mode = 'a' if append else 'w'
-            with open(output_file, mode, newline='', encoding='utf-8') as f:
-                writer = csv.DictWriter(f, fieldnames=headers, extrasaction='ignore')
-
-                if not file_exists or not append:
-                    writer.writeheader()
-
-                writer.writerows(relationships)
-            return True
-        except Exception as e:
-            print(f"ERROR: Failed to write relationships: {e}")
-            return False
 
 
 # Convenience function for getting a service instance

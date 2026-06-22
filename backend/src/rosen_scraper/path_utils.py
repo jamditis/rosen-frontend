@@ -6,7 +6,45 @@ This module provides shared path handling utilities to ensure
 consistent path resolution across all modules.
 """
 
+import os
+import re
 from pathlib import Path
+
+# Characters that are illegal in filenames on common filesystems.
+_ILLEGAL_FILENAME_CHARS = re.compile(r'[\\/*?:"<>|]')
+
+
+def build_output_path(
+    title: str,
+    item_id: str,
+    suffix: str,
+    output_dir: str,
+    default_title: str,
+) -> str:
+    """
+    Build a sanitized "<title> - <id> - <suffix>" path under output_dir.
+
+    Strips filename-illegal characters from the title, falls back to
+    default_title when the result is empty, truncates the title to 60
+    characters, and ensures output_dir exists. Shared by the PDF and
+    transcript writers so the filename convention lives in one place.
+
+    Args:
+        title: Article/transcript title (already defaulted by the caller).
+        item_id: Record id used in the filename.
+        suffix: Trailing part of the filename, e.g. "text.pdf" or "transcript.txt".
+        output_dir: Directory the file is written to (created if missing).
+        default_title: Title used when sanitizing leaves an empty string.
+
+    Returns:
+        The full output path.
+    """
+    sanitized = _ILLEGAL_FILENAME_CHARS.sub("", title)
+    if not sanitized:
+        sanitized = default_title
+    filename = f"{sanitized[:60]} - {item_id} - {suffix}"
+    os.makedirs(output_dir, exist_ok=True)
+    return os.path.join(output_dir, filename)
 
 
 def find_project_root() -> Path:

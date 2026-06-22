@@ -9,13 +9,14 @@ This module creates visually appealing, well-structured PDFs with:
 - Clean layout and accessibility features
 """
 
-import os
 import re
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
 from reportlab.lib.colors import gray, darkblue
+
+from rosen_scraper.path_utils import build_output_path
 
 class EnhancedPDFFormatter:
     """Enhanced PDF formatter with proper text structure and styling."""
@@ -124,13 +125,9 @@ class EnhancedPDFFormatter:
         item_id = article_data.get('id', 'NO-ID')
         doc_format = article_data.get('format', 'text')
 
-        sanitized_title = re.sub(r'[\\/*?:"<>|]', "", title)
-        if not sanitized_title:
-            sanitized_title = "Untitled Article"
-
-        pdf_filename = f"{sanitized_title[:60]} - {item_id} - {doc_format}.pdf"
-        os.makedirs(output_dir, exist_ok=True)
-        pdf_filepath = os.path.join(output_dir, pdf_filename)
+        pdf_filepath = build_output_path(
+            title, item_id, f"{doc_format}.pdf", output_dir, "Untitled Article"
+        )
 
         try:
             # Create document
@@ -352,17 +349,4 @@ class EnhancedPDFFormatter:
         text = re.sub(r'\*([^\*]+)\*', r'<i>\1</i>', text)      # *italic*
         text = re.sub(r'_([^_]+)_', r'<i>\1</i>', text)         # _italic_
 
-        # Handle quotes
-        text = text.replace('"', '"').replace('"', '"')
-        text = text.replace(''', "'").replace(''', "'")
-
         return text
-
-# Convenience function to maintain compatibility
-def create_article_pdf(article_data, output_dir="processed_pdf_library"):
-    """
-    Create an enhanced PDF using the new formatter.
-    Maintains compatibility with existing code.
-    """
-    formatter = EnhancedPDFFormatter()
-    return formatter.create_formatted_pdf(article_data, output_dir)
