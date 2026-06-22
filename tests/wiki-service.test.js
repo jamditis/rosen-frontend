@@ -135,13 +135,15 @@ describe('wiki service helpers', () => {
 
 describe('wiki route helpers', () => {
   it('parses index and nested wiki hashes', () => {
-    assert.deepEqual(parseWikiHash('#wiki'), { route: 'wiki', slug: null });
-    assert.deepEqual(parseWikiHash('#wiki/concept/public-journalism'), { route: 'wiki', slug: 'concept/public-journalism' });
+    assert.deepEqual(parseWikiHash('#wiki'), { route: 'wiki', slug: null, notFound: false });
+    assert.deepEqual(parseWikiHash('#wiki/concept/public-journalism'), { route: 'wiki', slug: 'concept/public-journalism', notFound: false });
   });
 
-  it('rejects unknown prefixes and malformed slugs', () => {
-    assert.deepEqual(parseWikiHash('#archive'), { route: null, slug: null });
-    assert.deepEqual(parseWikiHash('#wiki/concept/Bad'), { route: 'wiki', slug: null });
+  it('rejects unknown prefixes and flags malformed slugs as not-found', () => {
+    assert.deepEqual(parseWikiHash('#archive'), { route: null, slug: null, notFound: false });
+    // A malformed slug stays on the wiki route but signals not-found, so the page
+    // renders a not-found state instead of silently falling back to the index.
+    assert.deepEqual(parseWikiHash('#wiki/concept/Bad'), { route: 'wiki', slug: null, notFound: true });
   });
 
   it('builds only safe wiki page hrefs', () => {

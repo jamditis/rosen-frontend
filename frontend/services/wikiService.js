@@ -40,14 +40,15 @@ export function wikiPageHref(slug) {
 
 export function parseWikiHash(hash) {
   const cleanHash = asString(hash).replace(/^#/, '').split('?')[0];
-  if (cleanHash === WIKI_ROUTE_PREFIX) return { route: WIKI_ROUTE_PREFIX, slug: null };
-  if (!cleanHash.startsWith(`${WIKI_ROUTE_PREFIX}/`)) return { route: null, slug: null };
+  if (cleanHash === WIKI_ROUTE_PREFIX) return { route: WIKI_ROUTE_PREFIX, slug: null, notFound: false };
+  if (!cleanHash.startsWith(`${WIKI_ROUTE_PREFIX}/`)) return { route: null, slug: null, notFound: false };
 
+  // A slug under #wiki/ that fails validation is a malformed deep link, not the
+  // index. Flag it so the page renders a not-found state rather than silently
+  // falling back to the index (spec phase 1: a malformed slug renders not-found).
   const slug = cleanHash.slice(WIKI_ROUTE_PREFIX.length + 1);
-  return {
-    route: WIKI_ROUTE_PREFIX,
-    slug: isValidWikiSlug(slug) ? slug : null
-  };
+  if (isValidWikiSlug(slug)) return { route: WIKI_ROUTE_PREFIX, slug, notFound: false };
+  return { route: WIKI_ROUTE_PREFIX, slug: null, notFound: true };
 }
 
 export function isSafeReferenceUrl(url) {

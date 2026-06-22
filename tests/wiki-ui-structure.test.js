@@ -21,11 +21,16 @@ describe('wiki UI wiring', () => {
     assert.match(toolsSrc, /id:\s*'wiki'/);
     assert.match(toolsSrc, /action:\s*'wiki'/);
     assert.match(appSrc, /action\s*===\s*'wiki'[\s\S]*navigateTo\(ROUTES\.wiki\)/);
+    // The archive group must be rendered, not just declared, or the modal's
+    // discovery path to the wiki is dead.
+    assert.match(toolsSrc, /TOOLS\.archive\.map/);
   });
 
-  it('renders an explicit missing-page state for unknown wiki slugs', () => {
+  it('renders an explicit missing-page state for unknown and malformed wiki slugs', () => {
     assert.match(wikiSrc, /Wiki page not found/);
     assert.match(wikiSrc, /activeSlug[\s\S]*selectedPage/);
+    // A malformed deep link must reach the not-found state, not the index.
+    assert.match(wikiSrc, /activeSlug\s*\|\|\s*notFound/);
   });
 
   it('does not link the public app to repo-only markdown files', () => {

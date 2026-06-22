@@ -112,10 +112,13 @@ const WikiPage = ({ initialSlug = null }) => {
   const [query, setQuery] = useState('');
   const [kind, setKind] = useState('all');
   const [activeSlug, setActiveSlug] = useState(initialSlug);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     const syncSlug = () => {
-      setActiveSlug(parseWikiHash(window.location.hash).slug);
+      const parsed = parseWikiHash(window.location.hash);
+      setActiveSlug(parsed.slug);
+      setNotFound(parsed.notFound);
     };
     syncSlug();
     window.addEventListener('hashchange', syncSlug);
@@ -140,11 +143,11 @@ const WikiPage = ({ initialSlug = null }) => {
   if (loading) return html`<div className="py-20 text-center text-stone-500">Loading wiki...</div>`;
   if (error) return html`<div className="py-20 text-center text-red-600">${error}</div>`;
   if (selectedPage) return html`<${WikiDetail} page=${selectedPage} pages=${pages} onBack=${() => { window.location.hash = 'wiki'; }} />`;
-  if (activeSlug) return html`
+  if (activeSlug || notFound) return html`
     <div className="max-w-3xl mx-auto w-full text-center py-20 border border-dashed border-stone-300 rounded-sm bg-white">
       <${AlertCircle} className="w-10 h-10 mx-auto text-amber-500 mb-4" />
       <h1 className="font-display text-3xl text-stone-900 mb-3">Wiki page not found</h1>
-      <p className="text-sm text-stone-600 mb-6">No wiki page exists for ${activeSlug}. The scaffold only renders published seed pages.</p>
+      <p className="text-sm text-stone-600 mb-6">${activeSlug ? `No wiki page exists for ${activeSlug}.` : 'That wiki link is not valid.'} The scaffold only renders published seed pages.</p>
       <button onClick=${() => { window.location.hash = 'wiki'; }} className="px-4 py-2 bg-stone-900 text-white rounded-sm text-sm font-bold hover:bg-stone-700">Back to wiki index</button>
     </div>
   `;
