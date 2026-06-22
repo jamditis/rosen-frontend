@@ -9,7 +9,9 @@
       "kind": "concept",
       "title": "Public journalism",
       "summary": "A journalism reform movement associated with Jay Rosen that argues journalists should help public life work, not only observe it from a distance.",
-      "aliases": ["Civic journalism"],
+      "aliases": [
+        "Civic journalism"
+      ],
       "body": [
         {
           "heading": "Why it matters here",
@@ -20,8 +22,13 @@
           "text": "Wiki prose should summarize what archive records and reliable sources say. It should not settle scholarly disputes, publish new interpretations, or turn community notes into unsourced claims."
         }
       ],
-      "relatedConcepts": ["concept/press-public-relationship", "concept/audience-relationship"],
-      "relatedEntities": ["entity/jay-rosen"],
+      "relatedConcepts": [
+        "concept/press-public-relationship",
+        "concept/audience-relationship"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
       "relatedRecords": [],
       "references": [
         {
@@ -29,7 +36,9 @@
           "url": "https://github.com/jamditis/rosen-frontend/issues/499"
         }
       ],
-      "contributors": ["archive maintainers"],
+      "contributors": [
+        "archive maintainers"
+      ],
       "lastUpdated": "2026-06-21",
       "revisionCount": 1,
       "moderationState": "seed"
@@ -40,14 +49,21 @@
       "kind": "entity",
       "title": "Jay Rosen",
       "summary": "Jay Rosen is the central subject of the archive: a journalism professor, critic, author, and public thinker whose work spans press criticism, public journalism, blogging, social media, and the press-public relationship.",
-      "aliases": ["Jay Rosen", "Jay", "Pressthink"],
+      "aliases": [
+        "Jay Rosen",
+        "Jay",
+        "Pressthink"
+      ],
       "body": [
         {
           "heading": "Role in the archive",
           "text": "Entity pages should help readers move from a name to the records, concepts, publications, and debates connected to that name. For the launch scaffold, this page demonstrates entity structure without enabling public edits yet."
         }
       ],
-      "relatedConcepts": ["concept/public-journalism", "concept/press-public-relationship"],
+      "relatedConcepts": [
+        "concept/public-journalism",
+        "concept/press-public-relationship"
+      ],
       "relatedEntities": [],
       "relatedRecords": [],
       "references": [
@@ -56,7 +72,9 @@
           "url": "https://pressthink.org/j/rosen-archive/"
         }
       ],
-      "contributors": ["archive maintainers"],
+      "contributors": [
+        "archive maintainers"
+      ],
       "lastUpdated": "2026-06-21",
       "revisionCount": 1,
       "moderationState": "seed"
@@ -67,19 +85,61 @@
       "kind": "concept",
       "title": "Press-public relationship",
       "summary": "A recurring frame for understanding how journalism imagines, addresses, serves, ignores, or learns from the public.",
-      "aliases": ["Press-public", "Public life"],
+      "aliases": [
+        "Press-public",
+        "Public life"
+      ],
       "body": [
         {
           "heading": "Use as a bridge page",
           "text": "This page should become a bridge between dissertation material, archive records, and entity pages. It is also a good candidate for stricter sourcing rules because it is interpretive and central to the collection."
         }
       ],
-      "relatedConcepts": ["concept/public-journalism", "concept/audience-relationship"],
-      "relatedEntities": ["entity/jay-rosen"],
+      "relatedConcepts": [
+        "concept/public-journalism",
+        "concept/audience-relationship"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
       "relatedRecords": [],
       "references": [],
-      "contributors": ["archive maintainers"],
+      "contributors": [
+        "archive maintainers"
+      ],
       "lastUpdated": "2026-06-21",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-audience-relationship",
+      "slug": "concept/audience-relationship",
+      "kind": "concept",
+      "title": "Audience relationship",
+      "summary": "A recurring question in the archive about how journalism understands the people it addresses, serves, ignores, measures, or invites into public work.",
+      "aliases": [
+        "Audience",
+        "People formerly known as the audience"
+      ],
+      "body": [
+        {
+          "heading": "Why this page exists",
+          "text": "This concept page gives the wiki a place to connect archive records about audiences, publics, participation, blogging, and social media without flattening those ideas into a single tag. Future record links should be curated from source records rather than inferred from keyword matches alone."
+        }
+      ],
+      "relatedConcepts": [
+        "concept/public-journalism",
+        "concept/press-public-relationship"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-22",
       "revisionCount": 1,
       "moderationState": "seed"
     }

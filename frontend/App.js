@@ -131,18 +131,20 @@ const App = () => {
       navigateTo(ROUTES.dissertation);
     } else if (action === 'entities') {
       navigateTo(ROUTES.entities);
+    } else if (action === 'wiki') {
+      navigateTo(ROUTES.wiki);
     }
   }, []);
 
   // Load Data
-  // Gate the ~13MB core fetch so a cold deep-link straight into #analytics
-  // doesn't fetch and parse data that route never renders (it draws from the
-  // prebuilt aggregates instead). The ref makes this fire once; depending on
-  // currentRoute means navigating away from analytics back-fills the data.
+  // Gate the ~13MB core fetch so cold deep-links into non-record routes do
+  // not fetch and parse archive data those routes never render. The ref makes
+  // this fire once; depending on currentRoute means navigating back to a
+  // record-backed route back-fills the data.
   const coreFetchStarted = useRef(false);
   useEffect(() => {
     if (coreFetchStarted.current) return;
-    if (currentRoute === ROUTES.analytics) return;
+    if (currentRoute === ROUTES.analytics || currentRoute === ROUTES.wiki) return;
     coreFetchStarted.current = true;
     fetchCoreData()
       .then((data) => {

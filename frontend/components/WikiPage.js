@@ -1,17 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { html } from '../html.js?v=3.4.5';
-import { BookOpen, GitBranch, History, Lock, Search, ShieldAlert, Sparkles, Users } from 'lucide-react';
-import { fetchWikiData, filterWikiPages, findWikiPageBySlug, normalizeWikiPages } from '../services/wikiService.js?v=3.4.5';
+import { AlertCircle, BookOpen, GitBranch, History, Lock, Search, ShieldAlert, Sparkles, Users } from 'lucide-react';
+import { buildWikiPageIndex, fetchWikiData, filterWikiPages, findWikiPageBySlug, normalizeWikiPages, parseWikiHash, wikiPageHref } from '../services/wikiService.js?v=3.4.5';
 
 const KIND_LABELS = {
   concept: 'Concepts',
   entity: 'Entities',
   topic: 'Topics and tags'
 };
-
-function pageHref(slug) {
-  return `#wiki/${slug}`;
-}
 
 const StatusCard = ({ icon: Icon, title, children }) => html`
   <div className="bg-white border border-stone-200 rounded-sm p-5 shadow-sm">
@@ -36,7 +32,7 @@ const RelatedList = ({ title, slugs, pages }) => {
         ${slugs.map(slug => {
           const page = findWikiPageBySlug(pages, slug);
           return html`
-            <a key=${slug} href=${pageHref(slug)} className="px-3 py-1.5 rounded-full border border-stone-200 bg-stone-50 text-xs font-bold text-stone-700 hover:border-stone-400 hover:bg-white transition-colors">
+            <a key=${slug} href=${wikiPageHref(slug)} className="px-3 py-1.5 rounded-full border border-stone-200 bg-stone-50 text-xs font-bold text-stone-700 hover:border-stone-400 hover:bg-white transition-colors">
               ${page?.title || slug}
             </a>
           `;
@@ -78,7 +74,7 @@ const WikiDetail = ({ page, pages, onBack }) => html`
               <ul className="space-y-2">
                 ${page.references.map(ref => html`
                   <li key=${ref.url} className="text-sm">
-                    <a href=${ref.url} target="_blank" rel="noreferrer" className="text-stone-900 font-bold underline decoration-stone-300 underline-offset-4 hover:decoration-stone-700">${ref.label}</a>
+                    <a href=${ref.url} target="_blank" rel="noopener noreferrer" className="text-stone-900 font-bold underline decoration-stone-300 underline-offset-4 hover:decoration-stone-700">${ref.label}</a>
                   </li>
                 `)}
               </ul>
@@ -95,14 +91,14 @@ const WikiDetail = ({ page, pages, onBack }) => html`
               <div><dt className="font-bold text-stone-900">Contributors</dt><dd>${page.contributors.join(', ')}</dd></div>
             </dl>
           </div>
-          ${page.aliases.length && html`
+          ${page.aliases.length > 0 ? html`
             <div className="border border-stone-200 bg-white rounded-sm p-4">
               <h2 className="font-display text-lg text-stone-900 mb-3">Aliases</h2>
               <div className="flex flex-wrap gap-2">
                 ${page.aliases.map(alias => html`<span key=${alias} className="text-xs px-2 py-1 bg-stone-100 text-stone-700 rounded-sm">${alias}</span>`)}
               </div>
             </div>
-          `}
+          ` : null}
         </aside>
       </div>
     </div>
@@ -119,8 +115,7 @@ const WikiPage = ({ initialSlug = null }) => {
 
   useEffect(() => {
     const syncSlug = () => {
-      const hash = window.location.hash.replace(/^#/, '');
-      setActiveSlug(hash.startsWith('wiki/') ? hash.replace(/^wiki\/?/, '') : null);
+      setActiveSlug(parseWikiHash(window.location.hash).slug);
     };
     syncSlug();
     window.addEventListener('hashchange', syncSlug);
@@ -138,12 +133,21 @@ const WikiPage = ({ initialSlug = null }) => {
   }, []);
 
   const visiblePages = useMemo(() => filterWikiPages(pages, { query, kind }), [pages, query, kind]);
-  const selectedPage = activeSlug ? findWikiPageBySlug(pages, activeSlug) : null;
+  const pageIndex = useMemo(() => buildWikiPageIndex(pages), [pages]);
+  const selectedPage = activeSlug ? (pageIndex.get(activeSlug) || null) : null;
   const counts = useMemo(() => pages.reduce((acc, page) => ({ ...acc, [page.kind]: (acc[page.kind] || 0) + 1 }), {}), [pages]);
 
   if (loading) return html`<div className="py-20 text-center text-stone-500">Loading wiki...</div>`;
   if (error) return html`<div className="py-20 text-center text-red-600">${error}</div>`;
   if (selectedPage) return html`<${WikiDetail} page=${selectedPage} pages=${pages} onBack=${() => { window.location.hash = 'wiki'; }} />`;
+  if (activeSlug) return html`
+    <div className="max-w-3xl mx-auto w-full text-center py-20 border border-dashed border-stone-300 rounded-sm bg-white">
+      <${AlertCircle} className="w-10 h-10 mx-auto text-amber-500 mb-4" />
+      <h1 className="font-display text-3xl text-stone-900 mb-3">Wiki page not found</h1>
+      <p className="text-sm text-stone-600 mb-6">No wiki page exists for ${activeSlug}. The scaffold only renders published seed pages.</p>
+      <button onClick=${() => { window.location.hash = 'wiki'; }} className="px-4 py-2 bg-stone-900 text-white rounded-sm text-sm font-bold hover:bg-stone-700">Back to wiki index</button>
+    </div>
+  `;
 
   return html`
     <div className="max-w-6xl mx-auto w-full space-y-8">
@@ -158,9 +162,9 @@ const WikiPage = ({ initialSlug = null }) => {
               A public knowledge layer for concepts, entities, topics, and record context. This first pass is read-only and source-backed so the product shape can be reviewed before editing, moderation, and revision storage are connected.
             </p>
           </div>
-          <a href="./docs/plans/2026-06-21-community-wiki-spec.md" className="inline-flex items-center justify-center px-4 py-2 border border-stone-300 rounded-sm text-sm font-bold text-stone-700 hover:bg-stone-50">
-            Read the spec
-          </a>
+          <div className="border border-stone-200 bg-stone-50 rounded-sm px-4 py-3 text-xs text-stone-600 max-w-sm">
+            The implementation spec lives in the repo at docs/plans/2026-06-21-community-wiki-spec.md so it can be reviewed with the code.
+          </div>
         </div>
       </section>
 
@@ -189,7 +193,7 @@ const WikiPage = ({ initialSlug = null }) => {
 
       <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         ${visiblePages.map(page => html`
-          <a key=${page.id} href=${pageHref(page.slug)} className="group bg-white border border-stone-200 rounded-sm p-5 shadow-sm hover:border-stone-400 hover:shadow-md transition-all">
+          <a key=${page.id} href=${wikiPageHref(page.slug)} className="group bg-white border border-stone-200 rounded-sm p-5 shadow-sm hover:border-stone-400 hover:shadow-md transition-all">
             <div className="flex items-center justify-between mb-3">
               <span className="text-[10px] uppercase tracking-wider font-bold text-stone-500">${page.kind}</span>
               <${Lock} className="w-3.5 h-3.5 text-stone-300" />

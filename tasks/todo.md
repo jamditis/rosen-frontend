@@ -1,13 +1,14 @@
-# Wiki scaffold plan
+# Wiki scaffold hardening plan
 
-- [x] Read issue 499 and confirm it is not marked do-not-automate.
-- [x] Research wiki product patterns: source-backed content, structured statements, revision history, page protection, rollback, and moderation queues.
-- [x] Add read-only wiki route scaffold that works in the zero-build frontend.
-- [x] Add seed wiki data and a small service layer that can later be swapped for a write API.
-- [x] Add tests for route registration, wiki seed data shape, and wiki search helpers.
-- [x] Write the roadmap/spec so the next pass can add authenticated editing without rethinking the model.
-- [x] Run targeted and broader checks, review the diff, commit, and open a pull request.
+- [x] Preserve the read-only wiki scaffold instead of enabling editing before moderation exists.
+- [x] Add a stricter wiki data contract: accepted page kinds, moderation states, slug format, safe reference URLs, and no dangling related page links.
+- [x] Refactor wiki helpers so routing, link generation, page normalization, indexing, and validation are testable outside React.
+- [x] Harden the public wiki UI: remove deployment-fragile docs links, add unknown-page handling, use safer external-link attributes, and keep source labels explicit.
+- [x] Expand the spec with architecture, acceptance criteria, threat model, storage options, rollout gates, review checklist, and verification strategy.
+- [x] Capture the lesson from the requested rework.
+- [x] Run adversarial review, targeted tests, frontend tests, full tests, and available static checks.
+- [x] Commit the hardening pass and update the pull request record.
 
 ## Review notes
 
-Verification passed for targeted wiki/route tests, frontend tests, and the full node test suite. Browser screenshot verification was blocked because the Playwright browser download returned 403 from the CDN.
+Second pass addressed adversarial findings: dangling related links, missing-slug handling, unsafe reference URLs, wiki cold-load archive fetches, route-param round trips, mobile navigation, and numeric HTM guards. Targeted tests, frontend tests, full tests, and git diff whitespace checks passed. Browser screenshot verification remains blocked because the Playwright CDN returns 403 for Chromium downloads.

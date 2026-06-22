@@ -1,4 +1,4 @@
-// ToolsModal.js - Modal with icons for exploring dissertation tools
+// ToolsModal.js - Modal with icons for exploring archive tools
 import { useEffect, useRef, useCallback } from 'react';
 import { html } from '../html.js?v=3.4.5';
 import { X, Map, BookOpen, HelpCircle, BarChart3, BookMarked } from 'lucide-react';
@@ -6,6 +6,16 @@ import { resolveSitePath } from '../utils/pathResolver.js?v=3.4.5';
 
 // Tool definitions with categories
 const TOOLS = {
+  archive: [
+    {
+      id: 'wiki',
+      name: 'Archive wiki',
+      description: 'Concept and entity pages',
+      icon: BookOpen,
+      action: 'wiki',
+      status: 'ready'
+    }
+  ],
   dissertation: [
     {
       id: 'mindmap',

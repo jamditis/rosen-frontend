@@ -45,6 +45,7 @@ describe('parseViewState', () => {
   it('parses a bare URL to the default route and empty filters', () => {
     const vs = parseViewState(BASE);
     assert.strictEqual(vs.route, DEFAULT_ROUTE);
+    assert.deepStrictEqual(vs.routeParams, {});
     assert.deepStrictEqual(vs.filters, defaultFilters());
     assert.strictEqual(vs.selectedRecord, null);
   });
@@ -58,6 +59,7 @@ describe('parseViewState', () => {
   it('parses nested wiki hashes as the wiki route', () => {
     const state = parseViewState('https://example.com/archive/#wiki/concept/public-journalism');
     assert.equal(state.route, ROUTES.wiki);
+    assert.deepEqual(state.routeParams, { wikiSlug: 'concept/public-journalism' });
   });
 
   it('falls back to the default route for an unknown hash', () => {
@@ -109,6 +111,13 @@ describe('viewStateToUrl', () => {
     assert.strictEqual(viewStateToUrl({ route: DEFAULT_ROUTE }, BASE).includes('#'), false);
   });
 
+  it('emits a nested wiki slug when route params include one', () => {
+    assert.strictEqual(
+      viewStateToUrl({ route: ROUTES.wiki, routeParams: { wikiSlug: 'concept/public-journalism' } }, BASE),
+      `${BASE}#wiki/concept/public-journalism`
+    );
+  });
+
   it('omits default and empty filter fields', () => {
     const url = viewStateToUrl({ filters: { ...defaultFilters(), search: 'press' } }, BASE);
     assert.strictEqual(url, `${BASE}?q=press`);
@@ -144,11 +153,13 @@ describe('round-trip', () => {
   const cases = {
     'empty state': {
       route: DEFAULT_ROUTE,
+      routeParams: {},
       filters: defaultFilters(),
       selectedRecord: null,
     },
     'fully populated state': {
       route: ROUTES.entities,
+      routeParams: {},
       filters: {
         search: 'audience atomization',
         categories: ['Criticism', 'Media theory'],
@@ -162,11 +173,19 @@ describe('round-trip', () => {
     },
     'route only': {
       route: ROUTES.dissertation,
+      routeParams: {},
+      filters: defaultFilters(),
+      selectedRecord: null,
+    },
+    'wiki detail route': {
+      route: ROUTES.wiki,
+      routeParams: { wikiSlug: 'concept/public-journalism' },
       filters: defaultFilters(),
       selectedRecord: null,
     },
     'category name containing a comma': {
       route: DEFAULT_ROUTE,
+      routeParams: {},
       filters: { ...defaultFilters(), categories: ['Reviews, essays'] },
       selectedRecord: null,
     },
