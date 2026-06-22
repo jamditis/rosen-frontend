@@ -60,12 +60,19 @@ export function isSafeReferenceUrl(url) {
 
 export async function fetchWikiData() {
   if (!wikiDataPromise) {
-    wikiDataPromise = fetch(WIKI_DATA_URL).then(response => {
+    const pending = fetch(WIKI_DATA_URL).then(response => {
       if (!response.ok) {
         throw new Error(`Failed to load wiki seed data: ${response.status}`);
       }
       return response.json();
     });
+    // Drop a failed load so a later visit retries instead of reusing the
+    // rejected promise for the rest of the session. The identity guard avoids
+    // clearing a newer promise a concurrent caller may have set.
+    pending.catch(() => {
+      if (wikiDataPromise === pending) wikiDataPromise = null;
+    });
+    wikiDataPromise = pending;
   }
   return wikiDataPromise;
 }

@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
   buildWikiPageIndex,
+  fetchWikiData,
   filterWikiPages,
   findWikiPageBySlug,
   isSafeReferenceUrl,
@@ -146,5 +147,29 @@ describe('wiki route helpers', () => {
   it('builds only safe wiki page hrefs', () => {
     assert.equal(wikiPageHref('concept/public-journalism'), '#wiki/concept/public-journalism');
     assert.equal(wikiPageHref('javascript:alert-1'), '#wiki');
+  });
+});
+
+describe('fetchWikiData caching', () => {
+  it('clears the cached promise after a failed load so a later visit retries', async () => {
+    const originalFetch = global.fetch;
+    let calls = 0;
+    global.fetch = async () => {
+      calls += 1;
+      if (calls === 1) {
+        throw new Error('network down');
+      }
+      return { ok: true, json: async () => ({ pages: [] }) };
+    };
+    try {
+      await assert.rejects(fetchWikiData(), /network down/);
+      // The second call must hit the network again rather than reuse the
+      // rejected promise; if the cache were poisoned, calls would stay at 1.
+      const data = await fetchWikiData();
+      assert.deepEqual(data, { pages: [] });
+      assert.equal(calls, 2);
+    } finally {
+      global.fetch = originalFetch;
+    }
   });
 });
