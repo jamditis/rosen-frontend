@@ -11,8 +11,6 @@ console.log('🔍 Validating DissertationPage Component...\n');
 // Check required files exist
 const requiredFiles = [
   'frontend/components/DissertationPage.js',
-  'frontend/components/shared/Button.js',
-  'frontend/components/shared/Modal.js',
   'frontend/components/MindMap.js',
   'frontend/components/DetailPanel.js',
   'frontend/components/dissertationData.js',
@@ -41,11 +39,6 @@ const content = fs.readFileSync(dissertationPagePath, 'utf-8');
 // Validation checks
 const checks = [
   {
-    name: 'Imports Button component',
-    test: content.includes("import Button from './shared/Button.js"),
-    critical: true
-  },
-  {
     name: 'Uses design system tokens',
     test: content.includes('var(--color-') && content.includes('var(--space-'),
     critical: true
@@ -69,11 +62,6 @@ const checks = [
     name: 'Has keyboard shortcuts',
     test: content.includes('handleKeyDown') && content.includes('Cmd/Ctrl'),
     critical: false
-  },
-  {
-    name: 'Uses shared Button component',
-    test: content.includes('<${Button}') || content.includes('<Button'),
-    critical: true
   },
   {
     name: 'Integrates with MindMap',

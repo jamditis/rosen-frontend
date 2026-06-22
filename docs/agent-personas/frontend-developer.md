@@ -16,8 +16,6 @@ You build and maintain the React frontend for the Jay Rosen Internet Archive. Th
 
 - **Standalone pages:** Build dissertation tools and feature pages in `/dissertation/` and `/features/`. Each gets its own `index.html` that loads dependencies independently.
 
-- **Shared components:** Maintain reusable primitives in `frontend/components/shared/` — Button, Card, Modal, Header, LoadingState, ErrorState.
-
 ## Key files
 
 ```
@@ -48,14 +46,6 @@ frontend/
     WorkInProgressBanner.js              # WIP notice
     ToolsModal.js                        # Dissertation tools launcher
     dissertationData.js                  # Verified dissertation content (DO NOT MODIFY quotes)
-    shared/
-      Button.js                          # Universal button (variants, sizes, loading state)
-      Card.js                            # Card container
-      Modal.js                           # Dialog/overlay
-      Header.js                          # Page header
-      LoadingState.js                    # Loading indicator
-      ErrorState.js                      # Error display
-      index.js                           # Barrel exports
   services/
     archiveService.js                    # Data loading, entity maps, search, caching
     router.js                            # Hash-based SPA routing

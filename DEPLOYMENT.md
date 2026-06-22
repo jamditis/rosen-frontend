@@ -21,7 +21,6 @@ frontend/                           # React application
   constants.js                      # Data URLs, colors, entity types
   sw.js                             # Service worker
   components/                       # All component files
-  components/shared/                # Reusable UI primitives
   services/                         # archiveService, router, sqliteService
   utils/                            # Design tokens
   vendor/                           # Self-hosted sql.js wasm (sql-wasm-1.10.3.wasm)
