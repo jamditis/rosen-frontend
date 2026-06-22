@@ -2,7 +2,7 @@
 type: concept
 title: Launch status
 description: Pre-launch state as of 2026-06-22 — naming and feature audit done, handoff sent, with the SFTP credential gap as the one live blocker to automated deploys.
-source: [GitHub issues #445/#460/#458/#484/#509, 2026-06-19 call, docs/decisions-pending.md]
+source: ["GitHub issues #445/#460/#458/#484/#509", "2026-06-19 call", "docs/decisions-pending.md"]
 verified: 2026-06-22
 tags: [launch, status, blocker]
 timestamp: 2026-06-22

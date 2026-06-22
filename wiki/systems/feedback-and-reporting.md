@@ -2,7 +2,7 @@
 type: system
 title: Feedback and reporting
 description: The live feedback path is an on-site "Report a bug" button that opens a prefilled GitHub issue; a branded in-archive form that hides GitHub is the planned replacement (#509).
-source: [GitHub #450/#451/#509, frontend/utils/bugReport.js, 2026-06-22 decision]
+source: ["GitHub #450/#451/#509", "frontend/utils/bugReport.js", "2026-06-22 decision"]
 verified: 2026-06-22
 tags: [feedback, report, intake, launch]
 timestamp: 2026-06-22

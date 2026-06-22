@@ -2,7 +2,7 @@
 type: system
 title: Deploy and hosting
 description: The archive is served from a legacy NYU Media Temple/Plesk box behind Cloudflare DNS on a GoDaddy domain; automated deploy exists but lacks SFTP credentials, so uploads are manual.
-source: [GitHub #458/#459/#367, 2026-06-19 call, DEPLOYMENT.md, deploy.yml]
+source: ["GitHub #458/#459/#367", "2026-06-19 call", "DEPLOYMENT.md", "deploy.yml"]
 verified: 2026-06-22
 tags: [deploy, hosting, sftp, blocker, cloudflare]
 timestamp: 2026-06-22

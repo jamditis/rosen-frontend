@@ -2,7 +2,7 @@
 type: concept
 title: Key dates
 description: The milestones that bear on launch — dissertation release, the test-audience greenlight, the Jay call, and the pre-launch handoff.
-source: [CLAUDE.md, GitHub #445, 2026-06-19 call, sent email 2026-06-22]
+source: ["CLAUDE.md", "GitHub #445", "2026-06-19 call", "sent email 2026-06-22"]
 verified: 2026-06-22
 tags: [timeline, dates, launch]
 timestamp: 2026-06-22

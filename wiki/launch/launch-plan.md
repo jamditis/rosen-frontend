@@ -2,7 +2,7 @@
 type: concept
 title: Launch plan
 description: A short, bounded test-audience release then iterate live, greenlit by Marla on 2026-06-17; readiness is gated by issue #445 and a small cluster of launch issues under umbrella #460.
-source: [GitHub #445/#460 cluster, 2026-06-17 forwarded thread, 2026-06-19 call]
+source: ["GitHub #445/#460 cluster", "2026-06-17 forwarded thread", "2026-06-19 call"]
 verified: 2026-06-22
 tags: [launch, plan, readiness]
 timestamp: 2026-06-22
