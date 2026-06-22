@@ -8,7 +8,8 @@ Captures parent post information for replies to enable threading.
 import re
 import requests
 from typing import Dict, Optional
-from datetime import datetime
+
+from rosen_scraper.processors import base
 
 
 class BlueskyProcessor:
@@ -178,11 +179,7 @@ class BlueskyProcessor:
             # Parse date
             pub_date = None
             if created_at:
-                try:
-                    dt = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
-                    pub_date = dt.strftime('%Y-%m-%d')
-                except Exception:
-                    pub_date = created_at[:10] if len(created_at) >= 10 else None
+                pub_date = base.iso_to_ymd(created_at)
 
             # Determine if this is a reply and get parent info
             is_reply = False
@@ -285,11 +282,7 @@ class BlueskyProcessor:
         parent_date = None
         created_at = parent_record.get('createdAt', '')
         if created_at:
-            try:
-                dt = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
-                parent_date = dt.strftime('%Y-%m-%d')
-            except Exception:
-                parent_date = created_at[:10] if len(created_at) >= 10 else None
+            parent_date = base.iso_to_ymd(created_at)
 
         return {
             'available': True,

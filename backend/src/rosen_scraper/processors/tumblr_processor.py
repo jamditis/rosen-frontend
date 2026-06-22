@@ -19,11 +19,12 @@ This processor handles all post types:
 
 import re
 import json
-import html
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, List, Optional
 from bs4 import BeautifulSoup
+
+from rosen_scraper.processors import base
 
 
 class TumblrProcessor:
@@ -404,15 +405,15 @@ class TumblrProcessor:
             datetime_attr = time_tag.get('datetime', '')
             if datetime_attr:
                 # Parse ISO format: 2014-08-20T21:24:05Z
-                iso_match = re.match(r'(\d{4})-(\d{2})-(\d{2})', datetime_attr)
-                if iso_match:
-                    pub_date = f"{iso_match.group(2)}/{iso_match.group(3)}/{iso_match.group(1)}"
+                iso_date = base.us_date_from_iso(datetime_attr, anchored=True)
+                if iso_date:
+                    pub_date = iso_date
 
         # Fallback: extract date from filename
         if not pub_date:
-            date_match = re.search(r'(\d{4})-(\d{2})-(\d{2})', filename)
-            if date_match:
-                pub_date = f"{date_match.group(2)}/{date_match.group(3)}/{date_match.group(1)}"
+            file_date = base.us_date_from_iso(filename, anchored=False)
+            if file_date:
+                pub_date = file_date
 
         # Extract title from h2 tag (common in tumblr-utils exports)
         title = ''
@@ -541,9 +542,9 @@ class TumblrProcessor:
             return dt.strftime('%m/%d/%Y')
 
         # Handle ISO format
-        iso_match = re.match(r'(\d{4})-(\d{2})-(\d{2})', str(date_str))
-        if iso_match:
-            return f"{iso_match.group(2)}/{iso_match.group(3)}/{iso_match.group(1)}"
+        iso_date = base.us_date_from_iso(date_str, anchored=True)
+        if iso_date:
+            return iso_date
 
         # Handle timestamp string
         try:
@@ -572,26 +573,7 @@ class TumblrProcessor:
 
     def _clean_html(self, html_content: str) -> str:
         """Strip HTML tags and clean text."""
-        if not html_content:
-            return ''
-
-        soup = BeautifulSoup(html_content, 'html.parser')
-
-        # Remove script and style elements
-        for element in soup(['script', 'style']):
-            element.decompose()
-
-        # Get text with newlines preserved for block elements
-        text = soup.get_text(separator='\n')
-
-        # Clean up whitespace
-        lines = [line.strip() for line in text.split('\n')]
-        text = '\n'.join(line for line in lines if line)
-
-        # Decode HTML entities
-        text = html.unescape(text)
-
-        return text.strip()
+        return base.clean_html(html_content)
 
     def _generate_excerpt(self, text: str, length: int = 300) -> str:
         """Generate excerpt from text."""
@@ -602,17 +584,12 @@ class TumblrProcessor:
         paragraphs = text.split('\n\n')
         excerpt = paragraphs[0] if paragraphs else text
 
-        if len(excerpt) > length:
-            excerpt = excerpt[:length].rsplit(' ', 1)[0] + '...'
-
-        return excerpt
+        return base.truncate_on_word_boundary(excerpt, length)
 
     def _truncate(self, text: str, length: int = 50) -> str:
         """Truncate text to specified length."""
         text = self._clean_html(text)
-        if len(text) > length:
-            return text[:length].rsplit(' ', 1)[0] + '...'
-        return text
+        return base.truncate_on_word_boundary(text, length)
 
 
 def main():

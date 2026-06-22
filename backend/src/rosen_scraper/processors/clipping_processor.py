@@ -22,6 +22,8 @@ from datetime import datetime
 from typing import Dict, List, Optional
 from dataclasses import dataclass
 
+from rosen_scraper.processors import base
+
 
 @dataclass
 class ClippingMetadata:
@@ -252,9 +254,9 @@ class ClippingProcessor:
         # Expected formats: "NYT_1998-03-15_headline.txt" or "1998-03-15_publication.txt"
         if filename:
             # Extract date from filename
-            date_match = re.search(r'(\d{4})-(\d{2})-(\d{2})', filename)
-            if date_match:
-                metadata.date = f"{date_match.group(2)}/{date_match.group(3)}/{date_match.group(1)}"
+            file_date = base.us_date_from_iso(filename, anchored=False)
+            if file_date:
+                metadata.date = file_date
                 confidence_factors.append(0.3)
 
             # Extract publication from filename prefix
@@ -338,9 +340,9 @@ class ClippingProcessor:
             return f"{date_match.group(1).zfill(2)}/{date_match.group(2).zfill(2)}/{date_match.group(3)}"
 
         # Pattern 3: 1998-03-15 (ISO)
-        iso_match = re.search(r'(\d{4})-(\d{2})-(\d{2})', text)
-        if iso_match:
-            return f"{iso_match.group(2)}/{iso_match.group(3)}/{iso_match.group(1)}"
+        iso_date = base.us_date_from_iso(text, anchored=False)
+        if iso_date:
+            return iso_date
 
         return ''
 
@@ -457,10 +459,7 @@ class ClippingProcessor:
         paragraphs = content.split('\n\n')
         excerpt = paragraphs[0] if paragraphs else content
 
-        if len(excerpt) > length:
-            excerpt = excerpt[:length].rsplit(' ', 1)[0] + '...'
-
-        return excerpt.strip()
+        return base.truncate_on_word_boundary(excerpt, length).strip()
 
     def _process_text_file(self, file_path: Path) -> Optional[Dict]:
         """Process a text file containing OCR output."""

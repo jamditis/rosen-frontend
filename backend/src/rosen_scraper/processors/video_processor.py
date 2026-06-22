@@ -8,6 +8,7 @@ downloading the entire video file.
 from typing import Optional, Dict, Any
 import yt_dlp
 from rosen_scraper import categorizer
+from rosen_scraper.processors import base
 import os
 import re
 import shutil
@@ -71,8 +72,7 @@ def process_video(url: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
                 ai_analysis = categorizer.summarize_and_classify(
                     video_data["raw_text"], schema
                 )
-                if ai_analysis:
-                    video_data.update(ai_analysis)
+                base.merge_ai_fields(video_data, ai_analysis, clobber=True)
             return video_data
     except Exception as e:
         print(f"  [Video Processor] Error processing video: {e}")
