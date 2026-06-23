@@ -1,30 +1,28 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-21",
+  "generatedAt": "2026-06-23",
   "status": "seed",
   "pages": [
     {
-      "id": "wiki-concept-public-journalism",
-      "slug": "concept/public-journalism",
+      "id": "wiki-concept-commerce-versus-public-duty",
+      "slug": "concept/commerce-versus-public-duty",
       "kind": "concept",
-      "title": "Public journalism",
-      "summary": "A journalism reform movement associated with Jay Rosen that argues journalists should help public life work, not only observe it from a distance.",
-      "aliases": [
-        "Civic journalism"
-      ],
+      "title": "The conflict between commerce and public duty is structural",
+      "summary": "Journalism operates as a business that claims a public function. Yellow journalism exposed this contradiction, and professionalization was an attempt to manage it, but the tension cannot be eliminated by professional standards alone.",
+      "aliases": [],
       "body": [
         {
-          "heading": "Why it matters here",
-          "text": "This concept is a key path into the archive because it connects Rosen's scholarship, teaching, and public criticism across decades. The wiki should use it as an example of a page that explains an idea while linking readers back to primary archive records."
+          "heading": "The idea",
+          "text": "Journalism is a business that claims a public mission, and Rosen argues the conflict between the two is structural, not incidental. Yellow journalism exposed the contradiction in the open; professional standards were an attempt to manage it. But the tension between private profit and public duty cannot be dissolved by professionalism alone, because it is built into the enterprise."
         },
         {
-          "heading": "Editorial stance",
-          "text": "Wiki prose should summarize what archive records and reliable sources say. It should not settle scholarly disputes, publish new interpretations, or turn community notes into unsourced claims."
+          "heading": "From The Impossible Press",
+          "text": "Yellow journalism put a sharper edge on the conflict between private profits and public duties. (Chapter 6, p. 240)"
         }
       ],
       "relatedConcepts": [
-        "concept/press-public-relationship",
-        "concept/audience-relationship"
+        "concept/the-professional-attitude",
+        "concept/the-press-structures-events"
       ],
       "relatedEntities": [
         "entity/jay-rosen"
@@ -32,14 +30,775 @@
       "relatedRecords": [],
       "references": [
         {
-          "label": "Issue 499: Community wiki for archive records, concepts and entities",
-          "url": "https://github.com/jamditis/rosen-frontend/issues/499"
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
         }
       ],
       "contributors": [
         "archive maintainers"
       ],
-      "lastUpdated": "2026-06-21",
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-communication-as-art",
+      "slug": "concept/communication-as-art",
+      "kind": "concept",
+      "title": "Communication is an art, not merely transmission",
+      "summary": "Effective public communication requires understanding audiences and contexts, not just sending out facts. Like seeds, ideas must be distributed so they can take root and grow, not scattered at random.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Communicating with a public is an art, not a transmission. Rosen, following Dewey, argues that effective communication depends on understanding audiences and contexts rather than simply broadcasting facts. Like seeds, ideas have to be planted where they can take root, not scattered at random in the hope that some will land."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "Seeds are sown not by being thrown out at random, but by being so distributed as to take root and have a chance of growth. (Chapter 8, p. 345)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/journalism-as-transaction",
+        "concept/the-public-is-formed-not-found"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-communication-is-not-community",
+      "slug": "concept/communication-is-not-community",
+      "kind": "concept",
+      "title": "Communication does not equal community",
+      "summary": "Linking people through media does not create the conditions for genuine public life.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Connecting people through media is not the same as building a community among them. Rosen warns against the assumption that more communication automatically produces shared public life. Channels that link strangers can leave them more isolated, not more bound together, because genuine community depends on shared experience and obligation that broadcasting alone does not supply."
+        },
+        {
+          "heading": "Why it endures",
+          "text": "The promise that a new network will knit society back together has followed the telegraph, radio, television, and the internet in turn. Rosen's distinction between communication and community explains why each wave of connection can coincide with a sense of fragmentation rather than cure it."
+        }
+      ],
+      "relatedConcepts": [
+        "concept/scale-matters",
+        "concept/media-publics-are-unstable"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-competition-for-attention",
+      "slug": "concept/competition-for-attention",
+      "kind": "concept",
+      "title": "The competition for attention transforms public life",
+      "summary": "When attention must be gained rather than granted, the content of public discourse is eclipsed by the struggle to be heard.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "When there is more information than anyone can absorb, attention becomes the scarce resource and the contest to capture it takes over. Rosen argues that once attention must be won rather than assumed, the struggle to be heard starts to crowd out the substance of public discourse. The form of the competition shapes what gets said."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "When there is an indefinite supply of available information, attention is scarce. The battle for attention is then the very substance of communication. (Chapter 5, p. 180)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/more-communication-more-difficulty",
+        "concept/news-as-drama"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-ecological-thinking",
+      "slug": "concept/ecological-thinking",
+      "kind": "concept",
+      "title": "The press-public relationship requires ecological thinking",
+      "summary": "Understanding journalism requires examining five interacting factors: scale, social bonds, media structure, language and symbols, and professional attitudes. Press and public exist within a larger system where changes in one element affect all others.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Rosen ends by arguing that the press and the public can only be understood ecologically, as parts of one system. Five interacting factors shape that system: scale, social bonds, media structure, language and symbols, and professional attitudes. Because a change in any one ripples through the others, no single reform of journalism can fix the relationship on its own."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "The trouble lies deeper than the press, and so does the remedy. (Chapter 7, p. 320)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/scale-matters",
+        "concept/the-professional-attitude",
+        "concept/communication-is-not-community"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-impossibility-of-the-informed-citizen",
+      "slug": "concept/impossibility-of-the-informed-citizen",
+      "kind": "concept",
+      "title": "The impossibility of the informed citizen",
+      "summary": "Modern conditions make the classical democratic ideal of the generally competent, naturally informed citizen impossible to achieve.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Democratic theory imagines a citizen who is generally competent and naturally informed about public affairs. Rosen argues that the scale and complexity of modern life make that ideal impossible to reach. No amount of reporting can turn every citizen into an expert on everything the modern state does, so the press cannot deliver the informed public that democratic theory assumes."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "One could free all the facts in the world and still not be informing the public, for the important question was not what was released into the environment, but what took shape in the beliefs and behavior of the average citizen. (Chapter 7, p. 280)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/making-public-does-not-make-a-public",
+        "concept/the-public-is-formed-not-found"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-information-is-relational",
+      "slug": "concept/information-is-relational",
+      "kind": "concept",
+      "title": "Information is relational",
+      "summary": "Information is not \"in\" the news but \"in\" the relationship between people and their changing environment.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Information, in Rosen's account, does not sit inside news items waiting to be delivered. It exists in the relationship between people and their changing environment, in what a fact means to someone trying to act on the world. The same report can inform one reader and mean nothing to another, because information is relational, not a substance the press hands over."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "Information is not really \"in\" the items which come over the wire and make their way into the newspaper. It is \"in\" the relations between people and a changing environment. (Chapter 2, p. 58)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/journalism-as-transaction",
+        "concept/pictures-in-our-heads"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-journalism-as-transaction",
+      "slug": "concept/journalism-as-transaction",
+      "kind": "concept",
+      "title": "Journalism as transaction, not action",
+      "summary": "The meaning of journalism lies not in what journalists do but in what happens between journalists and their audiences.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Rosen's central claim is that journalism is not an action performed by reporters but a transaction between the press and the people it addresses. Its meaning lies in the relationship, in what passes between journalists and their audiences, not in the act of publishing itself. Judging journalism only by what reporters do misses where its success or failure actually happens."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "Journalism is not an activity conducted solely by journalists; or, to put it another way, journalism is communication and communication is something that takes place between people. It is not an action but a transaction. (Introduction, pp. 5-6)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/information-is-relational",
+        "concept/communication-as-art"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-making-public-does-not-make-a-public",
+      "slug": "concept/making-public-does-not-make-a-public",
+      "kind": "concept",
+      "title": "Making things public does not make a public",
+      "summary": "Publication and publicity are not the same as creating an informed, engaged citizenry. Releasing information into the world accomplishes nothing if the conditions for public understanding and action do not exist.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Putting information into the world is not the same as creating a public that can use it. Rosen draws a sharp line between publicity and a public: releasing facts accomplishes nothing if the conditions for understanding and action are absent. Making things public, by itself, does not make a public."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "For any press anywhere, making things public does not a public make. (Conclusion, p. 400)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/the-public-is-formed-not-found",
+        "concept/impossibility-of-the-informed-citizen"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-media-hope-and-disappointment",
+      "slug": "concept/media-hope-and-disappointment",
+      "kind": "concept",
+      "title": "Each new medium inspires and then disappoints",
+      "summary": "Every communication technology follows the same arc: utopian hopes that it will restore small-scale democratic participation, followed by the realization that technology cannot solve social problems.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Each new medium arrives wrapped in the same hope, that it will finally restore the small-scale, participatory democracy that scale destroyed. Rosen traces a recurring arc from utopian expectation to disappointment, as people discover that a communication technology cannot, by itself, solve problems that are social and structural in origin."
+        },
+        {
+          "heading": "Why it endures",
+          "text": "Written before the web, the pattern has repeated with blogs, social media, and each new platform in turn: a burst of democratic promise, then the recognition that the underlying problems of public life remain. Rosen's arc is a standing caution against expecting the next tool to do the work that communities must do."
+        }
+      ],
+      "relatedConcepts": [
+        "concept/the-press-structures-events",
+        "concept/competition-for-attention"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-media-publics-are-unstable",
+      "slug": "concept/media-publics-are-unstable",
+      "kind": "concept",
+      "title": "Media-created publics are inherently unstable",
+      "summary": "Publics assembled by mass media form around events and dissolve when attention shifts. Unlike communities bound by shared experience and obligation, media publics lack the stability required for sustained democratic action.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "A public gathered by mass media forms around an event and scatters when attention moves on. Rosen contrasts these media publics with communities bound by shared experience and obligation: the former lack the stability that sustained democratic action requires. The audience can be assembled in an instant and lost just as fast."
+        },
+        {
+          "heading": "Why it endures",
+          "text": "The dynamic Rosen described has only sharpened online, where publics coalesce around a viral moment and dissolve within days. It explains why mobilizing attention is easy and sustaining a movement is hard, and why outrage cycles rarely convert into durable public life."
+        }
+      ],
+      "relatedConcepts": [
+        "concept/communication-is-not-community",
+        "concept/the-public-is-formed-not-found"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-mobilized-privacy",
+      "slug": "concept/mobilized-privacy",
+      "kind": "concept",
+      "title": "Mobilized privacy replaces public life",
+      "summary": "Modern communication is addressed not to the public but to private individuals consuming messages in isolation. We have evolved a radical form of mobilized privacy: individuals hooked into long lines of communication from remote sources.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Modern media speaks to private individuals, not to an assembled public. Rosen calls the result mobilized privacy: each person hooked into long lines of communication from remote sources while consuming the same messages alone. We are connected to distant events and isolated from one another at the same time."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "Our system of communication is not addressed at the public but at private individuals. We have evolved a radical form of mobilized privacy: the individual hooked into long lines of communication from remote sources. (Chapter 5, p. 160)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/the-newspaper-connects-and-dissolves",
+        "concept/news-as-drama"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-more-communication-more-difficulty",
+      "slug": "concept/more-communication-more-difficulty",
+      "kind": "concept",
+      "title": "More communication creates more to communicate about",
+      "summary": "Improvements in communication do not simplify the task of informing the public. They expand the volume of events, issues, and perspectives that demand attention, making the problem harder, not easier.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Better communication does not make informing the public easier. Rosen argues that every improvement expands the volume of events, issues, and voices competing for attention, so the task grows harder rather than simpler. The paradox is that the more we can communicate, the more there is to communicate about."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "Improvements in communication also make communication more difficult because they ensure that there will be more to communicate about. (Chapter 3, p. 95)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/competition-for-attention",
+        "concept/news-arises-from-distance"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-news-arises-from-distance",
+      "slug": "concept/news-arises-from-distance",
+      "kind": "concept",
+      "title": "News arises from distance",
+      "summary": "The need for journalism only exists when events unfold beyond direct experience. News crosses the space between individuals and events, and this distance is not merely geographic but social and experiential.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Journalism exists because most of what matters happens beyond our direct experience. News is what crosses the distance between people and events they cannot witness firsthand. Rosen stresses that this distance is not only geographic but social and experiential, which is why the press can never simply show us the world as it is."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "News arrives from a distance. It crosses the space between individuals and events. (Chapter 1, p. 13)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/information-is-relational",
+        "concept/the-newspaper-connects-and-dissolves"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-news-as-drama",
+      "slug": "concept/news-as-drama",
+      "kind": "concept",
+      "title": "News as drama turns citizens into spectators",
+      "summary": "The human interest story transforms the reader from a participant who acts on information into a spectator who merely watches. The journalist becomes a dramatist, and public affairs become entertainment.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "When news is told as drama, the reader's role quietly changes from participant to spectator. Rosen argues that the human interest story turns the journalist into a dramatist and public affairs into entertainment, so that citizens watch the show rather than act on what they learn."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "The journalist becomes a dramatist; the audience becomes spectators rather than participants. (Chapter 2, p. 72)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/competition-for-attention",
+        "concept/the-press-structures-events"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-pictures-in-our-heads",
+      "slug": "concept/pictures-in-our-heads",
+      "kind": "concept",
+      "title": "We respond to pictures in our heads, not reality",
+      "summary": "People act not on the world as it is but on representations of the world constructed from stereotypes, media images, and prior beliefs. We define first and then see.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "We act not on the world as it is but on the pictures of it we carry in our heads, built from stereotypes, media images, and prior beliefs. Drawing on Walter Lippmann, Rosen argues that we define first and then see, so the press shapes reality by shaping the representations through which people perceive it."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "The stereotype is a form of perception that works from private belief toward reality: we define first and then see. (Chapter 7, p. 282)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/information-is-relational",
+        "concept/the-press-structures-events"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-scale-matters",
+      "slug": "concept/scale-matters",
+      "kind": "concept",
+      "title": "Scale matters",
+      "summary": "Democratic theory was developed for small, self-contained communities; extending it to a continental republic creates problems the press cannot solve.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "The ideals of democratic self-government were worked out for small, face-to-face communities. Stretching them across a continental republic of strangers creates problems of scale that the press is then asked to solve on its own. Rosen argues those problems are structural: they come from the size and complexity of modern society, not from any failure of reporters to try harder."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "Till the Great Society is converted into a Great Community, the Public will remain in eclipse. (Chapter 8, p. 340)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/communication-is-not-community",
+        "concept/the-newspaper-connects-and-dissolves"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-the-newspaper-connects-and-dissolves",
+      "slug": "concept/the-newspaper-connects-and-dissolves",
+      "kind": "concept",
+      "title": "The newspaper both connects and dissolves",
+      "summary": "Mass circulation newspapers create abstract bonds between strangers while weakening the local, face-to-face ties that sustain genuine community.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "The mass newspaper ties millions of strangers into a shared daily experience, yet the same reach can loosen the local, face-to-face ties that sustain real community. Rosen describes this double motion: the press connects people in the abstract while dissolving the concrete bonds that public life depends on."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "As a way of tying people together the newspaper has a dissolving as well as a connecting tendency. (Chapter 4, p. 140)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/scale-matters",
+        "concept/mobilized-privacy"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-the-press-structures-events",
+      "slug": "concept/the-press-structures-events",
+      "kind": "concept",
+      "title": "The press structures events to its own demands",
+      "summary": "Mass media does not passively reflect the world; it reshapes events according to its own requirements for drama, conflict, brevity, and consumability. Form shapes content, and the medium biases the message.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "The press does not hold up a mirror to the world. Rosen argues that media reshape events to fit their own requirements, drama, conflict, brevity, consumability, so that form shapes content and the medium biases the message. What reaches the public is already structured by the demands of the channel that carried it."
+        },
+        {
+          "heading": "Why it endures",
+          "text": "The point anticipates decades of work on media framing and the logic of the feed, where what is measurable and shareable steers what is covered. Rosen's claim that the press structures events to its own demands explains why changing the medium changes the news, even when the facts stay the same."
+        }
+      ],
+      "relatedConcepts": [
+        "concept/news-as-drama",
+        "concept/the-professional-attitude"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-the-professional-attitude",
+      "slug": "concept/the-professional-attitude",
+      "kind": "concept",
+      "title": "The professional attitude obscures fundamental problems",
+      "summary": "By focusing exclusively on accuracy and fairness, journalism criticism misses the structural factors that determine whether the press can inform the public.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Professional journalism answers its critics with accuracy and fairness: get the facts right, give both sides. Rosen argues that this professional attitude, useful as it is, obscures the deeper structural factors that decide whether the press can inform the public at all. Reform aimed only at the conduct of individual journalists leaves those structures untouched."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "An impossible press was born, one which sought to solve the whole problem of public life simply by controlling the conduct of journalists. (Chapter 6, p. 220)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/commerce-versus-public-duty",
+        "concept/the-press-structures-events"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-the-public-is-formed-not-found",
+      "slug": "concept/the-public-is-formed-not-found",
+      "kind": "concept",
+      "title": "The public is not found but formed",
+      "summary": "There is no pre-existing public waiting to be informed. A public must be actively created through shared understanding of common problems, and this requires more than just distributing facts.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "There is no ready-made public sitting in wait for the morning's news. A public has to be formed, assembled around a shared understanding of common problems, and that takes more than distributing facts. Rosen argues that treating the public as something already there, only needing information, mistakes the hardest part of the press's job for a solved problem."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "Providing information is not all there is to informing the public. (Conclusion, p. 380)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/making-public-does-not-make-a-public",
+        "concept/communication-is-not-community"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-23",
       "revisionCount": 1,
       "moderationState": "seed"
     },
@@ -48,98 +807,39 @@
       "slug": "entity/jay-rosen",
       "kind": "entity",
       "title": "Jay Rosen",
-      "summary": "Jay Rosen is the central subject of the archive: a journalism professor, critic, author, and public thinker whose work spans press criticism, public journalism, blogging, social media, and the press-public relationship.",
-      "aliases": [
-        "Jay Rosen",
-        "Jay",
-        "Pressthink"
-      ],
+      "summary": "Professor of journalism at New York University and author of the PressThink blog; his 1986 dissertation, The Impossible Press, is the root of the archive.",
+      "aliases": [],
       "body": [
         {
-          "heading": "Role in the archive",
-          "text": "Entity pages should help readers move from a name to the records, concepts, publications, and debates connected to that name. For the launch scaffold, this page demonstrates entity structure without enabling public edits yet."
+          "heading": "Who he is",
+          "text": "Jay Rosen is a professor of journalism at New York University, where he has taught since 1986. He is the author of the PressThink blog and one of the most widely read critics of the American press. His work returns again and again to a single question: what is the press for, and what would it mean for journalism to actually inform the public?"
+        },
+        {
+          "heading": "The dissertation at the root",
+          "text": "In 1986 Rosen completed his doctoral dissertation, The Impossible Press: American Journalism and the Decline of Public Life, written at NYU under Neil Postman. Its argument, that journalism is a transaction between the press and the public rather than a one-way delivery of facts, runs through four decades of his later criticism. The 21 key ideas in this wiki are drawn from that dissertation."
         }
       ],
       "relatedConcepts": [
-        "concept/public-journalism",
-        "concept/press-public-relationship"
+        "concept/journalism-as-transaction",
+        "concept/the-public-is-formed-not-found",
+        "concept/ecological-thinking"
       ],
       "relatedEntities": [],
       "relatedRecords": [],
       "references": [
         {
-          "label": "Jay Rosen's Internet Archive",
-          "url": "https://pressthink.org/j/rosen-archive/"
-        }
-      ],
-      "contributors": [
-        "archive maintainers"
-      ],
-      "lastUpdated": "2026-06-21",
-      "revisionCount": 1,
-      "moderationState": "seed"
-    },
-    {
-      "id": "wiki-concept-press-public-relationship",
-      "slug": "concept/press-public-relationship",
-      "kind": "concept",
-      "title": "Press-public relationship",
-      "summary": "A recurring frame for understanding how journalism imagines, addresses, serves, ignores, or learns from the public.",
-      "aliases": [
-        "Press-public",
-        "Public life"
-      ],
-      "body": [
+          "label": "PressThink",
+          "url": "https://pressthink.org/"
+        },
         {
-          "heading": "Use as a bridge page",
-          "text": "This page should become a bridge between dissertation material, archive records, and entity pages. It is also a good candidate for stricter sourcing rules because it is interpretive and central to the collection."
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
         }
       ],
-      "relatedConcepts": [
-        "concept/public-journalism",
-        "concept/audience-relationship"
-      ],
-      "relatedEntities": [
-        "entity/jay-rosen"
-      ],
-      "relatedRecords": [],
-      "references": [],
       "contributors": [
         "archive maintainers"
       ],
-      "lastUpdated": "2026-06-21",
-      "revisionCount": 1,
-      "moderationState": "seed"
-    },
-    {
-      "id": "wiki-concept-audience-relationship",
-      "slug": "concept/audience-relationship",
-      "kind": "concept",
-      "title": "Audience relationship",
-      "summary": "A recurring question in the archive about how journalism understands the people it addresses, serves, ignores, measures, or invites into public work.",
-      "aliases": [
-        "Audience",
-        "People formerly known as the audience"
-      ],
-      "body": [
-        {
-          "heading": "Why this page exists",
-          "text": "This concept page gives the wiki a place to connect archive records about audiences, publics, participation, blogging, and social media without flattening those ideas into a single tag. Future record links should be curated from source records rather than inferred from keyword matches alone."
-        }
-      ],
-      "relatedConcepts": [
-        "concept/public-journalism",
-        "concept/press-public-relationship"
-      ],
-      "relatedEntities": [
-        "entity/jay-rosen"
-      ],
-      "relatedRecords": [],
-      "references": [],
-      "contributors": [
-        "archive maintainers"
-      ],
-      "lastUpdated": "2026-06-22",
+      "lastUpdated": "2026-06-23",
       "revisionCount": 1,
       "moderationState": "seed"
     }

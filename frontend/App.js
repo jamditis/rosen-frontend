@@ -393,6 +393,14 @@ const App = () => {
                     <${Compass} className="w-5 h-5" />
                 </button>
                 <button
+                  onClick=${() => goTo(ROUTES.wiki)}
+                  className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-md transition-colors hidden md:flex items-center gap-1 text-xs"
+                  aria-label="Archive wiki"
+                >
+                    <${BookOpen} className="w-4 h-4" />
+                    <span>Wiki</span>
+                </button>
+                <button
                   onClick=${() => goTo(ROUTES.about)}
                   className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-md transition-colors hidden md:flex items-center gap-1 text-xs"
                   aria-label="About"
