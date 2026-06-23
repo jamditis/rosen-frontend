@@ -1,0 +1,69 @@
+[
+  {
+    "id": "deploy-path",
+    "prompt": "Starting only from wiki/index.md, explain how deploys work, what blocks automation, and what cache or version steps matter.",
+    "expectedWikiFiles": [
+      "wiki/systems/deploy-and-hosting.md",
+      "wiki/systems/cache-and-versioning.md",
+      "wiki/systems/maintenance-automation.md"
+    ],
+    "requiredTerms": ["SFTP", "manual", "version.json", "CACHE_VERSION"],
+    "rubric": "A useful answer names the manual upload path, the missing SFTP credentials, and the release-time cache/version sweep."
+  },
+  {
+    "id": "public-wiki-boundary",
+    "prompt": "Where do public wiki pages live, and how are they different from internal OKF project knowledge?",
+    "expectedWikiFiles": [
+      "wiki/README.md",
+      "wiki/systems/public-community-wiki.md",
+      "wiki/meta/okf-profile.md"
+    ],
+    "requiredTerms": ["#wiki", "data/wiki-seed.json", "repo-maintenance"],
+    "rubric": "A useful answer separates the in-app #wiki reader feature from the repo-maintenance OKF bundle and names the seed-data file."
+  },
+  {
+    "id": "add-record",
+    "prompt": "How does a new archive Record enter the system, and what is currently blocked?",
+    "expectedWikiFiles": [
+      "wiki/systems/submission-server.md",
+      "wiki/systems/data-pipeline.md",
+      "wiki/systems/deploy-and-hosting.md",
+      "wiki/data/data-quality-gaps.md"
+    ],
+    "requiredTerms": ["node data/export-archive-data.js", "submit-record.yml", "SFTP"],
+    "rubric": "A useful answer distinguishes the Flask submission path from the sheet-driven workflow, then names export and deploy constraints."
+  },
+  {
+    "id": "verify-change",
+    "prompt": "What tests should a contributor run after changing wiki, frontend, or data surfaces?",
+    "expectedWikiFiles": [
+      "wiki/project/development-workflow.md",
+      "wiki/systems/ci-and-testing.md",
+      "wiki/sources/reverification-playbook.md"
+    ],
+    "requiredTerms": ["npm test", "npm run test:okf", "npm run test:frontend"],
+    "rubric": "A useful answer chooses the narrow verification command first, then names the broader suite for the touched surface."
+  },
+  {
+    "id": "open-decisions",
+    "prompt": "What decisions should be resolved before launch or deeper automation?",
+    "expectedWikiFiles": [
+      "wiki/launch/open-decisions.md",
+      "wiki/launch/launch-plan.md",
+      "wiki/project/launch-status.md"
+    ],
+    "requiredTerms": ["URL canonicalization", "Pillar 3a", "Pillar 3b"],
+    "rubric": "A useful answer names the current launch state and the highest-impact unresolved decisions before picking deeper automation work."
+  },
+  {
+    "id": "wiki-ux-guardrails",
+    "prompt": "What UI mistakes should a future OKF or public-wiki renderer avoid, and what trust signal must be visible per concept?",
+    "expectedWikiFiles": [
+      "wiki/meta/wiki-ux-requirements.md",
+      "wiki/meta/quality-model.md",
+      "wiki/systems/public-community-wiki.md"
+    ],
+    "requiredTerms": ["local graph", "global graph", "freshness badge", "verified", "source"],
+    "rubric": "A useful answer treats local-first graph navigation and per-concept freshness as requirements, not visual extras."
+  }
+]

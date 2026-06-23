@@ -1,0 +1,2325 @@
+{
+  "schemaVersion": 1,
+  "generatedFrom": "scripts/okf-flight-recorder.js",
+  "asOfDate": "2026-06-23",
+  "graphPolicy": {
+    "defaultView": "local",
+    "defaultHops": 1,
+    "maxDefaultHops": 2,
+    "globalView": "filterable opt-in",
+    "labelPolicy": "show labels by zoom level and node degree"
+  },
+  "summary": {
+    "markdownFiles": 44,
+    "concepts": 34,
+    "conceptDirectories": 9,
+    "byType": {
+      "concept": 15,
+      "event": 1,
+      "organization": 1,
+      "person": 2,
+      "playbook": 1,
+      "profile": 2,
+      "reference": 1,
+      "system": 9,
+      "template": 1,
+      "test": 1
+    },
+    "byDriftRisk": {
+      "high": 19,
+      "low": 6,
+      "medium": 9
+    },
+    "byFreshness": {
+      "fresh": 34
+    },
+    "totalInternalLinks": 115,
+    "totalExternalLinks": 2,
+    "orphanedConcepts": 13
+  },
+  "concepts": [
+    {
+      "path": "wiki/data/corpus.md",
+      "id": "data/corpus",
+      "type": "concept",
+      "title": "The corpus",
+      "description": "26,615 published records spanning four decades, plus 626 concepts and 7,379 entities across 6 categories; Jay Rosen is the top entity at 377 mentions.",
+      "tags": [
+        "corpus",
+        "counts",
+        "data"
+      ],
+      "source": [
+        "data/archive-analytics.json (regen 2026-06-20)",
+        "data/archive-core.json",
+        "CLAUDE.md"
+      ],
+      "verified": "2026-06-22",
+      "timestamp": "2026-06-22",
+      "verifiedAgeDays": 1,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 1 days before inventory",
+        "sourceCount": 3
+      },
+      "driftRisk": "medium",
+      "driftReasons": [
+        "change-prone topic: data"
+      ],
+      "inboundCount": 17,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/data/data-quality-gaps.md",
+          "wiki/launch/handoff-2026-06-22.md",
+          "wiki/launch/launch-plan.md",
+          "wiki/people/jay-rosen.md",
+          "wiki/people/jay-rosen.md",
+          "wiki/people/joe-amditis.md",
+          "wiki/people/joe-amditis.md",
+          "wiki/project/overview.md",
+          "wiki/project/overview.md",
+          "wiki/project/overview.md",
+          "wiki/project/overview.md",
+          "wiki/systems/data-pipeline.md",
+          "wiki/systems/data-pipeline.md",
+          "wiki/systems/feedback-and-reporting.md",
+          "wiki/systems/frontend.md",
+          "wiki/systems/frontend.md",
+          "wiki/timeline/key-dates.md"
+        ],
+        "outboundConcepts": [
+          "wiki/data/schema.md",
+          "wiki/project/overview.md",
+          "wiki/systems/deploy-and-hosting.md",
+          "wiki/systems/frontend.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "wiki",
+          "href": "../project/overview.md",
+          "path": "wiki/project/overview.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../systems/deploy-and-hosting.md",
+          "path": "wiki/systems/deploy-and-hosting.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "schema.md",
+          "path": "wiki/data/schema.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../systems/frontend.md",
+          "path": "wiki/systems/frontend.md",
+          "concept": true
+        },
+        {
+          "kind": "repo",
+          "href": "../../docs/decisions-pending.md",
+          "path": "docs/decisions-pending.md",
+          "concept": false
+        },
+        {
+          "kind": "repo",
+          "href": "../../docs/",
+          "path": "docs",
+          "concept": false
+        }
+      ]
+    },
+    {
+      "path": "wiki/data/data-quality-gaps.md",
+      "id": "data/data-quality-gaps",
+      "type": "concept",
+      "title": "Data quality gaps",
+      "description": "The known data gaps, quality risks, and order of attack for improving the archive data.",
+      "tags": [
+        "backlog",
+        "data",
+        "gaps",
+        "quality"
+      ],
+      "source": [
+        "CLAUDE.md",
+        "docs/definition-of-done.md",
+        "docs/backlog-priority.md",
+        "docs/decisions-pending.md",
+        "data/archive-analytics.json"
+      ],
+      "verified": "2026-06-23",
+      "timestamp": "2026-06-23",
+      "verifiedAgeDays": 0,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 5
+      },
+      "driftRisk": "medium",
+      "driftReasons": [
+        "change-prone topic: data"
+      ],
+      "inboundCount": 0,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [],
+        "outboundConcepts": [
+          "wiki/data/corpus.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "wiki",
+          "href": "corpus.md",
+          "path": "wiki/data/corpus.md",
+          "concept": true
+        },
+        {
+          "kind": "repo",
+          "href": "../../docs/definition-of-done.md",
+          "path": "docs/definition-of-done.md",
+          "concept": false
+        }
+      ]
+    },
+    {
+      "path": "wiki/data/schema.md",
+      "id": "data/schema",
+      "type": "concept",
+      "title": "Schema and vocabulary",
+      "description": "The archive's core types (Record, Entity, Entity Index, Facet) and the exact vocabulary to use when talking about them.",
+      "tags": [
+        "data",
+        "schema",
+        "vocabulary"
+      ],
+      "source": [
+        "CONTEXT.md",
+        "data/SCHEMA.md",
+        "data/schema.json"
+      ],
+      "verified": "2026-06-22",
+      "timestamp": "2026-06-22",
+      "verifiedAgeDays": 1,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 1 days before inventory",
+        "sourceCount": 3
+      },
+      "driftRisk": "medium",
+      "driftReasons": [
+        "change-prone topic: data"
+      ],
+      "inboundCount": 6,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/data/corpus.md",
+          "wiki/people/joe-amditis.md",
+          "wiki/project/overview.md",
+          "wiki/project/overview.md",
+          "wiki/project/overview.md",
+          "wiki/systems/data-pipeline.md"
+        ],
+        "outboundConcepts": [
+          "wiki/people/joe-amditis.md",
+          "wiki/systems/data-pipeline.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "repo",
+          "href": "../../CONTEXT.md",
+          "path": "CONTEXT.md",
+          "concept": false
+        },
+        {
+          "kind": "wiki",
+          "href": "../people/joe-amditis.md",
+          "path": "wiki/people/joe-amditis.md",
+          "concept": true
+        },
+        {
+          "kind": "repo",
+          "href": "../../data/SCHEMA.md",
+          "path": "data/SCHEMA.md",
+          "concept": false
+        },
+        {
+          "kind": "wiki",
+          "href": "../systems/data-pipeline.md",
+          "path": "wiki/systems/data-pipeline.md",
+          "concept": true
+        }
+      ]
+    },
+    {
+      "path": "wiki/launch/handoff-2026-06-22.md",
+      "id": "launch/handoff-2026-06-22",
+      "type": "event",
+      "title": "Pre-launch handoff to Jay (2026-06-22)",
+      "description": "The pre-launch package Joe sent on 2026-06-22 to Jay Rosen, Marla Supnick, and Eli Kuslansky — a status update plus a shared Drive folder with the access request, weekly-upload guide, and feature walkthrough.",
+      "tags": [
+        "email",
+        "event",
+        "handoff",
+        "launch"
+      ],
+      "source": [
+        "sent email 2026-06-22 10:47 -0400",
+        "shared Drive handoff folder",
+        "2026-06-19 call"
+      ],
+      "verified": "2026-06-22",
+      "timestamp": "2026-06-22",
+      "verifiedAgeDays": 1,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 1 days before inventory",
+        "sourceCount": 3
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: launch"
+      ],
+      "inboundCount": 8,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/launch/launch-plan.md",
+          "wiki/people/jay-rosen.md",
+          "wiki/people/joe-amditis.md",
+          "wiki/people/unified-field.md",
+          "wiki/project/launch-status.md",
+          "wiki/sources/provenance.md",
+          "wiki/systems/feedback-and-reporting.md",
+          "wiki/timeline/key-dates.md"
+        ],
+        "outboundConcepts": [
+          "wiki/data/corpus.md",
+          "wiki/people/joe-amditis.md",
+          "wiki/systems/deploy-and-hosting.md",
+          "wiki/systems/feedback-and-reporting.md",
+          "wiki/timeline/key-dates.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "wiki",
+          "href": "../people/joe-amditis.md",
+          "path": "wiki/people/joe-amditis.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../timeline/key-dates.md",
+          "path": "wiki/timeline/key-dates.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../systems/deploy-and-hosting.md",
+          "path": "wiki/systems/deploy-and-hosting.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../systems/feedback-and-reporting.md",
+          "path": "wiki/systems/feedback-and-reporting.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../data/corpus.md",
+          "path": "wiki/data/corpus.md",
+          "concept": true
+        }
+      ]
+    },
+    {
+      "path": "wiki/launch/launch-plan.md",
+      "id": "launch/launch-plan",
+      "type": "concept",
+      "title": "Launch plan",
+      "description": "A short, bounded test-audience release then iterate live, greenlit by Marla on 2026-06-17; readiness is gated by issue #445 and a small cluster of launch issues under umbrella #460.",
+      "tags": [
+        "launch",
+        "plan",
+        "readiness"
+      ],
+      "source": [
+        "GitHub #445/#460 cluster",
+        "2026-06-17 forwarded thread",
+        "2026-06-19 call"
+      ],
+      "verified": "2026-06-22",
+      "timestamp": "2026-06-22",
+      "verifiedAgeDays": 1,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 1 days before inventory",
+        "sourceCount": 3
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: launch"
+      ],
+      "inboundCount": 2,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/people/unified-field.md",
+          "wiki/project/launch-status.md"
+        ],
+        "outboundConcepts": [
+          "wiki/data/corpus.md",
+          "wiki/launch/handoff-2026-06-22.md",
+          "wiki/people/unified-field.md",
+          "wiki/systems/deploy-and-hosting.md",
+          "wiki/systems/feedback-and-reporting.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "wiki",
+          "href": "../people/unified-field.md",
+          "path": "wiki/people/unified-field.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "handoff-2026-06-22.md",
+          "path": "wiki/launch/handoff-2026-06-22.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../systems/deploy-and-hosting.md",
+          "path": "wiki/systems/deploy-and-hosting.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../systems/feedback-and-reporting.md",
+          "path": "wiki/systems/feedback-and-reporting.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../data/corpus.md",
+          "path": "wiki/data/corpus.md",
+          "concept": true
+        }
+      ]
+    },
+    {
+      "path": "wiki/launch/open-decisions.md",
+      "id": "launch/open-decisions",
+      "type": "concept",
+      "title": "Open launch and architecture decisions",
+      "description": "The decisions that still affect launch, data cleanup, submission automation, and future editor work.",
+      "tags": [
+        "architecture",
+        "decisions",
+        "launch"
+      ],
+      "source": [
+        "docs/decisions-pending.md",
+        "docs/definition-of-done.md",
+        "wiki/launch/launch-plan.md"
+      ],
+      "verified": "2026-06-23",
+      "timestamp": "2026-06-23",
+      "verifiedAgeDays": 0,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 3
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: automation, ci, launch, submission",
+        "change-prone topic: data, decisions"
+      ],
+      "inboundCount": 0,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [],
+        "outboundConcepts": [
+          "wiki/project/development-workflow.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "repo",
+          "href": "../../docs/decisions-pending.md",
+          "path": "docs/decisions-pending.md",
+          "concept": false
+        },
+        {
+          "kind": "wiki",
+          "href": "../project/development-workflow.md",
+          "path": "wiki/project/development-workflow.md",
+          "concept": true
+        }
+      ]
+    },
+    {
+      "path": "wiki/meta/adoption-playbook.md",
+      "id": "meta/adoption-playbook",
+      "type": "playbook",
+      "title": "OKF adoption playbook",
+      "description": "A practical process for applying this OKF profile to another repo, public archive, or open-source project.",
+      "tags": [
+        "adoption",
+        "okf",
+        "open-source",
+        "playbook"
+      ],
+      "source": [
+        "wiki/meta/okf-profile.md",
+        "wiki/meta/concept-template.md",
+        "https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md",
+        "https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing"
+      ],
+      "verified": "2026-06-23",
+      "timestamp": "2026-06-23",
+      "verifiedAgeDays": 0,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 4
+      },
+      "driftRisk": "medium",
+      "driftReasons": [
+        "change-prone topic: public, source"
+      ],
+      "inboundCount": 0,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [],
+        "outboundConcepts": []
+      },
+      "outboundLinks": []
+    },
+    {
+      "path": "wiki/meta/blindfold-test.md",
+      "id": "meta/blindfold-test",
+      "type": "test",
+      "title": "OKF blindfold test",
+      "description": "Scenario-based navigation test for whether a new contributor can answer project questions starting only from the OKF root index.",
+      "tags": [
+        "navigation",
+        "okf",
+        "onboarding",
+        "test"
+      ],
+      "source": [
+        "scripts/okf-blindfold-test.js",
+        "wiki/meta/blindfold-scenarios.json"
+      ],
+      "verified": "2026-06-23",
+      "timestamp": "2026-06-23",
+      "verifiedAgeDays": 0,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 2
+      },
+      "driftRisk": "low",
+      "driftReasons": [
+        "recently verified"
+      ],
+      "inboundCount": 0,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [],
+        "outboundConcepts": []
+      },
+      "outboundLinks": []
+    },
+    {
+      "path": "wiki/meta/bundle-inventory.md",
+      "id": "meta/bundle-inventory",
+      "type": "reference",
+      "title": "OKF bundle inventory",
+      "description": "Generated flight-recorder report for the Rosen project OKF bundle.",
+      "tags": [
+        "drift",
+        "generated",
+        "inventory",
+        "okf"
+      ],
+      "source": [
+        "scripts/okf-flight-recorder.js",
+        "wiki/meta/bundle-inventory.json"
+      ],
+      "verified": "2026-06-23",
+      "timestamp": "2026-06-23",
+      "verifiedAgeDays": 0,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 2
+      },
+      "driftRisk": "low",
+      "driftReasons": [
+        "recently verified"
+      ],
+      "inboundCount": 1,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/meta/okf-profile.md"
+        ],
+        "outboundConcepts": []
+      },
+      "outboundLinks": []
+    },
+    {
+      "path": "wiki/meta/community-roadmap.md",
+      "id": "meta/community-roadmap",
+      "type": "concept",
+      "title": "OKF community contribution roadmap",
+      "description": "Concrete ways this repo can contribute useful patterns, validators, and examples back to the wider OKF and open-knowledge community.",
+      "tags": [
+        "community",
+        "okf",
+        "open-source",
+        "roadmap"
+      ],
+      "source": [
+        "wiki/meta/okf-profile.md",
+        "scripts/validate-okf.js",
+        "https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md",
+        "https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing"
+      ],
+      "verified": "2026-06-23",
+      "timestamp": "2026-06-23",
+      "verifiedAgeDays": 0,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 4
+      },
+      "driftRisk": "medium",
+      "driftReasons": [
+        "change-prone topic: community, source"
+      ],
+      "inboundCount": 0,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [],
+        "outboundConcepts": []
+      },
+      "outboundLinks": []
+    },
+    {
+      "path": "wiki/meta/concept-template.md",
+      "id": "meta/concept-template",
+      "type": "template",
+      "title": "Concept templates",
+      "description": "Copyable OKF document templates for the Rosen project profile and other project wikis.",
+      "tags": [
+        "authoring",
+        "okf",
+        "templates"
+      ],
+      "source": [
+        "wiki/meta/okf-profile.md",
+        "https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md"
+      ],
+      "verified": "2026-06-23",
+      "timestamp": "2026-06-23",
+      "verifiedAgeDays": 0,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 2
+      },
+      "driftRisk": "low",
+      "driftReasons": [
+        "recently verified"
+      ],
+      "inboundCount": 0,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [],
+        "outboundConcepts": []
+      },
+      "outboundLinks": []
+    },
+    {
+      "path": "wiki/meta/enhancement-radar.md",
+      "id": "meta/enhancement-radar",
+      "type": "concept",
+      "title": "OKF enhancement radar",
+      "description": "Prioritized next experiments for turning the Rosen OKF bundle into reusable open-knowledge tooling.",
+      "tags": [
+        "okf",
+        "roadmap",
+        "tooling",
+        "ux"
+      ],
+      "source": [
+        "OKF explorer scan",
+        "2026-06-23",
+        "public wiki UX explorer scan",
+        "2026-06-23",
+        "wiki/meta/community-roadmap.md",
+        "wiki/meta/wiki-ux-requirements.md"
+      ],
+      "verified": "2026-06-23",
+      "timestamp": "2026-06-23",
+      "verifiedAgeDays": 0,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 6
+      },
+      "driftRisk": "low",
+      "driftReasons": [
+        "recently verified"
+      ],
+      "inboundCount": 0,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [],
+        "outboundConcepts": []
+      },
+      "outboundLinks": []
+    },
+    {
+      "path": "wiki/meta/okf-profile.md",
+      "id": "meta/okf-profile",
+      "type": "profile",
+      "title": "Rosen project OKF profile",
+      "description": "The stricter project-wiki conventions this repo layers on top of the minimal OKF v0.1 specification.",
+      "tags": [
+        "conventions",
+        "interoperability",
+        "okf",
+        "profile"
+      ],
+      "source": [
+        "https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md",
+        "https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing",
+        "wiki/README.md",
+        "scripts/validate-okf.js"
+      ],
+      "verified": "2026-06-23",
+      "timestamp": "2026-06-23",
+      "verifiedAgeDays": 0,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 4
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: ci"
+      ],
+      "inboundCount": 0,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [],
+        "outboundConcepts": [
+          "wiki/meta/bundle-inventory.md",
+          "wiki/meta/wiki-ux-requirements.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "wiki",
+          "href": "wiki-ux-requirements.md",
+          "path": "wiki/meta/wiki-ux-requirements.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "bundle-inventory.md",
+          "path": "wiki/meta/bundle-inventory.md",
+          "concept": true
+        }
+      ]
+    },
+    {
+      "path": "wiki/meta/quality-model.md",
+      "id": "meta/quality-model",
+      "type": "concept",
+      "title": "OKF quality model",
+      "description": "The checks that make an OKF bundle useful as shared project knowledge instead of stale documentation.",
+      "tags": [
+        "okf",
+        "quality",
+        "review",
+        "validation"
+      ],
+      "source": [
+        "wiki/meta/okf-profile.md",
+        "scripts/validate-okf.js",
+        "https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md"
+      ],
+      "verified": "2026-06-23",
+      "timestamp": "2026-06-23",
+      "verifiedAgeDays": 0,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 3
+      },
+      "driftRisk": "low",
+      "driftReasons": [
+        "recently verified"
+      ],
+      "inboundCount": 0,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [],
+        "outboundConcepts": []
+      },
+      "outboundLinks": []
+    },
+    {
+      "path": "wiki/meta/wiki-ux-requirements.md",
+      "id": "meta/wiki-ux-requirements",
+      "type": "concept",
+      "title": "Wiki UX requirements",
+      "description": "Non-negotiable wiki navigation and trust requirements derived from prior UX research on graph-heavy knowledge wikis.",
+      "tags": [
+        "freshness",
+        "graph",
+        "okf",
+        "ux",
+        "wiki"
+      ],
+      "source": [
+        "User UX research synthesis",
+        "2026-06-23",
+        "docs/plans/2026-06-21-community-wiki-spec.md",
+        "wiki/meta/bundle-inventory.json"
+      ],
+      "verified": "2026-06-23",
+      "timestamp": "2026-06-23",
+      "verifiedAgeDays": 0,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 4
+      },
+      "driftRisk": "low",
+      "driftReasons": [
+        "recently verified"
+      ],
+      "inboundCount": 1,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/meta/okf-profile.md"
+        ],
+        "outboundConcepts": []
+      },
+      "outboundLinks": [
+        {
+          "kind": "wiki",
+          "href": "bundle-inventory.json",
+          "path": "wiki/meta/bundle-inventory.json",
+          "concept": false
+        }
+      ]
+    },
+    {
+      "path": "wiki/people/jay-rosen.md",
+      "id": "people/jay-rosen",
+      "type": "person",
+      "title": "Jay Rosen",
+      "description": "NYU journalism professor, PressThink author, and the subject of the archive; owns the pressthink.org domain and will publish the launch essay.",
+      "tags": [
+        "person",
+        "pressthink",
+        "subject"
+      ],
+      "source": [
+        "2026-06-19 call (Fathom 156730488)",
+        "email threads",
+        "CLAUDE.md"
+      ],
+      "verified": "2026-06-22",
+      "timestamp": "2026-06-22",
+      "verifiedAgeDays": 1,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 1 days before inventory",
+        "sourceCount": 3
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: launch"
+      ],
+      "inboundCount": 5,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/people/joe-amditis.md",
+          "wiki/project/overview.md",
+          "wiki/systems/deploy-and-hosting.md",
+          "wiki/systems/feedback-and-reporting.md",
+          "wiki/timeline/key-dates.md"
+        ],
+        "outboundConcepts": [
+          "wiki/data/corpus.md",
+          "wiki/data/corpus.md",
+          "wiki/launch/handoff-2026-06-22.md",
+          "wiki/systems/deploy-and-hosting.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "wiki",
+          "href": "../data/corpus.md",
+          "path": "wiki/data/corpus.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../data/corpus.md",
+          "path": "wiki/data/corpus.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../systems/deploy-and-hosting.md",
+          "path": "wiki/systems/deploy-and-hosting.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../launch/handoff-2026-06-22.md",
+          "path": "wiki/launch/handoff-2026-06-22.md",
+          "concept": true
+        }
+      ]
+    },
+    {
+      "path": "wiki/people/joe-amditis.md",
+      "id": "people/joe-amditis",
+      "type": "person",
+      "title": "Joe Amditis",
+      "description": "Associate director at the Center for Cooperative Media; the archive's curator and the person who builds, deploys, and hands off the project.",
+      "tags": [
+        "ccm",
+        "curator",
+        "person"
+      ],
+      "source": [
+        "CONTEXT.md",
+        "CLAUDE.md",
+        "email signature"
+      ],
+      "verified": "2026-06-22",
+      "timestamp": "2026-06-22",
+      "verifiedAgeDays": 1,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 1 days before inventory",
+        "sourceCount": 3
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: ci, deploy"
+      ],
+      "inboundCount": 4,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/data/schema.md",
+          "wiki/launch/handoff-2026-06-22.md",
+          "wiki/project/overview.md",
+          "wiki/systems/deploy-and-hosting.md"
+        ],
+        "outboundConcepts": [
+          "wiki/data/corpus.md",
+          "wiki/data/corpus.md",
+          "wiki/data/schema.md",
+          "wiki/launch/handoff-2026-06-22.md",
+          "wiki/people/jay-rosen.md",
+          "wiki/systems/deploy-and-hosting.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "external",
+          "href": "http://centerforcooperativemedia.org/"
+        },
+        {
+          "kind": "wiki",
+          "href": "../data/schema.md",
+          "path": "wiki/data/schema.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../data/corpus.md",
+          "path": "wiki/data/corpus.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../data/corpus.md",
+          "path": "wiki/data/corpus.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../systems/deploy-and-hosting.md",
+          "path": "wiki/systems/deploy-and-hosting.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "jay-rosen.md",
+          "path": "wiki/people/jay-rosen.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../launch/handoff-2026-06-22.md",
+          "path": "wiki/launch/handoff-2026-06-22.md",
+          "concept": true
+        }
+      ]
+    },
+    {
+      "path": "wiki/people/unified-field.md",
+      "id": "people/unified-field",
+      "type": "organization",
+      "title": "Unified Field",
+      "description": "The design/strategy vendor advising on the archive's launch and promotion; greenlit the short test-audience launch and own a separate landing-page track.",
+      "tags": [
+        "launch",
+        "organization",
+        "person",
+        "vendor"
+      ],
+      "source": [
+        "GitHub #445",
+        "2026-06-17 forwarded thread",
+        "2026-06-22 email recipients"
+      ],
+      "verified": "2026-06-22",
+      "timestamp": "2026-06-22",
+      "verifiedAgeDays": 1,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 1 days before inventory",
+        "sourceCount": 3
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: launch"
+      ],
+      "inboundCount": 2,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/launch/launch-plan.md",
+          "wiki/timeline/key-dates.md"
+        ],
+        "outboundConcepts": [
+          "wiki/launch/handoff-2026-06-22.md",
+          "wiki/launch/launch-plan.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "wiki",
+          "href": "../launch/launch-plan.md",
+          "path": "wiki/launch/launch-plan.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../launch/handoff-2026-06-22.md",
+          "path": "wiki/launch/handoff-2026-06-22.md",
+          "concept": true
+        }
+      ]
+    },
+    {
+      "path": "wiki/project/development-workflow.md",
+      "id": "project/development-workflow",
+      "type": "concept",
+      "title": "Development workflow",
+      "description": "The repo workflow for choosing issues, changing the zero-build frontend, regenerating data, and verifying before a PR.",
+      "tags": [
+        "development",
+        "issues",
+        "pr",
+        "workflow"
+      ],
+      "source": [
+        "AGENTS.md",
+        "CLAUDE.md",
+        "README.md",
+        "package.json",
+        ".github/PULL_REQUEST_TEMPLATE.md"
+      ],
+      "verified": "2026-06-23",
+      "timestamp": "2026-06-23",
+      "verifiedAgeDays": 0,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 5
+      },
+      "driftRisk": "medium",
+      "driftReasons": [
+        "change-prone topic: data, workflow"
+      ],
+      "inboundCount": 1,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/launch/open-decisions.md"
+        ],
+        "outboundConcepts": [
+          "wiki/systems/cache-and-versioning.md",
+          "wiki/systems/cache-and-versioning.md",
+          "wiki/systems/frontend.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "wiki",
+          "href": "../systems/frontend.md",
+          "path": "wiki/systems/frontend.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../systems/cache-and-versioning.md",
+          "path": "wiki/systems/cache-and-versioning.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../systems/cache-and-versioning.md",
+          "path": "wiki/systems/cache-and-versioning.md",
+          "concept": true
+        }
+      ]
+    },
+    {
+      "path": "wiki/project/launch-status.md",
+      "id": "project/launch-status",
+      "type": "concept",
+      "title": "Launch status",
+      "description": "Pre-launch state as of 2026-06-22 — naming and feature audit done, handoff sent, with the SFTP credential gap as the one live blocker to automated deploys.",
+      "tags": [
+        "blocker",
+        "launch",
+        "status"
+      ],
+      "source": [
+        "GitHub issues #445/#460/#458/#484/#509",
+        "2026-06-19 call",
+        "docs/decisions-pending.md"
+      ],
+      "verified": "2026-06-22",
+      "timestamp": "2026-06-22",
+      "verifiedAgeDays": 1,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 1 days before inventory",
+        "sourceCount": 3
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: blocker, credential, deploy, launch, sftp"
+      ],
+      "inboundCount": 0,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [],
+        "outboundConcepts": [
+          "wiki/launch/handoff-2026-06-22.md",
+          "wiki/launch/launch-plan.md",
+          "wiki/systems/deploy-and-hosting.md",
+          "wiki/systems/feedback-and-reporting.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "wiki",
+          "href": "../launch/launch-plan.md",
+          "path": "wiki/launch/launch-plan.md",
+          "concept": true
+        },
+        {
+          "kind": "repo",
+          "href": "../../docs/feature-audit/",
+          "path": "docs/feature-audit",
+          "concept": false
+        },
+        {
+          "kind": "wiki",
+          "href": "../systems/feedback-and-reporting.md",
+          "path": "wiki/systems/feedback-and-reporting.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../launch/handoff-2026-06-22.md",
+          "path": "wiki/launch/handoff-2026-06-22.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../systems/deploy-and-hosting.md",
+          "path": "wiki/systems/deploy-and-hosting.md",
+          "concept": true
+        },
+        {
+          "kind": "repo",
+          "href": "../../docs/decisions-pending.md",
+          "path": "docs/decisions-pending.md",
+          "concept": false
+        },
+        {
+          "kind": "repo",
+          "href": "../../docs/backlog-priority.md",
+          "path": "docs/backlog-priority.md",
+          "concept": false
+        }
+      ]
+    },
+    {
+      "path": "wiki/project/overview.md",
+      "id": "project/overview",
+      "type": "concept",
+      "title": "What the archive is",
+      "description": "A public, searchable collection of Jay Rosen's four decades of journalism criticism and media theory, curated by Joe Amditis and hosted at pressthink.org.",
+      "tags": [
+        "archive",
+        "mission",
+        "overview"
+      ],
+      "source": [
+        "CONTEXT.md",
+        "CLAUDE.md",
+        "docs/narrative/project-history.md"
+      ],
+      "verified": "2026-06-22",
+      "timestamp": "2026-06-22",
+      "verifiedAgeDays": 1,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 1 days before inventory",
+        "sourceCount": 3
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: ci",
+        "change-prone topic: public"
+      ],
+      "inboundCount": 1,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/data/corpus.md"
+        ],
+        "outboundConcepts": [
+          "wiki/data/corpus.md",
+          "wiki/data/corpus.md",
+          "wiki/data/corpus.md",
+          "wiki/data/corpus.md",
+          "wiki/data/schema.md",
+          "wiki/data/schema.md",
+          "wiki/data/schema.md",
+          "wiki/people/jay-rosen.md",
+          "wiki/people/joe-amditis.md",
+          "wiki/systems/data-pipeline.md",
+          "wiki/systems/frontend.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "wiki",
+          "href": "../people/jay-rosen.md",
+          "path": "wiki/people/jay-rosen.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../people/joe-amditis.md",
+          "path": "wiki/people/joe-amditis.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../data/corpus.md",
+          "path": "wiki/data/corpus.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../data/corpus.md",
+          "path": "wiki/data/corpus.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../data/corpus.md",
+          "path": "wiki/data/corpus.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../data/schema.md",
+          "path": "wiki/data/schema.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../data/schema.md",
+          "path": "wiki/data/schema.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../data/corpus.md",
+          "path": "wiki/data/corpus.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../data/schema.md",
+          "path": "wiki/data/schema.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../systems/frontend.md",
+          "path": "wiki/systems/frontend.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../systems/data-pipeline.md",
+          "path": "wiki/systems/data-pipeline.md",
+          "concept": true
+        },
+        {
+          "kind": "repo",
+          "href": "../../docs/narrative/architecture.md",
+          "path": "docs/narrative/architecture.md",
+          "concept": false
+        }
+      ]
+    },
+    {
+      "path": "wiki/README.md",
+      "id": "README",
+      "type": "profile",
+      "title": "Jay Rosen's Internet Archive knowledge bundle",
+      "description": "How to use the repo-maintenance OKF bundle and how it differs from the public Archive wiki feature.",
+      "tags": [
+        "okf",
+        "profile",
+        "readme"
+      ],
+      "source": [
+        "wiki/index.md",
+        "wiki/meta/okf-profile.md",
+        "docs/plans/2026-06-21-community-wiki-spec.md"
+      ],
+      "verified": "2026-06-23",
+      "timestamp": "2026-06-23",
+      "verifiedAgeDays": 0,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 3
+      },
+      "driftRisk": "medium",
+      "driftReasons": [
+        "change-prone topic: public"
+      ],
+      "inboundCount": 0,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [],
+        "outboundConcepts": [
+          "wiki/systems/public-community-wiki.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "external",
+          "href": "https://github.com/GoogleCloudPlatform/knowledge-catalog/tree/main/okf"
+        },
+        {
+          "kind": "repo",
+          "href": "../data/wiki-seed.json",
+          "path": "data/wiki-seed.json",
+          "concept": false
+        },
+        {
+          "kind": "repo",
+          "href": "../frontend/services/wikiService.js",
+          "path": "frontend/services/wikiService.js",
+          "concept": false
+        },
+        {
+          "kind": "repo",
+          "href": "../frontend/components/WikiPage.js",
+          "path": "frontend/components/WikiPage.js",
+          "concept": false
+        },
+        {
+          "kind": "wiki",
+          "href": "systems/public-community-wiki.md",
+          "path": "wiki/systems/public-community-wiki.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "index.md",
+          "path": "wiki/index.md",
+          "concept": false
+        },
+        {
+          "kind": "repo",
+          "href": "../docs/",
+          "path": "docs",
+          "concept": false
+        },
+        {
+          "kind": "wiki",
+          "href": "log.md",
+          "path": "wiki/log.md",
+          "concept": false
+        },
+        {
+          "kind": "repo",
+          "href": "../docs/",
+          "path": "docs",
+          "concept": false
+        },
+        {
+          "kind": "repo",
+          "href": "../CONTEXT.md",
+          "path": "CONTEXT.md",
+          "concept": false
+        },
+        {
+          "kind": "repo",
+          "href": "../CLAUDE.md",
+          "path": "CLAUDE.md",
+          "concept": false
+        },
+        {
+          "kind": "repo",
+          "href": "../data/",
+          "path": "data",
+          "concept": false
+        },
+        {
+          "kind": "repo",
+          "href": "../CONTEXT.md",
+          "path": "CONTEXT.md",
+          "concept": false
+        },
+        {
+          "kind": "wiki",
+          "href": "meta/index.md",
+          "path": "wiki/meta/index.md",
+          "concept": false
+        }
+      ]
+    },
+    {
+      "path": "wiki/sources/provenance.md",
+      "id": "sources/provenance",
+      "type": "concept",
+      "title": "Provenance",
+      "description": "The source material behind this bundle and how to re-verify each class of fact.",
+      "tags": [
+        "provenance",
+        "sources",
+        "verification"
+      ],
+      "source": [
+        "this bundle's own references"
+      ],
+      "verified": "2026-06-22",
+      "timestamp": "2026-06-22",
+      "verifiedAgeDays": 1,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 1 days before inventory",
+        "sourceCount": 1
+      },
+      "driftRisk": "medium",
+      "driftReasons": [
+        "change-prone topic: provenance, source, verification"
+      ],
+      "inboundCount": 0,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [],
+        "outboundConcepts": [
+          "wiki/launch/handoff-2026-06-22.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "wiki",
+          "href": "../launch/handoff-2026-06-22.md",
+          "path": "wiki/launch/handoff-2026-06-22.md",
+          "concept": true
+        }
+      ]
+    },
+    {
+      "path": "wiki/sources/reverification-playbook.md",
+      "id": "sources/reverification-playbook",
+      "type": "concept",
+      "title": "Re-verification playbook",
+      "description": "Commands and files to re-check before quoting project facts, counts, versions, routes, deploy state, or issue status.",
+      "tags": [
+        "commands",
+        "sources",
+        "verification"
+      ],
+      "source": [
+        "package.json",
+        "version.json",
+        "data/archive-analytics.json",
+        ".github/workflows/",
+        "AGENTS.md",
+        "wiki/sources/provenance.md"
+      ],
+      "verified": "2026-06-23",
+      "timestamp": "2026-06-23",
+      "verifiedAgeDays": 0,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 6
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: deploy",
+        "change-prone topic: source, verification"
+      ],
+      "inboundCount": 0,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [],
+        "outboundConcepts": [
+          "wiki/systems/ci-and-testing.md",
+          "wiki/systems/deploy-and-hosting.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "wiki",
+          "href": "../systems/ci-and-testing.md",
+          "path": "wiki/systems/ci-and-testing.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../systems/deploy-and-hosting.md",
+          "path": "wiki/systems/deploy-and-hosting.md",
+          "concept": true
+        }
+      ]
+    },
+    {
+      "path": "wiki/systems/cache-and-versioning.md",
+      "id": "systems/cache-and-versioning",
+      "type": "system",
+      "title": "Cache and versioning",
+      "description": "The version knobs and browser caches that must move together so returning visitors receive fresh archive code and data.",
+      "tags": [
+        "cache",
+        "deploy",
+        "service-worker",
+        "versioning"
+      ],
+      "source": [
+        "README.md",
+        "DEPLOYMENT.md",
+        "version.json",
+        "frontend/sw.js",
+        "frontend/services/archiveService.js",
+        "frontend/services/cacheConfig.js",
+        "tests/version-consistency.test.js"
+      ],
+      "verified": "2026-06-23",
+      "timestamp": "2026-06-23",
+      "verifiedAgeDays": 0,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 7
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: cache, deploy, versioning",
+        "change-prone topic: data"
+      ],
+      "inboundCount": 2,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/project/development-workflow.md",
+          "wiki/project/development-workflow.md"
+        ],
+        "outboundConcepts": [
+          "wiki/systems/deploy-and-hosting.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "repo",
+          "href": "../../DEPLOYMENT.md",
+          "path": "DEPLOYMENT.md",
+          "concept": false
+        },
+        {
+          "kind": "wiki",
+          "href": "deploy-and-hosting.md",
+          "path": "wiki/systems/deploy-and-hosting.md",
+          "concept": true
+        }
+      ]
+    },
+    {
+      "path": "wiki/systems/ci-and-testing.md",
+      "id": "systems/ci-and-testing",
+      "type": "system",
+      "title": "CI and testing",
+      "description": "The test commands, GitHub Actions gates, and local preview audit paths that protect the archive.",
+      "tags": [
+        "ci",
+        "github-actions",
+        "tests",
+        "validation"
+      ],
+      "source": [
+        "package.json",
+        "tests/",
+        ".github/workflows/",
+        "AGENTS.md"
+      ],
+      "verified": "2026-06-23",
+      "timestamp": "2026-06-23",
+      "verifiedAgeDays": 0,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 4
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: ci, github-actions, testing"
+      ],
+      "inboundCount": 1,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/sources/reverification-playbook.md"
+        ],
+        "outboundConcepts": [
+          "wiki/systems/deploy-and-hosting.md",
+          "wiki/systems/maintenance-automation.md",
+          "wiki/systems/submission-server.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "wiki",
+          "href": "submission-server.md",
+          "path": "wiki/systems/submission-server.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "maintenance-automation.md",
+          "path": "wiki/systems/maintenance-automation.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "deploy-and-hosting.md",
+          "path": "wiki/systems/deploy-and-hosting.md",
+          "concept": true
+        }
+      ]
+    },
+    {
+      "path": "wiki/systems/data-pipeline.md",
+      "id": "systems/data-pipeline",
+      "type": "system",
+      "title": "Data pipeline (backend)",
+      "description": "Poetry-managed Python pipeline that scrapes, categorizes, and AI-analyzes sources, then exports the JSON the front end loads.",
+      "tags": [
+        "backend",
+        "data",
+        "pipeline"
+      ],
+      "source": [
+        "CLAUDE.md",
+        "docs/narrative/data-pipeline.md",
+        "backend/"
+      ],
+      "verified": "2026-06-22",
+      "timestamp": "2026-06-22",
+      "verifiedAgeDays": 1,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 1 days before inventory",
+        "sourceCount": 3
+      },
+      "driftRisk": "medium",
+      "driftReasons": [
+        "change-prone topic: data, source"
+      ],
+      "inboundCount": 2,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/data/schema.md",
+          "wiki/project/overview.md"
+        ],
+        "outboundConcepts": [
+          "wiki/data/corpus.md",
+          "wiki/data/corpus.md",
+          "wiki/data/schema.md",
+          "wiki/systems/frontend.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "repo",
+          "href": "../../backend/",
+          "path": "backend",
+          "concept": false
+        },
+        {
+          "kind": "repo",
+          "href": "../../data/",
+          "path": "data",
+          "concept": false
+        },
+        {
+          "kind": "wiki",
+          "href": "../data/corpus.md",
+          "path": "wiki/data/corpus.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "frontend.md",
+          "path": "wiki/systems/frontend.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../data/corpus.md",
+          "path": "wiki/data/corpus.md",
+          "concept": true
+        },
+        {
+          "kind": "repo",
+          "href": "../../docs/narrative/data-pipeline.md",
+          "path": "docs/narrative/data-pipeline.md",
+          "concept": false
+        },
+        {
+          "kind": "repo",
+          "href": "../../docs/ENTITY_EXTRACTION_PIPELINE.md",
+          "path": "docs/ENTITY_EXTRACTION_PIPELINE.md",
+          "concept": false
+        },
+        {
+          "kind": "wiki",
+          "href": "../data/schema.md",
+          "path": "wiki/data/schema.md",
+          "concept": true
+        }
+      ]
+    },
+    {
+      "path": "wiki/systems/deploy-and-hosting.md",
+      "id": "systems/deploy-and-hosting",
+      "type": "system",
+      "title": "Deploy and hosting",
+      "description": "The archive is served from a legacy NYU Media Temple/Plesk box behind Cloudflare DNS on a GoDaddy domain; automated deploy exists but lacks SFTP credentials, so uploads are manual.",
+      "tags": [
+        "blocker",
+        "cloudflare",
+        "deploy",
+        "hosting",
+        "sftp"
+      ],
+      "source": [
+        "GitHub #458/#459/#367",
+        "2026-06-19 call",
+        "DEPLOYMENT.md",
+        "deploy.yml"
+      ],
+      "verified": "2026-06-22",
+      "timestamp": "2026-06-22",
+      "verifiedAgeDays": 1,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 1 days before inventory",
+        "sourceCount": 4
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: blocker, cloudflare, credential, deploy, dns, hosting, sftp"
+      ],
+      "inboundCount": 12,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/data/corpus.md",
+          "wiki/launch/handoff-2026-06-22.md",
+          "wiki/launch/launch-plan.md",
+          "wiki/people/jay-rosen.md",
+          "wiki/people/joe-amditis.md",
+          "wiki/project/launch-status.md",
+          "wiki/sources/reverification-playbook.md",
+          "wiki/systems/cache-and-versioning.md",
+          "wiki/systems/ci-and-testing.md",
+          "wiki/systems/maintenance-automation.md",
+          "wiki/systems/maintenance-automation.md",
+          "wiki/systems/submission-server.md"
+        ],
+        "outboundConcepts": [
+          "wiki/people/jay-rosen.md",
+          "wiki/people/joe-amditis.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "wiki",
+          "href": "../people/jay-rosen.md",
+          "path": "wiki/people/jay-rosen.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../people/joe-amditis.md",
+          "path": "wiki/people/joe-amditis.md",
+          "concept": true
+        },
+        {
+          "kind": "repo",
+          "href": "../../DEPLOYMENT.md",
+          "path": "DEPLOYMENT.md",
+          "concept": false
+        }
+      ]
+    },
+    {
+      "path": "wiki/systems/feedback-and-reporting.md",
+      "id": "systems/feedback-and-reporting",
+      "type": "system",
+      "title": "Feedback and reporting",
+      "description": "The live feedback path is an on-site \"Report a bug\" button that opens a prefilled GitHub issue; a branded in-archive form that hides GitHub is the planned replacement (#509).",
+      "tags": [
+        "feedback",
+        "intake",
+        "launch",
+        "report"
+      ],
+      "source": [
+        "GitHub #450/#451/#509",
+        "frontend/utils/bugReport.js",
+        "2026-06-22 decision"
+      ],
+      "verified": "2026-06-22",
+      "timestamp": "2026-06-22",
+      "verifiedAgeDays": 1,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 1 days before inventory",
+        "sourceCount": 3
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: launch"
+      ],
+      "inboundCount": 4,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/launch/handoff-2026-06-22.md",
+          "wiki/launch/launch-plan.md",
+          "wiki/project/launch-status.md",
+          "wiki/systems/submission-server.md"
+        ],
+        "outboundConcepts": [
+          "wiki/data/corpus.md",
+          "wiki/launch/handoff-2026-06-22.md",
+          "wiki/people/jay-rosen.md",
+          "wiki/systems/submission-server.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "wiki",
+          "href": "../data/corpus.md",
+          "path": "wiki/data/corpus.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../people/jay-rosen.md",
+          "path": "wiki/people/jay-rosen.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../launch/handoff-2026-06-22.md",
+          "path": "wiki/launch/handoff-2026-06-22.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "submission-server.md",
+          "path": "wiki/systems/submission-server.md",
+          "concept": true
+        }
+      ]
+    },
+    {
+      "path": "wiki/systems/frontend.md",
+      "id": "systems/frontend",
+      "type": "system",
+      "title": "Front end (zero-build static site)",
+      "description": "React-via-CDN, HTM, and sql.js static site with hash routing and a service worker; no bundler, deployed as files.",
+      "tags": [
+        "architecture",
+        "frontend",
+        "static-site"
+      ],
+      "source": [
+        "CLAUDE.md",
+        "docs/narrative/architecture.md",
+        "index.html"
+      ],
+      "verified": "2026-06-22",
+      "timestamp": "2026-06-22",
+      "verifiedAgeDays": 1,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 1 days before inventory",
+        "sourceCount": 3
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: deploy"
+      ],
+      "inboundCount": 4,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/data/corpus.md",
+          "wiki/project/development-workflow.md",
+          "wiki/project/overview.md",
+          "wiki/systems/data-pipeline.md"
+        ],
+        "outboundConcepts": [
+          "wiki/data/corpus.md",
+          "wiki/data/corpus.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "wiki",
+          "href": "../data/corpus.md",
+          "path": "wiki/data/corpus.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../data/corpus.md",
+          "path": "wiki/data/corpus.md",
+          "concept": true
+        },
+        {
+          "kind": "repo",
+          "href": "../../docs/narrative/architecture.md",
+          "path": "docs/narrative/architecture.md",
+          "concept": false
+        },
+        {
+          "kind": "repo",
+          "href": "../../CONTEXT.md",
+          "path": "CONTEXT.md",
+          "concept": false
+        }
+      ]
+    },
+    {
+      "path": "wiki/systems/maintenance-automation.md",
+      "id": "systems/maintenance-automation",
+      "type": "system",
+      "title": "Maintenance automation",
+      "description": "The manual-dispatch jobs for enriching, syncing, deploying, and monitoring the archive outside the normal PR path.",
+      "tags": [
+        "automation",
+        "deploy",
+        "github-actions",
+        "maintenance"
+      ],
+      "source": [
+        ".github/workflows/maintenance.yml",
+        ".github/workflows/deploy.yml",
+        ".github/workflows/post-merge.yml",
+        "docs/setup/maintenance-runbook.md",
+        "docs/setup/pillar-3a-runbook.md"
+      ],
+      "verified": "2026-06-23",
+      "timestamp": "2026-06-23",
+      "verifiedAgeDays": 0,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 5
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: automation, ci, deploy, github-actions"
+      ],
+      "inboundCount": 1,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/systems/ci-and-testing.md"
+        ],
+        "outboundConcepts": [
+          "wiki/systems/deploy-and-hosting.md",
+          "wiki/systems/deploy-and-hosting.md",
+          "wiki/systems/submission-server.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "repo",
+          "href": "../../docs/setup/maintenance-runbook.md",
+          "path": "docs/setup/maintenance-runbook.md",
+          "concept": false
+        },
+        {
+          "kind": "wiki",
+          "href": "deploy-and-hosting.md",
+          "path": "wiki/systems/deploy-and-hosting.md",
+          "concept": true
+        },
+        {
+          "kind": "repo",
+          "href": "../../DEPLOYMENT.md",
+          "path": "DEPLOYMENT.md",
+          "concept": false
+        },
+        {
+          "kind": "wiki",
+          "href": "submission-server.md",
+          "path": "wiki/systems/submission-server.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "deploy-and-hosting.md",
+          "path": "wiki/systems/deploy-and-hosting.md",
+          "concept": true
+        }
+      ]
+    },
+    {
+      "path": "wiki/systems/public-community-wiki.md",
+      "id": "systems/public-community-wiki",
+      "type": "system",
+      "title": "Public archive wiki feature",
+      "description": "The in-app read-only #wiki route for community-facing concept/entity/topic pages, distinct from this repo-maintenance OKF bundle.",
+      "tags": [
+        "community",
+        "frontend",
+        "seed-data",
+        "wiki"
+      ],
+      "source": [
+        "docs/plans/2026-06-21-community-wiki-spec.md",
+        "data/wiki-seed.json",
+        "frontend/components/WikiPage.js",
+        "frontend/services/wikiService.js",
+        "tests/wiki-service.test.js",
+        "tests/wiki-ui-structure.test.js"
+      ],
+      "verified": "2026-06-23",
+      "timestamp": "2026-06-23",
+      "verifiedAgeDays": 0,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 6
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: ci",
+        "change-prone topic: community, data, public"
+      ],
+      "inboundCount": 1,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/README.md"
+        ],
+        "outboundConcepts": []
+      },
+      "outboundLinks": [
+        {
+          "kind": "repo",
+          "href": "../../docs/plans/2026-06-21-community-wiki-spec.md",
+          "path": "docs/plans/2026-06-21-community-wiki-spec.md",
+          "concept": false
+        }
+      ]
+    },
+    {
+      "path": "wiki/systems/submission-server.md",
+      "id": "systems/submission-server",
+      "type": "system",
+      "title": "Submission server (Pillar 3a)",
+      "description": "A Flask intake that validates and enqueues URL submissions; a separate local processor (POST /process or the scheduler) scrapes, categorizes, appends, regenerates, tests, and pushes.",
+      "tags": [
+        "backend",
+        "intake",
+        "pillar3a",
+        "submission"
+      ],
+      "source": [
+        "backend/submission_server/",
+        ".github/workflows/submit-record.yml",
+        "docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md"
+      ],
+      "verified": "2026-06-22",
+      "timestamp": "2026-06-22",
+      "verifiedAgeDays": 1,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 1 days before inventory",
+        "sourceCount": 3
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: submission"
+      ],
+      "inboundCount": 3,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/systems/ci-and-testing.md",
+          "wiki/systems/feedback-and-reporting.md",
+          "wiki/systems/maintenance-automation.md"
+        ],
+        "outboundConcepts": [
+          "wiki/systems/deploy-and-hosting.md",
+          "wiki/systems/feedback-and-reporting.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "repo",
+          "href": "../../backend/submission_server/",
+          "path": "backend/submission_server",
+          "concept": false
+        },
+        {
+          "kind": "wiki",
+          "href": "feedback-and-reporting.md",
+          "path": "wiki/systems/feedback-and-reporting.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "deploy-and-hosting.md",
+          "path": "wiki/systems/deploy-and-hosting.md",
+          "concept": true
+        },
+        {
+          "kind": "repo",
+          "href": "../../docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md",
+          "path": "docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md",
+          "concept": false
+        }
+      ]
+    },
+    {
+      "path": "wiki/timeline/key-dates.md",
+      "id": "timeline/key-dates",
+      "type": "concept",
+      "title": "Key dates",
+      "description": "The milestones that bear on launch — dissertation release, the test-audience greenlight, the Jay call, and the pre-launch handoff.",
+      "tags": [
+        "dates",
+        "launch",
+        "timeline"
+      ],
+      "source": [
+        "CLAUDE.md",
+        "GitHub #445",
+        "2026-06-19 call",
+        "sent email 2026-06-22"
+      ],
+      "verified": "2026-06-22",
+      "timestamp": "2026-06-22",
+      "verifiedAgeDays": 1,
+      "freshness": {
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 1 days before inventory",
+        "sourceCount": 4
+      },
+      "driftRisk": "high",
+      "driftReasons": [
+        "high-change topic: launch"
+      ],
+      "inboundCount": 1,
+      "localGraph": {
+        "defaultHops": 1,
+        "maxDefaultHops": 2,
+        "inboundConcepts": [
+          "wiki/launch/handoff-2026-06-22.md"
+        ],
+        "outboundConcepts": [
+          "wiki/data/corpus.md",
+          "wiki/launch/handoff-2026-06-22.md",
+          "wiki/people/jay-rosen.md",
+          "wiki/people/unified-field.md"
+        ]
+      },
+      "outboundLinks": [
+        {
+          "kind": "wiki",
+          "href": "../people/unified-field.md",
+          "path": "wiki/people/unified-field.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../people/jay-rosen.md",
+          "path": "wiki/people/jay-rosen.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../data/corpus.md",
+          "path": "wiki/data/corpus.md",
+          "concept": true
+        },
+        {
+          "kind": "wiki",
+          "href": "../launch/handoff-2026-06-22.md",
+          "path": "wiki/launch/handoff-2026-06-22.md",
+          "concept": true
+        }
+      ]
+    }
+  ],
+  "orphanedConcepts": [
+    "wiki/data/data-quality-gaps.md",
+    "wiki/launch/open-decisions.md",
+    "wiki/meta/adoption-playbook.md",
+    "wiki/meta/blindfold-test.md",
+    "wiki/meta/community-roadmap.md",
+    "wiki/meta/concept-template.md",
+    "wiki/meta/enhancement-radar.md",
+    "wiki/meta/okf-profile.md",
+    "wiki/meta/quality-model.md",
+    "wiki/project/launch-status.md",
+    "wiki/README.md",
+    "wiki/sources/provenance.md",
+    "wiki/sources/reverification-playbook.md"
+  ]
+}

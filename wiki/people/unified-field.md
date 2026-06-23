@@ -1,6 +1,6 @@
 ---
 type: organization
-title: Unified Field (Eli Kuslansky, Marla Supnick)
+title: Unified Field
 description: The design/strategy vendor advising on the archive's launch and promotion; greenlit the short test-audience launch and own a separate landing-page track.
 source: ["GitHub #445", "2026-06-17 forwarded thread", "2026-06-22 email recipients"]
 verified: 2026-06-22

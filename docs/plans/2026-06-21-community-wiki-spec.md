@@ -22,6 +22,8 @@ Issue 499 asks for a public wiki for archive records, concepts, entities, and re
 6. Moderation tools must ship before open editing.
 7. The wiki should deepen archive discovery, not become a second unsourced biography site.
 8. Read performance should not depend on loading the full archive data set unless a wiki screen needs record-backed context.
+9. Graph navigation must be local-first: one hop by default, two hops as expansion, and any global graph is a filterable opt-in.
+10. Staleness must be visible per page through a freshness badge derived from last-updated/source metadata or OKF `verified`/`source` metadata.
 
 ## Phase 1 acceptance criteria
 
@@ -33,6 +35,7 @@ Issue 499 asks for a public wiki for archive records, concepts, entities, and re
 - Every seed page has a title, kind, slug, summary, at least one body section, contributor attribution, revision count, last-updated date, and moderation state.
 - Every related concept/entity slug points to a seed page that exists.
 - Every public reference URL uses `http:` or `https:`.
+- Every page and result card shows freshness state.
 - Community-contributed labeling appears on every wiki surface.
 - The wiki route works with the existing hash router and does not break existing routes.
 - A cold `#wiki` deep link does not fetch archive core data or preload archive details.
@@ -255,6 +258,16 @@ Not acceptable:
 - Preview clearly distinguishes unsaved content from live content.
 - Rejection and needs-changes notices include moderator notes.
 - New contributors see examples of acceptable sources and unacceptable original synthesis.
+
+## Navigation and trust requirements
+
+- Do not use a global force graph as the default discovery surface.
+- Page detail views may show a local graph with one hop by default and two hops as an expansion.
+- The global graph, if added, must be an explicit view with filters for kind, moderation state, freshness, relationship type, and text search.
+- Graph labels should be gated by zoom level and node degree, not always-on.
+- Every wiki page, result card, related-page chip, and graph node should expose freshness state.
+- Freshness should include date, source/reference count, and a clear stale/unknown state.
+- Staleness must not be hidden behind a history tab.
 
 ## Moderator experience requirements
 
