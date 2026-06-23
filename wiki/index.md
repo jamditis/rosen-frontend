@@ -1,7 +1,7 @@
 ---
 okf_version: "0.1"
 title: Jay Rosen's Internet Archive — knowledge bundle
-description: Agent-navigable knowledge layer for the Jay Rosen's Internet Archive project — what it is, who's involved, how it's built, and where launch stands.
+description: Agent-navigable knowledge layer for the Jay Rosen's Internet Archive project — what it is, who's involved, how it's built, how to operate it, and where launch stands.
 tags: [rosen-archive, pressthink, okf, index]
 timestamp: 2026-06-22
 ---
@@ -14,13 +14,14 @@ This is the fast, agent-navigable layer. It states the verified facts and links 
 
 ## Map
 
-- **[project/](project/index.md)** — what the archive is, the curator, and where launch stands.
+- **[project/](project/index.md)** — what the archive is, the curator, where launch stands, and how repo work should be selected and verified.
 - **[people/](people/index.md)** — Jay Rosen, Joe Amditis, and the Unified Field vendor team.
-- **[systems/](systems/index.md)** — the static front end, the data pipeline, the submission server, deploy and hosting, and the feedback path.
-- **[data/](data/index.md)** — the corpus (record counts, record types, sources) and the schema and vocabulary.
-- **[launch/](launch/index.md)** — the launch plan, the readiness gate, and the 2026-06-22 handoff to Jay.
+- **[systems/](systems/index.md)** — the static front end, cache/versioning, CI, the data pipeline, automation, deploy and hosting, feedback, and the public `#wiki` feature.
+- **[data/](data/index.md)** — the corpus (record counts, record types, sources), schema/vocabulary, and known data-quality gaps.
+- **[launch/](launch/index.md)** — the launch plan, the readiness gate, open decisions, and the 2026-06-22 handoff to Jay.
 - **[timeline/](timeline/index.md)** — the key dates.
-- **[sources/](sources/index.md)** — provenance for the facts in this bundle.
+- **[sources/](sources/index.md)** — provenance and re-verification commands for the facts in this bundle.
+- **[meta/](meta/index.md)** — the local OKF profile, templates, adoption playbook, and quality model other projects can copy.
 
 ## Change log
 

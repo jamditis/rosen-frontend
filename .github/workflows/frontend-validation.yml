@@ -7,11 +7,14 @@ on:
       - 'frontend/**'
       - 'tools/**'
       - 'dissertation/**'
+      - 'docs/**'
       - 'features/**'
       - 'index.html'
       - 'version.json'
       - 'shared-styles.css'
       - 'tests/**'
+      - 'scripts/**'
+      - 'wiki/**'
       - 'data/**'
       - 'package.json'
       - 'package-lock.json'
@@ -22,11 +25,14 @@ on:
       - 'frontend/**'
       - 'tools/**'
       - 'dissertation/**'
+      - 'docs/**'
       - 'features/**'
       - 'index.html'
       - 'version.json'
       - 'shared-styles.css'
       - 'tests/**'
+      - 'scripts/**'
+      - 'wiki/**'
       - 'data/**'
       - 'package.json'
       - 'package-lock.json'
@@ -99,6 +105,9 @@ jobs:
 
       - name: Run extraction coverage check
         run: npm run test:data:extraction-coverage
+
+      - name: Validate OKF bundle
+        run: npm run test:okf
 
       - name: Check HTML documents are well-formed
         run: |
