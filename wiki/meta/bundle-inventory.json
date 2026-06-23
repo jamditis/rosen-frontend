@@ -26,9 +26,9 @@
       "test": 1
     },
     "byDriftRisk": {
-      "high": 19,
-      "low": 6,
-      "medium": 9
+      "high": 14,
+      "low": 9,
+      "medium": 11
     },
     "byFreshness": {
       "fresh": 34
@@ -67,7 +67,7 @@
       "driftReasons": [
         "change-prone topic: data"
       ],
-      "inboundCount": 17,
+      "inboundCount": 10,
       "localGraph": {
         "defaultHops": 1,
         "maxDefaultHops": 2,
@@ -76,17 +76,10 @@
           "wiki/launch/handoff-2026-06-22.md",
           "wiki/launch/launch-plan.md",
           "wiki/people/jay-rosen.md",
-          "wiki/people/jay-rosen.md",
-          "wiki/people/joe-amditis.md",
           "wiki/people/joe-amditis.md",
           "wiki/project/overview.md",
-          "wiki/project/overview.md",
-          "wiki/project/overview.md",
-          "wiki/project/overview.md",
-          "wiki/systems/data-pipeline.md",
           "wiki/systems/data-pipeline.md",
           "wiki/systems/feedback-and-reporting.md",
-          "wiki/systems/frontend.md",
           "wiki/systems/frontend.md",
           "wiki/timeline/key-dates.md"
         ],
@@ -221,15 +214,13 @@
       "driftReasons": [
         "change-prone topic: data"
       ],
-      "inboundCount": 6,
+      "inboundCount": 4,
       "localGraph": {
         "defaultHops": 1,
         "maxDefaultHops": 2,
         "inboundConcepts": [
           "wiki/data/corpus.md",
           "wiki/people/joe-amditis.md",
-          "wiki/project/overview.md",
-          "wiki/project/overview.md",
           "wiki/project/overview.md",
           "wiki/systems/data-pipeline.md"
         ],
@@ -455,7 +446,7 @@
       },
       "driftRisk": "high",
       "driftReasons": [
-        "high-change topic: automation, ci, launch, submission",
+        "high-change topic: automation, launch, submission",
         "change-prone topic: data, decisions"
       ],
       "inboundCount": 0,
@@ -746,9 +737,9 @@
         "reason": "Verified 0 days before inventory",
         "sourceCount": 4
       },
-      "driftRisk": "high",
+      "driftRisk": "low",
       "driftReasons": [
-        "high-change topic: ci"
+        "recently verified"
       ],
       "inboundCount": 0,
       "localGraph": {
@@ -906,7 +897,6 @@
         ],
         "outboundConcepts": [
           "wiki/data/corpus.md",
-          "wiki/data/corpus.md",
           "wiki/launch/handoff-2026-06-22.md",
           "wiki/systems/deploy-and-hosting.md"
         ]
@@ -963,9 +953,9 @@
         "reason": "Verified 1 days before inventory",
         "sourceCount": 3
       },
-      "driftRisk": "high",
+      "driftRisk": "low",
       "driftReasons": [
-        "high-change topic: ci, deploy"
+        "recently verified"
       ],
       "inboundCount": 4,
       "localGraph": {
@@ -978,7 +968,6 @@
           "wiki/systems/deploy-and-hosting.md"
         ],
         "outboundConcepts": [
-          "wiki/data/corpus.md",
           "wiki/data/corpus.md",
           "wiki/data/schema.md",
           "wiki/launch/handoff-2026-06-22.md",
@@ -1128,7 +1117,6 @@
         ],
         "outboundConcepts": [
           "wiki/systems/cache-and-versioning.md",
-          "wiki/systems/cache-and-versioning.md",
           "wiki/systems/frontend.md"
         ]
       },
@@ -1180,7 +1168,7 @@
       },
       "driftRisk": "high",
       "driftReasons": [
-        "high-change topic: blocker, credential, deploy, launch, sftp"
+        "high-change topic: blocker, credential, launch, sftp"
       ],
       "inboundCount": 0,
       "localGraph": {
@@ -1264,9 +1252,8 @@
         "reason": "Verified 1 days before inventory",
         "sourceCount": 3
       },
-      "driftRisk": "high",
+      "driftRisk": "medium",
       "driftReasons": [
-        "high-change topic: ci",
         "change-prone topic: public"
       ],
       "inboundCount": 1,
@@ -1278,11 +1265,6 @@
         ],
         "outboundConcepts": [
           "wiki/data/corpus.md",
-          "wiki/data/corpus.md",
-          "wiki/data/corpus.md",
-          "wiki/data/corpus.md",
-          "wiki/data/schema.md",
-          "wiki/data/schema.md",
           "wiki/data/schema.md",
           "wiki/people/jay-rosen.md",
           "wiki/people/joe-amditis.md",
@@ -1564,7 +1546,7 @@
       "driftRisk": "high",
       "driftReasons": [
         "high-change topic: deploy",
-        "change-prone topic: source, verification"
+        "change-prone topic: verification"
       ],
       "inboundCount": 0,
       "localGraph": {
@@ -1626,12 +1608,11 @@
         "high-change topic: cache, deploy, versioning",
         "change-prone topic: data"
       ],
-      "inboundCount": 2,
+      "inboundCount": 1,
       "localGraph": {
         "defaultHops": 1,
         "maxDefaultHops": 2,
         "inboundConcepts": [
-          "wiki/project/development-workflow.md",
           "wiki/project/development-workflow.md"
         ],
         "outboundConcepts": [
@@ -1745,7 +1726,7 @@
       },
       "driftRisk": "medium",
       "driftReasons": [
-        "change-prone topic: data, source"
+        "change-prone topic: data"
       ],
       "inboundCount": 2,
       "localGraph": {
@@ -1756,7 +1737,6 @@
           "wiki/project/overview.md"
         ],
         "outboundConcepts": [
-          "wiki/data/corpus.md",
           "wiki/data/corpus.md",
           "wiki/data/schema.md",
           "wiki/systems/frontend.md"
@@ -1843,9 +1823,9 @@
       },
       "driftRisk": "high",
       "driftReasons": [
-        "high-change topic: blocker, cloudflare, credential, deploy, dns, hosting, sftp"
+        "high-change topic: blocker, cloudflare, deploy, dns, hosting, sftp"
       ],
-      "inboundCount": 12,
+      "inboundCount": 11,
       "localGraph": {
         "defaultHops": 1,
         "maxDefaultHops": 2,
@@ -1859,7 +1839,6 @@
           "wiki/sources/reverification-playbook.md",
           "wiki/systems/cache-and-versioning.md",
           "wiki/systems/ci-and-testing.md",
-          "wiki/systems/maintenance-automation.md",
           "wiki/systems/maintenance-automation.md",
           "wiki/systems/submission-server.md"
         ],
@@ -1988,9 +1967,9 @@
         "reason": "Verified 1 days before inventory",
         "sourceCount": 3
       },
-      "driftRisk": "high",
+      "driftRisk": "low",
       "driftReasons": [
-        "high-change topic: deploy"
+        "recently verified"
       ],
       "inboundCount": 4,
       "localGraph": {
@@ -2003,7 +1982,6 @@
           "wiki/systems/data-pipeline.md"
         ],
         "outboundConcepts": [
-          "wiki/data/corpus.md",
           "wiki/data/corpus.md"
         ]
       },
@@ -2064,7 +2042,7 @@
       },
       "driftRisk": "high",
       "driftReasons": [
-        "high-change topic: automation, ci, deploy, github-actions"
+        "high-change topic: automation, deploy, github-actions"
       ],
       "inboundCount": 1,
       "localGraph": {
@@ -2074,7 +2052,6 @@
           "wiki/systems/ci-and-testing.md"
         ],
         "outboundConcepts": [
-          "wiki/systems/deploy-and-hosting.md",
           "wiki/systems/deploy-and-hosting.md",
           "wiki/systems/submission-server.md"
         ]
@@ -2141,9 +2118,8 @@
         "reason": "Verified 0 days before inventory",
         "sourceCount": 6
       },
-      "driftRisk": "high",
+      "driftRisk": "medium",
       "driftReasons": [
-        "high-change topic: ci",
         "change-prone topic: community, data, public"
       ],
       "inboundCount": 1,

@@ -122,7 +122,10 @@ function extractLinks({ rootDir, filePath, conceptSet }) {
 
 function includesAnyTerm(text, terms) {
   const haystack = text.toLowerCase();
-  return terms.filter(term => haystack.includes(term));
+  return terms.filter(term => {
+    const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(`(^|[^a-z0-9])${escaped}(?=$|[^a-z0-9])`).test(haystack);
+  });
 }
 
 function classifyDriftRisk({ concept, asOfDate }) {
@@ -203,7 +206,7 @@ export function buildFlightRecorderInventory({
   const conceptSet = new Set(conceptFiles.map(file => relPath(rootDir, file)));
   const inventoryDate = asOfDate || findAsOfDate(files);
   const inboundCounts = new Map([...conceptSet].map(file => [file, 0]));
-  const inboundRefs = new Map([...conceptSet].map(file => [file, []]));
+  const inboundRefs = new Map([...conceptSet].map(file => [file, new Set()]));
   let totalInternalLinks = 0;
   let totalExternalLinks = 0;
 
@@ -221,8 +224,7 @@ export function buildFlightRecorderInventory({
       } else {
         totalInternalLinks += 1;
       }
-      if (link.concept) inboundCounts.set(link.path, (inboundCounts.get(link.path) || 0) + 1);
-      if (link.concept) inboundRefs.get(link.path).push(conceptPath);
+      if (link.concept) inboundRefs.get(link.path).add(conceptPath);
     }
 
     return {
@@ -246,11 +248,12 @@ export function buildFlightRecorderInventory({
   const concepts = parsedConcepts
     .map(concept => {
       const drift = classifyDriftRisk({ concept, asOfDate: inventoryDate });
-      const outboundConcepts = concept.outboundLinks
+      const outboundConcepts = [...new Set(concept.outboundLinks
         .filter(link => link.concept)
-        .map(link => link.path)
+        .map(link => link.path))]
         .sort();
       const inboundConcepts = [...(inboundRefs.get(concept.path) || [])].sort();
+      inboundCounts.set(concept.path, inboundConcepts.length);
       return {
         path: concept.path,
         id: concept.id,

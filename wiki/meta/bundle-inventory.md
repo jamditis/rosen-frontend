@@ -54,9 +54,9 @@ The default navigation view should be a per-concept local graph, not a global fo
 
 | Risk | Count |
 | --- | ---: |
-| high | 19 |
-| low | 6 |
-| medium | 9 |
+| high | 14 |
+| low | 9 |
+| medium | 11 |
 
 ## Freshness badge counts
 
@@ -88,22 +88,17 @@ The default navigation view should be a per-concept local graph, not a global fo
 | [Pre-launch handoff to Jay (2026-06-22)](../launch/handoff-2026-06-22.md) | event | 2026-06-22 | 8 | high-change topic: launch |
 | [Launch plan](../launch/launch-plan.md) | concept | 2026-06-22 | 2 | high-change topic: launch |
 | [Jay Rosen](../people/jay-rosen.md) | person | 2026-06-22 | 5 | high-change topic: launch |
-| [Joe Amditis](../people/joe-amditis.md) | person | 2026-06-22 | 4 | high-change topic: ci, deploy |
 | [Unified Field](../people/unified-field.md) | organization | 2026-06-22 | 2 | high-change topic: launch |
-| [Launch status](../project/launch-status.md) | concept | 2026-06-22 | 0 | high-change topic: blocker, credential, deploy, launch, sftp |
-| [What the archive is](../project/overview.md) | concept | 2026-06-22 | 1 | high-change topic: ci; change-prone topic: public |
-| [Deploy and hosting](../systems/deploy-and-hosting.md) | system | 2026-06-22 | 12 | high-change topic: blocker, cloudflare, credential, deploy, dns, hosting, sftp |
+| [Launch status](../project/launch-status.md) | concept | 2026-06-22 | 0 | high-change topic: blocker, credential, launch, sftp |
+| [Deploy and hosting](../systems/deploy-and-hosting.md) | system | 2026-06-22 | 11 | high-change topic: blocker, cloudflare, deploy, dns, hosting, sftp |
 | [Feedback and reporting](../systems/feedback-and-reporting.md) | system | 2026-06-22 | 4 | high-change topic: launch |
-| [Front end (zero-build static site)](../systems/frontend.md) | system | 2026-06-22 | 4 | high-change topic: deploy |
 | [Submission server (Pillar 3a)](../systems/submission-server.md) | system | 2026-06-22 | 3 | high-change topic: submission |
 | [Key dates](../timeline/key-dates.md) | concept | 2026-06-22 | 1 | high-change topic: launch |
-| [Open launch and architecture decisions](../launch/open-decisions.md) | concept | 2026-06-23 | 0 | high-change topic: automation, ci, launch, submission; change-prone topic: data, decisions |
-| [Rosen project OKF profile](okf-profile.md) | profile | 2026-06-23 | 0 | high-change topic: ci |
-| [Re-verification playbook](../sources/reverification-playbook.md) | concept | 2026-06-23 | 0 | high-change topic: deploy; change-prone topic: source, verification |
-| [Cache and versioning](../systems/cache-and-versioning.md) | system | 2026-06-23 | 2 | high-change topic: cache, deploy, versioning; change-prone topic: data |
+| [Open launch and architecture decisions](../launch/open-decisions.md) | concept | 2026-06-23 | 0 | high-change topic: automation, launch, submission; change-prone topic: data, decisions |
+| [Re-verification playbook](../sources/reverification-playbook.md) | concept | 2026-06-23 | 0 | high-change topic: deploy; change-prone topic: verification |
+| [Cache and versioning](../systems/cache-and-versioning.md) | system | 2026-06-23 | 1 | high-change topic: cache, deploy, versioning; change-prone topic: data |
 | [CI and testing](../systems/ci-and-testing.md) | system | 2026-06-23 | 1 | high-change topic: ci, github-actions, testing |
-| [Maintenance automation](../systems/maintenance-automation.md) | system | 2026-06-23 | 1 | high-change topic: automation, ci, deploy, github-actions |
-| [Public archive wiki feature](../systems/public-community-wiki.md) | system | 2026-06-23 | 1 | high-change topic: ci; change-prone topic: community, data, public |
+| [Maintenance automation](../systems/maintenance-automation.md) | system | 2026-06-23 | 1 | high-change topic: automation, deploy, github-actions |
 
 ## Stale concepts
 
@@ -120,18 +115,18 @@ These concepts currently have no inbound links from other concept files. Section
 | Concept | Type | Verified | Inbound links | Reason |
 | --- | --- | --- | ---: | --- |
 | [Data quality gaps](../data/data-quality-gaps.md) | concept | 2026-06-23 | 0 | change-prone topic: data |
-| [Open launch and architecture decisions](../launch/open-decisions.md) | concept | 2026-06-23 | 0 | high-change topic: automation, ci, launch, submission; change-prone topic: data, decisions |
+| [Open launch and architecture decisions](../launch/open-decisions.md) | concept | 2026-06-23 | 0 | high-change topic: automation, launch, submission; change-prone topic: data, decisions |
 | [OKF adoption playbook](adoption-playbook.md) | playbook | 2026-06-23 | 0 | change-prone topic: public, source |
 | [OKF blindfold test](blindfold-test.md) | test | 2026-06-23 | 0 | recently verified |
 | [OKF community contribution roadmap](community-roadmap.md) | concept | 2026-06-23 | 0 | change-prone topic: community, source |
 | [Concept templates](concept-template.md) | template | 2026-06-23 | 0 | recently verified |
 | [OKF enhancement radar](enhancement-radar.md) | concept | 2026-06-23 | 0 | recently verified |
-| [Rosen project OKF profile](okf-profile.md) | profile | 2026-06-23 | 0 | high-change topic: ci |
+| [Rosen project OKF profile](okf-profile.md) | profile | 2026-06-23 | 0 | recently verified |
 | [OKF quality model](quality-model.md) | concept | 2026-06-23 | 0 | recently verified |
-| [Launch status](../project/launch-status.md) | concept | 2026-06-22 | 0 | high-change topic: blocker, credential, deploy, launch, sftp |
+| [Launch status](../project/launch-status.md) | concept | 2026-06-22 | 0 | high-change topic: blocker, credential, launch, sftp |
 | [Jay Rosen's Internet Archive knowledge bundle](../README.md) | profile | 2026-06-23 | 0 | change-prone topic: public |
 | [Provenance](../sources/provenance.md) | concept | 2026-06-22 | 0 | change-prone topic: provenance, source, verification |
-| [Re-verification playbook](../sources/reverification-playbook.md) | concept | 2026-06-23 | 0 | high-change topic: deploy; change-prone topic: source, verification |
+| [Re-verification playbook](../sources/reverification-playbook.md) | concept | 2026-06-23 | 0 | high-change topic: deploy; change-prone topic: verification |
 
 ## How to interpret this
 

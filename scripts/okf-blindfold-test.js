@@ -15,6 +15,7 @@ const DEFAULT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 
 const SCENARIOS_JSON = 'wiki/meta/blindfold-scenarios.json';
 const REPORT_MD = 'wiki/meta/blindfold-test.md';
 const GENERATED_FROM = 'scripts/okf-blindfold-test.js';
+const GENERATED_MARKDOWN_PATHS = new Set([REPORT_MD, 'wiki/meta/bundle-inventory.md']);
 
 function relPath(rootDir, filePath) {
   return path.relative(rootDir, filePath).split(path.sep).join('/');
@@ -46,6 +47,11 @@ function buildWikiGraph({ rootDir, bundleDir }) {
 
   for (const file of markdownFiles) {
     const sourceRel = relPath(rootDir, file);
+    if (GENERATED_MARKDOWN_PATHS.has(sourceRel)) {
+      graph.set(sourceRel, []);
+      continue;
+    }
+
     const text = stripFencedCodeBlocks(fs.readFileSync(file, 'utf8'));
     const targets = new Set();
 

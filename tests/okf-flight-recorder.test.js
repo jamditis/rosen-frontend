@@ -26,6 +26,20 @@ describe('OKF flight recorder', () => {
     assert.ok(inventory.summary.totalInternalLinks > 0);
   });
 
+  it('matches drift terms on boundaries and deduplicates graph neighbors', () => {
+    const inventory = buildFlightRecorderInventory({ rootDir });
+    const okfProfile = inventory.concepts.find(concept => concept.path === 'wiki/meta/okf-profile.md');
+
+    assert.ok(okfProfile);
+    assert.ok(!okfProfile.driftReasons.some(reason => reason.includes('high-change topic: ci')));
+
+    for (const concept of inventory.concepts) {
+      assert.equal(concept.localGraph.inboundConcepts.length, new Set(concept.localGraph.inboundConcepts).size);
+      assert.equal(concept.localGraph.outboundConcepts.length, new Set(concept.localGraph.outboundConcepts).size);
+      assert.equal(concept.inboundCount, concept.localGraph.inboundConcepts.length);
+    }
+  });
+
   it('flags known high-change project surfaces as high drift', () => {
     const inventory = buildFlightRecorderInventory({ rootDir });
     const highDriftPaths = new Set(

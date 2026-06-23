@@ -10,11 +10,12 @@ export const LINK_RE = /!?\[[^\]]*\]\(([^)]+)\)/g;
 const SECRET_PATTERNS = [
   ['private key block', /-----BEGIN (?:RSA |EC |DSA |OPENSSH |PGP )?PRIVATE KEY-----/],
   ['GitHub token', /\bgh[pousr]_[0-9A-Za-z]{36,}\b/],
+  ['GitHub fine-grained token', /\bgithub_pat_[0-9A-Za-z_]{22,}\b/],
   ['Google API key', /\bAIza[0-9A-Za-z_-]{35}\b/],
   ['Slack token', /\bxox[baprs]-[0-9A-Za-z-]{10,}\b/],
   [
     'secret assignment',
-    /(?:password|passwd|secret|api[_-]?key|apikey|client[_-]?secret|access[_-]?token|auth[_-]?token)\s*[:=]\s*['"]?[A-Za-z0-9+/]{24,}['"]?/i
+    /(?:password|passwd|secret|api[_-]?key|apikey|client[_-]?secret|access[_-]?token|auth[_-]?token)\s*[:=]\s*['"]?[A-Za-z0-9_+/=-]{24,}['"]?/i
   ]
 ];
 
@@ -93,8 +94,45 @@ export function isExternalLink(target) {
   return /^(https?:|mailto:|tel:|#)/.test(target);
 }
 
+export function isValidIsoDate(value) {
+  if (!DATE_RE.test(String(value || ''))) return false;
+  const [year, month, day] = String(value).split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day;
+}
+
+function stripMarkdownLinkTitle(target) {
+  const trimmed = target.trim();
+  if (!trimmed) return '';
+
+  if (trimmed.startsWith('<')) {
+    const close = trimmed.indexOf('>');
+    return close === -1 ? trimmed : trimmed.slice(1, close);
+  }
+
+  let escaped = false;
+  for (let i = 0; i < trimmed.length; i += 1) {
+    const char = trimmed[i];
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (char === '\\') {
+      escaped = true;
+      continue;
+    }
+    if (/\s/.test(char)) {
+      return trimmed.slice(0, i);
+    }
+  }
+
+  return trimmed;
+}
+
 export function resolveMarkdownTarget(filePath, target) {
-  const clean = target.split('#')[0].trim();
+  const clean = stripMarkdownLinkTitle(target).split('#')[0].trim();
   if (!clean || isExternalLink(clean)) return null;
   return path.resolve(path.dirname(filePath), clean);
 }
@@ -161,11 +199,11 @@ export function validateOkfBundle({ rootDir = process.cwd(), bundleDir = path.jo
     if (frontmatter.type && String(frontmatter.type).trim() !== frontmatter.type) {
       errors.push(`${rel}: type must not have leading or trailing whitespace`);
     }
-    if (frontmatter.verified && !DATE_RE.test(String(frontmatter.verified))) {
-      errors.push(`${rel}: verified must be YYYY-MM-DD`);
+    if (frontmatter.verified && !isValidIsoDate(frontmatter.verified)) {
+      errors.push(`${rel}: verified must be a valid YYYY-MM-DD date`);
     }
-    if (frontmatter.timestamp && !DATE_RE.test(String(frontmatter.timestamp))) {
-      errors.push(`${rel}: timestamp must be YYYY-MM-DD`);
+    if (frontmatter.timestamp && !isValidIsoDate(frontmatter.timestamp)) {
+      errors.push(`${rel}: timestamp must be a valid YYYY-MM-DD date`);
     }
     if (frontmatter.source && !Array.isArray(frontmatter.source)) {
       errors.push(`${rel}: source must be a list`);

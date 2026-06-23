@@ -97,4 +97,108 @@ See [related concept](../path/file.md).
       fs.rmSync(tmp, { recursive: true, force: true });
     }
   });
+
+  it('accepts Markdown links with optional titles', () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'okf-link-title-'));
+    try {
+      const wiki = path.join(tmp, 'wiki');
+      const dir = path.join(wiki, 'systems');
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(wiki, 'index.md'), '---\nokf_version: "0.1"\n---\n# test\n\n- [systems/](systems/index.md)\n');
+      fs.writeFileSync(path.join(dir, 'index.md'), '# systems\n\n- [One](one.md) - one\n- [Two](two.md) - two\n');
+      fs.writeFileSync(path.join(dir, 'one.md'), `---
+type: system
+title: One
+description: One concept.
+source: ["test"]
+verified: 2026-06-23
+tags: [test]
+timestamp: 2026-06-23
+---
+
+# One
+
+See [Two](two.md "Two concept").
+`);
+      fs.writeFileSync(path.join(dir, 'two.md'), `---
+type: system
+title: Two
+description: Two concept.
+source: ["test"]
+verified: 2026-06-23
+tags: [test]
+timestamp: 2026-06-23
+---
+
+# Two
+`);
+
+      const result = validateOkfBundle({ rootDir: tmp, bundleDir: wiki });
+      assert.deepEqual(result.errors, []);
+      assert.equal(result.ok, true);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it('rejects invalid calendar dates', () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'okf-bad-date-'));
+    try {
+      const wiki = path.join(tmp, 'wiki');
+      const dir = path.join(wiki, 'systems');
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(wiki, 'index.md'), '---\nokf_version: "0.1"\n---\n# test\n\n- [systems/](systems/index.md)\n');
+      fs.writeFileSync(path.join(dir, 'index.md'), '# systems\n\n- [Bad date](bad-date.md) - bad date\n');
+      fs.writeFileSync(path.join(dir, 'bad-date.md'), `---
+type: system
+title: Bad date
+description: Bad date concept.
+source: ["test"]
+verified: 2026-02-31
+tags: [test]
+timestamp: 2026-99-99
+---
+
+# Bad date
+`);
+
+      const result = validateOkfBundle({ rootDir: tmp, bundleDir: wiki });
+      assert.equal(result.ok, false);
+      assert.ok(result.errors.some(error => error.includes('verified must be a valid YYYY-MM-DD date')));
+      assert.ok(result.errors.some(error => error.includes('timestamp must be a valid YYYY-MM-DD date')));
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it('detects fine-grained GitHub personal access tokens', () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'okf-secret-'));
+    try {
+      const wiki = path.join(tmp, 'wiki');
+      const dir = path.join(wiki, 'systems');
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(wiki, 'index.md'), '---\nokf_version: "0.1"\n---\n# test\n\n- [systems/](systems/index.md)\n');
+      fs.writeFileSync(path.join(dir, 'index.md'), '# systems\n\n- [Secret](secret.md) - secret\n');
+      fs.writeFileSync(path.join(dir, 'secret.md'), `---
+type: system
+title: Secret
+description: Secret concept.
+source: ["test"]
+verified: 2026-06-23
+tags: [test]
+timestamp: 2026-06-23
+---
+
+# Secret
+
+Do not commit github_pat_1234567890abcdefghijklmnopqrstuvwxyz_ABCDEF.
+`);
+
+      const result = validateOkfBundle({ rootDir: tmp, bundleDir: wiki });
+      assert.equal(result.ok, false);
+      assert.ok(result.errors.some(error => error.includes('GitHub fine-grained token')));
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
 });
