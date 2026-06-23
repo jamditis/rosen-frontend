@@ -1,27 +1,27 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.4.5';
+import { html } from './html.js?v=3.4.6';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.4.5';
-import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.4.5';
-import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.4.5';
-import { openBugReport } from './utils/bugReport.js?v=3.4.5';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.4.5';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.4.5';
-import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.4.5';
-import Sidebar from './components/Sidebar.js?v=3.4.5';
-import WelcomeModal from './components/WelcomeModal.js?v=3.4.5';
-import RecordView from './components/RecordView.js?v=3.4.5';
-import FeaturedSection from './components/FeaturedSection.js?v=3.4.5';
-import DissertationPage from './components/DissertationPage.js?v=3.4.5';
-import ToolsModal from './components/ToolsModal.js?v=3.4.5';
-import LoadingQuotes from './components/LoadingQuotes.js?v=3.4.5';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.4.5';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.4.5';
-import EntityBrowser from './components/EntityBrowser.js?v=3.4.5';
-import Timeline from './components/Timeline.js?v=3.4.5';
-import AboutPage from './components/AboutPage.js?v=3.4.5';
-import WikiPage from './components/WikiPage.js?v=3.4.5';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.4.6';
+import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.4.6';
+import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.4.6';
+import { openBugReport } from './utils/bugReport.js?v=3.4.6';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.4.6';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.4.6';
+import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.4.6';
+import Sidebar from './components/Sidebar.js?v=3.4.6';
+import WelcomeModal from './components/WelcomeModal.js?v=3.4.6';
+import RecordView from './components/RecordView.js?v=3.4.6';
+import FeaturedSection from './components/FeaturedSection.js?v=3.4.6';
+import DissertationPage from './components/DissertationPage.js?v=3.4.6';
+import ToolsModal from './components/ToolsModal.js?v=3.4.6';
+import LoadingQuotes from './components/LoadingQuotes.js?v=3.4.6';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.4.6';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.4.6';
+import EntityBrowser from './components/EntityBrowser.js?v=3.4.6';
+import Timeline from './components/Timeline.js?v=3.4.6';
+import AboutPage from './components/AboutPage.js?v=3.4.6';
+import WikiPage from './components/WikiPage.js?v=3.4.6';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
@@ -391,6 +391,14 @@ const App = () => {
                   aria-label="Explore tools"
                 >
                     <${Compass} className="w-5 h-5" />
+                </button>
+                <button
+                  onClick=${() => goTo(ROUTES.wiki)}
+                  className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-md transition-colors hidden md:flex items-center gap-1 text-xs"
+                  aria-label="Archive wiki"
+                >
+                    <${BookOpen} className="w-4 h-4" />
+                    <span>Wiki</span>
                 </button>
                 <button
                   onClick=${() => goTo(ROUTES.about)}

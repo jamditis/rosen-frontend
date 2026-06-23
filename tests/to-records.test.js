@@ -8,7 +8,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { toRecords } from '../frontend/services/archiveService.js?v=3.4.5';
+import { toRecords } from '../frontend/services/archiveService.js?v=3.4.6';
 
 describe('toRecords', () => {
   it('derives records from recordEntityMap (the real-data path)', () => {

@@ -1,27 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-import { html } from '../html.js?v=3.4.5';
-import { AlertCircle, BookOpen, GitBranch, History, Lock, Search, ShieldAlert, Sparkles, Users } from 'lucide-react';
-import { buildWikiPageIndex, fetchWikiData, filterWikiPages, findWikiPageBySlug, normalizeWikiPages, parseWikiHash, wikiPageHref } from '../services/wikiService.js?v=3.4.5';
+import { html } from '../html.js?v=3.4.6';
+import { AlertCircle, Search } from 'lucide-react';
+import { buildWikiPageIndex, fetchWikiData, filterWikiPages, findWikiPageBySlug, normalizeWikiPages, parseWikiHash, wikiPageHref } from '../services/wikiService.js?v=3.4.6';
 
 const KIND_LABELS = {
   concept: 'Concepts',
   entity: 'Entities',
   topic: 'Topics and tags'
 };
-
-const StatusCard = ({ icon: Icon, title, children }) => html`
-  <div className="bg-white border border-stone-200 rounded-sm p-5 shadow-sm">
-    <div className="flex items-start gap-3">
-      <div className="p-2 bg-stone-100 text-stone-700 rounded-sm">
-        <${Icon} className="w-4 h-4" />
-      </div>
-      <div>
-        <h3 className="font-display text-stone-900 text-lg mb-2">${title}</h3>
-        <div className="text-sm text-stone-600 leading-relaxed">${children}</div>
-      </div>
-    </div>
-  </div>
-`;
 
 const RelatedList = ({ title, slugs, pages }) => {
   if (!slugs?.length) return null;
@@ -50,7 +36,6 @@ const WikiDetail = ({ page, pages, onBack }) => html`
       <div className="border-b border-stone-200 p-6 md:p-8 bg-stone-50">
         <div className="flex flex-wrap gap-2 mb-4">
           <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-1 bg-stone-900 text-white rounded-sm">${page.kind}</span>
-          <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-1 bg-amber-100 text-amber-800 rounded-sm">community seed</span>
         </div>
         <h1 className="font-display text-3xl md:text-5xl text-stone-900 mb-4">${page.title}</h1>
         <p className="text-lg text-stone-700 leading-relaxed max-w-3xl">${page.summary}</p>
@@ -87,7 +72,6 @@ const WikiDetail = ({ page, pages, onBack }) => html`
             <h2 className="font-display text-lg text-stone-900 mb-3">Page facts</h2>
             <dl className="space-y-3 text-xs text-stone-600">
               <div><dt className="font-bold text-stone-900">Last updated</dt><dd>${page.lastUpdated}</dd></div>
-              <div><dt className="font-bold text-stone-900">Revisions</dt><dd>${page.revisionCount}</dd></div>
               <div><dt className="font-bold text-stone-900">Contributors</dt><dd>${page.contributors.join(', ')}</dd></div>
             </dl>
           </div>
@@ -147,7 +131,7 @@ const WikiPage = ({ initialSlug = null }) => {
     <div className="max-w-3xl mx-auto w-full text-center py-20 border border-dashed border-stone-300 rounded-sm bg-white">
       <${AlertCircle} className="w-10 h-10 mx-auto text-amber-500 mb-4" />
       <h1 className="font-display text-3xl text-stone-900 mb-3">Wiki page not found</h1>
-      <p className="text-sm text-stone-600 mb-6">${activeSlug ? `No wiki page exists for ${activeSlug}.` : 'That wiki link is not valid.'} The scaffold only renders published seed pages.</p>
+      <p className="text-sm text-stone-600 mb-6">${activeSlug ? `No wiki page exists for ${activeSlug}.` : 'That wiki link is not valid.'} Only published wiki pages are available.</p>
       <button onClick=${() => { window.location.hash = 'wiki'; }} className="px-4 py-2 bg-stone-900 text-white rounded-sm text-sm font-bold hover:bg-stone-700">Back to wiki index</button>
     </div>
   `;
@@ -155,26 +139,10 @@ const WikiPage = ({ initialSlug = null }) => {
   return html`
     <div className="max-w-6xl mx-auto w-full space-y-8">
       <section className="bg-white border border-stone-200 rounded-sm p-6 md:p-8 shadow-sm">
-        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-          <div>
-            <div className="flex items-center gap-2 text-xs uppercase tracking-wider font-bold text-stone-500 mb-3">
-              <${BookOpen} className="w-4 h-4" /> Community wiki scaffold
-            </div>
-            <h1 className="font-display text-4xl md:text-6xl text-stone-900 mb-4">Archive wiki</h1>
-            <p className="text-stone-700 leading-relaxed max-w-3xl">
-              A public knowledge layer for concepts, entities, topics, and record context. This first pass is read-only and source-backed so the product shape can be reviewed before editing, moderation, and revision storage are connected.
-            </p>
-          </div>
-          <div className="border border-stone-200 bg-stone-50 rounded-sm px-4 py-3 text-xs text-stone-600 max-w-sm">
-            The implementation spec lives in the repo at docs/plans/2026-06-21-community-wiki-spec.md so it can be reviewed with the code.
-          </div>
-        </div>
-      </section>
-
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <${StatusCard} icon=${GitBranch} title="Structured pages">Concepts, entities, aliases, relationships, sources, contributors, and moderation state are already modeled in seed data.</${StatusCard}>
-        <${StatusCard} icon=${History} title="Revision-ready">The UI exposes revision counts and contributor attribution now; the spec defines append-only revisions, diffs, and revert rules.</${StatusCard}>
-        <${StatusCard} icon=${ShieldAlert} title="Moderation-first">Public editing is intentionally deferred until permissions, reports, locks, and rollback are built around source requirements.</${StatusCard}>
+        <h1 className="font-display text-4xl md:text-6xl text-stone-900 mb-4">Archive wiki</h1>
+        <p className="text-stone-700 leading-relaxed max-w-3xl">
+          The key ideas behind the archive, each one drawn from Jay Rosen's 1986 dissertation, The Impossible Press. Browse the concepts, follow the links between them, and trace every claim back to the text.
+        </p>
       </section>
 
       <section className="bg-stone-50 border border-stone-200 rounded-sm p-4 md:p-5">
@@ -197,38 +165,20 @@ const WikiPage = ({ initialSlug = null }) => {
       <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         ${visiblePages.map(page => html`
           <a key=${page.id} href=${wikiPageHref(page.slug)} className="group bg-white border border-stone-200 rounded-sm p-5 shadow-sm hover:border-stone-400 hover:shadow-md transition-all">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[10px] uppercase tracking-wider font-bold text-stone-500">${page.kind}</span>
-              <${Lock} className="w-3.5 h-3.5 text-stone-300" />
-            </div>
+            <span className="text-[10px] uppercase tracking-wider font-bold text-stone-500 block mb-3">${page.kind}</span>
             <h2 className="font-display text-2xl text-stone-900 mb-2 group-hover:underline decoration-stone-300 underline-offset-4">${page.title}</h2>
             <p className="text-sm text-stone-600 leading-relaxed mb-4">${page.summary}</p>
-            <div className="flex items-center justify-between text-xs text-stone-400">
-              <span>${page.revisionCount} revision</span>
-              <span>${page.lastUpdated}</span>
-            </div>
+            <span className="text-xs text-stone-400">Updated ${page.lastUpdated}</span>
           </a>
         `)}
       </section>
 
       ${visiblePages.length === 0 && html`
         <div className="text-center py-16 border border-dashed border-stone-300 rounded-sm bg-white">
-          <${Sparkles} className="w-8 h-8 mx-auto text-stone-300 mb-3" />
+          <${Search} className="w-8 h-8 mx-auto text-stone-300 mb-3" />
           <p className="text-stone-500 text-sm">No wiki pages match those filters.</p>
         </div>
       `}
-
-      <section className="bg-white border border-stone-200 rounded-sm p-6">
-        <div className="flex items-start gap-3">
-          <${Users} className="w-5 h-5 text-stone-500 mt-1" />
-          <div>
-            <h2 className="font-display text-2xl text-stone-900 mb-2">Contribution policy preview</h2>
-            <p className="text-sm text-stone-600 leading-relaxed">
-              Future edit screens should show source requirements, a code-of-conduct reminder, attribution expectations, and a warning that unsourced claims can be reverted or queued for moderation.
-            </p>
-          </div>
-        </div>
-      </section>
     </div>
   `;
 };

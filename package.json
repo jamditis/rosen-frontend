@@ -12,6 +12,7 @@
     "test:frontend": "node --test tests/version-consistency.test.js tests/frontend-structure.test.js tests/archive-analytics.test.js tests/record-deeplink.test.js tests/record-deeplink-behaviour.test.js tests/needs-review.test.js",
     "test:okf": "node --test tests/okf-bundle.test.js tests/okf-flight-recorder.test.js tests/okf-blindfold.test.js",
     "validate:okf": "node scripts/validate-okf.js",
+    "build-wiki": "node data/build-wiki-seed.js",
     "okf:flight-recorder": "node scripts/okf-flight-recorder.js",
     "okf:blindfold": "node scripts/okf-blindfold-test.js",
     "export-data": "node data/export-archive-data.js",

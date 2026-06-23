@@ -1,10 +1,10 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { html } from '../html.js?v=3.4.5';
+import { html } from '../html.js?v=3.4.6';
 import { Users, Building2, Lightbulb, BookOpen, MapPin, Calendar, Search, ArrowUpDown, ChevronDown, ChevronRight, X, ExternalLink } from 'lucide-react';
-import { fetchEntitiesData, getRecordsByEntity, getEntityById } from '../services/archiveService.js?v=3.4.5';
-import { COLORS, ENTITY_TYPE_CONFIG } from '../constants.js?v=3.4.5';
-import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.4.5';
+import { fetchEntitiesData, getRecordsByEntity, getEntityById } from '../services/archiveService.js?v=3.4.6';
+import { COLORS, ENTITY_TYPE_CONFIG } from '../constants.js?v=3.4.6';
+import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.4.6';
 
 // Add icons to shared config
 const TYPE_ICONS = {

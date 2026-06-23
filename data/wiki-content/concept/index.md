@@ -1,0 +1,25 @@
+# Concepts
+
+The 21 key ideas from Jay Rosen's 1986 dissertation, *The Impossible Press: American Journalism and the Decline of Public Life*.
+
+- [Journalism as transaction, not action](journalism-as-transaction.md)
+- [Information is relational](information-is-relational.md)
+- [The impossibility of the informed citizen](impossibility-of-the-informed-citizen.md)
+- [Scale matters](scale-matters.md)
+- [Communication does not equal community](communication-is-not-community.md)
+- [The competition for attention transforms public life](competition-for-attention.md)
+- [The professional attitude obscures fundamental problems](the-professional-attitude.md)
+- [News arises from distance](news-arises-from-distance.md)
+- [The public is not found but formed](the-public-is-formed-not-found.md)
+- [Each new medium inspires and then disappoints](media-hope-and-disappointment.md)
+- [The newspaper both connects and dissolves](the-newspaper-connects-and-dissolves.md)
+- [Mobilized privacy replaces public life](mobilized-privacy.md)
+- [News as drama turns citizens into spectators](news-as-drama.md)
+- [We respond to pictures in our heads, not reality](pictures-in-our-heads.md)
+- [More communication creates more to communicate about](more-communication-more-difficulty.md)
+- [Media-created publics are inherently unstable](media-publics-are-unstable.md)
+- [The conflict between commerce and public duty is structural](commerce-versus-public-duty.md)
+- [Making things public does not make a public](making-public-does-not-make-a-public.md)
+- [Communication is an art, not merely transmission](communication-as-art.md)
+- [The press structures events to its own demands](the-press-structures-events.md)
+- [The press-public relationship requires ecological thinking](ecological-thinking.md)
