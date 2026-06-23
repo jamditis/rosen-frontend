@@ -18,7 +18,7 @@ import {
   wikiPageHref,
   WIKI_MODERATION_STATES,
   WIKI_PAGE_KINDS
-} from '../frontend/services/wikiService.js?v=3.4.5';
+} from '../frontend/services/wikiService.js?v=3.4.6';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.join(__dirname, '..');

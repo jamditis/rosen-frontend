@@ -8,9 +8,9 @@
 // viewState.js too; what remains here is the imperative, window-bound
 // navigation helpers.
 
-import { ROUTES, DEFAULT_ROUTE } from './viewState.js?v=3.4.5';
-import { parseRecordId, setRecordParam } from '../utils/recordDeepLink.js?v=3.4.5';
-import { parseWikiHash } from './wikiService.js?v=3.4.5';
+import { ROUTES, DEFAULT_ROUTE } from './viewState.js?v=3.4.6';
+import { parseRecordId, setRecordParam } from '../utils/recordDeepLink.js?v=3.4.6';
+import { parseWikiHash } from './wikiService.js?v=3.4.6';
 
 export { ROUTES };
 

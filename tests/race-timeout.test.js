@@ -6,7 +6,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { raceTimeout } from '../frontend/utils/raceTimeout.js?v=3.4.5';
+import { raceTimeout } from '../frontend/utils/raceTimeout.js?v=3.4.6';
 
 const later = (value, ms) => new Promise((res) => setTimeout(() => res(value), ms));
 const laterReject = (err, ms) => new Promise((_, rej) => setTimeout(() => rej(err), ms));
