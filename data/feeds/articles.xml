@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Jay Rosen Internet Archive - Articles</title>
+    <title>Jay Rosen&apos;s Internet Archive - Articles</title>
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Articles and essays from Jay Rosen&apos;s journalism scholarship</description>
     <language>en-us</language>
-    <lastBuildDate>Thu, 18 Jun 2026 18:15:48 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 24 Jun 2026 23:37:26 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/articles.xml" rel="self" type="application/rss+xml"/>
-    <generator>Jay Rosen Internet Archive RSS Generator</generator>
+    <generator>Jay Rosen's Internet Archive RSS Generator</generator>
   <item>
     <title>Subscribers buy a product. Members join the cause.</title>
     <link>https://pressthink.org/2026/04/subscribers-buy-a-product-members-join-the-cause/</link>

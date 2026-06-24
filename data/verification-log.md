@@ -208,3 +208,16 @@ PressThink in the 2000s served every post in two URL variants: the regular `.htm
 - Entities: 5,036 (unchanged)
 - Relationships: 4,666 (unchanged)
 - Test suite: 331/331 pass (verified)
+
+---
+
+## Curator deletion: phantom records 00665 and 00666 (2026-06-24)
+
+Curator decision on issues #199 and #242 (Joe, 2026-06-24): delete both records. Removed from `data/archive_records-public.csv` and the `data/gap-fill-new-records.csv` staging file, then regenerated the published JSON and RSS/OPML feeds via `npm run export-data`.
+
+- **RECORD-00665, "The digital revolution"** (CJR, 2003): phantom. A Wayback CDX query over cjr.org 2003 to 2004 returned zero matching paths, and cjr.org/author/jay-rosen lists only the 2013 "awayness problem" piece. The 557-character body was share-widget text captured by a stale-branch scrape, not article content.
+- **RECORD-00666, "What are journalists for?"** (The American Prospect, 2001): the empty-URL duplicate of RECORD-00038. The matching prospect.org URL is Marty Linsky's book review, not a Rosen essay.
+
+Record count: 800 to 798. Data tests: 87 of 87 pass.
+
+Not part of this decision: RECORD-00038 carries the same Linsky book review attributed to Rosen with verified=TRUE. Re-attributing or removing it is a separate curator call.

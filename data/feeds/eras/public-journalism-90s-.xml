@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Jay Rosen Internet Archive - Public Journalism (90s)</title>
+    <title>Jay Rosen&apos;s Internet Archive - Public Journalism (90s)</title>
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records from the Public Journalism (90s) era</description>
     <language>en-us</language>
-    <lastBuildDate>Thu, 18 Jun 2026 18:15:48 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 24 Jun 2026 23:37:26 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/eras/public-journalism-90s-.xml" rel="self" type="application/rss+xml"/>
-    <generator>Jay Rosen Internet Archive RSS Generator</generator>
+    <generator>Jay Rosen's Internet Archive RSS Generator</generator>
   <item>
     <title>First Chapter: &apos;What Are Journalists For?&apos;</title>
     <link>https://archive.nytimes.com/www.nytimes.com/books/99/11/14/reviews/991114.14goldstt.html</link>
