@@ -28,12 +28,17 @@ const RAW_TEXT_MIN = 500;
 // Records whose raw_text is >= 500 chars but contains scraped junk rather than
 // the article body — the scraper captured a nav/listing page, or the URL has
 // link-rotted to a squatted domain. Claude correctly returns zero entities for
-// these. Tracked for Wayback recovery in issue #294; remove from this set
-// after raw_text is replaced and extraction is re-run.
-const ALLOWLIST = new Set([
-  'RECORD-00740', // wnycstudios.org returned the shows-listing nav, not the OTM segment transcript
-  'RECORD-00783', // fora.tv domain was squatted; raw_text is Vietnamese sports-streaming spam
-]);
+// these. Add a record here only after confirming it has no recoverable article
+// text; the standing fix is Wayback recovery (#294), not an allowlist entry.
+//
+// Empty as of #294: RECORD-00740 (OTM segment) and RECORD-00783 (fora.tv talk)
+// were both recovered from the Internet Archive, their raw_text replaced, and
+// entity extraction re-run, so neither needs allowlisting anymore. Note
+// RECORD-00783 is abstract-only by nature: the fora.tv source was video, so no
+// transcript exists to recover and its raw_text is the event abstract. Its
+// entity yield is genuine but thin -- that is the ceiling, not a regression to
+// re-recover.
+const ALLOWLIST = new Set([]);
 
 let records, relationships;
 
