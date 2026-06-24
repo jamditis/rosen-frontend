@@ -77,6 +77,8 @@ _DEPLOY_DATA_FILES: Tuple[str, ...] = (
     'data/archive-details.json',
     'data/archive-entities.json',
     'data/archive-analytics.json',
+    'data/wiki-seed.json',
+    'data/schema.json',  # data dictionary; linked from the open-data download UI
 )
 
 # Walking _DEPLOY_DIRS, prune these.
