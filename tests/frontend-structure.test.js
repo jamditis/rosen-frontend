@@ -113,6 +113,20 @@ describe('index.html structure', () => {
     assert.ok(indexContent.includes('Special+Elite'), 'Missing Special Elite font');
     assert.ok(indexContent.includes('Roboto+Mono'), 'Missing Roboto Mono font');
   });
+
+  it('preconnects to esm.sh so the first React import skips the TLS handshake (#283)', () => {
+    indexContent = indexContent || fs.readFileSync(path.join(rootDir, 'index.html'), 'utf-8');
+    assert.match(indexContent, /<link\s+rel="preconnect"\s+href="https:\/\/esm\.sh"/,
+      'Missing esm.sh preconnect; every cold visit pays the module-CDN handshake on the critical path');
+  });
+
+  it('does not prefetch the multi-MB combined archive-data.json (#283)', () => {
+    indexContent = indexContent || fs.readFileSync(path.join(rootDir, 'index.html'), 'utf-8');
+    // The production app loads the split files (archive-core/details/entities);
+    // a prefetch of the combined fallback downloads ~28MB no cold visit consumes.
+    assert.doesNotMatch(indexContent, /rel="prefetch"[^>]*archive-data\.json/,
+      'index.html prefetches archive-data.json -- a multi-MB cold-start payload the app never reads');
+  });
 });
 
 // ============================================
