@@ -4,6 +4,7 @@ import { html } from './html.js?v=3.4.6';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github } from 'lucide-react';
 import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.4.6';
 import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.4.6';
+import { withViewTransition } from './utils/viewTransition.js?v=3.4.6';
 import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.4.6';
 import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.4.6';
 import { openBugReport } from './utils/bugReport.js?v=3.4.6';
@@ -113,6 +114,17 @@ const App = () => {
   // Navigation helpers
   const goTo = useCallback((route) => {
     navigateTo(route);
+  }, []);
+
+  // Open, close, or switch the record modal with a View Transition cross-fade
+  // (#281). Used by every deliberate record selection -- grid card, entity
+  // browser, in-modal related links, and close -- so they animate the same way;
+  // browsers without the API just set state directly (see withViewTransition).
+  // Two paths stay plain on purpose: prev/next arrow paging (handleModalNav),
+  // where a cross-fade on every press would lag, and history-driven sync (back/
+  // forward, deep links), which should not animate on navigation.
+  const selectRecord = useCallback((id) => {
+    withViewTransition(() => setSelectedRecordId(id));
   }, []);
 
   // Tag click handlers (from RecordModal) — go to archive and filter
@@ -293,10 +305,10 @@ const App = () => {
       records=${records}
       filteredRecords=${filteredRecords}
       selectedRecordId=${selectedRecordId}
-      onClose=${() => setSelectedRecordId(null)}
+      onClose=${() => selectRecord(null)}
       onNext=${() => handleModalNav('next')}
       onPrev=${() => handleModalNav('prev')}
-      onSelectRecord=${setSelectedRecordId}
+      onSelectRecord=${selectRecord}
       onFilterCategory=${handleFilterCategory}
       onFilterSearch=${handleFilterSearch}
     />
@@ -573,7 +585,7 @@ const App = () => {
             ${isEntityBrowser && errorPanel}
 
             ${isEntityBrowser && !loading && !error && html`
-                <${EntityBrowser} records=${records} onSelectRecord=${setSelectedRecordId} />
+                <${EntityBrowser} records=${records} onSelectRecord=${selectRecord} />
             `}
 
             ${isArchiveGrid && html`
@@ -608,7 +620,7 @@ const App = () => {
                             return html`
                             <div
                                 key=${item.id}
-                                onClick=${() => setSelectedRecordId(item.id)}
+                                onClick=${() => selectRecord(item.id)}
                                 className="break-inside-avoid mb-6 bg-white border border-stone-200 hover:border-stone-400 hover:shadow-lg transition-all duration-300 rounded-sm flex flex-col group cursor-pointer overflow-hidden relative"
                             >
                                 <div className="h-1 w-full" style=${{ backgroundColor: theme.text }}></div>
