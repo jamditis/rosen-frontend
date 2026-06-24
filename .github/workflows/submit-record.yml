@@ -119,6 +119,28 @@ jobs:
           git config user.name "rosen-archive-bot[bot]"
           git config user.email "rosen-archive-bot[bot]@users.noreply.github.com"
 
+      - name: Materialize SFTP private key (optional, key-auth)
+        # Key-based auth is the eventual default (#302); password auth is the
+        # current fallback. When the ROSEN_SFTP_KEY_CONTENT secret is set, write
+        # the key body to a runner-temp file (0600) and export ROSEN_SFTP_KEY_PATH
+        # so the push step uses it — sftp_push.py prefers the key over the
+        # password whenever a key path is present. While the secret is unset this
+        # is a no-op and the push falls back to ROSEN_SFTP_PASSWORD, so landing
+        # this step changes nothing until the deploy pubkey is uploaded in cPanel
+        # and the secret is set.
+        env:
+          ROSEN_SFTP_KEY_CONTENT: ${{ secrets.ROSEN_SFTP_KEY_CONTENT }}
+        run: |
+          if [ -n "$ROSEN_SFTP_KEY_CONTENT" ]; then
+            umask 077
+            printf '%s\n' "$ROSEN_SFTP_KEY_CONTENT" > "$RUNNER_TEMP/rosen_deploy"
+            chmod 600 "$RUNNER_TEMP/rosen_deploy"
+            echo "ROSEN_SFTP_KEY_PATH=$RUNNER_TEMP/rosen_deploy" >> "$GITHUB_ENV"
+            echo "SFTP auth: private key materialized; using key-based authentication."
+          else
+            echo "SFTP auth: ROSEN_SFTP_KEY_CONTENT unset; using password authentication."
+          fi
+
       - name: Process submission
         working-directory: backend
         env:
@@ -140,7 +162,11 @@ jobs:
           ROSEN_SFTP_PASSWORD: ${{ secrets.ROSEN_SFTP_PASSWORD }}
           ROSEN_SFTP_REMOTE_PATH: ${{ secrets.ROSEN_SFTP_REMOTE_PATH }}
           ROSEN_SFTP_PORT: ${{ secrets.ROSEN_SFTP_PORT }}
-          ROSEN_SFTP_KEY_PATH: ${{ secrets.ROSEN_SFTP_KEY_PATH }}
+          # ROSEN_SFTP_KEY_PATH is exported by the "Materialize SFTP private key"
+          # step above (via $GITHUB_ENV) when key-auth is enabled. Do not also set
+          # it from a secret here: a step-level env entry overrides $GITHUB_ENV, so
+          # the usually-empty secret would shadow the materialized runner-temp path
+          # and silently fall back to password auth.
           ROSEN_SFTP_KEY_PASSPHRASE: ${{ secrets.ROSEN_SFTP_KEY_PASSPHRASE }}
           ROSEN_SFTP_KNOWN_HOSTS: ${{ secrets.ROSEN_SFTP_KNOWN_HOSTS }}
           # process_submission.py reads these for the git commit identity
