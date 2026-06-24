@@ -26,7 +26,7 @@ Values were verified on houseofjawn 2026-05-28 (wake-20260528T0805-d0b994). Use 
 | `ROSEN_SFTP_USER` | Bluehost cPanel | Same |
 | `ROSEN_SFTP_PASSWORD` | Bluehost cPanel | Same |
 | `ROSEN_SFTP_REMOTE_PATH` | See "SFTP remote path" below | Two candidates in existing docs — verify against current manual deploy practice |
-| `ROSEN_SFTP_KNOWN_HOSTS` | `ssh-keyscan` output, captured after Block 1 | Pins host key; rejects MITM. **Workflow gap** — see "Capturing the host key" below |
+| `ROSEN_SFTP_KNOWN_HOSTS` | `ssh-keyscan` output, captured after Block 1 | Pins host key; rejects MITM. Paste all of the inline `ssh-keyscan` output (every host-key line), not just one — the code accepts inline contents or a path (#408); see "Capturing the host key" below |
 
 Optional (only if switching from password to key auth later):
 
@@ -77,7 +77,7 @@ To verify before pasting:
 grep -A2 'remote_final' backend/submission_server/sftp_push.py
 ```
 
-`sftp_push.py:141` writes `f"{cfg['remote_path']}/{filename}"` — so `ROSEN_SFTP_REMOTE_PATH` must be the directory that directly contains the four `archive-*.json` files on the live site.
+`sftp_push.py:181` writes `f"{cfg['remote_path']}/{filename}"` — so `ROSEN_SFTP_REMOTE_PATH` must be the directory that directly contains the four `archive-*.json` files on the live site.
 
 ### Capturing the host key
 
@@ -88,56 +88,17 @@ Defer this step until you have the SFTP host from cPanel. Then on houseofjawn:
 ssh-keyscan -p <PORT> <HOST> 2>/dev/null
 ```
 
-`ssh-keyscan` prints one line per host-key type the server offers, each in the form `<host> <key-type> <key-body>` (or `[<host>]:<port> ...` for non-default ports). Paste the **whole line, hostname prefix included** — the `known_hosts` format requires the hostname to be the first field, and `paramiko`'s `RejectPolicy` matches the connect host against that prefix. Pasting only the `ssh-rsa AAAA…` body would leave no host mapping and every push would reject.
+`ssh-keyscan` prints one line per host-key type the server offers, each in the form `<host> <key-type> <key-body>` (or `[<host>]:<port> ...` for non-default ports). Paste **every line it emits** (all host-key types), each with its **hostname prefix** — the `known_hosts` format requires the hostname as the first field, and `paramiko`'s `RejectPolicy` matches the connect host against it. Keep all the lines, not just one: `paramiko` accepts only whichever host-key algorithm the server negotiates at connect time, so a single pasted line still rejects if the server picks a different type. Pasting only the `ssh-rsa AAAA…` body (no hostname) would leave no host mapping and every push would reject.
 
-`backend/submission_server/sftp_push.py:119` enforces `RejectPolicy`, so a missing or mismatched key fails the push rather than silently trusting a MITM. This is intentional for a production-writeable deploy step.
+`backend/submission_server/sftp_push.py:159` enforces `RejectPolicy`, so a missing or mismatched key fails the push rather than silently trusting a MITM. This is intentional for a production-writeable deploy step.
 
-#### Workflow gap (must fix before Smoke 3)
+#### Host-key handling (resolved in code — #408)
 
-`sftp_push.py:75-76` treats `ROSEN_SFTP_KNOWN_HOSTS` as a **filesystem path**, not inline key contents:
+`ROSEN_SFTP_KNOWN_HOSTS` can hold **either** a path to a `known_hosts` file on the runner **or** the raw `ssh-keyscan` line(s) inline. `sftp_push.py:142-158` checks whether the value is an existing file: if so it loads it directly; otherwise it treats the value as inline `known_hosts` contents, writes them to a temp file, and loads that. `set_missing_host_key_policy(RejectPolicy())` then still rejects any unpinned host. So pasting the `ssh-keyscan` output straight into the secret works as-is — **no `submit-record.yml` patch is required**.
 
-```python
-'known_hosts': os.environ.get('ROSEN_SFTP_KNOWN_HOSTS',
-                              str(Path.home() / '.ssh' / 'known_hosts')),
-```
+This closed the earlier inline-vs-path foot-gun: a secret holding inline contents used to fall through `load_host_keys`, leaving `RejectPolicy` to block every push with `Server '<host>' not found in known_hosts`. The fix landed in PR #408; issues #298 and #304 track it. The workflow passes the secret straight through, which is now correct for either shape.
 
-The secret value (a literal `ssh-rsa AAAA…` line) is then passed to `paramiko.SSHClient.load_host_keys()`. If the value isn't a path that exists, `load_host_keys` is silently skipped and `RejectPolicy` blocks every connection — Smoke 3 will fail at the SFTP step with `Server '<host>' not found in known_hosts`.
-
-`.github/workflows/submit-record.yml` currently passes the secret straight through as an env var (line 139), so the GHA runner inherits the same path-shape expectation.
-
-**Fix before running Smoke 3** — patch `.github/workflows/submit-record.yml` in two places:
-
-1. Add a materialization step before "Process submission":
-
-   ```yaml
-   - name: Materialize SFTP known_hosts
-     env:
-       ROSEN_SFTP_KNOWN_HOSTS_RAW: ${{ secrets.ROSEN_SFTP_KNOWN_HOSTS }}
-     run: |
-       if [ -z "$ROSEN_SFTP_KNOWN_HOSTS_RAW" ]; then
-         echo "ROSEN_SFTP_KNOWN_HOSTS is empty — skipping (push will fail under RejectPolicy)" >&2
-         exit 0
-       fi
-       mkdir -p "$RUNNER_TEMP/ssh"
-       chmod 700 "$RUNNER_TEMP/ssh"
-       printf '%s\n' "$ROSEN_SFTP_KNOWN_HOSTS_RAW" > "$RUNNER_TEMP/ssh/known_hosts"
-       chmod 644 "$RUNNER_TEMP/ssh/known_hosts"
-   ```
-
-   The empty-secret guard is inside the `run:` block instead of an `if:` expression because step-level `if:` cannot reference the `secrets` context directly on every GHA runner version — runtime guarding is portable.
-
-2. Change the existing `ROSEN_SFTP_KNOWN_HOSTS:` line in the "Process submission" step's `env:` block from `${{ secrets.ROSEN_SFTP_KNOWN_HOSTS }}` to the materialized file path:
-
-   ```yaml
-   # BEFORE
-   ROSEN_SFTP_KNOWN_HOSTS: ${{ secrets.ROSEN_SFTP_KNOWN_HOSTS }}
-   # AFTER
-   ROSEN_SFTP_KNOWN_HOSTS: ${{ runner.temp }}/ssh/known_hosts
-   ```
-
-The two changes have to land together. Step-level `env:` overrides anything written to `$GITHUB_ENV`, so the materialization step on its own won't reach `sftp_push.py` — only the line swap does.
-
-This is tracked separately so the code fix and the runbook can ship independently — see the follow-up issue noted in "Related issues + PRs" below. Alternative: change `sftp_push.py` to detect inline contents (e.g. value starts with `ssh-` or contains a newline) and write to a temp file. Either approach removes the foot-gun.
+Before Smoke 3, sanity-check that the secret holds **all** of the `ssh-keyscan` output — every host-key line (`<host> <key-type> <key-body>`, hostname first — see "Capturing the host key" above), not just one line or the `ssh-rsa AAAA…` body alone. `paramiko` accepts only the host-key type the server negotiates, so a one-line or body-only value can still reject the connect host — the same failure, one step later. Validate the secret against the full `ssh-keyscan` output before dispatching, not at push time.
 
 ---
 
@@ -191,7 +152,7 @@ Settings → Secrets and variables → Actions → "New repository secret" for e
 
 ### Optional: rotating away from password auth later
 
-Key-based auth is a possible future improvement but is **not safe to enable today** — the current `submit-record.yml` doesn't materialize a private key onto the runner. `sftp_push.py:53` reads `ROSEN_SFTP_KEY_PATH` as an existing path on disk, so setting that secret alone makes Smoke 3 fail with a missing-key-file error.
+Key-based auth is a possible future improvement but is **not safe to enable today** — the current `submit-record.yml` doesn't materialize a private key onto the runner. `sftp_push.py:54` reads `ROSEN_SFTP_KEY_PATH` as an existing path on disk, so setting that secret alone makes Smoke 3 fail with a missing-key-file error.
 
 Making key-auth work would mean:
 
@@ -245,7 +206,7 @@ Use a URL on the RFC 6761 `.invalid` TLD — DNS resolution always fails, so `is
 
 ### Smoke 3 — new URL, full pipeline
 
-7. Confirm the known_hosts workflow gap (see above) is fixed first — otherwise SFTP will fail.
+7. Confirm `ROSEN_SFTP_KNOWN_HOSTS` carries all of the host's `ssh-keyscan` output — every host-key line (inline is fine — handled in code, #408); a missing, partial, or wrong key fails the push under `RejectPolicy`.
 8. Pick a real PressThink URL NOT in the archive (`pressthink.org/[year]/...` from a recent post).
 9. Same dispatch flow.
 10. **Expected**: full pipeline runs, new `RECORD-NNNNN` commit appears on `main` from `rosen-archive-bot[bot]`, `post-merge.yml` fires, archive JSONs deploy via SFTP, live site updates within a minute of the workflow finishing.
@@ -279,7 +240,7 @@ Public-repo standard runners stay unmetered through the [March 2026 GHA pricing 
 - PR #225 — the workflow files themselves
 - PR #223 — `process_submission.py` + `sweep_stuck.py`
 - PR #214 — original design
-- Follow-up issue (to be filed): fix `ROSEN_SFTP_KNOWN_HOSTS` inline-vs-path mismatch in `sftp_push.py` or `submit-record.yml` (see "Workflow gap" above)
+- Resolved (PR #408, tracked by #298 / #304): `ROSEN_SFTP_KNOWN_HOSTS` inline-vs-path handling in `sftp_push.py` — the secret now accepts inline `ssh-keyscan` contents or a path, so no `submit-record.yml` patch is needed (see "Host-key handling" above)
 - Next: Pillar 3a piece 1 (Apps Script v2) — separate PR after this setup is verified end-to-end
 
 Receipt token: wake-20260528T0805-d0b994
