@@ -1,2 +1,13 @@
 # Git LFS tracking for large dissertation PDF files
 dissertation/*.pdf filter=lfs diff=lfs merge=lfs -text
+
+# Force LF line endings for the OKF/wiki knowledge bundle and its generated
+# artifacts. The OKF tooling parses frontmatter with `lines[0] === '---'` and
+# diffs the generated inventory/seed byte-for-byte. On Windows (core.autocrlf=true)
+# these files check out as CRLF, which breaks frontmatter detection and the
+# exact-match regeneration tests. CI runs on Linux (LF), so pinning eol=lf keeps
+# local Windows checkouts consistent with CI.
+wiki/**/*.md text eol=lf
+wiki/**/*.json text eol=lf
+data/wiki-content/**/*.md text eol=lf
+data/wiki-seed.json text eol=lf
