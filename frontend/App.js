@@ -3,6 +3,7 @@ import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { html } from './html.js?v=3.4.6';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github } from 'lucide-react';
 import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.4.6';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.4.6';
 import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.4.6';
 import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.4.6';
 import { openBugReport } from './utils/bugReport.js?v=3.4.6';
@@ -146,8 +147,11 @@ const App = () => {
     if (coreFetchStarted.current) return;
     if (currentRoute === ROUTES.analytics || currentRoute === ROUTES.wiki) return;
     coreFetchStarted.current = true;
+    perfMark('data:start');
     fetchCoreData()
       .then((data) => {
+        perfMark('data:end');
+        perfMeasure('data:load', 'data:start', 'data:end');
         setRecords(data.records);
         setFacets(data.facets);
         setAutocompleteIndex(data.autocompleteIndex);
