@@ -16,6 +16,7 @@
     "okf:flight-recorder": "node scripts/okf-flight-recorder.js",
     "okf:blindfold": "node scripts/okf-blindfold-test.js",
     "export-data": "node data/export-archive-data.js",
+    "bump-version": "node scripts/bump-version.mjs",
     "build-embeddings": "node data/lib/embeddings-builder.js",
     "preview": "node scripts/preview-server.js",
     "preview:audit": "node scripts/preview-audit.js"
