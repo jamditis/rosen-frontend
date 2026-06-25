@@ -36,10 +36,13 @@ export function loadAuthoredExcerpts(csvText) {
   const map = new Map();
   if (!csvText || !csvText.trim()) return map;
 
+  // bom: true so a sidecar saved from Excel as UTF-8-with-BOM still parses: without
+  // it csv-parse leaves the BOM on the first header key (record_id becomes
+  // "﻿record_id"), and every authored excerpt is silently ignored.
   // Unescape at the read boundary, the same as the other export CSVs (#335), so
   // an authored excerpt saved with the spreadsheet-safety apostrophe (e.g. an
   // excerpt that opens with "@" stored as "'@...") renders as its original text.
-  const rows = parse(csvText, { columns: true, skip_empty_lines: true, trim: true }).map(unescapeRow);
+  const rows = parse(csvText, { columns: true, skip_empty_lines: true, trim: true, bom: true }).map(unescapeRow);
   for (const row of rows) {
     const id = (row.record_id || row.id || row.ID || '').trim();
     const excerpt = (row.authored_excerpt || row.excerpt || '').trim();

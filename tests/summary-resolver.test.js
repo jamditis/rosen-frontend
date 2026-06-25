@@ -41,6 +41,15 @@ describe('loadAuthoredExcerpts', () => {
     assert.strictEqual(map.get('RECORD-9'), 'padded value');
   });
 
+  it('parses a sidecar saved as UTF-8 with a BOM (Excel) instead of ignoring every row', () => {
+    // Excel's "CSV UTF-8" export prepends a BOM; without bom:true csv-parse
+    // leaves it on the first header key, so record_id is undefined and nothing maps.
+    const map = loadAuthoredExcerpts(
+      '﻿record_id,authored_excerpt\nRECORD-00902,authored from excel\n'
+    );
+    assert.strictEqual(map.get('RECORD-00902'), 'authored from excel');
+  });
+
   it('unescapes the spreadsheet-safety apostrophe at the read boundary (#335)', () => {
     // An excerpt opening with "@" is stored as "'@..." for spreadsheet safety;
     // the public summary must show the original text, not the apostrophe.

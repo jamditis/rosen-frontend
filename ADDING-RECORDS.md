@@ -148,10 +148,12 @@ After editing, regenerate the JSON (Step 4) and upload (Step 5) the same way. Th
 After adding records and confirming the site looks right, save your work to the repository:
 
 ```bash
-git add data/archive_records-public.csv data/archive-core.json data/archive-data.json data/archive-details.json
+git add data/archive_records-public.csv data/authored-excerpts.csv data/archive-core.json data/archive-data.json data/archive-details.json
 git commit -m "Add [number] new records through [date]"
 git push
 ```
+
+`data/authored-excerpts.csv` is in that list on purpose: it is the source of your authored excerpts. If you skip it, the JSON still carries the override now, but the next regeneration from a clean checkout has no excerpt to apply and your text reverts to the auto-generated summary.
 
 This isn't required for the site to work, but it keeps a history of changes and makes it easy to undo mistakes.
 
