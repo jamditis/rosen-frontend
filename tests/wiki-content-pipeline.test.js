@@ -31,17 +31,36 @@ describe('wiki seed is generated from the OKF bundle', () => {
     assert.deepEqual(generated, committed);
   });
 
-  it('renders one page per concept idea plus the Jay Rosen entity', () => {
+  it('renders the dissertation concepts, one topic page per chapter, and the thinker entities', () => {
     const seed = buildSeed();
     const concepts = seed.pages.filter(page => page.kind === 'concept');
     const entities = seed.pages.filter(page => page.kind === 'entity');
-    assert.equal(concepts.length, 21);
-    assert.deepEqual(entities.map(page => page.slug), ['entity/jay-rosen']);
+    const topics = seed.pages.filter(page => page.kind === 'topic');
+    assert.equal(concepts.length, 39);
+    assert.equal(topics.length, 8);
+    // Jay Rosen plus the seven thinkers the dissertation engages by name.
+    assert.deepEqual(entities.map(page => page.slug).sort(), [
+      'entity/gabriel-tarde',
+      'entity/gustave-le-bon',
+      'entity/james-carey',
+      'entity/jay-rosen',
+      'entity/john-dewey',
+      'entity/neil-postman',
+      'entity/robert-park',
+      'entity/walter-lippmann'
+    ]);
     // Every concept links back to Rosen so the entity is reachable from any idea.
     for (const page of concepts) {
       assert.ok(
         page.relatedEntities.includes('entity/jay-rosen'),
         `${page.slug} should relate to entity/jay-rosen`
+      );
+    }
+    // Every topic page groups at least one concept so a chapter is navigable.
+    for (const page of topics) {
+      assert.ok(
+        page.relatedConcepts.length > 0,
+        `${page.slug} should link the concepts it groups`
       );
     }
   });
