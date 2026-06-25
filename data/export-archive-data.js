@@ -18,6 +18,7 @@ import { generateOPML, generateSubscriptionOPML } from './lib/opml-generator.js'
 import { computeAnalytics } from './compute-analytics.js';
 import { ERAS } from './eras.js';
 import { unescapeRow } from './lib/csv-unescape.js';
+import { loadAuthoredExcerpts, resolveSummary } from './lib/summary-resolver.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -79,7 +80,7 @@ function getEra(dateStr) {
   return 'Platform Transition & Future Models (2021-Present)';
 }
 
-function processRecord(row, index, type, relationshipsMap) {
+function processRecord(row, index, type, relationshipsMap, authoredExcerpts) {
   const rawCats = row.thematic_categories || row.Thematic_Categories || row.Categories || '';
   const rawConcepts = row.key_concepts || row.Key_Concepts || row.Concepts || '';
   const rawTags = row.tags || row.Tags || '';
@@ -145,7 +146,7 @@ function processRecord(row, index, type, relationshipsMap) {
     era: ((row.era || row.Era || '').trim() || getEra(date)),
     pub: pub,
     url: rawUrl,
-    summary: (row.summary || row.Summary || ''),
+    summary: resolveSummary(row, authoredExcerpts, rawId),
     quote: (row.pull_quote || row.Pull_Quote || row.excerpt || row.raw_text || ''),
     categories: cats,
     concepts: concepts,
@@ -195,6 +196,9 @@ async function main() {
   const socialPostsPath = path.join(__dirname, 'social_posts.csv');
   const relationshipsPath = path.join(__dirname, 'extracted_relationships.csv');
   const entitiesPath = path.join(__dirname, 'extracted_entities.csv');
+  // Optional sidecar of human-authored summary overrides (#309). Not in the
+  // required-files check below: a missing file fails open to no overrides.
+  const authoredExcerptsPath = path.join(__dirname, 'authored-excerpts.csv');
   const outputPath = path.join(__dirname, 'archive-data.json');
 
   // Check that files exist
@@ -229,9 +233,17 @@ async function main() {
   const relationshipsData = parse(relationshipsCsv, { columns: true, skip_empty_lines: true }).map(unescapeRow);
   const entitiesData = parse(entitiesCsv, { columns: true, skip_empty_lines: true }).map(unescapeRow);
 
+  // Human-authored summary overrides (#309), keyed by record id. Fails open to
+  // an empty map when the sidecar is absent so the export never breaks on it.
+  const authoredExcerptsCsv = fs.existsSync(authoredExcerptsPath)
+    ? fs.readFileSync(authoredExcerptsPath, 'utf-8')
+    : '';
+  const authoredExcerpts = loadAuthoredExcerpts(authoredExcerptsCsv);
+
   console.log(`  - Archive records: ${archiveRecordsData.length} rows`);
   console.log(`  - Social posts: ${socialPostsData.length} rows`);
   console.log(`  - Relationships: ${relationshipsData.length} rows`);
+  console.log(`  - Authored excerpts: ${authoredExcerpts.size} loaded`);
   console.log(`  - Entities: ${entitiesData.length} rows`);
 
   // Build relationships map
@@ -271,7 +283,7 @@ async function main() {
   console.log('\n⚙️  Processing records...');
 
   const mainRecords = archiveRecordsData.map((row, i) => {
-    const record = processRecord(row, i, 'article', relationshipsMap);
+    const record = processRecord(row, i, 'article', relationshipsMap, authoredExcerpts);
 
     // Only contribute to facets/autocomplete if the record will survive the
     // verified filter below. Unverified rows can carry stub or 404-chrome
@@ -289,7 +301,7 @@ async function main() {
   });
 
   const socialRecords = socialPostsData.map((row, i) => {
-    const record = processRecord(row, i, 'social', relationshipsMap);
+    const record = processRecord(row, i, 'social', relationshipsMap, authoredExcerpts);
 
     // Generate a useful summary for social records (CSV has no summary column).
     // Without this, summary would be empty and the modal would show nothing useful.
@@ -596,6 +608,21 @@ async function main() {
   console.log(`  - Total records before filter: ${beforeFilterCount}`);
   console.log(`  - Records after filter: ${afterFilterCount}`);
   console.log(`  - Filtered out: ${beforeFilterCount - afterFilterCount}`);
+
+  // Report how many authored excerpts actually landed on a served record so
+  // editors can confirm pickup (#309). Computed against the final, post-filter
+  // allRecords: an excerpt keyed to a record that is unverified, missing a title
+  // or date, or dropped as a thread member or repost never reaches the site, so
+  // it counts as unmatched and is surfaced as a warning rather than silently
+  // reported as applied.
+  if (authoredExcerpts.size > 0) {
+    const servedIds = new Set(allRecords.map(r => r.id));
+    const unmatched = [...authoredExcerpts.keys()].filter(id => !servedIds.has(id));
+    console.log(`  - Authored excerpts applied: ${authoredExcerpts.size - unmatched.length}/${authoredExcerpts.size}`);
+    if (unmatched.length > 0) {
+      console.warn(`  ⚠ Authored excerpts with no matching served record: ${unmatched.join(', ')}`);
+    }
+  }
 
   // Sort by date (newest first)
   allRecords.sort((a, b) => b.date.localeCompare(a.date));
