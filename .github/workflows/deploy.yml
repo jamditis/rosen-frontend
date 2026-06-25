@@ -72,6 +72,26 @@ jobs:
         working-directory: backend
         run: poetry install --without dev --no-interaction
 
+      - name: Materialize SFTP private key (optional, key-auth)
+        # Same key-auth plumbing as submit-record.yml (#302). deploy_full_site.py
+        # shares sftp_push.py's auth precedence (key over password when a key path
+        # is present), so when the ROSEN_SFTP_KEY_CONTENT secret is set, write it
+        # to a runner-temp file (0600) and export ROSEN_SFTP_KEY_PATH. No-op while
+        # the secret is unset, so the full-site deploy keeps using password auth
+        # until the cutover.
+        env:
+          ROSEN_SFTP_KEY_CONTENT: ${{ secrets.ROSEN_SFTP_KEY_CONTENT }}
+        run: |
+          if [ -n "$ROSEN_SFTP_KEY_CONTENT" ]; then
+            umask 077
+            printf '%s\n' "$ROSEN_SFTP_KEY_CONTENT" > "$RUNNER_TEMP/rosen_deploy"
+            chmod 600 "$RUNNER_TEMP/rosen_deploy"
+            echo "ROSEN_SFTP_KEY_PATH=$RUNNER_TEMP/rosen_deploy" >> "$GITHUB_ENV"
+            echo "SFTP auth: private key materialized; using key-based authentication."
+          else
+            echo "SFTP auth: ROSEN_SFTP_KEY_CONTENT unset; using password authentication."
+          fi
+
       - name: Deploy
         working-directory: backend
         env:
@@ -82,7 +102,11 @@ jobs:
           ROSEN_SFTP_PASSWORD: ${{ secrets.ROSEN_SFTP_PASSWORD }}
           ROSEN_SFTP_SITE_PATH: ${{ secrets.ROSEN_SFTP_SITE_PATH }}
           ROSEN_SFTP_PORT: ${{ secrets.ROSEN_SFTP_PORT }}
-          ROSEN_SFTP_KEY_PATH: ${{ secrets.ROSEN_SFTP_KEY_PATH }}
+          # ROSEN_SFTP_KEY_PATH is exported by the "Materialize SFTP private key"
+          # step above (via $GITHUB_ENV) when key-auth is enabled. Do not also set
+          # it from a secret here: a step-level env entry overrides $GITHUB_ENV, so
+          # the usually-empty secret would shadow the materialized runner-temp path
+          # and silently fall back to password auth.
           ROSEN_SFTP_KEY_PASSPHRASE: ${{ secrets.ROSEN_SFTP_KEY_PASSPHRASE }}
           ROSEN_SFTP_KNOWN_HOSTS: ${{ secrets.ROSEN_SFTP_KNOWN_HOSTS }}
           # The dry_run input is a typed boolean — safe to flow through env.

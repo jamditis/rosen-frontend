@@ -28,12 +28,12 @@ Values were verified on houseofjawn 2026-05-28 (wake-20260528T0805-d0b994). Use 
 | `ROSEN_SFTP_REMOTE_PATH` | See "SFTP remote path" below | Two candidates in existing docs — verify against current manual deploy practice |
 | `ROSEN_SFTP_KNOWN_HOSTS` | `ssh-keyscan` output, captured after Block 1 | Pins host key; rejects MITM. Paste all of the inline `ssh-keyscan` output (every host-key line), not just one — the code accepts inline contents or a path (#408); see "Capturing the host key" below |
 
-Optional (only if switching from password to key auth later):
+Optional (only if switching from password to key auth — see "Enabling key-based auth" below):
 
 | Secret | When needed |
 |---|---|
 | `ROSEN_SFTP_PORT` | Bluehost defaults to 22; set only if non-standard |
-| `ROSEN_SFTP_KEY_PATH` | Path inside the runner — usually only set after also providing the key via a separate secret pipeline |
+| `ROSEN_SFTP_KEY_CONTENT` | The **body** of the deploy private key. Setting it switches the push to key auth; the workflow writes it to a runner-temp file and exports `ROSEN_SFTP_KEY_PATH` itself — do not set a key-path secret |
 | `ROSEN_SFTP_KEY_PASSPHRASE` | Only if the key is encrypted |
 
 **Total: 11 required secrets + 3 optional**, all consumed by `submit-record.yml` or `sweep-stuck-rows.yml`. Sources verified via `grep -oE 'secrets\.ROSEN_[A-Z_]+|secrets\.GEMINI_[A-Z_]+' .github/workflows/{submit-record,sweep-stuck-rows}.yml`.
@@ -150,18 +150,20 @@ Settings → Secrets and variables → Actions → "New repository secret" for e
 3. `ROSEN_QUEUE_SHEET_ID` (and optionally `ROSEN_QUEUE_SHEET_TAB`) next.
 4. `ROSEN_SFTP_*` last (requires the cPanel side trip — see "SFTP credentials" above).
 
-### Optional: rotating away from password auth later
+### Enabling key-based auth (plumbing is in place)
 
-Key-based auth is a possible future improvement but is **not safe to enable today** — the current `submit-record.yml` doesn't materialize a private key onto the runner. `sftp_push.py:54` reads `ROSEN_SFTP_KEY_PATH` as an existing path on disk, so setting that secret alone makes Smoke 3 fail with a missing-key-file error.
+The workflow plumbing now exists. `submit-record.yml` has a "Materialize SFTP private key" step that, when the `ROSEN_SFTP_KEY_CONTENT` secret is set, writes the key body to a runner-temp file (`chmod 600`) and exports `ROSEN_SFTP_KEY_PATH` before the push; `sftp_push.py:169` prefers the key over the password whenever a key path is present. The step is a no-op while the secret is unset, so password auth stays the working default and nothing changes until the cutover below is done.
 
-Making key-auth work would mean:
+`submit-record.yml` (per-record push) and `deploy.yml` (Pillar 3c full-site deploy) both carry this step — both run an SFTP push that shares `sftp_push.py`'s auth precedence, so a single `ROSEN_SFTP_KEY_CONTENT` secret switches both. `sweep-stuck-rows.yml` re-dispatches stuck rows back through `submit-record.yml` (the SFTP push happens there, not in the sweep run), and `submit-prototype.yml` runs `--prototype-mode`, which short-circuits the push, so neither holds SFTP credentials.
 
-1. Generate a keypair: `ssh-keygen -t ed25519 -f rosen_deploy -N ''`. Upload the public key in cPanel under "SSH Access".
-2. Add a new repository secret `ROSEN_SFTP_KEY_CONTENT` holding the **body** of the private key file (the contents of `rosen_deploy`, not a path).
-3. Patch `submit-record.yml` to write that secret to a temp file with `chmod 600` before the "Process submission" step runs (e.g. `echo "$ROSEN_SFTP_KEY_CONTENT" > "$RUNNER_TEMP/rosen_deploy" && chmod 600 "$RUNNER_TEMP/rosen_deploy"`).
-4. Set `ROSEN_SFTP_KEY_PATH` to that temp path (and `ROSEN_SFTP_KEY_PASSPHRASE` if encrypted) instead of `ROSEN_SFTP_PASSWORD` in the env: block.
+To cut over from password to key auth:
 
-Until step 3 lands in the workflow, password auth is the only supported path — don't set `ROSEN_SFTP_KEY_PATH`.
+1. Generate a keypair: `ssh-keygen -t ed25519 -f rosen_deploy -N ''`. Upload the public key in cPanel under "SSH Access" for the deploy account, and verify it works from a workstation: `ssh -i rosen_deploy <user>@<host>`.
+2. Set the private-key **body** (not a path) as a secret: `gh secret set ROSEN_SFTP_KEY_CONTENT < rosen_deploy`. Add `ROSEN_SFTP_KEY_PASSPHRASE` too if the key is encrypted.
+3. Re-run Smoke 3 against a known-good URL. The run log should print `SFTP auth: private key materialized; using key-based authentication.` and the test record should reach `pressthink.org/j/rosen-archive/`.
+4. Once key auth is confirmed, remove `ROSEN_SFTP_PASSWORD` from the repo secrets to finish the rotation. Leaving it is harmless — the key takes precedence — but removing it is the point.
+
+Do not set a `ROSEN_SFTP_KEY_PATH` secret: the workflow exports that path itself, and a step-level secret of the same name would shadow it and silently fall back to password auth.
 
 ---
 
