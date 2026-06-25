@@ -196,6 +196,17 @@ Notes:
 - Types are Title Case in the data — they are display strings, not enum identifiers.
 - The long tail (`Owns`, `Owned By`, `Inspired By`, `Pioneered`) is small enough that future cleanup may consolidate them. Don't introduce new types without a corresponding update here.
 - All relationship rows pass referential integrity (every source/target entity ID exists in `extracted_entities.csv`).
+- `Influenced` is defined below for issue #344 (downstream impact) but is not yet populated; it is part of the type contract with a count of zero until its backfill pass runs.
+
+### Impact / influence (defined for #344, backfill pending)
+
+`Influenced` captures downstream impact: the source record or entity had an effect the target can be traced to, what the source's work led to, shaped, or set in motion. It is the forward, outbound counterpart to the inbound types already in use (`Inspired By`, `Expands On`, `Cites`): those name a source that draws on its target, with the influence flowing target to source, while `Influenced` names a source whose work the target follows from, the influence flowing source to target. Storage is the same source-to-target row in both cases; what inverts is the direction of influence the type asserts, not the column layout, so a backfill writes `Influenced` rows in the normal source-to-target shape with the source as the influencer.
+
+| Type | Count | Meaning |
+|------|------:|---------|
+| `Influenced` | 0 | Source had a downstream effect the target can be traced to (what the source's work led to) |
+
+This type is the schema contract for the impact dimension Joe named on the 2026-05-27 launch call. A separate backfill pass populates it where the downstream effect is evident in the records (issue #344, acceptance criterion 2), and the frontend surface is deferred to the same issue (criterion 3). Until the backfill runs its count is zero, so a consumer of the open feed should expect no `Influenced` rows yet. Citation-specific impact (the inverse of `Cites`) is representable as `Influenced` for now; whether it warrants a distinct `Cited By` type is left to the backfill pass, which will see the real distribution.
 
 ---
 
