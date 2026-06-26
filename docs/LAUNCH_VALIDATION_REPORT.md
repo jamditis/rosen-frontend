@@ -1,4 +1,4 @@
-# Jay Rosen Digital Archive - Launch Validation Report
+# Jay Rosen Internet Archive - Launch Validation Report
 
 **Generated:** January 31, 2026
 **Target Launch:** February 20, 2026 (~20 days)
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-A comprehensive audit of the Jay Rosen Digital Archive identified **12 critical issues** and **18 medium-priority improvements** that should be addressed before the February 20th launch. The archive contains 29,828 records with an overall data quality score of **71%**.
+A comprehensive audit of the Jay Rosen Internet Archive identified **12 critical issues** and **18 medium-priority improvements** that should be addressed before the February 20th launch. The archive contains 29,828 records with an overall data quality score of **71%**.
 
 ### Quick Stats
 | Metric | Value | Status |
