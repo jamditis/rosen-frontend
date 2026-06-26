@@ -13,6 +13,7 @@ The archive uses JSON and CSV formats for data storage, with RSS and OPML for sy
 | JSON | `archive-details.json` | Full record details |
 | JSON | `archive-entities.json` | Entity/relationship data |
 | CSV | `archive_records-public.csv` | Source archive records |
+| CSV | `authored-excerpts.csv` | Optional human-authored summary overrides, keyed by `record_id` (#309) |
 | CSV | `extracted_entities.csv` | Extracted entities |
 | CSV | `extracted_relationships.csv` | Entity relationships |
 | RSS 2.0 | `feeds/*.xml` | Syndication feeds |
@@ -36,7 +37,7 @@ Each record in the archive represents a piece of Jay Rosen's work.
 | `era` | string | | Time period classification |
 | `pub` | string | | Original publication/platform |
 | `url` | string | ✓ | URL to original content |
-| `summary` | string | | Description or excerpt |
+| `summary` | string | | Description or excerpt. A human-authored excerpt in `authored-excerpts.csv` for this record's id overrides it (#309) |
 | `quote` | string | | Notable pull quote |
 | `categories` | array | | Thematic categories |
 | `concepts` | array | | Key concepts mentioned |
