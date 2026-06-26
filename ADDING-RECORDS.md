@@ -118,15 +118,42 @@ That file doesn't need to be updated as often — articles and essays are more i
 
 ---
 
+## Controlling the summary shown for a post
+
+By default the archive shows an auto-generated or scraped summary for each post. If you want to write the exact summary text shown for a specific post instead, author an excerpt for it.
+
+Open this file:
+
+```
+data/authored-excerpts.csv
+```
+
+It has two columns: `record_id` and `authored_excerpt`. Add one row per post you want to control:
+
+```
+record_id,authored_excerpt
+RECORD-00902,The summary you want readers to see for this post.
+```
+
+- The `record_id` is the `id` of the row in `data/archive_records-public.csv` (for example `RECORD-00902`), or a `BSKY-` id for a social post.
+- When a record has an authored excerpt, the archive shows it instead of the auto-generated summary.
+- Leave a post out of this file, or leave its `authored_excerpt` blank, and the archive keeps its existing summary behavior. Nothing else changes.
+
+After editing, regenerate the JSON (Step 4) and upload (Step 5) the same way. The export prints how many authored excerpts it applied, so you can confirm yours was picked up.
+
+---
+
 ## Committing your changes to GitHub
 
 After adding records and confirming the site looks right, save your work to the repository:
 
 ```bash
-git add data/archive_records-public.csv data/archive-core.json data/archive-data.json data/archive-details.json
+git add data/archive_records-public.csv data/authored-excerpts.csv data/archive-core.json data/archive-data.json data/archive-details.json
 git commit -m "Add [number] new records through [date]"
 git push
 ```
+
+`data/authored-excerpts.csv` is in that list on purpose: it is the source of your authored excerpts. If you skip it, the JSON still carries the override now, but the next regeneration from a clean checkout has no excerpt to apply and your text reverts to the auto-generated summary.
 
 This isn't required for the site to work, but it keeps a history of changes and makes it easy to undo mistakes.
 

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-23",
+  "generatedAt": "2026-06-24",
   "status": "seed",
   "pages": [
     {
@@ -76,6 +76,56 @@
         "archive maintainers"
       ],
       "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-communication-is-an-art",
+      "slug": "concept/communication-is-an-art",
+      "kind": "concept",
+      "title": "Communication is an art, not a science",
+      "summary": "Effective public communication is an art rather than a science. It requires understanding audiences and contexts and tracing consequences, not simply transmitting facts at random.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Rosen draws from Dewey the claim that forming a public is an art of communication, not a science of transmission. Sending facts out into the world is not the same as informing people. What matters is whether ideas reach an audience prepared to receive them and whether the energies at work in public life can actually be traced to their consequences. Without that, Dewey warned, what passes for public opinion is opinion only in its weaker sense."
+        },
+        {
+          "heading": "Cultivation: growing understanding over time",
+          "text": "The art Rosen describes works the way cultivation does. Like a farmer, the communicator prepares the soil, plants seeds with care, and nurtures growth over time rather than expecting understanding to appear all at once. Seeds thrown out at random do not take. Understanding has to be tended into being, which is why the sowing-seeds image stands at the center of this part of the dissertation."
+        },
+        {
+          "heading": "Context: the same message, different effects",
+          "text": "Because communication is an art, the same information can inform one person and confuse another depending on how it is presented and received. Context shapes meaning. A fact dropped into the wrong setting lands differently than the same fact placed where an audience can make sense of it. The communicator's task is therefore not only to be accurate but to attend to the conditions under which a message is taken up."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "Unless there are methods for detecting the energies at work and tracing them through an intricate network of interactions to their consequences, what passes for public opinion will be \"opinion\" only in its derogatory sense. (Chapter 8, p. 360)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/public-must-be-formed",
+        "concept/communication-as-art",
+        "concept/the-public-is-formed-not-found",
+        "concept/communication-is-not-community",
+        "concept/making-public-does-not-make-a-public"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen",
+        "entity/john-dewey"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
       "revisionCount": 1,
       "moderationState": "seed"
     },
@@ -156,6 +206,94 @@
       "moderationState": "seed"
     },
     {
+      "id": "wiki-concept-crowd-psychology",
+      "slug": "concept/crowd-psychology",
+      "kind": "concept",
+      "title": "Crowd psychology",
+      "summary": "Late nineteenth century theorists worried that mass society created irrational crowds susceptible to manipulation and contagion. This anxiety framed early thinking about what the newspaper-reading public might become.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Toward the end of the nineteenth century, social theorists grew anxious that mass society was producing irrational crowds, prone to suggestion, manipulation, and emotional contagion. The fear was that as people were gathered into large, dense aggregations, the steadying influence of reason gave way to impulse spread from person to person. Rosen uses this body of thought as the backdrop for the new social body created by the newspaper: when theorists looked at the readers the mass press assembled, they reached for the language of the crowd to describe what they saw."
+        },
+        {
+          "heading": "Le Bon and Tarde",
+          "text": "Two figures anchor the chapter's treatment of this anxiety. Gustave Le Bon argued that individuals in a crowd lose their rational faculties and fall under the sway of suggestion and emotion. Gabriel Tarde drew a distinction between the crowd and the public, describing the public as a dispersed group held together by shared attention to the same media rather than by physical proximity. Between them they mark the move the chapter title names, from crowd to public: the readers of the mass press are not packed together in a square, yet they form a body that earlier writers could only understand by analogy to the crowd."
+        }
+      ],
+      "relatedConcepts": [
+        "concept/le-bons-crowd",
+        "concept/tardes-public",
+        "concept/public-formation",
+        "concept/media-publics-are-unstable",
+        "concept/communication-is-not-community"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen",
+        "entity/gustave-le-bon",
+        "entity/gabriel-tarde"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-eclipse-of-content",
+      "slug": "concept/eclipse-of-content",
+      "kind": "concept",
+      "title": "The eclipse of content",
+      "summary": "When the press must compete for attention, presentation begins to outweigh substance. What captures attention is not always what informs, and the front page becomes an instrument built to grab attention in a crowded marketplace.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Once attention has to be captured rather than granted, the struggle to be heard starts to shape what the press produces. Rosen describes how the competition for attention elevates presentation over substance, so that what captures attention may not be what informs. Content does not disappear, but it is eclipsed, pushed behind the work of being noticed. The press that must win a place in a crowded field begins to favor the qualities that win attention over the qualities that inform."
+        },
+        {
+          "heading": "The front page",
+          "text": "The front page is where this logic becomes a physical object. It is designed to grab attention in a crowded marketplace, and its headlines, images, and layout serve that commercial function. The page is not arranged to lay out the day's events in order of public importance; it is arranged for impact, to pull a reader toward one paper rather than another. In that sense the front page is the clearest sign of content being eclipsed by the demands of attention."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "When there is an indefinite supply of available information, attention is scarce. The battle for attention is then the very substance of communication. (Chapter 5, p. 180)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/competition-for-attention",
+        "concept/the-press-structures-events",
+        "concept/news-as-drama",
+        "concept/public-transmission-private-reception",
+        "concept/mobilized-privacy"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
       "id": "wiki-concept-ecological-thinking",
       "slug": "concept/ecological-thinking",
       "kind": "concept",
@@ -191,6 +329,47 @@
         "archive maintainers"
       ],
       "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-imagined-community",
+      "slug": "concept/imagined-community",
+      "kind": "concept",
+      "title": "The imagined community",
+      "summary": "Newspaper readers form an imagined community, sharing a sense of connection without ever meeting, bound together only by consuming the same information. These abstract bonds are weaker than those of an actual community.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "When people read the same newspaper, they come to feel part of a shared group even though they never meet. Rosen calls this an imagined community: a public bound together not by acquaintance or proximity but by consuming the same information at roughly the same time. It is real enough to give readers a sense of belonging to something larger than their immediate surroundings, and it is what allows a continental republic to feel like a single public at all. But the bond is built out of shared attention rather than shared life."
+        },
+        {
+          "heading": "The limits of imagination",
+          "text": "Because the connection is imagined, it lacks the thick bonds of an actual community: shared history, mutual obligation, and face-to-face accountability. People tied together only by reading the same thing have no standing claim on one another and no direct way to hold one another responsible. Rosen stresses that these abstract bonds are weak compared with the ties of a community whose members live with the consequences of their decisions together. The imagined community can assemble a public, but it cannot give that public the durability or obligation that face-to-face association provides."
+        }
+      ],
+      "relatedConcepts": [
+        "concept/the-newspaper-connects-and-dissolves",
+        "concept/communication-is-not-community",
+        "concept/media-publics-are-unstable",
+        "concept/jeffersons-dilemma",
+        "concept/news-arises-from-distance"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
       "revisionCount": 1,
       "moderationState": "seed"
     },
@@ -271,6 +450,51 @@
       "moderationState": "seed"
     },
     {
+      "id": "wiki-concept-jeffersons-dilemma",
+      "slug": "concept/jeffersons-dilemma",
+      "kind": "concept",
+      "title": "Jefferson's dilemma",
+      "summary": "Jefferson understood that genuine democratic deliberation was only possible in small communities, so he argued democracy required limits on scale. His advocacy for ward republics reflected that belief.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Jefferson grasped a problem at the heart of large-scale democracy: real deliberation happens when citizens can meet, talk, and decide together, and that is only possible in a small, self-contained community. His advocacy for ward republics was not a side project but a direct response to this limit. He understood that an informed public, in the full sense, depends on a scale where people can experience public matters firsthand rather than learn about them at a distance. Rosen treats this as a dilemma because the republic Jefferson helped found was already too large for the ward to be the unit of its public life."
+        },
+        {
+          "heading": "Ward republics",
+          "text": "The ward republic was Jefferson's concrete proposal for keeping democracy small enough to work. He suggested dividing counties into small wards where citizens could meet face-to-face and deliberate on public matters directly, rather than delegating that work upward to representatives or relying on accounts of events they never saw. The ward was an attempt to preserve, inside a continental republic, the conditions under which a public could actually form and act."
+        },
+        {
+          "heading": "The press as substitute",
+          "text": "Where the ward could not reach, the newspaper took its place. The press became a substitute for the direct communication possible in small communities, carrying news of public matters to people who could no longer gather to discuss them. The dilemma is whether that substitute is adequate: can a newspaper truly replace face-to-face deliberation, or does mediated communication change the nature of the public life it claims to sustain? Rosen leaves the question open here, but it sets up the larger argument that communication is not the same as community."
+        }
+      ],
+      "relatedConcepts": [
+        "concept/scale-matters",
+        "concept/news-arises-from-distance",
+        "concept/communication-is-not-community",
+        "concept/imagined-community",
+        "concept/the-public-is-formed-not-found"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
       "id": "wiki-concept-journalism-as-transaction",
       "slug": "concept/journalism-as-transaction",
       "kind": "concept",
@@ -305,6 +529,47 @@
         "archive maintainers"
       ],
       "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-le-bons-crowd",
+      "slug": "concept/le-bons-crowd",
+      "kind": "concept",
+      "title": "Le Bon's crowd",
+      "summary": "Le Bon argued that individuals in crowds lose their rational faculties and become susceptible to suggestion and emotion.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Gustave Le Bon held that a person inside a crowd is not the same person as that individual alone. In the crowd, Rosen recounts, the individual loses the rational faculties that ordinarily govern judgment and becomes open to suggestion and to the spread of emotion. The crowd thinks and acts by contagion rather than by deliberation, which is why it seemed to nineteenth century observers both powerful and dangerous. Le Bon's crowd supplies the darker half of the picture against which the idea of a public is later set: if the mass of newspaper readers were simply a crowd at scale, then the press would be a machine for spreading suggestion rather than informing citizens."
+        },
+        {
+          "heading": "Place in the chapter",
+          "text": "Rosen draws on Le Bon to mark the anxiety that the mass press inherited. The worry was not only that crowds gather in the street but that the newspaper might assemble a crowd at a distance, an audience susceptible to the same loss of reason and the same emotional contagion without ever being in one place. Tarde's account of the public is the answer the chapter offers to that worry, distinguishing the dispersed reading public from the irrational physical crowd."
+        }
+      ],
+      "relatedConcepts": [
+        "concept/crowd-psychology",
+        "concept/tardes-public",
+        "concept/public-formation",
+        "concept/media-publics-are-unstable"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen",
+        "entity/gustave-le-bon"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
       "revisionCount": 1,
       "moderationState": "seed"
     },
@@ -575,6 +840,105 @@
       "moderationState": "seed"
     },
     {
+      "id": "wiki-concept-news-as-information",
+      "slug": "concept/news-as-information",
+      "kind": "concept",
+      "title": "News as information",
+      "summary": "For news to work as information rather than as entertainment, three conditions must hold together: structure, action, and contingency.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Rosen argues that news functions as information only when it meets three conditions at once. The reader needs structure, an ordered understanding into which a new fact can fit, because without it facts are meaningless data points. The reader needs a sense of action, a feeling that there is something to be done with what is learned. And the situation needs contingency, an outcome that is still uncertain and depends on decisions not yet made. When any of these is missing, the same item that could have informed the reader instead becomes something to watch rather than act on. This is why information cannot be located inside the news item itself: it lives in the relation between a person and a changing environment."
+        },
+        {
+          "heading": "Structure: ordered understanding",
+          "text": "Information requires a framework of understanding. A fact arriving without a structure to receive it is a meaningless data point. The reader has to already hold an ordered picture of the situation for a new report to add anything to it (pp. 55-58)."
+        },
+        {
+          "heading": "Action: a feeling of participation",
+          "text": "News informs only when it connects to potential action. The reader must feel that there is something to do with what is learned, that the report bears on a choice or a course of conduct that is theirs to take (pp. 59-62)."
+        },
+        {
+          "heading": "Contingency: unpredictable outcomes",
+          "text": "Information matters when outcomes are uncertain, when the future still depends on decisions yet to be made. Where the result is already settled, fresh facts about it carry no informing power, however dramatic they are (pp. 63-65)."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "Information is not really \"in\" the items which come over the wire and make their way into the newspaper. It is \"in\" the relations between people and a changing environment. (Chapter 2, p. 58)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/information-is-relational",
+        "concept/news-as-drama",
+        "concept/sensationalism",
+        "concept/journalism-as-transaction",
+        "concept/news-arises-from-distance"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-omnicompetence-myth",
+      "slug": "concept/omnicompetence-myth",
+      "kind": "concept",
+      "title": "The omnicompetence myth",
+      "summary": "Democratic theory assumes citizens can hold informed opinions on every public question. Lippmann called this expectation entirely unworkable, and Rosen treats it as a myth the press cannot fulfill.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "The older democratic theory assumes an omnicompetent citizen, one who can form informed opinions on all public questions. Lippmann called that expectation entirely unworkable, and Rosen builds on the judgment. The press is like the beam of a searchlight that moves restlessly about, bringing one episode and then another out of darkness into vision, and people cannot do the work of the world by that light alone. The image makes the point precise: coverage is intermittent and selective by nature, so it can illuminate episodes but cannot supply the steady, full competence the ideal demands of every citizen."
+        },
+        {
+          "heading": "Too much to know",
+          "text": "One reason the myth fails is complexity. Modern society is too complex for any individual to understand fully. Specialization becomes necessary, and that very necessity opens gaps in public understanding that no general reader can close. The expert knows a narrow field; the citizen cannot become expert in all of them at once. Rosen reads this as a limit on what the press can deliver: it cannot turn a population into specialists on every question simply by reporting more."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "The press is like the beam of a searchlight that moves restlessly about, bringing one episode and then another out of darkness into vision. Men cannot do the work of the world by this light alone. (Chapter 7, p. 310)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/impossibility-of-the-informed-citizen",
+        "concept/pseudo-environment",
+        "concept/pictures-in-our-heads",
+        "concept/the-professional-attitude",
+        "concept/making-public-does-not-make-a-public"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen",
+        "entity/walter-lippmann"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
       "id": "wiki-concept-pictures-in-our-heads",
       "slug": "concept/pictures-in-our-heads",
       "kind": "concept",
@@ -613,6 +977,246 @@
       "moderationState": "seed"
     },
     {
+      "id": "wiki-concept-professional-standards",
+      "slug": "concept/professional-standards",
+      "kind": "concept",
+      "title": "Professional standards",
+      "summary": "Journalism adopted professional standards such as objectivity, accuracy, and fairness to prove its public responsibility and to set itself apart from yellow journalism. Rosen argues these standards assume too much and cannot solve the structural problems they were meant to fix.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "After yellow journalism, the press needed a way to show that it took its public duties seriously. The answer was a set of professional standards: objectivity, accuracy, fairness, and completeness. These became the marks of responsible journalism, the qualities a reporter could point to as proof of good faith. For Rosen, this turn to standards is the heart of what he calls the impossible press, because it tried to settle the whole problem of public life by controlling the conduct of journalists. The trouble is that standards govern how a journalist behaves; they do not, by themselves, reach the deeper question of whether the press can inform a public at all."
+        },
+        {
+          "heading": "Objectivity as a method for managing controversy",
+          "text": "Objectivity was the standard that promised the most. It offered neutrality and truth, a way of reporting the world without the reporter's own slant. Rosen reads it more skeptically. Objectivity worked as a method for managing controversy rather than as a way of achieving understanding. It gave journalists a defensible procedure for handling disputed claims, but procedure is not the same as comprehension, and a press organized around staying out of the fight is not necessarily a press that helps a public understand what is at stake."
+        },
+        {
+          "heading": "The limits of standards",
+          "text": "Professional standards run into a wall that no amount of care can climb. They assume the public exists and is ready to be informed. They cannot create a public where none exists. A journalist can be accurate, fair, and complete and still be writing into a void, because accuracy and fairness are answers to the question of how to report, not to the prior question of whether there is a formed public capable of acting on the report. This is why Rosen treats the standards as assuming too much: they take the existence of their audience for granted and so leave the hardest part of the work undone."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "An impossible press was born, one which sought to solve the whole problem of public life simply by controlling the conduct of journalists. (Chapter 6, p. 220)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/the-professional-attitude",
+        "concept/commerce-versus-public-duty",
+        "concept/the-yellow-journalism-crisis",
+        "concept/the-public-is-formed-not-found",
+        "concept/making-public-does-not-make-a-public"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-pseudo-environment",
+      "slug": "concept/pseudo-environment",
+      "kind": "concept",
+      "title": "The pseudo-environment",
+      "summary": "Drawing on Lippmann, Rosen argues that people respond not to reality but to representations of reality, the pictures in their heads, which may bear little resemblance to the actual world.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Lippmann argued that people do not act on the world as it is. They act on a representation of it, an inner picture assembled from what they have read, heard, and already believed. Rosen takes this seriously as a problem for the press. If what guides behavior is the picture in the head rather than the event itself, then publishing facts is not the same as informing the public. The decisive question is not what was released into the environment but what took shape in the beliefs and behavior of the average citizen. A press that pours more information into the world can still leave the pseudo-environment untouched."
+        },
+        {
+          "heading": "The reality gap",
+          "text": "Between the world and our picture of it lies a gap, and that gap produces systematic misunderstanding rather than occasional error. Rosen stresses that the press cannot simply bridge it. The distance is built into how perception works, so adding coverage does not close it on its own. This is why he treats the gap as a structural condition the press operates inside, not a defect a better newsroom could remove."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "One could free all the facts in the world and still not be informing the public, for the important question was not what was released into the environment, but what took shape in the beliefs and behavior of the average citizen. (Chapter 7, p. 280)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/pictures-in-our-heads",
+        "concept/omnicompetence-myth",
+        "concept/impossibility-of-the-informed-citizen",
+        "concept/making-public-does-not-make-a-public",
+        "concept/information-is-relational"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen",
+        "entity/walter-lippmann"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-public-formation",
+      "slug": "concept/public-formation",
+      "kind": "concept",
+      "title": "Public formation",
+      "summary": "The public is not a pre-existing entity but something created by mass media. Newspapers gather together people who would otherwise have no connection, and the same act both binds and loosens.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Rosen argues that the public is not a body that exists in advance, waiting for the news to arrive. It is something the mass media create. The newspaper gathers together people who would otherwise have no connection to one another and gives them a common object of attention. In this sense the press does not merely serve a public that is already there; it forms one. That is also why the public it makes carries the marks of how it was made, abstract and assembled rather than grown out of shared life."
+        },
+        {
+          "heading": "Dissolving bonds",
+          "text": "The act of forming a public has a cost. While the newspaper connects people across distances, it weakens local community bonds by directing attention outward. Readers turn from the people beside them toward events far away, so the same paper that ties strangers together loosens the face-to-face ties that held a town or neighborhood together. This is the dissolving tendency Rosen sets next to the connecting one: the newspaper builds a wide, thin web of attention by drawing energy away from the dense, local web it replaces."
+        },
+        {
+          "heading": "Unstable publics",
+          "text": "Because the bond is shared attention rather than shared experience and obligation, the publics the media form are inherently unstable. They gather around an event and dissolve when attention moves on to the next one. A public assembled this way has no lasting hold on its members; it lacks the steadiness that communities draw from common life and mutual duty. The newspaper can summon a public into being around a story, but it cannot make that public last beyond the story's hold on attention."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "As a way of tying people together the newspaper has a dissolving as well as a connecting tendency. (Chapter 4, p. 140)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/crowd-psychology",
+        "concept/tardes-public",
+        "concept/le-bons-crowd",
+        "concept/the-newspaper-connects-and-dissolves",
+        "concept/media-publics-are-unstable",
+        "concept/the-public-is-formed-not-found",
+        "concept/communication-is-not-community",
+        "concept/making-public-does-not-make-a-public"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen",
+        "entity/gabriel-tarde"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-public-must-be-formed",
+      "slug": "concept/public-must-be-formed",
+      "kind": "concept",
+      "title": "A public must be formed, not informed",
+      "summary": "Dewey argued there is no pre-existing public waiting to be informed. A public must be actively created through shared understanding of common problems, beginning where people can feel consequences directly.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Against the picture of a ready-made public that only lacks the facts, Dewey held that the public itself has to be brought into being. It forms when people come to share an understanding of the problems they hold in common, not when information is delivered to an audience already assembled. Rosen presents this as Dewey's answer to Lippmann: the failure of the informed citizen is real, but the remedy is to create the public, not to hand public affairs to experts."
+        },
+        {
+          "heading": "Why it must begin locally",
+          "text": "For Dewey, the work of forming a public starts where people stand. Public life must begin locally, in the settings where people can experience the consequences of decisions directly and take part in a way that matters to them. A public assembled at that scale has something to act on; one addressed only from a distance does not. This is the ground on which a wider public can later be built."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "Seeds are sown not by being thrown out at random, but by being so distributed as to take root and have a chance of growth. (Chapter 8, p. 345)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/communication-is-an-art",
+        "concept/the-public-is-formed-not-found",
+        "concept/scale-matters",
+        "concept/communication-is-not-community",
+        "concept/making-public-does-not-make-a-public",
+        "concept/impossibility-of-the-informed-citizen"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen",
+        "entity/john-dewey",
+        "entity/walter-lippmann"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-public-transmission-private-reception",
+      "slug": "concept/public-transmission-private-reception",
+      "kind": "concept",
+      "title": "Public transmission, private reception",
+      "summary": "Mass communication is transmitted to many but received in isolation. The newspaper or the broadcast reaches a crowd of people who are each alone, with no channel to respond or take part.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "A public message goes out to many people at once, but each person takes it in alone. Unlike the public square, where speech and reply happen face to face, mass media is consumed in private: reading the newspaper or watching television at home, by oneself. Rosen pairs that private reception with a second feature, the one-way flow. The audience can receive but cannot answer back or take part, so the connection runs in a single direction, from a remote source to a private reader. The result is a form of contact that links people to events without linking them to one another."
+        },
+        {
+          "heading": "Received alone, with no way to answer",
+          "text": "Two features of this arrangement reinforce each other. The first is where the message lands: not in a shared space but in the home, where it is read or watched in isolation rather than in the company of fellow citizens. The second is the shape of the channel: mass media creates a one-way flow in which there is no response channel, so the reader cannot reply, correct, or participate. Together they describe a kind of communication that reaches a mass audience while leaving each member of it on their own."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "Our system of communication is not addressed at the public but at private individuals. We have evolved a radical form of mobilized privacy: the individual hooked into long lines of communication from remote sources. (Chapter 5, p. 160)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/mobilized-privacy",
+        "concept/communication-is-not-community",
+        "concept/media-publics-are-unstable",
+        "concept/eclipse-of-content"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
       "id": "wiki-concept-scale-matters",
       "slug": "concept/scale-matters",
       "kind": "concept",
@@ -647,6 +1251,94 @@
         "archive maintainers"
       ],
       "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-sensationalism",
+      "slug": "concept/sensationalism",
+      "kind": "concept",
+      "title": "Sensationalism",
+      "summary": "Sensationalism is not an appetite for the crude but a symptom of the difficulty of holding the interest of a population that does not act on its world.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Rosen reads sensationalism not as a moral failing of the press or a corrupt taste in readers, but as a structural problem. When events carry no stake for the audience, the audience has no reason to attend, and the only way left to hold them is to raise the emotional pitch. Sensationalism is what news does when it can no longer count on the reader to care. It belongs to news as drama, the kind of news that asks only to be watched, rather than to news as information, the kind that asks to be acted on."
+        },
+        {
+          "heading": "Human interest: stories without stakes",
+          "text": "The human interest story is the clearest case. It engages the emotions without requiring any action, and the reader consumes it as they would a piece of fiction. Nothing in it turns on a choice the reader might make, so it works as drama: the journalist becomes a dramatist and the reader becomes a spectator (pp. 66-75)."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "Sensationalism is not a perverse appetite for the crude and spectacular, but the increasing difficulty of interesting a population which does not act on its world. (Chapter 2, p. 80)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/news-as-drama",
+        "concept/news-as-information",
+        "concept/competition-for-attention",
+        "concept/information-is-relational",
+        "concept/commerce-versus-public-duty"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-tardes-public",
+      "slug": "concept/tardes-public",
+      "kind": "concept",
+      "title": "Tarde's public",
+      "summary": "Tarde distinguished the public from the crowd: a dispersed group connected by shared attention to the same media rather than by physical proximity.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Gabriel Tarde drew the line that gives the chapter its title. Where Le Bon's crowd is a body of people pressed together in one place, Tarde's public is dispersed. Its members are scattered and may never meet, yet they form a single social body because they attend to the same media at the same time. The bond is shared attention rather than physical proximity. This is the figure that lets Rosen describe the readers of the mass newspaper as a public: connected not by being in a crowd but by reading the same paper, fixed on the same events from a distance."
+        },
+        {
+          "heading": "Place in the chapter",
+          "text": "Tarde's distinction is the hinge of the move from crowd to public. It reframes the nineteenth century fear of irrational masses by proposing a different kind of aggregation, one made possible by the newspaper itself. The dispersed public is calmer than the crowd, but, as the chapter goes on to argue, the attention that holds it together is shared and abstract rather than rooted in face-to-face life, which is what makes the resulting bonds unstable and the public liable to scatter when attention shifts."
+        }
+      ],
+      "relatedConcepts": [
+        "concept/crowd-psychology",
+        "concept/le-bons-crowd",
+        "concept/public-formation",
+        "concept/media-publics-are-unstable",
+        "concept/the-newspaper-connects-and-dissolves",
+        "concept/the-public-is-formed-not-found"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen",
+        "entity/gabriel-tarde"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
       "revisionCount": 1,
       "moderationState": "seed"
     },
@@ -803,6 +1495,269 @@
       "moderationState": "seed"
     },
     {
+      "id": "wiki-concept-the-telegraph-and-the-universal-town-meeting",
+      "slug": "concept/the-telegraph-and-the-universal-town-meeting",
+      "kind": "concept",
+      "title": "The telegraph and the universal town meeting",
+      "summary": "The telegraph inspired visions of a world united by instant communication, a universal town meeting spanning continents, and the newspaper was cast as that town meeting for politics.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "When the telegraph arrived it inspired visions of a world united by instant communication, a universal town meeting that could span continents. The newspaper was cast in the same role: a town meeting for politics, gathering a dispersed nation into a single deliberating body. Rosen treats this as the recurring hope attached to each new medium, the belief that faster and wider communication could restore the face-to-face deliberation once possible in a small community. The trouble was that connecting people across great distances did not recreate the community on which a real town meeting depends."
+        },
+        {
+          "heading": "The recurring pattern",
+          "text": "The telegraph was only the first instance of a pattern that repeats with each new medium. Every communication technology follows the same arc: utopian hopes that it will restore small-scale democratic participation, then the realization that technology cannot solve a social problem. The dream returns with each invention because the underlying wish, to close the distance that separates the public from the events that concern it, is never satisfied by speed or reach alone."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "The newspaper constitutes a universal town meeting for politics. (Chapter 3, p. 108)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/media-hope-and-disappointment",
+        "concept/more-communication-more-difficulty",
+        "concept/communication-is-not-community",
+        "concept/scale-matters",
+        "concept/news-arises-from-distance",
+        "concept/thoreaus-skepticism"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-the-yellow-journalism-crisis",
+      "slug": "concept/the-yellow-journalism-crisis",
+      "kind": "concept",
+      "title": "The yellow journalism crisis",
+      "summary": "The sensationalism of Pulitzer and Hearst created a crisis of credibility that drove the professionalization movement. Its most cited example was the press's role in the Spanish-American War, and its lasting consequence was the birth of journalism schools, professional associations, and codes of ethics.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Yellow journalism was the sensational press of Joseph Pulitzer and William Randolph Hearst. Its excesses created a crisis of credibility that did more than embarrass the trade: it drove the professionalization movement. By putting a sharper edge on the conflict between private profits and public duties, yellow journalism made the gap between journalism as a business and journalism as a public service impossible to ignore, and the professional reforms that followed were an answer to that crisis."
+        },
+        {
+          "heading": "The Spanish-American War",
+          "text": "The clearest cautionary tale was the Spanish-American War. Yellow journalism's role in promoting the war became the standard example of what an irresponsible press could do, a case study in press power and the duty that is supposed to come with it. The episode showed that a sensational press did not merely entertain; it could help push a country toward war, and that possibility hung over every later argument about the responsibilities of journalism."
+        },
+        {
+          "heading": "The professional reaction",
+          "text": "The crisis produced a reaction aimed at restoring credibility. It led to journalism schools, professional associations, and codes of ethics, the institutional machinery of a profession. These were attempts to repair the damage by changing how journalists were trained and held to account. In Rosen's reading this reaction is the origin of the impossible press: the hope that better-trained, better-governed journalists could resolve a conflict that runs deeper than the conduct of any individual reporter."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "Yellow journalism put a sharper edge on the conflict between private profits and public duties. (Chapter 6, p. 240)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/commerce-versus-public-duty",
+        "concept/professional-standards",
+        "concept/the-professional-attitude",
+        "concept/the-press-structures-events"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-concept-thoreaus-skepticism",
+      "slug": "concept/thoreaus-skepticism",
+      "kind": "concept",
+      "title": "Thoreau's skepticism about faster communication",
+      "summary": "Thoreau questioned whether faster communication served any purpose, doubting that a continent linked by telegraph would have anything important to say across the new connection.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "The idea",
+          "text": "Against the enthusiasm for the telegraph, Rosen sets the doubt of Henry David Thoreau, who questioned whether faster communication served any purpose at all. Thoreau's point was not that the wire would fail to connect Maine and Texas but that connection is not the same as having something worth saying. The example sharpens the chapter's argument: speed and reach answer the question of how to communicate, while leaving untouched the harder question of whether there is anything to communicate about and whether anyone is in a position to act on it."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "We are in great haste to construct a magnetic telegraph from Maine to Texas; but Maine and Texas, it may be, have nothing important to communicate. (Chapter 3, pp. 110-114)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/more-communication-more-difficulty",
+        "concept/the-telegraph-and-the-universal-town-meeting",
+        "concept/media-hope-and-disappointment",
+        "concept/communication-is-not-community"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-entity-gabriel-tarde",
+      "slug": "entity/gabriel-tarde",
+      "kind": "entity",
+      "title": "Gabriel Tarde",
+      "summary": "A social theorist Rosen draws on for the distinction between the crowd and the public, the dispersed social body that forms around shared attention to the same media.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "Who he is",
+          "text": "Rosen cites Gabriel Tarde as one of the late nineteenth century theorists who tried to make sense of the new kind of social body created by the mass circulation newspaper. Tarde is best known for distinguishing the public from the crowd: a group dispersed in space yet connected by shared attention to the same media rather than by physical proximity. Rosen uses this distinction to describe the public as the social body that emerges from the newspaper form."
+        },
+        {
+          "heading": "In the dissertation",
+          "text": "In Chapter 4, Rosen argues that the mass circulation newspaper created a social body that was neither a traditional community nor merely a crowd, with ambiguous properties that alarmed social theorists (Chapter 4, p. 117). Against the crowd psychology that worried his contemporaries, Tarde drew a line between the crowd and the public, the dispersed group held together by common attention to the same media rather than by being physically gathered (Chapter 4, pp. 126-134). This sets up Rosen's claim that the newspaper, as a way of tying people together, both connects and dissolves."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "\"As a way of tying people together the newspaper has a dissolving as well as a connecting tendency.\" (Chapter 4, p. 117)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/the-newspaper-connects-and-dissolves",
+        "concept/media-publics-are-unstable",
+        "concept/the-public-is-formed-not-found",
+        "concept/mobilized-privacy"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-entity-gustave-le-bon",
+      "slug": "entity/gustave-le-bon",
+      "kind": "entity",
+      "title": "Gustave Le Bon",
+      "summary": "A social theorist Rosen cites for the argument that individuals in crowds lose their rational faculties and become open to suggestion and emotion.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "Who he is",
+          "text": "Gustave Le Bon is one of the late nineteenth century theorists Rosen draws on in Chapter 4, where the mass circulation newspaper creates a new kind of social body that is neither a traditional community nor merely a crowd. Le Bon's best-known argument is that individuals in crowds lose their rational faculties and become susceptible to suggestion and emotion, which is the contribution Rosen cites him for."
+        },
+        {
+          "heading": "In the dissertation",
+          "text": "Rosen places Le Bon among the social theorists alarmed by the ambiguous properties of the new public formed by the newspaper. In Chapter 4 (pp. 117-125), Le Bon's crowd stands for the worry that mass society produces irrational crowds open to manipulation and contagion. Rosen uses this against the wider point of the chapter: as a way of tying people together the newspaper has a dissolving as well as a connecting tendency, weakening local ties while creating abstract, unstable bonds."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "\"As a way of tying people together the newspaper has a dissolving as well as a connecting tendency.\" (Chapter 4, p. 117)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/the-newspaper-connects-and-dissolves",
+        "concept/media-publics-are-unstable",
+        "concept/communication-is-not-community"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-entity-james-carey",
+      "slug": "entity/james-carey",
+      "kind": "entity",
+      "title": "James Carey",
+      "summary": "Professor and journalism dean at Columbia University whose thinking on communication informs Rosen's ecological account of the press and the public.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "Who he is",
+          "text": "James Carey was a professor and journalism dean at Columbia University. In The Impossible Press, Rosen draws on Carey's way of thinking about communication to frame the press and the public not as two fixed things but as parts of a larger relationship that has to be understood together."
+        },
+        {
+          "heading": "In the dissertation",
+          "text": "Carey appears in the conclusion (p. 374), where Rosen lays out an ecological understanding of the press-public relationship. Rosen identifies five factors that must be inserted between press and public for an adequate account: the size and scale of the world to be informed about, the character of the social bond among audience members, the structural characteristics of mass media, the nature of language and symbols, and the professional attitude. His most important finding there is that the professional attitude is a very limited view of press and public."
+        }
+      ],
+      "relatedConcepts": [
+        "concept/ecological-thinking",
+        "concept/the-professional-attitude",
+        "concept/the-public-is-formed-not-found"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [
+        "RECORD-00038",
+        "RECORD-00086"
+      ],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
       "id": "wiki-entity-jay-rosen",
       "slug": "entity/jay-rosen",
       "kind": "entity",
@@ -840,6 +1795,553 @@
         "archive maintainers"
       ],
       "lastUpdated": "2026-06-23",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-entity-john-dewey",
+      "slug": "entity/john-dewey",
+      "kind": "entity",
+      "title": "John Dewey",
+      "summary": "Philosopher and educational reformer whose answer to Walter Lippmann, that a public must be rebuilt as a community rather than simply informed, Rosen uses in The Impossible Press.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "Who he is",
+          "text": "John Dewey was a philosopher and educational reformer. Rosen cites him for his response to Walter Lippmann's argument about the public: Dewey accepted Lippmann's diagnosis that the citizen could not be the informed actor democratic theory assumed, but rejected his elitist remedy. Dewey argued instead that a public is not found but formed, created through shared understanding of common problems, and that the cure for public life lay in rebuilding community."
+        },
+        {
+          "heading": "In the dissertation",
+          "text": "In Part Two, Rosen sets Dewey against Lippmann as he traces how journalism professionalized after 1900 to reconcile the business of news with its claim to public service (p. 198). In Chapter 8 he develops Dewey's position at length: Dewey agreed with Lippmann's diagnosis but called for the reconstruction of community as the basis for a revitalized public, holding that there is no public out there waiting to be informed (p. 330). Rosen draws on Dewey's claim that a public must be actively created (p. 345) and on his idea of converting the Great Society into a Great Community (p. 340). Dewey also gives Rosen the figure of communication as an art: seeds are sown not by being thrown out at random, but by being so distributed as to take root and have a chance of growth."
+        }
+      ],
+      "relatedConcepts": [
+        "concept/the-public-is-formed-not-found",
+        "concept/communication-as-art",
+        "concept/communication-is-not-community",
+        "concept/scale-matters",
+        "concept/the-professional-attitude",
+        "concept/making-public-does-not-make-a-public"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen",
+        "entity/walter-lippmann"
+      ],
+      "relatedRecords": [
+        "RECORD-00763",
+        "RECORD-00038",
+        "RECORD-00086"
+      ],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-entity-neil-postman",
+      "slug": "entity/neil-postman",
+      "kind": "entity",
+      "title": "Neil Postman",
+      "summary": "Neil Postman was a media critic at New York University and the chair of Rosen's dissertation committee. Rosen draws on the ecological way of thinking about media in framing the press and public as parts of one larger system.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "Who he is",
+          "text": "The archive records Neil Postman as a media critic at New York University. The dissertation was completed in the media ecology program he chaired, and its closing argument carries that influence: Rosen proposes an ecological understanding of the relationship between press and public, in which press and public are part of a larger system and a change in one element affects the others. This is the single idea that explains why Rosen leans on Postman, so the page keeps to it."
+        },
+        {
+          "heading": "In the dissertation",
+          "text": "Rosen builds toward an ecological view of the press-public relationship. In the conclusion (Conclusion, p. 374) he identifies five factors that must be inserted between \"press\" and \"public\" for an adequate understanding: the size and scale of the world to be informed about, the character of the social bond among audience members, structural characteristics of mass media, the nature of language and symbols, and the professional attitude. His most important finding is that the professional attitude is a very limited view of press and public. The ecological framing itself (p. 400) treats press and public as part of a larger system, so that changes in one element affect all the others."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "\"For any press anywhere, making things public does not a public make.\" (Conclusion, p. 400)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/ecological-thinking",
+        "concept/the-professional-attitude",
+        "concept/making-public-does-not-make-a-public",
+        "concept/the-public-is-formed-not-found"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [
+        "RECORD-00045",
+        "RECORD-00890",
+        "RECORD-00790",
+        "RECORD-00880",
+        "RECORD-00367",
+        "RECORD-00230"
+      ],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-entity-robert-park",
+      "slug": "entity/robert-park",
+      "kind": "entity",
+      "title": "Robert Park",
+      "summary": "Robert Park appears in The Impossible Press among the social theorists Rosen draws on to understand the public that emerges from the mass circulation newspaper.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "Who he is",
+          "text": "In The Impossible Press, Robert Park is one of the social theorists Rosen turns to in analyzing the new kind of social body the mass circulation newspaper created. The dissertation does not give a separate account of Park's career; it cites him as part of the effort to describe a public that is neither a traditional community nor merely a crowd."
+        },
+        {
+          "heading": "In the dissertation",
+          "text": "Rosen invokes Park in Chapter 4 (p. 117), where the mass circulation newspaper produces a social body with ambiguous properties: as a way of tying people together the newspaper has a dissolving as well as a connecting tendency, weakening local ties while creating abstract, unstable bonds. Park reappears in Chapter 5 (p. 152), in the account of a public gathered together without actually meeting, where the system of communication is addressed not at the public but at private individuals hooked into long lines of communication from remote sources."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "\"As a way of tying people together the newspaper has a dissolving as well as a connecting tendency.\" (Chapter 4, p. 117)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/the-newspaper-connects-and-dissolves",
+        "concept/mobilized-privacy"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-entity-walter-lippmann",
+      "slug": "entity/walter-lippmann",
+      "kind": "entity",
+      "title": "Walter Lippmann",
+      "summary": "Walter Lippmann was a writer, reporter, and political commentator. Rosen draws on his argument that the classical democratic ideal of the informed citizen is incompatible with modern conditions.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "Who he is",
+          "text": "The archive records Walter Lippmann as a writer, reporter, and political commentator. In The Impossible Press, Rosen treats him as the first to recognize that the classical democratic ideal of the informed citizen was incompatible with modern conditions. Lippmann argued that people respond not to the world itself but to representations of it, the \"pictures in their heads,\" and that the stereotype is a form of perception that works from private belief toward reality: we define first and then see. On these grounds he called the expectation that average citizens can hold informed opinions on all public questions \"entirely unworkable.\""
+        },
+        {
+          "heading": "In the dissertation",
+          "text": "Chapter 7 builds on Lippmann's diagnosis of the pseudo-environment: people act on \"pictures in their heads\" rather than on reality, so releasing facts into the world is not the same as informing the public (p. 268, p. 280). The omnicompetence myth, the assumption that citizens can be informed on every public question, is the expectation Lippmann judged unworkable (p. 310). In Part Two and Chapter 8, Rosen pairs Lippmann with John Dewey, who agreed with the diagnosis but rejected the elitist solution and argued for rebuilding community as the basis for a revitalized public (p. 198, p. 330)."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "\"One could free all the facts in the world and still not be informing the public, for the important question was not what was released into the environment, but what took shape in the beliefs and behavior of the average citizen.\" (Chapter 7, p. 268)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/impossibility-of-the-informed-citizen",
+        "concept/pictures-in-our-heads",
+        "concept/making-public-does-not-make-a-public",
+        "concept/the-public-is-formed-not-found",
+        "concept/the-professional-attitude"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen",
+        "entity/john-dewey"
+      ],
+      "relatedRecords": [
+        "RECORD-00716",
+        "RECORD-00073",
+        "RECORD-00124",
+        "RECORD-00038"
+      ],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-topic-communication-without-community",
+      "slug": "topic/communication-without-community",
+      "kind": "topic",
+      "title": "Communication without community",
+      "summary": "Chapter 5 argues that the modern public is gathered together without ever meeting. Mass communication is addressed at private individuals, not at the public as a collective, and the press begins to structure events to its own demands.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "What the chapter argues",
+          "text": "Chapter 5 takes up the gap between being connected and being together. The modern public is gathered together without actually meeting, and Rosen treats that as a fact that changes both public life and the function of the press. Our system of communication is not addressed at the public but at private individuals: each person is hooked into long lines of communication that run from remote sources into a private space. Out of this arrangement Rosen draws two linked consequences. First, a radical form of mobilized privacy, in which public messages are received alone and with no channel to answer back. Second, an attention economy, in which the press must capture attention rather than be granted it, and so begins to structure events according to its own demands for drama, conflict, brevity, and consumability."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "Our system of communication is not addressed at the public but at private individuals. We have evolved a radical form of mobilized privacy: the individual hooked into long lines of communication from remote sources. (Chapter 5, p. 160)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/mobilized-privacy",
+        "concept/public-transmission-private-reception",
+        "concept/competition-for-attention",
+        "concept/eclipse-of-content",
+        "concept/communication-is-not-community",
+        "concept/the-press-structures-events"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-topic-democracy-and-distance",
+      "slug": "topic/democracy-and-distance",
+      "kind": "topic",
+      "title": "Democracy and distance",
+      "summary": "Chapter 1 argues that news arises from distance and that democracy, built for small communities, runs into trouble as its scale grows. The press becomes the substitute for the face-to-face contact a large republic cannot have.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "What the chapter argues",
+          "text": "Rosen opens The Impossible Press by tracing the need for journalism to a single condition: distance. News only becomes necessary when events unfold beyond the reach of direct experience, so the press is what crosses the space between people and the events they cannot witness. He reads the Romans as the first civilization to systematically need news, because their empire stretched beyond what word of mouth could carry. The American republic created a public on a still larger scale, one whose geographic spread made newspaper communication essential to democratic participation. The chapter sets up the tension that runs through the rest of the dissertation: democratic theory was developed for small, self-contained communities, and extending it across a continent asks the press to do work that face-to-face contact once did."
+        },
+        {
+          "heading": "The figures in this chapter",
+          "text": "Jefferson appears as the thinker who understood the problem of scale most clearly. He advocated ward republics, dividing counties into small units where citizens could meet and deliberate directly, precisely because he believed genuine democracy required limits on size. When that direct contact is impossible, the newspaper steps in as a substitute, raising the question of whether mediated communication can truly replace face-to-face deliberation. The chapter also introduces the idea that newspaper readers form an imagined community, bound together only by reading the same information, never by meeting. These threads, distance, scale, the ward republic, the press as substitute, and the imagined community, are developed in the concept pages linked below."
+        }
+      ],
+      "relatedConcepts": [
+        "concept/news-arises-from-distance",
+        "concept/jeffersons-dilemma",
+        "concept/imagined-community",
+        "concept/scale-matters",
+        "concept/communication-is-not-community",
+        "concept/the-newspaper-connects-and-dissolves"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-topic-forming-a-public",
+      "slug": "topic/forming-a-public",
+      "kind": "topic",
+      "title": "The art and science of forming a public",
+      "summary": "Chapter 8 follows Dewey's answer to Lippmann: a public is not waiting to be informed but must be created, and communication that forms it is an art of cultivation, not a science of transmission.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "What the chapter argues",
+          "text": "In this chapter Rosen turns from Lippmann's diagnosis to Dewey's response. Dewey accepted that the classical informed citizen could not survive modern conditions, but he rejected the conclusion that experts should govern in the public's place. His answer was to rebuild community as the ground on which a public could form. There is no public sitting in wait for the morning's news. A public is something that has to be made, assembled around a shared understanding of common problems. And the communication that forms it is an art rather than a science: like a farmer sowing seeds, the communicator prepares the ground, plants with care, and lets understanding take root and grow over time."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "Seeds are sown not by being thrown out at random, but by being so distributed as to take root and have a chance of growth. (Chapter 8, p. 330)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/public-must-be-formed",
+        "concept/communication-is-an-art",
+        "concept/the-public-is-formed-not-found",
+        "concept/communication-as-art",
+        "concept/scale-matters",
+        "concept/communication-is-not-community",
+        "concept/impossibility-of-the-informed-citizen"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen",
+        "entity/john-dewey",
+        "entity/walter-lippmann"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-topic-from-crowd-to-public",
+      "slug": "topic/from-crowd-to-public",
+      "kind": "topic",
+      "title": "From crowd to public",
+      "summary": "Chapter 4 of The Impossible Press argues that the mass circulation newspaper created a new kind of social body, the public, which is neither a traditional community nor a mere crowd. As a way of tying people together the newspaper both connects and dissolves.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "What the chapter argues",
+          "text": "Chapter 4, From Crowd to Public, takes up the social body that the mass circulation newspaper brought into being. Rosen describes it as something new: neither a traditional, face-to-face community nor merely a crowd, but a public with ambiguous properties that alarmed late nineteenth century social theorists. The chapter sets the crowd psychology of that period against the emerging idea of the public, then asks what kind of bond the newspaper actually creates among the strangers it gathers."
+        },
+        {
+          "heading": "The connecting and dissolving newspaper",
+          "text": "The chapter's central claim is that the public is the social body that emerges from the newspaper form, and that this form has two tendencies at once. The newspaper connects people across distance by giving scattered strangers a shared object of attention, and at the same time it dissolves the local ties that once held communities together by directing attention outward. The bonds it creates are abstract and unstable rather than rooted in shared experience and obligation."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "As a way of tying people together the newspaper has a dissolving as well as a connecting tendency. (Chapter 4, p. 140)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/crowd-psychology",
+        "concept/le-bons-crowd",
+        "concept/tardes-public",
+        "concept/public-formation",
+        "concept/the-newspaper-connects-and-dissolves",
+        "concept/media-publics-are-unstable",
+        "concept/communication-is-not-community",
+        "concept/the-public-is-formed-not-found"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen",
+        "entity/gustave-le-bon",
+        "entity/gabriel-tarde"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-topic-the-impossible-press",
+      "slug": "topic/the-impossible-press",
+      "kind": "topic",
+      "title": "The impossible press",
+      "summary": "The chapter that gives the dissertation its name argues that professionalizing journalism after 1900 tried to settle the conflict between journalism as a business and journalism as a public service, but the professional attitude hid deeper problems about what a public is.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "What the chapter argues",
+          "text": "This is the titular chapter of the dissertation. Rosen argues that the professionalization of journalism after 1900 was an attempt to reconcile a contradiction: journalism is a business, and journalism claims to be a public service. The professional attitude that grew out of this effort obscured fundamental problems in the relationship between the press and the public. Yellow journalism had put a sharper edge on the conflict between private profits and public duties, and professional standards such as objectivity, accuracy, fairness, and completeness became the way journalists tried to prove their public responsibility. But these standards assume too much. They take for granted that a public already exists and is ready to be informed, and so they leave the harder question, what a public is and how one is formed, untouched."
+        },
+        {
+          "heading": "The impossible press",
+          "text": "The press that emerges from this history is impossible in a specific sense: it tries to solve the whole problem of public life by controlling the conduct of journalists. A failing rooted in the structure of modern public life is treated as if it were a matter of individual behavior. Better journalists, more careful and more fair, cannot create a public where none exists, which is why Rosen calls the result an impossible press."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "An impossible press was born, one which sought to solve the whole problem of public life simply by controlling the conduct of journalists. (Chapter 6, p. 220)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/professional-standards",
+        "concept/the-yellow-journalism-crisis",
+        "concept/commerce-versus-public-duty",
+        "concept/the-professional-attitude",
+        "concept/the-public-is-formed-not-found",
+        "concept/making-public-does-not-make-a-public"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-topic-the-myth-of-the-omnicompetent-citizen",
+      "slug": "topic/the-myth-of-the-omnicompetent-citizen",
+      "kind": "topic",
+      "title": "The myth of the omnicompetent citizen",
+      "summary": "Chapter 7 argues that the classical democratic ideal of the generally informed citizen is incompatible with modern conditions. People respond not to the world itself but to pictures in their heads, and no flood of facts can close that gap.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "What the chapter argues",
+          "text": "In the second part of the dissertation, Rosen turns to the professionalized press and the critiques of it offered by Walter Lippmann and John Dewey. This chapter draws on Lippmann to make a hard claim: the democratic ideal of a citizen who can hold informed opinions on every public question is, in Lippmann's word, entirely unworkable. The reason is not laziness or bad journalism. People respond not to reality but to representations of reality, the pictures in their heads, and those pictures are built from stereotypes and prior belief as much as from fact. Rosen uses this to separate two things the older theory treated as one: releasing facts into the world, and informing the public. The chapter insists the second does not follow from the first."
+        },
+        {
+          "heading": "Why it matters",
+          "text": "If the trouble lies deeper than the press, then so does the remedy. Rosen reads Lippmann as exposing the limits of any press reform that only asks journalists to publish more or publish better. The pseudo-environment, the stereotype, and the limits of attention and complexity are structural facts about how people take in the world, not faults to be corrected by harder work at the newspaper. The chapter sets up the rest of Part Two: if the informed citizen is impossible on the old terms, the question becomes what a press could realistically do, and what would have to change beyond it."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "One could free all the facts in the world and still not be informing the public, for the important question was not what was released into the environment, but what took shape in the beliefs and behavior of the average citizen. (Chapter 7, p. 280)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/pseudo-environment",
+        "concept/omnicompetence-myth",
+        "concept/pictures-in-our-heads",
+        "concept/impossibility-of-the-informed-citizen",
+        "concept/ecological-thinking",
+        "concept/the-professional-attitude"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen",
+        "entity/walter-lippmann"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-topic-the-universal-town-meeting",
+      "slug": "topic/the-universal-town-meeting",
+      "kind": "topic",
+      "title": "The universal town meeting",
+      "summary": "The telegraph and penny press inspired hopes that new media could restore democracy by recreating a town meeting on a continental scale, but those hopes ignored the absence of any genuine community across the distances being bridged.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "What the chapter argues",
+          "text": "Chapter 3 examines the dream that each new communication technology will restore the scale of democratic participation once possible in small communities. The telegraph and the penny press inspired utopian visions of democracy restored, a universal town meeting that could span continents. Rosen argues that these visions ignored a basic problem: extending communication across distances where no genuine community existed did not recreate the conditions of the town meeting. Each new medium repeated the same arc of hope followed by disappointment, and the deeper paradox was that better communication made the task of informing the public harder rather than easier, because it ensured there would always be more to communicate about."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "Improvements in communication also make communication more difficult because they ensure that there will be more to communicate about. (Chapter 3, p. 95)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/the-telegraph-and-the-universal-town-meeting",
+        "concept/thoreaus-skepticism",
+        "concept/media-hope-and-disappointment",
+        "concept/more-communication-more-difficulty",
+        "concept/communication-is-not-community",
+        "concept/scale-matters"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
+      "revisionCount": 1,
+      "moderationState": "seed"
+    },
+    {
+      "id": "wiki-topic-two-views-of-news",
+      "slug": "topic/two-views-of-news",
+      "kind": "topic",
+      "title": "Two views of news",
+      "summary": "Chapter 2 distinguishes two kinds of news with different functions: news as information, which calls for action, and news as drama, which calls only for watching.",
+      "aliases": [],
+      "body": [
+        {
+          "heading": "What the chapter argues",
+          "text": "Rosen separates two types of news that look alike on the page but do different work. News as information asks the reader to act, and it can only function when three conditions hold: structure, an ordered understanding that makes facts meaningful; action, a feeling that the reader can do something with what is learned; and contingency, outcomes that are still unsettled. News as drama asks for nothing but attention. The human interest story engages emotion without requiring action, so the journalist becomes a dramatist and the audience becomes spectators rather than participants. Read this way, sensationalism is not a taste for the crude but a symptom of the difficulty of holding the interest of a population that does not act on its world."
+        },
+        {
+          "heading": "From The Impossible Press",
+          "text": "Information is not really \"in\" the items which come over the wire and make their way into the newspaper. It is \"in\" the relations between people and a changing environment. (Chapter 2, p. 58)"
+        }
+      ],
+      "relatedConcepts": [
+        "concept/news-as-information",
+        "concept/sensationalism",
+        "concept/news-as-drama",
+        "concept/information-is-relational",
+        "concept/journalism-as-transaction",
+        "concept/competition-for-attention"
+      ],
+      "relatedEntities": [
+        "entity/jay-rosen"
+      ],
+      "relatedRecords": [],
+      "references": [
+        {
+          "label": "The Impossible Press (1986), full reader",
+          "url": "https://pressthink.org/j/rosen-archive/dissertation/reader/"
+        }
+      ],
+      "contributors": [
+        "archive maintainers"
+      ],
+      "lastUpdated": "2026-06-24",
       "revisionCount": 1,
       "moderationState": "seed"
     }

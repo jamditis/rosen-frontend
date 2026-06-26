@@ -1,6 +1,6 @@
 # Concepts
 
-The 21 key ideas from Jay Rosen's 1986 dissertation, *The Impossible Press: American Journalism and the Decline of Public Life*.
+The key ideas from Jay Rosen's 1986 dissertation, *The Impossible Press: American Journalism and the Decline of Public Life*, one concept page per idea.
 
 - [Journalism as transaction, not action](journalism-as-transaction.md)
 - [Information is relational](information-is-relational.md)
@@ -23,3 +23,21 @@ The 21 key ideas from Jay Rosen's 1986 dissertation, *The Impossible Press: Amer
 - [Communication is an art, not merely transmission](communication-as-art.md)
 - [The press structures events to its own demands](the-press-structures-events.md)
 - [The press-public relationship requires ecological thinking](ecological-thinking.md)
+- [Jefferson's dilemma](jeffersons-dilemma.md)
+- [The imagined community](imagined-community.md)
+- [News as information](news-as-information.md)
+- [Sensationalism](sensationalism.md)
+- [The telegraph and the universal town meeting](the-telegraph-and-the-universal-town-meeting.md)
+- [Thoreau's skepticism about faster communication](thoreaus-skepticism.md)
+- [Public transmission, private reception](public-transmission-private-reception.md)
+- [The eclipse of content](eclipse-of-content.md)
+- [Professional standards](professional-standards.md)
+- [The yellow journalism crisis](the-yellow-journalism-crisis.md)
+- [The pseudo-environment](pseudo-environment.md)
+- [The omnicompetence myth](omnicompetence-myth.md)
+- [A public must be formed, not informed](public-must-be-formed.md)
+- [Communication is an art, not a science](communication-is-an-art.md)
+- [Crowd psychology](crowd-psychology.md)
+- [Le Bon's crowd](le-bons-crowd.md)
+- [Tarde's public](tardes-public.md)
+- [Public formation](public-formation.md)
