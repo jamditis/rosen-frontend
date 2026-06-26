@@ -11,7 +11,9 @@ import {
   isWellFormedHttpUrl,
   isValidRecordUrl,
   checkInternalLinks,
-  checkUrlWellFormedness
+  checkUrlWellFormedness,
+  collectUrlRecords,
+  buildUrlSourceMap
 } from '../scripts/verify-links.js';
 
 const fixture = {
@@ -61,6 +63,12 @@ describe('isValidRecordUrl', () => {
     assert.ok(!isValidRecordUrl('/'));
     assert.ok(!isValidRecordUrl('mailto:x@example.com'));
     assert.ok(!isValidRecordUrl(null));
+  });
+  it('rejects protocol-relative urls that only look site-local', () => {
+    // `//host/path` starts with `/` but a browser resolves it as a scheme-relative
+    // external link, so it is neither a valid internal route nor a well-formed http url.
+    assert.ok(!isValidRecordUrl('//example.com/path'));
+    assert.ok(!isValidRecordUrl('//cdn.evil.test'));
   });
 });
 
@@ -114,5 +122,109 @@ describe('checkUrlWellFormedness', () => {
     assert.equal(findings.length, 1);
     assert.equal(findings[0].sourceId, 'RECORD-3');
     assert.equal(findings[0].failureType, 'malformed_url');
+  });
+});
+
+describe('checkInternalLinks cross-file drift (archive-data.json vs archive-entities.json)', () => {
+  it('flags a record whose relatedIds disagree with its recordEntityMap entry', () => {
+    // R1: relatedIds {P1,P2} but the map says {P1}; every id resolves, so the
+    // dangling checks pass and only a set-equality check catches the drift.
+    const data = {
+      records: [
+        { id: 'R1', url: 'https://e.com/1', relatedIds: ['P1', 'P2'] },
+        { id: 'R2', url: 'https://e.com/2', relatedIds: ['P1'] } // matches the map -> clean
+      ],
+      entities: [{ id: 'P1' }, { id: 'P2' }]
+    };
+    const drifted = {
+      entities: [{ id: 'P1' }, { id: 'P2' }],
+      recordEntityMap: { R1: ['P1'], R2: ['P1'] }
+    };
+    const drift = checkInternalLinks(data, drifted).filter((f) => f.failureType === 'record_entity_map_drift');
+    assert.equal(drift.length, 1);
+    assert.equal(drift[0].sourceId, 'R1');
+  });
+
+  it('flags a map value missing from archive-entities.json even when archive-data.json keeps it', () => {
+    // P1 still exists in archive-data.json (entities) but archive-entities.json
+    // dropped it, so the entity browser would follow the map into nothing.
+    const data = {
+      records: [{ id: 'R1', url: 'https://e.com/1', relatedIds: ['P1'] }],
+      entities: [{ id: 'P1' }]
+    };
+    const auxDropped = { entities: [], recordEntityMap: { R1: ['P1'] } };
+    const findings = checkInternalLinks(data, auxDropped);
+    const aux = findings.filter((f) => f.failureType === 'dangling_record_entity_map_value_aux');
+    assert.equal(aux.length, 1);
+    assert.equal(aux[0].target, 'P1');
+    // The data.entities check still resolves, so no plain dangling-value finding, and
+    // relatedIds equals the map entry, so no drift -- the aux check is the only signal.
+    assert.equal(findings.filter((f) => f.failureType === 'dangling_record_entity_map_value').length, 0);
+    assert.equal(findings.filter((f) => f.failureType === 'record_entity_map_drift').length, 0);
+  });
+
+  it('flags a record that keeps relatedIds after its map key is dropped', () => {
+    // The base fixture already has this case: RECORD-5 carries relatedIds but has no
+    // recordEntityMap entry. The asymmetric check (iterate the map only) would miss it;
+    // the union check treats the absent map entry as empty and flags the drift.
+    const drift = checkInternalLinks(fixture, aux).filter((f) => f.failureType === 'record_entity_map_drift');
+    assert.equal(drift.length, 1);
+    assert.equal(drift[0].sourceId, 'RECORD-5');
+  });
+
+  it('does not fire the aux-entity check when archive-entities.json has no entity list', () => {
+    // Backward-compat: the original fixture has no aux.entities, so the consumed-payload
+    // check is skipped rather than treating every map value as dangling.
+    const findings = checkInternalLinks(fixture, aux);
+    assert.equal(findings.filter((f) => f.failureType === 'dangling_record_entity_map_value_aux').length, 0);
+  });
+});
+
+describe('collectUrlRecords (core archive-data.json + split archive-details.json)', () => {
+  it('merges both files, dedups identical pairs, keeps divergent and details-only urls', () => {
+    const core = [
+      { id: 'R1', url: 'https://e.com/1' },
+      { id: 'R2', url: 'https://e.com/2' }
+    ];
+    const details = {
+      R1: { url: 'https://e.com/1' }, // identical to core -> one entry
+      R2: { url: 'https://e.com/2-changed' }, // split/stale deploy diverged -> own entry
+      R3: { url: 'https://e.com/3' }, // present only in details -> included
+      R4: {} // no url KEY -> modal keeps core url, falls back silently, skipped
+    };
+    const merged = collectUrlRecords(core, details);
+    const pairs = merged.map((r) => `${r.id} ${r.url}`).sort();
+    assert.deepEqual(pairs, [
+      'R1 https://e.com/1',
+      'R2 https://e.com/2',
+      'R2 https://e.com/2-changed',
+      'R3 https://e.com/3'
+    ]);
+  });
+
+  it('keeps an explicit bad details url so the malformed modal link is flagged', () => {
+    // The modal merges details over the core record, so a url key present-but-empty
+    // overrides a valid core url and breaks the link. That must be checked, not skipped;
+    // only a missing key falls back to core.
+    const core = [{ id: 'R1', url: 'https://e.com/good' }];
+    const details = { R1: { url: '' } }; // explicit empty overrides core in the modal
+    const merged = collectUrlRecords(core, details);
+    assert.ok(merged.some((r) => r.id === 'R1' && r.url === ''), 'empty details url retained for checking');
+    const malformed = checkUrlWellFormedness(merged).filter((f) => f.failureType === 'malformed_url');
+    assert.ok(malformed.some((f) => f.sourceId === 'R1'), 'the empty modal url is reported');
+  });
+});
+
+describe('buildUrlSourceMap', () => {
+  it('maps each probeable url back to every record id that carries it', () => {
+    const urlRecords = [
+      { id: 'R1', url: 'https://e.com/x' },
+      { id: 'R2', url: 'https://e.com/x' }, // shared url -> both ids retained
+      { id: 'R3', url: '/site-local' }, // not a probeable http url -> skipped
+      { id: 'R4', url: 'mailto:a@b.com' } // not http -> skipped
+    ];
+    const map = buildUrlSourceMap(urlRecords);
+    assert.equal(map.size, 1);
+    assert.deepEqual(map.get('https://e.com/x'), ['R1', 'R2']);
   });
 });

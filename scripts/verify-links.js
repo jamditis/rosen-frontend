@@ -52,6 +52,11 @@ export function isWellFormedHttpUrl(value) {
 // in export-archive-data.js and archiveService.js. Those routes are intentional, not drift.
 export function isValidRecordUrl(value) {
   if (typeof value !== 'string' || value.length === 0) return false;
+  // A protocol-relative URL (`//host/path`) starts with `/` but a browser resolves
+  // it as a scheme-relative EXTERNAL link, not a site-local route. Reject it before
+  // the single-slash branch so it is neither passed as an internal route here nor
+  // missed by the http(s) probe (isWellFormedHttpUrl would also reject it).
+  if (value.startsWith('//')) return false;
   if (value.startsWith('/')) return value.length > 1;
   return isWellFormedHttpUrl(value);
 }
@@ -64,6 +69,12 @@ export function checkInternalLinks(data, aux) {
   const entities = data.entities || [];
   const recordIds = new Set(records.map((r) => r.id));
   const entityIds = new Set(entities.map((e) => e.id));
+  const recordsById = new Map(records.map((r) => [r.id, r]));
+  // archive-entities.json ships its own entity list, and that is the payload
+  // fetchEntitiesData()/EntityBrowser actually consume. A map value can resolve
+  // in archive-data.json while archive-entities.json has dropped it, so validate
+  // against this list too when it is present (absent in the unit fixture -> skip).
+  const auxEntityIds = (aux && Array.isArray(aux.entities)) ? new Set(aux.entities.map((e) => e.id)) : null;
   const findings = [];
 
   for (const record of records) {
@@ -116,6 +127,46 @@ export function checkInternalLinks(data, aux) {
           detail: 'recordEntityMap value is not an entity id in the dataset'
         });
       }
+      // The map lives in archive-entities.json and is consumed from its own entity
+      // list, so a value missing there is a dangling reference the entity browser
+      // would follow into nothing, even when archive-data.json still has the entity.
+      if (auxEntityIds && !auxEntityIds.has(entityRef)) {
+        findings.push({
+          category: 'internal',
+          failureType: 'dangling_record_entity_map_value_aux',
+          sourceId: recordId,
+          target: entityRef,
+          detail: 'recordEntityMap value is not present in archive-entities.json entities'
+        });
+      }
+    }
+  }
+
+  // Backlink integrity is two files agreeing: a record's relatedIds (archive-data.json)
+  // must equal its recordEntityMap entry (archive-entities.json). Each side can dangle-check
+  // clean while they disagree -- INCLUDING when one file drops the entry while the other
+  // keeps it -- so compare the UNION of records that carry relatedIds and records that hold
+  // a map entry, treating an absent side as the empty set. A map key that is not a record is
+  // already reported as a dangling key, so it is left out here.
+  const driftIds = new Set();
+  for (const r of records) {
+    if ((r.relatedIds || []).length) driftIds.add(r.id);
+  }
+  for (const recordId of Object.keys(recordEntityMap)) {
+    if (recordsById.has(recordId)) driftIds.add(recordId);
+  }
+  for (const recordId of driftIds) {
+    const related = new Set(recordsById.get(recordId)?.relatedIds || []);
+    const mapped = new Set(recordEntityMap[recordId] || []);
+    const equal = related.size === mapped.size && [...related].every((id) => mapped.has(id));
+    if (!equal) {
+      findings.push({
+        category: 'internal',
+        failureType: 'record_entity_map_drift',
+        sourceId: recordId,
+        target: recordId,
+        detail: 'record.relatedIds and recordEntityMap entry disagree (cross-file drift between archive-data.json and archive-entities.json)'
+      });
     }
   }
 
@@ -136,6 +187,52 @@ export function checkUrlWellFormedness(records) {
     }
   }
   return findings;
+}
+
+// Every (recordId, url) pair the launched app can navigate to. The record modal
+// reads its url from the split archive-details.json (fetchRecordDetails()), not
+// from archive-data.json, so a split or stale deploy can leave a dead url in
+// details while the core file is clean. Checking only the core file would pass a
+// link users still open, so the sweep covers both. Deduped by (id,url): an
+// identical pair in both files is one check; a divergent details url is its own
+// entry and gets verified. A details entry with no url is "no link", not a broken
+// one, so it is skipped; a core record with no url is still flagged downstream.
+export function collectUrlRecords(records, details) {
+  const seen = new Set();
+  const out = [];
+  const add = (id, url) => {
+    // NUL joins the id and url: it cannot occur in either, so the key is
+    // unambiguous where a space or comma could collide. Written as the \u0000
+    // escape, not a literal NUL byte, so the source stays plain text for tools.
+    const key = `${id}\u0000${url}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push({ id, url });
+  };
+  for (const r of records || []) add(r.id, r.url);
+  for (const [id, d] of Object.entries(details || {})) {
+    // The modal merges details over the core record ({ ...record, ...details }), so a
+    // url KEY present in details overrides the core url -- even an empty or null value,
+    // which hides or breaks the user-facing link. Check any present url (well-formedness
+    // flags a bad one); only a MISSING key falls back to core silently, no finding.
+    if (d && typeof d === 'object' && Object.prototype.hasOwnProperty.call(d, 'url')) add(id, d.url);
+  }
+  return out;
+}
+
+// Map each probeable url back to the record id(s) that carry it. The external
+// pass dedups urls, so without this a dead/redirecting url reports sourceId:null
+// and the triage output (record id + link + failure type) cannot say which record
+// to repair. A url shared by several records keeps all of their ids.
+export function buildUrlSourceMap(urlRecords) {
+  const map = new Map();
+  for (const { id, url } of urlRecords || []) {
+    if (!isWellFormedHttpUrl(url)) continue;
+    const ids = map.get(url) || [];
+    ids.push(id);
+    map.set(url, ids);
+  }
+  return map;
 }
 
 // ----- external liveness (opt-in, network) -----
@@ -167,8 +264,10 @@ function classify(status) {
 // fetched per host (probing already-published source URLs with HEAD is low
 // impact); that is a documented limitation, not an oversight.
 export async function checkExternalLiveness(urls, opts = {}) {
-  const { concurrency = 6, timeoutMs = 10000, delayMs = 150, max = Infinity } = opts;
+  const { concurrency = 6, timeoutMs = 10000, delayMs = 150, max = Infinity, sourceMap = null } = opts;
   const targets = [...new Set(urls)].slice(0, max);
+  // Record id(s) carrying each url, so a failure names the record(s) to repair.
+  const idsFor = (url) => (sourceMap ? sourceMap.get(url) || [] : []);
   const findings = [];
   let cursor = 0;
   let nextStart = 0;
@@ -193,10 +292,12 @@ export async function checkExternalLiveness(urls, opts = {}) {
         const { status, location } = await probe(url, { timeoutMs });
         const failureType = classify(status);
         if (failureType) {
-          findings.push({ category: 'external', failureType, sourceId: null, target: url, detail: `HTTP ${status}${location ? ` -> ${location}` : ''}` });
+          const ids = idsFor(url);
+          findings.push({ category: 'external', failureType, sourceId: ids[0] ?? null, sourceIds: ids, target: url, detail: `HTTP ${status}${location ? ` -> ${location}` : ''}` });
         }
       } catch (err) {
-        findings.push({ category: 'external', failureType: 'unreachable_url', sourceId: null, target: url, detail: err.name === 'AbortError' ? `timeout after ${timeoutMs}ms` : err.message });
+        const ids = idsFor(url);
+        findings.push({ category: 'external', failureType: 'unreachable_url', sourceId: ids[0] ?? null, sourceIds: ids, target: url, detail: err.name === 'AbortError' ? `timeout after ${timeoutMs}ms` : err.message });
       }
     }
   }
@@ -242,13 +343,19 @@ async function main(argv) {
   const args = parseArgs(argv);
   const data = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'archive-data.json'), 'utf-8'));
   const aux = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'archive-entities.json'), 'utf-8'));
+  // The record modal reads its url from this split payload, so it is part of the
+  // launchable URL surface even though the offline backlink checks only use core.
+  const details = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'archive-details.json'), 'utf-8'));
 
   const internal = checkInternalLinks(data, aux);
-  const url = checkUrlWellFormedness(data.records);
+  // Well-formedness and liveness cover the core records AND the details payload,
+  // deduped by (record, url), so a bad link reachable only through the modal is caught.
+  const urlRecords = collectUrlRecords(data.records, details.details);
+  const url = checkUrlWellFormedness(urlRecords);
   let external = null;
   if (args.external) {
-    const urls = (data.records || []).map((r) => r.url).filter(isWellFormedHttpUrl);
-    external = await checkExternalLiveness(urls, { max: args.max });
+    const sourceMap = buildUrlSourceMap(urlRecords);
+    external = await checkExternalLiveness([...sourceMap.keys()], { max: args.max, sourceMap });
   }
 
   const report = buildReport({ data, internal, url, external });
