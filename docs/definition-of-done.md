@@ -1,6 +1,6 @@
 # Definition of done
 
-A subsystem-by-subsystem grading of the Jay Rosen Internet Archive against four marks — **Complete**, **Partial**, **Stub**, **Missing** — and a named critical path to v4.0.
+A subsystem-by-subsystem grading of Jay Rosen's Internet Archive against four marks — **Complete**, **Partial**, **Stub**, **Missing** — and a named critical path to v4.0.
 
 **Snapshot:** 2026-05-25, post-merge of PR #258. Main at `40ea683`. Source: four read-only scans (architecture, live-site, security, backlog) plus empirical follow-ups on three findings that needed verification.
 

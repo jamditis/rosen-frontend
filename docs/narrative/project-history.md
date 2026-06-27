@@ -1,6 +1,6 @@
 # Project history
 
-The Jay Rosen Internet Archive is a public collection of the works, critiques, and teachings of Jay Rosen, professor of journalism at NYU since 1986. It covers four decades of journalism criticism, media theory, and public life. The project was built and is maintained by Joe Amditis.
+Jay Rosen's Internet Archive is a public collection of the works, critiques, and teachings of Jay Rosen, professor of journalism at NYU since 1986. It covers four decades of journalism criticism, media theory, and public life. The project was built and is maintained by Joe Amditis.
 
 This document is the primary historical record of the project, covering its development from inception in June 2025 through its current state. For an internet archive, maintaining its own historical record is both appropriate and necessary.
 

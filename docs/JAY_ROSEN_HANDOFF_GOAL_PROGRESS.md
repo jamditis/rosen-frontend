@@ -57,7 +57,7 @@ Living document tracking the multi-session goal of making the archive self-susta
 
 ## Naming correction
 
-Archive is **"The Jay Rosen Internet Archive"** (Jay locked this in Jan 31 2026: "There are subtle differences between 'digital' and 'internet' and it's a bit more musical."). Some docs still say "Digital Archive" — update on the next safe doc-refresh pass.
+Archive name is **"Jay Rosen's Internet Archive"**: possessive, "Internet" not "Digital", and no leading "The". It locked in two steps. "Internet" over "Digital" on 2026-01-31 ("subtle differences between 'digital' and 'internet' ... a bit more musical"). The possessive form on the 2026-06-19 launch-prep call ("You want it to be Possessive ... right?" / "I do"). The regression guard is `tests/feed-title.test.js`. Older docs that say "Digital Archive" or the non-possessive "Jay Rosen Internet Archive" are stale.
 
 ## Wednesday May 27 call composition
 

@@ -11,7 +11,7 @@ Cross-reference: `docs/JAY_ROSEN_HANDOFF_GOAL_PROGRESS.md` for the broader plan.
 1. **Be ready to articulate the Internet-Archive / AI-scraping mitigation.** Jay re-sent the Nieman Lab link the day before the call. "Nah I figured out a way around that" did not satisfy him.
 2. **The April 7 automated-intake commitment is the deliverable Jay expects.** Quoted back to Joe May 6. Either deliver, or set a firm date.
 3. **Know your position on Unified Field's role.** Marla + Eli will pitch design ideas; decide before the call how receptive vs. scoped-down.
-4. **Naming:** the archive is "The Jay Rosen Internet Archive" — drop "Digital" anywhere it still appears.
+4. **Naming:** the archive is "Jay Rosen's Internet Archive" — drop "Digital" anywhere it still appears.
 5. **Hali Rosen is the second submitter alongside Rafi.** Make sure she's named in the handoff plan.
 
 ## Editorial / curation

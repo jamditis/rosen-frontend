@@ -1,5 +1,5 @@
 /**
- * Jay Rosen Internet Archive - Service Worker
+ * Jay Rosen's Internet Archive - Service Worker
  *
  * Caching strategy:
  * - HTML / navigations: Network-first, cache as offline fallback. The page must

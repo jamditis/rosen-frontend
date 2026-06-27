@@ -1,7 +1,7 @@
 ---
 okf_version: "0.1"
 title: Jay Rosen's Internet Archive — knowledge bundle
-description: Agent-navigable knowledge layer for the Jay Rosen's Internet Archive project — what it is, who's involved, how it's built, how to operate it, and where launch stands.
+description: Agent-navigable knowledge layer for Jay Rosen's Internet Archive project — what it is, who's involved, how it's built, how to operate it, and where launch stands.
 tags: [rosen-archive, pressthink, okf, index]
 timestamp: 2026-06-22
 ---

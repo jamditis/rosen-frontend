@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a problem with the Jay Rosen Internet Archive
+description: Report a problem with Jay Rosen's Internet Archive
 title: "[bug] "
 labels: ["bug", "user-report"]
 body:

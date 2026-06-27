@@ -2,7 +2,7 @@
 
 ## What this project is
 
-The **Jay Rosen Internet Archive** is a public collection of the works, critiques, and teachings of Jay Rosen, professor of journalism at NYU since 1986. It covers four decades of journalism criticism, media theory, and public life. The archive currently holds ~940 records (articles, essays, interviews, lectures, social media posts) and is live at https://pressthink.org/j/rosen-archive/.
+The **Jay Rosen's Internet Archive** is a public collection of the works, critiques, and teachings of Jay Rosen, professor of journalism at NYU since 1986. It covers four decades of journalism criticism, media theory, and public life. The archive currently holds ~940 records (articles, essays, interviews, lectures, social media posts) and is live at https://pressthink.org/j/rosen-archive/.
 
 The archive curator is Joe Amditis.
 

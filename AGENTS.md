@@ -5,7 +5,7 @@ source of truth and update this file when agent-facing workflow changes.
 
 ## Project overview
 
-The Jay Rosen Internet Archive is a zero-build static site for the public
+Jay Rosen's Internet Archive is a zero-build static site for the public
 archive of Jay Rosen's work, critiques, teaching, and dissertation materials.
 Production runs at `https://pressthink.org/j/rosen-archive/`.
 

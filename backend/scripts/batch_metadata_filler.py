@@ -171,7 +171,7 @@ def _build_categories_prompt(record: Dict) -> str:
         f"- {name}: {desc}" for name, desc in CATEGORY_DESCRIPTIONS.items()
     )
 
-    return f"""You are classifying records for the Jay Rosen Internet Archive — a collection of the works, critiques, and teachings of Jay Rosen, NYU professor of journalism.
+    return f"""You are classifying records for Jay Rosen's Internet Archive — a collection of the works, critiques, and teachings of Jay Rosen, NYU professor of journalism.
 
 Assign 1-3 thematic categories to this record. Choose ONLY from the categories listed below.
 
@@ -207,7 +207,7 @@ def _build_concepts_prompt(record: Dict) -> str:
         f"- {name}: {desc}" for name, desc in CONCEPT_DESCRIPTIONS.items()
     )
 
-    return f"""You are classifying records for the Jay Rosen Internet Archive — a collection of the works, critiques, and teachings of Jay Rosen, NYU professor of journalism.
+    return f"""You are classifying records for Jay Rosen's Internet Archive — a collection of the works, critiques, and teachings of Jay Rosen, NYU professor of journalism.
 
 Identify which of Jay Rosen's key concepts (if any) are explicitly discussed in this record. Only assign a concept if it is a substantive part of the content — not just mentioned in passing.
 

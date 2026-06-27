@@ -1,6 +1,6 @@
 # Data pipeline guide
 
-A practical reference for contributors working on the Jay Rosen Internet Archive data pipeline. This covers environment setup, the AI enrichment system, known failure modes, and recommendations for improvement.
+A practical reference for contributors working on Jay Rosen's Internet Archive data pipeline. This covers environment setup, the AI enrichment system, known failure modes, and recommendations for improvement.
 
 ---
 

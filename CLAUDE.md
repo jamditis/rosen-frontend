@@ -1,4 +1,4 @@
-# CLAUDE.md - Jay Rosen Internet Archive
+# CLAUDE.md - Jay Rosen's Internet Archive
 
 
 ## Bug-fixing workflow
@@ -13,7 +13,7 @@ When a bug is reported, don't immediately attempt to fix it. Instead:
 
 ## Project overview
 
-The **Jay Rosen Internet Archive** is a public collection of the works, critiques, and teachings of Jay Rosen, NYU professor of journalism. It covers four decades of journalism criticism, media theory, and public life.
+The **Jay Rosen's Internet Archive** is a public collection of the works, critiques, and teachings of Jay Rosen, NYU professor of journalism. It covers four decades of journalism criticism, media theory, and public life.
 
 - **Live URL:** https://pressthink.org/j/rosen-archive/
 - **Repository:** github.com/jamditis/rosen-frontend

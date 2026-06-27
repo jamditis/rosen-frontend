@@ -3,7 +3,7 @@
 Entity Extractor Module
 
 This module uses Google Gemini AI to extract named entities and relationships
-from text content in the Jay Rosen Internet Archive. It identifies people,
+from text content in Jay Rosen's Internet Archive. It identifies people,
 organizations, works, concepts, events, and locations, along with their relationships.
 
 The module follows the entity_extraction_schema.json specification for entity types
@@ -297,7 +297,7 @@ def extract_entities_and_relationships(
     # Construct the AI prompt
     prompt = f"""
 **INSTRUCTIONS:**
-You are a specialized entity extraction AI for the Jay Rosen Internet Archive. Your task is to analyze journalism and media criticism texts to extract:
+You are a specialized entity extraction AI for Jay Rosen's Internet Archive. Your task is to analyze journalism and media criticism texts to extract:
 1. Named entities (people, organizations, works, concepts, events, locations)
 2. Relationships between these entities
 

@@ -1,4 +1,4 @@
-# Jay Rosen Internet Archive: handoff package
+# Jay Rosen's Internet Archive: handoff package
 
 **For**: Jay Rosen, Hali Rosen, and any future operator picking up this archive after Joe Amditis steps back.
 

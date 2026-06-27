@@ -1,5 +1,5 @@
 /**
- * SQLite Service for Jay Rosen Internet Archive
+ * SQLite Service for Jay Rosen's Internet Archive
  *
  * Provides SQL querying capabilities using sql.js (SQLite compiled to WebAssembly)
  *

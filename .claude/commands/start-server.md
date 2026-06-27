@@ -1,4 +1,4 @@
-Start the local development HTTP server for the Jay Rosen Internet Archive.
+Start the local development HTTP server for Jay Rosen's Internet Archive.
 
 Run the following command:
 ```bash
