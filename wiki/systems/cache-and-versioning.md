@@ -14,8 +14,8 @@ The archive has several cache layers. A release is safe only when the version kn
 
 ## Current knobs
 
-- `version.json` currently reports `version: 3.4.7`, `updated: 2026-06-24`, and `cache_version: v9`.
-- `index.html` versioned imports use `?v=3.4.7`.
+- `version.json` currently reports `version: 3.4.8`, `updated: 2026-06-27`, and `cache_version: v9`.
+- `index.html` versioned imports use `?v=3.4.8`.
 - `frontend/sw.js` has its own `CACHE_VERSION`.
 - `frontend/services/cacheConfig.js` defines the app data-cache version used by the archive Loader and HTTP cached loader paths.
 

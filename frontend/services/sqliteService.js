@@ -1,5 +1,5 @@
 /**
- * SQLite Service for Jay Rosen Internet Archive
+ * SQLite Service for Jay Rosen's Internet Archive
  *
  * Provides SQL querying capabilities using sql.js (SQLite compiled to WebAssembly)
  *
@@ -13,7 +13,7 @@
 // sql.js is loaded dynamically to ensure JS and WASM are from the same source
 // The import map version can have WASM binary mismatches
 
-import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.4.7';
+import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.4.8';
 
 // Self-hosted sql.js WASM binary (#291). The loader JS below is pinned with
 // SRI, but sql.js exposes no SRI hook for the .wasm it fetches via locateFile,
