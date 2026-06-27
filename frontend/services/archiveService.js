@@ -713,7 +713,7 @@ const downloadFile = (content, filename, mimeType) => {
 export const exportAsJSON = (records, filename = 'jay-rosen-archive.json') => {
   const exportData = {
     exported: new Date().toISOString(),
-    source: "Jay Rosen's Internet Archive",
+    source: 'Jay Rosen Digital Archive',
     url: 'https://pressthink.org/j/rosen-archive/',
     license: 'CC BY 4.0',
     recordCount: records.length,

@@ -8,7 +8,7 @@
 
 ## Goal verbatim
 
-> "all of the records, relationships, and entities... and we have a working and efficient process for jay rosen (very nontechnical person) to add and process additional content, articles, posts and/or examples of his work and digital output for inclusion in the archive once i am no longer working on Jay Rosen's Internet Archive project (without costing me any money)"
+> "all of the records, relationships, and entities... and we have a working and efficient process for jay rosen (very nontechnical person) to add and process additional content, articles, posts and/or examples of his work and digital output for inclusion in the archive once i am no longer working on the Jay Rosen Internet Archive project (without costing me any money)"
 
 Two hard constraints (same as Pillar 3, but stricter post-handoff):
 - Jay can drive it alone, no terminal/SSH/FTP, no rotation reminders, no maintenance windows.
