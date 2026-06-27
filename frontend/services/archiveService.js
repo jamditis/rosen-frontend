@@ -1,5 +1,5 @@
 
-import { DATA_CONFIG } from '../constants.js?v=3.4.7';
+import { DATA_CONFIG } from '../constants.js?v=3.4.8';
 import {
   initDatabase,
   loadArchiveData as loadSqliteData,
@@ -13,12 +13,12 @@ import {
   getCategoryCoOccurrence,
   searchRecords as sqlSearchRecords,
   getStats as getSqliteStats
-} from './sqliteService.js?v=3.4.7';
-import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.4.7';
-import { escapeCsvCell } from '../utils/csvSafety.js?v=3.4.7';
-import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.4.7';
-import { CACHE_VERSION, CACHE_TTL_MS, MAX_LOCALSTORAGE_SIZE, cacheKeyFor } from './cacheConfig.js?v=3.4.7';
-import { raceTimeout } from '../utils/raceTimeout.js?v=3.4.7';
+} from './sqliteService.js?v=3.4.8';
+import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.4.8';
+import { escapeCsvCell } from '../utils/csvSafety.js?v=3.4.8';
+import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.4.8';
+import { CACHE_VERSION, CACHE_TTL_MS, MAX_LOCALSTORAGE_SIZE, cacheKeyFor } from './cacheConfig.js?v=3.4.8';
+import { raceTimeout } from '../utils/raceTimeout.js?v=3.4.8';
 
 // Routine cache-hit / fetch-start logs are silent in production. Set
 // `localStorage.jrda_debug = '1'` in DevTools and reload to opt in (#170).
@@ -713,7 +713,7 @@ const downloadFile = (content, filename, mimeType) => {
 export const exportAsJSON = (records, filename = 'jay-rosen-archive.json') => {
   const exportData = {
     exported: new Date().toISOString(),
-    source: 'Jay Rosen Digital Archive',
+    source: "Jay Rosen's Internet Archive",
     url: 'https://pressthink.org/j/rosen-archive/',
     license: 'CC BY 4.0',
     recordCount: records.length,

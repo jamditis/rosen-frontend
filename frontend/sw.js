@@ -1,5 +1,5 @@
 /**
- * Jay Rosen Internet Archive - Service Worker
+ * Jay Rosen's Internet Archive - Service Worker
  *
  * Caching strategy:
  * - HTML / navigations: Network-first, cache as offline fallback. The page must
@@ -13,7 +13,7 @@
 // Cache version is tied to the app version in version.json. Bumping it on every
 // deploy (alongside index.html and the ?v= import strings) makes the activate
 // handler below drop every stale cache, so returning visitors never run old code.
-const CACHE_VERSION = '3.4.7';
+const CACHE_VERSION = '3.4.8';
 const CACHE_NAME = `jrda-cache-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `jrda-data-${CACHE_VERSION}`;
 
