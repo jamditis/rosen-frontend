@@ -8,7 +8,7 @@ timestamp: 2026-06-22
 
 # Jay Rosen's Internet Archive — knowledge bundle
 
-An Open Knowledge Format (OKF v0.1) bundle for the **Jay Rosen's Internet Archive** project (`jamditis/rosen-frontend`, live at <https://pressthink.org/j/rosen-archive/>).
+An Open Knowledge Format (OKF v0.1) bundle for **Jay Rosen's Internet Archive** project (`jamditis/rosen-frontend`, live at <https://pressthink.org/j/rosen-archive/>).
 
 This is the fast, agent-navigable layer. It states the verified facts and links into the deeper material that already lives in [`docs/`](../docs/), [`CONTEXT.md`](../CONTEXT.md), and [`CLAUDE.md`](../CLAUDE.md) rather than duplicating it. Read [`README.md`](README.md) first, then follow the map below.
 

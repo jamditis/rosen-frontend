@@ -10,7 +10,7 @@ timestamp: 2026-06-22
 
 # What the archive is
 
-The **Jay Rosen's Internet Archive** is a public, searchable collection of the works, critiques, and teachings of [Jay Rosen](../people/jay-rosen.md), professor of journalism at NYU and creator of the PressThink blog. It spans four decades — from the early PressThink era through his recent posts — and includes his 1986 dissertation, *The Impossible Press*.
+**Jay Rosen's Internet Archive** is a public, searchable collection of the works, critiques, and teachings of [Jay Rosen](../people/jay-rosen.md), professor of journalism at NYU and creator of the PressThink blog. It spans four decades — from the early PressThink era through his recent posts — and includes his 1986 dissertation, *The Impossible Press*.
 
 - **Live URL:** <https://pressthink.org/j/rosen-archive/>
 - **Repository:** `jamditis/rosen-frontend`

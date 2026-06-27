@@ -5,7 +5,7 @@ description: Review code changes for Jay Rosen's Internet Archive with domain-sp
 
 # Archive-Specific Code Review
 
-Review code changes with awareness of Jay Rosen's Internet Archive's unique architecture, patterns, and requirements.
+Review code changes with awareness of the unique architecture, patterns, and requirements of Jay Rosen's Internet Archive.
 
 ## When to Activate
 

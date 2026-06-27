@@ -1,6 +1,6 @@
 ---
 name: zero-build-frontend
-description: Develop React components for Jay Rosen's Internet Archive's zero-build architecture. Use when creating components, modifying frontend code, or troubleshooting import issues.
+description: Develop React components for Jay Rosen's Internet Archive zero-build architecture. Use when creating components, modifying frontend code, or troubleshooting import issues.
 ---
 
 # Zero-Build Frontend Development
