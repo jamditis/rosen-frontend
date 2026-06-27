@@ -1,6 +1,6 @@
 # Architecture
 
-Technical architecture reference for the Jay Rosen Internet Archive. Describes current state as of April 2026.
+Technical architecture reference for Jay Rosen's Internet Archive. Describes current state as of April 2026.
 
 
 ## High-level overview

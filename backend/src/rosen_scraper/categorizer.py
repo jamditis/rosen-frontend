@@ -235,7 +235,7 @@ def summarize_and_classify(text_content: str, schema: Dict[str, Any]) -> Optiona
     # the article text to analyze, and the desired JSON output format.
     prompt = f"""
     **INSTRUCTIONS:**
-    You are a specialized AI assistant for the Jay Rosen Internet Archive. Analyze the following article text and return a structured JSON object. The text may contain formatting artifacts; interpret it as best you can.
+    You are a specialized AI assistant for Jay Rosen's Internet Archive. Analyze the following article text and return a structured JSON object. The text may contain formatting artifacts; interpret it as best you can.
 
     **TAXONOMY FOR CLASSIFICATION (Choose the most relevant from these lists):**
     - Thematic Categories: {_format_categories_for_prompt(taxonomy.get('thematic_categories', []))}

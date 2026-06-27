@@ -1,4 +1,4 @@
-# Jay Rosen Internet Archive - Backend Pipeline
+# Jay Rosen's Internet Archive - Backend Pipeline
 
 The backend is a Python-based data pipeline that automatically fetches, processes, archives, and analyzes digital content from Jay Rosen's work across the web. It uses AI-powered analysis (Google Gemini) to categorize, summarize, and extract key concepts from articles, videos, and other media.
 
@@ -463,4 +463,4 @@ This project is licensed under the MIT License - see the root `/LICENSE` file fo
 
 ---
 
-**Maintained by Joe Amditis** | Part of the Jay Rosen Internet Archive Project
+**Maintained by Joe Amditis** | Part of Jay Rosen's Internet Archive Project

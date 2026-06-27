@@ -1,4 +1,4 @@
-# Jay Rosen Internet Archive — Context
+# Jay Rosen's Internet Archive — Context
 
 The shared vocabulary for talking about what the archive *is*, as distinct from how it's built. Use these terms exactly. When a generic word (post, service, document, map) feels natural, reach for the term below instead.
 

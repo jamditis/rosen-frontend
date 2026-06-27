@@ -1,11 +1,11 @@
 ---
 name: archive-code-review
-description: Review code changes for the Jay Rosen Internet Archive with domain-specific criteria. Use when reviewing PRs or significant code changes.
+description: Review code changes for Jay Rosen's Internet Archive with domain-specific criteria. Use when reviewing PRs or significant code changes.
 ---
 
 # Archive-Specific Code Review
 
-Review code changes with awareness of the Jay Rosen Internet Archive's unique architecture, patterns, and requirements.
+Review code changes with awareness of the unique architecture, patterns, and requirements of Jay Rosen's Internet Archive.
 
 ## When to Activate
 

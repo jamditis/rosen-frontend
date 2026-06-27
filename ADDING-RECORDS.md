@@ -1,6 +1,6 @@
 # Adding new records to the archive
 
-This guide explains how to add new articles, essays, or posts from 2026 onward to the Jay Rosen Internet Archive.
+This guide explains how to add new articles, essays, or posts from 2026 onward to Jay Rosen's Internet Archive.
 
 ---
 

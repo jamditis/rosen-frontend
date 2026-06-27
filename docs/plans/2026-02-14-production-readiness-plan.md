@@ -2,7 +2,7 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Ship the Jay Rosen Internet Archive with 100% data completeness, full entity coverage, and cross-browser testing by end of week Feb 23, 2026.
+**Goal:** Ship Jay Rosen's Internet Archive with 100% data completeness, full entity coverage, and cross-browser testing by end of week Feb 23, 2026.
 
 **Architecture:** Five parallel workstreams organized around entity extraction as the critical path. Batch API processing (Anthropic/OpenAI/Gemini) replaces the manual Ralph Loop for entity extraction and metadata gap-filling. Data fixes and UI work happen in parallel. Testing and deployment happen after data is finalized.
 

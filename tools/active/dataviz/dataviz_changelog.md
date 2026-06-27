@@ -1,6 +1,6 @@
-# **Changelog: Jay Rosen Internet Archive \- Data Dashboard**
+# **Changelog: Jay Rosen's Internet Archive \- Data Dashboard**
 
-This document tracks the development history, feature additions, and bug fixes for the data dashboard component of the Jay Rosen Internet Archive.
+This document tracks the development history, feature additions, and bug fixes for the data dashboard component of Jay Rosen's Internet Archive.
 
 ### **Version 3.0: Live data and archive theme**
 

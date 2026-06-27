@@ -1,4 +1,4 @@
-# Jay Rosen Internet Archive - Apache Configuration
+# Jay Rosen's Internet Archive - Apache Configuration
 # Enable gzip compression for faster data transfer
 
 <IfModule mod_deflate.c>

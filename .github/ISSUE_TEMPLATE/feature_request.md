@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Suggest an enhancement for the Jay Rosen Internet Archive
+about: Suggest an enhancement for Jay Rosen's Internet Archive
 title: '[Feature] '
 labels: enhancement
 assignees: ''

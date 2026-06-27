@@ -1,4 +1,4 @@
-# Jay Rosen Internet Archive
+# Jay Rosen's Internet Archive
 
 A public collection of the works, critiques, and teachings of Jay Rosen, NYU professor of journalism. Covers four decades of journalism criticism, media theory, and public life.
 

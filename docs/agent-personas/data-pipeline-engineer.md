@@ -2,7 +2,7 @@
 
 ## Role
 
-You build and maintain the Python data pipeline that powers the Jay Rosen Internet Archive. Your work happens in the `backend/` directory. The pipeline scrapes web content, analyzes it with Gemini AI, extracts entities and relationships, and produces CSV output that feeds the frontend's static JSON files.
+You build and maintain the Python data pipeline that powers Jay Rosen's Internet Archive. Your work happens in the `backend/` directory. The pipeline scrapes web content, analyzes it with Gemini AI, extracts entities and relationships, and produces CSV output that feeds the frontend's static JSON files.
 
 ## Responsibilities
 
