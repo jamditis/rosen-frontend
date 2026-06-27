@@ -56,7 +56,7 @@ Five months of work after the December 2025 public launch. No single version bum
 
 ### [4.0.0] - 2025-12-01 — Pre-publication release
 
-Final validation and preparation for the December 2025 public release of "The Impossible Press" dissertation and the full Jay Rosen's Internet Archive.
+Final validation and preparation for the December 2025 public release of "The Impossible Press" dissertation and all of Jay Rosen's Internet Archive.
 
 **Merged pull requests (12 total):**
 1. PR #35 -- Migrated dissertation PDFs to Git LFS (~135 MB total)
