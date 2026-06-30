@@ -28,6 +28,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { FEATURED_WORKS } from '../frontend/constants.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, '..', 'data');
@@ -189,6 +190,45 @@ export function checkUrlWellFormedness(records) {
   return findings;
 }
 
+// The external URLs each FEATURED_WORKS entry hotlinks: its `image` (an
+// images.unsplash.com hotlink that a photographer can withdraw, issue #479) and
+// its `link`. Both are third-party URLs that rot the same way a record url does,
+// and a withdrawn image 404s on a homepage launch card, so they belong in the same
+// pre-launch sweep. Returns { id, url } pairs, id tagged with the field so a finding
+// names which one to repair. A missing field is "no link", skipped here; a present
+// but malformed value is caught by checkFeaturedUrlWellFormedness below.
+export function collectFeaturedUrls(featuredWorks) {
+  const out = [];
+  for (const work of featuredWorks || []) {
+    for (const field of ['image', 'link']) {
+      const url = work?.[field];
+      if (url === undefined || url === null) continue;
+      out.push({ id: `${work?.id ?? '(unknown)'} (${field})`, url });
+    }
+  }
+  return out;
+}
+
+// Featured-work urls must be absolute http(s) hotlinks (not site-local routes like a
+// record url can be), so a malformed one is a deterministic finding that gates CI,
+// the same as a malformed record url. Liveness (a withdrawn-but-well-formed url) is
+// the report-only external pass, because network flakiness must not fail a build.
+export function checkFeaturedUrlWellFormedness(featuredUrls) {
+  const findings = [];
+  for (const { id, url } of featuredUrls || []) {
+    if (!isWellFormedHttpUrl(url)) {
+      findings.push({
+        category: 'featured',
+        failureType: 'malformed_featured_url',
+        sourceId: id,
+        target: url ?? null,
+        detail: 'FEATURED_WORKS image/link is not an absolute http(s) URL'
+      });
+    }
+  }
+  return findings;
+}
+
 // Every (recordId, url) pair the launched app can navigate to. The record modal
 // reads its url from the split archive-details.json (fetchRecordDetails()), not
 // from archive-data.json, so a split or stale deploy can leave a dead url in
@@ -308,8 +348,8 @@ export async function checkExternalLiveness(urls, opts = {}) {
 
 // ----- report -----
 
-export function buildReport({ data, internal, url, external }) {
-  const findings = [...internal, ...url, ...(external ? external.findings : [])];
+export function buildReport({ data, internal, url, featured = [], external }) {
+  const findings = [...internal, ...url, ...featured, ...(external ? external.findings : [])];
   return {
     generated: new Date().toISOString(),
     dataVersion: data.version ?? null,
@@ -318,6 +358,7 @@ export function buildReport({ data, internal, url, external }) {
       entitiesChecked: (data.entities || []).length,
       internalFailures: internal.length,
       malformedUrls: url.length,
+      featuredMalformed: featured.length,
       externalChecked: external ? external.checked : 0,
       externalFailures: external ? external.findings.length : 0
     },
@@ -352,13 +393,22 @@ async function main(argv) {
   // deduped by (record, url), so a bad link reachable only through the modal is caught.
   const urlRecords = collectUrlRecords(data.records, details.details);
   const url = checkUrlWellFormedness(urlRecords);
+  // The homepage's FEATURED_WORKS cards hotlink third-party image and link URLs (issue #479),
+  // a surface the record/details data does not cover. Fold them into the same sweep: a malformed
+  // featured url gates CI deterministically, and --external probes their liveness report-only.
+  const featuredUrls = collectFeaturedUrls(FEATURED_WORKS);
+  const featured = checkFeaturedUrlWellFormedness(featuredUrls);
   let external = null;
   if (args.external) {
-    const sourceMap = buildUrlSourceMap(urlRecords);
+    // Featured urls FIRST: checkExternalLiveness truncates with slice(0, max), so whatever sits at
+    // the tail is dropped under --max. The featured cards are the launch-critical surface #479 is
+    // about (and the only probe that catches a withdrawn-but-well-formed image), so they must never
+    // be the ones a --max cap skips. There are ~40 of them, so they cost a negligible slice of the budget.
+    const sourceMap = buildUrlSourceMap([...featuredUrls, ...urlRecords]);
     external = await checkExternalLiveness([...sourceMap.keys()], { max: args.max, sourceMap });
   }
 
-  const report = buildReport({ data, internal, url, external });
+  const report = buildReport({ data, internal, url, featured, external });
   if (args.out) {
     fs.writeFileSync(args.out, JSON.stringify(report, null, 2));
   }
@@ -368,6 +418,7 @@ async function main(argv) {
     `verify-links: ${s.recordsChecked} records, ${s.entitiesChecked} entities\n` +
       `  internal backlink failures: ${s.internalFailures}\n` +
       `  malformed urls: ${s.malformedUrls}\n` +
+      `  malformed featured urls: ${s.featuredMalformed}\n` +
       (args.external ? `  external probed: ${s.externalChecked}, failures: ${s.externalFailures}\n` : '') +
       (args.out ? `  report written: ${args.out}\n` : '')
   );
@@ -376,7 +427,7 @@ async function main(argv) {
   for (const f of report.findings) byType[f.failureType] = (byType[f.failureType] || 0) + 1;
   for (const [type, count] of Object.entries(byType)) process.stdout.write(`    ${type}: ${count}\n`);
 
-  const internalFailed = s.internalFailures > 0 || s.malformedUrls > 0;
+  const internalFailed = s.internalFailures > 0 || s.malformedUrls > 0 || s.featuredMalformed > 0;
   process.exitCode = internalFailed && !args.reportOnly ? 1 : 0;
 }
 
