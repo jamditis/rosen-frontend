@@ -13,7 +13,9 @@ import {
   checkInternalLinks,
   checkUrlWellFormedness,
   collectUrlRecords,
-  buildUrlSourceMap
+  buildUrlSourceMap,
+  collectFeaturedUrls,
+  checkFeaturedUrlWellFormedness
 } from '../scripts/verify-links.js';
 
 const fixture = {
@@ -226,5 +228,67 @@ describe('buildUrlSourceMap', () => {
     const map = buildUrlSourceMap(urlRecords);
     assert.equal(map.size, 1);
     assert.deepEqual(map.get('https://e.com/x'), ['R1', 'R2']);
+  });
+});
+
+describe('collectFeaturedUrls (FEATURED_WORKS image + link hotlinks, issue #479)', () => {
+  it('emits an { id, url } pair per image and link, tagging the field; a missing field is a null pair', () => {
+    const works = [
+      { id: 'feat-1', image: 'https://images.unsplash.com/photo-1', link: 'https://pressthink.org/a' },
+      { id: 'feat-2', image: 'https://images.unsplash.com/photo-2' } // no link -> a null link pair, not skipped
+    ];
+    const pairs = collectFeaturedUrls(works).map((p) => `${p.id} ${p.url}`).sort();
+    assert.deepEqual(pairs, [
+      'feat-1 (image) https://images.unsplash.com/photo-1',
+      'feat-1 (link) https://pressthink.org/a',
+      'feat-2 (image) https://images.unsplash.com/photo-2',
+      'feat-2 (link) null'
+    ]);
+  });
+
+  it('emits a null-url pair for a missing or null field (FeaturedSection renders it directly) so the check can fail it', () => {
+    const works = [{ id: 'feat-1', image: 'https://images.unsplash.com/p', link: null }];
+    const pairs = collectFeaturedUrls(works);
+    assert.equal(pairs.length, 2);
+    const linkPair = pairs.find((p) => p.id === 'feat-1 (link)');
+    assert.equal(linkPair.url, null);
+  });
+
+  it('handles an empty or absent list', () => {
+    assert.deepEqual(collectFeaturedUrls([]), []);
+    assert.deepEqual(collectFeaturedUrls(undefined), []);
+  });
+});
+
+describe('checkFeaturedUrlWellFormedness', () => {
+  it('passes absolute http(s) hotlinks and flags anything else', () => {
+    const featuredUrls = [
+      { id: 'feat-1 (image)', url: 'https://images.unsplash.com/photo-1' }, // ok
+      { id: 'feat-2 (image)', url: '/relative/path' }, // site-local route is not a valid hotlink
+      { id: 'feat-3 (link)', url: '' }, // empty
+      { id: 'feat-4 (image)', url: 'not a url' } // malformed
+    ];
+    const findings = checkFeaturedUrlWellFormedness(featuredUrls);
+    const flagged = findings.map((f) => f.sourceId).sort();
+    assert.deepEqual(flagged, ['feat-2 (image)', 'feat-3 (link)', 'feat-4 (image)']);
+    assert.ok(findings.every((f) => f.failureType === 'malformed_featured_url'));
+  });
+
+  it('flags a missing required field (null url) so a broken launch card cannot ship green', () => {
+    const featuredUrls = [
+      { id: 'feat-1 (image)', url: 'https://images.unsplash.com/p' }, // ok
+      { id: 'feat-2 (link)', url: null } // missing required field -> FeaturedSection would render href=undefined
+    ];
+    const findings = checkFeaturedUrlWellFormedness(featuredUrls);
+    assert.equal(findings.length, 1);
+    assert.equal(findings[0].sourceId, 'feat-2 (link)');
+    assert.equal(findings[0].failureType, 'malformed_featured_url');
+    assert.equal(findings[0].target, null);
+    assert.match(findings[0].detail, /missing a required/);
+  });
+
+  it('returns no findings for an all-clean set', () => {
+    const featuredUrls = [{ id: 'feat-1 (image)', url: 'https://images.unsplash.com/photo' }];
+    assert.deepEqual(checkFeaturedUrlWellFormedness(featuredUrls), []);
   });
 });
