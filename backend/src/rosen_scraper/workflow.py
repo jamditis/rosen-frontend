@@ -33,14 +33,15 @@ from rosen_scraper import entity_resolver
 from rosen_scraper.logger import get_logger, init_logger, PoisonPillType, ArchiveLogger
 from rosen_scraper.poison_pill_handler import get_poison_pill_manager, PoisonPillManager
 from rosen_scraper.path_utils import find_project_root
-from rosen_scraper.permissions_config import PAYWALLED_DOMAINS
+from rosen_scraper.permissions_config import OPEN_ACCESS_DOMAINS, PAYWALLED_DOMAINS
 
 # Load environment variables from a .env file for secure configuration management.
 load_dotenv()
 
 # --- Configuration ---
-# PAYWALLED_DOMAINS is the shared rights list in permissions_config.py, used by
-# determine_permissions() below and by the populate_new_fields.py backfill.
+# OPEN_ACCESS_DOMAINS and PAYWALLED_DOMAINS are the shared rights lists in
+# permissions_config.py, read by determine_permissions() below; PAYWALLED_DOMAINS
+# is also used by the populate_new_fields.py backfill.
 
 # Define key file paths using pathlib for cleaner path handling.
 SCRIPT_DIR = Path(__file__).resolve().parent
@@ -199,14 +200,9 @@ def determine_permissions(data: Dict[str, Any], url: str) -> str:
     """
     domain = urlparse(url).netloc.lower()
 
-    # Known permissive sources
-    permissive_domains = [
-        'pressthink.org',  # Jay Rosen's own blog
-        'twitter.com',
-        'medium.com'
-    ]
-
-    if any(domain.endswith(perm_domain) for perm_domain in permissive_domains):
+    # Open-access sources (OPEN_ACCESS_DOMAINS in permissions_config), matched by
+    # netloc suffix and checked before the paywall list.
+    if any(domain.endswith(open_domain) for open_domain in OPEN_ACCESS_DOMAINS):
         return "Open Access"
 
     # Paywall/premium sources

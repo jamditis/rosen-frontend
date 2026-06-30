@@ -180,17 +180,41 @@ class TestWorkflowModule:
         """medium.com stays Open Access by design.
 
         It is a member_only paywall in PoisonPillDetector.paywall_domains (a
-        scraping concern) but Open Access in determine_permissions' permissive
-        list (a rights concern). The permissive check runs first, so the two
-        lists answer different questions; #492 leaves the rights label intact.
+        scraping concern) but Open Access in OPEN_ACCESS_DOMAINS (a rights
+        concern). The open-access check runs first, so the two lists answer
+        different questions; #492 leaves the rights label intact.
         """
         assert workflow.determine_permissions({}, "https://medium.com/@jayrosen/x") == "Open Access"
 
     def test_determine_permissions_other_branches(self):
-        """Lock the permissive, educational, and default branches."""
+        """Lock the open-access, educational, and default branches."""
         assert workflow.determine_permissions({}, "https://pressthink.org/x") == "Open Access"
         assert workflow.determine_permissions({}, "https://example.edu/x") == "Educational Use"
         assert workflow.determine_permissions({}, "https://example.com/x") == "Standard Copyright"
+
+    def test_open_access_and_paywalled_lists_do_not_overlap(self):
+        """The two rights lists must stay disjoint (#508).
+
+        OPEN_ACCESS_DOMAINS is checked first by netloc suffix, so any
+        PAYWALLED_DOMAINS entry it matched would be labeled "Open Access" and
+        silently override the paywall. Guard the precedence conflict with the same
+        suffix rule determine_permissions uses, so it cannot arise from a future
+        edit to either list.
+        """
+        from rosen_scraper.permissions_config import (
+            OPEN_ACCESS_DOMAINS,
+            PAYWALLED_DOMAINS,
+        )
+
+        shadowed = [
+            paywalled
+            for paywalled in PAYWALLED_DOMAINS
+            if any(paywalled.endswith(open_domain) for open_domain in OPEN_ACCESS_DOMAINS)
+        ]
+        assert shadowed == [], (
+            f"these PAYWALLED_DOMAINS are shadowed by OPEN_ACCESS_DOMAINS and would "
+            f"return Open Access before the paywall check: {shadowed}"
+        )
 
     def test_append_record_to_csv_exists(self):
         """Test that append_record_to_csv function exists. The pipeline moved
