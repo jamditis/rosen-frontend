@@ -195,15 +195,16 @@ export function checkUrlWellFormedness(records) {
 // its `link`. Both are third-party URLs that rot the same way a record url does,
 // and a withdrawn image 404s on a homepage launch card, so they belong in the same
 // pre-launch sweep. Returns { id, url } pairs, id tagged with the field so a finding
-// names which one to repair. A missing field is "no link", skipped here; a present
-// but malformed value is caught by checkFeaturedUrlWellFormedness below.
+// names which one to repair. A missing field is emitted with url null (not skipped):
+// FeaturedSection renders link/image directly as href=${work.link} / src=${work.image},
+// so an absent field ships a card with a broken destination or image, and
+// checkFeaturedUrlWellFormedness must fail it rather than let the sweep stay green. A null target
+// is not probed for liveness: buildUrlSourceMap drops it, the same as a record with no url.
 export function collectFeaturedUrls(featuredWorks) {
   const out = [];
   for (const work of featuredWorks || []) {
     for (const field of ['image', 'link']) {
-      const url = work?.[field];
-      if (url === undefined || url === null) continue;
-      out.push({ id: `${work?.id ?? '(unknown)'} (${field})`, url });
+      out.push({ id: `${work?.id ?? '(unknown)'} (${field})`, url: work?.[field] ?? null });
     }
   }
   return out;
@@ -216,13 +217,16 @@ export function collectFeaturedUrls(featuredWorks) {
 export function checkFeaturedUrlWellFormedness(featuredUrls) {
   const findings = [];
   for (const { id, url } of featuredUrls || []) {
-    if (!isWellFormedHttpUrl(url)) {
+    const missing = url === null || url === undefined;
+    if (missing || !isWellFormedHttpUrl(url)) {
       findings.push({
         category: 'featured',
         failureType: 'malformed_featured_url',
         sourceId: id,
         target: url ?? null,
-        detail: 'FEATURED_WORKS image/link is not an absolute http(s) URL'
+        detail: missing
+          ? 'FEATURED_WORKS entry is missing a required image/link field; FeaturedSection renders it directly, so the launch card would have a broken destination or image'
+          : 'FEATURED_WORKS image/link is not an absolute http(s) URL'
       });
     }
   }
