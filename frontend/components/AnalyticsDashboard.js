@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { html } from '../html.js?v=3.4.8';
+import { html } from '../html.js?v=3.4.9';
 import {
   BarChart3,
   TrendingUp,
@@ -23,8 +23,8 @@ import {
   isSqliteReady,
   fetchAnalytics,
   queryAsObjects
-} from '../services/archiveService.js?v=3.4.8';
-import QueryBuilder from './QueryBuilder.js?v=3.4.8';
+} from '../services/archiveService.js?v=3.4.9';
+import QueryBuilder from './QueryBuilder.js?v=3.4.9';
 
 // Simple bar chart component
 const BarChart = ({ data, labelKey, valueKey, maxBars = 10, color = '#1c1917' }) => {

@@ -16,6 +16,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { computeAnalytics } from '../data/compute-analytics.js';
+import { ERAS } from '../data/eras.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,6 +41,28 @@ describe('analytics aggregates artifact (#338)', () => {
       assert.equal(typeof a.stats[key], 'number', `stats.${key} must be a number`);
       assert.ok(a.stats[key] > 0, `stats.${key} should be > 0`);
     }
+  });
+
+  it('orders byEra by the canonical taxonomy with nothing in the ELSE bucket (#385)', () => {
+    const a = JSON.parse(readSrc('data', 'archive-analytics.json'));
+    const eras = a.byEra.map((r) => r.era);
+    // Every shipped era must be a known canonical era. An era missing from
+    // data/eras.js sorts into the catch-all ELSE bucket and renders unordered.
+    // That is the #385 regression, where a stale 4-value list dropped 6 of 8
+    // eras into the bucket.
+    for (const era of eras) {
+      assert.ok(
+        ERAS.includes(era),
+        `byEra has "${era}", absent from the canonical data/eras.js taxonomy; it falls into the unordered ELSE bucket`
+      );
+    }
+    // byEra must follow the canonical data/eras.js sequence (limited to eras
+    // actually present), so the chart order can never drift from the taxonomy.
+    assert.deepEqual(
+      eras,
+      ERAS.filter((era) => eras.includes(era)),
+      'byEra is not in canonical data/eras.js order'
+    );
   });
 
   it('caps the top-N charts at 10 rows (matches dashboard limits)', () => {
