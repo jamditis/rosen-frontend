@@ -301,6 +301,328 @@ function writeStatus_(sheet, row, status, recordId, error) {
        .setValues([[status, recordId, error]]);
 }
 
+// ===========================================================================
+// Web app: branded in-archive report form (#509)
+//
+// The static archive has no server of its own, so its "Report a bug" / "Suggest
+// a record" form POSTs a JSON report to this web app, which files a GitHub issue
+// via the SAME GitHub App used for record submissions. The reader needs no
+// GitHub account and never leaves pressthink.org.
+//
+// Deploy: Editor -> Deploy -> New deployment -> Web app, "Execute as: me",
+// "Who has access: Anyone". Paste the /exec URL into frontend REPORT_CONFIG.
+// The GitHub App must have Issues: write (Actions-only is not enough to create
+// issues). Grant it in the App's permissions, then re-authorize the install.
+//
+// Browser CORS: Apps Script answers a simple cross-origin POST (text/plain body,
+// no custom headers) and sets Access-Control-Allow-Origin: *, but it cannot
+// answer a preflight. The frontend therefore POSTs text/plain: do not require
+// a JSON content type here.
+//
+// Rate limiting: Apps Script does not expose the caller IP, so per-IP limiting
+// is impossible in this ingress. Defense is a honeypot plus a GLOBAL per-day
+// issue cap (bounds total abuse volume, not per-sender). If that proves too
+// weak, move the endpoint to a Cloudflare Worker or add Turnstile.
+// ===========================================================================
+
+const KIND_REPORT = 'report';
+
+// Authoritative field caps (mirrors frontend LIMITS in reportSubmit.js).
+const REPORT_LIMITS = {
+  whatHappened: 5000,
+  expected: 2000,
+  steps: 3000,
+  url: 2000,
+  title: 300,
+  why: 3000,
+  email: 254,
+};
+
+// Global cap on issues this web app will file per UTC day.
+const REPORT_DAILY_CAP = 50;
+
+/**
+ * Health check: GET the /exec URL to confirm the web app is deployed and live.
+ */
+function doGet() {
+  return jsonOutput_({ ok: true, service: 'rosen-report' });
+}
+
+/**
+ * Web-app POST entry for reader reports. Always returns HTTP 200 with a JSON
+ * body (Apps Script cannot set other status codes); success/failure is carried
+ * in `ok`, which the frontend keys off.
+ */
+function doPost(e) {
+  try {
+    const payload = parseJsonBody_(e);
+    if (!payload || payload.kind !== KIND_REPORT) {
+      return jsonOutput_({ ok: false, error: 'Unrecognized request.' });
+    }
+    return handleReport_(payload);
+  } catch (err) {
+    // Log server-side (visible in the Apps Script execution log) without
+    // leaking internals to the caller.
+    Logger.log('report doPost error: ' + (err && err.stack ? err.stack : err));
+    return jsonOutput_({ ok: false, error: 'Server error.' });
+  }
+}
+
+function parseJsonBody_(e) {
+  if (!e || !e.postData || !e.postData.contents) return null;
+  try {
+    return JSON.parse(e.postData.contents);
+  } catch (err) {
+    return null;
+  }
+}
+
+function handleReport_(payload) {
+  // Honeypot: a real form never fills `website`. Return success without filing
+  // so a bot gets no signal to retry, and no issue is created.
+  if (reportField_(payload.website) !== '') {
+    return jsonOutput_({ ok: true, dropped: true });
+  }
+
+  const intent = payload.intent === 'record' ? 'record' : 'problem';
+
+  const check = validateReportPayload_(payload, intent);
+  if (!check.valid) {
+    return jsonOutput_({ ok: false, error: check.error });
+  }
+
+  // Atomically reserve a daily slot BEFORE filing. Reading the counter and
+  // filing separately would let a concurrent burst near the cap each pass a
+  // stale read and overflow it: the exact bursty case the cap defends against.
+  // The reserved slot is released on any failure path below.
+  const reservedKey = reserveDailySlot_();
+  if (!reservedKey) {
+    return jsonOutput_({
+      ok: false,
+      error: 'The archive is receiving a lot of reports right now. Please try again later.',
+    });
+  }
+
+  let config;
+  let token;
+  try {
+    config = readConfig_();
+    const jwt = makeAppJwt_(config.appId, config.privateKey);
+    token = getInstallationToken_(jwt, config.installId);
+  } catch (err) {
+    releaseDailySlot_(reservedKey);
+    Logger.log('report auth error: ' + (err && err.message ? err.message : err));
+    return jsonOutput_({ ok: false, error: 'Could not reach GitHub. Please try again later.' });
+  }
+
+  const issue = buildIssueFromReport_(payload, intent);
+
+  let response;
+  try {
+    response = createIssue_(token, config, issue);
+  } catch (err) {
+    releaseDailySlot_(reservedKey);
+    Logger.log('report createIssue error: ' + (err && err.message ? err.message : err));
+    return jsonOutput_({ ok: false, error: 'Could not reach GitHub. Please try again later.' });
+  }
+
+  if (response.getResponseCode() === 201) {
+    // Slot already counted at reservation; nothing more to do on success.
+    let issueUrl = '';
+    try {
+      issueUrl = JSON.parse(response.getContentText()).html_url || '';
+    } catch (err) {
+      issueUrl = '';
+    }
+    return jsonOutput_({ ok: true, issueUrl: issueUrl });
+  }
+
+  releaseDailySlot_(reservedKey);
+  Logger.log('report issue rejected (HTTP ' + response.getResponseCode() + '): ' +
+             response.getContentText().slice(0, 240));
+  return jsonOutput_({
+    ok: false,
+    error: 'GitHub could not accept the report (HTTP ' + response.getResponseCode() + ').',
+  });
+}
+
+function reportField_(v) {
+  return typeof v === 'string' ? v.trim() : '';
+}
+
+function validateReportPayload_(payload, intent) {
+  if (intent === 'record') {
+    const url = reportField_(payload.url);
+    if (!url) return { valid: false, error: 'A link to the work is required.' };
+    if (!/^https?:\/\//i.test(url)) {
+      return { valid: false, error: 'The link must start with http:// or https://.' };
+    }
+  } else if (!reportField_(payload.whatHappened)) {
+    return { valid: false, error: 'A description of the problem is required.' };
+  }
+
+  const email = reportField_(payload.email);
+  if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    return { valid: false, error: 'That email address is not valid.' };
+  }
+
+  const names = Object.keys(REPORT_LIMITS);
+  for (let i = 0; i < names.length; i++) {
+    const name = names[i];
+    if (reportField_(payload[name]).length > REPORT_LIMITS[name]) {
+      return { valid: false, error: 'One of the fields is too long.' };
+    }
+  }
+  return { valid: true, error: '' };
+}
+
+/**
+ * Blunt @-mention so a report body cannot ping a GitHub user or team. Issue
+ * bodies are markdown and GitHub strips raw HTML, so this is the practical
+ * abuse vector; a zero-width space after @ keeps the text readable while
+ * breaking mention parsing.
+ */
+function neutralizeMentions_(text) {
+  // Insert a zero-width space after each @ so GitHub does not parse it as a
+  // mention. Built with String.fromCharCode so no invisible character sits
+  // in source (it would be unreadable in review and easy to strip).
+  const zwsp = String.fromCharCode(0x200B);
+  return String(text || '').replace(/@/g, '@' + zwsp);
+}
+
+function truncateReport_(text, max) {
+  const s = String(text || '');
+  return s.length > max ? s.slice(0, max - 1) + '…' : s;
+}
+
+function reportBlockquote_(text) {
+  return String(text || '')
+    .split('\n')
+    .map(function (line) { return '> ' + line; })
+    .join('\n');
+}
+
+function buildIssueFromReport_(payload, intent) {
+  const lines = [];
+  let labels;
+  let title;
+
+  if (intent === 'record') {
+    labels = ['record-suggestion', 'user-report'];
+    const recTitle = reportField_(payload.title) || reportField_(payload.url);
+    title = '[record] ' + truncateReport_(neutralizeMentions_(recTitle), 120);
+    lines.push('Suggested by a reader via the in-archive form.', '');
+    lines.push('**Link:** ' + neutralizeMentions_(reportField_(payload.url)));
+    if (reportField_(payload.title)) {
+      lines.push('**Suggested title:** ' + neutralizeMentions_(reportField_(payload.title)));
+    }
+    if (reportField_(payload.why)) {
+      lines.push('', '**Why it belongs:**', '', reportBlockquote_(neutralizeMentions_(reportField_(payload.why))));
+    }
+  } else {
+    labels = ['bug', 'user-report'];
+    const firstLine = reportField_(payload.whatHappened).split('\n')[0];
+    title = '[bug] ' + truncateReport_(neutralizeMentions_(firstLine), 120);
+    lines.push('Reported by a reader via the in-archive form.', '');
+    lines.push('**What happened:**', '', reportBlockquote_(neutralizeMentions_(reportField_(payload.whatHappened))));
+    if (reportField_(payload.expected)) {
+      lines.push('', '**Expected:**', '', reportBlockquote_(neutralizeMentions_(reportField_(payload.expected))));
+    }
+    if (reportField_(payload.steps)) {
+      lines.push('', '**Steps to reproduce:**', '', reportBlockquote_(neutralizeMentions_(reportField_(payload.steps))));
+    }
+  }
+
+  lines.push('', '---', '');
+  if (reportField_(payload.email)) {
+    lines.push('**Contact:** ' + neutralizeMentions_(reportField_(payload.email)));
+  }
+  lines.push('**Page:** ' + neutralizeMentions_(reportField_(payload.page)));
+  lines.push('**Archive version:** ' + neutralizeMentions_(reportField_(payload.version)));
+  lines.push('**Browser:** ' + neutralizeMentions_(reportField_(payload.browser)));
+
+  return { title: title, body: lines.join('\n'), labels: labels };
+}
+
+/**
+ * Create a GitHub issue via the REST API. Returns the HTTPResponse so the
+ * caller can branch on the status code (201 on success).
+ */
+function createIssue_(token, config, issue) {
+  const url = GITHUB_API + '/repos/' + config.owner + '/' + config.repo + '/issues';
+  return UrlFetchApp.fetch(url, {
+    method: 'post',
+    contentType: 'application/json',
+    headers: {
+      Authorization: 'Bearer ' + token,
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': GITHUB_API_VERSION,
+    },
+    payload: JSON.stringify({ title: issue.title, body: issue.body, labels: issue.labels }),
+    muteHttpExceptions: true,
+  });
+}
+
+function reportDailyKey_() {
+  return 'report_count_' + Utilities.formatDate(new Date(), 'Etc/UTC', 'yyyy-MM-dd');
+}
+
+/**
+ * Atomically check-and-reserve one slot in today's counter under a script lock.
+ * Returns the reserved day key (truthy) if a slot was taken (caller may file),
+ * or null if the cap is full or the lock could not be acquired. Failing closed
+ * on a lock timeout keeps the cap from being bypassed under the contention it
+ * exists to bound. The returned key MUST be passed to releaseDailySlot_ so a
+ * rollback near UTC midnight targets the day that was actually reserved.
+ */
+function reserveDailySlot_() {
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(3000);
+  } catch (err) {
+    return null;
+  }
+  try {
+    const props = PropertiesService.getScriptProperties();
+    const key = reportDailyKey_();
+    const n = parseInt(props.getProperty(key) || '0', 10);
+    if (n >= REPORT_DAILY_CAP) return null;
+    props.setProperty(key, String(n + 1));
+    return key;
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * Give back a slot reserved under `key` when filing fails after reserving.
+ * Decrements the SAME day key that reserveDailySlot_ returned, so a failure that
+ * crosses UTC midnight does not decrement the new day. Best-effort: a missed
+ * release only tightens the cap slightly, never over-relaxes it.
+ */
+function releaseDailySlot_(key) {
+  if (!key) return;
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(3000);
+  } catch (err) {
+    return;
+  }
+  try {
+    const props = PropertiesService.getScriptProperties();
+    const n = parseInt(props.getProperty(key) || '0', 10);
+    if (n > 0) props.setProperty(key, String(n - 1));
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function jsonOutput_(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
 /**
  * Run once from the editor: installs the onEdit trigger and validates the
  * required script properties are present. Idempotent — re-running won't

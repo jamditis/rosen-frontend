@@ -19,6 +19,16 @@ export const DATA_CONFIG = {
     archive_analytics: './data/archive-analytics.json'
 };
 
+// Branded in-archive report form (#509). `endpoint` is the public Apps Script
+// web-app /exec URL that files the GitHub issue on the reader's behalf (see
+// automation/apps-script/Code.gs doPost). It is a public URL, not a secret.
+// Left empty until the web app is deployed: while empty, the report modal
+// degrades to the existing GitHub new-issue deep link, so nothing breaks before
+// launch. Set this to the /exec URL to turn the branded submit on.
+export const REPORT_CONFIG = {
+    endpoint: ''
+};
+
 export const ITEMS_PER_PAGE = 24;
 
 export const COLORS = [

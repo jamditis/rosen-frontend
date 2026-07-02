@@ -53,3 +53,66 @@ export const openBugReport = () => {
   });
   window.open(url, '_blank', 'noopener,noreferrer');
 };
+
+const RECORD_LABELS = 'record-suggestion,user-report';
+
+const trimField = (v) => (typeof v === 'string' ? v.trim() : '');
+
+/**
+ * Build a prefilled new-issue URL for a report the branded modal could not send
+ * to the backend (pre-deploy state, or an endpoint outage). Intent-aware and
+ * data-preserving: a "suggest a record" report goes to a record issue carrying
+ * its url/title/why, not the bug template (which would drop that data), and a
+ * "report a problem" report carries the typed what-happened/expected/steps into
+ * the bug form so the reader never has to retype what they just entered.
+ *
+ * @param {Object} opts
+ * @param {'problem'|'record'} [opts.intent]
+ * @param {Object} [opts.fields]   the entered form fields
+ * @param {Object} [opts.context]  { page, version, browser }
+ * @returns {string} an absolute github.com new-issue URL
+ */
+export const buildReportFallbackUrl = ({ intent = 'problem', fields = {}, context = {} } = {}) => {
+  const page = trimField(context.page);
+  const version = trimField(context.version);
+  const browser = trimField(context.browser);
+
+  if (intent === 'record') {
+    const url = trimField(fields.url);
+    const title = trimField(fields.title);
+    const why = trimField(fields.why);
+    const email = trimField(fields.email);
+    const body = ['Suggested by a reader via the in-archive form.', '', `Link: ${url}`];
+    if (title) body.push(`Suggested title: ${title}`);
+    if (why) body.push('', 'Why it belongs:', why);
+    if (email) body.push('', `Contact: ${email}`);
+    body.push('', `Page: ${page}`, `Archive version: ${version}`);
+    const params = new URLSearchParams({
+      title: `[record] ${title || url}`,
+      labels: RECORD_LABELS,
+      body: body.join('\n'),
+    });
+    return `${NEW_ISSUE_URL}?${params.toString()}`;
+  }
+
+  const params = new URLSearchParams({
+    template: TEMPLATE,
+    labels: LABELS,
+    'what-happened': trimField(fields.whatHappened),
+    expected: trimField(fields.expected),
+    steps: trimField(fields.steps),
+    'page-context': page,
+    'archive-version': version,
+    browser,
+  });
+  return `${NEW_ISSUE_URL}?${params.toString()}`;
+};
+
+/**
+ * Open the intent-aware fallback issue in a new tab. The modal calls this when
+ * the backend submit is unavailable, passing the reader's entered fields.
+ */
+export const openReportFallback = ({ intent, fields, context } = {}) => {
+  const url = buildReportFallbackUrl({ intent, fields, context });
+  window.open(url, '_blank', 'noopener,noreferrer');
+};

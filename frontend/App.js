@@ -5,9 +5,8 @@ import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, 
 import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.4.9';
 import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.4.9';
 import { withViewTransition } from './utils/viewTransition.js?v=3.4.9';
-import { ITEMS_PER_PAGE, COLORS } from './constants.js?v=3.4.9';
+import { ITEMS_PER_PAGE, COLORS, REPORT_CONFIG } from './constants.js?v=3.4.9';
 import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.4.9';
-import { openBugReport } from './utils/bugReport.js?v=3.4.9';
 import { setRecordParam } from './utils/recordDeepLink.js?v=3.4.9';
 import { recordNeedsReview } from './utils/needsReview.js?v=3.4.9';
 import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.4.9';
@@ -17,6 +16,7 @@ import RecordView from './components/RecordView.js?v=3.4.9';
 import FeaturedSection from './components/FeaturedSection.js?v=3.4.9';
 import DissertationPage from './components/DissertationPage.js?v=3.4.9';
 import ToolsModal from './components/ToolsModal.js?v=3.4.9';
+import BugReportModal from './components/BugReportModal.js?v=3.4.9';
 import LoadingQuotes from './components/LoadingQuotes.js?v=3.4.9';
 import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.4.9';
 import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.4.9';
@@ -68,6 +68,7 @@ const App = () => {
   // once the archive data finishes loading (clearing it if no record matches).
   const [selectedRecordId, setSelectedRecordId] = useState(() => getRecordIdFromUrl());
   const [toolsModalOpen, setToolsModalOpen] = useState(false);
+  const [bugReportOpen, setBugReportOpen] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   const [filters, setFilters] = useState({ ...DEFAULT_FILTERS });
@@ -366,6 +367,12 @@ const App = () => {
         onSelectTool=${handleToolSelect}
       />
 
+      <${BugReportModal}
+        isOpen=${bugReportOpen}
+        onClose=${() => setBugReportOpen(false)}
+        endpoint=${REPORT_CONFIG.endpoint}
+      />
+
       ${recordView}
 
       <header className=${`sticky top-0 z-50 w-full border-b transition-all duration-300 ${
@@ -425,7 +432,7 @@ const App = () => {
                     <span>About</span>
                 </button>
                 <button
-                  onClick=${openBugReport}
+                  onClick=${() => setBugReportOpen(true)}
                   className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-md transition-colors flex items-center gap-1 text-xs"
                   aria-label="Report a bug"
                   title="Report a bug"
