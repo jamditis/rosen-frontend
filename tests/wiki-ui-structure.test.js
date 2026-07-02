@@ -17,13 +17,19 @@ describe('wiki UI wiring', () => {
     assert.match(appSrc, /currentRoute\s*===\s*ROUTES\.analytics\s*\|\|\s*currentRoute\s*===\s*ROUTES\.wiki\)\s*return/);
   });
 
-  it('routes the mobile tools modal to the wiki page', () => {
-    assert.match(toolsSrc, /id:\s*'wiki'/);
-    assert.match(toolsSrc, /action:\s*'wiki'/);
+  it('keeps the wiki route reachable by deep link but exposes no public entry point', () => {
+    // Jarvis flagged at the launch review that the public "wiki" surface is
+    // unclear, so its entry points were pulled until we decide what the
+    // section becomes (PR #563). The route and its in-page navigation handler
+    // stay wired so existing #wiki deep links still resolve rather than 404.
+    // This is a reversible unlink, not a delete.
     assert.match(appSrc, /action\s*===\s*'wiki'[\s\S]*navigateTo\(ROUTES\.wiki\)/);
-    // The archive group must be rendered, not just declared, or the modal's
-    // discovery path to the wiki is dead.
-    assert.match(toolsSrc, /TOOLS\.archive\.map/);
+    // But nothing in the app advertises it: no nav button, footer link, or
+    // homepage tool-row chip navigates to the wiki, and the tools modal no
+    // longer lists it.
+    assert.doesNotMatch(appSrc, /goTo\(ROUTES\.wiki\)/);
+    assert.doesNotMatch(toolsSrc, /id:\s*'wiki'/);
+    assert.doesNotMatch(toolsSrc, /action:\s*'wiki'/);
   });
 
   it('renders an explicit missing-page state for unknown and malformed wiki slugs', () => {

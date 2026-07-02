@@ -404,17 +404,9 @@ const App = () => {
                 <button
                   onClick=${() => setToolsModalOpen(true)}
                   className="sm:hidden p-2 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-md border border-stone-200"
-                  aria-label="Explore tools"
+                  aria-label="Tools"
                 >
                     <${Compass} className="w-5 h-5" />
-                </button>
-                <button
-                  onClick=${() => goTo(ROUTES.wiki)}
-                  className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-md transition-colors hidden md:flex items-center gap-1 text-xs"
-                  aria-label="Archive wiki"
-                >
-                    <${BookOpen} className="w-4 h-4" />
-                    <span>Wiki</span>
                 </button>
                 <button
                   onClick=${() => goTo(ROUTES.about)}
@@ -497,13 +489,6 @@ const App = () => {
                                 >
                                     <${BarChart3} className="w-3.5 h-3.5" />
                                     Analytics
-                                </button>
-                                <button
-                                    onClick=${() => goTo(ROUTES.wiki)}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
-                                >
-                                    <${BookOpen} className="w-3.5 h-3.5" />
-                                    Wiki
                                 </button>
                                 <button
                                     onClick=${() => setToolsModalOpen(true)}
@@ -741,13 +726,12 @@ const App = () => {
               </p>
             </div>
             <div>
-              <h4 className="font-display font-bold text-stone-900 mb-2">Explore</h4>
+              <h4 className="font-display font-bold text-stone-900 mb-2">Sections</h4>
               <div className="space-y-1 text-xs">
                 <button onClick=${() => goTo(ROUTES.archive)} className="block hover:text-stone-900 transition-colors">Browse archive</button>
                 <button onClick=${() => goTo(ROUTES.dissertation)} className="block hover:text-stone-900 transition-colors">Dissertation mind map</button>
                 <button onClick=${() => goTo(ROUTES.entities)} className="block hover:text-stone-900 transition-colors">Entity browser</button>
                 <button onClick=${() => goTo(ROUTES.analytics)} className="block hover:text-stone-900 transition-colors">Analytics dashboard</button>
-                <button onClick=${() => goTo(ROUTES.wiki)} className="block hover:text-stone-900 transition-colors">Archive wiki</button>
                 <button onClick=${() => goTo(ROUTES.about)} className="block hover:text-stone-900 transition-colors">About this archive</button>
               </div>
             </div>

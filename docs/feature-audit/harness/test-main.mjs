@@ -691,7 +691,7 @@ const run = async () => {
   // Featured carousel.
   {
     const feat = await page.evaluate(() => {
-      const sec = [...document.querySelectorAll('h2')].find(h => /Featured Works/.test(h.textContent));
+      const sec = [...document.querySelectorAll('h2')].find(h => /^Read$/.test(h.textContent.trim()));
       const section = sec ? sec.closest('section') : null;
       if (!section) return { present: false };
       const cards = section.querySelectorAll('a[target="_blank"]');
@@ -704,29 +704,29 @@ const run = async () => {
     if (feat.present && feat.dotCount > 5) {
       const before = feat.firstStart[0];
       await page.evaluate(() => {
-        const sec = [...document.querySelectorAll('h2')].find(h => /Featured Works/.test(h.textContent)).closest('section');
+        const sec = [...document.querySelectorAll('h2')].find(h => /^Read$/.test(h.textContent.trim())).closest('section');
         sec.querySelectorAll('button[aria-label^="Go to slide"]')[5].click();
       });
       await sleep(300);
       const after = await page.evaluate(() => {
-        const sec = [...document.querySelectorAll('h2')].find(h => /Featured Works/.test(h.textContent)).closest('section');
+        const sec = [...document.querySelectorAll('h2')].find(h => /^Read$/.test(h.textContent.trim())).closest('section');
         return sec.querySelector('a[target="_blank"] h3')?.textContent?.trim();
       });
       jumped = before !== after;
     }
     // collapse via chevron
     await page.evaluate(() => {
-      const sec = [...document.querySelectorAll('h2')].find(h => /Featured Works/.test(h.textContent)).closest('section');
+      const sec = [...document.querySelectorAll('h2')].find(h => /^Read$/.test(h.textContent.trim())).closest('section');
       sec.querySelector('button').click();
     });
     await sleep(200);
     const collapsed = await page.evaluate(() => {
-      const sec = [...document.querySelectorAll('h2')].find(h => /Featured Works/.test(h.textContent)).closest('section');
+      const sec = [...document.querySelectorAll('h2')].find(h => /^Read$/.test(h.textContent.trim())).closest('section');
       return sec.querySelectorAll('a[target="_blank"]').length === 0;
     });
     // re-expand
     await page.evaluate(() => {
-      const sec = [...document.querySelectorAll('h2')].find(h => /Featured Works/.test(h.textContent)).closest('section');
+      const sec = [...document.querySelectorAll('h2')].find(h => /^Read$/.test(h.textContent.trim())).closest('section');
       sec.querySelector('button').click();
     });
     await sleep(200);
@@ -734,7 +734,7 @@ const run = async () => {
     await typeSearch(page, 'press');
     await sleep(200);
     const goneUnderFilter = await page.evaluate(() =>
-      ![...document.querySelectorAll('h2')].some(h => /Featured Works/.test(h.textContent)));
+      ![...document.querySelectorAll('h2')].some(h => /^Read$/.test(h.textContent.trim())));
     await typeSearch(page, '');
     await sleep(200);
     const noteCount = feat.cardCount === 3

@@ -2,7 +2,7 @@
  * Menu link integrity test (#411)
  *
  * Every dissertation-tool link rendered by the homepage Tools bar (App.js) and
- * the Explore Tools modal (ToolsModal.js) must resolve to a tool that is
+ * the Tools modal (ToolsModal.js) must resolve to a tool that is
  * actually deployed under dissertation/. Links to retired tools (moved to
  * archived/dissertation-tools/ and dropped from the deploy) return 404 — or, in
  * the faq case, a 301 off the archive — on the live site. This guards against
