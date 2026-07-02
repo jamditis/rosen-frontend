@@ -36,6 +36,13 @@ body:
     validations:
       required: false
   - type: input
+    id: contact
+    attributes:
+      label: Your email (optional)
+      description: Leave it if you want us to be able to follow up. Shown publicly on the issue.
+    validations:
+      required: false
+  - type: input
     id: page-context
     attributes:
       label: Page

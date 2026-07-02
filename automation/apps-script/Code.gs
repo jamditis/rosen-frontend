@@ -301,6 +301,464 @@ function writeStatus_(sheet, row, status, recordId, error) {
        .setValues([[status, recordId, error]]);
 }
 
+// ===========================================================================
+// Web app: branded in-archive report form (#509)
+//
+// The static archive has no server of its own, so its "Report a bug" / "Suggest
+// a record" form POSTs a JSON report to this web app, which files a GitHub issue
+// via the SAME GitHub App used for record submissions. The reader needs no
+// GitHub account and never leaves pressthink.org.
+//
+// Deploy: Editor -> Deploy -> New deployment -> Web app, "Execute as: me",
+// "Who has access: Anyone". Paste the /exec URL into frontend REPORT_CONFIG.
+// The GitHub App must have Issues: write (Actions-only is not enough to create
+// issues). Grant it in the App's permissions, then re-authorize the install.
+//
+// Browser CORS: Apps Script answers a simple cross-origin POST (text/plain body,
+// no custom headers) and sets Access-Control-Allow-Origin: *, but it cannot
+// answer a preflight. The frontend therefore POSTs text/plain: do not require
+// a JSON content type here.
+//
+// Rate limiting: Apps Script does not expose the caller IP, so per-IP limiting
+// is impossible in this ingress. Defense is a honeypot plus a GLOBAL per-day
+// issue cap (bounds total abuse volume, not per-sender). If that proves too
+// weak, move the endpoint to a Cloudflare Worker or add Turnstile.
+// ===========================================================================
+
+const KIND_REPORT = 'report';
+
+// Authoritative field caps (mirrors frontend LIMITS in reportSubmit.js).
+const REPORT_LIMITS = {
+  whatHappened: 5000,
+  expected: 2000,
+  steps: 3000,
+  url: 2000,
+  title: 300,
+  why: 3000,
+  email: 254,
+};
+
+// Caps for the auto-captured context fields. These are not user-typed, so
+// validateReportPayload_ does not gate them, but a direct POST can forge them.
+// Bound them before they reach an issue body so a forged request cannot create
+// an oversized issue.
+const REPORT_CONTEXT_LIMITS = {
+  page: 2048,
+  version: 64,
+  browser: 512,
+};
+
+// Global cap on issues this web app will file per UTC day.
+const REPORT_DAILY_CAP = 50;
+
+/**
+ * Health check: GET the /exec URL to confirm the web app is deployed and live.
+ */
+function doGet() {
+  return jsonOutput_({ ok: true, service: 'rosen-report' });
+}
+
+/**
+ * Web-app POST entry for reader reports. Always returns HTTP 200 with a JSON
+ * body (Apps Script cannot set other status codes); success/failure is carried
+ * in `ok`, which the frontend keys off.
+ */
+function doPost(e) {
+  try {
+    const payload = parseJsonBody_(e);
+    if (!payload || payload.kind !== KIND_REPORT) {
+      return jsonOutput_({ ok: false, error: 'Unrecognized request.' });
+    }
+    return handleReport_(payload);
+  } catch (err) {
+    // Log server-side (visible in the Apps Script execution log) without
+    // leaking internals to the caller.
+    Logger.log('report doPost error: ' + (err && err.stack ? err.stack : err));
+    return jsonOutput_({ ok: false, error: 'Server error.' });
+  }
+}
+
+function parseJsonBody_(e) {
+  if (!e || !e.postData || !e.postData.contents) return null;
+  try {
+    return JSON.parse(e.postData.contents);
+  } catch (err) {
+    return null;
+  }
+}
+
+function handleReport_(payload) {
+  // Honeypot: a real form never fills `website`. Return success without filing
+  // so a bot gets no signal to retry, and no issue is created.
+  if (reportField_(payload.website) !== '') {
+    return jsonOutput_({ ok: true, dropped: true });
+  }
+
+  const intent = payload.intent === 'record' ? 'record' : 'problem';
+
+  const check = validateReportPayload_(payload, intent);
+  if (!check.valid) {
+    return jsonOutput_({ ok: false, error: check.error });
+  }
+
+  // Dedupe a retried report before spending a daily slot or a GitHub round-trip.
+  // Sanitize the client-supplied key to safe characters and a bounded length so
+  // a forged value cannot bloat or collide the cache key.
+  const idemKey = reportField_(payload.idempotencyKey).replace(/[^A-Za-z0-9-]/g, '').slice(0, 64);
+  const idem = reserveIdempotencyKey_(idemKey);
+  if (idem.status === 'duplicate') {
+    return jsonOutput_({ ok: true, issueUrl: idem.url, duplicate: true });
+  }
+  if (idem.status === 'pending') {
+    return jsonOutput_({ ok: false, error: 'This report is already being filed. Please check GitHub in a moment.' });
+  }
+  if (idem.status === 'unavailable') {
+    return jsonOutput_({ ok: false, error: 'The archive is busy right now. Please try again in a moment.' });
+  }
+
+  // Atomically reserve a daily slot BEFORE filing. Reading the counter and
+  // filing separately would let a concurrent burst near the cap each pass a
+  // stale read and overflow it: the exact bursty case the cap defends against.
+  // The reserved slot is released on any failure path below.
+  const reservedKey = reserveDailySlot_();
+  if (!reservedKey) {
+    releaseIdempotencyKey_(idemKey);
+    return jsonOutput_({
+      ok: false,
+      error: 'The archive is receiving a lot of reports right now. Please try again later.',
+    });
+  }
+
+  let config;
+  let token;
+  try {
+    config = readConfig_();
+    const jwt = makeAppJwt_(config.appId, config.privateKey);
+    token = getInstallationToken_(jwt, config.installId);
+  } catch (err) {
+    releaseDailySlot_(reservedKey);
+    releaseIdempotencyKey_(idemKey);
+    Logger.log('report auth error: ' + (err && err.message ? err.message : err));
+    return jsonOutput_({ ok: false, error: 'Could not reach GitHub. Please try again later.' });
+  }
+
+  const issue = buildIssueFromReport_(payload, intent);
+
+  let response;
+  try {
+    response = createIssue_(token, config, issue);
+  } catch (err) {
+    releaseDailySlot_(reservedKey);
+    releaseIdempotencyKey_(idemKey);
+    Logger.log('report createIssue error: ' + (err && err.message ? err.message : err));
+    return jsonOutput_({ ok: false, error: 'Could not reach GitHub. Please try again later.' });
+  }
+
+  if (response.getResponseCode() === 201) {
+    // Slot already counted at reservation; nothing more to do on success.
+    let issueUrl = '';
+    try {
+      issueUrl = JSON.parse(response.getContentText()).html_url || '';
+    } catch (err) {
+      issueUrl = '';
+    }
+    // Record the filed url so a retry with the same key returns it, not a dup.
+    finishIdempotencyKey_(idemKey, issueUrl);
+    return jsonOutput_({ ok: true, issueUrl: issueUrl });
+  }
+
+  releaseDailySlot_(reservedKey);
+  releaseIdempotencyKey_(idemKey);
+  Logger.log('report issue rejected (HTTP ' + response.getResponseCode() + '): ' +
+             response.getContentText().slice(0, 240));
+  return jsonOutput_({
+    ok: false,
+    error: 'GitHub could not accept the report (HTTP ' + response.getResponseCode() + ').',
+  });
+}
+
+function reportField_(v) {
+  return typeof v === 'string' ? v.trim() : '';
+}
+
+function validateReportPayload_(payload, intent) {
+  if (intent === 'record') {
+    const url = reportField_(payload.url);
+    if (!url) return { valid: false, error: 'A link to the work is required.' };
+    if (!/^https?:\/\//i.test(url)) {
+      return { valid: false, error: 'The link must start with http:// or https://.' };
+    }
+  } else if (!reportField_(payload.whatHappened)) {
+    return { valid: false, error: 'A description of the problem is required.' };
+  }
+
+  const email = reportField_(payload.email);
+  if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    return { valid: false, error: 'That email address is not valid.' };
+  }
+
+  const names = Object.keys(REPORT_LIMITS);
+  for (let i = 0; i < names.length; i++) {
+    const name = names[i];
+    if (reportField_(payload[name]).length > REPORT_LIMITS[name]) {
+      return { valid: false, error: 'One of the fields is too long.' };
+    }
+  }
+  return { valid: true, error: '' };
+}
+
+/**
+ * Blunt @-mention so a report body cannot ping a GitHub user or team. Issue
+ * bodies are markdown and GitHub strips raw HTML, so this is the practical
+ * abuse vector; a zero-width space after @ keeps the text readable while
+ * breaking mention parsing.
+ */
+function neutralizeMentions_(text) {
+  // Insert a zero-width space after each @ so GitHub does not parse it as a
+  // mention. Built with String.fromCharCode so no invisible character sits
+  // in source (it would be unreadable in review and easy to strip).
+  const zwsp = String.fromCharCode(0x200B);
+  return String(text || '').replace(/@/g, '@' + zwsp);
+}
+
+function truncateReport_(text, max) {
+  const s = String(text || '');
+  return s.length > max ? s.slice(0, max - 1) + '…' : s;
+}
+
+/**
+ * Render a structured or auto-captured field (URL, email, page, version,
+ * browser) as an inline code span. neutralizeMentions_ is wrong for these: it
+ * would corrupt a legitimate handle URL like https://host/@user, which the
+ * curator has to click or copy. A code span is inert to @-mentions and keeps
+ * the value byte-exact. Strip backticks and newlines first so the value cannot
+ * break out of the span, and cap the length so a forged POST cannot bloat the
+ * issue. Returns '' for an empty field so the caller can omit the line.
+ */
+function reportInline_(text, max) {
+  const s = String(text || '').replace(/[`\r\n]+/g, ' ').trim();
+  if (!s) return '';
+  return '`' + truncateReport_(s, max) + '`';
+}
+
+function reportBlockquote_(text) {
+  return String(text || '')
+    .split('\n')
+    .map(function (line) { return '> ' + line; })
+    .join('\n');
+}
+
+function buildIssueFromReport_(payload, intent) {
+  const lines = [];
+  let labels;
+  let title;
+
+  // Issue titles do not render markdown or @-mentions, so they need truncation
+  // but not mention-blunting: blunting only corrupts a URL-derived title.
+  if (intent === 'record') {
+    labels = ['record-suggestion', 'user-report'];
+    // First line only: a multiline title would look broken in the title bar.
+    const recTitle = reportField_(payload.title).split('\n')[0] || reportField_(payload.url);
+    title = '[record] ' + truncateReport_(recTitle, 120);
+    lines.push('Suggested by a reader via the in-archive form.', '');
+    // The link is structured: keep it exact and copy-safe, do not blunt its @.
+    lines.push('**Link:** ' + reportInline_(reportField_(payload.url), REPORT_LIMITS.url));
+    if (reportField_(payload.title)) {
+      // Inline-code the suggested title too: a forged multiline or markdown-heavy
+      // title must not inject a heading, quote, or fake field into the body.
+      lines.push('**Suggested title:** ' + reportInline_(reportField_(payload.title), REPORT_LIMITS.title));
+    }
+    if (reportField_(payload.why)) {
+      lines.push('', '**Why it belongs:**', '', reportBlockquote_(neutralizeMentions_(reportField_(payload.why))));
+    }
+  } else {
+    labels = ['bug', 'user-report'];
+    const firstLine = reportField_(payload.whatHappened).split('\n')[0];
+    title = '[bug] ' + truncateReport_(firstLine, 120);
+    lines.push('Reported by a reader via the in-archive form.', '');
+    lines.push('**What happened:**', '', reportBlockquote_(neutralizeMentions_(reportField_(payload.whatHappened))));
+    if (reportField_(payload.expected)) {
+      lines.push('', '**Expected:**', '', reportBlockquote_(neutralizeMentions_(reportField_(payload.expected))));
+    }
+    if (reportField_(payload.steps)) {
+      lines.push('', '**Steps to reproduce:**', '', reportBlockquote_(neutralizeMentions_(reportField_(payload.steps))));
+    }
+  }
+
+  // Structured and auto-captured context: rendered as inline code so URLs and
+  // emails stay copy-safe and mention-inert, and forged context is length-capped.
+  lines.push('', '---', '');
+  if (reportField_(payload.email)) {
+    lines.push('**Contact:** ' + reportInline_(reportField_(payload.email), REPORT_LIMITS.email));
+  }
+  lines.push('**Page:** ' + reportInline_(reportField_(payload.page), REPORT_CONTEXT_LIMITS.page));
+  lines.push('**Archive version:** ' + reportInline_(reportField_(payload.version), REPORT_CONTEXT_LIMITS.version));
+  // The browser is disclosed only on the bug form, so attach it only to bug
+  // reports; record suggestions must not publish it.
+  if (intent !== 'record') {
+    lines.push('**Browser:** ' + reportInline_(reportField_(payload.browser), REPORT_CONTEXT_LIMITS.browser));
+  }
+
+  return { title: title, body: lines.join('\n'), labels: labels };
+}
+
+/**
+ * Create a GitHub issue via the REST API. Returns the HTTPResponse so the
+ * caller can branch on the status code (201 on success).
+ */
+function createIssue_(token, config, issue) {
+  const url = GITHUB_API + '/repos/' + config.owner + '/' + config.repo + '/issues';
+  return UrlFetchApp.fetch(url, {
+    method: 'post',
+    contentType: 'application/json',
+    headers: {
+      Authorization: 'Bearer ' + token,
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': GITHUB_API_VERSION,
+    },
+    payload: JSON.stringify({ title: issue.title, body: issue.body, labels: issue.labels }),
+    muteHttpExceptions: true,
+  });
+}
+
+function reportDailyKey_() {
+  return 'report_count_' + Utilities.formatDate(new Date(), 'Etc/UTC', 'yyyy-MM-dd');
+}
+
+/**
+ * Atomically check-and-reserve one slot in today's counter under a script lock.
+ * Returns the reserved day key (truthy) if a slot was taken (caller may file),
+ * or null if the cap is full or the lock could not be acquired. Failing closed
+ * on a lock timeout keeps the cap from being bypassed under the contention it
+ * exists to bound. The returned key MUST be passed to releaseDailySlot_ so a
+ * rollback near UTC midnight targets the day that was actually reserved.
+ */
+function reserveDailySlot_() {
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(3000);
+  } catch (err) {
+    return null;
+  }
+  try {
+    const props = PropertiesService.getScriptProperties();
+    const key = reportDailyKey_();
+    const n = parseInt(props.getProperty(key) || '0', 10);
+    if (n >= REPORT_DAILY_CAP) return null;
+    props.setProperty(key, String(n + 1));
+    return key;
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * Give back a slot reserved under `key` when filing fails after reserving.
+ * Decrements the SAME day key that reserveDailySlot_ returned, so a failure that
+ * crosses UTC midnight does not decrement the new day. Best-effort: a missed
+ * release only tightens the cap slightly, never over-relaxes it.
+ */
+function releaseDailySlot_(key) {
+  if (!key) return;
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(3000);
+  } catch (err) {
+    return;
+  }
+  try {
+    const props = PropertiesService.getScriptProperties();
+    const n = parseInt(props.getProperty(key) || '0', 10);
+    if (n > 0) props.setProperty(key, String(n - 1));
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+// Idempotency: a report carries a client-generated key that is stable across
+// the reader's retries of one report and unique per report. If the browser
+// aborts a slow-but-successful request and the reader retries, both requests
+// reach here with the same key; this dedupes them so only one issue is filed.
+// CacheService (not PropertiesService) because these keys must self-expire and
+// never need manual cleanup. 6h is comfortably longer than any retry window.
+var REPORT_IDEM_TTL_SECONDS = 21600;
+// The pending marker must outlive the longest possible filing, or a retry could
+// re-reserve a key whose first request is still running and file a duplicate.
+// Apps Script web-app executions are capped at ~6 minutes, so 10 minutes leaves
+// margin; a filing that dies at the cap without finishing frees the key by TTL.
+var REPORT_IDEM_PENDING_TTL_SECONDS = 600;
+var REPORT_IDEM_PENDING = 'pending';
+
+function reportIdemCacheKey_(key) {
+  return 'report_idem_' + key;
+}
+
+/**
+ * Atomically reserve an idempotency key for filing, under the same short script
+ * lock the daily counter uses so the check-and-mark cannot race a concurrent
+ * same-key retry. Returns one of:
+ *   { status: 'reserved' }        caller should file, then finish/release the key
+ *   { status: 'duplicate', url }  already filed; return this url, do not file
+ *   { status: 'pending' }         a concurrent request is filing it right now
+ *   { status: 'unavailable' }     lock contention; caller should fail closed
+ * An empty key (a legacy client) cannot be deduped, so it always reserves.
+ */
+function reserveIdempotencyKey_(key) {
+  if (!key) return { status: 'reserved' };
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(3000);
+  } catch (err) {
+    return { status: 'unavailable' };
+  }
+  try {
+    const cache = CacheService.getScriptCache();
+    const cacheKey = reportIdemCacheKey_(key);
+    const existing = cache.get(cacheKey);
+    // Absent (null) means unreserved. Any stored value that is not the pending
+    // marker means already filed, INCLUDING an empty string: a 201 whose body
+    // had no parseable url still filed the issue, so a retry must dedupe on it
+    // rather than treat '' as unreserved and file a second time.
+    if (existing != null && existing !== REPORT_IDEM_PENDING) {
+      return { status: 'duplicate', url: existing };
+    }
+    if (existing === REPORT_IDEM_PENDING) {
+      return { status: 'pending' };
+    }
+    // A failure path clears this eagerly (releaseIdempotencyKey_); the TTL is the
+    // backstop for a filing killed at the execution cap, so it must exceed that
+    // cap or a still-running filing could lose its marker to a retry.
+    cache.put(cacheKey, REPORT_IDEM_PENDING, REPORT_IDEM_PENDING_TTL_SECONDS);
+    return { status: 'reserved' };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * Record the filed issue url against the key so a later retry returns it instead
+ * of filing again. Longer TTL than the pending marker.
+ */
+function finishIdempotencyKey_(key, url) {
+  if (!key) return;
+  CacheService.getScriptCache().put(reportIdemCacheKey_(key), url || '', REPORT_IDEM_TTL_SECONDS);
+}
+
+/**
+ * Clear the pending marker when filing fails after reserving, so the reader can
+ * retry instead of being blocked by a key that will never resolve.
+ */
+function releaseIdempotencyKey_(key) {
+  if (!key) return;
+  CacheService.getScriptCache().remove(reportIdemCacheKey_(key));
+}
+
+function jsonOutput_(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
 /**
  * Run once from the editor: installs the onEdit trigger and validates the
  * required script properties are present. Idempotent — re-running won't

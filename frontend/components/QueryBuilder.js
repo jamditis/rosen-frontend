@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { html } from '../html.js?v=3.4.9';
+import { html } from '../html.js?v=3.5.0';
 import {
   Search,
   Play,
@@ -17,7 +17,7 @@ import {
   HelpCircle,
   Loader2
 } from 'lucide-react';
-import { queryAsObjects, isSqliteReady, initSqlite } from '../services/archiveService.js?v=3.4.9';
+import { queryAsObjects, isSqliteReady, initSqlite } from '../services/archiveService.js?v=3.5.0';
 
 // Query template definitions
 const QUERY_TEMPLATES = [
