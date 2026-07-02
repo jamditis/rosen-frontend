@@ -176,8 +176,9 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
     <button
       type="button"
       onClick=${() => { setIntent(value); setFormError(''); }}
+      disabled=${submitting}
       aria-pressed=${intent === value}
-      className=${`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold rounded-md border transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 ${
+      className=${`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold rounded-md border transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 disabled:opacity-60 disabled:cursor-not-allowed ${
         intent === value
           ? 'bg-stone-900 text-white border-stone-900'
           : 'bg-white text-stone-600 border-stone-300 hover:border-stone-400 hover:text-stone-900'
@@ -195,9 +196,10 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
         ref=${refEl || null}
         value=${fields[name]}
         onInput=${(e) => setField(name, e.target.value)}
+        disabled=${submitting}
         rows=${rows}
         placeholder=${placeholder}
-        className="w-full px-3 py-2 border border-stone-300 rounded-sm bg-white text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-stone-400"
+        className="w-full px-3 py-2 border border-stone-300 rounded-sm bg-white text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-stone-400 disabled:opacity-60 disabled:cursor-not-allowed"
       ></textarea>
     </label>
   `;
@@ -210,8 +212,9 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
         type=${type}
         value=${fields[name]}
         onInput=${(e) => setField(name, e.target.value)}
+        disabled=${submitting}
         placeholder=${placeholder}
-        className="w-full px-3 py-2 border border-stone-300 rounded-sm bg-white text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-stone-400"
+        className="w-full px-3 py-2 border border-stone-300 rounded-sm bg-white text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-stone-400 disabled:opacity-60 disabled:cursor-not-allowed"
       />
     </label>
   `;
@@ -282,6 +285,15 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
     }
 
     if (phase === 'error') {
+      // A failed send is ambiguous: the request may have timed out or lost its
+      // response yet still filed the issue server-side (or a concurrent retry is
+      // filing it right now). "Try again" is the only safe recovery here because it
+      // reuses the idempotency key, so the server returns the existing issue rather
+      // than filing a duplicate. We deliberately do NOT offer a direct GitHub deep
+      // link on this screen: that path bypasses the key and would open a second
+      // public issue for the same report. Try again returns to the form, which
+      // still carries the pre-submit "Prefer GitHub?" fallback for a genuine
+      // outage — where nothing was filed, so GitHub is safe.
       return html`
         <div className="px-6 py-10 text-center">
           <${AlertCircle} className="w-10 h-10 text-red-600 mx-auto mb-4" />
@@ -294,13 +306,6 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
               className="px-4 py-2 bg-stone-900 text-white rounded-sm text-sm font-bold hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
             >
               Try again
-            </button>
-            <button
-              type="button"
-              onClick=${() => { openFallback(); onClose(); }}
-              className="text-sm font-bold text-stone-600 hover:text-stone-900 underline"
-            >
-              Use the GitHub form instead
             </button>
           </div>
         </div>

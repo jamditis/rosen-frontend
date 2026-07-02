@@ -70,6 +70,15 @@ const bluntMentions = (v) => trimField(v).replace(/@/g, '@' + ZWSP);
 // field into the issue body once it renders on GitHub.
 const firstLine = (v) => trimField(v).split('\n')[0];
 
+// GitHub rejects issue titles longer than 256 characters, so a prefilled link
+// carrying a longer title (a 300-char entered title, or a 2000-char url used as
+// the title) opens an issue the reader cannot save. Cap the title portion at the
+// server's limit (Code.gs truncateReport_, 120) so every fallback link is
+// savable. Mirrors that helper: slice to max-1 and append a single ellipsis.
+const REPORT_TITLE_MAX = 120;
+const truncateTitle = (v) =>
+  v.length > REPORT_TITLE_MAX ? v.slice(0, REPORT_TITLE_MAX - 1) + '…' : v;
+
 /**
  * Build a prefilled new-issue URL for a report the branded modal could not send
  * to the backend (pre-deploy state, or an endpoint outage). Intent-aware and
@@ -100,7 +109,7 @@ export const buildReportFallbackUrl = ({ intent = 'problem', fields = {}, contex
     if (email) body.push('', `Contact: ${email}`);
     body.push('', `Page: ${page}`, `Archive version: ${version}`);
     const params = new URLSearchParams({
-      title: `[record] ${title || url}`,
+      title: `[record] ${truncateTitle(title || url)}`,
       labels: RECORD_LABELS,
       body: body.join('\n'),
     });

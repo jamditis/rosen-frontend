@@ -106,6 +106,30 @@ test('record fallback titles on the url when no title was entered', () => {
   assert.match(u.searchParams.get('title'), /^\[record\] https:\/\/x\.io\/a/);
 });
 
+test('record fallback truncates an over-long title to fit GitHub\'s issue-title cap', () => {
+  // GitHub rejects issue titles over 256 chars, so a prefilled link carrying a
+  // longer title opens an unsavable issue. The client fallback caps it like the
+  // server (Code.gs truncateReport_ at 120) so the reader can always submit.
+  const u = new URL(buildReportFallbackUrl({
+    intent: 'record',
+    fields: { url: 'https://x.io/a', title: 'x'.repeat(400) },
+  }));
+  const title = u.searchParams.get('title');
+  assert.ok(title.length <= 256, `record title must fit GitHub's 256-char cap, got ${title.length}`);
+  assert.match(title, /^\[record\] /);
+});
+
+test('record fallback truncates a very long url-derived title', () => {
+  // With no title entered the url becomes the title; a 2000-char url would blow
+  // past GitHub's cap, so it must be truncated too. The full url still survives
+  // in the issue body.
+  const longUrl = 'https://x.io/' + 'a'.repeat(2000);
+  const u = new URL(buildReportFallbackUrl({ intent: 'record', fields: { url: longUrl } }));
+  const title = u.searchParams.get('title');
+  assert.ok(title.length <= 256, `url-derived title must fit GitHub's 256-char cap, got ${title.length}`);
+  assert.match(u.searchParams.get('body'), new RegExp('a'.repeat(2000)), 'full url is preserved in the body');
+});
+
 test('record fallback blunts @-mentions and a multiline title cannot break the body', () => {
   // The reader submits this prefilled issue themselves on GitHub, so raw text
   // would ping a team or inject markdown once submitted. The fallback must match

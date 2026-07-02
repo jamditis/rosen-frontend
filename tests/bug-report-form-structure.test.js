@@ -58,6 +58,27 @@ describe('branded report form wiring', () => {
     assert.ok(guarded.length >= 2, `expected submit + fallback to gate on submitting, found ${guarded.length}`);
   });
 
+  it('freezes the intent tabs and text fields while a submit is in flight', () => {
+    // handleSubmit snapshots the payload before awaiting, so if the tabs or inputs
+    // stayed live during 'submitting' a reader could edit the text or switch intent
+    // mid-request, then see success (or a fallback link) for content that no longer
+    // matches what was sent. The tabs and every field must gate on `submitting`.
+    assert.match(modalSrc, /setIntent\(value\); setFormError\(''\); \}\}\s*disabled=\$\{submitting\}/);
+    const fieldGuards = modalSrc.match(/onInput=\$\{\(e\) => setField\(name, e\.target\.value\)\}\s*disabled=\$\{submitting\}/g) || [];
+    assert.ok(fieldGuards.length >= 2, `both textarea and input must gate on submitting, found ${fieldGuards.length}`);
+  });
+
+  it('does not offer a non-idempotent GitHub fallback on the error screen', () => {
+    // A failed send is ambiguous: the request may have filed the issue server-side
+    // anyway. The error screen must not offer a raw GitHub deep link, which bypasses
+    // the idempotency key and files a duplicate. Recovery is the idempotent "Try
+    // again"; the GitHub escape lives on the form (pre-submit) where nothing has
+    // been filed yet.
+    assert.match(modalSrc, /That did not go through/);
+    assert.match(modalSrc, /setPhase\('form'\)[\s\S]{0,400}Try again/);
+    assert.doesNotMatch(modalSrc, /Use the GitHub form instead/);
+  });
+
   it('locks every dismissal path while a submit is in flight', () => {
     // The in-flight submit is the single source of truth. If Escape, the backdrop,
     // or the close button could dismiss mid-request, a reader could close, reopen to
