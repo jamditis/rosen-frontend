@@ -9,7 +9,7 @@ const TOOLS = {
   archive: [
     {
       id: 'wiki',
-      name: 'Archive wiki',
+      name: 'Key ideas',
       description: 'Concept and entity pages',
       icon: BookOpen,
       action: 'wiki',
@@ -158,7 +158,7 @@ const ToolsModal = ({ isOpen, onClose, onSelectTool }) => {
         <div className="sticky top-0 bg-paper border-b border-stone-200 px-6 py-4 flex items-center justify-between z-10">
           <div>
             <h2 id="tools-modal-title" className="font-display text-xl text-stone-800">
-              Explore Tools
+              Tools
             </h2>
             <p className="text-xs text-stone-500 mt-1">
               Choose a tool to explore the archive and dissertation

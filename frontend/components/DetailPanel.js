@@ -172,7 +172,7 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
         ${!displayNode.summary && !displayNode.pullQuote && !displayNode.keyConcepts?.length && !displayNode.keyFigures?.length && html`
           <div className="text-center py-8 text-stone-400">
             <${FileText} className="w-8 h-8 mx-auto mb-2 opacity-30" />
-            <p className="text-sm">Detailed content coming soon</p>
+            <p className="text-sm">No additional detail for this item</p>
           </div>
         `}
       </div>

@@ -51,7 +51,7 @@ const FeaturedSection = () => {
             onClick=${() => setIsExpanded(!isExpanded)}
             className="flex items-end gap-4 group text-left focus:outline-none"
         >
-          <h2 className="text-2xl font-display font-bold text-stone-900">Featured Works</h2>
+          <h2 className="text-2xl font-display font-bold text-stone-900">Read</h2>
           <span className="text-sm text-stone-500 pb-1 mb-0.5 font-body hidden sm:inline group-hover:text-stone-800 transition-colors">Curated highlights</span>
           <div className="pb-1.5 text-stone-400 group-hover:text-stone-800 transition-colors">
             ${isExpanded ? html`<${ChevronUp} className="w-5 h-5" />` : html`<${ChevronDown} className="w-5 h-5" />`}
@@ -101,7 +101,7 @@ const FeaturedSection = () => {
                 </h3>
 
                 <div className="mt-auto pt-2 flex items-center justify-between text-xs font-bold uppercase tracking-widest text-stone-400 group-hover:text-stone-900 transition-colors">
-                    <span>Explore</span>
+                    <span>Read</span>
                     <${ArrowRight} className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
                 </div>
                 </div>
