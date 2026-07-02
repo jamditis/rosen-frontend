@@ -58,6 +58,18 @@ const RECORD_LABELS = 'record-suggestion,user-report';
 
 const trimField = (v) => (typeof v === 'string' ? v.trim() : '');
 
+// Insert a zero-width space after each @ so a reader's typed text cannot ping a
+// GitHub user or team once they submit the prefilled issue. Mirrors the server's
+// neutralizeMentions_ (Code.gs), and built with fromCharCode so no invisible
+// byte sits in source. Applied only to free-form prose: structured fields (url,
+// email, page) stay raw so GitHub autolinks them and a handle URL like
+// medium.com/@user is not corrupted.
+const ZWSP = String.fromCharCode(0x200B);
+const bluntMentions = (v) => trimField(v).replace(/@/g, '@' + ZWSP);
+// First line only, so a multiline title cannot inject a heading, quote, or fake
+// field into the issue body once it renders on GitHub.
+const firstLine = (v) => trimField(v).split('\n')[0];
+
 /**
  * Build a prefilled new-issue URL for a report the branded modal could not send
  * to the backend (pre-deploy state, or an endpoint outage). Intent-aware and
@@ -79,11 +91,11 @@ export const buildReportFallbackUrl = ({ intent = 'problem', fields = {}, contex
 
   if (intent === 'record') {
     const url = trimField(fields.url);
-    const title = trimField(fields.title);
-    const why = trimField(fields.why);
+    const title = firstLine(fields.title);
+    const why = bluntMentions(fields.why);
     const email = trimField(fields.email);
     const body = ['Suggested by a reader via the in-archive form.', '', `Link: ${url}`];
-    if (title) body.push(`Suggested title: ${title}`);
+    if (title) body.push(`Suggested title: ${bluntMentions(title)}`);
     if (why) body.push('', 'Why it belongs:', why);
     if (email) body.push('', `Contact: ${email}`);
     body.push('', `Page: ${page}`, `Archive version: ${version}`);
@@ -98,9 +110,11 @@ export const buildReportFallbackUrl = ({ intent = 'problem', fields = {}, contex
   const params = new URLSearchParams({
     template: TEMPLATE,
     labels: LABELS,
-    'what-happened': trimField(fields.whatHappened),
-    expected: trimField(fields.expected),
-    steps: trimField(fields.steps),
+    'what-happened': bluntMentions(fields.whatHappened),
+    expected: bluntMentions(fields.expected),
+    steps: bluntMentions(fields.steps),
+    // Structured, so kept raw (GitHub does not mention an email's domain).
+    contact: trimField(fields.email),
     'page-context': page,
     'archive-version': version,
     browser,

@@ -41,6 +41,43 @@ describe('branded report form wiring', () => {
     assert.match(modalSrc, /openReportFallback\(\{ intent, fields, context: captureContext\(\) \}\)/);
   });
 
+  it('routes a backend fallback to a user-clicked screen, not an auto popup', () => {
+    // window.open() after the submit await is popup-blocked once the click
+    // gesture is gone (a honeypot false-positive routes here after a round-trip),
+    // which would lose the report. The fallback result must set a phase whose
+    // button opens GitHub from a fresh user gesture instead of auto-opening.
+    assert.match(modalSrc, /setPhase\('fallback'\)/);
+    assert.match(modalSrc, /phase === 'fallback'/);
+  });
+
+  it('disables the GitHub fallback button while a submit is in flight', () => {
+    // Otherwise a reader can click Send, then the "Prefer GitHub?" link before the
+    // POST settles, filing the report twice: once server-side, once via the GitHub
+    // form. Both the submit and the fallback button must gate on `submitting`.
+    const guarded = modalSrc.match(/disabled=\$\{submitting\}/g) || [];
+    assert.ok(guarded.length >= 2, `expected submit + fallback to gate on submitting, found ${guarded.length}`);
+  });
+
+  it('locks every dismissal path while a submit is in flight', () => {
+    // The in-flight submit is the single source of truth. If Escape, the backdrop,
+    // or the close button could dismiss mid-request, a reader could close, reopen to
+    // a fresh form, and file the same report twice while the first POST completes.
+    // One guard (requestClose) that no-ops during 'submitting' covers all three.
+    assert.match(modalSrc, /const requestClose = useCallback\(\(\) => \{\s*if \(phase === 'submitting'\) return;/);
+    assert.match(modalSrc, /Escape' && isOpen\) requestClose\(\)/);
+    assert.match(modalSrc, /e\.currentTarget\) requestClose\(\)/);
+    assert.match(modalSrc, /ref=\$\{closeButtonRef\}\s*onClick=\$\{requestClose\}\s*disabled=\$\{submitting\}/);
+  });
+
+  it('generates one idempotency key per report and sends it for dedupe', () => {
+    // A stable per-report key lets the server dedupe a retried submit into a
+    // single issue. It is regenerated on open (reset effect), reused across
+    // retries within that open, and sent in the payload.
+    assert.match(modalSrc, /import \{[^}]*newReportKey[^}]*\} from '\.\.\/utils\/reportSubmit\.js\?v=/);
+    assert.match(modalSrc, /setReportKey\(newReportKey\(\)\)/);
+    assert.match(modalSrc, /idempotencyKey: reportKey/);
+  });
+
   it('keeps a hidden, non-tabbable honeypot in the modal', () => {
     assert.match(modalSrc, /left-\[-9999px\]/);
     assert.match(modalSrc, /tabindex="-1"/);
@@ -57,7 +94,11 @@ describe('branded report form wiring', () => {
   });
 
   it('routes submissions through the shared submit client', () => {
-    assert.match(modalSrc, /import \{ buildReportPayload, validateReport, submitReport \} from '\.\.\/utils\/reportSubmit\.js\?v=/);
+    const submitImport = modalSrc.match(/import \{([^}]*)\} from '\.\.\/utils\/reportSubmit\.js\?v=/);
+    assert.ok(submitImport, 'imports from reportSubmit.js');
+    for (const name of ['buildReportPayload', 'validateReport', 'submitReport']) {
+      assert.match(submitImport[1], new RegExp(`\\b${name}\\b`));
+    }
     assert.match(modalSrc, /submitReport\(/);
   });
 

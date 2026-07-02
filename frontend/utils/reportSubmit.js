@@ -32,12 +32,27 @@ export const LIMITS = {
 const trim = (v) => (typeof v === 'string' ? v.trim() : '');
 
 /**
+ * A per-report idempotency key: unique per report, stable across the reader's
+ * retries of it (the modal regenerates it only when it reopens). The server
+ * dedupes on this key, so a retry after a slow-but-successful submit that the
+ * browser aborted does not file a second issue. crypto.randomUUID is available
+ * in every browser the archive targets (secure context, and localhost counts);
+ * the fallback keeps tests and any non-secure context working.
+ * @returns {string}
+ */
+export const newReportKey = () =>
+  (typeof crypto !== 'undefined' && crypto.randomUUID)
+    ? crypto.randomUUID()
+    : 'r-' + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+
+/**
  * Build the JSON payload sent to the endpoint. `context` carries the
  * auto-captured page/version/browser so the reporter never types them.
  * `honeypot` is the hidden anti-spam field: real users leave it empty.
+ * `idempotencyKey` lets the server dedupe a retried report; see newReportKey.
  * @returns {Object} the wire payload
  */
-export const buildReportPayload = ({ intent, fields = {}, context = {}, honeypot = '' } = {}) => ({
+export const buildReportPayload = ({ intent, fields = {}, context = {}, honeypot = '', idempotencyKey = '' } = {}) => ({
   kind: REPORT_KIND,
   intent: intent === 'record' ? 'record' : 'problem',
   whatHappened: trim(fields.whatHappened),
@@ -52,6 +67,7 @@ export const buildReportPayload = ({ intent, fields = {}, context = {}, honeypot
   page: trim(context.page),
   version: trim(context.version),
   browser: trim(context.browser),
+  idempotencyKey: trim(idempotencyKey),
 });
 
 /**
@@ -88,8 +104,9 @@ export const validateReport = (payload) => {
  * POST a report to the endpoint. Returns a plain result the modal renders:
  *   { ok: true, issueUrl }         filed; link to the created issue
  *   { ok: true, issueUrl: '' }     accepted, but the URL was not readable
- *   { ok: false, fallback: true }  no endpoint configured; caller should fall
- *                                  back to the GitHub deep link
+ *   { ok: false, fallback: true }  no endpoint configured, or the submission was
+ *                                  honeypot-dropped; caller should fall back to
+ *                                  the GitHub deep link so nothing is lost
  *   { ok: false, error }           validation/network/server failure
  *
  * A missing/blank `endpoint` is not an error: it is the pre-deploy state, where
@@ -137,6 +154,14 @@ export const submitReport = async ({ endpoint, payload, fetchImpl, timeoutMs = 1
     }
     if (body.ok === false) {
       return { ok: false, error: body.error || 'Your report could not be filed.' };
+    }
+    // The server drops a honeypot hit as ok:true (no dropped issue is filed) so a
+    // bot gets no retry signal. A real user whose autofill populated the hidden
+    // field would otherwise see a false success with nothing filed, so route them
+    // to the GitHub fallback where their report survives. Bots POST without this
+    // client and stay silently dropped server-side, so the anti-spam value holds.
+    if (body.dropped) {
+      return { ok: false, fallback: true };
     }
     return { ok: true, issueUrl: body.issueUrl || '' };
   } catch (err) {

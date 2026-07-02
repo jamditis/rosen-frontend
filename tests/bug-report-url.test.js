@@ -48,9 +48,20 @@ test('prefill keys match the bug_report.yml field ids (guards against drift)', (
     new URL('../.github/ISSUE_TEMPLATE/bug_report.yml', import.meta.url),
     'utf8',
   );
-  for (const id of ['page-context', 'archive-version', 'browser']) {
+  for (const id of ['page-context', 'archive-version', 'browser', 'contact']) {
     assert.ok(yml.includes(`id: ${id}`), `bug_report.yml is missing field id: ${id}`);
   }
+});
+
+test('problem fallback carries the contact email so follow-up is not lost', () => {
+  // The reader can leave an email for follow-up. The record fallback keeps it as
+  // a Contact line; the problem fallback must not silently drop it on the exact
+  // outage path the fallback exists to preserve.
+  const u = new URL(buildReportFallbackUrl({
+    intent: 'problem',
+    fields: { whatHappened: 'blank', email: 'me@x.io' },
+  }));
+  assert.equal(u.searchParams.get('contact'), 'me@x.io');
 });
 
 // The modal falls back to a prefilled GitHub link when the backend is
@@ -93,6 +104,31 @@ test('record fallback opens a record issue, not the bug form, and keeps url/titl
 test('record fallback titles on the url when no title was entered', () => {
   const u = new URL(buildReportFallbackUrl({ intent: 'record', fields: { url: 'https://x.io/a' } }));
   assert.match(u.searchParams.get('title'), /^\[record\] https:\/\/x\.io\/a/);
+});
+
+test('record fallback blunts @-mentions and a multiline title cannot break the body', () => {
+  // The reader submits this prefilled issue themselves on GitHub, so raw text
+  // would ping a team or inject markdown once submitted. The fallback must match
+  // the hardened server body: blunt mentions in prose, keep the title single-line.
+  const u = new URL(buildReportFallbackUrl({
+    intent: 'record',
+    fields: { url: 'https://x.io', title: 'Real\n## Injected heading', why: 'ask @rosen-team about it' },
+  }));
+  const body = u.searchParams.get('body');
+  const zwsp = String.fromCharCode(0x200B);
+  assert.ok(!/@rosen-team/.test(body), 'raw @mention must not survive in the why text');
+  assert.ok(body.includes('@' + zwsp + 'rosen-team'), 'zero-width space inserted after @');
+  assert.ok(!body.split('\n').some((l) => l.startsWith('## Injected heading')), 'multiline title cannot inject a heading');
+  assert.ok(!u.searchParams.get('title').includes('\n'), 'issue title stays single-line');
+});
+
+test('problem fallback blunts @-mentions in the typed fields', () => {
+  const u = new URL(buildReportFallbackUrl({
+    intent: 'problem',
+    fields: { whatHappened: 'blank, cc @maintainer' },
+  }));
+  const zwsp = String.fromCharCode(0x200B);
+  assert.ok(u.searchParams.get('what-happened').includes('@' + zwsp + 'maintainer'), 'what-happened @mention blunted');
 });
 
 test('fallback defaults to the problem form and never emits "undefined"', () => {

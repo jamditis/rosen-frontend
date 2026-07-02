@@ -9,6 +9,7 @@ import {
   buildReportPayload,
   validateReport,
   submitReport,
+  newReportKey,
   REPORT_KIND,
   LIMITS,
 } from '../frontend/utils/reportSubmit.js';
@@ -33,6 +34,21 @@ test('buildReportPayload keeps a record intent', () => {
   const p = buildReportPayload({ intent: 'record', fields: { url: 'https://x' } });
   assert.strictEqual(p.intent, 'record');
   assert.strictEqual(p.url, 'https://x');
+});
+
+test('buildReportPayload carries the idempotency key (trimmed)', () => {
+  const p = buildReportPayload({ intent: 'problem', fields: { whatHappened: 'x' }, idempotencyKey: '  key-123  ' });
+  assert.strictEqual(p.idempotencyKey, 'key-123');
+});
+
+test('newReportKey returns a non-empty string that differs per call', () => {
+  // Stable within one report (reused across retries so the server dedupes) but
+  // unique per report, so two fresh keys must differ.
+  const a = newReportKey();
+  const b = newReportKey();
+  assert.strictEqual(typeof a, 'string');
+  assert.ok(a.length >= 8);
+  assert.notStrictEqual(a, b);
 });
 
 test('validateReport requires a problem description', () => {
@@ -88,6 +104,17 @@ test('submitReport surfaces a server ok:false as an error', async () => {
   const fetchImpl = async () => ({ ok: true, text: async () => JSON.stringify({ ok: false, error: 'nope' }) });
   const r = await submitReport({ endpoint: 'https://exec', payload: {}, fetchImpl });
   assert.deepStrictEqual(r, { ok: false, error: 'nope' });
+});
+
+test('submitReport routes a honeypot drop to the fallback, not a false success', async () => {
+  // The server drops a honeypot hit as { ok: true, dropped: true } so a bot gets
+  // no retry signal. A real user whose autofill tripped the hidden field must
+  // not see a false success with nothing filed: route them to the GitHub
+  // fallback, where their report is preserved. Bots POST without this client and
+  // stay silently dropped server-side.
+  const fetchImpl = async () => ({ ok: true, text: async () => JSON.stringify({ ok: true, dropped: true }) });
+  const r = await submitReport({ endpoint: 'https://exec', payload: {}, fetchImpl });
+  assert.deepStrictEqual(r, { ok: false, fallback: true });
 });
 
 test('submitReport treats a non-2xx as an error', async () => {

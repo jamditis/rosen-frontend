@@ -16,11 +16,11 @@
 // decorative italics, one primary action.
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { html } from '../html.js?v=3.4.9';
+import { html } from '../html.js?v=3.5.0';
 import { X, Bug, Lightbulb, Send, CheckCircle2, AlertCircle, ExternalLink } from 'lucide-react';
-import { ARCHIVE_VERSION, openReportFallback } from '../utils/bugReport.js?v=3.4.9';
-import { createSubmitGate } from '../utils/submitGate.js?v=3.4.9';
-import { buildReportPayload, validateReport, submitReport } from '../utils/reportSubmit.js?v=3.4.9';
+import { ARCHIVE_VERSION, openReportFallback } from '../utils/bugReport.js?v=3.5.0';
+import { createSubmitGate } from '../utils/submitGate.js?v=3.5.0';
+import { buildReportPayload, validateReport, submitReport, newReportKey } from '../utils/reportSubmit.js?v=3.5.0';
 
 const EMPTY_FIELDS = {
   whatHappened: '',
@@ -44,9 +44,12 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
   const [intent, setIntent] = useState('problem');
   const [fields, setFields] = useState({ ...EMPTY_FIELDS });
   const [honeypot, setHoneypot] = useState('');
-  const [phase, setPhase] = useState('form'); // form | submitting | success | error
+  const [phase, setPhase] = useState('form'); // form | submitting | success | error | fallback
   const [issueUrl, setIssueUrl] = useState('');
   const [formError, setFormError] = useState('');
+  // One idempotency key per opened report, reused across retries so the server
+  // dedupes them; regenerated on each open (see the reset effect below).
+  const [reportKey, setReportKey] = useState('');
 
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
@@ -69,6 +72,9 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
       setPhase('form');
       setIssueUrl('');
       setFormError('');
+      // Fresh idempotency key per report: retries of this report reuse it (so
+      // the server dedupes), but a new report gets a new key.
+      setReportKey(newReportKey());
     }
   }, [isOpen]);
 
@@ -82,12 +88,23 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
     return () => clearTimeout(t);
   }, [isOpen, phase, intent]);
 
+  // A submit in flight is the single source of truth: block every dismissal path
+  // (Escape, backdrop click, the close button) until it settles. Otherwise a
+  // reader could close mid-request, reopen to a fresh form, and file the same
+  // report a second time while the first POST is still completing server-side.
+  // submitReport's own timeout guarantees this lock releases (the phase leaves
+  // 'submitting') within 15s, so the modal can never wedge shut.
+  const requestClose = useCallback(() => {
+    if (phase === 'submitting') return;
+    onClose();
+  }, [phase, onClose]);
+
   // ESC closes; lock body scroll while open.
   useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape' && isOpen) onClose(); };
+    const onKey = (e) => { if (e.key === 'Escape' && isOpen) requestClose(); };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [isOpen, onClose]);
+  }, [isOpen, requestClose]);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? 'hidden' : '';
@@ -99,7 +116,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
     if (formError) setFormError('');
   }, [formError]);
 
-  const handleBackdrop = (e) => { if (e.target === e.currentTarget) onClose(); };
+  const handleBackdrop = (e) => { if (e.target === e.currentTarget) requestClose(); };
 
   // Open the intent-aware GitHub fallback, carrying what the reader entered so
   // a record suggestion does not land on the bug form and lose its url/title/why.
@@ -111,7 +128,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
   const handleSubmit = useCallback(async (e) => {
     if (e && e.preventDefault) e.preventDefault();
 
-    const payload = buildReportPayload({ intent, fields, context: captureContext(), honeypot });
+    const payload = buildReportPayload({ intent, fields, context: captureContext(), honeypot, idempotencyKey: reportKey });
 
     const check = validateReport(payload);
     if (!check.valid) { setFormError(check.error); return; }
@@ -130,10 +147,12 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
       if (!gateRef.current.isCurrent(seq)) return;
 
       if (result.fallback) {
-        // No endpoint configured yet: hand off to the intent-aware GitHub deep
-        // link so the button still works before the web app is deployed.
-        openFallback();
-        onClose();
+        // Do not window.open() here: the await above may have outlived the click
+        // gesture (a honeypot false-positive routes here after a round-trip), so
+        // a popup would be blocked and the report lost. Show a screen whose button
+        // opens GitHub from a fresh user gesture. Fires pre-deploy (no endpoint
+        // set) and on a honeypot false-positive.
+        setPhase('fallback');
         return;
       }
       if (result.ok) {
@@ -146,7 +165,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
     } finally {
       gateRef.current.end(seq);
     }
-  }, [intent, fields, honeypot, endpoint, openFallback, onClose]);
+  }, [intent, fields, honeypot, endpoint, reportKey, openFallback, onClose]);
 
   if (!isOpen) return null;
 
@@ -223,6 +242,39 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
               className="px-4 py-2 bg-stone-900 text-white rounded-sm text-sm font-bold hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
             >
               Done
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    if (phase === 'fallback') {
+      // Reached when the archive backend could not file the report (pre-deploy,
+      // or a honeypot false-positive). The reader's data is preserved in the
+      // prefilled GitHub link; the button opens it on a real click so the popup
+      // is not blocked.
+      return html`
+        <div className="px-6 py-10 text-center">
+          <${ExternalLink} className="w-10 h-10 text-stone-700 mx-auto mb-4" />
+          <h3 className="font-display text-xl text-stone-900 mb-2">Finish on GitHub</h3>
+          <p className="text-sm text-stone-600 max-w-sm mx-auto mb-6">
+            We could not send this from here, so we filled in a GitHub issue with
+            what you entered. Open it to post your ${isProblem ? 'report' : 'suggestion'}.
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick=${() => { openFallback(); onClose(); }}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-stone-900 text-white rounded-sm text-sm font-bold hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+            >
+              Open the issue form <${ExternalLink} className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick=${onClose}
+              className="text-sm font-bold text-stone-600 hover:text-stone-900 underline"
+            >
+              Cancel
             </button>
           </div>
         </div>
@@ -306,7 +358,8 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
           <button
             type="button"
             onClick=${() => { openFallback(); onClose(); }}
-            className="text-xs text-stone-500 hover:text-stone-800 underline"
+            disabled=${submitting}
+            className="text-xs text-stone-500 hover:text-stone-800 underline disabled:opacity-60 disabled:cursor-not-allowed disabled:no-underline"
           >
             Prefer GitHub? Open the issue form
           </button>
@@ -341,8 +394,9 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
           </div>
           <button
             ref=${closeButtonRef}
-            onClick=${onClose}
-            className="p-2 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500"
+            onClick=${requestClose}
+            disabled=${submitting}
+            className="p-2 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label="Close report form"
           >
             <${X} className="w-5 h-5" />
