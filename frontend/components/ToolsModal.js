@@ -6,16 +6,6 @@ import { resolveSitePath } from '../utils/pathResolver.js?v=3.4.9';
 
 // Tool definitions with categories
 const TOOLS = {
-  archive: [
-    {
-      id: 'wiki',
-      name: 'Key ideas',
-      description: 'Concept and entity pages',
-      icon: BookOpen,
-      action: 'wiki',
-      status: 'ready'
-    }
-  ],
   dissertation: [
     {
       id: 'mindmap',
@@ -177,21 +167,11 @@ const ToolsModal = ({ isOpen, onClose, onSelectTool }) => {
         <div className="p-6 space-y-8">
           <section>
             <h3 className="font-display text-sm font-bold text-stone-600 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <${BookMarked} className="w-4 h-4" />
-              Archive tools
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              ${TOOLS.archive.map((tool, i) => renderToolCard(tool, i, i === 0))}
-            </div>
-          </section>
-
-          <section>
-            <h3 className="font-display text-sm font-bold text-stone-600 uppercase tracking-wider mb-4 flex items-center gap-2">
               <${BookOpen} className="w-4 h-4" />
               Dissertation Tools
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              ${TOOLS.dissertation.map((tool, i) => renderToolCard(tool, i))}
+              ${TOOLS.dissertation.map((tool, i) => renderToolCard(tool, i, i === 0))}
             </div>
           </section>
 
