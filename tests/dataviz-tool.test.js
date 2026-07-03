@@ -122,8 +122,10 @@ describe('data dashboard reading path export escaping', () => {
   });
 
   it('wires the escaper into every untrusted markdown export field', () => {
-    for (const field of ['record.title', 'record.original_publication', 'record.id']) {
-      assert.match(script, new RegExp(`escapeMarkdownField\\(${field.replace('.', '\\.')}\\)`));
+    // Literal substring checks, not a regex built from the field name: the latter
+    // needs its own escaping and CodeQL flags the incomplete form.
+    for (const expr of ['escapeMarkdownField(record.title)', 'escapeMarkdownField(record.original_publication)', 'escapeMarkdownField(record.id)']) {
+      assert.ok(script.includes(expr), `expected ${expr} in the export`);
     }
   });
 
@@ -134,8 +136,8 @@ describe('data dashboard reading path export escaping', () => {
     // the filters are emitted as individually escaped, human-readable lines.
     assert.doesNotMatch(script, /escapeMarkdownField\(JSON\.stringify\(filters\)\)/);
     assert.doesNotMatch(script, /filters: \$\{JSON\.stringify\(filters\)\}/);
-    for (const field of ['filters.q', 'filters.categories.join', 'filters.publications.join']) {
-      assert.match(script, new RegExp(`escapeMarkdownField\\(${field.replace(/\./g, '\\.')}`));
+    for (const expr of ['escapeMarkdownField(filters.q', 'escapeMarkdownField(filters.categories.join', 'escapeMarkdownField(filters.publications.join']) {
+      assert.ok(script.includes(expr), `expected ${expr} in the export`);
     }
   });
 });
