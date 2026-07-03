@@ -26,7 +26,7 @@ export const DATA_CONFIG = {
 // degrades to the existing GitHub new-issue deep link, so nothing breaks before
 // launch. Set this to the /exec URL to turn the branded submit on.
 export const REPORT_CONFIG = {
-    endpoint: ''
+    endpoint: 'https://script.google.com/macros/s/AKfycbylsBFcpmqT6WE6Hl_KNOQG61x83nYjBmDgtDwBbiyqdmN60_TFKJhabm9BhgwD1RgwdA/exec'
 };
 
 export const ITEMS_PER_PAGE = 24;
