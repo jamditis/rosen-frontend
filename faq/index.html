@@ -3,15 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FAQ | The Impossible Press | Jay Rosen</title>
-    <link rel="icon" href="../../favicon.ico" />
-    <meta name="description" content="Frequently asked questions about Jay Rosen's 1986 dissertation, with AI-powered exploration options." />
+    <title>Frequently asked questions | Jay Rosen's Internet Archive</title>
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="icon" href="../favicon.ico" />
+    <meta name="description" content="Frequently asked questions about Jay Rosen's Internet Archive and his 1986 dissertation, The Impossible Press: what the collection holds, how to explore four decades of press criticism, and where to start." />
 
     <!-- Open Graph -->
-    <meta property="og:title" content="FAQ | The Impossible Press | Jay Rosen" />
-    <meta property="og:description" content="Frequently asked questions about Jay Rosen's 1986 dissertation, with AI-powered exploration options." />
+    <meta property="og:title" content="Frequently asked questions | Jay Rosen's Internet Archive" />
+    <meta property="og:description" content="What the archive holds, how to explore four decades of press criticism, and where to start, plus questions about the 1986 dissertation." />
     <meta property="og:type" content="article" />
-    <meta property="og:image" content="https://pressthink.org/j/rosen-archive/rosen-dissertation-feat.png" />
+    <meta property="og:url" content="https://pressthink.org/j/rosen-archive/faq/" />
+    <meta property="og:image" content="https://pressthink.org/j/rosen-archive/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Frequently asked questions | Jay Rosen's Internet Archive" />
+    <meta name="twitter:description" content="What the archive holds, how to explore four decades of press criticism, and where to start, plus questions about the 1986 dissertation." />
+    <meta name="twitter:image" content="https://pressthink.org/j/rosen-archive/og-image.png" />
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,9 +29,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS (pre-built for production) -->
-    <link rel="stylesheet" href="../../frontend/dist/tailwind.css" />
+    <link rel="stylesheet" href="../frontend/dist/tailwind.css" />
 
-    <link rel="stylesheet" href="../../shared-styles.css" />
+    <link rel="stylesheet" href="../shared-styles.css" />
     <style>
       .faq-item {
         cursor: pointer;
@@ -59,7 +69,7 @@
       <div class="max-w-4xl mx-auto px-4 py-3">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2">
-            <a href="../" class="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-md transition-colors" aria-label="Back to dissertation">
+            <a href="../" class="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-md transition-colors" aria-label="Back to the archive home">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
               </svg>
@@ -77,9 +87,9 @@
             </a>
           </div>
           <nav class="flex items-center gap-3">
-            <a href="../reader/"
+            <a href="../dissertation/reader/"
                class="text-xs bg-stone-800 text-white px-3 py-1.5 rounded hover:bg-stone-700 transition-colors">
-              Read Dissertation
+              Read the dissertation
             </a>
           </nav>
         </div>
@@ -93,7 +103,7 @@
           What would you like to know?
         </h2>
         <p class="text-stone-600 leading-relaxed mb-8">
-          Search through common questions about "The Impossible Press" or browse by category.
+          Search common questions about the archive and Jay Rosen's 1986 dissertation, or browse by category.
         </p>
 
         <!-- Search Box -->
@@ -117,6 +127,7 @@
         <!-- Category Pills -->
         <div class="flex flex-wrap gap-2 justify-center mt-6">
           <button class="pill active" data-category="all">All questions</button>
+          <button class="pill" data-category="archive">The archive</button>
           <button class="pill" data-category="basics">The basics</button>
           <button class="pill" data-category="concepts">Key concepts</button>
           <button class="pill" data-category="arguments">Core arguments</button>
@@ -134,12 +145,15 @@
           <div class="flex-1">
             <h3 class="font-medium text-stone-850 mb-1">Want deeper exploration?</h3>
             <p class="text-sm text-stone-600">
-              Use NotebookLM for AI-powered research and interactive discussion about the dissertation.
+              Use NotebookLM to research and ask questions about the archive or the dissertation.
             </p>
           </div>
-          <div class="flex gap-3">
-            <a href="https://notebooklm.google.com/notebook/d26d326e-20ec-46dc-b9b4-2c752b90e607" id="notebook-link" target="_blank" class="text-xs bg-stone-800 text-white px-4 py-2 rounded hover:bg-stone-700 transition-colors">
-              Open NotebookLM
+          <div class="flex flex-wrap gap-3">
+            <a href="#" id="notebook-link-archive" target="_blank" rel="noopener" class="text-xs bg-stone-800 text-white px-4 py-2 rounded hover:bg-stone-700 transition-colors">
+              Archive notebook
+            </a>
+            <a href="#" id="notebook-link" target="_blank" rel="noopener" class="text-xs border border-stone-300 text-stone-700 px-4 py-2 rounded hover:bg-stone-100 transition-colors">
+              Dissertation notebook
             </a>
           </div>
         </div>
@@ -179,10 +193,10 @@
     <footer class="py-12 px-4 bg-stone-100 border-t border-stone-200">
       <div class="max-w-4xl mx-auto text-center">
         <p class="text-sm text-stone-600 mb-4">
-          From <span class="font-display">The Impossible Press</span> by Jay Rosen
+          Part of <span class="font-display">Jay Rosen's Internet Archive</span>
         </p>
         <p class="text-xs text-stone-500">
-          Ph.D. Dissertation, New York University, 1986
+          Four decades of journalism criticism, media theory, and public life
         </p>
       </div>
     </footer>
@@ -191,10 +205,10 @@
 
     <!-- Text Selection Sharing Tool -->
     <script type="module">
-      import { TextSelectionTool } from '../../features/shared/text-selection.js';
+      import { TextSelectionTool } from '../features/shared/text-selection.js';
       const tool = new TextSelectionTool({
         contentSelector: 'main',
-        source: 'Jay Rosen, "The Impossible Press" (1986)',
+        source: "Jay Rosen's Internet Archive, FAQ",
         imageTheme: 'light'
       });
       tool.init();

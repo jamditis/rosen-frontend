@@ -2,9 +2,9 @@
 // Pre-generated responses for common questions about the work
 
 export const FAQ_METADATA = {
-  title: 'Ask The Impossible Press',
-  subtitle: 'Frequently Asked Questions',
-  introduction: 'Explore answers to common questions about Jay Rosen\'s 1986 work. These responses are grounded in the text and connect its arguments to contemporary media.',
+  title: 'Frequently asked questions',
+  subtitle: "Jay Rosen's Internet Archive",
+  introduction: 'Answers to common questions about the archive and Jay Rosen\'s 1986 dissertation: what the collection holds, how to explore it, and where to start. Responses are grounded in the archive and the dissertation text.',
   notebookLM: {
     dissertation: 'https://notebooklm.google.com/notebook/d26d326e-20ec-46dc-b9b4-2c752b90e607',
     archive: 'https://notebooklm.google.com/notebook/8d7e0d5f-63cd-4638-9f80-a668a070eed9',
@@ -13,15 +13,90 @@ export const FAQ_METADATA = {
 };
 
 export const FAQ_CATEGORIES = [
-  { id: 'basics', name: 'The Basics', icon: 'book' },
-  { id: 'concepts', name: 'Key Concepts', icon: 'lightbulb' },
-  { id: 'arguments', name: 'Core Arguments', icon: 'message-square' },
-  { id: 'figures', name: 'Key Thinkers', icon: 'users' },
-  { id: 'contemporary', name: 'Today\'s Relevance', icon: 'calendar' },
-  { id: 'later-work', name: 'Later Developments', icon: 'arrow-right' }
+  { id: 'archive', name: 'The archive', icon: 'archive' },
+  { id: 'basics', name: 'The basics', icon: 'book' },
+  { id: 'concepts', name: 'Key concepts', icon: 'lightbulb' },
+  { id: 'arguments', name: 'Core arguments', icon: 'message-square' },
+  { id: 'figures', name: 'Key thinkers', icon: 'users' },
+  { id: 'contemporary', name: 'Today\'s relevance', icon: 'calendar' },
+  { id: 'later-work', name: 'Later developments', icon: 'arrow-right' }
 ];
 
 export const FAQ_ITEMS = [
+  // === THE ARCHIVE ===
+  {
+    id: 'what-is-archive',
+    category: 'archive',
+    question: "What is Jay Rosen's Internet Archive?",
+    answer: `Jay Rosen's Internet Archive is a public, searchable collection of four decades of his work on the press. It gathers more than 26,000 records in one place: about 950 in-depth works (essays, newspaper clippings, and his 1986 doctoral dissertation) alongside more than 25,000 of his posts from Twitter/X, Bluesky, and Mastodon.
+
+The earliest item dates to 1986 and the most recent to 2026. The archive is curated by Joe Amditis.`
+  },
+  {
+    id: 'whats-in-archive',
+    category: 'archive',
+    question: 'What kinds of things are in it?',
+    answer: `Nearly every format Rosen published in as the media changed around him. It opens with his 1986 dissertation, then his blog PressThink (more than 400 posts, launched in 2003), his NYU teaching blog on Tumblr, and columns for outlets like HuffPost. From about 2019 on, it holds more than 25,000 short posts from Twitter/X, Bluesky, and Mastodon.
+
+Alongside the writing is a set of newspaper clippings that capture press debates he took part in, including the public journalism movement of the 1990s.`
+  },
+  {
+    id: 'archive-themes',
+    category: 'archive',
+    question: 'What are the big themes running through it?',
+    answer: `One argument runs across the whole collection: journalism is a transaction with the public, not just the act of informing it. Over the decades that idea takes on different names, each with its own moment.
+
+Public journalism in the 1990s. "The people formerly known as the audience" in 2006, once readers could publish back. "The view from nowhere," his critique of the pretense of neutrality. "The citizens agenda," a way to cover elections around what voters need instead of the horse race.
+
+Read in sequence, the archive follows one question asked for forty years: who does the press serve?`
+  },
+  {
+    id: 'archive-highlights',
+    category: 'archive',
+    question: 'Where should I start? Any hidden gems?',
+    answer: `A few pieces reward a first visit.
+
+<strong>The Impossible Press (1986).</strong> His NYU doctoral dissertation, and the root of everything after it. Its argument: professional journalism made an impossible promise, to solve "the whole problem of public life" simply by controlling how journalists behave.
+
+<strong>The People Formerly Known as the Audience (2006).</strong> The essay that named the shift to a two-way press. Its sharpest line: "Once the users take control, they never give it back."
+
+<strong>Audience Atomization Overcome (2009).</strong> How the press quietly defines which opinions count as serious, and what that leaves out.
+
+<strong>The View from Nowhere: Questions and Answers (2010).</strong> His case against neutrality performed as a professional pose.
+
+<strong>The clippings.</strong> Beyond the essays, the archive preserves newspaper clippings from the 1990s public journalism movement, when Rosen was one of its leading advocates. They catch the debate as it played out in print, not just online.`
+  },
+  {
+    id: 'how-to-explore-archive',
+    category: 'archive',
+    question: 'How do I search or browse the archive?',
+    answer: `Start from the archive home page and use whichever way fits.
+
+<strong>Search</strong> by keyword across titles, summaries, and categories.
+
+<strong>Filter</strong> by thematic category, such as press and media criticism, politics and democracy, or technology and digital media.
+
+<strong>Timeline</strong> jumps to a decade or a single year.
+
+<strong>Folders</strong> group records by category, and the <strong>entity explorer</strong> and <strong>mind map</strong> let you move through the people, institutions, and ideas Rosen writes about.`
+  },
+  {
+    id: 'suggest-or-report',
+    category: 'archive',
+    question: 'Can I suggest a record or report a problem?',
+    answer: `Yes. Use the "Report a bug" button in the archive's top navigation. It opens a short form to report a problem or suggest a work that belongs in the collection.
+
+You do not need a GitHub account; the archive files the report for you. Reports are posted publicly, so please leave out anything private.`
+  },
+  {
+    id: 'who-made-archive',
+    category: 'archive',
+    question: 'Who made this, and why?',
+    answer: `The archive is curated by Joe Amditis. Rosen's work is spread across a long-running blog, platforms that have since closed, newspaper morgues, and years of social posts.
+
+Gathering it in one searchable place keeps four decades of press criticism readable and citable, rather than scattered or lost as platforms shut down.`
+  },
+
   // === THE BASICS ===
   {
     id: 'what-is-dissertation',
@@ -843,6 +918,15 @@ Substack is a partial solution at best — valuable for some, but not a systemic
 
 // Search-friendly keywords for each FAQ
 export const FAQ_KEYWORDS = {
+  // The archive
+  'what-is-archive': ['archive', 'what is', 'collection', 'about the archive', 'records', 'internet archive'],
+  'whats-in-archive': ['contents', 'what is in', 'formats', 'pressthink', 'tumblr', 'twitter', 'bluesky', 'mastodon', 'social', 'interviews', 'clippings'],
+  'archive-themes': ['themes', 'throughline', 'big ideas', 'view from nowhere', 'citizens agenda', 'public journalism', 'audience', 'transaction'],
+  'archive-highlights': ['highlights', 'where to start', 'best', 'gems', 'hidden gems', 'recommended', 'start here', 'network', 'atomization'],
+  'how-to-explore-archive': ['search', 'browse', 'filter', 'timeline', 'folders', 'explorer', 'mind map', 'how to use', 'find'],
+  'suggest-or-report': ['suggest', 'report', 'bug', 'problem', 'contribute', 'add record', 'feedback'],
+  'who-made-archive': ['who made', 'curator', 'joe amditis', 'why', 'purpose'],
+
   // Basics
   'what-is-dissertation': ['about', 'summary', 'overview', 'what is', 'explain'],
   'why-impossible': ['impossible', 'why', 'meaning', 'title'],

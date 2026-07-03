@@ -144,4 +144,19 @@ describe('branded report form wiring', () => {
   it('exposes a configurable, default-empty report endpoint', () => {
     assert.match(constSrc, /export const REPORT_CONFIG = \{[\s\S]*endpoint:\s*''/);
   });
+
+  it('scrolls the body inside a fixed frame, not the whole card', () => {
+    // The card is a flex column that clips its rounded corners (overflow-hidden);
+    // the header is a non-shrinking child and the body is the only scroll region.
+    // If the whole card scrolled again (overflow-y-auto on the outer div), a long
+    // form would drag the header out of view and the scrollbar would run the
+    // rounded corners. The scroll region needs min-height:0 so a flex child can
+    // shrink below its content and overflow-y-auto engages. This site is
+    // zero-build (pre-built Tailwind) and has no min-h-0 class, so minHeight is
+    // set inline; asserting the inline style guards against a revert to the
+    // inert class that silently breaks scrolling.
+    assert.match(modalSrc, /max-h-\[90vh\] flex flex-col overflow-hidden/);
+    assert.match(modalSrc, /flex-shrink-0[^"]*px-6 py-4/);
+    assert.match(modalSrc, /className="flex-1 overflow-y-auto" style=\$\{\{ minHeight: 0 \}\}>\s*\$\{body\(\)\}/);
+  });
 });

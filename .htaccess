@@ -1,4 +1,14 @@
 # Jay Rosen's Internet Archive - Apache Configuration
+
+# Redirect the FAQ to its new top-level location (moved from /dissertation/faq/ in #567).
+# The FAQ now covers the whole archive, not just the dissertation, so it no longer
+# belongs under dissertation/. The (.*/)? prefix matches whichever mount this file
+# sees (the public /j/rosen-archive/ path or the /wp-content/ disk path), and a 301
+# lets browsers reattach the original #hash so existing permalinks keep working.
+<IfModule mod_alias.c>
+    RedirectMatch 301 ^(.*/)?dissertation/faq/?(index\.html)?$ https://pressthink.org/j/rosen-archive/faq/
+</IfModule>
+
 # Enable gzip compression for faster data transfer
 
 <IfModule mod_deflate.c>

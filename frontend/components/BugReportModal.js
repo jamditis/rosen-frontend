@@ -16,11 +16,11 @@
 // decorative italics, one primary action.
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { html } from '../html.js?v=3.5.0';
+import { html } from '../html.js?v=3.6.0';
 import { X, Bug, Lightbulb, Send, CheckCircle2, AlertCircle, ExternalLink } from 'lucide-react';
-import { ARCHIVE_VERSION, openReportFallback } from '../utils/bugReport.js?v=3.5.0';
-import { createSubmitGate } from '../utils/submitGate.js?v=3.5.0';
-import { buildReportPayload, validateReport, submitReport, newReportKey } from '../utils/reportSubmit.js?v=3.5.0';
+import { ARCHIVE_VERSION, openReportFallback } from '../utils/bugReport.js?v=3.6.0';
+import { createSubmitGate } from '../utils/submitGate.js?v=3.6.0';
+import { buildReportPayload, validateReport, submitReport, newReportKey } from '../utils/reportSubmit.js?v=3.6.0';
 
 const EMPTY_FIELDS = {
   whatHappened: '',
@@ -314,7 +314,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
 
     // phase === 'form' | 'submitting'
     return html`
-      <form onSubmit=${handleSubmit} className="px-6 py-5 space-y-4">
+      <form onSubmit=${handleSubmit} className="px-6 py-6 space-y-4">
         <div className="flex gap-2">
           ${intentTab('problem', Bug, 'Report a problem')}
           ${intentTab('record', Lightbulb, 'Suggest a record')}
@@ -389,10 +389,10 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
       aria-modal="true"
       aria-labelledby="bug-report-title"
     >
-      <div ref=${modalRef} className="bg-paper w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-lg shadow-2xl">
-        <div className="sticky top-0 bg-paper border-b border-stone-200 px-6 py-4 flex items-center justify-between z-10">
+      <div ref=${modalRef} className="bg-paper w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden rounded-lg shadow-2xl">
+        <div className="flex-shrink-0 bg-paper border-b border-stone-200 px-6 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <${Bug} className="w-5 h-5 text-stone-700" />
+            <${Bug} className="w-5 h-5 text-stone-700 flex-shrink-0" />
             <h2 id="bug-report-title" className="font-display text-xl text-stone-800">
               Report a problem or suggest a record
             </h2>
@@ -401,13 +401,19 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
             ref=${closeButtonRef}
             onClick=${requestClose}
             disabled=${submitting}
-            className="p-2 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex-shrink-0 p-2 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label="Close report form"
           >
             <${X} className="w-5 h-5" />
           </button>
         </div>
-        ${body()}
+        <!-- Inline minHeight:0 (not a Tailwind min-h-0 class): the pre-built,
+             zero-build stylesheet has no min-h-0 rule, and a flex child defaults
+             to min-height:auto, which refuses to shrink below its content and
+             defeats overflow-y-auto. This is the body's own scroll region. -->
+        <div className="flex-1 overflow-y-auto" style=${{ minHeight: 0 }}>
+          ${body()}
+        </div>
       </div>
     </div>
   `;
