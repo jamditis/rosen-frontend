@@ -75,3 +75,14 @@ This was the initial version created when the data visualization components were
   * Included stat cards for "Total records," "Years covered," and "Unique publications."  
 * **Architecture:**  
   * Established the single-file, vanilla JavaScript architecture, pulling data from a public Google Sheet.
+## 2026-07-03
+
+- Added a visualization mode switcher with four additional views: decade heatmap, category comparison, publication mix, and data quality review.
+- Added JSON export and shareable filter links so filtered result sets can be collected, revisited, and used outside the dashboard.
+- Improved filtering speed by storing normalized searchable text per record and scheduling chart redraws with `requestAnimationFrame`.
+- Added a chart status region and notes panel so alternate views explain what they show and exports report what happened.
+
+## 2026-07-03 follow-up
+
+- Added a reading path generator that selects up to ten representative records from the active filters across decades.
+- Added markdown export for generated reading paths so teachers, researchers, and editors can turn filtered archive slices into a short syllabus or briefing list.
