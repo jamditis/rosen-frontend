@@ -422,6 +422,12 @@
 
                     state.uniqueCategories = [...new Set(state.allRecords.flatMap(r => r.thematic_categories))].sort();
                     state.topPublications = computeTopPublications(state.allRecords, TOP_PUBLICATION_COUNT);
+                    // The data-quality "No concepts" check is meaningful only when some
+                    // records actually carry concepts to find the gaps against. Tie the
+                    // flag to that observed outcome, not the entities fetch: a 200 with an
+                    // empty or partial body also yields no concepts and must suppress the
+                    // check the same as a failed load.
+                    state.hasConceptData = state.allRecords.some(r => r.key_concepts.length > 0);
 
                     loadingState.classList.add('hidden');
                     dashboardMain.classList.remove('hidden');
@@ -454,7 +460,16 @@
                     });
                     if (patched) {
                         state.allRecords.forEach(r => { r.searchText = [r.title, r.original_publication, r.summary, ...r.thematic_categories, ...r.key_concepts].join(' ').toLowerCase(); });
-                        if (searchInput.value.trim()) updateDashboard();
+                        if (searchInput.value.trim()) {
+                            updateDashboard();
+                            // Hydration can enlarge the active result set: full summaries
+                            // match terms the preview text did not. A reading path is a
+                            // snapshot of that set, and updateDashboard keeps it in place
+                            // because the filters did not change, so regenerate it from the
+                            // hydrated data to keep the panel and export consistent with the
+                            // table. No scroll: this fires from a background load, not a click.
+                            if (state.readingPath.length) generateReadingPath({ scroll: false });
+                        }
                     }
                 } catch (err) {
                     console.warn('Full summaries unavailable; search and export will use the preview text.', err);
@@ -542,7 +557,7 @@
 
                 exportCsvBtn.addEventListener('click', exportDataToCSV);
                 exportJsonBtn.addEventListener('click', exportDataToJSON);
-                generateReadingPathBtn.addEventListener('click', generateReadingPath);
+                generateReadingPathBtn.addEventListener('click', () => generateReadingPath());
                 exportReadingPathBtn.addEventListener('click', exportReadingPathMarkdown);
                 copyLinkBtn.addEventListener('click', copyShareableLink);
                 // Settle a pending search before switching mode so the new chart
@@ -777,9 +792,15 @@
                 const checks = [
                     ['Missing publication', r => !r.original_publication || r.original_publication === 'Unknown'],
                     ['Missing summary', r => !r.summary],
-                    ['No categories', r => r.thematic_categories.length === 0],
-                    ['No concepts', r => r.key_concepts.length === 0]
+                    ['No categories', r => r.thematic_categories.length === 0]
                 ];
+                // Only assess concept coverage when the entity graph actually loaded.
+                // A failed entities load empties every record's key_concepts, so this
+                // check would flag the whole selection as a data gap rather than the
+                // transient load failure it is.
+                if (state.hasConceptData) {
+                    checks.push(['No concepts', r => r.key_concepts.length === 0]);
+                }
                 const counts = checks.map(([, test]) => state.dashboardData.filter(test).length);
                 replaceChart('alternatePrimary', 'alternate-primary-chart', { type: 'bar', data: { labels: checks.map(([label]) => label), datasets: [{ label: 'Records to review', data: counts, backgroundColor: ['#b8757e', '#c17a3a', '#8b6f3e', '#2c5f82'] }] }, options: { ...baseChartOptions, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: GRID } }, x: { grid: { color: GRID } } } } });
                 renderInsights([{ label: 'Review total', value: `${counts.reduce((a, b) => a + b, 0).toLocaleString()} flagged fields across the selected records.` }, { label: 'Unexpected use', value: 'This view turns the dashboard into a maintenance tool, not only a presentation tool.' }]);
@@ -795,7 +816,7 @@
                 return conceptScore + categoryScore + summaryScore + dateSpreadScore;
             }
 
-            function generateReadingPath() {
+            function generateReadingPath({ scroll = true } = {}) {
                 // Settle a pending search so the picked records and the snapshot
                 // filters describe the same, current selection.
                 searchDebounce?.flush();
@@ -825,10 +846,10 @@
                 // after a later filter change describes the path as generated
                 // rather than stamping the current, unrelated filters.
                 state.readingPathFilters = getShareableFilters();
-                renderReadingPath(picks);
+                renderReadingPath(picks, { scroll });
             }
 
-            function renderReadingPath(records) {
+            function renderReadingPath(records, { scroll = true } = {}) {
                 readingPathPanel.classList.remove('hidden');
                 exportReadingPathBtn.disabled = records.length === 0;
                 if (records.length === 0) {
@@ -847,7 +868,7 @@
                             <p class="text-sm mt-2" style="color: var(--color-text-secondary);">${escapeHtml((record.summary || '').slice(0, 220))}${record.summary && record.summary.length > 220 ? '…' : ''}</p>
                         </div>
                     </li>`).join('');
-                readingPathPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                if (scroll) readingPathPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
 
             // Neutralize record text before writing it into the Markdown export:
@@ -879,7 +900,11 @@
                     '# Jay Rosen archive reading path',
                     '',
                     `generated: ${new Date().toISOString()}`,
-                    `filters: ${JSON.stringify(filters)}`,
+                    'filters:',
+                    `   - search: ${escapeMarkdownField(filters.q || '(none)')}`,
+                    `   - years: ${escapeMarkdownField(`${filters.start}–${filters.end}`)}`,
+                    `   - categories: ${escapeMarkdownField(filters.categories.join(', ') || '(all)')}`,
+                    `   - publications: ${escapeMarkdownField(filters.publications.join(', ') || '(all)')}`,
                     '',
                     ...state.readingPath.flatMap((record, index) => [
                         `${index + 1}. ${escapeMarkdownField(record.title)}`,

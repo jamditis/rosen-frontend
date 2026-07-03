@@ -126,4 +126,36 @@ describe('data dashboard reading path export escaping', () => {
       assert.match(script, new RegExp(`escapeMarkdownField\\(${field.replace('.', '\\.')}\\)`));
     }
   });
+
+  it('renders the filters metadata as escaped fields, not a raw json blob', () => {
+    // The filters header carries category and publication names drawn from archive
+    // data, which can hold raw html after a bad import. Escaping a JSON.stringify
+    // blob would break its parseability while still risking markdown injection, so
+    // the filters are emitted as individually escaped, human-readable lines.
+    assert.doesNotMatch(script, /escapeMarkdownField\(JSON\.stringify\(filters\)\)/);
+    assert.doesNotMatch(script, /filters: \$\{JSON\.stringify\(filters\)\}/);
+    for (const field of ['filters.q', 'filters.categories.join', 'filters.publications.join']) {
+      assert.match(script, new RegExp(`escapeMarkdownField\\(${field.replace(/\./g, '\\.')}`));
+    }
+  });
+});
+
+describe('data dashboard degraded-state and hydration guards', () => {
+  it('gates the concept check on records actually carrying concepts', () => {
+    // Tie availability to the observed outcome, not the fetch status: a 200 with an
+    // empty entities body yields no concepts and must suppress the "No concepts"
+    // check the same as a failed load, or it flags the whole selection.
+    assert.match(script, /state\.hasConceptData = state\.allRecords\.some\(r => r\.key_concepts\.length > 0\)/);
+    assert.match(script, /if \(state\.hasConceptData\)\s*\{\s*checks\.push\(\['No concepts',/);
+  });
+
+  it('regenerates the reading path when hydration changes the result set', () => {
+    // Full-summary hydration can enlarge the search result set without a filter
+    // change; the path is a snapshot of that set, so recompute it silently.
+    assert.match(script, /if \(state\.readingPath\.length\) generateReadingPath\(\{ scroll: false \}\)/);
+  });
+
+  it('suppresses the panel scroll on a background regeneration', () => {
+    assert.match(script, /if \(scroll\) readingPathPanel\.scrollIntoView/);
+  });
 });
