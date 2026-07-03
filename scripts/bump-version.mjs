@@ -30,12 +30,21 @@ const VERSION_MARKER = /\?v=\d+\.\d+\.\d+/g;
 // rewritten, and only in sw.js (cacheConfig.js's non-semver 'v9' never matches).
 const SW_CACHE_VERSION = /(const CACHE_VERSION\s*=\s*['"])\d+\.\d+\.\d+(['"])/;
 
-// Collect index.html + every .js under frontend/, skipping build output (dist/)
-// and dependencies (node_modules/) — the same surface the version-consistency
-// test scans, so the two cannot disagree about which files carry a version.
+// Collect the root index.html and the standalone faq/index.html, plus every .js
+// under frontend/ and faq/, skipping build output (dist/) and dependencies
+// (node_modules/). This is the same surface the version-consistency test scans,
+// so the two cannot disagree about which files carry a version. faq/ is a standalone
+// page served outside the app bundle, so its imports carry their own ?v= and
+// must be stamped here too, or they drift while the app advances.
 export function collectVersionedFiles(rootDir) {
-  const files = [path.join(rootDir, 'index.html')];
+  const files = [
+    path.join(rootDir, 'index.html'),
+    path.join(rootDir, 'faq', 'index.html'),
+  ];
   const walk = (dir) => {
+    // A versioned root may be absent (e.g. a fixture tree with no faq/, or a
+    // checkout without frontend/); skip it rather than throwing ENOENT.
+    if (!fs.existsSync(dir)) return;
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const full = path.join(dir, entry.name);
       if (entry.isDirectory()) {
@@ -46,6 +55,7 @@ export function collectVersionedFiles(rootDir) {
     }
   };
   walk(path.join(rootDir, 'frontend'));
+  walk(path.join(rootDir, 'faq'));
   return files;
 }
 

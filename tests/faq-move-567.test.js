@@ -53,7 +53,9 @@ describe('FAQ move and rebrand (#567)', () => {
     assert.doesNotMatch(html, /\.\.\/\.\.\//);
     assert.match(html, /href="\.\.\/favicon\.ico"/);
     assert.match(html, /href="\.\.\/frontend\/dist\/tailwind\.css"/);
-    assert.match(html, /import \{ TextSelectionTool \} from '\.\.\/features\/shared\/text-selection\.js'/);
+    // The ?v= cache-busting query is optional here: this asserts the ../ depth,
+    // not the versioning (version-consistency.test.js owns the ?v= invariant).
+    assert.match(html, /import \{ TextSelectionTool \} from '\.\.\/features\/shared\/text-selection\.js(\?v=[\d.]+)?'/);
   });
 
   it('redirects the old /dissertation/faq/ URL with a 301', () => {
