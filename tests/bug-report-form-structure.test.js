@@ -141,7 +141,16 @@ describe('branded report form wiring', () => {
     }
   });
 
-  it('exposes a configurable, default-empty report endpoint', () => {
-    assert.match(constSrc, /export const REPORT_CONFIG = \{[\s\S]*endpoint:\s*''/);
+  it('wires a valid report endpoint (empty for fallback, or an Apps Script /exec URL)', () => {
+    // Empty keeps the GitHub deep-link fallback; a real value must be the public
+    // Apps Script web-app /exec URL that files the issue server-side (#509). This
+    // guards against a typo'd or hardcoded-wrong endpoint in either state.
+    const m = constSrc.match(/export const REPORT_CONFIG = \{[\s\S]*?endpoint:\s*'([^']*)'/);
+    assert.ok(m, 'REPORT_CONFIG.endpoint must be a single-quoted string literal');
+    const endpoint = m[1];
+    assert.ok(
+      endpoint === '' || /^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(endpoint),
+      `endpoint must be empty or an Apps Script /exec URL, got: ${endpoint}`,
+    );
   });
 });
