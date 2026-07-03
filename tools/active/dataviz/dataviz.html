@@ -115,6 +115,13 @@
         .archive-input:focus { outline: none; border-color: var(--color-accent-rust); box-shadow: 0 0 0 2px rgba(193, 122, 58, 0.2); }
 
         .chart-container { position: relative; height: 40vh; min-height: 300px; }
+        .chart-container.compact { height: 30vh; min-height: 240px; }
+        .insight-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 0.75rem; }
+        .insight-card { background: var(--color-card); border: 1px solid var(--color-border-light); border-radius: 0.375rem; padding: 0.75rem; }
+        .status-note { min-height: 1.5rem; color: var(--color-text-tertiary); }
+        .reading-path-list { counter-reset: reading-path; }
+        .reading-path-item { border-left: 3px solid var(--color-accent-rust); }
+        .reading-path-item::before { counter-increment: reading-path; content: counter(reading-path); display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; margin-right: 0.75rem; border-radius: 999px; background: var(--color-text-primary); color: var(--color-paper); font-size: 0.75rem; font-weight: 700; }
 
         /* Data table */
         .data-table th { cursor: pointer; position: relative; color: var(--color-text-secondary); }
@@ -195,6 +202,10 @@
                     <div class="mt-6 pt-6" style="border-top: 1px solid var(--color-border-light);">
                         <button id="dashboard-reset-filters" class="btn-ink w-full text-center py-2 px-4 text-sm font-medium">Reset all filters</button>
                         <button id="export-csv-btn" class="btn-outline w-full text-center mt-2 py-2 px-4 text-sm font-medium">Export filtered data (CSV)</button>
+                        <button id="export-json-btn" class="btn-outline w-full text-center mt-2 py-2 px-4 text-sm font-medium">Export filtered data (JSON)</button>
+                        <button id="generate-reading-path-btn" class="btn-outline w-full text-center mt-2 py-2 px-4 text-sm font-medium">Generate reading path</button>
+                        <button id="copy-link-btn" class="btn-outline w-full text-center mt-2 py-2 px-4 text-sm font-medium">Copy shareable filter link</button>
+                        <p id="dashboard-status-note" class="status-note text-xs mt-3" role="status" aria-live="polite"></p>
                     </div>
                 </aside>
 
@@ -208,8 +219,40 @@
                          <div class="p-4 archive-card text-center"><p class="text-xs uppercase tracking-wider" style="color: var(--color-text-muted);">Most active year</p><p id="stat-active-year" class="text-2xl font-bold mt-1">--</p></div>
                     </section>
 
+                    <!-- Reading path -->
+                    <section id="reading-path-panel" class="archive-card p-4 hidden" aria-live="polite">
+                        <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
+                            <div>
+                                <h4 class="font-display text-lg">Reading path</h4>
+                                <p id="reading-path-summary" class="text-sm mt-1" style="color: var(--color-text-tertiary);"></p>
+                            </div>
+                            <button id="export-reading-path-btn" class="btn-outline text-center py-2 px-4 text-sm font-medium" disabled>Export path (markdown)</button>
+                        </div>
+                        <ol id="reading-path-list" class="reading-path-list space-y-3"></ol>
+                    </section>
+
+                    <!-- Chart controls -->
+                    <section class="archive-card p-4">
+                        <div class="flex flex-col md:flex-row md:items-end gap-4 justify-between">
+                            <div>
+                                <h4 class="font-display text-lg">Visualization mode</h4>
+                                <p class="text-sm mt-1" style="color: var(--color-text-tertiary);">Switch between overview charts, time patterns, category comparisons, publication mix, and data quality checks.</p>
+                            </div>
+                            <label class="text-sm font-medium" style="color: var(--color-text-secondary);">
+                                Show
+                                <select id="chart-mode-select" class="archive-input mt-1" style="min-width: 16rem;">
+                                    <option value="overview" selected>Overview dashboard</option>
+                                    <option value="decades">Decade heatmap</option>
+                                    <option value="categories">Category comparison</option>
+                                    <option value="publications">Publication mix</option>
+                                    <option value="quality">Data quality review</option>
+                                </select>
+                            </label>
+                        </div>
+                    </section>
+
                     <!-- Charts -->
-                    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <section id="overview-charts" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="archive-card p-4 flex flex-col">
                             <h4 class="font-display text-center text-lg flex-shrink-0 mb-2">Thematic focus over time</h4>
                             <div class="chart-container"><canvas id="thematic-focus-chart"></canvas></div>
@@ -225,6 +268,21 @@
                         <div class="archive-card p-4 flex flex-col">
                             <h4 class="font-display text-center text-lg flex-shrink-0 mb-2">Yearly activity</h4>
                             <div class="chart-container"><canvas id="yearly-activity-chart"></canvas></div>
+                        </div>
+                    </section>
+
+                    <section id="alternate-charts" class="grid grid-cols-1 lg:grid-cols-2 gap-6 hidden">
+                        <div class="archive-card p-4 flex flex-col lg:col-span-2">
+                            <h4 id="alternate-chart-title" class="font-display text-center text-lg flex-shrink-0 mb-2">Decade heatmap</h4>
+                            <div class="chart-container"><canvas id="alternate-primary-chart"></canvas></div>
+                        </div>
+                        <div class="archive-card p-4 flex flex-col">
+                            <h4 id="alternate-secondary-title" class="font-display text-center text-lg flex-shrink-0 mb-2">Selected records by year</h4>
+                            <div class="chart-container compact"><canvas id="alternate-secondary-chart"></canvas></div>
+                        </div>
+                        <div class="archive-card p-4">
+                            <h4 class="font-display text-lg mb-3">Chart notes</h4>
+                            <div id="chart-insights" class="insight-grid text-sm"></div>
                         </div>
                     </section>
 
@@ -274,6 +332,20 @@
             const publicationFilters = document.getElementById('dashboard-publication-filters');
             const resetFiltersBtn = document.getElementById('dashboard-reset-filters');
             const exportCsvBtn = document.getElementById('export-csv-btn');
+            const exportJsonBtn = document.getElementById('export-json-btn');
+            const generateReadingPathBtn = document.getElementById('generate-reading-path-btn');
+            const exportReadingPathBtn = document.getElementById('export-reading-path-btn');
+            const copyLinkBtn = document.getElementById('copy-link-btn');
+            const dashboardStatusNote = document.getElementById('dashboard-status-note');
+            const chartModeSelect = document.getElementById('chart-mode-select');
+            const overviewCharts = document.getElementById('overview-charts');
+            const alternateCharts = document.getElementById('alternate-charts');
+            const alternateChartTitle = document.getElementById('alternate-chart-title');
+            const alternateSecondaryTitle = document.getElementById('alternate-secondary-title');
+            const chartInsights = document.getElementById('chart-insights');
+            const readingPathPanel = document.getElementById('reading-path-panel');
+            const readingPathSummary = document.getElementById('reading-path-summary');
+            const readingPathList = document.getElementById('reading-path-list');
             // Stats
             const statTotalRecords = document.getElementById('stat-total-records'), statYearsCovered = document.getElementById('stat-years-covered'), statPublications = document.getElementById('stat-publications'), statActiveYear = document.getElementById('stat-active-year');
             // Table
@@ -288,8 +360,15 @@
                 uniqueCategories: [],
                 topPublications: [],
                 charts: {},
+                readingPath: [],
+                readingPathFilters: null,
+                dashboardUpdateId: 0,
                 table: { currentPage: 1, rowsPerPage: 10, sortColumn: 'publication_date', sortDirection: 'desc' }
             };
+
+            // The debounced search runner, held at module scope so click actions
+            // can flush a pending keystroke before they read the filtered dataset.
+            let searchDebounce;
 
             // --- DATA HANDLING ---
             async function fetchData() {
@@ -335,7 +414,8 @@
                                 original_publication: (r.pub || 'Unknown').trim(),
                                 thematic_categories: Array.isArray(r.categories) ? r.categories : [],
                                 key_concepts: concepts,
-                                summary: r.summaryPreview || ''
+                                summary: r.summaryPreview || '',
+                                searchText: [r.title, r.pub, r.summaryPreview, ...(Array.isArray(r.categories) ? r.categories : []), ...concepts].join(' ').toLowerCase()
                             };
                         })
                         .filter(r => r.id && r.title && Number.isFinite(r.year));
@@ -372,7 +452,10 @@
                         const full = details[r.id] && details[r.id].summary;
                         if (full && full !== r.summary) { r.summary = full; patched++; }
                     });
-                    if (patched && searchInput.value.trim()) updateDashboard();
+                    if (patched) {
+                        state.allRecords.forEach(r => { r.searchText = [r.title, r.original_publication, r.summary, ...r.thematic_categories, ...r.key_concepts].join(' ').toLowerCase(); });
+                        if (searchInput.value.trim()) updateDashboard();
+                    }
                 } catch (err) {
                     console.warn('Full summaries unavailable; search and export will use the preview text.', err);
                 }
@@ -384,7 +467,27 @@
             }
 
             // --- UTILITY ---
-            function debounce(func, delay) { let timeout; return (...args) => { clearTimeout(timeout); timeout = setTimeout(() => func.apply(this, args), delay); }; }
+            function debounce(func, delay) {
+                let timeout;
+                const debounced = (...args) => { clearTimeout(timeout); timeout = setTimeout(() => { timeout = null; func.apply(this, args); }, delay); };
+                // flush() runs a pending call now and cancels the timer, so a click
+                // action can settle the debounced filter update before it reads
+                // state.dashboardData. It is a no-op when nothing is pending.
+                debounced.flush = () => { if (timeout) { clearTimeout(timeout); timeout = null; func(); } };
+                return debounced;
+            }
+            // True when two filter snapshots select the same records (view, a
+            // display mode, is ignored). Lets a reading path survive an
+            // updateDashboard that re-filters without a user filter change, such
+            // as the background summary hydration.
+            function sameSelection(a, b) {
+                if (!a || !b) return false;
+                const sameList = (x, y) => x.length === y.length && [...x].sort().join('|') === [...y].sort().join('|');
+                // Compare q case-insensitively: the record filter lower-cases the
+                // search term, so only a capitalization change selects the same set.
+                return a.q.toLowerCase() === b.q.toLowerCase() && a.start === b.start && a.end === b.end
+                    && sameList(a.categories, b.categories) && sameList(a.publications, b.publications);
+            }
             function stringToHash(str) { let h = 0; for (let i = 0; i < str.length; i++) { h = (h << 5) - h + str.charCodeAt(i); h |= 0; } return Math.abs(h); }
             function escapeHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
             // Neutralize CSV formula injection (#423): prefix a leading ' when the
@@ -421,7 +524,8 @@
                 createCheckboxes(state.topPublications, publicationFilters);
 
                 [categoryFilters, publicationFilters].forEach(el => el.addEventListener('change', updateDashboard));
-                searchInput.addEventListener('input', debounce(updateDashboard, 300));
+                searchDebounce = debounce(updateDashboard, 300);
+                searchInput.addEventListener('input', searchDebounce);
 
                 rowsPerPageSelect.addEventListener('change', () => {
                     state.table.rowsPerPage = parseInt(rowsPerPageSelect.value, 10);
@@ -437,6 +541,14 @@
                 });
 
                 exportCsvBtn.addEventListener('click', exportDataToCSV);
+                exportJsonBtn.addEventListener('click', exportDataToJSON);
+                generateReadingPathBtn.addEventListener('click', generateReadingPath);
+                exportReadingPathBtn.addEventListener('click', exportReadingPathMarkdown);
+                copyLinkBtn.addEventListener('click', copyShareableLink);
+                // Settle a pending search before switching mode so the new chart
+                // renders the current selection rather than the pre-keystroke data.
+                chartModeSelect.addEventListener('change', () => { searchDebounce?.flush(); syncChartModeVisibility(); scheduleChartUpdate(); });
+                restoreFiltersFromUrl();
 
                 updateDashboard();
             }
@@ -451,12 +563,23 @@
                     const inDateRange = r.year >= startYear && r.year <= endYear;
                     const inCategory = selectedCategories.length === 0 || selectedCategories.some(c => r.thematic_categories.includes(c));
                     const inPublication = selectedPublications.length === 0 || selectedPublications.includes(r.original_publication);
-                    const inSearch = searchTerm === '' || (r.title.toLowerCase().includes(searchTerm) || r.summary.toLowerCase().includes(searchTerm) || r.key_concepts.join(' ').toLowerCase().includes(searchTerm));
+                    const inSearch = searchTerm === '' || r.searchText.includes(searchTerm);
                     return inDateRange && inCategory && inPublication && inSearch;
                 });
 
+                // A reading path is a snapshot of a filter selection. Drop it when
+                // the selection actually changes, but not when updateDashboard runs
+                // for another reason (e.g. the background summary hydration
+                // re-filtering the same search), which must leave the path in place.
+                if (state.readingPath.length && !sameSelection(state.readingPathFilters, getShareableFilters())) {
+                    state.readingPath = [];
+                    state.readingPathFilters = null;
+                    readingPathPanel.classList.add('hidden');
+                    exportReadingPathBtn.disabled = true;
+                }
+
                 updateStatCards();
-                updateAllCharts();
+                scheduleChartUpdate();
                 state.table.currentPage = 1;
                 renderDataTable();
             }
@@ -484,12 +607,31 @@
                 Chart.defaults.borderColor = GRID;
             }
 
+            function scheduleChartUpdate() {
+                const updateId = ++state.dashboardUpdateId;
+                requestAnimationFrame(() => { if (updateId === state.dashboardUpdateId) updateAllCharts(); });
+            }
+
             function updateAllCharts() {
-                if (!chartsAvailable) return;
-                updateThematicFocusChart();
-                updatePublicationsTreemap();
-                updateTopConceptsChart();
-                updateYearlyActivityChart();
+                if (!chartsAvailable) {
+                    dashboardStatusNote.textContent = 'Charts are unavailable because the chart library did not load; filters, stats, table, and exports still work.';
+                    return;
+                }
+                syncChartModeVisibility();
+                if (chartModeSelect.value === 'overview') {
+                    updateThematicFocusChart();
+                    updatePublicationsTreemap();
+                    updateTopConceptsChart();
+                    updateYearlyActivityChart();
+                    return;
+                }
+                updateAlternateCharts(chartModeSelect.value);
+            }
+
+            function syncChartModeVisibility() {
+                const overview = chartModeSelect.value === 'overview';
+                overviewCharts.classList.toggle('hidden', !overview);
+                alternateCharts.classList.toggle('hidden', overview);
             }
 
             const getChartContext = (id) => document.getElementById(id).getContext('2d');
@@ -558,6 +700,198 @@
                     data: { labels, datasets: [{ label: 'Records per year', data, backgroundColor: '#c17a3a' }] },
                     options: { ...baseChartOptions, plugins: { legend: { display: false } }, scales: { y: { grid: { color: GRID } }, x: { grid: { color: GRID } } } }
                 });
+            }
+
+
+
+            function getYearLabelsAndCounts() {
+                const yearCounts = state.dashboardData.reduce((acc, r) => { acc[r.year] = (acc[r.year] || 0) + 1; return acc; }, {});
+                const labels = Object.keys(yearCounts).sort();
+                return { labels, data: labels.map(year => yearCounts[year]) };
+            }
+
+            function renderInsights(items) {
+                chartInsights.innerHTML = items.map(item => `<div class="insight-card"><strong>${escapeHtml(item.label)}</strong><p class="mt-1" style="color: var(--color-text-tertiary);">${escapeHtml(item.value)}</p></div>`).join('');
+            }
+
+            function replaceChart(key, canvasId, config) {
+                if (state.charts[key]) state.charts[key].destroy();
+                state.charts[key] = new Chart(getChartContext(canvasId), config);
+            }
+
+            function updateAlternateCharts(mode) {
+                const commonYear = getYearLabelsAndCounts();
+                replaceChart('alternateSecondary', 'alternate-secondary-chart', {
+                    type: 'bar',
+                    data: { labels: commonYear.labels, datasets: [{ label: 'Records', data: commonYear.data, backgroundColor: '#c17a3a' }] },
+                    options: { ...baseChartOptions, plugins: { legend: { display: false } }, scales: { y: { grid: { color: GRID } }, x: { grid: { color: GRID } } } }
+                });
+
+                if (mode === 'decades') return updateDecadeHeatmap();
+                if (mode === 'categories') return updateCategoryComparison();
+                if (mode === 'publications') return updatePublicationMix();
+                if (mode === 'quality') return updateDataQualityChart();
+            }
+
+            function updateDecadeHeatmap() {
+                alternateChartTitle.textContent = 'Decade heatmap';
+                alternateSecondaryTitle.textContent = 'Selected records by year';
+                const buckets = {};
+                state.dashboardData.forEach(r => {
+                    const decade = `${Math.floor(r.year / 10) * 10}s`;
+                    // Count every assigned category, not just the first. Most
+                    // records carry several themes, so first-only bucketing
+                    // dropped a large share of intersections and disagreed with
+                    // the category-comparison chart, which counts all of them.
+                    const categories = r.thematic_categories.length ? r.thematic_categories : ['Uncategorized'];
+                    categories.forEach(category => {
+                        buckets[`${decade} / ${category}`] = (buckets[`${decade} / ${category}`] || 0) + 1;
+                    });
+                });
+                const data = Object.entries(buckets).map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value).slice(0, 30);
+                replaceChart('alternatePrimary', 'alternate-primary-chart', { type: 'treemap', data: { datasets: [{ tree: data, key: 'value', groups: ['name'], spacing: 1, backgroundColor: ctx => ctx.raw?.g ? COLOR_PALETTE[stringToHash(ctx.raw.g) % COLOR_PALETTE.length] : '#928c82', labels: { display: true, color: '#fdfcf9', formatter: c => c.raw.g } }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => `${c.raw.g}: ${c.raw.v} records` } } } } });
+                renderInsights([{ label: 'Use this for', value: 'Finding eras where a theme becomes unusually active.' }, { label: 'Buckets shown', value: `${data.length} decade/category intersections.` }]);
+            }
+
+            function updateCategoryComparison() {
+                alternateChartTitle.textContent = 'Category comparison';
+                alternateSecondaryTitle.textContent = 'Selected records by year';
+                const rows = Object.entries(state.dashboardData.flatMap(r => r.thematic_categories).reduce((acc, c) => { acc[c] = (acc[c] || 0) + 1; return acc; }, {})).sort(([, a], [, b]) => b - a).slice(0, 12);
+                replaceChart('alternatePrimary', 'alternate-primary-chart', { type: 'bar', data: { labels: rows.map(([label]) => label), datasets: [{ label: 'Records', data: rows.map(([, count]) => count), backgroundColor: COLOR_PALETTE }] }, options: { ...baseChartOptions, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { grid: { color: GRID } }, y: { ticks: { font: { size: 10 } }, grid: { color: GRID } } } } });
+                renderInsights([{ label: 'Top category', value: rows[0] ? `${rows[0][0]} (${rows[0][1]} records)` : 'No category data in this selection.' }, { label: 'Export tip', value: 'Use JSON export to preserve category arrays for later analysis.' }]);
+            }
+
+            function updatePublicationMix() {
+                alternateChartTitle.textContent = 'Publication mix by decade';
+                alternateSecondaryTitle.textContent = 'Selected records by year';
+                const topPubs = computeTopPublications(state.dashboardData, 6);
+                const decades = [...new Set(state.dashboardData.map(r => `${Math.floor(r.year / 10) * 10}s`))].sort();
+                const datasets = topPubs.map((pub, i) => ({ label: pub, data: decades.map(decade => state.dashboardData.filter(r => r.original_publication === pub && `${Math.floor(r.year / 10) * 10}s` === decade).length), backgroundColor: COLOR_PALETTE[i % COLOR_PALETTE.length] }));
+                replaceChart('alternatePrimary', 'alternate-primary-chart', { type: 'bar', data: { labels: decades, datasets }, options: { ...baseChartOptions, scales: { x: { stacked: true, grid: { color: GRID } }, y: { stacked: true, grid: { color: GRID } } } } });
+                renderInsights([{ label: 'Publications shown', value: topPubs.length ? topPubs.join(', ') : 'No publications in this selection.' }, { label: 'Why stacked', value: 'Stacking shows both decade volume and contribution by publication.' }]);
+            }
+
+            function updateDataQualityChart() {
+                alternateChartTitle.textContent = 'Data quality review';
+                alternateSecondaryTitle.textContent = 'Selected records by year';
+                const checks = [
+                    ['Missing publication', r => !r.original_publication || r.original_publication === 'Unknown'],
+                    ['Missing summary', r => !r.summary],
+                    ['No categories', r => r.thematic_categories.length === 0],
+                    ['No concepts', r => r.key_concepts.length === 0]
+                ];
+                const counts = checks.map(([, test]) => state.dashboardData.filter(test).length);
+                replaceChart('alternatePrimary', 'alternate-primary-chart', { type: 'bar', data: { labels: checks.map(([label]) => label), datasets: [{ label: 'Records to review', data: counts, backgroundColor: ['#b8757e', '#c17a3a', '#8b6f3e', '#2c5f82'] }] }, options: { ...baseChartOptions, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: GRID } }, x: { grid: { color: GRID } } } } });
+                renderInsights([{ label: 'Review total', value: `${counts.reduce((a, b) => a + b, 0).toLocaleString()} flagged fields across the selected records.` }, { label: 'Unexpected use', value: 'This view turns the dashboard into a maintenance tool, not only a presentation tool.' }]);
+            }
+
+
+            // --- READING PATH ---
+            function scoreReadingPathRecord(record, index) {
+                const conceptScore = Math.min(record.key_concepts.length, 5) * 2;
+                const categoryScore = Math.min(record.thematic_categories.length, 3);
+                const summaryScore = record.summary ? 2 : 0;
+                const dateSpreadScore = Math.max(0, 6 - Math.abs(index % 6));
+                return conceptScore + categoryScore + summaryScore + dateSpreadScore;
+            }
+
+            function generateReadingPath() {
+                // Settle a pending search so the picked records and the snapshot
+                // filters describe the same, current selection.
+                searchDebounce?.flush();
+                if (state.dashboardData.length === 0) {
+                    alert('No records are available for the current filter selection.');
+                    return;
+                }
+                const byDecade = new Map();
+                [...state.dashboardData]
+                    .sort((a, b) => b.year - a.year || a.title.localeCompare(b.title))
+                    .forEach((record, index) => {
+                        const decade = Math.floor(record.year / 10) * 10;
+                        const scored = { ...record, readingScore: scoreReadingPathRecord(record, index) };
+                        const current = byDecade.get(decade) || [];
+                        current.push(scored);
+                        byDecade.set(decade, current);
+                    });
+
+                const picks = [...byDecade.entries()]
+                    .sort(([a], [b]) => a - b)
+                    .flatMap(([, records]) => records.sort((a, b) => b.readingScore - a.readingScore).slice(0, 2))
+                    .sort((a, b) => a.year - b.year || b.readingScore - a.readingScore)
+                    .slice(0, 10);
+
+                state.readingPath = picks;
+                // Snapshot the filters that produced this path, so an export
+                // after a later filter change describes the path as generated
+                // rather than stamping the current, unrelated filters.
+                state.readingPathFilters = getShareableFilters();
+                renderReadingPath(picks);
+            }
+
+            function renderReadingPath(records) {
+                readingPathPanel.classList.remove('hidden');
+                exportReadingPathBtn.disabled = records.length === 0;
+                if (records.length === 0) {
+                    readingPathSummary.textContent = 'No reading path is available for the current filters.';
+                    readingPathList.innerHTML = '';
+                    return;
+                }
+                const years = records.map(r => r.year).filter(Number.isFinite);
+                const yearRange = years.length ? `${Math.min(...years)}–${Math.max(...years)}` : 'unknown years';
+                readingPathSummary.textContent = `${records.length} selected records from ${yearRange}, drawn from the active filters.`;
+                readingPathList.innerHTML = records.map(record => `
+                    <li class="reading-path-item archive-inset p-3 flex items-start">
+                        <div class="min-w-0">
+                            <p class="font-semibold" style="color: var(--color-text-primary);">${escapeHtml(record.title)}</p>
+                            <p class="text-xs mt-1" style="color: var(--color-text-tertiary);">${escapeHtml(record.year)} · ${escapeHtml(record.original_publication)} · ${escapeHtml(record.thematic_categories.slice(0, 2).join(', ') || 'Uncategorized')}</p>
+                            <p class="text-sm mt-2" style="color: var(--color-text-secondary);">${escapeHtml((record.summary || '').slice(0, 220))}${record.summary && record.summary.length > 220 ? '…' : ''}</p>
+                        </div>
+                    </li>`).join('');
+                readingPathPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+
+            // Neutralize record text before writing it into the Markdown export:
+            // collapse newlines to keep one field per line, HTML-encode the angle
+            // brackets and ampersand so a raw-HTML Markdown previewer cannot run an
+            // embedded tag, and backslash-escape inline Markdown punctuation so a
+            // scraped value like "`x`" or "[a](b)" renders literally instead of
+            // restructuring the file. The CSV and table sinks already neutralize
+            // record content; this closes the same gap for the Markdown sink.
+            function escapeMarkdownField(value) {
+                return String(value ?? '')
+                    .replace(/[\r\n]+/g, ' ')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/[\\`*_\[\]]/g, '\\$&');
+            }
+            function exportReadingPathMarkdown() {
+                // Settle a pending search first: if it changed the selection the
+                // path is now stale, so updateDashboard clears it and the guard
+                // below asks the user to regenerate rather than export stale data.
+                searchDebounce?.flush();
+                if (!state.readingPath.length) {
+                    alert('Generate a reading path before exporting it.');
+                    return;
+                }
+                const filters = state.readingPathFilters || getShareableFilters();
+                const lines = [
+                    '# Jay Rosen archive reading path',
+                    '',
+                    `generated: ${new Date().toISOString()}`,
+                    `filters: ${JSON.stringify(filters)}`,
+                    '',
+                    ...state.readingPath.flatMap((record, index) => [
+                        `${index + 1}. ${escapeMarkdownField(record.title)}`,
+                        `   - date: ${escapeMarkdownField(record.publication_date || record.year)}`,
+                        `   - publication: ${escapeMarkdownField(record.original_publication)}`,
+                        `   - categories: ${escapeMarkdownField(record.thematic_categories.join(', ')) || 'Uncategorized'}`,
+                        `   - id: ${escapeMarkdownField(record.id)}`,
+                        ''
+                    ])
+                ];
+                downloadTextFile(`rosen_archive_reading_path_${new Date().toISOString().split('T')[0]}.md`, lines.join('\n'), 'text/markdown;charset=utf-8;');
+                dashboardStatusNote.textContent = `Exported a ${state.readingPath.length}-record reading path.`;
             }
 
             // --- DATA TABLE FUNCTIONS ---
@@ -639,7 +973,21 @@
             });
 
             // --- DATA EXPORT ---
+            function downloadTextFile(filename, text, type) {
+                const blob = new Blob([text], { type });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+
             function exportDataToCSV() {
+                searchDebounce?.flush();
                 if (state.dashboardData.length === 0) {
                     alert('No data to export for the current filter selection.');
                     return;
@@ -654,16 +1002,89 @@
                 );
                 csvData.unshift(headers.map(escapeCsvCell).join(','));
 
-                const blob = new Blob([csvData.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                const url = URL.createObjectURL(blob);
-                link.setAttribute('href', url);
-                link.setAttribute('download', `rosen_archive_export_${new Date().toISOString().split('T')[0]}.csv`);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
+                downloadTextFile(`rosen_archive_export_${new Date().toISOString().split('T')[0]}.csv`, csvData.join('\r\n'), 'text/csv;charset=utf-8;');
+                dashboardStatusNote.textContent = `Exported ${state.dashboardData.length.toLocaleString()} records as CSV.`;
+            }
+
+            function getExportRecords() {
+                const fields = ['id', 'publication_date', 'title', 'original_publication', 'summary', 'key_concepts', 'thematic_categories'];
+                return state.dashboardData.map(record => Object.fromEntries(fields.map(field => [field, record[field]])));
+            }
+
+            function exportDataToJSON() {
+                searchDebounce?.flush();
+                if (state.dashboardData.length === 0) {
+                    alert('No data to export for the current filter selection.');
+                    return;
+                }
+                const records = getExportRecords();
+                const payload = {
+                    exportedAt: new Date().toISOString(),
+                    filters: getShareableFilters(),
+                    recordCount: records.length,
+                    records
+                };
+                downloadTextFile(`rosen_archive_export_${new Date().toISOString().split('T')[0]}.json`, JSON.stringify(payload, null, 2), 'application/json;charset=utf-8;');
+                dashboardStatusNote.textContent = `Exported ${state.dashboardData.length.toLocaleString()} records as JSON.`;
+            }
+
+            function getShareableFilters() {
+                // Coerce the slider values to numbers: noUiSlider.get() can hand
+                // back strings, and the default-omission checks below use strict
+                // !==, so an uncoerced string would never equal the numeric
+                // min/max and every link would carry both bounds.
+                const [startYear, endYear] = dateSliderEl.noUiSlider ? dateSliderEl.noUiSlider.get().map(Number) : [state.minYear, state.maxYear];
+                return {
+                    q: searchInput.value.trim(),
+                    start: startYear,
+                    end: endYear,
+                    categories: [...categoryFilters.querySelectorAll('input:checked')].map(el => el.value),
+                    publications: [...publicationFilters.querySelectorAll('input:checked')].map(el => el.value),
+                    view: chartModeSelect.value
+                };
+            }
+
+            function parseSharedYear(value, fallback) {
+                const year = Number.parseInt(value, 10);
+                if (!Number.isFinite(year)) return fallback;
+                return Math.min(state.maxYear, Math.max(state.minYear, year));
+            }
+
+            function restoreFiltersFromUrl() {
+                const params = new URLSearchParams(window.location.search);
+                if (params.has('q')) searchInput.value = params.get('q');
+                if (params.has('view') && [...chartModeSelect.options].some(o => o.value === params.get('view'))) chartModeSelect.value = params.get('view');
+                const start = params.get('start'), end = params.get('end');
+                // A one-sided range (only start, or only end) is a valid share
+                // link: getShareableFilters omits whichever bound equals the
+                // slider default. Restore if either is present; parseSharedYear
+                // falls back to the min/max for the missing side.
+                if (dateSliderEl.noUiSlider && (start || end)) {
+                    dateSliderEl.noUiSlider.set([
+                        parseSharedYear(start, state.minYear),
+                        parseSharedYear(end, state.maxYear)
+                    ]);
+                }
+                for (const value of (params.get('categories') || '').split('|').filter(Boolean)) { const input = [...categoryFilters.querySelectorAll('input')].find(i => i.value === value); if (input) input.checked = true; }
+                for (const value of (params.get('publications') || '').split('|').filter(Boolean)) { const input = [...publicationFilters.querySelectorAll('input')].find(i => i.value === value); if (input) input.checked = true; }
+            }
+
+            async function copyShareableLink() {
+                const filters = getShareableFilters();
+                const params = new URLSearchParams();
+                if (filters.q) params.set('q', filters.q);
+                if (filters.start !== state.minYear) params.set('start', filters.start);
+                if (filters.end !== state.maxYear) params.set('end', filters.end);
+                if (filters.categories.length) params.set('categories', filters.categories.join('|'));
+                if (filters.publications.length) params.set('publications', filters.publications.join('|'));
+                if (filters.view !== 'overview') params.set('view', filters.view);
+                const url = `${window.location.origin}${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+                try {
+                    await navigator.clipboard.writeText(url);
+                    dashboardStatusNote.textContent = 'Copied a shareable filter link.';
+                } catch (err) {
+                    dashboardStatusNote.textContent = url;
+                }
             }
 
             // --- INITIALIZATION ---
