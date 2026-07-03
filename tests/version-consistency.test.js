@@ -130,19 +130,33 @@ describe('import version consistency', () => {
       `Found ${unversioned.length} unversioned local import(s):\n  ${unversioned.join('\n  ')}`);
   });
 
-  it('faq/index.html import versions match the canonical version', () => {
-    // The standalone FAQ page (moved to /faq/ in #567) loads ./script.js and
-    // ../features/shared/text-selection.js with their own ?v= markers, stamped
-    // by bump-version.mjs. Guard that they stay present and on the canonical
-    // version, so a returning reader can't be served stale FAQ code after a bump.
+  it('every faq/index.html module import is versioned and canonical', () => {
+    // The standalone FAQ page (moved to /faq/ in #567) loads local .js outside
+    // the app bundle, stamped by bump-version.mjs. Every such reference — via a
+    // <script src> or an `import ... from` — must carry ?v=, or a returning
+    // reader is served stale FAQ code under the .htaccess one-week JS cache.
+    // Asserting "the versions present are canonical" is not enough: an import
+    // that drops ?v= entirely would slip past that, and the .js-only unversioned
+    // check above never scans HTML. So require a version on every local .js ref.
     const faqHtml = fs.readFileSync(path.join(faqDir, 'index.html'), 'utf-8');
     const versionJson = JSON.parse(fs.readFileSync(path.join(rootDir, 'version.json'), 'utf-8'));
-    const faqVersions = new Set([...faqHtml.matchAll(/\?v=(\d+\.\d+\.\d+)/g)].map((m) => m[1]));
 
-    assert.strictEqual(faqVersions.size, 1,
-      `faq/index.html has ${faqVersions.size} distinct ?v= versions: ${[...faqVersions].join(', ')}`);
-    assert.strictEqual([...faqVersions][0], versionJson.version,
-      `faq/index.html ?v= (${[...faqVersions][0]}) must match version.json version (${versionJson.version}).`);
+    // Group 1: the local .js path. Group 2 (optional): its ?v= query.
+    const localJsRef = /(?:src=|from\s+)['"](\.\.?\/[^'"]+\.js)(\?v=\d+\.\d+\.\d+)?['"]/g;
+    const refs = [...faqHtml.matchAll(localJsRef)];
+
+    assert.ok(refs.length >= 2,
+      `expected at least the script.js and text-selection.js imports in faq/index.html, found ${refs.length}`);
+
+    const unversioned = refs.filter((m) => !m[2]).map((m) => m[1]);
+    assert.strictEqual(unversioned.length, 0,
+      `faq/index.html has unversioned local .js import(s): ${unversioned.join(', ')}`);
+
+    const versions = new Set(refs.map((m) => m[2].slice('?v='.length)));
+    assert.strictEqual(versions.size, 1,
+      `faq/index.html has ${versions.size} distinct import versions: ${[...versions].join(', ')}`);
+    assert.strictEqual([...versions][0], versionJson.version,
+      `faq/index.html import version (${[...versions][0]}) must match version.json (${versionJson.version}).`);
   });
 });
 
