@@ -4,9 +4,11 @@
  * Every dissertation-tool link rendered by the homepage Tools bar (App.js) and
  * the Tools modal (ToolsModal.js) must resolve to a tool that is
  * actually deployed under dissertation/. Links to retired tools (moved to
- * archived/dissertation-tools/ and dropped from the deploy) return 404 — or, in
- * the faq case, a 301 off the archive — on the live site. This guards against
- * the menu advertising tools that no longer ship.
+ * archived/dissertation-tools/ and dropped from the deploy) return 404 on the
+ * live site. The FAQ moved to the top-level faq/ in #567 (a 301 covers its old
+ * /dissertation/faq/ URL); because it no longer sits under dissertation/, it is
+ * checked separately below. This guards against the menu advertising tools that
+ * no longer ship.
  */
 
 import { describe, it } from 'node:test';
@@ -49,5 +51,18 @@ describe('menu link integrity (#411)', () => {
     }
     assert.deepStrictEqual(missing, [],
       `Menu links point to retired/undeployed dissertation tools:\n  ${missing.join('\n  ')}`);
+  });
+
+  it('the FAQ menu link points to the deployed top-level faq/ page', () => {
+    // The FAQ moved out of dissertation/ in #567. ToolsModal links to it as
+    // `faq/` (resolved to the site root at runtime), so the deployed page must
+    // exist at the repo-root faq/index.html, and the old location must be gone
+    // (its old URL is handled by the .htaccess 301, not a duplicate page).
+    const modal = fs.readFileSync(path.join(rootDir, 'frontend/components/ToolsModal.js'), 'utf-8');
+    assert.match(modal, /href:\s*'faq\/'/, 'ToolsModal should link to the top-level faq/');
+    assert.ok(fs.existsSync(path.join(rootDir, 'faq', 'index.html')),
+      'faq/index.html must exist for the FAQ menu link');
+    assert.ok(!fs.existsSync(path.join(rootDir, 'dissertation', 'faq', 'index.html')),
+      'the old dissertation/faq/ page must be gone (redirected, not duplicated)');
   });
 });

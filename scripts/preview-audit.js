@@ -40,6 +40,7 @@ const ROUTES = [
   { slug: 'record-modal',       url: '/?record=RECORD-00802' },
   { slug: 'dissertation',       url: '/dissertation/' },
   { slug: 'dissertation-reader',url: '/dissertation/reader/' },
+  { slug: 'faq',                url: '/faq/' },
   { slug: 'status-report',      url: '/features/status-report/' },
 ];
 

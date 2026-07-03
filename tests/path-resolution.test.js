@@ -95,7 +95,7 @@ describe('getSiteRoot(host)', () => {
 
 describe('resolveSitePath(rel, host)', () => {
   it('builds a root-relative path in local', () => {
-    assert.strictEqual(resolveSitePath('dissertation/faq/', 'localhost'), '/dissertation/faq/');
+    assert.strictEqual(resolveSitePath('faq/', 'localhost'), '/faq/');
   });
 
   it('prefixes the GH Pages root', () => {
@@ -113,8 +113,8 @@ describe('resolveSitePath(rel, host)', () => {
   });
 
   it('ignores a leading slash on the relative path (no double slash)', () => {
-    assert.strictEqual(resolveSitePath('/dissertation/faq/', 'pressthink.org'), '/j/rosen-archive/dissertation/faq/');
-    assert.strictEqual(resolveSitePath('/dissertation/faq/', 'localhost'), '/dissertation/faq/');
+    assert.strictEqual(resolveSitePath('/faq/', 'pressthink.org'), '/j/rosen-archive/faq/');
+    assert.strictEqual(resolveSitePath('/faq/', 'localhost'), '/faq/');
   });
 });
 

@@ -12,10 +12,12 @@
  * so every such path 404s: the pages load unstyled and their nav links break.
  *
  * The fix is location-relative paths, which resolve correctly under all three
- * deploy surfaces (localhost, *.github.io, production) because every tool sits
- * two levels below the repo root (`dissertation/<tool>/`), so `../../` is the
- * root everywhere. The one exception is assets that are deploy-only and not in
- * the repo (the dissertation PDF, the social card image): those stay full
+ * deploy surfaces (localhost, *.github.io, production). Most tools sit two levels
+ * below the repo root (`dissertation/<tool>/`), so `../../` is the root; the FAQ
+ * (`faq/`, moved out of dissertation/ in #567) and the dissertation landing page
+ * sit one level below, so their root is `../`. Each page's expected prefix is
+ * asserted per-page below. The one exception is assets that are deploy-only and
+ * not in the repo (the dissertation PDF, the social card image): those stay full
  * `https://` production URLs so they resolve in local preview too instead of
  * 404ing on a file the repo doesn't contain.
  *
@@ -44,7 +46,10 @@ const PAGES = [
   { rel: 'dissertation/reader/index.html', favicon: '../../favicon.ico' },
   { rel: 'dissertation/foreword/index.html', favicon: '../../favicon.ico' },
   { rel: 'dissertation/network-effect/index.html', favicon: '../../favicon.ico' },
-  { rel: 'dissertation/faq/index.html', favicon: '../../favicon.ico' },
+  // The FAQ moved up to the repo root (faq/) in #567 because it now covers the
+  // whole archive, not just the dissertation. One level below root, its
+  // preview-safe prefix is `../`, not `../../`.
+  { rel: 'faq/index.html', favicon: '../favicon.ico' },
   { rel: 'dissertation/index.html', favicon: '../favicon.ico' },
 ];
 

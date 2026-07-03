@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { html } from '../html.js?v=3.5.0';
+import { html } from '../html.js?v=3.6.0';
 import { Sparkles, X } from 'lucide-react';
 
 const BANNER_DISMISSED_KEY = 'jrda_announce_banner_dismissed';
@@ -34,12 +34,17 @@ const WorkInProgressBanner = () => {
               25,000+ records spanning four decades of journalism criticism, media theory, and public life.
             </p>
           </div>
+          <!-- p-3 (12px) around the 20px w-5/h-5 icon = a 44x44 tap target
+               (WCAG 2.5.5). Arbitrary values like min-w-[44px] are NOT in the
+               pre-built zero-build stylesheet, so padding is used instead. No
+               sky hover-bg exists in that CSS either; the icon darkens on hover
+               and the focus ring covers keyboard users. -->
           <button
             onClick=${handleDismiss}
-            className="p-1 text-sky-600 hover:text-sky-800 hover:bg-sky-100 rounded transition-colors flex-shrink-0"
+            className="flex-shrink-0 flex items-center justify-center p-3 text-sky-600 hover:text-sky-800 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500"
             aria-label="Dismiss banner"
           >
-            <${X} className="w-4 h-4" />
+            <${X} className="w-5 h-5" />
           </button>
         </div>
       </div>

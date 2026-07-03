@@ -1,5 +1,5 @@
 // FAQ: Ask the Dissertation
-import { FAQ_METADATA, FAQ_CATEGORIES, FAQ_ITEMS, FAQ_KEYWORDS } from './data.js';
+import { FAQ_METADATA, FAQ_CATEGORIES, FAQ_ITEMS, FAQ_KEYWORDS } from './data.js?v=3.6.0';
 
 // DOM Elements
 const faqContainer = document.getElementById('faq-container');
@@ -12,17 +12,21 @@ const categoryButtons = document.querySelectorAll('[data-category]');
 const expandAllBtn = document.getElementById('expand-all');
 const collapseAllBtn = document.getElementById('collapse-all');
 
-// NotebookLM link
+// NotebookLM links (dissertation + archive)
 const notebookLink = document.getElementById('notebook-link');
+const notebookLinkArchive = document.getElementById('notebook-link-archive');
 
 // State
 let activeCategory = 'all';
 let searchQuery = '';
 let openItemId = null;
 
-// Initialize NotebookLM link
-if (FAQ_METADATA.notebookLM?.dissertation) {
+// Initialize NotebookLM links from metadata (single source of truth for the URLs)
+if (notebookLink && FAQ_METADATA.notebookLM?.dissertation) {
   notebookLink.href = FAQ_METADATA.notebookLM.dissertation;
+}
+if (notebookLinkArchive && FAQ_METADATA.notebookLM?.archive) {
+  notebookLinkArchive.href = FAQ_METADATA.notebookLM.archive;
 }
 
 // Render a single FAQ item

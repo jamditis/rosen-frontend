@@ -1,29 +1,29 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.5.0';
+import { html } from './html.js?v=3.6.0';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.5.0';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.5.0';
-import { withViewTransition } from './utils/viewTransition.js?v=3.5.0';
-import { ITEMS_PER_PAGE, COLORS, REPORT_CONFIG } from './constants.js?v=3.5.0';
-import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.5.0';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.5.0';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.5.0';
-import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.5.0';
-import Sidebar from './components/Sidebar.js?v=3.5.0';
-import WelcomeModal from './components/WelcomeModal.js?v=3.5.0';
-import RecordView from './components/RecordView.js?v=3.5.0';
-import FeaturedSection from './components/FeaturedSection.js?v=3.5.0';
-import DissertationPage from './components/DissertationPage.js?v=3.5.0';
-import ToolsModal from './components/ToolsModal.js?v=3.5.0';
-import BugReportModal from './components/BugReportModal.js?v=3.5.0';
-import LoadingQuotes from './components/LoadingQuotes.js?v=3.5.0';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.5.0';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.5.0';
-import EntityBrowser from './components/EntityBrowser.js?v=3.5.0';
-import Timeline from './components/Timeline.js?v=3.5.0';
-import AboutPage from './components/AboutPage.js?v=3.5.0';
-import WikiPage from './components/WikiPage.js?v=3.5.0';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.6.0';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.6.0';
+import { withViewTransition } from './utils/viewTransition.js?v=3.6.0';
+import { ITEMS_PER_PAGE, COLORS, REPORT_CONFIG } from './constants.js?v=3.6.0';
+import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.6.0';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.6.0';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.6.0';
+import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.6.0';
+import Sidebar from './components/Sidebar.js?v=3.6.0';
+import WelcomeModal from './components/WelcomeModal.js?v=3.6.0';
+import RecordView from './components/RecordView.js?v=3.6.0';
+import FeaturedSection from './components/FeaturedSection.js?v=3.6.0';
+import DissertationPage from './components/DissertationPage.js?v=3.6.0';
+import ToolsModal from './components/ToolsModal.js?v=3.6.0';
+import BugReportModal from './components/BugReportModal.js?v=3.6.0';
+import LoadingQuotes from './components/LoadingQuotes.js?v=3.6.0';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.6.0';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.6.0';
+import EntityBrowser from './components/EntityBrowser.js?v=3.6.0';
+import Timeline from './components/Timeline.js?v=3.6.0';
+import AboutPage from './components/AboutPage.js?v=3.6.0';
+import WikiPage from './components/WikiPage.js?v=3.6.0';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
@@ -375,6 +375,8 @@ const App = () => {
 
       ${recordView}
 
+      <${WorkInProgressBanner} />
+
       <header className=${`sticky top-0 z-50 w-full border-b transition-all duration-300 ${
           isScrolled
             ? 'bg-paper border-stone-300 shadow-sm'
@@ -451,8 +453,6 @@ const App = () => {
             </div>
         </div>
       </header>
-
-      <${WorkInProgressBanner} />
 
       <div className=${`flex-grow container mx-auto px-4 py-6 flex gap-8 ${isEntityBrowser || isWiki ? 'justify-center' : ''}`}>
 

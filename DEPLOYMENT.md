@@ -12,6 +12,7 @@ favicon.ico                         # Site favicon
 shared-styles.css                   # Common styles for standalone tools
 version.json                        # Version metadata
 metadata.json                       # Archive metadata
+.htaccess                           # Apache config: CSP + security headers, gzip, caching, the FAQ 301 (re-upload whenever it changes)
 
 frontend/                           # React application
   index.js                          # App entry point
@@ -46,9 +47,10 @@ data/                               # Archive data (JSON only)
 dissertation/                       # Dissertation tools
   index.html                        # Landing page
   reader/                           # Full text reader
-  faq/                              # FAQ (linked from the Explore Tools menu)
   foreword/                         # Foreword page
   network-effect/                   # Network film analysis
+
+faq/                                # FAQ: archive + dissertation (linked from the Explore Tools menu; moved from dissertation/faq/ in #567)
 
 dissertation-launch/                # Dissertation launch landing
   index.html

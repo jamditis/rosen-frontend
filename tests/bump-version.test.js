@@ -62,6 +62,20 @@ describe('stampVersion', () => {
     assert.strictEqual(markers, 3, `expected 3 markers scanned, got ${markers}`);
   });
 
+  it('stamps the standalone faq/ page and its .js imports (#567)', () => {
+    // faq/ is served outside the app bundle, so its own ?v= markers must be in
+    // the bump surface or they drift while the app advances. This is the direct
+    // guard that collectVersionedFiles walks faq/ (not only frontend/).
+    write('faq/index.html', '<script type="module" src="./script.js?v=1.0.0"></script>\n');
+    write('faq/script.js', "import { FAQ_ITEMS } from './data.js?v=1.0.0';\n");
+    write('faq/data.js', 'export const FAQ_ITEMS = [];\n'); // data only; no import to stamp
+
+    stampVersion(root, '2.3.4');
+
+    assert.match(read('faq/index.html'), /src="\.\/script\.js\?v=2\.3\.4"/);
+    assert.match(read('faq/script.js'), /'\.\/data\.js\?v=2\.3\.4'/);
+  });
+
   it('leaves the data-cache CACHE_VERSION (cacheConfig.js) untouched', () => {
     stampVersion(root, '2.3.4');
     // cacheConfig's 'v9' is not semver, so the anchored sw.js regex can't match

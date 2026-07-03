@@ -15,8 +15,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.join(__dirname, '..');
 const frontendDir = path.join(rootDir, 'frontend');
+const faqDir = path.join(rootDir, 'faq');
 
-// Recursively collect every .js file under frontend/, skipping build output
+// Recursively collect every .js file under a directory, skipping build output
 // (dist/) and dependencies (node_modules/).
 function collectFrontendJsFiles(dir = frontendDir, acc = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -30,13 +31,20 @@ function collectFrontendJsFiles(dir = frontendDir, acc = []) {
   return acc;
 }
 
+// The versioned .js surface is frontend/ plus the standalone faq/ page: the
+// same set bump-version.mjs stamps, kept in lockstep so the guardrail and the
+// bumper cannot disagree about which imports must carry ?v=.
+function collectVersionedJsFiles() {
+  return [...collectFrontendJsFiles(frontendDir), ...collectFrontendJsFiles(faqDir)];
+}
+
 // ============================================
 // Import version consistency
 // ============================================
 
 describe('import version consistency', () => {
   it('all JS files use the same import version string', () => {
-    const jsFiles = collectFrontendJsFiles();
+    const jsFiles = collectVersionedJsFiles();
 
     // Extract all version strings from import statements
     const versionPattern = /\?v=(\d+\.\d+\.\d+)/g;
@@ -101,7 +109,7 @@ describe('import version consistency', () => {
     // The version-equality test above only compares versioned imports to each
     // other — an import with no version at all slips past it, so this check
     // exists to catch that case.
-    const jsFiles = collectFrontendJsFiles();
+    const jsFiles = collectVersionedJsFiles();
 
     // Matches `from './foo.js'` / `from '../foo.js'` including the
     // `export ... from` re-export form. Group 2 captures the version query,
@@ -120,6 +128,35 @@ describe('import version consistency', () => {
 
     assert.strictEqual(unversioned.length, 0,
       `Found ${unversioned.length} unversioned local import(s):\n  ${unversioned.join('\n  ')}`);
+  });
+
+  it('every faq/index.html module import is versioned and canonical', () => {
+    // The standalone FAQ page (moved to /faq/ in #567) loads local .js outside
+    // the app bundle, stamped by bump-version.mjs. Every such reference — via a
+    // <script src> or an `import ... from` — must carry ?v=, or a returning
+    // reader is served stale FAQ code under the .htaccess one-week JS cache.
+    // Asserting "the versions present are canonical" is not enough: an import
+    // that drops ?v= entirely would slip past that, and the .js-only unversioned
+    // check above never scans HTML. So require a version on every local .js ref.
+    const faqHtml = fs.readFileSync(path.join(faqDir, 'index.html'), 'utf-8');
+    const versionJson = JSON.parse(fs.readFileSync(path.join(rootDir, 'version.json'), 'utf-8'));
+
+    // Group 1: the local .js path. Group 2 (optional): its ?v= query.
+    const localJsRef = /(?:src=|from\s+)['"](\.\.?\/[^'"]+\.js)(\?v=\d+\.\d+\.\d+)?['"]/g;
+    const refs = [...faqHtml.matchAll(localJsRef)];
+
+    assert.ok(refs.length >= 2,
+      `expected at least the script.js and text-selection.js imports in faq/index.html, found ${refs.length}`);
+
+    const unversioned = refs.filter((m) => !m[2]).map((m) => m[1]);
+    assert.strictEqual(unversioned.length, 0,
+      `faq/index.html has unversioned local .js import(s): ${unversioned.join(', ')}`);
+
+    const versions = new Set(refs.map((m) => m[2].slice('?v='.length)));
+    assert.strictEqual(versions.size, 1,
+      `faq/index.html has ${versions.size} distinct import versions: ${[...versions].join(', ')}`);
+    assert.strictEqual([...versions][0], versionJson.version,
+      `faq/index.html import version (${[...versions][0]}) must match version.json (${versionJson.version}).`);
   });
 });
 
