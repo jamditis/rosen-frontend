@@ -57,12 +57,14 @@ _DEPLOY_FILES: Tuple[str, ...] = (
     'shared-styles.css',
     'version.json',
     'metadata.json',
+    '.htaccess',
     'ADDING-RECORDS.md',
 )
 
 _DEPLOY_DIRS: Tuple[str, ...] = (
     'frontend',
     'dissertation',
+    'faq',
     'dissertation-launch',
     'features/shared',
     'features/status-report',
