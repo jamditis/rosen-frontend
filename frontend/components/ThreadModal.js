@@ -1,8 +1,7 @@
-import { html } from '../html.js?v=3.6.4';
+import { html } from '../html.js?v=3.6.5';
 import { ExternalLink } from 'lucide-react';
-import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.6.4';
-import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.6.4';
-import { toEmbedUrl } from '../utils/bskyEmbed.js?v=3.6.4';
+import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.6.5';
+import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.6.5';
 
 // Convert URLs in text to clickable links. Shares the linkify split with
 // RecordModal so the two stay consistent and neither carries a stateful regex.
@@ -73,7 +72,7 @@ const ThreadPost = ({ post, totalPosts }) => {
             `}
 
             <a
-                href=${sanitizeHref(toEmbedUrl(post.url))}
+                href=${sanitizeHref(post.url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-xs text-sky-600 hover:text-sky-700 transition-colors"

@@ -95,7 +95,6 @@
     #                                 a dynamic doc-NN-NN-sheets.googleusercontent.com
     #                                 host; CSP re-checks the redirect target, so both
     #                                 must be allowed or the fetch is blocked.
-    # frame-src embed.bsky.app  -- Bluesky thread embeds (ThreadModal/RecordModal).
     # frame-src www.youtube.com -- YouTube video embeds (RecordModal, network-effect).
     # img-src images.unsplash.com -- featured-work photos (FeaturedSection, constants.js).
     # img-src journalism.nyu.edu  -- the dissertation bio photo.
@@ -111,7 +110,7 @@
     #                           external image hosts), so a wider allowance only opens an
     #                           arbitrary-origin beacon path with no deployed benefit.
     # Verify HSTS at the Cloudflare/host layer before adding here (avoid duplicate header).
-    Header set Content-Security-Policy "default-src 'self'; script-src 'self' https://esm.sh https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://esm.sh https://script.google.com https://docs.google.com https://*.googleusercontent.com; frame-src https://embed.bsky.app https://www.youtube.com; img-src 'self' data: https://images.unsplash.com https://journalism.nyu.edu https://pressthink.org; object-src 'none'; base-uri 'self'; form-action 'self'"
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' https://esm.sh https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://esm.sh https://script.google.com https://docs.google.com https://*.googleusercontent.com; frame-src https://www.youtube.com; img-src 'self' data: https://images.unsplash.com https://journalism.nyu.edu https://pressthink.org; object-src 'none'; base-uri 'self'; form-action 'self'"
 
     # Add cache control headers for data files
     <FilesMatch "\.(json)$">

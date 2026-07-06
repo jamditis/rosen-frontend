@@ -107,6 +107,6 @@ When deployment files change:
 ## Known project constraints
 
 - `archive.pressthink.org` intentionally uses `http://` for affected records because the subdomain has a TLS certificate issue.
-- Bluesky embeds use `embed.bsky.app`; update `ThreadModal.js` and `RecordModal.js` if that embed host changes.
+- Bluesky outbound links use `bsky.app`, not `embed.bsky.app`; the embed host returns placeholder/404 pages when opened directly.
 - Browser `localStorage` caching is disabled because the live data set can exceed storage limits.
 - Social/thread records may have generic titles until content-based title generation is implemented.

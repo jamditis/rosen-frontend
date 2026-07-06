@@ -107,8 +107,8 @@ test('.htaccess content security policy allows exactly the required origins', ()
     'https://docs.google.com',
     'https://*.googleusercontent.com',
   ]);
-  // frame-src: Bluesky thread embeds + YouTube video embeds.
-  assertSources('frame-src', ['https://embed.bsky.app', 'https://www.youtube.com']);
+  // frame-src: YouTube video embeds.
+  assertSources('frame-src', ['https://www.youtube.com']);
   // img-src: featured-work photos (images.unsplash.com), the dissertation bio photo
   // (journalism.nyu.edu), pressthink.org images referenced by absolute URL (equals
   // 'self' in production but listed so they do not depend on the serving origin), and

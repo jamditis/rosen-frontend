@@ -91,12 +91,12 @@
     "id": "MODAL-09",
     "area": "Archive browser",
     "subarea": "Record modal",
-    "feature": "External 'Read on' link with scheme sanitization and bsky embed rewrite",
+    "feature": "External 'Read on' link with scheme sanitization",
     "user_story": "As a reader, I want a safe outbound link to the original source, so that I can read the full piece without exposure to malicious URLs.",
-    "expected_behavior": "When url exists and is not '#', a 'Read on <pub>' link renders with target=_blank rel=noreferrer. The href is passed through sanitizeHref after rewriting '//bsky.app' to '//embed.bsky.app'. sanitizeHref allows only http/https/mailto and scheme-less relative/protocol-relative URLs, returning '#' for anything else (e.g. javascript:, including obfuscated 'java\\tscript:' that the URL parser collapses). Summary body text is linkified: bare http(s) URLs become target=_blank rel=noopener noreferrer links, other text rendered as-is.",
+    "expected_behavior": "When url exists and is not '#', a 'Read on <pub>' link renders with target=_blank rel=noreferrer. The href is the stored record URL passed directly through sanitizeHref; no Bluesky-specific host rewrite is applied. sanitizeHref allows only http/https/mailto and scheme-less relative/protocol-relative URLs, returning '#' for anything else (e.g. javascript:, including obfuscated 'java\\tscript:' that the URL parser collapses). Summary body text is linkified: bare http(s) URLs become target=_blank rel=noopener noreferrer links, other text rendered as-is.",
     "source_files": ["frontend/components/RecordModal.js", "frontend/utils/sanitizeHref.js", "frontend/utils/linkify.js"],
-    "test_notes": "Open a record with a bsky.app source URL and confirm the link points at embed.bsky.app. Manually craft a record with url='javascript:alert(1)' and confirm the link href is '#'. Open a record whose summary contains a URL and confirm it renders as a clickable link.",
-    "code_smell": "Summary-body links built by linkifyText are NOT passed through sanitizeHref (only the 'Read on' header link and thread links are); a javascript: URL embedded in summary text would render as a live href. linkify in RecordModal vs the regex copy inside ThreadModal are two separate implementations."
+    "test_notes": "Open a record with a bsky.app source URL and confirm the link points at bsky.app, not embed.bsky.app. Manually craft a record with url='javascript:alert(1)' and confirm the link href is '#'. Open a record whose summary contains a URL and confirm it renders as a clickable link.",
+    "code_smell": "Summary-body links built by linkifyText are not passed through sanitizeHref, but splitUrlsForLinkify only emits http(s) URLs, so the risk stays bounded unless the matcher changes."
   },
   {
     "id": "MODAL-10",
@@ -145,11 +145,11 @@
     "id": "MODAL-14",
     "area": "Archive browser",
     "subarea": "Thread modal",
-    "feature": "Thread post Bluesky link embed rewrite + sanitization",
-    "user_story": "As a reader, I want each thread post's outbound link to be safe and load without a Bluesky login, so that I can view the original post.",
-    "expected_behavior": "Each post's 'View on Bluesky' href is the post url with '//bsky.app' rewritten to '//embed.bsky.app', then run through sanitizeHref (http/https/mailto/relative allowed, else '#'). Opens target=_blank rel=noopener noreferrer.",
+    "feature": "Thread post Bluesky link sanitization",
+    "user_story": "As a reader, I want each thread post's outbound link to be safe and pointed at Bluesky, so that I can view the original post.",
+    "expected_behavior": "Each post's 'View on Bluesky' href is the stored post URL passed directly through sanitizeHref (http/https/mailto/relative allowed, else '#'); no Bluesky-specific host rewrite is applied. Opens target=_blank rel=noopener noreferrer.",
     "source_files": ["frontend/components/ThreadModal.js", "frontend/utils/sanitizeHref.js"],
-    "test_notes": "In an open thread, hover a 'View on Bluesky' link and confirm it points at embed.bsky.app. Confirm a malformed post url collapses to '#'."
+    "test_notes": "In an open thread, hover a 'View on Bluesky' link and confirm it points at bsky.app, not embed.bsky.app. Confirm a malformed post url collapses to '#'."
   },
   {
     "id": "MODAL-15",
