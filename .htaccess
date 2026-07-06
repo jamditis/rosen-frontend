@@ -74,12 +74,44 @@
     # Block unused browser capabilities by default
     Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
 
-    # Content Security Policy
-    # 'unsafe-inline' for styles is required because frontend components set inline styles.
-    # esm.sh is the React/HTM/Lucide/sql.js CDN per index.html import map.
-    # embed.bsky.app is the Bluesky thread embed used by ThreadModal/RecordModal.
+    # Content Security Policy. Validated in-browser across every route + standalone
+    # tool under this exact header (React mount, MiniSearch, sql.js, dataviz,
+    # dataexplorer, YouTube embed) with zero violations before shipping.
+    # script-src:
+    #   'unsafe-inline'      -- the zero-build app runs inline scripts site-wide:
+    #                           index.html's <script type="importmap"> plus small inline
+    #                           config/console blocks on index.html and the
+    #                           dissertation/faq/tools pages.
+    #   'wasm-unsafe-eval'   -- sql.js compiles its self-hosted WebAssembly binary.
+    #   esm.sh               -- React/HTM/Lucide/MiniSearch CDN per the import map.
+    #   cdnjs.cloudflare.com -- SRI-pinned sql.js loader (sqliteService.js), plus
+    #                           noUiSlider (dataviz) and PapaParse (dataexplorer).
+    #   cdn.jsdelivr.net     -- chart.js + treemap plugin (dataviz).
+    # style-src cdnjs.cloudflare.com -- noUiSlider stylesheet (dataviz).
+    # connect-src script.google.com  -- the branded report/submission endpoint (#509 fetch).
+    # connect-src docs.google.com + *.googleusercontent.com  -- the dataexplorer tool
+    #                                 fetches a published Google Sheet CSV (PapaParse
+    #                                 XHR), which 302-redirects from docs.google.com to
+    #                                 a dynamic doc-NN-NN-sheets.googleusercontent.com
+    #                                 host; CSP re-checks the redirect target, so both
+    #                                 must be allowed or the fetch is blocked.
+    # frame-src embed.bsky.app  -- Bluesky thread embeds (ThreadModal/RecordModal).
+    # frame-src www.youtube.com -- YouTube video embeds (RecordModal, network-effect).
+    # img-src images.unsplash.com -- featured-work photos (FeaturedSection, constants.js).
+    # img-src journalism.nyu.edu  -- the dissertation bio photo.
+    # img-src pressthink.org      -- images the pages reference by absolute URL (e.g. the
+    #                           dissertation portrait). This equals 'self' in production
+    #                           (the archive is served from pressthink.org), but is listed
+    #                           explicitly so the images do not depend on the serving
+    #                           origin staying identical (a preview origin or the
+    #                           archive.pressthink.org subdomain would otherwise break them).
+    #                           Inline paper-texture SVGs are data:. Kept to these hosts,
+    #                           not scheme-wide https:, because no deployed page loads an
+    #                           image from a data-controlled URL (archive records carry no
+    #                           external image hosts), so a wider allowance only opens an
+    #                           arbitrary-origin beacon path with no deployed benefit.
     # Verify HSTS at the Cloudflare/host layer before adding here (avoid duplicate header).
-    Header set Content-Security-Policy "default-src 'self'; script-src 'self' https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://esm.sh; frame-src https://embed.bsky.app; img-src 'self' data: https:; object-src 'none'; base-uri 'self'; form-action 'self'"
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' https://esm.sh https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://esm.sh https://script.google.com https://docs.google.com https://*.googleusercontent.com; frame-src https://embed.bsky.app https://www.youtube.com; img-src 'self' data: https://images.unsplash.com https://journalism.nyu.edu https://pressthink.org; object-src 'none'; base-uri 'self'; form-action 'self'"
 
     # Add cache control headers for data files
     <FilesMatch "\.(json)$">

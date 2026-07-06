@@ -91,6 +91,7 @@ If you've added records to the CSV and regenerated JSON, only upload:
 - `data/archive-data.json`
 - `data/archive-details.json`
 - `data/archive-analytics.json`
+- `data/search-index.json` (MiniSearch full-text index; regenerated with every record change, so it must ship or full-text search serves the previous index)
 
 Other files only change when the site code changes.
 
