@@ -81,8 +81,8 @@ Counts verified against current `data/` on 2026-05-25:
 |------|---------|----------|
 | `data/archive_records-public.csv` | 1,030 | Non-social archive records (800 RECORD, 137 TUMBLR, 83 CLIP, 10 THREAD). Line count is high (~50k+) due to multi-line text fields. Max record id is `RECORD-00901`; next ID for new records is `RECORD-00902`. |
 | `data/social_posts.csv` | ~29,700 | Twitter/X and Bluesky posts. Max BSKY id is `BSKY-03121`. |
-| `data/extracted_entities.csv` | 5,036 | Named entities (people, orgs, concepts) |
-| `data/extracted_relationships.csv` | 4,666 | Entity-to-record relationships |
+| `data/extracted_entities.csv` | 9,194 | Named entities (people, orgs, concepts) |
+| `data/extracted_relationships.csv` | 13,439 | Entity-to-record relationships |
 
 ### Regenerating JSON from CSV
 
@@ -170,8 +170,8 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── archive-entities.json        # Entity graph (~1.1 MB)
 │   ├── archive_records-public.csv   # Source records (1,030 rows)
 │   ├── social_posts.csv             # Social media posts (~29,700 rows)
-│   ├── extracted_entities.csv       # Named entities (5,036 rows)
-│   ├── extracted_relationships.csv  # Entity relationships (4,666 rows)
+│   ├── extracted_entities.csv       # Named entities (9,194 rows)
+│   ├── extracted_relationships.csv  # Entity relationships (13,439 rows)
 │   ├── export-archive-data.js       # JSON generator script
 │   ├── schema.json                  # Data schema
 │   └── README.md                    # Data dictionary
