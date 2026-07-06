@@ -212,6 +212,40 @@ describe('CACHE_VERSION', () => {
 });
 
 // ============================================
+// Agent-facing docs
+// ============================================
+
+describe('agent-facing version guidance', () => {
+  it('does not hard-code concrete app versions in agent docs', () => {
+    const docFiles = ['CLAUDE.md', 'AGENTS.md'];
+    const concreteVersionPatterns = [
+      {
+        label: 'concrete import query version',
+        pattern: /\?v=\d+\.\d+\.\d+/g,
+      },
+      {
+        label: 'current version literal',
+        pattern: /Current version:\s*v?\d+\.\d+\.\d+/gi,
+      },
+    ];
+
+    const matches = [];
+    for (const docFile of docFiles) {
+      const content = fs.readFileSync(path.join(rootDir, docFile), 'utf-8');
+      for (const { label, pattern } of concreteVersionPatterns) {
+        pattern.lastIndex = 0;
+        for (const match of content.matchAll(pattern)) {
+          matches.push(`${docFile}: ${label} "${match[0]}"`);
+        }
+      }
+    }
+
+    assert.strictEqual(matches.length, 0,
+      `Agent docs should point to version.json/index.html/sw.js instead of hard-coding deploy versions:\n  ${matches.join('\n  ')}`);
+  });
+});
+
+// ============================================
 // Import path validity
 // ============================================
 
