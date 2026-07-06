@@ -1,29 +1,29 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.6.2';
+import { html } from './html.js?v=3.6.3';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString } from './services/archiveService.js?v=3.6.2';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.6.2';
-import { withViewTransition } from './utils/viewTransition.js?v=3.6.2';
-import { ITEMS_PER_PAGE, COLORS, REPORT_CONFIG } from './constants.js?v=3.6.2';
-import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.6.2';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.6.2';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.6.2';
-import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.6.2';
-import Sidebar from './components/Sidebar.js?v=3.6.2';
-import WelcomeModal from './components/WelcomeModal.js?v=3.6.2';
-import RecordView from './components/RecordView.js?v=3.6.2';
-import FeaturedSection from './components/FeaturedSection.js?v=3.6.2';
-import DissertationPage from './components/DissertationPage.js?v=3.6.2';
-import ToolsModal from './components/ToolsModal.js?v=3.6.2';
-import BugReportModal from './components/BugReportModal.js?v=3.6.2';
-import LoadingQuotes from './components/LoadingQuotes.js?v=3.6.2';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.6.2';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.6.2';
-import EntityBrowser from './components/EntityBrowser.js?v=3.6.2';
-import Timeline from './components/Timeline.js?v=3.6.2';
-import AboutPage from './components/AboutPage.js?v=3.6.2';
-import WikiPage from './components/WikiPage.js?v=3.6.2';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString, loadSearchIndex } from './services/archiveService.js?v=3.6.3';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.6.3';
+import { withViewTransition } from './utils/viewTransition.js?v=3.6.3';
+import { ITEMS_PER_PAGE, COLORS, REPORT_CONFIG } from './constants.js?v=3.6.3';
+import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.6.3';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.6.3';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.6.3';
+import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.6.3';
+import Sidebar from './components/Sidebar.js?v=3.6.3';
+import WelcomeModal from './components/WelcomeModal.js?v=3.6.3';
+import RecordView from './components/RecordView.js?v=3.6.3';
+import FeaturedSection from './components/FeaturedSection.js?v=3.6.3';
+import DissertationPage from './components/DissertationPage.js?v=3.6.3';
+import ToolsModal from './components/ToolsModal.js?v=3.6.3';
+import BugReportModal from './components/BugReportModal.js?v=3.6.3';
+import LoadingQuotes from './components/LoadingQuotes.js?v=3.6.3';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.6.3';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.6.3';
+import EntityBrowser from './components/EntityBrowser.js?v=3.6.3';
+import Timeline from './components/Timeline.js?v=3.6.3';
+import AboutPage from './components/AboutPage.js?v=3.6.3';
+import WikiPage from './components/WikiPage.js?v=3.6.3';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
@@ -193,10 +193,59 @@ const App = () => {
   // includes() per record instead of re-normalizing every field every keystroke.
   const searchIndex = useMemo(() => records.map(buildSearchText), [records]);
 
+  // Lazy full-text index (#276), unioned with the substring blob above. Loaded
+  // on first non-empty search so browse-only visits never pay for MiniSearch or
+  // the ~1MB artifact. miniLoading (a ref) dedups concurrent loads across
+  // keystrokes before state commits; miniReady (state) re-runs the filter once
+  // the index resolves.
+  const miniRef = useRef(null);
+  const miniLoading = useRef(false);
+  const miniRetryAfter = useRef(0);
+  const [miniReady, setMiniReady] = useState(false);
+
+  useEffect(() => {
+    if (!filters.search.trim() || miniReady || miniLoading.current) return;
+    // After a failure, hold off before retrying so a persistently missing index
+    // (e.g. a stale deploy 404) is not refetched on every keystroke; a search
+    // past the cooldown still recovers from a transient failure. loadSearchIndex
+    // clears its own memo on failure, so the retry is a real re-fetch.
+    if (performance.now() < miniRetryAfter.current) return;
+    miniLoading.current = true;
+    loadSearchIndex()
+      .then((mini) => {
+        // miniReady is a monotonic "index is loaded" latch, so set it
+        // unconditionally even if the triggering search was cleared mid-load:
+        // the filter only reads it when a search term is active, and having it
+        // latched means the next search unions immediately. Not gating it on a
+        // per-run cancelled flag avoids a race where a cleared-then-retyped
+        // query could leave the loaded index unused until the box is edited.
+        miniRef.current = mini;
+        setMiniReady(true);
+      })
+      .catch((err) => {
+        miniRetryAfter.current = performance.now() + 10000;
+        console.warn('[search] full-text index unavailable; substring search only:', err.message);
+      })
+      .finally(() => { miniLoading.current = false; });
+  }, [filters.search, miniReady]);
+
   const filteredRecords = useMemo(() => {
     const term = normalizeForSearch(filters.search);
+    // Union the substring blob with MiniSearch full-text hits: a record matches
+    // if EITHER matches. Additive by design, so social / thread / dissertation
+    // records (absent from the article-scoped index) stay covered by substring,
+    // and nothing regresses while the index is still loading. combineWith AND +
+    // prefix = "every word present, last word may be a prefix", how a search box
+    // is expected to narrow.
+    const rawTerm = filters.search.trim();
+    let miniIds = null;
+    if (rawTerm && miniReady && miniRef.current) {
+      miniIds = new Set(
+        miniRef.current.search(rawTerm, { prefix: true, combineWith: 'AND' }).map((h) => h.id)
+      );
+    }
     let res = records.filter((r, i) => {
-      if (term && !searchIndex[i].includes(term)) return false;
+      if (term && !(searchIndex[i].includes(term) || (miniIds && miniIds.has(r.id)))) return false;
 
       if (filters.categories.length > 0) {
         const hasAll = filters.categories.every(cat => r.categories.includes(cat));
@@ -231,7 +280,7 @@ const App = () => {
     });
 
     return res;
-  }, [records, searchIndex, filters, sortBy]);
+  }, [records, searchIndex, filters, sortBy, miniReady]);
 
   useEffect(() => {
     setCurrentPage(1);

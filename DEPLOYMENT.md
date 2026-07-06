@@ -33,6 +33,7 @@ data/                               # Archive data (JSON only)
   archive-data.json                 # Combined fallback
   archive-entities.json             # Entity graph
   archive-analytics.json            # Prebuilt analytics aggregates (~1KB, loads on analytics view)
+  search-index.json                 # Prebuilt MiniSearch full-text index (~1MB, loads lazily on first search)
   wiki-seed.json                    # Community wiki seed pages (loads on the #wiki view)
   schema.json                       # Data dictionary, linked from the open-data download UI
   feeds/                            # RSS/OPML feeds

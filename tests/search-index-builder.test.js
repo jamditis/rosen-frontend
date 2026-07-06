@@ -103,12 +103,29 @@ test('caps the indexed raw_text slice at the configured boundary', () => {
   assert.equal(mini.search('LATETOKEN').length, 0, 'a term past the cap is not indexed');
 });
 
+test('indexes the author field so a name in the byline is findable (#276)', () => {
+  // The card-only substring search never reads author, so a person credited
+  // only in the author column was unfindable. Indexing author fixes the class,
+  // not just the one record whose summary was reworded.
+  const rows = [
+    { id: 'BYLINE', title: 'A guest piece', author: 'Joe Amditis', raw_text: '' },
+    { id: 'OTHER', title: 'Something else', author: 'Jane Doe', raw_text: '' },
+  ];
+  const { mini } = loadBuilt(rows);
+  const ids = mini.search('Joe Amditis').map((h) => h.id);
+  assert.ok(ids.includes('BYLINE'), 'a name in the author field should be findable');
+  assert.ok(!ids.includes('OTHER'), 'an unrelated record should not match');
+});
+
 test('recordToSearchDoc maps CSV column names and tolerates missing fields', () => {
-  const doc = recordToSearchDoc({ id: 'X', title: 'T', key_concepts: 'c1; c2', thematic_categories: 'cat' });
+  const doc = recordToSearchDoc({ id: 'X', title: 'T', author: 'Jane Doe', key_concepts: 'c1; c2', thematic_categories: 'cat' });
+  assert.equal(doc.author, 'Jane Doe', 'author maps through');
   assert.equal(doc.concepts, 'c1; c2', 'key_concepts maps to concepts');
   assert.equal(doc.categories, 'cat', 'thematic_categories maps to categories');
   assert.equal(doc.summary, '', 'missing summary becomes an empty string, not undefined');
   assert.equal(doc.body, '', 'missing raw_text becomes an empty string, not undefined');
+  const bare = recordToSearchDoc({ id: 'Y' });
+  assert.equal(bare.author, '', 'missing author becomes an empty string, not undefined');
 });
 
 test('skips rows without an id but keeps the rest', () => {

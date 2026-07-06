@@ -177,6 +177,8 @@ _STAGED_JSON_FILES = (
     'archive-details.json',
     'archive-entities.json',
     'archive-analytics.json',
+    'search-index.json',  # lazy full-text index, issue 276; stale here means a
+                          # submitted record is unsearchable by body or author
 )
 
 

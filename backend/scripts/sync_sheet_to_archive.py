@@ -78,15 +78,18 @@ DEFAULT_SHEET_TAB = "test_runs"
 # These are committed alongside the CSV so the PR carries a consistent data set
 # and main stays self-consistent. archive-analytics.json must be here too, or a
 # sheet-sync PR commits updated data but stale analytics and the parity test in
-# tests/archive-analytics.test.js fails in CI. Keep in sync with
-# sftp_push._PUSH_FILES (the deploy-time contract) and export-archive-data.js
-# (the producer).
+# tests/archive-analytics.test.js fails in CI. search-index.json (the lazy
+# full-text index, #276) likewise: omit it and main ships an index stale against
+# the record set. Keep in sync with sftp_push._PUSH_FILES (the deploy-time
+# contract) and export-archive-data.js (the producer); the equality is enforced
+# by backend/tests/test_publish_list_parity.py.
 _DEPLOY_JSON_FILES = (
     "archive-data.json",
     "archive-core.json",
     "archive-details.json",
     "archive-entities.json",
     "archive-analytics.json",
+    "search-index.json",
 )
 
 # Columns the enrichment jobs produce. On sync the sheet's non-empty value wins
