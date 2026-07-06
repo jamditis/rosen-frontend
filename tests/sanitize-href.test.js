@@ -23,7 +23,7 @@ describe('sanitizeHref (#322)', () => {
   it('passes through relative and protocol-relative URLs (e.g. the dissertation reader link)', () => {
     assert.strictEqual(sanitizeHref('./dissertation/reader/'), './dissertation/reader/');
     assert.strictEqual(sanitizeHref('/j/rosen-archive/dissertation/reader/'), '/j/rosen-archive/dissertation/reader/');
-    assert.strictEqual(sanitizeHref('//embed.bsky.app/profile/x'), '//embed.bsky.app/profile/x');
+    assert.strictEqual(sanitizeHref('//bsky.app/profile/x'), '//bsky.app/profile/x');
     assert.strictEqual(sanitizeHref('#'), '#');
   });
 

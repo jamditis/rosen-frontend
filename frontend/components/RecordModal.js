@@ -1,13 +1,12 @@
 
 import { useEffect, useState } from 'react';
-import { html } from '../html.js?v=3.6.4';
+import { html } from '../html.js?v=3.6.5';
 import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2 } from 'lucide-react';
-import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.6.4';
-import { ThreadModal } from './ThreadModal.js?v=3.6.4';
-import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.6.4';
-import { toEmbedUrl } from '../utils/bskyEmbed.js?v=3.6.4';
-import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.6.4';
-import { recordNeedsReview } from '../utils/needsReview.js?v=3.6.4';
+import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.6.5';
+import { ThreadModal } from './ThreadModal.js?v=3.6.5';
+import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.6.5';
+import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.6.5';
+import { recordNeedsReview } from '../utils/needsReview.js?v=3.6.5';
 
 const linkifyText = (text) => {
   const parts = splitUrlsForLinkify(text);
@@ -245,7 +244,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
                 </div>
 
                 ${displayRecord.url && displayRecord.url !== '#' && html`
-                  <a href=${sanitizeHref(toEmbedUrl(displayRecord.url))} target="_blank" rel="noreferrer" className="text-blue-700 hover:underline font-bold text-sm inline-flex items-center gap-1 mb-6">
+                  <a href=${sanitizeHref(displayRecord.url)} target="_blank" rel="noreferrer" className="text-blue-700 hover:underline font-bold text-sm inline-flex items-center gap-1 mb-6">
                     Read on ${displayRecord.pub} <${ExternalLink} className="w-3 h-3" />
                   </a>
                 `}
