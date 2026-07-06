@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen&apos;s Internet Archive</title>
-    <dateCreated>Wed, 24 Jun 2026 23:37:26 GMT</dateCreated>
-    <dateModified>Wed, 24 Jun 2026 23:37:26 GMT</dateModified>
+    <dateCreated>Mon, 06 Jul 2026 13:14:06 GMT</dateCreated>
+    <dateModified>Mon, 06 Jul 2026 13:14:06 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -328,6 +328,7 @@
         <outline text="The plan is to have no plan" type="link" url="https://www.adbusters.org/article/the-plan-is-to-have-no-plan" created="2020-05-04"/>
       </outline>
       <outline text="Platform Transition &amp; Future Models (2021-Present)" type="category">
+        <outline text="Jay Rosen&apos;s Internet Archive: an Introduction." type="link" url="https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/" created="2026-07-05"/>
         <outline text="It was a political hire, cont..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohf75js3k2j" created="2026-06-17"/>
         <outline text="it&apos;s not a typo, it&apos;s supposed to be an abbreviated form of continued." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohfytcl5s22" created="2026-06-17"/>
         <outline text="Kara Swisher: “I don’t want to work for the Ellisons, and I don’t want..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3moikloq4r22g" created="2026-06-17"/>
@@ -390,11 +391,11 @@ Bari Weiss had no experience when she was hired a..." type="link" url="https://b
         <outline text="Thank you, Mai." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmu5kstg7c23" created="2026-05-27"/>
         <outline text="Here&apos;s the letter: &quot;We are current and former journalists, professors..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmu5wufgmc23" created="2026-05-27"/>
         <outline text="Imagine if journalism had a moment like that..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmmfzkhpoc2e" created="2026-05-24"/>
-        <outline text="From 2024:" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmkhncpdp22h" created="2026-05-23"/>
       </outline>
     </outline>
     <outline text="By Category">
-      <outline text="Press &amp; Media Criticism (23482)" type="category">
+      <outline text="Press &amp; Media Criticism (23483)" type="category">
+        <outline text="Jay Rosen&apos;s Internet Archive: an Introduction." type="link" url="https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/"/>
         <outline text="It was a political hire, cont..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohf75js3k2j"/>
         <outline text="it&apos;s not a typo, it&apos;s supposed to be an abbreviated form of continued." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohfytcl5s22"/>
         <outline text="Kara Swisher: “I don’t want to work for the Ellisons, and I don’t want..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3moikloq4r22g"/>
@@ -423,7 +424,6 @@ Bari Weiss had no experience when she was hired a..." type="link" url="https://b
 
 Scott Pelley answers questions..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnplqvqnk22g"/>
         <outline text="If Scott Pelley keeps up with &quot;CBS News is on fire&quot; and new management..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnpv2dhp2c2z"/>
-        <outline text="If you have a specific example I might be able to reply." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnpybctxpc2z"/>
       </outline>
       <outline text="Journalism Theory &amp; Practice (8346)" type="category">
         <outline text="Finally..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mog4ns5tvk22"/>
@@ -512,7 +512,8 @@ Bari Weiss had no experience when she was hired a..." type="link" url="https://b
         <outline text="Thanks, Lora" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2wyfzxrxk2c"/>
         <outline text="Ahead of where we are at the moment, but, yes, that solution comes up lot in..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2wyegf7m22c"/>
       </outline>
-      <outline text="Technology &amp; Digital Media (2850)" type="category">
+      <outline text="Technology &amp; Digital Media (2851)" type="category">
+        <outline text="Jay Rosen&apos;s Internet Archive: an Introduction." type="link" url="https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/"/>
         <outline text="It was a political hire, cont..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohf75js3k2j"/>
         <outline text="One thing to keep your eye on as Paramount takes control:  what happen..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3modgj3bfys2l"/>
         <outline text="How does the app know that a news article maybe need a correction?" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mo53zqc3qk2j"/>
@@ -537,7 +538,6 @@ Bari Weiss had no experience when she was hired a..." type="link" url="https://b
         <outline text="Explore this gift article from The New York Times" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3n32dugfk2u"/>
         <outline text="Public journalism redux: Post-academia, Jay Rosen returns to where he started" type="link" url="https://dankennedy.net/2025/10/16/public-journalism-redux-post-academia-jay-rosen-returns-to-where-he-started/"/>
         <outline text="Something went awry here: The darkness is your that your story will twisted..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3aq26rnv225"/>
-        <outline text="Thanks, Nils" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m33i2mjmgk23"/>
       </outline>
       <outline text="Journalism Education (677)" type="category">
         <outline text="I have been there..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mog5545nsk2d"/>

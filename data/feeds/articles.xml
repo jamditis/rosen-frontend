@@ -5,9 +5,18 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Articles and essays from Jay Rosen&apos;s journalism scholarship</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 24 Jun 2026 23:37:26 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 06 Jul 2026 13:14:06 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/articles.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
+  <item>
+    <title>Jay Rosen&apos;s Internet Archive: an Introduction.</title>
+    <link>https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/</link>
+    <guid isPermaLink="true">https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/</guid>
+    <pubDate>Sun, 05 Jul 2026 00:00:00 GMT</pubDate>
+    <description>A Q&amp;A in which Jay Rosen introduces his internet archive, built and curated with Joe Amditis: a links-only collection of everything of Rosen&apos;s findable online, reaching back to his 1986 PhD dissertation and holding 26,615 records at launch. Rosen frames it as one media critic&apos;s attempt to preserve the web against link rot, a complement to the Internet Archive&apos;s Wayback Machine.</description>
+    <category>Press &amp; Media Criticism</category>
+    <category>Technology &amp; Digital Media</category>
+  </item>
   <item>
     <title>Subscribers buy a product. Members join the cause.</title>
     <link>https://pressthink.org/2026/04/subscribers-buy-a-product-members-join-the-cause/</link>
@@ -969,14 +978,6 @@
     <description>Peabody Awards has announced new members to its bicoastal board of directors. The new members, representing diverse media organizations and expertise, will provide counsel and advance Peabody&apos;s commitment to outstanding storytelling. The boards are separate from the Peabody Awards jury.</description>
     <category>Politics &amp; Democracy</category>
     <category>Technology &amp; Digital Media</category>
-    <category>Press &amp; Media Criticism</category>
-  </item>
-  <item>
-    <title>Industry leaders provide expert counsel - The Peabody Awards</title>
-    <link>https://peabodyawards.com/stories/industry-leaders-provide-expert-counsel-peabody/</link>
-    <guid isPermaLink="true">https://peabodyawards.com/stories/industry-leaders-provide-expert-counsel-peabody/</guid>
-    <pubDate>Wed, 11 Dec 2019 00:00:00 GMT</pubDate>
-    <description>Peabody Awards announced new members to its bicoastal board of directors. The new board members, representing diverse backgrounds in media and entertainment from both the East and West Coasts, will provide expert counsel and help extend Peabody&apos;s reach through new partnerships and public engagement.</description>
     <category>Press &amp; Media Criticism</category>
   </item>
   </channel>

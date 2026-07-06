@@ -2,15 +2,15 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen's Internet Archive - RSS Subscriptions</title>
-    <dateCreated>Wed, 24 Jun 2026 23:37:26 GMT</dateCreated>
+    <dateCreated>Mon, 06 Jul 2026 13:14:07 GMT</dateCreated>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
   <body>
     <outline text="Rss" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/rss.xml"/>
     <outline text="Articles" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/articles.xml"/>
     <outline text="Categories: Press media criticism" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/categories/press-media-criticism.xml"/>
-    <outline text="Categories: Politics democracy" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/categories/politics-democracy.xml"/>
     <outline text="Categories: Technology digital media" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/categories/technology-digital-media.xml"/>
+    <outline text="Categories: Politics democracy" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/categories/politics-democracy.xml"/>
     <outline text="Categories: Journalism theory practice" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-theory-practice.xml"/>
     <outline text="Categories: Journalism education" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-education.xml"/>
     <outline text="Categories: Audience public engagement" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/categories/audience-public-engagement.xml"/>
