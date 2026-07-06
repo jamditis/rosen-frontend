@@ -57,12 +57,14 @@ _DEPLOY_FILES: Tuple[str, ...] = (
     'shared-styles.css',
     'version.json',
     'metadata.json',
+    '.htaccess',
     'ADDING-RECORDS.md',
 )
 
 _DEPLOY_DIRS: Tuple[str, ...] = (
     'frontend',
     'dissertation',
+    'faq',
     'dissertation-launch',
     'features/shared',
     'features/status-report',
@@ -77,6 +79,7 @@ _DEPLOY_DATA_FILES: Tuple[str, ...] = (
     'data/archive-details.json',
     'data/archive-entities.json',
     'data/archive-analytics.json',
+    'data/search-index.json',  # prebuilt MiniSearch full-text index, loaded lazily on first search, issue 276
     'data/wiki-seed.json',
     'data/schema.json',  # data dictionary; linked from the open-data download UI
 )

@@ -16,36 +16,21 @@
  * of #276 (the tested core), so the wiring PRs that follow are mechanical.
  */
 import MiniSearch from 'minisearch';
+// The index schema (fields/storeFields/idField) is the shared build+runtime
+// contract, so it lives in one module that both the builder and the browser
+// loader import. It sits under frontend/ because that is what gets deployed;
+// see frontend/utils/searchConfig.js for why. Re-exported below so existing
+// importers of this builder keep resolving the same names.
+import { SEARCH_FIELDS, STORE_FIELDS, searchIndexOptions } from '../../frontend/utils/searchConfig.js';
 
 // raw_text is the long field. Cap the indexed slice so the artifact stays small
 // and the build stays fast. 8000 chars covers roughly the first few screens of
 // an article -- enough for recall without indexing the full body of every record.
 export const RAW_TEXT_INDEX_CHARS = 8000;
 
-// Fields MiniSearch tokenizes and ranks. Field order here is not significance;
-// per-field weight, if wanted, is set via searchOptions.boost at query time.
-export const SEARCH_FIELDS = ['title', 'summary', 'concepts', 'tags', 'categories', 'body'];
-
-// Fields stored on each hit so a caller can render a result row without a second
-// lookup. Keep this minimal -- the full record is fetched from archive-data.json
-// by id, so storing more than the title would just bloat the index artifact.
-export const STORE_FIELDS = ['title'];
+export { SEARCH_FIELDS, STORE_FIELDS, searchIndexOptions };
 
 const str = (v) => (v == null ? '' : String(v));
-
-/**
- * MiniSearch construction options. Shared by the builder here and the eventual
- * runtime loader so the index that is built and the index that is queried agree
- * on schema -- MiniSearch.loadJSON throws when load-time options differ from the
- * options used to build, so a single source prevents that drift.
- */
-export function searchIndexOptions() {
-  return {
-    idField: 'id',
-    fields: SEARCH_FIELDS,
-    storeFields: STORE_FIELDS,
-  };
-}
 
 /**
  * Map one archive CSV row (snake_case keys from csv-parse columns:true) to the
@@ -56,6 +41,7 @@ export function recordToSearchDoc(row, { rawTextChars = RAW_TEXT_INDEX_CHARS } =
   return {
     id: str(row.id),
     title: str(row.title),
+    author: str(row.author),
     summary: str(row.summary),
     concepts: str(row.key_concepts),
     tags: str(row.tags),

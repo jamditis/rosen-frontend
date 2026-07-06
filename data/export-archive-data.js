@@ -18,6 +18,7 @@ import { generateOPML, generateSubscriptionOPML } from './lib/opml-generator.js'
 import { computeAnalytics } from './compute-analytics.js';
 import { ERAS } from './eras.js';
 import { unescapeRow } from './lib/csv-unescape.js';
+import { buildSearchIndex } from './lib/search-index-builder.js';
 import { loadAuthoredExcerpts, resolveSummary } from './lib/summary-resolver.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -626,6 +627,30 @@ async function main() {
 
   // Sort by date (newest first)
   allRecords.sort((a, b) => b.date.localeCompare(a.date));
+
+  // Build the MiniSearch full-text index (#276). The frontend loads this to
+  // search author, tags, concepts, and body text -- fields the card-only
+  // substring search cannot reach. Built from the source CSV rows because they
+  // still carry raw_text, which the served JSON drops; filtered to the ids that
+  // actually ship so the index never exposes a filtered-out or unverified record.
+  //
+  // Scope: article records only (archive_records-public.csv), not social posts.
+  // #276 is a body-recall win, and only articles have a long body past the
+  // 120-char card preview that today's substring search already reads. Social
+  // posts are short enough that their preview covers the text, so indexing all
+  // 25.6k of them quadrupled the artifact (5 MB gzipped vs ~1 MB) for recall
+  // only on the tail of long posts. Social posts, generated threads, and the
+  // dissertation entry stay covered by the frontend substring fallback (union
+  // search: a record matches if the substring OR the index matches, so nothing
+  // that is findable today stops being findable).
+  console.log('\n💾 Building search index...');
+  const servedIds = new Set(allRecords.map(r => r.id));
+  const searchIndexRows = archiveRecordsData.filter(r => servedIds.has(r.id));
+  const { json: searchIndexJson, count: searchIndexCount } = buildSearchIndex(searchIndexRows);
+  const searchIndexPath = path.join(__dirname, 'search-index.json');
+  fs.writeFileSync(searchIndexPath, JSON.stringify(searchIndexJson));
+  const searchIndexKB = (fs.statSync(searchIndexPath).size / 1024).toFixed(1);
+  console.log(`  - Wrote search-index.json (${searchIndexCount} docs, ${searchIndexKB} KB)`);
 
   // Build output structure
   const output = {

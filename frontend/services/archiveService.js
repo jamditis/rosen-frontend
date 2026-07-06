@@ -1,5 +1,5 @@
 
-import { DATA_CONFIG } from '../constants.js?v=3.6.2';
+import { DATA_CONFIG } from '../constants.js?v=3.6.3';
 import {
   initDatabase,
   loadArchiveData as loadSqliteData,
@@ -13,12 +13,13 @@ import {
   getCategoryCoOccurrence,
   searchRecords as sqlSearchRecords,
   getStats as getSqliteStats
-} from './sqliteService.js?v=3.6.2';
-import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.6.2';
-import { escapeCsvCell } from '../utils/csvSafety.js?v=3.6.2';
-import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.6.2';
-import { CACHE_VERSION, CACHE_TTL_MS, MAX_LOCALSTORAGE_SIZE, cacheKeyFor } from './cacheConfig.js?v=3.6.2';
-import { raceTimeout } from '../utils/raceTimeout.js?v=3.6.2';
+} from './sqliteService.js?v=3.6.3';
+import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.6.3';
+import { searchIndexOptions } from '../utils/searchConfig.js?v=3.6.3';
+import { escapeCsvCell } from '../utils/csvSafety.js?v=3.6.3';
+import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.6.3';
+import { CACHE_VERSION, CACHE_TTL_MS, MAX_LOCALSTORAGE_SIZE, cacheKeyFor } from './cacheConfig.js?v=3.6.3';
+import { raceTimeout } from '../utils/raceTimeout.js?v=3.6.3';
 
 // Routine cache-hit / fetch-start logs are silent in production. Set
 // `localStorage.jrda_debug = '1'` in DevTools and reload to opt in (#170).
@@ -614,6 +615,34 @@ export const fetchAnalytics = async () => {
   const data = await response.json();
   setCachedData(dataUrl, data);
   return data;
+};
+
+/**
+ * Lazily load and construct the MiniSearch full-text index (#276).
+ *
+ * Kept here with the other data fetchers, but MiniSearch and the ~1MB index
+ * artifact are both loaded on demand -- the dynamic import means a browse-only
+ * visit never downloads either. The promise is memoized so repeat or concurrent
+ * first-search calls share one load; on failure the memo is cleared so a later
+ * search can retry rather than being stuck on the rejected promise. Throws on a
+ * failed fetch so the caller can fall back to substring search (the index is an
+ * additive recall boost, never the only search path).
+ */
+let searchIndexPromise = null;
+export const loadSearchIndex = () => {
+  if (!searchIndexPromise) {
+    searchIndexPromise = (async () => {
+      const { default: MiniSearch } = await import('minisearch');
+      const response = await fetch(DATA_CONFIG.search_index);
+      if (!response.ok) {
+        throw new Error(`search index fetch failed: HTTP ${response.status}`);
+      }
+      const text = await response.text();
+      return MiniSearch.loadJSON(text, searchIndexOptions());
+    })();
+    searchIndexPromise.catch(() => { searchIndexPromise = null; });
+  }
+  return searchIndexPromise;
 };
 
 /**

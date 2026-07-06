@@ -42,6 +42,7 @@ _PUSH_FILES = (
     "archive-details.json",
     "archive-entities.json",
     "archive-analytics.json",
+    "search-index.json",
 )
 
 
