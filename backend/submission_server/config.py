@@ -3,33 +3,24 @@
 Configuration for the submission server.
 """
 
-import os
 from pathlib import Path
 
+import os
 
-def _positive_int_from_env(name, default):
-    """Return a positive integer env value, falling back on bad input."""
-    try:
-        value = int(os.environ.get(name, str(default)))
-    except (TypeError, ValueError):
-        return default
-    return value if value > 0 else default
+from submission_runtime.config import (
+    BACKEND_DIR as BACKEND_DIR,
+    CSV_FILE as CSV_FILE,
+    DATA_DIR as DATA_DIR,
+    EXPORT_SCRIPT as EXPORT_SCRIPT,
+    FTP_STAGING_DIR as FTP_STAGING_DIR,
+    KNOWN_ENTITIES_FILE as KNOWN_ENTITIES_FILE,
+    PROJECT_ROOT as PROJECT_ROOT,
+    SCHEMA_FILE as SCHEMA_FILE,
+    THEMATIC_CATEGORIES as THEMATIC_CATEGORIES,
+    positive_int_from_env,
+)
 
-
-# Paths
-# The submission server lives in backend/submission_server/
-# The project root (with data/, frontend/, etc.) is two levels up
 SERVER_DIR = Path(__file__).resolve().parent
-BACKEND_DIR = SERVER_DIR.parent
-PROJECT_ROOT = BACKEND_DIR.parent
-
-# Data paths
-DATA_DIR = PROJECT_ROOT / "data"
-CSV_FILE = DATA_DIR / "archive_records-public.csv"
-SCHEMA_FILE = BACKEND_DIR / "schema.json"
-KNOWN_ENTITIES_FILE = BACKEND_DIR / "known_entities.json"
-EXPORT_SCRIPT = DATA_DIR / "export-archive-data.js"
-FTP_STAGING_DIR = PROJECT_ROOT / "ftp-upload" / "data"
 
 # Database
 DATABASE_PATH = SERVER_DIR / "submissions.db"
@@ -50,10 +41,10 @@ SUBMISSION_AUTH_TOKEN = os.environ.get("SUBMISSION_AUTH_TOKEN", "")
 
 # Submission flood controls. These protect the queue and downstream Gemini /
 # GitHub Actions usage if the legacy Flask endpoint is exposed publicly.
-SUBMISSION_RATE_LIMIT_PER_MINUTE = _positive_int_from_env(
+SUBMISSION_RATE_LIMIT_PER_MINUTE = positive_int_from_env(
     "SUBMISSION_RATE_LIMIT_PER_MINUTE", 5
 )
-SUBMISSION_RATE_LIMIT_PER_HOUR = _positive_int_from_env(
+SUBMISSION_RATE_LIMIT_PER_HOUR = positive_int_from_env(
     "SUBMISSION_RATE_LIMIT_PER_HOUR", 30
 )
 
@@ -78,17 +69,4 @@ ALLOWED_SHEET_TAB = os.environ.get("ROSEN_ALLOWED_SHEET_TAB", "").strip()
 # thousand rows; anything outside [1, MAX_SHEET_ROW] is treated as absent rather
 # than passed through to the Sheets API. The bound is generous on purpose — it
 # only rejects nonsense, not legitimate rows.
-MAX_SHEET_ROW = _positive_int_from_env("ROSEN_MAX_SHEET_ROW", 5_000_000)
-
-# The six canonical thematic categories. This list MUST stay in sync with
-# `facets.categories` in data/archive-data.json and the "Category Values"
-# section of data/SCHEMA.md. A form submission tagged with any other category
-# would not group, filter, or facet on the live site. See issue #173.
-THEMATIC_CATEGORIES = [
-    "Audience & Public Engagement",
-    "Journalism Education",
-    "Journalism Theory & Practice",
-    "Politics & Democracy",
-    "Press & Media Criticism",
-    "Technology & Digital Media",
-]
+MAX_SHEET_ROW = positive_int_from_env("ROSEN_MAX_SHEET_ROW", 5_000_000)

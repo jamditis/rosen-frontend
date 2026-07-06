@@ -48,9 +48,9 @@ Walked `backend/src/` and `backend/scripts/`. Ten core modules wired: `workflow.
 
 Two paths exist simultaneously:
 
-**Legacy:** Flask app at `backend/submission_server/` (`app.py`, `processor.py`, `db.py`, templates). Functional. Has SSRF guard, constant-time bearer-token auth, CSV formula escaping, parameterized SQL. Per closed issue #136. Now deprecated.
+**Legacy:** Flask app at `backend/submission_server/` (`app.py`, `processor.py`, `db.py`, templates). Functional. Has SSRF guard, constant-time bearer-token auth, CSV formula escaping, parameterized SQL. Per closed issue #136. Now deprecated. The current Action-facing runtime helpers now live in `backend/submission_runtime/`; `submission_server/` should be treated as the legacy Flask surface only.
 
-**Current:** GitHub Actions workflow at `.github/workflows/submit-record.yml` (deployed 2026-05-25) calls `backend/scripts/process_submission.py` directly. 12-step pipeline: scrape, categorize, dedupe, CSV append, regen JSONs, test, git push, SFTP upload, sheet writeback. Design doc: `docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md`. Per PRs #223, #225.
+**Current:** GitHub Actions workflow at `.github/workflows/submit-record.yml` (deployed 2026-05-25) calls `backend/scripts/process_submission.py` directly. 12-step pipeline: scrape, categorize, dedupe, CSV append, regen JSONs, test, git push, SFTP upload, sheet writeback. Runtime helpers: `backend/submission_runtime/`. Design doc: `docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md`. Per PRs #223, #225.
 
 **Blocker:** issue #226 — the `rosen-archive-bot` GitHub App + 11 repo secrets are not configured. Until they are, the workflow exists but can't run end-to-end. Joe's call (and credentials) needed.
 
@@ -58,7 +58,7 @@ Two paths exist simultaneously:
 
 **Gap-closing action:**
 1. Joe creates the GitHub App + adds the 11 secrets (#226).
-2. Add Flask-Limiter to the legacy server before any public exposure (#262), OR confirm the legacy server is truly retired and the new workflow handles rate limiting at the GitHub Actions layer.
+2. Add Flask-Limiter to the legacy server before any public exposure (#262), OR confirm the legacy server is truly retired and delete/archive the remaining Flask app, queue DB, scheduler, templates, and legacy processor tests.
 3. Smoke test: scrape-fail path, dedup short-circuit, full success.
 
 ---

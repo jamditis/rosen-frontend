@@ -18,8 +18,13 @@ from datetime import datetime
 from typing import Dict, Any, Optional, Set
 
 from rosen_scraper import dispatcher, entity_resolver
-from rosen_scraper.csv_safety import sanitize_csv_value
 from rosen_scraper.workflow import generate_source_based_id, enrich_data
+from submission_runtime.artifacts import DATA_DEPLOY_JSON_FILES
+from submission_runtime.csv_safety import (
+    MAX_FIELD_LENGTH,
+    sanitize_cell,
+    sanitize_record,
+)
 
 from .config import (
     DATA_DIR,
@@ -31,6 +36,10 @@ from . import sftp_push
 from . import sheets_callback
 
 logger = logging.getLogger('submission_server.processor')
+
+_MAX_FIELD_LENGTH = MAX_FIELD_LENGTH
+_sanitize_cell = sanitize_cell
+_sanitize_record = sanitize_record
 
 
 def _load_schema() -> Optional[Dict[str, Any]]:
@@ -88,46 +97,6 @@ def _get_csv_headers() -> list:
         return next(reader, [])
 
 
-# Upper bound on any single CSV cell. Generous for legitimate titles and
-# summaries, but stops a hostile submission writing an unbounded blob.
-_MAX_FIELD_LENGTH = 10000
-
-
-def _sanitize_cell(value: str) -> str:
-    """Length-bound and CSV-formula-escape a single string cell.
-
-    Neutralizes CSV formula injection (a value starting with =, +, -, @ is
-    prefixed with the spreadsheet-recognized single-quote escape) and caps the
-    length so neither scraped content nor user form input can inject a formula
-    or write an oversized blob into the shared archive CSV. See issue #143.
-
-    The escape itself is the pipeline-wide one in
-    ``rosen_scraper.csv_safety.sanitize_csv_value``. ``value`` is stripped
-    first, which removes any leading tab/CR/LF, so that helper's wider trigger
-    set collapses to exactly the =, +, -, @ this server has always escaped.
-    """
-    # Escape before bounding length. A value already at _MAX_FIELD_LENGTH that
-    # starts with a formula trigger would otherwise end up one char over the
-    # cap once the single-quote escape is prepended. Truncation chops only the
-    # tail, so the leading escape always survives.
-    text = sanitize_csv_value(value.strip())
-    if len(text) > _MAX_FIELD_LENGTH:
-        text = text[:_MAX_FIELD_LENGTH]
-    return text
-
-
-def _sanitize_record(record: Dict[str, Any]) -> Dict[str, Any]:
-    """Return a copy of ``record`` with every string field sanitized.
-
-    Non-string values (booleans, None) are passed through untouched — formula
-    injection only applies to text cells. The original dict is not mutated.
-    """
-    return {
-        key: _sanitize_cell(value) if isinstance(value, str) else value
-        for key, value in record.items()
-    }
-
-
 def _append_to_csv(record: Dict[str, Any], headers: list) -> bool:
     """Append a single record to the main archive CSV.
 
@@ -171,15 +140,7 @@ def _regenerate_json() -> bool:
 # Single source of truth for the canonical JSON artifact set. Also referenced
 # by _staging_has_content so a divergence can't silently desync staging and
 # the SFTP retry gate.
-_STAGED_JSON_FILES = (
-    'archive-data.json',
-    'archive-core.json',
-    'archive-details.json',
-    'archive-entities.json',
-    'archive-analytics.json',
-    'search-index.json',  # lazy full-text index, issue 276; stale here means a
-                          # submitted record is unsearchable by body or author
-)
+_STAGED_JSON_FILES = DATA_DEPLOY_JSON_FILES
 
 
 def _stage_for_ftp() -> bool:

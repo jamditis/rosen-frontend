@@ -53,7 +53,7 @@ import time
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
-# Make submission_server and rosen_scraper importable whether this runs as
+# Make submission_runtime and rosen_scraper importable whether this runs as
 # `python backend/scripts/sync_sheet_to_archive.py` or via the workflow's
 # `cd backend && python scripts/...` invocation. Mirrors process_submission.py.
 _BACKEND = pathlib.Path(__file__).resolve().parents[1]
@@ -63,7 +63,8 @@ for _candidate in (_BACKEND, _BACKEND / "src"):
 
 from rosen_scraper.sheets_client import open_spreadsheet  # noqa: E402
 from rosen_scraper.csv_safety import sanitize_csv_value  # noqa: E402
-from submission_server.config import (  # noqa: E402
+from submission_runtime.artifacts import DATA_DEPLOY_JSON_FILES  # noqa: E402
+from submission_runtime.config import (  # noqa: E402
     CSV_FILE as _DEFAULT_CSV_FILE,
     DATA_DIR,
     EXPORT_SCRIPT,
@@ -75,22 +76,7 @@ CSV_FILE = _DEFAULT_CSV_FILE
 DEFAULT_SHEET_TAB = "test_runs"
 
 # The canonical JSON artifacts `node export-archive-data.js` regenerates.
-# These are committed alongside the CSV so the PR carries a consistent data set
-# and main stays self-consistent. archive-analytics.json must be here too, or a
-# sheet-sync PR commits updated data but stale analytics and the parity test in
-# tests/archive-analytics.test.js fails in CI. search-index.json (the lazy
-# full-text index, #276) likewise: omit it and main ships an index stale against
-# the record set. Keep in sync with sftp_push._PUSH_FILES (the deploy-time
-# contract) and export-archive-data.js (the producer); the equality is enforced
-# by backend/tests/test_publish_list_parity.py.
-_DEPLOY_JSON_FILES = (
-    "archive-data.json",
-    "archive-core.json",
-    "archive-details.json",
-    "archive-entities.json",
-    "archive-analytics.json",
-    "search-index.json",
-)
+_DEPLOY_JSON_FILES = DATA_DEPLOY_JSON_FILES
 
 # Columns the enrichment jobs produce. On sync the sheet's non-empty value wins
 # (the sheet is the enrichment surface). An empty sheet cell never blanks the

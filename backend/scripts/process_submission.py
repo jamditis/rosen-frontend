@@ -75,8 +75,9 @@ from rosen_scraper import entity_csv_writer  # noqa: E402
 from rosen_scraper import entity_resolver  # noqa: E402
 from rosen_scraper.url_safety import is_safe_public_url  # noqa: E402
 from rosen_scraper.workflow import enrich_data  # noqa: E402
-from submission_server import sftp_push, sheets_callback  # noqa: E402
-from submission_server.config import (  # noqa: E402
+from submission_runtime import sftp_push, sheets_callback  # noqa: E402
+from submission_runtime.artifacts import DATA_DEPLOY_JSON_FILES  # noqa: E402
+from submission_runtime.config import (  # noqa: E402
     CSV_FILE as _DEFAULT_CSV_FILE,
     DATA_DIR,
     EXPORT_SCRIPT,
@@ -85,10 +86,9 @@ from submission_server.config import (  # noqa: E402
     PROJECT_ROOT,
     SCHEMA_FILE,
 )
-from submission_server.processor import (  # noqa: E402
-    _STAGED_JSON_FILES,
-    _sanitize_cell,
-    _sanitize_record,
+from submission_runtime.csv_safety import (  # noqa: E402
+    sanitize_cell as _sanitize_cell,
+    sanitize_record as _sanitize_record,
 )
 
 # Module-level handles that tests monkeypatch. Functions in this module call
@@ -101,6 +101,7 @@ extract_entities_and_relationships = _extract_entities
 # Tests override CSV_FILE to point at a tmp file. Defaults to the canonical
 # archive CSV when the script runs in CI.
 CSV_FILE = _DEFAULT_CSV_FILE
+_STAGED_JSON_FILES = DATA_DEPLOY_JSON_FILES
 
 # Shown to the submitter (via the sheet error column) when the scraper can't
 # fetch or parse a URL. Some hosts (Medium, paywalled or login-walled pages,

@@ -35,11 +35,6 @@ def _load_script_module():
     return module
 
 
-# Importing the script touches the real submission_server package; skip the
-# whole file if Flask isn't installed (matches conftest convention for the
-# other writeback tests).
-pytest.importorskip('flask')
-
 process_submission = _load_script_module()
 
 
