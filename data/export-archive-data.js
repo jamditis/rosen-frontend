@@ -174,16 +174,26 @@ function processRecord(row, index, type, relationshipsMap, authoredExcerpts) {
 function buildRelationshipsMap(relationshipsData) {
   const relationshipsMap = {};
 
-  for (const rel of relationshipsData) {
-    const source = rel.source_record_id || rel.Source || rel.source;
-    const target = rel.target_entity_id || rel.Target || rel.target;
+  // Link a record id and an entity id both ways, deduping. A record's relatedIds
+  // are read back from relationshipsMap[recordId] in processRecord().
+  const link = (recordId, entityId) => {
+    if (!recordId || !entityId) return;
+    if (!relationshipsMap[recordId]) relationshipsMap[recordId] = [];
+    if (!relationshipsMap[entityId]) relationshipsMap[entityId] = [];
+    if (!relationshipsMap[recordId].includes(entityId)) relationshipsMap[recordId].push(entityId);
+    if (!relationshipsMap[entityId].includes(recordId)) relationshipsMap[entityId].push(recordId);
+  };
 
-    if (source && target) {
-      if (!relationshipsMap[source]) relationshipsMap[source] = [];
-      if (!relationshipsMap[target]) relationshipsMap[target] = [];
-      if (!relationshipsMap[source].includes(target)) relationshipsMap[source].push(target);
-      if (!relationshipsMap[target].includes(source)) relationshipsMap[target].push(source);
-    }
+  for (const rel of relationshipsData) {
+    const record = rel.source_record_id || rel.Source || rel.source;
+    const targetEntity = rel.target_entity_id || rel.Target || rel.target;
+    const sourceEntity = rel.source_entity_id;
+
+    // The source record mentions both endpoints of the relationship, so associate
+    // it with each. Linking only the target left source-only entities (e.g. the
+    // interviewer in "X interviews Y") unreachable from any record.
+    link(record, targetEntity);
+    link(record, sourceEntity);
   }
 
   return relationshipsMap;

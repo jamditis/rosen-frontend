@@ -225,6 +225,37 @@ describe('archive-entities.json', () => {
     const uniqueIds = new Set(ids);
     assert.strictEqual(ids.length, uniqueIds.size, `Found ${ids.length - uniqueIds.size} duplicate entity IDs`);
   });
+
+  it('does not orphan entities outside the known pre-existing baseline', () => {
+    // An entity is orphaned when it is unreachable from every served record via
+    // recordEntityMap. That is the exact condition under which the UI's
+    // getRecordsByEntity() (archiveService.js: entityToRecords, built only from
+    // served records' relatedIds) returns zero: the entity shows in the Explorer
+    // but opens with no records. firstMentionRecordId is deliberately NOT part of
+    // this test -- the UI never reads it to list records, so an unreachable entity
+    // with a served first mention is still broken and must be counted.
+    //
+    // A baseline set of pre-existing unreachable entities remains, from records
+    // with empty raw_text (issues #207 / #211 / #199) and from entities whose only
+    // mentions are in unserved social posts. tests/fixtures/orphan-baseline.json
+    // pins their exact ids. This asserts the current unreachable set is a SUBSET of
+    // that baseline, so a future extraction slice -- or an exporter regression that
+    // drops recordEntityMap links -- cannot introduce a new orphan even if an
+    // unrelated cleanup drops the count by the same amount (a count ceiling would
+    // miss that). The 9c social slice added ~1,350 orphans before its cleanup (PR
+    // after #579); it now adds none. Shrink the fixture as the backlog clears.
+    const baseline = new Set(JSON.parse(
+      fs.readFileSync(path.join(__dirname, 'fixtures', 'orphan-baseline.json'), 'utf-8')));
+    const servedIds = new Set(fullData.records.map(r => r.id));
+    const reachable = new Set();
+    for (const [recId, entIds] of Object.entries(entitiesData.recordEntityMap)) {
+      if (servedIds.has(recId)) for (const eid of entIds) reachable.add(eid);
+    }
+    const orphaned = entitiesData.entities.filter(e => !reachable.has(e.id));
+    const novel = orphaned.filter(e => !baseline.has(e.id));
+    assert.equal(novel.length, 0,
+      `${novel.length} entities are unreachable but not in the pinned baseline; a data change introduced entities that open with zero records: ${novel.slice(0, 5).map(e => `${e.id}:${e.name}`).join(', ')}`);
+  });
 });
 
 // ============================================
