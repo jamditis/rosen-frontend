@@ -73,6 +73,13 @@ _DEPLOY_DIRS: Tuple[str, ...] = (
     'data/feeds',
 )
 
+# features/making-of is intentionally omitted. That page is a draft pending
+# curator sign-off, and its handoff chapter carries approval-gated disclosures,
+# so it is held out of the manifest to keep a routine full-site deploy from
+# publishing it early. On sign-off: add 'features/making-of' here and to
+# DEPLOYMENT.md, and exclude its og-image.html render template (a build-time
+# social card, not a browsable page) via _EXCLUDE_NAMES.
+
 _DEPLOY_DATA_FILES: Tuple[str, ...] = (
     'data/archive-core.json',
     'data/archive-data.json',

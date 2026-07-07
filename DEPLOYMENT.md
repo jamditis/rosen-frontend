@@ -82,6 +82,7 @@ Do not upload these to the production server:
 - `.env`, `google_credentials.json` — Credentials
 - `package.json`, `package-lock.json` — npm config
 - `CLAUDE.md`, `README.md` — Development docs
+- `features/making-of/` (draft, PR #592). Held pending curator approval of its handoff chapter. Do not upload it, even in a full `features/` sync, until sign-off. Its `og-image.html` is a build-time render template, not a page.
 
 ## Deploy after adding records
 
