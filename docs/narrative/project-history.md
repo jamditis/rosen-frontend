@@ -570,14 +570,14 @@ The initial development in June 2025 was plagued by environment issues beyond th
 
 ## Current state
 
-As of 2026-05-25, the archive contains:
+As of 2026-07-07, the archive contains:
 
 | Metric | Value |
 |--------|-------|
-| Archive records (articles, essays, etc.) | 1,030 (800 RECORD, 137 TUMBLR, 83 CLIP, 10 THREAD) |
-| Social media posts (Twitter + Bluesky) | ~29,700 |
-| Named entities | 5,036 |
-| Entity relationships | 4,666 |
+| Archive records (articles, essays, etc.) | 1,029 (799 RECORD, 137 TUMBLR, 83 CLIP, 10 THREAD) |
+| Social media posts (Twitter + Bluesky) | 29,747 |
+| Named entities | 8,152 |
+| Entity relationships | 12,560 |
 | Dissertation tools (live) | 4 (reader, foreword, network-effect, faq) |
 | Dissertation tools (retired to `archived/dissertation-tools/`) | 6 tools (comparison, concepts, context, excerpts, glossary, timeline) + a source bundle |
 | CI/CD workflows | 9 |
@@ -590,7 +590,7 @@ The frontend provides seven routes: the main archive view with record cards and 
 
 The archive data spans 1986 through 2026 — 41 years total, anchored at the early end by the 1986 dissertation and at the late end by 2026 social posts. The bulk of the non-dissertation material runs from 1989 (the earliest record in `archive_records-public.csv`) onward, a 38-year window. The 8-era classification system maps the arc from early career and public journalism through the blogging era, social media transformation, Trump-era democratic crisis, COVID-19 misinformation challenges, and the current moment.
 
-Known issues remain: social media records (~29,700) have generic titles needing AI-based title generation; browser localStorage can fill up on the live site; thread records have placeholder titles; ~200 records have zero extracted relationships because their `raw_text` is empty (issues #207/#211); 16 records still carry `verified=false`, a handful of which (e.g. The Baffler issue 12 from 1999 and the defunct Pew Center for Civic Journalism monograph from ~2000) are genuinely print-only and unrecoverable without library microfilm; and the `archive.pressthink.org` subdomain has a TLS certificate issue.
+Known issues remain: social media records (29,747) have generic titles needing AI-based title generation; browser localStorage can fill up on the live site; thread records have placeholder titles; ~200 records have zero extracted relationships because their `raw_text` is empty (issues #207/#211); 79 records still carry `verified=false`, a handful of which (e.g. The Baffler issue 12 from 1999 and the defunct Pew Center for Civic Journalism monograph from ~2000) are genuinely print-only and unrecoverable without library microfilm; and the `archive.pressthink.org` subdomain has a TLS certificate issue.
 
 The raw text content for each record was manually extracted by the project maintainer and is treated as sacred -- any data processing must preserve the `raw_text` field intact. CSV data must always be parsed with Python's `csv` module, not bash tools (grep, cut, awk), which cannot handle quoted fields with embedded commas. These are two rules learned through experience that apply to any future work on the archive.
 
