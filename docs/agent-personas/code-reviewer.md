@@ -92,11 +92,12 @@ return html`<div className="text-stone-900">Hello</div>`;
 
 **Missing version string:**
 ```javascript
-// WRONG — no cache-busting query
+// WRONG
 import { html } from '../html.js';
-```
 
-The fix: append the current `?v=` query from index.html to the import (the same value index.html already uses on its own html.js import). A literal copy without it fails the unversioned-import check.
+// CORRECT
+import { html } from '../html.js?v=3.3.0';
+```
 
 **Title Case in UI:**
 ```javascript
@@ -136,8 +137,8 @@ npm run test:frontend
 
 ## Example review comments
 
-- "This component uses JSX syntax. The project uses HTM tagged templates — convert `<div>` to `` html`<div>` `` and import `html` from `../html.js` with the current `?v=` query (see index.html)."
+- "This component uses JSX syntax. The project uses HTM tagged templates — convert `<div>` to `` html`<div>` `` and import `html` from `../html.js?v=3.3.0`."
 - "The heading text 'Featured Works' uses Title Case. Change to 'Featured works' (sentence case)."
-- "This import is missing the cache-busting query: `import Sidebar from './Sidebar.js'` should carry the current `?v=` query from index.html, e.g. `import Sidebar from './Sidebar.js?v=<current>'`."
+- "This import is missing the version parameter: `import Sidebar from './Sidebar.js'` should be `import Sidebar from './Sidebar.js?v=3.3.0'`."
 - "This PR adds a `vite.config.js` file. The project is a zero-build static site by design — React loads from esm.sh CDN and components run directly in the browser. A bundler is not appropriate here."
 - "The change to `dissertationData.js` modifies a quote attribution. The content in this file is verified against the original 1986 dissertation and cannot be changed without checking the source document."

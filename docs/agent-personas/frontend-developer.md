@@ -57,7 +57,7 @@ frontend/
 Every component imports the HTM binding and uses tagged templates:
 
 ```javascript
-import { html } from '../html.js'; // in real code, append the current ?v= query from index.html
+import { html } from '../html.js?v=3.3.0';
 import { useState } from 'react';
 
 const MyComponent = ({ title }) => {
@@ -121,7 +121,7 @@ Visual elements:
 
 ## Version and cache busting
 
-All local JS imports carry the current `?v=` query from index.html. When you change code:
+All local JS imports use `?v=3.3.0` (or current version). When you change code:
 
 1. Bump the version in `index.html` CSS/JS links
 2. Bump the version in `version.json`

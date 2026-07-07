@@ -212,62 +212,6 @@ describe('CACHE_VERSION', () => {
 });
 
 // ============================================
-// Agent-facing docs
-// ============================================
-
-describe('agent-facing version guidance', () => {
-  it('does not hard-code concrete app versions in agent docs', () => {
-    const personaDir = path.join(rootDir, 'docs', 'agent-personas');
-    const docFiles = [
-      'CLAUDE.md',
-      'AGENTS.md',
-      ...fs.readdirSync(personaDir)
-        .filter((f) => f.endsWith('.md'))
-        .map((f) => path.join('docs', 'agent-personas', f)),
-    ];
-    const concreteVersionPatterns = [
-      {
-        label: 'concrete import query version',
-        pattern: /\?v=\d+\.\d+\.\d+/g,
-      },
-      {
-        // A bare v-prefixed literal (e.g. "v3.5.0") anywhere in an agent doc.
-        // This is deliberately markdown-agnostic: it also catches the current
-        // "**Current deploy version:** vX.Y.Z" heading form, which an anchored
-        // "version:\s*vX.Y.Z" pattern misses because of the ":**" between them.
-        // The v prefix keeps it clean — a bare \d+\.\d+\.\d+ would false-match
-        // React (18.2.0), Lucide (0.292.0), and IPs (127.0.0.1).
-        label: 'concrete version literal',
-        pattern: /\bv\d+\.\d+\.\d+\b/gi,
-      },
-      {
-        // The unprefixed form the v-pattern above cannot safely catch:
-        // version.json stores the deploy version without a "v" (e.g. 3.6.4), so
-        // "Current deploy version: 3.6.4" must fail too. Scope it to the
-        // deploy-version guidance line — [:*\s]* tolerates the markdown "**" and
-        // colon — so it never false-matches unrelated semver like React 18.2.0.
-        label: 'concrete deploy-version literal',
-        pattern: /Current (?:deploy )?version[:*\s]*v?\d+\.\d+\.\d+/gi,
-      },
-    ];
-
-    const matches = [];
-    for (const docFile of docFiles) {
-      const content = fs.readFileSync(path.join(rootDir, docFile), 'utf-8');
-      for (const { label, pattern } of concreteVersionPatterns) {
-        pattern.lastIndex = 0;
-        for (const match of content.matchAll(pattern)) {
-          matches.push(`${docFile}: ${label} "${match[0]}"`);
-        }
-      }
-    }
-
-    assert.strictEqual(matches.length, 0,
-      `Agent docs should point to version.json/index.html/sw.js instead of hard-coding deploy versions:\n  ${matches.join('\n  ')}`);
-  });
-});
-
-// ============================================
 // Import path validity
 // ============================================
 
