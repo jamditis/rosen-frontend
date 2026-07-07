@@ -240,6 +240,15 @@ describe('agent-facing version guidance', () => {
         label: 'concrete version literal',
         pattern: /\bv\d+\.\d+\.\d+\b/gi,
       },
+      {
+        // The unprefixed form the v-pattern above cannot safely catch:
+        // version.json stores the deploy version without a "v" (e.g. 3.6.4), so
+        // "Current deploy version: 3.6.4" must fail too. Scope it to the
+        // deploy-version guidance line — [:*\s]* tolerates the markdown "**" and
+        // colon — so it never false-matches unrelated semver like React 18.2.0.
+        label: 'concrete deploy-version literal',
+        pattern: /Current (?:deploy )?version[:*\s]*v?\d+\.\d+\.\d+/gi,
+      },
     ];
 
     const matches = [];

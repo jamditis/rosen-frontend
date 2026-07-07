@@ -57,7 +57,7 @@ frontend/
 Every component imports the HTM binding and uses tagged templates:
 
 ```javascript
-import { html } from '../html.js?v=<current>'; // the current ?v= from index.html
+import { html } from '../html.js'; // in real code, append the current ?v= query from index.html
 import { useState } from 'react';
 
 const MyComponent = ({ title }) => {

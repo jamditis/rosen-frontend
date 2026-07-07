@@ -94,10 +94,9 @@ return html`<div className="text-stone-900">Hello</div>`;
 ```javascript
 // WRONG — no cache-busting query
 import { html } from '../html.js';
-
-// CORRECT — carry the current ?v= query (matches index.html)
-import { html } from '../html.js?v=<current>';
 ```
+
+The fix: append the current `?v=` query from index.html to the import (the same value index.html already uses on its own html.js import). A literal copy without it fails the unversioned-import check.
 
 **Title Case in UI:**
 ```javascript
