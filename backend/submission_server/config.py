@@ -3,11 +3,20 @@
 Configuration for the submission server.
 """
 
+import os
+import sys
 from pathlib import Path
 
-import os
+# submission_runtime lives at backend/submission_runtime and is imported as a
+# top-level package. The current GitHub Actions path runs with
+# working-directory: backend, so it resolves; the legacy repo-root invocation
+# (python -m backend.submission_server.scheduler) only puts the repo root on
+# sys.path. Add backend/ so the import resolves under both invocation modes.
+_BACKEND_DIR = Path(__file__).resolve().parent.parent
+if str(_BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(_BACKEND_DIR))
 
-from submission_runtime.config import (
+from submission_runtime.config import (  # noqa: E402
     BACKEND_DIR as BACKEND_DIR,
     CSV_FILE as CSV_FILE,
     DATA_DIR as DATA_DIR,
