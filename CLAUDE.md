@@ -75,12 +75,12 @@ Configured in `frontend/constants.js` via `DATA_CONFIG`.
 
 ### Source CSV files
 
-Counts verified against current `data/` on 2026-05-25:
+Counts verified against current `data/` on 2026-07-07:
 
 | File | Records | Contents |
 |------|---------|----------|
-| `data/archive_records-public.csv` | 1,030 | Non-social archive records (800 RECORD, 137 TUMBLR, 83 CLIP, 10 THREAD). Line count is high (~50k+) due to multi-line text fields. Max record id is `RECORD-00901`; next ID for new records is `RECORD-00902`. |
-| `data/social_posts.csv` | ~29,700 | Twitter/X and Bluesky posts. Max BSKY id is `BSKY-03121`. |
+| `data/archive_records-public.csv` | 1,029 | Non-social archive records (799 RECORD, 137 TUMBLR, 83 CLIP, 10 THREAD). Line count is high (~50k+) due to multi-line text fields. Max record id is `RECORD-00904`; next ID for new records is `RECORD-00905`. |
+| `data/social_posts.csv` | 29,747 | Twitter/X and Bluesky posts. Max BSKY id is `BSKY-03172`. |
 | `data/extracted_entities.csv` | 8,152 | Named entities (people, orgs, concepts) |
 | `data/extracted_relationships.csv` | 12,560 | Entity-to-record relationships |
 
@@ -168,8 +168,8 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── archive-core.json            # Lightweight records (~13 MB)
 │   ├── archive-details.json         # Full details (~13 MB)
 │   ├── archive-entities.json        # Entity graph (~1.1 MB)
-│   ├── archive_records-public.csv   # Source records (1,030 rows)
-│   ├── social_posts.csv             # Social media posts (~29,700 rows)
+│   ├── archive_records-public.csv   # Source records (1,029 rows)
+│   ├── social_posts.csv             # Social media posts (29,747 rows)
 │   ├── extracted_entities.csv       # Named entities (8,152 rows)
 │   ├── extracted_relationships.csv  # Entity relationships (12,560 rows)
 │   ├── export-archive-data.js       # JSON generator script
@@ -328,10 +328,10 @@ Supports: Articles, Videos, Twitter/X, Tumblr, Newspaper Clippings (PDF OCR).
 
 ## Known issues
 
-- Social media records (~29,700) have generic titles ("Tweet by Jay Rosen", "Post by Jay Rosen"). Fixing this would require AI-based title generation from post content.
+- Social media records (29,747) have generic titles ("Tweet by Jay Rosen", "Post by Jay Rosen"). Fixing this would require AI-based title generation from post content.
 - Browser localStorage can fill up on the live site due to data size. The ~13 MB `archive-core.json` exceeds localStorage's ~5 MB cap, so the core-data cache uses IndexedDB (`frontend/services/idbCache.js`, #275) — it structured-clones the parsed object on read (no `JSON.parse`) and persists across tab close. The old localStorage/sessionStorage path remains as a fallback for browsers where IndexedDB is blocked (Safari Private, Firefox strict tracking protection).
 - Thread records have placeholder titles ("[Bluesky Thread]") — needs content-based title generation.
 - Roughly 200 records have zero extracted relationships, most because their `raw_text` column is empty (issues #207 / #211). Extraction can be rerun once the raw_text gap-fill in issue #208 (PressThink sweep) and #209 (HuffPost sweep) lands.
-- 16 records still have `verified=false`. Recovery work is tracked in issue #199 (sub-batches in issue #242 and PR #244/#253). A small set is genuinely unrecoverable — print-only or vanished publications (e.g. The Baffler issue 12 from 1999; the defunct Pew Center for Civic Journalism's print monograph from ~2000).
+- 79 records still have `verified=false`. Recovery work is tracked in issue #199 (sub-batches in issue #242 and PR #244/#253). A small set is genuinely unrecoverable — print-only or vanished publications (e.g. The Baffler issue 12 from 1999; the defunct Pew Center for Civic Journalism's print monograph from ~2000).
 - `archive.pressthink.org` subdomain has a TLS certificate issue. Records using that subdomain correctly use `http://` URLs — browsers handle these fine but HTTPS fetch will fail.
 - Bluesky outbound links use `bsky.app`, not `embed.bsky.app`; the embed host returns placeholder/404 pages when opened directly.
