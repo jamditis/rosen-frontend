@@ -7,8 +7,11 @@ Checks if batch processing should run based on:
   1. Queue threshold (default: 5+ pending submissions)
   2. Daily schedule (any pending submissions at midnight)
 
-Intended to be called by cron every hour:
-    0 * * * * cd /path/to/rosen-frontend && python -m backend.submission_server.scheduler
+Superseded by the sweep-stuck-rows.yml GitHub Action (scripts/sweep_stuck.py,
+*/30 cron), which is the current dispatch path. Retained for legacy/manual use
+and slated for removal with the rest of the Flask submission_server package
+(issue #582). If invoked manually, run from the repo root:
+    cd /path/to/rosen-frontend && python -m backend.submission_server.scheduler
 """
 
 import sys

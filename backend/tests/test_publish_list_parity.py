@@ -1,31 +1,30 @@
 # -*- coding: utf-8 -*-
-"""Parity guard for the data-only deploy publish lists (#276 follow-up).
+"""Parity guard for the data-only deploy publish list (#276 follow-up).
 
-Four separate paths ship regenerated JSON without a full-site deploy, and each
-hardcodes its own list of artifact filenames:
+Several paths ship regenerated JSON without a full-site deploy:
 
-  - submission_server/processor.py   _STAGED_JSON_FILES  (submit-record staging)
-  - submission_server/sftp_push.py    _PUSH_FILES        (submit-record SFTP push)
-  - scripts/sync_sheet_to_archive.py  _DEPLOY_JSON_FILES  (sheet-sync commit)
+  - submission_runtime/artifacts.py   DATA_DEPLOY_JSON_FILES (canonical tuple)
+  - submission_runtime/sftp_push.py   _PUSH_FILES            (runtime alias)
+  - submission_server/processor.py    _STAGED_JSON_FILES     (legacy alias)
+  - scripts/process_submission.py     _STAGED_JSON_FILES     (Action alias)
+  - scripts/sync_sheet_to_archive.py  _DEPLOY_JSON_FILES     (sheet-sync alias)
   - submission_server/deploy.sh       ARTIFACTS="..."     (manual FTP staging;
                                                           shell, not a Python tuple)
 
-They must list the SAME artifacts: a file present in one but missing from another
-is deployed inconsistently. That contract lived only in "keep in sync" comments,
-which is how search-index.json (the lazy full-text index the exporter now writes
-for #276) was added to the producer and the full-site deploy but silently omitted
-from the incremental paths -- so a submitted record would be live in
-archive-core/details while MiniSearch still served the previous index.
+The Python paths must share the canonical runtime tuple, and the shell path must
+match it exactly. A file present in one but missing from another is deployed
+inconsistently.
 
 Two invariants make that class of bug a test failure instead of a latent gap:
-  1. The three lists are identical (catches editing one, forgetting the others).
+  1. The runtime tuple and shell list are identical.
   2. They equal the expected canonical set below (catches adding a new
      browser-loaded artifact to the exporter but to none of the lists -- pure
-     mutual parity would pass in that case because all three still agree).
+     mutual parity would pass in that case because both lists still agree).
 
 Adding a browser-loaded artifact the exporter regenerates therefore means:
-update all four publish paths AND EXPECTED_ARTIFACTS here. That deliberate friction
-is the point -- a data-only deploy that ships a stale index is the bad state.
+update submission_runtime/artifacts.py, deploy.sh, and EXPECTED_ARTIFACTS here.
+That deliberate friction is the point -- a data-only deploy that ships a stale
+index is the bad state.
 
 Parses the source instead of importing it: sync_sheet_to_archive imports the
 Google Sheets client at module load, which a lightweight test should not require.
@@ -48,9 +47,14 @@ EXPECTED_ARTIFACTS = frozenset({
     "search-index.json",
 })
 
-_PUBLISH_LISTS = (
+_CANONICAL_PUBLISH_LISTS = (
+    ("submission_runtime/artifacts.py", "DATA_DEPLOY_JSON_FILES"),
+)
+
+_PYTHON_ALIAS_LISTS = (
+    ("submission_runtime/sftp_push.py", "_PUSH_FILES"),
     ("submission_server/processor.py", "_STAGED_JSON_FILES"),
-    ("submission_server/sftp_push.py", "_PUSH_FILES"),
+    ("scripts/process_submission.py", "_STAGED_JSON_FILES"),
     ("scripts/sync_sheet_to_archive.py", "_DEPLOY_JSON_FILES"),
 )
 
@@ -142,7 +146,7 @@ def _all_publish_lists() -> dict:
     """label -> set(filenames) for every data-only publish path (Python + shell)."""
     lists = {
         f"{rel}:{name}": set(_extract_tuple(rel, name))
-        for rel, name in _PUBLISH_LISTS
+        for rel, name in _CANONICAL_PUBLISH_LISTS
     }
     for rel in _SHELL_PUBLISH_LISTS:
         lists[f"{rel}:ARTIFACTS"] = set(_extract_shell_list(rel))
@@ -155,7 +159,7 @@ def test_every_publish_list_matches_the_expected_artifact_set():
             f"{label} must list exactly the data-only deploy artifacts. "
             f"missing={sorted(EXPECTED_ARTIFACTS - files)} "
             f"extra={sorted(files - EXPECTED_ARTIFACTS)}. Add a browser-loaded "
-            f"artifact to every publish path (the three tuples and deploy.sh) and "
+            f"artifact to submission_runtime/artifacts.py, deploy.sh, and "
             f"EXPECTED_ARTIFACTS together."
         )
 
@@ -175,6 +179,18 @@ def test_parsers_find_nonempty_lists():
     for label, files in _all_publish_lists().items():
         assert len(files) >= 5, f"{label} parsed as {sorted(files)}; expected >=5 files"
         assert "archive-core.json" in files, f"{label} missing archive-core.json"
+
+
+def test_python_publish_paths_alias_the_runtime_artifact_list():
+    for rel, name in _PYTHON_ALIAS_LISTS:
+        source = _strip_comments((_BACKEND / rel).read_text(encoding="utf-8"))
+        assert "DATA_DEPLOY_JSON_FILES" in source, (
+            f"{rel} should import DATA_DEPLOY_JSON_FILES from submission_runtime.artifacts"
+        )
+        assert re.search(rf"{re.escape(name)}\s*=\s*DATA_DEPLOY_JSON_FILES\b", source), (
+            f"{rel}:{name} should alias DATA_DEPLOY_JSON_FILES instead of "
+            "declaring another artifact tuple"
+        )
 
 
 def test_shell_parser_reads_artifacts_assignment_not_loops():
