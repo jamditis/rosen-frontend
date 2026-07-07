@@ -17,7 +17,7 @@ When a bug is reported, don't immediately attempt to fix it. Instead:
 
 - **Live URL:** https://pressthink.org/j/rosen-archive/
 - **Repository:** github.com/jamditis/rosen-frontend
-- **Current version:** v3.4.1
+- **Current deploy version:** see `version.json`, `index.html`, and `frontend/sw.js`
 - **Archive curator:** Joe Amditis
 
 ### About Jay Rosen
@@ -50,7 +50,7 @@ Professor of Journalism at NYU since 1986. Creator of PressThink blog. Known for
 
 ### Version/cache busting
 
-All JS imports use `?v=3.3.0` query parameters. When changing code, bump the version string across all imports. Use the `/check-versions` skill to find version mismatches.
+All JS imports use the current `?v=` query parameter from `index.html`. When changing deployable code, bump the version in lockstep across `index.html`, `version.json`, every relevant import string, and `frontend/sw.js` `CACHE_VERSION`. Use the `/check-versions` skill to find version mismatches.
 
 ### Path configuration
 
@@ -316,8 +316,8 @@ Supports: Articles, Videos, Twitter/X, Tumblr, Newspaper Clippings (PDF OCR).
 1. **No build step for frontend.** Never suggest npm/webpack/vite for the production frontend. The only npm usage is `node data/export-archive-data.js` for data generation and `npm test` for testing.
 2. **Match the design system.** Use Roboto Mono body text, Special Elite for display headings, paper texture background. Follow `constants.js` color definitions.
 3. **Dissertation content is sacred.** Quotes and content in `dissertationData.js` are verified citations. Do not modify, paraphrase, or fabricate quotes.
-4. **Use HTM, not JSX.** All components use the `html` tagged template from `./html.js`. Import it as `import { html } from '../html.js?v=3.3.0'`.
-5. **Version all imports.** Every `.js` import must include the `?v=3.3.0` query parameter. Check `index.html` for the current version.
+4. **Use HTM, not JSX.** All components use the `html` tagged template from `./html.js`. Import it from the versioned local `html.js` path already used by the surrounding file.
+5. **Version all imports.** Every `.js` import must include the current `?v=` query parameter from `index.html`.
 6. **Standalone pages go in `/dissertation/` or `/features/`.** Each gets its own subdirectory with an `index.html`.
 7. **Keep data regeneration working.** If you modify CSV structure, update `data/export-archive-data.js` to match.
 8. **Backend uses Poetry.** Not pip directly. Run commands with `poetry run python ...`.
