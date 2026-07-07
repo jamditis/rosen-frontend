@@ -217,15 +217,28 @@ describe('CACHE_VERSION', () => {
 
 describe('agent-facing version guidance', () => {
   it('does not hard-code concrete app versions in agent docs', () => {
-    const docFiles = ['CLAUDE.md', 'AGENTS.md'];
+    const personaDir = path.join(rootDir, 'docs', 'agent-personas');
+    const docFiles = [
+      'CLAUDE.md',
+      'AGENTS.md',
+      ...fs.readdirSync(personaDir)
+        .filter((f) => f.endsWith('.md'))
+        .map((f) => path.join('docs', 'agent-personas', f)),
+    ];
     const concreteVersionPatterns = [
       {
         label: 'concrete import query version',
         pattern: /\?v=\d+\.\d+\.\d+/g,
       },
       {
-        label: 'current version literal',
-        pattern: /Current version:\s*v?\d+\.\d+\.\d+/gi,
+        // A bare v-prefixed literal (e.g. "v3.5.0") anywhere in an agent doc.
+        // This is deliberately markdown-agnostic: it also catches the current
+        // "**Current deploy version:** vX.Y.Z" heading form, which an anchored
+        // "version:\s*vX.Y.Z" pattern misses because of the ":**" between them.
+        // The v prefix keeps it clean — a bare \d+\.\d+\.\d+ would false-match
+        // React (18.2.0), Lucide (0.292.0), and IPs (127.0.0.1).
+        label: 'concrete version literal',
+        pattern: /\bv\d+\.\d+\.\d+\b/gi,
       },
     ];
 

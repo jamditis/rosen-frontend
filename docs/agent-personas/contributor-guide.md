@@ -64,7 +64,7 @@ These apply to all contributors regardless of role:
 
 1. **No build step for frontend.** Never suggest npm/Webpack/Vite for the production frontend. npm is only used for `node data/export-archive-data.js` (data generation) and `npm test` (testing).
 
-2. **HTM, not JSX.** All components use the `html` tagged template from `./html.js`. Import: `import { html } from '../html.js?v=3.3.0'`.
+2. **HTM, not JSX.** All components use the `html` tagged template from `./html.js`, imported with the current `?v=` query from index.html.
 
 3. **Version all imports.** Every `.js` import must include a `?v=X.X.X` query parameter matching the current version. Check `index.html` and `version.json` for the current version.
 
