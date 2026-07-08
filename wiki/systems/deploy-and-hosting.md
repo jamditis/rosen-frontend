@@ -24,7 +24,7 @@ The deploy automation exists (`.github/workflows/deploy.yml` + `backend/scripts/
 
 ## The interim path (manual)
 
-Until credentials land, the [Curator](../people/joe-amditis.md) keeps the site current with a manual upload via the WordPress File Manager plugin — drop the built files into `/wp-content/rosen-archive/`. The weekly emailed-zip fallback is #459. Manifest of what to upload: [DEPLOYMENT.md](../../DEPLOYMENT.md).
+Until credentials land, the [Curator](../people/joe-amditis.md) keeps the site current with a manual upload via the WordPress File Manager plugin — drop the built files into `/wp-content/rosen-archive/`. The weekly emailed-zip fallback is #459. Manifest of what to upload: [DEPLOYMENT.md](../../DEPLOYMENT.md). Do not include `features/making-of/` in a manual upload until its handoff chapter is approved; it is listed under "What NOT to deploy" in that manifest.
 
 ## Cache busting (three layers)
 

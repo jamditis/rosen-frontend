@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; }
+  body {
+    background-color: #f5f1e8;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    color: #1c1917;
+    font-family: 'Roboto Mono', monospace;
+    padding: 66px 72px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .top { display: flex; justify-content: space-between; font-size: 18px; color: #57534e; letter-spacing: .06em; border-bottom: 1px solid #d8d0bf; padding-bottom: 16px; }
+  .tab { display: inline-block; background: #e7dcc4; border: 1px solid #d8d0bf; border-bottom: 0; font-size: 18px; color: #57534e; padding: 8px 20px 6px; border-radius: 8px 8px 0 0; letter-spacing: .08em; }
+  h1 { font-family: 'Special Elite', monospace; font-size: 118px; line-height: .92; }
+  .subject { font-family: 'Special Elite', monospace; font-size: 46px; color: #3a5f3f; margin-top: 6px; }
+  .dek { font-size: 24px; max-width: 900px; color: #1c1917; margin-top: 22px; line-height: 1.5; }
+  .bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+  .byline { font-size: 20px; color: #57534e; }
+  .byline b { color: #1c1917; }
+  .modes { display: flex; gap: 0; border: 2px solid #1c1917; border-radius: 3px; overflow: hidden; font-size: 20px; }
+  .modes span { padding: 10px 20px; }
+  .modes .on { background: #1c1917; color: #f5f1e8; }
+  .modes .off { color: #57534e; }
+</style>
+</head>
+<body>
+  <div>
+    <div class="top"><span>FILE / pressthink.org/j/rosen-archive</span><span>REV. 3.6.5</span></div>
+  </div>
+  <div>
+    <div class="tab">CASE FILE</div>
+    <div style="border-top:3px solid #1c1917; padding-top:18px;">
+      <h1>The making of</h1>
+      <div class="subject">Jay Rosen's Internet Archive</div>
+    </div>
+    <p class="dek">How four decades of journalism criticism became one searchable archive, built to outlast the tools that made it. The honest version, mistakes included.</p>
+  </div>
+  <div class="bottom">
+    <div class="byline">Built and maintained by <b>Joe Amditis</b></div>
+    <div class="modes"><span class="off">Case file</span><span class="on">Article</span></div>
+  </div>
+</body>
+</html>
