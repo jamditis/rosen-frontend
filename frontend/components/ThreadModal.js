@@ -1,7 +1,7 @@
-import { html } from '../html.js?v=3.6.5';
+import { html } from '../html.js?v=3.6.6';
 import { ExternalLink } from 'lucide-react';
-import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.6.5';
-import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.6.5';
+import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.6.6';
+import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.6.6';
 
 // Convert URLs in text to clickable links. Shares the linkify split with
 // RecordModal so the two stay consistent and neither carries a stateful regex.
