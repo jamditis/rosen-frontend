@@ -27,7 +27,7 @@ frontend/                           # React application
   vendor/                           # Self-hosted sql.js wasm (sql-wasm-1.10.3.wasm)
   design-system/                    # CSS tokens, demo
 
-data/                               # Archive data (JSON only)
+data/                               # Published archive data and shared taxonomy
   archive-core.json                 # Lightweight record cards (loads on page load)
   archive-details.json              # Full summaries (loads on demand)
   archive-data.json                 # Combined fallback
@@ -36,6 +36,7 @@ data/                               # Archive data (JSON only)
   search-index.json                 # Prebuilt MiniSearch full-text index (~1MB, loads lazily on first search)
   wiki-seed.json                    # Community wiki seed pages (loads on the #wiki view)
   schema.json                       # Data dictionary, linked from the open-data download UI
+  eras.js                           # Canonical era taxonomy shared with the frontend
   feeds/                            # RSS/OPML feeds
     rss.xml
     articles.xml

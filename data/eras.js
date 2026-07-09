@@ -1,6 +1,6 @@
 /**
- * Canonical era taxonomy shared by the export pipeline and the
- * data-integrity test — each previously held its own copy of this list.
+ * Canonical era taxonomy shared by the export pipeline, tests, analytics, and
+ * frontend. Each previously held its own copy of this list.
  *
  * These 8 values are the eras the published archive actually uses: every
  * record in archive_records-public.csv carries one of them, the export
@@ -8,18 +8,10 @@
  * data/SCHEMA.md documents the same list. The order here is the published
  * order of `facets.eras`; keep it stable.
  *
- * This is not yet the repo-wide single source. Two other surfaces still
- * carry an independent — and currently divergent — era list: the frontend
- * fallback in frontend/constants.js (a stale 4-value taxonomy) and the
- * analytics ordering in data/compute-analytics.js. Folding those in is
- * tracked in issue #385; it is partly gated on the taxonomy decision below
- * because the frontend list is a different (coarser) taxonomy.
- *
  * Note: issue #197 proposed a different 8-era taxonomy (a non-overlapping
  * timeline with COVID-19 / Post-Trump / Second Trump splits). That proposal
- * was not adopted — the data conforms to the list below. Choosing between
- * the two taxonomies is the open editorial decision tracked in issue #201;
- * if it lands on #197's set, change this one file and run the data migration.
+ * was not adopted. Joe decided issue #201 on 2026-07-09: use the canonical
+ * 8-era taxonomy below across the repository.
  */
 export const ERAS = [
   "Public Journalism (90s)",

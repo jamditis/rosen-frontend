@@ -13,7 +13,8 @@
 // sql.js is loaded dynamically to ensure JS and WASM are from the same source
 // The import map version can have WASM binary mismatches
 
-import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.6.6';
+import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.6.7';
+import { ERAS } from '../constants.js?v=3.6.7';
 
 // Self-hosted sql.js WASM binary (#291). The loader JS below is pinned with
 // SRI, but sql.js exposes no SRI hook for the .wasm it fetches via locateFile,
@@ -405,6 +406,10 @@ export const getRecordCountByCategory = () => {
  * Get record count by era
  */
 export const getRecordCountByEra = () => {
+  const eraOrderCase = ERAS
+    .map((era, index) => `WHEN '${era.replace(/'/g, "''")}' THEN ${index + 1}`)
+    .join('\n        ');
+
   return queryAsObjects(`
     SELECT era, COUNT(*) as count
     FROM records
@@ -412,12 +417,10 @@ export const getRecordCountByEra = () => {
     GROUP BY era
     ORDER BY
       CASE era
-        WHEN 'Public Journalism (90s)' THEN 1
-        WHEN 'Web & Blogging (00s)' THEN 2
-        WHEN 'View from Nowhere (10s)' THEN 3
-        WHEN 'Democracy in Crisis (20s)' THEN 4
-        ELSE 5
-      END
+        ${eraOrderCase}
+        ELSE ${ERAS.length + 1}
+      END,
+      era
   `);
 };
 

@@ -110,25 +110,12 @@ Order is roughly by how many other things each decision unblocks. Resolve in ord
 
 ---
 
-## 5. SQLite-validator rollout timing
+## 5. Era taxonomy — decided
 
 **Issue:** [#201](https://github.com/jamditis/rosen-frontend/issues/201)
-**Blocks:** nothing today; affects future-Joe / future-Jay maintainability
-**Status:** design is complete, code not started
-
-**Options:**
-
-- **A. Build the validator as a CI step now (Phase 1 only)** *(recommended)*
-  - Catches FK/CHECK violations on PRs before they merge
-  - Schema drift (#196, #197 patterns) becomes impossible-to-merge rather than audit-found
-  - Additive: doesn't change source-of-truth, doesn't touch the runtime
-- **B. Wait until after Pillar 3a stabilizes**
-  - One thing at a time; avoid concurrent infrastructure changes
-  - Pillar 3a smoke testing might surface schema issues the validator would catch
-- **C. Skip entirely; rely on audit scripts**
-  - Current state. Lowest ongoing cost. Drift surfaces only when someone runs the audits.
-
-**Recommendation:** A — build the CI validator step now (small, contained, won't conflict with Pillar 3a work in any meaningful way). Defer the source-of-truth + Sheets-front-door work to post-handoff per the original #201 plan.
+**Status:** Decided by Joe on 2026-07-09.
+**Decision:** Adopt the canonical 8-era taxonomy in `data/eras.js` across the repository. Do not use the alternative taxonomy proposed in #197.
+**Related implementation:** The separate SQLite validator remains approved as future work after Pillar 3a stabilizes. This taxonomy decision does not change that timing.
 
 ---
 

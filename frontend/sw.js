@@ -13,7 +13,7 @@
 // Cache version is tied to the app version in version.json. Bumping it on every
 // deploy (alongside index.html and the ?v= import strings) makes the activate
 // handler below drop every stale cache, so returning visitors never run old code.
-const CACHE_VERSION = '3.6.6';
+const CACHE_VERSION = '3.6.7';
 const CACHE_NAME = `jrda-cache-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `jrda-data-${CACHE_VERSION}`;
 
@@ -41,6 +41,7 @@ const STATIC_ASSETS = IS_LOCAL ? [
   '/frontend/App.js',
   '/frontend/html.js',
   '/frontend/constants.js',
+  '/data/eras.js',
   '/frontend/index.css',
   '/frontend/dist/tailwind.css',
   '/frontend/services/archiveService.js',
@@ -69,6 +70,7 @@ const STATIC_ASSETS = IS_LOCAL ? [
   `${BASE_PATH}/frontend/App.js`,
   `${BASE_PATH}/frontend/html.js`,
   `${BASE_PATH}/frontend/constants.js`,
+  `${DATA_PATH}/eras.js`,
   `${BASE_PATH}/frontend/index.css`,
   `${BASE_PATH}/frontend/dist/tailwind.css`,
   `${BASE_PATH}/frontend/services/archiveService.js`,

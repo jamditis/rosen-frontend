@@ -65,7 +65,7 @@ function deployedDataDirs() {
   return pyTuple('_DEPLOY_DIRS').filter(d => d === 'data' || d.startsWith('data/'));
 }
 
-// The data/*.json basenames listed as DIRECT children of the `data/` block in
+// The data file basenames listed as DIRECT children of the `data/` block in
 // DEPLOYMENT.md's first fenced "Files to deploy" code block. Scoped to the data
 // block so top-level version.json / metadata.json are not counted, and pinned to
 // the direct-child indent so nested entries (e.g. data/feeds/index.json) and
@@ -86,7 +86,7 @@ function deploymentMdDataFiles() {
     if (childIndent === null) childIndent = indent;       // first child sets the direct-child level
     if (indent !== childIndent) continue;                 // skip deeper-nested entries (data/feeds/*)
     const entry = raw.trim().split('#')[0].trim();
-    const m = entry.match(/^([A-Za-z0-9_-]+\.json)$/);
+    const m = entry.match(/^([A-Za-z0-9_-]+\.(?:json|js))$/);
     if (m) files.add(`data/${m[1]}`);
   }
   return files;
@@ -134,9 +134,8 @@ describe('deploy data manifest classifies every data file', () => {
   });
 
   it('references only data files that exist on disk (no manifest rot)', () => {
-    const present = new Set(allDataJsonFiles());
     const missing = [...deployedDataFiles(), ...KNOWN_NOT_DEPLOYED.keys()]
-      .filter(rel => !present.has(rel));
+      .filter(rel => !fs.existsSync(path.join(rootDir, rel)));
     assert.deepStrictEqual(missing, [],
       `Manifest/exclusion lists reference data file(s) absent from data/: ${missing.join(', ')}`);
   });
