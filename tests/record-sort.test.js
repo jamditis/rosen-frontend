@@ -12,8 +12,19 @@
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { sortRecords, RECORD_SORTS } from '../frontend/utils/recordSort.js';
+
+// App.js is read as text, not imported: it uses esm.sh import-map specifiers the
+// node test runner cannot resolve, so the layout is asserted from source in the
+// same way view-transition.test.js and archive-analytics.test.js check theirs.
+const appSrc = fs.readFileSync(
+  path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'frontend', 'App.js'),
+  'utf-8',
+);
 
 // The exact shape Jay flagged: 2026 records across several months, shuffled in
 // input with March placed AFTER April, so a comparator that left input order
@@ -72,9 +83,29 @@ describe('sortRecords — per-year record ordering (#529)', () => {
   });
 
   it('date-asc is the default the year filter relies on', () => {
-    // The app defaults sortBy to 'date-asc' (App.js), so a year click shows the
-    // oldest record first. Guard that 'date-asc' is a recognised sort, not a
-    // silent fallthrough to date-desc.
+    // The app sets sortBy to 'date-asc' explicitly (App.js), so a year click
+    // shows the oldest record first. That app default and the helper's date-desc
+    // fallback are not in conflict: 'date-asc' is a recognised key, so the
+    // fallback never runs for it; date-desc only catches an unrecognised key and
+    // keeps the historical newest-first default. Guard that 'date-asc' stays
+    // recognised, so a year click never silently falls through to date-desc.
     assert.ok(RECORD_SORTS.includes('date-asc'));
+  });
+});
+
+describe('record grid renders row-major so array order is the reading order (#529)', () => {
+  it('uses a CSS grid, not columns masonry, for the record grid', () => {
+    // The records array is already chronological; a row-major grid (left-to-right
+    // then down) makes that the reading order. This is the actual #529 fix, so
+    // pin it: the sort tests above cannot catch a layout regression on their own.
+    assert.match(appSrc, /className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3/);
+  });
+
+  it('leaves no masonry classes that would restore column-major flow', () => {
+    // Regression guard on the real fix surface. The old `columns-*` masonry and
+    // the `break-inside-avoid` card class flowed the grid column-major, which is
+    // the jump-around order Jay reported; reverting to either reintroduces #529.
+    assert.doesNotMatch(appSrc, /columns-1 md:columns-2 xl:columns-3/);
+    assert.doesNotMatch(appSrc, /break-inside-avoid/);
   });
 });
