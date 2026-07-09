@@ -21,8 +21,13 @@ import { sortRecords, RECORD_SORTS } from '../frontend/utils/recordSort.js';
 // App.js is read as text, not imported: it uses esm.sh import-map specifiers the
 // node test runner cannot resolve, so the layout is asserted from source in the
 // same way view-transition.test.js and archive-analytics.test.js check theirs.
-const appSrc = fs.readFileSync(
-  path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'frontend', 'App.js'),
+const rootDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+const appSrc = fs.readFileSync(path.join(rootDir, 'frontend', 'App.js'), 'utf-8');
+// Production serves this pre-built bundle directly (index.html links it); there
+// is no Tailwind build step, so a utility class the source uses but the bundle
+// omits is inert in production.
+const shippedCss = fs.readFileSync(
+  path.join(rootDir, 'frontend', 'dist', 'tailwind.css'),
   'utf-8',
 );
 
@@ -107,5 +112,15 @@ describe('record grid renders row-major so array order is the reading order (#52
     // the jump-around order Jay reported; reverting to either reintroduces #529.
     assert.doesNotMatch(appSrc, /columns-1 md:columns-2 xl:columns-3/);
     assert.doesNotMatch(appSrc, /break-inside-avoid/);
+  });
+
+  it('ships every grid class the record grid depends on', () => {
+    // With no build step, a grid class the source names but the pre-built bundle
+    // lacks is inert: the columns to grid swap left xl at two columns because
+    // .xl:grid-cols-3 was missing from the shipped CSS. Pin the three the grid
+    // uses so a future breakpoint change cannot silently drop back a column.
+    for (const rule of ['.grid-cols-1{', '.md\\:grid-cols-2{', '.xl\\:grid-cols-3{']) {
+      assert.ok(shippedCss.includes(rule), `shipped tailwind.css is missing ${rule}`);
+    }
   });
 });
