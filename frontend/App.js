@@ -1,29 +1,30 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.6.5';
+import { html } from './html.js?v=3.6.6';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString, loadSearchIndex } from './services/archiveService.js?v=3.6.5';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.6.5';
-import { withViewTransition } from './utils/viewTransition.js?v=3.6.5';
-import { ITEMS_PER_PAGE, COLORS, REPORT_CONFIG } from './constants.js?v=3.6.5';
-import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.6.5';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.6.5';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.6.5';
-import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.6.5';
-import Sidebar from './components/Sidebar.js?v=3.6.5';
-import WelcomeModal from './components/WelcomeModal.js?v=3.6.5';
-import RecordView from './components/RecordView.js?v=3.6.5';
-import FeaturedSection from './components/FeaturedSection.js?v=3.6.5';
-import DissertationPage from './components/DissertationPage.js?v=3.6.5';
-import ToolsModal from './components/ToolsModal.js?v=3.6.5';
-import BugReportModal from './components/BugReportModal.js?v=3.6.5';
-import LoadingQuotes from './components/LoadingQuotes.js?v=3.6.5';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.6.5';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.6.5';
-import EntityBrowser from './components/EntityBrowser.js?v=3.6.5';
-import Timeline from './components/Timeline.js?v=3.6.5';
-import AboutPage from './components/AboutPage.js?v=3.6.5';
-import WikiPage from './components/WikiPage.js?v=3.6.5';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString, loadSearchIndex } from './services/archiveService.js?v=3.6.6';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.6.6';
+import { withViewTransition } from './utils/viewTransition.js?v=3.6.6';
+import { ITEMS_PER_PAGE, COLORS, REPORT_CONFIG } from './constants.js?v=3.6.6';
+import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.6.6';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.6.6';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.6.6';
+import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.6.6';
+import { sortRecords } from './utils/recordSort.js?v=3.6.6';
+import Sidebar from './components/Sidebar.js?v=3.6.6';
+import WelcomeModal from './components/WelcomeModal.js?v=3.6.6';
+import RecordView from './components/RecordView.js?v=3.6.6';
+import FeaturedSection from './components/FeaturedSection.js?v=3.6.6';
+import DissertationPage from './components/DissertationPage.js?v=3.6.6';
+import ToolsModal from './components/ToolsModal.js?v=3.6.6';
+import BugReportModal from './components/BugReportModal.js?v=3.6.6';
+import LoadingQuotes from './components/LoadingQuotes.js?v=3.6.6';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.6.6';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.6.6';
+import EntityBrowser from './components/EntityBrowser.js?v=3.6.6';
+import Timeline from './components/Timeline.js?v=3.6.6';
+import AboutPage from './components/AboutPage.js?v=3.6.6';
+import WikiPage from './components/WikiPage.js?v=3.6.6';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
@@ -273,11 +274,7 @@ const App = () => {
       return true;
     });
 
-    res = res.sort((a, b) => {
-        if (sortBy === 'date-asc') return a.date.localeCompare(b.date);
-        if (sortBy === 'title-asc') return a.title.localeCompare(b.title);
-        return b.date.localeCompare(a.date);
-    });
+    res = sortRecords(res, sortBy);
 
     return res;
   }, [records, searchIndex, filters, sortBy, miniReady]);
@@ -652,7 +649,7 @@ const App = () => {
                     `}
 
                     ${!error && !loading && viewMode === 'grid' && html`
-                    <div className="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                         ${paginatedRecords.map(item => {
                             const primaryCat = item.categories[0] || 'Uncategorized';
                             const colorIdx = hashString(primaryCat) % COLORS.length;
@@ -662,7 +659,7 @@ const App = () => {
                             <div
                                 key=${item.id}
                                 onClick=${() => selectRecord(item.id)}
-                                className="break-inside-avoid mb-6 bg-white border border-stone-200 hover:border-stone-400 hover:shadow-lg transition-all duration-300 rounded-sm flex flex-col group cursor-pointer overflow-hidden relative"
+                                className="bg-white border border-stone-200 hover:border-stone-400 hover:shadow-lg transition-all duration-300 rounded-sm flex flex-col group cursor-pointer overflow-hidden relative"
                             >
                                 <div className="h-1 w-full" style=${{ backgroundColor: theme.text }}></div>
                                 <div className="p-6 flex flex-col h-full">
