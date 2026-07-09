@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { html } from '../html.js?v=3.6.6';
+import { html } from '../html.js?v=3.6.7';
 import {
   Search,
   Play,
@@ -17,7 +17,12 @@ import {
   HelpCircle,
   Loader2
 } from 'lucide-react';
-import { queryAsObjects, isSqliteReady, initSqlite } from '../services/archiveService.js?v=3.6.6';
+import { queryAsObjects, isSqliteReady, initSqlite } from '../services/archiveService.js?v=3.6.7';
+import { ERAS } from '../constants.js?v=3.6.7';
+
+const eraOrderCase = ERAS
+  .map((era, index) => `WHEN '${era.replace(/'/g, "''")}' THEN ${index + 1}`)
+  .join('\n          ');
 
 // Query template definitions
 const QUERY_TEMPLATES = [
@@ -112,13 +117,8 @@ const QUERY_TEMPLATES = [
     fields: {
       ERA: {
         type: 'dropdown',
-        options: [
-          { label: 'Public Journalism (90s)', value: 'Public Journalism (90s)' },
-          { label: 'Web & Blogging (00s)', value: 'Web & Blogging (00s)' },
-          { label: 'View from Nowhere (10s)', value: 'View from Nowhere (10s)' },
-          { label: 'Democracy in Crisis (20s)', value: 'Democracy in Crisis (20s)' }
-        ],
-        default: 'Democracy in Crisis (20s)'
+        options: ERAS.map(era => ({ label: era, value: era })),
+        default: ERAS[ERAS.length - 1]
       },
       LIMIT: {
         type: 'number',
@@ -313,12 +313,10 @@ const QUERY_TEMPLATES = [
       GROUP BY era
       ORDER BY
         CASE era
-          WHEN 'Public Journalism (90s)' THEN 1
-          WHEN 'Web & Blogging (00s)' THEN 2
-          WHEN 'View from Nowhere (10s)' THEN 3
-          WHEN 'Democracy in Crisis (20s)' THEN 4
-          ELSE 5
-        END
+          ${eraOrderCase}
+          ELSE ${ERAS.length + 1}
+        END,
+        era
     `
   },
   {

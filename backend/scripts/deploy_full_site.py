@@ -89,6 +89,7 @@ _DEPLOY_DATA_FILES: Tuple[str, ...] = (
     'data/search-index.json',  # prebuilt MiniSearch full-text index, loaded lazily on first search, issue 276
     'data/wiki-seed.json',
     'data/schema.json',  # data dictionary; linked from the open-data download UI
+    'data/eras.js',  # canonical era taxonomy imported by the frontend
 )
 
 # Walking _DEPLOY_DIRS, prune these.
@@ -200,6 +201,16 @@ def collect_local_files(
     # First: every top-level deploy file EXCEPT entry points.
     for relpath in top_files:
         if relpath in entry_set:
+            continue
+        p = repo_root / relpath
+        if p.is_file():
+            _add(p)
+
+    # Shared JavaScript modules under data/ must exist before the frontend files
+    # that import them flip live. Other data files stay after the directory walk
+    # so this only changes ordering for runtime module dependencies.
+    for relpath in data_files:
+        if not relpath.endswith('.js'):
             continue
         p = repo_root / relpath
         if p.is_file():

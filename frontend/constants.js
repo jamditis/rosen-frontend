@@ -55,12 +55,7 @@ export const ENTITY_TYPE_CONFIG = {
   Location: { color: '#9a3412', bg: '#fff7ed', label: 'Locations' }
 };
 
-export const ERAS = [
-  "Public Journalism (90s)",
-  "Web & Blogging (00s)",
-  "View from Nowhere (10s)",
-  "Democracy in Crisis (20s)"
-];
+export { ERAS } from '../data/eras.js?v=3.6.7';
 
 export const FEATURED_WORKS = [
   {

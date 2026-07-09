@@ -139,15 +139,8 @@ export async function computeAnalytics(data) {
   // eras fell into one ELSE bucket and the chart rendered unordered past the
   // first few (issue #385). Order by the canonical sequence from data/eras.js
   // instead, so every era sorts and the ordering can never drift from the
-  // shipped taxonomy (and follows it automatically if the #201 decision changes
-  // it). ERAS values are trusted module constants, not user input; single quotes
-  // are escaped for SQL correctness regardless.
-  //
-  // This intentionally diverges from the live-query mirror
-  // (sqliteService.js getRecordCountByEra), which still carries the stale
-  // 4-value CASE. That mirror is currently unused (the dashboard renders these
-  // prebuilt aggregates) and lives in the coarser frontend taxonomy whose
-  // unification is the gated half of #385. It folds in there, not silently dropped.
+  // shipped taxonomy. ERAS values are trusted module constants, not user input;
+  // single quotes are escaped for SQL correctness regardless.
   const eraOrderCase = ERAS
     .map((era, i) => `WHEN '${era.replace(/'/g, "''")}' THEN ${i + 1}`)
     .join('\n          ');

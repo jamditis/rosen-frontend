@@ -229,6 +229,12 @@ class TestEntryPointsUploadedLast:
         assert names.index('frontend/sw.js') < names.index('version.json')
         assert names[-3:] == ['index.html', 'frontend/sw.js', 'version.json']
 
+    def test_shared_data_modules_upload_before_frontend_importers(self):
+        files = deploy_full_site.collect_local_files(_REPO_ROOT)
+        names = [f.relative_to(_REPO_ROOT).as_posix() for f in files]
+
+        assert names.index('data/eras.js') < names.index('frontend/constants.js')
+
 
 class TestServiceWorkerEntryPointOrder:
     """frontend/sw.js is a version-flipping entry point (#441).
