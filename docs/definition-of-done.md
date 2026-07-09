@@ -18,21 +18,18 @@ All six hash-based routes are wired and render: Archive (`/`), Folders (`#folder
 
 ---
 
-### 2. Dissertation tools — Partial (live coverage doesn't match repo structure)
+### 2. Dissertation tools — Complete in the repo; production cleanup runs on full deploy
 
-**What's actually live at `pressthink.org/j/rosen-archive/dissertation/`:** reader, foreword, network-effect, glossary, comparison, context, excerpts, faq, concepts, timeline — verified by HTTP fetch on 2026-05-25.
+The maintained surfaces are the dissertation landing page, reader, foreword,
+network-effect analysis, and the top-level archive FAQ. The six retired tools
+have been removed from the repository. A full-site deploy removes their stale
+production directories only after all current files upload successfully.
 
-**What's in the repo's `dissertation/` directory (actively maintained):** reader, foreword, network-effect, faq (4 of 10; faq restored in #411).
-
-**What's in the repo's `archived/dissertation-tools/`:** comparison, concepts, context, excerpts, glossary, timeline + a source bundle (6 retired tools + 1 source bundle).
-
-**The mismatch:** the six "retired" tools were uploaded to WordPress once (when they were active) and are still served because nothing has overwritten them. They function in browsers — `context/script.js`, for example, populates JS-empty divs at runtime — but they live in `archived/` in the repo, which means the deploy manifest (`DEPLOYMENT.md`) doesn't include them. Any edit in `archived/` won't reach production via the current FTP workflow. (`faq` is the exception: it was restored to `dissertation/faq/` in #411, so it is live and on the deploy manifest, not archived.)
-
-**False positives from the live-site scan agent:** WebFetch reported `/dissertation/context/` as "empty outline" and `/faq/` as "blank default view." Both are JS-populated SPAs and work fine in a real browser. The agent couldn't run JavaScript. Issue #260 has been updated to reflect this.
+The deployment cleanup is limited to comparison, concepts, context, excerpts,
+glossary, and timeline. It does not touch the maintained dissertation pages,
+the FAQ, or either tool under `tools/active/`.
 
 **Foreword "February 2026" line** (`dissertation/foreword/index.html:533`): this is primary-source text from Rosen's December 2025 foreword. CLAUDE.md rule 3 forbids editing. Leave alone or add an editorial footnote noting the writing date.
-
-**Gap-closing action:** decide the "retired tools" question (4 options, in [decisions-pending.md](./decisions-pending.md)): restore all to `dissertation/`, leave them archived and accept drift, remove them from production, or restore a high-value subset and retire the rest.
 
 ---
 
@@ -140,7 +137,7 @@ Design doc only: `docs/plans/2026-05-24-pillar3-authoring-workflow-design.md`. Z
 
 In execution order. Joe owns step 1; everything else flows from his decisions.
 
-1. **Joe resolves the six remaining architectural decisions.** See [decisions-pending.md](./decisions-pending.md). URL canonicalization, Pillar 3a deploy mechanism, Pillar 3b scope, social-platform backfill priority, dissertation tools restoration, and the entity-loading stack (wire or shelve, #503). The era taxonomy decision is recorded there as decided; the separate SQLite validator remains approved as future work.
+1. **Joe resolves the five remaining architectural decisions.** See [decisions-pending.md](./decisions-pending.md). URL canonicalization, Pillar 3a deploy mechanism, Pillar 3b scope, social-platform backfill priority, and the entity-loading stack (wire or shelve, #503). The era taxonomy and dissertation-tools decisions are recorded there as decided; the separate SQLite validator remains approved as future work.
 
 2. **Pillar 3a credentials + smoke test.** Issue #226. Joe creates the GitHub App, adds the 11 secrets, runs three smoke tests (scrape-fail, dedup, full success). ~30 min after approval.
 
@@ -164,7 +161,7 @@ In execution order. Joe owns step 1; everything else flows from his decisions.
 
 Defer until v4.0 ships. None block "complete."
 
-- Repo hygiene cluster: #166 (prune archived/), #167 (Action SHA pinning), #168 (stale branches), #169 (emoji filename), #259 (impossible-press.md relocation). Batch into one PR.
+- Repo hygiene cluster: #167 (Action SHA pinning), #168 (stale branches), #169 (emoji filename), #259 (impossible-press.md relocation). Batch into one PR.
 - Backend script consolidation: #187–#190, #132. Maintainability only.
 - Frontend internal architecture: #130, #133, #134, #135.
 - SSR/OG for record deep links: #263. Better social-share unfurls. Defer until Pillar 3a + gap-fill land.

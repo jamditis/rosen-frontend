@@ -4,10 +4,10 @@
 
 Invoked from `.github/workflows/deploy.yml` on workflow_dispatch. Walks the
 hardcoded manifest below, uploads every file via paramiko SFTP with an
-atomic .tmp+posix_rename, and aborts on the first transfer failure (a
-partial deploy is worse than no deploy — half the page would resolve to
-v3.4.0 imports while the other half stayed on v3.3.0, pinning visitors
-into a broken half-updated state).
+atomic .tmp+posix_rename, then removes explicitly retired remote directories.
+It aborts on the first transfer failure (a partial deploy is worse than no
+deploy — half the page would resolve to v3.4.0 imports while the other half
+stayed on v3.3.0, pinning visitors into a broken half-updated state).
 
 Two distinct env vars on purpose:
   - ROSEN_SFTP_REMOTE_PATH → the per-record `submit-record.yml` data dir
@@ -33,8 +33,10 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
+import errno
 import logging
 import os
+import stat
 import sys
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
@@ -71,6 +73,19 @@ _DEPLOY_DIRS: Tuple[str, ...] = (
     'tools/active/dataexplorer',
     'tools/active/dataviz',
     'data/feeds',
+)
+
+# These retired pages predate the current upload-only manifest and still exist
+# on the production server. Prune them after all current files upload so a
+# transfer failure cannot remove working pages before the replacement site is
+# in place. Missing directories are treated as already pruned.
+_REMOTE_PRUNE_DIRS: Tuple[str, ...] = (
+    'dissertation/comparison',
+    'dissertation/concepts',
+    'dissertation/context',
+    'dissertation/excerpts',
+    'dissertation/glossary',
+    'dissertation/timeline',
 )
 
 # features/making-of is intentionally omitted. That page is a draft pending
@@ -272,12 +287,36 @@ def _ensure_remote_dir(sftp, remote_dir: str, cache: Set[str]) -> None:
     cache.add(remote_dir)
 
 
+def _remove_remote_tree(sftp, remote_dir: str) -> bool:
+    """Remove a remote directory tree, returning False when already absent."""
+    try:
+        entries = sftp.listdir_attr(remote_dir)
+    except IOError:
+        try:
+            sftp.stat(remote_dir)
+        except IOError as exc:
+            if exc.errno == errno.ENOENT:
+                return False
+            raise
+        raise
+
+    for entry in entries:
+        child = f'{remote_dir}/{entry.filename}'
+        if stat.S_ISDIR(entry.st_mode):
+            _remove_remote_tree(sftp, child)
+        else:
+            sftp.remove(child)
+    sftp.rmdir(remote_dir)
+    return True
+
+
 def push_files(
     files: List[Path],
     repo_root: Path,
     cfg: Dict[str, Any],
+    remote_prune_dirs: Iterable[str] = _REMOTE_PRUNE_DIRS,
 ) -> Dict[str, Any]:
-    """Upload every file via .tmp + posix_rename. Aborts on first error.
+    """Upload files atomically, then remove retired remote directories.
 
     Returns {ok, files_pushed, error}. The atomic-rename guarantee mirrors
     backend/submission_server/sftp_push.py — readers on the live site
@@ -359,6 +398,11 @@ def push_files(
                 pushed += 1
                 if pushed % 25 == 0 or pushed == len(files):
                     logger.info(f"Pushed {pushed}/{len(files)} files")
+
+            for relpath in remote_prune_dirs:
+                remote_dir = f"{cfg['site_path']}/{relpath}"
+                if _remove_remote_tree(sftp, remote_dir):
+                    logger.info(f'Removed retired directory: {relpath}')
         finally:
             sftp.close()
     except paramiko.SSHException as exc:
@@ -412,6 +456,12 @@ def main(argv: Optional[List[str]] = None) -> int:
         print(f"dry-run: would upload {len(files)} files from {repo_root}")
         for f in files:
             print(f"  {f.relative_to(repo_root).as_posix()}")
+        print(
+            f'would remove {len(_REMOTE_PRUNE_DIRS)} retired directories '
+            'after upload'
+        )
+        for relpath in _REMOTE_PRUNE_DIRS:
+            print(f'  {relpath}')
         return 0
 
     cfg = _read_env()

@@ -9,6 +9,7 @@ partial deploy is worse than no deploy).
 These tests cover the load-bearing behaviors:
   - manifest entries all exist on disk (drift between code and reality)
   - DEPLOYMENT.md top-level entries all appear in the manifest
+  - retired dissertation routes are pruned only after uploads finish
   - --dry-run does not open a connection
   - missing ROSEN_SFTP_* env exits 2 with a clear stderr message
   - the file collector respects exclusion patterns
@@ -17,9 +18,12 @@ These tests cover the load-bearing behaviors:
 """
 from __future__ import annotations
 
+import errno
 import importlib.util
 import pathlib
+import stat
 import sys
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -354,6 +358,8 @@ class TestDryRun:
         assert mock_client_cls.call_count == 0
         out = capsys.readouterr().out
         assert 'dry-run' in out.lower() or 'would upload' in out.lower()
+        assert 'would remove 6 retired directories' in out
+        assert 'dissertation/comparison' in out
 
     def test_dry_run_with_missing_env_still_lists_files(self, monkeypatch, capsys):
         # Even without creds, --dry-run should print the file list — useful
@@ -415,6 +421,116 @@ class TestUploadPathsUsePosixRename:
             )
         # Each tmp upload followed by an atomic rename to its final name.
         assert mock_sftp.posix_rename.call_count == 2
+
+
+class TestRetiredDissertationTools:
+    """Full deploys remove the six retired dissertation routes."""
+
+    def test_prune_manifest_matches_removed_routes(self):
+        expected = (
+            'dissertation/comparison',
+            'dissertation/concepts',
+            'dissertation/context',
+            'dissertation/excerpts',
+            'dissertation/glossary',
+            'dissertation/timeline',
+        )
+        assert deploy_full_site._REMOTE_PRUNE_DIRS == expected
+        archived_tools_root = _REPO_ROOT / 'archived' / 'dissertation-tools'
+        for relpath in expected:
+            route_name = pathlib.PurePosixPath(relpath).name
+            assert not (archived_tools_root / route_name).exists()
+
+        # Issue #166 removes only retired tools. Both live development tools
+        # remain tracked and in the upload manifest.
+        for relpath in (
+            'tools/active/dataexplorer',
+            'tools/active/dataviz',
+        ):
+            assert (_REPO_ROOT / relpath).is_dir()
+            assert relpath in deploy_full_site._DEPLOY_DIRS
+
+    def test_remote_prune_runs_after_uploads(self, monkeypatch, tmp_path):
+        _set_env(monkeypatch)
+        (tmp_path / 'index.html').write_text('<html>')
+
+        with patch('paramiko.SSHClient') as mock_client_cls:
+            mock_client = MagicMock()
+            mock_sftp = MagicMock()
+            mock_sftp.listdir_attr.return_value = []
+            mock_client.open_sftp.return_value = mock_sftp
+            mock_client_cls.return_value = mock_client
+
+            result = deploy_full_site.push_files(
+                [tmp_path / 'index.html'],
+                repo_root=tmp_path,
+                cfg=deploy_full_site._read_env(),
+                remote_prune_dirs=('dissertation/comparison',),
+            )
+
+        assert result['ok'] is True
+        remote_dir = (
+            '/home/rosen/public_html/j/rosen-archive/'
+            'dissertation/comparison'
+        )
+        mock_sftp.rmdir.assert_called_once_with(remote_dir)
+        upload_call = next(
+            i for i, call in enumerate(mock_sftp.method_calls)
+            if call[0] == 'posix_rename'
+        )
+        prune_call = next(
+            i for i, call in enumerate(mock_sftp.method_calls)
+            if call[0] == 'rmdir'
+        )
+        assert prune_call > upload_call
+
+    def test_remote_prune_removes_nested_files_before_directories(self):
+        sftp = MagicMock()
+        root = '/site/dissertation/context'
+        assets = f'{root}/assets'
+        listings = {
+            root: [
+                SimpleNamespace(filename='index.html', st_mode=stat.S_IFREG),
+                SimpleNamespace(filename='assets', st_mode=stat.S_IFDIR),
+            ],
+            assets: [
+                SimpleNamespace(filename='app.js', st_mode=stat.S_IFREG),
+            ],
+        }
+        sftp.listdir_attr.side_effect = lambda path: listings[path]
+
+        assert deploy_full_site._remove_remote_tree(sftp, root) is True
+        assert [call.args[0] for call in sftp.remove.call_args_list] == [
+            f'{root}/index.html',
+            f'{assets}/app.js',
+        ]
+        assert [call.args[0] for call in sftp.rmdir.call_args_list] == [
+            assets,
+            root,
+        ]
+
+    def test_remote_prune_treats_missing_directory_as_complete(self):
+        sftp = MagicMock()
+        sftp.listdir_attr.side_effect = FileNotFoundError(
+            errno.ENOENT, 'not found',
+        )
+        sftp.stat.side_effect = FileNotFoundError(errno.ENOENT, 'not found')
+
+        assert deploy_full_site._remove_remote_tree(
+            sftp, '/site/dissertation/context',
+        ) is False
+        sftp.rmdir.assert_not_called()
+
+    def test_remote_prune_does_not_hide_permission_errors(self):
+        sftp = MagicMock()
+        denied = PermissionError(errno.EACCES, 'permission denied')
+        sftp.listdir_attr.side_effect = denied
+        sftp.stat.side_effect = denied
+
+        with pytest.raises(PermissionError, match='permission denied'):
+            deploy_full_site._remove_remote_tree(
+                sftp, '/site/dissertation/context',
+            )
 
 
 class TestAbortOnFirstFailure:

@@ -3,9 +3,8 @@
  *
  * Every dissertation-tool link rendered by the homepage Tools bar (App.js) and
  * the Tools modal (ToolsModal.js) must resolve to a tool that is
- * actually deployed under dissertation/. Links to retired tools (moved to
- * archived/dissertation-tools/ and dropped from the deploy) return 404 on the
- * live site. The FAQ moved to the top-level faq/ in #567 (a 301 covers its old
+ * actually deployed under dissertation/. Links to removed tools return 404 on
+ * the live site. The FAQ moved to the top-level faq/ in #567 (a 301 covers its old
  * /dissertation/faq/ URL); because it no longer sits under dissertation/, it is
  * checked separately below. This guards against the menu advertising tools that
  * no longer ship.
@@ -38,7 +37,7 @@ function collectDissertationToolSlugs(source) {
 }
 
 describe('menu link integrity (#411)', () => {
-  it('every dissertation-tool link points to a deployed tool, not a retired one', () => {
+  it('every dissertation-tool link points to a deployed tool', () => {
     const missing = [];
     for (const rel of SOURCES) {
       const source = fs.readFileSync(path.join(rootDir, rel), 'utf-8');
@@ -50,7 +49,7 @@ describe('menu link integrity (#411)', () => {
       }
     }
     assert.deepStrictEqual(missing, [],
-      `Menu links point to retired/undeployed dissertation tools:\n  ${missing.join('\n  ')}`);
+      `Menu links point to undeployed dissertation tools:\n  ${missing.join('\n  ')}`);
   });
 
   it('the FAQ menu link points to the deployed top-level faq/ page', () => {

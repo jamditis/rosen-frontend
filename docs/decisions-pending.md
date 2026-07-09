@@ -119,35 +119,7 @@ Order is roughly by how many other things each decision unblocks. Resolve in ord
 
 ---
 
-## 6. Dissertation tools live-vs-repo restoration
-
-**Surfaced during 2026-05-25 scans (not yet filed as an issue)**
-**Blocks:** the "dissertation tools" subsystem grade in definition-of-done (currently Partial)
-**Why now:** the live site serves 10 dissertation tools (reader, foreword, network-effect, glossary, comparison, context, excerpts, faq, concepts, timeline) but only 4 are in the maintained `dissertation/` directory. The other 6 live in `archived/dissertation-tools/`, which means edits there don't reach production via the FTP deploy manifest.
-
-**Partial action taken (2026-06-16):** faq was restored to the maintained `dissertation/faq/` directory in #411 — a partial option-D move. The remaining six tools are still archived; this decision stays open for them.
-
-**Options:**
-
-- **A. Restore all 7 to `dissertation/` and resume active maintenance**
-  - Live and repo align; updates flow naturally
-  - Each tool re-enters the maintenance budget — content updates, accessibility fixes, version-bump sweeps
-- **B. Leave the 7 in `archived/` and accept they drift on production**
-  - Lowest ongoing cost
-  - Risk: someone "fixes" `archived/dissertation-tools/faq/data.js`, expects it to update production, and is confused when nothing happens
-- **C. Remove the 7 from the production server too** *(recommended for some, not all)*
-  - Match repo and live both to the 3 maintained tools
-  - Loses functioning tools that visitors may already link to
-  - Lowest mental-model surface area
-- **D. Mixed: restore 2-3 high-value ones (faq, glossary, context), retire the rest**
-  - Curated middle ground
-  - Requires per-tool judgment call (which are pulling visitors, which are dead links)
-
-**Recommendation:** D — restore the high-value subset and remove the rest from production. Suggests faq + glossary + context have the most user value (Q&A, vocabulary, historical framing) and the others (timeline, concepts, comparison, excerpts) duplicate content already in reader. Confirm with Joe's read of which tools Rosen and Jay want kept.
-
----
-
-## 7. Wire or shelve the ports-and-adapters entity-loading stack
+## 6. Wire or shelve the ports-and-adapters entity-loading stack
 
 **Issue:** [#503](https://github.com/jamditis/rosen-frontend/issues/503) (spun from #487; refs [#130](https://github.com/jamditis/rosen-frontend/issues/130))
 **Blocks:** closing the #130 entity-loader migration; the repo carrying two entity-loading stacks, one of them dead
@@ -191,8 +163,7 @@ When you're back at a desk:
 
 1. Resolve decisions 1-2 first (they unblock the most downstream work).
 2. Decisions 3-5 are independent — handle in any order.
-3. Decision 6 needs a quick look at production analytics if available (which tools have any visitor traffic).
-4. Decision 7 is self-contained: the block above has the verified code state, the options, and a recommendation, so no extra research is needed to make the call.
-5. Once all seven are resolved, work through the critical path in [definition-of-done.md](./definition-of-done.md).
+3. Decision 6 is self-contained: the block above has the verified code state, the options, and a recommendation, so no extra research is needed to make the call.
+4. Once all six are resolved, work through the critical path in [definition-of-done.md](./definition-of-done.md).
 
 For each decision, the recommended option is the default if you don't want to think hard. The other options are there if the recommendation doesn't fit something only you know.

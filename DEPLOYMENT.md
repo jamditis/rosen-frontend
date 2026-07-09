@@ -68,6 +68,24 @@ tools/                              # Development/exploration tools
 ADDING-RECORDS.md                   # Instructions for adding new records
 ```
 
+## Retired routes removed by a full deploy
+
+After every listed file uploads successfully, `backend/scripts/deploy_full_site.py`
+removes these retired dissertation directories from the production server:
+
+```
+dissertation/comparison/
+dissertation/concepts/
+dissertation/context/
+dissertation/excerpts/
+dissertation/glossary/
+dissertation/timeline/
+```
+
+This cleanup is idempotent. Missing directories are treated as already removed.
+The live `dissertation/` pages, the top-level `faq/`, and `tools/active/` are not
+part of the cleanup list.
+
 ## What NOT to deploy
 
 Do not upload these to the production server:
