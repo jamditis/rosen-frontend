@@ -160,6 +160,44 @@ Order is roughly by how many other things each decision unblocks. Resolve in ord
 
 ---
 
+## 7. Wire or shelve the ports-and-adapters entity-loading stack
+
+**Issue:** [#503](https://github.com/jamditis/rosen-frontend/issues/503) (spun from #487; refs [#130](https://github.com/jamditis/rosen-frontend/issues/130))
+**Blocks:** closing the #130 entity-loader migration; the repo carrying two entity-loading stacks, one of them dead
+**Why now:** PR #504 (#487) consolidated the cache config (`cacheConfig.js`) and the timeout-race helper (`frontend/utils/raceTimeout.js`) that both stacks share, so the drift hazard between them is already gone. What is left is a duplication of intent, and it only grows as more code lands on either path. Added 2026-07-08.
+
+**The setup (verified against the code):** two entity-loading stacks coexist.
+
+- **Production path (live).** `archiveService.fetchEntitiesData` plus the mutable module-global `buildEntityMaps` (the `entityById` / `entityToRecords` / `recordToEntities` Maps). Its two consumers are `EntityBrowser.js:41` and `RecordModal.js:98`. On a fetch or parse failure its `catch` returns `{ entities: [], recordEntityMap: {} }`, so a failure renders as an empty Archive with no error shown. That contradicts the repo's own contract elsewhere: `fetchAnalytics` and `fetchCoreData` (#290) throw on failure "rather than a misleading empty view."
+- **Ports-and-adapters path (dead).** `services/loaders/entityDataLoader` (port) with `createHttpCachedLoader` (production adapter) and `createInMemoryLoader` (test adapter), composed by `createEntityIndex({ loader })` in `services/entityIndex.js`. Built as step 1 of #130 and test-covered (`tests/entity-index.test.js`, `tests/http-cached-loader.test.js`), but nothing outside its own tests imports it. The port rejects on a fetch or parse failure and does not resolve with empty arrays to mask that failure, with one gap the wiring must close: `toEntityDataPayload` (`httpCachedLoader.js:242`) defaults a non-array `entities` to `[]` and a missing `recordEntityMap` to `{}`, so a 200 that parses but has drifted from the expected shape still builds an empty index rather than rejecting. Schema validation on the parsed payload is the remaining fail-loud gap, which wiring option A should add.
+
+The two stacks differ on one behavior that matters, which makes this more than hygiene: the live path masks a load failure as an empty Archive, and the port surfaces it.
+
+**Options:**
+
+- **A. Wire it** *(recommended)*
+  - Compose `createEntityIndex({ loader: createHttpCachedLoader({ ... }) })` at the App composition root, migrate `EntityBrowser.js` and `RecordModal.js` onto the index, and delete archiveService's entity half (`buildEntityMaps`, the entity branch of `fetchEntitiesData`, the module-global entity Maps).
+  - Closes the #130 migration and removes the silent-failure path in one move.
+  - Behavior change: an entity-load failure surfaces as an error state instead of an empty browser, so the two consumers must render that error state (the #290 dashboard error state is the pattern to copy).
+  - Blast radius is bounded but not trivial: two consumer files, each calling several entity accessors that read the module Maps (`getRecordsByEntity`, `getEntityById`, `getEntitiesByRecord`, `calculateEntityConnectionStrength`, `areEntitiesLoaded`), all of which move onto the index query API. The index itself is already tested.
+- **B. Shelve it**
+  - Delete `loaders/` and `entityIndex` and their tests. Removes the dead code and the "two ways to load entities" confusion.
+  - Risk: it deletes the silent-failure fix along with the dead code. If chosen, first port the throw-on-failure guard into `fetchEntitiesData` so the empty-Archive-masks-failure behavior does not survive the cleanup.
+- **C. Fix in place, then shelve**
+  - Adopt the port's throw contract inside `archiveService.fetchEntitiesData` (throw instead of returning empty, consumers render an error state), keep the single production path, and delete `loaders/` and `entityIndex`.
+  - The middle path: it keeps one stack and captures the one behavior worth keeping, at the cost of not closing the #130 ports-and-adapters migration.
+
+**Recommendation:** A, with C as the launch-safe fallback. The silent-failure bug decides A and C over B: both surface a failed load, and only plain B would delete that fix along with the dead code. A over C is the narrower question of whether to close the #130 ports-and-adapters migration now: A closes it and keeps the tested port, C keeps a single `archiveService` path and defers the migration. Pick A while the blast radius is small and the port is already built and tested; fall back to C if launch stability outranks closing #130 this week. The one path to reject is plain B, which ships the empty-Archive-masks-failure behavior forward.
+
+**If A, the steps:**
+1. Compose the index at the App root: `createEntityIndex({ loader: createHttpCachedLoader({ ... }) })`, taking the adapter's option names from `httpCachedLoader.js`. `createEntityIndex` awaits `loader.loadEntityData()` on construction (`entityIndex.js:27`), so composing it eagerly here fetches `archive-entities.json` on every App load, a regression from today's on-demand fetch that runs only when `EntityBrowser` or `RecordModal` opens. Preserve on-demand loading: build the index behind a memoized promise created on first entity-view use, or compose only the loader at the root and construct the index where it is consumed.
+2. Add schema validation to the loader payload so a drifted-but-parseable response fails loud. `toEntityDataPayload` (`httpCachedLoader.js:242`) currently defaults a non-array `entities` to `[]` and a missing `recordEntityMap` to `{}`, so a 200 that parses but has drifted from the expected shape builds an empty index instead of rejecting. Validate the parsed payload there (reject on a non-array `entities` or a missing `recordEntityMap`) before it reaches `createEntityIndex`, so the port's throw-on-failure contract covers shape drift, not just fetch and JSON-parse failures. Without this step, steps 1 and 3 still let a malformed-but-parseable payload produce the silent-empty entity browser this decision removes.
+3. Migrate `EntityBrowser.js` and `RecordModal.js` off `fetchEntitiesData` and off the module-Map accessors onto the index query API: `getRecordsByEntity` becomes `recordsOf`, `getEntityById` becomes `entity`, `getEntitiesByRecord` becomes `entitiesOf`, and `calculateEntityConnectionStrength` becomes `strength` (same `{ strength, sharedEntities, prominenceScore }` shape). `areEntitiesLoaded` drops out, since awaiting the index replaces the loaded check. Render an explicit error state when the load rejects (mirror the #290 error state). One accessor has no index equivalent yet: `EntityBrowser` renders its browse list, type counts, and filter from the full `data.entities` array (`EntityBrowser.js:41-43`), but the index Query exposes only point lookups plus `types()`, with no all-entities query. Add an `entities()`/`allEntities()` query to the index before migrating the browser, or keep passing it the loader payload for the list; otherwise the migration leaves `EntityBrowser` without the list it renders from.
+4. Delete archiveService's entity half: `buildEntityMaps`, the entity branch of `fetchEntitiesData`, the module-global entity Maps, the five accessor exports above, and `findSharedEntities`, a sixth map-backed export (`archiveService.js:128`) whose only caller is the `calculateEntityConnectionStrength` this step removes; leaving it would strand an export that throws once its backing Maps are gone. Leave the details, search, and analytics paths alone.
+5. Add a consumer-level test that a rejected entity load renders the error state, not an empty browser, and a loader-level test that a 200 with a malformed-but-parseable payload (a non-array `entities`) rejects instead of yielding an empty index. The index itself is already covered by `tests/entity-index.test.js`.
+
+---
+
 ## How to use this doc
 
 When you're back at a desk:
@@ -167,6 +205,7 @@ When you're back at a desk:
 1. Resolve decisions 1-2 first (they unblock the most downstream work).
 2. Decisions 3-5 are independent — handle in any order.
 3. Decision 6 needs a quick look at production analytics if available (which tools have any visitor traffic).
-4. Once all six are resolved, work through the critical path in [definition-of-done.md](./definition-of-done.md).
+4. Decision 7 is self-contained: the block above has the verified code state, the options, and a recommendation, so no extra research is needed to make the call.
+5. Once all seven are resolved, work through the critical path in [definition-of-done.md](./definition-of-done.md).
 
 For each decision, the recommended option is the default if you don't want to think hard. The other options are there if the recommendation doesn't fit something only you know.
