@@ -314,7 +314,7 @@ Narrow screens:
 - Keep Mind map, Entities, Analytics, and More as a compact secondary row.
 - On narrow screens, use a two-by-two grid or a single `Explore tools` disclosure instead of forcing four large pills into one line.
 - Keep the text labels; do not rely on icons.
-- Do not expose River of News or the data explorer until the product decisions in issues #584 and #583 are resolved.
+- Do not expose River of News or the data explorer until the product decisions in issues #584 and #583 are resolved. "Not exposed" means unreachable in production, not merely absent from the tools row: `tools/active/dataexplorer` currently ships in the `_DEPLOY_DIRS` manifest of `backend/scripts/deploy_full_site.py` and is reachable by direct URL, so honoring this requires removing it from the deploy manifest (or gating it behind auth), not only leaving it out of navigation.
 
 ## Record detail specification
 
@@ -423,6 +423,8 @@ Use one of these low-disruption treatments:
 1. Preferred: show two adjacent series, `Articles and long-form records` and `Social posts`.
 2. Acceptable: add a switch between `All records` and `Articles only`, defaulting to Articles only for the era comparison.
 3. Minimum: annotate the 2021–present bar with `Includes 25,665 social posts` and offer a clear exclusion toggle.
+
+Before any of these treatments, normalize the era taxonomy to one consistent bucketing. The checked-in `byEra` data (canonical source `data/eras.js`, mirrored in `data/archive-analytics.json`) mixes decade labels that overlap in time (`View from Nowhere (10s)` spans 2010–2019) with fixed year-range buckets such as `Social Media & Financial Crisis (2010-2015)` and `Trump Era & Democratic Crisis (2016-2020)` that fall inside that same decade. Charting bars across overlapping, unequal spans is misleading regardless of the social-post treatment above, so the era axis must first be reduced to non-overlapping, comparable buckets (or the overlap made explicit in the labels and counts).
 
 Do not use a logarithmic scale without an explicit explanation.
 
@@ -572,8 +574,8 @@ If one data source fails, show the rest of the archive and label the missing fea
 
 The visual experience extends to social and messaging previews.
 
-- Restore a valid 1200-by-630 site image for the archive root.
-- Provide record-specific title and summary metadata for shared record URLs.
+- Restore a valid 1200-by-630 site image for the archive root, and add it to the deploy scope. The asset exists and `index.html` references it, but `og-image.png` is absent from both `_DEPLOY_FILES` in `backend/scripts/deploy_full_site.py` and `DEPLOYMENT.md`, so a full-site deploy leaves the live OG URL 404. This requirement is met only when the image is in the deploy manifest, not merely present in the repo.
+- Provide record-specific title and summary metadata for shared record URLs. This is not achievable for bare `?record=` query-string URLs under the current zero-build static FTP architecture: social and OG crawlers fetch the one static `index.html` and read its fixed metadata before React and sql.js can resolve the record, so every query-string record URL falls back to the site-level card. Per-record previews therefore require a server-side or pre-generated path: static per-record share pages (one HTML file per record with baked-in metadata) or an Apache rewrite that serves record-specific metadata. That path is the `?record=` SSR-fallback work tracked in issue #263. Until that path exists, the site image is the only preview these URLs can show; a metadata-only change cannot satisfy this on its own.
 - Reuse the archive's paper, black ink, archive mark, category rule, record title, publication, and date in a record-card image if per-record images are added.
 - Keep image text large enough for a small social card.
 - Use the site image as the first tier if per-record images are deferred.
