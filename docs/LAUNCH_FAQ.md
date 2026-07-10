@@ -63,8 +63,9 @@ those are deployed to the PressThink host over FTP. `ADDING-RECORDS.md` is
 the full procedure. There is also an in-progress submission path so a record can
 be proposed and swept in without hand-editing the CSV: a Flask submission server
 (Pillar 3) and a separate GitHub Action flow using `submit-record.yml` and
-`sweep-stuck-rows.yml` (Pillar 3a). `docs/HANDOFF.md` has the current state of
-each.
+`sweep-stuck-rows.yml` (Pillar 3a). `automation/SETUP.md` is the current
+(Pillar 3) operational guide; `docs/HANDOFF.md` describes the post-Pillar-3a
+target state.
 
 Accuracy note for Joe: the source issue described this as a "weekly scrape of the
 PressThink RSS feed," and that is not what the code does today. The archive
@@ -80,9 +81,10 @@ not a description.
 Two data paths, and the distinction is worth getting right because both come up:
 
 - **Everyday browsing is flat JSON.** Search, filter, and record cards read
-  pre-built JSON files (`archive-core.json` loads on page load; details, entities,
-  and the full file load on demand). No query engine, no database — just data the
-  browser already has. That is why it feels instant.
+  pre-built JSON files (`archive-core.json` loads on page load; details are
+  prefetched about a second later; entities and the full file load on demand). No
+  query engine, no database — just data the browser already has. That is why it
+  feels instant.
 - **Custom queries use SQLite compiled to WebAssembly.** The analytics and query
   surface can load `sql.js` (SQLite built to WASM) and run real SQL *in the
   browser*, only when someone actually writes a custom query. It does not download
@@ -99,11 +101,13 @@ optional custom-query surface: the SQLite database is built in the browser from
 the local JSON and the WASM binary is self-hosted
 (`frontend/vendor/sql-wasm-1.10.3.wasm`), but the `sql.js` *loader* script still
 loads from cdnjs on the first custom query (`frontend/services/sqliteService.js`,
-pinned with subresource integrity). So everyday browsing and all the archive data
-are fully self-hosted; only the optional query engine's loader has a CDN
-dependency, and vendoring that one script too would close the last gap. To
-preserve or fork the whole thing, you copy the files (and, for offline custom
-queries, that loader script).
+pinned with subresource integrity). So all the archive *data* is self-hosted, and
+everyday browsing calls no third-party API. The app *code* is not fully CDN-free,
+though: the core libraries (React, HTM, Lucide, idb-keyval, MiniSearch) load from
+`esm.sh` through the import map in `index.html`, and that `sql.js` loader loads
+from cdnjs. Vendoring those libraries and the loader would close the remaining
+gaps. To preserve or fork the whole thing, you copy the files (and, for full
+offline use, those CDN-loaded scripts).
 
 ## How the entity and relationship mapping works
 
@@ -142,17 +146,21 @@ CSV by hand.
 
 ## Quick talking points (for reading aloud)
 
-- It is a public archive of Jay Rosen's work: ~1,030 curated records plus tens of
-  thousands of social posts, cross-indexed by people, organizations, and concepts.
+- It is a public archive of Jay Rosen's work: about 26,600 records in the shipped
+  data — roughly 950 articles and essays plus about 25,700 archived social posts —
+  cross-indexed by people, organizations, and concepts.
 - It is a static site. No server, no database server, nothing calling an AI model
   while you use it — so it is fast, cheap to keep online, and hard to break.
-- AI helped build the index offline; every extracted entity and relationship was
-  reviewed before it shipped. The running site is just reviewed data.
+- AI helped build the index offline, through a documented review pipeline. The
+  curated set is human-reviewed; the second-pass review of the larger social-post
+  extraction is still in progress. The running site is just the resulting data.
 - The everyday archive is flat JSON files. A SQLite database compiled to
   WebAssembly powers optional custom queries in the browser, loaded only when you
   ask for one.
-- The entity map is relational: typed connections between specific entities, not
-  just "these two names show up together."
+- The entity map links entities to the records they appear in, so the Explorer
+  answers "which entities share records with X" — stronger than loose co-mention.
+  The typed relationship types live in the source data, not the in-browser query
+  layer.
 - It is open source. Clone it, serve it with one command, send a pull request.
 - If someone asks about automated ingest: it is curated through a reviewed
   pipeline today, not an automatic weekly scrape.
