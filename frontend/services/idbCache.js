@@ -27,7 +27,7 @@
  * is unaffected.
  */
 
-import { raceTimeout } from '../utils/raceTimeout.js?v=3.6.9';
+import { raceTimeout } from '../utils/raceTimeout.js?v=3.7.0';
 
 // A dedicated database/store so idbClear() only ever wipes this cache, never
 // some other consumer's idb-keyval default store.
