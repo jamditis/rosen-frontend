@@ -22,7 +22,7 @@ import { ERAS } from '../constants.js?v=3.6.8';
 import {
   extractRecordIds,
   templateIsComposable,
-} from '../services/queryComposition.js?v=3.6.8';
+} from '../services/queryComposition.js?v=3.6.9';
 
 const eraOrderCase = ERAS
   .map((era, index) => `WHEN '${era.replace(/'/g, "''")}' THEN ${index + 1}`)

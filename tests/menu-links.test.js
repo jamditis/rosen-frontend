@@ -22,6 +22,46 @@ const rootDir = path.join(__dirname, '..');
 
 // Files that render dissertation-tool links.
 const SOURCES = ['frontend/App.js', 'frontend/components/ToolsModal.js'];
+const SHIPPED_CONTENT_ROOTS = [
+  'frontend',
+  'dissertation',
+  'faq',
+  'dissertation-launch',
+  'features/shared',
+  'features/status-report',
+  'tools/active',
+];
+const SHIPPED_CONTENT_FILES = [
+  'index.html',
+  'shared-styles.css',
+  'version.json',
+  'metadata.json',
+  '.htaccess',
+  'ADDING-RECORDS.md',
+];
+const TEXT_EXTENSIONS = new Set(['.css', '.html', '.js', '.json', '.md']);
+const RETIRED_TOOL_REFERENCES = [
+  ['comparison tool copy', /\bcomparison tools?\b/i],
+  ['retired timeline source', /sources:\s*\[[^\]]*['"]Timeline['"]/i],
+  ['retired dissertation route', /dissertation\/(?:comparison|concepts|context|excerpts|glossary|timeline)\//i],
+  ['retired tool directory', /\.\/(?:comparison-tool|context-1986|annotated-excerpts|glossary|timeline)\//i],
+];
+
+function collectShippedContentFiles() {
+  const files = SHIPPED_CONTENT_FILES.map((rel) => path.join(rootDir, rel));
+  const walk = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(fullPath);
+      } else if (TEXT_EXTENSIONS.has(path.extname(entry.name))) {
+        files.push(fullPath);
+      }
+    }
+  };
+  for (const rel of SHIPPED_CONTENT_ROOTS) walk(path.join(rootDir, rel));
+  return files;
+}
 
 // Collect every dissertation/<slug>/ referenced as a link target. ToolsModal
 // hardcodes the absolute path; App.js builds it from the FEATURES_PATH template.
@@ -63,5 +103,19 @@ describe('menu link integrity (#411)', () => {
       'faq/index.html must exist for the FAQ menu link');
     assert.ok(!fs.existsSync(path.join(rootDir, 'dissertation', 'faq', 'index.html')),
       'the old dissertation/faq/ page must be gone (redirected, not duplicated)');
+  });
+
+  it('shipped content does not reference retired dissertation tools', () => {
+    const staleReferences = [];
+    for (const filePath of collectShippedContentFiles()) {
+      const source = fs.readFileSync(filePath, 'utf-8');
+      for (const [label, pattern] of RETIRED_TOOL_REFERENCES) {
+        if (pattern.test(source)) {
+          staleReferences.push(`${path.relative(rootDir, filePath)}: ${label}`);
+        }
+      }
+    }
+    assert.deepStrictEqual(staleReferences, [],
+      `Shipped content references retired dissertation tools:\n  ${staleReferences.join('\n  ')}`);
   });
 });

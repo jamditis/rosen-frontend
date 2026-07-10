@@ -4,11 +4,6 @@ export default {
     "./*.{html,js}",
     "./components/**/*.js",
     "./services/**/*.js",
-    "./comparison-tool/**/*.{html,js}",
-    "./glossary/**/*.{html,js}",
-    "./context-1986/**/*.{html,js}",
-    "./timeline/**/*.{html,js}",
-    "./annotated-excerpts/**/*.{html,js}",
     "./faq/**/*.{html,js}",
     "./future-features/**/*.{html,js}"
   ],
