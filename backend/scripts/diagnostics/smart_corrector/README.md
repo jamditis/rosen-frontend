@@ -84,27 +84,30 @@ ALL TESTS PASSING:
 ✓ Cost Tracker      - Estimation and tracking working
 ```
 
-## How to Use
+## How to use
 
-### Quick Start
+Run these commands from `backend/`.
+
+### Quick start
 ```bash
-# Dry run (preview only, no changes)
-python run_smart_corrector.py --dry-run --limit 10
+# Preview the first 10 records (dry run is the default)
+poetry run python -m scripts.corrector --rows :10
 
-# Process first 25 rows
-python run_smart_corrector.py --limit 25
+# Preview inclusive sheet rows 27 through 42
+poetry run python -m scripts.corrector --rows 27-42
 
-# Full run with $35 budget
-python run_smart_corrector.py --max-cost 35.00
+# Write an open-ended range, capped at 50 records and $10
+poetry run python -m scripts.corrector --rows 201- --limit 50 --max-cost 10 --live
 ```
 
 ### Options
 ```bash
---limit N              Process N rows (default: all)
---batch-size N         Rows per batch (default: 25)
---max-cost AMOUNT      Budget limit in USD (default: 35.00)
---no-speed-optimization  Disable 2x audio speed
---dry-run              Preview without writing
+--rows RANGE   Select :N, N-M, or N- (default: all data rows)
+--limit N      Cap the selected record count
+--resume       Skip leading rows with a completion marker
+--max-cost USD Stop before a paid call would exceed this budget (default: 35.00)
+--dry-run      Analyze without worksheet writes (default)
+--live         Write raw text, AI fields, and notes
 ```
 
 ## Cost Estimates

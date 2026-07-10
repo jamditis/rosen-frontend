@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Row-range selection for the smart-corrector script cluster (issue #187).
+"""Row-range selection for the canonical smart-corrector driver (issue #187).
 
-The five ``backend/scripts/run_smart_corrector*.py`` drivers each reimplement
-one step: turn a human row range into a slice of
+The five former ``backend/scripts/run_smart_corrector*.py`` drivers each
+reimplemented one step: turn a human row range into a slice of
 ``worksheet.get_all_records()`` and a sheet row number for each selected
-record. They do not agree on the math.
+record. They did not agree on the math.
 
 ``get_all_records()`` returns the data rows only, so record index ``k`` maps to
 sheet row ``k + 2`` — sheet row 1 is the header, sheet row 2 is the first data
@@ -14,9 +14,10 @@ that mapping; ``_200`` spells it out (``row_num = i + 2  # +2 for header row and
 ``all_records[26:42]`` but writes results to rows 27..42, so it reads sheet row
 28 and writes its result one row up, to row 27 — a one-row attribution shift.
 
-This module is the single, tested source of that mapping. It is pure stdlib —
-no Google Sheets, no network — so the boundary math is unit-testable without
-credentials. The credentials-gated sheet I/O stays in the driver (issue #184).
+This module is the single, tested source of that mapping. It is pure stdlib,
+with no Google Sheets or network imports, so the boundary math is unit-testable
+without credentials. ``scripts.corrector`` uses ``RowRange`` for every slice
+and target sheet row; the numbered legacy drivers delegate to that CLI.
 """
 
 from __future__ import annotations

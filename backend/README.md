@@ -189,9 +189,24 @@ python scripts/run_date_backfill.py
 # Run entity extraction
 python src/rosen_scraper/entity_extractor.py
 
-# Run smart corrector (fix data issues)
-python scripts/run_smart_corrector.py
+# Preview smart-corrector changes for sheet rows 27 through 42
+# Dry run is the default; this does not write to the worksheet.
+poetry run python -m scripts.corrector --rows 27-42
 ```
+
+The smart corrector accepts `--rows :N` for the first N data records,
+`--rows N-M` for inclusive sheet rows, and `--rows N-` for an open-ended
+range. `--limit` caps any selection. `--resume` skips leading selected rows
+whose notes already contain a smart-corrector completion marker; failed and
+incomplete rows are retried. `--max-cost` sets the hard estimated-cost stop;
+its default is $35.
+
+Use `--live` only for a supervised write. Live runs update recovered
+`raw_text`, processing notes, and the canonical AI fields when analysis is
+available: `summary`, `thematic_categories`, `key_concepts`, `tags`, and
+`pull_quote`. The old `run_smart_corrector*.py` commands remain as thin shims
+with their historical row-range defaults, but they now use this CLI and its
+safe dry-run default.
 
 ### Running Tests
 
