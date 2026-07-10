@@ -38,9 +38,11 @@ a language model.
 
 AI is used earlier, offline, as a research tool: extracting candidate entities
 and relationships from the source material during data preparation. That
-extraction goes through a documented review pipeline before it ships (see
-`docs/ENTITY_EXTRACTION_PIPELINE.md` and `data/verification-log.md`). By the time
-a record reaches the site it is plain data in a JSON file.
+extraction goes through a documented review pipeline (see
+`docs/ENTITY_EXTRACTION_PIPELINE.md` and `data/verification-log.md`): the older
+curated set is signed off, and the second-pass review of the larger social-post
+extraction is still in progress. By the time a record reaches the site it is
+plain data in a JSON file.
 
 Accuracy note for Joe: `data/verification-log.md` signs off on the curated set
 (5,036 entities, 4,666 relationships) and notes a second-pass diff over the
