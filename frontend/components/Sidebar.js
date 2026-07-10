@@ -1,8 +1,8 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { html } from '../html.js?v=3.6.7';
+import { html } from '../html.js?v=3.6.8';
 import { X, Search, XCircle, ChevronDown, ChevronUp, MessageSquare } from 'lucide-react';
-import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.6.7';
+import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.6.8';
 
 const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, autocompleteIndex }) => {
   const [suggestions, setSuggestions] = useState([]);
@@ -72,7 +72,8 @@ const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, a
     filters.categories.length +
     (filters.era ? 1 : 0) +
     (filters.year ? 1 : 0) +
-    (filters.type ? 1 : 0);
+    (filters.type ? 1 : 0) +
+    (filters.recordIds !== null ? 1 : 0);
 
   return html`
     <div>
@@ -103,6 +104,7 @@ const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, a
               ${filters.categories.length > 0 && html` — ${filters.categories.join(', ')}`}
               ${filters.era && html` — ${filters.era}`}
               ${filters.type && html` — ${filters.type}`}
+              ${filters.recordIds !== null && html`, query results`}
             </div>
           `}
 

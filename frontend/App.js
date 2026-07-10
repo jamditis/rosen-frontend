@@ -1,30 +1,31 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.6.7';
+import { html } from './html.js?v=3.6.8';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString, loadSearchIndex } from './services/archiveService.js?v=3.6.7';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.6.7';
-import { withViewTransition } from './utils/viewTransition.js?v=3.6.7';
-import { ITEMS_PER_PAGE, COLORS, REPORT_CONFIG } from './constants.js?v=3.6.7';
-import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.6.7';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.6.7';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.6.7';
-import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.6.7';
-import { sortRecords } from './utils/recordSort.js?v=3.6.7';
-import Sidebar from './components/Sidebar.js?v=3.6.7';
-import WelcomeModal from './components/WelcomeModal.js?v=3.6.7';
-import RecordView from './components/RecordView.js?v=3.6.7';
-import FeaturedSection from './components/FeaturedSection.js?v=3.6.7';
-import DissertationPage from './components/DissertationPage.js?v=3.6.7';
-import ToolsModal from './components/ToolsModal.js?v=3.6.7';
-import BugReportModal from './components/BugReportModal.js?v=3.6.7';
-import LoadingQuotes from './components/LoadingQuotes.js?v=3.6.7';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.6.7';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.6.7';
-import EntityBrowser from './components/EntityBrowser.js?v=3.6.7';
-import Timeline from './components/Timeline.js?v=3.6.7';
-import AboutPage from './components/AboutPage.js?v=3.6.7';
-import WikiPage from './components/WikiPage.js?v=3.6.7';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString, loadSearchIndex } from './services/archiveService.js?v=3.6.8';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.6.8';
+import { withViewTransition } from './utils/viewTransition.js?v=3.6.8';
+import { ITEMS_PER_PAGE, COLORS, REPORT_CONFIG } from './constants.js?v=3.6.8';
+import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.6.8';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.6.8';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.6.8';
+import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.6.8';
+import { sortRecords } from './utils/recordSort.js?v=3.6.8';
+import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.6.8';
+import Sidebar from './components/Sidebar.js?v=3.6.8';
+import WelcomeModal from './components/WelcomeModal.js?v=3.6.8';
+import RecordView from './components/RecordView.js?v=3.6.8';
+import FeaturedSection from './components/FeaturedSection.js?v=3.6.8';
+import DissertationPage from './components/DissertationPage.js?v=3.6.8';
+import ToolsModal from './components/ToolsModal.js?v=3.6.8';
+import BugReportModal from './components/BugReportModal.js?v=3.6.8';
+import LoadingQuotes from './components/LoadingQuotes.js?v=3.6.8';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.6.8';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.6.8';
+import EntityBrowser from './components/EntityBrowser.js?v=3.6.8';
+import Timeline from './components/Timeline.js?v=3.6.8';
+import AboutPage from './components/AboutPage.js?v=3.6.8';
+import WikiPage from './components/WikiPage.js?v=3.6.8';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
@@ -50,6 +51,7 @@ const DEFAULT_FILTERS = {
   publication: [],
   type: null,
   includeReplies: false,
+  recordIds: null,
 };
 
 const App = () => {
@@ -140,6 +142,11 @@ const App = () => {
     navigateTo(ROUTES.archive);
   }, []);
 
+  const handleQueryResults = useCallback((recordIds) => {
+    setFilters(prev => ({ ...prev, recordIds }));
+    navigateTo(ROUTES.archive);
+  }, []);
+
   // Tool selection handler
   const handleToolSelect = useCallback((action) => {
     if (action === 'mindmap') {
@@ -192,7 +199,17 @@ const App = () => {
   // Precompute a normalized search blob per record once per data load (#456),
   // so the per-keystroke filter normalizes only the term and runs one
   // includes() per record instead of re-normalizing every field every keystroke.
-  const searchIndex = useMemo(() => records.map(buildSearchText), [records]);
+  const queryRecords = useMemo(
+    () => intersectByRecordIds(records, filters.recordIds),
+    [records, filters.recordIds]
+  );
+
+  const queryFacets = useMemo(
+    () => filters.recordIds === null ? facets : deriveFacetsForRecords(facets, queryRecords, filters),
+    [facets, queryRecords, filters.recordIds, filters.categories, filters.era]
+  );
+
+  const searchIndex = useMemo(() => queryRecords.map(buildSearchText), [queryRecords]);
 
   // Lazy full-text index (#276), unioned with the substring blob above. Loaded
   // on first non-empty search so browse-only visits never pay for MiniSearch or
@@ -245,7 +262,7 @@ const App = () => {
         miniRef.current.search(rawTerm, { prefix: true, combineWith: 'AND' }).map((h) => h.id)
       );
     }
-    let res = records.filter((r, i) => {
+    let res = queryRecords.filter((r, i) => {
       if (term && !(searchIndex[i].includes(term) || (miniIds && miniIds.has(r.id)))) return false;
 
       if (filters.categories.length > 0) {
@@ -277,7 +294,7 @@ const App = () => {
     res = sortRecords(res, sortBy);
 
     return res;
-  }, [records, searchIndex, filters, sortBy, miniReady]);
+  }, [queryRecords, searchIndex, filters, sortBy, miniReady]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -370,7 +387,8 @@ const App = () => {
     filters.categories.length +
     (filters.era ? 1 : 0) +
     (filters.year ? 1 : 0) +
-    (filters.type ? 1 : 0);
+    (filters.type ? 1 : 0) +
+    (filters.recordIds !== null ? 1 : 0);
 
   // Full-page routes: dissertation, about, analytics
   if (currentRoute === ROUTES.dissertation) {
@@ -382,7 +400,12 @@ const App = () => {
   }
 
   if (isAnalytics) {
-    return html`<${AnalyticsDashboard} onBack=${() => goTo(ROUTES.archive)} />`;
+    return html`
+      <${AnalyticsDashboard}
+        onBack=${() => goTo(ROUTES.archive)}
+        onRecordResults=${handleQueryResults}
+      />
+    `;
   }
 
   // Shared fail-loud panel for the record-backed routes. fetchCoreData throws
@@ -504,7 +527,7 @@ const App = () => {
 
          ${isArchiveGrid && html`
              <${Sidebar}
-                facets=${facets}
+                facets=${queryFacets}
                 filters=${filters}
                 setFilters=${setFilters}
                 isOpen=${sidebarOpen}
@@ -518,7 +541,7 @@ const App = () => {
 
             ${isArchiveGrid && html`
                 <div>
-                    ${!filters.search && !filters.era && !filters.year && filters.categories.length === 0 && html`
+                    ${!filters.search && !filters.era && !filters.year && filters.categories.length === 0 && filters.recordIds === null && html`
                         <section className="mb-6 pb-4 border-b border-stone-200">
                             <div className="flex flex-wrap items-center gap-2">
                                 <span className="text-xs text-stone-500 mr-1">Tools:</span>
@@ -554,13 +577,13 @@ const App = () => {
                         </section>
                     `}
 
-                    ${!loading && !filters.search && !filters.era && !filters.year && filters.categories.length === 0 && html`
+                    ${!loading && !filters.search && !filters.era && !filters.year && filters.categories.length === 0 && filters.recordIds === null && html`
                         <${FeaturedSection} />
                     `}
 
                     ${!loading && !filters.search && !filters.era && filters.categories.length === 0 && html`
                         <${Timeline}
-                          records=${records}
+                          records=${queryRecords}
                           selectedYear=${filters.year}
                           onSelectYear=${handleYearSelect}
                         />
@@ -575,7 +598,9 @@ const App = () => {
             ${isArchiveGrid && html`
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-stone-200 pb-4 scroll-mt-24" ref=${recordsRef}>
                 <div className="font-display text-stone-500 text-sm">
-                    ${loading ? 'Loading archive...' : `${filteredRecords.length} records found`}
+                    ${loading
+                      ? 'Loading archive...'
+                      : `${filteredRecords.length} records found${filters.recordIds !== null ? ' in query results' : ''}`}
                 </div>
                 <div className="flex items-center gap-3">
                    <div className="flex bg-stone-200 p-1 rounded mr-4">
@@ -623,7 +648,11 @@ const App = () => {
             ${isEntityBrowser && errorPanel}
 
             ${isEntityBrowser && !loading && !error && html`
-                <${EntityBrowser} records=${records} onSelectRecord=${selectRecord} />
+                <${EntityBrowser}
+                  records=${queryRecords}
+                  queryActive=${filters.recordIds !== null}
+                  onSelectRecord=${selectRecord}
+                />
             `}
 
             ${isArchiveGrid && html`

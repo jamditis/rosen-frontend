@@ -1,6 +1,6 @@
 
 import { useMemo } from 'react';
-import { html } from '../html.js?v=3.6.7';
+import { html } from '../html.js?v=3.6.8';
 import { ArrowLeft, Archive, BookOpen, Network, Search, ExternalLink, Github, Mail } from 'lucide-react';
 
 const AboutPage = ({ onBack, records }) => {
