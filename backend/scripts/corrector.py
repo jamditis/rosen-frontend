@@ -10,7 +10,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
+import re
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import datetime
@@ -31,22 +33,36 @@ AI_FIELDS = (
     "pull_quote",
 )
 SMART_CORRECTOR_MARKER = "Smart Corrector:"
-# A completed row's most recent smart-corrector status starts with one of these.
-# The consolidated corrector writes "Complete - ..."; the five retired drivers
-# wrote "Used cached text ..." or "Reprocessed via ..." with no "Complete -"
-# prefix. Statuses that mean the row still needs work ("Incomplete - ...",
-# "Needs reprocessing") deliberately stay out so --resume retries them.
-COMPLETION_STATUS_PREFIXES = (
-    "Complete -",
-    "Used cached text",
-    "Reprocessed via",
+_MARKER_STEM = SMART_CORRECTOR_MARKER.rstrip(":")  # marker text without its colon
+# Strip an echoed marker from a note body by matching the stem plus its WHOLE run of
+# trailing colons. A plain str.replace of "Smart Corrector:" reconstructs the marker
+# ("Smart Corrector::" -> "Smart Corrector:"), which at a line start forges a note
+# boundary; matching ":+" removes every colon so no marker can survive in the body.
+_MARKER_ECHO_RE = re.compile(re.escape(_MARKER_STEM) + r":+")
+# Only the consolidated corrector writes a "Complete -" status, and it writes that
+# note in the SAME batch_update as the AI-field values (see run_corrector), so a
+# "Complete -" note is proof the AI fields landed. The retired drivers wrote
+# "Used cached text ..." / "Reprocessed via ..." notes with no "Complete -" prefix
+# and did not write AI fields; treating those as complete would skip a row on
+# --resume and leave its AI fields permanently empty. So completion requires the
+# "Complete -" prefix and nothing else.
+COMPLETION_STATUS_PREFIX = "Complete -"
+# Anchor the status to an actual note boundary at the start of the cell or a line.
+# Every writer (this corrector and the retired drivers) overwrites the cell with a
+# single note that opens at position 0, so a genuine "[YYYY-MM-DD HH:MM] Smart
+# Corrector:" boundary only ever appears at a line start. Matching the marker
+# anywhere would let an embedded copy inside a note body (a legacy Failed note or a
+# manual edit whose text echoes a full boundary) be read as the last note and mask
+# a failed row as complete. _note() sanitizes notes THIS run writes, but persisted
+# cells are read raw, so the anchor is what protects against already-poisoned data.
+_NOTE_STATUS_BOUNDARY = re.compile(
+    r"^\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}\] " + re.escape(SMART_CORRECTOR_MARKER) + r"\s*",
+    re.MULTILINE,
 )
-# A success prefix is necessary but not sufficient. "Used cached text" and
-# "Reprocessed via" describe the text-extraction step, and a legacy driver could
-# pair either with an inline failure (e.g. "Used cached text ... | AI error: ...")
-# on a row whose AI analysis never landed. Any of these markers in the status
-# means the row is not safely complete, so --resume must retry it rather than skip
-# it and leave the AI fields empty.
+# A "Complete -" prefix is necessary but not sufficient: a legacy note could pair
+# it with an inline failure (e.g. "Complete - ... | AI error: ...") on a row whose
+# AI analysis never landed. Any of these markers in the status means the row is not
+# safely complete, so --resume must retry it rather than skip it.
 INCOMPLETE_STATUS_MARKERS = (
     "Incomplete",
     "Needs reprocessing",
@@ -151,15 +167,15 @@ def run_corrector(
         and selected
     ):
         selection_end_row = row_range.sheet_row(len(selected) - 1)
-    resume_offset = _resume_offset(selected) if resume else 0
     stats = {
         "selected": len(selected),
         "processed": 0,
-        "skipped": resume_offset,
+        "skipped": 0,
         "cached": 0,
         "reprocessed": 0,
         "errors": 0,
         "write_errors": 0,
+        "ai_unavailable": 0,
         "ai_fields_written": 0,
         "estimated_cost": 0.0,
         "budget_stopped": False,
@@ -172,8 +188,14 @@ def run_corrector(
         },
     }
 
-    for local_index in range(resume_offset, len(selected)):
+    for local_index in range(len(selected)):
         record = selected[local_index]
+        # Skip each already-completed row individually. A leading-offset scan that
+        # stopped at the first incomplete row would reprocess (and re-pay for)
+        # completed rows that follow a failed one, e.g. [Failed, Complete, Complete].
+        if resume and _notes_indicate_completion(str(record.get("notes", ""))):
+            stats["skipped"] += 1
+            continue
         row_number = row_range.sheet_row(local_index)
         url = str(record.get("url") or "").strip()
         if not url:
@@ -212,6 +234,7 @@ def run_corrector(
                         if selection_limit is not None
                         else None
                     ),
+                    resume=resume,
                     stats=stats,
                 ):
                     break
@@ -223,9 +246,23 @@ def run_corrector(
                     operation=f"Source processing for sheet row {row_number}",
                     stats=stats,
                 )
-            if result and result.get("status") == "needs_transcription":
+            if result and (
+                result.get("needs_transcription")
+                or result.get("status") == "needs_transcription"
+            ):
+                # Route on the needs_transcription FLAG as well as the status string:
+                # processors signal this as status="needs_transcription" AND as
+                # status="partial" with the flag set (e.g. the YouTube processor when
+                # youtube-transcript-api is absent, or SoundCloud without an audio
+                # optimizer). Matching either avoids missing the partial shape without
+                # regressing the status-string case. This row cannot be completed
+                # here: it writes an actionable note but lands no AI fields, so it
+                # counts as a per-row failure for the exit code (main() keys off
+                # errors) while its distinct edge-case stat records the specific
+                # reason. Same shape as missing_content.
                 reason = str(result.get("error") or "Requires audio transcription")
                 note = _note(f"[NEEDS_TRANSCRIPTION] {reason[:50]}")
+                stats["errors"] += 1
                 stats["edge_cases"]["needs_transcription"] += 1
                 if _write_row(
                     worksheet,
@@ -295,6 +332,7 @@ def run_corrector(
                 remaining_limit=(
                     len(selected) - local_index if selection_limit is not None else None
                 ),
+                resume=resume,
                 stats=stats,
             ):
                 if row_updates:
@@ -313,7 +351,6 @@ def run_corrector(
                         stats["processed"] += 1
                     else:
                         stats["write_errors"] += 1
-                        stats["errors"] += 1
                 break
             if is_valid and quality_score >= 0.7:
                 stats["cached"] += 1
@@ -339,11 +376,27 @@ def run_corrector(
                 write_ai_fields=write_ai_fields,
             )
             row_updates.extend(analysis_updates)
-            if written_fields:
-                result_message += f" | Updated: {', '.join(written_fields)}"
+
+        # "Complete -" is proof the AI fields landed: it is written in the SAME
+        # batch as those field values, so completion is defined by whether any
+        # field actually landed, not by whether the categorizer returned something.
+        if written_fields:
+            result_message += f" | Updated: {', '.join(written_fields)}"
             note = _note(f"Complete - {result_message}")
+        elif not write_ai_fields:
+            # Text-only mode writes no AI fields by design. The row's text work is
+            # done but it is NOT AI-complete, so it must not claim "Complete -" or a
+            # later AI-mode --resume would skip a row whose AI fields never landed.
+            note = _note(f"Text updated - {result_message}")
         else:
+            # An AI-field run that saved no field (missing/None analysis, an empty
+            # payload like {"error": ...}, or values that normalized to blank) did
+            # not do its job, so mark it incomplete for --resume and count it so the
+            # CLI exits non-zero.
             note = _note(f"Incomplete - {result_message} | AI analysis unavailable")
+            if not dry_run:
+                stats["errors"] += 1
+                stats["ai_unavailable"] += 1
 
         row_updates.append((columns["notes"], note))
         if _write_row(worksheet, row_number, row_updates, dry_run=dry_run):
@@ -351,8 +404,13 @@ def run_corrector(
             if not dry_run:
                 stats["ai_fields_written"] += len(written_fields)
         else:
+            # A write can fail for this one row (a transient API error, a cell-level
+            # rejection) without the whole sheet being unwritable. Aborting here would
+            # abandon the good rows still ahead AND, because the abandoned rows keep
+            # their old notes, a later --resume would reprocess and re-pay for them.
+            # So record the failure and keep going; main() exits non-zero when
+            # write_errors > 0 so the operator still sees that a row did not save.
             stats["write_errors"] += 1
-            stats["errors"] += 1
 
     return stats
 
@@ -364,6 +422,7 @@ def _authorize_cost(
     row_number: int,
     selection_end_row: int | None,
     remaining_limit: int | None,
+    resume: bool,
     stats: dict[str, Any],
 ) -> bool:
     if cost_tracker.can_afford(estimated_cost):
@@ -373,10 +432,16 @@ def _authorize_cost(
     stats["budget_stop_row"] = row_number
     end_row = selection_end_row or ""
     limit_arg = f" --limit {remaining_limit}" if remaining_limit is not None else ""
+    # Preserve the original run's resume mode. The budget stop happens before the
+    # stop row is processed, so no new note lands and any old "Complete -" marker
+    # stays. Adding --resume to a full-refresh continuation would then skip that
+    # row instead of refreshing it; a resume run must keep --resume to go on
+    # skipping already-complete rows.
+    resume_arg = " --resume" if resume else ""
     stats["budget_note"] = (
         f"Budget limit reached before sheet row {row_number} "
         f"(next estimated call: ${estimated_cost:.4f}). Review recorded spend, "
-        f"then rerun with --rows {row_number}-{end_row}{limit_arg} --resume "
+        f"then rerun with --rows {row_number}-{end_row}{limit_arg}{resume_arg} "
         "and a higher --max-cost."
     )
     return False
@@ -446,10 +511,15 @@ def _analysis_updates(
     written = []
     for field in AI_FIELDS:
         value = analysis.get(field)
-        if not value:
-            continue
         if isinstance(value, list):
-            value = ", ".join(str(item) for item in value)
+            # Drop empty/whitespace items so a list like [""] normalizes to "" and
+            # is treated as no value, not a written-but-blank cell.
+            value = ", ".join(str(item) for item in value if str(item).strip())
+        # Gate on the FINAL cell value: an empty string, whitespace, or a list that
+        # normalized to "" must not be counted as a written field, or a later
+        # --resume would treat the blank cell as complete.
+        if value is None or not str(value).strip():
+            continue
         updates.append((columns[field], value))
         written.append(field)
     return updates, written
@@ -487,37 +557,33 @@ def _column_name(column: int) -> str:
 
 
 def _note(message: str) -> str:
+    # Neutralize any smart-corrector marker inside the free-text body (e.g. a
+    # processor error that echoes a prior note) so a later status scan cannot
+    # mistake it for a real timestamped note boundary and read a failed row as
+    # complete. Stripping the marker stem plus its trailing colon run (not a plain
+    # str.replace, which would reconstruct the marker) leaves the timestamped prefix
+    # this function writes as the only real marker.
+    body = _MARKER_ECHO_RE.sub(_MARKER_STEM, message)
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
-    return f"[{timestamp}] {SMART_CORRECTOR_MARKER} {message}"
+    return f"[{timestamp}] {SMART_CORRECTOR_MARKER} {body}"
 
 
 def _notes_indicate_completion(notes: str) -> bool:
-    """True when the row's most recent smart-corrector status marks it complete.
+    """True when the row's most recent smart-corrector note marks it complete.
 
-    A run overwrites the notes cell with a single note, but legacy drivers may
-    have left several accumulated notes in one cell. Anchor on the status that
-    follows the LAST "Smart Corrector:" marker so a stale success note earlier in
-    the cell cannot mask a current "Needs reprocessing"/"Incomplete" status and
-    skip a row that still needs work.
+    A run overwrites the notes cell with a single note, but legacy cells may hold
+    several accumulated notes. Take the status of the LAST timestamped note so a
+    stale success note earlier in the cell cannot mask a current
+    "Needs reprocessing"/"Incomplete" status, and so error text that merely
+    contains the marker cannot be read as a status.
     """
-    marker_at = notes.rfind(SMART_CORRECTOR_MARKER)
-    if marker_at == -1:
+    matches = list(_NOTE_STATUS_BOUNDARY.finditer(notes))
+    if not matches:
         return False
-    # lstrip() absorbs the ": " (or a bare ":") between the marker and status,
-    # so a legacy note without the space after the colon still anchors here.
-    status = notes[marker_at + len(SMART_CORRECTOR_MARKER) :].lstrip()
-    if not status.startswith(COMPLETION_STATUS_PREFIXES):
+    status = notes[matches[-1].end() :]
+    if not status.startswith(COMPLETION_STATUS_PREFIX):
         return False
     return not any(marker in status for marker in INCOMPLETE_STATUS_MARKERS)
-
-
-def _resume_offset(records: list[dict[str, Any]]) -> int:
-    offset = 0
-    for record in records:
-        if not _notes_indicate_completion(str(record.get("notes", ""))):
-            break
-        offset += 1
-    return offset
 
 
 def _requested_end_row(rows: str | None) -> int | None:
@@ -528,11 +594,34 @@ def _requested_end_row(rows: str | None) -> int | None:
     return int(end) if separator and end else None
 
 
-def _resolve_rows(rows: str | None, start_row: int | None) -> str | None:
-    """Map the legacy --start-row alias onto the canonical open-ended rows spec."""
+def _resolve_rows(rows: str | None, start_row: str | None) -> str | None:
+    """Map the legacy --start-row alias onto the canonical open-ended rows spec.
+
+    ``start_row`` is the raw token, not a parsed int, so that ``parse_row_range``
+    applies the same canonical validation it applies to ``--rows N-`` and rejects
+    malformed tokens (underscores, signs, leading zeros) instead of argparse
+    silently normalizing e.g. ``1_0`` to ``10``.
+    """
     if start_row is not None:
         return f"{start_row}-"
     return rows
+
+
+def _positive_finite_cost(raw: str) -> float:
+    # --max-cost is a hard budget cap, so only a positive finite number is
+    # meaningful. inf would silently disable the advertised stop; nan, zero, or a
+    # negative value would stop before the first row yet exit 0 as a clean budget
+    # stop despite doing no work. Reject them here so the bad value can never reach
+    # the cost tracker.
+    try:
+        value = float(raw)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(f"invalid float value: {raw!r}") from exc
+    if not math.isfinite(value) or value <= 0:
+        raise argparse.ArgumentTypeError(
+            f"--max-cost must be a positive finite number (got {raw!r})"
+        )
+    return value
 
 
 def build_parser(
@@ -550,7 +639,7 @@ def build_parser(
     )
     row_selection.add_argument(
         "--start-row",
-        type=int,
+        metavar="N",
         default=None,
         help="Legacy alias for --rows N- (start at row N with no upper bound)",
     )
@@ -567,7 +656,7 @@ def build_parser(
     )
     parser.add_argument(
         "--max-cost",
-        type=float,
+        type=_positive_finite_cost,
         default=DEFAULT_MAX_COST,
         help=f"Maximum estimated paid-call cost in USD (default: {DEFAULT_MAX_COST:.2f})",
     )
@@ -730,10 +819,19 @@ def main(
         f"missing content {stats['edge_cases']['missing_content']}, "
         f"needs transcription {stats['edge_cases']['needs_transcription']}, "
         f"AI fields written {stats['ai_fields_written']}, "
+        f"AI unavailable {stats['ai_unavailable']}, "
         f"estimated cost ${stats['estimated_cost']:.4f}."
     )
     if stats["budget_stopped"]:
         print(stats["budget_note"])
+    # A live run that hit a per-row processing failure (a "Failed" note, missing
+    # content, or unavailable AI analysis -> stats["errors"]) or that could not save
+    # a row (stats["write_errors"]) did not fully do its job, so exit non-zero
+    # instead of masking it as success. ai_unavailable is a subset of errors, so
+    # checking errors covers it. A clean budget stop is not a failure and does not
+    # increment either counter, so it still exits zero.
+    if not args.dry_run and (stats["errors"] or stats["write_errors"]):
+        return 1
     return 0
 
 
