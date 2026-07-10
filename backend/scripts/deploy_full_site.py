@@ -56,11 +56,19 @@ logger = logging.getLogger('deploy_full_site')
 _DEPLOY_FILES: Tuple[str, ...] = (
     'index.html',
     'favicon.ico',
+    'favicon.svg',  # SVG favicon referenced by index.html, the FAQ, and both data tools
+    'og-image.png',  # social card referenced by the OG/Twitter meta tags
     'shared-styles.css',
     'version.json',
     'metadata.json',
     '.htaccess',
     'ADDING-RECORDS.md',
+    # Shared Tailwind build for the standalone data tools. It sits at
+    # tools/active/, one level above the two deployed tool dirs, so the dir
+    # walk below never reaches it; both tools load it as ../tailwind.css.
+    # Listed explicitly so a full deploy ships it -- dataexplorer and dataviz
+    # render unstyled without it.
+    'tools/active/tailwind.css',
 )
 
 _DEPLOY_DIRS: Tuple[str, ...] = (

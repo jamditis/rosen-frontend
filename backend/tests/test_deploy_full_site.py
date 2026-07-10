@@ -21,6 +21,7 @@ from __future__ import annotations
 import errno
 import importlib.util
 import pathlib
+import re
 import stat
 import sys
 from types import SimpleNamespace
@@ -282,6 +283,144 @@ class TestServiceWorkerEntryPointOrder:
         assert names.index('index.html') < names.index('frontend/sw.js')
         # version.json (not precached) flips last.
         assert names[-3:] == ['index.html', 'frontend/sw.js', 'version.json']
+
+
+class TestReferencedAssetsAreDeployed:
+    """Every local asset a deployed HTML page references must be in the manifest.
+
+    Regression guard for the bug class where a static asset lives OUTSIDE the
+    deployed directory subtrees, so the dir walk never reaches it and a full
+    deploy ships pages that reference a file it never uploads. Concretely:
+      - favicon.svg (repo root) is referenced by index.html, the FAQ, the
+        design-system demo, and both data tools, but is not under any deployed
+        dir, so a manifest without it deploys pages with a broken SVG favicon.
+      - tools/active/tailwind.css sits one level above the two deployed tool
+        dirs; dataexplorer and dataviz load it as ../tailwind.css, so a manifest
+        without it deploys both tools unstyled.
+    Such a page only "works" on the live server when a past manual upload left
+    the file there -- FTP does not delete unlisted files -- which hides the gap
+    until a clean deploy or an asset change. This test resolves every
+    <link>/<script>/<img> href/src and every <meta content=> image reference
+    in every deployed HTML page and asserts the target is in the manifest, so
+    the class cannot regress.
+
+    Scope: only assets that EXIST in the repo are in scope, since this guards
+    manifest drift. A reference to a file absent from the repo is a dangling or
+    live-only asset the manifest cannot ship -- a separate broken-link concern.
+    """
+
+    _ASSET_EXTS = (
+        '.css', '.js', '.mjs', '.svg', '.png', '.ico', '.jpg', '.jpeg',
+        '.gif', '.webp', '.woff', '.woff2', '.xml',
+    )
+    # href/src on the tags that pull in a static asset.
+    _TAG_REF_RE = re.compile(
+        r'<(?:link|script|img)\b[^>]*?\b(?:href|src)\s*=\s*["\']([^"\']+)["\']',
+        re.IGNORECASE | re.DOTALL,
+    )
+    # content= on <meta> tags. The og:image / twitter:image social-card assets
+    # are referenced ONLY here (never via href/src) and with the absolute live
+    # URL, so a href/src-only scan misses them. The asset-extension filter in
+    # _resolve_asset_ref drops the non-asset meta values (og:title, og:url,
+    # twitter:card, og:image:width, ...), so matching every content= is safe.
+    _META_REF_RE = re.compile(
+        r'<meta\b[^>]*?\bcontent\s*=\s*["\']([^"\']+)["\']',
+        re.IGNORECASE | re.DOTALL,
+    )
+    _SITE_ORIGIN = 'https://pressthink.org'
+    _SITE_ROOT_PREFIX = '/j/rosen-archive/'
+
+    def _deployed_relpaths(self):
+        files = deploy_full_site.collect_local_files(_REPO_ROOT)
+        return {f.relative_to(_REPO_ROOT).as_posix() for f in files}
+
+    def _resolve_asset_ref(self, html_path, raw):
+        """Map one raw href/src/meta-content value to the repo-relative file it
+        points at, or None when it is not a repo asset this manifest ships
+        (external host, non-file scheme, non-asset extension, or a path that
+        escapes the repo).
+        """
+        ref = raw.split('#', 1)[0].split('?', 1)[0].strip()
+        if not ref:
+            return None
+        # A full production URL to our own origin (og:image / twitter:image use
+        # the absolute live URL) is really a site-root path; strip the origin so
+        # the site-root branch resolves it instead of the external-URL skip.
+        if ref.lower().startswith(self._SITE_ORIGIN.lower() + '/'):
+            ref = ref[len(self._SITE_ORIGIN):]
+        low = ref.lower()
+        if low.startswith((
+            'http://', 'https://', '//', 'data:', 'mailto:',
+            'tel:', 'javascript:', 'blob:',
+        )):
+            return None
+        if not low.endswith(self._ASSET_EXTS):
+            return None
+        if ref.startswith('/'):
+            # Only production site-root paths map back to the repo; any other
+            # absolute path (e.g. /wp-content/...) is not a repo asset.
+            if not ref.startswith(self._SITE_ROOT_PREFIX):
+                return None
+            return ref[len(self._SITE_ROOT_PREFIX):]
+        target = (html_path.parent / ref).resolve()
+        try:
+            return target.relative_to(_REPO_ROOT).as_posix()
+        except ValueError:
+            return None  # escapes the repo; not ours to ship
+
+    def _page_asset_problems(self, deployed, rel_html):
+        html_path = _REPO_ROOT / rel_html
+        text = html_path.read_text(encoding='utf-8', errors='replace')
+        raws = self._TAG_REF_RE.findall(text) + self._META_REF_RE.findall(text)
+        problems = []
+        for raw in raws:
+            target_rel = self._resolve_asset_ref(html_path, raw)
+            if target_rel is None:
+                continue
+            # In scope: a file that EXISTS in the repo but sits outside the
+            # deployed dir walk, so the manifest misses it. A ref to a file
+            # absent from the repo is a dangling / live-only reference the
+            # manifest cannot ship -- a separate broken-link concern, not
+            # manifest drift -- so skip it here.
+            if not (_REPO_ROOT / target_rel).is_file():
+                continue
+            if target_rel not in deployed:
+                problems.append(
+                    f'{rel_html} references {raw!r} -> {target_rel} '
+                    f'(not in the deploy manifest)'
+                )
+        return problems
+
+    def test_deployed_html_asset_refs_are_all_shipped(self):
+        deployed = self._deployed_relpaths()
+        deployed_html = sorted(p for p in deployed if p.endswith('.html'))
+        assert deployed_html, "expected deployed HTML pages in the manifest"
+
+        problems = []
+        for rel_html in deployed_html:
+            problems.extend(self._page_asset_problems(deployed, rel_html))
+
+        assert not problems, (
+            'deployed pages reference local assets the manifest does not '
+            'ship:\n  ' + '\n  '.join(sorted(problems))
+        )
+
+    def test_meta_social_card_asset_is_covered(self):
+        """og:image / twitter:image are referenced only via <meta content=>
+        absolute URLs. The resolver must map the production origin back to the
+        repo file, and dropping the asset from the manifest must fail the scan
+        -- otherwise the social-card gap (og-image.png) regresses silently.
+        """
+        index = _REPO_ROOT / 'index.html'
+        ref = f'{self._SITE_ORIGIN}{self._SITE_ROOT_PREFIX}og-image.png'
+        assert self._resolve_asset_ref(index, ref) == 'og-image.png'
+
+        deployed = self._deployed_relpaths()
+        deployed.discard('og-image.png')
+        problems = self._page_asset_problems(deployed, 'index.html')
+        assert any('og-image.png' in p for p in problems), (
+            'meta og:image asset is not covered by the deploy regression guard'
+        )
 
 
 class TestKnownHostsHandling:
