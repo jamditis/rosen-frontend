@@ -5,11 +5,10 @@ list in [`DEPLOYMENT.md`](../DEPLOYMENT.md)). Not part of the live static site.
 
 ## What's here
 
-- `dissertation-tools/` — 7 earlier standalone dissertation tools (comparison,
-  concepts, context, excerpts, faq, glossary, timeline) plus a `source/` bundle
-  (the dissertation PDF, a transcribed markdown copy, and a build helper). The
-  3 maintained surfaces (reader, foreword, network-effect) live in
-  `dissertation/` instead.
+- `dissertation-tools/source/` — the tracked source bundle for the maintained
+  dissertation reader in `dissertation/reader/`: the original dissertation PDF,
+  a transcription, and the historical PDF build helper. It remains as source
+  provenance after the six retired tool routes were removed.
 - `scripts/` — retired one-off scripts, split into `data-oneoffs/` and
   `backend-oneoffs/`, kept as provenance. Most are data and relationship repairs
   that ran once against a known dataset and were never meant to recur;
@@ -22,17 +21,6 @@ list in [`DEPLOYMENT.md`](../DEPLOYMENT.md)). Not part of the live static site.
   [`docs/narrative/architecture.md`](../docs/narrative/architecture.md), and
   [`.claude/skills/data-pipeline.md`](../.claude/skills/data-pipeline.md). Each
   subdir carries its own README; provenance only, do not run.
-
-## Why these are still tracked
-
-`dissertation-tools/`: the 7 tools were uploaded to WordPress once and are still served on production,
-even though the FTP deploy manifest no longer includes them — so this is the
-only editable source for those live pages. Whether to fold them back into the
-maintained `dissertation/` directory or leave them here is an open call; see the
-dissertation-tools entry in [`docs/decisions-pending.md`](../docs/decisions-pending.md).
-They were left in place
-when the rest of `archived/` (archive-v1, the Win95 promo site, the BYOK chat,
-old web snapshots, and legacy docs) was pruned in #166.
 
 ## Rule
 

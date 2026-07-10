@@ -135,7 +135,7 @@ After completing the work, Rosen became a leading voice in the "public journalis
 Rosen coined influential concepts like "the view from nowhere" (the pretense of journalistic neutrality) and "the people formerly known as the audience" (recognizing that digital technology has transformed passive audiences into active participants).
 
 <em>The Impossible Press</em> represents the intellectual foundation for all his later work.`,
-    sources: ['Timeline', 'Introduction']
+    sources: ['Introduction']
   },
   {
     id: 'who-is-postman',
@@ -446,7 +446,7 @@ Rosen's sympathies are largely with Dewey, but he recognizes that Dewey never fu
 **The controversy:** Traditional journalists attacked public journalism as abandoning objectivity and neutrality. They saw the reporter as an outside observer, not a participant in civic life.
 
 **The legacy:** Public journalism as a movement faded, but its ideas influenced later developments: civic journalism, engagement journalism, solutions journalism, community-centered reporting. All share the insight that journalism should help create the conditions for public life, not just document its absence.`,
-    sources: ['Timeline', 'Later Work']
+    sources: ['Later Work']
   },
   {
     id: 'view-from-nowhere',
@@ -495,7 +495,7 @@ Rosen argues this is both impossible and misleading:
 **Enacting the transaction:** The blog form itself embodies the insight from <em>The Impossible Press</em> that journalism is a transaction. Rosen's posts become dialogues with readers, not one-way transmissions.
 
 **Testing Dewey:** PressThink represents an attempt to do what Dewey advocated — create a community of inquiry around shared problems.`,
-    sources: ['pressthink.org', 'Timeline']
+    sources: ['pressthink.org']
   },
 
   // === ADDITIONAL BASICS ===
@@ -539,8 +539,6 @@ Each chapter builds on previous ones, creating a cumulative argument that profes
 **For the philosophically inclined:** Focus on Chapters 7 and 8, the Lippmann-Dewey debate. This is where the deepest theoretical work happens.
 
 **For practitioners:** Chapter 6 on the professional attitude is most directly relevant to how journalists think about their work today.
-
-**For contemporary relevance:** Use the comparison tools on this site to see how 1986 arguments apply to 2025 conditions, then dive into the chapters that interest you most.
 
 **A warning:** This is an academic dissertation written in 1986. The prose is careful and sometimes dense. Give it time — the ideas reward patience.`,
     sources: ['Introduction']

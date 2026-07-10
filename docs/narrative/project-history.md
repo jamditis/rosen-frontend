@@ -579,7 +579,6 @@ As of 2026-07-07, the archive contains:
 | Named entities | 8,152 |
 | Entity relationships | 12,560 |
 | Dissertation tools (live) | 4 (reader, foreword, network-effect, faq) |
-| Dissertation tools (retired to `archived/dissertation-tools/`) | 6 tools (comparison, concepts, context, excerpts, glossary, timeline) + a source bundle |
 | CI/CD workflows | 9 |
 | Era classifications | 8 (non-overlapping) |
 | Key concept taxonomy | 13 concepts |
