@@ -31,7 +31,31 @@ AI_FIELDS = (
     "pull_quote",
 )
 SMART_CORRECTOR_MARKER = "Smart Corrector:"
-SMART_CORRECTOR_SUCCESS_MARKER = "Smart Corrector: Complete -"
+# A completed row's most recent smart-corrector status starts with one of these.
+# The consolidated corrector writes "Complete - ..."; the five retired drivers
+# wrote "Used cached text ..." or "Reprocessed via ..." with no "Complete -"
+# prefix. Statuses that mean the row still needs work ("Incomplete - ...",
+# "Needs reprocessing") deliberately stay out so --resume retries them.
+COMPLETION_STATUS_PREFIXES = (
+    "Complete -",
+    "Used cached text",
+    "Reprocessed via",
+)
+# A success prefix is necessary but not sufficient. "Used cached text" and
+# "Reprocessed via" describe the text-extraction step, and a legacy driver could
+# pair either with an inline failure (e.g. "Used cached text ... | AI error: ...")
+# on a row whose AI analysis never landed. Any of these markers in the status
+# means the row is not safely complete, so --resume must retry it rather than skip
+# it and leave the AI fields empty.
+INCOMPLETE_STATUS_MARKERS = (
+    "Incomplete",
+    "Needs reprocessing",
+    "AI error",
+    "AI analysis unavailable",
+    "Budget limit",
+    "Failed",
+    "NEEDS_TRANSCRIPTION",
+)
 RAW_TEXT_TRUNCATE_AT = 49_000
 TRUNCATION_SUFFIX = "... [TRUNCATED]"
 DEFAULT_MAX_COST = 35.0
@@ -467,10 +491,30 @@ def _note(message: str) -> str:
     return f"[{timestamp}] {SMART_CORRECTOR_MARKER} {message}"
 
 
+def _notes_indicate_completion(notes: str) -> bool:
+    """True when the row's most recent smart-corrector status marks it complete.
+
+    A run overwrites the notes cell with a single note, but legacy drivers may
+    have left several accumulated notes in one cell. Anchor on the status that
+    follows the LAST "Smart Corrector:" marker so a stale success note earlier in
+    the cell cannot mask a current "Needs reprocessing"/"Incomplete" status and
+    skip a row that still needs work.
+    """
+    marker_at = notes.rfind(SMART_CORRECTOR_MARKER)
+    if marker_at == -1:
+        return False
+    # lstrip() absorbs the ": " (or a bare ":") between the marker and status,
+    # so a legacy note without the space after the colon still anchors here.
+    status = notes[marker_at + len(SMART_CORRECTOR_MARKER) :].lstrip()
+    if not status.startswith(COMPLETION_STATUS_PREFIXES):
+        return False
+    return not any(marker in status for marker in INCOMPLETE_STATUS_MARKERS)
+
+
 def _resume_offset(records: list[dict[str, Any]]) -> int:
     offset = 0
     for record in records:
-        if SMART_CORRECTOR_SUCCESS_MARKER not in str(record.get("notes", "")):
+        if not _notes_indicate_completion(str(record.get("notes", ""))):
             break
         offset += 1
     return offset
@@ -484,6 +528,13 @@ def _requested_end_row(rows: str | None) -> int | None:
     return int(end) if separator and end else None
 
 
+def _resolve_rows(rows: str | None, start_row: int | None) -> str | None:
+    """Map the legacy --start-row alias onto the canonical open-ended rows spec."""
+    if start_row is not None:
+        return f"{start_row}-"
+    return rows
+
+
 def build_parser(
     *, default_rows: str | None = None, default_limit: int | None = None
 ) -> argparse.ArgumentParser:
@@ -491,10 +542,17 @@ def build_parser(
     parser = argparse.ArgumentParser(
         description="Run the range-safe Rosen Archive smart corrector."
     )
-    parser.add_argument(
+    row_selection = parser.add_mutually_exclusive_group()
+    row_selection.add_argument(
         "--rows",
         default=default_rows,
         help="Sheet rows as :N, N-M, or N- (default: all data rows)",
+    )
+    row_selection.add_argument(
+        "--start-row",
+        type=int,
+        default=None,
+        help="Legacy alias for --rows N- (start at row N with no upper bound)",
     )
     parser.add_argument(
         "--limit",
@@ -634,8 +692,9 @@ def main(
     """Run the CLI with optional range defaults for legacy shims."""
     parser = build_parser(default_rows=default_rows, default_limit=default_limit)
     args = parser.parse_args(argv)
+    rows_spec = _resolve_rows(args.rows, args.start_row)
     try:
-        row_range = parse_row_range(args.rows, limit=args.limit)
+        row_range = parse_row_range(rows_spec, limit=args.limit)
     except ValueError as exc:
         parser.error(str(exc))
 
@@ -660,7 +719,7 @@ def main(
         write_ai_fields=True,
         resume=args.resume,
         cost_tracker=cost_tracker,
-        selection_end_row=_requested_end_row(args.rows),
+        selection_end_row=_requested_end_row(rows_spec),
         selection_limit=args.limit,
     )
     mode = "Dry run" if args.dry_run else "Live run"

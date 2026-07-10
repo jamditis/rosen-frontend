@@ -489,6 +489,183 @@ def test_resume_skips_a_leading_completed_row():
     assert stats["skipped"] == 1
 
 
+@pytest.mark.parametrize(
+    "legacy_note",
+    [
+        "[2026-01-01 12:00] Smart Corrector: Used cached text (Q:0.91)",
+        "[2026-01-01 12:00] Smart Corrector: Reprocessed via article | 1234 chars",
+    ],
+)
+def test_resume_skips_a_leading_row_with_a_legacy_completion_note(legacy_note):
+    records = make_records(1)
+    records[0]["notes"] = legacy_note
+    worksheet = FakeWorksheet(records)
+    categorized = []
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: categorized.append(text),
+        processors={},
+        detector=article_content,
+        validator=valid_content,
+        schema={},
+        resume=True,
+    )
+
+    assert categorized == []
+    assert stats["processed"] == 0
+    assert stats["skipped"] == 1
+
+
+@pytest.mark.parametrize(
+    "unfinished_note",
+    [
+        "[2026-01-01 12:00] Smart Corrector: Needs reprocessing",
+        "[2026-01-01 12:00] Smart Corrector: Incomplete - Reprocessed via article | 10 chars",
+    ],
+)
+def test_resume_retries_a_leading_row_that_still_needs_work(unfinished_note):
+    records = make_records(1)
+    records[0]["notes"] = unfinished_note
+    worksheet = FakeWorksheet(records)
+    categorized = []
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: categorized.append(text),
+        processors={},
+        detector=article_content,
+        validator=valid_content,
+        schema={},
+        resume=True,
+    )
+
+    assert categorized == ["record-index-0"]
+    assert stats["processed"] == 1
+    assert stats["skipped"] == 0
+
+
+def test_resume_retries_when_newest_note_needs_work_despite_stale_success():
+    # A legacy driver may leave several notes accumulated in one cell. Resume
+    # must honour the newest status: a stale "Used cached text" success note
+    # followed by a current "Needs reprocessing" note must not skip the row.
+    records = make_records(1)
+    records[0]["notes"] = (
+        "[2026-01-01 12:00] Smart Corrector: Used cached text (Q:0.91) "
+        "[2026-02-01 09:00] Smart Corrector: Needs reprocessing"
+    )
+    worksheet = FakeWorksheet(records)
+    categorized = []
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: categorized.append(text),
+        processors={},
+        detector=article_content,
+        validator=valid_content,
+        schema={},
+        resume=True,
+    )
+
+    assert categorized == ["record-index-0"]
+    assert stats["processed"] == 1
+    assert stats["skipped"] == 0
+
+
+@pytest.mark.parametrize(
+    "note_with_inline_failure",
+    [
+        "[2026-01-01 12:00] Smart Corrector: Used cached text (Q:0.86) | AI error: APIError: [429]",
+        "[2026-01-01 12:00] Smart Corrector: Reprocessed via article | 900 chars | AI analysis unavailable",
+        "[2026-01-01 12:00] Smart Corrector: Used cached text (Q:0.9) | Budget limit reached before AI analysis",
+    ],
+)
+def test_resume_retries_a_legacy_success_prefix_paired_with_a_failure(
+    note_with_inline_failure,
+):
+    # "Used cached text"/"Reprocessed via" describe text extraction, not AI
+    # completion. A legacy note that opens with one but records an inline failure
+    # is not safely complete, so --resume must retry it rather than skip a row
+    # whose AI fields never landed.
+    records = make_records(1)
+    records[0]["notes"] = note_with_inline_failure
+    worksheet = FakeWorksheet(records)
+    categorized = []
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: categorized.append(text),
+        processors={},
+        detector=article_content,
+        validator=valid_content,
+        schema={},
+        resume=True,
+    )
+
+    assert categorized == ["record-index-0"]
+    assert stats["processed"] == 1
+    assert stats["skipped"] == 0
+
+
+def test_resume_retries_when_newest_note_omits_space_after_marker():
+    # Anchoring must not depend on the space after "Smart Corrector:". A newest
+    # status written without that space still wins over an earlier spaced success
+    # note, so the row is retried rather than wrongly skipped.
+    records = make_records(1)
+    records[0]["notes"] = (
+        "[2026-01-01 12:00] Smart Corrector: Used cached text (Q:0.91) "
+        "[2026-02-01 09:00] Smart Corrector:Needs reprocessing"
+    )
+    worksheet = FakeWorksheet(records)
+    categorized = []
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: categorized.append(text),
+        processors={},
+        detector=article_content,
+        validator=valid_content,
+        schema={},
+        resume=True,
+    )
+
+    assert categorized == ["record-index-0"]
+    assert stats["processed"] == 1
+    assert stats["skipped"] == 0
+
+
+def test_resume_skips_when_newest_note_completes_after_a_stale_retry():
+    # The mirror case: a stale "Needs reprocessing" note followed by a current
+    # success note counts as done, so resume skips the row.
+    records = make_records(1)
+    records[0]["notes"] = (
+        "[2026-01-01 12:00] Smart Corrector: Needs reprocessing "
+        "[2026-02-01 09:00] Smart Corrector: Complete - Updated: summary"
+    )
+    worksheet = FakeWorksheet(records)
+    categorized = []
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: categorized.append(text),
+        processors={},
+        detector=article_content,
+        validator=valid_content,
+        schema={},
+        resume=True,
+    )
+
+    assert categorized == []
+    assert stats["processed"] == 0
+    assert stats["skipped"] == 1
+
+
 def test_cli_defaults_to_dry_run_and_supports_requested_flags():
     parser = build_parser()
 
@@ -555,6 +732,41 @@ def test_cli_budget_hint_preserves_row_bounds_and_remaining_limit(
     assert exit_code == 0
     assert expected_hint in output
     assert "--rows 35- --resume" not in output
+
+
+def test_start_row_is_a_legacy_alias_and_conflicts_with_rows():
+    parser = build_parser()
+
+    parsed = parser.parse_args(["--start-row", "251"])
+    assert parsed.start_row == 251
+
+    with pytest.raises(SystemExit):
+        parser.parse_args(["--rows", "27-42", "--start-row", "251"])
+
+
+def test_start_row_drives_open_ended_selection(monkeypatch, capsys):
+    runtime = RuntimeDependencies(
+        worksheet=FakeWorksheet(make_records(50)),
+        categorizer=FakeCategorizer(cost_per_call=0.006),
+        processors={},
+        detector=article_content,
+        validator=valid_content,
+        schema={},
+    )
+    monkeypatch.setattr(
+        "scripts.corrector.build_cost_tracker",
+        lambda max_cost: FakeCostTracker(max_budget=max_cost),
+    )
+
+    exit_code = main(
+        ["--start-row", "27", "--limit", "10", "--max-cost", "0.0481"],
+        environment_loader=lambda dotenv_path: None,
+        runtime_builder=lambda: runtime,
+    )
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "--rows 35- --limit 2 --resume" in output
 
 
 def test_budget_stops_before_an_unaffordable_categorizer_call():
