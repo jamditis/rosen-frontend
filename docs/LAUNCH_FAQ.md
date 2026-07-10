@@ -13,14 +13,16 @@ Live site: https://pressthink.org/j/rosen-archive/
 ## The one-sentence version
 
 It is a public, searchable archive of four decades of Jay Rosen's journalism
-criticism: 1,030 curated records and tens of thousands of social posts,
-cross-indexed by about 8,150 named people, organizations, and concepts and the
-typed relationships between them. It runs as a static site with no server-side
-code and nothing calling out to an AI model when you use it.
+criticism: about 26,600 records in the shipped data — roughly 950 articles and
+essays plus about 25,700 archived social posts — cross-indexed by about 8,150
+named people, organizations, and concepts. It runs as a static site with no
+server-side code and nothing calling out to an AI model when you use it.
 
-Accuracy note for Joe: the archive's analytics page shows about 8,150 entities
-(computed live from the shipped data), so that is the reader-facing figure this
-FAQ uses. The README still says 5,036 entities and 4,666 relationships — the older
+Accuracy note for Joe: these figures are computed from the shipped data, not
+guessed — `archive-core.json` holds 26,616 records (951 non-social plus 25,665
+social), `archive-entities.json` holds 8,152 entities, and
+`data/extracted_relationships.csv` holds about 12,560 relationship rows. The
+README still says 5,036 entities and 4,666 relationships — the older
 curated-record figures from before the social-post extraction grew the data — so
 update `README.md` to match, or the doc set stays inconsistent.
 
@@ -33,17 +35,24 @@ API to an AI model in that path, so nothing you do on the site sends a request t
 a language model.
 
 AI is used earlier, offline, as a research tool: extracting candidate entities
-and relationships from the source material during data preparation. Every one of
-those passes through review before it ships (see `docs/ENTITY_EXTRACTION_PIPELINE.md`
-and the verification log in `data/`). By the time a record reaches the site it is
-plain reviewed data in a JSON file. The runtime is dumb on purpose, and that is a
+and relationships from the source material during data preparation. That
+extraction goes through a documented review pipeline before it ships (see
+`docs/ENTITY_EXTRACTION_PIPELINE.md` and `data/verification-log.md`). By the time
+a record reaches the site it is plain data in a JSON file.
+
+Accuracy note for Joe: `data/verification-log.md` signs off on the curated set
+(5,036 entities, 4,666 relationships) and notes a second-pass diff over the
+larger social-post extraction is still queued — so the full 8,150-entity set is
+reviewed-in-progress, not fully signed off. Don't tell Jay "every single entity
+is human-verified" until that diff closes. The runtime is dumb on purpose, and that is a
 feature: it is cheap to host, fast to load, and it needs no model and no API key
 to keep working. One caveat: the core frontend libraries (React, HTM,
 Lucide) load from a public CDN (`esm.sh`) through an import map in `index.html`,
-so a first visit does depend on that CDN being reachable. (The SQLite query engine
-is the exception — its WASM binary is vendored in the repo, not CDN-loaded.) The
-archive's own data is self-hosted next to the site, which is the part that matters
-for long-term survival.
+so a first visit does depend on that CDN being reachable. (The SQLite query
+engine's WASM binary is vendored in the repo, but its loader script still loads
+from cdnjs on first use — see the link-rot section below.) The archive's own data
+is self-hosted next to the site, which is the part that matters for long-term
+survival.
 
 ## How records get added
 
@@ -85,22 +94,35 @@ Two data paths, and the distinction is worth getting right because both come up:
 
 Why it is link-rot resistant: the data lives as files on the archive's own host
 next to the site that reads them, so there is no third-party API or service that
-can disappear and take the archive down with it. The custom-query engine runs
-locally — its SQLite database is built in the browser from the JSON, and the WASM
-binary is vendored in the repo (`frontend/vendor/sql-wasm-1.10.3.wasm`), so a
-query does not phone home either. To preserve or fork the whole thing, you copy
-the files.
+can disappear and take the everyday archive down with it. One exception on the
+optional custom-query surface: the SQLite database is built in the browser from
+the local JSON and the WASM binary is self-hosted
+(`frontend/vendor/sql-wasm-1.10.3.wasm`), but the `sql.js` *loader* script still
+loads from cdnjs on the first custom query (`frontend/services/sqliteService.js`,
+pinned with subresource integrity). So everyday browsing and all the archive data
+are fully self-hosted; only the optional query engine's loader has a CDN
+dependency, and vendoring that one script too would close the last gap. To
+preserve or fork the whole thing, you copy the files (and, for offline custom
+queries, that loader script).
 
 ## How the entity and relationship mapping works
 
-It is relational, not just co-mention. The pipeline pulls out about 8,150 named
-entities — people, organizations, and concepts — and the relationships that are
-*typed edges* between two specific entities (a subject, a relationship type, and
-an object), stored as real relationship rows, not a count of how often two names
-appear in the same post. So the Explorer can answer "how is X connected to Y,"
-not only "X and Y are mentioned together a lot." The extraction and merge steps
-are in `docs/ENTITY_EXTRACTION_PIPELINE.md`; extracted entities and relationships
-are reviewed before they ship.
+It is relational, not just loose co-mention. The offline pipeline extracts about
+8,150 named entities — people, organizations, and concepts — and typed
+relationships between them (a subject, a relationship type, and an object) into
+`data/extracted_relationships.csv`.
+
+An important caveat about what the browser actually receives: the export step
+(`data/export-archive-data.js`) collapses those typed relationships into a plain
+entity-to-record association map, and the in-browser SQLite ships a single
+`record_entities(record_id, entity_id)` table — the relationship *type* is not
+carried into the shipped data. So the Explorer answers "which entities share
+records with X" — who and what co-occur across the same records — which is
+stronger than a loose full-text co-mention, but it is not a typed "X is-the-editor-of
+Y" query in the browser. The typed relationship types live in the source CSV and
+the offline pipeline; surfacing them in the Explorer would mean shipping the
+relationship table too, which is a real feature, not something the site does
+today. The extraction and merge steps are in `docs/ENTITY_EXTRACTION_PIPELINE.md`.
 
 ## How someone can contribute
 
