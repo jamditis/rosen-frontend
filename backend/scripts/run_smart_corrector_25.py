@@ -15,4 +15,4 @@ else:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main(default_rows=":25"))
+    raise SystemExit(main(default_limit=25))

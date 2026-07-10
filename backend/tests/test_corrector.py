@@ -1416,9 +1416,9 @@ def test_cli_loads_backend_dotenv_before_resolving_runtime_settings(monkeypatch)
     "script_name, default_call",
     [
         ("run_smart_corrector.py", "main()"),
-        ("run_smart_corrector_25.py", 'main(default_rows=":25")'),
+        ("run_smart_corrector_25.py", "main(default_limit=25)"),
         ("run_smart_corrector_27_42.py", 'main(default_rows="27-42")'),
-        ("run_smart_corrector_200.py", 'main(default_rows=":200")'),
+        ("run_smart_corrector_200.py", "main(default_limit=200)"),
         (
             "run_smart_corrector_201_plus.py",
             'main(default_rows="201-", default_limit=50)',
@@ -1436,3 +1436,62 @@ def test_legacy_corrector_driver_is_a_credential_free_shim(script_name, default_
     assert default_call in source
     assert "gspread" not in source
     assert "Credentials" not in source
+
+
+def _drive_main_capturing_selected_rows(argv, record_count, **main_kwargs):
+    """Run main() against a fake runtime and return the record texts the
+    categorizer analyzed, which equals the sheet rows the CLI selected. Lets a
+    test assert a legacy shim's default selection without real credentials.
+    """
+    analyzed = []
+
+    def categorize(text, schema):
+        analyzed.append(text)
+        return {
+            "summary": "s",
+            "thematic_categories": ["c"],
+            "key_concepts": ["k"],
+            "tags": ["t"],
+            "pull_quote": "q",
+        }
+
+    runtime = RuntimeDependencies(
+        worksheet=FakeWorksheet(make_records(record_count)),
+        categorizer=categorize,
+        processors={},
+        detector=article_content,
+        validator=valid_content,
+        schema={},
+    )
+    exit_code = main(
+        argv,
+        environment_loader=lambda dotenv_path: None,
+        runtime_builder=lambda: runtime,
+        **main_kwargs,
+    )
+    return exit_code, analyzed
+
+
+def test_first_n_shim_default_limit_selects_the_first_n_rows():
+    # main(default_limit=25), with no --limit, reproduces the retired 25-driver's
+    # first-25 default (limit=25 applied over the whole sheet).
+    exit_code, analyzed = _drive_main_capturing_selected_rows(
+        ["--live"], 60, default_limit=25
+    )
+
+    assert exit_code == 0
+    assert analyzed == [f"record-index-{index}" for index in range(25)]
+
+
+def test_first_n_shim_lets_an_explicit_limit_expand_past_the_default():
+    # The retired 25/200 drivers let --limit raise the batch above the named
+    # default (--limit=50 processed the first 50 rows). Modeling the default as
+    # default_limit=N preserves that. A default_rows=":N" range would instead clamp
+    # the count to min(N, limit) and silently drop rows N+1.. for larger-limit
+    # commands, which is the regression this guards against.
+    exit_code, analyzed = _drive_main_capturing_selected_rows(
+        ["--limit", "50", "--live"], 60, default_limit=25
+    )
+
+    assert exit_code == 0
+    assert analyzed == [f"record-index-{index}" for index in range(50)]
