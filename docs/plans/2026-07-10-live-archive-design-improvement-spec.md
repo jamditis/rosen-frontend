@@ -1,16 +1,18 @@
 # Live archive design improvement spec
 
 Date: 2026-07-10
-
+Status: Proposed
 Live surface inspected: https://pressthink.org/j/rosen-archive/
-
-Repo issue source inspected: https://github.com/jamditis/rosen-frontend/issues?q=is%3Aissue+is%3Aopen+-label%3Ado-not-automate
+Repo issues reviewed: open issues excluding do-not-automate (https://github.com/jamditis/rosen-frontend/issues?q=is%3Aissue+is%3Aopen+-label%3Ado-not-automate)
+Scope: Subtle improvements to the live public archive without changing its core identity, information model, or zero-build architecture
 
 ## Purpose
 
-Improve the Rosen Archive design without changing its identity. The site should still feel like a warm paper archive with filing-cabinet tools, mono body text, display headings, subdued category colors, and direct access to records. The work should make the current design clearer, calmer, more legible, and easier to operate on desktop and mobile.
+This spec defines a focused refinement of Jay Rosen's Internet Archive. The work should make the archive easier to understand, scan, filter, navigate, and share while preserving the qualities that already make it distinctive.
 
-This is a design spec, not an implementation ticket. It should guide small, testable changes that can ship in batches.
+The archive should still feel like the same place after this work. It should keep the warm paper field, paper texture, Special Elite display type, Roboto Mono interface and reading type, black-and-stone controls, category colors, editorial photography, folder metaphor, and typewriter pacing. The target is greater clarity and finish, not a visual reset.
+
+This is a design spec, not an implementation ticket. It guides small, testable changes that can ship in batches.
 
 ## Constraints that must not change
 
@@ -21,390 +23,644 @@ This is a design spec, not an implementation ticket. It should guide small, test
 - Keep progressive data loading and avoid adding large first-load assets.
 - Keep all public deploy changes aligned with favicon, social sharing, og image, and version bump rules.
 
-## Evidence reviewed
+## Evidence used
 
-### Live site and code-backed surface map
+The live archive at [pressthink.org/j/rosen-archive](https://pressthink.org/j/rosen-archive/) was inspected in Microsoft Edge on July 10, 2026. The review covered:
 
-Automated browser inspection of the live production URL was attempted with Playwright, but the environment could not download the required Chromium build because the Playwright CDN returned 403. I still reviewed the live URL through the web fetcher and compared it against the current production-facing source because this repo is the live app source.
+- The desktop archive home, search results, layered filters, cards, folders, empty state, and timeline.
+- Record detail opening, closing, URL state, navigation, related records, categories, tags, and concepts.
+- The entity browser and entity detail panel.
+- The analytics page.
+- The dissertation mind map.
+- The About page.
+- Responsive behavior at a narrow CSS viewport using 250 percent browser zoom.
+- Browser accessibility exposure for the main controls, record cards, dialogs, and entity controls.
 
-The current archive surface includes:
+The review also considered the current Vercel web interface guidelines, the repository's design-taste checks, and all eligible open GitHub issues returned by the required query that excludes `do-not-automate` issues.
 
-- A sticky paper header that switches from translucent paper to solid paper with a subtle shadow after scroll.
-- A compact brand block with newspaper icon, full desktop name, and mobile `JRIA` label.
-- Desktop stats for record count and timeline span.
-- Header actions for tools, about, report a bug, curator link, and mobile filter drawer.
-- A left filter sidebar on large screens and a slide-in mobile filter drawer.
-- Search with suggestions, category checkboxes, era radios, content-type radios, and a reset-all action.
-- Home-only tool pills, featured works, and a timeline strip.
-- Result controls with found count, cards/folders toggle, sort control, pagination, and record cards.
-- Modal record viewing with previous/next navigation, deep links, category filtering, and related connections.
-- Separate pages for dissertation, entities, analytics, about, and wiki.
+## Product principles
 
-### Open issue themes
+### Preserve the archive's voice
 
-Open issues were reviewed with `do-not-automate` excluded. The design-related signals are:
+The current visual language feels archival, editorial, handmade, and specific to Jay Rosen's work. Keep it. New components should look like they were made from the same paper, ink, type, rules, and filing-system vocabulary.
 
-- #602: Entity browser counts are not labeled as query-scoped.
-- #601: Query filter cannot be cleared without resetting all filters.
-- #584: Decide whether the data explorer belongs in the public deploy surface.
-- #575 and #530: Build or publish the walkthrough as a branded public archive page.
-- #525: SQL query builder is broken and points to a blank page.
-- #524: Add more thematic categories to the archive.
-- #483: `og:image` returns 404.
-- #402: Finish the “Digital Archive” to “Internet Archive” rename outside the feed surface.
+### Let the archive lead
 
-These issues point to a shared problem: the site has strong archival atmosphere, but some tool affordances, scoped states, and public-facing launch details need clearer framing.
+The homepage currently asks the Read carousel, tools, filters, timeline, results, and masthead to compete at once. The archive records are the primary task. Curated reading and specialist tools should support that task without delaying it.
 
-## Design diagnosis
+### Make scope visible
 
-### What works now
+Users should always be able to answer:
 
-- The site has a memorable identity. The paper background, mono type, display face, stone borders, and category chips feel aligned with an archive rather than a generic search app.
-- The header is compact and persistent, which helps orientation during long result browsing.
-- The left sidebar makes the primary research workflow visible: search, categories, time, and content type.
-- The home page gives several entry points: featured works, timeline, entities, analytics, dissertation, and more tools.
-- The card grid works for scanning many records because metadata, categories, dates, and snippets appear close together.
-- Record modals keep browsing context intact and support next/previous motion through the current result set.
-- The report form is in-brand instead of sending readers straight to GitHub.
+- What part of the archive am I viewing?
+- Which filters are active?
+- How many results do those filters produce?
+- Is a count archive-wide or limited by a query?
+- How do I remove one constraint without losing the others?
 
-### What feels less clear
+### Use motion to explain change
 
-- The hierarchy competes in a few places. Header stats, tools, featured works, timeline, result controls, and filters can all appear before the first record.
-- Some controls are technically available but not self-explanatory. `More`, `Entities`, `Analytics`, and query result states need more context for readers who did not build the site.
-- Filter state is visible but not summarized as a plain-language sentence. A reader can end up in a scoped result set without understanding why counts changed.
-- The search clear control is small and local; clearing only the query should be as obvious as resetting all filters.
-- Entity counts and query-derived record sets need scope labels so readers know whether they are seeing global archive counts or filtered counts.
-- Mobile puts many high-value controls behind icon-only buttons. This is space-efficient but raises the cost of first use.
-- The `JRIA` mobile wordmark saves space, but it may be cryptic for new visitors arriving from search or social links.
-- Public launch details such as og image health are part of the design system because they shape first impressions before the page loads.
+Keep the current restrained fades and modal transitions, but shorten any transition that leaves text visibly doubled or washed out. Motion should show a view change, panel opening, or result update. It should not hold the interface in an unreadable midpoint.
 
-## Design principles
+### Treat narrow screens as a different reading mode
 
-1. Preserve the archive feeling.
-   - Keep warmth, paper texture, stone borders, typewriter cues, and small editorial labels.
-   - Avoid glossy surfaces, bright SaaS colors, large gradients, and oversized rounded cards.
+Mobile should not be a tall stack of every desktop feature. It should prioritize search, active scope, records, and the next useful action. Curated features and exploratory tools can remain available with less vertical cost.
 
-2. Make state readable.
-   - Every scoped view should answer: “What am I looking at, why, and how do I clear it?”
-   - Counts must say whether they are global, filtered, query-scoped, or local to a tool.
+## What already works
 
-3. Prefer editorial hints over UI chrome.
-   - Add short labels, helper text, and inline context before adding more panels.
-   - Treat the archive like a guided research desk, not an app dashboard.
+These qualities should be retained and strengthened.
 
-4. Keep improvements reversible.
-   - Ship small CSS and copy changes first.
-   - Avoid new data dependencies unless needed for an issue.
+### Visual identity
 
-5. Design for slow reading and fast recovery.
-   - Results should be easy to scan, but mistakes should be easy to undo.
-   - Search, filters, sort, view mode, and query scopes need local clear paths.
+- The warm paper background and subtle texture create a clear archival setting without imitating a museum website.
+- Special Elite gives headings and record titles a recognizable voice.
+- Roboto Mono keeps metadata, dates, filters, and summaries connected to the filing-system idea.
+- Black, stone, muted blue, purple, teal, and rust accents provide enough hierarchy without turning the archive into color confetti.
+- Grayscale editorial images in the Read section feel appropriate to the subject and contrast well with the paper field.
 
-## Proposed improvements
+### Information patterns
 
-### 1. Add a results state sentence above the grid
+- The top masthead communicates the collection name, record count, and date span at a glance.
+- The timeline histogram shows the archive's historical shape before a user reads individual records.
+- Record cards expose publication, date, title, summary, and categories in a compact repeated form.
+- The folder view is a strong domain-specific alternative to generic cards. Its tabbed folder silhouette is memorable and useful.
+- Record URLs update with `?record=`, which preserves a direct link while the modal is open.
+- The record modal has a strong reading hierarchy: date and type, title, byline, source link, quotation, summary, related records, and taxonomy.
+- The entity browser's type counts and side-panel detail make a large network approachable.
+- The dissertation mind map has clear controls, a useful legend, visible hierarchy, and a good canvas-to-chrome balance.
+- The About page has a calm reading measure, useful live stats, and clear explanations of the archive's purpose.
 
-Add a one-line, plain-language state summary above the result controls.
+## Main findings
 
-Examples:
+### The homepage hierarchy is crowded
 
-- `Showing 214 records matching “public journalism” across all eras.`
-- `Showing 38 records in query results, filtered to press criticism.`
-- `Showing all 1,248 records, sorted oldest first.`
-- `No records match “x” with the current filters.`
+At desktop width, the masthead, tools, Read carousel, sidebar filters, timeline, result count, view switch, sort control, and cards are all visible in the first screen. Each part is individually understandable, but the page does not establish a strong first action.
 
-Details:
+At narrow width, the Read cards become large stacked features. A visitor can spend several screens moving through curated highlights before reaching the timeline and archive results. The visual treatment is attractive, but the archive task is delayed.
 
-- Place it near the existing found-count line, not in the sidebar.
-- Use body mono text at small size, with the active query/category/year/type emphasized in stone-900.
-- Include a local `Clear query` action when `filters.search` is set.
-- Include a local `Clear query result scope` action when `filters.recordIds !== null`.
-- Keep `Reset all filters` in the sidebar for full reset.
+### Search feedback is delayed and fragmented
 
-Why:
+Typing `gatekeeping` produced a brief zero-result state before the real five-result state appeared. The suggestion menu remained open over the sidebar and contained near-duplicate capitalization and phrase variants. The result count sat in the main column, separated from the search field and active filters.
 
-- Addresses #601 by making query clearing obvious without forcing a full reset.
-- Reduces confusion when analytics or entity workflows send readers back to scoped archive results.
+When search and a thematic category were combined, the selected checkbox was the only persistent explanation of the narrower result set. There was no compact active-filter summary above the results. The only visible reset control was low in the sidebar, requiring a long scroll.
 
-Acceptance criteria:
+### Record cards do not expose their action clearly
 
-- Search text can be cleared without resetting category, era, year, type, or query result scope.
-- Query result scope can be cleared without resetting normal filters.
-- The sentence updates after search, category, era, year, content type, sort, and query-result changes.
-- Empty states explain both the query and active filters.
+In the browser accessibility tree, archive cards appeared as generic groups rather than links or buttons. The visual card affordance is clear to a pointer user, but the semantic and keyboard affordance is weak. The card title should be a real link that supports Enter, Cmd/Ctrl-click, middle-click, and context menus.
 
-### 2. Label scoped counts everywhere counts appear
+### The record modal needs focus work
 
-Counts should use explicit labels:
+The record detail correctly exposed a dialog role, and Escape closed it. The Share link and Copy citation controls had accessible names. The close control appeared as an unnamed button. Focus did not move into the dialog when it opened and did not return to the triggering card when it closed. Background archive controls remained exposed in the accessibility tree while the modal was open.
 
-- `1,248 archive records` for global counts.
-- `214 filtered records` for filter-limited result sets.
-- `38 query result records` for analytics or query builder output.
-- `12 people in current results` versus `12 people in archive` for entity browser counts.
+The modal's visual design is strong. This is an interaction repair, not a redesign.
 
-Details:
+### Query scope is not a first-class state
 
-- Header stats should stay global and say so in tooltips or visible small labels.
-- Entity browser counts should include a scope label when entered from query results.
-- Result count should avoid the ambiguous `records found` wording when the list is scoped by query IDs.
+The live entity browser presents counts as if they describe the full archive. Open issues document that a query-limited entity view can silently recompute every count from the query subset. The user then has no visible scope label or query-only reset.
 
-Why:
+This is both a design and trust problem. Counts need a named scope wherever they appear.
 
-- Directly addresses #602.
-- Makes analytics-to-archive and entity-to-archive workflows less surprising.
+### Entity metadata contains unexplained shorthand
 
-Acceptance criteria:
+Entity rows use compact values such as `P:6` and the detail panel uses `Prominence: 6`. The shortened form saves space but asks first-time users to infer its meaning. The page begins with “Browse entities and their connections” but lacks a strong visible page title, so it reads as a tool panel rather than a destination within the archive.
 
-- No count-bearing UI relies only on a bare number.
-- Query-scoped counts are visually distinct but not louder than the content.
-- Existing tests for query result filtering continue to pass.
+### Folder counts need context
 
-### 3. Make the mobile header less cryptic
+The folder view is visually strong, but category counts overlap because records can belong to more than one category. The folder totals therefore exceed the archive total with no explanation. The global Sort control remains beside the Cards/Folders switch even though its relevance to six category folders is unclear.
 
-Replace or supplement `JRIA` on mobile with a two-line compact mark:
+### Route chrome is inconsistent
 
-- Line 1: `Rosen archive`
-- Line 2: `Internet archive` or `records and tools`
+The homepage uses the full masthead. About uses a plain Back to archive bar. Analytics uses a different Archive/title header and foregrounds “Powered by sql.js.” The dissertation uses its own book header and includes “Part of Jay Rosen's Internet Archive” only at the bottom.
 
-Details:
+These pages should remain distinct, but they need one shared orientation pattern so users always know they are still inside the archive.
 
-- Keep the newspaper icon.
-- Use `Special Elite` for the primary line and mono for the small descriptor.
-- Keep within the current header height if possible.
-- If space is tight, use `Rosen archive` instead of `JRIA` and rely on the icon.
+### Analytics overstates implementation and understates meaning
 
-Why:
+The analytics page gives `sql.js` prominent billing even though that detail matters more to maintainers than readers. Its era chart is dominated by 25,734 records in the 2021–present range, making earlier eras look nearly empty. The chart is numerically correct but not useful for comparison without separating social posts from curated articles or explaining the skew.
 
-- New mobile visitors should understand where they landed without opening a menu.
-- Supports the remaining rename work in #402.
+### Sharing is visually unfinished
 
-Acceptance criteria:
+Open issues confirm that the site-level `og:image` returns 404 and that record deep links produce generic social previews. A user can copy a record link from a polished modal and then see an empty or generic preview in Bluesky, Twitter/X, Slack, or messaging apps. The share experience should carry the archive identity beyond the site.
 
-- Header actions still fit at 390px width.
-- The archive name is understandable without prior knowledge of the acronym.
-- No horizontal overflow is introduced.
+## Proposed design system refinements
 
-### 4. Strengthen the filter drawer affordance on mobile
+### Type roles
 
-The mobile filter button should communicate both function and state.
+Keep the current families and reduce role ambiguity.
 
-Details:
+| Role | Typeface | Treatment | Use |
+| --- | --- | --- | --- |
+| Archive display | Special Elite | Large, dark ink, balanced wrapping | Page titles, record titles, folder names |
+| Section heading | Special Elite | Medium, dark ink | Read, Timeline, Archive stats, Related records |
+| Reading text | Roboto Mono | Regular, comfortable line height, limited measure | Summaries, About copy, quotations |
+| Interface text | Roboto Mono | Medium, sentence case | Buttons, tabs, filter names, navigation |
+| Metadata | Roboto Mono | Regular, muted ink, tabular numerals | Dates, counts, publication, range labels |
+| Micro-label | Roboto Mono | Medium, restrained tracking | Record type, category label, compact status |
 
-- Change the icon-only button to `Filters` plus icon at small widths where space allows.
-- Keep the red count badge, but add `active` in `aria-label` when filters are active.
-- In the drawer header, show `Filters` plus `3 active` when applicable.
-- Add a sticky drawer footer with `Show 214 records` and `Reset all`.
+Requirements:
 
-Why:
+- Keep body and metadata text at 16 CSS pixels or larger at the default desktop scale unless a tested utility exception is needed.
+- Use tabular numerals for dates, counts, timeline labels, and analytics values.
+- Use `text-wrap: balance` on short display headings and `text-wrap: pretty` on summaries.
+- Keep all interface labels in sentence case. Existing content titles retain their authored casing.
+- Do not introduce a third typeface.
 
-- Mobile users should not have to infer that sliders means filters.
-- The drawer needs a clear exit that confirms the result set.
+### Color roles
 
-Acceptance criteria:
+Keep the existing palette values from the current constants and assign each color a named job.
 
-- Mobile drawer can be opened, filters changed, and closed with visible result feedback.
-- Keyboard focus remains inside the drawer while open.
-- The close and reset actions remain reachable without scrolling to the drawer bottom.
+- Paper: site background and reading field.
+- Raised paper: cards, dialogs, drawers, and side panels.
+- Ink: primary text, primary controls, selected dark surfaces.
+- Muted ink: metadata and supporting copy that still passes WCAG AA.
+- Hairline: separators, card boundaries, timeline rails.
+- Category colors: category identity only.
+- Link blue: source links and other navigation links.
+- Focus blue: keyboard focus only; it must not double as selected or current state.
+- Error rust: errors and failed states only.
 
-### 5. Clarify tools as research modes, not generic utilities
+No new gradient, glass, glow, or shadow language should be added. The current paper, rules, and restrained elevation are enough.
 
-Rename and group the home tool pills as `Research modes`.
+### Spacing and density
 
-Suggested labels:
+Use an 8-pixel base with a 4-pixel half step.
 
-- `Read the dissertation`
-- `Browse entities`
-- `View archive analytics`
-- `Open more tools`
+- 4 pixels between a title and its immediate metadata.
+- 8 pixels between related metadata items.
+- 12–16 pixels inside compact controls and result rows.
+- 20–24 pixels inside standard cards and panels.
+- 32 pixels between functional groups.
+- 48–64 pixels between major page sections on desktop.
+- 32–40 pixels between major sections on narrow screens.
 
-Details:
+Reduce ornamental padding before reducing text size. The archive should remain dense enough to scan without making controls small.
 
-- Keep pill styling, but add a short line above: `Choose a path into the archive.`
-- Keep the icon set, subdued borders, and compact spacing.
-- In the tools modal, add one-sentence descriptions that explain what each mode is for.
+### Surface grammar
 
-Why:
-
-- #575 and #530 ask for a branded walkthrough. This is a low-cost first step toward guided onboarding.
-- Tool names like `Analytics` and `Entities` are accurate but assume insider knowledge.
-
-Acceptance criteria:
-
-- Home tools read as entry points for readers, not developer features.
-- The labels remain sentence case.
-- Existing route behavior does not change.
-
-### 6. Add a lightweight guided walkthrough page
-
-Create a public walkthrough page that explains how to use the archive in five short sections:
-
-1. Search by idea, title, or phrase.
-2. Filter by theme and era.
-3. Open a record and follow related entities.
-4. Use the dissertation and analytics tools.
-5. Report a problem or suggest a record.
-
-Details:
-
-- Use the existing design system, not a separate marketing layout.
-- Link it from the home tool area, about page, and tools modal.
-- Keep the page static and cache-friendly.
-- Include no large screenshots unless optimized and versioned.
-
-Why:
-
-- Addresses #575 and #530 while staying in the archive voice.
-- Helps readers understand why multiple tools exist.
-
-Acceptance criteria:
-
-- The walkthrough has an svg favicon and complete social metadata before publication.
-- It uses the same header/footer framing as other public pages or a clearly intentional standalone frame.
-- It passes `npm run preview:audit` before deploy.
-
-### 7. Improve record cards for scan rhythm
-
-Make record cards easier to scan without changing their basic shape.
-
-Details:
-
-- Keep warm white card surfaces, stone borders, and category chips.
-- Use a consistent metadata row order: date, publication/source, type.
-- Limit visible category chips to a stable count, then show `+n more`.
-- Increase title line-height slightly if cards feel dense.
-- Add a subtle hover/focus treatment that looks like paper lift, not a glossy button.
-- Ensure card focus state is as visible as hover state.
-
-Why:
-
-- The grid is the main reading surface. Small rhythm improvements compound over long sessions.
-
-Acceptance criteria:
-
-- Cards remain visually compatible with the existing design system.
-- Keyboard users can see which card is focused.
-- Long titles and many categories do not cause uneven card interiors beyond the current grid behavior.
-
-### 8. Improve empty and loading states
-
-Replace generic status text with archive-specific, action-oriented states.
-
-Examples:
-
-- Loading: `Opening the archive drawers…`
-- Search loading with MiniSearch pending: `Searching titles and summaries now. Full-text matches are still loading.`
-- Empty search: `No records match this combination. Clear the query, remove one filter, or reset all filters.`
-- Data error: keep the current reload action, but add a support/report path if reload fails.
-
-Details:
-
-- Use restrained language. Avoid jokes that could become annoying.
-- Keep loading quotes if they remain fast and accessible.
-
-Why:
-
-- The current app has strong data-loading behavior; the interface should explain it in reader terms.
-
-Acceptance criteria:
-
-- Loading and empty states do not shift layout more than needed.
-- Error states give a next action.
-- Text remains sentence case.
-
-### 9. Make public launch metadata part of the visual system
-
-Fix the missing og image and treat social cards as a designed surface.
-
-Details:
-
-- Create or repair the `og:image` referenced by production metadata.
-- The image should use the archive’s paper background, display type, newspaper/filing-cabinet cue, and a short readable title.
-- Verify absolute production URL and dimensions.
-- Keep the svg favicon aligned with the same visual system.
-
-Why:
-
-- #483 reports that `og:image` returns 404.
-- Shared links are often the first design impression.
-
-Acceptance criteria:
-
-- `og:image` returns 200 from production after deploy.
-- `twitter:image` or equivalent points to the same valid asset unless there is a deliberate variant.
-- The image remains legible in a small social preview.
-
-### 10. Reconsider public tool exposure before adding visual polish
-
-Before polishing the data explorer or query builder, decide whether each belongs on the public surface.
-
-Details:
-
-- If a tool is public, give it a reader-facing name, description, empty state, and safe back path.
-- If a tool is curator-only, remove it from public navigation and document how maintainers access it.
-- Broken tools should not be discoverable from public paths.
-
-Why:
-
-- #584 asks whether the data explorer belongs in the public deploy surface.
-- #525 reports a broken SQL query builder blank page.
-- Design polish should not make unstable surfaces more prominent.
-
-Acceptance criteria:
-
-- Public navigation includes only tools that load reliably in preview.
-- Each public tool has an explanatory title and back path.
-- Curator-only tools are documented outside the public reader flow.
-
-## Visual tokens to preserve and tune
-
-### Typography
-
-- Keep `Special Elite` for display headings and archive labels.
-- Keep `Roboto Mono` for body and control text.
-- Increase line-height on dense card titles and modal summaries before increasing font size.
-- Avoid all-caps for longer labels; reserve uppercase tracking for short section labels.
-
-### Color
-
-- Keep warm paper as the page base.
-- Keep stone neutrals as the default interface color.
-- Keep existing category color families, but ensure chip contrast passes WCAG 2.1 AA.
-- Use red only for errors, active badges, and destructive/problem reporting signals.
-
-### Spacing
-
-- Reduce stacked pre-results modules when a filter is active.
-- Keep sidebar sections separated by quiet borders.
-- Use consistent `gap-2`, `gap-3`, and `gap-4` patterns for controls.
-- Avoid adding new large vertical bands above the first record.
+- Use cards for individual records and selected-item detail.
+- Use folders for thematic category browsing.
+- Use plain rules and spacing for page sections.
+- Use pills only for short filters, categories, or selected tokens.
+- Use a side panel for entity detail on wide screens and a full-height sheet on narrow screens.
+- Use a modal for a single record because the user should return to the prior result context.
 
 ### Motion
 
-- Keep transitions subtle: opacity, border, paper lift, and existing modal view transitions.
-- Avoid parallax, large transforms, or animated decoration.
+- Keep transitions subtle: opacity, border, paper lift, and the existing modal view transitions.
+- Avoid parallax, large transforms, and animated decoration.
 - Respect `prefers-reduced-motion` for any new motion.
 
-## Implementation sequence
+## Homepage specification
 
-### Phase 1: clarity without new pages
+### Desktop order
 
-- Add the results state sentence and local clear actions.
-- Label scoped counts, starting with result counts and entity counts.
-- Adjust mobile header label.
-- Improve mobile filter button and drawer header/footer.
+1. Masthead.
+2. Compact orientation row: one sentence about the archive, plus “How to use this archive.”
+3. Search and filter scope bar.
+4. Result count, active filters, Cards/Folders switch, and sort.
+5. Timeline, collapsed by default only after a user has an active text query.
+6. Results.
+7. Read highlights and specialist tools as secondary discovery sections.
+8. Footer.
 
-### Phase 2: guided entry points
+This order keeps all existing features but makes browse and search the first task. If the current Read carousel must remain above results on desktop, reduce it to one featured card plus two compact links and add a clear “View all highlights” action.
 
-- Rename home tool labels as research modes.
-- Add short tool descriptions in the tools modal.
-- Add a guided walkthrough page if the content is approved.
+### Masthead
 
-### Phase 3: scan and launch polish
+Keep the current full archive name, record count, date range, About, Report a bug, and curator credit on wide screens.
 
-- Tune record card metadata rhythm and focus states.
-- Improve empty and loading copy.
-- Fix og image and verify social metadata.
-- Decide public exposure for data explorer and query builder before visual treatment.
+Refinements:
+
+- Make the archive mark and title one link to the default archive state.
+- Label every icon-only control.
+- Give About, Report a bug, and the future guide consistent text-link treatment.
+- Keep the record count and date range, but reduce their border weight so the collection name remains primary.
+- On narrow screens, use `JRIA` only as a compact mark if the full name is available in the accessible name and appears in the drawer or first page heading.
+
+### Orientation row
+
+Use a single quiet sentence:
+
+> Browse four decades of Jay Rosen's writing, teaching, criticism, and public conversation.
+
+Place a “How to use this archive” link beside it. This implements the public guide direction from issues #530 and #575 without adding a welcome modal to every visit.
+
+### Search field
+
+- Label the field “Search the archive.”
+- Keep a short example placeholder such as `Try “gatekeeping” or “public journalism”…`.
+- Debounce results without rendering a false zero-result state. Keep the previous results visible with a small `Searching…` status until the new result set is ready.
+- Announce the final result count with `aria-live="polite"`.
+- Normalize duplicate suggestions by case and punctuation.
+- Group suggestions by type where useful: topics, people, publications, and exact phrases.
+- Limit the open menu height so it does not cover the full thematic filter block.
+- Support arrow keys, Enter, Escape, and clear-button behavior with a standard combobox pattern.
+- Keep typed text distinct from a selected suggestion; choosing a suggestion should never happen as a side effect of dismissing the menu.
+
+### Active scope bar
+
+Place this directly above results. It should contain:
+
+- Result count: `5 records` rather than `5 records found`.
+- A removable token for each active constraint: text query, query-builder result set, category, era, content type, and folder.
+- A clear action on each token.
+- A quiet “Clear all” link shown only when two or more constraints are active.
+- A scope sentence when a query result set is active: `Within 48 query results`.
+
+Each token clears independently. Removing the text-query token clears `filters.search` while preserving category, era, content type, and any query-builder result scope. Removing the query-builder result-set token clears `filters.recordIds` while preserving the text query and the other filters. This directly addresses issue #601, where the query result scope currently cannot be cleared without resetting everything.
+
+### Sidebar and filter drawer
+
+Desktop:
+
+- Keep the left sidebar.
+- Keep common categories, era, and content type visible.
+- Make the sidebar sticky only within the results region and ensure it never obscures focused controls.
+- Place Reset filters near the top once any filter is active; do not require a scroll to the footer.
+
+Narrow screens:
+
+- Replace the sidebar with a Filters button that includes an active count, such as `Filters (2)`.
+- Open a full-height paper drawer with a clear heading, Close button, Apply button, and Reset filters link.
+- Preserve filter changes if the drawer is dismissed accidentally.
+- Keep the result count and active tokens visible behind the closed drawer.
+- Use 44-pixel minimum touch targets.
+
+### Timeline
+
+- Keep the histogram and horizontal historical shape.
+- Make every bar a labeled button with year and record count.
+- Increase the hit area without increasing the visible bar width.
+- Add an explicit selected-year label and clear action.
+- Use tabular numerals.
+- Keep the rail and labels visible in high contrast.
+- On narrow screens, show a compact sparkline with a “Choose a year” disclosure rather than the full horizontal rail.
+- When search is active, collapse the timeline under `Timeline: All years` so results remain near the search field.
+
+### Cards view
+
+- Make the title a real link and the whole card a larger linked hit area without nesting conflicting interactive elements.
+- Preserve publication, date, title, summary, and category order.
+- Allow titles to wrap; do not truncate the primary title without a recovery path.
+- Clamp summaries consistently to four lines on desktop and three on narrow screens.
+- Keep category labels quiet and limit the visible set to two, with `+N more` when needed.
+- Use the category-colored top rule as identity, not as the only selected or focused cue.
+- Add a clear `:focus-visible` outline that is distinct from hover.
+- Do not animate card position or scale. A small ink/border contrast change is enough for hover.
+
+### Folders view
+
+- Keep the current folder silhouette and six-folder grid.
+- Add the note `Records may appear in more than one folder` beside the folder-view heading.
+- Hide the record sort control while the user is looking at the six top-level folders.
+- Sort only after a folder is opened.
+- Make the folder name and count one labeled link or button.
+- Keep category color on the tab and left rule, with visible focus independent of color.
+
+### Read highlights
+
+- Keep the photography, black labels, and editorial selection.
+- On desktop, show one large feature and two smaller text-led highlights or keep the three-card row at a reduced height.
+- On narrow screens, use one current card with previous/next controls and a visible `1 of 21` label. Do not stack several full-height image cards before the archive results.
+- Stop automatic movement while focus or pointer is inside the section.
+- Honor reduced motion.
+- Use descriptive link labels such as `Read The View from Nowhere` instead of a repeated `Read` alone.
+
+### Tools
+
+- Keep Mind map, Entities, Analytics, and More as a compact secondary row.
+- On narrow screens, use a two-by-two grid or a single `Explore tools` disclosure instead of forcing four large pills into one line.
+- Keep the text labels; do not rely on icons.
+- Do not expose River of News or the data explorer until the product decisions in issues #584 and #583 are resolved. "Not exposed" means unreachable in production, not merely absent from the tools row: `tools/active/dataexplorer` currently ships in the `_DEPLOY_DIRS` manifest of `backend/scripts/deploy_full_site.py` and is reachable by direct URL. Removing it from `_DEPLOY_DIRS` only stops future uploads; the already-uploaded live directory stays served, because `push_files()` prunes only `_REMOTE_PRUNE_DIRS` and `tools/active/` is currently exempt from that cleanup per DEPLOYMENT.md. Honoring this therefore requires a remote prune step (add the directory to `_REMOTE_PRUNE_DIRS` so the deploy deletes it) or an auth gate, not only removing it from navigation or the upload manifest.
+
+## Record detail specification
+
+### Visual structure
+
+Keep the current modal width, paper surface, title treatment, quotation rule, and footer navigation. Refine the hierarchy:
+
+- Keep date and content type in the top utility row.
+- Keep title and byline as the first reading block.
+- Treat the source link as the primary action: `Read on PressThink`, `Read on Bluesky`, or the truthful source name.
+- Keep Share link and Copy citation as compact secondary controls with text labels in their accessible names and tooltips.
+- Place categories, tags, concepts, related records, and era after the summary under clear section headings.
+- If the record is unavailable at its source, replace the primary action with a factual status and any archived copy that exists.
+
+### Dialog behavior
+
+- Use `role="dialog"`, `aria-modal="true"`, and an accessible name from the record title.
+- Name the close button `Close record`.
+- Move focus to the dialog heading or close button after opening.
+- Trap Tab and Shift+Tab inside the dialog.
+- Mark the background inert while the dialog is open.
+- Close with Escape and the close button.
+- Return focus to the exact card or link that opened the dialog.
+- Preserve the result scroll position.
+- Add `overscroll-behavior: contain` to prevent the archive behind the dialog from moving.
+- Keep the `?record=` URL while open and remove it on close without discarding the current search and filter state.
+- Honor reduced motion and shorten the exit transition so text does not remain doubled during dismissal.
+
+### Previous and next
+
+- Keep Previous, `1 of 3`, and Next at the bottom.
+- Explain that navigation is within the current filtered result set when filters are active.
+- Use a disabled state with readable contrast, not near-invisible text.
+- Support Left and Right Arrow only when focus is not inside a text field or interactive subcontrol.
+
+### Content quality and feedback
+
+Issue #581 shows that summary quality is part of the reading experience. Keep Report a bug available from the modal and prefill the record ID. Add a small `Report a problem with this record` link near the record metadata rather than asking readers to return to the masthead.
+
+## Entity browser specification
+
+### Page identity
+
+- Add the visible page title `Entities and connections`.
+- Keep the sentence `Browse people, organizations, works, concepts, events, and locations mentioned across the archive.`
+- Add the shared archive breadcrumb or masthead pattern above it.
+
+### Scope and counts
+
+- Show `All archive records` by default.
+- When opened from a filtered or query-built result set, show `Within 48 query results` beside the page title and result count.
+- Provide `Clear query scope` without clearing other filters.
+- Use `Showing 100 of 8,152 entities` only for archive-wide scope.
+- Use `Showing 100 of 612 entities within 48 query results` for query scope.
+- Carry the same scope label into the entity detail panel.
+
+This directly addresses issues #601 and #602.
+
+### Type filters and search
+
+- Keep the current type chips and counts.
+- Allow chips to wrap to a second line on medium widths instead of shrinking text.
+- Keep the search field and sort control on one row only when both have room.
+- Announce updated counts after search or type changes.
+- Add a visible clear control for entity search.
+
+### Entity rows
+
+- Keep the two-column desktop list.
+- Replace `P:6` with a tooltip-backed label such as `Prominence 6` or remove it from the row if users do not act on it.
+- Make the entity name, type, descriptor, record count, and prominence one coherent button label.
+- Keep type icons restrained and pair them with text where the icon meaning is not obvious.
+- Use one-column rows below the medium breakpoint.
+
+### Detail panel
+
+- Keep the right-side panel on wide screens.
+- Use a full-height paper sheet on narrow screens.
+- Name the close control.
+- Move focus into the panel and return it to the entity row on close.
+- Keep record rows readable; allow two title lines before truncation.
+- Explain the difference between the count shown in the list and the count shown in the panel if deduplication or scope changes it.
+
+## Analytics specification
+
+### Header and framing
+
+- Use the shared archive breadcrumb/header pattern.
+- Keep `Archive analytics` as the page title.
+- Move `Powered by sql.js` to a small technical note near the bottom or About section.
+- Add one sentence describing what the page answers: `See how the archive is distributed across time, subjects, and named entities.`
+
+### Overview cards
+
+- Keep Records, Categories, Concepts, and Entities.
+- Use tabular numerals and consistent thousands separators.
+- Add a small definition or tooltip where a count can be misunderstood.
+- Keep these cards compact so the first chart begins in the first screen.
+
+### Era chart
+
+The 2021–present category contains nearly all social posts and makes the earlier era bars unreadable.
+
+Use one of these low-disruption treatments:
+
+1. Preferred: show two adjacent series, `Articles and long-form records` and `Social posts`.
+2. Acceptable: add a switch between `All records` and `Articles only`, defaulting to Articles only for the era comparison.
+3. Minimum: annotate the 2021–present bar with `Includes 25,665 social posts` and offer a clear exclusion toggle.
+
+Before any of these treatments, resolve the era-axis overlap for the chart only. The checked-in `byEra` data (canonical source `data/eras.js`, mirrored in `data/archive-analytics.json`) mixes decade labels that overlap in time (`View from Nowhere (10s)` spans 2010–2019) with fixed year-range buckets such as `Social Media & Financial Crisis (2010-2015)` and `Trump Era & Democratic Crisis (2016-2020)` that fall inside that same decade. Charting bars across overlapping, unequal spans is misleading regardless of the social-post treatment above. Do not change the canonical 8-era taxonomy in `data/eras.js` to fix this: that list is a decided, test-guarded data model (Joe, 2026-07-09; issue #201; guarded by `tests/data-integrity.test.js`), and editing it would move filters and feeds, not just the chart. Instead, derive an analytics-only bucketing for the era chart, or make the overlap explicit in the chart's labels and counts.
+
+Do not use a logarithmic scale without an explicit explanation.
+
+### Other charts
+
+- Keep horizontal bars for categories and people.
+- Use the same left edge, label pattern, bar height, and number alignment across chart sections.
+- Use category colors only for categories. Use one neutral or ink-derived scale for people and entities.
+- Make chart rows links only if they lead to a filtered result set; otherwise keep them static.
+- Provide the exact value as text so color and bar length are never the only cues.
+
+## Dissertation, About, guide, and other routes
+
+### Shared archive orientation
+
+Create one lightweight route header used by About, Analytics, Entities, the guide, and other standalone archive pages:
+
+- Archive mark.
+- `Jay Rosen's Internet Archive` link.
+- Current section title.
+- Back to archive action.
+
+The dissertation can keep its book-specific header, but add `Jay Rosen's Internet Archive / The Impossible Press` as a breadcrumb near the top. This applies the reader-orientation finding from issue #561 without weakening the book identity.
+
+### Dissertation mind map
+
+- Keep the current canvas, node colors, legend, zoom, fit, Collapse all, Expand all, and Read full text controls.
+- Add keyboard instructions to Help.
+- Provide an ordered outline fallback for readers who cannot use the canvas.
+- Keep node labels readable at 200 percent text zoom.
+- On narrow screens, place the legend and topic tags in disclosures so the map receives more vertical space.
+
+### About page
+
+- Keep the narrow reading measure and current content structure.
+- Link the live stats to their related views where the destination is useful.
+- Add the public guide beside `What you can do here`.
+- Use the same shared route header as the rest of the archive.
+
+### Public guide
+
+Build the guide described in issues #530 and #575 as a real archive route, not a document embed.
+
+- Include a table of contents with anchored sections.
+- Use live counts.
+- Link each described feature to the working feature.
+- Include a real example record and its citation/share flow.
+- Explain the difference between the archive and the Vault.
+- Point public feedback to the in-archive report form.
+- Keep private intake-bot instructions out of the public page.
+
+## Responsive specification
+
+### Breakpoint behavior
+
+Use content-driven breakpoints rather than device names.
+
+- Wide: full masthead, sidebar plus main content, three record columns, entity detail panel.
+- Medium: compact masthead, sidebar plus two record columns, wrapped entity filters.
+- Narrow: compact archive mark, filter drawer, one result column, one highlight at a time, entity detail sheet.
+
+### Narrow-screen order
+
+1. Compact masthead.
+2. Archive purpose and guide link.
+3. Search.
+4. Active scope and Filters button.
+5. Result count, view switch, and sort.
+6. Results.
+7. Collapsed timeline.
+8. Read highlight.
+9. Tools.
+10. Footer.
+
+### Narrow-screen controls
+
+- Minimum 44-by-44-pixel touch targets for primary controls.
+- Keep labels on uncommon icons.
+- Avoid a four-pill tools row that depends on shrinking or horizontal overflow.
+- Allow two title lines before truncation.
+- Keep page gutters between 16 and 24 CSS pixels.
+- Respect safe-area insets on full-height drawers and sheets.
+- Do not disable browser zoom.
+
+## Loading, empty, and error states
+
+### Search loading
+
+- Keep the current results visible.
+- Add `Searching…` beside the result count.
+- Do not flash `0 records` before the final result set is known.
+
+### Empty search
+
+Use:
+
+> No records match “gatekeepng”
+>
+> Check the spelling, remove a filter, or try one of these related terms.
+
+Provide related suggestions, removable active filters, and Clear all. Keep the user's text in the field.
+
+### Data loading
+
+- Preserve the masthead, search, scope bar, and expected results shape.
+- Use quiet paper skeletons for six records.
+- Announce loading and completion.
+
+### Route or query failure
+
+Issue #525 reports a query-builder path that can lead to a blank page. No archive route should render blank.
+
+Use a route-level error panel with:
+
+- A factual heading.
+- The failed action in plain language.
+- `Try again`.
+- `Return to archive`.
+- `Report this problem` with relevant route and query context.
+
+### Partial data
+
+If one data source fails, show the rest of the archive and label the missing feature. Do not replace the full app with a generic error.
+
+## Accessibility requirements
+
+- Add a skip link to the main archive content.
+- Use semantic landmarks and hierarchical headings.
+- Make result cards real links.
+- Give every icon-only button an accessible name.
+- Use `:focus-visible` and never remove the outline without a visible replacement.
+- Keep focus, hover, selected, active filter, current record, and disabled states visually distinct.
+- Never use category color as the only state cue.
+- Use native controls where possible.
+- Follow the standard combobox pattern for search suggestions.
+- Follow modal focus rules described above.
+- Announce result counts, filter changes, loading, and errors politely.
+- Honor `prefers-reduced-motion`.
+- Test at 200 percent text size and 400 percent page zoom.
+- Test keyboard-only use, NVDA with Edge, Windows high contrast, and touch.
+- Ensure sticky controls do not obscure focused content.
+- Add `scroll-margin-top` to anchored guide and About headings.
+- Give images explicit width and height to prevent layout shift.
+- Lazy-load below-fold Read images.
+
+## Share and link presentation
+
+The visual experience extends to social and messaging previews.
+
+- Restore a valid 1200-by-630 site image for the archive root, and add it to the deploy scope. The asset exists and `index.html` references it, but `og-image.png` is absent from both `_DEPLOY_FILES` in `backend/scripts/deploy_full_site.py` and `DEPLOYMENT.md`, so a full-site deploy leaves the live OG URL 404. This requirement is met only when the image is in the deploy manifest, not merely present in the repo.
+- Provide record-specific title and summary metadata for shared record URLs. This is not achievable for bare `?record=` query-string URLs under the current zero-build static FTP architecture: social and OG crawlers fetch the one static `index.html` and read its fixed metadata before React and sql.js can resolve the record, so every query-string record URL falls back to the site-level card. Per-record previews therefore require a server-side or pre-generated path: static per-record share pages (one HTML file per record with baked-in metadata) or an Apache rewrite that serves record-specific metadata. That path is the `?record=` SSR-fallback work tracked in issue #263. Until that path exists, the site image is the only preview these URLs can show; a metadata-only change cannot satisfy this on its own.
+- Reuse the archive's paper, black ink, archive mark, category rule, record title, publication, and date in a record-card image if per-record images are added.
+- Keep image text large enough for a small social card.
+- Use the site image as the first tier if per-record images are deferred.
+- Verify Bluesky, Twitter/X, Facebook, Mastodon, Slack, iMessage, and generic Open Graph output.
+
+This work maps to issues #263 and #483.
+
+## Category maintenance
+
+Issue #524 asks for more thematic categories and for a path Jay can maintain when Joe is unavailable.
+
+Design requirements:
+
+- The filter list and folder grid must handle more than six categories without redesign.
+- Desktop may show the six most-used categories plus `More categories`.
+- Narrow screens should use a searchable category section in the filter drawer.
+- Folder view may paginate or group categories if the count grows beyond 12.
+- Category order, label, color, and description should come from one documented data source.
+- Do not add self-service editing controls to the public archive. Document the curator workflow separately unless an authenticated administration surface is approved later.
+
+## Issue mapping
+
+| Issue | Design response |
+| --- | --- |
+| [#602](https://github.com/jamditis/rosen-frontend/issues/602) | Show query scope in entity counts and detail. |
+| [#601](https://github.com/jamditis/rosen-frontend/issues/601) | Add a removable query token that preserves other filters. |
+| [#575](https://github.com/jamditis/rosen-frontend/issues/575) | Build an interactive, branded public guide with live links and counts. |
+| [#561](https://github.com/jamditis/rosen-frontend/issues/561) | Add a shared archive breadcrumb/signpost inside readers and tools. |
+| [#530](https://github.com/jamditis/rosen-frontend/issues/530) | Publish the guide and keep private intake instructions private. |
+| [#525](https://github.com/jamditis/rosen-frontend/issues/525) | Replace blank query failures with a recoverable error state. |
+| [#524](https://github.com/jamditis/rosen-frontend/issues/524) | Make category browsing and maintenance scale beyond six categories. |
+| [#581](https://github.com/jamditis/rosen-frontend/issues/581) | Add record-specific feedback near the summary and prefill record context. |
+| [#263](https://github.com/jamditis/rosen-frontend/issues/263) | Give record deep links informative share metadata. |
+| [#483](https://github.com/jamditis/rosen-frontend/issues/483) | Restore a valid archive preview image. |
+| [#584](https://github.com/jamditis/rosen-frontend/issues/584) | Do not add River of News to navigation until its product status is decided. |
+| [#583](https://github.com/jamditis/rosen-frontend/issues/583) | Do not surface the data explorer until its public status is decided. |
+
+## Delivery sequence
+
+### Phase 1: clarity and accessibility
+
+- Fix card semantics and focus styles.
+- Fix modal naming, focus entry, focus trap, inert background, and focus return.
+- Add active filter tokens, query scope, granular clear actions, and polite result announcements.
+- Prevent false zero-result flashes.
+- Add route-level blank/failure states.
+- Add the shared archive orientation pattern.
+
+### Phase 2: homepage hierarchy and responsive pacing
+
+- Move search, scope, and results ahead of tall discovery content.
+- Refine Read into one mobile highlight at a time.
+- Add the mobile filter drawer.
+- Collapse the timeline during active search and on narrow screens.
+- Hide irrelevant sort controls in folder view.
+
+### Phase 3: specialist routes
+
+- Refine entity labels, scope, and detail behavior.
+- Reframe analytics and separate social-post skew from article comparisons.
+- Add an outline fallback and narrow-screen disclosures to the mind map.
+- Build the public guide.
+
+### Phase 4: sharing and category scale
+
+- Restore the site preview image.
+- Add record-specific previews through the #263 static or pre-generated share path (a metadata-only change cannot satisfy `?record=` query-string URLs), and, if approved, record-card images.
+- Expand the category data model and document the curator workflow.
 
 ## Testing and review checklist
 
@@ -419,19 +675,78 @@ Run these checks for any implementation PR that follows this spec:
 - Screen reader spot check for count labels, active filters, drawer state, and modal title.
 - Social metadata URL check for favicon and og image.
 
+## Acceptance criteria
+
+### Identity
+
+- A side-by-side comparison still reads as the same archive.
+- Existing typefaces, paper texture, core palette, folder metaphor, timeline, record modal, and category colors remain.
+- No new visual trend layer is introduced.
+
+### Homepage
+
+- Search, active scope, result count, and first results are visible before Read highlights on a 390-by-844 CSS-pixel viewport.
+- Users can remove any one filter, including query scope, without clearing the others.
+- Search never shows a final empty state before the debounced query completes.
+- Suggestions are keyboard-operable and deduplicated.
+- Folder totals include an overlap explanation.
+
+### Records
+
+- Every record card is reachable and openable by keyboard as a real link.
+- Opening a record moves focus into the dialog.
+- Tab cannot escape the dialog.
+- Escape closes the dialog.
+- Closing returns focus to the triggering record.
+- The background is inert while the dialog is open.
+- The record URL remains shareable without losing the current result context.
+
+### Entities
+
+- Archive-wide and query-scoped counts cannot be confused.
+- Query scope can be cleared independently.
+- Entity type filters, search, and detail are usable at 390 CSS pixels without horizontal page scrolling.
+- `P:N` shorthand is removed or explained.
+
+### Analytics
+
+- Earlier eras remain visually comparable even when social posts dominate the latest era.
+- Exact values are available as text.
+- The page explains its purpose before its implementation.
+
+### Responsive and access
+
+- The key tasks pass at 390, 768, 1024, and 1440 CSS pixels.
+- The app passes the existing preview audit with no WCAG 2.1 AA violations.
+- Manual keyboard, NVDA, high-contrast, reduced-motion, 200 percent text, and 400 percent zoom checks pass.
+- Primary touch targets are at least 44 CSS pixels where layout permits and never below WCAG 2.2 minimum target requirements.
+- No sticky element obscures focused content.
+
+### Sharing
+
+- The archive root returns a valid Open Graph image.
+- A shared record shows its title and summary rather than the generic shell.
+- Preview verification passes in at least Bluesky, Twitter/X, Slack, and a generic Open Graph debugger.
+
 ## Non-goals
 
-- Do not redesign the archive into a new brand.
-- Do not replace the card grid with a dense table.
-- Do not make analytics the primary landing experience.
-- Do not add a build system.
-- Do not add new heavy images or fonts to first load.
-- Do not expose broken or curator-only tools because they look interesting.
+- Replacing the zero-build React/HTM/sql.js architecture.
+- Introducing Vite, Webpack, JSX, or a production build step.
+- Rebranding the archive.
+- Replacing Special Elite or Roboto Mono.
+- Adding personalization, accounts, saved searches, or recommendations.
+- Publishing private intake-bot details.
+- Surfacing undecided hidden tools.
+- Rewriting verified dissertation quotations or attributions.
+- Changing the archive taxonomy without the curator decision required by the related data work.
 
 ## Open questions for maintainers
 
-- Should the walkthrough be part of the main app route or a standalone public page under `features/`?
-- Should entity counts always be global unless explicitly entered from a query-scoped flow?
-- Which public tool names does Jay prefer: plain nouns (`Entities`) or reader-facing verbs (`Browse entities`)?
-- Should the mobile header use `Rosen archive` or the full `Jay Rosen archive` when space permits?
-- Should query-builder and data-explorer surfaces be public, curator-only, or removed from navigation?
+- Should the public guide be a main app route or a standalone page under `features/`? The spec calls for a real archive route with live links and counts; the exact mount point is open.
+- Which public tool names does Jay prefer: plain nouns (`Entities`, `Analytics`) or reader-facing verbs (`Browse entities`, `View analytics`)?
+- When space permits on mobile, should the header read `Rosen archive` or the full `Jay Rosen's Internet Archive`? The compact `JRIA` mark is only acceptable when the full name is in the accessible name.
+- Should the data explorer and the unreachable River of News component be public, curator-only, or removed from navigation? This follows the product decisions in issues #583 (data explorer) and #584 (River of News). The broken SQL query builder is tracked separately as a bug in issue #525.
+
+## Definition of done
+
+The refinement is done when a first-time reader can understand the archive, search or browse it, see and remove every active constraint, open and close a record without losing place, understand whether counts are scoped, move through every key interaction by keyboard, and share a link that looks like the archive, while a returning reader still recognizes the current Rosen archive immediately.
