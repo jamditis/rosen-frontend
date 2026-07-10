@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { html } from '../html.js?v=3.6.8';
+import { html } from '../html.js?v=3.6.9';
 import {
   Search,
   Play,
@@ -17,8 +17,8 @@ import {
   HelpCircle,
   Loader2
 } from 'lucide-react';
-import { queryAsObjects, isSqliteReady, initSqlite } from '../services/archiveService.js?v=3.6.8';
-import { ERAS } from '../constants.js?v=3.6.8';
+import { queryAsObjects, isSqliteReady, initSqlite } from '../services/archiveService.js?v=3.6.9';
+import { ERAS } from '../constants.js?v=3.6.9';
 import {
   extractRecordIds,
   templateIsComposable,

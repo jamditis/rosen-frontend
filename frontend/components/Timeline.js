@@ -1,6 +1,6 @@
 
 import { useMemo, useState } from 'react';
-import { html } from '../html.js?v=3.6.8';
+import { html } from '../html.js?v=3.6.9';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const Timeline = ({ records, selectedYear, onSelectYear }) => {
