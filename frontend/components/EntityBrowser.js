@@ -1,10 +1,11 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { html } from '../html.js?v=3.6.7';
+import { html } from '../html.js?v=3.6.8';
 import { Users, Building2, Lightbulb, BookOpen, MapPin, Calendar, Search, ArrowUpDown, ChevronDown, ChevronRight, X, ExternalLink } from 'lucide-react';
-import { fetchEntitiesData, getRecordsByEntity, getEntityById } from '../services/archiveService.js?v=3.6.7';
-import { COLORS, ENTITY_TYPE_CONFIG } from '../constants.js?v=3.6.7';
-import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.6.7';
+import { fetchEntitiesData, getRecordsByEntity } from '../services/archiveService.js?v=3.6.8';
+import { getEntityScope } from '../services/queryComposition.js?v=3.6.8';
+import { COLORS, ENTITY_TYPE_CONFIG } from '../constants.js?v=3.6.8';
+import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.6.8';
 
 // Add icons to shared config
 const TYPE_ICONS = {
@@ -23,7 +24,7 @@ const TYPE_CONFIG = Object.fromEntries(
   ])
 );
 
-const EntityBrowser = ({ records, onSelectRecord }) => {
+const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
   const [entities, setEntities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedType, setSelectedType] = useState(null);
@@ -48,18 +49,28 @@ const EntityBrowser = ({ records, onSelectRecord }) => {
     load();
   }, []);
 
+  const { entities: scopedEntities, recordIdsByEntity } = useMemo(
+    () => getEntityScope(entities, recordEntityMap, records, queryActive),
+    [entities, recordEntityMap, records, queryActive]
+  );
+
+  const scopedEntityById = useMemo(
+    () => new Map(scopedEntities.map(entity => [entity.id, entity])),
+    [scopedEntities]
+  );
+
   // Type counts
   const typeCounts = useMemo(() => {
     const counts = {};
-    entities.forEach(e => {
+    scopedEntities.forEach(e => {
       counts[e.type] = (counts[e.type] || 0) + 1;
     });
     return counts;
-  }, [entities]);
+  }, [scopedEntities]);
 
   // Filter and sort entities
   const filteredEntities = useMemo(() => {
-    let result = entities;
+    let result = scopedEntities;
 
     if (selectedType) {
       result = result.filter(e => e.type === selectedType);
@@ -82,7 +93,7 @@ const EntityBrowser = ({ records, onSelectRecord }) => {
     }
 
     return result;
-  }, [entities, selectedType, searchTerm, sortBy]);
+  }, [scopedEntities, selectedType, searchTerm, sortBy]);
 
   // Limit displayed entities for performance
   const [displayLimit, setDisplayLimit] = useState(100);
@@ -105,7 +116,9 @@ const EntityBrowser = ({ records, onSelectRecord }) => {
     setSelectedEntity(entity);
 
     // Find records that mention this entity
-    const recordIds = getRecordsByEntity(entity.id);
+    const recordIds = queryActive
+      ? (recordIdsByEntity.get(entity.id) || [])
+      : getRecordsByEntity(entity.id);
     const matchedRecords = recordIds
       .map(rid => records.find(r => r.id === rid))
       .filter(Boolean)
@@ -115,7 +128,7 @@ const EntityBrowser = ({ records, onSelectRecord }) => {
     // Find co-occurring entities (appear in same records)
     const coEntityCounts = {};
     recordIds.forEach(rid => {
-      const entityIds = recordEntityMap[rid] || [];
+      const entityIds = new Set(recordEntityMap[rid] || []);
       entityIds.forEach(eid => {
         if (eid !== entity.id) {
           coEntityCounts[eid] = (coEntityCounts[eid] || 0) + 1;
@@ -125,7 +138,7 @@ const EntityBrowser = ({ records, onSelectRecord }) => {
 
     const coEntities = Object.entries(coEntityCounts)
       .map(([eid, count]) => {
-        const e = getEntityById(eid);
+        const e = scopedEntityById.get(eid);
         return e ? { ...e, coCount: count } : null;
       })
       .filter(Boolean)
@@ -133,7 +146,7 @@ const EntityBrowser = ({ records, onSelectRecord }) => {
       .slice(0, 20);
 
     setCoOccurring(coEntities);
-  }, [selectedEntity, records, recordEntityMap]);
+  }, [selectedEntity, records, queryActive, recordEntityMap, recordIdsByEntity, scopedEntityById]);
 
   if (loading) {
     return html`
@@ -162,7 +175,7 @@ const EntityBrowser = ({ records, onSelectRecord }) => {
               : 'bg-white text-stone-600 border-stone-200 hover:border-stone-400'
           }`}
         >
-          All (${entities.length})
+          All (${scopedEntities.length})
         </button>
         ${Object.entries(TYPE_CONFIG).map(([type, config]) => {
           const count = typeCounts[type] || 0;

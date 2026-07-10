@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { html } from '../html.js?v=3.6.7';
+import { html } from '../html.js?v=3.6.8';
 import {
   BarChart3,
   TrendingUp,
@@ -23,8 +23,8 @@ import {
   isSqliteReady,
   fetchAnalytics,
   queryAsObjects
-} from '../services/archiveService.js?v=3.6.7';
-import QueryBuilder from './QueryBuilder.js?v=3.6.7';
+} from '../services/archiveService.js?v=3.6.8';
+import QueryBuilder from './QueryBuilder.js?v=3.6.8';
 
 // Simple bar chart component
 const BarChart = ({ data, labelKey, valueKey, maxBars = 10, color = '#1c1917' }) => {
@@ -78,7 +78,7 @@ const StatCard = ({ icon: Icon, label, value, sublabel }) => html`
   </div>
 `;
 
-const AnalyticsDashboard = ({ onBack }) => {
+const AnalyticsDashboard = ({ onBack, onRecordResults }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState(null);
@@ -284,7 +284,7 @@ const AnalyticsDashboard = ({ onBack }) => {
               <p className="text-sm text-stone-600 mb-6">
                 Build custom queries by completing sentences. Choose from dropdowns and enter values to explore the archive your way.
               </p>
-              <${QueryBuilder} />
+              <${QueryBuilder} onRecordResults=${onRecordResults} />
             </section>
 
             <!-- Custom Query Section -->

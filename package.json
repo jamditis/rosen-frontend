@@ -9,7 +9,7 @@
     "test:data": "node --test tests/data-integrity.test.js tests/csv-quality.test.js tests/feed-title.test.js tests/csv-unescape.test.js tests/pressthink-dedup.test.js",
     "test:data:extraction-coverage": "node --test tests/extraction-coverage.test.js",
     "test:pipeline": "node --test tests/data-pipeline.test.js tests/thread-detection.test.js tests/process-record.test.js tests/thread-algorithm.test.js",
-    "test:frontend": "node --test tests/version-consistency.test.js tests/frontend-structure.test.js tests/archive-analytics.test.js tests/frontend-era-taxonomy.test.js tests/record-deeplink.test.js tests/record-deeplink-behaviour.test.js tests/needs-review.test.js",
+    "test:frontend": "node --test tests/version-consistency.test.js tests/frontend-structure.test.js tests/archive-analytics.test.js tests/frontend-era-taxonomy.test.js tests/query-builder-integration.test.js tests/record-deeplink.test.js tests/record-deeplink-behaviour.test.js tests/needs-review.test.js",
     "test:okf": "node --test tests/okf-bundle.test.js tests/okf-flight-recorder.test.js tests/okf-blindfold.test.js",
     "validate:okf": "node scripts/validate-okf.js",
     "build-wiki": "node data/build-wiki-seed.js",

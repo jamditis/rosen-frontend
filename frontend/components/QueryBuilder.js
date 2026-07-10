@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { html } from '../html.js?v=3.6.7';
+import { html } from '../html.js?v=3.6.8';
 import {
   Search,
   Play,
@@ -17,8 +17,12 @@ import {
   HelpCircle,
   Loader2
 } from 'lucide-react';
-import { queryAsObjects, isSqliteReady, initSqlite } from '../services/archiveService.js?v=3.6.7';
-import { ERAS } from '../constants.js?v=3.6.7';
+import { queryAsObjects, isSqliteReady, initSqlite } from '../services/archiveService.js?v=3.6.8';
+import { ERAS } from '../constants.js?v=3.6.8';
+import {
+  extractRecordIds,
+  templateIsComposable,
+} from '../services/queryComposition.js?v=3.6.8';
 
 const eraOrderCase = ERAS
   .map((era, index) => `WHEN '${era.replace(/'/g, "''")}' THEN ${index + 1}`)
@@ -28,6 +32,7 @@ const eraOrderCase = ERAS
 const QUERY_TEMPLATES = [
   {
     id: 'count-by-field',
+    composable: false,
     name: 'Count Records',
     sentence: ['Count all records grouped by', 'FIELD', 'showing the top', 'LIMIT', 'results'],
     fields: {
@@ -59,6 +64,7 @@ const QUERY_TEMPLATES = [
   },
   {
     id: 'search-titles',
+    composable: true,
     name: 'Search Titles',
     sentence: ['Find records where the title contains', 'SEARCH_TERM', 'limited to', 'LIMIT', 'results'],
     fields: {
@@ -75,7 +81,7 @@ const QUERY_TEMPLATES = [
       }
     },
     buildSql: (values) => `
-      SELECT title, date, pub
+      SELECT id, title, date, pub
       FROM records
       WHERE title LIKE '%${values.SEARCH_TERM.replace(/'/g, "''")}%'
       ORDER BY date DESC
@@ -84,6 +90,7 @@ const QUERY_TEMPLATES = [
   },
   {
     id: 'records-by-year',
+    composable: true,
     name: 'Records from Year',
     sentence: ['Show me all records from the year', 'YEAR', 'limited to', 'LIMIT', 'results'],
     fields: {
@@ -103,7 +110,7 @@ const QUERY_TEMPLATES = [
       }
     },
     buildSql: (values) => `
-      SELECT title, date, pub, type
+      SELECT id, title, date, pub, type
       FROM records
       WHERE year = '${values.YEAR}'
       ORDER BY date DESC
@@ -112,6 +119,7 @@ const QUERY_TEMPLATES = [
   },
   {
     id: 'records-by-era',
+    composable: true,
     name: 'Records by Era',
     sentence: ['Show records from the', 'ERA', 'era, limited to', 'LIMIT', 'results'],
     fields: {
@@ -128,7 +136,7 @@ const QUERY_TEMPLATES = [
       }
     },
     buildSql: (values) => `
-      SELECT title, date, pub, year
+      SELECT id, title, date, pub, year
       FROM records
       WHERE era = '${values.ERA}'
       ORDER BY date DESC
@@ -137,6 +145,7 @@ const QUERY_TEMPLATES = [
   },
   {
     id: 'top-categories',
+    composable: false,
     name: 'Top Categories',
     sentence: ['Show the top', 'LIMIT', 'categories by number of records'],
     fields: {
@@ -157,6 +166,7 @@ const QUERY_TEMPLATES = [
   },
   {
     id: 'records-by-category',
+    composable: true,
     name: 'Records in Category',
     sentence: ['Find records in the', 'CATEGORY', 'category, showing', 'LIMIT', 'results'],
     fields: {
@@ -173,7 +183,7 @@ const QUERY_TEMPLATES = [
       }
     },
     buildSql: (values) => `
-      SELECT r.title, r.date, r.pub
+      SELECT DISTINCT r.id, r.title, r.date, r.pub
       FROM records r
       JOIN record_categories rc ON r.id = rc.record_id
       WHERE rc.category LIKE '%${values.CATEGORY.replace(/'/g, "''")}%'
@@ -183,6 +193,7 @@ const QUERY_TEMPLATES = [
   },
   {
     id: 'top-publications',
+    composable: false,
     name: 'Top Publications',
     sentence: ['Show the top', 'LIMIT', 'publications Jay has written for'],
     fields: {
@@ -204,6 +215,7 @@ const QUERY_TEMPLATES = [
   },
   {
     id: 'top-people',
+    composable: false,
     name: 'Most Mentioned People',
     sentence: ['Show the top', 'LIMIT', 'most frequently mentioned people'],
     fields: {
@@ -226,6 +238,7 @@ const QUERY_TEMPLATES = [
   },
   {
     id: 'top-concepts',
+    composable: false,
     name: 'Most Common Concepts',
     sentence: ['Show the top', 'LIMIT', 'most frequently discussed concepts'],
     fields: {
@@ -246,6 +259,7 @@ const QUERY_TEMPLATES = [
   },
   {
     id: 'records-mentioning-person',
+    composable: true,
     name: 'Records Mentioning Person',
     sentence: ['Find records that mention', 'PERSON_NAME', 'limited to', 'LIMIT', 'results'],
     fields: {
@@ -262,7 +276,7 @@ const QUERY_TEMPLATES = [
       }
     },
     buildSql: (values) => `
-      SELECT DISTINCT r.title, r.date, r.pub
+      SELECT DISTINCT r.id, r.title, r.date, r.pub
       FROM records r
       JOIN record_entities re ON r.id = re.record_id
       JOIN entities e ON re.entity_id = e.id
@@ -273,6 +287,7 @@ const QUERY_TEMPLATES = [
   },
   {
     id: 'yearly-output',
+    composable: false,
     name: 'Yearly Output',
     sentence: ['Show how many', 'TYPE', 'Jay produced each year'],
     fields: {
@@ -300,6 +315,7 @@ const QUERY_TEMPLATES = [
   },
   {
     id: 'compare-eras',
+    composable: false,
     name: 'Compare Eras',
     sentence: ['Compare the number of records across all eras'],
     fields: {},
@@ -321,6 +337,7 @@ const QUERY_TEMPLATES = [
   },
   {
     id: 'category-cooccurrence',
+    composable: false,
     name: 'Related Categories',
     sentence: ['Show categories that often appear together, top', 'LIMIT', 'pairs'],
     fields: {
@@ -468,7 +485,7 @@ const ResultsTable = ({ results }) => {
 };
 
 // Main QueryBuilder component
-const QueryBuilder = () => {
+const QueryBuilder = ({ onRecordResults }) => {
   const [selectedTemplateId, setSelectedTemplateId] = useState(QUERY_TEMPLATES[0].id);
   const [fieldValues, setFieldValues] = useState({});
   const [results, setResults] = useState(null);
@@ -515,6 +532,15 @@ const QueryBuilder = () => {
 
       const sql = selectedTemplate.buildSql(fieldValues);
       const queryResults = queryAsObjects(sql);
+
+      if (templateIsComposable(selectedTemplate)) {
+        setResults(null);
+        setResultCount(queryResults.length);
+        setError(null);
+        onRecordResults(extractRecordIds(queryResults));
+        return;
+      }
+
       setResults(queryResults);
       setResultCount(queryResults.length);
       setError(null);

@@ -1,38 +1,21 @@
 // Pure data layer for composing QueryBuilder results with the main archive filters.
 //
-// Today the QueryBuilder (frontend/components/QueryBuilder.js) is a dead-end: a
-// user can build a SQL query and see its rows in a results table, but those rows
-// never feed back into the main filter state, so the Explorer, EntityBrowser, and
-// archive view never see them (issue #135). Joe's decision (2026-05-21) is Path A:
-// a record-returning query becomes a derived filter that narrows the main view. (A
-// later 2026-06-05 comment on #135 argues for Path B, since the #133 dependency Path A
-// was to ship with is parked; that re-recommendation is unacknowledged. This module is
-// pure and additive, so it stands either way -- only intersectByRecordIds leans Path A,
-// and unused it is a clean deletion.)
+// QueryBuilder record queries feed this module's record-id subset into App.js.
+// App then renders that subset through the archive cards, RecordView, facets,
+// timeline, and entity browser. The facet and entity derivations below keep
+// those secondary views on the same record subset. Aggregate queries have no
+// record ids, so they remain tabular inside the analytics route (issue #135,
+// Path A, reaffirmed by Joe on 2026-07-09).
 //
-// Path A's load-bearing transform is turning query result rows into a record-id set
-// and intersecting the archive against it. This module is that transform, and only
-// that: no React, no DOM, no SQLite. Every function takes plain values and returns
-// plain values, so the whole thing is unit-testable under `node --test`.
-//
-// This is the Phase-1 foundation, consumers deferred -- the same shape viewState.js
-// took for issue #133. The follow-up that wires this in has prerequisites this module
-// deliberately does not reach into, because each has a visible effect that belongs
-// with the UX decision, not here:
-//   - The record-returning templates in QueryBuilder.js currently SELECT only
-//     presentation fields (title, date, pub), so their rows carry no id. extractRecordIds
-//     finds ids only once those SELECTs add the record id column (and ResultsTable,
-//     which renders every result column, is told how to present or hide it).
-//   - Each QUERY_TEMPLATES entry needs a `composable` flag for templateIsComposable
-//     to gate the button on; until then it reports false for every template (safe).
-//   - The App.js filter shape needs a nullable recordIds slot, filteredRecords needs to
-//     call intersectByRecordIds, and the URL round-trip rides on #133 Phase 2.
-// Keeping the transform pure and separately tested means that wiring is mechanical.
+// Path A's load-bearing transform turns query result rows into a record-id set
+// and intersects the archive against it. This module owns those pure composition
+// transforms: no React, no DOM, no SQLite. Every function takes plain values and
+// returns plain values, so the whole thing is unit-testable under `node --test`.
 //
 // The three concerns are deliberately separate:
 //   - templateIsComposable(template) -- static: can this query feed the filter at
 //     all? A record-returning template can; an aggregate (COUNT/GROUP BY) can't.
-//     This is the gate for the "use as filter" button, decided before the query runs.
+//     This gates dispatch into the archive view, decided before the query runs.
 //   - extractRecordIds(rows)         -- runtime: which records did it return? Empty
 //     is a real answer (the query matched nothing), not a sign of non-composability.
 //   - intersectByRecordIds(...)      -- runtime: apply the resulting id set.
@@ -88,18 +71,14 @@ export function extractRecordIds(rows, idColumn = 'id') {
 
 /**
  * True when a query template can compose with the main archive filters: it returns
- * record rows rather than an aggregate. This gates the "use these records as filter"
- * affordance, and is a static property of the template, decided before the query
- * runs -- a record-returning template that happens to match zero rows is still
- * composable (applying it narrows the archive to nothing), so the row count must not
- * enter this decision.
+ * record rows rather than an aggregate. This gates dispatch into the archive and is
+ * a static property of the template, decided before the query runs. A record-returning
+ * template that happens to match zero rows is still composable because applying it
+ * narrows the archive to nothing, so the row count must not enter this decision.
  *
  * The default is conservative: a template is composable only when it explicitly
  * declares `composable: true`. An unmarked or aggregate template returns false, so
- * the affordance never appears on a query whose result cannot be a record filter.
- * The follow-up that adds the button also adds the `composable` flag to each
- * QUERY_TEMPLATES entry; until then this reports false for every template, which is
- * the safe non-action.
+ * a query whose result cannot be a record filter stays in the tabular results view.
  *
  * @param {{ composable?: boolean } | null | undefined} template
  * @returns {boolean}
@@ -142,4 +121,128 @@ export function intersectByRecordIds(records, recordIds) {
     const id = normalizeId(r && r.id);
     return id !== null && wanted.has(id);
   });
+}
+
+/**
+ * Restrict the archive's facet choices to values present in a record subset.
+ *
+ * The source facet arrays already carry the archive's published ordering,
+ * including the canonical era order. Filtering those arrays preserves that
+ * order without copying taxonomy values into this module.
+ *
+ * Active category and era selections remain available even when the query
+ * subset does not contain them, so the sidebar can still remove those filters.
+ *
+ * @param {{categories?: string[], eras?: string[], publications?: string[]}} facets
+ * @param {Array<{categories?: string[], era?: string, pub?: string}>} records
+ * @param {{categories?: string[], era?: string | null}} [selected]
+ * @returns {{categories: string[], eras: string[], publications: string[]}}
+ */
+export function deriveFacetsForRecords(facets, records, selected = {}) {
+  const available = {
+    categories: new Set(),
+    eras: new Set(),
+    publications: new Set(),
+  };
+
+  for (const record of Array.isArray(records) ? records : []) {
+    for (const category of Array.isArray(record?.categories) ? record.categories : []) {
+      available.categories.add(category);
+    }
+    if (record?.era) available.eras.add(record.era);
+    if (record?.pub) available.publications.add(record.pub);
+  }
+
+  for (const category of Array.isArray(selected.categories) ? selected.categories : []) {
+    available.categories.add(category);
+  }
+  if (selected.era) available.eras.add(selected.era);
+
+  const source = facets && typeof facets === 'object' ? facets : {};
+  return {
+    categories: (source.categories || []).filter(value => available.categories.has(value)),
+    eras: (source.eras || []).filter(value => available.eras.has(value)),
+    publications: (source.publications || []).filter(value => available.publications.has(value)),
+  };
+}
+
+/**
+ * Restrict entity metadata and entity-to-record links to a record subset.
+ *
+ * Entity payloads carry archive-wide mention totals and relationships. Query
+ * results need counts computed from their records so unrelated entities do not
+ * remain visible with zero matching records. Each entity is counted once per
+ * record, and the source entity order is preserved.
+ *
+ * @param {Array<{id?: unknown, totalMentions?: number}>} entities
+ * @param {Record<string, Array<unknown>>} recordEntityMap
+ * @param {Array<{id?: unknown}>} records
+ * @returns {{entities: Array<object>, recordIdsByEntity: Map<string, string[]>}}
+ */
+export function deriveEntityScope(entities, recordEntityMap, records) {
+  const sourceEntities = Array.isArray(entities) ? entities : [];
+  const availableEntityIds = new Set(
+    sourceEntities.map(entity => normalizeId(entity?.id)).filter(id => id !== null)
+  );
+  const relationships = recordEntityMap && typeof recordEntityMap === 'object'
+    ? recordEntityMap
+    : {};
+  const recordIdsByEntity = new Map();
+  const seenRecordIds = new Set();
+
+  for (const record of Array.isArray(records) ? records : []) {
+    const recordId = normalizeId(record?.id);
+    if (recordId === null || seenRecordIds.has(recordId)) continue;
+    seenRecordIds.add(recordId);
+
+    const seenEntityIds = new Set();
+    const relatedIds = Array.isArray(relationships[recordId]) ? relationships[recordId] : [];
+    for (const relatedId of relatedIds) {
+      const entityId = normalizeId(relatedId);
+      if (
+        entityId === null ||
+        seenEntityIds.has(entityId) ||
+        !availableEntityIds.has(entityId)
+      ) continue;
+
+      seenEntityIds.add(entityId);
+      if (!recordIdsByEntity.has(entityId)) recordIdsByEntity.set(entityId, []);
+      recordIdsByEntity.get(entityId).push(recordId);
+    }
+  }
+
+  return {
+    entities: sourceEntities
+      .filter(entity => recordIdsByEntity.has(normalizeId(entity?.id)))
+      .map(entity => ({
+        ...entity,
+        totalMentions: recordIdsByEntity.get(normalizeId(entity.id)).length,
+      })),
+    recordIdsByEntity,
+  };
+}
+
+/**
+ * Use the payload entity index until a query scope is active.
+ *
+ * The payload contains entities that are not represented in recordEntityMap and
+ * archive-wide mention totals that cannot be reconstructed from that map. Query
+ * results need the derived subset; ordinary entity browsing must keep the source
+ * array and its metadata untouched.
+ *
+ * @param {Array<object>} entities
+ * @param {Record<string, Array<unknown>>} recordEntityMap
+ * @param {Array<{id?: unknown}>} records
+ * @param {boolean} queryActive
+ * @returns {{entities: Array<object>, recordIdsByEntity: Map<string, string[]> | null}}
+ */
+export function getEntityScope(entities, recordEntityMap, records, queryActive) {
+  if (!queryActive) {
+    return {
+      entities: Array.isArray(entities) ? entities : [],
+      recordIdsByEntity: null,
+    };
+  }
+
+  return deriveEntityScope(entities, recordEntityMap, records);
 }

@@ -11,11 +11,13 @@
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import {
+import * as queryComposition from '../frontend/services/queryComposition.js';
+
+const {
   extractRecordIds,
   templateIsComposable,
   intersectByRecordIds,
-} from '../frontend/services/queryComposition.js';
+} = queryComposition;
 
 // A record-returning query result (the SELECT carries an id column).
 const RECORD_ROWS = [
@@ -61,16 +63,6 @@ describe('extractRecordIds', () => {
     );
   });
 
-  it('returns [] for current QueryBuilder record rows, which do not yet SELECT id', () => {
-    // The record-returning templates today SELECT only presentation fields, so there is
-    // no id column to extract. This pins the wiring prerequisite (those SELECTs must add
-    // the record id) so it is a tested fact, not a surprise when the helper is wired in.
-    const currentSearchTitlesRows = [
-      { title: 'A', date: '2024-01-01', pub: 'PressThink' },
-      { title: 'B', date: '2023-05-02', pub: 'NYU' },
-    ];
-    assert.deepStrictEqual(extractRecordIds(currentSearchTitlesRows), []);
-  });
 });
 
 describe('templateIsComposable', () => {
@@ -152,5 +144,91 @@ describe('intersectByRecordIds', () => {
 
   it('returns [] for a non-array records argument', () => {
     assert.deepStrictEqual(intersectByRecordIds(null, ['rec-1']), []);
+  });
+});
+
+describe('deriveEntityScope', () => {
+  it('keeps only entities linked to query records and replaces global mention counts', () => {
+    assert.equal(
+      typeof queryComposition.deriveEntityScope,
+      'function',
+      'queryComposition must export deriveEntityScope'
+    );
+    if (typeof queryComposition.deriveEntityScope !== 'function') return;
+
+    const entities = [
+      { id: 'person-1', type: 'Person', name: 'One', totalMentions: 20 },
+      { id: 'org-1', type: 'Organization', name: 'Two', totalMentions: 15 },
+      { id: 'concept-1', type: 'Concept', name: 'Three', totalMentions: 8 },
+      { id: 'location-1', type: 'Location', name: 'Unrelated', totalMentions: 4 },
+    ];
+    const recordEntityMap = {
+      'record-1': ['person-1', 'org-1', 'person-1'],
+      'record-2': ['org-1', 'concept-1'],
+      'record-outside-query': ['person-1', 'location-1'],
+    };
+    const records = [{ id: 'record-1' }, { id: 'record-2' }];
+
+    const scope = queryComposition.deriveEntityScope(entities, recordEntityMap, records);
+
+    assert.deepStrictEqual(
+      scope.entities.map(({ id, totalMentions }) => ({ id, totalMentions })),
+      [
+        { id: 'person-1', totalMentions: 1 },
+        { id: 'org-1', totalMentions: 2 },
+        { id: 'concept-1', totalMentions: 1 },
+      ]
+    );
+    assert.deepStrictEqual(scope.recordIdsByEntity.get('person-1'), ['record-1']);
+    assert.deepStrictEqual(scope.recordIdsByEntity.get('org-1'), ['record-1', 'record-2']);
+    assert.equal(scope.recordIdsByEntity.has('location-1'), false);
+  });
+});
+
+describe('getEntityScope', () => {
+  it('preserves the payload entity index when no query is active', () => {
+    assert.equal(
+      typeof queryComposition.getEntityScope,
+      'function',
+      'queryComposition must export getEntityScope'
+    );
+    if (typeof queryComposition.getEntityScope !== 'function') return;
+
+    const entities = [
+      { id: 'person-1', type: 'Person', name: 'One', totalMentions: 20 },
+      { id: 'org-1', type: 'Organization', name: 'Two', totalMentions: 15 },
+    ];
+    const scope = queryComposition.getEntityScope(
+      entities,
+      { 'record-1': ['person-1'] },
+      [{ id: 'record-1' }],
+      false
+    );
+
+    assert.strictEqual(scope.entities, entities);
+    assert.deepStrictEqual(
+      scope.entities.map(({ id, totalMentions }) => ({ id, totalMentions })),
+      [
+        { id: 'person-1', totalMentions: 20 },
+        { id: 'org-1', totalMentions: 15 },
+      ]
+    );
+    assert.equal(scope.recordIdsByEntity, null);
+  });
+
+  it('derives the entity index when a query is active', () => {
+    const entities = [
+      { id: 'person-1', totalMentions: 20 },
+      { id: 'org-1', totalMentions: 15 },
+    ];
+    const scope = queryComposition.getEntityScope(
+      entities,
+      { 'record-1': ['person-1'] },
+      [{ id: 'record-1' }],
+      true
+    );
+
+    assert.deepStrictEqual(scope.entities, [{ id: 'person-1', totalMentions: 1 }]);
+    assert.deepStrictEqual(scope.recordIdsByEntity.get('person-1'), ['record-1']);
   });
 });
