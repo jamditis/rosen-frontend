@@ -14,9 +14,11 @@ Live site: https://pressthink.org/j/rosen-archive/
 
 It is a public, searchable archive of four decades of Jay Rosen's journalism
 criticism: about 26,600 records in the shipped data — roughly 950 articles and
-essays plus about 25,700 archived social posts — cross-indexed by about 8,150
-named people, organizations, and concepts. It runs as a static site with no
-server-side code and nothing calling out to an AI model when you use it.
+essays plus about 25,700 archived social posts. An extracted index of about 8,150
+named people, organizations, and concepts cross-links the records that have
+extracted relationships (about 1,400 so far), not the whole corpus. It runs as a
+static site with no server-side code and nothing calling out to an AI model when
+you use it.
 
 Accuracy note for Joe: these figures are computed from the shipped data, not
 guessed — `archive-core.json` holds 26,616 records (951 non-social plus 25,665
@@ -60,12 +62,13 @@ Records are curated, not scraped on a timer. A record is a row in a source CSV
 (`data/archive_records-public.csv` and the social-post CSVs); `node
 data/export-archive-data.js` regenerates the split JSON files the site reads, and
 those are deployed to the PressThink host over FTP. `ADDING-RECORDS.md` is
-the full procedure. There is also an in-progress submission path so a record can
-be proposed and swept in without hand-editing the CSV: a Flask submission server
-(Pillar 3) and a separate GitHub Action flow using `submit-record.yml` and
-`sweep-stuck-rows.yml` (Pillar 3a). `automation/SETUP.md` is the current
-(Pillar 3) operational guide; `docs/HANDOFF.md` describes the post-Pillar-3a
-target state.
+the full procedure. A lighter-weight submission path is designed so a record can
+be proposed without hand-editing the CSV — a Flask submission server (Pillar 3)
+and a GitHub Action flow using `submit-record.yml` and `sweep-stuck-rows.yml`
+(Pillar 3a) — but it is not stood up yet: the Pillar 3a wiring exists in code and
+was never activated. `automation/PILLAR3A-STATUS.md` is the current status and
+`docs/setup/pillar-3a-runbook.md` is the install procedure. Until it is live,
+records are added the manual way above.
 
 Accuracy note for Joe: the source issue described this as a "weekly scrape of the
 PressThink RSS feed," and that is not what the code does today. The archive
@@ -82,9 +85,10 @@ Two data paths, and the distinction is worth getting right because both come up:
 
 - **Everyday browsing is flat JSON.** Search, filter, and record cards read
   pre-built JSON files (`archive-core.json` loads on page load; details are
-  prefetched about a second later; entities and the full file load on demand). No
-  query engine, no database — just data the browser already has. That is why it
-  feels instant.
+  prefetched about a second later; entities load on demand). No query engine, no
+  database — just data the browser already has. That is why it feels instant.
+  (The combined `archive-data.json` is only a fallback and the source the query
+  engine below builds from — not part of normal browsing.)
 - **Custom queries use SQLite compiled to WebAssembly.** The analytics and query
   surface can load `sql.js` (SQLite built to WASM) and run real SQL *in the
   browser*, only when someone actually writes a custom query. It does not download
@@ -148,7 +152,8 @@ CSV by hand.
 
 - It is a public archive of Jay Rosen's work: about 26,600 records in the shipped
   data — roughly 950 articles and essays plus about 25,700 archived social posts —
-  cross-indexed by people, organizations, and concepts.
+  with an extracted index of people, organizations, and concepts over the records
+  that have relationships (about 1,400 so far).
 - It is a static site. No server, no database server, nothing calling an AI model
   while you use it — so it is fast, cheap to keep online, and hard to break.
 - AI helped build the index offline, through a documented review pipeline. The
