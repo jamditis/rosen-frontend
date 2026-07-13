@@ -9,6 +9,8 @@ Upload these files and directories from the repo root:
 ```
 index.html                          # Main archive page
 favicon.ico                         # Site favicon
+favicon.svg                         # SVG favicon (referenced by index.html, the FAQ, and both data tools)
+og-image.png                        # Social sharing card (referenced by the OG/Twitter meta tags)
 shared-styles.css                   # Common styles for standalone tools
 version.json                        # Version metadata
 metadata.json                       # Archive metadata
@@ -62,6 +64,7 @@ features/                           # Standalone feature pages
   status-report/                    # Status report generator
 
 tools/                              # Development/exploration tools
+  active/tailwind.css               # Shared Tailwind build both tools load as ../tailwind.css
   active/dataexplorer/              # Tabular data explorer
   active/dataviz/                   # Data visualization
 

@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { html } from '../html.js?v=3.6.9';
+import { html } from '../html.js?v=3.7.0';
 import {
   Search,
   Play,
@@ -17,12 +17,12 @@ import {
   HelpCircle,
   Loader2
 } from 'lucide-react';
-import { queryAsObjects, isSqliteReady, initSqlite } from '../services/archiveService.js?v=3.6.9';
-import { ERAS } from '../constants.js?v=3.6.9';
+import { queryAsObjects, isSqliteReady, initSqlite } from '../services/archiveService.js?v=3.7.0';
+import { ERAS } from '../constants.js?v=3.7.0';
 import {
   extractRecordIds,
   templateIsComposable,
-} from '../services/queryComposition.js?v=3.6.9';
+} from '../services/queryComposition.js?v=3.7.0';
 
 const eraOrderCase = ERAS
   .map((era, index) => `WHEN '${era.replace(/'/g, "''")}' THEN ${index + 1}`)

@@ -21,10 +21,13 @@ from __future__ import annotations
 import errno
 import importlib.util
 import pathlib
+import posixpath
+import re
 import stat
 import sys
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
+from urllib.parse import urlsplit
 
 import pytest
 
@@ -96,18 +99,50 @@ class TestManifestExistsOnDisk:
 
 
 class TestDeploymentMdAlignment:
-    """DEPLOYMENT.md's top-level deploy targets must all appear in the manifest.
+    """DEPLOYMENT.md and the manifest must not drift, in both directions.
 
-    Top-level = unindented line in the first fenced code block. Sub-entries
-    (indented) are descriptive — the script walks each dir recursively.
+    Forward: every top-level line in the first fenced block is covered by the
+    manifest (a documented path the deploy would actually walk). Reverse: every
+    explicit file entry in the manifest -- including a nested one listed as an
+    indented sub-entry -- is documented, so a manual FTP deploy that follows the
+    doc uploads it. Directories are walked recursively, so their sub-entries are
+    descriptive only and are not checked individually.
     """
 
-    def test_top_level_md_entries_in_manifest(self):
-        md = (_REPO_ROOT / 'DEPLOYMENT.md').read_text()
+    @staticmethod
+    def _fenced_block():
         # First fenced block is the deploy list. Split on ``` and grab index 1.
-        fenced = md.split('```')[1]
-        top_level = set()
+        md = (_REPO_ROOT / 'DEPLOYMENT.md').read_text()
+        return md.split('```')[1]
+
+    @staticmethod
+    def _documented_paths(fenced):
+        """Full repo-relative paths documented in a fenced deploy block.
+
+        Indented sub-entries are joined onto their parent via an indentation
+        stack, so `active/tailwind.css` listed under `tools/` reconstructs to
+        `tools/active/tailwind.css`. Without this, a nested file entry would be
+        invisible to a plain top-level scan.
+        """
+        documented = set()
+        stack = []  # (indent, segment) outermost -> current
         for line in fenced.splitlines():
+            if not line.strip():
+                continue
+            indent = len(line) - len(line.lstrip())
+            entry = line.split('#', 1)[0].strip().rstrip('/')
+            if not entry:
+                continue
+            while stack and stack[-1][0] >= indent:
+                stack.pop()
+            prefix = '/'.join(seg for _, seg in stack)
+            documented.add(f'{prefix}/{entry}' if prefix else entry)
+            stack.append((indent, entry))
+        return documented
+
+    def test_top_level_md_entries_in_manifest(self):
+        top_level = set()
+        for line in self._fenced_block().splitlines():
             # Skip blank lines and any indented (sub) entry.
             if not line.strip() or line.startswith(' ') or line.startswith('\t'):
                 continue
@@ -128,6 +163,64 @@ class TestDeploymentMdAlignment:
         assert not missing, (
             f"DEPLOYMENT.md lists top-level entries the manifest doesn't "
             f"cover: {sorted(missing)}"
+        )
+
+    def test_manifest_file_entries_documented(self):
+        """Reverse direction: every explicit file the manifest ships --
+        _DEPLOY_FILES and _DEPLOY_DATA_FILES, including nested ones like
+        tools/active/tailwind.css -- must appear in DEPLOYMENT.md. The
+        top-level test only checks first path segments, so a nested file could
+        drop from the doc while the manifest stayed correct; a manual deploy
+        following the doc would then omit it (e.g. both data tools unstyled).
+        """
+        documented = self._documented_paths(self._fenced_block())
+        explicit = (deploy_full_site._DEPLOY_FILES
+                    + deploy_full_site._DEPLOY_DATA_FILES)
+        missing = [f for f in explicit if f not in documented]
+        assert not missing, (
+            f"manifest file entries missing from DEPLOYMENT.md: {missing}"
+        )
+
+        # The reconstruction must genuinely resolve nested paths -- a top-level
+        # or substring check would still pass with the parent context wrong.
+        # Dropping the nested line must make its full path undetectable.
+        pruned = '\n'.join(
+            line for line in self._fenced_block().splitlines()
+            if 'active/tailwind.css' not in line
+        )
+        assert 'tools/active/tailwind.css' not in self._documented_paths(pruned)
+
+    def test_manifest_dir_entries_documented(self):
+        """Reverse direction for directories: every _DEPLOY_DIRS entry -- even
+        a nested one like features/status-report or tools/active/dataviz --
+        must be documented in DEPLOYMENT.md, either as the directory itself or
+        via a file listed under it. The file reverse-check and the top-level
+        segment check both miss this: a nested dir line could drop from the doc
+        while the manifest stayed correct, and a manual deploy following the doc
+        would then omit a whole feature directory.
+        """
+        documented = self._documented_paths(self._fenced_block())
+
+        def covered(path):
+            # A dir is documented if it is listed, or if any documented path
+            # sits under it (the doc may name only files inside the dir).
+            return path in documented or any(
+                d.startswith(path + '/') for d in documented)
+
+        missing = [d for d in deploy_full_site._DEPLOY_DIRS if not covered(d)]
+        assert not missing, (
+            f"manifest dir entries missing from DEPLOYMENT.md: {missing}"
+        )
+
+        # Teeth: dropping the nested status-report line must make its path
+        # undetectable -- the top-level `features/` line must not mask it.
+        pruned = self._documented_paths('\n'.join(
+            line for line in self._fenced_block().splitlines()
+            if 'status-report/' not in line
+        ))
+        assert not (
+            'features/status-report' in pruned
+            or any(d.startswith('features/status-report/') for d in pruned)
         )
 
 
@@ -282,6 +375,283 @@ class TestServiceWorkerEntryPointOrder:
         assert names.index('index.html') < names.index('frontend/sw.js')
         # version.json (not precached) flips last.
         assert names[-3:] == ['index.html', 'frontend/sw.js', 'version.json']
+
+
+class TestReferencedAssetsAreDeployed:
+    """Every local asset a deployed HTML page references must be in the manifest.
+
+    Regression guard for the bug class where a static asset lives OUTSIDE the
+    deployed directory subtrees, so the dir walk never reaches it and a full
+    deploy ships pages that reference a file it never uploads. Concretely:
+      - favicon.svg (repo root) is referenced by index.html, the FAQ, the
+        design-system demo, and both data tools, but is not under any deployed
+        dir, so a manifest without it deploys pages with a broken SVG favicon.
+      - tools/active/tailwind.css sits one level above the two deployed tool
+        dirs; dataexplorer and dataviz load it as ../tailwind.css, so a manifest
+        without it deploys both tools unstyled.
+    Such a page only "works" on the live server when a past manual upload left
+    the file there -- FTP does not delete unlisted files -- which hides the gap
+    until a clean deploy or an asset change. This test resolves every
+    <link>/<script>/<img> href/src and every <meta content=> image reference
+    in every deployed HTML page and asserts the target is in the manifest, so
+    the class cannot regress.
+
+    Scope: only assets that EXIST in the repo are in scope, since this guards
+    manifest drift. A reference to a file absent from the repo is a dangling or
+    live-only asset the manifest cannot ship -- a separate broken-link concern.
+    """
+
+    # href/src on the tags that pull in a static asset. The (?<![\w-]) guard
+    # anchors the attribute so a data-src / data-href decoy is not read as the
+    # real src / href (\b alone matches after the hyphen in data-src).
+    _TAG_REF_RE = re.compile(
+        r'<(?:link|script|img)\b[^>]*?(?<![\w-])(?:href|src)\s*=\s*'
+        r'["\']([^"\']+)["\']',
+        re.IGNORECASE | re.DOTALL,
+    )
+    # A whole <meta> element, so we can read its property/name before deciding
+    # whether its content is an asset URL. The (?<![\w-]) guard anchors each
+    # attribute to a real boundary so data-property / data-content decoys do
+    # not read as the property / content attributes (\b alone matches after the
+    # hyphen in data-property).
+    _META_TAG_RE = re.compile(r'<meta\b[^>]*?>', re.IGNORECASE | re.DOTALL)
+    _META_KEY_RE = re.compile(
+        r'(?<![\w-])(?:property|name)\s*=\s*["\']([^"\']+)["\']', re.IGNORECASE)
+    _META_CONTENT_RE = re.compile(
+        r'(?<![\w-])content\s*=\s*["\']([^"\']+)["\']', re.IGNORECASE)
+    # <meta> keys whose content is a deployable image URL. The social-card
+    # assets are referenced ONLY here (never via href/src) and with the
+    # absolute live URL, so a href/src-only scan misses them. Scoping to these
+    # keys keeps prose (og:title, og:description) and dimensions
+    # (og:image:width) out of path resolution.
+    _IMAGE_META_KEYS = frozenset({
+        'og:image', 'og:image:url', 'og:image:secure_url',
+        'twitter:image', 'twitter:image:src',
+    })
+    _SITE_ORIGIN = 'https://pressthink.org'
+    _SITE_HOST = urlsplit(_SITE_ORIGIN).hostname  # single source: 'pressthink.org'
+    _SITE_ROOT_PREFIX = '/j/rosen-archive/'
+
+    def _deployed_relpaths(self):
+        files = deploy_full_site.collect_local_files(_REPO_ROOT)
+        return {f.relative_to(_REPO_ROOT).as_posix() for f in files}
+
+    def _image_meta_refs(self, text):
+        """Content URLs of the image-bearing <meta> tags (og:image etc.).
+
+        A tag can carry more than one key attribute (e.g. name= for prose plus
+        property= for the image), so every name/property value is checked, not
+        just the first. A tag counts as image-bearing if any of its keys is an
+        image key.
+        """
+        refs = []
+        for tag in self._META_TAG_RE.findall(text):
+            keys = {k.strip().lower() for k in self._META_KEY_RE.findall(tag)}
+            if keys & self._IMAGE_META_KEYS:
+                content = self._META_CONTENT_RE.search(tag)
+                if content:
+                    refs.append(content.group(1))
+        return refs
+
+    def _resolve_asset_ref(self, html_path, raw):
+        """Map one raw href/src/image-meta value to the repo-relative file it
+        points at, or None when it is not a repo path this manifest could ship
+        (external host, non-file scheme, or a path that escapes the repo).
+
+        No extension filter: every value reaching here is a resource URL, so
+        whether it is a shippable asset is decided by existence in
+        _page_asset_problems, not by a hardcoded suffix allowlist.
+        """
+        ref = raw.split('#', 1)[0].split('?', 1)[0].strip()
+        if not ref:
+            return None
+        parts = urlsplit(ref)
+        if parts.scheme or ref.startswith('//'):
+            # An absolute or protocol-relative URL. Only our own origin maps
+            # back to the repo: a non-http(s) scheme (data:/mailto:/tel:/
+            # javascript:/blob:) or any other host is not a repo asset. urlsplit
+            # lowercases and drops the port from .hostname, so //pressthink.org/
+            # and https://pressthink.org:443/ resolve to the same origin as the
+            # canonical https form (og:image / twitter:image use the live URL).
+            if parts.scheme and parts.scheme not in ('http', 'https'):
+                return None
+            if (parts.hostname or '') != self._SITE_HOST:
+                return None
+            site_path = parts.path
+        elif ref.startswith('/'):
+            site_path = ref
+        else:
+            # A relative reference resolves against the page's own directory.
+            html_dir = html_path.parent.relative_to(_REPO_ROOT).as_posix()
+            return self._repo_rel(posixpath.join(html_dir, ref))
+        # Absolute or site-root path: only production site-root paths map back
+        # to the repo; any other (e.g. /wp-content/...) is not a repo asset.
+        if not site_path.startswith(self._SITE_ROOT_PREFIX):
+            return None
+        return self._repo_rel(site_path[len(self._SITE_ROOT_PREFIX):])
+
+    @staticmethod
+    def _repo_rel(rel):
+        """Normalize a repo-relative URL path lexically (collapse . and .. the
+        way a browser does) and bound it to the repo.
+
+        Lexical, not Path.resolve(): a URL path is a string, so normalization
+        must not touch the filesystem or dereference a symlink into its target
+        -- that would hide that the URL-visible alias itself is unshipped. A
+        path that climbs out of the checkout is not ours to ship.
+        """
+        norm = posixpath.normpath(rel)
+        if norm in ('.', '..') or norm.startswith(('../', '/')):
+            return None
+        return norm
+
+    def _page_asset_problems(self, deployed, rel_html):
+        html_path = _REPO_ROOT / rel_html
+        text = html_path.read_text(encoding='utf-8', errors='replace')
+        raws = self._TAG_REF_RE.findall(text) + self._image_meta_refs(text)
+        problems = []
+        for raw in raws:
+            target_rel = self._resolve_asset_ref(html_path, raw)
+            if target_rel is None:
+                continue
+            # In scope: a file that EXISTS in the repo but sits outside the
+            # deployed dir walk, so the manifest misses it. A ref to a file
+            # absent from the repo is a dangling / live-only reference the
+            # manifest cannot ship -- a separate broken-link concern, not
+            # manifest drift -- so skip it here.
+            if not (_REPO_ROOT / target_rel).is_file():
+                continue
+            if target_rel not in deployed:
+                problems.append(
+                    f'{rel_html} references {raw!r} -> {target_rel} '
+                    f'(not in the deploy manifest)'
+                )
+        return problems
+
+    def test_deployed_html_asset_refs_are_all_shipped(self):
+        deployed = self._deployed_relpaths()
+        deployed_html = sorted(p for p in deployed if p.endswith('.html'))
+        assert deployed_html, "expected deployed HTML pages in the manifest"
+
+        problems = []
+        for rel_html in deployed_html:
+            problems.extend(self._page_asset_problems(deployed, rel_html))
+
+        assert not problems, (
+            'deployed pages reference local assets the manifest does not '
+            'ship:\n  ' + '\n  '.join(sorted(problems))
+        )
+
+    def test_meta_social_card_asset_is_covered(self):
+        """og:image / twitter:image are referenced only via <meta content=>
+        absolute URLs. The resolver must map the production origin back to the
+        repo file, and dropping the asset from the manifest must fail the scan
+        -- otherwise the social-card gap (og-image.png) regresses silently.
+        """
+        index = _REPO_ROOT / 'index.html'
+        ref = f'{self._SITE_ORIGIN}{self._SITE_ROOT_PREFIX}og-image.png'
+        assert self._resolve_asset_ref(index, ref) == 'og-image.png'
+
+        deployed = self._deployed_relpaths()
+        deployed.discard('og-image.png')
+        problems = self._page_asset_problems(deployed, 'index.html')
+        assert any('og-image.png' in p for p in problems), (
+            'meta og:image asset is not covered by the deploy regression guard'
+        )
+
+    def test_resolve_covers_non_whitelisted_asset_types(self):
+        """The resolver must not drop a reference by its file extension.
+
+        A <link>/<script>/<img> href/src, and an og:image / twitter:image
+        content URL, is a resource path whatever its suffix: a web manifest,
+        an .avif hero, or the dissertation PDF all name a file the deploy
+        must ship. Gating resolution on an extension allowlist let a deployed
+        reference to any type not on the list 404 after a clean deploy while
+        the guard reported nothing -- exactly the omission class it exists to
+        catch. Existence, not extension, decides scope (see _page_asset_problems).
+        """
+        index = _REPO_ROOT / 'index.html'
+        pdf = ('dissertation/reader/'
+               'THE_IMPOSSIBLE_PRESS_NYU_ROSEN-JAY-1986.pdf')
+        cases = {
+            f'{self._SITE_ORIGIN}{self._SITE_ROOT_PREFIX}site.webmanifest':
+                'site.webmanifest',
+            './hero.avif': 'hero.avif',
+            f'{self._SITE_ORIGIN}{self._SITE_ROOT_PREFIX}{pdf}': pdf,
+        }
+        for raw, expected in cases.items():
+            assert self._resolve_asset_ref(index, raw) == expected, raw
+
+    def test_resolve_normalizes_and_bounds_site_root_paths(self):
+        """A site-root path must resolve to its normalized manifest key and
+        stay inside the repo, matching the relative branch and the docstring.
+
+        A browser reads `/j/rosen-archive/frontend/../og-image.png` as the
+        deployed root image, so it must map to `og-image.png`, not the raw
+        `frontend/../og-image.png` (which no manifest key equals, so the guard
+        would falsely report the shipped image missing). A path that climbs out
+        of the site root is not a repo asset and must return None, not a string
+        that escapes the checkout.
+        """
+        index = _REPO_ROOT / 'index.html'
+        assert self._resolve_asset_ref(
+            index, f'{self._SITE_ROOT_PREFIX}frontend/../og-image.png'
+        ) == 'og-image.png'
+        assert self._resolve_asset_ref(
+            index, f'{self._SITE_ORIGIN}{self._SITE_ROOT_PREFIX}'
+            'frontend/../favicon.svg'
+        ) == 'favicon.svg'
+        assert self._resolve_asset_ref(
+            index, f'{self._SITE_ROOT_PREFIX}../../etc/passwd'
+        ) is None
+
+    def test_tag_ref_re_ignores_data_prefixed_attributes(self):
+        """href/src extraction must not read a data-src / data-href decoy as
+        the real attribute. \\b alone matches after the hyphen in data-src, so
+        a lazy-load placeholder would be scanned instead of the src a browser
+        actually loads -- the same data-* class fixed in the meta regexes.
+        """
+        assert self._TAG_REF_RE.findall(
+            "<img data-src='./placeholder.png' src='../og-image.png'>"
+        ) == ['../og-image.png']
+        # a normal single-attribute tag still matches
+        assert self._TAG_REF_RE.findall(
+            '<link rel="icon" href="/j/rosen-archive/favicon.svg">'
+        ) == ['/j/rosen-archive/favicon.svg']
+
+    def test_image_meta_refs_reads_every_attribute_exactly(self):
+        """The meta scan must inspect every name/property on a tag, not just
+        the first, and must not treat data-* attributes as the real key or
+        content. A social card can carry prose in an earlier name= while the
+        image lives in a later property=, or carry data-property/data-content
+        decoys; the first-match, data-blind scan misread both.
+        """
+        cases = {
+            '<meta content="card.png" property="og:image" />': ['card.png'],
+            '<meta name="description" property="og:image" '
+            'content="card.png" />': ['card.png'],
+            '<meta property="og:image" data-content="ignored" '
+            'content="card.png" />': ['card.png'],
+            '<meta data-property="og:image" content="card.png" />': [],
+        }
+        for tag, expected in cases.items():
+            assert self._image_meta_refs(tag) == expected, tag
+
+    def test_resolve_handles_same_origin_url_variants(self):
+        """og:image can be authored as a protocol-relative or explicit-port
+        URL to our own origin; a browser resolves both to the same deployed
+        file as the canonical https form, so the guard must too. A genuinely
+        different host is still skipped.
+        """
+        index = _REPO_ROOT / 'index.html'
+        for raw in (
+            f'//pressthink.org{self._SITE_ROOT_PREFIX}og-image.png',
+            f'https://pressthink.org:443{self._SITE_ROOT_PREFIX}og-image.png',
+        ):
+            assert self._resolve_asset_ref(index, raw) == 'og-image.png', raw
+        assert self._resolve_asset_ref(
+            index, f'https://evil.example{self._SITE_ROOT_PREFIX}og-image.png'
+        ) is None
 
 
 class TestKnownHostsHandling:
