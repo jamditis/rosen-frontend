@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
-"""Push regenerated JSON files from the local staging dir to pressthink.org."""
+"""Push regenerated JSON files from the local staging dir to pressthink.org.
+
+Authentication is by password (ROSEN_SFTP_PASSWORD) or private key
+(ROSEN_SFTP_KEY_PATH, preferred over the password when both are set).
+ROSEN_SFTP_KEY_PATH is a path on disk, not a secret: in GitHub Actions the
+deploy workflows materialize it from the ROSEN_SFTP_KEY_CONTENT secret in their
+"Materialize SFTP private key" step, which writes a 0600 runner-temp file and
+exports ROSEN_SFTP_KEY_PATH. Locally it points at your own key file, so there is
+no ROSEN_SFTP_KEY_PATH secret to look for.
+"""
 
 from __future__ import annotations
 

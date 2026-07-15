@@ -17,6 +17,12 @@ Two distinct env vars on purpose:
 Separate names so a misconfigured per-record workflow can't accidentally
 overwrite anything outside data/.
 
+SFTP key auth shares sftp_push.py's precedence (key over password). In GitHub
+Actions ROSEN_SFTP_KEY_PATH is not a secret: deploy.yml's "Materialize SFTP
+private key" step writes the ROSEN_SFTP_KEY_CONTENT secret to a 0600 runner-temp
+file and exports ROSEN_SFTP_KEY_PATH, so there is no ROSEN_SFTP_KEY_PATH secret
+to look for.
+
 Manifest mirrors DEPLOYMENT.md "Files to deploy". A pytest checks both
 directions: every entry must exist on disk, and DEPLOYMENT.md's top-level
 list must all appear here.
