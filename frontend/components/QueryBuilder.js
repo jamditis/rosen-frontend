@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { html } from '../html.js?v=3.7.0';
+import { html } from '../html.js?v=3.7.1';
 import {
   Search,
   Play,
@@ -17,12 +17,13 @@ import {
   HelpCircle,
   Loader2
 } from 'lucide-react';
-import { queryAsObjects, isSqliteReady, initSqlite } from '../services/archiveService.js?v=3.7.0';
-import { ERAS } from '../constants.js?v=3.7.0';
+import { queryAsObjects, isSqliteReady, initSqlite } from '../services/archiveService.js?v=3.7.1';
+import { ERAS } from '../constants.js?v=3.7.1';
 import {
   extractRecordIds,
   templateIsComposable,
-} from '../services/queryComposition.js?v=3.7.0';
+  resolveFieldValues,
+} from '../services/queryComposition.js?v=3.7.1';
 
 const eraOrderCase = ERAS
   .map((era, index) => `WHEN '${era.replace(/'/g, "''")}' THEN ${index + 1}`)
@@ -497,14 +498,12 @@ const QueryBuilder = ({ onRecordResults }) => {
 
   const selectedTemplate = QUERY_TEMPLATES.find(t => t.id === selectedTemplateId);
 
-  // Initialize field values when template changes
+  // Initialize field values when the template changes. resolveFieldValues with an
+  // empty source yields each declared field's default, the same resolution the two
+  // buildSql sites use, so init, reset, and build never drift from one definition.
   useEffect(() => {
     if (selectedTemplate) {
-      const defaults = {};
-      Object.entries(selectedTemplate.fields).forEach(([key, field]) => {
-        defaults[key] = field.default;
-      });
-      setFieldValues(defaults);
+      setFieldValues(resolveFieldValues(selectedTemplate, {}));
       setResults(null);
       setError(null);
     }
@@ -530,7 +529,7 @@ const QueryBuilder = ({ onRecordResults }) => {
         }
       }
 
-      const sql = selectedTemplate.buildSql(fieldValues);
+      const sql = selectedTemplate.buildSql(resolveFieldValues(selectedTemplate, fieldValues));
       const queryResults = queryAsObjects(sql);
 
       if (templateIsComposable(selectedTemplate)) {
@@ -553,17 +552,13 @@ const QueryBuilder = ({ onRecordResults }) => {
   };
 
   const resetQuery = () => {
-    const defaults = {};
-    Object.entries(selectedTemplate.fields).forEach(([key, field]) => {
-      defaults[key] = field.default;
-    });
-    setFieldValues(defaults);
+    setFieldValues(resolveFieldValues(selectedTemplate, {}));
     setResults(null);
     setError(null);
     setResultCount(0);
   };
 
-  const currentSql = selectedTemplate ? selectedTemplate.buildSql(fieldValues) : '';
+  const currentSql = selectedTemplate ? selectedTemplate.buildSql(resolveFieldValues(selectedTemplate, fieldValues)) : '';
 
   return html`
     <div className="space-y-6">

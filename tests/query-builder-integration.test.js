@@ -219,6 +219,82 @@ describe('query-scoped entities', () => {
   });
 });
 
+describe('QueryBuilder field-value resolution (#525)', () => {
+  // Regression guard for the blank-page crash. Selecting a text template
+  // (Search Titles, Records in Category, Records Mentioning Person) blanked the
+  // whole archive. The template switch set selectedTemplate synchronously, but
+  // the effect that repopulates fieldValues runs after render, so the render in
+  // between called buildSql with the previous template's values -- missing the
+  // new text field. buildSql does values.SEARCH_TERM.replace(...), and .replace
+  // on undefined throws during render, unmounting the app. Resolving field values
+  // against the template defaults before every buildSql call closes the gap.
+
+  it('fills a missing declared field from its default', () => {
+    assert.equal(
+      typeof queryComposition.resolveFieldValues,
+      'function',
+      'queryComposition must export resolveFieldValues'
+    );
+    const searchTitles = {
+      fields: { SEARCH_TERM: { default: '' }, LIMIT: { default: 20 } },
+    };
+    // fieldValues still holds the previous (Count Records) template's keys.
+    const resolved = queryComposition.resolveFieldValues(searchTitles, { FIELD: 'year', LIMIT: 10 });
+    assert.equal(resolved.SEARCH_TERM, '', 'text field falls back to its default, not undefined');
+    assert.equal(resolved.LIMIT, 10, 'a value present in fieldValues is kept');
+    assert.ok(!('FIELD' in resolved), 'keys not declared by the template are dropped');
+  });
+
+  it('keeps a user-entered value, including empty string and zero, over the default', () => {
+    const t = { fields: { SEARCH_TERM: { default: 'fallback' }, LIMIT: { default: 20 } } };
+    assert.equal(queryComposition.resolveFieldValues(t, { SEARCH_TERM: 'nixon' }).SEARCH_TERM, 'nixon');
+    assert.equal(queryComposition.resolveFieldValues(t, { SEARCH_TERM: '' }).SEARCH_TERM, '');
+    assert.equal(queryComposition.resolveFieldValues(t, { LIMIT: 0 }).LIMIT, 0);
+  });
+
+  it('never leaves a text field undefined, so buildSql .replace cannot throw', () => {
+    // Mirrors the real Search Titles template (QueryBuilder.js): the crash was
+    // values.SEARCH_TERM.replace on an undefined value.
+    const buildSql = (values) =>
+      `WHERE title LIKE '%${values.SEARCH_TERM.replace(/'/g, "''")}%' LIMIT ${values.LIMIT}`;
+    const t = { fields: { SEARCH_TERM: { default: '' }, LIMIT: { default: 20 } } };
+    assert.doesNotThrow(() => buildSql(queryComposition.resolveFieldValues(t, {})));
+  });
+
+  it('tolerates a missing fields map and non-object values', () => {
+    assert.deepStrictEqual(queryComposition.resolveFieldValues({}, {}), {});
+    assert.deepStrictEqual(queryComposition.resolveFieldValues(null, null), {});
+    assert.deepStrictEqual(
+      queryComposition.resolveFieldValues({ fields: { X: { default: 1 } } }, null),
+      { X: 1 }
+    );
+  });
+
+  it('resolves field values against template defaults before every buildSql call', () => {
+    assert.match(
+      queryBuilderSrc,
+      /import\s*\{[\s\S]*?resolveFieldValues[\s\S]*?\}\s*from\s*['"]\.\.\/services\/queryComposition\.js\?v=\d+\.\d+\.\d+['"]/,
+      'QueryBuilder must import resolveFieldValues from queryComposition'
+    );
+    assert.doesNotMatch(
+      queryBuilderSrc,
+      /buildSql\(fieldValues\)/,
+      'buildSql must never be handed raw fieldValues'
+    );
+    // The runQuery site and the live SQL preview both resolve first.
+    assert.match(
+      queryBuilderSrc,
+      /buildSql\(resolveFieldValues\(selectedTemplate,\s*fieldValues\)\)/,
+      'the runQuery buildSql call must resolve field values against the template first'
+    );
+    assert.match(
+      queryBuilderSrc,
+      /const\s+currentSql\s*=\s*selectedTemplate\s*\?\s*selectedTemplate\.buildSql\(resolveFieldValues\(selectedTemplate,\s*fieldValues\)\)\s*:\s*''/,
+      'the render-time SQL preview must resolve field values against the template first'
+    );
+  });
+});
+
 describe('query composition deployment', () => {
   it('pre-caches the shared query module for local and deployed paths', () => {
     assert.match(serviceWorkerSrc, /['"]\/frontend\/services\/queryComposition\.js['"]/);

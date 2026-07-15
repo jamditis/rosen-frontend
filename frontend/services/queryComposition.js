@@ -88,6 +88,40 @@ export function templateIsComposable(template) {
 }
 
 /**
+ * Resolve a template's field values against its declared defaults so a caller can
+ * build SQL without tripping over an unset field.
+ *
+ * QueryBuilder keeps fieldValues in React state that an effect repopulates only
+ * after a template switch has rendered. On the render between the switch and that
+ * effect, fieldValues still carries the previous template's keys, so the newly
+ * selected template's fields are missing. A template whose buildSql dereferences a
+ * text field (values.SEARCH_TERM.replace(...)) then throws during render and blanks
+ * the whole app (issue #525). Resolving here fills every field the template
+ * declares -- the caller's value when present, the field default otherwise -- and
+ * returns only those fields, dropping stale keys left over from a prior template.
+ * It mirrors the `values[part] ?? field.default` fallback the query sentence UI
+ * already uses, so the built SQL matches the sentence the user sees.
+ *
+ * Nullish coalescing is deliberate: an empty string or a 0 the user entered is a
+ * real value and is kept; only null/undefined falls back to the default.
+ *
+ * @param {{fields?: Record<string, {default?: unknown}>} | null | undefined} template
+ * @param {Record<string, unknown> | null | undefined} values
+ * @returns {Record<string, unknown>}
+ */
+export function resolveFieldValues(template, values) {
+  const fields = template && typeof template === 'object' && template.fields
+    ? template.fields
+    : {};
+  const source = values && typeof values === 'object' ? values : {};
+  const resolved = {};
+  for (const [key, field] of Object.entries(fields)) {
+    resolved[key] = source[key] ?? (field ? field.default : undefined);
+  }
+  return resolved;
+}
+
+/**
  * Narrow an archive record array to the records named by recordIds, preserving
  * the input array's existing order and sort.
  *
