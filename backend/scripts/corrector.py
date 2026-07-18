@@ -18,6 +18,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Protocol
+from urllib.parse import urlparse
 
 try:
     from .corrector_range import RowRange, parse_row_range
@@ -39,6 +40,20 @@ _MARKER_STEM = SMART_CORRECTOR_MARKER.rstrip(":")  # marker text without its col
 # ("Smart Corrector::" -> "Smart Corrector:"), which at a line start forges a note
 # boundary; matching ":+" removes every colon so no marker can survive in the body.
 _MARKER_ECHO_RE = re.compile(re.escape(_MARKER_STEM) + r":+")
+
+
+def resolve_and_validate(url: str):
+    """Load URL safety lazily so checkout-local CLI help remains available."""
+    from rosen_scraper.url_safety import resolve_and_validate as validate
+
+    return validate(url)
+
+
+def pinned_resolution(host: str | None, ips: list[str]):
+    """Return the URL-safety pin without importing the package at CLI startup."""
+    from rosen_scraper.url_safety import pinned_resolution as pin
+
+    return pin(host, ips)
 # Only the consolidated corrector writes a "Complete -" status, and it writes that
 # note in the SAME batch_update as the AI-field values (see run_corrector), so a
 # "Complete -" note is proof the AI fields landed. The retired drivers wrote
@@ -202,7 +217,12 @@ def run_corrector(
             stats["skipped"] += 1
             continue
 
-        content_type = detector(url)
+        try:
+            content_type = detector(url)
+        except ValueError:
+            # A malformed URL still permits analysis of valid cached text. If the
+            # row needs a fetch, the safety guard below rejects it before dispatch.
+            content_type = "article"
         existing_raw_text = str(record.get("raw_text") or "")
         is_valid, quality_score, _issues = _validate(
             validator, existing_raw_text, url, content_type
@@ -214,6 +234,21 @@ def run_corrector(
         if is_valid and quality_score >= 0.7:
             result_message = f"Used cached text (Q:{quality_score:.2f})"
         else:
+            safe, reason, validated_ips = resolve_and_validate(url)
+            if not safe:
+                note = _note(f"Failed - Unsafe URL: {reason}"[:70])
+                stats["errors"] += 1
+                if _write_row(
+                    worksheet,
+                    row_number,
+                    [(columns["notes"], note)],
+                    dry_run=dry_run,
+                ):
+                    stats["processed"] += 1
+                else:
+                    stats["write_errors"] += 1
+                continue
+
             processor_cost = None
             if (
                 cost_tracker is not None
@@ -238,7 +273,12 @@ def run_corrector(
                     stats=stats,
                 ):
                     break
-            result = _run_processor(processors, content_type, url)
+            result = _run_processor(
+                processors,
+                content_type,
+                url,
+                validated_ips=validated_ips,
+            )
             if processor_cost is not None:
                 _record_cost(
                     cost_tracker,
@@ -470,30 +510,51 @@ def _validate(
 
 
 def _run_processor(
-    processors: Mapping[str, Processor], content_type: str, url: str
+    processors: Mapping[str, Processor],
+    content_type: str,
+    url: str,
+    *,
+    validated_ips: list[str] | None = None,
 ) -> Mapping[str, Any] | None:
+    if validated_ips is None:
+        safe, reason, validated_ips = resolve_and_validate(url)
+        if not safe:
+            return {"status": "failed", "error": f"Unsafe URL: {reason}"}
+
     processor_name = _processor_name(content_type, url)
     processor = processors.get(processor_name) or processors.get("default")
     if processor is None:
         return None
     try:
-        return processor(url)
+        host = urlparse(url).hostname
+        # Only provider-owned hosts selected by _processor_name reach the legacy
+        # specialized processors. Arbitrary public hosts use the default scraper,
+        # whose requests and Chromium paths validate every redirect/subrequest.
+        # Pin the provider's initial connection here to close the remaining DNS
+        # check-to-use window without weakening that stricter default path.
+        with pinned_resolution(host, validated_ips):
+            return processor(url)
     except Exception as exc:
         return {"status": "failed", "error": str(exc)}
 
 
 def _processor_name(content_type: str, url: str) -> str:
-    lowered_url = url.lower()
-    if content_type == "audio" and "soundcloud" in lowered_url:
+    try:
+        host = (urlparse(url).hostname or "").lower().rstrip(".")
+    except ValueError:
+        return "default"
+
+    def is_host(*domains: str) -> bool:
+        return any(host == domain or host.endswith(f".{domain}") for domain in domains)
+
+    if content_type == "audio" and is_host("soundcloud.com"):
         return "soundcloud"
     if content_type == "video":
-        if "youtube" in lowered_url or "youtu.be" in lowered_url:
+        if is_host("youtube.com", "youtu.be"):
             return "youtube"
-        if "c-span" in lowered_url:
+        if is_host("c-span.org"):
             return "cspan"
-    if content_type == "social" and (
-        "twitter.com" in lowered_url or "x.com" in lowered_url
-    ):
+    if content_type == "social" and is_host("twitter.com", "x.com"):
         return "twitter"
     return "default"
 

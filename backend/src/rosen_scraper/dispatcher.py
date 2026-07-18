@@ -7,6 +7,7 @@ handler (e.g., for video, articles, etc.).
 
 from typing import Optional, Dict, Any
 import re
+from urllib.parse import urlparse
 from rosen_scraper.processors import article_processor, video_processor, base
 from rosen_scraper.processors.twitter_processor import TwitterProcessor
 from rosen_scraper.processors.bluesky_processor import BlueskyProcessor
@@ -31,9 +32,13 @@ def _process_social(
 # the article default stay explicit branches below -- they call module functions
 # with a different return shape.
 _SOCIAL_PROCESSORS = [
-    (re.compile(r"(twitter\.com|x\.com)/.*?/status/"), TwitterProcessor),
-    (re.compile(r"bsky\.app/profile/.*/post/"), BlueskyProcessor),
+    (("twitter.com", "x.com"), re.compile(r"/.+?/status/"), TwitterProcessor),
+    (("bsky.app",), re.compile(r"/profile/.+/post/"), BlueskyProcessor),
 ]
+
+
+def _host_matches(host: str, *domains: str) -> bool:
+    return any(host == domain or host.endswith(f".{domain}") for domain in domains)
 
 
 def dispatch_url(url: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
@@ -51,15 +56,22 @@ def dispatch_url(url: str, schema: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     Returns:
         dict: A dictionary containing the processed data, or None if an error occurs.
     """
+    try:
+        parsed = urlparse(url)
+        host = (parsed.hostname or "").lower().rstrip(".")
+    except ValueError:
+        host = ""
+        parsed = urlparse("")
+
     # YouTube videos
-    if re.search(r"(youtube\.com|youtu\.be)", url):
+    if _host_matches(host, "youtube.com", "youtu.be"):
         return video_processor.process_video(url, schema)
 
     # Twitter/X and Bluesky posts: class-based processors that return a status
     # envelope. Their dispatch is shared in _process_social; the table preserves
     # the original branch order (Twitter before Bluesky).
-    for pattern, processor_class in _SOCIAL_PROCESSORS:
-        if pattern.search(url):
+    for domains, path_pattern, processor_class in _SOCIAL_PROCESSORS:
+        if _host_matches(host, *domains) and path_pattern.search(parsed.path):
             return _process_social(processor_class(), url, schema)
 
     # Default path. The article cascade (URL Context -> trafilatura ->

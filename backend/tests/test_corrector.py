@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import os
 import re
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -14,6 +16,8 @@ from scripts.corrector import (
     RuntimeDependencies,
     _note,
     _notes_indicate_completion,
+    _processor_name,
+    _run_processor,
     build_parser,
     main,
     run_corrector,
@@ -97,6 +101,15 @@ def valid_content(raw_text, url, content_type):
 
 def article_content(url):
     return "article"
+
+
+@pytest.fixture(autouse=True)
+def treat_test_urls_as_public(monkeypatch):
+    """Keep credential-free processor tests independent of live DNS."""
+    monkeypatch.setattr(
+        "scripts.corrector.resolve_and_validate",
+        lambda url: (True, "ok", ["93.184.216.34"]),
+    )
 
 
 def make_records(count):
@@ -471,6 +484,91 @@ def test_invalid_source_routes_to_the_injected_processor(
     )
 
     assert processor_calls == [url]
+
+
+@pytest.mark.parametrize(
+    "content_type, url",
+    [
+        ("audio", "http://127.0.0.1/?soundcloud.com"),
+        ("video", "http://169.254.169.254/latest/meta-data/?youtube.com"),
+        ("video", "http://localhost:8080/admin#c-span.org"),
+        ("social", "http://10.0.0.1/?twitter.com"),
+        ("audio", "https://soundcloud.com.attacker.example/track"),
+    ],
+)
+def test_processor_dispatch_uses_the_url_host_not_query_or_fragment(content_type, url):
+    assert _processor_name(content_type, url) == "default"
+
+
+def test_run_processor_rejects_unsafe_url_before_calling_processor(monkeypatch):
+    monkeypatch.setattr(
+        "scripts.corrector.resolve_and_validate",
+        lambda url: (False, "host is not a public address", []),
+    )
+
+    result = _run_processor(
+        {"default": lambda url: pytest.fail("unsafe URL reached processor")},
+        "article",
+        "http://127.0.0.1/admin",
+    )
+
+    assert result == {
+        "status": "failed",
+        "error": "Unsafe URL: host is not a public address",
+    }
+
+
+def test_run_rejects_malformed_url_before_detection_or_cost(monkeypatch):
+    worksheet = FakeWorksheet(make_records(1))
+    worksheet.records[0]["url"] = "http://[::1"
+    cost_tracker = FakeCostTracker(max_budget=1.0, processor_cost=0.5)
+    monkeypatch.setattr(
+        "scripts.corrector.resolve_and_validate",
+        lambda url: (False, "URL could not be parsed", []),
+    )
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: pytest.fail("categorizer was called"),
+        processors={"default": lambda url: pytest.fail("processor was called")},
+        detector=lambda url: (_ for _ in ()).throw(ValueError("bad URL")),
+        validator=lambda raw_text, url, content_type: (False, 0.0, ["invalid"]),
+        schema={},
+        dry_run=False,
+        cost_tracker=cost_tracker,
+    )
+
+    assert cost_tracker.operations == []
+    assert stats["processed"] == 1
+    assert stats["errors"] == 1
+    assert "Failed - Unsafe URL: URL could not be parsed" in worksheet.batch_calls[
+        0
+    ][0]["values"][0][0]
+
+
+def test_cached_content_does_not_require_url_resolution(monkeypatch):
+    worksheet = FakeWorksheet(make_records(1))
+    worksheet.records[0]["url"] = "https://retired-host.example/article"
+    monkeypatch.setattr(
+        "scripts.corrector.resolve_and_validate",
+        lambda url: (False, "host could not be resolved", []),
+    )
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: {"summary": "Cached summary"},
+        processors={"default": lambda url: pytest.fail("processor was called")},
+        detector=article_content,
+        validator=valid_content,
+        schema={},
+        dry_run=False,
+    )
+
+    assert stats["processed"] == 1
+    assert stats["cached"] == 1
+    assert stats["errors"] == 0
 
 
 def test_resume_retries_a_leading_failed_row():
@@ -1436,6 +1534,32 @@ def test_legacy_corrector_driver_is_a_credential_free_shim(script_name, default_
     assert default_call in source
     assert "gspread" not in source
     assert "Credentials" not in source
+
+
+@pytest.mark.parametrize(
+    "script_name",
+    [
+        "corrector.py",
+        "run_smart_corrector.py",
+        "run_smart_corrector_25.py",
+        "run_smart_corrector_27_42.py",
+        "run_smart_corrector_200.py",
+        "run_smart_corrector_201_plus.py",
+    ],
+)
+def test_corrector_scripts_show_help_without_an_installed_package(script_name):
+    backend_dir = Path(__file__).resolve().parents[1]
+    result = subprocess.run(
+        [sys.executable, "-S", f"scripts/{script_name}", "--help"],
+        cwd=backend_dir,
+        env={**os.environ, "PYTHONPATH": ""},
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert "usage:" in result.stdout
 
 
 def _drive_main_capturing_selected_rows(argv, record_count, **main_kwargs):
