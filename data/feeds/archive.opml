@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen&apos;s Internet Archive</title>
-    <dateCreated>Wed, 15 Jul 2026 14:40:21 GMT</dateCreated>
-    <dateModified>Wed, 15 Jul 2026 14:40:21 GMT</dateModified>
+    <dateCreated>Sat, 18 Jul 2026 19:23:51 GMT</dateCreated>
+    <dateModified>Sat, 18 Jul 2026 19:23:51 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -328,6 +328,7 @@
         <outline text="The plan is to have no plan" type="link" url="https://www.adbusters.org/article/the-plan-is-to-have-no-plan" created="2020-05-04"/>
       </outline>
       <outline text="Platform Transition &amp; Future Models (2021-Present)" type="category">
+        <outline text="Why The Ubyssey is covering the World Cup" type="link" url="https://ubyssey.ca/margins/world-cup-coverage/" created="2026-07-15"/>
         <outline text="Jay Rosen&apos;s Internet Archive: an Introduction." type="link" url="https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/" created="2026-07-05"/>
         <outline text="It was a political hire, cont..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohf75js3k2j" created="2026-06-17"/>
         <outline text="it&apos;s not a typo, it&apos;s supposed to be an abbreviated form of continued." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohfytcl5s22" created="2026-06-17"/>
@@ -390,11 +391,11 @@ Bari Weiss had no experience when she was hired a..." type="link" url="https://b
         <outline text="Thanks, Jim." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmtvjxpp7c2k" created="2026-05-27"/>
         <outline text="Thank you, Mai." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmu5kstg7c23" created="2026-05-27"/>
         <outline text="Here&apos;s the letter: &quot;We are current and former journalists, professors..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmu5wufgmc23" created="2026-05-27"/>
-        <outline text="Imagine if journalism had a moment like that..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmmfzkhpoc2e" created="2026-05-24"/>
       </outline>
     </outline>
     <outline text="By Category">
-      <outline text="Press &amp; Media Criticism (23483)" type="category">
+      <outline text="Press &amp; Media Criticism (23484)" type="category">
+        <outline text="Why The Ubyssey is covering the World Cup" type="link" url="https://ubyssey.ca/margins/world-cup-coverage/"/>
         <outline text="Jay Rosen&apos;s Internet Archive: an Introduction." type="link" url="https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/"/>
         <outline text="It was a political hire, cont..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohf75js3k2j"/>
         <outline text="it&apos;s not a typo, it&apos;s supposed to be an abbreviated form of continued." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohfytcl5s22"/>
@@ -423,9 +424,9 @@ Bari Weiss had no experience when she was hired a..." type="link" url="https://b
         <outline text="&quot;CBS News is on fire.&quot;
 
 Scott Pelley answers questions..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnplqvqnk22g"/>
-        <outline text="If Scott Pelley keeps up with &quot;CBS News is on fire&quot; and new management..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnpv2dhp2c2z"/>
       </outline>
-      <outline text="Journalism Theory &amp; Practice (8346)" type="category">
+      <outline text="Journalism Theory &amp; Practice (8347)" type="category">
+        <outline text="Why The Ubyssey is covering the World Cup" type="link" url="https://ubyssey.ca/margins/world-cup-coverage/"/>
         <outline text="Finally..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mog4ns5tvk22"/>
         <outline text="One thing to keep your eye on as Paramount takes control:  what happen..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3modgj3bfys2l"/>
         <outline text="The post says keep an eye on what happens to fact checking at CNN." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3modin76wac22"/>
@@ -450,7 +451,6 @@ Scott Pelley answers questions..." type="link" url="https://bsky.app/profile/jay
         <outline text="Public journalism redux: Post-academia, Jay Rosen returns to where he started" type="link" url="https://dankennedy.net/2025/10/16/public-journalism-redux-post-academia-jay-rosen-returns-to-where-he-started/"/>
         <outline text="This is a very good paragraph" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3bm3dbqps2n"/>
         <outline text="I agree with that" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3aq4v2qes25"/>
-        <outline text="Fair question" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3apoxbkzk25"/>
       </outline>
       <outline text="Politics &amp; Democracy (7687)" type="category">
         <outline text="It was a political hire, cont..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohf75js3k2j"/>
@@ -485,7 +485,8 @@ Bari Weiss had no experience when she was hired a..." type="link" url="https://b
         <outline text="After initially appearing to come out against the rules, Donald Trump seemed to..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3bk7tcxik2u"/>
         <outline text="First, I am happy to share a similar ranking from those with a different POV—..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m375ykxdoc2h"/>
       </outline>
-      <outline text="Audience &amp; Public Engagement (3744)" type="category">
+      <outline text="Audience &amp; Public Engagement (3745)" type="category">
+        <outline text="Why The Ubyssey is covering the World Cup" type="link" url="https://ubyssey.ca/margins/world-cup-coverage/"/>
         <outline text="en.wikipedia.org/wiki/Public_..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnfdxeu7tk2i"/>
         <outline text="Wow..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmw74eltqs2f"/>
         <outline text="Subscribers buy a product. Members join the cause." type="link" url="https://pressthink.org/2026/04/subscribers-buy-a-product-members-join-the-cause/"/>
@@ -510,7 +511,6 @@ Bari Weiss had no experience when she was hired a..." type="link" url="https://b
         <outline text="Thanks, Erik" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2x5cuspvs2c"/>
         <outline text="Thanks, Zack" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2wzdqghik2c"/>
         <outline text="Thanks, Lora" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2wyfzxrxk2c"/>
-        <outline text="Ahead of where we are at the moment, but, yes, that solution comes up lot in..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2wyegf7m22c"/>
       </outline>
       <outline text="Technology &amp; Digital Media (2851)" type="category">
         <outline text="Jay Rosen&apos;s Internet Archive: an Introduction." type="link" url="https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/"/>

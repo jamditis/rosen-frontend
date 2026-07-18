@@ -5,9 +5,19 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records in the &quot;Journalism Theory &amp; Practice&quot; category</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 15 Jul 2026 14:40:21 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 18 Jul 2026 19:23:51 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-theory-practice.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
+  <item>
+    <title>Why The Ubyssey is covering the World Cup</title>
+    <link>https://ubyssey.ca/margins/world-cup-coverage/</link>
+    <guid isPermaLink="true">https://ubyssey.ca/margins/world-cup-coverage/</guid>
+    <pubDate>Wed, 15 Jul 2026 00:00:00 GMT</pubDate>
+    <description>The Ubyssey sports editor Caleb Peterson applies Jay Rosen’s concept of “awayness” to the newspaper’s decision to cover the 2026 FIFA World Cup. Peterson argues that simply reporting events readers can already watch or find elsewhere does not solve an awayness problem; the publication instead has to add value through beat expertise, analysis and trusted voices.</description>
+    <category>Journalism Theory &amp; Practice</category>
+    <category>Press &amp; Media Criticism</category>
+    <category>Audience &amp; Public Engagement</category>
+  </item>
   <item>
     <title>Finally...</title>
     <link>https://bsky.app/profile/jayrosen.bsky.social/post/3mog4ns5tvk22</link>
@@ -453,17 +463,6 @@
     <pubDate>Thu, 09 Oct 2025 00:00:00 GMT</pubDate>
     <description>A Twitter/X post by Jay Rosen from 2025-10-09. Topics: Press &amp; Media Criticism, Journalism Theory &amp; Practice.</description>
     <category>Press &amp; Media Criticism</category>
-    <category>Journalism Theory &amp; Practice</category>
-  </item>
-  <item>
-    <title>News Consumers are Content Creators in an AI-Driven World</title>
-    <link>https://newscreatorcorps.org/2025/10/news-consumers-content-creators/</link>
-    <guid isPermaLink="true">https://newscreatorcorps.org/2025/10/news-consumers-content-creators/</guid>
-    <pubDate>Wed, 08 Oct 2025 00:00:00 GMT</pubDate>
-    <description>The lines between news consumers and content creators are fading because of artificial intelligence. This shift began with the rise of the internet, social media, and smartphones, leading to participatory journalism and citizen reporting. AI tools now amplify this trend, providing automated content generation, media editing, and personalized curation, along with potential for fact-checking. Consumers are also curators and gatekeepers, influencing the visibility of information through their interactions. This new reality brings responsibilities, including combating misinformation, understanding AI&apos;s role, and promoting media literacy. The future of news involves active consumer participation, offering opportunities for a diverse information landscape alongside challenges in maintaining accuracy.
-</description>
-    <category>Technology &amp; Digital Media</category>
-    <category>Audience &amp; Public Engagement</category>
     <category>Journalism Theory &amp; Practice</category>
   </item>
   </channel>

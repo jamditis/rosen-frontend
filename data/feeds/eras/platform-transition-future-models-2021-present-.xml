@@ -5,9 +5,19 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records from the Platform Transition &amp; Future Models (2021-Present) era</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 15 Jul 2026 14:40:21 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 18 Jul 2026 19:23:51 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/eras/platform-transition-future-models-2021-present-.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
+  <item>
+    <title>Why The Ubyssey is covering the World Cup</title>
+    <link>https://ubyssey.ca/margins/world-cup-coverage/</link>
+    <guid isPermaLink="true">https://ubyssey.ca/margins/world-cup-coverage/</guid>
+    <pubDate>Wed, 15 Jul 2026 00:00:00 GMT</pubDate>
+    <description>The Ubyssey sports editor Caleb Peterson applies Jay Rosen’s concept of “awayness” to the newspaper’s decision to cover the 2026 FIFA World Cup. Peterson argues that simply reporting events readers can already watch or find elsewhere does not solve an awayness problem; the publication instead has to add value through beat expertise, analysis and trusted voices.</description>
+    <category>Journalism Theory &amp; Practice</category>
+    <category>Press &amp; Media Criticism</category>
+    <category>Audience &amp; Public Engagement</category>
+  </item>
   <item>
     <title>Jay Rosen&apos;s Internet Archive: an Introduction.</title>
     <link>https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/</link>
@@ -445,14 +455,6 @@ Bari Weiss had no experience when she was hired a...</title>
     <category>Press &amp; Media Criticism</category>
     <category>Politics &amp; Democracy</category>
     <category>Technology &amp; Digital Media</category>
-  </item>
-  <item>
-    <title>Imagine if journalism had a moment like that...</title>
-    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3mmmfzkhpoc2e</link>
-    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3mmmfzkhpoc2e</guid>
-    <pubDate>Sun, 24 May 2026 00:00:00 GMT</pubDate>
-    <description>A Bluesky post by Jay Rosen from 2026-05-24.</description>
-
   </item>
   </channel>
 </rss>

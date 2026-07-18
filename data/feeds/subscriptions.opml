@@ -2,18 +2,18 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen's Internet Archive - RSS Subscriptions</title>
-    <dateCreated>Wed, 15 Jul 2026 14:40:21 GMT</dateCreated>
+    <dateCreated>Sat, 18 Jul 2026 19:23:51 GMT</dateCreated>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
   <body>
     <outline text="Rss" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/rss.xml"/>
     <outline text="Articles" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/articles.xml"/>
+    <outline text="Categories: Journalism theory practice" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-theory-practice.xml"/>
     <outline text="Categories: Press media criticism" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/categories/press-media-criticism.xml"/>
+    <outline text="Categories: Audience public engagement" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/categories/audience-public-engagement.xml"/>
     <outline text="Categories: Technology digital media" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/categories/technology-digital-media.xml"/>
     <outline text="Categories: Politics democracy" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/categories/politics-democracy.xml"/>
-    <outline text="Categories: Journalism theory practice" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-theory-practice.xml"/>
     <outline text="Categories: Journalism education" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-education.xml"/>
-    <outline text="Categories: Audience public engagement" type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/categories/audience-public-engagement.xml"/>
     <outline text="Eras: Platform transition future models 2021 present " type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/eras/platform-transition-future-models-2021-present-.xml"/>
     <outline text="Eras: Democracy in crisis 20s " type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/eras/democracy-in-crisis-20s-.xml"/>
     <outline text="Eras: Trump era democratic crisis 2016 2020 " type="rss" xmlUrl="https://pressthink.org/j/rosen-archive/data/feeds/eras/trump-era-democratic-crisis-2016-2020-.xml"/>

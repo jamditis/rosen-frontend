@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { html } from '../html.js?v=3.7.2';
+import { html } from '../html.js?v=3.7.3';
 import { Sparkles, X } from 'lucide-react';
 
 const BANNER_DISMISSED_KEY = 'jrda_announce_banner_dismissed';
