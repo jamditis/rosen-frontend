@@ -26,6 +26,7 @@ import EntityBrowser from './components/EntityBrowser.js?v=3.7.3';
 import Timeline from './components/Timeline.js?v=3.7.3';
 import AboutPage from './components/AboutPage.js?v=3.7.3';
 import WikiPage from './components/WikiPage.js?v=3.7.3';
+import StartHerePage from './components/StartHerePage.js?v=3.7.3';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
@@ -149,7 +150,9 @@ const App = () => {
 
   // Tool selection handler
   const handleToolSelect = useCallback((action) => {
-    if (action === 'mindmap') {
+    if (action === 'start') {
+      navigateTo(ROUTES.start);
+    } else if (action === 'mindmap') {
       navigateTo(ROUTES.dissertation);
     } else if (action === 'entities') {
       navigateTo(ROUTES.entities);
@@ -390,22 +393,61 @@ const App = () => {
     (filters.type ? 1 : 0) +
     (filters.recordIds !== null ? 1 : 0);
 
-  // Full-page routes: dissertation, about, analytics
+  // Keep global overlays mounted on full-page routes. Returning a page directly
+  // here used to strand any full-page action that opened the bug report modal,
+  // because the modal only existed in the archive shell below.
+  const renderFullPage = (page) => html`
+    <div className="min-h-screen flex flex-col">
+      ${page}
+      <${BugReportModal}
+        isOpen=${bugReportOpen}
+        onClose=${() => setBugReportOpen(false)}
+        endpoint=${REPORT_CONFIG.endpoint}
+      />
+    </div>
+  `;
+
+  // Full-page routes: Start Here, dissertation, about, analytics
+  if (currentRoute === ROUTES.start) {
+    const handleStartRecordSelect = (recordOrId) => {
+      const id = typeof recordOrId === 'string' ? recordOrId : recordOrId?.id;
+      if (!id || !records.some(record => record.id === id)) return;
+      navigateTo(ROUTES.archive, id);
+      selectRecord(id);
+    };
+
+    return renderFullPage(html`
+      <${StartHerePage}
+        onBack=${() => goTo(ROUTES.archive)}
+        records=${records}
+        onNavigate=${goTo}
+        onOpenBugReport=${() => setBugReportOpen(true)}
+        onSelectRecord=${handleStartRecordSelect}
+      />
+    `);
+  }
+
   if (currentRoute === ROUTES.dissertation) {
-    return html`<${DissertationPage} onBack=${() => goTo(ROUTES.archive)} />`;
+    return renderFullPage(html`<${DissertationPage} onBack=${() => goTo(ROUTES.archive)} />`);
   }
 
   if (currentRoute === ROUTES.about) {
-    return html`<${AboutPage} onBack=${() => goTo(ROUTES.archive)} records=${records} />`;
+    return renderFullPage(html`
+      <${AboutPage}
+        onBack=${() => goTo(ROUTES.archive)}
+        onStart=${() => goTo(ROUTES.start)}
+        records=${records}
+      />
+    `);
   }
 
   if (isAnalytics) {
-    return html`
+    return renderFullPage(html`
       <${AnalyticsDashboard}
         onBack=${() => goTo(ROUTES.archive)}
         onRecordResults=${handleQueryResults}
       />
-    `;
+    `);
   }
 
   // Shared fail-loud panel for the record-backed routes. fetchCoreData throws
@@ -428,7 +470,7 @@ const App = () => {
 
   return html`
     <div className="min-h-screen flex flex-col">
-      <${WelcomeModal} />
+      <${WelcomeModal} onStart=${() => goTo(ROUTES.start)} />
 
       <${ToolsModal}
         isOpen=${toolsModalOpen}
@@ -810,6 +852,7 @@ const App = () => {
             <div>
               <h4 className="font-display font-bold text-stone-900 mb-2">Sections</h4>
               <div className="space-y-1 text-xs">
+                <button onClick=${() => goTo(ROUTES.start)} className="block hover:text-stone-900 transition-colors">Start here</button>
                 <button onClick=${() => goTo(ROUTES.archive)} className="block hover:text-stone-900 transition-colors">Browse archive</button>
                 <button onClick=${() => goTo(ROUTES.dissertation)} className="block hover:text-stone-900 transition-colors">Dissertation mind map</button>
                 <button onClick=${() => goTo(ROUTES.entities)} className="block hover:text-stone-900 transition-colors">Entity browser</button>

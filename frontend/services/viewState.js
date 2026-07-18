@@ -19,6 +19,7 @@ import { parseWikiHash, wikiPageHref } from './wikiService.js?v=3.7.3';
 /** Hash route names. The default route renders with no hash at all. */
 export const ROUTES = {
   archive: 'archive',
+  start: 'start',
   folders: 'folders',
   entities: 'entities',
   dissertation: 'dissertation',

@@ -177,6 +177,12 @@ describe('round-trip', () => {
       filters: defaultFilters(),
       selectedRecord: null,
     },
+    'Start Here route': {
+      route: ROUTES.start,
+      routeParams: {},
+      filters: defaultFilters(),
+      selectedRecord: null,
+    },
     'wiki detail route': {
       route: ROUTES.wiki,
       routeParams: { wikiSlug: 'concept/public-journalism' },

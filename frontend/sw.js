@@ -47,6 +47,7 @@ const STATIC_ASSETS = IS_LOCAL ? [
   '/frontend/services/archiveService.js',
   '/frontend/services/idbCache.js',
   '/frontend/services/queryComposition.js',
+  '/frontend/services/tourState.js',
   '/frontend/components/Sidebar.js',
   '/frontend/components/RecordModal.js',
   '/frontend/components/FeaturedSection.js',
@@ -61,6 +62,7 @@ const STATIC_ASSETS = IS_LOCAL ? [
   '/frontend/components/AnalyticsDashboard.js',
   '/frontend/components/QueryBuilder.js',
   '/frontend/components/AboutPage.js',
+  '/frontend/components/StartHerePage.js',
   '/frontend/components/WikiPage.js',
   '/frontend/services/wikiService.js',
   '/frontend/services/sqliteService.js'
@@ -77,6 +79,7 @@ const STATIC_ASSETS = IS_LOCAL ? [
   `${BASE_PATH}/frontend/services/archiveService.js`,
   `${BASE_PATH}/frontend/services/idbCache.js`,
   `${BASE_PATH}/frontend/services/queryComposition.js`,
+  `${BASE_PATH}/frontend/services/tourState.js`,
   `${BASE_PATH}/frontend/components/Sidebar.js`,
   `${BASE_PATH}/frontend/components/RecordModal.js`,
   `${BASE_PATH}/frontend/components/FeaturedSection.js`,
@@ -91,6 +94,7 @@ const STATIC_ASSETS = IS_LOCAL ? [
   `${BASE_PATH}/frontend/components/AnalyticsDashboard.js`,
   `${BASE_PATH}/frontend/components/QueryBuilder.js`,
   `${BASE_PATH}/frontend/components/AboutPage.js`,
+  `${BASE_PATH}/frontend/components/StartHerePage.js`,
   `${BASE_PATH}/frontend/components/WikiPage.js`,
   `${BASE_PATH}/frontend/services/wikiService.js`,
   `${BASE_PATH}/frontend/services/sqliteService.js`
