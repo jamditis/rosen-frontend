@@ -44,7 +44,7 @@ const rootDir = path.join(__dirname, '..');
 // user straight onto a page with the same 404 class.
 const PAGES = [
   { rel: 'dissertation/reader/index.html', favicon: '../../favicon.ico' },
-  { rel: 'dissertation/foreword/index.html', favicon: '../../favicon.ico' },
+  { rel: 'dissertation/foreword/index.html', favicon: '../../favicon.svg' },
   { rel: 'dissertation/network-effect/index.html', favicon: '../../favicon.ico' },
   // The FAQ moved up to the repo root (faq/) in #567 because it now covers the
   // whole archive, not just the dissertation. One level below root, its
@@ -87,5 +87,24 @@ describe('standalone dissertation tools use preview-safe paths (#415)', () => {
         `${page.rel} should load the favicon via ${page.favicon} so local preview finds it`,
       );
     });
+  }
+});
+
+describe('foreword social metadata (#611, #612)', () => {
+  const html = fs.readFileSync(
+    path.join(rootDir, 'dissertation/foreword/index.html'),
+    'utf-8',
+  );
+
+  for (const tag of [
+    'property="og:url"',
+    'property="og:image:width"',
+    'property="og:image:height"',
+    'name="twitter:card"',
+    'name="twitter:title"',
+    'name="twitter:description"',
+    'name="twitter:image"',
+  ]) {
+    it(`declares ${tag}`, () => assert.ok(html.includes(tag)));
   }
 });
