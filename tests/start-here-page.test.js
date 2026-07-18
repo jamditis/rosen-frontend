@@ -71,6 +71,7 @@ describe('Start here page', () => {
   });
 
   it('moves focus on route entry and in-page jumps while respecting reduced motion', () => {
+    assert.match(page, /window\.scrollTo\(\{ top: 0, left: 0, behavior: 'auto' \}\)/);
     assert.match(page, /titleRef\.current\?\.focus\(\{ preventScroll: true \}\)/);
     assert.match(page, /ref=\$\{titleRef\} tabIndex="-1"/);
     assert.match(page, /prefers-reduced-motion: reduce/);
@@ -99,5 +100,6 @@ describe('Start here page', () => {
     assert.match(app, /const renderFullPage = \(page\)/);
     assert.match(app, /<\$\{BugReportModal\}/);
     assert.equal((serviceWorker.match(/StartHerePage\.js/g) || []).length, 2);
+    assert.equal((serviceWorker.match(/tourState\.js/g) || []).length, 2);
   });
 });

@@ -82,6 +82,7 @@ const StartHerePage = ({
   const titleRef = useRef(null);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     titleRef.current?.focus({ preventScroll: true });
   }, []);
 
