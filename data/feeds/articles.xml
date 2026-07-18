@@ -5,9 +5,19 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Articles and essays from Jay Rosen&apos;s journalism scholarship</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 15 Jul 2026 14:40:21 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 18 Jul 2026 19:23:51 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/articles.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
+  <item>
+    <title>Why The Ubyssey is covering the World Cup</title>
+    <link>https://ubyssey.ca/margins/world-cup-coverage/</link>
+    <guid isPermaLink="true">https://ubyssey.ca/margins/world-cup-coverage/</guid>
+    <pubDate>Wed, 15 Jul 2026 00:00:00 GMT</pubDate>
+    <description>The Ubyssey sports editor Caleb Peterson applies Jay Rosen’s concept of “awayness” to the newspaper’s decision to cover the 2026 FIFA World Cup. Peterson argues that simply reporting events readers can already watch or find elsewhere does not solve an awayness problem; the publication instead has to add value through beat expertise, analysis and trusted voices.</description>
+    <category>Journalism Theory &amp; Practice</category>
+    <category>Press &amp; Media Criticism</category>
+    <category>Audience &amp; Public Engagement</category>
+  </item>
   <item>
     <title>Jay Rosen&apos;s Internet Archive: an Introduction.</title>
     <link>https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/</link>
@@ -968,16 +978,6 @@
     <pubDate>Thu, 26 Dec 2019 00:00:00 GMT</pubDate>
     <description>Jay Rosen critiques Chuck Todd&apos;s Rolling Stone interview, where Todd admits naiveté regarding Republican misinformation under the Trump administration. Rosen argues this isn&apos;t naiveté but professional malpractice, highlighting Todd&apos;s influential position and responsibility to understand political dynamics. Rosen contends Todd&apos;s failure stems from willful blindness and a lack of imagination, not a lack of knowledge.</description>
     <category>Politics &amp; Democracy</category>
-    <category>Press &amp; Media Criticism</category>
-  </item>
-  <item>
-    <title>Peabody adds six new members to board of directors</title>
-    <link>https://news.uga.edu/peabody-appoints-six-new-members-to-board/</link>
-    <guid isPermaLink="true">https://news.uga.edu/peabody-appoints-six-new-members-to-board/</guid>
-    <pubDate>Thu, 12 Dec 2019 00:00:00 GMT</pubDate>
-    <description>Peabody Awards has announced new members to its bicoastal board of directors. The new members, representing diverse media organizations and expertise, will provide counsel and advance Peabody&apos;s commitment to outstanding storytelling. The boards are separate from the Peabody Awards jury.</description>
-    <category>Politics &amp; Democracy</category>
-    <category>Technology &amp; Digital Media</category>
     <category>Press &amp; Media Criticism</category>
   </item>
   </channel>

@@ -1,31 +1,31 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.7.2';
+import { html } from './html.js?v=3.7.3';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString, loadSearchIndex } from './services/archiveService.js?v=3.7.2';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.7.2';
-import { withViewTransition } from './utils/viewTransition.js?v=3.7.2';
-import { ITEMS_PER_PAGE, COLORS, REPORT_CONFIG } from './constants.js?v=3.7.2';
-import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.7.2';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.7.2';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.7.2';
-import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.7.2';
-import { sortRecords } from './utils/recordSort.js?v=3.7.2';
-import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.7.2';
-import Sidebar from './components/Sidebar.js?v=3.7.2';
-import WelcomeModal from './components/WelcomeModal.js?v=3.7.2';
-import RecordView from './components/RecordView.js?v=3.7.2';
-import FeaturedSection from './components/FeaturedSection.js?v=3.7.2';
-import DissertationPage from './components/DissertationPage.js?v=3.7.2';
-import ToolsModal from './components/ToolsModal.js?v=3.7.2';
-import BugReportModal from './components/BugReportModal.js?v=3.7.2';
-import LoadingQuotes from './components/LoadingQuotes.js?v=3.7.2';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.7.2';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.7.2';
-import EntityBrowser from './components/EntityBrowser.js?v=3.7.2';
-import Timeline from './components/Timeline.js?v=3.7.2';
-import AboutPage from './components/AboutPage.js?v=3.7.2';
-import WikiPage from './components/WikiPage.js?v=3.7.2';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString, loadSearchIndex } from './services/archiveService.js?v=3.7.3';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.7.3';
+import { withViewTransition } from './utils/viewTransition.js?v=3.7.3';
+import { ITEMS_PER_PAGE, COLORS, REPORT_CONFIG } from './constants.js?v=3.7.3';
+import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.7.3';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.7.3';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.7.3';
+import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.7.3';
+import { sortRecords } from './utils/recordSort.js?v=3.7.3';
+import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.7.3';
+import Sidebar from './components/Sidebar.js?v=3.7.3';
+import WelcomeModal from './components/WelcomeModal.js?v=3.7.3';
+import RecordView from './components/RecordView.js?v=3.7.3';
+import FeaturedSection from './components/FeaturedSection.js?v=3.7.3';
+import DissertationPage from './components/DissertationPage.js?v=3.7.3';
+import ToolsModal from './components/ToolsModal.js?v=3.7.3';
+import BugReportModal from './components/BugReportModal.js?v=3.7.3';
+import LoadingQuotes from './components/LoadingQuotes.js?v=3.7.3';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.7.3';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.7.3';
+import EntityBrowser from './components/EntityBrowser.js?v=3.7.3';
+import Timeline from './components/Timeline.js?v=3.7.3';
+import AboutPage from './components/AboutPage.js?v=3.7.3';
+import WikiPage from './components/WikiPage.js?v=3.7.3';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
