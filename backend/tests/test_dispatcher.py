@@ -36,6 +36,20 @@ class TestDispatcherModule:
         mock_process_video.assert_called_once_with(url, sample_schema)
 
     @patch("rosen_scraper.dispatcher.article_processor.process_article")
+    @patch("rosen_scraper.dispatcher.video_processor.process_video")
+    def test_provider_name_in_query_does_not_select_video(
+        self, mock_process_video, mock_process_article, sample_schema
+    ):
+        url = "https://attacker.example/?youtube.com/watch?v=x"
+        mock_process_article.return_value = {"type": "article"}
+
+        result = dispatcher.dispatch_url(url, sample_schema)
+
+        assert result == {"type": "article"}
+        mock_process_video.assert_not_called()
+        mock_process_article.assert_called_once_with(url, sample_schema)
+
+    @patch("rosen_scraper.dispatcher.article_processor.process_article")
     def test_dispatch_url_article(self, mock_process_article, sample_schema):
         """Test dispatching article URL."""
         url = "https://example.com/article"

@@ -518,6 +518,59 @@ def test_run_processor_rejects_unsafe_url_before_calling_processor(monkeypatch):
     }
 
 
+def test_run_rejects_malformed_url_before_detection_or_cost(monkeypatch):
+    worksheet = FakeWorksheet(make_records(1))
+    worksheet.records[0]["url"] = "http://[::1"
+    cost_tracker = FakeCostTracker(max_budget=1.0, processor_cost=0.5)
+    monkeypatch.setattr(
+        "scripts.corrector.resolve_and_validate",
+        lambda url: (False, "URL could not be parsed", []),
+    )
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: pytest.fail("categorizer was called"),
+        processors={"default": lambda url: pytest.fail("processor was called")},
+        detector=lambda url: (_ for _ in ()).throw(ValueError("bad URL")),
+        validator=lambda raw_text, url, content_type: (False, 0.0, ["invalid"]),
+        schema={},
+        dry_run=False,
+        cost_tracker=cost_tracker,
+    )
+
+    assert cost_tracker.operations == []
+    assert stats["processed"] == 1
+    assert stats["errors"] == 1
+    assert "Failed - Unsafe URL: URL could not be parsed" in worksheet.batch_calls[
+        0
+    ][0]["values"][0][0]
+
+
+def test_cached_content_does_not_require_url_resolution(monkeypatch):
+    worksheet = FakeWorksheet(make_records(1))
+    worksheet.records[0]["url"] = "https://retired-host.example/article"
+    monkeypatch.setattr(
+        "scripts.corrector.resolve_and_validate",
+        lambda url: (False, "host could not be resolved", []),
+    )
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: {"summary": "Cached summary"},
+        processors={"default": lambda url: pytest.fail("processor was called")},
+        detector=article_content,
+        validator=valid_content,
+        schema={},
+        dry_run=False,
+    )
+
+    assert stats["processed"] == 1
+    assert stats["cached"] == 1
+    assert stats["errors"] == 0
+
+
 def test_resume_retries_a_leading_failed_row():
     records = make_records(1)
     records[0]["notes"] = "[2026-01-01 12:00] Smart Corrector: Failed - timeout"

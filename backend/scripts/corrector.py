@@ -217,7 +217,12 @@ def run_corrector(
             stats["skipped"] += 1
             continue
 
-        content_type = detector(url)
+        try:
+            content_type = detector(url)
+        except ValueError:
+            # A malformed URL still permits analysis of valid cached text. If the
+            # row needs a fetch, the safety guard below rejects it before dispatch.
+            content_type = "article"
         existing_raw_text = str(record.get("raw_text") or "")
         is_valid, quality_score, _issues = _validate(
             validator, existing_raw_text, url, content_type
@@ -229,6 +234,21 @@ def run_corrector(
         if is_valid and quality_score >= 0.7:
             result_message = f"Used cached text (Q:{quality_score:.2f})"
         else:
+            safe, reason, validated_ips = resolve_and_validate(url)
+            if not safe:
+                note = _note(f"Failed - Unsafe URL: {reason}"[:70])
+                stats["errors"] += 1
+                if _write_row(
+                    worksheet,
+                    row_number,
+                    [(columns["notes"], note)],
+                    dry_run=dry_run,
+                ):
+                    stats["processed"] += 1
+                else:
+                    stats["write_errors"] += 1
+                continue
+
             processor_cost = None
             if (
                 cost_tracker is not None
@@ -253,7 +273,12 @@ def run_corrector(
                     stats=stats,
                 ):
                     break
-            result = _run_processor(processors, content_type, url)
+            result = _run_processor(
+                processors,
+                content_type,
+                url,
+                validated_ips=validated_ips,
+            )
             if processor_cost is not None:
                 _record_cost(
                     cost_tracker,
@@ -485,11 +510,16 @@ def _validate(
 
 
 def _run_processor(
-    processors: Mapping[str, Processor], content_type: str, url: str
+    processors: Mapping[str, Processor],
+    content_type: str,
+    url: str,
+    *,
+    validated_ips: list[str] | None = None,
 ) -> Mapping[str, Any] | None:
-    safe, reason, validated_ips = resolve_and_validate(url)
-    if not safe:
-        return {"status": "failed", "error": f"Unsafe URL: {reason}"}
+    if validated_ips is None:
+        safe, reason, validated_ips = resolve_and_validate(url)
+        if not safe:
+            return {"status": "failed", "error": f"Unsafe URL: {reason}"}
 
     processor_name = _processor_name(content_type, url)
     processor = processors.get(processor_name) or processors.get("default")
