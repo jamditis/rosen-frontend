@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import os
 import re
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -1479,6 +1481,32 @@ def test_legacy_corrector_driver_is_a_credential_free_shim(script_name, default_
     assert default_call in source
     assert "gspread" not in source
     assert "Credentials" not in source
+
+
+@pytest.mark.parametrize(
+    "script_name",
+    [
+        "corrector.py",
+        "run_smart_corrector.py",
+        "run_smart_corrector_25.py",
+        "run_smart_corrector_27_42.py",
+        "run_smart_corrector_200.py",
+        "run_smart_corrector_201_plus.py",
+    ],
+)
+def test_corrector_scripts_show_help_without_an_installed_package(script_name):
+    backend_dir = Path(__file__).resolve().parents[1]
+    result = subprocess.run(
+        [sys.executable, "-S", f"scripts/{script_name}", "--help"],
+        cwd=backend_dir,
+        env={**os.environ, "PYTHONPATH": ""},
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert "usage:" in result.stdout
 
 
 def _drive_main_capturing_selected_rows(argv, record_count, **main_kwargs):

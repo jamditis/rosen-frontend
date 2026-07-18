@@ -20,8 +20,6 @@ from pathlib import Path
 from typing import Any, Protocol
 from urllib.parse import urlparse
 
-from rosen_scraper.url_safety import pinned_resolution, resolve_and_validate
-
 try:
     from .corrector_range import RowRange, parse_row_range
 except ImportError:  # pragma: no cover - supports direct script imports
@@ -42,6 +40,20 @@ _MARKER_STEM = SMART_CORRECTOR_MARKER.rstrip(":")  # marker text without its col
 # ("Smart Corrector::" -> "Smart Corrector:"), which at a line start forges a note
 # boundary; matching ":+" removes every colon so no marker can survive in the body.
 _MARKER_ECHO_RE = re.compile(re.escape(_MARKER_STEM) + r":+")
+
+
+def resolve_and_validate(url: str):
+    """Load URL safety lazily so checkout-local CLI help remains available."""
+    from rosen_scraper.url_safety import resolve_and_validate as validate
+
+    return validate(url)
+
+
+def pinned_resolution(host: str | None, ips: list[str]):
+    """Return the URL-safety pin without importing the package at CLI startup."""
+    from rosen_scraper.url_safety import pinned_resolution as pin
+
+    return pin(host, ips)
 # Only the consolidated corrector writes a "Complete -" status, and it writes that
 # note in the SAME batch_update as the AI-field values (see run_corrector), so a
 # "Complete -" note is proof the AI fields landed. The retired drivers wrote
