@@ -18,6 +18,9 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Protocol
+from urllib.parse import urlparse
+
+from rosen_scraper.url_safety import pinned_resolution, resolve_and_validate
 
 try:
     from .corrector_range import RowRange, parse_row_range
@@ -472,28 +475,44 @@ def _validate(
 def _run_processor(
     processors: Mapping[str, Processor], content_type: str, url: str
 ) -> Mapping[str, Any] | None:
+    safe, reason, validated_ips = resolve_and_validate(url)
+    if not safe:
+        return {"status": "failed", "error": f"Unsafe URL: {reason}"}
+
     processor_name = _processor_name(content_type, url)
     processor = processors.get(processor_name) or processors.get("default")
     if processor is None:
         return None
     try:
-        return processor(url)
+        host = urlparse(url).hostname
+        # Only provider-owned hosts selected by _processor_name reach the legacy
+        # specialized processors. Arbitrary public hosts use the default scraper,
+        # whose requests and Chromium paths validate every redirect/subrequest.
+        # Pin the provider's initial connection here to close the remaining DNS
+        # check-to-use window without weakening that stricter default path.
+        with pinned_resolution(host, validated_ips):
+            return processor(url)
     except Exception as exc:
         return {"status": "failed", "error": str(exc)}
 
 
 def _processor_name(content_type: str, url: str) -> str:
-    lowered_url = url.lower()
-    if content_type == "audio" and "soundcloud" in lowered_url:
+    try:
+        host = (urlparse(url).hostname or "").lower().rstrip(".")
+    except ValueError:
+        return "default"
+
+    def is_host(*domains: str) -> bool:
+        return any(host == domain or host.endswith(f".{domain}") for domain in domains)
+
+    if content_type == "audio" and is_host("soundcloud.com"):
         return "soundcloud"
     if content_type == "video":
-        if "youtube" in lowered_url or "youtu.be" in lowered_url:
+        if is_host("youtube.com", "youtu.be"):
             return "youtube"
-        if "c-span" in lowered_url:
+        if is_host("c-span.org"):
             return "cspan"
-    if content_type == "social" and (
-        "twitter.com" in lowered_url or "x.com" in lowered_url
-    ):
+    if content_type == "social" and is_host("twitter.com", "x.com"):
         return "twitter"
     return "default"
 

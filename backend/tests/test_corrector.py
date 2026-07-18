@@ -14,6 +14,8 @@ from scripts.corrector import (
     RuntimeDependencies,
     _note,
     _notes_indicate_completion,
+    _processor_name,
+    _run_processor,
     build_parser,
     main,
     run_corrector,
@@ -97,6 +99,15 @@ def valid_content(raw_text, url, content_type):
 
 def article_content(url):
     return "article"
+
+
+@pytest.fixture(autouse=True)
+def treat_test_urls_as_public(monkeypatch):
+    """Keep credential-free processor tests independent of live DNS."""
+    monkeypatch.setattr(
+        "scripts.corrector.resolve_and_validate",
+        lambda url: (True, "ok", ["93.184.216.34"]),
+    )
 
 
 def make_records(count):
@@ -471,6 +482,38 @@ def test_invalid_source_routes_to_the_injected_processor(
     )
 
     assert processor_calls == [url]
+
+
+@pytest.mark.parametrize(
+    "content_type, url",
+    [
+        ("audio", "http://127.0.0.1/?soundcloud.com"),
+        ("video", "http://169.254.169.254/latest/meta-data/?youtube.com"),
+        ("video", "http://localhost:8080/admin#c-span.org"),
+        ("social", "http://10.0.0.1/?twitter.com"),
+        ("audio", "https://soundcloud.com.attacker.example/track"),
+    ],
+)
+def test_processor_dispatch_uses_the_url_host_not_query_or_fragment(content_type, url):
+    assert _processor_name(content_type, url) == "default"
+
+
+def test_run_processor_rejects_unsafe_url_before_calling_processor(monkeypatch):
+    monkeypatch.setattr(
+        "scripts.corrector.resolve_and_validate",
+        lambda url: (False, "host is not a public address", []),
+    )
+
+    result = _run_processor(
+        {"default": lambda url: pytest.fail("unsafe URL reached processor")},
+        "article",
+        "http://127.0.0.1/admin",
+    )
+
+    assert result == {
+        "status": "failed",
+        "error": "Unsafe URL: host is not a public address",
+    }
 
 
 def test_resume_retries_a_leading_failed_row():
