@@ -40,6 +40,7 @@ const NON_RECORD_ROUTES = new Set([
 ]);
 
 const DESKTOP_RECORD_APPS = new Set(['archive', 'folders', 'entities', 'start', 'findings']);
+const DESKTOP_DETAILS_PRELOAD_APPS = new Set(['archive', 'folders']);
 const DESKTOP_GUIDED_SHELL_DESTINATIONS = new Set([
   'archive',
   'folders',
@@ -137,6 +138,11 @@ const App = () => {
     && (
       desktopActiveNeedsRecords
       || desktopOpenAppIds.some((appId) => DESKTOP_RECORD_APPS.has(appId))
+    );
+  const desktopNeedsDetailsPreload = currentRoute === ROUTES.desktop
+    && (
+      DESKTOP_DETAILS_PRELOAD_APPS.has(desktopAppId)
+      || desktopOpenAppIds.some((appId) => DESKTOP_DETAILS_PRELOAD_APPS.has(appId))
     );
 
   // Ref for scrolling to results
@@ -366,7 +372,6 @@ const App = () => {
         setFacets(data.facets);
         setAutocompleteIndex(data.autocompleteIndex);
         setLoading(false);
-        setTimeout(() => preloadDetails(), 1000);
       })
       .catch(err => {
         console.error(err);
@@ -374,6 +379,20 @@ const App = () => {
         setLoading(false);
       });
   }, [currentRoute, desktopAppId, desktopNeedsRecords]);
+
+  // Preserve the standard archive's background full-detail warmup, but keep
+  // the lighter guided and entity desktop surfaces on core data until a
+  // record is actually opened. Archive/Folders opt back in even when they are
+  // restored in a background window. Cancelling the timer when the route or
+  // visible window set changes avoids paying for a surface the visitor left.
+  useEffect(() => {
+    const detailsPreloadEnabled = currentRoute !== ROUTES.desktop
+      || desktopNeedsDetailsPreload;
+    if (!records.length || !detailsPreloadEnabled) return undefined;
+
+    const timer = setTimeout(() => preloadDetails(), 1000);
+    return () => clearTimeout(timer);
+  }, [records.length, currentRoute, desktopNeedsDetailsPreload]);
 
   useEffect(() => {
     const handleScroll = () => {

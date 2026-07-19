@@ -21,6 +21,23 @@ describe('desktop route wiring', () => {
     assert.match(app, /NON_RECORD_ROUTES\.has\(currentRoute\)\s*&&\s*!desktopNeedsRecords\) return/);
   });
 
+  it('defers full details outside desktop Archive and Folders', () => {
+    const app = read('frontend/App.js');
+    const coreLoadEffect = app.slice(
+      app.indexOf('// Load Data'),
+      app.indexOf('// Preserve the standard archive'),
+    );
+
+    assert.match(app, /DESKTOP_DETAILS_PRELOAD_APPS\s*=\s*new Set\(\['archive', 'folders'\]\)/);
+    assert.match(app, /desktopOpenAppIds\.some\(\(appId\) => DESKTOP_DETAILS_PRELOAD_APPS\.has\(appId\)\)/);
+    assert.match(app, /currentRoute !== ROUTES\.desktop\s*\|\| desktopNeedsDetailsPreload/);
+    assert.match(app, /if \(!records\.length \|\| !detailsPreloadEnabled\) return undefined/);
+    assert.match(app, /const timer = setTimeout\(\(\) => preloadDetails\(\), 1000\)/);
+    assert.match(app, /return \(\) => clearTimeout\(timer\)/);
+    assert.doesNotMatch(coreLoadEffect, /preloadDetails/,
+      'the core fetch promise must not unconditionally warm the full details corpus');
+  });
+
   it('keeps desktop-only assets out of standard-route eager loading and service-worker install', () => {
     const app = read('frontend/App.js');
     const index = read('index.html');
@@ -62,9 +79,18 @@ describe('desktop route wiring', () => {
     assert.match(audit, /slug: 'desktop-folders',[\s\S]*url: '\/#desktop\/folders',[\s\S]*verifyStandardExit:[\s\S]*appId: 'folders'/);
     assert.match(audit, /slug: 'desktop-start',[\s\S]*url: '\/#desktop\/start',[\s\S]*verifyStandardExit:[\s\S]*appId: 'start'/);
     assert.match(audit, /slug: 'desktop-findings',[\s\S]*url: '\/#desktop\/findings',[\s\S]*verifyStandardExit:[\s\S]*appId: 'findings'/);
+    assert.match(audit, /slug: 'desktop-start',\s+url: '\/#desktop\/start',\s+archiveDetails: 'forbid'/,
+      'guided desktop routes must permanently reject the full-details warmup');
+    assert.match(audit, /slug: 'desktop-findings',\s+url: '\/#desktop\/findings',\s+archiveDetails: 'forbid'/);
     assert.match(audit, /buttonName: 'Open standard Start here'/,
       'the focused findings view must use its actual standard-view action name');
     assert.match(audit, /slug: 'desktop-entities',[\s\S]*url: '\/#desktop\/entities',[\s\S]*verifyStandardExit:[\s\S]*appId: 'entities'/);
+    assert.match(audit, /slug: 'desktop-entities',\s+url: '\/#desktop\/entities',\s+archiveDetails: 'forbid'/,
+      'entity browsing must load its index without warming every record detail');
+    assert.match(audit, /slug: 'desktop-archive',\s+url: '\/#desktop\/archive',\s+archiveDetails: 'require'/,
+      'the canonical browsing surface must retain its deliberate warmup');
+    assert.match(audit, /archiveDetailsRequests\.length !== 1/,
+      'the browser audit must enforce both the deferral and single-request contracts');
     assert.match(audit, /slug: 'desktop-entity-detail',\s+url: '\/\?entity=P0005#desktop\/entities'/);
     assert.match(audit, /slug: 'desktop-entity-record',[\s\S]*url: '\/\?record=RECORD-00903&entity=P0005#desktop\/entities',[\s\S]*verifyEntityRecordFlow: true/);
     assert.match(audit, /slug: 'desktop-dissertation',[\s\S]*url: '\/#desktop\/dissertation',[\s\S]*verifyStandardExit:[\s\S]*appId: 'dissertation'/);

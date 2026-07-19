@@ -38,15 +38,16 @@ const OUT_DIR = REQUESTED_VIEWPORT
   : OUT_DIR_ROOT;
 
 const ROUTES = [
-  { slug: 'home-archive',       url: '/' },
+  { slug: 'home-archive',       url: '/', archiveDetails: 'require' },
   { slug: 'start-here',         url: '/#start', verifyDesktopEntry: true },
   { slug: 'participate',        url: '/features/participate/' },
-  { slug: 'archive-desktop',    url: '/#desktop', verifyStartPathRoundTrip: true },
-  { slug: 'desktop-start-menu', url: '/#desktop', verifyDesktopStartMenu: true },
+  { slug: 'archive-desktop',    url: '/#desktop', archiveDetails: 'forbid', verifyStartPathRoundTrip: true },
+  { slug: 'desktop-start-menu', url: '/#desktop', archiveDetails: 'forbid', verifyDesktopStartMenu: true },
   { slug: 'desktop-unknown',    url: '/#desktop/not-real' },
   {
     slug: 'desktop-archive',
     url: '/#desktop/archive',
+    archiveDetails: 'require',
     verifyStandardExit: {
       appId: 'archive',
       expectedHash: '',
@@ -57,6 +58,7 @@ const ROUTES = [
   {
     slug: 'desktop-folders',
     url: '/#desktop/folders',
+    archiveDetails: 'require',
     verifyStandardExit: {
       appId: 'folders',
       expectedHash: '#folders',
@@ -67,6 +69,7 @@ const ROUTES = [
   {
     slug: 'desktop-start',
     url: '/#desktop/start',
+    archiveDetails: 'forbid',
     verifyStandardExit: {
       appId: 'start',
       expectedHash: '#start',
@@ -77,6 +80,7 @@ const ROUTES = [
   {
     slug: 'desktop-findings',
     url: '/#desktop/findings',
+    archiveDetails: 'forbid',
     verifyStandardExit: {
       appId: 'findings',
       buttonName: 'Open standard Start here',
@@ -88,6 +92,7 @@ const ROUTES = [
   {
     slug: 'desktop-entities',
     url: '/#desktop/entities',
+    archiveDetails: 'forbid',
     verifyStandardExit: {
       appId: 'entities',
       expectedHash: '#entities',
@@ -95,7 +100,7 @@ const ROUTES = [
       focusLabel: 'Standard entities main after desktop exit',
     },
   },
-  { slug: 'desktop-entity-detail', url: '/?entity=P0005#desktop/entities' },
+  { slug: 'desktop-entity-detail', url: '/?entity=P0005#desktop/entities', archiveDetails: 'forbid' },
   {
     slug: 'desktop-entity-record',
     url: '/?record=RECORD-00903&entity=P0005#desktop/entities',
@@ -254,9 +259,29 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     // layout cannot leak from the previous hash-only route.
     targetUrl.searchParams.set('_audit', `${viewport.name}-${route.slug}`);
   }
-  await page.goto(targetUrl.toString(), { waitUntil: 'networkidle', timeout: 30000 });
-  // Async React render + lazy-loaded sql.js: small extra settle.
-  await page.waitForTimeout(1500);
+  const archiveDetailsRequests = [];
+  const captureArchiveDetails = (request) => {
+    if (new URL(request.url()).pathname.endsWith('/data/archive-details.json')) {
+      archiveDetailsRequests.push(request.url());
+    }
+  };
+  if (route.archiveDetails) page.on('request', captureArchiveDetails);
+  try {
+    await page.goto(targetUrl.toString(), { waitUntil: 'networkidle', timeout: 30000 });
+    // Async React render + lazy-loaded sql.js, plus the intentional 1s details
+    // warmup on standard/Archive/Folder surfaces: small extra settle.
+    await page.waitForTimeout(1500);
+  } finally {
+    if (route.archiveDetails) page.off('request', captureArchiveDetails);
+  }
+  if (route.archiveDetails === 'forbid' && archiveDetailsRequests.length > 0) {
+    throw new Error(`${route.slug} unexpectedly loaded archive-details.json`);
+  }
+  if (route.archiveDetails === 'require' && archiveDetailsRequests.length !== 1) {
+    throw new Error(
+      `${route.slug} loaded archive-details.json ${archiveDetailsRequests.length} times; expected exactly once`,
+    );
+  }
   if (route.verifyDesktopEntry) {
     const sourceUrl = page.url();
     const desktopEntry = page.getByRole('button', { name: 'Explore the archive desktop', exact: true });
