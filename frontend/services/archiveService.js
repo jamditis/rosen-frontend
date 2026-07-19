@@ -562,7 +562,15 @@ export const fetchEntitiesData = async () => {
       return data;
     } catch (error) {
       console.error('Error fetching entities data:', error);
-      return { entities: [], recordEntityMap: {} };
+      // Record details can still fall back to category-based relationships,
+      // so keep returning a shaped payload for that consumer. Carry the
+      // failure explicitly so EntityBrowser can distinguish an outage from a
+      // legitimate empty scope instead of presenting a silent zero-result UI.
+      return {
+        entities: [],
+        recordEntityMap: {},
+        error: 'The entity index could not load. Archive records remain available.',
+      };
     } finally {
       entitiesLoading = false;
     }

@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { html } from '../html.js?v=3.7.5';
-import { Users, Building2, Lightbulb, BookOpen, MapPin, Calendar, Search, ArrowUpDown, ChevronDown, ChevronRight, X, ExternalLink } from 'lucide-react';
+import { Users, Building2, Lightbulb, BookOpen, MapPin, Calendar, Search, ArrowUpDown, ChevronDown, ChevronRight, X, ExternalLink, AlertTriangle, RotateCw } from 'lucide-react';
 import { fetchEntitiesData, getRecordsByEntity } from '../services/archiveService.js?v=3.7.5';
 import { getEntityScope } from '../services/queryComposition.js?v=3.7.5';
 import { COLORS, ENTITY_TYPE_CONFIG } from '../constants.js?v=3.7.5';
@@ -27,6 +27,7 @@ const TYPE_CONFIG = Object.fromEntries(
 const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
   const [entities, setEntities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [selectedType, setSelectedType] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('mentions');
@@ -39,10 +40,20 @@ const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const data = await fetchEntitiesData();
-      if (data && data.entities) {
-        setEntities(data.entities);
-        setRecordEntityMap(data.recordEntityMap || {});
+      setLoadError(null);
+      try {
+        const data = await fetchEntitiesData();
+        if (data?.error) {
+          setLoadError(data.error);
+          setEntities([]);
+          setRecordEntityMap({});
+        } else if (data?.entities) {
+          setEntities(data.entities);
+          setRecordEntityMap(data.recordEntityMap || {});
+        }
+      } catch (error) {
+        console.error('Error loading entity browser:', error);
+        setLoadError('The entity index could not load. Archive records remain available.');
       }
       setLoading(false);
     };
@@ -153,6 +164,27 @@ const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
       <div className="flex flex-col items-center justify-center py-20">
         <div className="animate-spin w-8 h-8 border-2 border-stone-300 border-t-stone-800 rounded-full mb-4"></div>
         <p className="text-stone-500 text-sm font-body">Loading entity data...</p>
+      </div>
+    `;
+  }
+
+  if (loadError) {
+    return html`
+      <div className="flex items-start gap-3 border border-red-300 border-l-4 border-l-red-700 bg-red-50 p-5 text-red-900" role="alert">
+        <${AlertTriangle} className="mt-0.5 h-6 w-6 flex-shrink-0" aria-hidden="true" />
+        <div>
+          <h3 className="font-display text-lg font-bold">Unable to load people and ideas</h3>
+          <p className="mt-1 text-sm leading-relaxed">${loadError}</p>
+          <button
+            type="button"
+            onClick=${() => window.location.reload()}
+            className="mt-4 inline-flex items-center gap-2 border-2 border-red-800 bg-white px-4 py-2 text-sm font-bold text-red-900 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2"
+            style=${{ minHeight: '44px' }}
+          >
+            <${RotateCw} className="h-4 w-4" aria-hidden="true" />
+            Reload page
+          </button>
+        </div>
       </div>
     `;
   }

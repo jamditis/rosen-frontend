@@ -19,6 +19,8 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const appJs = fs.readFileSync(path.join(__dirname, '..', 'frontend', 'App.js'), 'utf-8');
+const archiveServiceJs = fs.readFileSync(path.join(__dirname, '..', 'frontend', 'services', 'archiveService.js'), 'utf-8');
+const entityBrowserJs = fs.readFileSync(path.join(__dirname, '..', 'frontend', 'components', 'EntityBrowser.js'), 'utf-8');
 
 describe('fail-loud error panel is shared across record-backed routes (#369)', () => {
   it('defines a single shared errorPanel keyed on the error state', () => {
@@ -48,5 +50,22 @@ describe('fail-loud error panel is shared across record-backed routes (#369)', (
     assert.notStrictEqual(gridIdx, -1, 'archive grid branch must exist');
     assert.ok(appJs.slice(gridIdx, gridIdx + 200).includes('errorPanel'),
       'the archive grid branch must render the shared errorPanel');
+  });
+});
+
+describe('entity-index failures remain distinct from core-data failures', () => {
+  it('returns a shaped failure that preserves record-modal fallback behavior', () => {
+    assert.match(
+      archiveServiceJs,
+      /return \{\s*entities:\s*\[\],\s*recordEntityMap:\s*\{\},\s*error:\s*'The entity index could not load\./,
+    );
+  });
+
+  it('renders an explicit shared-browser alert instead of an empty entity list', () => {
+    assert.match(entityBrowserJs, /if \(data\?\.error\)[\s\S]*setLoadError\(data\.error\)/);
+    assert.match(entityBrowserJs, /if \(loadError\)[\s\S]*role="alert"/);
+    assert.match(entityBrowserJs, /Unable to load people and ideas/);
+    assert.match(entityBrowserJs, /window\.location\.reload\(\)/);
+    assert.match(entityBrowserJs, /minHeight:\s*'44px'/);
   });
 });
