@@ -339,9 +339,13 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     const desktopUrl = page.url();
     const activeWindow = page.locator(`[data-window-id="${appId}"]`);
 
-    await activeWindow.getByRole('button', { name: buttonName, exact: true }).click();
+    const standardExit = activeWindow.getByRole('button', { name: buttonName, exact: true });
+    await standardExit.focus();
+    await page.keyboard.press('Enter');
     await page.waitForURL((url) => url.hash === expectedHash);
-    await assertFocused(page.locator(focusSelector), focusLabel);
+    const standardFocusTarget = page.locator(focusSelector);
+    await assertFocused(standardFocusTarget, focusLabel);
+    await assertVisibleFocusOutline(standardFocusTarget, focusLabel);
 
     await page.goBack({ waitUntil: 'networkidle' });
     if (page.url() !== desktopUrl) {

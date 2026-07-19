@@ -101,8 +101,10 @@ describe('desktop route wiring', () => {
       'the approved participation path must retain an explicit archive-root exit');
     assert.match(audit, /'Desktop home after participate browser Back'/,
       'browser Back from Participate must reconstruct desktop focus and closed-popup state');
-    assert.match(audit, /buttonName = 'Open standard view'[\s\S]*activeWindow\.getByRole\('button', \{ name: buttonName, exact: true \}\)[\s\S]*page\.url\(\) !== desktopUrl/,
+    assert.match(audit, /buttonName = 'Open standard view'[\s\S]*standardExit\.focus\(\)[\s\S]*keyboard\.press\('Enter'\)[\s\S]*page\.url\(\) !== desktopUrl/,
       'canonical adapter exits must round-trip their exact desktop URL');
+    assert.match(audit, /assertVisibleFocusOutline\(standardFocusTarget, focusLabel\)/,
+      'every keyboard-activated canonical exit must expose a visible destination focus ring');
     assert.match(audit, /`#desktop-window-title-\$\{appId\}`/,
       'Back from standard view must restore focus to the active desktop window');
     assert.match(audit, /assertArchiveRootReturn\([\s\S]*'Dissertation return'/,
