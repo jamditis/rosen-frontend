@@ -116,6 +116,7 @@ const ROUTES = [
   {
     slug: 'desktop-dissertation',
     url: '/#desktop/dissertation',
+    verifyDissertationDetail: true,
     verifyStandardExit: {
       appId: 'dissertation',
       expectedHash: '#dissertation',
@@ -553,6 +554,51 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     }
     await assertFocused(page.locator('#desktop-window-title-tools'), 'Tools window after browser Back');
   }
+  if (route.verifyDissertationDetail) {
+    const detailOpener = page.getByRole('button', {
+      name: 'The Impossible Press: American Journalism and the Decline of Public Life',
+      exact: true,
+    });
+    await detailOpener.focus();
+    await page.keyboard.press('Enter');
+    const detailClose = page.getByRole('button', { name: 'Close detail panel' });
+    await detailClose.waitFor();
+    await assertFocused(detailClose, 'Contained dissertation detail close');
+    await assertVisibleFocusOutline(detailClose, 'Contained dissertation detail close');
+
+    const containment = await page.evaluate(() => {
+      const panel = document.querySelector('.archive-detail-panel');
+      const surface = document.querySelector('.desktop-dissertation-surface');
+      const standardExit = document.querySelector('.desktop-standard-button');
+      if (!panel || !surface || !standardExit) return null;
+      const panelRect = panel.getBoundingClientRect();
+      const surfaceRect = surface.getBoundingClientRect();
+      const exitRect = standardExit.getBoundingClientRect();
+      const topmostExit = document.elementFromPoint(
+        exitRect.left + (exitRect.width / 2),
+        exitRect.top + (exitRect.height / 2),
+      )?.closest('.desktop-standard-button');
+      return {
+        position: getComputedStyle(panel).position,
+        containedClass: panel.classList.contains('is-contained'),
+        horizontallyContained: panelRect.left >= surfaceRect.left - 1
+          && panelRect.right <= surfaceRect.right + 1,
+        verticallyContained: panelRect.top >= surfaceRect.top - 1
+          && panelRect.bottom <= surfaceRect.bottom + 1,
+        standardExitTopmost: topmostExit === standardExit,
+      };
+    });
+    if (
+      !containment
+      || containment.position !== 'absolute'
+      || !containment.containedClass
+      || !containment.horizontallyContained
+      || !containment.verticallyContained
+      || !containment.standardExitTopmost
+    ) {
+      throw new Error(`Dissertation detail escaped its desktop surface: ${JSON.stringify(containment)}`);
+    }
+  }
   if (route.verifyReaderReturn) {
     const readerReturn = page.getByTitle('Back to archive');
     await assertArchiveRootReturn(page, readerReturn, 'Reader return');
@@ -658,6 +704,17 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     await page.keyboard.press('Escape');
     await dialog.waitFor({ state: 'hidden' });
     await assertFocused(recordOpener, 'Entity record opener after ordinary close');
+  }
+  if (route.verifyDissertationDetail) {
+    await page.keyboard.press('Escape');
+    await page.getByRole('button', { name: 'Close detail panel' }).waitFor({ state: 'hidden' });
+    await assertFocused(
+      page.getByRole('button', {
+        name: 'The Impossible Press: American Journalism and the Decline of Public Life',
+        exact: true,
+      }),
+      'Dissertation node after contained detail close',
+    );
   }
   if (route.verifyDesktopStartMenu) {
     const startButton = page.getByRole('button', { name: 'Start', exact: true });

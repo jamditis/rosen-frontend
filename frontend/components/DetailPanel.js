@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { html } from '../html.js?v=3.7.5';
+import { html } from '../html.js?v=3.7.6';
 import { X, FileText, Quote, BookOpen, Lightbulb, User } from 'lucide-react';
 
 // Type labels for display
@@ -14,7 +14,7 @@ const TYPE_LABELS = {
   figure: 'Key Figure'
 };
 
-const DetailPanel = ({ node, isOpen, onClose }) => {
+const DetailPanel = ({ node, isOpen, onClose, contained = false }) => {
   // Keep the last node data so panel can animate out with content
   const [displayNode, setDisplayNode] = useState(node);
   const panelRef = useRef(null);
@@ -38,7 +38,10 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
       const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
       let frame = null;
       let timer = null;
-      const focusClose = () => closeButtonRef.current?.focus();
+      const focusClose = () => {
+        if (contained) panelRef.current?.scrollIntoView({ block: 'start' });
+        closeButtonRef.current?.focus({ preventScroll: contained });
+      };
       if (reduceMotion) frame = requestAnimationFrame(focusClose);
       else timer = setTimeout(focusClose, 100);
       return () => {
@@ -55,7 +58,7 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
     }
 
     return undefined;
-  }, [isOpen, displayNode]);
+  }, [isOpen, displayNode, contained]);
 
   // Handle ESC key to close panel
   useEffect(() => {
@@ -74,10 +77,12 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
   // Don't render anything if we've never had a node
   if (!displayNode) return null;
 
+  const positionClass = contained ? 'absolute' : 'fixed';
+
   return html`
     ${isOpen && html`
       <div
-        className="fixed inset-0 bg-black/20 z-40 sm:hidden"
+        className=${`${positionClass} inset-0 bg-black/20 z-40 sm:hidden`}
         style=${{ zIndex: 70 }}
         onClick=${onClose}
       />
@@ -90,11 +95,14 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
       inert=${isOpen ? undefined : ''}
       aria-labelledby="detail-panel-title"
       className=${`
-        archive-detail-panel fixed top-0 h-full w-full sm:w-[420px] bg-white border-l border-stone-200
+        archive-detail-panel ${contained ? 'is-contained' : ''} ${positionClass} top-0 h-full w-full sm:w-[420px] bg-white border-l border-stone-200
         shadow-xl z-50 transform transition-transform duration-300 ease-out
         ${isOpen ? 'right-0' : '-right-full sm:-right-[420px]'}
       `}
-      style=${{ maxWidth: 'calc(100vw - 16px)', zIndex: 80 }}
+      style=${{
+        maxWidth: contained ? 'calc(100% - 16px)' : 'calc(100vw - 16px)',
+        zIndex: 80,
+      }}
     >
       <div className="sticky top-0 bg-white border-b border-stone-200 px-4 sm:px-6 py-4 flex items-center justify-between">
         <span className="text-[10px] font-bold uppercase tracking-wider text-stone-600">

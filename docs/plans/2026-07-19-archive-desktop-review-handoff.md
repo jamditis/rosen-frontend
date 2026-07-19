@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This handoff is for the independent design and accessibility review required by [issue #622](https://github.com/jamditis/rosen-frontend/issues/622). It does not record an approval. It gives a reviewer a compact, reproducible path through the optional archive desktop and leaves the editorial making-of and live-release gates closed.
+This handoff is for the independent design and accessibility review required by [issue #622](https://github.com/jamditis/rosen-frontend/issues/622). It does not record an approval. It gives a reviewer a compact, reproducible path through the optional archive desktop and leaves the editorial making-of, merge, deployment, and live-verification gates closed.
 
 Review branch: `codex/issue-622-desktop-foundation`
 
@@ -27,7 +27,7 @@ npm run test:frontend
 npm run preview:audit
 ```
 
-The expected test results are 1,102 passing repository tests across 225 suites and 286 passing frontend tests across 55 suites. `preview:audit` intentionally exits nonzero for the repository's inherited accessibility baseline. The expected result for this branch is 33 rule-level findings across 32 routes and three viewports (96 states), with zero findings in all 51 desktop rows, including the open Start-menu interaction state. A `FAILED` console line or an `audit-error` report row is a runtime regression, not part of that inherited baseline: the audit separately gates unhandled page errors, caught application console errors, same-origin failed or HTTP-error requests, and the route-scoped `archive-details.json` preload contract during application loading and interaction. Screenshots are written beneath `preview-audit-results/screenshots/{mobile,tablet,desktop}/`.
+The expected test results are 1,106 passing repository tests across 226 suites and 286 passing frontend tests across 55 suites. `preview:audit` intentionally exits nonzero for the repository's inherited accessibility baseline. The expected result for this branch is 33 rule-level findings across 32 routes and three viewports (96 states), with zero findings in all 51 desktop rows, including the open Start-menu and bounded dissertation-detail interaction states. A `FAILED` console line or an `audit-error` report row is a runtime regression, not part of that inherited baseline: the audit separately gates unhandled page errors, caught application console errors, same-origin failed or HTTP-error requests, and the route-scoped `archive-details.json` preload contract during application loading and interaction. Screenshots are written beneath `preview-audit-results/screenshots/{mobile,tablet,desktop}/`.
 
 ## Review sequence
 
@@ -141,7 +141,7 @@ Then restore networking and, separately, simulate blocked desktop JavaScript, de
 - Do not restore the deprecated data-explorer toy.
 - Do not add or review a public making-of page: its interview, fact-check, design, and publication approvals have not occurred.
 - Do not treat the inherited 33 audit findings on maintained standard/standalone surfaces as desktop regressions.
-- Do not approve a version/cache bump, deployment, or live publication from this review alone.
+- Treat the coordinated `3.7.6` version/cache stamp as a stale-cache safeguard in this PR, not as approval to merge, deploy, or publish the desktop.
 
 ## Reviewer record
 
@@ -158,4 +158,4 @@ Then restore networking and, separately, simulate blocked desktop JavaScript, de
 - Accessibility notes:
 - Evidence links or attached recording:
 
-Approval here satisfies only the independent review gate. Making-of approval, merge, coordinated release version/cache bump, and live-archive verification remain separate decisions.
+Approval here satisfies only the independent review gate. Making-of approval, merge, deployment, and live-archive verification remain separate decisions.

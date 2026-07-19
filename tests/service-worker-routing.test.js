@@ -29,20 +29,26 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = path.join(__dirname, '..');
 const SW_SRC = fs.readFileSync(path.join(ROOT, 'frontend', 'sw.js'), 'utf8');
+const APP_VERSION = JSON.parse(
+  fs.readFileSync(path.join(ROOT, 'version.json'), 'utf8'),
+).version;
 
 /**
  * Run sw.js in a sandbox shaped like a production deploy. Returns the sandbox
  * (with the SW's top-level functions attached), the captured event handlers,
  * and the list of URLs the install handler tried to cache.add.
  */
-function loadSW(hostname = 'pressthink.org') {
+function loadSW(hostname = 'pressthink.org', {
+  cacheMatch = async () => null,
+  fetchImpl = async () => { throw new Error('offline'); },
+} = {}) {
   const handlers = {};
   const added = [];
   const fakeCache = {
     add: async (url) => { added.push(String(url)); },
     addAll: async (urls) => { urls.forEach(u => added.push(String(u))); },
     put: async () => {},
-    match: async () => null,
+    match: cacheMatch,
   };
   const sandbox = {
     self: {
@@ -57,6 +63,9 @@ function loadSW(hostname = 'pressthink.org') {
       delete: async () => true,
     },
     location: { origin: `https://${hostname}`, hostname },
+    URL,
+    Response,
+    fetch: fetchImpl,
     console: { log: () => {}, warn: () => {} },
   };
   vm.createContext(sandbox);
@@ -90,6 +99,26 @@ describe('service worker request classification (#274)', () => {
 
   it('does not treat a JS sub-resource as an HTML request', () => {
     assert.equal(sandbox.isHtmlRequest({ mode: 'cors' }, `${BASE}/frontend/App.js`), false);
+  });
+
+  it('recognizes root and index query deep links as SPA navigations', () => {
+    assert.equal(sandbox.isSpaNavigation({
+      mode: 'navigate',
+      url: `https://pressthink.org${BASE}/?record=RECORD-00903`,
+    }), true);
+    assert.equal(sandbox.isSpaNavigation({
+      mode: 'navigate',
+      url: `https://pressthink.org${BASE}/index.html?q=public`,
+    }), true);
+  });
+
+  it('does not classify standalone controlled pages as SPA navigations', () => {
+    for (const path of ['/faq/', '/dissertation/reader/', '/features/winer-method/']) {
+      assert.equal(sandbox.isSpaNavigation({
+        mode: 'navigate',
+        url: `https://pressthink.org${BASE}${path}`,
+      }), false, path);
+    }
   });
 
   it('still classifies archive JSON under /data/ as a data file', () => {
@@ -173,6 +202,45 @@ describe('service worker install precache (#274)', () => {
   }
 });
 
+describe('service worker offline navigation fallback', () => {
+  it('uses the cached app root for an uncached SPA query deep link', async () => {
+    const appRoot = { source: 'cached app root' };
+    const matched = [];
+    const { sandbox } = loadSW('pressthink.org', {
+      cacheMatch: async (request) => {
+        matched.push(request);
+        return request === `${BASE}/` ? appRoot : null;
+      },
+    });
+
+    const response = await sandbox.networkFirst({
+      mode: 'navigate',
+      url: `https://pressthink.org${BASE}/?record=RECORD-00903`,
+    }, 'test-cache');
+
+    assert.equal(response, appRoot);
+    assert.equal(matched.at(-1), `${BASE}/`);
+  });
+
+  it('returns unavailable instead of substituting the SPA for an uncached standalone page', async () => {
+    const matched = [];
+    const { sandbox } = loadSW('pressthink.org', {
+      cacheMatch: async (request) => {
+        matched.push(request);
+        return request === `${BASE}/` ? { source: 'wrong app root' } : null;
+      },
+    });
+
+    const response = await sandbox.networkFirst({
+      mode: 'navigate',
+      url: `https://pressthink.org${BASE}/faq/`,
+    }, 'test-cache');
+
+    assert.equal(response.status, 503);
+    assert.equal(matched.includes(`${BASE}/`), false);
+  });
+});
+
 describe('service worker optional desktop cache', () => {
   for (const [surface, host, prefix] of [
     ['GitHub Pages', 'jamditis.github.io', '/rosen-frontend'],
@@ -185,7 +253,7 @@ describe('service worker optional desktop cache', () => {
       assert.equal(added.length, 9);
       assert.equal(new Set(added).size, 9);
       assert.ok(added.every(url => url.startsWith(`${prefix}/frontend/desktop/`)));
-      assert.ok(added.every(url => url.endsWith('?v=3.7.5')));
+      assert.ok(added.every(url => url.endsWith(`?v=${APP_VERSION}`)));
     });
   }
 });
@@ -236,7 +304,7 @@ describe('service worker structure (#274)', () => {
 
   it('falls back from query-string navigations to the cached app root', () => {
     const networkFirstSource = SW_SRC.slice(SW_SRC.indexOf('async function networkFirst'));
-    assert.match(networkFirstSource, /request\.mode === 'navigate'/);
+    assert.match(networkFirstSource, /isSpaNavigation\(request\)/);
     assert.match(networkFirstSource, /cache\.match\(`\$\{SITE_ROOT\}\/`\)/);
   });
 });

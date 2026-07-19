@@ -114,7 +114,9 @@ describe('desktop route wiring', () => {
     assert.match(audit, /slug: 'desktop-entity-record',[\s\S]*url: '\/\?record=RECORD-00903&entity=P0005#desktop\/entities',[\s\S]*verifyEntityRecordFlow: true/);
     assert.match(audit, /slug: 'desktop-entity-record',\s+url: '\/\?record=RECORD-00903&entity=P0005#desktop\/entities',\s+archiveDetails: 'require'/,
       'a record opened on a deferred entity surface must still load its details once on demand');
-    assert.match(audit, /slug: 'desktop-dissertation',[\s\S]*url: '\/#desktop\/dissertation',[\s\S]*verifyStandardExit:[\s\S]*appId: 'dissertation'/);
+    assert.match(audit, /slug: 'desktop-dissertation',[\s\S]*url: '\/#desktop\/dissertation',[\s\S]*verifyDissertationDetail: true,[\s\S]*verifyStandardExit:[\s\S]*appId: 'dissertation'/);
+    assert.match(audit, /verifyDissertationDetail[\s\S]*Contained dissertation detail close[\s\S]*horizontallyContained[\s\S]*standardExitTopmost/,
+      'the rendered audit must keep dissertation details inside the desktop surface and below its taskbar escape');
     assert.match(audit, /slug: 'desktop-analytics',[\s\S]*url: '\/\?record=RECORD-00802&entity=P0005#desktop\/analytics',[\s\S]*verifyDiscardedDesktopContext: true[\s\S]*verifyStandardExit:[\s\S]*appId: 'analytics'/);
     assert.match(audit, /slug: 'desktop-readme',\s+url: '\/#desktop\/readme'/);
     assert.match(audit, /slug: 'desktop-tools',[\s\S]*url: '\/#desktop\/tools',[\s\S]*verifyToolRoundTrip: true/);
@@ -360,6 +362,24 @@ describe('desktop research adapters', () => {
     assert.match(analytics, /<\$\{AnalyticsDashboard\}[\s\S]*embedded=\$\{true\}/);
     assert.match(dissertationPage, /embedded\s*=\s*false/);
     assert.match(analyticsDashboard, /embedded\s*=\s*false/);
+    assert.match(dissertationPage, /<\$\{DetailPanel\}[\s\S]*contained=\$\{embedded\}/,
+      'the shared detail drawer must use bounded positioning inside the desktop adapter');
+    assert.match(dissertationPage, /desktop-dissertation-surface/);
+    assert.match(read('frontend/desktop/desktop.css'),
+      /\.desktop-dissertation-surface\s*\{[\s\S]*position:\s*relative;[\s\S]*isolation:\s*isolate;/,
+      'the embedded dissertation must establish a clipped local positioning context');
+    assert.match(read('frontend/components/DetailPanel.js'),
+      /contained\s*=\s*false[\s\S]*positionClass\s*=\s*contained\s*\?\s*'absolute'\s*:\s*'fixed'/,
+      'the standard drawer stays viewport-fixed while its desktop form becomes container-absolute');
+    assert.match(read('frontend/components/DetailPanel.js'),
+      /if \(contained\) panelRef\.current\?\.scrollIntoView\(\{ block: 'start' \}\)[\s\S]*focus\(\{ preventScroll: contained \}\)/,
+      'compact embedded detail focus must reveal the locally positioned close control');
+    assert.match(read('frontend/desktop/desktop.css'),
+      /\.archive-detail-panel\.is-contained\s*\{[\s\S]*max-height:\s*calc\(100dvh - var\(--desktop-taskbar-height\)/,
+      'a contained drawer must end above the fixed desktop taskbar');
+    assert.match(read('frontend/desktop/desktop.css'),
+      /\.archive-detail-panel\.is-contained button:focus-visible\s*\{[\s\S]*outline:\s*3px solid #7a4f00/,
+      'the locally contained close control must not inherit a transparent focus ring');
   });
 
   it('keeps aggregate queries in the desktop and offers standard-view exits', () => {
@@ -398,7 +418,7 @@ describe('desktop research adapters', () => {
       'small detail metadata must keep AA contrast on white');
     assert.match(detailPanel, /prefers-reduced-motion: reduce/);
     assert.match(detailPanel, /if \(reduceMotion\) frame = requestAnimationFrame\(focusClose\)/);
-    assert.match(detailPanel, /\}, \[isOpen, displayNode\]\);/,
+    assert.match(detailPanel, /\}, \[isOpen, displayNode, contained\]\);/,
       'focus entry must wait until retained panel content has rendered');
     assert.match(map, /Math\.max\(\s*safeMinimumZoom,\s*Math\.min\(scaleX, scaleY/);
     assert.match(map, /prefers-reduced-motion: reduce/);
@@ -618,6 +638,6 @@ describe('desktop interaction structure', () => {
     assert.match(handoff, /A `FAILED` console line or an `audit-error` report row is a runtime regression/,
       'reviewers must be able to distinguish route failures from the inherited axe baseline');
     assert.match(handoff, /Outcome: approve \/ approve with changes \/ request changes \/ blocked/);
-    assert.match(handoff, /Making-of approval, merge, coordinated release version\/cache bump, and live-archive verification remain separate decisions/);
+    assert.match(handoff, /Making-of approval, merge, deployment, and live-archive verification remain separate decisions/);
   });
 });

@@ -1057,10 +1057,21 @@
 }
 
 .desktop-dissertation-surface {
+  position: relative;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   background: var(--desktop-paper);
+  isolation: isolate;
+}
+
+.archive-detail-panel.is-contained {
+  max-height: calc(100dvh - var(--desktop-taskbar-height) - env(safe-area-inset-bottom, 0px));
+}
+
+.archive-detail-panel.is-contained button:focus-visible {
+  outline: 3px solid #7a4f00;
+  outline-offset: 2px;
 }
 
 .desktop-dissertation-map {

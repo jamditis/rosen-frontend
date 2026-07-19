@@ -13,7 +13,7 @@
 // Cache version is tied to the app version in version.json. Bumping it on every
 // deploy (alongside index.html and the ?v= import strings) makes the activate
 // handler below drop every stale cache, so returning visitors never run old code.
-const CACHE_VERSION = '3.7.5';
+const CACHE_VERSION = '3.7.6';
 const CACHE_NAME = `jrda-cache-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `jrda-data-${CACHE_VERSION}`;
 
@@ -243,6 +243,15 @@ function isHtmlRequest(request, pathname) {
   return request.mode === 'navigate' || pathname.endsWith('.html');
 }
 
+// Only the root document is the single-page application. Standalone pages are
+// controlled by this root-scoped worker too, but must never receive the cached
+// SPA shell at their own URL when their exact response is unavailable offline.
+function isSpaNavigation(request) {
+  if (request.mode !== 'navigate') return false;
+  const pathname = new URL(request.url).pathname;
+  return pathname === `${SITE_ROOT}/` || pathname === `${SITE_ROOT}/index.html`;
+}
+
 // Check if URL is a static asset. '.html' is deliberately excluded -- HTML is
 // handled by isHtmlRequest/networkFirst, not cache-first.
 function isStaticAsset(pathname) {
@@ -364,7 +373,7 @@ async function networkFirst(request, cacheName) {
     // single-page app document. The install cache holds the clean site root,
     // so use it as the navigation fallback instead of returning a plain 503
     // merely because the cached Request lacks that query string.
-    if (!cachedResponse && request.mode === 'navigate') {
+    if (!cachedResponse && isSpaNavigation(request)) {
       cachedResponse = await cache.match(`${SITE_ROOT}/`);
     }
     if (cachedResponse) {

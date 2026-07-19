@@ -10,6 +10,7 @@ const worker = read('frontend/sw.js');
 const shell = read('frontend/desktop/DesktopShell.js');
 const deployment = read('DEPLOYMENT.md');
 const indexCss = read('frontend/index.css');
+const appVersion = JSON.parse(read('version.json')).version;
 
 describe('root service-worker scope', () => {
   it('registers a root bridge and checks its imported implementation fresh', () => {
@@ -27,7 +28,10 @@ describe('root service-worker scope', () => {
 
 describe('service-worker shell manifests', () => {
   it('loads and pre-caches the design tokens at their explicit prefix-safe URL', () => {
-    assert.match(index, /href="\.\/frontend\/design-system\/tokens\.css\?v=3\.7\.5"/);
+    assert.match(
+      index,
+      new RegExp(`href="\\./frontend/design-system/tokens\\.css\\?v=${appVersion.replaceAll('.', '\\.')}"`),
+    );
     assert.ok(
       index.indexOf('./frontend/design-system/tokens.css') < index.indexOf('./frontend/index.css'),
       'tokens must load before the stylesheet that consumes them',

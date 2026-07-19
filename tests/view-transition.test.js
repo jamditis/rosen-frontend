@@ -129,7 +129,7 @@ describe('App.js record-modal view transition (#281)', () => {
 
   it('disables shared record and detail-panel CSS motion at the source', () => {
     assert.match(modalSrc, /className="archive-record-dialog /);
-    assert.match(detailPanelSrc, /archive-detail-panel fixed/);
+    assert.match(detailPanelSrc, /archive-detail-panel \$\{contained \? 'is-contained' : ''\} \$\{positionClass\}/);
     assert.match(indexCss, /@media \(prefers-reduced-motion: reduce\)/);
     assert.match(indexCss, /\.archive-record-dialog \*/);
     assert.match(indexCss, /\.archive-detail-panel/);
