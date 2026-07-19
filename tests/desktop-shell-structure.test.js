@@ -186,6 +186,8 @@ describe('desktop guided-path adapter', () => {
     assert.match(startPage, /embedded\s*=\s*false/);
     assert.match(panel, /<\$\{StartHerePage\}[\s\S]*embedded=\$\{true\}/);
     assert.match(panel, /<\$\{SelectedFindings\}/);
+    assert.match(startPage, /start-here-path-grid/);
+    assert.match(startPage, /selected-findings-grid/);
     assert.match(app, /startView=\$\{desktopStartView\}/);
     assert.match(app, /records,\s*\n\s*onNavigate:\s*handleDesktopGuideNavigate/);
   });
@@ -283,5 +285,6 @@ describe('desktop interaction structure', () => {
     assert.match(css, /desktop-filter-panel label\.flex[\s\S]*min-height:\s*44px/);
     assert.match(css, /Previous results page[\s\S]*min-width:\s*44px/);
     assert.match(css, /desktop-canonical-surface button[\s\S]*min-width:\s*44px/);
+    assert.match(css, /@container\s*\(min-width:\s*42rem\)[\s\S]*selected-findings-grid/);
   });
 });

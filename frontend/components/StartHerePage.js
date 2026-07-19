@@ -92,7 +92,7 @@ export const SelectedFindings = ({
       </div>
 
       ${featuredRecords.length > 0 ? html`
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="selected-findings-grid grid gap-6 md:grid-cols-3">
           ${featuredRecords.map(({ record, entry }) => html`
             <button
               key=${record.id}
@@ -268,7 +268,7 @@ const StartHerePage = ({
             <p className="mt-2 max-w-2xl font-body text-sm leading-relaxed text-stone-600">Pick the route that best matches what you came to do. You can switch paths at any time.</p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="start-here-path-grid grid gap-6 md:grid-cols-3">
             <a
               href="#guide"
               onClick=${(event) => { event.preventDefault(); scrollTo('guide'); }}

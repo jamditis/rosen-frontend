@@ -1027,6 +1027,7 @@
 }
 
 .desktop-guided-panel {
+  container-type: inline-size;
   min-height: 616px;
   max-height: calc(100vh - 210px);
   overflow-y: auto;
@@ -1102,6 +1103,20 @@
   max-width: 64rem;
   margin: 0 auto;
   padding: clamp(1.25rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2rem) 0;
+}
+
+/* Tailwind's viewport breakpoints cannot see the width of a desktop window.
+   Keep authored cards readable until the embedded panel itself is wide enough. */
+.desktop-guided-panel .start-here-path-grid,
+.desktop-guided-panel .selected-findings-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@container (min-width: 42rem) {
+  .desktop-guided-panel .start-here-path-grid,
+  .desktop-guided-panel .selected-findings-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .desktop-start-here-embedded {
