@@ -135,6 +135,7 @@ const DesktopShell = ({
   const menuItemRefs = useRef([]);
   const lastShellAppRef = useRef(null);
   const reportedOpenAppsRef = useRef('');
+  const pointerWindowControlRef = useRef(null);
 
   useEffect(() => {
     const stylesheetId = 'archive-desktop-styles';
@@ -343,6 +344,10 @@ const DesktopShell = ({
     setStatusMessage(`Closed ${app.label}.`);
     if (activeAppId === app.id) {
       onSelectApp?.(nextVisibleDesktopWindow(nextLayout) || null);
+    } else {
+      requestAnimationFrame(() => {
+        windowTitleRefs.current[shellApp?.id || 'home']?.focus({ preventScroll: true });
+      });
     }
   };
 
@@ -352,6 +357,10 @@ const DesktopShell = ({
     setStatusMessage(`Minimized ${app.label}. Use its taskbar button to restore it.`);
     if (activeAppId === app.id) {
       onSelectApp?.(nextVisibleDesktopWindow(nextLayout, app.id) || null);
+    } else {
+      requestAnimationFrame(() => {
+        windowTitleRefs.current[shellApp?.id || 'home']?.focus({ preventScroll: true });
+      });
     }
   };
 
@@ -576,11 +585,22 @@ const DesktopShell = ({
         aria-labelledby=${titleId}
         data-window-id=${appId}
         onPointerDown=${(event) => {
-          if (!app || isActive || event.target.closest('.desktop-window-controls')) return;
+          if (!app || isActive) return;
+          if (event.target.closest('.desktop-window-controls')) {
+            pointerWindowControlRef.current = app.id;
+            requestAnimationFrame(() => {
+              if (pointerWindowControlRef.current === app.id) {
+                pointerWindowControlRef.current = null;
+              }
+            });
+            return;
+          }
           activateWindow(app.id);
         }}
-        onFocusCapture=${() => {
-          if (app && !isActive) activateWindow(app.id);
+        onFocusCapture=${(event) => {
+          const pointerControlFocus = pointerWindowControlRef.current === app?.id
+            && event.target.closest('.desktop-window-controls');
+          if (app && !isActive && !pointerControlFocus) activateWindow(app.id);
         }}
       >
         <div className="desktop-window-titlebar">

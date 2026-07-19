@@ -236,6 +236,10 @@ describe('desktop windowing and spatial memory', () => {
     assert.match(shell, /desktop-active-window-label/);
     assert.match(shell, /onFocusCapture/);
     assert.match(shell, /activeWindow\?\.contains\(document\.activeElement\)/);
+    assert.match(shell, /pointerWindowControlRef/,
+      'pointer title-bar actions must not be consumed by background-window activation');
+    assert.match(shell, /windowTitleRefs\.current\[shellApp\?\.id \|\| 'home'\]\?\.focus/,
+      'closing or minimizing a background window must recover focus in the active surface');
     assert.match(shell, /Minimize \$\{windowTitle\}/);
     assert.match(shell, /aria-label="Open desktop windows"/);
     assert.match(shell, /Reset desktop layout/);
