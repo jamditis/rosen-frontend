@@ -249,6 +249,8 @@ describe('desktop windowing and spatial memory', () => {
     assert.match(css, /@media \(max-width: 700px\)[\s\S]*\.desktop-window\s*\{[\s\S]*display:\s*none/);
     assert.match(css, /\.desktop-window\.is-active\s*\{\s*display:\s*block/);
     assert.match(css, /\.desktop-task-window-list[\s\S]*overflow-x:\s*auto/);
+    assert.match(css, /@media \(max-width: 420px\)[\s\S]*\.desktop-standard-button span[\s\S]*white-space:\s*normal/);
+    assert.match(css, /\.desktop-start-button,\s*\.desktop-standard-button\s*\{\s*flex:\s*0 0 auto/);
   });
 });
 

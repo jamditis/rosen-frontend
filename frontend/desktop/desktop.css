@@ -1165,6 +1165,11 @@
   cursor: pointer;
 }
 
+.desktop-start-button,
+.desktop-standard-button {
+  flex: 0 0 auto;
+}
+
 .desktop-task-window-list {
   display: flex;
   flex: 1 1 auto;
@@ -1210,6 +1215,7 @@
 
 .desktop-start-button svg,
 .desktop-task-button svg {
+  flex: 0 0 auto;
   width: 19px;
   height: 19px;
 }
@@ -1710,10 +1716,21 @@
 }
 
 @media (max-width: 420px) {
-  .desktop-standard-button span {
-    max-width: 86px;
+  .desktop-standard-button {
+    flex-basis: 118px;
+    max-width: 118px;
+    gap: 0.3rem;
+    padding-right: 0.3rem;
+    padding-left: 0.3rem;
   }
 
+  .desktop-standard-button span {
+    max-width: none;
+    overflow: visible;
+    line-height: 1;
+    text-overflow: clip;
+    white-space: normal;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
