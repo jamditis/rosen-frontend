@@ -49,6 +49,8 @@ const ROUTES = [
   { slug: 'desktop-analytics',  url: '/#desktop/analytics' },
   { slug: 'desktop-readme',     url: '/#desktop/readme' },
   { slug: 'desktop-tools',      url: '/#desktop/tools' },
+  { slug: 'desktop-record-modal', url: '/?record=RECORD-00802#desktop/archive' },
+  { slug: 'desktop-report',     url: '/#desktop', openReport: true },
   {
     slug: 'desktop-windowing',
     url: '/#desktop/analytics',
@@ -127,6 +129,11 @@ async function auditOne(page, route, viewport) {
   await page.goto(targetUrl.toString(), { waitUntil: 'networkidle', timeout: 30000 });
   // Async React render + lazy-loaded sql.js: small extra settle.
   await page.waitForTimeout(1500);
+  if (route.openReport) {
+    await page.getByRole('button', { name: /^Report a problem\./ }).first().click();
+    await page.getByRole('dialog', { name: 'Report a problem or suggest a record' }).waitFor();
+    await page.waitForTimeout(100);
+  }
 
   const shotDir = resolve(OUT_DIR, 'screenshots', viewport.name);
   await mkdir(shotDir, { recursive: true });

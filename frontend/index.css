@@ -41,6 +41,25 @@ mark {
   border-radius: 2px;
 }
 
+/* The report form is reachable from both the canonical archive and the
+   optional desktop. Keep its controls touch-safe even though the zero-build
+   Tailwind bundle does not include min-h-11/min-w-11 utilities. */
+.archive-report-dialog button,
+.archive-report-dialog input:not([type='hidden']):not([tabindex='-1']),
+.archive-report-dialog textarea,
+.archive-report-dialog select,
+.archive-report-dialog a[href] {
+  min-height: 44px;
+}
+
+.archive-report-dialog a[href] {
+  align-items: center;
+}
+
+.archive-report-dialog .archive-report-dialog-close {
+  min-width: 44px;
+}
+
 /* Settings sidebar slide-in animation */
 @keyframes slideInRight {
   from {

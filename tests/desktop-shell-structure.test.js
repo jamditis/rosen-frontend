@@ -52,6 +52,9 @@ describe('desktop route wiring', () => {
     assert.match(audit, /slug: 'desktop-analytics',\s+url: '\/#desktop\/analytics'/);
     assert.match(audit, /slug: 'desktop-readme',\s+url: '\/#desktop\/readme'/);
     assert.match(audit, /slug: 'desktop-tools',\s+url: '\/#desktop\/tools'/);
+    assert.match(audit, /slug: 'desktop-record-modal',\s+url: '\/\?record=RECORD-00802#desktop\/archive'/);
+    assert.match(audit, /slug: 'desktop-report',[\s\S]*openReport: true/);
+    assert.match(audit, /getByRole\('dialog', \{ name: 'Report a problem or suggest a record' \}\)/);
     assert.match(audit, /slug: 'desktop-windowing'[\s\S]*desktopLayout:[\s\S]*zOrder/);
     assert.match(audit, /name: 'mobile',\s+width: 375,\s+height: 812/);
     assert.match(audit, /name: 'tablet',\s+width: 768,\s+height: 1024/);

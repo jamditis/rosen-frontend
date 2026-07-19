@@ -18,6 +18,7 @@ describe('branded report form wiring', () => {
   const appSrc = read('frontend', 'App.js');
   const modalSrc = read('frontend', 'components', 'BugReportModal.js');
   const constSrc = read('frontend', 'constants.js');
+  const indexCss = read('frontend', 'index.css');
 
   it('opens the themed modal from the header button, not the GitHub deep link', () => {
     // The button must flip modal state. If it ever reverts to onClick=openBugReport
@@ -85,7 +86,7 @@ describe('branded report form wiring', () => {
     // a fresh form, and file the same report twice while the first POST completes.
     // One guard (requestClose) that no-ops during 'submitting' covers all three.
     assert.match(modalSrc, /const requestClose = useCallback\(\(\) => \{\s*if \(phase === 'submitting'\) return;/);
-    assert.match(modalSrc, /Escape' && isOpen\) requestClose\(\)/);
+    assert.match(modalSrc, /if \(e\.key === 'Escape'\) \{\s*requestClose\(\)/);
     assert.match(modalSrc, /e\.currentTarget\) requestClose\(\)/);
     assert.match(modalSrc, /ref=\$\{closeButtonRef\}\s*onClick=\$\{requestClose\}\s*disabled=\$\{submitting\}/);
   });
@@ -112,6 +113,15 @@ describe('branded report form wiring', () => {
     assert.match(modalSrc, /Suggest a record/);
     assert.match(modalSrc, /role="dialog"/);
     assert.match(modalSrc, /aria-modal="true"/);
+  });
+
+  it('traps focus, returns it to the trigger, and keeps touch targets large enough', () => {
+    assert.match(modalSrc, /returnFocusRef\.current = document\.activeElement/);
+    assert.match(modalSrc, /if \(e\.key !== 'Tab'\) return/);
+    assert.match(modalSrc, /modalRef\.current\?\.contains\(document\.activeElement\)/);
+    assert.match(modalSrc, /archive-report-dialog-close/);
+    assert.match(indexCss, /archive-report-dialog[\s\S]*min-height:\s*44px/);
+    assert.match(indexCss, /archive-report-dialog-close[\s\S]*min-width:\s*44px/);
   });
 
   it('routes submissions through the shared submit client', () => {
