@@ -30,10 +30,11 @@ export function parseState(search = '') {
   const record = params.get('record');
   const concept = params.get('concept');
   const safeView = VALID_VIEWS.has(view) ? view : 'trail';
+  const safeRecord = safeView === 'records' && RECORD_IDS.has(record) ? record : null;
   return {
     view: safeView,
-    preset: VALID_PRESETS.has(preset) ? preset : 'all',
-    record: safeView === 'records' && RECORD_IDS.has(record) ? record : null,
+    preset: safeRecord ? 'all' : VALID_PRESETS.has(preset) ? preset : 'all',
+    record: safeRecord,
     concept: safeView === 'concepts' && CONCEPT_IDS.has(concept) ? concept : null,
   };
 }

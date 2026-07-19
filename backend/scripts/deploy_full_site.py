@@ -120,6 +120,7 @@ _DEPLOY_DATA_FILES: Tuple[str, ...] = (
     'data/search-index.json',  # prebuilt MiniSearch full-text index, loaded lazily on first search, issue 276
     'data/wiki-seed.json',
     'data/schema.json',  # data dictionary; linked from the open-data download UI
+    'data/SCHEMA.md',  # human-readable data guide; linked from participation/open-data UI
     'data/eras.js',  # canonical era taxonomy imported by the frontend
 )
 
@@ -210,7 +211,8 @@ def collect_local_files(
     entry_points: Iterable[str] = _ENTRY_POINTS,
 ) -> List[Path]:
     """Walk the manifest and return every file to upload, ordered so that
-    entry-point files (index.html, frontend/sw.js, version.json) come LAST.
+    each feature's index.html follows its dependencies, and site entry-point
+    files (index.html, frontend/sw.js, version.json) come LAST.
 
     Skips entries that don't exist on disk (the existence tests catch
     those at PR time — at deploy time we keep going so a missing optional
@@ -219,9 +221,24 @@ def collect_local_files(
     The entry-points-last ordering is the cross-file consistency hinge for
     version-bump deploys: see the _ENTRY_POINTS comment for why.
     """
+    # Normalize iterables because dirs and data_files are each consumed in two
+    # passes. This preserves support for callers that provide generators rather
+    # than tuples.
+    dirs = tuple(dirs)
+    data_files = tuple(data_files)
     files: List[Path] = []
     seen: Set[Path] = set()
-    entry_set = set(entry_points)
+    declared_entry_points = tuple(entry_points)
+    # Every deployed standalone feature gets dependency-first semantics without
+    # requiring a second hand-maintained manifest. Its directory is walked
+    # normally, but index.html is held until all deployed dirs/data have landed.
+    feature_entry_points = tuple(
+        f'{relpath.rstrip("/")}/index.html'
+        for relpath in dirs
+        if relpath.rstrip('/').startswith('features/')
+        and (repo_root / relpath / 'index.html').is_file()
+    )
+    entry_set = set(declared_entry_points) | set(feature_entry_points)
 
     def _add(p: Path) -> None:
         rp = p.resolve()
@@ -269,8 +286,16 @@ def collect_local_files(
         if p.is_file():
             _add(p)
 
-    # LAST: entry points, in the order declared.
-    for relpath in entry_points:
+    # Feature entry points flip only after every walked dependency and data file
+    # is live. The global app/SW/version entry points retain their declared
+    # absolute-last ordering after the standalone features.
+    for relpath in feature_entry_points:
+        p = repo_root / relpath
+        if p.is_file():
+            _add(p)
+
+    # LAST: global entry points, in the order declared.
+    for relpath in declared_entry_points:
         p = repo_root / relpath
         if p.is_file():
             _add(p)

@@ -127,11 +127,19 @@ describe('Winer method safe query presets and deep links', () => {
 
   it('round-trips valid URL state and discards unknown or injected values', () => {
     const state = parseState('?view=records&preset=idea&record=direct-2009-flying-seminar');
-    assert.deepEqual(state, { view: 'records', preset: 'idea', record: 'direct-2009-flying-seminar', concept: null });
+    assert.deepEqual(state, { view: 'records', preset: 'all', record: 'direct-2009-flying-seminar', concept: null });
     assert.deepEqual(parseState('?view=<script>&preset=SELECT+*&record=../../secret&concept=javascript:alert(1)'), {
       view: 'trail', preset: 'all', record: null, concept: null,
     });
-    assert.equal(serializeState(state), '?view=records&preset=idea&record=direct-2009-flying-seminar');
+    assert.equal(serializeState(state), '?view=records&record=direct-2009-flying-seminar');
+  });
+
+  it('canonicalizes record permalinks to the complete corpus so an incompatible preset cannot hide the requested record', () => {
+    const recordId = 'direct-2001-desktop-websites';
+    const state = parseState(`?view=records&preset=infrastructure&record=${recordId}`);
+    assert.deepEqual(state, { view: 'records', preset: 'all', record: recordId, concept: null });
+    assert.equal(serializeState({ view: 'records', preset: 'infrastructure', record: recordId }), `?view=records&record=${recordId}`);
+    assert.ok(runPreset(state.preset).some(({ id }) => id === recordId));
   });
 
   it('round-trips allowlisted concept pages and strips state that does not belong to the active view', () => {
@@ -172,11 +180,29 @@ describe('Winer method public page and deployment', () => {
     assert.match(html, new RegExp(`<script type="module" src="\\.\\/script\\.js\\?v=${releaseVersion}"><\\/script>`));
   });
 
+  it('loads the standalone-page display and mono webfonts with an early connection hint', () => {
+    assert.match(html, /<link rel="preconnect" href="https:\/\/fonts\.googleapis\.com">/);
+    assert.match(html, /<link rel="preconnect" href="https:\/\/fonts\.gstatic\.com" crossorigin>/);
+    assert.match(html, /<link href="https:\/\/fonts\.googleapis\.com\/css2\?family=Roboto\+Mono:wght@300;400;500;700&family=Special\+Elite&display=swap" rel="stylesheet">/);
+  });
+
   it('uses only local frozen feature data and performs no runtime scraping or unrestricted fetch', () => {
     assert.doesNotMatch(script, /XMLHttpRequest|WebSocket|EventSource|\.\.\/\.\.\/data\//);
     assert.deepEqual([...script.matchAll(/fetch\(([^)]+)\)/g)].map((match) => match[1]), ["'./demo.sqlite'"]);
     assert.match(script, new RegExp(`from '\\.\\/data\\.js\\?v=${releaseVersion}'`));
-    assert.doesNotMatch(html, /<link[^>]+rel="(?:preconnect|stylesheet)"[^>]+href="https?:\/\//);
+    const externalResourceHints = [...html.matchAll(/<link\b[^>]*>/g)]
+      .map(([tag]) => tag)
+      .filter((tag) => /rel="(?:preconnect|stylesheet)"/.test(tag))
+      .map((tag) => tag.match(/href="(https?:\/\/[^\"]+)"/)?.[1])
+      .filter(Boolean);
+    assert.deepEqual(
+      externalResourceHints,
+      [
+        'https://fonts.googleapis.com',
+        'https://fonts.gstatic.com',
+        'https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap',
+      ],
+    );
   });
 
   it('leads with the authored trail and presents record controls as editorial lenses', () => {
