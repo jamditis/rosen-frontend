@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { html } from '../html.js?v=3.7.5';
 import { Users, Building2, Lightbulb, BookOpen, MapPin, Calendar, Search, ArrowUpDown, ChevronDown, ChevronRight, X, ExternalLink, AlertTriangle, RotateCw } from 'lucide-react';
 import { fetchEntitiesData, getRecordsByEntity } from '../services/archiveService.js?v=3.7.5';
@@ -35,6 +35,8 @@ const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
   const [entityRecords, setEntityRecords] = useState([]);
   const [coOccurring, setCoOccurring] = useState([]);
   const [recordEntityMap, setRecordEntityMap] = useState({});
+  const detailHeadingRef = useRef(null);
+  const entityOpenerRef = useRef(null);
 
   // Load entity data
   useEffect(() => {
@@ -115,15 +117,29 @@ const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
     setDisplayLimit(100);
   }, [selectedType, searchTerm, sortBy]);
 
-  // When an entity is selected, find its records and co-occurring entities
-  const handleEntitySelect = useCallback((entity) => {
+  const closeEntityDetails = useCallback(() => {
+    const opener = entityOpenerRef.current;
+    setSelectedEntity(null);
+    setEntityRecords([]);
+    setCoOccurring([]);
+    entityOpenerRef.current = null;
+    requestAnimationFrame(() => {
+      if (opener?.isConnected) opener.focus();
+    });
+  }, []);
+
+  // When an entity is selected, find its records and co-occurring entities.
+  // Keep the stable list opener while following co-occurrence links inside the
+  // detail panel, so closing the research path has somewhere useful to return.
+  const handleEntitySelect = useCallback((entity, opener = null) => {
     if (selectedEntity && selectedEntity.id === entity.id) {
-      setSelectedEntity(null);
-      setEntityRecords([]);
-      setCoOccurring([]);
+      closeEntityDetails();
       return;
     }
 
+    if (opener && !opener.closest('[data-entity-detail]')) {
+      entityOpenerRef.current = opener;
+    }
     setSelectedEntity(entity);
 
     // Find records that mention this entity
@@ -157,7 +173,17 @@ const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
       .slice(0, 20);
 
     setCoOccurring(coEntities);
-  }, [selectedEntity, records, queryActive, recordEntityMap, recordIdsByEntity, scopedEntityById]);
+  }, [selectedEntity, records, queryActive, recordEntityMap, recordIdsByEntity, scopedEntityById, closeEntityDetails]);
+
+  useEffect(() => {
+    if (!selectedEntity) return undefined;
+    // Compact layouts place the selected detail before the long result list.
+    // Moving focus makes that new context immediate for keyboard and screen-
+    // reader users, and scrolls it into view for touch users who selected a
+    // card near the top of a list that can contain hundreds of entities.
+    const frame = requestAnimationFrame(() => detailHeadingRef.current?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [selectedEntity?.id]);
 
   if (loading) {
     return html`
@@ -281,7 +307,7 @@ const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
       <!-- Main content: entity list + detail panel -->
       <div className="flex flex-col lg:flex-row gap-6">
         <!-- Entity list -->
-        <div className="flex-grow">
+        <div className="entity-browser-list flex-grow">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             ${displayedEntities.map(entity => {
               const config = TYPE_CONFIG[entity.type] || TYPE_CONFIG.Concept;
@@ -293,8 +319,9 @@ const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
                 <button
                   type="button"
                   key=${entity.id}
-                  onClick=${() => handleEntitySelect(entity)}
+                  onClick=${(event) => handleEntitySelect(entity, event.currentTarget)}
                   aria-expanded=${Boolean(isSelected)}
+                  aria-controls=${isSelected ? 'entity-detail-panel' : undefined}
                   className=${`text-left p-3 border rounded transition-all ${
                     isSelected
                       ? 'border-stone-800 bg-stone-50 shadow-md'
@@ -350,8 +377,20 @@ const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
 
         <!-- Detail panel (when entity selected) -->
         ${selectedEntity && html`
-          <div className="lg:w-96 lg:sticky lg:top-20 lg:self-start flex-shrink-0">
-            <div className="border border-stone-200 rounded bg-white shadow-sm">
+          <div className="entity-browser-detail flex-shrink-0 lg:sticky lg:top-20 lg:w-96 lg:self-start">
+            <div
+              id="entity-detail-panel"
+              data-entity-detail
+              role="region"
+              aria-labelledby="entity-detail-title"
+              onKeyDown=${(event) => {
+                if (event.key !== 'Escape') return;
+                event.preventDefault();
+                event.stopPropagation();
+                closeEntityDetails();
+              }}
+              className="border border-stone-200 rounded bg-white shadow-sm"
+            >
               <!-- Entity header -->
               <div className="p-4 border-b border-stone-100">
                 <div className="flex items-center justify-between">
@@ -371,14 +410,19 @@ const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
                   </div>
                   <button
                     type="button"
-                    onClick=${() => { setSelectedEntity(null); setEntityRecords([]); setCoOccurring([]); }}
+                    onClick=${closeEntityDetails}
                     className="text-stone-400 hover:text-stone-600"
                     aria-label="Close entity details"
                   >
                     <${X} className="w-4 h-4" aria-hidden="true" />
                   </button>
                 </div>
-                <h3 className="font-display font-bold text-lg text-stone-900 mt-2">
+                <h3
+                  id="entity-detail-title"
+                  ref=${detailHeadingRef}
+                  tabIndex="-1"
+                  className="entity-detail-heading font-display font-bold text-lg text-stone-900 mt-2"
+                >
                   ${selectedEntity.name}
                 </h3>
                 ${selectedEntity.role && selectedEntity.role !== 'None' && html`
@@ -433,7 +477,7 @@ const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
                         <button
                           type="button"
                           key=${coEntity.id}
-                          onClick=${() => handleEntitySelect(coEntity)}
+                          onClick=${(event) => handleEntitySelect(coEntity, event.currentTarget)}
                           className="w-full text-left flex items-center gap-2 p-1.5 rounded hover:bg-stone-50 transition-colors"
                         >
                           <${CoIcon} className="w-3 h-3 flex-shrink-0" style=${{ color: coConfig.color }} />

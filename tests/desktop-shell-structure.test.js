@@ -153,6 +153,22 @@ describe('desktop entity adapter', () => {
     assert.match(panel, /onSelectRecord=\$\{onSelectRecord\}/);
     assert.match(panel, /Open standard view/);
   });
+
+  it('prioritizes selected entity details on compact layouts with exact focus entry and return', () => {
+    const browser = read('frontend/components/EntityBrowser.js');
+    const css = read('frontend/index.css');
+    assert.match(browser, /className="entity-browser-list flex-grow"/);
+    assert.match(browser, /className="entity-browser-detail flex-shrink-0/);
+    assert.match(css, /\.entity-browser-list\s*\{\s*order:\s*2/);
+    assert.match(css, /\.entity-browser-detail\s*\{\s*order:\s*1/);
+    assert.match(css, /\.entity-detail-heading:focus-visible\s*\{[\s\S]*outline:\s*3px solid/);
+    assert.match(css, /@media \(min-width: 1024px\)[\s\S]*\.entity-browser-list\s*\{\s*order:\s*1[\s\S]*\.entity-browser-detail\s*\{\s*order:\s*2/);
+    assert.match(browser, /role="region"[\s\S]*aria-labelledby="entity-detail-title"/);
+    assert.match(browser, /detailHeadingRef\.current\?\.focus\(\)/);
+    assert.match(browser, /if \(event\.key !== 'Escape'\) return;/);
+    assert.match(browser, /if \(opener\?\.isConnected\) opener\.focus\(\)/);
+    assert.match(browser, /!opener\.closest\('\[data-entity-detail\]'\)/);
+  });
 });
 
 describe('desktop research adapters', () => {

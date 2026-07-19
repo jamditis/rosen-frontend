@@ -22,6 +22,33 @@
   outline-offset: -3px;
 }
 
+/* The entity browser can render hundreds of cards. On narrow layouts, place
+   the newly selected master/detail panel before that long list so the result
+   of an activation is immediately visible. The wide layout retains the
+   conventional list-left/detail-right arrangement. */
+.entity-browser-list {
+  order: 2;
+}
+
+.entity-browser-detail {
+  order: 1;
+}
+
+.entity-detail-heading:focus-visible {
+  outline: 3px solid #44403c;
+  outline-offset: 4px;
+}
+
+@media (min-width: 1024px) {
+  .entity-browser-list {
+    order: 1;
+  }
+
+  .entity-browser-detail {
+    order: 2;
+  }
+}
+
 /* iOS Safari zooms the page when a focused form field is smaller than 16px.
    The compact desktop and its global report dialog both sit beside fixed
    controls, so keep their text-entry surfaces at the non-zooming threshold. */
