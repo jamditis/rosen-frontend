@@ -85,6 +85,7 @@ const Sidebar = ({
     (filters.recordIds !== null ? 1 : 0);
   const embedded = variant === 'desktop';
   const searchInputId = embedded ? 'desktop-archive-search' : 'archive-search';
+  const FilterPanelTag = embedded ? 'div' : 'aside';
 
   return html`
     <div className=${embedded ? 'desktop-filter-root' : ''}>
@@ -96,7 +97,7 @@ const Sidebar = ({
           aria-hidden="true"
         />
 
-      <aside
+      <${FilterPanelTag}
         className=${embedded
           ? `desktop-filter-panel ${isOpen ? 'is-open' : ''}`
           : `
@@ -105,7 +106,7 @@ const Sidebar = ({
             overflow-y-auto lg:overflow-visible shadow-2xl lg:shadow-none
             ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           `}
-        aria-label="Archive filters"
+        aria-label=${embedded ? undefined : 'Archive filters'}
       >
         <div className="p-5 lg:p-0 space-y-8">
 
@@ -261,7 +262,7 @@ const Sidebar = ({
           </button>
 
         </div>
-      </aside>
+      <//>
     </div>
   `;
 };

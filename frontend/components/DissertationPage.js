@@ -42,9 +42,10 @@ const DissertationPage = ({ onBack, embedded = false }) => {
               <button
                 type="button"
                 onClick=${onBack}
+                aria-label="Back to archive"
                 className="flex items-center gap-2 text-stone-600 hover:text-stone-900 transition-colors text-sm"
               >
-                <${ArrowLeft} className="w-4 h-4" />
+                <${ArrowLeft} className="w-4 h-4" aria-hidden="true" />
                 <span className="hidden sm:inline">Back to Archive</span>
               </button>
             `}
@@ -135,6 +136,7 @@ const DissertationPage = ({ onBack, embedded = false }) => {
           nodes=${DISSERTATION_NODES}
           onNodeSelect=${handleNodeSelect}
           isPanelOpen=${detailPanelOpen}
+          minimumZoom=${embedded ? 44 / 72 : 0.3}
           className=${embedded ? '' : 'absolute inset-0'}
         />
       </div>

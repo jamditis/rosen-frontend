@@ -781,7 +781,7 @@
 }
 
 .desktop-sort-control select {
-  min-height: 40px;
+  min-height: 44px;
   border: 1px solid #827c72;
   border-radius: 0;
   background: #fffdf8;
@@ -806,6 +806,29 @@
   border: 1px solid #b4ac9e;
   background: rgba(255, 253, 248, 0.72);
   box-shadow: none;
+}
+
+.desktop-filter-panel button,
+.desktop-filter-panel input:not([type='checkbox']):not([type='radio']),
+.desktop-filter-panel select,
+.desktop-filter-panel label.flex {
+  min-height: 44px;
+}
+
+.desktop-filter-panel label.flex {
+  align-items: center;
+}
+
+#desktop-archive-search {
+  padding-right: 44px;
+}
+
+.desktop-filter-panel button[aria-label='Clear archive search'] {
+  top: 0;
+  right: 0;
+  display: grid;
+  min-width: 44px;
+  place-items: center;
 }
 
 .desktop-filter-backdrop {
@@ -842,6 +865,12 @@
 .desktop-archive-results .py-20 {
   padding-top: 3rem;
   padding-bottom: 3rem;
+}
+
+.desktop-archive-results button[aria-label='Previous results page'],
+.desktop-archive-results button[aria-label='Next results page'] {
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .desktop-archive-error {
@@ -969,6 +998,10 @@
 .desktop-canonical-surface input,
 .desktop-canonical-surface select {
   min-height: 44px;
+}
+
+.desktop-canonical-surface button {
+  min-width: 44px;
 }
 
 .desktop-canonical-surface button.text-white {

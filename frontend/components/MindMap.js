@@ -388,7 +388,13 @@ const MindMapEdge = ({ edge }) => {
 };
 
 // Main Mind Map Component
-const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) => {
+const MindMap = ({
+  nodes,
+  onNodeSelect,
+  className = '',
+  isPanelOpen = false,
+  minimumZoom = 0.3,
+}) => {
   const containerRef = useRef(null);
   const [expandedIds, setExpandedIds] = useState(new Set(['root']));
   const [selectedNodeId, setSelectedNodeId] = useState(null);
@@ -400,6 +406,9 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
   const [isAnimating, setIsAnimating] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const animationRef = useRef(null);
+  const safeMinimumZoom = Number.isFinite(minimumZoom)
+    ? Math.min(1.5, Math.max(0.3, minimumZoom))
+    : 0.3;
 
   // Add child counts to nodes
   const nodesWithCounts = useMemo(() => {
@@ -423,6 +432,14 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
     const startZoom = zoom;
     const startPan = { ...pan };
     const startTime = performance.now();
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+    if (reduceMotion || duration <= 0) {
+      setZoom(targetZoom);
+      setPan(targetPan);
+      setIsAnimating(false);
+      return;
+    }
 
     const animate = (currentTime) => {
       const elapsed = currentTime - startTime;
@@ -464,7 +481,10 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
     // Calculate zoom to fit content
     const scaleX = availableWidth / newBounds.width;
     const scaleY = availableHeight / newBounds.height;
-    const targetZoom = Math.min(scaleX, scaleY, 1.5); // Cap max zoom at 1.5
+    const targetZoom = Math.max(
+      safeMinimumZoom,
+      Math.min(scaleX, scaleY, 1.5),
+    ); // Cap max zoom at 1.5 without shrinking desktop touch targets.
 
     // Calculate pan to center content
     const contentCenterX = newBounds.x + newBounds.width / 2;
@@ -478,7 +498,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
       setZoom(targetZoom);
       setPan({ x: targetPanX, y: targetPanY });
     }
-  }, [animateToFit]);
+  }, [animateToFit, safeMinimumZoom]);
 
   // Fit view to a specific node and its immediate connections
   const fitToNodeCluster = useCallback((nodeId, animate = true) => {
@@ -527,7 +547,10 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
     // Calculate zoom to fit cluster
     const scaleX = availableWidth / clusterBounds.width;
     const scaleY = availableHeight / clusterBounds.height;
-    const targetZoom = Math.min(scaleX, scaleY, 1.2); // Cap at 1.2 for readability
+    const targetZoom = Math.max(
+      safeMinimumZoom,
+      Math.min(scaleX, scaleY, 1.2),
+    ); // Cap at 1.2 for readability.
 
     // Calculate pan to center the cluster
     const clusterCenterX = clusterBounds.x + clusterBounds.width / 2;
@@ -541,7 +564,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
       setZoom(targetZoom);
       setPan({ x: targetPanX, y: targetPanY });
     }
-  }, [visibleNodes, nodeWidth, nodeHeight, animateToFit]);
+  }, [visibleNodes, nodeWidth, nodeHeight, animateToFit, safeMinimumZoom]);
 
   // Handle node selection - auto-fit to node cluster and notify parent
   const handleNodeSelect = useCallback((node) => {
@@ -586,7 +609,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
 
   // Zoom controls
   const handleZoomIn = () => setZoom(z => Math.min(z * 1.2, 3));
-  const handleZoomOut = () => setZoom(z => Math.max(z / 1.2, 0.3));
+  const handleZoomOut = () => setZoom(z => Math.max(z / 1.2, safeMinimumZoom));
   const handleReset = () => fitToView(bounds, true);
   const handleFitToView = () => fitToView(bounds, true);
 
@@ -641,8 +664,8 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
   const handleWheel = useCallback((e) => {
     e.preventDefault();
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    setZoom(z => Math.max(0.3, Math.min(3, z * delta)));
-  }, []);
+    setZoom(z => Math.max(safeMinimumZoom, Math.min(3, z * delta)));
+  }, [safeMinimumZoom]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -666,7 +689,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
           break;
         case '-':
           e.preventDefault();
-          setZoom(z => Math.max(z / 1.2, 0.3));
+          setZoom(z => Math.max(z / 1.2, safeMinimumZoom));
           break;
         case '0':
           e.preventDefault();
@@ -693,7 +716,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedNodeId, handleDeselectNode]);
+  }, [selectedNodeId, handleDeselectNode, safeMinimumZoom]);
 
   // Cancel any in-flight fit-to-view animation on unmount. animateToFit
   // re-schedules requestAnimationFrame until the tween finishes; without this,

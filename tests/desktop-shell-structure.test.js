@@ -84,6 +84,8 @@ describe('desktop archive adapter', () => {
     const panel = read('frontend/desktop/DesktopArchivePanel.js');
     const sidebar = read('frontend/components/Sidebar.js');
     assert.match(sidebar, /Search archive/);
+    assert.match(sidebar, /FilterPanelTag = embedded \? 'div' : 'aside'/,
+      'the embedded filter panel must not nest a complementary landmark in a window region');
     assert.match(panel, /onSetViewMode\('folder'\)/);
     assert.match(panel, /<\$\{Sidebar\}/);
     assert.match(panel, /onSelectRecord=\$\{onSelectRecord\}/);
@@ -158,12 +160,19 @@ describe('desktop research adapters', () => {
 
   it('keeps mind-map keyboard shortcuts local and exposes its nodes to the keyboard', () => {
     const map = read('frontend/components/MindMap.js');
+    const dissertationPage = read('frontend/components/DissertationPage.js');
     assert.match(map, /containerRef\.current\?\.contains\(document\.activeElement\)/);
     assert.match(map, /role="button"/);
     assert.match(map, /tabIndex="0"/);
     assert.match(map, /e\.key === 'Enter' \|\| e\.key === ' '/);
     assert.match(map, /role="region"/);
     assert.doesNotMatch(map, /role="application"/);
+    assert.match(dissertationPage, /minimumZoom=\$\{embedded \? 44 \/ 72 : 0\.3\}/);
+    assert.match(dissertationPage, /aria-label="Back to archive"/,
+      'the standard mobile back button keeps its name when its visible label is hidden');
+    assert.match(map, /Math\.max\(\s*safeMinimumZoom,\s*Math\.min\(scaleX, scaleY/);
+    assert.match(map, /prefers-reduced-motion: reduce/);
+    assert.match(map, /if \(reduceMotion \|\| duration <= 0\)/);
   });
 });
 
@@ -271,5 +280,8 @@ describe('desktop interaction structure', () => {
     assert.match(css, /env\(safe-area-inset-bottom/);
     assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
     assert.match(css, /overflow-x:\s*hidden/);
+    assert.match(css, /desktop-filter-panel label\.flex[\s\S]*min-height:\s*44px/);
+    assert.match(css, /Previous results page[\s\S]*min-width:\s*44px/);
+    assert.match(css, /desktop-canonical-surface button[\s\S]*min-width:\s*44px/);
   });
 });
