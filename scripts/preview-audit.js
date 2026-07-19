@@ -43,7 +43,7 @@ const ROUTES = [
   { slug: 'participate',        url: '/features/participate/' },
   { slug: 'archive-desktop',    url: '/#desktop', archiveDetails: 'forbid', verifyStartPathRoundTrip: true },
   { slug: 'desktop-start-menu', url: '/#desktop', archiveDetails: 'forbid', verifyDesktopStartMenu: true },
-  { slug: 'desktop-unknown',    url: '/#desktop/not-real' },
+  { slug: 'desktop-unknown',    url: '/#desktop/not-real', verifyBlockedMakingOf: true },
   {
     slug: 'desktop-archive',
     url: '/#desktop/archive',
@@ -636,6 +636,34 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     await page.keyboard.press('Escape');
     await dialog.waitFor({ state: 'hidden' });
     await assertFocused(recordOpener, 'Entity record opener after ordinary close');
+  }
+  if (route.verifyBlockedMakingOf) {
+    const archiveDataRequests = [];
+    const captureArchiveData = (request) => {
+      if (new URL(request.url()).pathname.includes('/data/archive-')) {
+        archiveDataRequests.push(request.url());
+      }
+    };
+    page.on('request', captureArchiveData);
+    try {
+      await page.evaluate(() => { window.location.hash = '#desktop/making-of'; });
+      await page.waitForURL((url) => url.hash === '#desktop/making-of');
+      await page.waitForTimeout(1500);
+    } finally {
+      page.off('request', captureArchiveData);
+    }
+    await page.locator('.desktop-notice').filter({ hasText: 'That desktop item is unavailable.' }).waitFor();
+    const renderedText = await page.locator('.archive-desktop').innerText();
+    if (
+      renderedText.includes('How it was made')
+      || /interview|publication approval|making-of narrative/i.test(renderedText)
+    ) {
+      throw new Error('Blocked making-of metadata leaked through its guessed desktop URL');
+    }
+    if (archiveDataRequests.length > 0) {
+      throw new Error(`Blocked making-of URL loaded archive data: ${JSON.stringify(archiveDataRequests)}`);
+    }
+    await assertFocused(page.locator('#desktop-window-title-home'), 'Desktop home after blocked making-of URL');
   }
   if (route.openReport) {
     const reportDialog = page.getByRole('dialog', { name: 'Report a problem or suggest a record' });

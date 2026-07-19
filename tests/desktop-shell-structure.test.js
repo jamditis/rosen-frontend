@@ -74,7 +74,9 @@ describe('desktop route wiring', () => {
       'desktop entry and browser Back must visibly focus both ends of the round trip');
     assert.match(audit, /slug: 'archive-desktop',[\s\S]*url: '\/#desktop',[\s\S]*verifyStartPathRoundTrip: true/);
     assert.match(audit, /slug: 'desktop-start-menu',[\s\S]*verifyDesktopStartMenu: true/);
-    assert.match(audit, /slug: 'desktop-unknown',\s+url: '\/#desktop\/not-real'/);
+    assert.match(audit, /slug: 'desktop-unknown',\s+url: '\/#desktop\/not-real',\s+verifyBlockedMakingOf: true/);
+    assert.match(audit, /window\.location\.hash = '#desktop\/making-of'[\s\S]*Blocked making-of metadata leaked[\s\S]*Blocked making-of URL loaded archive data[\s\S]*Desktop home after blocked making-of URL/,
+      'a guessed gated route must remain generic, data-free, and home-focused');
     assert.match(audit, /slug: 'desktop-archive',[\s\S]*url: '\/#desktop\/archive',[\s\S]*verifyStandardExit:[\s\S]*appId: 'archive'/);
     assert.match(audit, /slug: 'desktop-folders',[\s\S]*url: '\/#desktop\/folders',[\s\S]*verifyStandardExit:[\s\S]*appId: 'folders'/);
     assert.match(audit, /slug: 'desktop-start',[\s\S]*url: '\/#desktop\/start',[\s\S]*verifyStandardExit:[\s\S]*appId: 'start'/);
