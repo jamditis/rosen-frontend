@@ -288,6 +288,24 @@ async function auditOne(page, route, viewport) {
       throw new Error('About history return reopened the Start menu');
     }
     await assertFocused(page.locator('#desktop-window-title-home'), 'Desktop home after about browser Back');
+
+    await startButton.click();
+    await startMenu.getByRole('menuitem', { name: /^Participate/ }).click();
+    await page.waitForURL((url) => url.pathname.endsWith('/features/participate/'));
+    await assertArchiveRootReturn(
+      page,
+      page.locator('.archive-link'),
+      'Participate return',
+    );
+
+    await page.goBack({ waitUntil: 'networkidle' });
+    if (new URL(page.url()).hash !== '#desktop') {
+      throw new Error(`Participate history return lost its desktop route: ${page.url()}`);
+    }
+    if (await startMenu.isVisible()) {
+      throw new Error('Participate history return reopened the Start menu');
+    }
+    await assertFocused(page.locator('#desktop-window-title-home'), 'Desktop home after participate browser Back');
   }
   if (route.verifyStandardExit) {
     const {

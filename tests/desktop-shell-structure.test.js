@@ -88,6 +88,10 @@ describe('desktop route wiring', () => {
       'an in-document Start launch must announce its canonical route destination');
     assert.match(audit, /'Desktop home after about browser Back'/,
       'Back from a canonical route must reconstruct desktop focus and closed-popup state');
+    assert.match(audit, /assertArchiveRootReturn\([\s\S]*'Participate return'/,
+      'the approved participation path must retain an explicit archive-root exit');
+    assert.match(audit, /'Desktop home after participate browser Back'/,
+      'browser Back from Participate must reconstruct desktop focus and closed-popup state');
     assert.match(audit, /buttonName = 'Open standard view'[\s\S]*activeWindow\.getByRole\('button', \{ name: buttonName, exact: true \}\)[\s\S]*page\.url\(\) !== desktopUrl/,
       'canonical adapter exits must round-trip their exact desktop URL');
     assert.match(audit, /`#desktop-window-title-\$\{appId\}`/,

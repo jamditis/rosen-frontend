@@ -36,7 +36,7 @@ The expected test results are 1,099 passing repository tests across 225 suites a
 1. Begin at `/` and confirm the familiar archive remains the first experience.
 2. Enter through Start here or Tools, then inspect `/#desktop` directly.
 3. Open Read me and return to the launcher.
-4. Open Tools and launch Dissertation release. First use browser Back and confirm the Tools window reconstructs. Relaunch the page and use its 44-pixel “Back to archive” control to confirm the explicit standard-view escape. Repeat with the method demonstration and data visualization to sample the deeper standalone path prefixes.
+4. Open Tools and launch Dissertation release. First use browser Back and confirm the Tools window reconstructs. Relaunch the page and use its 44-pixel “Back to archive” control to confirm the explicit standard-view escape. Repeat with the method demonstration and data visualization to sample the deeper standalone path prefixes. Launch both The method and Participate from Start and confirm browser Back reconstructs desktop home after each approved path.
 5. Open Start, choose About, and confirm keyboard focus enters the “About this archive” heading. Use browser Back and confirm the desktop home title owns focus and Start remains closed.
 6. From Archive, Folders, Start here, Selected findings, People & ideas, Dissertation, and Analytics, choose the standard-view action. Confirm focus enters the canonical destination, then use browser Back and confirm the exact desktop window and URL return.
 
