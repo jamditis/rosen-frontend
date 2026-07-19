@@ -50,10 +50,14 @@ describe('desktop route wiring', () => {
     assert.match(audit, /slug: 'desktop-entities',\s+url: '\/#desktop\/entities'/);
     assert.match(audit, /slug: 'desktop-dissertation',\s+url: '\/#desktop\/dissertation'/);
     assert.match(audit, /slug: 'desktop-analytics',\s+url: '\/#desktop\/analytics'/);
+    assert.match(audit, /slug: 'desktop-readme',\s+url: '\/#desktop\/readme'/);
+    assert.match(audit, /slug: 'desktop-tools',\s+url: '\/#desktop\/tools'/);
     assert.match(audit, /slug: 'desktop-windowing'[\s\S]*desktopLayout:[\s\S]*zOrder/);
     assert.match(audit, /name: 'mobile',\s+width: 375,\s+height: 812/);
     assert.match(audit, /name: 'tablet',\s+width: 768,\s+height: 1024/);
     assert.match(audit, /name: 'desktop',\s+width: 1440,\s+height: 900/);
+    assert.match(audit, /PREVIEW_AUDIT_VIEWPORT/,
+      'the complete audit can be sharded by viewport without reducing route coverage');
   });
 });
 

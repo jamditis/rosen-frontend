@@ -30,7 +30,11 @@ const URL_HOST = CLIENT_HOST.includes(':') && !CLIENT_HOST.startsWith('[')
   ? `[${CLIENT_HOST}]`
   : CLIENT_HOST;
 const BASE = `http://${URL_HOST}:${PORT}`;
-const OUT_DIR = resolve(fileURLToPath(import.meta.url), '..', '..', 'preview-audit-results');
+const REQUESTED_VIEWPORT = (process.env.PREVIEW_AUDIT_VIEWPORT || '').trim();
+const OUT_DIR_ROOT = resolve(fileURLToPath(import.meta.url), '..', '..', 'preview-audit-results');
+const OUT_DIR = REQUESTED_VIEWPORT
+  ? resolve(OUT_DIR_ROOT, 'shards', REQUESTED_VIEWPORT)
+  : OUT_DIR_ROOT;
 
 const ROUTES = [
   { slug: 'home-archive',       url: '/' },
@@ -43,6 +47,8 @@ const ROUTES = [
   { slug: 'desktop-entities',   url: '/#desktop/entities' },
   { slug: 'desktop-dissertation', url: '/#desktop/dissertation' },
   { slug: 'desktop-analytics',  url: '/#desktop/analytics' },
+  { slug: 'desktop-readme',     url: '/#desktop/readme' },
+  { slug: 'desktop-tools',      url: '/#desktop/tools' },
   {
     slug: 'desktop-windowing',
     url: '/#desktop/analytics',
@@ -67,11 +73,18 @@ const ROUTES = [
   { slug: 'winer-method',       url: '/features/winer-method/' },
 ];
 
-const VIEWPORTS = [
+const ALL_VIEWPORTS = [
   { name: 'mobile',  width: 375,  height: 812  },
   { name: 'tablet',  width: 768,  height: 1024 },
   { name: 'desktop', width: 1440, height: 900  },
 ];
+const VIEWPORTS = REQUESTED_VIEWPORT
+  ? ALL_VIEWPORTS.filter(({ name }) => name === REQUESTED_VIEWPORT)
+  : ALL_VIEWPORTS;
+
+if (REQUESTED_VIEWPORT && VIEWPORTS.length === 0) {
+  throw new Error(`Unknown PREVIEW_AUDIT_VIEWPORT "${REQUESTED_VIEWPORT}". Expected mobile, tablet, or desktop.`);
+}
 
 async function startServer() {
   const proc = spawn('node', ['scripts/preview-server.js'], {
