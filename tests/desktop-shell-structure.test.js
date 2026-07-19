@@ -271,6 +271,8 @@ describe('desktop interaction structure', () => {
     assert.match(shell, /role="menuitem"/);
     assert.match(shell, /aria-haspopup="menu"/);
     assert.match(shell, /aria-expanded=\$\{startOpen\}/);
+    assert.match(shell, /tabIndex=\$\{index === menuFocusIndex \? 0 : -1\}/);
+    assert.match(shell, /setMenuFocusIndex\(nextIndex\)/);
     assert.match(shell, /event\.key === 'Escape'/);
     assert.match(shell, /role="region"/);
     assert.doesNotMatch(shell, /aria-modal/);

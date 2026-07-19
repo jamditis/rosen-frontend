@@ -114,6 +114,7 @@ const DesktopShell = ({
 
   const [shortcutFocusIndex, setShortcutFocusIndex] = useState(0);
   const [startOpen, setStartOpen] = useState(false);
+  const [menuFocusIndex, setMenuFocusIndex] = useState(0);
   const [statusMessage, setStatusMessage] = useState(
     hasUnknownApp ? 'That desktop item is unavailable. Showing the desktop home.' : '',
   );
@@ -229,6 +230,7 @@ const DesktopShell = ({
 
   useEffect(() => {
     if (!startOpen) return undefined;
+    setMenuFocusIndex(0);
     const frame = requestAnimationFrame(() => menuItemRefs.current[0]?.focus());
 
     const closeFromOutside = (event) => {
@@ -327,6 +329,7 @@ const DesktopShell = ({
     }
 
     event.preventDefault();
+    setMenuFocusIndex(nextIndex);
     menuItemRefs.current[nextIndex]?.focus();
   };
 
@@ -688,7 +691,8 @@ const DesktopShell = ({
                 type="button"
                 className="desktop-menu-item"
                 role="menuitem"
-                tabIndex="-1"
+                tabIndex=${index === menuFocusIndex ? 0 : -1}
+                onFocus=${() => setMenuFocusIndex(index)}
                 onClick=${() => openApp(app)}
                 onKeyDown=${(event) => handleMenuKeyDown(event, index)}
               >
@@ -702,7 +706,8 @@ const DesktopShell = ({
               type="button"
               className="desktop-menu-item"
               role="menuitem"
-              tabIndex="-1"
+              tabIndex=${menuFocusIndex === startApps.length ? 0 : -1}
+              onFocus=${() => setMenuFocusIndex(startApps.length)}
               onClick=${resetLayout}
               onKeyDown=${(event) => handleMenuKeyDown(event, startApps.length)}
             >
@@ -714,7 +719,8 @@ const DesktopShell = ({
               type="button"
               className="desktop-menu-item desktop-menu-exit"
               role="menuitem"
-              tabIndex="-1"
+              tabIndex=${menuFocusIndex === startApps.length + 1 ? 0 : -1}
+              onFocus=${() => setMenuFocusIndex(startApps.length + 1)}
               onClick=${onExit}
               onKeyDown=${(event) => handleMenuKeyDown(event, startApps.length + 1)}
             >
