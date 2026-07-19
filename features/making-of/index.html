@@ -477,7 +477,7 @@
         <li><span class="d-tag">2025-08</span><p class="d-body">Google URL Context tool becomes stage 1 of the scrape cascade.</p></li>
         <li><span class="d-tag">REVIEW</span><p class="d-body">Codex reads code before merge (from 2025-10). CI plus a second review model added 2025-12. Pre-PR <code>codex</code> review and review subagents by 2026.</p></li>
         <li><span class="d-tag">OCR</span><p class="d-body">Tesseract (open-source) chosen over model-based OCR for scanned clippings. Recorded in git as a rename commit.</p></li>
-        <li><span class="d-tag">TEST</span><p class="d-body">A 42-row production test scored articles 25/25 and multimedia 10/16, surfacing six edge-case classes the paper design had missed.</p></li>
+        <li><span class="d-tag">TEST</span><p class="d-body">A 42-row production test scored articles 25/25 and multimedia 10/16, turning up six edge-case classes the paper design had missed.</p></li>
         <li><span class="d-tag">INVARIANT</span><p class="d-body">No model in the runtime. Flat files read in-browser. The archive functions with every AI vendor gone.</p></li>
       </ul>
       <div class="exhibit">
@@ -514,7 +514,7 @@ adopted after the silent-write failures of 2025-09 and 2025-10. not broken since
         <li><span class="d-tag">2025-10</span><p class="d-body">A few hundred records, flat. No relationship queries possible.</p></li>
         <li><span class="d-tag">METHOD</span><p class="d-body">Model extracts entities. An in-memory registry dedupes names to canonical IDs (<code>P-00001</code> Jay Rosen, <code>O-00001</code> The New York Times).</p></li>
         <li><span class="d-tag">RUN 1</span><p class="d-body">~8 hrs. Schema revised to stop self-referential entities ("Jay Rosen founded [this post]").</p></li>
-        <li><span class="d-tag">SCHEMA</span><p class="d-body">Relationship vocabulary grew 10 to 15 types after a 100-record run surfaced ownership, founding, and influence links the schema had been rejecting.</p></li>
+        <li><span class="d-tag">SCHEMA</span><p class="d-body">Relationship vocabulary grew 10 to 15 types after a 100-record run turned up ownership, founding, and influence links the schema had been rejecting.</p></li>
         <li><span class="d-tag">AUGMENT</span><p class="d-body">An early augmentation run wrote malformed ids (<code>REL-06161</code>, UNKNOWN sources, blank entities). Those rows were deleted and rerun clean before the batch was trusted.</p></li>
         <li><span class="d-tag">GRAPH</span><p class="d-body">Current: 8,152 entities, 12,560 relationships. Jay is the central node. Nearest: NYT, PressThink, Washington Post.</p></li>
         <li><span class="d-tag">LESSON</span><p class="d-body">A "4:1 build-vs-criticize" claim was a founded/pioneered conflation. Reached 20+ files before removal.</p></li>
@@ -561,22 +561,17 @@ adopted after the silent-write failures of 2025-09 and 2025-10. not broken since
     </div>
 
     <div class="m-article prose">
-      <p class="lead">Everything up to here is the part you can automate. This chapter is the part you cannot.</p>
-      <p>The contract that paid for this archive ended in September. I kept building after that, unpaid, for most of a year, because I did not want to hand Jay something half-finished, and because I had wanted to build this exact thing since 2014. Preservation runs on grants and goodwill and somebody's nights, and the grant always ends before the work does.</p>
-      <p>The archive was built and the automatic publish was built, and getting the finished files onto the live site turned into its own small project: the way the site had been set up years earlier took real work to untangle before anything could go out the door. The link rot the archive fights had reached the archive's own front door.</p>
-      <p>So the fallback is almost funny, and it is honest, so it stays. Once a week I email Jay a zip file, he opens it, and he drags the new files into a web uploader by hand. That is the deploy pipeline right now. It is clunky and it works.</p>
-      <p>There was one real disagreement near the end, too, about whether the first thing a visitor meets should be the archive or a page that signs them up first. I pushed hard for the archive. A page that greets you with a form is telling you it wants something from you before it gives you anything, and this thing has exactly one job, which is to hand you the record and get out of the way.</p>
-      <p>I will not pretend the data is finished either. It is around ninety-five or ninety-six percent of the way there, with a soft spot roughly from 2004 to 2008 where the record thins out: publications that folded, or that never archived themselves. Looking at that stretch with Jay once, I told him I thought he had written more than we had been able to find. I still think so, and I have not found it.</p>
+      <p class="lead">The archive was built and the automatic publish was built, and getting the finished files onto the live site turned into its own small project: the way the site had been set up years earlier took real work to untangle before anything could go out the door. The link rot the archive fights had reached the archive's own front door.</p>
+      <p>Once a week I email Jay a zip file, he opens it, and he drags the new files into a web uploader by hand. That is the deploy pipeline right now. It is clunky and it works.</p>
+      <p>The data is not finished either. It is around ninety-five or ninety-six percent of the way there, with a soft spot roughly from 2004 to 2008 where the record thins out: publications that folded, or that never archived themselves. Looking at that stretch with Jay once, I told him I thought he had written more than we had been able to find. I still think so, and I have not found it.</p>
       <p class="pull">The link rot the archive fights had reached the archive's own front door.</p>
     </div>
 
     <div class="m-case">
       <ul class="dossier">
-        <li><span class="d-tag">CONTRACT</span><p class="d-body">Ended September 2025. Build continued unpaid for ~a year after.</p></li>
         <li><span class="d-tag">DEPLOY</span><p class="d-body">Automatic publish built, not yet wired up. Updated by hand in the meantime.</p></li>
         <li><span class="d-tag">SETUP</span><p class="d-body">The original hosting setup predated the archive and took time to untangle before the first publish.</p></li>
         <li><span class="d-tag">FALLBACK</span><p class="d-body">Weekly, the curator receives a zip and uploads files by hand through a web file manager. Clunky, working.</p></li>
-        <li><span class="d-tag">DESIGN</span><p class="d-body">A proposal to front the archive with a sign-up page was declined in favor of archive-first.</p></li>
         <li><span class="d-tag">QUALITY</span><p class="d-body">~95&ndash;96%. Soft coverage roughly 2004&ndash;2008 (folded or unarchived publications).</p></li>
         <li><span class="d-tag">CAPACITY</span><p class="d-body">Solo and unpaid. New records added by hand. No standing technical maintainer on the archive's side.</p></li>
       </ul>
@@ -603,7 +598,7 @@ status  open.  more is out there.  not yet found</pre>
     </div>
 
     <div class="m-article prose">
-      <p class="lead">The launch did not finish the archive. It exposed it. The minute the structure was visible to other people, the drift showed: counts in the docs that no longer matched the data, records with empty text, threads with placeholder titles, a claim in a file that the system had outgrown. So the work turned inward. The archive started keeping a record of itself, and checking that record against reality.</p>
+      <p class="lead">The launch did not finish the archive. Once other people could see the structure, the errors in it were easy to find: counts in the docs that no longer matched the data, records with empty text, threads with placeholder titles, a claim in a file that the system had outgrown. So the archive started keeping a record of itself, and checking that record against reality.</p>
       <p>That is the rule the whole thing runs on now. Every change goes through a branch and a review before it lands. Nothing merges itself. When a document says the system does something, that sentence gets checked against the system, because I have been burned by a confident wrong sentence before. This page is part of that same habit. I wrote it from the project's own history and its git log, and I checked every number on it against the live files the day it went up. Some of those numbers are gaps, and I left them on the page instead of rounding them off: seventy-nine records still unverified, a handful of them genuinely gone, a print-only piece from 1999, a monograph from a civic-journalism center that no longer exists. An archive that only reports its wins is not keeping an honest record.</p>
       <p>The real test of this thing is not today. It is a day years from now, when the model that reads these records is discontinued, or the company that made it is gone, or the contract was never renewed and nobody is being paid to care. On that day, someone types a name into the archive and it answers, out of flat files, in a browser, with no machine in the loop. If that happens, it worked.</p>
       <p class="pull">An archive that only reports its wins is not keeping an honest record.</p>
@@ -611,7 +606,7 @@ status  open.  more is out there.  not yet found</pre>
 
     <div class="m-case">
       <ul class="dossier">
-        <li><span class="d-tag">2025-12</span><p class="d-body">Launch makes the structure legible. Drift surfaces: stale counts, empty text, placeholder titles, doc claims out of sync.</p></li>
+        <li><span class="d-tag">2025-12</span><p class="d-body">Errors found after launch: stale counts, empty text, placeholder titles, doc claims out of sync.</p></li>
         <li><span class="d-tag">DISCIPLINE</span><p class="d-body">Branch and review on every change. No self-merge. Docs checked against the system.</p></li>
         <li><span class="d-tag">OPEN</span><p class="d-body">79 records unverified (2026-07-07). Some unrecoverable: a 1999 print-only piece, a defunct civic-journalism center's monograph.</p></li>
         <li><span class="d-tag">OPEN</span><p class="d-body">Coverage soft spot roughly 2004&ndash;2008.</p></li>
