@@ -303,7 +303,7 @@
     </div>
     <h1 class="title">The making of</h1>
     <p class="subject">Jay Rosen's Internet Archive</p>
-    <p class="dek">Jay Rosen spent four decades publishing across dozens of websites. I spent about a year turning what survived into one searchable archive. I am not a software engineer. I taught myself git, but I did not write the scraper. A language model wrote the scraper. I pointed several of them at a pile of records, got some help from a grad student, and I am still building it in public. This is how I did it, mistakes included.</p>
+    <p class="dek">Jay Rosen spent four decades publishing across dozens of websites. I spent about a year turning what survived into one searchable archive. I am not a software engineer. The scrapers were my design, the models wrote them and ran them, and I decided whether what came back was right, with some help from a grad student along the way. The tools changed under me the whole time. This is how I did it, mistakes included.</p>
     <p class="byline">By <b>Joe Amditis</b>. Source of record: the archive's own <code>docs/narrative</code> and the project's public git history.</p>
     <div class="masthead-toggle">
       <span class="toggle-label" id="mast-mode-label">Read as</span>
@@ -336,7 +336,7 @@
   <nav class="contents" aria-label="Chapters">
     <h2>Contents</h2>
     <ol>
-      <li><a href="#ch1"><span class="cn">01</span><span class="ct">The itch</span><span class="cd">the premise</span></a></li>
+      <li><a href="#ch1"><span class="cn">01</span><span class="ct">What was disappearing</span><span class="cd">the premise</span></a></li>
       <li><a href="#ch2"><span class="cn">02</span><span class="ct">Learning git in public</span><span class="cd">the tools</span></a></li>
       <li><a href="#ch3"><span class="cn">03</span><span class="ct">The pipeline and its potholes</span><span class="cd">the machine</span></a></li>
       <li><a href="#ch4"><span class="cn">04</span><span class="ct">Working with the machines</span><span class="cd">the method</span></a></li>
@@ -352,26 +352,26 @@
   <!-- ============ CH 1 ============ -->
   <article class="chapter reveal" id="ch1">
     <div class="ch-head">
-      <span class="ch-ref">CH.01 &nbsp;/&nbsp; origin</span>
-      <h2>The itch</h2>
-      <p class="ch-date">Where this really starts</p>
+      <span class="ch-ref">CH.01 &nbsp;/&nbsp; the problem</span>
+      <h2>What was disappearing</h2>
+      <p class="ch-date">Four decades, dozens of websites</p>
     </div>
 
     <div class="m-article prose">
-      <p class="lead">I have been trying to scrape things off the internet since about 2014. My first GitHub account, long gone now, was full of half-working experiments for pulling pages down and pinning them in place before they vanished. So when the chance came to build an archive of Jay Rosen's work, it landed on an itch I had been scratching for a decade.</p>
-      <p>Jay has taught journalism at NYU since 1986, and he wrote in public the whole time: the PressThink blog, op-eds, academic papers, panels on YouTube, thousands of tweets, Bluesky threads, Tumblr posts from his Studio 20 years. That is the problem in one sentence. The work is everywhere, and everywhere is not a place you can keep. Publications merge, fold, and get bought by people who do not care. Links rot. You can be an intellectual in public for forty years and watch the record of it thin out behind you.</p>
+      <p class="lead">Jay has taught journalism at NYU since 1986, and he wrote in public the whole time: the PressThink blog, op-eds, academic papers, panels on YouTube, thousands of tweets, Bluesky threads, Tumblr posts from his Studio 20 years. The work is everywhere, and everywhere is not a place you can keep. Publications merge, fold, and get bought by people who do not care. Links rot. You can be an intellectual in public for forty years and watch the record of it thin out behind you.</p>
       <p>The brief was easy to say and hard to do: put everything of Jay's that has a URL in one place, and make it searchable. Not a list of links. A list of links rots at the same rate as the web. I wanted a structured record: each piece with its text, its date, its ideas, and its connections to his other ideas, so that "the view from nowhere" or "the people formerly known as the audience" is something you can follow through the work, not just a phrase you can find.</p>
-      <p>And I wanted it to outlast me. That is the part I kept circling. I meant survive the contract, the tools, the platforms, and eventually the web it was scraped from.</p>
+      <p>A job this size used to need a team, or a grant, or both. Someone to write the scrapers, someone to clean up what came back, someone to build the thing readers actually use. Archives like this one did not get built by a single person, which is a large part of why the records in them get lost instead. What I had was a year, a clear idea of what it should do, and tools that had just become good enough that one person could ask for the parts and then check whether they worked.</p>
+      <p>And I wanted it to outlast me. That is the part I kept circling. I meant survive the tools, the platforms, and eventually the web it was scraped from.</p>
       <p class="pull">You can be an intellectual in public for forty years and watch the record of it thin out behind you.</p>
     </div>
 
     <div class="m-case">
       <ul class="dossier">
         <li><span class="d-tag">SUBJECT</span><p class="d-body">Jay Rosen. Professor of journalism, NYU, since 1986. Author of the PressThink blog.</p></li>
-        <li><span class="d-tag">ORIGIN</span><p class="d-body">Builder's first scraping experiments date to a 2014 GitHub account, since deleted.</p></li>
         <li><span class="d-tag">PROBLEM</span><p class="d-body">Four decades of work across dozens of platforms. Link rot removing it piece by piece.</p></li>
         <li><span class="d-tag">OBJECTIVE</span><p class="d-body">One searchable archive of every Rosen work reachable by URL. Structured records, not a link list.</p></li>
-        <li><span class="d-tag">CONSTRAINT</span><p class="d-body">Must outlast the contract, the tools, the platforms, and the source web.</p></li>
+        <li><span class="d-tag">CONSTRAINT</span><p class="d-body">Must outlast the tools, the platforms, and the source web.</p></li>
+        <li><span class="d-tag">TEAM</span><p class="d-body">One person, not an engineer, plus models and some help from a grad student.</p></li>
         <li><span class="d-tag">SCOPE</span><p class="d-body">Articles, essays, op-eds, video, audio, Tumblr, Twitter/X, Bluesky, and a 1986 dissertation.</p></li>
       </ul>
     </div>
@@ -384,14 +384,15 @@
     <div class="ch-head">
       <span class="ch-ref">CH.02 &nbsp;/&nbsp; 2025, learning the tools</span>
       <h2>Learning git in public</h2>
-      <p class="ch-date">The unflattering early chapters</p>
+      <p class="ch-date">What the job actually was</p>
     </div>
 
     <div class="m-article prose">
-      <p class="lead">I have to tell you how bad I was at this at the start, because the archive's own history is written into the thing it lives in, and the early chapters are not flattering.</p>
+      <p class="lead">I am not a software engineer and I did not become one. The job was to describe what the archive needed, have a model write it, run it, and decide whether what came back was right. Then do that again, most days, for a year.</p>
       <p>I did not really understand git when I began. I knew it the way you know a city from a map: I had the names, not the streets. My first real repository for the project has 111 commits on a single branch, and ten of them are titled "Add files via upload." That is the message GitHub writes for you when you drag files into the browser instead of pushing them from your machine. I was not using version control. I was using a website as a hard drive with a nicer icon.</p>
-      <p>It got more expensive than embarrassing. Early on I committed an API key where it did not belong and woke up to an email telling me it had been running up a bill overnight before I caught it. Another time a scraper of mine tripped a rate limit so hard that GitHub disabled every automated action on my account for looking like abuse. And at one point I deleted the whole repository and started over, and lost about a month of the project's history doing it. The archive is supposed to be a record that survives. I erased a chunk of its own record by hand.</p>
-      <p>What fixed it was not a tutorial. It was the second and third repositories. The second one had real dependency management and pull requests, but I also committed the dissertation's PDFs straight into it, which is what you are specifically not supposed to do, and crammed five half-built frontends in side by side. The third one, the one still standing, finally did the boring correct thing: one job per repository, secrets kept out, changes made on a branch and reviewed before they land. I learned separation of concerns the way most people do, which is by not doing it first.</p>
+      <p>Some of it got expensive. Early on I committed an API key where it did not belong and woke up to an email telling me it had been running up a bill overnight before I caught it. Another time a scraper of mine tripped a rate limit so hard that GitHub disabled every automated action on my account for looking like abuse. And at one point I deleted the whole repository and started over, and lost about a month of the project's history doing it. The archive is supposed to be a record that survives. I erased a chunk of its own record by hand.</p>
+      <p>What fixed it was not a tutorial. It was the second and third repositories. The second one had real dependency management and pull requests, but I also committed the dissertation's PDFs straight into it, which is what you are specifically not supposed to do, and crammed five half-built frontends in side by side. The third one, the one still standing, finally did the boring correct thing: one job per repository, secrets kept out, changes made on a branch and reviewed before they land.</p>
+      <p>The tools did not sit still while this was going on. At the start I was moving code between a browser tab and my editor by hand. By the end the models were running in the terminal, reading the repository directly, opening pull requests, and reviewing each other's work before anything merged. My part did not change: say what it should do, run it, decide whether it was right. What changed was how much I had to carry between those steps, and how much I could ask for at once.</p>
       <p class="pull">I was using a website as a hard drive with a nicer icon.</p>
     </div>
 
