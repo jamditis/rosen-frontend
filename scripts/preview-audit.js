@@ -69,6 +69,7 @@ const ROUTES = [
   { slug: 'about',              url: '/#about' },
   { slug: 'analytics',          url: '/#analytics' },
   { slug: 'record-modal',       url: '/?record=RECORD-00802' },
+  { slug: 'dissertation-map-detail', url: '/#dissertation', openDissertationDetail: true },
   { slug: 'dissertation',       url: '/dissertation/' },
   { slug: 'dissertation-reader',url: '/dissertation/reader/' },
   { slug: 'faq',                url: '/faq/' },
@@ -133,6 +134,11 @@ async function auditOne(page, route, viewport) {
   if (route.openReport) {
     await page.getByRole('button', { name: /^Report a problem\./ }).first().click();
     await page.getByRole('dialog', { name: 'Report a problem or suggest a record' }).waitFor();
+    await page.waitForTimeout(100);
+  }
+  if (route.openDissertationDetail) {
+    await page.locator('svg[aria-label^="Dissertation mind map"] [role="button"]').first().click();
+    await page.getByRole('dialog').waitFor();
     await page.waitForTimeout(100);
   }
 

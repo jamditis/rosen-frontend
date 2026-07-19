@@ -55,6 +55,8 @@ describe('desktop route wiring', () => {
     assert.match(audit, /slug: 'desktop-tools',\s+url: '\/#desktop\/tools'/);
     assert.match(audit, /slug: 'desktop-record-modal',\s+url: '\/\?record=RECORD-00802#desktop\/archive'/);
     assert.match(audit, /slug: 'desktop-report',[\s\S]*openReport: true/);
+    assert.match(audit, /slug: 'dissertation-map-detail',[\s\S]*openDissertationDetail: true/,
+      'the shared keyboard-scrollable detail panel stays in the full audit matrix');
     assert.match(audit, /getByRole\('dialog', \{ name: 'Report a problem or suggest a record' \}\)/);
     assert.match(audit, /slug: 'desktop-windowing'[\s\S]*desktopLayout:[\s\S]*zOrder/);
     assert.match(audit, /name: 'mobile',\s+width: 375,\s+height: 812/);
