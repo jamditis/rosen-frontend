@@ -158,6 +158,9 @@ const DesktopShell = ({
   const dragSessionRef = useRef(null);
   const dragFrameRef = useRef(null);
   const resetFocusPendingRef = useRef(false);
+  const previousMinimizedByIdRef = useRef(new Map(
+    layout.windows.map((entry) => [entry.id, entry.minimized]),
+  ));
   const layoutRef = useRef(layout);
   const activeAppIdRef = useRef(activeAppId);
 
@@ -640,6 +643,29 @@ const DesktopShell = ({
       return next;
     });
   };
+
+  const minimizedStateSignature = layout.windows
+    .map((entry) => `${entry.id}:${entry.minimized ? 1 : 0}`)
+    .join('|');
+  useEffect(() => {
+    const previous = previousMinimizedByIdRef.current;
+    const restoredWindow = layout.windows.some((entry) => (
+      entry.minimized === false && previous.get(entry.id) === true
+    ));
+    previousMinimizedByIdRef.current = new Map(
+      layout.windows.map((entry) => [entry.id, entry.minimized]),
+    );
+    if (!restoredWindow || isCompactDesktop()) return undefined;
+
+    let reclampFrame = null;
+    const mountedFrame = requestAnimationFrame(() => {
+      reclampFrame = requestAnimationFrame(reclampVisibleWindows);
+    });
+    return () => {
+      cancelAnimationFrame(mountedFrame);
+      if (reclampFrame !== null) cancelAnimationFrame(reclampFrame);
+    };
+  }, [minimizedStateSignature]);
 
   useEffect(() => {
     const cancelFromKeyboard = (event) => {

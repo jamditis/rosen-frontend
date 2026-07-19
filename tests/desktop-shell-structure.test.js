@@ -528,6 +528,11 @@ describe('desktop windowing and spatial memory', () => {
     assert.match(shell, /COMPACT_DESKTOP_QUERY[\s\S]*cancelWindowDrag/);
     assert.match(shell, /visualViewport\?\.addEventListener\('resize'/);
     assert.match(shell, /orientationchange/);
+    assert.match(
+      shell,
+      /previousMinimizedByIdRef[\s\S]*entry\.minimized === false[\s\S]*previous\.get\(entry\.id\) === true[\s\S]*requestAnimationFrame\(reclampVisibleWindows\)/,
+      'restoring an existing minimized window must retrigger viewport clamping',
+    );
 
     assert.match(css, /\.desktop-window-titlebar\.is-movable\s*\{[\s\S]*cursor:\s*grab/);
     assert.match(css, /\.desktop-window\.is-dragging\s+\.desktop-window-titlebar[\s\S]*cursor:\s*grabbing/);
@@ -545,6 +550,8 @@ describe('desktop windowing and spatial memory', () => {
       'recoverability checks must fail closed when browser geometry is missing');
     assert.match(audit, /Keyboard move did not retain visible focus/);
     assert.match(audit, /Single-pointer Move control did not update persisted position/);
+    assert.match(audit, /Restored minimized Archive escaped recoverable bounds/,
+      'the browser audit must restore and reclamp a window hidden during viewport change');
   });
 
   it('renders named non-modal windows, active state, task buttons, and reset controls', () => {

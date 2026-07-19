@@ -1357,6 +1357,93 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     }
     await analyticsTitle.focus();
     await assertFocused(analyticsTitle, 'Analytics title after expanding from 200%-zoom equivalent');
+
+    const browser = page.context().browser();
+    if (!browser) throw new Error('Minimized-window restore audit could not create an isolated context');
+    const restoreContext = await browser.newContext({
+      viewport: wideViewport,
+      serviceWorkers: 'block',
+    });
+    const restorePage = await restoreContext.newPage();
+    const restoreErrors = [];
+    restorePage.on('pageerror', (error) => restoreErrors.push(error.message || String(error)));
+    restorePage.on('console', (message) => {
+      if (message.type() === 'error') restoreErrors.push(message.text());
+    });
+    await restoreContext.addInitScript((desktopLayout) => {
+      localStorage.setItem('jrda-desktop-layout', JSON.stringify(desktopLayout));
+    }, {
+      schema: 2,
+      windows: [
+        { id: 'archive', minimized: true, position: { x: 500, y: 260 } },
+        { id: 'analytics', minimized: false, position: { x: 0, y: 0 } },
+      ],
+      zOrder: ['archive', 'analytics'],
+    });
+    try {
+      const restoreUrl = new URL(BASE);
+      restoreUrl.searchParams.set('_audit', 'minimized-window-restore');
+      restoreUrl.hash = '#desktop/analytics';
+      await restorePage.goto(restoreUrl.toString(), { waitUntil: 'networkidle' });
+      await restorePage.locator('#desktop-window-title-analytics').waitFor();
+      await restorePage.setViewportSize({ width: 1000, height: 700 });
+      await restorePage.waitForTimeout(200);
+
+      const hiddenArchiveX = await restorePage.evaluate(() => (
+        JSON.parse(localStorage.getItem('jrda-desktop-layout'))?.windows
+          ?.find(({ id }) => id === 'archive')?.position?.x
+      ));
+      if (hiddenArchiveX !== 500) {
+        throw new Error(`Minimized Archive moved before restore: ${hiddenArchiveX}`);
+      }
+
+      await restorePage.getByRole('button', { name: /^Restore Archive/ }).click();
+      await restorePage.waitForURL((url) => url.hash === '#desktop/archive');
+      const restoredArchiveTitle = restorePage.locator('#desktop-window-title-archive');
+      await assertFocused(restoredArchiveTitle, 'Archive title after minimized restore');
+      await restorePage.waitForTimeout(250);
+      const restoredArchive = await restorePage.evaluate(() => {
+        const frame = document.querySelector('[data-window-id="archive"]')?.getBoundingClientRect();
+        const titlebar = document.querySelector(
+          '[data-window-id="archive"] .desktop-window-titlebar',
+        )?.getBoundingClientRect();
+        const savedPosition = JSON.parse(localStorage.getItem('jrda-desktop-layout'))?.windows
+          ?.find(({ id }) => id === 'archive')?.position;
+        return {
+          frameLeft: frame?.left,
+          frameRight: frame?.right,
+          titleLeft: titlebar?.left,
+          titleRight: titlebar?.right,
+          titleTop: titlebar?.top,
+          viewportWidth: window.innerWidth,
+          savedPosition,
+        };
+      });
+      const restoredGeometry = [
+        restoredArchive.frameLeft,
+        restoredArchive.frameRight,
+        restoredArchive.titleLeft,
+        restoredArchive.titleRight,
+        restoredArchive.titleTop,
+        restoredArchive.viewportWidth,
+      ];
+      if (
+        !restoredGeometry.every(Number.isFinite)
+        || restoredArchive.titleLeft < 7
+        || restoredArchive.titleRight > restoredArchive.viewportWidth - 7
+        || restoredArchive.titleTop < 7
+        || restoredArchive.savedPosition?.x === 500
+      ) {
+        throw new Error(
+          `Restored minimized Archive escaped recoverable bounds: ${JSON.stringify(restoredArchive)}`,
+        );
+      }
+      if (restoreErrors.length > 0) {
+        throw new Error(`Minimized-window restore emitted errors: ${JSON.stringify(restoreErrors)}`);
+      }
+    } finally {
+      await restoreContext.close();
+    }
   }
   if (route.verifyBackgroundPointerControl && viewport.name === 'desktop') {
     const startButton = page.getByRole('button', { name: 'Start', exact: true });
