@@ -207,7 +207,7 @@ async function assertArchiveRootReturn(page, locator, label) {
   }
 }
 
-async function auditOne(page, route, viewport) {
+async function auditOne(page, route, viewport, beforeAccessibilityScan = () => {}) {
   const assertFocused = async (locator, label) => {
     await locator.waitFor();
     await page.waitForTimeout(100);
@@ -497,6 +497,12 @@ async function auditOne(page, route, viewport) {
   // Viewport is sufficient for visual review of the above-the-fold rendering.
   await page.screenshot({ path: resolve(shotDir, `${route.slug}.png`), fullPage: false, timeout: 15000 });
 
+  // Network health belongs to the application-loading and interaction phase.
+  // Stop that capture before axe is injected: axe preloads CSS imports itself
+  // and currently resolves nested imports against the document URL, which can
+  // create synthetic requests that the browser never makes while rendering.
+  await beforeAccessibilityScan();
+
   const axe = new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']);
   const result = await axe.analyze();
   if (route.verifyEntityRecordFlow) {
@@ -627,10 +633,32 @@ async function main() {
         for (const route of ROUTES) {
           console.log(`  ${viewport.name.padEnd(8)} ${route.url}`);
           const pageErrors = [];
+          const networkErrors = [];
           const capturePageError = (error) => pageErrors.push(error.message || String(error));
+          const captureBadResponse = (response) => {
+            const url = new URL(response.url());
+            if (url.origin === BASE && response.status() >= 400) {
+              networkErrors.push(`${response.status()} ${url.pathname}`);
+            }
+          };
+          const captureFailedRequest = (request) => {
+            const url = new URL(request.url());
+            if (url.origin === BASE) {
+              networkErrors.push(`${request.failure()?.errorText || 'request failed'} ${url.pathname}`);
+            }
+          };
           page.on('pageerror', capturePageError);
+          page.on('response', captureBadResponse);
+          page.on('requestfailed', captureFailedRequest);
           try {
-            const row = await auditOne(page, route, viewport);
+            const assertApplicationNetworkHealthy = () => {
+              page.off('response', captureBadResponse);
+              page.off('requestfailed', captureFailedRequest);
+              if (networkErrors.length > 0) {
+                throw new Error(`Same-origin network errors: ${JSON.stringify(networkErrors)}`);
+              }
+            };
+            const row = await auditOne(page, route, viewport, assertApplicationNetworkHealthy);
             if (pageErrors.length > 0) {
               throw new Error(`Unhandled page errors: ${JSON.stringify(pageErrors)}`);
             }
@@ -640,6 +668,8 @@ async function main() {
             rows.push({ route: route.slug, url: route.url, viewport: viewport.name, violations: [{ id: 'audit-error', impact: 'critical', help: err.message, helpUrl: '', nodes: 0, sample: '' }], passes: 0, incomplete: 0 });
           } finally {
             page.off('pageerror', capturePageError);
+            page.off('response', captureBadResponse);
+            page.off('requestfailed', captureFailedRequest);
           }
         }
       }

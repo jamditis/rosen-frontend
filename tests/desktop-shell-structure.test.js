@@ -118,6 +118,12 @@ describe('desktop route wiring', () => {
       'every rendered desktop row must fail on horizontal page overflow');
     assert.match(audit, /page\.on\('pageerror', capturePageError\)[\s\S]*Unhandled page errors:[\s\S]*page\.off\('pageerror', capturePageError\)/,
       'each audit row must fail on unhandled JavaScript errors without leaking listeners');
+    assert.match(audit, /url\.origin === BASE && response\.status\(\) >= 400[\s\S]*Same-origin network errors:/,
+      'missing local runtime assets must fail their route instead of looking partially successful');
+    assert.match(audit, /await beforeAccessibilityScan\(\);[\s\S]*new AxeBuilder/,
+      'application network capture must stop before axe issues its own synthetic CSS requests');
+    assert.match(audit, /page\.off\('response', captureBadResponse\)[\s\S]*page\.off\('requestfailed', captureFailedRequest\)/,
+      'route-scoped network listeners must not leak into later rows');
     assert.match(audit, /slug: 'desktop-windowing'[\s\S]*desktopLayout:[\s\S]*zOrder/);
     assert.match(audit, /name: 'mobile',\s+width: 375,\s+height: 812/);
     assert.match(audit, /name: 'tablet',\s+width: 768,\s+height: 1024/);
