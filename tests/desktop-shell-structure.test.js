@@ -43,6 +43,13 @@ describe('desktop route wiring', () => {
 
   it('adds the desktop route to preview audit at mobile, tablet, and desktop sizes', () => {
     const audit = read('scripts/preview-audit.js');
+    const auditSlugs = [...audit.matchAll(/\bslug: '([^']+)'/g)].map((match) => match[1]);
+    const desktopAuditSlugs = auditSlugs.filter((slug) => (
+      slug === 'archive-desktop' || slug.startsWith('desktop-')
+    ));
+    assert.equal(auditSlugs.length, 32, 'the review handoff expects 32 routes per viewport');
+    assert.equal(new Set(auditSlugs).size, auditSlugs.length, 'audit route slugs must stay unique');
+    assert.equal(desktopAuditSlugs.length, 17, 'the review handoff expects 17 desktop rows per viewport');
     assert.match(audit, /slug: 'archive-desktop',[\s\S]*url: '\/#desktop',[\s\S]*verifyStartPathRoundTrip: true/);
     assert.match(audit, /slug: 'desktop-start-menu',[\s\S]*verifyDesktopStartMenu: true/);
     assert.match(audit, /slug: 'desktop-unknown',\s+url: '\/#desktop\/not-real'/);
