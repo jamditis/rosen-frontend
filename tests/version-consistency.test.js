@@ -10,6 +10,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { collectVersionedFiles } from '../scripts/bump-version.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,9 +32,9 @@ function collectFrontendJsFiles(dir = frontendDir, acc = []) {
   return acc;
 }
 
-// The versioned .js surface is frontend/ plus the standalone faq/ page: the
-// same set bump-version.mjs stamps, kept in lockstep so the guardrail and the
-// bumper cannot disagree about which imports must carry ?v=.
+// Local-import completeness is enforced for the app and FAQ JavaScript here;
+// the canonical-marker test above this helper covers the broader browser-file
+// surface returned by bump-version.mjs, including standalone features.
 function collectVersionedJsFiles() {
   return [...collectFrontendJsFiles(frontendDir), ...collectFrontendJsFiles(faqDir)];
 }
@@ -43,6 +44,42 @@ function collectVersionedJsFiles() {
 // ============================================
 
 describe('import version consistency', () => {
+  it('keeps the participation stylesheet on the cache-busted release surface', () => {
+    const canonical = JSON.parse(
+      fs.readFileSync(path.join(rootDir, 'version.json'), 'utf-8'),
+    ).version;
+    const participateHtml = fs.readFileSync(
+      path.join(rootDir, 'features', 'participate', 'index.html'),
+      'utf-8',
+    );
+
+    assert.match(
+      participateHtml,
+      new RegExp(`href=["']\\./styles\\.css\\?v=${canonical}["']`),
+      'features/participate/index.html must cache-bust its local stylesheet',
+    );
+  });
+
+  it('every cache-busting marker on the complete bump surface is canonical', () => {
+    const canonical = JSON.parse(
+      fs.readFileSync(path.join(rootDir, 'version.json'), 'utf-8'),
+    ).version;
+    const drift = [];
+
+    for (const file of collectVersionedFiles(rootDir)) {
+      if (!fs.existsSync(file)) continue;
+      const content = fs.readFileSync(file, 'utf-8');
+      for (const match of content.matchAll(/\?v=(\d+\.\d+\.\d+)/g)) {
+        if (match[1] !== canonical) {
+          drift.push(`${path.relative(rootDir, file)}: ${match[1]}`);
+        }
+      }
+    }
+
+    assert.deepStrictEqual(drift, [],
+      `Version markers outside the canonical ${canonical} release: ${drift.join(', ')}`);
+  });
+
   it('all JS files use the same import version string', () => {
     const jsFiles = collectVersionedJsFiles();
 

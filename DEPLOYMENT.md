@@ -38,6 +38,7 @@ data/                               # Published archive data and shared taxonomy
   search-index.json                 # Prebuilt MiniSearch full-text index (~1MB, loads lazily on first search)
   wiki-seed.json                    # Community wiki seed pages (loads on the #wiki view)
   schema.json                       # Data dictionary, linked from the open-data download UI
+  SCHEMA.md                         # Human-readable data guide, linked from Ways to Participate
   eras.js                           # Canonical era taxonomy shared with the frontend
   feeds/                            # RSS/OPML feeds
     rss.xml
@@ -72,6 +73,12 @@ tools/                              # Development/exploration tools
 
 ADDING-RECORDS.md                   # Instructions for adding new records
 ```
+
+The full-site deploy uploads each standalone `features/*/index.html` only after
+the files in its feature directory and the shared data manifest. This keeps a
+feature's public entry point on the previous release until its JavaScript, CSS,
+and data dependencies are live. The root `index.html`, service worker, and
+`version.json` then retain their existing final three release flips.
 
 ## Retired routes removed by a full deploy
 
@@ -122,7 +129,7 @@ Other files only change when the site code changes.
 
 ## Version cache busting
 
-After uploading, bump the `?v=X.X.X` query parameter on all JS/CSS imports in `index.html` to bust the Cloudflare cache. Update `version.json` to match, and bump `frontend/sw.js` `CACHE_VERSION` to the same value. The service worker serves static JS cache-first with `ignoreSearch: true`, so the `?v=` bump alone does not invalidate it — only a `CACHE_VERSION` change drops the stale service-worker cache, so returning visitors keep running old JS until it bumps. `tests/version-consistency.test.js` enforces that the three stay in lockstep.
+Before committing and uploading a release, run `npm run bump-version -- X.X.X` to stamp the `?v=X.X.X` query parameter on versioned JS/CSS references in the root app, FAQ, and standalone feature pages. Commit those stamps with the release so the full-site upload contains them. The command also updates `version.json` and bumps `frontend/sw.js` `CACHE_VERSION` to the same value. The service worker serves static JS cache-first with `ignoreSearch: true`, so a `?v=` bump alone does not invalidate it — only a `CACHE_VERSION` change drops the stale service-worker cache, so returning visitors keep running old JS until it bumps. `tests/version-consistency.test.js` enforces the complete marker surface and cache version stay in lockstep.
 
 ## FTP credentials
 

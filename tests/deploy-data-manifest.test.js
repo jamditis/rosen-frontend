@@ -86,7 +86,7 @@ function deploymentMdDataFiles() {
     if (childIndent === null) childIndent = indent;       // first child sets the direct-child level
     if (indent !== childIndent) continue;                 // skip deeper-nested entries (data/feeds/*)
     const entry = raw.trim().split('#')[0].trim();
-    const m = entry.match(/^([A-Za-z0-9_-]+\.(?:json|js))$/);
+    const m = entry.match(/^([A-Za-z0-9_-]+\.(?:json|js|md))$/i);
     if (m) files.add(`data/${m[1]}`);
   }
   return files;

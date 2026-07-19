@@ -332,6 +332,70 @@ class TestEntryPointsUploadedLast:
 
         assert names.index('data/eras.js') < names.index('frontend/constants.js')
 
+    def test_data_file_generators_are_not_consumed_before_non_js_files(self,
+                                                                       tmp_path):
+        data_dir = tmp_path / 'data'
+        data_dir.mkdir()
+        (data_dir / 'eras.js').write_text('export const ERAS = [];')
+        (data_dir / 'schema.json').write_text('{}')
+
+        files = deploy_full_site.collect_local_files(
+            tmp_path,
+            top_files=(),
+            dirs=(),
+            data_files=(name for name in (
+                'data/eras.js',
+                'data/schema.json',
+            )),
+            entry_points=(),
+        )
+
+        assert [f.relative_to(tmp_path).as_posix() for f in files] == [
+            'data/eras.js',
+            'data/schema.json',
+        ]
+
+    def test_each_feature_html_uploads_after_its_dependencies(self, tmp_path):
+        feature = tmp_path / 'features' / 'example'
+        feature.mkdir(parents=True)
+        (feature / 'index.html').write_text('<script src="./script.js"></script>')
+        (feature / 'script.js').write_text('// browser dependency')
+        (feature / 'styles.css').write_text('/* browser dependency */')
+
+        files = deploy_full_site.collect_local_files(
+            tmp_path,
+            top_files=(),
+            dirs=('features/example',),
+            data_files=(),
+            entry_points=(),
+        )
+        names = [f.relative_to(tmp_path).as_posix() for f in files]
+
+        assert names.index('features/example/script.js') < names.index(
+            'features/example/index.html')
+        assert names.index('features/example/styles.css') < names.index(
+            'features/example/index.html')
+
+    def test_winer_entry_html_uploads_after_all_winer_dependencies(self):
+        files = deploy_full_site.collect_local_files(_REPO_ROOT)
+        names = [f.relative_to(_REPO_ROOT).as_posix() for f in files]
+        entry = names.index('features/winer-method/index.html')
+        dependencies = [
+            name for name in names
+            if name.startswith('features/winer-method/')
+            and name != 'features/winer-method/index.html'
+        ]
+
+        assert dependencies
+        assert all(names.index(name) < entry for name in dependencies)
+
+
+class TestLinkedDataGuideDeployment:
+    """The participation page's data-guide link must survive a full deploy."""
+
+    def test_schema_markdown_is_in_canonical_manifest(self):
+        assert 'data/SCHEMA.md' in deploy_full_site._DEPLOY_DATA_FILES
+
 
 class TestServiceWorkerEntryPointOrder:
     """frontend/sw.js is a version-flipping entry point (#441).
