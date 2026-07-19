@@ -113,7 +113,7 @@ const AnalyticsDashboard = ({ onBack, onRecordResults, embedded = false }) => {
         setLoading(false);
       } catch (err) {
         console.error('[Analytics] Error:', err);
-        setError(err.message);
+        setError('The archive summary could not load. Please refresh the page or try again later.');
         setLoading(false);
       }
     };

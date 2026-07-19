@@ -142,6 +142,7 @@ describe('analytics lazy-load wiring (#338)', () => {
     assert.match(dashboard, /className="[^"]*animate-spin[^"]*" aria-hidden="true"/);
     assert.match(dashboard, /role="alert"/);
     assert.match(dashboard, /<h3 className="text-red-800 font-bold mb-2">Error loading analytics<\/h3>/);
+    assert.match(dashboard, /The archive summary could not load\. Please refresh the page or try again later\./);
     assert.match(dashboard, /style=\$\{\{ minHeight: '44px', backgroundColor: '#991b1b', color: '#ffffff' \}\}/);
     assert.match(dashboard, /focus:ring-2 focus:ring-amber-600 focus:ring-offset-2/);
   });
