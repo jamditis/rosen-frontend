@@ -160,6 +160,7 @@ describe('desktop tool links', () => {
 
     const readerStyles = readFileSync(join(process.cwd(), 'dissertation/reader/src/css/layout.css'), 'utf8');
     assert.match(readerStyles, /\.btn\s*\{[^}]*min-height:\s*44px/s);
+    assert.match(readerStyles, /\.settings-toggle\s*\{[^}]*width:\s*44px;[^}]*height:\s*44px;/s);
     assert.match(readerStyles, /\.reader-header__actions \.btn--secondary\[title="Back to archive"\]/);
     assert.doesNotMatch(readerStyles, /Back to dissertation home/,
       'responsive reader rules must target the real archive-return title');

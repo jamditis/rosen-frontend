@@ -43,7 +43,7 @@ describe('desktop route wiring', () => {
 
   it('adds the desktop route to preview audit at mobile, tablet, and desktop sizes', () => {
     const audit = read('scripts/preview-audit.js');
-    assert.match(audit, /slug: 'archive-desktop',\s+url: '\/#desktop'/);
+    assert.match(audit, /slug: 'archive-desktop',[\s\S]*url: '\/#desktop',[\s\S]*verifyStartPathRoundTrip: true/);
     assert.match(audit, /slug: 'desktop-start-menu',[\s\S]*verifyDesktopStartMenu: true/);
     assert.match(audit, /slug: 'desktop-unknown',\s+url: '\/#desktop\/not-real'/);
     assert.match(audit, /slug: 'desktop-archive',\s+url: '\/#desktop\/archive'/);
@@ -77,11 +77,15 @@ describe('desktop route wiring', () => {
       'the reverse-Tab probe waits for the popup focus frame instead of racing it');
     assert.match(audit, /'Previous visible tool after reverse Tab'/,
       'the Start audit proves Tab exits do not strand focus in an unmounted menu');
-    assert.match(audit, /archiveReturnBox\.width < 44 \|\| archiveReturnBox\.height < 44/,
+    assert.match(audit, /assertArchiveRootReturn\([\s\S]*'Method return'/,
+      'the Start path round-trip keeps the JavaScript launcher and explicit exit live');
+    assert.match(audit, /'Desktop home after method browser Back'/,
+      'browser Back must reconstruct the desktop home with the popup closed');
+    assert.match(audit, /assertArchiveRootReturn\([\s\S]*'Dissertation return'/,
       'the tool round-trip audit keeps the standalone return touch-sized');
     assert.match(audit, /assertFocused\(page\.locator\('#desktop-window-title-tools'\), 'Tools window after browser Back'\)/,
       'browser Back must reconstruct the nested Tools route and foreground focus');
-    assert.match(audit, /Reader return target was smaller than 44px/);
+    assert.match(audit, /assertArchiveRootReturn\(page, readerReturn, 'Reader return'\)/);
     assert.match(audit, /Reader overflowed the viewport by/);
     assert.match(audit, /slug: 'desktop-windowing'[\s\S]*desktopLayout:[\s\S]*zOrder/);
     assert.match(audit, /name: 'mobile',\s+width: 375,\s+height: 812/);

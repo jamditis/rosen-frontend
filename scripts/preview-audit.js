@@ -41,7 +41,7 @@ const ROUTES = [
   { slug: 'home-archive',       url: '/' },
   { slug: 'start-here',         url: '/#start' },
   { slug: 'participate',        url: '/features/participate/' },
-  { slug: 'archive-desktop',    url: '/#desktop' },
+  { slug: 'archive-desktop',    url: '/#desktop', verifyStartPathRoundTrip: true },
   { slug: 'desktop-start-menu', url: '/#desktop', verifyDesktopStartMenu: true },
   { slug: 'desktop-unknown',    url: '/#desktop/not-real' },
   { slug: 'desktop-archive',    url: '/#desktop/archive' },
@@ -123,6 +123,25 @@ async function startServer() {
   return proc;
 }
 
+async function assertArchiveRootReturn(page, locator, label) {
+  await locator.waitFor({ state: 'visible' });
+  const box = await locator.boundingBox();
+  if (!box || box.width < 44 || box.height < 44) {
+    throw new Error(`${label} target was smaller than 44px: ${JSON.stringify(box)}`);
+  }
+
+  const returnUrl = new URL(await locator.getAttribute('href'), page.url());
+  const archiveRootUrl = new URL(BASE);
+  if (
+    returnUrl.origin !== archiveRootUrl.origin
+    || returnUrl.pathname !== archiveRootUrl.pathname
+    || returnUrl.search
+    || returnUrl.hash
+  ) {
+    throw new Error(`${label} resolved outside the archive root: ${returnUrl}`);
+  }
+}
+
 async function auditOne(page, route, viewport) {
   const assertFocused = async (locator, label) => {
     await locator.waitFor();
@@ -161,6 +180,28 @@ async function auditOne(page, route, viewport) {
     await page.locator('svg[aria-label^="Dissertation mind map"] [role="button"]').first().click();
     await page.getByRole('dialog').waitFor();
     await page.waitForTimeout(100);
+  }
+  if (route.verifyStartPathRoundTrip) {
+    const startButton = page.getByRole('button', { name: 'Start', exact: true });
+    const startMenu = page.getByRole('menu', { name: 'Archive desktop Start menu' });
+    await startButton.click();
+    await startMenu.waitFor();
+    await startMenu.getByRole('menuitem', { name: /^The method/ }).click();
+    await page.waitForURL((url) => url.pathname.endsWith('/features/winer-method/'));
+    await assertArchiveRootReturn(
+      page,
+      page.getByRole('link', { name: "Return to Jay Rosen's Internet Archive" }),
+      'Method return',
+    );
+
+    await page.goBack({ waitUntil: 'networkidle' });
+    if (new URL(page.url()).hash !== '#desktop') {
+      throw new Error(`Method history return lost its desktop route: ${page.url()}`);
+    }
+    if (await startMenu.isVisible()) {
+      throw new Error('Method history return reopened the Start menu');
+    }
+    await assertFocused(page.locator('#desktop-window-title-home'), 'Desktop home after method browser Back');
   }
   if (route.verifyDesktopStartMenu) {
     const startButton = page.getByRole('button', { name: 'Start', exact: true });
@@ -217,21 +258,11 @@ async function auditOne(page, route, viewport) {
     await dissertationLink.click();
     await page.waitForURL((url) => url.pathname.endsWith('/dissertation/'));
 
-    const archiveReturn = page.getByRole('link', { name: "Back to Jay Rosen's Internet Archive" });
-    const archiveReturnBox = await archiveReturn.boundingBox();
-    const archiveReturnUrl = new URL(await archiveReturn.getAttribute('href'), page.url());
-    const archiveRootUrl = new URL(BASE);
-    if (
-      archiveReturnUrl.origin !== archiveRootUrl.origin
-      || archiveReturnUrl.pathname !== archiveRootUrl.pathname
-      || archiveReturnUrl.search
-      || archiveReturnUrl.hash
-    ) {
-      throw new Error(`Dissertation return resolved outside the archive root: ${archiveReturnUrl}`);
-    }
-    if (!archiveReturnBox || archiveReturnBox.width < 44 || archiveReturnBox.height < 44) {
-      throw new Error(`Dissertation return target was smaller than 44px: ${JSON.stringify(archiveReturnBox)}`);
-    }
+    await assertArchiveRootReturn(
+      page,
+      page.getByRole('link', { name: "Back to Jay Rosen's Internet Archive" }),
+      'Dissertation return',
+    );
 
     await page.goBack({ waitUntil: 'networkidle' });
     const toolsRegion = page.getByRole('region', { name: 'Tools' });
@@ -247,11 +278,7 @@ async function auditOne(page, route, viewport) {
   }
   if (route.verifyReaderReturn) {
     const readerReturn = page.getByTitle('Back to archive');
-    await readerReturn.waitFor({ state: 'visible' });
-    const readerReturnBox = await readerReturn.boundingBox();
-    if (!readerReturnBox || readerReturnBox.width < 44 || readerReturnBox.height < 44) {
-      throw new Error(`Reader return target was smaller than 44px: ${JSON.stringify(readerReturnBox)}`);
-    }
+    await assertArchiveRootReturn(page, readerReturn, 'Reader return');
     const pageOverflow = await page.evaluate(() => (
       document.documentElement.scrollWidth - document.documentElement.clientWidth
     ));
