@@ -156,7 +156,7 @@ export const DESKTOP_APPS = Object.freeze([
     group: 'help',
     surfaces: [],
     availability: 'blocked',
-    availabilityNote: 'Connect only after the existing draft receives curator approval.',
+    availabilityNote: 'Connect only after the interview and editorial gates are complete and the curator gives explicit publication approval.',
     launch: null,
   },
 ].map(freezeApp));

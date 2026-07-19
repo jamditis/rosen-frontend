@@ -4,7 +4,7 @@
 
 Issue #622 adds an optional Windows 95/98-inspired exploration shell to Jay Rosen's Internet Archive. The standard archive stays the default. The desktop is a second front door that reuses canonical routes, records, services, and reporting behavior.
 
-The implemented slices cover the product map, accessible shell, archive and record browsing, people and ideas, the dissertation map, analytics, the visitor guide and authored selected-record trail, the shipped archive-method demonstration, the shipped participation path, maintained tools, concurrent window behavior, low-risk spatial memory, and root-scoped offline behavior. The curator-authored making-of narrative remains approval-gated.
+The implemented slices cover the product map, accessible shell, archive and record browsing, people and ideas, the dissertation map, analytics, the visitor guide and authored selected-record trail, the shipped archive-method demonstration, the shipped participation path, maintained tools, concurrent window behavior, low-risk spatial memory, and root-scoped offline behavior. The curator-authored making-of narrative remains gated by the interview and publication workflow added in PR #626.
 
 ## Product intent
 
@@ -48,7 +48,11 @@ No prior prototype or implementation was found. The only matching ref was the ne
 | Selected findings | authored selected-record trail in `#start` | Selected findings | Open the shared three-record trail in-shell | Ready; uses the exact approved copy, matching logic, canonical records, and record overlay from Start here |
 | Archive method demo | `features/winer-method/` | The method | Open the canonical standalone demonstration | Ready; issue #532 shipped in PR #623 while this branch was in progress, and the desktop now links to that maintained route without copying its independent corpus |
 | Participate | `features/participate/` | Participate | Open the canonical standalone page | Ready; PR #624 shipped the approved path while this branch was in progress, so the registry exposes that real page without copying it |
-| Making-of narrative | draft `features/making-of/` | How it was made | Add only after curator approval | Blocked; deployment rules explicitly withhold the draft |
+| Making-of narrative | provisional draft `features/making-of/` | How it was made | Add only after the interview, editorial, and publication gates | Blocked; PR #626 documents the process but grants no content or publication approval, and deployment rules explicitly withhold the draft |
+
+### Making-of approval boundary
+
+PR #626 adds `docs/narrative/INTERVIEW_GUIDE.md` as the source of truth for reconstructing the personal making-of story. That handoff does not approve the provisional page or any first-person claim. No interview round, story brief, reconstructed prose, fact check, design, or publication gate has been approved in this work, and the user did not ask to begin the interview. The desktop registry therefore keeps `making-of` as blocked metadata with no surface and no launch target. A later integration must follow the guide, receive explicit publication approval, then separately update the path allowlist and both deployment manifests.
 
 ### Standalone pages and tools
 

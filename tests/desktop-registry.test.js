@@ -92,6 +92,8 @@ describe('desktop app registry', () => {
       assert.ok(app, `${id} stays represented in availability metadata`);
       assert.notEqual(app.availability, 'ready');
       assert.deepEqual(app.surfaces, []);
+      assert.equal(app.launch, null);
+      assert.match(app.availabilityNote, /interview[\s\S]*publication approval/i);
     }
     assert.equal(getDesktopApp('does-not-exist'), null);
   });
