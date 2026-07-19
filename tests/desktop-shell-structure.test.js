@@ -44,6 +44,7 @@ describe('desktop route wiring', () => {
   it('adds the desktop route to preview audit at mobile, tablet, and desktop sizes', () => {
     const audit = read('scripts/preview-audit.js');
     assert.match(audit, /slug: 'archive-desktop',\s+url: '\/#desktop'/);
+    assert.match(audit, /slug: 'desktop-unknown',\s+url: '\/#desktop\/not-real'/);
     assert.match(audit, /slug: 'desktop-archive',\s+url: '\/#desktop\/archive'/);
     assert.match(audit, /slug: 'desktop-start',\s+url: '\/#desktop\/start'/);
     assert.match(audit, /slug: 'desktop-findings',\s+url: '\/#desktop\/findings'/);
@@ -291,6 +292,10 @@ describe('desktop interaction structure', () => {
     const shell = read('frontend/desktop/DesktopShell.js');
     assert.match(shell, /Standard archive/);
     assert.match(shell, /That desktop item is unavailable/);
+    assert.match(shell, /className="desktop-notice" role="note"/);
+    assert.doesNotMatch(shell, /className="desktop-notice" role="status"/,
+      'the visible note must not duplicate the dedicated live-region announcement');
+    assert.match(shell, /aria-live="polite" aria-atomic="true"/);
     assert.match(shell, /onExit/);
   });
 

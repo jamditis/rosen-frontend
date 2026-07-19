@@ -115,9 +115,7 @@ const DesktopShell = ({
   const [shortcutFocusIndex, setShortcutFocusIndex] = useState(0);
   const [startOpen, setStartOpen] = useState(false);
   const [menuFocusIndex, setMenuFocusIndex] = useState(0);
-  const [statusMessage, setStatusMessage] = useState(
-    hasUnknownApp ? 'That desktop item is unavailable. Showing the desktop home.' : '',
-  );
+  const [statusMessage, setStatusMessage] = useState('');
   const [layout, setLayout] = useState(() => {
     try {
       return parseDesktopLayout(localStorage.getItem(DESKTOP_LAYOUT_STORAGE_KEY), shellAppIds);
@@ -380,7 +378,7 @@ const DesktopShell = ({
   const renderWelcome = () => html`
     <div className="desktop-document">
       ${hasUnknownApp && html`
-        <div className="desktop-notice" role="status">
+        <div className="desktop-notice" role="note">
           <${AlertTriangle} className="desktop-inline-icon" aria-hidden="true" />
           <span>That desktop item is unavailable. Showing the desktop home.</span>
         </div>
@@ -399,7 +397,7 @@ const DesktopShell = ({
         <article>
           <span className="desktop-principle-number">02</span>
           <h4>Keep canonical links</h4>
-          <p>Archive records and research areas open in their maintained standard routes.</p>
+          <p>Archive records and research areas reuse maintained content and preserve canonical links.</p>
         </article>
         <article>
           <span className="desktop-principle-number">03</span>
