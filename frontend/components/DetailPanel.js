@@ -34,11 +34,17 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
     if (isOpen) {
       if (!wasOpenRef.current) returnFocusRef.current = document.activeElement;
       wasOpenRef.current = true;
-      // Small delay to ensure animation has started.
-      const timer = setTimeout(() => {
-        closeButtonRef.current?.focus();
-      }, 100);
-      return () => clearTimeout(timer);
+      if (!displayNode) return undefined;
+      const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      let frame = null;
+      let timer = null;
+      const focusClose = () => closeButtonRef.current?.focus();
+      if (reduceMotion) frame = requestAnimationFrame(focusClose);
+      else timer = setTimeout(focusClose, 100);
+      return () => {
+        if (frame !== null) cancelAnimationFrame(frame);
+        if (timer !== null) clearTimeout(timer);
+      };
     }
 
     if (wasOpenRef.current) {
@@ -49,7 +55,7 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
     }
 
     return undefined;
-  }, [isOpen]);
+  }, [isOpen, displayNode]);
 
   // Handle ESC key to close panel
   useEffect(() => {
@@ -80,7 +86,8 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
     <div
       ref=${panelRef}
       role="dialog"
-      aria-modal="true"
+      aria-hidden=${isOpen ? undefined : 'true'}
+      inert=${isOpen ? undefined : ''}
       aria-labelledby="detail-panel-title"
       className=${`
         fixed top-0 h-full w-full sm:w-[420px] bg-white border-l border-stone-200

@@ -185,6 +185,16 @@ describe('desktop research adapters', () => {
     assert.match(dissertationPage, /minimumZoom=\$\{embedded \? 44 \/ 72 : 0\.3\}/);
     assert.match(dissertationPage, /aria-label="Back to archive"/,
       'the standard mobile back button keeps its name when its visible label is hidden');
+    const detailPanel = read('frontend/components/DetailPanel.js');
+    assert.doesNotMatch(detailPanel, /aria-modal/,
+      'the side panel must not claim modal behavior while the map remains available');
+    assert.match(detailPanel, /aria-hidden=\$\{isOpen \? undefined : 'true'\}/);
+    assert.match(detailPanel, /inert=\$\{isOpen \? undefined : ''\}/,
+      'the retained closing panel must not expose off-screen dialog controls');
+    assert.match(detailPanel, /prefers-reduced-motion: reduce/);
+    assert.match(detailPanel, /if \(reduceMotion\) frame = requestAnimationFrame\(focusClose\)/);
+    assert.match(detailPanel, /\}, \[isOpen, displayNode\]\);/,
+      'focus entry must wait until retained panel content has rendered');
     assert.match(map, /Math\.max\(\s*safeMinimumZoom,\s*Math\.min\(scaleX, scaleY/);
     assert.match(map, /prefers-reduced-motion: reduce/);
     assert.match(map, /if \(reduceMotion \|\| duration <= 0\)/);

@@ -186,6 +186,11 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
   }, [isOpen]);
 
   const handleClose = () => {
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      onClose();
+      return;
+    }
     setIsClosing(true);
     setTimeout(() => {
       onClose();

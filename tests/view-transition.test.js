@@ -70,6 +70,7 @@ describe('index.html import map', () => {
 describe('App.js record-modal view transition (#281)', () => {
   const src = fs.readFileSync(path.join(frontendDir, 'App.js'), 'utf-8');
   const resultsSrc = fs.readFileSync(path.join(frontendDir, 'components', 'ArchiveResults.js'), 'utf-8');
+  const modalSrc = fs.readFileSync(path.join(frontendDir, 'components', 'RecordModal.js'), 'utf-8');
 
   it('imports the versioned helper', () => {
     assert.match(src, /from '\.\/utils\/viewTransition\.js\?v=\d+\.\d+\.\d+'/);
@@ -96,5 +97,10 @@ describe('App.js record-modal view transition (#281)', () => {
 
   it('closes the modal via selectRecord', () => {
     assert.match(src, /onClose=\$\{\(\) => selectRecord\(null\)\}/);
+  });
+
+  it('does not retain the animated close delay under reduced motion', () => {
+    assert.match(modalSrc, /matchMedia\?\.\('\(prefers-reduced-motion: reduce\)'\)\.matches/);
+    assert.match(modalSrc, /if \(reduceMotion\) \{\s*onClose\(\);\s*return;/);
   });
 });
