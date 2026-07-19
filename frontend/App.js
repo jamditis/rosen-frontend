@@ -130,6 +130,7 @@ const App = () => {
   }));
   const desktopActiveNeedsRecords = currentRoute === ROUTES.desktop
     && DESKTOP_RECORD_APPS.has(desktopAppId);
+  const desktopRecordOverlayOpen = desktopActiveNeedsRecords && Boolean(selectedRecordId);
   const desktopNeedsRecords = currentRoute === ROUTES.desktop
     && (
       desktopActiveNeedsRecords
@@ -584,7 +585,7 @@ const App = () => {
     onSelectRecord: selectRecord,
     selectedEntityId,
     onSelectEntity: setSelectedEntityId,
-    autoFocusSelection: !selectedRecordId,
+    autoFocusSelection: !desktopRecordOverlayOpen,
     onOpenStandard: () => goTo(ROUTES.entities),
   };
 
@@ -648,7 +649,7 @@ const App = () => {
         <${Suspense} fallback=${desktopFallback}>
           <${DesktopShell}
             activeAppId=${desktopAppId}
-            autoFocusWindow=${!selectedRecordId}
+            autoFocusWindow=${!desktopRecordOverlayOpen}
             onSelectApp=${goToDesktop}
             onNavigate=${goTo}
             onOpenBugReport=${() => { setBugReportIntent('problem'); setBugReportOpen(true); }}

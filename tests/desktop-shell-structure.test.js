@@ -57,6 +57,7 @@ describe('desktop route wiring', () => {
     assert.match(audit, /slug: 'desktop-tools',\s+url: '\/#desktop\/tools'/);
     assert.match(audit, /slug: 'desktop-record-modal',\s+url: '\/\?record=RECORD-00802#desktop\/archive'/);
     assert.match(audit, /slug: 'entity-detail',\s+url: '\/\?entity=P0005#entities'/);
+    assert.match(audit, /slug: 'entity-record',[\s\S]*url: '\/\?record=RECORD-00903&entity=P0005#entities',[\s\S]*verifyEntityRecordFlow: true/);
     assert.match(audit, /slug: 'desktop-report',[\s\S]*openReport: true/);
     assert.match(audit, /slug: 'dissertation-map-detail',[\s\S]*openDissertationDetail: true/,
       'the shared keyboard-scrollable detail panel stays in the full audit matrix');
@@ -145,7 +146,8 @@ describe('desktop entity adapter', () => {
     assert.match(panel, /onSelectEntity=\$\{onSelectEntity\}/);
     assert.match(panel, /embedded=\$\{true\}/);
     assert.match(panel, /autoFocusSelection=\$\{autoFocusSelection\}/);
-    assert.match(app, /autoFocusSelection:\s*!selectedRecordId/);
+    assert.match(app, /const desktopRecordOverlayOpen = desktopActiveNeedsRecords && Boolean\(selectedRecordId\)/);
+    assert.match(app, /autoFocusSelection:\s*!desktopRecordOverlayOpen/);
   });
 
   it('does not fetch or copy entity and archive data inside desktop modules', () => {
@@ -329,7 +331,7 @@ describe('desktop windowing and spatial memory', () => {
       'scheduled window-title focus must yield to an overlay restoring its exact opener');
     assert.match(shell, /if \(!autoFocusWindow\) return undefined/,
       'a foreground record overlay must retain focus ownership during direct desktop loads');
-    assert.match(app, /autoFocusWindow=\$\{!selectedRecordId\}/);
+    assert.match(app, /autoFocusWindow=\$\{!desktopRecordOverlayOpen\}/);
     assert.match(shell, /pointerWindowControlRef/,
       'pointer title-bar actions must not be consumed by background-window activation');
     assert.match(shell, /windowTitleRefs\.current\[shellApp\?\.id \|\| 'home'\]\?\.focus/,

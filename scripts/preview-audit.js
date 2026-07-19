@@ -74,6 +74,11 @@ const ROUTES = [
   },
   { slug: 'entities',           url: '/#entities' },
   { slug: 'entity-detail',      url: '/?entity=P0005#entities' },
+  {
+    slug: 'entity-record',
+    url: '/?record=RECORD-00903&entity=P0005#entities',
+    verifyEntityRecordFlow: true,
+  },
   { slug: 'about',              url: '/#about' },
   { slug: 'analytics',          url: '/#analytics' },
   { slug: 'record-modal',       url: '/?record=RECORD-00802' },
