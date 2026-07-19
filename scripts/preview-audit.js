@@ -57,7 +57,7 @@ const ROUTES = [
   { slug: 'desktop-dissertation', url: '/#desktop/dissertation' },
   { slug: 'desktop-analytics',  url: '/#desktop/analytics' },
   { slug: 'desktop-readme',     url: '/#desktop/readme' },
-  { slug: 'desktop-tools',      url: '/#desktop/tools' },
+  { slug: 'desktop-tools',      url: '/#desktop/tools', verifyToolRoundTrip: true },
   { slug: 'desktop-record-modal', url: '/?record=RECORD-00802#desktop/archive' },
   { slug: 'desktop-report',     url: '/#desktop', openReport: true },
   {
@@ -124,6 +124,13 @@ async function startServer() {
 }
 
 async function auditOne(page, route, viewport) {
+  const assertFocused = async (locator, label) => {
+    await locator.waitFor();
+    await page.waitForTimeout(100);
+    if (!await locator.evaluate((element) => document.activeElement === element)) {
+      throw new Error(`${label} did not own focus`);
+    }
+  };
   await page.setViewportSize({ width: viewport.width, height: viewport.height });
   // Spatial memory is intentionally persistent in production. Keep each audit
   // route deterministic, then opt into one explicit concurrent-window case.
@@ -156,13 +163,6 @@ async function auditOne(page, route, viewport) {
     await page.waitForTimeout(100);
   }
   if (route.verifyDesktopStartMenu) {
-    const assertFocused = async (locator, label) => {
-      await locator.waitFor();
-      await page.waitForTimeout(100);
-      if (!await locator.evaluate((element) => document.activeElement === element)) {
-        throw new Error(`${label} did not own focus`);
-      }
-    };
     const startButton = page.getByRole('button', { name: 'Start', exact: true });
     const startMenu = page.getByRole('menu', { name: 'Archive desktop Start menu' });
 
@@ -212,6 +212,39 @@ async function auditOne(page, route, viewport) {
     await startMenu.waitFor();
     await assertFocused(menuItems.first(), 'First Start menu destination before accessibility scan');
   }
+  if (route.verifyToolRoundTrip) {
+    const dissertationLink = page.getByRole('link', { name: /^Dissertation release\./ });
+    await dissertationLink.click();
+    await page.waitForURL((url) => url.pathname.endsWith('/dissertation/'));
+
+    const archiveReturn = page.getByRole('link', { name: "Back to Jay Rosen's Internet Archive" });
+    const archiveReturnBox = await archiveReturn.boundingBox();
+    const archiveReturnUrl = new URL(await archiveReturn.getAttribute('href'), page.url());
+    const archiveRootUrl = new URL(BASE);
+    if (
+      archiveReturnUrl.origin !== archiveRootUrl.origin
+      || archiveReturnUrl.pathname !== archiveRootUrl.pathname
+      || archiveReturnUrl.search
+      || archiveReturnUrl.hash
+    ) {
+      throw new Error(`Dissertation return resolved outside the archive root: ${archiveReturnUrl}`);
+    }
+    if (!archiveReturnBox || archiveReturnBox.width < 44 || archiveReturnBox.height < 44) {
+      throw new Error(`Dissertation return target was smaller than 44px: ${JSON.stringify(archiveReturnBox)}`);
+    }
+
+    await page.goBack({ waitUntil: 'networkidle' });
+    const toolsRegion = page.getByRole('region', { name: 'Tools' });
+    await toolsRegion.waitFor();
+    if (new URL(page.url()).hash !== '#desktop/tools') {
+      throw new Error(`Tool history return lost its desktop route: ${page.url()}`);
+    }
+    const toolLinkCount = await toolsRegion.getByRole('link').count();
+    if (toolLinkCount !== 7) {
+      throw new Error(`Tool history return exposed ${toolLinkCount} links; expected 7`);
+    }
+    await assertFocused(page.locator('#desktop-window-title-tools'), 'Tools window after browser Back');
+  }
 
   const shotDir = resolve(OUT_DIR, 'screenshots', viewport.name);
   await mkdir(shotDir, { recursive: true });
@@ -223,13 +256,6 @@ async function auditOne(page, route, viewport) {
   const axe = new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']);
   const result = await axe.analyze();
   if (route.verifyEntityRecordFlow) {
-    const assertFocused = async (locator, label) => {
-      await locator.waitFor();
-      await page.waitForTimeout(100);
-      if (!await locator.evaluate((element) => document.activeElement === element)) {
-        throw new Error(`${label} did not own focus`);
-      }
-    };
     const dialog = page.getByRole('dialog');
     const dialogClose = page.getByLabel('Close record details');
     await assertFocused(dialogClose, 'Direct record dialog');

@@ -27,7 +27,7 @@ npm run test:frontend
 npm run preview:audit
 ```
 
-`preview:audit` intentionally exits nonzero for the repository's inherited accessibility baseline. The expected result for this branch is 33 rule-level findings across 31 routes and three viewports (93 states), with zero findings in all 48 desktop rows, including the open Start-menu interaction state. Screenshots are written beneath `preview-audit-results/screenshots/{mobile,tablet,desktop}/`.
+The expected test results are 1,095 passing repository tests across 224 suites and 281 passing frontend tests across 54 suites. `preview:audit` intentionally exits nonzero for the repository's inherited accessibility baseline. The expected result for this branch is 33 rule-level findings across 31 routes and three viewports (93 states), with zero findings in all 48 desktop rows, including the open Start-menu interaction state. Screenshots are written beneath `preview-audit-results/screenshots/{mobile,tablet,desktop}/`.
 
 ## Review sequence
 
@@ -36,6 +36,7 @@ npm run preview:audit
 1. Begin at `/` and confirm the familiar archive remains the first experience.
 2. Enter through Start here or Tools, then inspect `/#desktop` directly.
 3. Open Read me and return to the launcher.
+4. Open Tools and launch Dissertation release. First use browser Back and confirm the Tools window reconstructs. Relaunch the page and use its 44-pixel “Back to archive” control to confirm the explicit standard-view escape. Repeat with the method demonstration and data visualization to sample the deeper standalone path prefixes.
 
 Evaluate:
 
@@ -93,7 +94,8 @@ At narrow widths, confirm the metaphor intentionally becomes a two-column touch 
 Keyboard-only:
 
 - traverse shortcuts with Arrow keys, Home, End, Enter, and Space;
-- open Start, traverse all groups, and close with Escape;
+- open Start, traverse all groups, verify Arrow-key wrap, and close with Escape;
+- reopen Start and leave it with forward and reverse Tab; focus should land on a visible adjacent control, never the removed popup;
 - enter and leave record dialogs, entity details, filter drawers, and dissertation details;
 - minimize/restore/close windows and use Reset;
 - confirm every programmatic focus target has a visible indicator.

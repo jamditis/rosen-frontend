@@ -55,7 +55,7 @@ describe('desktop route wiring', () => {
     assert.match(audit, /slug: 'desktop-dissertation',\s+url: '\/#desktop\/dissertation'/);
     assert.match(audit, /slug: 'desktop-analytics',\s+url: '\/#desktop\/analytics'/);
     assert.match(audit, /slug: 'desktop-readme',\s+url: '\/#desktop\/readme'/);
-    assert.match(audit, /slug: 'desktop-tools',\s+url: '\/#desktop\/tools'/);
+    assert.match(audit, /slug: 'desktop-tools',[\s\S]*url: '\/#desktop\/tools',[\s\S]*verifyToolRoundTrip: true/);
     assert.match(audit, /slug: 'desktop-record-modal',\s+url: '\/\?record=RECORD-00802#desktop\/archive'/);
     assert.match(audit, /slug: 'entity-detail',\s+url: '\/\?entity=P0005#entities'/);
     assert.match(audit, /slug: 'entity-record',[\s\S]*url: '\/\?record=RECORD-00903&entity=P0005#entities',[\s\S]*verifyEntityRecordFlow: true/);
@@ -76,6 +76,10 @@ describe('desktop route wiring', () => {
       'the reverse-Tab probe waits for the popup focus frame instead of racing it');
     assert.match(audit, /'Previous visible tool after reverse Tab'/,
       'the Start audit proves Tab exits do not strand focus in an unmounted menu');
+    assert.match(audit, /archiveReturnBox\.width < 44 \|\| archiveReturnBox\.height < 44/,
+      'the tool round-trip audit keeps the standalone return touch-sized');
+    assert.match(audit, /assertFocused\(page\.locator\('#desktop-window-title-tools'\), 'Tools window after browser Back'\)/,
+      'browser Back must reconstruct the nested Tools route and foreground focus');
     assert.match(audit, /slug: 'desktop-windowing'[\s\S]*desktopLayout:[\s\S]*zOrder/);
     assert.match(audit, /name: 'mobile',\s+width: 375,\s+height: 812/);
     assert.match(audit, /name: 'tablet',\s+width: 768,\s+height: 1024/);
