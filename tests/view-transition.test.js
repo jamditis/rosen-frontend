@@ -33,6 +33,11 @@ describe('withViewTransition helper', () => {
     assert.match(src, /typeof document\.startViewTransition !== 'function'/);
   });
 
+  it('runs the state update without a transition when reduced motion is requested', () => {
+    assert.match(src, /matchMedia\?\.\('\(prefers-reduced-motion: reduce\)'\)\.matches/);
+    assert.match(src, /if \(\s*reduceMotion\s*\|\|\s*typeof document/);
+  });
+
   it('flushes the React update synchronously inside the transition (React 18)', () => {
     // Without flushSync the API snapshots the "after" DOM before React commits,
     // so nothing animates. flushSync forces the commit inside the callback.
