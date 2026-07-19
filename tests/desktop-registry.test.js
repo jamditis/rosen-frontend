@@ -42,11 +42,13 @@ describe('desktop app registry', () => {
   it('derives a concise shortcut set and a complete Start menu from ready apps', () => {
     const ready = getReadyDesktopApps();
     const shortcuts = ready.filter((app) => app.surfaces.includes('desktop')).map((app) => app.id).sort();
-    const menuItems = ready.filter((app) => app.surfaces.includes('start')).map((app) => app.id).sort();
+    const menuItems = ready.filter((app) => app.surfaces.includes('start')).map((app) => app.id);
     assert.ok(shortcuts.every((id) => menuItems.includes(id)), 'Start includes every wallpaper shortcut');
-    assert.ok(menuItems.includes('method'), 'Start includes the standalone method demonstration');
-    assert.ok(menuItems.includes('findings'), 'Start includes the approved selected-record trail');
-    assert.ok(menuItems.includes('participate'), 'Start includes the shipped participation page');
+    assert.deepEqual(menuItems, [
+      'archive', 'folders', 'start', 'findings',
+      'entities', 'dissertation', 'analytics', 'tools', 'method',
+      'about', 'report', 'readme', 'participate',
+    ], 'Start keeps explore, research, and help destinations together');
     assert.ok(!shortcuts.includes('method'), 'the experimental method demo does not crowd the wallpaper');
     assert.ok(shortcuts.length >= 8, 'the launcher should expose the useful initial map');
   });

@@ -115,7 +115,7 @@ Rendering maps semantic icon keys to the existing Lucide icon components. Regist
 - Live app windows remain concurrently open in a deterministic cascade. Each is a labelled non-modal region, not a dialog, and none hides the shortcut field or background windows from assistive technology.
 - Activating a taskbar window raises it, updates the URL, and exposes a visible textual Active marker in addition to the title-bar treatment. Keyboard focus entering a background window raises it without moving focus away from the chosen control.
 - Minimize, restore, and close are ordinary 44-pixel buttons. Minimizing or closing the active window selects the next visible window; minimized task buttons include a textual state label.
-- The Start button opens a named menu, moves focus to its first item, supports Up/Down/Home/End, closes on Escape, and returns focus to the Start button.
+- The Start button opens a named menu, keeps Explore, Research, and Help destinations together, moves focus to its first item, supports Up/Down/Home/End, closes on Escape, and returns focus to the Start button.
 - The taskbar always exposes “Standard archive.”
 - Closing the last in-shell window returns to `#desktop` and restores focus to its shortcut when possible.
 
