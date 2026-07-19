@@ -108,6 +108,13 @@ async function runInstall(handlers) {
   await pending;
 }
 
+async function runMessage(handlers, data) {
+  assert.ok(handlers.message, 'no message handler registered');
+  let pending;
+  handlers.message({ data, waitUntil: (p) => { pending = p; } });
+  if (pending) await pending;
+}
+
 describe('service worker install precache (#274)', () => {
   it('warms archive-core.json on install', async () => {
     const { handlers, added } = loadSW();
@@ -139,6 +146,29 @@ describe('service worker install precache (#274)', () => {
     assert.ok(added.includes('/index.html'), 'local root index missing from precache');
     assert.ok(!added.includes('/frontend/index.html'), 'nonexistent frontend index must not be cached');
   });
+
+  it('keeps every GitHub Pages install entry inside the deployed subtree', async () => {
+    const { handlers, added } = loadSW('jamditis.github.io');
+    await runInstall(handlers);
+    assert.ok(added.length > 0, 'GitHub Pages install manifest is empty');
+    assert.ok(
+      added.every(url => url.startsWith('/rosen-frontend/')),
+      `install entry escaped /rosen-frontend/: ${added.find(url => !url.startsWith('/rosen-frontend/'))}`
+    );
+    assert.ok(added.includes('/rosen-frontend/'), 'GitHub Pages app root missing from precache');
+  });
+});
+
+describe('service worker optional desktop cache', () => {
+  it('warms exactly nine versioned desktop assets under the GitHub Pages subtree', async () => {
+    const { handlers, added } = loadSW('jamditis.github.io');
+    await runMessage(handlers, { action: 'cacheDesktop' });
+
+    assert.equal(added.length, 9);
+    assert.equal(new Set(added).size, 9);
+    assert.ok(added.every(url => url.startsWith('/rosen-frontend/frontend/desktop/')));
+    assert.ok(added.every(url => url.endsWith('?v=3.7.5')));
+  });
 });
 
 describe('service worker safePut (#274)', () => {
@@ -165,6 +195,16 @@ describe('service worker structure (#274)', () => {
     // analytics lazy-load test asserts archive-analytics.json appears in sw.js.
     assert.match(SW_SRC, /const\s+DATA_URLS\b/);
     assert.match(SW_SRC, /archive-analytics\.json/);
+  });
+
+  it('does not contain duplicate data-manifest entries', () => {
+    const manifest = SW_SRC.slice(
+      SW_SRC.indexOf('const DATA_URLS'),
+      SW_SRC.indexOf('const INSTALL_PRECACHE_DATA'),
+    );
+    const entries = [...manifest.matchAll(/`\$\{DATA_PATH\}\/([^`]+)`/g)].map(match => match[1]);
+    assert.ok(entries.length > 0, 'DATA_URLS manifest is empty');
+    assert.equal(new Set(entries).size, entries.length);
   });
 
   it('derives the install precache as a bounded subset of DATA_URLS', () => {
