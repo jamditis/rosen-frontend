@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The making of Jay Rosen's Internet Archive</title>
-<meta name="description" content="How four decades of scattered journalism criticism became one searchable archive, built to outlast the tools that made it. The honest version, mistakes included, told two ways: as a case file of evidence and as a first-person article.">
+<meta name="description" content="Jay Rosen spent four decades publishing across dozens of websites. How what survived became one searchable archive, mistakes included.">
 
 <!-- Favicon -->
 <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 
 <!-- Open Graph / social -->
 <meta property="og:title" content="The making of Jay Rosen's Internet Archive">
-<meta property="og:description" content="How four decades of scattered journalism criticism became one searchable archive, built to outlast the tools that made it. The honest version, mistakes included.">
+<meta property="og:description" content="Jay Rosen spent four decades publishing across dozens of websites. How what survived became one searchable archive, mistakes included.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://pressthink.org/j/rosen-archive/features/making-of/">
 <meta property="og:image" content="https://pressthink.org/j/rosen-archive/features/making-of/og-image.png">
@@ -19,7 +19,7 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="The making of Jay Rosen's Internet Archive">
-<meta name="twitter:description" content="How four decades of scattered journalism criticism became one searchable archive, built to outlast the tools that made it.">
+<meta name="twitter:description" content="Jay Rosen spent four decades publishing across dozens of websites. How what survived became one searchable archive, mistakes included.">
 <meta name="twitter:image" content="https://pressthink.org/j/rosen-archive/features/making-of/og-image.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -126,8 +126,6 @@
     font-size: clamp(20px, 4vw, 30px); color: var(--green); margin: 0 0 22px;
   }
   .dek { max-width: var(--measure); font-size: 16px; margin: 0 0 12px; }
-  .dek-note { max-width: var(--measure); font-size: 13px; color: var(--ink-soft); margin: 0 0 20px; }
-  .dek-note b { color: var(--ink); font-weight: 700; }
   .byline { font-size: 13px; color: var(--ink-soft); margin: 0 0 30px; }
   .byline b { color: var(--ink); font-weight: 700; }
 
@@ -305,8 +303,7 @@
     </div>
     <h1 class="title">The making of</h1>
     <p class="subject">Jay Rosen's Internet Archive</p>
-    <p class="dek">Jay Rosen spent four decades publishing across dozens of sites, and the web was quietly deleting the record as it went. I spent about a year turning what survived into one searchable archive, built so it keeps working after the tools that made it are gone. This is how that actually went, mistakes included.</p>
-    <p class="dek-note">The story runs two ways. The <b>case file</b> is the evidence: dates, counts, receipts, and a few exhibits you can check. The <b>article</b> is the testimony: what I was thinking, and where I was wrong. Switch anytime.</p>
+    <p class="dek">Jay Rosen spent four decades publishing across dozens of websites. I spent about a year turning what survived into one searchable archive. I am not a software engineer. I taught myself git, but I did not write the scraper. A language model wrote the scraper. I pointed several of them at a pile of records, got some help from a grad student, and I am still building it in public. This is how I did it, mistakes included.</p>
     <p class="byline">By <b>Joe Amditis</b>. Source of record: the archive's own <code>docs/narrative</code> and the project's public git history.</p>
     <div class="masthead-toggle">
       <span class="toggle-label" id="mast-mode-label">Read as</span>
@@ -433,7 +430,7 @@
     <div class="m-article prose">
       <p class="lead">The machine that fills the archive is a Python pipeline: take a URL, fetch the page, pull out the text, ask a model to read it, write the result to a row. Simple to describe. The first bugs were the stupid, expensive kind. A missing audio module turned out to be Python 3.12 dropping something the old code leaned on, so I pinned everything back to 3.11. An "API key not valid" error that cost me an afternoon was curly quotes in a config file where straight quotes belonged. The key was fine. The typography was not.</p>
       <p>The recurring fight was scraping. The big news sites do not want a bot reading them, and they will block a headless browser without blinking. So the fetch became a cascade: try Google's URL Context tool first, fall back to a plain fast fetch, fall back again to a full stealth browser only when the cheaper paths failed. Cheapest tool that works, every time, because I was paying for the expensive ones.</p>
-      <p>The old PressThink archive was its own kind of hard. Years of posts lived on single enormous pages, and two different URL structures pointed at overlapping content. I had to write parsers for the giant pages and then dedupe two schemes against each other. I am still not certain I caught every collision. I expect bug reports to find the ones I missed, so I built the thing so that fixing one is a fifteen-minute job rather than a rebuild.</p>
+      <p>The old PressThink archive was its own kind of hard. Years of posts lived on single enormous pages, and two different URL structures pointed at overlapping content. I had a model write parsers for the giant pages and dedupe the two schemes against each other. I am still not certain it caught every collision. I expect bug reports to find the ones I missed, so I built the thing so that fixing one is a fifteen-minute job rather than a rebuild.</p>
       <p>Scale broke things that worked fine on ten records. After the first full run the publication dates came back empty, all of them, because the sites did not put the date where the scraper looked. One backfill pass recovered 680 dates from patterns buried in the URLs, a second pulled 144 more out of page metadata, and the dataset landed at ninety-seven percent dated. Most of the pipeline's hard problems were that shape: reality arriving in a format nobody had planned for.</p>
       <p>The worst bug of the whole project did not crash anything, which is exactly why it was the worst. A re-analysis script was catching the model's answer in a variable and writing none of it to the sheet, falling back to the same hardcoded defaults every time, so all 725 records came out reading identical. I only found it because someone asked whether the re-analysis was actually doing anything with its results. It wasn't. The same silent-write pattern surfaced a month later in a different script, that time with a price tag: about fifty cents billed across eighty rows for analysis that never got saved. The money was trivial. The lesson was the expensive part.</p>
       <p>One decision from this stretch outlived every other one: keep the whole thing boring. No database server to run, no subscription to lapse. The data would be flat files a person could open, and the site would read them directly. That choice is the one I would defend hardest.</p>
