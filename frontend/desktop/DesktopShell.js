@@ -74,6 +74,7 @@ const launchModeLabel = (app) => {
 
 const DesktopShell = ({
   activeAppId = null,
+  autoFocusWindow = true,
   onSelectApp,
   onNavigate,
   onOpenBugReport,
@@ -193,6 +194,7 @@ const DesktopShell = ({
     let focusTarget = null;
     if (shellApp) {
       lastShellAppRef.current = shellApp.id;
+      if (!autoFocusWindow) return undefined;
       const activeWindow = document.querySelector(`[data-window-id="${shellApp.id}"]`);
       if (activeWindow?.contains(document.activeElement)) return undefined;
       focusTarget = windowTitleRefs.current[shellApp.id];
@@ -210,9 +212,18 @@ const DesktopShell = ({
       focusTarget = windowTitleRefs.current.home || desktopTitleRef.current;
     }
 
-    const frame = requestAnimationFrame(() => focusTarget?.focus({ preventScroll: true }));
+    const frame = requestAnimationFrame(() => {
+      if (shellApp) {
+        const activeWindow = document.querySelector(`[data-window-id="${shellApp.id}"]`);
+        // A foreground overlay can restore its exact opener after this effect
+        // has scheduled chrome focus. Re-check at paint time so the window
+        // title cannot overwrite that more precise focus destination.
+        if (activeWindow?.contains(document.activeElement)) return;
+      }
+      focusTarget?.focus({ preventScroll: true });
+    });
     return () => cancelAnimationFrame(frame);
-  }, [activeAppId, shellApp, shortcutApps, layout.windows.length]);
+  }, [activeAppId, autoFocusWindow, shellApp, shortcutApps, layout.windows.length]);
 
   useEffect(() => {
     if (!shellApp) return undefined;
@@ -547,6 +558,7 @@ const DesktopShell = ({
       onSelectRecord=${entityView.onSelectRecord}
       selectedEntityId=${entityView.selectedEntityId}
       onSelectEntity=${entityView.onSelectEntity}
+      autoFocusSelection=${entityView.autoFocusSelection}
       onOpenStandard=${entityView.onOpenStandard}
     />
   `;

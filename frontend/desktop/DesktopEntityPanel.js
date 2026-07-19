@@ -8,6 +8,7 @@ const DesktopEntityPanel = ({
   onSelectRecord,
   selectedEntityId,
   onSelectEntity,
+  autoFocusSelection,
   onOpenStandard,
 }) => html`
   <div className="desktop-entity-panel">
@@ -32,6 +33,7 @@ const DesktopEntityPanel = ({
         selectedEntityId=${selectedEntityId}
         onSelectEntity=${onSelectEntity}
         embedded=${true}
+        autoFocusSelection=${autoFocusSelection}
       />
     </div>
   </div>

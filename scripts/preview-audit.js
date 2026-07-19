@@ -4,8 +4,9 @@
 // desktop viewports, runs axe-core, writes per-route screenshots + a single
 // HTML report. Run via `npm run preview:audit`.
 //
-// Routes: top-level SPA hash routes + standalone subpages + one record
-// deep-link to exercise the modal path. Update ROUTES below to add more.
+// Routes: top-level SPA hash routes + standalone subpages + record deep links
+// that exercise canonical modal and background-view combinations. Update
+// ROUTES below to add more.
 
 import { spawn } from 'node:child_process';
 import { mkdir, writeFile, rm } from 'node:fs/promises';
@@ -47,6 +48,11 @@ const ROUTES = [
   { slug: 'desktop-findings',   url: '/#desktop/findings' },
   { slug: 'desktop-entities',   url: '/#desktop/entities' },
   { slug: 'desktop-entity-detail', url: '/?entity=P0005#desktop/entities' },
+  {
+    slug: 'desktop-entity-record',
+    url: '/?record=RECORD-00903&entity=P0005#desktop/entities',
+    verifyEntityRecordFlow: true,
+  },
   { slug: 'desktop-dissertation', url: '/#desktop/dissertation' },
   { slug: 'desktop-analytics',  url: '/#desktop/analytics' },
   { slug: 'desktop-readme',     url: '/#desktop/readme' },
@@ -153,6 +159,34 @@ async function auditOne(page, route, viewport) {
 
   const axe = new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']);
   const result = await axe.analyze();
+  if (route.verifyEntityRecordFlow) {
+    const assertFocused = async (locator, label) => {
+      await locator.waitFor();
+      await page.waitForTimeout(100);
+      if (!await locator.evaluate((element) => document.activeElement === element)) {
+        throw new Error(`${label} did not own focus`);
+      }
+    };
+    const dialog = page.getByRole('dialog');
+    const dialogClose = page.getByLabel('Close record details');
+    await assertFocused(dialogClose, 'Direct record dialog');
+
+    await page.keyboard.press('Escape');
+    await dialog.waitFor({ state: 'hidden' });
+    await assertFocused(page.locator('#entity-detail-title'), 'Selected entity after direct record close');
+
+    const recordOpener = page
+      .getByRole('region', { name: 'Records mentioning this entity' })
+      .getByRole('button')
+      .first();
+    await recordOpener.waitFor();
+    await recordOpener.click();
+    await dialog.waitFor();
+    await assertFocused(dialogClose, 'Record dialog opened from entity details');
+    await page.keyboard.press('Escape');
+    await dialog.waitFor({ state: 'hidden' });
+    await assertFocused(recordOpener, 'Entity record opener after ordinary close');
+  }
   return {
     route: route.slug,
     url: route.url,

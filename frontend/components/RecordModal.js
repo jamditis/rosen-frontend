@@ -53,6 +53,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
   const dialogRef = useRef(null);
   const closeButtonRef = useRef(null);
   const openerRef = useRef(null);
+  const hasRecord = Boolean(record);
 
   // Fetch details when modal opens
   useEffect(() => {
@@ -196,6 +197,8 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
       return undefined;
     }
 
+    if (!hasRecord) return undefined;
+
     if (!openerRef.current) {
       openerRef.current = document.activeElement instanceof HTMLElement
         ? document.activeElement
@@ -203,7 +206,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
     }
     const frame = requestAnimationFrame(() => closeButtonRef.current?.focus());
     return () => cancelAnimationFrame(frame);
-  }, [isOpen]);
+  }, [isOpen, hasRecord]);
 
   const completeClose = (afterClose = null) => {
     onClose();

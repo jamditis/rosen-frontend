@@ -101,6 +101,12 @@ describe('App.js record-modal view transition (#281)', () => {
     assert.match(src, /onClose=\$\{\(\) => selectRecord\(null\)\}/);
   });
 
+  it('waits for a deep-linked record to render before assigning dialog focus', () => {
+    assert.match(modalSrc, /const hasRecord = Boolean\(record\)/);
+    assert.match(modalSrc, /if \(!hasRecord\) return undefined/);
+    assert.match(modalSrc, /\}, \[isOpen, hasRecord\]\);/);
+  });
+
   it('does not retain the animated close delay under reduced motion', () => {
     assert.match(modalSrc, /matchMedia\?\.\('\(prefers-reduced-motion: reduce\)'\)\.matches/);
     assert.match(modalSrc, /if \(reduceMotion\) \{\s*completeClose\(afterClose\);\s*return;/);

@@ -584,6 +584,7 @@ const App = () => {
     onSelectRecord: selectRecord,
     selectedEntityId,
     onSelectEntity: setSelectedEntityId,
+    autoFocusSelection: !selectedRecordId,
     onOpenStandard: () => goTo(ROUTES.entities),
   };
 
@@ -647,6 +648,7 @@ const App = () => {
         <${Suspense} fallback=${desktopFallback}>
           <${DesktopShell}
             activeAppId=${desktopAppId}
+            autoFocusWindow=${!selectedRecordId}
             onSelectApp=${goToDesktop}
             onNavigate=${goTo}
             onOpenBugReport=${() => { setBugReportIntent('problem'); setBugReportOpen(true); }}
@@ -953,6 +955,7 @@ const App = () => {
                   onSelectRecord=${selectRecord}
                   selectedEntityId=${selectedEntityId}
                   onSelectEntity=${setSelectedEntityId}
+                  autoFocusSelection=${!selectedRecordId}
                 />
             `}
 

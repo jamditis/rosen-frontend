@@ -31,6 +31,7 @@ const EntityBrowser = ({
   selectedEntityId = null,
   onSelectEntity,
   embedded = false,
+  autoFocusSelection = true,
 }) => {
   const [entities, setEntities] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -194,8 +195,10 @@ const EntityBrowser = ({
     onSelectEntity?.(entity.id);
   }, [selectedEntity, closeEntityDetails, showEntityDetails, onSelectEntity]);
 
+  // Re-run showEntityDetails even when the selected ID is unchanged: on a cold
+  // deep link, the entity index can resolve before the core record list, and
+  // the derived record/co-occurrence panels must refresh when that list arrives.
   useEffect(() => {
-    if (selectedEntityId === selectedEntity?.id) return;
     if (!selectedEntityId) {
       if (selectedEntity) {
         entityOpenerRef.current = null;
@@ -208,7 +211,9 @@ const EntityBrowser = ({
 
     const entity = scopedEntityById.get(selectedEntityId);
     if (entity) {
-      entityOpenerRef.current = null;
+      if (selectedEntityId !== selectedEntity?.id) {
+        entityOpenerRef.current = null;
+      }
       showEntityDetails(entity);
     } else if (!loading) {
       onSelectEntity?.(null);
@@ -216,7 +221,7 @@ const EntityBrowser = ({
   }, [selectedEntityId, selectedEntity?.id, scopedEntityById, showEntityDetails, loading, onSelectEntity]);
 
   useEffect(() => {
-    if (!selectedEntity) return undefined;
+    if (!selectedEntity || !autoFocusSelection) return undefined;
     // Compact layouts place the selected detail before the long result list.
     // Moving focus makes that new context immediate for keyboard and screen-
     // reader users, and scrolls it into view for touch users who selected a
@@ -226,13 +231,20 @@ const EntityBrowser = ({
       // DesktopShell first announces/focuses the newly active window. Enter
       // the selected content on the following paint so a deep link or Forward
       // traversal does not finish on chrome instead of the requested entity.
-      focusFrame = requestAnimationFrame(() => detailHeadingRef.current?.focus());
+      focusFrame = requestAnimationFrame(() => {
+        const detailPanel = detailHeadingRef.current?.closest('[data-entity-detail]');
+        // RecordModal restores an ordinary close to its exact invoking record
+        // button inside this panel. Preserve that more precise return point;
+        // direct combined URLs have no such opener and still enter the heading.
+        if (detailPanel?.contains(document.activeElement)) return;
+        detailHeadingRef.current?.focus();
+      });
     });
     return () => {
       cancelAnimationFrame(layoutFrame);
       if (focusFrame !== null) cancelAnimationFrame(focusFrame);
     };
-  }, [selectedEntity?.id]);
+  }, [selectedEntity?.id, autoFocusSelection]);
 
   if (loading) {
     return html`
@@ -491,7 +503,12 @@ const EntityBrowser = ({
                 <${DetailSectionHeading} className="text-xs font-bold uppercase tracking-wider text-stone-600 mb-3">
                   Records (${entityRecords.length})
                 <//>
-                <div className="space-y-2 max-h-64 overflow-y-auto" tabIndex="0" aria-label="Records mentioning this entity">
+                <div
+                  className="space-y-2 max-h-64 overflow-y-auto"
+                  role="region"
+                  tabIndex="0"
+                  aria-label="Records mentioning this entity"
+                >
                   ${entityRecords.slice(0, 20).map(record => html`
                     <button
                       type="button"

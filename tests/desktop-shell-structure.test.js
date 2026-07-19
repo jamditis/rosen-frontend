@@ -50,6 +50,7 @@ describe('desktop route wiring', () => {
     assert.match(audit, /slug: 'desktop-findings',\s+url: '\/#desktop\/findings'/);
     assert.match(audit, /slug: 'desktop-entities',\s+url: '\/#desktop\/entities'/);
     assert.match(audit, /slug: 'desktop-entity-detail',\s+url: '\/\?entity=P0005#desktop\/entities'/);
+    assert.match(audit, /slug: 'desktop-entity-record',[\s\S]*url: '\/\?record=RECORD-00903&entity=P0005#desktop\/entities',[\s\S]*verifyEntityRecordFlow: true/);
     assert.match(audit, /slug: 'desktop-dissertation',\s+url: '\/#desktop\/dissertation'/);
     assert.match(audit, /slug: 'desktop-analytics',\s+url: '\/#desktop\/analytics'/);
     assert.match(audit, /slug: 'desktop-readme',\s+url: '\/#desktop\/readme'/);
@@ -60,6 +61,9 @@ describe('desktop route wiring', () => {
     assert.match(audit, /slug: 'dissertation-map-detail',[\s\S]*openDissertationDetail: true/,
       'the shared keyboard-scrollable detail panel stays in the full audit matrix');
     assert.match(audit, /getByRole\('dialog', \{ name: 'Report a problem or suggest a record' \}\)/);
+    assert.match(audit, /assertFocused\(dialogClose, 'Direct record dialog'\)/);
+    assert.match(audit, /assertFocused\(page\.locator\('#entity-detail-title'\), 'Selected entity after direct record close'\)/);
+    assert.match(audit, /assertFocused\(recordOpener, 'Entity record opener after ordinary close'\)/);
     assert.match(audit, /slug: 'desktop-windowing'[\s\S]*desktopLayout:[\s\S]*zOrder/);
     assert.match(audit, /name: 'mobile',\s+width: 375,\s+height: 812/);
     assert.match(audit, /name: 'tablet',\s+width: 768,\s+height: 1024/);
@@ -140,6 +144,8 @@ describe('desktop entity adapter', () => {
     assert.match(panel, /selectedEntityId=\$\{selectedEntityId\}/);
     assert.match(panel, /onSelectEntity=\$\{onSelectEntity\}/);
     assert.match(panel, /embedded=\$\{true\}/);
+    assert.match(panel, /autoFocusSelection=\$\{autoFocusSelection\}/);
+    assert.match(app, /autoFocusSelection:\s*!selectedRecordId/);
   });
 
   it('does not fetch or copy entity and archive data inside desktop modules', () => {
@@ -174,10 +180,19 @@ describe('desktop entity adapter', () => {
     assert.match(browser, /role="region"[\s\S]*aria-labelledby="entity-detail-title"/);
     assert.match(browser, /const DetailHeading = embedded \? 'h3' : 'h2'/);
     assert.match(browser, /const DetailSectionHeading = embedded \? 'h4' : 'h3'/);
-    assert.match(browser, /layoutFrame = requestAnimationFrame[\s\S]*focusFrame = requestAnimationFrame\(\(\) => detailHeadingRef\.current\?\.focus\(\)\)/);
+    assert.match(browser, /layoutFrame = requestAnimationFrame[\s\S]*focusFrame = requestAnimationFrame/);
+    assert.match(browser, /detailPanel\?\.contains\(document\.activeElement\)[\s\S]*detailHeadingRef\.current\?\.focus\(\)/,
+      'deferred entity focus must preserve a record modal\'s more precise opener return');
+    assert.match(browser, /if \(!selectedEntity \|\| !autoFocusSelection\) return undefined/);
+    assert.match(browser, /\[selectedEntity\?\.id, autoFocusSelection\]/);
+    assert.doesNotMatch(browser, /if \(selectedEntityId === selectedEntity\?\.id\) return/,
+      'cold entity deep links must refresh their derived records when the core corpus arrives');
+    assert.match(browser, /if \(selectedEntityId !== selectedEntity\?\.id\)[\s\S]*showEntityDetails\(entity\)/);
     assert.match(browser, /if \(event\.key !== 'Escape'\) return;/);
     assert.match(browser, /if \(opener\?\.isConnected\) opener\.focus\(\)/);
     assert.match(browser, /data-entity-id=\$\{entity\.id\}/);
+    assert.match(browser, /role="region"[\s\S]*aria-label="Records mentioning this entity"/,
+      'the keyboard-scrollable record list needs semantics that permit its accessible name');
     assert.match(browser, /else if \(fallback\?\.isConnected\) fallback\.focus\(\)/);
     assert.match(browser, /!opener\.closest\('\[data-entity-detail\]'\)/);
   });
@@ -304,11 +319,17 @@ describe('desktop windowing and spatial memory', () => {
 
   it('renders named non-modal windows, active state, task buttons, and reset controls', () => {
     const shell = read('frontend/desktop/DesktopShell.js');
+    const app = read('frontend/App.js');
     assert.match(shell, /className="desktop-window-stack"/);
     assert.match(shell, /role="region"/);
     assert.match(shell, /desktop-active-window-label/);
     assert.match(shell, /onFocusCapture/);
     assert.match(shell, /activeWindow\?\.contains\(document\.activeElement\)/);
+    assert.match(shell, /requestAnimationFrame\(\(\) => \{[\s\S]*activeWindow\?\.contains\(document\.activeElement\)[\s\S]*focusTarget\?\.focus/,
+      'scheduled window-title focus must yield to an overlay restoring its exact opener');
+    assert.match(shell, /if \(!autoFocusWindow\) return undefined/,
+      'a foreground record overlay must retain focus ownership during direct desktop loads');
+    assert.match(app, /autoFocusWindow=\$\{!selectedRecordId\}/);
     assert.match(shell, /pointerWindowControlRef/,
       'pointer title-bar actions must not be consumed by background-window activation');
     assert.match(shell, /windowTitleRefs\.current\[shellApp\?\.id \|\| 'home'\]\?\.focus/,
