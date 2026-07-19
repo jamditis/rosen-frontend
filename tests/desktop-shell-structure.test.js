@@ -69,8 +69,13 @@ describe('desktop route wiring', () => {
     assert.match(audit, /menuItemCount !== 15/,
       'the complete Start menu is exercised as an open accessibility state');
     assert.match(audit, /assertFocused\(startButton, 'Start button after Escape'\)/);
-    assert.match(audit, /getByRole\('region', \{ name: 'Tools' \}\)\.waitFor\(\)/,
+    assert.match(audit, /const toolsRegion = page\.getByRole\('region', \{ name: 'Tools' \}\);[\s\S]*await toolsRegion\.waitFor\(\)/,
       'the Start audit proves a real in-shell destination launches');
+    assert.match(audit, /assertFocused\(startButton, 'Start button after forward Tab'\)/);
+    assert.match(audit, /'First Start menu destination before reverse Tab'/,
+      'the reverse-Tab probe waits for the popup focus frame instead of racing it');
+    assert.match(audit, /'Previous visible tool after reverse Tab'/,
+      'the Start audit proves Tab exits do not strand focus in an unmounted menu');
     assert.match(audit, /slug: 'desktop-windowing'[\s\S]*desktopLayout:[\s\S]*zOrder/);
     assert.match(audit, /name: 'mobile',\s+width: 375,\s+height: 812/);
     assert.match(audit, /name: 'tablet',\s+width: 768,\s+height: 1024/);

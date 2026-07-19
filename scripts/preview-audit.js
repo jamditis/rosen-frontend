@@ -186,10 +186,31 @@ async function auditOne(page, route, viewport) {
 
     await startButton.click();
     await startMenu.getByRole('menuitem', { name: /^Tools/ }).click();
-    await page.getByRole('region', { name: 'Tools' }).waitFor();
+    const toolsRegion = page.getByRole('region', { name: 'Tools' });
+    await toolsRegion.waitFor();
     await startButton.click();
     await startMenu.waitFor();
     await assertFocused(menuItems.first(), 'First Start menu destination after an app launch');
+    await page.keyboard.press('ArrowUp');
+    await assertFocused(startMenu.getByRole('menuitem', { name: /^Standard archive/ }), 'Wrapped last Start menu destination');
+    await page.keyboard.press('ArrowDown');
+    await assertFocused(menuItems.first(), 'Wrapped first Start menu destination');
+    await page.keyboard.press('Tab');
+    await startMenu.waitFor({ state: 'hidden' });
+    await assertFocused(startButton, 'Start button after forward Tab');
+
+    await startButton.click();
+    await startMenu.waitFor();
+    await assertFocused(menuItems.first(), 'First Start menu destination before reverse Tab');
+    await page.keyboard.press('Shift+Tab');
+    await startMenu.waitFor({ state: 'hidden' });
+    await assertFocused(
+      toolsRegion.getByRole('link', { name: /^Data visualization\./ }),
+      'Previous visible tool after reverse Tab',
+    );
+    await startButton.click();
+    await startMenu.waitFor();
+    await assertFocused(menuItems.first(), 'First Start menu destination before accessibility scan');
   }
 
   const shotDir = resolve(OUT_DIR, 'screenshots', viewport.name);
