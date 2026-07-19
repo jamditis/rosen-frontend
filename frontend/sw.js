@@ -13,7 +13,7 @@
 // Cache version is tied to the app version in version.json. Bumping it on every
 // deploy (alongside index.html and the ?v= import strings) makes the activate
 // handler below drop every stale cache, so returning visitors never run old code.
-const CACHE_VERSION = '3.7.4';
+const CACHE_VERSION = '3.7.5';
 const CACHE_NAME = `jrda-cache-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `jrda-data-${CACHE_VERSION}`;
 
@@ -63,6 +63,7 @@ const STATIC_ASSETS = IS_LOCAL ? [
   '/frontend/components/QueryBuilder.js',
   '/frontend/components/AboutPage.js',
   '/frontend/components/StartHerePage.js',
+  '/frontend/utils/reportDeepLink.js',
   '/frontend/components/WikiPage.js',
   '/frontend/services/wikiService.js',
   '/frontend/services/sqliteService.js'
@@ -95,6 +96,7 @@ const STATIC_ASSETS = IS_LOCAL ? [
   `${BASE_PATH}/frontend/components/QueryBuilder.js`,
   `${BASE_PATH}/frontend/components/AboutPage.js`,
   `${BASE_PATH}/frontend/components/StartHerePage.js`,
+  `${BASE_PATH}/frontend/utils/reportDeepLink.js`,
   `${BASE_PATH}/frontend/components/WikiPage.js`,
   `${BASE_PATH}/frontend/services/wikiService.js`,
   `${BASE_PATH}/frontend/services/sqliteService.js`

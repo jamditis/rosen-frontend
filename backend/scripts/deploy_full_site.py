@@ -85,6 +85,7 @@ _DEPLOY_DIRS: Tuple[str, ...] = (
     'features/shared',
     'features/status-report',
     'features/winer-method',
+    'features/participate',
     'tools/active/dataexplorer',
     'tools/active/dataviz',
     'data/feeds',

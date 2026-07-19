@@ -1,32 +1,34 @@
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.7.4';
+import { html } from './html.js?v=3.7.5';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString, loadSearchIndex } from './services/archiveService.js?v=3.7.4';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.7.4';
-import { withViewTransition } from './utils/viewTransition.js?v=3.7.4';
-import { ITEMS_PER_PAGE, COLORS, REPORT_CONFIG } from './constants.js?v=3.7.4';
-import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.7.4';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.7.4';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.7.4';
-import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.7.4';
-import { sortRecords } from './utils/recordSort.js?v=3.7.4';
-import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.7.4';
-import Sidebar from './components/Sidebar.js?v=3.7.4';
-import WelcomeModal from './components/WelcomeModal.js?v=3.7.4';
-import RecordView from './components/RecordView.js?v=3.7.4';
-import FeaturedSection from './components/FeaturedSection.js?v=3.7.4';
-import DissertationPage from './components/DissertationPage.js?v=3.7.4';
-import ToolsModal from './components/ToolsModal.js?v=3.7.4';
-import BugReportModal from './components/BugReportModal.js?v=3.7.4';
-import LoadingQuotes from './components/LoadingQuotes.js?v=3.7.4';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.7.4';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.7.4';
-import EntityBrowser from './components/EntityBrowser.js?v=3.7.4';
-import Timeline from './components/Timeline.js?v=3.7.4';
-import AboutPage from './components/AboutPage.js?v=3.7.4';
-import WikiPage from './components/WikiPage.js?v=3.7.4';
-import StartHerePage from './components/StartHerePage.js?v=3.7.4';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString, loadSearchIndex } from './services/archiveService.js?v=3.7.5';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.7.5';
+import { withViewTransition } from './utils/viewTransition.js?v=3.7.5';
+import { ITEMS_PER_PAGE, COLORS, REPORT_CONFIG } from './constants.js?v=3.7.5';
+import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.7.5';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.7.5';
+import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.7.5';
+import { resolveSitePath } from './utils/pathResolver.js?v=3.7.5';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.7.5';
+import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.7.5';
+import { sortRecords } from './utils/recordSort.js?v=3.7.5';
+import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.7.5';
+import Sidebar from './components/Sidebar.js?v=3.7.5';
+import WelcomeModal from './components/WelcomeModal.js?v=3.7.5';
+import RecordView from './components/RecordView.js?v=3.7.5';
+import FeaturedSection from './components/FeaturedSection.js?v=3.7.5';
+import DissertationPage from './components/DissertationPage.js?v=3.7.5';
+import ToolsModal from './components/ToolsModal.js?v=3.7.5';
+import BugReportModal from './components/BugReportModal.js?v=3.7.5';
+import LoadingQuotes from './components/LoadingQuotes.js?v=3.7.5';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.7.5';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.7.5';
+import EntityBrowser from './components/EntityBrowser.js?v=3.7.5';
+import Timeline from './components/Timeline.js?v=3.7.5';
+import AboutPage from './components/AboutPage.js?v=3.7.5';
+import WikiPage from './components/WikiPage.js?v=3.7.5';
+import StartHerePage from './components/StartHerePage.js?v=3.7.5';
 
 // Helper to highlight text
 const Highlight = ({ text, term }) => {
@@ -73,6 +75,7 @@ const App = () => {
   const [selectedRecordId, setSelectedRecordId] = useState(() => getRecordIdFromUrl());
   const [toolsModalOpen, setToolsModalOpen] = useState(false);
   const [bugReportOpen, setBugReportOpen] = useState(false);
+  const [bugReportIntent, setBugReportIntent] = useState('problem');
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   const [filters, setFilters] = useState({ ...DEFAULT_FILTERS });
@@ -80,6 +83,17 @@ const App = () => {
   // Ref for scrolling to results
   const resultsRef = useRef(null);
   const recordsRef = useRef(null);
+  const reportEntryHandled = useRef(false);
+
+  useEffect(() => {
+    if (reportEntryHandled.current) return;
+    reportEntryHandled.current = true;
+    const entry = readReportDeepLink(window.location.href);
+    if (!entry.intent) return;
+    setBugReportIntent(entry.intent);
+    setBugReportOpen(true);
+    window.history.replaceState({}, '', entry.cleanHref);
+  }, []);
 
   // Migrate legacy ?view= URLs on mount, then sync hash state
   useEffect(() => {
@@ -403,6 +417,7 @@ const App = () => {
         isOpen=${bugReportOpen}
         onClose=${() => setBugReportOpen(false)}
         endpoint=${REPORT_CONFIG.endpoint}
+        initialIntent=${bugReportIntent}
       />
     </div>
   `;
@@ -421,7 +436,7 @@ const App = () => {
         onBack=${() => goTo(ROUTES.archive)}
         records=${records}
         onNavigate=${goTo}
-        onOpenBugReport=${() => setBugReportOpen(true)}
+        onOpenBugReport=${() => { setBugReportIntent('problem'); setBugReportOpen(true); }}
         onSelectRecord=${handleStartRecordSelect}
       />
     `);
@@ -436,6 +451,7 @@ const App = () => {
       <${AboutPage}
         onBack=${() => goTo(ROUTES.archive)}
         onStart=${() => goTo(ROUTES.start)}
+        onParticipate=${() => { window.location.href = resolveSitePath('features/participate/'); }}
         records=${records}
       />
     `);
@@ -482,6 +498,7 @@ const App = () => {
         isOpen=${bugReportOpen}
         onClose=${() => setBugReportOpen(false)}
         endpoint=${REPORT_CONFIG.endpoint}
+        initialIntent=${bugReportIntent}
       />
 
       ${recordView}
@@ -537,7 +554,7 @@ const App = () => {
                     <span>About</span>
                 </button>
                 <button
-                  onClick=${() => setBugReportOpen(true)}
+                  onClick=${() => { setBugReportIntent('problem'); setBugReportOpen(true); }}
                   className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-md transition-colors flex items-center gap-1 text-xs"
                   aria-label="Report a bug"
                   title="Report a bug"
@@ -853,6 +870,7 @@ const App = () => {
               <h4 className="font-display font-bold text-stone-900 mb-2">Sections</h4>
               <div className="space-y-1 text-xs">
                 <button onClick=${() => goTo(ROUTES.start)} className="block hover:text-stone-900 transition-colors">Start here</button>
+                <a href=${resolveSitePath('features/participate/')} className="block hover:text-stone-900 transition-colors">Ways to participate</a>
                 <button onClick=${() => goTo(ROUTES.archive)} className="block hover:text-stone-900 transition-colors">Browse archive</button>
                 <button onClick=${() => goTo(ROUTES.dissertation)} className="block hover:text-stone-900 transition-colors">Dissertation mind map</button>
                 <button onClick=${() => goTo(ROUTES.entities)} className="block hover:text-stone-900 transition-colors">Entity browser</button>

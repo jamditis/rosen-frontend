@@ -56,7 +56,7 @@ describe('Start here entry points', () => {
   it('offers Start here from the About page', () => {
     const source = read('frontend/components/AboutPage.js');
 
-    assert.match(source, /const AboutPage = \(\{ onBack, onStart, records \}\)/);
+    assert.match(source, /const AboutPage = \(\{ onBack, onStart, onParticipate, records \}\)/);
     assert.match(source, /onClick=\$\{onStart\}/);
     assert.match(source, /Start here/);
   });
