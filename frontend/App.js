@@ -102,6 +102,7 @@ const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentRoute, setCurrentRoute] = useState(() => getCurrentRoute());
   const [desktopAppId, setDesktopAppId] = useState(() => getDesktopAppIdFromUrl());
+  const [desktopOpenAppIds, setDesktopOpenAppIds] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('date-asc');
   const [isScrolled, setIsScrolled] = useState(false);
@@ -119,8 +120,13 @@ const App = () => {
     ...DEFAULT_FILTERS,
     ...parseViewState(window.location.href).filters,
   }));
-  const desktopNeedsRecords = currentRoute === ROUTES.desktop
+  const desktopActiveNeedsRecords = currentRoute === ROUTES.desktop
     && DESKTOP_RECORD_APPS.has(desktopAppId);
+  const desktopNeedsRecords = currentRoute === ROUTES.desktop
+    && (
+      desktopActiveNeedsRecords
+      || desktopOpenAppIds.some((appId) => DESKTOP_RECORD_APPS.has(appId))
+    );
 
   // Ref for scrolling to results
   const resultsRef = useRef(null);
@@ -166,19 +172,19 @@ const App = () => {
 
   // Update URL when record selected (without changing route)
   useEffect(() => {
-    if (desktopNeedsRecords) return;
+    if (desktopActiveNeedsRecords) return;
     const url = new URL(window.location.href);
     setRecordParam(url.searchParams, selectedRecordId);
     try {
       window.history.replaceState({}, '', url);
     } catch(e) { console.warn("History update blocked"); }
-  }, [selectedRecordId, desktopNeedsRecords]);
+  }, [selectedRecordId, desktopActiveNeedsRecords]);
 
   // Desktop archive links preserve the canonical filter query plus the shared
   // ?record= deep link. The hash only identifies the active shell app; no
   // second desktop-only filter or record URL format is introduced.
   useEffect(() => {
-    if (!desktopNeedsRecords) return;
+    if (!desktopActiveNeedsRecords) return;
     const nextUrl = viewStateToUrl({
       route: ROUTES.desktop,
       routeParams: { desktopAppId },
@@ -190,7 +196,7 @@ const App = () => {
     } catch {
       console.warn('Desktop view-state update blocked');
     }
-  }, [desktopNeedsRecords, desktopAppId, filters, selectedRecordId]);
+  }, [desktopActiveNeedsRecords, desktopAppId, filters, selectedRecordId]);
 
   // Navigation helpers
   const goTo = useCallback((route) => {
@@ -276,7 +282,7 @@ const App = () => {
         setError('Failed to load archive data. Please refresh the page or try again later.');
         setLoading(false);
       });
-  }, [currentRoute, desktopAppId]);
+  }, [currentRoute, desktopAppId, desktopNeedsRecords]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -508,7 +514,7 @@ const App = () => {
     onOpenFolder: handleFolderClick,
     onPageChange: handlePageChange,
     onClearFilters: () => setFilters({ ...DEFAULT_FILTERS }),
-    onOpenStandard: () => goTo(viewMode === 'folder' ? ROUTES.folders : ROUTES.archive),
+    onOpenStandard: (mode = viewMode) => goTo(mode === 'folder' ? ROUTES.folders : ROUTES.archive),
   };
 
   const desktopEntityView = {
@@ -569,6 +575,7 @@ const App = () => {
             onNavigate=${goTo}
             onOpenBugReport=${() => setBugReportOpen(true)}
             onExit=${() => goTo(ROUTES.archive)}
+            onOpenAppsChange=${setDesktopOpenAppIds}
             archiveView=${desktopArchiveView}
             analyticsView=${desktopAnalyticsView}
             dissertationView=${desktopDissertationView}
@@ -576,7 +583,7 @@ const App = () => {
           />
         <//>
       <//>
-    `, desktopNeedsRecords ? recordView : null);
+    `, desktopActiveNeedsRecords ? recordView : null);
   }
 
   if (currentRoute === ROUTES.start) {

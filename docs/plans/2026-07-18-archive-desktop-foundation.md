@@ -4,7 +4,7 @@
 
 Issue #622 adds an optional Windows 95/98-inspired exploration shell to Jay Rosen's Internet Archive. The standard archive stays the default. The desktop is a second front door that reuses canonical routes, records, services, and reporting behavior.
 
-The implemented slices cover the product map, accessible shell, archive and record browsing, people and ideas, the dissertation map, analytics, the shipped archive-method demonstration, maintained tools, and root-scoped offline behavior. Multi-window behavior, persisted layout, and approval-gated editorial integrations remain later slices.
+The implemented slices cover the product map, accessible shell, archive and record browsing, people and ideas, the dissertation map, analytics, the shipped archive-method demonstration, maintained tools, concurrent window behavior, low-risk spatial memory, and root-scoped offline behavior. Approval-gated editorial integrations remain later slices.
 
 ## Product intent
 
@@ -81,7 +81,7 @@ The desktop extends the existing hash vocabulary:
 | `#desktop/tools` | Desktop with the maintained-tools window active |
 | `#desktop/:unknown` | Desktop home fallback with an accessible status announcement |
 
-Only in-shell windows use the nested desktop hash. Archive, Folders, People & ideas, Dissertation, and Analytics use thin in-shell adapters over shared application state or canonical components. Each offers an explicit standard-view exit. Launching Start here or About performs an explicit transition to that destination's existing canonical route. The report action opens the existing report dialog and does not mint a new URL.
+Only in-shell windows use the nested desktop hash. The hash identifies the active window; other open or minimized windows are presentation state, not a parallel content URL. Archive, Folders, People & ideas, Dissertation, and Analytics use thin in-shell adapters over shared application state or canonical components. Each offers an explicit standard-view exit. Launching Start here or About performs an explicit transition to that destination's existing canonical route. The report action opens the existing report dialog and does not mint a new URL.
 
 Desktop filter state uses the existing readable query vocabulary, for example `?q=citizen&cat=Criticism#desktop/archive`, and survives copy, reload, and route changes. Record state remains `?record=RECORD_ID`. Copy-link and citation actions deliberately strip the desktop hash and filter query to produce the standard canonical record URL. Browser back and forward traverse desktop window changes and canonical route transitions through the existing history listeners.
 
@@ -103,19 +103,33 @@ Rendering maps semantic icon keys to the existing Lucide icon components. Regist
 ### Desktop and tablet
 
 - A two-column shortcut field uses one roving tab stop. Arrow keys move by row or column; Home and End jump to the bounds; Enter and Space activate.
-- A non-modal content window occupies the main workspace. It is a labelled section, not a dialog, and does not hide the shortcut field from assistive technology.
+- Live app windows remain concurrently open in a deterministic cascade. Each is a labelled non-modal region, not a dialog, and none hides the shortcut field or background windows from assistive technology.
+- Activating a taskbar window raises it, updates the URL, and exposes a visible textual Active marker in addition to the title-bar treatment. Keyboard focus entering a background window raises it without moving focus away from the chosen control.
+- Minimize, restore, and close are ordinary 44-pixel buttons. Minimizing or closing the active window selects the next visible window; minimized task buttons include a textual state label.
 - The Start button opens a named menu, moves focus to its first item, supports Up/Down/Home/End, closes on Escape, and returns focus to the Start button.
 - The taskbar always exposes “Standard archive.”
-- Closing an in-shell window returns to `#desktop` and restores focus to its shortcut when possible.
+- Closing the last in-shell window returns to `#desktop` and restores focus to its shortcut when possible.
 
 ### Mobile and narrow zoom layouts
 
 - The spatial canvas becomes a two-column touch launcher with normal document flow.
-- An active in-shell app becomes a full-width content panel rather than a shrunken floating window.
+- Only the active in-shell app is rendered as a full-width content panel; other open/minimized apps remain reachable through the horizontally scrollable task list and Start menu.
 - The taskbar respects safe-area insets and remains usable at 200% zoom.
 - No action depends on drag, hover, right-click, double-click, sound, or animation.
 
-Reduced-motion mode removes decorative transitions. The foundation does not implement movable, resizable, minimized, or persisted windows; those behaviors belong to Phase 5 after equivalent keyboard controls are designed.
+Reduced-motion mode removes decorative transitions. Windows deliberately use bounded cascading placement rather than drag or resize. That keeps content on-screen, avoids a pointer-only interaction, and makes a separate keyboard geometry mode unnecessary. If freeform placement is added later, equivalent keyboard movement/resizing and clamping must ship in the same change.
+
+## Windowing and spatial memory
+
+The desktop persists only a schema-versioned presentation envelope in `jrda-desktop-layout`:
+
+- allowlisted open shell-app IDs;
+- each window's minimized boolean;
+- a repaired, duplicate-free z-order.
+
+Schema 1 never stores record data, filters, queries, active content, scroll positions, or authored material. Unknown IDs, malformed JSON, duplicates, and future schema versions fall back safely. Cards and Folders are one window family because they are two layouts of the canonical Archive app and would otherwise duplicate filter-control IDs.
+
+The URL remains authoritative for the active window. Activating or restoring a window creates understandable browser history; Back and Forward therefore revisit and, when necessary, reopen that historical window. A visible Reset desktop layout command in both Start and Read me closes all app windows, clears the saved envelope, and returns to `#desktop`. Restored visible Archive, Folders, or People & ideas windows notify `App.js` to load the one shared corpus even when another app is URL-active; only a URL-active record app can show the canonical record overlay.
 
 ## Loading, failure, and offline behavior
 
@@ -123,7 +137,7 @@ The desktop route is lazy-loaded. A standard archive visit adds only the route v
 
 The desktop stylesheet is requested only after the desktop component mounts. A failed dynamic import renders a plain archive-styled fallback with a working route to the standard archive. A failed desktop stylesheet leaves semantic content usable.
 
-The root page now registers a stable root `sw.js` bridge, which imports the cache-versioned `frontend/sw.js` implementation with fresh-import checking. Its implicit scope is `/` in local preview and the deployed archive subtree on GitHub Pages and production. The install manifest covers the complete eager standard-app module graph and the real root `index.html`; it does not contain desktop modules. On the first desktop mount, `DesktopShell` asks the active worker to warm the seven optional desktop assets for the next visit.
+The root page now registers a stable root `sw.js` bridge, which imports the cache-versioned `frontend/sw.js` implementation with fresh-import checking. Its implicit scope is `/` in local preview and the deployed archive subtree on GitHub Pages and production. The install manifest covers the complete eager standard-app module graph and the real root `index.html`; it does not contain desktop modules. On the first desktop mount, `DesktopShell` asks the active worker to warm the eight optional desktop assets for the next visit.
 
 Browser validation in a new storage context confirms that the worker controls the root page, a standard visitor caches no desktop assets, the standard archive reloads offline, a first-ever desktop visit warms its optional module graph, and `?record=...#desktop/archive` reloads offline after the record details have been opened once. Query-string navigations fall back to the cached clean app root. Data that was never opened remains governed by the existing explicit loading/error states; the large analytics SQLite source is never prefetched.
 
@@ -170,17 +184,18 @@ The adapter provides:
 Measured from the integrated current-main build with service workers blocked and the background details preload settled:
 
 - the standard route requests 58 same-origin resources after 2.5 seconds, excluding the document;
-- local decoded transfer is 27,459,325 bytes, 15,839 bytes over the original baseline;
+- local decoded transfer is 27,459,697 bytes, 16,211 bytes over the original baseline;
 - the one added standard-route request is `ArchiveResults.js`, extracted from `App.js` so standard and desktop results share one renderer;
-- `frontend/App.js` is 39,977 bytes, `ArchiveResults.js` is 8,714 bytes, `frontend/services/viewState.js` is 6,969 bytes, and `frontend/services/router.js` is 2,769 bytes;
+- `frontend/App.js` is 40,349 bytes, `ArchiveResults.js` is 8,714 bytes, `frontend/services/viewState.js` is 6,969 bytes, and `frontend/services/router.js` is 2,769 bytes;
 - the standard route does not request `DesktopShell.js`, `desktopRegistry.js`, or `desktop.css`;
-- a cold `#desktop` deep link requests 62 same-origin resources totaling 608,478 decoded bytes, including seven desktop assets but no archive corpus; `#desktop/archive` makes one `archive-core.json` request and no duplicate corpus request;
+- a cold `#desktop` deep link requests 63 same-origin resources totaling 622,729 decoded bytes, including eight desktop assets but no archive corpus; `#desktop/archive` makes one `archive-core.json` request and no duplicate corpus request;
 - `#desktop`, `#desktop/archive`, `#desktop/entities`, `#desktop/dissertation`, and `#desktop/analytics` have zero automated accessibility violations at their validated target sizes, as do selected-entity, dissertation-detail, and open-record states;
-- keyboard checks cover shortcut arrow navigation and activation, Start-menu focus entry and Escape return, window close focus return, filter-drawer entry/Escape return, record-modal entry/return, unknown-app fallback, and mobile reflow without horizontal overflow;
+- keyboard checks cover shortcut arrow navigation and activation, Start-menu focus entry/Escape/reset, background-window focus raising, minimize/restore/close and focus return, taskbar restoration, filter-drawer entry/Escape return, record-modal entry/return, unknown-app fallback, and mobile reflow without horizontal overflow;
 - entity browsing makes one core and one entity-index request, dissertation makes no data request, and analytics fetches only the small aggregate until an explicit query loads SQLite;
 - dissertation nodes are keyboard reachable, its shortcuts act only while the map owns focus, and its detail panel returns focus to the exact SVG node;
 - an analytics composable query returns its 20 canonical record IDs to `#desktop/archive` without leaving the shell;
-- the complete test suite passes 1,036 tests across 217 suites on rebased version `3.7.4`; the focused frontend suite passes 187 tests across 42 suites, and the production deploy-manifest suite passes all 36 focused tests;
-- a fresh browser confirms the root worker installs `jrda-cache-3.7.4` and `jrda-data-3.7.4`, a standard visit caches zero desktop assets, first desktop use warms exactly seven unique versioned assets, and an opened canonical record reloads to the same record while offline without console errors.
+- the complete test suite passes 1,046 tests across 220 suites on rebased version `3.7.4`; the focused frontend suite passes 197 tests across 45 suites, and the production deploy-manifest suite passes all 36 focused tests;
+- a fresh browser confirms the root worker installs `jrda-cache-3.7.4` and `jrda-data-3.7.4`, a standard visit caches zero desktop assets, first desktop use warms exactly eight unique versioned assets, and a persisted Archive-plus-Analytics layout reloads offline with both canonical surfaces intact and no console errors;
+- browser checks confirm one active full-width window at 375×812, 812×375 landscape, and a 720×450 200%-zoom equivalent; all have no horizontal overflow or automated accessibility findings.
 
-The repository-wide preview audit covers 16 routes at mobile, tablet, and desktop sizes (48 rendered states) and reports 33 rule-level findings. `#desktop`, Archive, People & ideas, Dissertation, Analytics, and the Winer method demonstration each contribute zero findings at every viewport. The remaining findings are confined to previously maintained standard archive, standalone dissertation, reader, FAQ, and status-report surfaces.
+The repository-wide preview audit covers 17 routes at mobile, tablet, and desktop sizes (51 rendered states) and reports 33 rule-level findings. `#desktop`, Archive, People & ideas, Dissertation, Analytics, the explicit concurrent-window layout, and the Winer method demonstration each contribute zero findings at every viewport. The remaining findings are confined to previously maintained standard archive, standalone dissertation, reader, FAQ, and status-report surfaces.

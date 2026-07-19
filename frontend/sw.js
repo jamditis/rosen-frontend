@@ -131,6 +131,7 @@ const DESKTOP_ASSETS = [
   'DesktopDissertationPanel.js',
   'DesktopAnalyticsPanel.js',
   'desktopRegistry.js',
+  'desktopWindowState.js',
   'desktop.css'
 ].map(file => `${FRONTEND_PATH}/desktop/${file}?v=${CACHE_VERSION}`);
 

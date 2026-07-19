@@ -41,6 +41,19 @@ const ROUTES = [
   { slug: 'desktop-entities',   url: '/#desktop/entities' },
   { slug: 'desktop-dissertation', url: '/#desktop/dissertation' },
   { slug: 'desktop-analytics',  url: '/#desktop/analytics' },
+  {
+    slug: 'desktop-windowing',
+    url: '/#desktop/analytics',
+    desktopLayout: {
+      schema: 1,
+      windows: [
+        { id: 'archive', minimized: false },
+        { id: 'entities', minimized: false },
+        { id: 'analytics', minimized: false },
+      ],
+      zOrder: ['archive', 'entities', 'analytics'],
+    },
+  },
   { slug: 'entities',           url: '/#entities' },
   { slug: 'about',              url: '/#about' },
   { slug: 'analytics',          url: '/#analytics' },
@@ -79,7 +92,24 @@ async function startServer() {
 
 async function auditOne(page, route, viewport) {
   await page.setViewportSize({ width: viewport.width, height: viewport.height });
-  await page.goto(BASE + route.url, { waitUntil: 'networkidle', timeout: 30000 });
+  // Spatial memory is intentionally persistent in production. Keep each audit
+  // route deterministic, then opt into one explicit concurrent-window case.
+  if (page.url().startsWith(BASE)) {
+    await page.evaluate((desktopLayout) => {
+      if (desktopLayout) {
+        localStorage.setItem('jrda-desktop-layout', JSON.stringify(desktopLayout));
+      } else {
+        localStorage.removeItem('jrda-desktop-layout');
+      }
+    }, route.desktopLayout || null);
+  }
+  const targetUrl = new URL(BASE + route.url);
+  if (route.slug === 'archive-desktop' || route.slug.startsWith('desktop-')) {
+    // A distinct document navigation remounts DesktopShell so the in-memory
+    // layout cannot leak from the previous hash-only route.
+    targetUrl.searchParams.set('_audit', `${viewport.name}-${route.slug}`);
+  }
+  await page.goto(targetUrl.toString(), { waitUntil: 'networkidle', timeout: 30000 });
   // Async React render + lazy-loaded sql.js: small extra settle.
   await page.waitForTimeout(1500);
 

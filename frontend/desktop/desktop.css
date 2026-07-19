@@ -111,6 +111,7 @@
 
 .desktop-shortcut,
 .desktop-window-close,
+.desktop-window-minimize,
 .desktop-start-button,
 .desktop-task-button,
 .desktop-menu-item,
@@ -192,11 +193,20 @@
   text-transform: uppercase;
 }
 
+.desktop-window-stack {
+  position: relative;
+  min-width: 0;
+  min-height: calc(100svh - var(--desktop-taskbar-height) - 4rem);
+}
+
 .desktop-window {
+  position: absolute;
+  top: calc(clamp(2.6rem, 9vh, 7rem) + var(--desktop-window-y, 0px));
+  left: calc(50% + var(--desktop-window-x, 0px));
   align-self: start;
   width: min(100%, 780px);
   min-width: 0;
-  margin: clamp(2.6rem, 9vh, 7rem) auto 1rem;
+  margin: 0;
   border: 3px solid var(--desktop-chrome);
   border-top-color: var(--desktop-chrome-light);
   border-left-color: var(--desktop-chrome-light);
@@ -204,6 +214,7 @@
   border-bottom-color: #292722;
   background: var(--desktop-chrome);
   box-shadow: 10px 12px 0 rgba(0, 0, 0, 0.22), 18px 22px 40px rgba(0, 0, 0, 0.22);
+  transform: translateX(-50%);
 }
 
 .desktop-window-titlebar {
@@ -243,12 +254,38 @@
   outline-offset: 3px;
 }
 
+.desktop-active-window-label {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  padding: 0 0.42rem;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.desktop-window.is-inactive .desktop-window-titlebar {
+  color: #fff;
+  background: #74736f;
+}
+
 .desktop-titlebar-icon {
   width: 21px;
   height: 21px;
 }
 
-.desktop-window-close {
+.desktop-window-controls {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.2rem;
+}
+
+.desktop-window-close,
+.desktop-window-minimize {
   display: grid;
   flex: 0 0 44px;
   width: 44px;
@@ -262,19 +299,22 @@
   cursor: pointer;
 }
 
-.desktop-window-close svg {
+.desktop-window-close svg,
+.desktop-window-minimize svg {
   width: 23px;
   height: 23px;
   stroke-width: 3;
 }
 
-.desktop-window-close:active {
+.desktop-window-close:active,
+.desktop-window-minimize:active {
   border-color: var(--desktop-chrome-light);
   border-top-color: var(--desktop-chrome-dark);
   border-left-color: var(--desktop-chrome-dark);
 }
 
 .desktop-window-close:focus-visible,
+.desktop-window-minimize:focus-visible,
 .desktop-start-button:focus-visible,
 .desktop-task-button:focus-visible,
 .desktop-menu-item:focus-visible,
@@ -428,6 +468,35 @@
   line-height: 1.55;
 }
 
+.desktop-layout-help {
+  margin: 0 0 1rem;
+  padding: 1rem;
+  border: 1px solid #aaa292;
+  background: #ece6da;
+}
+
+.desktop-layout-help h4,
+.desktop-layout-help p {
+  margin-top: 0;
+}
+
+.desktop-layout-help p {
+  color: #49443c;
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+
+.desktop-layout-help .desktop-standard-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.desktop-layout-help svg {
+  width: 18px;
+  height: 18px;
+}
+
 .desktop-future-section {
   padding: 1rem;
   border: 1px solid #aaa292;
@@ -565,8 +634,8 @@
 }
 
 .desktop-window-wide {
-  width: min(100%, 1100px);
-  margin-top: clamp(1.4rem, 5vh, 4rem);
+  top: calc(clamp(1.4rem, 5vh, 4rem) + var(--desktop-window-y, 0px));
+  width: min(calc(100% - 56px), 1100px);
 }
 
 .desktop-window-wide .desktop-window-body {
@@ -966,6 +1035,44 @@
   cursor: pointer;
 }
 
+.desktop-task-window-list {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-items: center;
+  gap: 0.35rem;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: thin;
+}
+
+.desktop-task-window-list > [role='listitem'] {
+  flex: 0 0 auto;
+}
+
+.desktop-task-window-list .desktop-task-button {
+  width: min(190px, 24vw);
+}
+
+.desktop-task-button.is-minimized {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent,
+    transparent 4px,
+    rgba(23, 21, 18, 0.1) 4px,
+    rgba(23, 21, 18, 0.1) 7px
+  );
+}
+
+.desktop-task-button small {
+  display: block;
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
 .desktop-start-button {
   font-family: var(--font-display, 'Special Elite', cursive);
   font-size: 0.92rem;
@@ -1211,11 +1318,15 @@
     overflow-y: auto;
     background: #f5f1e8;
     box-shadow: 7px 0 18px rgba(0, 0, 0, 0.3);
+    visibility: hidden;
+    pointer-events: none;
     transform: translateX(-105%);
     transition: transform 140ms ease;
   }
 
   .desktop-filter-panel.is-open {
+    visibility: visible;
+    pointer-events: auto;
     transform: translateX(0);
   }
 }
@@ -1232,6 +1343,14 @@
     grid-template-columns: repeat(2, minmax(88px, 105px));
   }
 
+  .desktop-window {
+    --desktop-window-x: 0px !important;
+  }
+
+  .desktop-window-wide {
+    width: 100%;
+  }
+
   .desktop-principles,
   .desktop-tool-grid {
     grid-template-columns: 1fr;
@@ -1244,7 +1363,7 @@
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 700px), (max-width: 900px) and (max-height: 520px) {
   .archive-desktop {
     --desktop-taskbar-height: 58px;
     min-height: 100svh;
@@ -1283,10 +1402,21 @@
     background: rgba(5, 50, 54, 0.28);
   }
 
+  .desktop-window-stack {
+    min-height: calc(100svh - var(--desktop-taskbar-height) - 1.8rem - env(safe-area-inset-bottom, 0px));
+  }
+
   .desktop-window {
+    position: static;
+    display: none;
     width: 100%;
     margin: 1rem 0 0;
     box-shadow: 5px 6px 0 rgba(0, 0, 0, 0.22);
+    transform: none;
+  }
+
+  .desktop-window.is-active {
+    display: block;
   }
 
   .desktop-app-active .desktop-shortcut-panel {
@@ -1406,6 +1536,10 @@
     max-width: 42vw;
   }
 
+  .desktop-task-window-list .desktop-task-button {
+    width: min(150px, 38vw);
+  }
+
   .desktop-task-status {
     display: none;
   }
@@ -1423,9 +1557,6 @@
     max-width: 86px;
   }
 
-  .desktop-task-button.is-active {
-    display: none;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1448,6 +1579,7 @@
   .desktop-shortcut,
   .desktop-window,
   .desktop-window-close,
+  .desktop-window-minimize,
   .desktop-start-button,
   .desktop-task-button,
   .desktop-menu-item,

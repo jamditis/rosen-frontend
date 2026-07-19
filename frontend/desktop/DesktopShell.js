@@ -14,7 +14,9 @@ import {
   Info,
   Library,
   Menu,
+  Minus,
   Network,
+  RotateCcw,
   Search,
   Sparkles,
   Users,
@@ -32,6 +34,16 @@ import {
   getDesktopApp,
   getReadyDesktopApps,
 } from './desktopRegistry.js?v=3.7.4';
+import {
+  DESKTOP_LAYOUT_STORAGE_KEY,
+  activateDesktopWindow,
+  closeDesktopWindow,
+  emptyDesktopLayout,
+  minimizeDesktopWindow,
+  nextVisibleDesktopWindow,
+  parseDesktopLayout,
+  serializeDesktopLayout,
+} from './desktopWindowState.js?v=3.7.4';
 
 const ICONS = {
   archive: Archive,
@@ -68,6 +80,7 @@ const DesktopShell = ({
   onNavigate,
   onOpenBugReport,
   onExit,
+  onOpenAppsChange,
   archiveView,
   analyticsView,
   dissertationView,
@@ -82,6 +95,11 @@ const DesktopShell = ({
     () => readyApps.filter((app) => app.surfaces.includes('start')),
     [readyApps],
   );
+  const shellApps = useMemo(
+    () => readyApps.filter((app) => app.launch.kind === 'shell'),
+    [readyApps],
+  );
+  const shellAppIds = useMemo(() => shellApps.map((app) => app.id), [shellApps]);
   const plannedApps = useMemo(
     () => DESKTOP_APPS.filter((app) => app.availability !== 'ready'),
     [],
@@ -97,14 +115,23 @@ const DesktopShell = ({
   const [statusMessage, setStatusMessage] = useState(
     hasUnknownApp ? 'That desktop item is unavailable. Showing the desktop home.' : '',
   );
+  const [layout, setLayout] = useState(() => {
+    try {
+      return parseDesktopLayout(localStorage.getItem(DESKTOP_LAYOUT_STORAGE_KEY), shellAppIds);
+    } catch {
+      return emptyDesktopLayout();
+    }
+  });
 
   const desktopTitleRef = useRef(null);
-  const windowTitleRef = useRef(null);
+  const windowTitleRefs = useRef({});
   const shortcutRefs = useRef([]);
+  const taskButtonRefs = useRef({});
   const startButtonRef = useRef(null);
   const startMenuRef = useRef(null);
   const menuItemRefs = useRef([]);
   const lastShellAppRef = useRef(null);
+  const reportedOpenAppsRef = useRef('');
 
   useEffect(() => {
     const stylesheetId = 'archive-desktop-styles';
@@ -136,30 +163,67 @@ const DesktopShell = ({
   }, []);
 
   useEffect(() => {
+    if (!shellApp) return;
+    setLayout((current) => activateDesktopWindow(current, shellApp.id, shellAppIds));
+  }, [shellApp, shellAppIds]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        DESKTOP_LAYOUT_STORAGE_KEY,
+        serializeDesktopLayout(layout, shellAppIds),
+      );
+    } catch {
+      // Private browsing and storage policies may reject persistence. Window
+      // behavior remains fully usable for the current session.
+    }
+  }, [layout, shellAppIds]);
+
+  useEffect(() => {
+    const visibleAppIds = layout.windows
+      .filter((entry) => !entry.minimized)
+      .map((entry) => entry.id);
+    const signature = visibleAppIds.join('|');
+    if (reportedOpenAppsRef.current === signature) return;
+    reportedOpenAppsRef.current = signature;
+    onOpenAppsChange?.(visibleAppIds);
+  }, [layout.windows, onOpenAppsChange]);
+
+  useEffect(() => {
+    let focusTarget = null;
     if (shellApp) {
       lastShellAppRef.current = shellApp.id;
-      windowTitleRef.current?.focus({ preventScroll: true });
-      return;
-    }
-
-    if (activeAppId) {
+      const activeWindow = document.querySelector(`[data-window-id="${shellApp.id}"]`);
+      if (activeWindow?.contains(document.activeElement)) return undefined;
+      focusTarget = windowTitleRefs.current[shellApp.id];
+    } else if (activeAppId) {
       setStatusMessage('That desktop item is unavailable. Showing the desktop home.');
-      windowTitleRef.current?.focus({ preventScroll: true });
-      return;
-    }
-
-    if (lastShellAppRef.current) {
+      focusTarget = windowTitleRefs.current.home;
+    } else if (lastShellAppRef.current && layout.windows.length === 0) {
       const index = shortcutApps.findIndex((app) => app.id === lastShellAppRef.current);
       if (index >= 0) {
         setShortcutFocusIndex(index);
-        shortcutRefs.current[index]?.focus({ preventScroll: true });
+        focusTarget = shortcutRefs.current[index];
       }
       lastShellAppRef.current = null;
-      return;
+    } else {
+      focusTarget = windowTitleRefs.current.home || desktopTitleRef.current;
     }
 
-    desktopTitleRef.current?.focus({ preventScroll: true });
-  }, [activeAppId, shellApp, shortcutApps]);
+    const frame = requestAnimationFrame(() => focusTarget?.focus({ preventScroll: true }));
+    return () => cancelAnimationFrame(frame);
+  }, [activeAppId, shellApp, shortcutApps, layout.windows.length]);
+
+  useEffect(() => {
+    if (!shellApp) return undefined;
+    const frame = requestAnimationFrame(() => {
+      taskButtonRefs.current[shellApp.id]?.scrollIntoView({
+        block: 'nearest',
+        inline: 'nearest',
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [shellApp, layout.windows]);
 
   useEffect(() => {
     if (!startOpen) return undefined;
@@ -180,6 +244,15 @@ const DesktopShell = ({
     };
   }, [startOpen]);
 
+  const activateWindow = (appId) => {
+    setLayout((current) => activateDesktopWindow(current, appId, shellAppIds));
+    if (activeAppId === appId) {
+      windowTitleRefs.current[appId]?.focus({ preventScroll: true });
+    } else {
+      onSelectApp?.(appId);
+    }
+  };
+
   const openApp = (app) => {
     const index = shortcutApps.findIndex((candidate) => candidate.id === app.id);
     if (index >= 0) setShortcutFocusIndex(index);
@@ -187,7 +260,7 @@ const DesktopShell = ({
 
     if (app.launch.kind === 'shell') {
       setStatusMessage(`Opening ${app.label}.`);
-      onSelectApp?.(app.launch.destination);
+      activateWindow(app.launch.destination);
       return;
     }
     if (app.launch.kind === 'action') {
@@ -232,7 +305,7 @@ const DesktopShell = ({
     moveShortcutFocus(nextIndex);
   };
 
-  const menuEntryCount = startApps.length + 1;
+  const menuEntryCount = startApps.length + 2;
   const handleMenuKeyDown = (event, index) => {
     let nextIndex = index;
     if (event.key === 'ArrowDown') nextIndex = (index + 1) % menuEntryCount;
@@ -255,9 +328,35 @@ const DesktopShell = ({
     menuItemRefs.current[nextIndex]?.focus();
   };
 
-  const closeWindow = () => {
-    setStatusMessage(`Closed ${shellApp?.label || 'the unavailable item'}.`);
+  const closeWindow = (app) => {
+    const nextLayout = closeDesktopWindow(layout, app.id, shellAppIds);
+    setLayout(nextLayout);
+    setStatusMessage(`Closed ${app.label}.`);
+    if (activeAppId === app.id) {
+      onSelectApp?.(nextVisibleDesktopWindow(nextLayout) || null);
+    }
+  };
+
+  const minimizeWindow = (app) => {
+    const nextLayout = minimizeDesktopWindow(layout, app.id, shellAppIds);
+    setLayout(nextLayout);
+    setStatusMessage(`Minimized ${app.label}. Use its taskbar button to restore it.`);
+    if (activeAppId === app.id) {
+      onSelectApp?.(nextVisibleDesktopWindow(nextLayout, app.id) || null);
+    }
+  };
+
+  const resetLayout = () => {
+    setLayout(emptyDesktopLayout());
+    setStartOpen(false);
+    setStatusMessage('Desktop layout reset. All app windows were closed.');
+    try {
+      localStorage.removeItem(DESKTOP_LAYOUT_STORAGE_KEY);
+    } catch {
+      // The in-memory reset still succeeds when storage is unavailable.
+    }
     onSelectApp?.(null);
+    requestAnimationFrame(() => startButtonRef.current?.focus());
   };
 
   const renderWelcome = () => html`
@@ -303,10 +402,21 @@ const DesktopShell = ({
 
       <dl className="desktop-definition-list">
         <div><dt>Shortcut</dt><dd>A maintained way into the collection. One click is enough.</dd></div>
-        <div><dt>Desktop window</dt><dd>Orientation or tool content that stays inside this shell.</dd></div>
+        <div><dt>Desktop window</dt><dd>A live archive surface that can remain open while you compare another path.</dd></div>
         <div><dt>Standard view</dt><dd>The existing canonical archive route, with its full current behavior.</dd></div>
         <div><dt>Start</dt><dd>The complete list of destinations and the dependable way out.</dd></div>
       </dl>
+
+      <section className="desktop-layout-help" aria-labelledby="desktop-layout-help-title">
+        <h4 id="desktop-layout-help-title">Window memory</h4>
+        <p>
+          Open and minimized app windows are saved on this device. Active state stays in the URL, so Back and Forward move between the windows you activated.
+        </p>
+        <button type="button" className="desktop-standard-link" onClick=${resetLayout}>
+          <${RotateCcw} aria-hidden="true" />
+          Reset desktop layout
+        </button>
+      </section>
 
       <section aria-labelledby="future-connections-title" className="desktop-future-section">
         <h4 id="future-connections-title">Future connections</h4>
@@ -354,9 +464,11 @@ const DesktopShell = ({
     </div>
   `;
 
-  const renderArchive = () => html`
+  const renderArchive = (appId) => {
+    const windowViewMode = appId === 'folders' ? 'folder' : 'grid';
+    return html`
     <${DesktopArchivePanel}
-      viewMode=${archiveView.viewMode}
+      viewMode=${windowViewMode}
       loading=${archiveView.loading}
       error=${archiveView.error}
       filters=${archiveView.filters}
@@ -376,9 +488,10 @@ const DesktopShell = ({
       onOpenFolder=${archiveView.onOpenFolder}
       onPageChange=${archiveView.onPageChange}
       onClearFilters=${archiveView.onClearFilters}
-      onOpenStandard=${archiveView.onOpenStandard}
+      onOpenStandard=${() => archiveView.onOpenStandard(windowViewMode)}
     />
   `;
+  };
 
   const renderEntities = () => html`
     <${DesktopEntityPanel}
@@ -402,15 +515,92 @@ const DesktopShell = ({
     />
   `;
 
-  const windowTitle = shellApp?.label || 'Archive desktop';
-  let windowContent = renderWelcome();
-  if (shellApp?.id === 'archive' || shellApp?.id === 'folders') windowContent = renderArchive();
-  else if (shellApp?.id === 'entities') windowContent = renderEntities();
-  else if (shellApp?.id === 'dissertation') windowContent = renderDissertation();
-  else if (shellApp?.id === 'analytics') windowContent = renderAnalytics();
-  else if (shellApp?.id === 'readme') windowContent = renderReadme();
-  else if (shellApp?.id === 'tools') windowContent = renderTools();
-  const isWideWindow = ['archive', 'folders', 'entities', 'dissertation', 'analytics'].includes(shellApp?.id);
+  const renderWindowContent = (app) => {
+    if (!app) return renderWelcome();
+    if (app.id === 'archive' || app.id === 'folders') return renderArchive(app.id);
+    if (app.id === 'entities') return renderEntities();
+    if (app.id === 'dissertation') return renderDissertation();
+    if (app.id === 'analytics') return renderAnalytics();
+    if (app.id === 'readme') return renderReadme();
+    if (app.id === 'tools') return renderTools();
+    return renderWelcome();
+  };
+
+  const renderWindowFrame = (app, stackIndex = 0) => {
+    const appId = app?.id || 'home';
+    const windowTitle = app?.label || 'Archive desktop';
+    const isActive = app ? shellApp?.id === app.id : !shellApp;
+    const isWideWindow = ['archive', 'folders', 'entities', 'dissertation', 'analytics'].includes(app?.id);
+    const titleId = `desktop-window-title-${appId}`;
+    const style = app ? {
+      '--desktop-window-x': `${(stackIndex % 4) * 14}px`,
+      '--desktop-window-y': `${(stackIndex % 4) * 14}px`,
+      zIndex: stackIndex + 3,
+    } : { zIndex: 1 };
+
+    return html`
+      <section
+        key=${appId}
+        className=${`desktop-window ${isWideWindow ? 'desktop-window-wide' : ''} ${isActive ? 'is-active' : 'is-inactive'} ${app ? '' : 'desktop-home-window'}`}
+        style=${style}
+        role="region"
+        aria-labelledby=${titleId}
+        data-window-id=${appId}
+        onPointerDown=${(event) => {
+          if (!app || isActive || event.target.closest('.desktop-window-controls')) return;
+          activateWindow(app.id);
+        }}
+        onFocusCapture=${() => {
+          if (app && !isActive) activateWindow(app.id);
+        }}
+      >
+        <div className="desktop-window-titlebar">
+          <div className="desktop-window-title-copy">
+            <span aria-hidden="true">${iconFor(app?.icon || 'archive', 'desktop-titlebar-icon')}</span>
+            <h2
+              id=${titleId}
+              ref=${(element) => { windowTitleRefs.current[appId] = element; }}
+              tabIndex="-1"
+            >${windowTitle}</h2>
+            ${isActive && html`<span className="desktop-active-window-label">Active</span>`}
+          </div>
+          ${app && html`
+            <div className="desktop-window-controls">
+              <button
+                type="button"
+                className="desktop-window-minimize"
+                onClick=${() => minimizeWindow(app)}
+                aria-label=${`Minimize ${windowTitle}`}
+              >
+                <${Minus} aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                className="desktop-window-close"
+                onClick=${() => closeWindow(app)}
+                aria-label=${`Close ${windowTitle}`}
+              >
+                <${X} aria-hidden="true" />
+              </button>
+            </div>
+          `}
+        </div>
+        <div className="desktop-window-body">${renderWindowContent(app)}</div>
+        <div className="desktop-window-status">
+          ${isActive ? 'Active window' : 'Open in background'}
+        </div>
+      </section>
+    `;
+  };
+
+  const openWindows = layout.zOrder
+    .map((id) => layout.windows.find((entry) => entry.id === id))
+    .filter((entry) => entry && !entry.minimized)
+    .map((entry) => getDesktopApp(entry.id))
+    .filter((app) => app?.availability === 'ready' && app.launch.kind === 'shell');
+  const taskWindows = layout.windows
+    .map((entry) => ({ ...entry, app: getDesktopApp(entry.id) }))
+    .filter((entry) => entry.app?.availability === 'ready' && entry.app.launch.kind === 'shell');
 
   return html`
     <main id="main-content" className=${`archive-desktop ${shellApp ? 'desktop-app-active' : ''}`}>
@@ -446,27 +636,10 @@ const DesktopShell = ({
           </div>
         </section>
 
-        <section
-          className=${`desktop-window ${isWideWindow ? 'desktop-window-wide' : ''}`}
-          role="region"
-          aria-labelledby="desktop-window-title"
-        >
-          <div className="desktop-window-titlebar">
-            <div className="desktop-window-title-copy">
-              <span aria-hidden="true">${iconFor(shellApp?.icon || 'archive', 'desktop-titlebar-icon')}</span>
-              <h2 id="desktop-window-title" ref=${windowTitleRef} tabIndex="-1">${windowTitle}</h2>
-            </div>
-            ${activeAppId && html`
-              <button type="button" className="desktop-window-close" onClick=${closeWindow} aria-label=${`Close ${windowTitle}`}>
-                <${X} aria-hidden="true" />
-              </button>
-            `}
-          </div>
-          <div className="desktop-window-body">${windowContent}</div>
-          <div className="desktop-window-status" aria-hidden="true">
-            ${shellApp ? 'Desktop window' : 'Archive desktop home'}
-          </div>
-        </section>
+        <div className="desktop-window-stack">
+          ${renderWindowFrame(null)}
+          ${openWindows.map((app, index) => renderWindowFrame(app, index))}
+        </div>
       </div>
 
       <p className="desktop-live-status" aria-live="polite" aria-atomic="true">${statusMessage}</p>
@@ -504,11 +677,23 @@ const DesktopShell = ({
             <button
               ref=${(element) => { menuItemRefs.current[startApps.length] = element; }}
               type="button"
+              className="desktop-menu-item"
+              role="menuitem"
+              tabIndex="-1"
+              onClick=${resetLayout}
+              onKeyDown=${(event) => handleMenuKeyDown(event, startApps.length)}
+            >
+              <span className="desktop-menu-icon"><${RotateCcw} aria-hidden="true" /></span>
+              <span><strong>Reset desktop layout</strong><small>Close windows and clear saved state</small></span>
+            </button>
+            <button
+              ref=${(element) => { menuItemRefs.current[startApps.length + 1] = element; }}
+              type="button"
               className="desktop-menu-item desktop-menu-exit"
               role="menuitem"
               tabIndex="-1"
               onClick=${onExit}
-              onKeyDown=${(event) => handleMenuKeyDown(event, startApps.length)}
+              onKeyDown=${(event) => handleMenuKeyDown(event, startApps.length + 1)}
             >
               <span className="desktop-menu-icon"><${ArrowLeft} aria-hidden="true" /></span>
               <span><strong>Standard archive</strong><small>Leave the desktop view</small></span>
@@ -536,16 +721,27 @@ const DesktopShell = ({
           <span>Standard archive</span>
         </button>
 
-        ${shellApp && html`
-          <button
-            type="button"
-            className="desktop-task-button is-active"
-            aria-current="page"
-            onClick=${() => windowTitleRef.current?.focus()}
-          >
-            ${iconFor(shellApp.icon, 'desktop-task-icon')}
-            <span>${shellApp.label}</span>
-          </button>
+        ${taskWindows.length > 0 && html`
+          <div className="desktop-task-window-list" role="list" aria-label="Open desktop windows" tabIndex="0">
+            ${taskWindows.map(({ app, minimized }) => html`
+              <div role="listitem" key=${app.id}>
+                <button
+                  ref=${(element) => { taskButtonRefs.current[app.id] = element; }}
+                  type="button"
+                  className=${`desktop-task-button ${shellApp?.id === app.id ? 'is-active' : ''} ${minimized ? 'is-minimized' : ''}`}
+                  aria-current=${shellApp?.id === app.id ? 'page' : undefined}
+                  aria-label=${`${minimized ? 'Restore' : 'Activate'} ${app.label}${minimized ? ', minimized' : ''}`}
+                  onClick=${() => {
+                    setStatusMessage(`${minimized ? 'Restored' : 'Activated'} ${app.label}.`);
+                    activateWindow(app.id);
+                  }}
+                >
+                  ${iconFor(app.icon, 'desktop-task-icon')}
+                  <span>${app.label}${minimized ? html`<small>Minimized</small>` : ''}</span>
+                </button>
+              </div>
+            `)}
+          </div>
         `}
 
         <div className="desktop-task-status" aria-hidden="true">

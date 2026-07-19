@@ -48,6 +48,7 @@ describe('desktop route wiring', () => {
     assert.match(audit, /slug: 'desktop-entities',\s+url: '\/#desktop\/entities'/);
     assert.match(audit, /slug: 'desktop-dissertation',\s+url: '\/#desktop\/dissertation'/);
     assert.match(audit, /slug: 'desktop-analytics',\s+url: '\/#desktop\/analytics'/);
+    assert.match(audit, /slug: 'desktop-windowing'[\s\S]*desktopLayout:[\s\S]*zOrder/);
     assert.match(audit, /name: 'mobile',\s+width: 375,\s+height: 812/);
     assert.match(audit, /name: 'tablet',\s+width: 768,\s+height: 1024/);
     assert.match(audit, /name: 'desktop',\s+width: 1440,\s+height: 900/);
@@ -61,7 +62,7 @@ describe('desktop archive adapter', () => {
     assert.match(app, /<\$\{ArchiveResults\}/, 'standard archive uses shared results');
     assert.match(panel, /<\$\{ArchiveResults\}/, 'desktop adapter uses shared results');
     assert.match(app, /archiveView=\$\{desktopArchiveView\}/);
-    assert.match(app, /desktopNeedsRecords \? recordView : null/,
+    assert.match(app, /desktopActiveNeedsRecords \? recordView : null/,
       'desktop record reading uses the canonical RecordView overlay');
   });
 
@@ -103,7 +104,7 @@ describe('desktop entity adapter', () => {
     assert.match(panel, /<\$\{EntityBrowser\}/);
     assert.match(app, /entityView=\$\{desktopEntityView\}/);
     assert.match(app, /records:\s*queryRecords/);
-    assert.match(app, /desktopNeedsRecords \? recordView : null/,
+    assert.match(app, /desktopActiveNeedsRecords \? recordView : null/,
       'entity records open in the canonical RecordView overlay');
   });
 
@@ -161,6 +162,47 @@ describe('desktop research adapters', () => {
     assert.match(map, /e\.key === 'Enter' \|\| e\.key === ' '/);
     assert.match(map, /role="region"/);
     assert.doesNotMatch(map, /role="application"/);
+  });
+});
+
+describe('desktop windowing and spatial memory', () => {
+  it('uses the versioned state model for concurrent windows and safe persistence', () => {
+    const shell = read('frontend/desktop/DesktopShell.js');
+    const state = read('frontend/desktop/desktopWindowState.js');
+    assert.match(shell, /desktopWindowState\.js\?v=\d+\.\d+\.\d+/);
+    assert.match(shell, /activateDesktopWindow/);
+    assert.match(shell, /minimizeDesktopWindow/);
+    assert.match(shell, /closeDesktopWindow/);
+    assert.match(shell, /DESKTOP_LAYOUT_STORAGE_KEY/);
+    assert.match(state, /DESKTOP_LAYOUT_SCHEMA\s*=\s*1/);
+    assert.match(state, /candidate\.schema !== DESKTOP_LAYOUT_SCHEMA/);
+  });
+
+  it('renders named non-modal windows, active state, task buttons, and reset controls', () => {
+    const shell = read('frontend/desktop/DesktopShell.js');
+    assert.match(shell, /className="desktop-window-stack"/);
+    assert.match(shell, /role="region"/);
+    assert.match(shell, /desktop-active-window-label/);
+    assert.match(shell, /onFocusCapture/);
+    assert.match(shell, /activeWindow\?\.contains\(document\.activeElement\)/);
+    assert.match(shell, /Minimize \$\{windowTitle\}/);
+    assert.match(shell, /aria-label="Open desktop windows"/);
+    assert.match(shell, /Reset desktop layout/);
+    assert.doesNotMatch(shell, /role="dialog"|aria-modal/);
+  });
+
+  it('loads data for visible restored record apps but keeps record overlays URL-active', () => {
+    const app = read('frontend/App.js');
+    assert.match(app, /desktopOpenAppIds\.some\(\(appId\) => DESKTOP_RECORD_APPS\.has\(appId\)\)/);
+    assert.match(app, /onOpenAppsChange=\$\{setDesktopOpenAppIds\}/);
+    assert.match(app, /desktopActiveNeedsRecords \? recordView : null/);
+  });
+
+  it('collapses to one active full-width window on narrow screens', () => {
+    const css = read('frontend/desktop/desktop.css');
+    assert.match(css, /@media \(max-width: 700px\)[\s\S]*\.desktop-window\s*\{[\s\S]*display:\s*none/);
+    assert.match(css, /\.desktop-window\.is-active\s*\{\s*display:\s*block/);
+    assert.match(css, /\.desktop-task-window-list[\s\S]*overflow-x:\s*auto/);
   });
 });
 
