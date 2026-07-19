@@ -46,7 +46,7 @@
         "creator": "observations.creatorObserved → record.creator",
         "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
       },
-      "normalizedRecordSha256": "b78d291a29b08b4ec730fb5b014a73ebaa58a0f38cd55f47b7d72d999e82d2f6",
+      "normalizedRecordSha256": "bb381ed3027f2337e8d9651e5ac2b61dba99d0bb774aaba49de1c9396558e9b1",
       "retrieval": {
         "capturedAt": "2026-07-19T00:34:23.683Z",
         "finalUrl": "http://scripting.com/2004/08.html#When:3:28:15PM",
@@ -72,7 +72,7 @@
         "creator": "observations.creatorObserved → record.creator",
         "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
       },
-      "normalizedRecordSha256": "b2b650aa06ab676799c5950dd514e0fc4ed2433f60d192a1e224c6e72fc95abc",
+      "normalizedRecordSha256": "91aed846859967de8dd10db32716a427a73945ed94e56dda736d568073e06f13",
       "retrieval": {
         "capturedAt": "2026-07-19T00:34:24.758Z",
         "finalUrl": "https://pressthink.org/2009/03/rosens-flying-seminar-in-the-future-of-news/",
@@ -98,7 +98,7 @@
         "creator": "observations.creatorObserved → record.creator",
         "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
       },
-      "normalizedRecordSha256": "a7c6cc2102e42b475a85f4093212220bae44b353f22a118db7c9c7671b04beb1",
+      "normalizedRecordSha256": "a1351bcce930ada6fcce0ef81b8329f2d0c3550ed0130a5477839767508b74c7",
       "retrieval": {
         "capturedAt": "2026-07-19T00:34:24.889Z",
         "finalUrl": "http://scripting.com/stories/2009/05/15/techHeroesWhoBlog.html",
@@ -150,7 +150,7 @@
         "creator": "observations.creatorObserved → record.creator",
         "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
       },
-      "normalizedRecordSha256": "0f1dffb5809a4d26ede20b8bbe4f5f986b4181e916662504ef02c8f10fdeed88",
+      "normalizedRecordSha256": "45a368842681d6dfc9a5269b83547342421ae62281aeeae6a27393abf0f0314f",
       "retrieval": {
         "capturedAt": "2026-07-19T00:34:25.757Z",
         "finalUrl": "http://scripting.com/about",
@@ -176,7 +176,7 @@
         "creator": "observations.creatorObserved → record.creator",
         "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
       },
-      "normalizedRecordSha256": "44b50a81d41aa01efd381e31091ce0cfadc4393aec403bc73712116ea9f1111d",
+      "normalizedRecordSha256": "f52e238b05ef17099b217aa0fb7af7f7d78bc53d8548b4d7e2a7d32e09c8cf77",
       "retrieval": {
         "capturedAt": "2026-07-19T00:34:26.211Z",
         "finalUrl": "https://github.com/scripting/Scripting-News",
@@ -228,7 +228,7 @@
         "creator": "observations.creatorObserved → record.creator",
         "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
       },
-      "normalizedRecordSha256": "827c9082fb464a3763d4704db965854410feb52c28c3b791a28e7ea3dbf40d73",
+      "normalizedRecordSha256": "6b023b5caca6bdf55fd24a1c0f0970c86cdd3c9a6e35bb3fbb3d648b3528dc18",
       "retrieval": {
         "capturedAt": "2026-07-19T00:34:26.850Z",
         "finalUrl": "https://github.com/scripting/feedland",
@@ -280,7 +280,7 @@
         "creator": "observations.creatorObserved → record.creator",
         "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
       },
-      "normalizedRecordSha256": "d37f673f318fb14a76ba8285fec0f2c12273c52cf6faab097adddc3f73cf5590",
+      "normalizedRecordSha256": "d666846e4dbc57406dd14190cb27a4363bcc5b31c2e26eaa273a105a93a4708f",
       "retrieval": {
         "capturedAt": "2026-07-19T00:34:27.026Z",
         "finalUrl": "http://scripting.com/2026/02/07/220012.html",
