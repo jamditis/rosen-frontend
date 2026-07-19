@@ -62,6 +62,7 @@ describe('desktop route wiring', () => {
     assert.match(audit, /slug: 'desktop-report',[\s\S]*openReport: true/);
     assert.match(audit, /slug: 'dissertation-map-detail',[\s\S]*openDissertationDetail: true/,
       'the shared keyboard-scrollable detail panel stays in the full audit matrix');
+    assert.match(audit, /slug: 'dissertation-reader',[\s\S]*verifyReaderReturn: true/);
     assert.match(audit, /getByRole\('dialog', \{ name: 'Report a problem or suggest a record' \}\)/);
     assert.match(audit, /assertFocused\(dialogClose, 'Direct record dialog'\)/);
     assert.match(audit, /assertFocused\(page\.locator\('#entity-detail-title'\), 'Selected entity after direct record close'\)/);
@@ -80,6 +81,8 @@ describe('desktop route wiring', () => {
       'the tool round-trip audit keeps the standalone return touch-sized');
     assert.match(audit, /assertFocused\(page\.locator\('#desktop-window-title-tools'\), 'Tools window after browser Back'\)/,
       'browser Back must reconstruct the nested Tools route and foreground focus');
+    assert.match(audit, /Reader return target was smaller than 44px/);
+    assert.match(audit, /Reader overflowed the viewport by/);
     assert.match(audit, /slug: 'desktop-windowing'[\s\S]*desktopLayout:[\s\S]*zOrder/);
     assert.match(audit, /name: 'mobile',\s+width: 375,\s+height: 812/);
     assert.match(audit, /name: 'tablet',\s+width: 768,\s+height: 1024/);

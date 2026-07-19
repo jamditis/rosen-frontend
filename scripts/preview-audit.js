@@ -85,7 +85,7 @@ const ROUTES = [
   { slug: 'record-modal',       url: '/?record=RECORD-00802' },
   { slug: 'dissertation-map-detail', url: '/#dissertation', openDissertationDetail: true },
   { slug: 'dissertation',       url: '/dissertation/' },
-  { slug: 'dissertation-reader',url: '/dissertation/reader/' },
+  { slug: 'dissertation-reader',url: '/dissertation/reader/', verifyReaderReturn: true },
   { slug: 'faq',                url: '/faq/' },
   { slug: 'status-report',      url: '/features/status-report/' },
   { slug: 'winer-method',       url: '/features/winer-method/' },
@@ -244,6 +244,20 @@ async function auditOne(page, route, viewport) {
       throw new Error(`Tool history return exposed ${toolLinkCount} links; expected 7`);
     }
     await assertFocused(page.locator('#desktop-window-title-tools'), 'Tools window after browser Back');
+  }
+  if (route.verifyReaderReturn) {
+    const readerReturn = page.getByTitle('Back to archive');
+    await readerReturn.waitFor({ state: 'visible' });
+    const readerReturnBox = await readerReturn.boundingBox();
+    if (!readerReturnBox || readerReturnBox.width < 44 || readerReturnBox.height < 44) {
+      throw new Error(`Reader return target was smaller than 44px: ${JSON.stringify(readerReturnBox)}`);
+    }
+    const pageOverflow = await page.evaluate(() => (
+      document.documentElement.scrollWidth - document.documentElement.clientWidth
+    ));
+    if (pageOverflow > 1) {
+      throw new Error(`Reader overflowed the viewport by ${pageOverflow}px`);
+    }
   }
 
   const shotDir = resolve(OUT_DIR, 'screenshots', viewport.name);

@@ -154,6 +154,38 @@ describe('desktop tool links', () => {
     }
   });
 
+  it('keeps every standalone archive return visible and at least 44px tall', () => {
+    const methodStyles = readFileSync(join(process.cwd(), 'features/winer-method/styles.css'), 'utf8');
+    assert.match(methodStyles, /\.archive-link\s*\{[^}]*min-height:\s*44px/);
+
+    const readerStyles = readFileSync(join(process.cwd(), 'dissertation/reader/src/css/layout.css'), 'utf8');
+    assert.match(readerStyles, /\.btn\s*\{[^}]*min-height:\s*44px/s);
+    assert.match(readerStyles, /\.reader-header__actions \.btn--secondary\[title="Back to archive"\]/);
+    assert.doesNotMatch(readerStyles, /Back to dissertation home/,
+      'responsive reader rules must target the real archive-return title');
+
+    const foreword = readFileSync(join(process.cwd(), 'dissertation/foreword/index.html'), 'utf8');
+    assert.match(foreword, /\.nav-back\s*\{[^}]*min-height:\s*44px/s);
+
+    const network = readFileSync(join(process.cwd(), 'dissertation/network-effect/index.html'), 'utf8');
+    assert.match(network, /<a href="\.\.\/\.\.\/"[^>]*min-height:\s*44px;[^>]*aria-label="Back to archive"/);
+
+    const faq = readFileSync(join(process.cwd(), 'faq/index.html'), 'utf8');
+    assert.match(faq, /<a href="\.\.\/"[^>]*min-height:\s*44px;[^>]*aria-label="Back to the archive home"/);
+
+    const dataviz = readFileSync(join(process.cwd(), 'tools/active/dataviz/dataviz.html'), 'utf8');
+    assert.match(dataviz, /<a href="\.\.\/\.\.\/\.\.\/"[^>]*min-height:\s*44px;[^>]*title="Back to the archive"/);
+  });
+
+  it('lets the dissertation reader flex and wrap inside compact viewports', () => {
+    const layout = readFileSync(join(process.cwd(), 'dissertation/reader/src/css/layout.css'), 'utf8');
+    assert.match(layout, /\.reader-content\s*\{[^}]*min-width:\s*0;[^}]*width:\s*100%;/s);
+
+    const typography = readFileSync(join(process.cwd(), 'dissertation/reader/src/css/typography.css'), 'utf8');
+    assert.match(typography, /@media \(max-width:\s*767px\)[\s\S]*\.reader-content h1\s*\{[^}]*font-size:\s*2rem;/);
+    assert.match(typography, /@media \(max-width:\s*767px\)[\s\S]*\.reader-content h2\s*\{[^}]*font-size:\s*1\.4rem;/);
+  });
+
   it('does not revive the retired dot-grid explorer', () => {
     const targets = DESKTOP_TOOL_LINKS.map((tool) => tool.href).join('\n');
     assert.doesNotMatch(targets, /dataexplorer|data_explorer_grid/i);

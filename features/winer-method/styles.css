@@ -23,7 +23,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, [tabindex="-1"]:fo
 .skip-link:focus { top: 1rem; }
 
 .site-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; max-width: 1180px; margin: auto; padding: 1rem 1.5rem; border-bottom: 1px solid var(--rule); }
-.archive-link { display: flex; align-items: center; gap: .75rem; color: var(--ink); text-decoration: none; }
+.archive-link { display: flex; align-items: center; min-height: 44px; gap: .75rem; color: var(--ink); text-decoration: none; }
 .archive-link span:last-child { display: flex; flex-direction: column; line-height: 1.35; }
 .archive-link small { color: var(--muted); }
 .archive-mark { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; background: var(--ink); color: white; font-family: var(--display); }

@@ -27,7 +27,7 @@ npm run test:frontend
 npm run preview:audit
 ```
 
-The expected test results are 1,095 passing repository tests across 224 suites and 281 passing frontend tests across 54 suites. `preview:audit` intentionally exits nonzero for the repository's inherited accessibility baseline. The expected result for this branch is 33 rule-level findings across 31 routes and three viewports (93 states), with zero findings in all 48 desktop rows, including the open Start-menu interaction state. Screenshots are written beneath `preview-audit-results/screenshots/{mobile,tablet,desktop}/`.
+The expected test results are 1,097 passing repository tests across 224 suites and 283 passing frontend tests across 54 suites. `preview:audit` intentionally exits nonzero for the repository's inherited accessibility baseline. The expected result for this branch is 33 rule-level findings across 31 routes and three viewports (93 states), with zero findings in all 48 desktop rows, including the open Start-menu interaction state. Screenshots are written beneath `preview-audit-results/screenshots/{mobile,tablet,desktop}/`.
 
 ## Review sequence
 
