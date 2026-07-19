@@ -42,6 +42,7 @@ const MIME = {
   '.txt':  'text/plain; charset=utf-8',
   '.pdf':  'application/pdf',
   '.md':   'text/markdown; charset=utf-8',
+  '.wasm': 'application/wasm',
 };
 
 function safeResolve(urlPath) {

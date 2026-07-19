@@ -62,6 +62,7 @@ dissertation-launch/                # Dissertation launch landing
 features/                           # Standalone feature pages
   shared/text-selection.js
   status-report/                    # Status report generator
+  winer-method/                     # Independent public-source archive-method demonstration
 
 tools/                              # Development/exploration tools
   active/tailwind.css               # Shared Tailwind build both tools load as ../tailwind.css

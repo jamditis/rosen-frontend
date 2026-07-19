@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { html } from '../html.js?v=3.7.3';
+import { html } from '../html.js?v=3.7.4';
 import { Sparkles, X } from 'lucide-react';
 import {
   readTourState,
   shouldShowTourEntry,
-} from '../services/tourState.js?v=3.7.3';
+} from '../services/tourState.js?v=3.7.4';
 
 const BANNER_DISMISSED_KEY = 'jrda_announce_banner_dismissed';
 

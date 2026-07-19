@@ -1,8 +1,8 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { html } from '../html.js?v=3.7.3';
+import { html } from '../html.js?v=3.7.4';
 import { X, Search, XCircle, ChevronDown, ChevronUp, MessageSquare } from 'lucide-react';
-import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.7.3';
+import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.7.4';
 
 const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, autocompleteIndex }) => {
   const [suggestions, setSuggestions] = useState([]);

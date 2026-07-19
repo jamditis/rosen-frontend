@@ -1,0 +1,295 @@
+{
+  "schemaVersion": 1,
+  "captureTool": "capture-ingestion-evidence.mjs@1",
+  "captureMode": "offline curator-supervised retrieval with immutable response and normalized-record digests",
+  "recordSource": "./data.js",
+  "runtimeNetworkAccess": false,
+  "records": [
+    {
+      "id": "direct-2001-desktop-websites",
+      "retrievalUrl": "https://scripting.com/2001/01.html#myBlogOnTheDesktop",
+      "sourceLocator": "January 2001 archive, My Blog on the Desktop entry",
+      "observations": {
+        "sourceTitle": "My Blog on the Desktop",
+        "dateObserved": "January 18, 2001 archive entry",
+        "creatorObserved": "Dave Winer"
+      },
+      "fieldMapping": {
+        "sourceTitle": "observations.sourceTitle → record.sourceTitle",
+        "publicationDate": "observations.dateObserved + ingestion-log dateBasis → record.date",
+        "creator": "observations.creatorObserved → record.creator",
+        "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
+      },
+      "normalizedRecordSha256": "d9ada0ffb8266874d93e125b814d448da47c1433767bd235166dc2d1710867ef",
+      "retrieval": {
+        "capturedAt": "2026-07-19T00:34:23.525Z",
+        "finalUrl": "http://scripting.com/2001/01.html#myBlogOnTheDesktop",
+        "httpStatus": 200,
+        "contentType": "text/html",
+        "byteLength": 164709,
+        "responseSha256": "0f4dc95911afeb12a2e071c31a062039762759bdf4d9e2bbeba889731be2f6ec",
+        "client": "curl-http1.1-fallback-http-transport-fallback"
+      }
+    },
+    {
+      "id": "direct-2004-bloggers-sources",
+      "retrievalUrl": "https://scripting.com/2004/08.html#When:3:28:15PM",
+      "sourceLocator": "August 10 archive entry at 3:28:15 PM",
+      "observations": {
+        "sourceTitle": "Archive: August 2004",
+        "dateObserved": "August 10, 2004 entry at 3:28:15 PM Eastern",
+        "creatorObserved": "Dave Winer"
+      },
+      "fieldMapping": {
+        "sourceTitle": "observations.sourceTitle → record.sourceTitle",
+        "publicationDate": "observations.dateObserved + ingestion-log dateBasis → record.date",
+        "creator": "observations.creatorObserved → record.creator",
+        "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
+      },
+      "normalizedRecordSha256": "addb6c7262b7fbaab1588c09387efc2d4f11b43dc7dd08e73740f1e4ad4beaf2",
+      "retrieval": {
+        "capturedAt": "2026-07-19T00:34:23.683Z",
+        "finalUrl": "http://scripting.com/2004/08.html#When:3:28:15PM",
+        "httpStatus": 200,
+        "contentType": "text/html",
+        "byteLength": 278250,
+        "responseSha256": "744fb8900df04879f6633dec49b110bf0f402a323648131b984e0e5730bc1e42",
+        "client": "curl-http1.1-fallback-http-transport-fallback"
+      }
+    },
+    {
+      "id": "direct-2009-flying-seminar",
+      "retrievalUrl": "https://pressthink.org/2009/03/rosens-flying-seminar-in-the-future-of-news/",
+      "sourceLocator": "PressThink article metadata and body",
+      "observations": {
+        "sourceTitle": "Rosen’s Flying Seminar In The Future of News",
+        "dateObserved": "26 March 2009 article date",
+        "creatorObserved": "Jay Rosen"
+      },
+      "fieldMapping": {
+        "sourceTitle": "observations.sourceTitle → record.sourceTitle",
+        "publicationDate": "observations.dateObserved + ingestion-log dateBasis → record.date",
+        "creator": "observations.creatorObserved → record.creator",
+        "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
+      },
+      "normalizedRecordSha256": "b2b650aa06ab676799c5950dd514e0fc4ed2433f60d192a1e224c6e72fc95abc",
+      "retrieval": {
+        "capturedAt": "2026-07-19T00:34:24.758Z",
+        "finalUrl": "https://pressthink.org/2009/03/rosens-flying-seminar-in-the-future-of-news/",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=UTF-8",
+        "byteLength": 78748,
+        "responseSha256": "4ff3dc9296f644ac51c7c6fe030271e90b1e6d2ebb092e49e206e0abd0c9f49f",
+        "client": "node-fetch"
+      }
+    },
+    {
+      "id": "direct-2009-tech-heroes",
+      "retrievalUrl": "https://scripting.com/stories/2009/05/15/techHeroesWhoBlog.html",
+      "sourceLocator": "Dated Scripting News permalink",
+      "observations": {
+        "sourceTitle": "Tech heroes who blog?",
+        "dateObserved": "15 May 2009 post date",
+        "creatorObserved": "Dave Winer"
+      },
+      "fieldMapping": {
+        "sourceTitle": "observations.sourceTitle → record.sourceTitle",
+        "publicationDate": "observations.dateObserved + ingestion-log dateBasis → record.date",
+        "creator": "observations.creatorObserved → record.creator",
+        "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
+      },
+      "normalizedRecordSha256": "a7c6cc2102e42b475a85f4093212220bae44b353f22a118db7c9c7671b04beb1",
+      "retrieval": {
+        "capturedAt": "2026-07-19T00:34:24.889Z",
+        "finalUrl": "http://scripting.com/stories/2009/05/15/techHeroesWhoBlog.html",
+        "httpStatus": 200,
+        "contentType": "text/html",
+        "byteLength": 7534,
+        "responseSha256": "6c5fc10fd214f4fdf67c7e251621f0ff9ea2881f76a400c1cc3fd3aaf4989e9b",
+        "client": "curl-http1.1-fallback-http-transport-fallback"
+      }
+    },
+    {
+      "id": "direct-2013-networked-beat",
+      "retrievalUrl": "https://pressthink.org/2013/05/designs-for-a-networked-beat/",
+      "sourceLocator": "PressThink article metadata and lecture description",
+      "observations": {
+        "sourceTitle": "Designs for a Networked Beat",
+        "dateObserved": "13 May 2013 article date and lecture description",
+        "creatorObserved": "Jay Rosen"
+      },
+      "fieldMapping": {
+        "sourceTitle": "observations.sourceTitle → record.sourceTitle",
+        "publicationDate": "observations.dateObserved + ingestion-log dateBasis → record.date",
+        "creator": "observations.creatorObserved → record.creator",
+        "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
+      },
+      "normalizedRecordSha256": "3a02ff9a70907a591758097719b2d621de2bc1aa4c8ccfa222e7f04e6fada835",
+      "retrieval": {
+        "capturedAt": "2026-07-19T00:34:25.622Z",
+        "finalUrl": "https://pressthink.org/2013/05/designs-for-a-networked-beat/",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=UTF-8",
+        "byteLength": 78289,
+        "responseSha256": "87f11473267304ff459897a87c05fe837ba65efca576a3ff21047f68ba8f349d",
+        "client": "node-fetch"
+      }
+    },
+    {
+      "id": "direct-2013-motto",
+      "retrievalUrl": "https://scripting.com/about",
+      "sourceLocator": "About Scripting News page",
+      "observations": {
+        "sourceTitle": "About Scripting News",
+        "dateObserved": "August 4, 2013 page creation date supplied by the author",
+        "creatorObserved": "Dave Winer"
+      },
+      "fieldMapping": {
+        "sourceTitle": "observations.sourceTitle → record.sourceTitle",
+        "publicationDate": "observations.dateObserved + ingestion-log dateBasis → record.date",
+        "creator": "observations.creatorObserved → record.creator",
+        "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
+      },
+      "normalizedRecordSha256": "7bd83e6dc7ea9df254913b96ce6c608a6a5503f396207dc23539bebfafbc4b5a",
+      "retrieval": {
+        "capturedAt": "2026-07-19T00:34:25.757Z",
+        "finalUrl": "http://scripting.com/about",
+        "httpStatus": 200,
+        "contentType": "text/html",
+        "byteLength": 17085,
+        "responseSha256": "1fef387508e8da30611fbaa1c6f79c7ca8de2297da0086656d14608dd40e8fe1",
+        "client": "curl-http1.1-fallback-http-transport-fallback"
+      }
+    },
+    {
+      "id": "direct-2016-github-archive",
+      "retrievalUrl": "https://github.com/scripting/Scripting-News",
+      "sourceLocator": "Repository README and commit history",
+      "observations": {
+        "sourceTitle": "scripting/Scripting-News",
+        "dateObserved": "June 2, 2016 initial repository commit",
+        "creatorObserved": "Dave Winer"
+      },
+      "fieldMapping": {
+        "sourceTitle": "observations.sourceTitle → record.sourceTitle",
+        "publicationDate": "observations.dateObserved + ingestion-log dateBasis → record.date",
+        "creator": "observations.creatorObserved → record.creator",
+        "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
+      },
+      "normalizedRecordSha256": "defc7e8f47696fcb8ad6403f3e5f9113664fcb87455550ae569eb886938a0a11",
+      "retrieval": {
+        "capturedAt": "2026-07-19T00:34:26.211Z",
+        "finalUrl": "https://github.com/scripting/Scripting-News",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "byteLength": 269819,
+        "responseSha256": "9513d0476a4a6b4862f8fac64156120c48ab2e4ca50bdfcb710d1e3adacda132",
+        "client": "node-fetch"
+      }
+    },
+    {
+      "id": "direct-2017-source-namespace",
+      "retrievalUrl": "https://source.scripting.com/",
+      "sourceLocator": "Specification page and supplied dates",
+      "observations": {
+        "sourceTitle": "The “source” namespace",
+        "dateObserved": "October 2, 2017 posting date supplied by the specification",
+        "creatorObserved": "Dave Winer"
+      },
+      "fieldMapping": {
+        "sourceTitle": "observations.sourceTitle → record.sourceTitle",
+        "publicationDate": "observations.dateObserved + ingestion-log dateBasis → record.date",
+        "creator": "observations.creatorObserved → record.creator",
+        "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
+      },
+      "normalizedRecordSha256": "3c7eeb8860fc66d83ae5044495ceb4fd7b5a977d7878fc7d83a8284d9d1ee839",
+      "retrieval": {
+        "capturedAt": "2026-07-19T00:34:26.371Z",
+        "finalUrl": "http://source.scripting.com/",
+        "httpStatus": 200,
+        "contentType": "text/html",
+        "byteLength": 37348,
+        "responseSha256": "186e96d73ae174210398ca09241a7609e3ba91d1275d73afaa85e4400ef53077",
+        "client": "curl-http1.1-fallback-http-transport-fallback"
+      }
+    },
+    {
+      "id": "direct-2023-feedland",
+      "retrievalUrl": "https://github.com/scripting/feedland",
+      "sourceLocator": "Repository README, license, and history",
+      "observations": {
+        "sourceTitle": "scripting/feedland",
+        "dateObserved": "April 24, 2023 public-source announcement recorded in the README",
+        "creatorObserved": "Dave Winer and contributors"
+      },
+      "fieldMapping": {
+        "sourceTitle": "observations.sourceTitle → record.sourceTitle",
+        "publicationDate": "observations.dateObserved + ingestion-log dateBasis → record.date",
+        "creator": "observations.creatorObserved → record.creator",
+        "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
+      },
+      "normalizedRecordSha256": "7620f680bfdfb564629e0895f5ee2d7e6e7e63c3cd9ff5ff0e4b2693a2eccf12",
+      "retrieval": {
+        "capturedAt": "2026-07-19T00:34:26.850Z",
+        "finalUrl": "https://github.com/scripting/feedland",
+        "httpStatus": 200,
+        "contentType": "text/html; charset=utf-8",
+        "byteLength": 266459,
+        "responseSha256": "79fba6940683ab0b4dc99c65cc9596bfc51006d8b841bce3bfcd0932354b59b6",
+        "client": "node-fetch"
+      }
+    },
+    {
+      "id": "direct-2024-social-blogroll",
+      "retrievalUrl": "https://blogroll.scripting.com/",
+      "sourceLocator": "Working prototype plus scripting/blogroll repository",
+      "observations": {
+        "sourceTitle": "blogroll.social",
+        "dateObserved": "February 14, 2024 first public toolkit commit",
+        "creatorObserved": "Dave Winer"
+      },
+      "fieldMapping": {
+        "sourceTitle": "observations.sourceTitle → record.sourceTitle",
+        "publicationDate": "observations.dateObserved + ingestion-log dateBasis → record.date",
+        "creator": "observations.creatorObserved → record.creator",
+        "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
+      },
+      "normalizedRecordSha256": "8fb0d9f8bd2ccc0a24be21c597427a6085d38fa21f354ad7bcfc487538de9cab",
+      "retrieval": {
+        "capturedAt": "2026-07-19T00:34:26.901Z",
+        "finalUrl": "http://blogroll.scripting.com/",
+        "httpStatus": 200,
+        "contentType": "text/html",
+        "byteLength": 3929,
+        "responseSha256": "7e965ec783ab74add27ac4069e28ccc7ce74c7baa554289ec36c569edfdc5cf0",
+        "client": "curl-http1.1-fallback-http-transport-fallback"
+      }
+    },
+    {
+      "id": "direct-2026-community-news",
+      "retrievalUrl": "https://scripting.com/2026/02/07/220012.html",
+      "sourceLocator": "Dated Scripting News permalink",
+      "observations": {
+        "sourceTitle": "The reboot that news needs",
+        "dateObserved": "February 7, 2026 dated permalink",
+        "creatorObserved": "Dave Winer"
+      },
+      "fieldMapping": {
+        "sourceTitle": "observations.sourceTitle → record.sourceTitle",
+        "publicationDate": "observations.dateObserved + ingestion-log dateBasis → record.date",
+        "creator": "observations.creatorObserved → record.creator",
+        "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
+      },
+      "normalizedRecordSha256": "d37f673f318fb14a76ba8285fec0f2c12273c52cf6faab097adddc3f73cf5590",
+      "retrieval": {
+        "capturedAt": "2026-07-19T00:34:27.026Z",
+        "finalUrl": "http://scripting.com/2026/02/07/220012.html",
+        "httpStatus": 200,
+        "contentType": "text/html",
+        "byteLength": 17964,
+        "responseSha256": "b39d4733e63cb765d32d51697daee4c4d7e4ed91319e88eda5b7726ffbf79cd3",
+        "client": "curl-http1.1-fallback-http-transport-fallback"
+      }
+    }
+  ]
+}
