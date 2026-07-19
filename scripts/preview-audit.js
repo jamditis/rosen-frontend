@@ -135,6 +135,7 @@ const ROUTES = [
     slug: 'desktop-windowing',
     url: '/#desktop/analytics',
     verifyDesktopWindowHistory: true,
+    verifyZoomReflow: true,
     verifyBackgroundPointerControl: true,
     desktopLayout: {
       schema: 1,
@@ -691,6 +692,127 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     const standardMain = page.locator('#main-content');
     await assertFocused(standardMain, 'Standard archive main after Tools entry Back');
     await assertVisibleFocusOutline(standardMain, 'Standard archive main after Tools entry Back');
+  }
+  if (route.verifyZoomReflow && viewport.name === 'desktop') {
+    const wideViewport = { width: viewport.width, height: viewport.height };
+    const analyticsTitle = page.locator('#desktop-window-title-analytics');
+    const expectedWideWindowIds = await page.locator('[data-window-id]').evaluateAll((elements) => (
+      elements
+        .filter((element) => {
+          const styles = getComputedStyle(element);
+          const rect = element.getBoundingClientRect();
+          return styles.display !== 'none'
+            && styles.visibility !== 'hidden'
+            && rect.width > 0
+            && rect.height > 0;
+        })
+        .map((element) => element.dataset.windowId)
+    ));
+    try {
+      await page.setViewportSize({ width: 720, height: 450 });
+      await page.waitForTimeout(200);
+
+      const compactState = await page.evaluate(() => {
+        const visibleWindowIds = [...document.querySelectorAll('[data-window-id]')]
+          .filter((element) => {
+            const styles = getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return styles.display !== 'none'
+              && styles.visibility !== 'hidden'
+              && rect.width > 0
+              && rect.height > 0;
+          })
+          .map((element) => element.dataset.windowId);
+        const activeRect = document.querySelector('[data-window-id="analytics"]')
+          ?.getBoundingClientRect();
+        const taskbarRect = document.querySelector('.desktop-taskbar')?.getBoundingClientRect();
+        return {
+          focusedId: document.activeElement?.id,
+          visibleWindowIds,
+          overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          activeLeft: activeRect?.left,
+          activeRight: activeRect?.right,
+          taskbarTop: taskbarRect?.top,
+          taskbarBottom: taskbarRect?.bottom,
+        };
+      });
+      if (compactState.focusedId !== 'desktop-window-title-analytics') {
+        throw new Error(`200%-zoom reflow lost active-window focus: ${JSON.stringify(compactState)}`);
+      }
+      if (compactState.visibleWindowIds.join('|') !== 'analytics') {
+        throw new Error(`200%-zoom reflow exposed the wrong windows: ${JSON.stringify(compactState)}`);
+      }
+      if (
+        compactState.overflow > 1
+        || compactState.activeLeft < -1
+        || compactState.activeRight > 721
+        || compactState.taskbarTop < 0
+        || compactState.taskbarBottom > 451
+      ) {
+        throw new Error(`200%-zoom reflow escaped the usable viewport: ${JSON.stringify(compactState)}`);
+      }
+
+      const startButton = page.getByRole('button', { name: 'Start', exact: true });
+      await startButton.focus();
+      await page.keyboard.press('Enter');
+      const startMenu = page.getByRole('menu', { name: 'Archive desktop Start menu' });
+      await startMenu.waitFor();
+      await page.keyboard.press('End');
+      const standardExit = startMenu.getByRole('menuitem', { name: /^Standard archive/ });
+      await assertFocused(standardExit, 'Last Start item at 200%-zoom equivalent');
+      const exitInViewport = await standardExit.evaluate((element) => {
+        const rect = element.getBoundingClientRect();
+        return rect.top >= 0 && rect.bottom <= window.innerHeight;
+      });
+      if (!exitInViewport) {
+        throw new Error('200%-zoom Start menu did not scroll its final destination into view');
+      }
+
+      setApplicationNetworkCapture(false);
+      try {
+        const zoomResult = await new AxeBuilder({ page })
+          .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+          .analyze();
+        if (zoomResult.violations.length > 0) {
+          throw new Error(
+            `200%-zoom reflow added accessibility findings: ${zoomResult.violations.map(({ id }) => id).join(', ')}`,
+          );
+        }
+      } finally {
+        setApplicationNetworkCapture(true);
+      }
+      await page.keyboard.press('Escape');
+      await startMenu.waitFor({ state: 'hidden' });
+      await assertFocused(startButton, 'Start button after 200%-zoom menu Escape');
+    } finally {
+      await page.setViewportSize(wideViewport);
+      await page.waitForTimeout(200);
+    }
+
+    const restoredWideState = await page.evaluate(() => ({
+      visibleWindowIds: [...document.querySelectorAll('[data-window-id]')]
+        .filter((element) => {
+          const styles = getComputedStyle(element);
+          const rect = element.getBoundingClientRect();
+          return styles.display !== 'none'
+            && styles.visibility !== 'hidden'
+            && rect.width > 0
+            && rect.height > 0;
+        })
+        .map((element) => element.dataset.windowId),
+      activeAnalytics: document.querySelector('[data-window-id="analytics"]')
+        ?.classList.contains('is-active'),
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    }));
+    if (
+      restoredWideState.visibleWindowIds.join('|') !== expectedWideWindowIds.join('|')
+      || !restoredWideState.activeAnalytics
+      || restoredWideState.overflow > 1
+    ) {
+      throw new Error(`Expanding after 200%-zoom lost the window stack: ${JSON.stringify(restoredWideState)}`);
+    }
+    await analyticsTitle.focus();
+    await assertFocused(analyticsTitle, 'Analytics title after expanding from 200%-zoom equivalent');
   }
   if (route.verifyBackgroundPointerControl && viewport.name === 'desktop') {
     await page.getByRole('button', { name: /^Tools\./ }).click();

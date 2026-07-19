@@ -185,9 +185,11 @@ describe('desktop route wiring', () => {
       'console capture must share the narrow axe-only instrumentation pause');
     assert.match(audit, /page\.off\('response', captureBadResponse\)[\s\S]*page\.off\('requestfailed', captureFailedRequest\)/,
       'route-scoped network listeners must not leak into later rows');
-    assert.match(audit, /slug: 'desktop-windowing'[\s\S]*verifyDesktopWindowHistory: true[\s\S]*verifyBackgroundPointerControl: true[\s\S]*desktopLayout:[\s\S]*zOrder/);
+    assert.match(audit, /slug: 'desktop-windowing'[\s\S]*verifyDesktopWindowHistory: true[\s\S]*verifyZoomReflow: true[\s\S]*verifyBackgroundPointerControl: true[\s\S]*desktopLayout:[\s\S]*zOrder/);
     assert.match(audit, /'Restored Archive title after browser Back'[\s\S]*assertVisibleFocusOutline\(archiveTitle/,
       'history must visibly focus a URL-active window that was minimized before Back');
+    assert.match(audit, /setViewportSize\(\{ width: 720, height: 450 \}\)[\s\S]*200%-zoom reflow lost active-window focus[\s\S]*Last Start item at 200%-zoom equivalent[\s\S]*zoomResult\.violations[\s\S]*Expanding after 200%-zoom lost the window stack/,
+      'the permanent browser audit must exercise live 200%-zoom reflow, its short Start menu, and stack restoration');
     assert.match(audit, /viewport\.name === 'desktop'[\s\S]*analyticsClose\.boundingBox\(\)[\s\S]*await analyticsClose\.click\(\)[\s\S]*Background Analytics close activated a different window[\s\S]*Tools title after background Analytics close/,
       'a physically exposed background control must act on its first real pointer click');
     assert.match(audit, /name: 'mobile',\s+width: 375,\s+height: 812/);

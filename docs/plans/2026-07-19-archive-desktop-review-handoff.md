@@ -91,6 +91,8 @@ Review at:
 
 At narrow widths, confirm the metaphor intentionally becomes a two-column touch launcher with one active full-width app, rather than a shrunken freeform desktop. Check fixed taskbar reachability, internal content scrolling, safe-area spacing, orientation changes, and absence of two-dimensional page scrolling.
 
+The automated concurrent-window row permanently reproduces the 1440×900 → 720×450 → 1440×900 transition, including active-title focus, a keyboard-reachable final Start-menu item, a separate compact axe scan, and restoration of the visible three-window stack.
+
 ### 5. Accessibility pass
 
 Keyboard-only:
