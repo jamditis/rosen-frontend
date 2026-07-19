@@ -19,6 +19,7 @@ describe('canonical route-entry focus', () => {
 
   it('marks stable entry targets on canonical route surfaces', () => {
     const app = read('frontend/App.js');
+    const css = read('frontend/index.css');
     const about = read('frontend/components/AboutPage.js');
     const dissertation = read('frontend/components/DissertationPage.js');
     const analytics = read('frontend/components/AnalyticsDashboard.js');
@@ -29,5 +30,8 @@ describe('canonical route-entry focus', () => {
       assert.match(source, /data-route-entry-focus/);
       assert.match(source, /tabIndex=/);
     }
+    assert.match(css, /\[data-route-entry-focus\]:focus-visible\s*\{[\s\S]*outline:\s*3px solid #0369a1/,
+      'route-entry targets need a visible keyboard focus indicator');
+    assert.match(css, /@media \(forced-colors: active\)[\s\S]*\[data-route-entry-focus\]:focus-visible[\s\S]*outline-color:\s*Highlight/);
   });
 });

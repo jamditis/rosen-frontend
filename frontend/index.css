@@ -19,6 +19,21 @@
   outline-offset: -3px;
 }
 
+/* Client-side route changes focus a stable heading or main landmark so the
+   destination is announced. Keep that programmatic target visibly located
+   for keyboard users even when a component carries Tailwind's outline-none
+   utility for ordinary pointer interaction. */
+[data-route-entry-focus]:focus-visible {
+  outline: 3px solid #0369a1;
+  outline-offset: 4px;
+}
+
+@media (forced-colors: active) {
+  [data-route-entry-focus]:focus-visible {
+    outline-color: Highlight;
+  }
+}
+
 /* The entity browser can render hundreds of cards. On narrow layouts, place
    the newly selected master/detail panel before that long list so the result
    of an activation is immediately visible. The wide layout retains the

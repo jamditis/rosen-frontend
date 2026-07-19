@@ -215,6 +215,27 @@ async function auditOne(page, route, viewport) {
       throw new Error(`${label} did not own focus`);
     }
   };
+  const assertVisibleFocusOutline = async (locator, label) => {
+    const focusStyle = await locator.evaluate((element) => {
+      const styles = getComputedStyle(element);
+      return {
+        focusVisible: element.matches(':focus-visible'),
+        style: styles.outlineStyle,
+        width: Number.parseFloat(styles.outlineWidth),
+        color: styles.outlineColor,
+      };
+    });
+    const transparentColor = focusStyle.color === 'transparent'
+      || /rgba\([^)]*,\s*0\s*\)$/.test(focusStyle.color);
+    if (
+      !focusStyle.focusVisible
+      || focusStyle.style === 'none'
+      || focusStyle.width < 2
+      || transparentColor
+    ) {
+      throw new Error(`${label} did not expose a visible focus outline: ${JSON.stringify(focusStyle)}`);
+    }
+  };
   await page.setViewportSize({ width: viewport.width, height: viewport.height });
   // Spatial memory is intentionally persistent in production. Keep each audit
   // route deterministic, then opt into one explicit concurrent-window case.
@@ -273,12 +294,12 @@ async function auditOne(page, route, viewport) {
     // instead of leaving it on <body>, while Back still reconstructs desktop
     // focus and closed-popup state.
     await startButton.click();
-    await startMenu.getByRole('menuitem', { name: /^About/ }).click();
+    await startMenu.getByRole('menuitem', { name: /^About/ }).focus();
+    await page.keyboard.press('Enter');
     await page.waitForURL((url) => url.hash === '#about');
-    await assertFocused(
-      page.getByRole('heading', { name: 'About this archive', level: 1 }),
-      'About heading after Start navigation',
-    );
+    const aboutHeading = page.getByRole('heading', { name: 'About this archive', level: 1 });
+    await assertFocused(aboutHeading, 'About heading after Start navigation');
+    await assertVisibleFocusOutline(aboutHeading, 'About heading after keyboard Start navigation');
 
     await page.goBack({ waitUntil: 'networkidle' });
     if (new URL(page.url()).hash !== '#desktop') {

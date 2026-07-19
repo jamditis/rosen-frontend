@@ -93,6 +93,8 @@ describe('desktop route wiring', () => {
       'browser Back must reconstruct the desktop home with the popup closed');
     assert.match(audit, /'About heading after Start navigation'/,
       'an in-document Start launch must announce its canonical route destination');
+    assert.match(audit, /assertVisibleFocusOutline\(aboutHeading, 'About heading after keyboard Start navigation'\)/,
+      'the route-entry contract must remain visibly focused for keyboard users');
     assert.match(audit, /'Desktop home after about browser Back'/,
       'Back from a canonical route must reconstruct desktop focus and closed-popup state');
     assert.match(audit, /assertArchiveRootReturn\([\s\S]*'Participate return'/,
