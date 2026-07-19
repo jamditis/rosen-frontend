@@ -61,6 +61,7 @@ logger = logging.getLogger('deploy_full_site')
 
 _DEPLOY_FILES: Tuple[str, ...] = (
     'index.html',
+    'sw.js',  # root-scope bridge; imports frontend/sw.js
     'favicon.ico',
     'favicon.svg',  # SVG favicon referenced by index.html, the FAQ, and both data tools
     'og-image.png',  # social card referenced by the OG/Twitter meta tags
@@ -147,11 +148,14 @@ _EXCLUDE_SUFFIXES: Tuple[str, ...] = ('.pyc', '.test.js', '.spec.js', '.csv')
 #     files makes the new worker snapshot an all-new tree — that is what its
 #     CACHE_VERSION bump fixes (the #430 stale-deploy class) without trading it
 #     for a stale-HTML pin.
+#   sw.js           — the stable root-scope bridge that imports frontend/sw.js.
+#     It flips after both files it connects so an update can never install from
+#     a half-updated pair.
 #   version.json    — the refresh signal; not precached (served network-first),
 #     so it flips LAST as the least-harmful stale state: a client racing the
 #     final rename pins the old version.json (a missed update nudge) rather than
 #     any asset the worker would cache.
-_ENTRY_POINTS: Tuple[str, ...] = ('index.html', 'frontend/sw.js', 'version.json')
+_ENTRY_POINTS: Tuple[str, ...] = ('index.html', 'frontend/sw.js', 'sw.js', 'version.json')
 
 
 # ---------- Config ----------------------------------------------------------
@@ -212,7 +216,7 @@ def collect_local_files(
 ) -> List[Path]:
     """Walk the manifest and return every file to upload, ordered so that
     each feature's index.html follows its dependencies, and site entry-point
-    files (index.html, frontend/sw.js, version.json) come LAST.
+    files (index.html, both service-worker files, version.json) come LAST.
 
     Skips entries that don't exist on disk (the existence tests catch
     those at PR time — at deploy time we keep going so a missing optional

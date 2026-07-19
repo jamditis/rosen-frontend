@@ -113,11 +113,14 @@ Hash-based SPA routing (`frontend/services/router.js`):
 | Route | Hash | Component | Description |
 |-------|------|-----------|-------------|
 | Archive | (default) | `App.js` main view | Record cards with filters |
+| Start here | `#start` | `StartHerePage.js` | Guided visitor hub and field guide |
 | Folders | `#folders` | `App.js` folder view | Browse by category folders |
 | Entities | `#entities` | `EntityBrowser.js` | Browse/search extracted entities |
 | Dissertation | `#dissertation` | `DissertationPage.js` | Mind map + detail panel |
 | About | `#about` | `AboutPage.js` | About the archive |
 | Analytics | `#analytics` | `AnalyticsDashboard.js` | Archive statistics |
+| Wiki | `#wiki` / `#wiki/:slug` | `WikiPage.js` | Maintained deep links; not currently in public navigation |
+| Archive desktop | `#desktop` / `#desktop/:app` | lazy `DesktopShell.js` | Optional alternate exploration shell |
 
 Record deep links: `?record=RECORD_ID` opens a record modal on any route.
 

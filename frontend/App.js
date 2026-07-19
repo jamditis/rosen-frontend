@@ -1,12 +1,13 @@
 
-import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
+import { Component, Suspense, lazy, useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { html } from './html.js?v=3.7.5';
-import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, FolderOpen, SearchX, ChevronLeft, ChevronRight, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, hashString, loadSearchIndex } from './services/archiveService.js?v=3.7.5';
+import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github } from 'lucide-react';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.7.5';
 import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.7.5';
 import { withViewTransition } from './utils/viewTransition.js?v=3.7.5';
-import { ITEMS_PER_PAGE, COLORS, REPORT_CONFIG } from './constants.js?v=3.7.5';
-import { ROUTES, getCurrentRoute, navigateTo, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.7.5';
+import { ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.7.5';
+import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.7.5';
+import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.7.5';
 import { setRecordParam } from './utils/recordDeepLink.js?v=3.7.5';
 import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.7.5';
 import { resolveSitePath } from './utils/pathResolver.js?v=3.7.5';
@@ -21,7 +22,6 @@ import FeaturedSection from './components/FeaturedSection.js?v=3.7.5';
 import DissertationPage from './components/DissertationPage.js?v=3.7.5';
 import ToolsModal from './components/ToolsModal.js?v=3.7.5';
 import BugReportModal from './components/BugReportModal.js?v=3.7.5';
-import LoadingQuotes from './components/LoadingQuotes.js?v=3.7.5';
 import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.7.5';
 import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.7.5';
 import EntityBrowser from './components/EntityBrowser.js?v=3.7.5';
@@ -29,19 +29,55 @@ import Timeline from './components/Timeline.js?v=3.7.5';
 import AboutPage from './components/AboutPage.js?v=3.7.5';
 import WikiPage from './components/WikiPage.js?v=3.7.5';
 import StartHerePage from './components/StartHerePage.js?v=3.7.5';
+import ArchiveResults from './components/ArchiveResults.js?v=3.7.5';
 
-// Helper to highlight text
-const Highlight = ({ text, term }) => {
-  if (!term || term.length < 2) return html`<span>${text}</span>`;
-  const parts = text.split(new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
-  return html`
-    <span>
-      ${parts.map((part, i) =>
-        part.toLowerCase() === term.toLowerCase() ? html`<mark key=${i}>${part}</mark>` : part
-      )}
-    </span>
-  `;
-};
+const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.7.5'));
+
+const NON_RECORD_ROUTES = new Set([
+  ROUTES.analytics,
+  ROUTES.wiki,
+  ROUTES.desktop,
+]);
+
+const DESKTOP_RECORD_APPS = new Set(['archive', 'folders', 'entities']);
+
+class DesktopRouteErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { failed: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  componentDidCatch(error) {
+    console.error('Archive desktop failed to load:', error);
+  }
+
+  render() {
+    if (!this.state.failed) return this.props.children;
+
+    return html`
+      <main id="main-content" className="min-h-screen px-4 py-16" style=${{ backgroundColor: '#fdfbf7' }}>
+        <div className="mx-auto max-w-xl border-2 border-stone-800 bg-white p-8 shadow-lg">
+          <p className="mb-2 font-body text-xs font-bold uppercase tracking-wider text-stone-500">Archive desktop unavailable</p>
+          <h1 className="font-display text-3xl font-bold text-stone-900">The standard archive is still ready.</h1>
+          <p className="mt-4 font-body text-sm leading-relaxed text-stone-600">
+            The optional desktop view could not load. No archive data or standard navigation is affected.
+          </p>
+          <button
+            type="button"
+            onClick=${this.props.onExit}
+            className="mt-6 inline-flex items-center justify-center bg-stone-900 px-5 py-3 font-display text-sm font-bold text-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+          >
+            Open the standard archive
+          </button>
+        </div>
+      </main>
+    `;
+  }
+}
 
 // One source of truth for the empty filter state. The initial state and both
 // "clear filters" paths spread this, so adding a filter field can't leave a
@@ -65,6 +101,7 @@ const App = () => {
   const [error, setError] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [currentRoute, setCurrentRoute] = useState(() => getCurrentRoute());
+  const [desktopAppId, setDesktopAppId] = useState(() => getDesktopAppIdFromUrl());
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('date-asc');
   const [isScrolled, setIsScrolled] = useState(false);
@@ -78,7 +115,12 @@ const App = () => {
   const [bugReportIntent, setBugReportIntent] = useState('problem');
   const [showBackToTop, setShowBackToTop] = useState(false);
 
-  const [filters, setFilters] = useState({ ...DEFAULT_FILTERS });
+  const [filters, setFilters] = useState(() => ({
+    ...DEFAULT_FILTERS,
+    ...parseViewState(window.location.href).filters,
+  }));
+  const desktopNeedsRecords = currentRoute === ROUTES.desktop
+    && DESKTOP_RECORD_APPS.has(desktopAppId);
 
   // Ref for scrolling to results
   const resultsRef = useRef(null);
@@ -102,6 +144,7 @@ const App = () => {
     const syncRoute = () => {
       const route = getCurrentRoute();
       setCurrentRoute(route);
+      setDesktopAppId(getDesktopAppIdFromUrl());
 
       const recordId = getRecordIdFromUrl();
       if (recordId && records.length > 0) {
@@ -123,16 +166,39 @@ const App = () => {
 
   // Update URL when record selected (without changing route)
   useEffect(() => {
+    if (desktopNeedsRecords) return;
     const url = new URL(window.location.href);
     setRecordParam(url.searchParams, selectedRecordId);
     try {
       window.history.replaceState({}, '', url);
     } catch(e) { console.warn("History update blocked"); }
-  }, [selectedRecordId]);
+  }, [selectedRecordId, desktopNeedsRecords]);
+
+  // Desktop archive links preserve the canonical filter query plus the shared
+  // ?record= deep link. The hash only identifies the active shell app; no
+  // second desktop-only filter or record URL format is introduced.
+  useEffect(() => {
+    if (!desktopNeedsRecords) return;
+    const nextUrl = viewStateToUrl({
+      route: ROUTES.desktop,
+      routeParams: { desktopAppId },
+      filters,
+      selectedRecord: selectedRecordId,
+    }, window.location.href);
+    try {
+      window.history.replaceState({}, '', nextUrl);
+    } catch {
+      console.warn('Desktop view-state update blocked');
+    }
+  }, [desktopNeedsRecords, desktopAppId, filters, selectedRecordId]);
 
   // Navigation helpers
   const goTo = useCallback((route) => {
     navigateTo(route);
+  }, []);
+
+  const goToDesktop = useCallback((appId = null) => {
+    navigateToDesktop(appId);
   }, []);
 
   // Open, close, or switch the record modal with a View Transition cross-fade
@@ -149,17 +215,24 @@ const App = () => {
   // Tag click handlers (from RecordModal) — go to archive and filter
   const handleFilterCategory = useCallback((cat) => {
     setFilters(prev => ({ ...prev, categories: [cat] }));
-    navigateTo(ROUTES.archive);
-  }, []);
+    if (currentRoute === ROUTES.desktop) navigateToDesktop('archive');
+    else navigateTo(ROUTES.archive);
+  }, [currentRoute]);
 
   const handleFilterSearch = useCallback((term) => {
     setFilters(prev => ({ ...prev, search: term }));
-    navigateTo(ROUTES.archive);
-  }, []);
+    if (currentRoute === ROUTES.desktop) navigateToDesktop('archive');
+    else navigateTo(ROUTES.archive);
+  }, [currentRoute]);
 
   const handleQueryResults = useCallback((recordIds) => {
     setFilters(prev => ({ ...prev, recordIds }));
     navigateTo(ROUTES.archive);
+  }, []);
+
+  const handleDesktopQueryResults = useCallback((recordIds) => {
+    setFilters(prev => ({ ...prev, recordIds }));
+    navigateToDesktop('archive');
   }, []);
 
   // Tool selection handler
@@ -172,6 +245,8 @@ const App = () => {
       navigateTo(ROUTES.entities);
     } else if (action === 'wiki') {
       navigateTo(ROUTES.wiki);
+    } else if (action === 'desktop') {
+      navigateToDesktop();
     }
   }, []);
 
@@ -183,7 +258,7 @@ const App = () => {
   const coreFetchStarted = useRef(false);
   useEffect(() => {
     if (coreFetchStarted.current) return;
-    if (currentRoute === ROUTES.analytics || currentRoute === ROUTES.wiki) return;
+    if (NON_RECORD_ROUTES.has(currentRoute) && !desktopNeedsRecords) return;
     coreFetchStarted.current = true;
     perfMark('data:start');
     fetchCoreData()
@@ -201,7 +276,7 @@ const App = () => {
         setError('Failed to load archive data. Please refresh the page or try again later.');
         setLoading(false);
       });
-  }, [currentRoute]);
+  }, [currentRoute, desktopAppId]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -318,13 +393,17 @@ const App = () => {
   }, [filters, sortBy]);
 
   // Derive viewMode from route for backward-compatible logic
-  const viewMode = currentRoute === ROUTES.folders ? 'folder' : 'grid';
+  const viewMode = currentRoute === ROUTES.folders
+    || (currentRoute === ROUTES.desktop && desktopAppId === 'folders')
+    ? 'folder'
+    : 'grid';
 
   useEffect(() => {
-    if ((filters.search || filters.year) && currentRoute === ROUTES.folders) {
-      navigateTo(ROUTES.archive);
+    if ((filters.search || filters.year) && viewMode === 'folder') {
+      if (currentRoute === ROUTES.desktop) navigateToDesktop('archive');
+      else navigateTo(ROUTES.archive);
     }
-  }, [filters.search, filters.year, currentRoute]);
+  }, [filters.search, filters.year, currentRoute, viewMode]);
 
   const totalPages = Math.ceil(filteredRecords.length / ITEMS_PER_PAGE);
   const paginatedRecords = filteredRecords.slice(
@@ -346,7 +425,8 @@ const App = () => {
 
   const handleFolderClick = (category) => {
     setFilters(prev => ({ ...prev, categories: [category] }));
-    navigateTo(ROUTES.archive);
+    if (currentRoute === ROUTES.desktop) navigateToDesktop('archive');
+    else navigateTo(ROUTES.archive);
   };
 
   const handleModalNav = (direction) => {
@@ -407,12 +487,53 @@ const App = () => {
     (filters.type ? 1 : 0) +
     (filters.recordIds !== null ? 1 : 0);
 
+  const desktopArchiveView = {
+    viewMode,
+    loading,
+    error,
+    filters,
+    setFilters,
+    facets: queryFacets,
+    autocompleteIndex,
+    sortBy,
+    setSortBy,
+    filteredRecords,
+    paginatedRecords,
+    folderGroups,
+    currentPage,
+    totalPages,
+    activeFilterCount,
+    onSetViewMode: (mode) => navigateToDesktop(mode === 'folder' ? 'folders' : 'archive'),
+    onSelectRecord: selectRecord,
+    onOpenFolder: handleFolderClick,
+    onPageChange: handlePageChange,
+    onClearFilters: () => setFilters({ ...DEFAULT_FILTERS }),
+    onOpenStandard: () => goTo(viewMode === 'folder' ? ROUTES.folders : ROUTES.archive),
+  };
+
+  const desktopEntityView = {
+    records: queryRecords,
+    queryActive: filters.recordIds !== null,
+    onSelectRecord: selectRecord,
+    onOpenStandard: () => goTo(ROUTES.entities),
+  };
+
+  const desktopDissertationView = {
+    onOpenStandard: () => goTo(ROUTES.dissertation),
+  };
+
+  const desktopAnalyticsView = {
+    onRecordResults: handleDesktopQueryResults,
+    onOpenStandard: () => goTo(ROUTES.analytics),
+  };
+
   // Keep global overlays mounted on full-page routes. Returning a page directly
   // here used to strand any full-page action that opened the bug report modal,
   // because the modal only existed in the archive shell below.
-  const renderFullPage = (page) => html`
+  const renderFullPage = (page, routeOverlay = null) => html`
     <div className="min-h-screen flex flex-col">
       ${page}
+      ${routeOverlay}
       <${BugReportModal}
         isOpen=${bugReportOpen}
         onClose=${() => setBugReportOpen(false)}
@@ -422,7 +543,42 @@ const App = () => {
     </div>
   `;
 
-  // Full-page routes: Start Here, dissertation, about, analytics
+  // Full-page routes: desktop, Start here, dissertation, about, analytics
+  if (currentRoute === ROUTES.desktop) {
+    const desktopFallback = html`
+      <main id="main-content" className="min-h-screen px-4 py-16 text-white" style=${{ backgroundColor: '#0b6867' }}>
+        <div className="mx-auto max-w-lg border-2 border-white/70 bg-black/20 p-6">
+          <p className="font-display text-xl" role="status">Opening the archive desktop...</p>
+          <button
+            type="button"
+            onClick=${() => goTo(ROUTES.archive)}
+            className="mt-5 border-2 border-white px-4 py-3 font-body text-sm font-bold focus:outline-none focus:ring-2 focus:ring-amber-300"
+          >
+            Return to the standard archive
+          </button>
+        </div>
+      </main>
+    `;
+
+    return renderFullPage(html`
+      <${DesktopRouteErrorBoundary} onExit=${() => goTo(ROUTES.archive)}>
+        <${Suspense} fallback=${desktopFallback}>
+          <${DesktopShell}
+            activeAppId=${desktopAppId}
+            onSelectApp=${goToDesktop}
+            onNavigate=${goTo}
+            onOpenBugReport=${() => setBugReportOpen(true)}
+            onExit=${() => goTo(ROUTES.archive)}
+            archiveView=${desktopArchiveView}
+            analyticsView=${desktopAnalyticsView}
+            dissertationView=${desktopDissertationView}
+            entityView=${desktopEntityView}
+          />
+        <//>
+      <//>
+    `, desktopNeedsRecords ? recordView : null);
+  }
+
   if (currentRoute === ROUTES.start) {
     const handleStartRecordSelect = (recordOrId) => {
       const id = typeof recordOrId === 'string' ? recordOrId : recordOrId?.id;
@@ -715,134 +871,21 @@ const App = () => {
             `}
 
             ${isArchiveGrid && html`
-                <div>
-                    ${errorPanel}
-
-                    ${!error && loading && html`
-                    <${LoadingQuotes} />
-                    `}
-
-                    ${!error && !loading && filteredRecords.length === 0 && html`
-                    <div className="text-center py-20 border-2 border-dashed border-stone-200 rounded-lg bg-stone-50">
-                        <${SearchX} className="w-12 h-12 mx-auto text-stone-300 mb-4" />
-                        <h3 className="font-display text-xl text-stone-700 mb-2">No records found</h3>
-                        <p className="text-stone-500 text-sm mb-6">Try adjusting your search terms or filters.</p>
-                        <button
-                            onClick=${() => setFilters({ ...DEFAULT_FILTERS })}
-                            className="text-sm border-b-2 border-stone-800 pb-0.5 hover:text-stone-600 transition-colors font-bold"
-                        >
-                            Clear all filters
-                        </button>
-                    </div>
-                    `}
-
-                    ${!error && !loading && viewMode === 'grid' && html`
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                        ${paginatedRecords.map(item => {
-                            const primaryCat = item.categories[0] || 'Uncategorized';
-                            const colorIdx = hashString(primaryCat) % COLORS.length;
-                            const theme = COLORS[colorIdx];
-
-                            return html`
-                            <div
-                                key=${item.id}
-                                onClick=${() => selectRecord(item.id)}
-                                className="bg-white border border-stone-200 hover:border-stone-400 hover:shadow-lg transition-all duration-300 rounded-sm flex flex-col group cursor-pointer overflow-hidden relative"
-                            >
-                                <div className="h-1 w-full" style=${{ backgroundColor: theme.text }}></div>
-                                <div className="p-6 flex flex-col h-full">
-                                    <div className="flex justify-between items-start mb-3">
-                                        <span className="text-xs font-bold uppercase tracking-wider text-stone-400">${item.pub}</span>
-                                        <span className="text-xs text-stone-400 font-mono border border-stone-200 px-1 rounded">${item.date}</span>
-                                    </div>
-
-                                    <h3 className="text-lg font-display font-bold text-stone-900 leading-tight mb-3 group-hover:text-stone-600 transition-colors">
-                                        <${Highlight} text=${item.title} term=${filters.search} />
-                                    </h3>
-
-                                    <p className="text-stone-600 text-sm leading-relaxed mb-4 flex-grow font-body">
-                                        <${Highlight} text=${item.summaryPreview || item.summary || ''} term=${filters.search} />
-                                    </p>
-
-                                    <div className="mt-auto pt-4 border-t border-stone-100 flex flex-wrap gap-2">
-                                        ${item.categories.slice(0, 2).map(c => html`
-                                            <span key=${c} className="text-[10px] uppercase font-bold px-2 py-1 rounded bg-stone-100 text-stone-600 tracking-wide border border-stone-200">
-                                                ${c}
-                                            </span>
-                                        `)}
-                                        ${recordNeedsReview(item) && html`
-                                            <span
-                                                className="text-[10px] uppercase font-bold px-2 py-1 rounded tracking-wide"
-                                                style=${{ backgroundColor: '#fffbeb', color: '#b45309' }}
-                                                title="Auto-submitted; pending a human review pass"
-                                            >
-                                                needs review
-                                            </span>
-                                        `}
-                                    </div>
-                                </div>
-                            </div>
-                            `;
-                        })}
-                    </div>
-                    `}
-
-                    ${!error && !loading && viewMode === 'folder' && html`
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        ${folderGroups.map(group => {
-                            const colorIdx = hashString(group.name) % COLORS.length;
-                            const theme = COLORS[colorIdx];
-
-                            return html`
-                            <button
-                                key=${group.name}
-                                onClick=${() => handleFolderClick(group.name)}
-                                className="text-left group relative flex flex-col h-40 transition-transform hover:-translate-y-1 focus:outline-none"
-                            >
-                                <div
-                                    className="folder-tab-shape w-1/2 h-8 border-t border-l border-r relative z-10 translate-y-[1px] ml-0"
-                                    style=${{ backgroundColor: theme.bg, borderColor: theme.border }}
-                                >
-                                    <span
-                                        className="px-4 py-2 text-[10px] font-bold uppercase block truncate"
-                                        style=${{ color: theme.text }}
-                                    >
-                                        ${group.count} records
-                                    </span>
-                                </div>
-                                <div className="flex-grow w-full bg-white border border-stone-300 rounded-r-md rounded-b-md shadow-sm p-6 relative z-20 flex items-center">
-                                    <div className="w-1 h-full absolute left-0 top-0 rounded-l-sm" style=${{ backgroundColor: theme.text }} />
-                                    <h3 className="text-lg font-display font-bold text-stone-800 group-hover:underline decoration-stone-300 underline-offset-4">
-                                        ${group.name}
-                                    </h3>
-                                    <${FolderOpen} className="w-6 h-6 ml-auto text-stone-300 group-hover:text-stone-500 transition-colors" />
-                                </div>
-                            </button>
-                            `;
-                        })}
-                    </div>
-                    `}
-
-                    ${!loading && viewMode === 'grid' && totalPages > 1 && html`
-                        <div className="mt-12 flex justify-center items-center gap-4">
-                            <button
-                            onClick=${() => handlePageChange(currentPage - 1)}
-                            disabled=${currentPage === 1}
-                            className="p-2 border border-stone-300 rounded hover:bg-stone-100 disabled:opacity-30 transition-all"
-                            >
-                                <${ChevronLeft} className="w-5 h-5" />
-                            </button>
-                            <span className="font-display text-stone-600">Page ${currentPage} of ${totalPages}</span>
-                            <button
-                            onClick=${() => handlePageChange(currentPage + 1)}
-                            disabled=${currentPage === totalPages}
-                            className="p-2 border border-stone-300 rounded hover:bg-stone-100 disabled:opacity-30 transition-all"
-                            >
-                                <${ChevronRight} className="w-5 h-5" />
-                            </button>
-                        </div>
-                    `}
-                </div>
+                <${ArchiveResults}
+                  errorPanel=${errorPanel}
+                  loading=${loading}
+                  filteredRecords=${filteredRecords}
+                  paginatedRecords=${paginatedRecords}
+                  folderGroups=${folderGroups}
+                  viewMode=${viewMode}
+                  searchTerm=${filters.search}
+                  currentPage=${currentPage}
+                  totalPages=${totalPages}
+                  onSelectRecord=${selectRecord}
+                  onOpenFolder=${handleFolderClick}
+                  onPageChange=${handlePageChange}
+                  onClearFilters=${() => setFilters({ ...DEFAULT_FILTERS })}
+                />
             `}
          </main>
 
@@ -883,7 +926,7 @@ const App = () => {
               <p className="text-xs leading-relaxed mb-2">
                 Curated by <a href="https://github.com/jamditis" target="_blank" rel="noreferrer" className="text-stone-900 font-bold hover:underline">Joe Amditis</a>
               </p>
-              <p className="text-xs text-stone-400">
+              <p className="text-xs text-stone-600">
                 ${records.length} records | ${minYear}–${maxYear}
               </p>
             </div>

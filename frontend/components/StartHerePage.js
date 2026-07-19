@@ -11,6 +11,7 @@ import {
   FolderOpen,
   Library,
   Network,
+  Monitor,
   Search,
   Sparkles
 } from 'lucide-react';
@@ -173,9 +174,20 @@ const StartHerePage = ({
             Jay Rosen's Internet Archive brings together decades of writing, teaching, interviews, and public commentary about journalism and democratic life. Search directly, follow a curated trail, or learn how the collection is organized.
           </p>
 
-          <div className="mt-8">
+          <div className="mt-8 flex flex-wrap gap-3">
             ${routeButton('archive', 'Search and browse records', Search)}
+            <button
+              type="button"
+              onClick=${() => navigate('desktop')}
+              className="inline-flex items-center justify-center gap-2 border-2 border-stone-800 bg-white px-5 py-3 font-display text-sm font-bold text-stone-900 transition-colors hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+            >
+              <${Monitor} className="h-4 w-4" aria-hidden="true" />
+              Explore the archive desktop
+            </button>
           </div>
+          <p className="mt-3 max-w-2xl font-body text-xs leading-relaxed text-stone-500">
+            Prefer a spatial map? The optional desktop arranges these same archive paths as shortcuts, folders, and windows.
+          </p>
 
           ${stats.total > 0 && html`
             <p className="mt-4 font-body text-xs text-stone-500">

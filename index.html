@@ -101,7 +101,11 @@
       );
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./frontend/sw.js')
+          // Register the root bridge so the worker controls the archive page,
+          // not only /frontend/. Checking imported scripts without HTTP-cache
+          // reuse makes a frontend/sw.js CACHE_VERSION bump observable even
+          // though this small bridge intentionally stays stable.
+          navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
             .then(registration => {
               console.log('SW registered:', registration.scope);
             })

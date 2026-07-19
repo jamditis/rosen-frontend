@@ -36,6 +36,11 @@ const ROUTES = [
   { slug: 'home-archive',       url: '/' },
   { slug: 'start-here',         url: '/#start' },
   { slug: 'participate',        url: '/features/participate/' },
+  { slug: 'archive-desktop',    url: '/#desktop' },
+  { slug: 'desktop-archive',    url: '/#desktop/archive' },
+  { slug: 'desktop-entities',   url: '/#desktop/entities' },
+  { slug: 'desktop-dissertation', url: '/#desktop/dissertation' },
+  { slug: 'desktop-analytics',  url: '/#desktop/analytics' },
   { slug: 'entities',           url: '/#entities' },
   { slug: 'about',              url: '/#about' },
   { slug: 'analytics',          url: '/#analytics' },
@@ -49,6 +54,7 @@ const ROUTES = [
 
 const VIEWPORTS = [
   { name: 'mobile',  width: 375,  height: 812  },
+  { name: 'tablet',  width: 768,  height: 1024 },
   { name: 'desktop', width: 1440, height: 900  },
 ];
 

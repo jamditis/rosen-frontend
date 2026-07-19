@@ -97,9 +97,9 @@ describe('Start here page', () => {
   it('is wired as a cached full-page route with the report modal still mounted', () => {
     assert.match(app, /currentRoute === ROUTES\.start/);
     assert.match(app, /<\$\{StartHerePage\}/);
-    assert.match(app, /const renderFullPage = \(page\)/);
+    assert.match(app, /const renderFullPage = \(page, routeOverlay = null\)/);
     assert.match(app, /<\$\{BugReportModal\}/);
-    assert.equal((serviceWorker.match(/StartHerePage\.js/g) || []).length, 2);
-    assert.equal((serviceWorker.match(/tourState\.js/g) || []).length, 2);
+    assert.equal((serviceWorker.match(/StartHerePage\.js/g) || []).length, 1);
+    assert.equal((serviceWorker.match(/tourState\.js/g) || []).length, 1);
   });
 });

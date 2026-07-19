@@ -22,6 +22,7 @@ const readSrc = (...parts) => fs.readFileSync(path.join(rootDir, ...parts), 'utf
 const queryBuilderSrc = readSrc('frontend', 'components', 'QueryBuilder.js');
 const analyticsSrc = readSrc('frontend', 'components', 'AnalyticsDashboard.js');
 const appSrc = readSrc('frontend', 'App.js');
+const archiveResultsSrc = readSrc('frontend', 'components', 'ArchiveResults.js');
 const entityBrowserSrc = readSrc('frontend', 'components', 'EntityBrowser.js');
 const serviceWorkerSrc = readSrc('frontend', 'sw.js');
 
@@ -100,7 +101,12 @@ describe('QueryBuilder shared archive path', () => {
       /<\$\{AnalyticsDashboard\}[\s\S]*?onRecordResults=\$\{handleQueryResults\}/
     );
     assert.match(appSrc, /const\s+paginatedRecords\s*=\s*filteredRecords\.slice\(/);
-    assert.match(appSrc, /paginatedRecords\.map\([\s\S]*?onClick=\$\{\(\)\s*=>\s*selectRecord\(item\.id\)\}/);
+    assert.match(
+      appSrc,
+      /<\$\{ArchiveResults\}[\s\S]*?paginatedRecords=\$\{paginatedRecords\}[\s\S]*?onSelectRecord=\$\{selectRecord\}/
+    );
+    assert.match(archiveResultsSrc, /paginatedRecords\.map\(/);
+    assert.match(archiveResultsSrc, /onSelectRecord\(recordId\)/);
     assert.match(
       appSrc,
       /<\$\{RecordView\}[\s\S]*?filteredRecords=\$\{filteredRecords\}[\s\S]*?selectedRecordId=\$\{selectedRecordId\}/
@@ -296,11 +302,11 @@ describe('QueryBuilder field-value resolution (#525)', () => {
 });
 
 describe('query composition deployment', () => {
-  it('pre-caches the shared query module for local and deployed paths', () => {
-    assert.match(serviceWorkerSrc, /['"]\/frontend\/services\/queryComposition\.js['"]/);
+  it('pre-caches the shared query module through the environment-aware frontend path', () => {
+    assert.match(serviceWorkerSrc, /['"]services\/queryComposition\.js['"]/);
     assert.match(
       serviceWorkerSrc,
-      /`\$\{BASE_PATH\}\/frontend\/services\/queryComposition\.js`/
+      /APP_SHELL_FRONTEND_FILES\.map\(file\s*=>\s*`\$\{FRONTEND_PATH\}\/\$\{file\}`\)/
     );
   });
 });

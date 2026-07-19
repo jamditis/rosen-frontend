@@ -136,14 +136,14 @@ describe('analytics lazy-load wiring (#338)', () => {
     assert.match(body, /throw new Error/, 'fetchAnalytics must throw on a failed fetch');
   });
 
-  it('App.js skips the core fetch on a cold #analytics deep-link', () => {
+  it('App.js skips the core fetch on cold non-record deep links', () => {
     const src = readSrc('frontend', 'App.js');
     assert.match(src, /coreFetchStarted/, 'expected the coreFetchStarted ref guard');
-    assert.match(
-      src,
-      /currentRoute\s*===\s*ROUTES\.analytics\s*\|\|\s*currentRoute\s*===\s*ROUTES\.wiki\)\s*return/,
-      'the load effect must early-return on analytics and wiki routes'
-    );
+    assert.match(src, /NON_RECORD_ROUTES\s*=\s*new Set\([\s\S]*ROUTES\.analytics/);
+    assert.match(src, /NON_RECORD_ROUTES\s*=\s*new Set\([\s\S]*ROUTES\.wiki/);
+    assert.match(src, /NON_RECORD_ROUTES\s*=\s*new Set\([\s\S]*ROUTES\.desktop/);
+    assert.match(src, /NON_RECORD_ROUTES\.has\(currentRoute\)\s*&&\s*!desktopNeedsRecords\) return/,
+      'the load effect must early-return for every non-record route');
   });
 
   it('constants.js defines a relative archive_analytics path', () => {

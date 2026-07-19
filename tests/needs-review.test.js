@@ -66,13 +66,11 @@ describe('recordNeedsReview — flagged only for an explicit true', () => {
 });
 
 describe('the live marker surfaces delegate to the predicate (keeps coverage relevant)', () => {
-  // The marker goes on the surfaces that actually render. The issue named
-  // RiverOfNews.js as the card feed, but that component is imported nowhere — the
-  // live archive cards are built inline in App.js. So these guard App.js (cards)
-  // and RecordModal.js (modal): both must route through recordNeedsReview, or a
-  // future edit could drop the marker / hand-roll a buggy check and #350 recurs.
-  it('App.js (live card feed) renders the marker via recordNeedsReview', () => {
-    assert.match(readSrc('frontend/App.js'), /recordNeedsReview\(\s*item\s*\)/);
+  // ArchiveResults owns the shared standard/desktop card feed; RecordModal owns
+  // the detail surface. Both must route through recordNeedsReview, or a future
+  // edit could drop the marker / hand-roll a buggy check and #350 recurs.
+  it('ArchiveResults.js (shared live card feed) renders the marker via recordNeedsReview', () => {
+    assert.match(readSrc('frontend/components/ArchiveResults.js'), /recordNeedsReview\(\s*item\s*\)/);
   });
 
   it('RecordModal.js (record modal) renders the marker via recordNeedsReview on the core record', () => {

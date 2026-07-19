@@ -4,7 +4,16 @@ import { html } from '../html.js?v=3.7.5';
 import { X, Search, XCircle, ChevronDown, ChevronUp, MessageSquare } from 'lucide-react';
 import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.7.5';
 
-const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, autocompleteIndex }) => {
+const Sidebar = ({
+  facets,
+  filters,
+  setFilters,
+  isOpen,
+  onClose,
+  resetFilters,
+  autocompleteIndex,
+  variant = 'standard',
+}) => {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showAllCategories, setShowAllCategories] = useState(false);
@@ -74,26 +83,36 @@ const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, a
     (filters.year ? 1 : 0) +
     (filters.type ? 1 : 0) +
     (filters.recordIds !== null ? 1 : 0);
+  const embedded = variant === 'desktop';
+  const searchInputId = embedded ? 'desktop-archive-search' : 'archive-search';
 
   return html`
-    <div>
+    <div className=${embedded ? 'desktop-filter-root' : ''}>
         <div
-          className=${`fixed inset-0 bg-black/50 z-[55] lg:hidden backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+          className=${embedded
+            ? `desktop-filter-backdrop ${isOpen ? 'is-open' : ''}`
+            : `fixed inset-0 bg-black/50 z-[55] lg:hidden backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
           onClick=${onClose}
+          aria-hidden="true"
         />
 
-      <aside className=${`
-        fixed inset-y-0 left-0 z-[60] lg:z-auto w-80 bg-[#fdfbf7] border-r border-stone-300
-        transform transition-transform duration-300 ease-out lg:translate-x-0 lg:static lg:w-64 lg:bg-transparent lg:border-none lg:block shrink-0
-        overflow-y-auto lg:overflow-visible shadow-2xl lg:shadow-none
-        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
+      <aside
+        className=${embedded
+          ? `desktop-filter-panel ${isOpen ? 'is-open' : ''}`
+          : `
+            fixed inset-y-0 left-0 z-[60] lg:z-auto w-80 bg-[#fdfbf7] border-r border-stone-300
+            transform transition-transform duration-300 ease-out lg:translate-x-0 lg:static lg:w-64 lg:bg-transparent lg:border-none lg:block shrink-0
+            overflow-y-auto lg:overflow-visible shadow-2xl lg:shadow-none
+            ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+          `}
+        aria-label="Archive filters"
+      >
         <div className="p-5 lg:p-0 space-y-8">
 
           <div className="flex justify-between items-center lg:hidden mb-6">
-            <h3 className="font-display text-xl">Filters & sort</h3>
-            <button onClick=${onClose} className="p-1 hover:bg-stone-200 rounded">
-              <${X} className="w-6 h-6" />
+            <h3 className="font-display text-xl">Filters and sort</h3>
+            <button type="button" onClick=${onClose} className="p-1 hover:bg-stone-200 rounded" aria-label="Close archive filters">
+              <${X} className="w-6 h-6" aria-hidden="true" />
             </button>
           </div>
 
@@ -109,9 +128,10 @@ const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, a
           `}
 
           <div className="space-y-2" ref=${searchRef}>
-            <label className="text-xs font-bold uppercase tracking-wider text-stone-500">Search archive</label>
+            <label htmlFor=${searchInputId} className="text-xs font-bold uppercase tracking-wider text-stone-600">Search archive</label>
             <div className="relative">
               <input
+                id=${searchInputId}
                 type="text"
                 value=${filters.search}
                 onChange=${handleSearchChange}
@@ -122,10 +142,12 @@ const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, a
               <${Search} className="w-4 h-4 text-stone-400 absolute left-2.5 top-2.5" />
               ${filters.search && html`
                 <button
+                  type="button"
                   onClick=${() => setFilters(prev => ({ ...prev, search: '' }))}
                   className="absolute right-2 top-2 text-stone-400 hover:text-stone-800"
+                  aria-label="Clear archive search"
                 >
-                  <${XCircle} className="w-4 h-4" />
+                  <${XCircle} className="w-4 h-4" aria-hidden="true" />
                 </button>
               `}
 
@@ -133,23 +155,25 @@ const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, a
                 <div className="absolute z-30 w-full bg-white border border-stone-300 shadow-lg mt-1 max-h-60 overflow-y-auto">
                   <ul>
                     ${suggestions.map((term, idx) => html`
-                      <li
-                        key=${idx}
-                        onClick=${() => handleSelectSuggestion(term)}
-                        className="px-3 py-2 text-sm text-stone-700 hover:bg-stone-100 cursor-pointer truncate border-b border-stone-100 last:border-0"
-                      >
-                        ${term}
+                      <li key=${idx}>
+                        <button
+                          type="button"
+                          onClick=${() => handleSelectSuggestion(term)}
+                          className="block w-full px-3 py-2 text-left text-sm text-stone-700 hover:bg-stone-100 cursor-pointer truncate border-b border-stone-100 last:border-0"
+                        >
+                          ${term}
+                        </button>
                       </li>
                     `)}
                   </ul>
                 </div>
               `}
             </div>
-            <p className="text-[10px] text-stone-400 mt-1">Searches titles, summaries, and categories</p>
+            <p className="text-[10px] text-stone-600 mt-1">Searches titles, summaries, and categories</p>
           </div>
 
           <div className="border-t border-stone-200 pt-4">
-             <h4 className="text-xs font-bold uppercase tracking-wider text-stone-500 mb-3">Thematic categories</h4>
+             <h4 className="text-xs font-bold uppercase tracking-wider text-stone-600 mb-3">Thematic categories</h4>
              <div className="space-y-2">
                 ${visibleCategories.map(cat => html`
                   <label key=${cat} className="flex items-start gap-2 cursor-pointer group">
@@ -165,18 +189,19 @@ const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, a
 
                 ${facets.categories.length > 10 && html`
                     <button
+                        type="button"
                         onClick=${() => setShowAllCategories(!showAllCategories)}
                         className="text-xs text-stone-500 hover:text-stone-900 font-bold flex items-center gap-1 mt-2"
                     >
-                        ${showAllCategories ? html`View Less <${ChevronUp} className="w-3 h-3"/>` : html`View All (${facets.categories.length - 10} more) <${ChevronDown} className="w-3 h-3"/>`}
+                        ${showAllCategories ? html`View less <${ChevronUp} className="w-3 h-3"/>` : html`View all (${facets.categories.length - 10} more) <${ChevronDown} className="w-3 h-3"/>`}
                     </button>
                 `}
              </div>
           </div>
 
           <div className="border-t border-stone-200 pt-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-stone-500 mb-3">Timeline</h4>
-            <p className="text-[10px] text-stone-400 mb-2">Filter by era or click a year in the timeline bar</p>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-stone-600 mb-3">Timeline</h4>
+            <p className="text-[10px] text-stone-600 mb-2">Filter by era or click a year in the timeline bar</p>
             <div className="space-y-2">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -204,7 +229,7 @@ const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, a
           </div>
 
           <div className="border-t border-stone-200 pt-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-stone-500 mb-3">Content type</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-stone-600 mb-3">Content type</h4>
             <div className="flex flex-wrap gap-4">
               ${[
                 { label: 'All', value: null },
@@ -228,6 +253,7 @@ const Sidebar = ({ facets, filters, setFilters, isOpen, onClose, resetFilters, a
           </div>
 
           <button
+            type="button"
             onClick=${resetFilters}
             className="w-full py-2 border border-stone-300 text-stone-600 text-xs font-bold uppercase tracking-wider hover:bg-stone-800 hover:text-white transition-colors mt-4"
           >

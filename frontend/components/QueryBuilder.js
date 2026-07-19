@@ -365,9 +365,10 @@ const QUERY_TEMPLATES = [
 ];
 
 // Dropdown component
-const Dropdown = ({ options, value, onChange }) => {
+const Dropdown = ({ options, value, onChange, label }) => {
   return html`
     <select
+      aria-label=${label}
       value=${value}
       onChange=${(e) => onChange(e.target.value)}
       className="mx-1 px-3 py-1.5 bg-amber-100 border-2 border-amber-300 rounded-lg text-stone-800 font-bold text-sm cursor-pointer hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-400 appearance-none"
@@ -381,9 +382,10 @@ const Dropdown = ({ options, value, onChange }) => {
 };
 
 // Number input component
-const NumberInput = ({ value, onChange, min, max }) => {
+const NumberInput = ({ value, onChange, min, max, label }) => {
   return html`
     <input
+      aria-label=${label}
       type="number"
       value=${value}
       onChange=${(e) => onChange(parseInt(e.target.value) || min)}
@@ -395,9 +397,10 @@ const NumberInput = ({ value, onChange, min, max }) => {
 };
 
 // Text input component
-const TextInput = ({ value, onChange, placeholder }) => {
+const TextInput = ({ value, onChange, placeholder, label }) => {
   return html`
     <input
+      aria-label=${label}
       type="text"
       value=${value}
       onChange=${(e) => onChange(e.target.value)}
@@ -410,6 +413,17 @@ const TextInput = ({ value, onChange, placeholder }) => {
 
 // Query sentence renderer
 const QuerySentence = ({ template, values, onChange }) => {
+  const fieldLabels = {
+    FIELD: 'Group records by',
+    LIMIT: 'Result limit',
+    SEARCH_TERM: 'Title search term',
+    YEAR: 'Year',
+    ERA: 'Era',
+    CATEGORY: 'Category',
+    PERSON_NAME: 'Person name',
+    TYPE: 'Record type',
+  };
+
   return html`
     <div className="flex flex-wrap items-center gap-1 text-lg text-stone-700 leading-relaxed py-2">
       ${template.sentence.map((part, index) => {
@@ -423,6 +437,7 @@ const QuerySentence = ({ template, values, onChange }) => {
               key=${index}
               options=${field.options}
               value=${currentValue}
+              label=${fieldLabels[part] || part}
               onChange=${(val) => onChange(part, val)}
             />`;
           } else if (field.type === 'number') {
@@ -432,6 +447,7 @@ const QuerySentence = ({ template, values, onChange }) => {
               onChange=${(val) => onChange(part, val)}
               min=${field.min}
               max=${field.max}
+              label=${fieldLabels[part] || part}
             />`;
           } else if (field.type === 'text') {
             return html`<${TextInput}
@@ -439,6 +455,7 @@ const QuerySentence = ({ template, values, onChange }) => {
               value=${currentValue}
               onChange=${(val) => onChange(part, val)}
               placeholder=${field.placeholder}
+              label=${fieldLabels[part] || part}
             />`;
           }
         }
@@ -452,7 +469,7 @@ const QuerySentence = ({ template, values, onChange }) => {
 // Results table component
 const ResultsTable = ({ results }) => {
   if (!results || results.length === 0) {
-    return html`<p className="text-stone-400 text-sm italic">No results found</p>`;
+    return html`<p className="text-stone-600 text-sm italic">No results found</p>`;
   }
 
   const columns = Object.keys(results[0]);
@@ -564,10 +581,11 @@ const QueryBuilder = ({ onRecordResults }) => {
     <div className="space-y-6">
       <!-- Template Selector -->
       <div className="flex flex-wrap items-center gap-3">
-        <label className="text-sm font-bold text-stone-500 uppercase tracking-wider">
+        <label htmlFor="query-template" className="text-sm font-bold text-stone-600 uppercase tracking-wider">
           I want to:
         </label>
         <select
+          id="query-template"
           value=${selectedTemplateId}
           onChange=${(e) => setSelectedTemplateId(e.target.value)}
           className="px-4 py-2 bg-white border-2 border-stone-300 rounded-lg text-stone-800 font-bold cursor-pointer hover:border-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-400"
@@ -599,6 +617,7 @@ const QueryBuilder = ({ onRecordResults }) => {
         <!-- Action Buttons -->
         <div className="flex flex-wrap items-center gap-3 mt-6 pt-4 border-t border-stone-200">
           <button
+            type="button"
             onClick=${runQuery}
             disabled=${dbLoading}
             className="flex items-center gap-2 px-5 py-2.5 bg-stone-900 text-white rounded-lg hover:bg-stone-800 transition-colors font-bold disabled:opacity-60"
@@ -608,6 +627,7 @@ const QueryBuilder = ({ onRecordResults }) => {
               : html`<${Play} className="w-4 h-4" /> Run Query`}
           </button>
           <button
+            type="button"
             onClick=${resetQuery}
             className="flex items-center gap-2 px-4 py-2.5 bg-stone-100 text-stone-600 rounded-lg hover:bg-stone-200 transition-colors font-medium"
           >
@@ -615,6 +635,7 @@ const QueryBuilder = ({ onRecordResults }) => {
             Reset
           </button>
           <button
+            type="button"
             onClick=${() => setShowSql(!showSql)}
             className="flex items-center gap-2 px-4 py-2.5 text-stone-500 hover:text-stone-700 transition-colors font-medium text-sm"
           >

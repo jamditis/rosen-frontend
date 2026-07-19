@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { html } from '../html.js?v=3.7.5';
 import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2 } from 'lucide-react';
 import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.7.5';
@@ -7,6 +7,7 @@ import { ThreadModal } from './ThreadModal.js?v=3.7.5';
 import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.7.5';
 import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.7.5';
 import { recordNeedsReview } from '../utils/needsReview.js?v=3.7.5';
+import { canonicalRecordUrl } from '../utils/recordDeepLink.js?v=3.7.5';
 
 const linkifyText = (text) => {
   const parts = splitUrlsForLinkify(text);
@@ -48,6 +49,9 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
   // State for lazy-loaded details
   const [fullRecord, setFullRecord] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const dialogRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const openerRef = useRef(null);
 
   // Fetch details when modal opens
   useEffect(() => {
@@ -141,10 +145,45 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
       if (e.key === 'Escape') handleClose();
       if (e.key === 'ArrowLeft' && hasPrev) onPrev();
       if (e.key === 'ArrowRight' && hasNext) onNext();
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusable = Array.from(dialogRef.current.querySelectorAll(
+          'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )).filter((element) => element.offsetParent !== null);
+        if (focusable.length === 0) {
+          e.preventDefault();
+          dialogRef.current.focus();
+          return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, hasPrev, hasNext, onPrev, onNext]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      if (openerRef.current?.isConnected) openerRef.current.focus();
+      openerRef.current = null;
+      return undefined;
+    }
+
+    if (!openerRef.current) {
+      openerRef.current = document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    }
+    const frame = requestAnimationFrame(() => closeButtonRef.current?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [isOpen]);
 
   const handleClose = () => {
     setIsClosing(true);
@@ -162,13 +201,14 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
 
   const handleCopyCitation = () => {
     if (!fullRecord) return;
-    const text = `${fullRecord.author} (${fullRecord.year}). "${fullRecord.title}". ${fullRecord.pub}. Retrieved from ${window.location.href}`;
+    const recordUrl = canonicalRecordUrl(window.location.href, fullRecord.id);
+    const text = `${fullRecord.author} (${fullRecord.year}). "${fullRecord.title}". ${fullRecord.pub}. Retrieved from ${recordUrl}`;
     navigator.clipboard.writeText(text).then(() => showNotification("Citation copied to clipboard"));
   };
 
   const handleShare = () => {
       if(!record) return;
-      const url = `${window.location.origin}${window.location.pathname}?record=${record.id}`;
+      const url = canonicalRecordUrl(window.location.href, record.id);
       navigator.clipboard.writeText(url).then(() => showNotification("Link copied to clipboard"));
   };
 
@@ -180,7 +220,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
   const youtubeId = (displayRecord.url || '').match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/)?.[2];
 
   return html`
-    <div className="fixed inset-0 z-[80]" role="dialog" aria-modal="true">
+    <div className="fixed inset-0 z-[80]" role="dialog" aria-modal="true" aria-labelledby="record-modal-title">
       <div className=${`fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-stone-800 text-white px-6 py-3 rounded shadow-lg z-[90] transition-all duration-300 flex items-center gap-3 ${showToast ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
         <${CheckCircle} className="w-4 h-4 text-green-400" />
         <span className="text-sm font-bold">${toastMessage}</span>
@@ -192,7 +232,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
       />
 
       <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-6 pointer-events-none">
-        <div className=${`
+        <div ref=${dialogRef} tabIndex="-1" className=${`
           bg-[#fdfbf7] w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl pointer-events-auto 
           border border-stone-200 transform transition-all duration-300
           ${isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}
@@ -210,21 +250,21 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
               `}
             </div>
             <div className="flex items-center gap-2">
-              <button onClick=${handleShare} className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded transition-colors" title="Share Link">
-                <${Share2} className="w-5 h-5" />
+              <button type="button" onClick=${handleShare} className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded transition-colors" style=${{ minWidth: '44px', minHeight: '44px' }} title="Copy canonical record link" aria-label="Copy canonical record link">
+                <${Share2} className="w-5 h-5" aria-hidden="true" />
               </button>
-              <button onClick=${handleCopyCitation} className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded transition-colors" title="Copy citation">
-                <${Quote} className="w-5 h-5" />
+              <button type="button" onClick=${handleCopyCitation} className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded transition-colors" style=${{ minWidth: '44px', minHeight: '44px' }} title="Copy citation" aria-label="Copy citation">
+                <${Quote} className="w-5 h-5" aria-hidden="true" />
               </button>
-              <button onClick=${handleClose} className="p-2 text-stone-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
-                <${X} className="w-6 h-6" />
+              <button ref=${closeButtonRef} type="button" onClick=${handleClose} className="p-2 text-stone-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors" style=${{ minWidth: '44px', minHeight: '44px' }} aria-label="Close record details">
+                <${X} className="w-6 h-6" aria-hidden="true" />
               </button>
             </div>
           </div>
 
           <div className="overflow-y-auto p-6 sm:p-10 font-body leading-relaxed space-y-8">
             <div>
-                <h2 className="text-3xl sm:text-4xl font-display font-bold text-stone-900 mb-2 leading-tight">${displayRecord.title}</h2>
+                <h2 id="record-modal-title" className="text-3xl sm:text-4xl font-display font-bold text-stone-900 mb-2 leading-tight">${displayRecord.title}</h2>
 
                 <!-- Read needsReview from the core record, not displayRecord:
                      details merge ({...record, ...details}) lets a stale

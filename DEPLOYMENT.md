@@ -8,6 +8,7 @@ Upload these files and directories from the repo root:
 
 ```
 index.html                          # Main archive page
+sw.js                               # Root-scope service-worker bridge (loads frontend/sw.js)
 favicon.ico                         # Site favicon
 favicon.svg                         # SVG favicon (referenced by index.html, the FAQ, and both data tools)
 og-image.png                        # Social sharing card (referenced by the OG/Twitter meta tags)
@@ -77,8 +78,9 @@ ADDING-RECORDS.md                   # Instructions for adding new records
 The full-site deploy uploads each standalone `features/*/index.html` only after
 the files in its feature directory and the shared data manifest. This keeps a
 feature's public entry point on the previous release until its JavaScript, CSS,
-and data dependencies are live. The root `index.html`, service worker, and
-`version.json` then retain their existing final three release flips.
+and data dependencies are live. The root `index.html`, implementation worker,
+root-scope worker bridge, and `version.json` then retain their final four
+release flips.
 
 ## Retired routes removed by a full deploy
 
@@ -129,7 +131,7 @@ Other files only change when the site code changes.
 
 ## Version cache busting
 
-Before committing and uploading a release, run `npm run bump-version -- X.X.X` to stamp the `?v=X.X.X` query parameter on versioned JS/CSS references in the root app, FAQ, and standalone feature pages. Commit those stamps with the release so the full-site upload contains them. The command also updates `version.json` and bumps `frontend/sw.js` `CACHE_VERSION` to the same value. The service worker serves static JS cache-first with `ignoreSearch: true`, so a `?v=` bump alone does not invalidate it — only a `CACHE_VERSION` change drops the stale service-worker cache, so returning visitors keep running old JS until it bumps. `tests/version-consistency.test.js` enforces the complete marker surface and cache version stay in lockstep.
+Before committing and uploading a release, run `npm run bump-version -- X.X.X` to stamp the `?v=X.X.X` query parameter on versioned JS/CSS references in the root app, FAQ, and standalone feature pages. Commit those stamps with the release so the full-site upload contains them. The command also updates `version.json` and bumps `frontend/sw.js` `CACHE_VERSION` to the same value. The stable root `sw.js` bridge imports that implementation so it can control the whole archive subtree. The service worker serves static JS cache-first with `ignoreSearch: true`, so a `?v=` bump alone does not invalidate it — only a `CACHE_VERSION` change drops the stale service-worker cache, so returning visitors keep running old JS until it bumps. `tests/version-consistency.test.js` enforces the complete marker surface and cache version stay in lockstep.
 
 ## FTP credentials
 

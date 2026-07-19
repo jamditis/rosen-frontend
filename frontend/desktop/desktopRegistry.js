@@ -1,0 +1,287 @@
+import { ROUTES } from '../services/viewState.js?v=3.7.4';
+
+const APP_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const APP_GROUPS = new Set(['explore', 'research', 'help']);
+const APP_SURFACES = new Set(['desktop', 'start']);
+const AVAILABILITY_STATES = new Set(['ready', 'planned', 'blocked']);
+const LAUNCH_KINDS = new Set(['route', 'shell', 'action']);
+const ROUTE_DESTINATIONS = new Set(Object.values(ROUTES));
+
+const freezeApp = (app) => Object.freeze({
+  ...app,
+  surfaces: Object.freeze([...(app.surfaces || [])]),
+  launch: app.launch ? Object.freeze({ ...app.launch }) : null,
+});
+
+export const DESKTOP_APPS = Object.freeze([
+  {
+    id: 'archive',
+    label: 'Archive',
+    description: 'Search and browse the canonical record collection.',
+    icon: 'archive',
+    group: 'explore',
+    surfaces: ['desktop', 'start'],
+    availability: 'ready',
+    launch: { kind: 'shell', destination: 'archive' },
+  },
+  {
+    id: 'folders',
+    label: 'Folders',
+    description: 'Enter the collection through its thematic folders.',
+    icon: 'folders',
+    group: 'explore',
+    surfaces: ['desktop', 'start'],
+    availability: 'ready',
+    launch: { kind: 'shell', destination: 'folders' },
+  },
+  {
+    id: 'start',
+    label: 'Start here',
+    description: 'Choose a guided path into the archive.',
+    icon: 'start',
+    group: 'explore',
+    surfaces: ['desktop', 'start'],
+    availability: 'ready',
+    launch: { kind: 'route', destination: ROUTES.start },
+  },
+  {
+    id: 'entities',
+    label: 'People & ideas',
+    description: 'Trace people, organizations, concepts, and relationships.',
+    icon: 'entities',
+    group: 'research',
+    surfaces: ['desktop', 'start'],
+    availability: 'ready',
+    launch: { kind: 'shell', destination: 'entities' },
+  },
+  {
+    id: 'dissertation',
+    label: 'Dissertation',
+    description: 'Explore The Impossible Press through its mind map.',
+    icon: 'dissertation',
+    group: 'research',
+    surfaces: ['desktop', 'start'],
+    availability: 'ready',
+    launch: { kind: 'shell', destination: 'dissertation' },
+  },
+  {
+    id: 'analytics',
+    label: 'Analytics',
+    description: 'View patterns across the archive at collection scale.',
+    icon: 'analytics',
+    group: 'research',
+    surfaces: ['desktop', 'start'],
+    availability: 'ready',
+    launch: { kind: 'shell', destination: 'analytics' },
+  },
+  {
+    id: 'tools',
+    label: 'Tools',
+    description: 'Open maintained reading and research tools.',
+    icon: 'tools',
+    group: 'research',
+    surfaces: ['desktop', 'start'],
+    availability: 'ready',
+    launch: { kind: 'shell', destination: 'tools' },
+  },
+  {
+    id: 'about',
+    label: 'About the archive',
+    description: 'Read about the collection, its scope, and its curator.',
+    icon: 'about',
+    group: 'help',
+    surfaces: ['desktop', 'start'],
+    availability: 'ready',
+    launch: { kind: 'route', destination: ROUTES.about },
+  },
+  {
+    id: 'report',
+    label: 'Report a problem',
+    description: 'Tell the curator about a broken link or archive error.',
+    icon: 'report',
+    group: 'help',
+    surfaces: ['desktop', 'start'],
+    availability: 'ready',
+    launch: { kind: 'action', destination: 'report' },
+  },
+  {
+    id: 'readme',
+    label: 'Read me',
+    description: 'Learn what this desktop is and how to move around it.',
+    icon: 'readme',
+    group: 'help',
+    surfaces: ['desktop', 'start'],
+    availability: 'ready',
+    launch: { kind: 'shell', destination: 'readme' },
+  },
+  {
+    id: 'findings',
+    label: 'Selected findings',
+    description: 'An authored trail through real archive records.',
+    icon: 'findings',
+    group: 'explore',
+    surfaces: [],
+    availability: 'planned',
+    availabilityNote: 'Add in Phase 4 with approved copy and canonical record links.',
+    launch: null,
+  },
+  {
+    id: 'method',
+    label: 'The method',
+    description: 'Case studies showing how the archive method works.',
+    icon: 'method',
+    group: 'research',
+    surfaces: [],
+    availability: 'planned',
+    availabilityNote: 'Connect after issue #532 ships a maintained route.',
+    launch: null,
+  },
+  {
+    id: 'participate',
+    label: 'Participate',
+    description: 'Approved ways to support and contribute to the archive.',
+    icon: 'participate',
+    group: 'help',
+    surfaces: [],
+    availability: 'blocked',
+    availabilityNote: 'Issue #347 says DO NOT AUTOMATE and awaits design and scope decisions.',
+    launch: null,
+  },
+  {
+    id: 'making-of',
+    label: 'How it was made',
+    description: 'The curator-approved making-of narrative.',
+    icon: 'making-of',
+    group: 'help',
+    surfaces: [],
+    availability: 'blocked',
+    availabilityNote: 'Connect only after the existing draft receives curator approval.',
+    launch: null,
+  },
+].map(freezeApp));
+
+export const DESKTOP_TOOL_LINKS = Object.freeze([
+  {
+    id: 'dissertation-release',
+    label: 'Dissertation release',
+    description: 'Context, responses, and paths through The Impossible Press.',
+    icon: 'dissertation',
+    href: 'dissertation/',
+    status: 'ready',
+  },
+  {
+    id: 'dissertation-reader',
+    label: 'Dissertation reader',
+    description: 'Read the complete 1986 dissertation with navigation and citations.',
+    icon: 'readme',
+    href: 'dissertation/reader/',
+    status: 'ready',
+  },
+  {
+    id: 'foreword',
+    label: 'Foreword',
+    description: 'Read the foreword to the public dissertation release.',
+    icon: 'readme',
+    href: 'dissertation/foreword/',
+    status: 'ready',
+  },
+  {
+    id: 'network-effect',
+    label: 'Network and public life',
+    description: 'Follow an illustrated path from the film Network to the dissertation.',
+    icon: 'findings',
+    href: 'dissertation/network-effect/',
+    status: 'ready',
+  },
+  {
+    id: 'faq',
+    label: 'Archive FAQ',
+    description: 'Answers about the archive and the dissertation.',
+    icon: 'about',
+    href: 'faq/',
+    status: 'ready',
+  },
+  {
+    id: 'dataviz',
+    label: 'Data visualization',
+    description: 'Filter the archive and inspect charts and collection statistics.',
+    icon: 'analytics',
+    href: 'tools/active/dataviz/dataviz.html',
+    status: 'beta',
+  },
+].map((tool) => Object.freeze({ ...tool })));
+
+export function validateDesktopRegistry(registry) {
+  if (!Array.isArray(registry) || registry.length === 0) {
+    throw new TypeError('Desktop app registry must be a non-empty array');
+  }
+
+  const ids = new Set();
+  for (const app of registry) {
+    if (!APP_ID_PATTERN.test(app?.id || '')) {
+      throw new TypeError(`Invalid desktop app id: ${app?.id || '(missing)'}`);
+    }
+    if (ids.has(app.id)) {
+      throw new TypeError(`Duplicate desktop app id: ${app.id}`);
+    }
+    ids.add(app.id);
+
+    if (typeof app.label !== 'string' || app.label.trim() === '') {
+      throw new TypeError(`Desktop app ${app.id} needs a label`);
+    }
+    if (typeof app.description !== 'string' || app.description.trim() === '') {
+      throw new TypeError(`Desktop app ${app.id} needs a description`);
+    }
+    if (typeof app.icon !== 'string' || app.icon.trim() === '') {
+      throw new TypeError(`Desktop app ${app.id} needs an icon key`);
+    }
+    if (!APP_GROUPS.has(app.group)) {
+      throw new TypeError(`Desktop app ${app.id} has an unknown group`);
+    }
+    if (!AVAILABILITY_STATES.has(app.availability)) {
+      throw new TypeError(`Desktop app ${app.id} has an unknown availability state`);
+    }
+    if (!Array.isArray(app.surfaces) || app.surfaces.some((surface) => !APP_SURFACES.has(surface))) {
+      throw new TypeError(`Desktop app ${app.id} has an invalid surface`);
+    }
+    if (new Set(app.surfaces).size !== app.surfaces.length) {
+      throw new TypeError(`Desktop app ${app.id} repeats a surface`);
+    }
+
+    if (app.availability !== 'ready') {
+      if (app.surfaces.length > 0 || app.launch !== null) {
+        throw new TypeError(`Unavailable desktop app ${app.id} must not be actionable`);
+      }
+      if (typeof app.availabilityNote !== 'string' || app.availabilityNote.trim() === '') {
+        throw new TypeError(`Unavailable desktop app ${app.id} needs a dependency note`);
+      }
+      continue;
+    }
+
+    if (app.surfaces.length === 0) {
+      throw new TypeError(`Ready desktop app ${app.id} needs a surface`);
+    }
+    if (!app.launch || !LAUNCH_KINDS.has(app.launch.kind)) {
+      throw new TypeError(`Ready desktop app ${app.id} has an invalid launch kind`);
+    }
+    if (app.launch.kind === 'route' && (
+      !ROUTE_DESTINATIONS.has(app.launch.destination) || app.launch.destination === ROUTES.desktop
+    )) {
+      throw new TypeError(`Desktop app ${app.id} has an unknown route destination`);
+    }
+    if (app.launch.kind === 'shell' && app.launch.destination !== app.id) {
+      throw new TypeError(`Desktop app ${app.id} must use its id as the shell destination`);
+    }
+    if (app.launch.kind === 'action' && app.launch.destination !== 'report') {
+      throw new TypeError(`Desktop app ${app.id} has an unknown action destination`);
+    }
+  }
+
+  return true;
+}
+
+validateDesktopRegistry(DESKTOP_APPS);
+
+export const getReadyDesktopApps = () => DESKTOP_APPS.filter((app) => app.availability === 'ready');
+
+export const getDesktopApp = (id) => DESKTOP_APPS.find((app) => app.id === id) || null;

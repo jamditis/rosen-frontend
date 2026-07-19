@@ -19,6 +19,8 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
   const [displayNode, setDisplayNode] = useState(node);
   const panelRef = useRef(null);
   const closeButtonRef = useRef(null);
+  const returnFocusRef = useRef(null);
+  const wasOpenRef = useRef(false);
 
   useEffect(() => {
     if (node) {
@@ -29,12 +31,24 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
 
   // Focus management: focus close button when panel opens
   useEffect(() => {
-    if (isOpen && closeButtonRef.current) {
-      // Small delay to ensure animation has started
-      setTimeout(() => {
+    if (isOpen) {
+      if (!wasOpenRef.current) returnFocusRef.current = document.activeElement;
+      wasOpenRef.current = true;
+      // Small delay to ensure animation has started.
+      const timer = setTimeout(() => {
         closeButtonRef.current?.focus();
       }, 100);
+      return () => clearTimeout(timer);
     }
+
+    if (wasOpenRef.current) {
+      wasOpenRef.current = false;
+      const trigger = returnFocusRef.current;
+      returnFocusRef.current = null;
+      requestAnimationFrame(() => trigger?.focus?.({ preventScroll: true }));
+    }
+
+    return undefined;
   }, [isOpen]);
 
   // Handle ESC key to close panel
@@ -58,6 +72,7 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
     ${isOpen && html`
       <div
         className="fixed inset-0 bg-black/20 z-40 sm:hidden"
+        style=${{ zIndex: 70 }}
         onClick=${onClose}
       />
     `}
@@ -72,13 +87,14 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
         shadow-xl z-50 transform transition-transform duration-300 ease-out
         ${isOpen ? 'right-0' : '-right-full sm:-right-[420px]'}
       `}
-      style=${{ maxWidth: 'calc(100vw - 16px)' }}
+      style=${{ maxWidth: 'calc(100vw - 16px)', zIndex: 80 }}
     >
       <div className="sticky top-0 bg-white border-b border-stone-200 px-4 sm:px-6 py-4 flex items-center justify-between">
         <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400">
           ${TYPE_LABELS[displayNode.type] || 'Section'}
         </span>
         <button
+          type="button"
           ref=${closeButtonRef}
           onClick=${onClose}
           className="p-2.5 sm:p-1.5 hover:bg-stone-100 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"

@@ -74,9 +74,10 @@ describe('service worker request classification (#274)', () => {
     assert.equal(sandbox.isStaticAsset(`${BASE}/index.html`), false);
   });
 
-  it('still treats versioned JS and CSS as static assets', () => {
+  it('still treats versioned JS, CSS, and the self-hosted query runtime as static assets', () => {
     assert.equal(sandbox.isStaticAsset(`${BASE}/frontend/App.js`), true);
     assert.equal(sandbox.isStaticAsset(`${BASE}/frontend/dist/tailwind.css`), true);
+    assert.equal(sandbox.isStaticAsset(`${BASE}/frontend/vendor/sql-wasm-1.10.3.wasm`), true);
   });
 
   it('treats a top-level navigation as an HTML request', () => {
@@ -130,6 +131,14 @@ describe('service worker install precache (#274)', () => {
     assert.ok(added.some(u => /\/index\.html$/.test(u)), 'index.html missing from precache');
     assert.ok(added.some(u => /\/index\.js$/.test(u)), 'index.js missing from precache');
   });
+
+  it('pre-caches the real document root in local preview', async () => {
+    const { handlers, added } = loadSW('127.0.0.1');
+    await runInstall(handlers);
+    assert.ok(added.includes('/'), 'local site root missing from precache');
+    assert.ok(added.includes('/index.html'), 'local root index missing from precache');
+    assert.ok(!added.includes('/frontend/index.html'), 'nonexistent frontend index must not be cached');
+  });
 });
 
 describe('service worker safePut (#274)', () => {
@@ -164,5 +173,11 @@ describe('service worker structure (#274)', () => {
 
   it('routes HTML/navigation requests to networkFirst in the fetch handler', () => {
     assert.match(SW_SRC, /isHtmlRequest\([^)]*\)[\s\S]{0,80}networkFirst/);
+  });
+
+  it('falls back from query-string navigations to the cached app root', () => {
+    const networkFirstSource = SW_SRC.slice(SW_SRC.indexOf('async function networkFirst'));
+    assert.match(networkFirstSource, /request\.mode === 'navigate'/);
+    assert.match(networkFirstSource, /cache\.match\(`\$\{SITE_ROOT\}\/`\)/);
   });
 });

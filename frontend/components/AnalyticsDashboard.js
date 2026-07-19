@@ -28,7 +28,7 @@ import QueryBuilder from './QueryBuilder.js?v=3.7.5';
 
 // Simple bar chart component
 const BarChart = ({ data, labelKey, valueKey, maxBars = 10, color = '#1c1917' }) => {
-  if (!data || data.length === 0) return html`<p className="text-stone-400 text-sm">No data available</p>`;
+  if (!data || data.length === 0) return html`<p className="text-stone-600 text-sm">No data available</p>`;
 
   const displayData = data.slice(0, maxBars);
   const maxValue = Math.max(...displayData.map(d => d[valueKey]));
@@ -71,14 +71,14 @@ const StatCard = ({ icon: Icon, label, value, sublabel }) => html`
       <div className="p-2 bg-stone-100 rounded">
         <${Icon} className="w-4 h-4 text-stone-600" />
       </div>
-      <span className="text-xs uppercase tracking-wider text-stone-400 font-bold">${label}</span>
+      <span className="text-xs uppercase tracking-wider text-stone-600 font-bold">${label}</span>
     </div>
     <div className="text-2xl font-bold text-stone-900">${value}</div>
     ${sublabel && html`<div className="text-xs text-stone-500 mt-1">${sublabel}</div>`}
   </div>
 `;
 
-const AnalyticsDashboard = ({ onBack, onRecordResults }) => {
+const AnalyticsDashboard = ({ onBack, onRecordResults, embedded = false }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState(null);
@@ -143,14 +143,16 @@ const AnalyticsDashboard = ({ onBack, onRecordResults }) => {
   };
 
   return html`
-    <div className="min-h-screen bg-[#fdfbf7]">
-      <header className="sticky top-0 z-50 bg-paper border-b border-stone-300 shadow-sm">
+    <div className=${embedded ? 'desktop-analytics-surface' : 'min-h-screen bg-[#fdfbf7]'}>
+      ${!embedded && html`<header className="sticky top-0 z-50 bg-paper border-b border-stone-300 shadow-sm">
         <div className="container mx-auto px-4 h-16 flex items-center">
           <button
+            type="button"
+            aria-label="Return to archive"
             onClick=${onBack}
             className="flex items-center gap-2 text-stone-600 hover:text-stone-900 transition-colors mr-4"
           >
-            <${ArrowLeft} className="w-5 h-5" />
+            <${ArrowLeft} className="w-5 h-5" aria-hidden="true" />
             <span className="text-sm font-bold hidden sm:inline">Archive</span>
           </button>
           <div className="flex items-center gap-3">
@@ -163,9 +165,9 @@ const AnalyticsDashboard = ({ onBack, onRecordResults }) => {
             </div>
           </div>
         </div>
-      </header>
+      </header>`}
 
-      <div className="container mx-auto px-4 py-6">
+      <div className=${embedded ? 'desktop-analytics-content' : 'container mx-auto px-4 py-6'}>
         ${loading && html`
           <div className="flex flex-col items-center justify-center h-64">
             <${Loader2} className="w-8 h-8 text-stone-400 animate-spin mb-4" />
@@ -178,6 +180,7 @@ const AnalyticsDashboard = ({ onBack, onRecordResults }) => {
             <p className="text-red-700 font-bold mb-2">Error loading analytics</p>
             <p className="text-red-600 text-sm">${error}</p>
             <button
+              type="button"
               onClick=${() => window.location.reload()}
               className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
             >
@@ -190,7 +193,7 @@ const AnalyticsDashboard = ({ onBack, onRecordResults }) => {
           <div className="space-y-8">
             <!-- Summary Stats -->
             <section>
-              <h3 className="text-sm uppercase tracking-wider text-stone-400 font-bold mb-4 flex items-center gap-2">
+              <h3 className="text-sm uppercase tracking-wider text-stone-600 font-bold mb-4 flex items-center gap-2">
                 <${Database} className="w-4 h-4" /> Database overview
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -220,28 +223,28 @@ const AnalyticsDashboard = ({ onBack, onRecordResults }) => {
             <!-- Charts Grid -->
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <section className="bg-white border border-stone-200 rounded-lg p-4">
-                <h3 className="text-sm uppercase tracking-wider text-stone-400 font-bold mb-4 flex items-center gap-2">
+                <h3 className="text-sm uppercase tracking-wider text-stone-600 font-bold mb-4 flex items-center gap-2">
                   <${Calendar} className="w-4 h-4" /> Records by era
                 </h3>
                 <${BarChart} data=${byEra} labelKey="era" valueKey="count" color="#059669" />
               </section>
 
               <section className="bg-white border border-stone-200 rounded-lg p-4">
-                <h3 className="text-sm uppercase tracking-wider text-stone-400 font-bold mb-4 flex items-center gap-2">
+                <h3 className="text-sm uppercase tracking-wider text-stone-600 font-bold mb-4 flex items-center gap-2">
                   <${Tag} className="w-4 h-4" /> Top categories
                 </h3>
                 <${BarChart} data=${byCategory} labelKey="category" valueKey="count" color="#0284c7" />
               </section>
 
               <section className="bg-white border border-stone-200 rounded-lg p-4">
-                <h3 className="text-sm uppercase tracking-wider text-stone-400 font-bold mb-4 flex items-center gap-2">
+                <h3 className="text-sm uppercase tracking-wider text-stone-600 font-bold mb-4 flex items-center gap-2">
                   <${Users} className="w-4 h-4" /> Most mentioned people
                 </h3>
                 <${BarChart} data=${topPeople} labelKey="name" valueKey="mentions" color="#7c3aed" />
               </section>
 
               <section className="bg-white border border-stone-200 rounded-lg p-4">
-                <h3 className="text-sm uppercase tracking-wider text-stone-400 font-bold mb-4 flex items-center gap-2">
+                <h3 className="text-sm uppercase tracking-wider text-stone-600 font-bold mb-4 flex items-center gap-2">
                   <${TrendingUp} className="w-4 h-4" /> Most common concepts
                 </h3>
                 <${BarChart} data=${topConcepts} labelKey="concept" valueKey="count" color="#dc2626" />
@@ -250,7 +253,7 @@ const AnalyticsDashboard = ({ onBack, onRecordResults }) => {
 
             <!-- Records by Year -->
             <section className="bg-white border border-stone-200 rounded-lg p-4">
-              <h3 className="text-sm uppercase tracking-wider text-stone-400 font-bold mb-4 flex items-center gap-2">
+              <h3 className="text-sm uppercase tracking-wider text-stone-600 font-bold mb-4 flex items-center gap-2">
                 <${Calendar} className="w-4 h-4" /> Output by year
               </h3>
               <div className="overflow-x-auto">
@@ -260,7 +263,7 @@ const AnalyticsDashboard = ({ onBack, onRecordResults }) => {
 
             <!-- Category Co-occurrence -->
             <section className="bg-white border border-stone-200 rounded-lg p-4">
-              <h3 className="text-sm uppercase tracking-wider text-stone-400 font-bold mb-4">
+              <h3 className="text-sm uppercase tracking-wider text-stone-600 font-bold mb-4">
                 Categories that appear together
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -277,7 +280,7 @@ const AnalyticsDashboard = ({ onBack, onRecordResults }) => {
 
             <!-- Query Builder -->
             <section className="bg-gradient-to-br from-stone-50 to-amber-50 border-2 border-stone-200 rounded-lg p-6">
-              <h3 className="text-sm uppercase tracking-wider text-stone-500 font-bold mb-4 flex items-center gap-2">
+              <h3 className="text-sm uppercase tracking-wider text-stone-600 font-bold mb-4 flex items-center gap-2">
                 <${Database} className="w-4 h-4" /> Query builder
                 <span className="ml-2 px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full font-normal normal-case">No SQL knowledge required!</span>
               </h3>
@@ -301,6 +304,7 @@ const AnalyticsDashboard = ({ onBack, onRecordResults }) => {
                 />
                 <div className="flex items-center gap-4">
                   <button
+                    type="button"
                     onClick=${runCustomQuery}
                     disabled=${sqlLoading}
                     className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors font-bold text-sm flex items-center gap-2 disabled:opacity-60"
@@ -309,7 +313,7 @@ const AnalyticsDashboard = ({ onBack, onRecordResults }) => {
                       ? html`<${Loader2} className="w-4 h-4 animate-spin" /> Loading database...`
                       : html`<${RefreshCw} className="w-4 h-4" /> Run Query`}
                   </button>
-                  <span className="text-xs text-stone-500">
+                  <span className="text-xs text-stone-300">
                     ${sqlLoading
                       ? 'First query loads the full archive into SQLite (~28MB, one time)'
                       : 'Tables: records, record_categories, record_concepts, entities, record_entities'}
@@ -336,11 +340,12 @@ const AnalyticsDashboard = ({ onBack, onRecordResults }) => {
 
             <!-- Example Queries -->
             <section className="bg-stone-50 border border-stone-200 rounded-lg p-4">
-              <h3 className="text-sm uppercase tracking-wider text-stone-400 font-bold mb-4">
+              <h3 className="text-sm uppercase tracking-wider text-stone-600 font-bold mb-4">
                 Example queries to try
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <button
+                  type="button"
                   onClick=${() => setCustomQuery("SELECT pub, COUNT(*) as count FROM records GROUP BY pub ORDER BY count DESC LIMIT 15")}
                   className="text-left p-3 bg-white rounded border border-stone-200 hover:border-stone-400 transition-colors"
                 >
@@ -348,6 +353,7 @@ const AnalyticsDashboard = ({ onBack, onRecordResults }) => {
                   <p className="text-stone-500 mt-1">Which outlets has Jay written for most?</p>
                 </button>
                 <button
+                  type="button"
                   onClick=${() => setCustomQuery("SELECT year, type, COUNT(*) as count FROM records GROUP BY year, type ORDER BY year DESC")}
                   className="text-left p-3 bg-white rounded border border-stone-200 hover:border-stone-400 transition-colors"
                 >
@@ -355,6 +361,7 @@ const AnalyticsDashboard = ({ onBack, onRecordResults }) => {
                   <p className="text-stone-500 mt-1">Compare output types over time</p>
                 </button>
                 <button
+                  type="button"
                   onClick=${() => setCustomQuery("SELECT e.name, e.type, COUNT(*) as mentions FROM entities e JOIN record_entities re ON e.id = re.entity_id WHERE e.type = 'Organization' GROUP BY e.id ORDER BY mentions DESC LIMIT 15")}
                   className="text-left p-3 bg-white rounded border border-stone-200 hover:border-stone-400 transition-colors"
                 >
@@ -362,6 +369,7 @@ const AnalyticsDashboard = ({ onBack, onRecordResults }) => {
                   <p className="text-stone-500 mt-1">Most mentioned organizations</p>
                 </button>
                 <button
+                  type="button"
                   onClick=${() => setCustomQuery("SELECT title, date, pub FROM records WHERE title LIKE '%Trump%' ORDER BY date DESC LIMIT 20")}
                   className="text-left p-3 bg-white rounded border border-stone-200 hover:border-stone-400 transition-colors"
                 >

@@ -64,6 +64,7 @@ describe('index.html import map', () => {
 
 describe('App.js record-modal view transition (#281)', () => {
   const src = fs.readFileSync(path.join(frontendDir, 'App.js'), 'utf-8');
+  const resultsSrc = fs.readFileSync(path.join(frontendDir, 'components', 'ArchiveResults.js'), 'utf-8');
 
   it('imports the versioned helper', () => {
     assert.match(src, /from '\.\/utils\/viewTransition\.js\?v=\d+\.\d+\.\d+'/);
@@ -75,7 +76,8 @@ describe('App.js record-modal view transition (#281)', () => {
   });
 
   it('opens the modal via selectRecord on a grid card click', () => {
-    assert.match(src, /onClick=\$\{\(\) => selectRecord\(item\.id\)\}/);
+    assert.match(src, /<\$\{ArchiveResults\}[\s\S]*?onSelectRecord=\$\{selectRecord\}/);
+    assert.match(resultsSrc, /onSelectRecord\(recordId\)/);
   });
 
   it('routes every record-select path (entity browser, in-modal links) through selectRecord', () => {

@@ -62,6 +62,18 @@ describe('parseViewState', () => {
     assert.deepEqual(state.routeParams, { wikiSlug: 'concept/public-journalism' });
   });
 
+  it('parses a desktop app deep link without treating it as a second route', () => {
+    const state = parseViewState('https://example.com/archive/#desktop/tools');
+    assert.equal(state.route, ROUTES.desktop);
+    assert.deepEqual(state.routeParams, { desktopAppId: 'tools' });
+  });
+
+  it('keeps an unknown safe desktop app id for the shell fallback', () => {
+    const state = parseViewState('https://example.com/archive/#desktop/not-real');
+    assert.equal(state.route, ROUTES.desktop);
+    assert.deepEqual(state.routeParams, { desktopAppId: 'not-real' });
+  });
+
   it('falls back to the default route for an unknown hash', () => {
     assert.strictEqual(parseViewState(`${BASE}#bogus`).route, DEFAULT_ROUTE);
   });
@@ -115,6 +127,13 @@ describe('viewStateToUrl', () => {
     assert.strictEqual(
       viewStateToUrl({ route: ROUTES.wiki, routeParams: { wikiSlug: 'concept/public-journalism' } }, BASE),
       `${BASE}#wiki/concept/public-journalism`
+    );
+  });
+
+  it('emits a nested desktop app id when one is active', () => {
+    assert.strictEqual(
+      viewStateToUrl({ route: ROUTES.desktop, routeParams: { desktopAppId: 'readme' } }, BASE),
+      `${BASE}#desktop/readme`
     );
   });
 
@@ -180,6 +199,12 @@ describe('round-trip', () => {
     'Start Here route': {
       route: ROUTES.start,
       routeParams: {},
+      filters: defaultFilters(),
+      selectedRecord: null,
+    },
+    'desktop tool window': {
+      route: ROUTES.desktop,
+      routeParams: { desktopAppId: 'tools' },
       filters: defaultFilters(),
       selectedRecord: null,
     },

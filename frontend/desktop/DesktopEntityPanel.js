@@ -1,0 +1,33 @@
+import { html } from '../html.js?v=3.7.4';
+import EntityBrowser from '../components/EntityBrowser.js?v=3.7.4';
+
+const DesktopEntityPanel = ({
+  records,
+  queryActive,
+  onSelectRecord,
+  onOpenStandard,
+}) => html`
+  <div className="desktop-entity-panel">
+    <header className="desktop-archive-heading">
+      <div>
+        <p className="desktop-eyebrow">People and ideas</p>
+        <h3>Trace the archive's relationships</h3>
+        <p>
+          Explore the canonical entity index, then open any connected record without leaving the desktop.
+        </p>
+      </div>
+      <button type="button" className="desktop-standard-link" onClick=${onOpenStandard}>
+        Open standard view
+      </button>
+    </header>
+    <div className="desktop-entity-browser">
+      <${EntityBrowser}
+        records=${records}
+        queryActive=${queryActive}
+        onSelectRecord=${onSelectRecord}
+      />
+    </div>
+  </div>
+`;
+
+export default DesktopEntityPanel;

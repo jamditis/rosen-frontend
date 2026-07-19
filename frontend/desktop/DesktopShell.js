@@ -1,0 +1,545 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { html } from '../html.js?v=3.7.4';
+import {
+  AlertTriangle,
+  Archive,
+  ArrowLeft,
+  BarChart3,
+  BookOpen,
+  Compass,
+  ExternalLink,
+  FileQuestion,
+  FileText,
+  FolderOpen,
+  Info,
+  Library,
+  Menu,
+  Network,
+  Search,
+  Sparkles,
+  Users,
+  Wrench,
+  X,
+} from 'lucide-react';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.7.4';
+import DesktopArchivePanel from './DesktopArchivePanel.js?v=3.7.4';
+import DesktopAnalyticsPanel from './DesktopAnalyticsPanel.js?v=3.7.4';
+import DesktopDissertationPanel from './DesktopDissertationPanel.js?v=3.7.4';
+import DesktopEntityPanel from './DesktopEntityPanel.js?v=3.7.4';
+import {
+  DESKTOP_APPS,
+  DESKTOP_TOOL_LINKS,
+  getDesktopApp,
+  getReadyDesktopApps,
+} from './desktopRegistry.js?v=3.7.4';
+
+const ICONS = {
+  archive: Archive,
+  folders: FolderOpen,
+  start: Compass,
+  entities: Network,
+  dissertation: BookOpen,
+  analytics: BarChart3,
+  tools: Wrench,
+  about: Info,
+  report: AlertTriangle,
+  readme: FileText,
+  findings: Sparkles,
+  method: Search,
+  participate: Users,
+  'making-of': Library,
+};
+
+const iconFor = (key, className = 'desktop-icon-svg') => {
+  const Icon = ICONS[key] || FileQuestion;
+  return html`<${Icon} className=${className} aria-hidden="true" />`;
+};
+
+const launchModeLabel = (app) => {
+  if (app.launch.kind === 'shell') return 'Desktop window';
+  if (app.launch.kind === 'action') return 'Opens dialog';
+  return 'Standard view';
+};
+
+const DesktopShell = ({
+  activeAppId = null,
+  onSelectApp,
+  onNavigate,
+  onOpenBugReport,
+  onExit,
+  archiveView,
+  analyticsView,
+  dissertationView,
+  entityView,
+}) => {
+  const readyApps = useMemo(() => getReadyDesktopApps(), []);
+  const plannedApps = useMemo(
+    () => DESKTOP_APPS.filter((app) => app.availability !== 'ready'),
+    [],
+  );
+  const activeApp = activeAppId ? getDesktopApp(activeAppId) : null;
+  const shellApp = activeApp?.availability === 'ready' && activeApp.launch.kind === 'shell'
+    ? activeApp
+    : null;
+  const hasUnknownApp = Boolean(activeAppId && !shellApp);
+
+  const [shortcutFocusIndex, setShortcutFocusIndex] = useState(0);
+  const [startOpen, setStartOpen] = useState(false);
+  const [statusMessage, setStatusMessage] = useState(
+    hasUnknownApp ? 'That desktop item is unavailable. Showing the desktop home.' : '',
+  );
+
+  const desktopTitleRef = useRef(null);
+  const windowTitleRef = useRef(null);
+  const shortcutRefs = useRef([]);
+  const startButtonRef = useRef(null);
+  const startMenuRef = useRef(null);
+  const menuItemRefs = useRef([]);
+  const lastShellAppRef = useRef(null);
+
+  useEffect(() => {
+    const stylesheetId = 'archive-desktop-styles';
+    if (document.getElementById(stylesheetId)) return undefined;
+
+    const link = document.createElement('link');
+    link.id = stylesheetId;
+    link.rel = 'stylesheet';
+    link.href = resolveSitePath('frontend/desktop/desktop.css?v=3.7.4');
+    link.addEventListener('error', () => {
+      setStatusMessage('Desktop styling could not load. All destinations remain available.');
+    }, { once: true });
+    document.head.appendChild(link);
+
+    return undefined;
+  }, []);
+
+  useEffect(() => {
+    // Registration happens after the first document load. Asking the active
+    // root worker to warm this optional module graph means even a first-ever
+    // direct desktop visit is available on the next offline load, while a
+    // standard archive visitor never downloads desktop-only assets.
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready
+        .then((registration) => registration.active?.postMessage({ action: 'cacheDesktop' }))
+        .catch(() => {});
+    }
+    return undefined;
+  }, []);
+
+  useEffect(() => {
+    if (shellApp) {
+      lastShellAppRef.current = shellApp.id;
+      windowTitleRef.current?.focus({ preventScroll: true });
+      return;
+    }
+
+    if (activeAppId) {
+      setStatusMessage('That desktop item is unavailable. Showing the desktop home.');
+      windowTitleRef.current?.focus({ preventScroll: true });
+      return;
+    }
+
+    if (lastShellAppRef.current) {
+      const index = readyApps.findIndex((app) => app.id === lastShellAppRef.current);
+      if (index >= 0) {
+        setShortcutFocusIndex(index);
+        shortcutRefs.current[index]?.focus({ preventScroll: true });
+      }
+      lastShellAppRef.current = null;
+      return;
+    }
+
+    desktopTitleRef.current?.focus({ preventScroll: true });
+  }, [activeAppId, shellApp, readyApps]);
+
+  useEffect(() => {
+    if (!startOpen) return undefined;
+    const frame = requestAnimationFrame(() => menuItemRefs.current[0]?.focus());
+
+    const closeFromOutside = (event) => {
+      if (
+        !startMenuRef.current?.contains(event.target)
+        && !startButtonRef.current?.contains(event.target)
+      ) {
+        setStartOpen(false);
+      }
+    };
+    document.addEventListener('pointerdown', closeFromOutside);
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener('pointerdown', closeFromOutside);
+    };
+  }, [startOpen]);
+
+  const openApp = (app) => {
+    const index = readyApps.findIndex((candidate) => candidate.id === app.id);
+    if (index >= 0) setShortcutFocusIndex(index);
+    setStartOpen(false);
+
+    if (app.launch.kind === 'shell') {
+      setStatusMessage(`Opening ${app.label}.`);
+      onSelectApp?.(app.launch.destination);
+      return;
+    }
+    if (app.launch.kind === 'action') {
+      setStatusMessage('Opening the archive problem report.');
+      onOpenBugReport?.();
+      return;
+    }
+
+    setStatusMessage(`${app.label} opens in the standard archive view.`);
+    onNavigate?.(app.launch.destination);
+  };
+
+  const moveShortcutFocus = (nextIndex) => {
+    const clamped = Math.max(0, Math.min(readyApps.length - 1, nextIndex));
+    setShortcutFocusIndex(clamped);
+    shortcutRefs.current[clamped]?.focus();
+  };
+
+  const handleShortcutKeyDown = (event, app, index) => {
+    const columns = 2;
+    let nextIndex = index;
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      openApp(app);
+      return;
+    }
+    if (event.key === 'ArrowLeft') nextIndex = index - 1;
+    else if (event.key === 'ArrowRight') nextIndex = index + 1;
+    else if (event.key === 'ArrowUp') nextIndex = index - columns;
+    else if (event.key === 'ArrowDown') nextIndex = index + columns;
+    else if (event.key === 'Home') nextIndex = 0;
+    else if (event.key === 'End') nextIndex = readyApps.length - 1;
+    else return;
+
+    event.preventDefault();
+    moveShortcutFocus(nextIndex);
+  };
+
+  const menuEntryCount = readyApps.length + 1;
+  const handleMenuKeyDown = (event, index) => {
+    let nextIndex = index;
+    if (event.key === 'ArrowDown') nextIndex = (index + 1) % menuEntryCount;
+    else if (event.key === 'ArrowUp') nextIndex = (index - 1 + menuEntryCount) % menuEntryCount;
+    else if (event.key === 'Home') nextIndex = 0;
+    else if (event.key === 'End') nextIndex = menuEntryCount - 1;
+    else if (event.key === 'Escape') {
+      event.preventDefault();
+      setStartOpen(false);
+      startButtonRef.current?.focus();
+      return;
+    } else if (event.key === 'Tab') {
+      setStartOpen(false);
+      return;
+    } else {
+      return;
+    }
+
+    event.preventDefault();
+    menuItemRefs.current[nextIndex]?.focus();
+  };
+
+  const closeWindow = () => {
+    setStatusMessage(`Closed ${shellApp?.label || 'the unavailable item'}.`);
+    onSelectApp?.(null);
+  };
+
+  const renderWelcome = () => html`
+    <div className="desktop-document">
+      ${hasUnknownApp && html`
+        <div className="desktop-notice" role="status">
+          <${AlertTriangle} className="desktop-inline-icon" aria-hidden="true" />
+          <span>That desktop item is unavailable. Showing the desktop home.</span>
+        </div>
+      `}
+      <p className="desktop-eyebrow">A second front door</p>
+      <h3>Welcome to the archive desktop</h3>
+      <p className="desktop-lede">
+        This optional view arranges the same Rosen Archive as shortcuts, folders, and windows. It is a map of the collection, not a separate copy of it.
+      </p>
+      <div className="desktop-principles">
+        <article>
+          <span className="desktop-principle-number">01</span>
+          <h4>Choose a path</h4>
+          <p>Open a shortcut once, or use Start for the complete destination list.</p>
+        </article>
+        <article>
+          <span className="desktop-principle-number">02</span>
+          <h4>Keep canonical links</h4>
+          <p>Archive records and research areas open in their maintained standard routes.</p>
+        </article>
+        <article>
+          <span className="desktop-principle-number">03</span>
+          <h4>Leave at any time</h4>
+          <p>The taskbar always provides a direct route back to the standard archive.</p>
+        </article>
+      </div>
+    </div>
+  `;
+
+  const renderReadme = () => html`
+    <div className="desktop-document">
+      <p className="desktop-eyebrow">Read me</p>
+      <h3>A familiar shape for a large archive</h3>
+      <p className="desktop-lede">
+        Personal-computing and early-web history overlap with many of the archive's questions about publishing, publics, platforms, and control. This shell uses that history to make routes visible and the collection feel containable.
+      </p>
+
+      <dl className="desktop-definition-list">
+        <div><dt>Shortcut</dt><dd>A maintained way into the collection. One click is enough.</dd></div>
+        <div><dt>Desktop window</dt><dd>Orientation or tool content that stays inside this shell.</dd></div>
+        <div><dt>Standard view</dt><dd>The existing canonical archive route, with its full current behavior.</dd></div>
+        <div><dt>Start</dt><dd>The complete list of destinations and the dependable way out.</dd></div>
+      </dl>
+
+      <section aria-labelledby="future-connections-title" className="desktop-future-section">
+        <h4 id="future-connections-title">Future connections</h4>
+        <p>These destinations stay non-actionable until their real content and approvals exist.</p>
+        <ul>
+          ${plannedApps.map((app) => html`
+            <li key=${app.id}>
+              <span>${app.label}</span>
+              <small>${app.availability === 'blocked' ? 'Awaiting approval or dependency' : 'Planned for a later phase'}</small>
+            </li>
+          `)}
+        </ul>
+      </section>
+    </div>
+  `;
+
+  const renderTools = () => html`
+    <div className="desktop-document">
+      <p className="desktop-eyebrow">Maintained tools</p>
+      <h3>Reading and research tools</h3>
+      <p className="desktop-lede">
+        These pages are maintained alongside the archive. Each opens as its own full page and keeps a route back to the collection.
+      </p>
+      <div className="desktop-tool-grid">
+        ${DESKTOP_TOOL_LINKS.map((tool) => html`
+          <a
+            key=${tool.id}
+            className="desktop-tool-link"
+            href=${resolveSitePath(tool.href)}
+            aria-label=${`${tool.label}. Opens a standalone archive page.`}
+          >
+            <span className="desktop-tool-icon">${iconFor(tool.icon)}</span>
+            <span className="desktop-tool-copy">
+              <strong>${tool.label}</strong>
+              <small>${tool.description}</small>
+              <span className="desktop-tool-mode">
+                Open page <${ExternalLink} className="desktop-external-icon" aria-hidden="true" />
+                ${tool.status === 'beta' ? html`<em>Beta</em>` : ''}
+              </span>
+            </span>
+          </a>
+        `)}
+      </div>
+    </div>
+  `;
+
+  const renderArchive = () => html`
+    <${DesktopArchivePanel}
+      viewMode=${archiveView.viewMode}
+      loading=${archiveView.loading}
+      error=${archiveView.error}
+      filters=${archiveView.filters}
+      setFilters=${archiveView.setFilters}
+      facets=${archiveView.facets}
+      autocompleteIndex=${archiveView.autocompleteIndex}
+      sortBy=${archiveView.sortBy}
+      setSortBy=${archiveView.setSortBy}
+      filteredRecords=${archiveView.filteredRecords}
+      paginatedRecords=${archiveView.paginatedRecords}
+      folderGroups=${archiveView.folderGroups}
+      currentPage=${archiveView.currentPage}
+      totalPages=${archiveView.totalPages}
+      activeFilterCount=${archiveView.activeFilterCount}
+      onSetViewMode=${archiveView.onSetViewMode}
+      onSelectRecord=${archiveView.onSelectRecord}
+      onOpenFolder=${archiveView.onOpenFolder}
+      onPageChange=${archiveView.onPageChange}
+      onClearFilters=${archiveView.onClearFilters}
+      onOpenStandard=${archiveView.onOpenStandard}
+    />
+  `;
+
+  const renderEntities = () => html`
+    <${DesktopEntityPanel}
+      records=${entityView.records}
+      queryActive=${entityView.queryActive}
+      onSelectRecord=${entityView.onSelectRecord}
+      onOpenStandard=${entityView.onOpenStandard}
+    />
+  `;
+
+  const renderDissertation = () => html`
+    <${DesktopDissertationPanel}
+      onOpenStandard=${dissertationView.onOpenStandard}
+    />
+  `;
+
+  const renderAnalytics = () => html`
+    <${DesktopAnalyticsPanel}
+      onRecordResults=${analyticsView.onRecordResults}
+      onOpenStandard=${analyticsView.onOpenStandard}
+    />
+  `;
+
+  const windowTitle = shellApp?.label || 'Archive desktop';
+  let windowContent = renderWelcome();
+  if (shellApp?.id === 'archive' || shellApp?.id === 'folders') windowContent = renderArchive();
+  else if (shellApp?.id === 'entities') windowContent = renderEntities();
+  else if (shellApp?.id === 'dissertation') windowContent = renderDissertation();
+  else if (shellApp?.id === 'analytics') windowContent = renderAnalytics();
+  else if (shellApp?.id === 'readme') windowContent = renderReadme();
+  else if (shellApp?.id === 'tools') windowContent = renderTools();
+  const isWideWindow = ['archive', 'folders', 'entities', 'dissertation', 'analytics'].includes(shellApp?.id);
+
+  return html`
+    <main id="main-content" className=${`archive-desktop ${shellApp ? 'desktop-app-active' : ''}`}>
+      <div className="desktop-wallpaper-mark" aria-hidden="true">JR</div>
+      <div className="desktop-workspace">
+        <section className="desktop-shortcut-panel" aria-labelledby="desktop-title">
+          <header className="desktop-brand">
+            <p>Jay Rosen's Internet Archive</p>
+            <h1 id="desktop-title" ref=${desktopTitleRef} tabIndex="-1">Archive desktop</h1>
+            <span>Optional exploration view</span>
+          </header>
+
+          <div className="desktop-shortcut-grid" role="list" aria-label="Archive desktop shortcuts">
+            ${readyApps.map((app, index) => html`
+              <div role="listitem" key=${app.id}>
+                <button
+                  ref=${(element) => { shortcutRefs.current[index] = element; }}
+                  type="button"
+                  className=${`desktop-shortcut ${shellApp?.id === app.id ? 'is-active' : ''}`}
+                  tabIndex=${index === shortcutFocusIndex ? 0 : -1}
+                  aria-current=${shellApp?.id === app.id ? 'page' : undefined}
+                  aria-label=${`${app.label}. ${app.description} ${launchModeLabel(app)}.`}
+                  onFocus=${() => setShortcutFocusIndex(index)}
+                  onClick=${() => openApp(app)}
+                  onKeyDown=${(event) => handleShortcutKeyDown(event, app, index)}
+                >
+                  <span className="desktop-shortcut-icon">${iconFor(app.icon)}</span>
+                  <span className="desktop-shortcut-label">${app.label}</span>
+                  <span className="desktop-shortcut-mode">${launchModeLabel(app)}</span>
+                </button>
+              </div>
+            `)}
+          </div>
+        </section>
+
+        <section
+          className=${`desktop-window ${isWideWindow ? 'desktop-window-wide' : ''}`}
+          role="region"
+          aria-labelledby="desktop-window-title"
+        >
+          <div className="desktop-window-titlebar">
+            <div className="desktop-window-title-copy">
+              <span aria-hidden="true">${iconFor(shellApp?.icon || 'archive', 'desktop-titlebar-icon')}</span>
+              <h2 id="desktop-window-title" ref=${windowTitleRef} tabIndex="-1">${windowTitle}</h2>
+            </div>
+            ${activeAppId && html`
+              <button type="button" className="desktop-window-close" onClick=${closeWindow} aria-label=${`Close ${windowTitle}`}>
+                <${X} aria-hidden="true" />
+              </button>
+            `}
+          </div>
+          <div className="desktop-window-body">${windowContent}</div>
+          <div className="desktop-window-status" aria-hidden="true">
+            ${shellApp ? 'Desktop window' : 'Archive desktop home'}
+          </div>
+        </section>
+      </div>
+
+      <p className="desktop-live-status" aria-live="polite" aria-atomic="true">${statusMessage}</p>
+
+      ${startOpen && html`
+        <div
+          id="archive-desktop-start-menu"
+          ref=${startMenuRef}
+          className="desktop-start-menu"
+          role="menu"
+          aria-label="Archive desktop Start menu"
+        >
+          <div className="desktop-start-rail" aria-hidden="true"><span>Rosen archive</span></div>
+          <div className="desktop-start-content">
+            <div className="desktop-start-heading" role="presentation">
+              <strong>Archive desktop</strong>
+              <small>Choose a destination</small>
+            </div>
+            ${readyApps.map((app, index) => html`
+              <button
+                key=${app.id}
+                ref=${(element) => { menuItemRefs.current[index] = element; }}
+                type="button"
+                className="desktop-menu-item"
+                role="menuitem"
+                tabIndex="-1"
+                onClick=${() => openApp(app)}
+                onKeyDown=${(event) => handleMenuKeyDown(event, index)}
+              >
+                <span className="desktop-menu-icon">${iconFor(app.icon)}</span>
+                <span><strong>${app.label}</strong><small>${launchModeLabel(app)}</small></span>
+              </button>
+            `)}
+            <div className="desktop-menu-divider" role="separator"></div>
+            <button
+              ref=${(element) => { menuItemRefs.current[readyApps.length] = element; }}
+              type="button"
+              className="desktop-menu-item desktop-menu-exit"
+              role="menuitem"
+              tabIndex="-1"
+              onClick=${onExit}
+              onKeyDown=${(event) => handleMenuKeyDown(event, readyApps.length)}
+            >
+              <span className="desktop-menu-icon"><${ArrowLeft} aria-hidden="true" /></span>
+              <span><strong>Standard archive</strong><small>Leave the desktop view</small></span>
+            </button>
+          </div>
+        </div>
+      `}
+
+      <nav className="desktop-taskbar" aria-label="Archive desktop taskbar">
+        <button
+          ref=${startButtonRef}
+          type="button"
+          className=${`desktop-start-button ${startOpen ? 'is-pressed' : ''}`}
+          aria-haspopup="menu"
+          aria-expanded=${startOpen}
+          aria-controls="archive-desktop-start-menu"
+          onClick=${() => setStartOpen((open) => !open)}
+        >
+          <${Menu} aria-hidden="true" />
+          <strong>Start</strong>
+        </button>
+
+        <button type="button" className="desktop-task-button desktop-standard-button" onClick=${onExit}>
+          <${ArrowLeft} aria-hidden="true" />
+          <span>Standard archive</span>
+        </button>
+
+        ${shellApp && html`
+          <button
+            type="button"
+            className="desktop-task-button is-active"
+            aria-current="page"
+            onClick=${() => windowTitleRef.current?.focus()}
+          >
+            ${iconFor(shellApp.icon, 'desktop-task-icon')}
+            <span>${shellApp.label}</span>
+          </button>
+        `}
+
+        <div className="desktop-task-status" aria-hidden="true">
+          <span>Rosen archive</span>
+          <small>desktop</small>
+        </div>
+      </nav>
+    </main>
+  `;
+};
+
+export default DesktopShell;

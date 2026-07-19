@@ -26,6 +26,7 @@ export const ROUTES = {
   about: 'about',
   analytics: 'analytics',
   wiki: 'wiki',
+  desktop: 'desktop',
 };
 
 export const DEFAULT_ROUTE = ROUTES.archive;
@@ -79,10 +80,15 @@ export function parseViewState(href) {
   // navigateTo() never produces one (search params sit before the hash).
   const hash = url.hash.replace(/^#/, '').split('?')[0];
   const wikiHash = parseWikiHash(hash);
-  const route = wikiHash.route === ROUTES.wiki
+  const desktopHash = hash.match(/^desktop(?:\/([a-z0-9]+(?:-[a-z0-9]+)*))?$/);
+  const route = desktopHash
+    ? ROUTES.desktop
+    : wikiHash.route === ROUTES.wiki
     ? ROUTES.wiki
     : Object.values(ROUTES).includes(hash) ? hash : DEFAULT_ROUTE;
-  const routeParams = wikiHash.route === ROUTES.wiki && wikiHash.slug
+  const routeParams = desktopHash?.[1]
+    ? { desktopAppId: desktopHash[1] }
+    : wikiHash.route === ROUTES.wiki && wikiHash.slug
     ? { wikiSlug: wikiHash.slug }
     : {};
 
@@ -157,8 +163,11 @@ export function viewStateToUrl(viewState, baseHref) {
 
   url.search = params.toString();
   const wikiSlug = viewState.routeParams?.wikiSlug;
+  const desktopAppId = viewState.routeParams?.desktopAppId;
   url.hash = route === DEFAULT_ROUTE ? ''
     : route === ROUTES.wiki && wikiSlug ? wikiPageHref(wikiSlug).slice(1)
+    : route === ROUTES.desktop && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(desktopAppId || '')
+      ? `${ROUTES.desktop}/${desktopAppId}`
     : route;
   return url.toString();
 }

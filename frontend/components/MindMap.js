@@ -154,6 +154,7 @@ const MindMapNode = ({ node, nodeWidth, nodeHeight, isExpanded, hasChildren, isS
   const style = NODE_STYLES[node.type] || NODE_STYLES.chapter;
   const isRoot = node.type === 'root';
   const [isHovered, setIsHovered] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   // Single click on node: expand if has children, always select
   const handleNodeClick = useCallback((e) => {
@@ -174,18 +175,34 @@ const MindMapNode = ({ node, nodeWidth, nodeHeight, isExpanded, hasChildren, isS
     onToggle(node.id);
   }, [node.id, onToggle]);
 
-  const shadowOffset = isSelected ? 4 : isHovered ? 3 : 2;
-  const borderWidth = isSelected ? 2.5 : isHovered ? 2 : 1.5;
+  const handleNodeKeyDown = useCallback((e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      handleNodeClick(e);
+    }
+  }, [handleNodeClick]);
+
+  const isEmphasized = isSelected || isFocused;
+  const shadowOffset = isEmphasized ? 4 : isHovered ? 3 : 2;
+  const borderWidth = isEmphasized ? 2.5 : isHovered ? 2 : 1.5;
 
   return html`
     <g
       transform="translate(${node.x - nodeWidth / 2}, ${node.y - nodeHeight / 2})"
+      role="button"
+      tabIndex="0"
+      aria-label=${`${node.label}${node.subtitle ? `: ${node.subtitle}` : ''}`}
+      aria-expanded=${hasChildren ? isExpanded : undefined}
+      aria-pressed=${isSelected}
       style=${{
         cursor: 'pointer',
         transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)'
       }}
+      onClick=${handleNodeClick}
+      onKeyDown=${handleNodeKeyDown}
       onMouseEnter=${() => setIsHovered(true)}
       onMouseLeave=${() => setIsHovered(false)}
+      onFocus=${() => setIsFocused(true)}
+      onBlur=${() => setIsFocused(false)}
     >
       <rect
         x=${shadowOffset}
@@ -202,13 +219,12 @@ const MindMapNode = ({ node, nodeWidth, nodeHeight, isExpanded, hasChildren, isS
         height=${nodeHeight}
         rx="8"
         fill=${isHovered ? style.bgHover : style.bg}
-        stroke=${isSelected ? style.accent : style.border}
+        stroke=${isEmphasized ? style.accent : style.border}
         strokeWidth=${borderWidth}
-        onClick=${handleNodeClick}
         style=${{ transition: 'all 0.2s ease', cursor: 'pointer' }}
       />
 
-      ${isSelected && html`
+      ${isEmphasized && html`
         <rect
           x="-3"
           y="-3"
@@ -631,10 +647,9 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Only handle if this component is focused or no input is focused
-      if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
-        return;
-      }
+      // Keep map shortcuts local to the map. This matters when the canonical
+      // component is embedded in another shell with its own arrow-key model.
+      if (!containerRef.current?.contains(document.activeElement)) return;
 
       switch(e.key) {
         case 'Escape':
@@ -749,6 +764,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
     <div className=${`relative w-full h-full bg-stone-100 overflow-hidden ${className}`} ref=${containerRef}>
       <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
         <button
+          type="button"
           onClick=${handleZoomIn}
           className="p-3 sm:p-2.5 bg-white rounded-lg shadow-md border border-stone-200 hover:bg-stone-50 hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
           title="Zoom in"
@@ -757,6 +773,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
           <${ZoomIn} className="w-5 h-5 text-stone-600" />
         </button>
         <button
+          type="button"
           onClick=${handleZoomOut}
           className="p-3 sm:p-2.5 bg-white rounded-lg shadow-md border border-stone-200 hover:bg-stone-50 hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
           title="Zoom out"
@@ -766,6 +783,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
         </button>
         <div className="h-px bg-stone-200 my-1" />
         <button
+          type="button"
           onClick=${handleReset}
           className="p-3 sm:p-2.5 bg-white rounded-lg shadow-md border border-stone-200 hover:bg-stone-50 hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
           title="Re-center view"
@@ -780,6 +798,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
           ${Math.round(zoom * 100)}%
         </div>
         <button
+          type="button"
           onClick=${collapseAll}
           className="px-3 py-2.5 sm:py-2 text-xs font-medium bg-white hover:bg-stone-50 text-stone-600 rounded-lg shadow-md border border-stone-200 transition-all hover:shadow-lg whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
           title="Collapse all nodes"
@@ -788,6 +807,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
           Collapse All
         </button>
         <button
+          type="button"
           onClick=${expandAll}
           className="px-3 py-2.5 sm:py-2 text-xs font-medium bg-stone-800 hover:bg-stone-700 text-white rounded-lg shadow-md border border-stone-700 transition-all hover:shadow-lg whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
           title="Expand all nodes"
@@ -796,6 +816,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
           Expand All
         </button>
         <button
+          type="button"
           onClick=${() => setShowShortcuts(!showShortcuts)}
           className="p-2.5 sm:p-2 bg-white hover:bg-stone-50 text-stone-600 rounded-lg shadow-md border border-stone-200 transition-all hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
           title="Keyboard shortcuts"
@@ -810,6 +831,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-stone-800 text-sm">Keyboard Shortcuts</h3>
             <button
+              type="button"
               onClick=${() => setShowShortcuts(false)}
               className="text-stone-400 hover:text-stone-600 transition-colors"
               aria-label="Close shortcuts panel"
@@ -863,7 +885,8 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
         onClick=${handleSvgClick}
         onWheel=${handleWheel}
         tabIndex="0"
-        role="application"
+        role="region"
+        aria-roledescription="interactive mind map"
         aria-label="Dissertation mind map. Use arrow keys to pan, +/- to zoom. Press ESC to close panel. On touch devices, drag to pan."
       >
         <g
