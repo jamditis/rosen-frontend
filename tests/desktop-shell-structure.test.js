@@ -220,6 +220,11 @@ describe('desktop windowing and spatial memory', () => {
     assert.match(shell, /minimizeDesktopWindow/);
     assert.match(shell, /closeDesktopWindow/);
     assert.match(shell, /DESKTOP_LAYOUT_STORAGE_KEY/);
+    assert.match(
+      shell,
+      /if \(layout\.windows\.length === 0\) \{\s*localStorage\.removeItem\(DESKTOP_LAYOUT_STORAGE_KEY\);\s*return;/,
+      'an empty or reset layout must clear persistence instead of recreating an empty envelope',
+    );
     assert.match(state, /DESKTOP_LAYOUT_SCHEMA\s*=\s*1/);
     assert.match(state, /candidate\.schema !== DESKTOP_LAYOUT_SCHEMA/);
   });

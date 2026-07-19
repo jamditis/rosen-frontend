@@ -172,6 +172,10 @@ const DesktopShell = ({
 
   useEffect(() => {
     try {
+      if (layout.windows.length === 0) {
+        localStorage.removeItem(DESKTOP_LAYOUT_STORAGE_KEY);
+        return;
+      }
       localStorage.setItem(
         DESKTOP_LAYOUT_STORAGE_KEY,
         serializeDesktopLayout(layout, shellAppIds),
