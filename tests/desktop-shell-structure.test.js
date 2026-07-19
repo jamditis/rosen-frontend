@@ -81,6 +81,10 @@ describe('desktop route wiring', () => {
       'the Start path round-trip keeps the JavaScript launcher and explicit exit live');
     assert.match(audit, /'Desktop home after method browser Back'/,
       'browser Back must reconstruct the desktop home with the popup closed');
+    assert.match(audit, /'About heading after Start navigation'/,
+      'an in-document Start launch must announce its canonical route destination');
+    assert.match(audit, /'Desktop home after about browser Back'/,
+      'Back from a canonical route must reconstruct desktop focus and closed-popup state');
     assert.match(audit, /assertArchiveRootReturn\([\s\S]*'Dissertation return'/,
       'the tool round-trip audit keeps the standalone return touch-sized');
     assert.match(audit, /assertFocused\(page\.locator\('#desktop-window-title-tools'\), 'Tools window after browser Back'\)/,

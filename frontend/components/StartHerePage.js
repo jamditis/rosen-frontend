@@ -231,7 +231,7 @@ const StartHerePage = ({
             </div>
             <p className="font-body text-xs font-bold uppercase tracking-wider text-stone-500">Visitor guide</p>
           </div>
-          <h1 ref=${titleRef} tabIndex="-1" id="start-here-title" className="max-w-3xl font-display text-3xl font-bold leading-tight text-stone-900 outline-none md:text-5xl">
+          <h1 ref=${titleRef} tabIndex="-1" data-route-entry-focus id="start-here-title" className="max-w-3xl font-display text-3xl font-bold leading-tight text-stone-900 outline-none md:text-5xl">
             Start here
           </h1>
           <p className="mt-4 max-w-3xl font-body text-lg leading-relaxed text-stone-600">

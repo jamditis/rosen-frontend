@@ -160,7 +160,11 @@ const AnalyticsDashboard = ({ onBack, onRecordResults, embedded = false }) => {
               <${BarChart3} className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-display font-bold text-stone-900">Archive analytics</h2>
+              <h2
+                data-route-entry-focus
+                tabIndex="-1"
+                className="text-xl font-display font-bold text-stone-900 outline-none"
+              >Archive analytics</h2>
               <p className="text-xs text-stone-500">Powered by sql.js (SQLite in your browser)</p>
             </div>
           </div>

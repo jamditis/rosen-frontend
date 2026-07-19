@@ -48,6 +48,8 @@ const DESKTOP_GUIDED_SHELL_DESTINATIONS = new Set([
   'analytics',
 ]);
 
+const ROUTE_ENTRY_FOCUS_SELECTOR = '[data-route-entry-focus], #main-content';
+
 class DesktopRouteErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -141,6 +143,36 @@ const App = () => {
   const resultsRef = useRef(null);
   const recordsRef = useRef(null);
   const reportEntryHandled = useRef(false);
+  const previouslyRenderedRoute = useRef(currentRoute);
+
+  // Hash navigation replaces parts of the React tree without giving the
+  // browser a document-navigation focus reset. When the invoking control is
+  // unmounted, focus otherwise falls through to <body> and a keyboard or
+  // screen-reader user receives no indication that a new page appeared.
+  //
+  // Child views with a more precise destination (record dialogs, selected
+  // entities, Start here, desktop windows) claim focus in their own effects.
+  // Re-check at paint time and yield to any connected non-body target so this
+  // fallback cannot overwrite those richer focus contracts.
+  useEffect(() => {
+    const previousRoute = previouslyRenderedRoute.current;
+    previouslyRenderedRoute.current = currentRoute;
+    if (previousRoute === currentRoute) return undefined;
+
+    const frame = requestAnimationFrame(() => {
+      const activeElement = document.activeElement;
+      if (
+        activeElement instanceof HTMLElement
+        && activeElement !== document.body
+        && activeElement.isConnected
+      ) return;
+
+      const focusTarget = document.querySelector(ROUTE_ENTRY_FOCUS_SELECTOR);
+      if (!(focusTarget instanceof HTMLElement)) return;
+      focusTarget.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [currentRoute]);
 
   useEffect(() => {
     if (reportEntryHandled.current) return;
@@ -839,7 +871,12 @@ const App = () => {
              />
          `}
 
-         <main className="flex-grow min-w-0 flex flex-col">
+         <main
+           id="main-content"
+           data-route-entry-focus
+           tabIndex="-1"
+           className="flex-grow min-w-0 flex flex-col outline-none"
+         >
 
             ${isArchiveGrid && html`
                 <div>

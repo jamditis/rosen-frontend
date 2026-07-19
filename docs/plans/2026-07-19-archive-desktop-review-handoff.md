@@ -27,7 +27,7 @@ npm run test:frontend
 npm run preview:audit
 ```
 
-The expected test results are 1,097 passing repository tests across 224 suites and 283 passing frontend tests across 54 suites. `preview:audit` intentionally exits nonzero for the repository's inherited accessibility baseline. The expected result for this branch is 33 rule-level findings across 31 routes and three viewports (93 states), with zero findings in all 48 desktop rows, including the open Start-menu interaction state. Screenshots are written beneath `preview-audit-results/screenshots/{mobile,tablet,desktop}/`.
+The expected test results are 1,099 passing repository tests across 225 suites and 285 passing frontend tests across 55 suites. `preview:audit` intentionally exits nonzero for the repository's inherited accessibility baseline. The expected result for this branch is 33 rule-level findings across 31 routes and three viewports (93 states), with zero findings in all 48 desktop rows, including the open Start-menu interaction state. Screenshots are written beneath `preview-audit-results/screenshots/{mobile,tablet,desktop}/`.
 
 ## Review sequence
 
@@ -37,6 +37,7 @@ The expected test results are 1,097 passing repository tests across 224 suites a
 2. Enter through Start here or Tools, then inspect `/#desktop` directly.
 3. Open Read me and return to the launcher.
 4. Open Tools and launch Dissertation release. First use browser Back and confirm the Tools window reconstructs. Relaunch the page and use its 44-pixel “Back to archive” control to confirm the explicit standard-view escape. Repeat with the method demonstration and data visualization to sample the deeper standalone path prefixes.
+5. Open Start, choose About, and confirm keyboard focus enters the “About this archive” heading. Use browser Back and confirm the desktop home title owns focus and Start remains closed.
 
 Evaluate:
 
@@ -96,6 +97,7 @@ Keyboard-only:
 - traverse shortcuts with Arrow keys, Home, End, Enter, and Space;
 - open Start, traverse all groups, verify Arrow-key wrap, and close with Escape;
 - reopen Start and leave it with forward and reverse Tab; focus should land on a visible adjacent control, never the removed popup;
+- launch About from Start and confirm the in-document route change never leaves focus on the document body;
 - enter and leave record dialogs, entity details, filter drawers, and dissertation details;
 - minimize/restore/close windows and use Reset;
 - confirm every programmatic focus target has a visible indicator.

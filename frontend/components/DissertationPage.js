@@ -90,7 +90,11 @@ const DissertationPage = ({ onBack, embedded = false }) => {
         <div className="container mx-auto px-4 py-4 md:py-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="max-w-2xl">
-              <h1 className="font-display text-xl md:text-2xl font-bold text-stone-900 leading-tight">
+              <h1
+                data-route-entry-focus=${embedded ? undefined : true}
+                tabIndex=${embedded ? undefined : '-1'}
+                className="font-display text-xl md:text-2xl font-bold text-stone-900 leading-tight outline-none"
+              >
                 The Impossible Press
               </h1>
               <h2 className="text-sm md:text-base text-stone-600">

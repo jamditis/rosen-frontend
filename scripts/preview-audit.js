@@ -202,6 +202,27 @@ async function auditOne(page, route, viewport) {
       throw new Error('Method history return reopened the Start menu');
     }
     await assertFocused(page.locator('#desktop-window-title-home'), 'Desktop home after method browser Back');
+
+    // In-document navigation unmounts the popup and its invoking menu item.
+    // The canonical route-entry fallback must move focus into the destination
+    // instead of leaving it on <body>, while Back still reconstructs desktop
+    // focus and closed-popup state.
+    await startButton.click();
+    await startMenu.getByRole('menuitem', { name: /^About/ }).click();
+    await page.waitForURL((url) => url.hash === '#about');
+    await assertFocused(
+      page.getByRole('heading', { name: 'About this archive', level: 1 }),
+      'About heading after Start navigation',
+    );
+
+    await page.goBack({ waitUntil: 'networkidle' });
+    if (new URL(page.url()).hash !== '#desktop') {
+      throw new Error(`About history return lost its desktop route: ${page.url()}`);
+    }
+    if (await startMenu.isVisible()) {
+      throw new Error('About history return reopened the Start menu');
+    }
+    await assertFocused(page.locator('#desktop-window-title-home'), 'Desktop home after about browser Back');
   }
   if (route.verifyDesktopStartMenu) {
     const startButton = page.getByRole('button', { name: 'Start', exact: true });
