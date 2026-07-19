@@ -43,7 +43,12 @@ const ROUTES = [
   { slug: 'participate',        url: '/features/participate/' },
   { slug: 'archive-desktop',    url: '/#desktop', archiveDetails: 'forbid', verifyStartPathRoundTrip: true },
   { slug: 'desktop-start-menu', url: '/#desktop', archiveDetails: 'forbid', verifyDesktopStartMenu: true },
-  { slug: 'desktop-unknown',    url: '/#desktop/not-real', verifyBlockedMakingOf: true },
+  {
+    slug: 'desktop-unknown',
+    url: '/#desktop/not-real',
+    verifyBlockedMakingOf: true,
+    verifyDeferredInvalidRecord: true,
+  },
   {
     slug: 'desktop-archive',
     url: '/#desktop/archive',
@@ -676,6 +681,69 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       throw new Error(`Blocked making-of URL loaded archive data: ${JSON.stringify(archiveDataRequests)}`);
     }
     await assertFocused(page.locator('#desktop-window-title-home'), 'Desktop home after blocked making-of URL');
+  }
+  if (route.verifyDeferredInvalidRecord) {
+    const browser = page.context().browser();
+    if (!browser) throw new Error('Invalid-record focus audit could not create an isolated browser context');
+    const invalidContext = await browser.newContext({
+      viewport: { width: viewport.width, height: viewport.height },
+      serviceWorkers: 'block',
+    });
+    const invalidPage = await invalidContext.newPage();
+    const invalidPageErrors = [];
+    invalidPage.on('pageerror', (error) => invalidPageErrors.push(error.message || String(error)));
+    invalidPage.on('console', (message) => {
+      if (message.type() === 'error') invalidPageErrors.push(message.text());
+    });
+    let releaseCore;
+    const coreGate = new Promise((resolveGate) => { releaseCore = resolveGate; });
+    const holdCoreRequest = async (interceptedRoute) => {
+      await coreGate;
+      await interceptedRoute.continue();
+    };
+    await invalidPage.route('**/data/archive-core.json', holdCoreRequest);
+    try {
+      const invalidRecordUrl = new URL(BASE);
+      invalidRecordUrl.searchParams.set('_audit', `${viewport.name}-deferred-invalid-record`);
+      invalidRecordUrl.searchParams.set('record', 'NOT-A-RECORD');
+      invalidRecordUrl.hash = '#desktop/archive';
+      const coreRequest = invalidPage.waitForRequest((request) => (
+        new URL(request.url()).pathname.endsWith('/data/archive-core.json')
+      ));
+      const navigation = invalidPage.goto(
+        invalidRecordUrl.toString(),
+        { waitUntil: 'domcontentloaded' },
+      );
+      await coreRequest;
+      await navigation;
+
+      const archiveTitle = invalidPage.locator('#desktop-window-title-archive');
+      await archiveTitle.waitFor();
+      await invalidPage.waitForTimeout(100);
+      if (!await archiveTitle.evaluate((element) => document.activeElement === element)) {
+        throw new Error('Archive title did not own focus while an invalid record waited for validation');
+      }
+      if (await invalidPage.getByRole('dialog').count()) {
+        throw new Error('Invalid deferred record rendered a dialog before canonical data validation');
+      }
+
+      releaseCore();
+      await invalidPage.waitForLoadState('networkidle');
+      await invalidPage.waitForTimeout(300);
+      if (new URL(invalidPage.url()).searchParams.has('record')) {
+        throw new Error(`Invalid deferred record remained in the canonical URL: ${invalidPage.url()}`);
+      }
+      if (!await archiveTitle.evaluate((element) => document.activeElement === element)) {
+        throw new Error('Archive title lost focus after invalid record validation');
+      }
+      if (invalidPageErrors.length > 0) {
+        throw new Error(`Invalid-record focus audit emitted errors: ${JSON.stringify(invalidPageErrors)}`);
+      }
+    } finally {
+      releaseCore?.();
+      await invalidPage.unroute('**/data/archive-core.json', holdCoreRequest);
+      await invalidContext.close();
+    }
   }
   if (route.verifyToolsDesktopEntry) {
     const sourceUrl = page.url();

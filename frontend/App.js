@@ -135,7 +135,11 @@ const App = () => {
     && DESKTOP_RECORD_APPS.has(desktopAppId);
   const desktopDisallowsRecordContext = currentRoute === ROUTES.desktop
     && !DESKTOP_RECORD_APPS.has(desktopAppId);
-  const desktopRecordOverlayOpen = desktopActiveNeedsRecords && Boolean(selectedRecordId);
+  const selectedRecordIsLoaded = useMemo(
+    () => Boolean(selectedRecordId) && records.some(({ id }) => id === selectedRecordId),
+    [records, selectedRecordId],
+  );
+  const desktopRecordOverlayOpen = desktopActiveNeedsRecords && selectedRecordIsLoaded;
   const desktopNeedsRecords = currentRoute === ROUTES.desktop
     && (
       desktopActiveNeedsRecords
