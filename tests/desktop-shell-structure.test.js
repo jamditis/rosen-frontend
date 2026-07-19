@@ -191,6 +191,10 @@ describe('desktop research adapters', () => {
     assert.match(detailPanel, /aria-hidden=\$\{isOpen \? undefined : 'true'\}/);
     assert.match(detailPanel, /inert=\$\{isOpen \? undefined : ''\}/,
       'the retained closing panel must not expose off-screen dialog controls');
+    assert.match(detailPanel, /className="archive-detail-content[^\n]+"\s*tabIndex="0"\s*aria-label="Detail panel content"/,
+      'the shared reading pane must expose a named keyboard scroll target');
+    assert.doesNotMatch(detailPanel, /text-stone-400/,
+      'small detail metadata must keep AA contrast on white');
     assert.match(detailPanel, /prefers-reduced-motion: reduce/);
     assert.match(detailPanel, /if \(reduceMotion\) frame = requestAnimationFrame\(focusClose\)/);
     assert.match(detailPanel, /\}, \[isOpen, displayNode\]\);/,

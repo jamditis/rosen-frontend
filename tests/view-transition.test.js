@@ -71,6 +71,8 @@ describe('App.js record-modal view transition (#281)', () => {
   const src = fs.readFileSync(path.join(frontendDir, 'App.js'), 'utf-8');
   const resultsSrc = fs.readFileSync(path.join(frontendDir, 'components', 'ArchiveResults.js'), 'utf-8');
   const modalSrc = fs.readFileSync(path.join(frontendDir, 'components', 'RecordModal.js'), 'utf-8');
+  const detailPanelSrc = fs.readFileSync(path.join(frontendDir, 'components', 'DetailPanel.js'), 'utf-8');
+  const indexCss = fs.readFileSync(path.join(frontendDir, 'index.css'), 'utf-8');
 
   it('imports the versioned helper', () => {
     assert.match(src, /from '\.\/utils\/viewTransition\.js\?v=\d+\.\d+\.\d+'/);
@@ -102,5 +104,15 @@ describe('App.js record-modal view transition (#281)', () => {
   it('does not retain the animated close delay under reduced motion', () => {
     assert.match(modalSrc, /matchMedia\?\.\('\(prefers-reduced-motion: reduce\)'\)\.matches/);
     assert.match(modalSrc, /if \(reduceMotion\) \{\s*onClose\(\);\s*return;/);
+  });
+
+  it('disables shared record and detail-panel CSS motion at the source', () => {
+    assert.match(modalSrc, /className="archive-record-dialog /);
+    assert.match(detailPanelSrc, /archive-detail-panel fixed/);
+    assert.match(indexCss, /@media \(prefers-reduced-motion: reduce\)/);
+    assert.match(indexCss, /\.archive-record-dialog \*/);
+    assert.match(indexCss, /\.archive-detail-panel/);
+    assert.match(indexCss, /transition-duration:\s*0\.01ms !important/);
+    assert.match(indexCss, /animation-iteration-count:\s*1 !important/);
   });
 });

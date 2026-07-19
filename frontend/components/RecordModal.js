@@ -225,7 +225,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
   const youtubeId = (displayRecord.url || '').match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/)?.[2];
 
   return html`
-    <div className="fixed inset-0 z-[80]" role="dialog" aria-modal="true" aria-labelledby="record-modal-title">
+    <div className="archive-record-dialog fixed inset-0 z-[80]" role="dialog" aria-modal="true" aria-labelledby="record-modal-title">
       <div className=${`fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-stone-800 text-white px-6 py-3 rounded shadow-lg z-[90] transition-all duration-300 flex items-center gap-3 ${showToast ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
         <${CheckCircle} className="w-4 h-4 text-green-400" />
         <span className="text-sm font-bold">${toastMessage}</span>

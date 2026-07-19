@@ -1,6 +1,27 @@
 /* Import Design System Tokens */
 @import url('./design-system/tokens.css');
 
+/* Shared detail surfaces can render outside the optional desktop subtree.
+   Keep their canonical transitions from bypassing the user's motion setting. */
+@media (prefers-reduced-motion: reduce) {
+  .archive-record-dialog,
+  .archive-record-dialog *,
+  .archive-record-dialog *::before,
+  .archive-record-dialog *::after,
+  .archive-detail-panel,
+  .archive-detail-panel * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.archive-detail-content:focus-visible {
+  outline: 3px solid #44403c;
+  outline-offset: -3px;
+}
+
 /* Prevent horizontal overflow */
 html, body {
   overflow-x: hidden;

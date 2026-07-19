@@ -90,14 +90,14 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
       inert=${isOpen ? undefined : ''}
       aria-labelledby="detail-panel-title"
       className=${`
-        fixed top-0 h-full w-full sm:w-[420px] bg-white border-l border-stone-200
+        archive-detail-panel fixed top-0 h-full w-full sm:w-[420px] bg-white border-l border-stone-200
         shadow-xl z-50 transform transition-transform duration-300 ease-out
         ${isOpen ? 'right-0' : '-right-full sm:-right-[420px]'}
       `}
       style=${{ maxWidth: 'calc(100vw - 16px)', zIndex: 80 }}
     >
       <div className="sticky top-0 bg-white border-b border-stone-200 px-4 sm:px-6 py-4 flex items-center justify-between">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-stone-600">
           ${TYPE_LABELS[displayNode.type] || 'Section'}
         </span>
         <button
@@ -112,7 +112,11 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
         </button>
       </div>
 
-      <div className="pl-4 pr-6 sm:pl-6 sm:pr-8 py-6 overflow-y-auto overflow-x-hidden h-[calc(100%-64px)]">
+      <div
+        className="archive-detail-content pl-4 pr-6 sm:pl-6 sm:pr-8 py-6 overflow-y-auto overflow-x-hidden h-[calc(100%-64px)]"
+        tabIndex="0"
+        aria-label="Detail panel content"
+      >
         <h2 id="detail-panel-title" className="font-display text-xl font-bold text-stone-900 leading-tight mb-2 break-words">
           ${displayNode.label}
         </h2>
@@ -122,7 +126,7 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
         `}
 
         ${(displayNode.pageStart || displayNode.pageRef) && html`
-          <div className="flex items-center gap-2 text-xs text-stone-400 mb-6 font-mono">
+          <div className="flex items-center gap-2 text-xs text-stone-600 mb-6 font-mono">
             <${FileText} className="w-3.5 h-3.5" />
             <span>
               ${displayNode.pageRef || `Pages ${displayNode.pageStart}${displayNode.pageEnd ? `–${displayNode.pageEnd}` : '+'}`}
@@ -132,7 +136,7 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
 
         ${displayNode.pullQuote && html`
           <div className="mb-6">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-2">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-600 mb-2">
               <${Quote} className="w-3.5 h-3.5" />
               <span>From the text</span>
             </div>
@@ -144,7 +148,7 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
 
         ${displayNode.summary && html`
           <div className="mb-6">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-2">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-600 mb-2">
               <${BookOpen} className="w-3.5 h-3.5" />
               <span>Summary</span>
             </div>
@@ -156,7 +160,7 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
 
         ${displayNode.keyConcepts && displayNode.keyConcepts.length > 0 && html`
           <div className="mb-6">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-2">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-600 mb-2">
               <${Lightbulb} className="w-3.5 h-3.5" />
               <span>Key Concepts</span>
             </div>
@@ -175,7 +179,7 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
 
         ${displayNode.keyFigures && displayNode.keyFigures.length > 0 && html`
           <div className="mb-6">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-2">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-600 mb-2">
               <${User} className="w-3.5 h-3.5" />
               <span>Key Figures</span>
             </div>
@@ -193,7 +197,7 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
         `}
 
         ${!displayNode.summary && !displayNode.pullQuote && !displayNode.keyConcepts?.length && !displayNode.keyFigures?.length && html`
-          <div className="text-center py-8 text-stone-400">
+          <div className="text-center py-8 text-stone-600">
             <${FileText} className="w-8 h-8 mx-auto mb-2 opacity-30" />
             <p className="text-sm">No additional detail for this item</p>
           </div>
