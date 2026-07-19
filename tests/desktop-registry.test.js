@@ -8,6 +8,7 @@ import {
   getDesktopApp,
   getReadyDesktopApps,
   validateDesktopRegistry,
+  validateDesktopToolLinks,
 } from '../frontend/desktop/desktopRegistry.js';
 import { ROUTES } from '../frontend/services/viewState.js';
 
@@ -126,6 +127,20 @@ describe('desktop app registry', () => {
 });
 
 describe('desktop tool links', () => {
+  it('validates unique, safe, display-complete tool metadata', () => {
+    assert.equal(validateDesktopToolLinks(DESKTOP_TOOL_LINKS), true);
+    const valid = DESKTOP_TOOL_LINKS[0];
+    assert.throws(() => validateDesktopToolLinks([valid, { ...valid }]), /duplicate desktop tool id/i);
+    assert.throws(
+      () => validateDesktopToolLinks([{ ...valid, id: 'unsafe-path', href: '../index.html' }]),
+      /unsafe standalone destination/i,
+    );
+    assert.throws(
+      () => validateDesktopToolLinks([{ ...valid, id: 'unknown-status', status: 'preview' }]),
+      /unknown status/i,
+    );
+  });
+
   it('points every surfaced tool at a deployed local file', () => {
     for (const tool of DESKTOP_TOOL_LINKS) {
       const relativeFile = deployedFileFor(tool.href);

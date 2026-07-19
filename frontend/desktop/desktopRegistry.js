@@ -5,6 +5,7 @@ const APP_GROUPS = new Set(['explore', 'research', 'help']);
 const APP_SURFACES = new Set(['desktop', 'start']);
 const AVAILABILITY_STATES = new Set(['ready', 'planned', 'blocked']);
 const LAUNCH_KINDS = new Set(['route', 'shell', 'action', 'path']);
+const TOOL_STATUSES = new Set(['ready', 'beta', 'experimental']);
 const ROUTE_DESTINATIONS = new Set(Object.values(ROUTES));
 const PATH_DESTINATIONS = new Set([
   'features/participate/',
@@ -220,6 +221,50 @@ export const DESKTOP_TOOL_LINKS = Object.freeze([
   },
 ].map((tool) => Object.freeze({ ...tool })));
 
+export function validateDesktopToolLinks(tools) {
+  if (!Array.isArray(tools) || tools.length === 0) {
+    throw new TypeError('Desktop tool registry must be a non-empty array');
+  }
+
+  const ids = new Set();
+  const destinations = new Set();
+  for (const tool of tools) {
+    if (!APP_ID_PATTERN.test(tool?.id || '')) {
+      throw new TypeError(`Invalid desktop tool id: ${tool?.id || '(missing)'}`);
+    }
+    if (ids.has(tool.id)) {
+      throw new TypeError(`Duplicate desktop tool id: ${tool.id}`);
+    }
+    ids.add(tool.id);
+
+    for (const field of ['label', 'description', 'icon']) {
+      if (typeof tool[field] !== 'string' || tool[field].trim() === '') {
+        throw new TypeError(`Desktop tool ${tool.id} needs a ${field}`);
+      }
+    }
+    if (!TOOL_STATUSES.has(tool.status)) {
+      throw new TypeError(`Desktop tool ${tool.id} has an unknown status`);
+    }
+
+    const href = tool.href;
+    const pathSegments = typeof href === 'string' ? href.split('/') : [];
+    const hasSafePath = typeof href === 'string'
+      && /^[a-z0-9][a-z0-9._/-]*$/.test(href)
+      && !href.includes('//')
+      && !pathSegments.some((segment) => segment === '.' || segment === '..')
+      && (href.endsWith('/') || href.endsWith('.html'));
+    if (!hasSafePath) {
+      throw new TypeError(`Desktop tool ${tool.id} has an unsafe standalone destination`);
+    }
+    if (destinations.has(href)) {
+      throw new TypeError(`Duplicate desktop tool destination: ${href}`);
+    }
+    destinations.add(href);
+  }
+
+  return true;
+}
+
 export function validateDesktopRegistry(registry) {
   if (!Array.isArray(registry) || registry.length === 0) {
     throw new TypeError('Desktop app registry must be a non-empty array');
@@ -293,6 +338,7 @@ export function validateDesktopRegistry(registry) {
 }
 
 validateDesktopRegistry(DESKTOP_APPS);
+validateDesktopToolLinks(DESKTOP_TOOL_LINKS);
 
 export const getReadyDesktopApps = () => DESKTOP_APPS.filter((app) => app.availability === 'ready');
 
