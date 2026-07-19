@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   DESKTOP_APPS,
@@ -10,6 +10,22 @@ import {
   validateDesktopRegistry,
 } from '../frontend/desktop/desktopRegistry.js';
 import { ROUTES } from '../frontend/services/viewState.js';
+
+const deployedFileFor = (destination) => (
+  destination.endsWith('/') ? `${destination}index.html` : destination
+);
+
+const assertArchiveReturn = (id, relativeFile) => {
+  const directoryDepth = relativeFile.split('/').length - 1;
+  const rootHref = '../'.repeat(directoryDepth);
+  const escapedRootHref = rootHref.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const html = readFileSync(join(process.cwd(), relativeFile), 'utf8');
+  assert.match(
+    html,
+    new RegExp(`<a\\b[^>]*href=["']${escapedRootHref}["']`, 'i'),
+    `${id} offers a preview-safe link back to the archive root (${rootHref})`,
+  );
+};
 
 describe('desktop app registry', () => {
   it('validates the production registry and keeps ids unique', () => {
@@ -68,10 +84,9 @@ describe('desktop app registry', () => {
 
   it('points every standalone app at a deployed local file', () => {
     for (const app of getReadyDesktopApps().filter(({ launch }) => launch.kind === 'path')) {
-      const relativeFile = app.launch.destination.endsWith('/')
-        ? `${app.launch.destination}index.html`
-        : app.launch.destination;
+      const relativeFile = deployedFileFor(app.launch.destination);
       assert.ok(existsSync(join(process.cwd(), relativeFile)), `${app.id} target exists: ${relativeFile}`);
+      assertArchiveReturn(app.id, relativeFile);
     }
   });
 
@@ -113,8 +128,14 @@ describe('desktop app registry', () => {
 describe('desktop tool links', () => {
   it('points every surfaced tool at a deployed local file', () => {
     for (const tool of DESKTOP_TOOL_LINKS) {
-      const relativeFile = tool.href.endsWith('/') ? `${tool.href}index.html` : tool.href;
+      const relativeFile = deployedFileFor(tool.href);
       assert.ok(existsSync(join(process.cwd(), relativeFile)), `${tool.id} target exists: ${relativeFile}`);
+    }
+  });
+
+  it('keeps every surfaced standalone tool connected to the archive root', () => {
+    for (const tool of DESKTOP_TOOL_LINKS) {
+      assertArchiveReturn(tool.id, deployedFileFor(tool.href));
     }
   });
 
