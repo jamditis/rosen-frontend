@@ -810,7 +810,6 @@ const DesktopShell = ({
           className=${`desktop-start-button ${startOpen ? 'is-pressed' : ''}`}
           aria-haspopup="menu"
           aria-expanded=${startOpen}
-          aria-controls="archive-desktop-start-menu"
           onClick=${() => setStartOpen((open) => !open)}
         >
           <${Menu} aria-hidden="true" />

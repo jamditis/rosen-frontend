@@ -379,6 +379,8 @@ describe('desktop interaction structure', () => {
     const shell = read('frontend/desktop/DesktopShell.js');
     assert.match(shell, /<main id="main-content"/);
     assert.match(shell, /role="menu"/);
+    assert.doesNotMatch(shell, /aria-controls=/,
+      'the optional menu relationship must not leave axe with an unresolvable critical incomplete');
     assert.match(shell, /role="menuitem"/);
     assert.match(shell, /aria-haspopup="menu"/);
     assert.match(shell, /aria-expanded=\$\{startOpen\}/);
