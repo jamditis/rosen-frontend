@@ -171,7 +171,19 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
 
   useEffect(() => {
     if (!isOpen) {
-      if (openerRef.current?.isConnected) openerRef.current.focus();
+      const opener = openerRef.current;
+      const openerWindow = opener?.closest('.desktop-window');
+      // A history traversal can close the record and activate a different
+      // desktop window in the same render. Focusing an opener in the now-
+      // background window would activate it again and undo Back/Forward.
+      // Standard views have no desktop-window ancestor and retain the normal
+      // exact-opener return; explicit closes in the active desktop window do too.
+      if (
+        opener?.isConnected
+        && (!openerWindow || openerWindow.classList.contains('is-active'))
+      ) {
+        opener.focus();
+      }
       openerRef.current = null;
       return undefined;
     }

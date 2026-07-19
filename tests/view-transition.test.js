@@ -112,6 +112,12 @@ describe('App.js record-modal view transition (#281)', () => {
     assert.match(modalSrc, /onFilterSearch \? \(tag\) => leaveRecordFor\(onFilterSearch, tag\)/);
   });
 
+  it('does not let history-driven focus return undo a desktop window change', () => {
+    assert.match(modalSrc, /const openerWindow = opener\?\.closest\('\.desktop-window'\)/);
+    assert.match(modalSrc, /!openerWindow \|\| openerWindow\.classList\.contains\('is-active'\)/);
+    assert.match(modalSrc, /opener\?\.isConnected[\s\S]*opener\.focus\(\)/);
+  });
+
   it('disables shared record and detail-panel CSS motion at the source', () => {
     assert.match(modalSrc, /className="archive-record-dialog /);
     assert.match(detailPanelSrc, /archive-detail-panel fixed/);
