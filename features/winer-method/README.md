@@ -21,7 +21,7 @@ requests; the canonical record URLs remain HTTPS.
 `build-data-artifacts.mjs` script produces both `source-manifest.json` and the
 feature-local `demo.sqlite` projection from those records. The database is
 queried through four allowlisted statements in `script.js`; visitors never
-submit SQL. The JavaScript corpus is also a resilient rendering fallback if
+submit SQL. The JavaScript corpus is also the rendering fallback if
 WebAssembly is unavailable. URL state remains shareable in either mode.
 
 The authored trail is a five-stop editorial reading; it does not pretend that

@@ -4,6 +4,8 @@
   --paper: #fdfbf7;
   --rule: #d6d3d1;
   --accent: #075985;
+  --manila: #e8dfc8;
+  --manila-edge: #c9bda0;
   --display: 'Special Elite', Georgia, serif;
   --mono: 'Roboto Mono', ui-monospace, monospace;
 }
@@ -19,7 +21,7 @@ a:focus-visible { outline: 3px solid #0ea5e9; outline-offset: 4px; }
 .archive-link { display: inline-flex; align-items: center; gap: 0.75rem; text-decoration: none; min-height: 44px; }
 .archive-link strong, .archive-link small { display: block; }
 .archive-link strong { font-family: var(--display); }
-.archive-link small { margin-top: 0.15rem; color: var(--muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em; }
+.archive-link small { margin-top: 0.15rem; color: var(--muted); font-size: 0.72rem; letter-spacing: normal; }
 .archive-mark { display: grid; place-items: center; width: 2.3rem; height: 2.3rem; background: var(--ink); color: #fff; font-family: var(--display); }
 .quiet-link { min-height: 44px; display: inline-flex; align-items: center; font-size: 0.8rem; font-weight: 700; text-underline-offset: 4px; }
 .hero { position: relative; isolation: isolate; min-height: 42rem; overflow: hidden; display: flex; align-items: flex-end; background: #141210; }
@@ -28,17 +30,23 @@ a:focus-visible { outline: 3px solid #0ea5e9; outline-offset: 4px; }
 .portrait { position: absolute; z-index: -2; right: clamp(1rem, 8vw, 9rem); bottom: 0; width: min(34rem, 48vw); height: min(40rem, 95%); object-fit: cover; object-position: center top; filter: grayscale(1) contrast(1.05); }
 .hero::after { content: ''; position: absolute; z-index: -1; inset: 0; background: linear-gradient(90deg, rgba(15,13,12,0.99) 0%, rgba(15,13,12,0.94) 40%, rgba(15,13,12,0.56) 68%, rgba(15,13,12,0.18) 100%), linear-gradient(0deg, rgba(15,13,12,0.78), transparent 60%); }
 .hero-copy { width: min(72rem, 100%); margin: 0 auto; padding: 6rem 1rem 5rem; }
-.kicker, .eyebrow { margin: 0; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
-.kicker { color: #d6d3d1; }
+/* Typed folder tab, not a tracked-out eyebrow. Manila fill with a dog-eared
+   top-right corner so the label reads as something typed onto a file folder.
+   One treatment for light and dark sections — on the dark hero the tab reads
+   as a physical tab lying on the desk. */
+.kicker, .eyebrow { display: inline-block; margin: 0; padding: 0.3rem 0.8rem 0.28rem; font-family: var(--display); font-size: 0.8rem; font-weight: 400; letter-spacing: 0.01em; text-transform: none; color: #44403c; background: var(--manila); border: 1px solid var(--manila-edge); clip-path: polygon(0 0, calc(100% - 0.5rem) 0, 100% 0.5rem, 100% 100%, 0 100%); }
 h1, h2, h3 { font-family: var(--display); }
 h1 { max-width: 58rem; margin: 0.8rem 0 0; color: #fff; font-size: clamp(3rem, 7vw, 6.2rem); line-height: 0.98; }
 h1 span { display: block; white-space: nowrap; }
 .deck { max-width: 43rem; margin: 1.5rem 0 0; color: #e7e5e4; font-size: clamp(1rem, 1.7vw, 1.2rem); line-height: 1.65; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 2rem; }
-.primary-action, .secondary-action { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; padding: 0.8rem 1.1rem; font-size: 0.82rem; font-weight: 700; text-decoration: none; }
+.primary-action, .secondary-action { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; padding: 0.8rem 1.1rem; font-size: 0.82rem; font-weight: 700; text-decoration: none; transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease; }
 .primary-action { background: #fff; color: var(--ink); border: 2px solid #fff; }
 .secondary-action { color: #fff; border: 2px solid #a8a29e; }
-.primary-action:hover, .secondary-action:hover { transform: translateY(-2px); }
+/* Invert on hover rather than lifting. A translateY implies a drop shadow this
+   flat, print-derived system does not have, and the lift had no transition. */
+.primary-action:hover { background: transparent; color: #fff; }
+.secondary-action:hover { background: #fff; color: var(--ink); border-color: #fff; }
 .paths { width: min(72rem, calc(100% - 2rem)); margin: 0 auto; padding: 5rem 0; }
 .section-heading { max-width: 48rem; }
 .section-heading h2, .disclosure h2, .contact h2, .closing h2 { margin: 0.65rem 0 0; font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1.06; }
@@ -57,8 +65,8 @@ h1 span { display: block; white-space: nowrap; }
 .disclosure > p { margin: 0; line-height: 1.75; }
 .contact { align-items: center; }
 .primary-action.dark { justify-self: end; background: var(--ink); color: #fff; border-color: var(--ink); }
+.primary-action.dark:hover { background: transparent; color: var(--ink); }
 .closing { padding: 5rem 1rem; text-align: center; color: #fff; background: var(--ink); }
-.closing .eyebrow { color: #a8a29e; }
 .closing .hero-actions { justify-content: center; }
 .secondary-action.light { border-color: #78716c; }
 footer { width: min(72rem, calc(100% - 2rem)); margin: 0 auto; padding: 2rem 0; display: flex; justify-content: space-between; gap: 1.5rem; color: var(--muted); font-size: 0.76rem; line-height: 1.5; }
@@ -91,5 +99,4 @@ footer nav a { min-height: 44px; display: inline-flex; align-items: center; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
-  .primary-action:hover, .secondary-action:hover { transform: none; }
 }
