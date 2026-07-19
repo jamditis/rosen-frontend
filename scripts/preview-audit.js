@@ -41,7 +41,7 @@ const ROUTES = [
   { slug: 'home-archive',       url: '/', archiveDetails: 'require', verifyToolsDesktopEntry: true },
   { slug: 'start-here',         url: '/#start', verifyDesktopEntry: true },
   { slug: 'participate',        url: '/features/participate/' },
-  { slug: 'archive-desktop',    url: '/#desktop', archiveDetails: 'forbid', verifyStartPathRoundTrip: true },
+  { slug: 'archive-desktop',    url: '/#desktop', archiveDetails: 'forbid', verifyStartPathRoundTrip: true, verifyCompactHomeFocus: true },
   { slug: 'desktop-start-menu', url: '/#desktop', archiveDetails: 'forbid', verifyDesktopStartMenu: true },
   {
     slug: 'desktop-unknown',
@@ -224,6 +224,11 @@ async function assertArchiveRootReturn(page, locator, label) {
 }
 
 async function auditOne(page, route, viewport, setApplicationNetworkCapture = () => {}) {
+  const compactDesktopViewport = viewport.width <= 700
+    || (viewport.width <= 900 && viewport.height <= 520);
+  const desktopHomeFocusTarget = page.locator(
+    compactDesktopViewport ? '#desktop-title' : '#desktop-window-title-home',
+  );
   const assertFocused = async (locator, label) => {
     await locator.waitFor();
     await page.waitForTimeout(100);
@@ -308,9 +313,8 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     await desktopEntry.focus();
     await page.keyboard.press('Enter');
     await page.waitForURL((url) => url.hash === '#desktop');
-    const desktopHomeTitle = page.locator('#desktop-window-title-home');
-    await assertFocused(desktopHomeTitle, 'Desktop home after Start here entry');
-    await assertVisibleFocusOutline(desktopHomeTitle, 'Desktop home after Start here entry');
+    await assertFocused(desktopHomeFocusTarget, 'Desktop home after Start here entry');
+    await assertVisibleFocusOutline(desktopHomeFocusTarget, 'Desktop home after Start here entry');
 
     await page.goBack({ waitUntil: 'networkidle' });
     if (page.url() !== sourceUrl) {
@@ -382,7 +386,7 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     if (await startMenu.isVisible()) {
       throw new Error('Method history return reopened the Start menu');
     }
-    await assertFocused(page.locator('#desktop-window-title-home'), 'Desktop home after method browser Back');
+    await assertFocused(desktopHomeFocusTarget, 'Desktop home after method browser Back');
 
     // In-document navigation unmounts the popup and its invoking menu item.
     // The canonical route-entry fallback must move focus into the destination
@@ -403,7 +407,7 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     if (await startMenu.isVisible()) {
       throw new Error('About history return reopened the Start menu');
     }
-    await assertFocused(page.locator('#desktop-window-title-home'), 'Desktop home after about browser Back');
+    await assertFocused(desktopHomeFocusTarget, 'Desktop home after about browser Back');
 
     await startButton.click();
     await startMenu.getByRole('menuitem', { name: /^Participate/ }).click();
@@ -421,7 +425,7 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     if (await startMenu.isVisible()) {
       throw new Error('Participate history return reopened the Start menu');
     }
-    await assertFocused(page.locator('#desktop-window-title-home'), 'Desktop home after participate browser Back');
+    await assertFocused(desktopHomeFocusTarget, 'Desktop home after participate browser Back');
   }
   if (route.verifyStandardExit) {
     const {
@@ -744,10 +748,14 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
 
       releaseCore();
       await invalidPage.waitForLoadState('networkidle');
-      await invalidPage.waitForTimeout(300);
+      await invalidPage.waitForURL(
+        (url) => !url.searchParams.has('record'),
+        { timeout: 10000 },
+      );
       if (new URL(invalidPage.url()).searchParams.has('record')) {
         throw new Error(`Invalid deferred record remained in the canonical URL: ${invalidPage.url()}`);
       }
+      await invalidPage.waitForTimeout(100);
       if (!await archiveTitle.evaluate((element) => document.activeElement === element)) {
         throw new Error('Archive title lost focus after invalid record validation');
       }
@@ -820,6 +828,95 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       await failureContext.close();
     }
   }
+  if (route.verifyCompactHomeFocus && viewport.name === 'mobile') {
+    const browser = page.context().browser();
+    if (!browser) throw new Error('Compact-home audit could not create an isolated browser context');
+    const compactContext = await browser.newContext({
+      viewport: { width: 320, height: 568 },
+      serviceWorkers: 'block',
+    });
+    const compactPage = await compactContext.newPage();
+    const compactErrors = [];
+    compactPage.on('pageerror', (error) => compactErrors.push(error.message || String(error)));
+    compactPage.on('console', (message) => {
+      if (message.type() === 'error') compactErrors.push(message.text());
+    });
+    try {
+      const compactUrl = new URL(BASE);
+      compactUrl.searchParams.set('_audit', 'compact-home-focus');
+      compactUrl.hash = '#desktop';
+      await compactPage.goto(compactUrl.toString(), { waitUntil: 'networkidle' });
+
+      const compactTitle = compactPage.locator('#desktop-title');
+      await assertFocused(compactTitle, 'Compact desktop launcher heading');
+      await assertVisibleFocusOutline(compactTitle, 'Compact desktop launcher heading');
+      const compactHomeState = await compactPage.evaluate(() => {
+        const titleRect = document.querySelector('#desktop-title')?.getBoundingClientRect();
+        const taskbarRect = document.querySelector('.desktop-taskbar')?.getBoundingClientRect();
+        return {
+          overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          titleTop: titleRect?.top,
+          titleBottom: titleRect?.bottom,
+          taskbarTop: taskbarRect?.top,
+        };
+      });
+      if (
+        compactHomeState.overflow > 1
+        || compactHomeState.titleTop < -1
+        || compactHomeState.titleBottom > compactHomeState.taskbarTop
+      ) {
+        throw new Error(`Compact desktop entry focus was not visible: ${JSON.stringify(compactHomeState)}`);
+      }
+
+      await compactPage.setViewportSize({ width: 1440, height: 900 });
+      await compactPage.reload({ waitUntil: 'networkidle' });
+      await assertFocused(
+        compactPage.locator('#desktop-window-title-home'),
+        'Wide desktop home before compact reflow',
+      );
+      await compactPage.setViewportSize({ width: 320, height: 568 });
+      await assertFocused(compactTitle, 'Compact launcher after live reflow');
+      await assertVisibleFocusOutline(compactTitle, 'Compact launcher after live reflow');
+
+      await compactPage.evaluate(() => { window.location.hash = '#desktop/not-real'; });
+      await compactPage.waitForURL((url) => url.hash === '#desktop/not-real');
+      const compactHomeTitle = compactPage.locator('#desktop-window-title-home');
+      await assertFocused(compactHomeTitle, 'Compact unknown-app home title');
+      const compactFallbackState = await compactPage.evaluate(() => {
+        const titleRect = document.querySelector('#desktop-window-title-home')?.getBoundingClientRect();
+        const noticeRect = document.querySelector('.desktop-notice')?.getBoundingClientRect();
+        const taskbarRect = document.querySelector('.desktop-taskbar')?.getBoundingClientRect();
+        return {
+          titleTop: titleRect?.top,
+          titleBottom: titleRect?.bottom,
+          noticeTop: noticeRect?.top,
+          noticeBottom: noticeRect?.bottom,
+          taskbarTop: taskbarRect?.top,
+        };
+      });
+      if (
+        compactFallbackState.titleTop < -1
+        || compactFallbackState.titleBottom > compactFallbackState.taskbarTop
+        || compactFallbackState.noticeTop < -1
+        || compactFallbackState.noticeBottom > compactFallbackState.taskbarTop
+      ) {
+        throw new Error(`Compact unknown-app fallback was not visible: ${JSON.stringify(compactFallbackState)}`);
+      }
+      const compactAxeResult = await new AxeBuilder({ page: compactPage })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .analyze();
+      if (compactAxeResult.violations.length > 0) {
+        throw new Error(
+          `Compact desktop home added accessibility findings: ${compactAxeResult.violations.map(({ id }) => id).join(', ')}`,
+        );
+      }
+      if (compactErrors.length > 0) {
+        throw new Error(`Compact desktop home emitted errors: ${JSON.stringify(compactErrors)}`);
+      }
+    } finally {
+      await compactContext.close();
+    }
+  }
   if (route.verifyToolsDesktopEntry) {
     const sourceUrl = page.url();
     const toolsTrigger = page.getByRole('button', {
@@ -834,9 +931,8 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     await desktopEntry.focus();
     await page.keyboard.press('Enter');
     await page.waitForURL((url) => url.hash === '#desktop');
-    const desktopHomeTitle = page.locator('#desktop-window-title-home');
-    await assertFocused(desktopHomeTitle, 'Desktop home after Tools entry');
-    await assertVisibleFocusOutline(desktopHomeTitle, 'Desktop home after Tools entry');
+    await assertFocused(desktopHomeFocusTarget, 'Desktop home after Tools entry');
+    await assertVisibleFocusOutline(desktopHomeFocusTarget, 'Desktop home after Tools entry');
 
     await page.goBack({ waitUntil: 'networkidle' });
     if (page.url() !== sourceUrl) {

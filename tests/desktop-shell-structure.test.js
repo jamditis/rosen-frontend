@@ -80,7 +80,7 @@ describe('desktop route wiring', () => {
       'responsive Tools triggers must enter the desktop and visibly restore the canonical source');
     assert.match(audit, /'Desktop home after Start here entry'[\s\S]*page\.url\(\) !== sourceUrl[\s\S]*'Start here heading after desktop entry Back'/,
       'desktop entry and browser Back must visibly focus both ends of the round trip');
-    assert.match(audit, /slug: 'archive-desktop',[\s\S]*url: '\/#desktop',[\s\S]*verifyStartPathRoundTrip: true/);
+    assert.match(audit, /slug: 'archive-desktop',[\s\S]*url: '\/#desktop',[\s\S]*verifyStartPathRoundTrip: true,[\s\S]*verifyCompactHomeFocus: true/);
     assert.match(audit, /slug: 'desktop-start-menu',[\s\S]*verifyDesktopStartMenu: true/);
     assert.match(audit, /slug: 'desktop-unknown',[\s\S]*url: '\/#desktop\/not-real',[\s\S]*verifyBlockedMakingOf: true,[\s\S]*verifyDeferredInvalidRecord: true/);
     assert.match(audit, /verifyDesktopLoadFailure: true/);
@@ -92,6 +92,8 @@ describe('desktop route wiring', () => {
       'a delayed invalid record must never suppress visible window focus or survive validation');
     assert.match(audit, /verifyDesktopLoadFailure[\s\S]*failurePage\.route\('\*\*\/frontend\/desktop\/DesktopShell\.js\*'[\s\S]*The standard archive is still ready\.[\s\S]*Desktop failure heading[\s\S]*Open the standard archive[\s\S]*Standard archive after desktop load failure/,
       'a blocked optional module must focus its fallback and retain a verified standard escape');
+    assert.match(audit, /verifyCompactHomeFocus[\s\S]*width: 320, height: 568[\s\S]*Compact desktop launcher heading[\s\S]*Wide desktop home before compact reflow[\s\S]*Compact launcher after live reflow[\s\S]*Compact unknown-app home title[\s\S]*Compact unknown-app fallback was not visible/,
+      'the smallest compact home must keep both ordinary and fallback focus visibly oriented');
     assert.match(audit, /slug: 'desktop-archive',[\s\S]*url: '\/#desktop\/archive',[\s\S]*verifyStandardExit:[\s\S]*appId: 'archive'/);
     assert.match(audit, /slug: 'desktop-folders',[\s\S]*url: '\/#desktop\/folders',[\s\S]*verifyStandardExit:[\s\S]*appId: 'folders'/);
     assert.match(audit, /slug: 'desktop-start',[\s\S]*url: '\/#desktop\/start',[\s\S]*verifyStandardExit:[\s\S]*appId: 'start'/);
@@ -469,6 +471,7 @@ describe('desktop windowing and spatial memory', () => {
   it('renders named non-modal windows, active state, task buttons, and reset controls', () => {
     const shell = read('frontend/desktop/DesktopShell.js');
     const app = read('frontend/App.js');
+    const css = read('frontend/desktop/desktop.css');
     assert.match(shell, /className="desktop-window-stack"/);
     assert.match(shell, /role="region"/);
     assert.match(shell, /desktop-active-window-label/);
@@ -490,6 +493,10 @@ describe('desktop windowing and spatial memory', () => {
     assert.match(shell, /compactQuery\.addEventListener\('change', preserveVisibleFocus\)/);
     assert.match(shell, /shortcutPanelRef\.current\?\.contains\(document\.activeElement\)[\s\S]*windowTitleRefs\.current\[shellApp\.id\]\?\.focus/,
       'compact reflow must transfer focus out of the shortcut panel it hides');
+    assert.match(shell, /compactDesktop[\s\S]*desktopTitleRef\.current[\s\S]*revealFocusTarget[\s\S]*scrollIntoView/,
+      'compact home must focus its visible launcher while compact fallback routes reveal their message');
+    assert.match(css, /\.desktop-brand h1:focus-visible\s*\{[\s\S]*outline:\s*2px solid #fff/,
+      'the compact launcher focus destination must expose a visible indicator');
     assert.match(shell, /Minimize \$\{windowTitle\}/);
     assert.match(shell, /aria-label="Open desktop windows"/);
     assert.match(shell, /Reset desktop layout/);

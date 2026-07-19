@@ -72,6 +72,8 @@ const launchModeLabel = (app) => {
   return 'Standard view';
 };
 
+const COMPACT_DESKTOP_QUERY = '(max-width: 700px), (max-width: 900px) and (max-height: 520px)';
+
 const DesktopShell = ({
   activeAppId = null,
   autoFocusWindow = true,
@@ -196,6 +198,8 @@ const DesktopShell = ({
 
   useEffect(() => {
     let focusTarget = null;
+    let revealFocusTarget = false;
+    const compactDesktop = window.matchMedia?.(COMPACT_DESKTOP_QUERY).matches === true;
     if (shellApp) {
       lastShellAppRef.current = shellApp.id;
       if (!autoFocusWindow) return undefined;
@@ -205,6 +209,7 @@ const DesktopShell = ({
     } else if (activeAppId) {
       setStatusMessage('That desktop item is unavailable. Showing the desktop home.');
       focusTarget = windowTitleRefs.current.home;
+      revealFocusTarget = compactDesktop;
     } else if (lastShellAppRef.current && layout.windows.length === 0) {
       const index = shortcutApps.findIndex((app) => app.id === lastShellAppRef.current);
       if (index >= 0) {
@@ -213,7 +218,9 @@ const DesktopShell = ({
       }
       lastShellAppRef.current = null;
     } else {
-      focusTarget = windowTitleRefs.current.home || desktopTitleRef.current;
+      focusTarget = compactDesktop
+        ? desktopTitleRef.current
+        : windowTitleRefs.current.home || desktopTitleRef.current;
     }
 
     const frame = requestAnimationFrame(() => {
@@ -225,6 +232,9 @@ const DesktopShell = ({
         if (activeWindow?.contains(document.activeElement)) return;
       }
       focusTarget?.focus({ preventScroll: true });
+      if (revealFocusTarget) {
+        focusTarget?.scrollIntoView({ block: 'start', inline: 'nearest' });
+      }
     });
     return () => cancelAnimationFrame(frame);
   }, [
@@ -249,23 +259,26 @@ const DesktopShell = ({
 
   useEffect(() => {
     if (!window.matchMedia) return undefined;
-    const compactQuery = window.matchMedia(
-      '(max-width: 700px), (max-width: 900px) and (max-height: 520px)',
-    );
+    const compactQuery = window.matchMedia(COMPACT_DESKTOP_QUERY);
     const preserveVisibleFocus = (event) => {
-      if (
-        event.matches
-        && shellApp
-        && shortcutPanelRef.current?.contains(document.activeElement)
-      ) {
+      if (!event.matches) return;
+      if (shellApp && shortcutPanelRef.current?.contains(document.activeElement)) {
         requestAnimationFrame(() => {
           windowTitleRefs.current[shellApp.id]?.focus({ preventScroll: true });
+        });
+      } else if (!shellApp && document.activeElement === windowTitleRefs.current.home) {
+        requestAnimationFrame(() => {
+          if (activeAppId) {
+            windowTitleRefs.current.home?.scrollIntoView({ block: 'start', inline: 'nearest' });
+          } else {
+            desktopTitleRef.current?.focus({ preventScroll: true });
+          }
         });
       }
     };
     compactQuery.addEventListener('change', preserveVisibleFocus);
     return () => compactQuery.removeEventListener('change', preserveVisibleFocus);
-  }, [shellApp]);
+  }, [activeAppId, shellApp]);
 
   useEffect(() => {
     if (!startOpen) return undefined;
