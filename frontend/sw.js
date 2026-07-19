@@ -21,7 +21,12 @@ const DATA_CACHE_NAME = `jrda-data-${CACHE_VERSION}`;
 // this classic worker is loaded through the root sw.js bridge, so it cannot
 // `import` from the shared resolver and duplicates this logic inline.
 const HOST = self.location.hostname;
-const IS_LOCAL = HOST === 'localhost' || HOST === '127.0.0.1';
+// Browsers serialize IPv6 URL hostnames with brackets; tests and other
+// runtimes may expose the bare literal. Keep this in sync with pathResolver.
+const IS_LOCAL = HOST === 'localhost'
+  || HOST === '127.0.0.1'
+  || HOST === '::1'
+  || HOST === '[::1]';
 const IS_GITHUB_PAGES = HOST.endsWith('.github.io');
 
 const SITE_ROOT = IS_LOCAL ? ''

@@ -116,6 +116,15 @@ async function runMessage(handlers, data) {
 }
 
 describe('service worker install precache (#274)', () => {
+  it('keeps browser-serialized IPv6 loopback on local preview paths', async () => {
+    const { handlers, added } = loadSW('[::1]');
+    await runInstall(handlers);
+    assert.ok(added.includes('/index.html'));
+    assert.ok(added.includes('/frontend/App.js'));
+    assert.ok(added.includes('/data/archive-core.json'));
+    assert.equal(added.some((url) => url.startsWith('/j/rosen-archive/')), false);
+  });
+
   it('warms archive-core.json on install', async () => {
     const { handlers, added } = loadSW();
     await runInstall(handlers);
