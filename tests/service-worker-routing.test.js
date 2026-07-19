@@ -147,28 +147,38 @@ describe('service worker install precache (#274)', () => {
     assert.ok(!added.includes('/frontend/index.html'), 'nonexistent frontend index must not be cached');
   });
 
-  it('keeps every GitHub Pages install entry inside the deployed subtree', async () => {
-    const { handlers, added } = loadSW('jamditis.github.io');
-    await runInstall(handlers);
-    assert.ok(added.length > 0, 'GitHub Pages install manifest is empty');
-    assert.ok(
-      added.every(url => url.startsWith('/rosen-frontend/')),
-      `install entry escaped /rosen-frontend/: ${added.find(url => !url.startsWith('/rosen-frontend/'))}`
-    );
-    assert.ok(added.includes('/rosen-frontend/'), 'GitHub Pages app root missing from precache');
-  });
+  for (const [surface, host, prefix] of [
+    ['GitHub Pages', 'jamditis.github.io', '/rosen-frontend'],
+    ['production', 'pressthink.org', '/j/rosen-archive'],
+  ]) {
+    it(`keeps every ${surface} install entry inside the deployed subtree`, async () => {
+      const { handlers, added } = loadSW(host);
+      await runInstall(handlers);
+      assert.ok(added.length > 0, `${surface} install manifest is empty`);
+      assert.ok(
+        added.every(url => url.startsWith(`${prefix}/`)),
+        `install entry escaped ${prefix}/: ${added.find(url => !url.startsWith(`${prefix}/`))}`
+      );
+      assert.ok(added.includes(`${prefix}/`), `${surface} app root missing from precache`);
+    });
+  }
 });
 
 describe('service worker optional desktop cache', () => {
-  it('warms exactly nine versioned desktop assets under the GitHub Pages subtree', async () => {
-    const { handlers, added } = loadSW('jamditis.github.io');
-    await runMessage(handlers, { action: 'cacheDesktop' });
+  for (const [surface, host, prefix] of [
+    ['GitHub Pages', 'jamditis.github.io', '/rosen-frontend'],
+    ['production', 'pressthink.org', '/j/rosen-archive'],
+  ]) {
+    it(`warms exactly nine versioned desktop assets under the ${surface} subtree`, async () => {
+      const { handlers, added } = loadSW(host);
+      await runMessage(handlers, { action: 'cacheDesktop' });
 
-    assert.equal(added.length, 9);
-    assert.equal(new Set(added).size, 9);
-    assert.ok(added.every(url => url.startsWith('/rosen-frontend/frontend/desktop/')));
-    assert.ok(added.every(url => url.endsWith('?v=3.7.5')));
-  });
+      assert.equal(added.length, 9);
+      assert.equal(new Set(added).size, 9);
+      assert.ok(added.every(url => url.startsWith(`${prefix}/frontend/desktop/`)));
+      assert.ok(added.every(url => url.endsWith('?v=3.7.5')));
+    });
+  }
 });
 
 describe('service worker safePut (#274)', () => {
