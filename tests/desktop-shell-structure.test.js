@@ -332,6 +332,7 @@ describe('desktop interaction structure', () => {
 
   it('defines touch, responsive, safe-area, and reduced-motion behavior', () => {
     const css = read('frontend/desktop/desktop.css');
+    const indexCss = read('frontend/index.css');
     assert.match(css, /min-width:\s*44px/);
     assert.match(css, /min-height:\s*44px/);
     assert.match(css, /@media\s*\(max-width:\s*700px\)/);
@@ -354,5 +355,7 @@ describe('desktop interaction structure', () => {
     assert.match(css, /\.desktop-window-wide\s+\.desktop-window-body\s*\{[^}]*overscroll-behavior:\s*contain/s);
     assert.match(css, /@media \(max-width: 700px\)[\s\S]*?\.desktop-window-wide\s+\.desktop-window-body\s*\{[^}]*height:\s*auto[^}]*overflow-y:\s*visible/s,
       'compact layouts return window content to the normal mobile flow');
+    assert.match(indexCss, /@media \(max-width: 700px\), \(max-width: 900px\) and \(max-height: 520px\)[\s\S]*\.archive-desktop \.desktop-window-body input[\s\S]*\.archive-report-dialog textarea[\s\S]*font-size:\s*1rem/,
+      'compact text fields must not trigger iOS focus zoom around fixed shell controls');
   });
 });
