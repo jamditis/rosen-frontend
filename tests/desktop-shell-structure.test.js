@@ -44,6 +44,7 @@ describe('desktop route wiring', () => {
   it('adds the desktop route to preview audit at mobile, tablet, and desktop sizes', () => {
     const audit = read('scripts/preview-audit.js');
     assert.match(audit, /slug: 'archive-desktop',\s+url: '\/#desktop'/);
+    assert.match(audit, /slug: 'desktop-start-menu',[\s\S]*verifyDesktopStartMenu: true/);
     assert.match(audit, /slug: 'desktop-unknown',\s+url: '\/#desktop\/not-real'/);
     assert.match(audit, /slug: 'desktop-archive',\s+url: '\/#desktop\/archive'/);
     assert.match(audit, /slug: 'desktop-start',\s+url: '\/#desktop\/start'/);
@@ -65,6 +66,11 @@ describe('desktop route wiring', () => {
     assert.match(audit, /assertFocused\(dialogClose, 'Direct record dialog'\)/);
     assert.match(audit, /assertFocused\(page\.locator\('#entity-detail-title'\), 'Selected entity after direct record close'\)/);
     assert.match(audit, /assertFocused\(recordOpener, 'Entity record opener after ordinary close'\)/);
+    assert.match(audit, /menuItemCount !== 15/,
+      'the complete Start menu is exercised as an open accessibility state');
+    assert.match(audit, /assertFocused\(startButton, 'Start button after Escape'\)/);
+    assert.match(audit, /getByRole\('region', \{ name: 'Tools' \}\)\.waitFor\(\)/,
+      'the Start audit proves a real in-shell destination launches');
     assert.match(audit, /slug: 'desktop-windowing'[\s\S]*desktopLayout:[\s\S]*zOrder/);
     assert.match(audit, /name: 'mobile',\s+width: 375,\s+height: 812/);
     assert.match(audit, /name: 'tablet',\s+width: 768,\s+height: 1024/);

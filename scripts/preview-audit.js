@@ -42,6 +42,7 @@ const ROUTES = [
   { slug: 'start-here',         url: '/#start' },
   { slug: 'participate',        url: '/features/participate/' },
   { slug: 'archive-desktop',    url: '/#desktop' },
+  { slug: 'desktop-start-menu', url: '/#desktop', verifyDesktopStartMenu: true },
   { slug: 'desktop-unknown',    url: '/#desktop/not-real' },
   { slug: 'desktop-archive',    url: '/#desktop/archive' },
   { slug: 'desktop-start',      url: '/#desktop/start' },
@@ -153,6 +154,42 @@ async function auditOne(page, route, viewport) {
     await page.locator('svg[aria-label^="Dissertation mind map"] [role="button"]').first().click();
     await page.getByRole('dialog').waitFor();
     await page.waitForTimeout(100);
+  }
+  if (route.verifyDesktopStartMenu) {
+    const assertFocused = async (locator, label) => {
+      await locator.waitFor();
+      await page.waitForTimeout(100);
+      if (!await locator.evaluate((element) => document.activeElement === element)) {
+        throw new Error(`${label} did not own focus`);
+      }
+    };
+    const startButton = page.getByRole('button', { name: 'Start', exact: true });
+    const startMenu = page.getByRole('menu', { name: 'Archive desktop Start menu' });
+
+    await startButton.click();
+    await startMenu.waitFor();
+    const menuItems = startMenu.getByRole('menuitem');
+    const menuItemCount = await menuItems.count();
+    if (menuItemCount !== 15) {
+      throw new Error(`Start menu exposed ${menuItemCount} destinations; expected 15`);
+    }
+    await assertFocused(menuItems.first(), 'First Start menu destination');
+    await page.keyboard.press('ArrowDown');
+    await assertFocused(startMenu.getByRole('menuitem', { name: /^Folders/ }), 'Next Start menu destination');
+    await page.keyboard.press('End');
+    await assertFocused(startMenu.getByRole('menuitem', { name: /^Standard archive/ }), 'Last Start menu destination');
+    await page.keyboard.press('Home');
+    await assertFocused(menuItems.first(), 'First Start menu destination after Home');
+    await page.keyboard.press('Escape');
+    await startMenu.waitFor({ state: 'hidden' });
+    await assertFocused(startButton, 'Start button after Escape');
+
+    await startButton.click();
+    await startMenu.getByRole('menuitem', { name: /^Tools/ }).click();
+    await page.getByRole('region', { name: 'Tools' }).waitFor();
+    await startButton.click();
+    await startMenu.waitFor();
+    await assertFocused(menuItems.first(), 'First Start menu destination after an app launch');
   }
 
   const shotDir = resolve(OUT_DIR, 'screenshots', viewport.name);

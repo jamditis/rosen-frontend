@@ -66,6 +66,15 @@ describe('desktop app registry', () => {
     }
   });
 
+  it('points every standalone app at a deployed local file', () => {
+    for (const app of getReadyDesktopApps().filter(({ launch }) => launch.kind === 'path')) {
+      const relativeFile = app.launch.destination.endsWith('/')
+        ? `${app.launch.destination}index.html`
+        : app.launch.destination;
+      assert.ok(existsSync(join(process.cwd(), relativeFile)), `${app.id} target exists: ${relativeFile}`);
+    }
+  });
+
   it('opens the canonical explore and research surfaces through real in-shell adapters', () => {
     for (const id of ['archive', 'folders', 'start', 'findings', 'entities', 'dissertation', 'analytics']) {
       const app = getDesktopApp(id);
