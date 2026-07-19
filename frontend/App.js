@@ -154,10 +154,24 @@ const App = () => {
   useEffect(() => {
     migrateLegacyUrl();
 
-    const syncRoute = () => {
+    const syncRoute = (event) => {
       const route = getCurrentRoute();
       setCurrentRoute(route);
       setDesktopAppId(getDesktopAppIdFromUrl());
+
+      // Desktop filters replace the current history entry as their readable
+      // query string changes. Back/Forward must therefore restore those
+      // historical query-backed filters alongside the active window. Ordinary
+      // hash navigation keeps the live in-memory filters (standard archive
+      // filters are not URL-synchronised), while transient analytics recordIds
+      // intentionally clear because they are not part of the URL contract.
+      if (event?.type === 'popstate') {
+        const historicalState = parseViewState(window.location.href);
+        setFilters({
+          ...DEFAULT_FILTERS,
+          ...historicalState.filters,
+        });
+      }
 
       const recordId = getRecordIdFromUrl();
       if (recordId && records.length > 0) {

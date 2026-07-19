@@ -115,6 +115,8 @@ describe('desktop archive adapter', () => {
     assert.match(app, /viewStateToUrl\(\{[\s\S]*route:\s*ROUTES\.desktop/);
     assert.match(app, /routeParams:\s*\{\s*desktopAppId\s*\}/);
     assert.match(app, /selectedRecord:\s*selectedRecordId/);
+    assert.match(app, /event\?\.type === 'popstate'[\s\S]*historicalState = parseViewState\(window\.location\.href\)[\s\S]*setFilters\(\{[\s\S]*\.\.\.DEFAULT_FILTERS,[\s\S]*\.\.\.historicalState\.filters/,
+      'Back and Forward must restore the query-backed filters recorded in desktop history');
   });
 });
 
