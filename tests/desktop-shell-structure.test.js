@@ -526,6 +526,10 @@ describe('desktop interaction structure', () => {
     assert.match(handoff, /375 × 812/);
     assert.match(handoff, /200%-zoom equivalent/);
     assert.match(handoff, /Screen reader:/);
+    assert.match(handoff, /Left\/Right stop at visual row edges/,
+      'the review script must exercise the shortcut field as a spatial keyboard model');
+    assert.match(handoff, /repeat from the Start menu[\s\S]*visible focus ring to Start/,
+      'the transient report-menu trigger needs an explicit independent-review check');
     assert.doesNotMatch(handoff, /\/home\/jamditis/,
       'the checked-in review procedure must not depend on the author worktree path');
     assert.match(handoff, /A `FAILED` console line or an `audit-error` report row is a runtime regression/,

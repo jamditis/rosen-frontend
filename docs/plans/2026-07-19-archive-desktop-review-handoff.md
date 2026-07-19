@@ -95,9 +95,10 @@ At narrow widths, confirm the metaphor intentionally becomes a two-column touch 
 
 Keyboard-only:
 
-- traverse shortcuts with Arrow keys, Home, End, Enter, and Space;
+- traverse shortcuts with Arrow keys, Home, End, Enter, and Space; confirm Left/Right stop at visual row edges and Up/Down stop at column edges instead of jumping diagonally;
 - open Start, traverse all groups, verify Arrow-key wrap, and close with Escape;
 - reopen Start and leave it with forward and reverse Tab; focus should land on a visible adjacent control, never the removed popup;
+- open Report a problem from its desktop shortcut, close with Escape, and confirm focus returns to that exact shortcut; repeat from the Start menu and confirm the first report field receives focus before Escape returns a visible focus ring to Start;
 - launch About from Start and confirm the in-document route change never leaves focus on the document body;
 - enter and leave record dialogs, entity details, filter drawers, and dissertation details;
 - minimize/restore/close windows and use Reset;
