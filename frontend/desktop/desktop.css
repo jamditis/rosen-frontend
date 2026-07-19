@@ -196,7 +196,12 @@
 .desktop-window-stack {
   position: relative;
   min-width: 0;
-  min-height: calc(100svh - var(--desktop-taskbar-height) - 4rem);
+  min-height: calc(
+    100svh
+    - var(--desktop-taskbar-height)
+    - 2.5rem
+    - clamp(1rem, 2.2vw, 2rem)
+  );
 }
 
 .desktop-window {
@@ -640,7 +645,21 @@
 
 .desktop-window-wide .desktop-window-body {
   position: relative;
-  min-height: 620px;
+  height: min(
+    760px,
+    calc(
+      100svh
+      - var(--desktop-taskbar-height)
+      - clamp(1rem, 2.2vw, 2rem)
+      - clamp(1.4rem, 5vh, 4rem)
+      - var(--desktop-window-y, 0px)
+      - 6.5rem
+    )
+  );
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .desktop-archive-panel {
@@ -1029,12 +1048,8 @@
 .desktop-guided-panel {
   container-type: inline-size;
   min-height: 616px;
-  max-height: calc(100vh - 210px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
   color: #211e1a;
   background: #fdfbf7;
-  scrollbar-gutter: stable;
 }
 
 .desktop-guided-panel button.text-white {
@@ -1585,7 +1600,11 @@
   }
 
   .desktop-window-wide .desktop-window-body {
+    height: auto;
     min-height: calc(100svh - var(--desktop-taskbar-height) - 110px - env(safe-area-inset-bottom, 0px));
+    overflow-y: visible;
+    overscroll-behavior: auto;
+    scrollbar-gutter: auto;
   }
 
   .desktop-archive-panel {
@@ -1638,6 +1657,9 @@
     height: calc(100svh - var(--desktop-taskbar-height) - 110px - env(safe-area-inset-bottom, 0px));
     min-height: inherit;
     max-height: calc(100svh - var(--desktop-taskbar-height) - 110px - env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
   }
 
   .desktop-adapter-toolbar {

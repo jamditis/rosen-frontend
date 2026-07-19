@@ -337,5 +337,11 @@ describe('desktop interaction structure', () => {
     assert.match(css, /Previous results page[\s\S]*min-width:\s*44px/);
     assert.match(css, /desktop-canonical-surface button[\s\S]*min-width:\s*44px/);
     assert.match(css, /@container\s*\(min-width:\s*42rem\)[\s\S]*selected-findings-grid/);
+    assert.match(css, /\.desktop-window-wide\s+\.desktop-window-body\s*\{[^}]*height:\s*min\(/s,
+      'wide desktop windows bound their content pane to the available viewport');
+    assert.match(css, /\.desktop-window-wide\s+\.desktop-window-body\s*\{[^}]*overflow-y:\s*auto/s);
+    assert.match(css, /\.desktop-window-wide\s+\.desktop-window-body\s*\{[^}]*overscroll-behavior:\s*contain/s);
+    assert.match(css, /@media \(max-width: 700px\)[\s\S]*?\.desktop-window-wide\s+\.desktop-window-body\s*\{[^}]*height:\s*auto[^}]*overflow-y:\s*visible/s,
+      'compact layouts return window content to the normal mobile flow');
   });
 });
