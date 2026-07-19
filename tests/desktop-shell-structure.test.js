@@ -297,6 +297,9 @@ describe('desktop interaction structure', () => {
     assert.match(css, /@media\s*\(max-width:\s*700px\)/);
     assert.match(css, /env\(safe-area-inset-bottom/);
     assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+    const archivePanel = read('frontend/desktop/DesktopArchivePanel.js');
+    assert.match(archivePanel, /prefers-reduced-motion: reduce/);
+    assert.match(archivePanel, /behavior:\s*reduceMotion \? 'auto' : 'smooth'/);
     assert.match(css, /@media\s*\(forced-colors:\s*active\)[\s\S]*\.desktop-wallpaper-mark\s*\{\s*display:\s*none/);
     assert.match(css, /\.desktop-brand,[\s\S]*\.desktop-shortcut-mode\s*\{[\s\S]*color:\s*CanvasText/);
     assert.match(css, /\.desktop-menu-item:hover small,[\s\S]*color:\s*CanvasText/);

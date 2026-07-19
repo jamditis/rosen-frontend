@@ -66,7 +66,11 @@ const DesktopArchivePanel = ({
 
   const changePage = (page) => {
     onPageChange(page);
-    resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    resultsRef.current?.scrollIntoView({
+      behavior: reduceMotion ? 'auto' : 'smooth',
+      block: 'start',
+    });
   };
 
   const errorPanel = error && html`
