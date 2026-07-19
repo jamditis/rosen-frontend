@@ -8,6 +8,7 @@ const index = read('index.html');
 const bridge = read('sw.js');
 const worker = read('frontend/sw.js');
 const shell = read('frontend/desktop/DesktopShell.js');
+const deployment = read('DEPLOYMENT.md');
 
 describe('root service-worker scope', () => {
   it('registers a root bridge and checks its imported implementation fresh', () => {
@@ -57,5 +58,13 @@ describe('service-worker shell manifests', () => {
     assert.match(worker, /DESKTOP_ASSETS[\s\S]*\?v=\$\{CACHE_VERSION\}/);
     assert.match(worker, /event\.data\?\.action === 'cacheDesktop'/);
     assert.match(shell, /postMessage\(\{ action: 'cacheDesktop' \}\)/);
+  });
+
+  it('documents the optional desktop deployment and offline release check', () => {
+    assert.match(deployment, /desktop\/\s+# Optional lazy desktop shell/);
+    assert.match(deployment, /standard archive visit must not request or\s+cache them/);
+    assert.match(deployment, /DESKTOP_ASSETS/);
+    assert.match(deployment, /deploy_full_site\.py --dry-run/);
+    assert.match(deployment, /Do not add `features\/making-of\/`/);
   });
 });
