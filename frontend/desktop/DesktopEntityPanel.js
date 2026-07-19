@@ -4,6 +4,7 @@ import EntityBrowser from '../components/EntityBrowser.js?v=3.7.5';
 const DesktopEntityPanel = ({
   records,
   queryActive,
+  dataStatus = null,
   onSelectRecord,
   onOpenStandard,
 }) => html`
@@ -20,6 +21,7 @@ const DesktopEntityPanel = ({
         Open standard view
       </button>
     </header>
+    ${dataStatus}
     <div className="desktop-entity-browser">
       <${EntityBrowser}
         records=${records}

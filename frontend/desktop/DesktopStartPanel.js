@@ -5,6 +5,7 @@ import StartHerePage, { SelectedFindings } from '../components/StartHerePage.js?
 const DesktopStartPanel = ({
   mode = 'start',
   records = [],
+  dataStatus = null,
   onNavigate,
   onSelectRecord,
   onOpenBugReport,
@@ -25,6 +26,8 @@ const DesktopStartPanel = ({
           ${findingsOnly ? 'Open standard Start here' : 'Open standard view'}
         </button>
       </div>
+
+      ${dataStatus}
 
       ${findingsOnly ? html`
         <div className="desktop-findings-content">

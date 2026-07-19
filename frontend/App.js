@@ -551,6 +551,8 @@ const App = () => {
   const desktopEntityView = {
     records: queryRecords,
     queryActive: filters.recordIds !== null,
+    loading,
+    error,
     onSelectRecord: selectRecord,
     onOpenStandard: () => goTo(ROUTES.entities),
   };
@@ -566,6 +568,8 @@ const App = () => {
 
   const desktopStartView = {
     records,
+    loading,
+    error,
     onNavigate: handleDesktopGuideNavigate,
     onSelectRecord: selectRecord,
     onOpenBugReport: () => {

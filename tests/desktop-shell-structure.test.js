@@ -127,6 +127,9 @@ describe('desktop entity adapter', () => {
     assert.match(panel, /<\$\{EntityBrowser\}/);
     assert.match(app, /entityView=\$\{desktopEntityView\}/);
     assert.match(app, /records:\s*queryRecords/);
+    assert.match(app, /const desktopEntityView = \{[\s\S]*?loading,[\s\S]*?error,/);
+    assert.match(panel, /dataStatus\s*=\s*null/);
+    assert.match(panel, /\$\{dataStatus\}[\s\S]*?<div className="desktop-entity-browser">/);
     assert.match(app, /desktopActiveNeedsRecords \? recordView : null/,
       'entity records open in the canonical RecordView overlay');
   });
@@ -222,7 +225,23 @@ describe('desktop guided-path adapter', () => {
     assert.match(startPage, /start-here-path-grid/);
     assert.match(startPage, /selected-findings-grid/);
     assert.match(app, /startView=\$\{desktopStartView\}/);
-    assert.match(app, /records,\s*\n\s*onNavigate:\s*handleDesktopGuideNavigate/);
+    assert.match(app, /const desktopStartView = \{[\s\S]*?records,[\s\S]*?onNavigate:\s*handleDesktopGuideNavigate/);
+    assert.match(app, /const desktopStartView = \{[\s\S]*?loading,[\s\S]*?error,/);
+    assert.match(panel, /dataStatus\s*=\s*null/);
+    assert.match(panel, /\$\{dataStatus\}[\s\S]*?\$\{findingsOnly \? html`/);
+  });
+
+  it('explains loading and failed canonical record data in dependent windows', () => {
+    const shell = read('frontend/desktop/DesktopShell.js');
+    const css = read('frontend/desktop/desktop.css');
+
+    assert.match(shell, /role="status">\$\{loadingMessage\}/);
+    assert.match(shell, /className="desktop-data-status is-error" role="alert"/);
+    assert.match(shell, /Connected records are unavailable\./);
+    assert.match(shell, /Guide records are unavailable\./);
+    assert.match(shell, /window\.location\.reload\(\)/);
+    assert.match(css, /\.desktop-data-status\.is-error button \{[\s\S]*?min-height:\s*44px/);
+    assert.match(css, /\.desktop-data-status\.is-error button:focus-visible/);
   });
 
   it('keeps guide navigation in shell and opens records in the canonical overlay', () => {

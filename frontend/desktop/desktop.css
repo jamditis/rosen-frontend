@@ -949,6 +949,74 @@
   padding-top: 1rem;
 }
 
+.desktop-data-status {
+  margin: 1rem 0 0;
+  padding: 0.8rem 1rem;
+  border-left: 5px solid #6d655a;
+  background: #eee9df;
+  color: #3f3932;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.desktop-data-status.is-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  border: 1px solid #a43c32;
+  border-left: 5px solid #a43c32;
+  background: #fff0eb;
+  color: #5d211c;
+  font-weight: 400;
+}
+
+.desktop-data-status.is-error > svg {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.desktop-data-status.is-error strong {
+  display: block;
+  font-family: var(--font-display, 'Special Elite', cursive);
+  font-size: 1.05rem;
+}
+
+.desktop-data-status.is-error p {
+  margin: 0.35rem 0 0.75rem;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.desktop-data-status.is-error button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.7rem;
+  border: 2px solid #716d64;
+  background: #fffdf8;
+  color: inherit;
+  font-size: 0.68rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.desktop-data-status.is-error button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.desktop-data-status.is-error button:focus-visible {
+  outline: 3px solid #9b6b00;
+  outline-offset: 2px;
+}
+
+.desktop-guided-panel > .desktop-data-status {
+  margin: 1rem clamp(1rem, 3vw, 2rem) 0;
+}
+
 .desktop-entity-browser button,
 .desktop-entity-browser input,
 .desktop-entity-browser select {

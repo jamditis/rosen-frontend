@@ -501,6 +501,30 @@ const DesktopShell = ({
     </div>
   `;
 
+  const renderDataStatus = (view, loadingMessage, errorTitle) => {
+    if (view.error) {
+      return html`
+        <div className="desktop-data-status is-error" role="alert">
+          <${AlertTriangle} aria-hidden="true" />
+          <div>
+            <strong>${errorTitle}</strong>
+            <p>${view.error}</p>
+            <button type="button" onClick=${() => window.location.reload()}>
+              <${RotateCcw} aria-hidden="true" />
+              Reload page
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    if (view.loading) {
+      return html`<p className="desktop-data-status" role="status">${loadingMessage}</p>`;
+    }
+
+    return null;
+  };
+
   const renderArchive = (appId) => {
     const windowViewMode = appId === 'folders' ? 'folder' : 'grid';
     return html`
@@ -534,6 +558,11 @@ const DesktopShell = ({
     <${DesktopEntityPanel}
       records=${entityView.records}
       queryActive=${entityView.queryActive}
+      dataStatus=${renderDataStatus(
+        entityView,
+        'Loading connected archive records…',
+        'Connected records are unavailable.',
+      )}
       onSelectRecord=${entityView.onSelectRecord}
       onOpenStandard=${entityView.onOpenStandard}
     />
@@ -556,6 +585,11 @@ const DesktopShell = ({
     <${DesktopStartPanel}
       mode=${appId}
       records=${startView.records}
+      dataStatus=${renderDataStatus(
+        startView,
+        'Loading the guide’s archive records…',
+        'Guide records are unavailable.',
+      )}
       onNavigate=${startView.onNavigate}
       onSelectRecord=${startView.onSelectRecord}
       onOpenBugReport=${startView.onOpenBugReport}
