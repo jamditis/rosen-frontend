@@ -655,6 +655,10 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     await assertFocused(recordOpener, 'Entity record opener after ordinary close');
   }
   if (route.verifyBlockedMakingOf) {
+    await page.getByRole('button', { name: /^Tools\./ }).click();
+    await page.waitForURL((url) => url.hash === '#desktop/tools');
+    await assertFocused(page.locator('#desktop-window-title-tools'), 'Tools title before blocked making-of URL');
+
     const archiveDataRequests = [];
     const captureArchiveData = (request) => {
       if (new URL(request.url()).pathname.includes('/data/archive-')) {
@@ -681,6 +685,16 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       throw new Error(`Blocked making-of URL loaded archive data: ${JSON.stringify(archiveDataRequests)}`);
     }
     await assertFocused(page.locator('#desktop-window-title-home'), 'Desktop home after blocked making-of URL');
+    const homeTitleIsTopmost = await page.locator('#desktop-window-title-home').evaluate((title) => {
+      const rect = title.getBoundingClientRect();
+      const topmostWindow = document
+        .elementFromPoint(rect.left + (rect.width / 2), rect.top + (rect.height / 2))
+        ?.closest('[data-window-id]');
+      return topmostWindow?.dataset.windowId === 'home';
+    });
+    if (!homeTitleIsTopmost) {
+      throw new Error('Restored desktop window covered the active home title');
+    }
   }
   if (route.verifyDeferredInvalidRecord) {
     const browser = page.context().browser();

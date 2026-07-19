@@ -81,6 +81,8 @@ describe('desktop route wiring', () => {
     assert.match(audit, /slug: 'desktop-unknown',[\s\S]*url: '\/#desktop\/not-real',[\s\S]*verifyBlockedMakingOf: true,[\s\S]*verifyDeferredInvalidRecord: true/);
     assert.match(audit, /window\.location\.hash = '#desktop\/making-of'[\s\S]*Blocked making-of metadata leaked[\s\S]*Blocked making-of URL loaded archive data[\s\S]*Desktop home after blocked making-of URL/,
       'a guessed gated route must remain generic, data-free, and home-focused');
+    assert.match(audit, /Desktop home after blocked making-of URL[\s\S]*elementFromPoint[\s\S]*Restored desktop window covered the active home title/,
+      'a restored window must not visually cover the active desktop home fallback');
     assert.match(audit, /verifyDeferredInvalidRecord[\s\S]*browser\.newContext\([\s\S]*serviceWorkers: 'block'[\s\S]*invalidPage\.route\('\*\*\/data\/archive-core\.json'[\s\S]*NOT-A-RECORD[\s\S]*Archive title did not own focus while an invalid record waited for validation[\s\S]*Invalid deferred record remained in the canonical URL/,
       'a delayed invalid record must never suppress visible window focus or survive validation');
     assert.match(audit, /slug: 'desktop-archive',[\s\S]*url: '\/#desktop\/archive',[\s\S]*verifyStandardExit:[\s\S]*appId: 'archive'/);
@@ -471,6 +473,8 @@ describe('desktop windowing and spatial memory', () => {
       'a foreground record overlay must retain focus ownership during direct desktop loads');
     assert.match(shell, /activeShellWindowVisible[\s\S]*layout\.windows\.some\(\(entry\) => entry\.id === shellApp\.id && !entry\.minimized\)/,
       'focus must rerun when history remounts a minimized active window without changing window count');
+    assert.match(shell, /shellApp \? 1 : layout\.zOrder\.length \+ 3/,
+      'desktop home must stack above restored windows when the URL makes home active');
     assert.match(app, /autoFocusWindow=\$\{!desktopRecordOverlayOpen\}/);
     assert.match(shell, /pointerWindowControlRef/,
       'pointer title-bar actions must not be consumed by background-window activation');

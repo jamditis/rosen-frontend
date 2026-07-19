@@ -642,7 +642,13 @@ const DesktopShell = ({
       '--desktop-window-x': `${(stackIndex % 4) * 14}px`,
       '--desktop-window-y': `${(stackIndex % 4) * 14}px`,
       zIndex: stackIndex + 3,
-    } : { zIndex: 1 };
+    } : {
+      // Restored windows remain available in the taskbar on a desktop-home or
+      // unknown-app URL, but home is the active surface in both cases. Keep it
+      // above the saved stack so its visible content agrees with URL and focus
+      // state; an activated app sends home back behind the stack.
+      zIndex: shellApp ? 1 : layout.zOrder.length + 3,
+    };
 
     return html`
       <section
