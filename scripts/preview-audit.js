@@ -54,9 +54,47 @@ const ROUTES = [
       focusLabel: 'Standard archive main after desktop exit',
     },
   },
-  { slug: 'desktop-start',      url: '/#desktop/start' },
-  { slug: 'desktop-findings',   url: '/#desktop/findings' },
-  { slug: 'desktop-entities',   url: '/#desktop/entities' },
+  {
+    slug: 'desktop-folders',
+    url: '/#desktop/folders',
+    verifyStandardExit: {
+      appId: 'folders',
+      expectedHash: '#folders',
+      focusSelector: '#main-content',
+      focusLabel: 'Standard folders main after desktop exit',
+    },
+  },
+  {
+    slug: 'desktop-start',
+    url: '/#desktop/start',
+    verifyStandardExit: {
+      appId: 'start',
+      expectedHash: '#start',
+      focusSelector: '[data-route-entry-focus]',
+      focusLabel: 'Standard Start heading after desktop exit',
+    },
+  },
+  {
+    slug: 'desktop-findings',
+    url: '/#desktop/findings',
+    verifyStandardExit: {
+      appId: 'findings',
+      buttonName: 'Open standard Start here',
+      expectedHash: '#start',
+      focusSelector: '[data-route-entry-focus]',
+      focusLabel: 'Standard Start heading after findings exit',
+    },
+  },
+  {
+    slug: 'desktop-entities',
+    url: '/#desktop/entities',
+    verifyStandardExit: {
+      appId: 'entities',
+      expectedHash: '#entities',
+      focusSelector: '#main-content',
+      focusLabel: 'Standard entities main after desktop exit',
+    },
+  },
   { slug: 'desktop-entity-detail', url: '/?entity=P0005#desktop/entities' },
   {
     slug: 'desktop-entity-record',
@@ -254,6 +292,7 @@ async function auditOne(page, route, viewport) {
   if (route.verifyStandardExit) {
     const {
       appId,
+      buttonName = 'Open standard view',
       expectedHash,
       focusSelector,
       focusLabel,
@@ -261,7 +300,7 @@ async function auditOne(page, route, viewport) {
     const desktopUrl = page.url();
     const activeWindow = page.locator(`[data-window-id="${appId}"]`);
 
-    await activeWindow.getByRole('button', { name: 'Open standard view', exact: true }).click();
+    await activeWindow.getByRole('button', { name: buttonName, exact: true }).click();
     await page.waitForURL((url) => url.hash === expectedHash);
     await assertFocused(page.locator(focusSelector), focusLabel);
 

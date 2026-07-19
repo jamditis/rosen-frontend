@@ -47,9 +47,12 @@ describe('desktop route wiring', () => {
     assert.match(audit, /slug: 'desktop-start-menu',[\s\S]*verifyDesktopStartMenu: true/);
     assert.match(audit, /slug: 'desktop-unknown',\s+url: '\/#desktop\/not-real'/);
     assert.match(audit, /slug: 'desktop-archive',[\s\S]*url: '\/#desktop\/archive',[\s\S]*verifyStandardExit:[\s\S]*appId: 'archive'/);
-    assert.match(audit, /slug: 'desktop-start',\s+url: '\/#desktop\/start'/);
-    assert.match(audit, /slug: 'desktop-findings',\s+url: '\/#desktop\/findings'/);
-    assert.match(audit, /slug: 'desktop-entities',\s+url: '\/#desktop\/entities'/);
+    assert.match(audit, /slug: 'desktop-folders',[\s\S]*url: '\/#desktop\/folders',[\s\S]*verifyStandardExit:[\s\S]*appId: 'folders'/);
+    assert.match(audit, /slug: 'desktop-start',[\s\S]*url: '\/#desktop\/start',[\s\S]*verifyStandardExit:[\s\S]*appId: 'start'/);
+    assert.match(audit, /slug: 'desktop-findings',[\s\S]*url: '\/#desktop\/findings',[\s\S]*verifyStandardExit:[\s\S]*appId: 'findings'/);
+    assert.match(audit, /buttonName: 'Open standard Start here'/,
+      'the focused findings view must use its actual standard-view action name');
+    assert.match(audit, /slug: 'desktop-entities',[\s\S]*url: '\/#desktop\/entities',[\s\S]*verifyStandardExit:[\s\S]*appId: 'entities'/);
     assert.match(audit, /slug: 'desktop-entity-detail',\s+url: '\/\?entity=P0005#desktop\/entities'/);
     assert.match(audit, /slug: 'desktop-entity-record',[\s\S]*url: '\/\?record=RECORD-00903&entity=P0005#desktop\/entities',[\s\S]*verifyEntityRecordFlow: true/);
     assert.match(audit, /slug: 'desktop-dissertation',[\s\S]*url: '\/#desktop\/dissertation',[\s\S]*verifyStandardExit:[\s\S]*appId: 'dissertation'/);
@@ -85,7 +88,7 @@ describe('desktop route wiring', () => {
       'an in-document Start launch must announce its canonical route destination');
     assert.match(audit, /'Desktop home after about browser Back'/,
       'Back from a canonical route must reconstruct desktop focus and closed-popup state');
-    assert.match(audit, /activeWindow\.getByRole\('button', \{ name: 'Open standard view', exact: true \}\)[\s\S]*page\.url\(\) !== desktopUrl/,
+    assert.match(audit, /buttonName = 'Open standard view'[\s\S]*activeWindow\.getByRole\('button', \{ name: buttonName, exact: true \}\)[\s\S]*page\.url\(\) !== desktopUrl/,
       'canonical adapter exits must round-trip their exact desktop URL');
     assert.match(audit, /`#desktop-window-title-\$\{appId\}`/,
       'Back from standard view must restore focus to the active desktop window');
