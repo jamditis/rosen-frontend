@@ -436,6 +436,53 @@ async function auditOne(page, route, viewport) {
     }
   }
 
+  if (route.slug === 'archive-desktop' || route.slug.startsWith('desktop-')) {
+    const undersizedTargets = await page.locator('.archive-desktop').evaluate((desktop) => {
+      const interactiveSelector = [
+        'button',
+        'a[href]',
+        'input',
+        'select',
+        'textarea',
+        'summary',
+        '[role="button"]',
+        '[tabindex="0"]',
+      ].join(',');
+      return [...desktop.querySelectorAll(interactiveSelector)]
+        .filter((element) => {
+          const rect = element.getBoundingClientRect();
+          const styles = getComputedStyle(element);
+          const compactNativeControl = ['checkbox', 'radio', 'range'].includes(element.type);
+          return !compactNativeControl
+            && !element.closest('[aria-hidden="true"]')
+            && styles.display !== 'none'
+            && styles.visibility !== 'hidden'
+            && rect.width > 0
+            && rect.height > 0;
+        })
+        .map((element) => {
+          const rect = element.getBoundingClientRect();
+          return {
+            name: (element.getAttribute('aria-label')
+              || element.getAttribute('title')
+              || element.textContent
+              || element.tagName)
+              .trim()
+              .replace(/\s+/g, ' ')
+              .slice(0, 80),
+            width: Number(rect.width.toFixed(1)),
+            height: Number(rect.height.toFixed(1)),
+          };
+        })
+        .filter(({ width, height }) => width < 44 || height < 44);
+    });
+    if (undersizedTargets.length > 0) {
+      throw new Error(
+        `${route.slug} exposed undersized desktop targets: ${JSON.stringify(undersizedTargets.slice(0, 10))}`,
+      );
+    }
+  }
+
   const shotDir = resolve(OUT_DIR, 'screenshots', viewport.name);
   await mkdir(shotDir, { recursive: true });
   // Viewport-only screenshots. Full-page on long content (e.g. the dissertation

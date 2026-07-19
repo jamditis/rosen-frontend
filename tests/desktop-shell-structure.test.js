@@ -111,6 +111,9 @@ describe('desktop route wiring', () => {
       'browser Back must reconstruct the nested Tools route and foreground focus');
     assert.match(audit, /assertArchiveRootReturn\(page, readerReturn, 'Reader return'\)/);
     assert.match(audit, /Reader overflowed the viewport by/);
+    assert.match(audit, /route\.slug === 'archive-desktop' \|\| route\.slug\.startsWith\('desktop-'\)[\s\S]*interactiveSelector[\s\S]*width < 44 \|\| height < 44/,
+      'every rendered desktop row must enforce the 44-pixel target contract');
+    assert.match(audit, /undersized desktop targets/);
     assert.match(audit, /slug: 'desktop-windowing'[\s\S]*desktopLayout:[\s\S]*zOrder/);
     assert.match(audit, /name: 'mobile',\s+width: 375,\s+height: 812/);
     assert.match(audit, /name: 'tablet',\s+width: 768,\s+height: 1024/);
@@ -226,6 +229,8 @@ describe('desktop entity adapter', () => {
     assert.match(css, /\.entity-detail-heading:focus-visible\s*\{[\s\S]*outline:\s*3px solid/);
     assert.match(css, /@media \(min-width: 1024px\)[\s\S]*\.entity-browser-list\s*\{\s*order:\s*1[\s\S]*\.entity-browser-detail\s*\{\s*order:\s*2/);
     assert.match(browser, /role="region"[\s\S]*aria-labelledby="entity-detail-title"/);
+    assert.match(browser, /style=\$\{\{ minWidth: '44px', minHeight: '44px' \}\}[\s\S]*aria-label="Close entity details"/,
+      'the shared entity-detail close target must be touch-safe in standard and desktop views');
     assert.match(browser, /const DetailHeading = embedded \? 'h3' : 'h2'/);
     assert.match(browser, /const DetailSectionHeading = embedded \? 'h4' : 'h3'/);
     assert.match(browser, /layoutFrame = requestAnimationFrame[\s\S]*focusFrame = requestAnimationFrame/);

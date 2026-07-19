@@ -475,7 +475,8 @@ const EntityBrowser = ({
                   <button
                     type="button"
                     onClick=${closeEntityDetails}
-                    className="text-stone-400 hover:text-stone-600"
+                    className="inline-flex items-center justify-center text-stone-400 hover:text-stone-600"
+                    style=${{ minWidth: '44px', minHeight: '44px' }}
                     aria-label="Close entity details"
                   >
                     <${X} className="w-4 h-4" aria-hidden="true" />
