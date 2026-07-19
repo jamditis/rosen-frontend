@@ -30,6 +30,15 @@ Some issues are tracked for human visibility only and are not engineering tasks.
 - Never select, work on, or open a pull request against a `do-not-automate` issue, and never change its state.
 - These issues also open with a "DO NOT AUTOMATE" banner in the body. If you have already opened one, stop and move on.
 
+## Making-of narrative interview
+
+The personal story of how the archive was built is interview material, not
+something to draft or infer from the existing page.
+
+- When Joe asks to begin, continue, or reconstruct that story, read `docs/narrative/INTERVIEW_GUIDE.md` in full before asking questions or editing prose. It holds the question bank, verification protocol, sensitive-claim boundaries, and editorial approval gates.
+- Treat `features/making-of/index.html` as a provisional draft, not as approved first-person testimony.
+- Never deploy the making-of page or lift its deployment hold without Joe's explicit publication approval.
+
 ## Key commands
 
 ```bash
