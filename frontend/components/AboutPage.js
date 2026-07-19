@@ -1,6 +1,6 @@
 
 import { useMemo } from 'react';
-import { html } from '../html.js?v=3.7.5';
+import { html } from '../html.js?v=3.7.6';
 import { ArrowLeft, ArrowRight, Archive, BookOpen, Network, Search, Github, Mail } from 'lucide-react';
 
 const AboutPage = ({ onBack, onStart, onParticipate, records }) => {
@@ -46,7 +46,11 @@ const AboutPage = ({ onBack, onStart, onParticipate, records }) => {
             <div className="bg-stone-900 text-white p-2">
               <${Archive} className="w-6 h-6" aria-hidden="true" />
             </div>
-            <h1 className="text-3xl md:text-5xl font-display font-bold text-stone-900">About this archive</h1>
+            <h1
+              data-route-entry-focus
+              tabIndex="-1"
+              className="text-3xl md:text-5xl font-display font-bold text-stone-900 outline-none"
+            >About this archive</h1>
           </div>
           <p className="text-lg text-stone-600 leading-relaxed font-body">
             Jay Rosen's Internet Archive is a curated public collection of the works, critiques, and teachings of Jay Rosen, professor of journalism at New York University. It preserves four decades of writing about journalism, democracy, and public life.

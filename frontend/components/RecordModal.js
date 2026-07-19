@@ -1,12 +1,13 @@
 
-import { useEffect, useState } from 'react';
-import { html } from '../html.js?v=3.7.5';
+import { useEffect, useRef, useState } from 'react';
+import { html } from '../html.js?v=3.7.6';
 import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2 } from 'lucide-react';
-import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.7.5';
-import { ThreadModal } from './ThreadModal.js?v=3.7.5';
-import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.7.5';
-import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.7.5';
-import { recordNeedsReview } from '../utils/needsReview.js?v=3.7.5';
+import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.7.6';
+import { ThreadModal } from './ThreadModal.js?v=3.7.6';
+import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.7.6';
+import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.7.6';
+import { recordNeedsReview } from '../utils/needsReview.js?v=3.7.6';
+import { canonicalRecordUrl } from '../utils/recordDeepLink.js?v=3.7.6';
 
 const linkifyText = (text) => {
   const parts = splitUrlsForLinkify(text);
@@ -39,15 +40,20 @@ const TagGroup = ({title, tags, onClick}) => {
     `;
 }
 
-const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSelectRecord, onFilterCategory, onFilterSearch, hasPrev, hasNext, currentIndex, total }) => {
+const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSelectRecord, onSelectEntity, onFilterCategory, onFilterSearch, hasPrev, hasNext, currentIndex, total }) => {
   const [isClosing, setIsClosing] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [relatedWorks, setRelatedWorks] = useState([]);
+  const [recordEntities, setRecordEntities] = useState([]);
 
   // State for lazy-loaded details
   const [fullRecord, setFullRecord] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const dialogRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const openerRef = useRef(null);
+  const hasRecord = Boolean(record);
 
   // Fetch details when modal opens
   useEffect(() => {
@@ -93,10 +99,17 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
     if (!fullRecord || !allRecords) return;
 
     const findRelated = async () => {
+      setRecordEntities([]);
       // Ensure entity data is loaded
       if (!areEntitiesLoaded()) {
         await fetchEntitiesData();
       }
+
+      setRecordEntities(
+        getEntitiesByRecord(fullRecord.id)
+          .sort((a, b) => (b.prominence || 0) - (a.prominence || 0))
+          .slice(0, 8)
+      );
 
       // Calculate entity-based connections to all other article records
       const connections = [];
@@ -141,17 +154,85 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
       if (e.key === 'Escape') handleClose();
       if (e.key === 'ArrowLeft' && hasPrev) onPrev();
       if (e.key === 'ArrowRight' && hasNext) onNext();
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusable = Array.from(dialogRef.current.querySelectorAll(
+          'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )).filter((element) => element.offsetParent !== null);
+        if (focusable.length === 0) {
+          e.preventDefault();
+          dialogRef.current.focus();
+          return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, hasPrev, hasNext, onPrev, onNext]);
 
-  const handleClose = () => {
+  useEffect(() => {
+    if (!isOpen) {
+      const opener = openerRef.current;
+      const openerWindow = opener?.closest('.desktop-window');
+      // A history traversal can close the record and activate a different
+      // desktop window in the same render. Focusing an opener in the now-
+      // background window would activate it again and undo Back/Forward.
+      // Standard views have no desktop-window ancestor and retain the normal
+      // exact-opener return; explicit closes in the active desktop window do too.
+      if (
+        opener?.isConnected
+        && (!openerWindow || openerWindow.classList.contains('is-active'))
+      ) {
+        opener.focus();
+      }
+      openerRef.current = null;
+      return undefined;
+    }
+
+    if (!hasRecord) return undefined;
+
+    if (!openerRef.current) {
+      openerRef.current = document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    }
+    const frame = requestAnimationFrame(() => closeButtonRef.current?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [isOpen, hasRecord]);
+
+  const completeClose = (afterClose = null) => {
+    onClose();
+    setIsClosing(false);
+    afterClose?.();
+  };
+
+  const beginClose = (afterClose = null) => {
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) {
+      completeClose(afterClose);
+      return;
+    }
     setIsClosing(true);
-    setTimeout(() => {
-      onClose();
-      setIsClosing(false);
-    }, 300);
+    setTimeout(() => completeClose(afterClose), 300);
+  };
+
+  const handleClose = () => beginClose();
+
+  const leaveRecordFor = (action, value) => {
+    // This action intentionally activates a different archive surface. Do not
+    // return focus to the record opener in the now-background source window:
+    // DesktopShell correctly treats that focus as window activation and would
+    // otherwise undo the requested navigation after the close delay.
+    openerRef.current = null;
+    beginClose(() => action(value));
   };
 
   const showNotification = (msg) => {
@@ -162,13 +243,14 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
 
   const handleCopyCitation = () => {
     if (!fullRecord) return;
-    const text = `${fullRecord.author} (${fullRecord.year}). "${fullRecord.title}". ${fullRecord.pub}. Retrieved from ${window.location.href}`;
+    const recordUrl = canonicalRecordUrl(window.location.href, fullRecord.id);
+    const text = `${fullRecord.author} (${fullRecord.year}). "${fullRecord.title}". ${fullRecord.pub}. Retrieved from ${recordUrl}`;
     navigator.clipboard.writeText(text).then(() => showNotification("Citation copied to clipboard"));
   };
 
   const handleShare = () => {
       if(!record) return;
-      const url = `${window.location.origin}${window.location.pathname}?record=${record.id}`;
+      const url = canonicalRecordUrl(window.location.href, record.id);
       navigator.clipboard.writeText(url).then(() => showNotification("Link copied to clipboard"));
   };
 
@@ -180,7 +262,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
   const youtubeId = (displayRecord.url || '').match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/)?.[2];
 
   return html`
-    <div className="fixed inset-0 z-[80]" role="dialog" aria-modal="true">
+    <div className="archive-record-dialog fixed inset-0 z-[80]" role="dialog" aria-modal="true" aria-labelledby="record-modal-title">
       <div className=${`fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-stone-800 text-white px-6 py-3 rounded shadow-lg z-[90] transition-all duration-300 flex items-center gap-3 ${showToast ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
         <${CheckCircle} className="w-4 h-4 text-green-400" />
         <span className="text-sm font-bold">${toastMessage}</span>
@@ -192,7 +274,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
       />
 
       <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-6 pointer-events-none">
-        <div className=${`
+        <div ref=${dialogRef} tabIndex="-1" className=${`
           bg-[#fdfbf7] w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl pointer-events-auto 
           border border-stone-200 transform transition-all duration-300
           ${isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}
@@ -210,21 +292,21 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
               `}
             </div>
             <div className="flex items-center gap-2">
-              <button onClick=${handleShare} className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded transition-colors" title="Share Link">
-                <${Share2} className="w-5 h-5" />
+              <button type="button" onClick=${handleShare} className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded transition-colors" style=${{ minWidth: '44px', minHeight: '44px' }} title="Copy canonical record link" aria-label="Copy canonical record link">
+                <${Share2} className="w-5 h-5" aria-hidden="true" />
               </button>
-              <button onClick=${handleCopyCitation} className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded transition-colors" title="Copy citation">
-                <${Quote} className="w-5 h-5" />
+              <button type="button" onClick=${handleCopyCitation} className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded transition-colors" style=${{ minWidth: '44px', minHeight: '44px' }} title="Copy citation" aria-label="Copy citation">
+                <${Quote} className="w-5 h-5" aria-hidden="true" />
               </button>
-              <button onClick=${handleClose} className="p-2 text-stone-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
-                <${X} className="w-6 h-6" />
+              <button ref=${closeButtonRef} type="button" onClick=${handleClose} className="p-2 text-stone-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors" style=${{ minWidth: '44px', minHeight: '44px' }} aria-label="Close record details">
+                <${X} className="w-6 h-6" aria-hidden="true" />
               </button>
             </div>
           </div>
 
           <div className="overflow-y-auto p-6 sm:p-10 font-body leading-relaxed space-y-8">
             <div>
-                <h2 className="text-3xl sm:text-4xl font-display font-bold text-stone-900 mb-2 leading-tight">${displayRecord.title}</h2>
+                <h2 id="record-modal-title" className="text-3xl sm:text-4xl font-display font-bold text-stone-900 mb-2 leading-tight">${displayRecord.title}</h2>
 
                 <!-- Read needsReview from the core record, not displayRecord:
                      details merge ({...record, ...details}) lets a stale
@@ -282,6 +364,32 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
               </div>
             `}
 
+            ${onSelectEntity && recordEntities.length > 0 && html`
+              <section className="border-t border-stone-200 pt-8" aria-labelledby="record-entities-title">
+                <h3 id="record-entities-title" className="text-xl font-display font-bold text-stone-900 mb-2">
+                  People and ideas in this record
+                </h3>
+                <p className="mb-4 text-sm text-stone-600">
+                  Continue through the archive's canonical relationship index.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  ${recordEntities.map(entity => html`
+                    <button
+                      type="button"
+                      key=${entity.id}
+                      onClick=${() => leaveRecordFor(onSelectEntity, entity.id)}
+                      className="inline-flex items-center gap-2 rounded border border-stone-300 bg-white px-3 py-2 text-left text-sm text-stone-800 transition-colors hover:border-stone-600 hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-stone-700 focus:ring-offset-2"
+                      style=${{ minHeight: '44px' }}
+                      aria-label=${`Explore ${entity.name} in People and ideas`}
+                    >
+                      <span className="font-bold">${entity.name}</span>
+                      <span className="text-xs uppercase tracking-wide text-stone-500">${entity.type}</span>
+                    </button>
+                  `)}
+                </div>
+              </section>
+            `}
+
             ${relatedWorks.length > 0 && html`
                 <div className="border-t border-stone-200 pt-8">
                     <h3 className="text-xl font-display font-bold text-stone-900 mb-4 flex items-center gap-2">
@@ -327,9 +435,9 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
             <hr className="my-8 border-stone-200" />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-               <${TagGroup} title="Thematic categories" tags=${displayRecord.categories} onClick=${onFilterCategory ? (cat) => { handleClose(); onFilterCategory(cat); } : undefined} />
-               <${TagGroup} title="Tags" tags=${displayRecord.tags} onClick=${onFilterSearch ? (tag) => { handleClose(); onFilterSearch(tag); } : undefined} />
-               <${TagGroup} title="Key concepts" tags=${displayRecord.concepts} onClick=${onFilterSearch ? (concept) => { handleClose(); onFilterSearch(concept); } : undefined} />
+               <${TagGroup} title="Thematic categories" tags=${displayRecord.categories} onClick=${onFilterCategory ? (cat) => leaveRecordFor(onFilterCategory, cat) : undefined} />
+               <${TagGroup} title="Tags" tags=${displayRecord.tags} onClick=${onFilterSearch ? (tag) => leaveRecordFor(onFilterSearch, tag) : undefined} />
+               <${TagGroup} title="Key concepts" tags=${displayRecord.concepts} onClick=${onFilterSearch ? (concept) => leaveRecordFor(onFilterSearch, concept) : undefined} />
 
                <div>
                   <h5 className="text-xs font-bold uppercase text-stone-400 mb-2">Era</h5>

@@ -1,13 +1,13 @@
 
 import { useState } from 'react';
-import { html } from '../html.js?v=3.7.5';
+import { html } from '../html.js?v=3.7.6';
 import { BookOpen, ExternalLink, ArrowLeft, Calendar, GraduationCap } from 'lucide-react';
-import MindMap from './MindMap.js?v=3.7.5';
-import DetailPanel from './DetailPanel.js?v=3.7.5';
-import { DISSERTATION_NODES } from './dissertationData.js?v=3.7.5';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.7.5';
+import MindMap from './MindMap.js?v=3.7.6';
+import DetailPanel from './DetailPanel.js?v=3.7.6';
+import { DISSERTATION_NODES } from './dissertationData.js?v=3.7.6';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.7.6';
 
-const DissertationPage = ({ onBack }) => {
+const DissertationPage = ({ onBack, embedded = false }) => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [detailPanelOpen, setDetailPanelOpen] = useState(false);
 
@@ -32,16 +32,20 @@ const DissertationPage = ({ onBack }) => {
   };
 
   return html`
-    <div className="h-screen w-screen bg-paper flex flex-col overflow-hidden max-w-full">
-      <header className="flex-shrink-0 z-30 w-full bg-paper border-b border-stone-200">
+    <div className=${embedded
+      ? 'desktop-dissertation-surface'
+      : 'h-screen w-screen bg-paper flex flex-col overflow-hidden max-w-full'}>
+      ${!embedded && html`<header className="flex-shrink-0 z-30 w-full bg-paper border-b border-stone-200">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
             ${onBack && html`
               <button
+                type="button"
                 onClick=${onBack}
+                aria-label="Back to archive"
                 className="flex items-center gap-2 text-stone-600 hover:text-stone-900 transition-colors text-sm"
               >
-                <${ArrowLeft} className="w-4 h-4" />
+                <${ArrowLeft} className="w-4 h-4" aria-hidden="true" />
                 <span className="hidden sm:inline">Back to Archive</span>
               </button>
             `}
@@ -80,13 +84,17 @@ const DissertationPage = ({ onBack }) => {
             <${ExternalLink} className="w-3.5 h-3.5" />
           </a>
         </div>
-      </header>
+      </header>`}
 
       <div className="flex-shrink-0 bg-gradient-to-r from-stone-50 to-stone-100 border-b border-stone-200">
         <div className="container mx-auto px-4 py-4 md:py-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="max-w-2xl">
-              <h1 className="font-display text-xl md:text-2xl font-bold text-stone-900 leading-tight">
+              <h1
+                data-route-entry-focus=${embedded ? undefined : true}
+                tabIndex=${embedded ? undefined : '-1'}
+                className="font-display text-xl md:text-2xl font-bold text-stone-900 leading-tight outline-none"
+              >
                 The Impossible Press
               </h1>
               <h2 className="text-sm md:text-base text-stone-600">
@@ -110,10 +118,10 @@ const DissertationPage = ({ onBack }) => {
       <div className="flex-shrink-0 bg-white border-b border-stone-200">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="text-xs text-stone-500">
-            <span className="font-bold uppercase tracking-wider text-stone-400 mr-2">Navigate:</span>
+            <span className="font-bold uppercase tracking-wider text-stone-600 mr-2">Navigate:</span>
             Click any node to expand and see details.
           </div>
-          <div className="hidden sm:flex items-center gap-4 text-[10px] text-stone-400">
+          <div className="hidden sm:flex items-center gap-4 text-[10px] text-stone-600">
             <span className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded bg-amber-100 border-2 border-amber-400" /> Parts
             </span>
@@ -127,12 +135,13 @@ const DissertationPage = ({ onBack }) => {
         </div>
       </div>
 
-      <div className="flex-1 relative overflow-hidden">
+      <div className=${embedded ? 'desktop-dissertation-map' : 'flex-1 relative overflow-hidden'}>
         <${MindMap}
           nodes=${DISSERTATION_NODES}
           onNodeSelect=${handleNodeSelect}
           isPanelOpen=${detailPanelOpen}
-          className="absolute inset-0"
+          minimumZoom=${embedded ? 44 / 72 : 0.3}
+          className=${embedded ? '' : 'absolute inset-0'}
         />
       </div>
 
@@ -140,10 +149,11 @@ const DissertationPage = ({ onBack }) => {
         node=${selectedNode}
         isOpen=${detailPanelOpen}
         onClose=${closeDetailPanel}
+        contained=${embedded}
       />
 
-      <footer className="bg-stone-50 border-t border-stone-200 py-2 flex-shrink-0">
-        <div className="container mx-auto px-4 flex items-center justify-between text-xs text-stone-400">
+      ${!embedded && html`<footer className="bg-stone-50 border-t border-stone-200 py-2 flex-shrink-0">
+        <div className="container mx-auto px-4 flex items-center justify-between text-xs text-stone-600">
           <div>
             Part of <span className="font-semibold text-stone-600">Jay Rosen's Internet Archive</span>
           </div>
@@ -156,7 +166,7 @@ const DissertationPage = ({ onBack }) => {
             >
               @jayrosen_nyu
             </a>
-            <span className="text-stone-300">|</span>
+            <span className="text-stone-500">|</span>
             <a
               href="https://pressthink.org"
               target="_blank"
@@ -167,7 +177,7 @@ const DissertationPage = ({ onBack }) => {
             </a>
           </div>
         </div>
-      </footer>
+      </footer>`}
     </div>
   `;
 };

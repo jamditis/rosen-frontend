@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { html } from '../html.js?v=3.7.5';
+import { html } from '../html.js?v=3.7.6';
 import {
   AlertCircle,
   ArrowLeft,
@@ -11,10 +11,11 @@ import {
   FolderOpen,
   Library,
   Network,
+  Monitor,
   Search,
   Sparkles
 } from 'lucide-react';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.7.5';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.7.6';
 
 const normalizeTitle = (title = '') => title
   .toLowerCase()
@@ -73,36 +74,97 @@ const findFeaturedRecords = (records) => {
   }).filter(Boolean);
 };
 
+export const SelectedFindings = ({
+  records = [],
+  onSelectRecord,
+  onBrowseArchive,
+}) => {
+  const featuredRecords = useMemo(() => findFeaturedRecords(records), [records]);
+
+  return html`
+    <section id="highlights" aria-labelledby="highlights-title" className="mb-16 scroll-mt-24">
+      <div className="mb-6 flex items-end justify-between gap-4 border-b border-stone-300 pb-2">
+        <div>
+          <p className="mb-1 font-body text-xs font-bold uppercase tracking-wider text-stone-500">Curated entry points</p>
+          <h2 id="highlights-title" tabIndex="-1" className="font-display text-2xl font-bold text-stone-900 outline-none">Three works, one developing argument</h2>
+          <p className="mt-2 max-w-2xl font-body text-sm leading-relaxed text-stone-600">A short path through nearly twenty-five years of questions about journalism, public life, and professional authority.</p>
+        </div>
+      </div>
+
+      ${featuredRecords.length > 0 ? html`
+        <div className="selected-findings-grid grid gap-6 md:grid-cols-3">
+          ${featuredRecords.map(({ record, entry }) => html`
+            <button
+              key=${record.id}
+              type="button"
+              onClick=${() => onSelectRecord && onSelectRecord(record.id)}
+              className="group flex flex-col border border-stone-200 bg-white p-5 text-left shadow-sm transition-all hover:border-stone-800 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+              aria-label=${`Open ${record.title} in the archive`}
+            >
+              <span className="mb-4 flex w-full items-center justify-between border-b border-stone-200 pb-2 font-body text-[10px] font-bold uppercase tracking-wider text-stone-500">
+                <span>Folio ${entry.folio}</span>
+                <span>${entry.year} · ${entry.form}</span>
+              </span>
+              <span className="block font-display text-lg font-bold leading-tight text-stone-900">${record.title}</span>
+              <span className="mt-3 flex-grow font-body text-sm leading-relaxed text-stone-600">${entry.note}</span>
+              <span className="mt-4 inline-flex w-full items-center justify-between border-t border-stone-200 pt-4 font-body text-xs font-bold uppercase tracking-wider text-stone-800">
+                Open archive record
+                <${ArrowRight} className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+              </span>
+            </button>
+          `)}
+        </div>
+      ` : html`
+        <div className="border border-stone-200 bg-white p-6">
+          <p className="font-body text-sm leading-relaxed text-stone-600">Curated records will appear here once the archive data has loaded. You can still search or browse the full collection now.</p>
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick=${onBrowseArchive}
+              className="inline-flex items-center justify-center gap-2 bg-stone-900 px-5 py-3 font-display text-sm font-bold text-white transition-colors hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+            >
+              <${Search} className="h-4 w-4" aria-hidden="true" />
+              Browse the archive
+            </button>
+          </div>
+        </div>
+      `}
+    </section>
+  `;
+};
+
 const StartHerePage = ({
   onBack,
   records = [],
   onNavigate,
   onOpenBugReport,
-  onSelectRecord
+  onSelectRecord,
+  embedded = false,
 }) => {
   const titleRef = useRef(null);
 
   useEffect(() => {
+    if (embedded) return;
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     titleRef.current?.focus({ preventScroll: true });
-  }, []);
+  }, [embedded]);
 
-  const { stats, featuredRecords } = useMemo(() => {
+  const stats = useMemo(() => {
     const years = records
       .map((record) => Number.parseInt(record.year, 10))
       .filter(Number.isFinite);
     const categories = new Set(records.flatMap((record) => record.categories || []).filter(Boolean));
 
     return {
-      stats: {
-        total: records.length,
-        categories: categories.size,
-        minYear: years.length > 0 ? Math.min(...years) : null,
-        maxYear: years.length > 0 ? Math.max(...years) : null
-      },
-      featuredRecords: findFeaturedRecords(records)
+      total: records.length,
+      categories: categories.size,
+      minYear: years.length > 0 ? Math.min(...years) : null,
+      maxYear: years.length > 0 ? Math.max(...years) : null
     };
   }, [records]);
+
+  const ContentTag = embedded ? 'div' : 'main';
+  const ParticipateTag = embedded ? 'section' : 'aside';
 
   const navigate = (route) => {
     if (onNavigate) onNavigate(route);
@@ -144,8 +206,8 @@ const StartHerePage = ({
   `;
 
   return html`
-    <div className="min-h-screen bg-[#fdfbf7]">
-      <header className="sticky top-0 z-50 border-b border-stone-300 bg-paper shadow-sm">
+    <div className=${`${embedded ? 'desktop-start-here-embedded' : 'min-h-screen'} bg-[#fdfbf7]`}>
+      ${!embedded && html`<header className="sticky top-0 z-50 border-b border-stone-300 bg-paper shadow-sm">
         <div className="container mx-auto flex h-16 items-center px-4">
           <button
             type="button"
@@ -156,26 +218,40 @@ const StartHerePage = ({
             Back to archive
           </button>
         </div>
-      </header>
+      </header>`}
 
-      <main id="main-content" className="container mx-auto max-w-5xl px-4 py-8 md:py-16">
-        <section aria-labelledby="start-here-title" className="mb-12 border-b-2 border-stone-800 pb-8">
+      <${ContentTag}
+        id=${embedded ? undefined : 'main-content'}
+        className=${`container mx-auto max-w-5xl px-4 ${embedded ? 'py-6 md:py-8' : 'py-8 md:py-16'}`}
+      >
+        <section aria-labelledby=${embedded ? undefined : 'start-here-title'} className="mb-12 border-b-2 border-stone-800 pb-8">
           <div className="mb-4 flex items-center gap-3">
             <div className="bg-stone-900 p-2 text-white">
               <${Compass} className="h-6 w-6" aria-hidden="true" />
             </div>
             <p className="font-body text-xs font-bold uppercase tracking-wider text-stone-500">Visitor guide</p>
           </div>
-          <h1 ref=${titleRef} tabIndex="-1" id="start-here-title" className="max-w-3xl font-display text-3xl font-bold leading-tight text-stone-900 outline-none md:text-5xl">
+          <h1 ref=${titleRef} tabIndex="-1" data-route-entry-focus id="start-here-title" className="max-w-3xl font-display text-3xl font-bold leading-tight text-stone-900 outline-none md:text-5xl">
             Start here
           </h1>
           <p className="mt-4 max-w-3xl font-body text-lg leading-relaxed text-stone-600">
             Jay Rosen's Internet Archive brings together decades of writing, teaching, interviews, and public commentary about journalism and democratic life. Search directly, follow a curated trail, or learn how the collection is organized.
           </p>
 
-          <div className="mt-8">
+          <div className="mt-8 flex flex-wrap gap-3">
             ${routeButton('archive', 'Search and browse records', Search)}
+            ${!embedded && html`<button
+              type="button"
+              onClick=${() => navigate('desktop')}
+              className="inline-flex items-center justify-center gap-2 border-2 border-stone-800 bg-white px-5 py-3 font-display text-sm font-bold text-stone-900 transition-colors hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+            >
+              <${Monitor} className="h-4 w-4" aria-hidden="true" />
+              Explore the archive desktop
+            </button>`}
           </div>
+          ${!embedded && html`<p className="mt-3 max-w-2xl font-body text-xs leading-relaxed text-stone-500">
+            Prefer a spatial map? The optional desktop arranges these same archive paths as shortcuts, folders, and windows.
+          </p>`}
 
           ${stats.total > 0 && html`
             <p className="mt-4 font-body text-xs text-stone-500">
@@ -192,7 +268,7 @@ const StartHerePage = ({
             <p className="mt-2 max-w-2xl font-body text-sm leading-relaxed text-stone-600">Pick the route that best matches what you came to do. You can switch paths at any time.</p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="start-here-path-grid grid gap-6 md:grid-cols-3">
             <a
               href="#guide"
               onClick=${(event) => { event.preventDefault(); scrollTo('guide'); }}
@@ -230,45 +306,11 @@ const StartHerePage = ({
           </div>
         </nav>
 
-        <section id="highlights" aria-labelledby="highlights-title" className="mb-16 scroll-mt-24">
-          <div className="mb-6 flex items-end justify-between gap-4 border-b border-stone-300 pb-2">
-            <div>
-              <p className="mb-1 font-body text-xs font-bold uppercase tracking-wider text-stone-500">Curated entry points</p>
-              <h2 id="highlights-title" tabIndex="-1" className="font-display text-2xl font-bold text-stone-900 outline-none">Three works, one developing argument</h2>
-              <p className="mt-2 max-w-2xl font-body text-sm leading-relaxed text-stone-600">A short path through nearly twenty-five years of questions about journalism, public life, and professional authority.</p>
-            </div>
-          </div>
-
-          ${featuredRecords.length > 0 ? html`
-            <div className="grid gap-6 md:grid-cols-3">
-              ${featuredRecords.map(({ record, entry }) => html`
-                <button
-                  key=${record.id}
-                  type="button"
-                  onClick=${() => onSelectRecord && onSelectRecord(record.id)}
-                  className="group flex flex-col border border-stone-200 bg-white p-5 text-left shadow-sm transition-all hover:border-stone-800 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
-                  aria-label=${`Open ${record.title} in the archive`}
-                >
-                  <span className="mb-4 flex w-full items-center justify-between border-b border-stone-200 pb-2 font-body text-[10px] font-bold uppercase tracking-wider text-stone-500">
-                    <span>Folio ${entry.folio}</span>
-                    <span>${entry.year} · ${entry.form}</span>
-                  </span>
-                  <span className="block font-display text-lg font-bold leading-tight text-stone-900">${record.title}</span>
-                  <span className="mt-3 flex-grow font-body text-sm leading-relaxed text-stone-600">${entry.note}</span>
-                  <span className="mt-4 inline-flex w-full items-center justify-between border-t border-stone-200 pt-4 font-body text-xs font-bold uppercase tracking-wider text-stone-800">
-                    Open archive record
-                    <${ArrowRight} className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
-                  </span>
-                </button>
-              `)}
-            </div>
-          ` : html`
-            <div className="border border-stone-200 bg-white p-6">
-              <p className="font-body text-sm leading-relaxed text-stone-600">Curated records will appear here once the archive data has loaded. You can still search or browse the full collection now.</p>
-              <div className="mt-4">${routeButton('archive', 'Browse the archive', Search)}</div>
-            </div>
-          `}
-        </section>
+        <${SelectedFindings}
+          records=${records}
+          onSelectRecord=${onSelectRecord}
+          onBrowseArchive=${() => navigate('archive')}
+        />
 
         <section id="guide" aria-labelledby="guide-title" className="mb-16 scroll-mt-24">
           <details className="border border-stone-300 bg-white px-5 py-2 md:p-8">
@@ -347,14 +389,14 @@ const StartHerePage = ({
           </details>
         </section>
 
-        <aside className="mb-8 border-y-2 border-stone-900 bg-stone-100 px-6 py-7 md:flex md:items-center md:justify-between md:gap-8" aria-labelledby="participate-callout-title">
+        <${ParticipateTag} className="mb-8 border-y-2 border-stone-900 bg-stone-100 px-6 py-7 md:flex md:items-center md:justify-between md:gap-8" aria-labelledby="participate-callout-title">
           <div>
-            <p className="font-body text-xs font-bold uppercase tracking-wider text-stone-500">A living collection</p>
+            <p className="font-body text-xs font-bold uppercase tracking-wider text-stone-600">A living collection</p>
             <h2 id="participate-callout-title" className="mt-1 font-display text-2xl font-bold text-stone-900">Help keep the archive useful.</h2>
             <p className="mt-2 max-w-2xl font-body text-sm leading-relaxed text-stone-600">Share a record, suggest something missing, report a barrier, follow new additions, or reuse the project.</p>
           </div>
           <a href=${resolveSitePath('features/participate/')} className="mt-4 inline-flex min-h-11 shrink-0 items-center gap-2 bg-stone-900 px-5 py-3 font-display text-sm font-bold text-white hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 md:mt-0">Ways to participate<${ArrowRight} className="h-4 w-4" aria-hidden="true" /></a>
-        </aside>
+        <//>
 
         <section aria-labelledby="continue-title" className="border border-stone-300 bg-white p-6 md:flex md:items-center md:justify-between md:gap-8 md:p-8">
           <div>
@@ -368,7 +410,7 @@ const StartHerePage = ({
           <div className="mt-4 shrink-0">${routeButton('archive', 'Enter the archive', ArrowRight)}</div>
         </section>
 
-        <div className="pb-4 pt-8 text-center">
+        ${!embedded && html`<div className="pb-4 pt-8 text-center">
           <button
             type="button"
             onClick=${onBack}
@@ -377,8 +419,8 @@ const StartHerePage = ({
             <${ArrowLeft} className="h-4 w-4" aria-hidden="true" />
             Back to archive
           </button>
-        </div>
-      </main>
+        </div>`}
+      <//>
     </div>
   `;
 };

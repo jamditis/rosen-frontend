@@ -16,11 +16,11 @@
 // decorative italics, one primary action.
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { html } from '../html.js?v=3.7.5';
+import { html } from '../html.js?v=3.7.6';
 import { X, Bug, Lightbulb, Send, CheckCircle2, AlertCircle, ExternalLink } from 'lucide-react';
-import { ARCHIVE_VERSION, openReportFallback } from '../utils/bugReport.js?v=3.7.5';
-import { createSubmitGate } from '../utils/submitGate.js?v=3.7.5';
-import { buildReportPayload, validateReport, submitReport, newReportKey } from '../utils/reportSubmit.js?v=3.7.5';
+import { ARCHIVE_VERSION, openReportFallback } from '../utils/bugReport.js?v=3.7.6';
+import { createSubmitGate } from '../utils/submitGate.js?v=3.7.6';
+import { buildReportPayload, validateReport, submitReport, newReportKey } from '../utils/reportSubmit.js?v=3.7.6';
 
 const EMPTY_FIELDS = {
   whatHappened: '',
@@ -54,6 +54,8 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
   const firstFieldRef = useRef(null);
+  const returnFocusRef = useRef(null);
+  const wasOpenRef = useRef(false);
   // Owns the submit lifecycle: blocks a synchronous double-submit, allows a fresh
   // submit after reopen, and drops a stale in-flight result. Pure + unit-tested
   // in submitGate.js so these races cannot silently regress. useRef with an
@@ -88,6 +90,26 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
     return () => clearTimeout(t);
   }, [isOpen, phase, intent]);
 
+  // Remember the exact trigger so every close path returns keyboard focus,
+  // whether the report opened from the archive header, Start here, or a
+  // desktop shortcut/menu item.
+  useEffect(() => {
+    let frame = null;
+    if (isOpen && !wasOpenRef.current) {
+      returnFocusRef.current = document.activeElement;
+    } else if (!isOpen && wasOpenRef.current) {
+      const target = returnFocusRef.current;
+      frame = requestAnimationFrame(() => {
+        if (target?.isConnected && typeof target.focus === 'function') {
+          target.focus({ preventScroll: true });
+        }
+      });
+      returnFocusRef.current = null;
+    }
+    wasOpenRef.current = isOpen;
+    return () => { if (frame !== null) cancelAnimationFrame(frame); };
+  }, [isOpen]);
+
   // A submit in flight is the single source of truth: block every dismissal path
   // (Escape, backdrop click, the close button) until it settles. Otherwise a
   // reader could close mid-request, reopen to a fresh form, and file the same
@@ -99,9 +121,37 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
     onClose();
   }, [phase, onClose]);
 
-  // ESC closes; lock body scroll while open.
+  // ESC closes. Tab and Shift+Tab stay inside the modal instead of moving
+  // focus into the visually obscured archive or desktop behind it.
   useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape' && isOpen) requestClose(); };
+    const onKey = (e) => {
+      if (!isOpen) return;
+      if (e.key === 'Escape') {
+        requestClose();
+        return;
+      }
+      if (e.key !== 'Tab') return;
+
+      const focusable = [...(modalRef.current?.querySelectorAll(
+        'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]):not([type="hidden"]):not([tabindex="-1"]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      ) || [])].filter((element) => element.getClientRects().length > 0);
+      if (focusable.length === 0) {
+        e.preventDefault();
+        closeButtonRef.current?.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const focusOutside = !modalRef.current?.contains(document.activeElement);
+      if (e.shiftKey && (document.activeElement === first || focusOutside)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (document.activeElement === last || focusOutside)) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, [isOpen, requestClose]);
@@ -184,7 +234,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
           : 'bg-white text-stone-600 border-stone-300 hover:border-stone-400 hover:text-stone-900'
       }`}
     >
-      <${Icon} className="w-4 h-4" />
+      <${Icon} className="w-4 h-4" aria-hidden="true" />
       ${label}
     </button>
   `;
@@ -223,7 +273,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
     if (phase === 'success') {
       return html`
         <div className="px-6 py-10 text-center">
-          <${CheckCircle2} className="w-10 h-10 text-green-600 mx-auto mb-4" />
+          <${CheckCircle2} className="w-10 h-10 text-green-600 mx-auto mb-4" aria-hidden="true" />
           <h3 className="font-display text-xl text-stone-900 mb-2">Thank you</h3>
           <p className="text-sm text-stone-600 max-w-sm mx-auto mb-6">
             Your ${isProblem ? 'report' : 'suggestion'} reached the archive. We read every one.
@@ -235,7 +285,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-sm font-bold text-stone-700 hover:text-stone-900 underline"
             >
-              View it on GitHub <${ExternalLink} className="w-3.5 h-3.5" />
+              View it on GitHub <${ExternalLink} className="w-3.5 h-3.5" aria-hidden="true" />
             </a>
           `}
           <div className="mt-8">
@@ -258,7 +308,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
       // is not blocked.
       return html`
         <div className="px-6 py-10 text-center">
-          <${ExternalLink} className="w-10 h-10 text-stone-700 mx-auto mb-4" />
+          <${ExternalLink} className="w-10 h-10 text-stone-700 mx-auto mb-4" aria-hidden="true" />
           <h3 className="font-display text-xl text-stone-900 mb-2">Finish on GitHub</h3>
           <p className="text-sm text-stone-600 max-w-sm mx-auto mb-6">
             We could not send this from here, so we filled in a GitHub issue with
@@ -270,7 +320,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
               onClick=${() => { openFallback(); onClose(); }}
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-stone-900 text-white rounded-sm text-sm font-bold hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
             >
-              Open the issue form <${ExternalLink} className="w-4 h-4" />
+              Open the issue form <${ExternalLink} className="w-4 h-4" aria-hidden="true" />
             </button>
             <button
               type="button"
@@ -296,7 +346,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
       // outage — where nothing was filed, so GitHub is safe.
       return html`
         <div className="px-6 py-10 text-center">
-          <${AlertCircle} className="w-10 h-10 text-red-600 mx-auto mb-4" />
+          <${AlertCircle} className="w-10 h-10 text-red-600 mx-auto mb-4" aria-hidden="true" />
           <h3 className="font-display text-xl text-stone-900 mb-2">That did not go through</h3>
           <p className="text-sm text-stone-600 max-w-sm mx-auto mb-6">${formError}</p>
           <div className="flex items-center justify-center gap-3">
@@ -373,7 +423,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
             disabled=${submitting}
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-stone-900 text-white rounded-sm text-sm font-bold hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-sky-500 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <${Send} className="w-4 h-4" />
+            <${Send} className="w-4 h-4" aria-hidden="true" />
             ${submitting ? 'Sending...' : 'Send report'}
           </button>
         </div>
@@ -383,7 +433,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
 
   return html`
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      className="archive-report-dialog fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
       onClick=${handleBackdrop}
       role="dialog"
       aria-modal="true"
@@ -392,7 +442,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
       <div ref=${modalRef} className="bg-paper w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden rounded-lg shadow-2xl">
         <div className="flex-shrink-0 bg-paper border-b border-stone-200 px-6 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <${Bug} className="w-5 h-5 text-stone-700 flex-shrink-0" />
+            <${Bug} className="w-5 h-5 text-stone-700 flex-shrink-0" aria-hidden="true" />
             <h2 id="bug-report-title" className="font-display text-xl text-stone-800">
               Report a problem or suggest a record
             </h2>
@@ -401,10 +451,10 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
             ref=${closeButtonRef}
             onClick=${requestClose}
             disabled=${submitting}
-            className="flex-shrink-0 p-2 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="archive-report-dialog-close flex-shrink-0 p-2 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label="Close report form"
           >
-            <${X} className="w-5 h-5" />
+            <${X} className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
         <!-- Inline minHeight:0 (not a Tailwind min-h-0 class): the pre-built,

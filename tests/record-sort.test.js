@@ -23,6 +23,10 @@ import { sortRecords, RECORD_SORTS } from '../frontend/utils/recordSort.js';
 // same way view-transition.test.js and archive-analytics.test.js check theirs.
 const rootDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const appSrc = fs.readFileSync(path.join(rootDir, 'frontend', 'App.js'), 'utf-8');
+const archiveResultsSrc = fs.readFileSync(
+  path.join(rootDir, 'frontend', 'components', 'ArchiveResults.js'),
+  'utf-8',
+);
 // Production serves this pre-built bundle directly (index.html links it); there
 // is no Tailwind build step, so a utility class the source uses but the bundle
 // omits is inert in production.
@@ -103,15 +107,15 @@ describe('record grid renders row-major so array order is the reading order (#52
     // The records array is already chronological; a row-major grid (left-to-right
     // then down) makes that the reading order. This is the actual #529 fix, so
     // pin it: the sort tests above cannot catch a layout regression on their own.
-    assert.match(appSrc, /className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3/);
+    assert.match(archiveResultsSrc, /'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'/);
   });
 
   it('leaves no masonry classes that would restore column-major flow', () => {
     // Regression guard on the real fix surface. The old `columns-*` masonry and
     // the `break-inside-avoid` card class flowed the grid column-major, which is
     // the jump-around order Jay reported; reverting to either reintroduces #529.
-    assert.doesNotMatch(appSrc, /columns-1 md:columns-2 xl:columns-3/);
-    assert.doesNotMatch(appSrc, /break-inside-avoid/);
+    assert.doesNotMatch(archiveResultsSrc, /columns-1 md:columns-2 xl:columns-3/);
+    assert.doesNotMatch(archiveResultsSrc, /break-inside-avoid/);
   });
 
   it('ships every grid class the record grid depends on', () => {

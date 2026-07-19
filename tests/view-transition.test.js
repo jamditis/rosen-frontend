@@ -33,6 +33,11 @@ describe('withViewTransition helper', () => {
     assert.match(src, /typeof document\.startViewTransition !== 'function'/);
   });
 
+  it('runs the state update without a transition when reduced motion is requested', () => {
+    assert.match(src, /matchMedia\?\.\('\(prefers-reduced-motion: reduce\)'\)\.matches/);
+    assert.match(src, /if \(\s*reduceMotion\s*\|\|\s*typeof document/);
+  });
+
   it('flushes the React update synchronously inside the transition (React 18)', () => {
     // Without flushSync the API snapshots the "after" DOM before React commits,
     // so nothing animates. flushSync forces the commit inside the callback.
@@ -64,6 +69,10 @@ describe('index.html import map', () => {
 
 describe('App.js record-modal view transition (#281)', () => {
   const src = fs.readFileSync(path.join(frontendDir, 'App.js'), 'utf-8');
+  const resultsSrc = fs.readFileSync(path.join(frontendDir, 'components', 'ArchiveResults.js'), 'utf-8');
+  const modalSrc = fs.readFileSync(path.join(frontendDir, 'components', 'RecordModal.js'), 'utf-8');
+  const detailPanelSrc = fs.readFileSync(path.join(frontendDir, 'components', 'DetailPanel.js'), 'utf-8');
+  const indexCss = fs.readFileSync(path.join(frontendDir, 'index.css'), 'utf-8');
 
   it('imports the versioned helper', () => {
     assert.match(src, /from '\.\/utils\/viewTransition\.js\?v=\d+\.\d+\.\d+'/);
@@ -75,7 +84,8 @@ describe('App.js record-modal view transition (#281)', () => {
   });
 
   it('opens the modal via selectRecord on a grid card click', () => {
-    assert.match(src, /onClick=\$\{\(\) => selectRecord\(item\.id\)\}/);
+    assert.match(src, /<\$\{ArchiveResults\}[\s\S]*?onSelectRecord=\$\{selectRecord\}/);
+    assert.match(resultsSrc, /onSelectRecord\(recordId\)/);
   });
 
   it('routes every record-select path (entity browser, in-modal links) through selectRecord', () => {
@@ -89,5 +99,41 @@ describe('App.js record-modal view transition (#281)', () => {
 
   it('closes the modal via selectRecord', () => {
     assert.match(src, /onClose=\$\{\(\) => selectRecord\(null\)\}/);
+  });
+
+  it('waits for a deep-linked record to render before assigning dialog focus', () => {
+    assert.match(modalSrc, /const hasRecord = Boolean\(record\)/);
+    assert.match(modalSrc, /if \(!hasRecord\) return undefined/);
+    assert.match(modalSrc, /\}, \[isOpen, hasRecord\]\);/);
+  });
+
+  it('does not retain the animated close delay under reduced motion', () => {
+    assert.match(modalSrc, /matchMedia\?\.\('\(prefers-reduced-motion: reduce\)'\)\.matches/);
+    assert.match(modalSrc, /if \(reduceMotion\) \{\s*completeClose\(afterClose\);\s*return;/);
+  });
+
+  it('finishes filter navigation after close without reactivating a background opener', () => {
+    assert.match(modalSrc, /const leaveRecordFor = \(action, value\) => \{[\s\S]*?openerRef\.current = null;[\s\S]*?beginClose\(\(\) => action\(value\)\)/);
+    assert.match(modalSrc, /onFilterCategory \? \(cat\) => leaveRecordFor\(onFilterCategory, cat\)/);
+    assert.match(modalSrc, /onFilterSearch \? \(tag\) => leaveRecordFor\(onFilterSearch, tag\)/);
+    assert.match(modalSrc, /onSelectEntity && recordEntities\.length > 0/);
+    assert.match(modalSrc, /leaveRecordFor\(onSelectEntity, entity\.id\)/);
+    assert.match(src, /handleRecordEntitySelect[\s\S]*navigateToDesktop\('entities', entityId\)[\s\S]*navigateTo\(ROUTES\.entities, null, entityId\)/);
+  });
+
+  it('does not let history-driven focus return undo a desktop window change', () => {
+    assert.match(modalSrc, /const openerWindow = opener\?\.closest\('\.desktop-window'\)/);
+    assert.match(modalSrc, /!openerWindow \|\| openerWindow\.classList\.contains\('is-active'\)/);
+    assert.match(modalSrc, /opener\?\.isConnected[\s\S]*opener\.focus\(\)/);
+  });
+
+  it('disables shared record and detail-panel CSS motion at the source', () => {
+    assert.match(modalSrc, /className="archive-record-dialog /);
+    assert.match(detailPanelSrc, /archive-detail-panel \$\{contained \? 'is-contained' : ''\} \$\{positionClass\}/);
+    assert.match(indexCss, /@media \(prefers-reduced-motion: reduce\)/);
+    assert.match(indexCss, /\.archive-record-dialog \*/);
+    assert.match(indexCss, /\.archive-detail-panel/);
+    assert.match(indexCss, /transition-duration:\s*0\.01ms !important/);
+    assert.match(indexCss, /animation-iteration-count:\s*1 !important/);
   });
 });

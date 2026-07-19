@@ -49,8 +49,18 @@ describe('Start here page', () => {
 
   it('uses real archive records for highlights and handles unloaded data', () => {
     assert.match(page, /findFeaturedRecords\(records\)/);
+    assert.match(page, /export const SelectedFindings/);
     assert.match(page, /records\s*\.filter\(\(record\) => record\.type !== 'social'\)/);
     assert.match(page, /Curated records will appear here once the archive data has loaded/);
+  });
+
+  it('can render inside the desktop without a nested main landmark or navigation loop', () => {
+    assert.match(page, /embedded\s*=\s*false/);
+    assert.match(page, /const ContentTag = embedded \? 'div' : 'main'/);
+    assert.match(page, /id=\$\{embedded \? undefined : 'main-content'\}/);
+    assert.match(page, /\$\{!embedded && html`<header/);
+    assert.match(page, /\$\{!embedded && html`<button[\s\S]*Explore the archive desktop/);
+    assert.match(page, /if \(embedded\) return;/);
   });
 
   it('keeps the complete guide in accessible progressive disclosure', () => {
@@ -97,9 +107,9 @@ describe('Start here page', () => {
   it('is wired as a cached full-page route with the report modal still mounted', () => {
     assert.match(app, /currentRoute === ROUTES\.start/);
     assert.match(app, /<\$\{StartHerePage\}/);
-    assert.match(app, /const renderFullPage = \(page\)/);
+    assert.match(app, /const renderFullPage = \(page, routeOverlay = null\)/);
     assert.match(app, /<\$\{BugReportModal\}/);
-    assert.equal((serviceWorker.match(/StartHerePage\.js/g) || []).length, 2);
-    assert.equal((serviceWorker.match(/tourState\.js/g) || []).length, 2);
+    assert.equal((serviceWorker.match(/StartHerePage\.js/g) || []).length, 1);
+    assert.equal((serviceWorker.match(/tourState\.js/g) || []).length, 1);
   });
 });

@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { html } from '../html.js?v=3.7.5';
+import { html } from '../html.js?v=3.7.6';
 import { ChevronDown, ChevronRight, ZoomIn, ZoomOut, Maximize2, Focus, HelpCircle, X } from 'lucide-react';
 
 // Enhanced node type styles with gradients and shadows
@@ -154,6 +154,7 @@ const MindMapNode = ({ node, nodeWidth, nodeHeight, isExpanded, hasChildren, isS
   const style = NODE_STYLES[node.type] || NODE_STYLES.chapter;
   const isRoot = node.type === 'root';
   const [isHovered, setIsHovered] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   // Single click on node: expand if has children, always select
   const handleNodeClick = useCallback((e) => {
@@ -174,18 +175,34 @@ const MindMapNode = ({ node, nodeWidth, nodeHeight, isExpanded, hasChildren, isS
     onToggle(node.id);
   }, [node.id, onToggle]);
 
-  const shadowOffset = isSelected ? 4 : isHovered ? 3 : 2;
-  const borderWidth = isSelected ? 2.5 : isHovered ? 2 : 1.5;
+  const handleNodeKeyDown = useCallback((e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      handleNodeClick(e);
+    }
+  }, [handleNodeClick]);
+
+  const isEmphasized = isSelected || isFocused;
+  const shadowOffset = isEmphasized ? 4 : isHovered ? 3 : 2;
+  const borderWidth = isEmphasized ? 2.5 : isHovered ? 2 : 1.5;
 
   return html`
     <g
       transform="translate(${node.x - nodeWidth / 2}, ${node.y - nodeHeight / 2})"
+      role="button"
+      tabIndex="0"
+      aria-label=${`${node.label}${node.subtitle ? `: ${node.subtitle}` : ''}`}
+      aria-expanded=${hasChildren ? isExpanded : undefined}
+      aria-pressed=${isSelected}
       style=${{
         cursor: 'pointer',
         transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)'
       }}
+      onClick=${handleNodeClick}
+      onKeyDown=${handleNodeKeyDown}
       onMouseEnter=${() => setIsHovered(true)}
       onMouseLeave=${() => setIsHovered(false)}
+      onFocus=${() => setIsFocused(true)}
+      onBlur=${() => setIsFocused(false)}
     >
       <rect
         x=${shadowOffset}
@@ -202,13 +219,12 @@ const MindMapNode = ({ node, nodeWidth, nodeHeight, isExpanded, hasChildren, isS
         height=${nodeHeight}
         rx="8"
         fill=${isHovered ? style.bgHover : style.bg}
-        stroke=${isSelected ? style.accent : style.border}
+        stroke=${isEmphasized ? style.accent : style.border}
         strokeWidth=${borderWidth}
-        onClick=${handleNodeClick}
         style=${{ transition: 'all 0.2s ease', cursor: 'pointer' }}
       />
 
-      ${isSelected && html`
+      ${isEmphasized && html`
         <rect
           x="-3"
           y="-3"
@@ -372,7 +388,13 @@ const MindMapEdge = ({ edge }) => {
 };
 
 // Main Mind Map Component
-const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) => {
+const MindMap = ({
+  nodes,
+  onNodeSelect,
+  className = '',
+  isPanelOpen = false,
+  minimumZoom = 0.3,
+}) => {
   const containerRef = useRef(null);
   const [expandedIds, setExpandedIds] = useState(new Set(['root']));
   const [selectedNodeId, setSelectedNodeId] = useState(null);
@@ -384,6 +406,9 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
   const [isAnimating, setIsAnimating] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const animationRef = useRef(null);
+  const safeMinimumZoom = Number.isFinite(minimumZoom)
+    ? Math.min(1.5, Math.max(0.3, minimumZoom))
+    : 0.3;
 
   // Add child counts to nodes
   const nodesWithCounts = useMemo(() => {
@@ -407,6 +432,14 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
     const startZoom = zoom;
     const startPan = { ...pan };
     const startTime = performance.now();
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+    if (reduceMotion || duration <= 0) {
+      setZoom(targetZoom);
+      setPan(targetPan);
+      setIsAnimating(false);
+      return;
+    }
 
     const animate = (currentTime) => {
       const elapsed = currentTime - startTime;
@@ -448,7 +481,10 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
     // Calculate zoom to fit content
     const scaleX = availableWidth / newBounds.width;
     const scaleY = availableHeight / newBounds.height;
-    const targetZoom = Math.min(scaleX, scaleY, 1.5); // Cap max zoom at 1.5
+    const targetZoom = Math.max(
+      safeMinimumZoom,
+      Math.min(scaleX, scaleY, 1.5),
+    ); // Cap max zoom at 1.5 without shrinking desktop touch targets.
 
     // Calculate pan to center content
     const contentCenterX = newBounds.x + newBounds.width / 2;
@@ -462,7 +498,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
       setZoom(targetZoom);
       setPan({ x: targetPanX, y: targetPanY });
     }
-  }, [animateToFit]);
+  }, [animateToFit, safeMinimumZoom]);
 
   // Fit view to a specific node and its immediate connections
   const fitToNodeCluster = useCallback((nodeId, animate = true) => {
@@ -511,7 +547,10 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
     // Calculate zoom to fit cluster
     const scaleX = availableWidth / clusterBounds.width;
     const scaleY = availableHeight / clusterBounds.height;
-    const targetZoom = Math.min(scaleX, scaleY, 1.2); // Cap at 1.2 for readability
+    const targetZoom = Math.max(
+      safeMinimumZoom,
+      Math.min(scaleX, scaleY, 1.2),
+    ); // Cap at 1.2 for readability.
 
     // Calculate pan to center the cluster
     const clusterCenterX = clusterBounds.x + clusterBounds.width / 2;
@@ -525,7 +564,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
       setZoom(targetZoom);
       setPan({ x: targetPanX, y: targetPanY });
     }
-  }, [visibleNodes, nodeWidth, nodeHeight, animateToFit]);
+  }, [visibleNodes, nodeWidth, nodeHeight, animateToFit, safeMinimumZoom]);
 
   // Handle node selection - auto-fit to node cluster and notify parent
   const handleNodeSelect = useCallback((node) => {
@@ -570,7 +609,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
 
   // Zoom controls
   const handleZoomIn = () => setZoom(z => Math.min(z * 1.2, 3));
-  const handleZoomOut = () => setZoom(z => Math.max(z / 1.2, 0.3));
+  const handleZoomOut = () => setZoom(z => Math.max(z / 1.2, safeMinimumZoom));
   const handleReset = () => fitToView(bounds, true);
   const handleFitToView = () => fitToView(bounds, true);
 
@@ -625,16 +664,15 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
   const handleWheel = useCallback((e) => {
     e.preventDefault();
     const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    setZoom(z => Math.max(0.3, Math.min(3, z * delta)));
-  }, []);
+    setZoom(z => Math.max(safeMinimumZoom, Math.min(3, z * delta)));
+  }, [safeMinimumZoom]);
 
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Only handle if this component is focused or no input is focused
-      if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') {
-        return;
-      }
+      // Keep map shortcuts local to the map. This matters when the canonical
+      // component is embedded in another shell with its own arrow-key model.
+      if (!containerRef.current?.contains(document.activeElement)) return;
 
       switch(e.key) {
         case 'Escape':
@@ -651,7 +689,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
           break;
         case '-':
           e.preventDefault();
-          setZoom(z => Math.max(z / 1.2, 0.3));
+          setZoom(z => Math.max(z / 1.2, safeMinimumZoom));
           break;
         case '0':
           e.preventDefault();
@@ -678,7 +716,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedNodeId, handleDeselectNode]);
+  }, [selectedNodeId, handleDeselectNode, safeMinimumZoom]);
 
   // Cancel any in-flight fit-to-view animation on unmount. animateToFit
   // re-schedules requestAnimationFrame until the tween finishes; without this,
@@ -749,6 +787,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
     <div className=${`relative w-full h-full bg-stone-100 overflow-hidden ${className}`} ref=${containerRef}>
       <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
         <button
+          type="button"
           onClick=${handleZoomIn}
           className="p-3 sm:p-2.5 bg-white rounded-lg shadow-md border border-stone-200 hover:bg-stone-50 hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
           title="Zoom in"
@@ -757,6 +796,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
           <${ZoomIn} className="w-5 h-5 text-stone-600" />
         </button>
         <button
+          type="button"
           onClick=${handleZoomOut}
           className="p-3 sm:p-2.5 bg-white rounded-lg shadow-md border border-stone-200 hover:bg-stone-50 hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
           title="Zoom out"
@@ -766,6 +806,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
         </button>
         <div className="h-px bg-stone-200 my-1" />
         <button
+          type="button"
           onClick=${handleReset}
           className="p-3 sm:p-2.5 bg-white rounded-lg shadow-md border border-stone-200 hover:bg-stone-50 hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
           title="Re-center view"
@@ -780,6 +821,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
           ${Math.round(zoom * 100)}%
         </div>
         <button
+          type="button"
           onClick=${collapseAll}
           className="px-3 py-2.5 sm:py-2 text-xs font-medium bg-white hover:bg-stone-50 text-stone-600 rounded-lg shadow-md border border-stone-200 transition-all hover:shadow-lg whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
           title="Collapse all nodes"
@@ -788,6 +830,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
           Collapse All
         </button>
         <button
+          type="button"
           onClick=${expandAll}
           className="px-3 py-2.5 sm:py-2 text-xs font-medium bg-stone-800 hover:bg-stone-700 text-white rounded-lg shadow-md border border-stone-700 transition-all hover:shadow-lg whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
           title="Expand all nodes"
@@ -796,6 +839,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
           Expand All
         </button>
         <button
+          type="button"
           onClick=${() => setShowShortcuts(!showShortcuts)}
           className="p-2.5 sm:p-2 bg-white hover:bg-stone-50 text-stone-600 rounded-lg shadow-md border border-stone-200 transition-all hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
           title="Keyboard shortcuts"
@@ -810,6 +854,7 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold text-stone-800 text-sm">Keyboard Shortcuts</h3>
             <button
+              type="button"
               onClick=${() => setShowShortcuts(false)}
               className="text-stone-400 hover:text-stone-600 transition-colors"
               aria-label="Close shortcuts panel"
@@ -863,7 +908,8 @@ const MindMap = ({ nodes, onNodeSelect, className = '', isPanelOpen = false }) =
         onClick=${handleSvgClick}
         onWheel=${handleWheel}
         tabIndex="0"
-        role="application"
+        role="region"
+        aria-roledescription="interactive mind map"
         aria-label="Dissertation mind map. Use arrow keys to pan, +/- to zoom. Press ESC to close panel. On touch devices, drag to pan."
       >
         <g

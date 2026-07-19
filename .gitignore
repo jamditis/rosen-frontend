@@ -98,6 +98,7 @@ playwright-report/
 
 # Preview audit output (npm run preview:audit)
 preview-audit-results/
+preview-audit-results-*/
 
 # Entity extraction working data
 data/social_import/

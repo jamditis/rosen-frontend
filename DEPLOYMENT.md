@@ -8,6 +8,7 @@ Upload these files and directories from the repo root:
 
 ```
 index.html                          # Main archive page
+sw.js                               # Root-scope service-worker bridge (loads frontend/sw.js)
 favicon.ico                         # Site favicon
 favicon.svg                         # SVG favicon (referenced by index.html, the FAQ, and both data tools)
 og-image.png                        # Social sharing card (referenced by the OG/Twitter meta tags)
@@ -24,6 +25,7 @@ frontend/                           # React application
   constants.js                      # Data URLs, colors, entity types
   sw.js                             # Service worker
   components/                       # All component files
+  desktop/                          # Optional lazy desktop shell, adapters, registry, window state, and CSS
   services/                         # archiveService, router, sqliteService
   utils/                            # Design tokens
   vendor/                           # Self-hosted sql.js wasm (sql-wasm-1.10.3.wasm)
@@ -77,8 +79,9 @@ ADDING-RECORDS.md                   # Instructions for adding new records
 The full-site deploy uploads each standalone `features/*/index.html` only after
 the files in its feature directory and the shared data manifest. This keeps a
 feature's public entry point on the previous release until its JavaScript, CSS,
-and data dependencies are live. The root `index.html`, service worker, and
-`version.json` then retain their existing final three release flips.
+and data dependencies are live. The root `index.html`, implementation worker,
+root-scope worker bridge, and `version.json` then retain their final four
+release flips.
 
 ## Retired routes removed by a full deploy
 
@@ -129,7 +132,31 @@ Other files only change when the site code changes.
 
 ## Version cache busting
 
-Before committing and uploading a release, run `npm run bump-version -- X.X.X` to stamp the `?v=X.X.X` query parameter on versioned JS/CSS references in the root app, FAQ, and standalone feature pages. Commit those stamps with the release so the full-site upload contains them. The command also updates `version.json` and bumps `frontend/sw.js` `CACHE_VERSION` to the same value. The service worker serves static JS cache-first with `ignoreSearch: true`, so a `?v=` bump alone does not invalidate it — only a `CACHE_VERSION` change drops the stale service-worker cache, so returning visitors keep running old JS until it bumps. `tests/version-consistency.test.js` enforces the complete marker surface and cache version stay in lockstep.
+Before committing and uploading a release, run `npm run bump-version -- X.X.X` to stamp the `?v=X.X.X` query parameter on versioned JS/CSS references in the root app, FAQ, and standalone feature pages. Commit those stamps with the release so the full-site upload contains them. The command also updates `version.json` and bumps `frontend/sw.js` `CACHE_VERSION` to the same value. The stable root `sw.js` bridge imports that implementation so it can control the whole archive subtree. The service worker serves static JS cache-first with `ignoreSearch: true`, so a `?v=` bump alone does not invalidate it — only a `CACHE_VERSION` change drops the stale service-worker cache, so returning visitors keep running old JS until it bumps. `tests/version-consistency.test.js` enforces the complete marker surface and cache version stay in lockstep.
+
+### Optional desktop release check
+
+`frontend/desktop/` is part of the recursively deployed `frontend/` directory,
+but its modules and stylesheet are intentionally absent from the service
+worker's install-time app shell. A standard archive visit must not request or
+cache them. After a visitor opens `#desktop`, the mounted shell asks the active
+worker to warm the allowlisted `DESKTOP_ASSETS` for a later offline visit.
+
+For a coordinated release that changes the desktop:
+
+1. run the normal version bump so desktop imports, `version.json`, and
+   `frontend/sw.js` use the same new version;
+2. run `npm test` and `npm run preview:audit`;
+3. run `python backend/scripts/deploy_full_site.py --dry-run` (or the Poetry
+   equivalent from `backend/`) and confirm the complete `frontend/desktop/`
+   runtime set is present;
+4. in a fresh browser profile, confirm the standard route requests no desktop
+   assets, then visit `#desktop`, reload it offline, and verify the permanent
+   “Standard archive” exit still works.
+
+Do not add `features/making-of/` to either deployment path or a desktop launch
+target until its separate editorial and publication gates are explicitly
+approved.
 
 ## FTP credentials
 

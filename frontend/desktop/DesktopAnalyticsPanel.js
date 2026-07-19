@@ -1,0 +1,27 @@
+import { html } from '../html.js?v=3.7.6';
+import AnalyticsDashboard from '../components/AnalyticsDashboard.js?v=3.7.6';
+
+const DesktopAnalyticsPanel = ({ onRecordResults, onOpenStandard }) => html`
+  <div className="desktop-analytics-panel">
+    <header className="desktop-archive-heading">
+      <div>
+        <p className="desktop-eyebrow">Collection patterns</p>
+        <h3>Archive analytics</h3>
+        <p>
+          Inspect the maintained aggregate data now. The larger query database still loads only when you choose to run a query.
+        </p>
+      </div>
+      <button type="button" className="desktop-standard-link" onClick=${onOpenStandard}>
+        Open standard view
+      </button>
+    </header>
+    <div className="desktop-canonical-surface">
+      <${AnalyticsDashboard}
+        embedded=${true}
+        onRecordResults=${onRecordResults}
+      />
+    </div>
+  </div>
+`;
+
+export default DesktopAnalyticsPanel;

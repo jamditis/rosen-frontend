@@ -1,6 +1,6 @@
-import { html } from '../html.js?v=3.7.5';
-import RecordModal from './RecordModal.js?v=3.7.5';
-import { deriveNavFlags } from '../utils/modalNav.js?v=3.7.5';
+import { html } from '../html.js?v=3.7.6';
+import RecordModal from './RecordModal.js?v=3.7.6';
+import { deriveNavFlags } from '../utils/modalNav.js?v=3.7.6';
 
 /**
  * Single owner for "render the selected record."
@@ -24,6 +24,7 @@ export default function RecordView({
   onNext,
   onPrev,
   onSelectRecord,
+  onSelectEntity,
   onFilterCategory,
   onFilterSearch,
 }) {
@@ -46,6 +47,7 @@ export default function RecordView({
       onNext=${onNext}
       onPrev=${onPrev}
       onSelectRecord=${onSelectRecord}
+      onSelectEntity=${onSelectEntity}
       onFilterCategory=${onFilterCategory}
       onFilterSearch=${onFilterSearch}
       hasPrev=${hasPrev}

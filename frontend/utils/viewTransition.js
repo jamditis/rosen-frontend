@@ -15,7 +15,13 @@
 import { flushSync } from 'react-dom';
 
 export function withViewTransition(update) {
-  if (typeof document === 'undefined' || typeof document.startViewTransition !== 'function') {
+  const reduceMotion = typeof window !== 'undefined'
+    && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  if (
+    reduceMotion
+    || typeof document === 'undefined'
+    || typeof document.startViewTransition !== 'function'
+  ) {
     update();
     return;
   }

@@ -14,7 +14,8 @@ describe('wiki UI wiring', () => {
   const toolsSrc = read('frontend', 'components', 'ToolsModal.js');
 
   it('does not start the large archive fetch on a cold wiki deep link', () => {
-    assert.match(appSrc, /currentRoute\s*===\s*ROUTES\.analytics\s*\|\|\s*currentRoute\s*===\s*ROUTES\.wiki\)\s*return/);
+    assert.match(appSrc, /NON_RECORD_ROUTES\s*=\s*new Set\([\s\S]*ROUTES\.wiki/);
+    assert.match(appSrc, /NON_RECORD_ROUTES\.has\(currentRoute\)\s*&&\s*!desktopNeedsRecords\) return/);
   });
 
   it('keeps the wiki route reachable by deep link but exposes no public entry point', () => {

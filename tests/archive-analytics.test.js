@@ -136,14 +136,25 @@ describe('analytics lazy-load wiring (#338)', () => {
     assert.match(body, /throw new Error/, 'fetchAnalytics must throw on a failed fetch');
   });
 
-  it('App.js skips the core fetch on a cold #analytics deep-link', () => {
+  it('announces analytics loading and failure with a usable recovery action', () => {
+    const dashboard = readSrc('frontend', 'components', 'AnalyticsDashboard.js');
+    assert.match(dashboard, /role="status" aria-live="polite"/);
+    assert.match(dashboard, /className="[^"]*animate-spin[^"]*" aria-hidden="true"/);
+    assert.match(dashboard, /role="alert"/);
+    assert.match(dashboard, /<h3 className="text-red-800 font-bold mb-2">Error loading analytics<\/h3>/);
+    assert.match(dashboard, /The archive summary could not load\. Please refresh the page or try again later\./);
+    assert.match(dashboard, /style=\$\{\{ minHeight: '44px', backgroundColor: '#991b1b', color: '#ffffff' \}\}/);
+    assert.match(dashboard, /focus:ring-2 focus:ring-amber-600 focus:ring-offset-2/);
+  });
+
+  it('App.js skips the core fetch on cold non-record deep links', () => {
     const src = readSrc('frontend', 'App.js');
     assert.match(src, /coreFetchStarted/, 'expected the coreFetchStarted ref guard');
-    assert.match(
-      src,
-      /currentRoute\s*===\s*ROUTES\.analytics\s*\|\|\s*currentRoute\s*===\s*ROUTES\.wiki\)\s*return/,
-      'the load effect must early-return on analytics and wiki routes'
-    );
+    assert.match(src, /NON_RECORD_ROUTES\s*=\s*new Set\([\s\S]*ROUTES\.analytics/);
+    assert.match(src, /NON_RECORD_ROUTES\s*=\s*new Set\([\s\S]*ROUTES\.wiki/);
+    assert.match(src, /NON_RECORD_ROUTES\s*=\s*new Set\([\s\S]*ROUTES\.desktop/);
+    assert.match(src, /NON_RECORD_ROUTES\.has\(currentRoute\)\s*&&\s*!desktopNeedsRecords\) return/,
+      'the load effect must early-return for every non-record route');
   });
 
   it('constants.js defines a relative archive_analytics path', () => {

@@ -32,4 +32,22 @@ export function setRecordParam(searchParams, recordId) {
   return searchParams;
 }
 
-export default { parseRecordId, setRecordParam };
+// Build the one shareable record URL used by every archive surface. Desktop
+// windows intentionally resolve to the standard archive record URL so the
+// optional shell never creates a second incompatible citation/share format.
+export function canonicalRecordUrl(locationHref, recordId) {
+  if (typeof locationHref !== 'string' || locationHref === '') {
+    throw new TypeError('canonicalRecordUrl requires a location URL');
+  }
+  if (typeof recordId !== 'string' || recordId === '') {
+    throw new TypeError('canonicalRecordUrl requires a record id');
+  }
+
+  const url = new URL(locationHref);
+  url.search = '';
+  url.hash = '';
+  setRecordParam(url.searchParams, recordId);
+  return url.toString();
+}
+
+export default { canonicalRecordUrl, parseRecordId, setRecordParam };

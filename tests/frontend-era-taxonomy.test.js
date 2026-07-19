@@ -94,11 +94,10 @@ describe('frontend era taxonomy (#385)', () => {
 
     assert.match(deploymentGuide, /^\s+eras\.js\s+#/m, 'DEPLOYMENT.md must list data/eras.js');
     assert.match(deployScript, /['"]data\/eras\.js['"]/, 'the full-site deploy must upload data/eras.js');
-    assert.match(serviceWorker, /['"]\/data\/eras\.js['"]/, 'the local app shell must cache data/eras.js');
     assert.match(
       serviceWorker,
       /`\$\{DATA_PATH\}\/eras\.js`/,
-      'the deployed app shell must cache data/eras.js'
+      'every app-shell environment must cache data/eras.js'
     );
   });
 });

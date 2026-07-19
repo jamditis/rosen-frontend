@@ -18,7 +18,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseRecordId, setRecordParam } from '../frontend/utils/recordDeepLink.js';
+import { canonicalRecordUrl, parseRecordId, setRecordParam } from '../frontend/utils/recordDeepLink.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const readSrc = (rel) => fs.readFileSync(path.join(__dirname, '..', rel), 'utf-8');
@@ -102,6 +102,34 @@ describe('setRecordParam — the write-effect set/delete branch', () => {
   });
 });
 
+describe('canonicalRecordUrl — one share format across archive surfaces', () => {
+  it('strips desktop state and filter params from a record URL', () => {
+    assert.equal(
+      canonicalRecordUrl(
+        'https://pressthink.org/j/rosen-archive/?q=press&record=OLD#desktop/archive',
+        'RECORD-00042',
+      ),
+      'https://pressthink.org/j/rosen-archive/?record=RECORD-00042',
+    );
+  });
+
+  it('preserves local and GitHub Pages base paths', () => {
+    assert.equal(
+      canonicalRecordUrl('http://127.0.0.1:8765/#desktop/archive', 'BSKY-17'),
+      'http://127.0.0.1:8765/?record=BSKY-17',
+    );
+    assert.equal(
+      canonicalRecordUrl('https://example.github.io/rosen-frontend/#desktop', 'X-9'),
+      'https://example.github.io/rosen-frontend/?record=X-9',
+    );
+  });
+
+  it('rejects missing URL or record inputs', () => {
+    assert.throws(() => canonicalRecordUrl('', 'RECORD-1'), /location URL/);
+    assert.throws(() => canonicalRecordUrl('https://example.com/', ''), /record id/);
+  });
+});
+
 describe('production delegates to these helpers (keeps the tests above relevant)', () => {
   // The behavioural assertions only protect the shipped deep link if the real
   // code routes through parseRecordId/setRecordParam. Without these guards the
@@ -119,6 +147,9 @@ describe('production delegates to these helpers (keeps the tests above relevant)
   });
 
   it('App.js URL-sync effect writes the record param via setRecordParam', () => {
-    assert.match(readSrc('frontend/App.js'), /setRecordParam\(\s*url\.searchParams\s*,\s*selectedRecordId\s*\)/);
+    assert.match(
+      readSrc('frontend/App.js'),
+      /setRecordParam\(\s*url\.searchParams\s*,[\s\S]{0,120}selectedRecordId\s*,?\s*\)/,
+    );
   });
 });

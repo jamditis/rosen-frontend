@@ -310,11 +310,14 @@ Hash-based SPA routing via `router.js`:
 | Route | Hash | Component |
 |-------|------|-----------|
 | Archive | (default) | `App.js` main view |
+| Start here | `#start` | `StartHerePage.js` |
 | Folders | `#folders` | `App.js` folder view |
 | Entities | `#entities` | `EntityBrowser.js` |
 | Dissertation | `#dissertation` | `DissertationPage.js` |
 | About | `#about` | `AboutPage.js` |
 | Analytics | `#analytics` | `AnalyticsDashboard.js` |
+| Wiki | `#wiki` / `#wiki/:slug` | `WikiPage.js` |
+| Archive desktop | `#desktop` / `#desktop/:app` | lazy `DesktopShell.js` |
 
 Record deep links: `?record=RECORD_ID` opens a record modal on any route.
 

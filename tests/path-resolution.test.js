@@ -34,6 +34,12 @@ describe('getEnvironment(host)', () => {
     assert.strictEqual(getEnvironment('127.0.0.1'), 'local');
   });
 
+  it('returns local for bare and browser-serialized IPv6 loopback', () => {
+    assert.strictEqual(getEnvironment('::1'), 'local');
+    assert.strictEqual(getEnvironment('[::1]'), 'local');
+    assert.strictEqual(resolveSitePath('frontend/desktop/desktop.css', '[::1]'), '/frontend/desktop/desktop.css');
+  });
+
   it('returns github-pages for jamditis.github.io', () => {
     assert.strictEqual(getEnvironment('jamditis.github.io'), 'github-pages');
   });

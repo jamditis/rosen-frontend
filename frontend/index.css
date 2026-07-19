@@ -1,5 +1,79 @@
-/* Import Design System Tokens */
-@import url('./design-system/tokens.css');
+/* Shared detail surfaces can render outside the optional desktop subtree.
+   Keep their canonical transitions from bypassing the user's motion setting. */
+@media (prefers-reduced-motion: reduce) {
+  .archive-record-dialog,
+  .archive-record-dialog *,
+  .archive-record-dialog *::before,
+  .archive-record-dialog *::after,
+  .archive-detail-panel,
+  .archive-detail-panel * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.archive-detail-content:focus-visible {
+  outline: 3px solid #44403c;
+  outline-offset: -3px;
+}
+
+/* Client-side route changes focus a stable heading or main landmark so the
+   destination is announced. Keep that programmatic target visibly located
+   for keyboard users even when a component carries Tailwind's outline-none
+   utility for ordinary pointer interaction. */
+[data-route-entry-focus]:focus-visible {
+  outline: 3px solid #0369a1;
+  outline-offset: 4px;
+}
+
+@media (forced-colors: active) {
+  [data-route-entry-focus]:focus-visible {
+    outline-color: Highlight;
+  }
+}
+
+/* The entity browser can render hundreds of cards. On narrow layouts, place
+   the newly selected master/detail panel before that long list so the result
+   of an activation is immediately visible. The wide layout retains the
+   conventional list-left/detail-right arrangement. */
+.entity-browser-list {
+  order: 2;
+}
+
+.entity-browser-detail {
+  order: 1;
+}
+
+.entity-detail-heading:focus-visible {
+  outline: 3px solid #44403c;
+  outline-offset: 4px;
+}
+
+@media (min-width: 1024px) {
+  .entity-browser-list {
+    order: 1;
+  }
+
+  .entity-browser-detail {
+    order: 2;
+  }
+}
+
+/* iOS Safari zooms the page when a focused form field is smaller than 16px.
+   The compact desktop and its global report dialog both sit beside fixed
+   controls, so keep their text-entry surfaces at the non-zooming threshold. */
+@media (max-width: 700px), (max-width: 900px) and (max-height: 520px) {
+  .archive-desktop .desktop-window-body input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  .archive-desktop .desktop-window-body select,
+  .archive-desktop .desktop-window-body textarea,
+  .archive-report-dialog input:not([type='checkbox']):not([type='radio']):not([type='range']),
+  .archive-report-dialog select,
+  .archive-report-dialog textarea {
+    font-size: 1rem;
+  }
+}
 
 /* Prevent horizontal overflow */
 html, body {
@@ -39,6 +113,25 @@ mark {
   color: var(--color-selection-text);
   padding: 0 2px;
   border-radius: 2px;
+}
+
+/* The report form is reachable from both the canonical archive and the
+   optional desktop. Keep its controls touch-safe even though the zero-build
+   Tailwind bundle does not include min-h-11/min-w-11 utilities. */
+.archive-report-dialog button,
+.archive-report-dialog input:not([type='hidden']):not([tabindex='-1']),
+.archive-report-dialog textarea,
+.archive-report-dialog select,
+.archive-report-dialog a[href] {
+  min-height: 44px;
+}
+
+.archive-report-dialog a[href] {
+  align-items: center;
+}
+
+.archive-report-dialog .archive-report-dialog-close {
+  min-width: 44px;
 }
 
 /* Settings sidebar slide-in animation */

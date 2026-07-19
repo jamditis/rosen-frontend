@@ -172,10 +172,9 @@ describe('idb-keyval delivery wiring (#275)', () => {
     assert.match(html, /"idb-keyval":\s*"https:\/\/esm\.sh\/idb-keyval@\d+\.\d+\.\d+"/);
   });
 
-  it('the service worker precaches idbCache.js in both layouts', () => {
+  it('the service worker precaches idbCache.js through the environment-aware shell manifest', () => {
     const sw = fs.readFileSync(path.join(rootDir, 'frontend', 'sw.js'), 'utf-8');
-    const hits = sw.match(/frontend\/services\/idbCache\.js/g) || [];
-    assert.ok(hits.length >= 2,
-      `idbCache.js must be precached in both the local and deployed asset lists (found ${hits.length})`);
+    assert.match(sw, /['"]services\/idbCache\.js['"]/);
+    assert.match(sw, /APP_SHELL_FRONTEND_FILES\.map\(file\s*=>\s*`\$\{FRONTEND_PATH\}\/\$\{file\}`\)/);
   });
 });
