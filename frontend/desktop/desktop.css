@@ -115,6 +115,7 @@
 }
 
 .desktop-shortcut,
+.desktop-window-move,
 .desktop-window-close,
 .desktop-window-minimize,
 .desktop-start-button,
@@ -211,8 +212,8 @@
 
 .desktop-window {
   position: absolute;
-  top: calc(clamp(2.6rem, 9vh, 7rem) + var(--desktop-window-y, 0px));
-  left: calc(50% + var(--desktop-window-x, 0px));
+  top: calc(clamp(2.6rem, 9vh, 7rem) + var(--desktop-window-position-y, 0px));
+  left: calc(50% + var(--desktop-window-position-x, 0px));
   align-self: start;
   width: min(100%, 780px);
   min-width: 0;
@@ -227,6 +228,13 @@
   transform: translateX(-50%);
 }
 
+.desktop-window.is-active {
+  box-shadow:
+    0 0 0 2px rgba(240, 201, 75, 0.72),
+    12px 14px 0 rgba(0, 0, 0, 0.25),
+    20px 24px 44px rgba(0, 0, 0, 0.28);
+}
+
 .desktop-window-titlebar {
   display: flex;
   min-height: 48px;
@@ -239,6 +247,16 @@
   background:
     repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(255, 255, 255, 0.04) 3px, rgba(255, 255, 255, 0.04) 4px),
     linear-gradient(90deg, var(--desktop-ink-blue), var(--desktop-ink-blue-light));
+}
+
+.desktop-window-titlebar.is-movable {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.desktop-window.is-dragging .desktop-window-titlebar {
+  cursor: grabbing;
 }
 
 .desktop-window-title-copy {
@@ -259,7 +277,7 @@
   outline: none;
 }
 
-.desktop-window-title-copy h2:focus-visible {
+.desktop-window-title-copy h2:focus {
   outline: 2px solid #fff;
   outline-offset: 3px;
 }
@@ -295,6 +313,7 @@
 }
 
 .desktop-window-close,
+.desktop-window-move,
 .desktop-window-minimize {
   display: grid;
   flex: 0 0 44px;
@@ -310,6 +329,7 @@
 }
 
 .desktop-window-close svg,
+.desktop-window-move svg,
 .desktop-window-minimize svg {
   width: 23px;
   height: 23px;
@@ -317,6 +337,7 @@
 }
 
 .desktop-window-close:active,
+.desktop-window-move:active,
 .desktop-window-minimize:active {
   border-color: var(--desktop-chrome-light);
   border-top-color: var(--desktop-chrome-dark);
@@ -324,12 +345,67 @@
 }
 
 .desktop-window-close:focus-visible,
+.desktop-window-move:focus-visible,
 .desktop-window-minimize:focus-visible,
 .desktop-start-button:focus-visible,
 .desktop-task-button:focus-visible,
 .desktop-menu-item:focus-visible,
 .desktop-tool-link:focus-visible {
   outline: 3px solid #f0c94b;
+  outline-offset: 2px;
+}
+
+.desktop-window-move-panel {
+  position: absolute;
+  z-index: 8;
+  top: 60px;
+  right: 8px;
+  display: grid;
+  width: min(310px, calc(100% - 16px));
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.45rem;
+  padding: 0.6rem;
+  border: 3px solid var(--desktop-chrome-dark);
+  border-top-color: var(--desktop-chrome-light);
+  border-left-color: var(--desktop-chrome-light);
+  background: var(--desktop-chrome);
+  color: #211e1a;
+  box-shadow: 6px 7px 0 rgba(0, 0, 0, 0.26);
+}
+
+.desktop-window-move-panel p {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+
+.desktop-window-move-arrows {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(4, minmax(44px, 1fr));
+  gap: 0.3rem;
+}
+
+.desktop-window-move-panel button {
+  min-width: 44px;
+  min-height: 44px;
+  border: 2px solid var(--desktop-chrome-dark);
+  border-top-color: var(--desktop-chrome-light);
+  border-left-color: var(--desktop-chrome-light);
+  background: var(--desktop-chrome);
+  color: #211e1a;
+  cursor: pointer;
+}
+
+.desktop-window-move-panel button:active {
+  border-color: var(--desktop-chrome-light);
+  border-top-color: var(--desktop-chrome-dark);
+  border-left-color: var(--desktop-chrome-dark);
+}
+
+.desktop-window-move-panel button:focus-visible {
+  outline: 3px solid #6f270d;
   outline-offset: 2px;
 }
 
@@ -600,7 +676,7 @@
 }
 
 .desktop-window-wide {
-  top: calc(clamp(1.4rem, 5vh, 4rem) + var(--desktop-window-y, 0px));
+  top: calc(clamp(1.4rem, 5vh, 4rem) + var(--desktop-window-position-y, 0px));
   width: min(calc(100% - 56px), 1100px);
 }
 
@@ -608,13 +684,16 @@
   position: relative;
   height: min(
     760px,
-    calc(
+    max(
+      240px,
+      calc(
       100svh
       - var(--desktop-taskbar-height)
       - clamp(1rem, 2.2vw, 2rem)
       - clamp(1.4rem, 5vh, 4rem)
-      - var(--desktop-window-y, 0px)
+      - var(--desktop-window-position-y, 0px)
       - 6.5rem
+      )
     )
   );
   min-height: 0;
@@ -1534,10 +1613,6 @@
     grid-template-columns: repeat(2, minmax(88px, 105px));
   }
 
-  .desktop-window {
-    --desktop-window-x: 0px !important;
-  }
-
   .desktop-window-wide {
     width: 100%;
   }
@@ -1616,6 +1691,16 @@
     margin: 1rem 0 0;
     box-shadow: 5px 6px 0 rgba(0, 0, 0, 0.22);
     transform: none;
+  }
+
+  .desktop-window-titlebar.is-movable {
+    cursor: default;
+    touch-action: auto;
+  }
+
+  .desktop-window-move,
+  .desktop-window-move-panel {
+    display: none;
   }
 
   .desktop-window.is-active {
@@ -1833,6 +1918,7 @@
 
   .desktop-shortcut,
   .desktop-window,
+  .desktop-window-move,
   .desktop-window-close,
   .desktop-window-minimize,
   .desktop-start-button,
@@ -1843,11 +1929,24 @@
   }
 
   .desktop-shortcut:focus-visible,
+  .desktop-window-move:focus-visible,
   .desktop-window-close:focus-visible,
   .desktop-start-button:focus-visible,
   .desktop-task-button:focus-visible,
   .desktop-menu-item:focus-visible,
   .desktop-tool-link:focus-visible {
     outline: 3px solid Highlight;
+  }
+
+  .desktop-window-move-panel {
+    border-color: ButtonText;
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .desktop-window-move-panel button {
+    border-color: ButtonText;
+    background: ButtonFace;
+    color: ButtonText;
   }
 }

@@ -145,6 +145,8 @@ const ROUTES = [
     verifyDesktopWindowHistory: true,
     verifyZoomReflow: true,
     verifyBackgroundPointerControl: true,
+    verifyWindowDrag: true,
+    verifyWindowMoveControls: true,
     desktopLayout: {
       schema: 1,
       windows: [
@@ -530,6 +532,182 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       throw new Error(`Window-history Forward lost its exact Analytics URL: ${page.url()}`);
     }
     await assertFocused(analyticsTitle, 'Analytics title after window-history Forward');
+  }
+  if (route.verifyWindowDrag && viewport.name === 'desktop') {
+    const storedPosition = async (appId) => page.evaluate((id) => {
+      const saved = JSON.parse(localStorage.getItem('jrda-desktop-layout'));
+      return saved?.windows?.find((entry) => entry.id === id)?.position || null;
+    }, appId);
+    const assertRecoverable = async (appId) => {
+      const bounds = await page.locator(`[data-window-id="${appId}"]`).evaluate((element) => {
+        const frame = element.getBoundingClientRect();
+        const titlebar = element.querySelector('.desktop-window-titlebar')?.getBoundingClientRect();
+        const taskbar = document.querySelector('.desktop-taskbar')?.getBoundingClientRect();
+        return {
+          frameTop: frame.top,
+          frameBottom: frame.bottom,
+          titleLeft: titlebar?.left,
+          titleRight: titlebar?.right,
+          titleTop: titlebar?.top,
+          titleBottom: titlebar?.bottom,
+          taskbarTop: taskbar?.top,
+          viewportWidth: window.innerWidth,
+        };
+      });
+      const geometryComplete = Object.values(bounds).every(Number.isFinite);
+      const requiredVisibleHeight = geometryComplete
+        ? Math.min(
+          Math.max(bounds.titleBottom - bounds.frameTop, 340),
+          bounds.frameBottom - bounds.frameTop,
+        )
+        : Number.NaN;
+      if (
+        !geometryComplete
+        || bounds.titleLeft < 7
+        || bounds.titleRight > bounds.viewportWidth - 7
+        || bounds.titleTop < 7
+        || bounds.frameTop + requiredVisibleHeight > bounds.taskbarTop - 7
+      ) {
+        throw new Error(`Moved window escaped recoverable bounds: ${JSON.stringify(bounds)}`);
+      }
+    };
+    const dragTitlebar = async (appId, targetX, targetY) => {
+      const titlebar = page.locator(`[data-window-id="${appId}"] .desktop-window-titlebar`);
+      const point = await titlebar.evaluate((element, id) => {
+        const rect = element.getBoundingClientRect();
+        for (let y = rect.top + 3; y < rect.bottom - 3; y += 3) {
+          for (let x = rect.left + 3; x < rect.right - 3; x += 12) {
+            const hit = document.elementFromPoint(x, y);
+            if (
+              hit?.closest('[data-window-id]')?.dataset.windowId === id
+              && !hit.closest('.desktop-window-controls')
+            ) return { x, y };
+          }
+        }
+        return null;
+      }, appId);
+      if (!point) throw new Error(`Could not find an exposed ${appId} title-bar point for drag`);
+      await page.mouse.move(point.x, point.y);
+      await page.mouse.down();
+      await page.mouse.move(targetX, targetY, { steps: 10 });
+      await page.mouse.up();
+      await page.waitForTimeout(150);
+    };
+
+    const backgroundHistoryLength = await page.evaluate(() => history.length);
+    const analyticsUrlBeforeBackgroundDrag = page.url();
+    const entityPositionBeforeDrag = await storedPosition('entities');
+    const startButton = page.getByRole('button', { name: 'Start', exact: true });
+    await startButton.focus();
+    await page.keyboard.press('Enter');
+    const startMenu = page.getByRole('menu', { name: 'Archive desktop Start menu' });
+    await startMenu.waitFor();
+    await dragTitlebar('entities', 8, 8);
+    await startMenu.waitFor({ state: 'hidden' });
+    await page.waitForURL((url) => url.hash === '#desktop/entities');
+    const backgroundHistoryAfter = await page.evaluate(() => history.length);
+    if (backgroundHistoryAfter !== backgroundHistoryLength + 1) {
+      throw new Error(
+        `Background window drag did not create exactly one activation history entry: ${backgroundHistoryLength} -> ${backgroundHistoryAfter}`,
+      );
+    }
+    await assertFocused(page.locator('#desktop-window-title-entities'), 'Background window after drag');
+    await assertRecoverable('entities');
+    const movedEntityPosition = await storedPosition('entities');
+    if (
+      !movedEntityPosition
+      || (
+        movedEntityPosition.x === entityPositionBeforeDrag?.x
+        && movedEntityPosition.y === entityPositionBeforeDrag?.y
+      )
+    ) {
+      throw new Error(`Background drag did not persist its final position: ${JSON.stringify(movedEntityPosition)}`);
+    }
+
+    await page.goBack({ waitUntil: 'networkidle' });
+    if (page.url() !== analyticsUrlBeforeBackgroundDrag) {
+      throw new Error(`Back after background drag lost the prior active window: ${page.url()}`);
+    }
+    const analyticsTitle = page.locator('#desktop-window-title-analytics');
+    await assertFocused(analyticsTitle, 'Analytics after background-drag Back');
+
+    const activeHistoryLength = await page.evaluate(() => history.length);
+    const activeUrl = page.url();
+    const analyticsBeforeDrag = await storedPosition('analytics');
+    await dragTitlebar('analytics', viewport.width - 8, viewport.height - 68);
+    const activeHistoryAfter = await page.evaluate(() => history.length);
+    if (page.url() !== activeUrl || activeHistoryAfter !== activeHistoryLength) {
+      throw new Error(`Window drag changed browser history: ${JSON.stringify({
+        beforeUrl: activeUrl,
+        afterUrl: page.url(),
+        beforeLength: activeHistoryLength,
+        afterLength: activeHistoryAfter,
+      })}`);
+    }
+    const analyticsAfterDrag = await storedPosition('analytics');
+    if (
+      !analyticsAfterDrag
+      || (analyticsAfterDrag.x === analyticsBeforeDrag?.x && analyticsAfterDrag.y === analyticsBeforeDrag?.y)
+    ) {
+      throw new Error(`Active drag did not persist movement: ${JSON.stringify(analyticsAfterDrag)}`);
+    }
+    await assertFocused(analyticsTitle, 'Active Analytics window after drag');
+    const pointerFocusOutline = await analyticsTitle.evaluate((element) => {
+      const styles = getComputedStyle(element);
+      return {
+        style: styles.outlineStyle,
+        width: Number.parseFloat(styles.outlineWidth),
+      };
+    });
+    if (pointerFocusOutline.style === 'none' || pointerFocusOutline.width < 2) {
+      throw new Error(`Active drag did not leave visible focus: ${JSON.stringify(pointerFocusOutline)}`);
+    }
+    await assertRecoverable('analytics');
+  }
+  if (route.verifyWindowMoveControls && viewport.name === 'desktop') {
+    const moveButton = page.getByRole('button', { name: 'Move Analytics', exact: true });
+    const moveUrl = page.url();
+    const moveHistoryLength = await page.evaluate(() => history.length);
+    const readAnalyticsPosition = () => page.evaluate(() => {
+      const saved = JSON.parse(localStorage.getItem('jrda-desktop-layout'));
+      return saved?.windows?.find((entry) => entry.id === 'analytics')?.position || null;
+    });
+    await moveButton.click();
+    const moveGroup = page.getByRole('group', { name: 'Move Analytics window' });
+    await moveGroup.waitFor();
+    const leftButton = page.getByRole('button', { name: 'Move Analytics left', exact: true });
+    await assertFocused(leftButton, 'First Analytics Move control');
+    const keyboardBefore = await readAnalyticsPosition();
+    await page.keyboard.press('ArrowLeft');
+    const keyboardAfter = await readAnalyticsPosition();
+    if (!keyboardAfter || keyboardAfter.x >= keyboardBefore.x) {
+      throw new Error(`Keyboard Move control did not update persisted position: ${JSON.stringify({ keyboardBefore, keyboardAfter })}`);
+    }
+    if (!await leftButton.evaluate((element) => document.activeElement === element && element.matches(':focus-visible'))) {
+      throw new Error('Keyboard move did not retain visible focus');
+    }
+
+    const pointerBefore = keyboardAfter;
+    await page.getByRole('button', { name: 'Move Analytics up', exact: true }).click();
+    const pointerAfter = await readAnalyticsPosition();
+    if (!pointerAfter || pointerAfter.y >= pointerBefore.y) {
+      throw new Error(`Single-pointer Move control did not update persisted position: ${JSON.stringify({ pointerBefore, pointerAfter })}`);
+    }
+    const doneButton = page.getByRole('button', { name: 'Done moving Analytics', exact: true });
+    await doneButton.focus();
+    await page.keyboard.press('Enter');
+    await moveGroup.waitFor({ state: 'hidden' });
+    await assertFocused(moveButton, 'Analytics Move button after Done');
+    await assertVisibleFocusOutline(moveButton, 'Analytics Move button after Done');
+    const moveHistoryAfter = await page.evaluate(() => history.length);
+    if (page.url() !== moveUrl || moveHistoryAfter !== moveHistoryLength) {
+      throw new Error(`Move controls changed browser history: ${JSON.stringify({
+        beforeUrl: moveUrl,
+        afterUrl: page.url(),
+        beforeLength: moveHistoryLength,
+        afterLength: moveHistoryAfter,
+      })}`);
+    }
   }
   if (route.verifyToolRoundTrip) {
     const dissertationLink = page.getByRole('link', { name: /^Dissertation release\./ });
@@ -1032,6 +1210,10 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
         })
         .map((element) => element.dataset.windowId)
     ));
+    const expectedWidePositions = await page.evaluate(() => (
+      JSON.parse(localStorage.getItem('jrda-desktop-layout'))?.windows
+        ?.map(({ id, position }) => ({ id, position })) || []
+    ));
     try {
       await page.setViewportSize({ width: 720, height: 450 });
       await page.waitForTimeout(200);
@@ -1108,6 +1290,41 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       await page.keyboard.press('Escape');
       await startMenu.waitFor({ state: 'hidden' });
       await assertFocused(startButton, 'Start button after 200%-zoom menu Escape');
+
+      await analyticsTitle.focus();
+      await page.setViewportSize({ width: 375, height: 812 });
+      await page.waitForTimeout(200);
+      const portraitState = await page.evaluate(() => ({
+        focusedId: document.activeElement?.id,
+        visibleWindowIds: [...document.querySelectorAll('[data-window-id]')]
+          .filter((element) => {
+            const styles = getComputedStyle(element);
+            const rect = element.getBoundingClientRect();
+            return styles.display !== 'none'
+              && styles.visibility !== 'hidden'
+              && rect.width > 0
+              && rect.height > 0;
+          })
+          .map((element) => element.dataset.windowId),
+        overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        savedPositions: JSON.parse(localStorage.getItem('jrda-desktop-layout'))?.windows
+          ?.map(({ id, position }) => ({ id, position })) || [],
+      }));
+      if (portraitState.focusedId !== 'desktop-window-title-analytics') {
+        throw new Error(`Portrait compact reflow lost active-window focus: ${JSON.stringify(portraitState)}`);
+      }
+      if (
+        portraitState.visibleWindowIds.join('|') !== 'analytics'
+        || portraitState.overflow > 1
+      ) {
+        throw new Error(`Portrait compact reflow escaped the single-app layout: ${JSON.stringify(portraitState)}`);
+      }
+      if (JSON.stringify(portraitState.savedPositions) !== JSON.stringify(expectedWidePositions)) {
+        throw new Error(`Compact reflow mutated saved wide positions: ${JSON.stringify({
+          expectedWidePositions,
+          savedPositions: portraitState.savedPositions,
+        })}`);
+      }
     } finally {
       await page.setViewportSize(wideViewport);
       await page.waitForTimeout(200);
@@ -1127,11 +1344,14 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       activeAnalytics: document.querySelector('[data-window-id="analytics"]')
         ?.classList.contains('is-active'),
       overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      savedPositions: JSON.parse(localStorage.getItem('jrda-desktop-layout'))?.windows
+        ?.map(({ id, position }) => ({ id, position })) || [],
     }));
     if (
       restoredWideState.visibleWindowIds.join('|') !== expectedWideWindowIds.join('|')
       || !restoredWideState.activeAnalytics
       || restoredWideState.overflow > 1
+      || JSON.stringify(restoredWideState.savedPositions) !== JSON.stringify(expectedWidePositions)
     ) {
       throw new Error(`Expanding after 200%-zoom lost the window stack: ${JSON.stringify(restoredWideState)}`);
     }
@@ -1139,7 +1359,11 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     await assertFocused(analyticsTitle, 'Analytics title after expanding from 200%-zoom equivalent');
   }
   if (route.verifyBackgroundPointerControl && viewport.name === 'desktop') {
-    await page.getByRole('button', { name: /^Tools\./ }).click();
+    const startButton = page.getByRole('button', { name: 'Start', exact: true });
+    await startButton.focus();
+    await page.keyboard.press('Enter');
+    const startMenu = page.getByRole('menu', { name: 'Archive desktop Start menu' });
+    await startMenu.getByRole('menuitem', { name: /^Tools/ }).click();
     await page.waitForURL((url) => url.hash === '#desktop/tools');
     const toolsUrl = page.url();
     const analyticsWindow = page.locator('[data-window-id="analytics"]');
