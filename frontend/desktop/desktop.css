@@ -502,50 +502,6 @@
   height: 18px;
 }
 
-.desktop-future-section {
-  padding: 1rem;
-  border: 1px solid #aaa292;
-  background: rgba(255, 255, 255, 0.48);
-}
-
-.desktop-future-section > p {
-  color: #514c43;
-  font-size: 0.76rem;
-  line-height: 1.55;
-}
-
-.desktop-future-section ul {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.55rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.desktop-future-section li {
-  padding: 0.65rem;
-  border-left: 3px solid #938979;
-  background: #e6e0d5;
-}
-
-.desktop-future-section li span,
-.desktop-future-section li small {
-  display: block;
-}
-
-.desktop-future-section li span {
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-.desktop-future-section li small {
-  margin-top: 0.2rem;
-  color: #615c54;
-  font-size: 0.62rem;
-  line-height: 1.35;
-}
-
 .desktop-tool-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1763,7 +1719,6 @@
   }
 
   .desktop-principles,
-  .desktop-future-section ul,
   .desktop-tool-grid {
     grid-template-columns: 1fr;
   }

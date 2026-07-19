@@ -12,7 +12,6 @@ import {
   FileText,
   FolderOpen,
   Info,
-  Library,
   Menu,
   Minus,
   Network,
@@ -30,7 +29,6 @@ import DesktopDissertationPanel from './DesktopDissertationPanel.js?v=3.7.5';
 import DesktopEntityPanel from './DesktopEntityPanel.js?v=3.7.5';
 import DesktopStartPanel from './DesktopStartPanel.js?v=3.7.5';
 import {
-  DESKTOP_APPS,
   DESKTOP_TOOL_LINKS,
   getDesktopApp,
   getReadyDesktopApps,
@@ -60,7 +58,6 @@ const ICONS = {
   findings: Sparkles,
   method: Search,
   participate: Users,
-  'making-of': Library,
 };
 
 const iconFor = (key, className = 'desktop-icon-svg') => {
@@ -102,10 +99,6 @@ const DesktopShell = ({
     [readyApps],
   );
   const shellAppIds = useMemo(() => shellApps.map((app) => app.id), [shellApps]);
-  const plannedApps = useMemo(
-    () => DESKTOP_APPS.filter((app) => app.availability !== 'ready'),
-    [],
-  );
   const activeApp = activeAppId ? getDesktopApp(activeAppId) : null;
   const shellApp = activeApp?.availability === 'ready' && activeApp.launch.kind === 'shell'
     ? activeApp
@@ -455,18 +448,6 @@ const DesktopShell = ({
         </button>
       </section>
 
-      <section aria-labelledby="future-connections-title" className="desktop-future-section">
-        <h4 id="future-connections-title">Future connections</h4>
-        <p>These destinations stay non-actionable until their real content and approvals exist.</p>
-        <ul>
-          ${plannedApps.map((app) => html`
-            <li key=${app.id}>
-              <span>${app.label}</span>
-              <small>${app.availability === 'blocked' ? 'Awaiting approval or dependency' : 'Planned for a later phase'}</small>
-            </li>
-          `)}
-        </ul>
-      </section>
     </div>
   `;
 

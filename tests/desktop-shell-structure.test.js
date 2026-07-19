@@ -349,6 +349,14 @@ describe('desktop interaction structure', () => {
     assert.match(shell, /onExit/);
   });
 
+  it('keeps approval-gated apps in metadata without a public placeholder', () => {
+    const shell = read('frontend/desktop/DesktopShell.js');
+    const registry = read('frontend/desktop/desktopRegistry.js');
+
+    assert.match(registry, /id:\s*'making-of'[\s\S]*availability:\s*'blocked'[\s\S]*launch:\s*null/);
+    assert.doesNotMatch(shell, /plannedApps|Future connections|making-of|How it was made/);
+  });
+
   it('defines touch, responsive, safe-area, and reduced-motion behavior', () => {
     const css = read('frontend/desktop/desktop.css');
     const indexCss = read('frontend/index.css');
