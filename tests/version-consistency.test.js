@@ -17,6 +17,7 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.join(__dirname, '..');
 const frontendDir = path.join(rootDir, 'frontend');
 const faqDir = path.join(rootDir, 'faq');
+const deployScriptPath = path.join(rootDir, 'backend', 'scripts', 'deploy_full_site.py');
 
 // Recursively collect every .js file under a directory, skipping build output
 // (dist/) and dependencies (node_modules/).
@@ -39,11 +40,51 @@ function collectVersionedJsFiles() {
   return [...collectFrontendJsFiles(frontendDir), ...collectFrontendJsFiles(faqDir)];
 }
 
+function deployedFeatureDirs() {
+  const deployScript = fs.readFileSync(deployScriptPath, 'utf-8');
+  const block = deployScript.match(/_DEPLOY_DIRS\s*:[^=]*=\s*\(([\s\S]*?)\)/);
+  assert.ok(block, 'deploy_full_site.py must declare _DEPLOY_DIRS');
+  return [...block[1].matchAll(/['"](features\/[^'"]+)['"]/g)]
+    .map((match) => path.join(rootDir, match[1]));
+}
+
 // ============================================
 // Import version consistency
 // ============================================
 
 describe('import version consistency', () => {
+  it('every deployed feature cacheable local reference is versioned and canonical', () => {
+    const canonical = JSON.parse(
+      fs.readFileSync(path.join(rootDir, 'version.json'), 'utf-8'),
+    ).version;
+    const invalid = [];
+    const scan = (dir) => {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const file = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          scan(file);
+          continue;
+        }
+        if (!entry.isFile() || !/\.(?:html|js)$/.test(entry.name)) continue;
+        const content = fs.readFileSync(file, 'utf-8');
+        const patterns = entry.name.endsWith('.html')
+          ? [/(?:src|href)=['"]((?:\.\.?\/)+[^'"?#]+\.(?:js|css))(\?v=(\d+\.\d+\.\d+))?['"]/g]
+          : [/(?:\bfrom\s+|\bimport\s*)['"]((?:\.\.?\/)+[^'"?#]+\.js)(\?v=(\d+\.\d+\.\d+))?['"]/g];
+        for (const pattern of patterns) {
+          for (const match of content.matchAll(pattern)) {
+            if (match[3] !== canonical) {
+              invalid.push(`${path.relative(rootDir, file)} -> ${match[1]}${match[2] || ''}`);
+            }
+          }
+        }
+      }
+    };
+
+    for (const dir of deployedFeatureDirs()) scan(dir);
+    assert.deepStrictEqual(invalid, [],
+      `Deployed feature refs missing ?v=${canonical} or using another version: ${invalid.join(', ')}`);
+  });
+
   it('keeps the participation stylesheet on the cache-busted release surface', () => {
     const canonical = JSON.parse(
       fs.readFileSync(path.join(rootDir, 'version.json'), 'utf-8'),
