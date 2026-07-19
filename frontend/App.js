@@ -55,6 +55,8 @@ class DesktopRouteErrorBoundary extends Component {
   constructor(props) {
     super(props);
     this.state = { failed: false };
+    this.failureHeading = null;
+    this.focusFailureFrame = null;
   }
 
   static getDerivedStateFromError() {
@@ -63,6 +65,14 @@ class DesktopRouteErrorBoundary extends Component {
 
   componentDidCatch(error) {
     console.error('Archive desktop failed to load:', error);
+    this.focusFailureFrame = requestAnimationFrame(() => {
+      this.focusFailureFrame = null;
+      this.failureHeading?.focus({ preventScroll: true });
+    });
+  }
+
+  componentWillUnmount() {
+    if (this.focusFailureFrame !== null) cancelAnimationFrame(this.focusFailureFrame);
   }
 
   render() {
@@ -72,7 +82,11 @@ class DesktopRouteErrorBoundary extends Component {
       <main id="main-content" className="min-h-screen px-4 py-16" style=${{ backgroundColor: '#fdfbf7' }}>
         <div className="mx-auto max-w-xl border-2 border-stone-800 bg-white p-8 shadow-lg">
           <p className="mb-2 font-body text-xs font-bold uppercase tracking-wider text-stone-500">Archive desktop unavailable</p>
-          <h1 className="font-display text-3xl font-bold text-stone-900">The standard archive is still ready.</h1>
+          <h1
+            ref=${(element) => { this.failureHeading = element; }}
+            tabIndex="-1"
+            className="font-display text-3xl font-bold text-stone-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+          >The standard archive is still ready.</h1>
           <p className="mt-4 font-body text-sm leading-relaxed text-stone-600">
             The optional desktop view could not load. No archive data or standard navigation is affected.
           </p>

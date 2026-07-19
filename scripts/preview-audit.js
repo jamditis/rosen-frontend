@@ -48,6 +48,7 @@ const ROUTES = [
     url: '/#desktop/not-real',
     verifyBlockedMakingOf: true,
     verifyDeferredInvalidRecord: true,
+    verifyDesktopLoadFailure: true,
   },
   {
     slug: 'desktop-archive',
@@ -757,6 +758,66 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       releaseCore?.();
       await invalidPage.unroute('**/data/archive-core.json', holdCoreRequest);
       await invalidContext.close();
+    }
+  }
+  if (route.verifyDesktopLoadFailure) {
+    const browser = page.context().browser();
+    if (!browser) throw new Error('Desktop failure audit could not create an isolated browser context');
+    const failureContext = await browser.newContext({
+      viewport: { width: viewport.width, height: viewport.height },
+      serviceWorkers: 'block',
+    });
+    const failurePage = await failureContext.newPage();
+    const failurePageErrors = [];
+    failurePage.on('pageerror', (error) => failurePageErrors.push(error.message || String(error)));
+    const failDesktopModule = (interceptedRoute) => interceptedRoute.abort('failed');
+    await failurePage.route('**/frontend/desktop/DesktopShell.js*', failDesktopModule);
+    try {
+      const failureUrl = new URL(BASE);
+      failureUrl.searchParams.set('_audit', `${viewport.name}-desktop-load-failure`);
+      failureUrl.hash = '#desktop';
+      await failurePage.goto(failureUrl.toString(), { waitUntil: 'domcontentloaded' });
+
+      const failureHeading = failurePage.getByRole('heading', {
+        name: 'The standard archive is still ready.',
+      });
+      await failureHeading.waitFor();
+      await assertFocused(failureHeading, 'Desktop failure heading');
+      const focusStyle = await failureHeading.evaluate((element) => ({
+        focusVisible: element.matches(':focus-visible'),
+        boxShadow: getComputedStyle(element).boxShadow,
+      }));
+      if (!focusStyle.focusVisible || focusStyle.boxShadow === 'none') {
+        throw new Error(`Desktop failure heading had no visible focus ring: ${JSON.stringify(focusStyle)}`);
+      }
+
+      const recoveryButton = failurePage.getByRole('button', { name: 'Open the standard archive' });
+      const recoveryBox = await recoveryButton.boundingBox();
+      const failureOverflow = await failurePage.evaluate(() => (
+        document.documentElement.scrollWidth - document.documentElement.clientWidth
+      ));
+      if (!recoveryBox || recoveryBox.width < 44 || recoveryBox.height < 44 || failureOverflow > 1) {
+        throw new Error(`Desktop failure recovery escaped its responsive surface: ${JSON.stringify({ recoveryBox, failureOverflow })}`);
+      }
+      const failureAxeResult = await new AxeBuilder({ page: failurePage })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+        .analyze();
+      if (failureAxeResult.violations.length > 0) {
+        throw new Error(
+          `Desktop failure recovery added accessibility findings: ${failureAxeResult.violations.map(({ id }) => id).join(', ')}`,
+        );
+      }
+
+      await recoveryButton.click();
+      await failurePage.waitForURL((url) => url.hash === '');
+      await failurePage.locator('#main-content').waitFor();
+      await assertFocused(failurePage.locator('#main-content'), 'Standard archive after desktop load failure');
+      if (failurePageErrors.length > 0) {
+        throw new Error(`Desktop failure recovery emitted uncaught page errors: ${JSON.stringify(failurePageErrors)}`);
+      }
+    } finally {
+      await failurePage.unroute('**/frontend/desktop/DesktopShell.js*', failDesktopModule);
+      await failureContext.close();
     }
   }
   if (route.verifyToolsDesktopEntry) {

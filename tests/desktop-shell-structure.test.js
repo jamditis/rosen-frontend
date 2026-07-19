@@ -11,6 +11,10 @@ describe('desktop route wiring', () => {
     assert.match(app, lazyShellImport);
     assert.match(app, /DesktopRouteErrorBoundary/);
     assert.match(app, /<\$\{Suspense\}/);
+    assert.match(app, /componentDidCatch[\s\S]*requestAnimationFrame[\s\S]*failureHeading\?\.focus/,
+      'the optional-shell failure surface must claim focus after it replaces Suspense');
+    assert.match(app, /ref=\$\{\(element\) => \{ this\.failureHeading = element; \}\}[\s\S]*tabIndex="-1"/,
+      'the focused failure heading must be a programmatic focus destination');
     assert.doesNotMatch(app, /^import .*DesktopShell/m);
   });
 
@@ -79,12 +83,15 @@ describe('desktop route wiring', () => {
     assert.match(audit, /slug: 'archive-desktop',[\s\S]*url: '\/#desktop',[\s\S]*verifyStartPathRoundTrip: true/);
     assert.match(audit, /slug: 'desktop-start-menu',[\s\S]*verifyDesktopStartMenu: true/);
     assert.match(audit, /slug: 'desktop-unknown',[\s\S]*url: '\/#desktop\/not-real',[\s\S]*verifyBlockedMakingOf: true,[\s\S]*verifyDeferredInvalidRecord: true/);
+    assert.match(audit, /verifyDesktopLoadFailure: true/);
     assert.match(audit, /window\.location\.hash = '#desktop\/making-of'[\s\S]*Blocked making-of metadata leaked[\s\S]*Blocked making-of URL loaded archive data[\s\S]*Desktop home after blocked making-of URL/,
       'a guessed gated route must remain generic, data-free, and home-focused');
     assert.match(audit, /Desktop home after blocked making-of URL[\s\S]*elementFromPoint[\s\S]*Restored desktop window covered the active home title/,
       'a restored window must not visually cover the active desktop home fallback');
     assert.match(audit, /verifyDeferredInvalidRecord[\s\S]*browser\.newContext\([\s\S]*serviceWorkers: 'block'[\s\S]*invalidPage\.route\('\*\*\/data\/archive-core\.json'[\s\S]*NOT-A-RECORD[\s\S]*Archive title did not own focus while an invalid record waited for validation[\s\S]*Invalid deferred record remained in the canonical URL/,
       'a delayed invalid record must never suppress visible window focus or survive validation');
+    assert.match(audit, /verifyDesktopLoadFailure[\s\S]*failurePage\.route\('\*\*\/frontend\/desktop\/DesktopShell\.js\*'[\s\S]*The standard archive is still ready\.[\s\S]*Desktop failure heading[\s\S]*Open the standard archive[\s\S]*Standard archive after desktop load failure/,
+      'a blocked optional module must focus its fallback and retain a verified standard escape');
     assert.match(audit, /slug: 'desktop-archive',[\s\S]*url: '\/#desktop\/archive',[\s\S]*verifyStandardExit:[\s\S]*appId: 'archive'/);
     assert.match(audit, /slug: 'desktop-folders',[\s\S]*url: '\/#desktop\/folders',[\s\S]*verifyStandardExit:[\s\S]*appId: 'folders'/);
     assert.match(audit, /slug: 'desktop-start',[\s\S]*url: '\/#desktop\/start',[\s\S]*verifyStandardExit:[\s\S]*appId: 'start'/);
