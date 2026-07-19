@@ -10,10 +10,10 @@ The standard archive remains the default. The desktop is an optional Windows 95/
 
 ## Start the review build
 
-From the isolated worktree:
+From a dedicated worktree or clone checked out at the review branch:
 
 ```bash
-cd /home/jamditis/worktrees/rosen-frontend-622
+cd /path/to/rosen-frontend
 npm run preview
 ```
 
@@ -27,7 +27,7 @@ npm run test:frontend
 npm run preview:audit
 ```
 
-The expected test results are 1,099 passing repository tests across 225 suites and 285 passing frontend tests across 55 suites. `preview:audit` intentionally exits nonzero for the repository's inherited accessibility baseline. The expected result for this branch is 33 rule-level findings across 32 routes and three viewports (96 states), with zero findings in all 51 desktop rows, including the open Start-menu interaction state. Screenshots are written beneath `preview-audit-results/screenshots/{mobile,tablet,desktop}/`.
+The expected test results are 1,099 passing repository tests across 225 suites and 285 passing frontend tests across 55 suites. `preview:audit` intentionally exits nonzero for the repository's inherited accessibility baseline. The expected result for this branch is 33 rule-level findings across 32 routes and three viewports (96 states), with zero findings in all 51 desktop rows, including the open Start-menu interaction state. A `FAILED` console line or an `audit-error` report row is a runtime regression, not part of that inherited baseline: the audit separately gates unhandled page errors and same-origin failed or HTTP-error requests during application loading and interaction. Screenshots are written beneath `preview-audit-results/screenshots/{mobile,tablet,desktop}/`.
 
 ## Review sequence
 

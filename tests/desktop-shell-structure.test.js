@@ -507,6 +507,10 @@ describe('desktop interaction structure', () => {
     assert.match(handoff, /375 × 812/);
     assert.match(handoff, /200%-zoom equivalent/);
     assert.match(handoff, /Screen reader:/);
+    assert.doesNotMatch(handoff, /\/home\/jamditis/,
+      'the checked-in review procedure must not depend on the author worktree path');
+    assert.match(handoff, /A `FAILED` console line or an `audit-error` report row is a runtime regression/,
+      'reviewers must be able to distinguish route failures from the inherited axe baseline');
     assert.match(handoff, /Outcome: approve \/ approve with changes \/ request changes \/ blocked/);
     assert.match(handoff, /Making-of approval, merge, coordinated release version\/cache bump, and live-archive verification remain separate decisions/);
   });
