@@ -43,6 +43,7 @@ const ROUTES = [
   { slug: 'dissertation-reader',url: '/dissertation/reader/' },
   { slug: 'faq',                url: '/faq/' },
   { slug: 'status-report',      url: '/features/status-report/' },
+  { slug: 'winer-method',       url: '/features/winer-method/' },
 ];
 
 const VIEWPORTS = [

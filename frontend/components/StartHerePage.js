@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { html } from '../html.js?v=3.7.3';
+import { html } from '../html.js?v=3.7.4';
 import {
   AlertCircle,
   ArrowLeft,

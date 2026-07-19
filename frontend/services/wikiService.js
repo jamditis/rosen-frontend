@@ -1,4 +1,4 @@
-import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.7.3';
+import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.7.4';
 
 const WIKI_DATA_URL = './data/wiki-seed.json';
 

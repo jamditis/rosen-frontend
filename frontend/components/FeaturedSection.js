@@ -1,8 +1,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { html } from '../html.js?v=3.7.3';
+import { html } from '../html.js?v=3.7.4';
 import { ArrowRight, ChevronDown, ChevronUp, Book, GraduationCap, MessageCircle, PenTool, FileText, Sparkles } from 'lucide-react';
-import { FEATURED_WORKS } from '../constants.js?v=3.7.3';
+import { FEATURED_WORKS } from '../constants.js?v=3.7.4';
 
 const FeaturedSection = () => {
   const [startIndex, setStartIndex] = useState(0);
