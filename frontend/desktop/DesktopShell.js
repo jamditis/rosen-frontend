@@ -112,6 +112,7 @@ const DesktopShell = ({
   const [startOpen, setStartOpen] = useState(false);
   const [menuFocusIndex, setMenuFocusIndex] = useState(0);
   const [statusMessage, setStatusMessage] = useState('');
+  const [resetFocusRequest, setResetFocusRequest] = useState(0);
   const [layout, setLayout] = useState(() => {
     try {
       return parseDesktopLayout(localStorage.getItem(DESKTOP_LAYOUT_STORAGE_KEY), shellAppIds);
@@ -135,6 +136,7 @@ const DesktopShell = ({
   const lastShellAppRef = useRef(null);
   const reportedOpenAppsRef = useRef('');
   const pointerWindowControlRef = useRef(null);
+  const resetFocusPendingRef = useRef(false);
 
   useEffect(() => {
     const stylesheetId = 'archive-desktop-styles';
@@ -200,6 +202,14 @@ const DesktopShell = ({
     let focusTarget = null;
     let revealFocusTarget = false;
     const compactDesktop = window.matchMedia?.(COMPACT_DESKTOP_QUERY).matches === true;
+    if (resetFocusPendingRef.current) {
+      if (shellApp || layout.windows.length > 0) return undefined;
+      resetFocusPendingRef.current = false;
+      const resetFrame = requestAnimationFrame(() => {
+        startButtonRef.current?.focus({ preventScroll: true });
+      });
+      return () => cancelAnimationFrame(resetFrame);
+    }
     if (shellApp) {
       lastShellAppRef.current = shellApp.id;
       if (!autoFocusWindow) return undefined;
@@ -244,6 +254,7 @@ const DesktopShell = ({
     shellApp,
     shortcutApps,
     layout.windows.length,
+    resetFocusRequest,
   ]);
 
   useEffect(() => {
@@ -421,6 +432,9 @@ const DesktopShell = ({
   };
 
   const resetLayout = () => {
+    resetFocusPendingRef.current = true;
+    lastShellAppRef.current = null;
+    setResetFocusRequest((request) => request + 1);
     setLayout(emptyDesktopLayout());
     setStartOpen(false);
     setStatusMessage('Desktop layout reset. All app windows were closed.');
@@ -430,7 +444,6 @@ const DesktopShell = ({
       // The in-memory reset still succeeds when storage is unavailable.
     }
     onSelectApp?.(null);
-    requestAnimationFrame(() => startButtonRef.current?.focus());
   };
 
   const renderWelcome = () => html`

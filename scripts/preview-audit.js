@@ -659,6 +659,24 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     await dialog.waitFor({ state: 'hidden' });
     await assertFocused(recordOpener, 'Entity record opener after ordinary close');
   }
+  if (route.verifyDesktopStartMenu) {
+    const startButton = page.getByRole('button', { name: 'Start', exact: true });
+    const startMenu = page.getByRole('menu', { name: 'Archive desktop Start menu' });
+    const resetItem = startMenu.getByRole('menuitem', { name: /^Reset desktop layout/ });
+    await resetItem.focus();
+    await page.keyboard.press('Enter');
+    await startMenu.waitFor({ state: 'hidden' });
+    await page.waitForURL((url) => url.hash === '#desktop');
+    await assertFocused(startButton, 'Start button after keyboard layout reset');
+    await assertVisibleFocusOutline(startButton, 'Start button after keyboard layout reset');
+    const resetState = await page.evaluate(() => ({
+      storedLayout: localStorage.getItem('jrda-desktop-layout'),
+      taskCount: document.querySelectorAll('.desktop-task-window-list button').length,
+    }));
+    if (resetState.storedLayout !== null || resetState.taskCount !== 0) {
+      throw new Error(`Desktop reset retained window state: ${JSON.stringify(resetState)}`);
+    }
+  }
   if (route.verifyBlockedMakingOf) {
     await page.getByRole('button', { name: /^Tools\./ }).click();
     await page.waitForURL((url) => url.hash === '#desktop/tools');

@@ -472,6 +472,7 @@ describe('desktop windowing and spatial memory', () => {
     const shell = read('frontend/desktop/DesktopShell.js');
     const app = read('frontend/App.js');
     const css = read('frontend/desktop/desktop.css');
+    const audit = read('scripts/preview-audit.js');
     assert.match(shell, /className="desktop-window-stack"/);
     assert.match(shell, /role="region"/);
     assert.match(shell, /desktop-active-window-label/);
@@ -500,6 +501,10 @@ describe('desktop windowing and spatial memory', () => {
     assert.match(shell, /Minimize \$\{windowTitle\}/);
     assert.match(shell, /aria-label="Open desktop windows"/);
     assert.match(shell, /Reset desktop layout/);
+    assert.match(shell, /resetFocusPendingRef[\s\S]*resetFocusRequest[\s\S]*startButtonRef\.current\?\.focus/,
+      'layout reset must reserve focus ownership until the empty home state settles');
+    assert.match(audit, /verifyDesktopStartMenu[\s\S]*Start button after keyboard layout reset[\s\S]*jrda-desktop-layout[\s\S]*Desktop reset retained window state/,
+      'the browser audit must activate reset and verify focus plus persisted-state cleanup');
     assert.doesNotMatch(shell, /role="dialog"|aria-modal/);
   });
 
