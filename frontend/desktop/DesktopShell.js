@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { html } from '../html.js?v=3.7.6';
+import { html } from '../html.js?v=3.7.7';
 import {
   AlertTriangle,
   Archive,
+  ArrowDown,
   ArrowLeft,
+  ArrowRight,
+  ArrowUp,
   BarChart3,
   BookOpen,
   Compass,
@@ -14,6 +17,7 @@ import {
   Info,
   Menu,
   Minus,
+  Move,
   Network,
   RotateCcw,
   Search,
@@ -22,27 +26,29 @@ import {
   Wrench,
   X,
 } from 'lucide-react';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.7.6';
-import DesktopArchivePanel from './DesktopArchivePanel.js?v=3.7.6';
-import DesktopAnalyticsPanel from './DesktopAnalyticsPanel.js?v=3.7.6';
-import DesktopDissertationPanel from './DesktopDissertationPanel.js?v=3.7.6';
-import DesktopEntityPanel from './DesktopEntityPanel.js?v=3.7.6';
-import DesktopStartPanel from './DesktopStartPanel.js?v=3.7.6';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.7.7';
+import DesktopArchivePanel from './DesktopArchivePanel.js?v=3.7.7';
+import DesktopAnalyticsPanel from './DesktopAnalyticsPanel.js?v=3.7.7';
+import DesktopDissertationPanel from './DesktopDissertationPanel.js?v=3.7.7';
+import DesktopEntityPanel from './DesktopEntityPanel.js?v=3.7.7';
+import DesktopStartPanel from './DesktopStartPanel.js?v=3.7.7';
 import {
   DESKTOP_TOOL_LINKS,
   getDesktopApp,
   getReadyDesktopApps,
-} from './desktopRegistry.js?v=3.7.6';
+} from './desktopRegistry.js?v=3.7.7';
 import {
   DESKTOP_LAYOUT_STORAGE_KEY,
   activateDesktopWindow,
+  clampDesktopWindowPosition,
   closeDesktopWindow,
   emptyDesktopLayout,
   minimizeDesktopWindow,
+  moveDesktopWindow,
   nextVisibleDesktopWindow,
   parseDesktopLayout,
   serializeDesktopLayout,
-} from './desktopWindowState.js?v=3.7.6';
+} from './desktopWindowState.js?v=3.7.7';
 
 const ICONS = {
   archive: Archive,
@@ -73,6 +79,11 @@ const launchModeLabel = (app) => {
 };
 
 const COMPACT_DESKTOP_QUERY = '(max-width: 700px), (max-width: 900px) and (max-height: 520px)';
+const DRAG_THRESHOLD = 5;
+const MOVE_STEP = 32;
+const MOVE_FINE_STEP = 8;
+const WINDOW_EDGE_MARGIN = 8;
+const MINIMUM_VISIBLE_WINDOW_HEIGHT = 340;
 
 const DesktopShell = ({
   activeAppId = null,
@@ -113,6 +124,8 @@ const DesktopShell = ({
   const [menuFocusIndex, setMenuFocusIndex] = useState(0);
   const [statusMessage, setStatusMessage] = useState('');
   const [resetFocusRequest, setResetFocusRequest] = useState(0);
+  const [dragFocusRequest, setDragFocusRequest] = useState(0);
+  const [moveControlsAppId, setMoveControlsAppId] = useState(null);
   const [layout, setLayout] = useState(() => {
     try {
       return parseDesktopLayout(localStorage.getItem(DESKTOP_LAYOUT_STORAGE_KEY), shellAppIds);
@@ -127,7 +140,11 @@ const DesktopShell = ({
 
   const desktopTitleRef = useRef(null);
   const shortcutPanelRef = useRef(null);
+  const windowStackRef = useRef(null);
   const windowTitleRefs = useRef({});
+  const windowFrameRefs = useRef({});
+  const moveButtonRefs = useRef({});
+  const movePanelRefs = useRef({});
   const shortcutRefs = useRef([]);
   const taskButtonRefs = useRef({});
   const startButtonRef = useRef(null);
@@ -136,7 +153,19 @@ const DesktopShell = ({
   const lastShellAppRef = useRef(null);
   const reportedOpenAppsRef = useRef('');
   const pointerWindowControlRef = useRef(null);
+  const requestedActiveAppRef = useRef(null);
+  const pendingDragFocusRef = useRef(null);
+  const dragSessionRef = useRef(null);
+  const dragFrameRef = useRef(null);
   const resetFocusPendingRef = useRef(false);
+  const previousMinimizedByIdRef = useRef(new Map(
+    layout.windows.map((entry) => [entry.id, entry.minimized]),
+  ));
+  const layoutRef = useRef(layout);
+  const activeAppIdRef = useRef(activeAppId);
+
+  layoutRef.current = layout;
+  activeAppIdRef.current = activeAppId;
 
   useEffect(() => {
     const stylesheetId = 'archive-desktop-styles';
@@ -145,7 +174,7 @@ const DesktopShell = ({
     const link = document.createElement('link');
     link.id = stylesheetId;
     link.rel = 'stylesheet';
-    link.href = resolveSitePath('frontend/desktop/desktop.css?v=3.7.6');
+    link.href = resolveSitePath('frontend/desktop/desktop.css?v=3.7.7');
     link.addEventListener('error', () => {
       setStatusMessage('Desktop styling could not load. All destinations remain available.');
     }, { once: true });
@@ -171,6 +200,12 @@ const DesktopShell = ({
     if (!shellApp) return;
     setLayout((current) => activateDesktopWindow(current, shellApp.id, shellAppIds));
   }, [shellApp, shellAppIds]);
+
+  useEffect(() => {
+    if (requestedActiveAppRef.current === activeAppId) {
+      requestedActiveAppRef.current = null;
+    }
+  }, [activeAppId]);
 
   useEffect(() => {
     try {
@@ -202,6 +237,7 @@ const DesktopShell = ({
     let focusTarget = null;
     let revealFocusTarget = false;
     const compactDesktop = window.matchMedia?.(COMPACT_DESKTOP_QUERY).matches === true;
+    if (dragSessionRef.current) return undefined;
     if (resetFocusPendingRef.current) {
       if (shellApp || layout.windows.length > 0) return undefined;
       resetFocusPendingRef.current = false;
@@ -254,6 +290,7 @@ const DesktopShell = ({
     shellApp,
     shortcutApps,
     layout.windows.length,
+    dragFocusRequest,
     resetFocusRequest,
   ]);
 
@@ -273,7 +310,20 @@ const DesktopShell = ({
     const compactQuery = window.matchMedia(COMPACT_DESKTOP_QUERY);
     const preserveVisibleFocus = (event) => {
       if (!event.matches) return;
-      if (shellApp && shortcutPanelRef.current?.contains(document.activeElement)) {
+      cancelWindowDrag();
+      if (moveControlsAppId) {
+        setMoveControlsAppId(null);
+        requestAnimationFrame(() => {
+          windowTitleRefs.current[shellApp?.id || 'home']?.focus({ preventScroll: true });
+        });
+      }
+      const hiddenMoveFocus = document.activeElement?.closest?.(
+        '.desktop-window-move, .desktop-window-move-panel',
+      );
+      if (
+        shellApp
+        && (shortcutPanelRef.current?.contains(document.activeElement) || hiddenMoveFocus)
+      ) {
         requestAnimationFrame(() => {
           windowTitleRefs.current[shellApp.id]?.focus({ preventScroll: true });
         });
@@ -289,7 +339,7 @@ const DesktopShell = ({
     };
     compactQuery.addEventListener('change', preserveVisibleFocus);
     return () => compactQuery.removeEventListener('change', preserveVisibleFocus);
-  }, [activeAppId, shellApp]);
+  }, [activeAppId, moveControlsAppId, shellApp]);
 
   useEffect(() => {
     if (!startOpen) return undefined;
@@ -311,14 +361,358 @@ const DesktopShell = ({
     };
   }, [startOpen]);
 
-  const activateWindow = (appId) => {
-    setLayout((current) => activateDesktopWindow(current, appId, shellAppIds));
-    if (activeAppId === appId) {
+  useEffect(() => {
+    if (!moveControlsAppId) return undefined;
+    const frame = requestAnimationFrame(() => {
+      movePanelRefs.current[moveControlsAppId]
+        ?.querySelector('button')
+        ?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [moveControlsAppId]);
+
+  useEffect(() => {
+    const appId = pendingDragFocusRef.current;
+    if (!appId || activeAppId !== appId || dragSessionRef.current) return undefined;
+    const frame = requestAnimationFrame(() => {
       windowTitleRefs.current[appId]?.focus({ preventScroll: true });
+      pendingDragFocusRef.current = null;
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [activeAppId, dragFocusRequest]);
+
+  const isCompactDesktop = () => (
+    window.matchMedia?.(COMPACT_DESKTOP_QUERY).matches === true
+  );
+
+  const positionForWindow = (appId, sourceLayout = layoutRef.current) => (
+    sourceLayout.windows.find((entry) => entry.id === appId)?.position || { x: 0, y: 0 }
+  );
+
+  const workAreaBounds = () => {
+    const visualViewport = window.visualViewport;
+    const left = visualViewport?.offsetLeft || 0;
+    const top = visualViewport?.offsetTop || 0;
+    const right = left + (visualViewport?.width || window.innerWidth);
+    const viewportBottom = top + (visualViewport?.height || window.innerHeight);
+    const taskbarTop = document.querySelector('.desktop-taskbar')
+      ?.getBoundingClientRect().top;
+    return {
+      left,
+      right,
+      top,
+      bottom: Number.isFinite(taskbarTop) ? Math.min(viewportBottom, taskbarTop) : viewportBottom,
+    };
+  };
+
+  const clampWindowPosition = (
+    appId,
+    position,
+    currentPosition = positionForWindow(appId),
+    capturedGeometry = null,
+  ) => {
+    const frame = windowFrameRefs.current[appId];
+    const titlebar = frame?.querySelector('.desktop-window-titlebar');
+    if (!frame || !titlebar) return currentPosition;
+    return clampDesktopWindowPosition(position, {
+      currentPosition,
+      frameRect: capturedGeometry?.frameRect || frame.getBoundingClientRect(),
+      titlebarRect: capturedGeometry?.titlebarRect || titlebar.getBoundingClientRect(),
+      workArea: capturedGeometry?.workArea || workAreaBounds(),
+      margin: WINDOW_EDGE_MARGIN,
+      minimumVisibleHeight: MINIMUM_VISIBLE_WINDOW_HEIGHT,
+    });
+  };
+
+  const applyWindowPosition = (appId, position) => {
+    const frame = windowFrameRefs.current[appId];
+    if (!frame) return;
+    frame.style.setProperty('--desktop-window-position-x', `${position.x}px`);
+    frame.style.setProperty('--desktop-window-position-y', `${position.y}px`);
+  };
+
+  const scheduleWindowPositionPreview = (appId, position) => {
+    if (dragFrameRef.current !== null) cancelAnimationFrame(dragFrameRef.current);
+    dragFrameRef.current = requestAnimationFrame(() => {
+      dragFrameRef.current = null;
+      applyWindowPosition(appId, position);
+    });
+  };
+
+  const releaseDragCapture = (session, event) => {
+    try {
+      if (session.captureTarget.hasPointerCapture(event.pointerId)) {
+        session.captureTarget.releasePointerCapture(event.pointerId);
+      }
+    } catch {
+      // A canceled or disconnected pointer may already have lost capture.
+    }
+  };
+
+  const cancelWindowDrag = (restorePosition = true) => {
+    const session = dragSessionRef.current;
+    if (!session) return;
+    dragSessionRef.current = null;
+    if (dragFrameRef.current !== null) {
+      cancelAnimationFrame(dragFrameRef.current);
+      dragFrameRef.current = null;
+    }
+    session.frame.classList.remove('is-dragging');
+    if (restorePosition) applyWindowPosition(session.app.id, session.startPosition);
+    try {
+      if (session.captureTarget.hasPointerCapture(session.pointerId)) {
+        session.captureTarget.releasePointerCapture(session.pointerId);
+      }
+    } catch {
+      // Reflow and unmount can disconnect the original capture target.
+    }
+  };
+
+  const activateWindow = (appId, { focusIfActive = true } = {}) => {
+    if (
+      requestedActiveAppRef.current === appId
+      && activeAppIdRef.current !== appId
+    ) return;
+    setLayout((current) => activateDesktopWindow(current, appId, shellAppIds));
+    if (activeAppIdRef.current === appId) {
+      if (focusIfActive && !dragSessionRef.current) {
+        windowTitleRefs.current[appId]?.focus({ preventScroll: true });
+      }
     } else {
+      requestedActiveAppRef.current = appId;
       onSelectApp?.(appId);
     }
   };
+
+  const beginWindowDrag = (event, app) => {
+    if (
+      isCompactDesktop()
+      || event.isPrimary === false
+      || (event.pointerType === 'mouse' && event.button !== 0)
+      || event.target.closest('.desktop-window-controls')
+    ) return;
+
+    const frame = windowFrameRefs.current[app.id];
+    if (!frame) return;
+    const startPosition = positionForWindow(app.id);
+    const titlebarRect = event.currentTarget.getBoundingClientRect();
+    setStartOpen(false);
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      return;
+    }
+    dragSessionRef.current = {
+      app,
+      pointerId: event.pointerId,
+      captureTarget: event.currentTarget,
+      frame,
+      startClientX: event.clientX,
+      startClientY: event.clientY,
+      startPosition,
+      position: startPosition,
+      moved: false,
+      frameRect: frame.getBoundingClientRect(),
+      titlebarRect,
+      workArea: workAreaBounds(),
+    };
+    activateWindow(app.id, { focusIfActive: false });
+    event.stopPropagation();
+  };
+
+  const moveWindowDrag = (event) => {
+    const session = dragSessionRef.current;
+    if (!session || session.pointerId !== event.pointerId) return;
+    const deltaX = event.clientX - session.startClientX;
+    const deltaY = event.clientY - session.startClientY;
+    if (!session.moved && Math.hypot(deltaX, deltaY) < DRAG_THRESHOLD) return;
+    event.preventDefault();
+    if (!session.moved) {
+      session.moved = true;
+      session.frame.classList.add('is-dragging');
+    }
+    session.position = clampWindowPosition(
+      session.app.id,
+      {
+        x: session.startPosition.x + deltaX,
+        y: session.startPosition.y + deltaY,
+      },
+      session.startPosition,
+      session,
+    );
+    scheduleWindowPositionPreview(session.app.id, session.position);
+  };
+
+  const finishWindowDrag = (event, canceled = false) => {
+    const session = dragSessionRef.current;
+    if (!session || session.pointerId !== event.pointerId) return;
+    dragSessionRef.current = null;
+    if (dragFrameRef.current !== null) {
+      cancelAnimationFrame(dragFrameRef.current);
+      dragFrameRef.current = null;
+    }
+    session.frame.classList.remove('is-dragging');
+    releaseDragCapture(session, event);
+
+    if (canceled) {
+      applyWindowPosition(session.app.id, session.startPosition);
+      setStatusMessage(`Canceled moving ${session.app.label}.`);
+    } else if (session.moved) {
+      applyWindowPosition(session.app.id, session.position);
+      setLayout((current) => moveDesktopWindow(
+        current,
+        session.app.id,
+        session.position,
+        shellAppIds,
+      ));
+      setStatusMessage(`Moved ${session.app.label} window.`);
+    } else {
+      setStatusMessage(`Activated ${session.app.label}.`);
+    }
+
+    pendingDragFocusRef.current = session.app.id;
+    setDragFocusRequest((request) => request + 1);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        windowTitleRefs.current[session.app.id]?.focus({ preventScroll: true });
+      });
+    });
+  };
+
+  const closeMoveControls = (appId, returnFocus = true) => {
+    setMoveControlsAppId((current) => (current === appId ? null : current));
+    if (returnFocus) {
+      requestAnimationFrame(() => {
+        moveButtonRefs.current[appId]?.focus({ preventScroll: true });
+      });
+    }
+  };
+
+  const openMoveControls = (app) => {
+    if (isCompactDesktop()) return;
+    activateWindow(app.id, { focusIfActive: false });
+    setMoveControlsAppId(app.id);
+    setStatusMessage(`Move controls opened for ${app.label}.`);
+  };
+
+  const commitWindowPosition = (app, nextPosition, message) => {
+    const currentPosition = positionForWindow(app.id);
+    const clamped = clampWindowPosition(app.id, nextPosition, currentPosition);
+    applyWindowPosition(app.id, clamped);
+    setLayout((current) => moveDesktopWindow(current, app.id, clamped, shellAppIds));
+    setStatusMessage(message);
+  };
+
+  const moveWindowBy = (app, deltaX, deltaY, direction) => {
+    const currentPosition = positionForWindow(app.id);
+    commitWindowPosition(app, {
+      x: currentPosition.x + deltaX,
+      y: currentPosition.y + deltaY,
+    }, `${app.label} moved ${direction}.`);
+  };
+
+  const handleMoveControlsKeyDown = (event, app) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeMoveControls(app.id);
+      return;
+    }
+    const step = event.shiftKey ? MOVE_FINE_STEP : MOVE_STEP;
+    const direction = {
+      ArrowLeft: [-step, 0, 'left'],
+      ArrowUp: [0, -step, 'up'],
+      ArrowDown: [0, step, 'down'],
+      ArrowRight: [step, 0, 'right'],
+    }[event.key];
+    if (!direction) return;
+    event.preventDefault();
+    moveWindowBy(app, ...direction);
+  };
+
+  const reclampVisibleWindows = () => {
+    if (isCompactDesktop()) return;
+    setLayout((current) => {
+      let next = current;
+      for (const entry of current.windows) {
+        if (entry.minimized || !windowFrameRefs.current[entry.id]) continue;
+        const clamped = clampWindowPosition(entry.id, entry.position, entry.position);
+        if (clamped.x === entry.position.x && clamped.y === entry.position.y) continue;
+        applyWindowPosition(entry.id, clamped);
+        next = moveDesktopWindow(next, entry.id, clamped, shellAppIds);
+      }
+      return next;
+    });
+  };
+
+  const minimizedStateSignature = layout.windows
+    .map((entry) => `${entry.id}:${entry.minimized ? 1 : 0}`)
+    .join('|');
+  useEffect(() => {
+    const previous = previousMinimizedByIdRef.current;
+    const restoredWindow = layout.windows.some((entry) => (
+      entry.minimized === false && previous.get(entry.id) === true
+    ));
+    previousMinimizedByIdRef.current = new Map(
+      layout.windows.map((entry) => [entry.id, entry.minimized]),
+    );
+    if (!restoredWindow || isCompactDesktop()) return undefined;
+
+    let reclampFrame = null;
+    const mountedFrame = requestAnimationFrame(() => {
+      reclampFrame = requestAnimationFrame(reclampVisibleWindows);
+    });
+    return () => {
+      cancelAnimationFrame(mountedFrame);
+      if (reclampFrame !== null) cancelAnimationFrame(reclampFrame);
+    };
+  }, [minimizedStateSignature]);
+
+  useEffect(() => {
+    const cancelFromKeyboard = (event) => {
+      if (event.key !== 'Escape' || !dragSessionRef.current) return;
+      event.preventDefault();
+      const app = dragSessionRef.current.app;
+      cancelWindowDrag();
+      setStatusMessage(`Canceled moving ${app.label}.`);
+      requestAnimationFrame(() => {
+        windowTitleRefs.current[app.id]?.focus({ preventScroll: true });
+      });
+    };
+    document.addEventListener('keydown', cancelFromKeyboard);
+    return () => document.removeEventListener('keydown', cancelFromKeyboard);
+  }, []);
+
+  useEffect(() => {
+    let frame = null;
+    const handleViewportChange = () => {
+      cancelWindowDrag();
+      if (frame !== null) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        frame = null;
+        if (isCompactDesktop()) {
+          setMoveControlsAppId(null);
+          return;
+        }
+        reclampVisibleWindows();
+      });
+    };
+
+    const observer = typeof ResizeObserver === 'function'
+      ? new ResizeObserver(handleViewportChange)
+      : null;
+    if (windowStackRef.current) observer?.observe(windowStackRef.current);
+    window.addEventListener('resize', handleViewportChange);
+    window.addEventListener('orientationchange', handleViewportChange);
+    window.visualViewport?.addEventListener('resize', handleViewportChange);
+    handleViewportChange();
+    return () => {
+      if (frame !== null) cancelAnimationFrame(frame);
+      observer?.disconnect();
+      window.removeEventListener('resize', handleViewportChange);
+      window.removeEventListener('orientationchange', handleViewportChange);
+      window.visualViewport?.removeEventListener('resize', handleViewportChange);
+    };
+  }, [layout.windows.map((entry) => entry.id).join('|')]);
 
   const openApp = (app, source = 'desktop') => {
     const index = shortcutApps.findIndex((candidate) => candidate.id === app.id);
@@ -406,6 +800,8 @@ const DesktopShell = ({
   };
 
   const closeWindow = (app) => {
+    if (dragSessionRef.current?.app.id === app.id) cancelWindowDrag();
+    if (moveControlsAppId === app.id) closeMoveControls(app.id, false);
     const nextLayout = closeDesktopWindow(layout, app.id, shellAppIds);
     setLayout(nextLayout);
     setStatusMessage(`Closed ${app.label}.`);
@@ -419,6 +815,8 @@ const DesktopShell = ({
   };
 
   const minimizeWindow = (app) => {
+    if (dragSessionRef.current?.app.id === app.id) cancelWindowDrag();
+    if (moveControlsAppId === app.id) closeMoveControls(app.id, false);
     const nextLayout = minimizeDesktopWindow(layout, app.id, shellAppIds);
     setLayout(nextLayout);
     setStatusMessage(`Minimized ${app.label}. Use its taskbar button to restore it.`);
@@ -432,6 +830,8 @@ const DesktopShell = ({
   };
 
   const resetLayout = () => {
+    cancelWindowDrag();
+    setMoveControlsAppId(null);
     resetFocusPendingRef.current = true;
     lastShellAppRef.current = null;
     setResetFocusRequest((request) => request + 1);
@@ -497,7 +897,7 @@ const DesktopShell = ({
       <section className="desktop-layout-help" aria-labelledby="desktop-layout-help-title">
         <h4 id="desktop-layout-help-title">Window memory</h4>
         <p>
-          Open and minimized app windows are saved on this device. Active state stays in the URL, so Back and Forward move between the windows you activated.
+          On wider screens, drag a title bar or choose its Move button. Move offers click, tap, and keyboard arrow controls. Open, minimized, and moved app windows are saved on this device. Active state stays in the URL, so Back and Forward move between the windows you activated; position changes do not add history entries.
         </p>
         <button type="button" className="desktop-standard-link" onClick=${resetLayout}>
           <${RotateCcw} aria-hidden="true" />
@@ -650,9 +1050,42 @@ const DesktopShell = ({
     return renderWelcome();
   };
 
-  const renderWindowFrame = (app, stackIndex = 0) => {
+  const windowStatusText = (app, isActive) => {
+    const stackStatus = isActive ? 'Active' : 'Background';
+    let context = 'One archive, two ways in';
+
+    if (app?.id === 'archive' || app?.id === 'folders') {
+      if (archiveView.loading) context = 'Loading canonical archive records';
+      else if (archiveView.error) context = 'Canonical archive records unavailable';
+      else {
+        const filterLabel = archiveView.activeFilterCount === 1 ? 'filter' : 'filters';
+        context = `${archiveView.filteredRecords.length} records; ${archiveView.activeFilterCount} active ${filterLabel}; page ${archiveView.currentPage} of ${archiveView.totalPages}`;
+      }
+    } else if (app?.id === 'entities') {
+      context = entityView.selectedEntityId
+        ? 'Selected entity context stays open'
+        : 'Canonical entity index; connected records open in place';
+    } else if (app?.id === 'analytics') {
+      context = 'Aggregate index ready; larger queries load on request';
+    } else if (app?.id === 'dissertation') {
+      context = 'One dissertation, many routes through it';
+    } else if (app?.id === 'start' || app?.id === 'findings') {
+      context = 'Guide records come from the canonical archive';
+    } else if (app?.id === 'tools') {
+      context = `${DESKTOP_TOOL_LINKS.length} maintained archive tools`;
+    } else if (app?.id === 'readme') {
+      context = 'Layout memory: this device only';
+    }
+
+    return `${stackStatus}; ${context}`;
+  };
+
+  const renderWindowFrame = (app) => {
     const appId = app?.id || 'home';
     const windowTitle = app?.label || 'Welcome to the archive desktop';
+    const windowEntry = app
+      ? layout.windows.find((entry) => entry.id === app.id)
+      : null;
     const isActive = app ? shellApp?.id === app.id : !shellApp;
     const isWideWindow = [
       'archive',
@@ -664,10 +1097,12 @@ const DesktopShell = ({
       'findings',
     ].includes(app?.id);
     const titleId = `desktop-window-title-${appId}`;
+    const movePanelId = `desktop-window-move-panel-${appId}`;
+    const moveInstructionsId = `desktop-window-move-instructions-${appId}`;
     const style = app ? {
-      '--desktop-window-x': `${(stackIndex % 4) * 14}px`,
-      '--desktop-window-y': `${(stackIndex % 4) * 14}px`,
-      zIndex: stackIndex + 3,
+      '--desktop-window-position-x': `${windowEntry?.position.x || 0}px`,
+      '--desktop-window-position-y': `${windowEntry?.position.y || 0}px`,
+      zIndex: layout.zOrder.indexOf(app.id) + 3,
     } : {
       // Restored windows remain available in the taskbar on a desktop-home or
       // unknown-app URL, but home is the active surface in both cases. Keep it
@@ -679,6 +1114,7 @@ const DesktopShell = ({
     return html`
       <section
         key=${appId}
+        ref=${(element) => { windowFrameRefs.current[appId] = element; }}
         className=${`desktop-window ${isWideWindow ? 'desktop-window-wide' : ''} ${isActive ? 'is-active' : 'is-inactive'} ${app ? '' : 'desktop-home-window'}`}
         style=${style}
         role="region"
@@ -700,10 +1136,18 @@ const DesktopShell = ({
         onFocusCapture=${(event) => {
           const pointerControlFocus = pointerWindowControlRef.current === app?.id
             && event.target.closest('.desktop-window-controls');
-          if (app && !isActive && !pointerControlFocus) activateWindow(app.id);
+          const dragFocus = dragSessionRef.current?.app.id === app?.id;
+          if (app && !isActive && !pointerControlFocus && !dragFocus) activateWindow(app.id);
         }}
       >
-        <div className="desktop-window-titlebar">
+        <div
+          className=${`desktop-window-titlebar ${app ? 'is-movable' : ''}`}
+          onPointerDown=${app ? (event) => beginWindowDrag(event, app) : undefined}
+          onPointerMove=${app ? moveWindowDrag : undefined}
+          onPointerUp=${app ? (event) => finishWindowDrag(event) : undefined}
+          onPointerCancel=${app ? (event) => finishWindowDrag(event, true) : undefined}
+          onLostPointerCapture=${app ? (event) => finishWindowDrag(event, true) : undefined}
+        >
           <div className="desktop-window-title-copy">
             <span aria-hidden="true">${iconFor(app?.icon || 'archive', 'desktop-titlebar-icon')}</span>
             <h2
@@ -715,6 +1159,19 @@ const DesktopShell = ({
           </div>
           ${app && html`
             <div className="desktop-window-controls">
+              <button
+                ref=${(element) => { moveButtonRefs.current[app.id] = element; }}
+                type="button"
+                className="desktop-window-move"
+                aria-label=${`Move ${windowTitle}`}
+                aria-expanded=${moveControlsAppId === app.id}
+                onClick=${() => {
+                  if (moveControlsAppId === app.id) closeMoveControls(app.id);
+                  else openMoveControls(app);
+                }}
+              >
+                <${Move} aria-hidden="true" />
+              </button>
               <button
                 type="button"
                 className="desktop-window-minimize"
@@ -734,17 +1191,63 @@ const DesktopShell = ({
             </div>
           `}
         </div>
+        ${app && moveControlsAppId === app.id && html`
+          <div
+            id=${movePanelId}
+            ref=${(element) => { movePanelRefs.current[app.id] = element; }}
+            className="desktop-window-move-panel"
+            role="group"
+            aria-label=${`Move ${windowTitle} window`}
+            aria-describedby=${moveInstructionsId}
+            onKeyDown=${(event) => handleMoveControlsKeyDown(event, app)}
+          >
+            <p id=${moveInstructionsId}>Use the arrow buttons or arrow keys. Hold Shift for smaller keyboard steps.</p>
+            <div className="desktop-window-move-arrows">
+              <button
+                type="button"
+                aria-label=${`Move ${windowTitle} left`}
+                onClick=${() => moveWindowBy(app, -MOVE_STEP, 0, 'left')}
+              ><${ArrowLeft} aria-hidden="true" /></button>
+              <button
+                type="button"
+                aria-label=${`Move ${windowTitle} up`}
+                onClick=${() => moveWindowBy(app, 0, -MOVE_STEP, 'up')}
+              ><${ArrowUp} aria-hidden="true" /></button>
+              <button
+                type="button"
+                aria-label=${`Move ${windowTitle} down`}
+                onClick=${() => moveWindowBy(app, 0, MOVE_STEP, 'down')}
+              ><${ArrowDown} aria-hidden="true" /></button>
+              <button
+                type="button"
+                aria-label=${`Move ${windowTitle} right`}
+                onClick=${() => moveWindowBy(app, MOVE_STEP, 0, 'right')}
+              ><${ArrowRight} aria-hidden="true" /></button>
+            </div>
+            <button
+              type="button"
+              className="desktop-window-center"
+              aria-label=${`Center ${windowTitle}`}
+              onClick=${() => commitWindowPosition(app, { x: 0, y: 0 }, `${app.label} centered.`)}
+            >Center</button>
+            <button
+              type="button"
+              className="desktop-window-move-done"
+              aria-label=${`Done moving ${windowTitle}`}
+              onClick=${() => closeMoveControls(app.id)}
+            >Done</button>
+          </div>
+        `}
         <div className="desktop-window-body">${renderWindowContent(app)}</div>
         <div className="desktop-window-status">
-          ${isActive ? 'Active window' : 'Open in background'}
+          ${windowStatusText(app, isActive)}
         </div>
       </section>
     `;
   };
 
-  const openWindows = layout.zOrder
-    .map((id) => layout.windows.find((entry) => entry.id === id))
-    .filter((entry) => entry && !entry.minimized)
+  const openWindows = layout.windows
+    .filter((entry) => !entry.minimized)
     .map((entry) => getDesktopApp(entry.id))
     .filter((app) => app?.availability === 'ready' && app.launch.kind === 'shell');
   const taskWindows = layout.windows
@@ -786,9 +1289,9 @@ const DesktopShell = ({
           </div>
         </section>
 
-        <div className="desktop-window-stack">
+        <div ref=${windowStackRef} className="desktop-window-stack">
           ${renderWindowFrame(null)}
-          ${openWindows.map((app, index) => renderWindowFrame(app, index))}
+          ${openWindows.map((app) => renderWindowFrame(app))}
         </div>
       </div>
 

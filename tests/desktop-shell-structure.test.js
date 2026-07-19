@@ -209,6 +209,8 @@ describe('desktop route wiring', () => {
       'history must visibly focus a URL-active window that was minimized before Back');
     assert.match(audit, /setViewportSize\(\{ width: 720, height: 450 \}\)[\s\S]*200%-zoom reflow lost active-window focus[\s\S]*Last Start item at 200%-zoom equivalent[\s\S]*zoomResult\.violations[\s\S]*Expanding after 200%-zoom lost the window stack/,
       'the permanent browser audit must exercise live 200%-zoom reflow, its short Start menu, and stack restoration');
+    assert.match(audit, /setViewportSize\(\{ width: 375, height: 812 \}\)[\s\S]*Portrait compact reflow lost active-window focus[\s\S]*Compact reflow mutated saved wide positions/,
+      'moved geometry must remain inert and unchanged through phone reflow');
     assert.match(audit, /viewport\.name === 'desktop'[\s\S]*analyticsClose\.boundingBox\(\)[\s\S]*await analyticsClose\.click\(\)[\s\S]*Background Analytics close activated a different window[\s\S]*Tools title after background Analytics close/,
       'a physically exposed background control must act on its first real pointer click');
     assert.match(audit, /name: 'mobile',\s+width: 375,\s+height: 812/);
@@ -484,8 +486,72 @@ describe('desktop windowing and spatial memory', () => {
       /if \(layout\.windows\.length === 0\) \{\s*localStorage\.removeItem\(DESKTOP_LAYOUT_STORAGE_KEY\);\s*return;/,
       'an empty or reset layout must clear persistence instead of recreating an empty envelope',
     );
-    assert.match(state, /DESKTOP_LAYOUT_SCHEMA\s*=\s*1/);
-    assert.match(state, /candidate\.schema !== DESKTOP_LAYOUT_SCHEMA/);
+    assert.match(state, /DESKTOP_LAYOUT_SCHEMA\s*=\s*2/);
+    assert.match(state, /LEGACY_DESKTOP_LAYOUT_SCHEMA\s*=\s*1/);
+    assert.match(state, /candidate\?\.schema === LEGACY_DESKTOP_LAYOUT_SCHEMA[\s\S]*candidate\?\.schema === DESKTOP_LAYOUT_SCHEMA/,
+      'schema 1 must migrate explicitly while future schemas still fail closed');
+    assert.match(state, /MAX_POSITION_OFFSET/);
+    assert.match(state, /CASCADE_STEP\s*=\s*32/,
+      'the default cascade must expose readable background title bars');
+    assert.match(state, /Number\.isFinite\(position\.x\)[\s\S]*Number\.isFinite\(position\.y\)/);
+  });
+
+  it('supports direct and non-drag window movement without coupling geometry to history', () => {
+    const shell = read('frontend/desktop/DesktopShell.js');
+    const css = read('frontend/desktop/desktop.css');
+    const audit = read('scripts/preview-audit.js');
+
+    assert.match(shell, /moveDesktopWindow/);
+    assert.match(shell, /clampDesktopWindowPosition/);
+    assert.match(shell, /DRAG_THRESHOLD\s*=\s*5/);
+    assert.match(shell, /setPointerCapture\(event\.pointerId\)/);
+    assert.match(shell, /beginWindowDrag[\s\S]*setStartOpen\(false\)[\s\S]*setPointerCapture\(event\.pointerId\)/,
+      'a title-bar pointer action must dismiss an open Start menu');
+    assert.match(shell, /releasePointerCapture\(event\.pointerId\)/);
+    assert.match(shell, /onPointerMove=/);
+    assert.match(shell, /onPointerCancel=/);
+    assert.match(shell, /--desktop-window-position-x/);
+    assert.match(shell, /zIndex: layout\.zOrder\.indexOf\(app\.id\) \+ 3[\s\S]*const openWindows = layout\.windows/,
+      'raising must update z-index without reordering and disconnecting the captured title bar');
+    assert.match(shell, /requestAnimationFrame[\s\S]*style\.setProperty/,
+      'pointer movement should preview through throttled CSS rather than rerendering heavy panels');
+    assert.match(shell, /moveDesktopWindow\(current, app\.id/,
+      'pointer and keyboard movement must commit through the allowlisted state transition');
+    assert.match(shell, /aria-label=\$\{`Move \$\{windowTitle\}`\}/);
+    assert.match(shell, /role="group"[\s\S]*aria-label=\$\{`Move \$\{windowTitle\} window`\}/);
+    for (const direction of ['left', 'up', 'down', 'right']) {
+      assert.match(shell, new RegExp('Move \\$\\{windowTitle\\} ' + direction));
+    }
+    assert.match(shell, /Center \$\{windowTitle\}/);
+    assert.match(shell, /Done moving \$\{windowTitle\}/);
+    assert.match(shell, /event\.key === 'Escape'[\s\S]*closeMoveControls/);
+    assert.match(shell, /COMPACT_DESKTOP_QUERY[\s\S]*cancelWindowDrag/);
+    assert.match(shell, /visualViewport\?\.addEventListener\('resize'/);
+    assert.match(shell, /orientationchange/);
+    assert.match(
+      shell,
+      /previousMinimizedByIdRef[\s\S]*entry\.minimized === false[\s\S]*previous\.get\(entry\.id\) === true[\s\S]*requestAnimationFrame\(reclampVisibleWindows\)/,
+      'restoring an existing minimized window must retrigger viewport clamping',
+    );
+
+    assert.match(css, /\.desktop-window-titlebar\.is-movable\s*\{[\s\S]*cursor:\s*grab/);
+    assert.match(css, /\.desktop-window\.is-dragging\s+\.desktop-window-titlebar[\s\S]*cursor:\s*grabbing/);
+    assert.match(css, /touch-action:\s*none/);
+    assert.match(css, /\.desktop-window-move-panel/);
+    assert.match(css, /@media \(max-width: 700px\)[\s\S]*\.desktop-window-move[\s\S]*display:\s*none/,
+      'compact layouts must not expose a movement operation they intentionally ignore');
+
+    assert.match(audit, /verifyWindowDrag:\s*true/);
+    assert.match(audit, /verifyWindowMoveControls:\s*true/);
+    assert.match(audit, /Window drag changed browser history/);
+    assert.match(audit, /Move controls changed browser history/);
+    assert.match(audit, /Moved window escaped recoverable bounds/);
+    assert.match(audit, /Object\.values\(bounds\)\.every\(Number\.isFinite\)/,
+      'recoverability checks must fail closed when browser geometry is missing');
+    assert.match(audit, /Keyboard move did not retain visible focus/);
+    assert.match(audit, /Single-pointer Move control did not update persisted position/);
+    assert.match(audit, /Restored minimized Archive escaped recoverable bounds/,
+      'the browser audit must restore and reclamp a window hidden during viewport change');
   });
 
   it('renders named non-modal windows, active state, task buttons, and reset controls', () => {
@@ -526,6 +592,16 @@ describe('desktop windowing and spatial memory', () => {
     assert.match(audit, /verifyDesktopStartMenu[\s\S]*Start button after keyboard layout reset[\s\S]*jrda-desktop-layout[\s\S]*Desktop reset retained window state/,
       'the browser audit must activate reset and verify focus plus persisted-state cleanup');
     assert.doesNotMatch(shell, /role="dialog"|aria-modal/);
+  });
+
+  it('uses the status bar for truthful archive context instead of generic chrome', () => {
+    const shell = read('frontend/desktop/DesktopShell.js');
+    assert.match(shell, /const windowStatusText = \(app, isActive\)/);
+    assert.match(shell, /archiveView\.filteredRecords\.length[\s\S]*archiveView\.activeFilterCount[\s\S]*archiveView\.currentPage[\s\S]*archiveView\.totalPages/);
+    assert.match(shell, /Layout memory: this device only/);
+    assert.match(shell, /Aggregate index ready; larger queries load on request/);
+    assert.match(shell, /One archive, two ways in/);
+    assert.doesNotMatch(shell, /\$\{isActive \? 'Active window' : 'Open in background'\}/);
   });
 
   it('loads data for visible restored record apps but keeps record overlays URL-active', () => {
