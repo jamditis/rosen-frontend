@@ -51,6 +51,10 @@ describe('desktop route wiring', () => {
     assert.equal(auditSlugs.length, 32, 'the review handoff expects 32 routes per viewport');
     assert.equal(new Set(auditSlugs).size, auditSlugs.length, 'audit route slugs must stay unique');
     assert.equal(desktopAuditSlugs.length, 17, 'the review handoff expects 17 desktop rows per viewport');
+    assert.match(audit, /slug: 'start-here',[\s\S]*verifyDesktopEntry: true/,
+      'the optional Start-here entry must be a real keyboard/history audit path');
+    assert.match(audit, /'Desktop home after Start here entry'[\s\S]*page\.url\(\) !== sourceUrl[\s\S]*'Start here heading after desktop entry Back'/,
+      'desktop entry and browser Back must visibly focus both ends of the round trip');
     assert.match(audit, /slug: 'archive-desktop',[\s\S]*url: '\/#desktop',[\s\S]*verifyStartPathRoundTrip: true/);
     assert.match(audit, /slug: 'desktop-start-menu',[\s\S]*verifyDesktopStartMenu: true/);
     assert.match(audit, /slug: 'desktop-unknown',\s+url: '\/#desktop\/not-real'/);

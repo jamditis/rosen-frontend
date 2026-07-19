@@ -39,7 +39,7 @@ const OUT_DIR = REQUESTED_VIEWPORT
 
 const ROUTES = [
   { slug: 'home-archive',       url: '/' },
-  { slug: 'start-here',         url: '/#start' },
+  { slug: 'start-here',         url: '/#start', verifyDesktopEntry: true },
   { slug: 'participate',        url: '/features/participate/' },
   { slug: 'archive-desktop',    url: '/#desktop', verifyStartPathRoundTrip: true },
   { slug: 'desktop-start-menu', url: '/#desktop', verifyDesktopStartMenu: true },
@@ -257,6 +257,24 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
   await page.goto(targetUrl.toString(), { waitUntil: 'networkidle', timeout: 30000 });
   // Async React render + lazy-loaded sql.js: small extra settle.
   await page.waitForTimeout(1500);
+  if (route.verifyDesktopEntry) {
+    const sourceUrl = page.url();
+    const desktopEntry = page.getByRole('button', { name: 'Explore the archive desktop', exact: true });
+    await desktopEntry.focus();
+    await page.keyboard.press('Enter');
+    await page.waitForURL((url) => url.hash === '#desktop');
+    const desktopHomeTitle = page.locator('#desktop-window-title-home');
+    await assertFocused(desktopHomeTitle, 'Desktop home after Start here entry');
+    await assertVisibleFocusOutline(desktopHomeTitle, 'Desktop home after Start here entry');
+
+    await page.goBack({ waitUntil: 'networkidle' });
+    if (page.url() !== sourceUrl) {
+      throw new Error(`Start here entry Back lost its exact source URL: ${page.url()}`);
+    }
+    const startHeading = page.locator('#start-here-title');
+    await assertFocused(startHeading, 'Start here heading after desktop entry Back');
+    await assertVisibleFocusOutline(startHeading, 'Start here heading after desktop entry Back');
+  }
   if (route.openReport) {
     const reportDialog = page.getByRole('dialog', { name: 'Report a problem or suggest a record' });
     const reportField = page.getByLabel('What happened?');
