@@ -44,7 +44,16 @@ const ROUTES = [
   { slug: 'archive-desktop',    url: '/#desktop', verifyStartPathRoundTrip: true },
   { slug: 'desktop-start-menu', url: '/#desktop', verifyDesktopStartMenu: true },
   { slug: 'desktop-unknown',    url: '/#desktop/not-real' },
-  { slug: 'desktop-archive',    url: '/#desktop/archive' },
+  {
+    slug: 'desktop-archive',
+    url: '/#desktop/archive',
+    verifyStandardExit: {
+      appId: 'archive',
+      expectedHash: '',
+      focusSelector: '#main-content',
+      focusLabel: 'Standard archive main after desktop exit',
+    },
+  },
   { slug: 'desktop-start',      url: '/#desktop/start' },
   { slug: 'desktop-findings',   url: '/#desktop/findings' },
   { slug: 'desktop-entities',   url: '/#desktop/entities' },
@@ -54,8 +63,26 @@ const ROUTES = [
     url: '/?record=RECORD-00903&entity=P0005#desktop/entities',
     verifyEntityRecordFlow: true,
   },
-  { slug: 'desktop-dissertation', url: '/#desktop/dissertation' },
-  { slug: 'desktop-analytics',  url: '/#desktop/analytics' },
+  {
+    slug: 'desktop-dissertation',
+    url: '/#desktop/dissertation',
+    verifyStandardExit: {
+      appId: 'dissertation',
+      expectedHash: '#dissertation',
+      focusSelector: '[data-route-entry-focus]',
+      focusLabel: 'Standard dissertation heading after desktop exit',
+    },
+  },
+  {
+    slug: 'desktop-analytics',
+    url: '/#desktop/analytics',
+    verifyStandardExit: {
+      appId: 'analytics',
+      expectedHash: '#analytics',
+      focusSelector: '[data-route-entry-focus]',
+      focusLabel: 'Standard analytics heading after desktop exit',
+    },
+  },
   { slug: 'desktop-readme',     url: '/#desktop/readme' },
   { slug: 'desktop-tools',      url: '/#desktop/tools', verifyToolRoundTrip: true },
   { slug: 'desktop-record-modal', url: '/?record=RECORD-00802#desktop/archive' },
@@ -223,6 +250,29 @@ async function auditOne(page, route, viewport) {
       throw new Error('About history return reopened the Start menu');
     }
     await assertFocused(page.locator('#desktop-window-title-home'), 'Desktop home after about browser Back');
+  }
+  if (route.verifyStandardExit) {
+    const {
+      appId,
+      expectedHash,
+      focusSelector,
+      focusLabel,
+    } = route.verifyStandardExit;
+    const desktopUrl = page.url();
+    const activeWindow = page.locator(`[data-window-id="${appId}"]`);
+
+    await activeWindow.getByRole('button', { name: 'Open standard view', exact: true }).click();
+    await page.waitForURL((url) => url.hash === expectedHash);
+    await assertFocused(page.locator(focusSelector), focusLabel);
+
+    await page.goBack({ waitUntil: 'networkidle' });
+    if (page.url() !== desktopUrl) {
+      throw new Error(`${appId} standard-view Back lost its exact desktop URL: ${page.url()}`);
+    }
+    await assertFocused(
+      page.locator(`#desktop-window-title-${appId}`),
+      `${appId} window after standard-view browser Back`,
+    );
   }
   if (route.verifyDesktopStartMenu) {
     const startButton = page.getByRole('button', { name: 'Start', exact: true });

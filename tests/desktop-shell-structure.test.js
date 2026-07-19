@@ -46,14 +46,14 @@ describe('desktop route wiring', () => {
     assert.match(audit, /slug: 'archive-desktop',[\s\S]*url: '\/#desktop',[\s\S]*verifyStartPathRoundTrip: true/);
     assert.match(audit, /slug: 'desktop-start-menu',[\s\S]*verifyDesktopStartMenu: true/);
     assert.match(audit, /slug: 'desktop-unknown',\s+url: '\/#desktop\/not-real'/);
-    assert.match(audit, /slug: 'desktop-archive',\s+url: '\/#desktop\/archive'/);
+    assert.match(audit, /slug: 'desktop-archive',[\s\S]*url: '\/#desktop\/archive',[\s\S]*verifyStandardExit:[\s\S]*appId: 'archive'/);
     assert.match(audit, /slug: 'desktop-start',\s+url: '\/#desktop\/start'/);
     assert.match(audit, /slug: 'desktop-findings',\s+url: '\/#desktop\/findings'/);
     assert.match(audit, /slug: 'desktop-entities',\s+url: '\/#desktop\/entities'/);
     assert.match(audit, /slug: 'desktop-entity-detail',\s+url: '\/\?entity=P0005#desktop\/entities'/);
     assert.match(audit, /slug: 'desktop-entity-record',[\s\S]*url: '\/\?record=RECORD-00903&entity=P0005#desktop\/entities',[\s\S]*verifyEntityRecordFlow: true/);
-    assert.match(audit, /slug: 'desktop-dissertation',\s+url: '\/#desktop\/dissertation'/);
-    assert.match(audit, /slug: 'desktop-analytics',\s+url: '\/#desktop\/analytics'/);
+    assert.match(audit, /slug: 'desktop-dissertation',[\s\S]*url: '\/#desktop\/dissertation',[\s\S]*verifyStandardExit:[\s\S]*appId: 'dissertation'/);
+    assert.match(audit, /slug: 'desktop-analytics',[\s\S]*url: '\/#desktop\/analytics',[\s\S]*verifyStandardExit:[\s\S]*appId: 'analytics'/);
     assert.match(audit, /slug: 'desktop-readme',\s+url: '\/#desktop\/readme'/);
     assert.match(audit, /slug: 'desktop-tools',[\s\S]*url: '\/#desktop\/tools',[\s\S]*verifyToolRoundTrip: true/);
     assert.match(audit, /slug: 'desktop-record-modal',\s+url: '\/\?record=RECORD-00802#desktop\/archive'/);
@@ -85,6 +85,10 @@ describe('desktop route wiring', () => {
       'an in-document Start launch must announce its canonical route destination');
     assert.match(audit, /'Desktop home after about browser Back'/,
       'Back from a canonical route must reconstruct desktop focus and closed-popup state');
+    assert.match(audit, /activeWindow\.getByRole\('button', \{ name: 'Open standard view', exact: true \}\)[\s\S]*page\.url\(\) !== desktopUrl/,
+      'canonical adapter exits must round-trip their exact desktop URL');
+    assert.match(audit, /`#desktop-window-title-\$\{appId\}`/,
+      'Back from standard view must restore focus to the active desktop window');
     assert.match(audit, /assertArchiveRootReturn\([\s\S]*'Dissertation return'/,
       'the tool round-trip audit keeps the standalone return touch-sized');
     assert.match(audit, /assertFocused\(page\.locator\('#desktop-window-title-tools'\), 'Tools window after browser Back'\)/,
