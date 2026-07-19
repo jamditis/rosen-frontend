@@ -165,6 +165,8 @@ describe('desktop route wiring', () => {
       'every rendered desktop row must fail on horizontal page overflow');
     assert.match(audit, /page\.on\('pageerror', capturePageError\)[\s\S]*Unhandled page errors:[\s\S]*page\.off\('pageerror', capturePageError\)/,
       'each audit row must fail on unhandled JavaScript errors without leaking listeners');
+    assert.match(audit, /message\.type\(\) === 'error'[\s\S]*page\.on\('console', captureConsoleError\)[\s\S]*Application console errors:[\s\S]*page\.off\('console', captureConsoleError\)/,
+      'caught application failures must not hide behind console.error or leak listeners');
     assert.match(audit, /url\.origin === BASE && response\.status\(\) >= 400[\s\S]*Same-origin network errors:/,
       'missing local runtime assets must fail their route instead of looking partially successful');
     assert.match(audit, /setApplicationNetworkCapture\(false\);[\s\S]*new AxeBuilder[\s\S]*finally \{[\s\S]*setApplicationNetworkCapture\(true\)/,
@@ -173,6 +175,8 @@ describe('desktop route wiring', () => {
       'network capture must resume for interaction checks that run after accessibility analysis');
     assert.match(audit, /if \(!captureApplicationNetwork\) return;/,
       'route network listeners must ignore only the explicitly paused instrumentation phase');
+    assert.match(audit, /captureApplicationNetwork && message\.type\(\) === 'error'/,
+      'console capture must share the narrow axe-only instrumentation pause');
     assert.match(audit, /page\.off\('response', captureBadResponse\)[\s\S]*page\.off\('requestfailed', captureFailedRequest\)/,
       'route-scoped network listeners must not leak into later rows');
     assert.match(audit, /slug: 'desktop-windowing'[\s\S]*verifyDesktopWindowHistory: true[\s\S]*desktopLayout:[\s\S]*zOrder/);

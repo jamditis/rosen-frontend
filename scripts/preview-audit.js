@@ -752,9 +752,15 @@ async function main() {
         for (const route of ROUTES) {
           console.log(`  ${viewport.name.padEnd(8)} ${route.url}`);
           const pageErrors = [];
+          const consoleErrors = [];
           const networkErrors = [];
           let captureApplicationNetwork = true;
           const capturePageError = (error) => pageErrors.push(error.message || String(error));
+          const captureConsoleError = (message) => {
+            if (captureApplicationNetwork && message.type() === 'error') {
+              consoleErrors.push(message.text());
+            }
+          };
           const captureBadResponse = (response) => {
             if (!captureApplicationNetwork) return;
             const url = new URL(response.url());
@@ -770,6 +776,7 @@ async function main() {
             }
           };
           page.on('pageerror', capturePageError);
+          page.on('console', captureConsoleError);
           page.on('response', captureBadResponse);
           page.on('requestfailed', captureFailedRequest);
           try {
@@ -782,6 +789,9 @@ async function main() {
             if (pageErrors.length > 0) {
               throw new Error(`Unhandled page errors: ${JSON.stringify(pageErrors)}`);
             }
+            if (consoleErrors.length > 0) {
+              throw new Error(`Application console errors: ${JSON.stringify(consoleErrors)}`);
+            }
             if (networkErrors.length > 0) {
               throw new Error(`Same-origin network errors: ${JSON.stringify(networkErrors)}`);
             }
@@ -791,6 +801,7 @@ async function main() {
             rows.push({ route: route.slug, url: route.url, viewport: viewport.name, violations: [{ id: 'audit-error', impact: 'critical', help: err.message, helpUrl: '', nodes: 0, sample: '' }], passes: 0, incomplete: 0 });
           } finally {
             page.off('pageerror', capturePageError);
+            page.off('console', captureConsoleError);
             page.off('response', captureBadResponse);
             page.off('requestfailed', captureFailedRequest);
           }
