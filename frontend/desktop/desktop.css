@@ -1750,6 +1750,26 @@
     background-image: none;
   }
 
+  .desktop-wallpaper-mark {
+    display: none;
+  }
+
+  .desktop-brand,
+  .desktop-shortcut,
+  .desktop-shortcut-mode {
+    color: CanvasText;
+    text-shadow: none;
+  }
+
+  .desktop-shortcut-mode {
+    background: Canvas;
+  }
+
+  .desktop-menu-item:hover small,
+  .desktop-menu-item:focus-visible small {
+    color: CanvasText;
+  }
+
   .desktop-shortcut,
   .desktop-window,
   .desktop-window-close,

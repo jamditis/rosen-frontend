@@ -292,6 +292,9 @@ describe('desktop interaction structure', () => {
     assert.match(css, /@media\s*\(max-width:\s*700px\)/);
     assert.match(css, /env\(safe-area-inset-bottom/);
     assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+    assert.match(css, /@media\s*\(forced-colors:\s*active\)[\s\S]*\.desktop-wallpaper-mark\s*\{\s*display:\s*none/);
+    assert.match(css, /\.desktop-brand,[\s\S]*\.desktop-shortcut-mode\s*\{[\s\S]*color:\s*CanvasText/);
+    assert.match(css, /\.desktop-menu-item:hover small,[\s\S]*color:\s*CanvasText/);
     assert.match(css, /overflow-x:\s*hidden/);
     assert.match(css, /desktop-filter-panel label\.flex[\s\S]*min-height:\s*44px/);
     assert.match(css, /Previous results page[\s\S]*min-width:\s*44px/);
