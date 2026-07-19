@@ -169,22 +169,23 @@ const AnalyticsDashboard = ({ onBack, onRecordResults, embedded = false }) => {
 
       <div className=${embedded ? 'desktop-analytics-content' : 'container mx-auto px-4 py-6'}>
         ${loading && html`
-          <div className="flex flex-col items-center justify-center h-64">
-            <${Loader2} className="w-8 h-8 text-stone-400 animate-spin mb-4" />
+          <div className="flex flex-col items-center justify-center h-64" role="status" aria-live="polite">
+            <${Loader2} className="w-8 h-8 text-stone-400 animate-spin mb-4" aria-hidden="true" />
             <p className="text-stone-500">Loading analytics...</p>
           </div>
         `}
 
         ${error && html`
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-            <p className="text-red-700 font-bold mb-2">Error loading analytics</p>
-            <p className="text-red-600 text-sm">${error}</p>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center" role="alert">
+            <h3 className="text-red-800 font-bold mb-2">Error loading analytics</h3>
+            <p className="text-red-800 text-sm">${error}</p>
             <button
               type="button"
               onClick=${() => window.location.reload()}
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              className="mt-4 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2"
+              style=${{ minHeight: '44px', backgroundColor: '#991b1b', color: '#ffffff' }}
             >
-              Reload Page
+              Reload page
             </button>
           </div>
         `}
