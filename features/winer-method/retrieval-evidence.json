@@ -46,7 +46,7 @@
         "creator": "observations.creatorObserved → record.creator",
         "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
       },
-      "normalizedRecordSha256": "bb381ed3027f2337e8d9651e5ac2b61dba99d0bb774aaba49de1c9396558e9b1",
+      "normalizedRecordSha256": "eb4f3f26a86b5a4c41aff67af0cee728a2c798f41174019758de1f32f7c5ab02",
       "retrieval": {
         "capturedAt": "2026-07-19T00:34:23.683Z",
         "finalUrl": "http://scripting.com/2004/08.html#When:3:28:15PM",
@@ -150,7 +150,7 @@
         "creator": "observations.creatorObserved → record.creator",
         "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
       },
-      "normalizedRecordSha256": "45a368842681d6dfc9a5269b83547342421ae62281aeeae6a27393abf0f0314f",
+      "normalizedRecordSha256": "8c15fc013038123221dd95a5c2a2bc9b5aa00aa42c37227881d30595eb77d552",
       "retrieval": {
         "capturedAt": "2026-07-19T00:34:25.757Z",
         "finalUrl": "http://scripting.com/about",
@@ -176,7 +176,7 @@
         "creator": "observations.creatorObserved → record.creator",
         "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
       },
-      "normalizedRecordSha256": "f52e238b05ef17099b217aa0fb7af7f7d78bc53d8548b4d7e2a7d32e09c8cf77",
+      "normalizedRecordSha256": "143ac5d95d854c1a06be6b4a89d82661a5f7aeacdfdeac9d266a488e1ff96970",
       "retrieval": {
         "capturedAt": "2026-07-19T00:34:26.211Z",
         "finalUrl": "https://github.com/scripting/Scripting-News",
@@ -228,7 +228,7 @@
         "creator": "observations.creatorObserved → record.creator",
         "editorialFields": "source body + named locator → curator-authored record.title, summary, themes, entities, and evidence"
       },
-      "normalizedRecordSha256": "6b023b5caca6bdf55fd24a1c0f0970c86cdd3c9a6e35bb3fbb3d648b3528dc18",
+      "normalizedRecordSha256": "7620f680bfdfb564629e0895f5ee2d7e6e7e63c3cd9ff5ff0e4b2693a2eccf12",
       "retrieval": {
         "capturedAt": "2026-07-19T00:34:26.850Z",
         "finalUrl": "https://github.com/scripting/feedland",

@@ -16,7 +16,7 @@ import {
   TIMELINE_MILESTONES,
   FIELD_COMPLETENESS,
   ACTION_ITEMS
-} from './data.js?v=3.7.7';
+} from './data.js?v=3.7.8';
 
 // ============================================================================
 // Countdown Timer
