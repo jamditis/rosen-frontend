@@ -159,6 +159,7 @@ Measured from `origin/main` commit `cefac66` on 2026-07-18 with service workers 
 - `frontend/services/router.js`: 2,129 bytes;
 - initial standard route after its background details preload settles: 57 same-origin resources and 27,443,486 uncompressed local bytes;
 - the last figure includes the existing delayed `archive-details.json` preload, which accounts for 13,520,143 bytes;
+- across five fresh 1440×900 Chromium contexts with service workers blocked and explicit garbage collection after that settle, the median standard route uses 43,801,952 bytes of JavaScript heap, 1,514 DOM nodes, and 285 JavaScript event listeners;
 - no desktop-specific request exists in the baseline.
 
 Post-change checks must show no `DesktopShell.js`, desktop registry, or desktop CSS request on the standard route. The desktop branch inherited version `3.7.5` when it rebased over PR #624; it does not introduce a separate version bump.
@@ -193,6 +194,7 @@ The adapter provides:
 Measured from the integrated current-main build with service workers blocked and each route settled to network idle:
 
 - the standard route requests 77 resources totaling 27,570,549 decoded bytes after its existing background details preload and requests zero desktop assets;
+- the equivalent five-sample garbage-collected standard-route median is 43,846,256 bytes of JavaScript heap, only 44,304 bytes (0.10%) above the pre-desktop baseline, with two additional DOM nodes and the same 285 event listeners. A cold desktop home uses 3,433,828 bytes because it does not load the corpus, while record-backed Start here uses 43,655,708 bytes and still remains below the settled standard route because it does not trigger the details preload;
 - the one foundation-era standard-route module is `ArchiveResults.js`, extracted from `App.js` so standard and desktop results share one renderer; Phase 4 adds no new standard-route request;
 - `frontend/App.js` is 42,938 bytes, `ArchiveResults.js` is 8,714 bytes, `StartHerePage.js` is 23,199 bytes, the thin `DesktopStartPanel.js` adapter is 1,519 bytes, `frontend/services/viewState.js` is 6,969 bytes, and `frontend/services/router.js` is 2,769 bytes;
 - a cold `#desktop` deep link requests 78 resources totaling 659,408 decoded bytes, including nine desktop assets totaling 96,466 decoded bytes but no archive corpus;
