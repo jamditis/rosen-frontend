@@ -258,9 +258,22 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
   // Async React render + lazy-loaded sql.js: small extra settle.
   await page.waitForTimeout(1500);
   if (route.openReport) {
-    await page.getByRole('button', { name: /^Report a problem\./ }).first().click();
-    await page.getByRole('dialog', { name: 'Report a problem or suggest a record' }).waitFor();
-    await page.waitForTimeout(100);
+    const reportDialog = page.getByRole('dialog', { name: 'Report a problem or suggest a record' });
+    const reportField = page.getByLabel('What happened?');
+    const reportShortcut = page.getByRole('button', { name: /^Report a problem\./ }).first();
+    await reportShortcut.click();
+    await reportDialog.waitFor();
+    await assertFocused(reportField, 'Report field after desktop shortcut launch');
+    await page.keyboard.press('Escape');
+    await reportDialog.waitFor({ state: 'hidden' });
+    await assertFocused(reportShortcut, 'Report shortcut after dialog close');
+
+    const startButton = page.getByRole('button', { name: 'Start', exact: true });
+    await startButton.click();
+    const startMenu = page.getByRole('menu', { name: 'Archive desktop Start menu' });
+    await startMenu.getByRole('menuitem', { name: /^Report a problem/ }).click();
+    await reportDialog.waitFor();
+    await assertFocused(reportField, 'Report field after Start menu launch');
   }
   if (route.openDissertationDetail) {
     await page.locator('svg[aria-label^="Dissertation mind map"] [role="button"]').first().click();
@@ -534,6 +547,14 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     await page.keyboard.press('Escape');
     await dialog.waitFor({ state: 'hidden' });
     await assertFocused(recordOpener, 'Entity record opener after ordinary close');
+  }
+  if (route.openReport) {
+    const reportDialog = page.getByRole('dialog', { name: 'Report a problem or suggest a record' });
+    await page.keyboard.press('Escape');
+    await reportDialog.waitFor({ state: 'hidden' });
+    const startButton = page.getByRole('button', { name: 'Start', exact: true });
+    await assertFocused(startButton, 'Start button after Start menu report close');
+    await assertVisibleFocusOutline(startButton, 'Start button after Start menu report close');
   }
   return {
     route: route.slug,

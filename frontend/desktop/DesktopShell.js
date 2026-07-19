@@ -285,7 +285,7 @@ const DesktopShell = ({
     }
   };
 
-  const openApp = (app) => {
+  const openApp = (app, source = 'desktop') => {
     const index = shortcutApps.findIndex((candidate) => candidate.id === app.id);
     if (index >= 0) setShortcutFocusIndex(index);
     setStartOpen(false);
@@ -297,6 +297,12 @@ const DesktopShell = ({
     }
     if (app.launch.kind === 'action') {
       setStatusMessage('Opening the archive problem report.');
+      // A Start menu item disappears in the same render that mounts the
+      // canonical report dialog. Move focus to the durable Start button first
+      // so the shared modal can capture and later restore a connected trigger.
+      if (source === 'start-menu') {
+        startButtonRef.current?.focus({ preventScroll: true });
+      }
       onOpenBugReport?.();
       return;
     }
@@ -765,7 +771,7 @@ const DesktopShell = ({
                 role="menuitem"
                 tabIndex=${index === menuFocusIndex ? 0 : -1}
                 onFocus=${() => setMenuFocusIndex(index)}
-                onClick=${() => openApp(app)}
+                onClick=${() => openApp(app, 'start-menu')}
                 onKeyDown=${(event) => handleMenuKeyDown(event, index)}
               >
                 <span className="desktop-menu-icon">${iconFor(app.icon)}</span>

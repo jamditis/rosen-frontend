@@ -43,6 +43,7 @@ describe('desktop route wiring', () => {
 
   it('adds the desktop route to preview audit at mobile, tablet, and desktop sizes', () => {
     const audit = read('scripts/preview-audit.js');
+    const shell = read('frontend/desktop/DesktopShell.js');
     const auditSlugs = [...audit.matchAll(/\bslug: '([^']+)'/g)].map((match) => match[1]);
     const desktopAuditSlugs = auditSlugs.filter((slug) => (
       slug === 'archive-desktop' || slug.startsWith('desktop-')
@@ -74,6 +75,14 @@ describe('desktop route wiring', () => {
       'the shared keyboard-scrollable detail panel stays in the full audit matrix');
     assert.match(audit, /slug: 'dissertation-reader',[\s\S]*verifyReaderReturn: true/);
     assert.match(audit, /getByRole\('dialog', \{ name: 'Report a problem or suggest a record' \}\)/);
+    assert.match(shell, /const openApp = \(app, source = 'desktop'\)[\s\S]*source === 'start-menu'[\s\S]*startButtonRef\.current\?\.focus[\s\S]*onOpenBugReport\?\.\(\)/,
+      'the disappearing report menu item must hand focus to a durable modal return target');
+    assert.match(shell, /onClick=\$\{\(\) => openApp\(app, 'start-menu'\)\}/,
+      'Start menu launches must identify their transient trigger source');
+    assert.match(audit, /'Report shortcut after dialog close'[\s\S]*getByRole\('menuitem', \{ name: \/\^Report a problem\/[\s\S]*'Report field after Start menu launch'/,
+      'the report audit must exercise both the stable shortcut and unmounted Start-menu trigger');
+    assert.match(audit, /'Start button after Start menu report close'[\s\S]*assertVisibleFocusOutline\(startButton/,
+      'closing a report launched from Start must return visible focus to Start');
     assert.match(audit, /assertFocused\(dialogClose, 'Direct record dialog'\)/);
     assert.match(audit, /assertFocused\(page\.locator\('#entity-detail-title'\), 'Selected entity after direct record close'\)/);
     assert.match(audit, /assertFocused\(recordOpener, 'Entity record opener after ordinary close'\)/);
