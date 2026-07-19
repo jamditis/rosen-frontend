@@ -196,10 +196,14 @@ async function verify() {
   if (evidence.records.length !== RECORDS.length) throw new Error('Evidence record count does not match');
   for (const record of RECORDS) {
     const stored = evidenceById.get(record.id);
-    const expected = normalizedEvidence(record, logById.get(record.id));
     if (!stored) throw new Error(`Missing retrieval evidence for ${record.id}`);
-    if (stored.normalizedRecordSha256 !== expected.normalizedRecordSha256) {
-      throw new Error(`Normalized record digest drifted for ${record.id}; recapture after verifying the source`);
+    const logRecord = logById.get(record.id);
+    if (!logRecord) throw new Error(`Missing ingestion record for ${record.id}`);
+    const expected = normalizedEvidence(record, logRecord);
+    for (const field of ['id', 'retrievalUrl', 'sourceLocator', 'observations', 'fieldMapping', 'normalizedRecordSha256']) {
+      if (digest(stored[field]) !== digest(expected[field])) {
+        throw new Error(`Normalization evidence field "${field}" drifted for ${record.id}; recapture after verifying the source`);
+      }
     }
     if (!/^[a-f0-9]{64}$/.test(stored.retrieval.responseSha256) || stored.retrieval.byteLength < 1) {
       throw new Error(`Invalid response evidence for ${record.id}`);

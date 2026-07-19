@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it } from 'node:test';
@@ -59,6 +60,29 @@ describe('Winer method ingestion evidence', () => {
       '--verify',
     ], { cwd: root, encoding: 'utf8' });
     assert.match(output, /Verified 11 stored retrieval and normalization evidence records/);
+  });
+
+  it('rejects drift in the stored supervised-normalization envelope', () => {
+    const temporaryDir = fs.mkdtempSync(path.join(os.tmpdir(), 'winer-evidence-'));
+    try {
+      for (const filename of ['capture-ingestion-evidence.mjs', 'data.js', 'ingestion-log.json', 'retrieval-evidence.json']) {
+        fs.copyFileSync(path.join(featureDir, filename), path.join(temporaryDir, filename));
+      }
+      const temporaryEvidencePath = path.join(temporaryDir, 'retrieval-evidence.json');
+      const temporaryEvidence = JSON.parse(fs.readFileSync(temporaryEvidencePath, 'utf8'));
+      temporaryEvidence.records[0].retrievalUrl = 'https://example.invalid/drifted';
+      fs.writeFileSync(temporaryEvidencePath, `${JSON.stringify(temporaryEvidence, null, 2)}\n`);
+
+      assert.throws(() => execFileSync(process.execPath, [
+        path.join(temporaryDir, 'capture-ingestion-evidence.mjs'),
+        '--verify',
+      ], { cwd: root, encoding: 'utf8', stdio: 'pipe' }), (error) => {
+        assert.match(error.stderr, /Normalization evidence field "retrievalUrl" drifted/);
+        return true;
+      });
+    } finally {
+      fs.rmSync(temporaryDir, { recursive: true, force: true });
+    }
   });
 
   it('reproduces the downloadable manifest and SQLite database from the frozen records', () => {
