@@ -20,6 +20,17 @@ When a bug is reported, don't immediately attempt to fix it. Instead:
 - **Current deploy version:** see `version.json`, `index.html`, and `frontend/sw.js`
 - **Archive curator:** Joe Amditis
 
+### Making-of narrative interview handoff
+
+When Joe asks to begin, continue, or reconstruct the personal story of how he
+built the archive, read [`docs/narrative/INTERVIEW_GUIDE.md`](docs/narrative/INTERVIEW_GUIDE.md)
+in full before asking questions or editing prose. It contains the interview
+strategy, section-by-section question bank, verification protocol, sensitive
+claim boundaries, reconstruction method, and editorial approval gates. The
+existing `features/making-of/index.html` is a provisional draft and must not be
+treated as approved first-person testimony or deployed without Joe's explicit
+publication approval.
+
 ### About Jay Rosen
 
 Professor of Journalism at NYU since 1986. Creator of PressThink blog. Known for "the view from nowhere," "audience atomization overcome," and critiques of professional journalism.
