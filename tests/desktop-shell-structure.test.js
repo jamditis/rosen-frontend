@@ -114,6 +114,8 @@ describe('desktop route wiring', () => {
     assert.match(audit, /route\.slug === 'archive-desktop' \|\| route\.slug\.startsWith\('desktop-'\)[\s\S]*interactiveSelector[\s\S]*width < 44 \|\| height < 44/,
       'every rendered desktop row must enforce the 44-pixel target contract');
     assert.match(audit, /undersized desktop targets/);
+    assert.match(audit, /desktopOverflow[\s\S]*overflowed the viewport by/,
+      'every rendered desktop row must fail on horizontal page overflow');
     assert.match(audit, /slug: 'desktop-windowing'[\s\S]*desktopLayout:[\s\S]*zOrder/);
     assert.match(audit, /name: 'mobile',\s+width: 375,\s+height: 812/);
     assert.match(audit, /name: 'tablet',\s+width: 768,\s+height: 1024/);

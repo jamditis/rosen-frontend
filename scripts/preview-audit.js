@@ -437,6 +437,13 @@ async function auditOne(page, route, viewport) {
   }
 
   if (route.slug === 'archive-desktop' || route.slug.startsWith('desktop-')) {
+    const desktopOverflow = await page.evaluate(() => (
+      document.documentElement.scrollWidth - document.documentElement.clientWidth
+    ));
+    if (desktopOverflow > 1) {
+      throw new Error(`${route.slug} overflowed the viewport by ${desktopOverflow}px`);
+    }
+
     const undersizedTargets = await page.locator('.archive-desktop').evaluate((desktop) => {
       const interactiveSelector = [
         'button',
