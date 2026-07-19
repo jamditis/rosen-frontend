@@ -120,8 +120,12 @@ describe('desktop route wiring', () => {
       'each audit row must fail on unhandled JavaScript errors without leaking listeners');
     assert.match(audit, /url\.origin === BASE && response\.status\(\) >= 400[\s\S]*Same-origin network errors:/,
       'missing local runtime assets must fail their route instead of looking partially successful');
-    assert.match(audit, /await beforeAccessibilityScan\(\);[\s\S]*new AxeBuilder/,
-      'application network capture must stop before axe issues its own synthetic CSS requests');
+    assert.match(audit, /setApplicationNetworkCapture\(false\);[\s\S]*new AxeBuilder[\s\S]*finally \{[\s\S]*setApplicationNetworkCapture\(true\)/,
+      'application network capture must pause only while axe issues synthetic CSS requests');
+    assert.match(audit, /setApplicationNetworkCapture\(true\);[\s\S]*route\.verifyEntityRecordFlow/,
+      'network capture must resume for interaction checks that run after accessibility analysis');
+    assert.match(audit, /if \(!captureApplicationNetwork\) return;/,
+      'route network listeners must ignore only the explicitly paused instrumentation phase');
     assert.match(audit, /page\.off\('response', captureBadResponse\)[\s\S]*page\.off\('requestfailed', captureFailedRequest\)/,
       'route-scoped network listeners must not leak into later rows');
     assert.match(audit, /slug: 'desktop-windowing'[\s\S]*desktopLayout:[\s\S]*zOrder/);
