@@ -33,13 +33,19 @@ describe('desktop app registry', () => {
       () => validateDesktopRegistry([{ ...valid, launch: { kind: 'route', destination: 'missing' } }]),
       /unknown route destination/i,
     );
+    assert.throws(
+      () => validateDesktopRegistry([{ ...valid, launch: { kind: 'path', destination: '../missing/' } }]),
+      /unknown standalone destination/i,
+    );
   });
 
-  it('derives matching shortcut and Start menu sets from ready apps', () => {
+  it('derives a concise shortcut set and a complete Start menu from ready apps', () => {
     const ready = getReadyDesktopApps();
     const shortcuts = ready.filter((app) => app.surfaces.includes('desktop')).map((app) => app.id).sort();
     const menuItems = ready.filter((app) => app.surfaces.includes('start')).map((app) => app.id).sort();
-    assert.deepEqual(shortcuts, menuItems);
+    assert.ok(shortcuts.every((id) => menuItems.includes(id)), 'Start includes every wallpaper shortcut');
+    assert.ok(menuItems.includes('method'), 'Start includes the standalone method demonstration');
+    assert.ok(!shortcuts.includes('method'), 'the experimental method demo does not crowd the wallpaper');
     assert.ok(shortcuts.length >= 8, 'the launcher should expose the useful initial map');
   });
 
@@ -64,8 +70,15 @@ describe('desktop app registry', () => {
     }
   });
 
+  it('opens the shipped method demonstration at its canonical standalone path', () => {
+    const app = getDesktopApp('method');
+    assert.equal(app.availability, 'ready');
+    assert.deepEqual(app.launch, { kind: 'path', destination: 'features/winer-method/' });
+    assert.ok(DESKTOP_TOOL_LINKS.some((tool) => tool.href === app.launch.destination));
+  });
+
   it('keeps future integrations unavailable and non-actionable', () => {
-    for (const id of ['findings', 'method', 'participate', 'making-of']) {
+    for (const id of ['findings', 'participate', 'making-of']) {
       const app = getDesktopApp(id);
       assert.ok(app, `${id} stays represented in availability metadata`);
       assert.notEqual(app.availability, 'ready');

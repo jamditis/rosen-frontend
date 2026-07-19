@@ -4,8 +4,9 @@ const APP_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const APP_GROUPS = new Set(['explore', 'research', 'help']);
 const APP_SURFACES = new Set(['desktop', 'start']);
 const AVAILABILITY_STATES = new Set(['ready', 'planned', 'blocked']);
-const LAUNCH_KINDS = new Set(['route', 'shell', 'action']);
+const LAUNCH_KINDS = new Set(['route', 'shell', 'action', 'path']);
 const ROUTE_DESTINATIONS = new Set(Object.values(ROUTES));
+const PATH_DESTINATIONS = new Set(['features/winer-method/']);
 
 const freezeApp = (app) => Object.freeze({
   ...app,
@@ -128,13 +129,12 @@ export const DESKTOP_APPS = Object.freeze([
   {
     id: 'method',
     label: 'The method',
-    description: 'Case studies showing how the archive method works.',
+    description: 'See a bounded, evidence-backed archive method demonstration.',
     icon: 'method',
     group: 'research',
-    surfaces: [],
-    availability: 'planned',
-    availabilityNote: 'Connect after issue #532 ships a maintained route.',
-    launch: null,
+    surfaces: ['start'],
+    availability: 'ready',
+    launch: { kind: 'path', destination: 'features/winer-method/' },
   },
   {
     id: 'participate',
@@ -161,6 +161,14 @@ export const DESKTOP_APPS = Object.freeze([
 ].map(freezeApp));
 
 export const DESKTOP_TOOL_LINKS = Object.freeze([
+  {
+    id: 'method-demo',
+    label: 'Archive method demonstration',
+    description: 'Follow an independent, evidence-backed example built from 11 frozen public-source records.',
+    icon: 'method',
+    href: 'features/winer-method/',
+    status: 'experimental',
+  },
   {
     id: 'dissertation-release',
     label: 'Dissertation release',
@@ -274,6 +282,9 @@ export function validateDesktopRegistry(registry) {
     }
     if (app.launch.kind === 'action' && app.launch.destination !== 'report') {
       throw new TypeError(`Desktop app ${app.id} has an unknown action destination`);
+    }
+    if (app.launch.kind === 'path' && !PATH_DESTINATIONS.has(app.launch.destination)) {
+      throw new TypeError(`Desktop app ${app.id} has an unknown standalone destination`);
     }
   }
 

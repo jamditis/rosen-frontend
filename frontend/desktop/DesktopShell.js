@@ -58,6 +58,7 @@ const iconFor = (key, className = 'desktop-icon-svg') => {
 const launchModeLabel = (app) => {
   if (app.launch.kind === 'shell') return 'Desktop window';
   if (app.launch.kind === 'action') return 'Opens dialog';
+  if (app.launch.kind === 'path') return 'Standalone page';
   return 'Standard view';
 };
 
@@ -73,6 +74,14 @@ const DesktopShell = ({
   entityView,
 }) => {
   const readyApps = useMemo(() => getReadyDesktopApps(), []);
+  const shortcutApps = useMemo(
+    () => readyApps.filter((app) => app.surfaces.includes('desktop')),
+    [readyApps],
+  );
+  const startApps = useMemo(
+    () => readyApps.filter((app) => app.surfaces.includes('start')),
+    [readyApps],
+  );
   const plannedApps = useMemo(
     () => DESKTOP_APPS.filter((app) => app.availability !== 'ready'),
     [],
@@ -140,7 +149,7 @@ const DesktopShell = ({
     }
 
     if (lastShellAppRef.current) {
-      const index = readyApps.findIndex((app) => app.id === lastShellAppRef.current);
+      const index = shortcutApps.findIndex((app) => app.id === lastShellAppRef.current);
       if (index >= 0) {
         setShortcutFocusIndex(index);
         shortcutRefs.current[index]?.focus({ preventScroll: true });
@@ -150,7 +159,7 @@ const DesktopShell = ({
     }
 
     desktopTitleRef.current?.focus({ preventScroll: true });
-  }, [activeAppId, shellApp, readyApps]);
+  }, [activeAppId, shellApp, shortcutApps]);
 
   useEffect(() => {
     if (!startOpen) return undefined;
@@ -172,7 +181,7 @@ const DesktopShell = ({
   }, [startOpen]);
 
   const openApp = (app) => {
-    const index = readyApps.findIndex((candidate) => candidate.id === app.id);
+    const index = shortcutApps.findIndex((candidate) => candidate.id === app.id);
     if (index >= 0) setShortcutFocusIndex(index);
     setStartOpen(false);
 
@@ -186,13 +195,18 @@ const DesktopShell = ({
       onOpenBugReport?.();
       return;
     }
+    if (app.launch.kind === 'path') {
+      setStatusMessage(`${app.label} opens as a standalone archive page.`);
+      window.location.assign(resolveSitePath(app.launch.destination));
+      return;
+    }
 
     setStatusMessage(`${app.label} opens in the standard archive view.`);
     onNavigate?.(app.launch.destination);
   };
 
   const moveShortcutFocus = (nextIndex) => {
-    const clamped = Math.max(0, Math.min(readyApps.length - 1, nextIndex));
+    const clamped = Math.max(0, Math.min(shortcutApps.length - 1, nextIndex));
     setShortcutFocusIndex(clamped);
     shortcutRefs.current[clamped]?.focus();
   };
@@ -211,14 +225,14 @@ const DesktopShell = ({
     else if (event.key === 'ArrowUp') nextIndex = index - columns;
     else if (event.key === 'ArrowDown') nextIndex = index + columns;
     else if (event.key === 'Home') nextIndex = 0;
-    else if (event.key === 'End') nextIndex = readyApps.length - 1;
+    else if (event.key === 'End') nextIndex = shortcutApps.length - 1;
     else return;
 
     event.preventDefault();
     moveShortcutFocus(nextIndex);
   };
 
-  const menuEntryCount = readyApps.length + 1;
+  const menuEntryCount = startApps.length + 1;
   const handleMenuKeyDown = (event, index) => {
     let nextIndex = index;
     if (event.key === 'ArrowDown') nextIndex = (index + 1) % menuEntryCount;
@@ -331,6 +345,7 @@ const DesktopShell = ({
               <span className="desktop-tool-mode">
                 Open page <${ExternalLink} className="desktop-external-icon" aria-hidden="true" />
                 ${tool.status === 'beta' ? html`<em>Beta</em>` : ''}
+                ${tool.status === 'experimental' ? html`<em>Experimental</em>` : ''}
               </span>
             </span>
           </a>
@@ -409,7 +424,7 @@ const DesktopShell = ({
           </header>
 
           <div className="desktop-shortcut-grid" role="list" aria-label="Archive desktop shortcuts">
-            ${readyApps.map((app, index) => html`
+            ${shortcutApps.map((app, index) => html`
               <div role="listitem" key=${app.id}>
                 <button
                   ref=${(element) => { shortcutRefs.current[index] = element; }}
@@ -470,7 +485,7 @@ const DesktopShell = ({
               <strong>Archive desktop</strong>
               <small>Choose a destination</small>
             </div>
-            ${readyApps.map((app, index) => html`
+            ${startApps.map((app, index) => html`
               <button
                 key=${app.id}
                 ref=${(element) => { menuItemRefs.current[index] = element; }}
@@ -487,13 +502,13 @@ const DesktopShell = ({
             `)}
             <div className="desktop-menu-divider" role="separator"></div>
             <button
-              ref=${(element) => { menuItemRefs.current[readyApps.length] = element; }}
+              ref=${(element) => { menuItemRefs.current[startApps.length] = element; }}
               type="button"
               className="desktop-menu-item desktop-menu-exit"
               role="menuitem"
               tabIndex="-1"
               onClick=${onExit}
-              onKeyDown=${(event) => handleMenuKeyDown(event, readyApps.length)}
+              onKeyDown=${(event) => handleMenuKeyDown(event, startApps.length)}
             >
               <span className="desktop-menu-icon"><${ArrowLeft} aria-hidden="true" /></span>
               <span><strong>Standard archive</strong><small>Leave the desktop view</small></span>

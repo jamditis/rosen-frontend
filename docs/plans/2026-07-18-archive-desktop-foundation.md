@@ -4,7 +4,7 @@
 
 Issue #622 adds an optional Windows 95/98-inspired exploration shell to Jay Rosen's Internet Archive. The standard archive stays the default. The desktop is a second front door that reuses canonical routes, records, services, and reporting behavior.
 
-The implemented slices cover the product map, accessible shell, archive and record browsing, people and ideas, the dissertation map, analytics, maintained tools, and root-scoped offline behavior. Multi-window behavior, persisted layout, and approval-gated editorial integrations remain later slices.
+The implemented slices cover the product map, accessible shell, archive and record browsing, people and ideas, the dissertation map, analytics, the shipped archive-method demonstration, maintained tools, and root-scoped offline behavior. Multi-window behavior, persisted layout, and approval-gated editorial integrations remain later slices.
 
 ## Product intent
 
@@ -46,7 +46,7 @@ No prior prototype or implementation was found. The only matching ref was the ne
 | Maintained tool index | `#desktop/tools` | Tools | Open an in-shell tool window | Ready |
 | Community wiki | `#wiki` and `#wiki/:slug` | None | No public desktop entry | Excluded for now; the current archive intentionally keeps this deep-link route out of public navigation pending editorial direction |
 | Selected findings | current selected-record trail in `#start` | Selected findings | Later in-shell adapter | Planned; Phase 4 should use real record links and approved copy |
-| Archive method demo | issue #532 | The method | Add after its real route ships | Planned; another worktree is currently implementing it |
+| Archive method demo | `features/winer-method/` | The method | Open the canonical standalone demonstration | Ready; issue #532 shipped in PR #623 while this branch was in progress, and the desktop now links to that maintained route without copying its independent corpus |
 | Participate | issue #347 | Participate | Add only after approval | Blocked; issue #347 says `DO NOT AUTOMATE` and awaits a design asset plus scope/funding decisions |
 | Making-of narrative | draft `features/making-of/` | How it was made | Add only after curator approval | Blocked; deployment rules explicitly withhold the draft |
 
@@ -54,6 +54,7 @@ No prior prototype or implementation was found. The only matching ref was the ne
 
 | Surface | Path | Initial desktop placement | State and reason |
 | --- | --- | --- | --- |
+| Archive method demonstration | `features/winer-method/` | Start menu and Tools window | Ready; preserved as an independent, experimental standalone page without crowding the wallpaper shortcut field |
 | Dissertation release page | `dissertation/` | Tools window | Ready |
 | Dissertation reader | `dissertation/reader/` | Tools window | Ready |
 | Foreword | `dissertation/foreword/` | Reach through the dissertation release page | Ready |
@@ -133,11 +134,11 @@ Measured from `origin/main` commit `cefac66` on 2026-07-18 with service workers 
 - `frontend/App.js`: 41,899 bytes;
 - `frontend/services/viewState.js`: 6,574 bytes;
 - `frontend/services/router.js`: 2,129 bytes;
-- initial standard route after 1.5 seconds: 57 same-origin resources and 27,443,486 uncompressed local bytes;
+- initial standard route after its background details preload settles: 57 same-origin resources and 27,443,486 uncompressed local bytes;
 - the last figure includes the existing delayed `archive-details.json` preload, which accounts for 13,520,143 bytes;
 - no desktop-specific request exists in the baseline.
 
-Post-change checks must show no `DesktopShell.js`, desktop registry, or desktop CSS request on the standard route. The current feature-PR convention keeps version `3.7.3`; coordinated release work will bump imports, `version.json`, and the service-worker cache together.
+Post-change checks must show no `DesktopShell.js`, desktop registry, or desktop CSS request on the standard route. The desktop branch inherited version `3.7.4` when it rebased over PR #623; it does not introduce a separate version bump.
 
 ## Foundation acceptance
 
@@ -166,19 +167,20 @@ The adapter provides:
 
 ## Validation after implementation
 
-Measured from the completed archive adapter with service workers blocked:
+Measured from the integrated current-main build with service workers blocked and the background details preload settled:
 
-- the standard route requests 58 same-origin resources after 1.5 seconds, excluding the document;
-- local decoded transfer is 27,455,174 bytes, 11,688 bytes over the original baseline and 6,573 bytes over the shell-only checkpoint;
+- the standard route requests 58 same-origin resources after 2.5 seconds, excluding the document;
+- local decoded transfer is 27,459,325 bytes, 15,839 bytes over the original baseline;
 - the one added standard-route request is `ArchiveResults.js`, extracted from `App.js` so standard and desktop results share one renderer;
-- `frontend/App.js` is 39,232 bytes, `ArchiveResults.js` is 8,714 bytes, `frontend/services/viewState.js` is 6,969 bytes, and `frontend/services/router.js` is 2,769 bytes;
+- `frontend/App.js` is 39,977 bytes, `ArchiveResults.js` is 8,714 bytes, `frontend/services/viewState.js` is 6,969 bytes, and `frontend/services/router.js` is 2,769 bytes;
 - the standard route does not request `DesktopShell.js`, `desktopRegistry.js`, or `desktop.css`;
-- a cold `#desktop` deep link does not request core archive data; `#desktop/archive` makes one `archive-core.json` request and no duplicate corpus request;
+- a cold `#desktop` deep link requests 62 same-origin resources totaling 608,478 decoded bytes, including seven desktop assets but no archive corpus; `#desktop/archive` makes one `archive-core.json` request and no duplicate corpus request;
 - `#desktop`, `#desktop/archive`, `#desktop/entities`, `#desktop/dissertation`, and `#desktop/analytics` have zero automated accessibility violations at their validated target sizes, as do selected-entity, dissertation-detail, and open-record states;
 - keyboard checks cover shortcut arrow navigation and activation, Start-menu focus entry and Escape return, window close focus return, filter-drawer entry/Escape return, record-modal entry/return, unknown-app fallback, and mobile reflow without horizontal overflow;
 - entity browsing makes one core and one entity-index request, dissertation makes no data request, and analytics fetches only the small aggregate until an explicit query loads SQLite;
 - dissertation nodes are keyboard reachable, its shortcuts act only while the map owns focus, and its detail panel returns focus to the exact SVG node;
 - an analytics composable query returns its 20 canonical record IDs to `#desktop/archive` without leaving the shell;
-- the complete test suite passed 1,000 tests across 211 suites at the Phase 3 checkpoint, and the production deploy-manifest suite passes all 36 focused tests after the root service-worker bridge was added.
+- the complete test suite passes 1,036 tests across 217 suites on rebased version `3.7.4`; the focused frontend suite passes 187 tests across 42 suites, and the production deploy-manifest suite passes all 36 focused tests;
+- a fresh browser confirms the root worker installs `jrda-cache-3.7.4` and `jrda-data-3.7.4`, a standard visit caches zero desktop assets, first desktop use warms exactly seven unique versioned assets, and an opened canonical record reloads to the same record while offline without console errors.
 
-The repository-wide preview audit reports 49 rule-level findings. Before this work it reported 35 across mobile and desktop; the new tablet viewport accounts for 16 equivalent findings, while shared record-card/modal improvements remove two desktop findings. Both desktop routes contribute zero findings in every viewport. Remaining findings belong to the previously audited standard, entity, analytics, dissertation, reader, FAQ, and status surfaces.
+The repository-wide preview audit covers 16 routes at mobile, tablet, and desktop sizes (48 rendered states) and reports 33 rule-level findings. `#desktop`, Archive, People & ideas, Dissertation, Analytics, and the Winer method demonstration each contribute zero findings at every viewport. The remaining findings are confined to previously maintained standard archive, standalone dissertation, reader, FAQ, and status-report surfaces.

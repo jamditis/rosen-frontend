@@ -3,11 +3,12 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 const read = (path) => readFileSync(path, 'utf8');
+const lazyShellImport = /lazy\(\(\)\s*=>\s*import\('\.\/desktop\/DesktopShell\.js\?v=\d+\.\d+\.\d+'\)\)/;
 
 describe('desktop route wiring', () => {
   it('lazy-loads the optional shell behind an error boundary', () => {
     const app = read('frontend/App.js');
-    assert.match(app, /lazy\(\(\)\s*=>\s*import\('\.\/desktop\/DesktopShell\.js\?v=3\.7\.3'\)\)/);
+    assert.match(app, lazyShellImport);
     assert.match(app, /DesktopRouteErrorBoundary/);
     assert.match(app, /<\$\{Suspense\}/);
     assert.doesNotMatch(app, /^import .*DesktopShell/m);
@@ -26,7 +27,7 @@ describe('desktop route wiring', () => {
     const worker = read('frontend/sw.js');
     const installManifest = worker.slice(worker.indexOf('const STATIC_ASSETS'), worker.indexOf('const DATA_URLS'));
 
-    assert.match(app, /lazy\(\(\)\s*=>\s*import\('\.\/desktop\/DesktopShell\.js\?v=3\.7\.3'\)\)/);
+    assert.match(app, lazyShellImport);
     assert.doesNotMatch(index, /DesktopShell|desktopRegistry|desktop\.css/);
     assert.doesNotMatch(installManifest, /DesktopShell|desktopRegistry|desktop\.css/);
   });

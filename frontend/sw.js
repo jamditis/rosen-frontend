@@ -121,7 +121,9 @@ const INSTALL_PRECACHE_DATA = DATA_URLS.filter(url => url.endsWith('/archive-cor
 // Optional shell assets are cached only after DesktopShell asks for them. This
 // covers a first-ever direct #desktop visit too: registration occurs after the
 // page load, then the active worker warms the already-used module graph for the
-// next offline visit without making standard visitors download it.
+// next offline visit without making standard visitors download it. These use
+// the same versioned request keys as the dynamic imports so a first visit and
+// the warm-up message cannot create query/no-query duplicates in the cache.
 const DESKTOP_ASSETS = [
   'DesktopShell.js',
   'DesktopArchivePanel.js',
@@ -130,7 +132,7 @@ const DESKTOP_ASSETS = [
   'DesktopAnalyticsPanel.js',
   'desktopRegistry.js',
   'desktop.css'
-].map(file => `${FRONTEND_PATH}/desktop/${file}`);
+].map(file => `${FRONTEND_PATH}/desktop/${file}?v=${CACHE_VERSION}`);
 
 console.log('[SW] Environment:',
   IS_LOCAL ? 'local development'

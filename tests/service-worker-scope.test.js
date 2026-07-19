@@ -54,6 +54,7 @@ describe('service-worker shell manifests', () => {
     );
     assert.doesNotMatch(installManifest, /desktop\/|DesktopShell|desktopRegistry|desktop\.css/);
     assert.match(worker, /const DESKTOP_ASSETS[\s\S]*DesktopShell\.js[\s\S]*desktop\.css/);
+    assert.match(worker, /DESKTOP_ASSETS[\s\S]*\?v=\$\{CACHE_VERSION\}/);
     assert.match(worker, /event\.data\?\.action === 'cacheDesktop'/);
     assert.match(shell, /postMessage\(\{ action: 'cacheDesktop' \}\)/);
   });
