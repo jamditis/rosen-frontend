@@ -43,11 +43,20 @@ const DesktopArchivePanel = ({
 
   useEffect(() => {
     if (!filterOpen) return undefined;
+    let focusFrame = null;
     const frame = requestAnimationFrame(() => {
-      document.getElementById('desktop-archive-search')?.focus();
+      // The narrow drawer changes from visibility:hidden in the same commit.
+      // Give that style one painted frame before moving focus into it; a
+      // single requestAnimationFrame can run while the input is still treated
+      // as hidden and silently leave focus on the toggle.
+      focusFrame = requestAnimationFrame(() => {
+        document.getElementById('desktop-archive-search')?.focus();
+      });
     });
     const handleKeyDown = (event) => {
-      if (event.key !== 'Escape') return;
+      const drawerActive = !window.matchMedia
+        || window.matchMedia('(max-width: 1100px)').matches;
+      if (event.key !== 'Escape' || !drawerActive) return;
       event.preventDefault();
       setFilterOpen(false);
       filterButtonRef.current?.focus();
@@ -55,6 +64,7 @@ const DesktopArchivePanel = ({
     document.addEventListener('keydown', handleKeyDown);
     return () => {
       cancelAnimationFrame(frame);
+      if (focusFrame !== null) cancelAnimationFrame(focusFrame);
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [filterOpen]);

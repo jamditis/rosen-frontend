@@ -98,6 +98,10 @@ describe('desktop archive adapter', () => {
     assert.match(panel, /<\$\{Sidebar\}/);
     assert.match(panel, /onSelectRecord=\$\{onSelectRecord\}/);
     assert.match(panel, /Open standard view/);
+    assert.match(panel, /requestAnimationFrame\(\(\) => \{[\s\S]*requestAnimationFrame\(\(\) => \{[\s\S]*desktop-archive-search/,
+      'drawer focus waits until the newly visible panel has painted');
+    assert.match(panel, /matchMedia\('\(max-width: 1100px\)'\)\.matches/,
+      'Escape only closes the filters while they are an overlay drawer');
   });
 
   it('serializes desktop filters and records through the canonical view state', () => {
