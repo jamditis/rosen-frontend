@@ -16,11 +16,11 @@
 // decorative italics, one primary action.
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { html } from '../html.js?v=3.7.4';
+import { html } from '../html.js?v=3.7.5';
 import { X, Bug, Lightbulb, Send, CheckCircle2, AlertCircle, ExternalLink } from 'lucide-react';
-import { ARCHIVE_VERSION, openReportFallback } from '../utils/bugReport.js?v=3.7.4';
-import { createSubmitGate } from '../utils/submitGate.js?v=3.7.4';
-import { buildReportPayload, validateReport, submitReport, newReportKey } from '../utils/reportSubmit.js?v=3.7.4';
+import { ARCHIVE_VERSION, openReportFallback } from '../utils/bugReport.js?v=3.7.5';
+import { createSubmitGate } from '../utils/submitGate.js?v=3.7.5';
+import { buildReportPayload, validateReport, submitReport, newReportKey } from '../utils/reportSubmit.js?v=3.7.5';
 
 const EMPTY_FIELDS = {
   whatHappened: '',
@@ -40,7 +40,7 @@ const captureContext = () => ({
   browser: typeof navigator !== 'undefined' ? navigator.userAgent : '',
 });
 
-const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
+const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'problem' }) => {
   const [intent, setIntent] = useState('problem');
   const [fields, setFields] = useState({ ...EMPTY_FIELDS });
   const [honeypot, setHoneypot] = useState('');
@@ -66,7 +66,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
   useEffect(() => {
     if (isOpen) {
       gateRef.current.reset();
-      setIntent('problem');
+      setIntent(initialIntent === 'record' ? 'record' : 'problem');
       setFields({ ...EMPTY_FIELDS });
       setHoneypot('');
       setPhase('form');
@@ -76,7 +76,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '' }) => {
       // the server dedupes), but a new report gets a new key.
       setReportKey(newReportKey());
     }
-  }, [isOpen]);
+  }, [isOpen, initialIntent]);
 
   // Focus the first field on open (or the close button on the result screens).
   useEffect(() => {

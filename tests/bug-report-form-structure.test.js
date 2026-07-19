@@ -22,7 +22,7 @@ describe('branded report form wiring', () => {
   it('opens the themed modal from the header button, not the GitHub deep link', () => {
     // The button must flip modal state. If it ever reverts to onClick=openBugReport
     // the reader gets dropped on github.com again, which is the regression #509 fixes.
-    assert.match(appSrc, /onClick=\$\{\(\)\s*=>\s*setBugReportOpen\(true\)\}/);
+    assert.match(appSrc, /onClick=\$\{\(\) => \{ setBugReportIntent\('problem'\); setBugReportOpen\(true\); \}\}/);
     assert.match(appSrc, /aria-label="Report a bug"/);
     assert.match(appSrc, /const \[bugReportOpen, setBugReportOpen\] = useState\(false\)/);
   });

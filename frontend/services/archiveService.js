@@ -1,5 +1,5 @@
 
-import { DATA_CONFIG } from '../constants.js?v=3.7.4';
+import { DATA_CONFIG } from '../constants.js?v=3.7.5';
 import {
   initDatabase,
   loadArchiveData as loadSqliteData,
@@ -13,13 +13,13 @@ import {
   getCategoryCoOccurrence,
   searchRecords as sqlSearchRecords,
   getStats as getSqliteStats
-} from './sqliteService.js?v=3.7.4';
-import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.7.4';
-import { searchIndexOptions } from '../utils/searchConfig.js?v=3.7.4';
-import { escapeCsvCell } from '../utils/csvSafety.js?v=3.7.4';
-import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.7.4';
-import { CACHE_VERSION, CACHE_TTL_MS, MAX_LOCALSTORAGE_SIZE, cacheKeyFor } from './cacheConfig.js?v=3.7.4';
-import { raceTimeout } from '../utils/raceTimeout.js?v=3.7.4';
+} from './sqliteService.js?v=3.7.5';
+import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.7.5';
+import { searchIndexOptions } from '../utils/searchConfig.js?v=3.7.5';
+import { escapeCsvCell } from '../utils/csvSafety.js?v=3.7.5';
+import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.7.5';
+import { CACHE_VERSION, CACHE_TTL_MS, MAX_LOCALSTORAGE_SIZE, cacheKeyFor } from './cacheConfig.js?v=3.7.5';
+import { raceTimeout } from '../utils/raceTimeout.js?v=3.7.5';
 
 // Routine cache-hit / fetch-start logs are silent in production. Set
 // `localStorage.jrda_debug = '1'` in DevTools and reload to opt in (#170).

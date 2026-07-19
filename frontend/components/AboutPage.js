@@ -1,9 +1,9 @@
 
 import { useMemo } from 'react';
-import { html } from '../html.js?v=3.7.4';
+import { html } from '../html.js?v=3.7.5';
 import { ArrowLeft, ArrowRight, Archive, BookOpen, Network, Search, Github, Mail } from 'lucide-react';
 
-const AboutPage = ({ onBack, onStart, records }) => {
+const AboutPage = ({ onBack, onStart, onParticipate, records }) => {
 
   // Calculate live stats from records
   const stats = useMemo(() => {
@@ -58,6 +58,16 @@ const AboutPage = ({ onBack, onStart, records }) => {
               className="group mt-6 inline-flex items-center gap-2 px-5 py-3 bg-stone-900 text-white font-display font-bold hover:bg-stone-700 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
             >
               Start here
+              <${ArrowRight} className="w-4 h-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+            </button>
+          `}
+          ${onParticipate && html`
+            <button
+              type="button"
+              onClick=${onParticipate}
+              className="group ml-0 mt-3 inline-flex items-center gap-2 border border-stone-900 bg-white px-5 py-3 font-display font-bold text-stone-900 transition-colors hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 sm:ml-3 sm:mt-6"
+            >
+              Ways to participate
               <${ArrowRight} className="w-4 h-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
             </button>
           `}

@@ -60,6 +60,7 @@ dissertation-launch/                # Dissertation launch landing
   index.html
 
 features/                           # Standalone feature pages
+  participate/                     # Ways to Participate landing page
   shared/text-selection.js
   status-report/                    # Status report generator
   winer-method/                     # Independent public-source archive-method demonstration
