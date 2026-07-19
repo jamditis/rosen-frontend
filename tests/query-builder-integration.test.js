@@ -111,7 +111,10 @@ describe('QueryBuilder shared archive path', () => {
       appSrc,
       /<\$\{RecordView\}[\s\S]*?filteredRecords=\$\{filteredRecords\}[\s\S]*?selectedRecordId=\$\{selectedRecordId\}/
     );
-    assert.match(appSrc, /setRecordParam\(url\.searchParams,\s*selectedRecordId\)/);
+    assert.match(
+      appSrc,
+      /setRecordParam\(\s*url\.searchParams\s*,[\s\S]{0,120}selectedRecordId\s*,?\s*\)/,
+    );
   });
 
   it('mounts the timeline for active record-query results', () => {

@@ -133,6 +133,8 @@ const App = () => {
   }));
   const desktopActiveNeedsRecords = currentRoute === ROUTES.desktop
     && DESKTOP_RECORD_APPS.has(desktopAppId);
+  const desktopDisallowsRecordContext = currentRoute === ROUTES.desktop
+    && !DESKTOP_RECORD_APPS.has(desktopAppId);
   const desktopRecordOverlayOpen = desktopActiveNeedsRecords && Boolean(selectedRecordId);
   const desktopNeedsRecords = currentRoute === ROUTES.desktop
     && (
@@ -236,11 +238,18 @@ const App = () => {
   useEffect(() => {
     if (desktopActiveNeedsRecords) return;
     const url = new URL(window.location.href);
-    setRecordParam(url.searchParams, selectedRecordId);
+    setRecordParam(
+      url.searchParams,
+      desktopDisallowsRecordContext ? null : selectedRecordId,
+    );
+    if (desktopDisallowsRecordContext) {
+      url.searchParams.delete('entity');
+      if (selectedRecordId !== null) setSelectedRecordId(null);
+    }
     try {
       window.history.replaceState({}, '', url);
     } catch(e) { console.warn("History update blocked"); }
-  }, [selectedRecordId, desktopActiveNeedsRecords]);
+  }, [selectedRecordId, desktopActiveNeedsRecords, desktopDisallowsRecordContext]);
 
   // Desktop archive links preserve the canonical filter query plus the shared
   // ?record= deep link. The hash only identifies the active shell app; no

@@ -102,7 +102,7 @@ describe('desktop route wiring', () => {
     assert.match(audit, /slug: 'desktop-entity-record',\s+url: '\/\?record=RECORD-00903&entity=P0005#desktop\/entities',\s+archiveDetails: 'require'/,
       'a record opened on a deferred entity surface must still load its details once on demand');
     assert.match(audit, /slug: 'desktop-dissertation',[\s\S]*url: '\/#desktop\/dissertation',[\s\S]*verifyStandardExit:[\s\S]*appId: 'dissertation'/);
-    assert.match(audit, /slug: 'desktop-analytics',[\s\S]*url: '\/#desktop\/analytics',[\s\S]*verifyStandardExit:[\s\S]*appId: 'analytics'/);
+    assert.match(audit, /slug: 'desktop-analytics',[\s\S]*url: '\/\?record=RECORD-00802&entity=P0005#desktop\/analytics',[\s\S]*verifyDiscardedDesktopContext: true[\s\S]*verifyStandardExit:[\s\S]*appId: 'analytics'/);
     assert.match(audit, /slug: 'desktop-readme',\s+url: '\/#desktop\/readme'/);
     assert.match(audit, /slug: 'desktop-tools',[\s\S]*url: '\/#desktop\/tools',[\s\S]*verifyToolRoundTrip: true/);
     assert.match(audit, /slug: 'desktop-record-modal',\s+url: '\/\?record=RECORD-00802#desktop\/archive'/);
@@ -144,6 +144,10 @@ describe('desktop route wiring', () => {
       'browser Back must reconstruct the desktop home with the popup closed');
     assert.match(audit, /'About heading after Start navigation'/,
       'an in-document Start launch must announce its canonical route destination');
+    assert.match(audit, /slug: 'desktop-analytics'[\s\S]*record=RECORD-00802&entity=P0005#desktop\/analytics[\s\S]*verifyDiscardedDesktopContext: true/,
+      'a real browser row must exercise unusable record and entity context on a non-record desktop app');
+    assert.match(audit, /verifyDiscardedDesktopContext[\s\S]*searchParams\.has\('record'\)[\s\S]*searchParams\.has\('entity'\)[\s\S]*Non-record desktop app rendered a record dialog/,
+      'the preview audit must reject non-canonical desktop context and hidden record overlays');
     assert.match(audit, /assertVisibleFocusOutline\(aboutHeading, 'About heading after keyboard Start navigation'\)/,
       'the route-entry contract must remain visibly focused for keyboard users');
     assert.match(audit, /'Desktop home after about browser Back'/,
@@ -205,6 +209,10 @@ describe('desktop archive adapter', () => {
     const app = read('frontend/App.js');
     const panel = read('frontend/desktop/DesktopArchivePanel.js');
     assert.match(app, /<\$\{ArchiveResults\}/, 'standard archive uses shared results');
+    assert.match(app, /const desktopDisallowsRecordContext = currentRoute === ROUTES\.desktop[\s\S]*!DESKTOP_RECORD_APPS\.has\(desktopAppId\)/,
+      'non-record desktop apps must identify URL context they cannot render');
+    assert.match(app, /desktopDisallowsRecordContext \? null : selectedRecordId[\s\S]*url\.searchParams\.delete\('entity'\)[\s\S]*setSelectedRecordId\(null\)/,
+      'non-record desktop apps must discard unusable record and entity context');
     assert.match(panel, /<\$\{ArchiveResults\}/, 'desktop adapter uses shared results');
     assert.match(app, /archiveView=\$\{desktopArchiveView\}/);
     assert.match(app, /desktopActiveNeedsRecords \? recordView : null/,

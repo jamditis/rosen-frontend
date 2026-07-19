@@ -119,7 +119,8 @@ const ROUTES = [
   },
   {
     slug: 'desktop-analytics',
-    url: '/#desktop/analytics',
+    url: '/?record=RECORD-00802&entity=P0005#desktop/analytics',
+    verifyDiscardedDesktopContext: true,
     verifyStandardExit: {
       appId: 'analytics',
       expectedHash: '#analytics',
@@ -285,6 +286,15 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     throw new Error(
       `${route.slug} loaded archive-details.json ${archiveDetailsRequests.length} times; expected exactly once`,
     );
+  }
+  if (route.verifyDiscardedDesktopContext) {
+    const canonicalUrl = new URL(page.url());
+    if (canonicalUrl.searchParams.has('record') || canonicalUrl.searchParams.has('entity')) {
+      throw new Error(`Non-record desktop app retained unusable context: ${canonicalUrl}`);
+    }
+    if (await page.getByRole('dialog').count()) {
+      throw new Error('Non-record desktop app rendered a record dialog');
+    }
   }
   if (route.verifyDesktopEntry) {
     const sourceUrl = page.url();

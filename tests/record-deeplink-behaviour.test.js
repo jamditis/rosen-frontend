@@ -147,6 +147,9 @@ describe('production delegates to these helpers (keeps the tests above relevant)
   });
 
   it('App.js URL-sync effect writes the record param via setRecordParam', () => {
-    assert.match(readSrc('frontend/App.js'), /setRecordParam\(\s*url\.searchParams\s*,\s*selectedRecordId\s*\)/);
+    assert.match(
+      readSrc('frontend/App.js'),
+      /setRecordParam\(\s*url\.searchParams\s*,[\s\S]{0,120}selectedRecordId\s*,?\s*\)/,
+    );
   });
 });
