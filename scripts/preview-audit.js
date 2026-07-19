@@ -135,6 +135,7 @@ const ROUTES = [
     slug: 'desktop-windowing',
     url: '/#desktop/analytics',
     verifyDesktopWindowHistory: true,
+    verifyBackgroundPointerControl: true,
     desktopLayout: {
       schema: 1,
       windows: [
@@ -690,6 +691,26 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     const standardMain = page.locator('#main-content');
     await assertFocused(standardMain, 'Standard archive main after Tools entry Back');
     await assertVisibleFocusOutline(standardMain, 'Standard archive main after Tools entry Back');
+  }
+  if (route.verifyBackgroundPointerControl && viewport.name === 'desktop') {
+    await page.getByRole('button', { name: /^Tools\./ }).click();
+    await page.waitForURL((url) => url.hash === '#desktop/tools');
+    const toolsUrl = page.url();
+    const analyticsWindow = page.locator('[data-window-id="analytics"]');
+    const analyticsClose = analyticsWindow.getByRole('button', { name: 'Close Analytics' });
+    const closeBox = await analyticsClose.boundingBox();
+    if (!closeBox || closeBox.width < 44 || closeBox.height < 44) {
+      throw new Error(`Exposed background Analytics close target was not touch-safe: ${JSON.stringify(closeBox)}`);
+    }
+    await analyticsClose.click();
+    await analyticsWindow.waitFor({ state: 'hidden' });
+    if (page.url() !== toolsUrl) {
+      throw new Error(`Background Analytics close activated a different window: ${page.url()}`);
+    }
+    await assertFocused(page.locator('#desktop-window-title-tools'), 'Tools title after background Analytics close');
+    if (await page.getByRole('button', { name: /^(Activate|Restore) Analytics/ }).count()) {
+      throw new Error('Closed background Analytics remained in the taskbar');
+    }
   }
   if (route.openReport) {
     const reportDialog = page.getByRole('dialog', { name: 'Report a problem or suggest a record' });

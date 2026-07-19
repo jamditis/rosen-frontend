@@ -185,9 +185,11 @@ describe('desktop route wiring', () => {
       'console capture must share the narrow axe-only instrumentation pause');
     assert.match(audit, /page\.off\('response', captureBadResponse\)[\s\S]*page\.off\('requestfailed', captureFailedRequest\)/,
       'route-scoped network listeners must not leak into later rows');
-    assert.match(audit, /slug: 'desktop-windowing'[\s\S]*verifyDesktopWindowHistory: true[\s\S]*desktopLayout:[\s\S]*zOrder/);
+    assert.match(audit, /slug: 'desktop-windowing'[\s\S]*verifyDesktopWindowHistory: true[\s\S]*verifyBackgroundPointerControl: true[\s\S]*desktopLayout:[\s\S]*zOrder/);
     assert.match(audit, /'Restored Archive title after browser Back'[\s\S]*assertVisibleFocusOutline\(archiveTitle/,
       'history must visibly focus a URL-active window that was minimized before Back');
+    assert.match(audit, /viewport\.name === 'desktop'[\s\S]*analyticsClose\.boundingBox\(\)[\s\S]*await analyticsClose\.click\(\)[\s\S]*Background Analytics close activated a different window[\s\S]*Tools title after background Analytics close/,
+      'a physically exposed background control must act on its first real pointer click');
     assert.match(audit, /name: 'mobile',\s+width: 375,\s+height: 812/);
     assert.match(audit, /name: 'tablet',\s+width: 768,\s+height: 1024/);
     assert.match(audit, /name: 'desktop',\s+width: 1440,\s+height: 900/);
