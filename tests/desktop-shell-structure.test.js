@@ -70,6 +70,10 @@ describe('desktop route wiring', () => {
     assert.equal(desktopAuditSlugs.length, 17, 'the review handoff expects 17 desktop rows per viewport');
     assert.match(audit, /slug: 'start-here',[\s\S]*verifyDesktopEntry: true/,
       'the optional Start-here entry must be a real keyboard/history audit path');
+    assert.match(audit, /slug: 'home-archive',[\s\S]*verifyToolsDesktopEntry: true/,
+      'the optional Tools entry must be a real keyboard/history audit path');
+    assert.match(audit, /viewport\.width < 640 \? 'Tools' : 'More'[\s\S]*'Tools dialog close control'[\s\S]*'Desktop home after Tools entry'[\s\S]*'Standard archive main after Tools entry Back'/,
+      'responsive Tools triggers must enter the desktop and visibly restore the canonical source');
     assert.match(audit, /'Desktop home after Start here entry'[\s\S]*page\.url\(\) !== sourceUrl[\s\S]*'Start here heading after desktop entry Back'/,
       'desktop entry and browser Back must visibly focus both ends of the round trip');
     assert.match(audit, /slug: 'archive-desktop',[\s\S]*url: '\/#desktop',[\s\S]*verifyStartPathRoundTrip: true/);

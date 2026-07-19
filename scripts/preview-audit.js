@@ -38,7 +38,7 @@ const OUT_DIR = REQUESTED_VIEWPORT
   : OUT_DIR_ROOT;
 
 const ROUTES = [
-  { slug: 'home-archive',       url: '/', archiveDetails: 'require' },
+  { slug: 'home-archive',       url: '/', archiveDetails: 'require', verifyToolsDesktopEntry: true },
   { slug: 'start-here',         url: '/#start', verifyDesktopEntry: true },
   { slug: 'participate',        url: '/features/participate/' },
   { slug: 'archive-desktop',    url: '/#desktop', archiveDetails: 'forbid', verifyStartPathRoundTrip: true },
@@ -664,6 +664,32 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       throw new Error(`Blocked making-of URL loaded archive data: ${JSON.stringify(archiveDataRequests)}`);
     }
     await assertFocused(page.locator('#desktop-window-title-home'), 'Desktop home after blocked making-of URL');
+  }
+  if (route.verifyToolsDesktopEntry) {
+    const sourceUrl = page.url();
+    const toolsTrigger = page.getByRole('button', {
+      name: viewport.width < 640 ? 'Tools' : 'More',
+      exact: true,
+    });
+    await toolsTrigger.focus();
+    await page.keyboard.press('Enter');
+    await assertFocused(page.getByLabel('Close tools menu'), 'Tools dialog close control');
+
+    const desktopEntry = page.getByRole('button', { name: /^Archive desktop/ });
+    await desktopEntry.focus();
+    await page.keyboard.press('Enter');
+    await page.waitForURL((url) => url.hash === '#desktop');
+    const desktopHomeTitle = page.locator('#desktop-window-title-home');
+    await assertFocused(desktopHomeTitle, 'Desktop home after Tools entry');
+    await assertVisibleFocusOutline(desktopHomeTitle, 'Desktop home after Tools entry');
+
+    await page.goBack({ waitUntil: 'networkidle' });
+    if (page.url() !== sourceUrl) {
+      throw new Error(`Tools entry Back lost its exact standard URL: ${page.url()}`);
+    }
+    const standardMain = page.locator('#main-content');
+    await assertFocused(standardMain, 'Standard archive main after Tools entry Back');
+    await assertVisibleFocusOutline(standardMain, 'Standard archive main after Tools entry Back');
   }
   if (route.openReport) {
     const reportDialog = page.getByRole('dialog', { name: 'Report a problem or suggest a record' });
