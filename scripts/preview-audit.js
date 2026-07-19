@@ -104,6 +104,7 @@ const ROUTES = [
   {
     slug: 'desktop-entity-record',
     url: '/?record=RECORD-00903&entity=P0005#desktop/entities',
+    archiveDetails: 'require',
     verifyEntityRecordFlow: true,
   },
   {

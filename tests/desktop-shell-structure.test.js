@@ -93,6 +93,8 @@ describe('desktop route wiring', () => {
       'the browser audit must enforce both the deferral and single-request contracts');
     assert.match(audit, /slug: 'desktop-entity-detail',\s+url: '\/\?entity=P0005#desktop\/entities'/);
     assert.match(audit, /slug: 'desktop-entity-record',[\s\S]*url: '\/\?record=RECORD-00903&entity=P0005#desktop\/entities',[\s\S]*verifyEntityRecordFlow: true/);
+    assert.match(audit, /slug: 'desktop-entity-record',\s+url: '\/\?record=RECORD-00903&entity=P0005#desktop\/entities',\s+archiveDetails: 'require'/,
+      'a record opened on a deferred entity surface must still load its details once on demand');
     assert.match(audit, /slug: 'desktop-dissertation',[\s\S]*url: '\/#desktop\/dissertation',[\s\S]*verifyStandardExit:[\s\S]*appId: 'dissertation'/);
     assert.match(audit, /slug: 'desktop-analytics',[\s\S]*url: '\/#desktop\/analytics',[\s\S]*verifyStandardExit:[\s\S]*appId: 'analytics'/);
     assert.match(audit, /slug: 'desktop-readme',\s+url: '\/#desktop\/readme'/);
