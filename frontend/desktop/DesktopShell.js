@@ -672,7 +672,7 @@ const DesktopShell = ({
 
   return html`
     <main id="main-content" className=${`archive-desktop ${shellApp ? 'desktop-app-active' : ''}`}>
-      <h1 className="desktop-mobile-page-title">Archive desktop</h1>
+      ${shellApp && html`<h1 className="desktop-mobile-page-title">Archive desktop</h1>`}
       <div className="desktop-wallpaper-mark" aria-hidden="true">JR</div>
       <div className="desktop-workspace">
         <section ref=${shortcutPanelRef} className="desktop-shortcut-panel" aria-labelledby="desktop-title">

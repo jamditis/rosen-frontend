@@ -275,7 +275,10 @@ describe('desktop windowing and spatial memory', () => {
   });
 
   it('collapses to one active full-width window on narrow screens', () => {
+    const shell = read('frontend/desktop/DesktopShell.js');
     const css = read('frontend/desktop/desktop.css');
+    assert.match(shell, /\$\{shellApp && html`<h1 className="desktop-mobile-page-title">Archive desktop<\/h1>`\}/,
+      'the replacement mobile page heading must not duplicate the visible launcher heading');
     assert.match(css, /@media \(max-width: 700px\)[\s\S]*\.desktop-window\s*\{[\s\S]*display:\s*none/);
     assert.match(css, /\.desktop-window\.is-active\s*\{\s*display:\s*block/);
     assert.match(css, /\.desktop-task-window-list[\s\S]*overflow-x:\s*auto/);
