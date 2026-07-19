@@ -134,6 +134,7 @@ const ROUTES = [
   {
     slug: 'desktop-windowing',
     url: '/#desktop/analytics',
+    verifyDesktopWindowHistory: true,
     desktopLayout: {
       schema: 1,
       windows: [
@@ -481,6 +482,31 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     await startButton.click();
     await startMenu.waitFor();
     await assertFocused(menuItems.first(), 'First Start menu destination before accessibility scan');
+  }
+  if (route.verifyDesktopWindowHistory) {
+    const archiveTask = page.getByRole('button', { name: 'Activate Archive' });
+    await archiveTask.focus();
+    await page.keyboard.press('Enter');
+    await page.waitForURL((url) => url.hash === '#desktop/archive');
+    const archiveTitle = page.locator('#desktop-window-title-archive');
+    await assertFocused(archiveTitle, 'Archive title after taskbar activation');
+
+    await page.getByRole('button', { name: 'Minimize Archive' }).focus();
+    await page.keyboard.press('Enter');
+    await page.waitForURL((url) => url.hash === '#desktop/analytics');
+    const analyticsHistoryUrl = page.url();
+    const analyticsTitle = page.locator('#desktop-window-title-analytics');
+    await assertFocused(analyticsTitle, 'Analytics title after minimizing Archive');
+
+    await page.goBack({ waitUntil: 'networkidle' });
+    await assertFocused(archiveTitle, 'Restored Archive title after browser Back');
+    await assertVisibleFocusOutline(archiveTitle, 'Restored Archive title after browser Back');
+
+    await page.goForward({ waitUntil: 'networkidle' });
+    if (page.url() !== analyticsHistoryUrl) {
+      throw new Error(`Window-history Forward lost its exact Analytics URL: ${page.url()}`);
+    }
+    await assertFocused(analyticsTitle, 'Analytics title after window-history Forward');
   }
   if (route.verifyToolRoundTrip) {
     const dissertationLink = page.getByRole('link', { name: /^Dissertation release\./ });

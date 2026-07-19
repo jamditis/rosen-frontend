@@ -175,7 +175,9 @@ describe('desktop route wiring', () => {
       'route network listeners must ignore only the explicitly paused instrumentation phase');
     assert.match(audit, /page\.off\('response', captureBadResponse\)[\s\S]*page\.off\('requestfailed', captureFailedRequest\)/,
       'route-scoped network listeners must not leak into later rows');
-    assert.match(audit, /slug: 'desktop-windowing'[\s\S]*desktopLayout:[\s\S]*zOrder/);
+    assert.match(audit, /slug: 'desktop-windowing'[\s\S]*verifyDesktopWindowHistory: true[\s\S]*desktopLayout:[\s\S]*zOrder/);
+    assert.match(audit, /'Restored Archive title after browser Back'[\s\S]*assertVisibleFocusOutline\(archiveTitle/,
+      'history must visibly focus a URL-active window that was minimized before Back');
     assert.match(audit, /name: 'mobile',\s+width: 375,\s+height: 812/);
     assert.match(audit, /name: 'tablet',\s+width: 768,\s+height: 1024/);
     assert.match(audit, /name: 'desktop',\s+width: 1440,\s+height: 900/);
@@ -443,6 +445,8 @@ describe('desktop windowing and spatial memory', () => {
       'scheduled window-title focus must yield to an overlay restoring its exact opener');
     assert.match(shell, /if \(!autoFocusWindow\) return undefined/,
       'a foreground record overlay must retain focus ownership during direct desktop loads');
+    assert.match(shell, /activeShellWindowVisible[\s\S]*layout\.windows\.some\(\(entry\) => entry\.id === shellApp\.id && !entry\.minimized\)/,
+      'focus must rerun when history remounts a minimized active window without changing window count');
     assert.match(app, /autoFocusWindow=\$\{!desktopRecordOverlayOpen\}/);
     assert.match(shell, /pointerWindowControlRef/,
       'pointer title-bar actions must not be consumed by background-window activation');

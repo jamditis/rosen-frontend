@@ -117,6 +117,10 @@ const DesktopShell = ({
       return emptyDesktopLayout();
     }
   });
+  const activeShellWindowVisible = Boolean(
+    shellApp
+    && layout.windows.some((entry) => entry.id === shellApp.id && !entry.minimized),
+  );
 
   const desktopTitleRef = useRef(null);
   const shortcutPanelRef = useRef(null);
@@ -223,7 +227,14 @@ const DesktopShell = ({
       focusTarget?.focus({ preventScroll: true });
     });
     return () => cancelAnimationFrame(frame);
-  }, [activeAppId, autoFocusWindow, shellApp, shortcutApps, layout.windows.length]);
+  }, [
+    activeAppId,
+    activeShellWindowVisible,
+    autoFocusWindow,
+    shellApp,
+    shortcutApps,
+    layout.windows.length,
+  ]);
 
   useEffect(() => {
     if (!shellApp) return undefined;
