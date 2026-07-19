@@ -8,6 +8,8 @@
   --blue-dark: #0c4a6e;
   --amber: #fef3c7;
   --red: #991b1b;
+  --manila: #e8dfc8;
+  --manila-edge: #c9bda0;
   --display: 'Special Elite', Georgia, serif;
   --mono: 'Roboto Mono', ui-monospace, monospace;
 }
@@ -34,8 +36,11 @@ main, footer { max-width: 1180px; margin: auto; padding-inline: 1.5rem; }
 .hero-copy { min-width: 0; }
 .hero-context { align-self: stretch; display: flex; flex-direction: column; justify-content: flex-end; gap: 1.25rem; padding-left: 1.25rem; border-left: 1px solid var(--rule); }
 .disclaimer { display: flex; flex-direction: column; gap: .55rem; margin: 0; padding: .9rem 1rem; border: 1px solid #f59e0b; background: #fffbeb; color: #78350f; font-size: .7rem; line-height: 1.55; }
-.disclaimer strong { text-transform: uppercase; letter-spacing: .08em; }
-.kicker, .eyebrow { color: var(--blue-dark); font-size: .75rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+.disclaimer strong { letter-spacing: normal; }
+/* Typed folder tab, matching features/participate. A manila fill with a
+   dog-eared top-right corner and a typewriter face, so the label reads as
+   something typed onto a folder rather than a tracked-out sans eyebrow. */
+.kicker, .eyebrow { display: inline-block; padding: .3rem .8rem .28rem; font-family: var(--display); font-size: .8rem; font-weight: 400; letter-spacing: .01em; text-transform: none; color: #44403c; background: var(--manila); border: 1px solid var(--manila-edge); clip-path: polygon(0 0, calc(100% - .5rem) 0, 100% .5rem, 100% 100%, 0 100%); }
 h1, h2 { font-family: var(--display); font-weight: 400; line-height: 1.08; }
 h1 { max-width: 820px; margin: .55rem 0 1.1rem; font-size: clamp(3.1rem, 5.2vw, 4.75rem); letter-spacing: -.025em; }
 h1 em { color: var(--blue-dark); font-style: normal; }
@@ -51,7 +56,7 @@ h3 { line-height: 1.35; }
 .hero-stats { display: grid; grid-template-columns: 1fr; margin: 0; border-block: 1px solid var(--rule); }
 .hero-stats div { display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; padding: .65rem .2rem; border-bottom: 1px solid var(--rule); }
 .hero-stats div:last-child { border-bottom: 0; }
-.hero-stats dt { color: var(--muted); font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; }
+.hero-stats dt { color: var(--muted); font-size: .75rem; letter-spacing: normal; }
 .hero-stats dd { margin: 0; font-family: var(--display); font-size: 1.35rem; text-align: right; }
 
 .explorer { margin: .25rem 0 2rem; padding: 1.5rem; border: 1px solid var(--ink); background: rgba(255,255,255,.75); box-shadow: 8px 8px 0 rgba(28,25,23,.08); }
@@ -79,7 +84,7 @@ h3 { line-height: 1.35; }
 .timeline > li:last-child::before { display: none; }
 .step { display: grid; place-items: center; align-self: start; width: 3rem; height: 3rem; border: 1px solid var(--ink); border-radius: 50%; background: var(--paper); font-size: .75rem; }
 .trail-stop { min-width: 0; }
-.trail-label { margin: 0 0 .45rem; color: var(--blue-dark); font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.trail-label { margin: 0 0 .45rem; color: var(--blue-dark); font-size: .75rem; font-weight: 700; letter-spacing: normal; }
 .trail-interpretation { max-width: 760px; margin: 1.2rem 0 .75rem; font-size: .9rem; }
 .trail-transition { max-width: 760px; margin: 0; padding: .9rem 1rem; border-left: 3px solid var(--blue-dark); background: #f0f9ff; color: var(--muted); font-size: .78rem; }
 .record-card { padding: 1.4rem; border: 1px solid var(--rule); background: white; box-shadow: 7px 7px 0 rgba(28,25,23,.05); }
@@ -103,7 +108,7 @@ h3 { line-height: 1.35; }
 .findings-grid h3 { margin-top: 0; font-family: var(--display); font-size: 1.4rem; font-weight: 400; }
 .findings-grid p { color: var(--muted); font-size: .8rem; }
 .evidence-links { display: flex; flex-direction: column; gap: .45rem; margin-top: 1rem; padding-top: .8rem; border-top: 1px solid var(--rule); font-size: .7rem; }
-.evidence-links span { color: var(--muted); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.evidence-links span { color: var(--muted); font-weight: 700; letter-spacing: normal; }
 
 .concept-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin: 2rem 0 0; padding: 0; list-style: none; counter-reset: none; }
 .concept-grid li { min-width: 0; }
@@ -129,7 +134,7 @@ h3 { line-height: 1.35; }
 .relation-path { display: grid; grid-template-columns: minmax(0, 1fr) minmax(8.5rem, .9fr) minmax(0, 1fr); min-height: 180px; align-items: stretch; border: 1px solid var(--rule); background: rgba(255,255,255,.55); }
 .entity-node { position: relative; z-index: 1; display: flex; min-width: 0; flex-direction: column; justify-content: center; padding: 1rem; border: 0; background: white; color: var(--ink); text-decoration: none; }
 .entity-node:hover { background: #f0f9ff; box-shadow: inset 0 -4px var(--blue-dark); }
-.entity-node > span { color: var(--blue-dark); font-size: .6rem; letter-spacing: .08em; text-transform: uppercase; }
+.entity-node > span { color: var(--blue-dark); font-size: .68rem; letter-spacing: normal; }
 .entity-node strong { margin: .45rem 0; font-family: var(--display); font-size: 1.25rem; font-weight: 400; line-height: 1.2; }
 .entity-node small { color: var(--muted); font-size: .62rem; }
 .relation-bridge { position: relative; display: flex; flex-direction: column; justify-content: center; gap: .75rem; padding: 1rem .45rem; text-align: center; }
@@ -146,7 +151,7 @@ h3 { line-height: 1.35; }
 .entity-grid strong { display: block; margin: .35rem 0; }
 .entity-grid p { margin: 0; color: var(--muted); font-size: .78rem; }
 .entity-grid small { display: block; margin-top: .75rem; padding-top: .6rem; border-top: 1px solid var(--soft); color: var(--blue-dark); font-size: .65rem; }
-.entity-kind { color: var(--blue-dark); font-size: .65rem; text-transform: uppercase; letter-spacing: .08em; }
+.entity-kind { color: var(--blue-dark); font-size: .7rem; letter-spacing: normal; }
 
 .method-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin: 2rem 0; counter-reset: method; }
 .method-grid > div { padding: 1.2rem; border-top: 3px solid var(--ink); background: white; counter-increment: method; }
