@@ -9,6 +9,7 @@ const bridge = read('sw.js');
 const worker = read('frontend/sw.js');
 const shell = read('frontend/desktop/DesktopShell.js');
 const deployment = read('DEPLOYMENT.md');
+const indexCss = read('frontend/index.css');
 
 describe('root service-worker scope', () => {
   it('registers a root bridge and checks its imported implementation fresh', () => {
@@ -25,6 +26,17 @@ describe('root service-worker scope', () => {
 });
 
 describe('service-worker shell manifests', () => {
+  it('loads and pre-caches the design tokens at their explicit prefix-safe URL', () => {
+    assert.match(index, /href="\.\/frontend\/design-system\/tokens\.css\?v=3\.7\.5"/);
+    assert.ok(
+      index.indexOf('./frontend/design-system/tokens.css') < index.indexOf('./frontend/index.css'),
+      'tokens must load before the stylesheet that consumes them',
+    );
+    assert.doesNotMatch(indexCss, /@import[^;]*design-system\/tokens\.css/,
+      'a cached stylesheet import can lose its intended relative base on offline navigation');
+    assert.match(worker, /'design-system\/tokens\.css'/);
+  });
+
   it('covers every eager local module in the standard app shell', () => {
     const seen = new Set();
     const visit = (path) => {

@@ -40,6 +40,7 @@ const APP_SHELL_FRONTEND_FILES = [
   'html.js',
   'constants.js',
   'index.css',
+  'design-system/tokens.css',
   'dist/tailwind.css',
   'components/AboutPage.js',
   'components/AnalyticsDashboard.js',

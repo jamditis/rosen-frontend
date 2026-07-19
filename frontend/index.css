@@ -1,6 +1,3 @@
-/* Import Design System Tokens */
-@import url('./design-system/tokens.css');
-
 /* Shared detail surfaces can render outside the optional desktop subtree.
    Keep their canonical transitions from bypassing the user's motion setting. */
 @media (prefers-reduced-motion: reduce) {
