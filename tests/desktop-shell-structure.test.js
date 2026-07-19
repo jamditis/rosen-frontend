@@ -248,6 +248,9 @@ describe('desktop windowing and spatial memory', () => {
       'pointer title-bar actions must not be consumed by background-window activation');
     assert.match(shell, /windowTitleRefs\.current\[shellApp\?\.id \|\| 'home'\]\?\.focus/,
       'closing or minimizing a background window must recover focus in the active surface');
+    assert.match(shell, /compactQuery\.addEventListener\('change', preserveVisibleFocus\)/);
+    assert.match(shell, /shortcutPanelRef\.current\?\.contains\(document\.activeElement\)[\s\S]*windowTitleRefs\.current\[shellApp\.id\]\?\.focus/,
+      'compact reflow must transfer focus out of the shortcut panel it hides');
     assert.match(shell, /Minimize \$\{windowTitle\}/);
     assert.match(shell, /aria-label="Open desktop windows"/);
     assert.match(shell, /Reset desktop layout/);

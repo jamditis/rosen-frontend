@@ -125,6 +125,7 @@ const DesktopShell = ({
   });
 
   const desktopTitleRef = useRef(null);
+  const shortcutPanelRef = useRef(null);
   const windowTitleRefs = useRef({});
   const shortcutRefs = useRef([]);
   const taskButtonRefs = useRef({});
@@ -230,6 +231,26 @@ const DesktopShell = ({
     });
     return () => cancelAnimationFrame(frame);
   }, [shellApp, layout.windows]);
+
+  useEffect(() => {
+    if (!window.matchMedia) return undefined;
+    const compactQuery = window.matchMedia(
+      '(max-width: 700px), (max-width: 900px) and (max-height: 520px)',
+    );
+    const preserveVisibleFocus = (event) => {
+      if (
+        event.matches
+        && shellApp
+        && shortcutPanelRef.current?.contains(document.activeElement)
+      ) {
+        requestAnimationFrame(() => {
+          windowTitleRefs.current[shellApp.id]?.focus({ preventScroll: true });
+        });
+      }
+    };
+    compactQuery.addEventListener('change', preserveVisibleFocus);
+    return () => compactQuery.removeEventListener('change', preserveVisibleFocus);
+  }, [shellApp]);
 
   useEffect(() => {
     if (!startOpen) return undefined;
@@ -654,7 +675,7 @@ const DesktopShell = ({
       <h1 className="desktop-mobile-page-title">Archive desktop</h1>
       <div className="desktop-wallpaper-mark" aria-hidden="true">JR</div>
       <div className="desktop-workspace">
-        <section className="desktop-shortcut-panel" aria-labelledby="desktop-title">
+        <section ref=${shortcutPanelRef} className="desktop-shortcut-panel" aria-labelledby="desktop-title">
           <header className="desktop-brand">
             <p>Jay Rosen's Internet Archive</p>
             <h1 id="desktop-title" ref=${desktopTitleRef} tabIndex="-1">Archive desktop</h1>
