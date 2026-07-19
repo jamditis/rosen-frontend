@@ -438,4 +438,15 @@ describe('desktop interaction structure', () => {
     assert.match(indexCss, /@media \(max-width: 700px\), \(max-width: 900px\) and \(max-height: 520px\)[\s\S]*\.archive-desktop \.desktop-window-body input[\s\S]*\.archive-report-dialog textarea[\s\S]*font-size:\s*1rem/,
       'compact text fields must not trigger iOS focus zoom around fixed shell controls');
   });
+
+  it('ships a reproducible independent-review handoff without crossing release gates', () => {
+    const handoff = read('docs/plans/2026-07-19-archive-desktop-review-handoff.md');
+    assert.match(handoff, /does not record an approval/i);
+    assert.match(handoff, /\?record=RECORD-00903&entity=P0005#desktop\/entities/);
+    assert.match(handoff, /375 × 812/);
+    assert.match(handoff, /200%-zoom equivalent/);
+    assert.match(handoff, /Screen reader:/);
+    assert.match(handoff, /Outcome: approve \/ approve with changes \/ request changes \/ blocked/);
+    assert.match(handoff, /Making-of approval, merge, coordinated release version\/cache bump, and live-archive verification remain separate decisions/);
+  });
 });
