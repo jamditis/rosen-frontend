@@ -45,6 +45,8 @@ describe('desktop app registry', () => {
     const menuItems = ready.filter((app) => app.surfaces.includes('start')).map((app) => app.id).sort();
     assert.ok(shortcuts.every((id) => menuItems.includes(id)), 'Start includes every wallpaper shortcut');
     assert.ok(menuItems.includes('method'), 'Start includes the standalone method demonstration');
+    assert.ok(menuItems.includes('findings'), 'Start includes the approved selected-record trail');
+    assert.ok(menuItems.includes('participate'), 'Start includes the shipped participation page');
     assert.ok(!shortcuts.includes('method'), 'the experimental method demo does not crowd the wallpaper');
     assert.ok(shortcuts.length >= 8, 'the launcher should expose the useful initial map');
   });
@@ -63,7 +65,7 @@ describe('desktop app registry', () => {
   });
 
   it('opens the canonical explore and research surfaces through real in-shell adapters', () => {
-    for (const id of ['archive', 'folders', 'entities', 'dissertation', 'analytics']) {
+    for (const id of ['archive', 'folders', 'start', 'findings', 'entities', 'dissertation', 'analytics']) {
       const app = getDesktopApp(id);
       assert.equal(app.availability, 'ready');
       assert.deepEqual(app.launch, { kind: 'shell', destination: id });
@@ -77,8 +79,15 @@ describe('desktop app registry', () => {
     assert.ok(DESKTOP_TOOL_LINKS.some((tool) => tool.href === app.launch.destination));
   });
 
+  it('opens the shipped participation page at its canonical standalone path', () => {
+    const app = getDesktopApp('participate');
+    assert.equal(app.availability, 'ready');
+    assert.deepEqual(app.launch, { kind: 'path', destination: 'features/participate/' });
+    assert.ok(existsSync(join(process.cwd(), 'features/participate/index.html')));
+  });
+
   it('keeps future integrations unavailable and non-actionable', () => {
-    for (const id of ['findings', 'participate', 'making-of']) {
+    for (const id of ['making-of']) {
       const app = getDesktopApp(id);
       assert.ok(app, `${id} stays represented in availability metadata`);
       assert.notEqual(app.availability, 'ready');

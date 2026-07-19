@@ -12,7 +12,17 @@ import {
   serializeDesktopLayout,
 } from '../frontend/desktop/desktopWindowState.js';
 
-const ALLOWED = ['archive', 'folders', 'entities', 'dissertation', 'analytics', 'tools', 'readme'];
+const ALLOWED = [
+  'archive',
+  'folders',
+  'start',
+  'findings',
+  'entities',
+  'dissertation',
+  'analytics',
+  'tools',
+  'readme',
+];
 
 describe('desktop window-state schema', () => {
   it('falls back safely for missing, malformed, and future-schema preferences', () => {
@@ -70,6 +80,13 @@ describe('desktop window-state transitions', () => {
     layout = activateDesktopWindow(layout, 'folders', ALLOWED);
     assert.deepEqual(layout.windows, [{ id: 'folders', minimized: false }]);
     assert.deepEqual(layout.zOrder, ['folders']);
+  });
+
+  it('treats Start here and Selected findings as one guided-path window family', () => {
+    let layout = activateDesktopWindow(emptyDesktopLayout(), 'start', ALLOWED);
+    layout = activateDesktopWindow(layout, 'findings', ALLOWED);
+    assert.deepEqual(layout.windows, [{ id: 'findings', minimized: false }]);
+    assert.deepEqual(layout.zOrder, ['findings']);
   });
 
   it('minimizes, restores, selects the next visible window, and closes safely', () => {

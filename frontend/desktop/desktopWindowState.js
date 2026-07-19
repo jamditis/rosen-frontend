@@ -3,12 +3,14 @@ export const DESKTOP_LAYOUT_STORAGE_KEY = 'jrda-desktop-layout';
 
 const MAX_PERSISTED_WINDOWS = 12;
 
-// Cards and Folders are two presentations of the same archive application.
-// Keeping them in one family prevents duplicate filter/search control IDs and
-// mirrors the standard archive's existing layout switch.
-export const desktopWindowFamily = (id) => (
-  id === 'archive' || id === 'folders' ? 'archive' : id
-);
+// Some destinations are alternate presentations of one underlying surface.
+// Keeping each pair in one family prevents duplicate control/heading IDs and
+// mirrors the standard archive's existing layout and guided-path switches.
+export const desktopWindowFamily = (id) => {
+  if (id === 'archive' || id === 'folders') return 'archive';
+  if (id === 'start' || id === 'findings') return 'start';
+  return id;
+};
 
 export const emptyDesktopLayout = () => ({
   schema: DESKTOP_LAYOUT_SCHEMA,

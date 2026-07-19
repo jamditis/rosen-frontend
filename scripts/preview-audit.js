@@ -38,6 +38,8 @@ const ROUTES = [
   { slug: 'participate',        url: '/features/participate/' },
   { slug: 'archive-desktop',    url: '/#desktop' },
   { slug: 'desktop-archive',    url: '/#desktop/archive' },
+  { slug: 'desktop-start',      url: '/#desktop/start' },
+  { slug: 'desktop-findings',   url: '/#desktop/findings' },
   { slug: 'desktop-entities',   url: '/#desktop/entities' },
   { slug: 'desktop-dissertation', url: '/#desktop/dissertation' },
   { slug: 'desktop-analytics',  url: '/#desktop/analytics' },

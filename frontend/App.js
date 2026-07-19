@@ -39,7 +39,14 @@ const NON_RECORD_ROUTES = new Set([
   ROUTES.desktop,
 ]);
 
-const DESKTOP_RECORD_APPS = new Set(['archive', 'folders', 'entities']);
+const DESKTOP_RECORD_APPS = new Set(['archive', 'folders', 'entities', 'start', 'findings']);
+const DESKTOP_GUIDED_SHELL_DESTINATIONS = new Set([
+  'archive',
+  'folders',
+  'entities',
+  'dissertation',
+  'analytics',
+]);
 
 class DesktopRouteErrorBoundary extends Component {
   constructor(props) {
@@ -205,6 +212,16 @@ const App = () => {
 
   const goToDesktop = useCallback((appId = null) => {
     navigateToDesktop(appId);
+  }, []);
+
+  const handleDesktopGuideNavigate = useCallback((destination) => {
+    if (destination === 'desktop') {
+      navigateToDesktop();
+    } else if (DESKTOP_GUIDED_SHELL_DESTINATIONS.has(destination)) {
+      navigateToDesktop(destination);
+    } else {
+      navigateTo(destination);
+    }
   }, []);
 
   // Open, close, or switch the record modal with a View Transition cross-fade
@@ -533,6 +550,17 @@ const App = () => {
     onOpenStandard: () => goTo(ROUTES.analytics),
   };
 
+  const desktopStartView = {
+    records,
+    onNavigate: handleDesktopGuideNavigate,
+    onSelectRecord: selectRecord,
+    onOpenBugReport: () => {
+      setBugReportIntent('problem');
+      setBugReportOpen(true);
+    },
+    onOpenStandard: () => goTo(ROUTES.start),
+  };
+
   // Keep global overlays mounted on full-page routes. Returning a page directly
   // here used to strand any full-page action that opened the bug report modal,
   // because the modal only existed in the archive shell below.
@@ -573,13 +601,14 @@ const App = () => {
             activeAppId=${desktopAppId}
             onSelectApp=${goToDesktop}
             onNavigate=${goTo}
-            onOpenBugReport=${() => setBugReportOpen(true)}
+            onOpenBugReport=${() => { setBugReportIntent('problem'); setBugReportOpen(true); }}
             onExit=${() => goTo(ROUTES.archive)}
             onOpenAppsChange=${setDesktopOpenAppIds}
             archiveView=${desktopArchiveView}
             analyticsView=${desktopAnalyticsView}
             dissertationView=${desktopDissertationView}
             entityView=${desktopEntityView}
+            startView=${desktopStartView}
           />
         <//>
       <//>

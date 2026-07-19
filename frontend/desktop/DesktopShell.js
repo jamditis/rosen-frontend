@@ -28,6 +28,7 @@ import DesktopArchivePanel from './DesktopArchivePanel.js?v=3.7.5';
 import DesktopAnalyticsPanel from './DesktopAnalyticsPanel.js?v=3.7.5';
 import DesktopDissertationPanel from './DesktopDissertationPanel.js?v=3.7.5';
 import DesktopEntityPanel from './DesktopEntityPanel.js?v=3.7.5';
+import DesktopStartPanel from './DesktopStartPanel.js?v=3.7.5';
 import {
   DESKTOP_APPS,
   DESKTOP_TOOL_LINKS,
@@ -85,6 +86,7 @@ const DesktopShell = ({
   analyticsView,
   dissertationView,
   entityView,
+  startView,
 }) => {
   const readyApps = useMemo(() => getReadyDesktopApps(), []);
   const shortcutApps = useMemo(
@@ -515,12 +517,24 @@ const DesktopShell = ({
     />
   `;
 
+  const renderGuidedPath = (appId) => html`
+    <${DesktopStartPanel}
+      mode=${appId}
+      records=${startView.records}
+      onNavigate=${startView.onNavigate}
+      onSelectRecord=${startView.onSelectRecord}
+      onOpenBugReport=${startView.onOpenBugReport}
+      onOpenStandard=${startView.onOpenStandard}
+    />
+  `;
+
   const renderWindowContent = (app) => {
     if (!app) return renderWelcome();
     if (app.id === 'archive' || app.id === 'folders') return renderArchive(app.id);
     if (app.id === 'entities') return renderEntities();
     if (app.id === 'dissertation') return renderDissertation();
     if (app.id === 'analytics') return renderAnalytics();
+    if (app.id === 'start' || app.id === 'findings') return renderGuidedPath(app.id);
     if (app.id === 'readme') return renderReadme();
     if (app.id === 'tools') return renderTools();
     return renderWelcome();
@@ -528,9 +542,17 @@ const DesktopShell = ({
 
   const renderWindowFrame = (app, stackIndex = 0) => {
     const appId = app?.id || 'home';
-    const windowTitle = app?.label || 'Archive desktop';
+    const windowTitle = app?.label || 'Welcome to the archive desktop';
     const isActive = app ? shellApp?.id === app.id : !shellApp;
-    const isWideWindow = ['archive', 'folders', 'entities', 'dissertation', 'analytics'].includes(app?.id);
+    const isWideWindow = [
+      'archive',
+      'folders',
+      'entities',
+      'dissertation',
+      'analytics',
+      'start',
+      'findings',
+    ].includes(app?.id);
     const titleId = `desktop-window-title-${appId}`;
     const style = app ? {
       '--desktop-window-x': `${(stackIndex % 4) * 14}px`,
@@ -604,6 +626,7 @@ const DesktopShell = ({
 
   return html`
     <main id="main-content" className=${`archive-desktop ${shellApp ? 'desktop-app-active' : ''}`}>
+      <h1 className="desktop-mobile-page-title">Archive desktop</h1>
       <div className="desktop-wallpaper-mark" aria-hidden="true">JR</div>
       <div className="desktop-workspace">
         <section className="desktop-shortcut-panel" aria-labelledby="desktop-title">

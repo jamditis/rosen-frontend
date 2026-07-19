@@ -130,6 +130,7 @@ const DESKTOP_ASSETS = [
   'DesktopEntityPanel.js',
   'DesktopDissertationPanel.js',
   'DesktopAnalyticsPanel.js',
+  'DesktopStartPanel.js',
   'desktopRegistry.js',
   'desktopWindowState.js',
   'desktop.css'

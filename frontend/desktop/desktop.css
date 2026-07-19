@@ -993,6 +993,88 @@
   padding: 1rem;
 }
 
+.desktop-guided-panel {
+  min-height: 616px;
+  max-height: calc(100vh - 210px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: #211e1a;
+  background: #fdfbf7;
+  scrollbar-gutter: stable;
+}
+
+.desktop-guided-panel button.text-white {
+  color: #fff;
+}
+
+.desktop-mobile-page-title {
+  display: none;
+}
+
+.desktop-adapter-toolbar {
+  position: sticky;
+  z-index: 8;
+  top: 0;
+  display: flex;
+  min-height: 54px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.35rem 0.55rem 0.35rem 0.8rem;
+  border-bottom: 1px solid #918a7e;
+  background: #e8e2d7;
+  box-shadow: 0 2px 0 rgba(71, 66, 59, 0.16);
+}
+
+.desktop-adapter-toolbar > span,
+.desktop-adapter-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.desktop-adapter-toolbar > span {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.desktop-adapter-toolbar svg {
+  width: 17px;
+  height: 17px;
+}
+
+.desktop-adapter-toolbar button {
+  min-height: 44px;
+  padding: 0.45rem 0.65rem;
+  border: 2px solid #716d64;
+  border-top-color: #fffef9;
+  border-left-color: #fffef9;
+  background: #f7f3eb;
+  color: #243d63;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.desktop-adapter-toolbar button:focus-visible,
+.desktop-guided-panel button:focus-visible,
+.desktop-guided-panel a:focus-visible {
+  outline: 3px solid #9b6b00;
+  outline-offset: 2px;
+}
+
+.desktop-findings-content {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: clamp(1.25rem, 3vw, 2.5rem) clamp(1rem, 3vw, 2rem) 0;
+}
+
+.desktop-start-here-embedded {
+  min-height: 0;
+}
+
 .desktop-live-status {
   position: fixed;
   width: 1px;
@@ -1369,6 +1451,18 @@
     min-height: 100svh;
   }
 
+  .desktop-mobile-page-title {
+    position: absolute;
+    display: block;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
   .desktop-wallpaper-mark {
     right: -0.08em;
     bottom: 0.45em;
@@ -1484,6 +1578,21 @@
 
   .desktop-analytics-content {
     padding: 0.75rem;
+  }
+
+  .desktop-guided-panel {
+    height: calc(100svh - var(--desktop-taskbar-height) - 110px - env(safe-area-inset-bottom, 0px));
+    min-height: inherit;
+    max-height: calc(100svh - var(--desktop-taskbar-height) - 110px - env(safe-area-inset-bottom, 0px));
+  }
+
+  .desktop-adapter-toolbar {
+    align-items: stretch;
+    padding-left: 0.55rem;
+  }
+
+  .desktop-adapter-toolbar > span {
+    align-self: center;
   }
 
   .desktop-sort-control {

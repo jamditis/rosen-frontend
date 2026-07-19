@@ -6,7 +6,10 @@ const APP_SURFACES = new Set(['desktop', 'start']);
 const AVAILABILITY_STATES = new Set(['ready', 'planned', 'blocked']);
 const LAUNCH_KINDS = new Set(['route', 'shell', 'action', 'path']);
 const ROUTE_DESTINATIONS = new Set(Object.values(ROUTES));
-const PATH_DESTINATIONS = new Set(['features/winer-method/']);
+const PATH_DESTINATIONS = new Set([
+  'features/participate/',
+  'features/winer-method/',
+]);
 
 const freezeApp = (app) => Object.freeze({
   ...app,
@@ -43,7 +46,7 @@ export const DESKTOP_APPS = Object.freeze([
     group: 'explore',
     surfaces: ['desktop', 'start'],
     availability: 'ready',
-    launch: { kind: 'route', destination: ROUTES.start },
+    launch: { kind: 'shell', destination: 'start' },
   },
   {
     id: 'entities',
@@ -121,10 +124,9 @@ export const DESKTOP_APPS = Object.freeze([
     description: 'An authored trail through real archive records.',
     icon: 'findings',
     group: 'explore',
-    surfaces: [],
-    availability: 'planned',
-    availabilityNote: 'Add in Phase 4 with approved copy and canonical record links.',
-    launch: null,
+    surfaces: ['start'],
+    availability: 'ready',
+    launch: { kind: 'shell', destination: 'findings' },
   },
   {
     id: 'method',
@@ -142,10 +144,9 @@ export const DESKTOP_APPS = Object.freeze([
     description: 'Approved ways to support and contribute to the archive.',
     icon: 'participate',
     group: 'help',
-    surfaces: [],
-    availability: 'blocked',
-    availabilityNote: 'Issue #347 says DO NOT AUTOMATE and awaits design and scope decisions.',
-    launch: null,
+    surfaces: ['start'],
+    availability: 'ready',
+    launch: { kind: 'path', destination: 'features/participate/' },
   },
   {
     id: 'making-of',

@@ -17,7 +17,7 @@ describe('desktop route wiring', () => {
   it('does not fetch archive data for a cold desktop home deep link', () => {
     const app = read('frontend/App.js');
     assert.match(app, /NON_RECORD_ROUTES\s*=\s*new Set\([\s\S]*ROUTES\.desktop/);
-    assert.match(app, /DESKTOP_RECORD_APPS\s*=\s*new Set\(\['archive', 'folders', 'entities'\]\)/);
+    assert.match(app, /DESKTOP_RECORD_APPS\s*=\s*new Set\(\['archive', 'folders', 'entities', 'start', 'findings'\]\)/);
     assert.match(app, /NON_RECORD_ROUTES\.has\(currentRoute\)\s*&&\s*!desktopNeedsRecords\) return/);
   });
 
@@ -45,6 +45,8 @@ describe('desktop route wiring', () => {
     const audit = read('scripts/preview-audit.js');
     assert.match(audit, /slug: 'archive-desktop',\s+url: '\/#desktop'/);
     assert.match(audit, /slug: 'desktop-archive',\s+url: '\/#desktop\/archive'/);
+    assert.match(audit, /slug: 'desktop-start',\s+url: '\/#desktop\/start'/);
+    assert.match(audit, /slug: 'desktop-findings',\s+url: '\/#desktop\/findings'/);
     assert.match(audit, /slug: 'desktop-entities',\s+url: '\/#desktop\/entities'/);
     assert.match(audit, /slug: 'desktop-dissertation',\s+url: '\/#desktop\/dissertation'/);
     assert.match(audit, /slug: 'desktop-analytics',\s+url: '\/#desktop\/analytics'/);
@@ -162,6 +164,32 @@ describe('desktop research adapters', () => {
     assert.match(map, /e\.key === 'Enter' \|\| e\.key === ' '/);
     assert.match(map, /role="region"/);
     assert.doesNotMatch(map, /role="application"/);
+  });
+});
+
+describe('desktop guided-path adapter', () => {
+  it('reuses the canonical Start here component and exported selected-record trail', () => {
+    const app = read('frontend/App.js');
+    const startPage = read('frontend/components/StartHerePage.js');
+    const panel = read('frontend/desktop/DesktopStartPanel.js');
+
+    assert.match(startPage, /export const SelectedFindings/);
+    assert.match(startPage, /embedded\s*=\s*false/);
+    assert.match(panel, /<\$\{StartHerePage\}[\s\S]*embedded=\$\{true\}/);
+    assert.match(panel, /<\$\{SelectedFindings\}/);
+    assert.match(app, /startView=\$\{desktopStartView\}/);
+    assert.match(app, /records,\s*\n\s*onNavigate:\s*handleDesktopGuideNavigate/);
+  });
+
+  it('keeps guide navigation in shell and opens records in the canonical overlay', () => {
+    const app = read('frontend/App.js');
+    const panel = read('frontend/desktop/DesktopStartPanel.js');
+
+    assert.match(app, /DESKTOP_GUIDED_SHELL_DESTINATIONS\.has\(destination\)[\s\S]*navigateToDesktop\(destination\)/);
+    assert.match(app, /onSelectRecord:\s*selectRecord/);
+    assert.match(app, /desktopActiveNeedsRecords \? recordView : null/);
+    assert.match(panel, /onOpenStandard/);
+    assert.match(panel, /onOpenBugReport=\$\{onOpenBugReport\}/);
   });
 });
 
