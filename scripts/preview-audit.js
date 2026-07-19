@@ -626,11 +626,20 @@ async function main() {
       for (const viewport of VIEWPORTS) {
         for (const route of ROUTES) {
           console.log(`  ${viewport.name.padEnd(8)} ${route.url}`);
+          const pageErrors = [];
+          const capturePageError = (error) => pageErrors.push(error.message || String(error));
+          page.on('pageerror', capturePageError);
           try {
-            rows.push(await auditOne(page, route, viewport));
+            const row = await auditOne(page, route, viewport);
+            if (pageErrors.length > 0) {
+              throw new Error(`Unhandled page errors: ${JSON.stringify(pageErrors)}`);
+            }
+            rows.push(row);
           } catch (err) {
             console.error(`  FAILED ${viewport.name} ${route.url}: ${err.message}`);
             rows.push({ route: route.slug, url: route.url, viewport: viewport.name, violations: [{ id: 'audit-error', impact: 'critical', help: err.message, helpUrl: '', nodes: 0, sample: '' }], passes: 0, incomplete: 0 });
+          } finally {
+            page.off('pageerror', capturePageError);
           }
         }
       }

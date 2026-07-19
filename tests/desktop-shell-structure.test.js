@@ -116,6 +116,8 @@ describe('desktop route wiring', () => {
     assert.match(audit, /undersized desktop targets/);
     assert.match(audit, /desktopOverflow[\s\S]*overflowed the viewport by/,
       'every rendered desktop row must fail on horizontal page overflow');
+    assert.match(audit, /page\.on\('pageerror', capturePageError\)[\s\S]*Unhandled page errors:[\s\S]*page\.off\('pageerror', capturePageError\)/,
+      'each audit row must fail on unhandled JavaScript errors without leaking listeners');
     assert.match(audit, /slug: 'desktop-windowing'[\s\S]*desktopLayout:[\s\S]*zOrder/);
     assert.match(audit, /name: 'mobile',\s+width: 375,\s+height: 812/);
     assert.match(audit, /name: 'tablet',\s+width: 768,\s+height: 1024/);
