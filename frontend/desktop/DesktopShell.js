@@ -324,6 +324,9 @@ const DesktopShell = ({
 
   const handleShortcutKeyDown = (event, app, index) => {
     const columns = 2;
+    const lastIndex = shortcutApps.length - 1;
+    const rowStart = Math.floor(index / columns) * columns;
+    const rowEnd = Math.min(rowStart + columns - 1, lastIndex);
     let nextIndex = index;
 
     if (event.key === 'Enter' || event.key === ' ') {
@@ -331,12 +334,12 @@ const DesktopShell = ({
       openApp(app);
       return;
     }
-    if (event.key === 'ArrowLeft') nextIndex = index - 1;
-    else if (event.key === 'ArrowRight') nextIndex = index + 1;
-    else if (event.key === 'ArrowUp') nextIndex = index - columns;
-    else if (event.key === 'ArrowDown') nextIndex = index + columns;
+    if (event.key === 'ArrowLeft') nextIndex = Math.max(rowStart, index - 1);
+    else if (event.key === 'ArrowRight') nextIndex = Math.min(rowEnd, index + 1);
+    else if (event.key === 'ArrowUp') nextIndex = index - columns >= 0 ? index - columns : index;
+    else if (event.key === 'ArrowDown') nextIndex = index + columns <= lastIndex ? index + columns : index;
     else if (event.key === 'Home') nextIndex = 0;
-    else if (event.key === 'End') nextIndex = shortcutApps.length - 1;
+    else if (event.key === 'End') nextIndex = lastIndex;
     else return;
 
     event.preventDefault();

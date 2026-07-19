@@ -114,7 +114,7 @@ Rendering maps semantic icon keys to the existing Lucide icon components. Regist
 
 ### Desktop and tablet
 
-- A two-column shortcut field uses one roving tab stop. Arrow keys move by row or column; Home and End jump to the bounds; Enter and Space activate.
+- A two-column shortcut field uses one roving tab stop. Arrow keys move by visible row or column and stop at spatial edges rather than jumping diagonally; Home and End jump to the bounds; Enter and Space activate.
 - Live app windows remain concurrently open in a deterministic cascade. Each is a labelled non-modal region, not a dialog, and none hides the shortcut field or background windows from assistive technology.
 - Activating a taskbar window raises it, updates the URL, and exposes a visible textual Active marker in addition to the title-bar treatment. Keyboard focus entering a background window raises it without moving focus away from the chosen control.
 - Minimize, restore, and close are ordinary 44-pixel buttons. Minimizing or closing the active window selects the next visible window; minimized task buttons include a textual state label.

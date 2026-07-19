@@ -98,6 +98,10 @@ describe('desktop route wiring', () => {
       'the Start audit proves Tab exits do not strand focus in an unmounted menu');
     assert.match(audit, /assertArchiveRootReturn\([\s\S]*'Method return'/,
       'the Start path round-trip keeps the JavaScript launcher and explicit exit live');
+    assert.match(shell, /rowStart = Math\.floor\(index \/ columns\) \* columns[\s\S]*Math\.min\(rowEnd, index \+ 1\)[\s\S]*index \+ columns <= lastIndex/,
+      'shortcut arrows must follow the visible row and column instead of jumping diagonally at edges');
+    assert.match(audit, /'Right edge of the first desktop row'[\s\S]*'Left edge of the second desktop row'[\s\S]*'Bottom edge of the desktop shortcut column'/,
+      'the rendered shortcut audit must pin spatial edge behavior');
     assert.match(audit, /'Desktop home after method browser Back'/,
       'browser Back must reconstruct the desktop home with the popup closed');
     assert.match(audit, /'About heading after Start navigation'/,

@@ -281,6 +281,25 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     await page.waitForTimeout(100);
   }
   if (route.verifyStartPathRoundTrip) {
+    const shortcuts = page.locator('.desktop-shortcut');
+    await shortcuts.nth(0).focus();
+    await page.keyboard.press('ArrowRight');
+    await assertFocused(shortcuts.nth(1), 'Right shortcut in the first desktop row');
+    await page.keyboard.press('ArrowRight');
+    await assertFocused(shortcuts.nth(1), 'Right edge of the first desktop row');
+    await page.keyboard.press('ArrowDown');
+    await assertFocused(shortcuts.nth(3), 'Shortcut below Folders');
+    await page.keyboard.press('ArrowLeft');
+    await assertFocused(shortcuts.nth(2), 'Left shortcut in the second desktop row');
+    await page.keyboard.press('ArrowLeft');
+    await assertFocused(shortcuts.nth(2), 'Left edge of the second desktop row');
+    await page.keyboard.press('End');
+    await assertFocused(shortcuts.last(), 'Last desktop shortcut');
+    await page.keyboard.press('ArrowDown');
+    await assertFocused(shortcuts.last(), 'Bottom edge of the desktop shortcut column');
+    await page.keyboard.press('Home');
+    await assertFocused(shortcuts.first(), 'First desktop shortcut after Home');
+
     const startButton = page.getByRole('button', { name: 'Start', exact: true });
     const startMenu = page.getByRole('menu', { name: 'Archive desktop Start menu' });
     await startButton.click();
