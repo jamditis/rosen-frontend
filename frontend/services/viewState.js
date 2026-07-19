@@ -1,9 +1,10 @@
 // Pure URL <-> view-state serialisation for the archive SPA.
 //
 // "View state" is the user's actual mental model of "where am I": the route,
-// the active filters, and the selected record. Today that state is split
-// across router.js (hash route + ?record) and App.js (filter useState), so a
-// reload loses the filters and a shared URL only carries the route.
+// route-specific context such as a selected entity, the active filters, and
+// the selected record. Today that state is split across router.js (hash route
+// plus query context) and App.js (filter/selection state), so this helper keeps
+// reloads and shared URLs from losing meaningful context.
 //
 // This module is the single serialisation helper called for in issue #133.
 // It is deliberately pure: no React, no reads or writes of window.location.
@@ -44,6 +45,7 @@ const PARAM = {
   categories: 'cat',
   publication: 'pub',
   record: 'record',
+  entity: 'entity',
 };
 
 /**
@@ -93,6 +95,12 @@ export function parseViewState(href) {
     : {};
 
   const params = url.searchParams;
+  const entityId = params.get(PARAM.entity);
+  const isEntityRoute = route === ROUTES.entities
+    || (route === ROUTES.desktop && routeParams.desktopAppId === 'entities');
+  if (isEntityRoute && /^[A-Za-z0-9_.:-]+$/.test(entityId || '')) {
+    routeParams.entityId = entityId;
+  }
   const filters = defaultFilters();
 
   const search = params.get(PARAM.search);
@@ -161,9 +169,15 @@ export function viewStateToUrl(viewState, baseHref) {
     params.set(PARAM.record, viewState.selectedRecord);
   }
 
-  url.search = params.toString();
   const wikiSlug = viewState.routeParams?.wikiSlug;
   const desktopAppId = viewState.routeParams?.desktopAppId;
+  const entityId = viewState.routeParams?.entityId;
+  const isEntityRoute = route === ROUTES.entities
+    || (route === ROUTES.desktop && desktopAppId === 'entities');
+  if (isEntityRoute && /^[A-Za-z0-9_.:-]+$/.test(entityId || '')) {
+    params.set(PARAM.entity, entityId);
+  }
+  url.search = params.toString();
   url.hash = route === DEFAULT_ROUTE ? ''
     : route === ROUTES.wiki && wikiSlug ? wikiPageHref(wikiSlug).slice(1)
     : route === ROUTES.desktop && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(desktopAppId || '')

@@ -24,6 +24,7 @@ export default function RecordView({
   onNext,
   onPrev,
   onSelectRecord,
+  onSelectEntity,
   onFilterCategory,
   onFilterSearch,
 }) {
@@ -46,6 +47,7 @@ export default function RecordView({
       onNext=${onNext}
       onPrev=${onPrev}
       onSelectRecord=${onSelectRecord}
+      onSelectEntity=${onSelectEntity}
       onFilterCategory=${onFilterCategory}
       onFilterSearch=${onFilterSearch}
       hasPrev=${hasPrev}

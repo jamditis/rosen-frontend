@@ -24,7 +24,14 @@ const TYPE_CONFIG = Object.fromEntries(
   ])
 );
 
-const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
+const EntityBrowser = ({
+  records,
+  queryActive,
+  onSelectRecord,
+  selectedEntityId = null,
+  onSelectEntity,
+  embedded = false,
+}) => {
   const [entities, setEntities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
@@ -119,27 +126,23 @@ const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
 
   const closeEntityDetails = useCallback(() => {
     const opener = entityOpenerRef.current;
+    const selectedId = selectedEntity?.id;
     setSelectedEntity(null);
     setEntityRecords([]);
     setCoOccurring([]);
     entityOpenerRef.current = null;
     requestAnimationFrame(() => {
+      const fallback = selectedId
+        ? document.querySelector(`[data-entity-id="${selectedId}"]`)
+        : null;
       if (opener?.isConnected) opener.focus();
+      else if (fallback?.isConnected) fallback.focus();
+      else document.getElementById('entity-search')?.focus();
     });
-  }, []);
+    onSelectEntity?.(null);
+  }, [selectedEntity?.id, onSelectEntity]);
 
-  // When an entity is selected, find its records and co-occurring entities.
-  // Keep the stable list opener while following co-occurrence links inside the
-  // detail panel, so closing the research path has somewhere useful to return.
-  const handleEntitySelect = useCallback((entity, opener = null) => {
-    if (selectedEntity && selectedEntity.id === entity.id) {
-      closeEntityDetails();
-      return;
-    }
-
-    if (opener && !opener.closest('[data-entity-detail]')) {
-      entityOpenerRef.current = opener;
-    }
+  const showEntityDetails = useCallback((entity) => {
     setSelectedEntity(entity);
 
     // Find records that mention this entity
@@ -165,15 +168,52 @@ const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
 
     const coEntities = Object.entries(coEntityCounts)
       .map(([eid, count]) => {
-        const e = scopedEntityById.get(eid);
-        return e ? { ...e, coCount: count } : null;
+        const coEntity = scopedEntityById.get(eid);
+        return coEntity ? { ...coEntity, coCount: count } : null;
       })
       .filter(Boolean)
       .sort((a, b) => b.coCount - a.coCount)
       .slice(0, 20);
 
     setCoOccurring(coEntities);
-  }, [selectedEntity, records, queryActive, recordEntityMap, recordIdsByEntity, scopedEntityById, closeEntityDetails]);
+  }, [records, queryActive, recordEntityMap, recordIdsByEntity, scopedEntityById]);
+
+  // When an entity is selected, find its records and co-occurring entities.
+  // Keep the stable list opener while following co-occurrence links inside the
+  // detail panel, so closing the research path has somewhere useful to return.
+  const handleEntitySelect = useCallback((entity, opener = null) => {
+    if (selectedEntity && selectedEntity.id === entity.id) {
+      closeEntityDetails();
+      return;
+    }
+
+    if (opener && !opener.closest('[data-entity-detail]')) {
+      entityOpenerRef.current = opener;
+    }
+    showEntityDetails(entity);
+    onSelectEntity?.(entity.id);
+  }, [selectedEntity, closeEntityDetails, showEntityDetails, onSelectEntity]);
+
+  useEffect(() => {
+    if (selectedEntityId === selectedEntity?.id) return;
+    if (!selectedEntityId) {
+      if (selectedEntity) {
+        entityOpenerRef.current = null;
+        setSelectedEntity(null);
+        setEntityRecords([]);
+        setCoOccurring([]);
+      }
+      return;
+    }
+
+    const entity = scopedEntityById.get(selectedEntityId);
+    if (entity) {
+      entityOpenerRef.current = null;
+      showEntityDetails(entity);
+    } else if (!loading) {
+      onSelectEntity?.(null);
+    }
+  }, [selectedEntityId, selectedEntity?.id, scopedEntityById, showEntityDetails, loading, onSelectEntity]);
 
   useEffect(() => {
     if (!selectedEntity) return undefined;
@@ -181,8 +221,17 @@ const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
     // Moving focus makes that new context immediate for keyboard and screen-
     // reader users, and scrolls it into view for touch users who selected a
     // card near the top of a list that can contain hundreds of entities.
-    const frame = requestAnimationFrame(() => detailHeadingRef.current?.focus());
-    return () => cancelAnimationFrame(frame);
+    let focusFrame = null;
+    const layoutFrame = requestAnimationFrame(() => {
+      // DesktopShell first announces/focuses the newly active window. Enter
+      // the selected content on the following paint so a deep link or Forward
+      // traversal does not finish on chrome instead of the requested entity.
+      focusFrame = requestAnimationFrame(() => detailHeadingRef.current?.focus());
+    });
+    return () => {
+      cancelAnimationFrame(layoutFrame);
+      if (focusFrame !== null) cancelAnimationFrame(focusFrame);
+    };
   }, [selectedEntity?.id]);
 
   if (loading) {
@@ -220,6 +269,8 @@ const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
   const selConfig = selectedEntity
     ? (TYPE_CONFIG[selectedEntity.type] || TYPE_CONFIG.Concept)
     : null;
+  const DetailHeading = embedded ? 'h3' : 'h2';
+  const DetailSectionHeading = embedded ? 'h4' : 'h3';
 
   return html`
     <div className="flex flex-col gap-6">
@@ -319,6 +370,7 @@ const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
                 <button
                   type="button"
                   key=${entity.id}
+                  data-entity-id=${entity.id}
                   onClick=${(event) => handleEntitySelect(entity, event.currentTarget)}
                   aria-expanded=${Boolean(isSelected)}
                   aria-controls=${isSelected ? 'entity-detail-panel' : undefined}
@@ -417,14 +469,14 @@ const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
                     <${X} className="w-4 h-4" aria-hidden="true" />
                   </button>
                 </div>
-                <h3
+                <${DetailHeading}
                   id="entity-detail-title"
                   ref=${detailHeadingRef}
                   tabIndex="-1"
                   className="entity-detail-heading font-display font-bold text-lg text-stone-900 mt-2"
                 >
                   ${selectedEntity.name}
-                </h3>
+                <//>
                 ${selectedEntity.role && selectedEntity.role !== 'None' && html`
                   <p className="text-sm text-stone-600 font-body mt-1">${selectedEntity.role}</p>
                 `}
@@ -436,9 +488,9 @@ const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
 
               <!-- Records mentioning this entity -->
               <div className="p-4 border-b border-stone-100">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-stone-600 mb-3">
+                <${DetailSectionHeading} className="text-xs font-bold uppercase tracking-wider text-stone-600 mb-3">
                   Records (${entityRecords.length})
-                </h4>
+                <//>
                 <div className="space-y-2 max-h-64 overflow-y-auto" tabIndex="0" aria-label="Records mentioning this entity">
                   ${entityRecords.slice(0, 20).map(record => html`
                     <button
@@ -466,9 +518,9 @@ const EntityBrowser = ({ records, queryActive, onSelectRecord }) => {
               <!-- Co-occurring entities -->
               ${coOccurring.length > 0 && html`
                 <div className="p-4">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-stone-600 mb-3">
+                  <${DetailSectionHeading} className="text-xs font-bold uppercase tracking-wider text-stone-600 mb-3">
                     Often appears with
-                  </h4>
+                  <//>
                   <div className="space-y-1.5">
                     ${coOccurring.slice(0, 15).map(coEntity => {
                       const coConfig = TYPE_CONFIG[coEntity.type] || TYPE_CONFIG.Concept;

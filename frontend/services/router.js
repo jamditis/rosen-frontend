@@ -30,14 +30,27 @@ export function getDesktopAppIdFromUrl() {
 }
 
 /**
- * Navigate to a route by updating the hash.
- * Optionally sets a ?record=ID query parameter.
+ * Read the optional selected entity from a canonical entity route.
  */
-export function navigateTo(route, recordId) {
+export function getEntityIdFromUrl() {
+  return parseViewState(window.location.href).routeParams.entityId || null;
+}
+
+/**
+ * Navigate to a route by updating the hash.
+ * Optionally sets a ?record=ID query parameter and canonical entity context.
+ */
+export function navigateTo(route, recordId, entityId) {
   const url = new URL(window.location.href);
 
   // Clean up legacy query params
   url.searchParams.delete('view');
+  if (route === ROUTES.entities && entityId !== undefined) {
+    if (/^[A-Za-z0-9_.:-]+$/.test(entityId || '')) url.searchParams.set('entity', entityId);
+    else url.searchParams.delete('entity');
+  } else if (route !== ROUTES.entities) {
+    url.searchParams.delete('entity');
+  }
 
   setRecordParam(url.searchParams, recordId);
 
@@ -49,7 +62,7 @@ export function navigateTo(route, recordId) {
 /**
  * Navigate within the desktop shell while keeping the app id in the hash.
  */
-export function navigateToDesktop(appId = null) {
+export function navigateToDesktop(appId = null, entityId) {
   if (appId !== null && (
     typeof appId !== 'string' || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(appId)
   )) {
@@ -58,6 +71,12 @@ export function navigateToDesktop(appId = null) {
 
   const url = new URL(window.location.href);
   url.searchParams.delete('view');
+  if (appId === 'entities' && entityId !== undefined) {
+    if (/^[A-Za-z0-9_.:-]+$/.test(entityId || '')) url.searchParams.set('entity', entityId);
+    else url.searchParams.delete('entity');
+  } else if (appId !== 'entities') {
+    url.searchParams.delete('entity');
+  }
   setRecordParam(url.searchParams, null);
   url.hash = appId ? `${ROUTES.desktop}/${appId}` : ROUTES.desktop;
   window.history.pushState({}, '', url);

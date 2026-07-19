@@ -107,6 +107,19 @@ describe('parseViewState', () => {
     assert.strictEqual(parseViewState(`${BASE}?record=RECORD-00123`).selectedRecord, 'RECORD-00123');
   });
 
+  it('parses a selected entity only on canonical entity routes', () => {
+    assert.deepEqual(
+      parseViewState(`${BASE}?entity=P0001#entities`).routeParams,
+      { entityId: 'P0001' },
+    );
+    assert.deepEqual(
+      parseViewState(`${BASE}?entity=C0001#desktop/entities`).routeParams,
+      { desktopAppId: 'entities', entityId: 'C0001' },
+    );
+    assert.deepEqual(parseViewState(`${BASE}?entity=C0001#about`).routeParams, {});
+    assert.deepEqual(parseViewState(`${BASE}?entity=not%20safe#entities`).routeParams, {});
+  });
+
   it('strips a stray ?suffix from the hash defensively', () => {
     assert.strictEqual(parseViewState(`${BASE}#about?stale=1`).route, ROUTES.about);
   });
@@ -134,6 +147,24 @@ describe('viewStateToUrl', () => {
     assert.strictEqual(
       viewStateToUrl({ route: ROUTES.desktop, routeParams: { desktopAppId: 'readme' } }, BASE),
       `${BASE}#desktop/readme`
+    );
+  });
+
+  it('emits selected entities only for canonical entity routes', () => {
+    assert.strictEqual(
+      viewStateToUrl({ route: ROUTES.entities, routeParams: { entityId: 'P0001' } }, BASE),
+      `${BASE}?entity=P0001#entities`,
+    );
+    assert.strictEqual(
+      viewStateToUrl({
+        route: ROUTES.desktop,
+        routeParams: { desktopAppId: 'entities', entityId: 'C0001' },
+      }, BASE),
+      `${BASE}?entity=C0001#desktop/entities`,
+    );
+    assert.strictEqual(
+      viewStateToUrl({ route: ROUTES.about, routeParams: { entityId: 'C0001' } }, BASE),
+      `${BASE}#about`,
     );
   });
 
@@ -205,6 +236,12 @@ describe('round-trip', () => {
     'desktop tool window': {
       route: ROUTES.desktop,
       routeParams: { desktopAppId: 'tools' },
+      filters: defaultFilters(),
+      selectedRecord: null,
+    },
+    'desktop selected entity': {
+      route: ROUTES.desktop,
+      routeParams: { desktopAppId: 'entities', entityId: 'C0001' },
       filters: defaultFilters(),
       selectedRecord: null,
     },

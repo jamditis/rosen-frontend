@@ -545,6 +545,8 @@ const DesktopShell = ({
         'Connected records are unavailable.',
       )}
       onSelectRecord=${entityView.onSelectRecord}
+      selectedEntityId=${entityView.selectedEntityId}
+      onSelectEntity=${entityView.onSelectEntity}
       onOpenStandard=${entityView.onOpenStandard}
     />
   `;

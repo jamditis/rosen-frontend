@@ -6,6 +6,8 @@ const DesktopEntityPanel = ({
   queryActive,
   dataStatus = null,
   onSelectRecord,
+  selectedEntityId,
+  onSelectEntity,
   onOpenStandard,
 }) => html`
   <div className="desktop-entity-panel">
@@ -27,6 +29,9 @@ const DesktopEntityPanel = ({
         records=${records}
         queryActive=${queryActive}
         onSelectRecord=${onSelectRecord}
+        selectedEntityId=${selectedEntityId}
+        onSelectEntity=${onSelectEntity}
+        embedded=${true}
       />
     </div>
   </div>

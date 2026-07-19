@@ -6,7 +6,7 @@ import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } fr
 import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.7.5';
 import { withViewTransition } from './utils/viewTransition.js?v=3.7.5';
 import { ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.7.5';
-import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.7.5';
+import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.7.5';
 import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.7.5';
 import { setRecordParam } from './utils/recordDeepLink.js?v=3.7.5';
 import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.7.5';
@@ -118,6 +118,7 @@ const App = () => {
   // param instead of deleting it; the [records] effect then validates the id
   // once the archive data finishes loading (clearing it if no record matches).
   const [selectedRecordId, setSelectedRecordId] = useState(() => getRecordIdFromUrl());
+  const [selectedEntityId, setSelectedEntityId] = useState(() => getEntityIdFromUrl());
   const [toolsModalOpen, setToolsModalOpen] = useState(false);
   const [bugReportOpen, setBugReportOpen] = useState(false);
   const [bugReportIntent, setBugReportIntent] = useState('problem');
@@ -158,6 +159,7 @@ const App = () => {
       const route = getCurrentRoute();
       setCurrentRoute(route);
       setDesktopAppId(getDesktopAppIdFromUrl());
+      setSelectedEntityId(getEntityIdFromUrl());
 
       // Desktop filters replace the current history entry as their readable
       // query string changes. Back/Forward must therefore restore those
@@ -208,7 +210,10 @@ const App = () => {
     if (!desktopActiveNeedsRecords) return;
     const nextUrl = viewStateToUrl({
       route: ROUTES.desktop,
-      routeParams: { desktopAppId },
+      routeParams: {
+        desktopAppId,
+        ...(desktopAppId === 'entities' && selectedEntityId ? { entityId: selectedEntityId } : {}),
+      },
       filters,
       selectedRecord: selectedRecordId,
     }, window.location.href);
@@ -217,7 +222,23 @@ const App = () => {
     } catch {
       console.warn('Desktop view-state update blocked');
     }
-  }, [desktopActiveNeedsRecords, desktopAppId, filters, selectedRecordId]);
+  }, [desktopActiveNeedsRecords, desktopAppId, filters, selectedRecordId, selectedEntityId]);
+
+  useEffect(() => {
+    if (currentRoute !== ROUTES.entities) return;
+    const currentState = parseViewState(window.location.href);
+    const nextUrl = viewStateToUrl({
+      route: ROUTES.entities,
+      routeParams: selectedEntityId ? { entityId: selectedEntityId } : {},
+      filters: currentState.filters,
+      selectedRecord: selectedRecordId,
+    }, window.location.href);
+    try {
+      window.history.replaceState({}, '', nextUrl);
+    } catch {
+      console.warn('Entity view-state update blocked');
+    }
+  }, [currentRoute, selectedEntityId, selectedRecordId]);
 
   // Navigation helpers
   const goTo = useCallback((route) => {
@@ -260,6 +281,12 @@ const App = () => {
     setFilters(prev => ({ ...prev, search: term }));
     if (currentRoute === ROUTES.desktop) navigateToDesktop('archive');
     else navigateTo(ROUTES.archive);
+  }, [currentRoute]);
+
+  const handleRecordEntitySelect = useCallback((entityId) => {
+    setSelectedEntityId(entityId);
+    if (currentRoute === ROUTES.desktop) navigateToDesktop('entities', entityId);
+    else navigateTo(ROUTES.entities, null, entityId);
   }, [currentRoute]);
 
   const handleQueryResults = useCallback((recordIds) => {
@@ -509,6 +536,7 @@ const App = () => {
       onSelectRecord=${selectRecord}
       onFilterCategory=${handleFilterCategory}
       onFilterSearch=${handleFilterSearch}
+      onSelectEntity=${handleRecordEntitySelect}
     />
   `;
 
@@ -554,6 +582,8 @@ const App = () => {
     loading,
     error,
     onSelectRecord: selectRecord,
+    selectedEntityId,
+    onSelectEntity: setSelectedEntityId,
     onOpenStandard: () => goTo(ROUTES.entities),
   };
 
@@ -921,6 +951,8 @@ const App = () => {
                   records=${queryRecords}
                   queryActive=${filters.recordIds !== null}
                   onSelectRecord=${selectRecord}
+                  selectedEntityId=${selectedEntityId}
+                  onSelectEntity=${setSelectedEntityId}
                 />
             `}
 

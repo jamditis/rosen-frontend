@@ -40,11 +40,12 @@ const TagGroup = ({title, tags, onClick}) => {
     `;
 }
 
-const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSelectRecord, onFilterCategory, onFilterSearch, hasPrev, hasNext, currentIndex, total }) => {
+const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSelectRecord, onSelectEntity, onFilterCategory, onFilterSearch, hasPrev, hasNext, currentIndex, total }) => {
   const [isClosing, setIsClosing] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [relatedWorks, setRelatedWorks] = useState([]);
+  const [recordEntities, setRecordEntities] = useState([]);
 
   // State for lazy-loaded details
   const [fullRecord, setFullRecord] = useState(null);
@@ -97,10 +98,17 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
     if (!fullRecord || !allRecords) return;
 
     const findRelated = async () => {
+      setRecordEntities([]);
       // Ensure entity data is loaded
       if (!areEntitiesLoaded()) {
         await fetchEntitiesData();
       }
+
+      setRecordEntities(
+        getEntitiesByRecord(fullRecord.id)
+          .sort((a, b) => (b.prominence || 0) - (a.prominence || 0))
+          .slice(0, 8)
+      );
 
       // Calculate entity-based connections to all other article records
       const connections = [];
@@ -351,6 +359,32 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
               <div className="prose prose-stone max-w-none">
                 <p className="text-lg text-stone-800 leading-relaxed">${linkifyText(displayRecord.summary || displayRecord.summaryPreview || '')}</p>
               </div>
+            `}
+
+            ${onSelectEntity && recordEntities.length > 0 && html`
+              <section className="border-t border-stone-200 pt-8" aria-labelledby="record-entities-title">
+                <h3 id="record-entities-title" className="text-xl font-display font-bold text-stone-900 mb-2">
+                  People and ideas in this record
+                </h3>
+                <p className="mb-4 text-sm text-stone-600">
+                  Continue through the archive's canonical relationship index.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  ${recordEntities.map(entity => html`
+                    <button
+                      type="button"
+                      key=${entity.id}
+                      onClick=${() => leaveRecordFor(onSelectEntity, entity.id)}
+                      className="inline-flex items-center gap-2 rounded border border-stone-300 bg-white px-3 py-2 text-left text-sm text-stone-800 transition-colors hover:border-stone-600 hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-stone-700 focus:ring-offset-2"
+                      style=${{ minHeight: '44px' }}
+                      aria-label=${`Explore ${entity.name} in People and ideas`}
+                    >
+                      <span className="font-bold">${entity.name}</span>
+                      <span className="text-xs uppercase tracking-wide text-stone-500">${entity.type}</span>
+                    </button>
+                  `)}
+                </div>
+              </section>
             `}
 
             ${relatedWorks.length > 0 && html`

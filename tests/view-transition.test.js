@@ -110,6 +110,9 @@ describe('App.js record-modal view transition (#281)', () => {
     assert.match(modalSrc, /const leaveRecordFor = \(action, value\) => \{[\s\S]*?openerRef\.current = null;[\s\S]*?beginClose\(\(\) => action\(value\)\)/);
     assert.match(modalSrc, /onFilterCategory \? \(cat\) => leaveRecordFor\(onFilterCategory, cat\)/);
     assert.match(modalSrc, /onFilterSearch \? \(tag\) => leaveRecordFor\(onFilterSearch, tag\)/);
+    assert.match(modalSrc, /onSelectEntity && recordEntities\.length > 0/);
+    assert.match(modalSrc, /leaveRecordFor\(onSelectEntity, entity\.id\)/);
+    assert.match(src, /handleRecordEntitySelect[\s\S]*navigateToDesktop\('entities', entityId\)[\s\S]*navigateTo\(ROUTES\.entities, null, entityId\)/);
   });
 
   it('does not let history-driven focus return undo a desktop window change', () => {

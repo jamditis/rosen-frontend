@@ -49,11 +49,13 @@ describe('desktop route wiring', () => {
     assert.match(audit, /slug: 'desktop-start',\s+url: '\/#desktop\/start'/);
     assert.match(audit, /slug: 'desktop-findings',\s+url: '\/#desktop\/findings'/);
     assert.match(audit, /slug: 'desktop-entities',\s+url: '\/#desktop\/entities'/);
+    assert.match(audit, /slug: 'desktop-entity-detail',\s+url: '\/\?entity=P0005#desktop\/entities'/);
     assert.match(audit, /slug: 'desktop-dissertation',\s+url: '\/#desktop\/dissertation'/);
     assert.match(audit, /slug: 'desktop-analytics',\s+url: '\/#desktop\/analytics'/);
     assert.match(audit, /slug: 'desktop-readme',\s+url: '\/#desktop\/readme'/);
     assert.match(audit, /slug: 'desktop-tools',\s+url: '\/#desktop\/tools'/);
     assert.match(audit, /slug: 'desktop-record-modal',\s+url: '\/\?record=RECORD-00802#desktop\/archive'/);
+    assert.match(audit, /slug: 'entity-detail',\s+url: '\/\?entity=P0005#entities'/);
     assert.match(audit, /slug: 'desktop-report',[\s\S]*openReport: true/);
     assert.match(audit, /slug: 'dissertation-map-detail',[\s\S]*openDissertationDetail: true/,
       'the shared keyboard-scrollable detail panel stays in the full audit matrix');
@@ -113,10 +115,12 @@ describe('desktop archive adapter', () => {
     const app = read('frontend/App.js');
     assert.match(app, /parseViewState\(window\.location\.href\)\.filters/);
     assert.match(app, /viewStateToUrl\(\{[\s\S]*route:\s*ROUTES\.desktop/);
-    assert.match(app, /routeParams:\s*\{\s*desktopAppId\s*\}/);
+    assert.match(app, /routeParams:\s*\{\s*desktopAppId,[\s\S]*?entityId:\s*selectedEntityId/);
     assert.match(app, /selectedRecord:\s*selectedRecordId/);
     assert.match(app, /event\?\.type === 'popstate'[\s\S]*historicalState = parseViewState\(window\.location\.href\)[\s\S]*setFilters\(\{[\s\S]*\.\.\.DEFAULT_FILTERS,[\s\S]*\.\.\.historicalState\.filters/,
       'Back and Forward must restore the query-backed filters recorded in desktop history');
+    assert.match(app, /desktopAppId === 'entities' && selectedEntityId \? \{ entityId: selectedEntityId \} : \{\}/,
+      'a selected entity must share the canonical desktop view-state URL');
   });
 });
 
@@ -132,6 +136,10 @@ describe('desktop entity adapter', () => {
     assert.match(panel, /\$\{dataStatus\}[\s\S]*?<div className="desktop-entity-browser">/);
     assert.match(app, /desktopActiveNeedsRecords \? recordView : null/,
       'entity records open in the canonical RecordView overlay');
+    assert.match(app, /selectedEntityId,[\s\S]*onSelectEntity:\s*setSelectedEntityId/);
+    assert.match(panel, /selectedEntityId=\$\{selectedEntityId\}/);
+    assert.match(panel, /onSelectEntity=\$\{onSelectEntity\}/);
+    assert.match(panel, /embedded=\$\{true\}/);
   });
 
   it('does not fetch or copy entity and archive data inside desktop modules', () => {
@@ -164,9 +172,13 @@ describe('desktop entity adapter', () => {
     assert.match(css, /\.entity-detail-heading:focus-visible\s*\{[\s\S]*outline:\s*3px solid/);
     assert.match(css, /@media \(min-width: 1024px\)[\s\S]*\.entity-browser-list\s*\{\s*order:\s*1[\s\S]*\.entity-browser-detail\s*\{\s*order:\s*2/);
     assert.match(browser, /role="region"[\s\S]*aria-labelledby="entity-detail-title"/);
-    assert.match(browser, /detailHeadingRef\.current\?\.focus\(\)/);
+    assert.match(browser, /const DetailHeading = embedded \? 'h3' : 'h2'/);
+    assert.match(browser, /const DetailSectionHeading = embedded \? 'h4' : 'h3'/);
+    assert.match(browser, /layoutFrame = requestAnimationFrame[\s\S]*focusFrame = requestAnimationFrame\(\(\) => detailHeadingRef\.current\?\.focus\(\)\)/);
     assert.match(browser, /if \(event\.key !== 'Escape'\) return;/);
     assert.match(browser, /if \(opener\?\.isConnected\) opener\.focus\(\)/);
+    assert.match(browser, /data-entity-id=\$\{entity\.id\}/);
+    assert.match(browser, /else if \(fallback\?\.isConnected\) fallback\.focus\(\)/);
     assert.match(browser, /!opener\.closest\('\[data-entity-detail\]'\)/);
   });
 });
