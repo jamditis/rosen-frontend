@@ -185,17 +185,31 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
     return () => cancelAnimationFrame(frame);
   }, [isOpen]);
 
-  const handleClose = () => {
+  const completeClose = (afterClose = null) => {
+    onClose();
+    setIsClosing(false);
+    afterClose?.();
+  };
+
+  const beginClose = (afterClose = null) => {
     const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     if (reduceMotion) {
-      onClose();
+      completeClose(afterClose);
       return;
     }
     setIsClosing(true);
-    setTimeout(() => {
-      onClose();
-      setIsClosing(false);
-    }, 300);
+    setTimeout(() => completeClose(afterClose), 300);
+  };
+
+  const handleClose = () => beginClose();
+
+  const leaveRecordFor = (action, value) => {
+    // This action intentionally activates a different archive surface. Do not
+    // return focus to the record opener in the now-background source window:
+    // DesktopShell correctly treats that focus as window activation and would
+    // otherwise undo the requested navigation after the close delay.
+    openerRef.current = null;
+    beginClose(() => action(value));
   };
 
   const showNotification = (msg) => {
@@ -372,9 +386,9 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
             <hr className="my-8 border-stone-200" />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-               <${TagGroup} title="Thematic categories" tags=${displayRecord.categories} onClick=${onFilterCategory ? (cat) => { handleClose(); onFilterCategory(cat); } : undefined} />
-               <${TagGroup} title="Tags" tags=${displayRecord.tags} onClick=${onFilterSearch ? (tag) => { handleClose(); onFilterSearch(tag); } : undefined} />
-               <${TagGroup} title="Key concepts" tags=${displayRecord.concepts} onClick=${onFilterSearch ? (concept) => { handleClose(); onFilterSearch(concept); } : undefined} />
+               <${TagGroup} title="Thematic categories" tags=${displayRecord.categories} onClick=${onFilterCategory ? (cat) => leaveRecordFor(onFilterCategory, cat) : undefined} />
+               <${TagGroup} title="Tags" tags=${displayRecord.tags} onClick=${onFilterSearch ? (tag) => leaveRecordFor(onFilterSearch, tag) : undefined} />
+               <${TagGroup} title="Key concepts" tags=${displayRecord.concepts} onClick=${onFilterSearch ? (concept) => leaveRecordFor(onFilterSearch, concept) : undefined} />
 
                <div>
                   <h5 className="text-xs font-bold uppercase text-stone-400 mb-2">Era</h5>

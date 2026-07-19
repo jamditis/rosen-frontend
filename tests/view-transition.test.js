@@ -103,7 +103,13 @@ describe('App.js record-modal view transition (#281)', () => {
 
   it('does not retain the animated close delay under reduced motion', () => {
     assert.match(modalSrc, /matchMedia\?\.\('\(prefers-reduced-motion: reduce\)'\)\.matches/);
-    assert.match(modalSrc, /if \(reduceMotion\) \{\s*onClose\(\);\s*return;/);
+    assert.match(modalSrc, /if \(reduceMotion\) \{\s*completeClose\(afterClose\);\s*return;/);
+  });
+
+  it('finishes filter navigation after close without reactivating a background opener', () => {
+    assert.match(modalSrc, /const leaveRecordFor = \(action, value\) => \{[\s\S]*?openerRef\.current = null;[\s\S]*?beginClose\(\(\) => action\(value\)\)/);
+    assert.match(modalSrc, /onFilterCategory \? \(cat\) => leaveRecordFor\(onFilterCategory, cat\)/);
+    assert.match(modalSrc, /onFilterSearch \? \(tag\) => leaveRecordFor\(onFilterSearch, tag\)/);
   });
 
   it('disables shared record and detail-panel CSS motion at the source', () => {
