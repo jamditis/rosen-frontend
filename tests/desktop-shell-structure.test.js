@@ -102,6 +102,9 @@ describe('desktop archive adapter', () => {
       'drawer focus waits until the newly visible panel has painted');
     assert.match(panel, /matchMedia\('\(max-width: 1100px\)'\)\.matches/,
       'Escape only closes the filters while they are an overlay drawer');
+    assert.match(panel, /addEventListener\('change', preserveFocusedFilter\)/);
+    assert.match(panel, /event\.matches && filterPanelRef\.current\?\.contains\(document\.activeElement\)[\s\S]*setFilterOpen\(true\)/,
+      'reflow into drawer mode must not hide the currently focused filter');
   });
 
   it('serializes desktop filters and records through the canonical view state', () => {

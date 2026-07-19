@@ -35,6 +35,7 @@ const DesktopArchivePanel = ({
 }) => {
   const [filterOpen, setFilterOpen] = useState(false);
   const resultsRef = useRef(null);
+  const filterPanelRef = useRef(null);
   const filterButtonRef = useRef(null);
 
   useEffect(() => {
@@ -44,15 +45,18 @@ const DesktopArchivePanel = ({
   useEffect(() => {
     if (!filterOpen) return undefined;
     let focusFrame = null;
-    const frame = requestAnimationFrame(() => {
-      // The narrow drawer changes from visibility:hidden in the same commit.
-      // Give that style one painted frame before moving focus into it; a
-      // single requestAnimationFrame can run while the input is still treated
-      // as hidden and silently leave focus on the toggle.
-      focusFrame = requestAnimationFrame(() => {
-        document.getElementById('desktop-archive-search')?.focus();
+    let frame = null;
+    if (!filterPanelRef.current?.contains(document.activeElement)) {
+      frame = requestAnimationFrame(() => {
+        // The narrow drawer changes from visibility:hidden in the same commit.
+        // Give that style one painted frame before moving focus into it; a
+        // single requestAnimationFrame can run while the input is still treated
+        // as hidden and silently leave focus on the toggle.
+        focusFrame = requestAnimationFrame(() => {
+          document.getElementById('desktop-archive-search')?.focus();
+        });
       });
-    });
+    }
     const handleKeyDown = (event) => {
       const drawerActive = !window.matchMedia
         || window.matchMedia('(max-width: 1100px)').matches;
@@ -63,11 +67,23 @@ const DesktopArchivePanel = ({
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => {
-      cancelAnimationFrame(frame);
+      if (frame !== null) cancelAnimationFrame(frame);
       if (focusFrame !== null) cancelAnimationFrame(focusFrame);
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [filterOpen]);
+
+  useEffect(() => {
+    if (!window.matchMedia) return undefined;
+    const drawerQuery = window.matchMedia('(max-width: 1100px)');
+    const preserveFocusedFilter = (event) => {
+      if (event.matches && filterPanelRef.current?.contains(document.activeElement)) {
+        setFilterOpen(true);
+      }
+    };
+    drawerQuery.addEventListener('change', preserveFocusedFilter);
+    return () => drawerQuery.removeEventListener('change', preserveFocusedFilter);
+  }, []);
 
   const closeFilters = () => {
     setFilterOpen(false);
@@ -158,7 +174,7 @@ const DesktopArchivePanel = ({
       </div>
 
       <div className="desktop-archive-layout">
-        <div id="desktop-archive-filter-panel">
+        <div id="desktop-archive-filter-panel" ref=${filterPanelRef}>
           <${Sidebar}
             facets=${facets}
             filters=${filters}
