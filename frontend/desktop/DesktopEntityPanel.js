@@ -1,9 +1,10 @@
-import { html } from '../html.js?v=3.7.8';
-import EntityBrowser from '../components/EntityBrowser.js?v=3.7.8';
+import { html } from '../html.js?v=3.7.9';
+import EntityBrowser from '../components/EntityBrowser.js?v=3.7.9';
 
 const DesktopEntityPanel = ({
   records,
   queryActive,
+  onClearQuery,
   dataStatus = null,
   onSelectRecord,
   selectedEntityId,
@@ -29,6 +30,7 @@ const DesktopEntityPanel = ({
       <${EntityBrowser}
         records=${records}
         queryActive=${queryActive}
+        onClearQuery=${onClearQuery}
         onSelectRecord=${onSelectRecord}
         selectedEntityId=${selectedEntityId}
         onSelectEntity=${onSelectEntity}

@@ -1,11 +1,11 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { html } from '../html.js?v=3.7.8';
+import { html } from '../html.js?v=3.7.9';
 import { Users, Building2, Lightbulb, BookOpen, MapPin, Calendar, Search, ArrowUpDown, ChevronDown, ChevronRight, X, ExternalLink, AlertTriangle, RotateCw } from 'lucide-react';
-import { fetchEntitiesData, getRecordsByEntity } from '../services/archiveService.js?v=3.7.8';
-import { getEntityScope } from '../services/queryComposition.js?v=3.7.8';
-import { COLORS, ENTITY_TYPE_CONFIG } from '../constants.js?v=3.7.8';
-import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.7.8';
+import { fetchEntitiesData, getRecordsByEntity } from '../services/archiveService.js?v=3.7.9';
+import { getEntityScope } from '../services/queryComposition.js?v=3.7.9';
+import { COLORS, ENTITY_TYPE_CONFIG } from '../constants.js?v=3.7.9';
+import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.7.9';
 
 // Add icons to shared config
 const TYPE_ICONS = {
@@ -27,6 +27,7 @@ const TYPE_CONFIG = Object.fromEntries(
 const EntityBrowser = ({
   records,
   queryActive,
+  onClearQuery,
   onSelectRecord,
   selectedEntityId = null,
   onSelectEntity,
@@ -286,6 +287,19 @@ const EntityBrowser = ({
 
   return html`
     <div className="flex flex-col gap-6">
+      ${queryActive && html`
+        <div className="flex flex-col gap-3 border border-amber-300 bg-amber-50 p-4 text-sm text-stone-700 sm:flex-row sm:items-center sm:justify-between" role="status">
+          <p><strong>Query scope:</strong> Counts and connections below are limited to the current query results.</p>
+          <button
+            type="button"
+            onClick=${onClearQuery}
+            className="shrink-0 border border-amber-700 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wider text-amber-900 hover:bg-amber-100"
+          >
+            Clear query results
+          </button>
+        </div>
+      `}
+
       <!-- Type filter chips -->
       <div className="flex flex-wrap gap-2">
         <button
