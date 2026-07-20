@@ -1,9 +1,9 @@
-import { html } from '../html.js?v=3.7.8';
+import { html } from '../html.js?v=3.7.9';
 import { ChevronLeft, ChevronRight, FolderOpen, SearchX } from 'lucide-react';
-import { COLORS } from '../constants.js?v=3.7.8';
-import { hashString } from '../services/archiveService.js?v=3.7.8';
-import { recordNeedsReview } from '../utils/needsReview.js?v=3.7.8';
-import LoadingQuotes from './LoadingQuotes.js?v=3.7.8';
+import { COLORS } from '../constants.js?v=3.7.9';
+import { hashString } from '../services/archiveService.js?v=3.7.9';
+import { recordNeedsReview } from '../utils/needsReview.js?v=3.7.9';
+import LoadingQuotes from './LoadingQuotes.js?v=3.7.9';
 
 const Highlight = ({ text, term }) => {
   if (!term || term.length < 2) return html`<span>${text}</span>`;

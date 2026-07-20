@@ -27,6 +27,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -38,15 +39,13 @@ const deployScriptPath = path.join(rootDir, 'backend', 'scripts', 'deploy_full_s
 // Every *.json under data/, at any depth, as a repo-root-relative posix path
 // (e.g. 'data/archive-core.json', 'data/feeds/index.json'). Recursive so a
 // future asset like data/search/index.json cannot slip past the classification.
-function allDataJsonFiles(dir = dataDir, acc = []) {
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) allDataJsonFiles(full, acc);
-    else if (entry.isFile() && entry.name.endsWith('.json')) {
-      acc.push(path.relative(rootDir, full).split(path.sep).join('/'));
-    }
-  }
-  return acc;
+function allDataJsonFiles() {
+  return execFileSync('git', ['ls-files', '--', 'data'], {
+    cwd: rootDir,
+    encoding: 'utf8',
+  })
+    .split('\n')
+    .filter(rel => rel.endsWith('.json'));
 }
 
 // Extract a Python tuple of string literals named `name` from the deploy script
@@ -110,6 +109,22 @@ function isDeployed(relPath, deployedFiles, deployedDirs) {
 }
 
 describe('deploy data manifest classifies every data file', () => {
+  it('ignores gitignored local scratch JSON', () => {
+    const scratchDir = path.join(dataDir, '_recovery_tmp');
+    const scratchPath = path.join(scratchDir, 'issue-627-local-only.json');
+    fs.mkdirSync(scratchDir, { recursive: true });
+    fs.writeFileSync(scratchPath, '{}');
+    try {
+      assert.equal(
+        allDataJsonFiles().includes('data/_recovery_tmp/issue-627-local-only.json'),
+        false,
+        'gitignored recovery scratch cannot become a deploy-manifest candidate'
+      );
+    } finally {
+      fs.rmSync(scratchPath, { force: true });
+    }
+  });
+
   it('deploys or explicitly excludes every data/**/*.json', () => {
     const deployedFiles = deployedDataFiles();
     const deployedDirs = deployedDataDirs();

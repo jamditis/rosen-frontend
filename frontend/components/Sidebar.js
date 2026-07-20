@@ -1,8 +1,8 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { html } from '../html.js?v=3.7.8';
+import { html } from '../html.js?v=3.7.9';
 import { X, Search, XCircle, ChevronDown, ChevronUp, MessageSquare } from 'lucide-react';
-import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.7.8';
+import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.7.9';
 
 const Sidebar = ({
   facets,
@@ -125,6 +125,20 @@ const Sidebar = ({
               ${filters.era && html` — ${filters.era}`}
               ${filters.type && html` — ${filters.type}`}
               ${filters.recordIds !== null && html`, query results`}
+            </div>
+          `}
+
+          ${filters.recordIds !== null && html`
+            <div className="border border-amber-300 bg-amber-50 p-3 text-xs text-stone-700">
+              <p className="font-bold">Limited to query results</p>
+              <button
+                type="button"
+                onClick=${() => setFilters(prev => ({ ...prev, recordIds: null }))}
+                className="mt-2 inline-flex items-center gap-1 font-bold text-amber-900 underline underline-offset-2 hover:text-stone-900"
+              >
+                <${XCircle} className="h-4 w-4" aria-hidden="true" />
+                Clear query results
+              </button>
             </div>
           `}
 

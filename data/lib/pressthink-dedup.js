@@ -11,8 +11,8 @@
  *
  * The detector keys on the host-independent, "_p"-collapsed path so the two forms
  * of one post land on the same key. It is deliberately URL-based, not title-based:
- * a duplicate can carry a garbled title (RECORD-00607's title and summary are
- * confabulated off the slug), so a title+date match would miss it — the shared
+ * a duplicate can carry a title and summary confabulated from its slug, so a
+ * title+date match would miss it — the shared
  * URL path is the reliable signal.
  *
  * This reports candidate duplicates for a curator to adjudicate. It never deletes
@@ -131,12 +131,7 @@ export function clusterSignature(cluster) {
  * introduces. Resolution (which record to keep) is a curator decision, not here.
  */
 export const CURATOR_PENDING_DUPLICATES = new Set([
-  // "The People Formerly Known As The Audience" (2006-06-27) captured twice:
-  // RECORD-00191 archive.pressthink.org/.../ppl_frmr_p.html (Movable Type) and
-  // RECORD-00607 pressthink.org/.../ppl_frmr.html (WordPress). RECORD-00607's
-  // title ("People Former & Latter") and summary are confabulated off the slug.
-  // Pending curator decision to keep RECORD-00191 — see #469.
-  '2006/06/27/ppl_frmr::RECORD-00191|RECORD-00607',
+  // Empty after executing the curator-approved duplicate removal in #591.
 ]);
 
 /**
