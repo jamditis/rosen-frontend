@@ -9,6 +9,7 @@ row selection and sheet writes can be tested without Google credentials.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import os
@@ -40,6 +41,7 @@ _MARKER_STEM = SMART_CORRECTOR_MARKER.rstrip(":")  # marker text without its col
 # ("Smart Corrector::" -> "Smart Corrector:"), which at a line start forges a note
 # boundary; matching ":+" removes every colon so no marker can survive in the body.
 _MARKER_ECHO_RE = re.compile(re.escape(_MARKER_STEM) + r":+")
+_HANDOFF_TOKEN_RE = re.compile(r"\[HANDOFF_SHA256:([0-9a-f]{64})\]")
 
 
 def resolve_and_validate(url: str):
@@ -200,6 +202,8 @@ def run_corrector(
             "cell_limit": 0,
             "missing_content": 0,
             "needs_transcription": 0,
+            "partial": 0,
+            "youtube_fallback": 0,
         },
     }
 
@@ -227,6 +231,14 @@ def run_corrector(
         is_valid, quality_score, _issues = _validate(
             validator, existing_raw_text, url, content_type
         )
+        # Partial and fallback handoffs deliberately preserve metadata or an
+        # alternate URL in raw_text. Those values are not finished content, even
+        # if a permissive validator accepts them on the next run.
+        if _notes_require_reprocessing(
+            str(record.get("notes", "")), existing_raw_text
+        ):
+            is_valid = False
+            quality_score = 0.0
 
         row_updates: list[tuple[int, Any]] = []
         analysis_text = existing_raw_text
@@ -286,6 +298,54 @@ def run_corrector(
                     operation=f"Source processing for sheet row {row_number}",
                     stats=stats,
                 )
+            result_status = result.get("status") if result else None
+            if result_status == "partial":
+                usable_text = str(result.get("raw_text") or "").strip()
+                updates = [
+                    (
+                        columns["notes"],
+                        _note(
+                            f"[PARTIAL] {_handoff_token(usable_text)} "
+                            "Preserved available metadata; "
+                            "transcript still needed"
+                        ),
+                    )
+                ]
+                if usable_text:
+                    updates.insert(0, (columns["raw_text"], usable_text))
+                    stats["reprocessed"] += 1
+                stats["edge_cases"]["partial"] += 1
+                if result.get("needs_transcription"):
+                    stats["edge_cases"]["needs_transcription"] += 1
+                    stats["errors"] += 1
+                if _write_row(worksheet, row_number, updates, dry_run=dry_run):
+                    stats["processed"] += 1
+                else:
+                    stats["write_errors"] += 1
+                continue
+            if result_status == "youtube_fallback":
+                fallback_url = str(result.get("youtube_url") or "").strip()
+                updates = [
+                    (
+                        columns["notes"],
+                        _note(
+                            f"[YOUTUBE_FALLBACK] {_handoff_token(fallback_url)} "
+                            "Preserved alternate video URL"
+                        ),
+                    )
+                ]
+                if fallback_url:
+                    updates.insert(0, (columns["raw_text"], fallback_url))
+                    stats["reprocessed"] += 1
+                # The alternate URL is a recoverable handoff, not completed
+                # ingestion, so the command must remain non-zero either way.
+                stats["errors"] += 1
+                stats["edge_cases"]["youtube_fallback"] += 1
+                if _write_row(worksheet, row_number, updates, dry_run=dry_run):
+                    stats["processed"] += 1
+                else:
+                    stats["write_errors"] += 1
+                continue
             if result and (
                 result.get("needs_transcription")
                 or result.get("status") == "needs_transcription"
@@ -647,6 +707,26 @@ def _notes_indicate_completion(notes: str) -> bool:
     return not any(marker in status for marker in INCOMPLETE_STATUS_MARKERS)
 
 
+def _handoff_token(text: str) -> str:
+    digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    return f"[HANDOFF_SHA256:{digest}]"
+
+
+def _notes_require_reprocessing(notes: str, raw_text: str) -> bool:
+    """Return whether raw_text is the unchanged machine-preserved handoff."""
+    matches = list(_NOTE_STATUS_BOUNDARY.finditer(notes))
+    if not matches:
+        return False
+    status = notes[matches[-1].end() :]
+    if not any(marker in status for marker in ("[PARTIAL]", "[YOUTUBE_FALLBACK]")):
+        return False
+    token_match = _HANDOFF_TOKEN_RE.search(status)
+    if not token_match:
+        return False
+    current_digest = hashlib.sha256(raw_text.encode("utf-8")).hexdigest()
+    return token_match.group(1) == current_digest
+
+
 def _requested_end_row(rows: str | None) -> int | None:
     spec = (rows or "").strip()
     if spec.startswith(":"):
@@ -879,6 +959,8 @@ def main(
         f"write errors {stats['write_errors']}, "
         f"missing content {stats['edge_cases']['missing_content']}, "
         f"needs transcription {stats['edge_cases']['needs_transcription']}, "
+        f"partial {stats['edge_cases']['partial']}, "
+        f"YouTube fallbacks {stats['edge_cases']['youtube_fallback']}, "
         f"AI fields written {stats['ai_fields_written']}, "
         f"AI unavailable {stats['ai_unavailable']}, "
         f"estimated cost ${stats['estimated_cost']:.4f}."

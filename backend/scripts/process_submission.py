@@ -21,7 +21,7 @@ Behavior (12-step pipeline from the design's "Architecture" diagram):
    2b.  SSRF guard via is_safe_public_url(url)      (reject private/non-http)
     3.  dispatcher.dispatch_url(url)                (scrape, or pasted raw text)
     4.  categorize(...)                             (Gemini; degrade on fail)
-    5.  assign id: keep processor CLIP-/NYT-/WSJ-,  (else next RECORD-NNNNN)
+    5.  assign id: keep processor clipping ids       (else next RECORD-NNNNN)
     6.  enrich_data() + _sanitize_cell()            (mimic Pillar 3; flag review)
     7.  Append to data/archive_records-public.csv   (atomic tmp+rename)
     8.  node data/export-archive-data.js            (regen JSONs)
@@ -102,6 +102,10 @@ extract_entities_and_relationships = _extract_entities
 # archive CSV when the script runs in CI.
 CSV_FILE = _DEFAULT_CSV_FILE
 _STAGED_JSON_FILES = DATA_DEPLOY_JSON_FILES
+CLIPPING_ID_PREFIXES = frozenset({
+    'CLIP', 'NYT', 'WSJ', 'WP', 'LAT', 'CT', 'BG', 'GRD', 'CJR', 'AJR',
+    'EP', 'NR', 'PYN',
+})
 
 # Shown to the submitter (via the sheet error column) when the scraper can't
 # fetch or parse a URL. Some hosts (Medium, paywalled or login-walled pages,
@@ -766,20 +770,20 @@ def process_one(url: str, title: str = '', notes: str = '',
     # the submitter sees the record appear, then carry needs_review=true so a
     # human can vet the AI-generated metadata before it's treated as final.
     #
-    # Force verified True only when no processor set it: enrich_data() above runs
+    # Force verified True when no processor set it, and for clipping-family ids.
+    # OCR processors historically used verified=false to mean "review the OCR",
+    # but the generic needs_review field now carries that signal. Publishing all
+    # fresh clippings through verified=TRUE lets the exporter use one verification
+    # model instead of bypassing the column based on a CLIP- id prefix (#352).
+    # enrich_data() above runs
     # `data.setdefault('verified', False)` (a conservative default for legacy or
     # broken rows), so `scrape.get('verified', True)` would always read back that
     # False and the public exporter — which drops verified=False rows — would
     # silently hide every submission. Article scrapes leave verified unset, so
-    # they publish. A processor's explicit verified value is preserved: the
-    # clipping processor stamps 'false' on every OCR'd PDF as an "OCR needs a
-    # human check" signal, not a hide flag. That clipping still goes
-    # live-but-flagged — the exporter surfaces CLIP- ids via a dedicated
-    # allowance, and needs_review below marks it for the OCR review pass. (For a
-    # non-CLIP record an explicit 'false' does gate it, since the exporter drops
-    # verified=false rows without that allowance.) Unifying the CLIP- allowance
-    # with this verified/needs_review model is tracked in issue #352.
-    if processor_verified is None:
+    # they publish. A processor's explicit verified value remains authoritative
+    # for non-clipping records.
+    clipping_family = record_id.partition('-')[0] in CLIPPING_ID_PREFIXES
+    if processor_verified is None or clipping_family:
         # Write the string 'TRUE', not a Python bool. csv.DictWriter serializes
         # True as the string 'True', but data/export-archive-data.js treats only
         # the exact strings 'TRUE'/'true'/'Yes' (or a real boolean) as verified —

@@ -8,6 +8,7 @@
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 
 // ============================================
 // Re-implement processRecord dependencies
@@ -283,6 +284,15 @@ describe('processRecord: verified field', () => {
   it('uses Verified (capitalized) column name', () => {
     const row = { id: 'R8', title: 'T', Verified: 'TRUE', publication_date: '2020-06-15' };
     assert.strictEqual(processRecord(row, 0, 'article', {}).verified, true);
+  });
+
+  it('does not let a CLIP id bypass the verified column', () => {
+    const exporter = fs.readFileSync(new URL('../data/export-archive-data.js', import.meta.url), 'utf8');
+    assert.doesNotMatch(
+      exporter,
+      /rawId\.startsWith\(['"]CLIP-['"]\)/,
+      'clippings must publish through verified=TRUE plus needs_review, not an id-prefix bypass'
+    );
   });
 });
 

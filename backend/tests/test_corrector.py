@@ -14,6 +14,7 @@ import pytest
 from scripts.corrector import (
     SMART_CORRECTOR_MARKER,
     RuntimeDependencies,
+    _handoff_token,
     _note,
     _notes_indicate_completion,
     _processor_name,
@@ -414,12 +415,81 @@ def test_partial_result_with_transcription_flag_counts_as_needs_transcription():
     note = next(
         value for row, column, value in worksheet.updates if row == 2 and column == 3
     )
-    assert "[NEEDS_TRANSCRIPTION]" in note
+    assert "[PARTIAL]" in note
     assert "Failed - Processor not available" not in note
-    # No AI fields written, and the categorizer is never reached for this row.
+    # Metadata text is preserved, but no AI fields are written and the
+    # categorizer is never reached for this incomplete transcript.
     assert categorized_text == []
-    assert not any(column == 2 for _, column, _ in worksheet.updates)
+    assert (2, 2, "video description") in worksheet.updates
     assert stats["edge_cases"]["needs_transcription"] == 1
+    assert stats["edge_cases"]["partial"] == 1
+    assert stats["errors"] == 1
+
+
+def test_partial_result_preserves_usable_metadata_text_with_distinct_stat():
+    records = make_records(1)
+    worksheet = FakeWorksheet(records)
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: pytest.fail(
+            "degraded metadata should be preserved without treating it as a transcript"
+        ),
+        processors={
+            "default": lambda url: {
+                "status": "partial",
+                "source": "youtube_metadata",
+                "raw_text": "Usable video description",
+                "needs_transcription": True,
+            }
+        },
+        detector=article_content,
+        validator=lambda raw_text, url, content_type: (False, 0.2, ["too short"]),
+        schema={},
+        dry_run=False,
+    )
+
+    assert (2, 2, "Usable video description") in worksheet.updates
+    note = next(
+        value for row, column, value in worksheet.updates if row == 2 and column == 3
+    )
+    assert "[PARTIAL]" in note
+    assert stats["edge_cases"]["partial"] == 1
+    assert stats["edge_cases"]["needs_transcription"] == 1
+    assert stats["errors"] == 1
+
+
+def test_youtube_fallback_preserves_url_with_distinct_stat():
+    records = make_records(1)
+    records[0]["url"] = "https://www.c-span.org/video/?123/example"
+    worksheet = FakeWorksheet(records)
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: pytest.fail(
+            "a fallback URL is a handoff, not content to categorize"
+        ),
+        processors={
+            "cspan": lambda url: {
+                "status": "youtube_fallback",
+                "source": "cspan_youtube",
+                "youtube_url": "https://www.youtube.com/watch?v=abcdefghijk",
+            }
+        },
+        detector=lambda url: "video",
+        validator=lambda raw_text, url, content_type: (False, 0.2, ["too short"]),
+        schema={},
+        dry_run=False,
+    )
+
+    assert (2, 2, "https://www.youtube.com/watch?v=abcdefghijk") in worksheet.updates
+    note = next(
+        value for row, column, value in worksheet.updates if row == 2 and column == 3
+    )
+    assert "[YOUTUBE_FALLBACK]" in note
+    assert stats["edge_cases"]["youtube_fallback"] == 1
     assert stats["errors"] == 1
 
 
@@ -569,6 +639,99 @@ def test_cached_content_does_not_require_url_resolution(monkeypatch):
     assert stats["processed"] == 1
     assert stats["cached"] == 1
     assert stats["errors"] == 0
+
+
+def test_partial_note_forces_reprocessing_even_when_preserved_text_validates():
+    records = make_records(1)
+    records[0]["raw_text"] = "Metadata that a permissive validator accepts"
+    records[0]["notes"] = (
+        "[2026-01-01 12:00] Smart Corrector: "
+        f"[PARTIAL] {_handoff_token(records[0]['raw_text'])} "
+        "Preserved available metadata; transcript still needed"
+    )
+    worksheet = FakeWorksheet(records)
+    processor_calls = []
+
+    def process(url):
+        processor_calls.append(url)
+        return {
+            "status": "success",
+            "source": "youtube",
+            "raw_text": "Fresh complete transcript",
+        }
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: {"summary": f"Analyzed {text}"},
+        processors={"default": process},
+        detector=article_content,
+        validator=valid_content,
+        schema={},
+        dry_run=False,
+    )
+
+    assert processor_calls == ["https://example.test/0"]
+    assert (2, 2, "Fresh complete transcript") in worksheet.updates
+    assert stats["cached"] == 0
+    assert stats["reprocessed"] == 1
+
+
+def test_valid_pasted_transcript_replaces_a_partial_handoff_without_refetching():
+    records = make_records(1)
+    preserved_metadata = "Machine-preserved video description"
+    records[0]["raw_text"] = "A complete transcript pasted by a human"
+    records[0]["notes"] = (
+        "[2026-01-01 12:00] Smart Corrector: "
+        f"[PARTIAL] {_handoff_token(preserved_metadata)} "
+        "Preserved available metadata; transcript still needed"
+    )
+    worksheet = FakeWorksheet(records)
+    categorized = []
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: categorized.append(text)
+        or {"summary": "Analyzed pasted transcript"},
+        processors={"default": lambda url: pytest.fail("processor was called")},
+        detector=article_content,
+        validator=valid_content,
+        schema={},
+        dry_run=False,
+    )
+
+    assert categorized == ["A complete transcript pasted by a human"]
+    assert stats["cached"] == 1
+    assert stats["reprocessed"] == 0
+
+
+def test_valid_pasted_transcript_is_used_despite_needs_transcription_note():
+    records = make_records(1)
+    records[0]["url"] = "https://soundcloud.com/example/interview"
+    records[0]["raw_text"] = "A complete transcript pasted by a human"
+    records[0]["notes"] = (
+        "[2026-01-01 12:00] Smart Corrector: "
+        "[NEEDS_TRANSCRIPTION] Requires audio transcription"
+    )
+    worksheet = FakeWorksheet(records)
+    categorized = []
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: categorized.append(text)
+        or {"summary": "Analyzed pasted transcript"},
+        processors={"soundcloud": lambda url: pytest.fail("processor was called")},
+        detector=lambda url: "audio",
+        validator=valid_content,
+        schema={},
+        dry_run=False,
+    )
+
+    assert categorized == ["A complete transcript pasted by a human"]
+    assert stats["cached"] == 1
+    assert stats["reprocessed"] == 0
 
 
 def test_resume_retries_a_leading_failed_row():
