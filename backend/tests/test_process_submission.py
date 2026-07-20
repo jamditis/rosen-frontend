@@ -1572,15 +1572,13 @@ class TestReviewGate:
                       url='https://example.com/article')
         assert result['record_id'].startswith('RECORD-')
 
-    def test_processor_unverified_state_respected(self, monkeypatch,
-                                                  csv_with_headers):
-        """A processor's explicit verified value is preserved, not overwritten:
-        the clipping processor stamps verified='false' on OCR'd PDFs as an "OCR
-        needs a human check" signal. The submission path keeps that value (and
-        still flags needs_review). Note this does not hide the clipping -- the
-        exporter surfaces CLIP- ids via a dedicated allowance, so it goes
-        live-but-flagged; unifying that allowance with the verified/needs_review
-        model is tracked in issue #352."""
+    def test_clipping_uses_verified_true_plus_needs_review(self, monkeypatch,
+                                                          csv_with_headers):
+        """OCR confidence belongs in needs_review, not the publish gate.
+
+        A fresh clipping must use the same live-but-flagged contract as other
+        submissions so the exporter does not need a CLIP-id bypass.
+        """
         _stub_schema(monkeypatch)
         _stub_dispatcher_ok(monkeypatch, id='CLIP-00043', verified='false')
         _stub_sheets(monkeypatch)
@@ -1591,10 +1589,7 @@ class TestReviewGate:
              url='https://example.com/clip2.pdf')
         with csv_with_headers.open() as f:
             row = next(csv.DictReader(f))
-        assert row['verified'].lower() == 'false', (
-            "an explicit processor verified='false' (low-confidence OCR) must "
-            f"survive the submission path; got {row['verified']!r}")
-        # Still flagged for review like every auto-submission.
+        assert row['verified'] == 'TRUE'
         assert row['needs_review'].lower() == 'true'
 
     def test_titleless_submission_gets_visible_provisional_title(

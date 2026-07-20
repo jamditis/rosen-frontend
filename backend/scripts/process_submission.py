@@ -766,20 +766,20 @@ def process_one(url: str, title: str = '', notes: str = '',
     # the submitter sees the record appear, then carry needs_review=true so a
     # human can vet the AI-generated metadata before it's treated as final.
     #
-    # Force verified True only when no processor set it: enrich_data() above runs
+    # Force verified True when no processor set it, and for clipping-family ids.
+    # OCR processors historically used verified=false to mean "review the OCR",
+    # but the generic needs_review field now carries that signal. Publishing all
+    # fresh clippings through verified=TRUE lets the exporter use one verification
+    # model instead of bypassing the column based on a CLIP- id prefix (#352).
+    # enrich_data() above runs
     # `data.setdefault('verified', False)` (a conservative default for legacy or
     # broken rows), so `scrape.get('verified', True)` would always read back that
     # False and the public exporter — which drops verified=False rows — would
     # silently hide every submission. Article scrapes leave verified unset, so
-    # they publish. A processor's explicit verified value is preserved: the
-    # clipping processor stamps 'false' on every OCR'd PDF as an "OCR needs a
-    # human check" signal, not a hide flag. That clipping still goes
-    # live-but-flagged — the exporter surfaces CLIP- ids via a dedicated
-    # allowance, and needs_review below marks it for the OCR review pass. (For a
-    # non-CLIP record an explicit 'false' does gate it, since the exporter drops
-    # verified=false rows without that allowance.) Unifying the CLIP- allowance
-    # with this verified/needs_review model is tracked in issue #352.
-    if processor_verified is None:
+    # they publish. A processor's explicit verified value remains authoritative
+    # for non-clipping records.
+    clipping_family = record_id.startswith(('CLIP-', 'NYT-', 'WSJ-'))
+    if processor_verified is None or clipping_family:
         # Write the string 'TRUE', not a Python bool. csv.DictWriter serializes
         # True as the string 'True', but data/export-archive-data.js treats only
         # the exact strings 'TRUE'/'true'/'Yes' (or a real boolean) as verified —

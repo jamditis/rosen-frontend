@@ -414,13 +414,82 @@ def test_partial_result_with_transcription_flag_counts_as_needs_transcription():
     note = next(
         value for row, column, value in worksheet.updates if row == 2 and column == 3
     )
-    assert "[NEEDS_TRANSCRIPTION]" in note
+    assert "[PARTIAL]" in note
     assert "Failed - Processor not available" not in note
-    # No AI fields written, and the categorizer is never reached for this row.
+    # Metadata text is preserved, but no AI fields are written and the
+    # categorizer is never reached for this incomplete transcript.
     assert categorized_text == []
-    assert not any(column == 2 for _, column, _ in worksheet.updates)
+    assert (2, 2, "video description") in worksheet.updates
+    assert stats["edge_cases"]["needs_transcription"] == 1
+    assert stats["edge_cases"]["partial"] == 1
+    assert stats["errors"] == 1
+
+
+def test_partial_result_preserves_usable_metadata_text_with_distinct_stat():
+    records = make_records(1)
+    worksheet = FakeWorksheet(records)
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: pytest.fail(
+            "degraded metadata should be preserved without treating it as a transcript"
+        ),
+        processors={
+            "default": lambda url: {
+                "status": "partial",
+                "source": "youtube_metadata",
+                "raw_text": "Usable video description",
+                "needs_transcription": True,
+            }
+        },
+        detector=article_content,
+        validator=lambda raw_text, url, content_type: (False, 0.2, ["too short"]),
+        schema={},
+        dry_run=False,
+    )
+
+    assert (2, 2, "Usable video description") in worksheet.updates
+    note = next(
+        value for row, column, value in worksheet.updates if row == 2 and column == 3
+    )
+    assert "[PARTIAL]" in note
+    assert stats["edge_cases"]["partial"] == 1
     assert stats["edge_cases"]["needs_transcription"] == 1
     assert stats["errors"] == 1
+
+
+def test_youtube_fallback_preserves_url_with_distinct_stat():
+    records = make_records(1)
+    records[0]["url"] = "https://www.c-span.org/video/?123/example"
+    worksheet = FakeWorksheet(records)
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: pytest.fail(
+            "a fallback URL is a handoff, not content to categorize"
+        ),
+        processors={
+            "cspan": lambda url: {
+                "status": "youtube_fallback",
+                "source": "cspan_youtube",
+                "youtube_url": "https://www.youtube.com/watch?v=abcdefghijk",
+            }
+        },
+        detector=lambda url: "video",
+        validator=lambda raw_text, url, content_type: (False, 0.2, ["too short"]),
+        schema={},
+        dry_run=False,
+    )
+
+    assert (2, 2, "https://www.youtube.com/watch?v=abcdefghijk") in worksheet.updates
+    note = next(
+        value for row, column, value in worksheet.updates if row == 2 and column == 3
+    )
+    assert "[YOUTUBE_FALLBACK]" in note
+    assert stats["edge_cases"]["youtube_fallback"] == 1
+    assert stats["errors"] == 0
 
 
 def test_successful_processor_without_content_counts_missing_content():
