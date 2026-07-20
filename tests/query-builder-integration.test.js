@@ -24,6 +24,9 @@ const analyticsSrc = readSrc('frontend', 'components', 'AnalyticsDashboard.js');
 const appSrc = readSrc('frontend', 'App.js');
 const archiveResultsSrc = readSrc('frontend', 'components', 'ArchiveResults.js');
 const entityBrowserSrc = readSrc('frontend', 'components', 'EntityBrowser.js');
+const sidebarSrc = readSrc('frontend', 'components', 'Sidebar.js');
+const desktopEntityPanelSrc = readSrc('frontend', 'desktop', 'DesktopEntityPanel.js');
+const desktopShellSrc = readSrc('frontend', 'desktop', 'DesktopShell.js');
 const serviceWorkerSrc = readSrc('frontend', 'sw.js');
 
 function templateBlock(id) {
@@ -224,6 +227,41 @@ describe('query-scoped entities', () => {
       appSrc,
       /<\$\{EntityBrowser\}[\s\S]*?queryActive=\$\{filters\.recordIds\s*!==\s*null\}/,
       'App must tell EntityBrowser whether a query scope is active'
+    );
+  });
+
+  it('labels query-scoped counts and offers a query-only clear action', () => {
+    assert.match(
+      entityBrowserSrc,
+      /queryActive[\s\S]*?Counts and connections[\s\S]*?current query results/i,
+      'EntityBrowser must identify query-scoped entity counts'
+    );
+    assert.match(
+      entityBrowserSrc,
+      /onClick=\$\{onClearQuery\}[\s\S]*?Clear query results/,
+      'EntityBrowser must expose a query-only clear action'
+    );
+    assert.match(
+      appSrc,
+      /const\s+clearQueryFilter\s*=\s*useCallback\([\s\S]*?recordIds:\s*null/,
+      'App must clear recordIds without replacing independent filters'
+    );
+    assert.match(
+      appSrc,
+      /<\$\{EntityBrowser\}[\s\S]*?onClearQuery=\$\{clearQueryFilter\}/,
+      'the standard entity route must receive the clear action'
+    );
+    assert.match(desktopEntityPanelSrc, /onClearQuery=\$\{onClearQuery\}/);
+    assert.match(desktopShellSrc, /onClearQuery=\$\{entityView\.onClearQuery\}/);
+  });
+});
+
+describe('query-only filter controls', () => {
+  it('clears recordIds without resetting search, facets, era, year, or type', () => {
+    assert.match(
+      sidebarSrc,
+      /setFilters\(prev\s*=>\s*\(\{\s*\.\.\.prev,\s*recordIds:\s*null\s*\}\)\)[\s\S]*?Clear query results/,
+      'Sidebar needs an individual query clear control that preserves other filters'
     );
   });
 });

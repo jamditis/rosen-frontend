@@ -2,7 +2,7 @@
 
 ## Overview
 
-This plan migrates the Jay Rosen Digital Archive from fetching data via Google Sheets CSV exports to serving a single pre-processed JSON file from the WordPress server. This eliminates Google Sheets latency, CORS overhead, and reduces network requests from 3 to 1.
+This plan migrates Jay Rosen's Internet Archive from fetching data via Google Sheets CSV exports to serving a single pre-processed JSON file from the WordPress server. This eliminates Google Sheets latency, CORS overhead, and reduces network requests from 3 to 1.
 
 **Expected Performance Improvement:**
 - Current (Google Sheets): ~800-1500ms (3 requests, variable latency, CORS preflight)

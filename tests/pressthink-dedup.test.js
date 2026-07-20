@@ -181,7 +181,8 @@ describe('clusterSignature — allowlist key binds ids to the path', () => {
     const atOldPath = { key: '2006/06/27/ppl_frmr', records: [{ id: 'RECORD-00191' }, { id: 'RECORD-00607' }] };
     const atNewPath = { key: '2009/01/01/something_else', records: [{ id: 'RECORD-00191' }, { id: 'RECORD-00607' }] };
     assert.notEqual(clusterSignature(atOldPath), clusterSignature(atNewPath));
-    assert.ok(CURATOR_PENDING_DUPLICATES.has(clusterSignature(atOldPath)));
+    assert.equal(clusterSignature(atOldPath), '2006/06/27/ppl_frmr::RECORD-00191|RECORD-00607');
+    assert.ok(!CURATOR_PENDING_DUPLICATES.has(clusterSignature(atOldPath)));
     assert.ok(!CURATOR_PENDING_DUPLICATES.has(clusterSignature(atNewPath)));
   });
 });
