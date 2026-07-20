@@ -42,7 +42,8 @@ CSV_COLUMNS = [
     'tags', 'related_to', 'responds_to', 'influence', 'copyright',
     'license', 'permissions', 'date_processed', 'gdrive_pdf_link',
     'gdrive_raw_file_link', 'gdrive_transcript_link', 'transcript_filepath',
-    'pull_quote', 'raw_text', 'verified', 'notes'
+    'pull_quote', 'raw_text', 'verified', 'notes', 'low_confidence',
+    'needs_review'
 ]
 
 
@@ -128,8 +129,12 @@ def convert_to_csv_row(record, new_id):
         'transcript_filepath': '',
         'pull_quote': record.get('pull_quote', ''),
         'raw_text': '',
-        'verified': 'false',
-        'notes': record.get('notes', '')
+        # Clippings remain visible to the exporter while carrying a separate,
+        # explicit human-review signal.
+        'verified': 'TRUE',
+        'notes': record.get('notes', ''),
+        'low_confidence': '',
+        'needs_review': 'true'
     }
 
 

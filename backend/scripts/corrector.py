@@ -229,6 +229,12 @@ def run_corrector(
         is_valid, quality_score, _issues = _validate(
             validator, existing_raw_text, url, content_type
         )
+        # Partial and fallback handoffs deliberately preserve metadata or an
+        # alternate URL in raw_text. Those values are not finished content, even
+        # if a permissive validator accepts them on the next run.
+        if _notes_require_reprocessing(str(record.get("notes", ""))):
+            is_valid = False
+            quality_score = 0.0
 
         row_updates: list[tuple[int, Any]] = []
         analysis_text = existing_raw_text
@@ -323,8 +329,9 @@ def run_corrector(
                 if fallback_url:
                     updates.insert(0, (columns["raw_text"], fallback_url))
                     stats["reprocessed"] += 1
-                else:
-                    stats["errors"] += 1
+                # The alternate URL is a recoverable handoff, not completed
+                # ingestion, so the command must remain non-zero either way.
+                stats["errors"] += 1
                 stats["edge_cases"]["youtube_fallback"] += 1
                 if _write_row(worksheet, row_number, updates, dry_run=dry_run):
                     stats["processed"] += 1
@@ -690,6 +697,18 @@ def _notes_indicate_completion(notes: str) -> bool:
     if not status.startswith(COMPLETION_STATUS_PREFIX):
         return False
     return not any(marker in status for marker in INCOMPLETE_STATUS_MARKERS)
+
+
+def _notes_require_reprocessing(notes: str) -> bool:
+    """Return whether the latest note describes preserved, incomplete content."""
+    matches = list(_NOTE_STATUS_BOUNDARY.finditer(notes))
+    if not matches:
+        return False
+    status = notes[matches[-1].end() :]
+    return any(
+        marker in status
+        for marker in ("[PARTIAL]", "[YOUTUBE_FALLBACK]", "[NEEDS_TRANSCRIPTION]")
+    )
 
 
 def _requested_end_row(rows: str | None) -> int | None:

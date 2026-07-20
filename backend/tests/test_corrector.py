@@ -489,7 +489,7 @@ def test_youtube_fallback_preserves_url_with_distinct_stat():
     )
     assert "[YOUTUBE_FALLBACK]" in note
     assert stats["edge_cases"]["youtube_fallback"] == 1
-    assert stats["errors"] == 0
+    assert stats["errors"] == 1
 
 
 def test_successful_processor_without_content_counts_missing_content():
@@ -638,6 +638,41 @@ def test_cached_content_does_not_require_url_resolution(monkeypatch):
     assert stats["processed"] == 1
     assert stats["cached"] == 1
     assert stats["errors"] == 0
+
+
+def test_partial_note_forces_reprocessing_even_when_preserved_text_validates():
+    records = make_records(1)
+    records[0]["raw_text"] = "Metadata that a permissive validator accepts"
+    records[0]["notes"] = (
+        "[2026-01-01 12:00] Smart Corrector: "
+        "[PARTIAL] Preserved available metadata; transcript still needed"
+    )
+    worksheet = FakeWorksheet(records)
+    processor_calls = []
+
+    def process(url):
+        processor_calls.append(url)
+        return {
+            "status": "success",
+            "source": "youtube",
+            "raw_text": "Fresh complete transcript",
+        }
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: {"summary": f"Analyzed {text}"},
+        processors={"default": process},
+        detector=article_content,
+        validator=valid_content,
+        schema={},
+        dry_run=False,
+    )
+
+    assert processor_calls == ["https://example.test/0"]
+    assert (2, 2, "Fresh complete transcript") in worksheet.updates
+    assert stats["cached"] == 0
+    assert stats["reprocessed"] == 1
 
 
 def test_resume_retries_a_leading_failed_row():
