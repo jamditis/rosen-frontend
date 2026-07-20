@@ -1,0 +1,46 @@
+name: Verify external links
+
+on:
+  schedule:
+    - cron: '17 9 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-external-links
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify internal and external links
+        # At the 10-second per-URL timeout and six-worker pool, 3,000 probes
+        # remain within the two-hour job limit even in the all-timeout case.
+        run: npm run verify-links -- --external --report-only --max 3000 --out verify-links-report.json
+
+      - name: Upload link report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: verify-links-report
+          path: verify-links-report.json
+          if-no-files-found: warn
+          retention-days: 30
