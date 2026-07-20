@@ -66,7 +66,7 @@ class AccessiblePDFGenerator:
         self.accessibility_metadata.update({
             'title': title,
             'author': author,
-            'subject': f"Article from {original_publication}" if original_publication else "Digital Archive Article",
+            'subject': f"Article from {original_publication}" if original_publication else "Jay Rosen's Internet Archive article",
             'keywords': self._extract_keywords(record_data),
         })
         

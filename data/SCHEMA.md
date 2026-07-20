@@ -1,6 +1,6 @@
-# Jay Rosen Digital Archive - Data Schema
+# Jay Rosen's Internet Archive - Data Schema
 
-This document describes the data formats used in the Jay Rosen Digital Archive, following open web principles of transparency and interoperability.
+This document describes the data formats used in Jay Rosen's Internet Archive, following open web principles of transparency and interoperability.
 
 ## Overview
 
@@ -262,7 +262,7 @@ Feeds follow [RSS 2.0 specification](https://www.rssboard.org/rss-specification)
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Jay Rosen Digital Archive</title>
+    <title>Jay Rosen's Internet Archive</title>
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive description</description>
     <atom:link href="..." rel="self" type="application/rss+xml"/>
@@ -296,7 +296,7 @@ OPML files follow [OPML 2.0 specification](http://opml.org/spec2.opml).
 <?xml version="1.0" encoding="UTF-8"?>
 <opml version="2.0">
   <head>
-    <title>Jay Rosen Digital Archive</title>
+    <title>Jay Rosen's Internet Archive</title>
     <dateCreated>RFC 822 date</dateCreated>
   </head>
   <body>
