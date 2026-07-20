@@ -675,6 +675,34 @@ def test_partial_note_forces_reprocessing_even_when_preserved_text_validates():
     assert stats["reprocessed"] == 1
 
 
+def test_valid_pasted_transcript_is_used_despite_needs_transcription_note():
+    records = make_records(1)
+    records[0]["url"] = "https://soundcloud.com/example/interview"
+    records[0]["raw_text"] = "A complete transcript pasted by a human"
+    records[0]["notes"] = (
+        "[2026-01-01 12:00] Smart Corrector: "
+        "[NEEDS_TRANSCRIPTION] Requires audio transcription"
+    )
+    worksheet = FakeWorksheet(records)
+    categorized = []
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: categorized.append(text)
+        or {"summary": "Analyzed pasted transcript"},
+        processors={"soundcloud": lambda url: pytest.fail("processor was called")},
+        detector=lambda url: "audio",
+        validator=valid_content,
+        schema={},
+        dry_run=False,
+    )
+
+    assert categorized == ["A complete transcript pasted by a human"]
+    assert stats["cached"] == 1
+    assert stats["reprocessed"] == 0
+
+
 def test_resume_retries_a_leading_failed_row():
     records = make_records(1)
     records[0]["notes"] = "[2026-01-01 12:00] Smart Corrector: Failed - timeout"

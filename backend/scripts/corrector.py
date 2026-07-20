@@ -707,7 +707,7 @@ def _notes_require_reprocessing(notes: str) -> bool:
     status = notes[matches[-1].end() :]
     return any(
         marker in status
-        for marker in ("[PARTIAL]", "[YOUTUBE_FALLBACK]", "[NEEDS_TRANSCRIPTION]")
+        for marker in ("[PARTIAL]", "[YOUTUBE_FALLBACK]")
     )
 
 
