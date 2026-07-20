@@ -13,8 +13,9 @@ Usage:
 """
 
 import csv
+from contextlib import closing
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Set
+from typing import Dict, Iterator, List, Any, Optional, Set
 from datetime import datetime
 from rosen_scraper.path_utils import find_project_root
 
@@ -86,6 +87,38 @@ class CSVDataService:
         print(f"[CSV SERVICE] Entities: {self.entities_file.name}")
         print(f"[CSV SERVICE] Relationships: {self.relationships_file.name}")
 
+    def _read_dicts(self, path: Path) -> Iterator[Dict[str, str]]:
+        """
+        Yield the rows of a CSV as dicts.
+
+        The one place the DictReader read encoding lives: utf-8-sig strips the
+        byte-order mark a Sheets or Excel export writes, so the first column
+        name arrives as 'id' rather than '\\ufeffid'. get_headers reads the
+        same files with csv.reader and keeps its own copy of the encoding.
+
+        Yields rather than returning a list so a caller that stops early
+        (get_urls_to_process, once it reaches end_row) still stops reading
+        early. A caller that breaks out should wrap this in contextlib.closing
+        so the file is closed at that point rather than at finalization.
+
+        Callers keep their own existence checks, because what a missing file
+        means differs per caller: an absent URL worklist is worth a warning,
+        an absent social file is normal.
+
+        Args:
+            path: CSV to read. Must exist. Being a generator defers that
+                check: a missing path returns normally from this call and
+                raises FileNotFoundError at the first iteration instead. That
+                is the one way this differs from the inline `with open(...)`
+                it replaced, and it is why the existence checks stay with the
+                callers.
+
+        Yields:
+            One dict per data row, keyed by the header row.
+        """
+        with open(path, 'r', encoding='utf-8-sig') as f:
+            yield from csv.DictReader(f)
+
     def get_urls_to_process(self, start_row: int = 0, end_row: Optional[int] = None,
                             skip_processed: bool = True) -> List[Dict[str, str]]:
         """
@@ -104,9 +137,9 @@ class CSVDataService:
             return []
 
         urls = []
-        with open(self.urls_file, 'r', encoding='utf-8-sig') as f:
-            reader = csv.DictReader(f)
-            for i, row in enumerate(reader):
+        # closing() because this is the one reader that breaks early.
+        with closing(self._read_dicts(self.urls_file)) as rows:
+            for i, row in enumerate(rows):
                 if i < start_row:
                     continue
                 if end_row is not None and i >= end_row:
@@ -137,12 +170,10 @@ class CSVDataService:
 
         for csv_file in [self.records_file, self.social_file]:
             if csv_file.exists():
-                with open(csv_file, 'r', encoding='utf-8-sig') as f:
-                    reader = csv.DictReader(f)
-                    for row in reader:
-                        record_id = row.get('id', row.get('ID', ''))
-                        if record_id:
-                            ids.add(record_id)
+                for row in self._read_dicts(csv_file):
+                    record_id = row.get('id', row.get('ID', ''))
+                    if record_id:
+                        ids.add(record_id)
 
         return ids
 
@@ -157,12 +188,10 @@ class CSVDataService:
 
         for csv_file in [self.records_file, self.social_file]:
             if csv_file.exists():
-                with open(csv_file, 'r', encoding='utf-8-sig') as f:
-                    reader = csv.DictReader(f)
-                    for row in reader:
-                        url = row.get('url', row.get('URL', ''))
-                        if url:
-                            urls.add(url.strip())
+                for row in self._read_dicts(csv_file):
+                    url = row.get('url', row.get('URL', ''))
+                    if url:
+                        urls.add(url.strip())
 
         return urls
 
@@ -259,9 +288,7 @@ class CSVDataService:
         if not self.social_file.exists():
             return []
 
-        with open(self.social_file, 'r', encoding='utf-8-sig') as f:
-            reader = csv.DictReader(f)
-            return list(reader)
+        return list(self._read_dicts(self.social_file))
 
 
 # Convenience function for getting a service instance
