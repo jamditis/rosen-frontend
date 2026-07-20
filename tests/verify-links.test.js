@@ -215,6 +215,55 @@ describe('collectUrlRecords (core archive-data.json + split archive-details.json
     const malformed = checkUrlWellFormedness(merged).filter((f) => f.failureType === 'malformed_url');
     assert.ok(malformed.some((f) => f.sourceId === 'R1'), 'the empty modal url is reported');
   });
+
+  it('collects thread-post links with their owning record id', () => {
+    const merged = collectUrlRecords([], {
+      THREAD1: {
+        url: 'https://bsky.app/profile/jayrosen.bsky.social/post/root',
+        thread_data: {
+          posts: [
+            { url: 'https://bsky.app/profile/jayrosen.bsky.social/post/one' },
+            { url: 'https://bsky.app/profile/jayrosen.bsky.social/post/two' },
+          ],
+        },
+      },
+    });
+    assert.deepEqual(
+      merged.filter(({ id }) => id === 'THREAD1').map(({ url }) => url).sort(),
+      [
+        'https://bsky.app/profile/jayrosen.bsky.social/post/one',
+        'https://bsky.app/profile/jayrosen.bsky.social/post/root',
+        'https://bsky.app/profile/jayrosen.bsky.social/post/two',
+      ]
+    );
+  });
+
+  it('collects URLs linkified from summary and quote text', () => {
+    const merged = collectUrlRecords([
+      {
+        id: 'R1',
+        url: 'https://example.com/source',
+        summary: 'Compare https://example.com/summary with the source.',
+        quote: 'See https://example.net/quoted and https://example.com/summary',
+      },
+    ], {});
+    assert.deepEqual(
+      merged.map(({ url }) => url).sort(),
+      [
+        'https://example.com/source',
+        'https://example.com/summary',
+        'https://example.net/quoted',
+      ]
+    );
+  });
+
+  it('checks canonical bsky.app outbound URLs rather than the broken embed host', () => {
+    const merged = collectUrlRecords([
+      { id: 'R1', url: 'https://bsky.app/profile/jayrosen.bsky.social/post/abc' },
+    ], {});
+    assert.equal(merged[0].url, 'https://bsky.app/profile/jayrosen.bsky.social/post/abc');
+    assert.doesNotMatch(merged[0].url, /embed\.bsky\.app/);
+  });
 });
 
 describe('buildUrlSourceMap', () => {

@@ -29,6 +29,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { FEATURED_WORKS } from '../frontend/constants.js';
+import { splitUrlsForLinkify } from '../frontend/utils/linkify.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, '..', 'data');
@@ -253,13 +254,32 @@ export function collectUrlRecords(records, details) {
     seen.add(key);
     out.push({ id, url });
   };
-  for (const r of records || []) add(r.id, r.url);
+  const addLinkified = (id, text) => {
+    for (const part of splitUrlsForLinkify(text) || []) {
+      if (part.type === 'url') add(id, part.value);
+    }
+  };
+  const addRecordSurfaces = (id, record) => {
+    addLinkified(id, record?.summary);
+    addLinkified(id, record?.quote);
+    for (const post of record?.thread_data?.posts || []) {
+      if (Object.prototype.hasOwnProperty.call(post, 'url')) add(id, post.url);
+      addLinkified(id, post.content);
+    }
+  };
+  for (const r of records || []) {
+    add(r.id, r.url);
+    addRecordSurfaces(r.id, r);
+  }
   for (const [id, d] of Object.entries(details || {})) {
     // The modal merges details over the core record ({ ...record, ...details }), so a
     // url KEY present in details overrides the core url -- even an empty or null value,
     // which hides or breaks the user-facing link. Check any present url (well-formedness
     // flags a bad one); only a MISSING key falls back to core silently, no finding.
-    if (d && typeof d === 'object' && Object.prototype.hasOwnProperty.call(d, 'url')) add(id, d.url);
+    if (d && typeof d === 'object') {
+      if (Object.prototype.hasOwnProperty.call(d, 'url')) add(id, d.url);
+      addRecordSurfaces(id, d);
+    }
   }
   return out;
 }
