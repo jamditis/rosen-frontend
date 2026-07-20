@@ -25,6 +25,8 @@ _BACKEND = pathlib.Path(__file__).resolve().parents[1]
 if str(_BACKEND) not in sys.path:
     sys.path.insert(0, str(_BACKEND))
 
+from rosen_scraper.processors.clipping_processor import ClippingProcessor  # noqa: E402
+
 
 def _load_script_module():
     """Import process_submission.py as a regular module under tests."""
@@ -1572,15 +1574,18 @@ class TestReviewGate:
                       url='https://example.com/article')
         assert result['record_id'].startswith('RECORD-')
 
-    def test_clipping_uses_verified_true_plus_needs_review(self, monkeypatch,
-                                                          csv_with_headers):
+    @pytest.mark.parametrize("prefix", sorted(process_submission.CLIPPING_ID_PREFIXES))
+    def test_clipping_uses_verified_true_plus_needs_review(
+            self, monkeypatch, csv_with_headers, prefix):
         """OCR confidence belongs in needs_review, not the publish gate.
 
         A fresh clipping must use the same live-but-flagged contract as other
         submissions so the exporter does not need a CLIP-id bypass.
         """
         _stub_schema(monkeypatch)
-        _stub_dispatcher_ok(monkeypatch, id='CLIP-00043', verified='false')
+        _stub_dispatcher_ok(
+            monkeypatch, id=f'{prefix}-00043', verified='false'
+        )
         _stub_sheets(monkeypatch)
         _stub_sftp(monkeypatch)
         _stub_subprocess(monkeypatch)
@@ -1591,6 +1596,10 @@ class TestReviewGate:
             row = next(csv.DictReader(f))
         assert row['verified'] == 'TRUE'
         assert row['needs_review'].lower() == 'true'
+
+    def test_clipping_publish_prefixes_match_processor(self):
+        expected = {'CLIP', *ClippingProcessor.PUBLICATION_PREFIXES.values()}
+        assert process_submission.CLIPPING_ID_PREFIXES == expected
 
     def test_titleless_submission_gets_visible_provisional_title(
             self, monkeypatch, csv_with_headers):

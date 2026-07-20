@@ -9,6 +9,7 @@ row selection and sheet writes can be tested without Google credentials.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import os
@@ -40,6 +41,7 @@ _MARKER_STEM = SMART_CORRECTOR_MARKER.rstrip(":")  # marker text without its col
 # ("Smart Corrector::" -> "Smart Corrector:"), which at a line start forges a note
 # boundary; matching ":+" removes every colon so no marker can survive in the body.
 _MARKER_ECHO_RE = re.compile(re.escape(_MARKER_STEM) + r":+")
+_HANDOFF_TOKEN_RE = re.compile(r"\[HANDOFF_SHA256:([0-9a-f]{64})\]")
 
 
 def resolve_and_validate(url: str):
@@ -232,7 +234,9 @@ def run_corrector(
         # Partial and fallback handoffs deliberately preserve metadata or an
         # alternate URL in raw_text. Those values are not finished content, even
         # if a permissive validator accepts them on the next run.
-        if _notes_require_reprocessing(str(record.get("notes", ""))):
+        if _notes_require_reprocessing(
+            str(record.get("notes", "")), existing_raw_text
+        ):
             is_valid = False
             quality_score = 0.0
 
@@ -301,7 +305,8 @@ def run_corrector(
                     (
                         columns["notes"],
                         _note(
-                            "[PARTIAL] Preserved available metadata; "
+                            f"[PARTIAL] {_handoff_token(usable_text)} "
+                            "Preserved available metadata; "
                             "transcript still needed"
                         ),
                     )
@@ -323,7 +328,10 @@ def run_corrector(
                 updates = [
                     (
                         columns["notes"],
-                        _note("[YOUTUBE_FALLBACK] Preserved alternate video URL"),
+                        _note(
+                            f"[YOUTUBE_FALLBACK] {_handoff_token(fallback_url)} "
+                            "Preserved alternate video URL"
+                        ),
                     )
                 ]
                 if fallback_url:
@@ -699,16 +707,24 @@ def _notes_indicate_completion(notes: str) -> bool:
     return not any(marker in status for marker in INCOMPLETE_STATUS_MARKERS)
 
 
-def _notes_require_reprocessing(notes: str) -> bool:
-    """Return whether the latest note describes preserved, incomplete content."""
+def _handoff_token(text: str) -> str:
+    digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
+    return f"[HANDOFF_SHA256:{digest}]"
+
+
+def _notes_require_reprocessing(notes: str, raw_text: str) -> bool:
+    """Return whether raw_text is the unchanged machine-preserved handoff."""
     matches = list(_NOTE_STATUS_BOUNDARY.finditer(notes))
     if not matches:
         return False
     status = notes[matches[-1].end() :]
-    return any(
-        marker in status
-        for marker in ("[PARTIAL]", "[YOUTUBE_FALLBACK]")
-    )
+    if not any(marker in status for marker in ("[PARTIAL]", "[YOUTUBE_FALLBACK]")):
+        return False
+    token_match = _HANDOFF_TOKEN_RE.search(status)
+    if not token_match:
+        return False
+    current_digest = hashlib.sha256(raw_text.encode("utf-8")).hexdigest()
+    return token_match.group(1) == current_digest
 
 
 def _requested_end_row(rows: str | None) -> int | None:

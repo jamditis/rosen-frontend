@@ -14,6 +14,7 @@ import pytest
 from scripts.corrector import (
     SMART_CORRECTOR_MARKER,
     RuntimeDependencies,
+    _handoff_token,
     _note,
     _notes_indicate_completion,
     _processor_name,
@@ -645,7 +646,8 @@ def test_partial_note_forces_reprocessing_even_when_preserved_text_validates():
     records[0]["raw_text"] = "Metadata that a permissive validator accepts"
     records[0]["notes"] = (
         "[2026-01-01 12:00] Smart Corrector: "
-        "[PARTIAL] Preserved available metadata; transcript still needed"
+        f"[PARTIAL] {_handoff_token(records[0]['raw_text'])} "
+        "Preserved available metadata; transcript still needed"
     )
     worksheet = FakeWorksheet(records)
     processor_calls = []
@@ -673,6 +675,35 @@ def test_partial_note_forces_reprocessing_even_when_preserved_text_validates():
     assert (2, 2, "Fresh complete transcript") in worksheet.updates
     assert stats["cached"] == 0
     assert stats["reprocessed"] == 1
+
+
+def test_valid_pasted_transcript_replaces_a_partial_handoff_without_refetching():
+    records = make_records(1)
+    preserved_metadata = "Machine-preserved video description"
+    records[0]["raw_text"] = "A complete transcript pasted by a human"
+    records[0]["notes"] = (
+        "[2026-01-01 12:00] Smart Corrector: "
+        f"[PARTIAL] {_handoff_token(preserved_metadata)} "
+        "Preserved available metadata; transcript still needed"
+    )
+    worksheet = FakeWorksheet(records)
+    categorized = []
+
+    stats = run_corrector(
+        parse_row_range("2-2"),
+        worksheet=worksheet,
+        categorizer=lambda text, schema: categorized.append(text)
+        or {"summary": "Analyzed pasted transcript"},
+        processors={"default": lambda url: pytest.fail("processor was called")},
+        detector=article_content,
+        validator=valid_content,
+        schema={},
+        dry_run=False,
+    )
+
+    assert categorized == ["A complete transcript pasted by a human"]
+    assert stats["cached"] == 1
+    assert stats["reprocessed"] == 0
 
 
 def test_valid_pasted_transcript_is_used_despite_needs_transcription_note():

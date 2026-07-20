@@ -21,7 +21,7 @@ Behavior (12-step pipeline from the design's "Architecture" diagram):
    2b.  SSRF guard via is_safe_public_url(url)      (reject private/non-http)
     3.  dispatcher.dispatch_url(url)                (scrape, or pasted raw text)
     4.  categorize(...)                             (Gemini; degrade on fail)
-    5.  assign id: keep processor CLIP-/NYT-/WSJ-,  (else next RECORD-NNNNN)
+    5.  assign id: keep processor clipping ids       (else next RECORD-NNNNN)
     6.  enrich_data() + _sanitize_cell()            (mimic Pillar 3; flag review)
     7.  Append to data/archive_records-public.csv   (atomic tmp+rename)
     8.  node data/export-archive-data.js            (regen JSONs)
@@ -102,6 +102,10 @@ extract_entities_and_relationships = _extract_entities
 # archive CSV when the script runs in CI.
 CSV_FILE = _DEFAULT_CSV_FILE
 _STAGED_JSON_FILES = DATA_DEPLOY_JSON_FILES
+CLIPPING_ID_PREFIXES = frozenset({
+    'CLIP', 'NYT', 'WSJ', 'WP', 'LAT', 'CT', 'BG', 'GRD', 'CJR', 'AJR',
+    'EP', 'NR', 'PYN',
+})
 
 # Shown to the submitter (via the sheet error column) when the scraper can't
 # fetch or parse a URL. Some hosts (Medium, paywalled or login-walled pages,
@@ -778,7 +782,7 @@ def process_one(url: str, title: str = '', notes: str = '',
     # silently hide every submission. Article scrapes leave verified unset, so
     # they publish. A processor's explicit verified value remains authoritative
     # for non-clipping records.
-    clipping_family = record_id.startswith(('CLIP-', 'NYT-', 'WSJ-'))
+    clipping_family = record_id.partition('-')[0] in CLIPPING_ID_PREFIXES
     if processor_verified is None or clipping_family:
         # Write the string 'TRUE', not a Python bool. csv.DictWriter serializes
         # True as the string 'True', but data/export-archive-data.js treats only
