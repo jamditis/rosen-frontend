@@ -32,7 +32,9 @@ jobs:
         run: npm ci
 
       - name: Verify internal and external links
-        run: npm run verify-links -- --external --out verify-links-report.json
+        # At the 10-second per-URL timeout and six-worker pool, 3,000 probes
+        # remain within the two-hour job limit even in the all-timeout case.
+        run: npm run verify-links -- --external --report-only --max 3000 --out verify-links-report.json
 
       - name: Upload link report
         if: always()

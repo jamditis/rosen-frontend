@@ -238,7 +238,18 @@ describe('collectUrlRecords (core archive-data.json + split archive-details.json
     );
   });
 
-  it('collects URLs linkified from summary and quote text', () => {
+  it('flags a missing thread-post URL rendered by the thread modal', () => {
+    const merged = collectUrlRecords([], {
+      THREAD1: {
+        thread_data: { posts: [{ content: 'A post without its outbound URL' }] },
+      },
+    });
+    assert.ok(merged.some(({ id, url }) => id === 'THREAD1' && url === undefined));
+    const malformed = checkUrlWellFormedness(merged);
+    assert.ok(malformed.some(({ sourceId }) => sourceId === 'THREAD1'));
+  });
+
+  it('collects URLs linkified from summary text but not plain-text quotes', () => {
     const merged = collectUrlRecords([
       {
         id: 'R1',
@@ -252,7 +263,6 @@ describe('collectUrlRecords (core archive-data.json + split archive-details.json
       [
         'https://example.com/source',
         'https://example.com/summary',
-        'https://example.net/quoted',
       ]
     );
   });

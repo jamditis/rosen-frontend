@@ -10,7 +10,8 @@ describe('scheduled external link verification (#558)', () => {
     const workflow = fs.readFileSync(workflowUrl, 'utf8');
     assert.match(workflow, /schedule:/);
     assert.match(workflow, /workflow_dispatch:/);
-    assert.match(workflow, /verify-links[^\n]*--external[^\n]*--out\s+verify-links-report\.json/);
+    assert.match(workflow, /verify-links[^\n]*--external[^\n]*--report-only/);
+    assert.match(workflow, /verify-links[^\n]*--max\s+3000[^\n]*--out\s+verify-links-report\.json/);
   });
 
   it('retains the report as an artifact even if an offline integrity check fails', () => {

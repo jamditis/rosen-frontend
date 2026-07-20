@@ -261,9 +261,10 @@ export function collectUrlRecords(records, details) {
   };
   const addRecordSurfaces = (id, record) => {
     addLinkified(id, record?.summary);
-    addLinkified(id, record?.quote);
     for (const post of record?.thread_data?.posts || []) {
-      if (Object.prototype.hasOwnProperty.call(post, 'url')) add(id, post.url);
+      // ThreadModal renders this anchor for every post. Preserve a missing value
+      // so well-formedness checks flag the same broken href a reader would see.
+      add(id, post.url);
       addLinkified(id, post.content);
     }
   };
