@@ -106,8 +106,8 @@ def render_record_pages(
 ) -> Dict[str, str]:
     """Render all eligible shells, or only the requested record ids.
 
-    Missing and social requested records intentionally return no shell so the
-    caller can remove an obsolete remote page.
+    Social records intentionally return no shell so the caller can remove an
+    obsolete remote page. Missing requested records raise an error.
     """
     requested = None
     if record_ids is not None:
@@ -125,6 +125,11 @@ def render_record_pages(
         if record.get("type") == "social":
             continue
         rendered[record_id] = render_record_page(template, record)
+    if requested is not None:
+        missing = requested - seen
+        if missing:
+            missing_ids = ", ".join(sorted(missing))
+            raise ValueError(f"requested record ids not found: {missing_ids}")
     return dict(sorted(rendered.items()))
 
 

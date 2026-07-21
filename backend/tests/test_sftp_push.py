@@ -245,6 +245,34 @@ class TestRecordShellPush:
         mock_sftp.remove.assert_called_once_with(
             '/home/rosen/public_html/j/rosen-archive/r/BSKY-00001.html')
 
+    def test_missing_requested_record_fails_without_deleting_shell(
+            self, staging_dir, monkeypatch):
+        _set_env(monkeypatch)
+        (staging_dir / 'archive-data.json').write_text(json.dumps({
+            'records': [{
+                'id': 'RECORD-00002',
+                'title': 'Different record',
+                'type': 'article',
+            }],
+        }))
+
+        with patch('paramiko.SSHClient') as mock_client_cls:
+            mock_client = MagicMock()
+            mock_sftp = MagicMock()
+            remote_file = MagicMock()
+            remote_file.read.return_value = _LIVE_INDEX
+            mock_sftp.open.return_value.__enter__.return_value = remote_file
+            mock_client.open_sftp.return_value = mock_sftp
+            mock_client_cls.return_value = mock_client
+
+            result = sftp_push.push_to_production(
+                staging_dir, record_ids=('RECORD-00001',))
+
+        assert result['ok'] is False
+        assert 'RECORD-00001' in result['error']
+        mock_sftp.put.assert_not_called()
+        mock_sftp.remove.assert_not_called()
+
     def test_rejects_record_shell_push_outside_data_directory(
             self, staging_dir, monkeypatch):
         _set_env(monkeypatch, ROSEN_SFTP_REMOTE_PATH='/srv/archive-json')

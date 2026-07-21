@@ -18,7 +18,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { canonicalRecordUrl, parseRecordId, setRecordParam } from '../frontend/utils/recordDeepLink.js';
+import {
+  canonicalRecordUrl,
+  parseRecordId,
+  setRecordParam,
+  shareRecordUrl,
+} from '../frontend/utils/recordDeepLink.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const readSrc = (rel) => fs.readFileSync(path.join(__dirname, '..', rel), 'utf-8');
@@ -130,6 +135,42 @@ describe('canonicalRecordUrl — one share format across archive surfaces', () =
   });
 });
 
+describe('shareRecordUrl — bounded archive shells with useful social previews', () => {
+  it('uses the original source for social records', () => {
+    assert.equal(
+      shareRecordUrl(
+        'https://pressthink.org/j/rosen-archive/?record=OLD',
+        {
+          id: 'BSKY-03121',
+          type: 'social',
+          url: 'https://bsky.app/profile/jayrosen.bsky.social/post/abc',
+        },
+      ),
+      'https://bsky.app/profile/jayrosen.bsky.social/post/abc',
+    );
+  });
+
+  it('keeps non-social records on the archive metadata route', () => {
+    assert.equal(
+      shareRecordUrl(
+        'https://pressthink.org/j/rosen-archive/#desktop/archive',
+        { id: 'RECORD-00042', type: 'article', url: 'https://example.com/story' },
+      ),
+      'https://pressthink.org/j/rosen-archive/?record=RECORD-00042',
+    );
+  });
+
+  it('falls back to the archive route for an unsafe social source URL', () => {
+    assert.equal(
+      shareRecordUrl(
+        'https://pressthink.org/j/rosen-archive/',
+        { id: 'BSKY-03121', type: 'social', url: 'javascript:alert(1)' },
+      ),
+      'https://pressthink.org/j/rosen-archive/?record=BSKY-03121',
+    );
+  });
+});
+
 describe('production delegates to these helpers (keeps the tests above relevant)', () => {
   // The behavioural assertions only protect the shipped deep link if the real
   // code routes through parseRecordId/setRecordParam. Without these guards the
@@ -151,5 +192,21 @@ describe('production delegates to these helpers (keeps the tests above relevant)
       readSrc('frontend/App.js'),
       /setRecordParam\(\s*url\.searchParams\s*,[\s\S]{0,120}selectedRecordId\s*,?\s*\)/,
     );
+  });
+
+  it('RecordModal delegates share targets to shareRecordUrl', () => {
+    assert.match(
+      readSrc('frontend/components/RecordModal.js'),
+      /shareRecordUrl\(window\.location\.href,\s*shareRecord\)/,
+    );
+    assert.match(
+      readSrc('frontend/components/RecordModal.js'),
+      /const shareRecord = record\?\.type === 'social'\s*\? currentFullRecord/,
+    );
+    assert.match(
+      readSrc('frontend/components/RecordModal.js'),
+      /fullRecord\?\.id === record\?\.id \? fullRecord : null/,
+    );
+    assert.match(readSrc('frontend/components/RecordModal.js'), /disabled=\$\{sharePending\}/);
   });
 });

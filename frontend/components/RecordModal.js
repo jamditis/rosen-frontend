@@ -1,13 +1,13 @@
 
 import { useEffect, useRef, useState } from 'react';
-import { html } from '../html.js?v=3.7.9';
+import { html } from '../html.js?v=3.7.10';
 import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2 } from 'lucide-react';
-import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.7.9';
-import { ThreadModal } from './ThreadModal.js?v=3.7.9';
-import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.7.9';
-import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.7.9';
-import { recordNeedsReview } from '../utils/needsReview.js?v=3.7.9';
-import { canonicalRecordUrl } from '../utils/recordDeepLink.js?v=3.7.9';
+import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.7.10';
+import { ThreadModal } from './ThreadModal.js?v=3.7.10';
+import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.7.10';
+import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.7.10';
+import { recordNeedsReview } from '../utils/needsReview.js?v=3.7.10';
+import { canonicalRecordUrl, shareRecordUrl } from '../utils/recordDeepLink.js?v=3.7.10';
 
 const linkifyText = (text) => {
   const parts = splitUrlsForLinkify(text);
@@ -54,6 +54,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
   const closeButtonRef = useRef(null);
   const openerRef = useRef(null);
   const hasRecord = Boolean(record);
+  const currentFullRecord = fullRecord?.id === record?.id ? fullRecord : null;
 
   // Fetch details when modal opens
   useEffect(() => {
@@ -96,7 +97,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
 
   // Find related works based on shared entities
   useEffect(() => {
-    if (!fullRecord || !allRecords) return;
+    if (!currentFullRecord || !allRecords) return;
 
     const findRelated = async () => {
       setRecordEntities([]);
@@ -106,7 +107,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
       }
 
       setRecordEntities(
-        getEntitiesByRecord(fullRecord.id)
+        getEntitiesByRecord(currentFullRecord.id)
           .sort((a, b) => (b.prominence || 0) - (a.prominence || 0))
           .slice(0, 8)
       );
@@ -114,11 +115,11 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
       // Calculate entity-based connections to all other article records
       const connections = [];
       const candidateRecords = allRecords.filter(r =>
-        r.id !== fullRecord.id && r.type !== 'social'
+        r.id !== currentFullRecord.id && r.type !== 'social'
       );
 
       for (const candidate of candidateRecords) {
-        const result = calculateEntityConnectionStrength(fullRecord.id, candidate.id);
+        const result = calculateEntityConnectionStrength(currentFullRecord.id, candidate.id);
         if (result.strength > 0) {
           connections.push({
             ...candidate,
@@ -136,9 +137,9 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
       // Fallback: if no entity connections, use category matching
       if (related.length === 0) {
         related = allRecords.filter(r =>
-          r.id !== fullRecord.id &&
+          r.id !== currentFullRecord.id &&
           r.type !== 'social' &&
-          (r.categories || []).some(c => (fullRecord.categories || []).includes(c))
+          (r.categories || []).some(c => (currentFullRecord.categories || []).includes(c))
         ).slice(0, 4);
       }
 
@@ -146,7 +147,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
     };
 
     findRelated();
-  }, [fullRecord, allRecords]);
+  }, [currentFullRecord, allRecords]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -242,22 +243,27 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
   };
 
   const handleCopyCitation = () => {
-    if (!fullRecord) return;
-    const recordUrl = canonicalRecordUrl(window.location.href, fullRecord.id);
-    const text = `${fullRecord.author} (${fullRecord.year}). "${fullRecord.title}". ${fullRecord.pub}. Retrieved from ${recordUrl}`;
+    if (!currentFullRecord) return;
+    const recordUrl = canonicalRecordUrl(window.location.href, currentFullRecord.id);
+    const text = `${currentFullRecord.author} (${currentFullRecord.year}). "${currentFullRecord.title}". ${currentFullRecord.pub}. Retrieved from ${recordUrl}`;
     navigator.clipboard.writeText(text).then(() => showNotification("Citation copied to clipboard"));
   };
 
+  // Social share previews belong to the original platform, whose source URL is
+  // loaded with the detail record rather than the lightweight archive card.
+  const shareRecord = record?.type === 'social' ? currentFullRecord : record;
+  const sharePending = record?.type === 'social' && !currentFullRecord;
+
   const handleShare = () => {
-      if(!record) return;
-      const url = canonicalRecordUrl(window.location.href, record.id);
+      if (!shareRecord) return;
+      const url = shareRecordUrl(window.location.href, shareRecord);
       navigator.clipboard.writeText(url).then(() => showNotification("Link copied to clipboard"));
   };
 
   if (!isOpen || !record) return null;
 
   // Use fullRecord for display (with details), fallback to record for basic info
-  const displayRecord = fullRecord || record;
+  const displayRecord = currentFullRecord || record;
   const isVideo = (displayRecord.url || '').includes('youtube') || (displayRecord.url || '').includes('vimeo');
   const youtubeId = (displayRecord.url || '').match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/)?.[2];
 
@@ -292,7 +298,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
               `}
             </div>
             <div className="flex items-center gap-2">
-              <button type="button" onClick=${handleShare} className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded transition-colors" style=${{ minWidth: '44px', minHeight: '44px' }} title="Copy canonical record link" aria-label="Copy canonical record link">
+              <button type="button" onClick=${handleShare} disabled=${sharePending} className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 disabled:cursor-wait disabled:opacity-40 rounded transition-colors" style=${{ minWidth: '44px', minHeight: '44px' }} title=${sharePending ? 'Loading source post link' : displayRecord.type === 'social' ? 'Copy source post link' : 'Copy canonical record link'} aria-label=${sharePending ? 'Loading source post link' : displayRecord.type === 'social' ? 'Copy source post link' : 'Copy canonical record link'}>
                 <${Share2} className="w-5 h-5" aria-hidden="true" />
               </button>
               <button type="button" onClick=${handleCopyCitation} className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded transition-colors" style=${{ minWidth: '44px', minHeight: '44px' }} title="Copy citation" aria-label="Copy citation">

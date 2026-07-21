@@ -54,18 +54,35 @@ on:
         type: string
         default: ''
 
-concurrency:
-  group: pillar3a-submit-record
-  cancel-in-progress: false
-
 permissions:
   contents: read
+  actions: read
 
 jobs:
   submit:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Five hours may be spent behind older releases, leaving one hour for the
+    # submission pipeline after the FIFO wait completes.
+    timeout-minutes: 360
     steps:
+      - name: Checkout release queue helper
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Wait for release turn
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_QUEUE_TIMEOUT_SECONDS: 18000
+        run: node .github/scripts/wait-release-turn.mjs
+
+      # Installation tokens expire after one hour, so mint the write credential
+      # only after the potentially long queue wait has completed.
       - name: Mint GitHub App installation token
         id: app-token
         uses: actions/create-github-app-token@v1
@@ -73,7 +90,7 @@ jobs:
           app-id: ${{ secrets.ROSEN_GH_APP_ID }}
           private-key: ${{ secrets.ROSEN_GH_APP_PRIVATE_KEY }}
 
-      - name: Checkout main
+      - name: Checkout current main with write token
         uses: actions/checkout@v6
         with:
           token: ${{ steps.app-token.outputs.token }}
@@ -84,11 +101,6 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: '3.13'
-
-      - name: Set up Node 22
-        uses: actions/setup-node@v6
-        with:
-          node-version: '22'
 
       - name: Install Poetry
         run: |

@@ -549,6 +549,21 @@ def process_one(url: str, title: str = '', notes: str = '',
 
     # --- Sentinel handling: no-op submission that only runs the SFTP step. -
     if _is_sentinel(url):
+        if not retry_record_id:
+            msg = 'Sentinel retry requires a record id'
+            _safe_writeback(
+                sheet_id,
+                sheet_tab,
+                sheet_row or 0,
+                status='error',
+                error=msg,
+            )
+            result.update({
+                'status': 'error',
+                'exit_code': 1,
+                'error': msg,
+            })
+            return result
         logger.info(f'Sentinel URL ({url}); skipping scrape/categorize/append, '
                     'running SFTP only')
         # Even on a noop we still need the staged JSONs to push. Regen if
@@ -561,8 +576,7 @@ def process_one(url: str, title: str = '', notes: str = '',
                 _stage_for_ftp()
             except Exception as exc:  # noqa: BLE001
                 logger.warning(f'Sentinel regen failed (continuing): {exc}')
-        record_ids = (retry_record_id,) if retry_record_id else ()
-        push = sftp_push.push_to_production(record_ids=record_ids)
+        push = sftp_push.push_to_production(record_ids=(retry_record_id,))
         if push.get('skipped'):
             # A skipped push returns ok=True (a successful no-op), so it must be
             # matched before the ok branch below or it would fall through to
