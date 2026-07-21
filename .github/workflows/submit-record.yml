@@ -48,6 +48,11 @@ on:
         description: 'Queue row number (1-indexed) for writeback'
         required: true
         type: string
+      retry_record_id:
+        description: 'Archived record id whose metadata shell needs retry'
+        required: false
+        type: string
+        default: ''
 
 concurrency:
   group: pillar3a-submit-record
@@ -154,6 +159,7 @@ jobs:
           SHEET_ID: ${{ inputs.sheet_id }}
           SHEET_TAB: ${{ inputs.sheet_tab }}
           SHEET_ROW: ${{ inputs.sheet_row }}
+          RETRY_RECORD_ID: ${{ inputs.retry_record_id }}
           # Auth + integration secrets
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ROSEN_SHEETS_SA_KEY_JSON: ${{ secrets.ROSEN_SHEETS_SA_KEY_JSON }}
@@ -180,4 +186,5 @@ jobs:
             --raw-text "$RAW_TEXT" \
             --sheet-id "$SHEET_ID" \
             --sheet-tab "$SHEET_TAB" \
-            --sheet-row "$SHEET_ROW"
+            --sheet-row "$SHEET_ROW" \
+            --retry-record-id "$RETRY_RECORD_ID"

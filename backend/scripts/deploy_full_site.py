@@ -40,11 +40,8 @@ from __future__ import annotations
 
 import argparse
 import errno
-import html
-import json
 import logging
 import os
-import re
 import stat
 import sys
 from pathlib import Path
@@ -55,6 +52,15 @@ logging.basicConfig(
     format='%(asctime)s %(levelname)s %(message)s',
 )
 logger = logging.getLogger('deploy_full_site')
+
+_BACKEND = Path(__file__).resolve().parents[1]
+if str(_BACKEND) not in sys.path:
+    sys.path.insert(0, str(_BACKEND))
+
+from submission_runtime.record_pages import (  # noqa: E402
+    RECORD_SHELL_RE,
+    generate_record_pages,
+)
 
 
 # ---------- Manifest --------------------------------------------------------
@@ -210,112 +216,6 @@ def _is_excluded(path: Path) -> bool:
     return False
 
 
-_RECORD_ID_RE = re.compile(r'^[A-Za-z0-9-]+$')
-_SOCIAL_DESCRIPTION_LIMIT = 300
-
-
-def _replace_head_value(source: str, pattern: str, value: str, label: str) -> str:
-    """Replace one required head value and fail if the template drifted."""
-    replaced, count = re.subn(
-        pattern,
-        lambda match: f'{match.group(1)}{value}{match.group(2)}',
-        source,
-        count=1,
-        flags=re.IGNORECASE | re.DOTALL,
-    )
-    if count != 1:
-        raise ValueError(f'index.html must contain exactly one {label}')
-    return replaced
-
-
-def _record_description(record: Dict[str, Any]) -> str:
-    raw = record.get('summary') or record.get('quote') or record.get('title') or ''
-    normalized = re.sub(r'\s+', ' ', str(raw)).strip()
-    if len(normalized) > _SOCIAL_DESCRIPTION_LIMIT:
-        normalized = normalized[:_SOCIAL_DESCRIPTION_LIMIT - 1].rstrip() + '…'
-    return normalized
-
-
-def _render_record_page(template: str, record: Dict[str, Any]) -> str:
-    record_id = str(record.get('id') or '').strip()
-    if not _RECORD_ID_RE.fullmatch(record_id):
-        raise ValueError(f'unsafe or missing record id for social page: {record_id!r}')
-
-    raw_title = re.sub(r'\s+', ' ', str(record.get('title') or '')).strip()
-    if not raw_title:
-        raise ValueError(f'record {record_id} has no title for social metadata')
-
-    title = html.escape(raw_title, quote=True)
-    page_title = f'{title} | Jay Rosen\'s Internet Archive'
-    description = html.escape(_record_description(record), quote=True)
-    canonical = (
-        'https://pressthink.org/j/rosen-archive/'
-        f'?record={record_id}'
-    )
-
-    rendered = _replace_head_value(
-        template, r'(<title>)[\s\S]*?(</title>)', page_title, '<title>')
-    rendered = _replace_head_value(
-        rendered,
-        r'(<meta\s+name="description"\s+content=")[^"]*("\s*/?>)',
-        description,
-        'description meta tag',
-    )
-    rendered = _replace_head_value(
-        rendered,
-        r'(<link\s+rel="canonical"\s+href=")[^"]*("\s*/?>)',
-        canonical,
-        'canonical link',
-    )
-    for key, value in (
-        ('og:title', title),
-        ('og:description', description),
-        ('og:url', canonical),
-        ('og:type', 'article'),
-        ('twitter:title', title),
-        ('twitter:description', description),
-    ):
-        attribute = 'property' if key.startswith('og:') else 'name'
-        rendered = _replace_head_value(
-            rendered,
-            rf'(<meta\s+{attribute}="{re.escape(key)}"\s+content=")[^"]*("\s*/?>)',
-            value,
-            f'{key} meta tag',
-        )
-    return rendered
-
-
-def generate_record_pages(repo_root: Path) -> List[Path]:
-    """Build crawler-readable HTML shells for non-social record deep links."""
-    template = (repo_root / 'index.html').read_text(encoding='utf-8')
-    archive = json.loads(
-        (repo_root / 'data' / 'archive-data.json').read_text(encoding='utf-8'))
-    records = archive.get('records')
-    if not isinstance(records, list):
-        raise ValueError('data/archive-data.json must contain a records list')
-
-    output_dir = repo_root / 'r'
-    output_dir.mkdir(parents=True, exist_ok=True)
-    for stale in output_dir.glob('*.html'):
-        stale.unlink()
-
-    pages: List[Path] = []
-    seen: Set[str] = set()
-    for record in records:
-        if record.get('type') == 'social':
-            continue
-        record_id = str(record.get('id') or '').strip()
-        if record_id in seen:
-            raise ValueError(f'duplicate record id for social page: {record_id}')
-        seen.add(record_id)
-        page = output_dir / f'{record_id}.html'
-        page.write_text(_render_record_page(template, record), encoding='utf-8')
-        pages.append(page)
-
-    pages.sort(key=lambda page: page.name)
-    return pages
-
-
 def collect_local_files(
     repo_root: Path,
     top_files: Iterable[str] = _DEPLOY_FILES,
@@ -324,8 +224,8 @@ def collect_local_files(
     entry_points: Iterable[str] = _ENTRY_POINTS,
 ) -> List[Path]:
     """Walk the manifest and return every file to upload, ordered so that
-    each feature's index.html follows its dependencies, and site entry-point
-    files (index.html, both service-worker files, version.json) come LAST.
+    each HTML entry point follows its dependencies. Generated record shells
+    come after assets/data, followed by the global app entry points LAST.
 
     Skips entries that don't exist on disk (the existence tests catch
     those at PR time — at deploy time we keep going so a missing optional
@@ -351,7 +251,18 @@ def collect_local_files(
         if relpath.rstrip('/').startswith('features/')
         and (repo_root / relpath / 'index.html').is_file()
     )
-    entry_set = set(declared_entry_points) | set(feature_entry_points)
+    record_entry_points = tuple(sorted(
+        path.relative_to(repo_root).as_posix()
+        for relpath in dirs
+        if relpath.rstrip('/') == 'r'
+        for path in (repo_root / relpath).glob('*.html')
+        if path.is_file() and RECORD_SHELL_RE.fullmatch(path.name)
+    ))
+    entry_set = (
+        set(declared_entry_points)
+        | set(feature_entry_points)
+        | set(record_entry_points)
+    )
 
     def _add(p: Path) -> None:
         rp = p.resolve()
@@ -403,6 +314,13 @@ def collect_local_files(
     # is live. The global app/SW/version entry points retain their declared
     # absolute-last ordering after the standalone features.
     for relpath in feature_entry_points:
+        p = repo_root / relpath
+        if p.is_file():
+            _add(p)
+
+    # Record shells reference the global frontend and archive data. Flip them
+    # only after those dependencies, but before the root app/SW/version group.
+    for relpath in record_entry_points:
         p = repo_root / relpath
         if p.is_file():
             _add(p)
@@ -464,18 +382,62 @@ def _remove_remote_tree(sftp, remote_dir: str) -> bool:
     return True
 
 
+def _prune_remote_record_shells(
+    sftp,
+    remote_dir: str,
+    expected_names: Set[str],
+) -> int:
+    """Remove stale generated shells while preserving all unrelated entries."""
+    try:
+        entries = sftp.listdir_attr(remote_dir)
+    except IOError:
+        try:
+            sftp.stat(remote_dir)
+        except IOError as exc:
+            if exc.errno == errno.ENOENT:
+                return 0
+            raise
+        raise
+
+    removed = 0
+    for entry in entries:
+        if not stat.S_ISREG(entry.st_mode):
+            continue
+        if not RECORD_SHELL_RE.fullmatch(entry.filename):
+            continue
+        if entry.filename in expected_names:
+            continue
+        sftp.remove(f'{remote_dir}/{entry.filename}')
+        removed += 1
+    return removed
+
+
 def push_files(
     files: List[Path],
     repo_root: Path,
     cfg: Dict[str, Any],
     remote_prune_dirs: Iterable[str] = _REMOTE_PRUNE_DIRS,
+    record_shells: Optional[Iterable[Path]] = None,
 ) -> Dict[str, Any]:
-    """Upload files atomically, then remove retired remote directories.
+    """Upload files atomically, then reconcile retired remote content.
 
     Returns {ok, files_pushed, error}. The atomic-rename guarantee mirrors
     backend/submission_runtime/sftp_push.py — readers on the live site
-    never see a half-written file.
+    never see a half-written file. ``record_shells=None`` disables record-shell
+    reconciliation; an empty iterable intentionally clears every safe shell.
     """
+    expected_record_shells: Optional[Set[str]] = None
+    if record_shells is not None:
+        expected_record_shells = set()
+        for page in record_shells:
+            name = Path(page).name
+            if not RECORD_SHELL_RE.fullmatch(name):
+                return {
+                    'ok': False,
+                    'files_pushed': 0,
+                    'error': f'unsafe record shell name: {name!r}',
+                }
+            expected_record_shells.add(name)
     try:
         import paramiko
     except ImportError:
@@ -551,6 +513,13 @@ def push_files(
                 pushed += 1
                 if pushed % 25 == 0 or pushed == len(files):
                     logger.info(f"Pushed {pushed}/{len(files)} files")
+
+            if expected_record_shells is not None:
+                remote_record_dir = f"{cfg['site_path']}/r"
+                removed = _prune_remote_record_shells(
+                    sftp, remote_record_dir, expected_record_shells)
+                if removed:
+                    logger.info(f'Removed {removed} stale record metadata shells')
 
             for relpath in remote_prune_dirs:
                 remote_dir = f"{cfg['site_path']}/{relpath}"
@@ -630,7 +599,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 2
 
     logger.info(f'Deploying {len(files)} files to {cfg["host"]}:{cfg["site_path"]}')
-    result = push_files(files, repo_root, cfg)
+    result = push_files(files, repo_root, cfg, record_shells=record_pages)
     if result['ok']:
         logger.info(f'Deploy complete: {result["files_pushed"]} files pushed')
         return 0

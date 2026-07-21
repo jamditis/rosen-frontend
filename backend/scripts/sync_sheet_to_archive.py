@@ -10,7 +10,8 @@ Google Sheet. Nothing carries that work into ``data/archive_records-public.csv``
 so it never reaches the live site. This job closes that tail:
 
     read the sheet -> merge enriched columns into the CSV by ``id``
-    -> regen JSONs -> npm test -> commit (bot identity) -> SFTP to pressthink.org
+    -> regen JSONs -> npm test -> commit branch -> open review PR
+    -> Pillar 3c full-site deploy after merge
 
 The merge is ADDITIVE and never destructive:
 

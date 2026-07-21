@@ -27,7 +27,7 @@ Behavior (12-step pipeline from the design's "Architecture" diagram):
     8.  node data/export-archive-data.js            (regen JSONs)
     9.  npm test                                    (abort commit on fail)
    10.  git commit + push to main                   (App-token identity)
-   11.  SFTP push 4 JSONs to pressthink.org         (sftp_push.py)
+   11.  SFTP push JSONs + affected metadata shell   (sftp_push.py)
    12.  Sheet writeback F='live', G=RECORD-NNNNN   (retry once, then exit-non-0)
 
 Status outcomes: ``live | committed | archived | duplicate | error | noop``.
@@ -526,7 +526,8 @@ def process_one(url: str, title: str = '', notes: str = '',
                 sheet_id: str = '', sheet_tab: str = '',
                 sheet_row: Optional[int] = None,
                 prototype_mode: bool = False,
-                raw_text: str = '') -> Dict[str, Any]:
+                raw_text: str = '',
+                retry_record_id: str = '') -> Dict[str, Any]:
     """Run the 12-step pipeline for one submission. Returns a result dict.
 
     Keys: ``status`` (live/committed/archived/duplicate/error/noop), ``record_id``,
@@ -544,6 +545,7 @@ def process_one(url: str, title: str = '', notes: str = '',
     title = title or ''
     notes = notes or ''
     raw_text = raw_text or ''
+    retry_record_id = (retry_record_id or '').strip()
 
     # --- Sentinel handling: no-op submission that only runs the SFTP step. -
     if _is_sentinel(url):
@@ -559,7 +561,8 @@ def process_one(url: str, title: str = '', notes: str = '',
                 _stage_for_ftp()
             except Exception as exc:  # noqa: BLE001
                 logger.warning(f'Sentinel regen failed (continuing): {exc}')
-        push = sftp_push.push_to_production()
+        record_ids = (retry_record_id,) if retry_record_id else ()
+        push = sftp_push.push_to_production(record_ids=record_ids)
         if push.get('skipped'):
             # A skipped push returns ok=True (a successful no-op), so it must be
             # matched before the ok branch below or it would fall through to
@@ -964,7 +967,7 @@ def process_one(url: str, title: str = '', notes: str = '',
         logger.info('Prototype mode: skipping SFTP push to production')
     else:
         _stage_for_ftp()
-        push = sftp_push.push_to_production()
+        push = sftp_push.push_to_production(record_ids=(record_id,))
         if not (push.get('ok') and not push.get('skipped')):
             if push.get('skipped'):
                 # SFTP isn't configured on this runner, so retrying never makes
@@ -1017,6 +1020,8 @@ def _parse_args(argv):
     p.add_argument('--sheet-id', dest='sheet_id', default='')
     p.add_argument('--sheet-tab', dest='sheet_tab', default='')
     p.add_argument('--sheet-row', dest='sheet_row', type=int, default=0)
+    p.add_argument('--retry-record-id', dest='retry_record_id', default='',
+                   help='Archived record id whose metadata shell needs retry')
     p.add_argument('--prototype-mode', dest='prototype_mode',
                    action='store_true', default=False,
                    help='Skip SFTP push to PressThink (GH Pages auto-deploy '
@@ -1036,6 +1041,7 @@ def main(argv=None) -> int:
         sheet_row=args.sheet_row,
         prototype_mode=args.prototype_mode,
         raw_text=args.raw_text,
+        retry_record_id=args.retry_record_id,
     )
     logger.info(f'Result: status={result["status"]} '
                 f'record_id={result["record_id"]} error={result["error"]}')

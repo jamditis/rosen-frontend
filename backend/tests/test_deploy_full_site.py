@@ -396,6 +396,36 @@ class TestEntryPointsUploadedLast:
         assert names.index('sw.js') < names.index('version.json')
         assert names[-4:] == ['index.html', 'frontend/sw.js', 'sw.js', 'version.json']
 
+    def test_record_shells_follow_assets_and_data_before_global_entries(self,
+                                                                         tmp_path):
+        (tmp_path / 'index.html').write_text('<html>')
+        (tmp_path / 'version.json').write_text('{}')
+        (tmp_path / 'frontend').mkdir()
+        (tmp_path / 'frontend' / 'App.js').write_text('// app')
+        (tmp_path / 'r').mkdir()
+        (tmp_path / 'r' / 'RECORD-00002.html').write_text('<html>two</html>')
+        (tmp_path / 'r' / 'RECORD-00001.html').write_text('<html>one</html>')
+        (tmp_path / 'data').mkdir()
+        (tmp_path / 'data' / 'archive-data.json').write_text('{"records": []}')
+
+        files = deploy_full_site.collect_local_files(
+            tmp_path,
+            top_files=('index.html', 'version.json'),
+            dirs=('r', 'frontend'),
+            data_files=('data/archive-data.json',),
+            entry_points=('index.html', 'version.json'),
+        )
+        names = [f.relative_to(tmp_path).as_posix() for f in files]
+
+        for dependency in ('frontend/App.js', 'data/archive-data.json'):
+            assert names.index(dependency) < names.index('r/RECORD-00001.html')
+        assert names[-4:] == [
+            'r/RECORD-00001.html',
+            'r/RECORD-00002.html',
+            'index.html',
+            'version.json',
+        ]
+
     def test_shared_data_modules_upload_before_frontend_importers(self):
         files = deploy_full_site.collect_local_files(_REPO_ROOT)
         names = [f.relative_to(_REPO_ROOT).as_posix() for f in files]
@@ -1042,6 +1072,109 @@ class TestRetiredRoutes:
             deploy_full_site._remove_remote_tree(
                 sftp, '/site/dissertation/context',
             )
+
+
+class TestRecordShellReconciliation:
+    """A full deploy makes remote r/*.html match the generated archive."""
+
+    def test_removes_only_stale_safe_regular_shells_after_uploads(
+            self, monkeypatch, tmp_path):
+        _set_env(monkeypatch)
+        (tmp_path / 'index.html').write_text('<html>')
+        current = tmp_path / 'r' / 'RECORD-00001.html'
+        current.parent.mkdir()
+        current.write_text('<html>current</html>')
+
+        with patch('paramiko.SSHClient') as mock_client_cls:
+            mock_client = MagicMock()
+            mock_sftp = MagicMock()
+            mock_sftp.listdir_attr.return_value = [
+                SimpleNamespace(filename='RECORD-00001.html', st_mode=stat.S_IFREG),
+                SimpleNamespace(filename='STALE-00002.html', st_mode=stat.S_IFREG),
+                SimpleNamespace(filename='notes.txt', st_mode=stat.S_IFREG),
+                SimpleNamespace(filename='STALE-00003.html.tmp', st_mode=stat.S_IFREG),
+                SimpleNamespace(filename='nested', st_mode=stat.S_IFDIR),
+                SimpleNamespace(filename='LINK-00004.html', st_mode=stat.S_IFLNK),
+            ]
+            mock_client.open_sftp.return_value = mock_sftp
+            mock_client_cls.return_value = mock_client
+
+            result = deploy_full_site.push_files(
+                [tmp_path / 'index.html', current],
+                repo_root=tmp_path,
+                cfg=deploy_full_site._read_env(),
+                remote_prune_dirs=(),
+                record_shells=(current,),
+            )
+
+        assert result['ok'] is True
+        assert mock_sftp.remove.call_args_list == [
+            ((
+                '/home/rosen/public_html/j/rosen-archive/'
+                'r/STALE-00002.html',
+            ),),
+        ]
+        last_rename = max(
+            i for i, call in enumerate(mock_sftp.method_calls)
+            if call[0] == 'posix_rename'
+        )
+        prune = next(
+            i for i, call in enumerate(mock_sftp.method_calls)
+            if call[0] == 'remove'
+        )
+        assert prune > last_rename
+
+    def test_none_disables_reconciliation_and_empty_set_clears_shells(
+            self, monkeypatch, tmp_path):
+        _set_env(monkeypatch)
+        (tmp_path / 'index.html').write_text('<html>')
+
+        with patch('paramiko.SSHClient') as mock_client_cls:
+            mock_client = MagicMock()
+            mock_sftp = MagicMock()
+            mock_sftp.listdir_attr.return_value = [
+                SimpleNamespace(filename='STALE.html', st_mode=stat.S_IFREG),
+            ]
+            mock_client.open_sftp.return_value = mock_sftp
+            mock_client_cls.return_value = mock_client
+
+            deploy_full_site.push_files(
+                [tmp_path / 'index.html'], tmp_path,
+                deploy_full_site._read_env(), remote_prune_dirs=(),
+                record_shells=None,
+            )
+            mock_sftp.listdir_attr.assert_not_called()
+
+            result = deploy_full_site.push_files(
+                [tmp_path / 'index.html'], tmp_path,
+                deploy_full_site._read_env(), remote_prune_dirs=(),
+                record_shells=(),
+            )
+
+        assert result['ok'] is True
+        mock_sftp.remove.assert_called_once_with(
+            '/home/rosen/public_html/j/rosen-archive/r/STALE.html')
+
+    def test_upload_failure_skips_shell_reconciliation(self, monkeypatch,
+                                                        tmp_path):
+        _set_env(monkeypatch)
+        (tmp_path / 'index.html').write_text('<html>')
+
+        with patch('paramiko.SSHClient') as mock_client_cls:
+            mock_client = MagicMock()
+            mock_sftp = MagicMock()
+            mock_sftp.put.side_effect = IOError('disk full')
+            mock_client.open_sftp.return_value = mock_sftp
+            mock_client_cls.return_value = mock_client
+
+            result = deploy_full_site.push_files(
+                [tmp_path / 'index.html'], tmp_path,
+                deploy_full_site._read_env(), remote_prune_dirs=(),
+                record_shells=(),
+            )
+
+        assert result['ok'] is False
+        mock_sftp.listdir_attr.assert_not_called()
 
 
 class TestAbortOnFirstFailure:

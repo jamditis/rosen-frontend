@@ -157,12 +157,14 @@ def _stub_schema(monkeypatch):
 
 
 def _run(monkeypatch, csv_path, url='https://example.com/new', title='',
-         notes='', sheet_id='SHEET', sheet_tab='Queue', sheet_row=3):
+         notes='', sheet_id='SHEET', sheet_tab='Queue', sheet_row=3,
+         retry_record_id=''):
     """Convenience: invoke main() with a tmp CSV path patched in."""
     monkeypatch.setattr(process_submission, 'CSV_FILE', csv_path)
     return process_submission.process_one(
         url=url, title=title, notes=notes,
         sheet_id=sheet_id, sheet_tab=sheet_tab, sheet_row=sheet_row,
+        retry_record_id=retry_record_id,
     )
 
 
@@ -194,7 +196,7 @@ class TestHappyPath:
         assert final['status'] == 'live'
         assert final['record_id'] == result['record_id']
         # SFTP fired exactly once
-        sftp_mock.assert_called_once()
+        sftp_mock.assert_called_once_with(record_ids=(result['record_id'],))
         # git commit subprocess invoked with the record id in the message
         git_calls = [c for c in process_submission.subprocess.run.call_args_list
                      if c.args[0][:2] == ['git', 'commit']]
@@ -425,7 +427,7 @@ class TestPushRaceRetry:
         final = sheets_mock.call_args_list[-1].kwargs
         assert final['status'] == 'live'
         assert final['record_id'] == 'RECORD-00002'
-        sftp_mock.assert_called_once()
+        sftp_mock.assert_called_once_with(record_ids=('RECORD-00002',))
 
     def test_non_ff_push_keeps_id_when_still_free_after_reset(
             self, monkeypatch, csv_with_headers):
@@ -606,6 +608,7 @@ class TestSentinelUrl:
                      if c.args[0][:2] == ['git', 'commit']]
         assert git_calls == []
         sftp_mock.assert_called_once()
+        sftp_mock.assert_called_once_with(record_ids=())
         # Status reflects the no-op: not 'live' (no new row) and not 'error'.
         assert result['status'] in ('noop', 'live')
         # Sheet writeback for a sweep noop is optional — a sentinel submission
@@ -687,6 +690,24 @@ class TestCodexReviewFindings:
             f'got calls: {sheets_mock.call_args_list}'
         )
         assert result['status'] in ('noop', 'live')
+
+    def test_sentinel_retries_the_archived_record_shell(self, monkeypatch,
+                                                        csv_with_headers):
+        _stub_schema(monkeypatch)
+        monkeypatch.setattr(process_submission, 'dispatch_url', MagicMock())
+        monkeypatch.setattr(process_submission, 'categorize', MagicMock())
+        _stub_sheets(monkeypatch)
+        sftp_mock = _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        _run(
+            monkeypatch,
+            csv_with_headers,
+            url='https://example.com/sweep-noop-1748147200',
+            retry_record_id='RECORD-00042',
+        )
+
+        sftp_mock.assert_called_once_with(record_ids=('RECORD-00042',))
 
     def test_sentinel_keeps_archived_on_sftp_failure(self, monkeypatch,
                                                      csv_with_headers):
