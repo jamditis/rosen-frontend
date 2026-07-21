@@ -192,7 +192,7 @@ class TestDeploymentMdAlignment:
 
     def test_manifest_dir_entries_documented(self):
         """Reverse direction for directories: every _DEPLOY_DIRS entry -- even
-        a nested one like features/status-report or tools/active/dataviz --
+        a nested one like features/winer-method or tools/active/dataviz --
         must be documented in DEPLOYMENT.md, either as the directory itself or
         via a file listed under it. The file reverse-check and the top-level
         segment check both miss this: a nested dir line could drop from the doc
@@ -212,15 +212,15 @@ class TestDeploymentMdAlignment:
             f"manifest dir entries missing from DEPLOYMENT.md: {missing}"
         )
 
-        # Teeth: dropping the nested status-report line must make its path
+        # Teeth: dropping the nested Winer method line must make its path
         # undetectable -- the top-level `features/` line must not mask it.
         pruned = self._documented_paths('\n'.join(
             line for line in self._fenced_block().splitlines()
-            if 'status-report/' not in line
+            if 'winer-method/' not in line
         ))
         assert not (
-            'features/status-report' in pruned
-            or any(d.startswith('features/status-report/') for d in pruned)
+            'features/winer-method' in pruned
+            or any(d.startswith('features/winer-method/') for d in pruned)
         )
 
 
@@ -798,7 +798,7 @@ class TestDryRun:
         assert mock_client_cls.call_count == 0
         out = capsys.readouterr().out
         assert 'dry-run' in out.lower() or 'would upload' in out.lower()
-        assert 'would remove 6 retired directories' in out
+        assert 'would remove 7 retired directories' in out
         assert 'dissertation/comparison' in out
 
     def test_dry_run_with_missing_env_still_lists_files(self, monkeypatch, capsys):
@@ -863,8 +863,8 @@ class TestUploadPathsUsePosixRename:
         assert mock_sftp.posix_rename.call_count == 2
 
 
-class TestRetiredDissertationTools:
-    """Full deploys remove the six retired dissertation routes."""
+class TestRetiredRoutes:
+    """Full deploys remove retired public routes."""
 
     def test_prune_manifest_matches_removed_routes(self):
         expected = (
@@ -874,12 +874,16 @@ class TestRetiredDissertationTools:
             'dissertation/excerpts',
             'dissertation/glossary',
             'dissertation/timeline',
+            'features/status-report',
         )
         assert deploy_full_site._REMOTE_PRUNE_DIRS == expected
         archived_tools_root = _REPO_ROOT / 'archived' / 'dissertation-tools'
-        for relpath in expected:
+        for relpath in expected[:-1]:
             route_name = pathlib.PurePosixPath(relpath).name
             assert not (archived_tools_root / route_name).exists()
+
+        assert not (_REPO_ROOT / 'features' / 'status-report').exists()
+        assert 'features/status-report' not in deploy_full_site._DEPLOY_DIRS
 
         # Issue #166 removes only retired tools. Both live development tools
         # remain tracked and in the upload manifest.

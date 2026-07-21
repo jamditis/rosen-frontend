@@ -78,7 +78,7 @@ const server = createServer(async (req, res) => {
     const s = await stat(filePath);
     if (s.isDirectory()) {
       // Redirect bare-directory requests to the slashed form so relative URLs
-      // in standalone pages (e.g. /features/status-report → ./assets/foo)
+      // in standalone pages (e.g. /features/winer-method → ./assets/foo)
       // resolve against the right base. Location is built from the validated
       // absolute path — `requested` is already proven to be inside ROOT by
       // safeResolve() above. Belt-and-braces: re-prove same-origin to CodeQL
