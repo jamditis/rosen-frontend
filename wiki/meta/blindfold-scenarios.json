@@ -25,13 +25,13 @@
     "id": "add-record",
     "prompt": "How does a new archive Record enter the system, and what is currently blocked?",
     "expectedWikiFiles": [
-      "wiki/systems/submission-server.md",
+      "wiki/systems/submission-automation.md",
       "wiki/systems/data-pipeline.md",
       "wiki/systems/deploy-and-hosting.md",
       "wiki/data/data-quality-gaps.md"
     ],
     "requiredTerms": ["node data/export-archive-data.js", "submit-record.yml", "SFTP"],
-    "rubric": "A useful answer distinguishes the Flask submission path from the sheet-driven workflow, then names export and deploy constraints."
+    "rubric": "A useful answer names the sheet-driven workflow as the supported path, then identifies its export and deploy constraints."
   },
   {
     "id": "verify-change",

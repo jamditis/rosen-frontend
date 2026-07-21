@@ -6,7 +6,7 @@ Until both blocks below are done, both workflows are inert — a sweep tick or a
 
 Total time: ~30 minutes hands-on.
 
-Design source of truth: `docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md`. Tracking issue: [#226](https://github.com/jamditis/rosen-frontend/issues/226). Sibling Pillar 3 (now superseded) runbook: `automation/SETUP.md`.
+Design source of truth: `docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md`. Tracking issue: [#226](https://github.com/jamditis/rosen-frontend/issues/226).
 
 ---
 
@@ -62,22 +62,20 @@ pass insert claude/rosen/sftp
 
 ### SFTP remote path
 
-Two paths appear in existing docs; verify against your current manual FTP deploy practice before populating the secret:
-
-- `DEPLOYMENT.md` (manual deploy guide, line 3): `/wp-content/rosen-archive/`
-- `automation/SETUP.md` (Pillar 3 design): `<remote>/j/rosen-archive/data/`
-- `backend/submission_server/sftp_push.py` docstring example: `/home/u/public_html/j/rosen-archive/data`
-
-The live URL `pressthink.org/j/rosen-archive/` strongly suggests the second pattern (`<docroot>/j/rosen-archive/`). The data subdirectory is what gets the four JSONs — so the value should end in `/data`.
+Verify the remote directory against the current manual deploy path in
+`DEPLOYMENT.md` before populating the secret. `ROSEN_SFTP_REMOTE_PATH` must be
+the data directory that directly contains the six generated JSON artifacts in
+`submission_runtime.artifacts.DATA_DEPLOY_JSON_FILES`.
 
 To verify before pasting:
 
 ```bash
 # Read sftp_push.py to confirm it writes to <REMOTE_PATH>/archive-*.json (no further suffix)
-grep -A2 'remote_final' backend/submission_server/sftp_push.py
+grep -A2 'remote_final' backend/submission_runtime/sftp_push.py
 ```
 
-`sftp_push.py:181` writes `f"{cfg['remote_path']}/{filename}"` — so `ROSEN_SFTP_REMOTE_PATH` must be the directory that directly contains the four `archive-*.json` files on the live site.
+`sftp_push.py` writes each artifact to
+`f"{cfg['remote_path']}/{filename}"`; it does not add a `data/` suffix.
 
 ### Capturing the host key
 
@@ -90,11 +88,11 @@ ssh-keyscan -p <PORT> <HOST> 2>/dev/null
 
 `ssh-keyscan` prints one line per host-key type the server offers, each in the form `<host> <key-type> <key-body>` (or `[<host>]:<port> ...` for non-default ports). Paste **every line it emits** (all host-key types), each with its **hostname prefix** — the `known_hosts` format requires the hostname as the first field, and `paramiko`'s `RejectPolicy` matches the connect host against it. Keep all the lines, not just one: `paramiko` accepts only whichever host-key algorithm the server negotiates at connect time, so a single pasted line still rejects if the server picks a different type. Pasting only the `ssh-rsa AAAA…` body (no hostname) would leave no host mapping and every push would reject.
 
-`backend/submission_server/sftp_push.py:159` enforces `RejectPolicy`, so a missing or mismatched key fails the push rather than silently trusting a MITM. This is intentional for a production-writeable deploy step.
+`backend/submission_runtime/sftp_push.py` enforces `RejectPolicy`, so a missing or mismatched key fails the push rather than silently trusting a MITM. This is intentional for a production-writeable deploy step.
 
 #### Host-key handling (resolved in code — #408)
 
-`ROSEN_SFTP_KNOWN_HOSTS` can hold **either** a path to a `known_hosts` file on the runner **or** the raw `ssh-keyscan` line(s) inline. `sftp_push.py:142-158` checks whether the value is an existing file: if so it loads it directly; otherwise it treats the value as inline `known_hosts` contents, writes them to a temp file, and loads that. `set_missing_host_key_policy(RejectPolicy())` then still rejects any unpinned host. So pasting the `ssh-keyscan` output straight into the secret works as-is — **no `submit-record.yml` patch is required**.
+`ROSEN_SFTP_KNOWN_HOSTS` can hold **either** a path to a `known_hosts` file on the runner **or** the raw `ssh-keyscan` line(s) inline. `sftp_push.py` checks whether the value is an existing file: if so it loads it directly; otherwise it treats the value as inline `known_hosts` contents, writes them to a temp file, and loads that. `set_missing_host_key_policy(RejectPolicy())` then still rejects any unpinned host. So pasting the `ssh-keyscan` output straight into the secret works as-is — **no `submit-record.yml` patch is required**.
 
 This closed the earlier inline-vs-path foot-gun: a secret holding inline contents used to fall through `load_host_keys`, leaving `RejectPolicy` to block every push with `Server '<host>' not found in known_hosts`. The fix landed in PR #408; issues #298 and #304 track it. The workflow passes the secret straight through, which is now correct for either shape.
 
@@ -152,7 +150,7 @@ Settings → Secrets and variables → Actions → "New repository secret" for e
 
 ### Enabling key-based auth (plumbing is in place)
 
-The workflow plumbing now exists. `submit-record.yml` has a "Materialize SFTP private key" step that, when the `ROSEN_SFTP_KEY_CONTENT` secret is set, writes the key body to a runner-temp file (`chmod 600`) and exports `ROSEN_SFTP_KEY_PATH` before the push; `sftp_push.py:169` prefers the key over the password whenever a key path is present. The step is a no-op while the secret is unset, so password auth stays the working default and nothing changes until the cutover below is done.
+The workflow plumbing now exists. `submit-record.yml` has a "Materialize SFTP private key" step that, when the `ROSEN_SFTP_KEY_CONTENT` secret is set, writes the key body to a runner-temp file (`chmod 600`) and exports `ROSEN_SFTP_KEY_PATH` before the push; `sftp_push.py` prefers the key over the password whenever a key path is present. The step is a no-op while the secret is unset, so password auth stays the working default and nothing changes until the cutover below is done.
 
 `submit-record.yml` (per-record push) and `deploy.yml` (Pillar 3c full-site deploy) both carry this step — both run an SFTP push that shares `sftp_push.py`'s auth precedence, so a single `ROSEN_SFTP_KEY_CONTENT` secret switches both. `sweep-stuck-rows.yml` re-dispatches stuck rows back through `submit-record.yml` (the SFTP push happens there, not in the sweep run), and `submit-prototype.yml` runs `--prototype-mode`, which short-circuits the push, so neither holds SFTP credentials.
 

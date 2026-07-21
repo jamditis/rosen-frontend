@@ -1,7 +1,7 @@
 """
 Pytest configuration and fixtures for backend tests.
 
-Import paths (src/ for rosen_scraper, the backend root for submission_server)
+Import paths (src/ for rosen_scraper, the backend root for submission_runtime)
 are set via [tool.pytest.ini_options] pythonpath in pyproject.toml, so this
 file no longer needs to mutate sys.path. See issue #156.
 """

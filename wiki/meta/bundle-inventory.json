@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "generatedFrom": "scripts/okf-flight-recorder.js",
-  "asOfDate": "2026-06-23",
+  "asOfDate": "2026-07-21",
   "graphPolicy": {
     "defaultView": "local",
     "defaultHops": 1,
@@ -33,7 +33,7 @@
     "byFreshness": {
       "fresh": 34
     },
-    "totalInternalLinks": 115,
+    "totalInternalLinks": 114,
     "totalExternalLinks": 2,
     "orphanedConcepts": 13
   },
@@ -56,11 +56,11 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 1,
+      "verifiedAgeDays": 29,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 1 days before inventory",
+        "reason": "Verified 29 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "medium",
@@ -150,11 +150,11 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 0,
+      "verifiedAgeDays": 28,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 0 days before inventory",
+        "reason": "Verified 28 days before inventory",
         "sourceCount": 5
       },
       "driftRisk": "medium",
@@ -203,11 +203,11 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 1,
+      "verifiedAgeDays": 29,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 1 days before inventory",
+        "reason": "Verified 29 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "medium",
@@ -275,11 +275,11 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 1,
+      "verifiedAgeDays": 29,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 1 days before inventory",
+        "reason": "Verified 29 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "high",
@@ -359,11 +359,11 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 1,
+      "verifiedAgeDays": 29,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 1 days before inventory",
+        "reason": "Verified 29 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "high",
@@ -437,11 +437,11 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 0,
+      "verifiedAgeDays": 28,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 0 days before inventory",
+        "reason": "Verified 28 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "high",
@@ -493,11 +493,11 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 0,
+      "verifiedAgeDays": 28,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 0 days before inventory",
+        "reason": "Verified 28 days before inventory",
         "sourceCount": 4
       },
       "driftRisk": "medium",
@@ -529,8 +529,8 @@
         "scripts/okf-blindfold-test.js",
         "wiki/meta/blindfold-scenarios.json"
       ],
-      "verified": "2026-06-23",
-      "timestamp": "2026-06-23",
+      "verified": "2026-07-21",
+      "timestamp": "2026-07-21",
       "verifiedAgeDays": 0,
       "freshness": {
         "badge": "fresh",
@@ -567,8 +567,8 @@
         "scripts/okf-flight-recorder.js",
         "wiki/meta/bundle-inventory.json"
       ],
-      "verified": "2026-06-23",
-      "timestamp": "2026-06-23",
+      "verified": "2026-07-21",
+      "timestamp": "2026-07-21",
       "verifiedAgeDays": 0,
       "freshness": {
         "badge": "fresh",
@@ -611,11 +611,11 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 0,
+      "verifiedAgeDays": 28,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 0 days before inventory",
+        "reason": "Verified 28 days before inventory",
         "sourceCount": 4
       },
       "driftRisk": "medium",
@@ -648,11 +648,11 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 0,
+      "verifiedAgeDays": 28,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 0 days before inventory",
+        "reason": "Verified 28 days before inventory",
         "sourceCount": 2
       },
       "driftRisk": "low",
@@ -690,11 +690,11 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 0,
+      "verifiedAgeDays": 28,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 0 days before inventory",
+        "reason": "Verified 28 days before inventory",
         "sourceCount": 6
       },
       "driftRisk": "low",
@@ -730,11 +730,11 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 0,
+      "verifiedAgeDays": 28,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 0 days before inventory",
+        "reason": "Verified 28 days before inventory",
         "sourceCount": 4
       },
       "driftRisk": "low",
@@ -785,11 +785,11 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 0,
+      "verifiedAgeDays": 28,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 0 days before inventory",
+        "reason": "Verified 28 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "low",
@@ -826,11 +826,11 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 0,
+      "verifiedAgeDays": 28,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 0 days before inventory",
+        "reason": "Verified 28 days before inventory",
         "sourceCount": 4
       },
       "driftRisk": "low",
@@ -873,11 +873,11 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 1,
+      "verifiedAgeDays": 29,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 1 days before inventory",
+        "reason": "Verified 29 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "high",
@@ -946,11 +946,11 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 1,
+      "verifiedAgeDays": 29,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 1 days before inventory",
+        "reason": "Verified 29 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "low",
@@ -1037,11 +1037,11 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 1,
+      "verifiedAgeDays": 29,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 1 days before inventory",
+        "reason": "Verified 29 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "high",
@@ -1097,11 +1097,11 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 0,
+      "verifiedAgeDays": 28,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 0 days before inventory",
+        "reason": "Verified 28 days before inventory",
         "sourceCount": 5
       },
       "driftRisk": "medium",
@@ -1159,11 +1159,11 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 1,
+      "verifiedAgeDays": 29,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 1 days before inventory",
+        "reason": "Verified 29 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "high",
@@ -1245,11 +1245,11 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 1,
+      "verifiedAgeDays": 29,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 1 days before inventory",
+        "reason": "Verified 29 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "medium",
@@ -1365,11 +1365,11 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 0,
+      "verifiedAgeDays": 28,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 0 days before inventory",
+        "reason": "Verified 28 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "medium",
@@ -1486,11 +1486,11 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 1,
+      "verifiedAgeDays": 29,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 1 days before inventory",
+        "reason": "Verified 29 days before inventory",
         "sourceCount": 1
       },
       "driftRisk": "medium",
@@ -1536,11 +1536,11 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 0,
+      "verifiedAgeDays": 28,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 0 days before inventory",
+        "reason": "Verified 28 days before inventory",
         "sourceCount": 6
       },
       "driftRisk": "high",
@@ -1596,11 +1596,11 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 0,
+      "verifiedAgeDays": 28,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 0 days before inventory",
+        "reason": "Verified 28 days before inventory",
         "sourceCount": 7
       },
       "driftRisk": "high",
@@ -1654,11 +1654,11 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 0,
+      "verifiedAgeDays": 28,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 0 days before inventory",
+        "reason": "Verified 28 days before inventory",
         "sourceCount": 4
       },
       "driftRisk": "high",
@@ -1675,14 +1675,14 @@
         "outboundConcepts": [
           "wiki/systems/deploy-and-hosting.md",
           "wiki/systems/maintenance-automation.md",
-          "wiki/systems/submission-server.md"
+          "wiki/systems/submission-automation.md"
         ]
       },
       "outboundLinks": [
         {
           "kind": "wiki",
-          "href": "submission-server.md",
-          "path": "wiki/systems/submission-server.md",
+          "href": "submission-automation.md",
+          "path": "wiki/systems/submission-automation.md",
           "concept": true
         },
         {
@@ -1717,11 +1717,11 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 1,
+      "verifiedAgeDays": 29,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 1 days before inventory",
+        "reason": "Verified 29 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "medium",
@@ -1814,11 +1814,11 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 1,
+      "verifiedAgeDays": 29,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 1 days before inventory",
+        "reason": "Verified 29 days before inventory",
         "sourceCount": 4
       },
       "driftRisk": "high",
@@ -1840,7 +1840,7 @@
           "wiki/systems/cache-and-versioning.md",
           "wiki/systems/ci-and-testing.md",
           "wiki/systems/maintenance-automation.md",
-          "wiki/systems/submission-server.md"
+          "wiki/systems/submission-automation.md"
         ],
         "outboundConcepts": [
           "wiki/people/jay-rosen.md",
@@ -1887,32 +1887,30 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 1,
+      "verifiedAgeDays": 29,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 1 days before inventory",
+        "reason": "Verified 29 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "high",
       "driftReasons": [
         "high-change topic: launch"
       ],
-      "inboundCount": 4,
+      "inboundCount": 3,
       "localGraph": {
         "defaultHops": 1,
         "maxDefaultHops": 2,
         "inboundConcepts": [
           "wiki/launch/handoff-2026-06-22.md",
           "wiki/launch/launch-plan.md",
-          "wiki/project/launch-status.md",
-          "wiki/systems/submission-server.md"
+          "wiki/project/launch-status.md"
         ],
         "outboundConcepts": [
           "wiki/data/corpus.md",
           "wiki/launch/handoff-2026-06-22.md",
-          "wiki/people/jay-rosen.md",
-          "wiki/systems/submission-server.md"
+          "wiki/people/jay-rosen.md"
         ]
       },
       "outboundLinks": [
@@ -1932,12 +1930,6 @@
           "kind": "wiki",
           "href": "../launch/handoff-2026-06-22.md",
           "path": "wiki/launch/handoff-2026-06-22.md",
-          "concept": true
-        },
-        {
-          "kind": "wiki",
-          "href": "submission-server.md",
-          "path": "wiki/systems/submission-server.md",
           "concept": true
         }
       ]
@@ -1960,11 +1952,11 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 1,
+      "verifiedAgeDays": 29,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 1 days before inventory",
+        "reason": "Verified 29 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "low",
@@ -2033,11 +2025,11 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 0,
+      "verifiedAgeDays": 28,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 0 days before inventory",
+        "reason": "Verified 28 days before inventory",
         "sourceCount": 5
       },
       "driftRisk": "high",
@@ -2053,7 +2045,7 @@
         ],
         "outboundConcepts": [
           "wiki/systems/deploy-and-hosting.md",
-          "wiki/systems/submission-server.md"
+          "wiki/systems/submission-automation.md"
         ]
       },
       "outboundLinks": [
@@ -2077,8 +2069,8 @@
         },
         {
           "kind": "wiki",
-          "href": "submission-server.md",
-          "path": "wiki/systems/submission-server.md",
+          "href": "submission-automation.md",
+          "path": "wiki/systems/submission-automation.md",
           "concept": true
         },
         {
@@ -2111,11 +2103,11 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 0,
+      "verifiedAgeDays": 28,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 0 days before inventory",
+        "reason": "Verified 28 days before inventory",
         "sourceCount": 6
       },
       "driftRisk": "medium",
@@ -2141,61 +2133,54 @@
       ]
     },
     {
-      "path": "wiki/systems/submission-server.md",
-      "id": "systems/submission-server",
+      "path": "wiki/systems/submission-automation.md",
+      "id": "systems/submission-automation",
       "type": "system",
-      "title": "Submission server (Pillar 3a)",
-      "description": "A Flask intake that validates and enqueues URL submissions; a separate local processor (POST /process or the scheduler) scrapes, categorizes, appends, regenerates, tests, and pushes.",
+      "title": "Submission automation (Pillar 3a)",
+      "description": "The sheet-driven GitHub Actions path that validates, processes, publishes, and reports the status of new archive records.",
       "tags": [
         "backend",
-        "intake",
+        "github-actions",
         "pillar3a",
         "submission"
       ],
       "source": [
-        "backend/submission_server/",
+        "backend/submission_runtime/",
+        "backend/scripts/process_submission.py",
         ".github/workflows/submit-record.yml",
-        "docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md"
+        "docs/setup/pillar-3a-runbook.md"
       ],
-      "verified": "2026-06-22",
-      "timestamp": "2026-06-22",
-      "verifiedAgeDays": 1,
+      "verified": "2026-07-21",
+      "timestamp": "2026-07-21",
+      "verifiedAgeDays": 0,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 1 days before inventory",
-        "sourceCount": 3
+        "reason": "Verified 0 days before inventory",
+        "sourceCount": 4
       },
       "driftRisk": "high",
       "driftReasons": [
-        "high-change topic: submission"
+        "high-change topic: automation, github-actions, submission"
       ],
-      "inboundCount": 3,
+      "inboundCount": 2,
       "localGraph": {
         "defaultHops": 1,
         "maxDefaultHops": 2,
         "inboundConcepts": [
           "wiki/systems/ci-and-testing.md",
-          "wiki/systems/feedback-and-reporting.md",
           "wiki/systems/maintenance-automation.md"
         ],
         "outboundConcepts": [
-          "wiki/systems/deploy-and-hosting.md",
-          "wiki/systems/feedback-and-reporting.md"
+          "wiki/systems/deploy-and-hosting.md"
         ]
       },
       "outboundLinks": [
         {
           "kind": "repo",
-          "href": "../../backend/submission_server/",
-          "path": "backend/submission_server",
+          "href": "../../backend/submission_runtime/",
+          "path": "backend/submission_runtime",
           "concept": false
-        },
-        {
-          "kind": "wiki",
-          "href": "feedback-and-reporting.md",
-          "path": "wiki/systems/feedback-and-reporting.md",
-          "concept": true
         },
         {
           "kind": "wiki",
@@ -2205,8 +2190,14 @@
         },
         {
           "kind": "repo",
-          "href": "../../docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md",
-          "path": "docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md",
+          "href": "../../ADDING-RECORDS.md",
+          "path": "ADDING-RECORDS.md",
+          "concept": false
+        },
+        {
+          "kind": "repo",
+          "href": "../../docs/setup/pillar-3a-runbook.md",
+          "path": "docs/setup/pillar-3a-runbook.md",
           "concept": false
         }
       ]
@@ -2230,11 +2221,11 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 1,
+      "verifiedAgeDays": 29,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 1 days before inventory",
+        "reason": "Verified 29 days before inventory",
         "sourceCount": 4
       },
       "driftRisk": "high",

@@ -65,12 +65,11 @@ Records are curated, not scraped on a timer. A record is a row in a source CSV
 data/export-archive-data.js` regenerates the split JSON files the site reads, and
 those are deployed to the PressThink host over FTP. `ADDING-RECORDS.md` is
 the full procedure. A lighter-weight submission path is designed so a record can
-be proposed without hand-editing the CSV — a Flask submission server (Pillar 3)
-and a GitHub Action flow using `submit-record.yml` and `sweep-stuck-rows.yml`
-(Pillar 3a) — but it is not stood up yet: the Pillar 3a wiring exists in code and
-was never activated. `automation/PILLAR3A-STATUS.md` is the current status and
-`docs/setup/pillar-3a-runbook.md` is the install procedure. Until it is live,
-records are added the manual way above.
+be proposed without hand-editing the CSV through the Pillar 3a GitHub Action
+flow using `submit-record.yml` and `sweep-stuck-rows.yml`. The wiring exists in
+code but has not been activated. `automation/PILLAR3A-STATUS.md` is the current
+status and `docs/setup/pillar-3a-runbook.md` is the install procedure. Until it
+is live, records are added the manual way above.
 
 Accuracy note for Joe: the source issue described this as a "weekly scrape of the
 PressThink RSS feed," and that is not what the code does today. The archive

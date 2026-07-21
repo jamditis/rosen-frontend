@@ -9,8 +9,7 @@ services - cloud metadata endpoints, localhost ports, internal admin panels.
 
 ``is_safe_public_url`` resolves the hostname and accepts a URL only when it is a
 plain http/https request whose host resolves exclusively to public IP
-addresses. It is pure standard library so it can run anywhere the scraper or the
-submission server runs.
+addresses. It is pure standard library so every scraper entry point can use it.
 
 Resolving in the guard and then letting ``requests``/Chromium resolve again at
 connect time leaves a DNS-rebinding window: a low-TTL record can answer with a
