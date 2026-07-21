@@ -54,6 +54,7 @@ data/                               # Published archive data and shared taxonomy
 dissertation/                       # Dissertation tools
   index.html                        # Landing page
   reader/                           # Full text reader
+    THE_IMPOSSIBLE_PRESS_NYU_ROSEN-JAY-1986.pdf  # Original dissertation PDF (Git LFS; checkout must materialize it)
   foreword/                         # Foreword page
   network-effect/                   # Network film analysis
 
@@ -75,6 +76,11 @@ tools/                              # Development/exploration tools
 
 ADDING-RECORDS.md                   # Instructions for adding new records
 ```
+
+The dissertation PDF is stored through Git LFS. The Actions deploy checkout
+materializes it automatically. Before a manual FTP deploy, run
+`git lfs pull --include="dissertation/reader/*.pdf"` and confirm the reader PDF
+is 18,500,765 bytes; never upload the 133-byte LFS pointer.
 
 The full-site deploy uploads each standalone `features/*/index.html` only after
 the files in its feature directory and the shared data manifest. This keeps a
