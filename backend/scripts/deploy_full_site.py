@@ -84,7 +84,6 @@ _DEPLOY_DIRS: Tuple[str, ...] = (
     'faq',
     'dissertation-launch',
     'features/shared',
-    'features/status-report',
     'features/winer-method',
     'features/participate',
     'tools/active/dataexplorer',
@@ -92,10 +91,9 @@ _DEPLOY_DIRS: Tuple[str, ...] = (
     'data/feeds',
 )
 
-# These retired pages predate the current upload-only manifest and still exist
-# on the production server. Prune them after all current files upload so a
-# transfer failure cannot remove working pages before the replacement site is
-# in place. Missing directories are treated as already pruned.
+# Prune retired pages after all current files upload so a transfer failure
+# cannot remove working pages before the replacement site is in place. Missing
+# directories are treated as already pruned.
 _REMOTE_PRUNE_DIRS: Tuple[str, ...] = (
     'dissertation/comparison',
     'dissertation/concepts',
@@ -103,6 +101,7 @@ _REMOTE_PRUNE_DIRS: Tuple[str, ...] = (
     'dissertation/excerpts',
     'dissertation/glossary',
     'dissertation/timeline',
+    'features/status-report',
 )
 
 # features/making-of is intentionally omitted. That page is a draft pending

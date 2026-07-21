@@ -65,7 +65,6 @@ dissertation-launch/                # Dissertation launch landing
 features/                           # Standalone feature pages
   participate/                     # Ways to Participate landing page
   shared/text-selection.js
-  status-report/                    # Status report generator
   winer-method/                     # Independent public-source archive-method demonstration
 
 tools/                              # Development/exploration tools
@@ -86,7 +85,7 @@ release flips.
 ## Retired routes removed by a full deploy
 
 After every listed file uploads successfully, `backend/scripts/deploy_full_site.py`
-removes these retired dissertation directories from the production server:
+removes these retired directories from the production server:
 
 ```
 dissertation/comparison/
@@ -95,11 +94,12 @@ dissertation/context/
 dissertation/excerpts/
 dissertation/glossary/
 dissertation/timeline/
+features/status-report/
 ```
 
 This cleanup is idempotent. Missing directories are treated as already removed.
-The live `dissertation/` pages, the top-level `faq/`, and `tools/active/` are not
-part of the cleanup list.
+The remaining `dissertation/` pages, the top-level `faq/`, the shipped
+`features/` pages, and `tools/active/` are not part of the cleanup list.
 
 ## What NOT to deploy
 

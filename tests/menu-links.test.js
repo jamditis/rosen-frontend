@@ -27,8 +27,9 @@ const SHIPPED_CONTENT_ROOTS = [
   'dissertation',
   'faq',
   'dissertation-launch',
+  'features/participate',
   'features/shared',
-  'features/status-report',
+  'features/winer-method',
   'tools/active',
 ];
 const SHIPPED_CONTENT_FILES = [

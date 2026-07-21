@@ -170,8 +170,9 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 ├── dissertation-launch/             # Standalone dissertation launch landing page
 │
 ├── features/                        # Standalone feature pages
+│   ├── participate/                 # Ways to participate
 │   ├── shared/                      # Shared feature assets (text-selection.js)
-│   └── status-report/               # Archive status report generator
+│   └── winer-method/                # Public-source archive-method demonstration
 │
 ├── data/                            # Archive data files + export scripts
 │   ├── archive-data.json            # Full combined JSON (~28 MB)
@@ -267,7 +268,11 @@ Override the port with `PREVIEW_PORT=8765 npm run preview`. The server binds to 
 npm run preview:audit                 # Mobile + desktop, key routes, axe-core scan
 ```
 
-Spawns the preview server, walks 9 key routes (archive, explorer, entities, about, analytics, record modal, dissertation, dissertation reader, status report) at 375x812 and 1440x900 viewports, runs `axe-core` for WCAG 2.1 AA, and writes `preview-audit-results/axe-report.html` plus per-route screenshots under `preview-audit-results/screenshots/{viewport}/`. Exits non-zero if any violations are found.
+Spawns the preview server, walks 31 route states at mobile, tablet, and desktop
+viewports, runs `axe-core` for WCAG 2.1 AA, and writes
+`preview-audit-results/axe-report.html` plus per-route screenshots under
+`preview-audit-results/screenshots/{viewport}/`. Exits non-zero if any
+violations are found.
 
 ## Testing
 
