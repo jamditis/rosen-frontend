@@ -170,8 +170,9 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 ├── dissertation-launch/             # Standalone dissertation launch landing page
 │
 ├── features/                        # Standalone feature pages
+│   ├── participate/                 # Ways to participate
 │   ├── shared/                      # Shared feature assets (text-selection.js)
-│   └── status-report/               # Archive status report generator
+│   └── winer-method/                # Public-source archive-method demonstration
 │
 ├── data/                            # Archive data files + export scripts
 │   ├── archive-data.json            # Full combined JSON (~28 MB)
@@ -190,7 +191,7 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── src/                         # Scraper, processors, categorizer
 │   ├── scripts/                     # Maintenance scripts
 │   ├── tests/                       # Python test suite (pytest)
-│   ├── submission_server/           # Pillar 3a: Flask submission server + scheduler + SFTP push
+│   ├── submission_runtime/          # Pillar 3a: current Action helpers for config, SFTP, and Sheets
 │   ├── docs/                        # Backend-specific docs
 │   ├── pyproject.toml               # Poetry dependencies
 │   ├── schema.json                  # Backend data schema
@@ -267,7 +268,11 @@ Override the port with `PREVIEW_PORT=8765 npm run preview`. The server binds to 
 npm run preview:audit                 # Mobile + desktop, key routes, axe-core scan
 ```
 
-Spawns the preview server, walks 9 key routes (archive, explorer, entities, about, analytics, record modal, dissertation, dissertation reader, status report) at 375x812 and 1440x900 viewports, runs `axe-core` for WCAG 2.1 AA, and writes `preview-audit-results/axe-report.html` plus per-route screenshots under `preview-audit-results/screenshots/{viewport}/`. Exits non-zero if any violations are found.
+Spawns the preview server, walks 31 route states at mobile, tablet, and desktop
+viewports, runs `axe-core` for WCAG 2.1 AA, and writes
+`preview-audit-results/axe-report.html` plus per-route screenshots under
+`preview-audit-results/screenshots/{viewport}/`. Exits non-zero if any
+violations are found.
 
 ## Testing
 
@@ -291,7 +296,7 @@ Short version:
 3. Bump the version in `index.html`, `version.json`, all `?v=` import strings, and `frontend/sw.js` `CACHE_VERSION` to bust the Cloudflare cache. The service worker serves static JS cache-first with `ignoreSearch: true`, so a `?v=` bump alone does not invalidate it — only a `CACHE_VERSION` change drops the stale service-worker cache. `tests/version-consistency.test.js` enforces that `sw.js` `CACHE_VERSION` matches `version.json`.
 4. Upload only the files that changed via FTP.
 
-Pillar 3a (in-flight) automates this for record submissions via `backend/submission_server/` and the `submit-record.yml` / `sweep-stuck-rows.yml` workflows — see those files for the current state.
+Pillar 3a (in-flight) automates this for record submissions via `backend/submission_runtime/` and the `submit-record.yml` / `sweep-stuck-rows.yml` workflows. The retired Flask server is not a fallback path; its history remains available in git.
 
 ## Backend data pipeline
 

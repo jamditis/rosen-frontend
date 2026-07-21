@@ -41,22 +41,17 @@ Walked `backend/src/` and `backend/scripts/`. Ten core modules wired: `workflow.
 
 ---
 
-### 4. Submission server (Pillar 3a) — Partial (architecturally migrated, blocked on credentials)
+### 4. Submission automation (Pillar 3a) — Partial (implemented, blocked on credentials)
 
-Two paths exist simultaneously:
+The only supported path is the GitHub Actions workflow at `.github/workflows/submit-record.yml`, which calls `backend/scripts/process_submission.py` directly. Its 12-step pipeline scrapes, categorizes, deduplicates, appends the CSV, regenerates JSON, tests, pushes to git, uploads through SFTP, and writes status back to the sheet. Action-facing helpers live in `backend/submission_runtime/`. Design doc: `docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md`. Per PRs #223, #225, #590, and issue #582.
 
-**Legacy:** Flask app at `backend/submission_server/` (`app.py`, `processor.py`, `db.py`, templates). Functional. Has SSRF guard, constant-time bearer-token auth, CSV formula escaping, parameterized SQL. Per closed issue #136. Now deprecated. The current Action-facing runtime helpers now live in `backend/submission_runtime/`; `submission_server/` should be treated as the legacy Flask surface only.
-
-**Current:** GitHub Actions workflow at `.github/workflows/submit-record.yml` (deployed 2026-05-25) calls `backend/scripts/process_submission.py` directly. 12-step pipeline: scrape, categorize, dedupe, CSV append, regen JSONs, test, git push, SFTP upload, sheet writeback. Runtime helpers: `backend/submission_runtime/`. Design doc: `docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md`. Per PRs #223, #225.
+The earlier Flask app, queue database, scheduler, templates, deploy script, systemd packaging, and Flask dependency have been removed. A live-system check on 2026-07-21 confirmed that `houseofjawn` had no installed or active `rosen-submission.service` and no matching Cloudflare ingress, so there is no server endpoint or fallback path to operate.
 
 **Blocker:** issue #226 — the `rosen-archive-bot` GitHub App + 11 repo secrets are not configured. Until they are, the workflow exists but can't run end-to-end. Joe's call (and credentials) needed.
 
-**Security debt before public exposure:** no rate limiting on submission endpoints (filed as #262, follow-up to closed #136). Flask-Limiter + Flask-WTF CSRF were in the original #136 recommendation but never shipped.
-
 **Gap-closing action:**
 1. Joe creates the GitHub App + adds the 11 secrets (#226).
-2. Add Flask-Limiter to the legacy server before any public exposure (#262), OR confirm the legacy server is truly retired and delete/archive the remaining Flask app, queue DB, scheduler, templates, and legacy processor tests.
-3. Smoke test: scrape-fail path, dedup short-circuit, full success.
+2. Smoke test: scrape-fail path, dedup short-circuit, full success.
 
 ---
 
@@ -72,11 +67,7 @@ Design doc only: `docs/plans/2026-05-24-pillar3-authoring-workflow-design.md`. Z
 
 17 test files, ~4,048 lines. Frontend/data layer (8 core files: `csv-quality`, `data-integrity`, `data-pipeline`, `frontend-structure`, `process-record`, `thread-algorithm`, `thread-detection`, `version-consistency`) plus newer additions (`entity-index`, `http-cached-loader`, `fetch-error-handling`, `linkify`, `schema-no-bom`, `service-worker-cache`, `view-state`). Backend pytest realigned via PRs #249/#251/#252 after the May `src/` refactor; #250 gated credentialed + Selenium tests so CI skips cleanly.
 
-**Coverage caveats:**
-- `tests/version-consistency.test.js` enforces `index.html` + `frontend/**.js` ONLY. Dissertation pages, `archived/`, and `features/` subpages are NOT enforced on version bumps. Sweep them by hand. Tracked in the v3.3.0 session-state memory.
-- The submission server queue + batch logic has no test coverage per open issue #175.
-
-**Gap-closing action:** add a test wrapper around `submission_server/db.py` queue operations (#175). Low priority — code is small and was just audited by the security pass.
+**Coverage caveat:** `tests/version-consistency.test.js` enforces `index.html` + `frontend/**.js` ONLY. Dissertation pages, `archived/`, and `features/` subpages are NOT enforced on version bumps. Sweep them by hand. Tracked in the v3.3.0 session-state memory.
 
 ---
 
@@ -95,7 +86,7 @@ Design doc only: `docs/plans/2026-05-24-pillar3-authoring-workflow-design.md`. Z
 - `.env`, `.env.local`, `backend/.env*`, `google_credentials.json`, `*.key`, `*.pem`, `secrets.json` all covered by `.gitignore` (verified empirically — `*.local` at line 15 matches `.env.local`; the security audit's claim that dotfile globbing excluded it was wrong).
 - CDN imports version-pinned (`react@18.2.0`, `htm@3.1.1`, etc.) — SRI not available in import maps; accepted limitation.
 - Backend SQL: all parameterized. Subprocess calls: list-form (no shell-string injection). No dynamic-code execution patterns found.
-- Submission server: SSRF guard (`url_safety.py`), constant-time auth, CSV formula escaping, scheme-restricted URL validation.
+- Submission workflow: SSRF guard (`url_safety.py`), CSV formula escaping, and scheme-restricted URL validation.
 
 **Real fixes needed (one PR titled `security: harden .htaccess headers`):**
 - Add Content-Security-Policy header. Suggested policy in [issue #261](https://github.com/jamditis/rosen-frontend/issues/261). Diff is staged in `.htaccess` (working tree, uncommitted).
@@ -103,7 +94,6 @@ Design doc only: `docs/plans/2026-05-24-pillar3-authoring-workflow-design.md`. Z
 - Verify HSTS at Cloudflare/host layer before adding at .htaccess (avoid duplicate header).
 
 **Security debt to track:**
-- #262: rate limiting missing on submission server (Flask-Limiter). Ship before public flip.
 - #167: GitHub Actions pinned to floating tags (`@v1`, `@v4`), not commit SHAs. Elevated risk given `submit-record.yml` has write access. Defer until Pillar 3a closes; address as part of the handoff.
 
 ---
@@ -147,13 +137,11 @@ In execution order. Joe owns step 1; everything else flows from his decisions.
 
 5. **Resolve data quality issues per Joe's URL policy.** Issue #210 (merge or mark dupes after canonical policy lands), #197 (era taxonomy realignment), #199 (finalize unrecoverable list).
 
-6. **Submission server rate limiting.** Issue #262. Ship before any public exposure of the submission endpoint.
+6. **JAY_ADDING_RECORDS.md screenshot.** Issue #241. Joe captures annotated screenshot of the queue Sheet.
 
-7. **JAY_ADDING_RECORDS.md screenshot.** Issue #241. Joe captures annotated screenshot of the queue Sheet.
+7. **HANDOFF.md finalization.** Issue #204. Document all Pillar 3a decisions, Rafi/Hali contacts, failure modes, escalation paths.
 
-8. **HANDOFF.md finalization.** Issue #204. Document all Pillar 3a decisions, Rafi/Hali contacts, failure modes, escalation paths.
-
-9. **Handoff ceremony.** Transfer repo ownership or set up Jay/Hali write access. Recreate GitHub App + Apps Script under their accounts. Rotate SFTP creds off Joe.
+8. **Handoff ceremony.** Transfer repo ownership or set up Jay/Hali write access. Recreate GitHub App + Apps Script under their accounts. Rotate SFTP creds off Joe.
 
 ---
 

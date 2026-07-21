@@ -10,7 +10,6 @@ requires-python = ">=3.10, <4.0"
 dependencies = [
     "trafilatura (==2.0.0)",
     "requests (==2.32.5)",
-    "flask (==3.1.0)",
     "playwright (==1.55.0)",
     "playwright-stealth (==2.0.0)",
     "beautifulsoup4 (==4.14.2)",
@@ -67,7 +66,7 @@ optional = true
 desbordante = ">=2.4.1,<3.0.0"
 
 # pytest resolves imports via pythonpath instead of per-file sys.path hacks:
-# src/ exposes rosen_scraper, the backend root exposes submission_server.
+# src/ exposes rosen_scraper, and the backend root exposes submission_runtime.
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src", "."]

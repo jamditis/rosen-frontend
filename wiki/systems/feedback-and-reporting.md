@@ -18,4 +18,4 @@ This is the path given to [Jay](../people/jay-rosen.md) in the [2026-06-22 hando
 
 ## What's planned (#509)
 
-A **branded in-archive form** that looks like the archive (not a GitHub issue page), takes the report or record suggestion with no GitHub account required, and still creates a GitHub issue on the backend (reusing the `bugReport.js` field mapping; a likely host is the [submission server](submission-server.md)). Decided 2026-06-22: ship launch with the existing button, build the branded form next.
+A **branded in-archive form** that looks like the archive (not a GitHub issue page), takes the report or record suggestion with no GitHub account required, and still creates a GitHub issue through a separately hosted endpoint that reuses the `bugReport.js` field mapping. Decided 2026-06-22: ship launch with the existing button, build the branded form next.

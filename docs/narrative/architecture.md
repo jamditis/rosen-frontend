@@ -324,7 +324,8 @@ Record deep links: `?record=RECORD_ID` opens a record modal on any route.
 ### Standalone pages
 
 - **Dissertation tools** (`/dissertation/`): reader, foreword, network-effect analysis
-- **Features** (`/features/`): status report generator, shared feature assets
+- **Features** (`/features/`): participation page, Winer method demonstration,
+  and shared feature assets
 
 Each standalone page has its own subdirectory with an `index.html`.
 

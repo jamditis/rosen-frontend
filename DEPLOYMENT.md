@@ -55,6 +55,7 @@ data/                               # Published archive data and shared taxonomy
 dissertation/                       # Dissertation tools
   index.html                        # Landing page
   reader/                           # Full text reader
+    THE_IMPOSSIBLE_PRESS_NYU_ROSEN-JAY-1986.pdf  # Original dissertation PDF (Git LFS; checkout must materialize it)
   foreword/                         # Foreword page
   network-effect/                   # Network film analysis
 
@@ -66,7 +67,6 @@ dissertation-launch/                # Dissertation launch landing
 features/                           # Standalone feature pages
   participate/                     # Ways to Participate landing page
   shared/text-selection.js
-  status-report/                    # Status report generator
   winer-method/                     # Independent public-source archive-method demonstration
 
 tools/                              # Development/exploration tools
@@ -76,6 +76,11 @@ tools/                              # Development/exploration tools
 
 ADDING-RECORDS.md                   # Instructions for adding new records
 ```
+
+The dissertation PDF is stored through Git LFS. The Actions deploy checkout
+materializes it automatically. Before a manual FTP deploy, run
+`git lfs pull --include="dissertation/reader/*.pdf"` and confirm the reader PDF
+is 18,500,765 bytes; never upload the 133-byte LFS pointer.
 
 The full-site deploy uploads each standalone `features/*/index.html` only after
 the files in its feature directory and the shared data manifest. This keeps a
@@ -93,7 +98,7 @@ deep-link URL and loads the same React app.
 ## Retired routes removed by a full deploy
 
 After every listed file uploads successfully, `backend/scripts/deploy_full_site.py`
-removes these retired dissertation directories from the production server:
+removes these retired directories from the production server:
 
 ```
 dissertation/comparison/
@@ -102,11 +107,12 @@ dissertation/context/
 dissertation/excerpts/
 dissertation/glossary/
 dissertation/timeline/
+features/status-report/
 ```
 
 This cleanup is idempotent. Missing directories are treated as already removed.
-The live `dissertation/` pages, the top-level `faq/`, and `tools/active/` are not
-part of the cleanup list.
+The remaining `dissertation/` pages, the top-level `faq/`, the shipped
+`features/` pages, and `tools/active/` are not part of the cleanup list.
 
 ## What NOT to deploy
 

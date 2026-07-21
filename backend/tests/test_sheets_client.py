@@ -3,7 +3,7 @@
 
 The resolver must prefer ROSEN_SHEETS_SA_KEY_JSON (the CI secret), then
 ROSEN_SHEETS_SA_KEY (a path), then a local fallback file -- the same order as
-submission_server.sheets_callback, so the runner and the submission workflow
+submission_runtime.sheets_callback, so the runner and the submission workflow
 share one secret.
 """
 from __future__ import annotations

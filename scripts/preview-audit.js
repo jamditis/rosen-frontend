@@ -171,7 +171,6 @@ const ROUTES = [
   { slug: 'dissertation',       url: '/dissertation/' },
   { slug: 'dissertation-reader',url: '/dissertation/reader/', verifyReaderReturn: true },
   { slug: 'faq',                url: '/faq/' },
-  { slug: 'status-report',      url: '/features/status-report/' },
   { slug: 'winer-method',       url: '/features/winer-method/' },
 ];
 

@@ -88,7 +88,6 @@ _DEPLOY_DIRS: Tuple[str, ...] = (
     'faq',
     'dissertation-launch',
     'features/shared',
-    'features/status-report',
     'features/winer-method',
     'features/participate',
     'tools/active/dataexplorer',
@@ -96,10 +95,9 @@ _DEPLOY_DIRS: Tuple[str, ...] = (
     'data/feeds',
 )
 
-# These retired pages predate the current upload-only manifest and still exist
-# on the production server. Prune them after all current files upload so a
-# transfer failure cannot remove working pages before the replacement site is
-# in place. Missing directories are treated as already pruned.
+# Prune retired pages after all current files upload so a transfer failure
+# cannot remove working pages before the replacement site is in place. Missing
+# directories are treated as already pruned.
 _REMOTE_PRUNE_DIRS: Tuple[str, ...] = (
     'dissertation/comparison',
     'dissertation/concepts',
@@ -107,6 +105,7 @@ _REMOTE_PRUNE_DIRS: Tuple[str, ...] = (
     'dissertation/excerpts',
     'dissertation/glossary',
     'dissertation/timeline',
+    'features/status-report',
 )
 
 # features/making-of is intentionally omitted. That page is a draft pending
@@ -167,7 +166,7 @@ _ENTRY_POINTS: Tuple[str, ...] = ('index.html', 'frontend/sw.js', 'sw.js', 'vers
 def _read_env() -> Optional[Dict[str, Any]]:
     """Return SFTP config from env, or None when required vars are missing.
 
-    Mirrors backend/submission_server/sftp_push.py:_read_env but reads
+    Mirrors backend/submission_runtime/sftp_push.py:_read_env but reads
     ROSEN_SFTP_SITE_PATH (the full-site root) instead of the data-only
     ROSEN_SFTP_REMOTE_PATH.
     """
@@ -474,7 +473,7 @@ def push_files(
     """Upload files atomically, then remove retired remote directories.
 
     Returns {ok, files_pushed, error}. The atomic-rename guarantee mirrors
-    backend/submission_server/sftp_push.py — readers on the live site
+    backend/submission_runtime/sftp_push.py — readers on the live site
     never see a half-written file.
     """
     try:
@@ -499,8 +498,7 @@ def push_files(
         # ssh-dss, ecdsa-sha2-nistp{256,384,521}, hashed-host '|1|', plus
         # whatever ships next — and a malformed content blob will raise
         # cleanly from load_host_keys rather than failing later under
-        # RejectPolicy. Sibling backend/submission_server/sftp_push.py
-        # has the older path-only pattern; see follow-up issue for backport.
+        # RejectPolicy. The data-only submission runtime uses the same policy.
         known_hosts_raw = cfg['known_hosts']
         known_hosts_path = Path(known_hosts_raw).expanduser()
         if known_hosts_path.is_file():

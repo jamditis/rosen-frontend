@@ -9,7 +9,7 @@ a GitHub Action, where the service-account key arrives as a repo secret.
 
 This module gives them one resolver that prefers the CI path and falls back to
 the local file, in the same order as
-``submission_server.sheets_callback._load_credentials``:
+``submission_runtime.sheets_callback._load_credentials``:
 
     1. ROSEN_SHEETS_SA_KEY_JSON -- inline service-account JSON (the CI secret)
     2. ROSEN_SHEETS_SA_KEY      -- path to a service-account JSON file

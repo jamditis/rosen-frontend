@@ -196,13 +196,9 @@ describe('analytics lazy-load wiring (#338)', () => {
   });
 
   it('every deploy manifest ships the canonical data set (literal list or DATA_DEPLOY_JSON_FILES)', () => {
-    // Paths that still hardcode the list must contain the literals directly.
-    // deploy.sh is a shell script and deploy_full_site.py predates the
-    // extraction, so neither can import the Python tuple.
-    const literalManifests = [
-      ['backend', 'scripts', 'deploy_full_site.py'],
-      ['backend', 'submission_server', 'deploy.sh'],
-    ];
+    // The full-site deploy still hardcodes its larger manifest, so it must
+    // contain the analytics artifact directly.
+    const literalManifests = [['backend', 'scripts', 'deploy_full_site.py']];
     for (const m of literalManifests) {
       const src = readSrc(...m);
       // Sanity: confirm this really is a data-file manifest before asserting.
@@ -217,7 +213,8 @@ describe('analytics lazy-load wiring (#338)', () => {
     // asserting the reference is what keeps them in sync with artifacts.py.
     const constantManifests = [
       ['backend', 'scripts', 'sync_sheet_to_archive.py'],
-      ['backend', 'submission_server', 'processor.py'],
+      ['backend', 'scripts', 'process_submission.py'],
+      ['backend', 'submission_runtime', 'sftp_push.py'],
     ];
     for (const m of constantManifests) {
       const src = readSrc(...m);
@@ -227,14 +224,6 @@ describe('analytics lazy-load wiring (#338)', () => {
         `${m.join('/')} must ship the canonical DATA_DEPLOY_JSON_FILES set (import from submission_runtime.artifacts)`
       );
     }
-    // The legacy Flask sftp wrapper delegates to the runtime push, which
-    // pushes DATA_DEPLOY_JSON_FILES — so the analytics file rides along.
-    const wrapper = readSrc('backend', 'submission_server', 'sftp_push.py');
-    assert.match(
-      wrapper,
-      /submission_runtime\.sftp_push/,
-      'submission_server/sftp_push.py must delegate to submission_runtime.sftp_push (which ships DATA_DEPLOY_JSON_FILES)'
-    );
   });
 
   it('export pipeline regenerates the aggregates', () => {
