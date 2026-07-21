@@ -37,5 +37,5 @@ This does not replace the need to keep the deploy manifest correct. See [deploy-
 ## Safety notes
 
 - Do not put secret values in this OKF bundle. Link to runbooks and secret names only.
-- For submission automation, the current live blocker is still SFTP/server credentials; see [submission-server.md](submission-server.md) and [deploy-and-hosting.md](deploy-and-hosting.md).
+- For submission automation, the current live blockers are the GitHub App and deploy credentials; see [submission-automation.md](submission-automation.md) and [deploy-and-hosting.md](deploy-and-hosting.md).
 - A workflow-dispatch input must be passed through environment variables, not interpolated into shell text.

@@ -4,7 +4,7 @@ Dedup + atomic-CSV-append + entity-ID allocation for extracted entities.
 This module is a reusable extract of the helpers and per-record processing
 logic that originated in scripts/extract_entities_claude.py. The LLM call
 itself is NOT part of this module — callers (the claude-CLI script, the
-submission server, future Gemini batch paths) pass in an already-extracted
+submission workflow, future Gemini batch paths) pass in an already-extracted
 result dict and this module decides what to write.
 
 Why this exists:

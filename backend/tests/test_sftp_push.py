@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for submission_server.sftp_push — atomic JSON deploy to live site.
+"""Tests for submission_runtime.sftp_push — atomic JSON deploy to live site.
 
 Covers the load-bearing behaviors:
   - Missing env vars: no-op success so dev / CI runs don't break.
@@ -21,7 +21,7 @@ if str(_BACKEND) not in sys.path:
 pytest.importorskip("paramiko")
 import paramiko  # noqa: E402
 
-from submission_server import sftp_push  # noqa: E402
+from submission_runtime import sftp_push  # noqa: E402
 
 
 _REQUIRED_ENV = {
@@ -88,6 +88,12 @@ class TestMissingConfig:
             ROSEN_SFTP_KEY_PATH=None,
         )
         monkeypatch.setenv("ROSEN_SFTP_HOST", "sftp.example.com")
+        result = sftp_push.push_to_production(tmp_path)
+        assert result["skipped"] is True
+        assert result["ok"] is True
+
+    def test_non_integer_port_returns_skipped(self, tmp_path, monkeypatch):
+        _set_env(monkeypatch, ROSEN_SFTP_PORT="not-an-int")
         result = sftp_push.push_to_production(tmp_path)
         assert result["skipped"] is True
         assert result["ok"] is True
