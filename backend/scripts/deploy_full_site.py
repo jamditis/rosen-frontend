@@ -40,8 +40,11 @@ from __future__ import annotations
 
 import argparse
 import errno
+import html
+import json
 import logging
 import os
+import re
 import stat
 import sys
 from pathlib import Path
@@ -79,6 +82,7 @@ _DEPLOY_FILES: Tuple[str, ...] = (
 )
 
 _DEPLOY_DIRS: Tuple[str, ...] = (
+    'r',  # generated metadata shells for ?record= deep links
     'frontend',
     'dissertation',
     'faq',
@@ -205,6 +209,112 @@ def _is_excluded(path: Path) -> bool:
         if path.name.endswith(suffix):
             return True
     return False
+
+
+_RECORD_ID_RE = re.compile(r'^[A-Za-z0-9-]+$')
+_SOCIAL_DESCRIPTION_LIMIT = 300
+
+
+def _replace_head_value(source: str, pattern: str, value: str, label: str) -> str:
+    """Replace one required head value and fail if the template drifted."""
+    replaced, count = re.subn(
+        pattern,
+        lambda match: f'{match.group(1)}{value}{match.group(2)}',
+        source,
+        count=1,
+        flags=re.IGNORECASE | re.DOTALL,
+    )
+    if count != 1:
+        raise ValueError(f'index.html must contain exactly one {label}')
+    return replaced
+
+
+def _record_description(record: Dict[str, Any]) -> str:
+    raw = record.get('summary') or record.get('quote') or record.get('title') or ''
+    normalized = re.sub(r'\s+', ' ', str(raw)).strip()
+    if len(normalized) > _SOCIAL_DESCRIPTION_LIMIT:
+        normalized = normalized[:_SOCIAL_DESCRIPTION_LIMIT - 1].rstrip() + '…'
+    return normalized
+
+
+def _render_record_page(template: str, record: Dict[str, Any]) -> str:
+    record_id = str(record.get('id') or '').strip()
+    if not _RECORD_ID_RE.fullmatch(record_id):
+        raise ValueError(f'unsafe or missing record id for social page: {record_id!r}')
+
+    raw_title = re.sub(r'\s+', ' ', str(record.get('title') or '')).strip()
+    if not raw_title:
+        raise ValueError(f'record {record_id} has no title for social metadata')
+
+    title = html.escape(raw_title, quote=True)
+    page_title = f'{title} | Jay Rosen\'s Internet Archive'
+    description = html.escape(_record_description(record), quote=True)
+    canonical = (
+        'https://pressthink.org/j/rosen-archive/'
+        f'?record={record_id}'
+    )
+
+    rendered = _replace_head_value(
+        template, r'(<title>)[\s\S]*?(</title>)', page_title, '<title>')
+    rendered = _replace_head_value(
+        rendered,
+        r'(<meta\s+name="description"\s+content=")[^"]*("\s*/?>)',
+        description,
+        'description meta tag',
+    )
+    rendered = _replace_head_value(
+        rendered,
+        r'(<link\s+rel="canonical"\s+href=")[^"]*("\s*/?>)',
+        canonical,
+        'canonical link',
+    )
+    for key, value in (
+        ('og:title', title),
+        ('og:description', description),
+        ('og:url', canonical),
+        ('og:type', 'article'),
+        ('twitter:title', title),
+        ('twitter:description', description),
+    ):
+        attribute = 'property' if key.startswith('og:') else 'name'
+        rendered = _replace_head_value(
+            rendered,
+            rf'(<meta\s+{attribute}="{re.escape(key)}"\s+content=")[^"]*("\s*/?>)',
+            value,
+            f'{key} meta tag',
+        )
+    return rendered
+
+
+def generate_record_pages(repo_root: Path) -> List[Path]:
+    """Build crawler-readable HTML shells for non-social record deep links."""
+    template = (repo_root / 'index.html').read_text(encoding='utf-8')
+    archive = json.loads(
+        (repo_root / 'data' / 'archive-data.json').read_text(encoding='utf-8'))
+    records = archive.get('records')
+    if not isinstance(records, list):
+        raise ValueError('data/archive-data.json must contain a records list')
+
+    output_dir = repo_root / 'r'
+    output_dir.mkdir(parents=True, exist_ok=True)
+    for stale in output_dir.glob('*.html'):
+        stale.unlink()
+
+    pages: List[Path] = []
+    seen: Set[str] = set()
+    for record in records:
+        if record.get('type') == 'social':
+            continue
+        record_id = str(record.get('id') or '').strip()
+        if record_id in seen:
+            raise ValueError(f'duplicate record id for social page: {record_id}')
+        seen.add(record_id)
+        page = output_dir / f'{record_id}.html'
+        page.write_text(_render_record_page(template, record), encoding='utf-8')
+        pages.append(page)
+
+    pages.sort(key=lambda page: page.name)
+    return pages
 
 
 def collect_local_files(
@@ -495,6 +605,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     else:
         repo_root = Path(__file__).resolve().parents[2]
 
+    record_pages = generate_record_pages(repo_root)
+    logger.info(f'Generated {len(record_pages)} record-specific metadata pages')
     files = collect_local_files(repo_root)
 
     if args.dry_run:

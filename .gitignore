@@ -10,6 +10,7 @@ lerna-debug.log*
 
 # Node
 node_modules
+/r/*.html
 dist
 !frontend/dist/tailwind.css
 dist-ssr

@@ -19,6 +19,7 @@ These tests cover the load-bearing behaviors:
 from __future__ import annotations
 
 import errno
+import json
 import importlib.util
 import pathlib
 import posixpath
@@ -276,6 +277,72 @@ class TestCollectLocalFiles:
         rels = {f.relative_to(tmp_path).as_posix() for f in files}
         assert 'data/feeds/rss.xml' in rels
         assert 'data/feeds/leaked.csv' not in rels
+
+
+class TestRecordSharePages:
+    """Record deep links need crawler-readable metadata before React runs."""
+
+    def test_generates_record_specific_shells_and_removes_stale_ones(self,
+                                                                     tmp_path):
+        (tmp_path / 'data').mkdir()
+        (tmp_path / 'r').mkdir()
+        (tmp_path / 'r' / '.gitkeep').write_text('')
+        (tmp_path / 'r' / 'STALE.html').write_text('old')
+        (tmp_path / 'index.html').write_text(
+            '<!doctype html><html><head>'
+            '<title>Archive</title>'
+            '<meta name="description" content="Archive description" />'
+            '<link rel="canonical" href="https://pressthink.org/j/rosen-archive/" />'
+            '<meta property="og:title" content="Archive" />'
+            '<meta property="og:description" content="Archive description" />'
+            '<meta property="og:url" content="https://pressthink.org/j/rosen-archive/" />'
+            '<meta property="og:type" content="website" />'
+            '<meta name="twitter:title" content="Archive" />'
+            '<meta name="twitter:description" content="Archive description" />'
+            '</head><body><script src="./frontend/index.js"></script></body></html>',
+            encoding='utf-8',
+        )
+        (tmp_path / 'data' / 'archive-data.json').write_text(json.dumps({
+            'records': [
+                {
+                    'id': 'RECORD-00001',
+                    'title': 'A title with <angle> & "quotes"',
+                    'summary': 'A summary for social previews.',
+                    'type': 'article',
+                },
+                {
+                    'id': 'BSKY-1',
+                    'title': 'A social post',
+                    'summary': 'Do not prerender social records.',
+                    'type': 'social',
+                },
+            ],
+        }), encoding='utf-8')
+
+        pages = deploy_full_site.generate_record_pages(tmp_path)
+
+        assert [p.name for p in pages] == ['RECORD-00001.html']
+        assert not (tmp_path / 'r' / 'STALE.html').exists()
+        assert (tmp_path / 'r' / '.gitkeep').exists()
+        rendered = pages[0].read_text(encoding='utf-8')
+        assert 'A title with &lt;angle&gt; &amp; &quot;quotes&quot;' in rendered
+        assert 'A summary for social previews.' in rendered
+        assert ('https://pressthink.org/j/rosen-archive/'
+                '?record=RECORD-00001') in rendered
+        assert 'property="og:type" content="article"' in rendered
+        assert './frontend/index.js' in rendered
+        assert not (tmp_path / 'r' / 'BSKY-1.html').exists()
+
+    def test_htaccess_serves_generated_metadata_and_falls_back_for_unknown_ids(self):
+        config = (_REPO_ROOT / '.htaccess').read_text(encoding='utf-8')
+        assert re.search(
+            r'RewriteCond\s+%\{QUERY_STRING\}.*record=.*\[NC\]', config)
+        assert 'RewriteRule ^(?:index\\.html)?$ r/%2.html [L]' in config
+        assert 'RewriteCond %{REQUEST_FILENAME} !-f' in config
+        assert (
+            'RewriteRule ^r/[A-Za-z0-9-]+\\.html$ index.html [END,QSD]'
+            in config
+        )
 
 
 class TestEntryPointsUploadedLast:

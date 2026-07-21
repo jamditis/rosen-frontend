@@ -16,6 +16,7 @@ shared-styles.css                   # Common styles for standalone tools
 version.json                        # Version metadata
 metadata.json                       # Archive metadata
 .htaccess                           # Apache config: CSP + security headers, gzip, caching, the FAQ 301 (re-upload whenever it changes)
+r/                                  # Generated record-specific metadata shells for ?record= deep links
 
 frontend/                           # React application
   index.js                          # App entry point
@@ -82,6 +83,12 @@ feature's public entry point on the previous release until its JavaScript, CSS,
 and data dependencies are live. The root `index.html`, implementation worker,
 root-scope worker bridge, and `version.json` then retain their final four
 release flips.
+
+`backend/scripts/deploy_full_site.py` rebuilds `r/*.html` from the committed
+`index.html` and `data/archive-data.json` before collecting the upload. These
+small generated shells replace only the page metadata; Apache serves them
+internally for valid `?record=ID` requests while the browser keeps the public
+deep-link URL and loads the same React app.
 
 ## Retired routes removed by a full deploy
 
