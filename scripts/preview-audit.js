@@ -183,9 +183,10 @@ const ROUTES = [
   },
   {
     slug: 'record-error',
-    url: '/?record=RECORD-00802',
+    url: '/?record=BSKY-03169&report=problem&source=participate',
     archiveDetails: 'require',
     verifyRecordReading: 'error',
+    verifyReportFirst: true,
     mockDetailsFailure: true,
   },
   { slug: 'dissertation-map-detail', url: '/#dissertation', openDissertationDetail: true },
@@ -372,6 +373,20 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       `${route.slug} loaded archive-details.json ${archiveDetailsRequests.length} times; expected ${expectation}`,
     );
   }
+  if (route.verifyReportFirst) {
+    const reportDialog = page.getByRole('dialog', { name: 'Report a problem or suggest a record' });
+    await reportDialog.waitFor();
+    const reportState = await reportDialog.evaluate((element) => ({
+      inert: element.inert,
+      ariaHidden: element.getAttribute('aria-hidden'),
+      focusInside: element.contains(document.activeElement),
+    }));
+    if (reportState.inert || reportState.ariaHidden === 'true' || !reportState.focusInside) {
+      throw new Error(`Report-first record deep link hid its topmost dialog: ${JSON.stringify(reportState)}`);
+    }
+    await page.keyboard.press('Escape');
+    await reportDialog.waitFor({ state: 'hidden' });
+  }
   if (route.verifyRecordReading) {
     const dialog = page.getByRole('dialog', { name: /.*/ });
     await dialog.waitFor();
@@ -492,6 +507,10 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     }
     if (route.verifyRecordReading === 'error') {
       await dialog.getByText('Some record details are unavailable.', { exact: true }).waitFor();
+      const shareFallback = dialog.getByRole('button', { name: 'Copy canonical record link' });
+      if (await shareFallback.isDisabled()) {
+        throw new Error('Social record detail failure left its canonical share fallback disabled');
+      }
       const retryDetails = dialog.getByRole('button', { name: 'Retry details' });
       const retryRequest = page.waitForRequest(
         (request) => new URL(request.url()).pathname.endsWith('/data/archive-details.json'),

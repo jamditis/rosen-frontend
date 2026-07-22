@@ -48,6 +48,15 @@ const getSourceName = (record) => {
   }
 };
 
+const hasPublicSourceUrl = (record) => {
+  try {
+    const sourceUrl = new URL(record?.url);
+    return sourceUrl.protocol === 'http:' || sourceUrl.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
 const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSelectRecord, onSelectEntity, onFilterCategory, onFilterSearch, onReportProblem, nestedDialogOpen = false, hasPrev, hasNext, currentIndex, total }) => {
   const [isClosing, setIsClosing] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -219,14 +228,17 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
   // The dialog lives beside the archive shell in both standard and desktop
   // routes. Preserve each sibling's prior state while the record is open so
   // pointer, keyboard, and assistive-technology navigation cannot escape into
-  // the obscured surface. Overlays mounted later (such as the report form) are
-  // intentionally not part of this snapshot and can sit above the record.
+  // the obscured surface. Active modal siblings (such as a report opened before
+  // record data finishes loading) must stay available above the record.
   useEffect(() => {
     if (!isOpen || !hasRecord) return undefined;
 
     const dialog = dialogRef.current?.closest('.archive-record-dialog');
     const backgroundElements = dialog?.parentElement
-      ? Array.from(dialog.parentElement.children).filter(element => element !== dialog)
+      ? Array.from(dialog.parentElement.children).filter(element => (
+          element !== dialog
+          && !element.matches('[role="dialog"][aria-modal="true"]')
+        ))
       : [];
 
     backgroundStateRef.current = backgroundElements.map(element => ({
@@ -269,16 +281,15 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
       return undefined;
     }
 
-    if (!hasRecord) return undefined;
+    if (!hasRecord || nestedDialogOpen) return undefined;
+    if (openerRef.current) return undefined;
 
-    if (!openerRef.current) {
-      openerRef.current = document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null;
-    }
+    openerRef.current = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
     const frame = requestAnimationFrame(() => closeButtonRef.current?.focus());
     return () => cancelAnimationFrame(frame);
-  }, [isOpen, hasRecord]);
+  }, [isOpen, hasRecord, nestedDialogOpen]);
 
   const completeClose = (afterClose = null) => {
     onClose();
@@ -325,8 +336,16 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
 
   // Social share previews belong to the original platform, whose source URL is
   // loaded with the detail record rather than the lightweight archive card.
-  const shareRecord = record?.type === 'social' ? currentFullRecord : record;
-  const sharePending = record?.type === 'social' && !currentFullRecord;
+  const shareRecord = record?.type === 'social'
+    ? currentFullRecord || (detailsError ? record : null)
+    : record;
+  const sharePending = record?.type === 'social' && !shareRecord;
+  const shareUsesSource = shareRecord?.type === 'social' && hasPublicSourceUrl(shareRecord);
+  const shareLabel = sharePending
+    ? 'Loading source post link'
+    : shareUsesSource
+      ? 'Copy source post link'
+      : 'Copy canonical record link';
 
   const handleShare = () => {
       if (!shareRecord) return;
@@ -390,8 +409,8 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
                 onClick=${handleShare}
                 disabled=${sharePending}
                 className="archive-record-utility__action"
-                title=${sharePending ? 'Loading source post link' : displayRecord.type === 'social' ? 'Copy source post link' : 'Copy canonical record link'}
-                aria-label=${sharePending ? 'Loading source post link' : displayRecord.type === 'social' ? 'Copy source post link' : 'Copy canonical record link'}
+                title=${shareLabel}
+                aria-label=${shareLabel}
               >
                 <${Share2} aria-hidden="true" />
                 <span>Share link</span>

@@ -41,7 +41,14 @@ describe('archival record-reading surfaces', () => {
     assert.match(recordModal, /role="dialog" aria-modal="true" aria-labelledby="record-modal-title"/);
     assert.match(recordModal, /element\.inert = true/);
     assert.match(recordModal, /element\.setAttribute\('aria-hidden', 'true'\)/);
+    assert.match(
+      recordModal,
+      /!element\.matches\('\[role="dialog"\]\[aria-modal="true"\]'\)/,
+      'an already-open topmost dialog must not be hidden when the record mounts beneath it',
+    );
     assert.match(recordModal, /closeButtonRef\.current\?\.focus/);
+    assert.match(recordModal, /if \(!hasRecord \|\| nestedDialogOpen\) return undefined/);
+    assert.match(recordModal, /if \(openerRef\.current\) return undefined/);
     assert.match(recordModal, /e\.key === 'Tab'/);
     assert.match(recordModal, /document\.activeElement !== document\.body/);
     assert.match(recordModal, /blocksRecordNavigation\(e\.target\)/);
@@ -90,6 +97,16 @@ describe('archival record-reading surfaces', () => {
     assert.match(audit, /route\.mockDetailsFailure\s*\?\s*archiveDetailsRequests\.length < 1/);
     assert.match(audit, /message\.location\(\)\.url/);
     assert.match(audit, /Failed to load resource:[\s\S]{0,240}archive-details\.json/);
+    assert.match(
+      recordModal,
+      /currentFullRecord \|\| \(detailsError \? record : null\)/,
+      'a failed social detail fetch must fall back to a shareable canonical archive record',
+    );
+    assert.match(recordModal, /const sharePending = record\?\.type === 'social' && !shareRecord/);
+    assert.match(recordModal, /const shareUsesSource = shareRecord\?\.type === 'social' && hasPublicSourceUrl\(shareRecord\)/);
+    assert.match(audit, /record=BSKY-03169&report=problem&source=participate/);
+    assert.match(audit, /Report-first record deep link hid its topmost dialog/);
+    assert.match(audit, /Social record detail failure left its canonical share fallback disabled/);
   });
 
   it('keeps BugReportModal defaults stable when a caller omits initial fields', () => {
