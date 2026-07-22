@@ -1,7 +1,8 @@
 
 import { useMemo } from 'react';
-import { html } from '../html.js?v=3.8.0';
+import { html } from '../html.js?v=3.8.1';
 import { ArrowLeft, ArrowRight, Archive, BookOpen, Network, Search, Github, Mail } from 'lucide-react';
+import ArchiveRouteHeader from './ArchiveRouteHeader.js?v=3.8.1';
 
 const AboutPage = ({ onBack, onStart, onParticipate, records }) => {
 
@@ -25,23 +26,12 @@ const AboutPage = ({ onBack, onStart, onParticipate, records }) => {
   }, [records]);
 
   return html`
-    <div className="min-h-screen bg-[#fdfbf7]">
-      <header className="sticky top-0 z-50 bg-paper border-b border-stone-300 shadow-sm">
-        <div className="container mx-auto px-4 h-16 flex items-center">
-          <button
-            type="button"
-            onClick=${onBack}
-            className="flex items-center gap-2 px-1 py-3 text-stone-600 hover:text-stone-900 transition-colors font-bold text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
-          >
-            <${ArrowLeft} className="w-4 h-4" aria-hidden="true" />
-            Back to archive
-          </button>
-        </div>
-      </header>
+    <div className="min-h-screen archive-canvas">
+      <${ArchiveRouteHeader} onBack=${onBack} sectionTitle="About this archive" />
 
       <main className="container mx-auto px-4 py-12 max-w-3xl">
 
-        <div className="mb-12">
+        <div className="archive-panel archive-panel--accent archive-density--spacious mb-12">
           <div className="flex items-center gap-3 mb-4">
             <div className="bg-stone-900 text-white p-2">
               <${Archive} className="w-6 h-6" aria-hidden="true" />
@@ -59,7 +49,7 @@ const AboutPage = ({ onBack, onStart, onParticipate, records }) => {
             <button
               type="button"
               onClick=${onStart}
-              className="group mt-6 inline-flex items-center gap-2 px-5 py-3 bg-stone-900 text-white font-display font-bold hover:bg-stone-700 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+              className="archive-action archive-action--primary group mt-6"
             >
               Start here
               <${ArrowRight} className="w-4 h-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
@@ -69,7 +59,7 @@ const AboutPage = ({ onBack, onStart, onParticipate, records }) => {
             <button
               type="button"
               onClick=${onParticipate}
-              className="group ml-0 mt-3 inline-flex items-center gap-2 border border-stone-900 bg-white px-5 py-3 font-display font-bold text-stone-900 transition-colors hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 sm:ml-3 sm:mt-6"
+              className="archive-action archive-action--secondary group ml-0 mt-3 sm:ml-3 sm:mt-6"
             >
               Ways to participate
               <${ArrowRight} className="w-4 h-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
@@ -99,21 +89,21 @@ const AboutPage = ({ onBack, onStart, onParticipate, records }) => {
           <section className="mb-12">
             <h2 className="text-2xl font-display font-bold text-stone-900 mb-4">Archive stats</h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white border border-stone-200 p-4 text-center">
-                <div className="text-3xl font-display font-bold text-stone-900">${stats.total.toLocaleString()}</div>
-                <div className="text-xs text-stone-500 uppercase tracking-wider font-bold mt-1">Total records</div>
+              <div className="archive-stat text-center">
+                <div className="archive-stat__value">${stats.total.toLocaleString()}</div>
+                <div className="archive-stat__label mt-1">Total records</div>
               </div>
-              <div className="bg-white border border-stone-200 p-4 text-center">
-                <div className="text-3xl font-display font-bold text-stone-900">${stats.articles.toLocaleString()}</div>
-                <div className="text-xs text-stone-500 uppercase tracking-wider font-bold mt-1">Articles</div>
+              <div className="archive-stat text-center">
+                <div className="archive-stat__value">${stats.articles.toLocaleString()}</div>
+                <div className="archive-stat__label mt-1">Articles</div>
               </div>
-              <div className="bg-white border border-stone-200 p-4 text-center">
-                <div className="text-3xl font-display font-bold text-stone-900">${stats.social.toLocaleString()}</div>
-                <div className="text-xs text-stone-500 uppercase tracking-wider font-bold mt-1">Social posts</div>
+              <div className="archive-stat text-center">
+                <div className="archive-stat__value">${stats.social.toLocaleString()}</div>
+                <div className="archive-stat__label mt-1">Social posts</div>
               </div>
-              <div className="bg-white border border-stone-200 p-4 text-center">
-                <div className="text-3xl font-display font-bold text-stone-900">${stats.minYear}–${stats.maxYear}</div>
-                <div className="text-xs text-stone-500 uppercase tracking-wider font-bold mt-1">Date range</div>
+              <div className="archive-stat text-center">
+                <div className="archive-stat__value">${stats.minYear}–${stats.maxYear}</div>
+                <div className="archive-stat__label mt-1">Date range</div>
               </div>
             </div>
             <p className="text-xs text-stone-500 mt-2">Stats are calculated live from the loaded archive data.</p>
@@ -124,7 +114,7 @@ const AboutPage = ({ onBack, onStart, onParticipate, records }) => {
           <h2 className="text-2xl font-display font-bold text-stone-900 mb-4">What you can do here</h2>
           <div className="space-y-4">
             <div className="flex gap-4 items-start">
-              <div className="bg-stone-100 p-2 rounded flex-shrink-0">
+              <div className="archive-orientation-icon">
                 <${Search} className="w-5 h-5 text-stone-600" aria-hidden="true" />
               </div>
               <div>
@@ -133,7 +123,7 @@ const AboutPage = ({ onBack, onStart, onParticipate, records }) => {
               </div>
             </div>
             <div className="flex gap-4 items-start">
-              <div className="bg-stone-100 p-2 rounded flex-shrink-0">
+              <div className="archive-orientation-icon">
                 <${Network} className="w-5 h-5 text-stone-600" aria-hidden="true" />
               </div>
               <div>
@@ -142,7 +132,7 @@ const AboutPage = ({ onBack, onStart, onParticipate, records }) => {
               </div>
             </div>
             <div className="flex gap-4 items-start">
-              <div className="bg-stone-100 p-2 rounded flex-shrink-0">
+              <div className="archive-orientation-icon">
                 <${BookOpen} className="w-5 h-5 text-stone-600" aria-hidden="true" />
               </div>
               <div>
@@ -196,7 +186,7 @@ const AboutPage = ({ onBack, onStart, onParticipate, records }) => {
 
         <section className="mb-12">
           <h2 className="text-2xl font-display font-bold text-stone-900 mb-4">Credits and contact</h2>
-          <div className="bg-white border border-stone-200 p-6">
+          <div className="archive-panel">
             <div className="space-y-3 text-sm text-stone-700">
               <p><strong>Archive curator:</strong> Joe Amditis</p>
               <p><strong>Subject:</strong> Jay Rosen, NYU Professor of Journalism</p>
@@ -219,7 +209,7 @@ const AboutPage = ({ onBack, onStart, onParticipate, records }) => {
           <button
             type="button"
             onClick=${onBack}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-stone-900 text-white font-display font-bold hover:bg-stone-700 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+            className="archive-action archive-action--primary"
           >
             <${ArrowLeft} className="w-4 h-4" aria-hidden="true" />
             Back to archive

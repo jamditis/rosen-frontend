@@ -58,7 +58,7 @@ describe('Start here page', () => {
     assert.match(page, /embedded\s*=\s*false/);
     assert.match(page, /const ContentTag = embedded \? 'div' : 'main'/);
     assert.match(page, /id=\$\{embedded \? undefined : 'main-content'\}/);
-    assert.match(page, /\$\{!embedded && html`<header/);
+    assert.match(page, /\$\{!embedded && html`<\$\{ArchiveRouteHeader\}/);
     assert.match(page, /\$\{!embedded && html`<button[\s\S]*Explore the archive desktop/);
     assert.match(page, /if \(embedded\) return;/);
   });
