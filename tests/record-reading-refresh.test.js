@@ -68,13 +68,23 @@ describe('archival record-reading surfaces', () => {
     assert.match(styles, /@media \(max-width: 639px\)[\s\S]*\.archive-record-error button \{[\s\S]*grid-column: 2;[\s\S]*margin-left: 0;/);
   });
 
-  it('prefills the nearby record-problem report with the record id', () => {
+  it('keeps the record id in report context without satisfying the required description', () => {
     assert.match(recordView, /onReportProblem/);
     assert.match(app, /onReportProblem=\$\{handleRecordProblemReport\}/);
-    assert.match(app, /whatHappened:\s*`Problem with archive record \$\{recordId\}: `/);
+    assert.match(app, /handleRecordProblemReport = useCallback\(\(\) => \{[\s\S]*openBugReport\('problem'\)/);
+    assert.doesNotMatch(app, /whatHappened:\s*`Problem with archive record/);
     assert.match(app, /initialFields=\$\{bugReportInitialFields\}/);
     assert.match(bugReport, /initialFields\s*=\s*NO_INITIAL_FIELDS/);
     assert.match(bugReport, /\{ \.\.\.EMPTY_FIELDS, \.\.\.initialFields \}/);
+    assert.match(audit, /Record problem report auto-filled its required description/);
+    assert.match(audit, /Record problem report lost the record id from its captured page context/);
+  });
+
+  it('waits for detail-only attribution before enabling citation copy', () => {
+    assert.match(recordModal, /if \(!currentFullRecord\) return/);
+    assert.match(recordModal, /disabled=\$\{!currentFullRecord\}/);
+    assert.match(recordModal, /Citation unavailable without full details/);
+    assert.match(recordModal, /Loading citation details/);
   });
 
   it('coordinates nested modal body scroll locks through one ref-counted owner', () => {

@@ -461,8 +461,11 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       const reportDialog = page.getByRole('dialog', { name: 'Report a problem or suggest a record' });
       await reportDialog.waitFor();
       const reportField = reportDialog.getByLabel('What happened?');
-      if (!await reportField.inputValue().then(value => value.startsWith('Problem with archive record RECORD-00802:'))) {
-        throw new Error('Record problem report did not prefill the current archive id');
+      if (await reportField.inputValue() !== '') {
+        throw new Error('Record problem report auto-filled its required description');
+      }
+      if (new URL(page.url()).searchParams.get('record') !== 'RECORD-00802') {
+        throw new Error('Record problem report lost the record id from its captured page context');
       }
       await page.keyboard.press('Escape');
       await reportDialog.waitFor({ state: 'hidden' });

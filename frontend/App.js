@@ -183,10 +183,11 @@ const App = () => {
     setBugReportOpen(true);
   }, []);
 
-  const handleRecordProblemReport = useCallback((recordId) => {
-    openBugReport('problem', {
-      whatHappened: `Problem with archive record ${recordId}: `,
-    });
+  const handleRecordProblemReport = useCallback(() => {
+    // The selected record id already stays in the page URL captured with the
+    // report. Keep the required description empty so the reader must describe
+    // the actual problem instead of submitting an auto-filled prefix alone.
+    openBugReport('problem');
   }, [openBugReport]);
 
   // Hash navigation replaces parts of the React tree without giving the

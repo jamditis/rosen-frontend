@@ -325,12 +325,12 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
   };
 
   const handleCopyCitation = () => {
-    if (!displayRecord) return;
-    const recordUrl = canonicalRecordUrl(window.location.href, displayRecord.id);
-    const citationAuthor = displayRecord.author || 'Jay Rosen';
-    const citationYear = displayRecord.year || 'n.d.';
-    const citationSource = displayRecord.pub ? ` ${displayRecord.pub}.` : '';
-    const text = `${citationAuthor} (${citationYear}). "${displayRecord.title}".${citationSource} Retrieved from ${recordUrl}`;
+    if (!currentFullRecord) return;
+    const recordUrl = canonicalRecordUrl(window.location.href, currentFullRecord.id);
+    const citationAuthor = currentFullRecord.author || 'Jay Rosen';
+    const citationYear = currentFullRecord.year || 'n.d.';
+    const citationSource = currentFullRecord.pub ? ` ${currentFullRecord.pub}.` : '';
+    const text = `${citationAuthor} (${citationYear}). "${currentFullRecord.title}".${citationSource} Retrieved from ${recordUrl}`;
     navigator.clipboard.writeText(text).then(() => showNotification("Citation copied to clipboard"));
   };
 
@@ -346,6 +346,11 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
     : shareUsesSource
       ? 'Copy source post link'
       : 'Copy canonical record link';
+  const citationLabel = currentFullRecord
+    ? 'Copy citation'
+    : detailsError
+      ? 'Citation unavailable without full details'
+      : 'Loading citation details';
 
   const handleShare = () => {
       if (!shareRecord) return;
@@ -418,9 +423,10 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
               <button
                 type="button"
                 onClick=${handleCopyCitation}
+                disabled=${!currentFullRecord}
                 className="archive-record-utility__action"
-                title="Copy citation"
-                aria-label="Copy citation"
+                title=${citationLabel}
+                aria-label=${citationLabel}
               >
                 <${Quote} aria-hidden="true" />
                 <span>Copy citation</span>
