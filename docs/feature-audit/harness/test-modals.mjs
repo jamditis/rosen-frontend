@@ -21,9 +21,9 @@ async function suppressWelcome(page) {
 // Open the record modal by clicking the first record card (JS-dispatched click,
 // so any leftover overlay can't intercept it). Returns the open id.
 async function openFirstCard(page) {
-  await page.waitForSelector('.break-inside-avoid', { timeout: 15000 });
+  await page.waitForSelector('.archive-record-card__body', { timeout: 15000 });
   await page.evaluate(() => {
-    document.querySelector('.break-inside-avoid')
+    document.querySelector('.archive-record-card__body')
       ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   });
   await page.waitForSelector('[role="dialog"][aria-modal="true"]', { timeout: 10000 });
@@ -37,7 +37,7 @@ async function openFirstCard(page) {
 
 // Pick a real RECORD- id from the loaded card list.
 async function pickRealRecordId(page) {
-  await page.waitForSelector('.break-inside-avoid', { timeout: 15000 });
+  await page.waitForSelector('.archive-record-card__body', { timeout: 15000 });
   return page.evaluate(() => {
     // The card click handler captures item.id; we can't read it from DOM, so
     // open the first card briefly via the URL after a click is not ideal.
@@ -188,7 +188,7 @@ const main = async () => {
         await sleep(700);
         const after = await page.evaluate((label) => ({
           dialogGone: !document.querySelector('[role="dialog"][aria-modal="true"]'),
-          recordsLine: ([...document.querySelectorAll('*')].map(e => e.textContent).find(t => /records found/.test(t)) || '').match(/[\d,]+ records found/)?.[0],
+          recordsLine: document.querySelector('.archive-results-count')?.textContent?.trim() || '',
           // active filter chip text present in sidebar/header
           bodyHasCat: document.body.textContent.includes(label),
         }), chip.catLabel);

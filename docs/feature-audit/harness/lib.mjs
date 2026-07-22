@@ -30,13 +30,29 @@ export async function newPage(browser, viewport = { width: 1440, height: 900 }) 
   return { page, errors };
 }
 
-// Navigate and wait for the archive React app to finish its core data load.
+// Wait until the active archive route has rendered its own ready signal or
+// failed loudly. Do not swallow the timeout: an audit that runs against an
+// unready page cannot produce a trustworthy verdict.
+export async function waitForArchiveReady(page, timeout = 45000) {
+  await page.waitForFunction(
+    () => {
+      if (window.location.hash === '#entities') {
+        return document.querySelector('#entity-search')
+          || [...document.querySelectorAll('[role="alert"]')]
+            .some(alert => /Unable to load people and ideas/.test(alert.textContent || ''));
+      }
+
+      const count = document.querySelector('.archive-results-count')?.textContent || '';
+      return /[\d,]+\s+records?/.test(count) || document.querySelector('.archive-error-state');
+    },
+    { timeout },
+  );
+}
+
+// Navigate and wait for the selected archive route to finish loading.
 export async function gotoArchive(page, hashOrQuery = '') {
   await page.goto(BASE + '/index.html' + hashOrQuery, { waitUntil: 'domcontentloaded' });
-  await page.waitForFunction(
-    () => /records found/.test(document.body.textContent) || document.querySelector('[class*="border-red"]'),
-    { timeout: 45000 }
-  ).catch(() => {});
+  await waitForArchiveReady(page);
 }
 
 // Inject the React-controlled-input setter helper into the page context.

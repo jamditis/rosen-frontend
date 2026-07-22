@@ -36,6 +36,13 @@ export const REPORT_CONFIG = {
 
 export const ITEMS_PER_PAGE = 24;
 
+export const CONTENT_TYPE_OPTIONS = [
+    { label: 'All', value: null },
+    { label: 'Articles', value: 'article' },
+    { label: 'Twitter/X', value: 'twitter' },
+    { label: 'Bluesky', value: 'bluesky' },
+];
+
 export const COLORS = [
     { bg: '#e0f2fe', text: '#075985', border: '#bae6fd' }, // Sky
     { bg: '#f0fdf4', text: '#166534', border: '#bbf7d0' }, // Green
@@ -55,7 +62,7 @@ export const ENTITY_TYPE_CONFIG = {
   Location: { color: '#9a3412', bg: '#fff7ed', label: 'Locations' }
 };
 
-export { ERAS } from '../data/eras.js?v=3.8.1';
+export { ERAS } from '../data/eras.js?v=3.8.2';
 
 export const FEATURED_WORKS = [
   {

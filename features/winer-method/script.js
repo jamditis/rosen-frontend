@@ -7,7 +7,7 @@ import {
   PRESETS,
   RECORDS,
   TRAIL_STOPS,
-} from './data.js?v=3.8.1';
+} from './data.js?v=3.8.2';
 
 const VALID_VIEWS = new Set(['trail', 'records', 'concepts', 'connections', 'method']);
 const VALID_PRESETS = new Set(PRESETS.map(({ id }) => id));
@@ -168,12 +168,12 @@ function renderTrail() {
     <div class="evidence-links"><span>Evidence</span>${evidenceLinks(finding.evidenceRecordIds)}</div>
   </article>`).join('');
   return `<section class="panel" aria-labelledby="trail-title">
-    <p class="eyebrow">Authored trail</p>
+    <p class="archive-folder-tab eyebrow"><span>Authored trail</span></p>
     <h2 id="trail-title">Five stops through the evidence</h2>
     <p class="section-intro">This is an intentional reading across five of the 11 records. The connective text is the curator’s interpretation of the cited sources, not a claim that every item uses the same words.</p>
     <ol class="timeline">${stops}</ol>
     <section class="findings" aria-labelledby="findings-title">
-      <p class="eyebrow">Curator findings</p>
+      <p class="archive-folder-tab eyebrow"><span>Curator findings</span></p>
       <h2 id="findings-title">Four patterns worth testing</h2>
       <p class="section-intro">These are provisional readings, not findings attributed to Winer or Rosen. Follow the evidence links to evaluate each one.</p>
       <div class="findings-grid">${findings}</div>
@@ -183,7 +183,7 @@ function renderTrail() {
 
 function renderRecords(records) {
   return `<section class="panel" aria-labelledby="records-title">
-    <p class="eyebrow">Frozen mini-archive</p>
+    <p class="archive-folder-tab eyebrow"><span>Frozen mini-archive</span></p>
     <h2 id="records-title">${records.length} source records</h2>
     <p class="section-intro">Each record keeps a canonical URL, a provenance note, and a curator-written summary. Nothing is fetched from the Rosen archive.</p>
     <div class="record-grid">${records.map((record) => recordMarkup(record)).join('')}</div>
@@ -217,11 +217,11 @@ function renderConnections() {
     </article></li>`;
   }).join('');
   return `<section class="panel" aria-labelledby="connections-title">
-    <p class="eyebrow">Evidence-backed map</p>
+    <p class="archive-folder-tab eyebrow"><span>Evidence-backed map</span></p>
     <h2 id="connections-title">How the evidence relates</h2>
     <p class="section-intro">Each path is an editorial assertion backed by the linked source record—not a relationship inferred from proximity or co-occurrence. Select a node to jump to its note, or follow the center link to inspect the evidence.</p>
     <ol class="relation-map" aria-label="Seven evidence-backed entity relationships">${connections}</ol>
-    <div class="entity-heading"><p class="eyebrow">Entity notes</p><h3>Who and what appears in the corpus</h3></div><ul class="entity-grid">${entityCards}</ul>
+    <div class="entity-heading"><p class="archive-folder-tab eyebrow"><span>Entity notes</span></p><h3>Who and what appears in the corpus</h3></div><ul class="entity-grid">${entityCards}</ul>
   </section>`;
 }
 
@@ -230,7 +230,7 @@ function renderConcepts() {
   if (selected) {
     return `<section class="panel concept-page" aria-labelledby="concept-title">
       <a data-state-link class="back-link" href="${serializeState({ view: 'concepts' })}">← All six concepts</a>
-      <p class="eyebrow">Concept guide</p>
+      <p class="archive-folder-tab eyebrow"><span>Concept guide</span></p>
       <h2 id="concept-title">${escapeHtml(selected.title)}</h2>
       <p class="concept-short">${escapeHtml(selected.short)}</p>
       <div class="concept-reading">
@@ -251,7 +251,7 @@ function renderConcepts() {
     </a>
   </li>`).join('');
   return `<section class="panel" aria-labelledby="concepts-title">
-    <p class="eyebrow">Concept guide</p>
+    <p class="archive-folder-tab eyebrow"><span>Concept guide</span></p>
     <h2 id="concepts-title">Six terms for reading the trail</h2>
     <p class="section-intro">Each concise page defines one term only as it is used in this bounded corpus, then links back to the supporting records. Every concept URL is shareable.</p>
     <ol class="concept-grid">${cards}</ol>
@@ -261,7 +261,7 @@ function renderConcepts() {
 function renderMethod() {
   const sourceRows = RECORDS.map((record) => `<tr><td>${escapeHtml(record.id)}</td><td>${record.date}</td><td>${escapeHtml(record.sourceType)}</td><td><a href="${escapeHtml(record.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(record.sourceTitle)}</a><small class="source-publication">${escapeHtml(record.source)}</small></td><td>${escapeHtml(record.evidence)}</td></tr>`).join('');
   return `<section class="panel" aria-labelledby="method-title">
-    <p class="eyebrow">Transparent method</p>
+    <p class="archive-folder-tab eyebrow"><span>Transparent method</span></p>
     <h2 id="method-title">What this demonstration does</h2>
     <div class="method-grid">
       <div><h3>Retrieve offline</h3><p>Fetch public primary pages during curation and record the source locator and date basis.</p></div>
@@ -269,7 +269,7 @@ function renderMethod() {
       <div><h3>Connect</h3><p>Name entities and editorial relationships, each with a supporting record.</p></div>
       <div><h3>Query</h3><p>Apply four editorial lenses over local frozen data and preserve a JavaScript fallback with matching results.</p></div>
     </div>
-    <div class="method-security"><p class="eyebrow">Bounded interface</p><h3>Local evidence, limited controls</h3><p>The record interface exposes four allowlisted, read-only query presets. It accepts no free-form SQL, makes no runtime source requests, and falls back to the same frozen local records if SQLite is unavailable.</p></div>
+    <div class="method-security"><p class="archive-folder-tab eyebrow"><span>Bounded interface</span></p><h3>Local evidence, limited controls</h3><p>The record interface exposes four allowlisted, read-only query presets. It accepts no free-form SQL, makes no runtime source requests, and falls back to the same frozen local records if SQLite is unavailable.</p></div>
     <div class="limitations"><h3>Scope and limitations</h3><p>${escapeHtml(MANIFEST.scope)}</p><ul>${MANIFEST.exclusions.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul><p><strong>Frozen:</strong> ${MANIFEST.frozenOn}. <strong>Records:</strong> ${MANIFEST.recordCount}.</p></div>
     <div class="manifest-heading"><h3>Source manifest</h3><div class="manifest-actions"><a class="download-link" href="./source-manifest.json" download>Download source manifest (JSON)</a><a class="download-link" href="./ingestion-log.json" download>Download offline ingestion log (JSON)</a><a class="download-link" href="./retrieval-evidence.json" download>Download retrieval evidence (JSON)</a></div></div>
     <p class="table-hint" id="manifest-scroll-hint">On smaller screens, scroll horizontally to read all five columns.</p>

@@ -1,9 +1,10 @@
-import { html } from '../html.js?v=3.8.1';
+import { html } from '../html.js?v=3.8.2';
 import { ChevronLeft, ChevronRight, FolderOpen, SearchX } from 'lucide-react';
-import { COLORS } from '../constants.js?v=3.8.1';
-import { hashString } from '../services/archiveService.js?v=3.8.1';
-import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.1';
-import LoadingQuotes from './LoadingQuotes.js?v=3.8.1';
+import { COLORS } from '../constants.js?v=3.8.2';
+import { hashString } from '../services/archiveService.js?v=3.8.2';
+import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.2';
+import { canonicalRecordUrl } from '../utils/recordDeepLink.js?v=3.8.2';
+import LoadingQuotes from './LoadingQuotes.js?v=3.8.2';
 
 const Highlight = ({ text, term }) => {
   if (!term || term.length < 2) return html`<span>${text}</span>`;
@@ -40,27 +41,28 @@ const ArchiveResults = ({
   onPageChange,
   onClearFilters,
 }) => {
-  const activateCard = (event, recordId) => {
-    if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
-    if (event.type === 'keydown') event.preventDefault();
+  const openCard = (event, recordId) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
     onSelectRecord(recordId);
   };
 
   return html`
-    <div className=${compact ? 'desktop-archive-results' : ''}>
+    <div className=${compact ? 'archive-results archive-results--compact desktop-archive-results' : 'archive-results'}>
       ${errorPanel}
 
       ${!errorPanel && loading && html`<${LoadingQuotes} />`}
 
       ${!errorPanel && !loading && filteredRecords.length === 0 && html`
-        <div className="text-center py-20 border-2 border-dashed border-stone-200 rounded-lg bg-stone-50">
-          <${SearchX} className="w-12 h-12 mx-auto text-stone-300 mb-4" aria-hidden="true" />
-          <h3 className="font-display text-xl text-stone-700 mb-2">No records found</h3>
-          <p className="text-stone-500 text-sm mb-6">Try adjusting your search terms or filters.</p>
+        <div className="archive-empty-state">
+          <${SearchX} className="archive-empty-state__icon" aria-hidden="true" />
+          <p className="archive-section-label">Search result</p>
+          <h3>No records found</h3>
+          <p>Try adjusting your search terms or filters.</p>
           <button
             type="button"
             onClick=${onClearFilters}
-            className="text-sm border-b-2 border-stone-800 pb-0.5 hover:text-stone-600 transition-colors font-bold"
+            className="archive-action archive-action--secondary"
           >
             Clear all filters
           </button>
@@ -79,39 +81,54 @@ const ArchiveResults = ({
             return html`
               <article
                 key=${item.id}
-                className="bg-white border border-stone-200 hover:border-stone-400 hover:shadow-lg transition-all duration-300 rounded-sm flex flex-col group overflow-hidden relative"
+                className="archive-record-card"
               >
-                <div className="h-1 w-full" style=${{ backgroundColor: theme.text }}></div>
-                <div
-                  role="button"
-                  tabIndex="0"
+                <span
+                  className="archive-record-card__accent"
+                  style=${{ backgroundColor: theme.text }}
+                  aria-hidden="true"
+                />
+                <a
+                  href=${canonicalRecordUrl(window.location.href, item.id)}
                   aria-label=${`Open record: ${item.title}`}
-                  onClick=${(event) => activateCard(event, item.id)}
-                  onKeyDown=${(event) => activateCard(event, item.id)}
-                  className="p-6 flex flex-col h-full cursor-pointer focus:outline-none focus:ring-2 focus:ring-inset focus:ring-sky-500"
+                  onClick=${event => openCard(event, item.id)}
+                  className="archive-record-card__body"
                 >
-                  <div className="flex justify-between items-start mb-3 gap-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-stone-600">${item.pub}</span>
-                    <span className="text-xs text-stone-600 font-mono border border-stone-200 px-1 rounded">${item.date}</span>
+                  <div className="archive-record-card__meta">
+                    <span className="archive-record-card__publication">${item.pub}</span>
+                    <span className="archive-record-card__date">${item.date}</span>
                   </div>
 
-                  <h3 className="text-lg font-display font-bold text-stone-900 leading-tight mb-3 group-hover:text-stone-600 transition-colors">
+                  <h3 className="archive-record-card__title">
                     <${Highlight} text=${item.title} term=${searchTerm} />
                   </h3>
 
-                  <p className="text-stone-600 text-sm leading-relaxed mb-4 flex-grow font-body">
+                  <p className="archive-record-card__summary">
                     <${Highlight} text=${item.summaryPreview || item.summary || ''} term=${searchTerm} />
                   </p>
 
-                  <div className="mt-auto pt-4 border-t border-stone-100 flex flex-wrap gap-2">
-                    ${item.categories.slice(0, 2).map((category) => html`
-                      <span key=${category} className="text-[10px] uppercase font-bold px-2 py-1 rounded bg-stone-100 text-stone-600 tracking-wide border border-stone-200">
+                  <div className="archive-record-card__labels">
+                    ${item.categories.slice(0, 2).map((category, index) => html`
+                      <span
+                        key=${category}
+                        className="archive-record-card__label"
+                        style=${index === 0 ? {
+                          backgroundColor: theme.bg,
+                          borderColor: theme.border,
+                          color: theme.text,
+                        } : undefined}
+                      >
                         ${category}
                       </span>
                     `)}
+                    ${item.categories.length > 2 && html`
+                      <span className="archive-record-card__label">
+                        +${item.categories.length - 2} more
+                      </span>
+                    `}
                     ${recordNeedsReview(item) && html`
                       <span
-                        className="text-[10px] uppercase font-bold px-2 py-1 rounded tracking-wide"
+                        className="archive-record-card__label archive-record-card__label--review"
                         style=${{ backgroundColor: '#fffbeb', color: '#b45309' }}
                         title="Auto-submitted; pending a human review pass"
                       >
@@ -119,7 +136,7 @@ const ArchiveResults = ({
                       </span>
                     `}
                   </div>
-                </div>
+                </a>
               </article>
             `;
           })}
@@ -139,25 +156,28 @@ const ArchiveResults = ({
                 type="button"
                 key=${group.name}
                 onClick=${() => onOpenFolder(group.name)}
-                className="text-left group relative flex flex-col h-40 transition-transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+                className="archive-folder-card"
               >
                 <span
-                  className="folder-tab-shape block w-1/2 h-8 border-t border-l border-r relative z-10 translate-y-[1px] ml-0"
-                  style=${{ backgroundColor: theme.bg, borderColor: theme.border }}
+                  className="archive-folder-tab archive-folder-card__tab"
+                  style=${{
+                    '--archive-folder-tab-fill': theme.bg,
+                    '--archive-folder-tab-edge': theme.border,
+                  }}
                 >
                   <span
-                    className="px-4 py-2 text-[10px] font-bold uppercase block truncate"
+                    className="archive-folder-card__count"
                     style=${{ color: theme.text }}
                   >
                     ${group.count} records
                   </span>
                 </span>
-                <span className="flex-grow w-full bg-white border border-stone-300 rounded-r-md rounded-b-md shadow-sm p-6 relative z-20 flex items-center">
-                  <span className="w-1 h-full absolute left-0 top-0 rounded-l-sm" style=${{ backgroundColor: theme.text }}></span>
-                  <span className="text-lg font-display font-bold text-stone-800 group-hover:underline decoration-stone-300 underline-offset-4">
+                <span className="archive-folder-card__body">
+                  <span className="archive-folder-card__accent" style=${{ backgroundColor: theme.text }}></span>
+                  <span className="archive-folder-card__name">
                     ${group.name}
                   </span>
-                  <${FolderOpen} className="w-6 h-6 ml-auto text-stone-300 group-hover:text-stone-500 transition-colors" aria-hidden="true" />
+                  <${FolderOpen} className="archive-folder-card__icon" aria-hidden="true" />
                 </span>
               </button>
             `;
@@ -166,22 +186,22 @@ const ArchiveResults = ({
       `}
 
       ${!loading && !errorPanel && viewMode === 'grid' && totalPages > 1 && html`
-        <nav className="mt-12 flex justify-center items-center gap-4" aria-label="Archive results pages">
+        <nav className="archive-pagination" aria-label="Archive results pages">
           <button
             type="button"
             onClick=${() => onPageChange(currentPage - 1)}
             disabled=${currentPage === 1}
-            className="p-2 border border-stone-300 rounded hover:bg-stone-100 disabled:opacity-30 transition-all"
+            className="archive-action archive-action--quiet archive-pagination__button"
             aria-label="Previous results page"
           >
             <${ChevronLeft} className="w-5 h-5" aria-hidden="true" />
           </button>
-          <span className="font-display text-stone-600">Page ${currentPage} of ${totalPages}</span>
+          <span className="archive-pagination__status">Page ${currentPage} of ${totalPages}</span>
           <button
             type="button"
             onClick=${() => onPageChange(currentPage + 1)}
             disabled=${currentPage === totalPages}
-            className="p-2 border border-stone-300 rounded hover:bg-stone-100 disabled:opacity-30 transition-all"
+            className="archive-action archive-action--quiet archive-pagination__button"
             aria-label="Next results page"
           >
             <${ChevronRight} className="w-5 h-5" aria-hidden="true" />
