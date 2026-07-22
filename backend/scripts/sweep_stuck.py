@@ -101,7 +101,7 @@ def fetch_rows() -> List[Dict[str, Any]]:
 
     Returns a list of dicts, one per data row (header excluded). Keys:
     ``sheet_row`` (1-indexed), ``timestamp``, ``url``, ``title``, ``notes``,
-    ``status``.
+    ``status``, ``record_id``.
     """
     sheet_id = os.environ.get('SHEET_ID', '').strip()
     if not sheet_id:
@@ -129,6 +129,7 @@ def fetch_rows() -> List[Dict[str, Any]]:
             'notes': (row[3] or '').strip(),
             # row[4] = column E (reserved); row[5] = F status.
             'status': (row[5] or '').strip(),
+            'record_id': (row[6] or '').strip(),
         })
     return out
 
@@ -251,6 +252,8 @@ def sweep() -> Dict[str, int]:
             'sheet_id': sheet_id, 'sheet_tab': sheet_tab,
             'sheet_row': sheet_row,
         }
+        if status == 'archived':
+            inputs['retry_record_id'] = row.get('record_id', '')
         try:
             res = dispatch_workflow(inputs)
             if res.get('ok'):

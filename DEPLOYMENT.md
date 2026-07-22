@@ -16,6 +16,7 @@ shared-styles.css                   # Common styles for standalone tools
 version.json                        # Version metadata
 metadata.json                       # Archive metadata
 .htaccess                           # Apache config: CSP + security headers, gzip, caching, the FAQ 301 (re-upload whenever it changes)
+r/                                  # Generated record-specific metadata shells for ?record= deep links
 
 frontend/                           # React application
   index.js                          # App entry point
@@ -84,9 +85,19 @@ is 18,500,765 bytes; never upload the 133-byte LFS pointer.
 The full-site deploy uploads each standalone `features/*/index.html` only after
 the files in its feature directory and the shared data manifest. This keeps a
 feature's public entry point on the previous release until its JavaScript, CSS,
-and data dependencies are live. The root `index.html`, implementation worker,
+and data dependencies are live. Generated `r/*.html` record shells follow all
+frontend and data dependencies. The root `index.html`, implementation worker,
 root-scope worker bridge, and `version.json` then retain their final four
 release flips.
+
+`backend/scripts/deploy_full_site.py` rebuilds `r/*.html` from the committed
+`index.html` and `data/archive-data.json` before collecting the upload. These
+small generated shells replace only the page metadata; Apache serves them
+internally for valid `?record=ID` requests while the browser keeps the public
+deep-link URL and loads the same React app. After every upload succeeds, the
+deploy also removes safe `r/ID.html` files that no longer correspond to a
+generated non-social record. Unrelated files and directories under `r/` are
+left untouched.
 
 ## Retired routes removed by a full deploy
 
@@ -126,15 +137,24 @@ Do not upload these to the production server:
 
 ## Deploy after adding records
 
-If you've added records to the CSV and regenerated JSON, only upload:
+The automated `submit-record.yml` path uploads the regenerated JSON set first,
+then rebuilds and uploads the affected `r/ID.html` shell from the live
+production `index.html`. If that record becomes social, the obsolete shell is
+removed instead. This keeps record metadata current without exposing frontend
+assets from a release that has not had a full deploy.
+
+For a manual record-data update, upload the regenerated JSON set:
 
 - `data/archive-core.json`
 - `data/archive-data.json`
 - `data/archive-details.json`
+- `data/archive-entities.json`
 - `data/archive-analytics.json`
 - `data/search-index.json` (MiniSearch full-text index; regenerated with every record change, so it must ship or full-text search serves the previous index)
 
-Other files only change when the site code changes.
+Then run the full-site deploy so the corresponding record shells are rebuilt
+and reconciled. Do not publish record JSON alone: new or edited share metadata
+would remain stale until the next full deploy.
 
 ## Version cache busting
 

@@ -53,6 +53,15 @@ logging.basicConfig(
 )
 logger = logging.getLogger('deploy_full_site')
 
+_BACKEND = Path(__file__).resolve().parents[1]
+if str(_BACKEND) not in sys.path:
+    sys.path.insert(0, str(_BACKEND))
+
+from submission_runtime.record_pages import (  # noqa: E402
+    RECORD_SHELL_RE,
+    generate_record_pages,
+)
+
 
 # ---------- Manifest --------------------------------------------------------
 
@@ -79,6 +88,7 @@ _DEPLOY_FILES: Tuple[str, ...] = (
 )
 
 _DEPLOY_DIRS: Tuple[str, ...] = (
+    'r',  # generated metadata shells for ?record= deep links
     'frontend',
     'dissertation',
     'faq',
@@ -214,8 +224,8 @@ def collect_local_files(
     entry_points: Iterable[str] = _ENTRY_POINTS,
 ) -> List[Path]:
     """Walk the manifest and return every file to upload, ordered so that
-    each feature's index.html follows its dependencies, and site entry-point
-    files (index.html, both service-worker files, version.json) come LAST.
+    each HTML entry point follows its dependencies. Generated record shells
+    come after assets/data, followed by the global app entry points LAST.
 
     Skips entries that don't exist on disk (the existence tests catch
     those at PR time — at deploy time we keep going so a missing optional
@@ -241,7 +251,18 @@ def collect_local_files(
         if relpath.rstrip('/').startswith('features/')
         and (repo_root / relpath / 'index.html').is_file()
     )
-    entry_set = set(declared_entry_points) | set(feature_entry_points)
+    record_entry_points = tuple(sorted(
+        path.relative_to(repo_root).as_posix()
+        for relpath in dirs
+        if relpath.rstrip('/') == 'r'
+        for path in (repo_root / relpath).glob('*.html')
+        if path.is_file() and RECORD_SHELL_RE.fullmatch(path.name)
+    ))
+    entry_set = (
+        set(declared_entry_points)
+        | set(feature_entry_points)
+        | set(record_entry_points)
+    )
 
     def _add(p: Path) -> None:
         rp = p.resolve()
@@ -293,6 +314,13 @@ def collect_local_files(
     # is live. The global app/SW/version entry points retain their declared
     # absolute-last ordering after the standalone features.
     for relpath in feature_entry_points:
+        p = repo_root / relpath
+        if p.is_file():
+            _add(p)
+
+    # Record shells reference the global frontend and archive data. Flip them
+    # only after those dependencies, but before the root app/SW/version group.
+    for relpath in record_entry_points:
         p = repo_root / relpath
         if p.is_file():
             _add(p)
@@ -354,18 +382,62 @@ def _remove_remote_tree(sftp, remote_dir: str) -> bool:
     return True
 
 
+def _prune_remote_record_shells(
+    sftp,
+    remote_dir: str,
+    expected_names: Set[str],
+) -> int:
+    """Remove stale generated shells while preserving all unrelated entries."""
+    try:
+        entries = sftp.listdir_attr(remote_dir)
+    except IOError:
+        try:
+            sftp.stat(remote_dir)
+        except IOError as exc:
+            if exc.errno == errno.ENOENT:
+                return 0
+            raise
+        raise
+
+    removed = 0
+    for entry in entries:
+        if not stat.S_ISREG(entry.st_mode):
+            continue
+        if not RECORD_SHELL_RE.fullmatch(entry.filename):
+            continue
+        if entry.filename in expected_names:
+            continue
+        sftp.remove(f'{remote_dir}/{entry.filename}')
+        removed += 1
+    return removed
+
+
 def push_files(
     files: List[Path],
     repo_root: Path,
     cfg: Dict[str, Any],
     remote_prune_dirs: Iterable[str] = _REMOTE_PRUNE_DIRS,
+    record_shells: Optional[Iterable[Path]] = None,
 ) -> Dict[str, Any]:
-    """Upload files atomically, then remove retired remote directories.
+    """Upload files atomically, then reconcile retired remote content.
 
     Returns {ok, files_pushed, error}. The atomic-rename guarantee mirrors
     backend/submission_runtime/sftp_push.py — readers on the live site
-    never see a half-written file.
+    never see a half-written file. ``record_shells=None`` disables record-shell
+    reconciliation; an empty iterable intentionally clears every safe shell.
     """
+    expected_record_shells: Optional[Set[str]] = None
+    if record_shells is not None:
+        expected_record_shells = set()
+        for page in record_shells:
+            name = Path(page).name
+            if not RECORD_SHELL_RE.fullmatch(name):
+                return {
+                    'ok': False,
+                    'files_pushed': 0,
+                    'error': f'unsafe record shell name: {name!r}',
+                }
+            expected_record_shells.add(name)
     try:
         import paramiko
     except ImportError:
@@ -442,6 +514,13 @@ def push_files(
                 if pushed % 25 == 0 or pushed == len(files):
                     logger.info(f"Pushed {pushed}/{len(files)} files")
 
+            if expected_record_shells is not None:
+                remote_record_dir = f"{cfg['site_path']}/r"
+                removed = _prune_remote_record_shells(
+                    sftp, remote_record_dir, expected_record_shells)
+                if removed:
+                    logger.info(f'Removed {removed} stale record metadata shells')
+
             for relpath in remote_prune_dirs:
                 remote_dir = f"{cfg['site_path']}/{relpath}"
                 if _remove_remote_tree(sftp, remote_dir):
@@ -493,6 +572,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     else:
         repo_root = Path(__file__).resolve().parents[2]
 
+    record_pages = generate_record_pages(repo_root)
+    logger.info(f'Generated {len(record_pages)} record-specific metadata pages')
     files = collect_local_files(repo_root)
 
     if args.dry_run:
@@ -518,7 +599,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 2
 
     logger.info(f'Deploying {len(files)} files to {cfg["host"]}:{cfg["site_path"]}')
-    result = push_files(files, repo_root, cfg)
+    result = push_files(files, repo_root, cfg, record_shells=record_pages)
     if result['ok']:
         logger.info(f'Deploy complete: {result["files_pushed"]} files pushed')
         return 0

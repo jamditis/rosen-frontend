@@ -19,6 +19,7 @@ These tests cover the load-bearing behaviors:
 from __future__ import annotations
 
 import errno
+import json
 import importlib.util
 import pathlib
 import posixpath
@@ -278,6 +279,72 @@ class TestCollectLocalFiles:
         assert 'data/feeds/leaked.csv' not in rels
 
 
+class TestRecordSharePages:
+    """Record deep links need crawler-readable metadata before React runs."""
+
+    def test_generates_record_specific_shells_and_removes_stale_ones(self,
+                                                                     tmp_path):
+        (tmp_path / 'data').mkdir()
+        (tmp_path / 'r').mkdir()
+        (tmp_path / 'r' / '.gitkeep').write_text('')
+        (tmp_path / 'r' / 'STALE.html').write_text('old')
+        (tmp_path / 'index.html').write_text(
+            '<!doctype html><html><head>'
+            '<title>Archive</title>'
+            '<meta name="description" content="Archive description" />'
+            '<link rel="canonical" href="https://pressthink.org/j/rosen-archive/" />'
+            '<meta property="og:title" content="Archive" />'
+            '<meta property="og:description" content="Archive description" />'
+            '<meta property="og:url" content="https://pressthink.org/j/rosen-archive/" />'
+            '<meta property="og:type" content="website" />'
+            '<meta name="twitter:title" content="Archive" />'
+            '<meta name="twitter:description" content="Archive description" />'
+            '</head><body><script src="./frontend/index.js"></script></body></html>',
+            encoding='utf-8',
+        )
+        (tmp_path / 'data' / 'archive-data.json').write_text(json.dumps({
+            'records': [
+                {
+                    'id': 'RECORD-00001',
+                    'title': 'A title with <angle> & "quotes"',
+                    'summary': 'A summary for social previews.',
+                    'type': 'article',
+                },
+                {
+                    'id': 'BSKY-1',
+                    'title': 'A social post',
+                    'summary': 'Do not prerender social records.',
+                    'type': 'social',
+                },
+            ],
+        }), encoding='utf-8')
+
+        pages = deploy_full_site.generate_record_pages(tmp_path)
+
+        assert [p.name for p in pages] == ['RECORD-00001.html']
+        assert not (tmp_path / 'r' / 'STALE.html').exists()
+        assert (tmp_path / 'r' / '.gitkeep').exists()
+        rendered = pages[0].read_text(encoding='utf-8')
+        assert 'A title with &lt;angle&gt; &amp; &quot;quotes&quot;' in rendered
+        assert 'A summary for social previews.' in rendered
+        assert ('https://pressthink.org/j/rosen-archive/'
+                '?record=RECORD-00001') in rendered
+        assert 'property="og:type" content="article"' in rendered
+        assert './frontend/index.js' in rendered
+        assert not (tmp_path / 'r' / 'BSKY-1.html').exists()
+
+    def test_htaccess_serves_generated_metadata_and_falls_back_for_unknown_ids(self):
+        config = (_REPO_ROOT / '.htaccess').read_text(encoding='utf-8')
+        assert re.search(
+            r'RewriteCond\s+%\{QUERY_STRING\}.*record=.*\[NC\]', config)
+        assert 'RewriteRule ^(?:index\\.html)?$ r/%2.html [L]' in config
+        assert 'RewriteCond %{REQUEST_FILENAME} !-f' in config
+        assert (
+            'RewriteRule ^r/[A-Za-z0-9-]+\\.html$ index.html [END,QSD]'
+            in config
+        )
+
+
 class TestEntryPointsUploadedLast:
     """Cross-file consistency: entry points (index.html, version.json) must
     upload AFTER every asset they reference. If index.html ships before
@@ -328,6 +395,36 @@ class TestEntryPointsUploadedLast:
         assert names.index('frontend/sw.js') < names.index('sw.js')
         assert names.index('sw.js') < names.index('version.json')
         assert names[-4:] == ['index.html', 'frontend/sw.js', 'sw.js', 'version.json']
+
+    def test_record_shells_follow_assets_and_data_before_global_entries(self,
+                                                                         tmp_path):
+        (tmp_path / 'index.html').write_text('<html>')
+        (tmp_path / 'version.json').write_text('{}')
+        (tmp_path / 'frontend').mkdir()
+        (tmp_path / 'frontend' / 'App.js').write_text('// app')
+        (tmp_path / 'r').mkdir()
+        (tmp_path / 'r' / 'RECORD-00002.html').write_text('<html>two</html>')
+        (tmp_path / 'r' / 'RECORD-00001.html').write_text('<html>one</html>')
+        (tmp_path / 'data').mkdir()
+        (tmp_path / 'data' / 'archive-data.json').write_text('{"records": []}')
+
+        files = deploy_full_site.collect_local_files(
+            tmp_path,
+            top_files=('index.html', 'version.json'),
+            dirs=('r', 'frontend'),
+            data_files=('data/archive-data.json',),
+            entry_points=('index.html', 'version.json'),
+        )
+        names = [f.relative_to(tmp_path).as_posix() for f in files]
+
+        for dependency in ('frontend/App.js', 'data/archive-data.json'):
+            assert names.index(dependency) < names.index('r/RECORD-00001.html')
+        assert names[-4:] == [
+            'r/RECORD-00001.html',
+            'r/RECORD-00002.html',
+            'index.html',
+            'version.json',
+        ]
 
     def test_shared_data_modules_upload_before_frontend_importers(self):
         files = deploy_full_site.collect_local_files(_REPO_ROOT)
@@ -975,6 +1072,109 @@ class TestRetiredRoutes:
             deploy_full_site._remove_remote_tree(
                 sftp, '/site/dissertation/context',
             )
+
+
+class TestRecordShellReconciliation:
+    """A full deploy makes remote r/*.html match the generated archive."""
+
+    def test_removes_only_stale_safe_regular_shells_after_uploads(
+            self, monkeypatch, tmp_path):
+        _set_env(monkeypatch)
+        (tmp_path / 'index.html').write_text('<html>')
+        current = tmp_path / 'r' / 'RECORD-00001.html'
+        current.parent.mkdir()
+        current.write_text('<html>current</html>')
+
+        with patch('paramiko.SSHClient') as mock_client_cls:
+            mock_client = MagicMock()
+            mock_sftp = MagicMock()
+            mock_sftp.listdir_attr.return_value = [
+                SimpleNamespace(filename='RECORD-00001.html', st_mode=stat.S_IFREG),
+                SimpleNamespace(filename='STALE-00002.html', st_mode=stat.S_IFREG),
+                SimpleNamespace(filename='notes.txt', st_mode=stat.S_IFREG),
+                SimpleNamespace(filename='STALE-00003.html.tmp', st_mode=stat.S_IFREG),
+                SimpleNamespace(filename='nested', st_mode=stat.S_IFDIR),
+                SimpleNamespace(filename='LINK-00004.html', st_mode=stat.S_IFLNK),
+            ]
+            mock_client.open_sftp.return_value = mock_sftp
+            mock_client_cls.return_value = mock_client
+
+            result = deploy_full_site.push_files(
+                [tmp_path / 'index.html', current],
+                repo_root=tmp_path,
+                cfg=deploy_full_site._read_env(),
+                remote_prune_dirs=(),
+                record_shells=(current,),
+            )
+
+        assert result['ok'] is True
+        assert mock_sftp.remove.call_args_list == [
+            ((
+                '/home/rosen/public_html/j/rosen-archive/'
+                'r/STALE-00002.html',
+            ),),
+        ]
+        last_rename = max(
+            i for i, call in enumerate(mock_sftp.method_calls)
+            if call[0] == 'posix_rename'
+        )
+        prune = next(
+            i for i, call in enumerate(mock_sftp.method_calls)
+            if call[0] == 'remove'
+        )
+        assert prune > last_rename
+
+    def test_none_disables_reconciliation_and_empty_set_clears_shells(
+            self, monkeypatch, tmp_path):
+        _set_env(monkeypatch)
+        (tmp_path / 'index.html').write_text('<html>')
+
+        with patch('paramiko.SSHClient') as mock_client_cls:
+            mock_client = MagicMock()
+            mock_sftp = MagicMock()
+            mock_sftp.listdir_attr.return_value = [
+                SimpleNamespace(filename='STALE.html', st_mode=stat.S_IFREG),
+            ]
+            mock_client.open_sftp.return_value = mock_sftp
+            mock_client_cls.return_value = mock_client
+
+            deploy_full_site.push_files(
+                [tmp_path / 'index.html'], tmp_path,
+                deploy_full_site._read_env(), remote_prune_dirs=(),
+                record_shells=None,
+            )
+            mock_sftp.listdir_attr.assert_not_called()
+
+            result = deploy_full_site.push_files(
+                [tmp_path / 'index.html'], tmp_path,
+                deploy_full_site._read_env(), remote_prune_dirs=(),
+                record_shells=(),
+            )
+
+        assert result['ok'] is True
+        mock_sftp.remove.assert_called_once_with(
+            '/home/rosen/public_html/j/rosen-archive/r/STALE.html')
+
+    def test_upload_failure_skips_shell_reconciliation(self, monkeypatch,
+                                                        tmp_path):
+        _set_env(monkeypatch)
+        (tmp_path / 'index.html').write_text('<html>')
+
+        with patch('paramiko.SSHClient') as mock_client_cls:
+            mock_client = MagicMock()
+            mock_sftp = MagicMock()
+            mock_sftp.put.side_effect = IOError('disk full')
+            mock_client.open_sftp.return_value = mock_sftp
+            mock_client_cls.return_value = mock_client
+
+            result = deploy_full_site.push_files(
+                [tmp_path / 'index.html'], tmp_path,
+                deploy_full_site._read_env(), remote_prune_dirs=(),
+                record_shells=(),
+            )
+
+        assert result['ok'] is False
+        mock_sftp.listdir_attr.assert_not_called()
 
 
 class TestAbortOnFirstFailure:

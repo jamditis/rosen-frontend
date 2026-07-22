@@ -40,7 +40,8 @@ sweep_stuck = _load_script_module()
 
 # ---------- Fixtures ---------------------------------------------------------
 
-def _row(timestamp_iso, url, status, sheet_row=2, title='', notes=''):
+def _row(timestamp_iso, url, status, sheet_row=2, title='', notes='',
+         record_id=''):
     """One row in the queue, shaped the way ``sweep_stuck`` reads it.
 
     Columns: A=timestamp, B=url, C=title, D=notes, F=status, G=record_id,
@@ -53,6 +54,7 @@ def _row(timestamp_iso, url, status, sheet_row=2, title='', notes=''):
         'title': title,
         'notes': notes,
         'status': status,
+        'record_id': record_id,
     }
 
 
@@ -119,7 +121,7 @@ class TestStuckThresholds:
         _env(monkeypatch)
         rows = [_row(_iso_ago(hours=25),
                      'https://example.com/stuck-arc', 'archived',
-                     sheet_row=9)]
+                     sheet_row=9, record_id='RECORD-00009')]
         _stub_sheet_rows(monkeypatch, rows)
         dispatch_mock = _stub_dispatch_ok(monkeypatch)
 
@@ -131,6 +133,7 @@ class TestStuckThresholds:
         # 24h+ archived row gets dispatched with a sentinel URL so process_one
         # short-circuits scrape + categorize + append and only runs SFTP.
         assert payload['url'].startswith('https://example.com/sweep-noop-')
+        assert payload['retry_record_id'] == 'RECORD-00009'
 
 
 class TestSkipsFreshRows:
