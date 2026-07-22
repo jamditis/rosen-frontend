@@ -150,6 +150,6 @@ describe('archival record-reading surfaces', () => {
     assert.match(audit, /slug: 'record-incomplete'[\s\S]*mockIncompleteRecord/);
     assert.match(audit, /route\.mockIncompleteRecord/);
     assert.match(audit, /\.nth\(19\)\.waitFor\(\)/);
-    assert.match(claudeGuide, /walks 40 route states at mobile, tablet, and desktop/);
+    assert.match(claudeGuide, /walks 41 route states at mobile, tablet, and desktop/);
   });
 });

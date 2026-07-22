@@ -1,11 +1,11 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { html } from '../html.js?v=3.8.3';
+import { html } from '../html.js?v=3.8.4';
 import { Users, Building2, Lightbulb, BookOpen, MapPin, Calendar, Search, ArrowUpDown, ChevronDown, ChevronRight, X, ExternalLink, AlertTriangle, RotateCw } from 'lucide-react';
-import { fetchEntitiesData, getRecordsByEntity } from '../services/archiveService.js?v=3.8.3';
-import { getEntityScope } from '../services/queryComposition.js?v=3.8.3';
-import { COLORS, ENTITY_TYPE_CONFIG } from '../constants.js?v=3.8.3';
-import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.8.3';
+import { fetchEntitiesData, getRecordsByEntity } from '../services/archiveService.js?v=3.8.4';
+import { getEntityScope } from '../services/queryComposition.js?v=3.8.4';
+import { COLORS, ENTITY_TYPE_CONFIG } from '../constants.js?v=3.8.4';
+import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.8.4';
 
 // Add icons to shared config
 const TYPE_ICONS = {
@@ -249,27 +249,26 @@ const EntityBrowser = ({
 
   if (loading) {
     return html`
-      <div className="flex flex-col items-center justify-center py-20">
-        <div className="animate-spin w-8 h-8 border-2 border-stone-300 border-t-stone-800 rounded-full mb-4"></div>
-        <p className="text-stone-500 text-sm font-body">Loading entity data...</p>
+      <div className="archive-data-loading" role="status" aria-live="polite">
+        <div className="archive-data-loading__spinner" aria-hidden="true"></div>
+        <p>Loading entity data...</p>
       </div>
     `;
   }
 
   if (loadError) {
     return html`
-      <div className="flex items-start gap-3 border border-red-300 border-l-4 border-l-red-700 bg-red-50 p-5 text-red-900" role="alert">
-        <${AlertTriangle} className="mt-0.5 h-6 w-6 flex-shrink-0" aria-hidden="true" />
+      <div className="archive-notice archive-notice--danger archive-data-error" role="alert">
+        <${AlertTriangle} aria-hidden="true" />
         <div>
-          <h3 className="font-display text-lg font-bold">Unable to load people and ideas</h3>
-          <p className="mt-1 text-sm leading-relaxed">${loadError}</p>
+          <h3>Unable to load people and ideas</h3>
+          <p>${loadError}</p>
           <button
             type="button"
             onClick=${() => window.location.reload()}
-            className="mt-4 inline-flex items-center gap-2 border-2 border-red-800 bg-white px-4 py-2 text-sm font-bold text-red-900 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2"
-            style=${{ minHeight: '44px' }}
+            className="archive-action archive-action--danger"
           >
-            <${RotateCw} className="h-4 w-4" aria-hidden="true" />
+            <${RotateCw} aria-hidden="true" />
             Reload page
           </button>
         </div>
@@ -286,14 +285,14 @@ const EntityBrowser = ({
   const DetailSectionHeading = embedded ? 'h4' : 'h3';
 
   return html`
-    <div className="flex flex-col gap-6">
+    <div className="archive-data-surface archive-data-surface--entities">
       ${queryActive && html`
-        <div className="flex flex-col gap-3 border border-amber-300 bg-amber-50 p-4 text-sm text-stone-700 sm:flex-row sm:items-center sm:justify-between" role="status">
+        <div className="archive-notice archive-notice--warning archive-data-query-scope" role="status">
           <p><strong>Query scope:</strong> Counts and connections below are limited to the current query results.</p>
           <button
             type="button"
             onClick=${onClearQuery}
-            className="shrink-0 border border-amber-700 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wider text-amber-900 hover:bg-amber-100"
+            className="archive-action archive-action--secondary"
           >
             Clear query results
           </button>
@@ -301,16 +300,12 @@ const EntityBrowser = ({
       `}
 
       <!-- Type filter chips -->
-      <div className="flex flex-wrap gap-2">
+      <div className="archive-data-dimensions" aria-label="Entity types">
         <button
           type="button"
           onClick=${() => setSelectedType(null)}
           aria-pressed=${!selectedType}
-          className=${`px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
-            !selectedType
-              ? 'bg-stone-800 text-white border-stone-800'
-              : 'bg-white text-stone-600 border-stone-200 hover:border-stone-400'
-          }`}
+          className=${`archive-data-dimension ${!selectedType ? 'is-active' : ''}`}
         >
           All (${scopedEntities.length})
         </button>
@@ -324,14 +319,13 @@ const EntityBrowser = ({
               key=${type}
               onClick=${() => setSelectedType(selectedType === type ? null : type)}
               aria-pressed=${selectedType === type}
-              className=${`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-all ${
-                selectedType === type
-                  ? 'text-white border-transparent'
-                  : 'bg-white text-stone-600 border-stone-200 hover:border-stone-400'
-              }`}
-              style=${selectedType === type ? { backgroundColor: config.color } : {}}
+              className=${`archive-data-dimension ${selectedType === type ? 'is-active' : ''}`}
+              style=${{
+                '--archive-dimension-color': config.color,
+                '--archive-dimension-soft': config.bg,
+              }}
             >
-              <${Icon} className="w-3 h-3" />
+              <${Icon} aria-hidden="true" />
               ${config.label} (${count})
             </button>
           `;
@@ -339,36 +333,36 @@ const EntityBrowser = ({
       </div>
 
       <!-- Search and sort controls -->
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-grow">
+      <div className="archive-data-toolbar">
+        <div className="archive-data-search">
           <label htmlFor="entity-search" className="sr-only">Search entities</label>
-          <${Search} className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" aria-hidden="true" />
+          <${Search} className="archive-data-search__icon" aria-hidden="true" />
           <input
             id="entity-search"
             type="text"
             value=${searchTerm}
             onInput=${(e) => setSearchTerm(e.target.value)}
             placeholder="Search entities..."
-            className="w-full pl-9 pr-8 py-2 border border-stone-200 rounded text-sm font-body focus:outline-none focus:border-stone-400"
+            className="archive-control archive-data-search__input"
           />
           ${searchTerm && html`
             <button
               type="button"
               onClick=${() => setSearchTerm('')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
+              className="archive-data-search__clear"
               aria-label="Clear entity search"
             >
-              <${X} className="w-4 h-4" aria-hidden="true" />
+              <${X} aria-hidden="true" />
             </button>
           `}
         </div>
-        <div className="flex items-center gap-2">
-          <${ArrowUpDown} className="w-4 h-4 text-stone-400" aria-hidden="true" />
+        <div className="archive-data-sort">
+          <${ArrowUpDown} aria-hidden="true" />
           <select
             aria-label="Sort entities"
             value=${sortBy}
             onChange=${(e) => setSortBy(e.target.value)}
-            className="border border-stone-200 rounded text-sm font-body py-2 px-3 focus:outline-none focus:border-stone-400 bg-white"
+            className="archive-control"
           >
             <option value="mentions">Most mentioned</option>
             <option value="prominence">Highest prominence</option>
@@ -377,15 +371,15 @@ const EntityBrowser = ({
         </div>
       </div>
 
-      <div className="text-xs text-stone-500 font-body">
+      <div className="archive-data-caption" aria-live="polite">
         Showing ${displayedEntities.length} of ${filteredEntities.length} entities
       </div>
 
       <!-- Main content: entity list + detail panel -->
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className=${`archive-entity-layout ${selectedEntity ? 'has-detail' : ''}`}>
         <!-- Entity list -->
         <div className="entity-browser-list flex-grow">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="archive-entity-grid">
             ${displayedEntities.map(entity => {
               const config = TYPE_CONFIG[entity.type] || TYPE_CONFIG.Concept;
               const Icon = config.icon;
@@ -400,41 +394,42 @@ const EntityBrowser = ({
                   onClick=${(event) => handleEntitySelect(entity, event.currentTarget)}
                   aria-expanded=${Boolean(isSelected)}
                   aria-controls=${isSelected ? 'entity-detail-panel' : undefined}
-                  className=${`text-left p-3 border rounded transition-all ${
-                    isSelected
-                      ? 'border-stone-800 bg-stone-50 shadow-md'
-                      : 'border-stone-200 bg-white hover:border-stone-300 hover:shadow-sm'
-                  }`}
+                  className=${`archive-entity-row ${isSelected ? 'is-selected' : ''}`}
+                  style=${{
+                    '--archive-entity-accent': config.color,
+                    '--archive-entity-soft': config.bg,
+                  }}
                 >
-                  <div className="flex items-start gap-2">
+                  <div className="archive-entity-row__content">
                     <div
-                      className="p-1 rounded mt-0.5 flex-shrink-0"
+                      className="archive-entity-row__icon"
                       style=${{ backgroundColor: config.bg }}
                     >
-                      <${Icon} className="w-3.5 h-3.5" style=${{ color: config.color }} />
+                      <${Icon} style=${{ color: config.color }} aria-hidden="true" />
                     </div>
-                    <div className="min-w-0 flex-grow">
-                      <div className="font-display font-bold text-sm text-stone-900 truncate">
+                    <div className="archive-entity-row__body">
+                      <div className="archive-entity-row__name">
                         ${entity.name}
                       </div>
                       ${entity.role && entity.role !== 'None' && html`
-                        <div className="text-xs text-stone-500 font-body truncate mt-0.5">
+                        <div className="archive-entity-row__role">
                           ${entity.role}
                         </div>
                       `}
-                      <div className="flex items-center gap-3 mt-1">
-                        <span className="text-xs font-mono text-stone-600">
+                      <div className="archive-entity-row__metrics">
+                        <span>
                           ${mentions} record${mentions !== 1 ? 's' : ''}
                         </span>
                         ${entity.prominence > 0 && html`
-                          <span className="text-xs font-mono text-stone-600">
+                          <span>
                             P:${entity.prominence}
                           </span>
                         `}
                       </div>
                     </div>
                     <${isSelected ? ChevronDown : ChevronRight}
-                      className="w-4 h-4 text-stone-400 flex-shrink-0 mt-1"
+                      className="archive-entity-row__chevron"
+                      aria-hidden="true"
                     />
                   </div>
                 </button>
@@ -446,7 +441,7 @@ const EntityBrowser = ({
             <button
               type="button"
               onClick=${() => setDisplayLimit(prev => prev + 100)}
-              className="mt-4 w-full py-2 text-sm font-bold text-stone-600 border border-stone-200 rounded hover:bg-stone-50 transition-colors"
+              className="archive-action archive-action--secondary archive-entity-more"
             >
               Show more (${filteredEntities.length - displayedEntities.length} remaining)
             </button>
@@ -455,7 +450,7 @@ const EntityBrowser = ({
 
         <!-- Detail panel (when entity selected) -->
         ${selectedEntity && html`
-          <div className="entity-browser-detail flex-shrink-0 lg:sticky lg:top-20 lg:w-96 lg:self-start">
+          <div className="entity-browser-detail flex-shrink-0 archive-entity-detail">
             <div
               id="entity-detail-panel"
               data-entity-detail
@@ -467,59 +462,59 @@ const EntityBrowser = ({
                 event.stopPropagation();
                 closeEntityDetails();
               }}
-              className="border border-stone-200 rounded bg-white shadow-sm"
+              className="archive-data-panel archive-entity-detail__sheet"
             >
               <!-- Entity header -->
-              <div className="p-4 border-b border-stone-100">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+              <div className="archive-entity-detail__header">
+                <div className="archive-entity-detail__utility">
+                  <div className="archive-entity-detail__type">
                     <div
-                      className="p-1.5 rounded"
+                      className="archive-entity-detail__icon"
                       style=${{ backgroundColor: selConfig.bg }}
                     >
                       <${selConfig.icon}
-                        className="w-4 h-4"
                         style=${{ color: selConfig.color }}
+                        aria-hidden="true"
                       />
                     </div>
-                    <span className="text-xs font-bold uppercase tracking-wider text-stone-600">
+                    <span>
                       ${selectedEntity.type}
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick=${closeEntityDetails}
-                    className="inline-flex items-center justify-center text-stone-400 hover:text-stone-600"
+                    className="archive-action archive-action--quiet archive-entity-detail__close"
                     style=${{ minWidth: '44px', minHeight: '44px' }}
                     aria-label="Close entity details"
                   >
-                    <${X} className="w-4 h-4" aria-hidden="true" />
+                    <${X} aria-hidden="true" />
                   </button>
                 </div>
                 <${DetailHeading}
                   id="entity-detail-title"
                   ref=${detailHeadingRef}
                   tabIndex="-1"
-                  className="entity-detail-heading font-display font-bold text-lg text-stone-900 mt-2"
+                  className="entity-detail-heading archive-entity-detail__title"
                 >
                   ${selectedEntity.name}
                 <//>
                 ${selectedEntity.role && selectedEntity.role !== 'None' && html`
-                  <p className="text-sm text-stone-600 font-body mt-1">${selectedEntity.role}</p>
+                  <p className="archive-entity-detail__role">${selectedEntity.role}</p>
                 `}
-                <div className="flex gap-4 mt-2 text-xs text-stone-500 font-mono">
+                <div className="archive-entity-detail__metrics">
                   <span>${entityRecords.length} records</span>
                   <span>Prominence: ${selectedEntity.prominence || 0}</span>
                 </div>
               </div>
 
               <!-- Records mentioning this entity -->
-              <div className="p-4 border-b border-stone-100">
-                <${DetailSectionHeading} className="text-xs font-bold uppercase tracking-wider text-stone-600 mb-3">
+              <div className="archive-entity-detail__section">
+                <${DetailSectionHeading} className="archive-data-heading">
                   Records (${entityRecords.length})
                 <//>
                 <div
-                  className="space-y-2 max-h-64 overflow-y-auto"
+                  className="archive-entity-detail__records archive-data-scroll"
                   role="region"
                   tabIndex="0"
                   aria-label="Records mentioning this entity"
@@ -529,18 +524,18 @@ const EntityBrowser = ({
                       type="button"
                       key=${record.id}
                       onClick=${(e) => { e.stopPropagation(); onSelectRecord(record.id); }}
-                      className="w-full text-left p-2 rounded border border-stone-100 hover:border-stone-300 hover:bg-stone-50 transition-all"
+                      className="archive-entity-record"
                     >
-                      <div className="text-xs font-bold text-stone-800 font-display leading-tight truncate">
+                      <div className="archive-entity-record__title">
                         ${record.title}
                       </div>
-                      <div className="text-[10px] text-stone-600 mt-0.5 font-mono">
+                      <div className="archive-entity-record__meta">
                         ${record.date} | ${record.pub}
                       </div>
                     </button>
                   `)}
                   ${entityRecords.length > 20 && html`
-                    <div className="text-xs text-stone-600 text-center py-1">
+                    <div className="archive-data-caption archive-entity-record__more">
                       +${entityRecords.length - 20} more records
                     </div>
                   `}
@@ -549,11 +544,11 @@ const EntityBrowser = ({
 
               <!-- Co-occurring entities -->
               ${coOccurring.length > 0 && html`
-                <div className="p-4">
-                  <${DetailSectionHeading} className="text-xs font-bold uppercase tracking-wider text-stone-600 mb-3">
+                <div className="archive-entity-detail__section">
+                  <${DetailSectionHeading} className="archive-data-heading">
                     Often appears with
                   <//>
-                  <div className="space-y-1.5">
+                  <div className="archive-entity-relations">
                     ${coOccurring.slice(0, 15).map(coEntity => {
                       const coConfig = TYPE_CONFIG[coEntity.type] || TYPE_CONFIG.Concept;
                       const CoIcon = coConfig.icon;
@@ -562,15 +557,15 @@ const EntityBrowser = ({
                           type="button"
                           key=${coEntity.id}
                           onClick=${(event) => handleEntitySelect(coEntity, event.currentTarget)}
-                          className="w-full text-left flex items-center gap-2 p-1.5 rounded hover:bg-stone-50 transition-colors"
+                          className="archive-entity-relation"
                         >
-                          <${CoIcon} className="w-3 h-3 flex-shrink-0" style=${{ color: coConfig.color }} />
-                          <span className="text-xs font-body text-stone-700 truncate flex-grow">
+                          <${CoIcon} style=${{ color: coConfig.color }} aria-hidden="true" />
+                          <span>
                             ${coEntity.name}
                           </span>
-                          <span className="text-[10px] font-mono text-stone-600 flex-shrink-0">
+                          <strong>
                             ${coEntity.coCount}x
-                          </span>
+                          </strong>
                         </button>
                       `;
                     })}

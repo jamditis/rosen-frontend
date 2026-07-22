@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { html } from '../html.js?v=3.8.3';
+import { html } from '../html.js?v=3.8.4';
 import { Archive, ArrowRight, X } from 'lucide-react';
 import {
   readTourState,
   recordTourOutcome,
   shouldShowTourEntry,
   TOUR_OUTCOMES,
-} from '../services/tourState.js?v=3.8.3';
+} from '../services/tourState.js?v=3.8.4';
 
 const getStorage = () => {
   try {

@@ -39,6 +39,19 @@
   color: inherit;
 }
 
+/* Canonical surfaces opt into the shared action recipe. Keep that explicit
+   foreground above the shell's inherited-color reset, including actions on
+   dark technical panels such as the SQL terminal. */
+.archive-desktop .archive-action {
+  color: var(--archive-action-color);
+}
+
+@media (hover: hover) and (forced-colors: none) {
+  .archive-desktop .archive-action:hover:not(:disabled, [aria-disabled='true']) {
+    color: var(--archive-action-hover-color);
+  }
+}
+
 .desktop-wallpaper-mark {
   position: fixed;
   right: -0.02em;

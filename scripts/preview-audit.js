@@ -161,8 +161,8 @@ const ROUTES = [
       zOrder: ['archive', 'entities', 'analytics'],
     },
   },
-  { slug: 'entities',           url: '/#entities' },
-  { slug: 'entity-detail',      url: '/?entity=P0005#entities' },
+  { slug: 'entities',           url: '/#entities', dismissWelcome: true },
+  { slug: 'entity-detail',      url: '/?entity=P0005#entities', dismissWelcome: true },
   {
     slug: 'entity-record',
     url: '/?record=RECORD-00903&entity=P0005#entities',
@@ -170,6 +170,7 @@ const ROUTES = [
   },
   { slug: 'about',              url: '/#about' },
   { slug: 'analytics',          url: '/#analytics' },
+  { slug: 'analytics-query-results', url: '/#analytics', verifyQueryResults: true },
   { slug: 'record-article',     url: '/?record=RECORD-00802', archiveDetails: 'require', verifyRecordReading: 'article' },
   { slug: 'record-social',      url: '/?record=BSKY-03169', archiveDetails: 'require', verifyRecordReading: 'social' },
   { slug: 'record-thread',      url: '/?record=THREAD-00001', archiveDetails: 'require', verifyRecordReading: 'thread' },
@@ -556,6 +557,67 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     }
     if (await page.getByRole('dialog').count()) {
       throw new Error('Non-record desktop app rendered a record dialog');
+    }
+  }
+  if (route.verifyQueryResults) {
+    const runQuery = page.getByRole('button', { name: 'Run query', exact: true }).first();
+    await runQuery.focus();
+    await assertVisibleFocusOutline(runQuery, 'Query builder run control');
+    await page.keyboard.press('Enter');
+
+    const results = page.locator('.archive-query-results');
+    await results.waitFor({ state: 'visible', timeout: 30000 });
+    const resultsRegion = results.getByRole('region', { name: 'Query results' });
+    const resultRows = results.locator('tbody tr');
+    if (await resultRows.count() < 1) {
+      throw new Error('Query builder returned no tabular results');
+    }
+    await resultsRegion.focus();
+    await assertFocused(resultsRegion, 'Query results scroll region');
+    await assertVisibleFocusOutline(resultsRegion, 'Query results scroll region');
+
+    if (viewport.name === 'desktop') {
+      const originalViewport = { width: viewport.width, height: viewport.height };
+      try {
+        await page.setViewportSize({ width: 720, height: 450 });
+        await page.waitForTimeout(200);
+        const compactState = await page.evaluate(() => {
+          const geometry = (selector) => {
+            const rect = document.querySelector(selector)?.getBoundingClientRect();
+            return rect ? {
+              left: Number(rect.left.toFixed(1)),
+              right: Number(rect.right.toFixed(1)),
+              width: Number(rect.width.toFixed(1)),
+            } : null;
+          };
+          const scrollRegion = document.querySelector('.archive-query-results .archive-data-scroll');
+          return {
+            viewportWidth: window.innerWidth,
+            documentOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+            builder: geometry('.archive-query-builder'),
+            results: geometry('.archive-query-results'),
+            scrollRegion: geometry('.archive-query-results .archive-data-scroll'),
+            scrollRegionFocusable: scrollRegion?.tabIndex === 0,
+          };
+        });
+        const escaped = [compactState.builder, compactState.results, compactState.scrollRegion]
+          .some((rect) => (
+            !rect
+            || rect.left < -1
+            || rect.right > compactState.viewportWidth + 1
+            || rect.width > compactState.viewportWidth + 1
+          ));
+        if (
+          compactState.documentOverflow > 1
+          || escaped
+          || !compactState.scrollRegionFocusable
+        ) {
+          throw new Error(`Query results escaped the 200%-zoom viewport: ${JSON.stringify(compactState)}`);
+        }
+      } finally {
+        await page.setViewportSize(originalViewport);
+        await page.waitForTimeout(200);
+      }
     }
   }
   if (route.verifyDesktopEntry) {
@@ -1112,6 +1174,9 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     await page.locator('.archive-thread').scrollIntoViewIfNeeded();
   } else if (route.verifyRecordReading) {
     await page.locator('.archive-record-document').evaluate((element) => { element.scrollTop = 0; });
+  }
+  if (route.verifyQueryResults) {
+    await page.locator('.archive-query-results').scrollIntoViewIfNeeded();
   }
   if (route.dismissWelcome || route.screenshotResults) await page.waitForTimeout(100);
   // Viewport-only screenshots. Full-page on long content (e.g. the dissertation

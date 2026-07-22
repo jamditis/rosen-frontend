@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { html } from '../html.js?v=3.8.3';
+import { html } from '../html.js?v=3.8.4';
 import { ChevronDown, ChevronRight, ZoomIn, ZoomOut, Maximize2, Focus, HelpCircle, X } from 'lucide-react';
 
 // Enhanced node type styles with gradients and shadows
@@ -209,7 +209,7 @@ const MindMapNode = ({ node, nodeWidth, nodeHeight, isExpanded, hasChildren, isS
         y=${shadowOffset}
         width=${nodeWidth}
         height=${nodeHeight}
-        rx="8"
+        rx="2"
         fill=${style.shadow}
         style=${{ transition: 'all 0.2s ease' }}
       />
@@ -217,7 +217,7 @@ const MindMapNode = ({ node, nodeWidth, nodeHeight, isExpanded, hasChildren, isS
       <rect
         width=${nodeWidth}
         height=${nodeHeight}
-        rx="8"
+        rx="2"
         fill=${isHovered ? style.bgHover : style.bg}
         stroke=${isEmphasized ? style.accent : style.border}
         strokeWidth=${borderWidth}
@@ -230,7 +230,7 @@ const MindMapNode = ({ node, nodeWidth, nodeHeight, isExpanded, hasChildren, isS
           y="-3"
           width=${nodeWidth + 6}
           height=${nodeHeight + 6}
-          rx="10"
+          rx="4"
           fill="none"
           stroke=${style.accent}
           strokeWidth="2"
@@ -784,12 +784,12 @@ const MindMap = ({
   }, [bounds, fitToView]);
 
   return html`
-    <div className=${`relative w-full h-full bg-stone-100 overflow-hidden ${className}`} ref=${containerRef}>
-      <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+    <div className=${`archive-mind-map ${className}`} ref=${containerRef}>
+      <div className="archive-mind-map__controls">
         <button
           type="button"
           onClick=${handleZoomIn}
-          className="p-3 sm:p-2.5 bg-white rounded-lg shadow-md border border-stone-200 hover:bg-stone-50 hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
+          className="archive-mind-map__control"
           title="Zoom in"
           aria-label="Zoom in"
         >
@@ -798,17 +798,17 @@ const MindMap = ({
         <button
           type="button"
           onClick=${handleZoomOut}
-          className="p-3 sm:p-2.5 bg-white rounded-lg shadow-md border border-stone-200 hover:bg-stone-50 hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
+          className="archive-mind-map__control"
           title="Zoom out"
           aria-label="Zoom out"
         >
           <${ZoomOut} className="w-5 h-5 text-stone-600" />
         </button>
-        <div className="h-px bg-stone-200 my-1" />
+        <div className="archive-mind-map__control-rule" />
         <button
           type="button"
           onClick=${handleReset}
-          className="p-3 sm:p-2.5 bg-white rounded-lg shadow-md border border-stone-200 hover:bg-stone-50 hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
+          className="archive-mind-map__control"
           title="Re-center view"
           aria-label="Re-center view to show all nodes"
         >
@@ -816,32 +816,32 @@ const MindMap = ({
         </button>
       </div>
 
-      <div className="absolute bottom-4 left-4 z-10 flex flex-wrap items-center gap-2 max-w-[calc(100vw-2rem)]">
-        <div className="text-xs font-mono text-stone-500 bg-white/90 px-3 py-2 rounded-lg shadow-md border border-stone-200" aria-live="polite" aria-label=${`Zoom level: ${Math.round(zoom * 100)} percent`}>
+      <div className="archive-mind-map__status">
+        <div className="archive-mind-map__zoom" aria-live="polite" aria-label=${`Zoom level: ${Math.round(zoom * 100)} percent`}>
           ${Math.round(zoom * 100)}%
         </div>
         <button
           type="button"
           onClick=${collapseAll}
-          className="px-3 py-2.5 sm:py-2 text-xs font-medium bg-white hover:bg-stone-50 text-stone-600 rounded-lg shadow-md border border-stone-200 transition-all hover:shadow-lg whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
+          className="archive-action archive-action--secondary"
           title="Collapse all nodes"
           aria-label="Collapse all nodes"
         >
-          Collapse All
+          Collapse all
         </button>
         <button
           type="button"
           onClick=${expandAll}
-          className="px-3 py-2.5 sm:py-2 text-xs font-medium bg-stone-800 hover:bg-stone-700 text-white rounded-lg shadow-md border border-stone-700 transition-all hover:shadow-lg whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
+          className="archive-action archive-action--primary"
           title="Expand all nodes"
           aria-label="Expand all nodes"
         >
-          Expand All
+          Expand all
         </button>
         <button
           type="button"
           onClick=${() => setShowShortcuts(!showShortcuts)}
-          className="p-2.5 sm:p-2 bg-white hover:bg-stone-50 text-stone-600 rounded-lg shadow-md border border-stone-200 transition-all hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
+          className="archive-mind-map__control"
           title="Keyboard shortcuts"
           aria-label="Show keyboard shortcuts"
         >
@@ -850,46 +850,46 @@ const MindMap = ({
       </div>
 
       ${showShortcuts && html`
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 bg-white rounded-lg shadow-xl border border-stone-300 p-4 max-w-sm">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-stone-800 text-sm">Keyboard Shortcuts</h3>
+        <div className="archive-data-panel archive-mind-map__shortcuts">
+          <div className="archive-mind-map__shortcuts-header">
+            <h3>Keyboard shortcuts</h3>
             <button
               type="button"
               onClick=${() => setShowShortcuts(false)}
-              className="text-stone-400 hover:text-stone-600 transition-colors"
+              className="archive-action archive-action--quiet"
               aria-label="Close shortcuts panel"
             >
               <${X} className="w-4 h-4" />
             </button>
           </div>
-          <div className="space-y-2 text-xs">
-            <div className="flex justify-between items-center">
-              <span className="text-stone-600">Zoom in</span>
-              <kbd className="px-2 py-1 bg-stone-100 rounded border border-stone-300 font-mono text-stone-700">+</kbd>
+          <div className="archive-mind-map__shortcut-list">
+            <div>
+              <span>Zoom in</span>
+              <kbd>+</kbd>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-stone-600">Zoom out</span>
-              <kbd className="px-2 py-1 bg-stone-100 rounded border border-stone-300 font-mono text-stone-700">-</kbd>
+            <div>
+              <span>Zoom out</span>
+              <kbd>-</kbd>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-stone-600">Reset zoom</span>
-              <kbd className="px-2 py-1 bg-stone-100 rounded border border-stone-300 font-mono text-stone-700">0</kbd>
+            <div>
+              <span>Reset zoom</span>
+              <kbd>0</kbd>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-stone-600">Pan view</span>
-              <div className="flex gap-1">
-                <kbd className="px-2 py-1 bg-stone-100 rounded border border-stone-300 font-mono text-stone-700">↑</kbd>
-                <kbd className="px-2 py-1 bg-stone-100 rounded border border-stone-300 font-mono text-stone-700">↓</kbd>
-                <kbd className="px-2 py-1 bg-stone-100 rounded border border-stone-300 font-mono text-stone-700">←</kbd>
-                <kbd className="px-2 py-1 bg-stone-100 rounded border border-stone-300 font-mono text-stone-700">→</kbd>
+            <div>
+              <span>Pan view</span>
+              <div>
+                <kbd>↑</kbd>
+                <kbd>↓</kbd>
+                <kbd>←</kbd>
+                <kbd>→</kbd>
               </div>
             </div>
-            <div className="flex justify-between items-center">
-              <span className="text-stone-600">Close panel</span>
-              <kbd className="px-2 py-1 bg-stone-100 rounded border border-stone-300 font-mono text-stone-700">Esc</kbd>
+            <div>
+              <span>Close panel</span>
+              <kbd>Esc</kbd>
             </div>
-            <div className="border-t border-stone-200 my-2 pt-2">
-              <p className="text-stone-500 text-[10px] italic">Click nodes to expand/collapse • Drag to pan</p>
+            <div className="archive-mind-map__shortcut-note">
+              <p>Click nodes to expand or collapse. Drag to pan.</p>
             </div>
           </div>
         </div>
