@@ -14,6 +14,14 @@ const loading = read('frontend/components/LoadingQuotes.js');
 const styles = read('frontend/index.css');
 const recipes = read('frontend/design-system/recipes.css');
 const audit = read('scripts/preview-audit.js');
+const auditHarness = [
+  'docs/feature-audit/harness/lib.mjs',
+  'docs/feature-audit/harness/test-main.mjs',
+  'docs/feature-audit/harness/test-svc.mjs',
+  'docs/feature-audit/harness/test-modals.mjs',
+].map(read).join('\n');
+const mainAuditHarness = read('docs/feature-audit/harness/test-main.mjs');
+const serviceAuditHarness = read('docs/feature-audit/harness/test-svc.mjs');
 
 describe('archive discovery visual-system refresh', () => {
   it('gives compact filter and sort controls stable accessible names', () => {
@@ -67,6 +75,50 @@ describe('archive discovery visual-system refresh', () => {
     assert.match(results, /archive-folder-tab archive-folder-card__tab/);
     assert.doesNotMatch(results, /folder-tab-shape/);
     assert.match(styles, /\.archive-folder-card__tab[\s\S]*margin-left:\s*1rem/);
+  });
+
+  it('reuses the shared folder-tab silhouette on standalone archive labels', () => {
+    const participate = read('features/participate/index.html');
+    const participateCss = read('features/participate/styles.css');
+    const method = read('features/winer-method/index.html');
+    const methodScript = read('features/winer-method/script.js');
+    const methodCss = read('features/winer-method/styles.css');
+
+    assert.match(participate, /archive-folder-tab kicker/);
+    assert.match(participate, /archive-folder-tab eyebrow/);
+    assert.doesNotMatch(participateCss, /\.kicker[\s\S]*clip-path:\s*polygon/);
+
+    assert.match(method, /design-system\/recipes\.css\?v=3\.8\.2/);
+    assert.match(method, /archive-folder-tab kicker/);
+    assert.match(method, /archive-folder-tab eyebrow/);
+    assert.match(methodScript, /archive-folder-tab eyebrow/);
+    assert.doesNotMatch(methodCss, /\.kicker,\s*\.eyebrow[^}]*clip-path/);
+  });
+
+  it('keeps the feature-audit harness aligned with the refreshed archive controls', () => {
+    assert.match(auditHarness, /\.archive-results-count/);
+    assert.match(auditHarness, /\.archive-error-state/);
+    assert.doesNotMatch(auditHarness, /\/records found\/\.test\(document\.body\.textContent\)/);
+    assert.doesNotMatch(auditHarness, /Reset all filters\/\.test\(x\.textContent\)/);
+    assert.doesNotMatch(auditHarness, /button\[title="Folder View"\]/);
+    assert.doesNotMatch(auditHarness, /\/Reload Page\/\.test\(b\.textContent\)/);
+  });
+
+  it('keeps visible view labels inside their accessible names and documents all audit routes', () => {
+    assert.match(app, /aria-label="Cards view"[\s\S]*>Cards</);
+    assert.match(app, /aria-label="Folders view"[\s\S]*>Folders</);
+    assert.match(read('CLAUDE.md'), /walks 35 route states/);
+  });
+
+  it('does not expose search-independent timeline counts during a text search', () => {
+    assert.match(app, /currentRoute === ROUTES\.archive && !loading && !filters\.search[\s\S]*<\$\{Timeline\}/);
+    assert.doesNotMatch(app, /searchActive=\$\{Boolean\(filters\.search\)\}/);
+    assert.doesNotMatch(timeline, /searchActive/);
+  });
+
+  it('writes accumulated feature-audit verdicts before a fatal exit', () => {
+    assert.match(mainAuditHarness, /run\(\)\.catch\(err => \{[\s\S]*writeMainVerdicts\(err\)/);
+    assert.match(serviceAuditHarness, /main\(\)\.catch\(err => \{[\s\S]*writeServiceVerdicts\(err\)/);
   });
 
   it('puts archive work before secondary Read highlights', () => {

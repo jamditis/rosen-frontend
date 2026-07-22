@@ -7,11 +7,37 @@
 //
 // Run from repo root:  node docs/feature-audit/harness/test-svc.mjs
 import {
-  launchBrowser, newPage, gotoArchive, writeVerdicts, verdict, sleep, BASE,
+  launchBrowser, newPage, gotoArchive, waitForArchiveReady, loadStories, writeVerdicts, verdict, sleep, BASE,
 } from './lib.mjs';
 
 const V = {};               // verdict accumulator
 const note = (id, s, e = '', sev = '', n = '') => { V[id] = verdict(s, e, sev, n); };
+const stories = loadStories(['SVC']);
+
+function writeServiceVerdicts(fatalError = null) {
+  const failure = fatalError instanceof Error ? fatalError.message : String(fatalError || '');
+  for (const story of stories) {
+    if (!V[story.id]) {
+      note(
+        story.id,
+        'blocked',
+        failure ? `harness stopped before this check: ${failure}` : 'no test executed',
+        failure ? 'high' : 'low',
+        '',
+      );
+    }
+  }
+
+  const path = writeVerdicts('svc', V);
+  const counts = {};
+  for (const key of Object.keys(V)) counts[V[key].test_status] = (counts[V[key].test_status] || 0) + 1;
+  console.log('\n=== SVC verdicts written to', path, '===');
+  console.log('counts:', JSON.stringify(counts));
+  for (const key of Object.keys(V).sort()) {
+    const result = V[key];
+    console.log(`${key}: ${result.test_status}${result.errors_found ? '  !! ' + result.errors_found : ''}`);
+  }
+}
 
 const URL_OF = p => BASE + '/index.html' + (p || '');
 
@@ -23,13 +49,9 @@ function trackRequests(page) {
 }
 const countMatching = (reqs, sub) => reqs.filter(u => u.includes(sub)).length;
 
-// Wait for the archive grid to show its "records found" line OR an error panel.
+// Wait for the archive grid to show its numeric result count or an error panel.
 async function waitLoaded(page) {
-  await page.waitForFunction(
-    () => /records found/.test(document.body.textContent) ||
-          /Error loading archive/.test(document.body.textContent),
-    { timeout: 45000 }
-  ).catch(() => {});
+  await waitForArchiveReady(page);
 }
 
 const main = async () => {
@@ -44,8 +66,8 @@ const main = async () => {
       const page = await ctx.newPage();
       const reqs = trackRequests(page);
       await page.goto(URL_OF(''), { waitUntil: 'domcontentloaded' });
-      // Snapshot the request log at the instant the core load completes ("records
-      // found" appears) — BEFORE the deferred SVC-06 preload timer (App.js fires
+      // Snapshot the request log at the instant the core result count appears —
+      // BEFORE the deferred SVC-06 preload timer (App.js fires
       // preloadDetails ~1000ms after core resolves). The SVC-01 claim is about
       // what the *split-load on page load* fetches "at this point", which excludes
       // the deliberate later background preload.
@@ -57,7 +79,7 @@ const main = async () => {
       const combined = snap.filter(u => /archive-data\.json/.test(u)).length;
       const analytics = countMatching(snap, 'archive-analytics.json');
       const recCount = await page.evaluate(() =>
-        (document.body.textContent.match(/([\d,]+)\s+records found/) || [])[1] || 'NONE');
+        (document.querySelector('.archive-results-count')?.textContent.match(/([\d,]+)\s+records?/) || [])[1] || 'NONE');
       const hasDissertation = await page.evaluate(() =>
         /Impossible Press/.test(document.body.textContent));
       const ok = core >= 1 && details === 0 && entities === 0 && combined === 0;
@@ -119,7 +141,7 @@ const main = async () => {
       await sleep(500);
       const core2 = countMatching(reqs3, 'archive-core.json');
       const recCount2 = await p3.evaluate(() =>
-        (document.body.textContent.match(/([\d,]+)\s+records found/) || [])[1] || 'NONE');
+        (document.querySelector('.archive-results-count')?.textContent.match(/([\d,]+)\s+records?/) || [])[1] || 'NONE');
       const idbHadCoreKey = Array.isArray(idbState1) && idbState1.some(k => String(k).startsWith('archive-core::'));
       const ok02 = idbHadCoreKey && core2 === 0 && recCount2 !== 'NONE';
       note('SVC-02',
@@ -184,7 +206,8 @@ const main = async () => {
       // must not break the app).
       await page.reload({ waitUntil: 'domcontentloaded' });
       await waitLoaded(page);
-      const reloadWorks = await page.evaluate(() => /records found/.test(document.body.textContent));
+      const reloadWorks = await page.evaluate(() =>
+        /[\d,]+\s+records?/.test(document.querySelector('.archive-results-count')?.textContent || ''));
 
       const ok15 = swActive && reloadWorks;
       note('SVC-15',
@@ -224,7 +247,10 @@ const main = async () => {
       const archiveBack = await (async () => {
         await page.evaluate(() => { window.location.hash = ''; });
         await sleep(400);
-        return page.evaluate(() => ({ hash: location.hash, present: /records found/.test(document.body.textContent) }));
+        return page.evaluate(() => ({
+          hash: location.hash,
+          present: /[\d,]+\s+records?/.test(document.querySelector('.archive-results-count')?.textContent || ''),
+        }));
       })();
       // dissertation full-page route
       const diss = await routeProbe('dissertation', 'Impossible Press|Dissertation|dissertation');
@@ -234,7 +260,8 @@ const main = async () => {
       // unknown hash falls back to archive (default)
       await page.evaluate(() => { window.location.hash = 'bogusroute'; });
       await sleep(400);
-      const unknown = await page.evaluate(() => /records found/.test(document.body.textContent));
+      const unknown = await page.evaluate(() =>
+        /[\d,]+\s+records?/.test(document.querySelector('.archive-results-count')?.textContent || ''));
 
       const ok09 = entities.present && archiveBack.present && diss.present && unknown;
       note('SVC-09',
@@ -270,7 +297,7 @@ const main = async () => {
       await waitLoaded(page);
       const unknownView = await page.evaluate(() => ({
         hash: location.hash, search: location.search,
-        archive: /records found/.test(document.body.textContent),
+        archive: /[\d,]+\s+records?/.test(document.querySelector('.archive-results-count')?.textContent || ''),
       }));
       const dissOk = dissMig.hash === '#dissertation' && !/view=/.test(dissMig.search) && dissMig.present;
       const aboutOk = aboutMig.hash === '#about' && !/view=/.test(aboutMig.search) && aboutMig.present;
@@ -345,7 +372,7 @@ const main = async () => {
       // http://localhost:8000/data/archive-core.json
       const resolvedOk = !!coreReq && /\/\/localhost(:\d+)?\/data\/archive-core\.json/.test(coreReq);
       const recCount = await page.evaluate(() =>
-        (document.body.textContent.match(/([\d,]+)\s+records found/) || [])[1] || 'NONE');
+        (document.querySelector('.archive-results-count')?.textContent.match(/([\d,]+)\s+records?/) || [])[1] || 'NONE');
       note('SVC-17',
         resolvedOk && recCount !== 'NONE' ? 'pass' : 'fail',
         resolvedOk ? '' : `core request url=${coreReq}`,
@@ -369,13 +396,10 @@ const main = async () => {
       // disable SW by clearing registrations after first paint is not possible pre-nav.
       // playwright route() intercepts the actual network the SW makes too.
       await page.goto(URL_OF(''), { waitUntil: 'domcontentloaded' });
-      await page.waitForFunction(
-        () => /Error loading archive/.test(document.body.textContent),
-        { timeout: 20000 }
-      ).catch(() => {});
+      await page.waitForSelector('.archive-error-state', { timeout: 20000 });
       const archiveErr = await page.evaluate(() => ({
         panel: /Error loading archive/.test(document.body.textContent),
-        reload: /Reload Page/.test(document.body.textContent),
+        reload: /Reload page/.test(document.body.textContent),
       }));
       await ctx.close();
 
@@ -384,13 +408,10 @@ const main = async () => {
       const page2 = await ctx2.newPage();
       await page2.route('**/archive-core.json*', r => r.abort());
       await page2.goto(URL_OF('#entities'), { waitUntil: 'domcontentloaded' });
-      await page2.waitForFunction(
-        () => /Error loading archive/.test(document.body.textContent),
-        { timeout: 20000 }
-      ).catch(() => {});
+      await page2.waitForSelector('.archive-error-state', { timeout: 20000 });
       const entErr = await page2.evaluate(() => ({
         panel: /Error loading archive/.test(document.body.textContent),
-        reload: /Reload Page/.test(document.body.textContent),
+        reload: /Reload page/.test(document.body.textContent),
       }));
       await ctx2.close();
 
@@ -565,19 +586,14 @@ const main = async () => {
       '',
       'Entity connection lookups (getRecordsByEntity/getEntitiesByRecord/findSharedEntities/calculateEntityConnectionStrength) resolve from in-memory maps built by buildEntityMaps after entities/full data load; return empty/zero when a record/entity is unknown or maps not built. These are pure map functions not directly invoked by the SVC routing/data path (RecordModal/EntityBrowser consume them — those are ENT/MODAL stories). SMELL confirmed by code: features silently return empty when maps are not built yet (entities load on demand), so a record modal opened before entity data loads shows no connections with no "not loaded yet" indication. Map-building + lookup logic covered by unit suite (entity-index / archiveService map tests).');
 
-    const path = writeVerdicts('svc', V);
-    // Summary to stdout
-    const counts = {};
-    for (const k of Object.keys(V)) counts[V[k].test_status] = (counts[V[k].test_status] || 0) + 1;
-    console.log('\n=== SVC verdicts written to', path, '===');
-    console.log('counts:', JSON.stringify(counts));
-    for (const k of Object.keys(V).sort()) {
-      const v = V[k];
-      console.log(`${k}: ${v.test_status}${v.errors_found ? '  !! ' + v.errors_found : ''}`);
-    }
+    writeServiceVerdicts();
   } finally {
     await browser.close();
   }
 };
 
-main().catch(e => { console.error('FATAL', e); process.exit(1); });
+main().catch(err => {
+  console.error('FATAL', err);
+  writeServiceVerdicts(err);
+  process.exitCode = 1;
+});

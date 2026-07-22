@@ -6,7 +6,7 @@
 // empty/no-data, core-data error). React controlled inputs (the search box) are
 // driven via the injected SET_NATIVE_VALUE helper.
 import {
-  launchBrowser, newPage, gotoArchive, sleep,
+  launchBrowser, newPage, gotoArchive, waitForArchiveReady, sleep,
   loadStories, writeVerdicts, verdict, BASE,
 } from './lib.mjs';
 
@@ -15,6 +15,34 @@ const V = {};
 const set = (id, status, errors = '', severity = '', notes = '') => {
   V[id] = verdict(status, errors, severity, notes);
 };
+
+function writeMainVerdicts(fatalError = null) {
+  const failure = fatalError instanceof Error ? fatalError.message : String(fatalError || '');
+  for (const story of stories) {
+    if (!V[story.id]) {
+      set(
+        story.id,
+        'blocked',
+        failure ? `harness stopped before this check: ${failure}` : 'no test executed',
+        failure ? 'high' : 'low',
+        '',
+      );
+    }
+  }
+
+  const path = writeVerdicts('main', V);
+  const counts = { pass: 0, fail: 0, partial: 0, blocked: 0, 'n/a': 0 };
+  for (const id of Object.keys(V)) counts[V[id].test_status]++;
+  console.log('Wrote', path);
+  console.log('Tested', Object.keys(V).length, 'MAIN stories');
+  console.log(JSON.stringify(counts, null, 2));
+  for (const id of Object.keys(V).sort()) {
+    const result = V[id];
+    if (result.test_status === 'fail' || result.test_status === 'partial' || result.test_status === 'blocked') {
+      console.log(`${id} [${result.test_status}] ${result.errors_found || result.notes}`);
+    }
+  }
+}
 
 // The WelcomeModal renders a full-screen overlay on first visit (gated on the
 // localStorage key jrda_visited) and intercepts card clicks. Prime the key
@@ -379,7 +407,7 @@ const run = async () => {
     }
     // reset filters for next tests
     await page.evaluate(() => {
-      const b = [...document.querySelectorAll('aside button')].find(x => /Reset all filters/.test(x.textContent));
+      const b = document.querySelector('.archive-filter-sidebar__active button');
       if (b) b.click();
     });
     await sleep(200);
@@ -458,7 +486,7 @@ const run = async () => {
   }
 
   // ----------------------------------------------------------------- MAIN-10
-  // Reset all filters (sidebar button).
+  // Reset all active filters (sidebar button).
   {
     const baseCount = await recordsFound(page);
     await typeSearch(page, 'press');
@@ -472,7 +500,7 @@ const run = async () => {
     await sleep(200);
     const filteredCount = await recordsFound(page);
     await page.evaluate(() => {
-      const b = [...document.querySelectorAll('aside button')].find(x => /Reset all filters/.test(x.textContent));
+      const b = document.querySelector('.archive-filter-sidebar__active button');
       if (b) b.click();
     });
     await sleep(250);
@@ -481,7 +509,7 @@ const run = async () => {
       document.querySelector('aside input[type="text"]').value);
     if (filteredCount < baseCount && restored === baseCount && searchVal === '') {
       set('MAIN-10', 'pass', '', '',
-        `applied search+category+type (${filteredCount}); "Reset all filters" restored full ${restored} and cleared search box. (Empty-state "Clear all filters" uses the same reset object — verified in source; exercised in MAIN-16.)`);
+        `applied search+category+type (${filteredCount}); "Reset all" restored full ${restored} and cleared search box. (Empty-state "Clear all filters" uses the same reset object — verified in source; exercised in MAIN-16.)`);
     } else {
       set('MAIN-10', 'fail',
         `reset: base=${baseCount} filtered=${filteredCount} restored=${restored} searchVal="${searchVal}"`,
@@ -537,7 +565,7 @@ const run = async () => {
   // Folder view.
   {
     await page.evaluate(() => {
-      const b = [...document.querySelectorAll('button[title="Folder View"]')][0];
+      const b = document.querySelector('button[aria-label="Folders view"]');
       if (b) b.click();
     });
     await sleep(300);
@@ -566,7 +594,7 @@ const run = async () => {
     const switched = !afterClick.hash.includes('folders') && afterClick.checkedCats >= 1;
     // reset
     await page.evaluate(() => {
-      const b = [...document.querySelectorAll('aside button')].find(x => /Reset all filters/.test(x.textContent));
+      const b = document.querySelector('.archive-filter-sidebar__active button');
       if (b) b.click();
     });
     await sleep(200);
@@ -753,7 +781,7 @@ const run = async () => {
   {
     // start from a clean, unfiltered archive so prev/next has neighbours
     await page.evaluate(() => {
-      const b = [...document.querySelectorAll('aside button')].find(x => /Reset all filters/.test(x.textContent));
+      const b = document.querySelector('.archive-filter-sidebar__active button');
       if (b) b.click();
     });
     await sleep(250);
@@ -818,7 +846,7 @@ const run = async () => {
     }));
     // reset
     await page.evaluate(() => {
-      const b = [...document.querySelectorAll('aside button')].find(x => /Reset all filters/.test(x.textContent));
+      const b = document.querySelector('.archive-filter-sidebar__active button');
       if (b) b.click();
     });
     await sleep(200);
@@ -1022,9 +1050,7 @@ const run = async () => {
       const { page: bp } = await newPage(browser);
       await suppressWelcome(bp);
       await bp.goto(BASE + '/index.html?record=BADID-NONEXISTENT', { waitUntil: 'domcontentloaded' });
-      await bp.waitForFunction(
-        () => /records found/.test(document.body.textContent),
-        { timeout: 45000 }).catch(() => {});
+      await waitForArchiveReady(bp);
       await sleep(800);
       badNoModal = await bp.evaluate(() => !document.querySelector('[role="dialog"]'));
       await bp.close();
@@ -1054,14 +1080,11 @@ const run = async () => {
     const epErrors = [];
     ep.on('pageerror', e => epErrors.push(String(e)));
     await ep.goto(BASE + '/index.html', { waitUntil: 'domcontentloaded' });
-    await ep.waitForFunction(
-      () => /Error loading archive/.test(document.body.textContent) ||
-            /records found/.test(document.body.textContent),
-      { timeout: 30000 }).catch(() => {});
+    await ep.waitForSelector('.archive-error-state', { timeout: 30000 });
     await sleep(500);
     const archiveError = await ep.evaluate(() => ({
       panel: /Error loading archive/.test(document.body.textContent),
-      reloadBtn: [...document.querySelectorAll('button')].some(b => /Reload Page/.test(b.textContent)),
+      reloadBtn: [...document.querySelectorAll('button')].some(b => /Reload page/.test(b.textContent)),
     }));
     // navigate to entities, confirm error panel there too
     await ep.evaluate(() => { window.location.hash = 'entities'; window.dispatchEvent(new HashChangeEvent('hashchange')); });
@@ -1071,7 +1094,7 @@ const run = async () => {
     await ep.close();
     if (archiveError.panel && archiveError.reloadBtn && entitiesError) {
       set('MAIN-17', 'pass', '', '',
-        `aborting the core-data fetch surfaced the red "Error loading archive" panel with a "Reload Page" button on the archive route, and the same panel on #entities (shared fail-loud per #369). Loading state ("Loading archive..." + LoadingQuotes) confirmed during normal cold loads.`);
+        `aborting the core-data fetch surfaced the "Error loading archive" panel with a "Reload page" button on the archive route, and the same panel on #entities (shared fail-loud per #369). Loading state ("Loading archive..." + LoadingQuotes) confirmed during normal cold loads.`);
     } else {
       set('MAIN-17', 'partial',
         `error path: archivePanel=${archiveError.panel} reloadBtn=${archiveError.reloadBtn} entitiesPanel=${entitiesError}`,
@@ -1084,8 +1107,6 @@ const run = async () => {
     const { page: mp } = await newPage(browser, { width: 390, height: 844 });
     await suppressWelcome(mp);
     await gotoArchive(mp, '');
-    await mp.waitForFunction(
-      () => /records found/.test(document.body.textContent), { timeout: 45000 }).catch(() => {});
     const m1 = await mp.evaluate(() => {
       // sidebar hidden (translated off / not in lg layout): look for the toggle button
       const toggle = [...document.querySelectorAll('header button')]
@@ -1144,23 +1165,11 @@ const run = async () => {
     }
   }
 
-  // ensure every MAIN story has a verdict
-  for (const s of stories) {
-    if (!V[s.id]) set(s.id, 'blocked', 'no test executed', 'low', '');
-  }
-
-  const path = writeVerdicts('main', V);
-  const counts = { pass: 0, fail: 0, partial: 0, blocked: 0, 'n/a': 0 };
-  for (const id of Object.keys(V)) counts[V[id].test_status]++;
-  console.log('Wrote', path);
-  console.log('Tested', Object.keys(V).length, 'MAIN stories');
-  console.log(JSON.stringify(counts, null, 2));
-  for (const id of Object.keys(V).sort()) {
-    const v = V[id];
-    if (v.test_status === 'fail' || v.test_status === 'partial' || v.test_status === 'blocked') {
-      console.log(`${id} [${v.test_status}] ${v.errors_found || v.notes}`);
-    }
-  }
+  writeMainVerdicts();
 };
 
-run().catch(err => { console.error('FATAL', err); process.exit(1); });
+run().catch(err => {
+  console.error('FATAL', err);
+  writeMainVerdicts(err);
+  process.exitCode = 1;
+});

@@ -188,7 +188,7 @@ const main = async () => {
         await sleep(700);
         const after = await page.evaluate((label) => ({
           dialogGone: !document.querySelector('[role="dialog"][aria-modal="true"]'),
-          recordsLine: ([...document.querySelectorAll('*')].map(e => e.textContent).find(t => /records found/.test(t)) || '').match(/[\d,]+ records found/)?.[0],
+          recordsLine: document.querySelector('.archive-results-count')?.textContent?.trim() || '',
           // active filter chip text present in sidebar/header
           bodyHasCat: document.body.textContent.includes(label),
         }), chip.catLabel);

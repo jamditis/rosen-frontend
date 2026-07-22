@@ -1132,8 +1132,8 @@ const App = () => {
                           onClick=${() => goTo(ROUTES.archive)}
                           className=${`archive-view-switch__button ${currentRoute === ROUTES.archive ? 'is-active' : ''}`}
                           aria-pressed=${currentRoute === ROUTES.archive}
-                          aria-label="Card view"
-                          title="Card view"
+                          aria-label="Cards view"
+                          title="Cards view"
                         >
                             <${LayoutGrid} className="w-3 h-3" /> <span className="hidden sm:inline">Cards</span>
                         </button>
@@ -1142,8 +1142,8 @@ const App = () => {
                           onClick=${() => goTo(ROUTES.folders)}
                           className=${`archive-view-switch__button ${currentRoute === ROUTES.folders ? 'is-active' : ''}`}
                           aria-pressed=${currentRoute === ROUTES.folders}
-                          aria-label="Folder view"
-                          title="Folder view"
+                          aria-label="Folders view"
+                          title="Folders view"
                         >
                             <${Folder} className="w-3 h-3" /> <span className="hidden sm:inline">Folders</span>
                         </button>
@@ -1167,11 +1167,10 @@ const App = () => {
             </div>
             `}
 
-            ${currentRoute === ROUTES.archive && !loading && !filters.era && filters.categories.length === 0 && html`
+            ${currentRoute === ROUTES.archive && !loading && !filters.search && !filters.era && filters.categories.length === 0 && html`
                 <${Timeline}
                   records=${queryRecords}
                   selectedYear=${filters.year}
-                  searchActive=${Boolean(filters.search)}
                   onSelectYear=${handleYearSelect}
                 />
             `}

@@ -3,18 +3,14 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { html } from '../html.js?v=3.8.2';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
-const Timeline = ({ records, selectedYear, searchActive = false, onSelectYear }) => {
+const Timeline = ({ records, selectedYear, onSelectYear }) => {
   const [isExpanded, setIsExpanded] = useState(() => (
-    !searchActive && (typeof window === 'undefined' || window.innerWidth >= 640)
+    typeof window === 'undefined' || window.innerWidth >= 640
   ));
   const [hoveredYear, setHoveredYear] = useState(null);
   const [rovingYear, setRovingYear] = useState(null);
   const yearButtonRefs = useRef(new Map());
 
-  useEffect(() => {
-    if (searchActive) setIsExpanded(false);
-  }, [searchActive]);
-  
   const timelineData = useMemo(() => {
     const counts = {};
     let minYear = 2050;

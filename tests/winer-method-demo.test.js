@@ -208,7 +208,7 @@ describe('Winer method public page and deployment', () => {
   it('leads with the authored trail and presents record controls as editorial lenses', () => {
     assert.match(html, /<a class="primary-action" href="#explore">Begin with the authored trail<\/a>/);
     assert.match(html, /<section class="explorer"[^>]+data-lenses[^>]+hidden/);
-    assert.match(html, /<p class="eyebrow">Editorial lenses<\/p>/);
+    assert.match(html, /<p class="archive-folder-tab eyebrow"><span>Editorial lenses<\/span><\/p>/);
     assert.match(html, /Read the source records from four angles/);
     assert.doesNotMatch(html, /Four safe ways|free-form database console|fixed local filters/);
     assert.match(script, /Bounded interface/);

@@ -178,16 +178,7 @@ button:focus-visible {
 
 .kicker,
 .eyebrow {
-  display: inline-block;
   margin: 0;
-  padding: 0.3rem 0.8rem 0.28rem;
-  border: 1px solid var(--manila-edge);
-  clip-path: polygon(0 0, calc(100% - 0.5rem) 0, 100% 0.5rem, 100% 100%, 0 100%);
-  background: var(--manila);
-  color: #44403c;
-  font-family: var(--display);
-  font-size: 0.8rem;
-  font-weight: 400;
 }
 
 h1,
