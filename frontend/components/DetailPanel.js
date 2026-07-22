@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { html } from '../html.js?v=3.8.2';
+import { html } from '../html.js?v=3.8.3';
 import { X, FileText, Quote, BookOpen, Lightbulb, User } from 'lucide-react';
 
 // Type labels for display
@@ -10,8 +10,8 @@ const TYPE_LABELS = {
   part: 'Part',
   chapter: 'Chapter',
   conclusion: 'Conclusion',
-  concept: 'Key Concept',
-  figure: 'Key Figure'
+  concept: 'Key concept',
+  figure: 'Key figure'
 };
 
 const DetailPanel = ({ node, isOpen, onClose, contained = false }) => {
@@ -95,7 +95,7 @@ const DetailPanel = ({ node, isOpen, onClose, contained = false }) => {
       inert=${isOpen ? undefined : ''}
       aria-labelledby="detail-panel-title"
       className=${`
-        archive-detail-panel ${contained ? 'is-contained' : ''} ${positionClass} top-0 h-full w-full sm:w-[420px] bg-white border-l border-stone-200
+        archive-detail-panel archive-reading-panel ${contained ? 'is-contained' : ''} ${positionClass} top-0 h-full w-full sm:w-[420px]
         shadow-xl z-50 transform transition-transform duration-300 ease-out
         ${isOpen ? 'right-0' : '-right-full sm:-right-[420px]'}
       `}
@@ -104,37 +104,37 @@ const DetailPanel = ({ node, isOpen, onClose, contained = false }) => {
         zIndex: 80,
       }}
     >
-      <div className="sticky top-0 bg-white border-b border-stone-200 px-4 sm:px-6 py-4 flex items-center justify-between">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-stone-600">
+      <header className="archive-reading-panel__header">
+        <span>
           ${TYPE_LABELS[displayNode.type] || 'Section'}
         </span>
         <button
           type="button"
           ref=${closeButtonRef}
           onClick=${onClose}
-          className="p-2.5 sm:p-1.5 hover:bg-stone-100 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
+          className="archive-reading-panel__close"
           title="Close panel (ESC)"
           aria-label="Close detail panel"
         >
           <${X} className="w-5 h-5 text-stone-500" />
         </button>
-      </div>
+      </header>
 
       <div
-        className="archive-detail-content pl-4 pr-6 sm:pl-6 sm:pr-8 py-6 overflow-y-auto overflow-x-hidden h-[calc(100%-64px)]"
+        className="archive-detail-content archive-reading-panel__document"
         tabIndex="0"
         aria-label="Detail panel content"
       >
-        <h2 id="detail-panel-title" className="font-display text-xl font-bold text-stone-900 leading-tight mb-2 break-words">
+        <h2 id="detail-panel-title">
           ${displayNode.label}
         </h2>
 
         ${displayNode.subtitle && html`
-          <p className="text-stone-600 text-sm mb-4 break-words">${displayNode.subtitle}</p>
+          <p className="archive-reading-panel__subtitle">${displayNode.subtitle}</p>
         `}
 
         ${(displayNode.pageStart || displayNode.pageRef) && html`
-          <div className="flex items-center gap-2 text-xs text-stone-600 mb-6 font-mono">
+          <div className="archive-reading-panel__page-reference">
             <${FileText} className="w-3.5 h-3.5" />
             <span>
               ${displayNode.pageRef || `Pages ${displayNode.pageStart}${displayNode.pageEnd ? `–${displayNode.pageEnd}` : '+'}`}
@@ -143,69 +143,69 @@ const DetailPanel = ({ node, isOpen, onClose, contained = false }) => {
         `}
 
         ${displayNode.pullQuote && html`
-          <div className="mb-6">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-600 mb-2">
+          <section className="archive-reading-panel__section">
+            <h3>
               <${Quote} className="w-3.5 h-3.5" />
               <span>From the text</span>
-            </div>
-            <blockquote className="border-l-2 border-amber-300 pl-4 italic text-stone-700 text-sm leading-relaxed break-words">
-              "${displayNode.pullQuote}"
+            </h3>
+            <blockquote>
+              “${displayNode.pullQuote}”
             </blockquote>
-          </div>
+          </section>
         `}
 
         ${displayNode.summary && html`
-          <div className="mb-6">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-600 mb-2">
+          <section className="archive-reading-panel__section">
+            <h3>
               <${BookOpen} className="w-3.5 h-3.5" />
               <span>Summary</span>
-            </div>
-            <p className="text-stone-600 text-sm leading-relaxed break-words">
+            </h3>
+            <p>
               ${displayNode.summary}
             </p>
-          </div>
+          </section>
         `}
 
         ${displayNode.keyConcepts && displayNode.keyConcepts.length > 0 && html`
-          <div className="mb-6">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-600 mb-2">
+          <section className="archive-reading-panel__section">
+            <h3>
               <${Lightbulb} className="w-3.5 h-3.5" />
-              <span>Key Concepts</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
+              <span>Key concepts</span>
+            </h3>
+            <div className="archive-reading-panel__tags">
               ${displayNode.keyConcepts.map((concept, i) => html`
                 <span
                   key=${i}
-                  className="text-xs bg-violet-50 text-violet-800 px-2 py-1 border border-violet-200"
+                  className="archive-reading-panel__tag"
                 >
                   ${concept}
                 </span>
               `)}
             </div>
-          </div>
+          </section>
         `}
 
         ${displayNode.keyFigures && displayNode.keyFigures.length > 0 && html`
-          <div className="mb-6">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-600 mb-2">
+          <section className="archive-reading-panel__section">
+            <h3>
               <${User} className="w-3.5 h-3.5" />
-              <span>Key Figures</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
+              <span>Key figures</span>
+            </h3>
+            <div className="archive-reading-panel__tags">
               ${displayNode.keyFigures.map((figure, i) => html`
                 <span
                   key=${i}
-                  className="text-xs bg-green-50 text-green-800 px-2 py-1 border border-green-200"
+                  className="archive-reading-panel__tag"
                 >
                   ${figure}
                 </span>
               `)}
             </div>
-          </div>
+          </section>
         `}
 
         ${!displayNode.summary && !displayNode.pullQuote && !displayNode.keyConcepts?.length && !displayNode.keyFigures?.length && html`
-          <div className="text-center py-8 text-stone-600">
+          <div className="archive-reading-panel__empty">
             <${FileText} className="w-8 h-8 mx-auto mb-2 opacity-30" />
             <p className="text-sm">No additional detail for this item</p>
           </div>

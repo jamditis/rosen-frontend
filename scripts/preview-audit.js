@@ -170,7 +170,25 @@ const ROUTES = [
   },
   { slug: 'about',              url: '/#about' },
   { slug: 'analytics',          url: '/#analytics' },
-  { slug: 'record-modal',       url: '/?record=RECORD-00802' },
+  { slug: 'record-article',     url: '/?record=RECORD-00802', archiveDetails: 'require', verifyRecordReading: 'article' },
+  { slug: 'record-social',      url: '/?record=BSKY-03169', archiveDetails: 'require', verifyRecordReading: 'social' },
+  { slug: 'record-thread',      url: '/?record=THREAD-00001', archiveDetails: 'require', verifyRecordReading: 'thread' },
+  { slug: 'record-media',       url: '/?record=RECORD-00581', archiveDetails: 'require', verifyRecordReading: 'media' },
+  {
+    slug: 'record-incomplete',
+    url: '/?record=RECORD-00802',
+    archiveDetails: 'require',
+    verifyRecordReading: 'incomplete',
+    mockIncompleteRecord: 'RECORD-00802',
+  },
+  {
+    slug: 'record-error',
+    url: '/?record=BSKY-03169&report=problem&source=participate',
+    archiveDetails: 'require',
+    verifyRecordReading: 'error',
+    verifyReportFirst: true,
+    mockDetailsFailure: true,
+  },
   { slug: 'dissertation-map-detail', url: '/#dissertation', openDissertationDetail: true },
   { slug: 'dissertation',       url: '/dissertation/' },
   { slug: 'dissertation-reader',url: '/dissertation/reader/', verifyReaderReturn: true },
@@ -264,6 +282,41 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     }
   };
   await page.setViewportSize({ width: viewport.width, height: viewport.height });
+  await page.unroute('**/data/archive-details.json').catch(() => {});
+  await page.unroute('https://www.youtube.com/embed/**').catch(() => {});
+  if (route.verifyRecordReading === 'media') {
+    await page.route('https://www.youtube.com/embed/**', async (requestRoute) => {
+      await requestRoute.fulfill({
+        contentType: 'text/html',
+        body: '<!doctype html><html><head><title>Video preview</title><style>html,body{height:100%;margin:0;background:#000;color:#fff;font:16px monospace}body{display:grid;place-items:center}</style></head><body>Video preview</body></html>',
+      });
+    });
+  }
+  if (route.mockIncompleteRecord) {
+    await page.route('**/data/archive-details.json', async (requestRoute) => {
+      const response = await requestRoute.fetch();
+      const payload = await response.json();
+      payload.details[route.mockIncompleteRecord] = {
+        summary: '',
+        quote: '',
+        concepts: [],
+        tags: [],
+        url: '#',
+        author: '',
+        relatedIds: [],
+      };
+      await requestRoute.fulfill({ response, json: payload });
+    });
+  }
+  if (route.mockDetailsFailure) {
+    await page.route('**/data/archive-details.json', async (requestRoute) => {
+      await requestRoute.fulfill({
+        status: 503,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'Expected preview-audit details failure' }),
+      });
+    });
+  }
   // Spatial memory is intentionally persistent in production. Keep each audit
   // route deterministic, then opt into one explicit concurrent-window case.
   if (page.url().startsWith(BASE)) {
@@ -310,10 +363,191 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
   if (route.archiveDetails === 'forbid' && archiveDetailsRequests.length > 0) {
     throw new Error(`${route.slug} unexpectedly loaded archive-details.json`);
   }
-  if (route.archiveDetails === 'require' && archiveDetailsRequests.length !== 1) {
+  const detailsRequestMismatch = route.archiveDetails === 'require'
+    && (route.mockDetailsFailure
+      ? archiveDetailsRequests.length < 1
+      : archiveDetailsRequests.length !== 1);
+  if (detailsRequestMismatch) {
+    const expectation = route.mockDetailsFailure ? 'at least once' : 'exactly once';
     throw new Error(
-      `${route.slug} loaded archive-details.json ${archiveDetailsRequests.length} times; expected exactly once`,
+      `${route.slug} loaded archive-details.json ${archiveDetailsRequests.length} times; expected ${expectation}`,
     );
+  }
+  if (route.verifyReportFirst) {
+    const reportDialog = page.getByRole('dialog', { name: 'Report a problem or suggest a record' });
+    await reportDialog.waitFor();
+    const reportState = await reportDialog.evaluate((element) => ({
+      inert: element.inert,
+      ariaHidden: element.getAttribute('aria-hidden'),
+      focusInside: element.contains(document.activeElement),
+    }));
+    if (reportState.inert || reportState.ariaHidden === 'true' || !reportState.focusInside) {
+      throw new Error(`Report-first record deep link hid its topmost dialog: ${JSON.stringify(reportState)}`);
+    }
+    await page.keyboard.press('Escape');
+    await reportDialog.waitFor({ state: 'hidden' });
+  }
+  if (route.verifyRecordReading) {
+    const dialog = page.getByRole('dialog', { name: /.*/ });
+    await dialog.waitFor();
+    const closeRecord = page.getByRole('button', { name: 'Close record', exact: true }).last();
+    await assertFocused(closeRecord, `${route.slug} close control`);
+    await assertVisibleFocusOutline(closeRecord, `${route.slug} close control`);
+
+    const recordState = await dialog.evaluate((element) => {
+      const sheet = element.querySelector('.archive-record-sheet');
+      const documentSurface = element.querySelector('.archive-record-document');
+      const utilityTargets = [...element.querySelectorAll('.archive-record-utility button')]
+        .map((target) => {
+          const rect = target.getBoundingClientRect();
+          return { width: rect.width, height: rect.height, label: target.getAttribute('aria-label') };
+        });
+      const background = [...(element.parentElement?.children || [])]
+        .filter((sibling) => sibling !== element);
+      return {
+        sheetWidth: sheet?.getBoundingClientRect().width,
+        sheetHeight: sheet?.getBoundingClientRect().height,
+        viewportWidth: window.innerWidth,
+        viewportHeight: window.innerHeight,
+        documentOverflow: documentSurface
+          ? documentSurface.scrollWidth - documentSurface.clientWidth
+          : null,
+        overscroll: documentSurface ? getComputedStyle(documentSurface).overscrollBehavior : '',
+        backgroundInert: background.length > 0 && background.every((sibling) => sibling.inert),
+        utilityTargets,
+      };
+    });
+    if (
+      !recordState.sheetWidth
+      || !recordState.sheetHeight
+      || recordState.sheetWidth > recordState.viewportWidth + 1
+      || recordState.sheetHeight > recordState.viewportHeight + 1
+      || recordState.documentOverflow > 1
+      || recordState.overscroll !== 'contain'
+      || !recordState.backgroundInert
+      || recordState.utilityTargets.some(({ width, height }) => width < 44 || height < 44)
+    ) {
+      throw new Error(`${route.slug} reading sheet failed containment: ${JSON.stringify(recordState)}`);
+    }
+
+    const sourceAction = dialog.locator('.archive-record-source');
+    const expectsSourceAction = !['incomplete', 'error'].includes(route.verifyRecordReading);
+    if (expectsSourceAction) {
+      await sourceAction.waitFor();
+      const recordBeforeArrow = new URL(page.url()).searchParams.get('record');
+      await sourceAction.focus();
+      await page.keyboard.press('ArrowRight');
+      const recordAfterArrow = new URL(page.url()).searchParams.get('record');
+      if (recordAfterArrow !== recordBeforeArrow) {
+        throw new Error(`${route.slug} changed records while focus was inside its source action`);
+      }
+    }
+
+    if (route.verifyRecordReading === 'thread') {
+      const posts = dialog.locator('.archive-thread-post');
+      await posts.nth(19).waitFor();
+      if (await posts.count() < 20) throw new Error('Thread reading route did not render the large thread');
+    }
+    if (route.verifyRecordReading === 'article') {
+      const originalRecordId = new URL(page.url()).searchParams.get('record');
+      await closeRecord.focus();
+      await page.keyboard.press('ArrowRight');
+      await page.waitForURL((url) => url.searchParams.get('record') !== originalRecordId);
+      await page.keyboard.press('ArrowLeft');
+      await page.waitForURL((url) => url.searchParams.get('record') === originalRecordId);
+
+      const reportRecord = dialog.getByRole('button', { name: 'Report a problem with this record' });
+      await reportRecord.click();
+      const reportDialog = page.getByRole('dialog', { name: 'Report a problem or suggest a record' });
+      await reportDialog.waitFor();
+      const reportField = reportDialog.getByLabel('What happened?');
+      if (await reportField.inputValue() !== '') {
+        throw new Error('Record problem report auto-filled its required description');
+      }
+      if (new URL(page.url()).searchParams.get('record') !== 'RECORD-00802') {
+        throw new Error('Record problem report lost the record id from its captured page context');
+      }
+      await page.keyboard.press('Escape');
+      await reportDialog.waitFor({ state: 'hidden' });
+      await dialog.waitFor();
+      await assertFocused(reportRecord, 'Record problem link after report close');
+      const bodyOverflow = await page.evaluate(() => document.body.style.overflow);
+      if (bodyOverflow !== 'hidden') {
+        throw new Error('Record reader lost its body scroll lock after the report dialog closed');
+      }
+
+      await reportRecord.click();
+      await reportDialog.waitFor();
+      await page.evaluate(() => {
+        const recordUrl = new URL(window.location.href);
+        const backgroundUrl = new URL(recordUrl);
+        backgroundUrl.searchParams.delete('record');
+        history.replaceState(history.state, '', backgroundUrl);
+        history.pushState(history.state, '', recordUrl);
+      });
+      await page.goBack();
+      const recordDialog = page.locator('.archive-record-dialog[role="dialog"]');
+      await recordDialog.waitFor({ state: 'hidden' });
+      await reportDialog.waitFor();
+      const nestedReportState = await reportDialog.evaluate((element) => ({
+        focusInside: element.contains(document.activeElement),
+        page: window.location.href,
+      }));
+      if (!nestedReportState.focusInside) {
+        throw new Error(`Record close moved focus outside its nested report: ${JSON.stringify(nestedReportState)}`);
+      }
+      const nestedOverflow = await page.evaluate(() => document.body.style.overflow);
+      if (nestedOverflow !== 'hidden') {
+        throw new Error('Nested report lost its body scroll lock after browser Back');
+      }
+      await page.evaluate(() => {
+        window.__previewOriginalOpen = window.open;
+        window.__previewReportFallbackUrl = '';
+        window.open = (url) => {
+          window.__previewReportFallbackUrl = String(url);
+          return null;
+        };
+      });
+      await reportDialog.getByRole('button', { name: 'Prefer GitHub? Open the issue form' }).click();
+      await reportDialog.waitFor({ state: 'hidden' });
+      const fallbackUrl = await page.evaluate(() => {
+        const url = window.__previewReportFallbackUrl;
+        window.open = window.__previewOriginalOpen;
+        delete window.__previewOriginalOpen;
+        delete window.__previewReportFallbackUrl;
+        return url;
+      });
+      const capturedReportPage = new URL(fallbackUrl).searchParams.get('page-context');
+      if (new URL(capturedReportPage).searchParams.get('record') !== 'RECORD-00802') {
+        throw new Error(`Nested report lost its original record context after browser Back: ${capturedReportPage}`);
+      }
+      const releasedOverflow = await page.evaluate(() => document.body.style.overflow);
+      if (releasedOverflow === 'hidden') {
+        throw new Error('Nested report restored a stale body scroll lock after browser Back');
+      }
+      await page.goForward();
+      await recordDialog.waitFor();
+    }
+    if (route.verifyRecordReading === 'media') {
+      await dialog.locator('.archive-record-media iframe').waitFor();
+    }
+    if (route.verifyRecordReading === 'incomplete') {
+      await dialog.getByText('Source unavailable in this archive', { exact: true }).waitFor();
+    }
+    if (route.verifyRecordReading === 'error') {
+      await dialog.getByText('Some record details are unavailable.', { exact: true }).waitFor();
+      const shareFallback = dialog.getByRole('button', { name: 'Copy canonical record link' });
+      if (await shareFallback.isDisabled()) {
+        throw new Error('Social record detail failure left its canonical share fallback disabled');
+      }
+      const retryDetails = dialog.getByRole('button', { name: 'Retry details' });
+      const retryRequest = page.waitForRequest(
+        (request) => new URL(request.url()).pathname.endsWith('/data/archive-details.json'),
+      );
+      await retryDetails.click();
+      await retryRequest;
+      await dialog.getByText('Some record details are unavailable.', { exact: true }).waitFor();
+    }
   }
   if (route.verifyDiscardedDesktopContext) {
     const canonicalUrl = new URL(page.url());
@@ -874,6 +1108,11 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
   } else if (route.dismissWelcome) {
     await page.evaluate(() => window.scrollTo(0, 0));
   }
+  if (route.verifyRecordReading === 'thread') {
+    await page.locator('.archive-thread').scrollIntoViewIfNeeded();
+  } else if (route.verifyRecordReading) {
+    await page.locator('.archive-record-document').evaluate((element) => { element.scrollTop = 0; });
+  }
   if (route.dismissWelcome || route.screenshotResults) await page.waitForTimeout(100);
   // Viewport-only screenshots. Full-page on long content (e.g. the dissertation
   // reader, which is the entire 1986 text) can OOM the chromium process.
@@ -895,7 +1134,7 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
   }
   if (route.verifyEntityRecordFlow) {
     const dialog = page.getByRole('dialog');
-    const dialogClose = page.getByLabel('Close record details');
+    const dialogClose = page.getByLabel('Close record');
     await assertFocused(dialogClose, 'Direct record dialog');
 
     await page.keyboard.press('Escape');
@@ -1607,7 +1846,7 @@ async function main() {
 
     const browser = await launchBrowser();
     try {
-      const context = await browser.newContext();
+      const context = await browser.newContext({ serviceWorkers: 'block' });
       const page = await context.newPage();
 
       const rows = [];
@@ -1621,13 +1860,23 @@ async function main() {
           const capturePageError = (error) => pageErrors.push(error.message || String(error));
           const captureConsoleError = (message) => {
             if (captureApplicationNetwork && message.type() === 'error') {
+              if (route.mockDetailsFailure) {
+                if (message.text().includes('Error fetching details data:')) return;
+                const locationUrl = message.location().url;
+                const expectedResourceError = message.text().includes('Failed to load resource:')
+                  && locationUrl
+                  && new URL(locationUrl).pathname.endsWith('/data/archive-details.json');
+                if (expectedResourceError) return;
+              }
               consoleErrors.push(message.text());
             }
           };
           const captureBadResponse = (response) => {
             if (!captureApplicationNetwork) return;
             const url = new URL(response.url());
-            if (url.origin === BASE && response.status() >= 400) {
+            const expectedDetailsFailure = route.mockDetailsFailure
+              && url.pathname.endsWith('/data/archive-details.json');
+            if (url.origin === BASE && response.status() >= 400 && !expectedDetailsFailure) {
               networkErrors.push(`${response.status()} ${url.pathname}`);
             }
           };

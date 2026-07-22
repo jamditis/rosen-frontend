@@ -1,37 +1,37 @@
 
 import { Component, Suspense, lazy, useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.8.2';
+import { html } from './html.js?v=3.8.3';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github, Search, XCircle } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.2';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.2';
-import { withViewTransition } from './utils/viewTransition.js?v=3.8.2';
-import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.2';
-import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.2';
-import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.2';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.2';
-import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.2';
-import { resolveSitePath } from './utils/pathResolver.js?v=3.8.2';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.8.2';
-import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.8.2';
-import { sortRecords } from './utils/recordSort.js?v=3.8.2';
-import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.2';
-import Sidebar from './components/Sidebar.js?v=3.8.2';
-import WelcomeModal from './components/WelcomeModal.js?v=3.8.2';
-import RecordView from './components/RecordView.js?v=3.8.2';
-import FeaturedSection from './components/FeaturedSection.js?v=3.8.2';
-import DissertationPage from './components/DissertationPage.js?v=3.8.2';
-import ToolsModal from './components/ToolsModal.js?v=3.8.2';
-import BugReportModal from './components/BugReportModal.js?v=3.8.2';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.2';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.2';
-import EntityBrowser from './components/EntityBrowser.js?v=3.8.2';
-import Timeline from './components/Timeline.js?v=3.8.2';
-import AboutPage from './components/AboutPage.js?v=3.8.2';
-import WikiPage from './components/WikiPage.js?v=3.8.2';
-import StartHerePage from './components/StartHerePage.js?v=3.8.2';
-import ArchiveResults from './components/ArchiveResults.js?v=3.8.2';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.3';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.3';
+import { withViewTransition } from './utils/viewTransition.js?v=3.8.3';
+import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.3';
+import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.3';
+import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.3';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.3';
+import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.3';
+import { resolveSitePath } from './utils/pathResolver.js?v=3.8.3';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.8.3';
+import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.8.3';
+import { sortRecords } from './utils/recordSort.js?v=3.8.3';
+import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.3';
+import Sidebar from './components/Sidebar.js?v=3.8.3';
+import WelcomeModal from './components/WelcomeModal.js?v=3.8.3';
+import RecordView from './components/RecordView.js?v=3.8.3';
+import FeaturedSection from './components/FeaturedSection.js?v=3.8.3';
+import DissertationPage from './components/DissertationPage.js?v=3.8.3';
+import ToolsModal from './components/ToolsModal.js?v=3.8.3';
+import BugReportModal from './components/BugReportModal.js?v=3.8.3';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.3';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.3';
+import EntityBrowser from './components/EntityBrowser.js?v=3.8.3';
+import Timeline from './components/Timeline.js?v=3.8.3';
+import AboutPage from './components/AboutPage.js?v=3.8.3';
+import WikiPage from './components/WikiPage.js?v=3.8.3';
+import StartHerePage from './components/StartHerePage.js?v=3.8.3';
+import ArchiveResults from './components/ArchiveResults.js?v=3.8.3';
 
-const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.2'));
+const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.3'));
 
 const NON_RECORD_ROUTES = new Set([
   ROUTES.analytics,
@@ -139,6 +139,7 @@ const App = () => {
   const [toolsModalOpen, setToolsModalOpen] = useState(false);
   const [bugReportOpen, setBugReportOpen] = useState(false);
   const [bugReportIntent, setBugReportIntent] = useState('problem');
+  const [bugReportInitialFields, setBugReportInitialFields] = useState({});
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [announcedResultCount, setAnnouncedResultCount] = useState('');
 
@@ -176,6 +177,19 @@ const App = () => {
   const reportEntryHandled = useRef(false);
   const previouslyRenderedRoute = useRef(currentRoute);
 
+  const openBugReport = useCallback((intent = 'problem', initialFields = {}) => {
+    setBugReportIntent(intent);
+    setBugReportInitialFields(initialFields);
+    setBugReportOpen(true);
+  }, []);
+
+  const handleRecordProblemReport = useCallback(() => {
+    // The selected record id already stays in the page URL captured with the
+    // report. Keep the required description empty so the reader must describe
+    // the actual problem instead of submitting an auto-filled prefix alone.
+    openBugReport('problem');
+  }, [openBugReport]);
+
   // Hash navigation replaces parts of the React tree without giving the
   // browser a document-navigation focus reset. When the invoking control is
   // unmounted, focus otherwise falls through to <body> and a keyboard or
@@ -211,6 +225,7 @@ const App = () => {
     const entry = readReportDeepLink(window.location.href);
     if (!entry.intent) return;
     setBugReportIntent(entry.intent);
+    setBugReportInitialFields({});
     setBugReportOpen(true);
     window.history.replaceState({}, '', entry.cleanHref);
   }, []);
@@ -639,6 +654,8 @@ const App = () => {
       onFilterCategory=${handleFilterCategory}
       onFilterSearch=${handleFilterSearch}
       onSelectEntity=${handleRecordEntitySelect}
+      onReportProblem=${handleRecordProblemReport}
+      nestedDialogOpen=${bugReportOpen}
     />
   `;
 
@@ -759,10 +776,7 @@ const App = () => {
     error,
     onNavigate: handleDesktopGuideNavigate,
     onSelectRecord: selectRecord,
-    onOpenBugReport: () => {
-      setBugReportIntent('problem');
-      setBugReportOpen(true);
-    },
+    onOpenBugReport: () => openBugReport('problem'),
     onOpenStandard: () => goTo(ROUTES.start),
   };
 
@@ -778,6 +792,7 @@ const App = () => {
         onClose=${() => setBugReportOpen(false)}
         endpoint=${REPORT_CONFIG.endpoint}
         initialIntent=${bugReportIntent}
+        initialFields=${bugReportInitialFields}
       />
     </div>
   `;
@@ -807,7 +822,7 @@ const App = () => {
             autoFocusWindow=${!desktopRecordOverlayOpen}
             onSelectApp=${goToDesktop}
             onNavigate=${goTo}
-            onOpenBugReport=${() => { setBugReportIntent('problem'); setBugReportOpen(true); }}
+            onOpenBugReport=${() => openBugReport('problem')}
             onExit=${() => goTo(ROUTES.archive)}
             onOpenAppsChange=${setDesktopOpenAppIds}
             archiveView=${desktopArchiveView}
@@ -834,7 +849,7 @@ const App = () => {
         onBack=${() => goTo(ROUTES.archive)}
         records=${records}
         onNavigate=${goTo}
-        onOpenBugReport=${() => { setBugReportIntent('problem'); setBugReportOpen(true); }}
+        onOpenBugReport=${() => openBugReport('problem')}
         onSelectRecord=${handleStartRecordSelect}
       />
     `);
@@ -899,6 +914,7 @@ const App = () => {
         onClose=${() => setBugReportOpen(false)}
         endpoint=${REPORT_CONFIG.endpoint}
         initialIntent=${bugReportIntent}
+        initialFields=${bugReportInitialFields}
       />
 
       ${recordView}
@@ -954,7 +970,7 @@ const App = () => {
                     <span>About</span>
                 </button>
                 <button
-                  onClick=${() => { setBugReportIntent('problem'); setBugReportOpen(true); }}
+                  onClick=${() => openBugReport('problem')}
                   className="archive-action archive-action--quiet archive-site-header__action"
                   aria-label="Report a bug"
                   title="Report a bug"

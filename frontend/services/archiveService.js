@@ -1,5 +1,5 @@
 
-import { DATA_CONFIG } from '../constants.js?v=3.8.2';
+import { DATA_CONFIG } from '../constants.js?v=3.8.3';
 import {
   initDatabase,
   loadArchiveData as loadSqliteData,
@@ -13,13 +13,13 @@ import {
   getCategoryCoOccurrence,
   searchRecords as sqlSearchRecords,
   getStats as getSqliteStats
-} from './sqliteService.js?v=3.8.2';
-import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.8.2';
-import { searchIndexOptions } from '../utils/searchConfig.js?v=3.8.2';
-import { escapeCsvCell } from '../utils/csvSafety.js?v=3.8.2';
-import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.8.2';
-import { CACHE_VERSION, CACHE_TTL_MS, MAX_LOCALSTORAGE_SIZE, cacheKeyFor } from './cacheConfig.js?v=3.8.2';
-import { raceTimeout } from '../utils/raceTimeout.js?v=3.8.2';
+} from './sqliteService.js?v=3.8.3';
+import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.8.3';
+import { searchIndexOptions } from '../utils/searchConfig.js?v=3.8.3';
+import { escapeCsvCell } from '../utils/csvSafety.js?v=3.8.3';
+import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.8.3';
+import { CACHE_VERSION, CACHE_TTL_MS, MAX_LOCALSTORAGE_SIZE, cacheKeyFor } from './cacheConfig.js?v=3.8.3';
+import { raceTimeout } from '../utils/raceTimeout.js?v=3.8.3';
 
 // Routine cache-hit / fetch-start logs are silent in production. Set
 // `localStorage.jrda_debug = '1'` in DevTools and reload to opt in (#170).
@@ -486,9 +486,14 @@ const loadDetailsCache = async () => {
       setCachedData(dataUrl, data);
     } catch (error) {
       console.error('Error fetching details data:', error);
-      detailsCache = {};
+      // Keep the cache absent so a later explicit retry performs a fresh
+      // request. Propagate the failure so the record reader can distinguish a
+      // network/parse outage from a successful payload that lacks this record.
+      detailsCache = null;
+      throw error;
     } finally {
       detailsLoading = false;
+      detailsLoadPromise = null;
     }
   })();
 
@@ -589,7 +594,10 @@ export const areEntitiesLoaded = () => entitiesCache !== null;
  */
 export const preloadDetails = () => {
   if (!detailsCache && !detailsLoading) {
-    loadDetailsCache();
+    // Background warmup is best effort. Interactive fetchRecordDetails callers
+    // still receive the rejection and render their retry state, while this
+    // unawaited optimization must not create an unhandled rejection.
+    loadDetailsCache().catch(() => {});
   }
 };
 
