@@ -32,8 +32,8 @@ async function waitFor(page, fn, timeout = 20000) {
 
 // --- ENTITY BROWSER (#entities) -----------------------------------------
 // EntityBrowser renders inside the archive-grid route, gated on core data
-// (!loading && !error), so we use gotoArchive to wait for "records found"
-// then wait for entity cards (chips) to appear.
+// (!loading && !error), so gotoArchive waits for the route-specific search
+// control before the harness verifies the data-driven entity counts.
 
 async function testEntities(browser) {
   const { page, errors, requests } = await freshPage(browser, { width: 1440, height: 900 });

@@ -98,6 +98,8 @@ describe('archive discovery visual-system refresh', () => {
   it('keeps the feature-audit harness aligned with the refreshed archive controls', () => {
     assert.match(auditHarness, /\.archive-results-count/);
     assert.match(auditHarness, /\.archive-error-state/);
+    assert.match(auditHarness, /window\.location\.hash === '#entities'/);
+    assert.match(auditHarness, /document\.querySelector\('#entity-search'\)/);
     assert.doesNotMatch(auditHarness, /\/records found\/\.test\(document\.body\.textContent\)/);
     assert.doesNotMatch(auditHarness, /Reset all filters\/\.test\(x\.textContent\)/);
     assert.doesNotMatch(auditHarness, /button\[title="Folder View"\]/);
