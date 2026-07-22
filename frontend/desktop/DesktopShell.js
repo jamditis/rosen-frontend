@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { html } from '../html.js?v=3.7.11';
+import { html } from '../html.js?v=3.8.0';
 import {
   AlertTriangle,
   Archive,
@@ -26,17 +26,17 @@ import {
   Wrench,
   X,
 } from 'lucide-react';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.7.11';
-import DesktopArchivePanel from './DesktopArchivePanel.js?v=3.7.11';
-import DesktopAnalyticsPanel from './DesktopAnalyticsPanel.js?v=3.7.11';
-import DesktopDissertationPanel from './DesktopDissertationPanel.js?v=3.7.11';
-import DesktopEntityPanel from './DesktopEntityPanel.js?v=3.7.11';
-import DesktopStartPanel from './DesktopStartPanel.js?v=3.7.11';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.0';
+import DesktopArchivePanel from './DesktopArchivePanel.js?v=3.8.0';
+import DesktopAnalyticsPanel from './DesktopAnalyticsPanel.js?v=3.8.0';
+import DesktopDissertationPanel from './DesktopDissertationPanel.js?v=3.8.0';
+import DesktopEntityPanel from './DesktopEntityPanel.js?v=3.8.0';
+import DesktopStartPanel from './DesktopStartPanel.js?v=3.8.0';
 import {
   DESKTOP_TOOL_LINKS,
   getDesktopApp,
   getReadyDesktopApps,
-} from './desktopRegistry.js?v=3.7.11';
+} from './desktopRegistry.js?v=3.8.0';
 import {
   DESKTOP_LAYOUT_STORAGE_KEY,
   activateDesktopWindow,
@@ -48,7 +48,7 @@ import {
   nextVisibleDesktopWindow,
   parseDesktopLayout,
   serializeDesktopLayout,
-} from './desktopWindowState.js?v=3.7.11';
+} from './desktopWindowState.js?v=3.8.0';
 
 const ICONS = {
   archive: Archive,
@@ -174,7 +174,7 @@ const DesktopShell = ({
     const link = document.createElement('link');
     link.id = stylesheetId;
     link.rel = 'stylesheet';
-    link.href = resolveSitePath('frontend/desktop/desktop.css?v=3.7.11');
+    link.href = resolveSitePath('frontend/desktop/desktop.css?v=3.8.0');
     link.addEventListener('error', () => {
       setStatusMessage('Desktop styling could not load. All destinations remain available.');
     }, { once: true });

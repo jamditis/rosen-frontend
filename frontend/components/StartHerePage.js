@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { html } from '../html.js?v=3.7.11';
+import { html } from '../html.js?v=3.8.0';
 import {
   AlertCircle,
   ArrowLeft,
@@ -15,7 +15,7 @@ import {
   Search,
   Sparkles
 } from 'lucide-react';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.7.11';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.0';
 
 const normalizeTitle = (title = '') => title
   .toLowerCase()
@@ -389,13 +389,13 @@ const StartHerePage = ({
           </details>
         </section>
 
-        <${ParticipateTag} className="mb-8 border-y-2 border-stone-900 bg-stone-100 px-6 py-7 md:flex md:items-center md:justify-between md:gap-8" aria-labelledby="participate-callout-title">
+        <${ParticipateTag} className="archive-panel archive-panel--accent archive-density--spacious mb-8 md:flex md:items-center md:justify-between md:gap-8" aria-labelledby="participate-callout-title">
           <div>
-            <p className="font-body text-xs font-bold uppercase tracking-wider text-stone-600">A living collection</p>
+            <p className="archive-section-label">A living collection</p>
             <h2 id="participate-callout-title" className="mt-1 font-display text-2xl font-bold text-stone-900">Help keep the archive useful.</h2>
             <p className="mt-2 max-w-2xl font-body text-sm leading-relaxed text-stone-600">Share a record, suggest something missing, report a barrier, follow new additions, or reuse the project.</p>
           </div>
-          <a href=${resolveSitePath('features/participate/')} className="mt-4 inline-flex min-h-11 shrink-0 items-center gap-2 bg-stone-900 px-5 py-3 font-display text-sm font-bold text-white hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 md:mt-0">Ways to participate<${ArrowRight} className="h-4 w-4" aria-hidden="true" /></a>
+          <a href=${resolveSitePath('features/participate/')} className="archive-action archive-action--primary mt-4 shrink-0 md:mt-0">Ways to participate<${ArrowRight} className="h-4 w-4" aria-hidden="true" /></a>
         <//>
 
         <section aria-labelledby="continue-title" className="border border-stone-300 bg-white p-6 md:flex md:items-center md:justify-between md:gap-8 md:p-8">

@@ -1,21 +1,21 @@
 :root {
-  --ink: #1c1917;
-  --muted: #57534e;
-  --paper: #fdfbf7;
-  --paper-deep: #f3eee3;
-  --rule: #d6d3d1;
-  --hero: #121b18;
-  --signal: #f2bd49;
-  --manila: #e8dfc8;
-  --manila-edge: #c9bda0;
-  --sky: #5aa9c9;
-  --sky-soft: #e7f4f8;
-  --amber: #d89824;
-  --amber-soft: #fbf1d8;
-  --green: #548873;
-  --green-soft: #e7f1ec;
-  --display: 'Special Elite', Georgia, serif;
-  --mono: 'Roboto Mono', ui-monospace, monospace;
+  --ink: var(--archive-ink);
+  --muted: var(--archive-ink-muted);
+  --paper: var(--archive-canvas);
+  --paper-deep: var(--archive-paper-deep);
+  --rule: var(--archive-rule);
+  --hero: var(--archive-hero);
+  --signal: var(--archive-signal);
+  --manila: var(--archive-manila);
+  --manila-edge: var(--archive-manila-edge);
+  --sky: var(--archive-sky);
+  --sky-soft: var(--archive-sky-soft);
+  --amber: var(--archive-amber);
+  --amber-soft: var(--archive-amber-soft);
+  --green: var(--archive-green);
+  --green-soft: var(--archive-green-soft);
+  --display: var(--font-display);
+  --mono: var(--font-body);
 }
 
 * {

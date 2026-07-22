@@ -41,6 +41,7 @@ const ROUTES = [
   { slug: 'home-archive',       url: '/', archiveDetails: 'require', verifyToolsDesktopEntry: true },
   { slug: 'start-here',         url: '/#start', verifyDesktopEntry: true },
   { slug: 'participate',        url: '/features/participate/' },
+  { slug: 'design-system',      url: '/frontend/design-system/demo.html' },
   { slug: 'archive-desktop',    url: '/#desktop', archiveDetails: 'forbid', verifyStartPathRoundTrip: true, verifyCompactHomeFocus: true },
   { slug: 'desktop-start-menu', url: '/#desktop', archiveDetails: 'forbid', verifyDesktopStartMenu: true },
   {
