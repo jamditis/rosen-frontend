@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { html } from '../html.js?v=3.8.0';
+import { html } from '../html.js?v=3.8.1';
 import { Sparkles, X } from 'lucide-react';
 import {
   readTourState,
   shouldShowTourEntry,
-} from '../services/tourState.js?v=3.8.0';
+} from '../services/tourState.js?v=3.8.1';
 
 const BANNER_DISMISSED_KEY = 'jrda_announce_banner_dismissed';
 
@@ -51,7 +51,7 @@ const WorkInProgressBanner = () => {
   if (dismissed) return null;
 
   return html`
-    <div className="bg-sky-50 border-b border-sky-400">
+    <div className="archive-notice archive-announcement">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center gap-3">
           <${Sparkles} className="w-5 h-5 text-sky-600 flex-shrink-0" />
@@ -70,7 +70,7 @@ const WorkInProgressBanner = () => {
                and the focus ring covers keyboard users. -->
           <button
             onClick=${handleDismiss}
-            className="flex-shrink-0 flex items-center justify-center p-3 text-sky-600 hover:text-sky-800 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500"
+            className="archive-action archive-action--quiet archive-announcement__close flex-shrink-0 flex items-center justify-center p-3"
             aria-label="Dismiss banner"
           >
             <${X} className="w-5 h-5" />

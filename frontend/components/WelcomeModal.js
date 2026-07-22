@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { html } from '../html.js?v=3.8.0';
+import { html } from '../html.js?v=3.8.1';
 import { Archive, ArrowRight, X } from 'lucide-react';
 import {
   readTourState,
   recordTourOutcome,
   shouldShowTourEntry,
   TOUR_OUTCOMES,
-} from '../services/tourState.js?v=3.8.0';
+} from '../services/tourState.js?v=3.8.1';
 
 const getStorage = () => {
   try {
@@ -44,13 +44,13 @@ const WelcomeModal = ({ onStart }) => {
 
   return html`
     <aside
-      className="fixed z-40 bottom-4 right-4 w-full max-w-[calc(100vw-2rem)] sm:max-w-md bg-[#fdfbf7] border-2 border-stone-800 shadow-xl p-4 animate-fade-in"
+      className="archive-panel archive-panel--accent archive-welcome-panel fixed z-40 bottom-4 right-4 w-full max-w-[calc(100vw-2rem)] sm:max-w-md p-4"
       aria-labelledby="welcome-title"
       aria-describedby="welcome-description"
     >
       <button
         onClick=${handleDismiss}
-        className="absolute top-2 right-2 p-3 text-stone-500 hover:text-stone-900 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500"
+        className="archive-action archive-action--quiet archive-welcome-panel__close absolute top-2 right-2 p-3"
         aria-label="Dismiss Start here invitation"
       >
         <${X} className="w-5 h-5" aria-hidden="true" />
@@ -70,14 +70,14 @@ const WelcomeModal = ({ onStart }) => {
       <div className="flex flex-wrap items-center gap-2 mt-4">
         <button
           onClick=${handleStart}
-          className="group inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold text-white bg-stone-900 font-display transition-colors hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+          className="archive-action archive-action--primary group py-3"
         >
           <span>Start here</span>
           <${ArrowRight} className="w-4 h-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
         </button>
         <button
           onClick=${handleDismiss}
-          className="inline-flex items-center justify-center px-4 py-3 text-sm font-bold text-stone-600 font-display transition-colors hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+          className="archive-action archive-action--quiet py-3"
         >
           Maybe later
         </button>

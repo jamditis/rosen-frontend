@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { html } from '../html.js?v=3.8.0';
+import { html } from '../html.js?v=3.8.1';
 import {
   AlertCircle,
   ArrowLeft,
@@ -15,7 +15,8 @@ import {
   Search,
   Sparkles
 } from 'lucide-react';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.0';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.1';
+import ArchiveRouteHeader from './ArchiveRouteHeader.js?v=3.8.1';
 
 const normalizeTitle = (title = '') => title
   .toLowerCase()
@@ -98,7 +99,7 @@ export const SelectedFindings = ({
               key=${record.id}
               type="button"
               onClick=${() => onSelectRecord && onSelectRecord(record.id)}
-              className="group flex flex-col border border-stone-200 bg-white p-5 text-left shadow-sm transition-all hover:border-stone-800 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+              className="archive-panel archive-path-card group flex flex-col p-5 text-left"
               aria-label=${`Open ${record.title} in the archive`}
             >
               <span className="mb-4 flex w-full items-center justify-between border-b border-stone-200 pb-2 font-body text-[10px] font-bold uppercase tracking-wider text-stone-500">
@@ -115,13 +116,13 @@ export const SelectedFindings = ({
           `)}
         </div>
       ` : html`
-        <div className="border border-stone-200 bg-white p-6">
+        <div className="archive-panel">
           <p className="font-body text-sm leading-relaxed text-stone-600">Curated records will appear here once the archive data has loaded. You can still search or browse the full collection now.</p>
           <div className="mt-4">
             <button
               type="button"
               onClick=${onBrowseArchive}
-              className="inline-flex items-center justify-center gap-2 bg-stone-900 px-5 py-3 font-display text-sm font-bold text-white transition-colors hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+              className="archive-action archive-action--primary"
             >
               <${Search} className="h-4 w-4" aria-hidden="true" />
               Browse the archive
@@ -185,7 +186,7 @@ const StartHerePage = ({
     <button
       type="button"
       onClick=${() => navigate(route)}
-      className="inline-flex items-center justify-center gap-2 bg-stone-900 px-5 py-3 font-display text-sm font-bold text-white transition-colors hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+      className="archive-action archive-action--primary"
     >
       <${Icon} className="h-4 w-4" aria-hidden="true" />
       ${label}
@@ -206,30 +207,19 @@ const StartHerePage = ({
   `;
 
   return html`
-    <div className=${`${embedded ? 'desktop-start-here-embedded' : 'min-h-screen'} bg-[#fdfbf7]`}>
-      ${!embedded && html`<header className="sticky top-0 z-50 border-b border-stone-300 bg-paper shadow-sm">
-        <div className="container mx-auto flex h-16 items-center px-4">
-          <button
-            type="button"
-            onClick=${onBack}
-            className="flex items-center gap-2 px-1 py-3 text-sm font-bold text-stone-600 transition-colors hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
-          >
-            <${ArrowLeft} className="h-4 w-4" aria-hidden="true" />
-            Back to archive
-          </button>
-        </div>
-      </header>`}
+    <div className=${`${embedded ? 'desktop-start-here-embedded' : 'min-h-screen archive-canvas'}`}>
+      ${!embedded && html`<${ArchiveRouteHeader} onBack=${onBack} sectionTitle="Start here" />`}
 
       <${ContentTag}
         id=${embedded ? undefined : 'main-content'}
         className=${`container mx-auto max-w-5xl px-4 ${embedded ? 'py-6 md:py-8' : 'py-8 md:py-16'}`}
       >
-        <section aria-labelledby=${embedded ? undefined : 'start-here-title'} className="mb-12 border-b-2 border-stone-800 pb-8">
+        <section aria-labelledby=${embedded ? undefined : 'start-here-title'} className="archive-orientation-hero mb-12 pb-8">
           <div className="mb-4 flex items-center gap-3">
             <div className="bg-stone-900 p-2 text-white">
               <${Compass} className="h-6 w-6" aria-hidden="true" />
             </div>
-            <p className="font-body text-xs font-bold uppercase tracking-wider text-stone-500">Visitor guide</p>
+            <p className="archive-section-label">Visitor guide</p>
           </div>
           <h1 ref=${titleRef} tabIndex="-1" data-route-entry-focus id="start-here-title" className="max-w-3xl font-display text-3xl font-bold leading-tight text-stone-900 outline-none md:text-5xl">
             Start here
@@ -243,7 +233,7 @@ const StartHerePage = ({
             ${!embedded && html`<button
               type="button"
               onClick=${() => navigate('desktop')}
-              className="inline-flex items-center justify-center gap-2 border-2 border-stone-800 bg-white px-5 py-3 font-display text-sm font-bold text-stone-900 transition-colors hover:bg-stone-100 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+              className="archive-action archive-action--secondary"
             >
               <${Monitor} className="h-4 w-4" aria-hidden="true" />
               Explore the archive desktop
@@ -273,7 +263,7 @@ const StartHerePage = ({
               href="#guide"
               onClick=${(event) => { event.preventDefault(); scrollTo('guide'); }}
               aria-controls="guide"
-              className="group border border-stone-200 bg-white p-6 text-left shadow-sm transition-all hover:border-stone-800 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+              className="archive-panel archive-path-card group text-left"
             >
               <${Compass} className="mb-4 h-6 w-6 text-sky-700" aria-hidden="true" />
               <span className="block font-display text-xl font-bold text-stone-900">Learn how the archive works</span>
@@ -285,7 +275,7 @@ const StartHerePage = ({
               href="#highlights"
               onClick=${(event) => { event.preventDefault(); scrollTo('highlights'); }}
               aria-controls="highlights"
-              className="group border border-stone-200 bg-white p-6 text-left shadow-sm transition-all hover:border-stone-800 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+              className="archive-panel archive-path-card group text-left"
             >
               <${Sparkles} className="mb-4 h-6 w-6 text-amber-700" aria-hidden="true" />
               <span className="block font-display text-xl font-bold text-stone-900">Show me the highlights</span>
@@ -296,7 +286,7 @@ const StartHerePage = ({
             <button
               type="button"
               onClick=${() => navigate('entities')}
-              className="group border border-stone-200 bg-white p-6 text-left shadow-sm transition-all hover:border-stone-800 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+              className="archive-panel archive-path-card group text-left"
             >
               <${Network} className="mb-4 h-6 w-6 text-stone-700" aria-hidden="true" />
               <span className="block font-display text-xl font-bold text-stone-900">Research a topic or idea</span>
@@ -313,7 +303,7 @@ const StartHerePage = ({
         />
 
         <section id="guide" aria-labelledby="guide-title" className="mb-16 scroll-mt-24">
-          <details className="border border-stone-300 bg-white px-5 py-2 md:p-8">
+          <details className="archive-panel px-5 py-2 md:p-8">
             <summary className="cursor-pointer py-6 font-display text-stone-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2">
               <span className="block font-body text-xs font-bold uppercase tracking-wider text-stone-500">Complete visitor field guide · 7 sections</span>
               <span id="guide-title" tabIndex="-1" className="mt-1 block text-2xl font-bold outline-none">How to use the archive</span>
@@ -378,7 +368,7 @@ const StartHerePage = ({
               <button
                 type="button"
                 onClick=${onOpenBugReport}
-                className="inline-flex items-center justify-center gap-2 bg-stone-900 px-5 py-3 font-display text-sm font-bold text-white transition-colors hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+                className="archive-action archive-action--primary"
               >
                 <${AlertCircle} className="h-4 w-4" aria-hidden="true" />
                 Report an archive problem
@@ -398,7 +388,7 @@ const StartHerePage = ({
           <a href=${resolveSitePath('features/participate/')} className="archive-action archive-action--primary mt-4 shrink-0 md:mt-0">Ways to participate<${ArrowRight} className="h-4 w-4" aria-hidden="true" /></a>
         <//>
 
-        <section aria-labelledby="continue-title" className="border border-stone-300 bg-white p-6 md:flex md:items-center md:justify-between md:gap-8 md:p-8">
+        <section aria-labelledby="continue-title" className="archive-panel p-6 md:flex md:items-center md:justify-between md:gap-8 md:p-8">
           <div>
             <div className="mb-2 flex items-center gap-2 text-stone-500">
               <${Library} className="h-5 w-5" aria-hidden="true" />
@@ -414,7 +404,7 @@ const StartHerePage = ({
           <button
             type="button"
             onClick=${onBack}
-            className="inline-flex items-center gap-2 px-4 py-3 font-display text-sm font-bold text-stone-600 transition-colors hover:text-stone-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+            className="archive-action archive-action--quiet"
           >
             <${ArrowLeft} className="h-4 w-4" aria-hidden="true" />
             Back to archive

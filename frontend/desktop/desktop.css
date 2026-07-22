@@ -1175,6 +1175,13 @@
   color: #fff;
 }
 
+/* Start here now uses the shared archive action recipe instead of a Tailwind
+   text utility. Preserve its on-dark ink inside the desktop's inherited button
+   color reset. */
+.desktop-guided-panel .archive-action--primary {
+  color: var(--archive-on-dark);
+}
+
 .desktop-mobile-page-title {
   display: none;
 }

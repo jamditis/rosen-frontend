@@ -20,16 +20,24 @@ test('Tools modal uses available square archive styling and a one-column mobile 
   const source = read('frontend/components/ToolsModal.js');
 
   assert.match(source, /grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4/);
-  assert.match(source, /max-w-4xl[^\n]*rounded-none[^\n]*border-2[^\n]*border-stone-800/);
+  assert.match(source, /archive-dialog-backdrop/);
+  assert.match(source, /archive-dialog archive-tools-dialog/);
+  assert.match(source, /archive-panel archive-tool-card/);
   assert.doesNotMatch(source, /rounded-full bg-stone-100/);
 });
 
 test('About page has a compiled responsive H1 and consistent keyboard focus treatment', () => {
   const source = read('frontend/components/AboutPage.js');
+  const routeHeader = read('frontend/components/ArchiveRouteHeader.js');
+  const css = read('frontend/index.css');
 
   assert.match(source, /text-3xl md:text-5xl font-display font-bold/);
-  assert.ok((source.match(/focus:ring-2 focus:ring-sky-500 focus:ring-offset-2/g) || []).length >= 8,
-    'About page controls and links should expose a consistent visible focus ring');
+  assert.match(source, /archive-action archive-action--primary/);
+  assert.match(source, /archive-action archive-action--secondary/);
+  assert.match(routeHeader, /archive-route-header__brand/);
+  assert.match(css, /\.archive-route-header__brand:focus-visible/);
+  assert.match(css, /outline:\s*3px solid var\(--archive-focus\)/,
+    'About page recipe controls and route navigation should expose a visible focus ring');
   assert.ok((source.match(/aria-hidden="true"/g) || []).length >= 9,
     'Decorative About page icons should be hidden from assistive technology');
   assert.doesNotMatch(source, /text-xs text-stone-400 mt-2/,

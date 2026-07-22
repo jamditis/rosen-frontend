@@ -174,7 +174,8 @@ describe('branded report form wiring', () => {
     // zero-build (pre-built Tailwind) and has no min-h-0 class, so minHeight is
     // set inline; asserting the inline style guards against a revert to the
     // inert class that silently breaks scrolling.
-    assert.match(modalSrc, /max-h-\[90vh\] flex flex-col overflow-hidden/);
+    assert.match(modalSrc, /archive-report-dialog__panel flex flex-col overflow-hidden/);
+    assert.match(indexCss, /\.archive-report-dialog__panel\s*\{[\s\S]*max-height:\s*calc\(100dvh - 2rem\)/);
     assert.match(modalSrc, /flex-shrink-0[^"]*px-6 py-4/);
     assert.match(modalSrc, /className="flex-1 overflow-y-auto" style=\$\{\{ minHeight: 0 \}\}>\s*\$\{body\(\)\}/);
   });

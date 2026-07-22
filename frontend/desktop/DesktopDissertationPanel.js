@@ -1,6 +1,6 @@
-import { html } from '../html.js?v=3.8.0';
-import DissertationPage from '../components/DissertationPage.js?v=3.8.0';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.0';
+import { html } from '../html.js?v=3.8.1';
+import DissertationPage from '../components/DissertationPage.js?v=3.8.1';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.1';
 
 const DesktopDissertationPanel = ({ onOpenStandard }) => html`
   <div className="desktop-dissertation-panel">

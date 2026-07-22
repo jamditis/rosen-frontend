@@ -1,8 +1,8 @@
 // ToolsModal.js - Modal with icons for exploring archive tools
 import { useEffect, useRef, useCallback } from 'react';
-import { html } from '../html.js?v=3.8.0';
+import { html } from '../html.js?v=3.8.1';
 import { X, Compass, Map, BookOpen, HelpCircle, BarChart3, BookMarked, Monitor } from 'lucide-react';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.0';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.1';
 
 // Tool definitions with categories
 const TOOLS = {
@@ -27,7 +27,7 @@ const TOOLS = {
   dissertation: [
     {
       id: 'mindmap',
-      name: 'Mind Map',
+      name: 'Mind map',
       description: 'Interactive dissertation structure',
       icon: Map,
       action: 'mindmap', // in-page action
@@ -43,7 +43,7 @@ const TOOLS = {
     },
     {
       id: 'reader',
-      name: 'Dissertation Reader',
+      name: 'Dissertation reader',
       description: 'Read the full text',
       icon: BookMarked,
       href: 'dissertation/reader/',
@@ -53,7 +53,7 @@ const TOOLS = {
   data: [
     {
       id: 'dataviz',
-      name: 'Data Visualization',
+      name: 'Data visualization',
       description: 'Charts and analysis',
       icon: BarChart3,
       href: 'tools/active/dataviz/dataviz.html',
@@ -189,10 +189,10 @@ const ToolsModal = ({ isOpen, onClose, onSelectTool }) => {
       <button
         key=${tool.id}
         onClick=${() => handleToolClick(tool)}
-        className="group relative flex flex-col items-center p-4 sm:p-6 bg-white rounded-none border border-stone-300 hover:border-stone-800 hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+        className="archive-panel archive-tool-card group relative flex flex-col items-center p-4 sm:p-6"
       >
         ${tool.status === 'beta' && html`
-          <span className="absolute top-2 right-2 text-[10px] font-bold uppercase px-2 py-0.5 bg-amber-100 text-amber-700 rounded-none border border-amber-200">
+          <span className="archive-section-label absolute top-2 right-2">
             Beta
           </span>
         `}
@@ -214,7 +214,7 @@ const ToolsModal = ({ isOpen, onClose, onSelectTool }) => {
 
   return html`
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      className="archive-tools-dialog-backdrop archive-dialog-backdrop z-[100]"
       onClick=${handleBackdropClick}
       role="dialog"
       aria-modal="true"
@@ -222,10 +222,10 @@ const ToolsModal = ({ isOpen, onClose, onSelectTool }) => {
     >
       <div
         ref=${modalRef}
-        className="bg-paper w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-none border-2 border-stone-800 shadow-2xl"
+        className="archive-dialog archive-tools-dialog"
         tabIndex="-1"
       >
-        <div className="sticky top-0 bg-paper border-b-2 border-stone-800 px-6 py-4 flex items-center justify-between z-10">
+        <div className="archive-tools-dialog__header sticky top-0 px-6 py-4 flex items-center justify-between z-10">
           <div>
             <h2 id="tools-modal-title" className="font-display text-xl text-stone-800">
               Tools
@@ -237,7 +237,7 @@ const ToolsModal = ({ isOpen, onClose, onSelectTool }) => {
           <button
             ref=${closeButtonRef}
             onClick=${onClose}
-              className="p-3 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-none transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+              className="archive-action archive-action--quiet archive-tools-dialog__close"
               aria-label="Close tools menu"
             >
               <${X} className="w-5 h-5" aria-hidden="true" />
@@ -246,7 +246,7 @@ const ToolsModal = ({ isOpen, onClose, onSelectTool }) => {
 
         <div className="p-6 space-y-8">
           <section>
-            <h3 className="font-display text-sm font-bold text-stone-600 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <h3 className="archive-tools-dialog__section-title">
               <${Compass} className="w-4 h-4" aria-hidden="true" />
               Explore the archive
             </h3>
@@ -256,9 +256,9 @@ const ToolsModal = ({ isOpen, onClose, onSelectTool }) => {
           </section>
 
           <section>
-            <h3 className="font-display text-sm font-bold text-stone-600 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <h3 className="archive-tools-dialog__section-title">
               <${BookOpen} className="w-4 h-4" aria-hidden="true" />
-              Dissertation Tools
+              Dissertation tools
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               ${TOOLS.dissertation.map((tool) => renderToolCard(tool))}
@@ -266,9 +266,9 @@ const ToolsModal = ({ isOpen, onClose, onSelectTool }) => {
           </section>
 
           <section>
-            <h3 className="font-display text-sm font-bold text-stone-600 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <h3 className="archive-tools-dialog__section-title">
               <${BarChart3} className="w-4 h-4" aria-hidden="true" />
-              Data Tools
+              Data tools
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               ${TOOLS.data.map((tool) => renderToolCard(tool))}
@@ -276,9 +276,9 @@ const ToolsModal = ({ isOpen, onClose, onSelectTool }) => {
           </section>
         </div>
 
-        <div className="border-t border-stone-200 px-6 py-4 bg-stone-50">
-          <p className="text-xs text-stone-500 text-center">
-            Tools marked <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-[10px] font-bold">Beta</span> are still in development
+        <div className="archive-notice archive-tools-dialog__notice">
+          <p className="text-xs text-stone-700 text-center">
+            Tools marked <span className="archive-section-label">Beta</span> are still in development
           </p>
         </div>
       </div>

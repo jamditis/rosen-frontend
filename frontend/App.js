@@ -1,37 +1,37 @@
 
 import { Component, Suspense, lazy, useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.8.0';
+import { html } from './html.js?v=3.8.1';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.0';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.0';
-import { withViewTransition } from './utils/viewTransition.js?v=3.8.0';
-import { ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.0';
-import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.0';
-import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.0';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.0';
-import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.0';
-import { resolveSitePath } from './utils/pathResolver.js?v=3.8.0';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.8.0';
-import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.8.0';
-import { sortRecords } from './utils/recordSort.js?v=3.8.0';
-import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.0';
-import Sidebar from './components/Sidebar.js?v=3.8.0';
-import WelcomeModal from './components/WelcomeModal.js?v=3.8.0';
-import RecordView from './components/RecordView.js?v=3.8.0';
-import FeaturedSection from './components/FeaturedSection.js?v=3.8.0';
-import DissertationPage from './components/DissertationPage.js?v=3.8.0';
-import ToolsModal from './components/ToolsModal.js?v=3.8.0';
-import BugReportModal from './components/BugReportModal.js?v=3.8.0';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.0';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.0';
-import EntityBrowser from './components/EntityBrowser.js?v=3.8.0';
-import Timeline from './components/Timeline.js?v=3.8.0';
-import AboutPage from './components/AboutPage.js?v=3.8.0';
-import WikiPage from './components/WikiPage.js?v=3.8.0';
-import StartHerePage from './components/StartHerePage.js?v=3.8.0';
-import ArchiveResults from './components/ArchiveResults.js?v=3.8.0';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.1';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.1';
+import { withViewTransition } from './utils/viewTransition.js?v=3.8.1';
+import { ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.1';
+import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.1';
+import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.1';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.1';
+import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.1';
+import { resolveSitePath } from './utils/pathResolver.js?v=3.8.1';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.8.1';
+import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.8.1';
+import { sortRecords } from './utils/recordSort.js?v=3.8.1';
+import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.1';
+import Sidebar from './components/Sidebar.js?v=3.8.1';
+import WelcomeModal from './components/WelcomeModal.js?v=3.8.1';
+import RecordView from './components/RecordView.js?v=3.8.1';
+import FeaturedSection from './components/FeaturedSection.js?v=3.8.1';
+import DissertationPage from './components/DissertationPage.js?v=3.8.1';
+import ToolsModal from './components/ToolsModal.js?v=3.8.1';
+import BugReportModal from './components/BugReportModal.js?v=3.8.1';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.1';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.1';
+import EntityBrowser from './components/EntityBrowser.js?v=3.8.1';
+import Timeline from './components/Timeline.js?v=3.8.1';
+import AboutPage from './components/AboutPage.js?v=3.8.1';
+import WikiPage from './components/WikiPage.js?v=3.8.1';
+import StartHerePage from './components/StartHerePage.js?v=3.8.1';
+import ArchiveResults from './components/ArchiveResults.js?v=3.8.1';
 
-const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.0'));
+const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.1'));
 
 const NON_RECORD_ROUTES = new Set([
   ROUTES.analytics,
@@ -698,7 +698,7 @@ const App = () => {
   // here used to strand any full-page action that opened the bug report modal,
   // because the modal only existed in the archive shell below.
   const renderFullPage = (page, routeOverlay = null) => html`
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col archive-canvas">
       ${page}
       ${routeOverlay}
       <${BugReportModal}
@@ -831,18 +831,18 @@ const App = () => {
 
       <${WorkInProgressBanner} />
 
-      <header className=${`sticky top-0 z-50 w-full border-b transition-all duration-300 ${
+      <header className=${`archive-site-header sticky top-0 z-50 w-full transition-all duration-300 ${
           isScrolled
-            ? 'bg-paper border-stone-300 shadow-sm'
-            : 'bg-paper/80 backdrop-blur-md border-stone-200'
+            ? 'archive-site-header--scrolled'
+            : ''
       }`}>
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
             <button
               onClick=${() => goTo(ROUTES.archive)}
-              className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
+              className="archive-site-header__brand"
               aria-label="Return to archive home"
             >
-                <div className="bg-stone-900 text-white p-1.5">
+                <div className="archive-site-header__mark">
                     <${Newspaper} className="w-5 h-5" />
                 </div>
                 <h1 className="text-lg md:text-xl font-display font-bold text-stone-900 tracking-tight hidden sm:block">
@@ -851,7 +851,7 @@ const App = () => {
                 <h1 className="text-lg font-display font-bold text-stone-900 sm:hidden">JRIA</h1>
             </button>
 
-            <div className="hidden md:flex items-center gap-6 text-xs text-stone-500 border-l border-r border-stone-200 px-6 h-full">
+            <div className="archive-site-header__stats hidden md:flex items-center gap-6 px-6 h-full">
                 <div className="flex flex-col leading-tight">
                     <span className="font-bold text-stone-900">${records.length}</span>
                     <span>records</span>
@@ -866,14 +866,14 @@ const App = () => {
             <div className="flex items-center gap-4">
                 <button
                   onClick=${() => setToolsModalOpen(true)}
-                  className="sm:hidden p-2 text-stone-600 hover:text-stone-900 hover:bg-stone-100 rounded-md border border-stone-200"
+                  className="archive-action archive-action--quiet archive-site-header__action archive-site-header__tools sm:hidden"
                   aria-label="Tools"
                 >
                     <${Compass} className="w-5 h-5" />
                 </button>
                 <button
                   onClick=${() => goTo(ROUTES.about)}
-                  className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-md transition-colors hidden md:flex items-center gap-1 text-xs"
+                  className="archive-action archive-action--quiet archive-site-header__action archive-site-header__about hidden md:flex"
                   aria-label="About"
                 >
                     <${Info} className="w-4 h-4" />
@@ -881,20 +881,20 @@ const App = () => {
                 </button>
                 <button
                   onClick=${() => { setBugReportIntent('problem'); setBugReportOpen(true); }}
-                  className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded-md transition-colors flex items-center gap-1 text-xs"
+                  className="archive-action archive-action--quiet archive-site-header__action"
                   aria-label="Report a bug"
                   title="Report a bug"
                 >
                     <${Bug} className="w-4 h-4" />
                     <span className="hidden md:inline">Report a bug</span>
                 </button>
-                <a href="https://github.com/jamditis" target="_blank" rel="noreferrer" className="text-stone-500 hover:text-stone-900 transition-colors text-xs hidden md:inline-block">
+                <a href="https://github.com/jamditis" target="_blank" rel="noreferrer" className="archive-site-header__credit">
                     Curated by Joe Amditis
                 </a>
                 ${isArchiveGrid && html`
                     <button
                     onClick=${() => setSidebarOpen(true)}
-                    className="lg:hidden p-2 text-stone-800 hover:bg-stone-100 rounded-md border border-stone-300 relative"
+                    className="archive-site-header__filter lg:hidden p-2 text-stone-800 hover:bg-stone-100 rounded-md border border-stone-300 relative"
                     >
                         <${SlidersHorizontal} className="w-5 h-5" />
                         ${activeFilterCount > 0 && html`
@@ -932,33 +932,33 @@ const App = () => {
             ${isArchiveGrid && html`
                 <div>
                     ${!filters.search && !filters.era && !filters.year && filters.categories.length === 0 && filters.recordIds === null && html`
-                        <section className="mb-6 pb-4 border-b border-stone-200">
+                        <section className="archive-tools-strip archive-density--compact mb-6">
                             <div className="flex flex-wrap items-center gap-2">
-                                <span className="text-xs text-stone-500 mr-1">Tools:</span>
+                                <span className="archive-section-label mr-1">Tools</span>
                                 <button
                                     onClick=${() => goTo(ROUTES.dissertation)}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
+                                    className="archive-action archive-action--quiet"
                                 >
                                     <${BookOpen} className="w-3.5 h-3.5" />
                                     Mind Map
                                 </button>
                                 <button
                                     onClick=${() => goTo(ROUTES.entities)}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
+                                    className="archive-action archive-action--quiet"
                                 >
                                     <${Users} className="w-3.5 h-3.5" />
                                     Entities
                                 </button>
                                 <button
                                     onClick=${() => goTo(ROUTES.analytics)}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-50 transition-all text-xs font-medium text-stone-600 hover:text-stone-800"
+                                    className="archive-action archive-action--quiet"
                                 >
                                     <${BarChart3} className="w-3.5 h-3.5" />
                                     Analytics
                                 </button>
                                 <button
                                     onClick=${() => setToolsModalOpen(true)}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-stone-100 rounded-full border border-stone-200 hover:border-stone-400 hover:bg-stone-200 transition-all text-xs font-medium text-stone-500 hover:text-stone-700"
+                                    className="archive-action archive-action--quiet"
                                 >
                                     <${Compass} className="w-3.5 h-3.5" />
                                     More
@@ -1079,29 +1079,29 @@ const App = () => {
       `}
       </div>
 
-      <footer className="border-t border-stone-200 bg-stone-50 mt-auto">
+      <footer className="archive-site-footer mt-auto">
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-sm text-stone-600">
             <div>
-              <h4 className="font-display font-bold text-stone-900 mb-2">Jay Rosen's Internet Archive</h4>
+              <h4 className="archive-site-footer__heading">Jay Rosen's Internet Archive</h4>
               <p className="text-xs leading-relaxed">
                 A curated public collection of the works, critiques, and teachings of Jay Rosen, professor of journalism at New York University.
               </p>
             </div>
             <div>
-              <h4 className="font-display font-bold text-stone-900 mb-2">Sections</h4>
+              <h4 className="archive-site-footer__heading">Sections</h4>
               <div className="space-y-1 text-xs">
-                <button onClick=${() => goTo(ROUTES.start)} className="block hover:text-stone-900 transition-colors">Start here</button>
-                <a href=${resolveSitePath('features/participate/')} className="block hover:text-stone-900 transition-colors">Ways to participate</a>
-                <button onClick=${() => goTo(ROUTES.archive)} className="block hover:text-stone-900 transition-colors">Browse archive</button>
-                <button onClick=${() => goTo(ROUTES.dissertation)} className="block hover:text-stone-900 transition-colors">Dissertation mind map</button>
-                <button onClick=${() => goTo(ROUTES.entities)} className="block hover:text-stone-900 transition-colors">Entity browser</button>
-                <button onClick=${() => goTo(ROUTES.analytics)} className="block hover:text-stone-900 transition-colors">Analytics dashboard</button>
-                <button onClick=${() => goTo(ROUTES.about)} className="block hover:text-stone-900 transition-colors">About this archive</button>
+                <button onClick=${() => goTo(ROUTES.start)} className="archive-site-footer__link">Start here</button>
+                <a href=${resolveSitePath('features/participate/')} className="archive-site-footer__link">Ways to participate</a>
+                <button onClick=${() => goTo(ROUTES.archive)} className="archive-site-footer__link">Browse archive</button>
+                <button onClick=${() => goTo(ROUTES.dissertation)} className="archive-site-footer__link">Dissertation mind map</button>
+                <button onClick=${() => goTo(ROUTES.entities)} className="archive-site-footer__link">Entity browser</button>
+                <button onClick=${() => goTo(ROUTES.analytics)} className="archive-site-footer__link">Analytics dashboard</button>
+                <button onClick=${() => goTo(ROUTES.about)} className="archive-site-footer__link">About this archive</button>
               </div>
             </div>
             <div>
-              <h4 className="font-display font-bold text-stone-900 mb-2">Credits</h4>
+              <h4 className="archive-site-footer__heading">Credits</h4>
               <p className="text-xs leading-relaxed mb-2">
                 Curated by <a href="https://github.com/jamditis" target="_blank" rel="noreferrer" className="text-stone-900 font-bold hover:underline">Joe Amditis</a>
               </p>

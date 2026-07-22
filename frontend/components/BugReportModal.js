@@ -16,11 +16,11 @@
 // decorative italics, one primary action.
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { html } from '../html.js?v=3.8.0';
+import { html } from '../html.js?v=3.8.1';
 import { X, Bug, Lightbulb, Send, CheckCircle2, AlertCircle, ExternalLink } from 'lucide-react';
-import { ARCHIVE_VERSION, openReportFallback } from '../utils/bugReport.js?v=3.8.0';
-import { createSubmitGate } from '../utils/submitGate.js?v=3.8.0';
-import { buildReportPayload, validateReport, submitReport, newReportKey } from '../utils/reportSubmit.js?v=3.8.0';
+import { ARCHIVE_VERSION, openReportFallback } from '../utils/bugReport.js?v=3.8.1';
+import { createSubmitGate } from '../utils/submitGate.js?v=3.8.1';
+import { buildReportPayload, validateReport, submitReport, newReportKey } from '../utils/reportSubmit.js?v=3.8.1';
 
 const EMPTY_FIELDS = {
   whatHappened: '',
@@ -228,10 +228,10 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
       onClick=${() => { setIntent(value); setFormError(''); }}
       disabled=${submitting}
       aria-pressed=${intent === value}
-      className=${`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold rounded-md border transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 disabled:opacity-60 disabled:cursor-not-allowed ${
+      className=${`archive-action flex-1 ${
         intent === value
-          ? 'bg-stone-900 text-white border-stone-900'
-          : 'bg-white text-stone-600 border-stone-300 hover:border-stone-400 hover:text-stone-900'
+          ? 'archive-action--primary'
+          : 'archive-action--secondary'
       }`}
     >
       <${Icon} className="w-4 h-4" aria-hidden="true" />
@@ -249,7 +249,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
         disabled=${submitting}
         rows=${rows}
         placeholder=${placeholder}
-        className="w-full px-3 py-2 border border-stone-300 rounded-sm bg-white text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-stone-400 disabled:opacity-60 disabled:cursor-not-allowed"
+        className="archive-control"
       ></textarea>
     </label>
   `;
@@ -264,7 +264,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
         onInput=${(e) => setField(name, e.target.value)}
         disabled=${submitting}
         placeholder=${placeholder}
-        className="w-full px-3 py-2 border border-stone-300 rounded-sm bg-white text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-stone-400 disabled:opacity-60 disabled:cursor-not-allowed"
+        className="archive-control"
       />
     </label>
   `;
@@ -292,7 +292,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
             <button
               type="button"
               onClick=${onClose}
-              className="px-4 py-2 bg-stone-900 text-white rounded-sm text-sm font-bold hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="archive-action archive-action--primary"
             >
               Done
             </button>
@@ -318,14 +318,14 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
             <button
               type="button"
               onClick=${() => { openFallback(); onClose(); }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-stone-900 text-white rounded-sm text-sm font-bold hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="archive-action archive-action--primary"
             >
               Open the issue form <${ExternalLink} className="w-4 h-4" aria-hidden="true" />
             </button>
             <button
               type="button"
               onClick=${onClose}
-              className="text-sm font-bold text-stone-600 hover:text-stone-900 underline"
+              className="archive-action archive-action--quiet"
             >
               Cancel
             </button>
@@ -353,7 +353,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
             <button
               type="button"
               onClick=${() => setPhase('form')}
-              className="px-4 py-2 bg-stone-900 text-white rounded-sm text-sm font-bold hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              className="archive-action archive-action--primary"
             >
               Try again
             </button>
@@ -414,14 +414,14 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
             type="button"
             onClick=${() => { openFallback(); onClose(); }}
             disabled=${submitting}
-            className="text-xs text-stone-500 hover:text-stone-800 underline disabled:opacity-60 disabled:cursor-not-allowed disabled:no-underline"
+            className="archive-action archive-action--quiet"
           >
             Prefer GitHub? Open the issue form
           </button>
           <button
             type="submit"
             disabled=${submitting}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-stone-900 text-white rounded-sm text-sm font-bold hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-sky-500 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="archive-action archive-action--primary"
           >
             <${Send} className="w-4 h-4" aria-hidden="true" />
             ${submitting ? 'Sending...' : 'Send report'}
@@ -433,14 +433,14 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
 
   return html`
     <div
-      className="archive-report-dialog fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      className="archive-report-dialog archive-dialog-backdrop z-[100]"
       onClick=${handleBackdrop}
       role="dialog"
       aria-modal="true"
       aria-labelledby="bug-report-title"
     >
-      <div ref=${modalRef} className="bg-paper w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden rounded-lg shadow-2xl">
-        <div className="flex-shrink-0 bg-paper border-b border-stone-200 px-6 py-4 flex items-center justify-between gap-4">
+      <div ref=${modalRef} className="archive-dialog archive-report-dialog__panel flex flex-col overflow-hidden">
+        <div className="archive-report-dialog__header flex-shrink-0 px-6 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <${Bug} className="w-5 h-5 text-stone-700 flex-shrink-0" aria-hidden="true" />
             <h2 id="bug-report-title" className="font-display text-xl text-stone-800">
@@ -451,7 +451,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
             ref=${closeButtonRef}
             onClick=${requestClose}
             disabled=${submitting}
-            className="archive-report-dialog-close flex-shrink-0 p-2 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="archive-action archive-action--quiet archive-report-dialog-close flex-shrink-0"
             aria-label="Close report form"
           >
             <${X} className="w-5 h-5" aria-hidden="true" />
