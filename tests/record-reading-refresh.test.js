@@ -48,6 +48,7 @@ describe('archival record-reading surfaces', () => {
     );
     assert.match(recordModal, /closeButtonRef\.current\?\.focus/);
     assert.match(recordModal, /if \(!hasRecord \|\| nestedDialogOpen\) return undefined/);
+    assert.match(recordModal, /if \(nestedDialogOpen\) return undefined;[\s\S]*opener\?\.isConnected/);
     assert.match(recordModal, /if \(openerRef\.current\) return undefined/);
     assert.match(recordModal, /e\.key === 'Tab'/);
     assert.match(recordModal, /document\.activeElement !== document\.body/);
@@ -76,8 +77,12 @@ describe('archival record-reading surfaces', () => {
     assert.match(app, /initialFields=\$\{bugReportInitialFields\}/);
     assert.match(bugReport, /initialFields\s*=\s*NO_INITIAL_FIELDS/);
     assert.match(bugReport, /\{ \.\.\.EMPTY_FIELDS, \.\.\.initialFields \}/);
+    assert.match(bugReport, /reportContextRef\.current = captureContext\(\)/);
+    assert.match(bugReport, /context: reportContextRef\.current/);
     assert.match(audit, /Record problem report auto-filled its required description/);
     assert.match(audit, /Record problem report lost the record id from its captured page context/);
+    assert.match(audit, /Record close moved focus outside its nested report/);
+    assert.match(audit, /Nested report lost its original record context after browser Back/);
   });
 
   it('waits for detail-only attribution before enabling citation copy', () => {

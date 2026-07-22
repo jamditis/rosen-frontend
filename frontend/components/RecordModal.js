@@ -264,6 +264,11 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
 
   useEffect(() => {
     if (!isOpen) {
+      // Browser Back can dismiss the record while its report stays open above
+      // it. Leave focus and the saved opener alone until that topmost dialog
+      // closes; focusing through the report would break its modal boundary.
+      if (nestedDialogOpen) return undefined;
+
       const opener = openerRef.current;
       const openerWindow = opener?.closest('.desktop-window');
       // A history traversal can close the record and activate a different

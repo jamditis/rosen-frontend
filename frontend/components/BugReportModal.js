@@ -35,8 +35,9 @@ const EMPTY_FIELDS = {
 
 const NO_INITIAL_FIELDS = Object.freeze({});
 
-// Read the debug context the reporter should not have to type. Kept in a helper
-// so it is captured fresh at submit time (route + any open ?record= are current).
+// Read the debug context the reporter should not have to type. The modal
+// snapshots this once per opening so later history navigation cannot erase the
+// record or route the reader was reporting from.
 const captureContext = () => ({
   page: typeof window !== 'undefined' ? window.location.href : '',
   version: ARCHIVE_VERSION,
@@ -59,6 +60,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
   const firstFieldRef = useRef(null);
   const returnFocusRef = useRef(null);
   const wasOpenRef = useRef(false);
+  const reportContextRef = useRef(captureContext());
   // Owns the submit lifecycle: blocks a synchronous double-submit, allows a fresh
   // submit after reopen, and drops a stale in-flight result. Pure + unit-tested
   // in submitGate.js so these races cannot silently regress. useRef with an
@@ -71,6 +73,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
   useEffect(() => {
     if (isOpen) {
       gateRef.current.reset();
+      reportContextRef.current = captureContext();
       setIntent(initialIntent === 'record' ? 'record' : 'problem');
       setFields({ ...EMPTY_FIELDS, ...initialFields });
       setHoneypot('');
@@ -179,14 +182,14 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
   // Open the intent-aware GitHub fallback, carrying what the reader entered so
   // a record suggestion does not land on the bug form and lose its url/title/why.
   const openFallback = useCallback(
-    () => openReportFallback({ intent, fields, context: captureContext() }),
+    () => openReportFallback({ intent, fields, context: reportContextRef.current }),
     [intent, fields],
   );
 
   const handleSubmit = useCallback(async (e) => {
     if (e && e.preventDefault) e.preventDefault();
 
-    const payload = buildReportPayload({ intent, fields, context: captureContext(), honeypot, idempotencyKey: reportKey });
+    const payload = buildReportPayload({ intent, fields, context: reportContextRef.current, honeypot, idempotencyKey: reportKey });
 
     const check = validateReport(payload);
     if (!check.valid) { setFormError(check.error); return; }

@@ -40,7 +40,8 @@ describe('branded report form wiring', () => {
     // the bug template (which would drop its url/title/why), so the modal calls
     // the intent-aware openReportFallback rather than a bug-only deep link.
     assert.match(modalSrc, /import \{ ARCHIVE_VERSION, openReportFallback \} from '\.\.\/utils\/bugReport\.js\?v=/);
-    assert.match(modalSrc, /openReportFallback\(\{ intent, fields, context: captureContext\(\) \}\)/);
+    assert.match(modalSrc, /reportContextRef\.current = captureContext\(\)/);
+    assert.match(modalSrc, /openReportFallback\(\{ intent, fields, context: reportContextRef\.current \}\)/);
   });
 
   it('routes a backend fallback to a user-clicked screen, not an auto popup', () => {

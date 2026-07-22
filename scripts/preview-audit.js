@@ -489,12 +489,38 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       const recordDialog = page.locator('.archive-record-dialog[role="dialog"]');
       await recordDialog.waitFor({ state: 'hidden' });
       await reportDialog.waitFor();
+      const nestedReportState = await reportDialog.evaluate((element) => ({
+        focusInside: element.contains(document.activeElement),
+        page: window.location.href,
+      }));
+      if (!nestedReportState.focusInside) {
+        throw new Error(`Record close moved focus outside its nested report: ${JSON.stringify(nestedReportState)}`);
+      }
       const nestedOverflow = await page.evaluate(() => document.body.style.overflow);
       if (nestedOverflow !== 'hidden') {
         throw new Error('Nested report lost its body scroll lock after browser Back');
       }
-      await page.keyboard.press('Escape');
+      await page.evaluate(() => {
+        window.__previewOriginalOpen = window.open;
+        window.__previewReportFallbackUrl = '';
+        window.open = (url) => {
+          window.__previewReportFallbackUrl = String(url);
+          return null;
+        };
+      });
+      await reportDialog.getByRole('button', { name: 'Prefer GitHub? Open the issue form' }).click();
       await reportDialog.waitFor({ state: 'hidden' });
+      const fallbackUrl = await page.evaluate(() => {
+        const url = window.__previewReportFallbackUrl;
+        window.open = window.__previewOriginalOpen;
+        delete window.__previewOriginalOpen;
+        delete window.__previewReportFallbackUrl;
+        return url;
+      });
+      const capturedReportPage = new URL(fallbackUrl).searchParams.get('page-context');
+      if (new URL(capturedReportPage).searchParams.get('record') !== 'RECORD-00802') {
+        throw new Error(`Nested report lost its original record context after browser Back: ${capturedReportPage}`);
+      }
       const releasedOverflow = await page.evaluate(() => document.body.style.overflow);
       if (releasedOverflow === 'hidden') {
         throw new Error('Nested report restored a stale body scroll lock after browser Back');
