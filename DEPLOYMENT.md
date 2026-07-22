@@ -30,7 +30,7 @@ frontend/                           # React application
   services/                         # archiveService, router, sqliteService
   utils/                            # Design tokens
   vendor/                           # Self-hosted sql.js wasm (sql-wasm-1.10.3.wasm)
-  design-system/                    # CSS tokens, demo
+  design-system/                    # Semantic CSS tokens, interface recipes, demo
 
 data/                               # Published archive data and shared taxonomy
   archive-core.json                 # Lightweight record cards (loads on page load)
@@ -159,6 +159,23 @@ would remain stale until the next full deploy.
 ## Version cache busting
 
 Before committing and uploading a release, run `npm run bump-version -- X.X.X` to stamp the `?v=X.X.X` query parameter on versioned JS/CSS references in the root app, FAQ, and standalone feature pages. Commit those stamps with the release so the full-site upload contains them. The command also updates `version.json` and bumps `frontend/sw.js` `CACHE_VERSION` to the same value. The stable root `sw.js` bridge imports that implementation so it can control the whole archive subtree. The service worker serves static JS cache-first with `ignoreSearch: true`, so a `?v=` bump alone does not invalidate it — only a `CACHE_VERSION` change drops the stale service-worker cache, so returning visitors keep running old JS until it bumps. `tests/version-consistency.test.js` enforces the complete marker surface and cache version stay in lockstep.
+
+The design-system `legacy-token-bridge.css` uses a distinct pathname so the
+previous worker cannot substitute its cached `tokens.css` for it. Keep the
+bridge immediately before `tokens.css` in documents that consume shared
+recipes; it supplies safe semantic fallbacks during the first navigation after
+a worker update, and the current canonical token file overrides it afterward.
+
+## GitHub Pages release-candidate check
+
+GitHub Pages publishes the repository root from `main` at
+`https://jamditis.github.io/rosen-frontend/`. It serves the same zero-build
+files that the FTP deploy uploads; the path resolver supplies the Pages
+subdirectory instead of the PressThink subdirectory. After a visual change
+merges, use that site as the release-candidate preview before assembling or
+uploading an FTP package. Check the changed routes at mobile and desktop
+widths, then package the same committed files without rebuilding or rewriting
+them.
 
 ### Optional desktop release check
 

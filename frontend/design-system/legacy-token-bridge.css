@@ -1,0 +1,75 @@
+/**
+ * Previous-worker token bridge
+ *
+ * A returning visitor can receive the prior release's cached tokens.css during
+ * the first navigation after a deploy. This new, uncached pathname supplies
+ * the semantic roles recipes need until the updated worker takes control.
+ * Canonical values in tokens.css load immediately after and override these.
+ */
+
+:root {
+  --archive-canvas: var(--color-paper, #fdfbf7);
+  --archive-paper: var(--color-card, #fffefa);
+  --archive-paper-deep: var(--color-surface-muted, #f3eee3);
+  --archive-ink: var(--color-text-primary, #1c1917);
+  --archive-ink-soft: var(--color-text-secondary, #44403c);
+  --archive-ink-muted: var(--color-text-tertiary, #57534e);
+  --archive-ink-faint: var(--color-text-muted, #78716c);
+  --archive-rule-subtle: var(--color-border-subtle, #e7e5e4);
+  --archive-rule: var(--color-border-medium, #d6d3d1);
+  --archive-rule-strong: var(--color-border-dark, #a8a29e);
+  --archive-rule-dark: var(--color-border-darkest, #78716c);
+  --archive-hero: #121b18;
+  --archive-on-dark: #fdfbf7;
+  --archive-backdrop: rgba(18, 27, 24, 0.72);
+
+  --archive-signal: var(--color-accent-amber, #f2bd49);
+  --archive-signal-soft: var(--color-accent-amber-light, #fbf1d8);
+  --archive-signal-dark: var(--color-accent-amber-dark, #6f4300);
+  --archive-manila: var(--color-accent-amber-light, #e8dfc8);
+  --archive-manila-edge: var(--color-border-medium, #c9bda0);
+  --archive-sky: var(--color-accent-sky, #5aa9c9);
+  --archive-sky-soft: var(--color-accent-sky-light, #e7f4f8);
+  --archive-sky-dark: var(--color-accent-sky-dark, #1a3a4d);
+  --archive-amber: var(--color-accent-amber, #d89824);
+  --archive-amber-soft: var(--color-accent-amber-light, #fbf1d8);
+  --archive-amber-dark: var(--color-accent-amber-dark, #6f4300);
+  --archive-green: var(--color-accent-green, #548873);
+  --archive-green-soft: var(--color-accent-green-light, #e7f1ec);
+  --archive-green-dark: var(--color-accent-green-dark, #1f4d3e);
+  --archive-violet: var(--color-accent-violet, #6b5b7a);
+  --archive-violet-soft: var(--color-accent-violet-light, #e3dfe8);
+  --archive-violet-dark: var(--color-accent-violet-dark, #3d3447);
+  --archive-rose: var(--color-accent-rose, #a65d66);
+  --archive-rose-soft: var(--color-accent-rose-light, #ecdfe1);
+  --archive-rose-dark: var(--color-accent-rose-dark, #5f3439);
+  --archive-orange: var(--color-accent-orange, #c17a3a);
+  --archive-orange-soft: var(--color-accent-orange-light, #ede3d6);
+  --archive-orange-dark: var(--color-accent-orange-dark, #7a4a23);
+
+  --archive-link: var(--color-link, #075985);
+  --archive-link-hover: var(--color-link-hover, #0c4a6e);
+  --archive-focus: var(--color-focus, #0369a1);
+  --archive-danger: var(--color-error, #b42318);
+  --archive-danger-soft: #fbe9e7;
+  --archive-success: var(--color-success, #2f6a4f);
+  --archive-success-soft: #e7f1ec;
+  --archive-warning: var(--color-warning, #8a5100);
+  --archive-warning-soft: #fbf1d8;
+  --archive-info: var(--color-info, #1a3a4d);
+  --archive-info-soft: #e7f4f8;
+  --archive-selection: var(--color-selection-bg, #fef08a);
+
+  --archive-target-min: 2.75rem;
+  --archive-content-narrow: 42rem;
+  --archive-content-wide: 76rem;
+  --archive-shadow-small: var(--shadow-sm, 0 1px 2px rgba(28, 25, 23, 0.08));
+  --archive-shadow-medium: var(--shadow-lg, 0 0.5rem 1.5rem rgba(28, 25, 23, 0.11));
+  --archive-shadow-large: var(--shadow-2xl, 0 1rem 3rem rgba(18, 27, 24, 0.2));
+  --archive-shadow-offset: var(--shadow-offset, 0.45rem 0.45rem 0 rgba(28, 25, 23, 0.13));
+  --archive-shadow-offset-signal: 0.55rem 0.55rem 0 rgba(242, 189, 73, 0.34);
+  --archive-density-control-block: 0.75rem;
+  --archive-density-control-inline: 1.125rem;
+  --archive-density-panel: 1.5rem;
+  --archive-density-gap: 1rem;
+}

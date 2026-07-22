@@ -268,7 +268,7 @@ Override the port with `PREVIEW_PORT=8765 npm run preview`. The server binds to 
 npm run preview:audit                 # Mobile + desktop, key routes, axe-core scan
 ```
 
-Spawns the preview server, walks 31 route states at mobile, tablet, and desktop
+Spawns the preview server, walks 32 route states at mobile, tablet, and desktop
 viewports, runs `axe-core` for WCAG 2.1 AA, and writes
 `preview-audit-results/axe-report.html` plus per-route screenshots under
 `preview-audit-results/screenshots/{viewport}/`. Exits non-zero if any

@@ -31,8 +31,8 @@ const VERSION_MARKER = /\?v=\d+\.\d+\.\d+/g;
 // rewritten, and only in sw.js (cacheConfig.js's non-semver 'v9' never matches).
 const SW_CACHE_VERSION = /(const CACHE_VERSION\s*=\s*['"])\d+\.\d+\.\d+(['"])/;
 
-// Collect the root entry point and every browser JavaScript/HTML file in the
-// app and standalone-page trees. This is the same surface the
+// Collect the root entry point and every browser JavaScript, HTML, and CSS file
+// in the app and standalone-page trees. This is the same surface the
 // version-consistency test scans, so the guardrail and bumper cannot disagree.
 // Walking features/ (rather than naming today's feature pages) ensures a new
 // standalone feature automatically joins the version-bump surface.
@@ -51,9 +51,9 @@ export function collectVersionedFiles(rootDir) {
       }
     }
   };
-  walk(path.join(rootDir, 'frontend'), ['.js']);
-  walk(path.join(rootDir, 'faq'), ['.html', '.js']);
-  walk(path.join(rootDir, 'features'), ['.html', '.js']);
+  walk(path.join(rootDir, 'frontend'), ['.html', '.js', '.css']);
+  walk(path.join(rootDir, 'faq'), ['.html', '.js', '.css']);
+  walk(path.join(rootDir, 'features'), ['.html', '.js', '.css']);
   return files;
 }
 

@@ -88,6 +88,23 @@ describe('stampVersion', () => {
     assert.ok(collected.includes('features/example/script.js'));
   });
 
+  it('stamps frontend design-system HTML and CSS references', () => {
+    write('frontend/design-system/demo.html', [
+      '<link rel="stylesheet" href="./tokens.css?v=1.0.0">',
+      '<link rel="stylesheet" href="./recipes.css?v=1.0.0">',
+    ].join('\n'));
+    write('frontend/design-system/recipes.css', '@import url("./tokens.css?v=1.0.0");\n');
+
+    stampVersion(root, '2.3.4');
+
+    assert.match(read('frontend/design-system/demo.html'), /tokens\.css\?v=2\.3\.4/);
+    assert.match(read('frontend/design-system/demo.html'), /recipes\.css\?v=2\.3\.4/);
+    assert.match(read('frontend/design-system/recipes.css'), /tokens\.css\?v=2\.3\.4/);
+    const collected = collectVersionedFiles(root).map((f) => path.relative(root, f));
+    assert.ok(collected.includes('frontend/design-system/demo.html'));
+    assert.ok(collected.includes('frontend/design-system/recipes.css'));
+  });
+
   it('leaves the data-cache CACHE_VERSION (cacheConfig.js) untouched', () => {
     stampVersion(root, '2.3.4');
     // cacheConfig's 'v9' is not semver, so the anchored sw.js regex can't match
