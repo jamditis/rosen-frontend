@@ -1,8 +1,9 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { html } from '../html.js?v=3.8.1';
-import { X, Search, XCircle, ChevronDown, ChevronUp, MessageSquare } from 'lucide-react';
-import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.8.1';
+import { html } from '../html.js?v=3.8.2';
+import { X, Search, XCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.8.2';
+import { CONTENT_TYPE_OPTIONS } from '../constants.js?v=3.8.2';
 
 const Sidebar = ({
   facets,
@@ -17,6 +18,9 @@ const Sidebar = ({
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showAllCategories, setShowAllCategories] = useState(false);
+  const [isCompactViewport, setIsCompactViewport] = useState(() => (
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches
+  ));
   const searchRef = useRef(null);
 
   const handleSearchChange = (e) => {
@@ -72,6 +76,14 @@ const Sidebar = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 1023px)');
+    const syncViewport = () => setIsCompactViewport(media.matches);
+    syncViewport();
+    media.addEventListener('change', syncViewport);
+    return () => media.removeEventListener('change', syncViewport);
+  }, []);
+
   const visibleCategories = showAllCategories
     ? facets.categories
     : facets.categories.slice(0, 10);
@@ -86,9 +98,10 @@ const Sidebar = ({
   const embedded = variant === 'desktop';
   const searchInputId = embedded ? 'desktop-archive-search' : 'archive-search';
   const FilterPanelTag = embedded ? 'div' : 'aside';
+  const drawerIsInert = !embedded && isCompactViewport && !isOpen;
 
   return html`
-    <div className=${embedded ? 'desktop-filter-root' : ''}>
+    <div className=${embedded ? 'desktop-filter-root archive-filter-sidebar-root' : 'archive-filter-sidebar-root'}>
         <div
           className=${embedded
             ? `desktop-filter-backdrop ${isOpen ? 'is-open' : ''}`
@@ -98,17 +111,21 @@ const Sidebar = ({
         />
 
       <${FilterPanelTag}
+        id=${embedded ? 'desktop-archive-filters' : 'archive-filters'}
         className=${embedded
-          ? `desktop-filter-panel ${isOpen ? 'is-open' : ''}`
+          ? `desktop-filter-panel archive-filter-sidebar ${isOpen ? 'is-open' : ''}`
           : `
+            archive-filter-sidebar
             fixed inset-y-0 left-0 z-[60] lg:z-auto w-80 bg-[#fdfbf7] border-r border-stone-300
             transform transition-transform duration-300 ease-out lg:translate-x-0 lg:static lg:w-64 lg:bg-transparent lg:border-none lg:block shrink-0
             overflow-y-auto lg:overflow-visible shadow-2xl lg:shadow-none
             ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           `}
         aria-label=${embedded ? undefined : 'Archive filters'}
+        aria-hidden=${drawerIsInert ? 'true' : undefined}
+        inert=${drawerIsInert ? '' : undefined}
       >
-        <div className="p-5 lg:p-0 space-y-8">
+        <div className="archive-filter-sidebar__inner p-5 lg:p-0">
 
           <div className="flex justify-between items-center lg:hidden mb-6">
             <h3 className="font-display text-xl">Filters and sort</h3>
@@ -118,13 +135,16 @@ const Sidebar = ({
           </div>
 
           ${activeFilterCount > 0 && html`
-            <div className="lg:hidden bg-stone-100 rounded p-3 text-xs text-stone-600">
-              <span className="font-bold">${activeFilterCount} filter${activeFilterCount > 1 ? 's' : ''} active</span>
-              ${filters.search && html` — searching "${filters.search}"`}
-              ${filters.categories.length > 0 && html` — ${filters.categories.join(', ')}`}
-              ${filters.era && html` — ${filters.era}`}
-              ${filters.type && html` — ${filters.type}`}
-              ${filters.recordIds !== null && html`, query results`}
+            <div className="archive-filter-sidebar__active">
+              <div>
+                <span className="font-bold">${activeFilterCount} filter${activeFilterCount > 1 ? 's' : ''} active</span>
+                ${filters.search && html` — searching "${filters.search}"`}
+                ${filters.categories.length > 0 && html` — ${filters.categories.join(', ')}`}
+                ${filters.era && html` — ${filters.era}`}
+                ${filters.type && html` — ${filters.type}`}
+                ${filters.recordIds !== null && html`, query results`}
+              </div>
+              <button type="button" onClick=${resetFilters}>Reset all</button>
             </div>
           `}
 
@@ -142,8 +162,8 @@ const Sidebar = ({
             </div>
           `}
 
-          <div className="space-y-2" ref=${searchRef}>
-            <label htmlFor=${searchInputId} className="text-xs font-bold uppercase tracking-wider text-stone-600">Search archive</label>
+          <div className="archive-filter-sidebar__search-group space-y-2" ref=${searchRef}>
+            <label htmlFor=${searchInputId} className="archive-filter-sidebar__label">Search archive</label>
             <div className="relative">
               <input
                 id=${searchInputId}
@@ -152,7 +172,7 @@ const Sidebar = ({
                 onChange=${handleSearchChange}
                 onFocus=${() => filters.search.length > 1 && setShowSuggestions(true)}
                 placeholder="Keywords, title..."
-                className="w-full bg-white border border-stone-300 rounded-none p-2 pl-9 text-sm focus:outline-none focus:border-stone-800 focus:ring-1 focus:ring-stone-800 font-body shadow-sm transition-all"
+                className="archive-control archive-filter-sidebar__search"
               />
               <${Search} className="w-4 h-4 text-stone-400 absolute left-2.5 top-2.5" />
               ${filters.search && html`
@@ -184,11 +204,11 @@ const Sidebar = ({
                 </div>
               `}
             </div>
-            <p className="text-[10px] text-stone-600 mt-1">Searches titles, summaries, and categories</p>
+            <p className="archive-filter-sidebar__hint">Searches titles, summaries, and categories</p>
           </div>
 
-          <div className="border-t border-stone-200 pt-4">
-             <h4 className="text-xs font-bold uppercase tracking-wider text-stone-600 mb-3">Thematic categories</h4>
+          <div className="archive-filter-group border-t border-stone-200 pt-4">
+             <h4 className="archive-filter-sidebar__label">Thematic categories</h4>
              <div className="space-y-2">
                 ${visibleCategories.map(cat => html`
                   <label key=${cat} className="flex items-start gap-2 cursor-pointer group">
@@ -206,7 +226,7 @@ const Sidebar = ({
                     <button
                         type="button"
                         onClick=${() => setShowAllCategories(!showAllCategories)}
-                        className="text-xs text-stone-500 hover:text-stone-900 font-bold flex items-center gap-1 mt-2"
+                        className="archive-filter-more"
                     >
                         ${showAllCategories ? html`View less <${ChevronUp} className="w-3 h-3"/>` : html`View all (${facets.categories.length - 10} more) <${ChevronDown} className="w-3 h-3"/>`}
                     </button>
@@ -214,9 +234,9 @@ const Sidebar = ({
              </div>
           </div>
 
-          <div className="border-t border-stone-200 pt-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-stone-600 mb-3">Timeline</h4>
-            <p className="text-[10px] text-stone-600 mb-2">Filter by era or click a year in the timeline bar</p>
+          <div className="archive-filter-group border-t border-stone-200 pt-4">
+            <h4 className="archive-filter-sidebar__label">Timeline</h4>
+            <p className="archive-filter-sidebar__hint">Filter by era or choose a year in the timeline</p>
             <div className="space-y-2">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -243,15 +263,10 @@ const Sidebar = ({
             </div>
           </div>
 
-          <div className="border-t border-stone-200 pt-4">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-stone-600 mb-3">Content type</h4>
+          <div className="archive-filter-group border-t border-stone-200 pt-4">
+            <h4 className="archive-filter-sidebar__label">Content type</h4>
             <div className="flex flex-wrap gap-4">
-              ${[
-                { label: 'All', value: null },
-                { label: 'Articles', value: 'article' },
-                { label: 'Twitter/X', value: 'twitter' },
-                { label: 'Bluesky', value: 'bluesky' },
-              ].map((opt) => html`
+              ${CONTENT_TYPE_OPTIONS.map((opt) => html`
                 <label key=${opt.label} className="flex items-center gap-2 cursor-pointer">
                    <input
                     type="radio"
@@ -267,13 +282,17 @@ const Sidebar = ({
             ${/* Reply filtering is now handled during data export — short replies and thread members are excluded */''}
           </div>
 
-          <button
-            type="button"
-            onClick=${resetFilters}
-            className="w-full py-2 border border-stone-300 text-stone-600 text-xs font-bold uppercase tracking-wider hover:bg-stone-800 hover:text-white transition-colors mt-4"
-          >
-            Reset all filters
-          </button>
+          <div className="archive-filter-sidebar__actions">
+            ${!embedded && html`
+              <button
+                type="button"
+                onClick=${onClose}
+                className="archive-action archive-filter-sidebar__apply lg:hidden"
+              >
+                Apply filters
+              </button>
+            `}
+          </div>
 
         </div>
       <//>

@@ -1,6 +1,6 @@
 // LoadingQuotes.js - Rotating dissertation quotes during loading
 import { useState, useEffect } from 'react';
-import { html } from '../html.js?v=3.8.1';
+import { html } from '../html.js?v=3.8.2';
 import { BookOpen } from 'lucide-react';
 
 // Curated quotes from the dissertation for the loading screen
@@ -69,36 +69,31 @@ const LoadingQuotes = () => {
   const current = LOADING_QUOTES[currentIndex];
 
   return html`
-    <div className="flex flex-col items-center justify-center py-16 px-4">
-      <div className="relative mb-8">
-        <div className="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center">
-          <${BookOpen} className="w-8 h-8 text-stone-400 animate-pulse" />
+    <div className="archive-loading-state">
+      <div className="archive-loading-state__mark" aria-hidden="true">
+        <div>
+          <${BookOpen} />
         </div>
-        <div className="absolute inset-0 w-16 h-16 border-2 border-stone-200 border-t-stone-500 rounded-full animate-spin" style=${{ animationDuration: '1.5s' }} />
+        <span />
       </div>
 
       <div
-        className="max-w-xl text-center transition-opacity duration-300"
+        className="archive-loading-state__quote"
+        aria-hidden="true"
         style=${{ opacity: isVisible ? 1 : 0 }}
       >
-        <blockquote className="text-stone-600 text-sm md:text-base leading-relaxed italic mb-3">
+        <blockquote>
           "${current.quote}"
         </blockquote>
-        <cite className="text-xs text-stone-400 not-italic">
+        <cite>
           — The Impossible Press, ${current.source}
         </cite>
       </div>
 
-      <div className="mt-8 flex items-center gap-2">
-        <div className="flex gap-1">
-          <span className="w-2 h-2 bg-stone-300 rounded-full animate-bounce" style=${{ animationDelay: '0ms' }} />
-          <span className="w-2 h-2 bg-stone-300 rounded-full animate-bounce" style=${{ animationDelay: '150ms' }} />
-          <span className="w-2 h-2 bg-stone-300 rounded-full animate-bounce" style=${{ animationDelay: '300ms' }} />
-        </div>
-        <span className="text-xs text-stone-400 ml-2">Loading archive...</span>
-      </div>
-
-      <p className="text-xs text-stone-300 mt-6">
+      <p className="archive-loading-state__status" role="status" aria-live="polite" aria-atomic="true">
+        Loading archive...
+      </p>
+      <p className="archive-loading-state__tip">
         Tip: Records are cached for faster loading next time
       </p>
     </div>

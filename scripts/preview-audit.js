@@ -38,7 +38,10 @@ const OUT_DIR = REQUESTED_VIEWPORT
   : OUT_DIR_ROOT;
 
 const ROUTES = [
-  { slug: 'home-archive',       url: '/', archiveDetails: 'require', verifyToolsDesktopEntry: true },
+  { slug: 'home-archive',       url: '/', archiveDetails: 'require', verifyToolsDesktopEntry: true, dismissWelcome: true },
+  { slug: 'archive-active-filters', url: '/?q=journalism', archiveDetails: 'require', dismissWelcome: true, screenshotResults: true },
+  { slug: 'archive-folders',    url: '/#folders', archiveDetails: 'require', dismissWelcome: true, screenshotResults: true },
+  { slug: 'archive-empty-results', url: '/?q=zzzz-no-archive-record-zzzz', archiveDetails: 'require', dismissWelcome: true, screenshotResults: true },
   { slug: 'start-here',         url: '/#start', verifyDesktopEntry: true },
   { slug: 'participate',        url: '/features/participate/' },
   { slug: 'design-system',      url: '/frontend/design-system/demo.html' },
@@ -284,12 +287,23 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       archiveDetailsRequests.push(request.url());
     }
   };
+  // The warmup starts one second after the core corpus commits to React. A
+  // fixed post-navigation pause can race that timer on slower machines, so
+  // arm the request waiter before navigation and let the actual fetch be the
+  // readiness signal for routes that intentionally preload full details.
+  const expectedArchiveDetailsRequest = route.archiveDetails === 'require'
+    ? page.waitForRequest(
+      (request) => new URL(request.url()).pathname.endsWith('/data/archive-details.json'),
+      { timeout: 15000 },
+    ).catch(() => null)
+    : null;
   if (route.archiveDetails) page.on('request', captureArchiveDetails);
   try {
     await page.goto(targetUrl.toString(), { waitUntil: 'networkidle', timeout: 30000 });
     // Async React render + lazy-loaded sql.js, plus the intentional 1s details
     // warmup on standard/Archive/Folder surfaces: small extra settle.
     await page.waitForTimeout(1500);
+    if (expectedArchiveDetailsRequest) await expectedArchiveDetailsRequest;
   } finally {
     if (route.archiveDetails) page.off('request', captureArchiveDetails);
   }
@@ -844,6 +858,23 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
 
   const shotDir = resolve(OUT_DIR, 'screenshots', viewport.name);
   await mkdir(shotDir, { recursive: true });
+  if (route.dismissWelcome) {
+    const dismissWelcome = page.getByRole('button', { name: 'Dismiss Start here invitation' }).first();
+    const welcomeVisible = await dismissWelcome
+      .waitFor({ state: 'visible', timeout: 1000 })
+      .then(() => true)
+      .catch(() => false);
+    if (welcomeVisible) {
+      await dismissWelcome.click();
+      await dismissWelcome.waitFor({ state: 'hidden' });
+    }
+  }
+  if (route.screenshotResults) {
+    await page.locator('.archive-results-toolbar').scrollIntoViewIfNeeded();
+  } else if (route.dismissWelcome) {
+    await page.evaluate(() => window.scrollTo(0, 0));
+  }
+  if (route.dismissWelcome || route.screenshotResults) await page.waitForTimeout(100);
   // Viewport-only screenshots. Full-page on long content (e.g. the dissertation
   // reader, which is the entire 1986 text) can OOM the chromium process.
   // Viewport is sufficient for visual review of the above-the-fold rendering.

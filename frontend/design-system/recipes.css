@@ -46,6 +46,42 @@
   line-height: var(--line-height-tight);
 }
 
+/* An attached tab is a structural part of a folder surface, not a floating
+   badge. Keep the sloped shoulder and open bottom consistent wherever the
+   archive uses the physical-folder metaphor. */
+.archive-folder-tab {
+  --archive-folder-tab-fill: var(--archive-manila);
+  --archive-folder-tab-edge: var(--archive-manila-edge);
+
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  padding: 0.45rem 1.2rem 0.4rem 0.8rem;
+  border: 0;
+  clip-path: polygon(0 0, calc(100% - 0.85rem) 0, 100% 100%, 0 100%);
+  color: var(--archive-ink-soft);
+  background: var(--archive-folder-tab-edge);
+  font-family: var(--font-display);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-tight);
+}
+
+.archive-folder-tab::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 1px 1px 0;
+  clip-path: polygon(0 0, calc(100% - 0.82rem) 0, 100% 100%, 0 100%);
+  background: var(--archive-folder-tab-fill);
+}
+
+.archive-folder-tab > * {
+  position: relative;
+  z-index: 1;
+}
+
 .archive-action {
   --archive-action-background: var(--archive-paper);
   --archive-action-border: var(--archive-ink);
@@ -309,6 +345,7 @@
 
 @media (forced-colors: active) {
   .archive-section-label,
+  .archive-folder-tab,
   .archive-action,
   .archive-control,
   .archive-panel,
@@ -323,7 +360,8 @@
   }
 
   .archive-panel--accent::before,
-  .archive-notice::before {
+  .archive-notice::before,
+  .archive-folder-tab::before {
     background: Highlight;
   }
 

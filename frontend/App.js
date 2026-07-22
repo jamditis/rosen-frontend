@@ -1,37 +1,37 @@
 
 import { Component, Suspense, lazy, useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.8.1';
-import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.1';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.1';
-import { withViewTransition } from './utils/viewTransition.js?v=3.8.1';
-import { ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.1';
-import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.1';
-import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.1';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.1';
-import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.1';
-import { resolveSitePath } from './utils/pathResolver.js?v=3.8.1';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.8.1';
-import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.8.1';
-import { sortRecords } from './utils/recordSort.js?v=3.8.1';
-import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.1';
-import Sidebar from './components/Sidebar.js?v=3.8.1';
-import WelcomeModal from './components/WelcomeModal.js?v=3.8.1';
-import RecordView from './components/RecordView.js?v=3.8.1';
-import FeaturedSection from './components/FeaturedSection.js?v=3.8.1';
-import DissertationPage from './components/DissertationPage.js?v=3.8.1';
-import ToolsModal from './components/ToolsModal.js?v=3.8.1';
-import BugReportModal from './components/BugReportModal.js?v=3.8.1';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.1';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.1';
-import EntityBrowser from './components/EntityBrowser.js?v=3.8.1';
-import Timeline from './components/Timeline.js?v=3.8.1';
-import AboutPage from './components/AboutPage.js?v=3.8.1';
-import WikiPage from './components/WikiPage.js?v=3.8.1';
-import StartHerePage from './components/StartHerePage.js?v=3.8.1';
-import ArchiveResults from './components/ArchiveResults.js?v=3.8.1';
+import { html } from './html.js?v=3.8.2';
+import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github, Search, XCircle } from 'lucide-react';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.2';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.2';
+import { withViewTransition } from './utils/viewTransition.js?v=3.8.2';
+import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.2';
+import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.2';
+import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.2';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.2';
+import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.2';
+import { resolveSitePath } from './utils/pathResolver.js?v=3.8.2';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.8.2';
+import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.8.2';
+import { sortRecords } from './utils/recordSort.js?v=3.8.2';
+import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.2';
+import Sidebar from './components/Sidebar.js?v=3.8.2';
+import WelcomeModal from './components/WelcomeModal.js?v=3.8.2';
+import RecordView from './components/RecordView.js?v=3.8.2';
+import FeaturedSection from './components/FeaturedSection.js?v=3.8.2';
+import DissertationPage from './components/DissertationPage.js?v=3.8.2';
+import ToolsModal from './components/ToolsModal.js?v=3.8.2';
+import BugReportModal from './components/BugReportModal.js?v=3.8.2';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.2';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.2';
+import EntityBrowser from './components/EntityBrowser.js?v=3.8.2';
+import Timeline from './components/Timeline.js?v=3.8.2';
+import AboutPage from './components/AboutPage.js?v=3.8.2';
+import WikiPage from './components/WikiPage.js?v=3.8.2';
+import StartHerePage from './components/StartHerePage.js?v=3.8.2';
+import ArchiveResults from './components/ArchiveResults.js?v=3.8.2';
 
-const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.1'));
+const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.2'));
 
 const NON_RECORD_ROUTES = new Set([
   ROUTES.analytics,
@@ -140,6 +140,7 @@ const App = () => {
   const [bugReportOpen, setBugReportOpen] = useState(false);
   const [bugReportIntent, setBugReportIntent] = useState('problem');
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [announcedResultCount, setAnnouncedResultCount] = useState('');
 
   const [filters, setFilters] = useState(() => ({
     ...DEFAULT_FILTERS,
@@ -168,6 +169,10 @@ const App = () => {
   // Ref for scrolling to results
   const resultsRef = useRef(null);
   const recordsRef = useRef(null);
+  const filterTriggerRef = useRef(null);
+  const scopeStatusRef = useRef(null);
+  const scopeTokenRefs = useRef(new Map());
+  const pendingScopeFocusKey = useRef(null);
   const reportEntryHandled = useRef(false);
   const previouslyRenderedRoute = useRef(currentRoute);
 
@@ -558,6 +563,15 @@ const App = () => {
     currentPage * ITEMS_PER_PAGE
   );
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setAnnouncedResultCount(loading
+        ? 'Loading archive'
+        : `${filteredRecords.length} record${filteredRecords.length === 1 ? '' : 's'}`);
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [loading, filteredRecords.length]);
+
   const folderGroups = useMemo(() => {
     const counts = {};
     filteredRecords.forEach(r => {
@@ -601,6 +615,11 @@ const App = () => {
     setFilters(prev => ({ ...prev, year, era: null }));
   }, []);
 
+  const closeSidebar = useCallback(() => {
+    setSidebarOpen(false);
+    requestAnimationFrame(() => filterTriggerRef.current?.focus({ preventScroll: true }));
+  }, []);
+
   const years = records.map(r => parseInt(r.year)).filter(y => !isNaN(y));
   const minYear = years.length ? Math.min(...years) : 0;
   const maxYear = years.length ? Math.max(...years) : 0;
@@ -634,6 +653,59 @@ const App = () => {
     (filters.year ? 1 : 0) +
     (filters.type ? 1 : 0) +
     (filters.recordIds !== null ? 1 : 0);
+
+  const contentTypeLabel = CONTENT_TYPE_OPTIONS.find(option => option.value === filters.type)?.label;
+
+  const activeScopeTokens = [
+    filters.search ? { key: 'search', kind: 'search', label: `Search: “${filters.search}”` } : null,
+    ...filters.categories.map(category => ({
+      key: `category-${category}`,
+      kind: 'category',
+      value: category,
+      label: category,
+    })),
+    filters.era ? { key: 'era', kind: 'era', label: filters.era } : null,
+    filters.year ? { key: 'year', kind: 'year', label: filters.year } : null,
+    filters.type ? { key: 'type', kind: 'type', label: contentTypeLabel || filters.type } : null,
+    filters.recordIds !== null ? { key: 'query', kind: 'recordIds', label: 'Query results' } : null,
+  ].filter(Boolean);
+  const activeScopeKey = activeScopeTokens.map(token => token.key).join('|');
+
+  const clearScopeToken = (token) => {
+    const tokenIndex = activeScopeTokens.findIndex(candidate => candidate.key === token.key);
+    pendingScopeFocusKey.current = activeScopeTokens[tokenIndex + 1]?.key
+      || activeScopeTokens[tokenIndex - 1]?.key
+      || 'status';
+    setFilters(prev => {
+      if (token.kind === 'category') {
+        return { ...prev, categories: prev.categories.filter(category => category !== token.value) };
+      }
+      if (token.kind === 'search') return { ...prev, search: '' };
+      if (token.kind === 'era') return { ...prev, era: null };
+      if (token.kind === 'year') return { ...prev, year: null };
+      if (token.kind === 'type') return { ...prev, type: null };
+      if (token.kind === 'recordIds') return { ...prev, recordIds: null };
+      return prev;
+    });
+  };
+
+  const clearAllScope = () => {
+    pendingScopeFocusKey.current = 'status';
+    setFilters({ ...DEFAULT_FILTERS });
+  };
+
+  useEffect(() => {
+    if (!pendingScopeFocusKey.current) return undefined;
+    const frame = requestAnimationFrame(() => {
+      const focusKey = pendingScopeFocusKey.current;
+      pendingScopeFocusKey.current = null;
+      const focusTarget = focusKey === 'status'
+        ? scopeStatusRef.current
+        : scopeTokenRefs.current.get(focusKey);
+      focusTarget?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [activeScopeKey]);
 
   const desktopArchiveView = {
     viewMode,
@@ -797,15 +869,17 @@ const App = () => {
   // browser depend on the same load; render the same error on each instead of
   // letting the entity route show an empty browser with no explanation (#369).
   const errorPanel = error && html`
-    <div className="text-center py-20 border-2 border-red-200 rounded-lg bg-red-50 mx-4">
-        <${AlertCircle} className="w-12 h-12 mx-auto text-red-500 mb-4" />
-        <h3 className="font-display text-xl text-red-700 mb-2">Error loading archive</h3>
-        <p className="text-red-600 text-sm mb-6">${error}</p>
+    <div className="archive-error-state" role="alert">
+        <${AlertCircle} className="archive-error-state__icon" aria-hidden="true" />
+        <p className="archive-section-label">Archive status</p>
+        <h3>Error loading archive</h3>
+        <p>${error}</p>
         <button
+            type="button"
             onClick=${() => window.location.reload()}
-            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors font-bold text-sm"
+            className="archive-action archive-action--danger"
         >
-            Reload Page
+            Reload page
         </button>
     </div>
   `;
@@ -893,8 +967,13 @@ const App = () => {
                 </a>
                 ${isArchiveGrid && html`
                     <button
+                    type="button"
+                    ref=${filterTriggerRef}
                     onClick=${() => setSidebarOpen(true)}
                     className="archive-site-header__filter lg:hidden p-2 text-stone-800 hover:bg-stone-100 rounded-md border border-stone-300 relative"
+                    aria-label="Open archive filters"
+                    aria-expanded=${sidebarOpen}
+                    aria-controls="archive-filters"
                     >
                         <${SlidersHorizontal} className="w-5 h-5" />
                         ${activeFilterCount > 0 && html`
@@ -908,7 +987,7 @@ const App = () => {
         </div>
       </header>
 
-      <div className=${`flex-grow container mx-auto px-4 py-6 flex gap-8 ${isEntityBrowser || isWiki ? 'justify-center' : ''}`}>
+      <div className=${`archive-discovery-layout flex-grow container mx-auto px-4 py-6 flex gap-8 ${isEntityBrowser || isWiki ? 'justify-center' : ''}`}>
 
          ${isArchiveGrid && html`
              <${Sidebar}
@@ -916,7 +995,7 @@ const App = () => {
                 filters=${filters}
                 setFilters=${setFilters}
                 isOpen=${sidebarOpen}
-                onClose=${() => setSidebarOpen(false)}
+                onClose=${closeSidebar}
                 resetFilters=${() => setFilters({ ...DEFAULT_FILTERS })}
                 autocompleteIndex=${autocompleteIndex}
              />
@@ -930,11 +1009,11 @@ const App = () => {
          >
 
             ${isArchiveGrid && html`
-                <div>
-                    ${!filters.search && !filters.era && !filters.year && filters.categories.length === 0 && filters.recordIds === null && html`
+                <div className="archive-discovery-intro">
+                    ${activeFilterCount === 0 && html`
                         <section className="archive-tools-strip archive-density--compact mb-6">
-                            <div className="flex flex-wrap items-center gap-2">
-                                <span className="archive-section-label mr-1">Tools</span>
+                            <span className="archive-folder-tab archive-tools-strip__tab"><span>Tools</span></span>
+                            <div className="archive-tools-strip__items">
                                 <button
                                     onClick=${() => goTo(ROUTES.dissertation)}
                                     className="archive-action archive-action--quiet"
@@ -966,18 +1045,6 @@ const App = () => {
                             </div>
                         </section>
                     `}
-
-                    ${!loading && !filters.search && !filters.era && !filters.year && filters.categories.length === 0 && filters.recordIds === null && html`
-                        <${FeaturedSection} />
-                    `}
-
-                    ${!loading && !filters.search && !filters.era && filters.categories.length === 0 && html`
-                        <${Timeline}
-                          records=${queryRecords}
-                          selectedYear=${filters.year}
-                          onSelectYear=${handleYearSelect}
-                        />
-                    `}
                 </div>
             `}
 
@@ -986,45 +1053,127 @@ const App = () => {
             `}
 
             ${isArchiveGrid && html`
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4 border-b border-stone-200 pb-4 scroll-mt-24" ref=${recordsRef}>
-                <div className="font-display text-stone-500 text-sm">
-                    ${loading
-                      ? 'Loading archive...'
-                      : `${filteredRecords.length} records found${filters.recordIds !== null ? ' in query results' : ''}`}
+            <div className="archive-mobile-search">
+                <label htmlFor="archive-mobile-search">Search archive</label>
+                <div className="archive-mobile-search__control">
+                    <${Search} className="archive-mobile-search__icon" aria-hidden="true" />
+                    <input
+                      id="archive-mobile-search"
+                      type="search"
+                      value=${filters.search}
+                      onChange=${event => setFilters(prev => ({ ...prev, search: event.target.value }))}
+                      placeholder="Keywords or title"
+                      className="archive-control"
+                    />
+                    ${filters.search && html`
+                      <button
+                        type="button"
+                        onClick=${() => setFilters(prev => ({ ...prev, search: '' }))}
+                        aria-label="Clear archive search"
+                      >
+                        <${XCircle} aria-hidden="true" />
+                      </button>
+                    `}
                 </div>
-                <div className="flex items-center gap-3">
-                   <div className="flex bg-stone-200 p-1 rounded mr-4">
+            </div>
+
+            <div className="archive-results-toolbar scroll-mt-24" ref=${recordsRef}>
+                <div className="archive-results-summary">
+                    <span
+                      ref=${scopeStatusRef}
+                      tabIndex="-1"
+                      className="archive-results-count"
+                    >
+                      ${loading
+                        ? 'Loading archive...'
+                        : `${filteredRecords.length} record${filteredRecords.length === 1 ? '' : 's'}${filters.recordIds !== null ? ' in query results' : ''}`}
+                    </span>
+                    <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+                      ${announcedResultCount}
+                    </span>
+                    ${activeScopeTokens.length > 0 && html`
+                      <div className="archive-results-scope" aria-label="Active archive scope">
+                        ${activeScopeTokens.map(token => html`
+                          <button
+                            type="button"
+                            key=${token.key}
+                            ref=${element => {
+                              if (element) scopeTokenRefs.current.set(token.key, element);
+                              else scopeTokenRefs.current.delete(token.key);
+                            }}
+                            data-scope-key=${token.key}
+                            className="archive-scope-token"
+                            onClick=${() => clearScopeToken(token)}
+                            aria-label=${`Remove ${token.label} filter`}
+                          >
+                            <span>${token.label}</span>
+                            <${XCircle} aria-hidden="true" />
+                          </button>
+                        `)}
+                        ${activeScopeTokens.length > 1 && html`
+                          <button
+                            type="button"
+                            className="archive-scope-clear"
+                            onClick=${clearAllScope}
+                          >
+                            Clear all
+                          </button>
+                        `}
+                      </div>
+                    `}
+                    ${viewMode === 'folder' && html`
+                      <p className="archive-folder-note">Records may appear in more than one folder.</p>
+                    `}
+                </div>
+                <div className="archive-results-controls">
+                   <div className="archive-view-switch" role="group" aria-label="Archive view">
                         <button
+                          type="button"
                           onClick=${() => goTo(ROUTES.archive)}
-                          className=${`flex items-center justify-center gap-2 py-1.5 px-3 text-xs font-medium rounded shadow-sm transition-all ${currentRoute === ROUTES.archive ? 'bg-white text-stone-900' : 'text-stone-600 hover:bg-stone-100'}`}
-                          title="Grid View"
+                          className=${`archive-view-switch__button ${currentRoute === ROUTES.archive ? 'is-active' : ''}`}
+                          aria-pressed=${currentRoute === ROUTES.archive}
+                          aria-label="Card view"
+                          title="Card view"
                         >
                             <${LayoutGrid} className="w-3 h-3" /> <span className="hidden sm:inline">Cards</span>
                         </button>
                         <button
+                          type="button"
                           onClick=${() => goTo(ROUTES.folders)}
-                          className=${`flex items-center justify-center gap-2 py-1.5 px-3 text-xs font-medium rounded shadow-sm transition-all ${currentRoute === ROUTES.folders ? 'bg-white text-stone-900' : 'text-stone-600 hover:bg-stone-100'}`}
-                          title="Folder View"
+                          className=${`archive-view-switch__button ${currentRoute === ROUTES.folders ? 'is-active' : ''}`}
+                          aria-pressed=${currentRoute === ROUTES.folders}
+                          aria-label="Folder view"
+                          title="Folder view"
                         >
                             <${Folder} className="w-3 h-3" /> <span className="hidden sm:inline">Folders</span>
                         </button>
                     </div>
 
-                    <div class="flex items-center">
-                        <label htmlFor="sort-select" className="text-xs font-bold text-stone-500 uppercase hidden sm:inline mr-2">Sort:</label>
+                    ${viewMode === 'grid' && html`<label className="archive-sort-control" htmlFor="sort-select">
+                        <span>Sort</span>
                         <select
                         id="sort-select"
+                        aria-label="Sort archive records"
                         value=${sortBy}
                         onChange=${(e) => setSortBy(e.target.value)}
-                        className="bg-transparent border-b border-stone-300 text-sm font-bold text-stone-800 focus:outline-none focus:border-stone-800 py-1 pr-8 cursor-pointer"
+                        className="archive-control archive-sort-control__select"
                         >
                             <option value="date-desc">Newest first</option>
                             <option value="date-asc">Oldest first</option>
                             <option value="title-asc">Title (A-Z)</option>
                         </select>
-                    </div>
+                    </label>`}
                 </div>
             </div>
+            `}
+
+            ${currentRoute === ROUTES.archive && !loading && !filters.era && filters.categories.length === 0 && html`
+                <${Timeline}
+                  records=${queryRecords}
+                  selectedYear=${filters.year}
+                  searchActive=${Boolean(filters.search)}
+                  onSelectYear=${handleYearSelect}
+                />
             `}
 
             ${isEntityBrowser && html`
@@ -1065,6 +1214,10 @@ const App = () => {
                   onPageChange=${handlePageChange}
                   onClearFilters=${() => setFilters({ ...DEFAULT_FILTERS })}
                 />
+            `}
+
+            ${currentRoute === ROUTES.archive && !loading && activeFilterCount === 0 && html`
+                <${FeaturedSection} />
             `}
          </main>
 

@@ -42,14 +42,13 @@ async function typeSearch(page, value) {
 }
 
 async function recordsFound(page) {
-  // Scope to the results-count element (.font-display in the tools bar) — reading
+  // Scope to the results-count element — reading
   // document.body.textContent concatenates the footer's own record count and
   // year range with this line, corrupting the parsed number.
   return page.evaluate(() => {
-    const el = [...document.querySelectorAll('.font-display')]
-      .find(e => /records found/.test(e.textContent || ''));
+    const el = document.querySelector('.archive-results-count');
     if (!el) return null;
-    const m = el.textContent.match(/([\d,]+)\s+records found/);
+    const m = el.textContent.match(/([\d,]+)\s+records?/);
     return m ? parseInt(m[1].replace(/,/g, ''), 10) : null;
   });
 }
@@ -83,14 +82,14 @@ const run = async () => {
     const hdr = await page.evaluate(() => {
       const body = document.body.textContent || '';
       const span = (body.match(/(\d{4})[–-](\d{4})/) || [])[0] || '';
-      return { hasRecordsFound: /records found/.test(body), span };
+      return { hasRecordsFound: /\d[\d,]*\s+records?/.test(body), span };
     });
     if (loadOk && hdr.hasRecordsFound && /\d{4}[–-]\d{4}/.test(hdr.span)) {
       set('MAIN-13', 'pass', '', '',
-        `count line shows "${total} records found"; header/footer show total + year span ${hdr.span}.`);
+        `count line shows "${total} records"; header/footer show total + year span ${hdr.span}.`);
     } else {
       set('MAIN-13', 'fail',
-        `records-found line or year span missing (total=${total}, span="${hdr.span}")`,
+        `records line or year span missing (total=${total}, span="${hdr.span}")`,
         'medium', '');
     }
   }

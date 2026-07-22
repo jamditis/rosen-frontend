@@ -69,7 +69,7 @@ describe('desktop route wiring', () => {
     const desktopAuditSlugs = auditSlugs.filter((slug) => (
       slug === 'archive-desktop' || slug.startsWith('desktop-')
     ));
-    assert.equal(auditSlugs.length, 32, 'the preview audit expects 32 routes per viewport');
+    assert.equal(auditSlugs.length, 35, 'the preview audit expects 35 routes per viewport');
     assert.equal(new Set(auditSlugs).size, auditSlugs.length, 'audit route slugs must stay unique');
     assert.equal(desktopAuditSlugs.length, 17, 'the review handoff expects 17 desktop rows per viewport');
     assert.match(audit, /slug: 'start-here',[\s\S]*verifyDesktopEntry: true/,

@@ -10,10 +10,11 @@ page.on('pageerror', e => errors.push('PAGEERROR: ' + e.message));
 
 await page.goto(BASE + '/index.html', { waitUntil: 'domcontentloaded' });
 // wait for records to load
-await page.waitForFunction(() => /records found/.test(document.body.textContent), { timeout: 30000 }).catch(()=>{});
+await page.waitForFunction(() => /\d[\d,]*\s+records?/.test(
+  document.querySelector('.archive-results-count')?.textContent || ''
+), { timeout: 30000 }).catch(()=>{});
 const count = await page.evaluate(() => {
-  const el = [...document.querySelectorAll('.font-display.text-stone-500')].map(e=>e.textContent).find(t=>/records found/.test(t));
-  return el || 'NONE';
+  return document.querySelector('.archive-results-count')?.textContent || 'NONE';
 });
 console.log('record line:', count);
 console.log('console errors:', errors.length, errors.slice(0,5));
