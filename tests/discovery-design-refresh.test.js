@@ -98,8 +98,13 @@ describe('archive discovery visual-system refresh', () => {
   it('keeps the feature-audit harness aligned with the refreshed archive controls', () => {
     assert.match(auditHarness, /\.archive-results-count/);
     assert.match(auditHarness, /\.archive-error-state/);
+    assert.match(auditHarness, /\.archive-record-card__body/);
+    assert.match(mainAuditHarness, /\.archive-timeline__year:not\(:disabled\)/);
+    assert.match(mainAuditHarness, /\.archive-timeline__clear/);
     assert.match(auditHarness, /window\.location\.hash === '#entities'/);
     assert.match(auditHarness, /document\.querySelector\('#entity-search'\)/);
+    assert.doesNotMatch(auditHarness, /break-inside-avoid/);
+    assert.doesNotMatch(mainAuditHarness, /main \.flex\.h-32/);
     assert.doesNotMatch(auditHarness, /\/records found\/\.test\(document\.body\.textContent\)/);
     assert.doesNotMatch(auditHarness, /Reset all filters\/\.test\(x\.textContent\)/);
     assert.doesNotMatch(auditHarness, /button\[title="Folder View"\]/);
@@ -121,6 +126,18 @@ describe('archive discovery visual-system refresh', () => {
   it('writes accumulated feature-audit verdicts before a fatal exit', () => {
     assert.match(mainAuditHarness, /run\(\)\.catch\(err => \{[\s\S]*writeMainVerdicts\(err\)/);
     assert.match(serviceAuditHarness, /main\(\)\.catch\(err => \{[\s\S]*writeServiceVerdicts\(err\)/);
+    assert.match(
+      mainAuditHarness,
+      /finally\s*\{\s*await browser\.close\(\);\s*\}/,
+      'MAIN audit failures must not leave Chromium running',
+    );
+  });
+
+  it('returns focus to a stable filter control after Reset all removes itself', () => {
+    assert.match(sidebar, /const searchInputRef = useRef\(null\)/);
+    assert.match(sidebar, /const handleResetFilters = \(\) => \{[\s\S]*resetFilters\(\);[\s\S]*requestAnimationFrame\(\(\) => searchInputRef\.current\?\.focus\(\)\)/);
+    assert.match(sidebar, /onClick=\$\{handleResetFilters\}>Reset all/);
+    assert.match(sidebar, /id=\$\{searchInputId\}[\s\S]*ref=\$\{searchInputRef\}/);
   });
 
   it('puts archive work before secondary Read highlights', () => {

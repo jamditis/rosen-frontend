@@ -22,6 +22,7 @@ const Sidebar = ({
     typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches
   ));
   const searchRef = useRef(null);
+  const searchInputRef = useRef(null);
 
   const handleSearchChange = (e) => {
     const val = e.target.value;
@@ -64,6 +65,13 @@ const Sidebar = ({
 
   const handleTypeChange = (type) => {
     setFilters(prev => ({ ...prev, type }));
+  };
+
+  const handleResetFilters = () => {
+    resetFilters();
+    setSuggestions([]);
+    setShowSuggestions(false);
+    requestAnimationFrame(() => searchInputRef.current?.focus());
   };
 
   useEffect(() => {
@@ -144,7 +152,7 @@ const Sidebar = ({
                 ${filters.type && html` — ${filters.type}`}
                 ${filters.recordIds !== null && html`, query results`}
               </div>
-              <button type="button" onClick=${resetFilters}>Reset all</button>
+              <button type="button" onClick=${handleResetFilters}>Reset all</button>
             </div>
           `}
 
@@ -167,6 +175,7 @@ const Sidebar = ({
             <div className="relative">
               <input
                 id=${searchInputId}
+                ref=${searchInputRef}
                 type="text"
                 value=${filters.search}
                 onChange=${handleSearchChange}

@@ -320,9 +320,9 @@ const main = async () => {
       await page.goto(URL_OF(''), { waitUntil: 'domcontentloaded' });
       await waitLoaded(page);
       await page.evaluate(() => { try { localStorage.setItem('jrda_visited', 'true'); } catch {} });
-      await page.waitForSelector('.break-inside-avoid', { timeout: 15000 });
+      await page.waitForSelector('.archive-record-card__body', { timeout: 15000 });
       await page.evaluate(() => {
-        document.querySelector('.break-inside-avoid')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        document.querySelector('.archive-record-card__body')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       });
       await page.waitForSelector('[role="dialog"][aria-modal="true"]', { timeout: 10000 }).catch(() => {});
       const realId = await page.evaluate(() => new URLSearchParams(location.search).get('record'));
@@ -468,9 +468,9 @@ const main = async () => {
       await sleep(2000);
       const detailsPreloaded = countMatching(reqs, 'archive-details.json');
       // Open a card -> details should already be in memory (no NEW fetch) OR fetched now.
-      await page.waitForSelector('.break-inside-avoid', { timeout: 15000 });
+      await page.waitForSelector('.archive-record-card__body', { timeout: 15000 });
       await page.evaluate(() => {
-        document.querySelector('.break-inside-avoid')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        document.querySelector('.archive-record-card__body')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       });
       await page.waitForSelector('[role="dialog"][aria-modal="true"]', { timeout: 10000 }).catch(() => {});
       await sleep(1500);

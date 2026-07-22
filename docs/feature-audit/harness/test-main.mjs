@@ -81,14 +81,15 @@ async function recordsFound(page) {
   });
 }
 
-// Number of rendered grid cards (the clickable card divs in the columns layout).
+// Number of rendered cards in the canonical archive results grid.
 async function cardCount(page) {
   return page.evaluate(() =>
-    document.querySelectorAll('.columns-1 > div.break-inside-avoid').length);
+    document.querySelectorAll('.archive-record-card').length);
 }
 
 const run = async () => {
   const browser = await launchBrowser();
+  try {
   const { page, errors } = await newPage(browser);
   await suppressWelcome(page);
 
@@ -96,7 +97,7 @@ const run = async () => {
   await gotoArchive(page, '');
   // Wait for first cards to render (data fully loaded).
   await page.waitForFunction(
-    () => document.querySelectorAll('.columns-1 > div.break-inside-avoid').length > 0,
+    () => document.querySelectorAll('.archive-record-card__body').length > 0,
     { timeout: 45000 },
   ).catch(() => {});
 
@@ -131,17 +132,17 @@ const run = async () => {
       return { value: sel.value, firstOption: opts[0], options: opts };
     });
     const firstDates = await page.evaluate(() =>
-      [...document.querySelectorAll('.columns-1 > div.break-inside-avoid')]
+      [...document.querySelectorAll('.archive-record-card')]
         .slice(0, 3)
-        .map(c => c.querySelector('.font-mono')?.textContent?.trim() || ''));
+        .map(c => c.querySelector('.archive-record-card__date')?.textContent?.trim() || ''));
     const ascending = firstDates.length >= 2 && firstDates[0] <= firstDates[firstDates.length - 1];
     const smellConfirmed = sortState.value === 'date-asc' && sortState.firstOption.v === 'date-desc';
     // Confirm sort actually changes order: switch to title-asc.
     await page.selectOption('#sort-select', 'title-asc');
     await sleep(200);
     const titlesAfter = await page.evaluate(() =>
-      [...document.querySelectorAll('.columns-1 > div.break-inside-avoid')]
-        .slice(0, 5).map(c => c.querySelector('h3')?.textContent?.trim() || ''));
+      [...document.querySelectorAll('.archive-record-card')]
+        .slice(0, 5).map(c => c.querySelector('.archive-record-card__title')?.textContent?.trim() || ''));
     // The app sorts with String.localeCompare; verify the rendered order is
     // non-decreasing under the SAME comparator (JS < operator mis-orders the
     // leading emoji/punctuation titles that localeCompare places first).
@@ -164,22 +165,22 @@ const run = async () => {
   // Card grid: structure, accent bar, pub/date/title/summary/tags, click opens modal.
   {
     const struct = await page.evaluate(() => {
-      const grid = document.querySelector('.columns-1.md\\:columns-2.xl\\:columns-3');
-      const card = document.querySelector('.columns-1 > div.break-inside-avoid');
+      const card = document.querySelector('.archive-record-card');
+      const grid = card?.parentElement;
       if (!card) return { ok: false };
       return {
         gridPresent: !!grid,
-        breakAvoid: card.classList.contains('break-inside-avoid'),
-        accent: !!card.querySelector('.h-1'),
-        pub: !!card.querySelector('.uppercase'),
-        date: !!card.querySelector('.font-mono'),
-        title: !!card.querySelector('h3'),
-        summary: !!card.querySelector('p.font-body'),
-        tagCount: card.querySelectorAll('.mt-auto span').length,
+        semanticCard: card.tagName === 'ARTICLE',
+        accent: !!card.querySelector('.archive-record-card__accent'),
+        pub: !!card.querySelector('.archive-record-card__publication'),
+        date: !!card.querySelector('.archive-record-card__date'),
+        title: !!card.querySelector('.archive-record-card__title'),
+        summary: !!card.querySelector('.archive-record-card__summary'),
+        tagCount: card.querySelectorAll('.archive-record-card__label').length,
       };
     });
     // Click first card -> modal opens
-    await page.click('.columns-1 > div.break-inside-avoid');
+    await page.click('.archive-record-card__body');
     await page.waitForSelector('[role="dialog"]', { timeout: 5000 }).catch(() => {});
     const modalOpen = await page.evaluate(() => !!document.querySelector('[role="dialog"]'));
     // close it
@@ -188,7 +189,7 @@ const run = async () => {
     if (struct.ok !== false && struct.gridPresent && struct.accent && struct.title &&
         struct.summary && struct.date && modalOpen) {
       set('MAIN-01', 'pass', '', '',
-        `cards render in columns layout with accent bar, pub, date chip, title, summary, ${struct.tagCount} tag/badge chip(s); click opens record modal.`);
+        `cards render in the archive results grid with semantic article markup, accent bar, pub, date chip, title, summary, ${struct.tagCount} tag/badge chip(s); click opens record modal.`);
     } else {
       set('MAIN-01', 'fail',
         `card grid incomplete: ${JSON.stringify(struct)}, modalOpen=${modalOpen}`,
@@ -644,18 +645,18 @@ const run = async () => {
     // ensure clean archive
     const timeline = await page.evaluate(() => {
       const tl = [...document.querySelectorAll('h3')].find(h => /Timeline/.test(h.textContent));
-      const bars = [...document.querySelectorAll('main .flex.h-32 > div')];
+      const bars = [...document.querySelectorAll('.archive-timeline__year:not(:disabled)')];
       return { present: !!tl, barCount: bars.length };
     });
     // hover a bar -> tooltip text "records"
     let tooltipOk = false;
     if (timeline.barCount > 0) {
-      const bars = await page.$$('main .flex.h-32 > div');
+      const bars = await page.$$('.archive-timeline__year:not(:disabled)');
       const target = bars[Math.floor(bars.length / 2)];
       await target.hover();
       await sleep(150);
       tooltipOk = await page.evaluate(() =>
-        [...document.querySelectorAll('main .flex.h-32 .z-30')]
+        [...document.querySelectorAll('.archive-timeline__year:hover .archive-timeline__tooltip')]
           .some(t => /\d+\s+records/.test(t.textContent || '')));
     }
     // click a bar -> filters by year, then verify timeline hides under search
@@ -680,33 +681,28 @@ const run = async () => {
   {
     // find a non-zero bar and click it
     const clicked = await page.evaluate(() => {
-      const bars = [...document.querySelectorAll('main .flex.h-32 > div')];
-      // pick one whose inner colored bar has nonzero height
-      const target = bars.find(b => {
-        const inner = b.querySelector('div[style*="height"]');
-        return inner && inner.style.height && inner.style.height !== '0px';
-      });
+      const target = document.querySelector('.archive-timeline__year:not(:disabled)');
       if (target) { target.click(); return true; }
       return false;
     });
     await sleep(250);
     const chip = await page.evaluate(() => {
-      const b = [...document.querySelectorAll('button')].find(x => /Clear filter \(/.test(x.textContent));
+      const b = document.querySelector('.archive-timeline__clear');
       return b ? b.textContent.trim() : null;
     });
     const filteredByYear = await recordsFound(page);
     // click clear
     if (chip) {
       await page.evaluate(() => {
-        const b = [...document.querySelectorAll('button')].find(x => /Clear filter \(/.test(x.textContent));
+        const b = document.querySelector('.archive-timeline__clear');
         if (b) b.click();
       });
       await sleep(250);
     }
     const afterClear = await recordsFound(page);
-    if (clicked && chip && /Clear filter \(\d{4}\)/.test(chip) && afterClear > filteredByYear) {
+    if (clicked && chip && /Clear \d{4}/.test(chip) && afterClear > filteredByYear) {
       set('MAIN-19', 'pass', '', '',
-        `clicking a year bar set the year filter (${filteredByYear} records) and showed a red "${chip}" button; clicking it cleared the year and restored ${afterClear}.`);
+        `clicking a year bar set the year filter (${filteredByYear} records) and showed the "${chip}" timeline action; clicking it cleared the year and restored ${afterClear}.`);
     } else {
       set('MAIN-19', clicked ? 'partial' : 'blocked',
         `year chip: clicked=${clicked} chip="${chip}" filtered=${filteredByYear} afterClear=${afterClear}`,
@@ -785,7 +781,7 @@ const run = async () => {
       if (b) b.click();
     });
     await sleep(250);
-    await page.click('.columns-1 > div.break-inside-avoid');
+    await page.click('.archive-record-card__body');
     await page.waitForSelector('[role="dialog"]', { timeout: 8000 }).catch(() => {});
     const urlHasRecord = await page.evaluate(() => /[?&]record=/.test(window.location.href));
     // next
@@ -825,7 +821,7 @@ const run = async () => {
   // ----------------------------------------------------------------- MAIN-22
   // Drill-down from a record (category tag -> archive filtered).
   {
-    await page.click('.columns-1 > div.break-inside-avoid');
+    await page.click('.archive-record-card__body');
     await page.waitForSelector('[role="dialog"]', { timeout: 5000 }).catch(() => {});
     // click first category tag in the "Thematic categories" group
     const drill = await page.evaluate(() => {
@@ -1025,11 +1021,11 @@ const run = async () => {
     await suppressWelcome(dp);
     await gotoArchive(dp, '');
     await dp.waitForFunction(
-      () => document.querySelectorAll('.columns-1 > div.break-inside-avoid').length > 0,
+      () => document.querySelectorAll('.archive-record-card__body').length > 0,
       { timeout: 45000 }).catch(() => {});
     const validId = await dp.evaluate(async () => {
       // grab an id from the URL after clicking a card
-      const card = document.querySelector('.columns-1 > div.break-inside-avoid');
+      const card = document.querySelector('.archive-record-card__body');
       card.click();
       await new Promise(r => setTimeout(r, 300));
       const m = window.location.href.match(/[?&]record=([^&]+)/);
@@ -1155,8 +1151,6 @@ const run = async () => {
     }
   }
 
-  await browser.close();
-
   // record any uncaught page errors as a global note on MAIN-13 if present
   if (mainErrors.length) {
     const noisy = mainErrors.filter(e => !/favicon|sourcemap|DevTools/.test(e));
@@ -1166,6 +1160,9 @@ const run = async () => {
   }
 
   writeMainVerdicts();
+  } finally {
+    await browser.close();
+  }
 };
 
 run().catch(err => {
