@@ -1,6 +1,6 @@
-import { html } from '../html.js?v=3.7.10';
+import { html } from '../html.js?v=3.7.11';
 import { Compass, ExternalLink, Sparkles } from 'lucide-react';
-import StartHerePage, { SelectedFindings } from '../components/StartHerePage.js?v=3.7.10';
+import StartHerePage, { SelectedFindings } from '../components/StartHerePage.js?v=3.7.11';
 
 const DesktopStartPanel = ({
   mode = 'start',

@@ -1,13 +1,13 @@
 
 import { useEffect, useRef, useState } from 'react';
-import { html } from '../html.js?v=3.7.10';
+import { html } from '../html.js?v=3.7.11';
 import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2 } from 'lucide-react';
-import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.7.10';
-import { ThreadModal } from './ThreadModal.js?v=3.7.10';
-import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.7.10';
-import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.7.10';
-import { recordNeedsReview } from '../utils/needsReview.js?v=3.7.10';
-import { canonicalRecordUrl, shareRecordUrl } from '../utils/recordDeepLink.js?v=3.7.10';
+import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.7.11';
+import { ThreadModal } from './ThreadModal.js?v=3.7.11';
+import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.7.11';
+import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.7.11';
+import { recordNeedsReview } from '../utils/needsReview.js?v=3.7.11';
+import { canonicalRecordUrl, shareRecordUrl } from '../utils/recordDeepLink.js?v=3.7.11';
 
 const linkifyText = (text) => {
   const parts = splitUrlsForLinkify(text);
