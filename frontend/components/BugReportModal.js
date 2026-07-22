@@ -16,11 +16,12 @@
 // decorative italics, one primary action.
 
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { html } from '../html.js?v=3.8.2';
+import { html } from '../html.js?v=3.8.3';
 import { X, Bug, Lightbulb, Send, CheckCircle2, AlertCircle, ExternalLink } from 'lucide-react';
-import { ARCHIVE_VERSION, openReportFallback } from '../utils/bugReport.js?v=3.8.2';
-import { createSubmitGate } from '../utils/submitGate.js?v=3.8.2';
-import { buildReportPayload, validateReport, submitReport, newReportKey } from '../utils/reportSubmit.js?v=3.8.2';
+import { ARCHIVE_VERSION, openReportFallback } from '../utils/bugReport.js?v=3.8.3';
+import { createSubmitGate } from '../utils/submitGate.js?v=3.8.3';
+import { buildReportPayload, validateReport, submitReport, newReportKey } from '../utils/reportSubmit.js?v=3.8.3';
+import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.3';
 
 const EMPTY_FIELDS = {
   whatHappened: '',
@@ -32,6 +33,8 @@ const EMPTY_FIELDS = {
   email: '',
 };
 
+const NO_INITIAL_FIELDS = Object.freeze({});
+
 // Read the debug context the reporter should not have to type. Kept in a helper
 // so it is captured fresh at submit time (route + any open ?record= are current).
 const captureContext = () => ({
@@ -40,7 +43,7 @@ const captureContext = () => ({
   browser: typeof navigator !== 'undefined' ? navigator.userAgent : '',
 });
 
-const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'problem' }) => {
+const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'problem', initialFields = NO_INITIAL_FIELDS }) => {
   const [intent, setIntent] = useState('problem');
   const [fields, setFields] = useState({ ...EMPTY_FIELDS });
   const [honeypot, setHoneypot] = useState('');
@@ -69,7 +72,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
     if (isOpen) {
       gateRef.current.reset();
       setIntent(initialIntent === 'record' ? 'record' : 'problem');
-      setFields({ ...EMPTY_FIELDS });
+      setFields({ ...EMPTY_FIELDS, ...initialFields });
       setHoneypot('');
       setPhase('form');
       setIssueUrl('');
@@ -78,7 +81,7 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
       // the server dedupes), but a new report gets a new key.
       setReportKey(newReportKey());
     }
-  }, [isOpen, initialIntent]);
+  }, [isOpen, initialIntent, initialFields]);
 
   // Focus the first field on open (or the close button on the result screens).
   useEffect(() => {
@@ -127,6 +130,11 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
     const onKey = (e) => {
       if (!isOpen) return;
       if (e.key === 'Escape') {
+        // This modal can sit above an open record reader. Consume Escape here
+        // so the same keystroke cannot bubble into and close the underlying
+        // record dialog after this report unmounts.
+        e.preventDefault();
+        e.stopPropagation();
         requestClose();
         return;
       }
@@ -157,8 +165,8 @@ const BugReportModal = ({ isOpen, onClose, endpoint = '', initialIntent = 'probl
   }, [isOpen, requestClose]);
 
   useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    if (!isOpen) return undefined;
+    return acquireBodyScrollLock();
   }, [isOpen]);
 
   const setField = useCallback((name, value) => {

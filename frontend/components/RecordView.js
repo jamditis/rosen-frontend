@@ -1,6 +1,6 @@
-import { html } from '../html.js?v=3.8.2';
-import RecordModal from './RecordModal.js?v=3.8.2';
-import { deriveNavFlags } from '../utils/modalNav.js?v=3.8.2';
+import { html } from '../html.js?v=3.8.3';
+import RecordModal from './RecordModal.js?v=3.8.3';
+import { deriveNavFlags } from '../utils/modalNav.js?v=3.8.3';
 
 /**
  * Single owner for "render the selected record."
@@ -27,6 +27,8 @@ export default function RecordView({
   onSelectEntity,
   onFilterCategory,
   onFilterSearch,
+  onReportProblem,
+  nestedDialogOpen,
 }) {
   const record = records.find(r => r.id === selectedRecordId) || null;
   const { index, total, hasPrev, hasNext } = deriveNavFlags(filteredRecords, selectedRecordId);
@@ -50,6 +52,8 @@ export default function RecordView({
       onSelectEntity=${onSelectEntity}
       onFilterCategory=${onFilterCategory}
       onFilterSearch=${onFilterSearch}
+      onReportProblem=${onReportProblem}
+      nestedDialogOpen=${nestedDialogOpen}
       hasPrev=${hasPrev}
       hasNext=${hasNext}
       currentIndex=${index}

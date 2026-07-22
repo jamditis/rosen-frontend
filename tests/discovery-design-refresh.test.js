@@ -88,7 +88,7 @@ describe('archive discovery visual-system refresh', () => {
     assert.match(participate, /archive-folder-tab eyebrow/);
     assert.doesNotMatch(participateCss, /\.kicker[\s\S]*clip-path:\s*polygon/);
 
-    assert.match(method, /design-system\/recipes\.css\?v=3\.8\.2/);
+    assert.match(method, /design-system\/recipes\.css\?v=\d+\.\d+\.\d+/);
     assert.match(method, /archive-folder-tab kicker/);
     assert.match(method, /archive-folder-tab eyebrow/);
     assert.match(methodScript, /archive-folder-tab eyebrow/);
@@ -114,7 +114,7 @@ describe('archive discovery visual-system refresh', () => {
   it('keeps visible view labels inside their accessible names and documents all audit routes', () => {
     assert.match(app, /aria-label="Cards view"[\s\S]*>Cards</);
     assert.match(app, /aria-label="Folders view"[\s\S]*>Folders</);
-    assert.match(read('CLAUDE.md'), /walks 35 route states/);
+    assert.match(read('CLAUDE.md'), /walks 40 route states/);
   });
 
   it('does not expose search-independent timeline counts during a text search', () => {
@@ -197,7 +197,7 @@ describe('archive discovery visual-system refresh', () => {
     assert.match(audit, /slug: 'archive-active-filters'[\s\S]*url: '\/\?q=[^']+'[\s\S]*screenshotResults: true/);
     assert.match(audit, /slug: 'archive-folders'[\s\S]*url: '\/#folders'[\s\S]*screenshotResults: true/);
     assert.match(audit, /slug: 'archive-empty-results'[\s\S]*url: '\/\?q=[^']+'[\s\S]*screenshotResults: true/);
-    assert.match(audit, /slug: 'record-modal'[\s\S]*url: '\/\?record=RECORD-00802'/);
+    assert.match(audit, /slug: 'record-article'[\s\S]*url: '\/\?record=RECORD-00802'/);
     assert.match(audit, /route\.dismissWelcome[\s\S]*Dismiss Start here invitation/);
     assert.match(audit, /route\.screenshotResults[\s\S]*archive-results-toolbar[\s\S]*scrollIntoViewIfNeeded/);
   });

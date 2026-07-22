@@ -1,46 +1,54 @@
 
 import { useEffect, useRef, useState } from 'react';
-import { html } from '../html.js?v=3.8.2';
-import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2 } from 'lucide-react';
-import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.8.2';
-import { ThreadModal } from './ThreadModal.js?v=3.8.2';
-import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.8.2';
-import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.8.2';
-import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.2';
-import { canonicalRecordUrl, shareRecordUrl } from '../utils/recordDeepLink.js?v=3.8.2';
+import { html } from '../html.js?v=3.8.3';
+import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
+import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.8.3';
+import { ThreadModal } from './ThreadModal.js?v=3.8.3';
+import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.8.3';
+import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.8.3';
+import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.3';
+import { canonicalRecordUrl, shareRecordUrl } from '../utils/recordDeepLink.js?v=3.8.3';
+import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.3';
 
 const linkifyText = (text) => {
   const parts = splitUrlsForLinkify(text);
   if (parts === null) return null;
   return parts.map((part, i) => {
     if (part.type === 'url') {
-      return html`<a key=${i} href=${part.value} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 hover:underline break-all">${part.value}</a>`;
+      return html`<a key=${i} href=${part.value} target="_blank" rel="noopener noreferrer" className="archive-inline-link">${part.value}</a>`;
     }
     return part.value;
   });
 };
 
-const TagGroup = ({title, tags, onClick}) => {
-    if (!tags || tags.length === 0) return null;
-    return html`
-        <div className="mb-6">
-            <h5 className="text-xs font-bold uppercase text-stone-400 mb-2">${title}</h5>
-            <div className="flex flex-wrap gap-2">
-                ${tags.map(t => html`
-                    <button
-                      key=${t}
-                      onClick=${onClick ? () => onClick(t) : undefined}
-                      className=${`bg-stone-100 text-stone-700 px-2 py-1 rounded text-xs border border-stone-200 ${onClick ? 'hover:bg-stone-800 hover:text-white hover:border-stone-800 cursor-pointer transition-colors' : ''}`}
-                    >
-                        ${t}
-                    </button>
-                `)}
-            </div>
-        </div>
-    `;
-}
+const TagGroup = ({ title, tags, onClick }) => {
+  if (!tags || tags.length === 0) return null;
+  return html`
+    <section className="archive-record-tag-group">
+      <h4>${title}</h4>
+      <div className="archive-record-tag-list">
+        ${tags.map(tag => onClick ? html`
+          <button type="button" key=${tag} onClick=${() => onClick(tag)}>${tag}</button>
+        ` : html`<span key=${tag}>${tag}</span>`)}
+      </div>
+    </section>
+  `;
+};
 
-const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSelectRecord, onSelectEntity, onFilterCategory, onFilterSearch, hasPrev, hasNext, currentIndex, total }) => {
+const blocksRecordNavigation = (target) => target instanceof Element && Boolean(target.closest(
+  'input, select, textarea, iframe, [contenteditable="true"], .archive-record-source'
+));
+
+const getSourceName = (record) => {
+  if (record?.pub) return record.pub;
+  try {
+    return new URL(record?.url).hostname.replace(/^www\./, '');
+  } catch {
+    return 'original source';
+  }
+};
+
+const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSelectRecord, onSelectEntity, onFilterCategory, onFilterSearch, onReportProblem, nestedDialogOpen = false, hasPrev, hasNext, currentIndex, total }) => {
   const [isClosing, setIsClosing] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -50,50 +58,68 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
   // State for lazy-loaded details
   const [fullRecord, setFullRecord] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [detailsError, setDetailsError] = useState('');
+  const [detailsRequestKey, setDetailsRequestKey] = useState(0);
   const dialogRef = useRef(null);
   const closeButtonRef = useRef(null);
   const openerRef = useRef(null);
+  const backgroundStateRef = useRef([]);
   const hasRecord = Boolean(record);
   const currentFullRecord = fullRecord?.id === record?.id ? fullRecord : null;
 
+  useEffect(() => {
+    if (!isOpen || !hasRecord) return undefined;
+    return acquireBodyScrollLock();
+  }, [isOpen, hasRecord]);
+
   // Fetch details when modal opens
   useEffect(() => {
-    if (isOpen && record) {
-      document.body.style.overflow = 'hidden';
-      setIsClosing(false);
+    let cancelled = false;
 
-      // Check if we already have full details (from previous load or full data)
-      if (record.summary && record.url) {
-        // Already have full record
-        setFullRecord(record);
-        setLoadingDetails(false);
-      } else {
-        // Need to fetch details
-        setLoadingDetails(true);
-        fetchRecordDetails(record.id).then(details => {
-          if (details) {
-            setFullRecord({ ...record, ...details });
-          } else {
-            // Fallback: use summaryPreview as summary
-            setFullRecord({
-              ...record,
-              summary: record.summaryPreview || record.title,
-              quote: '',
-              concepts: [],
-              tags: [],
-              url: '#',
-              author: record.author || 'Jay Rosen',
-              relatedIds: []
-            });
-          }
-          setLoadingDetails(false);
-        });
-      }
-    } else {
-      document.body.style.overflow = '';
+    if (!isOpen || !record) {
       setFullRecord(null);
+      setDetailsError('');
+      return undefined;
     }
-  }, [isOpen, record?.id]);
+
+    setIsClosing(false);
+    setDetailsError('');
+
+    if (record.summary && record.url) {
+      setFullRecord(record);
+      setLoadingDetails(false);
+      return () => { cancelled = true; };
+    }
+
+    setFullRecord(null);
+    setLoadingDetails(true);
+    fetchRecordDetails(record.id)
+      .then(details => {
+        if (cancelled) return;
+        if (!details) {
+          setFullRecord({
+            ...record,
+            summary: record.summaryPreview || record.title,
+            quote: '',
+            concepts: [],
+            tags: [],
+            url: '#',
+            author: record.author || 'Jay Rosen',
+            relatedIds: []
+          });
+          return;
+        }
+        setFullRecord({ ...record, ...details });
+      })
+      .catch(() => {
+        if (!cancelled) setDetailsError('The full record could not be loaded. The archive summary is still available.');
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingDetails(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [isOpen, record?.id, detailsRequestKey]);
 
   // Find related works based on shared entities
   useEffect(() => {
@@ -151,10 +177,21 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (!isOpen) return;
-      if (e.key === 'Escape') handleClose();
-      if (e.key === 'ArrowLeft' && hasPrev) onPrev();
-      if (e.key === 'ArrowRight' && hasNext) onNext();
+      if (!isOpen || nestedDialogOpen) return;
+      const focusInsideRecord = dialogRef.current?.contains(document.activeElement);
+      if (!focusInsideRecord && document.activeElement !== document.body) return;
+      if (e.key === 'Escape') {
+        handleClose();
+        return;
+      }
+      if (!blocksRecordNavigation(e.target) && e.key === 'ArrowLeft' && hasPrev) {
+        e.preventDefault();
+        onPrev();
+      }
+      if (!blocksRecordNavigation(e.target) && e.key === 'ArrowRight' && hasNext) {
+        e.preventDefault();
+        onNext();
+      }
       if (e.key === 'Tab' && dialogRef.current) {
         const focusable = Array.from(dialogRef.current.querySelectorAll(
           'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
@@ -177,7 +214,41 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, hasPrev, hasNext, onPrev, onNext]);
+  }, [isOpen, nestedDialogOpen, hasPrev, hasNext, onPrev, onNext]);
+
+  // The dialog lives beside the archive shell in both standard and desktop
+  // routes. Preserve each sibling's prior state while the record is open so
+  // pointer, keyboard, and assistive-technology navigation cannot escape into
+  // the obscured surface. Overlays mounted later (such as the report form) are
+  // intentionally not part of this snapshot and can sit above the record.
+  useEffect(() => {
+    if (!isOpen || !hasRecord) return undefined;
+
+    const dialog = dialogRef.current?.closest('.archive-record-dialog');
+    const backgroundElements = dialog?.parentElement
+      ? Array.from(dialog.parentElement.children).filter(element => element !== dialog)
+      : [];
+
+    backgroundStateRef.current = backgroundElements.map(element => ({
+      element,
+      ariaHidden: element.getAttribute('aria-hidden'),
+      inert: element.inert
+    }));
+
+    backgroundStateRef.current.forEach(({ element }) => {
+      element.inert = true;
+      element.setAttribute('aria-hidden', 'true');
+    });
+
+    return () => {
+      backgroundStateRef.current.forEach(({ element, ariaHidden, inert }) => {
+        element.inert = inert;
+        if (ariaHidden === null) element.removeAttribute('aria-hidden');
+        else element.setAttribute('aria-hidden', ariaHidden);
+      });
+      backgroundStateRef.current = [];
+    };
+  }, [isOpen, hasRecord]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -222,7 +293,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
       return;
     }
     setIsClosing(true);
-    setTimeout(() => completeClose(afterClose), 300);
+    setTimeout(() => completeClose(afterClose), 180);
   };
 
   const handleClose = () => beginClose();
@@ -243,9 +314,12 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
   };
 
   const handleCopyCitation = () => {
-    if (!currentFullRecord) return;
-    const recordUrl = canonicalRecordUrl(window.location.href, currentFullRecord.id);
-    const text = `${currentFullRecord.author} (${currentFullRecord.year}). "${currentFullRecord.title}". ${currentFullRecord.pub}. Retrieved from ${recordUrl}`;
+    if (!displayRecord) return;
+    const recordUrl = canonicalRecordUrl(window.location.href, displayRecord.id);
+    const citationAuthor = displayRecord.author || 'Jay Rosen';
+    const citationYear = displayRecord.year || 'n.d.';
+    const citationSource = displayRecord.pub ? ` ${displayRecord.pub}.` : '';
+    const text = `${citationAuthor} (${citationYear}). "${displayRecord.title}".${citationSource} Retrieved from ${recordUrl}`;
     navigator.clipboard.writeText(text).then(() => showNotification("Citation copied to clipboard"));
   };
 
@@ -266,86 +340,152 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
   const displayRecord = currentFullRecord || record;
   const isVideo = (displayRecord.url || '').includes('youtube') || (displayRecord.url || '').includes('vimeo');
   const youtubeId = (displayRecord.url || '').match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/)?.[2];
+  const hasSource = Boolean(displayRecord.url && sanitizeHref(displayRecord.url) !== '#');
+  const sourceName = getSourceName(displayRecord);
+  const contentType = isVideo
+    ? 'Video'
+    : displayRecord.type === 'social'
+      ? (displayRecord.pub || 'Social media')
+      : displayRecord.type === 'Dissertation'
+        ? 'Dissertation'
+        : displayRecord.id?.startsWith('THREAD-')
+          ? 'Thread'
+          : 'Article';
+  const summary = displayRecord.summary || displayRecord.summaryPreview || '';
+  const navigationIsFiltered = Array.isArray(allRecords) && total < allRecords.length;
+  const positionLabel = currentIndex >= 0 && total > 0 ? `${currentIndex + 1} of ${total}` : 'Record view';
 
   return html`
-    <div className="archive-record-dialog fixed inset-0 z-[80]" role="dialog" aria-modal="true" aria-labelledby="record-modal-title">
-      <div className=${`fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-stone-800 text-white px-6 py-3 rounded shadow-lg z-[90] transition-all duration-300 flex items-center gap-3 ${showToast ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
-        <${CheckCircle} className="w-4 h-4 text-green-400" />
-        <span className="text-sm font-bold">${toastMessage}</span>
+    <div className="archive-record-dialog" role="dialog" aria-modal="true" aria-labelledby="record-modal-title">
+      <div
+        className=${`archive-record-toast ${showToast ? 'is-visible' : ''}`}
+        role="status"
+        aria-live="polite"
+      >
+        <${CheckCircle} aria-hidden="true" />
+        <span>${toastMessage}</span>
       </div>
 
-      <div 
-        className=${`absolute inset-0 bg-stone-900/60 backdrop-blur-sm transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
+      <div
+        className=${`archive-record-dialog__backdrop ${isClosing ? 'is-closing' : ''}`}
         onClick=${handleClose}
-      />
+        aria-hidden="true"
+      ></div>
 
-      <div className="absolute inset-0 flex items-center justify-center p-4 sm:p-6 pointer-events-none">
-        <div ref=${dialogRef} tabIndex="-1" className=${`
-          bg-[#fdfbf7] w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl pointer-events-auto 
-          border border-stone-200 transform transition-all duration-300
-          ${isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}
-        `}>
-          
-          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-stone-200 bg-white/50">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase text-stone-400 tracking-widest">
-              <span>${displayRecord.date}</span>
-              <span>•</span>
-              <span>${isVideo ? 'Video' : displayRecord.type === 'social' ? (displayRecord.pub || 'Social Media') : displayRecord.type === 'Dissertation' ? 'Dissertation' : 'Article'}</span>
-              ${loadingDetails && html`
-                <span className="ml-2 flex items-center gap-1 text-stone-500">
-                  <${Loader2} className="w-3 h-3 animate-spin" /> Loading...
+      <div className="archive-record-dialog__positioner">
+        <article
+          ref=${dialogRef}
+          tabIndex="-1"
+          className=${`archive-record-sheet ${isClosing ? 'is-closing' : ''}`}
+        >
+          <header className="archive-record-utility">
+            <div className="archive-record-utility__identity">
+              ${displayRecord.date && html`<time dateTime=${displayRecord.date}>${displayRecord.date}</time>`}
+              ${displayRecord.date && html`<span aria-hidden="true">•</span>`}
+              <span>${contentType}</span>
+            </div>
+            <div className="archive-record-utility__actions">
+              <button
+                type="button"
+                onClick=${handleShare}
+                disabled=${sharePending}
+                className="archive-record-utility__action"
+                title=${sharePending ? 'Loading source post link' : displayRecord.type === 'social' ? 'Copy source post link' : 'Copy canonical record link'}
+                aria-label=${sharePending ? 'Loading source post link' : displayRecord.type === 'social' ? 'Copy source post link' : 'Copy canonical record link'}
+              >
+                <${Share2} aria-hidden="true" />
+                <span>Share link</span>
+              </button>
+              <button
+                type="button"
+                onClick=${handleCopyCitation}
+                className="archive-record-utility__action"
+                title="Copy citation"
+                aria-label="Copy citation"
+              >
+                <${Quote} aria-hidden="true" />
+                <span>Copy citation</span>
+              </button>
+              <button
+                ref=${closeButtonRef}
+                type="button"
+                onClick=${handleClose}
+                className="archive-record-utility__action archive-record-utility__close"
+                title="Close record"
+                aria-label="Close record"
+              >
+                <${X} aria-hidden="true" />
+              </button>
+            </div>
+          </header>
+
+          <div className="archive-record-document">
+            ${loadingDetails && html`
+              <div className="archive-record-loading" role="status" aria-live="polite">
+                <${Loader2} className="archive-record-loading__icon" aria-hidden="true" />
+                <span>Loading the full record…</span>
+              </div>
+            `}
+
+            ${detailsError && html`
+              <div className="archive-record-error" role="alert">
+                <${AlertTriangle} aria-hidden="true" />
+                <div>
+                  <strong>Some record details are unavailable.</strong>
+                  <p>${detailsError}</p>
+                </div>
+                <button type="button" onClick=${() => setDetailsRequestKey(key => key + 1)}>
+                  <${RefreshCw} aria-hidden="true" /> Retry details
+                </button>
+              </div>
+            `}
+
+            <header className="archive-record-heading">
+              <h2 id="record-modal-title">${displayRecord.title}</h2>
+
+              <!-- Read needsReview from the core record, not displayRecord:
+                   details merge lets stale detail data overwrite a new flag. -->
+              ${recordNeedsReview(record) && html`
+                <span className="archive-record-review-state" title="Auto-submitted; pending a human review pass">
+                  Needs review
                 </span>
               `}
-            </div>
-            <div className="flex items-center gap-2">
-              <button type="button" onClick=${handleShare} disabled=${sharePending} className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 disabled:cursor-wait disabled:opacity-40 rounded transition-colors" style=${{ minWidth: '44px', minHeight: '44px' }} title=${sharePending ? 'Loading source post link' : displayRecord.type === 'social' ? 'Copy source post link' : 'Copy canonical record link'} aria-label=${sharePending ? 'Loading source post link' : displayRecord.type === 'social' ? 'Copy source post link' : 'Copy canonical record link'}>
-                <${Share2} className="w-5 h-5" aria-hidden="true" />
-              </button>
-              <button type="button" onClick=${handleCopyCitation} className="p-2 text-stone-500 hover:text-stone-900 hover:bg-stone-100 rounded transition-colors" style=${{ minWidth: '44px', minHeight: '44px' }} title="Copy citation" aria-label="Copy citation">
-                <${Quote} className="w-5 h-5" aria-hidden="true" />
-              </button>
-              <button ref=${closeButtonRef} type="button" onClick=${handleClose} className="p-2 text-stone-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors" style=${{ minWidth: '44px', minHeight: '44px' }} aria-label="Close record details">
-                <${X} className="w-6 h-6" aria-hidden="true" />
-              </button>
-            </div>
-          </div>
 
-          <div className="overflow-y-auto p-6 sm:p-10 font-body leading-relaxed space-y-8">
-            <div>
-                <h2 id="record-modal-title" className="text-3xl sm:text-4xl font-display font-bold text-stone-900 mb-2 leading-tight">${displayRecord.title}</h2>
+              <p className="archive-record-byline">By ${displayRecord.author || 'Jay Rosen'}</p>
 
-                <!-- Read needsReview from the core record, not displayRecord:
-                     details merge ({...record, ...details}) lets a stale
-                     details.needsReview overwrite a freshly flagged core record. -->
-                ${recordNeedsReview(record) && html`
-                  <span
-                    className="inline-block px-2 py-0.5 mb-3 rounded text-xs font-body"
-                    style=${{ backgroundColor: '#fffbeb', color: '#b45309' }}
-                    title="Auto-submitted; pending a human review pass"
-                  >
-                    needs review
-                  </span>
+              ${hasSource ? html`
+                <a
+                  href=${sanitizeHref(displayRecord.url)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="archive-record-source archive-action archive-action--primary"
+                >
+                  Read on ${sourceName} <${ExternalLink} aria-hidden="true" />
+                </a>
+              ` : !loadingDetails && !detailsError ? html`
+                <p className="archive-record-source-status">
+                  <${AlertTriangle} aria-hidden="true" /> Source unavailable in this archive
+                </p>
+              ` : null}
+
+              <div className="archive-record-provenance">
+                <span>Archive ID: ${displayRecord.id}</span>
+                ${onReportProblem && html`
+                  <button type="button" onClick=${() => onReportProblem(displayRecord.id)}>
+                    Report a problem with this record
+                  </button>
                 `}
-
-                <div className="text-lg text-stone-600 mb-4 font-display">
-                    By ${displayRecord.author || 'Jay Rosen'}
-                </div>
-
-                ${displayRecord.url && displayRecord.url !== '#' && html`
-                  <a href=${sanitizeHref(displayRecord.url)} target="_blank" rel="noreferrer" className="text-blue-700 hover:underline font-bold text-sm inline-flex items-center gap-1 mb-6">
-                    Read on ${displayRecord.pub} <${ExternalLink} className="w-3 h-3" />
-                  </a>
-                `}
-            </div>
+              </div>
+            </header>
 
             ${youtubeId && html`
-               <div className="aspect-video bg-black rounded-lg overflow-hidden mb-8 shadow-lg">
-                  <iframe
-                    src=${`https://www.youtube.com/embed/${youtubeId}`}
-                    allowFullScreen=${true}
-                    className="w-full h-full border-0"
-                  />
-               </div>
+              <div className="archive-record-media">
+                <iframe
+                  src=${`https://www.youtube.com/embed/${youtubeId}`}
+                  title=${`Video for ${displayRecord.title}`}
+                  allowFullScreen=${true}
+                ></iframe>
+              </div>
             `}
 
             ${(() => {
@@ -356,40 +496,38 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
               // Skip if quote is effectively the same as the title
               if (titleText.length > 10 && (quoteText === titleText || quoteText.startsWith(titleText) || titleText.startsWith(quoteText.substring(0, titleText.length)))) return null;
               return html`
-                <blockquote className="border-l-4 border-stone-800 pl-6 py-2 my-8 italic text-xl text-stone-700 font-display bg-stone-50/50 rounded-r-lg">
-                  "${quoteText}"
+                <blockquote className="archive-record-quotation">
+                  <${Quote} aria-hidden="true" />
+                  <p>“${quoteText}”</p>
                 </blockquote>
               `;
             })()}
 
             ${displayRecord.id?.startsWith('THREAD-') && displayRecord.thread_data ? html`
               <${ThreadModal} record=${displayRecord} />
+            ` : summary ? html`
+              <section className="archive-record-summary" aria-labelledby="record-summary-title">
+                <h3 id="record-summary-title">Summary</h3>
+                <p>${linkifyText(summary)}</p>
+              </section>
             ` : html`
-              <div className="prose prose-stone max-w-none">
-                <p className="text-lg text-stone-800 leading-relaxed">${linkifyText(displayRecord.summary || displayRecord.summaryPreview || '')}</p>
-              </div>
+              <p className="archive-record-incomplete">No summary is available for this record.</p>
             `}
 
             ${onSelectEntity && recordEntities.length > 0 && html`
-              <section className="border-t border-stone-200 pt-8" aria-labelledby="record-entities-title">
-                <h3 id="record-entities-title" className="text-xl font-display font-bold text-stone-900 mb-2">
-                  People and ideas in this record
-                </h3>
-                <p className="mb-4 text-sm text-stone-600">
-                  Continue through the archive's canonical relationship index.
-                </p>
-                <div className="flex flex-wrap gap-2">
+              <section className="archive-record-metadata archive-record-entities" aria-labelledby="record-entities-title">
+                <h3 id="record-entities-title">People and ideas in this record</h3>
+                <p>Continue through the archive's canonical relationship index.</p>
+                <div className="archive-record-entity-list">
                   ${recordEntities.map(entity => html`
                     <button
                       type="button"
                       key=${entity.id}
                       onClick=${() => leaveRecordFor(onSelectEntity, entity.id)}
-                      className="inline-flex items-center gap-2 rounded border border-stone-300 bg-white px-3 py-2 text-left text-sm text-stone-800 transition-colors hover:border-stone-600 hover:bg-stone-50 focus:outline-none focus:ring-2 focus:ring-stone-700 focus:ring-offset-2"
-                      style=${{ minHeight: '44px' }}
                       aria-label=${`Explore ${entity.name} in People and ideas`}
                     >
-                      <span className="font-bold">${entity.name}</span>
-                      <span className="text-xs uppercase tracking-wide text-stone-500">${entity.type}</span>
+                      <strong>${entity.name}</strong>
+                      <span>${entity.type}</span>
                     </button>
                   `)}
                 </div>
@@ -397,80 +535,64 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
             `}
 
             ${relatedWorks.length > 0 && html`
-                <div className="border-t border-stone-200 pt-8">
-                    <h3 className="text-xl font-display font-bold text-stone-900 mb-4 flex items-center gap-2">
-                        <${Link} className="w-5 h-5 text-stone-400" /> Related records
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        ${relatedWorks.map(rel => html`
-                            <button
-                                key=${rel.id}
-                                onClick=${() => onSelectRecord(rel.id)}
-                                className="text-left p-4 bg-stone-50 border border-stone-200 hover:border-stone-400 hover:shadow-sm transition-all rounded-sm group w-full"
-                            >
-                                <div className="flex items-center justify-between mb-1">
-                                  <span className="text-xs font-bold text-stone-400 uppercase tracking-wider">${rel.date}</span>
-                                  ${rel.connectionStrength > 0 && html`
-                                    <span className="text-[10px] font-mono px-1.5 py-0.5 bg-stone-200 text-stone-600 rounded">
-                                      ${rel.connectionStrength} shared ${rel.connectionStrength === 1 ? 'entity' : 'entities'}
-                                    </span>
-                                  `}
-                                </div>
-                                <h4 className="text-sm font-bold text-stone-800 group-hover:text-blue-800 leading-tight mb-1 line-clamp-2">
-                                    ${rel.title}
-                                </h4>
-                                <div className="text-xs text-stone-500 truncate mb-2">${rel.pub}</div>
-                                ${rel.sharedEntities && rel.sharedEntities.length > 0 && html`
-                                  <div className="flex flex-wrap gap-1">
-                                    ${rel.sharedEntities.slice(0, 4).map(entity => html`
-                                      <span key=${entity.id || entity.name} className="text-[10px] px-1.5 py-0.5 bg-white border border-stone-200 rounded text-stone-500">
-                                        ${entity.name}
-                                      </span>
-                                    `)}
-                                    ${rel.sharedEntities.length > 4 && html`
-                                      <span className="text-[10px] text-stone-400">+${rel.sharedEntities.length - 4}</span>
-                                    `}
-                                  </div>
-                                `}
-                            </button>
-                        `)}
-                    </div>
+              <section className="archive-record-related" aria-labelledby="record-related-title">
+                <h3 id="record-related-title"><${Link} aria-hidden="true" /> Related records</h3>
+                <div className="archive-record-related__grid">
+                  ${relatedWorks.map(rel => html`
+                    <button type="button" key=${rel.id} onClick=${() => onSelectRecord(rel.id)}>
+                      <span className="archive-record-related__utility">
+                        <span>${rel.date}</span>
+                        ${rel.connectionStrength > 0 && html`
+                          <span>${rel.connectionStrength} shared ${rel.connectionStrength === 1 ? 'entity' : 'entities'}</span>
+                        `}
+                      </span>
+                      <strong>${rel.title}</strong>
+                      <span>${rel.pub}</span>
+                    </button>
+                  `)}
                 </div>
+              </section>
             `}
 
-            <hr className="my-8 border-stone-200" />
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-               <${TagGroup} title="Thematic categories" tags=${displayRecord.categories} onClick=${onFilterCategory ? (cat) => leaveRecordFor(onFilterCategory, cat) : undefined} />
-               <${TagGroup} title="Tags" tags=${displayRecord.tags} onClick=${onFilterSearch ? (tag) => leaveRecordFor(onFilterSearch, tag) : undefined} />
-               <${TagGroup} title="Key concepts" tags=${displayRecord.concepts} onClick=${onFilterSearch ? (concept) => leaveRecordFor(onFilterSearch, concept) : undefined} />
-
-               <div>
-                  <h5 className="text-xs font-bold uppercase text-stone-400 mb-2">Era</h5>
-                  <span className="inline-block px-3 py-1 bg-stone-800 text-white text-xs font-bold rounded">${displayRecord.era}</span>
-               </div>
-            </div>
+            <section className="archive-record-metadata" aria-labelledby="record-metadata-title">
+              <h3 id="record-metadata-title">Archive metadata</h3>
+              <div className="archive-record-metadata__grid">
+                <${TagGroup} title="Thematic categories" tags=${displayRecord.categories} onClick=${onFilterCategory ? (cat) => leaveRecordFor(onFilterCategory, cat) : undefined} />
+                <${TagGroup} title="Tags" tags=${displayRecord.tags} onClick=${onFilterSearch ? (tag) => leaveRecordFor(onFilterSearch, tag) : undefined} />
+                <${TagGroup} title="Key concepts" tags=${displayRecord.concepts} onClick=${onFilterSearch ? (concept) => leaveRecordFor(onFilterSearch, concept) : undefined} />
+                ${displayRecord.era && html`
+                  <section className="archive-record-tag-group">
+                    <h4>Era</h4>
+                    <p>${displayRecord.era}</p>
+                  </section>
+                `}
+              </div>
+            </section>
           </div>
 
-          <div className="p-4 border-t border-stone-200 bg-stone-50 flex justify-between items-center text-sm">
-            <button 
-              onClick=${onPrev} 
+          <footer className="archive-record-navigation">
+            <button
+              type="button"
+              onClick=${onPrev}
               disabled=${!hasPrev}
-              className="flex items-center gap-2 text-stone-600 hover:text-black disabled:opacity-30 disabled:cursor-not-allowed transition-colors font-bold"
             >
-              <${ArrowLeft} className="w-4 h-4" /> Previous
+              <${ArrowLeft} aria-hidden="true" /> Previous
             </button>
-            <span className="text-stone-400 text-xs hidden sm:inline-block">${currentIndex + 1} of ${total}</span>
-            <button 
-              onClick=${onNext} 
+            <div>
+              <strong>${positionLabel}</strong>
+              ${navigationIsFiltered && html`
+                <span className="archive-record-navigation__context">Within current filtered results</span>
+              `}
+            </div>
+            <button
+              type="button"
+              onClick=${onNext}
               disabled=${!hasNext}
-              className="flex items-center gap-2 text-stone-600 hover:text-black disabled:opacity-30 disabled:cursor-not-allowed transition-colors font-bold"
             >
-              Next <${ArrowRight} className="w-4 h-4" />
+              Next <${ArrowRight} aria-hidden="true" />
             </button>
-          </div>
-
-        </div>
+          </footer>
+        </article>
       </div>
     </div>
   `;

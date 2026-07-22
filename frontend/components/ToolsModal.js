@@ -1,8 +1,9 @@
 // ToolsModal.js - Modal with icons for exploring archive tools
 import { useEffect, useRef, useCallback } from 'react';
-import { html } from '../html.js?v=3.8.2';
+import { html } from '../html.js?v=3.8.3';
 import { X, Compass, Map, BookOpen, HelpCircle, BarChart3, BookMarked, Monitor } from 'lucide-react';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.2';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.3';
+import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.3';
 
 // Tool definitions with categories
 const TOOLS = {
@@ -152,14 +153,8 @@ const ToolsModal = ({ isOpen, onClose, onSelectTool }) => {
 
   // Lock body scroll when open
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
+    if (!isOpen) return undefined;
+    return acquireBodyScrollLock();
   }, [isOpen]);
 
   const handleToolClick = useCallback((tool) => {

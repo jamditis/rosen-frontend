@@ -1,9 +1,9 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { html } from '../html.js?v=3.8.2';
+import { html } from '../html.js?v=3.8.3';
 import { X, Search, XCircle, ChevronDown, ChevronUp } from 'lucide-react';
-import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.8.2';
-import { CONTENT_TYPE_OPTIONS } from '../constants.js?v=3.8.2';
+import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.8.3';
+import { CONTENT_TYPE_OPTIONS } from '../constants.js?v=3.8.3';
 
 const Sidebar = ({
   facets,

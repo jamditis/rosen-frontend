@@ -1,132 +1,103 @@
-import { html } from '../html.js?v=3.8.2';
-import { ExternalLink } from 'lucide-react';
-import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.8.2';
-import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.8.2';
+import { html } from '../html.js?v=3.8.3';
+import { ExternalLink, MessageSquare } from 'lucide-react';
+import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.8.3';
+import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.8.3';
 
-// Convert URLs in text to clickable links. Shares the linkify split with
-// RecordModal so the two stay consistent and neither carries a stateful regex.
 const linkifyText = (text) => {
   const parts = splitUrlsForLinkify(text);
   if (parts === null) return null;
-  return parts.map((part, i) => {
+  return parts.map((part, index) => {
     if (part.type === 'url') {
-      return html`<a key=${i} href=${part.value} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 hover:underline break-all">${part.value}</a>`;
+      return html`
+        <a key=${index} href=${part.value} target="_blank" rel="noopener noreferrer" className="archive-inline-link">
+          ${part.value}
+        </a>
+      `;
     }
     return part.value;
   });
 };
 
-/**
- * ThreadPost - Individual post in a thread
- */
-const ThreadPost = ({ post, totalPosts }) => {
-    const depthColors = [
-        'border-sky-500',    // depth 0 (root)
-        'border-green-500',  // depth 1
-        'border-amber-500',  // depth 2
-        'border-pink-500',   // depth 3+
-    ];
-
-    const depthColor = depthColors[Math.min(post.depth, 3)];
-    const marginLeft = post.depth > 0 ? `${Math.min(post.depth, 5) * 16}px` : '0';
-
-    // Format date
-    const formatDate = (dateStr) => {
-        if (!dateStr) return '';
-        try {
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        } catch {
-            return dateStr;
-        }
-    };
-
-    return html`
-        <div
-            className="border-l-3 ${depthColor} pl-4 py-3 mb-3"
-            style=${{ marginLeft }}
-        >
-            <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-stone-400">
-                    Post ${post.number}/${totalPosts}
-                </span>
-                <span className="text-xs text-stone-400">
-                    ${formatDate(post.date)}
-                </span>
-            </div>
-
-            ${post.content ? html`
-                <div className="text-sm text-stone-800 leading-relaxed mb-2 whitespace-pre-wrap">
-                    ${linkifyText(post.content)}
-                </div>
-            ` : html`
-                <div className="text-sm text-stone-400 italic mb-2">
-                    [No content]
-                </div>
-            `}
-
-            <a
-                href=${sanitizeHref(post.url)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-sky-600 hover:text-sky-700 transition-colors"
-            >
-                View on Bluesky
-                <${ExternalLink} size=${12} />
-            </a>
-        </div>
-    `;
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return dateString;
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit'
+  });
 };
 
-/**
- * ThreadModal - Display thread content in RecordModal
- *
- * Used when a thread record (THREAD-XXXXX) is opened.
- * Parses thread_data JSON and displays posts in threaded format.
- */
+const ThreadPost = ({ post, totalPosts }) => {
+  const depth = Math.max(0, Number(post.depth) || 0);
+  const postUrl = sanitizeHref(post.url);
+
+  return html`
+    <article
+      className="archive-thread-post"
+      style=${{ '--thread-depth': Math.min(depth, 5), '--thread-accent': `var(--archive-thread-depth-${Math.min(depth, 3)})` }}
+      aria-labelledby=${`thread-post-${post.number}`}
+    >
+      <header>
+        <h4 id=${`thread-post-${post.number}`}>Post ${post.number} of ${totalPosts}</h4>
+        ${post.date && html`<time dateTime=${post.date}>${formatDate(post.date)}</time>`}
+      </header>
+
+      ${post.content ? html`
+        <p>${linkifyText(post.content)}</p>
+      ` : html`
+        <p className="archive-thread-post__missing">No content is available for this post.</p>
+      `}
+
+      ${postUrl !== '#' && html`
+        <a href=${sanitizeHref(post.url)} target="_blank" rel="noopener noreferrer">
+          View on Bluesky <${ExternalLink} aria-hidden="true" />
+        </a>
+      `}
+    </article>
+  `;
+};
+
+/** Display a Bluesky thread as one archival reading sequence. */
 export const ThreadModal = ({ record }) => {
-    // Get thread data from record (already parsed as object)
-    const threadData = record.thread_data;
+  const threadData = record.thread_data;
+  const posts = Array.isArray(threadData?.posts) ? threadData.posts : [];
 
-    if (!threadData || !threadData.posts) {
-        return html`
-            <div className="text-center text-stone-500 py-8">
-                <p>Thread data not available</p>
-            </div>
-        `;
-    }
-
-    const { posts, total_posts, max_depth } = threadData;
-
+  if (posts.length === 0) {
     return html`
-        <div className="thread-viewer">
-            <!-- Thread Stats - compact inline version -->
-            <div className="flex items-center gap-4 text-xs text-stone-500 mb-4 pb-3 border-b border-stone-200">
-                <span><strong className="text-stone-700">${total_posts}</strong> posts</span>
-                <span>·</span>
-                <span><strong className="text-stone-700">${max_depth}</strong> levels deep</span>
-                <span>·</span>
-                <span>Bluesky thread</span>
-            </div>
-
-            <!-- Thread Posts -->
-            <div className="thread-posts max-h-[600px] overflow-y-auto pr-2">
-                ${posts.map(post => html`
-                    <${ThreadPost}
-                        key=${post.id}
-                        post=${post}
-                        totalPosts=${total_posts}
-                    />
-                `)}
-            </div>
+      <div className="archive-thread archive-thread--unavailable" role="status">
+        <${MessageSquare} aria-hidden="true" />
+        <div>
+          <h3>Thread unavailable</h3>
+          <p>The archive record exists, but its individual posts are not available.</p>
         </div>
+      </div>
     `;
+  }
+
+  const totalPosts = Number(threadData.total_posts) || posts.length;
+  const maxDepth = Number(threadData.max_depth) || Math.max(...posts.map(post => Number(post.depth) || 0));
+
+  return html`
+    <section className="archive-thread" aria-labelledby="archive-thread-title">
+      <header className="archive-thread__header">
+        <div>
+          <${MessageSquare} aria-hidden="true" />
+          <h3 id="archive-thread-title">Bluesky thread</h3>
+        </div>
+        <p>${totalPosts} posts <span aria-hidden="true">•</span> ${maxDepth} levels deep</p>
+      </header>
+
+      <div className="archive-thread__posts">
+        ${posts.map(post => html`
+          <${ThreadPost} key=${post.id || post.number} post=${post} totalPosts=${totalPosts} />
+        `)}
+      </div>
+    </section>
+  `;
 };
 
 export default ThreadModal;

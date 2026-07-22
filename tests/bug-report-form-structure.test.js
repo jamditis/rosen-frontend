@@ -21,9 +21,10 @@ describe('branded report form wiring', () => {
   const indexCss = read('frontend', 'index.css');
 
   it('opens the themed modal from the header button, not the GitHub deep link', () => {
-    // The button must flip modal state. If it ever reverts to onClick=openBugReport
-    // the reader gets dropped on github.com again, which is the regression #509 fixes.
-    assert.match(appSrc, /onClick=\$\{\(\) => \{ setBugReportIntent\('problem'\); setBugReportOpen\(true\); \}\}/);
+    // The in-app helper must flip modal state; the header must not navigate to
+    // GitHub directly. The modal still owns its explicit fallback path.
+    assert.match(appSrc, /const openBugReport = useCallback[\s\S]*setBugReportOpen\(true\)/);
+    assert.match(appSrc, /onClick=\$\{\(\) => openBugReport\('problem'\)\}/);
     assert.match(appSrc, /aria-label="Report a bug"/);
     assert.match(appSrc, /const \[bugReportOpen, setBugReportOpen\] = useState\(false\)/);
   });
@@ -86,7 +87,7 @@ describe('branded report form wiring', () => {
     // a fresh form, and file the same report twice while the first POST completes.
     // One guard (requestClose) that no-ops during 'submitting' covers all three.
     assert.match(modalSrc, /const requestClose = useCallback\(\(\) => \{\s*if \(phase === 'submitting'\) return;/);
-    assert.match(modalSrc, /if \(e\.key === 'Escape'\) \{\s*requestClose\(\)/);
+    assert.match(modalSrc, /if \(e\.key === 'Escape'\) \{[\s\S]{0,400}e\.stopPropagation\(\);[\s\S]{0,120}requestClose\(\)/);
     assert.match(modalSrc, /e\.currentTarget\) requestClose\(\)/);
     assert.match(modalSrc, /ref=\$\{closeButtonRef\}\s*onClick=\$\{requestClose\}\s*disabled=\$\{submitting\}/);
   });
