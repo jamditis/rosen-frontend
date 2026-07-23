@@ -5703,3 +5703,62 @@ Final SHA-256 values after export:
 - `data/archive-details.json`: `6afaf462e63f3eed6d417aa74ee817d6971bd52ff7f2efd12bed807d15a9fa61`
 - `data/archive-entities.json`: `5c1ffefd78333243363651cb3796475b9c6294d74657eb6b6bd2982b97085e15`
 - `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`
+
+### Final extraction coverage batch
+
+The remaining archive records with source text but no relationship rows were
+mapped to existing entities only: `TUMBLR-00121`, `TUMBLR-00126`,
+`TUMBLR-00131`, `TUMBLR-00132`, `TUMBLR-00133`, `TUMBLR-00134`,
+`TUMBLR-00136`, `TUMBLR-00137`, `TUMBLR-00138`, `CLIP-00037`,
+`CLIP-00064`, `CLIP-00074`, and `CLIP-00076`. No new entity IDs were created.
+
+A read-only Kimi CLI review checked the proposed mappings. The review rejected
+unsupported Rosen attribution, a weak Open Studio event mention, a
+data-journalism/data-visualization mismatch, and a vague community edge. It
+also downgraded the Silicon Valley and social media rows to `Mentions`.
+
+Changes applied:
+
+- Appended 52 relationship rows to `data/extracted_relationships.csv`.
+- Added a focused regression proving every new context snippet is an exact
+  substring of its source record.
+- Left `data/extracted_entities.csv` unchanged.
+
+The focused regression
+`node --test --test-name-pattern "final extraction coverage batch" tests\extraction-coverage.test.js`
+failed before the relationship append because `TUMBLR-00121_REL_001` was
+missing, then passed after the append.
+
+Post-application counts:
+
+- Relationships: 11,136, up from 11,084.
+- Archive records with entities: 873/1,028 (84.9%), up from 860/1,028.
+- Extraction coverage missing archive records: 0, down from 13.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "final extraction coverage batch" tests\extraction-coverage.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: passed, 17/17 tests.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  50 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, and extraction coverage tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `67ff363b9a309e69de3c2792ab35bc478ad18a08655406a31830bc23154171e3`
+- `data/archive-data.json`: `4e6263ed2fcfed43bd8239dc00cc4fa8b9699d9b200c2f2315ac08fb5b406b8e`
+- `data/archive-core.json`: `66e7f3a62541cca74ec71797dd8c935a8432c01fea7e61dfa5a39817d2aefefa`
+- `data/archive-details.json`: `32dbd706650a06372c2e2ed2b89681de89ee0e6d9e62f6ff216af552252420df`
+- `data/archive-entities.json`: `645e726080c103797126a0d25af14dcd298727c2f3fde7a86c1a9bdec4f0482c`
+- `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`
