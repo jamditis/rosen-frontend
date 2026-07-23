@@ -2122,13 +2122,48 @@ describe('social_posts.csv', () => {
   });
 
   it('all social posts have explicit verified status', () => {
-    const unverified = socialPosts
-      .filter(post => post.verified !== 'TRUE')
+    const unresolved = socialPosts
+      .filter(post => !['TRUE', 'FALSE'].includes(post.verified))
       .map(post => post.id);
     assert.strictEqual(
-      unverified.length,
+      unresolved.length,
       0,
-      `${unverified.length} social posts are not explicitly verified: ${unverified.slice(0, 10).join(', ')}`
+      `${unresolved.length} social posts are missing an explicit TRUE/FALSE verification outcome: ${unresolved.slice(0, 10).join(', ')}`
+    );
+  });
+
+  it('verified social posts keep source evidence', () => {
+    const missingEvidence = socialPosts
+      .filter(post => post.verified === 'TRUE')
+      .filter(post => !(post.url || '').trim())
+      .filter(post => !/\bsource\b|\bimport\b|\bat:\/\/|\bcid=/i.test(post.notes || ''))
+      .map(post => post.id);
+    assert.strictEqual(
+      missingEvidence.length,
+      0,
+      `${missingEvidence.length} verified social posts lack platform URL or documented import evidence: ${missingEvidence.slice(0, 10).join(', ')}`
+    );
+  });
+
+  it('unverified social posts document why source evidence is unresolved', () => {
+    const undocumented = socialPosts
+      .filter(post => post.verified === 'FALSE')
+      .filter(post => !/unresolved|source.+absent|removed false|unrecover|not verified/i.test(post.notes || ''))
+      .map(post => post.id);
+    assert.strictEqual(
+      undocumented.length,
+      0,
+      `${undocumented.length} unverified social posts lack unresolved-source notes: ${undocumented.slice(0, 10).join(', ')}`
+    );
+  });
+
+  it('export does not force all social rows to verified by type', () => {
+    const exporterSource = fs.readFileSync(path.join(dataDir, 'export-archive-data.js'), 'utf-8');
+    const verifiedBlock = exporterSource.match(/const isVerified =[\s\S]*?;/);
+    assert.ok(verifiedBlock, 'could not find export verified expression');
+    assert.ok(
+      !/type\s*===\s*['"]social['"]/.test(verifiedBlock[0]),
+      'social rows must use explicit source verified status, not a type-wide shortcut'
     );
   });
 

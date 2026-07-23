@@ -6274,3 +6274,56 @@ Final SHA-256 values after export:
 - `data/archive-details.json`: `4503506056907fc4437533ce6717a59490a819f03ba9f454f7a5a3d07b03e8b1`
 - `data/archive-entities.json`: `1f7450b2ce55f8d736e00e25e4986992e5a862ba07cb2d8142d68252aae3ab32`
 - `data/archive-analytics.json`: `b2f31e9f0fc9ecc1f905c23aea62f7a03e144c6644bf922d4b147b5a3480f87e`
+
+### Social verification status closure
+
+The social verification gate was corrected to match the handoff standard:
+every social source row must have an explicit `TRUE` or `FALSE` verification
+outcome tied to platform/source evidence. A local CLI review recommended this
+path over marking every row `TRUE`, because 54 repaired non-Rosen Bluesky rows
+still lack authoritative source URLs after the false `jayrosen.bsky.social`
+URLs were removed.
+
+Changes applied:
+
+- Set 29,639 blank social `verified` cells to `TRUE` where the row retained
+  platform URL or import evidence.
+- Set the 54 source-absent non-Rosen Bluesky rows to `FALSE`; their notes
+  already document that the false Jay-profile URL was removed and the original
+  author URL remains unresolved.
+- Updated the social verification gate to require explicit `TRUE` or `FALSE`
+  rather than only `TRUE`.
+- Added evidence-link assertions for verified social rows and unresolved-source
+  note assertions for unverified social rows.
+- Removed the exporter shortcut that forced every `type === 'social'` row to
+  runtime verified status. Source verification status now comes from the CSV
+  value.
+- Regenerated archive JSON and feed artifacts.
+
+Validation:
+
+- `node --test --test-name-pattern "explicit verified status|verified social
+  posts keep source evidence|unverified social posts document|export does not
+  force all social rows" tests\csv-quality.test.js`: social subtests passed;
+  the only targeted failure was the existing archive gate for `RECORD-00865`.
+- `python backend\scripts\validate_archive_data.py`: no errors; archive records
+  1,024, social posts 29,747, entities 7,370, relationships 11,108.
+- `node data\export-archive-data.js`: passed. Published records stayed at
+  26,691 because the 54 `FALSE` rows were already excluded by the non-Rosen
+  social filter.
+- `npm run test:data`: 149 passing tests and two expected completion gates
+  still failing: `RECORD-00865` and 21 entity rows without
+  `first_mention_record_id`.
+- `git -c core.whitespace=trailing-space,cr-at-eol diff --check`: passed
+  except expected line-ending warnings.
+
+Final SHA-256 values after export:
+
+- `data/social_posts.csv`: `2051a074e633ea62a6826267d2ea310121d1fc0c00fc28cfd405bc93c7e62c6d`
+- `data/archive-data.json`: `d1ff2f1f60586c40821d4b1b4dcf058c31279a4a038c91726022e8b815d6787c`
+- `data/archive-core.json`: `60311259c572d39df017a0b3965e785dab53259e1ec6127b5928b712ba757acc`
+- `data/archive-details.json`: `01c80f37cead7de3510c3e2c0f2ae8317e52d37d9780984e3da2a1115ef7de7f`
+- `data/archive-entities.json`: `09280aa490446f8670e5198e2de44bc00556e0469cfc36472517875315e8f7ee`
+- `data/archive-analytics.json`: `b2f31e9f0fc9ecc1f905c23aea62f7a03e144c6644bf922d4b147b5a3480f87e`
+- `data/export-archive-data.js`: `c598a2561da07a67e80d0abb0a306e78acdec483e0684a6b5c6508979805331d`
+- `tests/csv-quality.test.js`: `c874a836225e89b2dc30e6be28c5a5b529fc68301ebcc3553899d8bda520c8cf`
