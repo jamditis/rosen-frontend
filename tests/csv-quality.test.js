@@ -2386,6 +2386,55 @@ describe('extracted_entities.csv', () => {
     }
   });
 
+  it('maps reviewed orphan entities to their earliest source-text evidence', () => {
+    const expected = new Map([
+      ['C0160', { recordId: 'RECORD-00237', phrase: 'freedom of speech' }],
+      ['C0261', { recordId: 'RECORD-00165', phrase: 'world citizenship' }],
+      ['C0316', { recordId: 'RECORD-00146', phrase: 'gatekeeper model' }],
+      ['C0545', { recordId: 'RECORD-00879', phrase: 'one-to-many' }],
+      ['C0562', { recordId: 'RECORD-00127', phrase: 'news/opinion distinction' }],
+      ['C0604', { recordId: 'RECORD-00503', phrase: 'Easongate' }],
+      ['C0650', { recordId: 'RECORD-00183', phrase: 'norm of objectivity' }],
+      ['E0106', { recordId: 'RECORD-00125', phrase: 'war in Iraq' }],
+      ['E0119', { recordId: 'RECORD-00110', phrase: 'Jason Blair crisis' }],
+      ['L0131', { recordId: 'CLIP-00076', phrase: 'Cambridge, Mass' }],
+      ['O0313', { recordId: 'RECORD-00208', phrase: 'Fort Worth Star-Telegram' }],
+      ['O1118', { recordId: 'RECORD-00140', phrase: 'Monacle' }],
+      ['O1189', { recordId: 'RECORD-00410', phrase: 'MediaChannel' }],
+      ['O1207', { recordId: 'RECORD-00882', phrase: 'Center for Collaborative Journalism' }],
+      ['P1015', { recordId: 'RECORD-00101', phrase: 'Matthew Yglesisas' }],
+      ['P1213', { recordId: 'RECORD-00115', phrase: 'Salaam Pax' }],
+      ['P2012', { recordId: 'RECORD-00138', phrase: 'Rupert Murdoch' }],
+      ['P2094', { recordId: 'RECORD-00170', phrase: 'Rony Albovitz' }],
+    ]);
+    const entitiesById = new Map(entities.map(entity => [entity.entity_id, entity]));
+    const recordsById = new Map(archiveRecords.map(record => [record.id, record]));
+
+    for (const [entityId, { recordId, phrase }] of expected) {
+      const entity = entitiesById.get(entityId);
+      const record = recordsById.get(recordId);
+      assert.ok(entity, `${entityId} must exist`);
+      assert.ok(record, `${recordId} must exist`);
+      assert.strictEqual(entity.first_mention_record_id, recordId);
+      assert.ok(
+        record.raw_text.toLowerCase().includes(phrase.toLowerCase()),
+        `${recordId} must contain ${phrase}`
+      );
+
+      const matchingRecords = archiveRecords
+        .filter(candidate => candidate.raw_text.toLowerCase().includes(phrase.toLowerCase()))
+        .sort((left, right) =>
+          left.publication_date.localeCompare(right.publication_date) ||
+          left.id.localeCompare(right.id)
+        );
+      assert.strictEqual(
+        matchingRecords[0]?.id,
+        recordId,
+        `${entityId} should point to the earliest archive record containing ${phrase}`
+      );
+    }
+  });
+
 });
 
 // ============================================

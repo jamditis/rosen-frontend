@@ -5762,3 +5762,76 @@ Final SHA-256 values after export:
 - `data/archive-details.json`: `32dbd706650a06372c2e2ed2b89681de89ee0e6d9e62f6ff216af552252420df`
 - `data/archive-entities.json`: `645e726080c103797126a0d25af14dcd298727c2f3fde7a86c1a9bdec4f0482c`
 - `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`
+
+### Reviewed orphan entity first mentions
+
+Filled 18 blank `first_mention_record_id` values for existing orphan entities
+with earliest source-text evidence. No new entities, relationships, merges, or
+taxonomy changes were applied.
+
+A read-only Kimi CLI review timed out twice without output. A read-only Grok
+CLI review approved the candidate set and required tests proving each mapped
+record contains the surface form and is the earliest archive record containing
+that form. The local earliest-record check moved `O1207` from `RECORD-00772`
+to earlier evidence in `RECORD-00882` before application.
+
+Mappings applied:
+
+- `C0160` -> `RECORD-00237` (`freedom of speech`)
+- `C0261` -> `RECORD-00165` (`world citizenship`)
+- `C0316` -> `RECORD-00146` (`gatekeeper model`)
+- `C0545` -> `RECORD-00879` (`one-to-many`)
+- `C0562` -> `RECORD-00127` (`news/opinion distinction`)
+- `C0604` -> `RECORD-00503` (`Easongate`)
+- `C0650` -> `RECORD-00183` (`norm of objectivity`)
+- `E0106` -> `RECORD-00125` (`war in Iraq`)
+- `E0119` -> `RECORD-00110` (`Jason Blair crisis`)
+- `L0131` -> `CLIP-00076` (`Cambridge, Mass`)
+- `O0313` -> `RECORD-00208` (`Fort Worth Star-Telegram`)
+- `O1118` -> `RECORD-00140` (`Monacle`)
+- `O1189` -> `RECORD-00410` (`MediaChannel`)
+- `O1207` -> `RECORD-00882` (`Center for Collaborative Journalism`)
+- `P1015` -> `RECORD-00101` (`Matthew Yglesisas`)
+- `P1213` -> `RECORD-00115` (`Salaam Pax`)
+- `P2012` -> `RECORD-00138` (`Rupert Murdoch`)
+- `P2094` -> `RECORD-00170` (`Rony Albovitz`)
+
+The focused regression
+`node --test --test-name-pattern "maps reviewed orphan entities" tests\csv-quality.test.js`
+failed before the CSV edit because `C0160` had a blank
+`first_mention_record_id`, then passed after the edit.
+
+Post-application counts:
+
+- Entities with blank `first_mention_record_id`: 32, down from 50.
+- Relationships: 11,136, unchanged.
+- Archive records with entities: 873/1,028 (84.9%), unchanged.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "maps reviewed orphan entities" tests\csv-quality.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: passed, 17/17 tests.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  32 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, extraction coverage, and reviewed
+  orphan first-mention tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `c5d87279ce7a7d9f2eb3a2bbcfcc24b00e37b90e8917b47c111ee7b887fb6467`
+- `data/extracted_relationships.csv`: `67ff363b9a309e69de3c2792ab35bc478ad18a08655406a31830bc23154171e3`
+- `data/archive-data.json`: `65b0759e21ea5d322afcc0227706e44159ccbe24bb0c19bc44be3c613cb893cc`
+- `data/archive-core.json`: `8dd394f46b86b9594fd95570087994542d9e5cb5cec3f8d2d49fdc64a13383aa`
+- `data/archive-details.json`: `0b20d217cd57a81dddfb32305186a4fc122f98792b4a17efbc321e4eb13b3ec2`
+- `data/archive-entities.json`: `5ebf7671e79a297e32e62a546dc498390b514ca31b7d532cb8758dd1f0eb6bec`
+- `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`
