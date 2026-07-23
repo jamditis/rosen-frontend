@@ -5,7 +5,7 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records in the &quot;Journalism Education&quot; category</description>
     <language>en-us</language>
-    <lastBuildDate>Mon, 20 Jul 2026 17:06:47 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 23 Jul 2026 17:31:08 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-education.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
   <item>
@@ -127,6 +127,16 @@
     <description>A Bluesky post by Jay Rosen from 2025-09-10. Topics: Journalism Education, Journalism Theory &amp; Practice.</description>
     <category>Journalism Education</category>
     <category>Journalism Theory &amp; Practice</category>
+  </item>
+  <item>
+    <title>Breaking News Consumer&apos;s Handbook</title>
+    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3lyj7jltcoc2l</link>
+    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3lyj7jltcoc2l</guid>
+    <pubDate>Wed, 10 Sep 2025 00:00:00 GMT</pubDate>
+    <description>A Bluesky post by Jay Rosen from 2025-09-10. Topics: Audience &amp; Public Engagement, Journalism Education, Press &amp; Media Criticism.</description>
+    <category>Audience &amp; Public Engagement</category>
+    <category>Journalism Education</category>
+    <category>Press &amp; Media Criticism</category>
   </item>
   <item>
     <title>I have never worked for a media company</title>
@@ -453,15 +463,6 @@
     <description>A Twitter/X post by Jay Rosen from 2024-11-08. Topics: Journalism Education, Technology &amp; Digital Media.</description>
     <category>Journalism Education</category>
     <category>Technology &amp; Digital Media</category>
-  </item>
-  <item>
-    <title>I think it&apos;s great</title>
-    <link>https://x.com/jayrosen_nyu/status/1853949575599435904</link>
-    <guid isPermaLink="true">https://x.com/jayrosen_nyu/status/1853949575599435904</guid>
-    <pubDate>Tue, 05 Nov 2024 00:00:00 GMT</pubDate>
-    <description>A Twitter/X post by Jay Rosen from 2024-11-05. Topics: Journalism Education, Audience &amp; Public Engagement.</description>
-    <category>Journalism Education</category>
-    <category>Audience &amp; Public Engagement</category>
   </item>
   </channel>
 </rss>

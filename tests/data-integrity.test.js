@@ -263,6 +263,54 @@ describe('archive-entities.json', () => {
 // ============================================
 
 describe('cross-file consistency', () => {
+  it('publishes the verified #751 records and excludes its false-identity clip', () => {
+    const fullIds = new Set(fullData.records.map(record => record.id));
+    const coreIds = new Set(coreData.records.map(record => record.id));
+
+    assert.ok(fullIds.has('RECORD-00804'), 'full data omits newly verified RECORD-00804');
+    assert.ok(coreIds.has('RECORD-00804'), 'core data omits newly verified RECORD-00804');
+    assert.ok(detailsData.details['RECORD-00804'], 'details omit newly verified RECORD-00804');
+    assert.ok(!fullIds.has('CLIP-00023'), 'full data publishes the CLIP-00023 false identity');
+    assert.ok(!coreIds.has('CLIP-00023'), 'core data publishes the CLIP-00023 false identity');
+    assert.ok(!detailsData.details['CLIP-00023'], 'details publish the CLIP-00023 false identity');
+  });
+
+  it('entity first mentions resolve to records that the archive serves', () => {
+    const servedIds = new Set(fullData.records.map(record => record.id));
+    const entitiesById = new Map(fullData.entities.map(entity => [entity.id, entity]));
+    const expectedFallbacks = new Map([
+      ['C0007', 'RECORD-00014'],
+      ['C1261', 'BSKY-02051'],
+      ['P2353', 'TWTR-07504'],
+    ]);
+
+    for (const [entityId, recordId] of expectedFallbacks) {
+      assert.strictEqual(
+        entitiesById.get(entityId)?.firstMentionRecordId,
+        recordId,
+        `${entityId} should use its earliest served relationship as first mention`
+      );
+    }
+    assert.strictEqual(entitiesById.get('P2353')?.role, '');
+    assert.strictEqual(entitiesById.get('P2353')?.affiliation, '');
+
+    for (const [label, entities] of [
+      ['archive-data.json', fullData.entities],
+      ['archive-entities.json', entitiesData.entities],
+    ]) {
+      const dangling = entities
+        .filter(entity => entity.firstMentionRecordId)
+        .filter(entity => !servedIds.has(entity.firstMentionRecordId))
+        .map(entity => `${entity.id}:${entity.firstMentionRecordId}`);
+
+      assert.deepStrictEqual(
+        dangling,
+        [],
+        `${label} contains ${dangling.length} unserved first mentions: ${dangling.slice(0, 10).join(', ')}`
+      );
+    }
+  });
+
   it('every core record ID has a details entry', () => {
     const missingDetails = [];
     for (const record of coreData.records) {

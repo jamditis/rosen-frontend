@@ -1,10 +1,11 @@
 /**
  * Extraction coverage invariant (issue #207).
  *
- * Locks in: every RECORD-* whose raw_text is long enough to be a real article
- * (>= 500 chars, matching backend/scripts/recover_articles_playwright.py:44
- * MIN_OK_LEN so test and recovery pipeline share one notion of "real article")
- * must appear at least once as source_record_id in extracted_relationships.csv.
+ * Locks in: every non-quarantined RECORD-* whose raw_text is long enough to be
+ * a real article (>= 500 chars, matching
+ * backend/scripts/recover_articles_playwright.py:44 MIN_OK_LEN so test and
+ * recovery pipeline share one notion of "real article") must appear at least
+ * once as source_record_id in extracted_relationships.csv.
  *
  * Goes RED when entity extraction has been skipped for records that already have
  * scrapable content. Goes GREEN as those records are re-extracted. If a record
@@ -31,14 +32,25 @@ const RAW_TEXT_MIN = 500;
 // these. Add a record here only after confirming it has no recoverable article
 // text; the standing fix is Wayback recovery (#294), not an allowlist entry.
 //
-// Empty as of #294: RECORD-00740 (OTM segment) and RECORD-00783 (fora.tv talk)
-// were both recovered from the Internet Archive, their raw_text replaced, and
-// entity extraction re-run, so neither needs allowlisting anymore. Note
-// RECORD-00783 is abstract-only by nature: the fora.tv source was video, so no
-// transcript exists to recover and its raw_text is the event abstract. Its
-// entity yield is genuine but thin -- that is the ceiling, not a regression to
-// re-recover.
-const ALLOWLIST = new Set([]);
+// RECORD-00740 (OTM segment) and RECORD-00783 (fora.tv talk) were both recovered
+// from the Internet Archive, their raw_text replaced, and entity extraction
+// re-run, so neither needs allowlisting anymore. RECORD-00614 is quarantined
+// because its URL and scraped body identify different works; relationships
+// derived from that mismatched body must not be published.
+const ALLOWLIST = new Set(['RECORD-00614']);
+
+function findCoverageOffenders(candidateRecords, candidateRelationships, allowlist = ALLOWLIST) {
+  const haveRel = new Set(
+    candidateRelationships.map(relationship => relationship.source_record_id).filter(Boolean)
+  );
+
+  return candidateRecords
+    .filter(record => record.id.startsWith('RECORD-'))
+    .filter(record => (record.raw_text || '').trim().length >= RAW_TEXT_MIN)
+    .filter(record => !haveRel.has(record.id))
+    .filter(record => !allowlist.has(record.id))
+    .map(record => record.id);
+}
 
 let records, relationships, entities;
 
@@ -58,20 +70,25 @@ before(() => {
 });
 
 describe('extraction coverage (#207)', () => {
-  it('every RECORD-* with raw_text >= 500 chars appears as source_record_id in extracted_relationships.csv', () => {
-    const haveRel = new Set(
-      relationships.map(r => r.source_record_id).filter(Boolean)
+  it('keeps unverified records in coverage unless they are explicitly quarantined', () => {
+    const fixture = [{
+      id: 'RECORD-UNVERIFIED',
+      raw_text: 'x'.repeat(RAW_TEXT_MIN),
+      verified: 'FALSE'
+    }];
+
+    assert.deepStrictEqual(
+      findCoverageOffenders(fixture, [], new Set()),
+      ['RECORD-UNVERIFIED']
     );
-    const offenders = records
-      .filter(r => r.id.startsWith('RECORD-'))
-      .filter(r => (r.raw_text || '').trim().length >= RAW_TEXT_MIN)
-      .filter(r => !haveRel.has(r.id))
-      .filter(r => !ALLOWLIST.has(r.id))
-      .map(r => r.id);
+  });
+
+  it('every non-quarantined RECORD-* with raw_text >= 500 chars appears as source_record_id in extracted_relationships.csv', () => {
+    const offenders = findCoverageOffenders(records, relationships);
     assert.strictEqual(
       offenders.length,
       0,
-      `${offenders.length} RECORD-* have raw_text >= ${RAW_TEXT_MIN} chars but 0 extracted relationships. ` +
+      `${offenders.length} non-quarantined RECORD-* have raw_text >= ${RAW_TEXT_MIN} chars but 0 extracted relationships. ` +
       `Sample: ${offenders.slice(0, 10).join(', ')}${offenders.length > 10 ? ', ...' : ''}`
     );
   });

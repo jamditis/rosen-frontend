@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen&apos;s Internet Archive</title>
-    <dateCreated>Mon, 20 Jul 2026 17:06:47 GMT</dateCreated>
-    <dateModified>Mon, 20 Jul 2026 17:06:47 GMT</dateModified>
+    <dateCreated>Thu, 23 Jul 2026 17:31:08 GMT</dateCreated>
+    <dateModified>Thu, 23 Jul 2026 17:31:08 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -13,6 +13,7 @@
         <outline text="First Chapter: &apos;What Are Journalists For?&apos;" type="link" url="https://archive.nytimes.com/www.nytimes.com/books/99/11/14/reviews/991114.14goldstt.html" created="1999-11-04"/>
         <outline text="Some feel media needs to give Kennedys time, space" type="link" url="https://www.newspapers.com/image/114579567/" created="1999-07-22"/>
         <outline text="The moral confusion of the media" type="link" url="https://www.newspapers.com/image/106424943/" created="1999-06-23"/>
+        <outline text="Pistols for Two: Jay Rosen vs Thomas Frank" type="link" url="https://thebaffler.com/odds-and-ends/pistols-for-two-jay-rosen-vs-thomas-frank" created="1999-03-01"/>
         <outline text="What Are Journalists For?" type="link" url="https://www.goodreads.com/book/show/139644.What_Are_Journalists_For_" created="1999-01-01"/>
         <outline text="What Are Journalists For? - Rosen, Professor Jay: 9780300078237 - AbeBooks" type="link" url="https://www.abebooks.com/9780300078237/What-Journalists-Rosen-Professor-Jay-0300078234/plp" created="1999-01-01"/>
         <outline text="Good news" type="link" url="https://www.newspapers.com/image/441927900/" created="1998-11-01"/>
@@ -23,6 +24,7 @@
         <outline text="Volusia today" type="link" url="https://www.newspapers.com/image/234529302/" created="1998-04-01"/>
         <outline text="Stetson media forum: News media and the community" type="link" url="https://www.newspapers.com/image/1232601673/" created="1998-03-29"/>
         <outline text="College students look at local news coverage and see a lot of bias" type="link" url="https://www.newspapers.com/image/234501782/" created="1998-03-27"/>
+        <outline text="Part of Our World: Journalism as Civic Leadership" type="link" url="https://www.upenn.edu/static/pnc/ptrosen.html" created="1998-01-01"/>
         <outline text="Talking heads" type="link" url="https://www.newspapers.com/image/195261742/" created="1997-11-09"/>
         <outline text="Re-examining Reporting" type="link" url="https://www.newspapers.com/image/1219950157/" created="1997-06-22"/>
         <outline text="A newspaper can be a catalyst for community dialogue" type="link" url="https://www.newspapers.com/image/641832828/" created="1996-12-01"/>
@@ -58,8 +60,6 @@
         <outline text="Study of network TV is out of touch" type="link" url="https://www.newspapers.com/image/1222226984/" created="1993-03-16"/>
         <outline text="Closing days: Bash the media" type="link" url="https://www.newspapers.com/image/581016778/" created="1992-11-05"/>
         <outline text="Should newspapers print the time of a candidate&apos;s TV ad?" type="link" url="https://www.newspapers.com/image/439851515/" created="1992-11-02"/>
-        <outline text="Dems hope to shine with glitzy convention" type="link" url="https://www.newspapers.com/image/1144546575/" created="1992-07-08"/>
-        <outline text="Who should the newspaper be published for?" type="link" url="https://www.newspapers.com/image/1125898881/" created="1992-01-29"/>
       </outline>
       <outline text="Blogging Launch &amp; Digital Disruption (2000-2004)" type="category">
         <outline text="News Turns From a Lecture to a Conversation" type="link" url="http://archive.pressthink.org/2004/12/29/tp04_lctr_p.html" created="2004-12-29"/>
@@ -167,7 +167,7 @@
       </outline>
       <outline text="Social Media &amp; Financial Crisis (2010-2015)" type="category">
         <outline text="Asymmetry between the major parties fries the circuits of the mainstream press - PressThink" type="link" url="https://pressthink.org/2016/09/asymmetry-between-the-major-parties-fries-the-circuits-of-the-mainstream-press/" created="2016-09-29"/>
-        <outline text="So I will try to explain why the Trump candidacy has been so confounding to our political press. - PressThink" type="link" url="https://pressthink.org/2015/11/i-will-try-to-explain-why-the-trump-candidacy-has-been-so-confounding-to-our-political-press/" created="2015-11-30"/>
+        <outline text="So I will try to explain why the Trump candidacy has been so confounding to our political press. - PressThink" type="link" url="https://pressthink.org/2015/11/i-will-try-to-explain-why-the-trump-candidacy-has-been-so-confounding-to-our-political-press/" created="2015-11-29"/>
         <outline text="The Pub #43: Why public media are sponsoring polls, and how a CBC video went viral" type="link" url="https://current.org/2015/11/the-pub-43-why-public-media-are-sponsoring-polls%E2%80%8B-and-how-a-cbc-video-went-viral/" created="2015-11-05"/>
         <outline text="Adapting Journalism to the Digital Space" type="link" url="https://journalism.nyu.edu/graduate/programs/studio-20-digital-first" created="2015-06-26"/>
         <outline text="Verstehen, was den Journalismus derzeit verändert" type="link" url="https://publicnotebook.wordpress.com/2014/11/26/verstehen-was-den-journalismus-derzeit-verandert/" created="2014-11-26"/>
@@ -270,6 +270,7 @@
         <outline text="Civic journalism 2.0: The Guardian and NYU launch a citizens agenda for 2012" type="link" url="https://www.niemanlab.org/2011/12/civic-journalism-2-0-the-guardian-and-nyu-launch-a-citizens-agenda-for-2012/" created="2011-12-08"/>
       </outline>
       <outline text="Trump Era &amp; Democratic Crisis (2016-2020)" type="category">
+        <outline text="Media Apocalypse, Episode 7: Jay Rosen on Journalism&apos;s Agenda" type="link" url="https://youtu.be/UFONrSIbB-k" created="2020-08-02"/>
         <outline text="NYU Professor Jay Rosen Tears Chuck Todd Over Trump Lies" type="link" url="https://www.mediaite.com/media/tv/nyu-professor-jay-rosen-tears-chuck-todd/" created="2019-12-26"/>
         <outline text="Peabody adds six new members to board of directors" type="link" url="https://news.uga.edu/peabody-appoints-six-new-members-to-board/" created="2019-12-12"/>
         <outline text="Industry leaders provide expert counsel - The Peabody Awards" type="link" url="https://peabodyawards.com/stories/industry-leaders-provide-expert-counsel-peabody/" created="2019-12-11"/>
@@ -394,7 +395,7 @@ Bari Weiss had no experience when she was hired a..." type="link" url="https://b
       </outline>
     </outline>
     <outline text="By Category">
-      <outline text="Press &amp; Media Criticism (23484)" type="category">
+      <outline text="Press &amp; Media Criticism (23524)" type="category">
         <outline text="Why The Ubyssey is covering the World Cup" type="link" url="https://ubyssey.ca/margins/world-cup-coverage/"/>
         <outline text="Jay Rosen&apos;s Internet Archive: an Introduction." type="link" url="https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/"/>
         <outline text="It was a political hire, cont..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohf75js3k2j"/>
@@ -425,7 +426,7 @@ Bari Weiss had no experience when she was hired a..." type="link" url="https://b
 
 Scott Pelley answers questions..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnplqvqnk22g"/>
       </outline>
-      <outline text="Journalism Theory &amp; Practice (8346)" type="category">
+      <outline text="Journalism Theory &amp; Practice (8351)" type="category">
         <outline text="Why The Ubyssey is covering the World Cup" type="link" url="https://ubyssey.ca/margins/world-cup-coverage/"/>
         <outline text="Finally..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mog4ns5tvk22"/>
         <outline text="One thing to keep your eye on as Paramount takes control:  what happen..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3modgj3bfys2l"/>
@@ -433,6 +434,7 @@ Scott Pelley answers questions..." type="link" url="https://bsky.app/profile/jay
         <outline text="Yes, it is..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnqesmg6ck2w"/>
         <outline text="Subscribers buy a product. Members join the cause." type="link" url="https://pressthink.org/2026/04/subscribers-buy-a-product-members-join-the-cause/"/>
         <outline text="For Jay Rosen, American Press Needs to Become More Pro-Democracy" type="link" url="https://jpinyu.com/2026/02/16/jay-rosen-american-press-become-more-pro-democracy/"/>
+        <outline text="New York Times editorial board has compiled &quot;a list of 12 markers of democratic..." type="link" url="https://x.com/jayrosen_nyu/status/1984269020305240436"/>
         <outline text="I send my questions about that to" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4eef7dwqc2p"/>
         <outline text="I have a lurid fascination with interviews that become trainwrecks" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m4e3rgesbk24"/>
         <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/"/>
@@ -450,9 +452,8 @@ Scott Pelley answers questions..." type="link" url="https://bsky.app/profile/jay
         <outline text="Kinda handy when these people sign the papers and identify themselves, don&apos;t..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3fkot3kac2k"/>
         <outline text="Public journalism redux: Post-academia, Jay Rosen returns to where he started" type="link" url="https://dankennedy.net/2025/10/16/public-journalism-redux-post-academia-jay-rosen-returns-to-where-he-started/"/>
         <outline text="This is a very good paragraph" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3bm3dbqps2n"/>
-        <outline text="I agree with that" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3aq4v2qes25"/>
       </outline>
-      <outline text="Politics &amp; Democracy (7687)" type="category">
+      <outline text="Politics &amp; Democracy (7711)" type="category">
         <outline text="It was a political hire, cont..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohf75js3k2j"/>
         <outline text="Finally..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mog4ns5tvk22"/>
         <outline text="From @status.news Paramount boss David Ellison also recently took the..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mo3z6kxclk25"/>
@@ -477,15 +478,15 @@ We know that because Bari Weiss..." type="link" url="https://bsky.app/profile/ja
 Bari Weiss had no experience when she was hired a..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmyvheftqk2d"/>
         <outline text="Here&apos;s the letter: &quot;We are current and former journalists, professors..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmu5wufgmc23"/>
         <outline text="For Jay Rosen, American Press Needs to Become More Pro-Democracy" type="link" url="https://jpinyu.com/2026/02/16/jay-rosen-american-press-become-more-pro-democracy/"/>
+        <outline text="New York Times editorial board has compiled &quot;a list of 12 markers of democratic..." type="link" url="https://x.com/jayrosen_nyu/status/1984269020305240436"/>
         <outline text="&quot;There are positive developments in local news but they’re being swamped by the..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3s5wsddck2x"/>
         <outline text="&quot;There are positive developments in local news but they’re being swamped by the..." type="link" url="https://x.com/jayrosen_nyu/status/1981021320079896971"/>
         <outline text="&quot;If you had enough money to buy ads, you could reach the voters you wanted to..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3n33q3xbk2i"/>
         <outline text="&quot;If you had enough money to buy ads, you could reach the voters you wanted to..." type="link" url="https://x.com/jayrosen_nyu/status/1980317607694856351"/>
         <outline text="The New York Times published the new rules imposed on journalists by The..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3fm2epscs26"/>
         <outline text="After initially appearing to come out against the rules, Donald Trump seemed to..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3bk7tcxik2u"/>
-        <outline text="First, I am happy to share a similar ranking from those with a different POV—..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m375ykxdoc2h"/>
       </outline>
-      <outline text="Audience &amp; Public Engagement (3744)" type="category">
+      <outline text="Audience &amp; Public Engagement (3747)" type="category">
         <outline text="Why The Ubyssey is covering the World Cup" type="link" url="https://ubyssey.ca/margins/world-cup-coverage/"/>
         <outline text="en.wikipedia.org/wiki/Public_..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mnfdxeu7tk2i"/>
         <outline text="Wow..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mmw74eltqs2f"/>
@@ -512,7 +513,7 @@ Bari Weiss had no experience when she was hired a..." type="link" url="https://b
         <outline text="Thanks, Zack" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2wzdqghik2c"/>
         <outline text="Thanks, Lora" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2wyfzxrxk2c"/>
       </outline>
-      <outline text="Technology &amp; Digital Media (2850)" type="category">
+      <outline text="Technology &amp; Digital Media (2878)" type="category">
         <outline text="Jay Rosen&apos;s Internet Archive: an Introduction." type="link" url="https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/"/>
         <outline text="It was a political hire, cont..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohf75js3k2j"/>
         <outline text="One thing to keep your eye on as Paramount takes control:  what happen..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3modgj3bfys2l"/>
@@ -539,7 +540,7 @@ Bari Weiss had no experience when she was hired a..." type="link" url="https://b
         <outline text="Public journalism redux: Post-academia, Jay Rosen returns to where he started" type="link" url="https://dankennedy.net/2025/10/16/public-journalism-redux-post-academia-jay-rosen-returns-to-where-he-started/"/>
         <outline text="Something went awry here: The darkness is your that your story will twisted..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3aq26rnv225"/>
       </outline>
-      <outline text="Journalism Education (677)" type="category">
+      <outline text="Journalism Education (678)" type="category">
         <outline text="I have been there..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mog5545nsk2d"/>
         <outline text="A new fellowship is all about putting the news in news creator" type="link" url="https://www.niemanlab.org/2025/10/a-new-fellowship-is-all-about-putting-the-news-in-news-creator/"/>
         <outline text="Thanks to Dan Kennedy for this post about my next gig after retiring from NYU&apos;s..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m3d2t6wu4k26"/>
@@ -553,6 +554,7 @@ Bari Weiss had no experience when she was hired a..." type="link" url="https://b
         <outline text="Now that&apos;s pedagogical" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lzpgizwcy22a"/>
         <outline text="I don&apos;t know" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lytdnn4egs2y"/>
         <outline text="I have found that adding a layer of reflection makes for good teaching..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lyjasqjyak2a"/>
+        <outline text="Breaking News Consumer&apos;s Handbook" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lyj7jltcoc2l"/>
         <outline text="I have never worked for a media company" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lyazlmiu5k2h"/>
         <outline text="Clay Shirky, vice provost at NYU, tries to help faculty adapt to digital tools" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lxifig4pk22n"/>
         <outline text="Meanwhile, at the University of Chicago.." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lx3ao6xhvs24"/>
@@ -564,7 +566,6 @@ Bari Weiss had no experience when she was hired a..." type="link" url="https://b
         <outline text="Thank you, Alex" type="link" url="https://x.com/jayrosen_nyu/status/1935525781922529578"/>
         <outline text="Thank you, Murasaki" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lrlatbodsc2j"/>
         <outline text="Thanks, Ryan" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lrizoqu2gs27"/>
-        <outline text="To my academic friends" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3lrixnfu7q22m"/>
       </outline>
     </outline>
     <outline text="RSS Feeds" type="include">

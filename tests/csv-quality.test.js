@@ -1667,6 +1667,39 @@ describe('extracted_relationships.csv', () => {
     assert.ok(relationships.length > 0, 'No relationships found');
   });
 
+  it('does not retain graph data extracted from quarantined RECORD-00614 content', () => {
+    const quarantined = relationships
+      .filter(relationship => relationship.source_record_id === 'RECORD-00614')
+      .map(relationship => relationship.relationship_id);
+    const quarantineBackedEntities = entities
+      .filter(entity => entity.first_mention_record_id === 'RECORD-00614')
+      .map(entity => entity.entity_id);
+
+    assert.deepStrictEqual(
+      quarantined,
+      [],
+      `RECORD-00614 retains ${quarantined.length} relationships from mismatched source content`
+    );
+    assert.deepStrictEqual(
+      quarantineBackedEntities,
+      [],
+      `RECORD-00614 remains the provenance source for entities: ${quarantineBackedEntities.join(', ')}`
+    );
+  });
+
+  it('preserves source-backed Free Press provenance from canonical RECORD-00150', () => {
+    const freePress = entities.find(entity => entity.entity_id === 'O0734');
+    const sourceRelationship = relationships.find(relationship =>
+      relationship.source_record_id === 'RECORD-00150' &&
+      (relationship.source_entity_id === 'O0734' || relationship.target_entity_id === 'O0734')
+    );
+
+    assert.ok(freePress, 'O0734 must retain its canonical Free Press evidence');
+    assert.strictEqual(freePress.first_mention_record_id, 'RECORD-00150');
+    assert.ok(sourceRelationship, 'O0734 must remain reachable from RECORD-00150');
+    assert.match(sourceRelationship.context_snippet, /from Free Press/);
+  });
+
   it('has source and target columns', () => {
     const columns = Object.keys(relationships[0]);
     const hasSource = columns.some(c => c.toLowerCase().includes('source'));
