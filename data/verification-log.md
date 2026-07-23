@@ -6034,3 +6034,71 @@ Final SHA-256 values after export:
 - `data/archive-details.json`: `777d9ae2a7dcba9548db16ebf67c99bb96e4c8901d9c063bd0fea8a7ab06e8c6`
 - `data/archive-entities.json`: `bfd6d6ff6219578a9889c42614637951a99e712a6421da1ab2d2ba67364dd133`
 - `data/archive-analytics.json`: `adf2fe0d9aaf5cd544659616c3f6f60ceaa0a24afef49e1c9a583f69d8a83e38`
+
+### Record 00613 unrecoverable placeholder removal
+
+`RECORD-00613` was removed from the public archive source after repeated
+source recovery attempts failed and the stored summary showed explicit
+AI-guesswork language. The row claimed a 2024-10-22 Twitter/X post by Jay
+Rosen, but no URL, primary platform record, Wayback capture, Bluesky match, or
+local social import could be recovered for the stored text.
+
+Decision review:
+
+- A read-only Kimi CLI review recommended deletion because no source supports
+  the title/date/source/text claim, the summary is placeholder prose, and no
+  entity or relationship rows depend on the record.
+
+Evidence:
+
+- Prior audit paged Jay Rosen's primary Bluesky author feed through the target
+  date and found no matching post.
+- Prior Wayback CDX search for Jay Rosen Twitter status URLs from
+  `2024-10-21` through `2024-10-23` found no captures for the stored text.
+- Prior exact-phrase and domain-restricted searches found no primary tweet or
+  source URL.
+- Fresh exact web searches for the raw text and key quoted phrases found no
+  matching source.
+- `social_posts.csv` has no row containing `real work of journalism`,
+  `What does this mean?`, `How will it work?`, or `What might go wrong?`.
+- The four local Jay Rosen Twitter/X rows on `2024-10-22` do not match the
+  stored text.
+- `data/extracted_entities.csv` and `data/extracted_relationships.csv` had no
+  references to `RECORD-00613`.
+
+Changes applied:
+
+- Removed `RECORD-00613` from `data/archive_records-public.csv`.
+- Removed stale `related_to` references from `RECORD-00036`, `RECORD-00045`,
+  `RECORD-00071`, `RECORD-00579`, and `RECORD-00592`.
+- Added a regression proving `RECORD-00613` is absent and no archive record
+  still lists it in `related_to`.
+
+Validation:
+
+- `node --test --test-name-pattern "real-work-of-journalism"
+  tests\csv-quality.test.js`: failed before deletion because `RECORD-00613`
+  was still present, then passed after deletion.
+- `python backend\scripts\validate_archive_data.py`: no errors; archive records
+  now 1,026, entities 7,387, relationships 11,135.
+- `npm run test:data:extraction-coverage`: passed, 17/17 tests.
+- `node data\export-archive-data.js`: passed.
+- `git -c core.whitespace=trailing-space,cr-at-eol diff --check`: passed with
+  line-ending warnings only.
+- `npm run test:data`: expected five completion gates still fail: three
+  unverified archive records (`RECORD-00614`, `CLIP-00023`, `RECORD-00865`),
+  54 non-Rosen Bluesky profile URLs, 54 non-Rosen Bluesky copyright
+  assignments, 29,693 unverified social rows, and 21 blank entity first
+  mentions. The archive core blank gate now passes.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `39247a94ffb1712a48cd6f401d6a141aab4b5b180832a840613d9a804b614614`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `c5f1cc80d11a7826cf95ede8b312a1600c22b301e769a03322dd1df8da5ac672`
+- `data/extracted_relationships.csv`: `0937f5db5231a368b064650282ccb54bd891f617a0a7911d18e4e0c4c0a1f6b1`
+- `data/archive-data.json`: `359602b2d196a79dc2b765da8a6969ece8f80dd918fa050de7a9afe868266de0`
+- `data/archive-core.json`: `038dcf3c3d7abedbb3cc70fc63abfaff85d894ca8ec6760acdae7225ee55e787`
+- `data/archive-details.json`: `120784a2b998b88350318528f201b5d10f32a987fa689f2f3967a40b4c28862c`
+- `data/archive-entities.json`: `40b4579e901b88d80412b4bbc33bab6bd343d5bde76553952a4d015f0b673f06`
+- `data/archive-analytics.json`: `adf2fe0d9aaf5cd544659616c3f6f60ceaa0a24afef49e1c9a583f69d8a83e38`

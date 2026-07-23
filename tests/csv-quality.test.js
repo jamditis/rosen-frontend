@@ -164,6 +164,25 @@ describe('archive_records-public.csv', () => {
     );
   });
 
+  it('does not publish the unrecoverable real-work-of-journalism placeholder tweet', () => {
+    assert.strictEqual(
+      archiveRecords.some(row => row.id === 'RECORD-00613'),
+      false,
+      'RECORD-00613 has no recovered source and uses AI-guesswork summary text'
+    );
+    const staleRelatedRecords = archiveRecords
+      .filter(row => (row.related_to || '')
+        .split(',')
+        .map(value => value.trim())
+        .includes('RECORD-00613'))
+      .map(row => row.id);
+    assert.deepStrictEqual(
+      staleRelatedRecords,
+      [],
+      `archive records still reference deleted RECORD-00613: ${staleRelatedRecords.join(', ')}`
+    );
+  });
+
   it('TomDispatch composite record preserves the source publisher while staying unresolved', () => {
     const record = archiveRecords.find(row => row.id === 'RECORD-00614');
     assert.ok(record, 'RECORD-00614 is missing');
