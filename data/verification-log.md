@@ -4740,3 +4740,94 @@ Final SHA-256 values after export:
 - `data/archive-details.json`: `a1ca9c19fcd3ec9ba5bd4ecf5dcd1f56938b94ddf326f88323eaaaa300176a1c`
 - `data/archive-entities.json`: `aaf271a553e5487dac47fec2a73931307b3165db3779010b42daa153c3747182`
 - `data/archive-analytics.json`: `7ee106c00e12e2afc11095dd5e14c25fb22d31904873ade397ae7860877e6d05`
+
+### HuffPost verification pilot 15 applied
+
+Pilot fifteen covered `RECORD-00874` through `RECORD-00878`. The packet lives
+at `%TEMP%\rosen-huffpost-pilot-15`. The primary agent fetched the sources;
+Kimi reviewed the proposed updates from captured evidence without web access
+and approved the batch. Kimi noted that `RECORD-00878` has a HuffPost title-tag
+and og-title mismatch; the stored title follows the og-title, and notes now
+preserve the title-tag wording.
+
+Source results:
+
+- `RECORD-00874`: canonical modern HuffPost returned 406 with an empty body,
+  but the HuffPost AMP URL returned 200 with author, title, and `2008-10-04`
+  published metadata. Summary, verification flags, and notes were updated.
+  Source SHA-256:
+  `690176d06c7d38c1a8da1e0c93d58a028f78391ac535937bbda43f7a828415bc`.
+- `RECORD-00875`: modern HuffPost returned 200 with author, title, and
+  `2009-04-14` published metadata. Summary, verification flags, and notes were
+  updated. Source SHA-256:
+  `d786adfffb8250640d6e0a9e396cdd825abe53253049690eb1de404ce64366a2`.
+- `RECORD-00876`: modern HuffPost returned 200 with author, title, and
+  `2009-04-16` published metadata. Summary, verification flags, and notes were
+  updated. Source SHA-256:
+  `aa074de890fbdedabf7995c7914a96419e01eacb8292f1b5a18cd39e731525ad`.
+- `RECORD-00877`: the first modern request returned 406 with an empty body; a
+  browser-header modern request returned 200 with author, title, and
+  `2011-02-10` published metadata. Summary, verification flags, and notes were
+  updated. Source SHA-256:
+  `defa25d8de9e9068f681fd117f583c4f39c1d0c321af667dd84e0b24bda076da`.
+- `RECORD-00878`: modern HuffPost returned 200 with author, og-title, and
+  `2015-12-07` published metadata. Summary, verification flags, and notes were
+  updated; notes preserve that the title tag reads `Tone Poem for the 'Leave It
+  There' Press` while og-title matches the stored title. Source SHA-256:
+  `58f738c6147be329cebf9b8134f1f94ba294438e23b4600f8237452c94f69da4`.
+
+The focused regression
+`node --test --test-name-pattern "HuffPost pilot fifteen" tests\csv-quality.test.js`
+failed before the CSV edit because `RECORD-00874` still had a blank summary,
+then passed after the patch. Raw-text SHA-256 values:
+
+- `RECORD-00874`: `7b6c5927576245bbdd6041252f87b037f552923fda2d66378bbef979fda6d1a7`
+- `RECORD-00875`: `87c75ed5851f83a2288d54a566de2180d051a3e4aa93c7a2881d957313b81216`
+- `RECORD-00876`: `ab23bf9fe433fb3d7e45f700e07b800b07fef963bc48946c2b661d5fc9e5b815`
+- `RECORD-00877`: `d0a7ccd044bcf915f136af7fe05a4d2db511657458dc8763013a7ff0708b0a75`
+- `RECORD-00878`: `8a431c9057372b9776779a734a530e4e9a3ced3bd0bfde4b4736c4ff1f2f7272`
+
+Post-application row counts:
+
+- Archive rows: 1,028.
+- Blank archive summaries: 1, down from 6 (`RECORD-00865`).
+- Archive rows not explicitly verified: 5, down from 10.
+- `#NN08` rows with capture-year dates: 1, unchanged (`RECORD-00865:2016-02-12`).
+- Generated records after export: 26,691.
+- Entities: 7,389.
+- Relationships: 10,804.
+
+Validation:
+
+- `node --test --test-name-pattern "HuffPost pilot fifteen" tests\csv-quality.test.js`:
+  passed.
+- `node data\export-archive-data.js`: passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 78 records with raw text but no extracted relationships.
+- `npm run test:data`: expected eight completion gates still fail: three core
+  blanks, one blank summary (`RECORD-00865`), five unverified archive records,
+  one `#NN08` capture-year date (`RECORD-00865:2016-02-12`), 54 non-Rosen
+  Bluesky profile URLs, 54 non-Rosen Bluesky copyright assignments, 29,693
+  unverified social rows, and 50 blank entity first mentions. The pilot-fifteen
+  regression passes.
+
+Packet artifact SHA-256 values:
+
+- `external-calls.ndjson`: `9d7d8b752c9d95a404ed782c4131de7a42613a3482b46ba5d1137220811e3a08`
+- `external-calls.json`: `6c30cbba1bd7321c94341d78502b2c6ba588b7fa7c720ca7b97369a24ff42093`
+- `fallback-calls.ndjson`: `3cc0d193993d16df7c71801738d7f1bf29bd734e03f7dcaf1a8f8ca152824eb5`
+- `fallback-calls.json`: `92bb8f31bdc8f595d1df181c6bd5c5bcfff3bddeaf96ef4af314dfb10554e6a5`
+- `kimi-review.txt`: `4eeed41b8a08d47bc0bffa8270ffcb64697859cd16d66d2967f2a89ca64895ec`
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `0dbb3d00617800eeb35823b25b9f50472be049ce5f22daab5b575fca66d74ce8`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `181b5acf3d3d3dd0f5f123885e542f8ff56ad7d9fd736f1eae281818918f4c72`
+- `data/archive-data.json`: `01624685440596e6708660039ea17cf507d5f841780d02edcfac9332625c1780`
+- `data/archive-core.json`: `35521dd30ce129717adae1ef7a6dacd011c622b7b40fa5a16708b9a38d7f2e20`
+- `data/archive-details.json`: `45712264720f74b2b102a2e34d899725cbcaf7c8a7259737d1373540ddb743fe`
+- `data/archive-entities.json`: `d21a684f27502a9d353171fe8ea30c364b80bec78cec31f1c7c5d0694bddbf70`
+- `data/archive-analytics.json`: `15788fa14498724398d1954fe86f6a3ab7593bfa2b61322da27be402fbe34128`

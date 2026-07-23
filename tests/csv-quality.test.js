@@ -1640,6 +1640,92 @@ describe('archive_records-public.csv', () => {
     }
   });
 
+  it('HuffPost pilot fifteen records match modern HuffPost evidence', () => {
+    const expected = new Map([
+      ['RECORD-00874', {
+        title: 'The Culture War Option For The Palin Convention',
+        url: 'https://www.huffpost.com/entry/the-culture-war-option-fo_b_123483',
+        publicationDate: '2008-10-04',
+        wordCount: '983',
+        rawTextSha: '7b6c5927576245bbdd6041252f87b037f552923fda2d66378bbef979fda6d1a7',
+        excerpt: 'McCain\'s convention gambit is now a culture war strategy. It depends for its execution on conflict with journalists and bloggers and on confusion between and among the press, the blogosphere, and the Democratic party.',
+        pullQuote: 'It revives cultural memory: the resentment narrative after Chicago \'68 but with the angry left more distributed.',
+        summary: 'Rosen argues that John McCain\'s Palin convention strategy turned toward culture-war politics by creating conflict with journalists and bloggers, blurring press-blogosphere-party boundaries, and betting on backlash.',
+        sourceSha: '690176d06c7d38c1a8da1e0c93d58a028f78391ac535937bbda43f7a828415bc',
+      }],
+      ['RECORD-00875', {
+        title: 'Audience Atomization Overcome: Why the Net Erodes the Authority of the Press',
+        url: 'https://www.huffpost.com/entry/audience-atomization-over_b_157807',
+        publicationDate: '2009-04-14',
+        wordCount: '1925',
+        rawTextSha: '87c75ed5851f83a2288d54a566de2180d051a3e4aa93c7a2881d957313b81216',
+        excerpt: 'Sometimes the people the press thinks of as deviant types are closer to the sphere of consensus than the journalists who are classifying those same people as "fringe."',
+        pullQuote: 'Take a sheet of paper and make a big circle in the middle.',
+        summary: 'Rosen uses the spheres of consensus, legitimate debate, and deviance to argue that the internet weakens press authority by letting publics challenge which voices journalists classify as fringe.',
+        sourceSha: 'd786adfffb8250640d6e0a9e396cdd825abe53253049690eb1de404ce64366a2',
+      }],
+      ['RECORD-00876', {
+        title: '"He Said, She Said" Journalism: Are We Done With That Yet?',
+        url: 'https://www.huffpost.com/entry/he-said-she-said-journali_b_187682',
+        publicationDate: '2009-04-16',
+        wordCount: '3024',
+        rawTextSha: 'ab23bf9fe433fb3d7e45f700e07b800b07fef963bc48946c2b661d5fc9e5b815',
+        excerpt: '"He said, she said" is not so much a truth-telling strategy as refuge-seeking behavior that fits well into newsroom production demands.',
+        pullQuote: 'There I am, sitting at the breakfast table, with my coffee and a copy of the New York Times, in the classic newspaper reading position from before the Web.',
+        summary: 'Rosen criticizes he said, she said journalism as a newsroom refuge that avoids judging competing truth claims, using AIG bailout coverage to argue that reporters should move beyond stenographic dispute framing.',
+        sourceSha: 'aa074de890fbdedabf7995c7914a96419e01eacb8292f1b5a18cd39e731525ad',
+      }],
+      ['RECORD-00877', {
+        title: 'The Politics of the New Huffington Post at AOL',
+        url: 'https://www.huffpost.com/entry/the-politics-of-the-new-h_b_821112',
+        publicationDate: '2011-02-10',
+        wordCount: '1306',
+        rawTextSha: 'd0a7ccd044bcf915f136af7fe05a4d2db511657458dc8763013a7ff0708b0a75',
+        excerpt: 'Is ideological innovation possible in online journalism, and will we see it from this merger? No one ever thinks to ask that. Without understanding why, we just assume the answer is no.',
+        pullQuote: '( Howard Kurtz: "Can a fast-moving, irreverent, and sometimes racy product keep its DNA once transplanted into a very different corporate culture?")\n\n2\\.',
+        summary: 'Rosen argues that coverage of AOL\'s purchase of HuffPost asked practical merger questions while ignoring whether the deal could produce ideological innovation in online journalism.',
+        sourceSha: 'defa25d8de9e9068f681fd117f583c4f39c1d0c321af667dd84e0b24bda076da',
+      }],
+      ['RECORD-00878', {
+        title: 'The Many Ways Journalists Are Complicit in Political Polarization',
+        url: 'https://www.huffpost.com/entry/leave-it-there-press_b_8739698',
+        publicationDate: '2015-12-07',
+        wordCount: '794',
+        rawTextSha: '8a431c9057372b9776779a734a530e4e9a3ced3bd0bfde4b4736c4ff1f2f7272',
+        excerpt: 'I am not saying journalists are the ones we should blame for American\'s dysfunctional politics. But I do consider them active participants in the events that got us here.',
+        pullQuote: 'Roy Blunt (R-MO) and moderator Chuck Todd appear on \'Meet the Press\' in Washington, D.C., Sunday, Oct.',
+        summary: 'Rosen argues that journalists are not the sole cause of political polarization but are active participants in it, especially when they distance themselves from conflicts their own conventions help sustain.',
+        sourceSha: '58f738c6147be329cebf9b8134f1f94ba294438e23b4600f8237452c94f69da4',
+      }],
+    ]);
+
+    for (const [id, source] of expected) {
+      const record = archiveRecords.find(row => row.id === id);
+      assert.ok(record, `${id} must exist`);
+      assert.strictEqual(record.title, source.title);
+      assert.strictEqual(record.url, source.url);
+      assert.strictEqual(record.author, 'Jay Rosen');
+      assert.strictEqual(record.publication_date, source.publicationDate);
+      assert.strictEqual(record.word_count, source.wordCount);
+      assert.strictEqual(
+        crypto.createHash('sha256').update(record.raw_text).digest('hex'),
+        source.rawTextSha,
+        `${id} raw_text changed unexpectedly`
+      );
+      assert.strictEqual(record.excerpt, source.excerpt);
+      assert.strictEqual(record.pull_quote, source.pullQuote);
+      assert.strictEqual(record.summary, source.summary);
+      assert.strictEqual(record.verified, 'TRUE');
+      assert.strictEqual(record.low_confidence, 'FALSE');
+      assert.strictEqual(record.needs_review, 'FALSE');
+      assert.match(record.notes, /Modern HuffPost source verified 2026-07-23/);
+      assert.match(record.notes, new RegExp(source.sourceSha));
+    }
+
+    const alternateTitle = archiveRecords.find(row => row.id === 'RECORD-00878');
+    assert.match(alternateTitle.notes, /title tag reads "Tone Poem for the 'Leave It There' Press"/);
+  });
+
   it('RECORD-00614 cannot verify mismatched TomDispatch works', () => {
     const record = archiveRecords.find(row => row.id === 'RECORD-00614');
     assert.ok(record, 'RECORD-00614 must exist');

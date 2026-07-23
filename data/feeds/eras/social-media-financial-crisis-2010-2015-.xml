@@ -5,7 +5,7 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records from the Social Media &amp; Financial Crisis (2010-2015) era</description>
     <language>en-us</language>
-    <lastBuildDate>Thu, 23 Jul 2026 19:33:22 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 23 Jul 2026 19:40:49 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/eras/social-media-financial-crisis-2010-2015-.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
   <item>
@@ -16,6 +16,14 @@
     <description>Rosen analyzes the challenges faced by mainstream political journalism during the 2016 US presidential election campaign, particularly in covering Donald Trump. Rosen argues that the traditional journalistic framework, based on the assumption of symmetry between the two major parties, is inadequate for understanding Trump&apos;s unconventional candidacy and the resulting asymmetric polarization. He proposes three key propositions: 1) Political journalism relies on a shared mental picture of politics that assumes similar actors with &apos;warring philosophies&apos;; 2) This symmetry is disrupted by the Republican Party&apos;s extreme stance and Trump&apos;s disregard for facts and norms; and 3) The media&apos;s failure to adapt to this asymmetry resembles &apos;technical debt&apos;, leading to a distorted representation of reality.</description>
     <category>Journalism Theory &amp; Practice</category>
     <category>Technology &amp; Digital Media</category>
+    <category>Press &amp; Media Criticism</category>
+  </item>
+  <item>
+    <title>The Many Ways Journalists Are Complicit in Political Polarization</title>
+    <link>https://www.huffpost.com/entry/leave-it-there-press_b_8739698</link>
+    <guid isPermaLink="true">https://www.huffpost.com/entry/leave-it-there-press_b_8739698</guid>
+    <pubDate>Mon, 07 Dec 2015 00:00:00 GMT</pubDate>
+    <description>Rosen argues that journalists are not the sole cause of political polarization but are active participants in it, especially when they distance themselves from conflicts their own conventions help sustain.</description>
     <category>Press &amp; Media Criticism</category>
   </item>
   <item>
@@ -464,14 +472,6 @@
     <description>Before the 1980s, the Republican Party was similar to the Democratic Party. The Great Realignment saw Ronald Reagan build a new coalition consisting of socially conservative Christians, the wealthy, and the Southern working class, united by exploiting social tensions. The Republican Party then shifted its focus from economic to social issues, fostering resentment towards groups considered the &quot;liberal elite.&quot; After Reagan, the party found a new unifying force in attacking the government, though this created internal tension regarding popular programs. The Republican Party is now in crisis, divided by its inability to shrink the government while still protecting popular programs. The party&apos;s future is uncertain, possibly fracturing or fading away without a new way to unite its factions.
 </description>
     <category>Politics &amp; Democracy</category>
-  </item>
-  <item>
-    <title>Studio 20</title>
-    <link>https://tmblr.co/ZCJQUyE6An_m</link>
-    <guid isPermaLink="true">https://tmblr.co/ZCJQUyE6An_m</guid>
-    <pubDate>Sun, 01 Jan 2012 00:00:00 GMT</pubDate>
-    <description>¶ ● A student reflects on her time at Studio 20. Shortly after, she wrote this post: My Time in Studio 20. “With newly established programs, you can either come out of it with a type of education no one has had before, or you can have an awful experience of a program that’s not well thought out.” Read the rest .</description>
-    <category>Journalism Education</category>
   </item>
   </channel>
 </rss>
