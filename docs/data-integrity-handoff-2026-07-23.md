@@ -42,6 +42,22 @@ The starting branch contains the closed design-spec commit from PR #606, which
 is unrelated to this data work. Publish this session from a new branch based on
 `origin/main`; do not add more commits to the old design branch.
 
+## Repository and PR state at handoff
+
+- Ready branch: `agent/data-integrity-verified-batches`.
+- Accepted data commit: `4dede919`.
+- Ready-for-review PR: [#751](https://github.com/jamditis/rosen-frontend/pull/751),
+  based on `main`.
+- Current local branch: `agent/data-integrity-completion-gates`.
+- Completion-gate commit: `86226f09`.
+- Stacked draft PR: [#752](https://github.com/jamditis/rosen-frontend/pull/752),
+  based on the ready branch.
+- Joe's pre-existing `.gitignore` change for `notebooklm-handoff/` remains
+  unstaged and must not be bundled into either PR.
+
+PR #751 is the review boundary for accepted repairs. PR #752 adds tests only
+and must remain draft while its nine completion gates fail.
+
 ## Current data counts
 
 | Dataset | Current state |
@@ -54,6 +70,8 @@ is unrelated to this data work. Publish this session from a new branch based on
 | Archive rows explicitly `verified=FALSE` | 39 |
 | Archive rows with blank summaries | 35 |
 | Archive rows with `needs_review=TRUE` | 10 |
+| Social rows with `verified=TRUE` | 54 |
+| Social rows without a final verified state | 29,693 |
 | Entities with blank `first_mention_record_id` | 49 |
 
 The archive CSV is UTF-8 without a BOM. It has 1,029 CRLF record boundaries
@@ -220,9 +238,22 @@ their hashes before deleting `%TEMP%`.
 - Knowledge graph: #698, #731, #732, #733, #734, #738.
 - PressThink recovery history: #208.
 
-None of the open stewardship issues meets every acceptance criterion yet. Add
-progress comments with the exact counts and PR links; do not close parent epics
-or claim the 100% goal is complete.
+None of the open stewardship issues meets every acceptance criterion yet. They
+were left open, with session updates posted here:
+
+- [Program epic #693](https://github.com/jamditis/rosen-frontend/issues/693#issuecomment-5058766695)
+- [Curated-record worker #724](https://github.com/jamditis/rosen-frontend/issues/724#issuecomment-5058766867)
+- [Social audit worker #725](https://github.com/jamditis/rosen-frontend/issues/725#issuecomment-5058767032)
+- [Preservation index #726](https://github.com/jamditis/rosen-frontend/issues/726#issuecomment-5058767210)
+- [Cross-file validation #731](https://github.com/jamditis/rosen-frontend/issues/731#issuecomment-5058767418)
+- [First-mention reconciliation #733](https://github.com/jamditis/rosen-frontend/issues/733#issuecomment-5058767598)
+- [Graph coverage metrics #738](https://github.com/jamditis/rosen-frontend/issues/738#issuecomment-5058767777)
+- [Closed PressThink history #208](https://github.com/jamditis/rosen-frontend/issues/208#issuecomment-5058767976),
+  updated without reopening it.
+
+Do not close parent epics or claim the 100% goal is complete. The session was
+explicitly stopped at the handoff boundary; resume only from an approved item
+in the next-actions list.
 
 ## Next safe actions
 
