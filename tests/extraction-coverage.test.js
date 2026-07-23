@@ -2067,6 +2067,266 @@ describe('extraction coverage (#207)', () => {
     }
   });
 
+  it('maps Tumblr extraction batch twelve to existing entities with source excerpts', () => {
+    const expected = new Map([
+      ['TUMBLR-00099', [
+        {
+          relationshipId: 'TUMBLR-00099_REL_001',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20 Professor Jason Samuels',
+        },
+        {
+          relationshipId: 'TUMBLR-00099_REL_002',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0249',
+          contextSnippet: 'Jason Samuels’ ESPN long-form segment “King of the Hill”',
+        },
+      ]],
+      ['TUMBLR-00100', [
+        {
+          relationshipId: 'TUMBLR-00100_REL_001',
+          sourceEntityId: 'P0290',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'NYU Visiting Scholar and Studio 20 Technical Adviser\nDave Winer',
+        },
+        {
+          relationshipId: 'TUMBLR-00100_REL_002',
+          sourceEntityId: 'P0290',
+          relationshipType: 'Discusses',
+          targetEntityId: 'L0020',
+          contextSnippet: 'New York is where it’s all happening',
+        },
+        {
+          relationshipId: 'TUMBLR-00100_REL_003',
+          sourceEntityId: 'P0290',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0192',
+          contextSnippet: 'They won’t be like Google, Facebook, Twitter or Apple.',
+        },
+        {
+          relationshipId: 'TUMBLR-00100_REL_004',
+          sourceEntityId: 'P0290',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0076',
+          contextSnippet: 'They won’t be like Google, Facebook, Twitter or Apple.',
+        },
+        {
+          relationshipId: 'TUMBLR-00100_REL_005',
+          sourceEntityId: 'P0290',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0075',
+          contextSnippet: 'They won’t be like Google, Facebook, Twitter or Apple.',
+        },
+        {
+          relationshipId: 'TUMBLR-00100_REL_006',
+          sourceEntityId: 'P0290',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0218',
+          contextSnippet: 'They won’t be like Google, Facebook, Twitter or Apple.',
+        },
+        {
+          relationshipId: 'TUMBLR-00100_REL_007',
+          sourceEntityId: 'P0290',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0002',
+          contextSnippet: 'And they won’t be the NY Times, Time-Warner or even the Huffington Post or Gawker.',
+        },
+        {
+          relationshipId: 'TUMBLR-00100_REL_008',
+          sourceEntityId: 'P0290',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O1393',
+          contextSnippet: 'And they won’t be the NY Times, Time-Warner or even the Huffington Post or Gawker.',
+        },
+        {
+          relationshipId: 'TUMBLR-00100_REL_009',
+          sourceEntityId: 'P0290',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0034',
+          contextSnippet: 'And they won’t be the NY Times, Time-Warner or even the Huffington Post or Gawker.',
+        },
+        {
+          relationshipId: 'TUMBLR-00100_REL_010',
+          sourceEntityId: 'P0290',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O1089',
+          contextSnippet: 'And they won’t be the NY Times, Time-Warner or even the Huffington Post or Gawker.',
+        },
+      ]],
+      ['TUMBLR-00103', [
+        {
+          relationshipId: 'TUMBLR-00103_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'W0059',
+          contextSnippet: 'Studio 20 has been working on an East Village hyperlocal site',
+        },
+        {
+          relationshipId: 'TUMBLR-00103_REL_002',
+          sourceEntityId: 'W0059',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0002',
+          contextSnippet: 'The Times is advising on the development of the site',
+        },
+        {
+          relationshipId: 'TUMBLR-00103_REL_003',
+          sourceEntityId: 'W0059',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0148',
+          contextSnippet: 'Carter Institute’s “Studio 20 concentration,”',
+        },
+        {
+          relationshipId: 'TUMBLR-00103_REL_004',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0148',
+          contextSnippet: 'Journalism Institute faculty members Jay Rosen and Jason Samuels',
+        },
+        {
+          relationshipId: 'TUMBLR-00103_REL_005',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0148',
+          contextSnippet: 'Journalism Institute faculty members Jay Rosen and Jason Samuels',
+        },
+        {
+          relationshipId: 'TUMBLR-00103_REL_006',
+          sourceEntityId: 'P1222',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0002',
+          contextSnippet: 'Jim Schachter, editor, digital initiatives, The New York Times',
+        },
+      ]],
+      ['TUMBLR-00104', [
+        {
+          relationshipId: 'TUMBLR-00104_REL_001',
+          sourceEntityId: 'W0059',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0002',
+          contextSnippet: 'collaboration with\nThe New York Times',
+        },
+        {
+          relationshipId: 'TUMBLR-00104_REL_002',
+          sourceEntityId: 'W0059',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0295',
+          contextSnippet: 'the Stern Consulting Corps (SCC) at the Leonard N. Stern School of Business',
+        },
+        {
+          relationshipId: 'TUMBLR-00104_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'W0059',
+          contextSnippet: 'Incubating the East Village Local and figuring out how it works is exactly what we designed the Studio 20 concentration for',
+        },
+        {
+          relationshipId: 'TUMBLR-00104_REL_004',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0043',
+          contextSnippet: 'the local news puzzle is one of the most important unsolved problems in journalism today',
+        },
+      ]],
+      ['TUMBLR-00105', [
+        {
+          relationshipId: 'TUMBLR-00105_REL_001',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20 Director\nJay Rosen',
+        },
+        {
+          relationshipId: 'TUMBLR-00105_REL_002',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0033',
+          contextSnippet: 'PressThink\npost',
+        },
+        {
+          relationshipId: 'TUMBLR-00105_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0002',
+          contextSnippet: 'this collaboration with the New York Times',
+        },
+        {
+          relationshipId: 'TUMBLR-00105_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P1225',
+          contextSnippet: 'assisted by my colleague,\nJason Samuels',
+        },
+        {
+          relationshipId: 'TUMBLR-00105_REL_005',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0596',
+          contextSnippet: 'formerly of ABCNews.com',
+        },
+        {
+          relationshipId: 'TUMBLR-00105_REL_006',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0644',
+          contextSnippet: 'social media to beat reporting',
+        },
+        {
+          relationshipId: 'TUMBLR-00105_REL_007',
+          sourceEntityId: 'P0290',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0049',
+          contextSnippet: 'Dave Winer\n, a visiting scholar at NYU',
+        },
+        {
+          relationshipId: 'TUMBLR-00105_REL_008',
+          sourceEntityId: 'P0290',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'technical adviser to Studio 20',
+        },
+        {
+          relationshipId: 'TUMBLR-00105_REL_009',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C1304',
+          contextSnippet: 'open source assignment desk system',
+        },
+        {
+          relationshipId: 'TUMBLR-00105_REL_010',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0102',
+          contextSnippet: 'holy grails of citizen journalism',
+        },
+      ]],
+    ]);
+    const recordsById = new Map(records.map(record => [record.id, record]));
+    const relationshipsById = new Map(relationships.map(relationship => [relationship.relationship_id, relationship]));
+
+    for (const [recordId, recordRelationships] of expected) {
+      const record = recordsById.get(recordId);
+      assert.ok(record, `${recordId} is missing`);
+
+      for (const expectedRelationship of recordRelationships) {
+        const relationship = relationshipsById.get(expectedRelationship.relationshipId);
+        assert.ok(relationship, `${expectedRelationship.relationshipId} is missing`);
+        assert.strictEqual(relationship.source_record_id, recordId);
+        assert.strictEqual(relationship.source_entity_id, expectedRelationship.sourceEntityId);
+        assert.strictEqual(relationship.relationship_type, expectedRelationship.relationshipType);
+        assert.strictEqual(relationship.target_entity_id, expectedRelationship.targetEntityId);
+        assert.strictEqual(relationship.context_snippet, expectedRelationship.contextSnippet);
+        assert.ok(
+          record.raw_text.includes(relationship.context_snippet),
+          `${relationship.relationship_id} has a context excerpt outside ${recordId}`
+        );
+      }
+    }
+  });
+
   it('maps every imported Bluesky thread to existing entities with source excerpts', () => {
     const threadIds = Array.from(
       { length: 10 },
