@@ -2327,6 +2327,217 @@ describe('extraction coverage (#207)', () => {
     }
   });
 
+  it('maps Tumblr extraction batch thirteen to existing entities with source excerpts', () => {
+    const expected = new Map([
+      ['TUMBLR-00108', [
+        {
+          relationshipId: 'TUMBLR-00108_REL_001',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20 Professor\nJason Samuels',
+        },
+        {
+          relationshipId: 'TUMBLR-00108_REL_002',
+          sourceEntityId: 'O0002',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P1225',
+          contextSnippet: 'quoted in Wednesday’s New York Times',
+        },
+        {
+          relationshipId: 'TUMBLR-00108_REL_003',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0049',
+          contextSnippet: 'associate professor of journalism at\nNew York University',
+        },
+        {
+          relationshipId: 'TUMBLR-00108_REL_004',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0055',
+          contextSnippet: 'former senior producer at ABC',
+        },
+        {
+          relationshipId: 'TUMBLR-00108_REL_005',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0015',
+          contextSnippet: 'network quality news with a pared-down staff',
+        },
+      ]],
+      ['TUMBLR-00109', [
+        {
+          relationshipId: 'TUMBLR-00109_REL_001',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20 Director\nJay Rosen',
+        },
+        {
+          relationshipId: 'TUMBLR-00109_REL_002',
+          sourceEntityId: 'P2515',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20’s\nTim Stenovec',
+        },
+        {
+          relationshipId: 'TUMBLR-00109_REL_003',
+          sourceEntityId: 'P2515',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0005',
+          contextSnippet: 'working with Rosen on the project',
+        },
+        {
+          relationshipId: 'TUMBLR-00109_REL_004',
+          sourceEntityId: 'P1831',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0225',
+          contextSnippet: 'Chris Hayes\nof the\nNation',
+        },
+        {
+          relationshipId: 'TUMBLR-00109_REL_005',
+          sourceEntityId: 'W0529',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P1831',
+          contextSnippet: 'with\nChris Hayes\nof the\nNation',
+        },
+      ]],
+      ['TUMBLR-00110', [
+        {
+          relationshipId: 'TUMBLR-00110_REL_001',
+          sourceEntityId: 'O0808',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Harvard’s Nieman Journalism Lab did a Q&A with Studio 20 Director',
+        },
+        {
+          relationshipId: 'TUMBLR-00110_REL_002',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20 Director\nJay Rosen',
+        },
+        {
+          relationshipId: 'TUMBLR-00110_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0002',
+          contextSnippet: 'collaboration with the New York Times',
+        },
+        {
+          relationshipId: 'TUMBLR-00110_REL_004',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C1007',
+          contextSnippet: 'means for journalism education',
+        },
+        {
+          relationshipId: 'TUMBLR-00110_REL_005',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Discusses',
+          targetEntityId: 'W0059',
+          contextSnippet: 'what the Times was doing with The Local',
+        },
+        {
+          relationshipId: 'TUMBLR-00110_REL_006',
+          sourceEntityId: 'W0895',
+          relationshipType: 'Mentions',
+          targetEntityId: 'L0137',
+          contextSnippet: 'Reporting New York\nconcentration at NYU can “own,” and that the Times can benefit from as a learning lab — and the community can gain from because it serves the\nEast Village\nwell',
+        },
+        {
+          relationshipId: 'TUMBLR-00110_REL_007',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0015',
+          contextSnippet: 'innovation puzzles that matter in journalism',
+        },
+      ]],
+      ['TUMBLR-00117', [
+        {
+          relationshipId: 'TUMBLR-00117_REL_001',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20 Professor Jason Samuels',
+        },
+        {
+          relationshipId: 'TUMBLR-00117_REL_002',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0547',
+          contextSnippet: 'the death of Michael Jackson',
+        },
+      ]],
+      ['TUMBLR-00120', [
+        {
+          relationshipId: 'TUMBLR-00120_REL_001',
+          sourceEntityId: 'O1420',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0005',
+          contextSnippet: 'editors of Quartz to Professor Jay Rosen',
+        },
+        {
+          relationshipId: 'TUMBLR-00120_REL_002',
+          sourceEntityId: 'O1420',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0179',
+          contextSnippet: 'as part of Studio 20’s\nnetworked reporting project',
+        },
+        {
+          relationshipId: 'TUMBLR-00120_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0259',
+          contextSnippet: 'Studio 20’s\nnetworked reporting project',
+        },
+        {
+          relationshipId: 'TUMBLR-00120_REL_004',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0259',
+          contextSnippet: 'Designs for a Networked Beat',
+        },
+        {
+          relationshipId: 'TUMBLR-00120_REL_005',
+          sourceEntityId: 'O1420',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0259',
+          contextSnippet: 'A networked beat spec for Studio 20 from Quartz',
+        },
+        {
+          relationshipId: 'TUMBLR-00120_REL_006',
+          sourceEntityId: 'O1420',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0075',
+          contextSnippet: 'suggest leads over Twitter or other media',
+        },
+      ]],
+    ]);
+    const recordsById = new Map(records.map(record => [record.id, record]));
+    const relationshipsById = new Map(relationships.map(relationship => [relationship.relationship_id, relationship]));
+
+    for (const [recordId, recordRelationships] of expected) {
+      const record = recordsById.get(recordId);
+      assert.ok(record, `${recordId} is missing`);
+
+      for (const expectedRelationship of recordRelationships) {
+        const relationship = relationshipsById.get(expectedRelationship.relationshipId);
+        assert.ok(relationship, `${expectedRelationship.relationshipId} is missing`);
+        assert.strictEqual(relationship.source_record_id, recordId);
+        assert.strictEqual(relationship.source_entity_id, expectedRelationship.sourceEntityId);
+        assert.strictEqual(relationship.relationship_type, expectedRelationship.relationshipType);
+        assert.strictEqual(relationship.target_entity_id, expectedRelationship.targetEntityId);
+        assert.strictEqual(relationship.context_snippet, expectedRelationship.contextSnippet);
+        assert.ok(
+          record.raw_text.includes(relationship.context_snippet),
+          `${relationship.relationship_id} has a context excerpt outside ${recordId}`
+        );
+      }
+    }
+  });
+
   it('maps every imported Bluesky thread to existing entities with source excerpts', () => {
     const threadIds = Array.from(
       { length: 10 },
