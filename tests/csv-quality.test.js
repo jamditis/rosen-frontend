@@ -89,6 +89,54 @@ describe('archive_records-public.csv', () => {
     );
   });
 
+  it('all archive records have complete core fields', () => {
+    const requiredFields = [
+      'id',
+      'title',
+      'url',
+      'author',
+      'publication_date',
+      'original_publication',
+      'publisher',
+      'content_type',
+      'format',
+    ];
+    const missing = archiveRecords.flatMap(record => requiredFields
+      .filter(field => !record[field]?.trim())
+      .map(field => `${record.id}:${field}`));
+    assert.strictEqual(
+      missing.length,
+      0,
+      `${missing.length} archive core fields are blank: ${missing.slice(0, 10).join(', ')}`
+    );
+  });
+
+  it('all archive records have source-grounded summaries', () => {
+    const missing = archiveRecords
+      .filter(record => !record.summary?.trim())
+      .map(record => record.id);
+    assert.strictEqual(
+      missing.length,
+      0,
+      `${missing.length} archive records have no summary: ${missing.slice(0, 10).join(', ')}`
+    );
+  });
+
+  it('all archive records have explicit verified status', () => {
+    // FALSE is an explicit verdict for an intentionally excluded row, e.g. a
+    // Jay Rosenstein namesake or source-identity mismatch. Only blank or
+    // unexpected values count as missing verification.
+    const explicit = new Set(['TRUE', 'FALSE']);
+    const unverified = archiveRecords
+      .filter(record => !explicit.has((record.verified || '').trim()))
+      .map(record => record.id);
+    assert.strictEqual(
+      unverified.length,
+      0,
+      `${unverified.length} archive records lack an explicit verified status (expected TRUE or FALSE): ${unverified.slice(0, 10).join(', ')}`
+    );
+  });
+
   it('HuffPost pilot rows preserve directly observed 2008 source dates', () => {
     const expectedDates = new Map([
       ['RECORD-00861', '2008-07-17'],
@@ -349,6 +397,19 @@ describe('archive_records-public.csv', () => {
       incomplete,
       [],
       `Newspaper clips lack source text fields: ${incomplete.join(', ')}`
+    );
+  });
+
+  it('HuffPost #NN08 imports use source publication years', () => {
+    const badDates = archiveRecords
+      .filter(record => record.original_publication === 'HuffPost')
+      .filter(record => /#NN08|Netroots Nation/i.test(record.title || ''))
+      .filter(record => !record.publication_date.startsWith('2008-'))
+      .map(record => `${record.id}:${record.publication_date}`);
+    assert.strictEqual(
+      badDates.length,
+      0,
+      `${badDates.length} #NN08 records use a capture year instead of 2008: ${badDates.join(', ')}`
     );
   });
 
@@ -1172,6 +1233,32 @@ describe('social_posts.csv', () => {
       `Found ${bskyUrls.length - uniqueUrls.size} duplicate Bluesky URLs`);
   });
 
+  it('does not address non-Rosen Bluesky posts as Jay Rosen posts', () => {
+    const misaddressed = socialPosts
+      .filter(row => row.platform === 'Bluesky')
+      .filter(row => row.author?.trim().toLowerCase() !== 'jay rosen')
+      .filter(row => row.url?.startsWith('https://bsky.app/profile/jayrosen.bsky.social/post/'))
+      .map(row => row.id);
+    assert.deepStrictEqual(
+      misaddressed,
+      [],
+      `${misaddressed.length} non-Rosen Bluesky posts use Jay Rosen's profile URL: ${misaddressed.slice(0, 10).join(', ')}`
+    );
+  });
+
+  it('does not assign Jay Rosen copyright to non-Rosen Bluesky posts', () => {
+    const misattributed = socialPosts
+      .filter(row => row.platform === 'Bluesky')
+      .filter(row => row.author?.trim().toLowerCase() !== 'jay rosen')
+      .filter(row => row.copyright?.trim().toLowerCase() === 'jay rosen')
+      .map(row => row.id);
+    assert.deepStrictEqual(
+      misattributed,
+      [],
+      `${misattributed.length} non-Rosen Bluesky posts assign copyright to Jay Rosen: ${misattributed.slice(0, 10).join(', ')}`
+    );
+  });
+
   it('records primary-source verification for Bluesky pilot 01', () => {
     const did = 'did:plc:3t37x6vfigdzzp2gjcfnzlz4';
     const responseHash = '3729ee61e0400fb44af226279271fea674e2fb2946fd85ec5ca4ef997adbe77d';
@@ -1330,6 +1417,17 @@ describe('social_posts.csv', () => {
       mismatches,
       [],
       `${mismatches.length} Twitter dates disagree with their source tweet IDs: ${mismatches.slice(0, 10).join(', ')}`
+    );
+  });
+
+  it('all social posts have explicit verified status', () => {
+    const unverified = socialPosts
+      .filter(post => post.verified !== 'TRUE')
+      .map(post => post.id);
+    assert.strictEqual(
+      unverified.length,
+      0,
+      `${unverified.length} social posts are not explicitly verified: ${unverified.slice(0, 10).join(', ')}`
     );
   });
 
@@ -1537,6 +1635,17 @@ describe('extracted_entities.csv', () => {
     });
     assert.strictEqual(badScores.length, 0,
       `${badScores.length} entities have non-numeric prominence scores`);
+  });
+
+  it('all entities identify their first mention record', () => {
+    const missing = entities
+      .filter(entity => !entity.first_mention_record_id?.trim())
+      .map(entity => entity.entity_id);
+    assert.strictEqual(
+      missing.length,
+      0,
+      `${missing.length} entities have no first_mention_record_id: ${missing.slice(0, 10).join(', ')}`
+    );
   });
 
   it('relationship-backed entities have a non-quarantined first mention', () => {
