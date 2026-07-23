@@ -991,6 +991,161 @@ describe('extraction coverage (#207)', () => {
     }
   });
 
+  it('maps Tumblr extraction batch seven to existing entities with source excerpts', () => {
+    const expected = new Map([
+      ['TUMBLR-00013', [
+        {
+          relationshipId: 'TUMBLR-00013_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0242',
+          contextSnippet: 'MTV show Teen Mom',
+        },
+      ]],
+      ['TUMBLR-00014', [
+        {
+          relationshipId: 'TUMBLR-00014_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0049',
+          contextSnippet: 'STUDIO 20 concentration at NYU',
+        },
+        {
+          relationshipId: 'TUMBLR-00014_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0148',
+          contextSnippet: 'Studio 20 at the Arthur L. Carter Journalism Institute',
+        },
+        {
+          relationshipId: 'TUMBLR-00014_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0180',
+          contextSnippet: 'innovation and adapting journalism to the web',
+        },
+        {
+          relationshipId: 'TUMBLR-00014_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O1191',
+          contextSnippet: 'World Wide Web and its mobile extensions',
+        },
+        {
+          relationshipId: 'TUMBLR-00014_REL_005',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0002',
+          contextSnippet: 'major partners was the New York Times',
+        },
+        {
+          relationshipId: 'TUMBLR-00014_REL_006',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0115',
+          contextSnippet: 'collaboration\nwith ProPublica',
+        },
+        {
+          relationshipId: 'TUMBLR-00014_REL_007',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'W0909',
+          contextSnippet: 'Explainer.net',
+        },
+        {
+          relationshipId: 'TUMBLR-00014_REL_008',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0310',
+          contextSnippet: 'Clay Shirky',
+        },
+        {
+          relationshipId: 'TUMBLR-00014_REL_009',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0158',
+          contextSnippet: 'collaboration with The Guardian',
+        },
+        {
+          relationshipId: 'TUMBLR-00014_REL_010',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0057',
+          contextSnippet: 'The Wall Street Journal',
+        },
+        {
+          relationshipId: 'TUMBLR-00014_REL_011',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0005',
+          contextSnippet: 'Jay Rosen',
+        },
+        {
+          relationshipId: 'TUMBLR-00014_REL_012',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P1225',
+          contextSnippet: 'Jason Samuels',
+        },
+      ]],
+      ['TUMBLR-00021', [
+        {
+          relationshipId: 'TUMBLR-00021_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0049',
+          contextSnippet: '#nyu',
+        },
+        {
+          relationshipId: 'TUMBLR-00021_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'C0015',
+          contextSnippet: '#journalism',
+        },
+      ]],
+      ['TUMBLR-00024', [
+        {
+          relationshipId: 'TUMBLR-00024_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0218',
+          contextSnippet: 'Apple Store',
+        },
+      ]],
+      ['TUMBLR-00026', [
+        {
+          relationshipId: 'TUMBLR-00026_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'C0015',
+          contextSnippet: '#journalism',
+        },
+      ]],
+    ]);
+    const recordsById = new Map(records.map(record => [record.id, record]));
+    const relationshipsById = new Map(relationships.map(relationship => [relationship.relationship_id, relationship]));
+
+    for (const [recordId, recordRelationships] of expected) {
+      const record = recordsById.get(recordId);
+      assert.ok(record, `${recordId} is missing`);
+
+      for (const expectedRelationship of recordRelationships) {
+        const relationship = relationshipsById.get(expectedRelationship.relationshipId);
+        assert.ok(relationship, `${expectedRelationship.relationshipId} is missing`);
+        assert.strictEqual(relationship.source_record_id, recordId);
+        assert.strictEqual(relationship.source_entity_id, expectedRelationship.sourceEntityId);
+        assert.strictEqual(relationship.relationship_type, expectedRelationship.relationshipType);
+        assert.strictEqual(relationship.target_entity_id, expectedRelationship.targetEntityId);
+        assert.strictEqual(relationship.context_snippet, expectedRelationship.contextSnippet);
+        assert.ok(
+          record.raw_text.includes(relationship.context_snippet),
+          `${relationship.relationship_id} has a context excerpt outside ${recordId}`
+        );
+      }
+    }
+  });
+
   it('maps every imported Bluesky thread to existing entities with source excerpts', () => {
     const threadIds = Array.from(
       { length: 10 },
