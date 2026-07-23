@@ -40,7 +40,7 @@ const RAW_TEXT_MIN = 500;
 // re-recover.
 const ALLOWLIST = new Set([]);
 
-let records, relationships;
+let records, relationships, entities;
 
 before(() => {
   records = parse(
@@ -49,6 +49,10 @@ before(() => {
   );
   relationships = parse(
     fs.readFileSync(path.join(dataDir, 'extracted_relationships.csv'), 'utf-8'),
+    { columns: true, skip_empty_lines: true }
+  );
+  entities = parse(
+    fs.readFileSync(path.join(dataDir, 'extracted_entities.csv'), 'utf-8'),
     { columns: true, skip_empty_lines: true }
   );
 });
@@ -70,5 +74,42 @@ describe('extraction coverage (#207)', () => {
       `${offenders.length} RECORD-* have raw_text >= ${RAW_TEXT_MIN} chars but 0 extracted relationships. ` +
       `Sample: ${offenders.slice(0, 10).join(', ')}${offenders.length > 10 ? ', ...' : ''}`
     );
+  });
+
+  it('maps every imported Bluesky thread to existing entities with source excerpts', () => {
+    const threadIds = Array.from(
+      { length: 10 },
+      (_, index) => `THREAD-${String(index + 1).padStart(5, '0')}`
+    );
+    const recordsById = new Map(records.map(record => [record.id, record]));
+    const entityIds = new Set(entities.map(entity => entity.entity_id));
+
+    for (const threadId of threadIds) {
+      const record = recordsById.get(threadId);
+      assert.ok(record, `${threadId} is missing from the archive`);
+
+      const threadRelationships = relationships.filter(
+        relationship => relationship.source_record_id === threadId
+      );
+      assert.ok(
+        threadRelationships.length > 0,
+        `${threadId} has no extracted relationships`
+      );
+
+      for (const relationship of threadRelationships) {
+        assert.ok(
+          entityIds.has(relationship.source_entity_id),
+          `${relationship.relationship_id} has an unknown source entity`
+        );
+        assert.ok(
+          entityIds.has(relationship.target_entity_id),
+          `${relationship.relationship_id} has an unknown target entity`
+        );
+        assert.ok(
+          record.raw_text.includes(relationship.context_snippet),
+          `${relationship.relationship_id} has a context excerpt outside ${threadId}`
+        );
+      }
+    }
   });
 });

@@ -92,6 +92,12 @@ poetry run python src/workflow.py
 - If CSV structure changes, update `data/export-archive-data.js` in the same change.
 - Dissertation quotes and attributions in `frontend/components/dissertationData.js` are verified content. Do not modify, paraphrase, or fabricate them.
 - Large dissertation PDFs are managed with Git LFS.
+- Treat unusually low yearly record counts as recovery leads. Compare years and
+  source coverage, then search source archives and captures before concluding
+  that Jay Rosen published less.
+- Preserve newspapers.com PDF provenance during extraction. Keep source-page
+  identity, page boundaries, OCR confidence, and manual verification separate
+  from the canonical archive row until the evidence packet is approved.
 
 ## Deployment notes
 
@@ -110,3 +116,22 @@ When deployment files change:
 - Bluesky embeds use `embed.bsky.app`; update `ThreadModal.js` and `RecordModal.js` if that embed host changes.
 - Browser `localStorage` caching is disabled because the live data set can exceed storage limits.
 - Social/thread records may have generic titles until content-based title generation is implemented.
+
+## Long-running agent work
+
+- Let long CLI-agent jobs run in the background while local work continues. Check
+  them at roughly ten-minute checkpoints instead of polling or narrating every
+  minute.
+- Use `kimi-code/kimi-for-coding` (K2.7 Coding) for data verification and
+  adversarial review by default. Keep concurrency at one until a reviewed
+  checkpoint explicitly approves a larger batch. Use K3 only when K2.7 cannot
+  handle a specific task.
+- Kimi prompt mode rejects both `--auto` and `--yolo`. For a non-interactive
+  `--prompt` run, omit those flags and put the read-only or write boundary in
+  the prompt itself.
+- Keep interactive or authenticated browser retrieval and access-policy
+  decisions with the primary agent. CLI reviewers may analyze captured
+  evidence, but they must not bypass browser or network controls.
+- For sources that resist normal fetching or scraping, use Firecrawl or
+  computer use as a fallback. Prefer direct primary-source extraction when it
+  works.

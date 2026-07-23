@@ -2207,7 +2207,7 @@ RECORD-00271_REL_010,RECORD-00271,P0488,Karl Rove,Affiliated With,O0029,Newsweek
 RECORD-00272_REL_001,RECORD-00272,P1161,Rick Kaplan,Affiliated With,O0071,MSNBC,"Rick Kaplan, head of MSNBC",1.0,2025-10-22
 RECORD-00272_REL_002,RECORD-00272,P1161,Rick Kaplan,Discusses,C0048,Civic Journalism,Kaplan's thinking related to civic journalists in the 1990s,0.7,2025-10-22
 RECORD-00272_REL_005,RECORD-00272,P0842,Jimmy Wales,Criticizes,O0002,The New York Times,Wales says that the business model of The New York Times is not sustainable,0.8,2025-10-22
-RECORD-00272_REL_006,RECORD-00272,O0515,Wikipedia,Discusses,O0516,Encyclopedia Brittanica,Wikipedia is kicking its butt without having a single employee,0.7,2025-10-22
+RECORD-00272_REL_006,RECORD-00272,O0515,Wikipedia,Discusses,O0516,Encyclopedia Britannica,Wikipedia is kicking its butt without having a single employee,0.7,2025-10-22
 RECORD-00272_REL_007,RECORD-00272,P0147,Jill Abramson,Affiliated With,O0002,The New York Times,Jill Abramson of The New York Times,1.0,2025-10-22
 RECORD-00272_REL_008,RECORD-00272,P0796,John Hinderaker,Affiliated With,O0612,Powerline,John Hinderaker of Powerline,1.0,2025-10-22
 RECORD-00272_REL_010,RECORD-00272,W0296,Bloggers vs. Journalists is Over,Published In,P0005,Jay Rosen,"Bloggers vs. Journalists is Over (Jan. 15, 2004, rev. Jan. 21.)",0.9,2025-10-22
@@ -9722,7 +9722,6 @@ RECORD-00854_REL_020,RECORD-00854,P0600,Walter Pincus,Affiliated With,O0394,The 
 RECORD-00854_REL_021,RECORD-00854,W0365,Power of the Pen: A Call for Journalistic Courage,Originated By,P0600,Walter Pincus,Power of the Pen: A Call for Journalistic Courage,1,2026-05-27
 RECORD-00854_REL_022,RECORD-00854,W0365,Power of the Pen: A Call for Journalistic Courage,Published In,W1009,Frank: Academics for the Real World,asked to write an essay for a new magazine called Frank: Academics for the Real World,1,2026-05-27
 RECORD-00854_REL_023,RECORD-00854,W1009,Frank: Academics for the Real World,Owned By,O0782,Clinton School of Public Service,published by the Clinton School of Public Service in Arkansas,1,2026-05-27
-RECORD-00854_REL_024,RECORD-00854,P0600,Walter Pincus,Criticizes,C1235,Objectivity as a truth claim,Pincus describes the rise of neutrality as a loss of rights and a conversion downward for the political press,0.95,2026-05-27
 RECORD-00854_REL_025,RECORD-00854,P0600,Walter Pincus,Originated By,C1240,Press as transmitters/stenographers,"They have increasingly become common carriers, transmitters of other people's ideas and thoughts",0.95,2026-05-27
 RECORD-00854_REL_026,RECORD-00854,P0600,Walter Pincus,Cites,P1317,William Allen White,he turns to the past to get his bearings. To William Allen White of Kansas,1,2026-05-27
 RECORD-00854_REL_027,RECORD-00854,P0600,Walter Pincus,Cites,P0224,Lincoln Steffens,"And to Lincoln Steffens, the great muckraker (and progressive) of the early 1900s",1,2026-05-27
@@ -9935,7 +9934,6 @@ RECORD-00863_REL_003,RECORD-00863,P0186,Richard Nixon,Mentions,E0449,1960 Kenned
 RECORD-00863_REL_004,RECORD-00863,P0869,Joe Trippi,Mentions,E0450,Netroots Nation 2008 (NN08),"#NN08 Sketchbook: I tell Joe Trippi that his ""Nixon won on radio"" (in 1960 debate) reference is basically an urban legend",0.8,2026-05-27
 RECORD-00864_REL_001,RECORD-00864,P0869,Joe Trippi,Discusses,E0448,Netroots Nation 2008,"#NN08 Sketchbook. Trippi's poem: ""I came up top down.""",0.8,2026-05-27
 RECORD-00865_REL_001,RECORD-00865,P2345,Rick Perlstein,Affiliated With,E0448,Netroots Nation 2008,#NN08 Sketchbook Rick Pearlstein: impressive. Very. I love it when the youngest person on the panel has the longest view.,0.9,2026-05-27
-RECORD-00866_REL_001,RECORD-00866,E0448,Netroots Nation 2008,Discusses,E0448,Netroots Nation 2008,"Politicians think 'Netroots Nation' equals 'youth,' because kids get the Net. But glance at the crowd and: Fail.",1,2026-05-27
 RECORD-00866_REL_002,RECORD-00866,E0448,Netroots Nation 2008,Published In,O0034,The Huffington Post,Posted on HuffingtonPost.com as part of Jay Rosen's NN08 Sketchbook series,1,2026-05-27
 RECORD-00867_REL_001,RECORD-00867,P2656,Matt Yglesias,Criticizes,E0004,Iraq War,"In policy debate you can't say, 'I know, let's spend a $170 billion a year on it.' But in Iraq...",0.9,2026-05-27
 RECORD-00867_REL_002,RECORD-00867,P2656,Matt Yglesias,Affiliated With,E0448,Netroots Nation 2008,#NN08 Sketchbook. Matt Yglesias,0.8,2026-05-27
@@ -10647,3 +10645,315 @@ RECORD-00783_REL_002,RECORD-00783,E0474,The future of context (presentation to A
 RECORD-00783_REL_003,RECORD-00783,E0474,The future of context (presentation to ABC Australia staff),Discusses,C1041,The Future of Context,calls for a rethink of the underlying methods of news production,1,2026-06-24
 RECORD-00783_REL_004,RECORD-00783,E0474,The future of context (presentation to ABC Australia staff),Discusses,C1329,"Journalists as ""explainers""","journalists and reporters to reclaim their role as ""explainers,"" taking a Socratic position on behalf of their audiences",0.9,2026-06-24
 RECORD-00783_REL_005,RECORD-00783,C1329,"Journalists as ""explainers""",Expands On,C1041,The Future of Context,"audiences lack the necessary background knowledge... reclaim their role as ""explainers""",0.7,2026-06-24
+THREAD-00001_REL_001,THREAD-00001,P0005,Jay Rosen,Discusses,C0004,View from Nowhere,"“The view from nowhere” and my focus on the “savvy style” in political journalism both spread in this fashion, as did this mantra during the 2024 campaign: “Not the odds, but the stakes.”",1.0,2026-07-23
+THREAD-00001_REL_002,THREAD-00001,P0005,Jay Rosen,Discusses,C0014,Savvy style,"“The view from nowhere” and my focus on the “savvy style” in political journalism both spread in this fashion, as did this mantra during the 2024 campaign: “Not the odds, but the stakes.”",1.0,2026-07-23
+THREAD-00001_REL_003,THREAD-00001,P0005,Jay Rosen,Discusses,C0062,Civic Journalism Movement,"It argued for a less distant, less detached press, and told the story of the civic journalism movement, a pre-internet attempt to warn journalists that they were dangerously disconnected.",1.0,2026-07-23
+THREAD-00001_REL_004,THREAD-00001,P0005,Jay Rosen,Discusses,C0126,Pro-Am journalism,"In 2008 I took that a step further, teaming up with Arianna Huffington as co-publisher to launch ""Off the Bus,"" an adventure in what we called ""pro-am journalism.""",1.0,2026-07-23
+THREAD-00001_REL_005,THREAD-00001,P0005,Jay Rosen,Discusses,C0934,"Not the odds, but the stakes","“The view from nowhere” and my focus on the “savvy style” in political journalism both spread in this fashion, as did this mantra during the 2024 campaign: “Not the odds, but the stakes.”",1.0,2026-07-23
+THREAD-00001_REL_006,THREAD-00001,P0005,Jay Rosen,Mentions,O0018,The New York Observer,"Derick Dirmaier, head of product at Talking Points Memo, and Elizabeth Spiers, cofounder of Gawker and formerly the editor in chief of The New York Observer, perfected their Studio 20 courses that way.",1.0,2026-07-23
+THREAD-00001_REL_007,THREAD-00001,P0005,Jay Rosen,Discusses,O0033,PressThink,"Which is an idea I put into practice four years later when I started my blog, PressThink.",1.0,2026-07-23
+THREAD-00001_REL_008,THREAD-00001,P0005,Jay Rosen,Mentions,O0034,The Huffington Post,Any reader of the Huffington Post — then at its height — should be able participate in the site's election coverage.,1.0,2026-07-23
+THREAD-00001_REL_009,THREAD-00001,P0005,Jay Rosen,Mentions,O0049,NYU,After 39 years on the job I am retiring as an NYU professor.,1.0,2026-07-23
+THREAD-00001_REL_010,THREAD-00001,P0005,Jay Rosen,Mentions,O0073,Talking Points Memo,"Derick Dirmaier, head of product at Talking Points Memo, and Elizabeth Spiers, cofounder of Gawker and formerly the editor in chief of The New York Observer, perfected their Studio 20 courses that way.",1.0,2026-07-23
+THREAD-00001_REL_011,THREAD-00001,P0005,Jay Rosen,Mentions,O0114,Associated Press Managing Editors,In 1989 I gave my first talk to a conference of journalists: the Associated Press Managing Editors.,1.0,2026-07-23
+THREAD-00001_REL_012,THREAD-00001,P0005,Jay Rosen,Mentions,O0116,Yale University Press,"Ten years later I published my book on this idea: What Are Journalists For? (1999, Yale University Press)",1.0,2026-07-23
+THREAD-00001_REL_013,THREAD-00001,P0005,Jay Rosen,Discusses,O0179,Studio 20,"In 2009 I started a graduate program at NYU called Studio 20, a reference to our offices at 20 Cooper Square in Manhattan.",1.0,2026-07-23
+THREAD-00001_REL_014,THREAD-00001,P0005,Jay Rosen,Mentions,O1089,Gawker,"Derick Dirmaier, head of product at Talking Points Memo, and Elizabeth Spiers, cofounder of Gawker and formerly the editor in chief of The New York Observer, perfected their Studio 20 courses that way.",1.0,2026-07-23
+THREAD-00001_REL_015,THREAD-00001,P0005,Jay Rosen,Mentions,P0010,Jeff Jarvis,"That audience grew much larger with the arrival of Twitter, which I joined in 2008 after much badgering from my colleague Jeff Jarvis.",1.0,2026-07-23
+THREAD-00001_REL_016,THREAD-00001,P0005,Jay Rosen,Discusses,P0165,Walter Lippmann,"A key character in my thesis was Walter Lippmann and his brilliant book, ""Public Opinion."" (1922)",1.0,2026-07-23
+THREAD-00001_REL_017,THREAD-00001,P0005,Jay Rosen,Mentions,P0180,Neil Postman,"NYU has been my home for most of my academic life, starting in 1980, when I moved to New York to enroll as a grad student in NYU’s Media Ecology program, so I could study with the great media critic, Neil Postman.",1.0,2026-07-23
+THREAD-00001_REL_018,THREAD-00001,P0005,Jay Rosen,Cites,P0181,Raymond Williams,I was moved by a single sentence from sociologist Raymond Williams. “There are in fact no masses; there are only ways of seeing people as masses.” (!958),1.0,2026-07-23
+THREAD-00001_REL_019,THREAD-00001,P0005,Jay Rosen,Mentions,P0182,Jim Romenesko,Some journalists may remember Jim Romenesko’s MediaNews.,1.0,2026-07-23
+THREAD-00001_REL_020,THREAD-00001,P0005,Jay Rosen,Mentions,P0183,Arianna Huffington,"In 2008 I took that a step further, teaming up with Arianna Huffington as co-publisher to launch ""Off the Bus,"" an adventure in what we called ""pro-am journalism.""",1.0,2026-07-23
+THREAD-00001_REL_021,THREAD-00001,P0005,Jay Rosen,Cites,P0184,Amanda Michel,"As Amanda Michel, the project's director put it, ""we instructed our citizen journalists to steer clear of the horse race and the top-down coverage that dominates the mainstream press.""",1.0,2026-07-23
+THREAD-00001_REL_022,THREAD-00001,P0005,Jay Rosen,Mentions,P0539,Elizabeth Spiers,"Derick Dirmaier, head of product at Talking Points Memo, and Elizabeth Spiers, cofounder of Gawker and formerly the editor in chief of The New York Observer, perfected their Studio 20 courses that way.",1.0,2026-07-23
+THREAD-00001_REL_023,THREAD-00001,P0005,Jay Rosen,Discusses,W0029,What Are Journalists For?,"It argued for a less distant, less detached press, and told the story of the civic journalism movement, a pre-internet attempt to warn journalists that they were dangerously disconnected.",1.0,2026-07-23
+THREAD-00001_REL_024,THREAD-00001,P0005,Jay Rosen,Cites,W0034,Amusing Ourselves to Death,"Postman was then writing his best book, ""Amusing Ourselves to Death,"" which argues that everything is becoming entertainment— schooling, parenting, politics, journalism.",1.0,2026-07-23
+THREAD-00001_REL_025,THREAD-00001,P0005,Jay Rosen,Discusses,W0036,Off the Bus,"In 2008 I took that a step further, teaming up with Arianna Huffington as co-publisher to launch ""Off the Bus,"" an adventure in what we called ""pro-am journalism.""",1.0,2026-07-23
+THREAD-00001_REL_026,THREAD-00001,P0005,Jay Rosen,Cites,W0877,Public Opinion,"A key character in my thesis was Walter Lippmann and his brilliant book, ""Public Opinion."" (1922)",1.0,2026-07-23
+THREAD-00002_REL_001,THREAD-00002,P0005,Jay Rosen,Mentions,C0065,Dueling realities,"Refuge-seeking includes such common practices as false balance, ""both sides do it,"" steering the story ""down the middle,"" and the depiction of ""dueling realities"" in a divided nation.",1.0,2026-07-23
+THREAD-00002_REL_002,THREAD-00002,P0005,Jay Rosen,Mentions,C0140,False Balance,"Refuge-seeking includes such common practices as false balance, ""both sides do it,"" steering the story ""down the middle,"" and the depiction of ""dueling realities"" in a divided nation.",1.0,2026-07-23
+THREAD-00002_REL_003,THREAD-00002,P0005,Jay Rosen,Discusses,C0143,Truth-Seeking,My third key distinction: truth-seeking vs. refuge-seeking behavior in journalism.,1.0,2026-07-23
+THREAD-00002_REL_004,THREAD-00002,P0005,Jay Rosen,Discusses,C0165,Horse Race,"If issues as framed don't bear on common troubles, then focusing on ""the issues"" — as against the horse race — may not be the answer it seems to be.",1.0,2026-07-23
+THREAD-00002_REL_005,THREAD-00002,P0005,Jay Rosen,Discusses,C0619,Accountability,Expect implies accountability. Predict trades in probability.,1.0,2026-07-23
+THREAD-00002_REL_006,THREAD-00002,P0005,Jay Rosen,Discusses,C0927,Refuge-seeking behavior in journalism,My third key distinction: truth-seeking vs. refuge-seeking behavior in journalism.,1.0,2026-07-23
+THREAD-00002_REL_007,THREAD-00002,P0005,Jay Rosen,Discusses,C1199,Audience vs. Public,"Audience vs. public, continued.",1.0,2026-07-23
+THREAD-00002_REL_008,THREAD-00002,P0005,Jay Rosen,Discusses,C1327,The best available version of the truth,"Truth-seeking is what journalists see themselves as always doing. ""The best available version of the truth.""",1.0,2026-07-23
+THREAD-00002_REL_009,THREAD-00002,P0005,Jay Rosen,Mentions,O0015,CNN,When what you're watching on CNN seems to have no value as information — and from it you are learning nothing — you can try to switch frames to see if the news makes better sense as ritual: in production of a shared world.,1.0,2026-07-23
+THREAD-00002_REL_010,THREAD-00002,P0005,Jay Rosen,Mentions,O0023,The Washington Post,"My favorite description of refuge-seeking behavior in journalism comes from a former reporter for the Washington Post, Paul Taylor, in his 1990 book about election coverage.",1.0,2026-07-23
+THREAD-00002_REL_011,THREAD-00002,P0005,Jay Rosen,Cites,P0164,John Dewey,"When people share common problems but don't realize it, they are an ""inchoate"" public. (John Dewey.)",1.0,2026-07-23
+THREAD-00002_REL_012,THREAD-00002,P0005,Jay Rosen,Cites,P0177,Paul Taylor,"My favorite description of refuge-seeking behavior in journalism comes from a former reporter for the Washington Post, Paul Taylor, in his 1990 book about election coverage.",1.0,2026-07-23
+THREAD-00002_REL_013,THREAD-00002,P0005,Jay Rosen,Cites,P0261,C. Wright Mills,"The great sociologist C. Wright Mills would distinguish between ""troubles"" and ""issues.""",1.0,2026-07-23
+THREAD-00002_REL_014,THREAD-00002,P0005,Jay Rosen,Mentions,P0341,Hannah Arendt,"These notes about some of the distinctions I draw in order to do my work were written under the influence of two masters of the form: the French critic Roland Barthes, and the political philosopher Hannah Arendt, known for her striking distinctions— such as labor vs. work. (Google it maybe.)",1.0,2026-07-23
+THREAD-00002_REL_015,THREAD-00002,P0005,Jay Rosen,Cites,P0572,James W. Carey,"In grad school I learned to distinguish between ""ritual"" and ""transmission"" views of human communication, a distinction introduced by James W. Carey.",1.0,2026-07-23
+THREAD-00002_REL_016,THREAD-00002,P0005,Jay Rosen,Discusses,W0051,Spotlight,"Also: Great journalism puts a spotlight on troubles and turns them into issues, which is exactly what the movie, ""Spotlight"" is about.",1.0,2026-07-23
+THREAD-00003_REL_001,THREAD-00003,P0005,Jay Rosen,Criticizes,C0004,View from Nowhere,"But the bosses also said this: We can have a diverse and multi-colored newsroom, and maintain the view from nowhere. 
+
+See the contradiction?",0.95,2026-07-23
+THREAD-00003_REL_002,THREAD-00003,P0005,Jay Rosen,Criticizes,C0050,Objectivity,Under-represented journalists are to simultaneously supply a missing perspective and suppress it— in order to prove their objectivity.,0.95,2026-07-23
+THREAD-00003_REL_003,THREAD-00003,P0005,Jay Rosen,Discusses,C0060,Trust in the news media,"To say that trust in the news media has declined is correct, but too vague.",1.0,2026-07-23
+THREAD-00003_REL_004,THREAD-00003,P0005,Jay Rosen,Discusses,C0644,Social Media,"The news industry is still struggling to re-establish a direct connection with readers (through newsletters and podcasts, for example...) after social media captured a lot of that territory for itself.",1.0,2026-07-23
+THREAD-00003_REL_005,THREAD-00003,P0005,Jay Rosen,Discusses,C0930,Pluralism,"Final note: Decades ago, the leadership class in American journalism accepted the argument that real pluralism had to come to their newsrooms, or the journalism would suffer.",1.0,2026-07-23
+THREAD-00003_REL_006,THREAD-00003,P0005,Jay Rosen,Mentions,O0015,CNN,"Last week CNN asked me how I explain the downturn in the news industry: big layoffs, scant investment, no recovery in sight.",1.0,2026-07-23
+THREAD-00003_REL_007,THREAD-00003,P0005,Jay Rosen,Cites,P0090,Steve Bannon,"The reality is that destroying confidence in the practice and products of journalism is a potent and successful political strategy, as with Steve Bannon's ""flood the zone.""",1.0,2026-07-23
+THREAD-00004_REL_001,THREAD-00004,P0005,Jay Rosen,Mentions,C0168,Public Editor,"As your public editor for today, I have a few questions.",1.0,2026-07-23
+THREAD-00004_REL_002,THREAD-00004,P0005,Jay Rosen,Criticizes,C0173,Horse Race Coverage,"* Did anyone wonder, as I have wondered, whether the depiction of “policy” — as possibly the next phase of the Trump campaign was more a wish of our own: to be perceived as serious people engaged in something more edifying than listless horse race coverage and vapid “strategy” talk?",0.95,2026-07-23
+THREAD-00004_REL_003,THREAD-00004,P0005,Jay Rosen,Criticizes,O0221,NBC News,"* In the modern era, or in the memory of anyone at NBC News, has there ever been a president less likely — and less qualified — to make the pivot to “more policy” of which our own headline confidently speaks?",0.95,2026-07-23
+THREAD-00004_REL_004,THREAD-00004,P0005,Jay Rosen,Criticizes,P0073,Donald Trump,"* Treating ""fewer grievances, more policy"" as a plausible next step for the campaign of Donald Trump is more than a stretch. It conflicts with everything we know about the guy.",0.95,2026-07-23
+THREAD-00004_REL_005,THREAD-00004,P0005,Jay Rosen,Mentions,P1724,Carol E. Lee,"By Matt Dixon, Kristen Welker, Jonathan Allen, Vaughn Hillyard, Garrett Haake and Carol E. Lee.",1.0,2026-07-23
+THREAD-00005_REL_001,THREAD-00005,P0005,Jay Rosen,Supports,C0042,Citizens agenda,"Here's one suggestion for what can replace the race once you demote it. For years I have been writing about the citizens agenda model. It puts a key question at the center: ""what do you want the candidates to be talking about as they compete for votes?""",0.95,2026-07-23
+THREAD-00005_REL_002,THREAD-00005,P0005,Jay Rosen,Criticizes,C0059,Horse Race Model,"""Horse race coverage prioritizes those in power, not the people the powerful are supposed to serve. "" 
+
+In explaining why today he demoted the horse race model, Colorado Newsline editor Quentin Young acknowledged that his newsroom had participated like any other in that ritual.",0.9,2026-07-23
+THREAD-00005_REL_003,THREAD-00005,P0005,Jay Rosen,Supports,C0934,"Not the odds, but the stakes","""Not the odds, but the stakes."" 
+
+That's been my shorthand for the principle that could most improve election coverage in 2024.",0.95,2026-07-23
+THREAD-00005_REL_004,THREAD-00005,P0005,Jay Rosen,Mentions,O0221,NBC News,"Because it's something any newsroom can do tomorrow, from NBC News to The Current in Lafayette, Louisiana:",1.0,2026-07-23
+THREAD-00006_REL_001,THREAD-00006,P0005,Jay Rosen,Discusses,C0619,Accountability,No accountability moment ever comes.,1.0,2026-07-23
+THREAD-00006_REL_002,THREAD-00006,P0005,Jay Rosen,Discusses,C1150,Unreliable narrator,Trump enjoys being the unreliable narrator of his own deeds and intentions.,1.0,2026-07-23
+THREAD-00006_REL_003,THREAD-00006,P0005,Jay Rosen,Criticizes,O0015,CNN,"We have a recent counter example. After CNN's debacle in staging a ""town hall"" with Trump, no one else has tried to do it.",0.95,2026-07-23
+THREAD-00006_REL_004,THREAD-00006,P0005,Jay Rosen,Criticizes,O0065,NBC,NBC willingly paid that cost with this interview.,0.95,2026-07-23
+THREAD-00006_REL_005,THREAD-00006,P0005,Jay Rosen,Mentions,O0075,Twitter,"After viewing the show, reading NBC's fact check, and monitoring the program's Twitter feed, I am left with these impressions. 1/",1.0,2026-07-23
+THREAD-00006_REL_006,THREAD-00006,P0005,Jay Rosen,Criticizes,O0279,Meet the Press,"What I learned by bringing an open mind to Meet the Press Sunday was... nothing, really.",0.95,2026-07-23
+THREAD-00006_REL_007,THREAD-00006,P0005,Jay Rosen,Mentions,O0403,Fox,Even Fox does it.,1.0,2026-07-23
+THREAD-00006_REL_008,THREAD-00006,P0005,Jay Rosen,Criticizes,P0073,Donald Trump,Trump enjoys being the unreliable narrator of his own deeds and intentions.,0.95,2026-07-23
+THREAD-00006_REL_009,THREAD-00006,P0005,Jay Rosen,Mentions,P0099,Peter Baker,"On the show, Welker raised the criticism she knew NBC would get for doing this, and asked Peter Baker to respond.",1.0,2026-07-23
+THREAD-00006_REL_010,THREAD-00006,P0005,Jay Rosen,Cites,P0106,Rachel Maddow,"I doubt we will ever know (same company) but I would love to hear what Rachel Maddow thought about NBC's interview with Trump.
+
+She is the one who said on air: “There’s a cost to us as a news organization of knowingly broadcasting untrue things.”",1.0,2026-07-23
+THREAD-00006_REL_011,THREAD-00006,P0005,Jay Rosen,Cites,P0357,Oliver Darcy,"In a scathing review of NBC's interview, Oliver Darcy highlights a failure that escaped broad notice in the reactions after: a failure to protect your talent and set them up to succeed.",1.0,2026-07-23
+THREAD-00007_REL_001,THREAD-00007,P0005,Jay Rosen,Discusses,C0550,Balance,"Told through the wrestling lens, the Jim Jordan story provides instant balance: there are reasons to admire his almost fanatic commitment to wrestling, and reasons to doubt his word about the sexual abuse.",1.0,2026-07-23
+THREAD-00007_REL_002,THREAD-00007,P0005,Jay Rosen,Criticizes,O0023,The Washington Post,"I read every word of this long (VERY long) profile of Jim Jordan by the Washington Post. ""Relentless Wrestler"" is the title. [gift link] 
+
+As the pages wore on, their central conceit began to seem thinner and thinner, which is what led to this short thread. 1/",0.95,2026-07-23
+THREAD-00008_REL_001,THREAD-00008,P0005,Jay Rosen,Supports,C0249,Fact-checking,You don't have to commit to fact-checking everything. It's bad form to say you will fact check nothing. You can predict and prepare for most of his lies.,0.95,2026-07-23
+THREAD-00008_REL_002,THREAD-00008,P0005,Jay Rosen,Cites,O0002,The New York Times,"The New York Times media reporter says there was a shift ""for an evening, at least — in the balance of power between Mr. Trump and the many journalists who have struggled, or stopped trying, to construct factual guardrails around [his] baseless claims.""",1.0,2026-07-23
+THREAD-00008_REL_003,THREAD-00008,P0005,Jay Rosen,Mentions,O0015,CNN,"CNN’s Abby Phillip last night: “[W]hen there is asymmetrical lying, there will be asymmetrical fact checking.”",1.0,2026-07-23
+THREAD-00008_REL_004,THREAD-00008,P0005,Jay Rosen,Mentions,O0055,ABC News,"""ABC News' repeated fact-checking of Trump stood in contrast to the approach CNN took when it moderated the debate with President Joe Biden in late June.""",1.0,2026-07-23
+THREAD-00008_REL_005,THREAD-00008,P0005,Jay Rosen,Mentions,P0073,Donald Trump,"The New York Times media reporter says there was a shift ""for an evening, at least — in the balance of power between Mr. Trump and the many journalists who have struggled, or stopped trying, to construct factual guardrails around [his] baseless claims.""",1.0,2026-07-23
+THREAD-00008_REL_006,THREAD-00008,P0005,Jay Rosen,Mentions,P0086,Joe Biden,"""ABC News' repeated fact-checking of Trump stood in contrast to the approach CNN took when it moderated the debate with President Joe Biden in late June.""",1.0,2026-07-23
+THREAD-00008_REL_007,THREAD-00008,P0005,Jay Rosen,Supports,P0208,Abby Phillip,"CNN’s Abby Phillip last night: “[W]hen there is asymmetrical lying, there will be asymmetrical fact checking.”
+
+Yes, it's aspiration only, but it's also the right principle.",0.95,2026-07-23
+THREAD-00008_REL_008,THREAD-00008,P0005,Jay Rosen,Cites,P0357,Oliver Darcy,"Here it is again, from Oliver Darcy's newsletter.",1.0,2026-07-23
+THREAD-00009_REL_001,THREAD-00009,P0005,Jay Rosen,Discusses,C0623,Denialism,"If I were entering political science today, I would make denialism my area of study.",1.0,2026-07-23
+THREAD-00010_REL_001,THREAD-00010,P0005,Jay Rosen,Supports,C0042,Citizens agenda,"Some good news. A consortium of Colorado newsrooms — many of which compete with each other — are teaming up to switch their election coverage over to the ""citizens agenda"" model, according to Colorado Public Radio.",0.95,2026-07-23
+THREAD-00010_REL_002,THREAD-00010,P0005,Jay Rosen,Discusses,C0165,Horse Race,"I have shared the shocking (in a good way) announcement that 30+ Colorado newsrooms will colaborate in their election coverage by adopting a ""citizens agenda"" approach, rather than the horse race.",1.0,2026-07-23
+THREAD-00010_REL_003,THREAD-00010,P0005,Jay Rosen,Mentions,O1576,Vermont Public,Here's an announcement from Vermont public radio and TV. It says they will be using a citizens agenda approach as well.,0.9,2026-07-23
+RECORD-00577_REL_009,RECORD-00577,P2119,Tom Goldstein,Discusses,C0076,Serious Journalism,"''people off by coming on too strongly''), but mostly he relates his intellectual journey.
+
+Following the depressing 1988 election, the audience for serious journalism seemed to be shrinking and Rosen was among those who felt politics had become a slick, cynical spectacle, taken over by the candidates' handlers. He turned to John Dewey
+and Jrgen Habermas. In contrast to Walter Lippmann's",0.93,2026-07-23
+RECORD-00143_REL_007,RECORD-00143,P0005,Jay Rosen,Discusses,C0243,Intervention,"its decision to print accusations of sexual conduct against a candidate for governor in the week before the vote. The LAT’s actions are seen as a late intervention in the race— possibly legitmate, maybe not. But it’s hard to resolve the matter when there is no language of “intervention” available to press thinking, no way to explain yourself in those terms. Listen to this:
+
+“I don’t consider it my",0.91,2026-07-23
+RECORD-00129_REL_006,RECORD-00129,P0005,Jay Rosen,Discusses,C0262,Local knowledge,"their homework, puzzled through problems of interpretation, seen the situation from different angles? Have they absorbed what anthropology calls local knowledge? (What the natives learn by being natives.)
+
+When confronted with a journalist who really knows what she is talking about, I am hungry for information and, when the time comes, opinion, analysis, interpretation, a gut feeling, a",0.97,2026-07-23
+RECORD-00117_REL_010,RECORD-00117,P0005,Jay Rosen,Discusses,C0308,Press solidarity,"for a journalist of conscience who happens to be in the favored group of reporters allowed to question the Attorney General? How would you imagine “press solidarity” working in a case like this?
+
+Todd Gitlin: At the minimum, television reporters should include in their reports the fact that Ashcroft won’t take questions from print reporters. That’s news.",0.98,2026-07-23
+RECORD-00132_REL_010,RECORD-00132,P0005,Jay Rosen,Discusses,C0323,Top-down control of the message,"it.
+One would not want to control it. IMPORTANT IF TRUE. Think what that does to one of the most reliable “laws” of presidential campaigns: that top down control of the message and the operation as a whole is essential, the way the game is played. Think how many news stories have been generated over the years by that thesis. Think of all the “disarray” stories when the operatives at the top lose control",0.94,2026-07-23
+RECORD-00126_REL_009,RECORD-00126,P0005,Jay Rosen,Discusses,C0324,Nation-building,"There is a lot that joins the two sites: the complexity and scale of destruction, the absence of any script, the fact that no one knows how to do nation-building in the Middle East, the many situations where problems have to be solved on the spot and without clearence from above, the living atmosphere of death. And of course the war that began with the Towers’ destruction has somehow",0.96,2026-07-23
+RECORD-00145_REL_013,RECORD-00145,P0005,Jay Rosen,Discusses,C0350,Distributed fact checking,"chosen term, but he means a social mechanism for catching errors and improving or extending ideas, which is part of the weblog’s gift to journalism— distributed fact checking, for one.
+
+Apcar said something I found insightful: “Kristof Reponds” was essentially a contract between him and Kristof, unwritten and based on a mutual sense of where the boundaries are. This is one answer to “everybody needs",0.99,2026-07-23
+RECORD-00122_REL_013,RECORD-00122,P0005,Jay Rosen,Discusses,C0362,Five O’clock Follies,"on the payroll than the Sierra Club has stamps. These things precede you.
+
+American journalism carries by means of craft culture the memory of the Five O’clock Follies in Vietnam, where comically upbeat officials gave fake body counts. Call it the Church of David Halberstam, who was there and still talks about it. Journalism “remembers” like a tribe remembers cities in the American South that",0.99,2026-07-23
+RECORD-00122_REL_014,RECORD-00122,P0005,Jay Rosen,Discusses,C0363,Church of Spiro Agnew,"reporters have the goods, saying they’re sick and tired of all the negative news from those who just want to tear down the community. (The Angry Church of Spiro Agnew.) This week on my TV set there’s this subtle ad from Shell suggesting—good news!—the company has more environmentalists on the payroll than the Sierra Club has stamps. These things precede you.
+
+American journalism carries by",0.99,2026-07-23
+RECORD-00122_REL_015,RECORD-00122,P0005,Jay Rosen,Discusses,C0364,Church of Taylor Branch,"about it. Journalism “remembers” like a tribe remembers cities in the American South that wanted bad news about race relations suppressed. (The Church of Taylor Branch?) In the recessed mind of the press, these shadows fall over the case before arguments are even presented in re: Rapidly Improving Iraq v. Overly Gloomy Press.
+
+Tom Regan of the Christian Science Monitor: “Despite all efforts to",0.99,2026-07-23
+RECORD-00119_REL_008,RECORD-00119,P0005,Jay Rosen,Discusses,C0399,Argument by link,"editors will probably start out by exchanging opinions in approximation of an existing dialogue in-house. But as soon as one of them discovers “argument by link,” their idea of what they’re doing may change. To force this moment upon mainstream journalism in setting after setting could be the Weblog’s gift to the newsroom.
+
+2.) Retreat
+
+I am with a host of web critics who objected to the",0.99,2026-07-23
+RECORD-00136_REL_010,RECORD-00136,P0005,Jay Rosen,Discusses,C0429,Moral authority of the witness,"actually been there too, embedded or not but working in a dangerous place. If the issue is sacrifice, journalists in Iraq have their dead.
+
+7. The moral authority of the witness—also a premise of the Voices site—is closely related to the moral authority of the correspondent on scene, mike in hand, deputized by the public as its eyes and ears. Compelling first hand accounts that tell us what’s going on",0.99,2026-07-23
+RECORD-00111_REL_013,RECORD-00111,P0005,Jay Rosen,Discusses,C0430,Perception is reality,"around, since they can always be counted on for observations like this, from Richard S. Dunham of Business Week: “Still, in politics, perception is reality, and the public remains convinced that Bush is rooted deeply in the political center.” Yes, that’s postmodern lite. Yes, it’s banal. This is my point about casual proponents in the press
+
+Finally, what I like most about the",0.97,2026-07-23
+RECORD-00131_REL_012,RECORD-00131,P0005,Jay Rosen,Discusses,C0438,Grassroots,"Dean” web sites come onto the net every day, their ability to share information is, at best, hit or miss…. Disjointed and disorganized, the current online grassroots campaign functions like any old twentieth century grapevine. It could be so much more. We have found a way to harness the passion that has given birth to this insurgent campaign, to empower it with tools that match the intensity of its",0.92,2026-07-23
+RECORD-00128_REL_008,RECORD-00128,P0005,Jay Rosen,Discusses,C0475,Campaign by the numbers,"catch phrases: “compassionate conservative,” “the people, not the powerful.”
+
+Everyone who knew the game knew how this sameness happened. It was a campaign by the numbers, for the numbers, about the numbers; and in the end it came down to numbers, which is basically all we really remember of 2000—the numbers and the fight in Florida about the numbers. To call the proceedings of that year “poll",0.99,2026-07-23
+RECORD-00128_REL_009,RECORD-00128,P0005,Jay Rosen,Discusses,C0476,Battleground States,"50 states, (those idiots) leaving no more than seventeen actually to think about. Here the press will help you out with its savvy references to “key battleground states,” which makes it sound reasonable to ignore all the others. (Those foolish states.)
+
+Then within the “battleground” states, polling will identify the likely voters hopelessly sold on Bush or hopelessly sold on Gore, which is most",0.98,2026-07-23
+RECORD-00128_REL_010,RECORD-00128,P0005,Jay Rosen,Discusses,C0477,Swing States,"voters, (the blessed) in the states that count. They are the electorate. Here the press comes to your aid again by fixing on undecided voters in “swing states” because it’s trying to be a savvy analyst and it knows how the operatives think.
+
+After all, what other logic is there?
+
+Well, I did some back of the envelope math: There are 17 states where the winner in 2000 won by 6 points or",0.98,2026-07-23
+RECORD-00162_REL_008,RECORD-00162,P0005,Jay Rosen,Discusses,C0540,Disclosure,"I have a political mind and some definite leanings… here they are.” A good many Americans (and some who comment at PressThink) are ready for the disclosure ethic in political journalism— waiting for it. But not so they can pounce on bias, which they do not see as some punishable sin.
+
+Rather, these new wave citizen-critics are accepting of human plurality, conscious of human perspective, confident that, if they",0.94,2026-07-23
+RECORD-00667_REL_001,RECORD-00667,P0005,Jay Rosen,Discusses,C0583,Politicized,"To borrow a thought from Jean Bethke Elshtain, (who was writing about the schools) to call journalism ""political"" work is not to say it should be freely politicized. Rather, we gain a wider view of what that work is about when we describe it as political, in the broadest meaning of the word.
+
+As any savvy operator (or attentive citizen) knows, the version of the public world we get from",0.93,2026-07-23
+RECORD-00158_REL_007,RECORD-00158,P0005,Jay Rosen,Discusses,C0597,Partisanship,"else and show it to us. If we want to “check” your interpretation with references, we will. This system of checks (and balances) is strong. It can withstand partisanship. But it remains nimbler.
+
+So while a good weblogger is constantly engaged with opinion, Doc says: don’t get married. Wedded to your views, that is. Because the next link can not only change your mind, it can add wiring, add",0.95,2026-07-23
+RECORD-00002_REL_032,RECORD-00002,P0001,Eric Nelson,Mentions,E0005,Bush announced his budget,"well.
+
+One idea I’m always pitching to Jay, and anyone else who will listen, is that we’ve moved from the “Information Age” to the “Age of Insight.” When Bush announced his budget, for instance, you could get that information from any one of thousands of sources. But a handful of people presented the best explanations (left and right) of what his budget really means. Because of blogs, it’s easy to figure",0.99,2026-07-23
+RECORD-00130_REL_011,RECORD-00130,P0005,Jay Rosen,Mentions,E0079,Chandra Levy story,"twelve months but twenty. Turns out the 44 million appeared ten times in the Post during that period, and never on the front page. Meanwhile, “the Chandra Levy story was discussed in 199 pieces in the Post, including fourteen front-page pieces.” I guess Chandra’s fate was important— informationally speaking.
+Downie is a well liked man, highly respected at the Washington Post. He believes",0.99,2026-07-23
+RECORD-00114_REL_008,RECORD-00114,P0005,Jay Rosen,Discusses,E0157,California Governor’s Race Debate,"(alright, it's mine) says yes. In California, they're about to try...
+First I learn that the California Broadcasters Association, sponsor of the big debate in the Governor’s race on Sep. 24th, has decided to give the candidates the questions in advance. This logic of this sounded… familar. Reading along, I discover it was a fugitive suggestion of my own, later pushed by Daniel Weintraub of the Sacramento Bee, who was",0.93,2026-07-23
+RECORD-00135_REL_013,RECORD-00135,P0005,Jay Rosen,Mentions,E0180,Boston Debate,"themselves, which are co-productions among questioners, candidates, and sponsoring agencies.
+
+Just recall the circumstances of 2000 when, before the Boston debate, Ralph Nader (who actually met the master narrative’s test of threatening to affect the outcome of the horse race) was barred from the hall after being banned from the podium. Whether the decision was right or wrong, it shows",0.97,2026-07-23
+RECORD-00113_REL_011,RECORD-00113,P0005,Jay Rosen,Discusses,E0181,Saturday Night Massacre,"press was parked in Washington and Ben Bradlee ran it for a while. The dramatic high point of the Nixon saga, as narrated by Big Jounalism, is the Saturday Night Massacre. The Attorney General, who has an ombudsman-like role in the government, is fired by Nixon in a classic abuse of political power. This is exactlly what the Post-style ombudsman is designed to prevent: a Saturday Night Massacre.",0.99,2026-07-23
+RECORD-00156_REL_007,RECORD-00156,P0005,Jay Rosen,Mentions,L0067,"Woody Creek, Colorado","only thing I ever saw that came close to Objective Journalism was a closed-circuit TV setup that watched shoplifters in the General Store at Woody Creek, Colorado. I always admired that machine, but I noticed that nobody paid any attention to it until one of those known, heavy, out-front shoplifters came into the place… but when that happened, everybody got so excited that the thief had to",0.99,2026-07-23
+RECORD-00165_REL_007,RECORD-00165,P0005,Jay Rosen,Mentions,L0075,Indonesia,"the UK and Holland, stationed in Jakarta, reporting from East Timor. He was fluent in Dutch, English, Russian, and Bahasa, the main language of Indonesia. He also spoke spotty French. He had lived in Moscow and Kazakhstan. He had friends all over the world; and there have been memorial services for him in Australia, Holland, Indonesia, England and now the U.S. The White House, the",0.98,2026-07-23
+RECORD-00110_REL_017,RECORD-00110,P0005,Jay Rosen,Mentions,L0136,Venice,"is a public out there to serve, to whom you send back reports that are in the common interest. In the sixteenth century the terms were, “I’m in Venice, you’re not, I’ll send you my reports, you pay me something.” But this was a private transaction; the public hadn’t been “invented” yet. It was beyond the imagination of the day that average citizens were like merchants who had",0.96,2026-07-23
+RECORD-00128_REL_011,RECORD-00128,P0005,Jay Rosen,Mentions,L0158,Czechoslovakia,"said in 1992 in a speech called, “The End of the Modern Era.” Havel, of course, is the playwright and political opponent of the communist regime in Czechoslovakia who became president of his country in 1990.
+
+Many of the traditional mechanisms of democracy created and developed and conserved in the modern era are so linked to the cult of objectivity and statistical average that they can",0.98,2026-07-23
+RECORD-00124_REL_011,RECORD-00124,P0005,Jay Rosen,Mentions,L0160,world capitals,"of “new” media?
+
+Merrill Brown: You’re exaggerating a bit, yes. I don’t believe the fundamentals of journalists reporting the news from City Hall, world capitals, combat zones and ballparks is going to be replaced by a new form of fact gathering. Experience, resources, and access will continue to have value. That said, what those reporters do with the facts and how they’re presented will",0.99,2026-07-23
+RECORD-00124_REL_012,RECORD-00124,P0005,Jay Rosen,Mentions,L0161,combat zones,"Brown: You’re exaggerating a bit, yes. I don’t believe the fundamentals of journalists reporting the news from City Hall, world capitals, combat zones and ballparks is going to be replaced by a new form of fact gathering. Experience, resources, and access will continue to have value. That said, what those reporters do with the facts and how they’re presented will change. And",0.99,2026-07-23
+RECORD-00124_REL_013,RECORD-00124,P0005,Jay Rosen,Mentions,L0162,ballparks,"You’re exaggerating a bit, yes. I don’t believe the fundamentals of journalists reporting the news from City Hall, world capitals, combat zones and ballparks is going to be replaced by a new form of fact gathering. Experience, resources, and access will continue to have value. That said, what those reporters do with the facts and how they’re presented will change. And how that",0.99,2026-07-23
+RECORD-00238_REL_011,RECORD-00238,P0005,Jay Rosen,Mentions,L0199,Gettysburg,"part of the speech?
+
+UPDATE: Jon Stewart doesn’t. He did a way better version of this post. Hang on for the end, where savvy pundits dissect the Gettysburg Address. And don’t miss the CNN reporter doing interviews in the field who asks a construction worker in a hard hat the following question: “What do you think it’s going to take for Barack Obama to win the working class white man’s",0.96,2026-07-23
+RECORD-00853_REL_020,RECORD-00853,P0005,Jay Rosen,Mentions,O0036,Jezebel,"fled in disbelief, [Jessica Valenti](http://feministing.com/archives/008709.html) and [Jezebel](http://jezebel.com/362976/the-stupidest-thing-you-ever-read-on-this-blog-and-maybe-the-whole-wide-internet) seethed on behalf of millions who might, [Jay Newton-Small](http://www.time-blog.com/swampland/2008/03/outrageous.html)",0.99,2026-07-23
+RECORD-00853_REL_021,RECORD-00853,P0005,Jay Rosen,Mentions,O0037,Obsidian Wings,"exasperated reply to Hoagland: ""How 'bout just doing a better job next time?""
+
+**Absence of a finding**
+
+Hilzoy of [Obsidian Wings](http://obsidianwings.blogs.com/obsidian_wings/) over at Delong's [joint](http://delong.typepad.com/sdj/2008/02/new-york-time-8.html#comment-105128044): ""I actually liked the Obama drug use piece, except for the 'did he",0.99,2026-07-23
+RECORD-00116_REL_008,RECORD-00116,P0005,Jay Rosen,Mentions,O0625,Local TV stations,"feels justified doing that.
+Justice Department spokeswoman Barbara Comstock says her boss, with few exceptions, is only granting short interviews to local TV stations as a way of “explaining key facts directly to the American people and not having as much of a filter from people who are already invested in having a different view of it.” Comstock indicated unhappiness with some print reporters",0.96,2026-07-23
+RECORD-00132_REL_011,RECORD-00132,P0005,Jay Rosen,Mentions,O0644,Ziff Davis,"televised Nixon-Kennedy debates has there been a comparable shift in the art and science of running a campaign.
+Take that, horse race. Writing in Ziff Davis’s Baseline magazine, Cone argues that Dean is a big deal whether he or not he prevails in the end. This scrambles the brains of the press in the degree that the press believes its own story— that winning the race is not only the",0.99,2026-07-23
+RECORD-00122_REL_016,RECORD-00122,P0005,Jay Rosen,Mentions,O0718,Chamber of Commerce,"army of American civil society, all thinking that their good works deserve good play—and agitating for it.
+
+Factor into press experience the Chamber of Commerce and Rotary types, also called civic boosters. In the name of a “positive” climate for local business, they want nothing but positive news circulated. Feeling in good company yet? Now the parade of corrupt council members and",0.98,2026-07-23
+RECORD-00122_REL_017,RECORD-00122,P0005,Jay Rosen,Mentions,O0719,Rotary,"civil society, all thinking that their good works deserve good play—and agitating for it.
+
+Factor into press experience the Chamber of Commerce and Rotary types, also called civic boosters. In the name of a “positive” climate for local business, they want nothing but positive news circulated. Feeling in good company yet? Now the parade of corrupt council members and greasy mayors",0.97,2026-07-23
+RECORD-00150_REL_015,RECORD-00150,P0005,Jay Rosen,Mentions,O0733,Killing the Buddha,"He will soon be rolling out a new web journal, of which I am publisher. (Watch this space for details.) He and Peter Manseau have a book coming out, Killing the Buddha: A Heretic’s Bible, from Free Press. It’s based on their tour around America.
+
+Like a lot of writers and journalists I know, Jeff consumed the press about Gregg Easterbook and the retraction of his weblog, in his weblog (Easterblogg), due to",0.98,2026-07-23
+RECORD-00124_REL_014,RECORD-00124,P0005,Jay Rosen,Mentions,O0951,Radio Shack,"Can it adapt to technology? Yes, and it will become multi-media as a matter of course. But when the tools you once commanded are down at Radio Shack, that isn’t about adapting or adopting. That’s an overturning. Do I exaggerate? What am I overlooking? And how do you assess this side of “new” media?
+
+Merrill Brown: You’re exaggerating a bit, yes. I don’t believe the",0.99,2026-07-23
+RECORD-00152_REL_008,RECORD-00152,P0005,Jay Rosen,Mentions,O0973,US Army Corps of Engineers,"required of it in the case of an occupying force.
+
+Yet the Right is screaming bloody murder that the media are not reporting every case of the US Army Corps of Engineers rebuilding a school (that the US bombed), or providing medicine to the Iraqi people (quietly prevented for 12 years under sanctions), etc. There of course have been 1000 times as many stories about these kinds of “heartening”",0.99,2026-07-23
+RECORD-00166_REL_010,RECORD-00166,P0005,Jay Rosen,Mentions,O0974,Nation of Islam,"spheres, although this act is often missing in their self-definition.
+
+In today’s New York Times, for example, an article on Michael Jackson and the Nation of Islam describes “the group’s philosophy of black separatism.” Reporter Sharon Waxman wrote: “The Nation of Islam is a small group that advocates black self-empowerment and a separate African-American state, and some of its leaders have",0.99,2026-07-23
+RECORD-00085_REL_007,RECORD-00085,P0339,David Thorburn,Mentions,O1109,Duke University,age and you're all invited of course to attend any of those sessions and I especially urge that you consider attending the final conference at which Katherine hailes from duke Nick monford of MIT and Rita Ry from the University of California Santa Barbara will be the panelists I also want to uh uh just before I introduce my colleague Phil hiltz uh i' like to I'd like to uh indicate to you or remind,0.84,2026-07-23
+RECORD-00280_REL_016,RECORD-00280,P0005,Jay Rosen,Mentions,O1110,Minnesota Public Radio,"United States,” transcipt of Sep. 2003 an interview with Doug McGill and Raman Narayanan from Wisconsin Public Radio.
+
+Doug McGill did a 13-minute Minnesota Public Radio piece from Sudan. (Link.) It also has has interviews with Anuak in Minnesota who were on the phone with others in Ethiopia while the massacre was going on.
+
+McGill in the comments:
+
+I admit I’m nervous that my glocal style — at",0.99,2026-07-23
+RECORD-00544_REL_016,RECORD-00544,P0005,Jay Rosen,Mentions,O1111,Poynter Online,"framed photocopies of actual clips). Result: win-win-win.
+
+“It makes moral sense.” I like that. Bill Mitchell, director of publishing and editor of Poynter Online, formerly director of electronic publishing at the San Jose Mercury News (Jan. 26) said the case against opening the archive wasn’t as strong as he initially thought:
+
+“Sure is worth exploring.”
+Given the importance of keeping",0.99,2026-07-23
+RECORD-00216_REL_013,RECORD-00216,P0005,Jay Rosen,Mentions,O1188,The National Debate,"do something similar?
+They were deciding, right then, to make a political statement, which they hoped would have impact.
+
+And when Robert Cox of the The National Debate went back to ‘69 and reviewed what was happening in Vietnam, and at home, including the turns in the war at that time…
+
+The “impact” of the Life magazine “ONE WEEK’S TOLL” was to crystalize opposition to the war in the wake the",0.94,2026-07-23
+RECORD-00002_REL_033,RECORD-00002,P0001,Eric Nelson,Mentions,P0050,Jose Canseco,"who have already written bestsellers, or celebrities of some other sort. Most bestsellers typically hit their sales peak the first week out. Think Jose Canseco, Jon Stewart, and Malcom Gladwell.
+
+Some books, however, beat the odds and win readers over one at a time. Editors, marketing, sales, the chains, TV bookers, and review editors—the experts—all decide a book won’t find a huge",0.99,2026-07-23
+RECORD-00853_REL_022,RECORD-00853,P0005,Jay Rosen,Mentions,P0061,Jessica Valenti,"demurred, [Ed Morrissey](http://hotair.com/archives/2008/03/02/charlotte-allen-embrace-the-dim/) fled in disbelief, [Jessica Valenti](http://feministing.com/archives/008709.html) and [Jezebel](http://jezebel.com/362976/the-stupidest-thing-you-ever-read-on-this-blog-and-maybe-the-whole-wide-internet) seethed on behalf of millions who might, [Jay",0.99,2026-07-23
+RECORD-00286_REL_018,RECORD-00286,P0005,Jay Rosen,Mentions,P0064,Rachel Sklar,tried to use the Journal as its political heatshield precisely because it knows our editors have more credibility on these matters.” Huh? But let Rachel Sklar have a go. Editorial Page editor Paul Gigot wouldn’t answer questions about it. I guess he thinks it speaks for itself! And here’s an email from a former WSJ staffer. The news staff of the Journal has been embarrassed many times,0.99,2026-07-23
+RECORD-00853_REL_023,RECORD-00853,P0005,Jay Rosen,Mentions,P0065,Lisa Schiffren,"on her face. (Our own [Rachel Sklar](https://www.huffpost.com/entry/wapo-writer-prov_n_89562) has more. And [Lisa Schiffren](http://corner.nationalreview.com/post/?q=OTMwNDBkNTdhM2NiYTJiZTNhMDk2Y2Y0MzNiNDhlZTk=) at National Review is not impressed.)
+
+John Pomfret, you misread. But what did you misread? Good provocations do not begin with an intention",0.99,2026-07-23
+RECORD-00853_REL_024,RECORD-00853,P0005,Jay Rosen,Mentions,P0071,Hilzoy,"exasperated reply to Hoagland: ""How 'bout just doing a better job next time?""
+
+**Absence of a finding**
+
+Hilzoy of [Obsidian Wings](http://obsidianwings.blogs.com/obsidian_wings/) over at Delong's [joint](http://delong.typepad.com/sdj/2008/02/new-york-time-8.html#comment-105128044): ""I actually liked the Obama drug use piece, except for",0.99,2026-07-23
+RECORD-00101_REL_010,RECORD-00101,P0005,Jay Rosen,Mentions,P1016,Brett Oswego,"clever) from The MinuteMan; “Fair and Balanced Coverage to Fight the Poison” from Anitodal; plus “ArchPundit, Fair and Balanced!” and this from Brett Oswego: “Sometimes I’m even ‘Fair and Balanced.’ The phrase is somewhat in disrepute nowadays, so don’t just take my word for it.”
+
+My current favorite happens to be “The (fair and balanced) talking dog” site: “Sure, the dog can talk,",0.99,2026-07-23
+RECORD-00568_REL_014,RECORD-00568,P0005,Jay Rosen,Mentions,P1054,John Leo,"Newsroom Diversity Dodge. Mitchell turns to the obvious solution when he asks: “Should editors embark on an ideological affirmative action program?” John Leo, columnist for US News and World Report, told Mitchell: “We all know that conferences changed the day the first black attended. And it was a very good thing…I don’t care how many Democrats or liberals there are in the newsroom,",0.99,2026-07-23
+RECORD-00513_REL_017,RECORD-00513,P0005,Jay Rosen,Mentions,P1178,Barry Parr,"role-playing game Second Life. Second Life has about 35,000 citizens — just about the same size as H2otown and the Half-Moon Bay, CA community that Barry Parr covers for Coastsider. What I envy about Coastsider? The sherriff’s log.
+I love the Greensboro News & Record’s experiment of adding a comment section to each letter to the editor. BlufftonToday is a good example of the Letters to",0.99,2026-07-23
+RECORD-00211_REL_013,RECORD-00211,P0005,Jay Rosen,Mentions,P1256,Cal Thomas,"becomes practical. The Point creates a programming slot where political issues can be joined. Mark Hyman gives the company its Rush Limbaugh or Cal Thomas. By centralizing news production Sinclair also weakens the power of local traditions and craft norms in journalism. That’s a plus if you want to re-construct news.
+
+Forces at the center de-throne and defang the local newsroom,",0.98,2026-07-23
+RECORD-00531_REL_009,RECORD-00531,P0005,Jay Rosen,Mentions,P1401,Britt Blaser,"away with it to a large extent, relentlessly focusing on giving up control of its message in favor of enabling supporters to organize themselves.”
+
+Britt Blaser: “As far as I can tell from close up and personal, there’s no limit to what role you can play in the campaign, as long as you provide an end-to-end solution and don’t call on the paid staff for resources of time, attention or",0.99,2026-07-23
+RECORD-00264_REL_011,RECORD-00264,P0005,Jay Rosen,Mentions,P1402,Matthew Stinson,"at AmishTechSupport: “Adopt a Campaign Journalist for what amounts to stalking and fact-checking the press-credentialed lapdogs of each campaign.”
+
+Matthew J. Stinson: “In the end it seems like the primary goal of the ‘watch’ blog folks is to force polarization and destroy nuance in the media rather than correct the record. I’m not disturbed by the notion that journalists should be",0.96,2026-07-23
+RECORD-00242_REL_012,RECORD-00242,P0005,Jay Rosen,Mentions,P1403,Professor Bainbridge,"forgot to tell affiliates it might later switch stories and claim that it never had plans to show the documentary. Clearly, it did have such plans.
+
+Professor Bainbridge: “As a Bush supporter, I’m okay with Sinclair’s decision (although more than a little worried it will backfire). Having said that, however, I must admit that I would be pretty annoyed at Sinclair if I were a shareholder. We have",0.99,2026-07-23
+RECORD-00166_REL_011,RECORD-00166,P0005,Jay Rosen,Mentions,P1657,Sharon Waxman,"New York Times, for example, an article on Michael Jackson and the Nation of Islam describes “the group’s philosophy of black separatism.” Reporter Sharon Waxman wrote: “The Nation of Islam is a small group that advocates black self-empowerment and a separate African-American state, and some of its leaders have espoused anti-Semitic, anti-gay and racist rhetoric.”
+
+In other words, they’re",0.99,2026-07-23
+RECORD-00202_REL_009,RECORD-00202,P0827,Weldon Berger,Mentions,P2093,Christopher Dodd,"Bauer and other conservative religious activists who weren’t shy about endorsing the concept of victory by moral values ambush. Connecticut senator Christopher Dodd said that Democrats “have lost the ability to connect with people’s value systems and we’re going to have to work to get that back,” a scenario Focus on the Family founder James Dobson finds unlikely so long as the likes of",0.98,2026-07-23
+RECORD-00772_REL_016,RECORD-00772,P2124,Adam Ragusea,Mentions,P2126,Rachel Martin,"""Previous"") [Next](https://current.org/2016/04/the-pub-62-jay-rosen-on-his-love-hate-relationship-with-public-media/# ""Next"")
+
+1. Agreed. Rachel Martin spoke to a Republican strategist named Rob Jesmer several weeks ago on Weekend Edition Sunday. Jesmer, like others on the right, has made allusions to the harm that President Obama has done to the country and like all of the",0.98,2026-07-23
+RECORD-00772_REL_017,RECORD-00772,P2124,Adam Ragusea,Mentions,P2127,Rob Jesmer,"""Next"")
+
+1. Agreed. Rachel Martin spoke to a Republican strategist named Rob Jesmer several weeks ago on Weekend Edition Sunday. Jesmer, like others on the right, has made allusions to the harm that President Obama has done to the country and like all of the others, offers nothing in the way of details to",0.98,2026-07-23
+RECORD-00772_REL_018,RECORD-00772,P2124,Adam Ragusea,Mentions,P2128,Christopher Simpson,"- Christopher Simpson
+
+     ‘Peanut gallery bomb thrower’? Perhaps this is an unspoken but widespread attitude at NPR and even at Current about critics of NPR content.
+
+     It seems revealing to me that Current had to reassure its audience that Prof.",0.94,2026-07-23
+RECORD-00483_REL_003,RECORD-00483,P0488,Karl Rove,Mentions,P2180,Jean Baudrillard,"to believe that human engagement with material reality is mediated by social constructs. It is almost as if Karl Rove and George Bush were reading Jean Baudrillard. What is isn’t nearly as important as what is thought to be. Reality is first constructed to fit policy preferences and then reinforced through continuous news management, including pressure and intimidation.(139)
+Why did so many",0.84,2026-07-23
+RECORD-00002_REL_034,RECORD-00002,P0001,Eric Nelson,Mentions,W0009,Reading Lolita in Tehran,"a friend until it climbs onto the bestseller list.
+
+These few, benighted books often hit their sales peaks long after they’ve hit bookstore shelves. Reading Lolita in Tehran, for example, currently sells ten times as many copies each week as it did the first week. The odds are against this, but it does happen. And every editor harbors the dream that each new book they publish will suddenly become",0.99,2026-07-23
+RECORD-00014_REL_022,RECORD-00014,P0005,Jay Rosen,Mentions,W0010,Obama’s youthful drug use,"in pattern recognition. Today I am back with the answers I received.
+
+I spoke of three “vetting” stories that went awry at the New York Times: Obama’s youthful drug use (Feb. 9). Hillary’s marriage as Topic A among prominent Democrats (from May, 2006.) And of course McCain’s friendship with a lobbyist. (Feb. 21. I wrote about it here, and here.)
+
+Each story left people scratching their heads:",0.99,2026-07-23
+RECORD-00014_REL_023,RECORD-00014,P0005,Jay Rosen,Mentions,W0011,Hillary’s marriage as Topic A among prominent Democrats,"I am back with the answers I received.
+
+I spoke of three “vetting” stories that went awry at the New York Times: Obama’s youthful drug use (Feb. 9). Hillary’s marriage as Topic A among prominent Democrats (from May, 2006.) And of course McCain’s friendship with a lobbyist. (Feb. 21. I wrote about it here, and here.)
+
+Each story left people scratching their heads: what were the editors thinking? Each was part of the “vetting”",0.99,2026-07-23
+RECORD-00014_REL_024,RECORD-00014,P0005,Jay Rosen,Mentions,W0012,McCain’s friendship with a lobbyist,"at the New York Times: Obama’s youthful drug use (Feb. 9). Hillary’s marriage as Topic A among prominent Democrats (from May, 2006.) And of course McCain’s friendship with a lobbyist. (Feb. 21. I wrote about it here, and here.)
+
+Each story left people scratching their heads: what were the editors thinking? Each was part of the “vetting” ritual in which the press imagines itself asking the hard questions of",0.99,2026-07-23
+RECORD-00056_REL_013,RECORD-00056,P0005,Jay Rosen,Mentions,W0085,Constitution,"me that's what's great about it. It points back to the history of struggle for press liberty, to the long rise of public opinion, and of course to the Constitution, a source from which The Media try to draw legitimacy. But the First Amendment actually speaks of the press. It doesn't mention media. Anyone could, but then almost no one does, uphold ""freedom of the media"" as a great right--",0.96,2026-07-23
+RECORD-00160_REL_012,RECORD-00160,P0005,Jay Rosen,Mentions,W0399,The Dean Connection,"him. And it would explain some of the journalism about Dean.
+This week, Samantha Shapiro’s cover story in the New York Times Magazine (“The Dean Connection”) got some important things right: “Part of Dean’s appeal is that he behaves in recognizably human ways.” That’s true.
+About the death of the hub and spoke system: “Dean supporters do not drive 200 miles through 10 inches of snow",0.99,2026-07-23
+RECORD-00135_REL_014,RECORD-00135,P0005,Jay Rosen,Mentions,W0519,Fargo,"this surrealistic swirl. It is over-the-top, excessive, the theater of the absurd. If the Coen brothers - producers of such twisted cult flicks as ”Fargo” and ”Blood Simple” - were to make a movie about politics, they would call it ”Spin Alley.”
+
+Little of it bears any resemblance to the truth. It would be more amusing were it not so symptomatic of a",0.98,2026-07-23
+RECORD-00135_REL_015,RECORD-00135,P0005,Jay Rosen,Mentions,W0520,Blood Simple,"swirl. It is over-the-top, excessive, the theater of the absurd. If the Coen brothers - producers of such twisted cult flicks as ”Fargo” and ”Blood Simple” - were to make a movie about politics, they would call it ”Spin Alley.”
+
+Little of it bears any resemblance to the truth. It would be more amusing were it not so symptomatic of a who’s-ahead-at-this-very-moment political culture",0.99,2026-07-23
+RECORD-00100_REL_006,RECORD-00100,P0005,Jay Rosen,Discusses,W0593,Peter King's Op-Ed on the California Recall,"Mickey Kaus points out how cliche-ridden and lifeless was Peter King’s Aug. 20th op ed on the Califorinia recall mess, which is worrisome because the Los Angeles Times plans to publish King regularly as the recall unfolds. Kaus’s judgment is correct, and I would add that the kind of cliches King serves up are specifically journalistic.
+
+There’s",0.95,2026-07-23
+RECORD-00109_REL_013,RECORD-00109,P0005,Jay Rosen,Mentions,W0610,News Watch,"get the real story.
+
+The fact is, daily life at FNC is all about management politics. I say this having served six years there - as producer of the media criticism show, News Watch, as a writer/producer of specials and (for the last year of my stay) as a newsroom copy editor. Not once in the 20+ years I had worked in broadcast journalism prior to Fox—including lengthy stays at The Associated Press, CBS",0.97,2026-07-23
+RECORD-00513_REL_018,RECORD-00513,P0005,Jay Rosen,Mentions,W0637,Media Log,"one-quarter of the 145 union newsroom jobs to save $2 million at the financially troubled paper.
+Dan Kennedy, writing on the Herald cuts at the Phoenix’s Media Log:
+
+HOW MUCH IS $7 MILLION? I didn’t get a chance to tend to Media Log yesterday - so, naturally, a poster accused me of ignoring the “Boston media story of the year … $7 million in painful cuts at the Boston Herald.” Well, now.",0.97,2026-07-23
