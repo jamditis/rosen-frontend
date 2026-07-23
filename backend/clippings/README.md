@@ -1,14 +1,14 @@
-# Newspaper Clippings Directory
+# Newspaper clippings directory
 
 Place your newspaper clipping files here.
 
-## Supported Formats
+## Supported formats
 
 - **PDF files** - Scanned newspaper clippings
 - **Text files (.txt)** - Pre-OCR'd text
 - **JSON files** - Pre-structured metadata
 
-## Naming Convention (Recommended)
+## Naming convention (recommended)
 
 Use descriptive filenames that include publication and date:
 ```
@@ -28,10 +28,10 @@ The clipping processor will:
 Run with:
 ```bash
 cd backend
-python -m rosen_scraper.processors.clipping_processor --input ./clippings --output ../data/clipping_records.csv
+poetry run python -m rosen_scraper.processors.clipping_processor --input ./clippings --output ../data/clipping_records.csv
 ```
 
-## Supported Publications
+## Supported publications
 
 The processor recognizes these publications automatically:
 - New York Times (NYT-)

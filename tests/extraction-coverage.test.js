@@ -83,6 +83,7 @@ describe('extraction coverage (#207)', () => {
     );
     const recordsById = new Map(records.map(record => [record.id, record]));
     const entityIds = new Set(entities.map(entity => entity.entity_id));
+    const normalizeNewlines = value => value.replace(/\r\n/g, '\n');
 
     for (const threadId of threadIds) {
       const record = recordsById.get(threadId);
@@ -106,7 +107,9 @@ describe('extraction coverage (#207)', () => {
           `${relationship.relationship_id} has an unknown target entity`
         );
         assert.ok(
-          record.raw_text.includes(relationship.context_snippet),
+          normalizeNewlines(record.raw_text).includes(
+            normalizeNewlines(relationship.context_snippet)
+          ),
           `${relationship.relationship_id} has a context excerpt outside ${threadId}`
         );
       }

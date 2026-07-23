@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The making of Jay Rosen's Internet Archive</title>
+<meta name="description" content="Jay Rosen spent four decades publishing across dozens of websites. How what survived became one searchable archive, mistakes included.">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+
+<!-- Open Graph / social -->
+<meta property="og:title" content="The making of Jay Rosen's Internet Archive">
+<meta property="og:description" content="Jay Rosen spent four decades publishing across dozens of websites. How what survived became one searchable archive, mistakes included.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://pressthink.org/j/rosen-archive/features/making-of/">
+<meta property="og:image" content="https://pressthink.org/j/rosen-archive/features/making-of/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The making of Jay Rosen's Internet Archive">
+<meta name="twitter:description" content="Jay Rosen spent four decades publishing across dozens of websites. How what survived became one searchable archive, mistakes included.">
+<meta name="twitter:image" content="https://pressthink.org/j/rosen-archive/features/making-of/og-image.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper: #f5f1e8;      /* aged newsprint */
+    --paper-2: #efe8d8;    /* recessed band */
+    --card: #fdfcf9;       /* cream card stock */
+    --ink: #1c1917;        /* stone-900 */
+    --ink-soft: #57534e;   /* muted metadata, AA on paper */
+    --blue: #2c5f82;       /* faded newspaper ink */
+    --green: #3a5f3f;      /* card-catalog green */
+    --tan: #d4a574;        /* manila folder tan */
+    --stamp: #8b3a3a;      /* faded rubber-stamp oxblood */
+    --line: #d8d0bf;       /* hairline rule */
+    --tab: #e7dcc4;        /* filing tab */
+    --shadow: 0 1px 2px rgba(28,25,23,.10), 0 6px 20px rgba(28,25,23,.06);
+    --measure: 66ch;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  body {
+    margin: 0;
+    background-color: var(--paper);
+    /* paper grain */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+    color: var(--ink);
+    font-family: 'Roboto Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 15px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .display { font-family: 'Special Elite', 'Roboto Mono', monospace; font-weight: 400; }
+
+  a { color: var(--blue); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  a:hover { color: var(--ink); }
+
+  /* focus visibility for keyboard users */
+  a:focus-visible, button:focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  .skip {
+    position: absolute; left: -9999px; top: 0;
+    background: var(--ink); color: var(--paper);
+    padding: 10px 16px; z-index: 100; border-radius: 0 0 4px 0;
+  }
+  .skip:focus { left: 0; }
+
+  .wrap { max-width: 940px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- sticky bar with the mode toggle ---------- */
+  .bar {
+    position: sticky; top: 0; z-index: 40;
+    background: rgba(245,241,232,.92);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+  }
+  .bar-inner {
+    max-width: 940px; margin: 0 auto; padding: 8px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .bar-title { font-size: 12px; letter-spacing: .04em; color: var(--ink-soft); }
+  .bar-title b { color: var(--ink); font-weight: 700; }
+
+  .toggle { display: inline-flex; align-items: center; gap: 8px; }
+  .toggle-label { font-size: 11px; color: var(--ink-soft); text-transform: none; }
+  .switch {
+    display: inline-flex; border: 1px solid var(--ink); border-radius: 2px; overflow: hidden;
+    background: var(--card);
+  }
+  .switch button {
+    font-family: 'Roboto Mono', monospace; font-size: 12px; font-weight: 500;
+    padding: 6px 12px; border: 0; background: transparent; color: var(--ink-soft);
+    cursor: pointer; line-height: 1;
+  }
+  .switch button + button { border-left: 1px solid var(--line); }
+  .switch button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+  /* ---------- masthead ---------- */
+  .masthead { padding: 56px 0 40px; }
+  .filemeta {
+    display: flex; justify-content: space-between; gap: 12px;
+    font-size: 12px; color: var(--ink-soft); border-bottom: 1px solid var(--line);
+    padding-bottom: 10px; margin-bottom: 34px; flex-wrap: wrap;
+  }
+  .kicker-ref { letter-spacing: .06em; }
+  h1.title {
+    font-size: clamp(38px, 8vw, 72px); line-height: .98; margin: 0 0 4px;
+    letter-spacing: -.01em;
+  }
+  .subject {
+    font-family: 'Special Elite', monospace;
+    font-size: clamp(20px, 4vw, 30px); color: var(--green); margin: 0 0 22px;
+  }
+  .dek { max-width: var(--measure); font-size: 16px; margin: 0 0 12px; }
+  .byline { font-size: 13px; color: var(--ink-soft); margin: 0 0 30px; }
+  .byline b { color: var(--ink); font-weight: 700; }
+
+  .masthead-toggle { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+  /* ---------- stat band ---------- */
+  .stats {
+    background: var(--paper-2);
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    padding: 30px 0;
+  }
+  .stats h2 { font-size: 14px; letter-spacing: .04em; color: var(--ink-soft); margin: 0 0 18px; }
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px 18px; }
+  @media (max-width: 620px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } }
+  .stat .num { font-family: 'Special Elite', monospace; font-size: clamp(28px, 5vw, 40px); line-height: 1; color: var(--ink); }
+  .stat.gap .num { color: var(--stamp); }
+  .stat .lbl { font-size: 12px; color: var(--ink-soft); margin-top: 6px; }
+
+  /* ---------- contents ---------- */
+  .contents { padding: 40px 0 8px; }
+  .contents h2 { font-size: 14px; letter-spacing: .04em; color: var(--ink-soft); margin: 0 0 14px; }
+  .contents ol { list-style: none; margin: 0; padding: 0; counter-reset: c; }
+  .contents li { border-top: 1px solid var(--line); }
+  .contents li:last-child { border-bottom: 1px solid var(--line); }
+  .contents a {
+    display: flex; gap: 16px; align-items: baseline; padding: 12px 4px;
+    text-decoration: none; color: var(--ink);
+  }
+  .contents a:hover { background: rgba(44,95,130,.06); }
+  .contents .cn { font-family: 'Special Elite', monospace; color: var(--tan); min-width: 46px; }
+  .contents .ct { flex: 1; }
+  .contents .cd { font-size: 12px; color: var(--ink-soft); white-space: nowrap; }
+  @media (max-width: 560px) { .contents .cd { display: none; } }
+
+  /* ---------- torn divider ---------- */
+  .torn { display: block; width: 100%; height: 22px; color: var(--paper-2); margin: 8px 0; }
+
+  /* ---------- chapters ---------- */
+  .chapter { padding: 44px 0 8px; scroll-margin-top: 64px; }
+  .ch-head { position: relative; margin-bottom: 26px; }
+  .ch-ref {
+    display: inline-block; font-size: 11px; color: var(--ink-soft);
+    background: var(--tab); border: 1px solid var(--line); border-bottom: 0;
+    padding: 4px 12px 3px; border-radius: 6px 6px 0 0; letter-spacing: .06em;
+  }
+  .ch-head h2 {
+    font-size: clamp(26px, 5vw, 40px); line-height: 1.05; margin: 0;
+    border-top: 2px solid var(--ink); padding-top: 12px;
+  }
+  .ch-date { font-size: 12px; color: var(--ink-soft); margin-top: 6px; }
+
+  /* article vs case-file bodies */
+  .mode-article .m-case { display: none; }
+  .mode-casefile .m-article { display: none; }
+
+  .prose p { max-width: var(--measure); margin: 0 0 18px; }
+  .prose .lead { font-size: 16px; }
+  .pull {
+    max-width: var(--measure);
+    border-left: 3px solid var(--tan);
+    padding: 6px 0 6px 18px; margin: 22px 0;
+    font-family: 'Special Elite', monospace; font-size: 19px; line-height: 1.4; color: var(--ink);
+  }
+
+  /* case-file dossier list */
+  .dossier { max-width: var(--measure); margin: 0; padding: 0; list-style: none; }
+  .dossier li {
+    display: grid; grid-template-columns: 96px 1fr; gap: 14px;
+    padding: 11px 0; border-bottom: 1px dashed var(--line);
+  }
+  .dossier .d-tag {
+    font-size: 11px; color: var(--blue); font-weight: 700; letter-spacing: .03em;
+    padding-top: 2px;
+  }
+  .dossier .d-body { margin: 0; }
+  .dossier code { background: rgba(28,25,23,.06); padding: 1px 5px; border-radius: 3px; font-size: 12.5px; }
+
+  /* exhibit: a photocopied piece of evidence attached to the case file */
+  .exhibit {
+    max-width: var(--measure); background: var(--card);
+    border: 1px solid var(--line); box-shadow: var(--shadow);
+    margin: 22px 0; padding: 0; overflow: hidden;
+  }
+  .exhibit .ex-cap {
+    font-size: 11px; letter-spacing: .06em; color: var(--ink-soft);
+    background: var(--tab); border-bottom: 1px solid var(--line);
+    padding: 6px 14px;
+  }
+  .exhibit .ex-cap b { color: var(--ink); font-weight: 700; }
+  .exhibit pre {
+    margin: 0; padding: 14px 16px; overflow-x: auto;
+    font-family: 'Roboto Mono', monospace; font-size: 12.5px; line-height: 1.6; color: var(--ink);
+    white-space: pre;
+  }
+
+  /* rubber stamp */
+  .stamp {
+    display: inline-block; margin-top: 20px;
+    border: 2px solid var(--stamp); color: var(--stamp);
+    font-family: 'Special Elite', monospace; font-size: 15px; letter-spacing: .12em;
+    padding: 4px 14px; border-radius: 3px; transform: rotate(-4deg);
+    opacity: .8;
+  }
+
+  /* card block used in colophon */
+  .card {
+    position: relative; background: var(--card); border: 1px solid var(--line);
+    border-radius: 3px; box-shadow: var(--shadow); padding: 26px 26px 24px; margin: 8px 0;
+  }
+  /* dog-eared corner */
+  .card::after {
+    content: ""; position: absolute; right: 0; bottom: 0;
+    border-width: 0 0 20px 20px; border-style: solid;
+    border-color: transparent transparent var(--paper-2) transparent;
+  }
+
+  /* ---------- colophon / footer ---------- */
+  .colophon { padding: 48px 0 20px; }
+  .colophon h2 { font-size: clamp(22px, 4vw, 30px); margin: 0 0 18px; }
+  .rules { max-width: var(--measure); margin: 0 0 26px; padding: 0; list-style: none; }
+  .rules li { padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .rules b { color: var(--green); }
+  .end-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+  .btn {
+    display: inline-block; text-decoration: none; font-size: 13px; font-weight: 500;
+    padding: 10px 18px; border: 1px solid var(--ink); border-radius: 2px;
+  }
+  .btn-primary { background: var(--ink); color: var(--paper); }
+  .btn-primary:hover { background: var(--blue); color: var(--paper); border-color: var(--blue); }
+  .btn-ghost:hover { background: rgba(28,25,23,.05); }
+
+  footer {
+    border-top: 1px solid var(--line); margin-top: 30px; padding: 26px 0 60px;
+    font-size: 12px; color: var(--ink-soft);
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: space-between;
+  }
+  footer .mark { display: flex; align-items: center; gap: 10px; }
+  footer img { width: 26px; height: 26px; }
+
+  /* fade-in on scroll. content is visible by default; JS opts into the effect */
+  .reveal { opacity: 1; transform: none; }
+  .has-reveal .reveal { opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
+  .has-reveal .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .has-reveal .reveal { opacity: 1; transform: none; transition: none; }
+  }
+  @media print {
+    .has-reveal .reveal { opacity: 1 !important; transform: none !important; }
+  }
+</style>
+</head>
+<body class="mode-article">
+
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- sticky bar -->
+<div class="bar">
+  <div class="bar-inner">
+    <span class="bar-title"><b>The making of</b> &middot; Jay Rosen's Internet Archive</span>
+    <div class="toggle">
+      <span class="toggle-label" id="bar-mode-label">Read as</span>
+      <div class="switch" role="group" aria-labelledby="bar-mode-label">
+        <button type="button" data-mode="casefile" aria-pressed="false">Case file</button>
+        <button type="button" data-mode="article" aria-pressed="true">Article</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="filemeta">
+      <span class="kicker-ref">FILE &nbsp;/&nbsp; pressthink.org/j/rosen-archive</span>
+      <span>REV. 3.6.5 &nbsp;/&nbsp; opened June 2025</span>
+    </div>
+    <h1 class="title">The making of</h1>
+    <p class="subject">Jay Rosen's Internet Archive</p>
+    <p class="dek">Jay Rosen spent four decades publishing across dozens of websites. I spent about a year turning what survived into one searchable archive. I am not a software engineer. The scrapers were my design, the models wrote them and ran them, and I decided whether what came back was right, with some help from a grad student along the way. The tools changed under me the whole time. This is how I did it, mistakes included.</p>
+    <p class="byline">By <b>Joe Amditis</b>. Source of record: the archive's own <code>docs/narrative</code> and the project's public git history.</p>
+    <div class="masthead-toggle">
+      <span class="toggle-label" id="mast-mode-label">Read as</span>
+      <div class="switch" role="group" aria-labelledby="mast-mode-label">
+        <button type="button" data-mode="casefile" aria-pressed="false">Case file</button>
+        <button type="button" data-mode="article" aria-pressed="true">Article</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- current state -->
+<section class="stats" aria-label="The archive today">
+  <div class="wrap">
+    <h2>The archive today, as of 2026-07-07</h2>
+    <div class="stat-grid">
+      <div class="stat"><div class="num" data-count="1029">1,029</div><div class="lbl">archive records</div></div>
+      <div class="stat"><div class="num" data-count="25665">25,665</div><div class="lbl">searchable social posts</div></div>
+      <div class="stat"><div class="num" data-count="8152">8,152</div><div class="lbl">named entities</div></div>
+      <div class="stat"><div class="num" data-count="12560">12,560</div><div class="lbl">relationships</div></div>
+      <div class="stat"><div class="num" data-count="41">41</div><div class="lbl">years spanned (1986&ndash;2026)</div></div>
+      <div class="stat gap"><div class="num" data-count="79">79</div><div class="lbl">records still unverified</div></div>
+    </div>
+  </div>
+</section>
+
+<main id="main" class="wrap">
+
+  <!-- contents -->
+  <nav class="contents" aria-label="Chapters">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#ch1"><span class="cn">01</span><span class="ct">What was disappearing</span><span class="cd">the premise</span></a></li>
+      <li><a href="#ch2"><span class="cn">02</span><span class="ct">Learning git in public</span><span class="cd">the tools</span></a></li>
+      <li><a href="#ch3"><span class="cn">03</span><span class="ct">The pipeline and its potholes</span><span class="cd">the machine</span></a></li>
+      <li><a href="#ch4"><span class="cn">04</span><span class="ct">Working with the machines</span><span class="cd">the method</span></a></li>
+      <li><a href="#ch5"><span class="cn">05</span><span class="ct">From records to a web of ideas</span><span class="cd">the graph</span></a></li>
+      <li><a href="#ch6"><span class="cn">06</span><span class="ct">Making it look like what it is</span><span class="cd">the design</span></a></li>
+      <li><a href="#ch7"><span class="cn">07</span><span class="ct">The part nobody automates</span><span class="cd">the handoff</span></a></li>
+      <li><a href="#ch8"><span class="cn">08</span><span class="ct">A record of the record</span><span class="cd">ongoing</span></a></li>
+    </ol>
+  </nav>
+
+  <svg class="torn" viewBox="0 0 1200 22" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q30 0 60 11 T120 11 T180 11 T240 11 T300 11 T360 11 T420 11 T480 11 T540 11 T600 11 T660 11 T720 11 T780 11 T840 11 T900 11 T960 11 T1020 11 T1080 11 T1140 11 T1200 11 V22 H0 Z" fill="currentColor"/></svg>
+
+  <!-- ============ CH 1 ============ -->
+  <article class="chapter reveal" id="ch1">
+    <div class="ch-head">
+      <span class="ch-ref">CH.01 &nbsp;/&nbsp; the problem</span>
+      <h2>What was disappearing</h2>
+      <p class="ch-date">Four decades, dozens of websites</p>
+    </div>
+
+    <div class="m-article prose">
+      <p class="lead">Jay has taught journalism at NYU since 1986, and he wrote in public the whole time: the PressThink blog, op-eds, academic papers, panels on YouTube, thousands of tweets, Bluesky threads, Tumblr posts from his Studio 20 years. The work is everywhere, and everywhere is not a place you can keep. Publications merge, fold, and get bought by people who do not care. Links rot. You can be an intellectual in public for forty years and watch the record of it thin out behind you.</p>
+      <p>The brief was easy to say and hard to do: put everything of Jay's that has a URL in one place, and make it searchable. Not a list of links. A list of links rots at the same rate as the web. I wanted a structured record: each piece with its text, its date, its ideas, and its connections to his other ideas, so that "the view from nowhere" or "the people formerly known as the audience" is something you can follow through the work, not just a phrase you can find.</p>
+      <p>A job this size used to need a team, or a grant, or both. Someone to write the scrapers, someone to clean up what came back, someone to build the thing readers actually use. Archives like this one did not get built by a single person, which is a large part of why the records in them get lost instead. What I had was a year, a clear idea of what it should do, and tools that had just become good enough that one person could ask for the parts and then check whether they worked.</p>
+      <p>And I wanted it to outlast me. That is the part I kept circling. I meant survive the tools, the platforms, and eventually the web it was scraped from.</p>
+      <p class="pull">You can be an intellectual in public for forty years and watch the record of it thin out behind you.</p>
+    </div>
+
+    <div class="m-case">
+      <ul class="dossier">
+        <li><span class="d-tag">SUBJECT</span><p class="d-body">Jay Rosen. Professor of journalism, NYU, since 1986. Author of the PressThink blog.</p></li>
+        <li><span class="d-tag">PROBLEM</span><p class="d-body">Four decades of work across dozens of platforms. Link rot removing it piece by piece.</p></li>
+        <li><span class="d-tag">OBJECTIVE</span><p class="d-body">One searchable archive of every Rosen work reachable by URL. Structured records, not a link list.</p></li>
+        <li><span class="d-tag">CONSTRAINT</span><p class="d-body">Must outlast the tools, the platforms, and the source web.</p></li>
+        <li><span class="d-tag">TEAM</span><p class="d-body">One person, not an engineer, plus models and some help from a grad student.</p></li>
+        <li><span class="d-tag">SCOPE</span><p class="d-body">Articles, essays, op-eds, video, audio, Tumblr, Twitter/X, Bluesky, and a 1986 dissertation.</p></li>
+      </ul>
+    </div>
+  </article>
+
+  <svg class="torn" viewBox="0 0 1200 22" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q30 0 60 11 T120 11 T180 11 T240 11 T300 11 T360 11 T420 11 T480 11 T540 11 T600 11 T660 11 T720 11 T780 11 T840 11 T900 11 T960 11 T1020 11 T1080 11 T1140 11 T1200 11 V22 H0 Z" fill="currentColor"/></svg>
+
+  <!-- ============ CH 2 ============ -->
+  <article class="chapter reveal" id="ch2">
+    <div class="ch-head">
+      <span class="ch-ref">CH.02 &nbsp;/&nbsp; 2025, learning the tools</span>
+      <h2>Learning git in public</h2>
+      <p class="ch-date">What the job actually was</p>
+    </div>
+
+    <div class="m-article prose">
+      <p class="lead">I am not a software engineer and I did not become one. The job was to describe what the archive needed, have a model write it, run it, and decide whether what came back was right. Then do that again, most days, for a year.</p>
+      <p>I did not really understand git when I began. I knew it the way you know a city from a map: I had the names, not the streets. My first real repository for the project has 111 commits on a single branch, and ten of them are titled "Add files via upload." That is the message GitHub writes for you when you drag files into the browser instead of pushing them from your machine. I was not using version control. I was using a website as a hard drive with a nicer icon.</p>
+      <p>Some of it got expensive. Early on I committed an API key where it did not belong and woke up to an email telling me it had been running up a bill overnight before I caught it. Another time a scraper of mine tripped a rate limit so hard that GitHub disabled every automated action on my account for looking like abuse. And at one point I deleted the whole repository and started over, and lost about a month of the project's history doing it. The archive is supposed to be a record that survives. I erased a chunk of its own record by hand.</p>
+      <p>What fixed it was not a tutorial. It was the second and third repositories. The second one had real dependency management and pull requests, but I also committed the dissertation's PDFs straight into it, which is what you are specifically not supposed to do, and crammed five half-built frontends in side by side. The third one, the one still standing, finally did the boring correct thing: one job per repository, secrets kept out, changes made on a branch and reviewed before they land.</p>
+      <p>The tools did not sit still while this was going on. At the start I was moving code between a browser tab and my editor by hand. By the end the models were running in the terminal, reading the repository directly, opening pull requests, and reviewing each other's work before anything merged. My part did not change: say what it should do, run it, decide whether it was right. What changed was how much I had to carry between those steps, and how much I could ask for at once.</p>
+      <p class="pull">I was using a website as a hard drive with a nicer icon.</p>
+    </div>
+
+    <div class="m-case">
+      <ul class="dossier">
+        <li><span class="d-tag">REPO 1</span><p class="d-body">2025-07, <code>jamditis/rosen</code>. 111 commits, 1 branch, 10 titled "Add files via upload" (GitHub's browser-upload message).</p></li>
+        <li><span class="d-tag">INCIDENT</span><p class="d-body">API key committed where it did not belong. Revoked, but not before it ran up a bill overnight.</p></li>
+        <li><span class="d-tag">INCIDENT</span><p class="d-body">A scraper tripped rate limits. GitHub disabled all automated actions on the account as suspected abuse.</p></li>
+        <li><span class="d-tag">INCIDENT</span><p class="d-body">First repo deleted and restarted. ~1 month of project history lost.</p></li>
+        <li><span class="d-tag">REPO 2</span><p class="d-body">2025-11, <code>jamditis/rosen-archive</code>. Real dependencies and PRs, but dissertation PDFs committed into git and five parallel frontend folders.</p></li>
+        <li><span class="d-tag">REPO 3</span><p class="d-body">2025-11, <code>jamditis/rosen-frontend</code>. Frontend split out. One job per repo, secrets excluded, branch-and-review. The keeper.</p></li>
+      </ul>
+      <div class="exhibit">
+        <div class="ex-cap"><b>Exhibit A</b> &middot; commit messages, first project repository (archived, public)</div>
+<pre tabindex="0" role="group" aria-label="Exhibit A, commit messages from the first project repository">repo jamditis/rosen:  111 commits, 1 branch
+
+   10 x  Add files via upload
+    1 x  Update OCR system name from DeepSeek to Tesseract
+    1 x  Write a CLAUDE.md
+    1 x  Update README with integration project and alerts
+   ...  87 more, one branch, no plan</pre>
+      </div>
+    </div>
+  </article>
+
+  <svg class="torn" viewBox="0 0 1200 22" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q30 0 60 11 T120 11 T180 11 T240 11 T300 11 T360 11 T420 11 T480 11 T540 11 T600 11 T660 11 T720 11 T780 11 T840 11 T900 11 T960 11 T1020 11 T1080 11 T1140 11 T1200 11 V22 H0 Z" fill="currentColor"/></svg>
+
+  <!-- ============ CH 3 ============ -->
+  <article class="chapter reveal" id="ch3">
+    <div class="ch-head">
+      <span class="ch-ref">CH.03 &nbsp;/&nbsp; 2025, the pipeline</span>
+      <h2>The pipeline and its potholes</h2>
+      <p class="ch-date">June to October 2025</p>
+    </div>
+
+    <div class="m-article prose">
+      <p class="lead">The pipeline is easy to describe: take a URL, fetch the page, pull out the text, ask a model to read it, write the result to a row. Saying that took a morning. The five months after it were spent running the thing and looking at what came back. The first bugs were the stupid, expensive kind. A missing audio module turned out to be Python 3.12 dropping something the old code leaned on, so I pinned everything back to 3.11. An "API key not valid" error that cost me an afternoon was curly quotes in a config file where straight quotes belonged. The key was fine. The typography was not.</p>
+      <p>The recurring fight was scraping. The big news sites do not want a bot reading them, and they will block a headless browser without blinking. So I asked for a cascade: try Google's URL Context tool first, fall back to a plain fast fetch, fall back again to a full stealth browser only when the cheaper paths failed. Cheapest tool that works, every time, because I was paying for the expensive ones.</p>
+      <p>The old PressThink archive was its own kind of hard. Years of posts lived on single enormous pages, and two different URL structures pointed at overlapping content. I had a model write parsers for the giant pages and dedupe the two schemes against each other. I am still not certain it caught every collision. I expect bug reports to find the ones I missed, so I built the thing so that fixing one is a fifteen-minute job rather than a rebuild.</p>
+      <p>Scale broke things that worked fine on ten records. After the first full run the publication dates came back empty, all of them, because the sites did not put the date where the scraper looked. One backfill pass recovered 680 dates from patterns buried in the URLs, a second pulled 144 more out of page metadata, and the dataset landed at ninety-seven percent dated. Most of the pipeline's hard problems were that shape: reality arriving in a format nobody had planned for.</p>
+      <p>The worst bug of the whole project did not crash anything, which is exactly why it was the worst. A re-analysis script was catching the model's answer in a variable and writing none of it to the sheet, falling back to the same hardcoded defaults every time, so all 725 records came out reading identical. I only found it because someone asked whether the re-analysis was actually doing anything with its results. It wasn't. The same silent-write pattern surfaced a month later in a different script, that time with a price tag: about fifty cents billed across eighty rows for analysis that never got saved. The money was trivial. The lesson was the expensive part.</p>
+      <p>One decision from this stretch outlived every other one: keep the whole thing boring. No database server to run, no subscription to lapse. The data would be flat files a person could open, and the site would read them directly.</p>
+    </div>
+
+    <div class="m-case">
+      <ul class="dossier">
+        <li><span class="d-tag">2025-06</span><p class="d-body">Pipeline stood up. Fetch a URL, run analysis, write a row.</p></li>
+        <li><span class="d-tag">ENV</span><p class="d-body">Python 3.12 dropped <code>audioop</code> (pin to 3.11). Curly quotes in <code>.env</code> misread as a bad API key.</p></li>
+        <li><span class="d-tag">SCRAPE</span><p class="d-body">Cascade. Stage 1 URL Context, stage 2 <code>requests</code> + <code>trafilatura</code>, stage 3 Playwright + stealth. Cheapest path that works. Big sites threw <code>net::ERR_HTTP2_PROTOCOL_ERROR</code> and timeouts at the headless browser.</p></li>
+        <li><span class="d-tag">PRESSTHINK</span><p class="d-body">Years of posts on single giant pages. Two overlapping URL schemes parsed and deduped. Some collisions may remain. Fixes turn around in ~15 min.</p></li>
+        <li><span class="d-tag">DATES</span><p class="d-body">First full run: publication dates 100% empty. Backfill recovered 680 from URL patterns, then 144 from page metadata. 97% coverage.</p></li>
+        <li><span class="d-tag">INCIDENT</span><p class="d-body">2025-09. A re-analysis caught its output in a variable and never wrote it to the sheet, falling back to hardcoded defaults. 725 records held identical values. Uniqueness ratio 0.1% (expected 60&ndash;80%). Found only when someone asked if it was doing anything.</p></li>
+        <li><span class="d-tag">INCIDENT</span><p class="d-body">2025-10. Same silent-write pattern in a second script. Rows 1&ndash;80 analyzed and billed (~$0.53) with zero fields written. Fixed with per-field write verification.</p></li>
+        <li><span class="d-tag">DECISION</span><p class="d-body">Zero server, zero subscription. Flat files the site reads directly. The durability spine.</p></li>
+      </ul>
+    </div>
+  </article>
+
+  <svg class="torn" viewBox="0 0 1200 22" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q30 0 60 11 T120 11 T180 11 T240 11 T300 11 T360 11 T420 11 T480 11 T540 11 T600 11 T660 11 T720 11 T780 11 T840 11 T900 11 T960 11 T1020 11 T1080 11 T1140 11 T1200 11 V22 H0 Z" fill="currentColor"/></svg>
+
+  <!-- ============ CH 4 ============ -->
+  <article class="chapter reveal" id="ch4">
+    <div class="ch-head">
+      <span class="ch-ref">CH.04 &nbsp;/&nbsp; 2025&ndash;2026, the machines</span>
+      <h2>Working with the machines</h2>
+      <p class="ch-date">What they were good for, and what they were not</p>
+    </div>
+
+    <div class="m-article prose">
+      <p class="lead">A model reads every record and proposes its summary, its themes, and the entities it names. I have leaned on Gemini for that since the first version, called through an API and not a chat window, because I needed it in a script, running the same way ten thousand times. Later I added review models: Codex reading code before a change lands, a second model as a tie-breaker. Every part of the building of this thing is soaked in AI.</p>
+      <p>The finished thing is not. The building of it uses AI to make something that does not need AI to keep working. Open the archive and there is no model in the loop. It is flat files and a small amount of code reading them in your browser. If every AI company folded tomorrow, the archive would not notice. That was a design goal, not an accident. Models get expensive, get worse, get discontinued, or decide you are no longer welcome.</p>
+      <p>The machines also taught me not to trust them, and that lesson has a price tag. The silent failures from the last chapter, the 725 identical records and the sibling bug that billed for work it never saved, became a rule I have not broken since: a script that does not crash is not a script that worked. Verify the output in the actual data store. Test on five rows, then twenty-five, then a hundred, never straight to the full set. If it cost money, confirm the money bought something. I also let the plain tool win when it was better. For reading text off scanned newspaper clippings I tried the impressive options and shipped Tesseract, an open-source OCR engine older than most of the models, because it did the job and it will still be here in ten years.</p>
+      <p>The version history has the receipt for that last choice. There is a commit in the first repo whose entire message is "Update OCR system name from DeepSeek to Tesseract." That is the moment the flashy option lost to the durable one.</p>
+      <p class="pull">The building of it uses AI to make something that does not need AI to keep working.</p>
+    </div>
+
+    <div class="m-case">
+      <ul class="dossier">
+        <li><span class="d-tag">ANALYSIS</span><p class="d-body">Gemini via API from v0.0.1, in a script, not a chat window. Produces summaries, themes, and entities per record.</p></li>
+        <li><span class="d-tag">2025-08</span><p class="d-body">Google URL Context tool becomes stage 1 of the scrape cascade.</p></li>
+        <li><span class="d-tag">REVIEW</span><p class="d-body">Codex reads code before merge (from 2025-10). CI plus a second review model added 2025-12. Pre-PR <code>codex</code> review and review subagents by 2026.</p></li>
+        <li><span class="d-tag">OCR</span><p class="d-body">Tesseract (open-source) chosen over model-based OCR for scanned clippings. Recorded in git as a rename commit.</p></li>
+        <li><span class="d-tag">TEST</span><p class="d-body">A 42-row production test scored articles 25/25 and multimedia 10/16, turning up six edge-case classes the paper design had missed.</p></li>
+        <li><span class="d-tag">INVARIANT</span><p class="d-body">No model in the runtime. Flat files read in-browser. The archive functions with every AI vendor gone.</p></li>
+      </ul>
+      <div class="exhibit">
+        <div class="ex-cap"><b>Exhibit B</b> &middot; the standing rule, from <code>docs/narrative/project-history.md</code></div>
+<pre tabindex="0" role="group" aria-label="Exhibit B, the standing testing rule">a script that does not crash is not a script that worked.
+
+  1.  verify the output in the actual data store
+  2.  test on 5 rows, then 25, then 100. never straight to full
+  3.  if it cost money, confirm the money bought something
+
+adopted after the silent-write failures of 2025-09 and 2025-10. not broken since.</pre>
+      </div>
+    </div>
+  </article>
+
+  <svg class="torn" viewBox="0 0 1200 22" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q30 0 60 11 T120 11 T180 11 T240 11 T300 11 T360 11 T420 11 T480 11 T540 11 T600 11 T660 11 T720 11 T780 11 T840 11 T900 11 T960 11 T1020 11 T1080 11 T1140 11 T1200 11 V22 H0 Z" fill="currentColor"/></svg>
+
+  <!-- ============ CH 5 ============ -->
+  <article class="chapter reveal" id="ch5">
+    <div class="ch-head">
+      <span class="ch-ref">CH.05 &nbsp;/&nbsp; 2025, the graph</span>
+      <h2>From records to a web of ideas</h2>
+      <p class="ch-date">October to December 2025</p>
+    </div>
+
+    <div class="m-article prose">
+      <p class="lead">By the fall of 2025 I had a few hundred pieces, each sitting alone, and no way to ask the question the archive existed to answer: How do Jay's ideas connect? Entity extraction is what turned the pile into a web. A model reads each record and pulls out the people, organizations, and concepts in it. Then the hard part starts, which is deciding that "The New York Times," "NY Times," and "NYT" are one thing and not three. That deduplication layer, resolving every name to a single canonical entity, is the piece that made the graph mean anything.</p>
+      <p>The first full run took about eight hours. The current graph holds 8,152 entities and 12,560 relationships. Read back, it puts Jay at the center by a wide margin, with the Times, PressThink, and the Washington Post as his nearest neighbors, which is roughly what four decades of media criticism should look like.</p>
+      <p>It also caught me believing my own output. An early analysis produced a tidy claim that Jay wrote about building journalism four times as often as criticizing it. It was wrong: the extractor had quietly merged "founded" and "pioneered" into one bucket, and the false ratio had spread into more than twenty files before I caught it.</p>
+    </div>
+
+    <div class="m-case">
+      <ul class="dossier">
+        <li><span class="d-tag">2025-10</span><p class="d-body">A few hundred records, flat. No relationship queries possible.</p></li>
+        <li><span class="d-tag">METHOD</span><p class="d-body">Model extracts entities. An in-memory registry dedupes names to canonical IDs (<code>P-00001</code> Jay Rosen, <code>O-00001</code> The New York Times).</p></li>
+        <li><span class="d-tag">RUN 1</span><p class="d-body">~8 hrs. Schema revised to stop self-referential entities ("Jay Rosen founded [this post]").</p></li>
+        <li><span class="d-tag">SCHEMA</span><p class="d-body">Relationship vocabulary grew 10 to 15 types after a 100-record run turned up ownership, founding, and influence links the schema had been rejecting.</p></li>
+        <li><span class="d-tag">AUGMENT</span><p class="d-body">An early augmentation run wrote malformed ids (<code>REL-06161</code>, UNKNOWN sources, blank entities). Those rows were deleted and rerun clean before the batch was trusted.</p></li>
+        <li><span class="d-tag">GRAPH</span><p class="d-body">Current: 8,152 entities, 12,560 relationships. Jay is the central node. Nearest: NYT, PressThink, Washington Post.</p></li>
+        <li><span class="d-tag">LESSON</span><p class="d-body">A "4:1 build-vs-criticize" claim was a founded/pioneered conflation. Reached 20+ files before removal.</p></li>
+      </ul>
+    </div>
+  </article>
+
+  <svg class="torn" viewBox="0 0 1200 22" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q30 0 60 11 T120 11 T180 11 T240 11 T300 11 T360 11 T420 11 T480 11 T540 11 T600 11 T660 11 T720 11 T780 11 T840 11 T900 11 T960 11 T1020 11 T1080 11 T1140 11 T1200 11 V22 H0 Z" fill="currentColor"/></svg>
+
+  <!-- ============ CH 6 ============ -->
+  <article class="chapter reveal" id="ch6">
+    <div class="ch-head">
+      <span class="ch-ref">CH.06 &nbsp;/&nbsp; 2025, the design</span>
+      <h2>Making it look like what it is</h2>
+      <p class="ch-date">December 2025, version 2.26.0</p>
+    </div>
+
+    <div class="m-article prose">
+      <p class="lead">For most of 2025 the archive looked like every other web app: bright blue, bright pink, white background, the default look of a thing built fast. It worked and it was wrong. It did not look like an archive of journalism history. It looked like a dashboard.</p>
+      <p>The fix was to tie every visual choice to a physical thing. The background became aged newsprint. The cards became cream card stock. The bright blue became the faded ink of an old front page, the green a card-catalog green, the accent a manila-folder tan. Paper grain, dog-eared corners, filing-tab notches. The page you are reading now is built from that same palette, on purpose: the archive and its own making-of should feel like they came out of the same drawer.</p>
+      <p>Handing this one to the machines wholesale did not work. My first plan was to send a swarm of automated edits through the components in five passes. They mixed styles, broke layouts, and I reverted all of it. What worked was narrower: let the machines inventory and scaffold, keep the deciding in human hands, and test on one page before it touches the app.</p>
+      <p class="pull">It worked and it was wrong.</p>
+    </div>
+
+    <div class="m-case">
+      <ul class="dossier">
+        <li><span class="d-tag">2025-12</span><p class="d-body">Frontend reads generic. Bright Tailwind (<code>sky-500</code>, <code>pink-500</code>), white ground. Verdict: not an archive.</p></li>
+        <li><span class="d-tag">v2.26.0</span><p class="d-body">Vintage archive aesthetic. Each color mapped to a material.</p></li>
+        <li><span class="d-tag">COLOR</span><p class="d-body">Newsprint <code>#f5f1e8</code>, cream stock <code>#fdfcf9</code>, faded ink <code>#2c5f82</code>, catalog green <code>#3a5f3f</code>, manila tan <code>#d4a574</code>.</p></li>
+        <li><span class="d-tag">INFRA</span><p class="d-body">~200 CSS tokens, reusable components, still zero build.</p></li>
+        <li><span class="d-tag">PROCESS</span><p class="d-body">Five-wave automated edits broke layouts, reverted. Machines scaffold, humans decide, test on a demo page first.</p></li>
+      </ul>
+    </div>
+  </article>
+
+  <svg class="torn" viewBox="0 0 1200 22" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q30 0 60 11 T120 11 T180 11 T240 11 T300 11 T360 11 T420 11 T480 11 T540 11 T600 11 T660 11 T720 11 T780 11 T840 11 T900 11 T960 11 T1020 11 T1080 11 T1140 11 T1200 11 V22 H0 Z" fill="currentColor"/></svg>
+
+  <!-- ============ CH 7 ============ -->
+  <article class="chapter reveal" id="ch7">
+    <div class="ch-head">
+      <span class="ch-ref">CH.07 &nbsp;/&nbsp; 2026, the handoff</span>
+      <h2>The part nobody automates</h2>
+      <p class="ch-date">The last hundred feet</p>
+    </div>
+
+    <div class="m-article prose">
+      <p class="lead">The archive was built and the automatic publish was built, and getting the finished files onto the live site turned into its own small project: the way the site had been set up years earlier took real work to untangle before anything could go out the door. The link rot the archive fights had reached the archive's own front door.</p>
+      <p>Once a week I email Jay a zip file, he opens it, and he drags the new files into a web uploader by hand. That is the deploy pipeline right now. It is clunky and it works.</p>
+      <p>The data is not finished either. It is around ninety-five or ninety-six percent of the way there, with a soft spot roughly from 2004 to 2008 where the record thins out: publications that folded, or that never archived themselves. Looking at that stretch with Jay once, I told him I thought he had written more than we had been able to find. I still think so, and I have not found it.</p>
+      <p class="pull">The link rot the archive fights had reached the archive's own front door.</p>
+    </div>
+
+    <div class="m-case">
+      <ul class="dossier">
+        <li><span class="d-tag">DEPLOY</span><p class="d-body">Automatic publish built, not yet wired up. Updated by hand in the meantime.</p></li>
+        <li><span class="d-tag">SETUP</span><p class="d-body">The original hosting setup predated the archive and took time to untangle before the first publish.</p></li>
+        <li><span class="d-tag">FALLBACK</span><p class="d-body">Weekly, the curator receives a zip and uploads files by hand through a web file manager. Clunky, working.</p></li>
+        <li><span class="d-tag">QUALITY</span><p class="d-body">~95&ndash;96%. Soft coverage roughly 2004&ndash;2008 (folded or unarchived publications).</p></li>
+        <li><span class="d-tag">CAPACITY</span><p class="d-body">One person. New records added by hand. No standing technical maintainer on the archive's side.</p></li>
+      </ul>
+      <div class="exhibit">
+        <div class="ex-cap"><b>Exhibit C</b> &middot; the coverage estimate</div>
+<pre tabindex="0" role="group" aria-label="Exhibit C, the coverage estimate">coverage estimate
+  overall     95 to 96% of the locatable work
+  soft spot   roughly 2004 to 2008
+  cause       publications folded, or never archived themselves
+
+status  open.  more is out there.  not yet found</pre>
+      </div>
+    </div>
+  </article>
+
+  <svg class="torn" viewBox="0 0 1200 22" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q30 0 60 11 T120 11 T180 11 T240 11 T300 11 T360 11 T420 11 T480 11 T540 11 T600 11 T660 11 T720 11 T780 11 T840 11 T900 11 T960 11 T1020 11 T1080 11 T1140 11 T1200 11 V22 H0 Z" fill="currentColor"/></svg>
+
+  <!-- ============ CH 8 ============ -->
+  <article class="chapter reveal" id="ch8">
+    <div class="ch-head">
+      <span class="ch-ref">CH.08 &nbsp;/&nbsp; ongoing</span>
+      <h2>A record of the record</h2>
+      <p class="ch-date">The test that has not happened yet</p>
+    </div>
+
+    <div class="m-article prose">
+      <p class="lead">The launch did not finish the archive. Once other people could see the structure, the errors in it were easy to find: counts in the docs that no longer matched the data, records with empty text, threads with placeholder titles, a claim in a file that the system had outgrown. So the archive started keeping a record of itself, and checking that record against reality.</p>
+      <p>That is the rule the whole thing runs on now. Every change goes through a branch and a review before it lands. Nothing merges itself. When a document says the system does something, that sentence gets checked against the system, because I have been burned by a confident wrong sentence before. This page is part of that same habit. I wrote it from the project's own history and its git log, and I checked every number on it against the live files the day it went up. Some of those numbers are gaps, and I left them on the page instead of rounding them off: seventy-nine records still unverified, a handful of them genuinely gone, a print-only piece from 1999, a monograph from a civic-journalism center that no longer exists. An archive that only reports its wins is not keeping an honest record.</p>
+      <p>The real test of this thing is not today. It is a day years from now, when the model that reads these records is discontinued, or the company that made it is gone, and nobody is being paid to care. On that day, someone types a name into the archive and it answers, out of flat files, in a browser, with no machine in the loop. If that happens, it worked.</p>
+      <p class="pull">An archive that only reports its wins is not keeping an honest record.</p>
+    </div>
+
+    <div class="m-case">
+      <ul class="dossier">
+        <li><span class="d-tag">2025-12</span><p class="d-body">Errors found after launch: stale counts, empty text, placeholder titles, doc claims out of sync.</p></li>
+        <li><span class="d-tag">DISCIPLINE</span><p class="d-body">Branch and review on every change. No self-merge. Docs checked against the system.</p></li>
+        <li><span class="d-tag">OPEN</span><p class="d-body">79 records unverified (2026-07-07). Some unrecoverable: a 1999 print-only piece, a defunct civic-journalism center's monograph.</p></li>
+        <li><span class="d-tag">OPEN</span><p class="d-body">Coverage soft spot roughly 2004&ndash;2008.</p></li>
+        <li><span class="d-tag">TEST</span><p class="d-body">Success is a future query answered from flat files, in a browser, with no model in the loop.</p></li>
+      </ul>
+      <span class="stamp" aria-hidden="true">Status: open</span>
+    </div>
+  </article>
+
+  <svg class="torn" viewBox="0 0 1200 22" preserveAspectRatio="none" aria-hidden="true"><path d="M0 11 Q30 0 60 11 T120 11 T180 11 T240 11 T300 11 T360 11 T420 11 T480 11 T540 11 T600 11 T660 11 T720 11 T780 11 T840 11 T900 11 T960 11 T1020 11 T1080 11 T1140 11 T1200 11 V22 H0 Z" fill="currentColor"/></svg>
+
+  <!-- colophon -->
+  <section class="colophon reveal" aria-label="Colophon and house rules">
+    <h2>Three rules the archive won't break</h2>
+    <div class="card">
+      <ul class="rules">
+        <li><b>Raw text is preserved.</b> Where a record has raw text, any processing must keep it intact. A change that destroys <code>raw_text</code> on an existing row is treated as a defect.</li>
+        <li><b>CSVs are parsed with a real parser.</b> The data holds quoted fields with embedded commas and newlines, so it is read with Python's <code>csv</code> module, never with grep, cut, or awk.</li>
+        <li><b>Dissertation quotes are verified.</b> Every quote and attribution from the 1986 dissertation was checked against the original text, and must not be modified, paraphrased, or fabricated.</li>
+      </ul>
+      <p style="max-width:var(--measure); margin:0; color:var(--ink-soft); font-size:13px;">How this page was made: one self-contained, zero-build HTML file in the archive's own palette. The story comes from the project's own <code>docs/narrative</code> and its public git history. Every number was checked against the live data files on 2026-07-07.</p>
+      <div class="end-actions">
+        <a class="btn btn-primary" href="https://pressthink.org/j/rosen-archive/">Open the archive</a>
+        <a class="btn btn-ghost" href="https://github.com/jamditis/rosen-frontend">View the source on GitHub</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap" style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:space-between; width:100%;">
+    <span class="mark"><img src="./favicon.svg" alt=""> Jay Rosen's Internet Archive</span>
+    <span>By Joe Amditis &middot; rev. 3.6.5</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  // ---- reading mode toggle (case file / article) ----
+  var body = document.body;
+  var buttons = Array.prototype.slice.call(document.querySelectorAll(".switch button[data-mode]"));
+  var STORAGE_KEY = "makingof-mode";
+
+  function applyMode(mode) {
+    if (mode !== "casefile" && mode !== "article") { mode = "article"; }
+    body.classList.remove("mode-article", "mode-casefile");
+    body.classList.add("mode-" + mode);
+    buttons.forEach(function (b) {
+      b.setAttribute("aria-pressed", b.getAttribute("data-mode") === mode ? "true" : "false");
+    });
+    try { localStorage.setItem(STORAGE_KEY, mode); } catch (e) { /* private mode: ignore */ }
+  }
+
+  buttons.forEach(function (b) {
+    b.addEventListener("click", function () { applyMode(b.getAttribute("data-mode")); });
+  });
+
+  var saved = null;
+  try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) { saved = null; }
+  if (saved) { applyMode(saved); }
+
+  // ---- reduced-motion check ----
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // ---- fade-in reveals (progressive enhancement; content is visible without JS) ----
+  var reveals = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+  if (!reduce && "IntersectionObserver" in window) {
+    document.documentElement.classList.add("has-reveal");
+    var revObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add("in"); revObs.unobserve(en.target); }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(function (el) { revObs.observe(el); });
+    // safety net: never leave content hidden if the observer stalls
+    setTimeout(function () { reveals.forEach(function (el) { el.classList.add("in"); }); }, 4000);
+  }
+
+  // ---- count-up stats ----
+  var counters = Array.prototype.slice.call(document.querySelectorAll(".num[data-count]"));
+  function formatNum(n) { return n.toLocaleString("en-US"); }
+
+  function runCount(el) {
+    var target = parseInt(el.getAttribute("data-count"), 10) || 0;
+    if (reduce) { el.textContent = formatNum(target); return; }
+    var start = null, dur = 1100;
+    function step(ts) {
+      if (start === null) { start = ts; }
+      var p = Math.min((ts - start) / dur, 1);
+      var eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+      el.textContent = formatNum(Math.round(target * eased));
+      if (p < 1) { requestAnimationFrame(step); }
+      else { el.textContent = formatNum(target); }
+    }
+    requestAnimationFrame(step);
+  }
+
+  if (reduce || !("IntersectionObserver" in window)) {
+    // leave the real numbers already present in the HTML
+    counters.forEach(function (el) { el.textContent = formatNum(parseInt(el.getAttribute("data-count"), 10) || 0); });
+  } else {
+    // reset to 0 only because we are about to animate up to the real value
+    counters.forEach(function (el) { el.textContent = "0"; });
+    var cObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting) { runCount(en.target); cObs.unobserve(en.target); }
+      });
+    }, { threshold: 0.5 });
+    counters.forEach(function (el) { cObs.observe(el); });
+  }
+})();
+</script>
+
+</body>
+</html>

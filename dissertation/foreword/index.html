@@ -4,14 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Foreword | The Impossible Press | Jay Rosen</title>
-  <link rel="icon" href="../../favicon.ico" />
+  <link rel="icon" href="../../favicon.svg" />
   <meta name="description" content="Jay Rosen's foreword to his 1986 PhD dissertation, 'The Impossible Press: American Journalism and the Decline of Public Life.'">
 
   <!-- Open Graph -->
   <meta property="og:title" content="Foreword | The Impossible Press | Jay Rosen">
   <meta property="og:description" content="In the summer of 1980 I moved to New York City to become a press critic. I was 24. I had no connections.">
   <meta property="og:type" content="article">
-  <meta property="og:image" content="https://pressthink.org/j/rosen-archive/rosen-dissertation-feat.png">
+  <meta property="og:url" content="https://pressthink.org/j/rosen-archive/dissertation/foreword/">
+  <meta property="og:image" content="https://pressthink.org/j/rosen-archive/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Foreword | The Impossible Press | Jay Rosen">
+  <meta name="twitter:description" content="In the summer of 1980 I moved to New York City to become a press critic. I was 24. I had no connections.">
+  <meta name="twitter:image" content="https://pressthink.org/j/rosen-archive/og-image.png">
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Roboto+Mono:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -81,6 +90,8 @@
     .nav-back {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
+      min-height: 44px;
       gap: 0.5rem;
       font-family: 'Roboto Mono', monospace;
       font-size: 0.8rem;
@@ -446,7 +457,7 @@
 
     <!-- Featured Image -->
     <figure class="featured-image">
-      <img src="https://pressthink.org/j/rosen-archive/rosen-dissertation-feat.png" alt="The Impossible Press: American Journalism and the Decline of Public Life by Jay Rosen">
+      <img src="https://pressthink.org/j/rosen-archive/og-image.png" alt="The Impossible Press: American Journalism and the Decline of Public Life by Jay Rosen">
     </figure>
 
     <!-- Content -->
@@ -587,7 +598,7 @@
 
   <!-- Text Selection Sharing Tool -->
   <script type="module">
-    import { TextSelectionTool } from '../../features/shared/text-selection.js';
+    import { TextSelectionTool } from '../../features/shared/text-selection.js?v=3.8.5';
     const tool = new TextSelectionTool({
       contentSelector: '.content',
       source: 'Jay Rosen, Foreword to "The Impossible Press" (2025)',

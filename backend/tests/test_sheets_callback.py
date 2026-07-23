@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for submission_server.sheets_callback — status writeback to Apps Script sheet.
+"""Tests for submission_runtime.sheets_callback — status writeback to the queue sheet.
 
 Covers the load-bearing behaviors:
   - Missing SA key: silent no-op (dev / CI shouldn't need real creds).
@@ -20,7 +20,7 @@ if str(_BACKEND) not in sys.path:
 
 pytest.importorskip("googleapiclient")
 
-from submission_server import sheets_callback  # noqa: E402
+from submission_runtime import sheets_callback  # noqa: E402
 
 
 SA_INFO = {
@@ -104,6 +104,23 @@ class TestSuccessfulWriteback:
         ranges = [d['range'] for d in batch.call_args.kwargs['body']['data']]
         # Always-quoted, including the Sheet1 default.
         assert all(r.startswith("'Sheet1'!") for r in ranges)
+
+    def test_tab_apostrophe_is_escaped(self, monkeypatch):
+        monkeypatch.setenv('ROSEN_SHEETS_SA_KEY_JSON', json.dumps(SA_INFO))
+
+        with patch.object(sheets_callback, '_load_credentials',
+                          return_value=MagicMock()), \
+             patch('googleapiclient.discovery.build') as mock_build:
+            mock_service = MagicMock()
+            mock_build.return_value = mock_service
+            batch = mock_service.spreadsheets.return_value.values.return_value.batchUpdate
+
+            sheets_callback.update_row(
+                sheet_id='SHEET1', sheet_tab="Joe's Sheet", row=5,
+                status='queued')
+
+        ranges = [d['range'] for d in batch.call_args.kwargs['body']['data']]
+        assert all(r.startswith("'Joe''s Sheet'!") for r in ranges)
 
 
 class TestHttpErrorReporting:

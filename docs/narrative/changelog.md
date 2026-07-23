@@ -1,10 +1,10 @@
 # Changelog
 
-Project version history for the Jay Rosen Internet Archive.
+Project version history for Jay Rosen's Internet Archive.
 
 This is an archival record condensed from session notes. Each entry preserves what was built, why decisions were made, what challenges arose, and key metrics and outcomes. Code snippets, file lists, bash commands, and session continuation instructions have been removed — the git history contains those details.
 
-Versions are listed in reverse chronological order within major version groups. The project began as a Python data pipeline (v0.0.1, June 2025) and grew into a static React frontend with 1,030 archive records, 4 live dissertation presentation surfaces (with 6 earlier tools retired to `archived/dissertation-tools/` alongside a non-tool source bundle), ~29,700 social media posts, and a knowledge graph of 5,036 named entities and 4,666 relationships spanning four decades of journalism criticism.
+Versions are listed in reverse chronological order within major version groups. The project began as a Python data pipeline (v0.0.1, June 2025) and grew into a static React frontend with 1,030 archive records, 4 live dissertation presentation surfaces, ~29,700 social media posts, and a knowledge graph of 5,036 named entities and 4,666 relationships spanning four decades of journalism criticism.
 
 A note on versioning: the cache-bust version embedded in `index.html` and `version.json` (currently `v3.3.0`) increments per static-bundle change. The release versions below (e.g. `[4.0.0]`) track milestones in the project's evolution. These are two related but distinct versioning schemes, intentionally separate.
 
@@ -20,6 +20,16 @@ Key milestones in the project's evolution:
 
 ---
 
+### [Unreleased] - 2026-07-09 — Retired dissertation tool removal
+
+Removed the comparison, concepts, context, excerpts, glossary, and timeline
+sources after the curator decided not to keep those tools in production. The
+full-site deploy now removes their stale production directories after all
+current files upload successfully. The maintained dissertation pages, the
+archive FAQ, and both tools under `tools/active/` remain unchanged.
+
+---
+
 ### [4.1.x] - 2026-01 through 2026-05 — Post-launch maintenance and authoring infrastructure
 
 Five months of work after the December 2025 public launch. No single version bump captures it -- this is a rolling description of the post-launch era as of 2026-05-25. Specific PR and issue numbers below refer to `jamditis/rosen-frontend` unless noted.
@@ -32,7 +42,7 @@ Five months of work after the December 2025 public launch. No single version bum
 | Social media posts | ~29,100 | ~29,700 |
 | Named entities | ~5,061 | 5,036 (some duplicates collapsed during quality work) |
 | Entity relationships | ~5,084 | 4,666 (post-cleanup; false relationships removed) |
-| Live dissertation surfaces | 9 tools | 3 surfaces (reader, foreword, network-effect); 7 of the rest moved to `archived/dissertation-tools/` as standalone tools, with a separate `source/` bundle (PDF + markdown + build helper) archived alongside |
+| Live dissertation surfaces | 9 tools | 3 surfaces (reader, foreword, network-effect); 7 older tools and a separate source bundle were retired at that point |
 | CI/CD workflows | 5 | 9 (added CodeQL, post-merge dashboard sync, Pillar 3a submit-record + sweep-stuck-rows, Claude review) |
 
 **Pillar 1 -- data quality and verification.** Series of focused PRs against the CSV source of truth and the supporting tests. Highlights: PR #235/#236 fixed wrong-overlay URLs on RECORD-00602/00613 and introduced a hedging-language guard that flags AI-guesswork summaries before they ship; PR #244 and #253 recovered 7 of the original 16 `verified=false` records via Wayback CDX search, with issue #242 tracking the next 9-record batch; PR #233 added a thread-dedup test; PR #210 / #254 fixed 4 title-drift bugs and produced a curator-decisions findings doc (`docs/issue-210-duplicate-findings.md`). The "raw_text is sacred" rule was reinforced as a hard invariant -- any edit that shortens or removes `raw_text` on existing rows is treated as a defect.
@@ -56,7 +66,7 @@ Five months of work after the December 2025 public launch. No single version bum
 
 ### [4.0.0] - 2025-12-01 — Pre-publication release
 
-Final validation and preparation for the December 2025 public release of "The Impossible Press" dissertation and the full Jay Rosen Internet Archive.
+Final validation and preparation for the December 2025 public release of "The Impossible Press" dissertation and all of Jay Rosen's Internet Archive.
 
 **Merged pull requests (12 total):**
 1. PR #35 -- Migrated dissertation PDFs to Git LFS (~135 MB total)

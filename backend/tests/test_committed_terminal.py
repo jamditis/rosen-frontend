@@ -76,7 +76,7 @@ def test_sentinel_branches_on_skipped_before_ok():
     process_submission loads gspread / Playwright.
     """
     src = (_BACKEND / "scripts" / "process_submission.py").read_text(encoding="utf-8")
-    first = src.index("push_to_production()")
+    first = src.index("push_to_production(")
     block = src[first:first + 1500]
     skipped_at = block.find("push.get('skipped')")
     ok_at = block.find("push.get('ok')")

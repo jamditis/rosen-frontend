@@ -62,6 +62,18 @@ describe('parseViewState', () => {
     assert.deepEqual(state.routeParams, { wikiSlug: 'concept/public-journalism' });
   });
 
+  it('parses a desktop app deep link without treating it as a second route', () => {
+    const state = parseViewState('https://example.com/archive/#desktop/tools');
+    assert.equal(state.route, ROUTES.desktop);
+    assert.deepEqual(state.routeParams, { desktopAppId: 'tools' });
+  });
+
+  it('keeps an unknown safe desktop app id for the shell fallback', () => {
+    const state = parseViewState('https://example.com/archive/#desktop/not-real');
+    assert.equal(state.route, ROUTES.desktop);
+    assert.deepEqual(state.routeParams, { desktopAppId: 'not-real' });
+  });
+
   it('falls back to the default route for an unknown hash', () => {
     assert.strictEqual(parseViewState(`${BASE}#bogus`).route, DEFAULT_ROUTE);
   });
@@ -95,6 +107,19 @@ describe('parseViewState', () => {
     assert.strictEqual(parseViewState(`${BASE}?record=RECORD-00123`).selectedRecord, 'RECORD-00123');
   });
 
+  it('parses a selected entity only on canonical entity routes', () => {
+    assert.deepEqual(
+      parseViewState(`${BASE}?entity=P0001#entities`).routeParams,
+      { entityId: 'P0001' },
+    );
+    assert.deepEqual(
+      parseViewState(`${BASE}?entity=C0001#desktop/entities`).routeParams,
+      { desktopAppId: 'entities', entityId: 'C0001' },
+    );
+    assert.deepEqual(parseViewState(`${BASE}?entity=C0001#about`).routeParams, {});
+    assert.deepEqual(parseViewState(`${BASE}?entity=not%20safe#entities`).routeParams, {});
+  });
+
   it('strips a stray ?suffix from the hash defensively', () => {
     assert.strictEqual(parseViewState(`${BASE}#about?stale=1`).route, ROUTES.about);
   });
@@ -115,6 +140,31 @@ describe('viewStateToUrl', () => {
     assert.strictEqual(
       viewStateToUrl({ route: ROUTES.wiki, routeParams: { wikiSlug: 'concept/public-journalism' } }, BASE),
       `${BASE}#wiki/concept/public-journalism`
+    );
+  });
+
+  it('emits a nested desktop app id when one is active', () => {
+    assert.strictEqual(
+      viewStateToUrl({ route: ROUTES.desktop, routeParams: { desktopAppId: 'readme' } }, BASE),
+      `${BASE}#desktop/readme`
+    );
+  });
+
+  it('emits selected entities only for canonical entity routes', () => {
+    assert.strictEqual(
+      viewStateToUrl({ route: ROUTES.entities, routeParams: { entityId: 'P0001' } }, BASE),
+      `${BASE}?entity=P0001#entities`,
+    );
+    assert.strictEqual(
+      viewStateToUrl({
+        route: ROUTES.desktop,
+        routeParams: { desktopAppId: 'entities', entityId: 'C0001' },
+      }, BASE),
+      `${BASE}?entity=C0001#desktop/entities`,
+    );
+    assert.strictEqual(
+      viewStateToUrl({ route: ROUTES.about, routeParams: { entityId: 'C0001' } }, BASE),
+      `${BASE}#about`,
     );
   });
 
@@ -174,6 +224,24 @@ describe('round-trip', () => {
     'route only': {
       route: ROUTES.dissertation,
       routeParams: {},
+      filters: defaultFilters(),
+      selectedRecord: null,
+    },
+    'Start Here route': {
+      route: ROUTES.start,
+      routeParams: {},
+      filters: defaultFilters(),
+      selectedRecord: null,
+    },
+    'desktop tool window': {
+      route: ROUTES.desktop,
+      routeParams: { desktopAppId: 'tools' },
+      filters: defaultFilters(),
+      selectedRecord: null,
+    },
+    'desktop selected entity': {
+      route: ROUTES.desktop,
+      routeParams: { desktopAppId: 'entities', entityId: 'C0001' },
       filters: defaultFilters(),
       selectedRecord: null,
     },

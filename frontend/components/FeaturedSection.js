@@ -1,8 +1,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { html } from '../html.js?v=3.4.7';
-import { ArrowRight, ChevronDown, ChevronUp, Book, GraduationCap, MessageCircle, PenTool, FileText, Sparkles } from 'lucide-react';
-import { FEATURED_WORKS } from '../constants.js?v=3.4.7';
+import { html } from '../html.js?v=3.8.5';
+import { ArrowRight, ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Book, GraduationCap, MessageCircle, PenTool, FileText, Sparkles } from 'lucide-react';
+import { FEATURED_WORKS } from '../constants.js?v=3.8.5';
 
 const FeaturedSection = () => {
   const [startIndex, setStartIndex] = useState(0);
@@ -16,8 +16,13 @@ const FeaturedSection = () => {
     setStartIndex((prev) => (prev + 1) % FEATURED_WORKS.length);
   }, []);
 
+  const previousSlide = useCallback(() => {
+    setStartIndex((prev) => (prev - 1 + FEATURED_WORKS.length) % FEATURED_WORKS.length);
+  }, []);
+
   useEffect(() => {
-    if (isPaused || !isExpanded || FEATURED_WORKS.length <= ITEMS_TO_SHOW) return;
+    const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion || isPaused || !isExpanded || FEATURED_WORKS.length <= ITEMS_TO_SHOW) return;
 
     const interval = setInterval(nextSlide, ROTATION_INTERVAL);
     return () => clearInterval(interval);
@@ -41,74 +46,86 @@ const FeaturedSection = () => {
   }
 
   return html`
-    <section 
-      className="mb-12"
+    <section
+      className="archive-featured"
       onMouseEnter=${() => setIsPaused(true)}
-      onMouseLeave=${() => setIsPaused(false)}
+      onMouseLeave=${event => {
+        if (!event.currentTarget.contains(document.activeElement)) setIsPaused(false);
+      }}
+      onFocusCapture=${() => setIsPaused(true)}
+      onBlurCapture=${event => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setIsPaused(false);
+      }}
+      aria-labelledby="archive-featured-title"
     >
-      <div className="flex items-end justify-between gap-4 mb-6 border-b border-stone-200 pb-2">
-        <button 
+      <div className="archive-featured__header">
+        <button
+            type="button"
             onClick=${() => setIsExpanded(!isExpanded)}
-            className="flex items-end gap-4 group text-left focus:outline-none"
+            className="archive-featured__toggle"
+            aria-expanded=${isExpanded}
+            aria-controls="archive-featured-grid"
         >
-          <h2 className="text-2xl font-display font-bold text-stone-900">Featured Works</h2>
-          <span className="text-sm text-stone-500 pb-1 mb-0.5 font-body hidden sm:inline group-hover:text-stone-800 transition-colors">Curated highlights</span>
-          <div className="pb-1.5 text-stone-400 group-hover:text-stone-800 transition-colors">
+          <h2 id="archive-featured-title">Read</h2>
+          <span className="archive-featured__description">Curated highlights</span>
+          <span className="archive-featured__chevron">
             ${isExpanded ? html`<${ChevronUp} className="w-5 h-5" />` : html`<${ChevronDown} className="w-5 h-5" />`}
-          </div>
+          </span>
         </button>
         
         ${isExpanded && html`
-            <div className="flex items-center gap-2 pb-1">
-            ${FEATURED_WORKS.map((_, idx) => html`
-                <button
-                    key=${idx}
-                    onClick=${() => setStartIndex(idx)}
-                    className=${`h-1.5 rounded-full transition-all duration-300 ${idx === startIndex ? 'w-8 bg-stone-800' : 'w-2 bg-stone-300 hover:bg-stone-400'}`}
-                    aria-label=${`Go to slide ${idx + 1}`}
-                />
-            `)}
+            <div className="archive-featured__controls" aria-label="Choose featured set">
+              <button
+                type="button"
+                onClick=${previousSlide}
+                className="archive-featured__control"
+                aria-label="Previous featured work"
+              >
+                <${ChevronLeft} aria-hidden="true" />
+              </button>
+              <span className="archive-featured__position">
+                ${startIndex + 1} of ${FEATURED_WORKS.length}
+              </span>
+              <button
+                type="button"
+                onClick=${nextSlide}
+                className="archive-featured__control"
+                aria-label="Next featured work"
+              >
+                <${ChevronRight} aria-hidden="true" />
+              </button>
             </div>
         `}
       </div>
       
       ${isExpanded && html`
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            ${visibleWorks.map((work, index) => html`
-            <a 
+        <div id="archive-featured-grid" className="archive-featured__grid">
+            ${visibleWorks.map((work) => html`
+            <a
                 key=${`${work.id}-${startIndex}`}
-                href=${work.link} 
-                target="_blank" 
+                href=${work.link}
+                target="_blank"
                 rel="noreferrer"
-                className="group relative flex flex-col bg-white border border-stone-200 hover:border-stone-800 transition-all duration-500 shadow-sm hover:shadow-xl overflow-hidden animate-fade-in"
-                style=${{ animationDelay: `${index * 100}ms` }}
+                className="archive-featured-card"
+                aria-label=${`Read ${work.title}`}
             >
-                <div className="relative h-28 overflow-hidden bg-stone-100">
-                <div className="absolute inset-0 bg-stone-900/10 group-hover:bg-transparent transition-colors z-10" />
-                <img 
-                    src=${work.image} 
-                    alt=${work.title} 
-                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500 grayscale group-hover:grayscale-0"
-                />
-                <span className="absolute top-3 left-3 z-20 bg-stone-900 text-white text-[10px] font-bold uppercase px-2 py-1 tracking-wider flex items-center">
+                <div className="archive-featured-card__media">
+                  <img src=${work.image} alt="" />
+                  <span className="archive-featured-card__label">
                     ${getIconForType(work.type)} ${work.type}
-                </span>
+                  </span>
                 </div>
 
-                <div className="p-4 flex-grow flex flex-col">
-                <h3 className="text-base font-display font-bold text-stone-900 mb-1 group-hover:text-stone-600 transition-colors leading-tight">
+                <div className="archive-featured-card__body">
+                <h3>
                     ${work.title}
                 </h3>
+                <p>${work.description}</p>
 
-                <div className="mt-auto pt-2 flex items-center justify-between text-xs font-bold uppercase tracking-widest text-stone-400 group-hover:text-stone-900 transition-colors">
-                    <span>Explore</span>
-                    <${ArrowRight} className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+                <div className="archive-featured-card__read">
+                    <span>Read</span>
+                    <${ArrowRight} className="w-4 h-4" aria-hidden="true" />
                 </div>
-                </div>
-
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-stone-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none w-64 text-center z-50 shadow-lg hidden sm:block" style=${{ lineHeight: '1.5' }}>
-                  ${work.description}
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-stone-900"></div>
                 </div>
             </a>
             `)}

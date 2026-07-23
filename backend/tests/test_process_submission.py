@@ -25,6 +25,8 @@ _BACKEND = pathlib.Path(__file__).resolve().parents[1]
 if str(_BACKEND) not in sys.path:
     sys.path.insert(0, str(_BACKEND))
 
+from rosen_scraper.processors.clipping_processor import ClippingProcessor  # noqa: E402
+
 
 def _load_script_module():
     """Import process_submission.py as a regular module under tests."""
@@ -34,11 +36,6 @@ def _load_script_module():
     spec.loader.exec_module(module)
     return module
 
-
-# Importing the script touches the real submission_server package; skip the
-# whole file if Flask isn't installed (matches conftest convention for the
-# other writeback tests).
-pytest.importorskip('flask')
 
 process_submission = _load_script_module()
 
@@ -160,12 +157,14 @@ def _stub_schema(monkeypatch):
 
 
 def _run(monkeypatch, csv_path, url='https://example.com/new', title='',
-         notes='', sheet_id='SHEET', sheet_tab='Queue', sheet_row=3):
+         notes='', sheet_id='SHEET', sheet_tab='Queue', sheet_row=3,
+         retry_record_id=''):
     """Convenience: invoke main() with a tmp CSV path patched in."""
     monkeypatch.setattr(process_submission, 'CSV_FILE', csv_path)
     return process_submission.process_one(
         url=url, title=title, notes=notes,
         sheet_id=sheet_id, sheet_tab=sheet_tab, sheet_row=sheet_row,
+        retry_record_id=retry_record_id,
     )
 
 
@@ -197,7 +196,7 @@ class TestHappyPath:
         assert final['status'] == 'live'
         assert final['record_id'] == result['record_id']
         # SFTP fired exactly once
-        sftp_mock.assert_called_once()
+        sftp_mock.assert_called_once_with(record_ids=(result['record_id'],))
         # git commit subprocess invoked with the record id in the message
         git_calls = [c for c in process_submission.subprocess.run.call_args_list
                      if c.args[0][:2] == ['git', 'commit']]
@@ -428,7 +427,7 @@ class TestPushRaceRetry:
         final = sheets_mock.call_args_list[-1].kwargs
         assert final['status'] == 'live'
         assert final['record_id'] == 'RECORD-00002'
-        sftp_mock.assert_called_once()
+        sftp_mock.assert_called_once_with(record_ids=('RECORD-00002',))
 
     def test_non_ff_push_keeps_id_when_still_free_after_reset(
             self, monkeypatch, csv_with_headers):
@@ -595,7 +594,8 @@ class TestSentinelUrl:
         _stub_subprocess(monkeypatch)
 
         result = _run(monkeypatch, csv_with_headers,
-                      url='https://example.com/sweep-noop-1748147200')
+                      url='https://example.com/sweep-noop-1748147200',
+                      retry_record_id='RECORD-00042')
 
         # Sentinel handling: no scrape, no categorize, no CSV append, no
         # commit. Only the SFTP step runs (so a stuck `archived` row gets a
@@ -609,6 +609,7 @@ class TestSentinelUrl:
                      if c.args[0][:2] == ['git', 'commit']]
         assert git_calls == []
         sftp_mock.assert_called_once()
+        sftp_mock.assert_called_once_with(record_ids=('RECORD-00042',))
         # Status reflects the no-op: not 'live' (no new row) and not 'error'.
         assert result['status'] in ('noop', 'live')
         # Sheet writeback for a sweep noop is optional — a sentinel submission
@@ -616,6 +617,37 @@ class TestSentinelUrl:
         if sheets_mock.call_args_list:
             assert sheets_mock.call_args_list[-1].kwargs.get('status') in (
                 'noop', 'live', 'archived', None)
+
+    def test_sentinel_without_record_id_becomes_terminal_error(
+            self, monkeypatch, csv_with_headers):
+        _stub_schema(monkeypatch)
+        monkeypatch.setattr(process_submission, 'dispatch_url', MagicMock())
+        monkeypatch.setattr(process_submission, 'categorize', MagicMock())
+        sheets_mock = _stub_sheets(monkeypatch)
+        sftp_mock = _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        result = _run(
+            monkeypatch,
+            csv_with_headers,
+            url='https://example.com/sweep-noop-1748147200',
+            sheet_row=42,
+        )
+
+        assert result['exit_code'] != 0
+        assert 'record id' in result['error'].lower()
+        sftp_mock.assert_not_called()
+        error_calls = [
+            call for call in sheets_mock.call_args_list
+            if call.kwargs.get('status') == 'error'
+            and call.kwargs.get('row') == 42
+        ]
+        assert error_calls
+        assert result['status'] == 'error'
+        assert not any(
+            call.kwargs.get('status') == 'live'
+            for call in sheets_mock.call_args_list
+        )
 
 
 class TestSheetWritebackResilience:
@@ -660,8 +692,8 @@ class TestSheetWritebackResilience:
         assert result.get('exit_code', 0) != 0
 
 
-class TestCodexReviewFindings:
-    """Regressions for two real bugs codex 5.4 surfaced in the initial PR."""
+class TestSubmissionRegressions:
+    """Regressions for bugs surfaced during the initial PR review."""
 
     def test_sentinel_writes_live_on_sftp_success(self, monkeypatch,
                                                   csv_with_headers):
@@ -678,7 +710,7 @@ class TestCodexReviewFindings:
 
         result = _run(monkeypatch, csv_with_headers,
                       url='https://example.com/sweep-noop-1748147200',
-                      sheet_row=42)
+                      sheet_row=42, retry_record_id='RECORD-00042')
 
         # Sentinel + successful SFTP must writeback status='live' for the
         # originally-archived row (row 42), so the sweeper stops re-firing.
@@ -690,6 +722,24 @@ class TestCodexReviewFindings:
             f'got calls: {sheets_mock.call_args_list}'
         )
         assert result['status'] in ('noop', 'live')
+
+    def test_sentinel_retries_the_archived_record_shell(self, monkeypatch,
+                                                        csv_with_headers):
+        _stub_schema(monkeypatch)
+        monkeypatch.setattr(process_submission, 'dispatch_url', MagicMock())
+        monkeypatch.setattr(process_submission, 'categorize', MagicMock())
+        _stub_sheets(monkeypatch)
+        sftp_mock = _stub_sftp(monkeypatch)
+        _stub_subprocess(monkeypatch)
+
+        _run(
+            monkeypatch,
+            csv_with_headers,
+            url='https://example.com/sweep-noop-1748147200',
+            retry_record_id='RECORD-00042',
+        )
+
+        sftp_mock.assert_called_once_with(record_ids=('RECORD-00042',))
 
     def test_sentinel_keeps_archived_on_sftp_failure(self, monkeypatch,
                                                      csv_with_headers):
@@ -708,7 +758,7 @@ class TestCodexReviewFindings:
 
         _run(monkeypatch, csv_with_headers,
              url='https://example.com/sweep-noop-1748147200',
-             sheet_row=42)
+             sheet_row=42, retry_record_id='RECORD-00042')
 
         live_calls = [c for c in sheets_mock.call_args_list
                       if c.kwargs.get('status') == 'live']
@@ -1577,17 +1627,18 @@ class TestReviewGate:
                       url='https://example.com/article')
         assert result['record_id'].startswith('RECORD-')
 
-    def test_processor_unverified_state_respected(self, monkeypatch,
-                                                  csv_with_headers):
-        """A processor's explicit verified value is preserved, not overwritten:
-        the clipping processor stamps verified='false' on OCR'd PDFs as an "OCR
-        needs a human check" signal. The submission path keeps that value (and
-        still flags needs_review). Note this does not hide the clipping -- the
-        exporter surfaces CLIP- ids via a dedicated allowance, so it goes
-        live-but-flagged; unifying that allowance with the verified/needs_review
-        model is tracked in issue #352."""
+    @pytest.mark.parametrize("prefix", sorted(process_submission.CLIPPING_ID_PREFIXES))
+    def test_clipping_uses_verified_true_plus_needs_review(
+            self, monkeypatch, csv_with_headers, prefix):
+        """OCR confidence belongs in needs_review, not the publish gate.
+
+        A fresh clipping must use the same live-but-flagged contract as other
+        submissions so the exporter does not need a CLIP-id bypass.
+        """
         _stub_schema(monkeypatch)
-        _stub_dispatcher_ok(monkeypatch, id='CLIP-00043', verified='false')
+        _stub_dispatcher_ok(
+            monkeypatch, id=f'{prefix}-00043', verified='false'
+        )
         _stub_sheets(monkeypatch)
         _stub_sftp(monkeypatch)
         _stub_subprocess(monkeypatch)
@@ -1596,11 +1647,12 @@ class TestReviewGate:
              url='https://example.com/clip2.pdf')
         with csv_with_headers.open() as f:
             row = next(csv.DictReader(f))
-        assert row['verified'].lower() == 'false', (
-            "an explicit processor verified='false' (low-confidence OCR) must "
-            f"survive the submission path; got {row['verified']!r}")
-        # Still flagged for review like every auto-submission.
+        assert row['verified'] == 'TRUE'
         assert row['needs_review'].lower() == 'true'
+
+    def test_clipping_publish_prefixes_match_processor(self):
+        expected = {'CLIP', *ClippingProcessor.PUBLICATION_PREFIXES.values()}
+        assert process_submission.CLIPPING_ID_PREFIXES == expected
 
     def test_titleless_submission_gets_visible_provisional_title(
             self, monkeypatch, csv_with_headers):

@@ -27,6 +27,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -38,15 +39,13 @@ const deployScriptPath = path.join(rootDir, 'backend', 'scripts', 'deploy_full_s
 // Every *.json under data/, at any depth, as a repo-root-relative posix path
 // (e.g. 'data/archive-core.json', 'data/feeds/index.json'). Recursive so a
 // future asset like data/search/index.json cannot slip past the classification.
-function allDataJsonFiles(dir = dataDir, acc = []) {
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) allDataJsonFiles(full, acc);
-    else if (entry.isFile() && entry.name.endsWith('.json')) {
-      acc.push(path.relative(rootDir, full).split(path.sep).join('/'));
-    }
-  }
-  return acc;
+function allDataJsonFiles() {
+  return execFileSync('git', ['ls-files', '--', 'data'], {
+    cwd: rootDir,
+    encoding: 'utf8',
+  })
+    .split('\n')
+    .filter(rel => rel.endsWith('.json'));
 }
 
 // Extract a Python tuple of string literals named `name` from the deploy script
@@ -65,7 +64,7 @@ function deployedDataDirs() {
   return pyTuple('_DEPLOY_DIRS').filter(d => d === 'data' || d.startsWith('data/'));
 }
 
-// The data/*.json basenames listed as DIRECT children of the `data/` block in
+// The data file basenames listed as DIRECT children of the `data/` block in
 // DEPLOYMENT.md's first fenced "Files to deploy" code block. Scoped to the data
 // block so top-level version.json / metadata.json are not counted, and pinned to
 // the direct-child indent so nested entries (e.g. data/feeds/index.json) and
@@ -86,7 +85,7 @@ function deploymentMdDataFiles() {
     if (childIndent === null) childIndent = indent;       // first child sets the direct-child level
     if (indent !== childIndent) continue;                 // skip deeper-nested entries (data/feeds/*)
     const entry = raw.trim().split('#')[0].trim();
-    const m = entry.match(/^([A-Za-z0-9_-]+\.json)$/);
+    const m = entry.match(/^([A-Za-z0-9_-]+\.(?:json|js|md))$/i);
     if (m) files.add(`data/${m[1]}`);
   }
   return files;
@@ -110,6 +109,22 @@ function isDeployed(relPath, deployedFiles, deployedDirs) {
 }
 
 describe('deploy data manifest classifies every data file', () => {
+  it('ignores gitignored local scratch JSON', () => {
+    const scratchDir = path.join(dataDir, '_recovery_tmp');
+    const scratchPath = path.join(scratchDir, 'issue-627-local-only.json');
+    fs.mkdirSync(scratchDir, { recursive: true });
+    fs.writeFileSync(scratchPath, '{}');
+    try {
+      assert.equal(
+        allDataJsonFiles().includes('data/_recovery_tmp/issue-627-local-only.json'),
+        false,
+        'gitignored recovery scratch cannot become a deploy-manifest candidate'
+      );
+    } finally {
+      fs.rmSync(scratchPath, { force: true });
+    }
+  });
+
   it('deploys or explicitly excludes every data/**/*.json', () => {
     const deployedFiles = deployedDataFiles();
     const deployedDirs = deployedDataDirs();
@@ -134,9 +149,8 @@ describe('deploy data manifest classifies every data file', () => {
   });
 
   it('references only data files that exist on disk (no manifest rot)', () => {
-    const present = new Set(allDataJsonFiles());
     const missing = [...deployedDataFiles(), ...KNOWN_NOT_DEPLOYED.keys()]
-      .filter(rel => !present.has(rel));
+      .filter(rel => !fs.existsSync(path.join(rootDir, rel)));
     assert.deepStrictEqual(missing, [],
       `Manifest/exclusion lists reference data file(s) absent from data/: ${missing.join(', ')}`);
   });

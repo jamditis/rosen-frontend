@@ -13,7 +13,9 @@ import {
   checkInternalLinks,
   checkUrlWellFormedness,
   collectUrlRecords,
-  buildUrlSourceMap
+  buildUrlSourceMap,
+  collectFeaturedUrls,
+  checkFeaturedUrlWellFormedness
 } from '../scripts/verify-links.js';
 
 const fixture = {
@@ -213,6 +215,65 @@ describe('collectUrlRecords (core archive-data.json + split archive-details.json
     const malformed = checkUrlWellFormedness(merged).filter((f) => f.failureType === 'malformed_url');
     assert.ok(malformed.some((f) => f.sourceId === 'R1'), 'the empty modal url is reported');
   });
+
+  it('collects thread-post links with their owning record id', () => {
+    const merged = collectUrlRecords([], {
+      THREAD1: {
+        url: 'https://bsky.app/profile/jayrosen.bsky.social/post/root',
+        thread_data: {
+          posts: [
+            { url: 'https://bsky.app/profile/jayrosen.bsky.social/post/one' },
+            { url: 'https://bsky.app/profile/jayrosen.bsky.social/post/two' },
+          ],
+        },
+      },
+    });
+    assert.deepEqual(
+      merged.filter(({ id }) => id === 'THREAD1').map(({ url }) => url).sort(),
+      [
+        'https://bsky.app/profile/jayrosen.bsky.social/post/one',
+        'https://bsky.app/profile/jayrosen.bsky.social/post/root',
+        'https://bsky.app/profile/jayrosen.bsky.social/post/two',
+      ]
+    );
+  });
+
+  it('flags a missing thread-post URL rendered by the thread modal', () => {
+    const merged = collectUrlRecords([], {
+      THREAD1: {
+        thread_data: { posts: [{ content: 'A post without its outbound URL' }] },
+      },
+    });
+    assert.ok(merged.some(({ id, url }) => id === 'THREAD1' && url === undefined));
+    const malformed = checkUrlWellFormedness(merged);
+    assert.ok(malformed.some(({ sourceId }) => sourceId === 'THREAD1'));
+  });
+
+  it('collects URLs linkified from summary text but not plain-text quotes', () => {
+    const merged = collectUrlRecords([
+      {
+        id: 'R1',
+        url: 'https://example.com/source',
+        summary: 'Compare https://example.com/summary with the source.',
+        quote: 'See https://example.net/quoted and https://example.com/summary',
+      },
+    ], {});
+    assert.deepEqual(
+      merged.map(({ url }) => url).sort(),
+      [
+        'https://example.com/source',
+        'https://example.com/summary',
+      ]
+    );
+  });
+
+  it('checks canonical bsky.app outbound URLs rather than the broken embed host', () => {
+    const merged = collectUrlRecords([
+      { id: 'R1', url: 'https://bsky.app/profile/jayrosen.bsky.social/post/abc' },
+    ], {});
+    assert.equal(merged[0].url, 'https://bsky.app/profile/jayrosen.bsky.social/post/abc');
+    assert.doesNotMatch(merged[0].url, /embed\.bsky\.app/);
+  });
 });
 
 describe('buildUrlSourceMap', () => {
@@ -226,5 +287,67 @@ describe('buildUrlSourceMap', () => {
     const map = buildUrlSourceMap(urlRecords);
     assert.equal(map.size, 1);
     assert.deepEqual(map.get('https://e.com/x'), ['R1', 'R2']);
+  });
+});
+
+describe('collectFeaturedUrls (FEATURED_WORKS image + link hotlinks, issue #479)', () => {
+  it('emits an { id, url } pair per image and link, tagging the field; a missing field is a null pair', () => {
+    const works = [
+      { id: 'feat-1', image: 'https://images.unsplash.com/photo-1', link: 'https://pressthink.org/a' },
+      { id: 'feat-2', image: 'https://images.unsplash.com/photo-2' } // no link -> a null link pair, not skipped
+    ];
+    const pairs = collectFeaturedUrls(works).map((p) => `${p.id} ${p.url}`).sort();
+    assert.deepEqual(pairs, [
+      'feat-1 (image) https://images.unsplash.com/photo-1',
+      'feat-1 (link) https://pressthink.org/a',
+      'feat-2 (image) https://images.unsplash.com/photo-2',
+      'feat-2 (link) null'
+    ]);
+  });
+
+  it('emits a null-url pair for a missing or null field (FeaturedSection renders it directly) so the check can fail it', () => {
+    const works = [{ id: 'feat-1', image: 'https://images.unsplash.com/p', link: null }];
+    const pairs = collectFeaturedUrls(works);
+    assert.equal(pairs.length, 2);
+    const linkPair = pairs.find((p) => p.id === 'feat-1 (link)');
+    assert.equal(linkPair.url, null);
+  });
+
+  it('handles an empty or absent list', () => {
+    assert.deepEqual(collectFeaturedUrls([]), []);
+    assert.deepEqual(collectFeaturedUrls(undefined), []);
+  });
+});
+
+describe('checkFeaturedUrlWellFormedness', () => {
+  it('passes absolute http(s) hotlinks and flags anything else', () => {
+    const featuredUrls = [
+      { id: 'feat-1 (image)', url: 'https://images.unsplash.com/photo-1' }, // ok
+      { id: 'feat-2 (image)', url: '/relative/path' }, // site-local route is not a valid hotlink
+      { id: 'feat-3 (link)', url: '' }, // empty
+      { id: 'feat-4 (image)', url: 'not a url' } // malformed
+    ];
+    const findings = checkFeaturedUrlWellFormedness(featuredUrls);
+    const flagged = findings.map((f) => f.sourceId).sort();
+    assert.deepEqual(flagged, ['feat-2 (image)', 'feat-3 (link)', 'feat-4 (image)']);
+    assert.ok(findings.every((f) => f.failureType === 'malformed_featured_url'));
+  });
+
+  it('flags a missing required field (null url) so a broken launch card cannot ship green', () => {
+    const featuredUrls = [
+      { id: 'feat-1 (image)', url: 'https://images.unsplash.com/p' }, // ok
+      { id: 'feat-2 (link)', url: null } // missing required field -> FeaturedSection would render href=undefined
+    ];
+    const findings = checkFeaturedUrlWellFormedness(featuredUrls);
+    assert.equal(findings.length, 1);
+    assert.equal(findings[0].sourceId, 'feat-2 (link)');
+    assert.equal(findings[0].failureType, 'malformed_featured_url');
+    assert.equal(findings[0].target, null);
+    assert.match(findings[0].detail, /missing a required/);
+  });
+
+  it('returns no findings for an all-clean set', () => {
+    const featuredUrls = [{ id: 'feat-1 (image)', url: 'https://images.unsplash.com/photo' }];
+    assert.deepEqual(checkFeaturedUrlWellFormedness(featuredUrls), []);
   });
 });

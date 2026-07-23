@@ -1,20 +1,18 @@
-# Jay Rosen Internet Archive: handoff package
+# Jay Rosen's Internet Archive: handoff package
 
 **For**: Jay Rosen, Hali Rosen, and any future operator picking up this archive after Joe Amditis steps back.
 
 **About this doc**: the operational reference for keeping the archive alive and useful. Who maintains what, what to do when something breaks, when each piece is expected to need attention, and how to escalate if it's beyond your comfort zone.
 
-**Last updated**: 2026-05-25
+**Last updated**: 2026-07-21
 
-> **Architecture assumption**: this doc describes the post-handoff state, which assumes Pillar 3a (Apps Script → GitHub App → GitHub Action ingestion, designed in `docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md`) is deployed and the era taxonomy normalization (PR #218) is merged. **Until Pillar 3a is built**, the live system is still Pillar 3: Apps Script POSTs to a Flask submission server running on houseofjawn, with credentials wired via `SUBMISSION_URL` / `SUBMISSION_TOKEN`. The day-to-day failure modes and recovery steps in this doc only apply once Pillar 3a is in production — if a problem hits before then, see `automation/SETUP.md` for the current (Pillar 3) operational guide.
-
-> **Legacy submission limit**: while the Flask submission server is in use, `/submit` is rate-limited by client IP and supplied token. Defaults are 5 submissions per minute and 30 submissions per hour. Override only if Jay's real submission volume needs it with `SUBMISSION_RATE_LIMIT_PER_MINUTE` and `SUBMISSION_RATE_LIMIT_PER_HOUR`.
+> **Architecture status**: Pillar 3a is the only supported submission design: Apps Script → GitHub App → GitHub Action ingestion, as specified in `docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md`. The earlier Flask service was never deployed and has been removed. Until the GitHub App and repository credentials are configured, records use the manual path in [`ADDING-RECORDS.md`](../ADDING-RECORDS.md); there is no Flask fallback.
 
 ---
 
 ## TL;DR for Jay
 
-If you only read one paragraph: the archive is at `pressthink.org/j/rosen-archive/`. You add new content by ticking a checkbox in a Google Sheet — full instructions are in [`JAY_ADDING_RECORDS.md`](JAY_ADDING_RECORDS.md). If something looks wrong on the live archive, ask Hali first; if Hali isn't available and it's urgent, email Joe at `jamditis@gmail.com`. The archive runs at $0/mo after Joe steps back — no monthly bills will land on you.
+If you only read one paragraph: the archive is at `pressthink.org/j/rosen-archive/`. Once the GitHub App and repository credentials are configured, you add new content by ticking a checkbox in a Google Sheet — full instructions are in [`JAY_ADDING_RECORDS.md`](JAY_ADDING_RECORDS.md). Until then, use the manual path in [`ADDING-RECORDS.md`](../ADDING-RECORDS.md). If something looks wrong on the live archive, ask Hali first; if Hali isn't available and it's urgent, email Joe at `jamditis@gmail.com`. The archive runs at $0/mo after Joe steps back — no monthly bills will land on you.
 
 ---
 
@@ -83,7 +81,7 @@ If you only read one paragraph: the archive is at `pressthink.org/j/rosen-archiv
 ### GitHub Action fails on every submission
 
 1. Most common cause: a repo secret expired or got rotated
-2. Check repo Settings → Secrets and variables → Actions. Required secrets (names match `backend/submission_server/sheets_callback.py` and `sftp_push.py`):
+2. Check repo Settings → Secrets and variables → Actions. Required secrets (names match `backend/submission_runtime/sheets_callback.py` and `sftp_push.py`):
    - `ROSEN_SFTP_HOST`, `ROSEN_SFTP_USER`, `ROSEN_SFTP_REMOTE_PATH`, `ROSEN_SFTP_KNOWN_HOSTS` (Bluehost endpoint info)
    - one of: `ROSEN_SFTP_PASSWORD` (password auth) OR `ROSEN_SFTP_KEY_PATH` (private-key file, preferred)
    - optional: `ROSEN_SFTP_KEY_PASSPHRASE` (only when the private key is encrypted)
@@ -123,9 +121,8 @@ Estimated total time: ~2 hours, all one-time. Best done with Joe on a call or in
 4. **GCP project + service account migration**: if Jay or Hali has a Google Workspace account (university, paid Workspace), create a fresh GCP project under that account. Enable Sheets API. Create a service account. Download JSON. Update `SHEETS_SA_KEY` repo secret. Share the queue Sheet with the new service account's email (Editor). **If only personal Gmail accounts are available**, this still works but be aware: Google deletes personal accounts after 2 years of inactivity (Dec 2023 policy onward), taking the GCP project with them. Workspace accounts are exempt.
 5. **Gemini API key swap**: Jay or Hali generates their own Gemini API key from `aistudio.google.com`. Update `GEMINI_API_KEY` repo secret.
 6. **SFTP credentials sync**: confirm current Bluehost SFTP creds match `ROSEN_SFTP_*` repo secrets. Rotate if stale.
-7. **Decommission Pillar 3 (houseofjawn)**: Joe runs `sudo systemctl disable --now rosen-submission` on houseofjawn. Removes the Cloudflare tunnel entry for `rosen-submit.amditis.tech`. Deletes the DNS record. (Only matters if Pillar 3 was ever deployed — currently blocked on Joe per task #31.)
 
-After step 7, nothing on Joe's machines, accounts, or domains is in the archive's critical path.
+After step 6, nothing on Joe's machines, accounts, or domains is in the archive's critical path.
 
 ---
 
@@ -136,8 +133,7 @@ Joe disengages on a soft timeline driven by Jay's pace, not a fixed date. The ex
 1. **Now → Wednesday May 27 demo call**: Joe walks Jay through the live system, addresses any concerns, gets Jay's sign-off.
 2. **May 27 → ~30 days**: parallel-run period. Joe stays available for quick fixes; Hali starts handling everyday operator questions. Any architectural feedback from Jay lands in this window.
 3. **~30 days post-call**: handoff steps 1-6 above execute. Joe transfers repo to Jay/Hali; everything else recreates.
-4. **~60 days post-call**: handoff step 7 (decommission houseofjawn dependencies) if Pillar 3 deploy ever happened.
-5. **Steady state**: archive runs unattended. Hali is the day-to-day operator. Joe is available for "the world has changed" calls but not "Column F says error" calls.
+4. **Steady state**: archive runs unattended. Hali is the day-to-day operator. Joe is available for "the world has changed" calls but not "Column F says error" calls.
 
 This timeline is intentionally not a contract — slide it later or earlier based on Jay's comfort.
 
@@ -147,7 +143,7 @@ This timeline is intentionally not a contract — slide it later or earlier base
 
 This handoff doc does NOT cover:
 
-- **Pillar 3a operational details** beyond the framework above — those live in the design spec at `docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md` (which lands in this repo when PR #214 merges) and the eventual implementation. When Pillar 3a is implemented, update the relevant sections of this doc (the "Failure modes" section especially).
+- **Detailed Pillar 3a setup and smoke testing** — those live in `docs/setup/pillar-3a-runbook.md`; the failure modes above cover steady-state operation.
 - **Hand-editing records via PR** — that's the normal GitHub PR workflow; if Hali isn't comfortable with PRs yet, ask Joe for a 30-min walkthrough during the parallel-run period.
 - **Adding new categorization themes / eras** — the existing 8 canonical eras and 6 categories (in `data/SCHEMA.md`, established by PR #218) cover Jay's existing work. Adding new ones is a separate scope decision that needs Jay's editorial judgment + a PR.
 - **What to do if Bluehost goes away or rates rise unacceptably** — that's a "redesign X" conversation; call Joe.

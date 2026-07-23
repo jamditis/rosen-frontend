@@ -1,6 +1,6 @@
 # Adding new records to the archive
 
-This guide explains how to add new articles, essays, or posts from 2026 onward to the Jay Rosen Internet Archive.
+This guide explains how to add new articles, essays, or posts from 2026 onward to Jay Rosen's Internet Archive.
 
 ---
 
@@ -43,7 +43,7 @@ Add a new row at the **bottom** of the file. The most important columns are:
 
 | Column | What to put |
 |--------|-------------|
-| `id` | Next available ID — currently `RECORD-00902` (the current max is `RECORD-00901`). Always go one past the current max; don't fill gaps. |
+| `id` | Next available ID — one past the current max in the file (as of 2026-07-23 the max is `RECORD-00905`, so the next is `RECORD-00906`). Always check the bottom of the file for the real current max; don't fill gaps. |
 | `title` | Title of the article or post |
 | `url` | Link to the original |
 | `author` | `Jay Rosen` |
@@ -72,7 +72,7 @@ You can combine them: `Press & Media Criticism, Politics & Democracy`
 ### Example row (what a new 2026 PressThink post looks like)
 
 ```
-RECORD-00902,The Citizens' Agenda in 2026,https://pressthink.org/2026/03/citizens-agenda-2026/,Jay Rosen,2026-03-15,PressThink,PressThink,,Article,text,,,,Summary of the post goes here.,,Press & Media Criticism,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,,,,,,,,,,TRUE,
+RECORD-00906,The Citizens' Agenda in 2026,https://pressthink.org/2026/03/citizens-agenda-2026/,Jay Rosen,2026-03-15,PressThink,PressThink,,Article,text,,,,Summary of the post goes here.,,Press & Media Criticism,,Platform Transition & Future Models (2021-Present),Commentary/Critique,,,,,,,,,,,TRUE,
 ```
 
 ---
@@ -112,7 +112,7 @@ The site will show the new records immediately — no cache clearing needed.
 
 ## Adding social posts (Bluesky, Twitter)
 
-If you want to add posts from Jay's Bluesky account after retirement, use `data/social_posts.csv` instead. The columns are similar, but the `id` field uses a `BSKY-` prefix. The current max BSKY id is `BSKY-03121`, so the next ID is `BSKY-03122`. The `content_type` should be `Social Media Post`.
+If you want to add posts from Jay's Bluesky account after retirement, use `data/social_posts.csv` instead. The columns are similar, but the `id` field uses a `BSKY-` prefix — again, go one past the current max in the file (as of 2026-07-23 the max is `BSKY-03172`, so the next is `BSKY-03173`). The `content_type` should be `Social Media Post`.
 
 That file doesn't need to be updated as often — articles and essays are more important for the archive.
 
@@ -132,10 +132,10 @@ It has two columns: `record_id` and `authored_excerpt`. Add one row per post you
 
 ```
 record_id,authored_excerpt
-RECORD-00902,The summary you want readers to see for this post.
+RECORD-00906,The summary you want readers to see for this post.
 ```
 
-- The `record_id` is the `id` of the row in `data/archive_records-public.csv` (for example `RECORD-00902`), or a `BSKY-` id for a social post.
+- The `record_id` is the `id` of the row in `data/archive_records-public.csv` (for example `RECORD-00906`), or a `BSKY-` id for a social post.
 - When a record has an authored excerpt, the archive shows it instead of the auto-generated summary.
 - Leave a post out of this file, or leave its `authored_excerpt` blank, and the archive keeps its existing summary behavior. Nothing else changes.
 

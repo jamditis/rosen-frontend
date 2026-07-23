@@ -1,6 +1,6 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { html } from '../html.js?v=3.4.7';
+import { html } from '../html.js?v=3.8.5';
 import { X, FileText, Quote, BookOpen, Lightbulb, User } from 'lucide-react';
 
 // Type labels for display
@@ -10,15 +10,17 @@ const TYPE_LABELS = {
   part: 'Part',
   chapter: 'Chapter',
   conclusion: 'Conclusion',
-  concept: 'Key Concept',
-  figure: 'Key Figure'
+  concept: 'Key concept',
+  figure: 'Key figure'
 };
 
-const DetailPanel = ({ node, isOpen, onClose }) => {
+const DetailPanel = ({ node, isOpen, onClose, contained = false }) => {
   // Keep the last node data so panel can animate out with content
   const [displayNode, setDisplayNode] = useState(node);
   const panelRef = useRef(null);
   const closeButtonRef = useRef(null);
+  const returnFocusRef = useRef(null);
+  const wasOpenRef = useRef(false);
 
   useEffect(() => {
     if (node) {
@@ -29,13 +31,34 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
 
   // Focus management: focus close button when panel opens
   useEffect(() => {
-    if (isOpen && closeButtonRef.current) {
-      // Small delay to ensure animation has started
-      setTimeout(() => {
-        closeButtonRef.current?.focus();
-      }, 100);
+    if (isOpen) {
+      if (!wasOpenRef.current) returnFocusRef.current = document.activeElement;
+      wasOpenRef.current = true;
+      if (!displayNode) return undefined;
+      const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      let frame = null;
+      let timer = null;
+      const focusClose = () => {
+        if (contained) panelRef.current?.scrollIntoView({ block: 'start' });
+        closeButtonRef.current?.focus({ preventScroll: contained });
+      };
+      if (reduceMotion) frame = requestAnimationFrame(focusClose);
+      else timer = setTimeout(focusClose, 100);
+      return () => {
+        if (frame !== null) cancelAnimationFrame(frame);
+        if (timer !== null) clearTimeout(timer);
+      };
     }
-  }, [isOpen]);
+
+    if (wasOpenRef.current) {
+      wasOpenRef.current = false;
+      const trigger = returnFocusRef.current;
+      returnFocusRef.current = null;
+      requestAnimationFrame(() => trigger?.focus?.({ preventScroll: true }));
+    }
+
+    return undefined;
+  }, [isOpen, displayNode, contained]);
 
   // Handle ESC key to close panel
   useEffect(() => {
@@ -54,10 +77,13 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
   // Don't render anything if we've never had a node
   if (!displayNode) return null;
 
+  const positionClass = contained ? 'absolute' : 'fixed';
+
   return html`
     ${isOpen && html`
       <div
-        className="fixed inset-0 bg-black/20 z-40 sm:hidden"
+        className=${`${positionClass} inset-0 bg-black/20 z-40 sm:hidden`}
+        style=${{ zIndex: 70 }}
         onClick=${onClose}
       />
     `}
@@ -65,41 +91,50 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
     <div
       ref=${panelRef}
       role="dialog"
-      aria-modal="true"
+      aria-hidden=${isOpen ? undefined : 'true'}
+      inert=${isOpen ? undefined : ''}
       aria-labelledby="detail-panel-title"
       className=${`
-        fixed top-0 h-full w-full sm:w-[420px] bg-white border-l border-stone-200
+        archive-detail-panel archive-reading-panel ${contained ? 'is-contained' : ''} ${positionClass} top-0 h-full w-full sm:w-[420px]
         shadow-xl z-50 transform transition-transform duration-300 ease-out
         ${isOpen ? 'right-0' : '-right-full sm:-right-[420px]'}
       `}
-      style=${{ maxWidth: 'calc(100vw - 16px)' }}
+      style=${{
+        maxWidth: contained ? 'calc(100% - 16px)' : 'calc(100vw - 16px)',
+        zIndex: 80,
+      }}
     >
-      <div className="sticky top-0 bg-white border-b border-stone-200 px-4 sm:px-6 py-4 flex items-center justify-between">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400">
+      <header className="archive-reading-panel__header">
+        <span>
           ${TYPE_LABELS[displayNode.type] || 'Section'}
         </span>
         <button
+          type="button"
           ref=${closeButtonRef}
           onClick=${onClose}
-          className="p-2.5 sm:p-1.5 hover:bg-stone-100 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-stone-400 focus:ring-offset-2"
+          className="archive-reading-panel__close"
           title="Close panel (ESC)"
           aria-label="Close detail panel"
         >
           <${X} className="w-5 h-5 text-stone-500" />
         </button>
-      </div>
+      </header>
 
-      <div className="pl-4 pr-6 sm:pl-6 sm:pr-8 py-6 overflow-y-auto overflow-x-hidden h-[calc(100%-64px)]">
-        <h2 id="detail-panel-title" className="font-display text-xl font-bold text-stone-900 leading-tight mb-2 break-words">
+      <div
+        className="archive-detail-content archive-reading-panel__document"
+        tabIndex="0"
+        aria-label="Detail panel content"
+      >
+        <h2 id="detail-panel-title">
           ${displayNode.label}
         </h2>
 
         ${displayNode.subtitle && html`
-          <p className="text-stone-600 text-sm mb-4 break-words">${displayNode.subtitle}</p>
+          <p className="archive-reading-panel__subtitle">${displayNode.subtitle}</p>
         `}
 
         ${(displayNode.pageStart || displayNode.pageRef) && html`
-          <div className="flex items-center gap-2 text-xs text-stone-400 mb-6 font-mono">
+          <div className="archive-reading-panel__page-reference">
             <${FileText} className="w-3.5 h-3.5" />
             <span>
               ${displayNode.pageRef || `Pages ${displayNode.pageStart}${displayNode.pageEnd ? `–${displayNode.pageEnd}` : '+'}`}
@@ -108,71 +143,71 @@ const DetailPanel = ({ node, isOpen, onClose }) => {
         `}
 
         ${displayNode.pullQuote && html`
-          <div className="mb-6">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-2">
+          <section className="archive-reading-panel__section">
+            <h3>
               <${Quote} className="w-3.5 h-3.5" />
               <span>From the text</span>
-            </div>
-            <blockquote className="border-l-2 border-amber-300 pl-4 italic text-stone-700 text-sm leading-relaxed break-words">
-              "${displayNode.pullQuote}"
+            </h3>
+            <blockquote>
+              “${displayNode.pullQuote}”
             </blockquote>
-          </div>
+          </section>
         `}
 
         ${displayNode.summary && html`
-          <div className="mb-6">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-2">
+          <section className="archive-reading-panel__section">
+            <h3>
               <${BookOpen} className="w-3.5 h-3.5" />
               <span>Summary</span>
-            </div>
-            <p className="text-stone-600 text-sm leading-relaxed break-words">
+            </h3>
+            <p>
               ${displayNode.summary}
             </p>
-          </div>
+          </section>
         `}
 
         ${displayNode.keyConcepts && displayNode.keyConcepts.length > 0 && html`
-          <div className="mb-6">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-2">
+          <section className="archive-reading-panel__section">
+            <h3>
               <${Lightbulb} className="w-3.5 h-3.5" />
-              <span>Key Concepts</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
+              <span>Key concepts</span>
+            </h3>
+            <div className="archive-reading-panel__tags">
               ${displayNode.keyConcepts.map((concept, i) => html`
                 <span
                   key=${i}
-                  className="text-xs bg-violet-50 text-violet-800 px-2 py-1 border border-violet-200"
+                  className="archive-reading-panel__tag"
                 >
                   ${concept}
                 </span>
               `)}
             </div>
-          </div>
+          </section>
         `}
 
         ${displayNode.keyFigures && displayNode.keyFigures.length > 0 && html`
-          <div className="mb-6">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-stone-400 mb-2">
+          <section className="archive-reading-panel__section">
+            <h3>
               <${User} className="w-3.5 h-3.5" />
-              <span>Key Figures</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
+              <span>Key figures</span>
+            </h3>
+            <div className="archive-reading-panel__tags">
               ${displayNode.keyFigures.map((figure, i) => html`
                 <span
                   key=${i}
-                  className="text-xs bg-green-50 text-green-800 px-2 py-1 border border-green-200"
+                  className="archive-reading-panel__tag"
                 >
                   ${figure}
                 </span>
               `)}
             </div>
-          </div>
+          </section>
         `}
 
         ${!displayNode.summary && !displayNode.pullQuote && !displayNode.keyConcepts?.length && !displayNode.keyFigures?.length && html`
-          <div className="text-center py-8 text-stone-400">
+          <div className="archive-reading-panel__empty">
             <${FileText} className="w-8 h-8 mx-auto mb-2 opacity-30" />
-            <p className="text-sm">Detailed content coming soon</p>
+            <p className="text-sm">No additional detail for this item</p>
           </div>
         `}
       </div>

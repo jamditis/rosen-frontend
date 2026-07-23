@@ -2,9 +2,10 @@
 // Stamp the canonical archive version across every cache-busting marker (#282).
 //
 // version.json `version` is the single source of truth. This rewrites every
-// `?v=<x.y.z>` import marker in index.html + frontend/**/*.js and the static-asset
-// cache name in frontend/sw.js to match it, then runs the version-consistency
-// test as the guardrail. It replaces the manual multi-file edit that the
+// `?v=<x.y.z>` marker in the root app, FAQ, dissertation, and standalone
+// feature browser files, plus the static-asset cache name in frontend/sw.js,
+// then runs the version-consistency test as the guardrail. It replaces the
+// manual multi-file edit that the
 // version-consistency test only catches after the fact.
 //
 // frontend/services/cacheConfig.js holds a separate CACHE_VERSION (the data cache,
@@ -30,22 +31,30 @@ const VERSION_MARKER = /\?v=\d+\.\d+\.\d+/g;
 // rewritten, and only in sw.js (cacheConfig.js's non-semver 'v9' never matches).
 const SW_CACHE_VERSION = /(const CACHE_VERSION\s*=\s*['"])\d+\.\d+\.\d+(['"])/;
 
-// Collect index.html + every .js under frontend/, skipping build output (dist/)
-// and dependencies (node_modules/) — the same surface the version-consistency
-// test scans, so the two cannot disagree about which files carry a version.
+// Collect the root entry point and every browser JavaScript, HTML, and CSS file
+// in the app and standalone-page trees. This is the same surface the
+// version-consistency test scans, so the guardrail and bumper cannot disagree.
+// Walking features/ and dissertation/ (rather than naming today's standalone
+// pages) ensures additions automatically join the version-bump surface.
 export function collectVersionedFiles(rootDir) {
   const files = [path.join(rootDir, 'index.html')];
-  const walk = (dir) => {
+  const walk = (dir, extensions) => {
+    // A versioned root may be absent (e.g. a fixture tree with no faq/, or a
+    // checkout without frontend/); skip it rather than throwing ENOENT.
+    if (!fs.existsSync(dir)) return;
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const full = path.join(dir, entry.name);
       if (entry.isDirectory()) {
-        if (entry.name !== 'dist' && entry.name !== 'node_modules') walk(full);
-      } else if (entry.name.endsWith('.js')) {
+        if (entry.name !== 'dist' && entry.name !== 'node_modules') walk(full, extensions);
+      } else if (extensions.some((extension) => entry.name.endsWith(extension))) {
         files.push(full);
       }
     }
   };
-  walk(path.join(rootDir, 'frontend'));
+  walk(path.join(rootDir, 'frontend'), ['.html', '.js', '.css']);
+  walk(path.join(rootDir, 'faq'), ['.html', '.js', '.css']);
+  walk(path.join(rootDir, 'features'), ['.html', '.js', '.css']);
+  walk(path.join(rootDir, 'dissertation'), ['.html', '.js', '.css']);
   return files;
 }
 

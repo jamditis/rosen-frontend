@@ -3,9 +3,9 @@ type: test
 title: OKF blindfold test
 description: Scenario-based navigation test for whether a new contributor can answer project questions starting only from the OKF root index.
 source: ["scripts/okf-blindfold-test.js", "wiki/meta/blindfold-scenarios.json"]
-verified: 2026-06-23
+verified: 2026-07-21
 tags: [okf, test, navigation, onboarding]
-timestamp: 2026-06-23
+timestamp: 2026-07-21
 ---
 
 # OKF blindfold test
@@ -63,11 +63,11 @@ npm run okf:blindfold
 
 **Status:** pass
 
-**Expected files:** [systems/submission-server.md](../systems/submission-server.md), [systems/data-pipeline.md](../systems/data-pipeline.md), [systems/deploy-and-hosting.md](../systems/deploy-and-hosting.md), [data/data-quality-gaps.md](../data/data-quality-gaps.md)
+**Expected files:** [systems/submission-automation.md](../systems/submission-automation.md), [systems/data-pipeline.md](../systems/data-pipeline.md), [systems/deploy-and-hosting.md](../systems/deploy-and-hosting.md), [data/data-quality-gaps.md](../data/data-quality-gaps.md)
 
 **Required terms:** `node data/export-archive-data.js`, `submit-record.yml`, `SFTP`
 
-**Rubric:** A useful answer distinguishes the Flask submission path from the sheet-driven workflow, then names export and deploy constraints.
+**Rubric:** A useful answer names the sheet-driven workflow as the supported path, then identifies its export and deploy constraints.
 
 **Failures:** none
 

@@ -21,9 +21,9 @@ async function suppressWelcome(page) {
 // Open the record modal by clicking the first record card (JS-dispatched click,
 // so any leftover overlay can't intercept it). Returns the open id.
 async function openFirstCard(page) {
-  await page.waitForSelector('.break-inside-avoid', { timeout: 15000 });
+  await page.waitForSelector('.archive-record-card__body', { timeout: 15000 });
   await page.evaluate(() => {
-    document.querySelector('.break-inside-avoid')
+    document.querySelector('.archive-record-card__body')
       ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   });
   await page.waitForSelector('[role="dialog"][aria-modal="true"]', { timeout: 10000 });
@@ -37,7 +37,7 @@ async function openFirstCard(page) {
 
 // Pick a real RECORD- id from the loaded card list.
 async function pickRealRecordId(page) {
-  await page.waitForSelector('.break-inside-avoid', { timeout: 15000 });
+  await page.waitForSelector('.archive-record-card__body', { timeout: 15000 });
   return page.evaluate(() => {
     // The card click handler captures item.id; we can't read it from DOM, so
     // open the first card briefly via the URL after a click is not ideal.
@@ -188,7 +188,7 @@ const main = async () => {
         await sleep(700);
         const after = await page.evaluate((label) => ({
           dialogGone: !document.querySelector('[role="dialog"][aria-modal="true"]'),
-          recordsLine: ([...document.querySelectorAll('*')].map(e => e.textContent).find(t => /records found/.test(t)) || '').match(/[\d,]+ records found/)?.[0],
+          recordsLine: document.querySelector('.archive-results-count')?.textContent?.trim() || '',
           // active filter chip text present in sidebar/header
           bodyHasCat: document.body.textContent.includes(label),
         }), chip.catLabel);
@@ -316,7 +316,7 @@ const main = async () => {
         ok09 ? 'pass' : 'fail',
         ok09 ? '' : `readOn=${JSON.stringify(link.readOn)} anyJsHref=${link.anyJsHref}`,
         ok09 ? '' : 'high',
-        `"Read on" link: ${JSON.stringify(link.readOn)} (sanitizeHref + bsky->embed rewrite applied; target=_blank rel=noreferrer). SMELL REFUTED for the stated javascript: risk: utils/linkify.js splitUrlsForLinkify only matches https?:// URLs, so a "javascript:" token in summary text is rendered as PLAIN TEXT, never an <a href>. The summary linkify does bypass sanitizeHref, but it can only ever emit http/https hrefs, which are already safe — there is no live-javascript-href path through summary text. No js: href found in modal (${noLiveJs}).`);
+        `"Read on" link: ${JSON.stringify(link.readOn)} (stored URL passed directly through sanitizeHref; target=_blank rel=noreferrer). SMELL REFUTED for the stated javascript: risk: utils/linkify.js splitUrlsForLinkify only matches https?:// URLs, so a "javascript:" token in summary text is rendered as plain text, never an <a href>. The summary linkify does bypass sanitizeHref, but it can only ever emit http/https hrefs, which are already safe; no live-javascript-href path through summary text. No js: href found in modal (${noLiveJs}).`);
     } catch (e) {
       note('MODAL-09', 'fail', 'read-on link test error: ' + e.message, 'high');
     }
@@ -461,7 +461,8 @@ const main = async () => {
             firstBskyHref: blueskyLinks[0]?.getAttribute('href') || null,
             bskyTarget: blueskyLinks[0]?.getAttribute('target'),
             bskyRel: blueskyLinks[0]?.getAttribute('rel'),
-            embedRewrite: blueskyLinks.some(a => /embed\.bsky\.app/.test(a.getAttribute('href') || '')),
+            embedHostSeen: blueskyLinks.some(a => /embed\.bsky\.app/.test(a.getAttribute('href') || '')),
+            bskyAppSeen: blueskyLinks.some(a => /\/\/bsky\.app/.test(a.getAttribute('href') || '')),
             anyJs: blueskyLinks.some(a => /^\s*javascript:/i.test(a.getAttribute('href') || '')),
           };
         });
@@ -472,12 +473,12 @@ const main = async () => {
           ok13 ? '' : 'high',
           `Thread ${threadId}: viewer=${th.hasViewer} stats(posts/levels/Bluesky)=${th.hasStats}. Smell CONFIRMED: ThreadModal ships its own stateful-regex linkify (urlPattern.test with manual lastIndex reset — the exact bug class utils/linkify.js exists to avoid) and keeps a console.log diagnostic (ThreadModal.js:107). Functional here but a maintenance/latent-bug smell.`);
 
-        const ok14 = th.firstBskyHref && th.bskyTarget === '_blank' && /noopener/.test(th.bskyRel || '') && !th.anyJs;
+        const ok14 = th.firstBskyHref && th.bskyAppSeen && !th.embedHostSeen && th.bskyTarget === '_blank' && /noopener/.test(th.bskyRel || '') && !th.anyJs;
         note('MODAL-14',
           ok14 ? 'pass' : (th.firstBskyHref ? 'partial' : 'fail'),
-          ok14 ? '' : `bsky link: href=${th.firstBskyHref} target=${th.bskyTarget} rel=${th.bskyRel} anyJs=${th.anyJs}`,
+          ok14 ? '' : `bsky link: href=${th.firstBskyHref} target=${th.bskyTarget} rel=${th.bskyRel} embedHostSeen=${th.embedHostSeen} anyJs=${th.anyJs}`,
           ok14 ? '' : 'medium',
-          `"View on Bluesky" href="${th.firstBskyHref}", target=${th.bskyTarget}, rel=${th.bskyRel}, embed-rewrite-seen=${th.embedRewrite}, js-scheme=${th.anyJs}. sanitizeHref(toEmbedUrl(url)) applied per ThreadModal.js:84.`);
+          `"View on Bluesky" href="${th.firstBskyHref}", target=${th.bskyTarget}, rel=${th.bskyRel}, bsky-app-seen=${th.bskyAppSeen}, embed-host-seen=${th.embedHostSeen}, js-scheme=${th.anyJs}. sanitizeHref(post.url) applied in ThreadModal.`);
         await page.keyboard.press('Escape');
         await sleep(400);
       } else {

@@ -7,15 +7,14 @@ writes status back) is written in code but was never stood up: no secrets were
 set, the GitHub App key was never on disk, and the queue sheet had no submission
 tab. This file tracks what is done and what is left. The full install procedure
 is in `docs/setup/pillar-3a-runbook.md` (the Pillar 3a runbook); this is the
-current-state delta. `automation/SETUP.md` is the superseded Pillar 3 setup
-(Flask submission server + Cloudflare tunnel) and does not describe this flow.
+current-state delta.
 
 ## Deploy reality: no SFTP
 
 pressthink.org has no FTP/SFTP access. Files go live through the WordPress
 file-explorer plugin (manual upload), not a server account. So:
 
-- Leave every `ROSEN_SFTP_*` secret **unset**. `backend/submission_server/sftp_push.py`
+- Leave every `ROSEN_SFTP_*` secret **unset**. `backend/submission_runtime/sftp_push.py`
   returns a successful no-op when they are missing (`{ok: true, skipped: true}`),
   so the run stays green.
 - A processed row is written back as **`archived`**, not `live`
@@ -23,7 +22,7 @@ file-explorer plugin (manual upload), not a server account. So:
   committed to `main` but not pushed to the live site.
 - Go-live stays manual: after a run commits, upload the changed `data/*.json`
   (archive-core, archive-details, archive-entities, archive-data,
-  archive-analytics — the five files `sftp_push.py` pushes; see `DEPLOYMENT.md`
+  archive-analytics, and search-index — the six files `sftp_push.py` pushes; see `DEPLOYMENT.md`
   "Deploy after adding records") through the WP file-explorer plugin. The
   automation still does the slow part (scrape, categorize, regen); only the
   upload is manual.

@@ -4,10 +4,10 @@
 
 Invoked from `.github/workflows/deploy.yml` on workflow_dispatch. Walks the
 hardcoded manifest below, uploads every file via paramiko SFTP with an
-atomic .tmp+posix_rename, and aborts on the first transfer failure (a
-partial deploy is worse than no deploy — half the page would resolve to
-v3.4.0 imports while the other half stayed on v3.3.0, pinning visitors
-into a broken half-updated state).
+atomic .tmp+posix_rename, then removes explicitly retired remote directories.
+It aborts on the first transfer failure (a partial deploy is worse than no
+deploy — half the page would resolve to v3.4.0 imports while the other half
+stayed on v3.3.0, pinning visitors into a broken half-updated state).
 
 Two distinct env vars on purpose:
   - ROSEN_SFTP_REMOTE_PATH → the per-record `submit-record.yml` data dir
@@ -16,6 +16,12 @@ Two distinct env vars on purpose:
     (.../j/rosen-archive)
 Separate names so a misconfigured per-record workflow can't accidentally
 overwrite anything outside data/.
+
+SFTP key auth shares sftp_push.py's precedence (key over password). In GitHub
+Actions ROSEN_SFTP_KEY_PATH is not a secret: deploy.yml's "Materialize SFTP
+private key" step writes the ROSEN_SFTP_KEY_CONTENT secret to a 0600 runner-temp
+file and exports ROSEN_SFTP_KEY_PATH, so there is no ROSEN_SFTP_KEY_PATH secret
+to look for.
 
 Manifest mirrors DEPLOYMENT.md "Files to deploy". A pytest checks both
 directions: every entry must exist on disk, and DEPLOYMENT.md's top-level
@@ -33,8 +39,10 @@ Exit codes:
 from __future__ import annotations
 
 import argparse
+import errno
 import logging
 import os
+import stat
 import sys
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
@@ -45,6 +53,15 @@ logging.basicConfig(
 )
 logger = logging.getLogger('deploy_full_site')
 
+_BACKEND = Path(__file__).resolve().parents[1]
+if str(_BACKEND) not in sys.path:
+    sys.path.insert(0, str(_BACKEND))
+
+from submission_runtime.record_pages import (  # noqa: E402
+    RECORD_SHELL_RE,
+    generate_record_pages,
+)
+
 
 # ---------- Manifest --------------------------------------------------------
 
@@ -53,23 +70,56 @@ logger = logging.getLogger('deploy_full_site')
 
 _DEPLOY_FILES: Tuple[str, ...] = (
     'index.html',
+    'sw.js',  # root-scope bridge; imports frontend/sw.js
     'favicon.ico',
+    'favicon.svg',  # SVG favicon referenced by index.html, the FAQ, and both data tools
+    'og-image.png',  # social card referenced by the OG/Twitter meta tags
     'shared-styles.css',
     'version.json',
     'metadata.json',
+    '.htaccess',
     'ADDING-RECORDS.md',
+    # Shared Tailwind build for the standalone data tools. It sits at
+    # tools/active/, one level above the two deployed tool dirs, so the dir
+    # walk below never reaches it; both tools load it as ../tailwind.css.
+    # Listed explicitly so a full deploy ships it -- dataexplorer and dataviz
+    # render unstyled without it.
+    'tools/active/tailwind.css',
 )
 
 _DEPLOY_DIRS: Tuple[str, ...] = (
+    'r',  # generated metadata shells for ?record= deep links
     'frontend',
     'dissertation',
+    'faq',
     'dissertation-launch',
     'features/shared',
-    'features/status-report',
+    'features/winer-method',
+    'features/participate',
     'tools/active/dataexplorer',
     'tools/active/dataviz',
     'data/feeds',
 )
+
+# Prune retired pages after all current files upload so a transfer failure
+# cannot remove working pages before the replacement site is in place. Missing
+# directories are treated as already pruned.
+_REMOTE_PRUNE_DIRS: Tuple[str, ...] = (
+    'dissertation/comparison',
+    'dissertation/concepts',
+    'dissertation/context',
+    'dissertation/excerpts',
+    'dissertation/glossary',
+    'dissertation/timeline',
+    'features/status-report',
+)
+
+# features/making-of is intentionally omitted. That page is a draft pending
+# curator sign-off, and its handoff chapter carries approval-gated disclosures,
+# so it is held out of the manifest to keep a routine full-site deploy from
+# publishing it early. On sign-off: add 'features/making-of' here and to
+# DEPLOYMENT.md, and exclude its og-image.html render template (a build-time
+# social card, not a browsable page) via _EXCLUDE_NAMES.
 
 _DEPLOY_DATA_FILES: Tuple[str, ...] = (
     'data/archive-core.json',
@@ -77,8 +127,11 @@ _DEPLOY_DATA_FILES: Tuple[str, ...] = (
     'data/archive-details.json',
     'data/archive-entities.json',
     'data/archive-analytics.json',
+    'data/search-index.json',  # prebuilt MiniSearch full-text index, loaded lazily on first search, issue 276
     'data/wiki-seed.json',
     'data/schema.json',  # data dictionary; linked from the open-data download UI
+    'data/SCHEMA.md',  # human-readable data guide; linked from participation/open-data UI
+    'data/eras.js',  # canonical era taxonomy imported by the frontend
 )
 
 # Walking _DEPLOY_DIRS, prune these.
@@ -104,11 +157,14 @@ _EXCLUDE_SUFFIXES: Tuple[str, ...] = ('.pyc', '.test.js', '.spec.js', '.csv')
 #     files makes the new worker snapshot an all-new tree — that is what its
 #     CACHE_VERSION bump fixes (the #430 stale-deploy class) without trading it
 #     for a stale-HTML pin.
+#   sw.js           — the stable root-scope bridge that imports frontend/sw.js.
+#     It flips after both files it connects so an update can never install from
+#     a half-updated pair.
 #   version.json    — the refresh signal; not precached (served network-first),
 #     so it flips LAST as the least-harmful stale state: a client racing the
 #     final rename pins the old version.json (a missed update nudge) rather than
 #     any asset the worker would cache.
-_ENTRY_POINTS: Tuple[str, ...] = ('index.html', 'frontend/sw.js', 'version.json')
+_ENTRY_POINTS: Tuple[str, ...] = ('index.html', 'frontend/sw.js', 'sw.js', 'version.json')
 
 
 # ---------- Config ----------------------------------------------------------
@@ -116,7 +172,7 @@ _ENTRY_POINTS: Tuple[str, ...] = ('index.html', 'frontend/sw.js', 'version.json'
 def _read_env() -> Optional[Dict[str, Any]]:
     """Return SFTP config from env, or None when required vars are missing.
 
-    Mirrors backend/submission_server/sftp_push.py:_read_env but reads
+    Mirrors backend/submission_runtime/sftp_push.py:_read_env but reads
     ROSEN_SFTP_SITE_PATH (the full-site root) instead of the data-only
     ROSEN_SFTP_REMOTE_PATH.
     """
@@ -168,7 +224,8 @@ def collect_local_files(
     entry_points: Iterable[str] = _ENTRY_POINTS,
 ) -> List[Path]:
     """Walk the manifest and return every file to upload, ordered so that
-    entry-point files (index.html, frontend/sw.js, version.json) come LAST.
+    each HTML entry point follows its dependencies. Generated record shells
+    come after assets/data, followed by the global app entry points LAST.
 
     Skips entries that don't exist on disk (the existence tests catch
     those at PR time — at deploy time we keep going so a missing optional
@@ -177,9 +234,39 @@ def collect_local_files(
     The entry-points-last ordering is the cross-file consistency hinge for
     version-bump deploys: see the _ENTRY_POINTS comment for why.
     """
+    # Normalize iterables because dirs and data_files are each consumed in two
+    # passes. This preserves support for callers that provide generators rather
+    # than tuples.
+    dirs = tuple(dirs)
+    data_files = tuple(data_files)
     files: List[Path] = []
     seen: Set[Path] = set()
-    entry_set = set(entry_points)
+    declared_entry_points = tuple(entry_points)
+    # Every deployed standalone page gets dependency-first semantics without a
+    # second hand-maintained manifest. Directories are walked normally, but
+    # nested index.html files are held until all deployed dirs/data have landed.
+    # This covers dissertation/, faq/, tools/, and features/ uniformly as their
+    # versioned surfaces evolve. Generated r/*.html shells keep their dedicated
+    # ordering below because they depend on the global frontend and archive data.
+    standalone_entry_points = tuple(sorted(
+        path.relative_to(repo_root).as_posix()
+        for relpath in dirs
+        if relpath.rstrip('/') != 'r'
+        for path in (repo_root / relpath).rglob('index.html')
+        if path.is_file()
+    ))
+    record_entry_points = tuple(sorted(
+        path.relative_to(repo_root).as_posix()
+        for relpath in dirs
+        if relpath.rstrip('/') == 'r'
+        for path in (repo_root / relpath).glob('*.html')
+        if path.is_file() and RECORD_SHELL_RE.fullmatch(path.name)
+    ))
+    entry_set = (
+        set(declared_entry_points)
+        | set(standalone_entry_points)
+        | set(record_entry_points)
+    )
 
     def _add(p: Path) -> None:
         rp = p.resolve()
@@ -190,6 +277,16 @@ def collect_local_files(
     # First: every top-level deploy file EXCEPT entry points.
     for relpath in top_files:
         if relpath in entry_set:
+            continue
+        p = repo_root / relpath
+        if p.is_file():
+            _add(p)
+
+    # Shared JavaScript modules under data/ must exist before the frontend files
+    # that import them flip live. Other data files stay after the directory walk
+    # so this only changes ordering for runtime module dependencies.
+    for relpath in data_files:
+        if not relpath.endswith('.js'):
             continue
         p = repo_root / relpath
         if p.is_file():
@@ -217,8 +314,23 @@ def collect_local_files(
         if p.is_file():
             _add(p)
 
-    # LAST: entry points, in the order declared.
-    for relpath in entry_points:
+    # Standalone entry points flip only after every walked dependency and data
+    # file is live. The global app/SW/version entry points retain their declared
+    # absolute-last ordering after the standalone pages.
+    for relpath in standalone_entry_points:
+        p = repo_root / relpath
+        if p.is_file():
+            _add(p)
+
+    # Record shells reference the global frontend and archive data. Flip them
+    # only after those dependencies, but before the root app/SW/version group.
+    for relpath in record_entry_points:
+        p = repo_root / relpath
+        if p.is_file():
+            _add(p)
+
+    # LAST: global entry points, in the order declared.
+    for relpath in declared_entry_points:
         p = repo_root / relpath
         if p.is_file():
             _add(p)
@@ -251,17 +363,85 @@ def _ensure_remote_dir(sftp, remote_dir: str, cache: Set[str]) -> None:
     cache.add(remote_dir)
 
 
+def _remove_remote_tree(sftp, remote_dir: str) -> bool:
+    """Remove a remote directory tree, returning False when already absent."""
+    try:
+        entries = sftp.listdir_attr(remote_dir)
+    except IOError:
+        try:
+            sftp.stat(remote_dir)
+        except IOError as exc:
+            if exc.errno == errno.ENOENT:
+                return False
+            raise
+        raise
+
+    for entry in entries:
+        child = f'{remote_dir}/{entry.filename}'
+        if stat.S_ISDIR(entry.st_mode):
+            _remove_remote_tree(sftp, child)
+        else:
+            sftp.remove(child)
+    sftp.rmdir(remote_dir)
+    return True
+
+
+def _prune_remote_record_shells(
+    sftp,
+    remote_dir: str,
+    expected_names: Set[str],
+) -> int:
+    """Remove stale generated shells while preserving all unrelated entries."""
+    try:
+        entries = sftp.listdir_attr(remote_dir)
+    except IOError:
+        try:
+            sftp.stat(remote_dir)
+        except IOError as exc:
+            if exc.errno == errno.ENOENT:
+                return 0
+            raise
+        raise
+
+    removed = 0
+    for entry in entries:
+        if not stat.S_ISREG(entry.st_mode):
+            continue
+        if not RECORD_SHELL_RE.fullmatch(entry.filename):
+            continue
+        if entry.filename in expected_names:
+            continue
+        sftp.remove(f'{remote_dir}/{entry.filename}')
+        removed += 1
+    return removed
+
+
 def push_files(
     files: List[Path],
     repo_root: Path,
     cfg: Dict[str, Any],
+    remote_prune_dirs: Iterable[str] = _REMOTE_PRUNE_DIRS,
+    record_shells: Optional[Iterable[Path]] = None,
 ) -> Dict[str, Any]:
-    """Upload every file via .tmp + posix_rename. Aborts on first error.
+    """Upload files atomically, then reconcile retired remote content.
 
     Returns {ok, files_pushed, error}. The atomic-rename guarantee mirrors
-    backend/submission_server/sftp_push.py — readers on the live site
-    never see a half-written file.
+    backend/submission_runtime/sftp_push.py — readers on the live site
+    never see a half-written file. ``record_shells=None`` disables record-shell
+    reconciliation; an empty iterable intentionally clears every safe shell.
     """
+    expected_record_shells: Optional[Set[str]] = None
+    if record_shells is not None:
+        expected_record_shells = set()
+        for page in record_shells:
+            name = Path(page).name
+            if not RECORD_SHELL_RE.fullmatch(name):
+                return {
+                    'ok': False,
+                    'files_pushed': 0,
+                    'error': f'unsafe record shell name: {name!r}',
+                }
+            expected_record_shells.add(name)
     try:
         import paramiko
     except ImportError:
@@ -284,8 +464,7 @@ def push_files(
         # ssh-dss, ecdsa-sha2-nistp{256,384,521}, hashed-host '|1|', plus
         # whatever ships next — and a malformed content blob will raise
         # cleanly from load_host_keys rather than failing later under
-        # RejectPolicy. Sibling backend/submission_server/sftp_push.py
-        # has the older path-only pattern; see follow-up issue for backport.
+        # RejectPolicy. The data-only submission runtime uses the same policy.
         known_hosts_raw = cfg['known_hosts']
         known_hosts_path = Path(known_hosts_raw).expanduser()
         if known_hosts_path.is_file():
@@ -338,6 +517,18 @@ def push_files(
                 pushed += 1
                 if pushed % 25 == 0 or pushed == len(files):
                     logger.info(f"Pushed {pushed}/{len(files)} files")
+
+            if expected_record_shells is not None:
+                remote_record_dir = f"{cfg['site_path']}/r"
+                removed = _prune_remote_record_shells(
+                    sftp, remote_record_dir, expected_record_shells)
+                if removed:
+                    logger.info(f'Removed {removed} stale record metadata shells')
+
+            for relpath in remote_prune_dirs:
+                remote_dir = f"{cfg['site_path']}/{relpath}"
+                if _remove_remote_tree(sftp, remote_dir):
+                    logger.info(f'Removed retired directory: {relpath}')
         finally:
             sftp.close()
     except paramiko.SSHException as exc:
@@ -385,12 +576,20 @@ def main(argv: Optional[List[str]] = None) -> int:
     else:
         repo_root = Path(__file__).resolve().parents[2]
 
+    record_pages = generate_record_pages(repo_root)
+    logger.info(f'Generated {len(record_pages)} record-specific metadata pages')
     files = collect_local_files(repo_root)
 
     if args.dry_run:
         print(f"dry-run: would upload {len(files)} files from {repo_root}")
         for f in files:
             print(f"  {f.relative_to(repo_root).as_posix()}")
+        print(
+            f'would remove {len(_REMOTE_PRUNE_DIRS)} retired directories '
+            'after upload'
+        )
+        for relpath in _REMOTE_PRUNE_DIRS:
+            print(f'  {relpath}')
         return 0
 
     cfg = _read_env()
@@ -404,7 +603,7 @@ def main(argv: Optional[List[str]] = None) -> int:
         return 2
 
     logger.info(f'Deploying {len(files)} files to {cfg["host"]}:{cfg["site_path"]}')
-    result = push_files(files, repo_root, cfg)
+    result = push_files(files, repo_root, cfg, record_shells=record_pages)
     if result['ok']:
         logger.info(f'Deploy complete: {result["files_pushed"]} files pushed')
         return 0

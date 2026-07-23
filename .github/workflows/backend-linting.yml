@@ -56,7 +56,7 @@ jobs:
       # backend Python tree, and per-file E402 ignores live in pyproject.toml.
       - name: Run Ruff
         working-directory: backend
-        run: poetry run ruff check src/ tests/ submission_server/ scripts/
+        run: poetry run ruff check src/ tests/ submission_runtime/ scripts/
 
       # Black is not yet enforced — the backend predates any black pass, so this
       # step reports diffs without failing. Drop continue-on-error once the

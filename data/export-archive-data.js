@@ -18,6 +18,7 @@ import { generateOPML, generateSubscriptionOPML } from './lib/opml-generator.js'
 import { computeAnalytics } from './compute-analytics.js';
 import { ERAS } from './eras.js';
 import { unescapeRow } from './lib/csv-unescape.js';
+import { buildSearchIndex } from './lib/search-index-builder.js';
 import { loadAuthoredExcerpts, resolveSummary } from './lib/summary-resolver.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -108,8 +109,7 @@ function processRecord(row, index, type, relationshipsMap, authoredExcerpts) {
                      (row.verified || row.Verified) === 'true' ||
                      (row.verified || row.Verified) === 'Yes' ||
                      (row.verified || row.Verified) === true ||
-                     type === 'social' ||
-                     rawId.startsWith('CLIP-');
+                     type === 'social';
 
   // Extract thread_data for THREAD records
   // Check if thread_data column exists directly (from merged records)
@@ -173,16 +173,26 @@ function processRecord(row, index, type, relationshipsMap, authoredExcerpts) {
 function buildRelationshipsMap(relationshipsData) {
   const relationshipsMap = {};
 
-  for (const rel of relationshipsData) {
-    const source = rel.source_record_id || rel.Source || rel.source;
-    const target = rel.target_entity_id || rel.Target || rel.target;
+  // Link a record id and an entity id both ways, deduping. A record's relatedIds
+  // are read back from relationshipsMap[recordId] in processRecord().
+  const link = (recordId, entityId) => {
+    if (!recordId || !entityId) return;
+    if (!relationshipsMap[recordId]) relationshipsMap[recordId] = [];
+    if (!relationshipsMap[entityId]) relationshipsMap[entityId] = [];
+    if (!relationshipsMap[recordId].includes(entityId)) relationshipsMap[recordId].push(entityId);
+    if (!relationshipsMap[entityId].includes(recordId)) relationshipsMap[entityId].push(recordId);
+  };
 
-    if (source && target) {
-      if (!relationshipsMap[source]) relationshipsMap[source] = [];
-      if (!relationshipsMap[target]) relationshipsMap[target] = [];
-      if (!relationshipsMap[source].includes(target)) relationshipsMap[source].push(target);
-      if (!relationshipsMap[target].includes(source)) relationshipsMap[target].push(source);
-    }
+  for (const rel of relationshipsData) {
+    const record = rel.source_record_id || rel.Source || rel.source;
+    const targetEntity = rel.target_entity_id || rel.Target || rel.target;
+    const sourceEntity = rel.source_entity_id;
+
+    // The source record mentions both endpoints of the relationship, so associate
+    // it with each. Linking only the target left source-only entities (e.g. the
+    // interviewer in "X interviews Y") unreachable from any record.
+    link(record, targetEntity);
+    link(record, sourceEntity);
   }
 
   return relationshipsMap;
@@ -626,6 +636,30 @@ async function main() {
 
   // Sort by date (newest first)
   allRecords.sort((a, b) => b.date.localeCompare(a.date));
+
+  // Build the MiniSearch full-text index (#276). The frontend loads this to
+  // search author, tags, concepts, and body text -- fields the card-only
+  // substring search cannot reach. Built from the source CSV rows because they
+  // still carry raw_text, which the served JSON drops; filtered to the ids that
+  // actually ship so the index never exposes a filtered-out or unverified record.
+  //
+  // Scope: article records only (archive_records-public.csv), not social posts.
+  // #276 is a body-recall win, and only articles have a long body past the
+  // 120-char card preview that today's substring search already reads. Social
+  // posts are short enough that their preview covers the text, so indexing all
+  // 25.6k of them quadrupled the artifact (5 MB gzipped vs ~1 MB) for recall
+  // only on the tail of long posts. Social posts, generated threads, and the
+  // dissertation entry stay covered by the frontend substring fallback (union
+  // search: a record matches if the substring OR the index matches, so nothing
+  // that is findable today stops being findable).
+  console.log('\n💾 Building search index...');
+  const servedIds = new Set(allRecords.map(r => r.id));
+  const searchIndexRows = archiveRecordsData.filter(r => servedIds.has(r.id));
+  const { json: searchIndexJson, count: searchIndexCount } = buildSearchIndex(searchIndexRows);
+  const searchIndexPath = path.join(__dirname, 'search-index.json');
+  fs.writeFileSync(searchIndexPath, JSON.stringify(searchIndexJson));
+  const searchIndexKB = (fs.statSync(searchIndexPath).size / 1024).toFixed(1);
+  console.log(`  - Wrote search-index.json (${searchIndexCount} docs, ${searchIndexKB} KB)`);
 
   // Build output structure
   const output = {

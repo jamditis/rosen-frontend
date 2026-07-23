@@ -5,9 +5,19 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records in the &quot;Audience &amp; Public Engagement&quot; category</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 24 Jun 2026 23:37:26 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 20 Jul 2026 17:06:47 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/categories/audience-public-engagement.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
+  <item>
+    <title>Why The Ubyssey is covering the World Cup</title>
+    <link>https://ubyssey.ca/margins/world-cup-coverage/</link>
+    <guid isPermaLink="true">https://ubyssey.ca/margins/world-cup-coverage/</guid>
+    <pubDate>Wed, 15 Jul 2026 00:00:00 GMT</pubDate>
+    <description>The Ubyssey sports editor Caleb Peterson applies Jay Rosen’s concept of “awayness” to the newspaper’s decision to cover the 2026 FIFA World Cup. Peterson argues that simply reporting events readers can already watch or find elsewhere does not solve an awayness problem; the publication instead has to add value through beat expertise, analysis and trusted voices.</description>
+    <category>Journalism Theory &amp; Practice</category>
+    <category>Press &amp; Media Criticism</category>
+    <category>Audience &amp; Public Engagement</category>
+  </item>
   <item>
     <title>en.wikipedia.org/wiki/Public_...</title>
     <link>https://bsky.app/profile/jayrosen.bsky.social/post/3mnfdxeu7tk2i</link>
@@ -447,15 +457,6 @@
     <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3lzbxsjzhm22u</guid>
     <pubDate>Sat, 20 Sep 2025 00:00:00 GMT</pubDate>
     <description>A Bluesky post by Jay Rosen from 2025-09-20. Topics: Press &amp; Media Criticism, Audience &amp; Public Engagement.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Audience &amp; Public Engagement</category>
-  </item>
-  <item>
-    <title>You are more welcome</title>
-    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3lyywebuafs2g</link>
-    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3lyywebuafs2g</guid>
-    <pubDate>Wed, 17 Sep 2025 00:00:00 GMT</pubDate>
-    <description>A Bluesky post by Jay Rosen from 2025-09-17. Topics: Press &amp; Media Criticism, Audience &amp; Public Engagement.</description>
     <category>Press &amp; Media Criticism</category>
     <category>Audience &amp; Public Engagement</category>
   </item>

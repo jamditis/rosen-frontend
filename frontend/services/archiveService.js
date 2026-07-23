@@ -1,5 +1,5 @@
 
-import { DATA_CONFIG } from '../constants.js?v=3.4.7';
+import { DATA_CONFIG } from '../constants.js?v=3.8.5';
 import {
   initDatabase,
   loadArchiveData as loadSqliteData,
@@ -13,12 +13,13 @@ import {
   getCategoryCoOccurrence,
   searchRecords as sqlSearchRecords,
   getStats as getSqliteStats
-} from './sqliteService.js?v=3.4.7';
-import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.4.7';
-import { escapeCsvCell } from '../utils/csvSafety.js?v=3.4.7';
-import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.4.7';
-import { CACHE_VERSION, CACHE_TTL_MS, MAX_LOCALSTORAGE_SIZE, cacheKeyFor } from './cacheConfig.js?v=3.4.7';
-import { raceTimeout } from '../utils/raceTimeout.js?v=3.4.7';
+} from './sqliteService.js?v=3.8.5';
+import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.8.5';
+import { searchIndexOptions } from '../utils/searchConfig.js?v=3.8.5';
+import { escapeCsvCell } from '../utils/csvSafety.js?v=3.8.5';
+import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.8.5';
+import { CACHE_VERSION, CACHE_TTL_MS, MAX_LOCALSTORAGE_SIZE, cacheKeyFor } from './cacheConfig.js?v=3.8.5';
+import { raceTimeout } from '../utils/raceTimeout.js?v=3.8.5';
 
 // Routine cache-hit / fetch-start logs are silent in production. Set
 // `localStorage.jrda_debug = '1'` in DevTools and reload to opt in (#170).
@@ -485,9 +486,14 @@ const loadDetailsCache = async () => {
       setCachedData(dataUrl, data);
     } catch (error) {
       console.error('Error fetching details data:', error);
-      detailsCache = {};
+      // Keep the cache absent so a later explicit retry performs a fresh
+      // request. Propagate the failure so the record reader can distinguish a
+      // network/parse outage from a successful payload that lacks this record.
+      detailsCache = null;
+      throw error;
     } finally {
       detailsLoading = false;
+      detailsLoadPromise = null;
     }
   })();
 
@@ -561,7 +567,15 @@ export const fetchEntitiesData = async () => {
       return data;
     } catch (error) {
       console.error('Error fetching entities data:', error);
-      return { entities: [], recordEntityMap: {} };
+      // Record details can still fall back to category-based relationships,
+      // so keep returning a shaped payload for that consumer. Carry the
+      // failure explicitly so EntityBrowser can distinguish an outage from a
+      // legitimate empty scope instead of presenting a silent zero-result UI.
+      return {
+        entities: [],
+        recordEntityMap: {},
+        error: 'The entity index could not load. Archive records remain available.',
+      };
     } finally {
       entitiesLoading = false;
     }
@@ -580,7 +594,10 @@ export const areEntitiesLoaded = () => entitiesCache !== null;
  */
 export const preloadDetails = () => {
   if (!detailsCache && !detailsLoading) {
-    loadDetailsCache();
+    // Background warmup is best effort. Interactive fetchRecordDetails callers
+    // still receive the rejection and render their retry state, while this
+    // unawaited optimization must not create an unhandled rejection.
+    loadDetailsCache().catch(() => {});
   }
 };
 
@@ -614,6 +631,34 @@ export const fetchAnalytics = async () => {
   const data = await response.json();
   setCachedData(dataUrl, data);
   return data;
+};
+
+/**
+ * Lazily load and construct the MiniSearch full-text index (#276).
+ *
+ * Kept here with the other data fetchers, but MiniSearch and the ~1MB index
+ * artifact are both loaded on demand -- the dynamic import means a browse-only
+ * visit never downloads either. The promise is memoized so repeat or concurrent
+ * first-search calls share one load; on failure the memo is cleared so a later
+ * search can retry rather than being stuck on the rejected promise. Throws on a
+ * failed fetch so the caller can fall back to substring search (the index is an
+ * additive recall boost, never the only search path).
+ */
+let searchIndexPromise = null;
+export const loadSearchIndex = () => {
+  if (!searchIndexPromise) {
+    searchIndexPromise = (async () => {
+      const { default: MiniSearch } = await import('minisearch');
+      const response = await fetch(DATA_CONFIG.search_index);
+      if (!response.ok) {
+        throw new Error(`search index fetch failed: HTTP ${response.status}`);
+      }
+      const text = await response.text();
+      return MiniSearch.loadJSON(text, searchIndexOptions());
+    })();
+    searchIndexPromise.catch(() => { searchIndexPromise = null; });
+  }
+  return searchIndexPromise;
 };
 
 /**
@@ -713,7 +758,7 @@ const downloadFile = (content, filename, mimeType) => {
 export const exportAsJSON = (records, filename = 'jay-rosen-archive.json') => {
   const exportData = {
     exported: new Date().toISOString(),
-    source: 'Jay Rosen Digital Archive',
+    source: "Jay Rosen's Internet Archive",
     url: 'https://pressthink.org/j/rosen-archive/',
     license: 'CC BY 4.0',
     recordCount: records.length,

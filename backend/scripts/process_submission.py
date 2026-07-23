@@ -21,13 +21,13 @@ Behavior (12-step pipeline from the design's "Architecture" diagram):
    2b.  SSRF guard via is_safe_public_url(url)      (reject private/non-http)
     3.  dispatcher.dispatch_url(url)                (scrape, or pasted raw text)
     4.  categorize(...)                             (Gemini; degrade on fail)
-    5.  assign id: keep processor CLIP-/NYT-/WSJ-,  (else next RECORD-NNNNN)
+    5.  assign id: keep processor clipping ids       (else next RECORD-NNNNN)
     6.  enrich_data() + _sanitize_cell()            (mimic Pillar 3; flag review)
     7.  Append to data/archive_records-public.csv   (atomic tmp+rename)
     8.  node data/export-archive-data.js            (regen JSONs)
     9.  npm test                                    (abort commit on fail)
    10.  git commit + push to main                   (App-token identity)
-   11.  SFTP push 4 JSONs to pressthink.org         (sftp_push.py)
+   11.  SFTP push JSONs + affected metadata shell   (sftp_push.py)
    12.  Sheet writeback F='live', G=RECORD-NNNNN   (retry once, then exit-non-0)
 
 Status outcomes: ``live | committed | archived | duplicate | error | noop``.
@@ -75,8 +75,9 @@ from rosen_scraper import entity_csv_writer  # noqa: E402
 from rosen_scraper import entity_resolver  # noqa: E402
 from rosen_scraper.url_safety import is_safe_public_url  # noqa: E402
 from rosen_scraper.workflow import enrich_data  # noqa: E402
-from submission_server import sftp_push, sheets_callback  # noqa: E402
-from submission_server.config import (  # noqa: E402
+from submission_runtime import sftp_push, sheets_callback  # noqa: E402
+from submission_runtime.artifacts import DATA_DEPLOY_JSON_FILES  # noqa: E402
+from submission_runtime.config import (  # noqa: E402
     CSV_FILE as _DEFAULT_CSV_FILE,
     DATA_DIR,
     EXPORT_SCRIPT,
@@ -85,10 +86,9 @@ from submission_server.config import (  # noqa: E402
     PROJECT_ROOT,
     SCHEMA_FILE,
 )
-from submission_server.processor import (  # noqa: E402
-    _STAGED_JSON_FILES,
-    _sanitize_cell,
-    _sanitize_record,
+from submission_runtime.csv_safety import (  # noqa: E402
+    sanitize_cell as _sanitize_cell,
+    sanitize_record as _sanitize_record,
 )
 
 # Module-level handles that tests monkeypatch. Functions in this module call
@@ -101,6 +101,11 @@ extract_entities_and_relationships = _extract_entities
 # Tests override CSV_FILE to point at a tmp file. Defaults to the canonical
 # archive CSV when the script runs in CI.
 CSV_FILE = _DEFAULT_CSV_FILE
+_STAGED_JSON_FILES = DATA_DEPLOY_JSON_FILES
+CLIPPING_ID_PREFIXES = frozenset({
+    'CLIP', 'NYT', 'WSJ', 'WP', 'LAT', 'CT', 'BG', 'GRD', 'CJR', 'AJR',
+    'EP', 'NR', 'PYN',
+})
 
 # Shown to the submitter (via the sheet error column) when the scraper can't
 # fetch or parse a URL. Some hosts (Medium, paywalled or login-walled pages,
@@ -521,7 +526,8 @@ def process_one(url: str, title: str = '', notes: str = '',
                 sheet_id: str = '', sheet_tab: str = '',
                 sheet_row: Optional[int] = None,
                 prototype_mode: bool = False,
-                raw_text: str = '') -> Dict[str, Any]:
+                raw_text: str = '',
+                retry_record_id: str = '') -> Dict[str, Any]:
     """Run the 12-step pipeline for one submission. Returns a result dict.
 
     Keys: ``status`` (live/committed/archived/duplicate/error/noop), ``record_id``,
@@ -539,9 +545,25 @@ def process_one(url: str, title: str = '', notes: str = '',
     title = title or ''
     notes = notes or ''
     raw_text = raw_text or ''
+    retry_record_id = (retry_record_id or '').strip()
 
     # --- Sentinel handling: no-op submission that only runs the SFTP step. -
     if _is_sentinel(url):
+        if not retry_record_id:
+            msg = 'Sentinel retry requires a record id'
+            _safe_writeback(
+                sheet_id,
+                sheet_tab,
+                sheet_row or 0,
+                status='error',
+                error=msg,
+            )
+            result.update({
+                'status': 'error',
+                'exit_code': 1,
+                'error': msg,
+            })
+            return result
         logger.info(f'Sentinel URL ({url}); skipping scrape/categorize/append, '
                     'running SFTP only')
         # Even on a noop we still need the staged JSONs to push. Regen if
@@ -554,7 +576,7 @@ def process_one(url: str, title: str = '', notes: str = '',
                 _stage_for_ftp()
             except Exception as exc:  # noqa: BLE001
                 logger.warning(f'Sentinel regen failed (continuing): {exc}')
-        push = sftp_push.push_to_production()
+        push = sftp_push.push_to_production(record_ids=(retry_record_id,))
         if push.get('skipped'):
             # A skipped push returns ok=True (a successful no-op), so it must be
             # matched before the ok branch below or it would fall through to
@@ -765,20 +787,20 @@ def process_one(url: str, title: str = '', notes: str = '',
     # the submitter sees the record appear, then carry needs_review=true so a
     # human can vet the AI-generated metadata before it's treated as final.
     #
-    # Force verified True only when no processor set it: enrich_data() above runs
+    # Force verified True when no processor set it, and for clipping-family ids.
+    # OCR processors historically used verified=false to mean "review the OCR",
+    # but the generic needs_review field now carries that signal. Publishing all
+    # fresh clippings through verified=TRUE lets the exporter use one verification
+    # model instead of bypassing the column based on a CLIP- id prefix (#352).
+    # enrich_data() above runs
     # `data.setdefault('verified', False)` (a conservative default for legacy or
     # broken rows), so `scrape.get('verified', True)` would always read back that
     # False and the public exporter — which drops verified=False rows — would
     # silently hide every submission. Article scrapes leave verified unset, so
-    # they publish. A processor's explicit verified value is preserved: the
-    # clipping processor stamps 'false' on every OCR'd PDF as an "OCR needs a
-    # human check" signal, not a hide flag. That clipping still goes
-    # live-but-flagged — the exporter surfaces CLIP- ids via a dedicated
-    # allowance, and needs_review below marks it for the OCR review pass. (For a
-    # non-CLIP record an explicit 'false' does gate it, since the exporter drops
-    # verified=false rows without that allowance.) Unifying the CLIP- allowance
-    # with this verified/needs_review model is tracked in issue #352.
-    if processor_verified is None:
+    # they publish. A processor's explicit verified value remains authoritative
+    # for non-clipping records.
+    clipping_family = record_id.partition('-')[0] in CLIPPING_ID_PREFIXES
+    if processor_verified is None or clipping_family:
         # Write the string 'TRUE', not a Python bool. csv.DictWriter serializes
         # True as the string 'True', but data/export-archive-data.js treats only
         # the exact strings 'TRUE'/'true'/'Yes' (or a real boolean) as verified —
@@ -959,7 +981,7 @@ def process_one(url: str, title: str = '', notes: str = '',
         logger.info('Prototype mode: skipping SFTP push to production')
     else:
         _stage_for_ftp()
-        push = sftp_push.push_to_production()
+        push = sftp_push.push_to_production(record_ids=(record_id,))
         if not (push.get('ok') and not push.get('skipped')):
             if push.get('skipped'):
                 # SFTP isn't configured on this runner, so retrying never makes
@@ -1012,6 +1034,8 @@ def _parse_args(argv):
     p.add_argument('--sheet-id', dest='sheet_id', default='')
     p.add_argument('--sheet-tab', dest='sheet_tab', default='')
     p.add_argument('--sheet-row', dest='sheet_row', type=int, default=0)
+    p.add_argument('--retry-record-id', dest='retry_record_id', default='',
+                   help='Archived record id whose metadata shell needs retry')
     p.add_argument('--prototype-mode', dest='prototype_mode',
                    action='store_true', default=False,
                    help='Skip SFTP push to PressThink (GH Pages auto-deploy '
@@ -1031,6 +1055,7 @@ def main(argv=None) -> int:
         sheet_row=args.sheet_row,
         prototype_mode=args.prototype_mode,
         raw_text=args.raw_text,
+        retry_record_id=args.retry_record_id,
     )
     logger.info(f'Result: status={result["status"]} '
                 f'record_id={result["record_id"]} error={result["error"]}')

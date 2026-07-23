@@ -1,10 +1,12 @@
-# Jay Rosen Internet Archive - Backend Pipeline
+# Jay Rosen's Internet Archive - Backend Pipeline
 
 The backend is a Python-based data pipeline that automatically fetches, processes, archives, and analyzes digital content from Jay Rosen's work across the web. It uses AI-powered analysis (Google Gemini) to categorize, summarize, and extract key concepts from articles, videos, and other media.
 
+**You don't need any of this to browse the archive or run the website.** The site is a static frontend that reads pre-generated data files (see the [root README](../README.md) and [`data/README.md`](../data/README.md)). The backend is the tooling maintainers use to add and process new content, and it requires its own credentials (Google Cloud, Gemini) to run.
+
 ---
 
-## 🎯 What the Backend Does
+## What the backend does
 
 The pipeline performs these core functions:
 
@@ -17,9 +19,9 @@ The pipeline performs these core functions:
 
 ---
 
-## 🏗️ Architecture Overview
+## Architecture overview
 
-### Pipeline Flow
+### Pipeline flow
 
 ```mermaid
 graph LR
@@ -35,7 +37,7 @@ graph LR
     I --> J[Results → Google Sheets]
 ```
 
-### Core Components
+### Core components
 
 | Component | File | Purpose |
 |-----------|------|---------|
@@ -49,7 +51,7 @@ graph LR
 | **Entity Resolver** | `src/rosen_scraper/entity_resolver.py` | Identifies and resolves entities |
 | **Logger** | `src/rosen_scraper/logger.py` | Centralized logging with poison pill detection |
 
-### Directory Structure
+### Directory structure
 
 ```
 backend/
@@ -80,7 +82,7 @@ backend/
 
 ---
 
-## 🚀 Quick Start
+## Quick start
 
 ### Prerequisites
 
@@ -98,23 +100,19 @@ backend/
 # 1. Navigate to backend directory
 cd backend
 
-# 2. Create and activate virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# 2. Install Poetry (if not already installed)
+#    See https://python-poetry.org/docs/#installation
 
-# 3. Install Poetry (if not already installed)
-pip install poetry
-
-# 4. Install dependencies
+# 3. Install dependencies (Poetry manages the virtual environment)
 poetry install
 
-# 5. Install Playwright browsers
-playwright install
+# 4. Install Playwright browsers
+poetry run playwright install
 ```
 
 ### Configuration
 
-#### 1. Environment Variables
+#### 1. Environment variables
 
 Create a `.env` file in the `backend/` directory:
 
@@ -129,7 +127,7 @@ GEMINI_API_KEY="your_gemini_api_key_here"
 LOG_LEVEL="INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
 ```
 
-#### 2. Google Cloud Credentials
+#### 2. Google Cloud credentials
 
 Place your Google Cloud service account JSON file at:
 
@@ -141,7 +139,7 @@ backend/google_credentials.json
 - Google Sheets API read/write access
 - Google Drive API access (for PDF storage)
 
-#### 3. Google Sheets Setup
+#### 3. Google Sheets setup
 
 The pipeline expects two Google Sheets:
 
@@ -153,15 +151,15 @@ The pipeline expects two Google Sheets:
 
 ---
 
-## 📖 Usage
+## Usage
 
-### Running the Main Pipeline
+### Running the main pipeline
 
 Process new URLs from the input sheet:
 
 ```bash
 cd backend
-python src/rosen_scraper/workflow.py
+poetry run python src/rosen_scraper/workflow.py
 ```
 
 This will:
@@ -171,47 +169,62 @@ This will:
 4. Generate PDF archives
 5. Write results back to Google Sheets
 
-### Common Commands
+### Common commands
 
 ```bash
 # Run main pipeline
-python src/rosen_scraper/workflow.py
+poetry run python src/rosen_scraper/workflow.py
 
 # Clean duplicate data
-python scripts/diagnostics/data_deduper.py
+poetry run python scripts/diagnostics/data_deduper.py
 
 # Backfill missing metadata
-python scripts/backfill/backfill_worker.py
+poetry run python scripts/backfill/backfill_worker.py
 
 # Backfill missing dates
-python scripts/run_date_backfill.py
+poetry run python scripts/run_date_backfill.py
 
 # Run entity extraction
-python src/rosen_scraper/entity_extractor.py
+poetry run python src/rosen_scraper/entity_extractor.py
 
-# Run smart corrector (fix data issues)
-python scripts/run_smart_corrector.py
+# Preview smart-corrector changes for sheet rows 27 through 42
+# Dry run is the default; this does not write to the worksheet.
+poetry run python -m scripts.corrector --rows 27-42
 ```
 
-### Running Tests
+The smart corrector accepts `--rows :N` for the first N data records,
+`--rows N-M` for inclusive sheet rows, and `--rows N-` for an open-ended
+range. `--limit` caps any selection. `--resume` skips leading selected rows
+whose notes already contain a smart-corrector completion marker; failed and
+incomplete rows are retried. `--max-cost` sets the hard estimated-cost stop;
+its default is $35.
+
+Use `--live` only for a supervised write. Live runs update recovered
+`raw_text`, processing notes, and the canonical AI fields when analysis is
+available: `summary`, `thematic_categories`, `key_concepts`, `tags`, and
+`pull_quote`. The old `run_smart_corrector*.py` commands remain as thin shims
+with their historical row-range defaults, but they now use this CLI and its
+safe dry-run default.
+
+### Running tests
 
 ```bash
 # Install dev dependencies
 poetry install --with dev
 
 # Run all tests
-pytest
+poetry run pytest
 
 # Run with coverage
-pytest --cov=src/rosen_scraper
+poetry run pytest --cov=src/rosen_scraper
 
 # Run specific test file
-pytest tests/test_logging_system.py
+poetry run pytest tests/test_logging_system.py
 ```
 
 ---
 
-## 🔧 Configuration Files
+## Configuration files
 
 ### `schema.json`
 
@@ -243,23 +256,24 @@ Poetry configuration with dependencies:
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
-### Common Issues
+### Common issues
 
-#### 1. Import Errors or Module Not Found
+#### 1. Import errors or module not found
 
 **Problem:** `ModuleNotFoundError: No module named 'rosen_scraper'`
 
 **Solution:**
 ```bash
-# Ensure you're in the backend directory and venv is activated
+# Ensure you're in the backend directory, dependencies are installed,
+# and commands run inside Poetry's environment
 cd backend
-source venv/bin/activate
 poetry install
+poetry run python src/rosen_scraper/workflow.py
 ```
 
-#### 2. Google Sheets Authentication Failures
+#### 2. Google Sheets authentication failures
 
 **Problem:** `gspread.exceptions.APIError: [403] Forbidden`
 
@@ -268,7 +282,7 @@ poetry install
 - Ensure service account has access to the target Google Sheet
 - Share the sheet with the service account email (found in credentials JSON)
 
-#### 3. Gemini API Errors
+#### 3. Gemini API errors
 
 **Problem:** `google.api_core.exceptions.PermissionDenied: 403`
 
@@ -277,16 +291,16 @@ poetry install
 - Check API key has Gemini API access enabled in Google Cloud Console
 - Verify billing is enabled for the Google Cloud project
 
-#### 4. Playwright Browser Errors
+#### 4. Playwright browser errors
 
 **Problem:** `playwright._impl._api_types.Error: Executable doesn't exist`
 
 **Solution:**
 ```bash
-playwright install
+poetry run playwright install
 ```
 
-#### 5. PDF Generation Failures
+#### 5. PDF generation failures
 
 **Problem:** PDFs not being created or saved
 
@@ -295,7 +309,7 @@ playwright install
 - Verify sufficient disk space
 - Check logs for specific error messages
 
-#### 6. Content Extraction Returns Empty Text
+#### 6. Content extraction returns empty text
 
 **Problem:** Scraped articles have no text content
 
@@ -304,7 +318,7 @@ playwright install
 - Site may require authentication (add to paywalled domains list)
 - Site may be blocking automated access (check poison pill handler logs)
 
-### Debug Mode
+### Debug mode
 
 Enable detailed logging:
 
@@ -314,14 +328,14 @@ LOG_LEVEL="DEBUG"
 
 # Or set environment variable
 export LOG_LEVEL="DEBUG"
-python src/rosen_scraper/workflow.py
+poetry run python src/rosen_scraper/workflow.py
 ```
 
 Logs are written to:
 - Console (stdout)
 - `logs/` directory (if configured)
 
-### Poison Pill Detection
+### Poison pill detection
 
 The pipeline includes automatic detection of failed scrapes (paywalls, anti-bot blocks, CAPTCHAs, etc.):
 
@@ -335,9 +349,9 @@ The pipeline includes automatic detection of failed scrapes (paywalls, anti-bot 
 
 ---
 
-## 🔬 Development Workflow
+## Development workflow
 
-### Making Changes
+### Making changes
 
 1. **Create a feature branch**
    ```bash
@@ -348,12 +362,12 @@ The pipeline includes automatic detection of failed scrapes (paywalls, anti-bot 
 
 3. **Run tests**
    ```bash
-   pytest
+   poetry run pytest
    ```
 
 4. **Test manually**
    ```bash
-   python src/rosen_scraper/workflow.py
+   poetry run python src/rosen_scraper/workflow.py
    ```
 
 5. **Commit and push**
@@ -363,7 +377,7 @@ The pipeline includes automatic detection of failed scrapes (paywalls, anti-bot 
    git push origin feature/my-feature
    ```
 
-### Adding New Dependencies
+### Adding new dependencies
 
 ```bash
 # Add runtime dependency
@@ -379,7 +393,7 @@ poetry lock
 poetry install
 ```
 
-### Adding New Processors
+### Adding new processors
 
 To add a new content type processor:
 
@@ -388,7 +402,7 @@ To add a new content type processor:
 3. Add URL pattern detection in `dispatcher.py`
 4. Add tests in `tests/test_new_processor.py`
 
-### Modifying Taxonomy
+### Modifying taxonomy
 
 To add categories, concepts, or eras:
 
@@ -399,7 +413,7 @@ To add categories, concepts, or eras:
 
 ---
 
-## 📊 Data Schema
+## Data schema
 
 The pipeline outputs structured data with these key fields:
 
@@ -424,22 +438,20 @@ See `schema.json` for the complete list of output headers.
 
 ---
 
-## 🤝 Integration with Frontend
+## Integration with the frontend
 
 The backend populates data that the frontend consumes:
 
-1. **Google Sheets** - Backend writes to sheets
-2. **CSV Export** - Sheets published as CSV
-3. **Frontend Service** - `services/archiveService.js` fetches CSV
-4. **Display** - React components render the data
+1. **Google Sheets** - The backend writes processed results to sheets
+2. **CSV export** - Sheet data is exported into the CSV source files in `data/`
+3. **JSON generation** - `node data/export-archive-data.js` turns the CSVs into the static JSON files the site reads (see [`data/README.md`](../data/README.md))
+4. **Deploy** - The regenerated JSON is uploaded to the live site
 
-Update cycle:
-1. Backend processes new content → Google Sheets
-2. Frontend polls CSV (1-hour cache) → Displays updates
+The frontend never talks to Google Sheets or the backend at runtime — it only reads the pre-generated JSON.
 
 ---
 
-## 📚 Additional Resources
+## Additional resources
 
 - **Root README** - See `/README.md` for project overview
 - **Scripts Documentation** - See `scripts/README.md` for utility scripts
@@ -448,7 +460,7 @@ Update cycle:
 
 ---
 
-## 🔐 Security Notes
+## Security notes
 
 - **Never commit** `.env` or `google_credentials.json` to version control
 - **Rotate API keys** periodically
@@ -457,10 +469,10 @@ Update cycle:
 
 ---
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the root `/LICENSE` file for details.
 
 ---
 
-**Maintained by Joe Amditis** | Part of the Jay Rosen Internet Archive Project
+**Maintained by Joe Amditis** | Part of Jay Rosen's Internet Archive Project

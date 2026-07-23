@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """A1-notation helpers for the Google Sheets API.
 
-Shared so the submission-server writeback (submission_server.sheets_callback)
-and the stuck-row sweeper (scripts/sweep_stuck.py) quote tab names the same
+Shared so the submission writeback (submission_runtime.sheets_callback) and the
+stuck-row sweeper (scripts/sweep_stuck.py) quote tab names the same
 way; a divergence would let one path build a range the API rejects.
 """
 

@@ -1,0 +1,346 @@
+/**
+ * Frozen demonstration corpus for issue #532.
+ *
+ * This deliberately does not import the Rosen archive, SQLite, or any runtime
+ * scraper. Every record is a short, curator-written summary of a public source.
+ */
+
+const freeze = (value) => {
+  if (value && typeof value === 'object' && !Object.isFrozen(value)) {
+    Object.values(value).forEach(freeze);
+    Object.freeze(value);
+  }
+  return value;
+};
+
+export const RECORDS = freeze([
+  {
+    id: 'direct-2001-desktop-websites',
+    date: '2001-01-18',
+    year: 2001,
+    sourceTitle: 'My Blog on the Desktop',
+    title: 'Publishing moves onto the user’s machine',
+    creator: 'Dave Winer',
+    source: 'Scripting News',
+    sourceType: 'blog archive',
+    url: 'https://scripting.com/2001/01.html#myBlogOnTheDesktop',
+    summary: 'Winer describes a browser-based publishing tool whose data remains on the writer’s computer and can be moved into other applications. The practical premise is control: a source can publish without surrendering the underlying material.',
+    themes: ['user-control', 'direct-publishing'],
+    entities: ['dave-winer', 'scripting-news', 'desktop-websites'],
+    evidence: 'Primary page; dated archive entry written by Winer.',
+  },
+  {
+    id: 'direct-2004-bloggers-sources',
+    date: '2004-08-10',
+    year: 2004,
+    sourceTitle: 'Archive: August 2004',
+    title: 'Bloggers are framed as sources',
+    creator: 'Dave Winer',
+    source: 'Scripting News',
+    sourceType: 'blog archive',
+    url: 'https://scripting.com/2004/08.html#When:3:28:15PM',
+    summary: 'Responding to a familiar critique of blogs, Winer reverses the frame: A blogger who cites sources can also be the source speaking in public. This curated trail treats that distinction as a precursor to the later formulation.',
+    themes: ['direct-publishing', 'source-authority'],
+    entities: ['dave-winer', 'scripting-news', 'blogging'],
+    evidence: 'Primary page; dated archive entry written by Winer.',
+  },
+  {
+    id: 'direct-2009-flying-seminar',
+    date: '2009-03-26',
+    year: 2009,
+    sourceTitle: 'Rosen’s Flying Seminar In The Future of News',
+    title: '“The sources go direct” enters Rosen’s flying seminar',
+    creator: 'Jay Rosen',
+    source: 'PressThink',
+    sourceType: 'essay',
+    url: 'https://pressthink.org/2009/03/rosens-flying-seminar-in-the-future-of-news/',
+    summary: 'Rosen places Winer’s formulation inside a guided reading of the changing news system. He explains the structural claim: When sources can publish for themselves, the relationship among sources, reporters, and audiences changes.',
+    themes: ['journalism', 'direct-publishing', 'source-authority'],
+    entities: ['jay-rosen', 'dave-winer', 'pressthink', 'journalism'],
+    evidence: 'Primary PressThink essay by Rosen; links to the Rosen–Winer podcast discussion.',
+  },
+  {
+    id: 'direct-2009-tech-heroes',
+    date: '2009-05-15',
+    year: 2009,
+    sourceTitle: 'Tech heroes who blog?',
+    title: 'A request for trustworthy experts who publish',
+    creator: 'Dave Winer',
+    source: 'Scripting News',
+    sourceType: 'blog post',
+    url: 'https://scripting.com/stories/2009/05/15/techHeroesWhoBlog.html',
+    summary: 'Winer asks readers to identify technology practitioners who write publicly and whose integrity they trust. The post turns the abstract idea into a discovery problem: How do readers find credible experts who have gone direct?',
+    themes: ['source-authority', 'discovery', 'journalism'],
+    entities: ['dave-winer', 'scripting-news', 'blogging', 'journalism'],
+    evidence: 'Primary permalink written by Winer.',
+  },
+  {
+    id: 'direct-2013-networked-beat',
+    date: '2013-05-13',
+    year: 2013,
+    sourceTitle: 'Designs for a Networked Beat',
+    title: 'Direct sources become part of a networked beat',
+    creator: 'Jay Rosen',
+    source: 'PressThink',
+    sourceType: 'lecture essay',
+    url: 'https://pressthink.org/2013/05/designs-for-a-networked-beat/',
+    summary: 'Rosen connects direct publishing to networked reporting. The journalist’s task is no longer only to collect private statements; it also includes listening to, verifying, and connecting knowledgeable people who publish in public.',
+    themes: ['journalism', 'networks', 'source-authority'],
+    entities: ['jay-rosen', 'dave-winer', 'pressthink', 'journalism'],
+    evidence: 'Primary PressThink lecture essay by Rosen.',
+  },
+  {
+    id: 'direct-2013-motto',
+    date: '2013-08-04',
+    year: 2013,
+    sourceTitle: 'About Scripting News',
+    title: 'The phrase becomes a standing motto',
+    creator: 'Dave Winer',
+    source: 'About Scripting News',
+    sourceType: 'about page',
+    url: 'https://scripting.com/about',
+    summary: 'Winer includes “Sources go direct” among the enduring mottos that orient his work. On the same page he credits Rosen’s thinking about voice and authority. The intellectual exchange runs in both directions.',
+    themes: ['direct-publishing', 'source-authority'],
+    entities: ['dave-winer', 'jay-rosen', 'scripting-news'],
+    evidence: 'Primary about page authored and dated by Winer.',
+  },
+  {
+    id: 'direct-2016-github-archive',
+    date: '2016-06-02',
+    year: 2016,
+    sourceTitle: 'scripting/Scripting-News',
+    title: 'A blog opens its working archive on GitHub',
+    creator: 'Dave Winer',
+    source: 'scripting/Scripting-News',
+    sourceType: 'GitHub repository',
+    url: 'https://github.com/scripting/Scripting-News',
+    summary: 'The repository backs up Scripting News nightly and uses issues for discussion with readers. Publishing, preservation, and participation are inspectable parts of one public workflow.',
+    themes: ['open-data', 'preservation', 'participation'],
+    entities: ['dave-winer', 'scripting-news', 'github'],
+    evidence: 'Public repository README and commit history under Winer’s scripting organization.',
+  },
+  {
+    id: 'direct-2017-source-namespace',
+    date: '2017-10-02',
+    year: 2017,
+    sourceTitle: 'The “source” namespace',
+    title: 'RSS carries provenance with the item',
+    creator: 'Dave Winer',
+    source: 'The source namespace',
+    sourceType: 'technical specification',
+    url: 'https://source.scripting.com/',
+    summary: 'The source namespace adds machine-readable information about where feed content comes from. Direct publishing gains explicit provenance that feed readers can preserve and display.',
+    themes: ['open-data', 'provenance', 'syndication'],
+    entities: ['dave-winer', 'rss', 'source-namespace'],
+    evidence: 'Primary specification maintained by Winer; page supplies posting and update dates.',
+  },
+  {
+    id: 'direct-2023-feedland',
+    date: '2023-04-24',
+    year: 2023,
+    sourceTitle: 'scripting/feedland',
+    title: 'FeedLand’s server code becomes public',
+    creator: 'Dave Winer and contributors',
+    source: 'scripting/feedland',
+    sourceType: 'GitHub repository',
+    url: 'https://github.com/scripting/feedland',
+    summary: 'FeedLand makes a feed-reading and database toolkit available as public source. The infrastructure for following direct sources can itself be inspected, installed, and extended.',
+    themes: ['open-data', 'syndication', 'discovery'],
+    entities: ['dave-winer', 'feedland', 'rss', 'github'],
+    evidence: 'Public repository README, license, and history; README dates the public announcement.',
+  },
+  {
+    id: 'direct-2024-social-blogroll',
+    date: '2024-02-14',
+    year: 2024,
+    sourceTitle: 'blogroll.social',
+    title: 'The blogroll returns as an updating social layer',
+    creator: 'Dave Winer',
+    source: 'blogroll.social',
+    sourceType: 'working prototype',
+    url: 'https://blogroll.scripting.com/',
+    summary: 'A live prototype turns a curated OPML list of blogs into an updating social blogroll. Its accompanying public toolkit is designed so a site can supply its own list instead of relying on opaque platform ranking.',
+    themes: ['discovery', 'syndication', 'user-control'],
+    entities: ['dave-winer', 'blogroll', 'opml', 'rss'],
+    evidence: 'Primary working prototype and public toolkit; date anchored to the toolkit repository’s first commit.',
+  },
+  {
+    id: 'direct-2026-community-news',
+    date: '2026-02-07',
+    year: 2026,
+    sourceTitle: 'The reboot that news needs',
+    title: 'Direct publishing returns to the design of local news',
+    creator: 'Dave Winer',
+    source: 'Scripting News',
+    sourceType: 'blog post',
+    url: 'https://scripting.com/2026/02/07/220012.html',
+    summary: 'Winer sketches complementary roles in community news: Professionals report, bloggers join the story flow, readers may finance the organization, and independent developers provide replaceable open software. The early publishing premise is recast as institutional design.',
+    themes: ['journalism', 'participation', 'networks'],
+    entities: ['dave-winer', 'scripting-news', 'journalism', 'community-news'],
+    evidence: 'Primary permalink written by Winer.',
+  },
+]);
+
+/**
+ * Five records form the authored reading. The other six remain available in
+ * the complete source view and the fixed query presets.
+ */
+export const TRAIL_STOPS = freeze([
+  {
+    id: 'control',
+    label: 'The premise',
+    recordId: 'direct-2001-desktop-websites',
+    interpretation: 'The trail begins with a design choice: Publishing software can leave the writer in control of the underlying material. Directness starts here as an arrangement between a person, a tool, and their data.',
+    transition: 'As sources gain their own route to an audience, the publishing premise becomes a question for the structure of journalism.',
+  },
+  {
+    id: 'journalism',
+    label: 'The translation',
+    recordId: 'direct-2009-flying-seminar',
+    interpretation: 'Rosen places the formulation inside a guided public reading, his “flying seminar,” and names its structural consequence. The idea is no longer only about a publishing tool or a blogger; it becomes a way to read a changing news system.',
+    transition: 'A structural claim becomes more useful when it can guide day-to-day reporting practice.',
+  },
+  {
+    id: 'practice',
+    label: 'The practice',
+    recordId: 'direct-2013-networked-beat',
+    interpretation: 'The networked beat supplies that practice: Listen to knowledgeable people who publish in public, then verify and connect their work. Direct sources do not remove the journalist; they alter what reporting includes.',
+    transition: 'For public sources to remain findable and trustworthy, the surrounding infrastructure must carry origin and context too.',
+  },
+  {
+    id: 'provenance',
+    label: 'The infrastructure',
+    recordId: 'direct-2017-source-namespace',
+    interpretation: 'The RSS source namespace makes provenance part of the item itself. The idea of going direct is joined by a technical question: How can origin and context remain visible when material travels through feeds and readers?',
+    transition: 'The last record asks what these pieces could mean at the scale of a local institution.',
+  },
+  {
+    id: 'institution',
+    label: 'The institution',
+    recordId: 'direct-2026-community-news',
+    interpretation: 'The final stop recasts the early premise as institutional design. Professionals report, bloggers join the story flow, readers may finance the organization, and independent developers offer replaceable open software.',
+    transition: 'The trail ends on a proposal rather than a verdict: A user-controlled publishing idea has become one ingredient in imagining community news.',
+  },
+]);
+
+export const CONCEPTS = freeze([
+  {
+    id: 'direct-publishing',
+    title: 'Direct publishing',
+    short: 'A source can publish in public without first passing through a newsroom or platform editor.',
+    explanation: 'In this corpus, direct publishing begins with control of the publishing material and develops into the ability of a knowledgeable source to speak in public. The concept describes a changed route to an audience, not an automatic guarantee of accuracy or authority.',
+    question: 'What changes when publication is available to the source as well as the reporter?',
+    evidenceRecordIds: ['direct-2001-desktop-websites', 'direct-2004-bloggers-sources', 'direct-2009-flying-seminar'],
+  },
+  {
+    id: 'source-authority',
+    title: 'Source authority',
+    short: 'Public access to a first-hand voice changes how readers and reporters evaluate authority.',
+    explanation: 'The records distinguish being able to publish from being worth trusting. Winer’s request for trustworthy experts and Rosen’s journalism framing both make evaluation essential: Readers still need context, verification, and reasons for confidence.',
+    question: 'How can a reader recognize knowledge and integrity when a source speaks directly?',
+    evidenceRecordIds: ['direct-2004-bloggers-sources', 'direct-2009-tech-heroes', 'direct-2013-networked-beat'],
+  },
+  {
+    id: 'networked-beat',
+    title: 'The networked beat',
+    short: 'Reporting includes listening to and connecting knowledgeable people who already publish in public.',
+    explanation: 'A networked beat treats direct sources as part of the reporter’s field of attention. The journalistic work is not displaced. It expands to include finding, checking, connecting, and contextualizing public contributions.',
+    question: 'What does a reporter add when useful source material is already public?',
+    evidenceRecordIds: ['direct-2009-flying-seminar', 'direct-2013-networked-beat', 'direct-2026-community-news'],
+  },
+  {
+    id: 'provenance',
+    title: 'Provenance',
+    short: 'Links, public histories, and feed metadata help evidence retain its origin and context.',
+    explanation: 'Public source material needs a traceable path back to where it came from. The GitHub archive preserves that path as inspectable history; the RSS source namespace preserves it as machine-readable source context.',
+    question: 'What information must travel with an item so another person can verify its origin?',
+    evidenceRecordIds: ['direct-2016-github-archive', 'direct-2017-source-namespace', 'direct-2023-feedland'],
+  },
+  {
+    id: 'reader-controlled-discovery',
+    title: 'Reader-controlled discovery',
+    short: 'Readers can follow people and feeds they choose instead of relying only on platform ranking.',
+    explanation: 'Once more sources publish directly, discovery becomes a design problem. The records move from asking where trustworthy experts can be found to feed tools and an OPML-based blogroll prototype whose accompanying toolkit is designed for site-supplied lists.',
+    question: 'Does the reader, a curator, or a platform choose which direct sources remain visible?',
+    evidenceRecordIds: ['direct-2009-tech-heroes', 'direct-2023-feedland', 'direct-2024-social-blogroll'],
+  },
+  {
+    id: 'participatory-news',
+    title: 'Participatory news',
+    short: 'A community news institution can assign complementary roles to professionals, bloggers, readers, and developers.',
+    explanation: 'The closing proposal treats direct publishing as one part of a wider social arrangement: Professionals report, bloggers contribute to the story flow, readers may support the institution, and developers provide open, replaceable software.',
+    question: 'Which roles and safeguards would make a shared community news flow useful?',
+    evidenceRecordIds: ['direct-2013-networked-beat', 'direct-2016-github-archive', 'direct-2026-community-news'],
+  },
+]);
+
+export const CURATOR_FINDINGS = freeze([
+  {
+    id: 'registers',
+    title: 'The idea changes registers without losing its premise',
+    text: 'Across the selected sources, user control becomes source authority, then a claim about journalism, and finally a proposal for community news. The records do not use identical language, but they repeatedly return to people publishing on their own behalf.',
+    evidenceRecordIds: ['direct-2001-desktop-websites', 'direct-2009-flying-seminar', 'direct-2026-community-news'],
+  },
+  {
+    id: 'discovery',
+    title: 'Going direct creates a discovery problem',
+    text: 'More public voices do not automatically produce a useful information environment. From a reader request in 2009 to feed and blogroll infrastructure, the corpus repeatedly asks how credible experts are found, followed, and connected.',
+    evidenceRecordIds: ['direct-2009-tech-heroes', 'direct-2023-feedland', 'direct-2024-social-blogroll'],
+  },
+  {
+    id: 'infrastructure',
+    title: 'Open infrastructure carries the method forward',
+    text: 'Public repositories, RSS provenance, and inspectable feed software make source material easier to preserve and trace. In this mini-archive, formats and histories are evidence-bearing parts of the publishing system.',
+    evidenceRecordIds: ['direct-2016-github-archive', 'direct-2017-source-namespace', 'direct-2023-feedland'],
+  },
+  {
+    id: 'journalist-role',
+    title: 'The reporter’s role changes; it does not disappear',
+    text: 'Rosen’s records emphasize listening, verification, and connection when sources publish publicly. Winer’s community-news proposal then places professionals inside a wider participant network rather than outside it.',
+    evidenceRecordIds: ['direct-2009-flying-seminar', 'direct-2013-networked-beat', 'direct-2026-community-news'],
+  },
+]);
+
+export const ENTITIES = freeze([
+  { id: 'dave-winer', name: 'Dave Winer', kind: 'person', description: 'Developer and writer whose published work anchors this demonstration.' },
+  { id: 'jay-rosen', name: 'Jay Rosen', kind: 'person', description: 'Press critic who develops the journalism implications of the idea.' },
+  { id: 'scripting-news', name: 'Scripting News', kind: 'publication', description: 'Winer’s long-running public record of ideas and software work.' },
+  { id: 'pressthink', name: 'PressThink', kind: 'publication', description: 'Rosen’s public writing on journalism and the press.' },
+  { id: 'journalism', name: 'Journalism', kind: 'field', description: 'The institution whose source relationships are being reconsidered.' },
+  { id: 'blogging', name: 'Blogging', kind: 'practice', description: 'A low-friction way for a knowledgeable source to publish directly.' },
+  { id: 'rss', name: 'RSS', kind: 'format', description: 'An open format that lets readers follow published sources across sites.' },
+  { id: 'opml', name: 'OPML', kind: 'format', description: 'A portable format for lists and outlines, including feed subscriptions.' },
+  { id: 'source-namespace', name: 'Source namespace', kind: 'specification', description: 'RSS extensions that carry provenance and source context.' },
+  { id: 'github', name: 'GitHub', kind: 'platform', description: 'A public code and history surface used here for verification.' },
+  { id: 'feedland', name: 'FeedLand', kind: 'software', description: 'Open feed-reading infrastructure built around RSS.' },
+  { id: 'blogroll', name: 'Social blogroll', kind: 'software', description: 'An updating discovery layer built from feeds and a configurable OPML list.' },
+  { id: 'desktop-websites', name: 'Desktop websites', kind: 'software idea', description: 'Publishing tools designed around user control of data.' },
+  { id: 'community-news', name: 'Community news', kind: 'institutional model', description: 'A proposed news flow shared by professionals and community publishers.' },
+]);
+
+export const CONNECTIONS = freeze([
+  { from: 'dave-winer', to: 'jay-rosen', type: 'idea discussed with', evidenceRecord: 'direct-2009-flying-seminar' },
+  { from: 'blogging', to: 'journalism', type: 'changes source relationship in', evidenceRecord: 'direct-2013-networked-beat' },
+  { from: 'rss', to: 'source-namespace', type: 'extended by', evidenceRecord: 'direct-2017-source-namespace' },
+  { from: 'feedland', to: 'rss', type: 'reads and organizes', evidenceRecord: 'direct-2023-feedland' },
+  { from: 'blogroll', to: 'opml', type: 'is configured by', evidenceRecord: 'direct-2024-social-blogroll' },
+  { from: 'community-news', to: 'journalism', type: 'proposes a participatory model for', evidenceRecord: 'direct-2026-community-news' },
+  { from: 'scripting-news', to: 'github', type: 'publishes a backup and discussion history on', evidenceRecord: 'direct-2016-github-archive' },
+]);
+
+export const PRESETS = freeze([
+  { id: 'all', label: 'All source records', description: 'The complete 11-record corpus in chronological order.', themes: [] },
+  { id: 'idea', label: 'Idea and meaning', description: 'Where the phrase and its journalism meaning take shape.', themes: ['direct-publishing', 'source-authority', 'journalism'] },
+  { id: 'infrastructure', label: 'Tools and formats', description: 'RSS, OPML, provenance, public code, and preservation.', themes: ['open-data', 'provenance', 'syndication', 'preservation'] },
+  { id: 'participation', label: 'People and networks', description: 'Discovery, networks, and community participation.', themes: ['discovery', 'participation', 'networks'] },
+]);
+
+export const MANIFEST = freeze({
+  title: 'How an idea travels: Sources go direct, 2001–2026',
+  scope: 'A small demonstration corpus, not a complete Dave Winer archive.',
+  frozenOn: '2026-07-18',
+  ingestionLog: './ingestion-log.json',
+  recordCount: RECORDS.length,
+  sourcePolicy: 'Public primary pages and public repositories only. Summaries are curator-written; canonical URLs and evidence notes are retained on every record.',
+  exclusions: ['No private correspondence', 'No social-platform scraping', 'No claim of endorsement', 'No runtime scraping or archive database access'],
+});

@@ -5,7 +5,7 @@ description: Manage path configuration and deployment workflow for local vs prod
 
 # Deployment & Path Management
 
-The Jay Rosen Internet Archive deploys to WordPress via FTP with absolute paths. This skill manages the transition between local development and production paths.
+Jay Rosen's Internet Archive deploys to WordPress via FTP with absolute paths. This skill manages the transition between local development and production paths.
 
 ## When to Activate
 

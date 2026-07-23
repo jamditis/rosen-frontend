@@ -62,6 +62,67 @@ describe('stampVersion', () => {
     assert.strictEqual(markers, 3, `expected 3 markers scanned, got ${markers}`);
   });
 
+  it('stamps the standalone faq/ page and its .js imports (#567)', () => {
+    // faq/ is served outside the app bundle, so its own ?v= markers must be in
+    // the bump surface or they drift while the app advances. This is the direct
+    // guard that collectVersionedFiles walks faq/ (not only frontend/).
+    write('faq/index.html', '<script type="module" src="./script.js?v=1.0.0"></script>\n');
+    write('faq/script.js', "import { FAQ_ITEMS } from './data.js?v=1.0.0';\n");
+    write('faq/data.js', 'export const FAQ_ITEMS = [];\n'); // data only; no import to stamp
+
+    stampVersion(root, '2.3.4');
+
+    assert.match(read('faq/index.html'), /src="\.\/script\.js\?v=2\.3\.4"/);
+    assert.match(read('faq/script.js'), /'\.\/data\.js\?v=2\.3\.4'/);
+  });
+
+  it('stamps standalone feature HTML and browser JavaScript recursively', () => {
+    write('features/example/index.html', '<link rel="stylesheet" href="./styles.css?v=1.0.0">\n');
+    write('features/example/script.js', "import './data.js?v=1.0.0';\n");
+    stampVersion(root, '2.3.4');
+
+    assert.match(read('features/example/index.html'), /styles\.css\?v=2\.3\.4/);
+    assert.match(read('features/example/script.js'), /data\.js\?v=2\.3\.4/);
+    const collected = collectVersionedFiles(root).map((f) => path.relative(root, f));
+    assert.ok(collected.includes('features/example/index.html'));
+    assert.ok(collected.includes('features/example/script.js'));
+  });
+
+  it('stamps standalone dissertation HTML, CSS, and JavaScript recursively', () => {
+    write('dissertation/index.html', '<link rel="stylesheet" href="../shared-styles.css?v=1.0.0">\n');
+    write('dissertation/reader/index.html', [
+      '<link rel="stylesheet" href="src/css/main.css?v=1.0.0">',
+      '<script type="module" src="src/js/reader.js?v=1.0.0"></script>',
+    ].join('\n'));
+    write('dissertation/reader/src/css/main.css', '@import "variables.css?v=1.0.0";\n');
+    write('dissertation/reader/src/js/reader.js', "import './settings.js?v=1.0.0';\n");
+
+    stampVersion(root, '2.3.4');
+
+    assert.match(read('dissertation/index.html'), /shared-styles\.css\?v=2\.3\.4/);
+    assert.match(read('dissertation/reader/index.html'), /main\.css\?v=2\.3\.4/);
+    assert.match(read('dissertation/reader/index.html'), /reader\.js\?v=2\.3\.4/);
+    assert.match(read('dissertation/reader/src/css/main.css'), /variables\.css\?v=2\.3\.4/);
+    assert.match(read('dissertation/reader/src/js/reader.js'), /settings\.js\?v=2\.3\.4/);
+  });
+
+  it('stamps frontend design-system HTML and CSS references', () => {
+    write('frontend/design-system/demo.html', [
+      '<link rel="stylesheet" href="./tokens.css?v=1.0.0">',
+      '<link rel="stylesheet" href="./recipes.css?v=1.0.0">',
+    ].join('\n'));
+    write('frontend/design-system/recipes.css', '@import url("./tokens.css?v=1.0.0");\n');
+
+    stampVersion(root, '2.3.4');
+
+    assert.match(read('frontend/design-system/demo.html'), /tokens\.css\?v=2\.3\.4/);
+    assert.match(read('frontend/design-system/demo.html'), /recipes\.css\?v=2\.3\.4/);
+    assert.match(read('frontend/design-system/recipes.css'), /tokens\.css\?v=2\.3\.4/);
+    const collected = collectVersionedFiles(root).map((f) => path.relative(root, f));
+    assert.ok(collected.includes('frontend/design-system/demo.html'));
+    assert.ok(collected.includes('frontend/design-system/recipes.css'));
+  });
+
   it('leaves the data-cache CACHE_VERSION (cacheConfig.js) untouched', () => {
     stampVersion(root, '2.3.4');
     // cacheConfig's 'v9' is not semver, so the anchored sw.js regex can't match

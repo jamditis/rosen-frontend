@@ -1,4 +1,4 @@
-# CLAUDE.md - Jay Rosen Internet Archive
+# CLAUDE.md - Jay Rosen's Internet Archive
 
 
 ## Bug-fixing workflow
@@ -13,12 +13,23 @@ When a bug is reported, don't immediately attempt to fix it. Instead:
 
 ## Project overview
 
-The **Jay Rosen Internet Archive** is a public collection of the works, critiques, and teachings of Jay Rosen, NYU professor of journalism. It covers four decades of journalism criticism, media theory, and public life.
+**Jay Rosen's Internet Archive** is a public collection of the works, critiques, and teachings of Jay Rosen, NYU professor of journalism. It covers four decades of journalism criticism, media theory, and public life.
 
 - **Live URL:** https://pressthink.org/j/rosen-archive/
 - **Repository:** github.com/jamditis/rosen-frontend
-- **Current version:** v3.4.1
+- **Current deploy version:** see `version.json`, `index.html`, and `frontend/sw.js`
 - **Archive curator:** Joe Amditis
+
+### Making-of narrative interview handoff
+
+When Joe asks to begin, continue, or reconstruct the personal story of how he
+built the archive, read [`docs/narrative/INTERVIEW_GUIDE.md`](docs/narrative/INTERVIEW_GUIDE.md)
+in full before asking questions or editing prose. It contains the interview
+strategy, section-by-section question bank, verification protocol, sensitive
+claim boundaries, reconstruction method, and editorial approval gates. The
+existing `features/making-of/index.html` is a provisional draft and must not be
+treated as approved first-person testimony or deployed without Joe's explicit
+publication approval.
 
 ### About Jay Rosen
 
@@ -50,7 +61,7 @@ Professor of Journalism at NYU since 1986. Creator of PressThink blog. Known for
 
 ### Version/cache busting
 
-All JS imports use `?v=3.3.0` query parameters. When changing code, bump the version string across all imports. Use the `/check-versions` skill to find version mismatches.
+All JS imports use the current `?v=` query parameter from `index.html`. When changing deployable code, bump the version in lockstep across `index.html`, `version.json`, every relevant import string, and `frontend/sw.js` `CACHE_VERSION`. Use the `/check-versions` skill to find version mismatches.
 
 ### Path configuration
 
@@ -75,14 +86,14 @@ Configured in `frontend/constants.js` via `DATA_CONFIG`.
 
 ### Source CSV files
 
-Counts verified against current `data/` on 2026-05-25:
+Counts verified against current `data/` on 2026-07-07:
 
 | File | Records | Contents |
 |------|---------|----------|
-| `data/archive_records-public.csv` | 1,030 | Non-social archive records (800 RECORD, 137 TUMBLR, 83 CLIP, 10 THREAD). Line count is high (~50k+) due to multi-line text fields. Max record id is `RECORD-00901`; next ID for new records is `RECORD-00902`. |
-| `data/social_posts.csv` | ~29,700 | Twitter/X and Bluesky posts. Max BSKY id is `BSKY-03121`. |
-| `data/extracted_entities.csv` | 5,036 | Named entities (people, orgs, concepts) |
-| `data/extracted_relationships.csv` | 4,666 | Entity-to-record relationships |
+| `data/archive_records-public.csv` | 1,029 | Non-social archive records (799 RECORD, 137 TUMBLR, 83 CLIP, 10 THREAD). Line count is high (~50k+) due to multi-line text fields. Max record id is `RECORD-00904`; next ID for new records is `RECORD-00905`. |
+| `data/social_posts.csv` | 29,747 | Twitter/X and Bluesky posts. Max BSKY id is `BSKY-03172`. |
+| `data/extracted_entities.csv` | 8,152 | Named entities (people, orgs, concepts) |
+| `data/extracted_relationships.csv` | 12,560 | Entity-to-record relationships |
 
 ### Regenerating JSON from CSV
 
@@ -102,11 +113,14 @@ Hash-based SPA routing (`frontend/services/router.js`):
 | Route | Hash | Component | Description |
 |-------|------|-----------|-------------|
 | Archive | (default) | `App.js` main view | Record cards with filters |
+| Start here | `#start` | `StartHerePage.js` | Guided visitor hub and field guide |
 | Folders | `#folders` | `App.js` folder view | Browse by category folders |
 | Entities | `#entities` | `EntityBrowser.js` | Browse/search extracted entities |
 | Dissertation | `#dissertation` | `DissertationPage.js` | Mind map + detail panel |
 | About | `#about` | `AboutPage.js` | About the archive |
 | Analytics | `#analytics` | `AnalyticsDashboard.js` | Archive statistics |
+| Wiki | `#wiki` / `#wiki/:slug` | `WikiPage.js` | Maintained deep links; not currently in public navigation |
+| Archive desktop | `#desktop` / `#desktop/:app` | lazy `DesktopShell.js` | Optional alternate exploration shell |
 
 Record deep links: `?record=RECORD_ID` opens a record modal on any route.
 
@@ -145,32 +159,30 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── utils/                       # Design tokens and small helpers
 │   └── design-system/               # CSS tokens and demo pages
 │
-├── dissertation/                    # Dissertation presentation tools (4 live)
+├── dissertation/                    # Dissertation presentation tools (3 live)
 │   ├── index.html                   # Dissertation landing page
 │   ├── reader/                      # Full text reader with selection sharing
 │   ├── foreword/                    # Foreword page
-│   ├── network-effect/              # Network film analysis
-│   └── faq/                         # Dissertation FAQ
-│   # Note: an earlier set of 6 standalone tools (comparison, concepts,
-│   # context, excerpts, glossary, timeline) was retired and now lives
-│   # in archived/dissertation-tools/ for reference, alongside a non-tool
-│   # source/ bundle (dissertation PDF + transcribed markdown + helper).
+│   └── network-effect/              # Network film analysis
+│
+├── faq/                             # FAQ for the archive + dissertation (moved from dissertation/faq/ in #567; old URL 301s via .htaccess)
 │
 ├── dissertation-launch/             # Standalone dissertation launch landing page
 │
 ├── features/                        # Standalone feature pages
+│   ├── participate/                 # Ways to participate
 │   ├── shared/                      # Shared feature assets (text-selection.js)
-│   └── status-report/               # Archive status report generator
+│   └── winer-method/                # Public-source archive-method demonstration
 │
 ├── data/                            # Archive data files + export scripts
 │   ├── archive-data.json            # Full combined JSON (~28 MB)
 │   ├── archive-core.json            # Lightweight records (~13 MB)
 │   ├── archive-details.json         # Full details (~13 MB)
 │   ├── archive-entities.json        # Entity graph (~1.1 MB)
-│   ├── archive_records-public.csv   # Source records (1,030 rows)
-│   ├── social_posts.csv             # Social media posts (~29,700 rows)
-│   ├── extracted_entities.csv       # Named entities (5,036 rows)
-│   ├── extracted_relationships.csv  # Entity relationships (4,666 rows)
+│   ├── archive_records-public.csv   # Source records (1,029 rows)
+│   ├── social_posts.csv             # Social media posts (29,747 rows)
+│   ├── extracted_entities.csv       # Named entities (8,152 rows)
+│   ├── extracted_relationships.csv  # Entity relationships (12,560 rows)
 │   ├── export-archive-data.js       # JSON generator script
 │   ├── schema.json                  # Data schema
 │   └── README.md                    # Data dictionary
@@ -179,7 +191,7 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── src/                         # Scraper, processors, categorizer
 │   ├── scripts/                     # Maintenance scripts
 │   ├── tests/                       # Python test suite (pytest)
-│   ├── submission_server/           # Pillar 3a: Flask submission server + scheduler + SFTP push
+│   ├── submission_runtime/          # Pillar 3a: current Action helpers for config, SFTP, and Sheets
 │   ├── docs/                        # Backend-specific docs
 │   ├── pyproject.toml               # Poetry dependencies
 │   ├── schema.json                  # Backend data schema
@@ -190,10 +202,9 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── dataexplorer/                # Tabular data explorer
 │   └── dataviz/                     # Data visualization tool
 │
-├── tests/                           # Frontend/data test suite — Node.js built-in runner (24 *.test.js files plus a validate-dissertation-page.js helper script; 25 files total)
+├── tests/                           # Frontend/data test suite — Node.js built-in runner (106 *.test.js files plus a validate-dissertation-page.js helper script; 107 runnable/support files total)
 │
 ├── archived/                        # Reference only, not deployed (see DEPLOYMENT.md)
-│   ├── dissertation-tools/          # 6 retired dissertation tools (comparison, concepts, context, excerpts, glossary, timeline) + a source/ bundle (PDF + markdown + helper script); kept pending the decisions-pending.md call. The faq tool was restored to dissertation/faq/ in #411.
 │   └── scripts/                     # Provenance-only one-off scripts, broken at import from here by design (each has a README). backend-oneoffs/ (#190) and data-oneoffs/ (#380). The rest of archived/ was pruned in #166.
 │
 ├── docs/                            # Project documentation
@@ -257,11 +268,15 @@ Override the port with `PREVIEW_PORT=8765 npm run preview`. The server binds to 
 npm run preview:audit                 # Mobile + desktop, key routes, axe-core scan
 ```
 
-Spawns the preview server, walks 9 key routes (archive, explorer, entities, about, analytics, record modal, dissertation, dissertation reader, status report) at 375x812 and 1440x900 viewports, runs `axe-core` for WCAG 2.1 AA, and writes `preview-audit-results/axe-report.html` plus per-route screenshots under `preview-audit-results/screenshots/{viewport}/`. Exits non-zero if any violations are found.
+Spawns the preview server, walks 41 route states at mobile, tablet, and desktop
+viewports, runs `axe-core` for WCAG 2.1 AA, and writes
+`preview-audit-results/axe-report.html` plus per-route screenshots under
+`preview-audit-results/screenshots/{viewport}/`. Exits non-zero if any
+violations are found.
 
 ## Testing
 
-Tests use Node.js built-in test runner (`node --test`). The suite under `tests/` currently spans 24 files covering data integrity, CSV quality, pipeline, thread algorithm/detection, frontend structure, view-state, route vocabulary, linkify, entity-index, service-worker cache, HTTP cached loader, fetch error handling, schema BOM, data-explorer security, version consistency, and process-record:
+Tests use Node.js built-in test runner (`node --test`). The suite under `tests/` currently spans 106 test files covering data integrity, CSV quality, pipeline, thread algorithm/detection, frontend structure, view-state, route vocabulary, linkify, entity-index, service-worker cache, HTTP cached loader, fetch error handling, schema BOM, data-explorer security, version consistency, process-record, and the current design-system surfaces:
 
 ```bash
 npm test                   # Run the full suite
@@ -281,7 +296,7 @@ Short version:
 3. Bump the version in `index.html`, `version.json`, all `?v=` import strings, and `frontend/sw.js` `CACHE_VERSION` to bust the Cloudflare cache. The service worker serves static JS cache-first with `ignoreSearch: true`, so a `?v=` bump alone does not invalidate it — only a `CACHE_VERSION` change drops the stale service-worker cache. `tests/version-consistency.test.js` enforces that `sw.js` `CACHE_VERSION` matches `version.json`.
 4. Upload only the files that changed via FTP.
 
-Pillar 3a (in-flight) automates this for record submissions via `backend/submission_server/` and the `submit-record.yml` / `sweep-stuck-rows.yml` workflows — see those files for the current state.
+Pillar 3a (in-flight) automates this for record submissions via `backend/submission_runtime/` and the `submit-record.yml` / `sweep-stuck-rows.yml` workflows. The retired Flask server is not a fallback path; its history remains available in git.
 
 ## Backend data pipeline
 
@@ -315,8 +330,8 @@ Supports: Articles, Videos, Twitter/X, Tumblr, Newspaper Clippings (PDF OCR).
 1. **No build step for frontend.** Never suggest npm/webpack/vite for the production frontend. The only npm usage is `node data/export-archive-data.js` for data generation and `npm test` for testing.
 2. **Match the design system.** Use Roboto Mono body text, Special Elite for display headings, paper texture background. Follow `constants.js` color definitions.
 3. **Dissertation content is sacred.** Quotes and content in `dissertationData.js` are verified citations. Do not modify, paraphrase, or fabricate quotes.
-4. **Use HTM, not JSX.** All components use the `html` tagged template from `./html.js`. Import it as `import { html } from '../html.js?v=3.3.0'`.
-5. **Version all imports.** Every `.js` import must include the `?v=3.3.0` query parameter. Check `index.html` for the current version.
+4. **Use HTM, not JSX.** All components use the `html` tagged template from `./html.js`. Import it from the versioned local `html.js` path already used by the surrounding file.
+5. **Version all imports.** Every `.js` import must include the current `?v=` query parameter from `index.html`.
 6. **Standalone pages go in `/dissertation/` or `/features/`.** Each gets its own subdirectory with an `index.html`.
 7. **Keep data regeneration working.** If you modify CSV structure, update `data/export-archive-data.js` to match.
 8. **Backend uses Poetry.** Not pip directly. Run commands with `poetry run python ...`.
@@ -327,10 +342,10 @@ Supports: Articles, Videos, Twitter/X, Tumblr, Newspaper Clippings (PDF OCR).
 
 ## Known issues
 
-- Social media records (~29,700) have generic titles ("Tweet by Jay Rosen", "Post by Jay Rosen"). Fixing this would require AI-based title generation from post content.
+- Social media records (29,747) have generic titles ("Tweet by Jay Rosen", "Post by Jay Rosen"). Fixing this would require AI-based title generation from post content.
 - Browser localStorage can fill up on the live site due to data size. The ~13 MB `archive-core.json` exceeds localStorage's ~5 MB cap, so the core-data cache uses IndexedDB (`frontend/services/idbCache.js`, #275) — it structured-clones the parsed object on read (no `JSON.parse`) and persists across tab close. The old localStorage/sessionStorage path remains as a fallback for browsers where IndexedDB is blocked (Safari Private, Firefox strict tracking protection).
 - Thread records have placeholder titles ("[Bluesky Thread]") — needs content-based title generation.
 - Roughly 200 records have zero extracted relationships, most because their `raw_text` column is empty (issues #207 / #211). Extraction can be rerun once the raw_text gap-fill in issue #208 (PressThink sweep) and #209 (HuffPost sweep) lands.
-- 16 records still have `verified=false`. Recovery work is tracked in issue #199 (sub-batches in issue #242 and PR #244/#253). A small set is genuinely unrecoverable — print-only or vanished publications (e.g. The Baffler issue 12 from 1999; the defunct Pew Center for Civic Journalism's print monograph from ~2000).
+- 79 records still have `verified=false`. Recovery work is tracked in issue #199 (sub-batches in issue #242 and PR #244/#253). A small set is genuinely unrecoverable — print-only or vanished publications (e.g. The Baffler issue 12 from 1999; the defunct Pew Center for Civic Journalism's print monograph from ~2000).
 - `archive.pressthink.org` subdomain has a TLS certificate issue. Records using that subdomain correctly use `http://` URLs — browsers handle these fine but HTTPS fetch will fail.
-- Bluesky thread links use `embed.bsky.app` (unauthenticated) rather than `bsky.app`. If Bluesky changes the embed subdomain, update `ThreadModal.js` and `RecordModal.js`.
+- Bluesky outbound links use `bsky.app`, not `embed.bsky.app`; the embed host returns placeholder/404 pages when opened directly.

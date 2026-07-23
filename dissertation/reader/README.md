@@ -1,4 +1,4 @@
-# Dissertation Reader: "The Impossible Press"
+# Dissertation reader: "The Impossible Press"
 
 A clean, accessible HTML reading experience for Jay Rosen's 1986 doctoral dissertation.
 
@@ -67,4 +67,4 @@ To preview locally, run `npm run preview` from the repository root and open `htt
 ## License
 
 The dissertation content is &copy; 1986 Jay Rosen.
-The reader code is part of the Jay Rosen Internet Archive project.
+The reader code is part of Jay Rosen's Internet Archive project.

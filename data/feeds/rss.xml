@@ -5,9 +5,28 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive of Jay Rosen&apos;s journalism scholarship, including articles, essays, social posts, and the 1986 dissertation &quot;The Impossible Press&quot;</description>
     <language>en-us</language>
-    <lastBuildDate>Wed, 24 Jun 2026 23:37:26 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 20 Jul 2026 17:06:47 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/rss.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
+  <item>
+    <title>Why The Ubyssey is covering the World Cup</title>
+    <link>https://ubyssey.ca/margins/world-cup-coverage/</link>
+    <guid isPermaLink="true">https://ubyssey.ca/margins/world-cup-coverage/</guid>
+    <pubDate>Wed, 15 Jul 2026 00:00:00 GMT</pubDate>
+    <description>The Ubyssey sports editor Caleb Peterson applies Jay Rosen’s concept of “awayness” to the newspaper’s decision to cover the 2026 FIFA World Cup. Peterson argues that simply reporting events readers can already watch or find elsewhere does not solve an awayness problem; the publication instead has to add value through beat expertise, analysis and trusted voices.</description>
+    <category>Journalism Theory &amp; Practice</category>
+    <category>Press &amp; Media Criticism</category>
+    <category>Audience &amp; Public Engagement</category>
+  </item>
+  <item>
+    <title>Jay Rosen&apos;s Internet Archive: an Introduction.</title>
+    <link>https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/</link>
+    <guid isPermaLink="true">https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/</guid>
+    <pubDate>Sun, 05 Jul 2026 00:00:00 GMT</pubDate>
+    <description>A Q&amp;A in which Jay Rosen introduces his internet archive, built and curated with Joe Amditis: a links-only collection of everything of Rosen&apos;s findable online, reaching back to his 1986 PhD dissertation and holding 26,615 records at launch. Rosen frames it as one media critic&apos;s attempt to preserve the web against link rot, a complement to the Internet Archive&apos;s Wayback Machine.</description>
+    <category>Press &amp; Media Criticism</category>
+    <category>Technology &amp; Digital Media</category>
+  </item>
   <item>
     <title>It was a political hire, cont...</title>
     <link>https://bsky.app/profile/jayrosen.bsky.social/post/3mohf75js3k2j</link>
@@ -851,24 +870,6 @@ Bari Weiss had no experience when she was hired a...</title>
     <description>A Bluesky post by Jay Rosen from 2025-10-25. Topics: Press &amp; Media Criticism, Technology &amp; Digital Media.</description>
     <category>Press &amp; Media Criticism</category>
     <category>Technology &amp; Digital Media</category>
-  </item>
-  <item>
-    <title>Another way to say this</title>
-    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3m3ztmvffm22z</link>
-    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3m3ztmvffm22z</guid>
-    <pubDate>Sat, 25 Oct 2025 00:00:00 GMT</pubDate>
-    <description>A Bluesky post by Jay Rosen from 2025-10-25. Topics: Press &amp; Media Criticism, Journalism Theory &amp; Practice.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Journalism Theory &amp; Practice</category>
-  </item>
-  <item>
-    <title>One U.S. journalist with a pedigree and tons of experience who can be counted...</title>
-    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3m3znyozkvs25</link>
-    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3m3znyozkvs25</guid>
-    <pubDate>Sat, 25 Oct 2025 00:00:00 GMT</pubDate>
-    <description>A Bluesky post by Jay Rosen from 2025-10-25. Topics: Press &amp; Media Criticism, Journalism Theory &amp; Practice.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Journalism Theory &amp; Practice</category>
   </item>
   </channel>
 </rss>

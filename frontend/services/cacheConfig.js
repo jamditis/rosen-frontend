@@ -10,7 +10,10 @@
  */
 
 // Increment to invalidate all caches (e.g. after a breaking payload change).
-export const CACHE_VERSION = 'v9';
+// v10: the 9c entity cleanup rewrote archive-entities.json; bump so a returning
+// visitor's cached pre-cleanup entity payload is dropped instead of served for
+// up to CACHE_TTL_MS after deploy.
+export const CACHE_VERSION = 'v10';
 
 // Entity data is small (~1MB), so a short TTL keeps it current cheaply.
 export const CACHE_TTL_MS = 1000 * 60 * 30; // 30 minutes

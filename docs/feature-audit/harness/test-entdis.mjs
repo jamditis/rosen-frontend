@@ -32,8 +32,8 @@ async function waitFor(page, fn, timeout = 20000) {
 
 // --- ENTITY BROWSER (#entities) -----------------------------------------
 // EntityBrowser renders inside the archive-grid route, gated on core data
-// (!loading && !error), so we use gotoArchive to wait for "records found"
-// then wait for entity cards (chips) to appear.
+// (!loading && !error), so gotoArchive waits for the route-specific search
+// control before the harness verifies the data-driven entity counts.
 
 async function testEntities(browser) {
   const { page, errors, requests } = await freshPage(browser, { width: 1440, height: 900 });
@@ -572,7 +572,7 @@ async function testDissertation(browser) {
           isOpen: /right-0/.test(dlg.className),
           typeLabel: labelSpan ? labelSpan.textContent.trim() : null,
           title,
-          comingSoon: /Detailed content coming soon/.test(txt),
+          comingSoon: /No additional detail for this item/.test(txt),
           hasSummaryOrConcepts: /Summary|Key Concepts|Key Figures|From the text/.test(txt),
         };
       });
@@ -583,7 +583,7 @@ async function testDissertation(browser) {
       results['ENT-16'] = verdict(validPanel ? 'pass' : 'partial',
         '',
         'low',
-        `Detail panel (role=dialog, open) shows type label "${panel.typeLabel}", title "${panel.title}", and ${panel.hasSummaryOrConcepts?'content sections (summary/concepts/figures/quote)':'the "Detailed content coming soon" empty state'} (comingSoon=${panel.comingSoon}). Confirmed smell exists in code: displayNode retained for animate-out can briefly show stale content on rapid toggling (not reliably reproducible headless).`);
+        `Detail panel (role=dialog, open) shows type label "${panel.typeLabel}", title "${panel.title}", and ${panel.hasSummaryOrConcepts?'content sections (summary/concepts/figures/quote)':'the "No additional detail for this item" empty state'} (comingSoon=${panel.comingSoon}). Confirmed smell exists in code: displayNode retained for animate-out can briefly show stale content on rapid toggling (not reliably reproducible headless).`);
     }
 
     // ENT-17: close panel via X, Esc, backdrop, empty-space SVG click.

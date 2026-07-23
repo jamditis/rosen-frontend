@@ -22,10 +22,6 @@ _BACKEND = pathlib.Path(__file__).resolve().parents[1]
 if str(_BACKEND) not in sys.path:
     sys.path.insert(0, str(_BACKEND))
 
-# The script imports submission_server (config/paths), which pulls flask in.
-pytest.importorskip("flask")
-
-
 def _load_module():
     path = _BACKEND / "scripts" / "sync_sheet_to_archive.py"
     spec = importlib.util.spec_from_file_location("sync_sheet_to_archive", path)

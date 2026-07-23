@@ -1,4 +1,4 @@
-# Production readiness design: Jay Rosen Internet Archive
+# Production readiness design: Jay Rosen's Internet Archive
 
 **Created:** February 14, 2026
 **Deadline:** End of week of February 23, 2026 (~9 days)

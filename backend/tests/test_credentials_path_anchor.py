@@ -31,7 +31,7 @@ SCRIPTS = {
     "scripts/diagnostics/text_cleaner.py": 2,
     "scripts/diagnostics/smart_corrector/gdrive_overflow_handler.py": 3,
     "scripts/verify_extraction_sheets.py": 1,
-    "scripts/run_smart_corrector_201_plus.py": 1,
+    "scripts/corrector.py": 1,
 }
 
 # Bare relative literals handed straight to a connector -- the bug.
@@ -59,6 +59,6 @@ def test_credentials_anchored_to_backend(rel, depth):
     assert f"parents[{depth}]" in src, rel
 
     # The declared depth genuinely reaches backend/ from this script's location.
-    assert path.resolve().parents[depth] == _BACKEND, (
-        f"{rel}: parents[{depth}] is {path.resolve().parents[depth]}, not {_BACKEND}"
-    )
+    assert (
+        path.resolve().parents[depth] == _BACKEND
+    ), f"{rel}: parents[{depth}] is {path.resolve().parents[depth]}, not {_BACKEND}"

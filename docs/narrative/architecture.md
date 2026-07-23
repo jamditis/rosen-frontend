@@ -1,6 +1,6 @@
 # Architecture
 
-Technical architecture reference for the Jay Rosen Internet Archive. Describes current state as of April 2026.
+Technical architecture reference for Jay Rosen's Internet Archive. Describes current state as of April 2026.
 
 
 ## High-level overview
@@ -310,18 +310,22 @@ Hash-based SPA routing via `router.js`:
 | Route | Hash | Component |
 |-------|------|-----------|
 | Archive | (default) | `App.js` main view |
+| Start here | `#start` | `StartHerePage.js` |
 | Folders | `#folders` | `App.js` folder view |
 | Entities | `#entities` | `EntityBrowser.js` |
 | Dissertation | `#dissertation` | `DissertationPage.js` |
 | About | `#about` | `AboutPage.js` |
 | Analytics | `#analytics` | `AnalyticsDashboard.js` |
+| Wiki | `#wiki` / `#wiki/:slug` | `WikiPage.js` |
+| Archive desktop | `#desktop` / `#desktop/:app` | lazy `DesktopShell.js` |
 
 Record deep links: `?record=RECORD_ID` opens a record modal on any route.
 
 ### Standalone pages
 
 - **Dissertation tools** (`/dissertation/`): reader, foreword, network-effect analysis
-- **Features** (`/features/`): status report generator, shared feature assets
+- **Features** (`/features/`): participation page, Winer method demonstration,
+  and shared feature assets
 
 Each standalone page has its own subdirectory with an `index.html`.
 

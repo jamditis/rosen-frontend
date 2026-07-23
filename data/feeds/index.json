@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "generated": "2026-06-24T23:37:26.547Z",
+  "generated": "2026-07-20T17:06:47.262Z",
   "baseUrl": "https://pressthink.org/j/rosen-archive",
   "feeds": [
     {
@@ -14,14 +14,19 @@
       "path": "./data/feeds/articles.xml"
     },
     {
+      "name": "categories - journalism-theory-practice",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-theory-practice.xml",
+      "path": "./data/feeds/categories/journalism-theory-practice.xml"
+    },
+    {
       "name": "categories - press-media-criticism",
       "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/press-media-criticism.xml",
       "path": "./data/feeds/categories/press-media-criticism.xml"
     },
     {
-      "name": "categories - politics-democracy",
-      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/politics-democracy.xml",
-      "path": "./data/feeds/categories/politics-democracy.xml"
+      "name": "categories - audience-public-engagement",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/audience-public-engagement.xml",
+      "path": "./data/feeds/categories/audience-public-engagement.xml"
     },
     {
       "name": "categories - technology-digital-media",
@@ -29,19 +34,14 @@
       "path": "./data/feeds/categories/technology-digital-media.xml"
     },
     {
-      "name": "categories - journalism-theory-practice",
-      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-theory-practice.xml",
-      "path": "./data/feeds/categories/journalism-theory-practice.xml"
+      "name": "categories - politics-democracy",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/politics-democracy.xml",
+      "path": "./data/feeds/categories/politics-democracy.xml"
     },
     {
       "name": "categories - journalism-education",
       "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-education.xml",
       "path": "./data/feeds/categories/journalism-education.xml"
-    },
-    {
-      "name": "categories - audience-public-engagement",
-      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/audience-public-engagement.xml",
-      "path": "./data/feeds/categories/audience-public-engagement.xml"
     },
     {
       "name": "eras - platform-transition-future-models-2021-present-",

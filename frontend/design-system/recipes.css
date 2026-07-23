@@ -1,0 +1,396 @@
+/**
+ * Archive interface recipes
+ *
+ * Small, namespaced presentation patterns for the zero-build archive. Load
+ * this file after Tailwind and before page-owned overrides.
+ */
+
+.archive-density--compact {
+  --archive-density-control-block: 0.5rem;
+  --archive-density-control-inline: 0.875rem;
+  --archive-density-panel: 1rem;
+  --archive-density-gap: 0.75rem;
+}
+
+.archive-density--spacious {
+  --archive-density-control-block: 0.875rem;
+  --archive-density-control-inline: 1.35rem;
+  --archive-density-panel: clamp(1.5rem, 3vw, 2rem);
+  --archive-density-gap: 1.25rem;
+}
+
+.archive-canvas {
+  color: var(--archive-ink);
+  background-color: var(--archive-canvas);
+  background-image:
+    radial-gradient(circle at 16% 0, rgba(232, 223, 200, 0.34), transparent 22rem),
+    linear-gradient(rgba(28, 25, 23, 0.018) 1px, transparent 1px);
+  background-size: auto, 100% 2rem;
+  font-family: var(--font-body);
+}
+
+.archive-section-label {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 1.75rem;
+  margin: 0;
+  padding: 0.28rem 0.78rem 0.24rem;
+  border: 1px solid var(--archive-manila-edge);
+  clip-path: polygon(0 0, calc(100% - 0.5rem) 0, 100% 0.5rem, 100% 100%, 0 100%);
+  color: var(--archive-ink-soft);
+  background: var(--archive-manila);
+  font-family: var(--font-display);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-tight);
+}
+
+/* An attached tab is a structural part of a folder surface, not a floating
+   badge. Keep the sloped shoulder and open bottom consistent wherever the
+   archive uses the physical-folder metaphor. */
+.archive-folder-tab {
+  --archive-folder-tab-fill: var(--archive-manila);
+  --archive-folder-tab-edge: var(--archive-manila-edge);
+
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  padding: 0.45rem 1.2rem 0.4rem 0.8rem;
+  border: 0;
+  clip-path: polygon(0 0, calc(100% - 0.85rem) 0, 100% 100%, 0 100%);
+  color: var(--archive-ink-soft);
+  background: var(--archive-folder-tab-edge);
+  font-family: var(--font-display);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-tight);
+}
+
+.archive-folder-tab::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: 1px 1px 0;
+  clip-path: polygon(0 0, calc(100% - 0.82rem) 0, 100% 100%, 0 100%);
+  background: var(--archive-folder-tab-fill);
+}
+
+.archive-folder-tab > * {
+  position: relative;
+  z-index: 1;
+}
+
+.archive-action {
+  --archive-action-background: var(--archive-paper);
+  --archive-action-border: var(--archive-ink);
+  --archive-action-color: var(--archive-ink);
+  --archive-action-hover-background: var(--archive-paper-deep);
+  --archive-action-hover-border: var(--archive-ink);
+  --archive-action-hover-color: var(--archive-ink);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-block-size: var(--archive-target-min);
+  padding: var(--archive-density-control-block) var(--archive-density-control-inline);
+  border: 2px solid var(--archive-action-border);
+  border-radius: 0;
+  color: var(--archive-action-color);
+  background: var(--archive-action-background);
+  box-shadow: var(--archive-shadow-small);
+  font-family: var(--font-display);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  text-align: center;
+  text-decoration: none;
+  transition: var(--transition-all);
+  cursor: pointer;
+  user-select: none;
+}
+
+.archive-action--primary {
+  --archive-action-background: var(--archive-ink);
+  --archive-action-border: var(--archive-ink);
+  --archive-action-color: var(--archive-on-dark);
+  --archive-action-hover-background: var(--archive-ink-soft);
+  --archive-action-hover-border: var(--archive-ink-soft);
+  --archive-action-hover-color: var(--archive-on-dark);
+}
+
+.archive-action--secondary {
+  --archive-action-background: var(--archive-paper);
+  --archive-action-border: var(--archive-ink);
+  --archive-action-color: var(--archive-ink);
+  --archive-action-hover-background: var(--archive-manila);
+  --archive-action-hover-border: var(--archive-ink);
+  --archive-action-hover-color: var(--archive-ink);
+}
+
+.archive-action--quiet {
+  --archive-action-background: transparent;
+  --archive-action-border: transparent;
+  --archive-action-color: var(--archive-ink);
+  --archive-action-hover-background: var(--archive-paper-deep);
+  --archive-action-hover-border: var(--archive-rule);
+  box-shadow: none;
+}
+
+.archive-action--danger {
+  --archive-action-background: var(--archive-danger);
+  --archive-action-border: var(--archive-danger);
+  --archive-action-color: #fff;
+  --archive-action-hover-background: #8f1c13;
+  --archive-action-hover-border: #8f1c13;
+  --archive-action-hover-color: #fff;
+}
+
+.archive-action:is(:disabled, [aria-disabled='true']) {
+  opacity: 0.52;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.archive-action:focus-visible,
+.archive-control:focus-visible,
+.archive-dialog [tabindex]:focus-visible {
+  outline: 3px solid var(--archive-focus);
+  outline-offset: 3px;
+}
+
+.archive-control {
+  min-block-size: var(--archive-target-min);
+  width: 100%;
+  padding: var(--archive-density-control-block) var(--archive-density-control-inline);
+  border: 1px solid var(--archive-rule-strong);
+  border-radius: 0;
+  color: var(--archive-ink);
+  background: var(--archive-paper);
+  box-shadow: inset 0 -1px 0 rgba(28, 25, 23, 0.06);
+  font: inherit;
+  line-height: var(--line-height-normal);
+  transition: var(--transition-colors), var(--transition-shadow);
+}
+
+.archive-control::placeholder {
+  color: var(--archive-ink-faint);
+  opacity: 1;
+}
+
+.archive-control:hover:not(:disabled) {
+  border-color: var(--archive-ink-muted);
+}
+
+.archive-control:disabled {
+  color: var(--archive-ink-faint);
+  background: var(--archive-paper-deep);
+  cursor: not-allowed;
+}
+
+.archive-panel {
+  position: relative;
+  padding: var(--archive-density-panel);
+  border: 1px solid var(--archive-rule);
+  border-radius: 0;
+  color: var(--archive-ink);
+  background: var(--archive-paper);
+  box-shadow: var(--archive-shadow-small);
+}
+
+.archive-panel--accent {
+  border-width: 2px;
+  border-color: var(--archive-ink);
+  box-shadow: var(--archive-shadow-offset);
+}
+
+.archive-panel--accent::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 0.38rem;
+  background: var(--archive-signal);
+}
+
+.archive-frame {
+  padding: 0.65rem;
+  border: 1px solid var(--archive-rule);
+  color: var(--archive-ink);
+  background: var(--archive-paper);
+  box-shadow: var(--archive-shadow-offset-signal);
+}
+
+.archive-notice {
+  --archive-notice-accent: var(--archive-sky-dark);
+  --archive-notice-background: var(--archive-info-soft);
+
+  position: relative;
+  padding: var(--archive-density-panel);
+  padding-inline-start: calc(var(--archive-density-panel) + 0.45rem);
+  border: 1px solid var(--archive-rule);
+  color: var(--archive-ink);
+  background: var(--archive-notice-background);
+}
+
+.archive-notice::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0.45rem;
+  background: var(--archive-notice-accent);
+}
+
+.archive-notice--success {
+  --archive-notice-accent: var(--archive-success);
+  --archive-notice-background: var(--archive-success-soft);
+}
+
+.archive-notice--warning {
+  --archive-notice-accent: var(--archive-warning);
+  --archive-notice-background: var(--archive-warning-soft);
+}
+
+.archive-notice--danger {
+  --archive-notice-accent: var(--archive-danger);
+  --archive-notice-background: var(--archive-danger-soft);
+}
+
+.archive-stat {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  min-height: 7rem;
+  padding: var(--archive-density-panel);
+  border-block: 2px solid var(--archive-ink);
+  color: var(--archive-ink);
+  background: var(--archive-paper);
+}
+
+.archive-stat__label {
+  color: var(--archive-ink-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.archive-stat__value {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1;
+}
+
+.archive-dialog-backdrop {
+  position: fixed;
+  z-index: var(--z-modal-backdrop);
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  overflow-y: auto;
+  background: var(--archive-backdrop);
+  backdrop-filter: blur(3px);
+}
+
+.archive-dialog {
+  position: relative;
+  z-index: var(--z-modal);
+  width: min(42rem, 100%);
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  padding: var(--archive-density-panel);
+  border: 2px solid var(--archive-ink);
+  color: var(--archive-ink);
+  background: var(--archive-canvas);
+  box-shadow: var(--archive-shadow-large), var(--archive-shadow-offset-signal);
+  animation: archive-dialog-enter var(--duration-medium) var(--ease-out);
+}
+
+@keyframes archive-dialog-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (hover: hover) {
+  .archive-action:hover:not(:disabled, [aria-disabled='true']) {
+    color: var(--archive-action-hover-color);
+    border-color: var(--archive-action-hover-border);
+    background: var(--archive-action-hover-background);
+    box-shadow: var(--archive-shadow-offset);
+    transform: translate(-2px, -2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .archive-action,
+  .archive-control,
+  .archive-dialog {
+    animation: none;
+    scroll-behavior: auto;
+    transition-duration: 0.01ms;
+  }
+
+  .archive-action:hover:not(:disabled, [aria-disabled='true']) {
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .archive-section-label,
+  .archive-folder-tab,
+  .archive-action,
+  .archive-control,
+  .archive-panel,
+  .archive-frame,
+  .archive-notice,
+  .archive-stat,
+  .archive-dialog {
+    border-color: CanvasText;
+    color: CanvasText;
+    background: Canvas;
+    box-shadow: none;
+  }
+
+  .archive-panel--accent::before,
+  .archive-notice::before,
+  .archive-folder-tab::before {
+    background: Highlight;
+  }
+
+  .archive-action:hover:not(:disabled, [aria-disabled='true']) {
+    color: HighlightText;
+    border-color: Highlight;
+    background: Highlight;
+    box-shadow: none;
+  }
+
+  .archive-action:focus-visible,
+  .archive-control:focus-visible,
+  .archive-dialog [tabindex]:focus-visible {
+    outline-color: Highlight;
+  }
+}
+
+@media print {
+  .archive-panel,
+  .archive-frame,
+  .archive-stat,
+  .archive-dialog {
+    box-shadow: none;
+  }
+
+  .archive-dialog-backdrop {
+    position: static;
+    display: block;
+    padding: 0;
+    background: transparent;
+  }
+}

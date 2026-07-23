@@ -50,6 +50,7 @@ Usage::
 This script makes no editorial or URL-canonicalization decisions — those are
 Joe's calls per #208. It only measures.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -150,7 +151,16 @@ def parse_modern_post_url(url: str) -> Optional[tuple[int, int, str]]:
     m = _MODERN_POST_RE.search("/" + norm)
     if not m:
         return None
-    return int(m.group(1)), int(m.group(2)), m.group(3)
+    slug = m.group(3)
+    # Treat a purely numeric final segment under /YYYY/MM/ as a non-post: it is an
+    # archive day index (/YYYY/MM/DD/) or paginated archive (/YYYY/MM/2/), which
+    # were otherwise counted as a post with a bogus numeric slug (issue #482). This
+    # also drops a genuinely all-numeric post slug, but PressThink slugs are
+    # word-derived, so that is a non-case here. Slugs that merely begin with
+    # digits, like 99-problems, still parse.
+    if slug.isdigit():
+        return None
+    return int(m.group(1)), int(m.group(2)), slug
 
 
 def _parse_record_year_month(

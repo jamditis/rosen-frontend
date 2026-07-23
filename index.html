@@ -1,7 +1,7 @@
 
 <!DOCTYPE html>
 <!--
-  jay rosen digital archive  —  an impossible press in view-source
+  jay rosen's internet archive  —  an impossible press in view-source
   "the impossible press: american journalism and the decline of public life" (1986)
 
   a dissertation that sat in a drawer for 39 years, finally published december 2025.
@@ -52,10 +52,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
 
     <!-- External CSS (versioned for cache busting) -->
-    <link rel="stylesheet" href="./frontend/index.css?v=3.4.7" />
+    <link rel="stylesheet" href="./frontend/design-system/legacy-token-bridge.css?v=3.8.5" />
+    <link rel="stylesheet" href="./frontend/design-system/tokens.css?v=3.8.5" />
+    <link rel="stylesheet" href="./frontend/index.css?v=3.8.5" />
 
     <!-- Tailwind CSS (pre-built for production) -->
-    <link rel="stylesheet" href="./frontend/dist/tailwind.css?v=3.4.7" />
+    <link rel="stylesheet" href="./frontend/dist/tailwind.css?v=3.8.5" />
+    <link rel="stylesheet" href="./frontend/design-system/recipes.css?v=3.8.5" />
 
   <!-- Import Map -->
   <script type="importmap">
@@ -67,7 +70,8 @@
     "htm": "https://esm.sh/htm@3.1.1",
     "lucide-react": "https://esm.sh/lucide-react@0.292.0?deps=react@18.2.0",
     "sql.js": "https://esm.sh/sql.js@1.10.3",
-    "idb-keyval": "https://esm.sh/idb-keyval@6.2.1"
+    "idb-keyval": "https://esm.sh/idb-keyval@6.2.1",
+    "minisearch": "https://esm.sh/minisearch@7.2.0"
   }
 }
 </script>
@@ -76,11 +80,11 @@
     <div id="root"></div>
     
     <!-- Main Entry Point (versioned for cache busting) -->
-    <script type="module" src="./frontend/index.js?v=3.4.7"></script>
+    <script type="module" src="./frontend/index.js?v=3.8.5"></script>
 
     <!-- Easter egg for the curious -->
     <script>
-      console.log('%c jay rosen digital archive ', 'background: #1c1917; color: #fdfbf7; font-weight: bold; font-size: 16px; padding: 4px 8px; border-radius: 2px; font-family: "Special Elite", serif;')
+      console.log("%c jay rosen's internet archive ", 'background: #1c1917; color: #fdfbf7; font-weight: bold; font-size: 16px; padding: 4px 8px; border-radius: 2px; font-family: "Special Elite", serif;')
       console.log('%c "the impossible press: american journalism and the decline of public life" (1986)', 'color: #78716c; font-style: italic; font-size: 13px;')
       console.log('%c stack: zero-build react 18 · esm.sh · htm · no bundler · no npm', 'color: #a8a29e; font-size: 11px;')
       console.log('%c built by joe amditis  —  jamditis@gmail.com  —  pressthink.org', 'color: #a8a29e; font-size: 11px;')
@@ -100,7 +104,11 @@
       );
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./frontend/sw.js')
+          // Register the root bridge so the worker controls the archive page,
+          // not only /frontend/. Checking imported scripts without HTTP-cache
+          // reuse makes a frontend/sw.js CACHE_VERSION bump observable even
+          // though this small bridge intentionally stays stable.
+          navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' })
             .then(registration => {
               console.log('SW registered:', registration.scope);
             })

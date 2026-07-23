@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { html } from '../html.js?v=3.4.7';
+import { html } from '../html.js?v=3.8.5';
 import {
   BarChart3,
   TrendingUp,
@@ -23,12 +23,12 @@ import {
   isSqliteReady,
   fetchAnalytics,
   queryAsObjects
-} from '../services/archiveService.js?v=3.4.7';
-import QueryBuilder from './QueryBuilder.js?v=3.4.7';
+} from '../services/archiveService.js?v=3.8.5';
+import QueryBuilder from './QueryBuilder.js?v=3.8.5';
 
 // Simple bar chart component
 const BarChart = ({ data, labelKey, valueKey, maxBars = 10, color = '#1c1917' }) => {
-  if (!data || data.length === 0) return html`<p className="text-stone-400 text-sm">No data available</p>`;
+  if (!data || data.length === 0) return html`<p className="text-stone-600 text-sm">No data available</p>`;
 
   const displayData = data.slice(0, maxBars);
   const maxValue = Math.max(...displayData.map(d => d[valueKey]));
@@ -38,20 +38,20 @@ const BarChart = ({ data, labelKey, valueKey, maxBars = 10, color = '#1c1917' })
   // column would either misalign the bars or truncate long names (e.g. the
   // era labels), which made the charts hard to compare.
   return html`
-    <div className="space-y-3">
+    <div className="archive-data-bars">
       ${displayData.map((item, i) => html`
-        <div key=${i}>
-          <div className="flex items-start justify-between gap-2 mb-1">
-            <span className="text-xs text-stone-600 min-w-0 break-words leading-tight">
+        <div key=${i} className="archive-data-bar">
+          <div className="archive-data-bar__labels">
+            <span>
               ${item[labelKey]}
             </span>
-            <span className="text-xs text-stone-500 font-mono flex-shrink-0">
+            <strong>
               ${item[valueKey].toLocaleString()}
-            </span>
+            </strong>
           </div>
-          <div className="h-3 bg-stone-100 rounded overflow-hidden">
+          <div className="archive-data-bar__track">
             <div
-              className="h-full rounded transition-all duration-500"
+              className="archive-data-bar__fill"
               style=${{
                 width: `${maxValue ? (item[valueKey] / maxValue) * 100 : 0}%`,
                 backgroundColor: color
@@ -65,20 +65,20 @@ const BarChart = ({ data, labelKey, valueKey, maxBars = 10, color = '#1c1917' })
 };
 
 // Stat card component
-const StatCard = ({ icon: Icon, label, value, sublabel }) => html`
-  <div className="bg-white border border-stone-200 rounded-lg p-4">
-    <div className="flex items-center gap-3 mb-2">
-      <div className="p-2 bg-stone-100 rounded">
-        <${Icon} className="w-4 h-4 text-stone-600" />
+const StatCard = ({ icon: Icon, label, value, sublabel, accent }) => html`
+  <div className="archive-data-stat" style=${{ '--archive-stat-accent': accent }}>
+    <div className="archive-data-stat__label">
+      <div className="archive-data-stat__icon">
+        <${Icon} aria-hidden="true" />
       </div>
-      <span className="text-xs uppercase tracking-wider text-stone-400 font-bold">${label}</span>
+      <span>${label}</span>
     </div>
-    <div className="text-2xl font-bold text-stone-900">${value}</div>
-    ${sublabel && html`<div className="text-xs text-stone-500 mt-1">${sublabel}</div>`}
+    <div className="archive-data-stat__value">${value}</div>
+    ${sublabel && html`<div className="archive-data-stat__note">${sublabel}</div>`}
   </div>
 `;
 
-const AnalyticsDashboard = ({ onBack }) => {
+const AnalyticsDashboard = ({ onBack, onRecordResults, embedded = false }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [stats, setStats] = useState(null);
@@ -113,7 +113,7 @@ const AnalyticsDashboard = ({ onBack }) => {
         setLoading(false);
       } catch (err) {
         console.error('[Analytics] Error:', err);
-        setError(err.message);
+        setError('The archive summary could not load. Please refresh the page or try again later.');
         setLoading(false);
       }
     };
@@ -143,115 +143,128 @@ const AnalyticsDashboard = ({ onBack }) => {
   };
 
   return html`
-    <div className="min-h-screen bg-[#fdfbf7]">
-      <header className="sticky top-0 z-50 bg-paper border-b border-stone-300 shadow-sm">
-        <div className="container mx-auto px-4 h-16 flex items-center">
+    <div className=${embedded ? 'desktop-analytics-surface archive-data-route archive-data-route--analytics is-embedded' : 'archive-data-route archive-data-route--analytics'}>
+      ${!embedded && html`<header className="archive-data-route__header">
+        <div className="archive-data-route__header-inner">
           <button
+            type="button"
+            aria-label="Return to archive"
             onClick=${onBack}
-            className="flex items-center gap-2 text-stone-600 hover:text-stone-900 transition-colors mr-4"
+            className="archive-action archive-action--quiet archive-data-route__back"
           >
-            <${ArrowLeft} className="w-5 h-5" />
-            <span className="text-sm font-bold hidden sm:inline">Archive</span>
+            <${ArrowLeft} aria-hidden="true" />
+            <span>Archive</span>
           </button>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-stone-900 rounded">
-              <${BarChart3} className="w-5 h-5 text-white" />
+          <div className="archive-data-route__identity">
+            <div className="archive-data-route__mark">
+              <${BarChart3} aria-hidden="true" />
             </div>
             <div>
-              <h2 className="text-xl font-display font-bold text-stone-900">Archive analytics</h2>
-              <p className="text-xs text-stone-500">Powered by sql.js (SQLite in your browser)</p>
+              <h2
+                data-route-entry-focus
+                tabIndex="-1"
+                className="archive-data-route__title"
+              >Archive analytics</h2>
+              <p>Powered by sql.js (SQLite in your browser)</p>
             </div>
           </div>
         </div>
-      </header>
+      </header>`}
 
-      <div className="container mx-auto px-4 py-6">
+      <div className=${embedded ? 'desktop-analytics-content archive-data-surface archive-data-surface--analytics' : 'archive-data-surface archive-data-surface--analytics'}>
         ${loading && html`
-          <div className="flex flex-col items-center justify-center h-64">
-            <${Loader2} className="w-8 h-8 text-stone-400 animate-spin mb-4" />
-            <p className="text-stone-500">Loading analytics...</p>
+          <div className="archive-data-loading" role="status" aria-live="polite">
+            <${Loader2} className="archive-data-loading__icon animate-spin" aria-hidden="true" />
+            <p>Loading analytics...</p>
           </div>
         `}
 
         ${error && html`
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-            <p className="text-red-700 font-bold mb-2">Error loading analytics</p>
-            <p className="text-red-600 text-sm">${error}</p>
+          <div className="archive-notice archive-notice--danger archive-data-error" role="alert">
+            <div>
+            <h3>Error loading analytics</h3>
+            <p>${error}</p>
             <button
+              type="button"
               onClick=${() => window.location.reload()}
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              className="archive-action archive-action--danger"
             >
-              Reload Page
+              Reload page
             </button>
+            </div>
           </div>
         `}
 
         ${!loading && !error && html`
-          <div className="space-y-8">
+          <div className="archive-data-sections">
             <!-- Summary Stats -->
-            <section>
-              <h3 className="text-sm uppercase tracking-wider text-stone-400 font-bold mb-4 flex items-center gap-2">
-                <${Database} className="w-4 h-4" /> Database overview
+            <section className="archive-data-section">
+              <h3 className="archive-data-heading">
+                <${Database} aria-hidden="true" /> Database overview
               </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="archive-data-stats">
                 <${StatCard}
                   icon=${BarChart3}
                   label="Records"
                   value=${stats?.records?.toLocaleString() || '0'}
+                  accent="var(--archive-ink)"
                 />
                 <${StatCard}
                   icon=${Tag}
                   label="Categories"
                   value=${stats?.categories || '0'}
+                  accent="var(--archive-sky-dark)"
                 />
                 <${StatCard}
                   icon=${TrendingUp}
                   label="Concepts"
                   value=${stats?.concepts || '0'}
+                  accent="var(--archive-amber-dark)"
                 />
                 <${StatCard}
                   icon=${Users}
                   label="Entities"
                   value=${stats?.entities?.toLocaleString() || '0'}
+                  accent="var(--archive-green-dark)"
                 />
               </div>
             </section>
 
             <!-- Charts Grid -->
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <section className="bg-white border border-stone-200 rounded-lg p-4">
-                <h3 className="text-sm uppercase tracking-wider text-stone-400 font-bold mb-4 flex items-center gap-2">
-                  <${Calendar} className="w-4 h-4" /> Records by era
+            <div className="archive-data-chart-grid">
+              <section className="archive-data-panel archive-data-chart">
+                <h3 className="archive-data-heading">
+                  <${Calendar} aria-hidden="true" /> Records by era
                 </h3>
                 <${BarChart} data=${byEra} labelKey="era" valueKey="count" color="#059669" />
               </section>
 
-              <section className="bg-white border border-stone-200 rounded-lg p-4">
-                <h3 className="text-sm uppercase tracking-wider text-stone-400 font-bold mb-4 flex items-center gap-2">
-                  <${Tag} className="w-4 h-4" /> Top categories
+              <section className="archive-data-panel archive-data-chart">
+                <h3 className="archive-data-heading">
+                  <${Tag} aria-hidden="true" /> Top categories
                 </h3>
                 <${BarChart} data=${byCategory} labelKey="category" valueKey="count" color="#0284c7" />
               </section>
 
-              <section className="bg-white border border-stone-200 rounded-lg p-4">
-                <h3 className="text-sm uppercase tracking-wider text-stone-400 font-bold mb-4 flex items-center gap-2">
-                  <${Users} className="w-4 h-4" /> Most mentioned people
+              <section className="archive-data-panel archive-data-chart">
+                <h3 className="archive-data-heading">
+                  <${Users} aria-hidden="true" /> Most mentioned people
                 </h3>
                 <${BarChart} data=${topPeople} labelKey="name" valueKey="mentions" color="#7c3aed" />
               </section>
 
-              <section className="bg-white border border-stone-200 rounded-lg p-4">
-                <h3 className="text-sm uppercase tracking-wider text-stone-400 font-bold mb-4 flex items-center gap-2">
-                  <${TrendingUp} className="w-4 h-4" /> Most common concepts
+              <section className="archive-data-panel archive-data-chart">
+                <h3 className="archive-data-heading">
+                  <${TrendingUp} aria-hidden="true" /> Most common concepts
                 </h3>
                 <${BarChart} data=${topConcepts} labelKey="concept" valueKey="count" color="#dc2626" />
               </section>
             </div>
 
             <!-- Records by Year -->
-            <section className="bg-white border border-stone-200 rounded-lg p-4">
-              <h3 className="text-sm uppercase tracking-wider text-stone-400 font-bold mb-4 flex items-center gap-2">
-                <${Calendar} className="w-4 h-4" /> Output by year
+            <section className="archive-data-panel archive-data-chart archive-data-chart--wide">
+              <h3 className="archive-data-heading">
+                <${Calendar} aria-hidden="true" /> Output by year
               </h3>
               <div className="overflow-x-auto">
                 <${BarChart} data=${byYear} labelKey="year" valueKey="count" maxBars=${30} color="#1c1917" />
@@ -259,57 +272,59 @@ const AnalyticsDashboard = ({ onBack }) => {
             </section>
 
             <!-- Category Co-occurrence -->
-            <section className="bg-white border border-stone-200 rounded-lg p-4">
-              <h3 className="text-sm uppercase tracking-wider text-stone-400 font-bold mb-4">
+            <section className="archive-data-panel archive-data-cooccurrence">
+              <h3 className="archive-data-heading">
                 Categories that appear together
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="archive-data-cooccurrence__grid">
                 ${coOccurrence.map((item, i) => html`
-                  <div key=${i} className="flex items-center justify-between bg-stone-50 rounded px-3 py-2">
-                    <span className="text-xs text-stone-700">
-                      ${item.category1} <span className="text-stone-400">+</span> ${item.category2}
+                  <div key=${i} className="archive-data-cooccurrence__row">
+                    <span>
+                      ${item.category1} <b aria-hidden="true">+</b> ${item.category2}
                     </span>
-                    <span className="text-xs font-mono text-stone-500">${item.co_occurrences}</span>
+                    <strong>${item.co_occurrences}</strong>
                   </div>
                 `)}
               </div>
             </section>
 
             <!-- Query Builder -->
-            <section className="bg-gradient-to-br from-stone-50 to-amber-50 border-2 border-stone-200 rounded-lg p-6">
-              <h3 className="text-sm uppercase tracking-wider text-stone-500 font-bold mb-4 flex items-center gap-2">
-                <${Database} className="w-4 h-4" /> Query builder
-                <span className="ml-2 px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full font-normal normal-case">No SQL knowledge required!</span>
+            <section className="archive-data-panel archive-query-lab">
+              <h3 className="archive-data-heading">
+                <${Database} aria-hidden="true" /> Query builder
+                <span className="archive-data-note">No SQL knowledge required</span>
               </h3>
-              <p className="text-sm text-stone-600 mb-6">
+              <p className="archive-query-lab__intro">
                 Build custom queries by completing sentences. Choose from dropdowns and enter values to explore the archive your way.
               </p>
-              <${QueryBuilder} />
+              <${QueryBuilder} onRecordResults=${onRecordResults} />
             </section>
 
             <!-- Custom Query Section -->
-            <section className="bg-stone-800 text-white rounded-lg p-4">
-              <h3 className="text-sm uppercase tracking-wider text-stone-400 font-bold mb-4 flex items-center gap-2">
-                <${Database} className="w-4 h-4" /> Advanced: raw SQL query
+            <section className="archive-query-terminal">
+              <h3 className="archive-data-heading">
+                <${Database} aria-hidden="true" /> Advanced: raw SQL query
               </h3>
-              <div className="space-y-4">
+              <div className="archive-query-terminal__body">
                 <textarea
                   value=${customQuery}
                   onChange=${(e) => setCustomQuery(e.target.value)}
-                  className="w-full h-24 bg-stone-900 text-green-400 font-mono text-sm p-3 rounded border border-stone-700 focus:border-green-500 focus:outline-none"
+                  className="archive-query-terminal__input"
                   placeholder="Enter SQL query..."
+                  aria-label="Raw SQL query"
                 />
-                <div className="flex items-center gap-4">
+                <div className="archive-query-terminal__actions">
                   <button
+                    type="button"
                     onClick=${runCustomQuery}
                     disabled=${sqlLoading}
-                    className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors font-bold text-sm flex items-center gap-2 disabled:opacity-60"
+                    className="archive-action archive-query-terminal__run"
                   >
                     ${sqlLoading
                       ? html`<${Loader2} className="w-4 h-4 animate-spin" /> Loading database...`
-                      : html`<${RefreshCw} className="w-4 h-4" /> Run Query`}
+                      : html`<${RefreshCw} className="w-4 h-4" /> Run query`}
                   </button>
-                  <span className="text-xs text-stone-500">
+                  <span className="archive-query-terminal__hint">
                     ${sqlLoading
                       ? 'First query loads the full archive into SQLite (~28MB, one time)'
                       : 'Tables: records, record_categories, record_concepts, entities, record_entities'}
@@ -317,16 +332,16 @@ const AnalyticsDashboard = ({ onBack }) => {
                 </div>
 
                 ${customQueryResult && html`
-                  <div className="mt-4">
+                  <div className="archive-query-terminal__results">
                     ${customQueryResult.success ? html`
-                      <div className="bg-stone-900 rounded p-3 overflow-x-auto">
-                        <pre className="text-xs text-green-400 font-mono">
+                      <div className="archive-data-scroll" role="region" tabIndex="0" aria-label="Raw SQL results">
+                        <pre>
                           ${JSON.stringify(customQueryResult.data, null, 2)}
                         </pre>
                       </div>
                     ` : html`
-                      <div className="bg-red-900/50 rounded p-3">
-                        <p className="text-red-400 text-sm">${customQueryResult.error}</p>
+                      <div className="archive-query-terminal__error" role="alert">
+                        <p>${customQueryResult.error}</p>
                       </div>
                     `}
                   </div>
@@ -335,38 +350,42 @@ const AnalyticsDashboard = ({ onBack }) => {
             </section>
 
             <!-- Example Queries -->
-            <section className="bg-stone-50 border border-stone-200 rounded-lg p-4">
-              <h3 className="text-sm uppercase tracking-wider text-stone-400 font-bold mb-4">
+            <section className="archive-data-panel archive-query-examples">
+              <h3 className="archive-data-heading">
                 Example queries to try
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div className="archive-query-examples__grid">
                 <button
+                  type="button"
                   onClick=${() => setCustomQuery("SELECT pub, COUNT(*) as count FROM records GROUP BY pub ORDER BY count DESC LIMIT 15")}
-                  className="text-left p-3 bg-white rounded border border-stone-200 hover:border-stone-400 transition-colors"
+                  className="archive-query-example"
                 >
-                  <span className="font-bold text-stone-800">Top publications</span>
-                  <p className="text-stone-500 mt-1">Which outlets has Jay written for most?</p>
+                  <span>Top publications</span>
+                  <p>Which outlets has Jay written for most?</p>
                 </button>
                 <button
+                  type="button"
                   onClick=${() => setCustomQuery("SELECT year, type, COUNT(*) as count FROM records GROUP BY year, type ORDER BY year DESC")}
-                  className="text-left p-3 bg-white rounded border border-stone-200 hover:border-stone-400 transition-colors"
+                  className="archive-query-example"
                 >
-                  <span className="font-bold text-stone-800">Articles vs social by year</span>
-                  <p className="text-stone-500 mt-1">Compare output types over time</p>
+                  <span>Articles vs social by year</span>
+                  <p>Compare output types over time</p>
                 </button>
                 <button
+                  type="button"
                   onClick=${() => setCustomQuery("SELECT e.name, e.type, COUNT(*) as mentions FROM entities e JOIN record_entities re ON e.id = re.entity_id WHERE e.type = 'Organization' GROUP BY e.id ORDER BY mentions DESC LIMIT 15")}
-                  className="text-left p-3 bg-white rounded border border-stone-200 hover:border-stone-400 transition-colors"
+                  className="archive-query-example"
                 >
-                  <span className="font-bold text-stone-800">Top organizations</span>
-                  <p className="text-stone-500 mt-1">Most mentioned organizations</p>
+                  <span>Top organizations</span>
+                  <p>Most mentioned organizations</p>
                 </button>
                 <button
+                  type="button"
                   onClick=${() => setCustomQuery("SELECT title, date, pub FROM records WHERE title LIKE '%Trump%' ORDER BY date DESC LIMIT 20")}
-                  className="text-left p-3 bg-white rounded border border-stone-200 hover:border-stone-400 transition-colors"
+                  className="archive-query-example"
                 >
-                  <span className="font-bold text-stone-800">Articles about Trump</span>
-                  <p className="text-stone-500 mt-1">Search for specific topics</p>
+                  <span>Articles about Trump</span>
+                  <p>Search for specific topics</p>
                 </button>
               </div>
             </section>

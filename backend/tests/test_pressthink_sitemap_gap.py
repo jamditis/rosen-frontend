@@ -69,6 +69,22 @@ def test_parse_modern_post_url_handles_day_based_urls():
     )
 
 
+def test_parse_modern_post_url_rejects_bare_numeric_final_segment():
+    # A purely numeric final segment under /YYYY/MM/ is an archive day index or
+    # paginated archive URL, not a post, so it must not parse as one (issue #482).
+    # /YYYY/MM/DD/ with no slug otherwise parses as a post with slug = the day.
+    assert gap.parse_modern_post_url("https://pressthink.org/2010/07/15/") is None
+    # day-less numeric tail (e.g. /YYYY/MM/2/), the second live shape in #482
+    assert gap.parse_modern_post_url("https://pressthink.org/2010/07/2/") is None
+    # /page/N/ pagination is already unmatched by the regex; pin it so it stays so
+    assert gap.parse_modern_post_url("https://pressthink.org/2010/07/page/2/") is None
+    # a real day-based post keeps parsing: the numeric guard only fires when the
+    # captured slug itself is all digits, and here the slug carries word tokens
+    assert gap.parse_modern_post_url(
+        "https://pressthink.org/2010/07/15/objectivity-as-persuasion/"
+    ) == (2010, 7, "objectivity-as-persuasion")
+
+
 def test_exact_url_match_when_archive_holds_modern_url():
     rows = [
         _record(

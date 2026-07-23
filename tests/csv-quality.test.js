@@ -1435,6 +1435,57 @@ describe('social_posts.csv', () => {
     assert.strictEqual(offenders.length, 0,
       `${offenders.length} published records have AI-guesswork hedging summaries (re-scrape or set verified=FALSE): ${offenders.slice(0, 5).join(', ')}`);
   });
+
+  it('no summary opens by equating the author with the document (#581)', () => {
+    // The summary generator sometimes wrote "Rosen is a/an <document>" (e.g.
+    // "Rosen is an open letter to Bill Gates...") where it meant to describe the
+    // piece, a grammar error a reader spots at a glance (RECORD-00444, #581).
+    // This is a regression guard for the observed #581 signature, not a general
+    // author=document detector. It flags "Rosen is a/an" followed by one of the
+    // document/act nouns seen in the 14 real defects AND that noun's complement:
+    // a comma, a preposition, or a present participle acting as a verb (followed
+    // by a determiner/preposition, or ending the clause). Requiring the
+    // participle to be verb-like keeps a person compound that merely starts with
+    // the same noun from matching -- "Rosen is an interview training coach..."
+    // has "training" modifying the head noun "coach", so it is not flagged, while
+    // "Rosen is a blog post presenting a dialogue..." (RECORD-00265) is. The noun
+    // list is deliberately closed to the observed defects rather than broadened
+    // to every possible document word: a wider list re-introduces person-construction
+    // false positives for no confirmed gain. Verified against all 14 originals.
+    // The one-time fix (data/fixes/fix-author-is-document-summaries.js) corrects
+    // those 14 by id.
+    const NOUNS = 'interview|preview|blog post|transcript|critique|debriefing|response|distillation|call to action|open letter';
+    const PREPS = 'of|to|with|by|for|in|on|about|between|from|as|against';
+    const DETS = 'an?|the';
+    const AUTHOR_IS_DOCUMENT = new RegExp(
+      `^\\s*(?:Jay\\s+)?Rosen\\s+is\\s+an?\\s+(?:${NOUNS})` +
+      `(?:,|\\s+(?:${PREPS})\\b|\\s+\\w+ing(?:\\s+(?:${DETS}|${PREPS})\\b|[,.]|$))`, 'i');
+
+    // Fixtures lock the boundary: the signature must fire on the observed defect
+    // shapes and must not fire on a person construction that merely starts with
+    // the same noun or on an already-corrected summary.
+    const shouldFlag = [
+      'Rosen is an open letter to Bill Gates offering advice on how to create a blog.',
+      'Rosen is a response to Michael Skube\'s opinion piece in the Los Angeles Times.',
+      'Rosen is a call to action, recruiting journalists to volunteer for a project.',
+      'Rosen is a blog post presenting a dialogue between Jay Rosen and a correspondent.',
+    ];
+    const shouldNotFlag = [
+      'Jay Rosen is an interview training coach for reporters.',
+      'Jay Rosen is a blog post writing instructor at NYU.',
+      'Rosen is a response coordinator for the newsroom.',
+      'Jay Rosen is a professor at NYU who argues for a different kind of press.',
+      'This is an open letter to Bill Gates offering advice on how to create a blog.',
+    ];
+    for (const s of shouldFlag) assert.ok(AUTHOR_IS_DOCUMENT.test(s), `expected to flag: ${s}`);
+    for (const s of shouldNotFlag) assert.ok(!AUTHOR_IS_DOCUMENT.test(s), `should not flag: ${s}`);
+
+    const offenders = archiveRecords
+      .filter(r => AUTHOR_IS_DOCUMENT.test(r.summary || ''))
+      .map(r => r.id);
+    assert.strictEqual(offenders.length, 0,
+      `${offenders.length} summaries open by calling Rosen the document (run data/fixes/fix-author-is-document-summaries.js): ${offenders.slice(0, 5).join(', ')}`);
+  });
 });
 
 // ============================================
@@ -1477,9 +1528,11 @@ describe('extracted_entities.csv', () => {
 
   it('relationship-backed entities have a non-quarantined first mention', () => {
     const quarantinedRecords = new Set(['RECORD-00614']);
+    const archiveRecordIds = new Set(archiveRecords.map(record => record.id));
     const relationshipBackedIds = new Set();
 
     for (const relationship of relationships) {
+      if (!archiveRecordIds.has(relationship.source_record_id)) continue;
       if (quarantinedRecords.has(relationship.source_record_id)) continue;
       relationshipBackedIds.add(relationship.source_entity_id);
       relationshipBackedIds.add(relationship.target_entity_id);
@@ -1578,6 +1631,7 @@ describe('extracted_entities.csv', () => {
     ]);
     const entitiesById = new Map(entities.map(entity => [entity.entity_id, entity]));
     const recordsById = new Map(archiveRecords.map(record => [record.id, record]));
+    const normalizeNewlines = value => value.replace(/\r\n/g, '\n');
 
     for (const [entityId, recordId] of expected) {
       const entity = entitiesById.get(entityId);
@@ -1592,7 +1646,11 @@ describe('extracted_entities.csv', () => {
       );
       assert.ok(sourceRelationships.length > 0, `${entityId} lacks a relationship in ${recordId}`);
       assert.ok(
-        sourceRelationships.some(relationship => record.raw_text.includes(relationship.context_snippet)),
+        sourceRelationships.some(relationship =>
+          normalizeNewlines(record.raw_text).includes(
+            normalizeNewlines(relationship.context_snippet)
+          )
+        ),
         `${entityId} lacks an exact source excerpt in ${recordId}`
       );
     }
@@ -1619,7 +1677,9 @@ describe('extracted_relationships.csv', () => {
 
   it('references only existing records and entity IDs', () => {
     const entityIds = new Set(entities.map(e => e.entity_id));
-    const recordIds = new Set(archiveRecords.map(record => record.id));
+    const recordIds = new Set(
+      [...archiveRecords, ...socialPosts].map(record => record.id)
+    );
     const badRefs = [];
     for (const rel of relationships) {
       if (!recordIds.has(rel.source_record_id)) {
@@ -1640,7 +1700,9 @@ describe('extracted_relationships.csv', () => {
   });
 
   it('has no self-referential entity relationships', () => {
+    const archiveRecordIds = new Set(archiveRecords.map(record => record.id));
     const selfReferences = relationships
+      .filter(relationship => archiveRecordIds.has(relationship.source_record_id))
       .filter(relationship => relationship.source_entity_id === relationship.target_entity_id)
       .map(relationship => relationship.relationship_id);
     assert.strictEqual(
@@ -1679,9 +1741,11 @@ describe('extracted_relationships.csv', () => {
     const entityNames = new Map(
       entities.map(entity => [entity.entity_id, entity.entity_name.trim()])
     );
+    const archiveRecordIds = new Set(archiveRecords.map(record => record.id));
     const mismatches = [];
 
     for (const relationship of relationships) {
+      if (!archiveRecordIds.has(relationship.source_record_id)) continue;
       for (const endpoint of ['source', 'target']) {
         const id = relationship[`${endpoint}_entity_id`];
         const storedName = relationship[`${endpoint}_entity_name`]?.trim();

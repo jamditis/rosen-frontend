@@ -3,9 +3,9 @@ type: reference
 title: OKF bundle inventory
 description: Generated flight-recorder report for the Rosen project OKF bundle.
 source: ["scripts/okf-flight-recorder.js", "wiki/meta/bundle-inventory.json"]
-verified: 2026-06-23
+verified: 2026-07-21
 tags: [okf, inventory, drift, generated]
-timestamp: 2026-06-23
+timestamp: 2026-07-21
 ---
 
 # OKF bundle inventory
@@ -31,7 +31,7 @@ The default navigation view should be a per-concept local graph, not a global fo
 | Markdown files | 44 |
 | Concepts | 34 |
 | Concept directories | 9 |
-| Internal links | 115 |
+| Internal links | 114 |
 | External links | 2 |
 | Orphaned concepts | 13 |
 
@@ -68,18 +68,18 @@ The default navigation view should be a per-concept local graph, not a global fo
 
 | Concept | Badge | Verified | Sources | Reason |
 | --- | --- | --- | ---: | --- |
-| [The corpus](../data/corpus.md) | Fresh | 2026-06-22 | 3 | Verified 1 days before inventory |
-| [Schema and vocabulary](../data/schema.md) | Fresh | 2026-06-22 | 3 | Verified 1 days before inventory |
-| [Pre-launch handoff to Jay (2026-06-22)](../launch/handoff-2026-06-22.md) | Fresh | 2026-06-22 | 3 | Verified 1 days before inventory |
-| [Launch plan](../launch/launch-plan.md) | Fresh | 2026-06-22 | 3 | Verified 1 days before inventory |
-| [Jay Rosen](../people/jay-rosen.md) | Fresh | 2026-06-22 | 3 | Verified 1 days before inventory |
-| [Joe Amditis](../people/joe-amditis.md) | Fresh | 2026-06-22 | 3 | Verified 1 days before inventory |
-| [Unified Field](../people/unified-field.md) | Fresh | 2026-06-22 | 3 | Verified 1 days before inventory |
-| [Launch status](../project/launch-status.md) | Fresh | 2026-06-22 | 3 | Verified 1 days before inventory |
-| [What the archive is](../project/overview.md) | Fresh | 2026-06-22 | 3 | Verified 1 days before inventory |
-| [Provenance](../sources/provenance.md) | Fresh | 2026-06-22 | 1 | Verified 1 days before inventory |
-| [Data pipeline (backend)](../systems/data-pipeline.md) | Fresh | 2026-06-22 | 3 | Verified 1 days before inventory |
-| [Deploy and hosting](../systems/deploy-and-hosting.md) | Fresh | 2026-06-22 | 4 | Verified 1 days before inventory |
+| [The corpus](../data/corpus.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
+| [Schema and vocabulary](../data/schema.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
+| [Pre-launch handoff to Jay (2026-06-22)](../launch/handoff-2026-06-22.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
+| [Launch plan](../launch/launch-plan.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
+| [Jay Rosen](../people/jay-rosen.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
+| [Joe Amditis](../people/joe-amditis.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
+| [Unified Field](../people/unified-field.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
+| [Launch status](../project/launch-status.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
+| [What the archive is](../project/overview.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
+| [Provenance](../sources/provenance.md) | Fresh | 2026-06-22 | 1 | Verified 29 days before inventory |
+| [Data pipeline (backend)](../systems/data-pipeline.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
+| [Deploy and hosting](../systems/deploy-and-hosting.md) | Fresh | 2026-06-22 | 4 | Verified 29 days before inventory |
 
 ## High-drift concepts
 
@@ -91,14 +91,14 @@ The default navigation view should be a per-concept local graph, not a global fo
 | [Unified Field](../people/unified-field.md) | organization | 2026-06-22 | 2 | high-change topic: launch |
 | [Launch status](../project/launch-status.md) | concept | 2026-06-22 | 0 | high-change topic: blocker, credential, launch, sftp |
 | [Deploy and hosting](../systems/deploy-and-hosting.md) | system | 2026-06-22 | 11 | high-change topic: blocker, cloudflare, deploy, dns, hosting, sftp |
-| [Feedback and reporting](../systems/feedback-and-reporting.md) | system | 2026-06-22 | 4 | high-change topic: launch |
-| [Submission server (Pillar 3a)](../systems/submission-server.md) | system | 2026-06-22 | 3 | high-change topic: submission |
+| [Feedback and reporting](../systems/feedback-and-reporting.md) | system | 2026-06-22 | 3 | high-change topic: launch |
 | [Key dates](../timeline/key-dates.md) | concept | 2026-06-22 | 1 | high-change topic: launch |
 | [Open launch and architecture decisions](../launch/open-decisions.md) | concept | 2026-06-23 | 0 | high-change topic: automation, launch, submission; change-prone topic: data, decisions |
 | [Re-verification playbook](../sources/reverification-playbook.md) | concept | 2026-06-23 | 0 | high-change topic: deploy; change-prone topic: verification |
 | [Cache and versioning](../systems/cache-and-versioning.md) | system | 2026-06-23 | 1 | high-change topic: cache, deploy, versioning; change-prone topic: data |
 | [CI and testing](../systems/ci-and-testing.md) | system | 2026-06-23 | 1 | high-change topic: ci, github-actions, testing |
 | [Maintenance automation](../systems/maintenance-automation.md) | system | 2026-06-23 | 1 | high-change topic: automation, deploy, github-actions |
+| [Submission automation (Pillar 3a)](../systems/submission-automation.md) | system | 2026-07-21 | 2 | high-change topic: automation, github-actions, submission |
 
 ## Stale concepts
 
@@ -117,7 +117,7 @@ These concepts currently have no inbound links from other concept files. Section
 | [Data quality gaps](../data/data-quality-gaps.md) | concept | 2026-06-23 | 0 | change-prone topic: data |
 | [Open launch and architecture decisions](../launch/open-decisions.md) | concept | 2026-06-23 | 0 | high-change topic: automation, launch, submission; change-prone topic: data, decisions |
 | [OKF adoption playbook](adoption-playbook.md) | playbook | 2026-06-23 | 0 | change-prone topic: public, source |
-| [OKF blindfold test](blindfold-test.md) | test | 2026-06-23 | 0 | recently verified |
+| [OKF blindfold test](blindfold-test.md) | test | 2026-07-21 | 0 | recently verified |
 | [OKF community contribution roadmap](community-roadmap.md) | concept | 2026-06-23 | 0 | change-prone topic: community, source |
 | [Concept templates](concept-template.md) | template | 2026-06-23 | 0 | recently verified |
 | [OKF enhancement radar](enhancement-radar.md) | concept | 2026-06-23 | 0 | recently verified |

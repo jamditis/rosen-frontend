@@ -10,6 +10,7 @@ lerna-debug.log*
 
 # Node
 node_modules
+/r/*.html
 dist
 !frontend/dist/tailwind.css
 dist-ssr
@@ -76,14 +77,11 @@ data/*.csv.bak
 data/*.csv.bak*
 data/*.csv.tmp
 
-# Submission server runtime SQLite database (created on first request)
-backend/submission_server/submissions.db
-
 # Project Specific
 # known_entities.json (publication + platform name -> host-alias map) is
 # committed as reference data so the submission pipeline can resolve
 # publications in CI and local runs. Every loader now resolves it to the single
-# curated backend/known_entities.json (submission_server.config,
+# curated backend/known_entities.json (submission_runtime.config,
 # process_submission, rosen_scraper.workflow via find_project_root, and the
 # diagnostic/backfill scripts anchored via Path(__file__) — #354).
 # schema_builder.py rebuilds the schema to a staging file by default and only
@@ -98,6 +96,7 @@ playwright-report/
 
 # Preview audit output (npm run preview:audit)
 preview-audit-results/
+preview-audit-results-*/
 
 # Entity extraction working data
 data/social_import/

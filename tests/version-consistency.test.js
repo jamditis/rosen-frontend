@@ -10,13 +10,17 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { collectVersionedFiles } from '../scripts/bump-version.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.join(__dirname, '..');
 const frontendDir = path.join(rootDir, 'frontend');
+const faqDir = path.join(rootDir, 'faq');
+const dissertationDir = path.join(rootDir, 'dissertation');
+const deployScriptPath = path.join(rootDir, 'backend', 'scripts', 'deploy_full_site.py');
 
-// Recursively collect every .js file under frontend/, skipping build output
+// Recursively collect every .js file under a directory, skipping build output
 // (dist/) and dependencies (node_modules/).
 function collectFrontendJsFiles(dir = frontendDir, acc = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -30,13 +34,126 @@ function collectFrontendJsFiles(dir = frontendDir, acc = []) {
   return acc;
 }
 
+// Local-import completeness is enforced for the app and FAQ JavaScript here;
+// the canonical-marker test above this helper covers the broader browser-file
+// surface returned by bump-version.mjs, including standalone features and the
+// dissertation pages.
+function collectVersionedJsFiles() {
+  return [...collectFrontendJsFiles(frontendDir), ...collectFrontendJsFiles(faqDir)];
+}
+
+function deployedFeatureDirs() {
+  const deployScript = fs.readFileSync(deployScriptPath, 'utf-8');
+  const block = deployScript.match(/_DEPLOY_DIRS\s*:[^=]*=\s*\(([\s\S]*?)\)/);
+  assert.ok(block, 'deploy_full_site.py must declare _DEPLOY_DIRS');
+  return [...block[1].matchAll(/['"](features\/[^'"]+)['"]/g)]
+    .map((match) => path.join(rootDir, match[1]));
+}
+
 // ============================================
 // Import version consistency
 // ============================================
 
 describe('import version consistency', () => {
+  it('every deployed feature cacheable local reference is versioned and canonical', () => {
+    const canonical = JSON.parse(
+      fs.readFileSync(path.join(rootDir, 'version.json'), 'utf-8'),
+    ).version;
+    const invalid = [];
+    const scan = (dir) => {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const file = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          scan(file);
+          continue;
+        }
+        if (!entry.isFile() || !/\.(?:html|js)$/.test(entry.name)) continue;
+        const content = fs.readFileSync(file, 'utf-8');
+        const patterns = entry.name.endsWith('.html')
+          ? [/(?:src|href)=['"]((?:\.\.?\/)+[^'"?#]+\.(?:js|css))(\?v=(\d+\.\d+\.\d+))?['"]/g]
+          : [/(?:\bfrom\s+|\bimport\s*)['"]((?:\.\.?\/)+[^'"?#]+\.js)(\?v=(\d+\.\d+\.\d+))?['"]/g];
+        for (const pattern of patterns) {
+          for (const match of content.matchAll(pattern)) {
+            if (match[3] !== canonical) {
+              invalid.push(`${path.relative(rootDir, file)} -> ${match[1]}${match[2] || ''}`);
+            }
+          }
+        }
+      }
+    };
+
+    for (const dir of deployedFeatureDirs()) scan(dir);
+    assert.deepStrictEqual(invalid, [],
+      `Deployed feature refs missing ?v=${canonical} or using another version: ${invalid.join(', ')}`);
+  });
+
+  it('keeps the participation stylesheet on the cache-busted release surface', () => {
+    const canonical = JSON.parse(
+      fs.readFileSync(path.join(rootDir, 'version.json'), 'utf-8'),
+    ).version;
+    const participateHtml = fs.readFileSync(
+      path.join(rootDir, 'features', 'participate', 'index.html'),
+      'utf-8',
+    );
+
+    assert.match(
+      participateHtml,
+      new RegExp(`href=["']\\./styles\\.css\\?v=${canonical}["']`),
+      'features/participate/index.html must cache-bust its local stylesheet',
+    );
+  });
+
+  it('every cache-busting marker on the complete bump surface is canonical', () => {
+    const canonical = JSON.parse(
+      fs.readFileSync(path.join(rootDir, 'version.json'), 'utf-8'),
+    ).version;
+    const drift = [];
+
+    for (const file of collectVersionedFiles(rootDir)) {
+      if (!fs.existsSync(file)) continue;
+      const content = fs.readFileSync(file, 'utf-8');
+      for (const match of content.matchAll(/\?v=(\d+\.\d+\.\d+)/g)) {
+        if (match[1] !== canonical) {
+          drift.push(`${path.relative(rootDir, file)}: ${match[1]}`);
+        }
+      }
+    }
+
+    assert.deepStrictEqual(drift, [],
+      `Version markers outside the canonical ${canonical} release: ${drift.join(', ')}`);
+  });
+
+  it('every dissertation HTML local JS reference is versioned and canonical', () => {
+    const canonical = JSON.parse(
+      fs.readFileSync(path.join(rootDir, 'version.json'), 'utf-8'),
+    ).version;
+    const invalid = [];
+    const localJsRef = /(?:src=|from\s+)['"]((?:\.\.?\/)+[^'"?#]+\.js)(\?v=(\d+\.\d+\.\d+))?['"]/g;
+
+    const scan = (dir) => {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const file = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          scan(file);
+          continue;
+        }
+        if (!entry.isFile() || !entry.name.endsWith('.html')) continue;
+        const content = fs.readFileSync(file, 'utf-8');
+        for (const match of content.matchAll(localJsRef)) {
+          if (match[3] !== canonical) {
+            invalid.push(`${path.relative(rootDir, file)} -> ${match[1]}${match[2] || ''}`);
+          }
+        }
+      }
+    };
+
+    scan(dissertationDir);
+    assert.deepStrictEqual(invalid, [],
+      `Dissertation HTML refs missing ?v=${canonical} or using another version: ${invalid.join(', ')}`);
+  });
+
   it('all JS files use the same import version string', () => {
-    const jsFiles = collectFrontendJsFiles();
+    const jsFiles = collectVersionedJsFiles();
 
     // Extract all version strings from import statements
     const versionPattern = /\?v=(\d+\.\d+\.\d+)/g;
@@ -101,7 +218,7 @@ describe('import version consistency', () => {
     // The version-equality test above only compares versioned imports to each
     // other — an import with no version at all slips past it, so this check
     // exists to catch that case.
-    const jsFiles = collectFrontendJsFiles();
+    const jsFiles = collectVersionedJsFiles();
 
     // Matches `from './foo.js'` / `from '../foo.js'` including the
     // `export ... from` re-export form. Group 2 captures the version query,
@@ -120,6 +237,35 @@ describe('import version consistency', () => {
 
     assert.strictEqual(unversioned.length, 0,
       `Found ${unversioned.length} unversioned local import(s):\n  ${unversioned.join('\n  ')}`);
+  });
+
+  it('every faq/index.html module import is versioned and canonical', () => {
+    // The standalone FAQ page (moved to /faq/ in #567) loads local .js outside
+    // the app bundle, stamped by bump-version.mjs. Every such reference — via a
+    // <script src> or an `import ... from` — must carry ?v=, or a returning
+    // reader is served stale FAQ code under the .htaccess one-week JS cache.
+    // Asserting "the versions present are canonical" is not enough: an import
+    // that drops ?v= entirely would slip past that, and the .js-only unversioned
+    // check above never scans HTML. So require a version on every local .js ref.
+    const faqHtml = fs.readFileSync(path.join(faqDir, 'index.html'), 'utf-8');
+    const versionJson = JSON.parse(fs.readFileSync(path.join(rootDir, 'version.json'), 'utf-8'));
+
+    // Group 1: the local .js path. Group 2 (optional): its ?v= query.
+    const localJsRef = /(?:src=|from\s+)['"](\.\.?\/[^'"]+\.js)(\?v=\d+\.\d+\.\d+)?['"]/g;
+    const refs = [...faqHtml.matchAll(localJsRef)];
+
+    assert.ok(refs.length >= 2,
+      `expected at least the script.js and text-selection.js imports in faq/index.html, found ${refs.length}`);
+
+    const unversioned = refs.filter((m) => !m[2]).map((m) => m[1]);
+    assert.strictEqual(unversioned.length, 0,
+      `faq/index.html has unversioned local .js import(s): ${unversioned.join(', ')}`);
+
+    const versions = new Set(refs.map((m) => m[2].slice('?v='.length)));
+    assert.strictEqual(versions.size, 1,
+      `faq/index.html has ${versions.size} distinct import versions: ${[...versions].join(', ')}`);
+    assert.strictEqual([...versions][0], versionJson.version,
+      `faq/index.html import version (${[...versions][0]}) must match version.json (${versionJson.version}).`);
   });
 });
 

@@ -19,6 +19,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: var(--color-bg);
+  background-image: none;
   min-height: 100vh;
 }
 
@@ -104,7 +105,7 @@ body {
   display: none;
 }
 
-.reader-header__actions .btn--secondary[title="Back to dissertation home"] {
+.reader-header__actions .btn--secondary[title="Back to archive"] {
   display: inline-flex;
   padding: var(--space-2);
   font-size: var(--font-size-xs);
@@ -139,8 +140,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   background: none;
   border: none;
   cursor: pointer;
@@ -273,9 +274,30 @@ body {
    ======================================== */
 .reader-content {
   flex: 1;
+  min-width: 0;
+  width: 100%;
   max-width: var(--content-max-width);
   margin: 0 auto;
   padding: var(--space-6) var(--content-padding);
+}
+
+.reader-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-5);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+}
+
+.reader-context a {
+  color: var(--color-link);
+  font-weight: var(--font-weight-semibold);
+  text-underline-offset: 0.2em;
 }
 
 /* ========================================
@@ -327,6 +349,17 @@ body {
   gap: var(--space-3);
 }
 
+.reader-footer a {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.2em;
+}
+
+.reader-footer a:hover {
+  color: var(--color-link-hover);
+}
+
 /* ========================================
    BUTTONS
    ======================================== */
@@ -334,6 +367,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 44px;
   padding: var(--space-2) var(--space-4);
   font-family: var(--font-heading);
   font-size: var(--font-size-sm);
@@ -483,7 +517,7 @@ body {
     padding-right: var(--space-3);
   }
 
-  .reader-header__actions .btn--secondary[title="Back to dissertation home"] {
+  .reader-header__actions .btn--secondary[title="Back to archive"] {
     padding: var(--space-1) var(--space-2);
   }
 }
@@ -506,11 +540,11 @@ body {
 
   /* Show more buttons on tablet */
   .reader-header__actions .btn--secondary[title="Download PDF"],
-  .reader-header__actions .btn--secondary[title="Back to dissertation home"] {
+  .reader-header__actions .btn--secondary[title="Back to archive"] {
     display: inline-flex;
   }
 
-  .reader-header__actions .btn--secondary[title="Back to dissertation home"] {
+  .reader-header__actions .btn--secondary[title="Back to archive"] {
     padding: var(--space-2) var(--space-4);
     font-size: var(--font-size-sm);
   }

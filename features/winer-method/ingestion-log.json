@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "retrievedOn": "2026-07-18",
+  "mode": "offline curator-supervised retrieval and normalization",
+  "runtimeNetworkAccess": false,
+  "captureTool": "capture-ingestion-evidence.mjs@1",
+  "evidenceArtifact": "retrieval-evidence.json",
+  "description": "Public pages and repositories were retrieved during curation, checked against their own dates and metadata, and normalized into the frozen records shipped with this demonstration. The companion evidence artifact records the actual response digest, byte length, retrieval client and final URL, supervised source observations, field mapping, and normalized-record digest for every record. No retrieval occurs in a visitor's browser.",
+  "records": [
+    {
+      "id": "direct-2001-desktop-websites",
+      "retrievalUrl": "https://scripting.com/2001/01.html#myBlogOnTheDesktop",
+      "sourceLocator": "January 2001 archive, My Blog on the Desktop entry",
+      "dateBasis": "Dated archive heading for January 18, 2001"
+    },
+    {
+      "id": "direct-2004-bloggers-sources",
+      "retrievalUrl": "https://scripting.com/2004/08.html#When:3:28:15PM",
+      "sourceLocator": "August 10 archive entry at 3:28:15 PM",
+      "dateBasis": "Dated archive heading and entry fragment"
+    },
+    {
+      "id": "direct-2009-flying-seminar",
+      "retrievalUrl": "https://pressthink.org/2009/03/rosens-flying-seminar-in-the-future-of-news/",
+      "sourceLocator": "PressThink article metadata and body",
+      "dateBasis": "Article publication date"
+    },
+    {
+      "id": "direct-2009-tech-heroes",
+      "retrievalUrl": "https://scripting.com/stories/2009/05/15/techHeroesWhoBlog.html",
+      "sourceLocator": "Dated Scripting News permalink",
+      "dateBasis": "Post byline date"
+    },
+    {
+      "id": "direct-2013-networked-beat",
+      "retrievalUrl": "https://pressthink.org/2013/05/designs-for-a-networked-beat/",
+      "sourceLocator": "PressThink article metadata and lecture description",
+      "dateBasis": "datePublished metadata and May 13 lecture date"
+    },
+    {
+      "id": "direct-2013-motto",
+      "retrievalUrl": "https://scripting.com/about",
+      "sourceLocator": "About Scripting News page",
+      "dateBasis": "Page creation date supplied by the author"
+    },
+    {
+      "id": "direct-2016-github-archive",
+      "retrievalUrl": "https://github.com/scripting/Scripting-News",
+      "sourceLocator": "Repository README and commit history",
+      "dateBasis": "Public repository history"
+    },
+    {
+      "id": "direct-2017-source-namespace",
+      "retrievalUrl": "https://source.scripting.com/",
+      "sourceLocator": "Specification page and supplied dates",
+      "dateBasis": "Specification posting date"
+    },
+    {
+      "id": "direct-2023-feedland",
+      "retrievalUrl": "https://github.com/scripting/feedland",
+      "sourceLocator": "Repository README, license, and history",
+      "dateBasis": "Public-source announcement date recorded in the README"
+    },
+    {
+      "id": "direct-2024-social-blogroll",
+      "retrievalUrl": "https://blogroll.scripting.com/",
+      "sourceLocator": "Working prototype plus scripting/blogroll repository",
+      "dateBasis": "First auditable toolkit commit on 2024-02-14",
+      "supplementalEvidence": "https://github.com/scripting/blogroll/commit/5102e7b802ae9f807b6fb459465b7ff9dc859d9f"
+    },
+    {
+      "id": "direct-2026-community-news",
+      "retrievalUrl": "https://scripting.com/2026/02/07/220012.html",
+      "sourceLocator": "Dated Scripting News permalink",
+      "dateBasis": "Post publication date"
+    }
+  ]
+}

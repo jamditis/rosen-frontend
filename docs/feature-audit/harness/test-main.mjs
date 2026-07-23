@@ -6,7 +6,7 @@
 // empty/no-data, core-data error). React controlled inputs (the search box) are
 // driven via the injected SET_NATIVE_VALUE helper.
 import {
-  launchBrowser, newPage, gotoArchive, sleep,
+  launchBrowser, newPage, gotoArchive, waitForArchiveReady, sleep,
   loadStories, writeVerdicts, verdict, BASE,
 } from './lib.mjs';
 
@@ -15,6 +15,34 @@ const V = {};
 const set = (id, status, errors = '', severity = '', notes = '') => {
   V[id] = verdict(status, errors, severity, notes);
 };
+
+function writeMainVerdicts(fatalError = null) {
+  const failure = fatalError instanceof Error ? fatalError.message : String(fatalError || '');
+  for (const story of stories) {
+    if (!V[story.id]) {
+      set(
+        story.id,
+        'blocked',
+        failure ? `harness stopped before this check: ${failure}` : 'no test executed',
+        failure ? 'high' : 'low',
+        '',
+      );
+    }
+  }
+
+  const path = writeVerdicts('main', V);
+  const counts = { pass: 0, fail: 0, partial: 0, blocked: 0, 'n/a': 0 };
+  for (const id of Object.keys(V)) counts[V[id].test_status]++;
+  console.log('Wrote', path);
+  console.log('Tested', Object.keys(V).length, 'MAIN stories');
+  console.log(JSON.stringify(counts, null, 2));
+  for (const id of Object.keys(V).sort()) {
+    const result = V[id];
+    if (result.test_status === 'fail' || result.test_status === 'partial' || result.test_status === 'blocked') {
+      console.log(`${id} [${result.test_status}] ${result.errors_found || result.notes}`);
+    }
+  }
+}
 
 // The WelcomeModal renders a full-screen overlay on first visit (gated on the
 // localStorage key jrda_visited) and intercepts card clicks. Prime the key
@@ -42,26 +70,26 @@ async function typeSearch(page, value) {
 }
 
 async function recordsFound(page) {
-  // Scope to the results-count element (.font-display in the tools bar) — reading
+  // Scope to the results-count element — reading
   // document.body.textContent concatenates the footer's own record count and
   // year range with this line, corrupting the parsed number.
   return page.evaluate(() => {
-    const el = [...document.querySelectorAll('.font-display')]
-      .find(e => /records found/.test(e.textContent || ''));
+    const el = document.querySelector('.archive-results-count');
     if (!el) return null;
-    const m = el.textContent.match(/([\d,]+)\s+records found/);
+    const m = el.textContent.match(/([\d,]+)\s+records?/);
     return m ? parseInt(m[1].replace(/,/g, ''), 10) : null;
   });
 }
 
-// Number of rendered grid cards (the clickable card divs in the columns layout).
+// Number of rendered cards in the canonical archive results grid.
 async function cardCount(page) {
   return page.evaluate(() =>
-    document.querySelectorAll('.columns-1 > div.break-inside-avoid').length);
+    document.querySelectorAll('.archive-record-card').length);
 }
 
 const run = async () => {
   const browser = await launchBrowser();
+  try {
   const { page, errors } = await newPage(browser);
   await suppressWelcome(page);
 
@@ -69,7 +97,7 @@ const run = async () => {
   await gotoArchive(page, '');
   // Wait for first cards to render (data fully loaded).
   await page.waitForFunction(
-    () => document.querySelectorAll('.columns-1 > div.break-inside-avoid').length > 0,
+    () => document.querySelectorAll('.archive-record-card__body').length > 0,
     { timeout: 45000 },
   ).catch(() => {});
 
@@ -83,14 +111,14 @@ const run = async () => {
     const hdr = await page.evaluate(() => {
       const body = document.body.textContent || '';
       const span = (body.match(/(\d{4})[–-](\d{4})/) || [])[0] || '';
-      return { hasRecordsFound: /records found/.test(body), span };
+      return { hasRecordsFound: /\d[\d,]*\s+records?/.test(body), span };
     });
     if (loadOk && hdr.hasRecordsFound && /\d{4}[–-]\d{4}/.test(hdr.span)) {
       set('MAIN-13', 'pass', '', '',
-        `count line shows "${total} records found"; header/footer show total + year span ${hdr.span}.`);
+        `count line shows "${total} records"; header/footer show total + year span ${hdr.span}.`);
     } else {
       set('MAIN-13', 'fail',
-        `records-found line or year span missing (total=${total}, span="${hdr.span}")`,
+        `records line or year span missing (total=${total}, span="${hdr.span}")`,
         'medium', '');
     }
   }
@@ -104,17 +132,17 @@ const run = async () => {
       return { value: sel.value, firstOption: opts[0], options: opts };
     });
     const firstDates = await page.evaluate(() =>
-      [...document.querySelectorAll('.columns-1 > div.break-inside-avoid')]
+      [...document.querySelectorAll('.archive-record-card')]
         .slice(0, 3)
-        .map(c => c.querySelector('.font-mono')?.textContent?.trim() || ''));
+        .map(c => c.querySelector('.archive-record-card__date')?.textContent?.trim() || ''));
     const ascending = firstDates.length >= 2 && firstDates[0] <= firstDates[firstDates.length - 1];
     const smellConfirmed = sortState.value === 'date-asc' && sortState.firstOption.v === 'date-desc';
     // Confirm sort actually changes order: switch to title-asc.
     await page.selectOption('#sort-select', 'title-asc');
     await sleep(200);
     const titlesAfter = await page.evaluate(() =>
-      [...document.querySelectorAll('.columns-1 > div.break-inside-avoid')]
-        .slice(0, 5).map(c => c.querySelector('h3')?.textContent?.trim() || ''));
+      [...document.querySelectorAll('.archive-record-card')]
+        .slice(0, 5).map(c => c.querySelector('.archive-record-card__title')?.textContent?.trim() || ''));
     // The app sorts with String.localeCompare; verify the rendered order is
     // non-decreasing under the SAME comparator (JS < operator mis-orders the
     // leading emoji/punctuation titles that localeCompare places first).
@@ -137,22 +165,22 @@ const run = async () => {
   // Card grid: structure, accent bar, pub/date/title/summary/tags, click opens modal.
   {
     const struct = await page.evaluate(() => {
-      const grid = document.querySelector('.columns-1.md\\:columns-2.xl\\:columns-3');
-      const card = document.querySelector('.columns-1 > div.break-inside-avoid');
+      const card = document.querySelector('.archive-record-card');
+      const grid = card?.parentElement;
       if (!card) return { ok: false };
       return {
         gridPresent: !!grid,
-        breakAvoid: card.classList.contains('break-inside-avoid'),
-        accent: !!card.querySelector('.h-1'),
-        pub: !!card.querySelector('.uppercase'),
-        date: !!card.querySelector('.font-mono'),
-        title: !!card.querySelector('h3'),
-        summary: !!card.querySelector('p.font-body'),
-        tagCount: card.querySelectorAll('.mt-auto span').length,
+        semanticCard: card.tagName === 'ARTICLE',
+        accent: !!card.querySelector('.archive-record-card__accent'),
+        pub: !!card.querySelector('.archive-record-card__publication'),
+        date: !!card.querySelector('.archive-record-card__date'),
+        title: !!card.querySelector('.archive-record-card__title'),
+        summary: !!card.querySelector('.archive-record-card__summary'),
+        tagCount: card.querySelectorAll('.archive-record-card__label').length,
       };
     });
     // Click first card -> modal opens
-    await page.click('.columns-1 > div.break-inside-avoid');
+    await page.click('.archive-record-card__body');
     await page.waitForSelector('[role="dialog"]', { timeout: 5000 }).catch(() => {});
     const modalOpen = await page.evaluate(() => !!document.querySelector('[role="dialog"]'));
     // close it
@@ -161,7 +189,7 @@ const run = async () => {
     if (struct.ok !== false && struct.gridPresent && struct.accent && struct.title &&
         struct.summary && struct.date && modalOpen) {
       set('MAIN-01', 'pass', '', '',
-        `cards render in columns layout with accent bar, pub, date chip, title, summary, ${struct.tagCount} tag/badge chip(s); click opens record modal.`);
+        `cards render in the archive results grid with semantic article markup, accent bar, pub, date chip, title, summary, ${struct.tagCount} tag/badge chip(s); click opens record modal.`);
     } else {
       set('MAIN-01', 'fail',
         `card grid incomplete: ${JSON.stringify(struct)}, modalOpen=${modalOpen}`,
@@ -380,7 +408,7 @@ const run = async () => {
     }
     // reset filters for next tests
     await page.evaluate(() => {
-      const b = [...document.querySelectorAll('aside button')].find(x => /Reset all filters/.test(x.textContent));
+      const b = document.querySelector('.archive-filter-sidebar__active button');
       if (b) b.click();
     });
     await sleep(200);
@@ -459,7 +487,7 @@ const run = async () => {
   }
 
   // ----------------------------------------------------------------- MAIN-10
-  // Reset all filters (sidebar button).
+  // Reset all active filters (sidebar button).
   {
     const baseCount = await recordsFound(page);
     await typeSearch(page, 'press');
@@ -473,7 +501,7 @@ const run = async () => {
     await sleep(200);
     const filteredCount = await recordsFound(page);
     await page.evaluate(() => {
-      const b = [...document.querySelectorAll('aside button')].find(x => /Reset all filters/.test(x.textContent));
+      const b = document.querySelector('.archive-filter-sidebar__active button');
       if (b) b.click();
     });
     await sleep(250);
@@ -482,7 +510,7 @@ const run = async () => {
       document.querySelector('aside input[type="text"]').value);
     if (filteredCount < baseCount && restored === baseCount && searchVal === '') {
       set('MAIN-10', 'pass', '', '',
-        `applied search+category+type (${filteredCount}); "Reset all filters" restored full ${restored} and cleared search box. (Empty-state "Clear all filters" uses the same reset object — verified in source; exercised in MAIN-16.)`);
+        `applied search+category+type (${filteredCount}); "Reset all" restored full ${restored} and cleared search box. (Empty-state "Clear all filters" uses the same reset object — verified in source; exercised in MAIN-16.)`);
     } else {
       set('MAIN-10', 'fail',
         `reset: base=${baseCount} filtered=${filteredCount} restored=${restored} searchVal="${searchVal}"`,
@@ -538,7 +566,7 @@ const run = async () => {
   // Folder view.
   {
     await page.evaluate(() => {
-      const b = [...document.querySelectorAll('button[title="Folder View"]')][0];
+      const b = document.querySelector('button[aria-label="Folders view"]');
       if (b) b.click();
     });
     await sleep(300);
@@ -567,7 +595,7 @@ const run = async () => {
     const switched = !afterClick.hash.includes('folders') && afterClick.checkedCats >= 1;
     // reset
     await page.evaluate(() => {
-      const b = [...document.querySelectorAll('aside button')].find(x => /Reset all filters/.test(x.textContent));
+      const b = document.querySelector('.archive-filter-sidebar__active button');
       if (b) b.click();
     });
     await sleep(200);
@@ -617,18 +645,18 @@ const run = async () => {
     // ensure clean archive
     const timeline = await page.evaluate(() => {
       const tl = [...document.querySelectorAll('h3')].find(h => /Timeline/.test(h.textContent));
-      const bars = [...document.querySelectorAll('main .flex.h-32 > div')];
+      const bars = [...document.querySelectorAll('.archive-timeline__year:not(:disabled)')];
       return { present: !!tl, barCount: bars.length };
     });
     // hover a bar -> tooltip text "records"
     let tooltipOk = false;
     if (timeline.barCount > 0) {
-      const bars = await page.$$('main .flex.h-32 > div');
+      const bars = await page.$$('.archive-timeline__year:not(:disabled)');
       const target = bars[Math.floor(bars.length / 2)];
       await target.hover();
       await sleep(150);
       tooltipOk = await page.evaluate(() =>
-        [...document.querySelectorAll('main .flex.h-32 .z-30')]
+        [...document.querySelectorAll('.archive-timeline__year:hover .archive-timeline__tooltip')]
           .some(t => /\d+\s+records/.test(t.textContent || '')));
     }
     // click a bar -> filters by year, then verify timeline hides under search
@@ -653,33 +681,28 @@ const run = async () => {
   {
     // find a non-zero bar and click it
     const clicked = await page.evaluate(() => {
-      const bars = [...document.querySelectorAll('main .flex.h-32 > div')];
-      // pick one whose inner colored bar has nonzero height
-      const target = bars.find(b => {
-        const inner = b.querySelector('div[style*="height"]');
-        return inner && inner.style.height && inner.style.height !== '0px';
-      });
+      const target = document.querySelector('.archive-timeline__year:not(:disabled)');
       if (target) { target.click(); return true; }
       return false;
     });
     await sleep(250);
     const chip = await page.evaluate(() => {
-      const b = [...document.querySelectorAll('button')].find(x => /Clear filter \(/.test(x.textContent));
+      const b = document.querySelector('.archive-timeline__clear');
       return b ? b.textContent.trim() : null;
     });
     const filteredByYear = await recordsFound(page);
     // click clear
     if (chip) {
       await page.evaluate(() => {
-        const b = [...document.querySelectorAll('button')].find(x => /Clear filter \(/.test(x.textContent));
+        const b = document.querySelector('.archive-timeline__clear');
         if (b) b.click();
       });
       await sleep(250);
     }
     const afterClear = await recordsFound(page);
-    if (clicked && chip && /Clear filter \(\d{4}\)/.test(chip) && afterClear > filteredByYear) {
+    if (clicked && chip && /Clear \d{4}/.test(chip) && afterClear > filteredByYear) {
       set('MAIN-19', 'pass', '', '',
-        `clicking a year bar set the year filter (${filteredByYear} records) and showed a red "${chip}" button; clicking it cleared the year and restored ${afterClear}.`);
+        `clicking a year bar set the year filter (${filteredByYear} records) and showed the "${chip}" timeline action; clicking it cleared the year and restored ${afterClear}.`);
     } else {
       set('MAIN-19', clicked ? 'partial' : 'blocked',
         `year chip: clicked=${clicked} chip="${chip}" filtered=${filteredByYear} afterClear=${afterClear}`,
@@ -691,7 +714,7 @@ const run = async () => {
   // Featured carousel.
   {
     const feat = await page.evaluate(() => {
-      const sec = [...document.querySelectorAll('h2')].find(h => /Featured Works/.test(h.textContent));
+      const sec = [...document.querySelectorAll('h2')].find(h => /^Read$/.test(h.textContent.trim()));
       const section = sec ? sec.closest('section') : null;
       if (!section) return { present: false };
       const cards = section.querySelectorAll('a[target="_blank"]');
@@ -704,29 +727,29 @@ const run = async () => {
     if (feat.present && feat.dotCount > 5) {
       const before = feat.firstStart[0];
       await page.evaluate(() => {
-        const sec = [...document.querySelectorAll('h2')].find(h => /Featured Works/.test(h.textContent)).closest('section');
+        const sec = [...document.querySelectorAll('h2')].find(h => /^Read$/.test(h.textContent.trim())).closest('section');
         sec.querySelectorAll('button[aria-label^="Go to slide"]')[5].click();
       });
       await sleep(300);
       const after = await page.evaluate(() => {
-        const sec = [...document.querySelectorAll('h2')].find(h => /Featured Works/.test(h.textContent)).closest('section');
+        const sec = [...document.querySelectorAll('h2')].find(h => /^Read$/.test(h.textContent.trim())).closest('section');
         return sec.querySelector('a[target="_blank"] h3')?.textContent?.trim();
       });
       jumped = before !== after;
     }
     // collapse via chevron
     await page.evaluate(() => {
-      const sec = [...document.querySelectorAll('h2')].find(h => /Featured Works/.test(h.textContent)).closest('section');
+      const sec = [...document.querySelectorAll('h2')].find(h => /^Read$/.test(h.textContent.trim())).closest('section');
       sec.querySelector('button').click();
     });
     await sleep(200);
     const collapsed = await page.evaluate(() => {
-      const sec = [...document.querySelectorAll('h2')].find(h => /Featured Works/.test(h.textContent)).closest('section');
+      const sec = [...document.querySelectorAll('h2')].find(h => /^Read$/.test(h.textContent.trim())).closest('section');
       return sec.querySelectorAll('a[target="_blank"]').length === 0;
     });
     // re-expand
     await page.evaluate(() => {
-      const sec = [...document.querySelectorAll('h2')].find(h => /Featured Works/.test(h.textContent)).closest('section');
+      const sec = [...document.querySelectorAll('h2')].find(h => /^Read$/.test(h.textContent.trim())).closest('section');
       sec.querySelector('button').click();
     });
     await sleep(200);
@@ -734,7 +757,7 @@ const run = async () => {
     await typeSearch(page, 'press');
     await sleep(200);
     const goneUnderFilter = await page.evaluate(() =>
-      ![...document.querySelectorAll('h2')].some(h => /Featured Works/.test(h.textContent)));
+      ![...document.querySelectorAll('h2')].some(h => /^Read$/.test(h.textContent.trim())));
     await typeSearch(page, '');
     await sleep(200);
     const noteCount = feat.cardCount === 3
@@ -754,11 +777,11 @@ const run = async () => {
   {
     // start from a clean, unfiltered archive so prev/next has neighbours
     await page.evaluate(() => {
-      const b = [...document.querySelectorAll('aside button')].find(x => /Reset all filters/.test(x.textContent));
+      const b = document.querySelector('.archive-filter-sidebar__active button');
       if (b) b.click();
     });
     await sleep(250);
-    await page.click('.columns-1 > div.break-inside-avoid');
+    await page.click('.archive-record-card__body');
     await page.waitForSelector('[role="dialog"]', { timeout: 8000 }).catch(() => {});
     const urlHasRecord = await page.evaluate(() => /[?&]record=/.test(window.location.href));
     // next
@@ -798,7 +821,7 @@ const run = async () => {
   // ----------------------------------------------------------------- MAIN-22
   // Drill-down from a record (category tag -> archive filtered).
   {
-    await page.click('.columns-1 > div.break-inside-avoid');
+    await page.click('.archive-record-card__body');
     await page.waitForSelector('[role="dialog"]', { timeout: 5000 }).catch(() => {});
     // click first category tag in the "Thematic categories" group
     const drill = await page.evaluate(() => {
@@ -819,7 +842,7 @@ const run = async () => {
     }));
     // reset
     await page.evaluate(() => {
-      const b = [...document.querySelectorAll('aside button')].find(x => /Reset all filters/.test(x.textContent));
+      const b = document.querySelector('.archive-filter-sidebar__active button');
       if (b) b.click();
     });
     await sleep(200);
@@ -998,11 +1021,11 @@ const run = async () => {
     await suppressWelcome(dp);
     await gotoArchive(dp, '');
     await dp.waitForFunction(
-      () => document.querySelectorAll('.columns-1 > div.break-inside-avoid').length > 0,
+      () => document.querySelectorAll('.archive-record-card__body').length > 0,
       { timeout: 45000 }).catch(() => {});
     const validId = await dp.evaluate(async () => {
       // grab an id from the URL after clicking a card
-      const card = document.querySelector('.columns-1 > div.break-inside-avoid');
+      const card = document.querySelector('.archive-record-card__body');
       card.click();
       await new Promise(r => setTimeout(r, 300));
       const m = window.location.href.match(/[?&]record=([^&]+)/);
@@ -1023,9 +1046,7 @@ const run = async () => {
       const { page: bp } = await newPage(browser);
       await suppressWelcome(bp);
       await bp.goto(BASE + '/index.html?record=BADID-NONEXISTENT', { waitUntil: 'domcontentloaded' });
-      await bp.waitForFunction(
-        () => /records found/.test(document.body.textContent),
-        { timeout: 45000 }).catch(() => {});
+      await waitForArchiveReady(bp);
       await sleep(800);
       badNoModal = await bp.evaluate(() => !document.querySelector('[role="dialog"]'));
       await bp.close();
@@ -1055,14 +1076,11 @@ const run = async () => {
     const epErrors = [];
     ep.on('pageerror', e => epErrors.push(String(e)));
     await ep.goto(BASE + '/index.html', { waitUntil: 'domcontentloaded' });
-    await ep.waitForFunction(
-      () => /Error loading archive/.test(document.body.textContent) ||
-            /records found/.test(document.body.textContent),
-      { timeout: 30000 }).catch(() => {});
+    await ep.waitForSelector('.archive-error-state', { timeout: 30000 });
     await sleep(500);
     const archiveError = await ep.evaluate(() => ({
       panel: /Error loading archive/.test(document.body.textContent),
-      reloadBtn: [...document.querySelectorAll('button')].some(b => /Reload Page/.test(b.textContent)),
+      reloadBtn: [...document.querySelectorAll('button')].some(b => /Reload page/.test(b.textContent)),
     }));
     // navigate to entities, confirm error panel there too
     await ep.evaluate(() => { window.location.hash = 'entities'; window.dispatchEvent(new HashChangeEvent('hashchange')); });
@@ -1072,7 +1090,7 @@ const run = async () => {
     await ep.close();
     if (archiveError.panel && archiveError.reloadBtn && entitiesError) {
       set('MAIN-17', 'pass', '', '',
-        `aborting the core-data fetch surfaced the red "Error loading archive" panel with a "Reload Page" button on the archive route, and the same panel on #entities (shared fail-loud per #369). Loading state ("Loading archive..." + LoadingQuotes) confirmed during normal cold loads.`);
+        `aborting the core-data fetch surfaced the "Error loading archive" panel with a "Reload page" button on the archive route, and the same panel on #entities (shared fail-loud per #369). Loading state ("Loading archive..." + LoadingQuotes) confirmed during normal cold loads.`);
     } else {
       set('MAIN-17', 'partial',
         `error path: archivePanel=${archiveError.panel} reloadBtn=${archiveError.reloadBtn} entitiesPanel=${entitiesError}`,
@@ -1085,8 +1103,6 @@ const run = async () => {
     const { page: mp } = await newPage(browser, { width: 390, height: 844 });
     await suppressWelcome(mp);
     await gotoArchive(mp, '');
-    await mp.waitForFunction(
-      () => /records found/.test(document.body.textContent), { timeout: 45000 }).catch(() => {});
     const m1 = await mp.evaluate(() => {
       // sidebar hidden (translated off / not in lg layout): look for the toggle button
       const toggle = [...document.querySelectorAll('header button')]
@@ -1135,8 +1151,6 @@ const run = async () => {
     }
   }
 
-  await browser.close();
-
   // record any uncaught page errors as a global note on MAIN-13 if present
   if (mainErrors.length) {
     const noisy = mainErrors.filter(e => !/favicon|sourcemap|DevTools/.test(e));
@@ -1145,23 +1159,14 @@ const run = async () => {
     }
   }
 
-  // ensure every MAIN story has a verdict
-  for (const s of stories) {
-    if (!V[s.id]) set(s.id, 'blocked', 'no test executed', 'low', '');
-  }
-
-  const path = writeVerdicts('main', V);
-  const counts = { pass: 0, fail: 0, partial: 0, blocked: 0, 'n/a': 0 };
-  for (const id of Object.keys(V)) counts[V[id].test_status]++;
-  console.log('Wrote', path);
-  console.log('Tested', Object.keys(V).length, 'MAIN stories');
-  console.log(JSON.stringify(counts, null, 2));
-  for (const id of Object.keys(V).sort()) {
-    const v = V[id];
-    if (v.test_status === 'fail' || v.test_status === 'partial' || v.test_status === 'blocked') {
-      console.log(`${id} [${v.test_status}] ${v.errors_found || v.notes}`);
-    }
+  writeMainVerdicts();
+  } finally {
+    await browser.close();
   }
 };
 
-run().catch(err => { console.error('FATAL', err); process.exit(1); });
+run().catch(err => {
+  console.error('FATAL', err);
+  writeMainVerdicts(err);
+  process.exitCode = 1;
+});

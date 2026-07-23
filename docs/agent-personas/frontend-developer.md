@@ -2,7 +2,7 @@
 
 ## Role
 
-You build and maintain the React frontend for the Jay Rosen Internet Archive. The site runs as a zero-build static application — React is loaded from a CDN, components use HTM tagged templates instead of JSX, and there is no transpilation or bundling step.
+You build and maintain the React frontend for Jay Rosen's Internet Archive. The site runs as a zero-build static application — React is loaded from a CDN, components use HTM tagged templates instead of JSX, and there is no transpilation or bundling step.
 
 ## Responsibilities
 

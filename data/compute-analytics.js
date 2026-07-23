@@ -18,6 +18,7 @@
  */
 
 import initSqlJs from 'sql.js/dist/sql-wasm.js';
+import { ERAS } from './eras.js';
 
 // The dashboard caps these three charts at 10 rows; the year/category/era
 // charts are unbounded (the dashboard slices them client-side). Keep these in
@@ -133,6 +134,17 @@ export async function computeAnalytics(data) {
   // The six charts + four stat counts, verbatim from the dashboard query
   // functions in sqliteService.js (getStats, getRecordCountBy*,
   // getMostMentionedEntities, getMostCommonConcepts, getCategoryCoOccurrence).
+
+  // byEra previously hardcoded a stale 4-value era list, so 6 of the 8 shipped
+  // eras fell into one ELSE bucket and the chart rendered unordered past the
+  // first few (issue #385). Order by the canonical sequence from data/eras.js
+  // instead, so every era sorts and the ordering can never drift from the
+  // shipped taxonomy. ERAS values are trusted module constants, not user input;
+  // single quotes are escaped for SQL correctness regardless.
+  const eraOrderCase = ERAS
+    .map((era, i) => `WHEN '${era.replace(/'/g, "''")}' THEN ${i + 1}`)
+    .join('\n          ');
+
   const analytics = {
     stats: rows(`SELECT
         (SELECT COUNT(*) FROM records) AS records,
@@ -143,12 +155,9 @@ export async function computeAnalytics(data) {
     byCategory: rows(`SELECT category, COUNT(*) AS count FROM record_categories GROUP BY category ORDER BY count DESC`),
     byEra: rows(`SELECT era, COUNT(*) AS count FROM records WHERE era != '' GROUP BY era ORDER BY
         CASE era
-          WHEN 'Public Journalism (90s)' THEN 1
-          WHEN 'Web & Blogging (00s)' THEN 2
-          WHEN 'View from Nowhere (10s)' THEN 3
-          WHEN 'Democracy in Crisis (20s)' THEN 4
-          ELSE 5
-        END`),
+          ${eraOrderCase}
+          ELSE ${ERAS.length + 1}
+        END, era`),
     topPeople: rows(`SELECT e.name, e.type, MAX(COALESCE(e.total_mentions, 0), COUNT(re.record_id)) AS mentions
         FROM entities e
         LEFT JOIN record_entities re ON e.id = re.entity_id

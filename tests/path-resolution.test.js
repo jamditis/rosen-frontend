@@ -34,6 +34,12 @@ describe('getEnvironment(host)', () => {
     assert.strictEqual(getEnvironment('127.0.0.1'), 'local');
   });
 
+  it('returns local for bare and browser-serialized IPv6 loopback', () => {
+    assert.strictEqual(getEnvironment('::1'), 'local');
+    assert.strictEqual(getEnvironment('[::1]'), 'local');
+    assert.strictEqual(resolveSitePath('frontend/desktop/desktop.css', '[::1]'), '/frontend/desktop/desktop.css');
+  });
+
   it('returns github-pages for jamditis.github.io', () => {
     assert.strictEqual(getEnvironment('jamditis.github.io'), 'github-pages');
   });
@@ -95,7 +101,7 @@ describe('getSiteRoot(host)', () => {
 
 describe('resolveSitePath(rel, host)', () => {
   it('builds a root-relative path in local', () => {
-    assert.strictEqual(resolveSitePath('dissertation/faq/', 'localhost'), '/dissertation/faq/');
+    assert.strictEqual(resolveSitePath('faq/', 'localhost'), '/faq/');
   });
 
   it('prefixes the GH Pages root', () => {
@@ -113,8 +119,8 @@ describe('resolveSitePath(rel, host)', () => {
   });
 
   it('ignores a leading slash on the relative path (no double slash)', () => {
-    assert.strictEqual(resolveSitePath('/dissertation/faq/', 'pressthink.org'), '/j/rosen-archive/dissertation/faq/');
-    assert.strictEqual(resolveSitePath('/dissertation/faq/', 'localhost'), '/dissertation/faq/');
+    assert.strictEqual(resolveSitePath('/faq/', 'pressthink.org'), '/j/rosen-archive/faq/');
+    assert.strictEqual(resolveSitePath('/faq/', 'localhost'), '/faq/');
   });
 });
 

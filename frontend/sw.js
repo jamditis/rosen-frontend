@@ -1,5 +1,5 @@
 /**
- * Jay Rosen Internet Archive - Service Worker
+ * Jay Rosen's Internet Archive - Service Worker
  *
  * Caching strategy:
  * - HTML / navigations: Network-first, cache as offline fallback. The page must
@@ -13,83 +13,101 @@
 // Cache version is tied to the app version in version.json. Bumping it on every
 // deploy (alongside index.html and the ?v= import strings) makes the activate
 // handler below drop every stale cache, so returning visitors never run old code.
-const CACHE_VERSION = '3.4.7';
+const CACHE_VERSION = '3.8.5';
 const CACHE_NAME = `jrda-cache-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `jrda-data-${CACHE_VERSION}`;
 
 // Detect deploy surface. Keep in sync with frontend/utils/pathResolver.js —
-// sw.js is registered as a classic worker (see index.html), so it cannot
+// this classic worker is loaded through the root sw.js bridge, so it cannot
 // `import` from the shared resolver and duplicates this logic inline.
 const HOST = self.location.hostname;
-const IS_LOCAL = HOST === 'localhost' || HOST === '127.0.0.1';
+// Browsers serialize IPv6 URL hostnames with brackets; tests and other
+// runtimes may expose the bare literal. Keep this in sync with pathResolver.
+const IS_LOCAL = HOST === 'localhost'
+  || HOST === '127.0.0.1'
+  || HOST === '::1'
+  || HOST === '[::1]';
 const IS_GITHUB_PAGES = HOST.endsWith('.github.io');
 
-const BASE_PATH = IS_LOCAL ? '/frontend'
+const SITE_ROOT = IS_LOCAL ? ''
   : IS_GITHUB_PAGES ? '/rosen-frontend'
   : '/j/rosen-archive';
-const DATA_PATH = IS_LOCAL ? '/data'
-  : IS_GITHUB_PAGES ? '/rosen-frontend/data'
-  : '/j/rosen-archive/data';
+const FRONTEND_PATH = `${SITE_ROOT}/frontend`;
+const DATA_PATH = `${SITE_ROOT}/data`;
 
-// Static assets to pre-cache on install. The local layout serves source
-// files at /frontend/<path>, while deployed surfaces serve a top-level
-// index.html at BASE_PATH and the source files under BASE_PATH/frontend/.
-const STATIC_ASSETS = IS_LOCAL ? [
-  '/frontend/',
-  '/frontend/index.html',
-  '/frontend/index.js',
-  '/frontend/App.js',
-  '/frontend/html.js',
-  '/frontend/constants.js',
-  '/frontend/index.css',
-  '/frontend/dist/tailwind.css',
-  '/frontend/services/archiveService.js',
-  '/frontend/services/idbCache.js',
-  '/frontend/components/Sidebar.js',
-  '/frontend/components/RecordModal.js',
-  '/frontend/components/FeaturedSection.js',
-  '/frontend/components/WelcomeModal.js',
-  '/frontend/components/DissertationPage.js',
-  '/frontend/components/MindMap.js',
-  '/frontend/components/DetailPanel.js',
-  '/frontend/components/dissertationData.js',
-  '/frontend/components/ToolsModal.js',
-  '/frontend/components/LoadingQuotes.js',
-  '/frontend/components/WorkInProgressBanner.js',
-  '/frontend/components/AnalyticsDashboard.js',
-  '/frontend/components/QueryBuilder.js',
-  '/frontend/components/AboutPage.js',
-  '/frontend/components/WikiPage.js',
-  '/frontend/services/wikiService.js',
-  '/frontend/services/sqliteService.js'
-] : [
-  `${BASE_PATH}/`,
-  `${BASE_PATH}/index.html`,
-  `${BASE_PATH}/frontend/index.js`,
-  `${BASE_PATH}/frontend/App.js`,
-  `${BASE_PATH}/frontend/html.js`,
-  `${BASE_PATH}/frontend/constants.js`,
-  `${BASE_PATH}/frontend/index.css`,
-  `${BASE_PATH}/frontend/dist/tailwind.css`,
-  `${BASE_PATH}/frontend/services/archiveService.js`,
-  `${BASE_PATH}/frontend/services/idbCache.js`,
-  `${BASE_PATH}/frontend/components/Sidebar.js`,
-  `${BASE_PATH}/frontend/components/RecordModal.js`,
-  `${BASE_PATH}/frontend/components/FeaturedSection.js`,
-  `${BASE_PATH}/frontend/components/WelcomeModal.js`,
-  `${BASE_PATH}/frontend/components/DissertationPage.js`,
-  `${BASE_PATH}/frontend/components/MindMap.js`,
-  `${BASE_PATH}/frontend/components/DetailPanel.js`,
-  `${BASE_PATH}/frontend/components/dissertationData.js`,
-  `${BASE_PATH}/frontend/components/ToolsModal.js`,
-  `${BASE_PATH}/frontend/components/LoadingQuotes.js`,
-  `${BASE_PATH}/frontend/components/WorkInProgressBanner.js`,
-  `${BASE_PATH}/frontend/components/AnalyticsDashboard.js`,
-  `${BASE_PATH}/frontend/components/QueryBuilder.js`,
-  `${BASE_PATH}/frontend/components/AboutPage.js`,
-  `${BASE_PATH}/frontend/components/WikiPage.js`,
-  `${BASE_PATH}/frontend/services/wikiService.js`,
-  `${BASE_PATH}/frontend/services/sqliteService.js`
+// The standard application shell is explicit so its first installed visit can
+// reopen offline even though registration happens after the initial page load.
+// Desktop modules are deliberately absent: they are warmed only after someone
+// opens the optional desktop, preserving its lazy/default-route contract.
+const APP_SHELL_FRONTEND_FILES = [
+  'index.js',
+  'App.js',
+  'html.js',
+  'constants.js',
+  'index.css',
+  'design-system/legacy-token-bridge.css',
+  'design-system/tokens.css',
+  'design-system/recipes.css',
+  'dist/tailwind.css',
+  'components/AboutPage.js',
+  'components/AnalyticsDashboard.js',
+  'components/ArchiveResults.js',
+  'components/ArchiveRouteHeader.js',
+  'components/BugReportModal.js',
+  'components/DetailPanel.js',
+  'components/DissertationPage.js',
+  'components/EntityBrowser.js',
+  'components/FeaturedSection.js',
+  'components/LoadingQuotes.js',
+  'components/MindMap.js',
+  'components/QueryBuilder.js',
+  'components/RecordModal.js',
+  'components/RecordView.js',
+  'components/Sidebar.js',
+  'components/StartHerePage.js',
+  'components/ThreadModal.js',
+  'components/Timeline.js',
+  'components/ToolsModal.js',
+  'components/WelcomeModal.js',
+  'components/WikiPage.js',
+  'components/WorkInProgressBanner.js',
+  'components/dissertationData.js',
+  'services/archiveService.js',
+  'services/bodyScrollLock.js',
+  'services/cacheConfig.js',
+  'services/idbCache.js',
+  'services/queryComposition.js',
+  'services/router.js',
+  'services/sqliteService.js',
+  'services/tourState.js',
+  'services/viewState.js',
+  'services/wikiService.js',
+  'utils/bugReport.js',
+  'utils/csvSafety.js',
+  'utils/linkify.js',
+  'utils/modalNav.js',
+  'utils/needsReview.js',
+  'utils/pathResolver.js',
+  'utils/perfMark.js',
+  'utils/raceTimeout.js',
+  'utils/recordDeepLink.js',
+  'utils/recordSort.js',
+  'utils/reportDeepLink.js',
+  'utils/reportSubmit.js',
+  'utils/sanitizeHref.js',
+  'utils/searchConfig.js',
+  'utils/searchNormalize.js',
+  'utils/submitGate.js',
+  'utils/viewTransition.js'
+];
+
+const STATIC_ASSETS = [
+  `${SITE_ROOT}/`,
+  `${SITE_ROOT}/index.html`,
+  `${SITE_ROOT}/favicon.ico`,
+  `${SITE_ROOT}/favicon.svg`,
+  `${DATA_PATH}/eras.js`,
+  ...APP_SHELL_FRONTEND_FILES.map(file => `${FRONTEND_PATH}/${file}`)
 ];
 
 // Archive data files the worker serves with stale-while-revalidate. The
@@ -101,6 +119,7 @@ const DATA_URLS = [
   `${DATA_PATH}/archive-details.json`,
   `${DATA_PATH}/archive-entities.json`,
   `${DATA_PATH}/archive-analytics.json`,
+  `${DATA_PATH}/search-index.json`,
   `${DATA_PATH}/wiki-seed.json`
 ];
 
@@ -108,6 +127,24 @@ const DATA_URLS = [
 // brotli). The rest of DATA_URLS stays on-demand, cached lazily by SWR on first
 // fetch. Deriving from DATA_URLS keeps the install set in sync with the manifest.
 const INSTALL_PRECACHE_DATA = DATA_URLS.filter(url => url.endsWith('/archive-core.json'));
+
+// Optional shell assets are cached only after DesktopShell asks for them. This
+// covers a first-ever direct #desktop visit too: registration occurs after the
+// page load, then the active worker warms the already-used module graph for the
+// next offline visit without making standard visitors download it. These use
+// the same versioned request keys as the dynamic imports so a first visit and
+// the warm-up message cannot create query/no-query duplicates in the cache.
+const DESKTOP_ASSETS = [
+  'DesktopShell.js',
+  'DesktopArchivePanel.js',
+  'DesktopEntityPanel.js',
+  'DesktopDissertationPanel.js',
+  'DesktopAnalyticsPanel.js',
+  'DesktopStartPanel.js',
+  'desktopRegistry.js',
+  'desktopWindowState.js',
+  'desktop.css'
+].map(file => `${FRONTEND_PATH}/desktop/${file}?v=${CACHE_VERSION}`);
 
 console.log('[SW] Environment:',
   IS_LOCAL ? 'local development'
@@ -201,10 +238,7 @@ self.addEventListener('fetch', event => {
 // Check if URL is a data file
 function isDataFile(pathname) {
   if (!pathname.endsWith('.json')) return false;
-  if (!pathname.includes('/data/')) return false;
-  // Tight prefix check on local mirrors isStaticAsset below; on deployed
-  // surfaces BASE_PATH narrows the match to our archive subtree.
-  return IS_LOCAL ? pathname.startsWith('/data/') : pathname.includes(BASE_PATH);
+  return pathname.startsWith(`${DATA_PATH}/`);
 }
 
 // Check if a request is for HTML: a real navigation, or any .html path. HTML is
@@ -213,11 +247,21 @@ function isHtmlRequest(request, pathname) {
   return request.mode === 'navigate' || pathname.endsWith('.html');
 }
 
+// Only the root document is the single-page application. Standalone pages are
+// controlled by this root-scoped worker too, but must never receive the cached
+// SPA shell at their own URL when their exact response is unavailable offline.
+function isSpaNavigation(request) {
+  if (request.mode !== 'navigate') return false;
+  const pathname = new URL(request.url).pathname;
+  return pathname === `${SITE_ROOT}/` || pathname === `${SITE_ROOT}/index.html`;
+}
+
 // Check if URL is a static asset. '.html' is deliberately excluded -- HTML is
 // handled by isHtmlRequest/networkFirst, not cache-first.
 function isStaticAsset(pathname) {
   const isAssetType = pathname.endsWith('.js') ||
     pathname.endsWith('.css') ||
+    pathname.endsWith('.wasm') ||
     pathname.endsWith('.ico') ||
     pathname.endsWith('.png') ||
     pathname.endsWith('.jpg') ||
@@ -225,10 +269,10 @@ function isStaticAsset(pathname) {
 
   if (!isAssetType) return false;
 
-  if (IS_LOCAL) {
-    return pathname.startsWith('/frontend/') || pathname.startsWith('/data/');
-  }
-  return pathname.includes(BASE_PATH);
+  return pathname.startsWith(`${FRONTEND_PATH}/`) ||
+    pathname.startsWith(`${DATA_PATH}/`) ||
+    pathname === `${SITE_ROOT}/favicon.ico` ||
+    pathname === `${SITE_ROOT}/favicon.svg`;
 }
 
 /**
@@ -328,7 +372,14 @@ async function networkFirst(request, cacheName) {
     }
     return networkResponse;
   } catch (err) {
-    const cachedResponse = await cache.match(request);
+    let cachedResponse = await cache.match(request);
+    // Query-string deep links (notably ?record=...) are still the same
+    // single-page app document. The install cache holds the clean site root,
+    // so use it as the navigation fallback instead of returning a plain 503
+    // merely because the cached Request lacks that query string.
+    if (!cachedResponse && isSpaNavigation(request)) {
+      cachedResponse = await cache.match(`${SITE_ROOT}/`);
+    }
     if (cachedResponse) {
       return cachedResponse;
     }
@@ -341,13 +392,23 @@ async function networkFirst(request, cacheName) {
 
 // Handle messages from clients
 self.addEventListener('message', event => {
-  if (event.data.action === 'skipWaiting') {
+  if (event.data?.action === 'skipWaiting') {
     self.skipWaiting();
   }
 
-  if (event.data.action === 'clearCache') {
-    caches.keys().then(names => {
-      names.forEach(name => caches.delete(name));
-    });
+  if (event.data?.action === 'clearCache') {
+    const pending = caches.keys().then(names => Promise.all(
+      names.map(name => caches.delete(name))
+    ));
+    event.waitUntil?.(pending);
+  }
+
+  if (event.data?.action === 'cacheDesktop') {
+    const pending = caches.open(CACHE_NAME).then(cache => Promise.allSettled(
+      DESKTOP_ASSETS.map(url =>
+        cache.add(url).catch(err => console.warn('[SW] Failed to cache desktop asset:', url, err))
+      )
+    ));
+    event.waitUntil?.(pending);
   }
 });

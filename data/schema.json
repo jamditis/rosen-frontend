@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://pressthink.org/j/rosen-archive/data/schema.json",
-  "title": "Jay Rosen Digital Archive Schema",
-  "description": "Schema for the Jay Rosen Digital Archive data format",
+  "title": "Jay Rosen's Internet Archive Schema",
+  "description": "Schema for Jay Rosen's Internet Archive data format",
   "type": "object",
   "properties": {
     "version": {

@@ -26,24 +26,40 @@ on:
 
 permissions:
   contents: read
-
-# Serialize with itself so two simultaneous deploy clicks can't race on
-# the SFTP write+rename for the same files. The per-record submit-record
-# workflow uses pillar3a-submit-record — that group only protects data/,
-# so it doesn't need to block this one (and vice versa, mostly).
-concurrency:
-  group: deploy-full-site
-  cancel-in-progress: false
+  actions: read
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Match the five-hour queue bound and reserve the final hour for deployment.
+    timeout-minutes: 360
     steps:
       - name: Checkout main
         uses: actions/checkout@v6
         with:
           ref: main
+          # The reader's original dissertation PDF is a Git LFS object. A
+          # pointer-only checkout would upload 133 bytes instead of the PDF.
+          lfs: true
+
+      - name: Set up Node 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      # GitHub concurrency groups retain only one pending run. This FIFO wait
+      # leaves every dispatch intact while preventing full and per-record deploys
+      # from publishing overlapping versions of the data and metadata shells.
+      - name: Wait for release turn
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_QUEUE_TIMEOUT_SECONDS: 18000
+        run: node .github/scripts/wait-release-turn.mjs
+
+      - name: Refresh main after queue wait
+        run: |
+          git fetch origin main
+          git checkout --detach FETCH_HEAD
 
       - name: Set up Python 3.13
         uses: actions/setup-python@v6

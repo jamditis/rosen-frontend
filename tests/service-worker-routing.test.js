@@ -29,20 +29,26 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = path.join(__dirname, '..');
 const SW_SRC = fs.readFileSync(path.join(ROOT, 'frontend', 'sw.js'), 'utf8');
+const APP_VERSION = JSON.parse(
+  fs.readFileSync(path.join(ROOT, 'version.json'), 'utf8'),
+).version;
 
 /**
  * Run sw.js in a sandbox shaped like a production deploy. Returns the sandbox
  * (with the SW's top-level functions attached), the captured event handlers,
  * and the list of URLs the install handler tried to cache.add.
  */
-function loadSW(hostname = 'pressthink.org') {
+function loadSW(hostname = 'pressthink.org', {
+  cacheMatch = async () => null,
+  fetchImpl = async () => { throw new Error('offline'); },
+} = {}) {
   const handlers = {};
   const added = [];
   const fakeCache = {
     add: async (url) => { added.push(String(url)); },
     addAll: async (urls) => { urls.forEach(u => added.push(String(u))); },
     put: async () => {},
-    match: async () => null,
+    match: cacheMatch,
   };
   const sandbox = {
     self: {
@@ -57,6 +63,9 @@ function loadSW(hostname = 'pressthink.org') {
       delete: async () => true,
     },
     location: { origin: `https://${hostname}`, hostname },
+    URL,
+    Response,
+    fetch: fetchImpl,
     console: { log: () => {}, warn: () => {} },
   };
   vm.createContext(sandbox);
@@ -74,9 +83,10 @@ describe('service worker request classification (#274)', () => {
     assert.equal(sandbox.isStaticAsset(`${BASE}/index.html`), false);
   });
 
-  it('still treats versioned JS and CSS as static assets', () => {
+  it('still treats versioned JS, CSS, and the self-hosted query runtime as static assets', () => {
     assert.equal(sandbox.isStaticAsset(`${BASE}/frontend/App.js`), true);
     assert.equal(sandbox.isStaticAsset(`${BASE}/frontend/dist/tailwind.css`), true);
+    assert.equal(sandbox.isStaticAsset(`${BASE}/frontend/vendor/sql-wasm-1.10.3.wasm`), true);
   });
 
   it('treats a top-level navigation as an HTML request', () => {
@@ -89,6 +99,26 @@ describe('service worker request classification (#274)', () => {
 
   it('does not treat a JS sub-resource as an HTML request', () => {
     assert.equal(sandbox.isHtmlRequest({ mode: 'cors' }, `${BASE}/frontend/App.js`), false);
+  });
+
+  it('recognizes root and index query deep links as SPA navigations', () => {
+    assert.equal(sandbox.isSpaNavigation({
+      mode: 'navigate',
+      url: `https://pressthink.org${BASE}/?record=RECORD-00903`,
+    }), true);
+    assert.equal(sandbox.isSpaNavigation({
+      mode: 'navigate',
+      url: `https://pressthink.org${BASE}/index.html?q=public`,
+    }), true);
+  });
+
+  it('does not classify standalone controlled pages as SPA navigations', () => {
+    for (const path of ['/faq/', '/dissertation/reader/', '/features/winer-method/']) {
+      assert.equal(sandbox.isSpaNavigation({
+        mode: 'navigate',
+        url: `https://pressthink.org${BASE}${path}`,
+      }), false, path);
+    }
   });
 
   it('still classifies archive JSON under /data/ as a data file', () => {
@@ -107,7 +137,23 @@ async function runInstall(handlers) {
   await pending;
 }
 
+async function runMessage(handlers, data) {
+  assert.ok(handlers.message, 'no message handler registered');
+  let pending;
+  handlers.message({ data, waitUntil: (p) => { pending = p; } });
+  if (pending) await pending;
+}
+
 describe('service worker install precache (#274)', () => {
+  it('keeps browser-serialized IPv6 loopback on local preview paths', async () => {
+    const { handlers, added } = loadSW('[::1]');
+    await runInstall(handlers);
+    assert.ok(added.includes('/index.html'));
+    assert.ok(added.includes('/frontend/App.js'));
+    assert.ok(added.includes('/data/archive-core.json'));
+    assert.equal(added.some((url) => url.startsWith('/j/rosen-archive/')), false);
+  });
+
   it('warms archive-core.json on install', async () => {
     const { handlers, added } = loadSW();
     await runInstall(handlers);
@@ -130,6 +176,86 @@ describe('service worker install precache (#274)', () => {
     assert.ok(added.some(u => /\/index\.html$/.test(u)), 'index.html missing from precache');
     assert.ok(added.some(u => /\/index\.js$/.test(u)), 'index.js missing from precache');
   });
+
+  it('pre-caches the real document root in local preview', async () => {
+    const { handlers, added } = loadSW('127.0.0.1');
+    await runInstall(handlers);
+    assert.ok(added.includes('/'), 'local site root missing from precache');
+    assert.ok(added.includes('/index.html'), 'local root index missing from precache');
+    assert.ok(!added.includes('/frontend/index.html'), 'nonexistent frontend index must not be cached');
+  });
+
+  for (const [surface, host, prefix] of [
+    ['GitHub Pages', 'jamditis.github.io', '/rosen-frontend'],
+    ['production', 'pressthink.org', '/j/rosen-archive'],
+  ]) {
+    it(`keeps every ${surface} install entry inside the deployed subtree`, async () => {
+      const { handlers, added } = loadSW(host);
+      await runInstall(handlers);
+      assert.ok(added.length > 0, `${surface} install manifest is empty`);
+      assert.ok(
+        added.every(url => url.startsWith(`${prefix}/`)),
+        `install entry escaped ${prefix}/: ${added.find(url => !url.startsWith(`${prefix}/`))}`
+      );
+      assert.ok(added.includes(`${prefix}/`), `${surface} app root missing from precache`);
+    });
+  }
+});
+
+describe('service worker offline navigation fallback', () => {
+  it('uses the cached app root for an uncached SPA query deep link', async () => {
+    const appRoot = { source: 'cached app root' };
+    const matched = [];
+    const { sandbox } = loadSW('pressthink.org', {
+      cacheMatch: async (request) => {
+        matched.push(request);
+        return request === `${BASE}/` ? appRoot : null;
+      },
+    });
+
+    const response = await sandbox.networkFirst({
+      mode: 'navigate',
+      url: `https://pressthink.org${BASE}/?record=RECORD-00903`,
+    }, 'test-cache');
+
+    assert.equal(response, appRoot);
+    assert.equal(matched.at(-1), `${BASE}/`);
+  });
+
+  it('returns unavailable instead of substituting the SPA for an uncached standalone page', async () => {
+    const matched = [];
+    const { sandbox } = loadSW('pressthink.org', {
+      cacheMatch: async (request) => {
+        matched.push(request);
+        return request === `${BASE}/` ? { source: 'wrong app root' } : null;
+      },
+    });
+
+    const response = await sandbox.networkFirst({
+      mode: 'navigate',
+      url: `https://pressthink.org${BASE}/faq/`,
+    }, 'test-cache');
+
+    assert.equal(response.status, 503);
+    assert.equal(matched.includes(`${BASE}/`), false);
+  });
+});
+
+describe('service worker optional desktop cache', () => {
+  for (const [surface, host, prefix] of [
+    ['GitHub Pages', 'jamditis.github.io', '/rosen-frontend'],
+    ['production', 'pressthink.org', '/j/rosen-archive'],
+  ]) {
+    it(`warms exactly nine versioned desktop assets under the ${surface} subtree`, async () => {
+      const { handlers, added } = loadSW(host);
+      await runMessage(handlers, { action: 'cacheDesktop' });
+
+      assert.equal(added.length, 9);
+      assert.equal(new Set(added).size, 9);
+      assert.ok(added.every(url => url.startsWith(`${prefix}/frontend/desktop/`)));
+      assert.ok(added.every(url => url.endsWith(`?v=${APP_VERSION}`)));
+    });
+  }
 });
 
 describe('service worker safePut (#274)', () => {
@@ -158,11 +284,27 @@ describe('service worker structure (#274)', () => {
     assert.match(SW_SRC, /archive-analytics\.json/);
   });
 
+  it('does not contain duplicate data-manifest entries', () => {
+    const manifest = SW_SRC.slice(
+      SW_SRC.indexOf('const DATA_URLS'),
+      SW_SRC.indexOf('const INSTALL_PRECACHE_DATA'),
+    );
+    const entries = [...manifest.matchAll(/`\$\{DATA_PATH\}\/([^`]+)`/g)].map(match => match[1]);
+    assert.ok(entries.length > 0, 'DATA_URLS manifest is empty');
+    assert.equal(new Set(entries).size, entries.length);
+  });
+
   it('derives the install precache as a bounded subset of DATA_URLS', () => {
     assert.match(SW_SRC, /INSTALL_PRECACHE_DATA\s*=\s*DATA_URLS\.filter/);
   });
 
   it('routes HTML/navigation requests to networkFirst in the fetch handler', () => {
     assert.match(SW_SRC, /isHtmlRequest\([^)]*\)[\s\S]{0,80}networkFirst/);
+  });
+
+  it('falls back from query-string navigations to the cached app root', () => {
+    const networkFirstSource = SW_SRC.slice(SW_SRC.indexOf('async function networkFirst'));
+    assert.match(networkFirstSource, /isSpaNavigation\(request\)/);
+    assert.match(networkFirstSource, /cache\.match\(`\$\{SITE_ROOT\}\/`\)/);
   });
 });

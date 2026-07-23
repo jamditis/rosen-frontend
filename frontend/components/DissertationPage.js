@@ -1,13 +1,13 @@
 
 import { useState } from 'react';
-import { html } from '../html.js?v=3.4.7';
+import { html } from '../html.js?v=3.8.5';
 import { BookOpen, ExternalLink, ArrowLeft, Calendar, GraduationCap } from 'lucide-react';
-import MindMap from './MindMap.js?v=3.4.7';
-import DetailPanel from './DetailPanel.js?v=3.4.7';
-import { DISSERTATION_NODES } from './dissertationData.js?v=3.4.7';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.4.7';
+import MindMap from './MindMap.js?v=3.8.5';
+import DetailPanel from './DetailPanel.js?v=3.8.5';
+import { DISSERTATION_NODES } from './dissertationData.js?v=3.8.5';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.5';
 
-const DissertationPage = ({ onBack }) => {
+const DissertationPage = ({ onBack, embedded = false }) => {
   const [selectedNode, setSelectedNode] = useState(null);
   const [detailPanelOpen, setDetailPanelOpen] = useState(false);
 
@@ -32,40 +32,43 @@ const DissertationPage = ({ onBack }) => {
   };
 
   return html`
-    <div className="h-screen w-screen bg-paper flex flex-col overflow-hidden max-w-full">
-      <header className="flex-shrink-0 z-30 w-full bg-paper border-b border-stone-200">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+    <div className=${embedded
+      ? 'desktop-dissertation-surface archive-dissertation-route is-embedded'
+      : 'archive-dissertation-route'}>
+      ${!embedded && html`<header className="archive-dissertation-header">
+        <div className="archive-dissertation-header__inner">
+          <div className="archive-dissertation-header__primary">
             ${onBack && html`
               <button
+                type="button"
                 onClick=${onBack}
-                className="flex items-center gap-2 text-stone-600 hover:text-stone-900 transition-colors text-sm"
+                aria-label="Back to archive"
+                className="archive-action archive-action--quiet archive-dissertation-header__back"
               >
-                <${ArrowLeft} className="w-4 h-4" />
-                <span className="hidden sm:inline">Back to Archive</span>
+                <${ArrowLeft} aria-hidden="true" />
+                <span>Back to archive</span>
               </button>
             `}
-            <div className="flex items-center gap-3">
-              <div className="bg-stone-900 text-white p-1.5">
-                <${BookOpen} className="w-5 h-5" />
+            <div className="archive-dissertation-header__identity">
+              <div className="archive-dissertation-header__mark">
+                <${BookOpen} aria-hidden="true" />
               </div>
-              <div className="hidden sm:block">
-                <h1 className="text-sm font-display font-bold text-stone-900 leading-tight">
+              <div>
+                <p className="archive-dissertation-header__title">
                   The Impossible Press
-                </h1>
-                <p className="text-[10px] text-stone-500">PhD Dissertation, 1986</p>
+                </p>
+                <p className="archive-dissertation-header__meta">PhD dissertation, 1986</p>
               </div>
             </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-6 text-xs text-stone-500">
-            <div className="flex items-center gap-2">
-              <${GraduationCap} className="w-4 h-4" />
+          <div className="archive-dissertation-header__metadata">
+            <div>
+              <${GraduationCap} aria-hidden="true" />
               <span>Jay Rosen</span>
             </div>
-            <div className="h-4 w-px bg-stone-200" />
-            <div className="flex items-center gap-2">
-              <${Calendar} className="w-4 h-4" />
+            <div>
+              <${Calendar} aria-hidden="true" />
               <span>New York University, 1986</span>
             </div>
           </div>
@@ -74,30 +77,38 @@ const DissertationPage = ({ onBack }) => {
             href=${dissertationPdfUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 bg-stone-800 text-white px-4 py-2 text-xs font-bold hover:bg-stone-700 transition-colors"
+            className="archive-action archive-action--primary archive-dissertation-header__read"
           >
-            <span>Read Full Text</span>
-            <${ExternalLink} className="w-3.5 h-3.5" />
+            <span>Read full text</span>
+            <${ExternalLink} aria-hidden="true" />
           </a>
         </div>
-      </header>
+      </header>`}
 
-      <div className="flex-shrink-0 bg-gradient-to-r from-stone-50 to-stone-100 border-b border-stone-200">
-        <div className="container mx-auto px-4 py-4 md:py-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="max-w-2xl">
-              <h1 className="font-display text-xl md:text-2xl font-bold text-stone-900 leading-tight">
+      <div className="archive-dissertation-intro">
+        <div className="archive-dissertation-intro__inner">
+          <div className="archive-dissertation-intro__layout">
+            <div className="archive-dissertation-intro__title">
+              <h1
+                data-route-entry-focus=${embedded ? undefined : true}
+                tabIndex=${embedded ? undefined : '-1'}
+              >
                 The Impossible Press
               </h1>
-              <h2 className="text-sm md:text-base text-stone-600">
+              <h2>
                 American Journalism and the Decline of Public Life
               </h2>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div
+              className="archive-dissertation-terms"
+              role="region"
+              tabIndex="0"
+              aria-label="Dissertation index terms"
+            >
               ${['Public Sphere', 'Objectivity', 'Lippmann', 'Dewey'].map(tag => html`
                 <span
                   key=${tag}
-                  className="text-[9px] uppercase font-bold px-2 py-1 bg-white border border-stone-200 text-stone-500 tracking-wide rounded"
+                  className="archive-index-term"
                 >
                   ${tag}
                 </span>
@@ -107,32 +118,33 @@ const DissertationPage = ({ onBack }) => {
         </div>
       </div>
 
-      <div className="flex-shrink-0 bg-white border-b border-stone-200">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="text-xs text-stone-500">
-            <span className="font-bold uppercase tracking-wider text-stone-400 mr-2">Navigate:</span>
+      <div className="archive-dissertation-guide">
+        <div className="archive-dissertation-guide__inner">
+          <div>
+            <strong>Navigate:</strong>
             Click any node to expand and see details.
           </div>
-          <div className="hidden sm:flex items-center gap-4 text-[10px] text-stone-400">
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded bg-amber-100 border-2 border-amber-400" /> Parts
+          <div className="archive-dissertation-legend" aria-label="Map legend">
+            <span>
+              <i className="archive-dissertation-legend__key is-part" aria-hidden="true" /> Parts
             </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded bg-sky-100 border-2 border-sky-400" /> Chapters
+            <span>
+              <i className="archive-dissertation-legend__key is-chapter" aria-hidden="true" /> Chapters
             </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded bg-stone-100 border-2 border-stone-400" /> Intro/Conclusion
+            <span>
+              <i className="archive-dissertation-legend__key is-bookend" aria-hidden="true" /> Intro/conclusion
             </span>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 relative overflow-hidden">
+      <div className=${embedded ? 'desktop-dissertation-map archive-dissertation-map' : 'archive-dissertation-map'}>
         <${MindMap}
           nodes=${DISSERTATION_NODES}
           onNodeSelect=${handleNodeSelect}
           isPanelOpen=${detailPanelOpen}
-          className="absolute inset-0"
+          minimumZoom=${embedded ? 44 / 72 : 0.3}
+          className=${embedded ? '' : 'absolute inset-0'}
         />
       </div>
 
@@ -140,34 +152,33 @@ const DissertationPage = ({ onBack }) => {
         node=${selectedNode}
         isOpen=${detailPanelOpen}
         onClose=${closeDetailPanel}
+        contained=${embedded}
       />
 
-      <footer className="bg-stone-50 border-t border-stone-200 py-2 flex-shrink-0">
-        <div className="container mx-auto px-4 flex items-center justify-between text-xs text-stone-400">
+      ${!embedded && html`<footer className="archive-dissertation-footer">
+        <div className="archive-dissertation-footer__inner">
           <div>
-            Part of <span className="font-semibold text-stone-600">Jay Rosen's Internet Archive</span>
+            Part of <strong>Jay Rosen's Internet Archive</strong>
           </div>
-          <div className="flex items-center gap-3">
+          <div>
             <a
               href="https://twitter.com/jayrosen_nyu"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-stone-600 transition-colors"
             >
               @jayrosen_nyu
             </a>
-            <span className="text-stone-300">|</span>
+            <span aria-hidden="true">|</span>
             <a
               href="https://pressthink.org"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-stone-600 transition-colors"
             >
               PressThink
             </a>
           </div>
         </div>
-      </footer>
+      </footer>`}
     </div>
   `;
 };

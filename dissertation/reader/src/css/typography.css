@@ -53,6 +53,16 @@ h5, h6 {
   font-weight: var(--font-weight-semibold);
 }
 
+@media (max-width: 767px) {
+  .reader-content h1 {
+    font-size: 2rem;
+  }
+
+  .reader-content h2 {
+    font-size: 1.4rem;
+  }
+}
+
 /* First heading after part title */
 .part-title + h2 {
   margin-top: var(--space-6);
@@ -116,14 +126,14 @@ blockquote blockquote {
    LINKS
    ======================================== */
 a {
-  color: var(--color-accent);
+  color: var(--color-link);
   text-decoration: underline;
   text-underline-offset: 2px;
   transition: color var(--transition-fast);
 }
 
 a:hover {
-  color: var(--color-accent-hover);
+  color: var(--color-link-hover);
 }
 
 a:focus {

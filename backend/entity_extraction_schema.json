@@ -1,6 +1,6 @@
 {
   "entity_extraction_config": {
-    "description": "Schema for extracting named entities and relationships from Jay Rosen Internet Archive content",
+    "description": "Schema for extracting named entities and relationships from Jay Rosen's Internet Archive content",
     "version": "2.1",
     "extraction_focus": [
       "People (journalists, politicians, media figures, academics)",

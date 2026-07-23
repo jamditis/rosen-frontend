@@ -5,7 +5,7 @@ source of truth and update this file when agent-facing workflow changes.
 
 ## Project overview
 
-The Jay Rosen Internet Archive is a zero-build static site for the public
+Jay Rosen's Internet Archive is a zero-build static site for the public
 archive of Jay Rosen's work, critiques, teaching, and dissertation materials.
 Production runs at `https://pressthink.org/j/rosen-archive/`.
 
@@ -29,6 +29,15 @@ Some issues are tracked for human visibility only and are not engineering tasks.
 - Enumerate candidate work with `gh issue list --search 'is:open -label:"do-not-automate"'` so these issues never enter selection. Skip any `do-not-automate` issue you reach another way.
 - Never select, work on, or open a pull request against a `do-not-automate` issue, and never change its state.
 - These issues also open with a "DO NOT AUTOMATE" banner in the body. If you have already opened one, stop and move on.
+
+## Making-of narrative interview
+
+The personal story of how the archive was built is interview material, not
+something to draft or infer from the existing page.
+
+- When Joe asks to begin, continue, or reconstruct that story, read `docs/narrative/INTERVIEW_GUIDE.md` in full before asking questions or editing prose. It holds the question bank, verification protocol, sensitive-claim boundaries, and editorial approval gates.
+- Treat `features/making-of/index.html` as a provisional draft, not as approved first-person testimony.
+- Never deploy the making-of page or lift its deployment hold without Joe's explicit publication approval.
 
 ## Key commands
 
@@ -113,7 +122,7 @@ When deployment files change:
 ## Known project constraints
 
 - `archive.pressthink.org` intentionally uses `http://` for affected records because the subdomain has a TLS certificate issue.
-- Bluesky embeds use `embed.bsky.app`; update `ThreadModal.js` and `RecordModal.js` if that embed host changes.
+- Bluesky outbound links use `bsky.app`, not `embed.bsky.app`; the embed host returns placeholder/404 pages when opened directly.
 - Browser `localStorage` caching is disabled because the live data set can exceed storage limits.
 - Social/thread records may have generic titles until content-based title generation is implemented.
 

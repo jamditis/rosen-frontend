@@ -1,0 +1,130 @@
+{
+  "title": "How an idea travels: Sources go direct, 2001–2026",
+  "scope": "A small demonstration corpus, not a complete Dave Winer archive.",
+  "frozenOn": "2026-07-18",
+  "recordCount": 11,
+  "sourcePolicy": "Public primary pages and public repositories only. Summaries are curator-written; canonical URLs and evidence notes are retained on every record.",
+  "records": [
+    {
+      "id": "direct-2001-desktop-websites",
+      "date": "2001-01-18",
+      "sourceTitle": "My Blog on the Desktop",
+      "recordTitle": "Publishing moves onto the user’s machine",
+      "creator": "Dave Winer",
+      "source": "Scripting News",
+      "sourceType": "blog archive",
+      "canonicalUrl": "https://scripting.com/2001/01.html#myBlogOnTheDesktop",
+      "verificationNote": "Primary page; dated archive entry written by Winer."
+    },
+    {
+      "id": "direct-2004-bloggers-sources",
+      "date": "2004-08-10",
+      "sourceTitle": "Archive: August 2004",
+      "recordTitle": "Bloggers are framed as sources",
+      "creator": "Dave Winer",
+      "source": "Scripting News",
+      "sourceType": "blog archive",
+      "canonicalUrl": "https://scripting.com/2004/08.html#When:3:28:15PM",
+      "verificationNote": "Primary page; dated archive entry written by Winer."
+    },
+    {
+      "id": "direct-2009-flying-seminar",
+      "date": "2009-03-26",
+      "sourceTitle": "Rosen’s Flying Seminar In The Future of News",
+      "recordTitle": "“The sources go direct” enters Rosen’s flying seminar",
+      "creator": "Jay Rosen",
+      "source": "PressThink",
+      "sourceType": "essay",
+      "canonicalUrl": "https://pressthink.org/2009/03/rosens-flying-seminar-in-the-future-of-news/",
+      "verificationNote": "Primary PressThink essay by Rosen; links to the Rosen–Winer podcast discussion."
+    },
+    {
+      "id": "direct-2009-tech-heroes",
+      "date": "2009-05-15",
+      "sourceTitle": "Tech heroes who blog?",
+      "recordTitle": "A request for trustworthy experts who publish",
+      "creator": "Dave Winer",
+      "source": "Scripting News",
+      "sourceType": "blog post",
+      "canonicalUrl": "https://scripting.com/stories/2009/05/15/techHeroesWhoBlog.html",
+      "verificationNote": "Primary permalink written by Winer."
+    },
+    {
+      "id": "direct-2013-networked-beat",
+      "date": "2013-05-13",
+      "sourceTitle": "Designs for a Networked Beat",
+      "recordTitle": "Direct sources become part of a networked beat",
+      "creator": "Jay Rosen",
+      "source": "PressThink",
+      "sourceType": "lecture essay",
+      "canonicalUrl": "https://pressthink.org/2013/05/designs-for-a-networked-beat/",
+      "verificationNote": "Primary PressThink lecture essay by Rosen."
+    },
+    {
+      "id": "direct-2013-motto",
+      "date": "2013-08-04",
+      "sourceTitle": "About Scripting News",
+      "recordTitle": "The phrase becomes a standing motto",
+      "creator": "Dave Winer",
+      "source": "About Scripting News",
+      "sourceType": "about page",
+      "canonicalUrl": "https://scripting.com/about",
+      "verificationNote": "Primary about page authored and dated by Winer."
+    },
+    {
+      "id": "direct-2016-github-archive",
+      "date": "2016-06-02",
+      "sourceTitle": "scripting/Scripting-News",
+      "recordTitle": "A blog opens its working archive on GitHub",
+      "creator": "Dave Winer",
+      "source": "scripting/Scripting-News",
+      "sourceType": "GitHub repository",
+      "canonicalUrl": "https://github.com/scripting/Scripting-News",
+      "verificationNote": "Public repository README and commit history under Winer’s scripting organization."
+    },
+    {
+      "id": "direct-2017-source-namespace",
+      "date": "2017-10-02",
+      "sourceTitle": "The “source” namespace",
+      "recordTitle": "RSS carries provenance with the item",
+      "creator": "Dave Winer",
+      "source": "The source namespace",
+      "sourceType": "technical specification",
+      "canonicalUrl": "https://source.scripting.com/",
+      "verificationNote": "Primary specification maintained by Winer; page supplies posting and update dates."
+    },
+    {
+      "id": "direct-2023-feedland",
+      "date": "2023-04-24",
+      "sourceTitle": "scripting/feedland",
+      "recordTitle": "FeedLand’s server code becomes public",
+      "creator": "Dave Winer and contributors",
+      "source": "scripting/feedland",
+      "sourceType": "GitHub repository",
+      "canonicalUrl": "https://github.com/scripting/feedland",
+      "verificationNote": "Public repository README, license, and history; README dates the public announcement."
+    },
+    {
+      "id": "direct-2024-social-blogroll",
+      "date": "2024-02-14",
+      "sourceTitle": "blogroll.social",
+      "recordTitle": "The blogroll returns as an updating social layer",
+      "creator": "Dave Winer",
+      "source": "blogroll.social",
+      "sourceType": "working prototype",
+      "canonicalUrl": "https://blogroll.scripting.com/",
+      "verificationNote": "Primary working prototype and public toolkit; date anchored to the toolkit repository’s first commit."
+    },
+    {
+      "id": "direct-2026-community-news",
+      "date": "2026-02-07",
+      "sourceTitle": "The reboot that news needs",
+      "recordTitle": "Direct publishing returns to the design of local news",
+      "creator": "Dave Winer",
+      "source": "Scripting News",
+      "sourceType": "blog post",
+      "canonicalUrl": "https://scripting.com/2026/02/07/220012.html",
+      "verificationNote": "Primary permalink written by Winer."
+    }
+  ]
+}

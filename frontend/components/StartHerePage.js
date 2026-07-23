@@ -1,0 +1,418 @@
+import { useEffect, useMemo, useRef } from 'react';
+import { html } from '../html.js?v=3.8.5';
+import {
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight,
+  BarChart3,
+  BookOpen,
+  Boxes,
+  Compass,
+  FolderOpen,
+  Library,
+  Network,
+  Monitor,
+  Search,
+  Sparkles
+} from 'lucide-react';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.5';
+import ArchiveRouteHeader from './ArchiveRouteHeader.js?v=3.8.5';
+
+const normalizeTitle = (title = '') => title
+  .toLowerCase()
+  .normalize('NFKD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .replace(/\s*\(\d{4}\)\s*$/, '')
+  .replace(/^pressthink:\s*/, '')
+  .replace(/[^a-z0-9]+/g, ' ')
+  .trim();
+
+const CURATED_SEQUENCE = [
+  {
+    title: 'The Impossible Press (1986)',
+    folio: '01',
+    form: 'PhD dissertation',
+    year: '1986',
+    note: 'Begin with the argument underneath the archive: journalism cannot be understood apart from the public life it is meant to serve.'
+  },
+  {
+    title: 'What Are Journalists For?',
+    folio: '02',
+    form: 'Book',
+    year: '1999',
+    note: 'That question becomes a practical experiment in public journalism—an attempt to reconnect reporting with communities acting on shared problems.'
+  },
+  {
+    title: 'The View from Nowhere',
+    folio: '03',
+    form: 'Essay and key concept',
+    year: '2010',
+    note: 'The trail arrives at a critique of professional detachment, asking what journalists should disclose about where they stand and why they should be trusted.'
+  }
+];
+
+const findFeaturedRecords = (records) => {
+  const selectedIds = new Set();
+
+  return CURATED_SEQUENCE.map((entry) => {
+    const target = normalizeTitle(entry.title);
+    const candidates = records
+      .filter((record) => record.type !== 'social')
+      .map((record) => {
+        const title = normalizeTitle(record.title);
+        const titleScore = title === target ? 3 : title.startsWith(`${target} `) ? 2 : 0;
+        const recordYear = String(record.year || record.date || '').slice(0, 4);
+        const score = titleScore > 0 ? titleScore + (recordYear === entry.year ? 4 : 0) : 0;
+        return { record, score };
+      })
+      .filter(({ record, score }) => score > 0 && !selectedIds.has(record.id))
+      .sort((a, b) => b.score - a.score || String(a.record.title).localeCompare(String(b.record.title)));
+
+    if (candidates.length === 0) return null;
+    const record = candidates[0].record;
+    selectedIds.add(record.id);
+    return { record, entry };
+  }).filter(Boolean);
+};
+
+export const SelectedFindings = ({
+  records = [],
+  onSelectRecord,
+  onBrowseArchive,
+}) => {
+  const featuredRecords = useMemo(() => findFeaturedRecords(records), [records]);
+
+  return html`
+    <section id="highlights" aria-labelledby="highlights-title" className="mb-16 scroll-mt-24">
+      <div className="mb-6 flex items-end justify-between gap-4 border-b border-stone-300 pb-2">
+        <div>
+          <p className="mb-1 font-body text-xs font-bold uppercase tracking-wider text-stone-500">Curated entry points</p>
+          <h2 id="highlights-title" tabIndex="-1" className="font-display text-2xl font-bold text-stone-900 outline-none">Three works, one developing argument</h2>
+          <p className="mt-2 max-w-2xl font-body text-sm leading-relaxed text-stone-600">A short path through nearly twenty-five years of questions about journalism, public life, and professional authority.</p>
+        </div>
+      </div>
+
+      ${featuredRecords.length > 0 ? html`
+        <div className="selected-findings-grid grid gap-6 md:grid-cols-3">
+          ${featuredRecords.map(({ record, entry }) => html`
+            <button
+              key=${record.id}
+              type="button"
+              onClick=${() => onSelectRecord && onSelectRecord(record.id)}
+              className="archive-panel archive-path-card group flex flex-col p-5 text-left"
+              aria-label=${`Open ${record.title} in the archive`}
+            >
+              <span className="mb-4 flex w-full items-center justify-between border-b border-stone-200 pb-2 font-body text-[10px] font-bold uppercase tracking-wider text-stone-500">
+                <span>Folio ${entry.folio}</span>
+                <span>${entry.year} · ${entry.form}</span>
+              </span>
+              <span className="block font-display text-lg font-bold leading-tight text-stone-900">${record.title}</span>
+              <span className="mt-3 flex-grow font-body text-sm leading-relaxed text-stone-600">${entry.note}</span>
+              <span className="mt-4 inline-flex w-full items-center justify-between border-t border-stone-200 pt-4 font-body text-xs font-bold uppercase tracking-wider text-stone-800">
+                Open archive record
+                <${ArrowRight} className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+              </span>
+            </button>
+          `)}
+        </div>
+      ` : html`
+        <div className="archive-panel">
+          <p className="font-body text-sm leading-relaxed text-stone-600">Curated records will appear here once the archive data has loaded. You can still search or browse the full collection now.</p>
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick=${onBrowseArchive}
+              className="archive-action archive-action--primary"
+            >
+              <${Search} className="h-4 w-4" aria-hidden="true" />
+              Browse the archive
+            </button>
+          </div>
+        </div>
+      `}
+    </section>
+  `;
+};
+
+const StartHerePage = ({
+  onBack,
+  records = [],
+  onNavigate,
+  onOpenBugReport,
+  onSelectRecord,
+  embedded = false,
+}) => {
+  const titleRef = useRef(null);
+
+  useEffect(() => {
+    if (embedded) return;
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    titleRef.current?.focus({ preventScroll: true });
+  }, [embedded]);
+
+  const stats = useMemo(() => {
+    const years = records
+      .map((record) => Number.parseInt(record.year, 10))
+      .filter(Number.isFinite);
+    const categories = new Set(records.flatMap((record) => record.categories || []).filter(Boolean));
+
+    return {
+      total: records.length,
+      categories: categories.size,
+      minYear: years.length > 0 ? Math.min(...years) : null,
+      maxYear: years.length > 0 ? Math.max(...years) : null
+    };
+  }, [records]);
+
+  const ContentTag = embedded ? 'div' : 'main';
+  const ParticipateTag = embedded ? 'section' : 'aside';
+
+  const navigate = (route) => {
+    if (onNavigate) onNavigate(route);
+  };
+
+  const scrollTo = (id) => {
+    const target = document.getElementById(id);
+    if (!target) return;
+    const disclosure = target.querySelector('details');
+    if (disclosure) disclosure.open = true;
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+    const focusTarget = target.querySelector('h2, summary');
+    focusTarget?.focus({ preventScroll: true });
+  };
+
+  const routeButton = (route, label, Icon = ArrowRight) => html`
+    <button
+      type="button"
+      onClick=${() => navigate(route)}
+      className="archive-action archive-action--primary"
+    >
+      <${Icon} className="h-4 w-4" aria-hidden="true" />
+      ${label}
+    </button>
+  `;
+
+  const guideItem = ({ id, icon: Icon, title, children, action }) => html`
+    <article id=${id} className="scroll-mt-24 border-t border-stone-200 py-8 sm:flex gap-4">
+      <div className="mb-3 flex h-12 w-12 items-center justify-center bg-stone-100 text-stone-700">
+        <${Icon} className="h-5 w-5" aria-hidden="true" />
+      </div>
+      <div className="flex-1">
+        <h3 className="mb-2 font-display text-xl font-bold text-stone-900">${title}</h3>
+        <div className="space-y-3 font-body text-sm leading-relaxed text-stone-600">${children}</div>
+        ${action && html`<div className="mt-4">${action}</div>`}
+      </div>
+    </article>
+  `;
+
+  return html`
+    <div className=${`${embedded ? 'desktop-start-here-embedded' : 'min-h-screen archive-canvas'}`}>
+      ${!embedded && html`<${ArchiveRouteHeader} onBack=${onBack} sectionTitle="Start here" />`}
+
+      <${ContentTag}
+        id=${embedded ? undefined : 'main-content'}
+        className=${`container mx-auto max-w-5xl px-4 ${embedded ? 'py-6 md:py-8' : 'py-8 md:py-16'}`}
+      >
+        <section aria-labelledby=${embedded ? undefined : 'start-here-title'} className="archive-orientation-hero mb-12 pb-8">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="bg-stone-900 p-2 text-white">
+              <${Compass} className="h-6 w-6" aria-hidden="true" />
+            </div>
+            <p className="archive-section-label">Visitor guide</p>
+          </div>
+          <h1 ref=${titleRef} tabIndex="-1" data-route-entry-focus id="start-here-title" className="max-w-3xl font-display text-3xl font-bold leading-tight text-stone-900 outline-none md:text-5xl">
+            Start here
+          </h1>
+          <p className="mt-4 max-w-3xl font-body text-lg leading-relaxed text-stone-600">
+            Jay Rosen's Internet Archive brings together decades of writing, teaching, interviews, and public commentary about journalism and democratic life. Search directly, follow a curated trail, or learn how the collection is organized.
+          </p>
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            ${routeButton('archive', 'Search and browse records', Search)}
+            ${!embedded && html`<button
+              type="button"
+              onClick=${() => navigate('desktop')}
+              className="archive-action archive-action--secondary"
+            >
+              <${Monitor} className="h-4 w-4" aria-hidden="true" />
+              Explore the archive desktop
+            </button>`}
+          </div>
+          ${!embedded && html`<p className="mt-3 max-w-2xl font-body text-xs leading-relaxed text-stone-500">
+            Prefer a spatial map? The optional desktop arranges these same archive paths as shortcuts, folders, and windows.
+          </p>`}
+
+          ${stats.total > 0 && html`
+            <p className="mt-4 font-body text-xs text-stone-500">
+              ${stats.total.toLocaleString()} records
+              ${stats.minYear !== null ? ` · ${stats.minYear}–${stats.maxYear}` : ''}
+              ${stats.categories > 0 ? ` · ${stats.categories.toLocaleString()} thematic collections` : ''}
+            </p>
+          `}
+        </section>
+
+        <nav aria-labelledby="choose-path-title" className="mb-16">
+          <div className="mb-6">
+            <h2 id="choose-path-title" className="font-display text-2xl font-bold text-stone-900">Choose a starting point</h2>
+            <p className="mt-2 max-w-2xl font-body text-sm leading-relaxed text-stone-600">Pick the route that best matches what you came to do. You can switch paths at any time.</p>
+          </div>
+
+          <div className="start-here-path-grid grid gap-6 md:grid-cols-3">
+            <a
+              href="#guide"
+              onClick=${(event) => { event.preventDefault(); scrollTo('guide'); }}
+              aria-controls="guide"
+              className="archive-panel archive-path-card group text-left"
+            >
+              <${Compass} className="mb-4 h-6 w-6 text-sky-700" aria-hidden="true" />
+              <span className="block font-display text-xl font-bold text-stone-900">Learn how the archive works</span>
+              <span className="mt-3 block font-body text-sm leading-relaxed text-stone-600">Open the complete field guide to records, folders, entities, research tools, and archive terminology.</span>
+              <span className="mt-4 inline-flex items-center gap-2 font-body text-xs font-bold uppercase tracking-wider text-stone-800">Open the field guide <${ArrowRight} className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
+            </a>
+
+            <a
+              href="#highlights"
+              onClick=${(event) => { event.preventDefault(); scrollTo('highlights'); }}
+              aria-controls="highlights"
+              className="archive-panel archive-path-card group text-left"
+            >
+              <${Sparkles} className="mb-4 h-6 w-6 text-amber-700" aria-hidden="true" />
+              <span className="block font-display text-xl font-bold text-stone-900">Show me the highlights</span>
+              <span className="mt-3 block font-body text-sm leading-relaxed text-stone-600">Begin with a few works that open onto the archive's recurring questions and ideas.</span>
+              <span className="mt-4 inline-flex items-center gap-2 font-body text-xs font-bold uppercase tracking-wider text-stone-800">See selected records <${ArrowRight} className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
+            </a>
+
+            <button
+              type="button"
+              onClick=${() => navigate('entities')}
+              className="archive-panel archive-path-card group text-left"
+            >
+              <${Network} className="mb-4 h-6 w-6 text-stone-700" aria-hidden="true" />
+              <span className="block font-display text-xl font-bold text-stone-900">Research a topic or idea</span>
+              <span className="mt-3 block font-body text-sm leading-relaxed text-stone-600">Trace people, organizations, concepts, and the records that connect them.</span>
+              <span className="mt-4 inline-flex items-center gap-2 font-body text-xs font-bold uppercase tracking-wider text-stone-800">Explore entities <${ArrowRight} className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
+            </button>
+          </div>
+        </nav>
+
+        <${SelectedFindings}
+          records=${records}
+          onSelectRecord=${onSelectRecord}
+          onBrowseArchive=${() => navigate('archive')}
+        />
+
+        <section id="guide" aria-labelledby="guide-title" className="mb-16 scroll-mt-24">
+          <details className="archive-panel px-5 py-2 md:p-8">
+            <summary className="cursor-pointer py-6 font-display text-stone-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2">
+              <span className="block font-body text-xs font-bold uppercase tracking-wider text-stone-500">Complete visitor field guide · 7 sections</span>
+              <span id="guide-title" tabIndex="-1" className="mt-1 block text-2xl font-bold outline-none">How to use the archive</span>
+              <span className="mt-2 block font-body text-sm font-normal leading-relaxed text-stone-600">Expand for a practical reference to every way into the collection, plus archive terminology and problem reporting.</span>
+            </summary>
+
+            <div className="border-t border-stone-200">
+
+          ${guideItem({
+            id: 'guide-records',
+            icon: Search,
+            title: 'Records and search',
+            children: html`<p>A record is the archive's basic unit: an article, post, interview, clipping, thread, or other item connected to Jay Rosen's work. Search looks across titles, summaries, and categories; filters help narrow the results by topic, era, year, publication, and format.</p><p>Open a record to read its summary, follow the original source, copy a citation, share it, or continue through related material.</p>`,
+            action: routeButton('archive', 'Search records', Search)
+          })}
+
+          ${guideItem({
+            id: 'guide-folders',
+            icon: FolderOpen,
+            title: 'Folders',
+            children: html`<p>Folders are a visual way to enter the archive through its major subject categories. Choose one when you want a broad theme rather than a particular title or phrase.</p>`,
+            action: routeButton('folders', 'Browse folders', FolderOpen)
+          })}
+
+          ${guideItem({
+            id: 'guide-entities',
+            icon: Network,
+            title: 'Entities and connections',
+            children: html`<p>The entity explorer indexes people, organizations, concepts, works, events, and locations mentioned across the collection. Use it to move from a name or idea to the records where it appears, then examine what frequently appears alongside it.</p>`,
+            action: routeButton('entities', 'Explore entities', Network)
+          })}
+
+          ${guideItem({
+            id: 'guide-dissertation',
+            icon: BookOpen,
+            title: 'The dissertation',
+            children: html`<p><em>The Impossible Press: American Journalism and the Decline of Public Life</em>, Rosen's 1986 NYU dissertation, has its own reading and exploration tools. Read the full text or use the mind map to understand its structure and enduring questions.</p>`,
+            action: routeButton('dissertation', 'Explore the dissertation', BookOpen)
+          })}
+
+          ${guideItem({
+            id: 'guide-analytics',
+            icon: BarChart3,
+            title: 'Analytics',
+            children: html`<p>The analytics dashboard shows the collection at a larger scale: output over time, recurring categories and concepts, frequently mentioned people, and other patterns. It is useful for forming a question before returning to individual records.</p>`,
+            action: routeButton('analytics', 'View archive analytics', BarChart3)
+          })}
+
+          ${guideItem({
+            id: 'guide-archive-vault',
+            icon: Boxes,
+            title: 'Internet Archive and Vault',
+            children: html`<p>On PressThink, <strong>Internet Archive</strong> means this curated, searchable collection of records and connections. <strong>Vault (2003–present)</strong> refers to the older PressThink blog archive. The Vault preserves the blog's original chronology; this archive brings many kinds of material together and adds summaries, categories, entities, and research tools.</p>`
+          })}
+
+          ${guideItem({
+            id: 'guide-reporting',
+            icon: AlertCircle,
+            title: 'Report a problem',
+            children: html`<p>The collection is maintained over time. If a link is broken, a record is incomplete, or something looks incorrect, use the in-archive report form. Your report can include the record you were viewing and helps the curator investigate the problem.</p>`,
+            action: html`
+              <button
+                type="button"
+                onClick=${onOpenBugReport}
+                className="archive-action archive-action--primary"
+              >
+                <${AlertCircle} className="h-4 w-4" aria-hidden="true" />
+                Report an archive problem
+              </button>
+            `
+          })}
+            </div>
+          </details>
+        </section>
+
+        <${ParticipateTag} className="archive-panel archive-panel--accent archive-density--spacious mb-8 md:flex md:items-center md:justify-between md:gap-8" aria-labelledby="participate-callout-title">
+          <div>
+            <p className="archive-section-label">A living collection</p>
+            <h2 id="participate-callout-title" className="mt-1 font-display text-2xl font-bold text-stone-900">Help keep the archive useful.</h2>
+            <p className="mt-2 max-w-2xl font-body text-sm leading-relaxed text-stone-600">Share a record, suggest something missing, report a barrier, follow new additions, or reuse the project.</p>
+          </div>
+          <a href=${resolveSitePath('features/participate/')} className="archive-action archive-action--primary mt-4 shrink-0 md:mt-0">Ways to participate<${ArrowRight} className="h-4 w-4" aria-hidden="true" /></a>
+        <//>
+
+        <section aria-labelledby="continue-title" className="archive-panel p-6 md:flex md:items-center md:justify-between md:gap-8 md:p-8">
+          <div>
+            <div className="mb-2 flex items-center gap-2 text-stone-500">
+              <${Library} className="h-5 w-5" aria-hidden="true" />
+              <span className="font-body text-xs font-bold uppercase tracking-wider">Continue exploring</span>
+            </div>
+            <h2 id="continue-title" className="font-display text-2xl font-bold text-stone-900">There is no required path through the archive.</h2>
+            <p className="mt-2 max-w-2xl font-body text-sm leading-relaxed text-stone-600">Search for something specific, browse a broad category, or follow the connections that catch your attention.</p>
+          </div>
+          <div className="mt-4 shrink-0">${routeButton('archive', 'Enter the archive', ArrowRight)}</div>
+        </section>
+
+        ${!embedded && html`<div className="pb-4 pt-8 text-center">
+          <button
+            type="button"
+            onClick=${onBack}
+            className="archive-action archive-action--quiet"
+          >
+            <${ArrowLeft} className="h-4 w-4" aria-hidden="true" />
+            Back to archive
+          </button>
+        </div>`}
+      <//>
+    </div>
+  `;
+};
+
+export default StartHerePage;

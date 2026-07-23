@@ -27,7 +27,7 @@ Backend commands run from `backend/` with Poetry:
 ```bash
 poetry install --with dev
 poetry run pytest -v --tb=short
-poetry run ruff check src/ tests/ submission_server/ scripts/
+poetry run ruff check src/ tests/ submission_runtime/ scripts/
 poetry run black --check src/ tests/
 poetry run mypy src/
 ```
@@ -40,7 +40,7 @@ Ruff gates backend CI. Black and MyPy currently report without gating in `backen
 - `backend-tests.yml` — Poetry install, Playwright Chromium, and pytest for backend changes; also has manual dispatch.
 - `backend-linting.yml` — Ruff gate, Black check, MyPy check.
 - `codeql.yml` — weekly and PR/push JavaScript CodeQL scan.
-- `submit-record.yml` and `sweep-stuck-rows.yml` — Pillar 3a submission path and stuck-row recovery; see [submission-server.md](submission-server.md).
+- `submit-record.yml` and `sweep-stuck-rows.yml` — Pillar 3a submission path and stuck-row recovery; see [submission-automation.md](submission-automation.md).
 - `submit-prototype.yml` — prototype submission workflow without production SFTP credentials.
 - `maintenance.yml` — out-of-band enrichment and sync jobs; see [maintenance-automation.md](maintenance-automation.md).
 - `deploy.yml` — manual full-site SFTP push; see [deploy-and-hosting.md](deploy-and-hosting.md).

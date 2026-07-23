@@ -1,6 +1,6 @@
 {
   "entity_extraction_config": {
-    "description": "Schema for extracting named entities and relationships from Jay Rosen Internet Archive content",
+    "description": "Schema for extracting named entities and relationships from Jay Rosen's Internet Archive content",
     "version": "3.0",
     "changelog": [
       "v3.0: Added 'Authored By' relationship, clarified 'Founded By', added negative examples",
@@ -17,7 +17,7 @@
     ]
   },
   "critical_rules": {
-    "record_context": "You are analyzing a RECORD from the Jay Rosen Internet Archive. The record itself (the article/post you're reading) should NOT be extracted as a new Work entity. Only extract OTHER works that are referenced within the text.",
+    "record_context": "You are analyzing a RECORD from Jay Rosen's Internet Archive. The record itself (the article/post you're reading) should NOT be extracted as a new Work entity. Only extract OTHER works that are referenced within the text.",
     "authorship_vs_founding": "Use 'Authored By' when someone WROTE an article, book, or piece. Use 'Founded By' ONLY when someone CREATED an organization, publication outlet, or ongoing project (like PressThink the blog, not individual blog posts).",
     "deduplication": "If an entity appears multiple times with slight variations (e.g., 'Jay Rosen', 'Rosen', 'Professor Rosen'), consolidate to one canonical entity with the full name."
   },
