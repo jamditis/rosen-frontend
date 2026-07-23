@@ -9,11 +9,11 @@ This repository contains everything that powers the archive: the website, the da
 ## What's in the archive
 
 - **1,029 curated records** — 799 articles and essays, 137 Tumblr posts, 83 newspaper clippings, and 10 social media threads
-- **~29,700 social media posts** from Twitter/X and Bluesky
+- **~29,700 social media posts** from Twitter/X, Bluesky, and Mastodon
 - **8,100+ named entities** (people, organizations, and concepts) and 12,500+ relationships connecting them across the collection
 - **The 1986 dissertation** — *The Impossible Press: American Journalism and the Decline of Public Life*, written under Neil Postman and released publicly in December 2025
 
-Every record is categorized by theme, era, and publication, and cross-linked to the people, organizations, and ideas it mentions.
+Every record is categorized by theme, era, and publication. Most of the curated records are also cross-linked to the people, organizations, and ideas they mention; entity extraction is still catching up on some records, and the social media posts are largely not entity-linked yet.
 
 ## Ways to explore
 
@@ -84,9 +84,9 @@ The site reads JSON files generated from four CSV source files:
 | Source file | What it contains |
 |-------------|-----------------|
 | `data/archive_records-public.csv` | Curated archive records (1,029 records) |
-| `data/social_posts.csv` | Twitter/X and Bluesky posts (~29,700) |
-| `data/extracted_entities.csv` | Named entities (8,152) |
-| `data/extracted_relationships.csv` | Entity relationships (12,560) |
+| `data/social_posts.csv` | Twitter/X, Bluesky, and Mastodon posts (29,747) |
+| `data/extracted_entities.csv` | Named entities (8,150) |
+| `data/extracted_relationships.csv` | Entity relationships (12,556) |
 
 To regenerate the JSON after editing a CSV:
 

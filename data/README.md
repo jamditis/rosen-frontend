@@ -25,9 +25,9 @@ Counts verified 2026-07-23; they grow as records are added.
 | File | Rows | Contents |
 |------|------|----------|
 | `archive_records-public.csv` | 1,029 | Curated records: 799 articles (`RECORD-`), 137 Tumblr posts (`TUMBLR-`), 83 newspaper clippings (`CLIP-`), 10 threads (`THREAD-`). Raw line count is much higher because text fields span multiple lines. |
-| `social_posts.csv` | ~29,700 | Twitter/X and Bluesky posts (`TW-`, `BSKY-` IDs) |
-| `extracted_entities.csv` | 8,152 | Named entities: people, organizations, and concepts |
-| `extracted_relationships.csv` | 12,560 | Entity-to-record relationships with context snippets |
+| `social_posts.csv` | 29,747 | Social media posts: 26,114 Twitter/X (`TWTR-`), 3,117 Bluesky (`BSKY-`), 516 Mastodon (`MAST-`) |
+| `extracted_entities.csv` | 8,150 | Named entities: people, organizations, and concepts |
+| `extracted_relationships.csv` | 12,556 | Entity-to-record relationships with context snippets |
 
 ### Reference files
 

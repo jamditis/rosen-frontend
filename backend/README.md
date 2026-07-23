@@ -266,10 +266,11 @@ Poetry configuration with dependencies:
 
 **Solution:**
 ```bash
-# Ensure you're in the backend directory and venv is activated
+# Ensure you're in the backend directory, dependencies are installed,
+# and commands run inside Poetry's environment
 cd backend
-source venv/bin/activate
 poetry install
+poetry run python src/rosen_scraper/workflow.py
 ```
 
 #### 2. Google Sheets authentication failures
@@ -296,7 +297,7 @@ poetry install
 
 **Solution:**
 ```bash
-playwright install
+poetry run playwright install
 ```
 
 #### 5. PDF generation failures
@@ -327,7 +328,7 @@ LOG_LEVEL="DEBUG"
 
 # Or set environment variable
 export LOG_LEVEL="DEBUG"
-python src/rosen_scraper/workflow.py
+poetry run python src/rosen_scraper/workflow.py
 ```
 
 Logs are written to:
@@ -361,12 +362,12 @@ The pipeline includes automatic detection of failed scrapes (paywalls, anti-bot 
 
 3. **Run tests**
    ```bash
-   pytest
+   poetry run pytest
    ```
 
 4. **Test manually**
    ```bash
-   python src/rosen_scraper/workflow.py
+   poetry run python src/rosen_scraper/workflow.py
    ```
 
 5. **Commit and push**
