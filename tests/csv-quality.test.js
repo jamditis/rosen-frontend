@@ -424,11 +424,11 @@ describe('archive_records-public.csv', () => {
 
   it('newspaper source replays exclude the Jay Rosenstein namesake', () => {
     const record = archiveRecords.find(row => row.id === 'CLIP-00023');
-    assert.ok(record, 'CLIP-00023 is missing');
-    assert.match(record.raw_text, /Jay Rosenstein/i);
-    assert.strictEqual(record.verified, 'FALSE');
-    assert.strictEqual(record.low_confidence, 'TRUE');
-    assert.strictEqual(record.needs_review, 'TRUE');
+    assert.strictEqual(
+      record,
+      undefined,
+      'CLIP-00023 names filmmaker Jay Rosenstein, not NYU journalism professor Jay Rosen'
+    );
   });
 
   it('newspaper clips link to their recovered Drive OCR source', () => {

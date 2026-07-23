@@ -6102,3 +6102,59 @@ Final SHA-256 values after export:
 - `data/archive-details.json`: `120784a2b998b88350318528f201b5d10f32a987fa689f2f3967a40b4c28862c`
 - `data/archive-entities.json`: `40b4579e901b88d80412b4bbc33bab6bd343d5bde76553952a4d015f0b673f06`
 - `data/archive-analytics.json`: `adf2fe0d9aaf5cd544659616c3f6f60ceaa0a24afef49e1c9a583f69d8a83e38`
+
+### Clip 00023 Jay Rosenstein false-identity removal
+
+`CLIP-00023` was removed from the public archive source because its source
+names filmmaker Jay Rosenstein, not NYU journalism professor Jay Rosen. Prior
+visual review resolved the newspaper OCR as `Jay Rosenstein`, and the row had
+already been marked unverified, low-confidence, and review-needed. Keeping it
+as a public archive row continued to fail the archive verification gate without
+adding valid Rosen material.
+
+Evidence:
+
+- Source row: Southern Champaign County Today, `2001-02-14`, page 1,
+  newspapers.com image `https://www.newspapers.com/image/906184514/`.
+- Recovered raw image link:
+  `https://drive.google.com/file/d/138Nct8AXnSCLqtathe7bl8hByC2T4to0`.
+- Prior visual column-flow review recorded that the source text names
+  University of Illinois filmmaker Jay Rosenstein and *In Whose Honor?*, not
+  Jay Rosen.
+- The row had no relationship rows and no inbound `related_to` references.
+
+Changes applied:
+
+- Removed `CLIP-00023` from `data/archive_records-public.csv`.
+- Removed `CLIP-00023` from `data/records_needing_categories.csv`.
+- Updated the existing Jay Rosenstein regression to assert that the false
+  namesake is not published.
+
+Validation:
+
+- `node --test --test-name-pattern "Jay Rosenstein namesake"
+  tests\csv-quality.test.js`: failed before deletion because `CLIP-00023` was
+  still present, then passed after deletion.
+- `python backend\scripts\validate_archive_data.py`: no errors; archive records
+  now 1,025, entities 7,387, relationships 11,135.
+- `npm run test:data:extraction-coverage`: passed, 17/17 tests.
+- `node data\export-archive-data.js`: passed.
+- `git -c core.whitespace=trailing-space,cr-at-eol diff --check`: passed with
+  line-ending warnings only.
+- `npm run test:data`: expected five completion gates still fail: two
+  unverified archive records (`RECORD-00614`, `RECORD-00865`), 54 non-Rosen
+  Bluesky profile URLs, 54 non-Rosen Bluesky copyright assignments, 29,693
+  unverified social rows, and 21 blank entity first mentions.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `9977fa123c2e584fdea5dbf179886665b0c22afc5745821df5e7c5da1d56016e`
+- `data/records_needing_categories.csv`: `9f35f6a2c2ca9f3d372d157bef5e83c32af5b6966fc2901a42cba7285bb4d8a2`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `c5f1cc80d11a7826cf95ede8b312a1600c22b301e769a03322dd1df8da5ac672`
+- `data/extracted_relationships.csv`: `0937f5db5231a368b064650282ccb54bd891f617a0a7911d18e4e0c4c0a1f6b1`
+- `data/archive-data.json`: `0b6a4938a6bf985292da8775b6dbef1ca7a7c29ccb962d72ddcfca04cfe24f40`
+- `data/archive-core.json`: `9fa2844655b6a116fc6cca78a32a30a45b4eccf336ab9eb49c4a4e57238f7ffa`
+- `data/archive-details.json`: `89f5ab733e77f9638e3f69685ac376544ded686edd4cfb80d11945437143e9ce`
+- `data/archive-entities.json`: `0d11c8ef61ca3c0a141f8a0d0849dad28ecd78e6fbf3c668845f40fa8c9454ce`
+- `data/archive-analytics.json`: `eb74b5ea3d463d61800fa3909de18be8e10065aa4eccb8cbd75abb1d622533ec`
