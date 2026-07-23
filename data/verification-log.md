@@ -6327,3 +6327,59 @@ Final SHA-256 values after export:
 - `data/archive-analytics.json`: `b2f31e9f0fc9ecc1f905c23aea62f7a03e144c6644bf922d4b147b5a3480f87e`
 - `data/export-archive-data.js`: `c598a2561da07a67e80d0abb0a306e78acdec483e0684a6b5c6508979805331d`
 - `tests/csv-quality.test.js`: `c874a836225e89b2dc30e6be28c5a5b529fc68301ebcc3553899d8bda520c8cf`
+
+### Entity first-mention closure
+
+The remaining 21 entity rows without `first_mention_record_id` were all
+relationship-orphan rows. Each was reviewed against source text and duplicate
+state rather than filled mechanically.
+
+Changes applied:
+
+- Mapped `P1928` (`Bill Buzenberg`) to `TWTR-09476`, the earliest exact social
+  source row titled `Quoted by Bill Buzenberg`.
+- Mapped `W0160` (`Downie's book about protecting serious journalism`) to
+  `RECORD-00130`, which contains the source phrase `protecting serious
+  journalism` in the Leonard Downie discussion.
+- Removed 19 no-evidence or too-generic orphan entities with no relationship
+  endpoints: `C0443`, `C0552`, `C0581`, `C0582`, `C0649`, `C0652`, `L0159`,
+  `O0722`, `O0734`, `P1214`, `P2011`, `P2176`, `P2177`, `W0258`, `W0260`,
+  `W0261`, `W0638`, `W0663`, and `W0664`.
+- Added regression coverage for the two source-backed mappings and for the 19
+  removed orphan rows.
+- Regenerated archive JSON and feed artifacts.
+
+Rejected source hits:
+
+- `P2011` matched `Westin` only as the Westin hotel in San Diego, not Av
+  Westin.
+- `P2177` matched Jules Boykoff, which is already represented by `P2178`, not
+  Maxwell T. Boykoff.
+- `P1214` matched only surname-level `Denton` text in a related-link title, not
+  enough to identify Nick Denton.
+- `L0159`, `O0722`, and the generic concepts were not stable canonical
+  identities as orphan rows.
+
+Validation:
+
+- `node --test --test-name-pattern "all entities identify|maps the second
+  reviewed orphan-entity batch|relationship-backed entities"
+  tests\csv-quality.test.js`: passed.
+- `python backend\scripts\validate_archive_data.py`: no errors; archive records
+  1,024, social posts 29,747, entities 7,351, relationships 11,108.
+- `node data\export-archive-data.js`: passed; published records stayed at
+  26,691, entities are now 7,351, and autocomplete terms are now 60,461.
+- `npm run test:data`: 150 passing tests and one expected completion gate still
+  failing: `RECORD-00865` remains unverified pending manual source recovery.
+- `git -c core.whitespace=trailing-space,cr-at-eol diff --check`: passed
+  except expected line-ending warnings.
+
+Final SHA-256 values after export:
+
+- `data/extracted_entities.csv`: `b359a0682c77e53b9cf3a1a43004c9fb40b49f4f02cf930838db4d67dcecf11d`
+- `data/archive-data.json`: `232d3ec89ebbd60a180edaac243509aedbf2d638d38223c09c95f9e78ff2e7fc`
+- `data/archive-core.json`: `bd60e041525d96b8f04fa5daf6d21e87627a598bd3e48fdd49fc087571280858`
+- `data/archive-details.json`: `46f16f6e2dd26365cf4a66245c3f88cd67ec21369e0f324574e0df25c0e2eb87`
+- `data/archive-entities.json`: `ffaefeaf1710427fe1a5209370a8bf2bbd7398fedca4151549e7f08154aeb6f6`
+- `data/archive-analytics.json`: `ce6e259b24be25b8c1aee0dac30cf0eec55bbcd92182f05b0f28609cbf67f472`
+- `tests/csv-quality.test.js`: `ee57d6e6fd94c0f1a64da9d7db8714e539346bf02384f263df03d5eee4ba10ef`

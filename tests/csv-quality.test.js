@@ -2604,19 +2604,58 @@ describe('extracted_entities.csv', () => {
       );
     }
 
-    const deferred = new Map([
-      ['L0159', 'city hall'],
-      ['P1928', 'Buzenberg'],
+    const finalMapped = new Map([
+      ['P1928', { recordId: 'TWTR-09476', phrase: 'Bill Buzenberg' }],
+      ['W0160', { recordId: 'RECORD-00130', phrase: 'protecting serious journalism' }],
     ]);
+    const sourceRecordsById = new Map(
+      [...archiveRecords, ...socialPosts].map(record => [record.id, record])
+    );
 
-    for (const [entityId, phrase] of deferred) {
+    for (const [entityId, { recordId, phrase }] of finalMapped) {
       const entity = entitiesById.get(entityId);
+      const record = sourceRecordsById.get(recordId);
       assert.ok(entity, `${entityId} must exist`);
-      assert.strictEqual(
-        entity.first_mention_record_id,
-        '',
-        `${entityId} should stay blank because ${phrase} is not enough evidence`
+      assert.ok(record, `${recordId} must exist`);
+      assert.strictEqual(entity.first_mention_record_id, recordId);
+      assert.ok(
+        [
+          record.title,
+          record.excerpt,
+          record.summary,
+          record.raw_text,
+          record.tags,
+          record.key_concepts,
+          record.pull_quote,
+        ].join('\n').toLowerCase().includes(phrase.toLowerCase()),
+        `${recordId} must contain ${phrase}`
       );
+    }
+
+    const deletedOrphans = [
+      'C0443',
+      'C0552',
+      'C0581',
+      'C0582',
+      'C0649',
+      'C0652',
+      'L0159',
+      'O0722',
+      'O0734',
+      'P1214',
+      'P2011',
+      'P2176',
+      'P2177',
+      'W0258',
+      'W0260',
+      'W0261',
+      'W0638',
+      'W0663',
+      'W0664',
+    ];
+
+    for (const entityId of deletedOrphans) {
+      assert.ok(!entitiesById.has(entityId), `${entityId} should be removed as a no-evidence orphan`);
     }
   });
 
