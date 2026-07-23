@@ -15,9 +15,20 @@ import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const dataDir = path.join(__dirname, '..', 'data');
+const repoDir = path.join(__dirname, '..');
+const dataDir = path.join(repoDir, 'data');
+const docsDir = path.join(repoDir, 'docs');
+const manualVerificationPath = path.join(docsDir, 'manual-verification-required-2026-07-23.md');
 
 let archiveRecords, socialPosts, entities, relationships;
+
+function readManualVerificationRecordIds() {
+  const markdown = fs.readFileSync(manualVerificationPath, 'utf-8');
+  return new Set(
+    [...markdown.matchAll(/^###\s+([A-Z]+-\d+)\s*$/gm)]
+      .map(match => match[1])
+  );
+}
 
 before(() => {
   archiveRecords = parse(
@@ -122,19 +133,45 @@ describe('archive_records-public.csv', () => {
     );
   });
 
-  it('all archive records have explicit verified status', () => {
+  it('all archive records have explicit verified status or manual queue coverage', () => {
     // An explicit verdict is TRUE (kept, source-replayed) or FALSE (an
-    // intentionally excluded row, e.g. a Jay Rosenstein namesake negative
-    // control). Only a blank or unexpected value counts as missing verification;
-    // FALSE is a verdict, not an omission, so the gate must not demand TRUE.
+    // intentionally excluded or unresolved row). FALSE is a verdict, not an
+    // omission, but every FALSE archive row must remain review-visible until
+    // stronger source evidence resolves it.
     const explicit = new Set(['TRUE', 'FALSE']);
-    const unverified = archiveRecords
+    const manualVerificationIds = readManualVerificationRecordIds();
+    const missingExplicitState = archiveRecords
       .filter(record => !explicit.has((record.verified || '').trim()))
       .map(record => record.id);
+    const unverified = archiveRecords.filter(record => record.verified === 'FALSE');
+    const undocumented = unverified
+      .filter(record => !manualVerificationIds.has(record.id))
+      .map(record => record.id);
+    const underflagged = unverified
+      .filter(record => record.low_confidence !== 'TRUE' || record.needs_review !== 'TRUE')
+      .map(record => record.id);
+    const staleManualQueueIds = [...manualVerificationIds]
+      .filter(id => !unverified.some(record => record.id === id));
+
     assert.strictEqual(
-      unverified.length,
+      missingExplicitState.length,
       0,
-      `${unverified.length} archive records lack an explicit verified status (expected TRUE or FALSE): ${unverified.slice(0, 10).join(', ')}`
+      `${missingExplicitState.length} archive records lack explicit TRUE/FALSE verified status: ${missingExplicitState.slice(0, 10).join(', ')}`
+    );
+    assert.strictEqual(
+      undocumented.length,
+      0,
+      `${undocumented.length} unverified archive records are missing from the manual verification queue: ${undocumented.slice(0, 10).join(', ')}`
+    );
+    assert.strictEqual(
+      underflagged.length,
+      0,
+      `${underflagged.length} unverified archive records lack low_confidence=TRUE and needs_review=TRUE: ${underflagged.slice(0, 10).join(', ')}`
+    );
+    assert.strictEqual(
+      staleManualQueueIds.length,
+      0,
+      `${staleManualQueueIds.length} manual verification queue records are not currently unverified: ${staleManualQueueIds.slice(0, 10).join(', ')}`
     );
   });
 
