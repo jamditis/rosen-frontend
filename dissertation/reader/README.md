@@ -1,4 +1,4 @@
-# Dissertation Reader: "The Impossible Press"
+# Dissertation reader: "The Impossible Press"
 
 A clean, accessible HTML reading experience for Jay Rosen's 1986 doctoral dissertation.
 

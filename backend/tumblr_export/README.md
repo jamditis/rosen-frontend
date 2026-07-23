@@ -1,8 +1,8 @@
-# Tumblr Export Directory
+# Tumblr export directory
 
 Place your Tumblr export files here.
 
-## How to Get Your Tumblr Export
+## How to get your Tumblr export
 
 1. Log into your Tumblr account
 2. Go to Settings (gear icon)
@@ -12,7 +12,7 @@ Place your Tumblr export files here.
 6. Download the ZIP file
 7. Unzip contents into this directory
 
-## Expected Structure
+## Expected structure
 
 After unzipping, you should have:
 ```
@@ -33,7 +33,7 @@ tumblr_export/
 Once files are in place, run:
 ```bash
 cd backend
-python -m rosen_scraper.processors.tumblr_processor --input ./tumblr_export --output ../data/tumblr_records.csv
+poetry run python -m rosen_scraper.processors.tumblr_processor --input ./tumblr_export --output ../data/tumblr_records.csv
 ```
 
 ## Notes

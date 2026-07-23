@@ -1,102 +1,85 @@
-# Archive Data Export
+# Archive data guide
 
-This directory contains tools for exporting archive data from CSV files to static JSON for improved load performance.
+This directory holds the archive's data: the CSV source files that record everything in the collection, the generated JSON files the website reads, and the script that turns one into the other.
 
-## Purpose
+The metadata and derived data (entities, relationships) are licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/): you're free to use and build on them, but attribution is required — credit the archive and link back to https://pressthink.org/j/rosen-archive/ (see the license section of [`SCHEMA.md`](SCHEMA.md)).
 
-The archive originally fetched data from Google Sheets at runtime, which caused:
-- Variable latency (800-1500ms)
-- CORS preflight overhead
-- Dependency on Google's availability
-- 3 separate network requests
+## The data files at a glance
 
-This export system generates a single pre-processed JSON file that loads in ~100-200ms.
+### Generated JSON (what the site reads)
 
-## Files
+| File | Size | Contents |
+|------|------|----------|
+| `archive-core.json` | ~13 MB | Lightweight record cards, loaded on page load |
+| `archive-details.json` | ~13 MB | Full summaries, quotes, and concepts, loaded on demand |
+| `archive-entities.json` | ~1.9 MB | Entity graph for the Explorer view, loaded on demand |
+| `archive-data.json` | ~30 MB | Full combined data — the fallback if the split files fail |
+| `archive-analytics.json` | ~4 KB | Prebuilt aggregates for the analytics view |
+| `search-index.json` | ~4 MB | Prebuilt MiniSearch full-text index, loaded on first search |
+| `wiki-seed.json` | ~125 KB | Seed pages for the public archive wiki (`#wiki` route) |
+
+### Source CSVs (the source of truth)
+
+Counts verified 2026-07-23; they grow as records are added.
+
+| File | Rows | Contents |
+|------|------|----------|
+| `archive_records-public.csv` | 1,029 | Curated records: 799 articles (`RECORD-`), 137 Tumblr posts (`TUMBLR-`), 83 newspaper clippings (`CLIP-`), 10 threads (`THREAD-`). Raw line count is much higher because text fields span multiple lines. |
+| `social_posts.csv` | 29,747 | Social media posts: 26,114 Twitter/X (`TWTR-`), 3,117 Bluesky (`BSKY-`), 516 Mastodon (`MAST-`) |
+| `extracted_entities.csv` | 8,150 | Named entities: people, organizations, and concepts |
+| `extracted_relationships.csv` | 12,556 | Entity-to-record relationships with context snippets |
+
+### Reference files
 
 | File | Purpose |
 |------|---------|
-| `IMPLEMENTATION_PLAN.md` | Detailed migration plan and architecture |
-| `export-archive-data.js` | Node.js script to generate JSON |
-| `archive-data.json` | Generated data file (~27MB, ~30k records, 5,036 entities) |
-| `archive_records-public.csv` | Main archive records (articles, essays) |
-| `social_posts.csv` | Social media posts (Bluesky, Twitter) |
-| `extracted_relationships.csv` | Entity relationships between records |
-| `extracted_entities.csv` | Named entities (people, orgs, concepts, etc.) |
+| `SCHEMA.md` | Human-readable data dictionary — start here if you want to use the data |
+| `schema.json` | Machine-readable schema, linked from the site's open-data download UI |
+| `eras.js` | The canonical era taxonomy, shared with the frontend |
+| `authored-excerpts.csv` | Curator-written summaries that override auto-generated ones |
+| `feeds/` | RSS feeds (full archive, articles, per-category, per-era) and OPML subscription lists |
+| `export-archive-data.js` | The Node.js script that generates all the JSON from the CSVs |
 
-## Quick Start
+## Using the data
+
+- **Just want to read it?** Browse the archive at https://pressthink.org/j/rosen-archive/ — it's the same data with search and filters.
+- **Want to analyze it?** The CSVs open in any spreadsheet app or data tool. `SCHEMA.md` explains every column. Note that text fields in `archive_records-public.csv` contain line breaks, so use a real CSV parser rather than splitting on newlines.
+- **Want to build on it?** The split JSON files are what the site itself consumes; `archive-data.json` is the everything-in-one-file option.
+
+Licensing: the code in this repository is MIT licensed; the metadata and derived data are [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) (attribution required); and the archived writings referenced by the data remain under the original copyright of their authors and publications.
+
+## Regenerating the JSON
+
+After editing a CSV, regenerate the JSON files from the repository root:
 
 ```bash
-# From the repository root:
-
-# Install dependencies
-npm install
-
-# Generate the JSON data file
-npm run export-data
-
-# Upload archive-data.json to WordPress
-# Path: /wp-content/rosen-archive/data/archive-data.json
+npm install          # first time only
+npm run export-data  # or: node data/export-archive-data.js
 ```
 
-## Workflow
+The script reads the four source CSVs (plus `authored-excerpts.csv`), processes and links the records, and writes the JSON files listed above. It prints progress as it goes, including a row count for each CSV it reads.
 
-1. **Export CSV from Google Sheets**: Download the latest CSV files from Google Sheets
-2. **Replace CSV files**: Place updated CSV files in this directory
-3. **Export to JSON**: Run `npm run export-data` to generate JSON
-4. **Deploy**: Upload JSON file to WordPress via FTP
+For the full record-adding walkthrough — written for non-technical curators — see [`ADDING-RECORDS.md`](../ADDING-RECORDS.md). For which files to upload to production, see [`DEPLOYMENT.md`](../DEPLOYMENT.md).
 
-## Data Sources
+### A note on history
 
-The export script reads from four CSV files:
-
-- **archive_records-public.csv**: Main articles, essays, and publications
-- **social_posts.csv**: Social media posts from Bluesky and Twitter
-- **extracted_relationships.csv**: Entity relationships for network visualization
-- **extracted_entities.csv**: Named entities (Person, Organization, Concept, Event, Location, Work)
-
-## Output Structure
-
-The generated `archive-data.json` contains:
-
-```json
-{
-  "version": "1.1.0",
-  "generated": "2025-12-01T...",
-  "records": [...],      // Array of processed records (~30k)
-  "entities": [...],     // Array of named entities (~5k)
-  "facets": {
-    "categories": [...], // Unique categories for filtering
-    "eras": [...],       // Time period classifications
-    "publications": [...], // Publication sources
-    "entityTypes": [...]   // Entity types (Person, Organization, etc.)
-  },
-  "autocompleteIndex": [...] // Search terms for autocomplete (~35k)
-}
-```
+The site originally fetched data from Google Sheets at runtime, which meant slow and unreliable loads. The pre-generated JSON approach replaced that: data loads in a few hundred milliseconds from static files, split so the first page load only fetches what it needs.
 
 ## Canonical CSVs vs `social_import/`
 
-The CSVs in `data/` (`archive_records-public.csv`, `social_posts.csv`,
-`extracted_entities.csv`, `extracted_relationships.csv`) are the **canonical
-inputs** for `export-archive-data.js`. Regenerate `archive-data.json` only
-from these.
+The CSVs listed above are the **canonical inputs** for `export-archive-data.js`. Regenerate the published JSON only from these.
 
-`data/social_import/` is the gitignored working directory for the backend
-entity-extraction pipeline. Three scripts default `--data-dir` to it:
+`data/social_import/` is the gitignored working directory for the backend entity-extraction pipeline. Three scripts default `--data-dir` to it:
 
 - `backend/scripts/unified_entity_processor.py`
 - `backend/scripts/batch_entity_extraction.py`
 - `backend/scripts/export_merged_data.py`
 
-A frozen copy of `rosen_social_posts.csv` and ~200 `batch_*` artifacts live
-there. That CSV may share a header with `social_posts.csv` but is older
-pipeline output, not the live data — **do not regenerate the published JSON
-from anything under `social_import/`**. If you need to refresh
-`data/social_posts.csv`, pull from Google Sheets (see Workflow above).
+A frozen copy of `rosen_social_posts.csv` and ~200 `batch_*` artifacts live there. That CSV may share a header with `social_posts.csv` but is older pipeline output, not the live data — **do not regenerate the published JSON from anything under `social_import/`**.
 
-## See Also
+## See also
 
-- `IMPLEMENTATION_PLAN.md` for full technical details
-- `../frontend/services/archiveService.js` for data loading logic
-- `../frontend/constants.js` for data source URLs
+- [`SCHEMA.md`](SCHEMA.md) — the data dictionary
+- [`../frontend/services/archiveService.js`](../frontend/services/archiveService.js) — how the site loads this data
+- [`../frontend/constants.js`](../frontend/constants.js) — data source URL configuration
+- [`../backend/README.md`](../backend/README.md) — the pipeline that produces new records

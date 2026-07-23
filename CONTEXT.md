@@ -1,6 +1,6 @@
 # Jay Rosen's Internet Archive — Context
 
-The shared vocabulary for talking about what the archive *is*, as distinct from how it's built. Use these terms exactly. When a generic word (post, service, document, map) feels natural, reach for the term below instead.
+The shared vocabulary contributors use when talking about what the archive *is*, as distinct from how it's built. If you're new to the project, this page explains what words like "Record" and "Entity" mean everywhere else in the documentation. Use these terms exactly. When a generic word (post, service, document, map) feels natural, reach for the term below instead.
 
 ## Language
 

@@ -1,5 +1,11 @@
 # Winer method demonstration
 
+A small, self-contained demonstration of the archive's curation method applied
+to a different subject: 11 public writings by software pioneer and blogger Dave
+Winer. It shows how the same approach — curated records, verified sources,
+concept pages, and an editorial reading trail — works on a corpus other than
+Jay Rosen's. View it on the live site under `features/winer-method/`.
+
 This standalone, read-only microsite applies a small part of the Rosen Archive
 method to a deliberately bounded public-source corpus. It is independent and
 unendorsed: Dave Winer did not commission, review, or endorse it.

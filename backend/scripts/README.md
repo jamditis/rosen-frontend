@@ -1,4 +1,4 @@
-# Tools Overview
+# Backend scripts overview
 
 This directory gathers stand-alone scripts and legacy utilities that are **not**
 part of the core ingestion pipeline in `src/`. They are grouped by their focus
@@ -18,6 +18,6 @@ production package.
   Keep them for reference or ad hoc spot checks; prefer adding formal tests in
   `tests/` for new coverage.
 
-Nothing in `tools/` is imported by the runtime pipeline, so moving these scripts
+Nothing in `scripts/` is imported by the runtime pipeline, so moving these scripts
 out of `src/` keeps the primary package lean while preserving institutional
 knowledge for future debugging sessions.
