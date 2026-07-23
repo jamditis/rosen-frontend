@@ -1308,6 +1308,88 @@ describe('archive_records-public.csv', () => {
     }
   });
 
+  it('HuffPost pilot eleven records match their official sources', () => {
+    const expected = new Map([
+      ['RECORD-00854', {
+        title: 'Walter Pincus of the <i>Post</i>: Our Neutered Newsrooms are a Poor Example to the Rest of the World',
+        url: 'https://www.huffpost.com/entry/walter-pincus-of-the-post_b_92019',
+        publicationDate: '2008-03-18',
+        wordCount: '2957',
+        rawTextSha: 'ef2ddee448169bdbc15a7b79665a8b32f3ba22ae9f2db87908324d5d2c3f2c61',
+        excerpt: 'The only exit from this system is for people in the press to start recognizing: there _is_ a politics to what they do. They have to get that part right. And they have to be more transparent about it.',
+        pullQuote: 'It is rare that a single article advances American press think.',
+        summary: "Rosen argues that neutrality claims like Clark Hoyt's defense of the Times trap the media-bias debate, and that journalists must recognize the politics in their work and make it transparent, as Josh Marshall's TPM does by joining accountability reporting to an open display of political conviction.",
+        sourceSha: '1dacc962fe486d4bf1ba6d0fb8427a4120100a4f6662fc9f03f7bf6b8d3cd42d',
+      }],
+      ['RECORD-00855', {
+        title: 'Obama Tells the Best Political Team on Television: You Guys Have a Choice...',
+        url: 'https://www.huffpost.com/entry/obama-tells-the-best-poli_b_92139',
+        publicationDate: '2008-03-18',
+        wordCount: '685',
+        rawTextSha: 'c2ca3b27f4321ff8980ec768a320cc143d21825810afecb63e097ff094a73c34',
+        excerpt: 'In fact it was a [speech](https://www.huffpost.com/entry/obama-race-speech-read-t_n_92077) aimed right at figures like Blitzer, at the [best political team](http://www.cnn.com/POLITICS/best.political.team/archive/) on television, and all the makers of our election year spectacle.',
+        pullQuote: 'Moments after it concluded Wolf Blitzer was asked to tell us what he heard in it.',
+        summary: "Rosen criticizes CNN and Wolf Blitzer for reducing Obama's race speech to campaign tactics instead of engaging its challenge to the campaign spectacle and the press's role in keeping race controversies alive.",
+        sourceSha: '99eee19f175791a76156c90f92c23f1efe6685ee1816b8723a8634e82cdf5df8',
+      }],
+      ['RECORD-00856', {
+        title: 'Where Did McCain Get What He\'s Got "in the Bank" with the Press?',
+        url: 'https://www.huffpost.com/entry/where-did-mccain-get-what_b_93711',
+        publicationDate: '2008-03-27',
+        wordCount: '2112',
+        rawTextSha: '2debe6510d79803d87d00a70e159323b532e1a9dcdfc6c4e8d0cb89d2f21d778',
+        excerpt: "Chuck Todd's phrase, _he's got enough of that in the bank,_ got people wondering what kind of depositary institution this was.",
+        pullQuote: "First came John McCain's strange assertion that Al Qaeda in Iraq was being trained and supported by the Iranians.",
+        summary: "Rosen asks why Chuck Todd said John McCain had enough credibility 'in the bank' with the press after falsely linking Al Qaeda in Iraq to Iran, arguing that banked capital came from McCain's open, on-the-record ease with reporters on the Straight Talk Express rather than demonstrated foreign-policy mastery.",
+        sourceSha: '61069523ad8e8d889f0c7165227a32150dc4812e27ab0885899523d42de7e7b7',
+      }],
+      ['RECORD-00857', {
+        title: 'The Uncharted: From Off The Bus to <i>Meet the Press</i>',
+        url: 'https://www.huffpost.com/entry/the-uncharted-from-off-th_b_96575',
+        publicationDate: '2008-04-22',
+        wordCount: '2470',
+        rawTextSha: '22c51b32da698e47140d442dcd86d43114d7f764b32fe62ce559bf03d5f8f6af',
+        excerpt: "They became public because [Mayhill Fowler](https://www.huffpost.com/mayhill-fowler) reported them for OffTheBus Friday afternoon. Russert used Mayhill's quotes again on [another story](https://www.huffpost.com/entry/obama-says-no-to-foreign_b_95357) she broke earlier in the week.",
+        pullQuote: 'One of these was OffTheBus itself, the site I started with Arianna Huffington last year.',
+        summary: "Rosen argues that Meet the Press erased Mayhill Fowler and OffTheBus from the Obama 'bitter' controversy, showing how old media struggled to credit pro-am campaign reporting even when it drove the story.",
+        sourceSha: 'b910fdc1de0d3682ba28281a7ba056949a2e08a59f5ada2c338a8ac72c5de842',
+      }],
+      ['RECORD-00858', {
+        title: 'They Were Undercover Campaign Volunteers',
+        url: 'https://www.huffpost.com/entry/they-were-undercover-camp_b_97529',
+        publicationDate: '2008-04-26',
+        wordCount: '186',
+        rawTextSha: 'a41a108da674f02a7e6a6264a5087db9275e4933053ce1cb747700eb5196c4cb',
+        excerpt: "They're both writers for City Paper who chose to go undercover to find out how the volunteer operations for both candidates actually worked.",
+        pullQuote: "But we're not the only ones trying to do that.",
+        summary: 'Rosen points readers to two Philadelphia City Paper writers who went undercover as Clinton and Obama volunteers, framing their reports as revealing evidence about campaign organizing despite ethical questions.',
+        sourceSha: 'fc27d7dc586be1c17fc929217f5c15bb7d58d4fb108f45dec56552bc5752f7c0',
+      }],
+    ]);
+
+    for (const [id, source] of expected) {
+      const record = archiveRecords.find(row => row.id === id);
+      assert.ok(record, `${id} must exist`);
+      assert.strictEqual(record.title, source.title);
+      assert.strictEqual(record.url, source.url);
+      assert.strictEqual(record.author, 'Jay Rosen');
+      assert.strictEqual(record.publication_date, source.publicationDate);
+      assert.strictEqual(record.word_count, source.wordCount);
+      assert.strictEqual(
+        crypto.createHash('sha256').update(record.raw_text).digest('hex'),
+        source.rawTextSha,
+        `${id} raw_text changed`
+      );
+      assert.strictEqual(record.excerpt, source.excerpt);
+      assert.strictEqual(record.pull_quote, source.pullQuote);
+      assert.strictEqual(record.summary, source.summary);
+      assert.strictEqual(record.verified, 'TRUE');
+      assert.strictEqual(record.needs_review, 'FALSE');
+      assert.match(record.notes, /Official HuffPost source verified 2026-07-23/);
+      assert.match(record.notes, new RegExp(source.sourceSha));
+    }
+  });
+
   it('RECORD-00614 cannot verify mismatched TomDispatch works', () => {
     const record = archiveRecords.find(row => row.id === 'RECORD-00614');
     assert.ok(record, 'RECORD-00614 must exist');

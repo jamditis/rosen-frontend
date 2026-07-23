@@ -4271,7 +4271,185 @@ entity row now uses `RECORD-00014` with a note documenting the correction. The
 entity CSV SHA-256 after this repair is
 `34f8d4cf9eee0cbebbb455e9b3b33d2ad8b8d6a30d7805a43f871932390225fe`.
 
-The update reduced archive rows with blank summaries from 29 to 24 and archive
-rows explicitly marked `verified=FALSE` from 33 to 28. The archive CSV remains
-1,028 rows by 38 columns, UTF-8 without a BOM, with 1,029 CRLF record
-boundaries and 81,117 embedded bare LF characters.
+Grok reviewed the summary draft in read-only mode and rejected only
+`RECORD-00851` as missing core argument structure. The accepted objection was
+applied: the final summary includes Huckabee's rise, elite contempt, Bruce
+Bartlett's impact-not-ideology standard, conservative attacks on media bias,
+and Rosen's larger concern about executive power.
+
+Changes applied:
+
+- `RECORD-00849`: summary added; `verified=TRUE`; `needs_review=FALSE`;
+  `low_confidence=FALSE`; notes now cite official response SHA-256
+  `b6741da8baf7628d4237fa9528672f9a6d24b37fec76b06c44292ec5027e1eab`.
+- `RECORD-00850`: URL corrected to
+  `https://www.huffpost.com/entry/the-hill-restores-armstro_b_77979`;
+  excerpt repaired; summary added; `verified=TRUE`; `needs_review=FALSE`;
+  `low_confidence=FALSE`; notes now cite official response SHA-256
+  `2229ffaf2eca673c5151ff1d889c7122014d59125f623ad935a0bf5e59ba43dc`.
+- `RECORD-00851`: pull quote repaired; summary added; `verified=TRUE`;
+  `needs_review=FALSE`; `low_confidence=FALSE`; notes now cite official
+  response SHA-256
+  `094c0b519ef803c83f504f13395f6017875d5c7f1260fcf8c50058fc1e3e3659`.
+- `RECORD-00852`: URL corrected to
+  `https://www.huffpost.com/entry/when-candidate-vetting-ru_b_88924`;
+  excerpt repaired; summary added; `verified=TRUE`; `needs_review=FALSE`;
+  `low_confidence=FALSE`; notes now cite official response SHA-256
+  `e6ecbe33ab28b04cad69d43c2befca17253a61ad44c05a0a7ecd60c390d45067`.
+- `RECORD-00853`: excerpt repaired; summary added; `verified=TRUE`;
+  `needs_review=FALSE`; `low_confidence=FALSE`; notes now cite official
+  response SHA-256
+  `c657d296262eb839af1965ab8c7ced33a50523b40f290c7e9060d41b35b8a540`.
+
+The focused regression
+`node --test --test-name-pattern "HuffPost pilot ten" tests\csv-quality.test.js`
+failed before the CSV edit because `RECORD-00849` had a blank summary, then
+passed after the five-row patch. Raw-text SHA-256 values stayed unchanged:
+
+- `RECORD-00849`: `3340135a7b379a8633e36b8f7c95aa0c27a38b6b261eeeb827d202470755fb1a`
+- `RECORD-00850`: `75c77a15a60f496db735f7d9529d82570c53c1caa3bbce1b8e5f13acee49d4f4`
+- `RECORD-00851`: `761fffa4f70e34427eafb1d8b042f0da5fe4a77a967b60086c794229e1d85dea`
+- `RECORD-00852`: `2fd0be897328e359679db375ac829982e49c4322ffa7f3dea872acf646ce7bee`
+- `RECORD-00853`: `03f54e83eb5a54551ff2b7a26a738a1478ec8a327aa77cfc2da115f0a1dc1e7f`
+
+Post-application row counts:
+
+- Archive rows: 1,028.
+- Blank archive summaries: 25, down from 30.
+- Archive rows not explicitly verified: 29, down from 34.
+- Generated records after export: 26,667.
+- Entities: 7,389.
+- Relationships: 10,804.
+
+Validation:
+
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 78 records with raw text but no extracted relationships.
+- `npm run test:data`: expected eight completion gates still fail: three core
+  blanks, 25 blank summaries, 29 unverified archive records, eight `#NN08`
+  capture-year dates, 54 non-Rosen Bluesky profile URLs, 54 non-Rosen Bluesky
+  copyright assignments, 29,693 unverified social rows, and 50 blank entity
+  first mentions. The pilot-ten regression passes.
+- `git -c core.whitespace=trailing-space,cr-at-eol diff --check`: no whitespace
+  errors; Windows line-ending warnings only.
+
+Packet artifact SHA-256 values:
+
+- `source-verification.json`: `48bfd5e59678ab879b460650988f9520e6429d4e21670c96522983937e9cc5ad`
+- `body-comparison.json`: `4b59d45bf6883b7a361bdcd51db10a529c725ecfa7f85dd7cbf19385b1f842d5`
+- `proposed-field-updates.json`: `e03b21729a8468488188b2a65ef8fa944d911760d6ccac1bb23f9c0628760d59`
+- `field-provenance.json`: `f50c8471b85061b038abc811e3644be46a440a52a4097a79e4102f315d7a82f4`
+- `external-calls.ndjson`: `5ce210494585276f47543dd14b975ebc82ef3323c0629c389626921fd65c0a5a`
+- `external-calls.json`: `f3f49b506ef61ce28e50c26f4c94ff5f3b1d71077748ed831654d1f6ed3ab685`
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `fdf5336203242e109f248de85d35fe14757be7f44f3ddf7051f08df62dacdc50`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `181b5acf3d3d3dd0f5f123885e542f8ff56ad7d9fd736f1eae281818918f4c72`
+- `data/archive-data.json`: `d2e2dddb78c0dd6d343799273f2bf8ef72c47aa90b8fc3d711f68b64df060da1`
+- `data/archive-core.json`: `ecc03f4852a009025c6b8282c4afcb6a75c85a91159e3d2483628bc25b14ce19`
+- `data/archive-details.json`: `4ca48aa51d4ce9e70a286dc86aa1e28d99622dc67bcf3b86801f59159f944790`
+- `data/archive-entities.json`: `73e939283f9b1f4afc953f4a4c8fb1d53cdce69af48be085e447d9f85b156733`
+- `data/archive-analytics.json`: `8ee5c5040e316c35b2b23f1708c6968373cc5c5703cf4550ac74457f0cbae67d`
+
+### HuffPost verification pilot 11 applied
+
+`RECORD-00854` through `RECORD-00858` were applied from the saved packet under
+`%TEMP%/rosen-k2-huffpost-pilot-11` without another network request. The K2
+worker captured five first-attempt official HTTP 200 responses, verified the
+stored titles, authors, dates, bodies, word counts, and pull quotes, and found
+no unresolved items. It rejected the stored excerpts because they were source
+description metadata rather than contiguous article-body passages.
+
+Grok reviewed the first summary draft in read-only no-web mode. It accepted
+`RECORD-00855`, `RECORD-00857`, and `RECORD-00858`, and rejected two summaries:
+`RECORD-00854` overemphasized Pincus and missed Clark Hoyt, Josh Marshall, and
+transparent political conviction; `RECORD-00856` used unsupported "honorable
+mythology" and blurred McCain's access with demonstrated mastery. Both
+objections were applied.
+
+Changes applied:
+
+- `RECORD-00854`: URL corrected to
+  `https://www.huffpost.com/entry/walter-pincus-of-the-post_b_92019`;
+  body-backed excerpt added; summary added; `verified=TRUE`;
+  `needs_review=FALSE`; `low_confidence=FALSE`; notes now cite official
+  response SHA-256
+  `1dacc962fe486d4bf1ba6d0fb8427a4120100a4f6662fc9f03f7bf6b8d3cd42d`.
+- `RECORD-00855`: body-backed excerpt added; summary added; `verified=TRUE`;
+  `needs_review=FALSE`; `low_confidence=FALSE`; notes now cite official
+  response SHA-256
+  `99eee19f175791a76156c90f92c23f1efe6685ee1816b8723a8634e82cdf5df8`.
+- `RECORD-00856`: body-backed excerpt added; summary added; `verified=TRUE`;
+  `needs_review=FALSE`; `low_confidence=FALSE`; notes now cite official
+  response SHA-256
+  `61069523ad8e8d889f0c7165227a32150dc4812e27ab0885899523d42de7e7b7`.
+- `RECORD-00857`: body-backed excerpt added; summary added; `verified=TRUE`;
+  `needs_review=FALSE`; `low_confidence=FALSE`; notes now cite official
+  response SHA-256
+  `b910fdc1de0d3682ba28281a7ba056949a2e08a59f5ada2c338a8ac72c5de842`.
+- `RECORD-00858`: body-backed excerpt added; summary added; `verified=TRUE`;
+  `needs_review=FALSE`; `low_confidence=FALSE`; notes now cite official
+  response SHA-256
+  `fc27d7dc586be1c17fc929217f5c15bb7d58d4fb108f45dec56552bc5752f7c0`.
+
+The focused regression
+`node --test --test-name-pattern "HuffPost pilot eleven" tests\csv-quality.test.js`
+failed before the CSV edit because `RECORD-00854` still used the shortened
+non-canonical URL, then passed after the five-row patch. A first local pre-check
+computed wrong raw-text hashes with a line splitter that is invalid for this
+multiline CSV; the regression was corrected to use the K2 `body-comparison.json`
+hashes and the same `csv-parse` semantics as the test suite. Correct raw-text
+SHA-256 values stayed unchanged:
+
+- `RECORD-00854`: `ef2ddee448169bdbc15a7b79665a8b32f3ba22ae9f2db87908324d5d2c3f2c61`
+- `RECORD-00855`: `c2ca3b27f4321ff8980ec768a320cc143d21825810afecb63e097ff094a73c34`
+- `RECORD-00856`: `2debe6510d79803d87d00a70e159323b532e1a9dcdfc6c4e8d0cb89d2f21d778`
+- `RECORD-00857`: `22c51b32da698e47140d442dcd86d43114d7f764b32fe62ce559bf03d5f8f6af`
+- `RECORD-00858`: `a41a108da674f02a7e6a6264a5087db9275e4933053ce1cb747700eb5196c4cb`
+
+Post-application row counts:
+
+- Archive rows: 1,028.
+- Blank archive summaries: 20, down from 25.
+- Archive rows not explicitly verified: 24, down from 29.
+- Generated records after export: 26,672.
+- Entities: 7,389.
+- Relationships: 10,804.
+
+Validation:
+
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 78 records with raw text but no extracted relationships.
+- `npm run test:data`: expected eight completion gates still fail: three core
+  blanks, 20 blank summaries, 24 unverified archive records, eight `#NN08`
+  capture-year dates, 54 non-Rosen Bluesky profile URLs, 54 non-Rosen Bluesky
+  copyright assignments, 29,693 unverified social rows, and 50 blank entity
+  first mentions. The pilot-eleven regression passes.
+
+Packet artifact SHA-256 values:
+
+- `source-verification.json`: `8bf7f250af5cfe0211518f268ed3270130aef01fd6fef1437b190e5452f37a69`
+- `body-comparison.json`: `aae26ec3508d35689349405529ba2c141bed145ef03cd39880d9df2caac814bc`
+- `proposed-field-updates.json`: `42eabb289cc4ebe78be837f72c9d7deed3ea37071451631725360de462823991`
+- `field-provenance.json`: `fb04e472fc887f04db01351a5bae34397097afe9f8e8d98e48d48564214d8bbf`
+- `external-calls.ndjson`: `3f6d7cb9c4ae5f82ec2373db2e267788956fd6d34b1b0ad86419ecf9cf33a75e`
+- `external-calls.json`: `7f266975ce1c03cfb2f003849fb299d4e1af698052831ceda0ff18406c569e9b`
+- `grok-summary-review.txt`: `87896301301824b70b41728493f86e2b6b3f5cd31d9f1e8e6b9df00baeec05f2`
+- `report.txt`: `de1177478b9a9ddc7aef16570330ef25bfd8b70ecf851414b2fa7f2003e9016c`
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `3dc0e08888a6a641e6a8f5c1ea3531bb459441f6ec44545ad53026751e613488`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `181b5acf3d3d3dd0f5f123885e542f8ff56ad7d9fd736f1eae281818918f4c72`
+- `data/archive-data.json`: `c105a0a956b5ee7613919b2f33a82c7ce278f340a0459a2636de5d2918443eb4`
+- `data/archive-core.json`: `a0d5ffff28044d647d6ab63bafd2ce6973b691793620a38cea20c61349c068bb`
+- `data/archive-details.json`: `578d2f137f1f053ee3cc8bc72b02c134a2f417eb89c7031faa3571da2787e025`
+- `data/archive-entities.json`: `2445f36dbacde8da21b50a9c76b852075ca5eaadeb7404ed584340006b99c877`
+- `data/archive-analytics.json`: `7be364e05556035f89c3925d28cfc0ef21f4078c4bea443d1241fccd8a6491fa`
