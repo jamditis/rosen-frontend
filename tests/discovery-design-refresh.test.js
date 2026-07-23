@@ -114,7 +114,7 @@ describe('archive discovery visual-system refresh', () => {
   it('keeps visible view labels inside their accessible names and documents all audit routes', () => {
     assert.match(app, /aria-label="Cards view"[\s\S]*>Cards</);
     assert.match(app, /aria-label="Folders view"[\s\S]*>Folders</);
-    assert.match(read('CLAUDE.md'), /walks 40 route states/);
+    assert.match(read('CLAUDE.md'), /walks 41 route states/);
   });
 
   it('does not expose search-independent timeline counts during a text search', () => {

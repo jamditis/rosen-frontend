@@ -202,7 +202,7 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── dataexplorer/                # Tabular data explorer
 │   └── dataviz/                     # Data visualization tool
 │
-├── tests/                           # Frontend/data test suite — Node.js built-in runner (24 *.test.js files plus a validate-dissertation-page.js helper script; 25 files total)
+├── tests/                           # Frontend/data test suite — Node.js built-in runner (105 *.test.js files plus a validate-dissertation-page.js helper script; 106 files total)
 │
 ├── archived/                        # Reference only, not deployed (see DEPLOYMENT.md)
 │   └── scripts/                     # Provenance-only one-off scripts, broken at import from here by design (each has a README). backend-oneoffs/ (#190) and data-oneoffs/ (#380). The rest of archived/ was pruned in #166.
@@ -268,7 +268,7 @@ Override the port with `PREVIEW_PORT=8765 npm run preview`. The server binds to 
 npm run preview:audit                 # Mobile + desktop, key routes, axe-core scan
 ```
 
-Spawns the preview server, walks 40 route states at mobile, tablet, and desktop
+Spawns the preview server, walks 41 route states at mobile, tablet, and desktop
 viewports, runs `axe-core` for WCAG 2.1 AA, and writes
 `preview-audit-results/axe-report.html` plus per-route screenshots under
 `preview-audit-results/screenshots/{viewport}/`. Exits non-zero if any
@@ -276,7 +276,7 @@ violations are found.
 
 ## Testing
 
-Tests use Node.js built-in test runner (`node --test`). The suite under `tests/` currently spans 24 files covering data integrity, CSV quality, pipeline, thread algorithm/detection, frontend structure, view-state, route vocabulary, linkify, entity-index, service-worker cache, HTTP cached loader, fetch error handling, schema BOM, data-explorer security, version consistency, and process-record:
+Tests use Node.js built-in test runner (`node --test`). The suite under `tests/` currently spans 105 test files covering data integrity, CSV quality, pipeline, thread algorithm/detection, frontend structure, view-state, route vocabulary, linkify, entity-index, service-worker cache, HTTP cached loader, fetch error handling, schema BOM, data-explorer security, version consistency, process-record, and the current design-system surfaces:
 
 ```bash
 npm test                   # Run the full suite

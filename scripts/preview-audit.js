@@ -161,8 +161,8 @@ const ROUTES = [
       zOrder: ['archive', 'entities', 'analytics'],
     },
   },
-  { slug: 'entities',           url: '/#entities' },
-  { slug: 'entity-detail',      url: '/?entity=P0005#entities' },
+  { slug: 'entities',           url: '/#entities', dismissWelcome: true },
+  { slug: 'entity-detail',      url: '/?entity=P0005#entities', dismissWelcome: true },
   {
     slug: 'entity-record',
     url: '/?record=RECORD-00903&entity=P0005#entities',
@@ -170,6 +170,7 @@ const ROUTES = [
   },
   { slug: 'about',              url: '/#about' },
   { slug: 'analytics',          url: '/#analytics' },
+  { slug: 'analytics-query-results', url: '/#analytics', verifyQueryResults: true },
   { slug: 'record-article',     url: '/?record=RECORD-00802', archiveDetails: 'require', verifyRecordReading: 'article' },
   { slug: 'record-social',      url: '/?record=BSKY-03169', archiveDetails: 'require', verifyRecordReading: 'social' },
   { slug: 'record-thread',      url: '/?record=THREAD-00001', archiveDetails: 'require', verifyRecordReading: 'thread' },
@@ -556,6 +557,67 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     }
     if (await page.getByRole('dialog').count()) {
       throw new Error('Non-record desktop app rendered a record dialog');
+    }
+  }
+  if (route.verifyQueryResults) {
+    const runQuery = page.getByRole('button', { name: 'Run query', exact: true }).first();
+    await runQuery.focus();
+    await assertVisibleFocusOutline(runQuery, 'Query builder run control');
+    await page.keyboard.press('Enter');
+
+    const results = page.locator('.archive-query-results');
+    await results.waitFor({ state: 'visible', timeout: 30000 });
+    const resultsRegion = results.getByRole('region', { name: 'Query results' });
+    const resultRows = results.locator('tbody tr');
+    if (await resultRows.count() < 1) {
+      throw new Error('Query builder returned no tabular results');
+    }
+    await resultsRegion.focus();
+    await assertFocused(resultsRegion, 'Query results scroll region');
+    await assertVisibleFocusOutline(resultsRegion, 'Query results scroll region');
+
+    if (viewport.name === 'desktop') {
+      const originalViewport = { width: viewport.width, height: viewport.height };
+      try {
+        await page.setViewportSize({ width: 720, height: 450 });
+        await page.waitForTimeout(200);
+        const compactState = await page.evaluate(() => {
+          const geometry = (selector) => {
+            const rect = document.querySelector(selector)?.getBoundingClientRect();
+            return rect ? {
+              left: Number(rect.left.toFixed(1)),
+              right: Number(rect.right.toFixed(1)),
+              width: Number(rect.width.toFixed(1)),
+            } : null;
+          };
+          const scrollRegion = document.querySelector('.archive-query-results .archive-data-scroll');
+          return {
+            viewportWidth: window.innerWidth,
+            documentOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+            builder: geometry('.archive-query-builder'),
+            results: geometry('.archive-query-results'),
+            scrollRegion: geometry('.archive-query-results .archive-data-scroll'),
+            scrollRegionFocusable: scrollRegion?.tabIndex === 0,
+          };
+        });
+        const escaped = [compactState.builder, compactState.results, compactState.scrollRegion]
+          .some((rect) => (
+            !rect
+            || rect.left < -1
+            || rect.right > compactState.viewportWidth + 1
+            || rect.width > compactState.viewportWidth + 1
+          ));
+        if (
+          compactState.documentOverflow > 1
+          || escaped
+          || !compactState.scrollRegionFocusable
+        ) {
+          throw new Error(`Query results escaped the 200%-zoom viewport: ${JSON.stringify(compactState)}`);
+        }
+      } finally {
+        await page.setViewportSize(originalViewport);
+        await page.waitForTimeout(200);
+      }
     }
   }
   if (route.verifyDesktopEntry) {
@@ -1112,6 +1174,9 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     await page.locator('.archive-thread').scrollIntoViewIfNeeded();
   } else if (route.verifyRecordReading) {
     await page.locator('.archive-record-document').evaluate((element) => { element.scrollTop = 0; });
+  }
+  if (route.verifyQueryResults) {
+    await page.locator('.archive-query-results').scrollIntoViewIfNeeded();
   }
   if (route.dismissWelcome || route.screenshotResults) await page.waitForTimeout(100);
   // Viewport-only screenshots. Full-page on long content (e.g. the dissertation
@@ -1847,76 +1912,79 @@ async function main() {
     const browser = await launchBrowser();
     try {
       const context = await browser.newContext({ serviceWorkers: 'block' });
-      const page = await context.newPage();
-
       const rows = [];
       for (const viewport of VIEWPORTS) {
-        for (const route of ROUTES) {
-          console.log(`  ${viewport.name.padEnd(8)} ${route.url}`);
-          const pageErrors = [];
-          const consoleErrors = [];
-          const networkErrors = [];
-          let captureApplicationNetwork = true;
-          const capturePageError = (error) => pageErrors.push(error.message || String(error));
-          const captureConsoleError = (message) => {
-            if (captureApplicationNetwork && message.type() === 'error') {
-              if (route.mockDetailsFailure) {
-                if (message.text().includes('Error fetching details data:')) return;
-                const locationUrl = message.location().url;
-                const expectedResourceError = message.text().includes('Failed to load resource:')
-                  && locationUrl
-                  && new URL(locationUrl).pathname.endsWith('/data/archive-details.json');
-                if (expectedResourceError) return;
+        const page = await context.newPage();
+        try {
+          for (const route of ROUTES) {
+            console.log(`  ${viewport.name.padEnd(8)} ${route.url}`);
+            const pageErrors = [];
+            const consoleErrors = [];
+            const networkErrors = [];
+            let captureApplicationNetwork = true;
+            const capturePageError = (error) => pageErrors.push(error.message || String(error));
+            const captureConsoleError = (message) => {
+              if (captureApplicationNetwork && message.type() === 'error') {
+                if (route.mockDetailsFailure) {
+                  if (message.text().includes('Error fetching details data:')) return;
+                  const locationUrl = message.location().url;
+                  const expectedResourceError = message.text().includes('Failed to load resource:')
+                    && locationUrl
+                    && new URL(locationUrl).pathname.endsWith('/data/archive-details.json');
+                  if (expectedResourceError) return;
+                }
+                consoleErrors.push(message.text());
               }
-              consoleErrors.push(message.text());
+            };
+            const captureBadResponse = (response) => {
+              if (!captureApplicationNetwork) return;
+              const url = new URL(response.url());
+              const expectedDetailsFailure = route.mockDetailsFailure
+                && url.pathname.endsWith('/data/archive-details.json');
+              if (url.origin === BASE && response.status() >= 400 && !expectedDetailsFailure) {
+                networkErrors.push(`${response.status()} ${url.pathname}`);
+              }
+            };
+            const captureFailedRequest = (request) => {
+              if (!captureApplicationNetwork) return;
+              const url = new URL(request.url());
+              if (url.origin === BASE) {
+                networkErrors.push(`${request.failure()?.errorText || 'request failed'} ${url.pathname}`);
+              }
+            };
+            page.on('pageerror', capturePageError);
+            page.on('console', captureConsoleError);
+            page.on('response', captureBadResponse);
+            page.on('requestfailed', captureFailedRequest);
+            try {
+              const row = await auditOne(
+                page,
+                route,
+                viewport,
+                (enabled) => { captureApplicationNetwork = enabled; },
+              );
+              if (pageErrors.length > 0) {
+                throw new Error(`Unhandled page errors: ${JSON.stringify(pageErrors)}`);
+              }
+              if (consoleErrors.length > 0) {
+                throw new Error(`Application console errors: ${JSON.stringify(consoleErrors)}`);
+              }
+              if (networkErrors.length > 0) {
+                throw new Error(`Same-origin network errors: ${JSON.stringify(networkErrors)}`);
+              }
+              rows.push(row);
+            } catch (err) {
+              console.error(`  FAILED ${viewport.name} ${route.url}: ${err.message}`);
+              rows.push({ route: route.slug, url: route.url, viewport: viewport.name, violations: [{ id: 'audit-error', impact: 'critical', help: err.message, helpUrl: '', nodes: 0, sample: '' }], passes: 0, incomplete: 0 });
+            } finally {
+              page.off('pageerror', capturePageError);
+              page.off('console', captureConsoleError);
+              page.off('response', captureBadResponse);
+              page.off('requestfailed', captureFailedRequest);
             }
-          };
-          const captureBadResponse = (response) => {
-            if (!captureApplicationNetwork) return;
-            const url = new URL(response.url());
-            const expectedDetailsFailure = route.mockDetailsFailure
-              && url.pathname.endsWith('/data/archive-details.json');
-            if (url.origin === BASE && response.status() >= 400 && !expectedDetailsFailure) {
-              networkErrors.push(`${response.status()} ${url.pathname}`);
-            }
-          };
-          const captureFailedRequest = (request) => {
-            if (!captureApplicationNetwork) return;
-            const url = new URL(request.url());
-            if (url.origin === BASE) {
-              networkErrors.push(`${request.failure()?.errorText || 'request failed'} ${url.pathname}`);
-            }
-          };
-          page.on('pageerror', capturePageError);
-          page.on('console', captureConsoleError);
-          page.on('response', captureBadResponse);
-          page.on('requestfailed', captureFailedRequest);
-          try {
-            const row = await auditOne(
-              page,
-              route,
-              viewport,
-              (enabled) => { captureApplicationNetwork = enabled; },
-            );
-            if (pageErrors.length > 0) {
-              throw new Error(`Unhandled page errors: ${JSON.stringify(pageErrors)}`);
-            }
-            if (consoleErrors.length > 0) {
-              throw new Error(`Application console errors: ${JSON.stringify(consoleErrors)}`);
-            }
-            if (networkErrors.length > 0) {
-              throw new Error(`Same-origin network errors: ${JSON.stringify(networkErrors)}`);
-            }
-            rows.push(row);
-          } catch (err) {
-            console.error(`  FAILED ${viewport.name} ${route.url}: ${err.message}`);
-            rows.push({ route: route.slug, url: route.url, viewport: viewport.name, violations: [{ id: 'audit-error', impact: 'critical', help: err.message, helpUrl: '', nodes: 0, sample: '' }], passes: 0, incomplete: 0 });
-          } finally {
-            page.off('pageerror', capturePageError);
-            page.off('console', captureConsoleError);
-            page.off('response', captureBadResponse);
-            page.off('requestfailed', captureFailedRequest);
           }
+        } finally {
+          await page.close();
         }
       }
 

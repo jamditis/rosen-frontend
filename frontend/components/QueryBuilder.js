@@ -7,23 +7,21 @@
  */
 
 import { useState, useEffect } from 'react';
-import { html } from '../html.js?v=3.8.3';
+import { html } from '../html.js?v=3.8.4';
 import {
-  Search,
   Play,
   RotateCcw,
-  ChevronDown,
   Sparkles,
   HelpCircle,
   Loader2
 } from 'lucide-react';
-import { queryAsObjects, isSqliteReady, initSqlite } from '../services/archiveService.js?v=3.8.3';
-import { ERAS } from '../constants.js?v=3.8.3';
+import { queryAsObjects, isSqliteReady, initSqlite } from '../services/archiveService.js?v=3.8.4';
+import { ERAS } from '../constants.js?v=3.8.4';
 import {
   extractRecordIds,
   templateIsComposable,
   resolveFieldValues,
-} from '../services/queryComposition.js?v=3.8.3';
+} from '../services/queryComposition.js?v=3.8.4';
 
 const eraOrderCase = ERAS
   .map((era, index) => `WHEN '${era.replace(/'/g, "''")}' THEN ${index + 1}`)
@@ -34,7 +32,7 @@ const QUERY_TEMPLATES = [
   {
     id: 'count-by-field',
     composable: false,
-    name: 'Count Records',
+    name: 'Count records',
     sentence: ['Count all records grouped by', 'FIELD', 'showing the top', 'LIMIT', 'results'],
     fields: {
       FIELD: {
@@ -66,7 +64,7 @@ const QUERY_TEMPLATES = [
   {
     id: 'search-titles',
     composable: true,
-    name: 'Search Titles',
+    name: 'Search titles',
     sentence: ['Find records where the title contains', 'SEARCH_TERM', 'limited to', 'LIMIT', 'results'],
     fields: {
       SEARCH_TERM: {
@@ -92,7 +90,7 @@ const QUERY_TEMPLATES = [
   {
     id: 'records-by-year',
     composable: true,
-    name: 'Records from Year',
+    name: 'Records from year',
     sentence: ['Show me all records from the year', 'YEAR', 'limited to', 'LIMIT', 'results'],
     fields: {
       YEAR: {
@@ -121,7 +119,7 @@ const QUERY_TEMPLATES = [
   {
     id: 'records-by-era',
     composable: true,
-    name: 'Records by Era',
+    name: 'Records by era',
     sentence: ['Show records from the', 'ERA', 'era, limited to', 'LIMIT', 'results'],
     fields: {
       ERA: {
@@ -147,7 +145,7 @@ const QUERY_TEMPLATES = [
   {
     id: 'top-categories',
     composable: false,
-    name: 'Top Categories',
+    name: 'Top categories',
     sentence: ['Show the top', 'LIMIT', 'categories by number of records'],
     fields: {
       LIMIT: {
@@ -168,7 +166,7 @@ const QUERY_TEMPLATES = [
   {
     id: 'records-by-category',
     composable: true,
-    name: 'Records in Category',
+    name: 'Records in category',
     sentence: ['Find records in the', 'CATEGORY', 'category, showing', 'LIMIT', 'results'],
     fields: {
       CATEGORY: {
@@ -195,7 +193,7 @@ const QUERY_TEMPLATES = [
   {
     id: 'top-publications',
     composable: false,
-    name: 'Top Publications',
+    name: 'Top publications',
     sentence: ['Show the top', 'LIMIT', 'publications Jay has written for'],
     fields: {
       LIMIT: {
@@ -217,7 +215,7 @@ const QUERY_TEMPLATES = [
   {
     id: 'top-people',
     composable: false,
-    name: 'Most Mentioned People',
+    name: 'Most mentioned people',
     sentence: ['Show the top', 'LIMIT', 'most frequently mentioned people'],
     fields: {
       LIMIT: {
@@ -240,7 +238,7 @@ const QUERY_TEMPLATES = [
   {
     id: 'top-concepts',
     composable: false,
-    name: 'Most Common Concepts',
+    name: 'Most common concepts',
     sentence: ['Show the top', 'LIMIT', 'most frequently discussed concepts'],
     fields: {
       LIMIT: {
@@ -261,7 +259,7 @@ const QUERY_TEMPLATES = [
   {
     id: 'records-mentioning-person',
     composable: true,
-    name: 'Records Mentioning Person',
+    name: 'Records mentioning person',
     sentence: ['Find records that mention', 'PERSON_NAME', 'limited to', 'LIMIT', 'results'],
     fields: {
       PERSON_NAME: {
@@ -289,7 +287,7 @@ const QUERY_TEMPLATES = [
   {
     id: 'yearly-output',
     composable: false,
-    name: 'Yearly Output',
+    name: 'Yearly output',
     sentence: ['Show how many', 'TYPE', 'Jay produced each year'],
     fields: {
       TYPE: {
@@ -317,7 +315,7 @@ const QUERY_TEMPLATES = [
   {
     id: 'compare-eras',
     composable: false,
-    name: 'Compare Eras',
+    name: 'Compare eras',
     sentence: ['Compare the number of records across all eras'],
     fields: {},
     buildSql: () => `
@@ -339,7 +337,7 @@ const QUERY_TEMPLATES = [
   {
     id: 'category-cooccurrence',
     composable: false,
-    name: 'Related Categories',
+    name: 'Related categories',
     sentence: ['Show categories that often appear together, top', 'LIMIT', 'pairs'],
     fields: {
       LIMIT: {
@@ -371,7 +369,7 @@ const Dropdown = ({ options, value, onChange, label }) => {
       aria-label=${label}
       value=${value}
       onChange=${(e) => onChange(e.target.value)}
-      className="mx-1 px-3 py-1.5 bg-amber-100 border-2 border-amber-300 rounded-lg text-stone-800 font-bold text-sm cursor-pointer hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-amber-400 appearance-none"
+      className="archive-query-field archive-query-field--dropdown"
       style=${{ minWidth: '140px' }}
     >
       ${options.map(opt => html`
@@ -391,7 +389,7 @@ const NumberInput = ({ value, onChange, min, max, label }) => {
       onChange=${(e) => onChange(parseInt(e.target.value) || min)}
       min=${min}
       max=${max}
-      className="mx-1 w-16 px-2 py-1.5 bg-sky-100 border-2 border-sky-300 rounded-lg text-stone-800 font-bold text-sm text-center focus:outline-none focus:ring-2 focus:ring-sky-400"
+      className="archive-query-field archive-query-field--number"
     />
   `;
 };
@@ -405,7 +403,7 @@ const TextInput = ({ value, onChange, placeholder, label }) => {
       value=${value}
       onChange=${(e) => onChange(e.target.value)}
       placeholder=${placeholder}
-      className="mx-1 px-3 py-1.5 bg-green-100 border-2 border-green-300 rounded-lg text-stone-800 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+      className="archive-query-field archive-query-field--text"
       style=${{ minWidth: '160px' }}
     />
   `;
@@ -425,7 +423,7 @@ const QuerySentence = ({ template, values, onChange }) => {
   };
 
   return html`
-    <div className="flex flex-wrap items-center gap-1 text-lg text-stone-700 leading-relaxed py-2">
+    <div className="archive-query-sentence__line">
       ${template.sentence.map((part, index) => {
         // Check if this part is a field placeholder
         if (template.fields[part]) {
@@ -460,7 +458,7 @@ const QuerySentence = ({ template, values, onChange }) => {
           }
         }
         // Regular text
-        return html`<span key=${index} className="mx-0.5">${part}</span>`;
+        return html`<span key=${index}>${part}</span>`;
       })}
     </div>
   `;
@@ -469,18 +467,18 @@ const QuerySentence = ({ template, values, onChange }) => {
 // Results table component
 const ResultsTable = ({ results }) => {
   if (!results || results.length === 0) {
-    return html`<p className="text-stone-600 text-sm italic">No results found</p>`;
+    return html`<p className="archive-query-empty">No results found</p>`;
   }
 
   const columns = Object.keys(results[0]);
 
   return html`
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+    <div className="archive-data-scroll" role="region" tabIndex="0" aria-label="Query results">
+      <table className="archive-data-table">
         <thead>
-          <tr className="bg-stone-100">
+          <tr>
             ${columns.map(col => html`
-              <th key=${col} className="px-3 py-2 text-left text-xs font-bold text-stone-600 uppercase tracking-wider border-b border-stone-200">
+              <th key=${col} scope="col">
                 ${col.replace(/_/g, ' ')}
               </th>
             `)}
@@ -488,9 +486,9 @@ const ResultsTable = ({ results }) => {
         </thead>
         <tbody>
           ${results.map((row, i) => html`
-            <tr key=${i} className=${i % 2 === 0 ? 'bg-white' : 'bg-stone-50'}>
+            <tr key=${i}>
               ${columns.map(col => html`
-                <td key=${col} className="px-3 py-2 text-stone-700 border-b border-stone-100 truncate" style=${{ maxWidth: '300px' }}>
+                <td key=${col}>
                   ${row[col] ?? '—'}
                 </td>
               `)}
@@ -578,17 +576,17 @@ const QueryBuilder = ({ onRecordResults }) => {
   const currentSql = selectedTemplate ? selectedTemplate.buildSql(resolveFieldValues(selectedTemplate, fieldValues)) : '';
 
   return html`
-    <div className="space-y-6">
+    <div className="archive-query-builder">
       <!-- Template Selector -->
-      <div className="flex flex-wrap items-center gap-3">
-        <label htmlFor="query-template" className="text-sm font-bold text-stone-600 uppercase tracking-wider">
+      <div className="archive-query-template">
+        <label htmlFor="query-template">
           I want to:
         </label>
         <select
           id="query-template"
           value=${selectedTemplateId}
           onChange=${(e) => setSelectedTemplateId(e.target.value)}
-          className="px-4 py-2 bg-white border-2 border-stone-300 rounded-lg text-stone-800 font-bold cursor-pointer hover:border-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-400"
+          className="archive-control"
         >
           ${QUERY_TEMPLATES.map(template => html`
             <option key=${template.id} value=${template.id}>${template.name}</option>
@@ -597,12 +595,12 @@ const QueryBuilder = ({ onRecordResults }) => {
       </div>
 
       <!-- Query Sentence Builder -->
-      <div className="bg-gradient-to-r from-amber-50 to-sky-50 border-2 border-stone-200 rounded-xl p-6">
-        <div className="flex items-start gap-2 mb-4">
-          <${Sparkles} className="w-5 h-5 text-amber-500 mt-1 flex-shrink-0" />
-          <p className="text-xs text-stone-500">
+      <div className="archive-query-sentence">
+        <div className="archive-query-sentence__instruction">
+          <${Sparkles} aria-hidden="true" />
+          <p>
             Complete the sentence below by choosing options or entering values.
-            Colored fields are interactive!
+            Ruled fields are interactive.
           </p>
         </div>
 
@@ -615,21 +613,21 @@ const QueryBuilder = ({ onRecordResults }) => {
         `}
 
         <!-- Action Buttons -->
-        <div className="flex flex-wrap items-center gap-3 mt-6 pt-4 border-t border-stone-200">
+        <div className="archive-query-actions">
           <button
             type="button"
             onClick=${runQuery}
             disabled=${dbLoading}
-            className="flex items-center gap-2 px-5 py-2.5 bg-stone-900 text-white rounded-lg hover:bg-stone-800 transition-colors font-bold disabled:opacity-60"
+            className="archive-action archive-action--primary"
           >
             ${dbLoading
               ? html`<${Loader2} className="w-4 h-4 animate-spin" /> Loading database...`
-              : html`<${Play} className="w-4 h-4" /> Run Query`}
+              : html`<${Play} className="w-4 h-4" /> Run query`}
           </button>
           <button
             type="button"
             onClick=${resetQuery}
-            className="flex items-center gap-2 px-4 py-2.5 bg-stone-100 text-stone-600 rounded-lg hover:bg-stone-200 transition-colors font-medium"
+            className="archive-action archive-action--secondary"
           >
             <${RotateCcw} className="w-4 h-4" />
             Reset
@@ -637,7 +635,7 @@ const QueryBuilder = ({ onRecordResults }) => {
           <button
             type="button"
             onClick=${() => setShowSql(!showSql)}
-            className="flex items-center gap-2 px-4 py-2.5 text-stone-500 hover:text-stone-700 transition-colors font-medium text-sm"
+            className="archive-action archive-action--quiet"
           >
             <${HelpCircle} className="w-4 h-4" />
             ${showSql ? 'Hide' : 'Show'} SQL
@@ -646,43 +644,43 @@ const QueryBuilder = ({ onRecordResults }) => {
 
         <!-- SQL Preview (collapsible) -->
         ${showSql && html`
-          <div className="mt-4 p-3 bg-stone-800 rounded-lg overflow-x-auto">
-            <pre className="text-xs text-green-400 font-mono whitespace-pre-wrap">${currentSql.trim()}</pre>
+          <div className="archive-query-sql-preview archive-data-scroll" role="region" tabIndex="0" aria-label="Generated SQL">
+            <pre>${currentSql.trim()}</pre>
           </div>
         `}
       </div>
 
       <!-- Results -->
       ${error && html`
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-700 text-sm font-medium">Error: ${error}</p>
+        <div className="archive-notice archive-notice--danger archive-query-error" role="alert">
+          <p><strong>Error:</strong> ${error}</p>
         </div>
       `}
 
       ${results && html`
-        <div className="bg-white border border-stone-200 rounded-lg overflow-hidden">
-          <div className="px-4 py-3 bg-stone-50 border-b border-stone-200 flex items-center justify-between">
-            <h4 className="font-bold text-stone-700">Results</h4>
-            <span className="text-xs text-stone-500">${resultCount} ${resultCount === 1 ? 'row' : 'rows'} returned</span>
+        <div className="archive-data-panel archive-query-results">
+          <div className="archive-query-results__header">
+            <h4>Results</h4>
+            <span>${resultCount} ${resultCount === 1 ? 'row' : 'rows'} returned</span>
           </div>
-          <div className="max-h-96 overflow-y-auto">
+          <div className="archive-query-results__table">
             <${ResultsTable} results=${results} />
           </div>
         </div>
       `}
 
       <!-- Color Legend -->
-      <div className="flex flex-wrap gap-4 text-xs text-stone-500">
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-amber-100 border-2 border-amber-300 rounded"></div>
+      <div className="archive-query-legend" aria-label="Query field legend">
+        <div>
+          <span className="archive-query-legend__swatch archive-query-legend__swatch--dropdown" aria-hidden="true"></span>
           <span>Dropdown choice</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-sky-100 border-2 border-sky-300 rounded"></div>
+        <div>
+          <span className="archive-query-legend__swatch archive-query-legend__swatch--number" aria-hidden="true"></span>
           <span>Number</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-green-100 border-2 border-green-300 rounded"></div>
+        <div>
+          <span className="archive-query-legend__swatch archive-query-legend__swatch--text" aria-hidden="true"></span>
           <span>Text search</span>
         </div>
       </div>
