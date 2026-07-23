@@ -60,6 +60,13 @@ describe('Ways to participate standalone page', () => {
     }
   });
 
+  it('keeps the decorative record field from competing with the white hero copy', () => {
+    assert.match(
+      css,
+      /\.hero::after\s*\{[^}]*background:\s*linear-gradient\([^}]*var\(--hero\)[^}]*\)[^}]*pointer-events:\s*none/s,
+    );
+  });
+
   it('keeps the archive-themed Easter egg hidden, keyboard reachable, and record backed', () => {
     assert.match(html, /class="portrait-stamp"/);
     assert.match(html, /id="archive-secret"[^>]*hidden/);

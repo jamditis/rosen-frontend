@@ -3,9 +3,9 @@
  * "The Impossible Press" by Jay Rosen (1986)
  */
 
-import ReaderSettings from './settings.js?v=3.8.6';
-import ReaderNavigation from './navigation.js?v=3.8.6';
-import ReadingProgress from './progress.js?v=3.8.6';
+import ReaderSettings from './settings.js?v=3.8.7';
+import ReaderNavigation from './navigation.js?v=3.8.7';
+import ReadingProgress from './progress.js?v=3.8.7';
 
 class DissertationReader {
   constructor() {
@@ -583,11 +583,15 @@ class DissertationReader {
       const maxWidth = width - 160;
       const lines = this.wrapText(ctx, quoteText, maxWidth);
 
-      let y = 120;
       const lineHeight = 42;
       const maxLines = Math.floor((height - 220) / lineHeight);
+      const visibleLineCount = Math.min(lines.length, maxLines);
+      const quoteTop = 120;
+      const quoteBottom = height - 120;
+      const lineSpan = Math.max(0, visibleLineCount - 1) * lineHeight;
+      let y = quoteTop + (quoteBottom - quoteTop - lineSpan) / 2;
 
-      for (let i = 0; i < Math.min(lines.length, maxLines); i++) {
+      for (let i = 0; i < visibleLineCount; i++) {
         let line = lines[i];
         if (i === maxLines - 1 && lines.length > maxLines) {
           line = line.substring(0, line.length - 3) + '..."';
