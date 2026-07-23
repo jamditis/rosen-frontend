@@ -62,7 +62,7 @@ export const ENTITY_TYPE_CONFIG = {
   Location: { color: '#9a3412', bg: '#fff7ed', label: 'Locations' }
 };
 
-export { ERAS } from '../data/eras.js?v=3.8.4';
+export { ERAS } from '../data/eras.js?v=3.8.5';
 
 export const FEATURED_WORKS = [
   {

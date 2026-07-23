@@ -19,6 +19,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: var(--color-bg);
+  background-image: none;
   min-height: 100vh;
 }
 
@@ -280,6 +281,25 @@ body {
   padding: var(--space-6) var(--content-padding);
 }
 
+.reader-context {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-5);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+}
+
+.reader-context a {
+  color: var(--color-link);
+  font-weight: var(--font-weight-semibold);
+  text-underline-offset: 0.2em;
+}
+
 /* ========================================
    PROGRESS BAR
    ======================================== */
@@ -327,6 +347,17 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
+}
+
+.reader-footer a {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.2em;
+}
+
+.reader-footer a:hover {
+  color: var(--color-link-hover);
 }
 
 /* ========================================

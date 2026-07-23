@@ -17,6 +17,7 @@ const __dirname = path.dirname(__filename);
 const rootDir = path.join(__dirname, '..');
 const frontendDir = path.join(rootDir, 'frontend');
 const faqDir = path.join(rootDir, 'faq');
+const dissertationDir = path.join(rootDir, 'dissertation');
 const deployScriptPath = path.join(rootDir, 'backend', 'scripts', 'deploy_full_site.py');
 
 // Recursively collect every .js file under a directory, skipping build output
@@ -35,7 +36,8 @@ function collectFrontendJsFiles(dir = frontendDir, acc = []) {
 
 // Local-import completeness is enforced for the app and FAQ JavaScript here;
 // the canonical-marker test above this helper covers the broader browser-file
-// surface returned by bump-version.mjs, including standalone features.
+// surface returned by bump-version.mjs, including standalone features and the
+// dissertation pages.
 function collectVersionedJsFiles() {
   return [...collectFrontendJsFiles(frontendDir), ...collectFrontendJsFiles(faqDir)];
 }
@@ -119,6 +121,35 @@ describe('import version consistency', () => {
 
     assert.deepStrictEqual(drift, [],
       `Version markers outside the canonical ${canonical} release: ${drift.join(', ')}`);
+  });
+
+  it('every dissertation HTML local JS reference is versioned and canonical', () => {
+    const canonical = JSON.parse(
+      fs.readFileSync(path.join(rootDir, 'version.json'), 'utf-8'),
+    ).version;
+    const invalid = [];
+    const localJsRef = /(?:src=|from\s+)['"]((?:\.\.?\/)+[^'"?#]+\.js)(\?v=(\d+\.\d+\.\d+))?['"]/g;
+
+    const scan = (dir) => {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const file = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          scan(file);
+          continue;
+        }
+        if (!entry.isFile() || !entry.name.endsWith('.html')) continue;
+        const content = fs.readFileSync(file, 'utf-8');
+        for (const match of content.matchAll(localJsRef)) {
+          if (match[3] !== canonical) {
+            invalid.push(`${path.relative(rootDir, file)} -> ${match[1]}${match[2] || ''}`);
+          }
+        }
+      }
+    };
+
+    scan(dissertationDir);
+    assert.deepStrictEqual(invalid, [],
+      `Dissertation HTML refs missing ?v=${canonical} or using another version: ${invalid.join(', ')}`);
   });
 
   it('all JS files use the same import version string', () => {

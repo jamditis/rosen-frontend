@@ -4,13 +4,26 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Network Effect | Jay Rosen's Dissertation</title>
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
   <link rel="icon" href="../../favicon.ico" />
+  <link rel="canonical" href="https://pressthink.org/j/rosen-archive/dissertation/network-effect/">
   <meta name="description" content="How Jay Rosen's 1986 analysis of the film Network anticipated the dynamics of social media in 2025.">
 
   <!-- Open Graph -->
+  <meta property="og:site_name" content="Jay Rosen's Internet Archive">
   <meta property="og:title" content="The Network Effect: 1976 → 1986 → 2025">
   <meta property="og:description" content="A scholar connects Jay Rosen's dissertation to our social media moment through the lens of a prophetic 1976 film.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pressthink.org/j/rosen-archive/dissertation/network-effect/">
+  <meta property="og:image" content="https://pressthink.org/j/rosen-archive/og-image.png">
+  <meta property="og:image:alt" content="Jay Rosen's Internet Archive">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Network Effect: 1976 → 1986 → 2025">
+  <meta name="twitter:description" content="A scholar connects Jay Rosen's dissertation to our social media moment through a prophetic 1976 film.">
+  <meta name="twitter:image" content="https://pressthink.org/j/rosen-archive/og-image.png">
+  <meta name="twitter:image:alt" content="Jay Rosen's Internet Archive">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,8 +33,11 @@
   <!-- Tailwind CSS -->
   <link rel="stylesheet" href="../../frontend/dist/tailwind.css" />
 
+  <link rel="stylesheet" href="../../frontend/design-system/legacy-token-bridge.css?v=3.8.5" />
+  <link rel="stylesheet" href="../../frontend/design-system/tokens.css?v=3.8.5" />
+  <link rel="stylesheet" href="../../frontend/design-system/recipes.css?v=3.8.5" />
   <!-- Shared Styles -->
-  <link rel="stylesheet" href="../../shared-styles.css" />
+  <link rel="stylesheet" href="../../shared-styles.css?v=3.8.5" />
 
   <style>
     :root {
@@ -510,7 +526,7 @@
 
   <!-- Text Selection Sharing Tool -->
   <script type="module">
-    import { TextSelectionTool } from '../../features/shared/text-selection.js';
+    import { TextSelectionTool } from '../../features/shared/text-selection.js?v=3.8.5';
     const tool = new TextSelectionTool({
       contentSelector: 'main',
       source: 'Jay Rosen, "The Impossible Press" (1986)',
