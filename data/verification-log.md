@@ -6158,3 +6158,75 @@ Final SHA-256 values after export:
 - `data/archive-details.json`: `89f5ab733e77f9638e3f69685ac376544ded686edd4cfb80d11945437143e9ce`
 - `data/archive-entities.json`: `0d11c8ef61ca3c0a141f8a0d0849dad28ecd78e6fbf3c668845f40fa8c9454ce`
 - `data/archive-analytics.json`: `eb74b5ea3d463d61800fa3909de18be8e10065aa4eccb8cbd75abb1d622533ec`
+
+### Record 00614 mismatched TomDispatch removal and Radio Open Source audio provenance
+
+`RECORD-00614` was removed from the public archive source because it linked to
+a 2004 TomDispatch/PressThink Sinclair article while storing an unrecovered
+2017-era Tom Engelhardt interview text about Sinclair, Tribune Media, Ajit
+Pai, Boris Epshteyn, and Jared Kushner. Exact-title and phrase searches did
+not recover a primary source for the stored interview text. The valid linked
+Sinclair source is already covered by verified `RECORD-00013`, so the
+composite row was deleted instead of repointed.
+
+The related Radio Open Source item raised by Joe is already present as
+verified `RECORD-00765`. Its page text is captured in `raw_text`; the direct
+audio download was added to notes as source provenance after Joe provided the
+page screenshot and the live Blubrry MP3 URL.
+
+Evidence:
+
+- `RECORD-00614` linked URL:
+  `https://tomdispatch.com/jay-rosen-on-a-political-empire-made-of-tv-stations/`.
+- Stored `RECORD-00614` text described the 2017 Sinclair-Tribune merger
+  context, including Tribune Media, Ajit Pai, Boris Epshteyn, and Jared
+  Kushner.
+- `RECORD-00013` preserves the verified Sinclair source:
+  `http://archive.pressthink.org/2004/11/16/snclr_vision_p.html`.
+- `RECORD-00765` page:
+  `https://radioopensource.org/jay-rosen-on-our-media-malaise-who-will-tell-the-people/`.
+- `RECORD-00765` direct audio:
+  `https://content.blubrry.com/radioopensource/rosendraft02.mp3`.
+
+Changes applied:
+
+- Removed `RECORD-00614` from `data/archive_records-public.csv`.
+- Removed stale `RECORD-00614` `related_to` references from `RECORD-00268`
+  and `RECORD-00626`.
+- Removed 17 source-only entity rows first mentioned by `RECORD-00614`:
+  `P2350`, `P2351`, `P2352`, `P2353`, `O1413`, `O1414`, `O1415`,
+  `O1416`, `W0759`, `W0760`, `C0778`, `C0779`, `C0780`, `C0781`,
+  `E0270`, `E0271`, and `L0216`.
+- Removed 27 `RECORD-00614_REL_*` relationship rows.
+- Added a regression proving `RECORD-00614` and its graph references are not
+  published while `RECORD-00013` remains verified.
+- Added a regression preserving the `RECORD-00765` direct audio source URL.
+- Regenerated archive JSON and feed artifacts.
+
+Validation:
+
+- `node --test --test-name-pattern "mismatched TomDispatch|TomDispatch Sinclair"
+  tests\csv-quality.test.js`: failed before deletion because `RECORD-00614`
+  was still present, then passed after deletion.
+- `node --test --test-name-pattern "Radio Open Source episode keeps the direct
+  audio source" tests\csv-quality.test.js`: failed before the note update,
+  then passed after the audio URL was recorded.
+- `python backend\scripts\validate_archive_data.py`: no errors; archive records
+  now 1,024, entities 7,370, relationships 11,108.
+- `npm run test:data:extraction-coverage`: passed, 17/17 tests.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected five completion gates still fail: one
+  unverified archive record (`RECORD-00865`), 54 non-Rosen Bluesky profile
+  URLs, 54 non-Rosen Bluesky copyright assignments, 29,693 unverified social
+  rows, and 21 blank entity first mentions.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `974584376137bc92fd28e3d87a3a9797869b1ca73e430981a8c85ec306fff62f`
+- `data/extracted_entities.csv`: `479cf3c84a631b72f866eaaf79b0c481559f777edd55522bbd02eedafc154e7d`
+- `data/extracted_relationships.csv`: `06778ddd0fee4543b256c4793194c1a1fd70c5f89b6a83bee20d4e26849c90a5`
+- `data/archive-data.json`: `f9ee33cdee28ab603bfc77c9e556fc172a08da8b98a95c7fdeef77db1acc9e0c`
+- `data/archive-core.json`: `b9c6cc8552a8e75e970439f2f43e4df957b155a5c79759b10b8c4e1a6b25b179`
+- `data/archive-details.json`: `2a532ccb3deb57aea88925ca186b652b0252f352e739dae074f404cca19cf028`
+- `data/archive-entities.json`: `b4ebd39625b87ea1f81646e41f0355d16bf4156caea076ddbe0bab8c7e8f2a95`
+- `data/archive-analytics.json`: `93d678b1aa7c1cca7a351ff26af442a02ad44637762e07771eca9de9c54b0a99`

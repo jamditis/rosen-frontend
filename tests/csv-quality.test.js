@@ -183,17 +183,58 @@ describe('archive_records-public.csv', () => {
     );
   });
 
-  it('TomDispatch composite record preserves the source publisher while staying unresolved', () => {
-    const record = archiveRecords.find(row => row.id === 'RECORD-00614');
-    assert.ok(record, 'RECORD-00614 is missing');
-    assert.strictEqual(record.url, 'https://tomdispatch.com/jay-rosen-on-a-political-empire-made-of-tv-stations/');
-    assert.strictEqual(record.publisher, 'TomDispatch.com');
-    assert.strictEqual(record.verified, 'FALSE');
-    assert.strictEqual(record.low_confidence, 'TRUE');
-    assert.strictEqual(record.needs_review, 'TRUE');
-    assert.match(record.notes, /Publisher repaired 2026-07-23/);
-    assert.match(record.notes, /17a23743ca1c399fbb878aa623e119d68469b16f2d1390bfb618aa1a5f1b54f1/);
-    assert.match(record.notes, /record remains unverified/i);
+  it('does not publish the mismatched TomDispatch composite record', () => {
+    const sourceRecord = archiveRecords.find(row => row.id === 'RECORD-00013');
+    assert.ok(sourceRecord, 'source-backed Sinclair record RECORD-00013 is missing');
+    assert.strictEqual(sourceRecord.url, 'http://archive.pressthink.org/2004/11/16/snclr_vision_p.html');
+    assert.strictEqual(sourceRecord.verified, 'TRUE');
+    assert.strictEqual(
+      archiveRecords.some(row => row.id === 'RECORD-00614'),
+      false,
+      'RECORD-00614 links a 2004 source while storing unrecovered 2017-era interview text'
+    );
+
+    const staleRelatedRecords = archiveRecords
+      .filter(row => (row.related_to || '')
+        .split(',')
+        .map(value => value.trim())
+        .includes('RECORD-00614'))
+      .map(row => row.id);
+    assert.deepStrictEqual(
+      staleRelatedRecords,
+      [],
+      `archive records still reference deleted RECORD-00614: ${staleRelatedRecords.join(', ')}`
+    );
+
+    const deletedEntityIds = [
+      'P2350',
+      'P2351',
+      'P2352',
+      'P2353',
+      'O1413',
+      'O1414',
+      'O1415',
+      'O1416',
+      'W0759',
+      'W0760',
+      'C0778',
+      'C0779',
+      'C0780',
+      'C0781',
+      'E0270',
+      'E0271',
+      'L0216',
+    ];
+    assert.strictEqual(
+      entities.some(row => row.first_mention_record_id === 'RECORD-00614' || deletedEntityIds.includes(row.entity_id)),
+      false,
+      'stale RECORD-00614 graph entities remain'
+    );
+    assert.strictEqual(
+      relationships.some(row => row.source_record_id === 'RECORD-00614' || deletedEntityIds.includes(row.source_entity_id) || deletedEntityIds.includes(row.target_entity_id)),
+      false,
+      'stale RECORD-00614 graph relationships remain'
+    );
   });
 
   it('HuffPost pilot rows preserve directly observed 2008 source dates', () => {
@@ -208,6 +249,15 @@ describe('archive_records-public.csv', () => {
       assert.ok(record, `${id} is missing`);
       assert.strictEqual(record.publication_date, expectedDate, `${id} uses its capture date instead of its source date`);
     }
+  });
+
+  it('Radio Open Source episode keeps the direct audio source', () => {
+    const record = archiveRecords.find(row => row.id === 'RECORD-00765');
+
+    assert.ok(record, 'RECORD-00765 is missing');
+    assert.strictEqual(record.url, 'https://radioopensource.org/jay-rosen-on-our-media-malaise-who-will-tell-the-people/');
+    assert.strictEqual(record.verified, 'TRUE');
+    assert.match(record.notes, /https:\/\/content\.blubrry\.com\/radioopensource\/rosendraft02\.mp3/);
   });
 
   it('verified newspaper clips have source-backed relevance', () => {
@@ -1799,19 +1849,14 @@ describe('archive_records-public.csv', () => {
     assert.match(alternateTitle.notes, /title tag reads "Tone Poem for the 'Leave It There' Press"/);
   });
 
-  it('RECORD-00614 cannot verify mismatched TomDispatch works', () => {
-    const record = archiveRecords.find(row => row.id === 'RECORD-00614');
-    assert.ok(record, 'RECORD-00614 must exist');
-    const linksToThe2004Article = record.url ===
-      'https://tomdispatch.com/jay-rosen-on-a-political-empire-made-of-tv-stations/';
-    const storesThe2017EraInterview =
-      /Tribune Media|Boris Epshteyn|Ajit Pai/i.test(record.raw_text);
-    const claimsVerified = /^true$/i.test(record.verified);
+  it('TomDispatch Sinclair source remains covered after removing the composite', () => {
+    const record = archiveRecords.find(row => row.id === 'RECORD-00013');
 
-    assert.ok(
-      !(claimsVerified && linksToThe2004Article && storesThe2017EraInterview),
-      'RECORD-00614 is verified while its URL resolves to a 2004 article and its text describes a 2017-era interview'
-    );
+    assert.ok(record, 'RECORD-00013 must exist');
+    assert.strictEqual(record.title, "PressThink: Off the Charts: Sinclair Broadcast Group's Political Vision");
+    assert.strictEqual(record.publication_date, '2004-11-16');
+    assert.match(record.raw_text, /This originally appeared Oct\. 28, 2004 at TomDispatch\.com/);
+    assert.doesNotMatch(record.raw_text, /Tribune Media|Boris Epshteyn|Ajit Pai/i);
   });
 
   it('RECORD-00097 uses the PressThink source publication date', () => {
