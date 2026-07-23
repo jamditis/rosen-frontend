@@ -619,6 +619,56 @@ async function main() {
   console.log(`  - Records after filter: ${afterFilterCount}`);
   console.log(`  - Filtered out: ${beforeFilterCount - afterFilterCount}`);
 
+  // Entity links must target the same post-filter record set the frontend
+  // receives.
+  const servedIds = new Set(allRecords.map(r => r.id));
+  // When the original first mention is not served, prefer the earliest served
+  // relationship for that entity. Clear the field only when no served evidence
+  // remains.
+  const firstServedMentionByEntity = new Map();
+  for (const record of allRecords) {
+    for (const entityId of new Set(record.relatedIds || [])) {
+      const current = firstServedMentionByEntity.get(entityId);
+      const candidateDate = record.date || '\uffff';
+      const currentDate = current?.date || '\uffff';
+      if (
+        !current ||
+        candidateDate < currentDate ||
+        (candidateDate === currentDate && record.id < current.id)
+      ) {
+        firstServedMentionByEntity.set(entityId, record);
+      }
+    }
+  }
+
+  const rewrittenFirstMentions = new Map();
+  let repointedFirstMentions = 0;
+  let clearedFirstMentions = 0;
+  for (const entity of entities) {
+    const firstMentionId = entity.firstMentionRecordId?.trim();
+    if (!firstMentionId || servedIds.has(firstMentionId)) continue;
+
+    const fallback = firstServedMentionByEntity.get(entity.id);
+    entity.firstMentionRecordId = fallback?.id || '';
+    if (fallback) repointedFirstMentions++;
+    else clearedFirstMentions++;
+    rewrittenFirstMentions.set(
+      firstMentionId,
+      (rewrittenFirstMentions.get(firstMentionId) || 0) + 1
+    );
+  }
+  if (rewrittenFirstMentions.size > 0) {
+    const rewrittenCount = [...rewrittenFirstMentions.values()]
+      .reduce((total, count) => total + count, 0);
+    const targets = [...rewrittenFirstMentions.entries()]
+      .map(([id, count]) => `${id} (${count})`)
+      .join(', ');
+    console.warn(
+      `  - Rewrote ${rewrittenCount} entity first mentions to unserved records ` +
+      `(${repointedFirstMentions} repointed, ${clearedFirstMentions} cleared): ${targets}`
+    );
+  }
+
   // Report how many authored excerpts actually landed on a served record so
   // editors can confirm pickup (#309). Computed against the final, post-filter
   // allRecords: an excerpt keyed to a record that is unverified, missing a title
@@ -626,7 +676,6 @@ async function main() {
   // it counts as unmatched and is surfaced as a warning rather than silently
   // reported as applied.
   if (authoredExcerpts.size > 0) {
-    const servedIds = new Set(allRecords.map(r => r.id));
     const unmatched = [...authoredExcerpts.keys()].filter(id => !servedIds.has(id));
     console.log(`  - Authored excerpts applied: ${authoredExcerpts.size - unmatched.length}/${authoredExcerpts.size}`);
     if (unmatched.length > 0) {
@@ -653,7 +702,6 @@ async function main() {
   // search: a record matches if the substring OR the index matches, so nothing
   // that is findable today stops being findable).
   console.log('\n💾 Building search index...');
-  const servedIds = new Set(allRecords.map(r => r.id));
   const searchIndexRows = archiveRecordsData.filter(r => servedIds.has(r.id));
   const { json: searchIndexJson, count: searchIndexCount } = buildSearchIndex(searchIndexRows);
   const searchIndexPath = path.join(__dirname, 'search-index.json');

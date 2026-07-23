@@ -31,7 +31,7 @@ RELATIONSHIPS_CSV = DATA_DIR / "extracted_relationships.csv"
 # Expected ID prefixes
 VALID_ID_PREFIXES = {
     'RECORD', 'PRESSTH', 'NYT', 'WSJ', 'WP', 'LAT', 'CJR', 'WAPO',
-    'TWTR', 'BSKY', 'TUMBLR', 'CLIP', 'VIDEO', 'AUDIO', 'PDF'
+    'TWTR', 'BSKY', 'TUMBLR', 'THREAD', 'CLIP', 'VIDEO', 'AUDIO', 'PDF'
 }
 
 # Required fields for each record type
@@ -265,7 +265,6 @@ def validate_entity_coverage(report):
 
     # Load archive records
     archive, _ = load_csv(ARCHIVE_CSV)
-    social, _ = load_csv(SOCIAL_CSV)
     relationships, _ = load_csv(RELATIONSHIPS_CSV)
 
     if not relationships:
@@ -279,11 +278,12 @@ def validate_entity_coverage(report):
         if rid:
             covered_records.add(rid)
 
-    total_records = (len(archive) if archive else 0) + (len(social) if social else 0)
-    coverage = len(covered_records)
+    archive_ids = {record.get('id', '') for record in archive or []}
+    total_records = len(archive) if archive else 0
+    coverage = len(covered_records & archive_ids)
     pct = 100 * coverage / total_records if total_records else 0
 
-    report.add_stat("Records with entities", f"{coverage}/{total_records} ({pct:.1f}%)")
+    report.add_stat("Archive records with entities", f"{coverage}/{total_records} ({pct:.1f}%)")
 
     if pct < 50:
         report.add_warning("Coverage", f"Only {pct:.1f}% of records have entity extraction")
