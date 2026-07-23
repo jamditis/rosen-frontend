@@ -808,6 +808,189 @@ describe('extraction coverage (#207)', () => {
     }
   });
 
+  it('maps Tumblr extraction batch six to existing entities with source excerpts', () => {
+    const expected = new Map([
+      ['TUMBLR-00052', [
+        {
+          relationshipId: 'TUMBLR-00052_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0656',
+          contextSnippet: 'Lisa Williams',
+        },
+        {
+          relationshipId: 'TUMBLR-00052_REL_002',
+          sourceEntityId: 'P0656',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O1751',
+          contextSnippet: 'founder and CEO of\nPlaceblogger.com',
+        },
+        {
+          relationshipId: 'TUMBLR-00052_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0259',
+          contextSnippet: 'MIT Media Lab’s Center for Future Civic Media',
+        },
+        {
+          relationshipId: 'TUMBLR-00052_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0075',
+          contextSnippet: 'Twitter',
+        },
+      ]],
+      ['TUMBLR-00057', [
+        {
+          relationshipId: 'TUMBLR-00057_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0049',
+          contextSnippet: 'NYU is offering what could be a model for next-gen J-school, its Studio 20 concentration',
+        },
+        {
+          relationshipId: 'TUMBLR-00057_REL_002',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'The classes are led by\nProf. Jay Rosen',
+        },
+        {
+          relationshipId: 'TUMBLR-00057_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0015',
+          contextSnippet: 'old employment path in the news business has been disrupted',
+        },
+      ]],
+      ['TUMBLR-00058', [
+        {
+          relationshipId: 'TUMBLR-00058_REL_001',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20\nProfessor Jay Rosen',
+        },
+        {
+          relationshipId: 'TUMBLR-00058_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0644',
+          contextSnippet: 'social media age',
+        },
+        {
+          relationshipId: 'TUMBLR-00058_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0290',
+          contextSnippet: 'Dave Winer',
+        },
+        {
+          relationshipId: 'TUMBLR-00058_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0310',
+          contextSnippet: 'Clay Shirky',
+        },
+        {
+          relationshipId: 'TUMBLR-00058_REL_005',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0010',
+          contextSnippet: 'Jeff Jarvis',
+        },
+        {
+          relationshipId: 'TUMBLR-00058_REL_006',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0128',
+          contextSnippet: 'Dan Gillmor',
+        },
+        {
+          relationshipId: 'TUMBLR-00058_REL_007',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'C0004',
+          contextSnippet: 'View from Nowhere',
+        },
+      ]],
+      ['TUMBLR-00059', [
+        {
+          relationshipId: 'TUMBLR-00059_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0474',
+          contextSnippet: 'Australian Broadcasting Corporation’s web site',
+        },
+        {
+          relationshipId: 'TUMBLR-00059_REL_002',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20 Professor Jay Rosen’s keynote presentation',
+        },
+        {
+          relationshipId: 'TUMBLR-00059_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0075',
+          contextSnippet: 'blogging and Twitter',
+        },
+        {
+          relationshipId: 'TUMBLR-00059_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0192',
+          contextSnippet: 'Targeted ads like those served to Google users',
+        },
+        {
+          relationshipId: 'TUMBLR-00059_REL_005',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0218',
+          contextSnippet: 'Apple',
+        },
+      ]],
+      ['TUMBLR-00061', [
+        {
+          relationshipId: 'TUMBLR-00061_REL_001',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20\nProfessor Jason Samuels',
+        },
+        {
+          relationshipId: 'TUMBLR-00061_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'C0015',
+          contextSnippet: 'Journalism',
+        },
+      ]],
+    ]);
+    const recordsById = new Map(records.map(record => [record.id, record]));
+    const relationshipsById = new Map(relationships.map(relationship => [relationship.relationship_id, relationship]));
+
+    for (const [recordId, recordRelationships] of expected) {
+      const record = recordsById.get(recordId);
+      assert.ok(record, `${recordId} is missing`);
+
+      for (const expectedRelationship of recordRelationships) {
+        const relationship = relationshipsById.get(expectedRelationship.relationshipId);
+        assert.ok(relationship, `${expectedRelationship.relationshipId} is missing`);
+        assert.strictEqual(relationship.source_record_id, recordId);
+        assert.strictEqual(relationship.source_entity_id, expectedRelationship.sourceEntityId);
+        assert.strictEqual(relationship.relationship_type, expectedRelationship.relationshipType);
+        assert.strictEqual(relationship.target_entity_id, expectedRelationship.targetEntityId);
+        assert.strictEqual(relationship.context_snippet, expectedRelationship.contextSnippet);
+        assert.ok(
+          record.raw_text.includes(relationship.context_snippet),
+          `${relationship.relationship_id} has a context excerpt outside ${recordId}`
+        );
+      }
+    }
+  });
+
   it('maps every imported Bluesky thread to existing entities with source excerpts', () => {
     const threadIds = Array.from(
       { length: 10 },
