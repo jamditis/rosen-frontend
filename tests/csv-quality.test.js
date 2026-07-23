@@ -138,6 +138,32 @@ describe('archive_records-public.csv', () => {
     );
   });
 
+  it('does not publish the corrupted News Creator Corps duplicate as an archive record', () => {
+    assert.ok(
+      socialPosts.some(row => row.id === 'BSKY-00119'),
+      'canonical Bluesky announcement BSKY-00119 is missing'
+    );
+    assert.ok(
+      socialPosts.some(row => row.id === 'BSKY-00086'),
+      'canonical Bluesky follow-up BSKY-00086 is missing'
+    );
+    assert.strictEqual(
+      archiveRecords.some(row => row.id === 'RECORD-00602'),
+      false,
+      'RECORD-00602 is a contradicted duplicate of canonical social rows'
+    );
+    assert.strictEqual(
+      entities.some(row => row.first_mention_record_id === 'RECORD-00602' || ['C0643', 'O1231'].includes(row.entity_id)),
+      false,
+      'stale RECORD-00602 graph entities remain'
+    );
+    assert.strictEqual(
+      relationships.some(row => row.source_record_id === 'RECORD-00602' || ['C0643', 'O1231'].includes(row.source_entity_id) || ['C0643', 'O1231'].includes(row.target_entity_id)),
+      false,
+      'stale RECORD-00602 graph relationships remain'
+    );
+  });
+
   it('TomDispatch composite record preserves the source publisher while staying unresolved', () => {
     const record = archiveRecords.find(row => row.id === 'RECORD-00614');
     assert.ok(record, 'RECORD-00614 is missing');

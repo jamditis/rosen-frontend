@@ -5960,3 +5960,77 @@ Final SHA-256 values after export:
 - `data/archive-details.json`: `9b132b6b9f8fd104eeed4c87ae4b009dc279d904d5bf39b83f1d449f535fc626`
 - `data/archive-entities.json`: `a42f7c7a12ef0ceb8508bbf564585841bbee80affd4ce34fa415cab03daa55fa`
 - `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`
+
+### Record 00602 corrupted duplicate removal
+
+`RECORD-00602` was removed from the public archive source after the available
+primary evidence showed it was a contradicted duplicate of canonical social
+rows, not a recoverable June 2025 archive record. The archive row claimed a
+2025-06-13 Twitter/X announcement, but the matching News Creator Corps
+announcement is already represented in `social_posts.csv` as `BSKY-00119` and
+`BSKY-00086`, with matching X imports also present. The row's stored `raw_text`
+was from a different newsroom-culture tweet and could not support the title,
+date, summary, or graph artifacts.
+
+Decision review:
+
+- Grok CLI did not return within the read-only review timeout.
+- Qwen CLI was installed but returned a `401` API-key error in this shell.
+- Kimi CLI recommended deletion because no source supports the combined
+  title/date/source/text claim and the announcement survives in canonical social
+  rows.
+
+Evidence:
+
+- Primary Bluesky URI recorded in prior audit:
+  `at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3m2oukjxiic2i`
+  with creation time `2025-10-08T14:37:50.06Z`.
+- Follow-up Bluesky URI recorded in prior audit:
+  `at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3m2wso76r7k2i`
+  with creation time `2025-10-11T18:25:23.395Z`.
+- Native X status found by exact-title web search:
+  `https://x.com/jayrosen_nyu/status/1975933807455875187`; its snowflake
+  timestamp decodes to `2025-10-08T14:38:25.429Z`, not the stored
+  `2025-06-13`.
+- News Creator Corps source article:
+  `https://newscreatorcorps.org/2025/10/news-consumers-content-creators/`,
+  dated `2025-10-08`.
+
+Changes applied:
+
+- Removed `RECORD-00602` from `data/archive_records-public.csv`.
+- Removed stale entities `C0643` (`Newsroom culture`) and `O1231` (`Media
+  executive`) from `data/extracted_entities.csv`.
+- Removed stale relationship `RECORD-00602_REL_001` from
+  `data/extracted_relationships.csv`.
+- Added a regression proving the corrupted archive duplicate and its graph
+  artifacts are absent while canonical social rows remain present.
+
+Validation:
+
+- `node --test --test-name-pattern "corrupted News Creator Corps"
+  tests\csv-quality.test.js`: failed before the deletion because
+  `RECORD-00602` was still present, then passed after the deletion.
+- `python backend\scripts\validate_archive_data.py`: no errors; archive records
+  now 1,027, entities 7,387, relationships 11,135.
+- `npm run test:data:extraction-coverage`: passed, 17/17 tests.
+- `node data\export-archive-data.js`: passed.
+- `git -c core.whitespace=trailing-space,cr-at-eol diff --check`: passed with
+  line-ending warnings only.
+- `npm run test:data`: expected six completion gates still fail: one core blank
+  (`RECORD-00613:url`), four unverified archive records (`RECORD-00613`,
+  `RECORD-00614`, `CLIP-00023`, `RECORD-00865`), 54 non-Rosen Bluesky profile
+  URLs, 54 non-Rosen Bluesky copyright assignments, 29,693 unverified social
+  rows, and 21 blank entity first mentions.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5e17660d90eb53565cdc90ed2849a5bd109f5df806054f1f71d6a1ef84f57255`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `c5f1cc80d11a7826cf95ede8b312a1600c22b301e769a03322dd1df8da5ac672`
+- `data/extracted_relationships.csv`: `0937f5db5231a368b064650282ccb54bd891f617a0a7911d18e4e0c4c0a1f6b1`
+- `data/archive-data.json`: `5c6414d9741a8f6489a2be55324d9fd5aa082b7f487aaac58cfcf55ec94fefea`
+- `data/archive-core.json`: `f477e9ca278254a97a5911829a849a62bbdc5e7986ee07f1fc842e77ff3597aa`
+- `data/archive-details.json`: `777d9ae2a7dcba9548db16ebf67c99bb96e4c8901d9c063bd0fea8a7ab06e8c6`
+- `data/archive-entities.json`: `bfd6d6ff6219578a9889c42614637951a99e712a6421da1ab2d2ba67364dd133`
+- `data/archive-analytics.json`: `adf2fe0d9aaf5cd544659616c3f6f60ceaa0a24afef49e1c9a583f69d8a83e38`
