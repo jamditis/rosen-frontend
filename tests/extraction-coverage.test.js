@@ -315,6 +315,126 @@ describe('extraction coverage (#207)', () => {
     }
   });
 
+  it('maps Tumblr extraction batch three to existing entities with source excerpts', () => {
+    const expected = new Map([
+      ['TUMBLR-00022', [
+        {
+          relationshipId: 'TUMBLR-00022_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0148',
+          contextSnippet: 'These final projects are the both the capstone project for students enrolled in the NYU Arthur L. Carter School of Journalism',
+        },
+        {
+          relationshipId: 'TUMBLR-00022_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O1039',
+          contextSnippet: 'partnered with Forbes to explore how to make online video a better return on investment.',
+        },
+        {
+          relationshipId: 'TUMBLR-00022_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0034',
+          contextSnippet: 'helped manage and produce social gaming content for the Huffington Post.',
+        },
+        {
+          relationshipId: 'TUMBLR-00022_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0015',
+          contextSnippet: 'drew inspiration from many innovative social feeds on Twitter as well as CNN’s In America documentary unit',
+        },
+      ]],
+      ['TUMBLR-00023', [
+        {
+          relationshipId: 'TUMBLR-00023_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0178',
+          contextSnippet: 'that they will collaborate in the development of a “citizens agenda” approach to election coverage during the 2012 campaign for president.',
+        },
+        {
+          relationshipId: 'TUMBLR-00023_REL_002',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0184',
+          contextSnippet: 'Jay Rosen and Amanda Michel, The Guardian’s Open Editor, explained it this way in a',
+        },
+        {
+          relationshipId: 'TUMBLR-00023_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0042',
+          contextSnippet: 'The alternative to “who’s going to win in the game of getting elected?” is, we think, a “citizens agenda” approach to campaign coverage.',
+        },
+      ]],
+      ['TUMBLR-00025', [
+        {
+          relationshipId: 'TUMBLR-00025_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0214',
+          contextSnippet: 'New York Daily News',
+        },
+      ]],
+      ['TUMBLR-00027', [
+        {
+          relationshipId: 'TUMBLR-00027_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O1748',
+          contextSnippet: 'Seed.com',
+        },
+        {
+          relationshipId: 'TUMBLR-00027_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0002',
+          contextSnippet: 'New York Times',
+        },
+      ]],
+      ['TUMBLR-00028', [
+        {
+          relationshipId: 'TUMBLR-00028_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0115',
+          contextSnippet: 'From ProPublica to the New York Times, you may see Studio 20 alums popping up all over the news world.',
+        },
+        {
+          relationshipId: 'TUMBLR-00028_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0002',
+          contextSnippet: 'From ProPublica to the New York Times, you may see Studio 20 alums popping up all over the news world.',
+        },
+      ]],
+    ]);
+    const recordsById = new Map(records.map(record => [record.id, record]));
+    const relationshipsById = new Map(relationships.map(relationship => [relationship.relationship_id, relationship]));
+
+    for (const [recordId, recordRelationships] of expected) {
+      const record = recordsById.get(recordId);
+      assert.ok(record, `${recordId} is missing`);
+
+      for (const expectedRelationship of recordRelationships) {
+        const relationship = relationshipsById.get(expectedRelationship.relationshipId);
+        assert.ok(relationship, `${expectedRelationship.relationshipId} is missing`);
+        assert.strictEqual(relationship.source_record_id, recordId);
+        assert.strictEqual(relationship.source_entity_id, expectedRelationship.sourceEntityId);
+        assert.strictEqual(relationship.relationship_type, expectedRelationship.relationshipType);
+        assert.strictEqual(relationship.target_entity_id, expectedRelationship.targetEntityId);
+        assert.strictEqual(relationship.context_snippet, expectedRelationship.contextSnippet);
+        assert.ok(
+          record.raw_text.includes(relationship.context_snippet),
+          `${relationship.relationship_id} has a context excerpt outside ${recordId}`
+        );
+      }
+    }
+  });
+
   it('maps every imported Bluesky thread to existing entities with source excerpts', () => {
     const threadIds = Array.from(
       { length: 10 },
