@@ -2,8 +2,8 @@
 <opml version="2.0">
   <head>
     <title>Jay Rosen&apos;s Internet Archive</title>
-    <dateCreated>Thu, 23 Jul 2026 19:01:53 GMT</dateCreated>
-    <dateModified>Thu, 23 Jul 2026 19:01:53 GMT</dateModified>
+    <dateCreated>Thu, 23 Jul 2026 19:09:53 GMT</dateCreated>
+    <dateModified>Thu, 23 Jul 2026 19:09:53 GMT</dateModified>
     <ownerName>Joe Amditis</ownerName>
     <docs>http://opml.org/spec2.opml</docs>
   </head>
@@ -296,6 +296,7 @@
         <outline text="Newspapers shouldn&apos;t apologize for telling the truth about Donald Trump" type="link" url="https://www.theguardian.com/commentisfree/2016/nov/01/newspapers-should-tell-truth-about-donald-trump-jay-rosen" created="2016-11-01"/>
         <outline text="Jay Rosen, Public Radio&apos;s Loyal Critic" type="link" url="https://soundcloud.com/currentpubmedia/jay-rosen-public-radios-loyal-critic" created="2016-04-22"/>
         <outline text="Too Much Of Podcasting Is In New York" type="link" url="https://soundcloud.com/currentpubmedia/too-much-of-podcasting-is-in-new-york" created="2016-04-22"/>
+        <outline text="#NN08 Sketchbook. Gina Cooper, boss of Netroots Nation, isn&apos;t smooth in questioning Pelosi, but behind her the power of millions." type="link" url="https://www.huffpost.com/entry/nn08-sketchbook-gina-coop_b_113780" created="2008-07-19"/>
       </outline>
       <outline text="Democracy in Crisis (20s)" type="category">
         <outline text="For Jay Rosen, American Press Needs to Become More Pro-Democracy" type="link" url="https://jpinyu.com/2026/02/16/jay-rosen-american-press-become-more-pro-democracy/" created="2026-02-16"/>
@@ -395,7 +396,7 @@ Bari Weiss had no experience when she was hired a..." type="link" url="https://b
       </outline>
     </outline>
     <outline text="By Category">
-      <outline text="Press &amp; Media Criticism (23543)" type="category">
+      <outline text="Press &amp; Media Criticism (23547)" type="category">
         <outline text="It was a political hire, cont..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohf75js3k2j"/>
         <outline text="it&apos;s not a typo, it&apos;s supposed to be an abbreviated form of continued." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohfytcl5s22"/>
         <outline text="Kara Swisher: “I don’t want to work for the Ellisons, and I don’t want..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3moikloq4r22g"/>
@@ -511,7 +512,7 @@ Bari Weiss had no experience when she was hired a..." type="link" url="https://b
         <outline text="Thanks, Zack" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2wzdqghik2c"/>
         <outline text="Thanks, Lora" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3m2wyfzxrxk2c"/>
       </outline>
-      <outline text="Technology &amp; Digital Media (2889)" type="category">
+      <outline text="Technology &amp; Digital Media (2890)" type="category">
         <outline text="It was a political hire, cont..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mohf75js3k2j"/>
         <outline text="One thing to keep your eye on as Paramount takes control:  what happen..." type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3modgj3bfys2l"/>
         <outline text="How does the app know that a news article maybe need a correction?" type="link" url="https://bsky.app/profile/jayrosen.bsky.social/post/3mo53zqc3qk2j"/>

@@ -4548,3 +4548,99 @@ Final SHA-256 values after export:
 - `data/archive-details.json`: `aecd75ba74bb097c9119a37a8f6cd81d40211f5adaca21f9d51dd34a9b3fcd32`
 - `data/archive-entities.json`: `9274f1af7e8aac5561bf904c3ff927d206ffd81420c8bcac124a9411b5de914b`
 - `data/archive-analytics.json`: `42c68dc5788c38afea64e9a06c986693dc59adbcc0d9876ad4878398ac72c32c`
+
+### HuffPost verification pilot 13 applied
+
+`RECORD-00864` through `RECORD-00868` were audited with saved Wayback evidence
+under `%TEMP%/rosen-k2-huffpost-pilot-13/wayback-evidence`. Four rows were
+verified. `RECORD-00865` remains unresolved because available captures did not
+provide both trustworthy 2008 posted-date evidence and article body text.
+
+Kimi reviewed the boundary decision in read-only mode. It agreed that verifying
+four rows and leaving `RECORD-00865` unresolved was defensible, with conditions:
+document `RECORD-00868` as metadata-derived, preserve its source URL and capture
+hash, and add an explicit failure note to `RECORD-00865`. Those conditions were
+applied.
+
+Changes applied:
+
+- `RECORD-00864`: body-backed excerpt repaired from the archived capture;
+  summary added; `verified=TRUE`; `needs_review=FALSE`;
+  `low_confidence=FALSE`; notes now cite Wayback capture SHA-256
+  `4bbb6c7857b7c1877cf14ef3b2207883ff7acd381a70f7c503248138b6f3d1d4`.
+- `RECORD-00865`: left `verified=FALSE`; set `needs_review=TRUE` and
+  `low_confidence=TRUE`; notes now record that the 2011 iframe replay returned
+  an empty body and the 2016 replay lacked a trustworthy 2008 posted date.
+- `RECORD-00866`: publication date corrected from `2013-11-09` to
+  `2008-07-19`; body-backed excerpt repaired from the archived capture; summary
+  added; `verified=TRUE`; `needs_review=FALSE`; `low_confidence=FALSE`; notes
+  now cite Wayback capture SHA-256
+  `0199cd5b7624d4595240146b9393425074553d587998dcb812d48a40bdb98266`.
+- `RECORD-00867`: publication date corrected from `2013-11-06` to
+  `2008-07-19`; body-backed excerpt repaired from the archived capture; summary
+  added; `verified=TRUE`; `needs_review=FALSE`; `low_confidence=FALSE`; notes
+  now cite Wayback capture SHA-256
+  `63b72c598a5a66c39c79418c36c8b1d0d6d375f4437847becc99042a7addd6f0`.
+- `RECORD-00868`: publication date corrected from `2016-02-12` to
+  `2008-07-19`; toolbar-only raw text replaced with a metadata-derived short
+  record from the capture headline and `article:published_time`; word count
+  corrected to 26; body-backed excerpt repaired; summary added;
+  `verified=TRUE`; `needs_review=FALSE`; `low_confidence=FALSE`; notes now cite
+  Wayback capture SHA-256
+  `11d7cfd6b97630102b1e96697abd182a3cc4385ad19418bd40a54d0971acc84e` and state
+  that no fuller article body was recovered.
+
+The focused regression
+`node --test --test-name-pattern "HuffPost pilot thirteen" tests\csv-quality.test.js`
+failed before the CSV edit because `RECORD-00864` still had the stale
+metadata-style excerpt, then passed after the patch. Raw-text SHA-256 values:
+
+- `RECORD-00864`: `5b15812a9d7e4014be9cc23396819e00188fe8692df092314ecd7035db665353`
+- `RECORD-00866`: `e07da9599f4e1f4ae586ed9bb6fb5c939aa435c087763988cd33338244561175`
+- `RECORD-00867`: `e2736a5a5586be748a1d526d3fdf6e44d7cee06ccdfc52ad8fd76494e1b265e8`
+- `RECORD-00868`: `950029bd6d26935db2210780e9ee4b210fbb55519a8a86403555e210032c1093`
+
+Post-application row counts:
+
+- Archive rows: 1,028.
+- Blank archive summaries: 11, down from 15.
+- Archive rows not explicitly verified: 15, down from 19.
+- `#NN08` rows with capture-year dates: 3, down from 6.
+- Generated records after export: 26,681.
+- Entities: 7,389.
+- Relationships: 10,804.
+
+Validation:
+
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 78 records with raw text but no extracted relationships.
+- `npm run test:data`: expected eight completion gates still fail: three core
+  blanks, 11 blank summaries, 15 unverified archive records, three `#NN08`
+  capture-year dates, 54 non-Rosen Bluesky profile URLs, 54 non-Rosen Bluesky
+  copyright assignments, 29,693 unverified social rows, and 50 blank entity
+  first mentions. The pilot-thirteen regression passes.
+
+Packet artifact SHA-256 values:
+
+- `kimi-decision-review.txt`: `6b571cde973d83f0acfd35b80f6fbf936d50946787a62717fecf5649e9fcaeec`
+- `wayback-evidence/external-calls.ndjson`: `bca8d8f640429b9a26cb3e322854592ba48dd09b738d35608976427715a3b072`
+- `wayback-evidence/RECORD-00864_wayback_capture.html`: `4bbb6c7857b7c1877cf14ef3b2207883ff7acd381a70f7c503248138b6f3d1d4`
+- `wayback-evidence/RECORD-00865_wayback_capture.html`: `e734395ec9db51a5b4b5a46fbddc3c67b793924135acda021358ff8c8a992940`
+- `wayback-evidence/RECORD-00865_wayback_iframe.html`: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`
+- `wayback-evidence/RECORD-00865_wayback_2016_iframe.html`: `dc1dfb7be312e866b5699ec61df0c3e82591f9bcf0a01c87da2001901b98276e`
+- `wayback-evidence/RECORD-00866_wayback_capture.html`: `0199cd5b7624d4595240146b9393425074553d587998dcb812d48a40bdb98266`
+- `wayback-evidence/RECORD-00867_wayback_capture.html`: `63b72c598a5a66c39c79418c36c8b1d0d6d375f4437847becc99042a7addd6f0`
+- `wayback-evidence/RECORD-00868_wayback_capture.html`: `11d7cfd6b97630102b1e96697abd182a3cc4385ad19418bd40a54d0971acc84e`
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `d24d54a5c4150b3127290fbb1f4933dee48e0811ac7ecabf1a46745b5cf22c73`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `181b5acf3d3d3dd0f5f123885e542f8ff56ad7d9fd736f1eae281818918f4c72`
+- `data/archive-data.json`: `101cd9206decec9cb33c5b91a9db0c3a57a6895a46a31f1356e2453d42d1ca5c`
+- `data/archive-core.json`: `421f51b4f441b855edcf97516e4d034e82e4d8566d9a178d52bacfddeb97ce1b`
+- `data/archive-details.json`: `1d88f557b1134b21a8c7abdc738f75a8dd24da0f0a433c29ddb0a13e7b70a1db`
+- `data/archive-entities.json`: `a9865c5d7df586e3902a678c2f8b421d4fd1c584f74bbbadadafb7fee72669f0`
+- `data/archive-analytics.json`: `430c2960209d2259c0b99e02bf183d82be16d7ee13999abdfe0e2a8607dd0775`

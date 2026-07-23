@@ -1472,6 +1472,86 @@ describe('archive_records-public.csv', () => {
     }
   });
 
+  it('HuffPost pilot thirteen records match available Wayback evidence', () => {
+    const expected = new Map([
+      ['RECORD-00864', {
+        title: '#NN08 Sketchbook. Trippi\'s poem: "I came up top down."',
+        url: 'https://www.huffpost.com/entry/nn08-sketchbook-trippis-p_b_113760',
+        publicationDate: '2008-07-19',
+        wordCount: '71',
+        rawTextSha: '5b15812a9d7e4014be9cc23396819e00188fe8692df092314ecd7035db665353',
+        excerpt: '# \\#NN08 Sketchbook. Trippi\'s poem: "I came up top down."',
+        pullQuote: '',
+        summary: 'A short #NN08 sketchbook post quotes Joe Trippi\'s poem: "I came up top down."',
+        sourceSha: '4bbb6c7857b7c1877cf14ef3b2207883ff7acd381a70f7c503248138b6f3d1d4',
+      }],
+      ['RECORD-00866', {
+        title: '#NN08 Sketchbook: Politicians think "Netroots Nation" equals "youth," because kids get the Net. But glance at the crowd and: Fail.',
+        url: 'https://www.huffpost.com/entry/nn08-sketchbook-politicia_b_113765',
+        publicationDate: '2008-07-19',
+        wordCount: '140',
+        rawTextSha: 'e07da9599f4e1f4ae586ed9bb6fb5c939aa435c087763988cd33338244561175',
+        excerpt: '# \\#NN08 Sketchbook: Politicians think "Netroots Nation" equals "youth," because kids get the Net. But glance at the crowd and: Fail.',
+        pullQuote: '',
+        summary: 'A short #NN08 sketchbook post says politicians wrongly equate Netroots Nation with youth because the crowd shows the movement is not just young people.',
+        sourceSha: '0199cd5b7624d4595240146b9393425074553d587998dcb812d48a40bdb98266',
+      }],
+      ['RECORD-00867', {
+        title: '#NN08 Sketchbook. Matt Yglesias: In policy debate you can\'t say, "I know, let\'s spend a $170 billion a year on it." But in Iraq...',
+        url: 'https://www.huffpost.com/entry/nn08-sketchbook-matt-ygle_b_113772',
+        publicationDate: '2008-07-19',
+        wordCount: '86',
+        rawTextSha: 'e2736a5a5586be748a1d526d3fdf6e44d7cee06ccdfc52ad8fd76494e1b265e8',
+        excerpt: '# \\#NN08 Sketchbook. Matt Yglesias: In policy debate you can\'t say, "I know, let\'s spend a $170 billion a year on it." But in Iraq...',
+        pullQuote: 'Matt Yglesias: In policy debate you can\'t say, "I know, let\'s spend a $170 billion a year on it." But in Iraq...',
+        summary: 'A short #NN08 sketchbook post quotes Matt Yglesias contrasting normal policy spending constraints with the scale of Iraq war spending.',
+        sourceSha: '63b72c598a5a66c39c79418c36c8b1d0d6d375f4437847becc99042a7addd6f0',
+      }],
+      ['RECORD-00868', {
+        title: '#NN08 Sketchbook. Gina Cooper, boss of Netroots Nation, isn\'t smooth in questioning Pelosi, but behind her the power of millions.',
+        url: 'https://www.huffpost.com/entry/nn08-sketchbook-gina-coop_b_113780',
+        publicationDate: '2008-07-19',
+        wordCount: '26',
+        rawTextSha: '950029bd6d26935db2210780e9ee4b210fbb55519a8a86403555e210032c1093',
+        excerpt: '# \\#NN08 Sketchbook. Gina Cooper, boss of Netroots Nation, isn\'t smooth in questioning Pelosi, but behind her the power of millions.',
+        pullQuote: '',
+        summary: "A short #NN08 sketchbook post notes Gina Cooper's unsmooth questioning of Nancy Pelosi while emphasizing the grassroots power behind her.",
+        sourceSha: '11d7cfd6b97630102b1e96697abd182a3cc4385ad19418bd40a54d0971acc84e',
+      }],
+    ]);
+
+    for (const [id, source] of expected) {
+      const record = archiveRecords.find(row => row.id === id);
+      assert.ok(record, `${id} must exist`);
+      assert.strictEqual(record.title, source.title);
+      assert.strictEqual(record.url, source.url);
+      assert.strictEqual(record.author, 'Jay Rosen');
+      assert.strictEqual(record.publication_date, source.publicationDate);
+      assert.strictEqual(record.word_count, source.wordCount);
+      assert.strictEqual(
+        crypto.createHash('sha256').update(record.raw_text).digest('hex'),
+        source.rawTextSha,
+        `${id} raw_text changed unexpectedly`
+      );
+      assert.strictEqual(record.excerpt, source.excerpt);
+      assert.strictEqual(record.pull_quote, source.pullQuote);
+      assert.strictEqual(record.summary, source.summary);
+      assert.strictEqual(record.verified, 'TRUE');
+      assert.strictEqual(record.needs_review, 'FALSE');
+      assert.match(record.notes, /Wayback archived HuffPost source verified 2026-07-23/);
+      assert.match(record.notes, new RegExp(source.sourceSha));
+    }
+
+    const unresolved = archiveRecords.find(row => row.id === 'RECORD-00865');
+    assert.ok(unresolved, 'RECORD-00865 must exist');
+    assert.strictEqual(unresolved.verified, 'FALSE');
+    assert.strictEqual(unresolved.needs_review, 'TRUE');
+    assert.strictEqual(unresolved.low_confidence, 'TRUE');
+    assert.match(unresolved.notes, /Pilot 13 unresolved/);
+    assert.match(unresolved.notes, /2011 iframe replay returned an empty body/);
+    assert.match(unresolved.notes, /2016 replay lacked a trustworthy 2008 posted date/);
+  });
+
   it('RECORD-00614 cannot verify mismatched TomDispatch works', () => {
     const record = archiveRecords.find(row => row.id === 'RECORD-00614');
     assert.ok(record, 'RECORD-00614 must exist');
