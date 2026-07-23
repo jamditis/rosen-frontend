@@ -4644,3 +4644,99 @@ Final SHA-256 values after export:
 - `data/archive-details.json`: `1d88f557b1134b21a8c7abdc738f75a8dd24da0f0a433c29ddb0a13e7b70a1db`
 - `data/archive-entities.json`: `a9865c5d7df586e3902a678c2f8b421d4fd1c584f74bbbadadafb7fee72669f0`
 - `data/archive-analytics.json`: `430c2960209d2259c0b99e02bf183d82be16d7ee13999abdfe0e2a8607dd0775`
+
+### HuffPost verification pilot 14 applied
+
+Pilot fourteen covered `RECORD-00869` through `RECORD-00873`. The packet lives
+at `%TEMP%\rosen-huffpost-pilot-14`. The primary agent fetched the sources;
+Kimi reviewed the captured evidence and proposed updates without web access.
+Kimi rejected the first draft summaries for `RECORD-00869`, `RECORD-00871`, and
+`RECORD-00872`; the final patch restored "draft off," qualified the Pelosi
+event wording, and tied the ABC News/Iraq point to the stored article body.
+Grok headless review was attempted twice with web search disabled, but the CLI
+hit its turn cap before returning a verdict.
+
+Source results:
+
+- `RECORD-00869`: modern HuffPost returned 406 with an empty body. The
+  normalized Wayback raw replay returned 200; its title and `Posted:
+  07/19/08 01:22 PM ET` metadata support the row. Publication date was
+  corrected from `2013-11-06` to `2008-07-19`; excerpt, summary, verification
+  flags, and notes were updated. Source SHA-256:
+  `2b51ef5dcf9349d3d2070c431b4525b1110d0356f3af8e33e2a9fa18d90e6345`.
+- `RECORD-00870`: modern HuffPost returned 404 with an empty body. The
+  normalized Wayback raw replay returned 200; its title and `Posted:
+  07/19/08 09:35 PM ET` metadata support the row. The title spacing,
+  publication date, excerpt, summary, verification flags, and notes were
+  updated. Source SHA-256:
+  `4fa21e3f81b9b2ac8df16fd77927177ac1d78669dfa035ee2731d19239eeb3f4`.
+- `RECORD-00871`: modern HuffPost returned 404 with an empty body. The
+  normalized Wayback raw replay returned 200; its `publish_date` meta tag and
+  author attribution support `2008-07-19`. The title, summary, verification
+  flags, and notes were updated. Source SHA-256:
+  `367e2163721d861b0b10ed052c4a1879c0b1a5eeb67816e937d5ef6e65519e26`.
+- `RECORD-00872`: modern HuffPost returned 200 with author, title, and
+  `2008-08-11` published metadata. Summary, verification flags, and notes were
+  updated. Source SHA-256:
+  `b1ed6da2177915cca79483da7d577db37476269bfa71d427e4da328e5e815721`.
+- `RECORD-00873`: modern HuffPost returned 200 with author, title, and
+  `2008-09-20` published metadata. Summary, verification flags, and notes were
+  updated. Source SHA-256:
+  `daae6c220c00a9c5bbf057cc7335f7d302a099f4ed44a5d53ddcabe398c30670`.
+
+The focused regression
+`node --test --test-name-pattern "HuffPost pilot fourteen" tests\csv-quality.test.js`
+failed before the CSV edit on `RECORD-00869`'s stale capture date, then passed
+after the patch. Raw-text SHA-256 values:
+
+- `RECORD-00869`: `9880cf8c15a7f57f68f5377896d518cd62e81d57b2712700b2e997c00264dc97`
+- `RECORD-00870`: `22f7cd6437c35a05bba3058a37e07f3eae4d8edab5ca9c7d8e5fad026efb6948`
+- `RECORD-00871`: `f5fd902bd42a8527399fc4eac961d9522b5106466cb277d95d2f3427cfc6882a`
+- `RECORD-00872`: `e30e2d5d64b020eea5c8a747fbd2b6f92715d90d5780f945a17f8665af77d788`
+- `RECORD-00873`: `8587258f83ca4b66503d95b69e030b9c111bf52b3e093798f365bd748f6c58d3`
+
+Post-application row counts:
+
+- Archive rows: 1,028.
+- Blank archive summaries: 6, down from 11.
+- Archive rows not explicitly verified: 10, down from 15.
+- `#NN08` rows with capture-year dates: 1, down from 2.
+- Generated records after export: 26,686.
+- Entities: 7,389.
+- Relationships: 10,804.
+
+Validation:
+
+- `node --test --test-name-pattern "HuffPost pilot fourteen" tests\csv-quality.test.js`:
+  passed.
+- `node data\export-archive-data.js`: passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 78 records with raw text but no extracted relationships.
+- `npm run test:data`: expected eight completion gates still fail: three core
+  blanks, six blank summaries (`RECORD-00865`, `RECORD-00874` through
+  `RECORD-00878`), 10 unverified archive records, one `#NN08` capture-year date
+  (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54 non-Rosen
+  Bluesky copyright assignments, 29,693 unverified social rows, and 50 blank
+  entity first mentions. The pilot-fourteen regression passes.
+
+Packet artifact SHA-256 values:
+
+- `external-calls.ndjson`: `878988da0e011df3b1dd6cb1b7f8d0b71d8bd792f713b3f46fd2c97ab7c6f28c`
+- `external-calls.json`: `31fb97c49f80b161d7b59d3a322196c69dc7337db34c1c285159287931d885f5`
+- `wayback-normalized-calls.ndjson`: `d6ba69f49f1d7091410bf2184a4b21494ea4d879d85d42767a5632d3ca09d75b`
+- `wayback-normalized-calls.json`: `7133eb4d2360c1d447cc301cf18cee4e60f0006cfd30c8a1027ed2c325e70045`
+- `kimi-review.txt`: `2199bcfe2d74ec50cb1621bb7aeb613b04d0b2837afd6dd2cdf3e8fe9237ced9`
+- `grok-review.txt`: `63093895ac434e7ac564c7474daf247ce3e9a5d832857778a1c85e240d239642`
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `35ed18079b5257fd5d96e87ad26db64f1caac18f5165e09920f7bc958c69957d`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `181b5acf3d3d3dd0f5f123885e542f8ff56ad7d9fd736f1eae281818918f4c72`
+- `data/archive-data.json`: `2d862e51c7422d4d36afec4cf74a370ae6c8096ed3ae6cebaed158217b526b62`
+- `data/archive-core.json`: `72eea517b4f85c771ca87921451cc530957aa3dcf03e97ad3be5738c7c6dfbf5`
+- `data/archive-details.json`: `a1ca9c19fcd3ec9ba5bd4ecf5dcd1f56938b94ddf326f88323eaaaa300176a1c`
+- `data/archive-entities.json`: `aaf271a553e5487dac47fec2a73931307b3165db3779010b42daa153c3747182`
+- `data/archive-analytics.json`: `7ee106c00e12e2afc11095dd5e14c25fb22d31904873ade397ae7860877e6d05`

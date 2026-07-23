@@ -1552,6 +1552,94 @@ describe('archive_records-public.csv', () => {
     assert.match(unresolved.notes, /2016 replay lacked a trustworthy 2008 posted date/);
   });
 
+  it('HuffPost pilot fourteen records match source evidence', () => {
+    const expected = new Map([
+      ['RECORD-00869', {
+        title: '#NN08 Righties came to Austin to draft off Netroots media attention, but stories comparing the two note how small their event is.',
+        url: 'https://www.huffpost.com/entry/nn08-righties-came-to-aus_b_113813',
+        publicationDate: '2008-07-19',
+        wordCount: '84',
+        rawTextSha: '9880cf8c15a7f57f68f5377896d518cd62e81d57b2712700b2e997c00264dc97',
+        excerpt: '# \\#NN08 Righties came to Austin to draft off Netroots media attention, but stories comparing the two note how small their event is.',
+        pullQuote: '',
+        summary: 'A short #NN08 post says right-wing bloggers came to Austin to draft off Netroots Nation media attention, while comparison stories noted how small their event was.',
+        sourceSha: '2b51ef5dcf9349d3d2070c431b4525b1110d0356f3af8e33e2a9fa18d90e6345',
+        sourcePattern: /Wayback archived HuffPost source verified 2026-07-23/,
+      }],
+      ['RECORD-00870', {
+        title: '#nn08 You know, if Markos was a control freak there would be no Netroots Nation. His "distributed ego" style should be studied.',
+        url: 'https://www.huffpost.com/entry/nn08-you-know-if-markos-w_b_113854',
+        publicationDate: '2008-07-19',
+        wordCount: '84',
+        rawTextSha: '22f7cd6437c35a05bba3058a37e07f3eae4d8edab5ca9c7d8e5fad026efb6948',
+        excerpt: '# \\#nn08 You know, if Markos was a control freak there would be no Netroots Nation. His "distributed ego" style should be studied.',
+        pullQuote: 'His "distributed ego" style should be studied.',
+        summary: 'A short #nn08 post says Markos Moulitsas\'s distributed ego leadership style helped make Netroots Nation possible and should be studied.',
+        sourceSha: '4fa21e3f81b9b2ac8df16fd77927177ac1d78669dfa035ee2731d19239eeb3f4',
+        sourcePattern: /Wayback archived HuffPost source verified 2026-07-23/,
+      }],
+      ['RECORD-00871', {
+        title: '#NN08 Sketchbook: Code Pinkers at the Pelosi event didn\'t get that their tactics were for people who never expect to take power.',
+        url: 'https://www.huffpost.com/entry/nn08-sketchbook-code-pink_b_113872',
+        publicationDate: '2008-07-19',
+        wordCount: '730',
+        rawTextSha: 'f5fd902bd42a8527399fc4eac961d9522b5106466cb277d95d2f3427cfc6882a',
+        excerpt: '# \\#NN08 Sketchbook: Code Pinkers at the Pelosi event didn\'t get that their tactics were for people who never expect to take power.',
+        pullQuote: '',
+        summary: 'A short #NN08 sketchbook post argues that Code Pink protesters at the Pelosi event during Netroots Nation used tactics suited to people who never expect to hold power.',
+        sourceSha: '367e2163721d861b0b10ed052c4a1879c0b1a5eeb67816e937d5ef6e65519e26',
+        sourcePattern: /Wayback archived HuffPost source verified 2026-07-23/,
+      }],
+      ['RECORD-00872', {
+        title: 'Three Questions For ABC News About Its Anthrax Reporting',
+        url: 'https://www.huffpost.com/entry/three-key-questions-for-a_b_116671',
+        publicationDate: '2008-08-11',
+        wordCount: '1520',
+        rawTextSha: 'e30e2d5d64b020eea5c8a747fbd2b6f92715d90d5780f945a17f8665af77d788',
+        excerpt: 'ABC News was probably duped on a story of huge importance, putting Iraqi fingerprints on anthrax attacks that actually came from the U.S at a time when the case for war was beginning to get traction.',
+        pullQuote: 'Dan Gillmor and I are posting these questions simultaneously.',
+        summary: 'Rosen and Dan Gillmor press ABC News to answer questions about its anthrax reporting, including whether sources misled the network into linking the attacks to Iraq.',
+        sourceSha: 'b1ed6da2177915cca79483da7d577db37476269bfa71d427e4da328e5e815721',
+        sourcePattern: /Modern HuffPost source verified 2026-07-23/,
+      }],
+      ['RECORD-00873', {
+        title: 'Hype Busters at Mother Jones Bring the Noise',
+        url: 'https://www.huffpost.com/entry/hype-busters-at-mother-jo_b_120078',
+        publicationDate: '2008-09-20',
+        wordCount: '1513',
+        rawTextSha: '8587258f83ca4b66503d95b69e030b9c111bf52b3e093798f365bd748f6c58d3',
+        excerpt: 'Mother Jones is currently running a feature offering us the views of 24 writers, thinkers and historians on a question the editors find important: "Is Obama exaggerating when he compares his campaign to the great progressive moments in US history?"',
+        pullQuote: 'Is the concept really so hard for the editors of Mother Jones to grasp?',
+        summary: 'Rosen critiques Mother Jones\'s Obama hype-busting package, arguing that attempts to puncture campaign hype can become another form of hype when the framing is careless.',
+        sourceSha: 'daae6c220c00a9c5bbf057cc7335f7d302a099f4ed44a5d53ddcabe398c30670',
+        sourcePattern: /Modern HuffPost source verified 2026-07-23/,
+      }],
+    ]);
+
+    for (const [id, source] of expected) {
+      const record = archiveRecords.find(row => row.id === id);
+      assert.ok(record, `${id} must exist`);
+      assert.strictEqual(record.title, source.title);
+      assert.strictEqual(record.url, source.url);
+      assert.strictEqual(record.author, 'Jay Rosen');
+      assert.strictEqual(record.publication_date, source.publicationDate);
+      assert.strictEqual(record.word_count, source.wordCount);
+      assert.strictEqual(
+        crypto.createHash('sha256').update(record.raw_text).digest('hex'),
+        source.rawTextSha,
+        `${id} raw_text changed unexpectedly`
+      );
+      assert.strictEqual(record.excerpt, source.excerpt);
+      assert.strictEqual(record.pull_quote, source.pullQuote);
+      assert.strictEqual(record.summary, source.summary);
+      assert.strictEqual(record.verified, 'TRUE');
+      assert.strictEqual(record.low_confidence, 'FALSE');
+      assert.strictEqual(record.needs_review, 'FALSE');
+      assert.match(record.notes, source.sourcePattern);
+      assert.match(record.notes, new RegExp(source.sourceSha));
+    }
+  });
+
   it('RECORD-00614 cannot verify mismatched TomDispatch works', () => {
     const record = archiveRecords.find(row => row.id === 'RECORD-00614');
     assert.ok(record, 'RECORD-00614 must exist');
