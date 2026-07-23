@@ -6,6 +6,50 @@ applicable field, map every entity, preserve provenance, and prove the result
 with repeatable checks. The archive is materially better, but it is not at
 100% and must not be described as complete.
 
+## Continuation checkpoint — 2026-07-23 19:48 -04:00
+
+Current review branch: `agent/data-integrity-huffpost-pilot09-20260723`.
+Current PR: [#760](https://github.com/jamditis/rosen-frontend/pull/760),
+based on `agent/data-integrity-completion-gates`.
+
+The original counts below are preserved as the wind-down snapshot. The current
+branch state has advanced:
+
+| Dataset or gate | Current branch state |
+| --- | ---: |
+| Archive records | 1,024 |
+| Social posts | 29,747 |
+| Entities | 7,351 |
+| Relationships | 11,108 |
+| Archive records with entity relationships | 871/1,024 |
+| Archive rows explicitly `verified=FALSE` | 1 |
+| Archive rows with blank summaries | 0 |
+| Archive rows with `needs_review=TRUE` | 9 |
+| Social rows with explicit verification state | 29,747/29,747 |
+| Entities with blank `first_mention_record_id` | 0 |
+| Long archive records without extracted relationships | 0 |
+
+Current validation on PR #760:
+
+- `npm run test:data` passes, 151 tests.
+- `npm run test:data:extraction-coverage` passes, 17 tests.
+- `python backend/scripts/validate_archive_data.py` passes with no errors.
+- `npm test` passes, 828 tests.
+
+Tracked continuation docs added after the original handoff:
+
+- `docs/manual-verification-required-2026-07-23.md`: only `RECORD-00865`
+  still needs Joe/browser capture.
+- `docs/pressthink-recovery-index-2026-07-23.md`: indexes 184 local
+  PressThink recovery audit rows, with 167 distinct missing works and 17
+  source or edition mapping decisions.
+- `docs/entity-merge-review-queue-2026-07-23.md`: tracks 28 entity merge
+  candidates, with 19 safe batch candidates and 9 curator-required cases.
+
+No permanent PressThink IDs, imports, rights decisions, taxonomy decisions,
+entity merges, source-text rewrites, or relationship changes were applied in
+the two curator queues. They remain review queues.
+
 ## Safety boundary
 
 - No live archive or production service was touched.
