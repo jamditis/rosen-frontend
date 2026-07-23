@@ -435,6 +435,203 @@ describe('extraction coverage (#207)', () => {
     }
   });
 
+  it('maps Tumblr extraction batch four to existing entities with source excerpts', () => {
+    const expected = new Map([
+      ['TUMBLR-00029', [
+        {
+          relationshipId: 'TUMBLR-00029_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0034',
+          contextSnippet: 'The Huffington Post’s many, many users will either love or hate',
+        },
+        {
+          relationshipId: 'TUMBLR-00029_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0178',
+          contextSnippet: 'I create user-driven features for The Guardian US',
+        },
+        {
+          relationshipId: 'TUMBLR-00029_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0075',
+          contextSnippet: 'managing our presence on different social networks such as Twitter',
+        },
+      ]],
+      ['TUMBLR-00030', [
+        {
+          relationshipId: 'TUMBLR-00030_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0178',
+          contextSnippet: 'Studio 20 is collaborating with the Guardian US on how to    improve election coverage',
+        },
+        {
+          relationshipId: 'TUMBLR-00030_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0042',
+          contextSnippet: '“The Citizens’ Agenda” as the project was    christened',
+        },
+        {
+          relationshipId: 'TUMBLR-00030_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0005',
+          contextSnippet: 'Our own Jay Rosen and the Guardian’s Amanda Michel summed up the idea',
+        },
+        {
+          relationshipId: 'TUMBLR-00030_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0184',
+          contextSnippet: 'Our own Jay Rosen and the Guardian’s Amanda Michel summed up the idea',
+        },
+        {
+          relationshipId: 'TUMBLR-00030_REL_005',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0277',
+          contextSnippet: 'John King',
+        },
+        {
+          relationshipId: 'TUMBLR-00030_REL_006',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0186',
+          contextSnippet: 'Grist',
+        },
+        {
+          relationshipId: 'TUMBLR-00030_REL_007',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0043',
+          contextSnippet: 'Wired',
+        },
+        {
+          relationshipId: 'TUMBLR-00030_REL_008',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0446',
+          contextSnippet: 'TechPresident',
+        },
+      ]],
+      ['TUMBLR-00031', [
+        {
+          relationshipId: 'TUMBLR-00031_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0015',
+          contextSnippet: 'CNN anchor/reporter Soledad O\'Brien',
+        },
+        {
+          relationshipId: 'TUMBLR-00031_REL_002',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20’s own Professor Jason Samuels',
+        },
+        {
+          relationshipId: 'TUMBLR-00031_REL_003',
+          sourceEntityId: 'P0109',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0015',
+          contextSnippet: 'CNN anchor/reporter Soledad O\'Brien',
+        },
+        {
+          relationshipId: 'TUMBLR-00031_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0109',
+          contextSnippet: 'CNN anchor/reporter Soledad O\'Brien',
+        },
+      ]],
+      ['TUMBLR-00032', [
+        {
+          relationshipId: 'TUMBLR-00032_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'O0115',
+          contextSnippet: 'joint explainer project with ProPublica',
+        },
+        {
+          relationshipId: 'TUMBLR-00032_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P1387',
+          contextSnippet: 'David Gregory asked a question about Super PACs',
+        },
+        {
+          relationshipId: 'TUMBLR-00032_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0005',
+          contextSnippet: 'Jay Rosen',
+        },
+      ]],
+      ['TUMBLR-00033', [
+        {
+          relationshipId: 'TUMBLR-00033_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'W0910',
+          contextSnippet: 'Building a Better Explainer project',
+        },
+        {
+          relationshipId: 'TUMBLR-00033_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'O0115',
+          contextSnippet: 'investigative journalism non-profit, ProPublica',
+        },
+        {
+          relationshipId: 'TUMBLR-00033_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'W0909',
+          contextSnippet: 'Explainer.net',
+        },
+        {
+          relationshipId: 'TUMBLR-00033_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0033',
+          contextSnippet: 'PressThink',
+        },
+        {
+          relationshipId: 'TUMBLR-00033_REL_005',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0308',
+          contextSnippet: 'Nieman Journalism Lab’s Lois Beckett visited Studio 20',
+        },
+      ]],
+    ]);
+    const recordsById = new Map(records.map(record => [record.id, record]));
+    const relationshipsById = new Map(relationships.map(relationship => [relationship.relationship_id, relationship]));
+
+    for (const [recordId, recordRelationships] of expected) {
+      const record = recordsById.get(recordId);
+      assert.ok(record, `${recordId} is missing`);
+
+      for (const expectedRelationship of recordRelationships) {
+        const relationship = relationshipsById.get(expectedRelationship.relationshipId);
+        assert.ok(relationship, `${expectedRelationship.relationshipId} is missing`);
+        assert.strictEqual(relationship.source_record_id, recordId);
+        assert.strictEqual(relationship.source_entity_id, expectedRelationship.sourceEntityId);
+        assert.strictEqual(relationship.relationship_type, expectedRelationship.relationshipType);
+        assert.strictEqual(relationship.target_entity_id, expectedRelationship.targetEntityId);
+        assert.strictEqual(relationship.context_snippet, expectedRelationship.contextSnippet);
+        assert.ok(
+          record.raw_text.includes(relationship.context_snippet),
+          `${relationship.relationship_id} has a context excerpt outside ${recordId}`
+        );
+      }
+    }
+  });
+
   it('maps every imported Bluesky thread to existing entities with source excerpts', () => {
     const threadIds = Array.from(
       { length: 10 },
