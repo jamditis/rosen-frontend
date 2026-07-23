@@ -6230,3 +6230,47 @@ Final SHA-256 values after export:
 - `data/archive-details.json`: `2a532ccb3deb57aea88925ca186b652b0252f352e739dae074f404cca19cf028`
 - `data/archive-entities.json`: `b4ebd39625b87ea1f81646e41f0355d16bf4156caea076ddbe0bab8c7e8f2a95`
 - `data/archive-analytics.json`: `93d678b1aa7c1cca7a351ff26af442a02ad44637762e07771eca9de9c54b0a99`
+
+### Non-Rosen Bluesky source URL and copyright cleanup
+
+Fifty-four imported non-Rosen Bluesky source rows carried false
+`jayrosen.bsky.social` post URLs and false Jay Rosen copyright attribution.
+These rows are already filtered out of the public archive output as non-Rosen
+social posts, but the source CSV still needed cleanup so source-level quality
+gates do not preserve false provenance.
+
+Changes applied:
+
+- Blanked the false `jayrosen.bsky.social` URLs on the 54 non-Rosen Bluesky
+  source rows. The original author post URLs remain unresolved.
+- Changed the false `Jay Rosen` copyright value to the row author for each
+  repaired source row.
+- Added a source cleanup note to each repaired row.
+- Regenerated archive JSON and feed artifacts.
+
+Validation:
+
+- Python CSV parser check passed with 29,747 social rows, platform counts of
+  26,114 Twitter/X, 3,117 Bluesky, and 516 Mastodon, and no malformed platform
+  values.
+- Node parser check found 0 remaining false `jayrosen.bsky.social` URLs on
+  non-Rosen Bluesky rows, 0 remaining false Jay Rosen copyright assignments on
+  those rows, and 54 cleanup notes.
+- `node --test --test-name-pattern "non-Rosen Bluesky|Jay Rosen copyright"
+  tests\csv-quality.test.js`: passed.
+- `python backend\scripts\validate_archive_data.py`: no errors; archive records
+  1,024, social posts 29,747, entities 7,370, relationships 11,108.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected three completion gates still fail:
+  `RECORD-00865` remains unverified pending manual source recovery, 29,693
+  social rows still need explicit verification status, and 21 entity rows still
+  lack `first_mention_record_id`.
+
+Final SHA-256 values after export:
+
+- `data/social_posts.csv`: `a810a17a9eac1d6748cc26ec2f9dbaa1c66f5d66a3992c27e03fc66a57724542`
+- `data/archive-data.json`: `34f46a247b61c400562b140cb85936a107f4022e5385c7118523da87a2235442`
+- `data/archive-core.json`: `3dd6596e36520d7d94603119a295ba3e2c3d05ef0151c467b7af775a9cb360be`
+- `data/archive-details.json`: `4503506056907fc4437533ce6717a59490a819f03ba9f454f7a5a3d07b03e8b1`
+- `data/archive-entities.json`: `1f7450b2ce55f8d736e00e25e4986992e5a862ba07cb2d8142d68252aae3ab32`
+- `data/archive-analytics.json`: `b2f31e9f0fc9ecc1f905c23aea62f7a03e144c6644bf922d4b147b5a3480f87e`
