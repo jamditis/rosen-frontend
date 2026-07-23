@@ -1,5 +1,7 @@
 # Deployment guide
 
+This is an internal guide for the archive's maintainers. If you're just exploring the project, start with the [root README](README.md) — you don't need anything here to browse the site or use the data.
+
 The archive is hosted at `pressthink.org/j/rosen-archive/`. Deploy by uploading changed files via FTP to `/wp-content/rosen-archive/`.
 
 ## Files to deploy
