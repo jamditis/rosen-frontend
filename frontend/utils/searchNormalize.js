@@ -64,6 +64,43 @@ export function normalizeForSearch(str) {
 }
 
 /**
+ * Find ordered autocomplete matches, deduplicated by normalized search text.
+ * The first spelling of an equivalent term is preserved for display.
+ * @param {Array<*>} terms - autocomplete terms in display-priority order
+ * @param {*} rawQuery - the user's unnormalized query
+ * @param {number} limit - maximum number of unique suggestions
+ * @returns {string[]} first-seen display terms matching the query
+ */
+export function findSearchSuggestions(terms, rawQuery, limit = 8) {
+  if (!Array.isArray(terms) || !Number.isFinite(limit)) return [];
+
+  const query = normalizeForSearch(rawQuery);
+  const max = Math.max(0, Math.floor(limit));
+  if (!query || max === 0) return [];
+
+  const seen = new Set();
+  const suggestions = [];
+
+  for (const term of terms) {
+    if (typeof term !== 'string') continue;
+    const normalizedTerm = normalizeForSearch(term);
+    if (
+      !normalizedTerm ||
+      !normalizedTerm.includes(query) ||
+      seen.has(normalizedTerm)
+    ) {
+      continue;
+    }
+
+    seen.add(normalizedTerm);
+    suggestions.push(term);
+    if (suggestions.length === max) break;
+  }
+
+  return suggestions;
+}
+
+/**
  * Build the normalized, searchable blob for a record: title, summary, and each
  * category, normalized and joined with a field separator so matches stay within
  * a single field. Precompute this once per record on data load, then test each
@@ -91,4 +128,9 @@ export function matchesSearch(record, rawTerm) {
   return buildSearchText(record).includes(term);
 }
 
-export default { normalizeForSearch, buildSearchText, matchesSearch };
+export default {
+  normalizeForSearch,
+  findSearchSuggestions,
+  buildSearchText,
+  matchesSearch,
+};
