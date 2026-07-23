@@ -1807,6 +1807,266 @@ describe('extraction coverage (#207)', () => {
     }
   });
 
+  it('maps Tumblr extraction batch eleven to existing entities with source excerpts', () => {
+    const expected = new Map([
+      ['TUMBLR-00091', [
+        {
+          relationshipId: 'TUMBLR-00091_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0808',
+          contextSnippet: 'Nieman Journalism Lab',
+        },
+        {
+          relationshipId: 'TUMBLR-00091_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0005',
+          contextSnippet: 'Jay Rosen’s\nStudio 20',
+        },
+        {
+          relationshipId: 'TUMBLR-00091_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0290',
+          contextSnippet: 'Dave Winer recommends',
+        },
+        {
+          relationshipId: 'TUMBLR-00091_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0015',
+          contextSnippet: 'what is journalism school for?',
+        },
+      ]],
+      ['TUMBLR-00093', [
+        {
+          relationshipId: 'TUMBLR-00093_REL_001',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20 Director\nJay Rosen',
+        },
+        {
+          relationshipId: 'TUMBLR-00093_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0290',
+          contextSnippet: 'Visiting Scholar\nDave Winer',
+        },
+        {
+          relationshipId: 'TUMBLR-00093_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'W1039',
+          contextSnippet: 'Rebooting the News',
+        },
+        {
+          relationshipId: 'TUMBLR-00093_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O1392',
+          contextSnippet: 'AOL Tries To Seed SXSW',
+        },
+        {
+          relationshipId: 'TUMBLR-00093_REL_005',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'E0469',
+          contextSnippet: 'SXSW',
+        },
+        {
+          relationshipId: 'TUMBLR-00093_REL_006',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0515',
+          contextSnippet: 'wikipedia system',
+        },
+      ]],
+      ['TUMBLR-00094', [
+        {
+          relationshipId: 'TUMBLR-00094_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0212',
+          contextSnippet: 'NYU Studio 20 concentration at the Arthur L. Carter School of Journalism',
+        },
+        {
+          relationshipId: 'TUMBLR-00094_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0015',
+          contextSnippet: 'new directions in journalism today',
+        },
+        {
+          relationshipId: 'TUMBLR-00094_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0034',
+          contextSnippet: 'Partner: The Huffington Post',
+        },
+        {
+          relationshipId: 'TUMBLR-00094_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0121',
+          contextSnippet: 'Laura Edwins\n| Partner: The Christian Science Monitor',
+        },
+        {
+          relationshipId: 'TUMBLR-00094_REL_005',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O1420',
+          contextSnippet: 'Partner: Quartz',
+        },
+        {
+          relationshipId: 'TUMBLR-00094_REL_006',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0178',
+          contextSnippet: 'Partner: The Guardian US',
+        },
+        {
+          relationshipId: 'TUMBLR-00094_REL_007',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0184',
+          contextSnippet: 'Amanda Michel',
+        },
+        {
+          relationshipId: 'TUMBLR-00094_REL_008',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0666',
+          contextSnippet: 'Global Voices Online',
+        },
+        {
+          relationshipId: 'TUMBLR-00094_REL_009',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0297',
+          contextSnippet: 'Partner: Univision',
+        },
+      ]],
+      ['TUMBLR-00096', [
+        {
+          relationshipId: 'TUMBLR-00096_REL_001',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20 Professor\nJason Samuels',
+        },
+        {
+          relationshipId: 'TUMBLR-00096_REL_002',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0055',
+          contextSnippet: 'senior producer at\nABC News Digital',
+        },
+        {
+          relationshipId: 'TUMBLR-00096_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0010',
+          contextSnippet: 'The Online Journalism Review talked with him',
+        },
+        {
+          relationshipId: 'TUMBLR-00096_REL_004',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0015',
+          contextSnippet: 'producing newscasts for the web',
+        },
+        {
+          relationshipId: 'TUMBLR-00096_REL_005',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0517',
+          contextSnippet: 'sold in Wal-Mart',
+        },
+        {
+          relationshipId: 'TUMBLR-00096_REL_006',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P1208',
+          contextSnippet: 'Christopher Hitchens',
+        },
+      ]],
+      ['TUMBLR-00098', [
+        {
+          relationshipId: 'TUMBLR-00098_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0034',
+          contextSnippet: 'with the Huffington Post',
+        },
+        {
+          relationshipId: 'TUMBLR-00098_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0121',
+          contextSnippet: 'with the Christian Science Monitor',
+        },
+        {
+          relationshipId: 'TUMBLR-00098_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O1420',
+          contextSnippet: 'with Quartz',
+        },
+        {
+          relationshipId: 'TUMBLR-00098_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0178',
+          contextSnippet: 'with the Guardian US',
+        },
+        {
+          relationshipId: 'TUMBLR-00098_REL_005',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0666',
+          contextSnippet: 'with Global Voices',
+        },
+        {
+          relationshipId: 'TUMBLR-00098_REL_006',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0297',
+          contextSnippet: 'with UNIVISION',
+        },
+        {
+          relationshipId: 'TUMBLR-00098_REL_007',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0426',
+          contextSnippet: 'PUSH New Media: Collaborative Innovation',
+        },
+      ]],
+    ]);
+    const recordsById = new Map(records.map(record => [record.id, record]));
+    const relationshipsById = new Map(relationships.map(relationship => [relationship.relationship_id, relationship]));
+
+    for (const [recordId, recordRelationships] of expected) {
+      const record = recordsById.get(recordId);
+      assert.ok(record, `${recordId} is missing`);
+
+      for (const expectedRelationship of recordRelationships) {
+        const relationship = relationshipsById.get(expectedRelationship.relationshipId);
+        assert.ok(relationship, `${expectedRelationship.relationshipId} is missing`);
+        assert.strictEqual(relationship.source_record_id, recordId);
+        assert.strictEqual(relationship.source_entity_id, expectedRelationship.sourceEntityId);
+        assert.strictEqual(relationship.relationship_type, expectedRelationship.relationshipType);
+        assert.strictEqual(relationship.target_entity_id, expectedRelationship.targetEntityId);
+        assert.strictEqual(relationship.context_snippet, expectedRelationship.contextSnippet);
+        assert.ok(
+          record.raw_text.includes(relationship.context_snippet),
+          `${relationship.relationship_id} has a context excerpt outside ${recordId}`
+        );
+      }
+    }
+  });
+
   it('maps every imported Bluesky thread to existing entities with source excerpts', () => {
     const threadIds = Array.from(
       { length: 10 },

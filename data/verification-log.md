@@ -5524,3 +5524,64 @@ Final SHA-256 values after export:
 - `data/archive-details.json`: `719646a9313a0b02af0b1f412c5e2947a65c5a6107d70471afd4672f9fa45713`
 - `data/archive-entities.json`: `2c364bb2d2db132831377358f693a03451c3aff5cff297b41d29a73576450e6f`
 - `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`
+
+### Tumblr extraction coverage batch 11
+
+Five more Tumblr records with source text but no relationship rows were mapped
+to existing entities only: `TUMBLR-00091`, `TUMBLR-00093`, `TUMBLR-00094`,
+`TUMBLR-00096`, and `TUMBLR-00098`. No new entity IDs were created.
+
+A read-only Kimi CLI review checked the proposed mappings. The review rejected
+one `rebooted music news system` concept row because the snippet was too
+music-specific for the existing `Rebooted system of news` concept, and rejected
+a Laura Edwins-to-Christian Science Monitor affiliation row because the source
+identified a project partner, not employment. The final batch dropped the music
+concept row and recast the Christian Science Monitor evidence as a Studio 20
+mention.
+
+Changes applied:
+
+- Appended 32 relationship rows to `data/extracted_relationships.csv`.
+- Added a focused regression proving every new context snippet is an exact
+  substring of its source record.
+- Left `data/extracted_entities.csv` unchanged.
+
+The focused regression
+`node --test --test-name-pattern "Tumblr extraction batch eleven" tests\extraction-coverage.test.js`
+failed before the relationship append because `TUMBLR-00091_REL_001` was
+missing, then passed after the append.
+
+Post-application counts:
+
+- Relationships: 11,027, up from 10,995.
+- Archive records with entities: 850/1,028 (82.7%), up from 845/1,028.
+- Extraction coverage missing archive records: 23, down from 28.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "Tumblr extraction batch eleven" tests\extraction-coverage.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 23 records with raw text but no extracted relationships.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  50 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, and Tumblr batch tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `2d8309e864817db1a3dc8af3ddf4f48ec737f3b54615140e380cfce873bbea4e`
+- `data/archive-data.json`: `1ef2ea537e40ab6b39b4adfc839d39968300c3df9fd1c9535577c657f2c2d954`
+- `data/archive-core.json`: `4287da1d78175c4ec67280c3de338dbb540842cd0d548f374331ae4080857392`
+- `data/archive-details.json`: `d45bcfe144b9fcb08ec5ca73b2ec8448c3f1a9ecd9e34a1d78b3d928f923f73e`
+- `data/archive-entities.json`: `de9262d869787396249c4cabb1a9c601a9b05382711bd17a47e6aca9b465ca21`
+- `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`
