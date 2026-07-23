@@ -100,7 +100,7 @@ This takes about 30–60 seconds and produces updated JSON files in the `data/` 
 
 ## Step 5: Upload to the live site
 
-Connect to pressthink.org via FTP (credentials from Joe) and upload these files to `/wp-content/rosen-archive/data/`:
+Connect to pressthink.org via FTP (credentials from Joe) and upload these files to `/wp-content/j/rosen-archive/data/`:
 
 - `data/archive-core.json`
 - `data/archive-data.json`
