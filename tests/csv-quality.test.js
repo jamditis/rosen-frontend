@@ -138,6 +138,19 @@ describe('archive_records-public.csv', () => {
     );
   });
 
+  it('TomDispatch composite record preserves the source publisher while staying unresolved', () => {
+    const record = archiveRecords.find(row => row.id === 'RECORD-00614');
+    assert.ok(record, 'RECORD-00614 is missing');
+    assert.strictEqual(record.url, 'https://tomdispatch.com/jay-rosen-on-a-political-empire-made-of-tv-stations/');
+    assert.strictEqual(record.publisher, 'TomDispatch.com');
+    assert.strictEqual(record.verified, 'FALSE');
+    assert.strictEqual(record.low_confidence, 'TRUE');
+    assert.strictEqual(record.needs_review, 'TRUE');
+    assert.match(record.notes, /Publisher repaired 2026-07-23/);
+    assert.match(record.notes, /17a23743ca1c399fbb878aa623e119d68469b16f2d1390bfb618aa1a5f1b54f1/);
+    assert.match(record.notes, /record remains unverified/i);
+  });
+
   it('HuffPost pilot rows preserve directly observed 2008 source dates', () => {
     const expectedDates = new Map([
       ['RECORD-00861', '2008-07-17'],

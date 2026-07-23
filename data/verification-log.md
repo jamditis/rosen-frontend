@@ -4864,3 +4864,66 @@ Packet artifact SHA-256 values:
   `3348da8c6d85800b662e0c182b0fa468b94669db53d0575207c84e6a896f4ecc`
 - `capture_20160212022545_normal_http_www.huffingtonpost.com_jay-rosen_nn08-sketchbook-rick-pear_b_113763.html.html`:
   `073a4739d3b109d6b1fc1fe3c77cc3df3a874cfdc5cec4d99d6f804d85dd4705`
+
+### TomDispatch record 00614 publisher repair
+
+`RECORD-00614` had a blank `publisher` field. The linked source URL was
+replayed under `%TEMP%/rosen-record-00614-publisher-repair` and returned HTTP
+200 from TomDispatch.com. The source page confirms the publisher identity but
+also confirms the record remains a composite mismatch: the linked page is a
+2004 Jay Rosen article, while the stored text presents a later Tom Engelhardt
+interview about a 2017-era Sinclair-Tribune deal.
+
+Changes applied:
+
+- Set `publisher=TomDispatch.com`.
+- Appended a note with the source response hash and the unresolved mismatch.
+- Left `verified=FALSE`, `needs_review=TRUE`, and `low_confidence=TRUE`.
+
+The focused regression
+`node --test --test-name-pattern "TomDispatch composite record" tests\csv-quality.test.js`
+failed before the CSV edit because the publisher field was blank, then passed
+after the repair.
+
+Post-application row counts:
+
+- Archive rows: 1,028.
+- Archive core blanks: 2, down from 3 (`RECORD-00602:url`,
+  `RECORD-00613:url`).
+- Blank archive summaries: 1, unchanged (`RECORD-00865`).
+- Archive rows not explicitly verified: 5, unchanged.
+- Generated records after export: 26,691.
+- Entities: 7,389.
+- Relationships: 10,804.
+
+Validation:
+
+- `node --test --test-name-pattern "TomDispatch composite record" tests\csv-quality.test.js`:
+  passed.
+- `node data\export-archive-data.js`: passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 78 records with raw text but no extracted relationships.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  50 blank entity first mentions. The TomDispatch regression passes.
+
+Packet artifact SHA-256 values:
+
+- `external-calls.ndjson`: `a6d05b699c109c8b3fffe73e3cc29b8a085824930d8628fbfe4aaacf9762a24e`
+- `tomdispatch-record-00614-source.html`: `17a23743ca1c399fbb878aa623e119d68469b16f2d1390bfb618aa1a5f1b54f1`
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `181b5acf3d3d3dd0f5f123885e542f8ff56ad7d9fd736f1eae281818918f4c72`
+- `data/archive-data.json`: `d6d053aab0516d11a3bbacd6fe266fce4bcef8a3302fedcd1efc2f35bbfde41f`
+- `data/archive-core.json`: `99f3c1f6db53305cd5ded044a1ebbfbd7e10034485614bed7437abaf6f892a52`
+- `data/archive-details.json`: `7b72c21efec0e8d1d18efed7c832014aa7adaeae8a22d138623d2c2c45da8a52`
+- `data/archive-entities.json`: `e67eb77fc2db743214125b04c6046b453cc14fa9ef1c02499061440ca4581342`
+- `data/archive-analytics.json`: `15788fa14498724398d1954fe86f6a3ab7593bfa2b61322da27be402fbe34128`
