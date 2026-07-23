@@ -1378,6 +1378,245 @@ describe('extraction coverage (#207)', () => {
     }
   });
 
+  it('maps Tumblr extraction batch nine to existing entities with source excerpts', () => {
+    const expected = new Map([
+      ['TUMBLR-00073', [
+        {
+          relationshipId: 'TUMBLR-00073_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0081',
+          contextSnippet: 'working at\nUnivision News',
+        },
+        {
+          relationshipId: 'TUMBLR-00073_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0034',
+          contextSnippet: 'working as a Community Intern at\nThe Huffington Post',
+        },
+        {
+          relationshipId: 'TUMBLR-00073_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0158',
+          contextSnippet: 'web producer for the\nGuardian U.S.',
+        },
+        {
+          relationshipId: 'TUMBLR-00073_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0051',
+          contextSnippet: 'the Atlantic’s health channel',
+        },
+        {
+          relationshipId: 'TUMBLR-00073_REL_005',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0118',
+          contextSnippet: 'picked up by the Drudge Report',
+        },
+        {
+          relationshipId: 'TUMBLR-00073_REL_006',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0276',
+          contextSnippet: 'Laura Edwins',
+        },
+        {
+          relationshipId: 'TUMBLR-00073_REL_007',
+          sourceEntityId: 'P0276',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0121',
+          contextSnippet: 'Laura Edwins\nis currently the web intern at the Christian Science Monitor',
+        },
+        {
+          relationshipId: 'TUMBLR-00073_REL_008',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O1420',
+          contextSnippet: 'Quartz',
+        },
+        {
+          relationshipId: 'TUMBLR-00073_REL_009',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O1170',
+          contextSnippet: 'NBC Universal’s iVillage',
+        },
+      ]],
+      ['TUMBLR-00077', [
+        {
+          relationshipId: 'TUMBLR-00077_REL_001',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20 Director\nJay Rosen',
+        },
+        {
+          relationshipId: 'TUMBLR-00077_REL_002',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0015',
+          contextSnippet: 'Journalism, the practice',
+        },
+        {
+          relationshipId: 'TUMBLR-00077_REL_003',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0238',
+          contextSnippet: 'the media',
+        },
+      ]],
+      ['TUMBLR-00078', [
+        {
+          relationshipId: 'TUMBLR-00078_REL_001',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20\nProfessor Jason Samuels',
+        },
+        {
+          relationshipId: 'TUMBLR-00078_REL_002',
+          sourceEntityId: 'P1225',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0088',
+          contextSnippet: 'President Barack Obama’s 2010 State of the Union address',
+        },
+      ]],
+      ['TUMBLR-00079', [
+        {
+          relationshipId: 'TUMBLR-00079_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P1225',
+          contextSnippet: 'Professor Jason Samuels’ latest documentary project',
+        },
+        {
+          relationshipId: 'TUMBLR-00079_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0015',
+          contextSnippet: 'air on CNN',
+        },
+        {
+          relationshipId: 'TUMBLR-00079_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0088',
+          contextSnippet: 'President Obama',
+        },
+        {
+          relationshipId: 'TUMBLR-00079_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0093',
+          contextSnippet: 'Hillary Clinton',
+        },
+        {
+          relationshipId: 'TUMBLR-00079_REL_005',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0240',
+          contextSnippet: 'Rahm Emanuel',
+        },
+        {
+          relationshipId: 'TUMBLR-00079_REL_006',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P2445',
+          contextSnippet: 'Olympia Snowe',
+        },
+        {
+          relationshipId: 'TUMBLR-00079_REL_007',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P1915',
+          contextSnippet: 'Douglas Brinkley',
+        },
+        {
+          relationshipId: 'TUMBLR-00079_REL_008',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P1078',
+          contextSnippet: 'David Sanger',
+        },
+      ]],
+      ['TUMBLR-00081', [
+        {
+          relationshipId: 'TUMBLR-00081_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0214',
+          contextSnippet: 'New York Daily News',
+        },
+        {
+          relationshipId: 'TUMBLR-00081_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0849',
+          contextSnippet: 'The Boston Herald',
+        },
+        {
+          relationshipId: 'TUMBLR-00081_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0454',
+          contextSnippet: 'City University of New York (CUNY)',
+        },
+        {
+          relationshipId: 'TUMBLR-00081_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0426',
+          contextSnippet: 'innovation—in the newsroom and in class',
+        },
+        {
+          relationshipId: 'TUMBLR-00081_REL_005',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0543',
+          contextSnippet: 'new media and how they’re innovating',
+        },
+        {
+          relationshipId: 'TUMBLR-00081_REL_006',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0289',
+          contextSnippet: 'legacy media that have been innovating',
+        },
+        {
+          relationshipId: 'TUMBLR-00081_REL_007',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0015',
+          contextSnippet: 'started in journalism',
+        },
+      ]],
+    ]);
+    const recordsById = new Map(records.map(record => [record.id, record]));
+    const relationshipsById = new Map(relationships.map(relationship => [relationship.relationship_id, relationship]));
+
+    for (const [recordId, recordRelationships] of expected) {
+      const record = recordsById.get(recordId);
+      assert.ok(record, `${recordId} is missing`);
+
+      for (const expectedRelationship of recordRelationships) {
+        const relationship = relationshipsById.get(expectedRelationship.relationshipId);
+        assert.ok(relationship, `${expectedRelationship.relationshipId} is missing`);
+        assert.strictEqual(relationship.source_record_id, recordId);
+        assert.strictEqual(relationship.source_entity_id, expectedRelationship.sourceEntityId);
+        assert.strictEqual(relationship.relationship_type, expectedRelationship.relationshipType);
+        assert.strictEqual(relationship.target_entity_id, expectedRelationship.targetEntityId);
+        assert.strictEqual(relationship.context_snippet, expectedRelationship.contextSnippet);
+        assert.ok(
+          record.raw_text.includes(relationship.context_snippet),
+          `${relationship.relationship_id} has a context excerpt outside ${recordId}`
+        );
+      }
+    }
+  });
+
   it('maps every imported Bluesky thread to existing entities with source excerpts', () => {
     const threadIds = Array.from(
       { length: 10 },
