@@ -1390,6 +1390,88 @@ describe('archive_records-public.csv', () => {
     }
   });
 
+  it('HuffPost pilot twelve records match their source evidence', () => {
+    const expected = new Map([
+      ['RECORD-00859', {
+        title: 'Scott McClellan And The Opacity Agenda',
+        url: 'https://www.huffpost.com/entry/scott-mcclellan-and-the-o_b_104857',
+        publicationDate: '2008-06-11',
+        wordCount: '2525',
+        rawTextSha: 'c012883e030a441f5bc519055e6553f32dfa5ccbd9411fb684f0a2dbc9409d2b',
+        excerpt: 'McClellan as White House spokesman lacked experience, talent, charm, agility, depth. But Bush and Cheney saw these defects as an advantage. They actually wanted the executive branch to become more opaque, and he was the perfect man for the job.',
+        pullQuote: 'These words have a strange poignancy today.',
+        summary: "Rosen uses Scott McClellan's memoir to argue that Bush and Cheney preferred an opaque executive branch and that McClellan's limits as press secretary served that secrecy agenda.",
+        sourceSha: 'cdf43c9170b945d23b37518cbf746f242530271cbd2b7117faa89fc3a22f864d',
+      }],
+      ['RECORD-00860', {
+        title: 'When Bill Clinton Met Mayhill Fowler on the Rope Line',
+        url: 'https://www.huffpost.com/entry/when-bill-clinton-met-may_b_106974',
+        publicationDate: '2008-06-21',
+        wordCount: '3888',
+        rawTextSha: '7e8f39348d07529ed28fd9019a529ce8852b4a9591da09f7869760b2940bcd8b',
+        excerpt: "Newsroom people, you don't have to leave the moral universe you grew up in. Just admit the possibility of another valid one beyond yours.",
+        pullQuote: 'Last week OffTheBus brought you another case with Mayhill Fowler in the middle of it.',
+        summary: "Rosen defends Mayhill Fowler's OffTheBus reporting on Bill Clinton's rope-line comments, arguing that campaign journalism can include a valid citizen-reporter ethic outside traditional newsroom rules.",
+        sourceSha: 'e541bfca40e39caabee788a7775fedf23e731f0007836fd84d415714ce44eb06',
+      }],
+      ['RECORD-00861', {
+        title: 'Karl Frisch of Media Matters in Austin Chronicle\'s story on Netroots: "We\'re ideological, not partisan." http://is.gd/WCk  #NN08',
+        url: 'https://www.huffpost.com/entry/karl-frisch-of-media-matt_b_113470',
+        publicationDate: '2008-07-17',
+        wordCount: '137',
+        rawTextSha: 'e5c37b47d7f36cbd0fe5a8b44c7405c99379cc0cc16e69edc32920151c866fda',
+        excerpt: 'Karl Frisch of Media Matters in Austin Chronicle\'s story on Netroots: "We\'re ideological, not partisan." [http://is.gd/WCk](http://web.archive.org/web/20131109231444/http://is.gd/WCk) \\#NN08',
+        pullQuote: '',
+        summary: 'A short #NN08 post points to an Austin Chronicle Netroots Nation item quoting Media Matters\' Karl Frisch: "We\'re ideological, not partisan."',
+        sourceSha: '0041b650c6c2d9689c1337ffe71f62db091c55950fa2bfdacd5bcdd63ca41afe',
+      }],
+      ['RECORD-00862', {
+        title: '#NN08 Nancy Pelosi was moved up half an hour this morning so the speculation is that Al Gore is a surprise guest later today.',
+        url: 'https://www.huffpost.com/entry/nn08-nancy-pelosi-was-mov_b_113745',
+        publicationDate: '2008-07-19',
+        wordCount: '82',
+        rawTextSha: '9946a7dc23ae8c527bb54b6a1a86c3fd00c6c3b746a369da6943cba908417153',
+        excerpt: '# \\#NN08 Nancy Pelosi was moved up half an hour this morning so the speculation is that Al Gore is a surprise guest later today.',
+        pullQuote: '',
+        summary: "A short #NN08 dispatch notes that Nancy Pelosi's Netroots Nation appearance was moved earlier, fueling speculation that Al Gore would appear as a surprise guest later that day.",
+        sourceSha: '94c9e65f3e58330739ad36373c6cafcd88af3c7845615ca5478975c3e0830537',
+      }],
+      ['RECORD-00863', {
+        title: '#NN08 Sketchbook: I tell Joe Trippi that his "Nixon won on radio" (in 1960 debate) reference is basically an urban legend.  Blank.',
+        url: 'https://www.huffpost.com/entry/nn08-sketchbook-i-tell-jo_b_113757',
+        publicationDate: '2008-07-19',
+        wordCount: '142',
+        rawTextSha: '81d637bcf5728a3fcf8d4e1edfda5ccfa6c8a5ffe43a3687792bac94432c7bf9',
+        excerpt: '# \\#NN08 Sketchbook: I tell Joe Trippi that his "Nixon won on radio" (in 1960 debate) reference is basically an urban legend. Blank.',
+        pullQuote: '',
+        summary: 'A short #NN08 sketchbook post says Rosen told Joe Trippi that the "Nixon won on radio" claim about the 1960 debate is an urban legend.',
+        sourceSha: '2ecba87badcf6807880b33ac689eba97e49bb267cbf8f26f8827a27c6dfd0b7d',
+      }],
+    ]);
+
+    for (const [id, source] of expected) {
+      const record = archiveRecords.find(row => row.id === id);
+      assert.ok(record, `${id} must exist`);
+      assert.strictEqual(record.title, source.title);
+      assert.strictEqual(record.url, source.url);
+      assert.strictEqual(record.author, 'Jay Rosen');
+      assert.strictEqual(record.publication_date, source.publicationDate);
+      assert.strictEqual(record.word_count, source.wordCount);
+      assert.strictEqual(
+        crypto.createHash('sha256').update(record.raw_text).digest('hex'),
+        source.rawTextSha,
+        `${id} raw_text changed`
+      );
+      assert.strictEqual(record.excerpt, source.excerpt);
+      assert.strictEqual(record.pull_quote, source.pullQuote);
+      assert.strictEqual(record.summary, source.summary);
+      assert.strictEqual(record.verified, 'TRUE');
+      assert.strictEqual(record.needs_review, 'FALSE');
+      assert.match(record.notes, /HuffPost source verified 2026-07-23/);
+      assert.match(record.notes, new RegExp(source.sourceSha));
+    }
+  });
+
   it('RECORD-00614 cannot verify mismatched TomDispatch works', () => {
     const record = archiveRecords.find(row => row.id === 'RECORD-00614');
     assert.ok(record, 'RECORD-00614 must exist');

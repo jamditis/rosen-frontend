@@ -4453,3 +4453,98 @@ Final SHA-256 values after export:
 - `data/archive-details.json`: `578d2f137f1f053ee3cc8bc72b02c134a2f417eb89c7031faa3571da2787e025`
 - `data/archive-entities.json`: `2445f36dbacde8da21b50a9c76b852075ca5eaadeb7404ed584340006b99c877`
 - `data/archive-analytics.json`: `7be364e05556035f89c3925d28cfc0ef21f4078c4bea443d1241fccd8a6491fa`
+
+### HuffPost verification pilot 12 applied
+
+`RECORD-00859` through `RECORD-00863` were applied from the saved packet under
+`%TEMP%/rosen-k2-huffpost-pilot-12`, with supplemental Wayback evidence for the
+three short `#NN08` rows whose modern HuffPost URLs now return 404. The K2
+worker verified `RECORD-00859` and `RECORD-00860` from first-attempt official
+HTTP 200 responses. It left `RECORD-00861` through `RECORD-00863` unresolved
+against modern HuffPost; the primary agent then fetched the exact Wayback
+captures already cited inside the stored raw text and saved those responses in
+`%TEMP%/rosen-k2-huffpost-pilot-12/wayback-supplemental`.
+
+Grok reviewed the summary draft in read-only no-web mode and accepted all five
+summaries. No objections were applied.
+
+Changes applied:
+
+- `RECORD-00859`: summary added; `verified=TRUE`; `needs_review=FALSE`;
+  `low_confidence=FALSE`; notes now cite official response SHA-256
+  `cdf43c9170b945d23b37518cbf746f242530271cbd2b7117faa89fc3a22f864d`.
+- `RECORD-00860`: summary added; `verified=TRUE`; `needs_review=FALSE`;
+  `low_confidence=FALSE`; notes now cite official response SHA-256
+  `e541bfca40e39caabee788a7775fedf23e731f0007836fd84d415714ce44eb06`.
+- `RECORD-00861`: body-backed excerpt repaired from the archived capture;
+  summary added; `verified=TRUE`; `needs_review=FALSE`;
+  `low_confidence=FALSE`; notes now cite Wayback capture SHA-256
+  `0041b650c6c2d9689c1337ffe71f62db091c55950fa2bfdacd5bcdd63ca41afe`.
+- `RECORD-00862`: publication date corrected from `2013-11-15` to
+  `2008-07-19`; body-backed excerpt repaired from the archived capture; summary
+  added; `verified=TRUE`; `needs_review=FALSE`; `low_confidence=FALSE`; notes
+  now cite Wayback capture SHA-256
+  `94c9e65f3e58330739ad36373c6cafcd88af3c7845615ca5478975c3e0830537`.
+- `RECORD-00863`: publication date corrected from `2013-11-15` to
+  `2008-07-19`; body-backed excerpt repaired from the archived capture; summary
+  added; `verified=TRUE`; `needs_review=FALSE`; `low_confidence=FALSE`; notes
+  now cite Wayback capture SHA-256
+  `2ecba87badcf6807880b33ac689eba97e49bb267cbf8f26f8827a27c6dfd0b7d`.
+
+The focused regression
+`node --test --test-name-pattern "HuffPost pilot twelve" tests\csv-quality.test.js`
+failed before the CSV edit because `RECORD-00859` still had a blank summary,
+then passed after the five-row patch. Raw-text SHA-256 values stayed unchanged:
+
+- `RECORD-00859`: `c012883e030a441f5bc519055e6553f32dfa5ccbd9411fb684f0a2dbc9409d2b`
+- `RECORD-00860`: `7e8f39348d07529ed28fd9019a529ce8852b4a9591da09f7869760b2940bcd8b`
+- `RECORD-00861`: `e5c37b47d7f36cbd0fe5a8b44c7405c99379cc0cc16e69edc32920151c866fda`
+- `RECORD-00862`: `9946a7dc23ae8c527bb54b6a1a86c3fd00c6c3b746a369da6943cba908417153`
+- `RECORD-00863`: `81d637bcf5728a3fcf8d4e1edfda5ccfa6c8a5ffe43a3687792bac94432c7bf9`
+
+Post-application row counts:
+
+- Archive rows: 1,028.
+- Blank archive summaries: 15, down from 20.
+- Archive rows not explicitly verified: 19, down from 24.
+- `#NN08` rows with capture-year dates: 6, down from 8.
+- Generated records after export: 26,677.
+- Entities: 7,389.
+- Relationships: 10,804.
+
+Validation:
+
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 78 records with raw text but no extracted relationships.
+- `npm run test:data`: expected eight completion gates still fail: three core
+  blanks, 15 blank summaries, 19 unverified archive records, six `#NN08`
+  capture-year dates, 54 non-Rosen Bluesky profile URLs, 54 non-Rosen Bluesky
+  copyright assignments, 29,693 unverified social rows, and 50 blank entity
+  first mentions. The pilot-twelve regression passes.
+
+Packet artifact SHA-256 values:
+
+- `source-verification.json`: `369464a06e300eed0bb9180f98b990633bd784d27e915bcfd449f5ce419559ae`
+- `body-comparison.json`: `5331d5e69902e7502d7ddfe8a73573356a22fec2a00c46adb4ab52ee4bdffdd0`
+- `proposed-field-updates.json`: `2ab058ad8b00ca46233d46db7ede262648ae2294ffa06510ca5fec560d9d1d4a`
+- `field-provenance.json`: `26b77187dc76a37e22019f14f9554d3eb9dbe884189fe26e3677c3d1f8147a0c`
+- `external-calls.ndjson`: `ef1f1f89f112d7987ff5c36b1609c745391079ff2b1559aeee347de67a3fdcd8`
+- `external-calls.json`: `663d928907863b29c80a532a409744c013f4ace491a9f8f2f52741fea36ac668`
+- `grok-summary-review.txt`: `1c40eda3991990ea93e535a15919f94fbeb76ad477ce1cc68faef37c35df5d4b`
+- `wayback-supplemental/external-calls.ndjson`: `5c48dde7a49b3dfb7d9c099316ea42693c0a08a9e7c1a80e9558e00c5ff58be0`
+- `wayback-supplemental/RECORD-00861_wayback_capture.html`: `0041b650c6c2d9689c1337ffe71f62db091c55950fa2bfdacd5bcdd63ca41afe`
+- `wayback-supplemental/RECORD-00862_wayback_capture.html`: `94c9e65f3e58330739ad36373c6cafcd88af3c7845615ca5478975c3e0830537`
+- `wayback-supplemental/RECORD-00863_wayback_capture.html`: `2ecba87badcf6807880b33ac689eba97e49bb267cbf8f26f8827a27c6dfd0b7d`
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `4d86a95512eeb5ebaf87dfde0998d994ab7d5f9378afb04c225079772e493eca`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `181b5acf3d3d3dd0f5f123885e542f8ff56ad7d9fd736f1eae281818918f4c72`
+- `data/archive-data.json`: `e2a848a56f8758cac75489025cb9665a667e7cd6c2c0ddb3edd9242aca04828f`
+- `data/archive-core.json`: `4c297e6f2c5f8cd448289c707b83e26de0822385fb63a788819a6ba7d3532624`
+- `data/archive-details.json`: `aecd75ba74bb097c9119a37a8f6cd81d40211f5adaca21f9d51dd34a9b3fcd32`
+- `data/archive-entities.json`: `9274f1af7e8aac5561bf904c3ff927d206ffd81420c8bcac124a9411b5de914b`
+- `data/archive-analytics.json`: `42c68dc5788c38afea64e9a06c986693dc59adbcc0d9876ad4878398ac72c32c`
