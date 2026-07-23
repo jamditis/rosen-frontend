@@ -5835,3 +5835,68 @@ Final SHA-256 values after export:
 - `data/archive-details.json`: `0b20d217cd57a81dddfb32305186a4fc122f98792b4a17efbc321e4eb13b3ec2`
 - `data/archive-entities.json`: `5ebf7671e79a297e32e62a546dc498390b514ca31b7d532cb8758dd1f0eb6bec`
 - `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`
+
+### Second reviewed orphan entity first-mention batch
+
+Filled 11 more blank `first_mention_record_id` values for existing orphan
+entities with source-text evidence. No new entities, relationships, merges, or
+taxonomy changes were applied.
+
+A read-only Grok CLI review approved the source-backed candidates below and
+rejected `L0159` (`city hall`) as a generic institutional place phrase and
+`P1928` (`Buzenberg`) as surname-only evidence.
+
+Mappings applied:
+
+- `E0121` -> `RECORD-00118` (`California recall`)
+- `E0197` -> `RECORD-00445`
+  (`Harvard conference on blogging, journalism and credibility`)
+- `E0221` -> `RECORD-00502` (`case of Trent Lott`)
+- `E0222` -> `RECORD-00242` (`Rathergate`)
+- `P0626` -> `RECORD-00509` (`Doc Searles`)
+- `P1050` -> `RECORD-00137` (`Dan Gillmor`)
+- `P1929` -> `RECORD-00544` (`Karen Schneider`)
+- `P2092` -> `RECORD-00410` (`Danny Schecter`)
+- `P2178` -> `RECORD-00673` (`Jules Boykoff`)
+- `W0571` -> `RECORD-00123` (`article about the Sacramento Bee`)
+- `W0573` -> `RECORD-00487` (`PowerLine`)
+
+The focused regression
+`node --test --test-name-pattern "second reviewed orphan-entity" tests\csv-quality.test.js`
+failed before the CSV edit because `E0121` had a blank
+`first_mention_record_id`, then passed after the edit.
+
+Post-application counts:
+
+- Entities with blank `first_mention_record_id`: 21, down from 32.
+- Relationships: 11,136, unchanged.
+- Archive records with entities: 873/1,028 (84.9%), unchanged.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "second reviewed orphan-entity" tests\csv-quality.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: passed, 17/17 tests.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  21 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, extraction coverage, and reviewed
+  orphan first-mention tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `cc96e3abbd36cfb455fc2fb1114e9cbd62b895d54efad1d1bb1c5fd7d4b3ecff`
+- `data/extracted_relationships.csv`: `67ff363b9a309e69de3c2792ab35bc478ad18a08655406a31830bc23154171e3`
+- `data/archive-data.json`: `0ed67a57744272069e161d2e62d6222c2ab0c8ad39c53b8239502babc4e6e92b`
+- `data/archive-core.json`: `2ae7c6812324469560d6fdda7c7fc8a44f9b34d1906c13559f2fa6d05288e63a`
+- `data/archive-details.json`: `5516573b8d559d219bc47195b24b7bc1047779594e2fe7cf2a329d9b2a4da137`
+- `data/archive-entities.json`: `0527d5cbdd826b69bb15c3f04798bba76e2d2e81a1c274bec230d530a2424713`
+- `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`

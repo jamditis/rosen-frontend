@@ -2435,6 +2435,51 @@ describe('extracted_entities.csv', () => {
     }
   });
 
+  it('maps the second reviewed orphan-entity batch to source-text evidence', () => {
+    const expected = new Map([
+      ['E0121', { recordId: 'RECORD-00118', phrase: 'California recall' }],
+      ['E0197', { recordId: 'RECORD-00445', phrase: 'Harvard conference on blogging, journalism and credibility' }],
+      ['E0221', { recordId: 'RECORD-00502', phrase: 'case of Trent Lott' }],
+      ['E0222', { recordId: 'RECORD-00242', phrase: 'Rathergate' }],
+      ['P0626', { recordId: 'RECORD-00509', phrase: 'Doc Searles' }],
+      ['P1050', { recordId: 'RECORD-00137', phrase: 'Dan Gillmor' }],
+      ['P1929', { recordId: 'RECORD-00544', phrase: 'Karen Schneider' }],
+      ['P2092', { recordId: 'RECORD-00410', phrase: 'Danny Schecter' }],
+      ['P2178', { recordId: 'RECORD-00673', phrase: 'Jules Boykoff' }],
+      ['W0571', { recordId: 'RECORD-00123', phrase: 'article about the Sacramento Bee' }],
+      ['W0573', { recordId: 'RECORD-00487', phrase: 'PowerLine' }],
+    ]);
+    const entitiesById = new Map(entities.map(entity => [entity.entity_id, entity]));
+    const recordsById = new Map(archiveRecords.map(record => [record.id, record]));
+
+    for (const [entityId, { recordId, phrase }] of expected) {
+      const entity = entitiesById.get(entityId);
+      const record = recordsById.get(recordId);
+      assert.ok(entity, `${entityId} must exist`);
+      assert.ok(record, `${recordId} must exist`);
+      assert.strictEqual(entity.first_mention_record_id, recordId);
+      assert.ok(
+        record.raw_text.toLowerCase().includes(phrase.toLowerCase()),
+        `${recordId} must contain ${phrase}`
+      );
+    }
+
+    const deferred = new Map([
+      ['L0159', 'city hall'],
+      ['P1928', 'Buzenberg'],
+    ]);
+
+    for (const [entityId, phrase] of deferred) {
+      const entity = entitiesById.get(entityId);
+      assert.ok(entity, `${entityId} must exist`);
+      assert.strictEqual(
+        entity.first_mention_record_id,
+        '',
+        `${entityId} should stay blank because ${phrase} is not enough evidence`
+      );
+    }
+  });
+
 });
 
 // ============================================
