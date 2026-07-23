@@ -76,6 +76,23 @@ describe('extraction coverage (#207)', () => {
     );
   });
 
+  it('every archive record with raw_text >= 500 chars has extracted relationships', () => {
+    const haveRel = new Set(
+      relationships.map(r => r.source_record_id).filter(Boolean)
+    );
+    const offenders = records
+      .filter(r => (r.raw_text || '').trim().length >= RAW_TEXT_MIN)
+      .filter(r => !haveRel.has(r.id))
+      .filter(r => !ALLOWLIST.has(r.id))
+      .map(r => r.id);
+    assert.strictEqual(
+      offenders.length,
+      0,
+      `${offenders.length} archive records have raw_text >= ${RAW_TEXT_MIN} chars but 0 extracted relationships. ` +
+      `Sample: ${offenders.slice(0, 10).join(', ')}${offenders.length > 10 ? ', ...' : ''}`
+    );
+  });
+
   it('maps every imported Bluesky thread to existing entities with source excerpts', () => {
     const threadIds = Array.from(
       { length: 10 },
