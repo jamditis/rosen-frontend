@@ -4831,3 +4831,36 @@ Final SHA-256 values after export:
 - `data/archive-details.json`: `45712264720f74b2b102a2e34d899725cbcaf7c8a7259737d1373540ddb743fe`
 - `data/archive-entities.json`: `d21a684f27502a9d353171fe8ea30c364b80bec78cec31f1c7c5d0694bddbf70`
 - `data/archive-analytics.json`: `15788fa14498724398d1954fe86f6a3ab7593bfa2b61322da27be402fbe34128`
+
+### HuffPost record 00865 recovery attempt
+
+`RECORD-00865` was rechecked under
+`%TEMP%/rosen-huffpost-record-00865-recovery` after pilot fifteen because it is
+the last remaining HuffPost blank summary, unverified archive row from the
+pilot range, and `#NN08` capture-year date gate.
+
+The recovery attempt did not produce enough source evidence to verify the row.
+CDX found one HTTP 200 capture for the canonical Huffington Post URL. The saved
+Wayback replay preserves the title and author, but the `articleBody` metadata
+is empty, the page body does not preserve article text, and the page metadata
+uses `2011-05-25 12:40:20 -0400` rather than a directly observed 2008 source
+date. Modern HuffPost, AMP, mobile, and `us_113763` variants returned either
+406 empty responses or 404 pages. The canonical row remains unchanged:
+`verified=FALSE`, `needs_review=TRUE`, `low_confidence=TRUE`, blank summary,
+and `publication_date=2016-02-12` pending better source evidence or curator
+decision.
+
+Kimi was invoked in read-only mode for a boundary review with the packet mounted
+as an added directory, but it timed out after the checkpoint window before
+returning a verdict. The partial response only acknowledged the review request,
+so no decision was taken from it.
+
+Packet artifact SHA-256 values:
+
+- `external-calls.ndjson`: `fb455295ef2711dfab5c6757d1b9d161436057a02d06bb3ddf2f7fa7a467e2b7`
+- `fallback-calls.ndjson`: `d3ddad1d5c66085cd9e7a0913237587cced31f41b930090cb4ad554a34db246f`
+- `kimi-boundary-review.txt`: partial timed-out response, 96 bytes.
+- `capture_20160212022545_id_http_www.huffingtonpost.com_jay-rosen_nn08-sketchbook-rick-pear_b_113763.html.html`:
+  `3348da8c6d85800b662e0c182b0fa468b94669db53d0575207c84e6a896f4ecc`
+- `capture_20160212022545_normal_http_www.huffingtonpost.com_jay-rosen_nn08-sketchbook-rick-pear_b_113763.html.html`:
+  `073a4739d3b109d6b1fc1fe3c77cc3df3a874cfdc5cec4d99d6f804d85dd4705`
