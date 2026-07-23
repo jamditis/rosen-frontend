@@ -5900,3 +5900,63 @@ Final SHA-256 values after export:
 - `data/archive-details.json`: `5516573b8d559d219bc47195b24b7bc1047779594e2fe7cf2a329d9b2a4da137`
 - `data/archive-entities.json`: `0527d5cbdd826b69bb15c3f04798bba76e2d2e81a1c274bec230d530a2424713`
 - `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`
+
+### Record 00865 title-only HuffPost cleanup
+
+`RECORD-00865` was cleaned up from saved Wayback HuffPost metadata while
+remaining unverified, low-confidence, and review-needed. The saved replay
+preserves the HuffPost headline and author but not a visible 2008 posted date
+or full article body, so the row is not marked verified.
+
+A read-only Grok CLI decision review selected a conservative repair: remove the
+Wayback toolbar chrome, set `excerpt`, `summary`, and `raw_text` from the
+recovered title/author metadata, and set `publication_date` to `2008-07-19`
+as sequence-inferred from adjacent `#NN08` post IDs. The notes field records
+the inference and the source limitation.
+
+Evidence:
+
+- Saved source:
+  `http://web.archive.org/web/20160212022545/http://www.huffingtonpost.com/jay-rosen/nn08-sketchbook-rick-pear_b_113763.html`
+- Saved source SHA-256:
+  `c90401d67a37efe6a848df9ac061f8695739a535f22be584bbe675ab8dd411ff`
+- Repaired `raw_text` SHA-256:
+  `ead27b7165e7d4af7dea127e0d26da371127117a60c2890a543fcc211795643a`
+
+Changes applied:
+
+- `publication_date`: `2016-02-12` -> `2008-07-19`
+- `word_count`: `771` -> `63`
+- `excerpt`: Wayback toolbar image link -> title text
+- `summary`: blank -> title-derived source summary
+- `raw_text`: Wayback toolbar chrome -> single-line title/author/source note
+- `verified`: remains `FALSE`
+- `low_confidence`: remains `TRUE`
+- `needs_review`: remains `TRUE`
+
+Validation:
+
+- `node --test --test-name-pattern "HuffPost pilot thirteen" tests\csv-quality.test.js`:
+  failed before the CSV edit because `RECORD-00865` still used the 2016 capture
+  date, then passed after the edit.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: passed, 17/17 tests.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected six completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), five unverified archive
+  records (`RECORD-00602`, `RECORD-00613`, `RECORD-00614`, `CLIP-00023`,
+  `RECORD-00865`), 54 non-Rosen Bluesky profile URLs, 54 non-Rosen Bluesky
+  copyright assignments, 29,693 unverified social rows, and 21 blank entity
+  first mentions. The archive summary and `#NN08` date gates now pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `c65ee61d3332f67c1c41ee3c086546a7a74f880647461365cb3760dccfa79fb7`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `cc96e3abbd36cfb455fc2fb1114e9cbd62b895d54efad1d1bb1c5fd7d4b3ecff`
+- `data/extracted_relationships.csv`: `67ff363b9a309e69de3c2792ab35bc478ad18a08655406a31830bc23154171e3`
+- `data/archive-data.json`: `7a0f4be34215f07a14075ef45ddd9329d621f27fb18d573ffe1056f6ffa29efd`
+- `data/archive-core.json`: `5065f3cdbc7f435c2d5541089f35db59177bdbbc403742fdb6790eba278dd0c5`
+- `data/archive-details.json`: `9b132b6b9f8fd104eeed4c87ae4b009dc279d904d5bf39b83f1d449f535fc626`
+- `data/archive-entities.json`: `a42f7c7a12ef0ceb8508bbf564585841bbee80affd4ce34fa415cab03daa55fa`
+- `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`

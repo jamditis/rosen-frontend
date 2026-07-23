@@ -1557,12 +1557,27 @@ describe('archive_records-public.csv', () => {
 
     const unresolved = archiveRecords.find(row => row.id === 'RECORD-00865');
     assert.ok(unresolved, 'RECORD-00865 must exist');
+    assert.strictEqual(unresolved.publication_date, '2008-07-19');
+    assert.strictEqual(unresolved.word_count, '63');
+    assert.strictEqual(
+      crypto.createHash('sha256').update(unresolved.raw_text).digest('hex'),
+      'ead27b7165e7d4af7dea127e0d26da371127117a60c2890a543fcc211795643a'
+    );
+    assert.strictEqual(
+      unresolved.excerpt,
+      '# #NN08 Sketchbook Rick Pearlstein: impressive. Very. I love it when the youngest person on the panel has the longest view.'
+    );
+    assert.strictEqual(
+      unresolved.summary,
+      'Rosen posts a short #NN08 sketchbook note praising Rick Pearlstein and saying the youngest person on the panel had the longest view.'
+    );
     assert.strictEqual(unresolved.verified, 'FALSE');
     assert.strictEqual(unresolved.needs_review, 'TRUE');
     assert.strictEqual(unresolved.low_confidence, 'TRUE');
-    assert.match(unresolved.notes, /Pilot 13 unresolved/);
-    assert.match(unresolved.notes, /2011 iframe replay returned an empty body/);
-    assert.match(unresolved.notes, /2016 replay lacked a trustworthy 2008 posted date/);
+    assert.doesNotMatch(unresolved.raw_text, /Wayback Machine|Archive Team|HUFFPOST NEWSLETTERS/);
+    assert.match(unresolved.notes, /title-only cleanup/);
+    assert.match(unresolved.notes, /sequence-inferred/);
+    assert.match(unresolved.notes, /c90401d67a37efe6a848df9ac061f8695739a535f22be584bbe675ab8dd411ff/);
   });
 
   it('HuffPost pilot fourteen records match source evidence', () => {
