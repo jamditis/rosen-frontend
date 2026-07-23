@@ -18,6 +18,7 @@ import {
   normalizeForSearch,
   buildSearchText,
   matchesSearch,
+  findSearchSuggestions,
 } from '../frontend/utils/searchNormalize.js';
 
 const RSQUO = String.fromCharCode(0x2019); // right single quote
@@ -125,5 +126,47 @@ describe('buildSearchText (#456) keeps matches within a field', () => {
     assert.equal(matchesSearch({}, ''), true);
     assert.equal(matchesSearch(null, 'anything'), false);
     assert.equal(matchesSearch(null, ''), true);
+  });
+});
+
+describe('findSearchSuggestions (#683)', () => {
+  it('folds case and typographic-apostrophe variants into one suggestion', () => {
+    const terms = [
+      "Citizen's Agenda",
+      "Citizen's agenda",
+      'Citizen' + RSQUO + 's Agenda',
+      'The Citizens Agenda',
+    ];
+
+    assert.deepEqual(findSearchSuggestions(terms, 'citizen'), [
+      "Citizen's Agenda",
+      'The Citizens Agenda',
+    ]);
+  });
+
+  it('applies the result limit after deduplication and preserves first-seen display text', () => {
+    const terms = [
+      'Alpha',
+      'ALPHA',
+      'alpha',
+      'Alpine',
+      'Almanac',
+    ];
+
+    assert.deepEqual(findSearchSuggestions(terms, 'al', 3), [
+      'Alpha',
+      'Alpine',
+      'Almanac',
+    ]);
+  });
+
+  it('ignores malformed terms and invalid queries or limits', () => {
+    assert.deepEqual(
+      findSearchSuggestions([null, '  ', 'Alpha', 42, 'Alpine'], 'al'),
+      ['Alpha', 'Alpine'],
+    );
+    assert.deepEqual(findSearchSuggestions(['Alpha'], '   '), []);
+    assert.deepEqual(findSearchSuggestions(['Alpha'], 'al', 0), []);
+    assert.deepEqual(findSearchSuggestions(null, 'al'), []);
   });
 });

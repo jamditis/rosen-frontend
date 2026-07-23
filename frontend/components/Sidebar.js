@@ -1,9 +1,12 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { html } from '../html.js?v=3.8.7';
+import { html } from '../html.js?v=3.8.8';
 import { X, Search, XCircle, ChevronDown, ChevronUp } from 'lucide-react';
-import { normalizeForSearch } from '../utils/searchNormalize.js?v=3.8.7';
-import { CONTENT_TYPE_OPTIONS } from '../constants.js?v=3.8.7';
+import {
+  findSearchSuggestions,
+  normalizeForSearch,
+} from '../utils/searchNormalize.js?v=3.8.8';
+import { CONTENT_TYPE_OPTIONS } from '../constants.js?v=3.8.8';
 
 const Sidebar = ({
   facets,
@@ -29,10 +32,7 @@ const Sidebar = ({
     setFilters(prev => ({ ...prev, search: val }));
 
     if (val.length > 1) {
-      const normVal = normalizeForSearch(val);
-      const matched = autocompleteIndex
-        .filter(term => normalizeForSearch(term).includes(normVal))
-        .slice(0, 8);
+      const matched = findSearchSuggestions(autocompleteIndex, val, 8);
       setSuggestions(matched);
       setShowSuggestions(true);
     } else {
@@ -198,8 +198,8 @@ const Sidebar = ({
               ${showSuggestions && suggestions.length > 0 && html`
                 <div className="absolute z-30 w-full bg-white border border-stone-300 shadow-lg mt-1 max-h-60 overflow-y-auto">
                   <ul>
-                    ${suggestions.map((term, idx) => html`
-                      <li key=${idx}>
+                    ${suggestions.map(term => html`
+                      <li key=${normalizeForSearch(term)}>
                         <button
                           type="button"
                           onClick=${() => handleSelectSuggestion(term)}
