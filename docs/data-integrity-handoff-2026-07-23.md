@@ -45,6 +45,9 @@ Tracked continuation docs added after the original handoff:
   source or edition mapping decisions.
 - `docs/entity-merge-review-queue-2026-07-23.md`: tracks 28 entity merge
   candidates, with 19 safe batch candidates and 9 curator-required cases.
+- `docs/social-source-recovery-queue-2026-07-23.md`: tracks 54 non-Rosen
+  Bluesky rows that remain `verified=FALSE` because their original native
+  source records are unresolved.
 
 No permanent PressThink IDs, imports, rights decisions, taxonomy decisions,
 entity merges, source-text rewrites, or relationship changes were applied in

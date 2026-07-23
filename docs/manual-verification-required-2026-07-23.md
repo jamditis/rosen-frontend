@@ -15,6 +15,10 @@ Related curator queues:
 - `docs/pressthink-recovery-index-2026-07-23.md`
 - `docs/entity-merge-review-queue-2026-07-23.md`
 
+Related source-recovery queue:
+
+- `docs/social-source-recovery-queue-2026-07-23.md`
+
 ## active records
 
 ### RECORD-00865
