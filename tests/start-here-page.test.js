@@ -6,14 +6,43 @@ const page = readFileSync('frontend/components/StartHerePage.js', 'utf8');
 const app = readFileSync('frontend/App.js', 'utf8');
 const serviceWorker = readFileSync('frontend/sw.js', 'utf8');
 const shippedCss = readFileSync('frontend/dist/tailwind.css', 'utf8');
+const styles = readFileSync('frontend/index.css', 'utf8');
 
 describe('Start here page', () => {
-  it('offers direct archive access and three intent-based starting points', () => {
-    assert.match(page, /Search and browse records/);
+  it('offers three intent-based starting points without immediately looping back to the archive', () => {
+    const heroStart = page.indexOf('className="archive-orientation-hero');
+    const heroEnd = page.indexOf('</section>', heroStart);
+    const hero = page.slice(heroStart, heroEnd);
+
+    assert.ok(heroStart > -1 && heroEnd > heroStart, 'the Start Here hero must be present');
+    assert.doesNotMatch(hero, /routeButton\('archive'/);
+    assert.doesNotMatch(page, /Search and browse records/);
     assert.match(page, /Learn how the archive works/);
     assert.match(page, /Show me the highlights/);
     assert.match(page, /Research a topic or idea/);
+    assert.match(page, /Browse the archive/);
+    assert.match(page, /routeButton\('archive', 'Search records', Search\)/);
+    assert.match(page, /routeButton\('archive', 'Enter the archive', ArrowRight\)/);
+    assert.match(page, /\$\{!embedded && html`[\s\S]*Explore the archive desktop[\s\S]*Prefer a spatial map\?/);
     assert.doesNotMatch(page, /Take a short tour/);
+  });
+
+  it('attaches a shared folder tab to the top edge of every starting-point card', () => {
+    assert.equal(
+      (page.match(/archive-folder-tab archive-path-card__tab/g) || []).length,
+      3,
+      'each of the three starting-point cards needs one folder tab',
+    );
+    for (const label of ['Guide', 'Highlights', 'Research']) {
+      assert.match(page, new RegExp(`archive-path-card__tab" aria-hidden="true"><span>${label}</span>`));
+    }
+    assert.equal(
+      (page.match(/archive-panel archive-path-card archive-path-card--folder/g) || []).length,
+      3,
+      'folder-card positioning must apply to every starting point',
+    );
+    assert.match(styles, /\.start-here-path-grid\s*\{[\s\S]*padding-top:\s*2rem/);
+    assert.match(styles, /\.archive-path-card > \.archive-path-card__tab\s*\{[\s\S]*position:\s*absolute[\s\S]*bottom:\s*calc\(100% - 1px\)/);
   });
 
   it('presents an authored chronological trail through three matched records', () => {
@@ -59,7 +88,7 @@ describe('Start here page', () => {
     assert.match(page, /const ContentTag = embedded \? 'div' : 'main'/);
     assert.match(page, /id=\$\{embedded \? undefined : 'main-content'\}/);
     assert.match(page, /\$\{!embedded && html`<\$\{ArchiveRouteHeader\}/);
-    assert.match(page, /\$\{!embedded && html`<button[\s\S]*Explore the archive desktop/);
+    assert.match(page, /\$\{!embedded && html`\s*<div[\s\S]*Explore the archive desktop[\s\S]*Prefer a spatial map\?/);
     assert.match(page, /if \(embedded\) return;/);
   });
 
