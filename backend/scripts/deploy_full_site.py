@@ -242,15 +242,19 @@ def collect_local_files(
     files: List[Path] = []
     seen: Set[Path] = set()
     declared_entry_points = tuple(entry_points)
-    # Every deployed standalone feature gets dependency-first semantics without
-    # requiring a second hand-maintained manifest. Its directory is walked
-    # normally, but index.html is held until all deployed dirs/data have landed.
-    feature_entry_points = tuple(
-        f'{relpath.rstrip("/")}/index.html'
+    # Every deployed standalone page gets dependency-first semantics without a
+    # second hand-maintained manifest. Directories are walked normally, but
+    # nested index.html files are held until all deployed dirs/data have landed.
+    # This covers dissertation/, faq/, tools/, and features/ uniformly as their
+    # versioned surfaces evolve. Generated r/*.html shells keep their dedicated
+    # ordering below because they depend on the global frontend and archive data.
+    standalone_entry_points = tuple(sorted(
+        path.relative_to(repo_root).as_posix()
         for relpath in dirs
-        if relpath.rstrip('/').startswith('features/')
-        and (repo_root / relpath / 'index.html').is_file()
-    )
+        if relpath.rstrip('/') != 'r'
+        for path in (repo_root / relpath).rglob('index.html')
+        if path.is_file()
+    ))
     record_entry_points = tuple(sorted(
         path.relative_to(repo_root).as_posix()
         for relpath in dirs
@@ -260,7 +264,7 @@ def collect_local_files(
     ))
     entry_set = (
         set(declared_entry_points)
-        | set(feature_entry_points)
+        | set(standalone_entry_points)
         | set(record_entry_points)
     )
 
@@ -310,10 +314,10 @@ def collect_local_files(
         if p.is_file():
             _add(p)
 
-    # Feature entry points flip only after every walked dependency and data file
-    # is live. The global app/SW/version entry points retain their declared
-    # absolute-last ordering after the standalone features.
-    for relpath in feature_entry_points:
+    # Standalone entry points flip only after every walked dependency and data
+    # file is live. The global app/SW/version entry points retain their declared
+    # absolute-last ordering after the standalone pages.
+    for relpath in standalone_entry_points:
         p = repo_root / relpath
         if p.is_file():
             _add(p)

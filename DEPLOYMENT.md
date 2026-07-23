@@ -84,13 +84,13 @@ materializes it automatically. Before a manual FTP deploy, run
 `git lfs pull --include="dissertation/reader/*.pdf"` and confirm the reader PDF
 is 18,500,765 bytes; never upload the 133-byte LFS pointer.
 
-The full-site deploy uploads each standalone `features/*/index.html` only after
-the files in its feature directory and the shared data manifest. This keeps a
-feature's public entry point on the previous release until its JavaScript, CSS,
-and data dependencies are live. Generated `r/*.html` record shells follow all
-frontend and data dependencies. The root `index.html`, implementation worker,
-root-scope worker bridge, and `version.json` then retain their final four
-release flips.
+The full-site deploy uploads every standalone `index.html` under its deployed
+directories only after all walked assets and the shared data manifest. This
+keeps dissertation, FAQ, feature, and tool entry points on the previous release
+until their JavaScript, CSS, and data dependencies are live. Generated
+`r/*.html` record shells follow all frontend and data dependencies. The root
+`index.html`, implementation worker, root-scope worker bridge, and
+`version.json` then retain their final four release flips.
 
 `backend/scripts/deploy_full_site.py` rebuilds `r/*.html` from the committed
 `index.html` and `data/archive-data.json` before collecting the upload. These

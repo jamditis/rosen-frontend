@@ -476,6 +476,65 @@ class TestEntryPointsUploadedLast:
         assert names.index('features/example/styles.css') < names.index(
             'features/example/index.html')
 
+    def test_each_standalone_html_uploads_after_its_dependencies(self, tmp_path):
+        dissertation = tmp_path / 'dissertation'
+        reader = dissertation / 'reader'
+        faq = tmp_path / 'faq'
+        reader.mkdir(parents=True)
+        faq.mkdir()
+        (dissertation / 'index.html').write_text(
+            '<link rel="stylesheet" href="./landing.css">')
+        (dissertation / 'landing.css').write_text('/* landing */')
+        (reader / 'index.html').write_text(
+            '<script src="./reader.js"></script>')
+        (reader / 'reader.js').write_text('// reader')
+        (faq / 'index.html').write_text(
+            '<link rel="stylesheet" href="./styles.css">')
+        (faq / 'styles.css').write_text('/* faq */')
+
+        files = deploy_full_site.collect_local_files(
+            tmp_path,
+            top_files=(),
+            dirs=('dissertation', 'faq'),
+            data_files=(),
+            entry_points=(),
+        )
+        names = [f.relative_to(tmp_path).as_posix() for f in files]
+
+        for asset, entry in (
+            ('dissertation/landing.css', 'dissertation/index.html'),
+            ('dissertation/reader/reader.js',
+             'dissertation/reader/index.html'),
+            ('faq/styles.css', 'faq/index.html'),
+        ):
+            assert names.index(asset) < names.index(entry)
+
+        assert names[-3:] == [
+            'dissertation/index.html',
+            'dissertation/reader/index.html',
+            'faq/index.html',
+        ]
+
+    def test_real_standalone_entry_points_follow_walked_assets(self):
+        files = deploy_full_site.collect_local_files(_REPO_ROOT)
+        names = [f.relative_to(_REPO_ROOT).as_posix() for f in files]
+        entries = [
+            name for name in names
+            if name.endswith('/index.html') and not name.startswith('r/')
+        ]
+        assets = [
+            name for name in names
+            if name.startswith(('dissertation/', 'faq/', 'features/'))
+            and name not in entries
+        ]
+
+        assert 'dissertation/index.html' in entries
+        assert 'dissertation/reader/index.html' in entries
+        assert 'faq/index.html' in entries
+        assert assets
+        assert max(names.index(name) for name in assets) < min(
+            names.index(name) for name in entries)
+
     def test_winer_entry_html_uploads_after_all_winer_dependencies(self):
         files = deploy_full_site.collect_local_files(_REPO_ROOT)
         names = [f.relative_to(_REPO_ROOT).as_posix() for f in files]
