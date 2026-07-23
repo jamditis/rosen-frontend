@@ -2,7 +2,7 @@
 
 This directory holds the archive's data: the CSV source files that record everything in the collection, the generated JSON files the website reads, and the script that turns one into the other.
 
-The data is part of the public record and free to use. If you build something with it, a link back to the archive is appreciated: https://pressthink.org/j/rosen-archive/
+The metadata and derived data (entities, relationships) are licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/): you're free to use and build on them, but attribution is required — credit the archive and link back to https://pressthink.org/j/rosen-archive/ (see the license section of [`SCHEMA.md`](SCHEMA.md)).
 
 ## The data files at a glance
 
@@ -46,7 +46,7 @@ Counts verified 2026-07-23; they grow as records are added.
 - **Want to analyze it?** The CSVs open in any spreadsheet app or data tool. `SCHEMA.md` explains every column. Note that text fields in `archive_records-public.csv` contain line breaks, so use a real CSV parser rather than splitting on newlines.
 - **Want to build on it?** The split JSON files are what the site itself consumes; `archive-data.json` is the everything-in-one-file option.
 
-The code in this repository is MIT licensed. The archived writings referenced by the data remain the work of their original authors and publications.
+Licensing: the code in this repository is MIT licensed; the metadata and derived data are [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) (attribution required); and the archived writings referenced by the data remain under the original copyright of their authors and publications.
 
 ## Regenerating the JSON
 

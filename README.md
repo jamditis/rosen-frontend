@@ -36,7 +36,7 @@ The archive's data is part of the public record and free to use. See [`data/READ
 - A human-readable data dictionary in [`data/SCHEMA.md`](data/SCHEMA.md)
 - RSS and OPML feeds under `data/feeds/`
 
-The code in this repository is MIT licensed (see [`LICENSE`](LICENSE)). The archived writings themselves remain the work of their original authors and publications; the dissertation is © 1986 Jay Rosen.
+Licensing: the code in this repository is MIT licensed (see [`LICENSE`](LICENSE)); the metadata and derived data (entities, relationships) are licensed [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), so reuse requires attribution; and the archived writings themselves remain under their original copyright — the dissertation is © 1986 Jay Rosen.
 
 ## Running the site locally
 
@@ -114,7 +114,7 @@ The site is hosted at `pressthink.org/j/rosen-archive/` and deployed by uploadin
 
 1. Edit source files as needed.
 2. If data changed: `node data/export-archive-data.js`.
-3. Run `npm run bump-version -- X.X.X` to stamp the new version across `index.html`, `version.json`, every `?v=` import string, and the service worker's `CACHE_VERSION`. The service worker matches cached JS with `ignoreSearch: true`, so only a `CACHE_VERSION` change drops its stale cache — a `?v=` bump alone is not enough.
+3. Run `npm run bump-version -- X.X.X` to stamp the new version across `index.html`, `version.json`, the `?v=` import strings in `frontend/`, `faq/`, and `features/`, and the service worker's `CACHE_VERSION`. The service worker matches cached JS with `ignoreSearch: true`, so only a `CACHE_VERSION` change drops its stale cache — a `?v=` bump alone is not enough. Note that the bumper does **not** walk `dissertation/` — the dissertation subpages version their assets independently, so sweep their `?v=` strings by hand when a release touches them.
 4. Upload only the files that changed via FTP to `/wp-content/rosen-archive/`.
 
 **Do not upload:** CSVs, backup files, screenshots, or the `backend/`, `tests/`, `docs/`, `archived/`, `.github/`, `.claude/`, or `node_modules/` trees. See `DEPLOYMENT.md` for the full exclusion list.
