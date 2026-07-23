@@ -1912,76 +1912,79 @@ async function main() {
     const browser = await launchBrowser();
     try {
       const context = await browser.newContext({ serviceWorkers: 'block' });
-      const page = await context.newPage();
-
       const rows = [];
       for (const viewport of VIEWPORTS) {
-        for (const route of ROUTES) {
-          console.log(`  ${viewport.name.padEnd(8)} ${route.url}`);
-          const pageErrors = [];
-          const consoleErrors = [];
-          const networkErrors = [];
-          let captureApplicationNetwork = true;
-          const capturePageError = (error) => pageErrors.push(error.message || String(error));
-          const captureConsoleError = (message) => {
-            if (captureApplicationNetwork && message.type() === 'error') {
-              if (route.mockDetailsFailure) {
-                if (message.text().includes('Error fetching details data:')) return;
-                const locationUrl = message.location().url;
-                const expectedResourceError = message.text().includes('Failed to load resource:')
-                  && locationUrl
-                  && new URL(locationUrl).pathname.endsWith('/data/archive-details.json');
-                if (expectedResourceError) return;
+        const page = await context.newPage();
+        try {
+          for (const route of ROUTES) {
+            console.log(`  ${viewport.name.padEnd(8)} ${route.url}`);
+            const pageErrors = [];
+            const consoleErrors = [];
+            const networkErrors = [];
+            let captureApplicationNetwork = true;
+            const capturePageError = (error) => pageErrors.push(error.message || String(error));
+            const captureConsoleError = (message) => {
+              if (captureApplicationNetwork && message.type() === 'error') {
+                if (route.mockDetailsFailure) {
+                  if (message.text().includes('Error fetching details data:')) return;
+                  const locationUrl = message.location().url;
+                  const expectedResourceError = message.text().includes('Failed to load resource:')
+                    && locationUrl
+                    && new URL(locationUrl).pathname.endsWith('/data/archive-details.json');
+                  if (expectedResourceError) return;
+                }
+                consoleErrors.push(message.text());
               }
-              consoleErrors.push(message.text());
+            };
+            const captureBadResponse = (response) => {
+              if (!captureApplicationNetwork) return;
+              const url = new URL(response.url());
+              const expectedDetailsFailure = route.mockDetailsFailure
+                && url.pathname.endsWith('/data/archive-details.json');
+              if (url.origin === BASE && response.status() >= 400 && !expectedDetailsFailure) {
+                networkErrors.push(`${response.status()} ${url.pathname}`);
+              }
+            };
+            const captureFailedRequest = (request) => {
+              if (!captureApplicationNetwork) return;
+              const url = new URL(request.url());
+              if (url.origin === BASE) {
+                networkErrors.push(`${request.failure()?.errorText || 'request failed'} ${url.pathname}`);
+              }
+            };
+            page.on('pageerror', capturePageError);
+            page.on('console', captureConsoleError);
+            page.on('response', captureBadResponse);
+            page.on('requestfailed', captureFailedRequest);
+            try {
+              const row = await auditOne(
+                page,
+                route,
+                viewport,
+                (enabled) => { captureApplicationNetwork = enabled; },
+              );
+              if (pageErrors.length > 0) {
+                throw new Error(`Unhandled page errors: ${JSON.stringify(pageErrors)}`);
+              }
+              if (consoleErrors.length > 0) {
+                throw new Error(`Application console errors: ${JSON.stringify(consoleErrors)}`);
+              }
+              if (networkErrors.length > 0) {
+                throw new Error(`Same-origin network errors: ${JSON.stringify(networkErrors)}`);
+              }
+              rows.push(row);
+            } catch (err) {
+              console.error(`  FAILED ${viewport.name} ${route.url}: ${err.message}`);
+              rows.push({ route: route.slug, url: route.url, viewport: viewport.name, violations: [{ id: 'audit-error', impact: 'critical', help: err.message, helpUrl: '', nodes: 0, sample: '' }], passes: 0, incomplete: 0 });
+            } finally {
+              page.off('pageerror', capturePageError);
+              page.off('console', captureConsoleError);
+              page.off('response', captureBadResponse);
+              page.off('requestfailed', captureFailedRequest);
             }
-          };
-          const captureBadResponse = (response) => {
-            if (!captureApplicationNetwork) return;
-            const url = new URL(response.url());
-            const expectedDetailsFailure = route.mockDetailsFailure
-              && url.pathname.endsWith('/data/archive-details.json');
-            if (url.origin === BASE && response.status() >= 400 && !expectedDetailsFailure) {
-              networkErrors.push(`${response.status()} ${url.pathname}`);
-            }
-          };
-          const captureFailedRequest = (request) => {
-            if (!captureApplicationNetwork) return;
-            const url = new URL(request.url());
-            if (url.origin === BASE) {
-              networkErrors.push(`${request.failure()?.errorText || 'request failed'} ${url.pathname}`);
-            }
-          };
-          page.on('pageerror', capturePageError);
-          page.on('console', captureConsoleError);
-          page.on('response', captureBadResponse);
-          page.on('requestfailed', captureFailedRequest);
-          try {
-            const row = await auditOne(
-              page,
-              route,
-              viewport,
-              (enabled) => { captureApplicationNetwork = enabled; },
-            );
-            if (pageErrors.length > 0) {
-              throw new Error(`Unhandled page errors: ${JSON.stringify(pageErrors)}`);
-            }
-            if (consoleErrors.length > 0) {
-              throw new Error(`Application console errors: ${JSON.stringify(consoleErrors)}`);
-            }
-            if (networkErrors.length > 0) {
-              throw new Error(`Same-origin network errors: ${JSON.stringify(networkErrors)}`);
-            }
-            rows.push(row);
-          } catch (err) {
-            console.error(`  FAILED ${viewport.name} ${route.url}: ${err.message}`);
-            rows.push({ route: route.slug, url: route.url, viewport: viewport.name, violations: [{ id: 'audit-error', impact: 'critical', help: err.message, helpUrl: '', nodes: 0, sample: '' }], passes: 0, incomplete: 0 });
-          } finally {
-            page.off('pageerror', capturePageError);
-            page.off('console', captureConsoleError);
-            page.off('response', captureBadResponse);
-            page.off('requestfailed', captureFailedRequest);
           }
+        } finally {
+          await page.close();
         }
       }
 

@@ -119,7 +119,11 @@ describe('archival research and data surfaces', () => {
     }
     assert.match(styles, /@media \(max-width: 720px\)[\s\S]*\.archive-data-toolbar/);
     assert.match(styles, /@media \(prefers-reduced-motion: reduce\)[\s\S]*\.archive-mind-map/);
-    assert.match(desktopStyles, /\.archive-desktop \.archive-action\s*\{[\s\S]*color:\s*var\(--archive-action-color\)/);
+    assert.match(
+      desktopStyles,
+      /@media \(forced-colors: none\)\s*\{\s*\.archive-desktop \.archive-action\s*\{[\s\S]*?color:\s*var\(--archive-action-color\);[\s\S]*?\}\s*\}/,
+      'desktop action foregrounds must defer to the shared forced-colors recipe',
+    );
     assert.match(
       desktopStyles,
       /@media \(hover: hover\) and \(forced-colors: none\)[\s\S]*\.archive-desktop \.archive-action:hover/,
@@ -132,6 +136,11 @@ describe('archival research and data surfaces', () => {
     assert.match(audit, /route\.verifyQueryResults/);
     assert.match(audit, /getByRole\('button', \{ name: 'Run query', exact: true \}\)/);
     assert.match(audit, /Query results escaped the 200%-zoom viewport/);
+    assert.match(
+      audit,
+      /for \(const viewport of VIEWPORTS\) \{\s*const page = await context\.newPage\(\);\s*try \{[\s\S]*?for \(const route of ROUTES\)[\s\S]*?finally \{\s*await page\.close\(\);\s*\}/,
+      'each viewport must use a fresh page so session history cannot reach Chromium\'s cap',
+    );
     assert.match(guide, /walks 41 route states at mobile, tablet, and desktop/);
   });
 });
