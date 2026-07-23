@@ -110,6 +110,112 @@ describe('extraction coverage (#207)', () => {
     );
   });
 
+  it('maps Tumblr extraction batch one to existing entities with source excerpts', () => {
+    const expected = new Map([
+      ['TUMBLR-00001', [
+        {
+          relationshipId: 'TUMBLR-00001_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'O0115',
+          contextSnippet: 'We showcased the explainers we created for ProPublica and other partners to a room full of journalists, editors and entrepreneurs.',
+        },
+        {
+          relationshipId: 'TUMBLR-00001_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'O0158',
+          contextSnippet: 'The wave of attention inspired\nThe Guardian\nto reach out to Studio 20 and commission their own music video explainer on the European sovereign debt crisis.',
+        },
+      ]],
+      ['TUMBLR-00007', [
+        {
+          relationshipId: 'TUMBLR-00007_REL_001',
+          sourceEntityId: 'W0059',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0002',
+          contextSnippet: 'The site is a collaboration between\nThe New York Times\nand New York University’s Arthur L. Carter Journalism Institute, and will cover New York City’s East Village.',
+        },
+        {
+          relationshipId: 'TUMBLR-00007_REL_002',
+          sourceEntityId: 'W0059',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0148',
+          contextSnippet: 'The site is a collaboration between\nThe New York Times\nand New York University’s Arthur L. Carter Journalism Institute, and will cover New York City’s East Village.',
+        },
+      ]],
+      ['TUMBLR-00008', [
+        {
+          relationshipId: 'TUMBLR-00008_REL_001',
+          sourceEntityId: 'E0370',
+          relationshipType: 'Occurred At',
+          targetEntityId: 'O1603',
+          contextSnippet: 'Studio 20 Director Jay Rosen recently gave an\nInaugural Lecture\nto the incoming class at Sciences Po école du journalisme in Paris',
+        },
+        {
+          relationshipId: 'TUMBLR-00008_REL_002',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C1088',
+          contextSnippet: 'Rosen elaborated on his talk in a post he published titled\nThe Journalists Formerly Known as the Media: My Advice to the Next Generation',
+        },
+      ]],
+      ['TUMBLR-00010', [
+        {
+          relationshipId: 'TUMBLR-00010_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O1089',
+          contextSnippet: 'Gawker\n; Burt Herman Co-Founder and CEO,\nStorify',
+        },
+        {
+          relationshipId: 'TUMBLR-00010_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0024',
+          contextSnippet: 'September 13: Jim Kennedy, VP/Director Strategic Planning,\nThe Associated Press',
+        },
+      ]],
+      ['TUMBLR-00011', [
+        {
+          relationshipId: 'TUMBLR-00011_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0115',
+          contextSnippet: 'Assia’s Studio III project is developing, producing and distributing content for “Radio ProPublica” a new audio platform for the investigative journalism newsrtoom.',
+        },
+        {
+          relationshipId: 'TUMBLR-00011_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0270',
+          contextSnippet: 'This fall, Ruth is working for\nJim Brady\n, Editor-in-Chief of Journal Register Company',
+        },
+      ]],
+    ]);
+    const recordsById = new Map(records.map(record => [record.id, record]));
+    const relationshipsById = new Map(relationships.map(relationship => [relationship.relationship_id, relationship]));
+
+    for (const [recordId, recordRelationships] of expected) {
+      const record = recordsById.get(recordId);
+      assert.ok(record, `${recordId} is missing`);
+
+      for (const expectedRelationship of recordRelationships) {
+        const relationship = relationshipsById.get(expectedRelationship.relationshipId);
+        assert.ok(relationship, `${expectedRelationship.relationshipId} is missing`);
+        assert.strictEqual(relationship.source_record_id, recordId);
+        assert.strictEqual(relationship.source_entity_id, expectedRelationship.sourceEntityId);
+        assert.strictEqual(relationship.relationship_type, expectedRelationship.relationshipType);
+        assert.strictEqual(relationship.target_entity_id, expectedRelationship.targetEntityId);
+        assert.strictEqual(relationship.context_snippet, expectedRelationship.contextSnippet);
+        assert.ok(
+          record.raw_text.includes(relationship.context_snippet),
+          `${relationship.relationship_id} has a context excerpt outside ${recordId}`
+        );
+      }
+    }
+  });
+
   it('maps every imported Bluesky thread to existing entities with source excerpts', () => {
     const threadIds = Array.from(
       { length: 10 },
