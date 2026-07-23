@@ -5,6 +5,16 @@ Last updated: 2026-07-23.
 This list is for records that still need a human browser capture, page print, PDF,
 or copied source text before they can be marked verified.
 
+At this checkpoint, only one archive record needs Joe's hands in a browser. The
+PressThink recovery packet and entity merge packet are different queues: they
+have enough local evidence for review, but they need curator decisions before
+canonical import or merge work.
+
+Related curator queues:
+
+- `docs/pressthink-recovery-index-2026-07-23.md`
+- `docs/entity-merge-review-queue-2026-07-23.md`
+
 ## active records
 
 ### RECORD-00865
