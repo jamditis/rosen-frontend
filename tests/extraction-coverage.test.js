@@ -632,6 +632,182 @@ describe('extraction coverage (#207)', () => {
     }
   });
 
+  it('maps Tumblr extraction batch five to existing entities with source excerpts', () => {
+    const expected = new Map([
+      ['TUMBLR-00034', [
+        {
+          relationshipId: 'TUMBLR-00034_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0306',
+          contextSnippet: 'Anjali Mullany',
+        },
+        {
+          relationshipId: 'TUMBLR-00034_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0214',
+          contextSnippet: 'New York Daily News’ push into social media',
+        },
+        {
+          relationshipId: 'TUMBLR-00034_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P1225',
+          contextSnippet: 'Studio 20 professor Jason Samuels',
+        },
+        {
+          relationshipId: 'TUMBLR-00034_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0644',
+          contextSnippet: 'New York Daily News’ push into social media',
+        },
+        {
+          relationshipId: 'TUMBLR-00034_REL_005',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'E0364',
+          contextSnippet: 'Occupy Wall Street',
+        },
+      ]],
+      ['TUMBLR-00035', [
+        {
+          relationshipId: 'TUMBLR-00035_REL_001',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'by Jay Rosen, Director of Studio 20',
+        },
+        {
+          relationshipId: 'TUMBLR-00035_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0076',
+          contextSnippet: 'Why didn’t the news industry invent Facebook?',
+        },
+        {
+          relationshipId: 'TUMBLR-00035_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0018',
+          contextSnippet: 'New York Observer’s website',
+        },
+      ]],
+      ['TUMBLR-00036', [
+        {
+          relationshipId: 'TUMBLR-00036_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0310',
+          contextSnippet: 'Clay Shirky',
+        },
+        {
+          relationshipId: 'TUMBLR-00036_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'C0612',
+          contextSnippet: 'Cognitive Surplus: Creativity and Generosity in a Connected Age',
+        },
+        {
+          relationshipId: 'TUMBLR-00036_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0490',
+          contextSnippet: 'Fortune\nnamed Shirky',
+        },
+        {
+          relationshipId: 'TUMBLR-00036_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P2485',
+          contextSnippet: 'Mark Zuckerberg, Steve Jobs, and Jeff Bezos',
+        },
+        {
+          relationshipId: 'TUMBLR-00036_REL_005',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P1894',
+          contextSnippet: 'Mark Zuckerberg, Steve Jobs, and Jeff Bezos',
+        },
+        {
+          relationshipId: 'TUMBLR-00036_REL_006',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0072',
+          contextSnippet: 'Mark Zuckerberg, Steve Jobs, and Jeff Bezos',
+        },
+      ]],
+      ['TUMBLR-00037', [
+        {
+          relationshipId: 'TUMBLR-00037_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0015',
+          contextSnippet: 'keen interest in journalism and improving it',
+        },
+        {
+          relationshipId: 'TUMBLR-00037_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'C0543',
+          contextSnippet: 'new media',
+        },
+      ]],
+      ['TUMBLR-00038', [
+        {
+          relationshipId: 'TUMBLR-00038_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0192',
+          contextSnippet: 'Google',
+        },
+        {
+          relationshipId: 'TUMBLR-00038_REL_002',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0049',
+          contextSnippet: 'Jay Rosen\n, Professor of Journalism at\nNYU',
+        },
+        {
+          relationshipId: 'TUMBLR-00038_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0033',
+          contextSnippet: 'PressThink',
+        },
+        {
+          relationshipId: 'TUMBLR-00038_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'C0543',
+          contextSnippet: 'new media',
+        },
+      ]],
+    ]);
+    const recordsById = new Map(records.map(record => [record.id, record]));
+    const relationshipsById = new Map(relationships.map(relationship => [relationship.relationship_id, relationship]));
+
+    for (const [recordId, recordRelationships] of expected) {
+      const record = recordsById.get(recordId);
+      assert.ok(record, `${recordId} is missing`);
+
+      for (const expectedRelationship of recordRelationships) {
+        const relationship = relationshipsById.get(expectedRelationship.relationshipId);
+        assert.ok(relationship, `${expectedRelationship.relationshipId} is missing`);
+        assert.strictEqual(relationship.source_record_id, recordId);
+        assert.strictEqual(relationship.source_entity_id, expectedRelationship.sourceEntityId);
+        assert.strictEqual(relationship.relationship_type, expectedRelationship.relationshipType);
+        assert.strictEqual(relationship.target_entity_id, expectedRelationship.targetEntityId);
+        assert.strictEqual(relationship.context_snippet, expectedRelationship.contextSnippet);
+        assert.ok(
+          record.raw_text.includes(relationship.context_snippet),
+          `${relationship.relationship_id} has a context excerpt outside ${recordId}`
+        );
+      }
+    }
+  });
+
   it('maps every imported Bluesky thread to existing entities with source excerpts', () => {
     const threadIds = Array.from(
       { length: 10 },
