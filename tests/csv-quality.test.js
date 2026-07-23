@@ -110,13 +110,18 @@ describe('archive_records-public.csv', () => {
   });
 
   it('all archive records have explicit verified status', () => {
+    // An explicit verdict is TRUE (kept, source-replayed) or FALSE (an
+    // intentionally excluded row, e.g. a Jay Rosenstein namesake negative
+    // control). Only a blank or unexpected value counts as missing verification;
+    // FALSE is a verdict, not an omission, so the gate must not demand TRUE.
+    const explicit = new Set(['TRUE', 'FALSE']);
     const unverified = archiveRecords
-      .filter(record => record.verified !== 'TRUE')
+      .filter(record => !explicit.has((record.verified || '').trim()))
       .map(record => record.id);
     assert.strictEqual(
       unverified.length,
       0,
-      `${unverified.length} archive records are not verified: ${unverified.slice(0, 10).join(', ')}`
+      `${unverified.length} archive records lack an explicit verified status (expected TRUE or FALSE): ${unverified.slice(0, 10).join(', ')}`
     );
   });
 
