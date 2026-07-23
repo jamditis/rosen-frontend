@@ -29,7 +29,9 @@ as soon as the current asset reaches the browser.
 
 Tokens load before their consumers. Recipes load after Tailwind so a component
 can opt into a stable recipe without depending on a generated utility class.
-Standalone pages load tokens and recipes before their page-owned stylesheet.
+Standalone pages load any generated utility stylesheet first, then the legacy
+bridge, tokens, recipes, `shared-styles.css`, and finally their page-owned
+stylesheet or inline composition rules.
 
 ## Semantic tokens
 

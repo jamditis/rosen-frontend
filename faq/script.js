@@ -1,5 +1,5 @@
 // FAQ: Ask the Dissertation
-import { FAQ_METADATA, FAQ_CATEGORIES, FAQ_ITEMS, FAQ_KEYWORDS } from './data.js?v=3.8.4';
+import { FAQ_METADATA, FAQ_CATEGORIES, FAQ_ITEMS, FAQ_KEYWORDS } from './data.js?v=3.8.5';
 
 // DOM Elements
 const faqContainer = document.getElementById('faq-container');
@@ -33,7 +33,7 @@ if (notebookLinkArchive && FAQ_METADATA.notebookLM?.archive) {
 function renderFAQItem(item) {
   const category = FAQ_CATEGORIES.find(c => c.id === item.category);
   const article = document.createElement('article');
-  article.className = 'faq-item card';
+  article.className = 'faq-item archive-panel';
   article.dataset.id = item.id;
   article.dataset.category = item.category;
 
@@ -50,48 +50,42 @@ function renderFAQItem(item) {
     .join('');
 
   article.id = item.id;
+  const answerId = `answer-${item.id}`;
+  const questionId = `question-${item.id}`;
 
   article.innerHTML = `
-    <div class="faq-question p-5 flex items-start justify-between gap-4">
-      <div class="flex-1">
-        <span class="text-xs text-stone-400 uppercase tracking-wider">${category?.name || item.category}</span>
-        <h3 class="font-medium text-stone-850 mt-1">${item.question}</h3>
-      </div>
-      <div class="flex items-center gap-2">
-        <button class="copy-link-btn p-2 text-stone-400 hover:text-stone-600 hover:bg-stone-100 rounded transition-colors" title="Copy link to this question" aria-label="Copy link to this question">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+    <div class="faq-question">
+      <h2 class="faq-heading">
+        <button type="button" class="faq-toggle" id="${questionId}" aria-expanded="false" aria-controls="${answerId}">
+          <span>
+            <span class="archive-folder-tab faq-category"><span>${category?.name || item.category}</span></span>
+            <span class="faq-question__text">${item.question}</span>
+          </span>
+          <svg class="faq-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
           </svg>
         </button>
-        <svg class="faq-chevron w-5 h-5 text-stone-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-        </svg>
-      </div>
+      </h2>
+      <button type="button" class="faq-copy-link" title="Copy link to this question" aria-label="Copy link to this question">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+          </svg>
+      </button>
     </div>
-    <div class="faq-answer">
-      <div class="px-5 pb-5 pt-0 border-t border-stone-100">
-        <div class="prose prose-stone prose-sm max-w-none mt-4 text-stone-600 leading-relaxed">
-          ${formattedAnswer}
-        </div>
-        ${item.sources?.length ? `
-        <div class="mt-4 pt-4 border-t border-stone-100">
-          <p class="text-xs text-stone-400">Sources: ${item.sources.join(', ')}</p>
-        </div>
-        ` : ''}
+    <div class="faq-answer" id="${answerId}" role="region" aria-labelledby="${questionId}" hidden>
+      ${formattedAnswer}
+      ${item.sources?.length ? `
+      <div class="faq-sources">
+        <p>Sources: ${item.sources.join(', ')}</p>
       </div>
+      ` : ''}
     </div>
   `;
 
-  // Toggle on click
-  article.querySelector('.faq-question').addEventListener('click', (e) => {
-    // Don't toggle if clicking the copy link button
-    if (e.target.closest('.copy-link-btn')) return;
-    toggleItem(item.id);
-  });
+  article.querySelector('.faq-toggle').addEventListener('click', () => toggleItem(item.id));
 
   // Copy link handler
-  article.querySelector('.copy-link-btn').addEventListener('click', (e) => {
-    e.stopPropagation();
+  article.querySelector('.faq-copy-link').addEventListener('click', (e) => {
     const url = `${window.location.origin}${window.location.pathname}#${item.id}`;
     // Capture the button now: e.currentTarget is null once dispatch finishes,
     // so reading it inside the async .then() callback would throw and report
@@ -115,14 +109,22 @@ function renderFAQItem(item) {
   return article;
 }
 
+function setItemOpen(item, isOpen) {
+  const toggle = item.querySelector('.faq-toggle');
+  const answer = item.querySelector('.faq-answer');
+  item.classList.toggle('open', isOpen);
+  toggle.setAttribute('aria-expanded', String(isOpen));
+  answer.hidden = !isOpen;
+}
+
 // Toggle FAQ item open/closed
 function toggleItem(id, updateHash = true) {
   const items = document.querySelectorAll('.faq-item');
 
   items.forEach(item => {
     if (item.dataset.id === id) {
-      item.classList.toggle('open');
-      const isOpen = item.classList.contains('open');
+      const isOpen = !item.classList.contains('open');
+      setItemOpen(item, isOpen);
       openItemId = isOpen ? id : null;
 
       // Update URL hash
@@ -141,7 +143,7 @@ function toggleItem(id, updateHash = true) {
         }, 100);
       }
     } else {
-      item.classList.remove('open');
+      setItemOpen(item, false);
     }
   });
 }
@@ -161,8 +163,8 @@ function handleUrlHash() {
 function expandAll() {
   const items = document.querySelectorAll('.faq-item');
   items.forEach(item => {
-    if (item.style.display !== 'none') {
-      item.classList.add('open');
+    if (!item.hidden) {
+      setItemOpen(item, true);
     }
   });
   openItemId = null; // Clear single item tracking
@@ -172,7 +174,7 @@ function expandAll() {
 function collapseAll() {
   const items = document.querySelectorAll('.faq-item');
   items.forEach(item => {
-    item.classList.remove('open');
+    setItemOpen(item, false);
   });
   openItemId = null;
   window.history.pushState(null, '', window.location.pathname); // Clear hash
@@ -205,7 +207,7 @@ function filterItems() {
     }
 
     const visible = categoryMatch && searchMatch;
-    item.style.display = visible ? '' : 'none';
+    item.hidden = !visible;
     if (visible) visibleCount++;
   });
 
@@ -229,7 +231,9 @@ function resetFilters() {
   clearSearch.classList.add('hidden');
 
   categoryButtons.forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.category === 'all');
+    const isActive = btn.dataset.category === 'all';
+    btn.classList.toggle('is-active', isActive);
+    btn.setAttribute('aria-pressed', String(isActive));
   });
 
   filterItems();
@@ -268,7 +272,11 @@ function init() {
   categoryButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       activeCategory = btn.dataset.category;
-      categoryButtons.forEach(b => b.classList.toggle('active', b === btn));
+      categoryButtons.forEach(b => {
+        const isActive = b === btn;
+        b.classList.toggle('is-active', isActive);
+        b.setAttribute('aria-pressed', String(isActive));
+      });
       filterItems();
     });
   });

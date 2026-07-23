@@ -4,31 +4,52 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Impossible Press | Jay Rosen's 1986 Dissertation</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
   <link rel="icon" href="../favicon.ico" />
+  <link rel="canonical" href="https://pressthink.org/j/rosen-archive/dissertation/">
   <meta name="description" content="Explore 'The Impossible Press: American Journalism and the Decline of Public Life' - Jay Rosen's groundbreaking 1986 PhD dissertation on the relationship between press and public.">
 
   <!-- Open Graph -->
+  <meta property="og:site_name" content="Jay Rosen's Internet Archive">
   <meta property="og:title" content="The Impossible Press | Jay Rosen (1986)">
   <meta property="og:description" content="A critical examination of journalism's foundational assumption that 'the press informs the public.'">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pressthink.org/j/rosen-archive/dissertation/">
+  <meta property="og:image" content="https://pressthink.org/j/rosen-archive/og-image.png">
+  <meta property="og:image:alt" content="Jay Rosen's Internet Archive">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Impossible Press | Jay Rosen (1986)">
+  <meta name="twitter:description" content="Read and explore Jay Rosen's 1986 dissertation on journalism, democracy, and public life.">
+  <meta name="twitter:image" content="https://pressthink.org/j/rosen-archive/og-image.png">
+  <meta name="twitter:image:alt" content="Jay Rosen's Internet Archive">
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Roboto+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../frontend/design-system/legacy-token-bridge.css?v=3.8.5">
+  <link rel="stylesheet" href="../frontend/design-system/tokens.css?v=3.8.5">
+  <link rel="stylesheet" href="../frontend/design-system/recipes.css?v=3.8.5">
+  <link rel="stylesheet" href="../shared-styles.css?v=3.8.5">
 
   <style>
     :root {
-      --color-stone-50: #fafaf9;
-      --color-stone-100: #f5f5f4;
-      --color-stone-200: #e7e5e4;
-      --color-stone-300: #d6d3d1;
-      --color-stone-400: #a8a29e;
-      --color-stone-500: #78716c;
-      --color-stone-600: #57534e;
-      --color-stone-700: #44403c;
+      --color-stone-50: var(--archive-canvas);
+      --color-stone-100: var(--archive-paper-deep);
+      --color-stone-200: var(--archive-rule-subtle);
+      --color-stone-300: var(--archive-rule);
+      --color-stone-400: var(--archive-rule-strong);
+      --color-stone-500: var(--archive-ink-muted);
+      --color-stone-600: var(--archive-ink-muted);
+      --color-stone-700: var(--archive-ink-soft);
       --color-stone-800: #292524;
-      --color-stone-900: #1c1917;
-      --color-sky-500: #0ea5e9;
-      --color-sky-600: #0284c7;
+      --color-stone-900: var(--archive-ink);
+      --color-sky-500: var(--archive-sky);
+      --color-sky-600: var(--archive-link);
+      --dissertation-on-dark-muted: #d6d3d1;
+      --dissertation-on-dark-soft: #a8a29e;
     }
 
     * {
@@ -46,6 +67,22 @@
       background: var(--color-stone-100);
       color: var(--color-stone-800);
       line-height: 1.7;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 1100;
+      top: 0.75rem;
+      left: 0.75rem;
+      padding: 0.75rem 1rem;
+      transform: translateY(-180%);
+      border: 2px solid var(--archive-on-dark);
+      color: var(--archive-on-dark);
+      background: var(--archive-ink);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
     }
 
     /* Hero Section */
@@ -83,8 +120,16 @@
       font-size: 0.75rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--color-stone-500);
+      color: var(--dissertation-on-dark-muted);
       margin-bottom: 1.5rem;
+    }
+
+    .archive-folder-tab.hero-eyebrow {
+      --archive-folder-tab-fill: #292524;
+      --archive-folder-tab-edge: var(--dissertation-on-dark-soft);
+      margin-right: auto;
+      margin-left: auto;
+      color: var(--archive-on-dark);
     }
 
     .hero-title {
@@ -136,7 +181,9 @@
 
     .hero-quote a {
       color: var(--color-sky-500);
-      text-decoration: none;
+      text-decoration: underline;
+      text-decoration-thickness: 0.08em;
+      text-underline-offset: 0.2em;
     }
 
     .hero-quote a:hover {
@@ -146,7 +193,7 @@
     .hero-quote-attribution {
       font-size: 0.85rem;
       font-style: normal;
-      color: var(--color-stone-500);
+      color: var(--dissertation-on-dark-muted);
       margin-top: 1rem;
     }
 
@@ -161,6 +208,36 @@
       border-radius: 6px;
       text-decoration: none;
       transition: all 0.2s ease;
+    }
+
+    .dissertation-action {
+      --archive-action-border: var(--dissertation-on-dark-soft);
+      --archive-action-background: transparent;
+      --archive-action-color: var(--archive-on-dark);
+      --archive-action-hover-border: var(--archive-on-dark);
+      --archive-action-hover-background: rgba(255, 255, 255, 0.12);
+      --archive-action-hover-color: var(--archive-on-dark);
+      box-shadow: none;
+    }
+
+    .dissertation-action--primary {
+      --archive-action-border: var(--archive-sky);
+      --archive-action-background: var(--archive-link);
+      --archive-action-color: #fff;
+      --archive-action-hover-border: var(--archive-sky);
+      --archive-action-hover-background: var(--archive-link-hover);
+      --archive-action-hover-color: #fff;
+    }
+
+    .dissertation-action:hover {
+      color: var(--archive-action-hover-color);
+      background: var(--archive-action-hover-background);
+      border-color: var(--archive-action-hover-border);
+      transform: translateY(-2px);
+    }
+
+    .dissertation-reading-action {
+      min-width: 13rem;
     }
 
     .hero-cta:hover {
@@ -204,7 +281,7 @@
       bottom: 2rem;
       left: 50%;
       transform: translateX(-50%);
-      color: var(--color-stone-500);
+      color: var(--dissertation-on-dark-muted);
       font-size: 0.7rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -556,7 +633,15 @@
 
     .about-attribution a {
       color: var(--color-sky-600);
-      text-decoration: none;
+      text-decoration: underline;
+      text-decoration-thickness: 0.08em;
+      text-underline-offset: 0.2em;
+    }
+
+    .about-text > p:not(.about-attribution) a {
+      text-decoration: underline;
+      text-decoration-thickness: 0.08em;
+      text-underline-offset: 0.2em;
     }
 
     .about-attribution a:hover {
@@ -702,7 +787,9 @@
 
     .scholar-context a {
       color: var(--color-sky-600);
-      text-decoration: none;
+      text-decoration: underline;
+      text-decoration-thickness: 0.08em;
+      text-underline-offset: 0.2em;
       display: inline-flex;
       align-items: center;
       gap: 0.25rem;
@@ -901,7 +988,7 @@
 
     .teaser .subtitle {
       font-size: 0.75rem;
-      color: var(--color-stone-500);
+      color: var(--dissertation-on-dark-muted);
       letter-spacing: 0.1em;
       text-transform: uppercase;
     }
@@ -948,6 +1035,41 @@
       opacity: 0.7;
     }
 
+    .site-nav__identity {
+      display: inline-flex;
+      min-height: var(--archive-target-min);
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--archive-on-dark);
+      text-decoration: none;
+    }
+
+    .site-nav__identity .archive-mark {
+      display: grid;
+      width: 2.35rem;
+      height: 2.35rem;
+      place-items: center;
+      color: var(--archive-ink);
+      background: var(--archive-on-dark);
+      font-family: var(--font-display);
+    }
+
+    .site-nav__identity > span:last-child {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.3;
+    }
+
+    .site-nav__identity strong {
+      font-family: var(--font-display);
+      font-weight: 400;
+    }
+
+    .site-nav__identity small {
+      color: var(--dissertation-on-dark-muted);
+      font-size: 0.68rem;
+    }
+
     /* Footer */
     footer {
       background: var(--color-stone-900);
@@ -957,7 +1079,7 @@
 
     footer p {
       font-size: 0.75rem;
-      color: var(--color-stone-500);
+      color: var(--dissertation-on-dark-muted);
     }
 
     footer a {
@@ -980,12 +1102,64 @@
     .footer-links span {
       color: var(--color-stone-600);
     }
+
+    @media (max-width: 640px) {
+      .site-nav {
+        gap: 0.75rem;
+        padding-inline: 1rem;
+      }
+
+      .hero {
+        padding-top: 7rem;
+      }
+
+      .site-nav__identity strong {
+        font-size: 0.8rem;
+      }
+
+      .site-nav__identity small {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-cta-primary,
+      .nav-card-featured,
+      .how-to-cta,
+      .how-to-cta-alt,
+      .timeline-dot-2025,
+      .timeline-connector::after,
+      .scroll-indicator {
+        animation: none;
+      }
+    }
+
+    @media (forced-colors: active) {
+      .dissertation-action,
+      .nav-card,
+      .how-to-card,
+      .scholar-card {
+        border-color: CanvasText;
+        color: CanvasText;
+        background: Canvas;
+        box-shadow: none;
+      }
+    }
   </style>
 </head>
 <body>
 
+  <a class="skip-link" href="#main-content">Skip to dissertation overview</a>
+
   <!-- Site Navigation -->
-  <nav class="site-nav">
+  <nav class="site-nav" aria-label="Archive breadcrumb">
+    <a href="../" class="site-nav__identity">
+      <span class="archive-mark" aria-hidden="true">JR</span>
+      <span>
+        <strong>Jay Rosen's Internet Archive</strong>
+        <small>The Impossible Press</small>
+      </span>
+    </a>
     <a href="../" class="site-nav__link" aria-label="Back to Jay Rosen's Internet Archive">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M19 12H5M12 19l-7-7 7-7"/>
@@ -995,11 +1169,12 @@
   </nav>
 
   <!-- main landmark: also the content root TextSelectionTool binds to (contentSelector: 'main') -->
-  <main>
+  <main id="main-content">
 
   <!-- Hero -->
   <section class="hero">
     <div class="hero-content">
+      <p class="archive-folder-tab hero-eyebrow"><span>Jay Rosen · 1986 · New York University</span></p>
       <h1 class="hero-title">The Impossible Press</h1>
       <p class="hero-subtitle">American Journalism and the Decline of Public Life</p>
       <p class="hero-meta">
@@ -1013,11 +1188,11 @@
       </div>
 
       <div class="hero-buttons">
-        <a href="https://pressthink.org/2025/10/jay-rosen-1986-dissertation-launch-blog-post/" target="_blank" rel="noopener" class="hero-cta hero-cta-primary">
-          Read Jay's Essay &rarr;
+        <a href="https://pressthink.org/2025/10/jay-rosen-1986-dissertation-launch-blog-post/" target="_blank" rel="noopener" class="archive-action dissertation-action dissertation-action--primary">
+          Read Jay's essay &rarr;
         </a>
-        <a href="#about-jay-rosen" class="hero-cta hero-cta-secondary">
-          Read Full Bio &darr;
+        <a href="#about-jay-rosen" class="archive-action dissertation-action">
+          Read full bio &darr;
         </a>
       </div>
     </div>
@@ -1029,10 +1204,10 @@
   <section style="background: var(--color-stone-800); padding: 3rem 2rem; text-align: center;">
     <div class="container">
       <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-        <a href="reader/" style="display: inline-block; font-family: 'Special Elite', monospace; font-size: 1.25rem; color: white; background: var(--color-sky-600); padding: 1rem 2.5rem; border-radius: 8px; text-decoration: none; transition: all 0.2s ease;" onmouseover="this.style.background='#0369a1'; this.style.transform='translateY(-2px)';" onmouseout="this.style.background='#0284c7'; this.style.transform='translateY(0)';">
-          Read the Dissertation &rarr;
+        <a href="reader/" class="archive-action dissertation-action dissertation-action--primary dissertation-reading-action">
+          Read the dissertation &rarr;
         </a>
-        <a href="#scholars-respond" style="display: inline-block; font-family: 'Roboto Mono', monospace; font-size: 1rem; color: var(--color-stone-400); background: transparent; border: 1px solid var(--color-stone-600); padding: 1rem 1.5rem; border-radius: 8px; text-decoration: none; transition: all 0.2s ease;" onmouseover="this.style.borderColor='var(--color-stone-400)'; this.style.color='var(--color-stone-200)';" onmouseout="this.style.borderColor='var(--color-stone-600)'; this.style.color='var(--color-stone-400)';">
+        <a href="#scholars-respond" class="archive-action dissertation-action dissertation-reading-action">
           Scholars respond &darr;
         </a>
       </div>
@@ -1051,7 +1226,7 @@
           <h3>📖 The reader</h3>
           <p>The full dissertation is available in a custom reading interface with chapter navigation and a progress bar that tracks where you are. The reader remembers your place, so you can pick up where you left off.</p>
           <p><strong>Special feature:</strong> Highlight any text to reveal a menu that lets you copy a citation, share the quote, or download a shareable image with the passage and its citation&mdash;perfect for social media.</p>
-          <span class="how-to-cta">Open the Reader &rarr;</span>
+          <span class="how-to-cta">Open the reader &rarr;</span>
         </a>
 
         <a href="https://notebooklm.google.com/notebook/d26d326e-20ec-46dc-b9b4-2c752b90e607" target="_blank" rel="noopener" class="how-to-card">
@@ -1216,7 +1391,7 @@
 
   <!-- Text Selection Sharing Tool -->
   <script type="module">
-    import { TextSelectionTool } from '../features/shared/text-selection.js';
+    import { TextSelectionTool } from '../features/shared/text-selection.js?v=3.8.5';
     const tool = new TextSelectionTool({
       contentSelector: 'main',
       source: 'Jay Rosen, "The Impossible Press" (1986)',

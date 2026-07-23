@@ -88,6 +88,24 @@ describe('stampVersion', () => {
     assert.ok(collected.includes('features/example/script.js'));
   });
 
+  it('stamps standalone dissertation HTML, CSS, and JavaScript recursively', () => {
+    write('dissertation/index.html', '<link rel="stylesheet" href="../shared-styles.css?v=1.0.0">\n');
+    write('dissertation/reader/index.html', [
+      '<link rel="stylesheet" href="src/css/main.css?v=1.0.0">',
+      '<script type="module" src="src/js/reader.js?v=1.0.0"></script>',
+    ].join('\n'));
+    write('dissertation/reader/src/css/main.css', '@import "variables.css?v=1.0.0";\n');
+    write('dissertation/reader/src/js/reader.js', "import './settings.js?v=1.0.0';\n");
+
+    stampVersion(root, '2.3.4');
+
+    assert.match(read('dissertation/index.html'), /shared-styles\.css\?v=2\.3\.4/);
+    assert.match(read('dissertation/reader/index.html'), /main\.css\?v=2\.3\.4/);
+    assert.match(read('dissertation/reader/index.html'), /reader\.js\?v=2\.3\.4/);
+    assert.match(read('dissertation/reader/src/css/main.css'), /variables\.css\?v=2\.3\.4/);
+    assert.match(read('dissertation/reader/src/js/reader.js'), /settings\.js\?v=2\.3\.4/);
+  });
+
   it('stamps frontend design-system HTML and CSS references', () => {
     write('frontend/design-system/demo.html', [
       '<link rel="stylesheet" href="./tokens.css?v=1.0.0">',

@@ -35,7 +35,8 @@ function collectFrontendJsFiles(dir = frontendDir, acc = []) {
 
 // Local-import completeness is enforced for the app and FAQ JavaScript here;
 // the canonical-marker test above this helper covers the broader browser-file
-// surface returned by bump-version.mjs, including standalone features.
+// surface returned by bump-version.mjs, including standalone features and the
+// dissertation pages.
 function collectVersionedJsFiles() {
   return [...collectFrontendJsFiles(frontendDir), ...collectFrontendJsFiles(faqDir)];
 }

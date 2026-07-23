@@ -1,8 +1,8 @@
 
 import { useMemo } from 'react';
-import { html } from '../html.js?v=3.8.4';
+import { html } from '../html.js?v=3.8.5';
 import { ArrowLeft, ArrowRight, Archive, BookOpen, Network, Search, Github, Mail } from 'lucide-react';
-import ArchiveRouteHeader from './ArchiveRouteHeader.js?v=3.8.4';
+import ArchiveRouteHeader from './ArchiveRouteHeader.js?v=3.8.5';
 
 const AboutPage = ({ onBack, onStart, onParticipate, records }) => {
 

@@ -202,7 +202,7 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── dataexplorer/                # Tabular data explorer
 │   └── dataviz/                     # Data visualization tool
 │
-├── tests/                           # Frontend/data test suite — Node.js built-in runner (105 *.test.js files plus a validate-dissertation-page.js helper script; 106 files total)
+├── tests/                           # Frontend/data test suite — Node.js built-in runner (106 *.test.js files plus a validate-dissertation-page.js helper script; 107 runnable/support files total)
 │
 ├── archived/                        # Reference only, not deployed (see DEPLOYMENT.md)
 │   └── scripts/                     # Provenance-only one-off scripts, broken at import from here by design (each has a README). backend-oneoffs/ (#190) and data-oneoffs/ (#380). The rest of archived/ was pruned in #166.
@@ -276,7 +276,7 @@ violations are found.
 
 ## Testing
 
-Tests use Node.js built-in test runner (`node --test`). The suite under `tests/` currently spans 105 test files covering data integrity, CSV quality, pipeline, thread algorithm/detection, frontend structure, view-state, route vocabulary, linkify, entity-index, service-worker cache, HTTP cached loader, fetch error handling, schema BOM, data-explorer security, version consistency, process-record, and the current design-system surfaces:
+Tests use Node.js built-in test runner (`node --test`). The suite under `tests/` currently spans 106 test files covering data integrity, CSV quality, pipeline, thread algorithm/detection, frontend structure, view-state, route vocabulary, linkify, entity-index, service-worker cache, HTTP cached loader, fetch error handling, schema BOM, data-explorer security, version consistency, process-record, and the current design-system surfaces:
 
 ```bash
 npm test                   # Run the full suite

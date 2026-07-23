@@ -1,10 +1,9 @@
 /**
  * Validation Script for DissertationPage Component
- * Run with: node validate-dissertation-page.js
+ * Run with: node tests/validate-dissertation-page.js
  */
 
-const fs = require('fs');
-const path = require('path');
+import { existsSync, readFileSync } from 'node:fs';
 
 console.log('🔍 Validating DissertationPage Component...\n');
 
@@ -15,6 +14,7 @@ const requiredFiles = [
   'frontend/components/DetailPanel.js',
   'frontend/components/dissertationData.js',
   'frontend/design-system/tokens.css',
+  'frontend/index.css',
   'frontend/html.js'
 ];
 
@@ -22,7 +22,7 @@ let allFilesExist = true;
 
 console.log('📁 Checking Required Files:');
 requiredFiles.forEach(file => {
-  const exists = fs.existsSync(file);
+  const exists = existsSync(file);
   console.log(`  ${exists ? '✅' : '❌'} ${file}`);
   if (!exists) allFilesExist = false;
 });
@@ -32,35 +32,47 @@ if (!allFilesExist) {
   process.exit(1);
 }
 
-// Read DissertationPage.js
+// Read the component and the presentation/accessibility collaborators it owns.
 const dissertationPagePath = 'frontend/components/DissertationPage.js';
-const content = fs.readFileSync(dissertationPagePath, 'utf-8');
+const content = readFileSync(dissertationPagePath, 'utf-8');
+const mindMap = readFileSync('frontend/components/MindMap.js', 'utf-8');
+const detailPanel = readFileSync('frontend/components/DetailPanel.js', 'utf-8');
+const styles = readFileSync('frontend/index.css', 'utf-8');
 
 // Validation checks
 const checks = [
   {
-    name: 'Uses design system tokens',
-    test: content.includes('var(--color-') && content.includes('var(--space-'),
+    name: 'Uses archive design-system recipes and semantic tokens',
+    test: content.includes('archive-action archive-action--')
+      && styles.includes('.archive-dissertation-route')
+      && styles.includes('var(--archive-'),
     critical: true
   },
   {
-    name: 'Has breadcrumb navigation',
-    test: content.includes('breadcrumbs') && content.includes('aria-label="Breadcrumb navigation"'),
+    name: 'Keeps archive orientation and route-entry focus',
+    test: content.includes('aria-label="Back to archive"')
+      && content.includes('data-route-entry-focus')
+      && content.includes("Jay Rosen's Internet Archive"),
     critical: false
   },
   {
-    name: 'Has loading state',
-    test: content.includes('isLoading') && content.includes('Loading dissertation'),
+    name: 'Has an accessible interactive-map region',
+    test: content.includes('aria-label="Dissertation index terms"')
+      && mindMap.includes('aria-roledescription="interactive mind map"')
+      && mindMap.includes('aria-live="polite"'),
     critical: false
   },
   {
-    name: 'Has accessibility features',
-    test: content.includes('aria-label') && content.includes('role="status"'),
+    name: 'Has an accessible detail dialog',
+    test: detailPanel.includes('role="dialog"')
+      && detailPanel.includes('aria-labelledby="detail-panel-title"')
+      && detailPanel.includes('aria-label="Close detail panel"'),
     critical: true
   },
   {
     name: 'Has keyboard shortcuts',
-    test: content.includes('handleKeyDown') && content.includes('Cmd/Ctrl'),
+    test: mindMap.includes('handleKeyDown')
+      && mindMap.includes('aria-label="Show keyboard shortcuts"'),
     critical: false
   },
   {
@@ -75,7 +87,8 @@ const checks = [
   },
   {
     name: 'Has responsive design',
-    test: content.includes('className="hidden') || content.includes('hide-mobile'),
+    test: styles.includes('@media (max-width: 720px)')
+      && styles.includes('.archive-dissertation-intro__layout'),
     critical: false
   }
 ];
@@ -102,7 +115,7 @@ checks.forEach(check => {
 });
 
 // Count design token usage
-const tokenCount = (content.match(/var\(--/g) || []).length;
+const tokenCount = (styles.match(/var\(--archive-/g) || []).length;
 console.log(`\n📊 Design System Integration:`);
 console.log(`  Design tokens used: ${tokenCount} times`);
 console.log(`  File size: ${(content.length / 1024).toFixed(2)} KB`);

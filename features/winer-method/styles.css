@@ -1,17 +1,17 @@
 :root {
-  --paper: #fdfbf7;
-  --ink: #1c1917;
-  --muted: #57534e;
-  --rule: #d6d3d1;
-  --soft: #f5f5f4;
-  --blue: #0369a1;
-  --blue-dark: #0c4a6e;
-  --amber: #fef3c7;
+  --paper: var(--archive-canvas);
+  --ink: var(--archive-ink);
+  --muted: var(--archive-ink-muted);
+  --rule: var(--archive-rule);
+  --soft: var(--archive-paper-deep);
+  --blue: var(--archive-focus);
+  --blue-dark: var(--archive-link-hover);
+  --amber: var(--archive-warning-soft);
   --red: #991b1b;
-  --manila: #e8dfc8;
-  --manila-edge: #c9bda0;
-  --display: 'Special Elite', Georgia, serif;
-  --mono: 'Roboto Mono', ui-monospace, monospace;
+  --manila: var(--archive-manila);
+  --manila-edge: var(--archive-manila-edge);
+  --display: var(--font-display);
+  --mono: var(--font-body);
 }
 
 * { box-sizing: border-box; }

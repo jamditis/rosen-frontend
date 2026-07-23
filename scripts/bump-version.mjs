@@ -2,10 +2,10 @@
 // Stamp the canonical archive version across every cache-busting marker (#282).
 //
 // version.json `version` is the single source of truth. This rewrites every
-// `?v=<x.y.z>` marker in the root app, FAQ, and standalone feature browser
-// files, plus the static-asset cache name in frontend/sw.js, then runs the
-// version-consistency
-// test as the guardrail. It replaces the manual multi-file edit that the
+// `?v=<x.y.z>` marker in the root app, FAQ, dissertation, and standalone
+// feature browser files, plus the static-asset cache name in frontend/sw.js,
+// then runs the version-consistency test as the guardrail. It replaces the
+// manual multi-file edit that the
 // version-consistency test only catches after the fact.
 //
 // frontend/services/cacheConfig.js holds a separate CACHE_VERSION (the data cache,
@@ -34,8 +34,8 @@ const SW_CACHE_VERSION = /(const CACHE_VERSION\s*=\s*['"])\d+\.\d+\.\d+(['"])/;
 // Collect the root entry point and every browser JavaScript, HTML, and CSS file
 // in the app and standalone-page trees. This is the same surface the
 // version-consistency test scans, so the guardrail and bumper cannot disagree.
-// Walking features/ (rather than naming today's feature pages) ensures a new
-// standalone feature automatically joins the version-bump surface.
+// Walking features/ and dissertation/ (rather than naming today's standalone
+// pages) ensures additions automatically join the version-bump surface.
 export function collectVersionedFiles(rootDir) {
   const files = [path.join(rootDir, 'index.html')];
   const walk = (dir, extensions) => {
@@ -54,6 +54,7 @@ export function collectVersionedFiles(rootDir) {
   walk(path.join(rootDir, 'frontend'), ['.html', '.js', '.css']);
   walk(path.join(rootDir, 'faq'), ['.html', '.js', '.css']);
   walk(path.join(rootDir, 'features'), ['.html', '.js', '.css']);
+  walk(path.join(rootDir, 'dissertation'), ['.html', '.js', '.css']);
   return files;
 }
 
