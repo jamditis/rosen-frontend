@@ -83,7 +83,7 @@ describe('Ways to participate standalone page', () => {
   it('keeps the three Start here orientation cards and adds participation as a secondary strip', () => {
     const start = read('frontend/components/StartHerePage.js');
     assert.match(start, /md:grid-cols-3/);
-    assert.equal((start.match(/className="archive-panel archive-path-card group text-left"/g) || []).length, 3);
+    assert.equal((start.match(/className="archive-panel archive-path-card archive-path-card--folder group text-left"/g) || []).length, 3);
     assert.match(start, /Help keep the archive useful/);
     assert.match(start, /features\/participate\//);
     assert.match(read('frontend/components/AboutPage.js'), /onParticipate/);

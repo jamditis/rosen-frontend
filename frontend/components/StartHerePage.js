@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { html } from '../html.js?v=3.8.5';
+import { html } from '../html.js?v=3.8.6';
 import {
   AlertCircle,
   ArrowLeft,
@@ -15,8 +15,8 @@ import {
   Search,
   Sparkles
 } from 'lucide-react';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.5';
-import ArchiveRouteHeader from './ArchiveRouteHeader.js?v=3.8.5';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.6';
+import ArchiveRouteHeader from './ArchiveRouteHeader.js?v=3.8.6';
 
 const normalizeTitle = (title = '') => title
   .toLowerCase()
@@ -228,20 +228,21 @@ const StartHerePage = ({
             Jay Rosen's Internet Archive brings together decades of writing, teaching, interviews, and public commentary about journalism and democratic life. Search directly, follow a curated trail, or learn how the collection is organized.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            ${routeButton('archive', 'Search and browse records', Search)}
-            ${!embedded && html`<button
+          ${!embedded && html`
+            <div className="mt-8 flex flex-wrap gap-3">
+              <button
               type="button"
               onClick=${() => navigate('desktop')}
               className="archive-action archive-action--secondary"
-            >
-              <${Monitor} className="h-4 w-4" aria-hidden="true" />
-              Explore the archive desktop
-            </button>`}
-          </div>
-          ${!embedded && html`<p className="mt-3 max-w-2xl font-body text-xs leading-relaxed text-stone-500">
-            Prefer a spatial map? The optional desktop arranges these same archive paths as shortcuts, folders, and windows.
-          </p>`}
+              >
+                <${Monitor} className="h-4 w-4" aria-hidden="true" />
+                Explore the archive desktop
+              </button>
+            </div>
+            <p className="mt-3 max-w-2xl font-body text-xs leading-relaxed text-stone-500">
+              Prefer a spatial map? The optional desktop arranges these same archive paths as shortcuts, folders, and windows.
+            </p>
+          `}
 
           ${stats.total > 0 && html`
             <p className="mt-4 font-body text-xs text-stone-500">
@@ -258,13 +259,14 @@ const StartHerePage = ({
             <p className="mt-2 max-w-2xl font-body text-sm leading-relaxed text-stone-600">Pick the route that best matches what you came to do. You can switch paths at any time.</p>
           </div>
 
-          <div className="start-here-path-grid grid gap-6 md:grid-cols-3">
+          <div className="start-here-path-grid grid md:grid-cols-3">
             <a
               href="#guide"
               onClick=${(event) => { event.preventDefault(); scrollTo('guide'); }}
               aria-controls="guide"
-              className="archive-panel archive-path-card group text-left"
+              className="archive-panel archive-path-card archive-path-card--folder group text-left"
             >
+              <span className="archive-folder-tab archive-path-card__tab" aria-hidden="true"><span>Guide</span></span>
               <${Compass} className="mb-4 h-6 w-6 text-sky-700" aria-hidden="true" />
               <span className="block font-display text-xl font-bold text-stone-900">Learn how the archive works</span>
               <span className="mt-3 block font-body text-sm leading-relaxed text-stone-600">Open the complete field guide to records, folders, entities, research tools, and archive terminology.</span>
@@ -275,8 +277,9 @@ const StartHerePage = ({
               href="#highlights"
               onClick=${(event) => { event.preventDefault(); scrollTo('highlights'); }}
               aria-controls="highlights"
-              className="archive-panel archive-path-card group text-left"
+              className="archive-panel archive-path-card archive-path-card--folder group text-left"
             >
+              <span className="archive-folder-tab archive-path-card__tab" aria-hidden="true"><span>Highlights</span></span>
               <${Sparkles} className="mb-4 h-6 w-6 text-amber-700" aria-hidden="true" />
               <span className="block font-display text-xl font-bold text-stone-900">Show me the highlights</span>
               <span className="mt-3 block font-body text-sm leading-relaxed text-stone-600">Begin with a few works that open onto the archive's recurring questions and ideas.</span>
@@ -286,8 +289,9 @@ const StartHerePage = ({
             <button
               type="button"
               onClick=${() => navigate('entities')}
-              className="archive-panel archive-path-card group text-left"
+              className="archive-panel archive-path-card archive-path-card--folder group text-left"
             >
+              <span className="archive-folder-tab archive-path-card__tab" aria-hidden="true"><span>Research</span></span>
               <${Network} className="mb-4 h-6 w-6 text-stone-700" aria-hidden="true" />
               <span className="block font-display text-xl font-bold text-stone-900">Research a topic or idea</span>
               <span className="mt-3 block font-body text-sm leading-relaxed text-stone-600">Trace people, organizations, concepts, and the records that connect them.</span>

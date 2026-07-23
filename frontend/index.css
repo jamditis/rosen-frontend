@@ -3205,6 +3205,28 @@ mark {
   transition: var(--transition-all);
 }
 
+.start-here-path-grid {
+  padding-top: 2rem;
+  column-gap: 1.5rem;
+  row-gap: 3.5rem;
+}
+
+.archive-path-card--folder {
+  position: relative;
+  overflow: visible;
+}
+
+.archive-path-card > .archive-path-card__tab {
+  position: absolute;
+  z-index: 2;
+  bottom: calc(100% - 1px);
+  left: 1rem;
+  min-width: 6.5rem;
+  max-width: calc(100% - 2rem);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
 .archive-orientation-icon {
   width: var(--archive-target-min);
   height: var(--archive-target-min);
@@ -4611,5 +4633,14 @@ mark {
     color: Canvas;
     background: CanvasText;
     box-shadow: none;
+  }
+
+  .archive-path-card > .archive-path-card__tab {
+    color: CanvasText;
+    background: CanvasText;
+  }
+
+  .archive-path-card > .archive-path-card__tab::before {
+    background: Canvas;
   }
 }
