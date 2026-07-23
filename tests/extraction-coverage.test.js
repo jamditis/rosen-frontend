@@ -1617,6 +1617,196 @@ describe('extraction coverage (#207)', () => {
     }
   });
 
+  it('maps Tumblr extraction batch ten to existing entities with source excerpts', () => {
+    const expected = new Map([
+      ['TUMBLR-00082', [
+        {
+          relationshipId: 'TUMBLR-00082_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0005',
+          contextSnippet: 'Jay Rosen asked the incoming class of Studio 20 students',
+        },
+      ]],
+      ['TUMBLR-00083', [
+        {
+          relationshipId: 'TUMBLR-00083_REL_001',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20 Director\nJay Rosen',
+        },
+        {
+          relationshipId: 'TUMBLR-00083_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0309',
+          contextSnippet: 'Poynter Institute',
+        },
+        {
+          relationshipId: 'TUMBLR-00083_REL_003',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0015',
+          contextSnippet: 'make journalism better',
+        },
+      ]],
+      ['TUMBLR-00084', [
+        {
+          relationshipId: 'TUMBLR-00084_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0426',
+          contextSnippet: 'project in innovation',
+        },
+        {
+          relationshipId: 'TUMBLR-00084_REL_002',
+          sourceEntityId: 'P0276',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0121',
+          contextSnippet: 'Laura Edwins\nis partnering with\nThe Christian Science Monitor',
+        },
+        {
+          relationshipId: 'TUMBLR-00084_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O1420',
+          contextSnippet: 'Quartz',
+        },
+        {
+          relationshipId: 'TUMBLR-00084_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0178',
+          contextSnippet: 'The Guardian US',
+        },
+        {
+          relationshipId: 'TUMBLR-00084_REL_005',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0034',
+          contextSnippet: 'The Huffington Post\n’s TV vertical',
+        },
+        {
+          relationshipId: 'TUMBLR-00084_REL_006',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0666',
+          contextSnippet: 'Global Voices Online',
+        },
+        {
+          relationshipId: 'TUMBLR-00084_REL_007',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0297',
+          contextSnippet: 'Univision',
+        },
+      ]],
+      ['TUMBLR-00085', [
+        {
+          relationshipId: 'TUMBLR-00085_REL_001',
+          sourceEntityId: 'P0290',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0212',
+          contextSnippet: 'Visiting Scholar at NYU’s Arthur L. Carter\nJournalism Institute',
+        },
+        {
+          relationshipId: 'TUMBLR-00085_REL_002',
+          sourceEntityId: 'P0290',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'assist the Studio 20 program as Technical Adviser',
+        },
+        {
+          relationshipId: 'TUMBLR-00085_REL_003',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20 Director Jay Rosen',
+        },
+        {
+          relationshipId: 'TUMBLR-00085_REL_004',
+          sourceEntityId: 'P0290',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0336',
+          contextSnippet: 'RSS and podcasting co-founder\nDave Winer',
+        },
+        {
+          relationshipId: 'TUMBLR-00085_REL_005',
+          sourceEntityId: 'P0290',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0273',
+          contextSnippet: 'co-founder of blogging, RSS and podcasting',
+        },
+        {
+          relationshipId: 'TUMBLR-00085_REL_006',
+          sourceEntityId: 'P0290',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0746',
+          contextSnippet: 'co-founder of blogging, RSS and podcasting',
+        },
+        {
+          relationshipId: 'TUMBLR-00085_REL_007',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0426',
+          contextSnippet: 'innovation in the news system',
+        },
+        {
+          relationshipId: 'TUMBLR-00085_REL_008',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0180',
+          contextSnippet: 'adapting journalism to the web',
+        },
+      ]],
+      ['TUMBLR-00086', [
+        {
+          relationshipId: 'TUMBLR-00086_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O1039',
+          contextSnippet: 'Chief Product Officer at\nForbes',
+        },
+        {
+          relationshipId: 'TUMBLR-00086_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0426',
+          contextSnippet: 'innovation in the digital age',
+        },
+        {
+          relationshipId: 'TUMBLR-00086_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0015',
+          contextSnippet: 'The mission of journalism is to inform',
+        },
+      ]],
+    ]);
+    const recordsById = new Map(records.map(record => [record.id, record]));
+    const relationshipsById = new Map(relationships.map(relationship => [relationship.relationship_id, relationship]));
+
+    for (const [recordId, recordRelationships] of expected) {
+      const record = recordsById.get(recordId);
+      assert.ok(record, `${recordId} is missing`);
+
+      for (const expectedRelationship of recordRelationships) {
+        const relationship = relationshipsById.get(expectedRelationship.relationshipId);
+        assert.ok(relationship, `${expectedRelationship.relationshipId} is missing`);
+        assert.strictEqual(relationship.source_record_id, recordId);
+        assert.strictEqual(relationship.source_entity_id, expectedRelationship.sourceEntityId);
+        assert.strictEqual(relationship.relationship_type, expectedRelationship.relationshipType);
+        assert.strictEqual(relationship.target_entity_id, expectedRelationship.targetEntityId);
+        assert.strictEqual(relationship.context_snippet, expectedRelationship.contextSnippet);
+        assert.ok(
+          record.raw_text.includes(relationship.context_snippet),
+          `${relationship.relationship_id} has a context excerpt outside ${recordId}`
+        );
+      }
+    }
+  });
+
   it('maps every imported Bluesky thread to existing entities with source excerpts', () => {
     const threadIds = Array.from(
       { length: 10 },
