@@ -1146,6 +1146,238 @@ describe('extraction coverage (#207)', () => {
     }
   });
 
+  it('maps Tumblr extraction batch eight to existing entities with source excerpts', () => {
+    const expected = new Map([
+      ['TUMBLR-00066', [
+        {
+          relationshipId: 'TUMBLR-00066_REL_001',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20\nProfessor Jay Rosen',
+        },
+        {
+          relationshipId: 'TUMBLR-00066_REL_002',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0015',
+          contextSnippet: 'what the next journalism system looks like',
+        },
+        {
+          relationshipId: 'TUMBLR-00066_REL_003',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0427',
+          contextSnippet: 'teach them to be innovators and entrepreneurs',
+        },
+      ]],
+      ['TUMBLR-00067', [
+        {
+          relationshipId: 'TUMBLR-00067_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0049',
+          contextSnippet: 'Studio 20 program\nat NYU',
+        },
+        {
+          relationshipId: 'TUMBLR-00067_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0180',
+          contextSnippet: 'innovation in web journalism',
+        },
+        {
+          relationshipId: 'TUMBLR-00067_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0213',
+          contextSnippet: 'subscribers to The Economist magazine',
+        },
+        {
+          relationshipId: 'TUMBLR-00067_REL_004',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0075',
+          contextSnippet: 'Prof. Jay Rosen on Twitter',
+        },
+      ]],
+      ['TUMBLR-00068', [
+        {
+          relationshipId: 'TUMBLR-00068_REL_001',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20 Professor Jay Rosen',
+        },
+        {
+          relationshipId: 'TUMBLR-00068_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0310',
+          contextSnippet: 'Clay Shirky',
+        },
+        {
+          relationshipId: 'TUMBLR-00068_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0543',
+          contextSnippet: "new media's present and future",
+        },
+        {
+          relationshipId: 'TUMBLR-00068_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0212',
+          contextSnippet: "NYU Arthur L. Carter Journalism Institute's",
+        },
+        {
+          relationshipId: 'TUMBLR-00068_REL_005',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0305',
+          contextSnippet: 'Matylda Czarnecka',
+        },
+        {
+          relationshipId: 'TUMBLR-00068_REL_006',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0306',
+          contextSnippet: 'Anjali Mullany',
+        },
+        {
+          relationshipId: 'TUMBLR-00068_REL_007',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'C0015',
+          contextSnippet: '#Journalism',
+        },
+      ]],
+      ['TUMBLR-00069', [
+        {
+          relationshipId: 'TUMBLR-00069_REL_001',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20 Professor Jay Rosen',
+        },
+        {
+          relationshipId: 'TUMBLR-00069_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0310',
+          contextSnippet: 'Clay Shirky',
+        },
+        {
+          relationshipId: 'TUMBLR-00069_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0049',
+          contextSnippet: 'New York University hosted a panel',
+        },
+        {
+          relationshipId: 'TUMBLR-00069_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0543',
+          contextSnippet: 'New Media’s Present and Future',
+        },
+        {
+          relationshipId: 'TUMBLR-00069_REL_005',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0047',
+          contextSnippet: 'movement of public journalism',
+        },
+        {
+          relationshipId: 'TUMBLR-00069_REL_006',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'C0247',
+          contextSnippet: 'mainstream media',
+        },
+        {
+          relationshipId: 'TUMBLR-00069_REL_007',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0249',
+          contextSnippet: 'after-the-fact-checking',
+        },
+        {
+          relationshipId: 'TUMBLR-00069_REL_008',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0555',
+          contextSnippet: 'Dan Rather',
+        },
+        {
+          relationshipId: 'TUMBLR-00069_REL_009',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0289',
+          contextSnippet: 'Rupert Murdoch',
+        },
+      ]],
+      ['TUMBLR-00071', [
+        {
+          relationshipId: 'TUMBLR-00071_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0115',
+          contextSnippet: 'musical explainers for ProPublica',
+        },
+        {
+          relationshipId: 'TUMBLR-00071_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'C0427',
+          contextSnippet: 'think entrepreneurially',
+        },
+        {
+          relationshipId: 'TUMBLR-00071_REL_003',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0843',
+          contextSnippet: 'create a YouTube account',
+        },
+        {
+          relationshipId: 'TUMBLR-00071_REL_004',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0075',
+          contextSnippet: 'community on Twitter or Reddit',
+        },
+        {
+          relationshipId: 'TUMBLR-00071_REL_005',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O1521',
+          contextSnippet: 'Twitter or Reddit',
+        },
+      ]],
+    ]);
+    const recordsById = new Map(records.map(record => [record.id, record]));
+    const relationshipsById = new Map(relationships.map(relationship => [relationship.relationship_id, relationship]));
+
+    for (const [recordId, recordRelationships] of expected) {
+      const record = recordsById.get(recordId);
+      assert.ok(record, `${recordId} is missing`);
+
+      for (const expectedRelationship of recordRelationships) {
+        const relationship = relationshipsById.get(expectedRelationship.relationshipId);
+        assert.ok(relationship, `${expectedRelationship.relationshipId} is missing`);
+        assert.strictEqual(relationship.source_record_id, recordId);
+        assert.strictEqual(relationship.source_entity_id, expectedRelationship.sourceEntityId);
+        assert.strictEqual(relationship.relationship_type, expectedRelationship.relationshipType);
+        assert.strictEqual(relationship.target_entity_id, expectedRelationship.targetEntityId);
+        assert.strictEqual(relationship.context_snippet, expectedRelationship.contextSnippet);
+        assert.ok(
+          record.raw_text.includes(relationship.context_snippet),
+          `${relationship.relationship_id} has a context excerpt outside ${recordId}`
+        );
+      }
+    }
+  });
+
   it('maps every imported Bluesky thread to existing entities with source excerpts', () => {
     const threadIds = Array.from(
       { length: 10 },
