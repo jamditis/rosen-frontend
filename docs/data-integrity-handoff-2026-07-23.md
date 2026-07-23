@@ -15,11 +15,12 @@ with repeatable checks. The archive is materially better, but it is not at
 - One-way choices remain held for curator review: permanent record IDs,
   duplicate/entity merges, edition identity, rights, full-text publication,
   and semantic relationship approval.
-- At a wind-down checkpoint, split completed work into a test-green review PR
-  and stack unresolved gates in a draft PR only when the separation preserves
-  the evidence trail. Use one draft PR if a split would obscure provenance.
+- At a wind-down checkpoint, keep completed work in a test-green review PR and
+  leave unresolved corpus-wide gates in their durable stewardship issues. A
+  deliberately red diagnostic branch is a measurement aid, not a merge
+  candidate.
 
-## Local repository state before handoff commits
+## Original session repository state before handoff commits
 
 - Working directory:
   `C:/Users/amdit/OneDrive/Desktop/Crimes/playground/rosen-frontend`
@@ -28,14 +29,14 @@ with repeatable checks. The archive is materially better, but it is not at
 - Merge base with `origin/main`: `f4a3d24c`
 - Pinned data commit used in evidence packets:
   `5d3d5351346a9712de4f54d95e69ba0f410c6efd`
-- Current archive SHA-256:
-  `d8ae5378cfb2a28dbde40d18768b8622fa2f5a233d51770abb7070a4f5956b92`
-- Current social SHA-256:
-  `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
-- Current entity SHA-256:
-  `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
-- Current relationship SHA-256:
-  `181b5acf3d3d3dd0f5f123885e542f8ff56ad7d9fd736f1eae281818918f4c72`
+- Reviewed archive SHA-256:
+  `bdd28e532ec5b0fd9e1abc180d4023d012b92e5fe6891922eff08bdbd863fe6a`
+- Reviewed social SHA-256:
+  `145c44f52033c7dcfda5f94f9db467ea85d68ecc82048e57067b8bc45a7a98fd`
+- Reviewed entity SHA-256:
+  `0f8571ba152b38a20e7a5a1e5a7c2b7c80a769c30e71291a4a9c87ccb408e21e`
+- Reviewed relationship SHA-256:
+  `dab127201925a5268f39dfcc7f75be40012c93f65602f96f6d008de18da0a5e4`
 
 The starting branch contains the closed design-spec commit from PR #606, which
 is unrelated to this data work. Publish this session from a new branch based on
@@ -45,18 +46,18 @@ is unrelated to this data work. Publish this session from a new branch based on
 
 | Dataset | Current state |
 | --- | ---: |
-| Archive records | 1,028 rows, 38 columns |
+| Archive records | 1,029 rows, 38 columns |
 | Social posts | 29,747 rows, 37 columns |
-| Entities | 7,389 rows, 11 columns |
-| Relationships | 10,804 rows, 10 columns |
-| Archive records with entity relationships | 795/1,028 (77.3%) |
+| Entities | 8,134 rows, 11 columns |
+| Relationships | 12,687 rows, 10 columns |
+| Archive records with entity relationships | 793/1,029 (77.1%) |
 | Archive rows explicitly `verified=FALSE` | 39 |
 | Archive rows with blank summaries | 35 |
 | Archive rows with `needs_review=TRUE` | 10 |
-| Entities with blank `first_mention_record_id` | 50 |
+| Entities with blank `first_mention_record_id` | 49 |
 
 The archive CSV is UTF-8 without a BOM. It has 1,029 CRLF record boundaries
-and 81,623 embedded bare LF characters. Preserve those line-ending counts when
+and 81,387 embedded bare LF characters. Preserve those line-ending counts when
 editing multiline source text.
 
 ## Completed work in this session
@@ -86,6 +87,9 @@ editing multiline source text.
   regression coverage in `data/verification-log.md`.
 - Repaired source-backed defects in `RECORD-00039`, `RECORD-00043`,
   `RECORD-00075`, and `RECORD-00667`.
+- Kept `RECORD-00667` metadata, bounded excerpts, and source hashes while
+  withholding its recovered full text because the source rights notice forbids
+  duplication or redistribution without express written permission.
 - Preserved unresolved identity problems instead of guessing:
   `RECORD-00602`, `RECORD-00613`, and composite `RECORD-00614`.
 - Eight HuffPost `#NN08` records still use capture-year dates:
@@ -104,8 +108,8 @@ editing multiline source text.
   non-quarantined relationship evidence.
 - Added 76 source-backed orphan-entity mappings and 76 evidence relationships.
 - No relationship-backed entity now has a blank first mention.
-- The remaining 50 blanks consist of probable duplicate identities, ambiguous
-  or no-evidence entities, and quarantine-only `O0734`.
+- The remaining 49 blanks consist of probable duplicate identities and
+  ambiguous or no-evidence entities.
 - The entity-merge audit has 28 probable duplicate pairs: 19 mechanical-looking
   candidates and nine curator-required identities. No merge was applied.
 
@@ -155,24 +159,29 @@ write a failing pilot-nine regression, then apply the accepted five-record
 batch. Evidence hashes are in the final pilot-nine section of
 `data/verification-log.md`.
 
-## Test state at the wind-down checkpoint
+## Test and completion-gate state after review
 
-`npm run test:data` currently reports 127 passing and eight failing tests.
-The failures are expected completion gates:
+The reviewed PR head reports 134 passing data tests and no failures. The full
+Node suite, backend validator, link verifier, and required GitHub checks also
+pass.
+
+Closed diagnostic draft #752 measured eight intentionally failing completion
+tests that remain owned by the stewardship issues:
 
 1. Three core blanks: `RECORD-00602:url`, `RECORD-00613:url`, and
    `RECORD-00614:publisher`.
 2. Thirty-five archive summaries are blank (`RECORD-00844` onward).
-3. Thirty-nine archive rows are not explicitly verified.
-4. Eight HuffPost `#NN08` rows use capture-year dates.
-5. Fifty-four non-Rosen Bluesky rows use Jay's profile URL.
-6. The same 54 rows assign copyright to Jay.
-7. Most social rows still lack explicit verification.
-8. Fifty entities lack a first-mention record.
+3. Eight HuffPost `#NN08` rows use capture-year dates.
+4. Fifty-four non-Rosen Bluesky rows use Jay's profile URL.
+5. The same 54 rows assign copyright to Jay.
+6. 29,693 social rows lack explicit verification.
+7. Forty-nine entities lack a first-mention record.
+8. Seventy-eight records with at least 500 raw-text characters have no
+   extracted relationships.
 
-Do not delete, skip, or weaken these gates to make CI green. For a test-green
-completed-work PR, keep the accepted repair regressions and stage the unresolved
-completion gates in a dependent draft PR.
+The archive verification gate itself is green: both `TRUE` (served) and `FALSE`
+(reviewed exclusion) are explicit verdicts. Do not bypass the remaining work by
+weakening gates or bulk-asserting verification without source evidence.
 
 ## Evidence packets on this machine
 

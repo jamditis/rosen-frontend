@@ -76,6 +76,19 @@ describe('archive_records-public.csv', () => {
     assert.ok(dupeCount < 5, `Found ${dupeCount} duplicate URLs in archive records`);
   });
 
+  it('does not publish raw emphasis markup in verified archive titles', () => {
+    const markedUp = archiveRecords
+      .filter(record => record.verified === 'TRUE')
+      .filter(record => /<\/?(?:i|em)\b[^>]*>/i.test(record.title || ''))
+      .map(record => `${record.id}:${record.title}`);
+
+    assert.deepStrictEqual(
+      markedUp,
+      [],
+      `${markedUp.length} verified archive titles contain raw emphasis markup: ${markedUp.join(', ')}`
+    );
+  });
+
   it('HuffPost pilot rows preserve directly observed 2008 source dates', () => {
     const expectedDates = new Map([
       ['RECORD-00861', '2008-07-17'],
@@ -411,10 +424,7 @@ describe('archive_records-public.csv', () => {
       'Penn National Commission on Society, Culture and Community'
     );
     assert.strictEqual(record.word_count, '7161');
-    assert.strictEqual(
-      crypto.createHash('sha256').update(record.raw_text).digest('hex'),
-      'd10991f16f048b4aabc97890c3147d4402f8d1f13a1315b452c3c7f363b9c5af'
-    );
+    assert.strictEqual(record.raw_text, '', 'rights-restricted full text must not be redistributed');
     assert.strictEqual(
       record.excerpt,
       'Some years ago, while watching the CBS Evening News, I was startled to hear Dan Rather say, "And that\'s part of our world tonight." Mr. Rather then thanked me for watching, but it was I who wanted to thank him-- for frank acknowledgment of what he and his colleagues actually do.'
@@ -431,6 +441,8 @@ describe('archive_records-public.csv', () => {
       record.notes,
       /85f414d02dd4550dc3394d0696330534194afd14409c46009a568c99a1780ec7/
     );
+    assert.match(record.notes, /full text not stored/i);
+    assert.match(record.notes, /rights notice/i);
     assert.strictEqual(record.verified, 'TRUE');
     assert.strictEqual(record.needs_review, 'FALSE');
   });
@@ -909,7 +921,7 @@ describe('archive_records-public.csv', () => {
   it('HuffPost pilot seven records match their official sources', () => {
     const expected = new Map([
       ['RECORD-00834', {
-        title: '"Something Quite Breathtaking."  My Exchange with Neil Lewis of the <i>New York Times</i>',
+        title: '"Something Quite Breathtaking." My Exchange with Neil Lewis of the New York Times',
         url: 'https://www.huffpost.com/entry/something-quite-breathtak_b_48081',
         publicationDate: '2007-05-10',
         wordCount: '1382',
@@ -1002,7 +1014,7 @@ describe('archive_records-public.csv', () => {
         sourceSha: '64c525c4fdab94598ed8bd923714e5ecf253fa9ea6ab95081061aecd5a8c9a17',
       }],
       ['RECORD-00840', {
-        title: 'Printing Press Progressives at <em>Mother Jones</em> Try to Debunk the Political Web',
+        title: 'Printing Press Progressives at Mother Jones Try to Debunk the Political Web',
         url: 'https://www.huffpost.com/entry/printing-press-progressiv_b_54281',
         publicationDate: '2007-06-29',
         wordCount: '2012',
@@ -1344,6 +1356,7 @@ describe('social_posts.csv', () => {
       post.excerpt,
       'Image-only post sharing On the Media\'s “Breaking News Consumer\'s Handbook,” a nine-point checklist for evaluating breaking-news reports.'
     );
+    assert.strictEqual(post.summary, post.excerpt);
     assert.strictEqual(
       post.thematic_categories,
       'Audience & Public Engagement, Journalism Education, Press & Media Criticism'
@@ -1645,13 +1658,25 @@ describe('extracted_entities.csv', () => {
         (relationship.source_entity_id === entityId || relationship.target_entity_id === entityId)
       );
       assert.ok(sourceRelationships.length > 0, `${entityId} lacks a relationship in ${recordId}`);
+      const storedSourceText = normalizeNewlines([
+        record.raw_text,
+        record.excerpt,
+        record.summary,
+        record.pull_quote,
+      ].filter(Boolean).join('\n\n'));
+      const hasStoredExactExcerpt = sourceRelationships.some(relationship =>
+        storedSourceText.includes(normalizeNewlines(relationship.context_snippet))
+      );
+      const isRightsWithheldEvidence =
+        !record.raw_text &&
+        /not to be duplicated or redistributed without.+written permission/i.test(record.permissions) &&
+        /raw_text(?:\.txt)? SHA-256 [a-f0-9]{64}/i.test(record.notes) &&
+        sourceRelationships.every(relationship =>
+          relationship.context_snippet.trim().split(/\s+/).length <= 80
+        );
       assert.ok(
-        sourceRelationships.some(relationship =>
-          normalizeNewlines(record.raw_text).includes(
-            normalizeNewlines(relationship.context_snippet)
-          )
-        ),
-        `${entityId} lacks an exact source excerpt in ${recordId}`
+        hasStoredExactExcerpt || isRightsWithheldEvidence,
+        `${entityId} lacks stored source evidence or a bounded, hashed rights-withheld excerpt in ${recordId}`
       );
     }
   });
