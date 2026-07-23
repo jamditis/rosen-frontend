@@ -216,6 +216,105 @@ describe('extraction coverage (#207)', () => {
     }
   });
 
+  it('maps Tumblr extraction batch two to existing entities with source excerpts', () => {
+    const expected = new Map([
+      ['TUMBLR-00012', [
+        {
+          relationshipId: 'TUMBLR-00012_REL_001',
+          sourceEntityId: 'O1474',
+          relationshipType: 'Discusses',
+          targetEntityId: 'O0179',
+          contextSnippet: 'PBS’\nMediaShift\nprofiled NYU’s Studio 20 concentration as an example of journalism education adapting to the changing media industry.',
+        },
+        {
+          relationshipId: 'TUMBLR-00012_REL_002',
+          sourceEntityId: 'P0005',
+          relationshipType: 'Affiliated With',
+          targetEntityId: 'O0179',
+          contextSnippet: 'Studio 20 Director\nJay Rosen\nexplains his philosophy for student participation',
+        },
+      ]],
+      ['TUMBLR-00015', [
+        {
+          relationshipId: 'TUMBLR-00015_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'P0310',
+          contextSnippet: 'Clay Shirky\njoined the Studio 20 faculty.',
+        },
+      ]],
+      ['TUMBLR-00016', [
+        {
+          relationshipId: 'TUMBLR-00016_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'O0115',
+          contextSnippet: 'The Redistricting Song is Dave’s third music video explainer and the second he’s created in partnership with ProPublica.',
+        },
+        {
+          relationshipId: 'TUMBLR-00016_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0308',
+          contextSnippet: 'Dave recently told\nThe Nieman Lab\n.',
+        },
+      ]],
+      ['TUMBLR-00018', [
+        {
+          relationshipId: 'TUMBLR-00018_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0760',
+          contextSnippet: 'Spanish Civil War\nfor publication by\nOxford University Press\n.',
+        },
+        {
+          relationshipId: 'TUMBLR-00018_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Mentions',
+          targetEntityId: 'O0023',
+          contextSnippet: 'picked up by the Washington Post, New York Times  International,  Scientific American and the Guardian',
+        },
+      ]],
+      ['TUMBLR-00019', [
+        {
+          relationshipId: 'TUMBLR-00019_REL_001',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'O0115',
+          contextSnippet: 'In Studio II\n, She introduced us to the skills and tactics we need to execute our long-term project with\nProPublica\n.',
+        },
+        {
+          relationshipId: 'TUMBLR-00019_REL_002',
+          sourceEntityId: 'O0179',
+          relationshipType: 'Discusses',
+          targetEntityId: 'C0100',
+          contextSnippet: 'Zoe taught us the value of iterative project management and\nagile development',
+        },
+      ]],
+    ]);
+    const recordsById = new Map(records.map(record => [record.id, record]));
+    const relationshipsById = new Map(relationships.map(relationship => [relationship.relationship_id, relationship]));
+
+    for (const [recordId, recordRelationships] of expected) {
+      const record = recordsById.get(recordId);
+      assert.ok(record, `${recordId} is missing`);
+
+      for (const expectedRelationship of recordRelationships) {
+        const relationship = relationshipsById.get(expectedRelationship.relationshipId);
+        assert.ok(relationship, `${expectedRelationship.relationshipId} is missing`);
+        assert.strictEqual(relationship.source_record_id, recordId);
+        assert.strictEqual(relationship.source_entity_id, expectedRelationship.sourceEntityId);
+        assert.strictEqual(relationship.relationship_type, expectedRelationship.relationshipType);
+        assert.strictEqual(relationship.target_entity_id, expectedRelationship.targetEntityId);
+        assert.strictEqual(relationship.context_snippet, expectedRelationship.contextSnippet);
+        assert.ok(
+          record.raw_text.includes(relationship.context_snippet),
+          `${relationship.relationship_id} has a context excerpt outside ${recordId}`
+        );
+      }
+    }
+  });
+
   it('maps every imported Bluesky thread to existing entities with source excerpts', () => {
     const threadIds = Array.from(
       { length: 10 },
