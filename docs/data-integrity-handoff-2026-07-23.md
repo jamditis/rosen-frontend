@@ -30,7 +30,7 @@ with repeatable checks. The archive is materially better, but it is not at
 - Pinned data commit used in evidence packets:
   `5d3d5351346a9712de4f54d95e69ba0f410c6efd`
 - Current archive SHA-256:
-  `5ced1d1107be86d48a943f38152e5ad4df2dfb1461c10cfe9304ff5bdc51e484`
+  `11ffcaa406a01a95dcdf24045675a42b8aaadfdd7429045fb654397e398186b8`
 - Current social SHA-256:
   `145c44f52033c7dcfda5f94f9db467ea85d68ecc82048e57067b8bc45a7a98fd`
 - Current entity SHA-256:
@@ -47,16 +47,15 @@ is unrelated to this data work. Publish this session from a new branch based on
 - Ready branch: `agent/data-integrity-verified-batches`.
 - Accepted data commit: `4dede919`.
 - Ready-for-review PR: [#751](https://github.com/jamditis/rosen-frontend/pull/751),
-  based on `main`.
+  merged into `main`.
 - Current local branch: `agent/data-integrity-completion-gates`.
-- Completion-gate commit: `86226f09`.
-- Stacked draft PR: [#752](https://github.com/jamditis/rosen-frontend/pull/752),
-  based on the ready branch.
+- Current draft PR: [#761](https://github.com/jamditis/rosen-frontend/pull/761),
+  based on `main`.
 - Joe's pre-existing `.gitignore` change for `notebooklm-handoff/` remains
   unstaged and must not be bundled into either PR.
 
-PR #751 is the review boundary for accepted repairs. PR #752 adds tests only
-and must remain draft while its nine completion gates fail.
+PR #761 is the current data-integrity checkpoint and must remain draft while
+its completion gates fail.
 
 ## Current data counts
 
@@ -67,8 +66,8 @@ and must remain draft while its nine completion gates fail.
 | Entities | 8,134 rows, 11 columns |
 | Relationships | 12,686 rows, 10 columns |
 | Archive records with entity relationships | 792/1,028 (77.0%) |
-| Archive rows explicitly `verified=FALSE` | 38 |
-| Archive rows with blank summaries | 34 |
+| Archive rows explicitly `verified=FALSE` | 33 |
+| Archive rows with blank summaries | 29 |
 | Archive rows with `needs_review=TRUE` | 10 |
 | Social rows with `verified=TRUE` | 54 |
 | Social rows without a final verified state | 29,693 |
@@ -88,7 +87,7 @@ editing multiline source text.
 - Added focused regressions for every accepted data repair.
 - Added explicit completion gates for core fields, summaries, verification,
   source dates, social identity, social verification, and entity first mentions.
-  Eight gates still fail honestly; they are the remaining work, not broken test
+  Seven gates still fail honestly; they are the remaining work, not broken test
   code.
 - The archive validator reports no structural errors.
 - The CRLF-aware `git diff --check` passes.
@@ -99,8 +98,8 @@ editing multiline source text.
   map every item to a canonical archive record with source evidence; no local
   unprocessed PDF directory remains. `CLIP-00023` stays quarantined as a
   Jay Rosenstein namesake.
-- Applied eight five-record HuffPost pilots, covering `RECORD-00804` through
-  `RECORD-00843`. Forty records now have source-backed summaries and explicit
+- Applied nine five-record HuffPost pilots, covering `RECORD-00804` through
+  `RECORD-00848`. Forty-five records now have source-backed summaries and explicit
   verification. Each pilot has immutable official-response hashes and focused
   regression coverage in `data/verification-log.md`.
 - Repaired source-backed defects in `RECORD-00039`, `RECORD-00043`,
@@ -162,7 +161,7 @@ That is 111 distinct missing works plus three mapping/edition decisions across
 assigned a permanent ID or imported because rights, edition identity, order,
 taxonomy, and graph decisions are one-way curator choices.
 
-## Last worker checkpoint: HuffPost pilot 09
+## Applied worker checkpoint: HuffPost pilot 09
 
 K2 finished cleanly with exit code 0 under
 `%TEMP%/rosen-k2-huffpost-pilot-09`. It captured first-attempt official HTTP
@@ -171,29 +170,27 @@ titles, authors, dates, bodies, word counts, excerpts, and pull quotes, and
 found 100% ordered normalized-token body coverage. An independent replay passed
 22 of 22 checks.
 
-The packet proposes one source-identity repair:
+The packet proposed one source-identity repair, which is now applied:
 
 - `RECORD-00847`: change the truncated
   `would-you-guys-like-us-t_b_63176` URL to
   `would-you-guys-like-us-to_b_63176`.
 
-The packet intentionally does not propose summaries or verification-state
-changes. No pilot-nine data was applied. The next session must read the saved
-official bodies, draft source-backed summaries, independently review the URL,
-write a failing pilot-nine regression, then apply the accepted five-record
-batch. Evidence hashes are in the final pilot-nine section of
-`data/verification-log.md`.
+The current branch added a failing pilot-nine regression first, drafted
+source-backed summaries from the saved official bodies, corrected
+`RECORD-00847`, set the five rows to `verified=TRUE` and `needs_review=FALSE`,
+regenerated exports, and kept the packet hashes in `data/verification-log.md`.
 
 ## Test and completion-gate state after review
 
-`npm run test:data` reports 136 passing and six failing tests.
+`npm run test:data` reports 137 passing and six failing tests.
 `npm run test:data:extraction-coverage` reports three passing and one failing
 test. Together they measure seven intentionally failing completion tests that
 remain owned by the stewardship issues:
 
 1. Three core blanks: `RECORD-00602:url`, `RECORD-00613:url`, and
    `RECORD-00614:publisher`.
-2. Thirty-four archive summaries are blank (`RECORD-00844` onward).
+2. Twenty-nine archive summaries are blank (`RECORD-00849` onward).
 3. Fifty-four non-Rosen Bluesky rows use Jay's profile URL.
 4. The same 54 rows assign copyright to Jay.
 5. 29,693 social rows lack explicit verification.
@@ -205,7 +202,7 @@ The archive verification gate itself is green: both `TRUE` (served) and `FALSE`
 (reviewed exclusion) are explicit verdicts. Do not bypass the remaining work by
 weakening gates or bulk-asserting verification without source evidence.
 
-Thirty-eight archive rows still carry `verified=FALSE`. That is an unresolved
+Thirty-three archive rows still carry `verified=FALSE`. That is an unresolved
 curation queue, not a missing-verdict test failure; the test accepts both
 `TRUE` and `FALSE` as explicit verification states.
 

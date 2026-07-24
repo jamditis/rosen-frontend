@@ -4177,3 +4177,39 @@ The main packet hashes are:
 - `report.txt`: `ec3d2160fad46edde82ee75ba673d91caf6c39559362d293cf5562f059b2395f`
 - `stdout.log`: `67ff137883e10a4009c8a8c67397c142bacd47de3ef65e16b35ecd6debc8d5f3`
 - `stderr.log`: `32d6f10b850649ebd1c58bed344f01ec01b0fa7a7d7f0db7d3144ba6cf455e81`
+
+### HuffPost verification pilot 09 applied
+
+The branch then accepted the pilot-nine packet into canonical data. A failing
+regression was added first for `RECORD-00844` through `RECORD-00848`, locking
+the five official-source hashes, the existing raw-text hashes, the source
+title/author/date/word-count fields, the accepted excerpts and pull quotes, the
+`RECORD-00847` URL repair, and the five source-backed summaries.
+
+Accepted row changes:
+
+- `RECORD-00844`: added a summary describing Gina Cooper, netroots volunteers,
+  YearlyKos, aggregated blogger attention, participation, and OffTheBus.
+- `RECORD-00845`: added a summary describing press-blogosphere relations at
+  YearlyKos, Dan Gillmor's readers-know-more lesson, and unresolved Iraq-war
+  accountability.
+- `RECORD-00846`: added a summary describing savviness as Rosen's account of
+  political journalism's vulnerability to Karl Rove.
+- `RECORD-00847`: corrected the URL to
+  `https://www.huffpost.com/entry/would-you-guys-like-us-to_b_63176` and
+  added a summary describing the White House press corps and Bush's managed
+  Iraq-trip press event.
+- `RECORD-00848`: added a summary describing the missing Bush-era master
+  narrative of executive-power expansion, centered on Charlie Savage, Jack
+  Goldsmith, and the Cheney project.
+
+All five rows are now `verified=TRUE` and `needs_review=FALSE`, with notes
+pointing to `%TEMP%/rosen-k2-huffpost-pilot-09` and the saved HTTP 200 source
+SHA-256 values. The targeted pilot-nine regression now passes. The archive CSV
+SHA-256 after application is
+`11ffcaa406a01a95dcdf24045675a42b8aaadfdd7429045fb654397e398186b8`.
+
+The update reduced archive rows with blank summaries from 34 to 29 and archive
+rows explicitly marked `verified=FALSE` from 38 to 33. The archive CSV remains
+1,028 rows by 38 columns, UTF-8 without a BOM, with 1,029 CRLF record
+boundaries and 81,117 embedded bare LF characters.

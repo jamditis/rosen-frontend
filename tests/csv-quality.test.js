@@ -1144,6 +1144,88 @@ describe('archive_records-public.csv', () => {
     }
   });
 
+  it('HuffPost pilot nine records match their official sources', () => {
+    const expected = new Map([
+      ['RECORD-00844', {
+        title: 'The Agitators: Notes From Day One of YearlyKos',
+        url: 'https://www.huffpost.com/entry/the-agitators-notes-from_b_58984',
+        publicationDate: '2007-08-03',
+        wordCount: '1356',
+        rawTextSha: '2f9cbe196f818a33fba9b939dab06656ea0320e13c2d70b3f96f169e877306b6',
+        excerpt: 'Bloggers aggregate attention to politics. Therefore they get attention from politicians. The press lives off politics, these Kossacks live for it.',
+        pullQuote: 'And I don\'t mean for a second that Kos is the CEO with the ideas and Cooper the efficient aide who carries out those ideas.',
+        summary: 'Reporting from YearlyKos, Rosen argues that Gina Cooper and the netroots volunteers, not only Markos Moulitsas, built the event\'s political force. He links the convention\'s influence to bloggers\' aggregated attention, participation, and OffTheBus\'s open campaign-reporting model.',
+        sourceSha: '81efb4c1054eadda15748ffea8cfc0afe3232fc62ddda9079a3a6719c805b3ef',
+      }],
+      ['RECORD-00845', {
+        title: 'Why Do We Suck? and Other Questions Political Journalists Asked Themselves at YearlyKos',
+        url: 'https://www.huffpost.com/entry/why-do-we-suck-and-other_b_59252',
+        publicationDate: '2007-08-06',
+        wordCount: '1490',
+        rawTextSha: '7cb479564dd03633b2c7bb786bc04dd2deb830be1fdcf0fc199d392f99dd0064',
+        excerpt: '"My readers know more than I do" had always been true, but it took the Internet for that knowledge to be forwarded into journalism. Now it\'s manifest in the professional lives of political reporters.',
+        pullQuote: 'My main conclusion: more respect expressed for the blogosphere, and a little less wariness between the two groups.',
+        summary: 'Rosen reviews press coverage of YearlyKos and finds more respect between political reporters and the liberal blogosphere than in earlier years. He argues that reporters are absorbing Dan Gillmor\'s lesson that readers know more than they do, though wariness and Iraq-war accountability remain unresolved.',
+        sourceSha: 'ab3c305fded823f14ed251b7398f3b06d5aa40280ef74d252ca4330b7c353dd7',
+      }],
+      ['RECORD-00846', {
+        title: 'Karl Rove and the Cult of Savviness in Our Political Press',
+        url: 'https://www.huffpost.com/entry/karl-rove-and-the-cult-of_b_60411',
+        publicationDate: '2007-08-14',
+        wordCount: '1146',
+        rawTextSha: '72dbfb5246cc8b0d683d29118ec10edc3782f27aac264326a0363860b735fd88',
+        excerpt: 'I think that the real -- and undeclared -- ideology of American journalism is savviness, which is what made the press so vulnerable to the likes of Karl Rove.',
+        pullQuote: 'Conservatives think the ideology of the Washington press corps is liberal.',
+        summary: 'Rosen uses Karl Rove\'s resignation to argue that American political journalism\'s undeclared ideology is savviness. He says reporters admired Rove\'s tactical skill so much that they underplayed his extremism and the damage his politics did.',
+        sourceSha: 'd1aa601f359f0032c03450a61053dcdd3540f447468d99a1f85ef5e773ba5920',
+      }],
+      ['RECORD-00847', {
+        title: '"Would You Guys Like us to Come Without You?"',
+        url: 'https://www.huffpost.com/entry/would-you-guys-like-us-to_b_63176',
+        publicationDate: '2007-09-05',
+        wordCount: '2001',
+        rawTextSha: '6f3fe544e2f1f293534b5fd35771c0cb1b874c807b8b90f75c7a8d35aee2e3b4',
+        excerpt: 'The press is not capable of making an independent decision denying the president his spin zone with a dateline in Iraq. When the White House says we\'re going, they\'re going.',
+        pullQuote: 'National Security Adviser Stephen Hadley had a good question for the White House press corps Monday, when the President--surprise!--flew to Iraq.',
+        summary: 'Rosen criticizes White House reporters for accepting President Bush\'s surprise Iraq trip as a necessary assignment even when it functioned as a managed propaganda event. He argues that the press corps lacked the independence to deny the president a spin zone with an Iraq dateline.',
+        sourceSha: 'd86954cf867853a02f6564c6497d299cdebbe31aff264aa6484b48742ee1d92c',
+      }],
+      ['RECORD-00848', {
+        title: 'The Master Narrative that Went Missing During the Bush Presidency',
+        url: 'https://www.huffpost.com/entry/the-master-narrative-that_b_64213',
+        publicationDate: '2007-09-13',
+        wordCount: '2206',
+        rawTextSha: '5e049405834c366b060928c123c539598e04f720395a35d77531e15c2bd6e48d',
+        excerpt: 'The story that produces lots of other stories should have been the hellbent expansion of executive power, and the go-it-alone politics that followed from it.',
+        pullQuote: 'Some new developments this week in the continuing story of how the press was overawed by the Administration of George W.',
+        summary: 'Rosen argues that Bush-era coverage lacked the master narrative of executive-power expansion. He points to Charlie Savage, Jack Goldsmith, and the Cheney project as evidence that the press needed a connecting story about maximal executive power rather than isolated campaign and policy episodes.',
+        sourceSha: '02251d36950723d42159dd8070954f1d02d0cd27c2106228ee93a9a799c7532e',
+      }],
+    ]);
+
+    for (const [id, source] of expected) {
+      const record = archiveRecords.find(row => row.id === id);
+      assert.ok(record, `${id} must exist`);
+      assert.strictEqual(record.title, source.title);
+      assert.strictEqual(record.url, source.url);
+      assert.strictEqual(record.author, 'Jay Rosen');
+      assert.strictEqual(record.publication_date, source.publicationDate);
+      assert.strictEqual(record.word_count, source.wordCount);
+      assert.strictEqual(
+        crypto.createHash('sha256').update(record.raw_text).digest('hex'),
+        source.rawTextSha,
+        `${id} raw_text changed`
+      );
+      assert.strictEqual(record.excerpt, source.excerpt);
+      assert.strictEqual(record.pull_quote, source.pullQuote);
+      assert.strictEqual(record.summary, source.summary);
+      assert.strictEqual(record.verified, 'TRUE');
+      assert.strictEqual(record.needs_review, 'FALSE');
+      assert.match(record.notes, /Official HuffPost source verified 2026-07-24/);
+      assert.match(record.notes, new RegExp(source.sourceSha));
+    }
+  });
+
   it('RECORD-00614 cannot verify mismatched TomDispatch works', () => {
     const record = archiveRecords.find(row => row.id === 'RECORD-00614');
     assert.ok(record, 'RECORD-00614 must exist');
