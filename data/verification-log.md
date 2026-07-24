@@ -1465,6 +1465,26 @@ because Rick Perlstein has earlier independent evidence in the graph. This
 drops the remaining unverified archive count by one and the remaining
 capture-year `#NN08` date gate from eight rows to seven.
 
+### Source-backed `#NN08` date corrections
+
+On July 24, 2026, six remaining Netroots Nation sketchbook rows were corrected
+from Wayback capture dates to the source date printed in the stored source text.
+Each row's raw text includes an explicit `Posted: 07/19/08` timestamp:
+
+| Record | Old date | Corrected date | Source text evidence |
+|---|---|---|---|
+| `RECORD-00862` | 2013-11-15 | 2008-07-19 | `Posted: 07/19/08 10:10 AM ET` |
+| `RECORD-00863` | 2013-11-15 | 2008-07-19 | `Posted: 07/19/08 10:46 AM ET` |
+| `RECORD-00866` | 2013-11-09 | 2008-07-19 | `Posted: 07/19/08 11:29 AM ET` |
+| `RECORD-00867` | 2013-11-06 | 2008-07-19 | `Posted: 07/19/08 11:53 AM ET` |
+| `RECORD-00869` | 2013-11-06 | 2008-07-19 | `Posted: 07/19/08 01:22 PM ET` |
+| `RECORD-00870` | 2013-11-13 | 2008-07-19 | `Posted: 07/19/08 09:35 PM ET` |
+
+`RECORD-00868` remains unresolved. Its stored body is still Wayback toolbar and
+migrated-stub text, with no direct `Posted:` source date in the canonical row.
+Do not infer its date from neighboring post IDs without labeling the evidence
+as sequence inference.
+
 At the staging checkpoint, the five-record pilot sourced 15 relationship
 assertions and six entity first mentions. Their relationship context was
 title-derived, but publication still needed a graph preview: one assertion
