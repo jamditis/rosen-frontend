@@ -6,7 +6,7 @@ applicable field, map every entity, preserve provenance, and prove the result
 with repeatable checks. The archive is materially better, but it is not at
 100% and must not be described as complete.
 
-## Continuation checkpoint — 2026-07-23 19:48 -04:00
+## Continuation checkpoint — 2026-07-23 20:48 -04:00
 
 Current review branch: `agent/data-integrity-huffpost-pilot09-20260723`.
 Current PR: [#760](https://github.com/jamditis/rosen-frontend/pull/760),
@@ -17,11 +17,11 @@ branch state has advanced:
 
 | Dataset or gate | Current branch state |
 | --- | ---: |
-| Archive records | 1,024 |
+| Archive records | 1,025 |
 | Social posts | 29,747 |
-| Entities | 7,351 |
-| Relationships | 11,108 |
-| Archive records with entity relationships | 871/1,024 |
+| Entities | 7,352 |
+| Relationships | 11,116 |
+| Archive records with entity relationships | 872/1,025 |
 | Archive rows explicitly `verified=FALSE` | 1 |
 | Archive rows with blank summaries | 0 |
 | Archive rows with `needs_review=TRUE` | 9 |
@@ -32,20 +32,31 @@ branch state has advanced:
 Current continuation hashes:
 
 - Archive CSV SHA-256:
-  `974584376137bc92fd28e3d87a3a9797869b1ca73e430981a8c85ec306fff62f`
+  `b8d5538b48a53780e407d47ac2340bbdb7e42604381f3a315d38e1a315cf7fe6`
 - Social CSV SHA-256:
   `9b09ddf28e9ca97e8d0dc8d81008f8c0f82a7cc166c87b12b0ccaaa0f824fd0f`
 - Entity CSV SHA-256:
-  `b359a0682c77e53b9cf3a1a43004c9fb40b49f4f02cf930838db4d67dcecf11d`
+  `1069122dcfa284602d4adc286dec347035d96de5c68b4c35f7ce81d99c9111cf`
 - Relationship CSV SHA-256:
-  `06778ddd0fee4543b256c4793194c1a1fd70c5f89b6a83bee20d4e26849c90a5`
+  `4ed2cd5e7942e07eda8e095aa14303de86b53e9751dc9b30fbbeffe2d8121240`
 
 Current validation on PR #760:
 
-- `npm run test:data` passes, 153 tests.
+- `npm run test:data` passes, 154 tests.
 - `npm run test:data:extraction-coverage` passes, 17 tests.
 - `python backend/scripts/validate_archive_data.py` passes with no errors.
-- `npm test` passes, 830 tests.
+- `npm test` passes, 831 tests.
+
+Current source addition:
+
+- `RECORD-00904` adds Caryl Rivers' HuffPost article
+  `A Counterpoint to the View From Everywhere`, published 2011-11-07.
+  Evidence came from the user-provided live HuffPost page opened in Microsoft
+  Edge with uBlock Origin enabled. This is a separate response article about
+  Jay Rosen's view from nowhere argument, not the unresolved `RECORD-00865`
+  `#NN08` micro-post.
+- Entity and relationship coverage for `RECORD-00904` adds Caryl Rivers as
+  `P2706` and eight source-backed relationships to existing archive entities.
 
 Tracked continuation docs added after the original handoff:
 

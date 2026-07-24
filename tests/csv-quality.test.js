@@ -298,6 +298,18 @@ describe('archive_records-public.csv', () => {
     assert.match(record.notes, /https:\/\/content\.blubrry\.com\/radioopensource\/rosendraft02\.mp3/);
   });
 
+  it('HuffPost counterpoint article keeps source metadata', () => {
+    const record = archiveRecords.find(row => row.id === 'RECORD-00904');
+
+    assert.ok(record, 'RECORD-00904 is missing');
+    assert.strictEqual(record.url, 'https://www.huffpost.com/entry/a-counterpoint-to-the-vie_b_1079818');
+    assert.strictEqual(record.author, 'Caryl Rivers');
+    assert.strictEqual(record.publication_date, '2011-11-07');
+    assert.strictEqual(record.verified, 'TRUE');
+    assert.match(record.raw_text, /transparency is the new objectivity/i);
+    assert.match(record.notes, /not the unresolved RECORD-00865 #NN08 micro-post/);
+  });
+
   it('verified newspaper clips have source-backed relevance', () => {
     const uncertaintyPatterns = [
       /not mentioned/i,
