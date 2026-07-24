@@ -74,6 +74,5 @@ Do not import the 167 distinct missing works until a curator decides:
 ## Manual help needed
 
 This PressThink packet set does not need new browser capture from Joe right now.
-The only current archive record still requiring hands-on browser verification is
-`RECORD-00865`, listed in
+No active archive records currently require hands-on browser verification; see
 `docs/manual-verification-required-2026-07-23.md`.

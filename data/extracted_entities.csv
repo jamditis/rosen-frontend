@@ -7349,3 +7349,12 @@ E0473,Event,Trump COVID-19 briefings,Trump COVID-19 briefings,Press briefings,,5
 C1329,Concept,"Journalists as ""explainers""","Journalists as ""explainers""",,,6,RECORD-00783,1,,
 E0474,Event,The future of context (presentation to ABC Australia staff),The future of context (presentation to ABC Australia staff),Talk / presentation,,5,RECORD-00783,1,,
 P2706,Person,Caryl Rivers,Caryl Rivers,Journalism professor and HuffPost contributor,Boston University,8,RECORD-00904,1,,Source-backed from HuffPost contributor byline on RECORD-00904.
+P2707,Person,Mike Masnick,mike masnick,Technology journalist and Techdirt founder,Techdirt,7,RECORD-00905,1,Techdirt; Jay Rosen; New York Times,"Added during user-provided link intake, 2026-07-24."
+P2708,Person,Em Kuntze,em kuntze,Author,smartocto,6,RECORD-00906,1,smartocto; Stefan ten Teije; Jay Rosen,"Added from smartocto byline, 2026-07-24."
+P2709,Person,Stefan ten Teije,stefan ten teije,Author,smartocto,6,RECORD-00906,1,smartocto; Em Kuntze; Jay Rosen,"Added from smartocto byline, 2026-07-24."
+P2710,Person,Alexandra Alter,alexandra alter,Reporter,The New York Times,4,RECORD-00905,1,The New York Times; Rick Perlstein; Craig Shirley,"Mentioned in Techdirt article discussing New York Times coverage, 2026-07-24."
+P2711,Person,Andy Plesser,andy plesser,BeetTV reporter and producer,BeetTV,5,RECORD-00909,1,BeetTV; John Paton; Journal Register Company,Name appears at the end of the YouTube description for RECORD-00909.
+O1760,Organization,smartocto,smartocto,Audience analytics and newsroom performance company,,6,RECORD-00906,1,Em Kuntze; Stefan ten Teije,"Added from user-provided smartocto article, 2026-07-24."
+O1761,Organization,Press Watch,press watch,Independent political coverage criticism site,,6,RECORD-00908,1,Dan Froomkin; Salon,Salon article states it was co-produced with Press Watch.
+O1762,Organization,Journal Register Company,journal register company,Local newspaper chain,,7,RECORD-00909,1,John Paton; BeetTV; AOL; Patch; Huffington Post,Added from BeetTV YouTube metadata and transcript.
+O1763,Organization,BeetTV,beettv,Online video journalism outlet,,5,RECORD-00909,1,Andy Plesser; John Paton,Added from YouTube channel/uploader metadata for RECORD-00909.

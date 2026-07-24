@@ -310,6 +310,75 @@ describe('archive_records-public.csv', () => {
     assert.match(record.notes, /not the unresolved RECORD-00865 #NN08 micro-post/);
   });
 
+  it('user-supplied campaign coverage links keep verified source metadata', () => {
+    const expectedRows = new Map([
+      ['RECORD-00905', {
+        url: 'https://www.techdirt.com/2014/08/20/real-reporting-is-about-revealing-truth-not-granting-equal-weight-to-bogus-arguments/',
+        author: 'Mike Masnick',
+        date: '2014-08-20',
+        textPattern: /he said\/she said/i,
+      }],
+      ['RECORD-00906', {
+        url: 'https://smartocto.com/blog/smartoctober-constructive-campaign-coverage/',
+        author: 'Em Kuntze; Stefan ten Teije',
+        date: '2024-10-09',
+        textPattern: /not the odds, but the stakes/i,
+      }],
+      ['RECORD-00907', {
+        url: 'https://edition.cnn.com/2023/11/15/media/2024-election-horse-race-stakes-nyu-professor/index.html',
+        author: 'Oliver Darcy',
+        date: '2023-11-15',
+        textPattern: /six words that make up a mantra/i,
+      }],
+      ['RECORD-00908', {
+        url: 'https://www.salon.com/2020/11/11/hey-political-reporters-get-lost-this-is-not-your-moment/',
+        author: 'Dan Froomkin',
+        date: '2020-11-11',
+        textPattern: /two sides/i,
+      }],
+      ['RECORD-00909', {
+        url: 'https://www.youtube.com/watch?v=9seqSeHWqbs',
+        author: 'Andy Plesser',
+        date: '2011-02-23',
+        textPattern: /Journal Register Company/i,
+      }],
+    ]);
+
+    for (const [id, expected] of expectedRows) {
+      const record = archiveRecords.find(row => row.id === id);
+
+      assert.ok(record, `${id} is missing`);
+      assert.strictEqual(record.url, expected.url);
+      assert.strictEqual(record.author, expected.author);
+      assert.strictEqual(record.publication_date, expected.date);
+      assert.strictEqual(record.verified, 'TRUE');
+      assert.strictEqual(record.low_confidence, 'FALSE');
+      assert.strictEqual(record.needs_review, 'FALSE');
+      assert.match(record.raw_text, expected.textPattern);
+      assert.match(record.notes, /2026-07-24/);
+    }
+
+    const margaretSullivanRecord = archiveRecords.find(row => row.id === 'RECORD-00726');
+    assert.ok(margaretSullivanRecord, 'RECORD-00726 is missing');
+    assert.strictEqual(
+      margaretSullivanRecord.url,
+      'https://margaretsullivan.substack.com/p/a-media-critic-urged-not-the-odds'
+    );
+  });
+
+  it('does not publish the unrecoverable NN08 sketchbook fragment', () => {
+    assert.strictEqual(
+      archiveRecords.some(row => row.id === 'RECORD-00865'),
+      false,
+      'RECORD-00865 is a fragmentary HuffPost-era NN08 note without a recoverable article source'
+    );
+    assert.strictEqual(
+      relationships.some(row => row.source_record_id === 'RECORD-00865'),
+      false,
+      'stale RECORD-00865 graph relationships remain'
+    );
+  });
+
   it('verified newspaper clips have source-backed relevance', () => {
     const uncertaintyPatterns = [
       /not mentioned/i,
@@ -1700,29 +1769,11 @@ describe('archive_records-public.csv', () => {
       assert.match(record.notes, new RegExp(source.sourceSha));
     }
 
-    const unresolved = archiveRecords.find(row => row.id === 'RECORD-00865');
-    assert.ok(unresolved, 'RECORD-00865 must exist');
-    assert.strictEqual(unresolved.publication_date, '2008-07-19');
-    assert.strictEqual(unresolved.word_count, '63');
     assert.strictEqual(
-      crypto.createHash('sha256').update(unresolved.raw_text).digest('hex'),
-      'ead27b7165e7d4af7dea127e0d26da371127117a60c2890a543fcc211795643a'
+      archiveRecords.some(row => row.id === 'RECORD-00865'),
+      false,
+      'RECORD-00865 should stay removed after curator review'
     );
-    assert.strictEqual(
-      unresolved.excerpt,
-      '# #NN08 Sketchbook Rick Pearlstein: impressive. Very. I love it when the youngest person on the panel has the longest view.'
-    );
-    assert.strictEqual(
-      unresolved.summary,
-      'Rosen posts a short #NN08 sketchbook note praising Rick Pearlstein and saying the youngest person on the panel had the longest view.'
-    );
-    assert.strictEqual(unresolved.verified, 'FALSE');
-    assert.strictEqual(unresolved.needs_review, 'TRUE');
-    assert.strictEqual(unresolved.low_confidence, 'TRUE');
-    assert.doesNotMatch(unresolved.raw_text, /Wayback Machine|Archive Team|HUFFPOST NEWSLETTERS/);
-    assert.match(unresolved.notes, /title-only cleanup/);
-    assert.match(unresolved.notes, /sequence-inferred/);
-    assert.match(unresolved.notes, /c90401d67a37efe6a848df9ac061f8695739a535f22be584bbe675ab8dd411ff/);
   });
 
   it('HuffPost pilot fourteen records match source evidence', () => {

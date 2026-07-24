@@ -5,7 +5,7 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records from the Social Media &amp; Financial Crisis (2010-2015) era</description>
     <language>en-us</language>
-    <lastBuildDate>Fri, 24 Jul 2026 00:49:50 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 24 Jul 2026 01:10:49 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/eras/social-media-financial-crisis-2010-2015-.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
   <item>
@@ -106,6 +106,15 @@
     <description>These twelve presented their final projects in front of an East Village crowd with friends, family and digital journalism people from the New York media world. Boryana created an engagement strategy for Narratively’s core readership, which could expand their content outside the New York City area. Danielle Powell / Al Jazeera America : The problem: Repurposing TV documentary by putting it online is lame: there has to be a better way!</description>
     <category>Technology &amp; Digital Media</category>
     <category>Audience &amp; Public Engagement</category>
+  </item>
+  <item>
+    <title>Real reporting is about revealing truth; not granting &apos;equal weight&apos; to bogus arguments</title>
+    <link>https://www.techdirt.com/2014/08/20/real-reporting-is-about-revealing-truth-not-granting-equal-weight-to-bogus-arguments/</link>
+    <guid isPermaLink="true">https://www.techdirt.com/2014/08/20/real-reporting-is-about-revealing-truth-not-granting-equal-weight-to-bogus-arguments/</guid>
+    <pubDate>Wed, 20 Aug 2014 00:00:00 GMT</pubDate>
+    <description>Mike Masnick uses Jay Rosen’s critique of he-said/she-said reporting to argue that journalism should report what is true rather than give equal weight to weak claims. The article centers on New York Times coverage of plagiarism allegations involving Rick Perlstein and Craig Shirley, and cites Margaret Sullivan’s public-editor response.</description>
+    <category>Press &amp; Media Criticism</category>
+    <category>Journalism Theory &amp; Practice</category>
   </item>
   <item>
     <title>When quoting both sides and leaving it there is the riskier call</title>
@@ -463,15 +472,6 @@
     <pubDate>Fri, 03 Feb 2012 00:00:00 GMT</pubDate>
     <description>I lead a team of editors to write, edit, blog, publish, and curate news that interest our audience, Arabic language speakers all over the world. A big part of it is keeping an eye on the website’s numbers—the page views, unique visitors, top stories, etc.—and then seeing how we can use that data to create better, more engaging content. I work on a small team that conducts something called “user research” in order to help make our digital product offerings better.</description>
     <category>Technology &amp; Digital Media</category>
-  </item>
-  <item>
-    <title>A Brief Theory of the Republican Party (2012)</title>
-    <link>https://publicnotebook.wordpress.com/2012/01/18/a-brief-theory-of-the-republican-party-2012/</link>
-    <guid isPermaLink="true">https://publicnotebook.wordpress.com/2012/01/18/a-brief-theory-of-the-republican-party-2012/</guid>
-    <pubDate>Wed, 18 Jan 2012 00:00:00 GMT</pubDate>
-    <description>Before the 1980s, the Republican Party was similar to the Democratic Party. The Great Realignment saw Ronald Reagan build a new coalition consisting of socially conservative Christians, the wealthy, and the Southern working class, united by exploiting social tensions. The Republican Party then shifted its focus from economic to social issues, fostering resentment towards groups considered the &quot;liberal elite.&quot; After Reagan, the party found a new unifying force in attacking the government, though this created internal tension regarding popular programs. The Republican Party is now in crisis, divided by its inability to shrink the government while still protecting popular programs. The party&apos;s future is uncertain, possibly fracturing or fading away without a new way to unite its factions.
-</description>
-    <category>Politics &amp; Democracy</category>
   </item>
   </channel>
 </rss>

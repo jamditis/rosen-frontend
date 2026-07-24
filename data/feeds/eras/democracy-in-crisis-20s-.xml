@@ -5,7 +5,7 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records from the Democracy in Crisis (20s) era</description>
     <language>en-us</language>
-    <lastBuildDate>Fri, 24 Jul 2026 00:49:50 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 24 Jul 2026 01:10:49 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/eras/democracy-in-crisis-20s-.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
   <item>
@@ -65,6 +65,16 @@
     <category>Politics &amp; Democracy</category>
   </item>
   <item>
+    <title>Smartoctober: Constructive campaign coverage</title>
+    <link>https://smartocto.com/blog/smartoctober-constructive-campaign-coverage/</link>
+    <guid isPermaLink="true">https://smartocto.com/blog/smartoctober-constructive-campaign-coverage/</guid>
+    <pubDate>Wed, 09 Oct 2024 00:00:00 GMT</pubDate>
+    <description>Em Kuntze and Stefan ten Teije connect Rosen’s “not the odds, but the stakes” frame to constructive campaign coverage. The article argues that horse-race polling should give way to coverage that asks what communities need, what politicians would do, and how newsrooms can measure constructive impact.</description>
+    <category>Press &amp; Media Criticism</category>
+    <category>Politics &amp; Democracy</category>
+    <category>Journalism Theory &amp; Practice</category>
+  </item>
+  <item>
     <title>The nonstop, dangerous Trump &apos;liestream&apos; is same as it ever was</title>
     <link>https://revkin.substack.com/p/the-nonstop-dangerous-trump-liestream</link>
     <guid isPermaLink="true">https://revkin.substack.com/p/the-nonstop-dangerous-trump-liestream</guid>
@@ -98,6 +108,15 @@
     <guid isPermaLink="true">https://www.newspapers.com/image/1254405332/</guid>
     <pubDate>Fri, 15 Dec 2023 00:00:00 GMT</pubDate>
     <description>Article discusses challenges journalists face when covering Donald Trump and potential second presidency. Jay Rosen is mentioned in context of &apos;stakes journalism&apos; - questioning what is at stake in an election.</description>
+    <category>Politics &amp; Democracy</category>
+  </item>
+  <item>
+    <title>Journalism professor’s six-word mantra is a blueprint for how news outlets should cover the 2024 race</title>
+    <link>https://edition.cnn.com/2023/11/15/media/2024-election-horse-race-stakes-nyu-professor/index.html</link>
+    <guid isPermaLink="true">https://edition.cnn.com/2023/11/15/media/2024-election-horse-race-stakes-nyu-professor/index.html</guid>
+    <pubDate>Wed, 15 Nov 2023 00:00:00 GMT</pubDate>
+    <description>Oliver Darcy reports on Jay Rosen’s “not the odds, but the stakes” campaign-coverage mantra as a blueprint for 2024 election journalism. The CNN article frames Rosen’s critique as a response to horse-race coverage and the democratic stakes of a possible second Trump presidency.</description>
+    <category>Press &amp; Media Criticism</category>
     <category>Politics &amp; Democracy</category>
   </item>
   <item>
@@ -211,6 +230,15 @@
     <category>Press &amp; Media Criticism</category>
     <category>Politics &amp; Democracy</category>
     <category>Journalism Theory &amp; Practice</category>
+  </item>
+  <item>
+    <title>Hey, political reporters — get lost! This is not your moment</title>
+    <link>https://www.salon.com/2020/11/11/hey-political-reporters-get-lost-this-is-not-your-moment/</link>
+    <guid isPermaLink="true">https://www.salon.com/2020/11/11/hey-political-reporters-get-lost-this-is-not-your-moment/</guid>
+    <pubDate>Wed, 11 Nov 2020 00:00:00 GMT</pubDate>
+    <description>Dan Froomkin argues that national political reporters should cede the early Biden-presidency story to beat reporters with policy expertise. The Salon article cites Jay Rosen’s critique of the “healing divisions” narrative and attacks both-sides equivalence in post-2020 political coverage.</description>
+    <category>Press &amp; Media Criticism</category>
+    <category>Politics &amp; Democracy</category>
   </item>
   <item>
     <title>To protect democracy, journalists need to learn to think like hackers and spies</title>
