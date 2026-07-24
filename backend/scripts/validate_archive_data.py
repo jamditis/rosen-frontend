@@ -96,7 +96,7 @@ def load_csv(filepath):
         return None, f"File not found: {filepath}"
 
     try:
-        with open(filepath, 'r', encoding='utf-8') as f:
+        with open(filepath, 'r', encoding='utf-8', newline='') as f:
             reader = csv.DictReader(f)
             records = list(reader)
         return records, None

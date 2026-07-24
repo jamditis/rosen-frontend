@@ -29,12 +29,23 @@ branch state has advanced:
 | Entities with blank `first_mention_record_id` | 0 |
 | Long archive records without extracted relationships | 0 |
 
+Current continuation hashes:
+
+- Archive CSV SHA-256:
+  `974584376137bc92fd28e3d87a3a9797869b1ca73e430981a8c85ec306fff62f`
+- Social CSV SHA-256:
+  `9b09ddf28e9ca97e8d0dc8d81008f8c0f82a7cc166c87b12b0ccaaa0f824fd0f`
+- Entity CSV SHA-256:
+  `b359a0682c77e53b9cf3a1a43004c9fb40b49f4f02cf930838db4d67dcecf11d`
+- Relationship CSV SHA-256:
+  `06778ddd0fee4543b256c4793194c1a1fd70c5f89b6a83bee20d4e26849c90a5`
+
 Current validation on PR #760:
 
-- `npm run test:data` passes, 151 tests.
+- `npm run test:data` passes, 153 tests.
 - `npm run test:data:extraction-coverage` passes, 17 tests.
 - `python backend/scripts/validate_archive_data.py` passes with no errors.
-- `npm test` passes, 828 tests.
+- `npm test` passes, 830 tests.
 
 Tracked continuation docs added after the original handoff:
 
@@ -45,8 +56,9 @@ Tracked continuation docs added after the original handoff:
   source or edition mapping decisions.
 - `docs/entity-merge-review-queue-2026-07-23.md`: tracks 28 entity merge
   candidates, with 19 safe batch candidates and 9 curator-required cases.
-- `docs/social-source-recovery-queue-2026-07-23.md`: tracks 54 non-Rosen
-  Bluesky rows that remain `verified=FALSE` because their original native
+- `docs/social-source-recovery-queue-2026-07-23.md`: tracks the non-Rosen
+  Bluesky source recovery queue. Sixteen rows now have exact ATProto text and
+  timestamp matches; 38 remain `verified=FALSE` because their original native
   source records are unresolved.
 
 No permanent PressThink IDs, imports, rights decisions, taxonomy decisions,
@@ -337,7 +349,8 @@ in the next-actions list.
 3. Prepare a curator proposal for importing the 111 confirmed works, including
    permanent IDs, order, rights, full-text treatment, taxonomy, and graph impact.
 4. Continue five-record HuffPost batches through the remaining 35 rows.
-5. Revisit the 54 source-absent Bluesky identities only if native ATProto
+5. Resolve the eight `#NN08` dates from primary evidence.
+6. Revisit the 38 source-absent Bluesky identities only if native ATProto
    records or another authoritative capture is recovered.
 7. Present the 28 entity merge pairs for curator approval before changing any
    canonical entity ID.

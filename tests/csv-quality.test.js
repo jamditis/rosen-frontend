@@ -8,6 +8,7 @@
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { parse } from 'csv-parse/sync';
@@ -2085,6 +2086,35 @@ describe('social_posts.csv', () => {
       assert.match(post.notes, new RegExp(`cid=${cid}`));
       assert.match(post.notes, new RegExp(`response SHA-256 ${responseHash}`));
     }
+  });
+
+  it('recovers native source URLs for non-Rosen Bluesky source queue rows', () => {
+    const expectedIds = [
+      'BSKY-00060', 'BSKY-00241', 'BSKY-00333', 'BSKY-00383', 'BSKY-00586',
+      'BSKY-00650', 'BSKY-00684', 'BSKY-00740', 'BSKY-00765', 'BSKY-00878',
+      'BSKY-01170', 'BSKY-01278', 'BSKY-01693', 'BSKY-01695', 'BSKY-01820',
+      'BSKY-02329',
+    ];
+
+    for (const id of expectedIds) {
+      const post = socialPosts.find(row => row.id === id);
+      assert.ok(post, `${id} is missing`);
+      assert.notStrictEqual(post.author, 'Jay Rosen', `${id} should remain attributed to its original author`);
+      assert.strictEqual(post.verified, 'TRUE');
+      assert.match(post.url, /^https:\/\/bsky\.app\/profile\/[^/]+\/post\/[a-z0-9]+$/);
+      assert.match(post.notes, /ATProto source recovery 2026-07-23/);
+      assert.match(post.notes, /\bURI at:\/\/did:plc:[a-z0-9]+\/app\.bsky\.feed\.post\/[a-z0-9]+\b/);
+      assert.match(post.notes, /\bcid=[a-z0-9]+\b/);
+    }
+  });
+
+  it('Python validator parses social_posts.csv with embedded newlines intact', () => {
+    const output = execFileSync('python', ['backend/scripts/validate_archive_data.py'], {
+      cwd: repoDir,
+      encoding: 'utf-8',
+    });
+    assert.match(output, /Social Posts:\s+29747\b/);
+    assert.doesNotMatch(output, /Bluesky, social media platforms/);
   });
 
   it('all platforms are recognized values', () => {
