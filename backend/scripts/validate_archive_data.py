@@ -15,6 +15,8 @@ Run with: python scripts/validate_archive_data.py
 """
 
 import csv
+import json
+import subprocess
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -22,11 +24,25 @@ from datetime import datetime
 
 
 # Configuration
-DATA_DIR = Path(__file__).parent.parent.parent / "data"
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+DATA_DIR = PROJECT_ROOT / "data"
 ARCHIVE_CSV = DATA_DIR / "archive_records-public.csv"
 SOCIAL_CSV = DATA_DIR / "social_posts.csv"
 ENTITIES_CSV = DATA_DIR / "extracted_entities.csv"
 RELATIONSHIPS_CSV = DATA_DIR / "extracted_relationships.csv"
+
+NODE_CSV_PARSE_SCRIPT = """
+import fs from 'node:fs';
+import { parse } from 'csv-parse/sync';
+
+const filePath = process.argv[1];
+const records = parse(fs.readFileSync(filePath, 'utf8'), {
+  columns: true,
+  skip_empty_lines: true,
+});
+
+process.stdout.write(JSON.stringify(records));
+"""
 
 # Expected ID prefixes
 VALID_ID_PREFIXES = {
@@ -90,15 +106,36 @@ class ValidationReport:
         return len(self.errors) == 0
 
 
+def load_csv_with_node(filepath):
+    """Load CSV using the same parser as the export and test pipeline."""
+    result = subprocess.run(
+        ['node', '--input-type=module', '--eval', NODE_CSV_PARSE_SCRIPT, str(filepath)],
+        cwd=PROJECT_ROOT,
+        capture_output=True,
+        text=True,
+        encoding='utf-8',
+        check=True,
+    )
+    return json.loads(result.stdout)
+
+
+def load_csv_with_python(filepath):
+    """Load CSV file with Python's standard reader."""
+    with open(filepath, 'r', encoding='utf-8', newline='') as f:
+        reader = csv.DictReader(f)
+        return list(reader)
+
+
 def load_csv(filepath):
-    """Load CSV file with proper encoding handling."""
+    """Load CSV file with parser behavior aligned to the export pipeline."""
     if not filepath.exists():
         return None, f"File not found: {filepath}"
 
     try:
-        with open(filepath, 'r', encoding='utf-8', newline='') as f:
-            reader = csv.DictReader(f)
-            records = list(reader)
+        try:
+            records = load_csv_with_node(filepath)
+        except (FileNotFoundError, subprocess.CalledProcessError, json.JSONDecodeError):
+            records = load_csv_with_python(filepath)
         return records, None
     except Exception as e:
         return None, f"Error reading {filepath}: {e}"
@@ -139,7 +176,7 @@ def validate_archive_records(report):
     for i, record in enumerate(records):
         # Check required fields
         for field in REQUIRED_FIELDS['archive']:
-            if record.get(field, '').strip():
+            if (record.get(field) or '').strip():
                 field_counts[field] += 1
 
         # Check ID validity
@@ -155,7 +192,7 @@ def validate_archive_records(report):
 
         # Track all fields
         for field in record.keys():
-            if record.get(field, '').strip():
+            if (record.get(field) or '').strip():
                 field_counts[f"has_{field}"] += 1
 
     # Report field completeness
@@ -242,7 +279,7 @@ def validate_relationships(report):
     }
 
     for record in records:
-        rel_type = record.get('relationship_type', '').strip()
+        rel_type = (record.get('relationship_type') or '').strip()
         types[rel_type] += 1
 
         # Check for malformed relationship types (CSV parsing issues)

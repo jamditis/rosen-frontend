@@ -5,7 +5,7 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive of Jay Rosen&apos;s journalism scholarship, including articles, essays, social posts, and the 1986 dissertation &quot;The Impossible Press&quot;</description>
     <language>en-us</language>
-    <lastBuildDate>Fri, 24 Jul 2026 01:10:49 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 24 Jul 2026 03:15:14 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/rss.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
   <item>
@@ -17,15 +17,6 @@
     <category>Journalism Theory &amp; Practice</category>
     <category>Press &amp; Media Criticism</category>
     <category>Audience &amp; Public Engagement</category>
-  </item>
-  <item>
-    <title>Jay Rosen&apos;s Internet Archive: an Introduction.</title>
-    <link>https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/</link>
-    <guid isPermaLink="true">https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/</guid>
-    <pubDate>Sun, 05 Jul 2026 00:00:00 GMT</pubDate>
-    <description>A Q&amp;A in which Jay Rosen introduces his internet archive, built and curated with Joe Amditis: a links-only collection of everything of Rosen&apos;s findable online, reaching back to his 1986 PhD dissertation and holding 26,615 records at launch. Rosen frames it as one media critic&apos;s attempt to preserve the web against link rot, a complement to the Internet Archive&apos;s Wayback Machine.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Technology &amp; Digital Media</category>
   </item>
   <item>
     <title>It was a political hire, cont...</title>
@@ -871,6 +862,15 @@ Bari Weiss had no experience when she was hired a...</title>
     <description>A Bluesky post by Jay Rosen from 2025-10-25. Topics: Press &amp; Media Criticism, Journalism Theory &amp; Practice.</description>
     <category>Press &amp; Media Criticism</category>
     <category>Journalism Theory &amp; Practice</category>
+  </item>
+  <item>
+    <title>Sarah Longwell</title>
+    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3m3zvjrplq22z</link>
+    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3m3zvjrplq22z</guid>
+    <pubDate>Sat, 25 Oct 2025 00:00:00 GMT</pubDate>
+    <description>A Bluesky post by Jay Rosen from 2025-10-25. Topics: Press &amp; Media Criticism, Technology &amp; Digital Media.</description>
+    <category>Press &amp; Media Criticism</category>
+    <category>Technology &amp; Digital Media</category>
   </item>
   </channel>
 </rss>

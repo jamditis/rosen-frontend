@@ -58,7 +58,7 @@ Current source addition:
 - Entity and relationship coverage for `RECORD-00904` adds Caryl Rivers as
   `P2706` and eight source-backed relationships to existing archive entities.
 - User-supplied link intake added five verified source-backed rows:
-  `RECORD-00905` Techdirt / Mike Masnick, `RECORD-00906` smartocto /
+  `RECORD-00910` Techdirt / Mike Masnick, `RECORD-00906` smartocto /
   Em Kuntze and Stefan ten Teije, `RECORD-00907` CNN / Oliver Darcy,
   `RECORD-00908` Salon / Dan Froomkin, and `RECORD-00909` BeetTV / Andy
   Plesser. The Margaret Sullivan Substack URL was already present as

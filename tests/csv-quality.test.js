@@ -248,7 +248,6 @@ describe('archive_records-public.csv', () => {
       'P2350',
       'P2351',
       'P2352',
-      'P2353',
       'O1413',
       'O1414',
       'O1415',
@@ -312,7 +311,7 @@ describe('archive_records-public.csv', () => {
 
   it('user-supplied campaign coverage links keep verified source metadata', () => {
     const expectedRows = new Map([
-      ['RECORD-00905', {
+      ['RECORD-00910', {
         url: 'https://www.techdirt.com/2014/08/20/real-reporting-is-about-revealing-truth-not-granting-equal-weight-to-bogus-arguments/',
         author: 'Mike Masnick',
         date: '2014-08-20',
@@ -1538,7 +1537,7 @@ describe('archive_records-public.csv', () => {
   it('HuffPost pilot eleven records match their official sources', () => {
     const expected = new Map([
       ['RECORD-00854', {
-        title: 'Walter Pincus of the <i>Post</i>: Our Neutered Newsrooms are a Poor Example to the Rest of the World',
+        title: 'Walter Pincus of the Post: Our Neutered Newsrooms are a Poor Example to the Rest of the World',
         url: 'https://www.huffpost.com/entry/walter-pincus-of-the-post_b_92019',
         publicationDate: '2008-03-18',
         wordCount: '2957',
@@ -1571,7 +1570,7 @@ describe('archive_records-public.csv', () => {
         sourceSha: '61069523ad8e8d889f0c7165227a32150dc4812e27ab0885899523d42de7e7b7',
       }],
       ['RECORD-00857', {
-        title: 'The Uncharted: From Off The Bus to <i>Meet the Press</i>',
+        title: 'The Uncharted: From Off The Bus to Meet the Press',
         url: 'https://www.huffpost.com/entry/the-uncharted-from-off-th_b_96575',
         publicationDate: '2008-04-22',
         wordCount: '2470',
@@ -2287,13 +2286,17 @@ describe('social_posts.csv', () => {
     );
   });
 
-  it('export does not force all social rows to verified by type', () => {
+  it('export uses explicit source verified status, not type or ID shortcuts', () => {
     const exporterSource = fs.readFileSync(path.join(dataDir, 'export-archive-data.js'), 'utf-8');
     const verifiedBlock = exporterSource.match(/const isVerified =[\s\S]*?;/);
     assert.ok(verifiedBlock, 'could not find export verified expression');
     assert.ok(
       !/type\s*===\s*['"]social['"]/.test(verifiedBlock[0]),
       'social rows must use explicit source verified status, not a type-wide shortcut'
+    );
+    assert.ok(
+      !/rawId\s*\.\s*startsWith/.test(verifiedBlock[0]),
+      'records must use explicit source verified status, not an ID-prefix shortcut'
     );
   });
 
@@ -2771,7 +2774,6 @@ describe('extracted_entities.csv', () => {
       'C0652',
       'L0159',
       'O0722',
-      'O0734',
       'P1214',
       'P2011',
       'P2176',

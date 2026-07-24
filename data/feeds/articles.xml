@@ -5,7 +5,7 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Articles and essays from Jay Rosen&apos;s journalism scholarship</description>
     <language>en-us</language>
-    <lastBuildDate>Fri, 24 Jul 2026 01:10:49 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 24 Jul 2026 03:15:14 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/articles.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
   <item>
@@ -17,15 +17,6 @@
     <category>Journalism Theory &amp; Practice</category>
     <category>Press &amp; Media Criticism</category>
     <category>Audience &amp; Public Engagement</category>
-  </item>
-  <item>
-    <title>Jay Rosen&apos;s Internet Archive: an Introduction.</title>
-    <link>https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/</link>
-    <guid isPermaLink="true">https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/</guid>
-    <pubDate>Sun, 05 Jul 2026 00:00:00 GMT</pubDate>
-    <description>A Q&amp;A in which Jay Rosen introduces his internet archive, built and curated with Joe Amditis: a links-only collection of everything of Rosen&apos;s findable online, reaching back to his 1986 PhD dissertation and holding 26,615 records at launch. Rosen frames it as one media critic&apos;s attempt to preserve the web against link rot, a complement to the Internet Archive&apos;s Wayback Machine.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Technology &amp; Digital Media</category>
   </item>
   <item>
     <title>Subscribers buy a product. Members join the cause.</title>
@@ -988,16 +979,6 @@
     <description>A repost of Rosen&apos;s viral PressThink passage about the Trump administration&apos;s COVID response strategy: deliberate confusion, blame-shifting, and &apos;flooding the zone with shit&apos; as a governing method. Originally published on PressThink in May 2020, republished by Adbusters magazine (issue #151).</description>
     <category>Press &amp; Media Criticism</category>
     <category>Politics &amp; Democracy</category>
-  </item>
-  <item>
-    <title>Jay Rosen and Nicholas Johnson on What the Media Can Do About Disinformation</title>
-    <link>https://drilled.media/podcasts/drilled/3/drilleds03-e09</link>
-    <guid isPermaLink="true">https://drilled.media/podcasts/drilled/3/drilleds03-e09</guid>
-    <pubDate>Sat, 29 Feb 2020 00:00:00 GMT</pubDate>
-    <description>Jay Rosen&apos;s call to focus on the stakes of the 2024 election, rather than the odds, critiques the dominance of &quot;horse race journalism&quot; in mainstream US media.  This focus overshadows crucial issues and diverse perspectives, while the rise of partisan media and misinformation further complicates the landscape.  The article highlights the need for more inclusive and issue-oriented coverage, contrasting the prevalent focus on campaign strategy and polling with examples of impactful investigative and local reporting.</description>
-    <category>Journalism Theory &amp; Practice</category>
-    <category>Politics &amp; Democracy</category>
-    <category>Press &amp; Media Criticism</category>
   </item>
   </channel>
 </rss>
