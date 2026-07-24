@@ -1480,10 +1480,18 @@ Each row's raw text includes an explicit `Posted: 07/19/08` timestamp:
 | `RECORD-00869` | 2013-11-06 | 2008-07-19 | `Posted: 07/19/08 01:22 PM ET` |
 | `RECORD-00870` | 2013-11-13 | 2008-07-19 | `Posted: 07/19/08 09:35 PM ET` |
 
-`RECORD-00868` remains unresolved. Its stored body is still Wayback toolbar and
-migrated-stub text, with no direct `Posted:` source date in the canonical row.
-Do not infer its date from neighboring post IDs without labeling the evidence
-as sequence inference.
+`RECORD-00868` was then replayed against the 2017 raw Wayback snapshot for the
+same original HuffPost URL. The 2016 capture remains a migrated-stub snapshot,
+but the 2017 capture exposes direct source metadata and article-header text:
+`article:published_time` is `2008-07-19 11:08:17 -0400`, JSON-LD
+`datePublished` is `2008-07-19T15:08:17Z`, and the rendered timestamp prints
+`07/19/2008 11:08 am ET`. The snapshot SHA-256 is
+`42fc386e459db9664e859eb4cdb28c914d53b18057db58ebf2c61e49a202b4ae`.
+
+The canonical row now sets `RECORD-00868` to 2008-07-19 and replaces its
+Wayback-toolbar raw text with source-derived title, byline, and published-date
+text. It remains `verified=FALSE` because the row still lacks reviewed
+summary/enrichment fields.
 
 At the staging checkpoint, the five-record pilot sourced 15 relationship
 assertions and six entity first mentions. Their relationship context was

@@ -30,7 +30,7 @@ with repeatable checks. The archive is materially better, but it is not at
 - Pinned data commit used in evidence packets:
   `5d3d5351346a9712de4f54d95e69ba0f410c6efd`
 - Current archive SHA-256:
-  `8ed17b17197a31dbb88447c5b16fec6bb36ffac527c9af67dc571fba428e252f`
+  `5ced1d1107be86d48a943f38152e5ad4df2dfb1461c10cfe9304ff5bdc51e484`
 - Current social SHA-256:
   `145c44f52033c7dcfda5f94f9db467ea85d68ecc82048e57067b8bc45a7a98fd`
 - Current entity SHA-256:
@@ -75,7 +75,7 @@ and must remain draft while its nine completion gates fail.
 | Entities with blank `first_mention_record_id` | 49 |
 
 The archive CSV is UTF-8 without a BOM. It has 1,029 CRLF record boundaries
-and 81,250 embedded bare LF characters. Preserve those line-ending counts when
+and 81,117 embedded bare LF characters. Preserve those line-ending counts when
 editing multiline source text.
 
 ## Completed work in this session
@@ -110,11 +110,12 @@ editing multiline source text.
   duplication or redistribution without express written permission.
 - Preserved unresolved identity problems instead of guessing:
   `RECORD-00602`, `RECORD-00613`, and composite `RECORD-00614`.
-- One HuffPost `#NN08` record still uses a capture-year date:
-  `RECORD-00868`.
 - Corrected six `#NN08` dates to 2008-07-19 from stored Wayback source text:
   `RECORD-00862`, `RECORD-00863`, `RECORD-00866`, `RECORD-00867`,
   `RECORD-00869`, and `RECORD-00870`.
+- Corrected `RECORD-00868` to 2008-07-19 and replaced its Wayback-toolbar raw
+  text with source-derived title/byline/date text from the 2017 raw Wayback
+  snapshot. No HuffPost `#NN08` record now uses a capture-year date.
 - Removed `RECORD-00865` and its lone relationship after curator review. The
   record was a fragment from the Netroots Nation 2008 sketchbook flow, with no
   direct authored body beyond the title-like snippet.
@@ -185,20 +186,19 @@ batch. Evidence hashes are in the final pilot-nine section of
 
 ## Test and completion-gate state after review
 
-`npm run test:data` reports 135 passing and seven failing tests.
+`npm run test:data` reports 136 passing and six failing tests.
 `npm run test:data:extraction-coverage` reports three passing and one failing
-test. Together they measure eight intentionally failing completion tests that
+test. Together they measure seven intentionally failing completion tests that
 remain owned by the stewardship issues:
 
 1. Three core blanks: `RECORD-00602:url`, `RECORD-00613:url`, and
    `RECORD-00614:publisher`.
 2. Thirty-four archive summaries are blank (`RECORD-00844` onward).
-3. One HuffPost `#NN08` row uses a capture-year date.
-4. Fifty-four non-Rosen Bluesky rows use Jay's profile URL.
-5. The same 54 rows assign copyright to Jay.
-6. 29,693 social rows lack explicit verification.
-7. Forty-nine entities lack a first-mention record.
-8. Seventy-eight records with at least 500 raw-text characters have no
+3. Fifty-four non-Rosen Bluesky rows use Jay's profile URL.
+4. The same 54 rows assign copyright to Jay.
+5. 29,693 social rows lack explicit verification.
+6. Forty-nine entities lack a first-mention record.
+7. Seventy-eight records with at least 500 raw-text characters have no
    extracted relationships.
 
 The archive verification gate itself is green: both `TRUE` (served) and `FALSE`
@@ -271,8 +271,7 @@ in the next-actions list.
 3. Prepare a curator proposal for importing the 111 confirmed works, including
    permanent IDs, order, rights, full-text treatment, taxonomy, and graph impact.
 4. Continue five-record HuffPost batches through the remaining 35 rows.
-5. Resolve the one remaining `#NN08` date from primary evidence.
-6. Revisit the 54 source-absent Bluesky identities only if native ATProto
+5. Revisit the 54 source-absent Bluesky identities only if native ATProto
    records or another authoritative capture is recovered.
 7. Present the 28 entity merge pairs for curator approval before changing any
    canonical entity ID.
