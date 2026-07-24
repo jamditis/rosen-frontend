@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "generated": "2026-07-24T02:03:07.674Z",
+  "generated": "2026-07-24T03:15:14.703Z",
   "baseUrl": "https://pressthink.org/j/rosen-archive",
   "feeds": [
     {
@@ -29,14 +29,14 @@
       "path": "./data/feeds/categories/audience-public-engagement.xml"
     },
     {
-      "name": "categories - technology-digital-media",
-      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/technology-digital-media.xml",
-      "path": "./data/feeds/categories/technology-digital-media.xml"
-    },
-    {
       "name": "categories - politics-democracy",
       "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/politics-democracy.xml",
       "path": "./data/feeds/categories/politics-democracy.xml"
+    },
+    {
+      "name": "categories - technology-digital-media",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/technology-digital-media.xml",
+      "path": "./data/feeds/categories/technology-digital-media.xml"
     },
     {
       "name": "categories - journalism-education",

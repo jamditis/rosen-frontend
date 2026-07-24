@@ -8,6 +8,7 @@
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { parse } from 'csv-parse/sync';
@@ -15,9 +16,20 @@ import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const dataDir = path.join(__dirname, '..', 'data');
+const repoDir = path.join(__dirname, '..');
+const dataDir = path.join(repoDir, 'data');
+const docsDir = path.join(repoDir, 'docs');
+const manualVerificationPath = path.join(docsDir, 'manual-verification-required-2026-07-23.md');
 
 let archiveRecords, socialPosts, entities, relationships;
+
+function readManualVerificationRecordIds() {
+  const markdown = fs.readFileSync(manualVerificationPath, 'utf-8');
+  return new Set(
+    [...markdown.matchAll(/^###\s+([A-Z]+-\d+)\s*$/gm)]
+      .map(match => match[1])
+  );
+}
 
 before(() => {
   archiveRecords = parse(
@@ -122,19 +134,143 @@ describe('archive_records-public.csv', () => {
     );
   });
 
-  it('all archive records have explicit verified status', () => {
+  it('all archive records have explicit verified status or manual queue coverage', () => {
     // An explicit verdict is TRUE (kept, source-replayed) or FALSE (an
-    // intentionally excluded row, e.g. a Jay Rosenstein namesake negative
-    // control). Only a blank or unexpected value counts as missing verification;
-    // FALSE is a verdict, not an omission, so the gate must not demand TRUE.
+    // intentionally excluded or unresolved row). FALSE is a verdict, not an
+    // omission, but every FALSE archive row must remain review-visible until
+    // stronger source evidence resolves it.
     const explicit = new Set(['TRUE', 'FALSE']);
-    const unverified = archiveRecords
+    const manualVerificationIds = readManualVerificationRecordIds();
+    const missingExplicitState = archiveRecords
       .filter(record => !explicit.has((record.verified || '').trim()))
       .map(record => record.id);
+    const unverified = archiveRecords.filter(record => record.verified === 'FALSE');
+    const undocumented = unverified
+      .filter(record => !manualVerificationIds.has(record.id))
+      .map(record => record.id);
+    const underflagged = unverified
+      .filter(record => record.low_confidence !== 'TRUE' || record.needs_review !== 'TRUE')
+      .map(record => record.id);
+    const staleManualQueueIds = [...manualVerificationIds]
+      .filter(id => !unverified.some(record => record.id === id));
+
     assert.strictEqual(
-      unverified.length,
+      missingExplicitState.length,
       0,
-      `${unverified.length} archive records lack an explicit verified status (expected TRUE or FALSE): ${unverified.slice(0, 10).join(', ')}`
+      `${missingExplicitState.length} archive records lack explicit TRUE/FALSE verified status: ${missingExplicitState.slice(0, 10).join(', ')}`
+    );
+    assert.strictEqual(
+      undocumented.length,
+      0,
+      `${undocumented.length} unverified archive records are missing from the manual verification queue: ${undocumented.slice(0, 10).join(', ')}`
+    );
+    assert.strictEqual(
+      underflagged.length,
+      0,
+      `${underflagged.length} unverified archive records lack low_confidence=TRUE and needs_review=TRUE: ${underflagged.slice(0, 10).join(', ')}`
+    );
+    assert.strictEqual(
+      staleManualQueueIds.length,
+      0,
+      `${staleManualQueueIds.length} manual verification queue records are not currently unverified: ${staleManualQueueIds.slice(0, 10).join(', ')}`
+    );
+  });
+
+  it('does not publish the corrupted News Creator Corps duplicate as an archive record', () => {
+    assert.ok(
+      socialPosts.some(row => row.id === 'BSKY-00119'),
+      'canonical Bluesky announcement BSKY-00119 is missing'
+    );
+    assert.ok(
+      socialPosts.some(row => row.id === 'BSKY-00086'),
+      'canonical Bluesky follow-up BSKY-00086 is missing'
+    );
+    assert.strictEqual(
+      archiveRecords.some(row => row.id === 'RECORD-00602'),
+      false,
+      'RECORD-00602 is a contradicted duplicate of canonical social rows'
+    );
+    assert.strictEqual(
+      entities.some(row => row.first_mention_record_id === 'RECORD-00602' || ['C0643', 'O1231'].includes(row.entity_id)),
+      false,
+      'stale RECORD-00602 graph entities remain'
+    );
+    assert.strictEqual(
+      relationships.some(row => row.source_record_id === 'RECORD-00602' || ['C0643', 'O1231'].includes(row.source_entity_id) || ['C0643', 'O1231'].includes(row.target_entity_id)),
+      false,
+      'stale RECORD-00602 graph relationships remain'
+    );
+  });
+
+  it('does not publish the unrecoverable real-work-of-journalism placeholder tweet', () => {
+    assert.strictEqual(
+      archiveRecords.some(row => row.id === 'RECORD-00613'),
+      false,
+      'RECORD-00613 has no recovered source and uses AI-guesswork summary text'
+    );
+    const staleRelatedRecords = archiveRecords
+      .filter(row => (row.related_to || '')
+        .split(',')
+        .map(value => value.trim())
+        .includes('RECORD-00613'))
+      .map(row => row.id);
+    assert.deepStrictEqual(
+      staleRelatedRecords,
+      [],
+      `archive records still reference deleted RECORD-00613: ${staleRelatedRecords.join(', ')}`
+    );
+  });
+
+  it('does not publish the mismatched TomDispatch composite record', () => {
+    const sourceRecord = archiveRecords.find(row => row.id === 'RECORD-00013');
+    assert.ok(sourceRecord, 'source-backed Sinclair record RECORD-00013 is missing');
+    assert.strictEqual(sourceRecord.url, 'http://archive.pressthink.org/2004/11/16/snclr_vision_p.html');
+    assert.strictEqual(sourceRecord.verified, 'TRUE');
+    assert.strictEqual(
+      archiveRecords.some(row => row.id === 'RECORD-00614'),
+      false,
+      'RECORD-00614 links a 2004 source while storing unrecovered 2017-era interview text'
+    );
+
+    const staleRelatedRecords = archiveRecords
+      .filter(row => (row.related_to || '')
+        .split(',')
+        .map(value => value.trim())
+        .includes('RECORD-00614'))
+      .map(row => row.id);
+    assert.deepStrictEqual(
+      staleRelatedRecords,
+      [],
+      `archive records still reference deleted RECORD-00614: ${staleRelatedRecords.join(', ')}`
+    );
+
+    const deletedEntityIds = [
+      'P2350',
+      'P2351',
+      'P2352',
+      'O1413',
+      'O1414',
+      'O1415',
+      'O1416',
+      'W0759',
+      'W0760',
+      'C0778',
+      'C0779',
+      'C0780',
+      'C0781',
+      'E0270',
+      'E0271',
+      'L0216',
+    ];
+    assert.strictEqual(
+      entities.some(row => row.first_mention_record_id === 'RECORD-00614' || deletedEntityIds.includes(row.entity_id)),
+      false,
+      'stale RECORD-00614 graph entities remain'
+    );
+    assert.strictEqual(
+      relationships.some(row => row.source_record_id === 'RECORD-00614' || deletedEntityIds.includes(row.source_entity_id) || deletedEntityIds.includes(row.target_entity_id)),
+      false,
+      'stale RECORD-00614 graph relationships remain'
     );
   });
 
@@ -150,6 +286,96 @@ describe('archive_records-public.csv', () => {
       assert.ok(record, `${id} is missing`);
       assert.strictEqual(record.publication_date, expectedDate, `${id} uses its capture date instead of its source date`);
     }
+  });
+
+  it('Radio Open Source episode keeps the direct audio source', () => {
+    const record = archiveRecords.find(row => row.id === 'RECORD-00765');
+
+    assert.ok(record, 'RECORD-00765 is missing');
+    assert.strictEqual(record.url, 'https://radioopensource.org/jay-rosen-on-our-media-malaise-who-will-tell-the-people/');
+    assert.strictEqual(record.verified, 'TRUE');
+    assert.match(record.notes, /https:\/\/content\.blubrry\.com\/radioopensource\/rosendraft02\.mp3/);
+  });
+
+  it('HuffPost counterpoint article keeps source metadata', () => {
+    const record = archiveRecords.find(row => row.id === 'RECORD-00904');
+
+    assert.ok(record, 'RECORD-00904 is missing');
+    assert.strictEqual(record.url, 'https://www.huffpost.com/entry/a-counterpoint-to-the-vie_b_1079818');
+    assert.strictEqual(record.author, 'Caryl Rivers');
+    assert.strictEqual(record.publication_date, '2011-11-07');
+    assert.strictEqual(record.verified, 'TRUE');
+    assert.match(record.raw_text, /transparency is the new objectivity/i);
+    assert.match(record.notes, /not the unresolved RECORD-00865 #NN08 micro-post/);
+  });
+
+  it('user-supplied campaign coverage links keep verified source metadata', () => {
+    const expectedRows = new Map([
+      ['RECORD-00910', {
+        url: 'https://www.techdirt.com/2014/08/20/real-reporting-is-about-revealing-truth-not-granting-equal-weight-to-bogus-arguments/',
+        author: 'Mike Masnick',
+        date: '2014-08-20',
+        textPattern: /he said\/she said/i,
+      }],
+      ['RECORD-00906', {
+        url: 'https://smartocto.com/blog/smartoctober-constructive-campaign-coverage/',
+        author: 'Em Kuntze; Stefan ten Teije',
+        date: '2024-10-09',
+        textPattern: /not the odds, but the stakes/i,
+      }],
+      ['RECORD-00907', {
+        url: 'https://edition.cnn.com/2023/11/15/media/2024-election-horse-race-stakes-nyu-professor/index.html',
+        author: 'Oliver Darcy',
+        date: '2023-11-15',
+        textPattern: /six words that make up a mantra/i,
+      }],
+      ['RECORD-00908', {
+        url: 'https://www.salon.com/2020/11/11/hey-political-reporters-get-lost-this-is-not-your-moment/',
+        author: 'Dan Froomkin',
+        date: '2020-11-11',
+        textPattern: /two sides/i,
+      }],
+      ['RECORD-00909', {
+        url: 'https://www.youtube.com/watch?v=9seqSeHWqbs',
+        author: 'Andy Plesser',
+        date: '2011-02-23',
+        textPattern: /Journal Register Company/i,
+      }],
+    ]);
+
+    for (const [id, expected] of expectedRows) {
+      const record = archiveRecords.find(row => row.id === id);
+
+      assert.ok(record, `${id} is missing`);
+      assert.strictEqual(record.url, expected.url);
+      assert.strictEqual(record.author, expected.author);
+      assert.strictEqual(record.publication_date, expected.date);
+      assert.strictEqual(record.verified, 'TRUE');
+      assert.strictEqual(record.low_confidence, 'FALSE');
+      assert.strictEqual(record.needs_review, 'FALSE');
+      assert.match(record.raw_text, expected.textPattern);
+      assert.match(record.notes, /2026-07-24/);
+    }
+
+    const margaretSullivanRecord = archiveRecords.find(row => row.id === 'RECORD-00726');
+    assert.ok(margaretSullivanRecord, 'RECORD-00726 is missing');
+    assert.strictEqual(
+      margaretSullivanRecord.url,
+      'https://margaretsullivan.substack.com/p/a-media-critic-urged-not-the-odds'
+    );
+  });
+
+  it('does not publish the unrecoverable NN08 sketchbook fragment', () => {
+    assert.strictEqual(
+      archiveRecords.some(row => row.id === 'RECORD-00865'),
+      false,
+      'RECORD-00865 is a fragmentary HuffPost-era NN08 note without a recoverable article source'
+    );
+    assert.strictEqual(
+      relationships.some(row => row.source_record_id === 'RECORD-00865'),
+      false,
+      'stale RECORD-00865 graph relationships remain'
+    );
   });
 
   it('verified newspaper clips have source-backed relevance', () => {
@@ -366,11 +592,11 @@ describe('archive_records-public.csv', () => {
 
   it('newspaper source replays exclude the Jay Rosenstein namesake', () => {
     const record = archiveRecords.find(row => row.id === 'CLIP-00023');
-    assert.ok(record, 'CLIP-00023 is missing');
-    assert.match(record.raw_text, /Jay Rosenstein/i);
-    assert.strictEqual(record.verified, 'FALSE');
-    assert.strictEqual(record.low_confidence, 'TRUE');
-    assert.strictEqual(record.needs_review, 'TRUE');
+    assert.strictEqual(
+      record,
+      undefined,
+      'CLIP-00023 names filmmaker Jay Rosenstein, not NYU journalism professor Jay Rosen'
+    );
   });
 
   it('newspaper clips link to their recovered Drive OCR source', () => {
@@ -1308,19 +1534,429 @@ describe('archive_records-public.csv', () => {
     }
   });
 
-  it('RECORD-00614 cannot verify mismatched TomDispatch works', () => {
-    const record = archiveRecords.find(row => row.id === 'RECORD-00614');
-    assert.ok(record, 'RECORD-00614 must exist');
-    const linksToThe2004Article = record.url ===
-      'https://tomdispatch.com/jay-rosen-on-a-political-empire-made-of-tv-stations/';
-    const storesThe2017EraInterview =
-      /Tribune Media|Boris Epshteyn|Ajit Pai/i.test(record.raw_text);
-    const claimsVerified = /^true$/i.test(record.verified);
+  it('HuffPost pilot eleven records match their official sources', () => {
+    const expected = new Map([
+      ['RECORD-00854', {
+        title: 'Walter Pincus of the Post: Our Neutered Newsrooms are a Poor Example to the Rest of the World',
+        url: 'https://www.huffpost.com/entry/walter-pincus-of-the-post_b_92019',
+        publicationDate: '2008-03-18',
+        wordCount: '2957',
+        rawTextSha: 'ef2ddee448169bdbc15a7b79665a8b32f3ba22ae9f2db87908324d5d2c3f2c61',
+        excerpt: 'The only exit from this system is for people in the press to start recognizing: there _is_ a politics to what they do. They have to get that part right. And they have to be more transparent about it.',
+        pullQuote: 'It is rare that a single article advances American press think.',
+        summary: "Rosen argues that neutrality claims like Clark Hoyt's defense of the Times trap the media-bias debate, and that journalists must recognize the politics in their work and make it transparent, as Josh Marshall's TPM does by joining accountability reporting to an open display of political conviction.",
+        sourceSha: '1dacc962fe486d4bf1ba6d0fb8427a4120100a4f6662fc9f03f7bf6b8d3cd42d',
+      }],
+      ['RECORD-00855', {
+        title: 'Obama Tells the Best Political Team on Television: You Guys Have a Choice...',
+        url: 'https://www.huffpost.com/entry/obama-tells-the-best-poli_b_92139',
+        publicationDate: '2008-03-18',
+        wordCount: '685',
+        rawTextSha: 'c2ca3b27f4321ff8980ec768a320cc143d21825810afecb63e097ff094a73c34',
+        excerpt: 'In fact it was a [speech](https://www.huffpost.com/entry/obama-race-speech-read-t_n_92077) aimed right at figures like Blitzer, at the [best political team](http://www.cnn.com/POLITICS/best.political.team/archive/) on television, and all the makers of our election year spectacle.',
+        pullQuote: 'Moments after it concluded Wolf Blitzer was asked to tell us what he heard in it.',
+        summary: "Rosen criticizes CNN and Wolf Blitzer for reducing Obama's race speech to campaign tactics instead of engaging its challenge to the campaign spectacle and the press's role in keeping race controversies alive.",
+        sourceSha: '99eee19f175791a76156c90f92c23f1efe6685ee1816b8723a8634e82cdf5df8',
+      }],
+      ['RECORD-00856', {
+        title: 'Where Did McCain Get What He\'s Got "in the Bank" with the Press?',
+        url: 'https://www.huffpost.com/entry/where-did-mccain-get-what_b_93711',
+        publicationDate: '2008-03-27',
+        wordCount: '2112',
+        rawTextSha: '2debe6510d79803d87d00a70e159323b532e1a9dcdfc6c4e8d0cb89d2f21d778',
+        excerpt: "Chuck Todd's phrase, _he's got enough of that in the bank,_ got people wondering what kind of depositary institution this was.",
+        pullQuote: "First came John McCain's strange assertion that Al Qaeda in Iraq was being trained and supported by the Iranians.",
+        summary: "Rosen asks why Chuck Todd said John McCain had enough credibility 'in the bank' with the press after falsely linking Al Qaeda in Iraq to Iran, arguing that banked capital came from McCain's open, on-the-record ease with reporters on the Straight Talk Express rather than demonstrated foreign-policy mastery.",
+        sourceSha: '61069523ad8e8d889f0c7165227a32150dc4812e27ab0885899523d42de7e7b7',
+      }],
+      ['RECORD-00857', {
+        title: 'The Uncharted: From Off The Bus to Meet the Press',
+        url: 'https://www.huffpost.com/entry/the-uncharted-from-off-th_b_96575',
+        publicationDate: '2008-04-22',
+        wordCount: '2470',
+        rawTextSha: '22c51b32da698e47140d442dcd86d43114d7f764b32fe62ce559bf03d5f8f6af',
+        excerpt: "They became public because [Mayhill Fowler](https://www.huffpost.com/mayhill-fowler) reported them for OffTheBus Friday afternoon. Russert used Mayhill's quotes again on [another story](https://www.huffpost.com/entry/obama-says-no-to-foreign_b_95357) she broke earlier in the week.",
+        pullQuote: 'One of these was OffTheBus itself, the site I started with Arianna Huffington last year.',
+        summary: "Rosen argues that Meet the Press erased Mayhill Fowler and OffTheBus from the Obama 'bitter' controversy, showing how old media struggled to credit pro-am campaign reporting even when it drove the story.",
+        sourceSha: 'b910fdc1de0d3682ba28281a7ba056949a2e08a59f5ada2c338a8ac72c5de842',
+      }],
+      ['RECORD-00858', {
+        title: 'They Were Undercover Campaign Volunteers',
+        url: 'https://www.huffpost.com/entry/they-were-undercover-camp_b_97529',
+        publicationDate: '2008-04-26',
+        wordCount: '186',
+        rawTextSha: 'a41a108da674f02a7e6a6264a5087db9275e4933053ce1cb747700eb5196c4cb',
+        excerpt: "They're both writers for City Paper who chose to go undercover to find out how the volunteer operations for both candidates actually worked.",
+        pullQuote: "But we're not the only ones trying to do that.",
+        summary: 'Rosen points readers to two Philadelphia City Paper writers who went undercover as Clinton and Obama volunteers, framing their reports as revealing evidence about campaign organizing despite ethical questions.',
+        sourceSha: 'fc27d7dc586be1c17fc929217f5c15bb7d58d4fb108f45dec56552bc5752f7c0',
+      }],
+    ]);
 
-    assert.ok(
-      !(claimsVerified && linksToThe2004Article && storesThe2017EraInterview),
-      'RECORD-00614 is verified while its URL resolves to a 2004 article and its text describes a 2017-era interview'
+    for (const [id, source] of expected) {
+      const record = archiveRecords.find(row => row.id === id);
+      assert.ok(record, `${id} must exist`);
+      assert.strictEqual(record.title, source.title);
+      assert.strictEqual(record.url, source.url);
+      assert.strictEqual(record.author, 'Jay Rosen');
+      assert.strictEqual(record.publication_date, source.publicationDate);
+      assert.strictEqual(record.word_count, source.wordCount);
+      assert.strictEqual(
+        crypto.createHash('sha256').update(record.raw_text).digest('hex'),
+        source.rawTextSha,
+        `${id} raw_text changed`
+      );
+      assert.strictEqual(record.excerpt, source.excerpt);
+      assert.strictEqual(record.pull_quote, source.pullQuote);
+      assert.strictEqual(record.summary, source.summary);
+      assert.strictEqual(record.verified, 'TRUE');
+      assert.strictEqual(record.needs_review, 'FALSE');
+      assert.match(record.notes, /Official HuffPost source verified 2026-07-23/);
+      assert.match(record.notes, new RegExp(source.sourceSha));
+    }
+  });
+
+  it('HuffPost pilot twelve records match their source evidence', () => {
+    const expected = new Map([
+      ['RECORD-00859', {
+        title: 'Scott McClellan And The Opacity Agenda',
+        url: 'https://www.huffpost.com/entry/scott-mcclellan-and-the-o_b_104857',
+        publicationDate: '2008-06-11',
+        wordCount: '2525',
+        rawTextSha: 'c012883e030a441f5bc519055e6553f32dfa5ccbd9411fb684f0a2dbc9409d2b',
+        excerpt: 'McClellan as White House spokesman lacked experience, talent, charm, agility, depth. But Bush and Cheney saw these defects as an advantage. They actually wanted the executive branch to become more opaque, and he was the perfect man for the job.',
+        pullQuote: 'These words have a strange poignancy today.',
+        summary: "Rosen uses Scott McClellan's memoir to argue that Bush and Cheney preferred an opaque executive branch and that McClellan's limits as press secretary served that secrecy agenda.",
+        sourceSha: 'cdf43c9170b945d23b37518cbf746f242530271cbd2b7117faa89fc3a22f864d',
+      }],
+      ['RECORD-00860', {
+        title: 'When Bill Clinton Met Mayhill Fowler on the Rope Line',
+        url: 'https://www.huffpost.com/entry/when-bill-clinton-met-may_b_106974',
+        publicationDate: '2008-06-21',
+        wordCount: '3888',
+        rawTextSha: '7e8f39348d07529ed28fd9019a529ce8852b4a9591da09f7869760b2940bcd8b',
+        excerpt: "Newsroom people, you don't have to leave the moral universe you grew up in. Just admit the possibility of another valid one beyond yours.",
+        pullQuote: 'Last week OffTheBus brought you another case with Mayhill Fowler in the middle of it.',
+        summary: "Rosen defends Mayhill Fowler's OffTheBus reporting on Bill Clinton's rope-line comments, arguing that campaign journalism can include a valid citizen-reporter ethic outside traditional newsroom rules.",
+        sourceSha: 'e541bfca40e39caabee788a7775fedf23e731f0007836fd84d415714ce44eb06',
+      }],
+      ['RECORD-00861', {
+        title: 'Karl Frisch of Media Matters in Austin Chronicle\'s story on Netroots: "We\'re ideological, not partisan." http://is.gd/WCk  #NN08',
+        url: 'https://www.huffpost.com/entry/karl-frisch-of-media-matt_b_113470',
+        publicationDate: '2008-07-17',
+        wordCount: '137',
+        rawTextSha: 'e5c37b47d7f36cbd0fe5a8b44c7405c99379cc0cc16e69edc32920151c866fda',
+        excerpt: 'Karl Frisch of Media Matters in Austin Chronicle\'s story on Netroots: "We\'re ideological, not partisan." [http://is.gd/WCk](http://web.archive.org/web/20131109231444/http://is.gd/WCk) \\#NN08',
+        pullQuote: '',
+        summary: 'A short #NN08 post points to an Austin Chronicle Netroots Nation item quoting Media Matters\' Karl Frisch: "We\'re ideological, not partisan."',
+        sourceSha: '0041b650c6c2d9689c1337ffe71f62db091c55950fa2bfdacd5bcdd63ca41afe',
+      }],
+      ['RECORD-00862', {
+        title: '#NN08 Nancy Pelosi was moved up half an hour this morning so the speculation is that Al Gore is a surprise guest later today.',
+        url: 'https://www.huffpost.com/entry/nn08-nancy-pelosi-was-mov_b_113745',
+        publicationDate: '2008-07-19',
+        wordCount: '82',
+        rawTextSha: '9946a7dc23ae8c527bb54b6a1a86c3fd00c6c3b746a369da6943cba908417153',
+        excerpt: '# \\#NN08 Nancy Pelosi was moved up half an hour this morning so the speculation is that Al Gore is a surprise guest later today.',
+        pullQuote: '',
+        summary: "A short #NN08 dispatch notes that Nancy Pelosi's Netroots Nation appearance was moved earlier, fueling speculation that Al Gore would appear as a surprise guest later that day.",
+        sourceSha: '94c9e65f3e58330739ad36373c6cafcd88af3c7845615ca5478975c3e0830537',
+      }],
+      ['RECORD-00863', {
+        title: '#NN08 Sketchbook: I tell Joe Trippi that his "Nixon won on radio" (in 1960 debate) reference is basically an urban legend.  Blank.',
+        url: 'https://www.huffpost.com/entry/nn08-sketchbook-i-tell-jo_b_113757',
+        publicationDate: '2008-07-19',
+        wordCount: '142',
+        rawTextSha: '81d637bcf5728a3fcf8d4e1edfda5ccfa6c8a5ffe43a3687792bac94432c7bf9',
+        excerpt: '# \\#NN08 Sketchbook: I tell Joe Trippi that his "Nixon won on radio" (in 1960 debate) reference is basically an urban legend. Blank.',
+        pullQuote: '',
+        summary: 'A short #NN08 sketchbook post says Rosen told Joe Trippi that the "Nixon won on radio" claim about the 1960 debate is an urban legend.',
+        sourceSha: '2ecba87badcf6807880b33ac689eba97e49bb267cbf8f26f8827a27c6dfd0b7d',
+      }],
+    ]);
+
+    for (const [id, source] of expected) {
+      const record = archiveRecords.find(row => row.id === id);
+      assert.ok(record, `${id} must exist`);
+      assert.strictEqual(record.title, source.title);
+      assert.strictEqual(record.url, source.url);
+      assert.strictEqual(record.author, 'Jay Rosen');
+      assert.strictEqual(record.publication_date, source.publicationDate);
+      assert.strictEqual(record.word_count, source.wordCount);
+      assert.strictEqual(
+        crypto.createHash('sha256').update(record.raw_text).digest('hex'),
+        source.rawTextSha,
+        `${id} raw_text changed`
+      );
+      assert.strictEqual(record.excerpt, source.excerpt);
+      assert.strictEqual(record.pull_quote, source.pullQuote);
+      assert.strictEqual(record.summary, source.summary);
+      assert.strictEqual(record.verified, 'TRUE');
+      assert.strictEqual(record.needs_review, 'FALSE');
+      assert.match(record.notes, /HuffPost source verified 2026-07-23/);
+      assert.match(record.notes, new RegExp(source.sourceSha));
+    }
+  });
+
+  it('HuffPost pilot thirteen records match available Wayback evidence', () => {
+    const expected = new Map([
+      ['RECORD-00864', {
+        title: '#NN08 Sketchbook. Trippi\'s poem: "I came up top down."',
+        url: 'https://www.huffpost.com/entry/nn08-sketchbook-trippis-p_b_113760',
+        publicationDate: '2008-07-19',
+        wordCount: '71',
+        rawTextSha: '5b15812a9d7e4014be9cc23396819e00188fe8692df092314ecd7035db665353',
+        excerpt: '# \\#NN08 Sketchbook. Trippi\'s poem: "I came up top down."',
+        pullQuote: '',
+        summary: 'A short #NN08 sketchbook post quotes Joe Trippi\'s poem: "I came up top down."',
+        sourceSha: '4bbb6c7857b7c1877cf14ef3b2207883ff7acd381a70f7c503248138b6f3d1d4',
+      }],
+      ['RECORD-00866', {
+        title: '#NN08 Sketchbook: Politicians think "Netroots Nation" equals "youth," because kids get the Net. But glance at the crowd and: Fail.',
+        url: 'https://www.huffpost.com/entry/nn08-sketchbook-politicia_b_113765',
+        publicationDate: '2008-07-19',
+        wordCount: '140',
+        rawTextSha: 'e07da9599f4e1f4ae586ed9bb6fb5c939aa435c087763988cd33338244561175',
+        excerpt: '# \\#NN08 Sketchbook: Politicians think "Netroots Nation" equals "youth," because kids get the Net. But glance at the crowd and: Fail.',
+        pullQuote: '',
+        summary: 'A short #NN08 sketchbook post says politicians wrongly equate Netroots Nation with youth because the crowd shows the movement is not just young people.',
+        sourceSha: '0199cd5b7624d4595240146b9393425074553d587998dcb812d48a40bdb98266',
+      }],
+      ['RECORD-00867', {
+        title: '#NN08 Sketchbook. Matt Yglesias: In policy debate you can\'t say, "I know, let\'s spend a $170 billion a year on it." But in Iraq...',
+        url: 'https://www.huffpost.com/entry/nn08-sketchbook-matt-ygle_b_113772',
+        publicationDate: '2008-07-19',
+        wordCount: '86',
+        rawTextSha: 'e2736a5a5586be748a1d526d3fdf6e44d7cee06ccdfc52ad8fd76494e1b265e8',
+        excerpt: '# \\#NN08 Sketchbook. Matt Yglesias: In policy debate you can\'t say, "I know, let\'s spend a $170 billion a year on it." But in Iraq...',
+        pullQuote: 'Matt Yglesias: In policy debate you can\'t say, "I know, let\'s spend a $170 billion a year on it." But in Iraq...',
+        summary: 'A short #NN08 sketchbook post quotes Matt Yglesias contrasting normal policy spending constraints with the scale of Iraq war spending.',
+        sourceSha: '63b72c598a5a66c39c79418c36c8b1d0d6d375f4437847becc99042a7addd6f0',
+      }],
+      ['RECORD-00868', {
+        title: '#NN08 Sketchbook. Gina Cooper, boss of Netroots Nation, isn\'t smooth in questioning Pelosi, but behind her the power of millions.',
+        url: 'https://www.huffpost.com/entry/nn08-sketchbook-gina-coop_b_113780',
+        publicationDate: '2008-07-19',
+        wordCount: '26',
+        rawTextSha: '950029bd6d26935db2210780e9ee4b210fbb55519a8a86403555e210032c1093',
+        excerpt: '# \\#NN08 Sketchbook. Gina Cooper, boss of Netroots Nation, isn\'t smooth in questioning Pelosi, but behind her the power of millions.',
+        pullQuote: '',
+        summary: "A short #NN08 sketchbook post notes Gina Cooper's unsmooth questioning of Nancy Pelosi while emphasizing the grassroots power behind her.",
+        sourceSha: '11d7cfd6b97630102b1e96697abd182a3cc4385ad19418bd40a54d0971acc84e',
+      }],
+    ]);
+
+    for (const [id, source] of expected) {
+      const record = archiveRecords.find(row => row.id === id);
+      assert.ok(record, `${id} must exist`);
+      assert.strictEqual(record.title, source.title);
+      assert.strictEqual(record.url, source.url);
+      assert.strictEqual(record.author, 'Jay Rosen');
+      assert.strictEqual(record.publication_date, source.publicationDate);
+      assert.strictEqual(record.word_count, source.wordCount);
+      assert.strictEqual(
+        crypto.createHash('sha256').update(record.raw_text).digest('hex'),
+        source.rawTextSha,
+        `${id} raw_text changed unexpectedly`
+      );
+      assert.strictEqual(record.excerpt, source.excerpt);
+      assert.strictEqual(record.pull_quote, source.pullQuote);
+      assert.strictEqual(record.summary, source.summary);
+      assert.strictEqual(record.verified, 'TRUE');
+      assert.strictEqual(record.needs_review, 'FALSE');
+      assert.match(record.notes, /Wayback archived HuffPost source verified 2026-07-23/);
+      assert.match(record.notes, new RegExp(source.sourceSha));
+    }
+
+    assert.strictEqual(
+      archiveRecords.some(row => row.id === 'RECORD-00865'),
+      false,
+      'RECORD-00865 should stay removed after curator review'
     );
+  });
+
+  it('HuffPost pilot fourteen records match source evidence', () => {
+    const expected = new Map([
+      ['RECORD-00869', {
+        title: '#NN08 Righties came to Austin to draft off Netroots media attention, but stories comparing the two note how small their event is.',
+        url: 'https://www.huffpost.com/entry/nn08-righties-came-to-aus_b_113813',
+        publicationDate: '2008-07-19',
+        wordCount: '84',
+        rawTextSha: '9880cf8c15a7f57f68f5377896d518cd62e81d57b2712700b2e997c00264dc97',
+        excerpt: '# \\#NN08 Righties came to Austin to draft off Netroots media attention, but stories comparing the two note how small their event is.',
+        pullQuote: '',
+        summary: 'A short #NN08 post says right-wing bloggers came to Austin to draft off Netroots Nation media attention, while comparison stories noted how small their event was.',
+        sourceSha: '2b51ef5dcf9349d3d2070c431b4525b1110d0356f3af8e33e2a9fa18d90e6345',
+        sourcePattern: /Wayback archived HuffPost source verified 2026-07-23/,
+      }],
+      ['RECORD-00870', {
+        title: '#nn08 You know, if Markos was a control freak there would be no Netroots Nation. His "distributed ego" style should be studied.',
+        url: 'https://www.huffpost.com/entry/nn08-you-know-if-markos-w_b_113854',
+        publicationDate: '2008-07-19',
+        wordCount: '84',
+        rawTextSha: '22f7cd6437c35a05bba3058a37e07f3eae4d8edab5ca9c7d8e5fad026efb6948',
+        excerpt: '# \\#nn08 You know, if Markos was a control freak there would be no Netroots Nation. His "distributed ego" style should be studied.',
+        pullQuote: 'His "distributed ego" style should be studied.',
+        summary: 'A short #nn08 post says Markos Moulitsas\'s distributed ego leadership style helped make Netroots Nation possible and should be studied.',
+        sourceSha: '4fa21e3f81b9b2ac8df16fd77927177ac1d78669dfa035ee2731d19239eeb3f4',
+        sourcePattern: /Wayback archived HuffPost source verified 2026-07-23/,
+      }],
+      ['RECORD-00871', {
+        title: '#NN08 Sketchbook: Code Pinkers at the Pelosi event didn\'t get that their tactics were for people who never expect to take power.',
+        url: 'https://www.huffpost.com/entry/nn08-sketchbook-code-pink_b_113872',
+        publicationDate: '2008-07-19',
+        wordCount: '730',
+        rawTextSha: 'f5fd902bd42a8527399fc4eac961d9522b5106466cb277d95d2f3427cfc6882a',
+        excerpt: '# \\#NN08 Sketchbook: Code Pinkers at the Pelosi event didn\'t get that their tactics were for people who never expect to take power.',
+        pullQuote: '',
+        summary: 'A short #NN08 sketchbook post argues that Code Pink protesters at the Pelosi event during Netroots Nation used tactics suited to people who never expect to hold power.',
+        sourceSha: '367e2163721d861b0b10ed052c4a1879c0b1a5eeb67816e937d5ef6e65519e26',
+        sourcePattern: /Wayback archived HuffPost source verified 2026-07-23/,
+      }],
+      ['RECORD-00872', {
+        title: 'Three Questions For ABC News About Its Anthrax Reporting',
+        url: 'https://www.huffpost.com/entry/three-key-questions-for-a_b_116671',
+        publicationDate: '2008-08-11',
+        wordCount: '1520',
+        rawTextSha: 'e30e2d5d64b020eea5c8a747fbd2b6f92715d90d5780f945a17f8665af77d788',
+        excerpt: 'ABC News was probably duped on a story of huge importance, putting Iraqi fingerprints on anthrax attacks that actually came from the U.S at a time when the case for war was beginning to get traction.',
+        pullQuote: 'Dan Gillmor and I are posting these questions simultaneously.',
+        summary: 'Rosen and Dan Gillmor press ABC News to answer questions about its anthrax reporting, including whether sources misled the network into linking the attacks to Iraq.',
+        sourceSha: 'b1ed6da2177915cca79483da7d577db37476269bfa71d427e4da328e5e815721',
+        sourcePattern: /Modern HuffPost source verified 2026-07-23/,
+      }],
+      ['RECORD-00873', {
+        title: 'Hype Busters at Mother Jones Bring the Noise',
+        url: 'https://www.huffpost.com/entry/hype-busters-at-mother-jo_b_120078',
+        publicationDate: '2008-09-20',
+        wordCount: '1513',
+        rawTextSha: '8587258f83ca4b66503d95b69e030b9c111bf52b3e093798f365bd748f6c58d3',
+        excerpt: 'Mother Jones is currently running a feature offering us the views of 24 writers, thinkers and historians on a question the editors find important: "Is Obama exaggerating when he compares his campaign to the great progressive moments in US history?"',
+        pullQuote: 'Is the concept really so hard for the editors of Mother Jones to grasp?',
+        summary: 'Rosen critiques Mother Jones\'s Obama hype-busting package, arguing that attempts to puncture campaign hype can become another form of hype when the framing is careless.',
+        sourceSha: 'daae6c220c00a9c5bbf057cc7335f7d302a099f4ed44a5d53ddcabe398c30670',
+        sourcePattern: /Modern HuffPost source verified 2026-07-23/,
+      }],
+    ]);
+
+    for (const [id, source] of expected) {
+      const record = archiveRecords.find(row => row.id === id);
+      assert.ok(record, `${id} must exist`);
+      assert.strictEqual(record.title, source.title);
+      assert.strictEqual(record.url, source.url);
+      assert.strictEqual(record.author, 'Jay Rosen');
+      assert.strictEqual(record.publication_date, source.publicationDate);
+      assert.strictEqual(record.word_count, source.wordCount);
+      assert.strictEqual(
+        crypto.createHash('sha256').update(record.raw_text).digest('hex'),
+        source.rawTextSha,
+        `${id} raw_text changed unexpectedly`
+      );
+      assert.strictEqual(record.excerpt, source.excerpt);
+      assert.strictEqual(record.pull_quote, source.pullQuote);
+      assert.strictEqual(record.summary, source.summary);
+      assert.strictEqual(record.verified, 'TRUE');
+      assert.strictEqual(record.low_confidence, 'FALSE');
+      assert.strictEqual(record.needs_review, 'FALSE');
+      assert.match(record.notes, source.sourcePattern);
+      assert.match(record.notes, new RegExp(source.sourceSha));
+    }
+  });
+
+  it('HuffPost pilot fifteen records match modern HuffPost evidence', () => {
+    const expected = new Map([
+      ['RECORD-00874', {
+        title: 'The Culture War Option For The Palin Convention',
+        url: 'https://www.huffpost.com/entry/the-culture-war-option-fo_b_123483',
+        publicationDate: '2008-10-04',
+        wordCount: '983',
+        rawTextSha: '7b6c5927576245bbdd6041252f87b037f552923fda2d66378bbef979fda6d1a7',
+        excerpt: 'McCain\'s convention gambit is now a culture war strategy. It depends for its execution on conflict with journalists and bloggers and on confusion between and among the press, the blogosphere, and the Democratic party.',
+        pullQuote: 'It revives cultural memory: the resentment narrative after Chicago \'68 but with the angry left more distributed.',
+        summary: 'Rosen argues that John McCain\'s Palin convention strategy turned toward culture-war politics by creating conflict with journalists and bloggers, blurring press-blogosphere-party boundaries, and betting on backlash.',
+        sourceSha: '690176d06c7d38c1a8da1e0c93d58a028f78391ac535937bbda43f7a828415bc',
+      }],
+      ['RECORD-00875', {
+        title: 'Audience Atomization Overcome: Why the Net Erodes the Authority of the Press',
+        url: 'https://www.huffpost.com/entry/audience-atomization-over_b_157807',
+        publicationDate: '2009-04-14',
+        wordCount: '1925',
+        rawTextSha: '87c75ed5851f83a2288d54a566de2180d051a3e4aa93c7a2881d957313b81216',
+        excerpt: 'Sometimes the people the press thinks of as deviant types are closer to the sphere of consensus than the journalists who are classifying those same people as "fringe."',
+        pullQuote: 'Take a sheet of paper and make a big circle in the middle.',
+        summary: 'Rosen uses the spheres of consensus, legitimate debate, and deviance to argue that the internet weakens press authority by letting publics challenge which voices journalists classify as fringe.',
+        sourceSha: 'd786adfffb8250640d6e0a9e396cdd825abe53253049690eb1de404ce64366a2',
+      }],
+      ['RECORD-00876', {
+        title: '"He Said, She Said" Journalism: Are We Done With That Yet?',
+        url: 'https://www.huffpost.com/entry/he-said-she-said-journali_b_187682',
+        publicationDate: '2009-04-16',
+        wordCount: '3024',
+        rawTextSha: 'ab23bf9fe433fb3d7e45f700e07b800b07fef963bc48946c2b661d5fc9e5b815',
+        excerpt: '"He said, she said" is not so much a truth-telling strategy as refuge-seeking behavior that fits well into newsroom production demands.',
+        pullQuote: 'There I am, sitting at the breakfast table, with my coffee and a copy of the New York Times, in the classic newspaper reading position from before the Web.',
+        summary: 'Rosen criticizes he said, she said journalism as a newsroom refuge that avoids judging competing truth claims, using AIG bailout coverage to argue that reporters should move beyond stenographic dispute framing.',
+        sourceSha: 'aa074de890fbdedabf7995c7914a96419e01eacb8292f1b5a18cd39e731525ad',
+      }],
+      ['RECORD-00877', {
+        title: 'The Politics of the New Huffington Post at AOL',
+        url: 'https://www.huffpost.com/entry/the-politics-of-the-new-h_b_821112',
+        publicationDate: '2011-02-10',
+        wordCount: '1306',
+        rawTextSha: 'd0a7ccd044bcf915f136af7fe05a4d2db511657458dc8763013a7ff0708b0a75',
+        excerpt: 'Is ideological innovation possible in online journalism, and will we see it from this merger? No one ever thinks to ask that. Without understanding why, we just assume the answer is no.',
+        pullQuote: '( Howard Kurtz: "Can a fast-moving, irreverent, and sometimes racy product keep its DNA once transplanted into a very different corporate culture?")\n\n2\\.',
+        summary: 'Rosen argues that coverage of AOL\'s purchase of HuffPost asked practical merger questions while ignoring whether the deal could produce ideological innovation in online journalism.',
+        sourceSha: 'defa25d8de9e9068f681fd117f583c4f39c1d0c321af667dd84e0b24bda076da',
+      }],
+      ['RECORD-00878', {
+        title: 'The Many Ways Journalists Are Complicit in Political Polarization',
+        url: 'https://www.huffpost.com/entry/leave-it-there-press_b_8739698',
+        publicationDate: '2015-12-07',
+        wordCount: '794',
+        rawTextSha: '8a431c9057372b9776779a734a530e4e9a3ced3bd0bfde4b4736c4ff1f2f7272',
+        excerpt: 'I am not saying journalists are the ones we should blame for American\'s dysfunctional politics. But I do consider them active participants in the events that got us here.',
+        pullQuote: 'Roy Blunt (R-MO) and moderator Chuck Todd appear on \'Meet the Press\' in Washington, D.C., Sunday, Oct.',
+        summary: 'Rosen argues that journalists are not the sole cause of political polarization but are active participants in it, especially when they distance themselves from conflicts their own conventions help sustain.',
+        sourceSha: '58f738c6147be329cebf9b8134f1f94ba294438e23b4600f8237452c94f69da4',
+      }],
+    ]);
+
+    for (const [id, source] of expected) {
+      const record = archiveRecords.find(row => row.id === id);
+      assert.ok(record, `${id} must exist`);
+      assert.strictEqual(record.title, source.title);
+      assert.strictEqual(record.url, source.url);
+      assert.strictEqual(record.author, 'Jay Rosen');
+      assert.strictEqual(record.publication_date, source.publicationDate);
+      assert.strictEqual(record.word_count, source.wordCount);
+      assert.strictEqual(
+        crypto.createHash('sha256').update(record.raw_text).digest('hex'),
+        source.rawTextSha,
+        `${id} raw_text changed unexpectedly`
+      );
+      assert.strictEqual(record.excerpt, source.excerpt);
+      assert.strictEqual(record.pull_quote, source.pullQuote);
+      assert.strictEqual(record.summary, source.summary);
+      assert.strictEqual(record.verified, 'TRUE');
+      assert.strictEqual(record.low_confidence, 'FALSE');
+      assert.strictEqual(record.needs_review, 'FALSE');
+      assert.match(record.notes, /Modern HuffPost source verified 2026-07-23/);
+      assert.match(record.notes, new RegExp(source.sourceSha));
+    }
+
+    const alternateTitle = archiveRecords.find(row => row.id === 'RECORD-00878');
+    assert.match(alternateTitle.notes, /title tag reads "Tone Poem for the 'Leave It There' Press"/);
+  });
+
+  it('TomDispatch Sinclair source remains covered after removing the composite', () => {
+    const record = archiveRecords.find(row => row.id === 'RECORD-00013');
+
+    assert.ok(record, 'RECORD-00013 must exist');
+    assert.strictEqual(record.title, "PressThink: Off the Charts: Sinclair Broadcast Group's Political Vision");
+    assert.strictEqual(record.publication_date, '2004-11-16');
+    assert.match(record.raw_text, /This originally appeared Oct\. 28, 2004 at TomDispatch\.com/);
+    assert.doesNotMatch(record.raw_text, /Tribune Media|Boris Epshteyn|Ajit Pai/i);
   });
 
   it('RECORD-00097 uses the PressThink source publication date', () => {
@@ -1514,6 +2150,35 @@ describe('social_posts.csv', () => {
     }
   });
 
+  it('recovers native source URLs for non-Rosen Bluesky source queue rows', () => {
+    const expectedIds = [
+      'BSKY-00060', 'BSKY-00241', 'BSKY-00333', 'BSKY-00383', 'BSKY-00586',
+      'BSKY-00650', 'BSKY-00684', 'BSKY-00740', 'BSKY-00765', 'BSKY-00878',
+      'BSKY-01170', 'BSKY-01278', 'BSKY-01693', 'BSKY-01695', 'BSKY-01820',
+      'BSKY-02329',
+    ];
+
+    for (const id of expectedIds) {
+      const post = socialPosts.find(row => row.id === id);
+      assert.ok(post, `${id} is missing`);
+      assert.notStrictEqual(post.author, 'Jay Rosen', `${id} should remain attributed to its original author`);
+      assert.strictEqual(post.verified, 'TRUE');
+      assert.match(post.url, /^https:\/\/bsky\.app\/profile\/[^/]+\/post\/[a-z0-9]+$/);
+      assert.match(post.notes, /ATProto source recovery 2026-07-23/);
+      assert.match(post.notes, /\bURI at:\/\/did:plc:[a-z0-9]+\/app\.bsky\.feed\.post\/[a-z0-9]+\b/);
+      assert.match(post.notes, /\bcid=[a-z0-9]+\b/);
+    }
+  });
+
+  it('Python validator parses social_posts.csv with embedded newlines intact', () => {
+    const output = execFileSync('python', ['backend/scripts/validate_archive_data.py'], {
+      cwd: repoDir,
+      encoding: 'utf-8',
+    });
+    assert.match(output, /Social Posts:\s+29747\b/);
+    assert.doesNotMatch(output, /Bluesky, social media platforms/);
+  });
+
   it('all platforms are recognized values', () => {
     const validPlatforms = new Set(['Twitter', 'Bluesky', 'twitter', 'bluesky', 'Twitter/X', 'Mastodon']);
     const badPlatforms = [];
@@ -1586,13 +2251,52 @@ describe('social_posts.csv', () => {
   });
 
   it('all social posts have explicit verified status', () => {
-    const unverified = socialPosts
-      .filter(post => post.verified !== 'TRUE')
+    const unresolved = socialPosts
+      .filter(post => !['TRUE', 'FALSE'].includes(post.verified))
       .map(post => post.id);
     assert.strictEqual(
-      unverified.length,
+      unresolved.length,
       0,
-      `${unverified.length} social posts are not explicitly verified: ${unverified.slice(0, 10).join(', ')}`
+      `${unresolved.length} social posts are missing an explicit TRUE/FALSE verification outcome: ${unresolved.slice(0, 10).join(', ')}`
+    );
+  });
+
+  it('verified social posts keep source evidence', () => {
+    const missingEvidence = socialPosts
+      .filter(post => post.verified === 'TRUE')
+      .filter(post => !(post.url || '').trim())
+      .filter(post => !/\bsource\b|\bimport\b|\bat:\/\/|\bcid=/i.test(post.notes || ''))
+      .map(post => post.id);
+    assert.strictEqual(
+      missingEvidence.length,
+      0,
+      `${missingEvidence.length} verified social posts lack platform URL or documented import evidence: ${missingEvidence.slice(0, 10).join(', ')}`
+    );
+  });
+
+  it('unverified social posts document why source evidence is unresolved', () => {
+    const undocumented = socialPosts
+      .filter(post => post.verified === 'FALSE')
+      .filter(post => !/unresolved|source.+absent|removed false|unrecover|not verified/i.test(post.notes || ''))
+      .map(post => post.id);
+    assert.strictEqual(
+      undocumented.length,
+      0,
+      `${undocumented.length} unverified social posts lack unresolved-source notes: ${undocumented.slice(0, 10).join(', ')}`
+    );
+  });
+
+  it('export uses explicit source verified status, not type or ID shortcuts', () => {
+    const exporterSource = fs.readFileSync(path.join(dataDir, 'export-archive-data.js'), 'utf-8');
+    const verifiedBlock = exporterSource.match(/const isVerified =[\s\S]*?;/);
+    assert.ok(verifiedBlock, 'could not find export verified expression');
+    assert.ok(
+      !/type\s*===\s*['"]social['"]/.test(verifiedBlock[0]),
+      'social rows must use explicit source verified status, not a type-wide shortcut'
+    );
+    assert.ok(
+      !/rawId\s*\.\s*startsWith/.test(verifiedBlock[0]),
+      'records must use explicit source verified status, not an ID-prefix shortcut'
     );
   });
 
@@ -1952,6 +2656,138 @@ describe('extracted_entities.csv', () => {
         hasStoredExactExcerpt || isRightsWithheldEvidence,
         `${entityId} lacks stored source evidence or a bounded, hashed rights-withheld excerpt in ${recordId}`
       );
+    }
+  });
+
+  it('maps reviewed orphan entities to their earliest source-text evidence', () => {
+    const expected = new Map([
+      ['C0160', { recordId: 'RECORD-00237', phrase: 'freedom of speech' }],
+      ['C0261', { recordId: 'RECORD-00165', phrase: 'world citizenship' }],
+      ['C0316', { recordId: 'RECORD-00146', phrase: 'gatekeeper model' }],
+      ['C0545', { recordId: 'RECORD-00879', phrase: 'one-to-many' }],
+      ['C0562', { recordId: 'RECORD-00127', phrase: 'news/opinion distinction' }],
+      ['C0604', { recordId: 'RECORD-00503', phrase: 'Easongate' }],
+      ['C0650', { recordId: 'RECORD-00183', phrase: 'norm of objectivity' }],
+      ['E0106', { recordId: 'RECORD-00125', phrase: 'war in Iraq' }],
+      ['E0119', { recordId: 'RECORD-00110', phrase: 'Jason Blair crisis' }],
+      ['L0131', { recordId: 'CLIP-00076', phrase: 'Cambridge, Mass' }],
+      ['O0313', { recordId: 'RECORD-00208', phrase: 'Fort Worth Star-Telegram' }],
+      ['O1118', { recordId: 'RECORD-00140', phrase: 'Monacle' }],
+      ['O1189', { recordId: 'RECORD-00410', phrase: 'MediaChannel' }],
+      ['O1207', { recordId: 'RECORD-00882', phrase: 'Center for Collaborative Journalism' }],
+      ['P1015', { recordId: 'RECORD-00101', phrase: 'Matthew Yglesisas' }],
+      ['P1213', { recordId: 'RECORD-00115', phrase: 'Salaam Pax' }],
+      ['P2012', { recordId: 'RECORD-00138', phrase: 'Rupert Murdoch' }],
+      ['P2094', { recordId: 'RECORD-00170', phrase: 'Rony Albovitz' }],
+    ]);
+    const entitiesById = new Map(entities.map(entity => [entity.entity_id, entity]));
+    const recordsById = new Map(archiveRecords.map(record => [record.id, record]));
+
+    for (const [entityId, { recordId, phrase }] of expected) {
+      const entity = entitiesById.get(entityId);
+      const record = recordsById.get(recordId);
+      assert.ok(entity, `${entityId} must exist`);
+      assert.ok(record, `${recordId} must exist`);
+      assert.strictEqual(entity.first_mention_record_id, recordId);
+      assert.ok(
+        record.raw_text.toLowerCase().includes(phrase.toLowerCase()),
+        `${recordId} must contain ${phrase}`
+      );
+
+      const matchingRecords = archiveRecords
+        .filter(candidate => candidate.raw_text.toLowerCase().includes(phrase.toLowerCase()))
+        .sort((left, right) =>
+          left.publication_date.localeCompare(right.publication_date) ||
+          left.id.localeCompare(right.id)
+        );
+      assert.strictEqual(
+        matchingRecords[0]?.id,
+        recordId,
+        `${entityId} should point to the earliest archive record containing ${phrase}`
+      );
+    }
+  });
+
+  it('maps the second reviewed orphan-entity batch to source-text evidence', () => {
+    const expected = new Map([
+      ['E0121', { recordId: 'RECORD-00118', phrase: 'California recall' }],
+      ['E0197', { recordId: 'RECORD-00445', phrase: 'Harvard conference on blogging, journalism and credibility' }],
+      ['E0221', { recordId: 'RECORD-00502', phrase: 'case of Trent Lott' }],
+      ['E0222', { recordId: 'RECORD-00242', phrase: 'Rathergate' }],
+      ['P0626', { recordId: 'RECORD-00509', phrase: 'Doc Searles' }],
+      ['P1050', { recordId: 'RECORD-00137', phrase: 'Dan Gillmor' }],
+      ['P1929', { recordId: 'RECORD-00544', phrase: 'Karen Schneider' }],
+      ['P2092', { recordId: 'RECORD-00410', phrase: 'Danny Schecter' }],
+      ['P2178', { recordId: 'RECORD-00673', phrase: 'Jules Boykoff' }],
+      ['W0571', { recordId: 'RECORD-00123', phrase: 'article about the Sacramento Bee' }],
+      ['W0573', { recordId: 'RECORD-00487', phrase: 'PowerLine' }],
+    ]);
+    const entitiesById = new Map(entities.map(entity => [entity.entity_id, entity]));
+    const recordsById = new Map(archiveRecords.map(record => [record.id, record]));
+
+    for (const [entityId, { recordId, phrase }] of expected) {
+      const entity = entitiesById.get(entityId);
+      const record = recordsById.get(recordId);
+      assert.ok(entity, `${entityId} must exist`);
+      assert.ok(record, `${recordId} must exist`);
+      assert.strictEqual(entity.first_mention_record_id, recordId);
+      assert.ok(
+        record.raw_text.toLowerCase().includes(phrase.toLowerCase()),
+        `${recordId} must contain ${phrase}`
+      );
+    }
+
+    const finalMapped = new Map([
+      ['P1928', { recordId: 'TWTR-09476', phrase: 'Bill Buzenberg' }],
+      ['W0160', { recordId: 'RECORD-00130', phrase: 'protecting serious journalism' }],
+    ]);
+    const sourceRecordsById = new Map(
+      [...archiveRecords, ...socialPosts].map(record => [record.id, record])
+    );
+
+    for (const [entityId, { recordId, phrase }] of finalMapped) {
+      const entity = entitiesById.get(entityId);
+      const record = sourceRecordsById.get(recordId);
+      assert.ok(entity, `${entityId} must exist`);
+      assert.ok(record, `${recordId} must exist`);
+      assert.strictEqual(entity.first_mention_record_id, recordId);
+      assert.ok(
+        [
+          record.title,
+          record.excerpt,
+          record.summary,
+          record.raw_text,
+          record.tags,
+          record.key_concepts,
+          record.pull_quote,
+        ].join('\n').toLowerCase().includes(phrase.toLowerCase()),
+        `${recordId} must contain ${phrase}`
+      );
+    }
+
+    const deletedOrphans = [
+      'C0443',
+      'C0552',
+      'C0581',
+      'C0582',
+      'C0649',
+      'C0652',
+      'L0159',
+      'O0722',
+      'P1214',
+      'P2011',
+      'P2176',
+      'P2177',
+      'W0258',
+      'W0260',
+      'W0261',
+      'W0638',
+      'W0663',
+      'W0664',
+    ];
+
+    for (const entityId of deletedOrphans) {
+      assert.ok(!entitiesById.has(entityId), `${entityId} should be removed as a no-evidence orphan`);
     }
   });
 

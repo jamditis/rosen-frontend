@@ -83,7 +83,7 @@ describe('stampVersion', () => {
 
     assert.match(read('features/example/index.html'), /styles\.css\?v=2\.3\.4/);
     assert.match(read('features/example/script.js'), /data\.js\?v=2\.3\.4/);
-    const collected = collectVersionedFiles(root).map((f) => path.relative(root, f));
+    const collected = collectVersionedFiles(root).map((f) => path.relative(root, f).replaceAll(path.sep, '/'));
     assert.ok(collected.includes('features/example/index.html'));
     assert.ok(collected.includes('features/example/script.js'));
   });
@@ -118,7 +118,7 @@ describe('stampVersion', () => {
     assert.match(read('frontend/design-system/demo.html'), /tokens\.css\?v=2\.3\.4/);
     assert.match(read('frontend/design-system/demo.html'), /recipes\.css\?v=2\.3\.4/);
     assert.match(read('frontend/design-system/recipes.css'), /tokens\.css\?v=2\.3\.4/);
-    const collected = collectVersionedFiles(root).map((f) => path.relative(root, f));
+    const collected = collectVersionedFiles(root).map((f) => path.relative(root, f).replaceAll(path.sep, '/'));
     assert.ok(collected.includes('frontend/design-system/demo.html'));
     assert.ok(collected.includes('frontend/design-system/recipes.css'));
   });

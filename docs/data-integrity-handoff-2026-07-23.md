@@ -6,6 +6,86 @@ applicable field, map every entity, preserve provenance, and prove the result
 with repeatable checks. The archive is materially better, but it is not at
 100% and must not be described as complete.
 
+## Continuation checkpoint — 2026-07-23 21:11 -04:00
+
+Current review branch: `agent/data-integrity-huffpost-pilot09-20260723`.
+Current PR: [#760](https://github.com/jamditis/rosen-frontend/pull/760),
+based on `agent/data-integrity-completion-gates`.
+
+The original counts below are preserved as the wind-down snapshot. The current
+branch state has advanced:
+
+| Dataset or gate | Current branch state |
+| --- | ---: |
+| Archive records | 1,029 |
+| Social posts | 29,747 |
+| Entities | 7,361 |
+| Relationships | 11,154 |
+| Archive records with entity relationships | 876/1,029 |
+| Archive rows explicitly `verified=FALSE` | 0 |
+| Archive rows with blank summaries | 0 |
+| Archive rows with `needs_review=TRUE` | 8 |
+| Social rows with explicit verification state | 29,747/29,747 |
+| Entities with blank `first_mention_record_id` | 0 |
+| Long archive records without extracted relationships | 0 |
+
+Current continuation hashes:
+
+- Archive CSV SHA-256:
+  `1f302d21cc8b17c57bc90bda782f675d3188ea6b08f0c82cc53de92c06f79c71`
+- Social CSV SHA-256:
+  `9b09ddf28e9ca97e8d0dc8d81008f8c0f82a7cc166c87b12b0ccaaa0f824fd0f`
+- Entity CSV SHA-256:
+  `d4be3086a8dd941751718208526d0d819c90489950dfdf2695a8f49623578389`
+- Relationship CSV SHA-256:
+  `d220c2ca3fe0e32abb2c828f5d29f5570ac32d66c038c40942d5060c1cee55ca`
+
+Current validation on PR #760:
+
+- `npm run test:data` passes, 156 tests.
+- `npm run test:data:extraction-coverage` passes, 17 tests.
+- `python backend/scripts/validate_archive_data.py` passes with no errors.
+- `npm test` passes, 833 tests.
+
+Current source addition:
+
+- `RECORD-00904` adds Caryl Rivers' HuffPost article
+  `A Counterpoint to the View From Everywhere`, published 2011-11-07.
+  Evidence came from the user-provided live HuffPost page opened in Microsoft
+  Edge with uBlock Origin enabled. This is a separate response article about
+  Jay Rosen's view from nowhere argument, not the removed `RECORD-00865`
+  `#NN08` micro-post.
+- Entity and relationship coverage for `RECORD-00904` adds Caryl Rivers as
+  `P2706` and eight source-backed relationships to existing archive entities.
+- User-supplied link intake added five verified source-backed rows:
+  `RECORD-00910` Techdirt / Mike Masnick, `RECORD-00906` smartocto /
+  Em Kuntze and Stefan ten Teije, `RECORD-00907` CNN / Oliver Darcy,
+  `RECORD-00908` Salon / Dan Froomkin, and `RECORD-00909` BeetTV / Andy
+  Plesser. The Margaret Sullivan Substack URL was already present as
+  `RECORD-00726`.
+- `RECORD-00865` was removed after curator review. Joe identified it as a
+  fragmentary HuffPost-era Netroots Nation 2008 sketchbook note rather than a
+  recoverable article. Removal deleted the archive row and its lone stale graph
+  relationship; no first-mention entities or related-record references used it.
+
+Tracked continuation docs added after the original handoff:
+
+- `docs/manual-verification-required-2026-07-23.md`: no active records need
+  Joe/browser capture after `RECORD-00865` removal.
+- `docs/pressthink-recovery-index-2026-07-23.md`: indexes 184 local
+  PressThink recovery audit rows, with 167 distinct missing works and 17
+  source or edition mapping decisions.
+- `docs/entity-merge-review-queue-2026-07-23.md`: tracks 28 entity merge
+  candidates, with 19 safe batch candidates and 9 curator-required cases.
+- `docs/social-source-recovery-queue-2026-07-23.md`: tracks the non-Rosen
+  Bluesky source recovery queue. Sixteen rows now have exact ATProto text and
+  timestamp matches; 38 remain `verified=FALSE` because their original native
+  source records are unresolved.
+
+No permanent PressThink IDs, imports, rights decisions, taxonomy decisions,
+entity merges, source-text rewrites, or relationship changes were applied in
+the two curator queues. They remain review queues.
+
 ## Safety boundary
 
 - No live archive or production service was touched.
@@ -109,15 +189,8 @@ editing multiline source text.
   duplication or redistribution without express written permission.
 - Preserved unresolved identity problems instead of guessing:
   `RECORD-00602`, `RECORD-00613`, and composite `RECORD-00614`.
-- Corrected six `#NN08` dates to 2008-07-19 from stored Wayback source text:
-  `RECORD-00862`, `RECORD-00863`, `RECORD-00866`, `RECORD-00867`,
-  `RECORD-00869`, and `RECORD-00870`.
-- Corrected `RECORD-00868` to 2008-07-19 and replaced its Wayback-toolbar raw
-  text with source-derived title/byline/date text from the 2017 raw Wayback
-  snapshot. No HuffPost `#NN08` record now uses a capture-year date.
-- Removed `RECORD-00865` and its lone relationship after curator review. The
-  record was a fragment from the Netroots Nation 2008 sketchbook flow, with no
-  direct authored body beyond the title-like snippet.
+- Seven HuffPost `#NN08` records still use capture-year dates:
+  `RECORD-00862`, `RECORD-00863`, and `RECORD-00866` through `RECORD-00870`.
 
 ### Social and graph data
 
@@ -290,7 +363,8 @@ in the next-actions list.
 3. Prepare a curator proposal for importing the 111 confirmed works, including
    permanent IDs, order, rights, full-text treatment, taxonomy, and graph impact.
 4. Continue five-record HuffPost batches through the remaining 35 rows.
-5. Revisit the 54 source-absent Bluesky identities only if native ATProto
+5. Resolve the eight `#NN08` dates from primary evidence.
+6. Revisit the 38 source-absent Bluesky identities only if native ATProto
    records or another authoritative capture is recovered.
 7. Present the 28 entity merge pairs for curator approval before changing any
    canonical entity ID.

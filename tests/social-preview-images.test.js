@@ -61,7 +61,7 @@ function pythonStringTuple(source, name) {
   // Manifest tuples close with a ')' at column 0, so match up to the first such
   // line; then take the quoted literal from each entry, dropping trailing
   // comments (no manifest path contains '#').
-  const block = source.match(new RegExp(`${name}[^=]*=\\s*\\(\\n([\\s\\S]*?)\\n\\)`));
+  const block = source.match(new RegExp(`^${name}[^\\n]*=\\s*\\(\\r?\\n([\\s\\S]*?)\\r?\\n\\)`, 'm'));
   if (!block) throw new Error(`could not read ${name} from deploy_full_site.py`);
   const entries = [];
   for (const rawLine of block[1].split('\n')) {
