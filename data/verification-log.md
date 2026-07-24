@@ -1223,9 +1223,10 @@ cohort suitable for a deterministic source-evidence pass followed by separate
 model-assisted metadata proposals under #724. Source verification and semantic
 enrichment must not be collapsed into one model decision.
 
-The current failing date gate identifies ten `#NN08` rows whose
-`publication_date` was copied from a 2013 or 2016 Wayback capture instead of the
-2008 post. Eight stored raw-text bodies explicitly print the 2008 source date:
+At the pre-pilot checkpoint, the failing date gate identified ten `#NN08` rows
+whose `publication_date` was copied from a 2013 or 2016 Wayback capture instead
+of the 2008 post. Eight stored raw-text bodies explicitly print the 2008 source
+date:
 `RECORD-00861` prints 2008-07-17, while `RECORD-00862`, `RECORD-00863`,
 `RECORD-00864`, `RECORD-00866`, `RECORD-00867`, `RECORD-00869`, and
 `RECORD-00870` print 2008-07-19. `RECORD-00865` and `RECORD-00868` contain
@@ -1257,13 +1258,13 @@ title, author, snapshot URI and hash, content-versus-chrome classification, and
 an external call log. It must not write CSV data or generate summaries, tags,
 concepts, rights claims, or entity mappings.
 
-Publishing this cohort has graph impact. All 75 rows already source 1,862
-relationship assertions, and 69 are the first mention for the 465 entities that
-currently dangle only in the published runtime. The two chrome-contaminated
-rows already source five assertions in total, apparently extracted from their
-titles. A verification flag must not be approved as an isolated cell edit: the
-review preview needs the record, its entity first mentions, and all affected
-assertions so source contamination cannot enter the public graph unnoticed.
+Publishing this cohort had graph impact. All 75 rows sourced 1,862 relationship
+assertions, and 69 were the first mention for the 465 entities that dangled
+only in the published runtime. The two chrome-contaminated rows sourced five
+assertions in total, apparently extracted from their titles. A verification
+flag must not be approved as an isolated cell edit: the review preview needs
+the record, its entity first mentions, and all affected assertions so source
+contamination cannot enter the public graph unnoticed.
 
 ## Published content-overlay defect in RECORD-00039
 
@@ -1453,11 +1454,51 @@ toolbar chrome. A source-only cleanup proposal may retain the source title as
 authored text while excluding page interface text; semantic enrichment remains
 out of scope for this pilot.
 
-The five records currently source 15 relationship assertions and six entity
-first mentions. Their relationship context is title-derived, but publication
-still needs a graph preview: one assertion can encode an inference even when
-its words appear in the title. K2 is assigned to classify those contexts as
-directly supported, title-derived only, contradicted, or review-needed.
+### Curator removal of `RECORD-00865`
+
+On July 24, 2026, Joe identified `RECORD-00865` as a Netroots Nation 2008
+sketchbook fragment rather than a durable archive work. The record had no
+direct authored body beyond the title-like snippet and one title-derived
+relationship to Rick Perlstein and Netroots Nation 2008. The canonical CSV now
+removes `RECORD-00865` and `RECORD-00865_REL_001`; entity `P2345` remains
+because Rick Perlstein has earlier independent evidence in the graph. This
+drops the remaining unverified archive count by one and the remaining
+capture-year `#NN08` date gate from eight rows to seven.
+
+### Source-backed `#NN08` date corrections
+
+On July 24, 2026, six remaining Netroots Nation sketchbook rows were corrected
+from Wayback capture dates to the source date printed in the stored source text.
+Each row's raw text includes an explicit `Posted: 07/19/08` timestamp:
+
+| Record | Old date | Corrected date | Source text evidence |
+|---|---|---|---|
+| `RECORD-00862` | 2013-11-15 | 2008-07-19 | `Posted: 07/19/08 10:10 AM ET` |
+| `RECORD-00863` | 2013-11-15 | 2008-07-19 | `Posted: 07/19/08 10:46 AM ET` |
+| `RECORD-00866` | 2013-11-09 | 2008-07-19 | `Posted: 07/19/08 11:29 AM ET` |
+| `RECORD-00867` | 2013-11-06 | 2008-07-19 | `Posted: 07/19/08 11:53 AM ET` |
+| `RECORD-00869` | 2013-11-06 | 2008-07-19 | `Posted: 07/19/08 01:22 PM ET` |
+| `RECORD-00870` | 2013-11-13 | 2008-07-19 | `Posted: 07/19/08 09:35 PM ET` |
+
+`RECORD-00868` was then replayed against the 2017 raw Wayback snapshot for the
+same original HuffPost URL. The 2016 capture remains a migrated-stub snapshot,
+but the 2017 capture exposes direct source metadata and article-header text:
+`article:published_time` is `2008-07-19 11:08:17 -0400`, JSON-LD
+`datePublished` is `2008-07-19T15:08:17Z`, and the rendered timestamp prints
+`07/19/2008 11:08 am ET`. The snapshot SHA-256 is
+`42fc386e459db9664e859eb4cdb28c914d53b18057db58ebf2c61e49a202b4ae`.
+
+The canonical row now sets `RECORD-00868` to 2008-07-19 and replaces its
+Wayback-toolbar raw text with source-derived title, byline, and published-date
+text. It remains `verified=FALSE` because the row still lacks reviewed
+summary/enrichment fields.
+
+At the staging checkpoint, the five-record pilot sourced 15 relationship
+assertions and six entity first mentions. Their relationship context was
+title-derived, but publication still needed a graph preview: one assertion
+could encode an inference even when its words appeared in the title. K2 was
+assigned to classify those contexts as directly supported, title-derived only,
+contradicted, or review-needed.
 
 ### External call log for the HuffPost staging pass
 
@@ -4136,3 +4177,2209 @@ The main packet hashes are:
 - `report.txt`: `ec3d2160fad46edde82ee75ba673d91caf6c39559362d293cf5562f059b2395f`
 - `stdout.log`: `67ff137883e10a4009c8a8c67397c142bacd47de3ef65e16b35ecd6debc8d5f3`
 - `stderr.log`: `32d6f10b850649ebd1c58bed344f01ec01b0fa7a7d7f0db7d3144ba6cf455e81`
+
+### HuffPost verification pilot 09 applied
+
+The branch then accepted the pilot-nine packet into canonical data. A failing
+regression was added first for `RECORD-00844` through `RECORD-00848`, locking
+the five official-source hashes, the existing raw-text hashes, the source
+title/author/date/word-count fields, the accepted excerpts and pull quotes, the
+`RECORD-00847` URL repair, and the five source-backed summaries.
+
+Accepted row changes:
+
+- `RECORD-00844`: added a summary describing Gina Cooper, netroots volunteers,
+  YearlyKos, aggregated blogger attention, participation, and OffTheBus.
+- `RECORD-00845`: added a summary describing press-blogosphere relations at
+  YearlyKos, Dan Gillmor's readers-know-more lesson, and unresolved Iraq-war
+  accountability.
+- `RECORD-00846`: added a summary describing savviness as Rosen's account of
+  political journalism's vulnerability to Karl Rove.
+- `RECORD-00847`: corrected the URL to
+  `https://www.huffpost.com/entry/would-you-guys-like-us-to_b_63176` and
+  added a summary describing the White House press corps and Bush's managed
+  Iraq-trip press event.
+- `RECORD-00848`: added a summary describing the missing Bush-era master
+  narrative of executive-power expansion, centered on Charlie Savage, Jack
+  Goldsmith, and the Cheney project.
+
+All five rows are now `verified=TRUE` and `needs_review=FALSE`, with notes
+pointing to `%TEMP%/rosen-k2-huffpost-pilot-09` and the saved HTTP 200 source
+SHA-256 values. The targeted pilot-nine regression now passes. The archive CSV
+SHA-256 after application is
+`11ffcaa406a01a95dcdf24045675a42b8aaadfdd7429045fb654397e398186b8`.
+
+The update reduced archive rows with blank summaries from 34 to 29 and archive
+rows explicitly marked `verified=FALSE` from 38 to 33. The archive CSV remains
+1,028 rows by 38 columns, UTF-8 without a BOM, with 1,029 CRLF record
+boundaries and 81,117 embedded bare LF characters.
+
+### HuffPost verification pilot 10 evidence packet and application
+
+The branch built `%TEMP%/rosen-k2-huffpost-pilot-10` for `RECORD-00849` through
+`RECORD-00853`. All five official HuffPost requests succeeded with HTTP 200:
+
+- `RECORD-00849`: 423,158 bytes; `b6741da8baf7628d4237fa9528672f9a6d24b37fec76b06c44292ec5027e1eab`
+- `RECORD-00850`: 416,826 bytes; `2229ffaf2eca673c5151ff1d889c7122014d59125f623ad935a0bf5e59ba43dc`
+- `RECORD-00851`: 433,345 bytes; `094c0b519ef803c83f504f13395f6017875d5c7f1260fcf8c50058fc1e3e3659`
+- `RECORD-00852`: 412,959 bytes; `e6ecbe33ab28b04cad69d43c2befca17253a61ad44c05a0a7ecd60c390d45067`
+- `RECORD-00853`: 454,346 bytes; `c657d296262eb839af1965ab8c7ced33a50523b40f290c7e9060d41b35b8a540`
+
+The first local body-coverage pass produced a false low score for
+`RECORD-00850` because the source HTML split `_The Hill_'s` across markup. After
+normalizing possessives, all five stored bodies reached 100% ordered normalized
+token coverage against the saved official response.
+
+Grok reviewed the packet in read-only mode. The useful objections were accepted:
+the first `RECORD-00851` summary incorrectly named Tony Snow, the first
+`RECORD-00852` summary imported the fuller thesis from `RECORD-00853`, and
+several excerpt/pull-quote fields needed stronger body grounding before the
+rows could be marked verified.
+
+Accepted row changes:
+
+- `RECORD-00849`: added a summary about Rather's CBS lawsuit, Rathergate, the
+  Bush National Guard story, and Rather's self-image as a driven reporter.
+- `RECORD-00850`: corrected the URL to
+  `https://www.huffpost.com/entry/the-hill-restores-armstro_b_77979`,
+  normalized the verified display title to remove raw `<i>` markup, replaced
+  the excerpt with a source-body passage, and added a summary about Rosen's Q&A
+  with Hugo Gurdon over The Hill restoring Armstrong Williams after the payola
+  scandal.
+- `RECORD-00851`: replaced the excerpt and pull quote with source-body
+  passages and added a summary about conservative elite contempt, the
+  liberal-media thesis, Dan Bartlett, Karl Rove, and Ari Fleischer.
+- `RECORD-00852`: corrected the URL to
+  `https://www.huffpost.com/entry/when-candidate-vetting-ru_b_88924`,
+  replaced the excerpt with a source-body passage, and added a summary that
+  keeps the record as a short reader prompt rather than importing the later
+  thesis from `RECORD-00853`.
+- `RECORD-00853`: replaced the excerpt with a source-body passage and added a
+  summary about the pattern-recognition follow-up, reader answers, and newsroom
+  self-image problems in Washington Post and New York Times stories.
+
+All five rows are now `verified=TRUE` and `needs_review=FALSE`, with notes
+pointing to `%TEMP%/rosen-k2-huffpost-pilot-10` and their saved HTTP 200 source
+SHA-256 values. A failing pilot-ten regression was added first and now passes.
+The archive CSV SHA-256 after application is
+`2065ef04985ab838ac13701b68538f7f9d393a84fdcc75e78a5f1404b88141da`.
+
+Serving `RECORD-00853` surfaced a source entity first-mention mismatch:
+`C0007` (`Anti-veneration`) pointed to `RECORD-00853`, but
+`RECORD-00014` has two earlier served `C0007` relationship edges. The canonical
+entity row now uses `RECORD-00014` with a note documenting the correction. The
+entity CSV SHA-256 after this repair is
+`34f8d4cf9eee0cbebbb455e9b3b33d2ad8b8d6a30d7805a43f871932390225fe`.
+
+Grok reviewed the summary draft in read-only mode and rejected only
+`RECORD-00851` as missing core argument structure. The accepted objection was
+applied: the final summary includes Huckabee's rise, elite contempt, Bruce
+Bartlett's impact-not-ideology standard, conservative attacks on media bias,
+and Rosen's larger concern about executive power.
+
+Changes applied:
+
+- `RECORD-00849`: summary added; `verified=TRUE`; `needs_review=FALSE`;
+  `low_confidence=FALSE`; notes now cite official response SHA-256
+  `b6741da8baf7628d4237fa9528672f9a6d24b37fec76b06c44292ec5027e1eab`.
+- `RECORD-00850`: URL corrected to
+  `https://www.huffpost.com/entry/the-hill-restores-armstro_b_77979`;
+  excerpt repaired; summary added; `verified=TRUE`; `needs_review=FALSE`;
+  `low_confidence=FALSE`; notes now cite official response SHA-256
+  `2229ffaf2eca673c5151ff1d889c7122014d59125f623ad935a0bf5e59ba43dc`.
+- `RECORD-00851`: pull quote repaired; summary added; `verified=TRUE`;
+  `needs_review=FALSE`; `low_confidence=FALSE`; notes now cite official
+  response SHA-256
+  `094c0b519ef803c83f504f13395f6017875d5c7f1260fcf8c50058fc1e3e3659`.
+- `RECORD-00852`: URL corrected to
+  `https://www.huffpost.com/entry/when-candidate-vetting-ru_b_88924`;
+  excerpt repaired; summary added; `verified=TRUE`; `needs_review=FALSE`;
+  `low_confidence=FALSE`; notes now cite official response SHA-256
+  `e6ecbe33ab28b04cad69d43c2befca17253a61ad44c05a0a7ecd60c390d45067`.
+- `RECORD-00853`: excerpt repaired; summary added; `verified=TRUE`;
+  `needs_review=FALSE`; `low_confidence=FALSE`; notes now cite official
+  response SHA-256
+  `c657d296262eb839af1965ab8c7ced33a50523b40f290c7e9060d41b35b8a540`.
+
+The focused regression
+`node --test --test-name-pattern "HuffPost pilot ten" tests\csv-quality.test.js`
+failed before the CSV edit because `RECORD-00849` had a blank summary, then
+passed after the five-row patch. Raw-text SHA-256 values stayed unchanged:
+
+- `RECORD-00849`: `3340135a7b379a8633e36b8f7c95aa0c27a38b6b261eeeb827d202470755fb1a`
+- `RECORD-00850`: `75c77a15a60f496db735f7d9529d82570c53c1caa3bbce1b8e5f13acee49d4f4`
+- `RECORD-00851`: `761fffa4f70e34427eafb1d8b042f0da5fe4a77a967b60086c794229e1d85dea`
+- `RECORD-00852`: `2fd0be897328e359679db375ac829982e49c4322ffa7f3dea872acf646ce7bee`
+- `RECORD-00853`: `03f54e83eb5a54551ff2b7a26a738a1478ec8a327aa77cfc2da115f0a1dc1e7f`
+
+Post-application row counts:
+
+- Archive rows: 1,028.
+- Blank archive summaries: 25, down from 30.
+- Archive rows not explicitly verified: 29, down from 34.
+- Generated records after export: 26,667.
+- Entities: 7,389.
+- Relationships: 10,804.
+
+Validation:
+
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 78 records with raw text but no extracted relationships.
+- `npm run test:data`: expected eight completion gates still fail: three core
+  blanks, 25 blank summaries, 29 unverified archive records, eight `#NN08`
+  capture-year dates, 54 non-Rosen Bluesky profile URLs, 54 non-Rosen Bluesky
+  copyright assignments, 29,693 unverified social rows, and 50 blank entity
+  first mentions. The pilot-ten regression passes.
+- `git -c core.whitespace=trailing-space,cr-at-eol diff --check`: no whitespace
+  errors; Windows line-ending warnings only.
+
+Packet artifact SHA-256 values:
+
+- `source-verification.json`: `48bfd5e59678ab879b460650988f9520e6429d4e21670c96522983937e9cc5ad`
+- `body-comparison.json`: `4b59d45bf6883b7a361bdcd51db10a529c725ecfa7f85dd7cbf19385b1f842d5`
+- `proposed-field-updates.json`: `e03b21729a8468488188b2a65ef8fa944d911760d6ccac1bb23f9c0628760d59`
+- `field-provenance.json`: `f50c8471b85061b038abc811e3644be46a440a52a4097a79e4102f315d7a82f4`
+- `external-calls.ndjson`: `5ce210494585276f47543dd14b975ebc82ef3323c0629c389626921fd65c0a5a`
+- `external-calls.json`: `f3f49b506ef61ce28e50c26f4c94ff5f3b1d71077748ed831654d1f6ed3ab685`
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `fdf5336203242e109f248de85d35fe14757be7f44f3ddf7051f08df62dacdc50`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `181b5acf3d3d3dd0f5f123885e542f8ff56ad7d9fd736f1eae281818918f4c72`
+- `data/archive-data.json`: `d2e2dddb78c0dd6d343799273f2bf8ef72c47aa90b8fc3d711f68b64df060da1`
+- `data/archive-core.json`: `ecc03f4852a009025c6b8282c4afcb6a75c85a91159e3d2483628bc25b14ce19`
+- `data/archive-details.json`: `4ca48aa51d4ce9e70a286dc86aa1e28d99622dc67bcf3b86801f59159f944790`
+- `data/archive-entities.json`: `73e939283f9b1f4afc953f4a4c8fb1d53cdce69af48be085e447d9f85b156733`
+- `data/archive-analytics.json`: `8ee5c5040e316c35b2b23f1708c6968373cc5c5703cf4550ac74457f0cbae67d`
+
+### HuffPost verification pilot 11 applied
+
+`RECORD-00854` through `RECORD-00858` were applied from the saved packet under
+`%TEMP%/rosen-k2-huffpost-pilot-11` without another network request. The K2
+worker captured five first-attempt official HTTP 200 responses, verified the
+stored titles, authors, dates, bodies, word counts, and pull quotes, and found
+no unresolved items. It rejected the stored excerpts because they were source
+description metadata rather than contiguous article-body passages.
+
+Grok reviewed the first summary draft in read-only no-web mode. It accepted
+`RECORD-00855`, `RECORD-00857`, and `RECORD-00858`, and rejected two summaries:
+`RECORD-00854` overemphasized Pincus and missed Clark Hoyt, Josh Marshall, and
+transparent political conviction; `RECORD-00856` used unsupported "honorable
+mythology" and blurred McCain's access with demonstrated mastery. Both
+objections were applied.
+
+Changes applied:
+
+- `RECORD-00854`: URL corrected to
+  `https://www.huffpost.com/entry/walter-pincus-of-the-post_b_92019`;
+  body-backed excerpt added; summary added; `verified=TRUE`;
+  `needs_review=FALSE`; `low_confidence=FALSE`; notes now cite official
+  response SHA-256
+  `1dacc962fe486d4bf1ba6d0fb8427a4120100a4f6662fc9f03f7bf6b8d3cd42d`.
+- `RECORD-00855`: body-backed excerpt added; summary added; `verified=TRUE`;
+  `needs_review=FALSE`; `low_confidence=FALSE`; notes now cite official
+  response SHA-256
+  `99eee19f175791a76156c90f92c23f1efe6685ee1816b8723a8634e82cdf5df8`.
+- `RECORD-00856`: body-backed excerpt added; summary added; `verified=TRUE`;
+  `needs_review=FALSE`; `low_confidence=FALSE`; notes now cite official
+  response SHA-256
+  `61069523ad8e8d889f0c7165227a32150dc4812e27ab0885899523d42de7e7b7`.
+- `RECORD-00857`: body-backed excerpt added; summary added; `verified=TRUE`;
+  `needs_review=FALSE`; `low_confidence=FALSE`; notes now cite official
+  response SHA-256
+  `b910fdc1de0d3682ba28281a7ba056949a2e08a59f5ada2c338a8ac72c5de842`.
+- `RECORD-00858`: body-backed excerpt added; summary added; `verified=TRUE`;
+  `needs_review=FALSE`; `low_confidence=FALSE`; notes now cite official
+  response SHA-256
+  `fc27d7dc586be1c17fc929217f5c15bb7d58d4fb108f45dec56552bc5752f7c0`.
+
+The focused regression
+`node --test --test-name-pattern "HuffPost pilot eleven" tests\csv-quality.test.js`
+failed before the CSV edit because `RECORD-00854` still used the shortened
+non-canonical URL, then passed after the five-row patch. A first local pre-check
+computed wrong raw-text hashes with a line splitter that is invalid for this
+multiline CSV; the regression was corrected to use the K2 `body-comparison.json`
+hashes and the same `csv-parse` semantics as the test suite. Correct raw-text
+SHA-256 values stayed unchanged:
+
+- `RECORD-00854`: `ef2ddee448169bdbc15a7b79665a8b32f3ba22ae9f2db87908324d5d2c3f2c61`
+- `RECORD-00855`: `c2ca3b27f4321ff8980ec768a320cc143d21825810afecb63e097ff094a73c34`
+- `RECORD-00856`: `2debe6510d79803d87d00a70e159323b532e1a9dcdfc6c4e8d0cb89d2f21d778`
+- `RECORD-00857`: `22c51b32da698e47140d442dcd86d43114d7f764b32fe62ce559bf03d5f8f6af`
+- `RECORD-00858`: `a41a108da674f02a7e6a6264a5087db9275e4933053ce1cb747700eb5196c4cb`
+
+Post-application row counts:
+
+- Archive rows: 1,028.
+- Blank archive summaries: 20, down from 25.
+- Archive rows not explicitly verified: 24, down from 29.
+- Generated records after export: 26,672.
+- Entities: 7,389.
+- Relationships: 10,804.
+
+Validation:
+
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 78 records with raw text but no extracted relationships.
+- `npm run test:data`: expected eight completion gates still fail: three core
+  blanks, 20 blank summaries, 24 unverified archive records, eight `#NN08`
+  capture-year dates, 54 non-Rosen Bluesky profile URLs, 54 non-Rosen Bluesky
+  copyright assignments, 29,693 unverified social rows, and 50 blank entity
+  first mentions. The pilot-eleven regression passes.
+
+Packet artifact SHA-256 values:
+
+- `source-verification.json`: `8bf7f250af5cfe0211518f268ed3270130aef01fd6fef1437b190e5452f37a69`
+- `body-comparison.json`: `aae26ec3508d35689349405529ba2c141bed145ef03cd39880d9df2caac814bc`
+- `proposed-field-updates.json`: `42eabb289cc4ebe78be837f72c9d7deed3ea37071451631725360de462823991`
+- `field-provenance.json`: `fb04e472fc887f04db01351a5bae34397097afe9f8e8d98e48d48564214d8bbf`
+- `external-calls.ndjson`: `3f6d7cb9c4ae5f82ec2373db2e267788956fd6d34b1b0ad86419ecf9cf33a75e`
+- `external-calls.json`: `7f266975ce1c03cfb2f003849fb299d4e1af698052831ceda0ff18406c569e9b`
+- `grok-summary-review.txt`: `87896301301824b70b41728493f86e2b6b3f5cd31d9f1e8e6b9df00baeec05f2`
+- `report.txt`: `de1177478b9a9ddc7aef16570330ef25bfd8b70ecf851414b2fa7f2003e9016c`
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `3dc0e08888a6a641e6a8f5c1ea3531bb459441f6ec44545ad53026751e613488`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `181b5acf3d3d3dd0f5f123885e542f8ff56ad7d9fd736f1eae281818918f4c72`
+- `data/archive-data.json`: `c105a0a956b5ee7613919b2f33a82c7ce278f340a0459a2636de5d2918443eb4`
+- `data/archive-core.json`: `a0d5ffff28044d647d6ab63bafd2ce6973b691793620a38cea20c61349c068bb`
+- `data/archive-details.json`: `578d2f137f1f053ee3cc8bc72b02c134a2f417eb89c7031faa3571da2787e025`
+- `data/archive-entities.json`: `2445f36dbacde8da21b50a9c76b852075ca5eaadeb7404ed584340006b99c877`
+- `data/archive-analytics.json`: `7be364e05556035f89c3925d28cfc0ef21f4078c4bea443d1241fccd8a6491fa`
+
+### HuffPost verification pilot 12 applied
+
+`RECORD-00859` through `RECORD-00863` were applied from the saved packet under
+`%TEMP%/rosen-k2-huffpost-pilot-12`, with supplemental Wayback evidence for the
+three short `#NN08` rows whose modern HuffPost URLs now return 404. The K2
+worker verified `RECORD-00859` and `RECORD-00860` from first-attempt official
+HTTP 200 responses. It left `RECORD-00861` through `RECORD-00863` unresolved
+against modern HuffPost; the primary agent then fetched the exact Wayback
+captures already cited inside the stored raw text and saved those responses in
+`%TEMP%/rosen-k2-huffpost-pilot-12/wayback-supplemental`.
+
+Grok reviewed the summary draft in read-only no-web mode and accepted all five
+summaries. No objections were applied.
+
+Changes applied:
+
+- `RECORD-00859`: summary added; `verified=TRUE`; `needs_review=FALSE`;
+  `low_confidence=FALSE`; notes now cite official response SHA-256
+  `cdf43c9170b945d23b37518cbf746f242530271cbd2b7117faa89fc3a22f864d`.
+- `RECORD-00860`: summary added; `verified=TRUE`; `needs_review=FALSE`;
+  `low_confidence=FALSE`; notes now cite official response SHA-256
+  `e541bfca40e39caabee788a7775fedf23e731f0007836fd84d415714ce44eb06`.
+- `RECORD-00861`: body-backed excerpt repaired from the archived capture;
+  summary added; `verified=TRUE`; `needs_review=FALSE`;
+  `low_confidence=FALSE`; notes now cite Wayback capture SHA-256
+  `0041b650c6c2d9689c1337ffe71f62db091c55950fa2bfdacd5bcdd63ca41afe`.
+- `RECORD-00862`: publication date corrected from `2013-11-15` to
+  `2008-07-19`; body-backed excerpt repaired from the archived capture; summary
+  added; `verified=TRUE`; `needs_review=FALSE`; `low_confidence=FALSE`; notes
+  now cite Wayback capture SHA-256
+  `94c9e65f3e58330739ad36373c6cafcd88af3c7845615ca5478975c3e0830537`.
+- `RECORD-00863`: publication date corrected from `2013-11-15` to
+  `2008-07-19`; body-backed excerpt repaired from the archived capture; summary
+  added; `verified=TRUE`; `needs_review=FALSE`; `low_confidence=FALSE`; notes
+  now cite Wayback capture SHA-256
+  `2ecba87badcf6807880b33ac689eba97e49bb267cbf8f26f8827a27c6dfd0b7d`.
+
+The focused regression
+`node --test --test-name-pattern "HuffPost pilot twelve" tests\csv-quality.test.js`
+failed before the CSV edit because `RECORD-00859` still had a blank summary,
+then passed after the five-row patch. Raw-text SHA-256 values stayed unchanged:
+
+- `RECORD-00859`: `c012883e030a441f5bc519055e6553f32dfa5ccbd9411fb684f0a2dbc9409d2b`
+- `RECORD-00860`: `7e8f39348d07529ed28fd9019a529ce8852b4a9591da09f7869760b2940bcd8b`
+- `RECORD-00861`: `e5c37b47d7f36cbd0fe5a8b44c7405c99379cc0cc16e69edc32920151c866fda`
+- `RECORD-00862`: `9946a7dc23ae8c527bb54b6a1a86c3fd00c6c3b746a369da6943cba908417153`
+- `RECORD-00863`: `81d637bcf5728a3fcf8d4e1edfda5ccfa6c8a5ffe43a3687792bac94432c7bf9`
+
+Post-application row counts:
+
+- Archive rows: 1,028.
+- Blank archive summaries: 15, down from 20.
+- Archive rows not explicitly verified: 19, down from 24.
+- `#NN08` rows with capture-year dates: 6, down from 8.
+- Generated records after export: 26,677.
+- Entities: 7,389.
+- Relationships: 10,804.
+
+Validation:
+
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 78 records with raw text but no extracted relationships.
+- `npm run test:data`: expected eight completion gates still fail: three core
+  blanks, 15 blank summaries, 19 unverified archive records, six `#NN08`
+  capture-year dates, 54 non-Rosen Bluesky profile URLs, 54 non-Rosen Bluesky
+  copyright assignments, 29,693 unverified social rows, and 50 blank entity
+  first mentions. The pilot-twelve regression passes.
+
+Packet artifact SHA-256 values:
+
+- `source-verification.json`: `369464a06e300eed0bb9180f98b990633bd784d27e915bcfd449f5ce419559ae`
+- `body-comparison.json`: `5331d5e69902e7502d7ddfe8a73573356a22fec2a00c46adb4ab52ee4bdffdd0`
+- `proposed-field-updates.json`: `2ab058ad8b00ca46233d46db7ede262648ae2294ffa06510ca5fec560d9d1d4a`
+- `field-provenance.json`: `26b77187dc76a37e22019f14f9554d3eb9dbe884189fe26e3677c3d1f8147a0c`
+- `external-calls.ndjson`: `ef1f1f89f112d7987ff5c36b1609c745391079ff2b1559aeee347de67a3fdcd8`
+- `external-calls.json`: `663d928907863b29c80a532a409744c013f4ace491a9f8f2f52741fea36ac668`
+- `grok-summary-review.txt`: `1c40eda3991990ea93e535a15919f94fbeb76ad477ce1cc68faef37c35df5d4b`
+- `wayback-supplemental/external-calls.ndjson`: `5c48dde7a49b3dfb7d9c099316ea42693c0a08a9e7c1a80e9558e00c5ff58be0`
+- `wayback-supplemental/RECORD-00861_wayback_capture.html`: `0041b650c6c2d9689c1337ffe71f62db091c55950fa2bfdacd5bcdd63ca41afe`
+- `wayback-supplemental/RECORD-00862_wayback_capture.html`: `94c9e65f3e58330739ad36373c6cafcd88af3c7845615ca5478975c3e0830537`
+- `wayback-supplemental/RECORD-00863_wayback_capture.html`: `2ecba87badcf6807880b33ac689eba97e49bb267cbf8f26f8827a27c6dfd0b7d`
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `4d86a95512eeb5ebaf87dfde0998d994ab7d5f9378afb04c225079772e493eca`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `181b5acf3d3d3dd0f5f123885e542f8ff56ad7d9fd736f1eae281818918f4c72`
+- `data/archive-data.json`: `e2a848a56f8758cac75489025cb9665a667e7cd6c2c0ddb3edd9242aca04828f`
+- `data/archive-core.json`: `4c297e6f2c5f8cd448289c707b83e26de0822385fb63a788819a6ba7d3532624`
+- `data/archive-details.json`: `aecd75ba74bb097c9119a37a8f6cd81d40211f5adaca21f9d51dd34a9b3fcd32`
+- `data/archive-entities.json`: `9274f1af7e8aac5561bf904c3ff927d206ffd81420c8bcac124a9411b5de914b`
+- `data/archive-analytics.json`: `42c68dc5788c38afea64e9a06c986693dc59adbcc0d9876ad4878398ac72c32c`
+
+### HuffPost verification pilot 13 applied
+
+`RECORD-00864` through `RECORD-00868` were audited with saved Wayback evidence
+under `%TEMP%/rosen-k2-huffpost-pilot-13/wayback-evidence`. Four rows were
+verified. `RECORD-00865` remains unresolved because available captures did not
+provide both trustworthy 2008 posted-date evidence and article body text.
+
+Kimi reviewed the boundary decision in read-only mode. It agreed that verifying
+four rows and leaving `RECORD-00865` unresolved was defensible, with conditions:
+document `RECORD-00868` as metadata-derived, preserve its source URL and capture
+hash, and add an explicit failure note to `RECORD-00865`. Those conditions were
+applied.
+
+Changes applied:
+
+- `RECORD-00864`: body-backed excerpt repaired from the archived capture;
+  summary added; `verified=TRUE`; `needs_review=FALSE`;
+  `low_confidence=FALSE`; notes now cite Wayback capture SHA-256
+  `4bbb6c7857b7c1877cf14ef3b2207883ff7acd381a70f7c503248138b6f3d1d4`.
+- `RECORD-00865`: left `verified=FALSE`; set `needs_review=TRUE` and
+  `low_confidence=TRUE`; notes now record that the 2011 iframe replay returned
+  an empty body and the 2016 replay lacked a trustworthy 2008 posted date.
+- `RECORD-00866`: publication date corrected from `2013-11-09` to
+  `2008-07-19`; body-backed excerpt repaired from the archived capture; summary
+  added; `verified=TRUE`; `needs_review=FALSE`; `low_confidence=FALSE`; notes
+  now cite Wayback capture SHA-256
+  `0199cd5b7624d4595240146b9393425074553d587998dcb812d48a40bdb98266`.
+- `RECORD-00867`: publication date corrected from `2013-11-06` to
+  `2008-07-19`; body-backed excerpt repaired from the archived capture; summary
+  added; `verified=TRUE`; `needs_review=FALSE`; `low_confidence=FALSE`; notes
+  now cite Wayback capture SHA-256
+  `63b72c598a5a66c39c79418c36c8b1d0d6d375f4437847becc99042a7addd6f0`.
+- `RECORD-00868`: publication date corrected from `2016-02-12` to
+  `2008-07-19`; toolbar-only raw text replaced with a metadata-derived short
+  record from the capture headline and `article:published_time`; word count
+  corrected to 26; body-backed excerpt repaired; summary added;
+  `verified=TRUE`; `needs_review=FALSE`; `low_confidence=FALSE`; notes now cite
+  Wayback capture SHA-256
+  `11d7cfd6b97630102b1e96697abd182a3cc4385ad19418bd40a54d0971acc84e` and state
+  that no fuller article body was recovered.
+
+The focused regression
+`node --test --test-name-pattern "HuffPost pilot thirteen" tests\csv-quality.test.js`
+failed before the CSV edit because `RECORD-00864` still had the stale
+metadata-style excerpt, then passed after the patch. Raw-text SHA-256 values:
+
+- `RECORD-00864`: `5b15812a9d7e4014be9cc23396819e00188fe8692df092314ecd7035db665353`
+- `RECORD-00866`: `e07da9599f4e1f4ae586ed9bb6fb5c939aa435c087763988cd33338244561175`
+- `RECORD-00867`: `e2736a5a5586be748a1d526d3fdf6e44d7cee06ccdfc52ad8fd76494e1b265e8`
+- `RECORD-00868`: `950029bd6d26935db2210780e9ee4b210fbb55519a8a86403555e210032c1093`
+
+Post-application row counts:
+
+- Archive rows: 1,028.
+- Blank archive summaries: 11, down from 15.
+- Archive rows not explicitly verified: 15, down from 19.
+- `#NN08` rows with capture-year dates: 3, down from 6.
+- Generated records after export: 26,681.
+- Entities: 7,389.
+- Relationships: 10,804.
+
+Validation:
+
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 78 records with raw text but no extracted relationships.
+- `npm run test:data`: expected eight completion gates still fail: three core
+  blanks, 11 blank summaries, 15 unverified archive records, three `#NN08`
+  capture-year dates, 54 non-Rosen Bluesky profile URLs, 54 non-Rosen Bluesky
+  copyright assignments, 29,693 unverified social rows, and 50 blank entity
+  first mentions. The pilot-thirteen regression passes.
+
+Packet artifact SHA-256 values:
+
+- `kimi-decision-review.txt`: `6b571cde973d83f0acfd35b80f6fbf936d50946787a62717fecf5649e9fcaeec`
+- `wayback-evidence/external-calls.ndjson`: `bca8d8f640429b9a26cb3e322854592ba48dd09b738d35608976427715a3b072`
+- `wayback-evidence/RECORD-00864_wayback_capture.html`: `4bbb6c7857b7c1877cf14ef3b2207883ff7acd381a70f7c503248138b6f3d1d4`
+- `wayback-evidence/RECORD-00865_wayback_capture.html`: `e734395ec9db51a5b4b5a46fbddc3c67b793924135acda021358ff8c8a992940`
+- `wayback-evidence/RECORD-00865_wayback_iframe.html`: `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`
+- `wayback-evidence/RECORD-00865_wayback_2016_iframe.html`: `dc1dfb7be312e866b5699ec61df0c3e82591f9bcf0a01c87da2001901b98276e`
+- `wayback-evidence/RECORD-00866_wayback_capture.html`: `0199cd5b7624d4595240146b9393425074553d587998dcb812d48a40bdb98266`
+- `wayback-evidence/RECORD-00867_wayback_capture.html`: `63b72c598a5a66c39c79418c36c8b1d0d6d375f4437847becc99042a7addd6f0`
+- `wayback-evidence/RECORD-00868_wayback_capture.html`: `11d7cfd6b97630102b1e96697abd182a3cc4385ad19418bd40a54d0971acc84e`
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `d24d54a5c4150b3127290fbb1f4933dee48e0811ac7ecabf1a46745b5cf22c73`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `181b5acf3d3d3dd0f5f123885e542f8ff56ad7d9fd736f1eae281818918f4c72`
+- `data/archive-data.json`: `101cd9206decec9cb33c5b91a9db0c3a57a6895a46a31f1356e2453d42d1ca5c`
+- `data/archive-core.json`: `421f51b4f441b855edcf97516e4d034e82e4d8566d9a178d52bacfddeb97ce1b`
+- `data/archive-details.json`: `1d88f557b1134b21a8c7abdc738f75a8dd24da0f0a433c29ddb0a13e7b70a1db`
+- `data/archive-entities.json`: `a9865c5d7df586e3902a678c2f8b421d4fd1c584f74bbbadadafb7fee72669f0`
+- `data/archive-analytics.json`: `430c2960209d2259c0b99e02bf183d82be16d7ee13999abdfe0e2a8607dd0775`
+
+### HuffPost verification pilot 14 applied
+
+Pilot fourteen covered `RECORD-00869` through `RECORD-00873`. The packet lives
+at `%TEMP%\rosen-huffpost-pilot-14`. The primary agent fetched the sources;
+Kimi reviewed the captured evidence and proposed updates without web access.
+Kimi rejected the first draft summaries for `RECORD-00869`, `RECORD-00871`, and
+`RECORD-00872`; the final patch restored "draft off," qualified the Pelosi
+event wording, and tied the ABC News/Iraq point to the stored article body.
+Grok headless review was attempted twice with web search disabled, but the CLI
+hit its turn cap before returning a verdict.
+
+Source results:
+
+- `RECORD-00869`: modern HuffPost returned 406 with an empty body. The
+  normalized Wayback raw replay returned 200; its title and `Posted:
+  07/19/08 01:22 PM ET` metadata support the row. Publication date was
+  corrected from `2013-11-06` to `2008-07-19`; excerpt, summary, verification
+  flags, and notes were updated. Source SHA-256:
+  `2b51ef5dcf9349d3d2070c431b4525b1110d0356f3af8e33e2a9fa18d90e6345`.
+- `RECORD-00870`: modern HuffPost returned 404 with an empty body. The
+  normalized Wayback raw replay returned 200; its title and `Posted:
+  07/19/08 09:35 PM ET` metadata support the row. The title spacing,
+  publication date, excerpt, summary, verification flags, and notes were
+  updated. Source SHA-256:
+  `4fa21e3f81b9b2ac8df16fd77927177ac1d78669dfa035ee2731d19239eeb3f4`.
+- `RECORD-00871`: modern HuffPost returned 404 with an empty body. The
+  normalized Wayback raw replay returned 200; its `publish_date` meta tag and
+  author attribution support `2008-07-19`. The title, summary, verification
+  flags, and notes were updated. Source SHA-256:
+  `367e2163721d861b0b10ed052c4a1879c0b1a5eeb67816e937d5ef6e65519e26`.
+- `RECORD-00872`: modern HuffPost returned 200 with author, title, and
+  `2008-08-11` published metadata. Summary, verification flags, and notes were
+  updated. Source SHA-256:
+  `b1ed6da2177915cca79483da7d577db37476269bfa71d427e4da328e5e815721`.
+- `RECORD-00873`: modern HuffPost returned 200 with author, title, and
+  `2008-09-20` published metadata. Summary, verification flags, and notes were
+  updated. Source SHA-256:
+  `daae6c220c00a9c5bbf057cc7335f7d302a099f4ed44a5d53ddcabe398c30670`.
+
+The focused regression
+`node --test --test-name-pattern "HuffPost pilot fourteen" tests\csv-quality.test.js`
+failed before the CSV edit on `RECORD-00869`'s stale capture date, then passed
+after the patch. Raw-text SHA-256 values:
+
+- `RECORD-00869`: `9880cf8c15a7f57f68f5377896d518cd62e81d57b2712700b2e997c00264dc97`
+- `RECORD-00870`: `22f7cd6437c35a05bba3058a37e07f3eae4d8edab5ca9c7d8e5fad026efb6948`
+- `RECORD-00871`: `f5fd902bd42a8527399fc4eac961d9522b5106466cb277d95d2f3427cfc6882a`
+- `RECORD-00872`: `e30e2d5d64b020eea5c8a747fbd2b6f92715d90d5780f945a17f8665af77d788`
+- `RECORD-00873`: `8587258f83ca4b66503d95b69e030b9c111bf52b3e093798f365bd748f6c58d3`
+
+Post-application row counts:
+
+- Archive rows: 1,028.
+- Blank archive summaries: 6, down from 11.
+- Archive rows not explicitly verified: 10, down from 15.
+- `#NN08` rows with capture-year dates: 1, down from 2.
+- Generated records after export: 26,686.
+- Entities: 7,389.
+- Relationships: 10,804.
+
+Validation:
+
+- `node --test --test-name-pattern "HuffPost pilot fourteen" tests\csv-quality.test.js`:
+  passed.
+- `node data\export-archive-data.js`: passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 78 records with raw text but no extracted relationships.
+- `npm run test:data`: expected eight completion gates still fail: three core
+  blanks, six blank summaries (`RECORD-00865`, `RECORD-00874` through
+  `RECORD-00878`), 10 unverified archive records, one `#NN08` capture-year date
+  (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54 non-Rosen
+  Bluesky copyright assignments, 29,693 unverified social rows, and 50 blank
+  entity first mentions. The pilot-fourteen regression passes.
+
+Packet artifact SHA-256 values:
+
+- `external-calls.ndjson`: `878988da0e011df3b1dd6cb1b7f8d0b71d8bd792f713b3f46fd2c97ab7c6f28c`
+- `external-calls.json`: `31fb97c49f80b161d7b59d3a322196c69dc7337db34c1c285159287931d885f5`
+- `wayback-normalized-calls.ndjson`: `d6ba69f49f1d7091410bf2184a4b21494ea4d879d85d42767a5632d3ca09d75b`
+- `wayback-normalized-calls.json`: `7133eb4d2360c1d447cc301cf18cee4e60f0006cfd30c8a1027ed2c325e70045`
+- `kimi-review.txt`: `2199bcfe2d74ec50cb1621bb7aeb613b04d0b2837afd6dd2cdf3e8fe9237ced9`
+- `grok-review.txt`: `63093895ac434e7ac564c7474daf247ce3e9a5d832857778a1c85e240d239642`
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `35ed18079b5257fd5d96e87ad26db64f1caac18f5165e09920f7bc958c69957d`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `181b5acf3d3d3dd0f5f123885e542f8ff56ad7d9fd736f1eae281818918f4c72`
+- `data/archive-data.json`: `2d862e51c7422d4d36afec4cf74a370ae6c8096ed3ae6cebaed158217b526b62`
+- `data/archive-core.json`: `72eea517b4f85c771ca87921451cc530957aa3dcf03e97ad3be5738c7c6dfbf5`
+- `data/archive-details.json`: `a1ca9c19fcd3ec9ba5bd4ecf5dcd1f56938b94ddf326f88323eaaaa300176a1c`
+- `data/archive-entities.json`: `aaf271a553e5487dac47fec2a73931307b3165db3779010b42daa153c3747182`
+- `data/archive-analytics.json`: `7ee106c00e12e2afc11095dd5e14c25fb22d31904873ade397ae7860877e6d05`
+
+### HuffPost verification pilot 15 applied
+
+Pilot fifteen covered `RECORD-00874` through `RECORD-00878`. The packet lives
+at `%TEMP%\rosen-huffpost-pilot-15`. The primary agent fetched the sources;
+Kimi reviewed the proposed updates from captured evidence without web access
+and approved the batch. Kimi noted that `RECORD-00878` has a HuffPost title-tag
+and og-title mismatch; the stored title follows the og-title, and notes now
+preserve the title-tag wording.
+
+Source results:
+
+- `RECORD-00874`: canonical modern HuffPost returned 406 with an empty body,
+  but the HuffPost AMP URL returned 200 with author, title, and `2008-10-04`
+  published metadata. Summary, verification flags, and notes were updated.
+  Source SHA-256:
+  `690176d06c7d38c1a8da1e0c93d58a028f78391ac535937bbda43f7a828415bc`.
+- `RECORD-00875`: modern HuffPost returned 200 with author, title, and
+  `2009-04-14` published metadata. Summary, verification flags, and notes were
+  updated. Source SHA-256:
+  `d786adfffb8250640d6e0a9e396cdd825abe53253049690eb1de404ce64366a2`.
+- `RECORD-00876`: modern HuffPost returned 200 with author, title, and
+  `2009-04-16` published metadata. Summary, verification flags, and notes were
+  updated. Source SHA-256:
+  `aa074de890fbdedabf7995c7914a96419e01eacb8292f1b5a18cd39e731525ad`.
+- `RECORD-00877`: the first modern request returned 406 with an empty body; a
+  browser-header modern request returned 200 with author, title, and
+  `2011-02-10` published metadata. Summary, verification flags, and notes were
+  updated. Source SHA-256:
+  `defa25d8de9e9068f681fd117f583c4f39c1d0c321af667dd84e0b24bda076da`.
+- `RECORD-00878`: modern HuffPost returned 200 with author, og-title, and
+  `2015-12-07` published metadata. Summary, verification flags, and notes were
+  updated; notes preserve that the title tag reads `Tone Poem for the 'Leave It
+  There' Press` while og-title matches the stored title. Source SHA-256:
+  `58f738c6147be329cebf9b8134f1f94ba294438e23b4600f8237452c94f69da4`.
+
+The focused regression
+`node --test --test-name-pattern "HuffPost pilot fifteen" tests\csv-quality.test.js`
+failed before the CSV edit because `RECORD-00874` still had a blank summary,
+then passed after the patch. Raw-text SHA-256 values:
+
+- `RECORD-00874`: `7b6c5927576245bbdd6041252f87b037f552923fda2d66378bbef979fda6d1a7`
+- `RECORD-00875`: `87c75ed5851f83a2288d54a566de2180d051a3e4aa93c7a2881d957313b81216`
+- `RECORD-00876`: `ab23bf9fe433fb3d7e45f700e07b800b07fef963bc48946c2b661d5fc9e5b815`
+- `RECORD-00877`: `d0a7ccd044bcf915f136af7fe05a4d2db511657458dc8763013a7ff0708b0a75`
+- `RECORD-00878`: `8a431c9057372b9776779a734a530e4e9a3ced3bd0bfde4b4736c4ff1f2f7272`
+
+Post-application row counts:
+
+- Archive rows: 1,028.
+- Blank archive summaries: 1, down from 6 (`RECORD-00865`).
+- Archive rows not explicitly verified: 5, down from 10.
+- `#NN08` rows with capture-year dates: 1, unchanged (`RECORD-00865:2016-02-12`).
+- Generated records after export: 26,691.
+- Entities: 7,389.
+- Relationships: 10,804.
+
+Validation:
+
+- `node --test --test-name-pattern "HuffPost pilot fifteen" tests\csv-quality.test.js`:
+  passed.
+- `node data\export-archive-data.js`: passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 78 records with raw text but no extracted relationships.
+- `npm run test:data`: expected eight completion gates still fail: three core
+  blanks, one blank summary (`RECORD-00865`), five unverified archive records,
+  one `#NN08` capture-year date (`RECORD-00865:2016-02-12`), 54 non-Rosen
+  Bluesky profile URLs, 54 non-Rosen Bluesky copyright assignments, 29,693
+  unverified social rows, and 50 blank entity first mentions. The pilot-fifteen
+  regression passes.
+
+Packet artifact SHA-256 values:
+
+- `external-calls.ndjson`: `9d7d8b752c9d95a404ed782c4131de7a42613a3482b46ba5d1137220811e3a08`
+- `external-calls.json`: `6c30cbba1bd7321c94341d78502b2c6ba588b7fa7c720ca7b97369a24ff42093`
+- `fallback-calls.ndjson`: `3cc0d193993d16df7c71801738d7f1bf29bd734e03f7dcaf1a8f8ca152824eb5`
+- `fallback-calls.json`: `92bb8f31bdc8f595d1df181c6bd5c5bcfff3bddeaf96ef4af314dfb10554e6a5`
+- `kimi-review.txt`: `4eeed41b8a08d47bc0bffa8270ffcb64697859cd16d66d2967f2a89ca64895ec`
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `0dbb3d00617800eeb35823b25b9f50472be049ce5f22daab5b575fca66d74ce8`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `181b5acf3d3d3dd0f5f123885e542f8ff56ad7d9fd736f1eae281818918f4c72`
+- `data/archive-data.json`: `01624685440596e6708660039ea17cf507d5f841780d02edcfac9332625c1780`
+- `data/archive-core.json`: `35521dd30ce129717adae1ef7a6dacd011c622b7b40fa5a16708b9a38d7f2e20`
+- `data/archive-details.json`: `45712264720f74b2b102a2e34d899725cbcaf7c8a7259737d1373540ddb743fe`
+- `data/archive-entities.json`: `d21a684f27502a9d353171fe8ea30c364b80bec78cec31f1c7c5d0694bddbf70`
+- `data/archive-analytics.json`: `15788fa14498724398d1954fe86f6a3ab7593bfa2b61322da27be402fbe34128`
+
+### HuffPost record 00865 recovery attempt
+
+`RECORD-00865` was rechecked under
+`%TEMP%/rosen-huffpost-record-00865-recovery` after pilot fifteen because it is
+the last remaining HuffPost blank summary, unverified archive row from the
+pilot range, and `#NN08` capture-year date gate.
+
+The recovery attempt did not produce enough source evidence to verify the row.
+CDX found one HTTP 200 capture for the canonical Huffington Post URL. The saved
+Wayback replay preserves the title and author, but the `articleBody` metadata
+is empty, the page body does not preserve article text, and the page metadata
+uses `2011-05-25 12:40:20 -0400` rather than a directly observed 2008 source
+date. Modern HuffPost, AMP, mobile, and `us_113763` variants returned either
+406 empty responses or 404 pages. The canonical row remains unchanged:
+`verified=FALSE`, `needs_review=TRUE`, `low_confidence=TRUE`, blank summary,
+and `publication_date=2016-02-12` pending better source evidence or curator
+decision.
+
+Kimi was invoked in read-only mode for a boundary review with the packet mounted
+as an added directory, but it timed out after the checkpoint window before
+returning a verdict. The partial response only acknowledged the review request,
+so no decision was taken from it.
+
+Packet artifact SHA-256 values:
+
+- `external-calls.ndjson`: `fb455295ef2711dfab5c6757d1b9d161436057a02d06bb3ddf2f7fa7a467e2b7`
+- `fallback-calls.ndjson`: `d3ddad1d5c66085cd9e7a0913237587cced31f41b930090cb4ad554a34db246f`
+- `kimi-boundary-review.txt`: partial timed-out response, 96 bytes.
+- `capture_20160212022545_id_http_www.huffingtonpost.com_jay-rosen_nn08-sketchbook-rick-pear_b_113763.html.html`:
+  `3348da8c6d85800b662e0c182b0fa468b94669db53d0575207c84e6a896f4ecc`
+- `capture_20160212022545_normal_http_www.huffingtonpost.com_jay-rosen_nn08-sketchbook-rick-pear_b_113763.html.html`:
+  `073a4739d3b109d6b1fc1fe3c77cc3df3a874cfdc5cec4d99d6f804d85dd4705`
+
+### TomDispatch record 00614 publisher repair
+
+`RECORD-00614` had a blank `publisher` field. The linked source URL was
+replayed under `%TEMP%/rosen-record-00614-publisher-repair` and returned HTTP
+200 from TomDispatch.com. The source page confirms the publisher identity but
+also confirms the record remains a composite mismatch: the linked page is a
+2004 Jay Rosen article, while the stored text presents a later Tom Engelhardt
+interview about a 2017-era Sinclair-Tribune deal.
+
+Changes applied:
+
+- Set `publisher=TomDispatch.com`.
+- Appended a note with the source response hash and the unresolved mismatch.
+- Left `verified=FALSE`, `needs_review=TRUE`, and `low_confidence=TRUE`.
+
+The focused regression
+`node --test --test-name-pattern "TomDispatch composite record" tests\csv-quality.test.js`
+failed before the CSV edit because the publisher field was blank, then passed
+after the repair.
+
+Post-application row counts:
+
+- Archive rows: 1,028.
+- Archive core blanks: 2, down from 3 (`RECORD-00602:url`,
+  `RECORD-00613:url`).
+- Blank archive summaries: 1, unchanged (`RECORD-00865`).
+- Archive rows not explicitly verified: 5, unchanged.
+- Generated records after export: 26,691.
+- Entities: 7,389.
+- Relationships: 10,804.
+
+Validation:
+
+- `node --test --test-name-pattern "TomDispatch composite record" tests\csv-quality.test.js`:
+  passed.
+- `node data\export-archive-data.js`: passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 78 records with raw text but no extracted relationships.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  50 blank entity first mentions. The TomDispatch regression passes.
+
+Packet artifact SHA-256 values:
+
+- `external-calls.ndjson`: `a6d05b699c109c8b3fffe73e3cc29b8a085824930d8628fbfe4aaacf9762a24e`
+- `tomdispatch-record-00614-source.html`: `17a23743ca1c399fbb878aa623e119d68469b16f2d1390bfb618aa1a5f1b54f1`
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `181b5acf3d3d3dd0f5f123885e542f8ff56ad7d9fd736f1eae281818918f4c72`
+- `data/archive-data.json`: `d6d053aab0516d11a3bbacd6fe266fce4bcef8a3302fedcd1efc2f35bbfde41f`
+- `data/archive-core.json`: `99f3c1f6db53305cd5ded044a1ebbfbd7e10034485614bed7437abaf6f892a52`
+- `data/archive-details.json`: `7b72c21efec0e8d1d18efed7c832014aa7adaeae8a22d138623d2c2c45da8a52`
+- `data/archive-entities.json`: `e67eb77fc2db743214125b04c6046b453cc14fa9ef1c02499061440ca4581342`
+- `data/archive-analytics.json`: `15788fa14498724398d1954fe86f6a3ab7593bfa2b61322da27be402fbe34128`
+
+### Tumblr extraction coverage batch 01
+
+Five Tumblr records with source text but no relationship rows were mapped to
+existing entities only: `TUMBLR-00001`, `TUMBLR-00007`, `TUMBLR-00008`,
+`TUMBLR-00010`, and `TUMBLR-00011`. No new entity IDs were created. A Qwen CLI
+proposal attempt failed before producing usable output because the local Qwen
+CLI returned an API-key 401, so the mappings were made directly from stored
+`raw_text`.
+
+Changes applied:
+
+- Appended 10 relationship rows to `data/extracted_relationships.csv`.
+- Added a focused regression proving every new context snippet is an exact
+  substring of its source record.
+- Left `data/extracted_entities.csv` unchanged.
+
+The focused regression
+`node --test --test-name-pattern "Tumblr extraction batch one" tests\extraction-coverage.test.js`
+failed before the relationship append because `TUMBLR-00001_REL_001` was
+missing, then passed after the append. The first validator pass caught unquoted
+embedded line feeds in appended snippets; the batch rows were rewritten with
+quoted CSV fields and the validator then passed.
+
+Post-application counts:
+
+- Relationships: 10,814, up from 10,804.
+- Archive records with entities: 800/1,028 (77.8%), up from 795/1,028.
+- Extraction coverage missing archive records: 73, down from 78.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "Tumblr extraction batch one" tests\extraction-coverage.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 73 records with raw text but no extracted relationships.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  50 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, and Tumblr batch tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `3ba486daeed35a640dd79480bf25bfc1382871f725b14ed989dda2cf87cb51ff`
+- `data/archive-data.json`: `207347eb14acb3b262d80f1142cf6865559b3bbef7ed2b16d902ed6c78b4e1f9`
+- `data/archive-core.json`: `923ac92bff9a71f66ea6ee6b49d4ed54e7d8b0d7198cf21dce7a1c659b55da50`
+- `data/archive-details.json`: `60509f2eea46f7cfb89d83ecbbb9bc1dbc34f3770a86be3bbd36cc61801b2f23`
+- `data/archive-entities.json`: `5fcf3c5fac1d6a90d1a0c82833b404429fe072b20af1d3d8f368d64e4ee6ccfa`
+- `data/archive-analytics.json`: `15788fa14498724398d1954fe86f6a3ab7593bfa2b61322da27be402fbe34128`
+
+### Tumblr extraction coverage batch 02
+
+Five more Tumblr records with source text but no relationship rows were mapped
+to existing entities only: `TUMBLR-00012`, `TUMBLR-00015`, `TUMBLR-00016`,
+`TUMBLR-00018`, and `TUMBLR-00019`. No new entity IDs were created.
+`TUMBLR-00013` and `TUMBLR-00014` were left for a later pass because their
+useful relationships need missing or ambiguous entities.
+
+Changes applied:
+
+- Appended nine relationship rows to `data/extracted_relationships.csv`.
+- Added a focused regression proving every new context snippet is an exact
+  substring of its source record.
+- Left `data/extracted_entities.csv` unchanged.
+
+The focused regression
+`node --test --test-name-pattern "Tumblr extraction batch two" tests\extraction-coverage.test.js`
+failed before the relationship append because `TUMBLR-00012_REL_001` was
+missing, then passed after the append.
+
+Post-application counts:
+
+- Relationships: 10,823, up from 10,814.
+- Archive records with entities: 805/1,028 (78.3%), up from 800/1,028.
+- Extraction coverage missing archive records: 68, down from 73.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "Tumblr extraction batch two" tests\extraction-coverage.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 68 records with raw text but no extracted relationships.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  50 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, and Tumblr batch tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `8ebfd7ccf592fb3d8ea7d1c043e6d7c7efd0deefcef49c2d4ecbbeaaf95ed61a`
+- `data/archive-data.json`: `5b9eddafd05afdcac5356fb9bc2cecf0c5639440cc3dc9fa174a3b773768725b`
+- `data/archive-core.json`: `9699ddf778172ef17c66daf3ca7575e30cd8a8290cd0512e4dda4b3db3b4c48c`
+- `data/archive-details.json`: `78eb09f73aff0eb15a8e46063d128ffec7bce56fcb855561c836187c1fe7846a`
+- `data/archive-entities.json`: `10e56a52b94de27898835cc2a369b0382ba94c8009c876ee1de84a5bc2e089f7`
+- `data/archive-analytics.json`: `15788fa14498724398d1954fe86f6a3ab7593bfa2b61322da27be402fbe34128`
+
+### Tumblr extraction coverage batch 03
+
+Five more Tumblr records with source text but no relationship rows were mapped
+to existing entities only: `TUMBLR-00022`, `TUMBLR-00023`, `TUMBLR-00025`,
+`TUMBLR-00027`, and `TUMBLR-00028`. No new entity IDs were created.
+`TUMBLR-00021`, `TUMBLR-00024`, and `TUMBLR-00026` were left for a later pass
+because the useful source text needs missing, ambiguous, or weaker entities.
+
+A read-only Kimi CLI review checked the proposed mappings. The review rejected
+weak rows tying Jason Samuels directly to Studio 20, tying Jay Rosen directly to
+Studio 20 through the Studio 3 course snippet, and deriving an AOL affiliation
+from a one-off Seed.com project sentence. It also downgraded project partner
+credits from `Discusses` to `Mentions` where the evidence was only a passing
+credit.
+
+Changes applied:
+
+- Appended 12 relationship rows to `data/extracted_relationships.csv`.
+- Added a focused regression proving every new context snippet is an exact
+  substring of its source record.
+- Left `data/extracted_entities.csv` unchanged.
+
+The focused regression
+`node --test --test-name-pattern "Tumblr extraction batch three" tests\extraction-coverage.test.js`
+failed before the relationship append because `TUMBLR-00022_REL_001` was
+missing, then passed after the append. During validation, the first CSV edit
+surfaced a mixed line-ending edge case in Node's CSV parser; the final version
+uses single-line snippets for this batch and preserves the prior CSV delimiter
+style.
+
+Post-application counts:
+
+- Relationships: 10,835, up from 10,823.
+- Archive records with entities: 810/1,028 (78.8%), up from 805/1,028.
+- Extraction coverage missing archive records: 63, down from 68.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "Tumblr extraction batch three" tests\extraction-coverage.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 63 records with raw text but no extracted relationships.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  50 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, and Tumblr batch tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `5c7bb68a275af15fac0487195d23743b405acd3258c6c44792ae3372579b9eae`
+- `data/archive-data.json`: `5512a62d61dd5faf0fe7dd0ae5c98adcc2fa2d9d85b676047177948517ebfe57`
+- `data/archive-core.json`: `ae1cf4290466d8c3585b0f17444d341a82998ed2e2927473aaf5e6c8641a2a52`
+- `data/archive-details.json`: `f876c46362446d9a3457596e4e88a9437472fb1aeebb9fb61acdc4bd2fe80509`
+- `data/archive-entities.json`: `3a7faf7f9e7ec47df9df4568c240029469518b0404362c2a20a2f41ea5e0c15d`
+- `data/archive-analytics.json`: `15788fa14498724398d1954fe86f6a3ab7593bfa2b61322da27be402fbe34128`
+
+### Tumblr extraction coverage batch 04
+
+Five more Tumblr records with source text but no relationship rows were mapped
+to existing entities only: `TUMBLR-00029`, `TUMBLR-00030`, `TUMBLR-00031`,
+`TUMBLR-00032`, and `TUMBLR-00033`. No new entity IDs were created.
+
+A read-only Kimi CLI review checked the proposed mappings. The review rejected
+a directional Jay Rosen-to-Amanda Michel row because the source only co-mentions
+both people, and rejected a Jason Samuels-to-CNN row because the snippet tied
+Soledad O'Brien, not Samuels, to CNN. The final batch replaced those with
+Studio 20 mention rows for Jay Rosen and Amanda Michel, plus a Soledad
+O'Brien-to-CNN affiliation row.
+
+Changes applied:
+
+- Appended 23 relationship rows to `data/extracted_relationships.csv`.
+- Added a focused regression proving every new context snippet is an exact
+  substring of its source record.
+- Left `data/extracted_entities.csv` unchanged.
+
+The focused regression
+`node --test --test-name-pattern "Tumblr extraction batch four" tests\extraction-coverage.test.js`
+failed before the relationship append because `TUMBLR-00029_REL_001` was
+missing, then passed after the append. The first full data run caught one
+non-canonical endpoint name for `W0910`; the final row uses the canonical
+entity name.
+
+Post-application counts:
+
+- Relationships: 10,858, up from 10,835.
+- Archive records with entities: 815/1,028 (79.3%), up from 810/1,028.
+- Extraction coverage missing archive records: 58, down from 63.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "Tumblr extraction batch four" tests\extraction-coverage.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 58 records with raw text but no extracted relationships.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  50 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, and Tumblr batch tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `11f3fdbb709819f598c9819d0b5be59e9b5eacf113dea797738ce490869c6d34`
+- `data/archive-data.json`: `040a8fc1d3dcfdeeba6741a1e3b36ee18dcfdc2be98d0f9afb3c12701c79bb30`
+- `data/archive-core.json`: `8b4954d8b86e1ecae1fc75f226970e8059f9e0835c071b5067da0ef9aa0861ec`
+- `data/archive-details.json`: `4439544d9d7c974f0237d7cd4f1a1b6c6106db0d8f50cbfa8ad8b6e17a679c8c`
+- `data/archive-entities.json`: `aeeedf7cae469de8d8ad084203e6cce39b99add1064173c8d6c8b6a2b8453a11`
+- `data/archive-analytics.json`: `15788fa14498724398d1954fe86f6a3ab7593bfa2b61322da27be402fbe34128`
+
+### Tumblr extraction coverage batch 05
+
+Five more Tumblr records with source text but no relationship rows were mapped
+to existing entities only: `TUMBLR-00034`, `TUMBLR-00035`, `TUMBLR-00036`,
+`TUMBLR-00037`, and `TUMBLR-00038`. No new entity IDs were created.
+
+A read-only Kimi CLI review checked the proposed mappings. The review approved
+the batch after three conservative changes: dropping a weak Clay Shirky-to-Carter
+Institute affiliation row whose snippet did not tie both endpoints together,
+downgrading bare `new media` snippets to `Mentions`, and recording PressThink as
+a Studio 20 mention rather than a Jay Rosen-to-PressThink relationship.
+
+Changes applied:
+
+- Appended 20 relationship rows to `data/extracted_relationships.csv`.
+- Added a focused regression proving every new context snippet is an exact
+  substring of its source record.
+- Left `data/extracted_entities.csv` unchanged.
+
+The focused regression
+`node --test --test-name-pattern "Tumblr extraction batch five" tests\extraction-coverage.test.js`
+failed before the relationship append because `TUMBLR-00034_REL_001` was
+missing, then passed after the append.
+
+Post-application counts:
+
+- Relationships: 10,878, up from 10,858.
+- Archive records with entities: 820/1,028 (79.8%), up from 815/1,028.
+- Extraction coverage missing archive records: 53, down from 58.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "Tumblr extraction batch five" tests\extraction-coverage.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 53 records with raw text but no extracted relationships.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  50 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, and Tumblr batch tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `a374ed91129265d5008f25c23ed6c8faf02455426516a69b3721ff8d36001d54`
+- `data/archive-data.json`: `cc6318a4f01480d984d4c83e4ecfa0c772b383885d1009db5cd5efb2770d19b0`
+- `data/archive-core.json`: `72092606ef828c9e2115493fd7e6a7b809f70e308b44b434c38aad70785330d4`
+- `data/archive-details.json`: `caf9b250d1be83276dc197395181de1d44cc069974aeac3fb6f3886de3ee36e4`
+- `data/archive-entities.json`: `57cb0e8cdfc0c0e7494083eda0036b39a37f1f6591564c7edce936c9f91c29d1`
+- `data/archive-analytics.json`: `15788fa14498724398d1954fe86f6a3ab7593bfa2b61322da27be402fbe34128`
+
+### Tumblr extraction coverage batch 06
+
+Five more Tumblr records with source text but no relationship rows were mapped
+to existing entities only: `TUMBLR-00052`, `TUMBLR-00057`, `TUMBLR-00058`,
+`TUMBLR-00059`, and `TUMBLR-00061`. No new entity IDs were created.
+
+A read-only Kimi CLI review checked the proposed mappings. The review approved
+the batch after three conservative changes: dropping a weak `The Australian`
+row whose snippet did not identify the newspaper, downgrading a bare
+`Journalism` concept row to `Mentions`, and keeping Lisa Williams-to-Placeblogger
+only because the source sentence identifies her as founder and CEO.
+
+Changes applied:
+
+- Appended 21 relationship rows to `data/extracted_relationships.csv`.
+- Added a focused regression proving every new context snippet is an exact
+  substring of its source record.
+- Left `data/extracted_entities.csv` unchanged.
+
+The focused regression
+`node --test --test-name-pattern "Tumblr extraction batch six" tests\extraction-coverage.test.js`
+failed before the relationship append because `TUMBLR-00052_REL_001` was
+missing, then passed after the append.
+
+Post-application counts:
+
+- Relationships: 10,899, up from 10,878.
+- Archive records with entities: 825/1,028 (80.3%), up from 820/1,028.
+- Extraction coverage missing archive records: 48, down from 53.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "Tumblr extraction batch six" tests\extraction-coverage.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 48 records with raw text but no extracted relationships.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  50 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, and Tumblr batch tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `1d2316c8b281164084a5807730491474f69dfdc489c39715bed0e1540ea99d03`
+- `data/archive-data.json`: `7b131bbc6273fb6a4163d6c3fd1e83a3e1679ca18615dc597cc7757b77961791`
+- `data/archive-core.json`: `612952f81ba85d124ee6dad6594eb80050e1c54934cf3a065b73df09c1f14be2`
+- `data/archive-details.json`: `fd74588f916923aa69e2a3a9d8f06987c8bcdb3543c6129d65bd1a83cd363bcf`
+- `data/archive-entities.json`: `6b948123fecd7bd6d1478833a83e1f37be5058609d3f0919632ee85b833f28b6`
+- `data/archive-analytics.json`: `15788fa14498724398d1954fe86f6a3ab7593bfa2b61322da27be402fbe34128`
+
+### Tumblr extraction coverage batch 07
+
+Five earlier skipped Tumblr records with source text but no relationship rows
+were mapped to existing entities only: `TUMBLR-00013`, `TUMBLR-00014`,
+`TUMBLR-00021`, `TUMBLR-00024`, and `TUMBLR-00026`. No new entity IDs were
+created.
+
+A read-only Kimi CLI review checked the proposed mappings. The review approved
+the batch after one row was dropped: a proposed New York Magazine mention whose
+source passage was not included in the review packet. The final batch kept only
+direct affiliation, concept, and mention rows supported by exact snippets in the
+source records.
+
+Changes applied:
+
+- Appended 17 relationship rows to `data/extracted_relationships.csv`.
+- Added a focused regression proving every new context snippet is an exact
+  substring of its source record.
+- Left `data/extracted_entities.csv` unchanged.
+
+The focused regression
+`node --test --test-name-pattern "Tumblr extraction batch seven" tests\extraction-coverage.test.js`
+failed before the relationship append because `TUMBLR-00013_REL_001` was
+missing, then passed after the append.
+
+Post-application counts:
+
+- Relationships: 10,916, up from 10,899.
+- Archive records with entities: 830/1,028 (80.7%), up from 825/1,028.
+- Extraction coverage missing archive records: 43, down from 48.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "Tumblr extraction batch seven" tests\extraction-coverage.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 43 records with raw text but no extracted relationships.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  50 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, and Tumblr batch tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `9434cd375c650fe371ae841a0e08bf29e556be4b8d28e2b0e3f9a35932e8920f`
+- `data/archive-data.json`: `06ff006882f0c650593129827f22bb06c3b12607a70f5a7e248c3055de570412`
+- `data/archive-core.json`: `d3b9450af703716450bdc16d9ab6f6034653c235cdc591e629cf71b20e46af05`
+- `data/archive-details.json`: `92e797c5665322d7c197e593df0c3de4ed27666f183d6bef8392b7adac8377e5`
+- `data/archive-entities.json`: `ede5a7f5550d4f33b03da959c30740a58ea2987d1ada2db49fd4f35e6ba742dd`
+- `data/archive-analytics.json`: `15788fa14498724398d1954fe86f6a3ab7593bfa2b61322da27be402fbe34128`
+
+### Tumblr extraction coverage batch 08
+
+Five more Tumblr records with source text but no relationship rows were mapped
+to existing entities only: `TUMBLR-00066`, `TUMBLR-00067`, `TUMBLR-00068`,
+`TUMBLR-00069`, and `TUMBLR-00071`. No new entity IDs were created.
+
+A read-only Kimi CLI review checked the proposed mappings. The review required
+five safety changes: downgrade the Carter Institute event-context row to
+`Mentions`, drop an Internet row whose target was not canonical for a concept
+mention, switch the Public Journalism row to Jay Rosen as source, downgrade a
+bare Mainstream Media row to `Mentions`, and downgrade the entrepreneurship
+advice row to `Mentions`.
+
+Changes applied:
+
+- Appended 28 relationship rows to `data/extracted_relationships.csv`.
+- Added a focused regression proving every new context snippet is an exact
+  substring of its source record.
+- Left `data/extracted_entities.csv` unchanged.
+
+The focused regression
+`node --test --test-name-pattern "Tumblr extraction batch eight" tests\extraction-coverage.test.js`
+failed before the relationship append because `TUMBLR-00066_REL_001` was
+missing, then passed after the append.
+
+Post-application counts:
+
+- Relationships: 10,944, up from 10,916.
+- Archive records with entities: 835/1,028 (81.2%), up from 830/1,028.
+- Extraction coverage missing archive records: 38, down from 43.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "Tumblr extraction batch eight" tests\extraction-coverage.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 38 records with raw text but no extracted relationships.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  50 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, and Tumblr batch tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `82d6f359ff5b31b344cdc5c3287e5da243056a72d4854719badc55b3689cf799`
+- `data/archive-data.json`: `82e444532cc609b36a843865c7e5b1be8564a3ad23808cb89ec9c7342d0d3a6e`
+- `data/archive-core.json`: `4c28f6822bec6e764cc16eee7860a9608366d9a11f048096ff98db4a5796c8f4`
+- `data/archive-details.json`: `b7b770e49f6c8740d8f6edbfab697c4ae74afa4de919acf2b6b31819c6bb70ba`
+- `data/archive-entities.json`: `16b8b43178316350d1fc35b9bf0a547a9e7e3c3ea292ee68343ea155df1dd485`
+- `data/archive-analytics.json`: `15788fa14498724398d1954fe86f6a3ab7593bfa2b61322da27be402fbe34128`
+
+### Tumblr extraction coverage batch 09
+
+Five more Tumblr records with source text but no relationship rows were mapped
+to existing entities only: `TUMBLR-00073`, `TUMBLR-00077`, `TUMBLR-00078`,
+`TUMBLR-00079`, and `TUMBLR-00081`. No new entity IDs were created.
+
+A read-only Kimi CLI review checked the proposed mappings. The first review
+timed out after approving most rows and flagging `TUMBLR-00081` snippets for
+direct verification. A local snippet check confirmed those excerpts were present,
+then a short follow-up review approved the final batch except for one dropped
+MIT row: `MIT’s Technology Review` refers to the publication, not the MIT
+institution entity.
+
+Changes applied:
+
+- Appended 29 relationship rows to `data/extracted_relationships.csv`.
+- Added a focused regression proving every new context snippet is an exact
+  substring of its source record.
+- Left `data/extracted_entities.csv` unchanged.
+
+The focused regression
+`node --test --test-name-pattern "Tumblr extraction batch nine" tests\extraction-coverage.test.js`
+failed before the relationship append because `TUMBLR-00073_REL_001` was
+missing, then passed after the append.
+
+Post-application counts:
+
+- Relationships: 10,973, up from 10,944.
+- Archive records with entities: 840/1,028 (81.7%), up from 835/1,028.
+- Extraction coverage missing archive records: 33, down from 38.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "Tumblr extraction batch nine" tests\extraction-coverage.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 33 records with raw text but no extracted relationships.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  50 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, and Tumblr batch tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `242de3e7528e1fc20fb7a01f4d6c184389962a7a0a7103e781024ed291f0a341`
+- `data/archive-data.json`: `e88802be9bb069d605b1054e9508fe2a61faadb4cbe8f8607ecdeb44a1b7d01f`
+- `data/archive-core.json`: `97eec8080cde09b947a9872c5e16fd8e7fc4449bba58ef6e1956af8131a601f5`
+- `data/archive-details.json`: `877a5c51508a07a9e465ff8180d0ce532ec32cd9b218729a5cab18b5dc3ad59e`
+- `data/archive-entities.json`: `dd4170d02d571e5ac9fa40843f334fc4587aabce1e67acb50d0b421eda80bedf`
+- `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`
+
+### Tumblr extraction coverage batch 10
+
+Five more Tumblr records with source text but no relationship rows were mapped
+to existing entities only: `TUMBLR-00082`, `TUMBLR-00083`, `TUMBLR-00084`,
+`TUMBLR-00085`, and `TUMBLR-00086`. No new entity IDs were created.
+
+A read-only Kimi CLI review checked the proposed mappings. The first batch ten
+review timed out without useful output, so a shorter no-tools retry was used.
+That review approved all final rows. Missing entity cases such as ExplainThis,
+Tablet, True/Slant, Lewis Dvorkin, and several students were intentionally left
+unmapped rather than creating new IDs.
+
+Changes applied:
+
+- Appended 22 relationship rows to `data/extracted_relationships.csv`.
+- Added a focused regression proving every new context snippet is an exact
+  substring of its source record.
+- Left `data/extracted_entities.csv` unchanged.
+
+The focused regression
+`node --test --test-name-pattern "Tumblr extraction batch ten" tests\extraction-coverage.test.js`
+failed before the relationship append because `TUMBLR-00082_REL_001` was
+missing, then passed after the append.
+
+Post-application counts:
+
+- Relationships: 10,995, up from 10,973.
+- Archive records with entities: 845/1,028 (82.2%), up from 840/1,028.
+- Extraction coverage missing archive records: 28, down from 33.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "Tumblr extraction batch ten" tests\extraction-coverage.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 28 records with raw text but no extracted relationships.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  50 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, and Tumblr batch tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `f7d51197aa1d965785efacc12c1c5c24321eef2346ae3860a7ca00d5fb771f5b`
+- `data/archive-data.json`: `29a69755a9d00133bd88c1cf64c9a9203d365c33a1ac9176857452fcfdff0d83`
+- `data/archive-core.json`: `d0ed95fe8620f758698aca6a88952f74dcadac663138f00c4b3231044ef57fe0`
+- `data/archive-details.json`: `719646a9313a0b02af0b1f412c5e2947a65c5a6107d70471afd4672f9fa45713`
+- `data/archive-entities.json`: `2c364bb2d2db132831377358f693a03451c3aff5cff297b41d29a73576450e6f`
+- `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`
+
+### Tumblr extraction coverage batch 11
+
+Five more Tumblr records with source text but no relationship rows were mapped
+to existing entities only: `TUMBLR-00091`, `TUMBLR-00093`, `TUMBLR-00094`,
+`TUMBLR-00096`, and `TUMBLR-00098`. No new entity IDs were created.
+
+A read-only Kimi CLI review checked the proposed mappings. The review rejected
+one `rebooted music news system` concept row because the snippet was too
+music-specific for the existing `Rebooted system of news` concept, and rejected
+a Laura Edwins-to-Christian Science Monitor affiliation row because the source
+identified a project partner, not employment. The final batch dropped the music
+concept row and recast the Christian Science Monitor evidence as a Studio 20
+mention.
+
+Changes applied:
+
+- Appended 32 relationship rows to `data/extracted_relationships.csv`.
+- Added a focused regression proving every new context snippet is an exact
+  substring of its source record.
+- Left `data/extracted_entities.csv` unchanged.
+
+The focused regression
+`node --test --test-name-pattern "Tumblr extraction batch eleven" tests\extraction-coverage.test.js`
+failed before the relationship append because `TUMBLR-00091_REL_001` was
+missing, then passed after the append.
+
+Post-application counts:
+
+- Relationships: 11,027, up from 10,995.
+- Archive records with entities: 850/1,028 (82.7%), up from 845/1,028.
+- Extraction coverage missing archive records: 23, down from 28.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "Tumblr extraction batch eleven" tests\extraction-coverage.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 23 records with raw text but no extracted relationships.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  50 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, and Tumblr batch tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `2d8309e864817db1a3dc8af3ddf4f48ec737f3b54615140e380cfce873bbea4e`
+- `data/archive-data.json`: `1ef2ea537e40ab6b39b4adfc839d39968300c3df9fd1c9535577c657f2c2d954`
+- `data/archive-core.json`: `4287da1d78175c4ec67280c3de338dbb540842cd0d548f374331ae4080857392`
+- `data/archive-details.json`: `d45bcfe144b9fcb08ec5ca73b2ec8448c3f1a9ecd9e34a1d78b3d928f923f73e`
+- `data/archive-entities.json`: `de9262d869787396249c4cabb1a9c601a9b05382711bd17a47e6aca9b465ca21`
+- `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`
+
+### Tumblr extraction coverage batch 12
+
+Five more Tumblr records with source text but no relationship rows were mapped
+to existing entities only: `TUMBLR-00099`, `TUMBLR-00100`, `TUMBLR-00103`,
+`TUMBLR-00104`, and `TUMBLR-00105`. No new entity IDs were created.
+
+A read-only Kimi CLI review checked the proposed mappings. The review rejected
+the weak NAMIC diversity, hyperlocal-as-topic, and East Village location rows,
+and recommended downgrading several partnership claims from `Affiliated With`
+to `Mentions`. The final batch followed those changes and kept only exact
+source excerpts.
+
+Changes applied:
+
+- Appended 32 relationship rows to `data/extracted_relationships.csv`.
+- Added a focused regression proving every new context snippet is an exact
+  substring of its source record.
+- Left `data/extracted_entities.csv` unchanged.
+
+The focused regression
+`node --test --test-name-pattern "Tumblr extraction batch twelve" tests\extraction-coverage.test.js`
+failed before the relationship append because `TUMBLR-00099_REL_001` was
+missing, then passed after the append.
+
+Post-application counts:
+
+- Relationships: 11,059, up from 11,027.
+- Archive records with entities: 855/1,028 (83.2%), up from 850/1,028.
+- Extraction coverage missing archive records: 18, down from 23.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "Tumblr extraction batch twelve" tests\extraction-coverage.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 18 records with raw text but no extracted relationships.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  50 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, and Tumblr batch tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `41b5a26176d7aa1459c210594f2a472264aaae1f7408c69c2167fd412fa87b54`
+- `data/archive-data.json`: `0c0a672152d4b7afeaf529eab9049c9d768f18bcdc20d40114a12becb574f382`
+- `data/archive-core.json`: `ad83962dad04eb372420a8365091452fdc7a3a3ca6ed68d0a02a3e1233bd962c`
+- `data/archive-details.json`: `7b7bee28733866bd887b3f22c5476f5e8d945397b86da895f44d05fe66b6cec6`
+- `data/archive-entities.json`: `e925e11fd72802a504964dbdc35fad61f2f95a20dfd17e8486e4a04f7a723f9d`
+- `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`
+
+### Tumblr extraction coverage batch 13
+
+Five more Tumblr records with source text but no relationship rows were mapped
+to existing entities only: `TUMBLR-00108`, `TUMBLR-00109`, `TUMBLR-00110`,
+`TUMBLR-00117`, and `TUMBLR-00120`. No new entity IDs were created.
+
+A read-only Kimi CLI review checked the proposed mappings. The review reversed
+the New York Times quote direction for `TUMBLR-00108`, rejected an unsupported
+The Breakdown-to-Nation affiliation, rejected the New York Association of Black
+Journalists and public-school-dropout concept overreach, and recast the
+Reporting New York/East Village evidence with the supported source entity.
+
+Changes applied:
+
+- Appended 25 relationship rows to `data/extracted_relationships.csv`.
+- Added a focused regression proving every new context snippet is an exact
+  substring of its source record.
+- Left `data/extracted_entities.csv` unchanged.
+
+The focused regression
+`node --test --test-name-pattern "Tumblr extraction batch thirteen" tests\extraction-coverage.test.js`
+failed before the relationship append because `TUMBLR-00108_REL_001` was
+missing, then passed after the append.
+
+Post-application counts:
+
+- Relationships: 11,084, up from 11,059.
+- Archive records with entities: 860/1,028 (83.7%), up from 855/1,028.
+- Extraction coverage missing archive records: 13, down from 18.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "Tumblr extraction batch thirteen" tests\extraction-coverage.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: expected completion gate still fails
+  on 13 records with raw text but no extracted relationships.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  50 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, and Tumblr batch tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `ff7b38cf754628e4dff27baabd92dda121534b60418ad59a26d099c4bda7e0fb`
+- `data/archive-data.json`: `667ccff11d8ba7fe314d1646d9ae9ecae4dcd872fce6317b3b00f6a7c90fe8eb`
+- `data/archive-core.json`: `8dd92b3ac443f0412c348c51c858cec42abd0acc471f2eaedcc43c50b51c34a0`
+- `data/archive-details.json`: `6afaf462e63f3eed6d417aa74ee817d6971bd52ff7f2efd12bed807d15a9fa61`
+- `data/archive-entities.json`: `5c1ffefd78333243363651cb3796475b9c6294d74657eb6b6bd2982b97085e15`
+- `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`
+
+### Final extraction coverage batch
+
+The remaining archive records with source text but no relationship rows were
+mapped to existing entities only: `TUMBLR-00121`, `TUMBLR-00126`,
+`TUMBLR-00131`, `TUMBLR-00132`, `TUMBLR-00133`, `TUMBLR-00134`,
+`TUMBLR-00136`, `TUMBLR-00137`, `TUMBLR-00138`, `CLIP-00037`,
+`CLIP-00064`, `CLIP-00074`, and `CLIP-00076`. No new entity IDs were created.
+
+A read-only Kimi CLI review checked the proposed mappings. The review rejected
+unsupported Rosen attribution, a weak Open Studio event mention, a
+data-journalism/data-visualization mismatch, and a vague community edge. It
+also downgraded the Silicon Valley and social media rows to `Mentions`.
+
+Changes applied:
+
+- Appended 52 relationship rows to `data/extracted_relationships.csv`.
+- Added a focused regression proving every new context snippet is an exact
+  substring of its source record.
+- Left `data/extracted_entities.csv` unchanged.
+
+The focused regression
+`node --test --test-name-pattern "final extraction coverage batch" tests\extraction-coverage.test.js`
+failed before the relationship append because `TUMBLR-00121_REL_001` was
+missing, then passed after the append.
+
+Post-application counts:
+
+- Relationships: 11,136, up from 11,084.
+- Archive records with entities: 873/1,028 (84.9%), up from 860/1,028.
+- Extraction coverage missing archive records: 0, down from 13.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "final extraction coverage batch" tests\extraction-coverage.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: passed, 17/17 tests.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  50 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, and extraction coverage tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `5833f0fec30553c1a1ee6fd5fe8663bbe396a32efd0ef3638ad59dcd8063d1a9`
+- `data/extracted_relationships.csv`: `67ff363b9a309e69de3c2792ab35bc478ad18a08655406a31830bc23154171e3`
+- `data/archive-data.json`: `4e6263ed2fcfed43bd8239dc00cc4fa8b9699d9b200c2f2315ac08fb5b406b8e`
+- `data/archive-core.json`: `66e7f3a62541cca74ec71797dd8c935a8432c01fea7e61dfa5a39817d2aefefa`
+- `data/archive-details.json`: `32dbd706650a06372c2e2ed2b89681de89ee0e6d9e62f6ff216af552252420df`
+- `data/archive-entities.json`: `645e726080c103797126a0d25af14dcd298727c2f3fde7a86c1a9bdec4f0482c`
+- `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`
+
+### Reviewed orphan entity first mentions
+
+Filled 18 blank `first_mention_record_id` values for existing orphan entities
+with earliest source-text evidence. No new entities, relationships, merges, or
+taxonomy changes were applied.
+
+A read-only Kimi CLI review timed out twice without output. A read-only Grok
+CLI review approved the candidate set and required tests proving each mapped
+record contains the surface form and is the earliest archive record containing
+that form. The local earliest-record check moved `O1207` from `RECORD-00772`
+to earlier evidence in `RECORD-00882` before application.
+
+Mappings applied:
+
+- `C0160` -> `RECORD-00237` (`freedom of speech`)
+- `C0261` -> `RECORD-00165` (`world citizenship`)
+- `C0316` -> `RECORD-00146` (`gatekeeper model`)
+- `C0545` -> `RECORD-00879` (`one-to-many`)
+- `C0562` -> `RECORD-00127` (`news/opinion distinction`)
+- `C0604` -> `RECORD-00503` (`Easongate`)
+- `C0650` -> `RECORD-00183` (`norm of objectivity`)
+- `E0106` -> `RECORD-00125` (`war in Iraq`)
+- `E0119` -> `RECORD-00110` (`Jason Blair crisis`)
+- `L0131` -> `CLIP-00076` (`Cambridge, Mass`)
+- `O0313` -> `RECORD-00208` (`Fort Worth Star-Telegram`)
+- `O1118` -> `RECORD-00140` (`Monacle`)
+- `O1189` -> `RECORD-00410` (`MediaChannel`)
+- `O1207` -> `RECORD-00882` (`Center for Collaborative Journalism`)
+- `P1015` -> `RECORD-00101` (`Matthew Yglesisas`)
+- `P1213` -> `RECORD-00115` (`Salaam Pax`)
+- `P2012` -> `RECORD-00138` (`Rupert Murdoch`)
+- `P2094` -> `RECORD-00170` (`Rony Albovitz`)
+
+The focused regression
+`node --test --test-name-pattern "maps reviewed orphan entities" tests\csv-quality.test.js`
+failed before the CSV edit because `C0160` had a blank
+`first_mention_record_id`, then passed after the edit.
+
+Post-application counts:
+
+- Entities with blank `first_mention_record_id`: 32, down from 50.
+- Relationships: 11,136, unchanged.
+- Archive records with entities: 873/1,028 (84.9%), unchanged.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "maps reviewed orphan entities" tests\csv-quality.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: passed, 17/17 tests.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  32 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, extraction coverage, and reviewed
+  orphan first-mention tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `c5d87279ce7a7d9f2eb3a2bbcfcc24b00e37b90e8917b47c111ee7b887fb6467`
+- `data/extracted_relationships.csv`: `67ff363b9a309e69de3c2792ab35bc478ad18a08655406a31830bc23154171e3`
+- `data/archive-data.json`: `65b0759e21ea5d322afcc0227706e44159ccbe24bb0c19bc44be3c613cb893cc`
+- `data/archive-core.json`: `8dd394f46b86b9594fd95570087994542d9e5cb5cec3f8d2d49fdc64a13383aa`
+- `data/archive-details.json`: `0b20d217cd57a81dddfb32305186a4fc122f98792b4a17efbc321e4eb13b3ec2`
+- `data/archive-entities.json`: `5ebf7671e79a297e32e62a546dc498390b514ca31b7d532cb8758dd1f0eb6bec`
+- `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`
+
+### Second reviewed orphan entity first-mention batch
+
+Filled 11 more blank `first_mention_record_id` values for existing orphan
+entities with source-text evidence. No new entities, relationships, merges, or
+taxonomy changes were applied.
+
+A read-only Grok CLI review approved the source-backed candidates below and
+rejected `L0159` (`city hall`) as a generic institutional place phrase and
+`P1928` (`Buzenberg`) as surname-only evidence.
+
+Mappings applied:
+
+- `E0121` -> `RECORD-00118` (`California recall`)
+- `E0197` -> `RECORD-00445`
+  (`Harvard conference on blogging, journalism and credibility`)
+- `E0221` -> `RECORD-00502` (`case of Trent Lott`)
+- `E0222` -> `RECORD-00242` (`Rathergate`)
+- `P0626` -> `RECORD-00509` (`Doc Searles`)
+- `P1050` -> `RECORD-00137` (`Dan Gillmor`)
+- `P1929` -> `RECORD-00544` (`Karen Schneider`)
+- `P2092` -> `RECORD-00410` (`Danny Schecter`)
+- `P2178` -> `RECORD-00673` (`Jules Boykoff`)
+- `W0571` -> `RECORD-00123` (`article about the Sacramento Bee`)
+- `W0573` -> `RECORD-00487` (`PowerLine`)
+
+The focused regression
+`node --test --test-name-pattern "second reviewed orphan-entity" tests\csv-quality.test.js`
+failed before the CSV edit because `E0121` had a blank
+`first_mention_record_id`, then passed after the edit.
+
+Post-application counts:
+
+- Entities with blank `first_mention_record_id`: 21, down from 32.
+- Relationships: 11,136, unchanged.
+- Archive records with entities: 873/1,028 (84.9%), unchanged.
+- Generated records after export: 26,691.
+
+Validation:
+
+- `node --test --test-name-pattern "second reviewed orphan-entity" tests\csv-quality.test.js`:
+  passed.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: passed, 17/17 tests.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected eight completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), one blank summary
+  (`RECORD-00865`), five unverified archive records, one `#NN08` capture-year
+  date (`RECORD-00865:2016-02-12`), 54 non-Rosen Bluesky profile URLs, 54
+  non-Rosen Bluesky copyright assignments, 29,693 unverified social rows, and
+  21 blank entity first mentions. The relationship endpoint, self-reference,
+  duplicate semantic key, canonical-name, extraction coverage, and reviewed
+  orphan first-mention tests pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5626cc10b446bd18a6c3426d7e61471ea6856d577deabdc3b57ce1ee7a340b2f`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `cc96e3abbd36cfb455fc2fb1114e9cbd62b895d54efad1d1bb1c5fd7d4b3ecff`
+- `data/extracted_relationships.csv`: `67ff363b9a309e69de3c2792ab35bc478ad18a08655406a31830bc23154171e3`
+- `data/archive-data.json`: `0ed67a57744272069e161d2e62d6222c2ab0c8ad39c53b8239502babc4e6e92b`
+- `data/archive-core.json`: `2ae7c6812324469560d6fdda7c7fc8a44f9b34d1906c13559f2fa6d05288e63a`
+- `data/archive-details.json`: `5516573b8d559d219bc47195b24b7bc1047779594e2fe7cf2a329d9b2a4da137`
+- `data/archive-entities.json`: `0527d5cbdd826b69bb15c3f04798bba76e2d2e81a1c274bec230d530a2424713`
+- `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`
+
+### Record 00865 title-only HuffPost cleanup
+
+`RECORD-00865` was cleaned up from saved Wayback HuffPost metadata while
+remaining unverified, low-confidence, and review-needed. The saved replay
+preserves the HuffPost headline and author but not a visible 2008 posted date
+or full article body, so the row is not marked verified.
+
+A read-only Grok CLI decision review selected a conservative repair: remove the
+Wayback toolbar chrome, set `excerpt`, `summary`, and `raw_text` from the
+recovered title/author metadata, and set `publication_date` to `2008-07-19`
+as sequence-inferred from adjacent `#NN08` post IDs. The notes field records
+the inference and the source limitation.
+
+Evidence:
+
+- Saved source:
+  `http://web.archive.org/web/20160212022545/http://www.huffingtonpost.com/jay-rosen/nn08-sketchbook-rick-pear_b_113763.html`
+- Saved source SHA-256:
+  `c90401d67a37efe6a848df9ac061f8695739a535f22be584bbe675ab8dd411ff`
+- Repaired `raw_text` SHA-256:
+  `ead27b7165e7d4af7dea127e0d26da371127117a60c2890a543fcc211795643a`
+
+Changes applied:
+
+- `publication_date`: `2016-02-12` -> `2008-07-19`
+- `word_count`: `771` -> `63`
+- `excerpt`: Wayback toolbar image link -> title text
+- `summary`: blank -> title-derived source summary
+- `raw_text`: Wayback toolbar chrome -> single-line title/author/source note
+- `verified`: remains `FALSE`
+- `low_confidence`: remains `TRUE`
+- `needs_review`: remains `TRUE`
+
+Validation:
+
+- `node --test --test-name-pattern "HuffPost pilot thirteen" tests\csv-quality.test.js`:
+  failed before the CSV edit because `RECORD-00865` still used the 2016 capture
+  date, then passed after the edit.
+- `python backend\scripts\validate_archive_data.py`: no errors.
+- `npm run test:data:extraction-coverage`: passed, 17/17 tests.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected six completion gates still fail: two core
+  blanks (`RECORD-00602:url`, `RECORD-00613:url`), five unverified archive
+  records (`RECORD-00602`, `RECORD-00613`, `RECORD-00614`, `CLIP-00023`,
+  `RECORD-00865`), 54 non-Rosen Bluesky profile URLs, 54 non-Rosen Bluesky
+  copyright assignments, 29,693 unverified social rows, and 21 blank entity
+  first mentions. The archive summary and `#NN08` date gates now pass.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `c65ee61d3332f67c1c41ee3c086546a7a74f880647461365cb3760dccfa79fb7`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `cc96e3abbd36cfb455fc2fb1114e9cbd62b895d54efad1d1bb1c5fd7d4b3ecff`
+- `data/extracted_relationships.csv`: `67ff363b9a309e69de3c2792ab35bc478ad18a08655406a31830bc23154171e3`
+- `data/archive-data.json`: `7a0f4be34215f07a14075ef45ddd9329d621f27fb18d573ffe1056f6ffa29efd`
+- `data/archive-core.json`: `5065f3cdbc7f435c2d5541089f35db59177bdbbc403742fdb6790eba278dd0c5`
+- `data/archive-details.json`: `9b132b6b9f8fd104eeed4c87ae4b009dc279d904d5bf39b83f1d449f535fc626`
+- `data/archive-entities.json`: `a42f7c7a12ef0ceb8508bbf564585841bbee80affd4ce34fa415cab03daa55fa`
+- `data/archive-analytics.json`: `22eae8f49c232ea86f71b6b183863ee8377d7ea512bf6abd06937757e719d91c`
+
+### Record 00602 corrupted duplicate removal
+
+`RECORD-00602` was removed from the public archive source after the available
+primary evidence showed it was a contradicted duplicate of canonical social
+rows, not a recoverable June 2025 archive record. The archive row claimed a
+2025-06-13 Twitter/X announcement, but the matching News Creator Corps
+announcement is already represented in `social_posts.csv` as `BSKY-00119` and
+`BSKY-00086`, with matching X imports also present. The row's stored `raw_text`
+was from a different newsroom-culture tweet and could not support the title,
+date, summary, or graph artifacts.
+
+Decision review:
+
+- Grok CLI did not return within the read-only review timeout.
+- Qwen CLI was installed but returned a `401` API-key error in this shell.
+- Kimi CLI recommended deletion because no source supports the combined
+  title/date/source/text claim and the announcement survives in canonical social
+  rows.
+
+Evidence:
+
+- Primary Bluesky URI recorded in prior audit:
+  `at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3m2oukjxiic2i`
+  with creation time `2025-10-08T14:37:50.06Z`.
+- Follow-up Bluesky URI recorded in prior audit:
+  `at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/3m2wso76r7k2i`
+  with creation time `2025-10-11T18:25:23.395Z`.
+- Native X status found by exact-title web search:
+  `https://x.com/jayrosen_nyu/status/1975933807455875187`; its snowflake
+  timestamp decodes to `2025-10-08T14:38:25.429Z`, not the stored
+  `2025-06-13`.
+- News Creator Corps source article:
+  `https://newscreatorcorps.org/2025/10/news-consumers-content-creators/`,
+  dated `2025-10-08`.
+
+Changes applied:
+
+- Removed `RECORD-00602` from `data/archive_records-public.csv`.
+- Removed stale entities `C0643` (`Newsroom culture`) and `O1231` (`Media
+  executive`) from `data/extracted_entities.csv`.
+- Removed stale relationship `RECORD-00602_REL_001` from
+  `data/extracted_relationships.csv`.
+- Added a regression proving the corrupted archive duplicate and its graph
+  artifacts are absent while canonical social rows remain present.
+
+Validation:
+
+- `node --test --test-name-pattern "corrupted News Creator Corps"
+  tests\csv-quality.test.js`: failed before the deletion because
+  `RECORD-00602` was still present, then passed after the deletion.
+- `python backend\scripts\validate_archive_data.py`: no errors; archive records
+  now 1,027, entities 7,387, relationships 11,135.
+- `npm run test:data:extraction-coverage`: passed, 17/17 tests.
+- `node data\export-archive-data.js`: passed.
+- `git -c core.whitespace=trailing-space,cr-at-eol diff --check`: passed with
+  line-ending warnings only.
+- `npm run test:data`: expected six completion gates still fail: one core blank
+  (`RECORD-00613:url`), four unverified archive records (`RECORD-00613`,
+  `RECORD-00614`, `CLIP-00023`, `RECORD-00865`), 54 non-Rosen Bluesky profile
+  URLs, 54 non-Rosen Bluesky copyright assignments, 29,693 unverified social
+  rows, and 21 blank entity first mentions.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `5e17660d90eb53565cdc90ed2849a5bd109f5df806054f1f71d6a1ef84f57255`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `c5f1cc80d11a7826cf95ede8b312a1600c22b301e769a03322dd1df8da5ac672`
+- `data/extracted_relationships.csv`: `0937f5db5231a368b064650282ccb54bd891f617a0a7911d18e4e0c4c0a1f6b1`
+- `data/archive-data.json`: `5c6414d9741a8f6489a2be55324d9fd5aa082b7f487aaac58cfcf55ec94fefea`
+- `data/archive-core.json`: `f477e9ca278254a97a5911829a849a62bbdc5e7986ee07f1fc842e77ff3597aa`
+- `data/archive-details.json`: `777d9ae2a7dcba9548db16ebf67c99bb96e4c8901d9c063bd0fea8a7ab06e8c6`
+- `data/archive-entities.json`: `bfd6d6ff6219578a9889c42614637951a99e712a6421da1ab2d2ba67364dd133`
+- `data/archive-analytics.json`: `adf2fe0d9aaf5cd544659616c3f6f60ceaa0a24afef49e1c9a583f69d8a83e38`
+
+### Record 00613 unrecoverable placeholder removal
+
+`RECORD-00613` was removed from the public archive source after repeated
+source recovery attempts failed and the stored summary showed explicit
+AI-guesswork language. The row claimed a 2024-10-22 Twitter/X post by Jay
+Rosen, but no URL, primary platform record, Wayback capture, Bluesky match, or
+local social import could be recovered for the stored text.
+
+Decision review:
+
+- A read-only Kimi CLI review recommended deletion because no source supports
+  the title/date/source/text claim, the summary is placeholder prose, and no
+  entity or relationship rows depend on the record.
+
+Evidence:
+
+- Prior audit paged Jay Rosen's primary Bluesky author feed through the target
+  date and found no matching post.
+- Prior Wayback CDX search for Jay Rosen Twitter status URLs from
+  `2024-10-21` through `2024-10-23` found no captures for the stored text.
+- Prior exact-phrase and domain-restricted searches found no primary tweet or
+  source URL.
+- Fresh exact web searches for the raw text and key quoted phrases found no
+  matching source.
+- `social_posts.csv` has no row containing `real work of journalism`,
+  `What does this mean?`, `How will it work?`, or `What might go wrong?`.
+- The four local Jay Rosen Twitter/X rows on `2024-10-22` do not match the
+  stored text.
+- `data/extracted_entities.csv` and `data/extracted_relationships.csv` had no
+  references to `RECORD-00613`.
+
+Changes applied:
+
+- Removed `RECORD-00613` from `data/archive_records-public.csv`.
+- Removed stale `related_to` references from `RECORD-00036`, `RECORD-00045`,
+  `RECORD-00071`, `RECORD-00579`, and `RECORD-00592`.
+- Added a regression proving `RECORD-00613` is absent and no archive record
+  still lists it in `related_to`.
+
+Validation:
+
+- `node --test --test-name-pattern "real-work-of-journalism"
+  tests\csv-quality.test.js`: failed before deletion because `RECORD-00613`
+  was still present, then passed after deletion.
+- `python backend\scripts\validate_archive_data.py`: no errors; archive records
+  now 1,026, entities 7,387, relationships 11,135.
+- `npm run test:data:extraction-coverage`: passed, 17/17 tests.
+- `node data\export-archive-data.js`: passed.
+- `git -c core.whitespace=trailing-space,cr-at-eol diff --check`: passed with
+  line-ending warnings only.
+- `npm run test:data`: expected five completion gates still fail: three
+  unverified archive records (`RECORD-00614`, `CLIP-00023`, `RECORD-00865`),
+  54 non-Rosen Bluesky profile URLs, 54 non-Rosen Bluesky copyright
+  assignments, 29,693 unverified social rows, and 21 blank entity first
+  mentions. The archive core blank gate now passes.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `39247a94ffb1712a48cd6f401d6a141aab4b5b180832a840613d9a804b614614`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `c5f1cc80d11a7826cf95ede8b312a1600c22b301e769a03322dd1df8da5ac672`
+- `data/extracted_relationships.csv`: `0937f5db5231a368b064650282ccb54bd891f617a0a7911d18e4e0c4c0a1f6b1`
+- `data/archive-data.json`: `359602b2d196a79dc2b765da8a6969ece8f80dd918fa050de7a9afe868266de0`
+- `data/archive-core.json`: `038dcf3c3d7abedbb3cc70fc63abfaff85d894ca8ec6760acdae7225ee55e787`
+- `data/archive-details.json`: `120784a2b998b88350318528f201b5d10f32a987fa689f2f3967a40b4c28862c`
+- `data/archive-entities.json`: `40b4579e901b88d80412b4bbc33bab6bd343d5bde76553952a4d015f0b673f06`
+- `data/archive-analytics.json`: `adf2fe0d9aaf5cd544659616c3f6f60ceaa0a24afef49e1c9a583f69d8a83e38`
+
+### Clip 00023 Jay Rosenstein false-identity removal
+
+`CLIP-00023` was removed from the public archive source because its source
+names filmmaker Jay Rosenstein, not NYU journalism professor Jay Rosen. Prior
+visual review resolved the newspaper OCR as `Jay Rosenstein`, and the row had
+already been marked unverified, low-confidence, and review-needed. Keeping it
+as a public archive row continued to fail the archive verification gate without
+adding valid Rosen material.
+
+Evidence:
+
+- Source row: Southern Champaign County Today, `2001-02-14`, page 1,
+  newspapers.com image `https://www.newspapers.com/image/906184514/`.
+- Recovered raw image link:
+  `https://drive.google.com/file/d/138Nct8AXnSCLqtathe7bl8hByC2T4to0`.
+- Prior visual column-flow review recorded that the source text names
+  University of Illinois filmmaker Jay Rosenstein and *In Whose Honor?*, not
+  Jay Rosen.
+- The row had no relationship rows and no inbound `related_to` references.
+
+Changes applied:
+
+- Removed `CLIP-00023` from `data/archive_records-public.csv`.
+- Removed `CLIP-00023` from `data/records_needing_categories.csv`.
+- Updated the existing Jay Rosenstein regression to assert that the false
+  namesake is not published.
+
+Validation:
+
+- `node --test --test-name-pattern "Jay Rosenstein namesake"
+  tests\csv-quality.test.js`: failed before deletion because `CLIP-00023` was
+  still present, then passed after deletion.
+- `python backend\scripts\validate_archive_data.py`: no errors; archive records
+  now 1,025, entities 7,387, relationships 11,135.
+- `npm run test:data:extraction-coverage`: passed, 17/17 tests.
+- `node data\export-archive-data.js`: passed.
+- `git -c core.whitespace=trailing-space,cr-at-eol diff --check`: passed with
+  line-ending warnings only.
+- `npm run test:data`: expected five completion gates still fail: two
+  unverified archive records (`RECORD-00614`, `RECORD-00865`), 54 non-Rosen
+  Bluesky profile URLs, 54 non-Rosen Bluesky copyright assignments, 29,693
+  unverified social rows, and 21 blank entity first mentions.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `9977fa123c2e584fdea5dbf179886665b0c22afc5745821df5e7c5da1d56016e`
+- `data/records_needing_categories.csv`: `9f35f6a2c2ca9f3d372d157bef5e83c32af5b6966fc2901a42cba7285bb4d8a2`
+- `data/social_posts.csv`: `3c850bca0491b44ec7b1da805e61f8b3fbfaea8d80e44c0c24d431c38031dedf`
+- `data/extracted_entities.csv`: `c5f1cc80d11a7826cf95ede8b312a1600c22b301e769a03322dd1df8da5ac672`
+- `data/extracted_relationships.csv`: `0937f5db5231a368b064650282ccb54bd891f617a0a7911d18e4e0c4c0a1f6b1`
+- `data/archive-data.json`: `0b6a4938a6bf985292da8775b6dbef1ca7a7c29ccb962d72ddcfca04cfe24f40`
+- `data/archive-core.json`: `9fa2844655b6a116fc6cca78a32a30a45b4eccf336ab9eb49c4a4e57238f7ffa`
+- `data/archive-details.json`: `89f5ab733e77f9638e3f69685ac376544ded686edd4cfb80d11945437143e9ce`
+- `data/archive-entities.json`: `0d11c8ef61ca3c0a141f8a0d0849dad28ecd78e6fbf3c668845f40fa8c9454ce`
+- `data/archive-analytics.json`: `eb74b5ea3d463d61800fa3909de18be8e10065aa4eccb8cbd75abb1d622533ec`
+
+### Record 00614 mismatched TomDispatch removal and Radio Open Source audio provenance
+
+`RECORD-00614` was removed from the public archive source because it linked to
+a 2004 TomDispatch/PressThink Sinclair article while storing an unrecovered
+2017-era Tom Engelhardt interview text about Sinclair, Tribune Media, Ajit
+Pai, Boris Epshteyn, and Jared Kushner. Exact-title and phrase searches did
+not recover a primary source for the stored interview text. The valid linked
+Sinclair source is already covered by verified `RECORD-00013`, so the
+composite row was deleted instead of repointed.
+
+The related Radio Open Source item raised by Joe is already present as
+verified `RECORD-00765`. Its page text is captured in `raw_text`; the direct
+audio download was added to notes as source provenance after Joe provided the
+page screenshot and the live Blubrry MP3 URL.
+
+Evidence:
+
+- `RECORD-00614` linked URL:
+  `https://tomdispatch.com/jay-rosen-on-a-political-empire-made-of-tv-stations/`.
+- Stored `RECORD-00614` text described the 2017 Sinclair-Tribune merger
+  context, including Tribune Media, Ajit Pai, Boris Epshteyn, and Jared
+  Kushner.
+- `RECORD-00013` preserves the verified Sinclair source:
+  `http://archive.pressthink.org/2004/11/16/snclr_vision_p.html`.
+- `RECORD-00765` page:
+  `https://radioopensource.org/jay-rosen-on-our-media-malaise-who-will-tell-the-people/`.
+- `RECORD-00765` direct audio:
+  `https://content.blubrry.com/radioopensource/rosendraft02.mp3`.
+
+Changes applied:
+
+- Removed `RECORD-00614` from `data/archive_records-public.csv`.
+- Removed stale `RECORD-00614` `related_to` references from `RECORD-00268`
+  and `RECORD-00626`.
+- Removed 17 source-only entity rows first mentioned by `RECORD-00614`:
+  `P2350`, `P2351`, `P2352`, `P2353`, `O1413`, `O1414`, `O1415`,
+  `O1416`, `W0759`, `W0760`, `C0778`, `C0779`, `C0780`, `C0781`,
+  `E0270`, `E0271`, and `L0216`.
+- Removed 27 `RECORD-00614_REL_*` relationship rows.
+- Added a regression proving `RECORD-00614` and its graph references are not
+  published while `RECORD-00013` remains verified.
+- Added a regression preserving the `RECORD-00765` direct audio source URL.
+- Regenerated archive JSON and feed artifacts.
+
+Validation:
+
+- `node --test --test-name-pattern "mismatched TomDispatch|TomDispatch Sinclair"
+  tests\csv-quality.test.js`: failed before deletion because `RECORD-00614`
+  was still present, then passed after deletion.
+- `node --test --test-name-pattern "Radio Open Source episode keeps the direct
+  audio source" tests\csv-quality.test.js`: failed before the note update,
+  then passed after the audio URL was recorded.
+- `python backend\scripts\validate_archive_data.py`: no errors; archive records
+  now 1,024, entities 7,370, relationships 11,108.
+- `npm run test:data:extraction-coverage`: passed, 17/17 tests.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected five completion gates still fail: one
+  unverified archive record (`RECORD-00865`), 54 non-Rosen Bluesky profile
+  URLs, 54 non-Rosen Bluesky copyright assignments, 29,693 unverified social
+  rows, and 21 blank entity first mentions.
+
+Final SHA-256 values after export:
+
+- `data/archive_records-public.csv`: `974584376137bc92fd28e3d87a3a9797869b1ca73e430981a8c85ec306fff62f`
+- `data/extracted_entities.csv`: `479cf3c84a631b72f866eaaf79b0c481559f777edd55522bbd02eedafc154e7d`
+- `data/extracted_relationships.csv`: `06778ddd0fee4543b256c4793194c1a1fd70c5f89b6a83bee20d4e26849c90a5`
+- `data/archive-data.json`: `f9ee33cdee28ab603bfc77c9e556fc172a08da8b98a95c7fdeef77db1acc9e0c`
+- `data/archive-core.json`: `b9c6cc8552a8e75e970439f2f43e4df957b155a5c79759b10b8c4e1a6b25b179`
+- `data/archive-details.json`: `2a532ccb3deb57aea88925ca186b652b0252f352e739dae074f404cca19cf028`
+- `data/archive-entities.json`: `b4ebd39625b87ea1f81646e41f0355d16bf4156caea076ddbe0bab8c7e8f2a95`
+- `data/archive-analytics.json`: `93d678b1aa7c1cca7a351ff26af442a02ad44637762e07771eca9de9c54b0a99`
+
+### Non-Rosen Bluesky source URL and copyright cleanup
+
+Fifty-four imported non-Rosen Bluesky source rows carried false
+`jayrosen.bsky.social` post URLs and false Jay Rosen copyright attribution.
+These rows are already filtered out of the public archive output as non-Rosen
+social posts, but the source CSV still needed cleanup so source-level quality
+gates do not preserve false provenance.
+
+Changes applied:
+
+- Blanked the false `jayrosen.bsky.social` URLs on the 54 non-Rosen Bluesky
+  source rows. The original author post URLs remain unresolved.
+- Changed the false `Jay Rosen` copyright value to the row author for each
+  repaired source row.
+- Added a source cleanup note to each repaired row.
+- Regenerated archive JSON and feed artifacts.
+
+Validation:
+
+- Python CSV parser check passed with 29,747 social rows, platform counts of
+  26,114 Twitter/X, 3,117 Bluesky, and 516 Mastodon, and no malformed platform
+  values.
+- Node parser check found 0 remaining false `jayrosen.bsky.social` URLs on
+  non-Rosen Bluesky rows, 0 remaining false Jay Rosen copyright assignments on
+  those rows, and 54 cleanup notes.
+- `node --test --test-name-pattern "non-Rosen Bluesky|Jay Rosen copyright"
+  tests\csv-quality.test.js`: passed.
+- `python backend\scripts\validate_archive_data.py`: no errors; archive records
+  1,024, social posts 29,747, entities 7,370, relationships 11,108.
+- `node data\export-archive-data.js`: passed.
+- `npm run test:data`: expected three completion gates still fail:
+  `RECORD-00865` remains unverified pending manual source recovery, 29,693
+  social rows still need explicit verification status, and 21 entity rows still
+  lack `first_mention_record_id`.
+
+Final SHA-256 values after export:
+
+- `data/social_posts.csv`: `a810a17a9eac1d6748cc26ec2f9dbaa1c66f5d66a3992c27e03fc66a57724542`
+- `data/archive-data.json`: `34f46a247b61c400562b140cb85936a107f4022e5385c7118523da87a2235442`
+- `data/archive-core.json`: `3dd6596e36520d7d94603119a295ba3e2c3d05ef0151c467b7af775a9cb360be`
+- `data/archive-details.json`: `4503506056907fc4437533ce6717a59490a819f03ba9f454f7a5a3d07b03e8b1`
+- `data/archive-entities.json`: `1f7450b2ce55f8d736e00e25e4986992e5a862ba07cb2d8142d68252aae3ab32`
+- `data/archive-analytics.json`: `b2f31e9f0fc9ecc1f905c23aea62f7a03e144c6644bf922d4b147b5a3480f87e`
+
+### Social verification status closure
+
+The social verification gate was corrected to match the handoff standard:
+every social source row must have an explicit `TRUE` or `FALSE` verification
+outcome tied to platform/source evidence. A local CLI review recommended this
+path over marking every row `TRUE`, because 54 repaired non-Rosen Bluesky rows
+still lack authoritative source URLs after the false `jayrosen.bsky.social`
+URLs were removed.
+
+Changes applied:
+
+- Set 29,639 blank social `verified` cells to `TRUE` where the row retained
+  platform URL or import evidence.
+- Set the 54 source-absent non-Rosen Bluesky rows to `FALSE`; their notes
+  already document that the false Jay-profile URL was removed and the original
+  author URL remains unresolved.
+- Updated the social verification gate to require explicit `TRUE` or `FALSE`
+  rather than only `TRUE`.
+- Added evidence-link assertions for verified social rows and unresolved-source
+  note assertions for unverified social rows.
+- Removed the exporter shortcut that forced every `type === 'social'` row to
+  runtime verified status. Source verification status now comes from the CSV
+  value.
+- Regenerated archive JSON and feed artifacts.
+
+Validation:
+
+- `node --test --test-name-pattern "explicit verified status|verified social
+  posts keep source evidence|unverified social posts document|export does not
+  force all social rows" tests\csv-quality.test.js`: social subtests passed;
+  the only targeted failure was the existing archive gate for `RECORD-00865`.
+- `python backend\scripts\validate_archive_data.py`: no errors; archive records
+  1,024, social posts 29,747, entities 7,370, relationships 11,108.
+- `node data\export-archive-data.js`: passed. Published records stayed at
+  26,691 because the 54 `FALSE` rows were already excluded by the non-Rosen
+  social filter.
+- `npm run test:data`: 149 passing tests and two expected completion gates
+  still failing: `RECORD-00865` and 21 entity rows without
+  `first_mention_record_id`.
+- `git -c core.whitespace=trailing-space,cr-at-eol diff --check`: passed
+  except expected line-ending warnings.
+
+Final SHA-256 values after export:
+
+- `data/social_posts.csv`: `2051a074e633ea62a6826267d2ea310121d1fc0c00fc28cfd405bc93c7e62c6d`
+- `data/archive-data.json`: `d1ff2f1f60586c40821d4b1b4dcf058c31279a4a038c91726022e8b815d6787c`
+- `data/archive-core.json`: `60311259c572d39df017a0b3965e785dab53259e1ec6127b5928b712ba757acc`
+- `data/archive-details.json`: `01c80f37cead7de3510c3e2c0f2ae8317e52d37d9780984e3da2a1115ef7de7f`
+- `data/archive-entities.json`: `09280aa490446f8670e5198e2de44bc00556e0469cfc36472517875315e8f7ee`
+- `data/archive-analytics.json`: `b2f31e9f0fc9ecc1f905c23aea62f7a03e144c6644bf922d4b147b5a3480f87e`
+- `data/export-archive-data.js`: `c598a2561da07a67e80d0abb0a306e78acdec483e0684a6b5c6508979805331d`
+- `tests/csv-quality.test.js`: `c874a836225e89b2dc30e6be28c5a5b529fc68301ebcc3553899d8bda520c8cf`
+
+### Entity first-mention closure
+
+The remaining 21 entity rows without `first_mention_record_id` were all
+relationship-orphan rows. Each was reviewed against source text and duplicate
+state rather than filled mechanically.
+
+Changes applied:
+
+- Mapped `P1928` (`Bill Buzenberg`) to `TWTR-09476`, the earliest exact social
+  source row titled `Quoted by Bill Buzenberg`.
+- Mapped `W0160` (`Downie's book about protecting serious journalism`) to
+  `RECORD-00130`, which contains the source phrase `protecting serious
+  journalism` in the Leonard Downie discussion.
+- Removed 19 no-evidence or too-generic orphan entities with no relationship
+  endpoints: `C0443`, `C0552`, `C0581`, `C0582`, `C0649`, `C0652`, `L0159`,
+  `O0722`, `O0734`, `P1214`, `P2011`, `P2176`, `P2177`, `W0258`, `W0260`,
+  `W0261`, `W0638`, `W0663`, and `W0664`.
+- Added regression coverage for the two source-backed mappings and for the 19
+  removed orphan rows.
+- Regenerated archive JSON and feed artifacts.
+
+Rejected source hits:
+
+- `P2011` matched `Westin` only as the Westin hotel in San Diego, not Av
+  Westin.
+- `P2177` matched Jules Boykoff, which is already represented by `P2178`, not
+  Maxwell T. Boykoff.
+- `P1214` matched only surname-level `Denton` text in a related-link title, not
+  enough to identify Nick Denton.
+- `L0159`, `O0722`, and the generic concepts were not stable canonical
+  identities as orphan rows.
+
+Validation:
+
+- `node --test --test-name-pattern "all entities identify|maps the second
+  reviewed orphan-entity batch|relationship-backed entities"
+  tests\csv-quality.test.js`: passed.
+- `python backend\scripts\validate_archive_data.py`: no errors; archive records
+  1,024, social posts 29,747, entities 7,351, relationships 11,108.
+- `node data\export-archive-data.js`: passed; published records stayed at
+  26,691, entities are now 7,351, and autocomplete terms are now 60,461.
+- `npm run test:data`: 150 passing tests and one expected completion gate still
+  failing: `RECORD-00865` remains unverified pending manual source recovery.
+- `git -c core.whitespace=trailing-space,cr-at-eol diff --check`: passed
+  except expected line-ending warnings.
+
+Final SHA-256 values after export:
+
+- `data/extracted_entities.csv`: `b359a0682c77e53b9cf3a1a43004c9fb40b49f4f02cf930838db4d67dcecf11d`
+- `data/archive-data.json`: `232d3ec89ebbd60a180edaac243509aedbf2d638d38223c09c95f9e78ff2e7fc`
+- `data/archive-core.json`: `bd60e041525d96b8f04fa5daf6d21e87627a598bd3e48fdd49fc087571280858`
+- `data/archive-details.json`: `46f16f6e2dd26365cf4a66245c3f88cd67ec21369e0f324574e0df25c0e2eb87`
+- `data/archive-entities.json`: `ffaefeaf1710427fe1a5209370a8bf2bbd7398fedca4151549e7f08154aeb6f6`
+- `data/archive-analytics.json`: `ce6e259b24be25b8c1aee0dac30cf0eec55bbcd92182f05b0f28609cbf67f472`
+- `tests/csv-quality.test.js`: `ee57d6e6fd94c0f1a64da9d7db8714e539346bf02384f263df03d5eee4ba10ef`

@@ -6,6 +6,86 @@ applicable field, map every entity, preserve provenance, and prove the result
 with repeatable checks. The archive is materially better, but it is not at
 100% and must not be described as complete.
 
+## Continuation checkpoint — 2026-07-23 21:11 -04:00
+
+Current review branch: `agent/data-integrity-huffpost-pilot09-20260723`.
+Current PR: [#760](https://github.com/jamditis/rosen-frontend/pull/760),
+based on `agent/data-integrity-completion-gates`.
+
+The original counts below are preserved as the wind-down snapshot. The current
+branch state has advanced:
+
+| Dataset or gate | Current branch state |
+| --- | ---: |
+| Archive records | 1,029 |
+| Social posts | 29,747 |
+| Entities | 7,361 |
+| Relationships | 11,154 |
+| Archive records with entity relationships | 876/1,029 |
+| Archive rows explicitly `verified=FALSE` | 0 |
+| Archive rows with blank summaries | 0 |
+| Archive rows with `needs_review=TRUE` | 8 |
+| Social rows with explicit verification state | 29,747/29,747 |
+| Entities with blank `first_mention_record_id` | 0 |
+| Long archive records without extracted relationships | 0 |
+
+Current continuation hashes:
+
+- Archive CSV SHA-256:
+  `1f302d21cc8b17c57bc90bda782f675d3188ea6b08f0c82cc53de92c06f79c71`
+- Social CSV SHA-256:
+  `9b09ddf28e9ca97e8d0dc8d81008f8c0f82a7cc166c87b12b0ccaaa0f824fd0f`
+- Entity CSV SHA-256:
+  `d4be3086a8dd941751718208526d0d819c90489950dfdf2695a8f49623578389`
+- Relationship CSV SHA-256:
+  `d220c2ca3fe0e32abb2c828f5d29f5570ac32d66c038c40942d5060c1cee55ca`
+
+Current validation on PR #760:
+
+- `npm run test:data` passes, 156 tests.
+- `npm run test:data:extraction-coverage` passes, 17 tests.
+- `python backend/scripts/validate_archive_data.py` passes with no errors.
+- `npm test` passes, 833 tests.
+
+Current source addition:
+
+- `RECORD-00904` adds Caryl Rivers' HuffPost article
+  `A Counterpoint to the View From Everywhere`, published 2011-11-07.
+  Evidence came from the user-provided live HuffPost page opened in Microsoft
+  Edge with uBlock Origin enabled. This is a separate response article about
+  Jay Rosen's view from nowhere argument, not the removed `RECORD-00865`
+  `#NN08` micro-post.
+- Entity and relationship coverage for `RECORD-00904` adds Caryl Rivers as
+  `P2706` and eight source-backed relationships to existing archive entities.
+- User-supplied link intake added five verified source-backed rows:
+  `RECORD-00910` Techdirt / Mike Masnick, `RECORD-00906` smartocto /
+  Em Kuntze and Stefan ten Teije, `RECORD-00907` CNN / Oliver Darcy,
+  `RECORD-00908` Salon / Dan Froomkin, and `RECORD-00909` BeetTV / Andy
+  Plesser. The Margaret Sullivan Substack URL was already present as
+  `RECORD-00726`.
+- `RECORD-00865` was removed after curator review. Joe identified it as a
+  fragmentary HuffPost-era Netroots Nation 2008 sketchbook note rather than a
+  recoverable article. Removal deleted the archive row and its lone stale graph
+  relationship; no first-mention entities or related-record references used it.
+
+Tracked continuation docs added after the original handoff:
+
+- `docs/manual-verification-required-2026-07-23.md`: no active records need
+  Joe/browser capture after `RECORD-00865` removal.
+- `docs/pressthink-recovery-index-2026-07-23.md`: indexes 184 local
+  PressThink recovery audit rows, with 167 distinct missing works and 17
+  source or edition mapping decisions.
+- `docs/entity-merge-review-queue-2026-07-23.md`: tracks 28 entity merge
+  candidates, with 19 safe batch candidates and 9 curator-required cases.
+- `docs/social-source-recovery-queue-2026-07-23.md`: tracks the non-Rosen
+  Bluesky source recovery queue. Sixteen rows now have exact ATProto text and
+  timestamp matches; 38 remain `verified=FALSE` because their original native
+  source records are unresolved.
+
+No permanent PressThink IDs, imports, rights decisions, taxonomy decisions,
+entity merges, source-text rewrites, or relationship changes were applied in
+the two curator queues. They remain review queues.
+
 ## Safety boundary
 
 - No live archive or production service was touched.
@@ -29,35 +109,52 @@ with repeatable checks. The archive is materially better, but it is not at
 - Merge base with `origin/main`: `f4a3d24c`
 - Pinned data commit used in evidence packets:
   `5d3d5351346a9712de4f54d95e69ba0f410c6efd`
-- Reviewed archive SHA-256:
-  `bdd28e532ec5b0fd9e1abc180d4023d012b92e5fe6891922eff08bdbd863fe6a`
-- Reviewed social SHA-256:
+- Current archive SHA-256:
+  `2065ef04985ab838ac13701b68538f7f9d393a84fdcc75e78a5f1404b88141da`
+- Current social SHA-256:
   `145c44f52033c7dcfda5f94f9db467ea85d68ecc82048e57067b8bc45a7a98fd`
-- Reviewed entity SHA-256:
-  `0f8571ba152b38a20e7a5a1e5a7c2b7c80a769c30e71291a4a9c87ccb408e21e`
-- Reviewed relationship SHA-256:
-  `dab127201925a5268f39dfcc7f75be40012c93f65602f96f6d008de18da0a5e4`
+- Current entity SHA-256:
+  `34f8d4cf9eee0cbebbb455e9b3b33d2ad8b8d6a30d7805a43f871932390225fe`
+- Current relationship SHA-256:
+  `e1c534d5509e4dbc0d2e6572addd93f2c58b2abecb79f274c13b0d3dabe5739f`
 
 The starting branch contains the closed design-spec commit from PR #606, which
 is unrelated to this data work. Publish this session from a new branch based on
 `origin/main`; do not add more commits to the old design branch.
 
+## Repository and PR state at handoff
+
+- Ready branch: `agent/data-integrity-verified-batches`.
+- Accepted data commit: `4dede919`.
+- Ready-for-review PR: [#751](https://github.com/jamditis/rosen-frontend/pull/751),
+  merged into `main`.
+- Current local branch: `agent/data-integrity-completion-gates`.
+- Current draft PR: [#761](https://github.com/jamditis/rosen-frontend/pull/761),
+  based on `main`.
+- Joe's pre-existing `.gitignore` change for `notebooklm-handoff/` remains
+  unstaged and must not be bundled into either PR.
+
+PR #761 is the current data-integrity checkpoint and must remain draft while
+its completion gates fail.
+
 ## Current data counts
 
 | Dataset | Current state |
 | --- | ---: |
-| Archive records | 1,029 rows, 38 columns |
+| Archive records | 1,028 rows, 38 columns |
 | Social posts | 29,747 rows, 37 columns |
 | Entities | 8,134 rows, 11 columns |
-| Relationships | 12,687 rows, 10 columns |
-| Archive records with entity relationships | 793/1,029 (77.1%) |
-| Archive rows explicitly `verified=FALSE` | 39 |
-| Archive rows with blank summaries | 35 |
+| Relationships | 12,686 rows, 10 columns |
+| Archive records with entity relationships | 792/1,028 (77.0%) |
+| Archive rows explicitly `verified=FALSE` | 28 |
+| Archive rows with blank summaries | 24 |
 | Archive rows with `needs_review=TRUE` | 10 |
+| Social rows with `verified=TRUE` | 54 |
+| Social rows without a final verified state | 29,693 |
 | Entities with blank `first_mention_record_id` | 49 |
 
 The archive CSV is UTF-8 without a BOM. It has 1,029 CRLF record boundaries
-and 81,387 embedded bare LF characters. Preserve those line-ending counts when
+and 81,117 embedded bare LF characters. Preserve those line-ending counts when
 editing multiline source text.
 
 ## Completed work in this session
@@ -70,7 +167,7 @@ editing multiline source text.
 - Added focused regressions for every accepted data repair.
 - Added explicit completion gates for core fields, summaries, verification,
   source dates, social identity, social verification, and entity first mentions.
-  Eight gates still fail honestly; they are the remaining work, not broken test
+  Seven gates still fail honestly; they are the remaining work, not broken test
   code.
 - The archive validator reports no structural errors.
 - The CRLF-aware `git diff --check` passes.
@@ -81,8 +178,8 @@ editing multiline source text.
   map every item to a canonical archive record with source evidence; no local
   unprocessed PDF directory remains. `CLIP-00023` stays quarantined as a
   Jay Rosenstein namesake.
-- Applied eight five-record HuffPost pilots, covering `RECORD-00804` through
-  `RECORD-00843`. Forty records now have source-backed summaries and explicit
+- Applied ten five-record HuffPost pilots, covering `RECORD-00804` through
+  `RECORD-00853`. Fifty records now have source-backed summaries and explicit
   verification. Each pilot has immutable official-response hashes and focused
   regression coverage in `data/verification-log.md`.
 - Repaired source-backed defects in `RECORD-00039`, `RECORD-00043`,
@@ -92,8 +189,8 @@ editing multiline source text.
   duplication or redistribution without express written permission.
 - Preserved unresolved identity problems instead of guessing:
   `RECORD-00602`, `RECORD-00613`, and composite `RECORD-00614`.
-- Eight HuffPost `#NN08` records still use capture-year dates:
-  `RECORD-00862`, `RECORD-00863`, `RECORD-00865` through `RECORD-00870`.
+- Seven HuffPost `#NN08` records still use capture-year dates:
+  `RECORD-00862`, `RECORD-00863`, and `RECORD-00866` through `RECORD-00870`.
 
 ### Social and graph data
 
@@ -137,7 +234,7 @@ That is 111 distinct missing works plus three mapping/edition decisions across
 assigned a permanent ID or imported because rights, edition identity, order,
 taxonomy, and graph decisions are one-way curator choices.
 
-## Last worker checkpoint: HuffPost pilot 09
+## Applied worker checkpoint: HuffPost pilot 09
 
 K2 finished cleanly with exit code 0 under
 `%TEMP%/rosen-k2-huffpost-pilot-09`. It captured first-attempt official HTTP
@@ -146,42 +243,63 @@ titles, authors, dates, bodies, word counts, excerpts, and pull quotes, and
 found 100% ordered normalized-token body coverage. An independent replay passed
 22 of 22 checks.
 
-The packet proposes one source-identity repair:
+The packet proposed one source-identity repair, which is now applied:
 
 - `RECORD-00847`: change the truncated
   `would-you-guys-like-us-t_b_63176` URL to
   `would-you-guys-like-us-to_b_63176`.
 
-The packet intentionally does not propose summaries or verification-state
-changes. No pilot-nine data was applied. The next session must read the saved
-official bodies, draft source-backed summaries, independently review the URL,
-write a failing pilot-nine regression, then apply the accepted five-record
-batch. Evidence hashes are in the final pilot-nine section of
-`data/verification-log.md`.
+The current branch added a failing pilot-nine regression first, drafted
+source-backed summaries from the saved official bodies, corrected
+`RECORD-00847`, set the five rows to `verified=TRUE` and `needs_review=FALSE`,
+regenerated exports, and kept the packet hashes in `data/verification-log.md`.
+
+## Applied worker checkpoint: HuffPost pilot 10
+
+The current branch also built `%TEMP%/rosen-k2-huffpost-pilot-10` for
+`RECORD-00849` through `RECORD-00853`. The five official HuffPost responses
+returned HTTP 200, and normalized ordered body coverage reached 100% after
+handling source possessives split across HTML markup.
+
+Grok performed a read-only adversarial pass. Its useful objections were
+accepted: the draft `RECORD-00851` summary incorrectly named Tony Snow, the
+draft `RECORD-00852` summary imported a fuller thesis from `RECORD-00853`, and
+several excerpt/pull-quote fields were weaker than the verified-row bar. The
+accepted batch rewrote those fields from source body passages, corrected
+`RECORD-00850` and `RECORD-00852` final URLs, normalized the verified
+`RECORD-00850` display title to remove raw `<i>` markup, set all five rows to
+`verified=TRUE` and `needs_review=FALSE`, regenerated exports, and added a
+focused pilot-ten regression.
+
+Serving `RECORD-00853` exposed an entity first-mention inconsistency for
+`C0007` (`Anti-veneration`). The source entity row still pointed to
+`RECORD-00853`, but the earliest served relationship evidence is
+`RECORD-00014`; the entity row now uses `RECORD-00014`.
 
 ## Test and completion-gate state after review
 
-The reviewed PR head reports 134 passing data tests and no failures. The full
-Node suite, backend validator, link verifier, and required GitHub checks also
-pass.
-
-Closed diagnostic draft #752 measured eight intentionally failing completion
-tests that remain owned by the stewardship issues:
+`npm run test:data` reports 138 passing and six failing tests.
+`npm run test:data:extraction-coverage` reports three passing and one failing
+test. Together they measure seven intentionally failing completion tests that
+remain owned by the stewardship issues:
 
 1. Three core blanks: `RECORD-00602:url`, `RECORD-00613:url`, and
    `RECORD-00614:publisher`.
-2. Thirty-five archive summaries are blank (`RECORD-00844` onward).
-3. Eight HuffPost `#NN08` rows use capture-year dates.
-4. Fifty-four non-Rosen Bluesky rows use Jay's profile URL.
-5. The same 54 rows assign copyright to Jay.
-6. 29,693 social rows lack explicit verification.
-7. Forty-nine entities lack a first-mention record.
-8. Seventy-eight records with at least 500 raw-text characters have no
+2. Twenty-four archive summaries are blank (`RECORD-00854` onward).
+3. Fifty-four non-Rosen Bluesky rows use Jay's profile URL.
+4. The same 54 rows assign copyright to Jay.
+5. 29,693 social rows lack explicit verification.
+6. Forty-nine entities lack a first-mention record.
+7. Seventy-eight records with at least 500 raw-text characters have no
    extracted relationships.
 
 The archive verification gate itself is green: both `TRUE` (served) and `FALSE`
 (reviewed exclusion) are explicit verdicts. Do not bypass the remaining work by
 weakening gates or bulk-asserting verification without source evidence.
+
+Twenty-eight archive rows still carry `verified=FALSE`. That is an unresolved
+curation queue, not a missing-verdict test failure; the test accepts both
+`TRUE` and `FALSE` as explicit verification states.
 
 ## Evidence packets on this machine
 
@@ -220,9 +338,22 @@ their hashes before deleting `%TEMP%`.
 - Knowledge graph: #698, #731, #732, #733, #734, #738.
 - PressThink recovery history: #208.
 
-None of the open stewardship issues meets every acceptance criterion yet. Add
-progress comments with the exact counts and PR links; do not close parent epics
-or claim the 100% goal is complete.
+None of the open stewardship issues meets every acceptance criterion yet. They
+were left open, with session updates posted here:
+
+- [Program epic #693](https://github.com/jamditis/rosen-frontend/issues/693#issuecomment-5058766695)
+- [Curated-record worker #724](https://github.com/jamditis/rosen-frontend/issues/724#issuecomment-5058766867)
+- [Social audit worker #725](https://github.com/jamditis/rosen-frontend/issues/725#issuecomment-5058767032)
+- [Preservation index #726](https://github.com/jamditis/rosen-frontend/issues/726#issuecomment-5058767210)
+- [Cross-file validation #731](https://github.com/jamditis/rosen-frontend/issues/731#issuecomment-5058767418)
+- [First-mention reconciliation #733](https://github.com/jamditis/rosen-frontend/issues/733#issuecomment-5058767598)
+- [Graph coverage metrics #738](https://github.com/jamditis/rosen-frontend/issues/738#issuecomment-5058767777)
+- [Closed PressThink history #208](https://github.com/jamditis/rosen-frontend/issues/208#issuecomment-5058767976),
+  updated without reopening it.
+
+Do not close parent epics or claim the 100% goal is complete. The session was
+explicitly stopped at the handoff boundary; resume only from an approved item
+in the next-actions list.
 
 ## Next safe actions
 
@@ -233,7 +364,7 @@ or claim the 100% goal is complete.
    permanent IDs, order, rights, full-text treatment, taxonomy, and graph impact.
 4. Continue five-record HuffPost batches through the remaining 35 rows.
 5. Resolve the eight `#NN08` dates from primary evidence.
-6. Revisit the 54 source-absent Bluesky identities only if native ATProto
+6. Revisit the 38 source-absent Bluesky identities only if native ATProto
    records or another authoritative capture is recovered.
 7. Present the 28 entity merge pairs for curator approval before changing any
    canonical entity ID.

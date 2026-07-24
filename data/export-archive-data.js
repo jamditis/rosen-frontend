@@ -108,8 +108,7 @@ function processRecord(row, index, type, relationshipsMap, authoredExcerpts) {
   const isVerified = (row.verified || row.Verified) === 'TRUE' ||
                      (row.verified || row.Verified) === 'true' ||
                      (row.verified || row.Verified) === 'Yes' ||
-                     (row.verified || row.Verified) === true ||
-                     type === 'social';
+                     (row.verified || row.Verified) === true;
 
   // Extract thread_data for THREAD records
   // Check if thread_data column exists directly (from merged records)

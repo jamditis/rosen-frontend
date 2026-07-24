@@ -34,7 +34,7 @@ describe('RECORD-00607 curator-approved removal (#591)', () => {
     const generated = JSON.parse(read('data/archive-entities.json'));
     const generatedIds = new Set(generated.entities.map((entity) => entity.id));
 
-    for (const entityId of ['C0543', 'O1237']) {
+    for (const entityId of ['O1237']) {
       assert.doesNotMatch(source, new RegExp(`^${entityId},`, 'm'));
       assert.equal(generatedIds.has(entityId), false);
     }

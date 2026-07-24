@@ -5,18 +5,9 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records in the &quot;Technology &amp; Digital Media&quot; category</description>
     <language>en-us</language>
-    <lastBuildDate>Thu, 23 Jul 2026 18:05:24 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 24 Jul 2026 03:15:14 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/categories/technology-digital-media.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
-  <item>
-    <title>Jay Rosen&apos;s Internet Archive: an Introduction.</title>
-    <link>https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/</link>
-    <guid isPermaLink="true">https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/</guid>
-    <pubDate>Sun, 05 Jul 2026 00:00:00 GMT</pubDate>
-    <description>A Q&amp;A in which Jay Rosen introduces his internet archive, built and curated with Joe Amditis: a links-only collection of everything of Rosen&apos;s findable online, reaching back to his 1986 PhD dissertation and holding 26,615 records at launch. Rosen frames it as one media critic&apos;s attempt to preserve the web against link rot, a complement to the Internet Archive&apos;s Wayback Machine.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Technology &amp; Digital Media</category>
-  </item>
   <item>
     <title>It was a political hire, cont...</title>
     <link>https://bsky.app/profile/jayrosen.bsky.social/post/3mohf75js3k2j</link>
@@ -469,6 +460,15 @@
     <description>A Bluesky post by Jay Rosen from 2025-09-12. Topics: Technology &amp; Digital Media, Audience &amp; Public Engagement.</description>
     <category>Technology &amp; Digital Media</category>
     <category>Audience &amp; Public Engagement</category>
+  </item>
+  <item>
+    <title>One thing I curse about Blue Ski: that I cannot fix a typo like that one</title>
+    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3lynkns3btc2x</link>
+    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3lynkns3btc2x</guid>
+    <pubDate>Fri, 12 Sep 2025 00:00:00 GMT</pubDate>
+    <description>A Bluesky post by Jay Rosen from 2025-09-12. Topics: Technology &amp; Digital Media, Press &amp; Media Criticism.</description>
+    <category>Technology &amp; Digital Media</category>
+    <category>Press &amp; Media Criticism</category>
   </item>
   </channel>
 </rss>
