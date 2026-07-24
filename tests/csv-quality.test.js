@@ -1226,6 +1226,88 @@ describe('archive_records-public.csv', () => {
     }
   });
 
+  it('HuffPost pilot ten records match their official sources', () => {
+    const expected = new Map([
+      ['RECORD-00849', {
+        title: 'Rather Unbound',
+        url: 'https://www.huffpost.com/entry/rather-unbound_b_65563',
+        publicationDate: '2007-09-24',
+        wordCount: '1202',
+        rawTextSha: '3340135a7b379a8633e36b8f7c95aa0c27a38b6b261eeeb827d202470755fb1a',
+        excerpt: 'If I were to underline one thing about Dan Rather\'s $70 million suit against CBS, it\'s the theatricality of it, which is also the key to understanding Rather himself.',
+        pullQuote: 'If I were to underline one thing about Dan Rather\'s $70 million suit against CBS, it\'s the _theatricality_ of it, which is also the key to understanding Rather himself.',
+        summary: 'Rosen reads Dan Rather\'s lawsuit against CBS as a theatrical attempt to replay Rathergate and revive Rather\'s self-image as a driven reporter. He argues that the case is less about money than about putting CBS, the Bush National Guard story, and Rather\'s own legacy back on stage.',
+        sourceSha: 'b6741da8baf7628d4237fa9528672f9a6d24b37fec76b06c44292ec5027e1eab',
+      }],
+      ['RECORD-00850', {
+        title: 'The Hill Restores Armstrong Williams to Legitimacy. Why?',
+        url: 'https://www.huffpost.com/entry/the-hill-restores-armstro_b_77979',
+        publicationDate: '2007-12-23',
+        wordCount: '1124',
+        rawTextSha: '75c77a15a60f496db735f7d9529d82570c53c1caa3bbce1b8e5f13acee49d4f4',
+        excerpt: 'HuffPost readers will certainly remember Armstrong Williams, the conservative pundit, and TV talk show host who took $240,000 from the Department of Education to promote the No Child Left Behind Act on his show and in his column.',
+        pullQuote: 'He didn\'t disclose the deal because he couldn\'t disclose it without exposing the contract as fraudulent.',
+        summary: 'Rosen questions The Hill\'s decision to restore Armstrong Williams as a pundit after the 2005 Department of Education payola scandal. Through a Q&A with editor Hugo Gurdon, he presses whether Williams\'s undisclosed government contract made his journalism, broadcasting, public relations, and government contracting work ethically fraudulent.',
+        sourceSha: '2229ffaf2eca673c5151ff1d889c7122014d59125f623ad935a0bf5e59ba43dc',
+      }],
+      ['RECORD-00851', {
+        title: 'Yahoos Within the GOP Coalition Challenged on their Media Think',
+        url: 'https://www.huffpost.com/entry/yahoos-within-the-gop-coa_b_78654',
+        publicationDate: '2007-12-29',
+        wordCount: '1764',
+        rawTextSha: '761fffa4f70e34427eafb1d8b042f0da5fe4a77a967b60086c794229e1d85dea',
+        excerpt: 'One answer would be, for conservatives who have actually been in power, the liberal media thesis is a bit like the theory of intelligent design is for Rich Lowry and Peggy Noonan: an intellectual embarrassment.',
+        pullQuote: 'John Cole ("Enjoy your new GOP, folks...") and Andrew Sullivan ("This is their party. And they asked for every last bit of it...") pounced on the squirming shown as Huckabee climbed in the polls during December.',
+        summary: 'Rosen argues that Mike Huckabee\'s rise exposed contempt for social conservatives among conservative elites while hard-line liberal-media claims persisted in other parts of the GOP coalition. He contrasts that thesis with Dan Bartlett, Karl Rove, and Ari Fleischer treating the press as more professional, varied, and independent than the yahoo version allows.',
+        sourceSha: '094c0b519ef803c83f504f13395f6017875d5c7f1260fcf8c50058fc1e3e3659',
+      }],
+      ['RECORD-00852', {
+        title: 'When Candidate "Vetting" Runs off the Rails',
+        url: 'https://www.huffpost.com/entry/when-candidate-vetting-ru_b_88924',
+        publicationDate: '2008-02-28',
+        wordCount: '112',
+        rawTextSha: '2fd0be897328e359679db375ac829982e49c4322ffa7f3dea872acf646ce7bee',
+        excerpt: 'Each story went weirdly wrong. Each story left people scratching their heads: what were the Times editors thinking?',
+        pullQuote: 'Huff Post readers, bloggers, journalists, talk show hosts, onlookers: help me out.',
+        summary: 'Rosen asks readers to find the pattern among three New York Times candidate-vetting stories about Obama, Hillary Clinton, and John McCain. The short prompt says each story went weirdly wrong, left readers wondering what the editors were thinking, and reflected a vetting ritual with a touch of the bizarre.',
+        sourceSha: 'e6ecbe33ab28b04cad69d43c2befca17253a61ad44c05a0a7ecd60c390d45067',
+      }],
+      ['RECORD-00853', {
+        title: 'When Dumb Articles Happen to Smart Newspapers',
+        url: 'https://www.huffpost.com/entry/when-dumb-articles-happen_b_89809',
+        publicationDate: '2008-03-04',
+        wordCount: '1912',
+        rawTextSha: '03f54e83eb5a54551ff2b7a26a738a1478ec8a327aa77cfc2da115f0a1dc1e7f',
+        excerpt: 'Thursday I posted a little exercise in pattern recognition at the New York Times. Today I am back with the answers I received, plus some commentary on the Washington Post\'s "women are dumb" article, which fits the pattern in some ways.',
+        pullQuote: 'Thursday I posted a little exercise in pattern recognition at the New York Times.',
+        summary: 'Rosen follows up on his candidate-vetting pattern exercise with reader responses and a critique of Washington Post and New York Times stories that revealed newsroom self-image problems. He argues that smart newspapers produce dumb articles when narrative rituals and institutional self-regard overwhelm evidence.',
+        sourceSha: 'c657d296262eb839af1965ab8c7ced33a50523b40f290c7e9060d41b35b8a540',
+      }],
+    ]);
+
+    for (const [id, source] of expected) {
+      const record = archiveRecords.find(row => row.id === id);
+      assert.ok(record, `${id} must exist`);
+      assert.strictEqual(record.title, source.title);
+      assert.strictEqual(record.url, source.url);
+      assert.strictEqual(record.author, 'Jay Rosen');
+      assert.strictEqual(record.publication_date, source.publicationDate);
+      assert.strictEqual(record.word_count, source.wordCount);
+      assert.strictEqual(
+        crypto.createHash('sha256').update(record.raw_text).digest('hex'),
+        source.rawTextSha,
+        `${id} raw_text changed`
+      );
+      assert.strictEqual(record.excerpt, source.excerpt);
+      assert.strictEqual(record.pull_quote, source.pullQuote);
+      assert.strictEqual(record.summary, source.summary);
+      assert.strictEqual(record.verified, 'TRUE');
+      assert.strictEqual(record.needs_review, 'FALSE');
+      assert.match(record.notes, /Official HuffPost source verified 2026-07-24/);
+      assert.match(record.notes, new RegExp(source.sourceSha));
+    }
+  });
+
   it('RECORD-00614 cannot verify mismatched TomDispatch works', () => {
     const record = archiveRecords.find(row => row.id === 'RECORD-00614');
     assert.ok(record, 'RECORD-00614 must exist');

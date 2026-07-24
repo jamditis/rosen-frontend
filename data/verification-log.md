@@ -4213,3 +4213,65 @@ The update reduced archive rows with blank summaries from 34 to 29 and archive
 rows explicitly marked `verified=FALSE` from 38 to 33. The archive CSV remains
 1,028 rows by 38 columns, UTF-8 without a BOM, with 1,029 CRLF record
 boundaries and 81,117 embedded bare LF characters.
+
+### HuffPost verification pilot 10 evidence packet and application
+
+The branch built `%TEMP%/rosen-k2-huffpost-pilot-10` for `RECORD-00849` through
+`RECORD-00853`. All five official HuffPost requests succeeded with HTTP 200:
+
+- `RECORD-00849`: 423,158 bytes; `b6741da8baf7628d4237fa9528672f9a6d24b37fec76b06c44292ec5027e1eab`
+- `RECORD-00850`: 416,826 bytes; `2229ffaf2eca673c5151ff1d889c7122014d59125f623ad935a0bf5e59ba43dc`
+- `RECORD-00851`: 433,345 bytes; `094c0b519ef803c83f504f13395f6017875d5c7f1260fcf8c50058fc1e3e3659`
+- `RECORD-00852`: 412,959 bytes; `e6ecbe33ab28b04cad69d43c2befca17253a61ad44c05a0a7ecd60c390d45067`
+- `RECORD-00853`: 454,346 bytes; `c657d296262eb839af1965ab8c7ced33a50523b40f290c7e9060d41b35b8a540`
+
+The first local body-coverage pass produced a false low score for
+`RECORD-00850` because the source HTML split `_The Hill_'s` across markup. After
+normalizing possessives, all five stored bodies reached 100% ordered normalized
+token coverage against the saved official response.
+
+Grok reviewed the packet in read-only mode. The useful objections were accepted:
+the first `RECORD-00851` summary incorrectly named Tony Snow, the first
+`RECORD-00852` summary imported the fuller thesis from `RECORD-00853`, and
+several excerpt/pull-quote fields needed stronger body grounding before the
+rows could be marked verified.
+
+Accepted row changes:
+
+- `RECORD-00849`: added a summary about Rather's CBS lawsuit, Rathergate, the
+  Bush National Guard story, and Rather's self-image as a driven reporter.
+- `RECORD-00850`: corrected the URL to
+  `https://www.huffpost.com/entry/the-hill-restores-armstro_b_77979`,
+  normalized the verified display title to remove raw `<i>` markup, replaced
+  the excerpt with a source-body passage, and added a summary about Rosen's Q&A
+  with Hugo Gurdon over The Hill restoring Armstrong Williams after the payola
+  scandal.
+- `RECORD-00851`: replaced the excerpt and pull quote with source-body
+  passages and added a summary about conservative elite contempt, the
+  liberal-media thesis, Dan Bartlett, Karl Rove, and Ari Fleischer.
+- `RECORD-00852`: corrected the URL to
+  `https://www.huffpost.com/entry/when-candidate-vetting-ru_b_88924`,
+  replaced the excerpt with a source-body passage, and added a summary that
+  keeps the record as a short reader prompt rather than importing the later
+  thesis from `RECORD-00853`.
+- `RECORD-00853`: replaced the excerpt with a source-body passage and added a
+  summary about the pattern-recognition follow-up, reader answers, and newsroom
+  self-image problems in Washington Post and New York Times stories.
+
+All five rows are now `verified=TRUE` and `needs_review=FALSE`, with notes
+pointing to `%TEMP%/rosen-k2-huffpost-pilot-10` and their saved HTTP 200 source
+SHA-256 values. A failing pilot-ten regression was added first and now passes.
+The archive CSV SHA-256 after application is
+`2065ef04985ab838ac13701b68538f7f9d393a84fdcc75e78a5f1404b88141da`.
+
+Serving `RECORD-00853` surfaced a source entity first-mention mismatch:
+`C0007` (`Anti-veneration`) pointed to `RECORD-00853`, but
+`RECORD-00014` has two earlier served `C0007` relationship edges. The canonical
+entity row now uses `RECORD-00014` with a note documenting the correction. The
+entity CSV SHA-256 after this repair is
+`34f8d4cf9eee0cbebbb455e9b3b33d2ad8b8d6a30d7805a43f871932390225fe`.
+
+The update reduced archive rows with blank summaries from 29 to 24 and archive
+rows explicitly marked `verified=FALSE` from 33 to 28. The archive CSV remains
+1,028 rows by 38 columns, UTF-8 without a BOM, with 1,029 CRLF record
+boundaries and 81,117 embedded bare LF characters.

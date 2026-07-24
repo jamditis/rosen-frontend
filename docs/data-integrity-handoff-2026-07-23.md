@@ -30,11 +30,11 @@ with repeatable checks. The archive is materially better, but it is not at
 - Pinned data commit used in evidence packets:
   `5d3d5351346a9712de4f54d95e69ba0f410c6efd`
 - Current archive SHA-256:
-  `11ffcaa406a01a95dcdf24045675a42b8aaadfdd7429045fb654397e398186b8`
+  `2065ef04985ab838ac13701b68538f7f9d393a84fdcc75e78a5f1404b88141da`
 - Current social SHA-256:
   `145c44f52033c7dcfda5f94f9db467ea85d68ecc82048e57067b8bc45a7a98fd`
 - Current entity SHA-256:
-  `0f8571ba152b38a20e7a5a1e5a7c2b7c80a769c30e71291a4a9c87ccb408e21e`
+  `34f8d4cf9eee0cbebbb455e9b3b33d2ad8b8d6a30d7805a43f871932390225fe`
 - Current relationship SHA-256:
   `e1c534d5509e4dbc0d2e6572addd93f2c58b2abecb79f274c13b0d3dabe5739f`
 
@@ -66,8 +66,8 @@ its completion gates fail.
 | Entities | 8,134 rows, 11 columns |
 | Relationships | 12,686 rows, 10 columns |
 | Archive records with entity relationships | 792/1,028 (77.0%) |
-| Archive rows explicitly `verified=FALSE` | 33 |
-| Archive rows with blank summaries | 29 |
+| Archive rows explicitly `verified=FALSE` | 28 |
+| Archive rows with blank summaries | 24 |
 | Archive rows with `needs_review=TRUE` | 10 |
 | Social rows with `verified=TRUE` | 54 |
 | Social rows without a final verified state | 29,693 |
@@ -98,8 +98,8 @@ editing multiline source text.
   map every item to a canonical archive record with source evidence; no local
   unprocessed PDF directory remains. `CLIP-00023` stays quarantined as a
   Jay Rosenstein namesake.
-- Applied nine five-record HuffPost pilots, covering `RECORD-00804` through
-  `RECORD-00848`. Forty-five records now have source-backed summaries and explicit
+- Applied ten five-record HuffPost pilots, covering `RECORD-00804` through
+  `RECORD-00853`. Fifty records now have source-backed summaries and explicit
   verification. Each pilot has immutable official-response hashes and focused
   regression coverage in `data/verification-log.md`.
 - Repaired source-backed defects in `RECORD-00039`, `RECORD-00043`,
@@ -181,16 +181,38 @@ source-backed summaries from the saved official bodies, corrected
 `RECORD-00847`, set the five rows to `verified=TRUE` and `needs_review=FALSE`,
 regenerated exports, and kept the packet hashes in `data/verification-log.md`.
 
+## Applied worker checkpoint: HuffPost pilot 10
+
+The current branch also built `%TEMP%/rosen-k2-huffpost-pilot-10` for
+`RECORD-00849` through `RECORD-00853`. The five official HuffPost responses
+returned HTTP 200, and normalized ordered body coverage reached 100% after
+handling source possessives split across HTML markup.
+
+Grok performed a read-only adversarial pass. Its useful objections were
+accepted: the draft `RECORD-00851` summary incorrectly named Tony Snow, the
+draft `RECORD-00852` summary imported a fuller thesis from `RECORD-00853`, and
+several excerpt/pull-quote fields were weaker than the verified-row bar. The
+accepted batch rewrote those fields from source body passages, corrected
+`RECORD-00850` and `RECORD-00852` final URLs, normalized the verified
+`RECORD-00850` display title to remove raw `<i>` markup, set all five rows to
+`verified=TRUE` and `needs_review=FALSE`, regenerated exports, and added a
+focused pilot-ten regression.
+
+Serving `RECORD-00853` exposed an entity first-mention inconsistency for
+`C0007` (`Anti-veneration`). The source entity row still pointed to
+`RECORD-00853`, but the earliest served relationship evidence is
+`RECORD-00014`; the entity row now uses `RECORD-00014`.
+
 ## Test and completion-gate state after review
 
-`npm run test:data` reports 137 passing and six failing tests.
+`npm run test:data` reports 138 passing and six failing tests.
 `npm run test:data:extraction-coverage` reports three passing and one failing
 test. Together they measure seven intentionally failing completion tests that
 remain owned by the stewardship issues:
 
 1. Three core blanks: `RECORD-00602:url`, `RECORD-00613:url`, and
    `RECORD-00614:publisher`.
-2. Twenty-nine archive summaries are blank (`RECORD-00849` onward).
+2. Twenty-four archive summaries are blank (`RECORD-00854` onward).
 3. Fifty-four non-Rosen Bluesky rows use Jay's profile URL.
 4. The same 54 rows assign copyright to Jay.
 5. 29,693 social rows lack explicit verification.
@@ -202,7 +224,7 @@ The archive verification gate itself is green: both `TRUE` (served) and `FALSE`
 (reviewed exclusion) are explicit verdicts. Do not bypass the remaining work by
 weakening gates or bulk-asserting verification without source evidence.
 
-Thirty-three archive rows still carry `verified=FALSE`. That is an unresolved
+Twenty-eight archive rows still carry `verified=FALSE`. That is an unresolved
 curation queue, not a missing-verdict test failure; the test accepts both
 `TRUE` and `FALSE` as explicit verification states.
 
