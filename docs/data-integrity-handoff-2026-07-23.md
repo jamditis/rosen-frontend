@@ -29,14 +29,14 @@ with repeatable checks. The archive is materially better, but it is not at
 - Merge base with `origin/main`: `f4a3d24c`
 - Pinned data commit used in evidence packets:
   `5d3d5351346a9712de4f54d95e69ba0f410c6efd`
-- Reviewed archive SHA-256:
-  `bdd28e532ec5b0fd9e1abc180d4023d012b92e5fe6891922eff08bdbd863fe6a`
-- Reviewed social SHA-256:
+- Current archive SHA-256:
+  `1ade8e3e09868a82f0b9cd916e9a5d922c0b7b6c558ae76fe7d0092c782e0394`
+- Current social SHA-256:
   `145c44f52033c7dcfda5f94f9db467ea85d68ecc82048e57067b8bc45a7a98fd`
-- Reviewed entity SHA-256:
+- Current entity SHA-256:
   `0f8571ba152b38a20e7a5a1e5a7c2b7c80a769c30e71291a4a9c87ccb408e21e`
-- Reviewed relationship SHA-256:
-  `dab127201925a5268f39dfcc7f75be40012c93f65602f96f6d008de18da0a5e4`
+- Current relationship SHA-256:
+  `e1c534d5509e4dbc0d2e6572addd93f2c58b2abecb79f274c13b0d3dabe5739f`
 
 The starting branch contains the closed design-spec commit from PR #606, which
 is unrelated to this data work. Publish this session from a new branch based on
@@ -62,20 +62,20 @@ and must remain draft while its nine completion gates fail.
 
 | Dataset | Current state |
 | --- | ---: |
-| Archive records | 1,029 rows, 38 columns |
+| Archive records | 1,028 rows, 38 columns |
 | Social posts | 29,747 rows, 37 columns |
 | Entities | 8,134 rows, 11 columns |
-| Relationships | 12,687 rows, 10 columns |
-| Archive records with entity relationships | 793/1,029 (77.1%) |
-| Archive rows explicitly `verified=FALSE` | 39 |
-| Archive rows with blank summaries | 35 |
+| Relationships | 12,686 rows, 10 columns |
+| Archive records with entity relationships | 792/1,028 (77.0%) |
+| Archive rows explicitly `verified=FALSE` | 38 |
+| Archive rows with blank summaries | 34 |
 | Archive rows with `needs_review=TRUE` | 10 |
 | Social rows with `verified=TRUE` | 54 |
 | Social rows without a final verified state | 29,693 |
 | Entities with blank `first_mention_record_id` | 49 |
 
-The archive CSV is UTF-8 without a BOM. It has 1,029 CRLF record boundaries
-and 81,387 embedded bare LF characters. Preserve those line-ending counts when
+The archive CSV is UTF-8 without a BOM. It has 1,028 CRLF record boundaries
+and 81,250 embedded bare LF characters. Preserve those line-ending counts when
 editing multiline source text.
 
 ## Completed work in this session
@@ -110,8 +110,11 @@ editing multiline source text.
   duplication or redistribution without express written permission.
 - Preserved unresolved identity problems instead of guessing:
   `RECORD-00602`, `RECORD-00613`, and composite `RECORD-00614`.
-- Eight HuffPost `#NN08` records still use capture-year dates:
-  `RECORD-00862`, `RECORD-00863`, `RECORD-00865` through `RECORD-00870`.
+- Seven HuffPost `#NN08` records still use capture-year dates:
+  `RECORD-00862`, `RECORD-00863`, and `RECORD-00866` through `RECORD-00870`.
+- Removed `RECORD-00865` and its lone relationship after curator review. The
+  record was a fragment from the Netroots Nation 2008 sketchbook flow, with no
+  direct authored body beyond the title-like snippet.
 
 ### Social and graph data
 
@@ -179,17 +182,15 @@ batch. Evidence hashes are in the final pilot-nine section of
 
 ## Test and completion-gate state after review
 
-The reviewed PR head reports 134 passing data tests and no failures. The full
-Node suite, backend validator, link verifier, and required GitHub checks also
-pass.
-
-Closed diagnostic draft #752 measured eight intentionally failing completion
-tests that remain owned by the stewardship issues:
+`npm run test:data` reports 135 passing and seven failing tests.
+`npm run test:data:extraction-coverage` reports three passing and one failing
+test. Together they measure eight intentionally failing completion tests that
+remain owned by the stewardship issues:
 
 1. Three core blanks: `RECORD-00602:url`, `RECORD-00613:url`, and
    `RECORD-00614:publisher`.
-2. Thirty-five archive summaries are blank (`RECORD-00844` onward).
-3. Eight HuffPost `#NN08` rows use capture-year dates.
+2. Thirty-four archive summaries are blank (`RECORD-00844` onward).
+3. Seven HuffPost `#NN08` rows use capture-year dates.
 4. Fifty-four non-Rosen Bluesky rows use Jay's profile URL.
 5. The same 54 rows assign copyright to Jay.
 6. 29,693 social rows lack explicit verification.
@@ -200,6 +201,10 @@ tests that remain owned by the stewardship issues:
 The archive verification gate itself is green: both `TRUE` (served) and `FALSE`
 (reviewed exclusion) are explicit verdicts. Do not bypass the remaining work by
 weakening gates or bulk-asserting verification without source evidence.
+
+Thirty-eight archive rows still carry `verified=FALSE`. That is an unresolved
+curation queue, not a missing-verdict test failure; the test accepts both
+`TRUE` and `FALSE` as explicit verification states.
 
 ## Evidence packets on this machine
 
@@ -263,7 +268,7 @@ in the next-actions list.
 3. Prepare a curator proposal for importing the 111 confirmed works, including
    permanent IDs, order, rights, full-text treatment, taxonomy, and graph impact.
 4. Continue five-record HuffPost batches through the remaining 35 rows.
-5. Resolve the eight `#NN08` dates from primary evidence.
+5. Resolve the seven remaining `#NN08` dates from primary evidence.
 6. Revisit the 54 source-absent Bluesky identities only if native ATProto
    records or another authoritative capture is recovered.
 7. Present the 28 entity merge pairs for curator approval before changing any

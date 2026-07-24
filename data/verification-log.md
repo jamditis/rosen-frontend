@@ -1223,9 +1223,10 @@ cohort suitable for a deterministic source-evidence pass followed by separate
 model-assisted metadata proposals under #724. Source verification and semantic
 enrichment must not be collapsed into one model decision.
 
-The current failing date gate identifies ten `#NN08` rows whose
-`publication_date` was copied from a 2013 or 2016 Wayback capture instead of the
-2008 post. Eight stored raw-text bodies explicitly print the 2008 source date:
+At the pre-pilot checkpoint, the failing date gate identified ten `#NN08` rows
+whose `publication_date` was copied from a 2013 or 2016 Wayback capture instead
+of the 2008 post. Eight stored raw-text bodies explicitly print the 2008 source
+date:
 `RECORD-00861` prints 2008-07-17, while `RECORD-00862`, `RECORD-00863`,
 `RECORD-00864`, `RECORD-00866`, `RECORD-00867`, `RECORD-00869`, and
 `RECORD-00870` print 2008-07-19. `RECORD-00865` and `RECORD-00868` contain
@@ -1257,13 +1258,13 @@ title, author, snapshot URI and hash, content-versus-chrome classification, and
 an external call log. It must not write CSV data or generate summaries, tags,
 concepts, rights claims, or entity mappings.
 
-Publishing this cohort has graph impact. All 75 rows already source 1,862
-relationship assertions, and 69 are the first mention for the 465 entities that
-currently dangle only in the published runtime. The two chrome-contaminated
-rows already source five assertions in total, apparently extracted from their
-titles. A verification flag must not be approved as an isolated cell edit: the
-review preview needs the record, its entity first mentions, and all affected
-assertions so source contamination cannot enter the public graph unnoticed.
+Publishing this cohort had graph impact. All 75 rows sourced 1,862 relationship
+assertions, and 69 were the first mention for the 465 entities that dangled
+only in the published runtime. The two chrome-contaminated rows sourced five
+assertions in total, apparently extracted from their titles. A verification
+flag must not be approved as an isolated cell edit: the review preview needs
+the record, its entity first mentions, and all affected assertions so source
+contamination cannot enter the public graph unnoticed.
 
 ## Published content-overlay defect in RECORD-00039
 
@@ -1453,11 +1454,23 @@ toolbar chrome. A source-only cleanup proposal may retain the source title as
 authored text while excluding page interface text; semantic enrichment remains
 out of scope for this pilot.
 
-The five records currently source 15 relationship assertions and six entity
-first mentions. Their relationship context is title-derived, but publication
-still needs a graph preview: one assertion can encode an inference even when
-its words appear in the title. K2 is assigned to classify those contexts as
-directly supported, title-derived only, contradicted, or review-needed.
+### Curator removal of `RECORD-00865`
+
+On July 24, 2026, Joe identified `RECORD-00865` as a Netroots Nation 2008
+sketchbook fragment rather than a durable archive work. The record had no
+direct authored body beyond the title-like snippet and one title-derived
+relationship to Rick Perlstein and Netroots Nation 2008. The canonical CSV now
+removes `RECORD-00865` and `RECORD-00865_REL_001`; entity `P2345` remains
+because Rick Perlstein has earlier independent evidence in the graph. This
+drops the remaining unverified archive count by one and the remaining
+capture-year `#NN08` date gate from eight rows to seven.
+
+At the staging checkpoint, the five-record pilot sourced 15 relationship
+assertions and six entity first mentions. Their relationship context was
+title-derived, but publication still needed a graph preview: one assertion
+could encode an inference even when its words appeared in the title. K2 was
+assigned to classify those contexts as directly supported, title-derived only,
+contradicted, or review-needed.
 
 ### External call log for the HuffPost staging pass
 
