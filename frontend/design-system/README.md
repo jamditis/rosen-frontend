@@ -162,6 +162,24 @@ behavior, or route-level testing.
 - Migrate one coherent surface per pull request and compare it at mobile,
   tablet, and desktop widths.
 
+## Visual restraint
+
+Use expressive archival treatments for orientation, narrative context, and
+primary artifacts. A landing page can earn a dark editorial field, a clipped
+label, or one offset signal panel when those choices help a reader understand
+where they are and why the material matters.
+
+Dense utility routes should let the system recede. Archive results, entity
+lists, analytics, repeated filters, and research tools should prefer compact
+density, plain paper, strong rules, and predictable controls. Repeated shadows,
+rotated elements, and competing signal colors make those surfaces harder to
+scan.
+
+Specialized modes keep their own visual identity. The dissertation may remain
+dark and book-like; Rosen 98 may keep teal wallpaper, blue title bars, and
+spatial windows. Shared tokens should improve contrast, focus, and state without
+making either mode look like the standard archive.
+
 ## Release checks
 
 When a deployable stylesheet changes:
