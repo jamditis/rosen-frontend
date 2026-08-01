@@ -903,9 +903,25 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       await page.mouse.up();
       await page.waitForTimeout(150);
     };
+    const installHistoryProbe = async (name) => page.evaluate((probeName) => {
+      const predecessor = new URL(window.location.href);
+      const baseline = new URL(window.location.href);
+      predecessor.searchParams.set('_history', `${probeName}-predecessor`);
+      baseline.searchParams.set('_history', `${probeName}-baseline`);
+      window.history.replaceState(window.history.state, '', predecessor);
+      window.history.pushState(window.history.state, '', baseline);
+      return {
+        predecessorUrl: predecessor.href,
+        baselineUrl: baseline.href,
+      };
+    }, name);
+    const assertUrl = (expectedUrl, context) => {
+      if (page.url() !== expectedUrl) {
+        throw new Error(`${context}: expected ${expectedUrl}, got ${page.url()}`);
+      }
+    };
 
-    const backgroundHistoryLength = await page.evaluate(() => history.length);
-    const analyticsUrlBeforeBackgroundDrag = page.url();
+    const backgroundProbe = await installHistoryProbe('background-drag');
     const entityPositionBeforeDrag = await storedPosition('entities');
     const startButton = page.getByRole('button', { name: 'Start', exact: true });
     await startButton.focus();
@@ -915,12 +931,7 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     await dragTitlebar('entities', 8, 8);
     await startMenu.waitFor({ state: 'hidden' });
     await page.waitForURL((url) => url.hash === '#desktop/entities');
-    const backgroundHistoryAfter = await page.evaluate(() => history.length);
-    if (backgroundHistoryAfter !== backgroundHistoryLength + 1) {
-      throw new Error(
-        `Background window drag did not create exactly one activation history entry: ${backgroundHistoryLength} -> ${backgroundHistoryAfter}`,
-      );
-    }
+    const entitiesUrlAfterBackgroundDrag = page.url();
     await assertFocused(page.locator('#desktop-window-title-entities'), 'Background window after drag');
     await assertRecoverable('entities');
     const movedEntityPosition = await storedPosition('entities');
@@ -935,25 +946,27 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     }
 
     await page.goBack({ waitUntil: 'networkidle' });
-    if (page.url() !== analyticsUrlBeforeBackgroundDrag) {
-      throw new Error(`Back after background drag lost the prior active window: ${page.url()}`);
-    }
+    assertUrl(backgroundProbe.baselineUrl, 'Background drag did not create exactly one activation entry');
     const analyticsTitle = page.locator('#desktop-window-title-analytics');
     await assertFocused(analyticsTitle, 'Analytics after background-drag Back');
+    await page.goBack({ waitUntil: 'networkidle' });
+    assertUrl(backgroundProbe.predecessorUrl, 'Background drag baseline did not retain its predecessor');
+    await page.goForward({ waitUntil: 'networkidle' });
+    assertUrl(backgroundProbe.baselineUrl, 'Background drag baseline was not forward-recoverable');
+    await page.goForward({ waitUntil: 'networkidle' });
+    assertUrl(entitiesUrlAfterBackgroundDrag, 'Background drag activation was not forward-recoverable');
+    await assertFocused(
+      page.locator('#desktop-window-title-entities'),
+      'Entities after background-drag Forward',
+    );
+    await page.goBack({ waitUntil: 'networkidle' });
+    assertUrl(backgroundProbe.baselineUrl, 'Background drag did not return to the Analytics baseline');
+    await assertFocused(analyticsTitle, 'Analytics after background-drag recovery');
 
-    const activeHistoryLength = await page.evaluate(() => history.length);
-    const activeUrl = page.url();
+    const activeProbe = await installHistoryProbe('active-drag');
     const analyticsBeforeDrag = await storedPosition('analytics');
     await dragTitlebar('analytics', viewport.width - 8, viewport.height - 68);
-    const activeHistoryAfter = await page.evaluate(() => history.length);
-    if (page.url() !== activeUrl || activeHistoryAfter !== activeHistoryLength) {
-      throw new Error(`Window drag changed browser history: ${JSON.stringify({
-        beforeUrl: activeUrl,
-        afterUrl: page.url(),
-        beforeLength: activeHistoryLength,
-        afterLength: activeHistoryAfter,
-      })}`);
-    }
+    assertUrl(activeProbe.baselineUrl, 'Active window drag changed the current URL');
     const analyticsAfterDrag = await storedPosition('analytics');
     if (
       !analyticsAfterDrag
@@ -973,6 +986,11 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       throw new Error(`Active drag did not leave visible focus: ${JSON.stringify(pointerFocusOutline)}`);
     }
     await assertRecoverable('analytics');
+    await page.goBack({ waitUntil: 'networkidle' });
+    assertUrl(activeProbe.predecessorUrl, 'Active window drag added a browser-history entry');
+    await page.goForward({ waitUntil: 'networkidle' });
+    assertUrl(activeProbe.baselineUrl, 'Active window drag baseline was not forward-recoverable');
+    await assertFocused(analyticsTitle, 'Analytics after active-drag history probe');
   }
   if (route.verifyWindowMoveControls && viewport.name === 'desktop') {
     const moveButton = page.getByRole('button', { name: 'Move Analytics', exact: true });
