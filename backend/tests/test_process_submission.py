@@ -197,12 +197,29 @@ class TestHappyPath:
         assert final['record_id'] == result['record_id']
         # SFTP fired exactly once
         sftp_mock.assert_called_once_with(record_ids=(result['record_id'],))
-        # git commit subprocess invoked with the record id in the message
+        # The input data commit lands first, then a census regeneration and
+        # focused freshness check produce a second report-only commit before
+        # the branch is pushed.
         git_calls = [c for c in process_submission.subprocess.run.call_args_list
                      if c.args[0][:2] == ['git', 'commit']]
-        assert git_calls, 'expected at least one git commit invocation'
+        assert len(git_calls) == 2
         msg = ' '.join(git_calls[0].args[0])
         assert result['record_id'] in msg
+        commands = [c.args[0]
+                    for c in process_submission.subprocess.run.call_args_list]
+        assert ['npm', 'run', 'census:stewardship'] in commands
+        assert ['node', '--test', 'tests/stewardship-census.test.js'] in commands
+        census_add = next(
+            cmd for cmd in commands
+            if cmd[:2] == ['git', 'add']
+            and 'data/stewardship-census.json' in cmd
+        )
+        assert census_add[2:] == [
+            'data/stewardship-census.json',
+            'data/stewardship-census.md',
+        ]
+        assert commands.index(['git', 'push', 'origin', 'HEAD:main']) \
+            > commands.index(git_calls[1].args[0])
 
 
 class TestDedup:
@@ -332,6 +349,31 @@ class TestTestSuiteFailure:
         assert final['status'] == 'error'
         # Output is truncated to <= 500 chars in the error field.
         assert len(final['error']) <= 600  # leave room for prefix wording
+
+    def test_census_failure_blocks_push(self, monkeypatch, csv_with_headers):
+        _stub_schema(monkeypatch)
+        _stub_dispatcher_ok(monkeypatch)
+        sheets_mock = _stub_sheets(monkeypatch)
+        sftp_mock = _stub_sftp(monkeypatch)
+
+        def rc(cmd):
+            return 1 if cmd == ['npm', 'run', 'census:stewardship'] else 0
+
+        _stub_subprocess(monkeypatch, returncode_for=rc,
+                         stderr='census generation failed')
+
+        result = _run(monkeypatch, csv_with_headers)
+
+        assert result['status'] == 'error'
+        commands = [c.args[0]
+                    for c in process_submission.subprocess.run.call_args_list]
+        # The input commit exists locally, but neither it nor a stale report may
+        # reach main when report generation fails.
+        assert len([cmd for cmd in commands
+                    if cmd[:2] == ['git', 'commit']]) == 1
+        assert not any(cmd[:2] == ['git', 'push'] for cmd in commands)
+        sftp_mock.assert_not_called()
+        assert sheets_mock.call_args_list[-1].kwargs['status'] == 'error'
 
 
 class TestSftpFailure:

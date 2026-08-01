@@ -14,7 +14,9 @@ from __future__ import annotations
 import csv
 import importlib.util
 import pathlib
+import subprocess
 import sys
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -252,6 +254,63 @@ def _seed_csv(tmp_path):
         writer.writeheader()
         writer.writerow({"id": "R1", "key_concepts": "", "raw_text": "orig body"})
     return csv_path
+
+
+def test_open_sync_pr_commits_census_after_input_data(tmp_path, monkeypatch):
+    csv_path = _seed_csv(tmp_path)
+    run_mock = MagicMock(return_value=subprocess.CompletedProcess(
+        args=[], returncode=0, stdout="", stderr=""))
+    monkeypatch.setattr(sync.subprocess, "run", run_mock)
+    monkeypatch.setenv("GITHUB_RUN_ID", "12345")
+
+    branch, _ = sync.open_sync_pr(csv_path, {
+        "rows_changed": 1,
+        "matched": 1,
+        "writes_by_field": {"key_concepts": 1},
+    })
+
+    assert branch == "sync/master-sheet-12345"
+    commands = [call.args[0] for call in run_mock.call_args_list]
+    commit_commands = [cmd for cmd in commands if cmd[:2] == ["git", "commit"]]
+    assert len(commit_commands) == 2
+    assert ["npm", "run", "census:stewardship"] in commands
+    assert ["node", "--test", "tests/stewardship-census.test.js"] in commands
+    assert [
+        "git", "add",
+        "data/stewardship-census.json",
+        "data/stewardship-census.md",
+    ] in commands
+    push_index = next(index for index, cmd in enumerate(commands)
+                      if cmd[:2] == ["git", "push"])
+    second_commit_index = max(index for index, cmd in enumerate(commands)
+                              if cmd[:2] == ["git", "commit"])
+    assert push_index > second_commit_index
+
+
+def test_open_sync_pr_blocks_publication_when_census_check_fails(
+        tmp_path, monkeypatch):
+    csv_path = _seed_csv(tmp_path)
+
+    def fake_run(cmd, *args, **kwargs):
+        if cmd == ["node", "--test", "tests/stewardship-census.test.js"]:
+            raise subprocess.CalledProcessError(
+                1, cmd, output="", stderr="stale stewardship census")
+        return subprocess.CompletedProcess(cmd, 0, "", "")
+
+    run_mock = MagicMock(side_effect=fake_run)
+    monkeypatch.setattr(sync.subprocess, "run", run_mock)
+
+    branch, message = sync.open_sync_pr(csv_path, {
+        "rows_changed": 1,
+        "matched": 1,
+        "writes_by_field": {"key_concepts": 1},
+    })
+
+    assert branch is None
+    assert "stale stewardship census" in message
+    commands = [call.args[0] for call in run_mock.call_args_list]
+    assert not any(cmd[:2] == ["git", "push"] for cmd in commands)
+    assert not any(cmd[:3] == ["gh", "pr", "create"] for cmd in commands)
 
 
 def test_dry_run_writes_nothing_and_opens_no_pr(tmp_path, monkeypatch):

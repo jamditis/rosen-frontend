@@ -102,6 +102,9 @@ const KNOWN_NOT_DEPLOYED = new Map([
   ['data/graph-validation-holds.json',
     'validator policy input used only by repository and CI graph checks; no ' +
     'deployed page reads it'],
+  ['data/stewardship-census.json',
+    'repository stewardship report, not referenced by any deployed page (built ' +
+    'by scripts/build-stewardship-census.mjs)'],
 ]);
 
 // A data file is "deployed" if it is listed individually or lives under a data/

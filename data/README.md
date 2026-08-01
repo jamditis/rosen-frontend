@@ -18,6 +18,8 @@ The metadata and derived data (entities, relationships) are licensed [CC BY 4.0]
 | `search-index.json` | ~4.4 MB | Prebuilt MiniSearch index for curated records, loaded on first search |
 | `social-search-index.json` | ~7.1 MB | Body-only MiniSearch index for published social posts and served thread containers, loaded on first search |
 | `wiki-seed.json` | ~125 KB | Seed pages for the public archive wiki (`#wiki` route) |
+| `stewardship-census.json` | ~150 KB | Machine-readable source/runtime, graph, field, URL, and preservation coverage census |
+| `stewardship-census.md` | ~4 KB | Concise human-readable census summary and 2026-07-22 baseline comparison |
 
 ### Source CSVs (the source of truth)
 
@@ -88,6 +90,22 @@ Published records that are intentionally generated without a canonical CSV row
 must likewise have their exact stable ID listed in
 `generatedPublishedRecordIds` in that policy file. The validator rejects both
 unlisted source-less records and obsolete entries that now have a source row.
+
+## Stewardship coverage census
+
+Regenerate the committed stewardship inventory from the canonical CSVs and the four runtime JSON bundles:
+
+```bash
+npm run census:stewardship
+```
+
+The command writes `stewardship-census.json` and `stewardship-census.md`. The JSON contract is `stewardship-census/1.0.0`: version 1 may gain fields, while renamed fields or changed count semantics require a new major version. Output has no wall-clock timestamp, so unchanged inputs in a full-history checkout produce byte-identical reports. A shallow checkout is rejected because it cannot reproduce the last input-changing commit used by the provenance stamp.
+
+The census stamps the most recent Git commit that changed an input file, the clean/dirty state of those inputs, and a SHA-256 digest for each CSV and runtime JSON file. Source and runtime counts remain separate. Filtered rows use the exporter's ordered first-match taxonomy and retain exact record IDs in JSON. The report also keeps the measured 2026-07-22 baseline and explains later deltas rather than overwriting the historical checkpoint.
+
+The command refuses to write a stamped report while any census input is dirty. After a data change, run the data tests and commit the source and runtime files first. The committed-report freshness subtest skips while those inputs are dirty, then resumes after that commit. Run `npm run census:stewardship`, rerun the test, and commit the two reports. This two-commit sequence keeps the input commit truthful and lets the freshness test compare the generated files byte for byte. The automated submission and master-sheet sync pipelines use this same data-commit-then-report-commit sequence before they push.
+
+`tests/stewardship-census.test.js` exercises representative fixtures, proves an intentional source-row change alters the census, and fails when the committed reports drift from regenerated output.
 
 For the full record-adding walkthrough — written for non-technical curators — see [`ADDING-RECORDS.md`](../ADDING-RECORDS.md). For which files to upload to production, see [`DEPLOYMENT.md`](../DEPLOYMENT.md).
 
