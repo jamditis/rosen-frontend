@@ -280,6 +280,11 @@ def test_open_sync_pr_commits_census_after_input_data(tmp_path, monkeypatch):
         "data/stewardship-census.json",
         "data/stewardship-census.md",
     ] in commands
+    create_pr = next(cmd for cmd in commands
+                     if cmd[:3] == ["gh", "pr", "create"])
+    body = create_pr[create_pr.index("--body") + 1]
+    assert "Create a merge commit" in body
+    assert "Do not squash or rebase" in body
     push_index = next(index for index, cmd in enumerate(commands)
                       if cmd[:2] == ["git", "push"])
     second_commit_index = max(index for index, cmd in enumerate(commands)

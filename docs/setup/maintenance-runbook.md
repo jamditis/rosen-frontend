@@ -63,10 +63,12 @@ The merge is additive and never destructive:
   `raw_text` is never blanked or shortened;
 - `id`, `url`, `verified`, `notes`, and everything else are left untouched.
 
-To go live: **review the PR**, let its CI pass, **merge it**, then run the
-**Pillar 3c deploy** workflow (`deploy.yml`) to push the full site to
-pressthink.org. The sync and the deploy are deliberately two steps so a human
-sees the data diff before it ships.
+To go live: **review the PR**, let its CI pass, then merge it with **Create a
+merge commit**. Do not squash or rebase a `sync/master-sheet-*` PR: its second
+commit stamps the first data commit as the census input, so both commits must
+remain intact. Then run the **Pillar 3c deploy** workflow (`deploy.yml`) to push
+the full site to pressthink.org. The sync and the deploy are deliberately two
+steps so a human sees the data diff before it ships.
 
 ---
 

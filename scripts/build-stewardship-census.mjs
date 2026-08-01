@@ -8,6 +8,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { parse } from 'csv-parse/sync';
+import { unescapeRow } from '../data/lib/csv-unescape.js';
 
 const ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SCHEMA_ID = 'stewardship-census/1.0.0';
@@ -27,6 +28,7 @@ const ALL_INPUT_FILES = [...SOURCE_FILES, ...RUNTIME_FILES];
 const REPOST_TITLE_PATTERN = /^(Quoted|Retweet|RT) by/i;
 const GENERIC_TITLE_PATTERN = /^(Reply|Tweet|Post|Quote) by/i;
 const PRESERVATION_URL_PATTERN = /https?:\/\/(?:web\.)?archive\.org\/(?:web\/|details\/|download\/)?[^\s"'<>)]*/i;
+const PRESERVATION_URLS_PATTERN = new RegExp(PRESERVATION_URL_PATTERN.source, 'gi');
 const LINK_FIELDS = [
   'url',
   'related_to',
@@ -153,7 +155,7 @@ function readCsv(filePath) {
     columns: true,
     relax_column_count: true,
     skip_empty_lines: true
-  });
+  }).map(unescapeRow);
 }
 
 function relativeInputPath(rootDir, dataDir, filename) {
@@ -552,15 +554,18 @@ function collectPreservationEvidence(rows) {
     }
     for (const field of EMBEDDED_FIELDS) {
       const value = String(row[field] || '');
-      const match = value.match(PRESERVATION_URL_PATTERN);
-      if (match) embeddedMatches.push({ record_id: row.id, field, value: match[0] });
+      for (const match of value.matchAll(PRESERVATION_URLS_PATTERN)) {
+        embeddedMatches.push({ record_id: row.id, field, value: match[0] });
+      }
     }
   }
   const summarize = matches => ({
     records: new Set(matches.map(match => match.record_id)).size,
     matches: matches.length,
     evidence: matches.sort((left, right) => (
-      compareCodeUnits(left.record_id, right.record_id) || compareCodeUnits(left.field, right.field)
+      compareCodeUnits(left.record_id, right.record_id)
+      || compareCodeUnits(left.field, right.field)
+      || compareCodeUnits(left.value, right.value)
     ))
   });
   return {

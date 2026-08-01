@@ -328,7 +328,10 @@ def open_sync_pr(csv_path: pathlib.Path, stats: Dict[str, Any]) -> Tuple[Optiona
         f"shortened. JSON was regenerated and `npm test` passed before this PR "
         f"opened. The stewardship census was refreshed and verified in a second "
         f"report-only commit.\n\n"
-        f"Merge to land the data on main, then run the **Pillar 3c deploy** "
+        f"**Required merge method:** use **Create a merge commit**. Do not "
+        f"squash or rebase this PR: the report commit stamps the preceding "
+        f"data commit as its input, so both commits must remain intact.\n\n"
+        f"After that merge lands the data on main, run the **Pillar 3c deploy** "
         f"workflow to push it live.\n\n"
         f"Design: `docs/plans/2026-05-29-batch-maintenance-runner-design.md`"
     )

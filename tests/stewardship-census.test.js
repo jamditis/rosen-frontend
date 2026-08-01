@@ -28,9 +28,14 @@ function buildFixtureCensus() {
 
 describe('stewardship coverage census', () => {
   it('reconciles representative source and runtime records with first-match filters', () => {
-    const census = buildFixtureCensus();
+    const inputs = loadStewardshipInputs({ dataDir: fixtureDir });
+    const census = buildStewardshipCensus({
+      inputs,
+      input: { commit: 'fixture-commit', dirty: false, files: inputs.files }
+    });
 
     assert.equal(census.schema.id, 'stewardship-census/1.0.0');
+    assert.equal(inputs.social.find(row => row.id === 'TWTR-00003').raw_text, '@reader ok');
     assert.equal(census.input.commit, 'fixture-commit');
     assert.equal(census.input.files.length, 8);
     assert.equal(census.records.source.curated.total, 2);
@@ -77,6 +82,16 @@ describe('stewardship coverage census', () => {
     assert.equal(census.urls.source.host_distribution['example.com'], 5);
     assert.equal(census.preservation.link_evidence.records, 1);
     assert.equal(census.preservation.embedded_candidates.records, 1);
+    assert.equal(census.preservation.embedded_candidates.matches, 4);
+    assert.deepEqual(
+      census.preservation.embedded_candidates.evidence.map(item => item.value),
+      [
+        'https://archive.org/details/example',
+        'https://web.archive.org/web/20230101/https://example.com/',
+        'https://archive.org/details/example',
+        'https://web.archive.org/web/20230101/https://example.com/'
+      ]
+    );
     assert.equal(census.cross_file.full_missing_from_core.count, 0);
     assert.equal(census.baseline_2026_07_22.data_commit, '5d3d5351346a9712de4f54d95e69ba0f410c6efd');
   });
