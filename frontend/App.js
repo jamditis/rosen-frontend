@@ -50,6 +50,7 @@ const DESKTOP_GUIDED_SHELL_DESTINATIONS = new Set([
 ]);
 
 const ROUTE_ENTRY_FOCUS_SELECTOR = '[data-route-entry-focus], #main-content';
+const MAX_MINI_INDEX_RETRIES = 3;
 
 class DesktopRouteErrorBoundary extends Component {
   constructor(props) {
@@ -470,55 +471,95 @@ const App = () => {
 
   const searchIndex = useMemo(() => queryRecords.map(buildSearchText), [queryRecords]);
 
-  // Lazy full-text index (#276), unioned with the substring blob above. Loaded
-  // on first non-empty search so browse-only visits never pay for MiniSearch or
-  // the ~1MB artifact. miniLoading (a ref) dedups concurrent loads across
-  // keystrokes before state commits; miniReady (state) re-runs the filter once
-  // the index resolves.
-  const miniRef = useRef(null);
+  // Lazy article and social full-text indexes (#276, #669), unioned with the
+  // substring blob above. Loaded on first non-empty search so browse-only visits
+  // never pay for MiniSearch or either artifact. Successful siblings remain in
+  // use while a missing artifact retries after a cooldown. miniRevision re-runs
+  // the filter whenever the available index set changes.
+  const miniRefs = useRef([]);
   const miniLoading = useRef(false);
+  const miniMounted = useRef(true);
   const miniRetryAfter = useRef(0);
-  const [miniReady, setMiniReady] = useState(false);
+  const miniRetryAttempts = useRef(0);
+  const miniRetryExhausted = useRef(false);
+  const miniRetryTimer = useRef(null);
+  const [miniRevision, setMiniRevision] = useState(0);
+  const [miniComplete, setMiniComplete] = useState(false);
+  const [miniRetryTick, setMiniRetryTick] = useState(0);
 
   useEffect(() => {
-    if (!filters.search.trim() || miniReady || miniLoading.current) return;
-    // After a failure, hold off before retrying so a persistently missing index
-    // (e.g. a stale deploy 404) is not refetched on every keystroke; a search
-    // past the cooldown still recovers from a transient failure. loadSearchIndex
-    // clears its own memo on failure, so the retry is a real re-fetch.
+    miniMounted.current = true;
+    return () => {
+      miniMounted.current = false;
+      if (miniRetryTimer.current !== null) clearTimeout(miniRetryTimer.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (
+      !filters.search.trim()
+      || miniComplete
+      || miniLoading.current
+      || miniRetryExhausted.current
+    ) return;
+    // A persistently missing index (for example, during a staggered deploy)
+    // should not be refetched on every keystroke. The timer triggers a real
+    // retry after the cooldown even when the query itself has not changed.
     if (performance.now() < miniRetryAfter.current) return;
+
+    const scheduleRetry = () => {
+      if (miniRetryAttempts.current >= MAX_MINI_INDEX_RETRIES) {
+        miniRetryExhausted.current = true;
+        return;
+      }
+      miniRetryAttempts.current += 1;
+      miniRetryAfter.current = performance.now() + 10000;
+      if (miniRetryTimer.current !== null) clearTimeout(miniRetryTimer.current);
+      miniRetryTimer.current = setTimeout(() => {
+        miniRetryTimer.current = null;
+        setMiniRetryTick(tick => tick + 1);
+      }, 10000);
+    };
+
     miniLoading.current = true;
     loadSearchIndex()
-      .then((mini) => {
-        // miniReady is a monotonic "index is loaded" latch, so set it
-        // unconditionally even if the triggering search was cleared mid-load:
-        // the filter only reads it when a search term is active, and having it
-        // latched means the next search unions immediately. Not gating it on a
-        // per-run cancelled flag avoids a race where a cleared-then-retyped
-        // query could leave the loaded index unused until the box is edited.
-        miniRef.current = mini;
-        setMiniReady(true);
+      .then((result) => {
+        if (!miniMounted.current) return;
+        miniRefs.current = result.indexes;
+        setMiniRevision(revision => revision + 1);
+        setMiniComplete(result.complete);
+        if (result.complete) {
+          miniRetryAfter.current = 0;
+          miniRetryAttempts.current = 0;
+          miniRetryExhausted.current = false;
+          if (miniRetryTimer.current !== null) clearTimeout(miniRetryTimer.current);
+          miniRetryTimer.current = null;
+        } else {
+          scheduleRetry();
+        }
       })
       .catch((err) => {
-        miniRetryAfter.current = performance.now() + 10000;
+        if (!miniMounted.current) return;
+        scheduleRetry();
         console.warn('[search] full-text index unavailable; substring search only:', err.message);
       })
       .finally(() => { miniLoading.current = false; });
-  }, [filters.search, miniReady]);
+  }, [filters.search, miniComplete, miniRetryTick]);
 
   const filteredRecords = useMemo(() => {
     const term = normalizeForSearch(filters.search);
-    // Union the substring blob with MiniSearch full-text hits: a record matches
-    // if EITHER matches. Additive by design, so social / thread / dissertation
-    // records (absent from the article-scoped index) stay covered by substring,
-    // and nothing regresses while the index is still loading. combineWith AND +
-    // prefix = "every word present, last word may be a prefix", how a search box
-    // is expected to narrow.
+    // Union the substring blob with both MiniSearch full-text indexes: a record
+    // matches if any path matches. Additive by design, so records absent from a
+    // prebuilt index stay covered by substring, and nothing regresses while the
+    // indexes are still loading. combineWith AND + prefix = "every word present,
+    // last word may be a prefix", how a search box is expected to narrow.
     const rawTerm = filters.search.trim();
     let miniIds = null;
-    if (rawTerm && miniReady && miniRef.current) {
+    if (rawTerm && miniRevision > 0 && miniRefs.current.length > 0) {
       miniIds = new Set(
-        miniRef.current.search(rawTerm, { prefix: true, combineWith: 'AND' }).map((h) => h.id)
+        miniRefs.current.flatMap((mini) => (
+          mini.search(rawTerm, { prefix: true, combineWith: 'AND' }).map((hit) => hit.id)
+        ))
       );
     }
     let res = queryRecords.filter((r, i) => {
@@ -553,7 +594,7 @@ const App = () => {
     res = sortRecords(res, sortBy);
 
     return res;
-  }, [queryRecords, searchIndex, filters, sortBy, miniReady]);
+  }, [queryRecords, searchIndex, filters, sortBy, miniRevision]);
 
   useEffect(() => {
     setCurrentPage(1);

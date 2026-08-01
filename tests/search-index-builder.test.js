@@ -13,6 +13,7 @@ import {
   buildSearchIndex,
   recordToSearchDoc,
   searchIndexOptions,
+  socialSearchIndexOptions,
   RAW_TEXT_INDEX_CHARS,
 } from '../data/lib/search-index-builder.js';
 
@@ -141,4 +142,25 @@ test('default raw_text cap is exported and applied', () => {
   assert.equal(RAW_TEXT_INDEX_CHARS, 8000);
   const doc = recordToSearchDoc({ id: 'L', raw_text: 'y'.repeat(20000) });
   assert.equal(doc.body.length, 8000, 'raw_text is truncated to the default cap');
+});
+
+test('the social schema indexes uncapped body text without duplicate metadata fields (#669)', () => {
+  const phrase = 'tail phrase unique to this social post';
+  const { json, count } = buildSearchIndex(
+    [{
+      id: 'SOCIAL-LONG',
+      title: 'metadata that belongs to the card search',
+      raw_text: `${'x '.repeat(RAW_TEXT_INDEX_CHARS)}${phrase}`,
+    }],
+    {
+      rawTextChars: Number.POSITIVE_INFINITY,
+      indexOptions: socialSearchIndexOptions(),
+    },
+  );
+  const mini = MiniSearch.loadJSON(JSON.stringify(json), socialSearchIndexOptions());
+
+  assert.equal(count, 1);
+  assert.deepEqual(Object.keys(json.fieldIds), ['body']);
+  assert.equal(mini.search(phrase, { combineWith: 'AND' })[0]?.id, 'SOCIAL-LONG');
+  assert.equal(mini.search('metadata').length, 0, 'social metadata must stay out of the body-only index');
 });

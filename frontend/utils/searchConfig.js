@@ -21,6 +21,12 @@
 // never reads author, which is why "Joe Amditis" returned nothing (#276).
 export const SEARCH_FIELDS = ['title', 'author', 'summary', 'concepts', 'tags', 'categories', 'body'];
 
+// The social artifact exists only to recover source text past the truncated
+// card preview. Its metadata is already covered by the in-memory substring
+// search, so indexing empty copies of those fields would add per-document
+// bookkeeping with no recall benefit (#669).
+export const SOCIAL_SEARCH_FIELDS = ['body'];
+
 // Fields stored on each hit so a result row renders without a second lookup.
 // Minimal on purpose: the full record is fetched from archive-data.json by id,
 // so storing more than the title would just bloat the index artifact.
@@ -31,5 +37,13 @@ export function searchIndexOptions() {
     idField: 'id',
     fields: SEARCH_FIELDS,
     storeFields: STORE_FIELDS,
+  };
+}
+
+export function socialSearchIndexOptions() {
+  return {
+    idField: 'id',
+    fields: SOCIAL_SEARCH_FIELDS,
+    storeFields: [],
   };
 }

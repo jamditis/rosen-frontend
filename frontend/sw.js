@@ -78,6 +78,7 @@ const APP_SHELL_FRONTEND_FILES = [
   'services/idbCache.js',
   'services/queryComposition.js',
   'services/router.js',
+  'services/searchIndexLoader.js',
   'services/sqliteService.js',
   'services/tourState.js',
   'services/viewState.js',
@@ -120,6 +121,7 @@ const DATA_URLS = [
   `${DATA_PATH}/archive-entities.json`,
   `${DATA_PATH}/archive-analytics.json`,
   `${DATA_PATH}/search-index.json`,
+  `${DATA_PATH}/social-search-index.json`,
   `${DATA_PATH}/wiki-seed.json`
 ];
 

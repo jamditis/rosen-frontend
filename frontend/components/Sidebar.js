@@ -213,7 +213,7 @@ const Sidebar = ({
                 </div>
               `}
             </div>
-            <p className="archive-filter-sidebar__hint">Searches titles, summaries, and categories</p>
+            <p className="archive-filter-sidebar__hint">Searches metadata, article text, and social post text</p>
           </div>
 
           <div className="archive-filter-group border-t border-stone-200 pt-4">

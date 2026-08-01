@@ -8,4 +8,5 @@ DATA_DEPLOY_JSON_FILES = (
     "archive-entities.json",
     "archive-analytics.json",
     "search-index.json",
+    "social-search-index.json",
 )

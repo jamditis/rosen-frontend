@@ -15,11 +15,12 @@ import {
   getStats as getSqliteStats
 } from './sqliteService.js?v=3.8.9';
 import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.8.9';
-import { searchIndexOptions } from '../utils/searchConfig.js?v=3.8.9';
+import { searchIndexOptions, socialSearchIndexOptions } from '../utils/searchConfig.js?v=3.8.9';
 import { escapeCsvCell } from '../utils/csvSafety.js?v=3.8.9';
 import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.8.9';
 import { CACHE_VERSION, CACHE_TTL_MS, MAX_LOCALSTORAGE_SIZE, cacheKeyFor } from './cacheConfig.js?v=3.8.9';
 import { raceTimeout } from '../utils/raceTimeout.js?v=3.8.9';
+import { createResilientSearchIndexLoader } from './searchIndexLoader.js?v=3.8.9';
 
 // Routine cache-hit / fetch-start logs are silent in production. Set
 // `localStorage.jrda_debug = '1'` in DevTools and reload to opt in (#170).
@@ -634,31 +635,36 @@ export const fetchAnalytics = async () => {
 };
 
 /**
- * Lazily load and construct the MiniSearch full-text index (#276).
+ * Lazily load and construct the MiniSearch full-text indexes (#276, #669).
  *
- * Kept here with the other data fetchers, but MiniSearch and the ~1MB index
- * artifact are both loaded on demand -- the dynamic import means a browse-only
- * visit never downloads either. The promise is memoized so repeat or concurrent
- * first-search calls share one load; on failure the memo is cleared so a later
- * search can retry rather than being stuck on the rejected promise. Throws on a
- * failed fetch so the caller can fall back to substring search (the index is an
- * additive recall boost, never the only search path).
+ * The article and social artifacts stay separate, but both are loaded on demand
+ * alongside MiniSearch. A browse-only visit therefore downloads none of them.
+ * The loader is memoized so repeat or concurrent searches share loaded
+ * artifacts. Each successful index is cached independently; a missing sibling
+ * is retried without refetching the healthy one. The indexes are an additive
+ * recall boost, never the only search path.
  */
-let searchIndexPromise = null;
-export const loadSearchIndex = () => {
-  if (!searchIndexPromise) {
-    searchIndexPromise = (async () => {
+let searchIndexLoaderPromise = null;
+export const loadSearchIndex = async () => {
+  if (!searchIndexLoaderPromise) {
+    searchIndexLoaderPromise = (async () => {
       const { default: MiniSearch } = await import('minisearch');
-      const response = await fetch(DATA_CONFIG.search_index);
-      if (!response.ok) {
-        throw new Error(`search index fetch failed: HTTP ${response.status}`);
-      }
-      const text = await response.text();
-      return MiniSearch.loadJSON(text, searchIndexOptions());
+      return createResilientSearchIndexLoader([
+        { url: DATA_CONFIG.search_index, options: searchIndexOptions() },
+        { url: DATA_CONFIG.social_search_index, options: socialSearchIndexOptions() },
+      ], {
+        loadJSON: MiniSearch.loadJSON.bind(MiniSearch),
+      });
     })();
-    searchIndexPromise.catch(() => { searchIndexPromise = null; });
+    searchIndexLoaderPromise.catch(() => { searchIndexLoaderPromise = null; });
   }
-  return searchIndexPromise;
+
+  const loader = await searchIndexLoaderPromise;
+  const result = await loader.load();
+  for (const failure of result.failures) {
+    console.warn(`[search] full-text index unavailable (${failure.url}):`, failure.error.message);
+  }
+  return result;
 };
 
 /**
