@@ -543,7 +543,25 @@ describe('desktop windowing and spatial memory', () => {
 
     assert.match(audit, /verifyWindowDrag:\s*true/);
     assert.match(audit, /verifyWindowMoveControls:\s*true/);
-    assert.match(audit, /Window drag changed browser history/);
+    const dragAudit = audit.slice(
+      audit.indexOf('if (route.verifyWindowDrag'),
+      audit.indexOf('if (route.verifyWindowMoveControls'),
+    );
+    assert.doesNotMatch(
+      dragAudit,
+      /history\.length/,
+      'drag history must not use the capped history.length value as a navigation count',
+    );
+    assert.match(
+      dragAudit,
+      /installHistoryProbe\('background-drag'\)[\s\S]*goBack[\s\S]*backgroundProbe\.baselineUrl[\s\S]*goBack[\s\S]*backgroundProbe\.predecessorUrl[\s\S]*goForward[\s\S]*backgroundProbe\.baselineUrl[\s\S]*goForward[\s\S]*entitiesUrlAfterBackgroundDrag/,
+      'a background drag must prove exactly one recoverable entry in both directions',
+    );
+    assert.match(
+      dragAudit,
+      /installHistoryProbe\('active-drag'\)[\s\S]*dragTitlebar\('analytics'[\s\S]*goBack[\s\S]*activeProbe\.predecessorUrl[\s\S]*goForward[\s\S]*activeProbe\.baselineUrl/,
+      'an active-window drag must prove that it added no navigation entry',
+    );
     assert.match(audit, /Move controls changed browser history/);
     assert.match(audit, /Moved window escaped recoverable bounds/);
     assert.match(audit, /Object\.values\(bounds\)\.every\(Number\.isFinite\)/,
