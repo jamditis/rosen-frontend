@@ -260,6 +260,38 @@ describe('preservation manifest schema (#701)', () => {
     rejectsManifest(duplicateCopy, 'duplicate', 'copyId');
   });
 
+  it('binds each object type to the type segment in its stable URN', () => {
+    const manifest = example('bot-wall');
+    manifest.objects[0].objectType = 'archive-record';
+
+    rejectsManifest(manifest, 'objectId', 'objectType', 'social-post');
+  });
+
+  it('requires one append-only creation event for every named storage copy', () => {
+    const manifest = example('successful-capture');
+    const copy = manifest.artifacts[0].storageCopies[0];
+    manifest.events = manifest.events.filter(event => event.storageCopyId !== copy.copyId);
+
+    rejectsManifest(manifest, copy.copyId, 'storage-copy-created');
+
+    const duplicate = example('successful-capture');
+    const creation = duplicate.events.find(event => event.storageCopyId === copy.copyId);
+    const secondCreation = clone(creation);
+    secondCreation.eventId = 'urn:rosen-preservation:event:duplicate-storage-copy-creation';
+    secondCreation.occurredAt = '2026-08-01T14:24:30.000Z';
+    duplicate.events.push(secondCreation);
+    rejectsManifest(duplicate, copy.copyId, 'multiple current', 'storage-copy-created');
+
+    const corrected = example('successful-capture');
+    const correctedCreation = corrected.events.find(event => event.storageCopyId === copy.copyId);
+    const correction = clone(correctedCreation);
+    correction.eventId = 'urn:rosen-preservation:event:corrected-storage-copy-creation';
+    correction.occurredAt = '2026-08-01T14:24:30.000Z';
+    correction.supersedesEventId = correctedCreation.eventId;
+    corrected.events.push(correction);
+    assert.equal(validatePreservationManifest(corrected), corrected);
+  });
+
   it('binds each declared capture artifact to the same capture event', () => {
     const manifest = example('successful-capture');
     const artifact = manifest.artifacts[0];
@@ -328,5 +360,27 @@ describe('Winer evidence compatibility', () => {
     assert.equal(event.normalizationEvidence.normalizedObjectSha256, source.normalizedRecordSha256);
     assert.equal(artifact.sha256, source.retrieval.responseSha256);
     assert.equal(artifact.byteSize, source.retrieval.byteLength);
+  });
+
+  it('keeps artifact identity distinct when two records have identical response bytes', () => {
+    const evidence = JSON.parse(fs.readFileSync(
+      path.join(root, 'features', 'winer-method', 'retrieval-evidence.json'),
+      'utf8',
+    ));
+    const duplicateBytes = clone(evidence);
+    duplicateBytes.records[1].retrieval.responseSha256 =
+      duplicateBytes.records[0].retrieval.responseSha256;
+    duplicateBytes.records[1].retrieval.byteLength =
+      duplicateBytes.records[0].retrieval.byteLength;
+    duplicateBytes.records[1].retrieval.contentType =
+      duplicateBytes.records[0].retrieval.contentType;
+
+    const manifest = convertWinerEvidence(duplicateBytes);
+    assert.equal(manifest.artifacts[0].sha256, manifest.artifacts[1].sha256);
+    assert.equal(manifest.artifacts[0].uri, manifest.artifacts[1].uri);
+    assert.notEqual(manifest.artifacts[0].artifactId, manifest.artifacts[1].artifactId);
+    assert.match(manifest.artifacts[0].artifactId, new RegExp(`:${duplicateBytes.records[0].id}:sha256:`));
+    assert.match(manifest.artifacts[1].artifactId, new RegExp(`:${duplicateBytes.records[1].id}:sha256:`));
+    validatePreservationManifest(manifest);
   });
 });

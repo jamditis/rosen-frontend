@@ -92,6 +92,16 @@ function validateReferences(manifest) {
   const events = uniqueMap(manifest.events, 'eventId', 'events');
   const artifacts = uniqueMap(manifest.artifacts, 'artifactId', 'artifacts');
   const copies = new Map();
+  const storageCopyEvents = new Map();
+
+  for (const object of manifest.objects) {
+    const objectIdType = object.objectId.match(/^urn:rosen:object:([^:]+):/)?.[1];
+    if (objectIdType !== object.objectType) {
+      throw new PreservationValidationError(
+        `${object.objectId}: objectId type ${objectIdType} must match objectType ${object.objectType}`,
+      );
+    }
+  }
 
   for (const artifact of manifest.artifacts) {
     for (const copy of artifact.storageCopies) {
@@ -210,6 +220,9 @@ function validateReferences(manifest) {
           `${event.eventId}: storageCopyId does not belong to the event artifact and object`,
         );
       }
+      const creationEvents = storageCopyEvents.get(event.storageCopyId) ?? [];
+      creationEvents.push(event);
+      storageCopyEvents.set(event.storageCopyId, creationEvents);
     }
 
     if (event.fixity) {
@@ -264,6 +277,20 @@ function validateReferences(manifest) {
       throw new PreservationValidationError(
         `${artifact.artifactId}: captureEventId declares a different artifactId`,
       );
+    }
+    for (const copy of artifact.storageCopies) {
+      const currentCreationEvents = (storageCopyEvents.get(copy.copyId) ?? [])
+        .filter(event => !supersededEvents.has(event.eventId));
+      if (currentCreationEvents.length === 0) {
+        throw new PreservationValidationError(
+          `${copy.copyId}: named storage copy requires a storage-copy-created event`,
+        );
+      }
+      if (currentCreationEvents.length > 1) {
+        throw new PreservationValidationError(
+          `${copy.copyId}: named storage copy has multiple current storage-copy-created events`,
+        );
+      }
     }
   }
 }

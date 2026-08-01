@@ -50,7 +50,7 @@ export function convertWinerEvidence(evidence) {
     const objectId = `urn:rosen:object:feature-record:${id}`;
     const eventSuffix = digest([id, record.retrieval.capturedAt, record.retrieval.responseSha256]);
     const eventId = `urn:rosen-preservation:event:winer:${id}:${eventSuffix}`;
-    const artifactId = `urn:rosen-preservation:artifact:sha256:${record.retrieval.responseSha256}`;
+    const artifactId = `urn:rosen-preservation:artifact:winer:${id}:sha256:${record.retrieval.responseSha256}`;
 
     objects.push({
       objectId,

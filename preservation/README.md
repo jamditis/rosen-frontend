@@ -59,7 +59,9 @@ filesystem layout.
 
 `objectId`, `objectType`, and `canonicalSourceUrl` are required. `sourceRecordId`
 and `label` are optional conveniences. Object IDs use the form
-`urn:rosen:object:<type>:<stable-id>` and cannot be filesystem paths.
+`urn:rosen:object:<type>:<stable-id>` and cannot be filesystem paths. The type
+segment and `objectType` must agree so identity never changes meaning between
+URN-aware and field-aware consumers.
 
 Version 1 object types are `archive-record`, `social-post`, `entity`,
 `relationship`, `dataset`, `source-file`, `generated-artifact`, and
@@ -121,7 +123,10 @@ The validator ensures object, event, artifact, fixity, and storage-copy
 references resolve and remain within one object. When a capture attempt names
 an artifact, the artifact's originating capture must be that same event. The
 model supports multiple captures, artifacts, and storage copies for the same
-archive object.
+archive object. Every named storage copy must have exactly one matching
+current `storage-copy-created` event; corrected predecessors remain in the
+append-only history, and storage state cannot appear through an artifact record
+edit alone.
 
 ## Rights and review boundaries
 
@@ -161,7 +166,7 @@ without modifying or replacing `retrieval-evidence.json`:
 | `retrieval.capturedAt` | retrieval and event timestamps |
 | final URL, status, content type, and byte length | required retrieval fields |
 | `retrieval.client` and top-level `captureTool` | client name/version and task version |
-| `retrieval.responseSha256` | content-addressed artifact URI and SHA-256 |
+| `retrieval.responseSha256` | record-scoped artifact ID plus content-addressed URI and SHA-256 |
 | observations, field mapping, source locator, normalized digest | `normalizationEvidence` |
 
 Verify the current 11-record artifact against schema v1:
