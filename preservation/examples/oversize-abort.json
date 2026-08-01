@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0.0",
+  "vocabularyVersion": "1.0.0",
+  "manifestId": "urn:rosen-preservation:manifest:example-oversize-abort",
+  "createdAt": "2026-08-01T15:30:00.000Z",
+  "objects": [
+    {
+      "objectId": "urn:rosen:object:archive-record:RECORD-00043",
+      "objectType": "archive-record",
+      "canonicalSourceUrl": "https://media.example/video.mp4",
+      "sourceRecordId": "RECORD-00043",
+      "label": "Oversize abort example"
+    }
+  ],
+  "events": [
+    {
+      "eventId": "urn:rosen-preservation:event:example-oversize-abort",
+      "eventType": "capture-attempt",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00043",
+      "taskVersion": "preservation-pilot@1.0.0",
+      "inputHash": "3333333333333333333333333333333333333333333333333333333333333333",
+      "actor": {
+        "actorType": "automation",
+        "actorId": "preservation-pilot"
+      },
+      "occurredAt": "2026-08-01T15:30:00.000Z",
+      "review": {
+        "state": "accepted",
+        "notes": "The response exceeded the per-source pilot limit and was not retained."
+      },
+      "retrieval": {
+        "requestedUrl": "https://media.example/video.mp4",
+        "observedSourceUrl": "https://media.example/video.mp4",
+        "retrievedAt": "2026-08-01T15:30:00.000Z",
+        "finalUrl": "https://media.example/video.mp4",
+        "httpStatus": 200,
+        "httpOutcome": "aborted",
+        "mediaType": "video/mp4",
+        "bytesReceived": 1048576,
+        "reportedByteLength": 62914560,
+        "limitBytes": 52428800,
+        "client": {
+          "name": "capture-worker",
+          "version": "1.0.0"
+        },
+        "semanticOutcome": "oversize-abort"
+      }
+    }
+  ],
+  "artifacts": []
+}

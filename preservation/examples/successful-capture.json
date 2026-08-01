@@ -1,0 +1,186 @@
+{
+  "schemaVersion": "1.0.0",
+  "vocabularyVersion": "1.0.0",
+  "manifestId": "urn:rosen-preservation:manifest:example-successful-capture",
+  "createdAt": "2026-08-01T14:30:00.000Z",
+  "description": "One archive record with two capture attempts, one response artifact, and two storage copies.",
+  "objects": [
+    {
+      "objectId": "urn:rosen:object:archive-record:RECORD-00001",
+      "objectType": "archive-record",
+      "canonicalSourceUrl": "https://example.org/original-story",
+      "sourceRecordId": "RECORD-00001",
+      "label": "Example successful capture"
+    }
+  ],
+  "events": [
+    {
+      "eventId": "urn:rosen-preservation:event:example-success-redirect",
+      "eventType": "capture-attempt",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00001",
+      "taskVersion": "preservation-pilot@1.0.0",
+      "inputHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "actor": {
+        "actorType": "automation",
+        "actorId": "preservation-pilot"
+      },
+      "occurredAt": "2026-08-01T14:20:00.000Z",
+      "review": {
+        "state": "accepted",
+        "notes": "Redirect was expected and retained as a separate attempt."
+      },
+      "retrieval": {
+        "requestedUrl": "https://example.org/original-story",
+        "observedSourceUrl": "https://example.org/original-story",
+        "retrievedAt": "2026-08-01T14:20:00.000Z",
+        "finalUrl": "https://www.example.org/original-story",
+        "httpStatus": 301,
+        "httpOutcome": "response-received",
+        "mediaType": "text/html",
+        "bytesReceived": 512,
+        "client": {
+          "name": "capture-worker",
+          "version": "1.0.0"
+        },
+        "semanticOutcome": "redirect",
+        "redirectChain": [
+          "https://example.org/original-story",
+          "https://www.example.org/original-story"
+        ]
+      }
+    },
+    {
+      "eventId": "urn:rosen-preservation:event:example-success-content",
+      "eventType": "capture-attempt",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00001",
+      "taskVersion": "preservation-pilot@1.0.0",
+      "inputHash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "actor": {
+        "actorType": "automation",
+        "actorId": "preservation-pilot"
+      },
+      "occurredAt": "2026-08-01T14:21:00.000Z",
+      "review": {
+        "state": "accepted",
+        "notes": "Page content matched the intended archive source."
+      },
+      "retrieval": {
+        "requestedUrl": "https://www.example.org/original-story",
+        "observedSourceUrl": "https://www.example.org/original-story",
+        "retrievedAt": "2026-08-01T14:21:00.000Z",
+        "finalUrl": "https://www.example.org/original-story",
+        "httpStatus": 200,
+        "httpOutcome": "response-received",
+        "mediaType": "text/html; charset=UTF-8",
+        "bytesReceived": 16384,
+        "client": {
+          "name": "capture-worker",
+          "version": "1.0.0"
+        },
+        "semanticOutcome": "intended-content"
+      },
+      "artifactId": "urn:rosen-preservation:artifact:example-success-response"
+    },
+    {
+      "eventId": "urn:rosen-preservation:event:example-success-artifact",
+      "eventType": "artifact-created",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00001",
+      "taskVersion": "artifact-writer@1.0.0",
+      "inputHash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "actor": {
+        "actorType": "automation",
+        "actorId": "artifact-writer"
+      },
+      "occurredAt": "2026-08-01T14:22:00.000Z",
+      "review": {
+        "state": "not-reviewed"
+      },
+      "artifactId": "urn:rosen-preservation:artifact:example-success-response"
+    },
+    {
+      "eventId": "urn:rosen-preservation:event:example-success-copy-primary",
+      "eventType": "storage-copy-created",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00001",
+      "taskVersion": "storage-writer@1.0.0",
+      "inputHash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "actor": {
+        "actorType": "automation",
+        "actorId": "storage-writer"
+      },
+      "occurredAt": "2026-08-01T14:23:00.000Z",
+      "review": {
+        "state": "not-reviewed"
+      },
+      "artifactId": "urn:rosen-preservation:artifact:example-success-response",
+      "storageCopyId": "urn:rosen-preservation:copy:example-success-primary"
+    },
+    {
+      "eventId": "urn:rosen-preservation:event:example-success-copy-replica",
+      "eventType": "storage-copy-created",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00001",
+      "taskVersion": "storage-writer@1.0.0",
+      "inputHash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "actor": {
+        "actorType": "automation",
+        "actorId": "storage-writer"
+      },
+      "occurredAt": "2026-08-01T14:24:00.000Z",
+      "review": {
+        "state": "not-reviewed"
+      },
+      "artifactId": "urn:rosen-preservation:artifact:example-success-response",
+      "storageCopyId": "urn:rosen-preservation:copy:example-success-replica"
+    },
+    {
+      "eventId": "urn:rosen-preservation:event:example-success-fixity",
+      "eventType": "fixity-check",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00001",
+      "taskVersion": "fixity-checker@1.0.0",
+      "inputHash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "actor": {
+        "actorType": "automation",
+        "actorId": "fixity-checker"
+      },
+      "occurredAt": "2026-08-01T14:25:00.000Z",
+      "review": {
+        "state": "accepted",
+        "notes": "The stored artifact matches its capture digest."
+      },
+      "fixity": {
+        "artifactId": "urn:rosen-preservation:artifact:example-success-response",
+        "algorithm": "sha256",
+        "expectedDigest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "observedDigest": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "outcome": "match"
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "artifactId": "urn:rosen-preservation:artifact:example-success-response",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00001",
+      "captureEventId": "urn:rosen-preservation:event:example-success-content",
+      "artifactType": "http-response",
+      "uri": "urn:sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "byteSize": 16384,
+      "mediaType": "text/html; charset=UTF-8",
+      "storageCopies": [
+        {
+          "copyId": "urn:rosen-preservation:copy:example-success-primary",
+          "uri": "s3://rosen-preservation-primary/example-success-response",
+          "storageClass": "preservation",
+          "access": "private",
+          "createdAt": "2026-08-01T14:23:00.000Z"
+        },
+        {
+          "copyId": "urn:rosen-preservation:copy:example-success-replica",
+          "uri": "s3://rosen-preservation-replica/example-success-response",
+          "storageClass": "replica",
+          "access": "private",
+          "createdAt": "2026-08-01T14:24:00.000Z"
+        }
+      ]
+    }
+  ]
+}

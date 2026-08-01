@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "1.0.0",
+  "vocabularyVersion": "1.0.0",
+  "manifestId": "urn:rosen-preservation:manifest:example-rights-hold",
+  "createdAt": "2026-08-01T16:00:00.000Z",
+  "objects": [
+    {
+      "objectId": "urn:rosen:object:archive-record:RECORD-00571",
+      "objectType": "archive-record",
+      "canonicalSourceUrl": "https://newsletter.example/p/restricted-source",
+      "sourceRecordId": "RECORD-00571",
+      "label": "Rights hold example"
+    }
+  ],
+  "events": [
+    {
+      "eventId": "urn:rosen-preservation:event:example-rights-unknown",
+      "eventType": "rights-decision",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00571",
+      "taskVersion": "rights-policy@0.1.0",
+      "inputHash": "4444444444444444444444444444444444444444444444444444444444444444",
+      "actor": {
+        "actorType": "human",
+        "actorId": "curator:joe-amditis"
+      },
+      "occurredAt": "2026-08-01T15:55:00.000Z",
+      "review": {
+        "state": "superseded",
+        "notes": "Initial unknown-rights decision was replaced after policy review."
+      },
+      "rights": {
+        "rightsStatus": "unknown",
+        "accessDecision": "private",
+        "publicDepositEligibility": "undetermined",
+        "policyVersion": "draft-0.1.0",
+        "decisionBasis": "No approved source-class decision was available."
+      }
+    },
+    {
+      "eventId": "urn:rosen-preservation:event:example-rights-hold",
+      "eventType": "rights-decision",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00571",
+      "taskVersion": "rights-policy@0.2.0",
+      "inputHash": "5555555555555555555555555555555555555555555555555555555555555555",
+      "actor": {
+        "actorType": "human",
+        "actorId": "curator:joe-amditis"
+      },
+      "occurredAt": "2026-08-01T16:00:00.000Z",
+      "review": {
+        "state": "accepted",
+        "notes": "Capture may be retained privately, but public deposit remains blocked."
+      },
+      "supersedesEventId": "urn:rosen-preservation:event:example-rights-unknown",
+      "rights": {
+        "rightsStatus": "hold",
+        "accessDecision": "restricted",
+        "publicDepositEligibility": "ineligible",
+        "policyVersion": "draft-0.2.0",
+        "decisionBasis": "The source class remains subject to curator policy issue #700."
+      }
+    }
+  ],
+  "artifacts": []
+}
