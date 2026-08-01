@@ -1,6 +1,6 @@
-import { html } from '../html.js?v=3.8.8';
+import { html } from '../html.js?v=3.8.9';
 import { Compass, ExternalLink, Sparkles } from 'lucide-react';
-import StartHerePage, { SelectedFindings } from '../components/StartHerePage.js?v=3.8.8';
+import StartHerePage, { SelectedFindings } from '../components/StartHerePage.js?v=3.8.9';
 
 const DesktopStartPanel = ({
   mode = 'start',
@@ -15,13 +15,13 @@ const DesktopStartPanel = ({
   const PanelIcon = findingsOnly ? Sparkles : Compass;
 
   return html`
-    <div className="desktop-guided-panel">
+    <div className="desktop-guided-panel archive-density--compact">
       <div className="desktop-adapter-toolbar">
         <span>
           <${PanelIcon} aria-hidden="true" />
           ${findingsOnly ? 'Curated entry points' : 'Visitor guide'}
         </span>
-        <button type="button" onClick=${onOpenStandard}>
+        <button type="button" className="archive-action archive-action--secondary" onClick=${onOpenStandard}>
           <${ExternalLink} aria-hidden="true" />
           ${findingsOnly ? 'Open standard Start here' : 'Open standard view'}
         </button>

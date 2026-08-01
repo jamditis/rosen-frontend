@@ -1,9 +1,9 @@
-import { html } from '../html.js?v=3.8.8';
-import DissertationPage from '../components/DissertationPage.js?v=3.8.8';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.8';
+import { html } from '../html.js?v=3.8.9';
+import DissertationPage from '../components/DissertationPage.js?v=3.8.9';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.9';
 
 const DesktopDissertationPanel = ({ onOpenStandard }) => html`
-  <div className="desktop-dissertation-panel">
+  <div className="desktop-dissertation-panel archive-density--compact">
     <header className="desktop-archive-heading">
       <div>
         <p className="desktop-eyebrow">Dissertation map</p>
@@ -13,10 +13,10 @@ const DesktopDissertationPanel = ({ onOpenStandard }) => html`
         </p>
       </div>
       <div className="desktop-heading-actions">
-        <a className="desktop-secondary-link" href=${resolveSitePath('dissertation/reader/')}>
+        <a className="desktop-secondary-link archive-action archive-action--secondary" href=${resolveSitePath('dissertation/reader/')}>
           Read full text
         </a>
-        <button type="button" className="desktop-standard-link" onClick=${onOpenStandard}>
+        <button type="button" className="desktop-standard-link archive-action archive-action--secondary" onClick=${onOpenStandard}>
           Open standard view
         </button>
       </div>

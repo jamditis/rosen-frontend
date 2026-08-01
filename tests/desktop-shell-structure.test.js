@@ -380,7 +380,7 @@ describe('desktop research adapters', () => {
       /\.archive-detail-panel\.is-contained\s*\{[\s\S]*max-height:\s*calc\(100dvh - var\(--desktop-taskbar-height\)/,
       'a contained drawer must end above the fixed desktop taskbar');
     assert.match(read('frontend/desktop/desktop.css'),
-      /\.archive-detail-panel\.is-contained button:focus-visible\s*\{[\s\S]*outline:\s*3px solid #7a4f00/,
+      /\.archive-detail-panel\.is-contained button:focus-visible\s*\{[\s\S]*outline:\s*3px solid var\(--desktop-focus\)/,
       'the locally contained close control must not inherit a transparent focus ring');
   });
 
@@ -451,8 +451,8 @@ describe('desktop guided-path adapter', () => {
     const shell = read('frontend/desktop/DesktopShell.js');
     const css = read('frontend/desktop/desktop.css');
 
-    assert.match(shell, /role="status">\$\{loadingMessage\}/);
-    assert.match(shell, /className="desktop-data-status is-error" role="alert"/);
+    assert.match(shell, /className="desktop-data-status archive-notice" role="status">\$\{loadingMessage\}/);
+    assert.match(shell, /className="desktop-data-status archive-notice archive-notice--danger is-error" role="alert"/);
     assert.match(shell, /Connected records are unavailable\./);
     assert.match(shell, /Guide records are unavailable\./);
     assert.match(shell, /window\.location\.reload\(\)/);
@@ -600,7 +600,7 @@ describe('desktop windowing and spatial memory', () => {
       'compact reflow must transfer focus out of the shortcut panel it hides');
     assert.match(shell, /compactDesktop[\s\S]*desktopTitleRef\.current[\s\S]*revealFocusTarget[\s\S]*scrollIntoView/,
       'compact home must focus its visible launcher while compact fallback routes reveal their message');
-    assert.match(css, /\.desktop-brand h1:focus-visible\s*\{[\s\S]*outline:\s*2px solid #fff/,
+    assert.match(css, /\.desktop-brand h1:focus-visible\s*\{[\s\S]*outline:\s*3px solid var\(--desktop-on-dark\)/,
       'the compact launcher focus destination must expose a visible indicator');
     assert.match(shell, /Minimize \$\{windowTitle\}/);
     assert.match(shell, /aria-label="Open desktop windows"/);
@@ -643,6 +643,47 @@ describe('desktop windowing and spatial memory', () => {
 });
 
 describe('desktop interaction structure', () => {
+  it('harmonizes Rosen 98 chrome with shared archive semantics', () => {
+    const shell = read('frontend/desktop/DesktopShell.js');
+    const css = read('frontend/desktop/desktop.css');
+
+    assert.match(shell, /from 'lucide-react'/,
+      'the desktop icon language must use the repository-owned local vector dependency');
+    assert.match(shell, /className="desktop-icon-glyph"/);
+    assert.doesNotMatch(shell, /data:image|desktop-win98-icon/,
+      'the shell must not embed unlicensed third-party bitmap payloads');
+    assert.match(shell, /Rosen 98/,
+      'the period shell must use its archive-owned Rosen 98 brand');
+    assert.match(shell, /archive-desktop archive-density--compact/,
+      'embedded recipe surfaces need the desktop density contract');
+
+    for (const [name, role] of [
+      ['paper', 'paper-deep'],
+      ['paper-light', 'paper'],
+      ['ink', 'ink'],
+      ['ink-muted', 'ink-muted'],
+      ['rule', 'rule'],
+      ['rule-strong', 'rule-strong'],
+      ['signal', 'signal'],
+      ['focus', 'focus'],
+      ['link', 'link'],
+      ['danger', 'danger'],
+    ]) {
+      assert.match(css, new RegExp(`--desktop-${name}: var\\(--archive-${role}\\)`),
+        `desktop ${name} must inherit the shared semantic role`);
+    }
+    assert.match(css, /--desktop-teal:\s*#008080/,
+      'the refreshed desktop keeps recognizable Windows-era teal');
+    assert.match(css, /--desktop-ink-blue:\s*#000080/,
+      'the refreshed desktop keeps a strong blue title bar');
+    assert.match(css, /\.desktop-menu-icon\s*>\s*svg[^{]*\{[^}]*width:\s*32px;[^}]*height:\s*32px/s,
+      'static Reset and Exit menu icons must match wrapped app icon sizing');
+    assert.match(css, /\.archive-desktop :is\([^)]*\):focus-visible\s*\{[^}]*scroll-margin-block:/s,
+      'fixed desktop chrome must not obscure a focused target');
+    assert.match(css, /@media \(forced-colors: active\)[\s\S]*\.desktop-icon-glyph\s*\{[\s\S]*color:\s*ButtonText/,
+      'desktop icons must inherit system colors in forced-colors mode');
+  });
+
   it('implements roving shortcut focus and conventional keyboard activation', () => {
     const shell = read('frontend/desktop/DesktopShell.js');
     for (const key of ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End']) {
@@ -672,8 +713,8 @@ describe('desktop interaction structure', () => {
     const shell = read('frontend/desktop/DesktopShell.js');
     assert.match(shell, /Standard archive/);
     assert.match(shell, /That desktop item is unavailable/);
-    assert.match(shell, /className="desktop-notice" role="note"/);
-    assert.doesNotMatch(shell, /className="desktop-notice" role="status"/,
+    assert.match(shell, /className="desktop-notice archive-notice archive-notice--warning" role="note"/);
+    assert.doesNotMatch(shell, /className="desktop-notice[^\"]*" role="status"/,
       'the visible note must not duplicate the dedicated live-region announcement');
     assert.match(shell, /aria-live="polite" aria-atomic="true"/);
     assert.match(shell, /onExit/);
