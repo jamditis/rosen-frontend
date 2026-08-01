@@ -7,7 +7,7 @@
  * abstractive bridges between concepts that never co-occur as entities.
  *
  * Each published article is encoded into one 384-dim vector with
- * bge-small-en-v1.5 (via @xenova/transformers, a build-time-only devDependency
+ * bge-small-en-v1.5 (via @huggingface/transformers, a build-time-only devDependency
  * -- it never reaches the browser, exactly like minisearch in #276). Vectors are
  * INT8-quantized with a per-vector scale and concatenated into a compact binary
  * (~359 KB for 947 articles) plus a JSON id index.
@@ -61,7 +61,7 @@ export const BYTES_PER_VECTOR = SCALE_BYTES + EMBED_DIM;
 // Bump on any regeneration whose vectors change (model, pooling, or chunk size).
 // The runtime worker and the service-worker cache key off this so stale vectors
 // can't ship silently after a deploy (see #278 C6).
-export const EMBED_INDEX_VERSION = '1.0.0';
+export const EMBED_INDEX_VERSION = '1.1.0';
 
 const str = (v) => (v == null ? '' : String(v));
 
@@ -225,14 +225,17 @@ export async function buildEmbeddings(articles, rawTextMap, embed) {
 }
 
 /**
- * The model seam. Dynamically imports @xenova/transformers so requiring this
+ * The model seam. Dynamically imports @huggingface/transformers so requiring this
  * module (e.g. in unit tests) never loads onnxruntime. Returns an async
  * embed(text) -> Float32Array(EMBED_DIM), mean-pooled and L2-normalized by the
  * pipeline.
  */
 export async function createExtractor() {
-  const { pipeline } = await import('@xenova/transformers');
-  const extractor = await pipeline('feature-extraction', MODEL_ID);
+  const { pipeline } = await import('@huggingface/transformers');
+  // Transformers.js v2 loaded model_quantized.onnx by default. V4 otherwise
+  // selects the full-precision model on Node, which needlessly changes the
+  // established embedding space and makes this build substantially slower.
+  const extractor = await pipeline('feature-extraction', MODEL_ID, { dtype: 'q8' });
   return async (text) => {
     const out = await extractor(text, { pooling: 'mean', normalize: true });
     return Float32Array.from(out.data);

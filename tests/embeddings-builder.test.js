@@ -211,6 +211,8 @@ test('committed artifact (if present) is self-consistent', () => {
   }
   const index = JSON.parse(readFileSync(jsonPath, 'utf8'));
   const bin = readFileSync(binPath);
+  assert.equal(index.version, EMBED_INDEX_VERSION);
+  assert.equal(index.model, MODEL_ID);
   assert.equal(index.dim, EMBED_DIM);
   assert.equal(index.bytesPerVector, BYTES_PER_VECTOR);
   assert.equal(index.ids.length, index.count);
