@@ -1706,7 +1706,11 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       || restoredWideState.overflow > 1
       || JSON.stringify(restoredWideState.savedPositions) !== JSON.stringify(expectedWidePositions)
     ) {
-      throw new Error(`Expanding after 200%-zoom lost the window stack: ${JSON.stringify(restoredWideState)}`);
+      throw new Error(`Expanding after 200%-zoom lost the window stack: ${JSON.stringify({
+        expectedWideWindowIds,
+        expectedWidePositions,
+        restoredWideState,
+      })}`);
     }
     await analyticsTitle.focus();
     await assertFocused(analyticsTitle, 'Analytics title after expanding from 200%-zoom equivalent');

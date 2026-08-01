@@ -13,6 +13,8 @@ const participateCss = read('features/participate/styles.css');
 const startHere = read('frontend/components/StartHerePage.js');
 const worker = read('frontend/sw.js');
 const audit = read('scripts/preview-audit.js');
+const acceptance = read('docs/design-system-acceptance-2026-08-01.md');
+const releaseManifest = read('docs/design-system-release-3.8.9.sha256');
 const appVersion = JSON.parse(read('version.json')).version;
 
 const position = (source, fragment) => {
@@ -156,5 +158,31 @@ describe('archive design-system foundations', () => {
     assert.match(startHere, /archive-action archive-action--primary/);
     assert.match(startHere, /Help keep the archive useful\./);
     assert.match(audit, /slug: 'design-system',\s+url: '\/frontend\/design-system\/demo\.html'/);
+  });
+
+  it('documents the final route count and where the visual system should recede', () => {
+    const readme = read('frontend/design-system/README.md');
+    assert.match(demo, /<span class="archive-stat__label">Audit routes<\/span><strong class="archive-stat__value">41<\/strong>/);
+    assert.match(demo, /07 \/ restraint/);
+    assert.match(demo, /Dense utility routes should let the system recede/);
+    assert.match(readme, /## Visual restraint/);
+    assert.match(readme, /Dense utility routes/);
+    assert.match(readme, /Specialized modes keep their own visual identity/);
+  });
+
+  it('records the 3.8.9 acceptance decision and an ordered partial-package manifest', () => {
+    assert.match(acceptance, /123 rows, 0 axe violations, 0 custom audit errors/);
+    assert.match(acceptance, /explicitly deferred to #772/);
+    assert.match(acceptance, /No production deployment was performed/);
+    assert.match(acceptance, /Files: 57/);
+
+    const manifestRows = releaseManifest.split('\n')
+      .filter((line) => /^[0-9a-f]{64}  \S+/.test(line));
+    assert.equal(manifestRows.length, 57);
+    assert.match(manifestRows[0], /  frontend\/App\.js$/);
+    assert.match(manifestRows.at(-3), /  index\.html$/);
+    assert.match(manifestRows.at(-2), /  frontend\/sw\.js$/);
+    assert.match(manifestRows.at(-1), /  version\.json$/);
+    assert.doesNotMatch(manifestRows.join('\n'), /(?:^|  )(?:backend|tests|features\/making-of)\//m);
   });
 });
