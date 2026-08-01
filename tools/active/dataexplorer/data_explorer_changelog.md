@@ -33,4 +33,4 @@
 | 2.4.0 | 2025-10-12 | Feature/UI | Line hover dimming: Implemented visual dimming (25% opacity) of all non-hovered lines/dots when the user hovers over an active connection path. |
 | 2.4.1 | 2025-10-12 | Fix/bug | Animation loop stability: Fixed bug where line hover effects stopped working after the path animation completed by forcing the animate() loop to run continuously while in Exploration Mode. |
 | 2.4.2 | 2025-10-12 | Fix/bug | Permanent line hover fix: Ensured the Canvas animation loop remains active indefinitely whenever the view is locked (in exploration mode), guaranteeing continuous line hover functionality regardless of the initial path animation status. |
-| 2.5.0 | 2025-10-13 | Data resilience | Added remote→local CSV fallback (`RosenArchivedataset-TEST-DATA.csv`) so the explorer loads even when the Google Sheet is offline; updated parsing to align with the main explorer. |
+| 2.5.0 | 2025-10-13 | Data parsing | Updated CSV parsing to align with the main explorer. |
