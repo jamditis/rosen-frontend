@@ -1,14 +1,27 @@
 .archive-desktop {
-  --desktop-teal: #0b6867;
-  --desktop-teal-deep: #064d4e;
-  --desktop-ink-blue: #243d63;
-  --desktop-ink-blue-light: #395d89;
-  --desktop-paper: #f5f1e8;
-  --desktop-paper-light: #fffdf8;
-  --desktop-chrome: #d7d2c7;
-  --desktop-chrome-light: #fffef9;
-  --desktop-chrome-dark: #6c6962;
-  --desktop-ink: #171512;
+  /* Rosen 98 keeps its period shell colors while archive content inherits the
+     same semantic paper, ink, rule, signal, and state roles as standard view. */
+  --desktop-teal: #008080;
+  --desktop-teal-deep: #006666;
+  --desktop-ink-blue: #000080;
+  --desktop-ink-blue-light: #10439a;
+  --desktop-chrome: #c0c0c0;
+  --desktop-chrome-light: #fff;
+  --desktop-chrome-dark: #808080;
+  --desktop-paper: var(--archive-paper-deep);
+  --desktop-paper-light: var(--archive-paper);
+  --desktop-ink: var(--archive-ink);
+  --desktop-ink-muted: var(--archive-ink-muted);
+  --desktop-rule: var(--archive-rule);
+  --desktop-rule-strong: var(--archive-rule-strong);
+  --desktop-signal: var(--archive-signal);
+  --desktop-focus: var(--archive-focus);
+  --desktop-link: var(--archive-link);
+  --desktop-danger: var(--archive-danger);
+  --desktop-danger-soft: var(--archive-danger-soft);
+  --desktop-warning: var(--archive-warning);
+  --desktop-warning-soft: var(--archive-warning-soft);
+  --desktop-on-dark: var(--archive-on-dark);
   --desktop-taskbar-height: 58px;
   position: relative;
   min-height: 100vh;
@@ -23,6 +36,7 @@
     linear-gradient(145deg, var(--desktop-teal) 0%, var(--desktop-teal-deep) 100%);
   background-size: 16px 16px, 16px 16px, auto, auto;
   font-family: var(--font-body, 'Roboto Mono', monospace);
+  scroll-padding-block-end: calc(var(--desktop-taskbar-height) + 1rem);
 }
 
 .archive-desktop,
@@ -37,6 +51,10 @@
 
 .archive-desktop button {
   color: inherit;
+}
+
+.archive-desktop :is(button, a, input, select, textarea, [tabindex]):focus-visible {
+  scroll-margin-block: 1rem calc(var(--desktop-taskbar-height) + 1rem);
 }
 
 /* Canonical surfaces opt into the shared action recipe. Keep that explicit
@@ -85,7 +103,7 @@
   margin: 0 0 1.25rem;
   padding: 0.75rem 0.8rem 0.8rem;
   border-left: 4px solid rgba(255, 255, 255, 0.8);
-  color: #fffdf8;
+  color: var(--desktop-on-dark);
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.45);
 }
 
@@ -118,7 +136,7 @@
 }
 
 .desktop-brand h1:focus-visible {
-  outline: 2px solid #fff;
+  outline: 3px solid var(--desktop-on-dark);
   outline-offset: 4px;
 }
 
@@ -152,7 +170,7 @@
   padding: 0.45rem 0.3rem;
   border: 2px solid transparent;
   border-radius: 0;
-  color: #fff;
+  color: var(--desktop-on-dark);
   background: transparent;
   text-align: center;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.75);
@@ -167,30 +185,36 @@
 }
 
 .desktop-shortcut:focus-visible {
-  border-color: #fff;
-  outline: 3px solid #17243b;
+  border-color: var(--desktop-on-dark);
+  outline: 3px solid var(--desktop-signal);
   outline-offset: 2px;
   background: rgba(8, 44, 55, 0.72);
 }
 
-.desktop-shortcut-icon,
-.desktop-tool-icon {
+.desktop-shortcut-icon {
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
-  border: 2px solid #181714;
-  border-top-color: #fffef9;
-  border-left-color: #fffef9;
-  background: linear-gradient(145deg, #f6e8bb, #c7a65d);
-  color: #17243b;
-  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.36);
+  width: 48px;
+  height: 48px;
+  color: var(--desktop-ink-blue);
+  filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.38));
   text-shadow: none;
 }
 
+.desktop-icon-layer {
+  display: grid;
+  place-items: center;
+}
+
 .desktop-icon-svg {
-  width: 27px;
-  height: 27px;
+  width: 42px;
+  height: 42px;
+}
+
+.desktop-icon-glyph {
+  display: block;
+  width: 100%;
+  height: 100%;
   stroke-width: 1.8;
 }
 
@@ -205,7 +229,7 @@
 .desktop-shortcut-mode {
   display: block;
   padding: 0.1rem 0.22rem;
-  color: #fff9e8;
+  color: var(--desktop-on-dark);
   background: rgba(0, 0, 0, 0.34);
   font-size: 0.57rem;
   font-weight: 700;
@@ -236,8 +260,8 @@
   border: 3px solid var(--desktop-chrome);
   border-top-color: var(--desktop-chrome-light);
   border-left-color: var(--desktop-chrome-light);
-  border-right-color: #292722;
-  border-bottom-color: #292722;
+  border-right-color: var(--desktop-ink);
+  border-bottom-color: var(--desktop-ink);
   background: var(--desktop-chrome);
   box-shadow: 10px 12px 0 rgba(0, 0, 0, 0.22), 18px 22px 40px rgba(0, 0, 0, 0.22);
   transform: translateX(-50%);
@@ -245,7 +269,7 @@
 
 .desktop-window.is-active {
   box-shadow:
-    0 0 0 2px rgba(240, 201, 75, 0.72),
+    0 0 0 2px var(--desktop-signal),
     12px 14px 0 rgba(0, 0, 0, 0.25),
     20px 24px 44px rgba(0, 0, 0, 0.28);
 }
@@ -258,7 +282,7 @@
   gap: 1rem;
   margin: 2px;
   padding: 0.3rem 0.35rem 0.3rem 0.75rem;
-  color: #fff;
+  color: var(--desktop-on-dark);
   background:
     repeating-linear-gradient(90deg, transparent, transparent 3px, rgba(255, 255, 255, 0.04) 3px, rgba(255, 255, 255, 0.04) 4px),
     linear-gradient(90deg, var(--desktop-ink-blue), var(--desktop-ink-blue-light));
@@ -293,7 +317,7 @@
 }
 
 .desktop-window-title-copy h2:focus {
-  outline: 2px solid #fff;
+  outline: 3px solid var(--desktop-on-dark);
   outline-offset: 3px;
 }
 
@@ -312,8 +336,8 @@
 }
 
 .desktop-window.is-inactive .desktop-window-titlebar {
-  color: #fff;
-  background: #74736f;
+  color: var(--desktop-on-dark);
+  background: var(--desktop-ink-muted);
 }
 
 .desktop-titlebar-icon {
@@ -366,7 +390,7 @@
 .desktop-task-button:focus-visible,
 .desktop-menu-item:focus-visible,
 .desktop-tool-link:focus-visible {
-  outline: 3px solid #f0c94b;
+  outline: 3px solid var(--desktop-signal);
   outline-offset: 2px;
 }
 
@@ -384,7 +408,7 @@
   border-top-color: var(--desktop-chrome-light);
   border-left-color: var(--desktop-chrome-light);
   background: var(--desktop-chrome);
-  color: #211e1a;
+  color: var(--desktop-ink);
   box-shadow: 6px 7px 0 rgba(0, 0, 0, 0.26);
 }
 
@@ -409,7 +433,7 @@
   border-top-color: var(--desktop-chrome-light);
   border-left-color: var(--desktop-chrome-light);
   background: var(--desktop-chrome);
-  color: #211e1a;
+  color: var(--desktop-ink);
   cursor: pointer;
 }
 
@@ -420,16 +444,16 @@
 }
 
 .desktop-window-move-panel button:focus-visible {
-  outline: 3px solid #6f270d;
+  outline: 3px solid var(--desktop-focus);
   outline-offset: 2px;
 }
 
 .desktop-window-body {
   min-height: 360px;
   margin: 0 2px;
-  border: 2px solid #77736a;
-  border-top-color: #292722;
-  border-left-color: #292722;
+  border: 2px solid var(--desktop-rule-strong);
+  border-top-color: var(--desktop-ink);
+  border-left-color: var(--desktop-ink);
   background-color: var(--desktop-paper);
   background-image:
     radial-gradient(circle at 14% 10%, rgba(183, 137, 72, 0.08), transparent 28%),
@@ -440,11 +464,11 @@
   min-height: 26px;
   margin: 3px 2px 2px;
   padding: 0.27rem 0.5rem;
-  border: 1px solid #77736a;
-  border-top-color: #807c74;
-  border-left-color: #807c74;
-  background: #e6e1d7;
-  color: #4b4842;
+  border: 1px solid var(--desktop-rule-strong);
+  border-top-color: var(--desktop-chrome-dark);
+  border-left-color: var(--desktop-chrome-dark);
+  background: var(--desktop-paper);
+  color: var(--desktop-ink-muted);
   font-size: 0.65rem;
 }
 
@@ -476,7 +500,7 @@
 
 .desktop-eyebrow {
   margin-bottom: 0.5rem;
-  color: #5f5237;
+  color: var(--desktop-warning);
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -486,7 +510,7 @@
 .desktop-lede {
   max-width: 68ch;
   margin-bottom: 1.75rem;
-  color: #38342d;
+  color: var(--desktop-ink-muted);
   font-size: clamp(0.88rem, 1.5vw, 1rem);
   line-height: 1.75;
 }
@@ -496,11 +520,8 @@
   align-items: flex-start;
   gap: 0.65rem;
   margin: -0.25rem 0 1.25rem;
-  padding: 0.8rem 0.9rem;
-  border: 1px solid #976b21;
-  border-left: 5px solid #976b21;
-  background: #fff2c9;
-  color: #4a3212;
+  padding: 0.8rem 0.9rem 0.8rem 1.35rem;
+  color: var(--desktop-ink);
   font-size: 0.78rem;
   font-weight: 700;
   line-height: 1.5;
@@ -515,7 +536,7 @@
 .desktop-principles {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-top: 2px solid #332f29;
+  border-top: 2px solid var(--desktop-ink);
 }
 
 .desktop-principles article {
@@ -525,12 +546,12 @@
 
 .desktop-principles article + article {
   padding-left: 1rem;
-  border-left: 1px solid #b9b09f;
+  border-left: 1px solid var(--desktop-rule-strong);
 }
 
 .desktop-principles p {
   margin-bottom: 0;
-  color: #4c473f;
+  color: var(--desktop-ink-muted);
   font-size: 0.75rem;
   line-height: 1.55;
 }
@@ -538,7 +559,7 @@
 .desktop-principle-number {
   display: inline-block;
   margin-bottom: 0.6rem;
-  color: #726442;
+  color: var(--desktop-warning);
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -546,7 +567,7 @@
 
 .desktop-definition-list {
   margin: 0 0 2rem;
-  border-top: 2px solid #332f29;
+  border-top: 2px solid var(--desktop-ink);
 }
 
 .desktop-definition-list > div {
@@ -554,7 +575,7 @@
   grid-template-columns: minmax(110px, 0.28fr) 1fr;
   gap: 1rem;
   padding: 0.9rem 0;
-  border-bottom: 1px solid #c8c0b3;
+  border-bottom: 1px solid var(--desktop-rule);
 }
 
 .desktop-definition-list dt {
@@ -564,7 +585,7 @@
 
 .desktop-definition-list dd {
   margin: 0;
-  color: #49443c;
+  color: var(--desktop-ink-muted);
   font-size: 0.78rem;
   line-height: 1.55;
 }
@@ -572,8 +593,8 @@
 .desktop-layout-help {
   margin: 0 0 1rem;
   padding: 1rem;
-  border: 1px solid #aaa292;
-  background: #ece6da;
+  border: 1px solid var(--desktop-rule-strong);
+  background: var(--desktop-paper);
 }
 
 .desktop-layout-help h4,
@@ -582,7 +603,7 @@
 }
 
 .desktop-layout-help p {
-  color: #49443c;
+  color: var(--desktop-ink-muted);
   font-size: 0.76rem;
   line-height: 1.55;
 }
@@ -610,32 +631,44 @@
   align-items: flex-start;
   gap: 0.75rem;
   padding: 0.8rem;
-  border: 2px solid #716d64;
-  border-top-color: #fffef9;
-  border-left-color: #fffef9;
-  background: #e6e1d7;
-  color: #1d1a17;
+  border: 2px solid var(--desktop-chrome-dark);
+  border-top-color: var(--desktop-chrome-light);
+  border-left-color: var(--desktop-chrome-light);
+  background: var(--desktop-chrome);
+  color: var(--desktop-ink);
   text-decoration: none;
   box-shadow: 2px 2px 0 rgba(48, 44, 38, 0.3);
 }
 
 .desktop-tool-link:hover {
-  background: #fffdf8;
+  background: var(--desktop-paper-light);
 }
 
 .desktop-tool-link:active {
-  border-color: #fffef9;
-  border-top-color: #716d64;
-  border-left-color: #716d64;
+  border-color: var(--desktop-chrome-light);
+  border-top-color: var(--desktop-chrome-dark);
+  border-left-color: var(--desktop-chrome-dark);
   box-shadow: none;
   transform: translate(1px, 1px);
 }
 
 .desktop-tool-icon {
+  display: grid;
   flex: 0 0 44px;
   width: 44px;
   height: 44px;
+  place-items: center;
+  border: 2px solid var(--desktop-chrome-dark);
+  border-top-color: var(--desktop-chrome-light);
+  border-left-color: var(--desktop-chrome-light);
+  background: var(--desktop-paper);
+  color: var(--desktop-ink-blue);
   box-shadow: none;
+}
+
+.desktop-tool-icon .desktop-icon-svg {
+  width: 34px;
+  height: 34px;
 }
 
 .desktop-tool-copy {
@@ -657,7 +690,7 @@
 
 .desktop-tool-copy small {
   margin-top: 0.25rem;
-  color: #524d45;
+  color: var(--desktop-ink);
   font-size: 0.67rem;
   line-height: 1.45;
 }
@@ -667,7 +700,7 @@
   align-items: center;
   gap: 0.25rem;
   margin-top: 0.5rem;
-  color: #243d63;
+  color: var(--archive-sky-dark);
   font-size: 0.62rem;
   font-weight: 700;
   text-decoration: underline;
@@ -677,9 +710,9 @@
 .desktop-tool-mode em {
   margin-left: auto;
   padding: 0.1rem 0.28rem;
-  border: 1px solid #7a5b20;
-  color: #4d3812;
-  background: #f7e4a8;
+  border: 1px solid var(--desktop-warning);
+  color: var(--desktop-warning);
+  background: var(--desktop-warning-soft);
   font-style: normal;
   text-decoration: none;
   text-transform: uppercase;
@@ -720,7 +753,7 @@
 .desktop-archive-panel {
   min-height: 616px;
   padding: clamp(1rem, 2.2vw, 1.65rem);
-  color: #211e1a;
+  color: var(--desktop-ink);
 }
 
 .desktop-archive-heading {
@@ -729,7 +762,7 @@
   justify-content: space-between;
   gap: 1rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #332f29;
+  border-bottom: 2px solid var(--desktop-ink);
 }
 
 .desktop-archive-heading h3,
@@ -747,7 +780,7 @@
 .desktop-archive-heading > div > p:last-child {
   max-width: 64ch;
   margin-bottom: 0;
-  color: #554f46;
+  color: var(--desktop-ink-muted);
   font-size: 0.72rem;
   line-height: 1.55;
 }
@@ -756,11 +789,11 @@
   flex: 0 0 auto;
   min-height: 44px;
   padding: 0.5rem 0.7rem;
-  border: 2px solid #716d64;
-  border-top-color: #fffef9;
-  border-left-color: #fffef9;
-  background: #e6e1d7;
-  color: #243d63;
+  border: 2px solid var(--desktop-chrome-dark);
+  border-top-color: var(--desktop-chrome-light);
+  border-left-color: var(--desktop-chrome-light);
+  background: var(--desktop-chrome);
+  color: var(--desktop-link);
   font-size: 0.66rem;
   font-weight: 700;
   text-decoration: underline;
@@ -773,7 +806,7 @@
 .desktop-filter-toggle:focus-visible,
 .desktop-sort-control select:focus-visible,
 .desktop-archive-error button:focus-visible {
-  outline: 3px solid #9b6b00;
+  outline: 3px solid var(--desktop-focus);
   outline-offset: 2px;
 }
 
@@ -783,14 +816,14 @@
   align-items: center;
   gap: 0.55rem;
   padding: 0.75rem 0;
-  border-bottom: 1px solid #aaa292;
+  border-bottom: 1px solid var(--desktop-rule-strong);
 }
 
 .desktop-view-switch {
   display: flex;
   padding: 2px;
-  border: 1px solid #8a847a;
-  background: #d6d0c5;
+  border: 1px solid var(--desktop-chrome-dark);
+  background: var(--desktop-chrome);
 }
 
 .desktop-view-switch button,
@@ -803,7 +836,7 @@
   padding: 0.4rem 0.65rem;
   border: 1px solid transparent;
   background: transparent;
-  color: #433f38;
+  color: var(--desktop-ink);
   font-size: 0.66rem;
   font-weight: 700;
   cursor: pointer;
@@ -816,20 +849,20 @@
 }
 
 .desktop-view-switch button.is-active {
-  border-color: #777168;
-  border-top-color: #fffef9;
-  border-left-color: #fffef9;
-  background: #fffdf8;
-  color: #171512;
+  border-color: var(--desktop-chrome-dark);
+  border-top-color: var(--desktop-chrome-light);
+  border-left-color: var(--desktop-chrome-light);
+  background: var(--desktop-paper-light);
+  color: var(--desktop-ink);
   box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.22);
 }
 
 .desktop-filter-toggle {
   display: none;
-  border: 2px solid #716d64;
-  border-top-color: #fffef9;
-  border-left-color: #fffef9;
-  background: #e6e1d7;
+  border: 2px solid var(--desktop-chrome-dark);
+  border-top-color: var(--desktop-chrome-light);
+  border-left-color: var(--desktop-chrome-light);
+  background: var(--desktop-chrome);
 }
 
 .desktop-filter-toggle > span {
@@ -838,8 +871,8 @@
   min-height: 20px;
   place-items: center;
   border-radius: 50%;
-  background: #243d63;
-  color: #fff;
+  background: var(--desktop-ink-blue);
+  color: var(--desktop-on-dark);
   font-size: 0.58rem;
 }
 
@@ -856,10 +889,10 @@
 
 .desktop-sort-control select {
   min-height: 44px;
-  border: 1px solid #827c72;
+  border: 1px solid var(--desktop-rule-strong);
   border-radius: 0;
-  background: #fffdf8;
-  color: #211e1a;
+  background: var(--desktop-paper-light);
+  color: var(--desktop-ink);
   font-size: 0.7rem;
   text-transform: none;
 }
@@ -877,8 +910,8 @@
   max-height: none;
   padding: 0.75rem;
   overflow: visible;
-  border: 1px solid #b4ac9e;
-  background: rgba(255, 253, 248, 0.72);
+  border: 1px solid var(--desktop-rule-strong);
+  background: color-mix(in srgb, var(--desktop-paper-light) 84%, transparent);
   box-shadow: none;
 }
 
@@ -916,7 +949,7 @@
 
 .desktop-result-summary {
   margin: 0 0 0.75rem;
-  color: #5c564d;
+  color: var(--desktop-ink-muted);
   font-family: var(--font-display, 'Special Elite', cursive);
   font-size: 0.78rem;
 }
@@ -951,11 +984,8 @@
   display: flex;
   align-items: flex-start;
   gap: 0.8rem;
-  padding: 1rem;
-  border: 1px solid #a43c32;
-  border-left: 5px solid #a43c32;
-  background: #fff0eb;
-  color: #5d211c;
+  padding: 1rem 1rem 1rem 1.55rem;
+  color: var(--desktop-ink);
 }
 
 .desktop-archive-error > svg {
@@ -982,8 +1012,9 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.45rem 0.7rem;
-  border: 2px solid #716d64;
-  background: #fffdf8;
+  border: 2px solid var(--desktop-danger);
+  background: var(--desktop-danger);
+  color: var(--archive-on-dark);
   font-size: 0.68rem;
   font-weight: 700;
   cursor: pointer;
@@ -997,7 +1028,7 @@
 .desktop-entity-panel {
   min-height: 616px;
   padding: clamp(1rem, 2.2vw, 1.65rem);
-  color: #211e1a;
+  color: var(--desktop-ink);
 }
 
 .desktop-entity-browser {
@@ -1006,10 +1037,8 @@
 
 .desktop-data-status {
   margin: 1rem 0 0;
-  padding: 0.8rem 1rem;
-  border-left: 5px solid #6d655a;
-  background: #eee9df;
-  color: #3f3932;
+  padding: 0.8rem 1rem 0.8rem 1.55rem;
+  color: var(--desktop-ink-muted);
   font-size: 0.72rem;
   font-weight: 700;
   line-height: 1.5;
@@ -1019,10 +1048,7 @@
   display: flex;
   align-items: flex-start;
   gap: 0.8rem;
-  border: 1px solid #a43c32;
-  border-left: 5px solid #a43c32;
-  background: #fff0eb;
-  color: #5d211c;
+  color: var(--desktop-ink);
   font-weight: 400;
 }
 
@@ -1050,9 +1076,9 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.45rem 0.7rem;
-  border: 2px solid #716d64;
-  background: #fffdf8;
-  color: inherit;
+  border: 2px solid var(--desktop-danger);
+  background: var(--desktop-danger);
+  color: var(--archive-on-dark);
   font-size: 0.68rem;
   font-weight: 700;
   cursor: pointer;
@@ -1064,7 +1090,7 @@
 }
 
 .desktop-data-status.is-error button:focus-visible {
-  outline: 3px solid #9b6b00;
+  outline: 3px solid var(--desktop-focus);
   outline-offset: 2px;
 }
 
@@ -1082,13 +1108,13 @@
  * canonical entity browser's explicit selected-chip treatment above that
  * scoped default so its dark chips remain legible in the adapter. */
 .desktop-entity-browser .text-white {
-  color: #fff;
+  color: var(--desktop-on-dark);
 }
 
 .desktop-entity-browser button:focus-visible,
 .desktop-entity-browser input:focus-visible,
 .desktop-entity-browser select:focus-visible {
-  outline: 3px solid #9b6b00;
+  outline: 3px solid var(--desktop-focus);
   outline-offset: 2px;
 }
 
@@ -1096,7 +1122,7 @@
 .desktop-analytics-panel {
   min-height: 616px;
   padding: clamp(1rem, 2.2vw, 1.65rem);
-  color: #211e1a;
+  color: var(--desktop-ink);
 }
 
 .desktop-heading-actions {
@@ -1112,11 +1138,11 @@
   align-items: center;
   justify-content: center;
   padding: 0.5rem 0.7rem;
-  border: 2px solid #716d64;
-  border-top-color: #fffef9;
-  border-left-color: #fffef9;
-  background: #fffdf8;
-  color: #243d63;
+  border: 2px solid var(--desktop-chrome-dark);
+  border-top-color: var(--desktop-chrome-light);
+  border-left-color: var(--desktop-chrome-light);
+  background: var(--desktop-paper-light);
+  color: var(--desktop-link);
   font-size: 0.66rem;
   font-weight: 700;
   text-decoration: underline;
@@ -1124,16 +1150,16 @@
 }
 
 .desktop-secondary-link:focus-visible {
-  outline: 3px solid #9b6b00;
+  outline: 3px solid var(--desktop-focus);
   outline-offset: 2px;
 }
 
 .desktop-canonical-surface {
   margin-top: 1rem;
   overflow: hidden;
-  border: 1px solid #aaa292;
-  background: #fdfbf7;
-  box-shadow: inset 1px 1px 0 #fffef9;
+  border: 1px solid var(--desktop-rule-strong);
+  background: var(--archive-canvas);
+  box-shadow: inset 1px 1px 0 var(--desktop-paper-light);
 }
 
 .desktop-canonical-surface button,
@@ -1147,7 +1173,7 @@
 }
 
 .desktop-canonical-surface button.text-white {
-  color: #fff;
+  color: var(--desktop-on-dark);
 }
 
 .desktop-dissertation-surface {
@@ -1164,7 +1190,7 @@
 }
 
 .archive-detail-panel.is-contained button:focus-visible {
-  outline: 3px solid #7a4f00;
+  outline: 3px solid var(--desktop-focus);
   outline-offset: 2px;
 }
 
@@ -1182,12 +1208,12 @@
 .desktop-guided-panel {
   container-type: inline-size;
   min-height: 616px;
-  color: #211e1a;
-  background: #fdfbf7;
+  color: var(--desktop-ink);
+  background: var(--archive-canvas);
 }
 
 .desktop-guided-panel button.text-white {
-  color: #fff;
+  color: var(--desktop-on-dark);
 }
 
 /* Start here now uses the shared archive action recipe instead of a Tailwind
@@ -1211,8 +1237,8 @@
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.35rem 0.55rem 0.35rem 0.8rem;
-  border-bottom: 1px solid #918a7e;
-  background: #e8e2d7;
+  border-bottom: 1px solid var(--desktop-rule-strong);
+  background: var(--desktop-paper);
   box-shadow: 0 2px 0 rgba(71, 66, 59, 0.16);
 }
 
@@ -1238,11 +1264,11 @@
 .desktop-adapter-toolbar button {
   min-height: 44px;
   padding: 0.45rem 0.65rem;
-  border: 2px solid #716d64;
-  border-top-color: #fffef9;
-  border-left-color: #fffef9;
-  background: #f7f3eb;
-  color: #243d63;
+  border: 2px solid var(--desktop-chrome-dark);
+  border-top-color: var(--desktop-chrome-light);
+  border-left-color: var(--desktop-chrome-light);
+  background: var(--desktop-paper-light);
+  color: var(--desktop-link);
   text-decoration: underline;
   text-underline-offset: 2px;
   cursor: pointer;
@@ -1251,7 +1277,7 @@
 .desktop-adapter-toolbar button:focus-visible,
 .desktop-guided-panel button:focus-visible,
 .desktop-guided-panel a:focus-visible {
-  outline: 3px solid #9b6b00;
+  outline: 3px solid var(--desktop-focus);
   outline-offset: 2px;
 }
 
@@ -1316,8 +1342,8 @@
   border: 2px solid var(--desktop-chrome-dark);
   border-top-color: var(--desktop-chrome-light);
   border-left-color: var(--desktop-chrome-light);
-  background: #e1dcd1;
-  color: #171512;
+  background: var(--desktop-chrome);
+  color: var(--desktop-ink);
   cursor: pointer;
 }
 
@@ -1369,6 +1395,21 @@
   font-size: 0.92rem;
 }
 
+.desktop-start-mark {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid var(--desktop-ink);
+  color: var(--desktop-on-dark);
+  background: var(--desktop-ink-blue);
+  font-family: var(--font-body);
+  font-size: 0.57rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
 .desktop-start-button svg,
 .desktop-task-button svg {
   flex: 0 0 auto;
@@ -1383,7 +1424,7 @@
   border-color: var(--desktop-chrome-light);
   border-top-color: var(--desktop-chrome-dark);
   border-left-color: var(--desktop-chrome-dark);
-  background: #c7c1b6;
+  background: var(--desktop-rule-strong);
 }
 
 .desktop-task-button {
@@ -1410,10 +1451,10 @@
   justify-content: center;
   margin-left: auto;
   padding: 0 0.8rem;
-  border: 2px solid #f3efe6;
-  border-top-color: #77736a;
-  border-left-color: #77736a;
-  color: #403c36;
+  border: 2px solid var(--desktop-paper-light);
+  border-top-color: var(--desktop-chrome-dark);
+  border-left-color: var(--desktop-chrome-dark);
+  color: var(--desktop-ink);
   text-align: right;
 }
 
@@ -1447,8 +1488,8 @@
   border: 3px solid var(--desktop-chrome);
   border-top-color: var(--desktop-chrome-light);
   border-left-color: var(--desktop-chrome-light);
-  border-right-color: #292722;
-  border-bottom-color: #292722;
+  border-right-color: var(--desktop-ink);
+  border-bottom-color: var(--desktop-ink);
   background: var(--desktop-chrome);
   box-shadow: 7px -7px 20px rgba(0, 0, 0, 0.34);
 }
@@ -1457,8 +1498,8 @@
   position: relative;
   min-height: 100%;
   overflow: hidden;
-  color: rgba(255, 255, 255, 0.78);
-  background: linear-gradient(180deg, #243d63, #13263f);
+  color: var(--desktop-on-dark);
+  background: linear-gradient(180deg, var(--desktop-ink-blue), var(--desktop-ink-blue-light));
 }
 
 .desktop-start-rail span {
@@ -1485,7 +1526,7 @@
   flex-direction: column;
   justify-content: center;
   padding: 0.45rem 0.65rem;
-  border-bottom: 1px solid #9b958b;
+  border-bottom: 1px solid var(--desktop-rule-strong);
 }
 
 .desktop-start-heading strong {
@@ -1494,7 +1535,7 @@
 
 .desktop-start-heading small {
   margin-top: 0.15rem;
-  color: #5b564f;
+  color: var(--desktop-ink);
   font-size: 0.62rem;
 }
 
@@ -1513,7 +1554,7 @@
 
 .desktop-menu-item:hover,
 .desktop-menu-item:focus-visible {
-  color: #fff;
+  color: var(--desktop-on-dark);
   background: var(--desktop-ink-blue);
 }
 
@@ -1522,14 +1563,13 @@
   width: 34px;
   height: 34px;
   place-items: center;
-  border: 1px solid #777168;
-  background: #f4e6b9;
-  color: #17243b;
+  color: var(--desktop-ink-blue);
 }
 
-.desktop-menu-icon svg {
-  width: 21px;
-  height: 21px;
+.desktop-menu-icon .desktop-icon-svg,
+.desktop-menu-icon > svg {
+  width: 32px;
+  height: 32px;
 }
 
 .desktop-menu-item > span:last-child,
@@ -1546,7 +1586,7 @@
 
 .desktop-menu-item small {
   margin-top: 0.12rem;
-  color: #5c5750;
+  color: var(--desktop-ink);
   font-size: 0.56rem;
   line-height: 1.2;
   text-transform: uppercase;
@@ -1554,14 +1594,14 @@
 
 .desktop-menu-item:hover small,
 .desktop-menu-item:focus-visible small {
-  color: #e9e4da;
+  color: var(--desktop-on-dark);
 }
 
 .desktop-menu-divider {
   height: 2px;
   margin: 0.25rem 0.3rem;
-  border-top: 1px solid #827d74;
-  border-bottom: 1px solid #fffef9;
+  border-top: 1px solid var(--desktop-chrome-dark);
+  border-bottom: 1px solid var(--desktop-chrome-light);
 }
 
 .desktop-menu-exit {
@@ -1608,7 +1648,7 @@
     max-height: 100%;
     padding: 1rem;
     overflow-y: auto;
-    background: #f5f1e8;
+    background: var(--desktop-paper);
     box-shadow: 7px 0 18px rgba(0, 0, 0, 0.3);
     visibility: hidden;
     pointer-events: none;
@@ -1920,6 +1960,16 @@
 
   .desktop-wallpaper-mark {
     display: none;
+  }
+
+  .desktop-icon-glyph {
+    color: ButtonText;
+  }
+
+  .desktop-start-mark {
+    border-color: ButtonText;
+    color: ButtonText;
+    background: ButtonFace;
   }
 
   .desktop-brand,

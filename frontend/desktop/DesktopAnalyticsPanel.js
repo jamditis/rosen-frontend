@@ -1,8 +1,8 @@
-import { html } from '../html.js?v=3.8.8';
-import AnalyticsDashboard from '../components/AnalyticsDashboard.js?v=3.8.8';
+import { html } from '../html.js?v=3.8.9';
+import AnalyticsDashboard from '../components/AnalyticsDashboard.js?v=3.8.9';
 
 const DesktopAnalyticsPanel = ({ onRecordResults, onOpenStandard }) => html`
-  <div className="desktop-analytics-panel">
+  <div className="desktop-analytics-panel archive-density--compact">
     <header className="desktop-archive-heading">
       <div>
         <p className="desktop-eyebrow">Collection patterns</p>
@@ -11,7 +11,7 @@ const DesktopAnalyticsPanel = ({ onRecordResults, onOpenStandard }) => html`
           Inspect the maintained aggregate data now. The larger query database still loads only when you choose to run a query.
         </p>
       </div>
-      <button type="button" className="desktop-standard-link" onClick=${onOpenStandard}>
+      <button type="button" className="desktop-standard-link archive-action archive-action--secondary" onClick=${onOpenStandard}>
         Open standard view
       </button>
     </header>

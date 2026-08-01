@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { html } from '../html.js?v=3.8.8';
+import { html } from '../html.js?v=3.8.9';
 import {
   AlertCircle,
   Filter,
@@ -7,8 +7,8 @@ import {
   LayoutGrid,
   RotateCw,
 } from 'lucide-react';
-import ArchiveResults from '../components/ArchiveResults.js?v=3.8.8';
-import Sidebar from '../components/Sidebar.js?v=3.8.8';
+import ArchiveResults from '../components/ArchiveResults.js?v=3.8.9';
+import Sidebar from '../components/Sidebar.js?v=3.8.9';
 
 const DesktopArchivePanel = ({
   viewMode,
@@ -100,12 +100,12 @@ const DesktopArchivePanel = ({
   };
 
   const errorPanel = error && html`
-    <div className="desktop-archive-error" role="alert">
+    <div className="desktop-archive-error archive-notice archive-notice--danger" role="alert">
       <${AlertCircle} aria-hidden="true" />
       <div>
         <h3>Error loading archive</h3>
         <p>${error}</p>
-        <button type="button" onClick=${() => window.location.reload()}>
+        <button type="button" className="archive-action archive-action--danger" onClick=${() => window.location.reload()}>
           <${RotateCw} aria-hidden="true" />
           Reload page
         </button>
@@ -114,7 +114,7 @@ const DesktopArchivePanel = ({
   `;
 
   return html`
-    <div className="desktop-archive-panel">
+    <div className="desktop-archive-panel archive-density--compact">
       <header className="desktop-archive-heading">
         <div>
           <p className="desktop-eyebrow">Canonical collection</p>
@@ -123,7 +123,7 @@ const DesktopArchivePanel = ({
             This window uses the archive's live records, filters, details, citations, and share links.
           </p>
         </div>
-        <button type="button" className="desktop-standard-link" onClick=${onOpenStandard}>
+        <button type="button" className="desktop-standard-link archive-action archive-action--secondary" onClick=${onOpenStandard}>
           Open standard view
         </button>
       </header>

@@ -1,5 +1,5 @@
-import { html } from '../html.js?v=3.8.8';
-import EntityBrowser from '../components/EntityBrowser.js?v=3.8.8';
+import { html } from '../html.js?v=3.8.9';
+import EntityBrowser from '../components/EntityBrowser.js?v=3.8.9';
 
 const DesktopEntityPanel = ({
   records,
@@ -12,7 +12,7 @@ const DesktopEntityPanel = ({
   autoFocusSelection,
   onOpenStandard,
 }) => html`
-  <div className="desktop-entity-panel">
+  <div className="desktop-entity-panel archive-density--compact">
     <header className="desktop-archive-heading">
       <div>
         <p className="desktop-eyebrow">People and ideas</p>
@@ -21,7 +21,7 @@ const DesktopEntityPanel = ({
           Explore the canonical entity index, then open any connected record without leaving the desktop.
         </p>
       </div>
-      <button type="button" className="desktop-standard-link" onClick=${onOpenStandard}>
+      <button type="button" className="desktop-standard-link archive-action archive-action--secondary" onClick=${onOpenStandard}>
         Open standard view
       </button>
     </header>

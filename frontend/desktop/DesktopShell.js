@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { html } from '../html.js?v=3.8.8';
+import { html } from '../html.js?v=3.8.9';
 import {
   AlertTriangle,
   Archive,
@@ -15,7 +15,6 @@ import {
   FileText,
   FolderOpen,
   Info,
-  Menu,
   Minus,
   Move,
   Network,
@@ -26,17 +25,17 @@ import {
   Wrench,
   X,
 } from 'lucide-react';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.8';
-import DesktopArchivePanel from './DesktopArchivePanel.js?v=3.8.8';
-import DesktopAnalyticsPanel from './DesktopAnalyticsPanel.js?v=3.8.8';
-import DesktopDissertationPanel from './DesktopDissertationPanel.js?v=3.8.8';
-import DesktopEntityPanel from './DesktopEntityPanel.js?v=3.8.8';
-import DesktopStartPanel from './DesktopStartPanel.js?v=3.8.8';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.9';
+import DesktopArchivePanel from './DesktopArchivePanel.js?v=3.8.9';
+import DesktopAnalyticsPanel from './DesktopAnalyticsPanel.js?v=3.8.9';
+import DesktopDissertationPanel from './DesktopDissertationPanel.js?v=3.8.9';
+import DesktopEntityPanel from './DesktopEntityPanel.js?v=3.8.9';
+import DesktopStartPanel from './DesktopStartPanel.js?v=3.8.9';
 import {
   DESKTOP_TOOL_LINKS,
   getDesktopApp,
   getReadyDesktopApps,
-} from './desktopRegistry.js?v=3.8.8';
+} from './desktopRegistry.js?v=3.8.9';
 import {
   DESKTOP_LAYOUT_STORAGE_KEY,
   activateDesktopWindow,
@@ -48,7 +47,7 @@ import {
   nextVisibleDesktopWindow,
   parseDesktopLayout,
   serializeDesktopLayout,
-} from './desktopWindowState.js?v=3.8.8';
+} from './desktopWindowState.js?v=3.8.9';
 
 const ICONS = {
   archive: Archive,
@@ -68,7 +67,11 @@ const ICONS = {
 
 const iconFor = (key, className = 'desktop-icon-svg') => {
   const Icon = ICONS[key] || FileQuestion;
-  return html`<${Icon} className=${className} aria-hidden="true" />`;
+  return html`
+    <span className=${`desktop-icon-layer ${className}`} aria-hidden="true">
+      <${Icon} className="desktop-icon-glyph" aria-hidden="true" />
+    </span>
+  `;
 };
 
 const launchModeLabel = (app) => {
@@ -174,7 +177,7 @@ const DesktopShell = ({
     const link = document.createElement('link');
     link.id = stylesheetId;
     link.rel = 'stylesheet';
-    link.href = resolveSitePath('frontend/desktop/desktop.css?v=3.8.8');
+    link.href = resolveSitePath('frontend/desktop/desktop.css?v=3.8.9');
     link.addEventListener('error', () => {
       setStatusMessage('Desktop styling could not load. All destinations remain available.');
     }, { once: true });
@@ -849,13 +852,13 @@ const DesktopShell = ({
   const renderWelcome = () => html`
     <div className="desktop-document">
       ${hasUnknownApp && html`
-        <div className="desktop-notice" role="note">
+        <div className="desktop-notice archive-notice archive-notice--warning" role="note">
           <${AlertTriangle} className="desktop-inline-icon" aria-hidden="true" />
           <span>That desktop item is unavailable. Showing the desktop home.</span>
         </div>
       `}
       <p className="desktop-eyebrow">A second front door</p>
-      <h3>Welcome to the archive desktop</h3>
+      <h3>Welcome to Rosen 98</h3>
       <p className="desktop-lede">
         This optional view arranges the same Rosen Archive as shortcuts, folders, and windows. It is a map of the collection, not a separate copy of it.
       </p>
@@ -899,7 +902,7 @@ const DesktopShell = ({
         <p>
           On wider screens, drag a title bar or choose its Move button. Move offers click, tap, and keyboard arrow controls. Open, minimized, and moved app windows are saved on this device. Active state stays in the URL, so Back and Forward move between the windows you activated; position changes do not add history entries.
         </p>
-        <button type="button" className="desktop-standard-link" onClick=${resetLayout}>
+        <button type="button" className="desktop-standard-link archive-action archive-action--secondary" onClick=${resetLayout}>
           <${RotateCcw} aria-hidden="true" />
           Reset desktop layout
         </button>
@@ -942,12 +945,12 @@ const DesktopShell = ({
   const renderDataStatus = (view, loadingMessage, errorTitle) => {
     if (view.error) {
       return html`
-        <div className="desktop-data-status is-error" role="alert">
+        <div className="desktop-data-status archive-notice archive-notice--danger is-error" role="alert">
           <${AlertTriangle} aria-hidden="true" />
           <div>
             <strong>${errorTitle}</strong>
             <p>${view.error}</p>
-            <button type="button" onClick=${() => window.location.reload()}>
+            <button type="button" className="archive-action archive-action--danger" onClick=${() => window.location.reload()}>
               <${RotateCcw} aria-hidden="true" />
               Reload page
             </button>
@@ -957,7 +960,7 @@ const DesktopShell = ({
     }
 
     if (view.loading) {
-      return html`<p className="desktop-data-status" role="status">${loadingMessage}</p>`;
+      return html`<p className="desktop-data-status archive-notice" role="status">${loadingMessage}</p>`;
     }
 
     return null;
@@ -1083,7 +1086,7 @@ const DesktopShell = ({
 
   const renderWindowFrame = (app) => {
     const appId = app?.id || 'home';
-    const windowTitle = app?.label || 'Welcome to the archive desktop';
+    const windowTitle = app?.label || 'Welcome to Rosen 98';
     const windowEntry = app
       ? layout.windows.find((entry) => entry.id === app.id)
       : null;
@@ -1256,14 +1259,14 @@ const DesktopShell = ({
     .filter((entry) => entry.app?.availability === 'ready' && entry.app.launch.kind === 'shell');
 
   return html`
-    <main id="main-content" className=${`archive-desktop ${shellApp ? 'desktop-app-active' : ''}`}>
+    <main id="main-content" className=${`archive-desktop archive-density--compact ${shellApp ? 'desktop-app-active' : ''}`}>
       ${shellApp && html`<h1 className="desktop-mobile-page-title">Archive desktop</h1>`}
       <div className="desktop-wallpaper-mark" aria-hidden="true">JR</div>
       <div className="desktop-workspace">
         <section ref=${shortcutPanelRef} className="desktop-shortcut-panel" aria-labelledby="desktop-title">
           <header className="desktop-brand">
             <p>Jay Rosen's Internet Archive</p>
-            <h1 id="desktop-title" ref=${desktopTitleRef} tabIndex="-1">Archive desktop</h1>
+            <h1 id="desktop-title" ref=${desktopTitleRef} tabIndex="-1">Rosen 98</h1>
             <span>Optional exploration view</span>
           </header>
 
@@ -1306,10 +1309,10 @@ const DesktopShell = ({
           role="menu"
           aria-label="Archive desktop Start menu"
         >
-          <div className="desktop-start-rail" aria-hidden="true"><span>Rosen archive</span></div>
+          <div className="desktop-start-rail" aria-hidden="true"><span>Rosen 98</span></div>
           <div className="desktop-start-content">
             <div className="desktop-start-heading" role="presentation">
-              <strong>Archive desktop</strong>
+              <strong>Rosen 98</strong>
               <small>Choose a destination</small>
             </div>
             ${startApps.map((app, index) => html`
@@ -1368,7 +1371,7 @@ const DesktopShell = ({
           aria-expanded=${startOpen}
           onClick=${() => setStartOpen((open) => !open)}
         >
-          <${Menu} aria-hidden="true" />
+          <span className="desktop-start-mark" aria-hidden="true">R98</span>
           <strong>Start</strong>
         </button>
 
@@ -1401,7 +1404,7 @@ const DesktopShell = ({
         `}
 
         <div className="desktop-task-status" aria-hidden="true">
-          <span>Rosen archive</span>
+          <span>Rosen 98</span>
           <small>desktop</small>
         </div>
       </nav>
