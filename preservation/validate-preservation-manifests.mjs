@@ -36,7 +36,7 @@ const eventPayloads = new Map([
 ]);
 const utcTimestampPattern = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{3})?Z$/;
 const waybackTimestampPattern = /^[0-9]{14}$/;
-const waybackReplayPattern = /^https:\/\/web\.archive\.org\/web\/([0-9]{14})(?:[a-z]{2}_)?\//;
+const waybackReplayPattern = /^https:\/\/web\.archive\.org\/web\/([0-9]{14})(?:[a-z]{2}_)?\/(https?:\/\/.+)$/;
 const sha256UrnPrefix = 'urn:sha256:';
 const outcomesWithoutHttpResponse = new Set(['network-error', 'timeout', 'not-requested']);
 
@@ -193,10 +193,20 @@ function validateReferences(manifest) {
         event.wayback.captureTimestamp,
         `${event.eventId} Wayback captureTimestamp`,
       );
-      const replayTimestamp = event.wayback.replayUrl.match(waybackReplayPattern)?.[1];
+      const replayMatch = event.wayback.replayUrl.match(waybackReplayPattern);
+      const replayTimestamp = replayMatch?.[1];
       if (replayTimestamp !== event.wayback.captureTimestamp) {
         throw new PreservationValidationError(
           `${event.eventId}: replayUrl timestamp must match captureTimestamp`,
+        );
+      }
+      const canonicalSourceUrl = objects.get(event.objectId)?.canonicalSourceUrl;
+      if (
+        canonicalSourceUrl
+        && new URL(replayMatch[2]).href !== new URL(canonicalSourceUrl).href
+      ) {
+        throw new PreservationValidationError(
+          `${event.eventId}: replayUrl target must match object canonicalSourceUrl`,
         );
       }
     }
@@ -352,6 +362,14 @@ function validateReferences(manifest) {
     if (!captureEvent.artifactId && currentArtifactCreationEvents.length > 1) {
       throw new PreservationValidationError(
         `${artifact.artifactId}: retained artifact has multiple current artifact-created events`,
+      );
+    }
+    if (
+      artifact.artifactType === 'http-response'
+      && outcomesWithoutHttpResponse.has(captureEvent.retrieval.httpOutcome)
+    ) {
+      throw new PreservationValidationError(
+        `${artifact.artifactId}: http-response artifact requires an HTTP response`,
       );
     }
     if (

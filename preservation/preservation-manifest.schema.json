@@ -354,7 +354,26 @@
         "embargoUntil": {
           "$ref": "#/$defs/timestamp"
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "accessDecision": {
+                "const": "embargoed"
+              }
+            },
+            "required": [
+              "accessDecision"
+            ]
+          },
+          "then": {
+            "required": [
+              "embargoUntil"
+            ]
+          }
+        }
+      ]
     },
     "fixity": {
       "type": "object",

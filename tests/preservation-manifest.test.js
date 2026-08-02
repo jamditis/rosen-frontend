@@ -411,6 +411,30 @@ describe('preservation manifest schema (#701)', () => {
     const wrongMediaType = example('successful-capture');
     wrongMediaType.artifacts[0].mediaType = 'application/octet-stream';
     rejectsManifest(wrongMediaType, 'http-response', 'mediaType', 'retrieval');
+
+    const artifactWithoutResponse = example('successful-capture');
+    const retainedArtifact = artifactWithoutResponse.artifacts[0];
+    const failedCapture = artifactWithoutResponse.events.find(event => (
+      event.eventId === retainedArtifact.captureEventId
+    ));
+    Object.assign(failedCapture.retrieval, {
+      httpOutcome: 'network-error',
+      httpStatus: null,
+      semanticOutcome: 'uncertain',
+      bytesReceived: 0,
+      mediaType: null,
+    });
+    retainedArtifact.byteSize = 0;
+    delete retainedArtifact.mediaType;
+    rejectsManifest(artifactWithoutResponse, 'http-response', 'HTTP response');
+  });
+
+  it('requires embargoed rights decisions to declare when the embargo ends', () => {
+    const manifest = example('rights-hold');
+    manifest.events[1].rights.accessDecision = 'embargoed';
+    delete manifest.events[1].rights.embargoUntil;
+
+    rejectsManifest(manifest, 'embargoUntil', 'required');
   });
 
   it('binds a Wayback replay URL to its declared capture timestamp', () => {
@@ -426,6 +450,11 @@ describe('preservation manifest schema (#701)', () => {
         `https://web.archive.org/web/20160304112233${modifier}/https://example.org/missing-story`;
       assert.equal(validatePreservationManifest(existingModifier), existingModifier);
     }
+
+    const wrongTarget = example('existing-wayback-reference');
+    wrongTarget.events[0].wayback.replayUrl =
+      'https://web.archive.org/web/20160304112233id_/https://other.example/wrong-story';
+    rejectsManifest(wrongTarget, 'replayUrl', 'target', 'canonicalSourceUrl');
   });
 
   it('binds fixity outcomes to the referenced artifact digest', () => {
