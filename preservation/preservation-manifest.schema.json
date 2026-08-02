@@ -272,7 +272,24 @@
             "$ref": "#/$defs/webUrl"
           }
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "semanticOutcome": {
+                "const": "oversize-abort"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "reportedByteLength",
+              "limitBytes"
+            ]
+          }
+        }
+      ]
     },
     "wayback": {
       "type": "object",

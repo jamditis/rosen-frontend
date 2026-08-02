@@ -96,9 +96,38 @@ describe('preservation manifest schema (#701)', () => {
     malformedDigest.artifacts[0].sha256 = 'not-a-sha256';
     rejectsManifest(malformedDigest, 'sha256', 'pattern');
 
+    const mismatchedDigestUri = example('successful-capture');
+    mismatchedDigestUri.artifacts[0].uri =
+      'urn:sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+    rejectsManifest(mismatchedDigestUri, 'uri', 'sha256', 'match');
+
     const unknownOutcome = example('bot-wall');
     unknownOutcome.events[0].retrieval.semanticOutcome = 'probably-fine';
     rejectsManifest(unknownOutcome, 'semanticOutcome', 'enum');
+  });
+
+  it('binds retrieval HTTP outcomes to whether a response was received', () => {
+    const responseWithoutStatus = example('bot-wall');
+    responseWithoutStatus.events[0].retrieval.httpStatus = null;
+    rejectsManifest(responseWithoutStatus, 'httpOutcome', 'response-received', 'httpStatus');
+
+    for (const outcome of ['network-error', 'timeout', 'not-requested']) {
+      const failedWithoutResponse = example('bot-wall');
+      failedWithoutResponse.events[0].retrieval.httpOutcome = outcome;
+      rejectsManifest(failedWithoutResponse, 'httpOutcome', outcome, 'httpStatus', 'null');
+    }
+  });
+
+  it('requires oversize aborts to carry internally consistent size evidence', () => {
+    const missingEvidence = example('oversize-abort');
+    delete missingEvidence.events[0].retrieval.reportedByteLength;
+    delete missingEvidence.events[0].retrieval.limitBytes;
+    rejectsManifest(missingEvidence, 'reportedByteLength', 'required');
+
+    const notOversize = example('oversize-abort');
+    notOversize.events[0].retrieval.reportedByteLength =
+      notOversize.events[0].retrieval.limitBytes;
+    rejectsManifest(notOversize, 'reportedByteLength', 'greater', 'limitBytes');
   });
 
   it('rejects impossible calendar timestamps across the manifest contract', () => {
@@ -208,6 +237,17 @@ describe('preservation manifest schema (#701)', () => {
       captureEntry.latestSemanticOutcome,
       newestRetrieval.retrieval.semanticOutcome
     );
+  });
+
+  it('does not let later operational events erase a substantive review state', () => {
+    const manifest = example('successful-capture');
+    const storageEvent = manifest.events.find(event => event.eventType === 'storage-copy-created');
+    storageEvent.occurredAt = '2026-08-01T14:26:00.000Z';
+    for (const event of manifest.events) event.review.state = 'not-reviewed';
+    manifest.events.find(event => event.eventType === 'fixity-check').review.state = 'accepted';
+
+    const entry = buildPreservationIndex(manifest).objectsById[manifest.objects[0].objectId];
+    assert.equal(entry.latestReviewState, 'accepted');
   });
 
   it('excludes superseded assertions from the derived latest state', () => {

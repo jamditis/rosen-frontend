@@ -37,6 +37,8 @@ const eventPayloads = new Map([
 const utcTimestampPattern = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{3})?Z$/;
 const waybackTimestampPattern = /^[0-9]{14}$/;
 const waybackReplayPattern = /^https:\/\/web\.archive\.org\/web\/([0-9]{14})(?:id_)?\//;
+const sha256UrnPrefix = 'urn:sha256:';
+const outcomesWithoutHttpResponse = new Set(['network-error', 'timeout', 'not-requested']);
 
 export class PreservationValidationError extends Error {
   constructor(message, options) {
@@ -104,6 +106,14 @@ function validateReferences(manifest) {
   }
 
   for (const artifact of manifest.artifacts) {
+    if (
+      artifact.uri.startsWith(sha256UrnPrefix)
+      && artifact.uri.slice(sha256UrnPrefix.length) !== artifact.sha256
+    ) {
+      throw new PreservationValidationError(
+        `${artifact.artifactId}: uri SHA-256 digest must match sha256`,
+      );
+    }
     for (const copy of artifact.storageCopies) {
       validateUtcTimestamp(copy.createdAt, `${copy.copyId} storage copy createdAt`);
       if (copies.has(copy.copyId)) {
@@ -122,6 +132,30 @@ function validateReferences(manifest) {
         event.retrieval.retrievedAt,
         `${event.eventId} retrieval retrievedAt`,
       );
+      if (
+        event.retrieval.httpOutcome === 'response-received'
+        && event.retrieval.httpStatus === null
+      ) {
+        throw new PreservationValidationError(
+          `${event.eventId}: httpOutcome response-received requires an httpStatus`,
+        );
+      }
+      if (
+        outcomesWithoutHttpResponse.has(event.retrieval.httpOutcome)
+        && event.retrieval.httpStatus !== null
+      ) {
+        throw new PreservationValidationError(
+          `${event.eventId}: httpOutcome ${event.retrieval.httpOutcome} requires httpStatus null`,
+        );
+      }
+      if (
+        event.retrieval.semanticOutcome === 'oversize-abort'
+        && event.retrieval.reportedByteLength <= event.retrieval.limitBytes
+      ) {
+        throw new PreservationValidationError(
+          `${event.eventId}: oversize-abort reportedByteLength must be greater than limitBytes`,
+        );
+      }
     }
     if (event.rights?.embargoUntil) {
       validateUtcTimestamp(
@@ -362,7 +396,19 @@ export function buildPreservationIndex(manifest) {
       latest.rightsDecision = event;
       entry.latestRightsDecision = event.rights;
     }
-    if (!supersededEventIds.has(event.eventId) && eventIsLater(event, latest.reviewState)) {
+    const reviewIsSubstantive = event.review.state !== 'not-reviewed';
+    const latestReviewIsSubstantive = latest.reviewState !== null
+      && latest.reviewState.review.state !== 'not-reviewed';
+    const reviewHasPriority = latest.reviewState === null
+      || (reviewIsSubstantive && !latestReviewIsSubstantive)
+      || (
+        reviewIsSubstantive === latestReviewIsSubstantive
+        && eventIsLater(event, latest.reviewState)
+      );
+    if (
+      !supersededEventIds.has(event.eventId)
+      && reviewHasPriority
+    ) {
       latest.reviewState = event;
       entry.latestReviewState = event.review.state;
     }
