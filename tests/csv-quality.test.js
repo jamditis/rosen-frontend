@@ -79,6 +79,13 @@ describe('archive_records-public.csv', () => {
       `Found ${ids.length - uniqueIds.size} duplicate IDs in archive records`);
   });
 
+  it('credits RECORD-00038 to the source page author', () => {
+    const record = archiveRecords.find(row => row.id === 'RECORD-00038');
+    assert.ok(record, 'RECORD-00038 must remain in the curated archive');
+    assert.equal(record.author, 'Marty Linsky');
+    assert.match(record.summary, /^Marty Linsky reviews Jay Rosen's book/);
+  });
+
   it('has no duplicate URLs', () => {
     const urls = archiveRecords
       .map(r => r.url || r.URL)

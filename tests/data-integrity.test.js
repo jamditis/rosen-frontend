@@ -158,6 +158,18 @@ describe('archive-details.json', () => {
     }
   });
 
+  it('publishes the corrected author for RECORD-00038', () => {
+    assert.equal(detailsData.details['RECORD-00038']?.author, 'Marty Linsky');
+    assert.match(
+      detailsData.details['RECORD-00038']?.summary,
+      /^Marty Linsky reviews Jay Rosen's book/
+    );
+    assert.equal(
+      fullData.records.find(record => record.id === 'RECORD-00038')?.author,
+      'Marty Linsky'
+    );
+  });
+
   it('THREAD records have thread_data in details', () => {
     const threadIds = Object.keys(detailsData.details).filter(id => id.startsWith('THREAD-'));
     assert.ok(threadIds.length > 0, 'Expected at least 1 THREAD record in details');
