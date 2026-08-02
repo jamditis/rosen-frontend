@@ -158,6 +158,27 @@ describe('archive-details.json', () => {
     }
   });
 
+  it('publishes the corrected author for RECORD-00038', () => {
+    assert.equal(detailsData.details['RECORD-00038']?.author, 'Marty Linsky');
+    assert.match(
+      detailsData.details['RECORD-00038']?.summary,
+      /^Marty Linsky reviews Jay Rosen's book/
+    );
+    assert.equal(
+      fullData.records.find(record => record.id === 'RECORD-00038')?.author,
+      'Marty Linsky'
+    );
+
+    const deployVersion = JSON.parse(
+      fs.readFileSync(path.join(dataDir, '..', 'version.json'), 'utf-8')
+    ).version;
+    assert.notEqual(
+      deployVersion,
+      '3.8.10',
+      'the RECORD-00038 correction must ship in a new cache generation'
+    );
+  });
+
   it('THREAD records have thread_data in details', () => {
     const threadIds = Object.keys(detailsData.details).filter(id => id.startsWith('THREAD-'));
     assert.ok(threadIds.length > 0, 'Expected at least 1 THREAD record in details');
