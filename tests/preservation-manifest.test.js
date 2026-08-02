@@ -167,6 +167,7 @@ describe('preservation manifest schema (#701)', () => {
       semanticOutcome: 'uncertain',
     });
     delete failedWithoutFinalUrl.events[0].retrieval.finalUrl;
+    delete failedWithoutFinalUrl.events[0].retrieval.redirectChain;
     assert.equal(validatePreservationManifest(failedWithoutFinalUrl), failedWithoutFinalUrl);
 
     const notRequested = example('bot-wall');
@@ -180,6 +181,7 @@ describe('preservation manifest schema (#701)', () => {
     delete notRequested.events[0].retrieval.finalUrl;
     delete notRequested.events[0].retrieval.observedSourceUrl;
     delete notRequested.events[0].retrieval.retrievedAt;
+    delete notRequested.events[0].retrieval.redirectChain;
     assert.equal(validatePreservationManifest(notRequested), notRequested);
   });
 
@@ -196,6 +198,33 @@ describe('preservation manifest schema (#701)', () => {
     const wrongFinalUrl = example('bot-wall');
     wrongFinalUrl.events[0].retrieval.finalUrl = 'https://other.example/wrong-story';
     rejectsManifest(wrongFinalUrl, 'finalUrl', 'canonicalSourceUrl', 'alternateSourceUrls');
+  });
+
+  it('binds redirect chain boundaries to the retrieval endpoints', () => {
+    const wrongStart = example('bot-wall');
+    wrongStart.events[0].retrieval.redirectChain[0] =
+      'https://other.example/unrelated-start';
+    rejectsManifest(wrongStart, 'redirectChain', 'start', 'requestedUrl');
+
+    const wrongEnd = example('bot-wall');
+    const wrongEndChain = wrongEnd.events[0].retrieval.redirectChain;
+    wrongEndChain[wrongEndChain.length - 1] = wrongEnd.events[0].retrieval.requestedUrl;
+    rejectsManifest(wrongEnd, 'redirectChain', 'end', 'finalUrl');
+
+    const withoutResponse = example('bot-wall');
+    Object.assign(withoutResponse.events[0].retrieval, {
+      httpOutcome: 'network-error',
+      finalUrl: null,
+      httpStatus: null,
+      mediaType: null,
+      bytesReceived: 0,
+      semanticOutcome: 'uncertain',
+    });
+    rejectsManifest(withoutResponse, 'redirectChain', 'finalUrl');
+
+    const emptyChain = example('bot-wall');
+    emptyChain.events[0].retrieval.redirectChain = [];
+    rejectsManifest(emptyChain, 'redirectChain', 'empty');
   });
 
   it('supports non-web canonical sources with explicit retrieval URLs', () => {
@@ -550,6 +579,39 @@ describe('preservation manifest schema (#701)', () => {
     generatedCopyArtifact.mediaType = 'application/json';
     generatedCreation.occurredAt = '2026-08-01T14:23:30.000Z';
     rejectsManifest(copyBeforeGeneratedArtifact, 'storage copy', 'before', 'artifact provenance');
+  });
+
+  it('allows a corrected current capture to rebind its retained artifact', () => {
+    const manifest = example('successful-capture');
+    const artifact = manifest.artifacts[0];
+    const originalCapture = manifest.events.find(event => (
+      event.eventId === artifact.captureEventId
+    ));
+    const correctedCapture = clone(originalCapture);
+    correctedCapture.eventId = 'urn:rosen-preservation:event:corrected-artifact-capture';
+    correctedCapture.occurredAt = '2026-08-01T14:21:30.000Z';
+    correctedCapture.retrieval.retrievedAt = correctedCapture.occurredAt;
+    correctedCapture.supersedesEventId = originalCapture.eventId;
+    artifact.captureEventId = correctedCapture.eventId;
+    manifest.events.push(correctedCapture);
+
+    assert.equal(validatePreservationManifest(manifest), manifest);
+  });
+
+  it('rejects artifact creation before the originating capture', () => {
+    const manifest = example('successful-capture');
+    const creation = manifest.events.find(event => event.eventType === 'artifact-created');
+    creation.occurredAt = '2026-08-01T14:20:30.000Z';
+
+    rejectsManifest(manifest, 'artifact-created', 'before', 'capture');
+  });
+
+  it('rejects current fixity checks before artifact provenance', () => {
+    const manifest = example('successful-capture');
+    const fixity = manifest.events.find(event => event.eventType === 'fixity-check');
+    fixity.occurredAt = '2026-08-01T14:20:30.000Z';
+
+    rejectsManifest(manifest, 'fixity-check', 'before', 'artifact provenance');
   });
 
   it('binds each declared capture artifact to the same capture event', () => {

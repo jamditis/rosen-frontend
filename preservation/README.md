@@ -117,7 +117,9 @@ metadata. A not-requested check may also omit `observedSourceUrl` and
 `retrievedAt`, because no request occurred. Optional
 `reportedByteLength` and `limitBytes` distinguish an oversize abort from a
 completed download. Requested, observed, and non-null final URLs must match the
-owning object's canonical URL or one of its explicit alternate source URLs.
+owning object's canonical URL or one of its explicit alternate source URLs. A
+present `redirectChain` must be non-empty, begin at `requestedUrl`, end at the
+non-null `finalUrl`, and is invalid when no final response URL exists.
 
 Semantic outcomes are `intended-content`, `bot-wall`, `login-wall`, `missing`,
 `redirect`, `uncertain`, and `oversize-abort`. Unknown values fail validation;
@@ -132,10 +134,11 @@ require their originating capture-event ID. Generated metadata, checksum, and
 other non-response artifacts may omit that ID, but they must have one current
 `artifact-created` event. An artifact cannot have multiple current creation
 events, even when its capture also names it. A superseded capture no longer
-introduces an artifact; the retained artifact then needs a current
-`artifact-created` event. The storage array may be empty when evidence proves a
-response digest but does not name a retained copy. Each named storage copy
-requires its own stable ID, URI, storage class, access state, and creation time.
+introduces an artifact. The retained artifact must point to a current correcting
+capture that declares it or have a current `artifact-created` event. The storage
+array may be empty when evidence proves a response digest but does not name a
+retained copy. Each named storage copy requires its own stable ID, URI, storage
+class, access state, and creation time.
 
 The validator ensures object, event, artifact, fixity, and storage-copy
 references resolve and remain within one object. When a capture attempt names
@@ -145,9 +148,11 @@ archive object. Every named storage copy must have exactly one matching
 current `storage-copy-created` event; corrected predecessors remain in the
 append-only history. The copy's `createdAt` must equal the current creation
 event's `occurredAt` and cannot predate the artifact's current capture or
-creation provenance. Content-addressed `urn:sha256:` artifact and copy URIs must
-match the owning artifact digest, so storage state cannot change through an
-artifact record edit alone.
+creation provenance. A current `artifact-created` event cannot predate the
+artifact's originating capture, and a current fixity check cannot predate the
+latest current artifact provenance. Content-addressed `urn:sha256:` artifact and
+copy URIs must match the owning artifact digest, so storage state cannot change
+through an artifact record edit alone.
 
 ## Rights and review boundaries
 

@@ -276,6 +276,35 @@ function validateReferences(manifest) {
           );
         }
       }
+      const redirectChain = event.retrieval.redirectChain;
+      if (redirectChain !== undefined) {
+        if (redirectChain.length === 0) {
+          throw new PreservationValidationError(
+            `${event.eventId}: retrieval redirectChain cannot be empty`,
+          );
+        }
+        if (event.retrieval.finalUrl == null) {
+          throw new PreservationValidationError(
+            `${event.eventId}: retrieval redirectChain requires a finalUrl`,
+          );
+        }
+        if (
+          new URL(redirectChain[0]).href
+          !== new URL(event.retrieval.requestedUrl).href
+        ) {
+          throw new PreservationValidationError(
+            `${event.eventId}: retrieval redirectChain must start at requestedUrl`,
+          );
+        }
+        if (
+          new URL(redirectChain[redirectChain.length - 1]).href
+          !== new URL(event.retrieval.finalUrl).href
+        ) {
+          throw new PreservationValidationError(
+            `${event.eventId}: retrieval redirectChain must end at finalUrl`,
+          );
+        }
+      }
     }
 
     const allowedPayloads = eventPayloads.get(event.eventType);
@@ -326,14 +355,6 @@ function validateReferences(manifest) {
       }
       if (artifact.objectId !== event.objectId) {
         throw new PreservationValidationError(`${event.eventId}: artifactId belongs to another object`);
-      }
-      if (
-        event.eventType === 'capture-attempt'
-        && artifact.captureEventId !== event.eventId
-      ) {
-        throw new PreservationValidationError(
-          `${event.eventId}: artifactId captureEventId must identify the same capture-attempt`,
-        );
       }
       if (event.eventType === 'artifact-created') {
         const creationEvents = artifactCreationEvents.get(event.artifactId) ?? [];
@@ -409,16 +430,34 @@ function validateReferences(manifest) {
           `${artifact.artifactId}: captureEventId must identify a capture-attempt for the same object`,
         );
       }
+      if (supersededEvents.has(captureEvent.eventId)) {
+        throw new PreservationValidationError(
+          `${artifact.artifactId}: captureEventId must identify a current capture-attempt for artifact provenance`,
+        );
+      }
       if (captureEvent.artifactId && captureEvent.artifactId !== artifact.artifactId) {
         throw new PreservationValidationError(
           `${artifact.artifactId}: captureEventId declares a different artifactId`,
         );
       }
     }
+    const currentDeclaringCaptureEvents = manifest.events.filter(event => (
+      event.eventType === 'capture-attempt'
+      && event.artifactId === artifact.artifactId
+      && !supersededEvents.has(event.eventId)
+    ));
+    if (currentDeclaringCaptureEvents.some(event => (
+      event.eventId !== artifact.captureEventId
+    ))) {
+      throw new PreservationValidationError(
+        `${artifact.artifactId}: artifactId captureEventId must identify the same capture-attempt and it must be current`,
+      );
+    }
     const currentArtifactCreationEvents = (artifactCreationEvents.get(artifact.artifactId) ?? [])
       .filter(event => !supersededEvents.has(event.eventId));
-    const captureDeclaresArtifact = captureEvent?.artifactId === artifact.artifactId
-      && !supersededEvents.has(captureEvent.eventId);
+    const captureDeclaresArtifact = currentDeclaringCaptureEvents.some(event => (
+      event.eventId === captureEvent?.eventId
+    ));
     if (!captureDeclaresArtifact && currentArtifactCreationEvents.length === 0) {
       throw new PreservationValidationError(
         `${artifact.artifactId}: retained artifact requires current provenance from an artifact-created event or declaring capture-attempt`,
@@ -436,6 +475,16 @@ function validateReferences(manifest) {
     const artifactProvenanceTime = Math.max(
       ...provenanceEvents.map(event => Date.parse(event.occurredAt)),
     );
+    if (
+      captureEvent
+      && currentArtifactCreationEvents.some(event => (
+        Date.parse(event.occurredAt) < Date.parse(captureEvent.occurredAt)
+      ))
+    ) {
+      throw new PreservationValidationError(
+        `${artifact.artifactId}: artifact-created event cannot occur before its capture-attempt`,
+      );
+    }
     if (
       artifact.artifactType === 'http-response'
       && outcomesWithoutHttpResponse.has(captureEvent.retrieval.httpOutcome)
@@ -460,6 +509,17 @@ function validateReferences(manifest) {
       throw new PreservationValidationError(
         `${artifact.artifactId}: http-response mediaType must match capture retrieval mediaType`,
       );
+    }
+    const currentFixityEvents = manifest.events.filter(event => (
+      event.fixity?.artifactId === artifact.artifactId
+      && !supersededEvents.has(event.eventId)
+    ));
+    for (const fixityEvent of currentFixityEvents) {
+      if (Date.parse(fixityEvent.occurredAt) < artifactProvenanceTime) {
+        throw new PreservationValidationError(
+          `${fixityEvent.eventId}: fixity-check cannot occur before current artifact provenance`,
+        );
+      }
     }
     for (const copy of artifact.storageCopies) {
       const currentCreationEvents = (storageCopyEvents.get(copy.copyId) ?? [])

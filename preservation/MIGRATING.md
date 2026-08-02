@@ -45,7 +45,10 @@ not emit a different version while claiming validation against the v1 schema.
    manifest. Never overwrite the source artifact.
 4. Preserve object, event, artifact, and copy IDs when their identities have not
    changed. If an event's assertion must be corrected, append a new event with
-   `supersedesEventId`; do not edit or delete the old event.
+   `supersedesEventId`; do not edit or delete the old event. When a corrected
+   capture retains the same artifact, rebind the artifact's `captureEventId` to
+   that current correction; superseded capture declarations do not remain
+   current provenance.
 5. Preserve original `taskVersion`, actor, event time, review, and
    `policyVersion` values. A migration must not make a historical decision look
    as if it used a newer policy.
