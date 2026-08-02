@@ -357,10 +357,12 @@ class TestTestSuiteFailure:
         sftp_mock = _stub_sftp(monkeypatch)
 
         def rc(cmd):
-            return 1 if cmd == ['npm', 'run', 'census:stewardship'] else 0
+            return 1 if cmd == [
+                'node', '--test', 'tests/stewardship-census.test.js'
+            ] else 0
 
         _stub_subprocess(monkeypatch, returncode_for=rc,
-                         stderr='census generation failed')
+                         stdout='stale stewardship census', stderr='')
 
         result = _run(monkeypatch, csv_with_headers)
 
@@ -373,7 +375,9 @@ class TestTestSuiteFailure:
                     if cmd[:2] == ['git', 'commit']]) == 1
         assert not any(cmd[:2] == ['git', 'push'] for cmd in commands)
         sftp_mock.assert_not_called()
-        assert sheets_mock.call_args_list[-1].kwargs['status'] == 'error'
+        final = sheets_mock.call_args_list[-1].kwargs
+        assert final['status'] == 'error'
+        assert 'stale stewardship census' in final['error']
 
 
 class TestSftpFailure:

@@ -364,7 +364,11 @@ def open_sync_pr(csv_path: pathlib.Path, stats: Dict[str, Any]) -> Tuple[Optiona
                        cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
         return branch, f"opened PR from {branch}"
     except subprocess.CalledProcessError as exc:
-        return None, f"commit/PR pipeline failed: {(exc.stderr or '').strip() or exc}"
+        diagnostics = "\n".join(
+            part.strip() for part in (exc.stderr or "", exc.stdout or "")
+            if part.strip()
+        )
+        return None, f"commit/PR pipeline failed: {diagnostics or exc}"
 
 
 # ---------- Orchestration ---------------------------------------------------

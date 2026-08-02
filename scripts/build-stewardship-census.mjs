@@ -25,6 +25,7 @@ const RUNTIME_FILES = [
   'archive-entities.json'
 ];
 const ALL_INPUT_FILES = [...SOURCE_FILES, ...RUNTIME_FILES];
+const OPTIONAL_INPUT_FILES = ['authored-excerpts.csv'];
 const REPOST_TITLE_PATTERN = /^(Quoted|Retweet|RT) by/i;
 const GENERIC_TITLE_PATTERN = /^(Reply|Tweet|Post|Quote) by/i;
 const PRESERVATION_URL_PATTERN = /https?:\/\/(?:web\.)?archive\.org\/(?:web\/|details\/|download\/)?[^\s"'<>)]*/i;
@@ -153,7 +154,6 @@ function readCsv(filePath) {
   return parse(fs.readFileSync(filePath), {
     bom: true,
     columns: true,
-    relax_column_count: true,
     skip_empty_lines: true
   }).map(unescapeRow);
 }
@@ -170,7 +170,11 @@ export function loadStewardshipInputs({ dataDir = path.join(ROOT_DIR, 'data'), r
     if (!fs.existsSync(filePath)) throw new Error(`Missing census input: ${filePath}`);
   }
 
-  const files = ALL_INPUT_FILES.map(filename => {
+  const availableInputFiles = [
+    ...ALL_INPUT_FILES,
+    ...OPTIONAL_INPUT_FILES.filter(filename => fs.existsSync(path.join(dataDir, filename)))
+  ];
+  const files = availableInputFiles.map(filename => {
     const filePath = path.join(dataDir, filename);
     return {
       path: relativeInputPath(rootDir, dataDir, filename),
@@ -555,7 +559,8 @@ function collectPreservationEvidence(rows) {
     for (const field of EMBEDDED_FIELDS) {
       const value = String(row[field] || '');
       for (const match of value.matchAll(PRESERVATION_URLS_PATTERN)) {
-        embeddedMatches.push({ record_id: row.id, field, value: match[0] });
+        const candidate = match[0].replace(/[.,;:!?]+$/u, '');
+        if (candidate) embeddedMatches.push({ record_id: row.id, field, value: candidate });
       }
     }
   }

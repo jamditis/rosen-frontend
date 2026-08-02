@@ -299,7 +299,7 @@ def test_open_sync_pr_blocks_publication_when_census_check_fails(
     def fake_run(cmd, *args, **kwargs):
         if cmd == ["node", "--test", "tests/stewardship-census.test.js"]:
             raise subprocess.CalledProcessError(
-                1, cmd, output="", stderr="stale stewardship census")
+                1, cmd, output="stale stewardship census", stderr="")
         return subprocess.CompletedProcess(cmd, 0, "", "")
 
     run_mock = MagicMock(side_effect=fake_run)

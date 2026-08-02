@@ -39,6 +39,10 @@
       {
         "path": "data/archive-entities.json",
         "sha256": "d1a1518c48ca4b5abbb959645f85ee6aaf7a15be2b62f9d8cc6d20a2ad00d19b"
+      },
+      {
+        "path": "data/authored-excerpts.csv",
+        "sha256": "9cf62f135d2c4f32ed1b7bdf19a06a2b5d7f5dca4a8040b2bbee5524e9a27a5e"
       }
     ]
   },
@@ -11913,12 +11917,12 @@
         {
           "record_id": "RECORD-00697",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20080821052126/http://del.icio.us/post?v=4&noui&jump=close&url=http://www.huffingtonpost.com/jay-rosen/bill-keller-im-proud-_b_88437.html&title=Jay%20Rosen:%20Bill%20Keller%3A%20%20%22I%27m%20Proud%20to%20Stand%20by%20This%20Story.%22%20%20%3Ci%3ETimes%3C%2Fi%3E%20Public%20Editor%3A%20You%20Were%20Wrong%20To%20Run%20It."
+          "value": "http://web.archive.org/web/20080821052126/http://del.icio.us/post?v=4&noui&jump=close&url=http://www.huffingtonpost.com/jay-rosen/bill-keller-im-proud-_b_88437.html&title=Jay%20Rosen:%20Bill%20Keller%3A%20%20%22I%27m%20Proud%20to%20Stand%20by%20This%20Story.%22%20%20%3Ci%3ETimes%3C%2Fi%3E%20Public%20Editor%3A%20You%20Were%20Wrong%20To%20Run%20It"
         },
         {
           "record_id": "RECORD-00697",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20080821052126/http://digg.com/submit?phase=2&url=http://www.huffingtonpost.com/jay-rosen/bill-keller-im-proud-_b_88437.html&title=Jay%20Rosen:%20Bill%20Keller%3A%20%20%22I%27m%20Proud%20to%20Stand%20by%20This%20Story.%22%20%20%3Ci%3ETimes%3C%2Fi%3E%20Public%20Editor%3A%20You%20Were%20Wrong%20To%20Run%20It."
+          "value": "http://web.archive.org/web/20080821052126/http://digg.com/submit?phase=2&url=http://www.huffingtonpost.com/jay-rosen/bill-keller-im-proud-_b_88437.html&title=Jay%20Rosen:%20Bill%20Keller%3A%20%20%22I%27m%20Proud%20to%20Stand%20by%20This%20Story.%22%20%20%3Ci%3ETimes%3C%2Fi%3E%20Public%20Editor%3A%20You%20Were%20Wrong%20To%20Run%20It"
         },
         {
           "record_id": "RECORD-00697",
@@ -11943,7 +11947,7 @@
         {
           "record_id": "RECORD-00697",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20080821052126/http://reddit.com/submit?url=http://www.huffingtonpost.com/jay-rosen/bill-keller-im-proud-_b_88437.html&title=Jay%20Rosen:%20Bill%20Keller%3A%20%20%22I%27m%20Proud%20to%20Stand%20by%20This%20Story.%22%20%20%3Ci%3ETimes%3C%2Fi%3E%20Public%20Editor%3A%20You%20Were%20Wrong%20To%20Run%20It."
+          "value": "http://web.archive.org/web/20080821052126/http://reddit.com/submit?url=http://www.huffingtonpost.com/jay-rosen/bill-keller-im-proud-_b_88437.html&title=Jay%20Rosen:%20Bill%20Keller%3A%20%20%22I%27m%20Proud%20to%20Stand%20by%20This%20Story.%22%20%20%3Ci%3ETimes%3C%2Fi%3E%20Public%20Editor%3A%20You%20Were%20Wrong%20To%20Run%20It"
         },
         {
           "record_id": "RECORD-00697",
@@ -12088,7 +12092,7 @@
         {
           "record_id": "RECORD-00697",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20080821052126/http://www.stumbleupon.com/submit.php?url=http://www.huffingtonpost.com/jay-rosen/bill-keller-im-proud-_b_88437.html&title=Jay%20Rosen:%20Bill%20Keller%3A%20%20%22I%27m%20Proud%20to%20Stand%20by%20This%20Story.%22%20%20%3Ci%3ETimes%3C%2Fi%3E%20Public%20Editor%3A%20You%20Were%20Wrong%20To%20Run%20It."
+          "value": "http://web.archive.org/web/20080821052126/http://www.stumbleupon.com/submit.php?url=http://www.huffingtonpost.com/jay-rosen/bill-keller-im-proud-_b_88437.html&title=Jay%20Rosen:%20Bill%20Keller%3A%20%20%22I%27m%20Proud%20to%20Stand%20by%20This%20Story.%22%20%20%3Ci%3ETimes%3C%2Fi%3E%20Public%20Editor%3A%20You%20Were%20Wrong%20To%20Run%20It"
         },
         {
           "record_id": "RECORD-00697",
@@ -18268,7 +18272,7 @@
         {
           "record_id": "RECORD-00737",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20210514234751/https://ad.doubleclick.net/ddm/activity/src=9728734;type=invmedia;cat=minnp0;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;npa=;ord=5535193758573.388?"
+          "value": "http://web.archive.org/web/20210514234751/https://ad.doubleclick.net/ddm/activity/src=9728734;type=invmedia;cat=minnp0;dc_lat=;dc_rdid=;tag_for_child_directed_treatment=;tfua=;npa=;ord=5535193758573.388"
         },
         {
           "record_id": "RECORD-00737",
@@ -23733,7 +23737,7 @@
         {
           "record_id": "RECORD-00763",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20231203164044/https://twitter.com/intent/tweet?url=https%3A%2F%2Fwww.wgbh.org%2Fnews%2Fcommentary%2F2017-04-05%2Fis-trust-based-journalism-the-future-jay-rosen-thinks-so&text=Is%20Trust-Based%20Journalism%20The%20Future%3F%20Jay%20Rosen%20Thinks%20So."
+          "value": "http://web.archive.org/web/20231203164044/https://twitter.com/intent/tweet?url=https%3A%2F%2Fwww.wgbh.org%2Fnews%2Fcommentary%2F2017-04-05%2Fis-trust-based-journalism-the-future-jay-rosen-thinks-so&text=Is%20Trust-Based%20Journalism%20The%20Future%3F%20Jay%20Rosen%20Thinks%20So"
         },
         {
           "record_id": "RECORD-00763",
@@ -25523,7 +25527,7 @@
         {
           "record_id": "RECORD-00787",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20170503091427/mailto:/?subject=Thought%20you%20would%20like%20this&body=http%3A%2F%2Fmediashift.org%2F2010%2F11%2Fhow-should-public-media-respond-to-efforts-to-defund-it326%2F."
+          "value": "http://web.archive.org/web/20170503091427/mailto:/?subject=Thought%20you%20would%20like%20this&body=http%3A%2F%2Fmediashift.org%2F2010%2F11%2Fhow-should-public-media-respond-to-efforts-to-defund-it326%2F"
         },
         {
           "record_id": "RECORD-00787",
@@ -25653,7 +25657,7 @@
         {
           "record_id": "RECORD-00788",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20160521003816/mailto:/?subject=Thought%20you%20would%20like%20this&body=http%3A%2F%2Fmediashift.org%2F2016%2F05%2Fjay-rosens-nyu-students-dig-deeper-into-disruption-of-news-business%2F."
+          "value": "http://web.archive.org/web/20160521003816/mailto:/?subject=Thought%20you%20would%20like%20this&body=http%3A%2F%2Fmediashift.org%2F2016%2F05%2Fjay-rosens-nyu-students-dig-deeper-into-disruption-of-news-business%2F"
         },
         {
           "record_id": "RECORD-00788",
@@ -28783,7 +28787,7 @@
         {
           "record_id": "RECORD-00861",
           "field": "notes",
-          "value": "http://web.archive.org/web/20131109231444/http://www.huffingtonpost.com:80/jay-rosen/karl-frisch-of-media-matt_b_113470.html."
+          "value": "http://web.archive.org/web/20131109231444/http://www.huffingtonpost.com:80/jay-rosen/karl-frisch-of-media-matt_b_113470.html"
         },
         {
           "record_id": "RECORD-00861",
@@ -28883,12 +28887,12 @@
         {
           "record_id": "RECORD-00862",
           "field": "notes",
-          "value": "http://web.archive.org/web/20131115100641/http://www.huffingtonpost.com:80/jay-rosen/nn08-nancy-pelosi-was-mov_b_113745.html."
+          "value": "http://web.archive.org/web/20131115100641/http://www.huffingtonpost.com:80/jay-rosen/nn08-nancy-pelosi-was-mov_b_113745.html"
         },
         {
           "record_id": "RECORD-00862",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20131115100641/http://reddit.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-nancy-pelosi-was-mov_b_113745.html&title=jay-rosen:%20%23NN08+Nancy+Pelosi+was+moved+up+half+an+hour+this+morning+so+the+speculation+is+that+Al+Gore+is+a+surprise+guest+later+today."
+          "value": "http://web.archive.org/web/20131115100641/http://reddit.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-nancy-pelosi-was-mov_b_113745.html&title=jay-rosen:%20%23NN08+Nancy+Pelosi+was+moved+up+half+an+hour+this+morning+so+the+speculation+is+that+Al+Gore+is+a+surprise+guest+later+today"
         },
         {
           "record_id": "RECORD-00862",
@@ -28943,7 +28947,7 @@
         {
           "record_id": "RECORD-00862",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20131115100641/http://www.stumbleupon.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-nancy-pelosi-was-mov_b_113745.html&title=jay-rosen:%20%23NN08+Nancy+Pelosi+was+moved+up+half+an+hour+this+morning+so+the+speculation+is+that+Al+Gore+is+a+surprise+guest+later+today."
+          "value": "http://web.archive.org/web/20131115100641/http://www.stumbleupon.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-nancy-pelosi-was-mov_b_113745.html&title=jay-rosen:%20%23NN08+Nancy+Pelosi+was+moved+up+half+an+hour+this+morning+so+the+speculation+is+that+Al+Gore+is+a+surprise+guest+later+today"
         },
         {
           "record_id": "RECORD-00862",
@@ -28963,12 +28967,12 @@
         {
           "record_id": "RECORD-00863",
           "field": "notes",
-          "value": "http://web.archive.org/web/20131115135650/http://www.huffingtonpost.com:80/jay-rosen/nn08-sketchbook-i-tell-jo_b_113757.html."
+          "value": "http://web.archive.org/web/20131115135650/http://www.huffingtonpost.com:80/jay-rosen/nn08-sketchbook-i-tell-jo_b_113757.html"
         },
         {
           "record_id": "RECORD-00863",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20131115135650/http://reddit.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-sketchbook-i-tell-jo_b_113757.html&title=jay-rosen:%20%23NN08+Sketchbook%3A+I+tell+Joe+Trippi+that+his+%22Nixon+won+on+radio%22+%28in+1960+debate%29+reference+is+basically+an+urban+legend.++Blank."
+          "value": "http://web.archive.org/web/20131115135650/http://reddit.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-sketchbook-i-tell-jo_b_113757.html&title=jay-rosen:%20%23NN08+Sketchbook%3A+I+tell+Joe+Trippi+that+his+%22Nixon+won+on+radio%22+%28in+1960+debate%29+reference+is+basically+an+urban+legend.++Blank"
         },
         {
           "record_id": "RECORD-00863",
@@ -29028,7 +29032,7 @@
         {
           "record_id": "RECORD-00863",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20131115135650/http://www.stumbleupon.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-sketchbook-i-tell-jo_b_113757.html&title=jay-rosen:%20%23NN08+Sketchbook%3A+I+tell+Joe+Trippi+that+his+%22Nixon+won+on+radio%22+%28in+1960+debate%29+reference+is+basically+an+urban+legend.++Blank."
+          "value": "http://web.archive.org/web/20131115135650/http://www.stumbleupon.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-sketchbook-i-tell-jo_b_113757.html&title=jay-rosen:%20%23NN08+Sketchbook%3A+I+tell+Joe+Trippi+that+his+%22Nixon+won+on+radio%22+%28in+1960+debate%29+reference+is+basically+an+urban+legend.++Blank"
         },
         {
           "record_id": "RECORD-00863",
@@ -29058,7 +29062,7 @@
         {
           "record_id": "RECORD-00864",
           "field": "notes",
-          "value": "http://web.archive.org/web/20131113072240/http://www.huffingtonpost.com:80/jay-rosen/nn08-sketchbook-trippis-p_b_113760.html."
+          "value": "http://web.archive.org/web/20131113072240/http://www.huffingtonpost.com:80/jay-rosen/nn08-sketchbook-trippis-p_b_113760.html"
         },
         {
           "record_id": "RECORD-00864",
@@ -29153,12 +29157,12 @@
         {
           "record_id": "RECORD-00866",
           "field": "notes",
-          "value": "http://web.archive.org/web/20131109181545/http://www.huffingtonpost.com:80/jay-rosen/nn08-sketchbook-politicia_b_113765.html."
+          "value": "http://web.archive.org/web/20131109181545/http://www.huffingtonpost.com:80/jay-rosen/nn08-sketchbook-politicia_b_113765.html"
         },
         {
           "record_id": "RECORD-00866",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20131109181545/http://reddit.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-sketchbook-politicia_b_113765.html&title=jay-rosen:%20%23NN08+Sketchbook%3A+Politicians+think+%22Netroots+Nation%22+equals+%22youth%2C%22+because+kids+get+the+Net.+But+glance+at+the+crowd+and%3A+Fail."
+          "value": "http://web.archive.org/web/20131109181545/http://reddit.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-sketchbook-politicia_b_113765.html&title=jay-rosen:%20%23NN08+Sketchbook%3A+Politicians+think+%22Netroots+Nation%22+equals+%22youth%2C%22+because+kids+get+the+Net.+But+glance+at+the+crowd+and%3A+Fail"
         },
         {
           "record_id": "RECORD-00866",
@@ -29218,7 +29222,7 @@
         {
           "record_id": "RECORD-00866",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20131109181545/http://www.stumbleupon.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-sketchbook-politicia_b_113765.html&title=jay-rosen:%20%23NN08+Sketchbook%3A+Politicians+think+%22Netroots+Nation%22+equals+%22youth%2C%22+because+kids+get+the+Net.+But+glance+at+the+crowd+and%3A+Fail."
+          "value": "http://web.archive.org/web/20131109181545/http://www.stumbleupon.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-sketchbook-politicia_b_113765.html&title=jay-rosen:%20%23NN08+Sketchbook%3A+Politicians+think+%22Netroots+Nation%22+equals+%22youth%2C%22+because+kids+get+the+Net.+But+glance+at+the+crowd+and%3A+Fail"
         },
         {
           "record_id": "RECORD-00866",
@@ -29248,12 +29252,12 @@
         {
           "record_id": "RECORD-00867",
           "field": "notes",
-          "value": "http://web.archive.org/web/20131106230522/http://www.huffingtonpost.com:80/jay-rosen/nn08-sketchbook-matt-ygle_b_113772.html."
+          "value": "http://web.archive.org/web/20131106230522/http://www.huffingtonpost.com:80/jay-rosen/nn08-sketchbook-matt-ygle_b_113772.html"
         },
         {
           "record_id": "RECORD-00867",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20131106230522/http://reddit.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-sketchbook-matt-ygle_b_113772.html&title=jay-rosen:%20%23NN08+Sketchbook.+Matt+Yglesias%3A+In+policy+debate+you+can%27t+say%2C+%22I+know%2C+let%27s+spend+a+%24170+billion+a+year+on+it.%22+But+in+Iraq..."
+          "value": "http://web.archive.org/web/20131106230522/http://reddit.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-sketchbook-matt-ygle_b_113772.html&title=jay-rosen:%20%23NN08+Sketchbook.+Matt+Yglesias%3A+In+policy+debate+you+can%27t+say%2C+%22I+know%2C+let%27s+spend+a+%24170+billion+a+year+on+it.%22+But+in+Iraq"
         },
         {
           "record_id": "RECORD-00867",
@@ -29313,7 +29317,7 @@
         {
           "record_id": "RECORD-00867",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20131106230522/http://www.stumbleupon.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-sketchbook-matt-ygle_b_113772.html&title=jay-rosen:%20%23NN08+Sketchbook.+Matt+Yglesias%3A+In+policy+debate+you+can%27t+say%2C+%22I+know%2C+let%27s+spend+a+%24170+billion+a+year+on+it.%22+But+in+Iraq..."
+          "value": "http://web.archive.org/web/20131106230522/http://www.stumbleupon.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-sketchbook-matt-ygle_b_113772.html&title=jay-rosen:%20%23NN08+Sketchbook.+Matt+Yglesias%3A+In+policy+debate+you+can%27t+say%2C+%22I+know%2C+let%27s+spend+a+%24170+billion+a+year+on+it.%22+But+in+Iraq"
         },
         {
           "record_id": "RECORD-00867",
@@ -29343,12 +29347,12 @@
         {
           "record_id": "RECORD-00868",
           "field": "notes",
-          "value": "http://web.archive.org/web/20160212022618/http://www.huffingtonpost.com/jay-rosen/nn08-sketchbook-gina-coop_b_113780.html."
+          "value": "http://web.archive.org/web/20160212022618/http://www.huffingtonpost.com/jay-rosen/nn08-sketchbook-gina-coop_b_113780.html"
         },
         {
           "record_id": "RECORD-00869",
           "field": "notes",
-          "value": "http://web.archive.org/web/20131106201257/http://www.huffingtonpost.com:80/jay-rosen/nn08-righties-came-to-aus_b_113813.html."
+          "value": "http://web.archive.org/web/20131106201257/http://www.huffingtonpost.com:80/jay-rosen/nn08-righties-came-to-aus_b_113813.html"
         },
         {
           "record_id": "RECORD-00869",
@@ -29358,7 +29362,7 @@
         {
           "record_id": "RECORD-00869",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20131106201257/http://reddit.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-righties-came-to-aus_b_113813.html&title=jay-rosen:%20%23NN08+Righties+came+to+Austin+to+draft+off+Netroots+media+attention%2C+but+stories+comparing+the+two+note+how+small+their+event+is."
+          "value": "http://web.archive.org/web/20131106201257/http://reddit.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-righties-came-to-aus_b_113813.html&title=jay-rosen:%20%23NN08+Righties+came+to+Austin+to+draft+off+Netroots+media+attention%2C+but+stories+comparing+the+two+note+how+small+their+event+is"
         },
         {
           "record_id": "RECORD-00869",
@@ -29418,7 +29422,7 @@
         {
           "record_id": "RECORD-00869",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20131106201257/http://www.stumbleupon.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-righties-came-to-aus_b_113813.html&title=jay-rosen:%20%23NN08+Righties+came+to+Austin+to+draft+off+Netroots+media+attention%2C+but+stories+comparing+the+two+note+how+small+their+event+is."
+          "value": "http://web.archive.org/web/20131106201257/http://www.stumbleupon.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-righties-came-to-aus_b_113813.html&title=jay-rosen:%20%23NN08+Righties+came+to+Austin+to+draft+off+Netroots+media+attention%2C+but+stories+comparing+the+two+note+how+small+their+event+is"
         },
         {
           "record_id": "RECORD-00869",
@@ -29448,7 +29452,7 @@
         {
           "record_id": "RECORD-00870",
           "field": "notes",
-          "value": "http://web.archive.org/web/20131113072245/http://www.huffingtonpost.com:80/jay-rosen/nn08-you-know-if-markos-w_b_113854.html."
+          "value": "http://web.archive.org/web/20131113072245/http://www.huffingtonpost.com:80/jay-rosen/nn08-you-know-if-markos-w_b_113854.html"
         },
         {
           "record_id": "RECORD-00870",
@@ -29458,7 +29462,7 @@
         {
           "record_id": "RECORD-00870",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20131113072245/http://reddit.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-you-know-if-markos-w_b_113854.html&title=jay-rosen:%20%23nn08+You+know%2C+if+Markos+was+a+control+freak+there+would+be+no+Netroots+Nation.++His+%22distributed+ego%22+style+should+be+studied."
+          "value": "http://web.archive.org/web/20131113072245/http://reddit.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-you-know-if-markos-w_b_113854.html&title=jay-rosen:%20%23nn08+You+know%2C+if+Markos+was+a+control+freak+there+would+be+no+Netroots+Nation.++His+%22distributed+ego%22+style+should+be+studied"
         },
         {
           "record_id": "RECORD-00870",
@@ -29518,7 +29522,7 @@
         {
           "record_id": "RECORD-00870",
           "field": "raw_text",
-          "value": "http://web.archive.org/web/20131113072245/http://www.stumbleupon.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-you-know-if-markos-w_b_113854.html&title=jay-rosen:%20%23nn08+You+know%2C+if+Markos+was+a+control+freak+there+would+be+no+Netroots+Nation.++His+%22distributed+ego%22+style+should+be+studied."
+          "value": "http://web.archive.org/web/20131113072245/http://www.stumbleupon.com/submit?url=http%3A%2F%2Fwww.huffingtonpost.com%2Fjay-rosen%2Fnn08-you-know-if-markos-w_b_113854.html&title=jay-rosen:%20%23nn08+You+know%2C+if+Markos+was+a+control+freak+there+would+be+no+Netroots+Nation.++His+%22distributed+ego%22+style+should+be+studied"
         },
         {
           "record_id": "RECORD-00870",
@@ -29548,7 +29552,7 @@
         {
           "record_id": "RECORD-00871",
           "field": "notes",
-          "value": "http://web.archive.org/web/20080724035535/http://www.huffingtonpost.com:80/jay-rosen/nn08-sketchbook-code-pink_b_113872.html."
+          "value": "http://web.archive.org/web/20080724035535/http://www.huffingtonpost.com:80/jay-rosen/nn08-sketchbook-code-pink_b_113872.html"
         },
         {
           "record_id": "RECORD-00871",

@@ -415,11 +415,14 @@ def _git_commit_and_push(record_id: str, title: str,
         return _PushResult(ok=True, non_ff=False, error=None)
     except subprocess.CalledProcessError as exc:
         stderr = (exc.stderr or '').strip()
+        stdout = (exc.stdout or '').strip()
+        diagnostics = '\n'.join(part for part in (stderr, stdout) if part)
         cmd = exc.cmd if isinstance(exc.cmd, (list, tuple)) else []
         is_push = list(cmd[:2]) == ['git', 'push']
         non_ff = is_push and _is_non_fast_forward(stderr)
         return _PushResult(ok=False, non_ff=non_ff,
-                           error=f'commit/push pipeline failed: {stderr or exc}')
+                           error=f'commit/push pipeline failed: '
+                                 f'{diagnostics or exc}')
 
 
 def _fetch_and_reset_main() -> Optional[str]:

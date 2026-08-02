@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 
 import {
@@ -94,6 +95,47 @@ describe('stewardship coverage census', () => {
     );
     assert.equal(census.cross_file.full_missing_from_core.count, 0);
     assert.equal(census.baseline_2026_07_22.data_commit, '5d3d5351346a9712de4f54d95e69ba0f410c6efd');
+  });
+
+  it('strips sentence punctuation from prose preservation candidates', () => {
+    const census = buildFixtureCensus();
+    assert.ok(census.preservation.embedded_candidates.evidence.every(item => (
+      !/[.,;:!?]$/.test(item.value)
+    )));
+  });
+
+  it('includes the authored-excerpts sidecar in provenance when present', t => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'stewardship-inputs-'));
+    t.after(() => fs.rmSync(tempDir, { recursive: true, force: true }));
+    fs.cpSync(fixtureDir, tempDir, { recursive: true });
+    const sidecarPath = path.join(tempDir, 'authored-excerpts.csv');
+    fs.writeFileSync(sidecarPath, 'record_id,authored_excerpt\nRECORD-00001,Curator summary\n');
+
+    const first = loadStewardshipInputs({ dataDir: tempDir });
+    const firstSidecar = first.files.find(file => file.path === 'authored-excerpts.csv');
+    assert.match(firstSidecar.sha256, /^[a-f0-9]{64}$/);
+
+    fs.appendFileSync(sidecarPath, 'RECORD-00002,Second summary\n');
+    const second = loadStewardshipInputs({ dataDir: tempDir });
+    assert.notEqual(
+      second.files.find(file => file.path === 'authored-excerpts.csv').sha256,
+      firstSidecar.sha256,
+    );
+  });
+
+  it('rejects CSV rows whose shape differs from the exporter boundary', t => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'stewardship-csv-shape-'));
+    t.after(() => fs.rmSync(tempDir, { recursive: true, force: true }));
+    fs.cpSync(fixtureDir, tempDir, { recursive: true });
+    const csvPath = path.join(tempDir, 'archive_records-public.csv');
+    const lines = fs.readFileSync(csvPath, 'utf8').trimEnd().split('\n');
+    lines[1] += ',unexpected-cell';
+    fs.writeFileSync(csvPath, `${lines.join('\n')}\n`);
+
+    assert.throws(
+      () => loadStewardshipInputs({ dataDir: tempDir }),
+      /Invalid Record Length|columns length/,
+    );
   });
 
   it('detects intentional count drift instead of accepting stale output', () => {
