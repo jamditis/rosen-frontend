@@ -51,11 +51,16 @@ export function convertWinerEvidence(evidence) {
     const eventSuffix = digest([id, record.retrieval.capturedAt, record.retrieval.responseSha256]);
     const eventId = `urn:rosen-preservation:event:winer:${id}:${eventSuffix}`;
     const artifactId = `urn:rosen-preservation:artifact:winer:${id}:sha256:${record.retrieval.responseSha256}`;
+    const alternateSourceUrls = new URL(record.retrieval.finalUrl).href
+      === new URL(record.retrievalUrl).href
+      ? []
+      : [record.retrieval.finalUrl];
 
     objects.push({
       objectId,
       objectType: 'feature-record',
       canonicalSourceUrl: record.retrievalUrl,
+      ...(alternateSourceUrls.length > 0 ? { alternateSourceUrls } : {}),
       sourceRecordId: id,
       label: record.observations.sourceTitle,
     });

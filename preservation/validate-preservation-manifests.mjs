@@ -119,6 +119,14 @@ function validateReferences(manifest) {
     }
     for (const copy of artifact.storageCopies) {
       validateUtcTimestamp(copy.createdAt, `${copy.copyId} storage copy createdAt`);
+      if (
+        copy.uri.startsWith(sha256UrnPrefix)
+        && copy.uri.slice(sha256UrnPrefix.length) !== artifact.sha256
+      ) {
+        throw new PreservationValidationError(
+          `${copy.copyId}: storage copy uri SHA-256 digest must match the artifact sha256`,
+        );
+      }
       if (copies.has(copy.copyId)) {
         throw new PreservationValidationError(`duplicate copyId ${copy.copyId} in storage copies`);
       }
@@ -207,6 +215,11 @@ function validateReferences(manifest) {
         event.rights.embargoUntil,
         `${event.eventId} rights embargoUntil`,
       );
+      if (Date.parse(event.rights.embargoUntil) <= Date.parse(event.occurredAt)) {
+        throw new PreservationValidationError(
+          `${event.eventId}: rights embargoUntil must be after event occurredAt`,
+        );
+      }
     }
     if (event.wayback) {
       validateWaybackTimestamp(
@@ -239,8 +252,8 @@ function validateReferences(manifest) {
 
     if (event.retrieval) {
       const allowedSourceUrls = sourceUrlsByObject.get(event.objectId);
-      for (const field of ['requestedUrl', 'observedSourceUrl']) {
-        if (event.retrieval[field] === undefined) continue;
+      for (const field of ['requestedUrl', 'observedSourceUrl', 'finalUrl']) {
+        if (event.retrieval[field] == null) continue;
         if (!allowedSourceUrls.has(new URL(event.retrieval[field]).href)) {
           throw new PreservationValidationError(
             `${event.eventId}: retrieval ${field} must match object canonicalSourceUrl or alternateSourceUrls`,
@@ -388,10 +401,11 @@ function validateReferences(manifest) {
     }
     const currentArtifactCreationEvents = (artifactCreationEvents.get(artifact.artifactId) ?? [])
       .filter(event => !supersededEvents.has(event.eventId));
-    const captureDeclaresArtifact = captureEvent?.artifactId === artifact.artifactId;
+    const captureDeclaresArtifact = captureEvent?.artifactId === artifact.artifactId
+      && !supersededEvents.has(captureEvent.eventId);
     if (!captureDeclaresArtifact && currentArtifactCreationEvents.length === 0) {
       throw new PreservationValidationError(
-        `${artifact.artifactId}: retained artifact requires an artifact-created event or a declaring capture-attempt`,
+        `${artifact.artifactId}: retained artifact requires current provenance from an artifact-created event or declaring capture-attempt`,
       );
     }
     if (!captureDeclaresArtifact && currentArtifactCreationEvents.length > 1) {
@@ -437,6 +451,29 @@ function validateReferences(manifest) {
           `${copy.copyId}: named storage copy has multiple current storage-copy-created events`,
         );
       }
+      if (currentCreationEvents[0].occurredAt !== copy.createdAt) {
+        throw new PreservationValidationError(
+          `${copy.copyId}: storage copy createdAt must match its current storage-copy-created event occurredAt`,
+        );
+      }
+    }
+  }
+
+  const manifestCreatedAt = Date.parse(manifest.createdAt);
+  for (const artifact of manifest.artifacts) {
+    for (const copy of artifact.storageCopies) {
+      if (Date.parse(copy.createdAt) > manifestCreatedAt) {
+        throw new PreservationValidationError(
+          `manifest createdAt cannot be earlier than storage copy ${copy.copyId} createdAt`,
+        );
+      }
+    }
+  }
+  for (const event of manifest.events) {
+    if (Date.parse(event.occurredAt) > manifestCreatedAt) {
+      throw new PreservationValidationError(
+        `manifest createdAt cannot be earlier than event ${event.eventId} occurredAt`,
+      );
     }
   }
 }

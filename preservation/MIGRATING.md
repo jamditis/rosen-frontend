@@ -40,7 +40,8 @@ not emit a different version while claiming validation against the v1 schema.
 1. Validate the source manifest with its declared schema and vocabulary.
 2. Run a deterministic, versioned migration tool against a copy. Record the
    source manifest's hash as the migration input.
-3. Assign a new `manifestId` and set `supersedesManifestId` to the source
+3. Assign a new `manifestId`, set `createdAt` at or after every migrated event
+   and storage-copy creation, and set `supersedesManifestId` to the source
    manifest. Never overwrite the source artifact.
 4. Preserve object, event, artifact, and copy IDs when their identities have not
    changed. If an event's assertion must be corrected, append a new event with

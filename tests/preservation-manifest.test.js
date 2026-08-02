@@ -101,6 +101,11 @@ describe('preservation manifest schema (#701)', () => {
       'urn:sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
     rejectsManifest(mismatchedDigestUri, 'uri', 'sha256', 'match');
 
+    const mismatchedCopyDigestUri = example('successful-capture');
+    mismatchedCopyDigestUri.artifacts[0].storageCopies[0].uri =
+      'urn:sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee';
+    rejectsManifest(mismatchedCopyDigestUri, 'copy', 'uri', 'SHA-256', 'artifact');
+
     const unknownOutcome = example('bot-wall');
     unknownOutcome.events[0].retrieval.semanticOutcome = 'probably-fine';
     rejectsManifest(unknownOutcome, 'semanticOutcome', 'enum');
@@ -187,6 +192,10 @@ describe('preservation manifest schema (#701)', () => {
 
     const explicitAlternate = example('successful-capture');
     assert.equal(validatePreservationManifest(explicitAlternate), explicitAlternate);
+
+    const wrongFinalUrl = example('bot-wall');
+    wrongFinalUrl.events[0].retrieval.finalUrl = 'https://other.example/wrong-story';
+    rejectsManifest(wrongFinalUrl, 'finalUrl', 'canonicalSourceUrl', 'alternateSourceUrls');
   });
 
   it('supports non-web canonical sources with explicit retrieval URLs', () => {
@@ -196,7 +205,10 @@ describe('preservation manifest schema (#701)', () => {
     object.objectId = 'urn:rosen:object:dataset:dataset-fixture';
     object.objectType = 'dataset';
     object.canonicalSourceUrl = `urn:sha256:${'a'.repeat(64)}`;
-    object.alternateSourceUrls = [event.retrieval.requestedUrl];
+    object.alternateSourceUrls = [
+      event.retrieval.requestedUrl,
+      event.retrieval.finalUrl,
+    ];
     event.objectId = object.objectId;
 
     assert.equal(validatePreservationManifest(manifest), manifest);
@@ -262,6 +274,16 @@ describe('preservation manifest schema (#701)', () => {
       testCase.mutate(testCase.manifest);
       rejectsManifest(testCase.manifest, ...testCase.expected);
     }
+  });
+
+  it('requires the manifest timestamp to include its event and copy history', () => {
+    const eventFromTheFuture = example('bot-wall');
+    eventFromTheFuture.createdAt = '2026-08-01T15:14:59.000Z';
+    rejectsManifest(eventFromTheFuture, 'manifest createdAt', 'event', 'earlier');
+
+    const copyFromTheFuture = example('successful-capture');
+    copyFromTheFuture.createdAt = '2026-08-01T14:22:30.000Z';
+    rejectsManifest(copyFromTheFuture, 'manifest createdAt', 'storage copy', 'earlier');
   });
 
   it('rejects payloads that do not belong to the declared event type', () => {
@@ -337,6 +359,9 @@ describe('preservation manifest schema (#701)', () => {
     const manifest = example('successful-capture');
     const storageEvent = manifest.events.find(event => event.eventType === 'storage-copy-created');
     storageEvent.occurredAt = '2026-08-01T14:26:00.000Z';
+    manifest.artifacts[0].storageCopies.find(copy => (
+      copy.copyId === storageEvent.storageCopyId
+    )).createdAt = storageEvent.occurredAt;
     for (const event of manifest.events) event.review.state = 'not-reviewed';
     manifest.events.find(event => event.eventType === 'fixity-check').review.state = 'accepted';
 
@@ -426,7 +451,13 @@ describe('preservation manifest schema (#701)', () => {
     correction.occurredAt = '2026-08-01T14:24:30.000Z';
     correction.supersedesEventId = correctedCreation.eventId;
     corrected.events.push(correction);
+    corrected.artifacts[0].storageCopies[0].createdAt = correction.occurredAt;
     assert.equal(validatePreservationManifest(corrected), corrected);
+
+    const mismatchedCreationTime = example('successful-capture');
+    mismatchedCreationTime.artifacts[0].storageCopies[0].createdAt =
+      '2026-08-01T14:22:59.000Z';
+    rejectsManifest(mismatchedCreationTime, copy.copyId, 'createdAt', 'occurredAt', 'match');
   });
 
   it('requires one append-only introduction path for every retained artifact', () => {
@@ -468,6 +499,22 @@ describe('preservation manifest schema (#701)', () => {
     const responseWithoutCapture = example('successful-capture');
     delete responseWithoutCapture.artifacts[0].captureEventId;
     rejectsManifest(responseWithoutCapture, 'captureEventId', 'required');
+
+    const supersededOnlyCapture = example('successful-capture');
+    const supersededArtifact = supersededOnlyCapture.artifacts[0];
+    const supersededCapture = supersededOnlyCapture.events.find(event => (
+      event.eventId === supersededArtifact.captureEventId
+    ));
+    supersededOnlyCapture.events = supersededOnlyCapture.events.filter(event => (
+      event.eventType !== 'artifact-created'
+    ));
+    const captureCorrection = clone(supersededCapture);
+    captureCorrection.eventId = 'urn:rosen-preservation:event:corrected-success-content';
+    captureCorrection.occurredAt = '2026-08-01T14:21:30.000Z';
+    captureCorrection.supersedesEventId = supersededCapture.eventId;
+    delete captureCorrection.artifactId;
+    supersededOnlyCapture.events.push(captureCorrection);
+    rejectsManifest(supersededOnlyCapture, supersededArtifact.artifactId, 'current', 'provenance');
   });
 
   it('binds each declared capture artifact to the same capture event', () => {
@@ -523,6 +570,11 @@ describe('preservation manifest schema (#701)', () => {
     delete manifest.events[1].rights.embargoUntil;
 
     rejectsManifest(manifest, 'embargoUntil', 'required');
+
+    const expiredEmbargo = example('rights-hold');
+    expiredEmbargo.events[1].rights.accessDecision = 'embargoed';
+    expiredEmbargo.events[1].rights.embargoUntil = '2026-08-01T15:59:59.000Z';
+    rejectsManifest(expiredEmbargo, 'embargoUntil', 'after', 'occurredAt');
   });
 
   it('requires cleared rights before public access or deposit eligibility', () => {

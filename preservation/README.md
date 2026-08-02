@@ -48,7 +48,7 @@ filesystem layout.
 | `schemaVersion` | Required | Data-shape version. Version 1 requires `1.0.0`. |
 | `vocabularyVersion` | Required | Event and state vocabulary version. Version 1 requires `1.0.0`. |
 | `manifestId` | Required | Stable `urn:rosen-preservation:manifest:*` identifier. |
-| `createdAt` | Required | UTC timestamp for this manifest representation. |
+| `createdAt` | Required | UTC timestamp for this manifest representation, at or after every contained event and storage-copy creation. |
 | `objects` | Required | Archive objects addressed by stable object IDs. |
 | `events` | Required | Ordered, append-only preservation history. May be empty. |
 | `artifacts` | Required | Captured or generated artifacts and their storage copies. May be empty. |
@@ -114,8 +114,8 @@ not-requested outcome may omit `finalUrl` and must carry null response
 metadata. A not-requested check may also omit `observedSourceUrl` and
 `retrievedAt`, because no request occurred. Optional
 `reportedByteLength` and `limitBytes` distinguish an oversize abort from a
-completed download. Requested and observed URLs must match the owning object's
-canonical URL or one of its explicit alternate source URLs.
+completed download. Requested, observed, and non-null final URLs must match the
+owning object's canonical URL or one of its explicit alternate source URLs.
 
 Semantic outcomes are `intended-content`, `bot-wall`, `login-wall`, `missing`,
 `redirect`, `uncertain`, and `oversize-abort`. Unknown values fail validation;
@@ -128,9 +128,11 @@ An artifact requires a stable artifact ID, owning object ID, artifact type,
 URI, SHA-256, byte size, and `storageCopies` array. HTTP-response artifacts also
 require their originating capture-event ID. Generated metadata, checksum, and
 other non-response artifacts may omit that ID, but they must have one current
-`artifact-created` event. The storage array may be empty when evidence proves a
-response digest but does not name a retained copy. Each named storage copy
-requires its own stable ID, URI, storage class, access state, and creation time.
+`artifact-created` event. A superseded capture no longer introduces an artifact;
+the retained artifact then needs a current `artifact-created` event. The storage
+array may be empty when evidence proves a response digest but does not name a
+retained copy. Each named storage copy requires its own stable ID, URI, storage
+class, access state, and creation time.
 
 The validator ensures object, event, artifact, fixity, and storage-copy
 references resolve and remain within one object. When a capture attempt names
@@ -138,8 +140,10 @@ an artifact, the artifact's originating capture must be that same event. The
 model supports multiple captures, artifacts, and storage copies for the same
 archive object. Every named storage copy must have exactly one matching
 current `storage-copy-created` event; corrected predecessors remain in the
-append-only history, and storage state cannot appear through an artifact record
-edit alone.
+append-only history. The copy's `createdAt` must equal the current creation
+event's `occurredAt`. Content-addressed `urn:sha256:` artifact and copy URIs
+must match the owning artifact digest, so storage state cannot change through
+an artifact record edit alone.
 
 ## Rights and review boundaries
 
@@ -150,7 +154,8 @@ recorded as an explicit private, undetermined hold while issue #700 establishes
 the governing policy. Only cleared rights may declare public access or public
 deposit eligibility, and those two public states must agree. Past events retain
 the policy version used when they were made and are not silently reinterpreted
-after a policy change.
+after a policy change. An embargo end must be later than the rights event that
+declares it.
 
 Review states are `not-reviewed`, `review-required`, `accepted`, `rejected`,
 and `superseded`. Notes are optional in the schema but should explain holds,
@@ -182,7 +187,7 @@ without modifying or replacing `retrieval-evidence.json`:
 | record `id` | `sourceRecordId` and stable feature-record object ID |
 | `retrievalUrl` | canonical, requested, and observed source URL |
 | `retrieval.capturedAt` | retrieval and event timestamps |
-| final URL, status, content type, and byte length | required retrieval fields |
+| final URL, status, content type, and byte length | required retrieval fields; a distinct final URL is an explicit alternate source |
 | `retrieval.client` and top-level `captureTool` | client name/version and task version |
 | `retrieval.responseSha256` | record-scoped artifact ID plus content-addressed URI and SHA-256 |
 | observations, field mapping, source locator, normalized digest | `normalizationEvidence` |

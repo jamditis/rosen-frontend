@@ -8,6 +8,9 @@
       "objectId": "urn:rosen:object:social-post:TWTR-00001",
       "objectType": "social-post",
       "canonicalSourceUrl": "https://social.example/status/1",
+      "alternateSourceUrls": [
+        "https://social.example/challenge"
+      ],
       "sourceRecordId": "TWTR-00001",
       "label": "Bot wall example"
     }
