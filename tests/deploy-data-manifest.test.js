@@ -99,6 +99,9 @@ const KNOWN_NOT_DEPLOYED = new Map([
   ['data/archive-embeddings.json',
     'embeddings build artifact, not referenced by any deployed page (built by ' +
     'data/lib/embeddings-builder.js)'],
+  ['data/graph-validation-holds.json',
+    'validator policy input used only by repository and CI graph checks; no ' +
+    'deployed page reads it'],
 ]);
 
 // A data file is "deployed" if it is listed individually or lives under a data/

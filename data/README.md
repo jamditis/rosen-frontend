@@ -59,6 +59,35 @@ npm run export-data  # or: node data/export-archive-data.js
 
 The script reads the four source CSVs (plus `authored-excerpts.csv`), processes and links the records, and writes the JSON files listed above. It prints progress as it goes, including a row count for each CSV it reads.
 
+## Validating graph integrity
+
+Run the cross-file graph validator from the repository root whenever records,
+entities, relationships, extraction schemas, or generated archive JSON changes:
+
+```bash
+npm run validate:graph
+```
+
+The command generates a disposable in-memory SQLite database from the CSV and
+JSON text sources. It enforces stable IDs, foreign keys, allowed types, first
+mention references, relationship endpoints, and equality between published
+`relatedIds`, `archive-entities.json`'s `recordEntityMap`, and the endpoint links
+derived from canonical relationships. It also compares every duplicated entity
+field across the two generated JSON files. The database is a validation artifact
+only; no SQLite file is committed or treated as canonical.
+
+Rows with unregistered relationship semantics must have an exact, reviewed
+entry in `graph-validation-holds.json`. Holds are explicit temporary states,
+not additions to the accepted relationship vocabulary. The per-relationship
+semantic endpoint matrix remains part of the relationship-type audit in issue
+#737; this validator requires both endpoints to resolve to typed entities without
+prematurely declaring that matrix canonical.
+
+Published records that are intentionally generated without a canonical CSV row
+must likewise have their exact stable ID listed in
+`generatedPublishedRecordIds` in that policy file. The validator rejects both
+unlisted source-less records and obsolete entries that now have a source row.
+
 For the full record-adding walkthrough — written for non-technical curators — see [`ADDING-RECORDS.md`](../ADDING-RECORDS.md). For which files to upload to production, see [`DEPLOYMENT.md`](../DEPLOYMENT.md).
 
 ### A note on history
