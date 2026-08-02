@@ -57,6 +57,7 @@
   "$defs": {
     "timestamp": {
       "type": "string",
+      "format": "date-time",
       "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]{3})?Z$"
     },
     "sha256": {
@@ -116,7 +117,7 @@
           ]
         },
         "canonicalSourceUrl": {
-          "$ref": "#/$defs/webUrl"
+          "$ref": "#/$defs/artifactUri"
         },
         "alternateSourceUrls": {
           "type": "array",
@@ -133,7 +134,57 @@
           "type": "string",
           "minLength": 1
         }
-      }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "objectType": { "const": "archive-record" },
+            "objectId": { "type": "string", "pattern": "^urn:rosen:object:archive-record:" }
+          }
+        },
+        {
+          "properties": {
+            "objectType": { "const": "social-post" },
+            "objectId": { "type": "string", "pattern": "^urn:rosen:object:social-post:" }
+          }
+        },
+        {
+          "properties": {
+            "objectType": { "const": "entity" },
+            "objectId": { "type": "string", "pattern": "^urn:rosen:object:entity:" }
+          }
+        },
+        {
+          "properties": {
+            "objectType": { "const": "relationship" },
+            "objectId": { "type": "string", "pattern": "^urn:rosen:object:relationship:" }
+          }
+        },
+        {
+          "properties": {
+            "objectType": { "const": "dataset" },
+            "objectId": { "type": "string", "pattern": "^urn:rosen:object:dataset:" }
+          }
+        },
+        {
+          "properties": {
+            "objectType": { "const": "source-file" },
+            "objectId": { "type": "string", "pattern": "^urn:rosen:object:source-file:" }
+          }
+        },
+        {
+          "properties": {
+            "objectType": { "const": "generated-artifact" },
+            "objectId": { "type": "string", "pattern": "^urn:rosen:object:generated-artifact:" }
+          }
+        },
+        {
+          "properties": {
+            "objectType": { "const": "feature-record" },
+            "objectId": { "type": "string", "pattern": "^urn:rosen:object:feature-record:" }
+          }
+        }
+      ]
     },
     "actor": {
       "type": "object",
@@ -200,9 +251,6 @@
       "additionalProperties": false,
       "required": [
         "requestedUrl",
-        "observedSourceUrl",
-        "retrievedAt",
-        "finalUrl",
         "httpStatus",
         "httpOutcome",
         "mediaType",
@@ -221,7 +269,10 @@
           "$ref": "#/$defs/timestamp"
         },
         "finalUrl": {
-          "$ref": "#/$defs/webUrl"
+          "anyOf": [
+            { "$ref": "#/$defs/webUrl" },
+            { "type": "null" }
+          ]
         },
         "httpStatus": {
           "type": [
@@ -293,7 +344,71 @@
             "required": [
               "reportedByteLength",
               "limitBytes"
-            ]
+            ],
+            "properties": {
+              "httpOutcome": { "const": "aborted" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "httpOutcome": { "const": "response-received" }
+            }
+          },
+          "then": {
+            "required": ["observedSourceUrl", "retrievedAt", "finalUrl"],
+            "properties": {
+              "finalUrl": { "$ref": "#/$defs/webUrl" },
+              "httpStatus": { "type": "integer" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "httpOutcome": { "const": "aborted" }
+            }
+          },
+          "then": {
+            "required": ["observedSourceUrl", "retrievedAt", "finalUrl"],
+            "properties": {
+              "finalUrl": { "$ref": "#/$defs/webUrl" },
+              "httpStatus": { "type": "integer" },
+              "semanticOutcome": {
+                "enum": ["uncertain", "oversize-abort"]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "httpOutcome": {
+                "enum": ["network-error", "timeout"]
+              }
+            }
+          },
+          "then": {
+            "required": ["observedSourceUrl", "retrievedAt"]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "httpOutcome": {
+                "enum": ["network-error", "timeout", "not-requested"]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "finalUrl": { "type": "null" },
+              "httpStatus": { "type": "null" },
+              "mediaType": { "type": "null" },
+              "bytesReceived": { "const": 0 },
+              "semanticOutcome": { "const": "uncertain" }
+            }
           }
         }
       ]
@@ -378,6 +493,32 @@
             "required": [
               "embargoUntil"
             ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "publicDepositEligibility": { "const": "eligible" }
+            }
+          },
+          "then": {
+            "properties": {
+              "rightsStatus": { "const": "cleared" },
+              "accessDecision": { "const": "public" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "accessDecision": { "const": "public" }
+            }
+          },
+          "then": {
+            "properties": {
+              "rightsStatus": { "const": "cleared" },
+              "publicDepositEligibility": { "const": "eligible" }
+            }
           }
         }
       ]
@@ -658,7 +799,6 @@
       "required": [
         "artifactId",
         "objectId",
-        "captureEventId",
         "artifactType",
         "uri",
         "sha256",
@@ -708,7 +848,19 @@
             "$ref": "#/$defs/storageCopy"
           }
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "artifactType": { "const": "http-response" }
+            }
+          },
+          "then": {
+            "required": ["captureEventId"]
+          }
+        }
+      ]
     }
   }
 }

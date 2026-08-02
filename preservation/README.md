@@ -60,7 +60,9 @@ filesystem layout.
 `objectId`, `objectType`, and `canonicalSourceUrl` are required. The optional
 `alternateSourceUrls` list records redirect targets or other source URLs that
 retrieval events may address; `sourceRecordId` and `label` are optional
-conveniences. Object IDs use the form
+conveniences. The canonical source may be HTTP(S), S3, Google Cloud Storage, a
+file URI, or a URN. An object with a non-web canonical source must list each
+web retrieval target explicitly in `alternateSourceUrls`. Object IDs use the form
 `urn:rosen:object:<type>:<stable-id>` and cannot be filesystem paths. The type
 segment and `objectType` must agree so identity never changes meaning between
 URN-aware and field-aware consumers.
@@ -103,24 +105,32 @@ calendar check and must equal the timestamp embedded in their replay URL.
 | `rights-decision` | `rights` | Record versioned rights, access, and deposit states. |
 | `review-decision` | `review` | Record a human disposition without changing earlier events. |
 
-Retrieval events always retain the requested and observed source URLs,
-retrieval time, final URL, nullable HTTP status, HTTP outcome, nullable media
-type, bytes received, client name and version, and semantic outcome. Optional
+Retrieval events always retain the requested source URL, nullable HTTP status,
+HTTP outcome, nullable media type, bytes received, client name and version, and
+semantic outcome. A received or aborted response, network error, or timeout
+also records the observed source URL and retrieval time. A received or aborted
+response requires a final URL and integer status. A network error, timeout, or
+not-requested outcome may omit `finalUrl` and must carry null response
+metadata. A not-requested check may also omit `observedSourceUrl` and
+`retrievedAt`, because no request occurred. Optional
 `reportedByteLength` and `limitBytes` distinguish an oversize abort from a
 completed download. Requested and observed URLs must match the owning object's
 canonical URL or one of its explicit alternate source URLs.
 
 Semantic outcomes are `intended-content`, `bot-wall`, `login-wall`, `missing`,
 `redirect`, `uncertain`, and `oversize-abort`. Unknown values fail validation;
-new vocabulary requires a version change.
+new vocabulary requires a version change. An `oversize-abort` semantic outcome
+must use the `aborted` HTTP outcome.
 
 ## Artifacts, storage, and fixity
 
-An artifact requires a stable artifact ID, owning object ID, originating
-capture-event ID, artifact type, URI, SHA-256, byte size, and `storageCopies`
-array. The array may be empty when evidence proves a response digest but does
-not name a retained copy. Each named storage copy requires its own stable ID,
-URI, storage class, access state, and creation time.
+An artifact requires a stable artifact ID, owning object ID, artifact type,
+URI, SHA-256, byte size, and `storageCopies` array. HTTP-response artifacts also
+require their originating capture-event ID. Generated metadata, checksum, and
+other non-response artifacts may omit that ID, but they must have one current
+`artifact-created` event. The storage array may be empty when evidence proves a
+response digest but does not name a retained copy. Each named storage copy
+requires its own stable ID, URI, storage class, access state, and creation time.
 
 The validator ensures object, event, artifact, fixity, and storage-copy
 references resolve and remain within one object. When a capture attempt names
@@ -137,8 +147,10 @@ The schema represents rights states; it does not decide them. `rightsStatus`,
 `accessDecision`, `publicDepositEligibility`, `policyVersion`, and
 `decisionBasis` are required on rights events. Unknown rights can therefore be
 recorded as an explicit private, undetermined hold while issue #700 establishes
-the governing policy. Past events retain the policy version used when they were
-made and are not silently reinterpreted after a policy change.
+the governing policy. Only cleared rights may declare public access or public
+deposit eligibility, and those two public states must agree. Past events retain
+the policy version used when they were made and are not silently reinterpreted
+after a policy change.
 
 Review states are `not-reviewed`, `review-required`, `accepted`, `rejected`,
 and `superseded`. Notes are optional in the schema but should explain holds,
@@ -150,12 +162,15 @@ rejections, and corrections.
 `objectsById` projection containing event, capture, artifact, and storage-copy
 IDs plus the latest semantic outcome, rights decision, and review state.
 Superseded events remain in the history and ID lists but do not supply those
-latest assertions. Among the remaining events, latest fields use the greatest
-`occurredAt` timestamp, with the stable event ID as the deterministic tie-break,
-rather than treating manifest array order as event-time order. The projection
-carries `derived: true` and its source manifest ID. Consumers may
-persist that projection for queries, but must regenerate it after any append or
-migration.
+latest assertions. Among the remaining events, semantic outcomes and rights
+decisions use the greatest `occurredAt` timestamp, with the stable event ID as
+the deterministic tie-break, rather than treating manifest array order as
+event-time order. Review state first prefers a substantive state over
+`not-reviewed`, then uses that same timestamp and event-ID ordering within each
+class. This prevents later operational events from erasing an earlier human
+review. The projection carries `derived: true` and its source manifest ID.
+Consumers may persist that projection for queries, but must regenerate it after
+any append or migration.
 
 ## Winer evidence compatibility
 

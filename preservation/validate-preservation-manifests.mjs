@@ -3,18 +3,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import Ajv2020 from 'ajv/dist/2020.js';
+import { compileJsonSchema } from '../scripts/json-schema-validator.mjs';
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 const schemaPath = path.join(moduleDir, 'preservation-manifest.schema.json');
 const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
-const ajv = new Ajv2020({
-  allErrors: true,
-  allowUnionTypes: true,
-  strict: true,
-  strictRequired: false,
+const validateSchema = compileJsonSchema(schema, {
+  source: 'preservation/preservation-manifest.schema.json',
 });
-const validateSchema = ajv.compile(schema);
 const eventPayloadFields = [
   'retrieval',
   'wayback',
@@ -135,10 +131,12 @@ function validateReferences(manifest) {
   for (const event of manifest.events) {
     validateUtcTimestamp(event.occurredAt, `${event.eventId} event occurredAt`);
     if (event.retrieval) {
-      validateUtcTimestamp(
-        event.retrieval.retrievedAt,
-        `${event.eventId} retrieval retrievedAt`,
-      );
+      if (event.retrieval.retrievedAt !== undefined) {
+        validateUtcTimestamp(
+          event.retrieval.retrievedAt,
+          `${event.eventId} retrieval retrievedAt`,
+        );
+      }
       if (
         event.retrieval.httpOutcome === 'response-received'
         && event.retrieval.httpStatus === null
@@ -188,6 +186,14 @@ function validateReferences(manifest) {
         );
       }
       if (
+        event.retrieval.semanticOutcome === 'oversize-abort'
+        && event.retrieval.httpOutcome !== 'aborted'
+      ) {
+        throw new PreservationValidationError(
+          `${event.eventId}: semanticOutcome oversize-abort requires httpOutcome aborted`,
+        );
+      }
+      if (
         event.retrieval.httpOutcome === 'aborted'
         && !semanticOutcomesForAbortedRetrieval.has(event.retrieval.semanticOutcome)
       ) {
@@ -234,6 +240,7 @@ function validateReferences(manifest) {
     if (event.retrieval) {
       const allowedSourceUrls = sourceUrlsByObject.get(event.objectId);
       for (const field of ['requestedUrl', 'observedSourceUrl']) {
+        if (event.retrieval[field] === undefined) continue;
         if (!allowedSourceUrls.has(new URL(event.retrieval[field]).href)) {
           throw new PreservationValidationError(
             `${event.eventId}: retrieval ${field} must match object canonicalSourceUrl or alternateSourceUrls`,
@@ -293,7 +300,6 @@ function validateReferences(manifest) {
       }
       if (
         event.eventType === 'capture-attempt'
-        && events.has(artifact.captureEventId)
         && artifact.captureEventId !== event.eventId
       ) {
         throw new PreservationValidationError(
@@ -361,30 +367,34 @@ function validateReferences(manifest) {
         `${artifact.artifactId}: objectId ${artifact.objectId} references a missing object`,
       );
     }
-    const captureEvent = events.get(artifact.captureEventId);
-    if (!captureEvent) {
-      throw new PreservationValidationError(
-        `${artifact.artifactId}: captureEventId ${artifact.captureEventId} is missing`,
-      );
-    }
-    if (captureEvent.eventType !== 'capture-attempt' || captureEvent.objectId !== artifact.objectId) {
-      throw new PreservationValidationError(
-        `${artifact.artifactId}: captureEventId must identify a capture-attempt for the same object`,
-      );
-    }
-    if (captureEvent.artifactId && captureEvent.artifactId !== artifact.artifactId) {
-      throw new PreservationValidationError(
-        `${artifact.artifactId}: captureEventId declares a different artifactId`,
-      );
+    let captureEvent;
+    if (artifact.captureEventId !== undefined) {
+      captureEvent = events.get(artifact.captureEventId);
+      if (!captureEvent) {
+        throw new PreservationValidationError(
+          `${artifact.artifactId}: captureEventId ${artifact.captureEventId} is missing`,
+        );
+      }
+      if (captureEvent.eventType !== 'capture-attempt' || captureEvent.objectId !== artifact.objectId) {
+        throw new PreservationValidationError(
+          `${artifact.artifactId}: captureEventId must identify a capture-attempt for the same object`,
+        );
+      }
+      if (captureEvent.artifactId && captureEvent.artifactId !== artifact.artifactId) {
+        throw new PreservationValidationError(
+          `${artifact.artifactId}: captureEventId declares a different artifactId`,
+        );
+      }
     }
     const currentArtifactCreationEvents = (artifactCreationEvents.get(artifact.artifactId) ?? [])
       .filter(event => !supersededEvents.has(event.eventId));
-    if (!captureEvent.artifactId && currentArtifactCreationEvents.length === 0) {
+    const captureDeclaresArtifact = captureEvent?.artifactId === artifact.artifactId;
+    if (!captureDeclaresArtifact && currentArtifactCreationEvents.length === 0) {
       throw new PreservationValidationError(
         `${artifact.artifactId}: retained artifact requires an artifact-created event or a declaring capture-attempt`,
       );
     }
-    if (!captureEvent.artifactId && currentArtifactCreationEvents.length > 1) {
+    if (!captureDeclaresArtifact && currentArtifactCreationEvents.length > 1) {
       throw new PreservationValidationError(
         `${artifact.artifactId}: retained artifact has multiple current artifact-created events`,
       );

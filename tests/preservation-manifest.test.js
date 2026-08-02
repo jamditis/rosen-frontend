@@ -109,43 +109,73 @@ describe('preservation manifest schema (#701)', () => {
   it('binds retrieval HTTP outcomes to whether a response was received', () => {
     const responseWithoutStatus = example('bot-wall');
     responseWithoutStatus.events[0].retrieval.httpStatus = null;
-    rejectsManifest(responseWithoutStatus, 'httpOutcome', 'response-received', 'httpStatus');
+    rejectsManifest(responseWithoutStatus, 'httpStatus', 'integer');
 
     for (const outcome of ['network-error', 'timeout', 'not-requested']) {
       const failedWithoutResponse = example('bot-wall');
       failedWithoutResponse.events[0].retrieval.httpOutcome = outcome;
-      rejectsManifest(failedWithoutResponse, 'httpOutcome', outcome, 'httpStatus', 'null');
+      rejectsManifest(failedWithoutResponse, 'finalUrl', 'null');
     }
 
     const semanticSuccessWithoutResponse = example('bot-wall');
     Object.assign(semanticSuccessWithoutResponse.events[0].retrieval, {
       httpOutcome: 'network-error',
+      finalUrl: null,
       httpStatus: null,
+      mediaType: null,
+      bytesReceived: 0,
       semanticOutcome: 'intended-content',
     });
-    rejectsManifest(semanticSuccessWithoutResponse, 'network-error', 'semanticOutcome', 'uncertain');
+    rejectsManifest(semanticSuccessWithoutResponse, 'semanticOutcome', 'const');
 
     const bytesWithoutResponse = example('bot-wall');
     Object.assign(bytesWithoutResponse.events[0].retrieval, {
       httpOutcome: 'timeout',
+      finalUrl: null,
       httpStatus: null,
+      mediaType: null,
       semanticOutcome: 'uncertain',
     });
-    rejectsManifest(bytesWithoutResponse, 'timeout', 'bytesReceived', 'zero');
+    rejectsManifest(bytesWithoutResponse, 'bytesReceived', 'const');
 
     const mediaTypeWithoutResponse = example('bot-wall');
     Object.assign(mediaTypeWithoutResponse.events[0].retrieval, {
       httpOutcome: 'not-requested',
+      finalUrl: null,
       httpStatus: null,
       semanticOutcome: 'uncertain',
       bytesReceived: 0,
     });
-    rejectsManifest(mediaTypeWithoutResponse, 'not-requested', 'mediaType', 'null');
+    rejectsManifest(mediaTypeWithoutResponse, 'mediaType', 'null');
 
     const semanticSuccessAfterAbort = example('bot-wall');
     semanticSuccessAfterAbort.events[0].retrieval.httpOutcome = 'aborted';
     semanticSuccessAfterAbort.events[0].retrieval.semanticOutcome = 'intended-content';
-    rejectsManifest(semanticSuccessAfterAbort, 'aborted', 'semanticOutcome');
+    rejectsManifest(semanticSuccessAfterAbort, 'semanticOutcome', 'enum');
+
+    const failedWithoutFinalUrl = example('bot-wall');
+    Object.assign(failedWithoutFinalUrl.events[0].retrieval, {
+      httpOutcome: 'network-error',
+      httpStatus: null,
+      mediaType: null,
+      bytesReceived: 0,
+      semanticOutcome: 'uncertain',
+    });
+    delete failedWithoutFinalUrl.events[0].retrieval.finalUrl;
+    assert.equal(validatePreservationManifest(failedWithoutFinalUrl), failedWithoutFinalUrl);
+
+    const notRequested = example('bot-wall');
+    Object.assign(notRequested.events[0].retrieval, {
+      httpOutcome: 'not-requested',
+      httpStatus: null,
+      mediaType: null,
+      bytesReceived: 0,
+      semanticOutcome: 'uncertain',
+    });
+    delete notRequested.events[0].retrieval.finalUrl;
+    delete notRequested.events[0].retrieval.observedSourceUrl;
+    delete notRequested.events[0].retrieval.retrievedAt;
+    assert.equal(validatePreservationManifest(notRequested), notRequested);
   });
 
   it('binds retrieval source URLs to the owning archive object', () => {
@@ -159,6 +189,19 @@ describe('preservation manifest schema (#701)', () => {
     assert.equal(validatePreservationManifest(explicitAlternate), explicitAlternate);
   });
 
+  it('supports non-web canonical sources with explicit retrieval URLs', () => {
+    const manifest = example('bot-wall');
+    const object = manifest.objects[0];
+    const event = manifest.events[0];
+    object.objectId = 'urn:rosen:object:dataset:dataset-fixture';
+    object.objectType = 'dataset';
+    object.canonicalSourceUrl = `urn:sha256:${'a'.repeat(64)}`;
+    object.alternateSourceUrls = [event.retrieval.requestedUrl];
+    event.objectId = object.objectId;
+
+    assert.equal(validatePreservationManifest(manifest), manifest);
+  });
+
   it('requires oversize aborts to carry internally consistent size evidence', () => {
     const missingEvidence = example('oversize-abort');
     delete missingEvidence.events[0].retrieval.reportedByteLength;
@@ -169,6 +212,10 @@ describe('preservation manifest schema (#701)', () => {
     notOversize.events[0].retrieval.reportedByteLength =
       notOversize.events[0].retrieval.limitBytes;
     rejectsManifest(notOversize, 'reportedByteLength', 'greater', 'limitBytes');
+
+    const completedResponse = example('oversize-abort');
+    completedResponse.events[0].retrieval.httpOutcome = 'response-received';
+    rejectsManifest(completedResponse, 'httpOutcome', 'const');
   });
 
   it('rejects impossible calendar timestamps across the manifest contract', () => {
@@ -177,37 +224,43 @@ describe('preservation manifest schema (#701)', () => {
         label: 'manifest createdAt',
         manifest: example('bot-wall'),
         mutate: manifest => { manifest.createdAt = '2026-99-99T99:99:99.000Z'; },
+        expected: ['createdAt', 'format', 'date-time'],
       },
       {
         label: 'event occurredAt',
         manifest: example('bot-wall'),
         mutate: manifest => { manifest.events[0].occurredAt = '2026-02-30T15:15:00.000Z'; },
+        expected: ['occurredAt', 'format', 'date-time'],
       },
       {
         label: 'retrieval retrievedAt',
         manifest: example('bot-wall'),
         mutate: manifest => { manifest.events[0].retrieval.retrievedAt = '2026-02-29T15:15:00Z'; },
+        expected: ['retrievedAt', 'format', 'date-time'],
       },
       {
         label: 'rights embargoUntil',
         manifest: example('rights-hold'),
         mutate: manifest => { manifest.events[1].rights.embargoUntil = '2026-13-01T00:00:00.000Z'; },
+        expected: ['embargoUntil', 'format', 'date-time'],
       },
       {
         label: 'storage copy createdAt',
         manifest: example('successful-capture'),
         mutate: manifest => { manifest.artifacts[0].storageCopies[0].createdAt = '2026-04-31T14:23:00.000Z'; },
+        expected: ['createdAt', 'format', 'date-time'],
       },
       {
         label: 'Wayback captureTimestamp',
         manifest: example('existing-wayback-reference'),
         mutate: manifest => { manifest.events[0].wayback.captureTimestamp = '20160230112233'; },
+        expected: ['Wayback captureTimestamp', 'valid UTC timestamp'],
       },
     ];
 
     for (const testCase of invalidCases) {
       testCase.mutate(testCase.manifest);
-      rejectsManifest(testCase.manifest, testCase.label, 'valid UTC timestamp');
+      rejectsManifest(testCase.manifest, ...testCase.expected);
     }
   });
 
@@ -334,6 +387,9 @@ describe('preservation manifest schema (#701)', () => {
 
     const orphanedArtifact = example('successful-capture');
     orphanedArtifact.artifacts[0].captureEventId = 'urn:rosen-preservation:event:missing';
+    delete orphanedArtifact.events.find(event => (
+      event.eventType === 'capture-attempt' && event.artifactId
+    )).artifactId;
     rejectsManifest(orphanedArtifact, 'captureEventId', 'missing');
 
     const duplicateCopy = example('successful-capture');
@@ -345,7 +401,7 @@ describe('preservation manifest schema (#701)', () => {
     const manifest = example('bot-wall');
     manifest.objects[0].objectType = 'archive-record';
 
-    rejectsManifest(manifest, 'objectId', 'objectType', 'social-post');
+    rejectsManifest(manifest, 'objectId', 'objectType', 'oneOf');
   });
 
   it('requires one append-only creation event for every named storage copy', () => {
@@ -397,6 +453,21 @@ describe('preservation manifest schema (#701)', () => {
     secondCreation.occurredAt = '2026-08-01T14:22:30.000Z';
     duplicateIntroduction.events.push(secondCreation);
     rejectsManifest(duplicateIntroduction, artifact.artifactId, 'multiple current', 'artifact-created');
+
+    const generatedArtifact = example('successful-capture');
+    const generated = generatedArtifact.artifacts[0];
+    const originatingCapture = generatedArtifact.events.find(event => (
+      event.eventId === generated.captureEventId
+    ));
+    delete originatingCapture.artifactId;
+    delete generated.captureEventId;
+    generated.artifactType = 'metadata';
+    generated.mediaType = 'application/json';
+    assert.equal(validatePreservationManifest(generatedArtifact), generatedArtifact);
+
+    const responseWithoutCapture = example('successful-capture');
+    delete responseWithoutCapture.artifacts[0].captureEventId;
+    rejectsManifest(responseWithoutCapture, 'captureEventId', 'required');
   });
 
   it('binds each declared capture artifact to the same capture event', () => {
@@ -440,6 +511,7 @@ describe('preservation manifest schema (#701)', () => {
       bytesReceived: 0,
       mediaType: null,
     });
+    delete failedCapture.retrieval.finalUrl;
     retainedArtifact.byteSize = 0;
     delete retainedArtifact.mediaType;
     rejectsManifest(artifactWithoutResponse, 'http-response', 'HTTP response');
@@ -451,6 +523,17 @@ describe('preservation manifest schema (#701)', () => {
     delete manifest.events[1].rights.embargoUntil;
 
     rejectsManifest(manifest, 'embargoUntil', 'required');
+  });
+
+  it('requires cleared rights before public access or deposit eligibility', () => {
+    const manifest = example('rights-hold');
+    Object.assign(manifest.events[0].rights, {
+      rightsStatus: 'unknown',
+      accessDecision: 'public',
+      publicDepositEligibility: 'eligible',
+    });
+
+    rejectsManifest(manifest, 'rightsStatus', 'const');
   });
 
   it('binds a Wayback replay URL to its declared capture timestamp', () => {
