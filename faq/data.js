@@ -72,7 +72,7 @@ Read in sequence, the archive follows one question asked for forty years: who do
     question: 'How do I search or browse the archive?',
     answer: `Start from the archive home page and use whichever way fits.
 
-<strong>Search</strong> by keyword across titles, summaries, bylines, categories, concepts, tags, available article text, and the full source text of published individual social posts. Records without redistributable body text remain searchable through their public metadata.
+<strong>Search</strong> by keyword across every record's title, summary, and categories. Curated archive records also index bylines, concepts, tags, and available article text. Published individual social posts and served thread containers index their full source text. Records without redistributable body text remain searchable through the public metadata in those core fields.
 
 <strong>Filter</strong> by thematic category, such as press and media criticism, politics and democracy, or technology and digital media.
 
