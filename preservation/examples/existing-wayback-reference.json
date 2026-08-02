@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1.0.0",
+  "vocabularyVersion": "1.0.0",
+  "manifestId": "urn:rosen-preservation:manifest:example-existing-wayback",
+  "createdAt": "2026-08-01T15:00:00.000Z",
+  "objects": [
+    {
+      "objectId": "urn:rosen:object:archive-record:RECORD-00657",
+      "objectType": "archive-record",
+      "canonicalSourceUrl": "https://example.org/missing-story",
+      "sourceRecordId": "RECORD-00657",
+      "label": "Existing Wayback reference"
+    }
+  ],
+  "events": [
+    {
+      "eventId": "urn:rosen-preservation:event:example-wayback-reference",
+      "eventType": "wayback-reference",
+      "objectId": "urn:rosen:object:archive-record:RECORD-00657",
+      "taskVersion": "wayback-inventory@1.0.0",
+      "inputHash": "1111111111111111111111111111111111111111111111111111111111111111",
+      "actor": {
+        "actorType": "human",
+        "actorId": "curator:joe-amditis"
+      },
+      "occurredAt": "2026-08-01T15:00:00.000Z",
+      "review": {
+        "state": "accepted",
+        "notes": "Existing replay was checked without submitting a new public capture."
+      },
+      "wayback": {
+        "captureTimestamp": "20160304112233",
+        "replayUrl": "https://web.archive.org/web/20160304112233id_/https://example.org/missing-story"
+      }
+    }
+  ],
+  "artifacts": []
+}
