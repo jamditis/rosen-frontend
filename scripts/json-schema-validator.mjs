@@ -1,4 +1,5 @@
 import Ajv2020 from 'ajv/dist/2020.js';
+import addFormats from 'ajv-formats';
 
 export function compileJsonSchema(schema, { source = 'JSON schema' } = {}) {
   const ajv = new Ajv2020({
@@ -6,6 +7,7 @@ export function compileJsonSchema(schema, { source = 'JSON schema' } = {}) {
     strict: true,
     strictRequired: false
   });
+  addFormats(ajv);
 
   try {
     return ajv.compile(schema);

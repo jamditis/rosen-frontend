@@ -1,5 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import {
   assertJsonSchemaDocument,
@@ -41,5 +43,12 @@ describe('JSON Schema validation helper', () => {
       () => compileJsonSchema({ type: 'not-a-json-schema-type' }, { source: 'broken schema' }),
       /broken schema could not be compiled:/
     );
+  });
+
+  it('compiles the repository schema with its standard formats', () => {
+    const repositorySchema = JSON.parse(
+      fs.readFileSync(path.join(process.cwd(), 'data', 'schema.json'), 'utf8')
+    );
+    assert.doesNotThrow(() => compileJsonSchema(repositorySchema, { source: 'data/schema.json' }));
   });
 });
