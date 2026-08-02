@@ -15,7 +15,8 @@ The metadata and derived data (entities, relationships) are licensed [CC BY 4.0]
 | `archive-entities.json` | ~1.9 MB | Entity graph for the Explorer view, loaded on demand |
 | `archive-data.json` | ~30 MB | Full combined data — the fallback if the split files fail |
 | `archive-analytics.json` | ~4 KB | Prebuilt aggregates for the analytics view |
-| `search-index.json` | ~4 MB | Prebuilt MiniSearch full-text index, loaded on first search |
+| `search-index.json` | ~4.4 MB | Prebuilt MiniSearch index for curated records, loaded on first search |
+| `social-search-index.json` | ~7.1 MB | Body-only MiniSearch index for published social posts and served thread containers, loaded on first search |
 | `wiki-seed.json` | ~125 KB | Seed pages for the public archive wiki (`#wiki` route) |
 
 ### Source CSVs (the source of truth)

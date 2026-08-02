@@ -1,12 +1,12 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { html } from '../html.js?v=3.8.9';
+import { html } from '../html.js?v=3.8.10';
 import { X, Search, XCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import {
   findSearchSuggestions,
   normalizeForSearch,
-} from '../utils/searchNormalize.js?v=3.8.9';
-import { CONTENT_TYPE_OPTIONS } from '../constants.js?v=3.8.9';
+} from '../utils/searchNormalize.js?v=3.8.10';
+import { CONTENT_TYPE_OPTIONS } from '../constants.js?v=3.8.10';
 
 const Sidebar = ({
   facets,
@@ -213,7 +213,7 @@ const Sidebar = ({
                 </div>
               `}
             </div>
-            <p className="archive-filter-sidebar__hint">Searches titles, summaries, and categories</p>
+            <p className="archive-filter-sidebar__hint">Searches metadata, article text, and social post text</p>
           </div>
 
           <div className="archive-filter-group border-t border-stone-200 pt-4">

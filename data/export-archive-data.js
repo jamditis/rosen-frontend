@@ -6,7 +6,9 @@
  * file that can be served statically, eliminating the need for Google Sheets fetch
  * and client-side CSV parsing.
  *
- * Usage: node csv/export-archive-data.js
+ * Usage:
+ *   node data/export-archive-data.js
+ *   node data/export-archive-data.js --search-indexes-only
  */
 
 import fs from 'fs';
@@ -18,7 +20,7 @@ import { generateOPML, generateSubscriptionOPML } from './lib/opml-generator.js'
 import { computeAnalytics } from './compute-analytics.js';
 import { ERAS } from './eras.js';
 import { unescapeRow } from './lib/csv-unescape.js';
-import { buildSearchIndex } from './lib/search-index-builder.js';
+import { buildSearchIndex, socialSearchIndexOptions } from './lib/search-index-builder.js';
 import { loadAuthoredExcerpts, resolveSummary } from './lib/summary-resolver.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -685,28 +687,65 @@ async function main() {
   // Sort by date (newest first)
   allRecords.sort((a, b) => b.date.localeCompare(a.date));
 
-  // Build the MiniSearch full-text index (#276). The frontend loads this to
-  // search author, tags, concepts, and body text -- fields the card-only
-  // substring search cannot reach. Built from the source CSV rows because they
-  // still carry raw_text, which the served JSON drops; filtered to the ids that
-  // actually ship so the index never exposes a filtered-out or unverified record.
+  // Build the two lazy MiniSearch indexes (#276, #669). Source CSV rows retain
+  // raw_text that the served card payload truncates. Thread containers are
+  // indexed from their complete served post lists because their individual
+  // member rows are intentionally filtered from the public archive. Restrict
+  // both artifacts to servedIds so unverified, reposted, non-Rosen, and
+  // otherwise filtered rows can never leak through search.
   //
-  // Scope: article records only (archive_records-public.csv), not social posts.
-  // #276 is a body-recall win, and only articles have a long body past the
-  // 120-char card preview that today's substring search already reads. Social
-  // posts are short enough that their preview covers the text, so indexing all
-  // 25.6k of them quadrupled the artifact (5 MB gzipped vs ~1 MB) for recall
-  // only on the tail of long posts. Social posts, generated threads, and the
-  // dissertation entry stay covered by the frontend substring fallback (union
-  // search: a record matches if the substring OR the index matches, so nothing
-  // that is findable today stops being findable).
-  console.log('\n💾 Building search index...');
+  // Keep the article and social artifacts separate. A measured unified index
+  // was materially larger than the article-only artifact; the split preserves
+  // that stable article resource while letting the browser fetch social-body
+  // recall only as part of the existing first-search lazy path. The social
+  // artifact carries only id + uncapped raw_text: duplicating titles, tags, and
+  // categories already present in the card substring search nearly doubled it.
+  console.log('\n💾 Building search indexes...');
   const searchIndexRows = archiveRecordsData.filter(r => servedIds.has(r.id));
   const { json: searchIndexJson, count: searchIndexCount } = buildSearchIndex(searchIndexRows);
   const searchIndexPath = path.join(__dirname, 'search-index.json');
   fs.writeFileSync(searchIndexPath, JSON.stringify(searchIndexJson));
   const searchIndexKB = (fs.statSync(searchIndexPath).size / 1024).toFixed(1);
   console.log(`  - Wrote search-index.json (${searchIndexCount} docs, ${searchIndexKB} KB)`);
+
+  const socialPostSearchRows = socialPostsData
+    .filter(row => servedIds.has(row.id))
+    .map(row => ({ id: row.id, raw_text: row.raw_text }));
+  const socialThreadSearchRows = allRecords
+    .filter(record => (
+      servedIds.has(record.id)
+      && record.id.startsWith('THREAD-')
+      && Array.isArray(record.thread_data?.posts)
+      && record.thread_data.posts.length > 0
+    ))
+    .map(record => ({
+      id: record.id,
+      raw_text: record.thread_data.posts
+        .map(post => typeof post.content === 'string' ? post.content : '')
+        .filter(Boolean)
+        .join('\n\n'),
+    }));
+  const socialSearchIndexRows = [...socialPostSearchRows, ...socialThreadSearchRows];
+  const { json: socialSearchIndexJson, count: socialSearchIndexCount } = buildSearchIndex(
+    socialSearchIndexRows,
+    {
+      rawTextChars: Number.POSITIVE_INFINITY,
+      indexOptions: socialSearchIndexOptions(),
+    }
+  );
+  const socialSearchIndexPath = path.join(__dirname, 'social-search-index.json');
+  fs.writeFileSync(socialSearchIndexPath, JSON.stringify(socialSearchIndexJson));
+  const socialSearchIndexKB = (fs.statSync(socialSearchIndexPath).size / 1024).toFixed(1);
+  console.log(`  - Wrote social-search-index.json (${socialSearchIndexCount} docs, ${socialSearchIndexKB} KB)`);
+
+  // Search artifacts change more often than the rest of the generated corpus
+  // and are large enough to merit an isolated regeneration path. This exits
+  // only after running the complete publication/filter pipeline above, so the
+  // servedIds boundary is identical to a full export.
+  if (process.argv.includes('--search-indexes-only')) {
+    console.log('  - Search-index-only export complete');
+    return;
+  }
 
   // Build output structure
   const output = {

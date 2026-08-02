@@ -41,6 +41,7 @@ EXPECTED_ARTIFACTS = frozenset({
     "archive-entities.json",
     "archive-analytics.json",
     "search-index.json",
+    "social-search-index.json",
 })
 
 _CANONICAL_PUBLISH_LISTS = (

@@ -13,7 +13,7 @@
 // Cache version is tied to the app version in version.json. Bumping it on every
 // deploy (alongside index.html and the ?v= import strings) makes the activate
 // handler below drop every stale cache, so returning visitors never run old code.
-const CACHE_VERSION = '3.8.9';
+const CACHE_VERSION = '3.8.10';
 const CACHE_NAME = `jrda-cache-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `jrda-data-${CACHE_VERSION}`;
 
@@ -78,6 +78,7 @@ const APP_SHELL_FRONTEND_FILES = [
   'services/idbCache.js',
   'services/queryComposition.js',
   'services/router.js',
+  'services/searchIndexLoader.js',
   'services/sqliteService.js',
   'services/tourState.js',
   'services/viewState.js',
@@ -120,6 +121,7 @@ const DATA_URLS = [
   `${DATA_PATH}/archive-entities.json`,
   `${DATA_PATH}/archive-analytics.json`,
   `${DATA_PATH}/search-index.json`,
+  `${DATA_PATH}/social-search-index.json`,
   `${DATA_PATH}/wiki-seed.json`
 ];
 

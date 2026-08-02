@@ -40,7 +40,8 @@ data/                               # Published archive data and shared taxonomy
   archive-data.json                 # Combined fallback
   archive-entities.json             # Entity graph
   archive-analytics.json            # Prebuilt analytics aggregates (~1KB, loads on analytics view)
-  search-index.json                 # Prebuilt MiniSearch full-text index (~1MB, loads lazily on first search)
+  search-index.json                 # Curated-record MiniSearch index (~1.2MB gzip, loads lazily on first search)
+  social-search-index.json          # Social-body MiniSearch index (~2.1MB gzip, loads lazily on first search)
   wiki-seed.json                    # Community wiki seed pages (loads on the #wiki view)
   schema.json                       # Data dictionary, linked from the open-data download UI
   SCHEMA.md                         # Human-readable data guide, linked from Ways to Participate
@@ -153,6 +154,7 @@ For a manual record-data update, upload the regenerated JSON set:
 - `data/archive-entities.json`
 - `data/archive-analytics.json`
 - `data/search-index.json` (MiniSearch full-text index; regenerated with every record change, so it must ship or full-text search serves the previous index)
+- `data/social-search-index.json` (social-body MiniSearch index; regenerated with every social-record change)
 
 Then run the full-site deploy so the corresponding record shells are rebuilt
 and reconciled. Do not publish record JSON alone: new or edited share metadata

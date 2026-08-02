@@ -12,8 +12,8 @@
  * the entire point of issue #276.
  *
  * Pure and side-effect free: rows in -> serializable index out. This module is
- * not yet wired into data/export-archive-data.js or the frontend; it is step 1
- * of #276 (the tested core), so the wiring PRs that follow are mechanical.
+ * Shared by data/export-archive-data.js for the separate article and social
+ * artifacts, and by the browser loader through their common schema.
  */
 import MiniSearch from 'minisearch';
 // The index schema (fields/storeFields/idField) is the shared build+runtime
@@ -21,14 +21,26 @@ import MiniSearch from 'minisearch';
 // loader import. It sits under frontend/ because that is what gets deployed;
 // see frontend/utils/searchConfig.js for why. Re-exported below so existing
 // importers of this builder keep resolving the same names.
-import { SEARCH_FIELDS, STORE_FIELDS, searchIndexOptions } from '../../frontend/utils/searchConfig.js';
+import {
+  SEARCH_FIELDS,
+  SOCIAL_SEARCH_FIELDS,
+  STORE_FIELDS,
+  searchIndexOptions,
+  socialSearchIndexOptions,
+} from '../../frontend/utils/searchConfig.js';
 
 // raw_text is the long field. Cap the indexed slice so the artifact stays small
 // and the build stays fast. 8000 chars covers roughly the first few screens of
 // an article -- enough for recall without indexing the full body of every record.
 export const RAW_TEXT_INDEX_CHARS = 8000;
 
-export { SEARCH_FIELDS, STORE_FIELDS, searchIndexOptions };
+export {
+  SEARCH_FIELDS,
+  SOCIAL_SEARCH_FIELDS,
+  STORE_FIELDS,
+  searchIndexOptions,
+  socialSearchIndexOptions,
+};
 
 const str = (v) => (v == null ? '' : String(v));
 
@@ -59,8 +71,11 @@ export function recordToSearchDoc(row, { rawTextChars = RAW_TEXT_INDEX_CHARS } =
  * skipped; a duplicate id surfaces MiniSearch's own error rather than being
  * silently dropped, so a CSV that violates id uniqueness fails loudly at build.
  */
-export function buildSearchIndex(rows, { rawTextChars = RAW_TEXT_INDEX_CHARS } = {}) {
-  const mini = new MiniSearch(searchIndexOptions());
+export function buildSearchIndex(
+  rows,
+  { rawTextChars = RAW_TEXT_INDEX_CHARS, indexOptions = searchIndexOptions() } = {},
+) {
+  const mini = new MiniSearch(indexOptions);
   const docs = [];
   for (const row of rows) {
     const doc = recordToSearchDoc(row, { rawTextChars });
@@ -74,8 +89,10 @@ export function buildSearchIndex(rows, { rawTextChars = RAW_TEXT_INDEX_CHARS } =
 export default {
   RAW_TEXT_INDEX_CHARS,
   SEARCH_FIELDS,
+  SOCIAL_SEARCH_FIELDS,
   STORE_FIELDS,
   searchIndexOptions,
+  socialSearchIndexOptions,
   recordToSearchDoc,
   buildSearchIndex,
 };

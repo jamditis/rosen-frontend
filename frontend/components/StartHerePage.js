@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { html } from '../html.js?v=3.8.9';
+import { html } from '../html.js?v=3.8.10';
 import {
   AlertCircle,
   ArrowLeft,
@@ -15,8 +15,8 @@ import {
   Search,
   Sparkles
 } from 'lucide-react';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.9';
-import ArchiveRouteHeader from './ArchiveRouteHeader.js?v=3.8.9';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.10';
+import ArchiveRouteHeader from './ArchiveRouteHeader.js?v=3.8.10';
 
 const normalizeTitle = (title = '') => title
   .toLowerCase()
@@ -320,7 +320,7 @@ const StartHerePage = ({
             id: 'guide-records',
             icon: Search,
             title: 'Records and search',
-            children: html`<p>A record is the archive's basic unit: an article, post, interview, clipping, thread, or other item connected to Jay Rosen's work. Search looks across titles, summaries, and categories; filters help narrow the results by topic, era, year, publication, and format.</p><p>Open a record to read its summary, follow the original source, copy a citation, share it, or continue through related material.</p>`,
+            children: html`<p>A record is the archive's basic unit: an article, post, interview, clipping, thread, or other item connected to Jay Rosen's work. Search looks across metadata, available article text, and the full source text of published social posts and served threads; filters help narrow the results by topic, era, year, publication, and format.</p><p>Open a record to read its summary, follow the original source, copy a citation, share it, or continue through related material.</p>`,
             action: routeButton('archive', 'Search records', Search)
           })}
 

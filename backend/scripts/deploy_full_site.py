@@ -128,6 +128,7 @@ _DEPLOY_DATA_FILES: Tuple[str, ...] = (
     'data/archive-entities.json',
     'data/archive-analytics.json',
     'data/search-index.json',  # prebuilt MiniSearch full-text index, loaded lazily on first search, issue 276
+    'data/social-search-index.json',  # social-body MiniSearch index, loaded lazily on first search, issue 669
     'data/wiki-seed.json',
     'data/schema.json',  # data dictionary; linked from the open-data download UI
     'data/SCHEMA.md',  # human-readable data guide; linked from participation/open-data UI
