@@ -116,6 +116,31 @@ describe('preservation manifest schema (#701)', () => {
       failedWithoutResponse.events[0].retrieval.httpOutcome = outcome;
       rejectsManifest(failedWithoutResponse, 'httpOutcome', outcome, 'httpStatus', 'null');
     }
+
+    const semanticSuccessWithoutResponse = example('bot-wall');
+    Object.assign(semanticSuccessWithoutResponse.events[0].retrieval, {
+      httpOutcome: 'network-error',
+      httpStatus: null,
+      semanticOutcome: 'intended-content',
+    });
+    rejectsManifest(semanticSuccessWithoutResponse, 'network-error', 'semanticOutcome', 'uncertain');
+
+    const bytesWithoutResponse = example('bot-wall');
+    Object.assign(bytesWithoutResponse.events[0].retrieval, {
+      httpOutcome: 'timeout',
+      httpStatus: null,
+      semanticOutcome: 'uncertain',
+    });
+    rejectsManifest(bytesWithoutResponse, 'timeout', 'bytesReceived', 'zero');
+
+    const mediaTypeWithoutResponse = example('bot-wall');
+    Object.assign(mediaTypeWithoutResponse.events[0].retrieval, {
+      httpOutcome: 'not-requested',
+      httpStatus: null,
+      semanticOutcome: 'uncertain',
+      bytesReceived: 0,
+    });
+    rejectsManifest(mediaTypeWithoutResponse, 'not-requested', 'mediaType', 'null');
   });
 
   it('requires oversize aborts to carry internally consistent size evidence', () => {
@@ -332,6 +357,32 @@ describe('preservation manifest schema (#701)', () => {
     assert.equal(validatePreservationManifest(corrected), corrected);
   });
 
+  it('requires one append-only introduction path for every retained artifact', () => {
+    const missingIntroduction = example('successful-capture');
+    const artifact = missingIntroduction.artifacts[0];
+    const captureEvent = missingIntroduction.events.find(event => event.eventId === artifact.captureEventId);
+    delete captureEvent.artifactId;
+    missingIntroduction.events = missingIntroduction.events.filter(event => (
+      event.eventType !== 'artifact-created'
+    ));
+    rejectsManifest(missingIntroduction, artifact.artifactId, 'artifact-created', 'capture-attempt');
+
+    const captureIntroduced = example('successful-capture');
+    captureIntroduced.events = captureIntroduced.events.filter(event => event.eventType !== 'artifact-created');
+    assert.equal(validatePreservationManifest(captureIntroduced), captureIntroduced);
+
+    const duplicateIntroduction = example('successful-capture');
+    const firstCreation = duplicateIntroduction.events.find(event => event.eventType === 'artifact-created');
+    delete duplicateIntroduction.events.find(event => (
+      event.eventId === duplicateIntroduction.artifacts[0].captureEventId
+    )).artifactId;
+    const secondCreation = clone(firstCreation);
+    secondCreation.eventId = 'urn:rosen-preservation:event:duplicate-artifact-creation';
+    secondCreation.occurredAt = '2026-08-01T14:22:30.000Z';
+    duplicateIntroduction.events.push(secondCreation);
+    rejectsManifest(duplicateIntroduction, artifact.artifactId, 'multiple current', 'artifact-created');
+  });
+
   it('binds each declared capture artifact to the same capture event', () => {
     const manifest = example('successful-capture');
     const artifact = manifest.artifacts[0];
@@ -352,12 +403,29 @@ describe('preservation manifest schema (#701)', () => {
     rejectsManifest(duplicateOrigin, 'captureEventId', 'different artifactId');
   });
 
+  it('binds retained HTTP-response metadata to its capture evidence', () => {
+    const wrongByteSize = example('successful-capture');
+    wrongByteSize.artifacts[0].byteSize += 1;
+    rejectsManifest(wrongByteSize, 'http-response', 'byteSize', 'bytesReceived');
+
+    const wrongMediaType = example('successful-capture');
+    wrongMediaType.artifacts[0].mediaType = 'application/octet-stream';
+    rejectsManifest(wrongMediaType, 'http-response', 'mediaType', 'retrieval');
+  });
+
   it('binds a Wayback replay URL to its declared capture timestamp', () => {
     const manifest = example('existing-wayback-reference');
     manifest.events[0].wayback.replayUrl =
       'https://web.archive.org/web/20170405122334id_/https://example.org/missing-story';
 
     rejectsManifest(manifest, 'replayUrl', 'captureTimestamp', 'match');
+
+    for (const modifier of ['if_', 'im_']) {
+      const existingModifier = example('existing-wayback-reference');
+      existingModifier.events[0].wayback.replayUrl =
+        `https://web.archive.org/web/20160304112233${modifier}/https://example.org/missing-story`;
+      assert.equal(validatePreservationManifest(existingModifier), existingModifier);
+    }
   });
 
   it('binds fixity outcomes to the referenced artifact digest', () => {

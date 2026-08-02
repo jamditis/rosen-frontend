@@ -36,7 +36,7 @@ const eventPayloads = new Map([
 ]);
 const utcTimestampPattern = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{3})?Z$/;
 const waybackTimestampPattern = /^[0-9]{14}$/;
-const waybackReplayPattern = /^https:\/\/web\.archive\.org\/web\/([0-9]{14})(?:id_)?\//;
+const waybackReplayPattern = /^https:\/\/web\.archive\.org\/web\/([0-9]{14})(?:[a-z]{2}_)?\//;
 const sha256UrnPrefix = 'urn:sha256:';
 const outcomesWithoutHttpResponse = new Set(['network-error', 'timeout', 'not-requested']);
 
@@ -94,6 +94,7 @@ function validateReferences(manifest) {
   const events = uniqueMap(manifest.events, 'eventId', 'events');
   const artifacts = uniqueMap(manifest.artifacts, 'artifactId', 'artifacts');
   const copies = new Map();
+  const artifactCreationEvents = new Map();
   const storageCopyEvents = new Map();
 
   for (const object of manifest.objects) {
@@ -146,6 +147,30 @@ function validateReferences(manifest) {
       ) {
         throw new PreservationValidationError(
           `${event.eventId}: httpOutcome ${event.retrieval.httpOutcome} requires httpStatus null`,
+        );
+      }
+      if (
+        outcomesWithoutHttpResponse.has(event.retrieval.httpOutcome)
+        && event.retrieval.semanticOutcome !== 'uncertain'
+      ) {
+        throw new PreservationValidationError(
+          `${event.eventId}: httpOutcome ${event.retrieval.httpOutcome} requires semanticOutcome uncertain`,
+        );
+      }
+      if (
+        outcomesWithoutHttpResponse.has(event.retrieval.httpOutcome)
+        && event.retrieval.bytesReceived !== 0
+      ) {
+        throw new PreservationValidationError(
+          `${event.eventId}: httpOutcome ${event.retrieval.httpOutcome} requires bytesReceived to be zero`,
+        );
+      }
+      if (
+        outcomesWithoutHttpResponse.has(event.retrieval.httpOutcome)
+        && event.retrieval.mediaType !== null
+      ) {
+        throw new PreservationValidationError(
+          `${event.eventId}: httpOutcome ${event.retrieval.httpOutcome} requires mediaType null`,
         );
       }
       if (
@@ -240,6 +265,11 @@ function validateReferences(manifest) {
           `${event.eventId}: artifactId captureEventId must identify the same capture-attempt`,
         );
       }
+      if (event.eventType === 'artifact-created') {
+        const creationEvents = artifactCreationEvents.get(event.artifactId) ?? [];
+        creationEvents.push(event);
+        artifactCreationEvents.set(event.artifactId, creationEvents);
+      }
     }
 
     if (event.storageCopyId) {
@@ -310,6 +340,35 @@ function validateReferences(manifest) {
     if (captureEvent.artifactId && captureEvent.artifactId !== artifact.artifactId) {
       throw new PreservationValidationError(
         `${artifact.artifactId}: captureEventId declares a different artifactId`,
+      );
+    }
+    const currentArtifactCreationEvents = (artifactCreationEvents.get(artifact.artifactId) ?? [])
+      .filter(event => !supersededEvents.has(event.eventId));
+    if (!captureEvent.artifactId && currentArtifactCreationEvents.length === 0) {
+      throw new PreservationValidationError(
+        `${artifact.artifactId}: retained artifact requires an artifact-created event or a declaring capture-attempt`,
+      );
+    }
+    if (!captureEvent.artifactId && currentArtifactCreationEvents.length > 1) {
+      throw new PreservationValidationError(
+        `${artifact.artifactId}: retained artifact has multiple current artifact-created events`,
+      );
+    }
+    if (
+      artifact.artifactType === 'http-response'
+      && artifact.byteSize !== captureEvent.retrieval.bytesReceived
+    ) {
+      throw new PreservationValidationError(
+        `${artifact.artifactId}: http-response byteSize must match capture retrieval bytesReceived`,
+      );
+    }
+    if (
+      artifact.artifactType === 'http-response'
+      && artifact.mediaType !== undefined
+      && artifact.mediaType !== captureEvent.retrieval.mediaType
+    ) {
+      throw new PreservationValidationError(
+        `${artifact.artifactId}: http-response mediaType must match capture retrieval mediaType`,
       );
     }
     for (const copy of artifact.storageCopies) {

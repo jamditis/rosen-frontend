@@ -305,7 +305,7 @@
         },
         "replayUrl": {
           "type": "string",
-          "pattern": "^https://web\\.archive\\.org/web/[0-9]{14}(?:id_)?/https?://[^\\s]+$"
+          "pattern": "^https://web\\.archive\\.org/web/[0-9]{14}(?:[a-z]{2}_)?/https?://[^\\s]+$"
         }
       }
     },
