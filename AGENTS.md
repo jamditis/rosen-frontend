@@ -30,6 +30,12 @@ Some issues are tracked for human visibility only and are not engineering tasks.
 - Never select, work on, or open a pull request against a `do-not-automate` issue, and never change its state.
 - These issues also open with a "DO NOT AUTOMATE" banner in the body. If you have already opened one, stop and move on.
 
+## Commits and attribution
+
+- Do not add AI attribution to commits, pull requests, issues, documentation, or code. The repository's `.claude/settings.json` disables Claude Code session links and generated-by text; do not reintroduce them manually.
+- Do not add `Co-authored-by` trailers, including trailers for Joe's aliases.
+- Before committing in every worktree and agent session, set `user.name` to `Joe Amditis` and `user.email` to `6799804+jamditis@users.noreply.github.com`.
+
 ## Making-of narrative interview
 
 The personal story of how the archive was built is interview material, not
