@@ -324,7 +324,14 @@ function assertEntityCopiesAgree(database) {
   }
 
   const sourceMismatch = firstRow(database, `
-    SELECT source.id
+    SELECT source.id,
+      CASE
+        WHEN EXISTS (
+          SELECT 1 FROM published_records
+          WHERE published_records.id = source.first_mention_record_id
+        ) AND source.first_mention_record_id IS NOT published.first_mention_record_id
+        THEN 1 ELSE 0
+      END AS first_mention_mismatch
     FROM source_entities source
     JOIN published_entities published ON published.id = source.id
     WHERE source.entity_type != published.entity_type
@@ -333,12 +340,22 @@ function assertEntityCopiesAgree(database) {
       OR source.role IS NOT published.role
       OR source.affiliation IS NOT published.affiliation
       OR source.prominence IS NOT published.prominence
+      OR (
+        EXISTS (
+          SELECT 1 FROM published_records
+          WHERE published_records.id = source.first_mention_record_id
+        )
+        AND source.first_mention_record_id IS NOT published.first_mention_record_id
+      )
       OR source.total_mentions IS NOT published.total_mentions
     LIMIT 1
   `);
   if (sourceMismatch) {
+    const field = sourceMismatch.first_mention_mismatch
+      ? ' firstMentionRecordId'
+      : '';
     throw new GraphValidationError(
-      `${sourceMismatch.id}: source and published entity fields disagree`
+      `${sourceMismatch.id}: source and published entity${field} fields disagree`
     );
   }
 
@@ -781,41 +798,14 @@ function publishedEntityFromJson(entity) {
 
 export function validationPolicyFromSchemas(
   activeSchema,
-  holdPolicy,
-  generatedPublishedRecordIds = []
+  holdPolicy
 ) {
   return {
     entityTypes: Object.keys(activeSchema.entity_types ?? {}),
     acceptedRelationshipTypes: Object.keys(activeSchema.relationship_types ?? {}),
     relationshipTypeHolds: holdPolicy.relationshipTypeHolds,
-    generatedPublishedRecordIds,
+    generatedPublishedRecordIds: holdPolicy.generatedPublishedRecordIds ?? [],
   };
-}
-
-function findGeneratedPublishedRecordIds(publishedRecords, archiveRecords, socialRecords) {
-  const sourceRecordIds = new Set(
-    [...archiveRecords, ...socialRecords].map(record => record.id)
-  );
-  const socialRecordIds = new Set(socialRecords.map(record => record.id));
-  const generatedIds = [];
-
-  for (const record of publishedRecords) {
-    if (sourceRecordIds.has(record.id)) continue;
-    if (record.id === 'dissertation-1986') {
-      generatedIds.push(record.id);
-      continue;
-    }
-    if (
-      record.id.startsWith('THREAD-')
-      && Array.isArray(record.thread_data?.posts)
-      && record.thread_data.posts.length >= 3
-      && record.thread_data.posts.every(post => socialRecordIds.has(post.id))
-    ) {
-      generatedIds.push(record.id);
-    }
-  }
-
-  return generatedIds;
 }
 
 export async function loadRepositoryGraphDataset(repositoryRoot) {
@@ -840,13 +830,8 @@ export async function loadRepositoryGraphDataset(repositoryRoot) {
     readJson(path.join(root, 'data/graph-validation-holds.json')),
   ]);
 
-  const generatedRecordIds = findGeneratedPublishedRecordIds(
-    archiveData.records,
-    archiveRecords,
-    socialRecords
-  );
   return {
-    policy: validationPolicyFromSchemas(extractionSchemaV3, holdPolicy, generatedRecordIds),
+    policy: validationPolicyFromSchemas(extractionSchemaV3, holdPolicy),
     sourceRecords: [...archiveRecords, ...socialRecords].map(record => ({ id: record.id })),
     publishedRecords: archiveData.records.map(record => ({
       id: record.id,

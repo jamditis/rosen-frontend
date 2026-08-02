@@ -1,5 +1,15 @@
 {
   "schemaVersion": 1,
+  "generatedPublishedRecordIds": [
+    "THREAD-00011",
+    "THREAD-00012",
+    "THREAD-00013",
+    "THREAD-00014",
+    "THREAD-00015",
+    "THREAD-00016",
+    "THREAD-00017",
+    "dissertation-1986"
+  ],
   "relationshipTypeHolds": [
     {
       "relationshipId": "TWTR-07504_REL_001",

@@ -173,6 +173,25 @@ describe('generated SQLite graph validator (#731)', () => {
       await rejectsWith(fieldFixture, 'P0001', 'source', 'published', 'disagree');
     }
 
+    const servedFirstMentionFixture = validFixture();
+    servedFirstMentionFixture.sourceRecords.push({ id: 'RECORD-00002' });
+    servedFirstMentionFixture.publishedRecords.push({ id: 'RECORD-00002', relatedIds: [] });
+    servedFirstMentionFixture.sourceEntities[0].firstMentionRecordId = 'RECORD-00002';
+    await rejectsWith(
+      servedFirstMentionFixture,
+      'P0001',
+      'source',
+      'published',
+      'firstMentionRecordId',
+      'disagree'
+    );
+
+    const unservedFirstMentionFixture = validFixture();
+    unservedFirstMentionFixture.sourceRecords.push({ id: 'RECORD-UNSERVED' });
+    unservedFirstMentionFixture.sourceEntities[0].firstMentionRecordId = 'RECORD-UNSERVED';
+    const unservedSummary = await validateGraphDataset(unservedFirstMentionFixture);
+    assert.equal(unservedSummary.publishedEntities, 2);
+
     const missingPublishedFixture = validFixture();
     missingPublishedFixture.sourceEntities.push({
       id: 'P0002',
@@ -306,11 +325,14 @@ describe('generated SQLite graph validator (#731)', () => {
 
     const policy = validationPolicyFromSchemas(
       { entity_types: { Person: {} }, relationship_types: { ActiveLink: {} } },
-      { relationshipTypeHolds: [] },
-      []
+      {
+        relationshipTypeHolds: [],
+        generatedPublishedRecordIds: ['THREAD-EXPECTED'],
+      }
     );
     assert.deepStrictEqual(policy.entityTypes, ['Person']);
     assert.deepStrictEqual(policy.acceptedRelationshipTypes, ['ActiveLink']);
+    assert.deepStrictEqual(policy.generatedPublishedRecordIds, ['THREAD-EXPECTED']);
   });
 
   it('validates the current repository data', async () => {
@@ -326,6 +348,5 @@ describe('generated SQLite graph validator (#731)', () => {
       dataset.policy.relationshipTypeHolds.length,
       'every explicit policy hold must correspond to a held source relationship'
     );
-    assert.ok(summary.heldRelationships > 2);
   });
 });

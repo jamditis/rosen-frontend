@@ -83,6 +83,11 @@ semantic endpoint matrix remains part of the relationship-type audit in issue
 #737; this validator requires both endpoints to resolve to typed entities without
 prematurely declaring that matrix canonical.
 
+Published records that are intentionally generated without a canonical CSV row
+must likewise have their exact stable ID listed in
+`generatedPublishedRecordIds` in that policy file. The validator rejects both
+unlisted source-less records and obsolete entries that now have a source row.
+
 For the full record-adding walkthrough — written for non-technical curators — see [`ADDING-RECORDS.md`](../ADDING-RECORDS.md). For which files to upload to production, see [`DEPLOYMENT.md`](../DEPLOYMENT.md).
 
 ### A note on history
