@@ -349,3 +349,18 @@ Supports: Articles, Videos, Twitter/X, Tumblr, Newspaper Clippings (PDF OCR).
 - 79 records still have `verified=false`. Recovery work is tracked in issue #199 (sub-batches in issue #242 and PR #244/#253). A small set is genuinely unrecoverable — print-only or vanished publications (e.g. The Baffler issue 12 from 1999; the defunct Pew Center for Civic Journalism's print monograph from ~2000).
 - `archive.pressthink.org` subdomain has a TLS certificate issue. Records using that subdomain correctly use `http://` URLs — browsers handle these fine but HTTPS fetch will fail.
 - Bluesky outbound links use `bsky.app`, not `embed.bsky.app`; the embed host returns placeholder/404 pages when opened directly.
+
+## Commits and attribution
+
+No AI attribution in commits, PR bodies, issues, docs, or code. `.claude/settings.json` sets `attribution.sessionUrl` to false and blanks `attribution.commit` and `attribution.pr`, which stops Claude Code from appending a `Claude-Session:` trailer to commits, adding the session link to PR bodies, and emitting the "Generated with Claude Code" strings. Web and Remote Control sessions both emit these by default. The setting lives in the repo rather than `~/.claude/settings.json` because cloud sessions clone the repo and never read user-level config. Don't reintroduce any of it by hand.
+
+No `Co-authored-by` trailers of any kind, including Joe's own aliases.
+
+Git identity — set before committing, in every worktree and every agent session:
+
+```sh
+git config user.name "Joe Amditis"
+git config user.email "6799804+jamditis@users.noreply.github.com"
+```
+
+Any other author email either trips GitHub's email-privacy push block (GH007) or makes a squash merge inject a `Co-authored-by` line into the merge body.
