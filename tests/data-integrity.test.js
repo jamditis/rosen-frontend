@@ -179,6 +179,27 @@ describe('archive-details.json', () => {
     );
   });
 
+  it('publishes the reader-suggested Cascadia Citizens Agenda record', () => {
+    const record = fullData.records.find(row => row.id === 'RECORD-00911');
+    assert.ok(record, 'RECORD-00911 must be exported to the public archive');
+    assert.equal(record.author, 'Jon Bauer');
+    assert.match(record.summary, /fifth election season/);
+    assert.equal(
+      record.url,
+      'https://www.cascadiadaily.com/2026/jul/16/citizens-agenda-26-help-cdn-pin-down-candidates-on-issues-that-matter-to-you/'
+    );
+    assert.equal('raw_text' in record, false, 'the public projection must not redistribute source text');
+
+    const deployVersion = JSON.parse(
+      fs.readFileSync(path.join(dataDir, '..', 'version.json'), 'utf-8')
+    ).version;
+    const [major, minor, patch] = deployVersion.split('.').map(Number);
+    assert.ok(
+      major > 3 || (major === 3 && (minor > 8 || (minor === 8 && patch >= 12))),
+      'the RECORD-00911 addition must ship in cache generation 3.8.12 or newer'
+    );
+  });
+
   it('THREAD records have thread_data in details', () => {
     const threadIds = Object.keys(detailsData.details).filter(id => id.startsWith('THREAD-'));
     assert.ok(threadIds.length > 0, 'Expected at least 1 THREAD record in details');

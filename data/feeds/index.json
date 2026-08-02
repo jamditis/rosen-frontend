@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "generated": "2026-08-02T08:16:15.891Z",
+  "generated": "2026-08-02T09:21:32.251Z",
   "baseUrl": "https://pressthink.org/j/rosen-archive",
   "feeds": [
     {
@@ -14,6 +14,16 @@
       "path": "./data/feeds/articles.xml"
     },
     {
+      "name": "categories - politics-democracy",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/politics-democracy.xml",
+      "path": "./data/feeds/categories/politics-democracy.xml"
+    },
+    {
+      "name": "categories - audience-public-engagement",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/audience-public-engagement.xml",
+      "path": "./data/feeds/categories/audience-public-engagement.xml"
+    },
+    {
       "name": "categories - journalism-theory-practice",
       "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-theory-practice.xml",
       "path": "./data/feeds/categories/journalism-theory-practice.xml"
@@ -22,16 +32,6 @@
       "name": "categories - press-media-criticism",
       "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/press-media-criticism.xml",
       "path": "./data/feeds/categories/press-media-criticism.xml"
-    },
-    {
-      "name": "categories - audience-public-engagement",
-      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/audience-public-engagement.xml",
-      "path": "./data/feeds/categories/audience-public-engagement.xml"
-    },
-    {
-      "name": "categories - politics-democracy",
-      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/politics-democracy.xml",
-      "path": "./data/feeds/categories/politics-democracy.xml"
     },
     {
       "name": "categories - technology-digital-media",

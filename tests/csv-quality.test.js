@@ -372,6 +372,19 @@ describe('archive_records-public.csv', () => {
     );
   });
 
+  it('keeps the reader-suggested Cascadia Citizens Agenda case study', () => {
+    const record = archiveRecords.find(row => row.id === 'RECORD-00911');
+    assert.ok(record, 'RECORD-00911 must remain in the curated archive');
+    assert.equal(record.author, 'Jon Bauer');
+    assert.equal(record.publication_date, '2026-07-16');
+    assert.equal(record.original_publication, 'Cascadia Daily News');
+    assert.equal(record.verified, 'TRUE');
+    assert.match(record.key_concepts, /(?:^|;)The Citizens' Agenda(?:;|$)/);
+    assert.match(record.raw_text, /developed by New York University journalism professor and media critic Jay Rosen/);
+    assert.ok(record.raw_text.length < 500, 'brief provenance must not enter the full-text extraction queue');
+    assert.match(record.permissions, /full text not redistributed/);
+  });
+
   it('does not publish the unrecoverable NN08 sketchbook fragment', () => {
     assert.strictEqual(
       archiveRecords.some(row => row.id === 'RECORD-00865'),
