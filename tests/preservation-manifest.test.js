@@ -284,6 +284,10 @@ describe('preservation manifest schema (#701)', () => {
     const copyFromTheFuture = example('successful-capture');
     copyFromTheFuture.createdAt = '2026-08-01T14:22:30.000Z';
     rejectsManifest(copyFromTheFuture, 'manifest createdAt', 'storage copy', 'earlier');
+
+    const retrievalAfterEvent = example('bot-wall');
+    retrievalAfterEvent.events[0].retrieval.retrievedAt = '2026-08-01T15:15:01.000Z';
+    rejectsManifest(retrievalAfterEvent, 'retrievedAt', 'after', 'event occurredAt');
   });
 
   it('rejects payloads that do not belong to the declared event type', () => {
@@ -344,6 +348,7 @@ describe('preservation manifest schema (#701)', () => {
     const staleRetrievalEvent = clone(retrievalEvents[0]);
     staleRetrievalEvent.eventId = 'urn:rosen-preservation:event:stale-retrieval-import';
     staleRetrievalEvent.occurredAt = '2025-01-01T00:00:00.000Z';
+    staleRetrievalEvent.retrieval.retrievedAt = staleRetrievalEvent.occurredAt;
     delete staleRetrievalEvent.supersedesEventId;
     captureManifest.events.push(staleRetrievalEvent);
 
@@ -485,6 +490,21 @@ describe('preservation manifest schema (#701)', () => {
     duplicateIntroduction.events.push(secondCreation);
     rejectsManifest(duplicateIntroduction, artifact.artifactId, 'multiple current', 'artifact-created');
 
+    const duplicateAlongsideCapture = example('successful-capture');
+    const declaredCreation = duplicateAlongsideCapture.events.find(event => (
+      event.eventType === 'artifact-created'
+    ));
+    const extraCreation = clone(declaredCreation);
+    extraCreation.eventId = 'urn:rosen-preservation:event:duplicate-alongside-capture';
+    extraCreation.occurredAt = '2026-08-01T14:22:30.000Z';
+    duplicateAlongsideCapture.events.push(extraCreation);
+    rejectsManifest(
+      duplicateAlongsideCapture,
+      duplicateAlongsideCapture.artifacts[0].artifactId,
+      'multiple current',
+      'artifact-created',
+    );
+
     const generatedArtifact = example('successful-capture');
     const generated = generatedArtifact.artifacts[0];
     const originatingCapture = generatedArtifact.events.find(event => (
@@ -515,6 +535,21 @@ describe('preservation manifest schema (#701)', () => {
     delete captureCorrection.artifactId;
     supersededOnlyCapture.events.push(captureCorrection);
     rejectsManifest(supersededOnlyCapture, supersededArtifact.artifactId, 'current', 'provenance');
+
+    const copyBeforeGeneratedArtifact = example('successful-capture');
+    const generatedCopyArtifact = copyBeforeGeneratedArtifact.artifacts[0];
+    const generatedCapture = copyBeforeGeneratedArtifact.events.find(event => (
+      event.eventId === generatedCopyArtifact.captureEventId
+    ));
+    const generatedCreation = copyBeforeGeneratedArtifact.events.find(event => (
+      event.eventType === 'artifact-created'
+    ));
+    delete generatedCapture.artifactId;
+    delete generatedCopyArtifact.captureEventId;
+    generatedCopyArtifact.artifactType = 'metadata';
+    generatedCopyArtifact.mediaType = 'application/json';
+    generatedCreation.occurredAt = '2026-08-01T14:23:30.000Z';
+    rejectsManifest(copyBeforeGeneratedArtifact, 'storage copy', 'before', 'artifact provenance');
   });
 
   it('binds each declared capture artifact to the same capture event', () => {
@@ -611,6 +646,12 @@ describe('preservation manifest schema (#701)', () => {
     wrongTarget.events[0].wayback.replayUrl =
       'https://web.archive.org/web/20160304112233id_/https://other.example/wrong-story';
     rejectsManifest(wrongTarget, 'replayUrl', 'target', 'canonicalSourceUrl');
+
+    const futureCapture = example('existing-wayback-reference');
+    futureCapture.events[0].wayback.captureTimestamp = '20990101120000';
+    futureCapture.events[0].wayback.replayUrl =
+      'https://web.archive.org/web/20990101120000id_/https://example.org/missing-story';
+    rejectsManifest(futureCapture, 'captureTimestamp', 'after', 'event occurredAt');
   });
 
   it('binds fixity outcomes to the referenced artifact digest', () => {
@@ -651,6 +692,9 @@ describe('Winer evidence compatibility', () => {
     assert.deepEqual(event.normalizationEvidence.observations, source.observations);
     assert.deepEqual(event.normalizationEvidence.fieldMapping, source.fieldMapping);
     assert.equal(event.normalizationEvidence.normalizedObjectSha256, source.normalizedRecordSha256);
+    assert.equal(event.normalizationEvidence.captureMode, evidence.captureMode);
+    assert.equal(event.normalizationEvidence.recordSource, evidence.recordSource);
+    assert.equal(event.normalizationEvidence.runtimeNetworkAccess, evidence.runtimeNetworkAccess);
     assert.equal(artifact.sha256, source.retrieval.responseSha256);
     assert.equal(artifact.byteSize, source.retrieval.byteLength);
   });

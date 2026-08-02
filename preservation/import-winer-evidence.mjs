@@ -33,6 +33,11 @@ function digest(value) {
 
 export function convertWinerEvidence(evidence) {
   requireText(evidence?.captureTool, 'captureTool');
+  requireText(evidence?.captureMode, 'captureMode');
+  requireText(evidence?.recordSource, 'recordSource');
+  if (typeof evidence?.runtimeNetworkAccess !== 'boolean') {
+    throw new TypeError('Winer evidence runtimeNetworkAccess must be a boolean');
+  }
   if (!Array.isArray(evidence?.records) || evidence.records.length === 0) {
     throw new TypeError('Winer evidence records must be a non-empty array');
   }
@@ -100,6 +105,9 @@ export function convertWinerEvidence(evidence) {
         observations: record.observations,
         fieldMapping: record.fieldMapping,
         normalizedObjectSha256: record.normalizedRecordSha256,
+        captureMode: evidence.captureMode,
+        recordSource: evidence.recordSource,
+        runtimeNetworkAccess: evidence.runtimeNetworkAccess,
       },
     });
     artifacts.push({

@@ -91,6 +91,8 @@ removed or rewritten.
 All ISO timestamps must name a real UTC calendar instant, not merely match the
 timestamp character pattern. Wayback capture timestamps receive the same
 calendar check and must equal the timestamp embedded in their replay URL.
+Retrieval and Wayback capture times cannot be later than their containing
+event's `occurredAt`.
 
 ## Event vocabulary
 
@@ -128,11 +130,12 @@ An artifact requires a stable artifact ID, owning object ID, artifact type,
 URI, SHA-256, byte size, and `storageCopies` array. HTTP-response artifacts also
 require their originating capture-event ID. Generated metadata, checksum, and
 other non-response artifacts may omit that ID, but they must have one current
-`artifact-created` event. A superseded capture no longer introduces an artifact;
-the retained artifact then needs a current `artifact-created` event. The storage
-array may be empty when evidence proves a response digest but does not name a
-retained copy. Each named storage copy requires its own stable ID, URI, storage
-class, access state, and creation time.
+`artifact-created` event. An artifact cannot have multiple current creation
+events, even when its capture also names it. A superseded capture no longer
+introduces an artifact; the retained artifact then needs a current
+`artifact-created` event. The storage array may be empty when evidence proves a
+response digest but does not name a retained copy. Each named storage copy
+requires its own stable ID, URI, storage class, access state, and creation time.
 
 The validator ensures object, event, artifact, fixity, and storage-copy
 references resolve and remain within one object. When a capture attempt names
@@ -141,9 +144,10 @@ model supports multiple captures, artifacts, and storage copies for the same
 archive object. Every named storage copy must have exactly one matching
 current `storage-copy-created` event; corrected predecessors remain in the
 append-only history. The copy's `createdAt` must equal the current creation
-event's `occurredAt`. Content-addressed `urn:sha256:` artifact and copy URIs
-must match the owning artifact digest, so storage state cannot change through
-an artifact record edit alone.
+event's `occurredAt` and cannot predate the artifact's current capture or
+creation provenance. Content-addressed `urn:sha256:` artifact and copy URIs must
+match the owning artifact digest, so storage state cannot change through an
+artifact record edit alone.
 
 ## Rights and review boundaries
 
@@ -191,6 +195,7 @@ without modifying or replacing `retrieval-evidence.json`:
 | `retrieval.client` and top-level `captureTool` | client name/version and task version |
 | `retrieval.responseSha256` | record-scoped artifact ID plus content-addressed URI and SHA-256 |
 | observations, field mapping, source locator, normalized digest | `normalizationEvidence` |
+| `captureMode`, `recordSource`, and `runtimeNetworkAccess` | capture-level `normalizationEvidence` provenance on every projected event |
 
 Verify the current 11-record artifact against schema v1:
 

@@ -584,6 +584,17 @@
         },
         "normalizedObjectSha256": {
           "$ref": "#/$defs/sha256"
+        },
+        "captureMode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recordSource": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runtimeNetworkAccess": {
+          "type": "boolean"
         }
       }
     },

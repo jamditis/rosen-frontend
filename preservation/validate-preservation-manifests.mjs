@@ -80,9 +80,12 @@ function validateWaybackTimestamp(value, label) {
   if (!waybackTimestampPattern.test(value)) {
     throw new PreservationValidationError(`${label} must be a valid UTC timestamp`);
   }
-  const isoTimestamp = `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`
+  validateUtcTimestamp(waybackTimestampToIso(value), label);
+}
+
+function waybackTimestampToIso(value) {
+  return `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`
     + `T${value.slice(8, 10)}:${value.slice(10, 12)}:${value.slice(12, 14)}.000Z`;
-  validateUtcTimestamp(isoTimestamp, label);
 }
 
 function validateReferences(manifest) {
@@ -144,6 +147,11 @@ function validateReferences(manifest) {
           event.retrieval.retrievedAt,
           `${event.eventId} retrieval retrievedAt`,
         );
+        if (Date.parse(event.retrieval.retrievedAt) > Date.parse(event.occurredAt)) {
+          throw new PreservationValidationError(
+            `${event.eventId}: retrieval retrievedAt cannot be after event occurredAt`,
+          );
+        }
       }
       if (
         event.retrieval.httpOutcome === 'response-received'
@@ -226,6 +234,14 @@ function validateReferences(manifest) {
         event.wayback.captureTimestamp,
         `${event.eventId} Wayback captureTimestamp`,
       );
+      if (
+        Date.parse(waybackTimestampToIso(event.wayback.captureTimestamp))
+        > Date.parse(event.occurredAt)
+      ) {
+        throw new PreservationValidationError(
+          `${event.eventId}: Wayback captureTimestamp cannot be after event occurredAt`,
+        );
+      }
       const replayMatch = event.wayback.replayUrl.match(waybackReplayPattern);
       const replayTimestamp = replayMatch?.[1];
       if (replayTimestamp !== event.wayback.captureTimestamp) {
@@ -408,11 +424,18 @@ function validateReferences(manifest) {
         `${artifact.artifactId}: retained artifact requires current provenance from an artifact-created event or declaring capture-attempt`,
       );
     }
-    if (!captureDeclaresArtifact && currentArtifactCreationEvents.length > 1) {
+    if (currentArtifactCreationEvents.length > 1) {
       throw new PreservationValidationError(
         `${artifact.artifactId}: retained artifact has multiple current artifact-created events`,
       );
     }
+    const provenanceEvents = [
+      ...currentArtifactCreationEvents,
+      ...(captureDeclaresArtifact ? [captureEvent] : []),
+    ];
+    const artifactProvenanceTime = Math.max(
+      ...provenanceEvents.map(event => Date.parse(event.occurredAt)),
+    );
     if (
       artifact.artifactType === 'http-response'
       && outcomesWithoutHttpResponse.has(captureEvent.retrieval.httpOutcome)
@@ -454,6 +477,11 @@ function validateReferences(manifest) {
       if (currentCreationEvents[0].occurredAt !== copy.createdAt) {
         throw new PreservationValidationError(
           `${copy.copyId}: storage copy createdAt must match its current storage-copy-created event occurredAt`,
+        );
+      }
+      if (Date.parse(copy.createdAt) < artifactProvenanceTime) {
+        throw new PreservationValidationError(
+          `${copy.copyId}: storage copy cannot be created before current artifact provenance`,
         );
       }
     }
