@@ -5,9 +5,19 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Articles and essays from Jay Rosen&apos;s journalism scholarship</description>
     <language>en-us</language>
-    <lastBuildDate>Sun, 02 Aug 2026 08:16:15 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 02 Aug 2026 09:21:32 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/articles.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
+  <item>
+    <title>Citizens Agenda &apos;26: Help CDN pin down candidates on issues that matter to you</title>
+    <link>https://www.cascadiadaily.com/2026/jul/16/citizens-agenda-26-help-cdn-pin-down-candidates-on-issues-that-matter-to-you/</link>
+    <guid isPermaLink="true">https://www.cascadiadaily.com/2026/jul/16/citizens-agenda-26-help-cdn-pin-down-candidates-on-issues-that-matter-to-you/</guid>
+    <pubDate>Thu, 16 Jul 2026 00:00:00 GMT</pubDate>
+    <description>Jon Bauer explains how Cascadia Daily News is using the Citizens Agenda model for a fifth election season in Whatcom and Skagit counties. Readers submit and rank questions that reporters will put to candidates, shifting coverage toward voter priorities, engagement, and solutions rather than campaign horse-race narratives.</description>
+    <category>Politics &amp; Democracy</category>
+    <category>Audience &amp; Public Engagement</category>
+    <category>Journalism Theory &amp; Practice</category>
+  </item>
   <item>
     <title>Why The Ubyssey is covering the World Cup</title>
     <link>https://ubyssey.ca/margins/world-cup-coverage/</link>
@@ -969,15 +979,6 @@
     <description>Jay Rosen reflects on his observations of the American press&apos;s coverage of Donald Trump&apos;s presidency.  He argues that the press&apos;s practices rest on assumptions about presidential behavior that don&apos;t apply to Trump, leading to a normalization of his actions rather than a critical examination.  He introduces the concept of &apos;verification in reverse,&apos; where publicly doubted claims are used to generate controversy and power political movements.  He also notes the effectiveness of strategies like &apos;flooding the zone&apos; (or the Russian equivalent, &apos;firehose of falsehoods&apos;) in undermining trust in journalism by overwhelming the truth with misinformation.</description>
     <category>Press &amp; Media Criticism</category>
     <category>Journalism Theory &amp; Practice</category>
-    <category>Politics &amp; Democracy</category>
-  </item>
-  <item>
-    <title>The plan is to have no plan</title>
-    <link>https://www.adbusters.org/article/the-plan-is-to-have-no-plan</link>
-    <guid isPermaLink="true">https://www.adbusters.org/article/the-plan-is-to-have-no-plan</guid>
-    <pubDate>Mon, 04 May 2020 00:00:00 GMT</pubDate>
-    <description>A repost of Rosen&apos;s viral PressThink passage about the Trump administration&apos;s COVID response strategy: deliberate confusion, blame-shifting, and &apos;flooding the zone with shit&apos; as a governing method. Originally published on PressThink in May 2020, republished by Adbusters magazine (issue #151).</description>
-    <category>Press &amp; Media Criticism</category>
     <category>Politics &amp; Democracy</category>
   </item>
   </channel>
