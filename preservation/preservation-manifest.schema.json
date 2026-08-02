@@ -118,6 +118,13 @@
         "canonicalSourceUrl": {
           "$ref": "#/$defs/webUrl"
         },
+        "alternateSourceUrls": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/webUrl"
+          },
+          "uniqueItems": true
+        },
         "sourceRecordId": {
           "type": "string",
           "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
@@ -305,7 +312,7 @@
         },
         "replayUrl": {
           "type": "string",
-          "pattern": "^https://web\\.archive\\.org/web/[0-9]{14}(?:[a-z]{2}_)?/https?://[^\\s]+$"
+          "pattern": "^https?://web\\.archive\\.org/web/[0-9]{14}(?:[a-z]{2}_)?/https?://[^\\s]+$"
         }
       }
     },

@@ -141,6 +141,22 @@ describe('preservation manifest schema (#701)', () => {
       bytesReceived: 0,
     });
     rejectsManifest(mediaTypeWithoutResponse, 'not-requested', 'mediaType', 'null');
+
+    const semanticSuccessAfterAbort = example('bot-wall');
+    semanticSuccessAfterAbort.events[0].retrieval.httpOutcome = 'aborted';
+    semanticSuccessAfterAbort.events[0].retrieval.semanticOutcome = 'intended-content';
+    rejectsManifest(semanticSuccessAfterAbort, 'aborted', 'semanticOutcome');
+  });
+
+  it('binds retrieval source URLs to the owning archive object', () => {
+    const manifest = example('bot-wall');
+    manifest.events[0].retrieval.requestedUrl = 'https://other.example/wrong-story';
+    manifest.events[0].retrieval.observedSourceUrl = 'https://other.example/wrong-story';
+
+    rejectsManifest(manifest, 'requestedUrl', 'canonicalSourceUrl', 'alternateSourceUrls');
+
+    const explicitAlternate = example('successful-capture');
+    assert.equal(validatePreservationManifest(explicitAlternate), explicitAlternate);
   });
 
   it('requires oversize aborts to carry internally consistent size evidence', () => {
@@ -450,6 +466,11 @@ describe('preservation manifest schema (#701)', () => {
         `https://web.archive.org/web/20160304112233${modifier}/https://example.org/missing-story`;
       assert.equal(validatePreservationManifest(existingModifier), existingModifier);
     }
+
+    const httpReplay = example('existing-wayback-reference');
+    httpReplay.events[0].wayback.replayUrl =
+      'http://web.archive.org/web/20160304112233id_/https://example.org/missing-story';
+    assert.equal(validatePreservationManifest(httpReplay), httpReplay);
 
     const wrongTarget = example('existing-wayback-reference');
     wrongTarget.events[0].wayback.replayUrl =

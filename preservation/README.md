@@ -57,8 +57,10 @@ filesystem layout.
 
 ### Object fields
 
-`objectId`, `objectType`, and `canonicalSourceUrl` are required. `sourceRecordId`
-and `label` are optional conveniences. Object IDs use the form
+`objectId`, `objectType`, and `canonicalSourceUrl` are required. The optional
+`alternateSourceUrls` list records redirect targets or other source URLs that
+retrieval events may address; `sourceRecordId` and `label` are optional
+conveniences. Object IDs use the form
 `urn:rosen:object:<type>:<stable-id>` and cannot be filesystem paths. The type
 segment and `objectType` must agree so identity never changes meaning between
 URN-aware and field-aware consumers.
@@ -105,7 +107,8 @@ Retrieval events always retain the requested and observed source URLs,
 retrieval time, final URL, nullable HTTP status, HTTP outcome, nullable media
 type, bytes received, client name and version, and semantic outcome. Optional
 `reportedByteLength` and `limitBytes` distinguish an oversize abort from a
-completed download.
+completed download. Requested and observed URLs must match the owning object's
+canonical URL or one of its explicit alternate source URLs.
 
 Semantic outcomes are `intended-content`, `bot-wall`, `login-wall`, `missing`,
 `redirect`, `uncertain`, and `oversize-abort`. Unknown values fail validation;

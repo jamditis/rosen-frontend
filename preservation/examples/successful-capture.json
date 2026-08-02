@@ -9,6 +9,9 @@
       "objectId": "urn:rosen:object:archive-record:RECORD-00001",
       "objectType": "archive-record",
       "canonicalSourceUrl": "https://example.org/original-story",
+      "alternateSourceUrls": [
+        "https://www.example.org/original-story"
+      ],
       "sourceRecordId": "RECORD-00001",
       "label": "Example successful capture"
     }

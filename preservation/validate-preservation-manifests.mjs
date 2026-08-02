@@ -36,9 +36,10 @@ const eventPayloads = new Map([
 ]);
 const utcTimestampPattern = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]{3})?Z$/;
 const waybackTimestampPattern = /^[0-9]{14}$/;
-const waybackReplayPattern = /^https:\/\/web\.archive\.org\/web\/([0-9]{14})(?:[a-z]{2}_)?\/(https?:\/\/.+)$/;
+const waybackReplayPattern = /^https?:\/\/web\.archive\.org\/web\/([0-9]{14})(?:[a-z]{2}_)?\/(https?:\/\/.+)$/;
 const sha256UrnPrefix = 'urn:sha256:';
 const outcomesWithoutHttpResponse = new Set(['network-error', 'timeout', 'not-requested']);
+const semanticOutcomesForAbortedRetrieval = new Set(['uncertain', 'oversize-abort']);
 
 export class PreservationValidationError extends Error {
   constructor(message, options) {
@@ -93,6 +94,7 @@ function validateReferences(manifest) {
   const objects = uniqueMap(manifest.objects, 'objectId', 'objects');
   const events = uniqueMap(manifest.events, 'eventId', 'events');
   const artifacts = uniqueMap(manifest.artifacts, 'artifactId', 'artifacts');
+  const sourceUrlsByObject = new Map();
   const copies = new Map();
   const artifactCreationEvents = new Map();
   const storageCopyEvents = new Map();
@@ -104,6 +106,10 @@ function validateReferences(manifest) {
         `${object.objectId}: objectId type ${objectIdType} must match objectType ${object.objectType}`,
       );
     }
+    sourceUrlsByObject.set(object.objectId, new Set([
+      object.canonicalSourceUrl,
+      ...(object.alternateSourceUrls ?? []),
+    ].map(url => new URL(url).href)));
   }
 
   for (const artifact of manifest.artifacts) {
@@ -181,6 +187,14 @@ function validateReferences(manifest) {
           `${event.eventId}: oversize-abort reportedByteLength must be greater than limitBytes`,
         );
       }
+      if (
+        event.retrieval.httpOutcome === 'aborted'
+        && !semanticOutcomesForAbortedRetrieval.has(event.retrieval.semanticOutcome)
+      ) {
+        throw new PreservationValidationError(
+          `${event.eventId}: httpOutcome aborted requires semanticOutcome uncertain or oversize-abort`,
+        );
+      }
     }
     if (event.rights?.embargoUntil) {
       validateUtcTimestamp(
@@ -200,13 +214,13 @@ function validateReferences(manifest) {
           `${event.eventId}: replayUrl timestamp must match captureTimestamp`,
         );
       }
-      const canonicalSourceUrl = objects.get(event.objectId)?.canonicalSourceUrl;
+      const allowedSourceUrls = sourceUrlsByObject.get(event.objectId);
       if (
-        canonicalSourceUrl
-        && new URL(replayMatch[2]).href !== new URL(canonicalSourceUrl).href
+        allowedSourceUrls
+        && !allowedSourceUrls.has(new URL(replayMatch[2]).href)
       ) {
         throw new PreservationValidationError(
-          `${event.eventId}: replayUrl target must match object canonicalSourceUrl`,
+          `${event.eventId}: replayUrl target must match object canonicalSourceUrl or alternateSourceUrls`,
         );
       }
     }
@@ -215,6 +229,17 @@ function validateReferences(manifest) {
       throw new PreservationValidationError(
         `${event.eventId}: objectId ${event.objectId} references a missing object`,
       );
+    }
+
+    if (event.retrieval) {
+      const allowedSourceUrls = sourceUrlsByObject.get(event.objectId);
+      for (const field of ['requestedUrl', 'observedSourceUrl']) {
+        if (!allowedSourceUrls.has(new URL(event.retrieval[field]).href)) {
+          throw new PreservationValidationError(
+            `${event.eventId}: retrieval ${field} must match object canonicalSourceUrl or alternateSourceUrls`,
+          );
+        }
+      }
     }
 
     const allowedPayloads = eventPayloads.get(event.eventType);
