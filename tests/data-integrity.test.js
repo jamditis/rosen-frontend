@@ -168,6 +168,15 @@ describe('archive-details.json', () => {
       fullData.records.find(record => record.id === 'RECORD-00038')?.author,
       'Marty Linsky'
     );
+
+    const deployVersion = JSON.parse(
+      fs.readFileSync(path.join(dataDir, '..', 'version.json'), 'utf-8')
+    ).version;
+    assert.notEqual(
+      deployVersion,
+      '3.8.10',
+      'the RECORD-00038 correction must ship in a new cache generation'
+    );
   });
 
   it('THREAD records have thread_data in details', () => {
