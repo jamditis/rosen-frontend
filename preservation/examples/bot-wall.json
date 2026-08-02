@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.0.0",
+  "vocabularyVersion": "1.0.0",
+  "manifestId": "urn:rosen-preservation:manifest:example-bot-wall",
+  "createdAt": "2026-08-01T15:15:00.000Z",
+  "objects": [
+    {
+      "objectId": "urn:rosen:object:social-post:TWTR-00001",
+      "objectType": "social-post",
+      "canonicalSourceUrl": "https://social.example/status/1",
+      "sourceRecordId": "TWTR-00001",
+      "label": "Bot wall example"
+    }
+  ],
+  "events": [
+    {
+      "eventId": "urn:rosen-preservation:event:example-bot-wall",
+      "eventType": "capture-attempt",
+      "objectId": "urn:rosen:object:social-post:TWTR-00001",
+      "taskVersion": "preservation-pilot@1.0.0",
+      "inputHash": "2222222222222222222222222222222222222222222222222222222222222222",
+      "actor": {
+        "actorType": "automation",
+        "actorId": "preservation-pilot"
+      },
+      "occurredAt": "2026-08-01T15:15:00.000Z",
+      "review": {
+        "state": "review-required",
+        "notes": "Response contains a challenge page, not the intended post."
+      },
+      "retrieval": {
+        "requestedUrl": "https://social.example/status/1",
+        "observedSourceUrl": "https://social.example/status/1",
+        "retrievedAt": "2026-08-01T15:15:00.000Z",
+        "finalUrl": "https://social.example/challenge",
+        "httpStatus": 403,
+        "httpOutcome": "response-received",
+        "mediaType": "text/html",
+        "bytesReceived": 12456,
+        "client": {
+          "name": "capture-worker",
+          "version": "1.0.0"
+        },
+        "semanticOutcome": "bot-wall",
+        "redirectChain": [
+          "https://social.example/status/1",
+          "https://social.example/challenge"
+        ]
+      }
+    }
+  ],
+  "artifacts": []
+}
