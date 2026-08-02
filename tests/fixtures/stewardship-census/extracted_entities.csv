@@ -1,0 +1,5 @@
+entity_id,entity_type,entity_name,normalized_name,role_or_description,affiliation,prominence_score,first_mention_record_id,total_mentions,related_entities,notes
+P0001,Person,Jay Rosen,jay rosen,Journalist,NYU,100,RECORD-00001,2,,
+C0001,Concept,Public sphere,public sphere,Concept,,80,RECORD-00001,1,,
+O0001,Organization,Example Org,example org,Publisher,,60,BSKY-00001,1,,
+W0001,Work,Missing book,missing book,Book,,20,RECORD-99999,1,,

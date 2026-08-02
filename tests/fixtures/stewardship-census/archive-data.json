@@ -1,0 +1,14 @@
+{
+  "version": "1.1.0",
+  "generated": "2026-01-01T00:00:00.000Z",
+  "records": [
+    {"id":"RECORD-00001","title":"Published article","author":"Jay Rosen","date":"2020-01-01","year":"2020","era":"Test","pub":"Example publication","url":"https://example.com/article","summary":"Useful summary","quote":"Notable quote","categories":["Journalism"],"concepts":["Public sphere"],"tags":["press"],"verified":true,"type":"article","relatedIds":["P0001","C0001"]},
+    {"id":"TWTR-00001","title":"Published tweet","author":"Jay Rosen","date":"2021-01-01","year":"2021","era":"Test","pub":"Twitter","url":"https://example.com/tweet","summary":"Generated summary","quote":"A useful tweet","categories":["Journalism"],"concepts":["Public sphere"],"tags":["press"],"verified":true,"type":"social","relatedIds":[]},
+    {"id":"BSKY-00001","title":"Published Bluesky post","author":"Jay Rosen","date":"2022-01-01","year":"2022","era":"Test","pub":"Bluesky","url":"https://example.com/bluesky","summary":"Generated summary","quote":"A useful post","categories":["Journalism"],"concepts":["Public sphere"],"tags":["press"],"verified":true,"type":"social","relatedIds":["P0001","O0001"]},
+    {"id":"THREAD-00001","title":"Generated thread","author":"Jay Rosen","date":"2022-01-02","year":"2022","era":"Test","pub":"Bluesky","url":"https://example.com/thread-member","summary":"Generated summary","quote":"Thread member text","categories":[],"concepts":[],"tags":[],"verified":true,"type":"social","relatedIds":[],"thread_data":{"thread_id":"BSKY-00002","total_posts":1,"max_depth":0,"posts":[{"number":1,"id":"BSKY-00002","content":"Thread member text","date":"2022-01-02","url":"https://example.com/thread-member","depth":0,"parent_id":null}]}},
+    {"id":"dissertation-1986","title":"The Impossible Press","author":"Jay Rosen","date":"1986-01-01","year":"1986","era":"Test","pub":"NYU","url":"./dissertation/","summary":"Dissertation","quote":"","categories":[],"concepts":[],"tags":[],"verified":true,"type":"Dissertation","relatedIds":[]}
+  ],
+  "entities": [],
+  "facets": {},
+  "autocompleteIndex": []
+}

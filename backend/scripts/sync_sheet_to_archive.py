@@ -10,7 +10,8 @@ Google Sheet. Nothing carries that work into ``data/archive_records-public.csv``
 so it never reaches the live site. This job closes that tail:
 
     read the sheet -> merge enriched columns into the CSV by ``id``
-    -> regen JSONs -> npm test -> commit branch -> open review PR
+    -> regen JSONs -> npm test -> commit data -> regenerate/commit census
+    -> open review PR
     -> Pillar 3c full-site deploy after merge
 
 The merge is ADDITIVE and never destructive:
@@ -78,6 +79,10 @@ DEFAULT_SHEET_TAB = "test_runs"
 
 # The canonical JSON artifacts `node export-archive-data.js` regenerates.
 _DEPLOY_JSON_FILES = DATA_DEPLOY_JSON_FILES
+_CENSUS_REPORT_PATHS = (
+    "data/stewardship-census.json",
+    "data/stewardship-census.md",
+)
 
 # Columns the enrichment jobs produce. On sync the sheet's non-empty value wins
 # (the sheet is the enrichment surface). An empty sheet cell never blanks the
@@ -294,11 +299,13 @@ def _branch_name() -> str:
 
 
 def open_sync_pr(csv_path: pathlib.Path, stats: Dict[str, Any]) -> Tuple[Optional[str], str]:
-    """Commit the merged data to a fresh branch, push it, and open a PR.
+    """Commit data and census to a fresh branch, push it, and open a PR.
 
     A direct push to main is deliberately avoided -- a human reviews the
     enrichment diff before it goes live (Joe, 2026-05-29). The live push itself
     is the existing deploy.yml (Pillar 3c) run, triggered after the PR merges.
+    The census is regenerated after the input commit and lands in a second
+    report-only commit so its input-commit provenance remains truthful.
 
     Returns ``(branch_or_None_on_error, message)``. ``gh`` authenticates via the
     GH_TOKEN env var, which the workflow sets to the GitHub App token so the new
@@ -319,8 +326,12 @@ def open_sync_pr(csv_path: pathlib.Path, stats: Dict[str, Any]) -> Tuple[Optiona
         f"value, fill-only columns (raw_text, publication_date, word_count) are "
         f"written only into empty cells, and raw_text is never blanked or "
         f"shortened. JSON was regenerated and `npm test` passed before this PR "
-        f"opened.\n\n"
-        f"Merge to land the data on main, then run the **Pillar 3c deploy** "
+        f"opened. The stewardship census was refreshed and verified in a second "
+        f"report-only commit.\n\n"
+        f"**Required merge method:** use **Create a merge commit**. Do not "
+        f"squash or rebase this PR: the report commit stamps the preceding "
+        f"data commit as its input, so both commits must remain intact.\n\n"
+        f"After that merge lands the data on main, run the **Pillar 3c deploy** "
         f"workflow to push it live.\n\n"
         f"Design: `docs/plans/2026-05-29-batch-maintenance-runner-design.md`"
     )
@@ -338,6 +349,14 @@ def open_sync_pr(csv_path: pathlib.Path, stats: Dict[str, Any]) -> Tuple[Optiona
                        cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
         subprocess.run(["git", "commit", "-m", title],
                        cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
+        subprocess.run(["npm", "run", "census:stewardship"],
+                       cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
+        subprocess.run(["node", "--test", "tests/stewardship-census.test.js"],
+                       cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
+        subprocess.run(["git", "add", *_CENSUS_REPORT_PATHS],
+                       cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
+        subprocess.run(["git", "commit", "-m", "data: refresh stewardship census"],
+                       cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
         subprocess.run(["git", "push", "origin", branch],
                        cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
         subprocess.run(["gh", "pr", "create", "--base", "main", "--head", branch,
@@ -345,7 +364,11 @@ def open_sync_pr(csv_path: pathlib.Path, stats: Dict[str, Any]) -> Tuple[Optiona
                        cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True)
         return branch, f"opened PR from {branch}"
     except subprocess.CalledProcessError as exc:
-        return None, f"git/gh op failed: {(exc.stderr or '').strip() or exc}"
+        diagnostics = "\n".join(
+            part.strip() for part in (exc.stderr or "", exc.stdout or "")
+            if part.strip()
+        )
+        return None, f"commit/PR pipeline failed: {diagnostics or exc}"
 
 
 # ---------- Orchestration ---------------------------------------------------

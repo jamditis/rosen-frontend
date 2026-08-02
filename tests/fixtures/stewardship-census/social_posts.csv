@@ -1,0 +1,8 @@
+id,title,url,author,publication_date,original_publication,platform,content_type,summary,thematic_categories,key_concepts,tags,related_to,pull_quote,raw_text,verified
+TWTR-00001,Published tweet,https://example.com/tweet,Jay Rosen,2021-01-01,Twitter,Twitter,TWITTER,,Journalism,Public sphere,press,,A useful tweet,A useful tweet,
+BSKY-00001,Published Bluesky post,https://example.com/bluesky,Jay Rosen,2022-01-01,Bluesky,Bluesky,BLUESKY,,Journalism,Public sphere,press,https://web.archive.org/web/20220101/https://example.net/,A useful post,A useful post,
+BSKY-00002,Thread member,https://example.com/thread-member,Jay Rosen,2022-01-02,Bluesky,Bluesky,BLUESKY,,Journalism,,press,,Thread member text,Thread member text,
+TWTR-00002,Retweet by Other,https://example.com/repost,Jay Rosen,2021-01-03,Twitter,Twitter,TWITTER,,,,,,Reposted text,Reposted text,
+MAST-00001,Third-party post,https://mastodon.social/@other/1,Other Person,2023-01-01,Mastodon,Mastodon,MASTODON,,,,,,Third-party text,Third-party text,
+TWTR-00003,Reply by Jay Rosen,https://twitter.com/jayrosen_nyu/status/3,Jay Rosen,2021-01-04,Twitter,Twitter,TWITTER,,,,,,'@reader ok,'@reader ok,
+MAST-00002,Bad,https://mastodon.social/@jay/2,Jay Rosen,2023-01-02,Mastodon,Mastodon,MASTODON,,,,,,Embedded https://archive.org/details/example. and https://web.archive.org/web/20230101/https://example.com/,Embedded https://archive.org/details/example. and https://web.archive.org/web/20230101/https://example.com/,

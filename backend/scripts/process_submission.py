@@ -26,7 +26,7 @@ Behavior (12-step pipeline from the design's "Architecture" diagram):
     7.  Append to data/archive_records-public.csv   (atomic tmp+rename)
     8.  node data/export-archive-data.js            (regen JSONs)
     9.  npm test                                    (abort commit on fail)
-   10.  git commit + push to main                   (App-token identity)
+   10.  commit data, regenerate/commit census, push (App-token identity)
    11.  SFTP push JSONs + affected metadata shell   (sftp_push.py)
    12.  Sheet writeback F='live', G=RECORD-NNNNN   (retry once, then exit-non-0)
 
@@ -102,6 +102,10 @@ extract_entities_and_relationships = _extract_entities
 # archive CSV when the script runs in CI.
 CSV_FILE = _DEFAULT_CSV_FILE
 _STAGED_JSON_FILES = DATA_DEPLOY_JSON_FILES
+_CENSUS_REPORT_PATHS = (
+    'data/stewardship-census.json',
+    'data/stewardship-census.md',
+)
 CLIPPING_ID_PREFIXES = frozenset({
     'CLIP', 'NYT', 'WSJ', 'WP', 'LAT', 'CT', 'BG', 'GRD', 'CJR', 'AJR',
     'EP', 'NR', 'PYN',
@@ -351,11 +355,13 @@ def _short_title(title: str, width: int = 60) -> str:
 
 def _git_commit_and_push(record_id: str, title: str,
                          relative_csv_path: str) -> _PushResult:
-    """Stage explicit paths, commit, push. Returns a _PushResult.
+    """Commit inputs, refresh/commit the census, then push both commits.
 
     ``ok`` is True when the push lands. On failure ``error`` holds the git
     stderr; ``non_ff`` is True only when a ``git push`` was rejected because
     main advanced — the one failure the caller retries via reset-and-replay.
+    The separate report commit preserves the census's truthful input-commit
+    stamp; the push happens only after both commits and the freshness check.
     """
     paths = ([relative_csv_path,
               'data/extracted_entities.csv',
@@ -386,17 +392,37 @@ def _git_commit_and_push(record_id: str, title: str,
             cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True,
         )
         subprocess.run(
+            ['npm', 'run', 'census:stewardship'],
+            cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True,
+        )
+        subprocess.run(
+            ['node', '--test', 'tests/stewardship-census.test.js'],
+            cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True,
+        )
+        subprocess.run(
+            ['git', 'add', *_CENSUS_REPORT_PATHS],
+            cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True,
+        )
+        subprocess.run(
+            ['git', 'commit', '-m',
+             f'data: refresh stewardship census for {record_id}'],
+            cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True,
+        )
+        subprocess.run(
             ['git', 'push', 'origin', 'HEAD:main'],
             cwd=str(PROJECT_ROOT), check=True, capture_output=True, text=True,
         )
         return _PushResult(ok=True, non_ff=False, error=None)
     except subprocess.CalledProcessError as exc:
         stderr = (exc.stderr or '').strip()
+        stdout = (exc.stdout or '').strip()
+        diagnostics = '\n'.join(part for part in (stderr, stdout) if part)
         cmd = exc.cmd if isinstance(exc.cmd, (list, tuple)) else []
         is_push = list(cmd[:2]) == ['git', 'push']
         non_ff = is_push and _is_non_fast_forward(stderr)
         return _PushResult(ok=False, non_ff=non_ff,
-                           error=f'git op failed: {stderr or exc}')
+                           error=f'commit/push pipeline failed: '
+                                 f'{diagnostics or exc}')
 
 
 def _fetch_and_reset_main() -> Optional[str]:
@@ -924,12 +950,12 @@ def process_one(url: str, title: str = '', notes: str = '',
         return {'status': 'error', 'record_id': record_id,
                 'error': test_err, 'exit_code': 1}
 
-    # --- Step 10: git commit + push (reset-and-replay on a race, #303). ----
-    # The push targets main directly. If main advanced since checkout the push
-    # is rejected non-fast-forward; reset onto the advanced main, replay this
-    # record's writes (re-keying to a free id), re-run the test gate against the
-    # merged tree, and retry. Bounded to MAX_PUSH_ATTEMPTS so a persistent racer
-    # can't loop forever.
+    # --- Step 10: data commit + census commit + push (retry races, #303). ---
+    # The push targets main directly only after the data commit and its matching
+    # report-only commit both exist. If main advanced since checkout the push is
+    # rejected non-fast-forward; reset onto the advanced main, replay this record's
+    # writes (re-keying to a free id), re-run the test gate against the merged tree,
+    # and retry. Bounded to MAX_PUSH_ATTEMPTS so a persistent racer can't loop.
     rel_csv = _csv_relpath(csv_path)
     push = _PushResult(ok=False, non_ff=False, error='not attempted')
     for attempt in range(1, MAX_PUSH_ATTEMPTS + 1):
