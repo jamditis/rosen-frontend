@@ -3151,6 +3151,7 @@ mark {
 }
 
 .archive-tools-strip {
+  container-type: inline-size;
   position: relative;
   margin-top: 2rem;
   padding: 1rem;
@@ -3180,6 +3181,24 @@ mark {
   padding: 0.45rem 0.7rem;
   font-family: var(--font-body);
   font-size: var(--font-size-xs);
+  white-space: nowrap;
+}
+
+.archive-tools-strip .archive-tools-strip__wide {
+  display: none;
+}
+
+@container (min-width: 56rem) {
+  .archive-tools-strip .archive-tools-strip__wide {
+    display: inline-flex;
+  }
+}
+
+.archive-tools-strip__status {
+  font-size: 0.58rem;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
 }
 
 .archive-orientation-hero {

@@ -676,6 +676,8 @@ describe('desktop interaction structure', () => {
       'the refreshed desktop keeps recognizable Windows-era teal');
     assert.match(css, /--desktop-ink-blue:\s*#000080/,
       'the refreshed desktop keeps a strong blue title bar');
+    assert.match(css, /\.desktop-shortcut-icon\s*\{[^}]*color:\s*var\(--desktop-on-dark\)/s,
+      'wallpaper shortcut icons must use the high-contrast light foreground');
     assert.match(css, /\.desktop-menu-icon\s*>\s*svg[^{]*\{[^}]*width:\s*32px;[^}]*height:\s*32px/s,
       'static Reset and Exit menu icons must match wrapped app icon sizing');
     assert.match(css, /\.archive-desktop :is\([^)]*\):focus-visible\s*\{[^}]*scroll-margin-block:/s,

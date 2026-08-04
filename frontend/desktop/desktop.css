@@ -196,7 +196,7 @@
   place-items: center;
   width: 48px;
   height: 48px;
-  color: var(--desktop-ink-blue);
+  color: var(--desktop-on-dark);
   filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.38));
   text-shadow: none;
 }
