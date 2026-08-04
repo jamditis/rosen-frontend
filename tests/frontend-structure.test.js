@@ -9,7 +9,9 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { Script } from 'node:vm';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -196,11 +198,121 @@ describe('key frontend files', () => {
 });
 
 // ============================================
-// JS brace balance check
+// JS syntax check
 // ============================================
 
-describe('JS brace balance', () => {
-  it('all frontend JS files have balanced braces', () => {
+// This used to count { against } and allow a drift of five, which passed every file
+// whose braces happened to balance. A missing operand, a stray comma, an unclosed
+// paren: all invisible to it, and a genuine unclosed brace slipped through as long as
+// the count stayed within tolerance. Node's own parser answers the real question.
+//
+// Always through stdin with an explicit --input-type=module. `node --check <file>` takes
+// its grammar from the nearest package.json to that file, and outside a module package it
+// parses as a sloppy script, which accepts `with`, octal literals, and duplicate parameter
+// names that are all SyntaxErrors in a module. This package is type: module today, so the
+// two forms agree; passing the source in means a stray nested package.json cannot quietly
+// loosen the grammar later.
+//
+// One child process per module file, about 2s across the frontend. The two classic workers
+// parse in-process. vm.SourceTextModule is 45x faster for modules and its SyntaxError carries
+// no line number, which is the whole value of the message below. The seconds are deliberate.
+function parseAsModule(source) {
+  return spawnSync(process.execPath, ['--input-type=module', '--check'], {
+    input: source,
+    encoding: 'utf-8',
+  });
+}
+
+// Classic workers are scripts, not modules, so module grammar is the wrong check for them:
+// it would accept a static `import` that the browser rejects at registration, turning the
+// offline cache off with a green suite. CommonJS is wrong too: its function wrapper permits
+// a top-level `return` that a browser script rejects. Script uses ECMAScript Script grammar
+// without that wrapper and includes the source line in its SyntaxError stack.
+function parseAsScript(source) {
+  try {
+    new Script(source, { filename: '[stdin]' });
+    return { status: 0, stderr: '' };
+  } catch (error) {
+    if (!(error instanceof SyntaxError)) throw error;
+    return { status: 1, stderr: error.stack ?? String(error) };
+  }
+}
+
+// Which files are classic rather than module, listed rather than sniffed. `sw.js` at the
+// root is registered without `{ type: 'module' }` (index.html:111) and does nothing but
+// `importScripts('./frontend/sw.js')`, and importScripts can only load a classic script --
+// so the implementation it pulls in is classic too, whatever the registration says.
+// An explicit list means adding a worker forces a decision here instead of silently
+// inheriting module grammar.
+const CLASSIC_SCRIPTS = new Set(['sw.js', path.join('frontend', 'sw.js')]);
+
+function parserFor(relativePath) {
+  return CLASSIC_SCRIPTS.has(relativePath) ? parseAsScript : parseAsModule;
+}
+
+// Node prints `[stdin]:<line>`, then the offending source line, then the message. Anchor
+// the match on the start of a line: a real message begins one, an echoed source line that
+// happens to contain "Error:" (a throw, a log string, a comment) does not.
+function syntaxError(stderr) {
+  const lines = String(stderr).split('\n');
+  const message = lines.find((l) => /^[A-Za-z]*Error: /.test(l))?.trim() ?? 'did not parse';
+  const where = /^\[stdin\]:(\d+)$/.exec(lines[0] ?? '');
+  return where ? `line ${where[1]}: ${message}` : message;
+}
+
+describe('JS syntax', () => {
+  // A checker that accepts everything reports a green suite and guards nothing, which is
+  // how the brace count survived as long as it did. Prove it still says no.
+  it('rejects source that does not parse', () => {
+    const result = parseAsModule('export const f = () => {\n  const x = 1 +;\n  return x;\n};\n');
+    if (result.error) throw result.error;
+    assert.notStrictEqual(result.status, 0, 'the syntax check accepted invalid source');
+    assert.match(result.stderr, /SyntaxError/);
+  });
+
+  // The case above fails under every grammar node has, so it proves the checker says no
+  // but nothing about which grammar. `with` is legal in a sloppy script and a SyntaxError
+  // in a module, so this is the assertion that fails if parseAsModule is ever simplified
+  // back to `node --check <file>` and a nested package.json turns up.
+  it('parses as a module, not as a sloppy script', () => {
+    const result = parseAsModule('var o = {};\nwith (o) {}\n');
+    if (result.error) throw result.error;
+    assert.notStrictEqual(result.status, 0, 'the syntax check is not using module grammar');
+  });
+
+  // The point of the split: a static import is valid module syntax and a SyntaxError in a
+  // classic worker, so this is what fails if sw.js is ever routed back through module
+  // grammar. Without it the two parsers agree on every file currently in the tree and the
+  // distinction could be deleted with the suite still green.
+  it('checks classic workers with script grammar', () => {
+    const staticImport = parseAsScript('import { thing } from "./thing.js";\n');
+    if (staticImport.error) throw staticImport.error;
+    assert.notStrictEqual(staticImport.status, 0, 'classic workers accepted a static import');
+    assert.match(staticImport.stderr, /Cannot use import statement outside a module/);
+
+    const topLevelReturn = parseAsScript('return 1;\n');
+    if (topLevelReturn.error) throw topLevelReturn.error;
+    assert.notStrictEqual(topLevelReturn.status, 0, 'classic workers accepted a top-level return');
+
+    const commonJsBinding = parseAsScript('let require;\n');
+    if (commonJsBinding.error) throw commonJsBinding.error;
+    assert.strictEqual(
+      commonJsBinding.status,
+      0,
+      'classic workers were parsed inside a CommonJS wrapper',
+    );
+  });
+
+  it('routes both service workers to script grammar', () => {
+    assert.ok(parserFor('sw.js') === parseAsScript, 'root bridge must parse as a script');
+    assert.ok(
+      parserFor(path.join('frontend', 'sw.js')) === parseAsScript,
+      'frontend/sw.js is loaded by importScripts, so it must parse as a script',
+    );
+    assert.ok(parserFor(path.join('frontend', 'app.js')) === parseAsModule);
+  });
+
+  it('parses every frontend JS file', () => {
     const jsFiles = [];
 
     function walkDir(dir) {
@@ -216,20 +328,26 @@ describe('JS brace balance', () => {
     }
 
     walkDir(frontendDir);
+    // The root bridge sits outside frontend/ and so was never checked at all. It is three
+    // lines today, which is exactly why an unparseable edit to it would be easy to miss:
+    // nothing else here would fail, and the archive would just stop caching offline.
+    const rootWorker = path.join(rootDir, 'sw.js');
+    if (fs.existsSync(rootWorker)) jsFiles.push(rootWorker);
+    assert.ok(jsFiles.length > 0, 'found no frontend JS files to parse');
 
     const errors = [];
     for (const file of jsFiles) {
-      const content = fs.readFileSync(file, 'utf-8');
-      const openBraces = (content.match(/{/g) || []).length;
-      const closeBraces = (content.match(/}/g) || []).length;
-      // Allow some tolerance for template literals with braces
-      if (Math.abs(openBraces - closeBraces) > 5) {
-        errors.push(`${path.relative(rootDir, file)}: brace mismatch (${openBraces} open, ${closeBraces} close)`);
+      const relative = path.relative(rootDir, file);
+      const result = parserFor(relative)(fs.readFileSync(file, 'utf-8'));
+      // A fork that never ran is not a syntax error, and blaming the file for it would
+      // send the reader to the wrong place.
+      if (result.error) throw result.error;
+      if (result.status !== 0) {
+        errors.push(`${relative}: ${syntaxError(result.stderr)}`);
       }
     }
 
-    assert.strictEqual(errors.length, 0,
-      `Potential syntax issues:\n${errors.join('\n')}`);
+    assert.strictEqual(errors.length, 0, `Syntax errors:\n${errors.join('\n')}`);
   });
 });
 
