@@ -9,6 +9,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -196,11 +197,62 @@ describe('key frontend files', () => {
 });
 
 // ============================================
-// JS brace balance check
+// JS syntax check
 // ============================================
 
-describe('JS brace balance', () => {
-  it('all frontend JS files have balanced braces', () => {
+// This used to count { against } and allow a drift of five, which passed every file
+// whose braces happened to balance. A missing operand, a stray comma, an unclosed
+// paren: all invisible to it, and a genuine unclosed brace slipped through as long as
+// the count stayed within tolerance. Node's own parser answers the real question.
+//
+// Always through stdin with an explicit --input-type=module. `node --check <file>` takes
+// its grammar from the nearest package.json to that file, and outside a module package it
+// parses as a sloppy script, which accepts `with`, octal literals, and duplicate parameter
+// names that are all SyntaxErrors in a module. This package is type: module today, so the
+// two forms agree; passing the source in means a stray nested package.json cannot quietly
+// loosen the grammar later.
+//
+// One process per file, about 2s across the frontend. vm.SourceTextModule is 45x faster
+// and its SyntaxError carries no line number, which is the whole value of the message
+// below. The seconds are bought deliberately.
+function parseAsModule(source) {
+  return spawnSync(process.execPath, ['--input-type=module', '--check'], {
+    input: source,
+    encoding: 'utf-8',
+  });
+}
+
+// Node prints `[stdin]:<line>`, then the offending source line, then the message. Anchor
+// the match on the start of a line: a real message begins one, an echoed source line that
+// happens to contain "Error:" (a throw, a log string, a comment) does not.
+function syntaxError(stderr) {
+  const lines = String(stderr).split('\n');
+  const message = lines.find((l) => /^[A-Za-z]*Error: /.test(l))?.trim() ?? 'did not parse';
+  const where = /^\[stdin\]:(\d+)$/.exec(lines[0] ?? '');
+  return where ? `line ${where[1]}: ${message}` : message;
+}
+
+describe('JS syntax', () => {
+  // A checker that accepts everything reports a green suite and guards nothing, which is
+  // how the brace count survived as long as it did. Prove it still says no.
+  it('rejects source that does not parse', () => {
+    const result = parseAsModule('export const f = () => {\n  const x = 1 +;\n  return x;\n};\n');
+    if (result.error) throw result.error;
+    assert.notStrictEqual(result.status, 0, 'the syntax check accepted invalid source');
+    assert.match(result.stderr, /SyntaxError/);
+  });
+
+  // The case above fails under every grammar node has, so it proves the checker says no
+  // but nothing about which grammar. `with` is legal in a sloppy script and a SyntaxError
+  // in a module, so this is the assertion that fails if parseAsModule is ever simplified
+  // back to `node --check <file>` and a nested package.json turns up.
+  it('parses as a module, not as a sloppy script', () => {
+    const result = parseAsModule('var o = {};\nwith (o) {}\n');
+    if (result.error) throw result.error;
+    assert.notStrictEqual(result.status, 0, 'the syntax check is not using module grammar');
+  });
+
+  it('parses every frontend JS file', () => {
     const jsFiles = [];
 
     function walkDir(dir) {
@@ -216,20 +268,20 @@ describe('JS brace balance', () => {
     }
 
     walkDir(frontendDir);
+    assert.ok(jsFiles.length > 0, 'found no frontend JS files to parse');
 
     const errors = [];
     for (const file of jsFiles) {
-      const content = fs.readFileSync(file, 'utf-8');
-      const openBraces = (content.match(/{/g) || []).length;
-      const closeBraces = (content.match(/}/g) || []).length;
-      // Allow some tolerance for template literals with braces
-      if (Math.abs(openBraces - closeBraces) > 5) {
-        errors.push(`${path.relative(rootDir, file)}: brace mismatch (${openBraces} open, ${closeBraces} close)`);
+      const result = parseAsModule(fs.readFileSync(file, 'utf-8'));
+      // A fork that never ran is not a syntax error, and blaming the file for it would
+      // send the reader to the wrong place.
+      if (result.error) throw result.error;
+      if (result.status !== 0) {
+        errors.push(`${path.relative(rootDir, file)}: ${syntaxError(result.stderr)}`);
       }
     }
 
-    assert.strictEqual(errors.length, 0,
-      `Potential syntax issues:\n${errors.join('\n')}`);
+    assert.strictEqual(errors.length, 0, `Syntax errors:\n${errors.join('\n')}`);
   });
 });
 
