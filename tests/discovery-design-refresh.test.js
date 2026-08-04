@@ -77,6 +77,36 @@ describe('archive discovery visual-system refresh', () => {
     assert.match(styles, /\.archive-folder-card__tab[\s\S]*margin-left:\s*1rem/);
   });
 
+  it('uses the available Tools strip width for direct links without crowding compact layouts', () => {
+    const toolsStrip = app.slice(
+      app.indexOf('<section className="archive-tools-strip'),
+      app.indexOf('</section>', app.indexOf('<section className="archive-tools-strip')),
+    );
+
+    for (const label of ['Start here', 'Mind map', 'Dissertation reader', 'Entities', 'Analytics', 'FAQ', 'More']) {
+      assert.match(toolsStrip, new RegExp(`>${label.replace(' ', '\\s*')}<|${label}`),
+        `the homepage Tools strip must expose ${label}`);
+    }
+    assert.match(toolsStrip, /href=\$\{resolveSitePath\('dissertation\/reader\/'\)\}/);
+    assert.match(toolsStrip, /Dissertation reader[\s\S]*archive-tools-strip__status">Beta/);
+    assert.match(toolsStrip, /href=\$\{resolveSitePath\('faq\/'\)\}/);
+    assert.equal([...toolsStrip.matchAll(/archive-tools-strip__wide"/g)].length, 3,
+      'exactly three extra controls belong to the wide strip');
+    assert.match(toolsStrip, /aria-labelledby="homepage-tools-title"[\s\S]*<h2 id="homepage-tools-title"/);
+    assert.match(toolsStrip, /aria-label="More tools"[\s\S]*aria-haspopup="dialog"/);
+    assert.match(styles, /\.archive-tools-strip\s*\{[^}]*container-type:\s*inline-size/s);
+    assert.match(styles, /\.archive-tools-strip \.archive-tools-strip__wide\s*\{[^}]*display:\s*none/s,
+      'the compact override must outrank the later-loaded shared action recipe');
+    assert.match(styles, /@container\s*\(min-width:\s*56rem\)[\s\S]*\.archive-tools-strip \.archive-tools-strip__wide\s*\{[^}]*display:\s*inline-flex/s);
+    assert.match(styles, /\.archive-tools-strip \.archive-action\s*\{[^}]*white-space:\s*nowrap/s);
+  });
+
+  it('uses the pinned Lucide release name for the More tools icon', () => {
+    assert.match(app, /\bMoreHorizontal\b/);
+    assert.doesNotMatch(app, /import \{[^}]*\bEllipsis\b[^}]*\} from 'lucide-react'/,
+      'lucide-react 0.292.0 does not export the later Ellipsis alias');
+  });
+
   it('reuses the shared folder-tab silhouette on standalone archive labels', () => {
     const participate = read('features/participate/index.html');
     const participateCss = read('features/participate/styles.css');

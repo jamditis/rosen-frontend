@@ -1,37 +1,37 @@
 
 import { Component, Suspense, lazy, useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.8.13';
-import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, BookOpen, Compass, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github, Search, XCircle } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.13';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.13';
-import { withViewTransition } from './utils/viewTransition.js?v=3.8.13';
-import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.13';
-import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.13';
-import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.13';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.13';
-import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.13';
-import { resolveSitePath } from './utils/pathResolver.js?v=3.8.13';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.8.13';
-import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.8.13';
-import { sortRecords } from './utils/recordSort.js?v=3.8.13';
-import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.13';
-import Sidebar from './components/Sidebar.js?v=3.8.13';
-import WelcomeModal from './components/WelcomeModal.js?v=3.8.13';
-import RecordView from './components/RecordView.js?v=3.8.13';
-import FeaturedSection from './components/FeaturedSection.js?v=3.8.13';
-import DissertationPage from './components/DissertationPage.js?v=3.8.13';
-import ToolsModal from './components/ToolsModal.js?v=3.8.13';
-import BugReportModal from './components/BugReportModal.js?v=3.8.13';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.13';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.13';
-import EntityBrowser from './components/EntityBrowser.js?v=3.8.13';
-import Timeline from './components/Timeline.js?v=3.8.13';
-import AboutPage from './components/AboutPage.js?v=3.8.13';
-import WikiPage from './components/WikiPage.js?v=3.8.13';
-import StartHerePage from './components/StartHerePage.js?v=3.8.13';
-import ArchiveResults from './components/ArchiveResults.js?v=3.8.13';
+import { html } from './html.js?v=3.8.14';
+import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, BookOpen, BookMarked, Compass, HelpCircle, MoreHorizontal, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github, Search, XCircle } from 'lucide-react';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.14';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.14';
+import { withViewTransition } from './utils/viewTransition.js?v=3.8.14';
+import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.14';
+import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.14';
+import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.14';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.14';
+import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.14';
+import { resolveSitePath } from './utils/pathResolver.js?v=3.8.14';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.8.14';
+import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.8.14';
+import { sortRecords } from './utils/recordSort.js?v=3.8.14';
+import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.14';
+import Sidebar from './components/Sidebar.js?v=3.8.14';
+import WelcomeModal from './components/WelcomeModal.js?v=3.8.14';
+import RecordView from './components/RecordView.js?v=3.8.14';
+import FeaturedSection from './components/FeaturedSection.js?v=3.8.14';
+import DissertationPage from './components/DissertationPage.js?v=3.8.14';
+import ToolsModal from './components/ToolsModal.js?v=3.8.14';
+import BugReportModal from './components/BugReportModal.js?v=3.8.14';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.14';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.14';
+import EntityBrowser from './components/EntityBrowser.js?v=3.8.14';
+import Timeline from './components/Timeline.js?v=3.8.14';
+import AboutPage from './components/AboutPage.js?v=3.8.14';
+import WikiPage from './components/WikiPage.js?v=3.8.14';
+import StartHerePage from './components/StartHerePage.js?v=3.8.14';
+import ArchiveResults from './components/ArchiveResults.js?v=3.8.14';
 
-const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.13'));
+const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.14'));
 
 const NON_RECORD_ROUTES = new Set([
   ROUTES.analytics,
@@ -1068,35 +1068,59 @@ const App = () => {
             ${isArchiveGrid && html`
                 <div className="archive-discovery-intro">
                     ${activeFilterCount === 0 && html`
-                        <section className="archive-tools-strip archive-density--compact mb-6">
-                            <span className="archive-folder-tab archive-tools-strip__tab"><span>Tools</span></span>
+                        <section className="archive-tools-strip archive-density--compact mb-6" aria-labelledby="homepage-tools-title">
+                            <h2 id="homepage-tools-title" className="archive-folder-tab archive-tools-strip__tab"><span>Tools</span></h2>
                             <div className="archive-tools-strip__items">
+                                <button
+                                    onClick=${() => goTo(ROUTES.start)}
+                                    className="archive-action archive-action--quiet archive-tools-strip__wide"
+                                >
+                                    <${Compass} className="w-3.5 h-3.5" aria-hidden="true" />
+                                    Start here
+                                </button>
                                 <button
                                     onClick=${() => goTo(ROUTES.dissertation)}
                                     className="archive-action archive-action--quiet"
                                 >
-                                    <${BookOpen} className="w-3.5 h-3.5" />
-                                    Mind Map
+                                    <${BookOpen} className="w-3.5 h-3.5" aria-hidden="true" />
+                                    Mind map
                                 </button>
+                                <a
+                                    href=${resolveSitePath('dissertation/reader/')}
+                                    className="archive-action archive-action--quiet archive-tools-strip__wide"
+                                >
+                                    <${BookMarked} className="w-3.5 h-3.5" aria-hidden="true" />
+                                    Dissertation reader
+                                    <span className="archive-tools-strip__status">Beta</span>
+                                </a>
                                 <button
                                     onClick=${() => goTo(ROUTES.entities)}
                                     className="archive-action archive-action--quiet"
                                 >
-                                    <${Users} className="w-3.5 h-3.5" />
+                                    <${Users} className="w-3.5 h-3.5" aria-hidden="true" />
                                     Entities
                                 </button>
                                 <button
                                     onClick=${() => goTo(ROUTES.analytics)}
                                     className="archive-action archive-action--quiet"
                                 >
-                                    <${BarChart3} className="w-3.5 h-3.5" />
+                                    <${BarChart3} className="w-3.5 h-3.5" aria-hidden="true" />
                                     Analytics
                                 </button>
+                                <a
+                                    href=${resolveSitePath('faq/')}
+                                    className="archive-action archive-action--quiet archive-tools-strip__wide"
+                                >
+                                    <${HelpCircle} className="w-3.5 h-3.5" aria-hidden="true" />
+                                    FAQ
+                                </a>
                                 <button
                                     onClick=${() => setToolsModalOpen(true)}
                                     className="archive-action archive-action--quiet"
+                                    aria-label="More tools"
+                                    aria-haspopup="dialog"
                                 >
-                                    <${Compass} className="w-3.5 h-3.5" />
+                                    <${MoreHorizontal} className="w-3.5 h-3.5" aria-hidden="true" />
                                     More
                                 </button>
                             </div>
