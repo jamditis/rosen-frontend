@@ -222,6 +222,29 @@ function parseAsModule(source) {
   });
 }
 
+// Classic workers are scripts, not modules, so module grammar is the wrong check for them:
+// it would accept a static `import` that the browser rejects at registration, turning the
+// offline cache off with a green suite. `commonjs` is node's name for script grammar here,
+// and the only part being borrowed is the grammar -- nothing requires or exports.
+function parseAsScript(source) {
+  return spawnSync(process.execPath, ['--input-type=commonjs', '--check'], {
+    input: source,
+    encoding: 'utf-8',
+  });
+}
+
+// Which files are classic rather than module, listed rather than sniffed. `sw.js` at the
+// root is registered without `{ type: 'module' }` (index.html:111) and does nothing but
+// `importScripts('./frontend/sw.js')`, and importScripts can only load a classic script --
+// so the implementation it pulls in is classic too, whatever the registration says.
+// An explicit list means adding a worker forces a decision here instead of silently
+// inheriting module grammar.
+const CLASSIC_SCRIPTS = new Set(['sw.js', path.join('frontend', 'sw.js')]);
+
+function parserFor(relativePath) {
+  return CLASSIC_SCRIPTS.has(relativePath) ? parseAsScript : parseAsModule;
+}
+
 // Node prints `[stdin]:<line>`, then the offending source line, then the message. Anchor
 // the match on the start of a line: a real message begins one, an echoed source line that
 // happens to contain "Error:" (a throw, a log string, a comment) does not.
@@ -252,6 +275,26 @@ describe('JS syntax', () => {
     assert.notStrictEqual(result.status, 0, 'the syntax check is not using module grammar');
   });
 
+  // The point of the split: a static import is valid module syntax and a SyntaxError in a
+  // classic worker, so this is what fails if sw.js is ever routed back through module
+  // grammar. Without it the two parsers agree on every file currently in the tree and the
+  // distinction could be deleted with the suite still green.
+  it('checks classic workers with script grammar, which rejects import', () => {
+    const result = parseAsScript('import { thing } from "./thing.js";\n');
+    if (result.error) throw result.error;
+    assert.notStrictEqual(result.status, 0, 'classic workers are not being checked as scripts');
+    assert.match(result.stderr, /Cannot use import statement outside a module/);
+  });
+
+  it('routes both service workers to script grammar', () => {
+    assert.ok(parserFor('sw.js') === parseAsScript, 'root bridge must parse as a script');
+    assert.ok(
+      parserFor(path.join('frontend', 'sw.js')) === parseAsScript,
+      'frontend/sw.js is loaded by importScripts, so it must parse as a script',
+    );
+    assert.ok(parserFor(path.join('frontend', 'app.js')) === parseAsModule);
+  });
+
   it('parses every frontend JS file', () => {
     const jsFiles = [];
 
@@ -268,16 +311,22 @@ describe('JS syntax', () => {
     }
 
     walkDir(frontendDir);
+    // The root bridge sits outside frontend/ and so was never checked at all. It is three
+    // lines today, which is exactly why an unparseable edit to it would be easy to miss:
+    // nothing else here would fail, and the archive would just stop caching offline.
+    const rootWorker = path.join(rootDir, 'sw.js');
+    if (fs.existsSync(rootWorker)) jsFiles.push(rootWorker);
     assert.ok(jsFiles.length > 0, 'found no frontend JS files to parse');
 
     const errors = [];
     for (const file of jsFiles) {
-      const result = parseAsModule(fs.readFileSync(file, 'utf-8'));
+      const relative = path.relative(rootDir, file);
+      const result = parserFor(relative)(fs.readFileSync(file, 'utf-8'));
       // A fork that never ran is not a syntax error, and blaming the file for it would
       // send the reader to the wrong place.
       if (result.error) throw result.error;
       if (result.status !== 0) {
-        errors.push(`${path.relative(rootDir, file)}: ${syntaxError(result.stderr)}`);
+        errors.push(`${relative}: ${syntaxError(result.stderr)}`);
       }
     }
 
