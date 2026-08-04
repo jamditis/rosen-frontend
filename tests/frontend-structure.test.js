@@ -11,6 +11,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { Script } from 'node:vm';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -212,9 +213,9 @@ describe('key frontend files', () => {
 // two forms agree; passing the source in means a stray nested package.json cannot quietly
 // loosen the grammar later.
 //
-// One process per file, about 2s across the frontend. vm.SourceTextModule is 45x faster
-// and its SyntaxError carries no line number, which is the whole value of the message
-// below. The seconds are bought deliberately.
+// One child process per module file, about 2s across the frontend. The two classic workers
+// parse in-process. vm.SourceTextModule is 45x faster for modules and its SyntaxError carries
+// no line number, which is the whole value of the message below. The seconds are deliberate.
 function parseAsModule(source) {
   return spawnSync(process.execPath, ['--input-type=module', '--check'], {
     input: source,
@@ -224,13 +225,17 @@ function parseAsModule(source) {
 
 // Classic workers are scripts, not modules, so module grammar is the wrong check for them:
 // it would accept a static `import` that the browser rejects at registration, turning the
-// offline cache off with a green suite. `commonjs` is node's name for script grammar here,
-// and the only part being borrowed is the grammar -- nothing requires or exports.
+// offline cache off with a green suite. CommonJS is wrong too: its function wrapper permits
+// a top-level `return` that a browser script rejects. Script uses ECMAScript Script grammar
+// without that wrapper and includes the source line in its SyntaxError stack.
 function parseAsScript(source) {
-  return spawnSync(process.execPath, ['--input-type=commonjs', '--check'], {
-    input: source,
-    encoding: 'utf-8',
-  });
+  try {
+    new Script(source, { filename: '[stdin]' });
+    return { status: 0, stderr: '' };
+  } catch (error) {
+    if (!(error instanceof SyntaxError)) throw error;
+    return { status: 1, stderr: error.stack ?? String(error) };
+  }
 }
 
 // Which files are classic rather than module, listed rather than sniffed. `sw.js` at the
@@ -279,11 +284,23 @@ describe('JS syntax', () => {
   // classic worker, so this is what fails if sw.js is ever routed back through module
   // grammar. Without it the two parsers agree on every file currently in the tree and the
   // distinction could be deleted with the suite still green.
-  it('checks classic workers with script grammar, which rejects import', () => {
-    const result = parseAsScript('import { thing } from "./thing.js";\n');
-    if (result.error) throw result.error;
-    assert.notStrictEqual(result.status, 0, 'classic workers are not being checked as scripts');
-    assert.match(result.stderr, /Cannot use import statement outside a module/);
+  it('checks classic workers with script grammar', () => {
+    const staticImport = parseAsScript('import { thing } from "./thing.js";\n');
+    if (staticImport.error) throw staticImport.error;
+    assert.notStrictEqual(staticImport.status, 0, 'classic workers accepted a static import');
+    assert.match(staticImport.stderr, /Cannot use import statement outside a module/);
+
+    const topLevelReturn = parseAsScript('return 1;\n');
+    if (topLevelReturn.error) throw topLevelReturn.error;
+    assert.notStrictEqual(topLevelReturn.status, 0, 'classic workers accepted a top-level return');
+
+    const commonJsBinding = parseAsScript('let require;\n');
+    if (commonJsBinding.error) throw commonJsBinding.error;
+    assert.strictEqual(
+      commonJsBinding.status,
+      0,
+      'classic workers were parsed inside a CommonJS wrapper',
+    );
   });
 
   it('routes both service workers to script grammar', () => {
