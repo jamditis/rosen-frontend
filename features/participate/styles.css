@@ -182,12 +182,25 @@ button:focus-visible {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(19rem, 0.7fr);
   align-items: center;
-  gap: clamp(2.5rem, 7vw, 6rem);
+  column-gap: clamp(2.5rem, 7vw, 6rem);
+  row-gap: 0;
 }
 
 .hero-copy {
   position: relative;
   z-index: 2;
+}
+
+.hero-copy-intro {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: end;
+}
+
+.hero-copy-details {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: start;
 }
 
 .kicker,
@@ -279,6 +292,8 @@ h1 span:last-child {
 }
 
 .portrait-card {
+  grid-column: 2;
+  grid-row: 1 / span 2;
   width: min(29rem, 100%);
   margin: 0;
   justify-self: end;
@@ -683,7 +698,8 @@ footer nav a {
 @media (max-width: 980px) {
   .hero-inner {
     grid-template-columns: minmax(0, 0.95fr) minmax(16rem, 0.65fr);
-    gap: 1.5rem;
+    column-gap: 1.5rem;
+    row-gap: 0;
   }
 
   h1 {
@@ -716,10 +732,26 @@ footer nav a {
   }
 
   .hero-inner {
-    padding: 2rem 1rem 3.5rem;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
+    padding: 2.25rem 1rem 2.75rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(6.5rem, 0.75fr);
+    grid-template-areas:
+      "kicker kicker"
+      "title portrait"
+      "deck deck"
+      "actions actions"
+      "note note";
+    align-items: center;
+    column-gap: clamp(0.75rem, 3vw, 1.5rem);
+    row-gap: 1.25rem;
+  }
+
+  .hero-copy {
+    display: contents;
+  }
+
+  .kicker {
+    grid-area: kicker;
   }
 
   .hero::after {
@@ -732,14 +764,17 @@ footer nav a {
   }
 
   .portrait-card {
+    grid-area: portrait;
     z-index: 1;
-    width: min(74%, 19rem);
-    margin: 0 0 -3.5rem auto;
-    align-self: flex-end;
+    width: min(100%, 13rem);
+    margin: 0;
+    align-self: center;
+    justify-self: end;
     box-shadow: 0.8rem 0.8rem 0 rgba(242, 189, 73, 0.3);
   }
 
   .portrait {
+    height: auto;
     aspect-ratio: 4 / 4.7;
   }
 
@@ -749,7 +784,9 @@ footer nav a {
   }
 
   h1 {
-    font-size: clamp(3.15rem, 16vw, 4.8rem);
+    grid-area: title;
+    margin: 0;
+    font-size: clamp(2.6rem, 12vw, 3.35rem);
   }
 
   h1 span {
@@ -757,11 +794,20 @@ footer nav a {
   }
 
   .deck {
+    grid-area: deck;
+    margin: 0;
     font-size: 0.94rem;
   }
 
   .hero-actions {
+    grid-area: actions;
+    margin: 0;
     display: grid;
+  }
+
+  .hero-note {
+    grid-area: note;
+    margin: 0;
   }
 
   .button {
