@@ -67,6 +67,14 @@ describe('Ways to participate standalone page', () => {
     );
   });
 
+  it('keeps the wide desktop headline clear of the portrait', () => {
+    assert.match(
+      css,
+      /h1\s*\{[^}]*font-size:\s*clamp\(4rem,\s*7\.2vw,\s*6\.25rem\)/s,
+      'the headline must stop growing before its first line reaches the portrait',
+    );
+  });
+
   it('keeps the archive-themed Easter egg hidden, keyboard reachable, and record backed', () => {
     assert.match(html, /class="portrait-stamp"/);
     assert.match(html, /id="archive-secret"[^>]*hidden/);

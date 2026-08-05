@@ -205,7 +205,7 @@ h1 {
   max-width: 50rem;
   margin: 1rem 0 0;
   color: #fff;
-  font-size: clamp(4rem, 7.2vw, 6.75rem);
+  font-size: clamp(4rem, 7.2vw, 6.25rem);
   font-weight: 400;
   letter-spacing: -0.035em;
   line-height: 0.86;
