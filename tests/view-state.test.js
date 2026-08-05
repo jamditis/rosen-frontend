@@ -11,6 +11,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   ROUTES,
+  ABOUT_PRIVACY_HASH,
+  getPrivacyDetailsHref,
   DEFAULT_ROUTE,
   defaultFilters,
   parseViewState,
@@ -60,6 +62,12 @@ describe('parseViewState', () => {
     const state = parseViewState('https://example.com/archive/#wiki/concept/public-journalism');
     assert.equal(state.route, ROUTES.wiki);
     assert.deepEqual(state.routeParams, { wikiSlug: 'concept/public-journalism' });
+  });
+
+  it('parses the privacy disclosure as a nested About destination', () => {
+    const state = parseViewState(`${BASE}#${ABOUT_PRIVACY_HASH}`);
+    assert.equal(state.route, ROUTES.about);
+    assert.deepEqual(state.routeParams, { aboutSection: 'privacy-and-browser-storage' });
   });
 
   it('parses a desktop app deep link without treating it as a second route', () => {
@@ -150,6 +158,16 @@ describe('viewStateToUrl', () => {
     );
   });
 
+  it('emits the routable privacy disclosure hash', () => {
+    assert.strictEqual(
+      viewStateToUrl({
+        route: ROUTES.about,
+        routeParams: { aboutSection: 'privacy-and-browser-storage' },
+      }, BASE),
+      `${BASE}#${ABOUT_PRIVACY_HASH}`,
+    );
+  });
+
   it('emits selected entities only for canonical entity routes', () => {
     assert.strictEqual(
       viewStateToUrl({ route: ROUTES.entities, routeParams: { entityId: 'P0001' } }, BASE),
@@ -196,6 +214,14 @@ describe('viewStateToUrl', () => {
 
   it('throws a clear error when baseHref is missing', () => {
     assert.throws(() => viewStateToUrl({ route: ROUTES.about }), /requires a baseHref/);
+  });
+});
+
+describe('getPrivacyDetailsHref', () => {
+  it('builds a clean, deploy-aware privacy URL with no inherited query state', () => {
+    assert.equal(getPrivacyDetailsHref('127.0.0.1'), '/#about/privacy');
+    assert.equal(getPrivacyDetailsHref('jamditis.github.io'), '/rosen-frontend/#about/privacy');
+    assert.equal(getPrivacyDetailsHref('pressthink.org'), '/j/rosen-archive/#about/privacy');
   });
 });
 

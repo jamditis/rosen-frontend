@@ -427,7 +427,7 @@ async function testNetworkEffect(browser) {
           caption: /I'm mad as hell/i.test(document.body.textContent),
         };
       });
-      const ok = /youtube\.com\/embed\/_RujOFCHsxo/.test(embed.src || '') && /rel=0/.test(embed.src || '');
+      const ok = /youtube-nocookie\.com\/embed\/_RujOFCHsxo/.test(embed.src || '') && /rel=0/.test(embed.src || '');
       results['DIS-13'] = verdict(ok ? 'pass' : 'fail',
         ok ? '' : `iframe src=${embed.src}`,
         'low',

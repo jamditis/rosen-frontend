@@ -137,7 +137,7 @@
     "subarea": "Network-effect",
     "feature": "Embedded Network (1976) film clip",
     "user_story": "As a reader, I want to watch the 'I'm mad as hell' scene, so that I can see the film moment the analysis is built on.",
-    "expected_behavior": "A responsive 16:9 YouTube iframe (embed/_RujOFCHsxo?rel=0) sits in the dark hero with a caption. The container preserves aspect ratio via padding-bottom 56.25%.",
+    "expected_behavior": "A responsive 16:9 YouTube privacy-enhanced iframe (youtube-nocookie.com/embed/_RujOFCHsxo?rel=0) sits in the dark hero with a caption. The container preserves aspect ratio via padding-bottom 56.25%.",
     "source_files": ["dissertation/network-effect/index.html"],
     "test_notes": "Open dissertation/network-effect/index.html. Confirm the video embeds and is responsive; needs network access to YouTube.",
     "code_smell": ""

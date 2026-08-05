@@ -44,13 +44,12 @@ function writeMainVerdicts(fatalError = null) {
   }
 }
 
-// The WelcomeModal renders a full-screen overlay on first visit (gated on the
-// localStorage key jrda_visited) and intercepts card clicks. Prime the key
-// before any navigation so the modal stays dismissed and the archive is
-// interactive. Applied to every page via addInitScript.
+// The WelcomeModal renders a first-visit invitation. Prime its versioned
+// tour-state key before navigation so unrelated archive stories begin without
+// that invitation. Applied to every page via addInitScript.
 async function suppressWelcome(page) {
   await page.addInitScript(() => {
-    try { localStorage.setItem('jrda_visited', 'true'); } catch (e) {}
+    try { localStorage.setItem('rosen:tour:v1', 'dismissed'); } catch (e) {}
   });
 }
 

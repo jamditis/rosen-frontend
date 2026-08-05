@@ -38,6 +38,14 @@ test('Tools modal marks only Archive desktop and Data visualization as beta', ()
 
   assert.deepEqual(betaIds, ['dataviz', 'desktop']);
   assert.equal(statusById.get('reader'), 'ready');
+  assert.match(source, /aria-label=\$\{tool\.name\}/,
+    'status badges must not change the stable accessible name used by keyboard and preview audits');
+  assert.match(source, /aria-describedby=\$\{cardDescriptionIds\}/,
+    'tool descriptions and release status must supplement the stable card name');
+  assert.match(source, /id=\$\{toolDescriptionId\}/,
+    'every card description must be associated with its control');
+  assert.match(source, /id=\$\{toolStatusId\}/,
+    'beta status must remain available to assistive technology');
 });
 
 test('Feature-audit coverage tracks the current Tools modal beta labels', () => {
@@ -59,8 +67,38 @@ test('Feature-audit coverage tracks the current Tools modal beta labels', () => 
     'the live audit result must require exactly the current two beta tools');
   assert.match(harness, /hasAllExpectedCards/,
     'the live audit result must require every expected tool card');
+  assert.match(harness, /linkDestinations/,
+    'the live audit must exercise the destination of every link-backed tool card');
+  assert.match(harness, /hasResolvedToolLinks/,
+    'MODAL-16 must fail when a tool card does not reach its resolved local destination');
+  assert.match(harness, /configuredBasePath/,
+    'link destinations must preserve a configured production or GitHub Pages subpath');
+  assert.match(harness, /new URL\(BASE\)\.pathname/,
+    'the live audit must derive its expected prefix from the configured base URL');
+  assert.doesNotMatch(harness, /Explore tools/,
+    'the live audit must not look for the retired tools-button accessible name');
+  assert.match(harness, /\['Tools', 'More tools'\]\.includes/,
+    'the live audit should open the chooser from either current tools entry point');
   assert.doesNotMatch(harness, /hardcoded prod hrefs|hrefs are hardcoded/,
     'the live audit must not re-report the resolved-link bug as current');
+});
+
+test('Generated modal audit notes preserve direct Bluesky outbound links', () => {
+  const generatedStories = JSON.parse(read('docs/feature-audit/feature-stories.json'));
+  const modalVerdicts = JSON.parse(read('docs/feature-audit/verdicts-modals.json'));
+  const storyNotes = ['MODAL-09', 'MODAL-14']
+    .map((id) => generatedStories.find((story) => story.id === id)?.notes || '')
+    .join(' ');
+  const verdictNotes = ['MODAL-09', 'MODAL-14']
+    .map((id) => modalVerdicts[id]?.notes || '')
+    .join(' ');
+
+  for (const notes of [storyNotes, verdictNotes]) {
+    assert.doesNotMatch(notes, /embed\.bsky\.app|toEmbedUrl|bsky->embed/,
+      'audit notes must not claim the retired Bluesky embed-host rewrite is active');
+    assert.match(notes, /bsky\.app/,
+      'audit notes should record that direct Bluesky outbound links stay on bsky.app');
+  }
 });
 
 test('About page has a compiled responsive H1 and consistent keyboard focus treatment', () => {

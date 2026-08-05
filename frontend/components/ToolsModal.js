@@ -1,9 +1,9 @@
 // ToolsModal.js - Modal with icons for exploring archive tools
 import { useEffect, useRef, useCallback } from 'react';
-import { html } from '../html.js?v=3.8.15';
+import { html } from '../html.js?v=3.8.16';
 import { X, Compass, Map, BookOpen, HelpCircle, BarChart3, BookMarked, Monitor } from 'lucide-react';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.15';
-import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.15';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.16';
+import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.16';
 
 // Tool definitions with categories
 const TOOLS = {
@@ -179,15 +179,22 @@ const ToolsModal = ({ isOpen, onClose, onSelectTool }) => {
 
   const renderToolCard = (tool) => {
     const IconComponent = tool.icon;
+    const toolDescriptionId = `tool-${tool.id}-description`;
+    const toolStatusId = `tool-${tool.id}-status`;
+    const cardDescriptionIds = tool.status === 'beta'
+      ? `${toolDescriptionId} ${toolStatusId}`
+      : toolDescriptionId;
 
     return html`
       <button
         key=${tool.id}
+        aria-label=${tool.name}
+        aria-describedby=${cardDescriptionIds}
         onClick=${() => handleToolClick(tool)}
         className="archive-panel archive-tool-card group relative flex flex-col items-center p-4 sm:p-6"
       >
         ${tool.status === 'beta' && html`
-          <span className="archive-section-label absolute top-2 right-2">
+          <span id=${toolStatusId} className="archive-section-label absolute top-2 right-2">
             Beta
           </span>
         `}
@@ -200,7 +207,7 @@ const ToolsModal = ({ isOpen, onClose, onSelectTool }) => {
           ${tool.name}
         </h3>
 
-        <p className="text-xs text-stone-500 text-center leading-relaxed">
+        <p id=${toolDescriptionId} className="text-xs text-stone-500 text-center leading-relaxed">
           ${tool.description}
         </p>
       </button>

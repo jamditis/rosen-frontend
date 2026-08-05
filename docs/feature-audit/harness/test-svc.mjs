@@ -319,7 +319,7 @@ const main = async () => {
       // First find a real record id by loading archive and clicking a card.
       await page.goto(URL_OF(''), { waitUntil: 'domcontentloaded' });
       await waitLoaded(page);
-      await page.evaluate(() => { try { localStorage.setItem('jrda_visited', 'true'); } catch {} });
+      await page.evaluate(() => { try { localStorage.setItem('rosen:tour:v1', 'dismissed'); } catch {} });
       await page.waitForSelector('.archive-record-card__body', { timeout: 15000 });
       await page.evaluate(() => {
         document.querySelector('.archive-record-card__body')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -463,7 +463,7 @@ const main = async () => {
       const reqs = trackRequests(page);
       await page.goto(URL_OF(''), { waitUntil: 'domcontentloaded' });
       await waitLoaded(page);
-      await page.evaluate(() => { try { localStorage.setItem('jrda_visited', 'true'); } catch {} });
+      await page.evaluate(() => { try { localStorage.setItem('rosen:tour:v1', 'dismissed'); } catch {} });
       // SVC-06: preloadDetails fires ~1s after core load (App.js setTimeout 1000).
       await sleep(2000);
       const detailsPreloaded = countMatching(reqs, 'archive-details.json');

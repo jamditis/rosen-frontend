@@ -284,9 +284,9 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
   };
   await page.setViewportSize({ width: viewport.width, height: viewport.height });
   await page.unroute('**/data/archive-details.json').catch(() => {});
-  await page.unroute('https://www.youtube.com/embed/**').catch(() => {});
+  await page.unroute('https://www.youtube-nocookie.com/embed/**').catch(() => {});
   if (route.verifyRecordReading === 'media') {
-    await page.route('https://www.youtube.com/embed/**', async (requestRoute) => {
+    await page.route('https://www.youtube-nocookie.com/embed/**', async (requestRoute) => {
       await requestRoute.fulfill({
         contentType: 'text/html',
         body: '<!doctype html><html><head><title>Video preview</title><style>html,body{height:100%;margin:0;background:#000;color:#fff;font:16px monospace}body{display:grid;place-items:center}</style></head><body>Video preview</body></html>',
