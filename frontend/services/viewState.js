@@ -15,7 +15,8 @@
 // consumes it is intentionally deferred until the entity-index hook
 // conventions land (#130 / PR #180), so both hooks share one shape.
 
-import { parseWikiHash, wikiPageHref } from './wikiService.js?v=3.8.14';
+import { parseWikiHash, wikiPageHref } from './wikiService.js?v=3.8.16';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.16';
 
 /** Hash route names. The default route renders with no hash at all. */
 export const ROUTES = {
@@ -29,6 +30,15 @@ export const ROUTES = {
   wiki: 'wiki',
   desktop: 'desktop',
 };
+
+export const ABOUT_PRIVACY_HASH = `${ROUTES.about}/privacy`;
+const ABOUT_PRIVACY_SECTION = 'privacy-and-browser-storage';
+
+// Start from the deployed site root so a privacy entry point never inherits
+// stale record/filter query parameters from the current archive URL. Keeping
+// this as a native href preserves copy-link, new-tab, and modified-click use.
+export const getPrivacyDetailsHref = (host) =>
+  `${resolveSitePath('', host)}#${ABOUT_PRIVACY_HASH}`;
 
 export const DEFAULT_ROUTE = ROUTES.archive;
 
@@ -83,15 +93,20 @@ export function parseViewState(href) {
   const hash = url.hash.replace(/^#/, '').split('?')[0];
   const wikiHash = parseWikiHash(hash);
   const desktopHash = hash.match(/^desktop(?:\/([a-z0-9]+(?:-[a-z0-9]+)*))?$/);
+  const isAboutPrivacy = hash === ABOUT_PRIVACY_HASH;
   const route = desktopHash
     ? ROUTES.desktop
     : wikiHash.route === ROUTES.wiki
     ? ROUTES.wiki
+    : isAboutPrivacy
+    ? ROUTES.about
     : Object.values(ROUTES).includes(hash) ? hash : DEFAULT_ROUTE;
   const routeParams = desktopHash?.[1]
     ? { desktopAppId: desktopHash[1] }
     : wikiHash.route === ROUTES.wiki && wikiHash.slug
     ? { wikiSlug: wikiHash.slug }
+    : isAboutPrivacy
+    ? { aboutSection: ABOUT_PRIVACY_SECTION }
     : {};
 
   const params = url.searchParams;
@@ -172,6 +187,7 @@ export function viewStateToUrl(viewState, baseHref) {
   const wikiSlug = viewState.routeParams?.wikiSlug;
   const desktopAppId = viewState.routeParams?.desktopAppId;
   const entityId = viewState.routeParams?.entityId;
+  const aboutSection = viewState.routeParams?.aboutSection;
   const isEntityRoute = route === ROUTES.entities
     || (route === ROUTES.desktop && desktopAppId === 'entities');
   if (isEntityRoute && /^[A-Za-z0-9_.:-]+$/.test(entityId || '')) {
@@ -179,6 +195,7 @@ export function viewStateToUrl(viewState, baseHref) {
   }
   url.search = params.toString();
   url.hash = route === DEFAULT_ROUTE ? ''
+    : route === ROUTES.about && aboutSection === ABOUT_PRIVACY_SECTION ? ABOUT_PRIVACY_HASH
     : route === ROUTES.wiki && wikiSlug ? wikiPageHref(wikiSlug).slice(1)
     : route === ROUTES.desktop && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(desktopAppId || '')
       ? `${ROUTES.desktop}/${desktopAppId}`

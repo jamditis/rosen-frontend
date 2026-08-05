@@ -3335,8 +3335,50 @@ mark {
 
 .archive-panel.archive-welcome-panel {
   position: fixed;
+  padding: 0;
+  max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: var(--archive-canvas);
   animation: archive-dialog-enter var(--duration-medium) var(--ease-out);
+}
+
+.archive-welcome-panel__privacy {
+  display: flex;
+  min-height: calc(var(--archive-target-min) + 0.38rem);
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.38rem 1rem 0;
+  border-bottom: 1px solid var(--archive-manila-edge);
+  color: var(--archive-ink-muted);
+  background: var(--archive-manila);
+  font-family: var(--font-body);
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+}
+
+.archive-welcome-panel__privacy a {
+  display: inline-flex;
+  flex: none;
+  min-height: var(--archive-target-min);
+  align-items: center;
+  color: var(--archive-ink);
+  font-weight: var(--font-weight-bold);
+  text-decoration: underline;
+  text-underline-offset: 0.18rem;
+}
+
+.archive-welcome-panel__privacy a:focus-visible {
+  outline: 2px solid var(--archive-ink);
+  outline-offset: 2px;
+}
+
+.archive-welcome-panel__body {
+  position: relative;
+  padding: 1rem;
 }
 
 .archive-notice.archive-announcement {

@@ -88,7 +88,14 @@ describe('archive discovery visual-system refresh', () => {
         `the homepage Tools strip must expose ${label}`);
     }
     assert.match(toolsStrip, /href=\$\{resolveSitePath\('dissertation\/reader\/'\)\}/);
-    assert.match(toolsStrip, /Dissertation reader[\s\S]*archive-tools-strip__status">Beta/);
+    const readerHref = "href=${resolveSitePath('dissertation/reader/')}";
+    const readerStart = toolsStrip.indexOf(readerHref);
+    const readerLink = toolsStrip.slice(
+      readerStart,
+      toolsStrip.indexOf('</a>', readerStart) + 4,
+    );
+    assert.doesNotMatch(readerLink, /archive-tools-strip__status[\s\S]*Beta/,
+      'the released dissertation reader must not carry a Beta label');
     assert.match(toolsStrip, /href=\$\{resolveSitePath\('faq\/'\)\}/);
     assert.equal([...toolsStrip.matchAll(/archive-tools-strip__wide"/g)].length, 3,
       'exactly three extra controls belong to the wide strip');

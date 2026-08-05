@@ -104,7 +104,7 @@
     "subarea": "Record modal",
     "feature": "Embedded YouTube player",
     "user_story": "As a reader, I want video records to play inline, so that I can watch without opening YouTube.",
-    "expected_behavior": "If the url matches a YouTube id pattern, an aspect-video iframe loads https://www.youtube.com/embed/<id> with allowFullScreen. When a YouTube id is present the quote block is suppressed. Vimeo urls set isVideo (type label 'Video') but do not get an embedded player (only youtube ids are extracted).",
+    "expected_behavior": "If the url matches a YouTube id pattern, an aspect-video iframe loads https://www.youtube-nocookie.com/embed/<id> in YouTube privacy-enhanced mode with allowFullScreen. When a YouTube id is present the quote block is suppressed. Vimeo urls set isVideo (type label 'Video') but do not get an embedded player (only youtube ids are extracted).",
     "source_files": ["frontend/components/RecordModal.js"],
     "test_notes": "Open a record whose url is a youtube.com/watch?v= or youtu.be link and confirm the inline player renders and the quote block is hidden. Open a vimeo record and confirm it shows the 'Video' label but no embedded player.",
     "code_smell": "Vimeo is treated as video for the label but never embedded — inconsistent. The YouTube regex is broad and could mis-extract ids from non-watch URLs."
@@ -167,22 +167,22 @@
     "area": "Dissertation",
     "subarea": "Tools modal",
     "feature": "Explore tools chooser",
-    "user_story": "As a reader, I want a menu of ways to explore the dissertation and data, so that I can pick mind map, FAQ, reader, or data viz.",
-    "expected_behavior": "A centered dialog (z-[100], role=dialog, aria-modal, aria-labelledby) over a blurred backdrop. Body scroll locked while open and restored on close/unmount. Close button focused 100ms after open; Escape closes; clicking the backdrop (target===currentTarget) closes. Two sections: Dissertation Tools (Mind Map in-page action, FAQ link, Dissertation Reader link [beta]) and Data Tools (Data Visualization link [beta]). Each card is a button; 'beta' cards show an amber Beta pill. Clicking an action tool calls onSelectTool(action) then onClose; clicking a link tool navigates via window.location.href = tool.href. Footer explains the Beta marker. Renders null when closed.",
+    "user_story": "As a reader, I want a menu of ways to explore the archive, dissertation, and data, so that I can choose the tool that fits my task.",
+    "expected_behavior": "A centered dialog (z-[100], role=dialog, aria-modal, aria-labelledby) over a blurred backdrop. Body scroll locked while open and restored on close/unmount. Close button focused when the dialog opens; Escape closes; clicking the backdrop (target===currentTarget) closes. Three sections: Explore the archive (Start here [ready], Archive desktop [beta]), Dissertation tools (Mind map in-page action [ready], FAQ link [ready], Dissertation reader link [ready]), and Data tools (Data visualization link [beta]). Each card is a button; beta cards show an amber Beta pill. Clicking an action tool calls onSelectTool(action) then onClose; clicking a link tool navigates via window.location.href = resolveSitePath(tool.href). Footer explains the Beta marker. Renders null when closed.",
     "source_files": ["frontend/components/ToolsModal.js"],
-    "test_notes": "Trigger the tools modal, confirm focus lands on the close button, Escape and backdrop-click both close it, the Mind Map card runs the in-page action and closes, and link cards navigate to the dissertation/faq/reader/dataviz URLs.",
-    "code_smell": "Tool hrefs are hardcoded absolute production paths ('/j/rosen-archive/...'), so on localhost or a different deploy path the FAQ/reader/dataviz links 404. firstToolRef is wired but never used for focus."
+    "test_notes": "Trigger the tools modal, confirm focus lands on the close button, Escape and backdrop-click both close it, and confirm only Archive desktop and Data visualization show Beta pills. Confirm action cards close the dialog and link cards navigate to resolved site URLs.",
+    "code_smell": "Tool release statuses are also represented in the homepage Tools strip and desktopRegistry.js, so automated checks must keep the three surfaces aligned."
   },
   {
     "id": "MODAL-17",
     "area": "Global UI",
     "subarea": "Welcome modal",
-    "feature": "First-visit welcome modal",
-    "user_story": "As a first-time visitor, I want a one-time intro to the archive, so that I understand what it is before I start browsing.",
-    "expected_behavior": "On mount it reads localStorage 'jrda_visited'; if absent, the modal becomes visible (full-screen dark overlay, z-[70]). It introduces the archive with three feature hints (browse records, explore connections, read the dissertation). Clicking 'Enter archive' sets localStorage 'jrda_visited'='true' and hides the modal. Once visited, it never shows again. No close button other than the Enter button, and no Escape handler.",
-    "source_files": ["frontend/components/WelcomeModal.js"],
-    "test_notes": "Clear localStorage key jrda_visited and reload to see the modal; click 'Enter archive' and reload to confirm it does not reappear. Confirm Escape does NOT dismiss it.",
-    "code_smell": "No Escape/backdrop dismissal and no role=dialog/aria-modal — the only exit is the single button; a user who blocks localStorage would see it on every load."
+    "feature": "First-visit welcome invitation and privacy note",
+    "user_story": "As a first-time visitor, I want a brief, skippable introduction and clear storage disclosure, so that I can start browsing with context and without a blocking consent prompt.",
+    "expected_behavior": "On mount it reads the versioned localStorage key 'rosen:tour:v1'. If no completed or dismissed outcome exists, a non-blocking aside appears at the bottom right with Start here, Maybe later, and close actions. A compact strip says the site has no tracking cookies, notes that preferences are local, and links to the routable #about/privacy disclosure. Every exit records a terminal outcome and hides the invitation for later visits; storage failures still allow it to close for the current session.",
+    "source_files": ["frontend/components/WelcomeModal.js", "frontend/services/tourState.js", "frontend/components/AboutPage.js"],
+    "test_notes": "Clear 'rosen:tour:v1' and reload to see the invitation. Confirm it does not block the archive, the privacy Details link reaches the disclosure (including in a new tab), and Maybe later stores 'dismissed'. Reload and confirm it does not reappear.",
+    "code_smell": "The disclosure depends on the first-visit invitation for prominence, so the permanent footer link must remain available after the invitation is dismissed."
   },
   {
     "id": "MODAL-18",

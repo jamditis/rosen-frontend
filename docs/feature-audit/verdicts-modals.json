@@ -39,7 +39,7 @@
     "test_status": "pass",
     "errors_found": "",
     "severity": "",
-    "notes": "\"Read on\" link: {\"href\":\"./dissertation/reader/\",\"rel\":\"noreferrer\",\"target\":\"_blank\"} (sanitizeHref + bsky->embed rewrite applied; target=_blank rel=noreferrer). SMELL REFUTED for the stated javascript: risk: utils/linkify.js splitUrlsForLinkify only matches https?:// URLs, so a \"javascript:\" token in summary text is rendered as PLAIN TEXT, never an <a href>. The summary linkify does bypass sanitizeHref, but it can only ever emit http/https hrefs, which are already safe — there is no live-javascript-href path through summary text. No js: href found in modal (true)."
+    "notes": "\"Read on\" links pass stored source URLs through sanitizeHref; direct bsky.app links remain on bsky.app. Summary URLs become links only when they use http or https, so javascript: text remains plain text."
   },
   "MODAL-02": {
     "test_status": "pass",
@@ -87,13 +87,13 @@
     "test_status": "pass",
     "errors_found": "",
     "severity": "",
-    "notes": "\"View on Bluesky\" href=\"https://embed.bsky.app/profile/jayrosen.bsky.social/post/3ltz4oceik22w\", target=_blank, rel=noopener noreferrer, embed-rewrite-seen=true, js-scheme=false. sanitizeHref(toEmbedUrl(url)) applied per ThreadModal.js:84."
+    "notes": "\"View on Bluesky\" links pass stored post URLs directly through sanitizeHref; bsky.app links remain on bsky.app, target=_blank and rel=noopener noreferrer are preserved, and javascript: URLs are rejected."
   },
   "MODAL-16": {
-    "test_status": "partial",
-    "errors_found": "Link-tool hrefs are hardcoded to production /j/rosen-archive/... and 404 on localhost/preview: /j/rosen-archive/dissertation/faq/=404, /j/rosen-archive/dissertation/reader/=404, /j/rosen-archive/tools/active/dataviz/dataviz.html=404",
-    "severity": "medium",
-    "notes": "ToolsModal: role=dialog z=100 sections(diss=true,data=true) cards(MindMap=true,FAQ=true,Reader=true,DataViz=true) Beta=true, ESC-close=true, body overflow=\"hidden\". SMELL: hrefs hardcoded to /j/rosen-archive/... (ToolsModal.js:22-41) — confirmed below via HTTP probe; firstToolRef wired but unused for focus (close button gets focus instead). CONFIRMED: all ToolsModal link hrefs 404 on localhost (/j/rosen-archive/dissertation/faq/=404, /j/rosen-archive/dissertation/reader/=404, /j/rosen-archive/tools/active/dataviz/dataviz.html=404) — FAQ/Reader/DataViz links are dead in local dev / any non-/j/rosen-archive deploy."
+    "test_status": "pass",
+    "errors_found": "",
+    "severity": "",
+    "notes": "ToolsModal: role=dialog z=100 sections(archive=true,diss=true,data=true) toolCards=[\"Archive desktop\",\"Data visualization\",\"Dissertation reader\",\"FAQ\",\"Mind map\",\"Start here\"], betaCards=[\"Archive desktop\",\"Data visualization\"], resolved links={\"FAQ\":{\"expectedPath\":\"/faq/\",\"actualPath\":\"/faq/\"},\"Dissertation reader\":{\"expectedPath\":\"/dissertation/reader/\",\"actualPath\":\"/dissertation/reader/\"},\"Data visualization\":{\"expectedPath\":\"/tools/active/dataviz/dataviz.html\",\"actualPath\":\"/tools/active/dataviz/dataviz.html\"}}, ESC-close=true, body overflow=\"hidden\"."
   },
   "MODAL-15": {
     "test_status": "pass",
@@ -105,7 +105,7 @@
     "test_status": "pass",
     "errors_found": "",
     "severity": "",
-    "notes": "First visit showed welcome modal=true; Enter set jrda_visited=\"true\" and hid it; second visit suppressed=true. SMELL CONFIRMED: no role=dialog/aria-modal, no ESC/backdrop dismissal (only the Enter button); a localStorage-blocked browser would see it every load. Functional but an a11y/edge-case gap."
+    "notes": "First visit showed non-blocking invitation=true; privacy note=true; clean details link=true; Maybe later stored rosen:tour:v1=\"dismissed\" and hid it; second visit suppressed=true."
   },
   "MODAL-18": {
     "test_status": "pass",

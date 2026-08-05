@@ -141,6 +141,17 @@ describe('desktop tool links', () => {
     );
   });
 
+  it('keeps the dissertation reader released and data visualization in beta', () => {
+    const statusById = new Map(DESKTOP_TOOL_LINKS.map((tool) => [tool.id, tool.status]));
+    const betaIds = DESKTOP_TOOL_LINKS
+      .filter((tool) => tool.status === 'beta')
+      .map((tool) => tool.id)
+      .sort();
+
+    assert.equal(statusById.get('dissertation-reader'), 'ready');
+    assert.deepEqual(betaIds, ['dataviz']);
+  });
+
   it('points every surfaced tool at a deployed local file', () => {
     for (const tool of DESKTOP_TOOL_LINKS) {
       const relativeFile = deployedFileFor(tool.href);

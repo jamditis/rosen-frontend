@@ -1,10 +1,10 @@
-import { html } from '../html.js?v=3.8.14';
+import { html } from '../html.js?v=3.8.16';
 import { ChevronLeft, ChevronRight, FolderOpen, SearchX } from 'lucide-react';
-import { COLORS } from '../constants.js?v=3.8.14';
-import { hashString } from '../services/archiveService.js?v=3.8.14';
-import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.14';
-import { canonicalRecordUrl } from '../utils/recordDeepLink.js?v=3.8.14';
-import LoadingQuotes from './LoadingQuotes.js?v=3.8.14';
+import { COLORS } from '../constants.js?v=3.8.16';
+import { hashString } from '../services/archiveService.js?v=3.8.16';
+import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.16';
+import { canonicalRecordUrl } from '../utils/recordDeepLink.js?v=3.8.16';
+import LoadingQuotes from './LoadingQuotes.js?v=3.8.16';
 
 const Highlight = ({ text, term }) => {
   if (!term || term.length < 2) return html`<span>${text}</span>`;

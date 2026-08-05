@@ -75,7 +75,7 @@
     "test_status": "pass",
     "errors_found": "",
     "severity": "low",
-    "notes": "YouTube iframe src=https://www.youtube.com/embed/_RujOFCHsxo?rel=0, title=\"Network (1976) - I'm Mad As Hell scene\", aspect via padding-bottom=504px (56.25% of width). Caption present=true."
+    "notes": "YouTube iframe src=https://www.youtube-nocookie.com/embed/_RujOFCHsxo?rel=0, title=\"Network (1976) - I'm Mad As Hell scene\", aspect via padding-bottom=504px (56.25% of width). Caption present=true."
   },
   "DIS-14": {
     "test_status": "pass",

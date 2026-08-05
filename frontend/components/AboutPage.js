@@ -1,8 +1,8 @@
 
 import { useMemo } from 'react';
-import { html } from '../html.js?v=3.8.14';
+import { html } from '../html.js?v=3.8.16';
 import { ArrowLeft, ArrowRight, Archive, BookOpen, Network, Search, Github, Mail } from 'lucide-react';
-import ArchiveRouteHeader from './ArchiveRouteHeader.js?v=3.8.14';
+import ArchiveRouteHeader from './ArchiveRouteHeader.js?v=3.8.16';
 
 const AboutPage = ({ onBack, onStart, onParticipate, records }) => {
 
@@ -66,6 +66,23 @@ const AboutPage = ({ onBack, onStart, onParticipate, records }) => {
             </button>
           `}
         </div>
+
+        <section
+          id="privacy-and-browser-storage"
+          aria-labelledby="privacy-and-browser-storage-title"
+          tabIndex="-1"
+          className="mb-12 scroll-mt-24"
+        >
+          <h2 id="privacy-and-browser-storage-title" className="text-2xl font-display font-bold text-stone-900 mb-4">Privacy and browser storage</h2>
+          <div className="text-stone-700 leading-relaxed font-body space-y-4">
+            <p>
+              This archive does not use advertising or analytics cookies. It uses local storage, session storage, IndexedDB, and cache storage to cache archive data and remember choices such as the welcome tour, reader settings, and desktop layout.
+            </p>
+            <p>
+              That browser storage stays on your device and can be cleared through your browser's site-data controls. Some fonts, code, and images come from third parties, including Google Fonts, esm.sh, and Unsplash; those services receive ordinary connection data such as your IP address. Embedded YouTube videos use YouTube's privacy-enhanced mode.
+            </p>
+          </div>
+        </section>
 
         <section className="mb-12">
           <h2 className="text-2xl font-display font-bold text-stone-900 mb-4">About Jay Rosen</h2>
