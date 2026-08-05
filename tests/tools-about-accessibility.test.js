@@ -26,6 +26,43 @@ test('Tools modal uses available square archive styling and a one-column mobile 
   assert.doesNotMatch(source, /rounded-full bg-stone-100/);
 });
 
+test('Tools modal marks only Archive desktop and Data visualization as beta', () => {
+  const source = read('frontend/components/ToolsModal.js');
+  const tools = [...source.matchAll(/\{\s+id: '([^']+)',[\s\S]*?status: '(ready|beta)'\s+\}/g)]
+    .map((match) => ({ id: match[1], status: match[2] }));
+  const statusById = new Map(tools.map((tool) => [tool.id, tool.status]));
+  const betaIds = tools
+    .filter((tool) => tool.status === 'beta')
+    .map((tool) => tool.id)
+    .sort();
+
+  assert.deepEqual(betaIds, ['dataviz', 'desktop']);
+  assert.equal(statusById.get('reader'), 'ready');
+});
+
+test('Feature-audit coverage tracks the current Tools modal beta labels', () => {
+  const stories = JSON.parse(read('docs/feature-audit/stories-02-modals.json'));
+  const toolsStory = stories.find((story) => story.id === 'MODAL-16');
+  const generatedStories = JSON.parse(read('docs/feature-audit/feature-stories.json'));
+  const generatedToolsStory = generatedStories.find((story) => story.id === 'MODAL-16');
+  const harness = read('docs/feature-audit/harness/test-modals.mjs');
+
+  assert.ok(toolsStory, 'MODAL-16 must remain in the maintained feature-audit catalog');
+  assert.match(toolsStory.expected_behavior, /Dissertation reader link \[ready\]/);
+  assert.match(toolsStory.expected_behavior, /Archive desktop.*\[beta\]/);
+  assert.match(toolsStory.expected_behavior, /Data visualization.*\[beta\]/);
+  assert.equal(generatedToolsStory?.expected_behavior, toolsStory.expected_behavior,
+    'the generated audit catalog must match its maintained source story');
+  assert.match(harness, /betaCards:/,
+    'the live audit must collect Beta labels from individual tool cards');
+  assert.match(harness, /hasCorrectBetaCards/,
+    'the live audit result must require exactly the current two beta tools');
+  assert.match(harness, /hasAllExpectedCards/,
+    'the live audit result must require every expected tool card');
+  assert.doesNotMatch(harness, /hardcoded prod hrefs|hrefs are hardcoded/,
+    'the live audit must not re-report the resolved-link bug as current');
+});
+
 test('About page has a compiled responsive H1 and consistent keyboard focus treatment', () => {
   const source = read('frontend/components/AboutPage.js');
   const routeHeader = read('frontend/components/ArchiveRouteHeader.js');

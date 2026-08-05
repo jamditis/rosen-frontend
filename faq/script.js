@@ -1,5 +1,5 @@
 // FAQ: Ask the Dissertation
-import { FAQ_METADATA, FAQ_CATEGORIES, FAQ_ITEMS, FAQ_KEYWORDS } from './data.js?v=3.8.14';
+import { FAQ_METADATA, FAQ_CATEGORIES, FAQ_ITEMS, FAQ_KEYWORDS } from './data.js?v=3.8.15';
 
 // DOM Elements
 const faqContainer = document.getElementById('faq-container');

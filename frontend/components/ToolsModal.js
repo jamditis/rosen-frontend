@@ -1,9 +1,9 @@
 // ToolsModal.js - Modal with icons for exploring archive tools
 import { useEffect, useRef, useCallback } from 'react';
-import { html } from '../html.js?v=3.8.14';
+import { html } from '../html.js?v=3.8.15';
 import { X, Compass, Map, BookOpen, HelpCircle, BarChart3, BookMarked, Monitor } from 'lucide-react';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.14';
-import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.14';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.15';
+import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.15';
 
 // Tool definitions with categories
 const TOOLS = {
@@ -22,7 +22,7 @@ const TOOLS = {
       description: 'Explore through an optional desktop view',
       icon: Monitor,
       action: 'desktop',
-      status: 'ready'
+      status: 'beta'
     }
   ],
   dissertation: [
@@ -48,7 +48,7 @@ const TOOLS = {
       description: 'Read the full text',
       icon: BookMarked,
       href: 'dissertation/reader/',
-      status: 'beta'
+      status: 'ready'
     }
   ],
   data: [

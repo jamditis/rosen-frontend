@@ -11,3 +11,7 @@ wiki/**/*.md text eol=lf
 wiki/**/*.json text eol=lf
 data/wiki-content/**/*.md text eol=lf
 data/wiki-seed.json text eol=lf
+
+# This generated spreadsheet deliberately uses RFC 4180 CRLF records. Do not
+# report each changed row's carriage return as trailing whitespace.
+docs/feature-audit/feature-stories.csv -whitespace

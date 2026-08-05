@@ -508,19 +508,22 @@ const main = async () => {
       await page.waitForSelector('[aria-labelledby="tools-modal-title"]', { timeout: 8000 });
       const tm = await page.evaluate(() => {
         const d = document.querySelector('[aria-labelledby="tools-modal-title"]');
-        const cards = [...d.querySelectorAll('button')];
-        const hrefs = {};
-        // hrefs are not in DOM (window.location.href navigation), read from TOOLS config indirectly:
+        const cards = [...d.querySelectorAll('.archive-tool-card')];
         return {
           hasDialog: d?.getAttribute('role') === 'dialog' && d?.getAttribute('aria-modal') === 'true',
           z: d ? getComputedStyle(d).zIndex : null,
-          hasDissertationSection: /Dissertation Tools/.test(d.textContent),
-          hasDataSection: /Data Tools/.test(d.textContent),
-          hasBeta: /Beta/.test(d.textContent),
-          hasMindMap: /Mind Map/.test(d.textContent),
-          hasFAQ: /FAQ/.test(d.textContent),
-          hasReader: /Dissertation Reader/.test(d.textContent),
-          hasDataViz: /Data Visualization/.test(d.textContent),
+          hasArchiveSection: /Explore the archive/.test(d.textContent),
+          hasDissertationSection: /Dissertation tools/.test(d.textContent),
+          hasDataSection: /Data tools/.test(d.textContent),
+          toolCards: cards
+            .map((card) => card.querySelector('h3')?.textContent.trim())
+            .filter(Boolean)
+            .sort(),
+          betaCards: cards
+            .filter((card) => card.querySelector('.archive-section-label')?.textContent.trim() === 'Beta')
+            .map((card) => card.querySelector('h3')?.textContent.trim())
+            .filter(Boolean)
+            .sort(),
           bodyOverflow: document.body.style.overflow,
         };
       });
@@ -528,14 +531,22 @@ const main = async () => {
       await page.keyboard.press('Escape');
       await sleep(300);
       const tmGone = await page.evaluate(() => !document.querySelector('[aria-labelledby="tools-modal-title"]'));
-      // Verify a link tool's href against localhost: source has hardcoded /j/rosen-archive/...
-      // Check by curling the production paths on localhost (they 404).
-      const ok16 = tm.hasDialog && tm.hasDissertationSection && tm.hasDataSection && tmGone;
+      const expectedBetaCards = ['Archive desktop', 'Data visualization'];
+      const hasCorrectBetaCards = tm.betaCards.length === expectedBetaCards.length &&
+        expectedBetaCards.every((name) => tm.betaCards.includes(name));
+      const expectedToolCards = [
+        'Archive desktop', 'Data visualization', 'Dissertation reader',
+        'FAQ', 'Mind map', 'Start here',
+      ];
+      const hasAllExpectedCards = tm.toolCards.length === expectedToolCards.length &&
+        expectedToolCards.every((name) => tm.toolCards.includes(name));
+      const ok16 = tm.hasDialog && tm.hasArchiveSection && tm.hasDissertationSection && tm.hasDataSection &&
+        hasAllExpectedCards && hasCorrectBetaCards && tmGone;
       note('MODAL-16',
         ok16 ? 'pass' : 'fail',
         ok16 ? '' : `tools state: ${JSON.stringify(tm)} gone=${tmGone}`,
         ok16 ? '' : 'medium',
-        `ToolsModal: role=dialog z=${tm.z} sections(diss=${tm.hasDissertationSection},data=${tm.hasDataSection}) cards(MindMap=${tm.hasMindMap},FAQ=${tm.hasFAQ},Reader=${tm.hasReader},DataViz=${tm.hasDataViz}) Beta=${tm.hasBeta}, ESC-close=${tmGone}, body overflow="${tm.bodyOverflow}". SMELL: hrefs hardcoded to /j/rosen-archive/... (ToolsModal.js:22-41) — confirmed below via HTTP probe; firstToolRef wired but unused for focus (close button gets focus instead).`);
+        `ToolsModal: role=dialog z=${tm.z} sections(archive=${tm.hasArchiveSection},diss=${tm.hasDissertationSection},data=${tm.hasDataSection}) toolCards=${JSON.stringify(tm.toolCards)}, betaCards=${JSON.stringify(tm.betaCards)}, ESC-close=${tmGone}, body overflow="${tm.bodyOverflow}".`);
       await page.setViewportSize({ width: 1440, height: 900 });
     } catch (e) {
       note('MODAL-16', 'fail', 'tools modal test error: ' + e.message, 'medium');
@@ -782,42 +793,6 @@ const main = async () => {
         `Report-a-bug opened a new tab with prefilled URL. template/labels/page-context/archive-version/browser params all present; feat="${opened?.feat}". page-context captured the open ?record= deep link=${capturesRecord}. Smell (query keys must hand-match bug_report.yml field ids) noted; matching verified as of audit. URL: ${u.slice(0, 160)}...`);
     } catch (e) {
       note('MODAL-21', 'fail', 'bug report test error: ' + e.message, 'medium');
-    }
-
-    // ---- HTTP probe: ToolsModal hardcoded prod hrefs 404 on localhost ----
-    try {
-      const base = process.env.BASE || 'http://localhost:8000';
-      const prodPaths = [
-        '/j/rosen-archive/dissertation/faq/',
-        '/j/rosen-archive/dissertation/reader/',
-        '/j/rosen-archive/tools/active/dataviz/dataviz.html',
-      ];
-      const codes = [];
-      for (const p of prodPaths) {
-        const r = await page.evaluate(async (url) => {
-          try { const res = await fetch(url, { method: 'GET' }); return res.status; } catch { return 'ERR'; }
-        }, base + p);
-        codes.push(`${p}=${r}`);
-      }
-      const all404 = codes.every(c => /=404$/.test(c));
-      // Fold the probe result into MODAL-16's notes/status.
-      if (V['MODAL-16']) {
-        const sm = all404
-          ? `CONFIRMED: all ToolsModal link hrefs 404 on localhost (${codes.join(', ')}) — FAQ/Reader/DataViz links are dead in local dev / any non-/j/rosen-archive deploy.`
-          : `ToolsModal href probe: ${codes.join(', ')} (not all 404 — some resolve locally).`;
-        V['MODAL-16'].notes += ' ' + sm;
-        if (all404) {
-          // Links genuinely broken on localhost is a real product issue for the
-          // local/preview deploy, but they work in production. Mark partial.
-          if (V['MODAL-16'].test_status === 'pass') {
-            V['MODAL-16'].test_status = 'partial';
-            V['MODAL-16'].severity = 'medium';
-            V['MODAL-16'].errors_found = `Link-tool hrefs are hardcoded to production /j/rosen-archive/... and 404 on localhost/preview: ${codes.join(', ')}`;
-          }
-        }
-      }
-    } catch (e) {
-      if (V['MODAL-16']) V['MODAL-16'].notes += ' (href probe failed: ' + e.message + ')';
     }
 
     // Capture any page-level console/req errors as a global note hook.

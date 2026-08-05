@@ -13,10 +13,10 @@
  */
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { html } from '../html.js?v=3.8.14';
+import { html } from '../html.js?v=3.8.15';
 import { Clock, ExternalLink, ChevronDown } from 'lucide-react';
-import { COLORS } from '../constants.js?v=3.8.14';
-import { hashString } from '../services/archiveService.js?v=3.8.14';
+import { COLORS } from '../constants.js?v=3.8.15';
+import { hashString } from '../services/archiveService.js?v=3.8.15';
 
 // Time groupings
 function getTimeGroup(dateStr) {

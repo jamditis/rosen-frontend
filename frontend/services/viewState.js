@@ -15,7 +15,7 @@
 // consumes it is intentionally deferred until the entity-index hook
 // conventions land (#130 / PR #180), so both hooks share one shape.
 
-import { parseWikiHash, wikiPageHref } from './wikiService.js?v=3.8.14';
+import { parseWikiHash, wikiPageHref } from './wikiService.js?v=3.8.15';
 
 /** Hash route names. The default route renders with no hash at all. */
 export const ROUTES = {

@@ -167,11 +167,11 @@
     "area": "Dissertation",
     "subarea": "Tools modal",
     "feature": "Explore tools chooser",
-    "user_story": "As a reader, I want a menu of ways to explore the dissertation and data, so that I can pick mind map, FAQ, reader, or data viz.",
-    "expected_behavior": "A centered dialog (z-[100], role=dialog, aria-modal, aria-labelledby) over a blurred backdrop. Body scroll locked while open and restored on close/unmount. Close button focused 100ms after open; Escape closes; clicking the backdrop (target===currentTarget) closes. Two sections: Dissertation Tools (Mind Map in-page action, FAQ link, Dissertation Reader link [beta]) and Data Tools (Data Visualization link [beta]). Each card is a button; 'beta' cards show an amber Beta pill. Clicking an action tool calls onSelectTool(action) then onClose; clicking a link tool navigates via window.location.href = tool.href. Footer explains the Beta marker. Renders null when closed.",
+    "user_story": "As a reader, I want a menu of ways to explore the archive, dissertation, and data, so that I can choose the tool that fits my task.",
+    "expected_behavior": "A centered dialog (z-[100], role=dialog, aria-modal, aria-labelledby) over a blurred backdrop. Body scroll locked while open and restored on close/unmount. Close button focused when the dialog opens; Escape closes; clicking the backdrop (target===currentTarget) closes. Three sections: Explore the archive (Start here [ready], Archive desktop [beta]), Dissertation tools (Mind map in-page action [ready], FAQ link [ready], Dissertation reader link [ready]), and Data tools (Data visualization link [beta]). Each card is a button; beta cards show an amber Beta pill. Clicking an action tool calls onSelectTool(action) then onClose; clicking a link tool navigates via window.location.href = resolveSitePath(tool.href). Footer explains the Beta marker. Renders null when closed.",
     "source_files": ["frontend/components/ToolsModal.js"],
-    "test_notes": "Trigger the tools modal, confirm focus lands on the close button, Escape and backdrop-click both close it, the Mind Map card runs the in-page action and closes, and link cards navigate to the dissertation/faq/reader/dataviz URLs.",
-    "code_smell": "Tool hrefs are hardcoded absolute production paths ('/j/rosen-archive/...'), so on localhost or a different deploy path the FAQ/reader/dataviz links 404. firstToolRef is wired but never used for focus."
+    "test_notes": "Trigger the tools modal, confirm focus lands on the close button, Escape and backdrop-click both close it, and confirm only Archive desktop and Data visualization show Beta pills. Confirm action cards close the dialog and link cards navigate to resolved site URLs.",
+    "code_smell": "Tool release statuses are also represented in the homepage Tools strip and desktopRegistry.js, so automated checks must keep the three surfaces aligned."
   },
   {
     "id": "MODAL-17",
