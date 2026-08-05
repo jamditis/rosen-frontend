@@ -1,6 +1,6 @@
-import { html } from '../html.js?v=3.8.17';
-import RecordModal from './RecordModal.js?v=3.8.17';
-import { deriveNavFlags } from '../utils/modalNav.js?v=3.8.17';
+import { html } from '../html.js?v=3.8.18';
+import RecordModal from './RecordModal.js?v=3.8.18';
+import { deriveNavFlags } from '../utils/modalNav.js?v=3.8.18';
 
 /**
  * Single owner for "render the selected record."

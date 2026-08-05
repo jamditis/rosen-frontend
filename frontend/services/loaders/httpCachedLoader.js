@@ -39,8 +39,8 @@ import {
   CACHE_TTL_MS,
   MAX_LOCALSTORAGE_SIZE,
   cacheKeyFor,
-} from '../cacheConfig.js?v=3.8.17';
-import { raceTimeout } from '../../utils/raceTimeout.js?v=3.8.17';
+} from '../cacheConfig.js?v=3.8.18';
+import { raceTimeout } from '../../utils/raceTimeout.js?v=3.8.18';
 
 // localStorage key holding the last-seen deploy version.
 const DEPLOY_VERSION_KEY = 'jrda_deploy_version';
