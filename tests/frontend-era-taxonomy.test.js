@@ -96,7 +96,7 @@ describe('frontend era taxonomy (#385)', () => {
     assert.match(deployScript, /['"]data\/eras\.js['"]/, 'the full-site deploy must upload data/eras.js');
     assert.match(
       serviceWorker,
-      /`\$\{DATA_PATH\}\/eras\.js`/,
+      /`\$\{DATA_PATH\}\/eras\.js\?v=\$\{CACHE_VERSION\}`/,
       'every app-shell environment must cache data/eras.js'
     );
   });

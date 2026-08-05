@@ -15,8 +15,16 @@
 // consumes it is intentionally deferred until the entity-index hook
 // conventions land (#130 / PR #180), so both hooks share one shape.
 
-import { parseWikiHash, wikiPageHref } from './wikiService.js?v=3.8.16';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.16';
+import { parseWikiHash, wikiPageHref } from './wikiService.js?v=3.8.17';
+import {
+  ABOUT_PRIVACY_HASH,
+  ABOUT_PRIVACY_SECTION,
+} from './privacyRoute.js?v=3.8.17';
+
+export {
+  ABOUT_PRIVACY_HASH,
+  getPrivacyDetailsHref,
+} from './privacyRoute.js?v=3.8.17';
 
 /** Hash route names. The default route renders with no hash at all. */
 export const ROUTES = {
@@ -30,15 +38,6 @@ export const ROUTES = {
   wiki: 'wiki',
   desktop: 'desktop',
 };
-
-export const ABOUT_PRIVACY_HASH = `${ROUTES.about}/privacy`;
-const ABOUT_PRIVACY_SECTION = 'privacy-and-browser-storage';
-
-// Start from the deployed site root so a privacy entry point never inherits
-// stale record/filter query parameters from the current archive URL. Keeping
-// this as a native href preserves copy-link, new-tab, and modified-click use.
-export const getPrivacyDetailsHref = (host) =>
-  `${resolveSitePath('', host)}#${ABOUT_PRIVACY_HASH}`;
 
 export const DEFAULT_ROUTE = ROUTES.archive;
 

@@ -14,6 +14,6 @@ A zero-build static site — no npm/Webpack/Vite for production. `index.html` lo
 
 - **Routing:** hash-based SPA ([Archive](../data/corpus.md), Folders, Entities, Dissertation, About, Analytics); `?record=ID` opens a record modal on any route.
 - **Data loading:** split files for performance with a combined fallback — see [data/corpus.md](../data/corpus.md). Core data is cached in IndexedDB (it exceeds the localStorage cap).
-- **Service worker:** `frontend/sw.js` serves static JS cache-first with `ignoreSearch: true`, so the `?v=` bump alone does not invalidate it — only a `CACHE_VERSION` bump drops the stale cache.
+- **Service worker:** `frontend/sw.js` serves static JS and CSS cache-first under exact versioned request URLs. Releases update both the `?v=` markers and `CACHE_VERSION` so old module requests cannot match and the old cache namespace is removed.
 
 Deeper detail: [docs/narrative/architecture.md](../../docs/narrative/architecture.md). Vocabulary: [CONTEXT.md](../../CONTEXT.md). The version bump is a release-time step, not per-PR.

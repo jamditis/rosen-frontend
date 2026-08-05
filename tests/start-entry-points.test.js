@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { resolvePrivacyRoute } from '../frontend/services/privacyRoute.js';
 
 const read = (path) => readFileSync(path, 'utf8');
 
@@ -123,6 +124,36 @@ describe('Start here entry points', () => {
       'the dissertation tools audit must verify the privacy-enhanced embed host');
     assert.doesNotMatch(dissertationToolsAudit, /youtube\\\.com\\\/embed\\\/_RujOFCHsxo/,
       'the dissertation tools audit must not require the retired embed host');
+  });
+
+  it('keeps the privacy entry point loadable while the previous view-state module is cached', () => {
+    const app = read('frontend/App.js');
+    const welcome = read('frontend/components/WelcomeModal.js');
+    const viewStateImport = app.match(
+      /import\s*\{([^}]*)\}\s*from\s*['"]\.\/services\/viewState\.js[^'"]*['"]/,
+    );
+
+    assert.doesNotMatch(
+      app,
+      /import\s*\{[^}]*\b(?:ABOUT_PRIVACY_HASH|getPrivacyDetailsHref)\b[^}]*\}\s*from\s*['"]\.\/services\/viewState\.js/,
+      'App.js must not require privacy exports that do not exist in the previous cached viewState.js',
+    );
+    assert.doesNotMatch(
+      welcome,
+      /from\s*['"]\.\.\/services\/viewState\.js/,
+      'WelcomeModal must not require the previous cached viewState.js to expose a new privacy helper',
+    );
+    assert.ok(viewStateImport, 'App.js must retain its view-state import');
+    assert.deepEqual(
+      viewStateImport[1].split(',').map((name) => name.trim()).filter(Boolean).sort(),
+      ['parseViewState', 'viewStateToUrl'],
+      'transition-safe App.js imports only the view-state exports shared by the previous release',
+    );
+    assert.equal(
+      resolvePrivacyRoute('archive', '#about/privacy'),
+      'about',
+      'the shell must correct the previous view-state parser fallback for the privacy destination',
+    );
   });
 
   it('offers Start here from the About page', () => {

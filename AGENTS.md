@@ -121,8 +121,11 @@ Production deploys by FTP to `pressthink.org/j/rosen-archive/`.
 When deployment files change:
 
 1. Regenerate JSON if data changed.
-2. Bump the version in lockstep across `index.html`, `version.json`, every relevant `?v=` import string, and `frontend/sw.js` `CACHE_VERSION`. The service worker serves static JS cache-first and matches with `ignoreSearch: true`, so a `?v=` bump alone does not invalidate it — only a `CACHE_VERSION` change drops the stale cache. Skip it and returning visitors keep running old JS (security fixes included) until some later deploy happens to bump it.
-3. Upload only changed production files.
+2. Bump the version in lockstep across `index.html`, `version.json`, every relevant `?v=` import string, and `frontend/sw.js` `CACHE_VERSION`. The service worker caches static JS and CSS under exact versioned request URLs and drops old cache namespaces when a release activates. Both version markers are required so returning visitors cannot mix module releases.
+3. Upload dependencies before release entry points. For a full manual bundle,
+   preserve the order produced by `backend/scripts/deploy_full_site.py`: assets
+   and data first; standalone pages and record shells next; then root
+   `index.html`, `frontend/sw.js`, root `sw.js`, and `version.json` last.
 4. Do not upload CSVs, backup files, screenshots, or the whole repo.
 
 ## Known project constraints

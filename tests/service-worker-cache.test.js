@@ -2,8 +2,9 @@
  * Service worker cache-invalidation tests (issue #141)
  *
  * The service worker must tie its cache name to the app version so that every
- * deploy drops stale caches, and cacheFirst must ignore the `?v=` query string
- * so a cache-busted request still matches a pre-cached asset.
+ * deploy drops stale caches. Static assets must retain the `?v=` query in the
+ * cache key so an older controlling worker cannot pair modules from different
+ * releases during the first navigation after a deploy.
  */
 
 import { describe, it } from 'node:test';
@@ -17,6 +18,7 @@ const __dirname = path.dirname(__filename);
 const ROOT = path.join(__dirname, '..');
 
 const SW = fs.readFileSync(path.join(ROOT, 'frontend', 'sw.js'), 'utf8');
+const HTACCESS = fs.readFileSync(path.join(ROOT, '.htaccess'), 'utf8');
 const VERSION = JSON.parse(
   fs.readFileSync(path.join(ROOT, 'version.json'), 'utf8')
 ).version;
@@ -38,8 +40,14 @@ describe('service worker cache invalidation', () => {
     assert.doesNotMatch(SW, /['"]jrda-cache-v\d+['"]/);
   });
 
-  it('makes cacheFirst ignore the query string when matching', () => {
+  it('makes cacheFirst match the exact versioned request URL', () => {
     const fn = SW.slice(SW.indexOf('function cacheFirst'));
-    assert.match(fn, /cache\.match\(request,\s*\{\s*ignoreSearch:\s*true\s*\}\)/);
+    assert.match(fn, /cache\.match\(request\)/);
+    assert.doesNotMatch(fn, /ignoreSearch\s*:\s*true/);
+  });
+
+  it('requires both service-worker scripts to revalidate on update checks', () => {
+    assert.match(HTACCESS, /<FilesMatch "\^sw\\\.js\$">/);
+    assert.match(HTACCESS, /Cache-Control "no-cache, max-age=0, must-revalidate"/);
   });
 });

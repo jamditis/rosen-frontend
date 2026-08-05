@@ -28,4 +28,4 @@ Until credentials land, the [Curator](../people/joe-amditis.md) keeps the site c
 
 ## Cache busting (three layers)
 
-`?v=` (Cloudflare) → `sw.js CACHE_VERSION` (service-worker cache, since `ignoreSearch: true` defeats `?v=`) → archive data cache version. The version bump is a release-time step, done once across merged work, not per-PR.
+`?v=` (Cloudflare and exact service-worker request keys) → `sw.js CACHE_VERSION` (service-worker namespace cleanup) → archive data cache version. The version bump is a release-time step, done once across merged work, not per-PR. For manual releases, upload dependencies first and upload `index.html`, both service-worker scripts, and `version.json` last in the canonical deploy-manifest order.

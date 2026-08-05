@@ -114,8 +114,8 @@ The site is hosted at `pressthink.org/j/rosen-archive/` and deployed by uploadin
 
 1. Edit source files as needed.
 2. If data changed: `node data/export-archive-data.js`.
-3. Run `npm run bump-version -- X.X.X` to stamp the new version across `index.html`, `version.json`, the `?v=` import strings in `frontend/`, `faq/`, and `features/`, and the service worker's `CACHE_VERSION`. The service worker matches cached JS with `ignoreSearch: true`, so only a `CACHE_VERSION` change drops its stale cache — a `?v=` bump alone is not enough. Note that the bumper does **not** walk `dissertation/` — the dissertation subpages version their assets independently, so sweep their `?v=` strings by hand when a release touches them.
-4. Upload only the files that changed via FTP to `/wp-content/rosen-archive/`.
+3. Run `npm run bump-version -- X.X.X` to stamp the new version across `index.html`, `version.json`, versioned JS/CSS references in `frontend/`, `faq/`, `features/`, and `dissertation/`, and the service worker's `CACHE_VERSION`. The service worker uses exact versioned request URLs and removes old cache namespaces when a release activates, so both version surfaces must move together.
+4. Upload dependencies first, then standalone pages and record shells. Upload root `index.html`, `frontend/sw.js`, root `sw.js`, and `version.json` last, preserving the order from `backend/scripts/deploy_full_site.py`.
 
 **Do not upload:** CSVs, backup files, screenshots, or the `backend/`, `tests/`, `docs/`, `archived/`, `.github/`, `.claude/`, or `node_modules/` trees. See `DEPLOYMENT.md` for the full exclusion list.
 

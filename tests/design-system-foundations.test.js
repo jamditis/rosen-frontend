@@ -8,6 +8,8 @@ const legacyBridge = read('frontend/design-system/legacy-token-bridge.css');
 const recipes = read('frontend/design-system/recipes.css');
 const index = read('index.html');
 const demo = read('frontend/design-system/demo.html');
+const faq = read('faq/index.html');
+const networkEffect = read('dissertation/network-effect/index.html');
 const participate = read('features/participate/index.html');
 const participateCss = read('features/participate/styles.css');
 const startHere = read('frontend/components/StartHerePage.js');
@@ -127,6 +129,11 @@ describe('archive design-system foundations', () => {
     assert.match(demo, /name="twitter:image:alt"/);
     assert.doesNotMatch(demo, /role="dialog"|aria-modal="true"/,
       'an inert visual specimen must not announce an active modal');
+  });
+
+  it('versions Tailwind on standalone pages that use the shared build', () => {
+    assert.match(faq, new RegExp(`frontend/dist/tailwind\\.css\\?v=${appVersion}`));
+    assert.match(networkEffect, new RegExp(`frontend/dist/tailwind\\.css\\?v=${appVersion}`));
   });
 
   it('bridges semantic tokens when the previous service worker supplies its cached token file', () => {

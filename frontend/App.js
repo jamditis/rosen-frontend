@@ -1,37 +1,38 @@
 
 import { Component, Suspense, lazy, useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.8.16';
+import { html } from './html.js?v=3.8.17';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, BookOpen, BookMarked, Compass, HelpCircle, MoreHorizontal, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github, Search, XCircle } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.16';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.16';
-import { withViewTransition } from './utils/viewTransition.js?v=3.8.16';
-import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.16';
-import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.16';
-import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.16';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.16';
-import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.16';
-import { resolveSitePath } from './utils/pathResolver.js?v=3.8.16';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.8.16';
-import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.8.16';
-import { sortRecords } from './utils/recordSort.js?v=3.8.16';
-import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.16';
-import Sidebar from './components/Sidebar.js?v=3.8.16';
-import WelcomeModal from './components/WelcomeModal.js?v=3.8.16';
-import RecordView from './components/RecordView.js?v=3.8.16';
-import FeaturedSection from './components/FeaturedSection.js?v=3.8.16';
-import DissertationPage from './components/DissertationPage.js?v=3.8.16';
-import ToolsModal from './components/ToolsModal.js?v=3.8.16';
-import BugReportModal from './components/BugReportModal.js?v=3.8.16';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.16';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.16';
-import EntityBrowser from './components/EntityBrowser.js?v=3.8.16';
-import Timeline from './components/Timeline.js?v=3.8.16';
-import AboutPage from './components/AboutPage.js?v=3.8.16';
-import WikiPage from './components/WikiPage.js?v=3.8.16';
-import StartHerePage from './components/StartHerePage.js?v=3.8.16';
-import ArchiveResults from './components/ArchiveResults.js?v=3.8.16';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.17';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.17';
+import { withViewTransition } from './utils/viewTransition.js?v=3.8.17';
+import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.17';
+import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.17';
+import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.17';
+import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.17';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.17';
+import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.17';
+import { resolveSitePath } from './utils/pathResolver.js?v=3.8.17';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.8.17';
+import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.8.17';
+import { sortRecords } from './utils/recordSort.js?v=3.8.17';
+import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.17';
+import Sidebar from './components/Sidebar.js?v=3.8.17';
+import WelcomeModal from './components/WelcomeModal.js?v=3.8.17';
+import RecordView from './components/RecordView.js?v=3.8.17';
+import FeaturedSection from './components/FeaturedSection.js?v=3.8.17';
+import DissertationPage from './components/DissertationPage.js?v=3.8.17';
+import ToolsModal from './components/ToolsModal.js?v=3.8.17';
+import BugReportModal from './components/BugReportModal.js?v=3.8.17';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.17';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.17';
+import EntityBrowser from './components/EntityBrowser.js?v=3.8.17';
+import Timeline from './components/Timeline.js?v=3.8.17';
+import AboutPage from './components/AboutPage.js?v=3.8.17';
+import WikiPage from './components/WikiPage.js?v=3.8.17';
+import StartHerePage from './components/StartHerePage.js?v=3.8.17';
+import ArchiveResults from './components/ArchiveResults.js?v=3.8.17';
 
-const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.16'));
+const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.17'));
 
 const NON_RECORD_ROUTES = new Set([
   ROUTES.analytics,
@@ -51,6 +52,8 @@ const DESKTOP_GUIDED_SHELL_DESTINATIONS = new Set([
 
 const ROUTE_ENTRY_FOCUS_SELECTOR = '[data-route-entry-focus], #main-content';
 const MAX_MINI_INDEX_RETRIES = 3;
+const getCurrentRouteWithPrivacyFallback = () =>
+  resolvePrivacyRoute(getCurrentRoute(), window.location.hash);
 
 class DesktopRouteErrorBoundary extends Component {
   constructor(props) {
@@ -125,7 +128,7 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [currentRoute, setCurrentRoute] = useState(() => getCurrentRoute());
+  const [currentRoute, setCurrentRoute] = useState(() => getCurrentRouteWithPrivacyFallback());
   const [desktopAppId, setDesktopAppId] = useState(() => getDesktopAppIdFromUrl());
   const [desktopOpenAppIds, setDesktopOpenAppIds] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -253,7 +256,7 @@ const App = () => {
     migrateLegacyUrl();
 
     const syncRoute = (event) => {
-      const route = getCurrentRoute();
+      const route = getCurrentRouteWithPrivacyFallback();
       setCurrentRoute(route);
       setCurrentHash(window.location.hash);
       setDesktopAppId(getDesktopAppIdFromUrl());

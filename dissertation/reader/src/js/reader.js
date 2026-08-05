@@ -3,9 +3,9 @@
  * "The Impossible Press" by Jay Rosen (1986)
  */
 
-import ReaderSettings from './settings.js?v=3.8.16';
-import ReaderNavigation from './navigation.js?v=3.8.16';
-import ReadingProgress from './progress.js?v=3.8.16';
+import ReaderSettings from './settings.js?v=3.8.17';
+import ReaderNavigation from './navigation.js?v=3.8.17';
+import ReadingProgress from './progress.js?v=3.8.17';
 
 class DissertationReader {
   constructor() {
