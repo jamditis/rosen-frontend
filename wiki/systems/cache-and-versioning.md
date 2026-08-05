@@ -21,7 +21,7 @@ The archive has several cache layers. A release is safe only when the version kn
 
 ## The service-worker trap
 
-The service worker serves static JavaScript cache-first and uses `ignoreSearch: true`. That means the browser can keep serving an old `frontend/index.js` even when `index.html` points to `frontend/index.js?v=new`. The service-worker `CACHE_VERSION` must change to drop the old static cache.
+The service worker serves static JavaScript and CSS cache-first under exact versioned request URLs. Every release must update both the `?v=` markers and the service-worker `CACHE_VERSION`: the request markers prevent cross-release matches, while the cache version removes the previous release namespace. During manual deployment, upload dependencies before entry points so the new worker cannot pre-cache old files under new request URLs.
 
 ## Data caches
 

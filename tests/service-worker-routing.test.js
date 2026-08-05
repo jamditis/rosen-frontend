@@ -149,7 +149,7 @@ describe('service worker install precache (#274)', () => {
     const { handlers, added } = loadSW('[::1]');
     await runInstall(handlers);
     assert.ok(added.includes('/index.html'));
-    assert.ok(added.includes('/frontend/App.js'));
+    assert.ok(added.includes(`/frontend/App.js?v=${APP_VERSION}`));
     assert.ok(added.includes('/data/archive-core.json'));
     assert.equal(added.some((url) => url.startsWith('/j/rosen-archive/')), false);
   });
@@ -174,7 +174,27 @@ describe('service worker install precache (#274)', () => {
     const { handlers, added } = loadSW();
     await runInstall(handlers);
     assert.ok(added.some(u => /\/index\.html$/.test(u)), 'index.html missing from precache');
-    assert.ok(added.some(u => /\/index\.js$/.test(u)), 'index.js missing from precache');
+    assert.ok(added.some(u => /\/index\.js\?v=\d+\.\d+\.\d+$/.test(u)), 'index.js missing from precache');
+  });
+
+  it('pre-caches module and stylesheet assets under their exact release URLs', async () => {
+    const { handlers, added } = loadSW();
+    await runInstall(handlers);
+
+    assert.ok(
+      added.includes(`${BASE}/frontend/App.js?v=${APP_VERSION}`),
+      'App.js must be cached under the same versioned URL requested by the page',
+    );
+    assert.ok(
+      added.includes(`${BASE}/frontend/services/viewState.js?v=${APP_VERSION}`),
+      'viewState.js must be cached under the same versioned URL requested by App.js',
+    );
+    assert.ok(
+      added.includes(`${BASE}/frontend/services/privacyRoute.js?v=${APP_VERSION}`),
+      'the privacy routing module must be available in the offline app shell',
+    );
+    assert.equal(added.includes(`${BASE}/frontend/App.js`), false);
+    assert.equal(added.includes(`${BASE}/frontend/services/viewState.js`), false);
   });
 
   it('pre-caches the real document root in local preview', async () => {
@@ -200,6 +220,33 @@ describe('service worker install precache (#274)', () => {
       assert.ok(added.includes(`${prefix}/`), `${surface} app root missing from precache`);
     });
   }
+});
+
+describe('service worker release-boundary module loading', () => {
+  it('does not satisfy a new release URL with a cached module from the previous release', async () => {
+    const staleModule = { source: 'previous release' };
+    const freshModule = {
+      ok: true,
+      source: 'current release',
+      clone() { return this; },
+    };
+    let networkFetches = 0;
+    const { sandbox } = loadSW('pressthink.org', {
+      cacheMatch: async (_request, options) => options?.ignoreSearch ? staleModule : null,
+      fetchImpl: async () => {
+        networkFetches += 1;
+        return freshModule;
+      },
+    });
+
+    const request = {
+      url: `https://pressthink.org${BASE}/frontend/App.js?v=${APP_VERSION}`,
+    };
+    const response = await sandbox.cacheFirst(request, 'previous-release-cache');
+
+    assert.equal(response, freshModule);
+    assert.equal(networkFetches, 1);
+  });
 });
 
 describe('service worker offline navigation fallback', () => {

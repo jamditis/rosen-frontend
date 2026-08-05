@@ -52,7 +52,7 @@ describe('FAQ move and rebrand (#567)', () => {
     // Two levels up (../../) would 404 now that the page sits one level below root.
     assert.doesNotMatch(html, /\.\.\/\.\.\//);
     assert.match(html, /href="\.\.\/favicon\.ico"/);
-    assert.match(html, /href="\.\.\/frontend\/dist\/tailwind\.css"/);
+    assert.match(html, /href="\.\.\/frontend\/dist\/tailwind\.css(?:\?v=[\d.]+)?"/);
     // The ?v= cache-busting query is optional here: this asserts the ../ depth,
     // not the versioning (version-consistency.test.js owns the ?v= invariant).
     assert.match(html, /import \{ TextSelectionTool \} from '\.\.\/features\/shared\/text-selection\.js(\?v=[\d.]+)?'/);

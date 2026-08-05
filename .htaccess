@@ -66,6 +66,18 @@
     ExpiresByType application/font-woff "access plus 1 month"
 </IfModule>
 
+# Service-worker scripts must be revalidated on every update check. This
+# applies to both the stable root bridge and frontend/sw.js.
+<FilesMatch "^sw\.js$">
+    <IfModule mod_expires.c>
+        ExpiresActive Off
+    </IfModule>
+    <IfModule mod_headers.c>
+        Header always set Cache-Control "no-cache, max-age=0, must-revalidate"
+        Header always set Expires "0"
+    </IfModule>
+</FilesMatch>
+
 # Set proper MIME types
 <IfModule mod_mime.c>
     AddType application/json .json

@@ -293,8 +293,11 @@ Short version:
 
 1. Edit source files as needed.
 2. Regenerate JSON if data changed: `node data/export-archive-data.js`.
-3. Bump the version in `index.html`, `version.json`, all `?v=` import strings, and `frontend/sw.js` `CACHE_VERSION` to bust the Cloudflare cache. The service worker serves static JS cache-first with `ignoreSearch: true`, so a `?v=` bump alone does not invalidate it — only a `CACHE_VERSION` change drops the stale service-worker cache. `tests/version-consistency.test.js` enforces that `sw.js` `CACHE_VERSION` matches `version.json`.
-4. Upload only the files that changed via FTP.
+3. Bump the version in `index.html`, `version.json`, all `?v=` import strings, and `frontend/sw.js` `CACHE_VERSION` to bust the Cloudflare cache. The service worker caches static JS and CSS under their exact versioned request URLs and drops old cache namespaces when a release activates. Both version markers are required so returning visitors cannot mix module releases. `tests/version-consistency.test.js` enforces that `sw.js` `CACHE_VERSION` matches `version.json`.
+4. Upload dependencies before release entry points. For a full manual bundle,
+   preserve the order produced by `backend/scripts/deploy_full_site.py`:
+   assets and data first; standalone pages and record shells next; then root
+   `index.html`, `frontend/sw.js`, root `sw.js`, and `version.json` last.
 
 Pillar 3a (in-flight) automates this for record submissions via `backend/submission_runtime/` and the `submit-record.yml` / `sweep-stuck-rows.yml` workflows. The retired Flask server is not a fallback path; its history remains available in git.
 

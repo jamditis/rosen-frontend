@@ -284,12 +284,11 @@ describe('CACHE_VERSION', () => {
     assert.ok(match[1].length > 0, 'CACHE_VERSION is empty');
   });
 
-  // #430: the service worker serves static JS cache-first and matches with
-  // `ignoreSearch: true`, so a `?v=` bump does NOT invalidate it — only its
-  // CACHE_VERSION (the cache name) does. The sw.js comment says CACHE_VERSION is
-  // "tied to the app version in version.json", but nothing enforced it, so a
-  // deploy that bumped `?v=` / version.json but forgot sw.js shipped stale JS to
-  // returning visitors. These tests make that lockstep a CI-enforced invariant.
+  // #430: the service worker serves static assets cache-first under exact
+  // versioned request URLs, while CACHE_VERSION names the release namespace.
+  // Both surfaces must move together: request versions prevent cross-release
+  // matches and the cache version removes the previous namespace. These tests
+  // make that lockstep a CI-enforced invariant.
   // (This is the app-version cache name in sw.js, a separate concept from
   // archiveService.js's data-cache version, which tracks version.json.cache_version.)
   const readSwCacheVersion = () => {

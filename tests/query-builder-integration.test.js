@@ -347,7 +347,7 @@ describe('query composition deployment', () => {
     assert.match(serviceWorkerSrc, /['"]services\/queryComposition\.js['"]/);
     assert.match(
       serviceWorkerSrc,
-      /APP_SHELL_FRONTEND_FILES\.map\(file\s*=>\s*`\$\{FRONTEND_PATH\}\/\$\{file\}`\)/
+      /APP_SHELL_FRONTEND_FILES\.map\(file\s*=>\s*`\$\{FRONTEND_PATH\}\/\$\{file\}\?v=\$\{CACHE_VERSION\}`\)/
     );
   });
 });

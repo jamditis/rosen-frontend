@@ -175,6 +175,6 @@ describe('idb-keyval delivery wiring (#275)', () => {
   it('the service worker precaches idbCache.js through the environment-aware shell manifest', () => {
     const sw = fs.readFileSync(path.join(rootDir, 'frontend', 'sw.js'), 'utf-8');
     assert.match(sw, /['"]services\/idbCache\.js['"]/);
-    assert.match(sw, /APP_SHELL_FRONTEND_FILES\.map\(file\s*=>\s*`\$\{FRONTEND_PATH\}\/\$\{file\}`\)/);
+    assert.match(sw, /APP_SHELL_FRONTEND_FILES\.map\(file\s*=>\s*`\$\{FRONTEND_PATH\}\/\$\{file\}\?v=\$\{CACHE_VERSION\}`\)/);
   });
 });

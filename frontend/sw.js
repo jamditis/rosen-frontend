@@ -5,15 +5,15 @@
  * - HTML / navigations: Network-first, cache as offline fallback. The page must
  *   be fetched fresh after a deploy so its ?v= import strings update (#274).
  * - Data files (JSON): Stale-while-revalidate (show cached, update in background)
- * - Static assets (JS, CSS, icons, images): Cache-first (fast loads); freshness
- *   across deploys comes from CACHE_VERSION dropping the cache, not the query.
+ * - Static assets (JS, CSS, icons, images): Cache-first (fast loads). Versioned
+ *   request URLs are exact cache keys so module releases cannot be mixed.
  * - Everything else same-origin: Network-first with cache fallback.
  */
 
 // Cache version is tied to the app version in version.json. Bumping it on every
 // deploy (alongside index.html and the ?v= import strings) makes the activate
-// handler below drop every stale cache, so returning visitors never run old code.
-const CACHE_VERSION = '3.8.16';
+// handler below drop stale cache namespaces after the release takes control.
+const CACHE_VERSION = '3.8.17';
 const CACHE_NAME = `jrda-cache-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `jrda-data-${CACHE_VERSION}`;
 
@@ -77,6 +77,7 @@ const APP_SHELL_FRONTEND_FILES = [
   'services/cacheConfig.js',
   'services/idbCache.js',
   'services/queryComposition.js',
+  'services/privacyRoute.js',
   'services/router.js',
   'services/searchIndexLoader.js',
   'services/sqliteService.js',
@@ -107,8 +108,8 @@ const STATIC_ASSETS = [
   `${SITE_ROOT}/index.html`,
   `${SITE_ROOT}/favicon.ico`,
   `${SITE_ROOT}/favicon.svg`,
-  `${DATA_PATH}/eras.js`,
-  ...APP_SHELL_FRONTEND_FILES.map(file => `${FRONTEND_PATH}/${file}`)
+  `${DATA_PATH}/eras.js?v=${CACHE_VERSION}`,
+  ...APP_SHELL_FRONTEND_FILES.map(file => `${FRONTEND_PATH}/${file}?v=${CACHE_VERSION}`)
 ];
 
 // Archive data files the worker serves with stale-while-revalidate. The
@@ -335,9 +336,7 @@ async function staleWhileRevalidate(request, cacheName) {
  */
 async function cacheFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
-  // ignoreSearch so a `?v=` cache-busting query still matches the pre-cached
-  // asset. Freshness across deploys is handled by CACHE_VERSION, not the query.
-  const cachedResponse = await cache.match(request, { ignoreSearch: true });
+  const cachedResponse = await cache.match(request);
   if (cachedResponse) {
     return cachedResponse;
   }
