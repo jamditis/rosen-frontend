@@ -75,6 +75,43 @@ describe('Ways to participate standalone page', () => {
     );
   });
 
+  it('composes the mobile portrait beside the headline instead of pushing it below the hero copy', () => {
+    const mobile = css.slice(
+      css.indexOf('@media (max-width: 720px)'),
+      css.indexOf('@media (max-width: 520px)'),
+    );
+
+    assert.match(mobile, /\.hero-inner\s*\{[^}]*display:\s*grid[^}]*grid-template-columns:/s);
+    assert.match(mobile, /grid-template-areas:[^;]*"title portrait"/s);
+    assert.match(mobile, /\.hero-copy\s*\{[^}]*display:\s*contents/s);
+    assert.match(
+      mobile,
+      /h1\s*\{[^}]*grid-area:\s*title[^}]*font-size:\s*clamp\(2\.6rem,\s*12vw,\s*3\.35rem\)/s,
+    );
+    assert.match(mobile, /\.portrait-card\s*\{[^}]*grid-area:\s*portrait/s);
+    assert.match(mobile, /\.portrait\s*\{[^}]*height:\s*auto/s);
+    assert.doesNotMatch(mobile, /margin:\s*0 0 -3\.5rem auto/);
+  });
+
+  it('keeps tablet hero columns compact without opening a second-row gutter', () => {
+    const tablet = css.slice(
+      css.indexOf('@media (max-width: 980px)'),
+      css.indexOf('@media (max-width: 720px)'),
+    );
+
+    assert.match(tablet, /\.hero-inner\s*\{[^}]*column-gap:\s*1\.5rem[^}]*row-gap:\s*0/s);
+    assert.doesNotMatch(tablet, /(?:^|\n)\s*gap:\s*1\.5rem/);
+  });
+
+  it('keeps mobile focus order aligned with the visual hero order', () => {
+    const heading = html.indexOf('<h1 id="page-title">');
+    const portrait = html.indexOf('<figure class="portrait-card">');
+    const actions = html.indexOf('<div class="hero-actions">');
+
+    assert.ok(heading < portrait, 'the portrait must follow the hero heading in source order');
+    assert.ok(portrait < actions, 'the portrait control must receive focus before the lower hero actions');
+  });
+
   it('keeps the archive-themed Easter egg hidden, keyboard reachable, and record backed', () => {
     assert.match(html, /class="portrait-stamp"/);
     assert.match(html, /id="archive-secret"[^>]*hidden/);
