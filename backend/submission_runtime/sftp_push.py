@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Push regenerated JSON files from the local staging dir to pressthink.org.
+"""Push regenerated JSON files from staging to pressthink.org.
 
-Authentication is by password (ROSEN_SFTP_PASSWORD) or private key
+The legacy module name remains for callers, while the shared remote adapter
+supports certificate-verified explicit FTPS and strict-known-host SFTP.
+Authentication is by password (ROSEN_SFTP_PASSWORD) or, for SFTP, private key
 (ROSEN_SFTP_KEY_PATH, preferred over the password when both are set).
 ROSEN_SFTP_KEY_PATH is a path on disk, not a secret: in GitHub Actions the
 deploy workflows materialize it from the ROSEN_SFTP_KEY_CONTENT secret in their
@@ -22,30 +24,54 @@ from typing import Any, Dict, Iterable, Optional, Tuple
 from .artifacts import DATA_DEPLOY_JSON_FILES
 from .config import FTP_STAGING_DIR
 from .record_pages import render_record_pages, validate_record_id
+from . import remote_transfer
 
 logger = logging.getLogger("submission_runtime.sftp_push")
 
 _PUSH_FILES = DATA_DEPLOY_JSON_FILES
 
 
+class TransferConfigurationError(ValueError):
+    """A present transfer setting is invalid and must fail the push."""
+
+
+class _RemoteConnectionError(RuntimeError):
+    """Keep connection configuration failures out of record-render errors."""
+
+
 def _read_env() -> Optional[Dict[str, Any]]:
-    """Return SFTP config from env, or None when required vars are missing."""
+    """Return transfer config from env, or None when required vars are missing."""
     host = os.environ.get("ROSEN_SFTP_HOST", "").strip()
     user = os.environ.get("ROSEN_SFTP_USER", "").strip()
     remote = os.environ.get("ROSEN_SFTP_REMOTE_PATH", "").strip()
     password = os.environ.get("ROSEN_SFTP_PASSWORD", "")
     key_path = os.environ.get("ROSEN_SFTP_KEY_PATH", "").strip()
+    try:
+        protocol = remote_transfer.normalize_protocol(
+            os.environ.get("ROSEN_TRANSFER_PROTOCOL", "sftp")
+        )
+    except ValueError as exc:
+        raise TransferConfigurationError(str(exc)) from exc
 
-    if not (host and user and remote and (password or key_path)):
+    if protocol == "ftps" and host and user and remote and key_path and not password:
+        raise TransferConfigurationError(
+            "FTPS requires ROSEN_SFTP_PASSWORD; private keys are SFTP-only"
+        )
+
+    has_auth = bool(password) if protocol == "ftps" else bool(password or key_path)
+    if not (host and user and remote and has_auth):
         return None
 
     try:
-        port = int(os.environ.get("ROSEN_SFTP_PORT", "22"))
-    except (TypeError, ValueError):
-        logger.warning("ROSEN_SFTP_PORT is not an integer; treating as unconfigured")
-        return None
+        default_port = "21" if protocol == "ftps" else "22"
+        port = int(os.environ.get("ROSEN_SFTP_PORT") or default_port)
+    except (TypeError, ValueError) as exc:
+        raise TransferConfigurationError(
+            "ROSEN_SFTP_PORT must be an integer"
+        ) from exc
 
     return {
+        "protocol": protocol,
         "host": host,
         "port": port,
         "user": user,
@@ -94,9 +120,18 @@ def push_to_production(
     record_ids: Iterable[str] = (),
 ) -> Dict[str, Any]:
     """Upload staged JSON, followed by the affected record metadata shells."""
-    cfg = _read_env()
+    try:
+        cfg = _read_env()
+    except TransferConfigurationError as exc:
+        logger.error(str(exc))
+        return {
+            "ok": False,
+            "skipped": False,
+            "files_pushed": 0,
+            "error": str(exc),
+        }
     if cfg is None:
-        logger.warning("SFTP env vars not set — skipping production push")
+        logger.warning("Transfer env vars not set — skipping production push")
         return {"ok": True, "skipped": True, "files_pushed": 0, "error": None}
 
     src_dir = Path(staging_dir) if staging_dir else FTP_STAGING_DIR
@@ -141,133 +176,105 @@ def push_to_production(
         }
 
     try:
-        import paramiko
-    except ImportError:
+        cfg["remote_path"] = remote_transfer.validate_archive_data_path(
+            cfg["remote_path"], cfg.get("protocol", "sftp")
+        )
+    except ValueError as exc:
         return {
             "ok": False,
             "skipped": False,
             "files_pushed": 0,
-            "error": "paramiko not installed",
+            "error": str(exc),
         }
+    site_path = _record_site_path(cfg["remote_path"]) if selected_ids else None
 
     pushed = 0
     error = None
-    tmp_known_hosts = None
     rendered_shells: Dict[str, str] = {}
     completed = False
-    client = paramiko.SSHClient()
+    remote = None
 
     try:
-        known_hosts_raw = cfg["known_hosts"]
-        known_hosts_path = Path(known_hosts_raw).expanduser()
-        if known_hosts_path.is_file():
-            client.load_host_keys(str(known_hosts_path))
-        elif known_hosts_raw and known_hosts_raw.strip():
-            with tempfile.NamedTemporaryFile(
-                mode="w",
-                delete=False,
-                suffix=".known_hosts",
-            ) as f:
-                f.write(known_hosts_raw)
-                if not known_hosts_raw.endswith("\n"):
-                    f.write("\n")
-                tmp_known_hosts = f.name
-            client.load_host_keys(tmp_known_hosts)
-        client.set_missing_host_key_policy(paramiko.RejectPolicy())
-
-        connect_kwargs = {
-            "hostname": cfg["host"],
-            "port": cfg["port"],
-            "username": cfg["user"],
-            "timeout": 30,
-            "allow_agent": False,
-            "look_for_keys": False,
-        }
-        if cfg["key_path"]:
-            connect_kwargs["key_filename"] = cfg["key_path"]
-            if cfg["key_passphrase"]:
-                connect_kwargs["passphrase"] = cfg["key_passphrase"]
-        else:
-            connect_kwargs["password"] = cfg["password"]
-
-        client.connect(**connect_kwargs)
-        sftp = client.open_sftp()
         try:
-            if selected_ids:
-                live_template = _read_remote_text(sftp, f"{site_path}/index.html")
-                rendered_shells = render_record_pages(
-                    live_template,
-                    src_dir / "archive-data.json",
-                    selected_ids,
+            remote = remote_transfer.connect_remote(cfg)
+        except (TypeError, ValueError, UnicodeError) as exc:
+            raise _RemoteConnectionError(str(exc)) from exc
+        if selected_ids:
+            live_template = _read_remote_text(
+                remote,
+                remote_transfer.scoped_archive_child(site_path, "index.html"),
+            )
+            rendered_shells = render_record_pages(
+                live_template,
+                src_dir / "archive-data.json",
+                selected_ids,
+            )
+
+        for filename in _PUSH_FILES:
+            local = src_dir / filename
+            remote_final = remote_transfer.scoped_archive_child(
+                cfg["remote_path"], filename
+            )
+            _atomic_upload(remote, local, remote_final)
+            pushed += 1
+            logger.info(f"Pushed {filename} to {cfg['host']}:{remote_final}")
+
+        if selected_ids:
+            record_dir = remote_transfer.scoped_archive_child(site_path, "r")
+            try:
+                remote.stat(record_dir)
+            except IOError as exc:
+                if exc.errno != errno.ENOENT:
+                    raise
+                remote.mkdir(record_dir)
+
+            for record_id in selected_ids:
+                remote_final = remote_transfer.scoped_archive_child(
+                    record_dir, f"{record_id}.html"
                 )
-
-            for filename in _PUSH_FILES:
-                local = src_dir / filename
-                remote_final = f"{cfg['remote_path']}/{filename}"
-                _atomic_upload(sftp, local, remote_final)
-                pushed += 1
-                logger.info(f"Pushed {filename} to {cfg['host']}:{remote_final}")
-
-            if selected_ids:
-                record_dir = f"{site_path}/r"
-                try:
-                    sftp.stat(record_dir)
-                except IOError as exc:
-                    if exc.errno != errno.ENOENT:
-                        raise
-                    sftp.mkdir(record_dir)
-
-                for record_id in selected_ids:
-                    remote_final = f"{record_dir}/{record_id}.html"
-                    source = rendered_shells.get(record_id)
-                    if source is None:
-                        try:
-                            sftp.remove(remote_final)
-                        except IOError as exc:
-                            if exc.errno != errno.ENOENT:
-                                raise
-                        continue
-                    local_tmp = None
+                source = rendered_shells.get(record_id)
+                if source is None:
                     try:
-                        with tempfile.NamedTemporaryFile(
-                            mode="w",
-                            encoding="utf-8",
-                            delete=False,
-                            suffix=".html",
-                        ) as handle:
-                            handle.write(source)
-                            local_tmp = Path(handle.name)
-                        _atomic_upload(sftp, local_tmp, remote_final)
-                        pushed += 1
-                        logger.info(
-                            f"Pushed record shell {record_id} to "
-                            f"{cfg['host']}:{remote_final}"
-                        )
-                    finally:
-                        if local_tmp is not None:
-                            try:
-                                local_tmp.unlink()
-                            except OSError:
-                                pass
-            completed = True
-        finally:
-            sftp.close()
-    except paramiko.SSHException as exc:
-        error = f"SSH error: {exc}"
+                        remote.remove(remote_final)
+                    except IOError as exc:
+                        if exc.errno != errno.ENOENT:
+                            raise
+                    continue
+                local_tmp = None
+                try:
+                    with tempfile.NamedTemporaryFile(
+                        mode="w",
+                        encoding="utf-8",
+                        delete=False,
+                        suffix=".html",
+                    ) as handle:
+                        handle.write(source)
+                        local_tmp = Path(handle.name)
+                    _atomic_upload(remote, local_tmp, remote_final)
+                    pushed += 1
+                    logger.info(
+                        f"Pushed record shell {record_id} to "
+                        f"{cfg['host']}:{remote_final}"
+                    )
+                finally:
+                    if local_tmp is not None:
+                        try:
+                            local_tmp.unlink()
+                        except OSError:
+                            pass
+        completed = True
+    except _RemoteConnectionError as exc:
+        error = f"Transfer error: {exc}"
         logger.error(error)
     except (TypeError, ValueError, UnicodeError) as exc:
         error = f"Record shell error: {exc}"
         logger.error(error)
-    except (IOError, OSError) as exc:
+    except Exception as exc:
         error = f"Transfer error: {exc}"
         logger.error(error)
     finally:
-        client.close()
-        if tmp_known_hosts:
-            try:
-                os.unlink(tmp_known_hosts)
-            except OSError:
-                pass
+        if remote is not None:
+            remote.close()
 
     return {
         "ok": error is None and completed,

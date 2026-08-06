@@ -31,8 +31,8 @@
       "medium": 18
     },
     "byFreshness": {
-      "fresh": 4,
-      "watch": 30
+      "fresh": 5,
+      "watch": 29
     },
     "totalInternalLinks": 114,
     "totalExternalLinks": 2,
@@ -1818,13 +1818,12 @@
       "id": "systems/deploy-and-hosting",
       "type": "system",
       "title": "Deploy and hosting",
-      "description": "The archive is served from a legacy NYU Media Temple/Plesk box behind Cloudflare DNS on a GoDaddy domain; automated deploy exists but lacks SFTP credentials, so uploads are manual.",
+      "description": "The archive is served from a legacy PressThink origin behind Cloudflare DNS and deploys through explicit FTPS.",
       "tags": [
-        "blocker",
         "cloudflare",
         "deploy",
-        "hosting",
-        "sftp"
+        "ftps",
+        "hosting"
       ],
       "source": [
         "GitHub #458/#459/#367",
@@ -1832,19 +1831,18 @@
         "DEPLOYMENT.md",
         "deploy.yml"
       ],
-      "verified": "2026-06-22",
-      "timestamp": "2026-06-22",
-      "verifiedAgeDays": 49,
+      "verified": "2026-08-06",
+      "timestamp": "2026-08-06",
+      "verifiedAgeDays": 4,
       "freshness": {
-        "badge": "watch",
-        "label": "Watch",
-        "reason": "Verified 49 days before inventory",
+        "badge": "fresh",
+        "label": "Fresh",
+        "reason": "Verified 4 days before inventory",
         "sourceCount": 4
       },
       "driftRisk": "high",
       "driftReasons": [
-        "high-change topic: blocker, cloudflare, deploy, dns, hosting, sftp",
-        "verified 49 days before inventory"
+        "high-change topic: cloudflare, deploy, dns, hosting"
       ],
       "inboundCount": 11,
       "localGraph": {

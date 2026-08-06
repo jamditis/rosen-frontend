@@ -116,7 +116,8 @@ poetry run python src/workflow.py
 
 ## Deployment notes
 
-Production deploys by FTP to `pressthink.org/j/rosen-archive/`.
+Production deploys by certificate-verified FTPS to
+`pressthink.org/j/rosen-archive/`.
 
 When deployment files change:
 

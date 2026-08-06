@@ -2,7 +2,16 @@
 
 This is an internal guide for the archive's maintainers. If you're just exploring the project, start with the [root README](README.md) — you don't need anything here to browse the site or use the data.
 
-The archive is hosted at `pressthink.org/j/rosen-archive/`. Deploy by uploading changed files via FTP to `/wp-content/rosen-archive/`.
+The archive is hosted at `pressthink.org/j/rosen-archive/`. Automated deploys
+use certificate-verified explicit FTPS to the chrooted path
+`j/rosen-archive/`; the code rejects broader FTPS roots before connecting.
+
+Production Actions must set `ROSEN_TRANSFER_PROTOCOL=ftps`, port 21,
+`ROSEN_SFTP_SITE_PATH=j/rosen-archive`, and
+`ROSEN_SFTP_REMOTE_PATH=j/rosen-archive/data`. The legacy SFTP adapter remains
+available for other environments, but its absolute paths must end in those same
+archive-root and data-directory suffixes. A missing protocol selector defaults
+to SFTP for backward compatibility and will not reach Edgar's FTPS service.
 
 ## Files to deploy
 
@@ -205,6 +214,7 @@ Do not add `features/making-of/` to either deployment path or a desktop launch
 target until its separate editorial and publication gates are explicitly
 approved.
 
-## FTP credentials
+## Transfer credentials
 
-Contact the project maintainer.
+Production uses the repository's encrypted Actions secrets. Never commit or
+paste credentials into workflow files, logs, issues, or pull requests.
