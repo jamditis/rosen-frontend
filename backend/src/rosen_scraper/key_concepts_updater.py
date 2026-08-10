@@ -2,7 +2,7 @@
 """
 Key Concepts Updater Script
 
-This script analyzes raw_text content from the test_runs sheet and updates
+This script analyzes raw_text content from the master archive sheet and updates
 the key_concepts column (Q) with appropriate concepts from schema.json using
 Gemini 2.0 Flash AI analysis.
 
@@ -61,7 +61,7 @@ load_dotenv()
 # Configuration
 CREDENTIALS_FILE = "google_credentials.json"
 SPREADSHEET_NAME = os.getenv("SPREADSHEET_NAME", "📎Rosen Archive URL List")
-SHEET_NAME = "test_runs"
+DEFAULT_SHEET_NAME = "archive_records"
 BATCH_SIZE = 100  # Process 100 rows at a time
 PROGRESS_FILE = "key_concepts_progress.json"
 
@@ -278,7 +278,7 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
                  resume: bool = True, force_reprocess: bool = False,
                  dry_run: bool = False) -> Dict:
     """
-    Process rows from test_runs sheet and update key concepts.
+    Process rows from the configured master sheet and update key concepts.
 
     Args:
         spreadsheet: Google Sheets spreadsheet object
@@ -296,7 +296,8 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
         Callers use ``gemini_calls`` + ``writes`` to enforce the "AI ran but
         wrote nothing" guard.
     """
-    worksheet = spreadsheet.worksheet(SHEET_NAME)
+    sheet_name = os.getenv("ROSEN_MASTER_SHEET_TAB") or DEFAULT_SHEET_NAME
+    worksheet = spreadsheet.worksheet(sheet_name)
 
     # Per-field write counter. Counts the cells we wrote -- or, under --dry-run,
     # would have written -- so the run summary can prove work happened. A live
@@ -493,7 +494,7 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
 def main():
     """Main execution function"""
     parser = argparse.ArgumentParser(
-        description="Update key concepts in test_runs sheet using Gemini 2.0 Flash analysis"
+        description="Update key concepts in the master archive sheet using Gemini 2.0 Flash analysis"
     )
     parser.add_argument(
         '--start',

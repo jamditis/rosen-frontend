@@ -37,8 +37,10 @@ class _FakeWorksheet:
 class _FakeSpreadsheet:
     def __init__(self, worksheet):
         self._ws = worksheet
+        self.requested_tabs = []
 
     def worksheet(self, name):
+        self.requested_tabs.append(name)
         return self._ws
 
 
@@ -61,6 +63,43 @@ def _row_needing_fill():
 
 def _worksheet_with_one_fillable_row():
     return _FakeWorksheet([["h"] * _NCOLS, _row_needing_fill()])
+
+
+def test_process_rows_defaults_to_current_archive_records_tab(monkeypatch):
+    """The live workbook no longer has a ``test_runs`` tab."""
+    monkeypatch.delenv("ROSEN_MASTER_SHEET_TAB", raising=False)
+    spreadsheet = _FakeSpreadsheet(_FakeWorksheet([["h"] * _NCOLS]))
+
+    kc.process_rows(
+        spreadsheet, model=object(),
+        schema={"taxonomy": {"key_concepts": []}},
+        start_row=2, limit=1, resume=False, dry_run=True)
+
+    assert spreadsheet.requested_tabs == ["archive_records"]
+
+
+def test_process_rows_treats_empty_workflow_tab_variable_as_unset(monkeypatch):
+    monkeypatch.setenv("ROSEN_MASTER_SHEET_TAB", "")
+    spreadsheet = _FakeSpreadsheet(_FakeWorksheet([["h"] * _NCOLS]))
+
+    kc.process_rows(
+        spreadsheet, model=object(),
+        schema={"taxonomy": {"key_concepts": []}},
+        start_row=2, limit=1, resume=False, dry_run=True)
+
+    assert spreadsheet.requested_tabs == ["archive_records"]
+
+
+def test_process_rows_accepts_configured_master_tab(monkeypatch):
+    monkeypatch.setenv("ROSEN_MASTER_SHEET_TAB", "staging_records")
+    spreadsheet = _FakeSpreadsheet(_FakeWorksheet([["h"] * _NCOLS]))
+
+    kc.process_rows(
+        spreadsheet, model=object(),
+        schema={"taxonomy": {"key_concepts": []}},
+        start_row=2, limit=1, resume=False, dry_run=True)
+
+    assert spreadsheet.requested_tabs == ["staging_records"]
 
 
 def test_dry_run_counts_but_writes_nothing(monkeypatch):

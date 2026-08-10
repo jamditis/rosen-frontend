@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "generatedFrom": "scripts/okf-flight-recorder.js",
-  "asOfDate": "2026-07-21",
+  "asOfDate": "2026-08-10",
   "graphPolicy": {
     "defaultView": "local",
     "defaultHops": 1,
@@ -27,11 +27,12 @@
     },
     "byDriftRisk": {
       "high": 14,
-      "low": 9,
-      "medium": 11
+      "low": 2,
+      "medium": 18
     },
     "byFreshness": {
-      "fresh": 34
+      "fresh": 4,
+      "watch": 30
     },
     "totalInternalLinks": 114,
     "totalExternalLinks": 2,
@@ -56,16 +57,17 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 29,
+      "verifiedAgeDays": 49,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 29 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 49 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "medium",
       "driftReasons": [
-        "change-prone topic: data"
+        "change-prone topic: data",
+        "verified 49 days before inventory"
       ],
       "inboundCount": 10,
       "localGraph": {
@@ -150,16 +152,17 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 28,
+      "verifiedAgeDays": 48,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 28 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 48 days before inventory",
         "sourceCount": 5
       },
       "driftRisk": "medium",
       "driftReasons": [
-        "change-prone topic: data"
+        "change-prone topic: data",
+        "verified 48 days before inventory"
       ],
       "inboundCount": 0,
       "localGraph": {
@@ -203,16 +206,17 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 29,
+      "verifiedAgeDays": 49,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 29 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 49 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "medium",
       "driftReasons": [
-        "change-prone topic: data"
+        "change-prone topic: data",
+        "verified 49 days before inventory"
       ],
       "inboundCount": 4,
       "localGraph": {
@@ -275,16 +279,17 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 29,
+      "verifiedAgeDays": 49,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 29 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 49 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "high",
       "driftReasons": [
-        "high-change topic: launch"
+        "high-change topic: launch",
+        "verified 49 days before inventory"
       ],
       "inboundCount": 8,
       "localGraph": {
@@ -359,16 +364,17 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 29,
+      "verifiedAgeDays": 49,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 29 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 49 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "high",
       "driftReasons": [
-        "high-change topic: launch"
+        "high-change topic: launch",
+        "verified 49 days before inventory"
       ],
       "inboundCount": 2,
       "localGraph": {
@@ -437,17 +443,18 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 28,
+      "verifiedAgeDays": 48,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 28 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 48 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "high",
       "driftReasons": [
         "high-change topic: automation, launch, submission",
-        "change-prone topic: data, decisions"
+        "change-prone topic: data, decisions",
+        "verified 48 days before inventory"
       ],
       "inboundCount": 0,
       "localGraph": {
@@ -493,16 +500,17 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 28,
+      "verifiedAgeDays": 48,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 28 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 48 days before inventory",
         "sourceCount": 4
       },
       "driftRisk": "medium",
       "driftReasons": [
-        "change-prone topic: public, source"
+        "change-prone topic: public, source",
+        "verified 48 days before inventory"
       ],
       "inboundCount": 0,
       "localGraph": {
@@ -529,8 +537,8 @@
         "scripts/okf-blindfold-test.js",
         "wiki/meta/blindfold-scenarios.json"
       ],
-      "verified": "2026-07-21",
-      "timestamp": "2026-07-21",
+      "verified": "2026-08-10",
+      "timestamp": "2026-08-10",
       "verifiedAgeDays": 0,
       "freshness": {
         "badge": "fresh",
@@ -567,8 +575,8 @@
         "scripts/okf-flight-recorder.js",
         "wiki/meta/bundle-inventory.json"
       ],
-      "verified": "2026-07-21",
-      "timestamp": "2026-07-21",
+      "verified": "2026-08-10",
+      "timestamp": "2026-08-10",
       "verifiedAgeDays": 0,
       "freshness": {
         "badge": "fresh",
@@ -611,16 +619,17 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 28,
+      "verifiedAgeDays": 48,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 28 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 48 days before inventory",
         "sourceCount": 4
       },
       "driftRisk": "medium",
       "driftReasons": [
-        "change-prone topic: community, source"
+        "change-prone topic: community, source",
+        "verified 48 days before inventory"
       ],
       "inboundCount": 0,
       "localGraph": {
@@ -648,16 +657,16 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 28,
+      "verifiedAgeDays": 48,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 28 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 48 days before inventory",
         "sourceCount": 2
       },
-      "driftRisk": "low",
+      "driftRisk": "medium",
       "driftReasons": [
-        "recently verified"
+        "verified 48 days before inventory"
       ],
       "inboundCount": 0,
       "localGraph": {
@@ -690,16 +699,16 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 28,
+      "verifiedAgeDays": 48,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 28 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 48 days before inventory",
         "sourceCount": 6
       },
-      "driftRisk": "low",
+      "driftRisk": "medium",
       "driftReasons": [
-        "recently verified"
+        "verified 48 days before inventory"
       ],
       "inboundCount": 0,
       "localGraph": {
@@ -730,16 +739,16 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 28,
+      "verifiedAgeDays": 48,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 28 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 48 days before inventory",
         "sourceCount": 4
       },
-      "driftRisk": "low",
+      "driftRisk": "medium",
       "driftReasons": [
-        "recently verified"
+        "verified 48 days before inventory"
       ],
       "inboundCount": 0,
       "localGraph": {
@@ -785,16 +794,16 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 28,
+      "verifiedAgeDays": 48,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 28 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 48 days before inventory",
         "sourceCount": 3
       },
-      "driftRisk": "low",
+      "driftRisk": "medium",
       "driftReasons": [
-        "recently verified"
+        "verified 48 days before inventory"
       ],
       "inboundCount": 0,
       "localGraph": {
@@ -826,16 +835,16 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 28,
+      "verifiedAgeDays": 48,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 28 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 48 days before inventory",
         "sourceCount": 4
       },
-      "driftRisk": "low",
+      "driftRisk": "medium",
       "driftReasons": [
-        "recently verified"
+        "verified 48 days before inventory"
       ],
       "inboundCount": 1,
       "localGraph": {
@@ -873,16 +882,17 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 29,
+      "verifiedAgeDays": 49,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 29 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 49 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "high",
       "driftReasons": [
-        "high-change topic: launch"
+        "high-change topic: launch",
+        "verified 49 days before inventory"
       ],
       "inboundCount": 5,
       "localGraph": {
@@ -946,16 +956,16 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 29,
+      "verifiedAgeDays": 49,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 29 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 49 days before inventory",
         "sourceCount": 3
       },
-      "driftRisk": "low",
+      "driftRisk": "medium",
       "driftReasons": [
-        "recently verified"
+        "verified 49 days before inventory"
       ],
       "inboundCount": 4,
       "localGraph": {
@@ -1037,16 +1047,17 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 29,
+      "verifiedAgeDays": 49,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 29 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 49 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "high",
       "driftReasons": [
-        "high-change topic: launch"
+        "high-change topic: launch",
+        "verified 49 days before inventory"
       ],
       "inboundCount": 2,
       "localGraph": {
@@ -1097,16 +1108,17 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 28,
+      "verifiedAgeDays": 48,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 28 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 48 days before inventory",
         "sourceCount": 5
       },
       "driftRisk": "medium",
       "driftReasons": [
-        "change-prone topic: data, workflow"
+        "change-prone topic: data, workflow",
+        "verified 48 days before inventory"
       ],
       "inboundCount": 1,
       "localGraph": {
@@ -1159,16 +1171,17 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 29,
+      "verifiedAgeDays": 49,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 29 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 49 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "high",
       "driftReasons": [
-        "high-change topic: blocker, credential, launch, sftp"
+        "high-change topic: blocker, credential, launch, sftp",
+        "verified 49 days before inventory"
       ],
       "inboundCount": 0,
       "localGraph": {
@@ -1245,16 +1258,17 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 29,
+      "verifiedAgeDays": 49,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 29 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 49 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "medium",
       "driftReasons": [
-        "change-prone topic: public"
+        "change-prone topic: public",
+        "verified 49 days before inventory"
       ],
       "inboundCount": 1,
       "localGraph": {
@@ -1365,16 +1379,17 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 28,
+      "verifiedAgeDays": 48,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 28 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 48 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "medium",
       "driftReasons": [
-        "change-prone topic: public"
+        "change-prone topic: public",
+        "verified 48 days before inventory"
       ],
       "inboundCount": 0,
       "localGraph": {
@@ -1486,16 +1501,17 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 29,
+      "verifiedAgeDays": 49,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 29 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 49 days before inventory",
         "sourceCount": 1
       },
       "driftRisk": "medium",
       "driftReasons": [
-        "change-prone topic: provenance, source, verification"
+        "change-prone topic: provenance, source, verification",
+        "verified 49 days before inventory"
       ],
       "inboundCount": 0,
       "localGraph": {
@@ -1536,17 +1552,18 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 28,
+      "verifiedAgeDays": 48,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 28 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 48 days before inventory",
         "sourceCount": 6
       },
       "driftRisk": "high",
       "driftReasons": [
         "high-change topic: deploy",
-        "change-prone topic: verification"
+        "change-prone topic: verification",
+        "verified 48 days before inventory"
       ],
       "inboundCount": 0,
       "localGraph": {
@@ -1596,17 +1613,18 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 28,
+      "verifiedAgeDays": 48,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 28 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 48 days before inventory",
         "sourceCount": 7
       },
       "driftRisk": "high",
       "driftReasons": [
         "high-change topic: cache, deploy, versioning",
-        "change-prone topic: data"
+        "change-prone topic: data",
+        "verified 48 days before inventory"
       ],
       "inboundCount": 1,
       "localGraph": {
@@ -1654,16 +1672,17 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 28,
+      "verifiedAgeDays": 48,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 28 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 48 days before inventory",
         "sourceCount": 4
       },
       "driftRisk": "high",
       "driftReasons": [
-        "high-change topic: ci, github-actions, testing"
+        "high-change topic: ci, github-actions, testing",
+        "verified 48 days before inventory"
       ],
       "inboundCount": 1,
       "localGraph": {
@@ -1717,16 +1736,17 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 29,
+      "verifiedAgeDays": 49,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 29 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 49 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "medium",
       "driftReasons": [
-        "change-prone topic: data"
+        "change-prone topic: data",
+        "verified 49 days before inventory"
       ],
       "inboundCount": 2,
       "localGraph": {
@@ -1814,16 +1834,17 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 29,
+      "verifiedAgeDays": 49,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 29 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 49 days before inventory",
         "sourceCount": 4
       },
       "driftRisk": "high",
       "driftReasons": [
-        "high-change topic: blocker, cloudflare, deploy, dns, hosting, sftp"
+        "high-change topic: blocker, cloudflare, deploy, dns, hosting, sftp",
+        "verified 49 days before inventory"
       ],
       "inboundCount": 11,
       "localGraph": {
@@ -1887,16 +1908,17 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 29,
+      "verifiedAgeDays": 49,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 29 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 49 days before inventory",
         "sourceCount": 3
       },
       "driftRisk": "high",
       "driftReasons": [
-        "high-change topic: launch"
+        "high-change topic: launch",
+        "verified 49 days before inventory"
       ],
       "inboundCount": 3,
       "localGraph": {
@@ -1952,16 +1974,16 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 29,
+      "verifiedAgeDays": 49,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 29 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 49 days before inventory",
         "sourceCount": 3
       },
-      "driftRisk": "low",
+      "driftRisk": "medium",
       "driftReasons": [
-        "recently verified"
+        "verified 49 days before inventory"
       ],
       "inboundCount": 4,
       "localGraph": {
@@ -2023,13 +2045,13 @@
         "docs/setup/maintenance-runbook.md",
         "docs/setup/pillar-3a-runbook.md"
       ],
-      "verified": "2026-06-23",
+      "verified": "2026-08-10",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 28,
+      "verifiedAgeDays": 0,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 28 days before inventory",
+        "reason": "Verified 0 days before inventory",
         "sourceCount": 5
       },
       "driftRisk": "high",
@@ -2103,16 +2125,17 @@
       ],
       "verified": "2026-06-23",
       "timestamp": "2026-06-23",
-      "verifiedAgeDays": 28,
+      "verifiedAgeDays": 48,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 28 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 48 days before inventory",
         "sourceCount": 6
       },
       "driftRisk": "medium",
       "driftReasons": [
-        "change-prone topic: community, data, public"
+        "change-prone topic: community, data, public",
+        "verified 48 days before inventory"
       ],
       "inboundCount": 1,
       "localGraph": {
@@ -2152,11 +2175,11 @@
       ],
       "verified": "2026-07-21",
       "timestamp": "2026-07-21",
-      "verifiedAgeDays": 0,
+      "verifiedAgeDays": 20,
       "freshness": {
         "badge": "fresh",
         "label": "Fresh",
-        "reason": "Verified 0 days before inventory",
+        "reason": "Verified 20 days before inventory",
         "sourceCount": 4
       },
       "driftRisk": "high",
@@ -2221,16 +2244,17 @@
       ],
       "verified": "2026-06-22",
       "timestamp": "2026-06-22",
-      "verifiedAgeDays": 29,
+      "verifiedAgeDays": 49,
       "freshness": {
-        "badge": "fresh",
-        "label": "Fresh",
-        "reason": "Verified 29 days before inventory",
+        "badge": "watch",
+        "label": "Watch",
+        "reason": "Verified 49 days before inventory",
         "sourceCount": 4
       },
       "driftRisk": "high",
       "driftReasons": [
-        "high-change topic: launch"
+        "high-change topic: launch",
+        "verified 49 days before inventory"
       ],
       "inboundCount": 1,
       "localGraph": {

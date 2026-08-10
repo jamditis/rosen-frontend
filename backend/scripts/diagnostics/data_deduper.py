@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-This script performs two main functions:
-1.  It cleans and deduplicates specified columns in the 'test_runs' Google Sheet.
-2.  It updates the 'entities' sheet by finding all mentions of each entity
-    within the 'test_runs' sheet and recording the corresponding record IDs.
+This script cleans and deduplicates configured multi-value columns in the
+current archive-records Google Sheet tab.
+
+It can also run the legacy entity-mention recomputation for workbooks that
+still have compatible ``entities`` and ``entity_mentions`` schemas. That pass
+is opt-in because the live workbook uses separate ``extracted_entities`` and
+``extracted_relationships`` tabs.
 
 This script operates without using any AI services and uses batch updates for efficiency.
 """
@@ -37,6 +40,7 @@ COLUMNS_TO_SEARCH_FOR_MENTIONS = [
 ]
 BATCH_SIZE = 100
 DELAY_BETWEEN_BATCHES = 5
+DEFAULT_MASTER_SHEET_TAB = "archive_records"
 # -------------------
 
 def clean_and_dedupe_cell(cell_value):
@@ -48,7 +52,7 @@ def clean_and_dedupe_cell(cell_value):
     unique_items = sorted(list(set(cleaned_items)))
     return ", ".join(unique_items)
 
-def update_entity_mentions(sh, test_runs_data, test_runs_header, dry_run=False):
+def update_entity_mentions(sh, master_data, master_header, dry_run=False):
     """Finds and updates entity mentions in the 'entities' sheet using batch updates.
 
     When ``dry_run`` is True the queued changes are counted and logged but no
@@ -66,20 +70,20 @@ def update_entity_mentions(sh, test_runs_data, test_runs_header, dry_run=False):
         entities_rows = entities_data[1:]
     except Exception as e:
         print(f"  [FATAL] Could not read 'entities' sheet. Error: {e}")
-        return 0
+        raise
 
     try:
         entity_name_col = entities_header.index('entity_name')
         entity_mentions_col = entities_header.index('entity_mentions')
-        record_id_col = test_runs_header.index('id')
-        search_col_indices = [test_runs_header.index(col) for col in COLUMNS_TO_SEARCH_FOR_MENTIONS]
+        record_id_col = master_header.index('id')
+        search_col_indices = [master_header.index(col) for col in COLUMNS_TO_SEARCH_FOR_MENTIONS]
     except ValueError as e:
         print(f"  [FATAL] A required column was not found in a sheet header: {e}")
-        return 0
+        raise
 
     entity_mentions_map = {row[entity_name_col]: set(re.split(r'[,;]\s*', row[entity_mentions_col])) if entity_mentions_col < len(row) and row[entity_mentions_col] else set() for row in entities_rows}
 
-    for record in test_runs_data:
+    for record in master_data:
         record_id = record[record_id_col]
         if not record_id:
             continue
@@ -121,7 +125,7 @@ def update_entity_mentions(sh, test_runs_data, test_runs_header, dry_run=False):
                     time.sleep(DELAY_BETWEEN_BATCHES)
                 except Exception as e:
                     print(f"  [FAIL] Batch update for 'entities' sheet failed. Error: {e}")
-                    return total_updates
+                    raise
 
     if batch_updates:
         if dry_run:
@@ -135,13 +139,16 @@ def update_entity_mentions(sh, test_runs_data, test_runs_header, dry_run=False):
                 print("  [SUCCESS] Final batch complete.")
             except Exception as e:
                 print(f"  [FAIL] Final batch update for 'entities' sheet failed. Error: {e}")
+                raise
 
     label = "would update" if dry_run else "updated"
     print(f"--- Entity Mention Process Complete. Total entities {label}: {total_updates} ---")
     return total_updates
 
-def run_deduplication(worksheet, data, header, dry_run=False):
-    """Runs the deduplication process on the test_runs sheet using batch updates.
+def run_deduplication(
+        worksheet, data, header, dry_run=False,
+        sheet_tab=DEFAULT_MASTER_SHEET_TAB):
+    """Runs the deduplication process on the selected sheet using batch updates.
 
     When ``dry_run`` is True the queued changes are counted and logged but no
     ``batch_update`` is sent. Returns the number of cells changed (or that would
@@ -149,11 +156,22 @@ def run_deduplication(worksheet, data, header, dry_run=False):
     """
     print("--- Starting Data Deduplication and Cleaning Process"
           + (" (DRY RUN)" if dry_run else "") + " ---")
-    try:
-        col_indices_to_process = [header.index(col_name) for col_name in COLUMNS_TO_DEDUPE]
-    except ValueError as e:
-        print(f"  [FATAL] A specified column for deduplication was not found: {e}")
-        return 0
+    columns_to_process = [
+        col_name for col_name in COLUMNS_TO_DEDUPE if col_name in header]
+    if not columns_to_process:
+        configured_columns = ", ".join(COLUMNS_TO_DEDUPE)
+        raise ValueError(
+            f"Sheet tab '{sheet_tab}' has none of the configured deduplication "
+            f"columns: {configured_columns}")
+
+    col_indices_to_process = [
+        header.index(col_name) for col_name in columns_to_process]
+    missing_columns = [
+        col_name for col_name in COLUMNS_TO_DEDUPE if col_name not in header]
+    if missing_columns:
+        print(
+            "  [INFO] Skipping deduplication columns absent from "
+            f"'{sheet_tab}': {', '.join(missing_columns)}")
 
     batch_updates = []
     total_updates = 0
@@ -172,33 +190,34 @@ def run_deduplication(worksheet, data, header, dry_run=False):
 
                     if len(batch_updates) >= BATCH_SIZE:
                         if dry_run:
-                            print(f"  [DRY-RUN] would send batch of {len(batch_updates)} updates to 'test_runs'")
+                            print(f"  [DRY-RUN] would send batch of {len(batch_updates)} updates to '{sheet_tab}'")
                             total_updates += len(batch_updates)
                             batch_updates = []
                             continue
                         try:
-                            print(f"  [INFO] Sending batch of {len(batch_updates)} updates to 'test_runs' sheet...")
+                            print(f"  [INFO] Sending batch of {len(batch_updates)} updates to '{sheet_tab}' sheet...")
                             worksheet.batch_update(batch_updates)
                             total_updates += len(batch_updates)
                             print(f"  [SUCCESS] Batch sent. Pausing for {DELAY_BETWEEN_BATCHES} seconds...")
                             batch_updates = []
                             time.sleep(DELAY_BETWEEN_BATCHES)
                         except Exception as e:
-                            print(f"  [FAIL] Batch update for 'test_runs' sheet failed. Error: {e}")
-                            return total_updates
+                            print(f"  [FAIL] Batch update for '{sheet_tab}' sheet failed. Error: {e}")
+                            raise
 
     if batch_updates:
         if dry_run:
-            print(f"  [DRY-RUN] would send final batch of {len(batch_updates)} updates to 'test_runs'")
+            print(f"  [DRY-RUN] would send final batch of {len(batch_updates)} updates to '{sheet_tab}'")
             total_updates += len(batch_updates)
         else:
             try:
-                print(f"  [INFO] Sending final batch of {len(batch_updates)} updates to 'test_runs' sheet...")
+                print(f"  [INFO] Sending final batch of {len(batch_updates)} updates to '{sheet_tab}' sheet...")
                 worksheet.batch_update(batch_updates)
                 total_updates += len(batch_updates)
                 print("  [SUCCESS] Final batch complete.")
             except Exception as e:
-                print(f"  [FAIL] Final batch update for 'test_runs' sheet failed. Error: {e}")
+                print(f"  [FAIL] Final batch update for '{sheet_tab}' sheet failed. Error: {e}")
+                raise
 
     label = "would update" if dry_run else "updated"
     print(f"--- Deduplication Process Complete. Total cells {label}: {total_updates} ---")
@@ -206,8 +225,8 @@ def run_deduplication(worksheet, data, header, dry_run=False):
 
 def _parse_args(argv=None):
     parser = argparse.ArgumentParser(
-        description="Normalize multi-value columns and recompute entity mentions "
-                    "on the master sheet (deterministic, no AI)."
+        description="Normalize multi-value columns on the master sheet "
+                    "(deterministic, no AI)."
     )
     parser.add_argument(
         '--dry-run', action='store_true',
@@ -215,9 +234,15 @@ def _parse_args(argv=None):
     )
     parser.add_argument(
         '--limit', type=int, default=0,
-        help='Cap how many test_runs rows the dedup pass touches (0 = all). The '
-             'entity-mention recompute always uses every row so valid mentions '
-             'are never dropped.'
+        help='Cap how many master-sheet rows the dedup pass touches (0 = all). '
+             'When enabled, the legacy entity-mention recompute always uses '
+             'every row so valid mentions are never dropped.'
+    )
+    parser.add_argument(
+        '--recompute-legacy-entity-mentions', action='store_true',
+        help='Also recompute the legacy entities.entity_mentions field. Enable '
+             'only for a workbook with compatible entities and master-sheet '
+             'schemas.'
     )
     return parser.parse_args(argv)
 
@@ -231,33 +256,56 @@ def main(argv=None):
         credentials_path = str(find_project_root() / credentials_filename)
         gc = get_gspread_client(credentials_path)
         sh = gc.open(os.environ.get("SPREADSHEET_NAME", "Rosen Archive URL List"))
-        test_runs_worksheet = sh.worksheet("test_runs")
-        print("  [INFO] Successfully connected to Google Sheet.")
+        master_sheet_tab = (
+            os.environ.get("ROSEN_MASTER_SHEET_TAB")
+            or DEFAULT_MASTER_SHEET_TAB
+        ).strip()
+        if not master_sheet_tab:
+            raise ValueError("ROSEN_MASTER_SHEET_TAB must not be empty")
+        master_worksheet = sh.worksheet(master_sheet_tab)
+        print(f"  [INFO] Successfully connected to Google Sheet tab '{master_sheet_tab}'.")
     except Exception as e:
         print(f"  [FATAL] Error connecting to Google Sheets: {e}")
         return 1
 
-    test_runs_values = test_runs_worksheet.get_all_values()
-    if len(test_runs_values) < 2:
-        print("  [INFO] No data in 'test_runs' to process.")
+    master_values = master_worksheet.get_all_values()
+    if len(master_values) < 2:
+        print(f"  [INFO] No data in '{master_sheet_tab}' to process.")
         return 0
-    test_runs_header = test_runs_values[0]
-    test_runs_data = test_runs_values[1:]
+    master_header = master_values[0]
+    master_data = master_values[1:]
 
-    dedup_data = test_runs_data
-    if args.limit and args.limit > 0 and len(test_runs_data) > args.limit:
-        dedup_data = test_runs_data[:args.limit]
+    dedup_data = master_data
+    if args.limit and args.limit > 0 and len(master_data) > args.limit:
+        dedup_data = master_data[:args.limit]
         print(f"  [INFO] --limit {args.limit}: deduplicating the first {args.limit} "
-              f"of {len(test_runs_data)} data rows.")
+              f"of {len(master_data)} data rows.")
 
-    dedup_writes = run_deduplication(
-        test_runs_worksheet, dedup_data, test_runs_header, dry_run=args.dry_run)
-    mention_writes = update_entity_mentions(
-        sh, test_runs_data, test_runs_header, dry_run=args.dry_run)
+    try:
+        dedup_writes = run_deduplication(
+            master_worksheet, dedup_data, master_header,
+            dry_run=args.dry_run, sheet_tab=master_sheet_tab)
+    except Exception as e:
+        print(f"  [FATAL] {e}")
+        return 1
+
+    mention_writes = 0
+    if args.recompute_legacy_entity_mentions:
+        print("  [INFO] Legacy entity-mention recomputation explicitly enabled.")
+        try:
+            mention_writes = update_entity_mentions(
+                sh, master_data, master_header, dry_run=args.dry_run)
+        except Exception as e:
+            print(f"  [FATAL] Legacy entity-mention recomputation failed: {e}")
+            return 1
+    else:
+        print(
+            "  [INFO] Skipping legacy entity-mention recomputation. Use "
+            "--recompute-legacy-entity-mentions only with a compatible workbook.")
 
     verb = "would change" if args.dry_run else "changed"
-    print(f"  [SUMMARY] {verb} {dedup_writes} test_runs cell(s) + "
-          f"{mention_writes} entity row(s).")
+    print(f"  [SUMMARY] {verb} {dedup_writes} '{master_sheet_tab}' cell(s) + "
+          f"{mention_writes} legacy entity row(s).")
     # Deterministic job: zero changes means the sheet is already clean, which is
     # a valid success -- unlike the AI jobs, there is no "spent money, wrote
     # nothing" failure mode to guard against here.

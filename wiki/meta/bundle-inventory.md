@@ -3,9 +3,9 @@ type: reference
 title: OKF bundle inventory
 description: Generated flight-recorder report for the Rosen project OKF bundle.
 source: ["scripts/okf-flight-recorder.js", "wiki/meta/bundle-inventory.json"]
-verified: 2026-07-21
+verified: 2026-08-10
 tags: [okf, inventory, drift, generated]
-timestamp: 2026-07-21
+timestamp: 2026-08-10
 ---
 
 # OKF bundle inventory
@@ -55,50 +55,51 @@ The default navigation view should be a per-concept local graph, not a global fo
 | Risk | Count |
 | --- | ---: |
 | high | 14 |
-| low | 9 |
-| medium | 11 |
+| low | 2 |
+| medium | 18 |
 
 ## Freshness badge counts
 
 | Badge | Count |
 | --- | ---: |
-| fresh | 34 |
+| fresh | 4 |
+| watch | 30 |
 
 ## Freshness watchlist
 
 | Concept | Badge | Verified | Sources | Reason |
 | --- | --- | --- | ---: | --- |
-| [The corpus](../data/corpus.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
-| [Schema and vocabulary](../data/schema.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
-| [Pre-launch handoff to Jay (2026-06-22)](../launch/handoff-2026-06-22.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
-| [Launch plan](../launch/launch-plan.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
-| [Jay Rosen](../people/jay-rosen.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
-| [Joe Amditis](../people/joe-amditis.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
-| [Unified Field](../people/unified-field.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
-| [Launch status](../project/launch-status.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
-| [What the archive is](../project/overview.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
-| [Provenance](../sources/provenance.md) | Fresh | 2026-06-22 | 1 | Verified 29 days before inventory |
-| [Data pipeline (backend)](../systems/data-pipeline.md) | Fresh | 2026-06-22 | 3 | Verified 29 days before inventory |
-| [Deploy and hosting](../systems/deploy-and-hosting.md) | Fresh | 2026-06-22 | 4 | Verified 29 days before inventory |
+| [The corpus](../data/corpus.md) | Watch | 2026-06-22 | 3 | Verified 49 days before inventory |
+| [Schema and vocabulary](../data/schema.md) | Watch | 2026-06-22 | 3 | Verified 49 days before inventory |
+| [Pre-launch handoff to Jay (2026-06-22)](../launch/handoff-2026-06-22.md) | Watch | 2026-06-22 | 3 | Verified 49 days before inventory |
+| [Launch plan](../launch/launch-plan.md) | Watch | 2026-06-22 | 3 | Verified 49 days before inventory |
+| [Jay Rosen](../people/jay-rosen.md) | Watch | 2026-06-22 | 3 | Verified 49 days before inventory |
+| [Joe Amditis](../people/joe-amditis.md) | Watch | 2026-06-22 | 3 | Verified 49 days before inventory |
+| [Unified Field](../people/unified-field.md) | Watch | 2026-06-22 | 3 | Verified 49 days before inventory |
+| [Launch status](../project/launch-status.md) | Watch | 2026-06-22 | 3 | Verified 49 days before inventory |
+| [What the archive is](../project/overview.md) | Watch | 2026-06-22 | 3 | Verified 49 days before inventory |
+| [Provenance](../sources/provenance.md) | Watch | 2026-06-22 | 1 | Verified 49 days before inventory |
+| [Data pipeline (backend)](../systems/data-pipeline.md) | Watch | 2026-06-22 | 3 | Verified 49 days before inventory |
+| [Deploy and hosting](../systems/deploy-and-hosting.md) | Watch | 2026-06-22 | 4 | Verified 49 days before inventory |
 
 ## High-drift concepts
 
 | Concept | Type | Verified | Inbound links | Reason |
 | --- | --- | --- | ---: | --- |
-| [Pre-launch handoff to Jay (2026-06-22)](../launch/handoff-2026-06-22.md) | event | 2026-06-22 | 8 | high-change topic: launch |
-| [Launch plan](../launch/launch-plan.md) | concept | 2026-06-22 | 2 | high-change topic: launch |
-| [Jay Rosen](../people/jay-rosen.md) | person | 2026-06-22 | 5 | high-change topic: launch |
-| [Unified Field](../people/unified-field.md) | organization | 2026-06-22 | 2 | high-change topic: launch |
-| [Launch status](../project/launch-status.md) | concept | 2026-06-22 | 0 | high-change topic: blocker, credential, launch, sftp |
-| [Deploy and hosting](../systems/deploy-and-hosting.md) | system | 2026-06-22 | 11 | high-change topic: blocker, cloudflare, deploy, dns, hosting, sftp |
-| [Feedback and reporting](../systems/feedback-and-reporting.md) | system | 2026-06-22 | 3 | high-change topic: launch |
-| [Key dates](../timeline/key-dates.md) | concept | 2026-06-22 | 1 | high-change topic: launch |
-| [Open launch and architecture decisions](../launch/open-decisions.md) | concept | 2026-06-23 | 0 | high-change topic: automation, launch, submission; change-prone topic: data, decisions |
-| [Re-verification playbook](../sources/reverification-playbook.md) | concept | 2026-06-23 | 0 | high-change topic: deploy; change-prone topic: verification |
-| [Cache and versioning](../systems/cache-and-versioning.md) | system | 2026-06-23 | 1 | high-change topic: cache, deploy, versioning; change-prone topic: data |
-| [CI and testing](../systems/ci-and-testing.md) | system | 2026-06-23 | 1 | high-change topic: ci, github-actions, testing |
-| [Maintenance automation](../systems/maintenance-automation.md) | system | 2026-06-23 | 1 | high-change topic: automation, deploy, github-actions |
+| [Pre-launch handoff to Jay (2026-06-22)](../launch/handoff-2026-06-22.md) | event | 2026-06-22 | 8 | high-change topic: launch; verified 49 days before inventory |
+| [Launch plan](../launch/launch-plan.md) | concept | 2026-06-22 | 2 | high-change topic: launch; verified 49 days before inventory |
+| [Jay Rosen](../people/jay-rosen.md) | person | 2026-06-22 | 5 | high-change topic: launch; verified 49 days before inventory |
+| [Unified Field](../people/unified-field.md) | organization | 2026-06-22 | 2 | high-change topic: launch; verified 49 days before inventory |
+| [Launch status](../project/launch-status.md) | concept | 2026-06-22 | 0 | high-change topic: blocker, credential, launch, sftp; verified 49 days before inventory |
+| [Deploy and hosting](../systems/deploy-and-hosting.md) | system | 2026-06-22 | 11 | high-change topic: blocker, cloudflare, deploy, dns, hosting, sftp; verified 49 days before inventory |
+| [Feedback and reporting](../systems/feedback-and-reporting.md) | system | 2026-06-22 | 3 | high-change topic: launch; verified 49 days before inventory |
+| [Key dates](../timeline/key-dates.md) | concept | 2026-06-22 | 1 | high-change topic: launch; verified 49 days before inventory |
+| [Open launch and architecture decisions](../launch/open-decisions.md) | concept | 2026-06-23 | 0 | high-change topic: automation, launch, submission; change-prone topic: data, decisions; verified 48 days before inventory |
+| [Re-verification playbook](../sources/reverification-playbook.md) | concept | 2026-06-23 | 0 | high-change topic: deploy; change-prone topic: verification; verified 48 days before inventory |
+| [Cache and versioning](../systems/cache-and-versioning.md) | system | 2026-06-23 | 1 | high-change topic: cache, deploy, versioning; change-prone topic: data; verified 48 days before inventory |
+| [CI and testing](../systems/ci-and-testing.md) | system | 2026-06-23 | 1 | high-change topic: ci, github-actions, testing; verified 48 days before inventory |
 | [Submission automation (Pillar 3a)](../systems/submission-automation.md) | system | 2026-07-21 | 2 | high-change topic: automation, github-actions, submission |
+| [Maintenance automation](../systems/maintenance-automation.md) | system | 2026-08-10 | 1 | high-change topic: automation, deploy, github-actions |
 
 ## Stale concepts
 
@@ -106,7 +107,36 @@ These concepts have a `verified` date more than 30 days before the inventory dat
 
 | Concept | Type | Verified | Inbound links | Reason |
 | --- | --- | --- | ---: | --- |
-| None | | | | |
+| [The corpus](../data/corpus.md) | concept | 2026-06-22 | 10 | change-prone topic: data; verified 49 days before inventory |
+| [Schema and vocabulary](../data/schema.md) | concept | 2026-06-22 | 4 | change-prone topic: data; verified 49 days before inventory |
+| [Pre-launch handoff to Jay (2026-06-22)](../launch/handoff-2026-06-22.md) | event | 2026-06-22 | 8 | high-change topic: launch; verified 49 days before inventory |
+| [Launch plan](../launch/launch-plan.md) | concept | 2026-06-22 | 2 | high-change topic: launch; verified 49 days before inventory |
+| [Jay Rosen](../people/jay-rosen.md) | person | 2026-06-22 | 5 | high-change topic: launch; verified 49 days before inventory |
+| [Joe Amditis](../people/joe-amditis.md) | person | 2026-06-22 | 4 | verified 49 days before inventory |
+| [Unified Field](../people/unified-field.md) | organization | 2026-06-22 | 2 | high-change topic: launch; verified 49 days before inventory |
+| [Launch status](../project/launch-status.md) | concept | 2026-06-22 | 0 | high-change topic: blocker, credential, launch, sftp; verified 49 days before inventory |
+| [What the archive is](../project/overview.md) | concept | 2026-06-22 | 1 | change-prone topic: public; verified 49 days before inventory |
+| [Provenance](../sources/provenance.md) | concept | 2026-06-22 | 0 | change-prone topic: provenance, source, verification; verified 49 days before inventory |
+| [Data pipeline (backend)](../systems/data-pipeline.md) | system | 2026-06-22 | 2 | change-prone topic: data; verified 49 days before inventory |
+| [Deploy and hosting](../systems/deploy-and-hosting.md) | system | 2026-06-22 | 11 | high-change topic: blocker, cloudflare, deploy, dns, hosting, sftp; verified 49 days before inventory |
+| [Feedback and reporting](../systems/feedback-and-reporting.md) | system | 2026-06-22 | 3 | high-change topic: launch; verified 49 days before inventory |
+| [Front end (zero-build static site)](../systems/frontend.md) | system | 2026-06-22 | 4 | verified 49 days before inventory |
+| [Key dates](../timeline/key-dates.md) | concept | 2026-06-22 | 1 | high-change topic: launch; verified 49 days before inventory |
+| [Data quality gaps](../data/data-quality-gaps.md) | concept | 2026-06-23 | 0 | change-prone topic: data; verified 48 days before inventory |
+| [Open launch and architecture decisions](../launch/open-decisions.md) | concept | 2026-06-23 | 0 | high-change topic: automation, launch, submission; change-prone topic: data, decisions; verified 48 days before inventory |
+| [OKF adoption playbook](adoption-playbook.md) | playbook | 2026-06-23 | 0 | change-prone topic: public, source; verified 48 days before inventory |
+| [OKF community contribution roadmap](community-roadmap.md) | concept | 2026-06-23 | 0 | change-prone topic: community, source; verified 48 days before inventory |
+| [Concept templates](concept-template.md) | template | 2026-06-23 | 0 | verified 48 days before inventory |
+| [OKF enhancement radar](enhancement-radar.md) | concept | 2026-06-23 | 0 | verified 48 days before inventory |
+| [Rosen project OKF profile](okf-profile.md) | profile | 2026-06-23 | 0 | verified 48 days before inventory |
+| [OKF quality model](quality-model.md) | concept | 2026-06-23 | 0 | verified 48 days before inventory |
+| [Wiki UX requirements](wiki-ux-requirements.md) | concept | 2026-06-23 | 1 | verified 48 days before inventory |
+| [Development workflow](../project/development-workflow.md) | concept | 2026-06-23 | 1 | change-prone topic: data, workflow; verified 48 days before inventory |
+| [Jay Rosen's Internet Archive knowledge bundle](../README.md) | profile | 2026-06-23 | 0 | change-prone topic: public; verified 48 days before inventory |
+| [Re-verification playbook](../sources/reverification-playbook.md) | concept | 2026-06-23 | 0 | high-change topic: deploy; change-prone topic: verification; verified 48 days before inventory |
+| [Cache and versioning](../systems/cache-and-versioning.md) | system | 2026-06-23 | 1 | high-change topic: cache, deploy, versioning; change-prone topic: data; verified 48 days before inventory |
+| [CI and testing](../systems/ci-and-testing.md) | system | 2026-06-23 | 1 | high-change topic: ci, github-actions, testing; verified 48 days before inventory |
+| [Public archive wiki feature](../systems/public-community-wiki.md) | system | 2026-06-23 | 1 | change-prone topic: community, data, public; verified 48 days before inventory |
 
 ## Orphaned concepts
 
@@ -114,19 +144,19 @@ These concepts currently have no inbound links from other concept files. Section
 
 | Concept | Type | Verified | Inbound links | Reason |
 | --- | --- | --- | ---: | --- |
-| [Data quality gaps](../data/data-quality-gaps.md) | concept | 2026-06-23 | 0 | change-prone topic: data |
-| [Open launch and architecture decisions](../launch/open-decisions.md) | concept | 2026-06-23 | 0 | high-change topic: automation, launch, submission; change-prone topic: data, decisions |
-| [OKF adoption playbook](adoption-playbook.md) | playbook | 2026-06-23 | 0 | change-prone topic: public, source |
-| [OKF blindfold test](blindfold-test.md) | test | 2026-07-21 | 0 | recently verified |
-| [OKF community contribution roadmap](community-roadmap.md) | concept | 2026-06-23 | 0 | change-prone topic: community, source |
-| [Concept templates](concept-template.md) | template | 2026-06-23 | 0 | recently verified |
-| [OKF enhancement radar](enhancement-radar.md) | concept | 2026-06-23 | 0 | recently verified |
-| [Rosen project OKF profile](okf-profile.md) | profile | 2026-06-23 | 0 | recently verified |
-| [OKF quality model](quality-model.md) | concept | 2026-06-23 | 0 | recently verified |
-| [Launch status](../project/launch-status.md) | concept | 2026-06-22 | 0 | high-change topic: blocker, credential, launch, sftp |
-| [Jay Rosen's Internet Archive knowledge bundle](../README.md) | profile | 2026-06-23 | 0 | change-prone topic: public |
-| [Provenance](../sources/provenance.md) | concept | 2026-06-22 | 0 | change-prone topic: provenance, source, verification |
-| [Re-verification playbook](../sources/reverification-playbook.md) | concept | 2026-06-23 | 0 | high-change topic: deploy; change-prone topic: verification |
+| [Data quality gaps](../data/data-quality-gaps.md) | concept | 2026-06-23 | 0 | change-prone topic: data; verified 48 days before inventory |
+| [Open launch and architecture decisions](../launch/open-decisions.md) | concept | 2026-06-23 | 0 | high-change topic: automation, launch, submission; change-prone topic: data, decisions; verified 48 days before inventory |
+| [OKF adoption playbook](adoption-playbook.md) | playbook | 2026-06-23 | 0 | change-prone topic: public, source; verified 48 days before inventory |
+| [OKF blindfold test](blindfold-test.md) | test | 2026-08-10 | 0 | recently verified |
+| [OKF community contribution roadmap](community-roadmap.md) | concept | 2026-06-23 | 0 | change-prone topic: community, source; verified 48 days before inventory |
+| [Concept templates](concept-template.md) | template | 2026-06-23 | 0 | verified 48 days before inventory |
+| [OKF enhancement radar](enhancement-radar.md) | concept | 2026-06-23 | 0 | verified 48 days before inventory |
+| [Rosen project OKF profile](okf-profile.md) | profile | 2026-06-23 | 0 | verified 48 days before inventory |
+| [OKF quality model](quality-model.md) | concept | 2026-06-23 | 0 | verified 48 days before inventory |
+| [Launch status](../project/launch-status.md) | concept | 2026-06-22 | 0 | high-change topic: blocker, credential, launch, sftp; verified 49 days before inventory |
+| [Jay Rosen's Internet Archive knowledge bundle](../README.md) | profile | 2026-06-23 | 0 | change-prone topic: public; verified 48 days before inventory |
+| [Provenance](../sources/provenance.md) | concept | 2026-06-22 | 0 | change-prone topic: provenance, source, verification; verified 49 days before inventory |
+| [Re-verification playbook](../sources/reverification-playbook.md) | concept | 2026-06-23 | 0 | high-change topic: deploy; change-prone topic: verification; verified 48 days before inventory |
 
 ## How to interpret this
 

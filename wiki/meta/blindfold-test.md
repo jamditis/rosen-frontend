@@ -3,9 +3,9 @@ type: test
 title: OKF blindfold test
 description: Scenario-based navigation test for whether a new contributor can answer project questions starting only from the OKF root index.
 source: ["scripts/okf-blindfold-test.js", "wiki/meta/blindfold-scenarios.json"]
-verified: 2026-07-21
+verified: 2026-08-10
 tags: [okf, test, navigation, onboarding]
-timestamp: 2026-07-21
+timestamp: 2026-08-10
 ---
 
 # OKF blindfold test
