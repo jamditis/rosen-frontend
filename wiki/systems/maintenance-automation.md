@@ -3,7 +3,7 @@ type: system
 title: Maintenance automation
 description: The manual-dispatch jobs for enriching, syncing, deploying, and monitoring the archive outside the normal PR path.
 source: [.github/workflows/maintenance.yml, .github/workflows/deploy.yml, .github/workflows/post-merge.yml, docs/setup/maintenance-runbook.md, docs/setup/pillar-3a-runbook.md]
-verified: 2026-06-23
+verified: 2026-08-10
 tags: [automation, maintenance, github-actions, deploy]
 timestamp: 2026-06-23
 ---
@@ -14,13 +14,26 @@ Maintenance jobs are separate from the normal submission path and from ordinary 
 
 ## Batch maintenance runner
 
-`.github/workflows/maintenance.yml` exposes three manual-dispatch jobs:
+`.github/workflows/maintenance.yml` exposes three manual-dispatch jobs. It has
+no schedule and remains manual by design:
 
 - `key_concepts` — uses Gemini to tag records in the master sheet.
-- `dedup` — deterministic normalization and entity-mention recomputation.
+- `dedup` — deterministic normalization of multi-value cells.
 - `sync_to_archive` — merges approved sheet data into `data/archive_records-public.csv`, regenerates JSON, runs tests, commits a branch, and opens a PR.
 
 The first run of any job should be a dry run. Use small limits before widening: `5 -> 25 -> 100`. `sync_to_archive` deliberately opens a PR instead of pushing to `main`, so a human reviews the data diff before it can ship.
+
+All three jobs use the current `archive_records` worksheet by default. The
+repository variable `ROSEN_MASTER_SHEET_TAB` can select a different compatible
+tab without changing code. Configuration is checked before dependencies are
+installed: the sheet name and service-account credential are required for all
+jobs, Gemini is required only for `key_concepts`, and the GitHub App is required
+only for `sync_to_archive`.
+
+The legacy dedup pass that writes `entity_mentions` in a separate `entities`
+worksheet is disabled by default and is not exposed by the Actions workflow. It
+can be invoked directly with `--recompute-legacy-entity-mentions` only for a
+workbook that still has that schema.
 
 Runbook: [docs/setup/maintenance-runbook.md](../../docs/setup/maintenance-runbook.md).
 

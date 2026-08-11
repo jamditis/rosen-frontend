@@ -242,8 +242,10 @@ class _FakeWorksheet:
 class _FakeSheet:
     def __init__(self, values):
         self._ws = _FakeWorksheet(values)
+        self.requested_tabs = []
 
     def worksheet(self, tab):
+        self.requested_tabs.append(tab)
         return self._ws
 
 
@@ -254,6 +256,39 @@ def _seed_csv(tmp_path):
         writer.writeheader()
         writer.writerow({"id": "R1", "key_concepts": "", "raw_text": "orig body"})
     return csv_path
+
+
+def test_run_defaults_to_current_archive_records_tab(tmp_path, monkeypatch):
+    monkeypatch.delenv("ROSEN_MASTER_SHEET_TAB", raising=False)
+    sheet = _FakeSheet([["id", "key_concepts"], ["R1", "Mindcasting"]])
+    monkeypatch.setattr(sync, "open_spreadsheet", lambda *a, **k: sheet)
+
+    result = sync.run(dry_run=True, csv_path=_seed_csv(tmp_path))
+
+    assert result["status"] == "dry_run"
+    assert sheet.requested_tabs == ["archive_records"]
+
+
+def test_run_treats_empty_workflow_tab_variable_as_unset(tmp_path, monkeypatch):
+    monkeypatch.setenv("ROSEN_MASTER_SHEET_TAB", "")
+    sheet = _FakeSheet([["id", "key_concepts"], ["R1", "Mindcasting"]])
+    monkeypatch.setattr(sync, "open_spreadsheet", lambda *a, **k: sheet)
+
+    result = sync.run(dry_run=True, csv_path=_seed_csv(tmp_path))
+
+    assert result["status"] == "dry_run"
+    assert sheet.requested_tabs == ["archive_records"]
+
+
+def test_run_accepts_configured_master_tab(tmp_path, monkeypatch):
+    monkeypatch.setenv("ROSEN_MASTER_SHEET_TAB", "staging_records")
+    sheet = _FakeSheet([["id", "key_concepts"], ["R1", "Mindcasting"]])
+    monkeypatch.setattr(sync, "open_spreadsheet", lambda *a, **k: sheet)
+
+    result = sync.run(dry_run=True, csv_path=_seed_csv(tmp_path))
+
+    assert result["status"] == "dry_run"
+    assert sheet.requested_tabs == ["staging_records"]
 
 
 def test_open_sync_pr_commits_census_after_input_data(tmp_path, monkeypatch):

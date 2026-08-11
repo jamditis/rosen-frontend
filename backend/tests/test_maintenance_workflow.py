@@ -63,6 +63,13 @@ def _run_step(wf):
     raise AssertionError("no 'Run maintenance job' step found")
 
 
+def _step(wf, name):
+    for step in wf["jobs"]["maintenance"]["steps"]:
+        if step.get("name") == name:
+            return step
+    raise AssertionError(f"no {name!r} step found")
+
+
 def test_inputs_not_interpolated_into_run(wf):
     step = _run_step(wf)
     # Inputs must arrive via env, never as ${{ ... }} expanded inside the shell
@@ -75,6 +82,33 @@ def test_inputs_not_interpolated_into_run(wf):
     # The run script reads the env vars.
     assert "$JOB" in step["run"]
     assert "$LIMIT" in step["run"]
+
+
+def test_configuration_preflight_runs_before_app_token(wf):
+    steps = wf["jobs"]["maintenance"]["steps"]
+    names = [step.get("name") for step in steps]
+    assert names.index("Check required configuration") < names.index(
+        "Mint GitHub App installation token")
+
+    preflight = _step(wf, "Check required configuration")
+    assert preflight["env"]["SPREADSHEET_NAME"] == "${{ secrets.SPREADSHEET_NAME }}"
+    assert preflight["env"]["ROSEN_SHEETS_SA_KEY_JSON"] == (
+        "${{ secrets.ROSEN_SHEETS_SA_KEY_JSON }}")
+    assert "ROSEN_GH_APP_ID" in preflight["env"]
+    assert "ROSEN_GH_APP_PRIVATE_KEY" in preflight["env"]
+
+
+def test_app_token_is_only_required_for_sync_job(wf):
+    token_step = _step(wf, "Mint GitHub App installation token")
+    assert token_step["if"] == "${{ inputs.job == 'sync_to_archive' }}"
+
+    checkout = _step(wf, "Checkout main")
+    assert "github.token" in checkout["with"]["token"]
+
+
+def test_workflow_passes_configurable_master_tab(wf):
+    env = _run_step(wf)["env"]
+    assert env["ROSEN_MASTER_SHEET_TAB"] == "${{ vars.ROSEN_MASTER_SHEET_TAB }}"
 
 
 def test_referenced_scripts_exist(wf):

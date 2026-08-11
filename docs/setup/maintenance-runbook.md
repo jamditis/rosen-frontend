@@ -6,7 +6,8 @@ which job to reach for. Design: `docs/plans/2026-05-29-batch-maintenance-runner-
 These jobs are separate from the submission path (Pillar 3a). Submissions add
 new records automatically when a curator ticks a row in the queue sheet. The
 maintenance jobs *enrich and reconcile* the archive over time, and run only when
-a person triggers them.
+a person triggers them. This is deliberate: the workflow has no schedule and
+does not run after a submission, merge, or deploy.
 
 ---
 
@@ -14,8 +15,8 @@ a person triggers them.
 
 | Job | What it does | Where it writes | Spends money? |
 |---|---|---|---|
-| `key_concepts` | Tags articles with Jay Rosen's 13 key concepts using Gemini | master sheet (`test_runs`) | yes (Gemini free tier) |
-| `dedup` | Normalizes multi-value cells and recomputes entity mentions; deterministic | master sheet | no |
+| `key_concepts` | Tags articles with Jay Rosen's 13 key concepts using Gemini | master sheet (`archive_records` by default) | yes (Gemini free tier) |
+| `dedup` | Normalizes multi-value cells; deterministic | master sheet (`archive_records` by default) | no |
 | `sync_to_archive` | Merges the sheet's enriched columns into the repo CSV, regenerates JSON, runs tests, and opens a PR | a review PR (then the live site after merge + deploy) | no |
 
 The usual order: enrich the sheet (`key_concepts`, `dedup`), then carry the
@@ -33,6 +34,11 @@ never reaches the live site until a sync runs.
 4. Uncheck **dry_run** and re-run to apply. Escalate the limit as you gain
    confidence: **5 -> 25 -> 100**, never the whole archive in one run (a run that
    exceeds the 6-hour Action cap is killed mid-write).
+
+The workflow checks its job-specific configuration before installing
+dependencies or minting a GitHub App token. All jobs require the sheet name and
+service-account credential. Only `key_concepts` requires Gemini, and only
+`sync_to_archive` requires the GitHub App.
 
 ### Why dry-run first, every time
 
@@ -72,7 +78,7 @@ steps so a human sees the data diff before it ships.
 
 ---
 
-## Required repo secrets
+## Required repo configuration
 
 Set these under Settings -> Secrets and variables -> Actions:
 
@@ -82,6 +88,12 @@ Set these under Settings -> Secrets and variables -> Actions:
 | `SPREADSHEET_NAME` | all jobs | exact name of the master sheet. The jobs open it by name; a wrong or missing value fails fast. |
 | `GEMINI_API_KEY` | `key_concepts` | Gemini free-tier key from aistudio.google.com. |
 | `ROSEN_GH_APP_ID`, `ROSEN_GH_APP_PRIVATE_KEY` | `sync_to_archive` | the same `rosen-archive-bot` App as Pillar 3a. The App needs **Contents: write** and **Pull requests: write** so it can push the branch and open the PR. |
+
+The scripts use the current `archive_records` tab by default. To target a
+different compatible tab, set the Actions **repository variable**
+`ROSEN_MASTER_SHEET_TAB` to its exact name. Use a variable, not a secret: the
+tab name is configuration and does not contain a credential. Codespaces and
+local runs can set the environment variable with the same name.
 
 `sync_to_archive` opens the PR with the App token (not the default
 `GITHUB_TOKEN`) on purpose: a PR opened by `GITHUB_TOKEN` would not trigger the
@@ -96,9 +108,7 @@ runs. What that means per job:
 
 - **`dedup`** is deterministic and idempotent. Re-running over already-clean
   rows is a cheap no-op (zero writes). To cover the whole sheet in one pass, run
-  it with a high `--limit` or `0` (no cap) -- it makes no AI calls. The
-  entity-mention recompute always reads every row, so valid mentions are never
-  dropped by a limit.
+  it with a high `--limit` or `0` (no cap) -- it makes no AI calls.
 - **`key_concepts`** has no persistent cursor in CI, so each run starts from the
   top of the sheet. With a small `limit` it keeps re-touching the first rows. It
   skips filling rows that already have concepts, but it still spends a Gemini
@@ -107,6 +117,17 @@ runs. What that means per job:
 
 This is a v1 limitation, not a bug. Sheet-resident progress (or committed/cached
 progress state) is a planned follow-up.
+
+### Legacy entity-mention pass
+
+The old dedup command also recomputed `entity_mentions` in a separate
+`entities` tab. The current workbook path uses `archive_records`, so that
+legacy cross-tab pass is disabled by default and is not enabled by the Actions
+workflow. Run it only against a workbook that still has the compatible legacy
+schema by invoking the script directly with
+`--recompute-legacy-entity-mentions`. Start with `--dry-run` and set
+`ROSEN_MASTER_SHEET_TAB` to the intended source tab when it is not
+`archive_records`.
 
 ---
 
@@ -120,6 +141,8 @@ grind, or pushing data by hand when an Action is broken:
    create (`.devcontainer/devcontainer.json`).
 2. Add `SPREADSHEET_NAME`, `GEMINI_API_KEY`, and `ROSEN_SHEETS_SA_KEY_JSON` as
    **Codespaces secrets** (Settings -> Codespaces) so they arrive as env vars.
+   Set `ROSEN_MASTER_SHEET_TAB` only when you need to override the default
+   `archive_records` tab.
 3. Run the same commands the Action runs, e.g.:
    ```bash
    poetry -C backend run python -m rosen_scraper.key_concepts_updater --limit 100 --dry-run

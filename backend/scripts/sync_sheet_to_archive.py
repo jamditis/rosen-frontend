@@ -75,7 +75,7 @@ from submission_runtime.config import (  # noqa: E402
 
 # Tests override this to point at a tmp CSV. Defaults to the canonical archive.
 CSV_FILE = _DEFAULT_CSV_FILE
-DEFAULT_SHEET_TAB = "test_runs"
+DEFAULT_SHEET_TAB = "archive_records"
 
 # The canonical JSON artifacts `node export-archive-data.js` regenerates.
 _DEPLOY_JSON_FILES = DATA_DEPLOY_JSON_FILES
@@ -390,7 +390,7 @@ def _print_stats(stats: Dict[str, Any], dry_run: bool) -> None:
     print("=" * 70)
 
 
-def run(sheet_tab: str = DEFAULT_SHEET_TAB, limit: int = 0,
+def run(sheet_tab: Optional[str] = None, limit: int = 0,
         dry_run: bool = False, csv_path: Optional[pathlib.Path] = None) -> Dict[str, Any]:
     """Read the sheet, merge into the CSV, and (unless dry-run) open a PR.
 
@@ -398,6 +398,8 @@ def run(sheet_tab: str = DEFAULT_SHEET_TAB, limit: int = 0,
     ``pr_opened | dry_run | nothing_to_sync | error``.
     """
     csv_path = pathlib.Path(csv_path or CSV_FILE)
+    sheet_tab = (sheet_tab if sheet_tab is not None else
+                 os.getenv("ROSEN_MASTER_SHEET_TAB") or DEFAULT_SHEET_TAB)
 
     # --- Read the master sheet. ---
     try:
@@ -463,8 +465,11 @@ def _parse_args(argv):
     p = argparse.ArgumentParser(
         description="Merge enriched master-sheet columns into the archive CSV "
                     "and deploy.")
-    p.add_argument("--sheet-tab", dest="sheet_tab", default=DEFAULT_SHEET_TAB,
-                   help=f"Sheet tab to read (default: {DEFAULT_SHEET_TAB})")
+    p.add_argument(
+        "--sheet-tab", dest="sheet_tab", default=None,
+        help=("Sheet tab to read (default: ROSEN_MASTER_SHEET_TAB or "
+              f"{DEFAULT_SHEET_TAB})"),
+    )
     p.add_argument("--limit", type=int, default=0,
                    help="Cap records changed this run (0 = no cap)")
     p.add_argument("--dry-run", dest="dry_run", action="store_true",

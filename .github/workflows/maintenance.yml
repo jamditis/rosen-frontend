@@ -56,7 +56,49 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
+      - name: Check required configuration
+        env:
+          JOB: ${{ inputs.job }}
+          SPREADSHEET_NAME: ${{ secrets.SPREADSHEET_NAME }}
+          ROSEN_SHEETS_SA_KEY_JSON: ${{ secrets.ROSEN_SHEETS_SA_KEY_JSON }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ROSEN_GH_APP_ID: ${{ secrets.ROSEN_GH_APP_ID }}
+          ROSEN_GH_APP_PRIVATE_KEY: ${{ secrets.ROSEN_GH_APP_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          missing=()
+          require_config() {
+            if [ -z "${!1:-}" ]; then
+              missing+=("$1")
+            fi
+          }
+
+          require_config SPREADSHEET_NAME
+          require_config ROSEN_SHEETS_SA_KEY_JSON
+          case "$JOB" in
+            key_concepts)
+              require_config GEMINI_API_KEY
+              ;;
+            dedup)
+              ;;
+            sync_to_archive)
+              require_config ROSEN_GH_APP_ID
+              require_config ROSEN_GH_APP_PRIVATE_KEY
+              ;;
+            *)
+              echo "Unknown job: $JOB" >&2
+              exit 1
+              ;;
+          esac
+
+          if [ "${#missing[@]}" -gt 0 ]; then
+            printf 'Missing required configuration: %s\n' "${missing[*]}" >&2
+            exit 1
+          fi
+          echo "Required configuration is present for job=$JOB"
+
       - name: Mint GitHub App installation token
+        if: ${{ inputs.job == 'sync_to_archive' }}
         id: app-token
         uses: actions/create-github-app-token@v1
         with:
@@ -66,7 +108,7 @@ jobs:
       - name: Checkout main
         uses: actions/checkout@v6
         with:
-          token: ${{ steps.app-token.outputs.token }}
+          token: ${{ steps.app-token.outputs.token || github.token }}
           ref: main
           fetch-depth: 0
 
@@ -124,10 +166,13 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ROSEN_SHEETS_SA_KEY_JSON: ${{ secrets.ROSEN_SHEETS_SA_KEY_JSON }}
           SPREADSHEET_NAME: ${{ secrets.SPREADSHEET_NAME }}
+          # Optional override; scripts default to the current archive_records
+          # tab when this repository variable is unset.
+          ROSEN_MASTER_SHEET_TAB: ${{ vars.ROSEN_MASTER_SHEET_TAB }}
           # sync_to_archive only: gh opens the review PR with the App token so
           # the new PR triggers CI (a PR opened by the default GITHUB_TOKEN would
           # not). The App needs Contents: write + Pull requests: write.
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token || github.token }}
           GIT_BOT_NAME: rosen-archive-bot
           GIT_BOT_EMAIL: "rosen-archive-bot[bot]@users.noreply.github.com"
         run: |
