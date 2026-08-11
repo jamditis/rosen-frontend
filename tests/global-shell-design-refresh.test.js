@@ -49,6 +49,34 @@ describe('global shell visual-system refresh', () => {
     assert.match(styles, /\.archive-site-footer/);
   });
 
+  it('keeps the footer navigation compact without undersized link targets', () => {
+    const footerLinkRule = styles.match(/\.archive-site-footer__link\s*\{([^}]*)\}/)?.[1] || '';
+    const backToTopRule = styles.match(/\.archive-back-to-top\s*\{([^}]*)\}/)?.[1] || '';
+
+    assert.match(app, /archive-site-footer__links/);
+    assert.doesNotMatch(app, /archive-site-footer__links[^>]*space-y-1/);
+    assert.match(
+      styles,
+      /\.archive-site-footer__links\s*\{[\s\S]*display:\s*grid/,
+    );
+    assert.match(
+      styles,
+      /@media \(min-width:\s*360px\)[\s\S]*\.archive-site-footer__links\s*\{[\s\S]*grid-template-columns:\s*repeat\(2,\s*minmax\(0,\s*1fr\)\)/,
+    );
+    assert.match(app, /grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8/);
+    assert.match(
+      footerLinkRule,
+      /min-height:\s*2rem/,
+    );
+    assert.doesNotMatch(
+      footerLinkRule,
+      /min-height:\s*var\(--archive-target-min\)/,
+    );
+    assert.match(app, /archive-back-to-top/);
+    assert.match(backToTopRule, /right:\s*1\.5rem/);
+    assert.match(backToTopRule, /left:\s*auto/);
+  });
+
   it('migrates orientation actions, panels, and statistics to recipes', () => {
     assert.match(startHere, /archive-action archive-action--primary/);
     assert.match(startHere, /archive-action archive-action--secondary/);

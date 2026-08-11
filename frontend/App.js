@@ -1,44 +1,45 @@
 
 import { Component, Suspense, lazy, useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.8.20';
+import { html } from './html.js?v=3.8.21';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, BookOpen, BookMarked, Compass, HelpCircle, MoreHorizontal, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github, Search, XCircle } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.20';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.20';
-import { withViewTransition } from './utils/viewTransition.js?v=3.8.20';
-import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.20';
-import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.20';
-import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.20';
-import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.20';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.20';
-import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.20';
-import { resolveSitePath } from './utils/pathResolver.js?v=3.8.20';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.8.20';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.21';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.21';
+import { withViewTransition } from './utils/viewTransition.js?v=3.8.21';
+import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.21';
+import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.21';
+import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.21';
+import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.21';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.21';
+import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.21';
+import { resolveSitePath } from './utils/pathResolver.js?v=3.8.21';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.8.21';
 import {
   buildSearchText,
   matchesParsedSearchText,
   normalizeForSearch,
   parseSearchQuery,
   searchLoadedIndexes,
-} from './utils/searchNormalize.js?v=3.8.20';
-import { sortRecords } from './utils/recordSort.js?v=3.8.20';
-import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.20';
-import Sidebar from './components/Sidebar.js?v=3.8.20';
-import WelcomeModal from './components/WelcomeModal.js?v=3.8.20';
-import RecordView from './components/RecordView.js?v=3.8.20';
-import FeaturedSection from './components/FeaturedSection.js?v=3.8.20';
-import DissertationPage from './components/DissertationPage.js?v=3.8.20';
-import ToolsModal from './components/ToolsModal.js?v=3.8.20';
-import BugReportModal from './components/BugReportModal.js?v=3.8.20';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.20';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.20';
-import EntityBrowser from './components/EntityBrowser.js?v=3.8.20';
-import Timeline from './components/Timeline.js?v=3.8.20';
-import AboutPage from './components/AboutPage.js?v=3.8.20';
-import WikiPage from './components/WikiPage.js?v=3.8.20';
-import StartHerePage from './components/StartHerePage.js?v=3.8.20';
-import ArchiveResults from './components/ArchiveResults.js?v=3.8.20';
+} from './utils/searchNormalize.js?v=3.8.21';
+import { sortRecords } from './utils/recordSort.js?v=3.8.21';
+import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.21';
+import { formatReleaseDate, loadReleaseMetadata } from './services/releaseMetadata.js?v=3.8.21';
+import Sidebar from './components/Sidebar.js?v=3.8.21';
+import WelcomeModal from './components/WelcomeModal.js?v=3.8.21';
+import RecordView from './components/RecordView.js?v=3.8.21';
+import FeaturedSection from './components/FeaturedSection.js?v=3.8.21';
+import DissertationPage from './components/DissertationPage.js?v=3.8.21';
+import ToolsModal from './components/ToolsModal.js?v=3.8.21';
+import BugReportModal from './components/BugReportModal.js?v=3.8.21';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.21';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.21';
+import EntityBrowser from './components/EntityBrowser.js?v=3.8.21';
+import Timeline from './components/Timeline.js?v=3.8.21';
+import AboutPage from './components/AboutPage.js?v=3.8.21';
+import WikiPage from './components/WikiPage.js?v=3.8.21';
+import StartHerePage from './components/StartHerePage.js?v=3.8.21';
+import ArchiveResults from './components/ArchiveResults.js?v=3.8.21';
 
-const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.20'));
+const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.21'));
 
 const NON_RECORD_ROUTES = new Set([
   ROUTES.analytics,
@@ -153,6 +154,7 @@ const App = () => {
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [announcedResultCount, setAnnouncedResultCount] = useState('');
   const [currentHash, setCurrentHash] = useState(() => window.location.hash);
+  const [releaseMetadata, setReleaseMetadata] = useState(null);
 
   const [filters, setFilters] = useState(() => ({
     ...DEFAULT_FILTERS,
@@ -439,6 +441,16 @@ const App = () => {
   // record-backed route back-fills the data.
   const coreFetchStarted = useRef(false);
   useEffect(() => {
+    let active = true;
+    loadReleaseMetadata()
+      .then((metadata) => {
+        if (active) setReleaseMetadata(metadata);
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
     if (coreFetchStarted.current) return;
     if (NON_RECORD_ROUTES.has(currentRoute) && !desktopNeedsRecords) return;
     coreFetchStarted.current = true;
@@ -708,6 +720,7 @@ const App = () => {
   const years = records.map(r => parseInt(r.year)).filter(y => !isNaN(y));
   const minYear = years.length ? Math.min(...years) : 0;
   const maxYear = years.length ? Math.max(...years) : 0;
+  const releaseDate = releaseMetadata ? formatReleaseDate(releaseMetadata.updated) : '';
 
   // One <RecordView> element for the default archive route. RecordView owns the
   // selected-record lookup and prev/next nav math that App.js used to compute
@@ -1334,7 +1347,7 @@ const App = () => {
       ${showBackToTop && html`
         <button
           onClick=${() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-6 right-6 z-40 p-3 bg-stone-800 text-white rounded-full shadow-lg hover:bg-stone-700 transition-all hover:scale-110"
+          className="archive-back-to-top fixed bottom-6 right-6 z-40 p-3 bg-stone-800 text-white rounded-full shadow-lg hover:bg-stone-700 transition-all hover:scale-110"
           aria-label="Back to top"
         >
           <${ChevronUp} className="w-5 h-5" />
@@ -1343,8 +1356,8 @@ const App = () => {
       </div>
 
       <footer className="archive-site-footer mt-auto">
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-sm text-stone-600">
+        <div className="container mx-auto px-4 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 text-sm text-stone-600">
             <div>
               <h4 className="archive-site-footer__heading">Jay Rosen's Internet Archive</h4>
               <p className="text-xs leading-relaxed">
@@ -1353,7 +1366,7 @@ const App = () => {
             </div>
             <div>
               <h4 className="archive-site-footer__heading">Sections</h4>
-              <div className="space-y-1 text-xs">
+              <div className="archive-site-footer__links text-xs">
                 <button onClick=${() => goTo(ROUTES.start)} className="archive-site-footer__link">Start here</button>
                 <a href=${resolveSitePath('features/participate/')} className="archive-site-footer__link">Ways to participate</a>
                 <button onClick=${() => goTo(ROUTES.archive)} className="archive-site-footer__link">Browse archive</button>
@@ -1372,6 +1385,13 @@ const App = () => {
               <p className="text-xs text-stone-600">
                 ${records.length} records | ${minYear}–${maxYear}
               </p>
+              ${releaseMetadata && html`
+                <p className="archive-site-footer__release">
+                  Last updated <time dateTime=${releaseMetadata.updated}>${releaseDate}</time>
+                  <span aria-hidden="true"> · </span>
+                  Version ${releaseMetadata.version}
+                </p>
+              `}
             </div>
           </div>
         </div>
