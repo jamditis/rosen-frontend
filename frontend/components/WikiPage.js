@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { html } from '../html.js?v=3.8.19';
+import { html } from '../html.js?v=3.8.20';
 import { AlertCircle, Search } from 'lucide-react';
-import { buildWikiPageIndex, fetchWikiData, filterWikiPages, findWikiPageBySlug, normalizeWikiPages, parseWikiHash, wikiPageHref } from '../services/wikiService.js?v=3.8.19';
+import { buildWikiPageIndex, fetchWikiData, filterWikiPages, findWikiPageBySlug, normalizeWikiPages, parseWikiHash, wikiPageHref } from '../services/wikiService.js?v=3.8.20';
 
 const KIND_LABELS = {
   concept: 'Concepts',

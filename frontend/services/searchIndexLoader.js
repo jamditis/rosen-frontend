@@ -2,6 +2,25 @@
  * Load independent full-text indexes without letting one unavailable artifact
  * discard siblings that loaded successfully.
  */
+export function loadSearchIndexArtifact(serialized, options, loadJS) {
+  const { phrasePostings, ...artifact } = JSON.parse(serialized);
+  const index = loadJS(artifact, options);
+  if (phrasePostings && typeof phrasePostings === 'object') {
+    index.phrasePostings = new Map(
+      Object.entries(phrasePostings).map(([key, documentIds]) => {
+        const recordIds = documentIds.map((documentId) => {
+          if (!Object.hasOwn(artifact.documentIds, documentId)) {
+            throw new Error(`exact phrase posting ${key} references missing document ${documentId}`);
+          }
+          return artifact.documentIds[documentId];
+        });
+        return [key, new Set(recordIds)];
+      }),
+    );
+  }
+  return index;
+}
+
 export async function loadAvailableSearchIndexes(
   specs,
   { fetchImpl = globalThis.fetch, loadJSON } = {},

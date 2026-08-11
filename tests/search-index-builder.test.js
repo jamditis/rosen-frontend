@@ -144,6 +144,68 @@ test('default raw_text cap is exported and applied', () => {
   assert.equal(doc.body.length, 8000, 'raw_text is truncated to the default cap');
 });
 
+test('indexes an exact concept phrase without matching separated words (#792)', () => {
+  const rows = [
+    {
+      id: 'EXACT-CONCEPT',
+      title: 'Reporting formulas',
+      key_concepts: 'He said/she said journalism, False balance',
+      raw_text: '',
+    },
+    {
+      id: 'SEPARATED-WORDS',
+      title: 'What he said about journalism',
+      summary: 'She said something else much later.',
+      raw_text: '',
+    },
+    {
+      id: 'EXACT-BODY',
+      title: 'A different reporting formula',
+      key_concepts: '',
+      raw_text: 'Critics call this he said, she said journalism.',
+    },
+  ];
+
+  const { json } = buildSearchIndex(rows);
+
+  assert.deepEqual(
+    json.phrasePostings?.['he~said~she~said'],
+    [0, 2],
+    'only records containing the adjacent phrase should be in its posting list',
+  );
+});
+
+test('shares the article concept vocabulary with the social body index (#792)', () => {
+  const { phraseVocabulary } = buildSearchIndex([{
+    id: 'ARTICLE',
+    key_concepts: 'He said/she said journalism',
+    raw_text: '',
+  }]);
+  const { json } = buildSearchIndex(
+    [{ id: 'SOCIAL', raw_text: 'A critique of he said, she said journalism.' }],
+    {
+      rawTextChars: Number.POSITIVE_INFINITY,
+      indexOptions: socialSearchIndexOptions(),
+      phraseVocabulary,
+    },
+  );
+
+  assert.deepEqual(json.phrasePostings?.['he~said~she~said'], [0]);
+});
+
+test('indexes concept phrases longer than six words and symbol boundaries (#792)', () => {
+  const { json } = buildSearchIndex([{
+    id: 'LONG-CONCEPT',
+    key_concepts: 'One+two three/four five#six seven eight',
+    raw_text: '',
+  }]);
+
+  assert.deepEqual(
+    json.phrasePostings?.['one~two~three~four~five~six~seven~eight'],
+    [0],
+  );
+});
+
 test('the social schema indexes uncapped body text without duplicate metadata fields (#669)', () => {
   const phrase = 'tail phrase unique to this social post';
   const { json, count } = buildSearchIndex(
