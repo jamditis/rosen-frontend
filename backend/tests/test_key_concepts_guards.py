@@ -61,8 +61,17 @@ def _row_needing_fill():
     return row
 
 
+def _archive_header():
+    header = [f"column_{index}" for index in range(_NCOLS)]
+    header[16] = "key_concepts"
+    header[33] = "raw_text"
+    header[35] = "notes"
+    header[36] = "colQ_changes"
+    return header
+
+
 def _worksheet_with_one_fillable_row():
-    return _FakeWorksheet([["h"] * _NCOLS, _row_needing_fill()])
+    return _FakeWorksheet([_archive_header(), _row_needing_fill()])
 
 
 def test_process_rows_defaults_to_current_archive_records_tab(monkeypatch):
@@ -134,21 +143,201 @@ def test_live_run_writes_the_cell(monkeypatch):
     assert any(r.startswith("Q") for r in written_ranges)  # filled key_concepts
 
 
-def test_failed_writes_do_not_count(monkeypatch):
-    # Gemini runs but every Sheets write raises. The write counter must stay 0
-    # so the zero-write guard fires -- it counts saved cells, not attempts.
+def test_failed_writes_abort_without_advancing_progress(monkeypatch):
+    # Gemini runs, but a failed Sheets write must abort before the progress
+    # cursor can skip the unsaved row on a later run.
     monkeypatch.setattr(kc, "analyze_key_concepts",
                         lambda model, rt, kcl, cur="": {
                             "concepts": ["Mindcasting"], "recommendations": ""})
-    ws = _FakeWorksheet([["h"] * _NCOLS, _row_needing_fill()], fail_writes=True)
+    saved_progress = []
+    monkeypatch.setattr(kc, "save_progress", saved_progress.append)
+    ws = _FakeWorksheet([_archive_header(), _row_needing_fill()], fail_writes=True)
+
+    with pytest.raises(RuntimeError, match="sheet write failed"):
+        kc.process_rows(
+            _FakeSpreadsheet(ws), model=object(),
+            schema={"taxonomy": {"key_concepts": ["Mindcasting"]}},
+            start_row=2, limit=1, resume=False, dry_run=False)
+
+    assert ws.updates == []
+    assert saved_progress == []
+
+
+def test_process_rows_resolves_write_columns_from_header(monkeypatch):
+    monkeypatch.setattr(kc, "analyze_key_concepts",
+                        lambda model, rt, kcl, cur="": {
+                            "concepts": ["Mindcasting"],
+                            "recommendations": "False balance"})
+    header = ["id", "raw_text", "notes", "key_concepts",
+              "colQ_changes", "low_confidence"]
+    row = ["R1", "x" * 200, "", "Mindcasting", "", "keep-me"]
+    ws = _FakeWorksheet([header, row])
+
     summary = kc.process_rows(
         _FakeSpreadsheet(ws), model=object(),
         schema={"taxonomy": {"key_concepts": ["Mindcasting"]}},
         start_row=2, limit=1, resume=False, dry_run=False)
 
-    assert summary["gemini_calls"] == 1     # the AI call happened (and cost money)
-    assert summary["writes"] == 0           # but nothing landed -> guard must fire
+    assert summary["by_field"]["recommendations"] == 1
+    assert ws.updates == [("E2", [["False balance"]])]
+
+
+def test_duplicate_required_headers_fail_before_gemini(monkeypatch):
+    gemini_called = False
+
+    def _analyze(*args, **kwargs):
+        nonlocal gemini_called
+        gemini_called = True
+        return {"concepts": [], "recommendations": ""}
+
+    monkeypatch.setattr(kc, "analyze_key_concepts", _analyze)
+    header = ["id", "raw_text", "notes", "notes", "key_concepts",
+              "colQ_changes"]
+    row = ["R1", "x" * 200, "", "", "", ""]
+
+    with pytest.raises(ValueError, match="duplicate.*notes"):
+        kc.process_rows(
+            _FakeSpreadsheet(_FakeWorksheet([header, row])), model=object(),
+            schema={"taxonomy": {"key_concepts": []}},
+            start_row=2, limit=1, resume=False, dry_run=False)
+
+    assert gemini_called is False
+
+
+def test_missing_required_header_fails_before_gemini(monkeypatch):
+    gemini_called = False
+
+    def _analyze(*args, **kwargs):
+        nonlocal gemini_called
+        gemini_called = True
+        return {"concepts": [], "recommendations": ""}
+
+    monkeypatch.setattr(kc, "analyze_key_concepts", _analyze)
+    header = ["id", "raw_text", "notes", "key_concepts"]
+    row = ["R1", "x" * 200, "", ""]
+
+    with pytest.raises(ValueError, match="missing.*colQ_changes"):
+        kc.process_rows(
+            _FakeSpreadsheet(_FakeWorksheet([header, row])), model=object(),
+            schema={"taxonomy": {"key_concepts": []}},
+            start_row=2, limit=1, resume=False, dry_run=False)
+
+    assert gemini_called is False
+
+
+def test_short_raw_text_preserves_existing_curator_notes():
+    header = ["id", "raw_text", "notes", "key_concepts", "colQ_changes"]
+    row = ["R1", "too short", "Curator audit trail", "", ""]
+    ws = _FakeWorksheet([header, row])
+
+    summary = kc.process_rows(
+        _FakeSpreadsheet(ws), model=object(),
+        schema={"taxonomy": {"key_concepts": []}},
+        start_row=2, limit=1, resume=False, dry_run=False)
+
+    assert summary["by_field"]["notes"] == 0
     assert ws.updates == []
+
+
+def test_short_text_note_write_failure_aborts_without_advancing_progress(monkeypatch):
+    saved_progress = []
+    monkeypatch.setattr(kc, "save_progress", saved_progress.append)
+    header = ["id", "raw_text", "notes", "key_concepts", "colQ_changes"]
+    row = ["R1", "too short", "", "", ""]
+    ws = _FakeWorksheet([header, row], fail_writes=True)
+
+    with pytest.raises(RuntimeError, match="sheet write failed"):
+        kc.process_rows(
+            _FakeSpreadsheet(ws), model=object(),
+            schema={"taxonomy": {"key_concepts": []}},
+            start_row=2, limit=1, resume=False, dry_run=False)
+
+    assert saved_progress == []
+
+
+def test_gemini_request_failure_aborts_without_advancing_progress(monkeypatch):
+    saved_progress = []
+    monkeypatch.setattr(kc, "save_progress", saved_progress.append)
+
+    class _FailingModel:
+        def generate_content(self, prompt):
+            raise RuntimeError("Gemini request failed")
+
+    with pytest.raises(RuntimeError, match="Gemini request failed"):
+        kc.process_rows(
+            _FakeSpreadsheet(_worksheet_with_one_fillable_row()),
+            model=_FailingModel(),
+            schema={"taxonomy": {"key_concepts": ["Mindcasting"]}},
+            start_row=2, limit=1, resume=False, dry_run=False)
+
+    assert saved_progress == []
+
+
+def test_invalid_gemini_json_aborts_without_advancing_progress(monkeypatch):
+    saved_progress = []
+    monkeypatch.setattr(kc, "save_progress", saved_progress.append)
+
+    class _Response:
+        text = "not valid JSON"
+
+    class _InvalidJsonModel:
+        def generate_content(self, prompt):
+            return _Response()
+
+    with pytest.raises(ValueError):
+        kc.process_rows(
+            _FakeSpreadsheet(_worksheet_with_one_fillable_row()),
+            model=_InvalidJsonModel(),
+            schema={"taxonomy": {"key_concepts": ["Mindcasting"]}},
+            start_row=2, limit=1, resume=False, dry_run=False)
+
+    assert saved_progress == []
+
+
+def test_progress_from_another_tab_does_not_skip_archive_rows(monkeypatch):
+    monkeypatch.delenv("ROSEN_MASTER_SHEET_TAB", raising=False)
+    monkeypatch.setattr(kc, "load_progress", lambda: {
+        "sheet_name": "staging_records", "last_processed_row": 99,
+        "total_processed": 10, "total_updated": 10, "last_run": None})
+    monkeypatch.setattr(kc, "analyze_key_concepts",
+                        lambda model, rt, kcl, cur="": {
+                            "concepts": ["Mindcasting"], "recommendations": ""})
+    ws = _worksheet_with_one_fillable_row()
+
+    summary = kc.process_rows(
+        _FakeSpreadsheet(ws), model=object(),
+        schema={"taxonomy": {"key_concepts": ["Mindcasting"]}},
+        start_row=None, limit=1, resume=True, dry_run=True)
+
+    assert summary["processed"] == 1
+    assert summary["writes"] == 1
+
+
+def test_progress_from_same_tab_resumes_after_saved_row(monkeypatch):
+    monkeypatch.delenv("ROSEN_MASTER_SHEET_TAB", raising=False)
+    monkeypatch.setattr(kc, "load_progress", lambda: {
+        "sheet_name": "archive_records", "last_processed_row": 2,
+        "total_processed": 1, "total_updated": 1, "last_run": None})
+    analyzed_text = []
+
+    def _analyze(model, raw_text, key_concepts, current_concepts=""):
+        analyzed_text.append(raw_text)
+        return {"concepts": ["Mindcasting"], "recommendations": ""}
+
+    monkeypatch.setattr(kc, "analyze_key_concepts", _analyze)
+    first_row = _row_needing_fill()
+    first_row[33] = "a" * 200
+    second_row = _row_needing_fill()
+    second_row[33] = "b" * 200
+    ws = _FakeWorksheet([_archive_header(), first_row, second_row])
+
+    summary = kc.process_rows(
+        _FakeSpreadsheet(ws), model=object(),
+        schema={"taxonomy": {"key_concepts": ["Mindcasting"]}},
+        start_row=None, limit=1, resume=True, dry_run=True)
+
+    assert summary["processed"] == 1
+    assert analyzed_text == ["b" * 200]
 
 
 def _stub_main_deps(monkeypatch, summary):

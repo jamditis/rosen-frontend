@@ -3,7 +3,7 @@
 Key Concepts Updater Script
 
 This script analyzes raw_text content from the master archive sheet and updates
-the key_concepts column (Q) with appropriate concepts from schema.json using
+the key_concepts column with appropriate concepts from schema.json using
 Gemini 2.0 Flash AI analysis.
 
 Features:
@@ -11,14 +11,11 @@ Features:
 - Automatically saves progress and resumes from last position
 - Rate limiting to avoid API quota issues
 - Intelligent handling of different row states:
-  * Empty colQ: Fills with identified key concepts
-  * Existing colQ data: Provides recommendations in colAK
-  * No raw text: Adds explanatory note in colAJ
+  * Empty key_concepts: Fills with identified key concepts
+  * Existing key_concepts data: Provides recommendations in colQ_changes
+  * No raw text: Adds an explanatory note without replacing curator notes
 
-Column Usage:
-- Column Q (key_concepts): Filled for empty rows
-- Column AJ (notes): Notes for rows that can't be processed
-- Column AK (changes): Recommendations for rows with existing concepts
+Columns are resolved from the worksheet header so column reordering is safe.
 
 Usage:
     # Process next 100 rows (resumes automatically)
@@ -51,6 +48,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 import gspread
 import google.generativeai as genai
+from gspread.utils import rowcol_to_a1
 
 from rosen_scraper.gemini_json import strip_gemini_fence
 from rosen_scraper.sheets_client import get_gspread_client
@@ -69,11 +67,9 @@ PROGRESS_FILE = "key_concepts_progress.json"
 DELAY_BETWEEN_UPDATES = 5  # Delay after each Google Sheets update (increased for rate limiting)
 DELAY_BETWEEN_BATCHES = 10  # Delay between batches of 100
 
-# Column mappings (0-indexed)
-COL_RAW_TEXT = 33  # Column AH (raw_text)
-COL_KEY_CONCEPTS = 16  # Column Q (key_concepts)
-COL_NOTES = 35  # Column AJ (notes)
-COL_CHANGES = 36  # Column AK (changes/recommendations)
+
+class SheetWriteError(RuntimeError):
+    """A worksheet update failed and processing must stop before progress saves."""
 
 
 def load_progress() -> Dict:
@@ -82,6 +78,7 @@ def load_progress() -> Dict:
         with open(PROGRESS_FILE, 'r', encoding='utf-8') as f:
             return json.load(f)
     return {
+        "sheet_name": None,
         "last_processed_row": 1,  # Start from row 2 (after header)
         "total_processed": 0,
         "total_updated": 0,
@@ -267,10 +264,10 @@ Return format (JSON object):
     except json.JSONDecodeError as e:
         print(f"  [WARN] JSON parsing error: {e}")
         print(f"  Response was: {result_text[:200]}")
-        return {"concepts": [], "recommendations": "Error parsing AI response"}
+        raise
     except Exception as e:
         print(f"  [WARN] Error analyzing concepts: {e}")
-        return {"concepts": [], "recommendations": f"Error: {str(e)}"}
+        raise
 
 
 def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
@@ -320,11 +317,25 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
                   f"{str(value)[:60]}")
             writes_by_field[field] += 1
             return
-        worksheet.update(values=[[value]], range_name=range_name)
+        try:
+            worksheet.update(values=[[value]], range_name=range_name)
+        except Exception as exc:
+            raise SheetWriteError(
+                f"Could not write {field} to {range_name}: {exc}"
+            ) from exc
         writes_by_field[field] += 1
 
-    # Load progress
+    # Progress belongs to one worksheet. A cursor from another tab must never
+    # skip rows in the selected master sheet.
     progress = load_progress()
+    if progress.get("sheet_name") != sheet_name:
+        progress = {
+            "sheet_name": sheet_name,
+            "last_processed_row": 1,
+            "total_processed": 0,
+            "total_updated": 0,
+            "last_run": None,
+        }
 
     # Determine starting row
     if start_row is None and resume:
@@ -345,6 +356,36 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
         return {'processed': 0, 'writes': 0, 'gemini_calls': 0,
                 'dry_run': dry_run, 'by_field': writes_by_field}
 
+    required_columns = ("raw_text", "key_concepts", "notes", "colQ_changes")
+    normalized_headers = [str(name).strip() for name in all_rows[0]]
+    duplicate_columns = [
+        name for name in required_columns
+        if normalized_headers.count(name) > 1
+    ]
+    if duplicate_columns:
+        duplicates = ", ".join(duplicate_columns)
+        raise ValueError(
+            f"Master sheet has duplicate required column(s): {duplicates}"
+        )
+
+    column_indices = {
+        name: index for index, name in enumerate(normalized_headers)
+    }
+    missing_columns = [
+        name for name in required_columns if name not in column_indices
+    ]
+    if missing_columns:
+        missing = ", ".join(missing_columns)
+        raise ValueError(f"Master sheet is missing required column(s): {missing}")
+
+    raw_text_index = column_indices["raw_text"]
+    key_concepts_index = column_indices["key_concepts"]
+    notes_index = column_indices["notes"]
+    changes_index = column_indices["colQ_changes"]
+
+    def _cell_address(row_number: int, column_index: int) -> str:
+        return rowcol_to_a1(row_number, column_index + 1)
+
     # Get key concepts from schema
     key_concepts_list = schema['taxonomy']['key_concepts']
     print(f"\n[*] Available Key Concepts: {len(key_concepts_list)}")
@@ -364,7 +405,6 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
 
     updates_made = 0
     skipped = 0
-    errors = 0
     processed_count = 0
 
     # Process rows
@@ -372,17 +412,30 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
         row_number = start_row + i
 
         try:
-            # Get raw text from column AH (index 33)
-            raw_text = row_data[COL_RAW_TEXT] if len(row_data) > COL_RAW_TEXT else ""
+            raw_text = (
+                row_data[raw_text_index]
+                if len(row_data) > raw_text_index else ""
+            )
 
-            # Get current key concepts from column Q (index 16)
-            current_concepts = row_data[COL_KEY_CONCEPTS] if len(row_data) > COL_KEY_CONCEPTS else ""
+            current_concepts = (
+                row_data[key_concepts_index]
+                if len(row_data) > key_concepts_index else ""
+            )
+            current_notes = (
+                row_data[notes_index] if len(row_data) > notes_index else ""
+            )
 
-            # Check if no raw text - add note to colAJ
+            # Record the skip reason only when the curator has not already
+            # supplied notes. Existing notes are an audit trail.
             if not raw_text or len(raw_text.strip()) < 100:
-                print(f"Row {row_number}: [NOTE] No raw text or too short - adding note to colAJ")
-                note = "Skipped: No raw text or content too short (< 100 chars)"
-                _write(f"AJ{row_number}", note, 'notes')
+                if current_notes.strip():
+                    print(f"Row {row_number}: [SKIP] No raw text or too short; "
+                          "preserving existing notes")
+                else:
+                    print(f"Row {row_number}: [NOTE] No raw text or too short; "
+                          "adding a skip note")
+                    note = "Skipped: No raw text or content too short (< 100 chars)"
+                    _write(_cell_address(row_number, notes_index), note, 'notes')
                 skipped += 1
                 processed_count += 1
                 time.sleep(DELAY_BETWEEN_UPDATES)
@@ -401,13 +454,13 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
 
                 if recommendations and recommendations != "N/A":
                     print(f"  [RECOMMENDATION] {recommendations}")
-                    # Update colAK with recommendations
-                    _write(f"AK{row_number}", recommendations, 'recommendations')
+                    _write(_cell_address(row_number, changes_index),
+                           recommendations, 'recommendations')
                     updates_made += 1
                 else:
                     print("  [OK] N/A - Current assignment looks good")
-                    # Update colAK with N/A
-                    _write(f"AK{row_number}", "N/A", 'recommendations')
+                    _write(_cell_address(row_number, changes_index),
+                           "N/A", 'recommendations')
                     updates_made += 1
 
                 skipped += 1
@@ -430,16 +483,16 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
 
             print(f"  AI-identified concepts: {new_concepts_str if new_concepts_str else '(none)'}")
 
-            # Update the cell in colQ
-            cell_address = f"Q{row_number}"
+            cell_address = _cell_address(row_number, key_concepts_index)
             _write(cell_address, new_concepts_str, 'key_concepts')
             print(f"  [OK] Updated: {cell_address}")
             updates_made += 1
 
-            # If there are recommendations, add to colAK
+            # If there are recommendations, add them to colQ_changes.
             if recommendations:
-                _write(f"AK{row_number}", recommendations, 'recommendations')
-                print("  [NOTE] Added recommendations to colAK")
+                _write(_cell_address(row_number, changes_index),
+                       recommendations, 'recommendations')
+                print("  [NOTE] Added recommendations to colQ_changes")
 
             processed_count += 1
 
@@ -448,9 +501,7 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
 
         except Exception as e:
             print(f"Row {row_number}: [ERROR] {e}")
-            errors += 1
-            processed_count += 1
-            continue
+            raise
 
     total_writes = sum(writes_by_field.values())
 
@@ -469,7 +520,6 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
     print(f"Rows in this batch: {processed_count}")
     print(f"[OK] Key concepts filled/updated: {updates_made}")
     print(f"[SKIP] Reviewed (had existing concepts): {skipped}")
-    print(f"[ERROR] Errors: {errors}")
     print(f"Gemini calls: {gemini_calls}")
     print(f"Cells {'that would be ' if dry_run else ''}written: {total_writes} "
           f"({writes_by_field})")
@@ -478,9 +528,9 @@ def process_rows(spreadsheet: gspread.Spreadsheet, model: genai.GenerativeModel,
     print(f"Total updates made across all runs: {progress['total_updated']}")
     print(f"Last processed row: {progress['last_processed_row']}")
     print("\n[*] Notes:")
-    print("  - Rows with no raw text: Notes added to column AJ")
-    print("  - Rows with existing concepts: Recommendations added to column AK")
-    print("  - Rows with empty concepts: Filled column Q, recommendations in AK")
+    print("  - Rows with no raw text: Skip note added when notes are empty")
+    print("  - Rows with existing concepts: Recommendations added to colQ_changes")
+    print("  - Rows with empty concepts: key_concepts filled from analysis")
 
     return {
         'processed': processed_count,
