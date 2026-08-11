@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Pillar 3c full-site SFTP deploy.
+"""Pillar 3c full-site deploy over verified SFTP or explicit FTPS.
 
 Invoked from `.github/workflows/deploy.yml` on workflow_dispatch. Walks the
-hardcoded manifest below, uploads every file via paramiko SFTP with an
-atomic .tmp+posix_rename, then removes explicitly retired remote directories.
+hardcoded manifest below, uploads every file through the shared remote adapter
+with an atomic temporary-file rename, then removes explicitly retired remote
+directories.
 It aborts on the first transfer failure (a partial deploy is worse than no
 deploy — half the page would resolve to v3.4.0 imports while the other half
 stayed on v3.3.0, pinning visitors into a broken half-updated state).
@@ -61,6 +62,7 @@ from submission_runtime.record_pages import (  # noqa: E402
     RECORD_SHELL_RE,
     generate_record_pages,
 )
+from submission_runtime import remote_transfer  # noqa: E402
 
 
 # ---------- Manifest --------------------------------------------------------
@@ -171,7 +173,7 @@ _ENTRY_POINTS: Tuple[str, ...] = ('index.html', 'frontend/sw.js', 'sw.js', 'vers
 # ---------- Config ----------------------------------------------------------
 
 def _read_env() -> Optional[Dict[str, Any]]:
-    """Return SFTP config from env, or None when required vars are missing.
+    """Return transfer config from env, or None when required vars are missing.
 
     Mirrors backend/submission_runtime/sftp_push.py:_read_env but reads
     ROSEN_SFTP_SITE_PATH (the full-site root) instead of the data-only
@@ -182,17 +184,21 @@ def _read_env() -> Optional[Dict[str, Any]]:
     site_path = os.environ.get('ROSEN_SFTP_SITE_PATH', '').strip()
     password = os.environ.get('ROSEN_SFTP_PASSWORD', '')
     key_path = os.environ.get('ROSEN_SFTP_KEY_PATH', '').strip()
+    protocol = remote_transfer.normalize_protocol(
+        os.environ.get('ROSEN_TRANSFER_PROTOCOL', 'sftp'))
 
-    if not (host and user and site_path and (password or key_path)):
+    has_auth = bool(password) if protocol == 'ftps' else bool(password or key_path)
+    if not (host and user and site_path and has_auth):
         return None
 
     try:
-        port = int(os.environ.get('ROSEN_SFTP_PORT', '22'))
-    except (TypeError, ValueError):
-        logger.warning("ROSEN_SFTP_PORT is not an integer; treating as unconfigured")
-        return None
+        default_port = '21' if protocol == 'ftps' else '22'
+        port = int(os.environ.get('ROSEN_SFTP_PORT') or default_port)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("ROSEN_SFTP_PORT must be an integer") from exc
 
     return {
+        'protocol': protocol,
         'host': host,
         'port': port,
         'user': user,
@@ -243,6 +249,17 @@ def collect_local_files(
     files: List[Path] = []
     seen: Set[Path] = set()
     declared_entry_points = tuple(entry_points)
+    resolved_repo_root = repo_root.resolve()
+
+    def _deployable_file(path: Path) -> bool:
+        if path.is_symlink() or not path.is_file():
+            return False
+        try:
+            path.resolve().relative_to(resolved_repo_root)
+        except ValueError:
+            return False
+        return True
+
     # Every deployed standalone page gets dependency-first semantics without a
     # second hand-maintained manifest. Directories are walked normally, but
     # nested index.html files are held until all deployed dirs/data have landed.
@@ -253,15 +270,17 @@ def collect_local_files(
         path.relative_to(repo_root).as_posix()
         for relpath in dirs
         if relpath.rstrip('/') != 'r'
+        and not (repo_root / relpath).is_symlink()
         for path in (repo_root / relpath).rglob('index.html')
-        if path.is_file()
+        if _deployable_file(path)
     ))
     record_entry_points = tuple(sorted(
         path.relative_to(repo_root).as_posix()
         for relpath in dirs
         if relpath.rstrip('/') == 'r'
+        and not (repo_root / relpath).is_symlink()
         for path in (repo_root / relpath).glob('*.html')
-        if path.is_file() and RECORD_SHELL_RE.fullmatch(path.name)
+        if _deployable_file(path) and RECORD_SHELL_RE.fullmatch(path.name)
     ))
     entry_set = (
         set(declared_entry_points)
@@ -270,6 +289,8 @@ def collect_local_files(
     )
 
     def _add(p: Path) -> None:
+        if not _deployable_file(p):
+            return
         rp = p.resolve()
         if rp not in seen:
             seen.add(rp)
@@ -280,7 +301,7 @@ def collect_local_files(
         if relpath in entry_set:
             continue
         p = repo_root / relpath
-        if p.is_file():
+        if _deployable_file(p):
             _add(p)
 
     # Shared JavaScript modules under data/ must exist before the frontend files
@@ -290,15 +311,15 @@ def collect_local_files(
         if not relpath.endswith('.js'):
             continue
         p = repo_root / relpath
-        if p.is_file():
+        if _deployable_file(p):
             _add(p)
 
     for relpath in dirs:
         d = repo_root / relpath
-        if not d.is_dir():
+        if d.is_symlink() or not d.is_dir():
             continue
         for sub in sorted(d.rglob('*')):
-            if sub.is_file() and not _is_excluded(sub):
+            if _deployable_file(sub) and not _is_excluded(sub):
                 # Also prune anything under an excluded-dir name anywhere
                 # in the path (e.g. frontend/foo/__pycache__/bar.pyc).
                 if any(part in _EXCLUDE_NAMES for part in sub.parts):
@@ -312,7 +333,7 @@ def collect_local_files(
 
     for relpath in data_files:
         p = repo_root / relpath
-        if p.is_file():
+        if _deployable_file(p):
             _add(p)
 
     # Standalone entry points flip only after every walked dependency and data
@@ -320,29 +341,29 @@ def collect_local_files(
     # absolute-last ordering after the standalone pages.
     for relpath in standalone_entry_points:
         p = repo_root / relpath
-        if p.is_file():
+        if _deployable_file(p):
             _add(p)
 
     # Record shells reference the global frontend and archive data. Flip them
     # only after those dependencies, but before the root app/SW/version group.
     for relpath in record_entry_points:
         p = repo_root / relpath
-        if p.is_file():
+        if _deployable_file(p):
             _add(p)
 
     # LAST: global entry points, in the order declared.
     for relpath in declared_entry_points:
         p = repo_root / relpath
-        if p.is_file():
+        if _deployable_file(p):
             _add(p)
 
     return files
 
 
-# ---------- SFTP upload -----------------------------------------------------
+# ---------- Remote upload ---------------------------------------------------
 
 def _ensure_remote_dir(sftp, remote_dir: str, cache: Set[str]) -> None:
-    """SFTP `mkdir -p`. Walks remote_dir segment by segment, creating
+    """Remote `mkdir -p`. Walks remote_dir segment by segment, creating
     missing dirs. Caches successful dirs so the next 50 files in the
     same dir don't re-stat it 50 times."""
     if remote_dir in cache or remote_dir in ('', '/'):
@@ -444,107 +465,60 @@ def push_files(
                 }
             expected_record_shells.add(name)
     try:
-        import paramiko
-    except ImportError:
-        return {'ok': False, 'files_pushed': 0,
-                'error': 'paramiko not installed'}
+        cfg['site_path'] = remote_transfer.validate_archive_root(
+            cfg['site_path'], cfg.get('protocol', 'sftp'))
+    except ValueError as exc:
+        return {'ok': False, 'files_pushed': 0, 'error': str(exc)}
 
     pushed = 0
     error: Optional[str] = None
-    dir_cache: Set[str] = set()
-    tmp_known_hosts: Optional[str] = None
-    client = paramiko.SSHClient()
+    # The archive root already exists. Treat it as the mkdir boundary so the
+    # publisher never stats or creates its broader parent (the account can see
+    # more of PressThink than this automation is authorized to touch).
+    dir_cache: Set[str] = {cfg['site_path']}
+    remote = None
 
     try:
-        # The ROSEN_SFTP_KNOWN_HOSTS secret can hold either a path on disk
-        # OR the raw host-key content. Disambiguation: if the value resolves
-        # to an existing file, treat it as a path; otherwise (any non-empty
-        # value) treat it as raw content and materialize to a tempfile so
-        # paramiko can load it. The is_file/content split avoids an
-        # algorithm allowlist — OpenSSH supports ssh-rsa, ssh-ed25519,
-        # ssh-dss, ecdsa-sha2-nistp{256,384,521}, hashed-host '|1|', plus
-        # whatever ships next — and a malformed content blob will raise
-        # cleanly from load_host_keys rather than failing later under
-        # RejectPolicy. The data-only submission runtime uses the same policy.
-        known_hosts_raw = cfg['known_hosts']
-        known_hosts_path = Path(known_hosts_raw).expanduser()
-        if known_hosts_path.is_file():
-            client.load_host_keys(str(known_hosts_path))
-        elif known_hosts_raw and known_hosts_raw.strip():
-            import tempfile
-            with tempfile.NamedTemporaryFile(
-                mode='w', delete=False, suffix='.known_hosts',
-            ) as f:
-                f.write(known_hosts_raw)
-                if not known_hosts_raw.endswith('\n'):
-                    f.write('\n')
-                tmp_known_hosts = f.name
-            client.load_host_keys(tmp_known_hosts)
-        client.set_missing_host_key_policy(paramiko.RejectPolicy())
-
-        connect_kwargs = {
-            'hostname': cfg['host'],
-            'port': cfg['port'],
-            'username': cfg['user'],
-            'timeout': 30,
-            'allow_agent': False,
-            'look_for_keys': False,
-        }
-        if cfg['key_path']:
-            connect_kwargs['key_filename'] = cfg['key_path']
-            if cfg['key_passphrase']:
-                connect_kwargs['passphrase'] = cfg['key_passphrase']
-        else:
-            connect_kwargs['password'] = cfg['password']
-
-        client.connect(**connect_kwargs)
-        sftp = client.open_sftp()
-        try:
-            for local in files:
-                rel = local.relative_to(repo_root).as_posix()
-                remote_final = f"{cfg['site_path']}/{rel}"
-                remote_tmp = f"{remote_final}.tmp"
-                remote_dir = remote_final.rsplit('/', 1)[0]
-                _ensure_remote_dir(sftp, remote_dir, dir_cache)
-                sftp.put(str(local), remote_tmp)
+        remote = remote_transfer.connect_remote(cfg)
+        for local in files:
+            rel = local.relative_to(repo_root).as_posix()
+            remote_final = remote_transfer.scoped_archive_child(
+                cfg['site_path'], rel)
+            remote_tmp = f"{remote_final}.tmp"
+            remote_dir = remote_final.rsplit('/', 1)[0]
+            _ensure_remote_dir(remote, remote_dir, dir_cache)
+            remote.put(str(local), remote_tmp)
+            try:
+                remote.posix_rename(remote_tmp, remote_final)
+            except (IOError, AttributeError):
                 try:
-                    sftp.posix_rename(remote_tmp, remote_final)
-                except (IOError, AttributeError):
-                    try:
-                        sftp.remove(remote_final)
-                    except IOError:
-                        pass
-                    sftp.rename(remote_tmp, remote_final)
-                pushed += 1
-                if pushed % 25 == 0 or pushed == len(files):
-                    logger.info(f"Pushed {pushed}/{len(files)} files")
+                    remote.remove(remote_final)
+                except IOError:
+                    pass
+                remote.rename(remote_tmp, remote_final)
+            pushed += 1
+            if pushed % 25 == 0 or pushed == len(files):
+                logger.info(f"Pushed {pushed}/{len(files)} files")
 
-            if expected_record_shells is not None:
-                remote_record_dir = f"{cfg['site_path']}/r"
-                removed = _prune_remote_record_shells(
-                    sftp, remote_record_dir, expected_record_shells)
-                if removed:
-                    logger.info(f'Removed {removed} stale record metadata shells')
+        if expected_record_shells is not None:
+            remote_record_dir = remote_transfer.scoped_archive_child(
+                cfg['site_path'], 'r')
+            removed = _prune_remote_record_shells(
+                remote, remote_record_dir, expected_record_shells)
+            if removed:
+                logger.info(f'Removed {removed} stale record metadata shells')
 
-            for relpath in remote_prune_dirs:
-                remote_dir = f"{cfg['site_path']}/{relpath}"
-                if _remove_remote_tree(sftp, remote_dir):
-                    logger.info(f'Removed retired directory: {relpath}')
-        finally:
-            sftp.close()
-    except paramiko.SSHException as exc:
-        error = f'SSH error: {exc}'
-        logger.error(error)
-    except (IOError, OSError) as exc:
+        for relpath in remote_prune_dirs:
+            remote_dir = remote_transfer.scoped_archive_child(
+                cfg['site_path'], relpath)
+            if _remove_remote_tree(remote, remote_dir):
+                logger.info(f'Removed retired directory: {relpath}')
+    except Exception as exc:
         error = f'Transfer error: {exc}'
         logger.error(error)
     finally:
-        client.close()
-        if tmp_known_hosts:
-            try:
-                os.unlink(tmp_known_hosts)
-            except OSError:
-                pass
+        if remote is not None:
+            remote.close()
 
     return {
         'ok': error is None and pushed == len(files),
@@ -557,7 +531,7 @@ def push_files(
 
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(
-        description='Push the full Jay Rosen archive site to pressthink.org via SFTP.',
+        description='Push the full Jay Rosen archive site to pressthink.org.',
     )
     parser.add_argument(
         '--dry-run',
@@ -593,12 +567,16 @@ def main(argv: Optional[List[str]] = None) -> int:
             print(f'  {relpath}')
         return 0
 
-    cfg = _read_env()
+    try:
+        cfg = _read_env()
+    except ValueError as exc:
+        print(f'error: {exc}', file=sys.stderr)
+        return 2
     if cfg is None:
         print(
-            'error: required SFTP env vars missing — set ROSEN_SFTP_HOST, '
-            'ROSEN_SFTP_USER, ROSEN_SFTP_SITE_PATH, and either '
-            'ROSEN_SFTP_PASSWORD or ROSEN_SFTP_KEY_PATH',
+            'error: required transfer env vars missing — set ROSEN_SFTP_HOST, '
+            'ROSEN_SFTP_USER, ROSEN_SFTP_SITE_PATH, and valid authentication '
+            'for the selected protocol',
             file=sys.stderr,
         )
         return 2

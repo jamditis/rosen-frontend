@@ -3,7 +3,7 @@ name: Pillar 3a — submit record
 # Fired by Apps Script (the queue-sheet "Process new submissions" button) via
 # the GitHub API workflow_dispatch endpoint. Runs backend/scripts/process_submission.py
 # end-to-end for one row: scrape, categorize, append CSV, regen JSONs, npm test,
-# git push to main, SFTP push to pressthink.org, sheet writeback.
+# git push to main, verified transfer to pressthink.org, sheet writeback.
 #
 # Design: docs/plans/2026-05-24-pillar3a-free-auto-deploy-design.md
 #
@@ -137,25 +137,24 @@ jobs:
           git config user.email "rosen-archive-bot[bot]@users.noreply.github.com"
 
       - name: Materialize SFTP private key (optional, key-auth)
-        # Key-based auth is the eventual default (#302); password auth is the
-        # current fallback. When the ROSEN_SFTP_KEY_CONTENT secret is set, write
-        # the key body to a runner-temp file (0600) and export ROSEN_SFTP_KEY_PATH
-        # so the push step uses it — sftp_push.py prefers the key over the
-        # password whenever a key path is present. While the secret is unset this
-        # is a no-op and the push falls back to ROSEN_SFTP_PASSWORD, so landing
-        # this step changes nothing until the deploy pubkey is uploaded in cPanel
-        # and the secret is set.
+        # Only the backward-compatible SFTP adapter supports key auth. Edgar's
+        # FTPS service always uses password auth, so an SFTP key is materialized
+        # only when the selected protocol is sftp.
         env:
+          ROSEN_TRANSFER_PROTOCOL: ${{ secrets.ROSEN_TRANSFER_PROTOCOL }}
           ROSEN_SFTP_KEY_CONTENT: ${{ secrets.ROSEN_SFTP_KEY_CONTENT }}
         run: |
-          if [ -n "$ROSEN_SFTP_KEY_CONTENT" ]; then
+          protocol="${ROSEN_TRANSFER_PROTOCOL:-sftp}"
+          protocol="${protocol,,}"
+          protocol="${protocol//[[:space:]]/}"
+          if [ "$protocol" = "sftp" ] && [ -n "$ROSEN_SFTP_KEY_CONTENT" ]; then
             umask 077
             printf '%s\n' "$ROSEN_SFTP_KEY_CONTENT" > "$RUNNER_TEMP/rosen_deploy"
             chmod 600 "$RUNNER_TEMP/rosen_deploy"
             echo "ROSEN_SFTP_KEY_PATH=$RUNNER_TEMP/rosen_deploy" >> "$GITHUB_ENV"
-            echo "SFTP auth: private key materialized; using key-based authentication."
+            echo "Transfer auth: private key materialized for SFTP."
           else
-            echo "SFTP auth: ROSEN_SFTP_KEY_CONTENT unset; using password authentication."
+            echo "Transfer auth: private key not materialized; using password authentication."
           fi
 
       - name: Process submission
@@ -175,6 +174,7 @@ jobs:
           # Auth + integration secrets
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           ROSEN_SHEETS_SA_KEY_JSON: ${{ secrets.ROSEN_SHEETS_SA_KEY_JSON }}
+          ROSEN_TRANSFER_PROTOCOL: ${{ secrets.ROSEN_TRANSFER_PROTOCOL }}
           ROSEN_SFTP_HOST: ${{ secrets.ROSEN_SFTP_HOST }}
           ROSEN_SFTP_USER: ${{ secrets.ROSEN_SFTP_USER }}
           ROSEN_SFTP_PASSWORD: ${{ secrets.ROSEN_SFTP_PASSWORD }}

@@ -5,7 +5,7 @@ Covers the load-bearing behaviors:
   - Missing env vars: no-op success so dev / CI runs don't break.
   - Missing staged files: explicit failure (would otherwise upload a partial set).
   - Successful push: posix_rename used (atomic from the reader's perspective).
-  - SFTP server without posix_rename: falls back to remove + rename.
+  - A server without posix_rename: falls back to remove + rename.
 """
 
 import sys
@@ -43,6 +43,7 @@ def _set_env(monkeypatch, **overrides):
         "ROSEN_SFTP_PORT",
         "ROSEN_SFTP_KNOWN_HOSTS",
         "ROSEN_SFTP_KEY_PASSPHRASE",
+        "ROSEN_TRANSFER_PROTOCOL",
     ):
         monkeypatch.delenv(key, raising=False)
     env = dict(_REQUIRED_ENV)
@@ -108,11 +109,34 @@ class TestMissingConfig:
         assert result["skipped"] is True
         assert result["ok"] is True
 
-    def test_non_integer_port_returns_skipped(self, tmp_path, monkeypatch):
+    def test_non_integer_port_fails_loudly(self, tmp_path, monkeypatch):
         _set_env(monkeypatch, ROSEN_SFTP_PORT="not-an-int")
         result = sftp_push.push_to_production(tmp_path)
-        assert result["skipped"] is True
-        assert result["ok"] is True
+        assert result["skipped"] is False
+        assert result["ok"] is False
+        assert "port" in result["error"].lower()
+
+    def test_invalid_protocol_fails_loudly(self, tmp_path, monkeypatch):
+        _set_env(monkeypatch, ROSEN_TRANSFER_PROTOCOL="ftp")
+        result = sftp_push.push_to_production(tmp_path)
+        assert result["skipped"] is False
+        assert result["ok"] is False
+        assert "protocol" in result["error"].lower()
+
+    def test_ftps_key_only_auth_fails_loudly(self, tmp_path, monkeypatch):
+        _set_env(
+            monkeypatch,
+            ROSEN_TRANSFER_PROTOCOL="ftps",
+            ROSEN_SFTP_REMOTE_PATH="j/rosen-archive/data",
+            ROSEN_SFTP_PASSWORD=None,
+            ROSEN_SFTP_KEY_PATH="/tmp/sftp-only-key",
+        )
+
+        result = sftp_push.push_to_production(tmp_path)
+
+        assert result["skipped"] is False
+        assert result["ok"] is False
+        assert "password" in result["error"].lower()
 
 
 class TestStagingPreflight:
@@ -132,6 +156,64 @@ class TestStagingPreflight:
         result = sftp_push.push_to_production(tmp_path)
         assert result["ok"] is False
         assert "missing" in result["error"].lower()
+
+
+class TestTransferConfig:
+    def test_ftps_defaults_to_port_21(self, monkeypatch):
+        _set_env(
+            monkeypatch,
+            ROSEN_TRANSFER_PROTOCOL="ftps",
+            ROSEN_SFTP_REMOTE_PATH="j/rosen-archive/data",
+            ROSEN_SFTP_PORT=None,
+        )
+
+        config = sftp_push._read_env()
+
+        assert config["protocol"] == "ftps"
+        assert config["port"] == 21
+
+    def test_empty_ftps_port_secret_defaults_to_port_21(self, monkeypatch):
+        _set_env(
+            monkeypatch,
+            ROSEN_TRANSFER_PROTOCOL="ftps",
+            ROSEN_SFTP_REMOTE_PATH="j/rosen-archive/data",
+            ROSEN_SFTP_PORT="",
+        )
+
+        config = sftp_push._read_env()
+
+        assert config["port"] == 21
+
+    def test_connect_configuration_error_is_a_transfer_error(
+        self, monkeypatch, staging_dir
+    ):
+        _set_env(monkeypatch)
+
+        with patch.object(
+            sftp_push.remote_transfer,
+            "connect_remote",
+            side_effect=ValueError("FTPS requires password authentication"),
+        ):
+            result = sftp_push.push_to_production(staging_dir)
+
+        assert result["ok"] is False
+        assert result["error"] == (
+            "Transfer error: FTPS requires password authentication"
+        )
+
+    def test_data_path_guard_runs_before_network(self, staging_dir, monkeypatch):
+        _set_env(
+            monkeypatch,
+            ROSEN_TRANSFER_PROTOCOL="ftps",
+            ROSEN_SFTP_REMOTE_PATH="j",
+        )
+
+        with patch.object(sftp_push.remote_transfer, "connect_remote") as connect:
+            result = sftp_push.push_to_production(staging_dir)
+
+        assert result["ok"] is False
+        assert "archive data" in result["error"]
+        connect.assert_not_called()
 
 
 class TestSuccessfulPush:

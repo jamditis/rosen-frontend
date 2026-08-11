@@ -1,30 +1,41 @@
 ---
 type: system
 title: Deploy and hosting
-description: The archive is served from a legacy NYU Media Temple/Plesk box behind Cloudflare DNS on a GoDaddy domain; automated deploy exists but lacks SFTP credentials, so uploads are manual.
+description: The archive is served from a legacy PressThink origin behind Cloudflare DNS and deploys through explicit FTPS.
 source: ["GitHub #458/#459/#367", "2026-06-19 call", "DEPLOYMENT.md", "deploy.yml"]
-verified: 2026-06-22
-tags: [deploy, hosting, sftp, blocker, cloudflare]
-timestamp: 2026-06-22
+verified: 2026-08-06
+tags: [deploy, hosting, ftps, cloudflare]
+timestamp: 2026-08-06
 ---
 
 # Deploy and hosting
 
-The archive is served at `https://pressthink.org/j/rosen-archive/`, with files under `/wp-content/rosen-archive/` (SFTP target path `/J`).
+The archive is served at `https://pressthink.org/j/rosen-archive/`. The transfer
+account's chroot exposes that tree as `j/rosen-archive/`.
 
 ## The hosting tangle
 
 - **Domain:** `pressthink.org` is on **GoDaddy**, owned by [Jay](../people/jay-rosen.md).
 - **DNS:** on **Cloudflare** (`jeff.ns.cloudflare.com`).
-- **Origin/hosting:** a legacy **Media Temple / Plesk** box with reverse DNS `nyuhyperlocal.org` (legacy NYU) — **not** GoDaddy's standard cPanel/Managed-WordPress product. The dry-run deploy confirmed this; on the call Jay first thought it was "on GoDaddy," which was the domain.
+- **Origin/hosting:** a legacy PressThink origin with reverse DNS
+  `nyuhyperlocal.org`. Deployment does not depend on a Plesk or cPanel control
+  panel.
 
-## The blocker
+## Automated transfer
 
-The deploy automation exists (`.github/workflows/deploy.yml` + `backend/scripts/deploy_full_site.py`) and expects SFTP credentials as repo secrets, but **no working credentials are set**, so it fails safe to manual. Getting credentials is the single unblock — request tracked in #458 (relayed via Jay to whoever manages hosting/DNS), full-site deploy wiring in #367. This blocker is known and already discussed with Jay; it is not waiting on Joe.
+The server exposes certificate-verified explicit FTPS on port 21; SSH/SFTP on
+port 22 is closed. `.github/workflows/deploy.yml` and the per-record submission
+path select FTPS through `ROSEN_TRANSFER_PROTOCOL`. Both reject remote paths
+outside `j/rosen-archive/` or its `data/` child before connecting. The server
+account can list the broader PressThink document root, so this client-side
+boundary is mandatory.
 
-## The interim path (manual)
+## Manual fallback
 
-Until credentials land, the [Curator](../people/joe-amditis.md) keeps the site current with a manual upload via the WordPress File Manager plugin — drop the built files into `/wp-content/rosen-archive/`. The weekly emailed-zip fallback is #459. Manifest of what to upload: [DEPLOYMENT.md](../../DEPLOYMENT.md). Do not include `features/making-of/` in a manual upload until its handoff chapter is approved; it is listed under "What NOT to deploy" in that manifest.
+If the automated path is unavailable, the [Curator](../people/joe-amditis.md)
+can upload through the WordPress File Manager plugin. Manifest of what to
+upload: [DEPLOYMENT.md](../../DEPLOYMENT.md). Do not include
+`features/making-of/` until its separate publication approval.
 
 ## Cache busting (three layers)
 

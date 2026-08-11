@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Tests for scripts/deploy_full_site.py — full-site SFTP push.
+"""Tests for scripts/deploy_full_site.py — verified full-site transfer.
 
 The script is invoked once per `deploy.yml` workflow_dispatch run. It walks
-a hardcoded manifest of files/directories, uploads each via paramiko SFTP
-with atomic posix_rename, and bails on the first transfer failure (a
+a hardcoded manifest of files/directories, uploads each through the selected
+remote adapter with an atomic rename, and bails on the first failure (a
 partial deploy is worse than no deploy).
 
 These tests cover the load-bearing behaviors:
@@ -64,6 +64,7 @@ def _set_env(monkeypatch, **overrides):
         'ROSEN_SFTP_HOST', 'ROSEN_SFTP_USER', 'ROSEN_SFTP_SITE_PATH',
         'ROSEN_SFTP_PASSWORD', 'ROSEN_SFTP_KEY_PATH', 'ROSEN_SFTP_PORT',
         'ROSEN_SFTP_KNOWN_HOSTS', 'ROSEN_SFTP_KEY_PASSPHRASE',
+        'ROSEN_TRANSFER_PROTOCOL',
     ):
         monkeypatch.delenv(key, raising=False)
     env = dict(_REQUIRED_ENV)
@@ -277,6 +278,22 @@ class TestCollectLocalFiles:
         rels = {f.relative_to(tmp_path).as_posix() for f in files}
         assert 'data/feeds/rss.xml' in rels
         assert 'data/feeds/leaked.csv' not in rels
+
+    def test_excludes_symlinked_files_from_deploy_manifest(self, tmp_path):
+        outside = tmp_path.parent / 'outside-secret.txt'
+        outside.write_text('must not deploy')
+        frontend = tmp_path / 'frontend'
+        frontend.mkdir()
+        (frontend / 'App.js').write_text('//')
+        (frontend / 'alias.txt').symlink_to(outside)
+
+        files = deploy_full_site.collect_local_files(
+            tmp_path, top_files=(), dirs=('frontend',), data_files=(),
+        )
+
+        rels = {path.relative_to(tmp_path).as_posix() for path in files}
+        assert 'frontend/App.js' in rels
+        assert 'frontend/alias.txt' not in rels
 
 
 class TestRecordSharePages:
@@ -985,6 +1002,71 @@ class TestMissingEnv:
         assert 'sftp' in err.lower() or 'env' in err.lower()
 
 
+class TestTransferConfig:
+    def test_ftps_defaults_to_port_21(self, monkeypatch):
+        _set_env(
+            monkeypatch,
+            ROSEN_TRANSFER_PROTOCOL='ftps',
+            ROSEN_SFTP_SITE_PATH='j/rosen-archive',
+            ROSEN_SFTP_PORT=None,
+        )
+
+        config = deploy_full_site._read_env()
+
+        assert config['protocol'] == 'ftps'
+        assert config['port'] == 21
+
+    def test_empty_ftps_port_secret_defaults_to_port_21(self, monkeypatch):
+        _set_env(
+            monkeypatch,
+            ROSEN_TRANSFER_PROTOCOL='ftps',
+            ROSEN_SFTP_SITE_PATH='j/rosen-archive',
+            ROSEN_SFTP_PORT='',
+        )
+
+        config = deploy_full_site._read_env()
+
+        assert config['port'] == 21
+
+    def test_invalid_protocol_raises_a_clear_configuration_error(
+        self, monkeypatch
+    ):
+        _set_env(monkeypatch, ROSEN_TRANSFER_PROTOCOL='ftp')
+
+        with pytest.raises(ValueError, match='must be sftp or ftps'):
+            deploy_full_site._read_env()
+
+    def test_non_integer_port_raises_a_clear_configuration_error(
+        self, monkeypatch
+    ):
+        _set_env(monkeypatch, ROSEN_SFTP_PORT='not-an-int')
+
+        with pytest.raises(ValueError, match='must be an integer'):
+            deploy_full_site._read_env()
+
+    def test_archive_path_guard_runs_before_network(self, monkeypatch, tmp_path):
+        _set_env(
+            monkeypatch,
+            ROSEN_TRANSFER_PROTOCOL='ftps',
+            ROSEN_SFTP_SITE_PATH='j',
+        )
+        local = tmp_path / 'index.html'
+        local.write_text('<html>')
+
+        with patch.object(
+            deploy_full_site.remote_transfer, 'connect_remote'
+        ) as connect:
+            result = deploy_full_site.push_files(
+                [local],
+                repo_root=tmp_path,
+                cfg=deploy_full_site._read_env(),
+            )
+
+        assert result['ok'] is False
+        assert 'archive root' in result['error']
+        connect.assert_not_called()
+
+
 class TestUploadPathsUsePosixRename:
     """Every uploaded file lands at .tmp first, then posix_rename — atomic."""
 
@@ -1017,6 +1099,34 @@ class TestUploadPathsUsePosixRename:
             )
         # Each tmp upload followed by an atomic rename to its final name.
         assert mock_sftp.posix_rename.call_count == 2
+
+    def test_ftps_upload_never_touches_archive_parent(self, monkeypatch, tmp_path):
+        _set_env(
+            monkeypatch,
+            ROSEN_TRANSFER_PROTOCOL='ftps',
+            ROSEN_SFTP_SITE_PATH='j/rosen-archive',
+        )
+        local = tmp_path / 'index.html'
+        local.write_text('<html>')
+        remote = MagicMock()
+
+        with patch.object(
+            deploy_full_site.remote_transfer,
+            'connect_remote',
+            return_value=remote,
+        ):
+            result = deploy_full_site.push_files(
+                [local],
+                repo_root=tmp_path,
+                cfg=deploy_full_site._read_env(),
+                remote_prune_dirs=(),
+            )
+
+        assert result['ok'] is True
+        for method_call in remote.method_calls:
+            for argument in method_call.args:
+                if isinstance(argument, str) and argument.startswith('j'):
+                    assert argument.startswith('j/rosen-archive/')
 
 
 class TestRetiredRoutes:
@@ -1108,6 +1218,19 @@ class TestRetiredRoutes:
             assets,
             root,
         ]
+
+    def test_remote_prune_removes_symlink_without_recursing(self):
+        remote = MagicMock()
+        root = 'j/rosen-archive/dissertation/context'
+        remote.listdir_attr.return_value = [
+            SimpleNamespace(filename='outside', st_mode=stat.S_IFLNK),
+        ]
+
+        assert deploy_full_site._remove_remote_tree(remote, root) is True
+
+        remote.listdir_attr.assert_called_once_with(root)
+        remote.remove.assert_called_once_with(f'{root}/outside')
+        remote.rmdir.assert_called_once_with(root)
 
     def test_remote_prune_treats_missing_directory_as_complete(self):
         sftp = MagicMock()

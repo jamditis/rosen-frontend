@@ -62,8 +62,8 @@ The default navigation view should be a per-concept local graph, not a global fo
 
 | Badge | Count |
 | --- | ---: |
-| fresh | 4 |
-| watch | 30 |
+| fresh | 5 |
+| watch | 29 |
 
 ## Freshness watchlist
 
@@ -80,7 +80,7 @@ The default navigation view should be a per-concept local graph, not a global fo
 | [What the archive is](../project/overview.md) | Watch | 2026-06-22 | 3 | Verified 49 days before inventory |
 | [Provenance](../sources/provenance.md) | Watch | 2026-06-22 | 1 | Verified 49 days before inventory |
 | [Data pipeline (backend)](../systems/data-pipeline.md) | Watch | 2026-06-22 | 3 | Verified 49 days before inventory |
-| [Deploy and hosting](../systems/deploy-and-hosting.md) | Watch | 2026-06-22 | 4 | Verified 49 days before inventory |
+| [Feedback and reporting](../systems/feedback-and-reporting.md) | Watch | 2026-06-22 | 3 | Verified 49 days before inventory |
 
 ## High-drift concepts
 
@@ -91,7 +91,6 @@ The default navigation view should be a per-concept local graph, not a global fo
 | [Jay Rosen](../people/jay-rosen.md) | person | 2026-06-22 | 5 | high-change topic: launch; verified 49 days before inventory |
 | [Unified Field](../people/unified-field.md) | organization | 2026-06-22 | 2 | high-change topic: launch; verified 49 days before inventory |
 | [Launch status](../project/launch-status.md) | concept | 2026-06-22 | 0 | high-change topic: blocker, credential, launch, sftp; verified 49 days before inventory |
-| [Deploy and hosting](../systems/deploy-and-hosting.md) | system | 2026-06-22 | 11 | high-change topic: blocker, cloudflare, deploy, dns, hosting, sftp; verified 49 days before inventory |
 | [Feedback and reporting](../systems/feedback-and-reporting.md) | system | 2026-06-22 | 3 | high-change topic: launch; verified 49 days before inventory |
 | [Key dates](../timeline/key-dates.md) | concept | 2026-06-22 | 1 | high-change topic: launch; verified 49 days before inventory |
 | [Open launch and architecture decisions](../launch/open-decisions.md) | concept | 2026-06-23 | 0 | high-change topic: automation, launch, submission; change-prone topic: data, decisions; verified 48 days before inventory |
@@ -99,6 +98,7 @@ The default navigation view should be a per-concept local graph, not a global fo
 | [Cache and versioning](../systems/cache-and-versioning.md) | system | 2026-06-23 | 1 | high-change topic: cache, deploy, versioning; change-prone topic: data; verified 48 days before inventory |
 | [CI and testing](../systems/ci-and-testing.md) | system | 2026-06-23 | 1 | high-change topic: ci, github-actions, testing; verified 48 days before inventory |
 | [Submission automation (Pillar 3a)](../systems/submission-automation.md) | system | 2026-07-21 | 2 | high-change topic: automation, github-actions, submission |
+| [Deploy and hosting](../systems/deploy-and-hosting.md) | system | 2026-08-06 | 11 | high-change topic: cloudflare, deploy, dns, hosting |
 | [Maintenance automation](../systems/maintenance-automation.md) | system | 2026-08-10 | 1 | high-change topic: automation, deploy, github-actions |
 
 ## Stale concepts
@@ -118,7 +118,6 @@ These concepts have a `verified` date more than 30 days before the inventory dat
 | [What the archive is](../project/overview.md) | concept | 2026-06-22 | 1 | change-prone topic: public; verified 49 days before inventory |
 | [Provenance](../sources/provenance.md) | concept | 2026-06-22 | 0 | change-prone topic: provenance, source, verification; verified 49 days before inventory |
 | [Data pipeline (backend)](../systems/data-pipeline.md) | system | 2026-06-22 | 2 | change-prone topic: data; verified 49 days before inventory |
-| [Deploy and hosting](../systems/deploy-and-hosting.md) | system | 2026-06-22 | 11 | high-change topic: blocker, cloudflare, deploy, dns, hosting, sftp; verified 49 days before inventory |
 | [Feedback and reporting](../systems/feedback-and-reporting.md) | system | 2026-06-22 | 3 | high-change topic: launch; verified 49 days before inventory |
 | [Front end (zero-build static site)](../systems/frontend.md) | system | 2026-06-22 | 4 | verified 49 days before inventory |
 | [Key dates](../timeline/key-dates.md) | concept | 2026-06-22 | 1 | high-change topic: launch; verified 49 days before inventory |

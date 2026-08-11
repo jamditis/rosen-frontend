@@ -191,7 +191,7 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── src/                         # Scraper, processors, categorizer
 │   ├── scripts/                     # Maintenance scripts
 │   ├── tests/                       # Python test suite (pytest)
-│   ├── submission_runtime/          # Pillar 3a: current Action helpers for config, SFTP, and Sheets
+│   ├── submission_runtime/          # Pillar 3a: config, remote transfer, and Sheets helpers
 │   ├── docs/                        # Backend-specific docs
 │   ├── pyproject.toml               # Poetry dependencies
 │   ├── schema.json                  # Backend data schema
@@ -287,7 +287,11 @@ npm run test:frontend      # Version consistency + frontend structure
 
 ## Deployment
 
-The site is hosted at `pressthink.org/j/rosen-archive/`. Deploy by uploading changed files via FTP to `/wp-content/rosen-archive/`. The complete file-by-file deploy manifest (what to upload, what to exclude) lives in `DEPLOYMENT.md`. The end-to-end record-add workflow for non-technical curators lives in `ADDING-RECORDS.md`.
+The site is hosted at `pressthink.org/j/rosen-archive/`. Deploy through the
+certificate-verified FTPS workflow, which is pinned to `j/rosen-archive/`.
+The complete file-by-file deploy manifest (what to upload, what to exclude)
+lives in `DEPLOYMENT.md`. The end-to-end record-add workflow for non-technical
+curators lives in `ADDING-RECORDS.md`.
 
 Short version:
 

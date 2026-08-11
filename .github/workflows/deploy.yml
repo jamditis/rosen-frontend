@@ -1,12 +1,13 @@
 name: Pillar 3c — deploy full site to pressthink.org
 
-# Manually-triggered (workflow_dispatch only) full-site SFTP push.
+# Manually-triggered (workflow_dispatch only) full-site transfer.
 # Replaces the manual FileZilla-style deploy with one click in the Actions UI.
 #
 # Pairs with backend/scripts/deploy_full_site.py — runs that script against
-# the secrets below. Reuses the same ROSEN_SFTP_* credentials as the per-record
-# `submit-record.yml`, plus one new secret:
-#   ROSEN_SFTP_SITE_PATH → the site root (e.g. /home/u/public_html/j/rosen-archive)
+# the secrets below. Reuses the same transfer credentials as the per-record
+# `submit-record.yml`, plus these deployment settings:
+#   ROSEN_TRANSFER_PROTOCOL → ftps for Edgar's port-21 service
+#   ROSEN_SFTP_SITE_PATH → the archive root (FTPS: j/rosen-archive)
 # Distinct from ROSEN_SFTP_REMOTE_PATH (the per-record data subdir) so a
 # misconfigured per-record workflow can't accidentally write outside data/.
 #
@@ -19,7 +20,7 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Skip the SFTP upload, just report what would be pushed'
+        description: 'Skip the upload, just report what would be pushed'
         required: false
         type: boolean
         default: false
@@ -89,30 +90,32 @@ jobs:
         run: poetry install --without dev --no-interaction
 
       - name: Materialize SFTP private key (optional, key-auth)
-        # Same key-auth plumbing as submit-record.yml (#302). deploy_full_site.py
-        # shares sftp_push.py's auth precedence (key over password when a key path
-        # is present), so when the ROSEN_SFTP_KEY_CONTENT secret is set, write it
-        # to a runner-temp file (0600) and export ROSEN_SFTP_KEY_PATH. No-op while
-        # the secret is unset, so the full-site deploy keeps using password auth
-        # until the cutover.
+        # Only the backward-compatible SFTP adapter supports key auth. Edgar's
+        # FTPS service always uses password auth, so an SFTP key is materialized
+        # only when the selected protocol is sftp.
         env:
+          ROSEN_TRANSFER_PROTOCOL: ${{ secrets.ROSEN_TRANSFER_PROTOCOL }}
           ROSEN_SFTP_KEY_CONTENT: ${{ secrets.ROSEN_SFTP_KEY_CONTENT }}
         run: |
-          if [ -n "$ROSEN_SFTP_KEY_CONTENT" ]; then
+          protocol="${ROSEN_TRANSFER_PROTOCOL:-sftp}"
+          protocol="${protocol,,}"
+          protocol="${protocol//[[:space:]]/}"
+          if [ "$protocol" = "sftp" ] && [ -n "$ROSEN_SFTP_KEY_CONTENT" ]; then
             umask 077
             printf '%s\n' "$ROSEN_SFTP_KEY_CONTENT" > "$RUNNER_TEMP/rosen_deploy"
             chmod 600 "$RUNNER_TEMP/rosen_deploy"
             echo "ROSEN_SFTP_KEY_PATH=$RUNNER_TEMP/rosen_deploy" >> "$GITHUB_ENV"
-            echo "SFTP auth: private key materialized; using key-based authentication."
+            echo "Transfer auth: private key materialized for SFTP."
           else
-            echo "SFTP auth: ROSEN_SFTP_KEY_CONTENT unset; using password authentication."
+            echo "Transfer auth: private key not materialized; using password authentication."
           fi
 
       - name: Deploy
         working-directory: backend
         env:
-          # Auth + remote path. ROSEN_SFTP_SITE_PATH is the new secret —
-          # distinct from ROSEN_SFTP_REMOTE_PATH (data subdir) by design.
+          # Auth + remote path. ROSEN_SFTP_SITE_PATH is distinct from
+          # ROSEN_SFTP_REMOTE_PATH (data subdir) by design.
+          ROSEN_TRANSFER_PROTOCOL: ${{ secrets.ROSEN_TRANSFER_PROTOCOL }}
           ROSEN_SFTP_HOST: ${{ secrets.ROSEN_SFTP_HOST }}
           ROSEN_SFTP_USER: ${{ secrets.ROSEN_SFTP_USER }}
           ROSEN_SFTP_PASSWORD: ${{ secrets.ROSEN_SFTP_PASSWORD }}
