@@ -19,6 +19,9 @@ import {
   buildSearchText,
   matchesSearch,
   findSearchSuggestions,
+  matchesParsedSearchText,
+  parseSearchQuery,
+  searchLoadedIndexes,
 } from '../frontend/utils/searchNormalize.js';
 
 const RSQUO = String.fromCharCode(0x2019); // right single quote
@@ -168,5 +171,164 @@ describe('findSearchSuggestions (#683)', () => {
     assert.deepEqual(findSearchSuggestions(['Alpha'], '   '), []);
     assert.deepEqual(findSearchSuggestions(['Alpha'], 'al', 0), []);
     assert.deepEqual(findSearchSuggestions(null, 'al'), []);
+  });
+});
+
+describe('quoted phrase search (#792)', () => {
+  it('parses a quoted phrase while keeping unquoted terms in the full-text query', () => {
+    const parsed = parseSearchQuery('"he said, she said" journalism');
+
+    assert.equal(parsed.miniQuery, 'he said, she said journalism');
+    assert.deepEqual(parsed.phraseKeys, ['he~said~she~said']);
+    assert.deepEqual(parsed.unquotedTokens, ['journalism']);
+  });
+
+  it('treats commas, slashes, and curly quotes as phrase boundaries', () => {
+    assert.deepEqual(
+      parseSearchQuery(LDQUO + 'he said/she said' + RDQUO).phraseKeys,
+      ['he~said~she~said'],
+    );
+  });
+
+  it('treats symbols as phrase boundaries and supports phrases longer than six words', () => {
+    const parsed = parseSearchQuery('"one+two three/four five#six seven eight"');
+
+    assert.equal(parsed.miniQuery, 'one+two three/four five#six seven eight');
+    assert.deepEqual(parsed.phraseKeys, ['one~two~three~four~five~six~seven~eight']);
+  });
+
+  it('treats an unmatched double quote as an ordinary query', () => {
+    const query = '"he said, she said" journalism "unfinished';
+    const parsed = parseSearchQuery(query);
+
+    assert.equal(parsed.miniQuery, query);
+    assert.deepEqual(parsed.phraseKeys, []);
+  });
+
+  it('leaves plain unquoted MiniSearch queries unchanged', () => {
+    const query = '  he said, she said journalism  ';
+    const parsed = parseSearchQuery(query);
+
+    assert.equal(parsed.miniQuery, query.trim());
+    assert.deepEqual(parsed.phraseKeys, []);
+  });
+
+  it('requires quoted words to be adjacent in one in-memory card field', () => {
+    const parsed = parseSearchQuery('"he said, she said" journalism');
+    const exact = buildSearchText({
+      title: 'He said/she said journalism',
+      summary: 'A reporting formula',
+      categories: [],
+    });
+    const separated = buildSearchText({
+      title: 'What he said about journalism',
+      summary: 'She said something else much later',
+      categories: [],
+    });
+
+    assert.equal(matchesParsedSearchText(exact, parsed), true);
+    assert.equal(matchesParsedSearchText(separated, parsed), false);
+  });
+
+  it('filters quoted article hits through exact postings and excludes unverifiable social hits', () => {
+    const calls = [];
+    const article = {
+      phrasePostings: new Map([
+        ['he~said~she~said', new Set(['EXACT'])],
+      ]),
+      search(query, options) {
+        calls.push({ source: 'article', query, options });
+        return [{ id: 'EXACT' }, { id: 'SEPARATED' }];
+      },
+    };
+    const social = {
+      search(query, options) {
+        calls.push({ source: 'social', query, options });
+        return [{ id: 'SOCIAL-UNVERIFIED' }];
+      },
+    };
+
+    const hits = searchLoadedIndexes([article, social], '"he said, she said" journalism');
+
+    assert.deepEqual(hits.map(hit => hit.id), ['EXACT']);
+    assert.deepEqual(calls, [
+      {
+        source: 'article',
+        query: 'he said, she said journalism',
+        options: { prefix: true, combineWith: 'AND' },
+      },
+      {
+        source: 'social',
+        query: 'he said, she said journalism',
+        options: { prefix: true, combineWith: 'AND' },
+      },
+    ]);
+  });
+
+  it('keeps a social hit when its shared phrase posting verifies adjacency', () => {
+    const social = {
+      phrasePostings: new Map([
+        ['he~said~she~said', new Set(['SOCIAL-EXACT'])],
+      ]),
+      search: () => [{ id: 'SOCIAL-EXACT' }, { id: 'SOCIAL-SEPARATED' }],
+    };
+
+    const hits = searchLoadedIndexes([social], '"he said, she said" journalism');
+
+    assert.deepEqual(hits.map(hit => hit.id), ['SOCIAL-EXACT']);
+  });
+
+  it('returns no deep-index hits when a quoted phrase has no posting vocabulary', () => {
+    const article = {
+      phrasePostings: new Map(),
+      search: () => [{ id: 'BROAD-AND-MATCH' }],
+    };
+
+    assert.deepEqual(searchLoadedIndexes([article], '"unknown exact phrase"'), []);
+  });
+
+  it('keeps symbols in the MiniSearch candidate query before applying exact postings', () => {
+    const seenQueries = [];
+    const article = {
+      phrasePostings: new Map([
+        ['one~two~three', new Set(['SYMBOL-MATCH'])],
+      ]),
+      search(query) {
+        seenQueries.push(query);
+        return query === 'one+two/three' ? [{ id: 'SYMBOL-MATCH' }] : [];
+      },
+    };
+
+    const hits = searchLoadedIndexes([article], '"one+two/three"');
+
+    assert.deepEqual(seenQueries, ['one+two/three']);
+    assert.deepEqual(hits.map(hit => hit.id), ['SYMBOL-MATCH']);
+  });
+
+  it('preserves the exact unquoted query and unions article and social hits', () => {
+    const calls = [];
+    const makeIndex = (id) => ({
+      search(query, options) {
+        calls.push({ query, options });
+        return [{ id }];
+      },
+    });
+
+    const hits = searchLoadedIndexes(
+      [makeIndex('ARTICLE'), makeIndex('SOCIAL')],
+      'he said, she said journalism',
+    );
+
+    assert.deepEqual(hits.map(hit => hit.id), ['ARTICLE', 'SOCIAL']);
+    assert.deepEqual(calls, [
+      {
+        query: 'he said, she said journalism',
+        options: { prefix: true, combineWith: 'AND' },
+      },
+      {
+        query: 'he said, she said journalism',
+        options: { prefix: true, combineWith: 'AND' },
+      },
+    ]);
   });
 });

@@ -1,5 +1,5 @@
 
-import { DATA_CONFIG } from '../constants.js?v=3.8.19';
+import { DATA_CONFIG } from '../constants.js?v=3.8.20';
 import {
   initDatabase,
   loadArchiveData as loadSqliteData,
@@ -13,14 +13,14 @@ import {
   getCategoryCoOccurrence,
   searchRecords as sqlSearchRecords,
   getStats as getSqliteStats
-} from './sqliteService.js?v=3.8.19';
-import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.8.19';
-import { searchIndexOptions, socialSearchIndexOptions } from '../utils/searchConfig.js?v=3.8.19';
-import { escapeCsvCell } from '../utils/csvSafety.js?v=3.8.19';
-import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.8.19';
-import { CACHE_VERSION, CACHE_TTL_MS, MAX_LOCALSTORAGE_SIZE, cacheKeyFor } from './cacheConfig.js?v=3.8.19';
-import { raceTimeout } from '../utils/raceTimeout.js?v=3.8.19';
-import { createResilientSearchIndexLoader } from './searchIndexLoader.js?v=3.8.19';
+} from './sqliteService.js?v=3.8.20';
+import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.8.20';
+import { searchIndexOptions, socialSearchIndexOptions } from '../utils/searchConfig.js?v=3.8.20';
+import { escapeCsvCell } from '../utils/csvSafety.js?v=3.8.20';
+import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.8.20';
+import { CACHE_VERSION, CACHE_TTL_MS, MAX_LOCALSTORAGE_SIZE, cacheKeyFor } from './cacheConfig.js?v=3.8.20';
+import { raceTimeout } from '../utils/raceTimeout.js?v=3.8.20';
+import { createResilientSearchIndexLoader, loadSearchIndexArtifact } from './searchIndexLoader.js?v=3.8.20';
 
 // Routine cache-hit / fetch-start logs are silent in production. Set
 // `localStorage.jrda_debug = '1'` in DevTools and reload to opt in (#170).
@@ -653,7 +653,11 @@ export const loadSearchIndex = async () => {
         { url: DATA_CONFIG.search_index, options: searchIndexOptions() },
         { url: DATA_CONFIG.social_search_index, options: socialSearchIndexOptions() },
       ], {
-        loadJSON: MiniSearch.loadJSON.bind(MiniSearch),
+        loadJSON: (serialized, options) => loadSearchIndexArtifact(
+          serialized,
+          options,
+          MiniSearch.loadJS.bind(MiniSearch),
+        ),
       });
     })();
     searchIndexLoaderPromise.catch(() => { searchIndexLoaderPromise = null; });

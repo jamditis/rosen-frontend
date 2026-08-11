@@ -1,38 +1,44 @@
 
 import { Component, Suspense, lazy, useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.8.19';
+import { html } from './html.js?v=3.8.20';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, BookOpen, BookMarked, Compass, HelpCircle, MoreHorizontal, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github, Search, XCircle } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.19';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.19';
-import { withViewTransition } from './utils/viewTransition.js?v=3.8.19';
-import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.19';
-import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.19';
-import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.19';
-import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.19';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.19';
-import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.19';
-import { resolveSitePath } from './utils/pathResolver.js?v=3.8.19';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.8.19';
-import { buildSearchText, normalizeForSearch } from './utils/searchNormalize.js?v=3.8.19';
-import { sortRecords } from './utils/recordSort.js?v=3.8.19';
-import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.19';
-import Sidebar from './components/Sidebar.js?v=3.8.19';
-import WelcomeModal from './components/WelcomeModal.js?v=3.8.19';
-import RecordView from './components/RecordView.js?v=3.8.19';
-import FeaturedSection from './components/FeaturedSection.js?v=3.8.19';
-import DissertationPage from './components/DissertationPage.js?v=3.8.19';
-import ToolsModal from './components/ToolsModal.js?v=3.8.19';
-import BugReportModal from './components/BugReportModal.js?v=3.8.19';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.19';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.19';
-import EntityBrowser from './components/EntityBrowser.js?v=3.8.19';
-import Timeline from './components/Timeline.js?v=3.8.19';
-import AboutPage from './components/AboutPage.js?v=3.8.19';
-import WikiPage from './components/WikiPage.js?v=3.8.19';
-import StartHerePage from './components/StartHerePage.js?v=3.8.19';
-import ArchiveResults from './components/ArchiveResults.js?v=3.8.19';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.20';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.20';
+import { withViewTransition } from './utils/viewTransition.js?v=3.8.20';
+import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.20';
+import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.20';
+import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.20';
+import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.20';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.20';
+import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.20';
+import { resolveSitePath } from './utils/pathResolver.js?v=3.8.20';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.8.20';
+import {
+  buildSearchText,
+  matchesParsedSearchText,
+  normalizeForSearch,
+  parseSearchQuery,
+  searchLoadedIndexes,
+} from './utils/searchNormalize.js?v=3.8.20';
+import { sortRecords } from './utils/recordSort.js?v=3.8.20';
+import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.20';
+import Sidebar from './components/Sidebar.js?v=3.8.20';
+import WelcomeModal from './components/WelcomeModal.js?v=3.8.20';
+import RecordView from './components/RecordView.js?v=3.8.20';
+import FeaturedSection from './components/FeaturedSection.js?v=3.8.20';
+import DissertationPage from './components/DissertationPage.js?v=3.8.20';
+import ToolsModal from './components/ToolsModal.js?v=3.8.20';
+import BugReportModal from './components/BugReportModal.js?v=3.8.20';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.20';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.20';
+import EntityBrowser from './components/EntityBrowser.js?v=3.8.20';
+import Timeline from './components/Timeline.js?v=3.8.20';
+import AboutPage from './components/AboutPage.js?v=3.8.20';
+import WikiPage from './components/WikiPage.js?v=3.8.20';
+import StartHerePage from './components/StartHerePage.js?v=3.8.20';
+import ArchiveResults from './components/ArchiveResults.js?v=3.8.20';
 
-const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.19'));
+const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.20'));
 
 const NON_RECORD_ROUTES = new Set([
   ROUTES.analytics,
@@ -575,16 +581,18 @@ const App = () => {
     // indexes are still loading. combineWith AND + prefix = "every word present,
     // last word may be a prefix", how a search box is expected to narrow.
     const rawTerm = filters.search.trim();
+    const parsedQuery = parseSearchQuery(rawTerm);
     let miniIds = null;
     if (rawTerm && miniRevision > 0 && miniRefs.current.length > 0) {
       miniIds = new Set(
-        miniRefs.current.flatMap((mini) => (
-          mini.search(rawTerm, { prefix: true, combineWith: 'AND' }).map((hit) => hit.id)
-        ))
+        searchLoadedIndexes(miniRefs.current, rawTerm).map(hit => hit.id)
       );
     }
     let res = queryRecords.filter((r, i) => {
-      if (term && !(searchIndex[i].includes(term) || (miniIds && miniIds.has(r.id)))) return false;
+      const substringMatch = parsedQuery.phraseKeys.length > 0
+        ? matchesParsedSearchText(searchIndex[i], parsedQuery)
+        : searchIndex[i].includes(term);
+      if (term && !(substringMatch || (miniIds && miniIds.has(r.id)))) return false;
 
       if (filters.categories.length > 0) {
         const hasAll = filters.categories.every(cat => r.categories.includes(cat));

@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import {
   createResilientSearchIndexLoader,
   loadAvailableSearchIndexes,
+  loadSearchIndexArtifact,
 } from '../frontend/services/searchIndexLoader.js';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -29,10 +30,51 @@ describe('lazy social full-text search runtime (#669)', () => {
       archiveServiceSource,
       /createResilientSearchIndexLoader\([\s\S]*DATA_CONFIG\.search_index[\s\S]*DATA_CONFIG\.social_search_index/,
     );
-    assert.match(archiveServiceSource, /loadJSON:\s*MiniSearch\.loadJSON\.bind\(MiniSearch\)/);
+    assert.match(
+      archiveServiceSource,
+      /loadJSON:\s*\(serialized, options\)\s*=>\s*loadSearchIndexArtifact\([\s\S]*MiniSearch\.loadJS\.bind\(MiniSearch\)/,
+    );
     assert.match(
       archiveServiceSource,
       /searchIndexLoaderPromise\.catch\(\(\) => \{ searchIndexLoaderPromise = null; \}\)/,
+    );
+  });
+
+  it('hydrates numeric phrase postings to public record ids without changing the index', () => {
+    const artifact = JSON.stringify({
+      documentIds: { 0: 'EXACT', 1: 'OTHER' },
+      phrasePostings: { 'he~said~she~said': [0] },
+    });
+    const loadedIndex = { search: () => [] };
+    let receivedArtifact;
+    let receivedOptions;
+
+    const result = loadSearchIndexArtifact(
+      artifact,
+      { fields: ['body'] },
+      (parsed, options) => {
+        receivedArtifact = parsed;
+        receivedOptions = options;
+        return loadedIndex;
+      },
+    );
+
+    assert.equal(result, loadedIndex);
+    assert.equal(receivedArtifact.phrasePostings, undefined);
+    assert.equal(receivedArtifact.documentIds[0], 'EXACT');
+    assert.deepEqual(receivedOptions, { fields: ['body'] });
+    assert.deepEqual(result.phrasePostings.get('he~said~she~said'), new Set(['EXACT']));
+  });
+
+  it('rejects a corrupt phrase posting that references a missing document', () => {
+    const artifact = JSON.stringify({
+      documentIds: { 0: 'EXACT' },
+      phrasePostings: { 'he~said~she~said': [1] },
+    });
+
+    assert.throws(
+      () => loadSearchIndexArtifact(artifact, {}, () => ({ search: () => [] })),
+      /exact phrase posting he~said~she~said references missing document 1/,
     );
   });
 
@@ -127,8 +169,8 @@ describe('lazy social full-text search runtime (#669)', () => {
 
   it('unions hits from every loaded index with the substring search', () => {
     assert.match(appSource, /miniRefs\.current\s*=\s*result\.indexes/);
-    assert.match(appSource, /miniRefs\.current\.flatMap\(\(mini\)\s*=>/);
-    assert.match(appSource, /searchIndex\[i\]\.includes\(term\)\s*\|\|\s*\(miniIds && miniIds\.has\(r\.id\)\)/);
+    assert.match(appSource, /searchLoadedIndexes\(miniRefs\.current, rawTerm\)/);
+    assert.match(appSource, /substringMatch\s*\|\|\s*\(miniIds && miniIds\.has\(r\.id\)\)/);
     assert.match(appSource, /setMiniRetryTick\(tick => tick \+ 1\)/);
     assert.match(appSource, /if \(result\.complete\)[\s\S]*else \{[\s\S]*scheduleRetry\(\)/);
     assert.match(appSource, /const MAX_MINI_INDEX_RETRIES = 3/);

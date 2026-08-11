@@ -702,7 +702,11 @@ async function main() {
   // categories already present in the card substring search nearly doubled it.
   console.log('\n💾 Building search indexes...');
   const searchIndexRows = archiveRecordsData.filter(r => servedIds.has(r.id));
-  const { json: searchIndexJson, count: searchIndexCount } = buildSearchIndex(searchIndexRows);
+  const {
+    json: searchIndexJson,
+    count: searchIndexCount,
+    phraseVocabulary,
+  } = buildSearchIndex(searchIndexRows);
   const searchIndexPath = path.join(__dirname, 'search-index.json');
   fs.writeFileSync(searchIndexPath, JSON.stringify(searchIndexJson));
   const searchIndexKB = (fs.statSync(searchIndexPath).size / 1024).toFixed(1);
@@ -731,6 +735,7 @@ async function main() {
     {
       rawTextChars: Number.POSITIVE_INFINITY,
       indexOptions: socialSearchIndexOptions(),
+      phraseVocabulary,
     }
   );
   const socialSearchIndexPath = path.join(__dirname, 'social-search-index.json');

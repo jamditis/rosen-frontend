@@ -30,6 +30,7 @@
 // title's last word plus a summary's first word). Keeps the old per-field
 // matching semantics while reducing the matcher to one substring test.
 const FIELD_SEP = String.fromCharCode(0x01);
+export const MIN_EXACT_PHRASE_WORDS = 2;
 
 /**
  * Fold a string to a normalized, lower-case, ASCII-punctuation form for search.
@@ -61,6 +62,124 @@ export function normalizeForSearch(str) {
     }
   }
   return out.replace(/\s+/g, ' ').trim();
+}
+
+/**
+ * Tokenize text at non-letter/digit boundaries for exact phrases. This covers
+ * MiniSearch's whitespace/punctuation boundaries plus symbols, while reusing
+ * the archive's case, quote, and diacritic folding.
+ */
+export function tokenizeSearchWords(value) {
+  return normalizeForSearch(value).split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+}
+
+/**
+ * Parse supported quoted phrases without changing ordinary query text.
+ * MiniSearch supplies broad token recall; phrase postings verify adjacency.
+ */
+export function parseSearchQuery(rawQuery) {
+  const source = rawQuery == null ? '' : String(rawQuery).trim();
+  const normalized = normalizeForSearch(source);
+  const quoteCount = [...normalized].filter(character => character === '"').length;
+  if (quoteCount % 2 !== 0) {
+    return {
+      miniQuery: source,
+      phraseKeys: [],
+      phraseTokens: [],
+      unquotedTokens: tokenizeSearchWords(source),
+    };
+  }
+  const phraseTokens = [];
+  const unquotedParts = [];
+  const quotePattern = /"([^"]+)"/g;
+  let cursor = 0;
+  let match;
+
+  while ((match = quotePattern.exec(normalized)) !== null) {
+    unquotedParts.push(normalized.slice(cursor, match.index));
+    const tokens = tokenizeSearchWords(match[1]);
+    if (tokens.length >= MIN_EXACT_PHRASE_WORDS) {
+      phraseTokens.push(tokens);
+    } else {
+      unquotedParts.push(match[1]);
+    }
+    cursor = match.index + match[0].length;
+  }
+  unquotedParts.push(normalized.slice(cursor));
+
+  if (phraseTokens.length === 0) {
+    return {
+      miniQuery: source,
+      phraseKeys: [],
+      phraseTokens: [],
+      unquotedTokens: tokenizeSearchWords(source),
+    };
+  }
+
+  return {
+    miniQuery: source
+      .replace(/["\u201c\u201d\u201e\u201f]/gu, '')
+      .replace(/\s+/g, ' ')
+      .trim(),
+    phraseKeys: phraseTokens.map(tokens => tokens.join('~')),
+    phraseTokens,
+    unquotedTokens: tokenizeSearchWords(unquotedParts.join(' ')),
+  };
+}
+
+function includesTokenSequence(fieldTokens, expectedTokens) {
+  if (expectedTokens.length > fieldTokens.length) return false;
+  const lastStart = fieldTokens.length - expectedTokens.length;
+  for (let start = 0; start <= lastStart; start += 1) {
+    if (expectedTokens.every((token, offset) => fieldTokens[start + offset] === token)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Apply quoted-query semantics to the already normalized in-memory card text.
+ * A phrase cannot cross a record field boundary.
+ */
+export function matchesParsedSearchText(searchText, parsedQuery) {
+  const parsed = parsedQuery || parseSearchQuery('');
+  if (parsed.phraseTokens.length === 0) {
+    return !parsed.miniQuery || searchText.includes(normalizeForSearch(parsed.miniQuery));
+  }
+
+  const fieldTokens = String(searchText || '')
+    .split(FIELD_SEP)
+    .map(tokenizeSearchWords);
+  const phrasesMatch = parsed.phraseTokens.every(tokens => (
+    fieldTokens.some(field => includesTokenSequence(field, tokens))
+  ));
+  if (!phrasesMatch) return false;
+
+  const allTokens = fieldTokens.flat();
+  return parsed.unquotedTokens.every(expected => (
+    allTokens.some(token => token.startsWith(expected))
+  ));
+}
+
+/**
+ * Search every loaded MiniSearch artifact. Quoted queries require each hit to
+ * be present in every exact phrase posting list. An artifact without postings
+ * cannot verify adjacency and contributes no quoted full-text hits.
+ */
+export function searchLoadedIndexes(indexes, rawQuery) {
+  const parsed = parseSearchQuery(rawQuery);
+  if (!parsed.miniQuery) return [];
+
+  return (Array.isArray(indexes) ? indexes : []).flatMap((mini) => {
+    const hits = mini.search(parsed.miniQuery, { prefix: true, combineWith: 'AND' });
+    if (parsed.phraseKeys.length === 0) return hits;
+    if (!(mini.phrasePostings instanceof Map)) return [];
+
+    return hits.filter(hit => parsed.phraseKeys.every(key => (
+      mini.phrasePostings.get(key)?.has(hit.id) === true
+    )));
+  });
 }
 
 /**
@@ -130,6 +249,10 @@ export function matchesSearch(record, rawTerm) {
 
 export default {
   normalizeForSearch,
+  tokenizeSearchWords,
+  parseSearchQuery,
+  matchesParsedSearchText,
+  searchLoadedIndexes,
   findSearchSuggestions,
   buildSearchText,
   matchesSearch,

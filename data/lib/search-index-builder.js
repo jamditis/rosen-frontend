@@ -28,6 +28,10 @@ import {
   searchIndexOptions,
   socialSearchIndexOptions,
 } from '../../frontend/utils/searchConfig.js';
+import {
+  MIN_EXACT_PHRASE_WORDS,
+  tokenizeSearchWords,
+} from '../../frontend/utils/searchNormalize.js';
 
 // raw_text is the long field. Cap the indexed slice so the artifact stays small
 // and the build stays fast. 8000 chars covers roughly the first few screens of
@@ -43,6 +47,59 @@ export {
 };
 
 const str = (v) => (v == null ? '' : String(v));
+
+export function buildPhraseVocabulary(docs) {
+  const vocabulary = new Set();
+  for (const doc of docs) {
+    const concepts = doc.concepts.split(/[,;]+/u);
+    for (const concept of concepts) {
+      const tokens = tokenizeSearchWords(concept);
+      for (let wordCount = MIN_EXACT_PHRASE_WORDS; wordCount <= tokens.length; wordCount += 1) {
+        for (let start = 0; start <= tokens.length - wordCount; start += 1) {
+          vocabulary.add(tokens.slice(start, start + wordCount).join('~'));
+        }
+      }
+    }
+  }
+  return vocabulary;
+}
+
+/**
+ * Build compact exact-phrase postings for phrases already named in the
+ * archive's concept vocabulary. Numeric document ids match MiniSearch's fresh
+ * index order and are hydrated to public record ids in the browser loader.
+ */
+export function buildPhrasePostings(docs, fields = SEARCH_FIELDS) {
+  const vocabulary = buildPhraseVocabulary(docs);
+  if (vocabulary.size === 0) return null;
+
+  return buildPhrasePostingsForVocabulary(docs, fields, vocabulary);
+}
+
+function buildPhrasePostingsForVocabulary(docs, fields, vocabulary) {
+  if (vocabulary.size === 0) return null;
+
+  const postings = Object.fromEntries([...vocabulary].sort().map(key => [key, []]));
+  const maxPhraseWords = Math.max(
+    ...[...vocabulary].map(key => key.split('~').length),
+  );
+  docs.forEach((doc, documentId) => {
+    const matches = new Set();
+    for (const field of fields) {
+      const tokens = tokenizeSearchWords(doc[field]);
+      const maxWords = Math.min(maxPhraseWords, tokens.length);
+      for (let wordCount = MIN_EXACT_PHRASE_WORDS; wordCount <= maxWords; wordCount += 1) {
+        for (let start = 0; start <= tokens.length - wordCount; start += 1) {
+          const key = tokens.slice(start, start + wordCount).join('~');
+          if (vocabulary.has(key)) matches.add(key);
+        }
+      }
+    }
+    for (const key of matches) postings[key].push(documentId);
+  });
+
+  return postings;
+}
 
 /**
  * Map one archive CSV row (snake_case keys from csv-parse columns:true) to the
@@ -73,7 +130,11 @@ export function recordToSearchDoc(row, { rawTextChars = RAW_TEXT_INDEX_CHARS } =
  */
 export function buildSearchIndex(
   rows,
-  { rawTextChars = RAW_TEXT_INDEX_CHARS, indexOptions = searchIndexOptions() } = {},
+  {
+    rawTextChars = RAW_TEXT_INDEX_CHARS,
+    indexOptions = searchIndexOptions(),
+    phraseVocabulary,
+  } = {},
 ) {
   const mini = new MiniSearch(indexOptions);
   const docs = [];
@@ -83,7 +144,22 @@ export function buildSearchIndex(
     docs.push(doc);
   }
   mini.addAll(docs);
-  return { json: mini.toJSON(), count: docs.length };
+  const json = mini.toJSON();
+  for (let documentId = 0; documentId < docs.length; documentId += 1) {
+    if (json.documentIds[documentId] !== docs[documentId].id) {
+      throw new Error(
+        `MiniSearch document id order changed at ${documentId}; exact phrase postings cannot be built safely`,
+      );
+    }
+  }
+  const resolvedPhraseVocabulary = phraseVocabulary || buildPhraseVocabulary(docs);
+  const phrasePostings = buildPhrasePostingsForVocabulary(
+    docs,
+    indexOptions.fields,
+    resolvedPhraseVocabulary,
+  );
+  if (phrasePostings) json.phrasePostings = phrasePostings;
+  return { json, count: docs.length, phraseVocabulary: resolvedPhraseVocabulary };
 }
 
 export default {
@@ -94,5 +170,7 @@ export default {
   searchIndexOptions,
   socialSearchIndexOptions,
   recordToSearchDoc,
+  buildPhraseVocabulary,
+  buildPhrasePostings,
   buildSearchIndex,
 };
