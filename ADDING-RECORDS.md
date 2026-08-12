@@ -69,6 +69,13 @@ Pick from these (use the exact spelling):
 
 You can combine them: `Press & Media Criticism, Politics & Democracy`
 
+> This list mirrors `backend/schema.json` (`taxonomy.thematic_categories`), the
+> single source the backend reviewer and auto-categorizer read. To add or
+> remove a category, edit that file and this list together. A test
+> (`backend/tests/test_taxonomy_single_source.py`) fails if they drift apart. The
+> scripts pick up the change with no code edit; this list is the one mirror to
+> keep in step.
+
 ### Example row (what a new 2026 PressThink post looks like)
 
 ```

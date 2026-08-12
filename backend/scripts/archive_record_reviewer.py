@@ -18,64 +18,28 @@ from collections import Counter, defaultdict
 # Add project root to path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
+# Add this scripts/ directory so the shared taxonomy loader imports whether this
+# file is run directly (python backend/scripts/...) or imported as a module.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-# Schema-defined taxonomies (from backend/schema.json)
-VALID_ERAS = [
-    "Early Career & Public Journalism (1990-1999)",
-    "Blogging Launch & Digital Disruption (2000-2004)",
-    "Peak Blogging & Citizen Journalism (2005-2009)",
-    "Social Media & Financial Crisis (2010-2015)",
-    "Trump Era & Democratic Crisis (2016-2020)",
-    "Platform Transition & Future Models (2021-Present)"
-]
+# Controlled vocabularies come from backend/schema.json, the single source (see
+# backend/scripts/taxonomy.py). They used to be hardcoded here and drifted from
+# schema; loading them means a category, era, concept, scope, or format is
+# edited in one place, and a stale copy fails test_taxonomy_single_source
+# instead of shipping.
+from taxonomy import (
+    content_formats,
+    eras,
+    key_concepts,
+    scopes,
+    thematic_categories,
+)
 
-VALID_CATEGORIES = [
-    "Press & Media Criticism",
-    "Journalism Theory & Practice",
-    "Journalism Education",
-    "Politics & Democracy",
-    "Technology & Digital Media",
-    "Audience & Public Engagement"
-]
-
-VALID_CONCEPTS = [
-    "View from Nowhere",
-    "Church of the Savvy",
-    "The People Formerly Known as the Audience",
-    "Parity Product",
-    "Verification in reverse",
-    "He said/she said journalism",
-    "Audience atomization overcome",
-    "The Production of Innocence",
-    "Horse-race journalism",
-    "False balance",
-    "The Citizens' Agenda",
-    "Not the odds but the stakes",
-    "Mindcasting"
-]
-
-VALID_SCOPES = [
-    "Theoretical",
-    "Commentary/Critique",
-    "Historical Analysis",
-    "Case Study",
-    "Pedagogical",
-    "Personal Reflection"
-]
-
-VALID_FORMATS = [
-    "Blog Post",
-    "Article",
-    "Academic Paper",
-    "Book Chapter",
-    "Interview (Text)",
-    "Interview (Audio/Video)",
-    "Lecture/Presentation",
-    "Panel Discussion",
-    "Tweet/Thread",
-    "Tumblr Post",
-    "Newspaper Clipping"
-]
+VALID_ERAS = eras()
+VALID_CATEGORIES = thematic_categories()
+VALID_CONCEPTS = key_concepts()
+VALID_SCOPES = scopes()
+VALID_FORMATS = content_formats()
 
 # Era mapping for normalization
 ERA_MAPPINGS = {
