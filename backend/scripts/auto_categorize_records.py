@@ -6,13 +6,9 @@ This script analyzes uncategorized records and assigns appropriate thematic cate
 using keyword matching and heuristic rules. It is conservative - only assigning categories
 when there is high confidence, and flagging records that need manual review.
 
-Valid thematic categories:
-- Press & Media Criticism
-- Journalism Theory & Practice
-- Journalism Education
-- Politics & Democracy
-- Technology & Digital Media
-- Audience & Public Engagement
+The valid thematic categories are defined once in backend/schema.json
+(taxonomy.thematic_categories). This script's CATEGORY_PATTERNS keys are checked
+against that list at import and raise if they drift.
 
 Usage:
     python auto_categorize_records.py [--dry-run] [--confidence-threshold 0.6]
@@ -20,11 +16,17 @@ Usage:
 
 import csv
 import re
+import sys
 from pathlib import Path
 from collections import defaultdict
 from datetime import datetime
 from typing import Dict, List, Tuple
 import argparse
+
+# Import the shared taxonomy loader whether this file is run directly
+# (python backend/scripts/...) or imported as a module.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from taxonomy import thematic_categories
 
 
 # Category keyword patterns (case-insensitive)
@@ -186,6 +188,35 @@ URL_PATTERNS = {
         r"digital",
     ],
 }
+
+
+def _assert_patterns_match_schema() -> None:
+    """Fail loud if a keyword rule names a bucket schema.json does not list.
+
+    A CATEGORY_PATTERNS or URL_PATTERNS key outside the canonical set would try
+    to assign a value the reviewer then rejects, so it is a bug. A canonical
+    category with no rule is fine: a new bucket can stay manual-only until
+    someone writes heuristics for it, which keeps adding a category a one-file
+    edit to schema.json rather than a schema edit plus placeholder rules.
+    """
+    canonical = set(thematic_categories())
+    unknown = sorted(set(CATEGORY_PATTERNS) - canonical)
+    if unknown:
+        raise SystemExit(
+            "CATEGORY_PATTERNS names buckets not in backend/schema.json "
+            f"(taxonomy.thematic_categories): {unknown}. "
+            "Edit schema.json and the rules together."
+        )
+    unknown_urls = sorted(set(URL_PATTERNS) - canonical)
+    if unknown_urls:
+        raise SystemExit(
+            "URL_PATTERNS references buckets not in backend/schema.json "
+            f"(taxonomy.thematic_categories): {unknown_urls}. "
+            "Edit schema.json and the rules together."
+        )
+
+
+_assert_patterns_match_schema()
 
 # Special case patterns
 SPECIAL_CASES = {
