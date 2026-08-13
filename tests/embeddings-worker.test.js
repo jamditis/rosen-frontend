@@ -135,6 +135,19 @@ test("temporal penalty down-weights a same-era match", () => {
   assert.ok(result[0].score > result[1].score);
 });
 
+test("temporal penalty accepts archive year strings", () => {
+  const store = buildStore();
+  const stringYears = { A: "2000", B: "2001", E: "2010" };
+  const result = neighbors(store, "A", {
+    k: 2,
+    yearOf: (id) => stringYears[id],
+  });
+  assert.deepEqual(
+    result.map((entry) => entry.id),
+    ["E", "B"],
+  );
+});
+
 test("temporal penalty never boosts a negative-cosine same-era match", () => {
   const ids = ["Q", "OPP"];
   const opposed = { Q: vec({ 0: 1 }), OPP: vec({ 0: -1 }) }; // cosine(Q, OPP) = -1
@@ -184,4 +197,59 @@ test("loadEmbeddingStore fetches the binary and sidecar via an injected fetch", 
   );
   assert.deepEqual(store.ids, IDS);
   assert.deepEqual(neighbors(store, "A", { k: 1 }).length, 1);
+});
+
+test("worker messages load once, echo request ids, and return structured errors", async () => {
+  const workerModule = await import(
+    "../frontend/services/embeddings-worker.js"
+  );
+  assert.equal(typeof workerModule.registerEmbeddingsWorker, "function");
+
+  const posted = [];
+  let messageHandler;
+  let loads = 0;
+  const scope = {
+    addEventListener(type, handler) {
+      assert.equal(type, "message");
+      messageHandler = handler;
+    },
+    postMessage(message) {
+      posted.push(message);
+    },
+  };
+  workerModule.registerEmbeddingsWorker(scope, {
+    loadStore: async () => {
+      loads++;
+      return buildStore();
+    },
+  });
+
+  const years = { A: "2000", B: "2001", E: "2010" };
+  await messageHandler({
+    data: { type: "neighbors", requestId: "first", recordId: "A", k: 2, years },
+  });
+  await messageHandler({
+    data: { type: "neighbors", requestId: "second", recordId: "A", k: 1, years },
+  });
+  await messageHandler({
+    data: { type: "neighbors", requestId: "bad-request" },
+  });
+
+  assert.equal(loads, 1);
+  assert.deepEqual(posted[0], {
+    type: "neighbors-result",
+    requestId: "first",
+    recordId: "A",
+    neighbors: [
+      { id: "E", score: posted[0].neighbors[0].score },
+      { id: "B", score: posted[0].neighbors[1].score },
+    ],
+  });
+  assert.equal(posted[1].requestId, "second");
+  assert.equal(posted[1].neighbors.length, 1);
+  assert.deepEqual(posted[2], {
+    type: "neighbors-error",
+    requestId: "bad-request",
+    error: "embeddings worker: recordId must be a non-empty string",
+  });
 });

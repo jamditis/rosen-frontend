@@ -23,6 +23,16 @@ export const BYTES_PER_VECTOR = SCALE_BYTES + EMBED_DIM;
  */
 export const TEMPORAL_PENALTY = 0.92;
 export const TEMPORAL_WINDOW_YEARS = 2;
+export const DEFAULT_EMBEDDINGS_BIN_URL = "../../data/archive-embeddings.bin";
+export const DEFAULT_EMBEDDINGS_INDEX_URL =
+  "../../data/archive-embeddings.json";
+
+function finiteYear(value) {
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  if (typeof value !== "string" || value.trim() === "") return null;
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : null;
+}
 
 function toDataView(buffer) {
   if (ArrayBuffer.isView(buffer)) {
@@ -170,7 +180,8 @@ export async function loadEmbeddingStore(
  * Returns `[]` for an id that is not in the index, so social posts and deep-link
  * records outside the embedded article set render no "similar in theme" strand
  * (#278 C8). `yearOf(id)` supplies the publication year for the temporal
- * penalty; when it is absent or returns a non-number the penalty is skipped.
+ * penalty; finite numeric strings are accepted because archive records store
+ * years as strings. Other missing or non-numeric values skip the penalty.
  * `exclude` is an optional set of ids to drop (a near-dup sidecar, once built).
  */
 export function neighbors(store, recordId, { k = 5, yearOf, exclude } = {}) {
@@ -178,7 +189,8 @@ export function neighbors(store, recordId, { k = 5, yearOf, exclude } = {}) {
   const queryIndex = position.get(recordId);
   if (queryIndex === undefined) return [];
   const query = vectors[queryIndex];
-  const baseYear = typeof yearOf === "function" ? yearOf(recordId) : null;
+  const baseYear =
+    typeof yearOf === "function" ? finiteYear(yearOf(recordId)) : null;
   const scored = [];
   for (let i = 0; i < ids.length; i++) {
     if (i === queryIndex) continue;
@@ -189,12 +201,11 @@ export function neighbors(store, recordId, { k = 5, yearOf, exclude } = {}) {
     // Only down-weight positive similarities: multiplying a negative cosine by
     // 0.92 moves it toward zero and would rank a dissimilar same-era record
     // higher, the opposite of the intended penalty. Thematic neighbors sit in
-    // the positive regime, so the guard costs nothing there. baseYear is a
-    // number only when yearOf is a function, so that check is implied.
-    if (score > 0 && typeof baseYear === "number") {
-      const year = yearOf(id);
+    // the positive regime, so the guard costs nothing there.
+    if (score > 0 && baseYear !== null) {
+      const year = finiteYear(yearOf(id));
       if (
-        typeof year === "number" &&
+        year !== null &&
         Math.abs(year - baseYear) <= TEMPORAL_WINDOW_YEARS
       ) {
         score *= TEMPORAL_PENALTY;
@@ -205,3 +216,112 @@ export function neighbors(store, recordId, { k = 5, yearOf, exclude } = {}) {
   scored.sort((a, b) => b.score - a.score);
   return scored.slice(0, k);
 }
+
+function requestYearOf(years) {
+  if (years instanceof Map) return (id) => years.get(id);
+  if (years && typeof years === "object") return (id) => years[id];
+  return undefined;
+}
+
+function errorMessage(error) {
+  return error instanceof Error ? error.message : String(error);
+}
+
+/**
+ * Register the dedicated Worker request boundary used by the RecordModal wiring.
+ *
+ * Request: `{ type: "neighbors", requestId, recordId, k?, years?, exclude? }`.
+ * Response: `{ type: "neighbors-result", requestId, recordId, neighbors }` or
+ * `{ type: "neighbors-error", requestId, error }`. `requestId` is an opaque
+ * string or number that lets the caller discard a late response. The artifact
+ * loads once on first use; a failed load clears the cached promise so a later
+ * request can retry after a transient deployment or network error.
+ */
+export function registerEmbeddingsWorker(
+  scope,
+  {
+    loadStore = () =>
+      loadEmbeddingStore(
+        DEFAULT_EMBEDDINGS_BIN_URL,
+        DEFAULT_EMBEDDINGS_INDEX_URL,
+      ),
+  } = {},
+) {
+  if (
+    !scope ||
+    typeof scope.addEventListener !== "function" ||
+    typeof scope.postMessage !== "function"
+  ) {
+    throw new Error("embeddings worker: invalid worker scope");
+  }
+
+  let storePromise;
+  const getStore = () => {
+    if (!storePromise) {
+      storePromise = Promise.resolve()
+        .then(() => loadStore())
+        .catch((error) => {
+          storePromise = undefined;
+          throw error;
+        });
+    }
+    return storePromise;
+  };
+
+  const onMessage = async (event) => {
+    const request = event?.data;
+    if (request?.type !== "neighbors") return;
+
+    const requestId = request.requestId;
+    try {
+      if (
+        (typeof requestId !== "string" && typeof requestId !== "number") ||
+        (typeof requestId === "string" && requestId.length === 0)
+      ) {
+        throw new Error(
+          "embeddings worker: requestId must be a string or number",
+        );
+      }
+      if (typeof request.recordId !== "string" || request.recordId.length === 0) {
+        throw new Error(
+          "embeddings worker: recordId must be a non-empty string",
+        );
+      }
+
+      const k = request.k ?? 5;
+      if (!Number.isInteger(k) || k < 1) {
+        throw new Error("embeddings worker: k must be a positive integer");
+      }
+      const exclude = Array.isArray(request.exclude)
+        ? new Set(request.exclude)
+        : undefined;
+      const result = neighbors(await getStore(), request.recordId, {
+        k,
+        yearOf: requestYearOf(request.years),
+        exclude,
+      });
+      scope.postMessage({
+        type: "neighbors-result",
+        requestId,
+        recordId: request.recordId,
+        neighbors: result,
+      });
+    } catch (error) {
+      scope.postMessage({
+        type: "neighbors-error",
+        requestId: requestId ?? null,
+        error: errorMessage(error),
+      });
+    }
+  };
+
+  scope.addEventListener("message", onMessage);
+  return onMessage;
+}
+
+const isDedicatedWorkerScope =
+  typeof globalThis.document === "undefined" &&
+  typeof globalThis.addEventListener === "function" &&
+  typeof globalThis.postMessage === "function";
+
+if (isDedicatedWorkerScope) registerEmbeddingsWorker(globalThis);
