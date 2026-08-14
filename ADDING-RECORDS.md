@@ -122,9 +122,9 @@ The site will show the new records immediately — no cache clearing needed.
 
 ## Adding social posts (Bluesky, Twitter)
 
-If you want to add posts from Jay's Bluesky account after retirement, use `data/social_posts.csv` instead. The columns are similar, but the `id` field uses a `BSKY-` prefix — again, go one past the current max in the file (as of 2026-07-23 the max is `BSKY-03172`, so the next is `BSKY-03173`). The `content_type` should be `Social Media Post`.
+This is the manual repair and backfill path. Use `data/social_posts.csv`. The `id` field uses a `BSKY-` prefix. Find the highest `BSKY-` ID in the file and use the next zero-padded number. For example, `BSKY-03172` is followed by `BSKY-03173`. The `content_type` should be `Social Media Post`.
 
-That file doesn't need to be updated as often — articles and essays are more important for the archive.
+New work now appears mainly on Bluesky. The planned continuous workflow is Bluesky-first. It treats original posts and meaningful public conversation as candidates. It keeps short acknowledgements as thread context, not standalone records. The complete system map is maintained in the public repository `docs/` directory.
 
 ---
 

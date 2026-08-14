@@ -13,6 +13,7 @@ A guide to the documentation in this repository — where to start depending on 
 | Understand the project's vocabulary | [`CONTEXT.md`](../CONTEXT.md) — what "Record," "Entity," and "Facet" mean here |
 | Deploy the site | [`DEPLOYMENT.md`](../DEPLOYMENT.md) — the file-by-file deploy manifest |
 | Understand the backend pipeline | [`backend/README.md`](../backend/README.md) |
+| Follow the Bluesky-first stewardship plan | [`bluesky-stewardship-pipeline.md`](bluesky-stewardship-pipeline.md) — plain-language source, preservation, processing, and escalation map |
 
 ## What's in this directory
 
@@ -27,6 +28,7 @@ The `docs/` directory holds the project's working documentation — history, pla
 
 - [`plans/`](plans/) — dated design and implementation plans, kept as a record of decisions
 - [`research/`](research/) — dated discovery and inventory writeups
+- [`bluesky-stewardship-pipeline.md`](bluesky-stewardship-pipeline.md) — the current source, preservation, processing, and escalation map for continuous archive stewardship
 - [`feature-audit/`](feature-audit/) — a full feature inventory of the app: 166 user stories, each tested in a real browser, with fixes tracked through re-test
 - Top-level audit reports (data quality, entity extraction, launch validation) — point-in-time snapshots, dated in their filenames or headers
 
