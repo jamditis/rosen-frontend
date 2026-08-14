@@ -1,4 +1,8 @@
-import { DISCOVERY_USER_AGENT, SOURCE_MANIFEST } from "./source-manifest.js";
+import {
+  DISCOVERY_USER_AGENT,
+  SOURCE_MANIFEST,
+  SOURCE_MANIFEST_VERSION,
+} from "./source-manifest.js";
 
 export const DISCOVERY_MODE = Object.freeze({
   DISABLED: "disabled",
@@ -7,9 +11,11 @@ export const DISCOVERY_MODE = Object.freeze({
 });
 
 export const MAX_REDIRECTS = 3;
-export const MAX_FEED_BYTES = 128 * 1024;
+export const MAX_FEED_BYTES = 256 * 1024;
 export const MAX_ROBOTS_BYTES = 32 * 1024;
+export const MAX_CANDIDATE_URL_LENGTH = 2_048;
 export const REQUEST_TIMEOUT_MS = 10_000;
+export const RESPONSE_READ_TIMEOUT_MS = 10_000;
 
 const STOP_STATUS_CODES = new Set([401, 403, 429]);
 const REDIRECT_STATUS_MIN = 300;
@@ -57,12 +63,32 @@ function isAllowedUrl(url, origins, pathPrefixes) {
   );
 }
 
+function hasFixedAtprotoResource(source, url) {
+  if (source.kind !== "atproto-author-feed") return true;
+  try {
+    const endpoint = new URL(source.endpoint);
+    if (url.pathname === endpoint.pathname && url.search === endpoint.search) {
+      return true;
+    }
+    if (typeof source.robotsUrl !== "string" || source.robotsUrl === "") {
+      return false;
+    }
+    return url.toString() === new URL(source.robotsUrl).toString();
+  } catch {
+    return false;
+  }
+}
+
 export function isAllowedFetchUrl(source, value) {
   try {
-    return isAllowedUrl(
-      new URL(value),
-      source.fetchOrigins,
-      source.fetchPathPrefixes,
+    const url = new URL(value);
+    return (
+      isAllowedUrl(
+        url,
+        source.fetchOrigins,
+        source.fetchPathPrefixes,
+      ) &&
+      hasFixedAtprotoResource(source, url)
     );
   } catch {
     return false;
@@ -71,10 +97,14 @@ export function isAllowedFetchUrl(source, value) {
 
 export function isAllowedCandidateUrl(source, value) {
   try {
-    return isAllowedUrl(
-      new URL(value),
-      source.candidateOrigins,
-      source.candidatePathPrefixes,
+    const url = new URL(value);
+    return (
+      url.toString().length <= MAX_CANDIDATE_URL_LENGTH &&
+      isAllowedUrl(
+        url,
+        source.candidateOrigins,
+        source.candidatePathPrefixes,
+      )
     );
   } catch {
     return false;
@@ -202,8 +232,37 @@ export async function fetchAllowedUrl({
   return { ok: false, reason: "redirect_limit", redirectChain };
 }
 
-/** Read only a small, bounded response body. Never call Response.text() here. */
-export async function readBoundedText(response, maxBytes) {
+async function readChunk(reader, timeoutMs) {
+  let timer;
+  try {
+    return await Promise.race([
+      reader.read().then(
+        (result) => ({ kind: "chunk", result }),
+        () => ({ kind: "error" }),
+      ),
+      new Promise((resolve) => {
+        timer = setTimeout(() => resolve({ kind: "timeout" }), timeoutMs);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function cancelReader(reader, reason) {
+  try {
+    await reader.cancel(reason);
+  } catch {
+    // A failed cancellation must not turn a safe stop into a failed run.
+  }
+}
+
+/** Read only a small, time-bounded response body. Never call Response.text() here. */
+export async function readBoundedText(
+  response,
+  maxBytes,
+  { timeoutMs = RESPONSE_READ_TIMEOUT_MS } = {},
+) {
   const declaredLength = Number(header(response, "Content-Length"));
   if (Number.isFinite(declaredLength) && declaredLength > maxBytes) {
     return { ok: false, reason: "response_too_large" };
@@ -213,13 +272,25 @@ export async function readBoundedText(response, maxBytes) {
   const reader = response.body.getReader();
   const chunks = [];
   let received = 0;
+  const deadline = Date.now() + timeoutMs;
   try {
     while (true) {
-      const { done, value } = await reader.read();
+      const remainingMs = deadline - Date.now();
+      const chunk = remainingMs <= 0
+        ? { kind: "timeout" }
+        : await readChunk(reader, remainingMs);
+      if (chunk.kind === "timeout") {
+        await cancelReader(reader, "response_read_timeout");
+        return { ok: false, reason: "response_read_timeout" };
+      }
+      if (chunk.kind === "error") {
+        return { ok: false, reason: "response_read_error" };
+      }
+      const { done, value } = chunk.result;
       if (done) break;
       received += value.byteLength;
       if (received > maxBytes) {
-        await reader.cancel();
+        await cancelReader(reader, "response_too_large");
         return { ok: false, reason: "response_too_large" };
       }
       chunks.push(value);
@@ -379,7 +450,13 @@ function isObject(value) {
 }
 
 function atPostUri(value) {
-  if (typeof value !== "string") return null;
+  if (
+    typeof value !== "string" ||
+    value.length === 0 ||
+    value.length > MAX_CANDIDATE_URL_LENGTH
+  ) {
+    return null;
+  }
   const match = value.match(
     /^at:\/\/(did:[a-z0-9:%._-]+)\/app\.bsky\.feed\.post\/[a-z0-9._~-]+$/i,
   );
@@ -400,6 +477,7 @@ function atprotoPost(post) {
     !authorDid ||
     uri.actorDid !== authorDid ||
     !contentId ||
+    contentId.length > MAX_CANDIDATE_URL_LENGTH ||
     post.record.$type !== POST_COLLECTION
   ) {
     return null;
@@ -606,7 +684,9 @@ async function readRobotsPolicy(source, options) {
   if (result.notModified) {
     return { allowed: false, reason: "robots_not_modified" };
   }
-  const body = await readBoundedText(result.response, MAX_ROBOTS_BYTES);
+  const body = await readBoundedText(result.response, MAX_ROBOTS_BYTES, {
+    timeoutMs: RESPONSE_READ_TIMEOUT_MS,
+  });
   if (!body.ok) return { allowed: false, reason: `robots_${body.reason}` };
   const policy = evaluateRobots(body.text, {
     userAgent: DISCOVERY_USER_AGENT,
@@ -649,9 +729,15 @@ export async function discoverSource(source, {
     return { sourceId: source.id, status: "unexpected_content_type" };
   }
 
-  const body = await readBoundedText(result.response, MAX_FEED_BYTES);
+  const body = await readBoundedText(result.response, MAX_FEED_BYTES, {
+    timeoutMs: RESPONSE_READ_TIMEOUT_MS,
+  });
   if (!body.ok) return { sourceId: source.id, status: body.reason };
-  if (looksLikeAccessControlPage(body.text)) {
+  if (
+    source.kind !== "atproto-author-feed" &&
+    source.kind !== "wordpress-api" &&
+    looksLikeAccessControlPage(body.text)
+  ) {
     return { sourceId: source.id, status: "access_control_page" };
   }
   if (source.kind === "atproto-author-feed") {
@@ -706,6 +792,7 @@ export async function runDiscovery({
   if (mode !== DISCOVERY_MODE.DRY_RUN) {
     return {
       mode: DISCOVERY_MODE.DISABLED,
+      manifestVersion: SOURCE_MANIFEST_VERSION,
       startedAt,
       sourceCount: sources.length,
       sources: [],
@@ -724,6 +811,7 @@ export async function runDiscovery({
   }
   return {
     mode: DISCOVERY_MODE.DRY_RUN,
+    manifestVersion: SOURCE_MANIFEST_VERSION,
     startedAt,
     sourceCount: sources.length,
     sources: outcomes,

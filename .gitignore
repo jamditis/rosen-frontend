@@ -105,6 +105,8 @@ data/social_import/
 
 # Cloudflare Workers dev artifacts
 .wrangler/
+# Local Wrangler secrets must never enter a commit.
+.dev.vars*
 # This JavaScript-only scaffold does not consume generated Wrangler types.
 workers/**/worker-configuration.d.ts
 

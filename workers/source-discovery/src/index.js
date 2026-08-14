@@ -1,6 +1,9 @@
 import { DISCOVERY_MODE, runDiscovery } from "./discovery.js";
 import { runLiveDiscovery } from "./ledger.js";
-import { PUBLIC_SOURCE_MANIFEST } from "./source-manifest.js";
+import {
+  PUBLIC_SOURCE_MANIFEST,
+  SOURCE_MANIFEST_VERSION,
+} from "./source-manifest.js";
 
 function configuredMode(value) {
   if (value === DISCOVERY_MODE.LIVE) return DISCOVERY_MODE.LIVE;
@@ -23,6 +26,7 @@ function logRun(report) {
     JSON.stringify({
       event: "rosen_source_discovery",
       mode: report.mode,
+      manifestVersion: report.manifestVersion,
       runId: report.runId,
       startedAt: report.startedAt,
       finishedAt: report.finishedAt,
@@ -43,6 +47,7 @@ export default {
       return json({
         status: "ok",
         mode: configuredMode(env.DISCOVERY_MODE),
+        manifestVersion: SOURCE_MANIFEST_VERSION,
         sources: PUBLIC_SOURCE_MANIFEST,
       });
     }
@@ -61,6 +66,10 @@ export default {
         JSON.stringify({
           event: "rosen_source_discovery_error",
           error: error instanceof Error ? error.name : "unknown_error",
+          message:
+            error instanceof Error && error.message !== ""
+              ? error.message.slice(0, 256)
+              : "unknown_error",
         }),
       );
     }

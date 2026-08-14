@@ -14,10 +14,14 @@ It is a read-only candidate-discovery control plane. It is not the archive scrap
 - The Worker only offers `GET /health`. It has no HTTP endpoint that starts discovery or accepts a URL.
 - It deploys only to `https://rosen-source-discovery.jamditis.workers.dev`.
 - The source manifest is fixed in source code. It allows HTTPS URLs from named origins and paths only.
-- The public Bluesky source is Jay Rosen's fixed DID `did:plc:3t37x6vfigdzzp2gjcfnzlz4` on the public AT Protocol AppView endpoint.
+- The source manifest is versioned. Increase `SOURCE_MANIFEST_VERSION` only when a reviewed source boundary or adapter shape changes.
+- The public Bluesky source is Jay Rosen's fixed DID `did:plc:3t37x6vfigdzzp2gjcfnzlz4` on the public AT Protocol AppView endpoint. It reads the fixed public API `robots.txt` policy before the author feed.
+- A Bluesky redirect cannot change that fixed author-feed path or query.
 - The Bluesky adapter classifies original posts, replies, quote posts, reposts, and entries in Jay-authored threads. It does not classify archive value.
 - Each applicable source reads `robots.txt` first. A disallow, crawl delay, 401, 403, 429, CAPTCHA, paywall, large response, invalid payload, or unsafe redirect stops that source.
 - Conditional feed requests use stored ETag and Last-Modified values.
+- A transient network failure, response-read error or timeout, `429`, or `5xx` result
+  creates an exponential per-origin backoff from 15 minutes to 24 hours.
 - PressThink runs as a 168-hour backstop after a successful check.
 
 The manifest starts with Jay Rosen's public Bluesky author feed. It retains the public PressThink WordPress index as a low-frequency backstop. The Worker only records compact source metadata. The existing repository workflow remains the only route to archive publishing.
@@ -28,11 +32,13 @@ Run these commands from this directory:
 
 ```bash
 node --test test/*.test.js
-wrangler types --check --config wrangler.jsonc
+wrangler types /tmp/rosen-source-discovery-worker-configuration.d.ts --config wrangler.jsonc
 wrangler dev --local --test-scheduled --config wrangler.jsonc
 ```
 
-The last command starts a local server. `GET /health` confirms the mode and public source labels. It uses a local D1 database.
+The type command generates a temporary binding declaration. The last command
+starts a local server. `GET /health` confirms the mode and public source labels.
+It uses a local D1 database.
 
 ## Deployment and rollback
 

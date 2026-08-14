@@ -6,6 +6,9 @@
 export const DISCOVERY_USER_AGENT =
   "RosenArchiveDiscovery/0.1 (read-only; https://github.com/jamditis/rosen-frontend/issues/806)";
 
+/** Increment when the reviewed source boundary or adapter shape changes. */
+export const SOURCE_MANIFEST_VERSION = "2026-08-14.2";
+
 export const SOURCE_MANIFEST = Object.freeze([
   Object.freeze({
     id: "jay-rosen-bluesky",
@@ -14,8 +17,9 @@ export const SOURCE_MANIFEST = Object.freeze([
     actorDid: "did:plc:3t37x6vfigdzzp2gjcfnzlz4",
     endpoint:
       "https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?actor=did%3Aplc%3A3t37x6vfigdzzp2gjcfnzlz4&filter=posts_and_author_threads&limit=25",
+    robotsUrl: "https://public.api.bsky.app/robots.txt",
     fetchOrigins: ["https://public.api.bsky.app"],
-    fetchPathPrefixes: ["/xrpc/app.bsky.feed.getAuthorFeed"],
+    fetchPathPrefixes: ["/xrpc/app.bsky.feed.getAuthorFeed", "/robots.txt"],
     maxCandidates: 25,
   }),
   Object.freeze({
