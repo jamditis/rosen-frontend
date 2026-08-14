@@ -20,6 +20,10 @@ const TRACKING_PARAMETERS = new Set([
   "mc_cid",
   "mc_eid",
 ]);
+const POST_COLLECTION = "app.bsky.feed.post";
+const REPOST_REASON_TYPE = "app.bsky.feed.defs#reasonRepost";
+const QUOTE_EMBED_TYPE = "app.bsky.embed.record";
+const QUOTE_WITH_MEDIA_EMBED_TYPE = "app.bsky.embed.recordWithMedia";
 
 function header(response, name) {
   return response.headers?.get?.(name) || "";
@@ -166,6 +170,7 @@ export async function fetchAllowedUrl({
         return {
           ok: false,
           reason: `http_${response.status}`,
+          status: response.status,
           redirectChain,
         };
       }
@@ -260,11 +265,11 @@ function splitRobotsGroups(text) {
 
 function robotsRuleMatches(pathname, pattern) {
   if (pattern === "") return false;
-  const expression = pattern
+  const endsAtPathBoundary = pattern.endsWith("$");
+  const expression = pattern.slice(0, endsAtPathBoundary ? -1 : undefined)
     .replace(/[.+?^${}()|[\]\\]/g, "\\$&")
-    .replace(/\*/g, ".*")
-    .replace(/\$$/, "$");
-  return new RegExp(`^${expression}`).test(pathname);
+    .replace(/\*/g, ".*");
+  return new RegExp(`^${expression}${endsAtPathBoundary ? "$" : ""}`).test(pathname);
 }
 
 /**
@@ -349,22 +354,150 @@ function valuesInContainers(text, containerName, valueReader) {
   return Array.from(text.matchAll(expression), (match) => valueReader(match[1])).flat();
 }
 
-function wordPressPostValues(text) {
+function parseWordPressPostValues(text) {
   try {
     const items = JSON.parse(text);
-    if (!Array.isArray(items)) return [];
-    return items
-      .filter((item) => item && typeof item === "object")
-      .map((item) => ({
+    if (!Array.isArray(items)) return { valid: false, values: [] };
+    return {
+      valid: true,
+      values: items.filter((item) => item && typeof item === "object").map((item) => ({
         url: typeof item.link === "string" ? item.link : "",
         externalTimestamp: typeof item.modified === "string" ? item.modified : null,
-      }));
+      })),
+    };
   } catch {
-    return [];
+    return { valid: false, values: [] };
   }
 }
 
+function wordPressPostValues(text) {
+  return parseWordPressPostValues(text).values;
+}
+
+function isObject(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function atPostUri(value) {
+  if (typeof value !== "string") return null;
+  const match = value.match(
+    /^at:\/\/(did:[a-z0-9:%._-]+)\/app\.bsky\.feed\.post\/[a-z0-9._~-]+$/i,
+  );
+  return match ? { uri: value, actorDid: match[1] } : null;
+}
+
+function stringValue(value) {
+  return typeof value === "string" && value !== "" ? value : null;
+}
+
+function atprotoPost(post) {
+  if (!isObject(post) || !isObject(post.author) || !isObject(post.record)) return null;
+  const uri = atPostUri(post.uri);
+  const authorDid = stringValue(post.author.did);
+  const contentId = stringValue(post.cid);
+  if (
+    !uri ||
+    !authorDid ||
+    uri.actorDid !== authorDid ||
+    !contentId ||
+    post.record.$type !== POST_COLLECTION
+  ) {
+    return null;
+  }
+  return {
+    uri,
+    authorDid,
+    contentId,
+    record: post.record,
+    indexedAt: stringValue(post.indexedAt),
+  };
+}
+
+function replyReferences(record) {
+  if (!Object.hasOwn(record, "reply")) return { rootId: null, parentId: null };
+  if (!isObject(record.reply) || !isObject(record.reply.root) || !isObject(record.reply.parent)) {
+    return null;
+  }
+  const root = atPostUri(record.reply.root.uri);
+  const parent = atPostUri(record.reply.parent.uri);
+  if (!root || !parent) return null;
+  return { rootId: root.uri, parentId: parent.uri, rootActorDid: root.actorDid };
+}
+
+function isQuotePost(record) {
+  if (!Object.hasOwn(record, "embed")) return false;
+  if (!isObject(record.embed)) return null;
+  if (record.embed.$type !== QUOTE_EMBED_TYPE && record.embed.$type !== QUOTE_WITH_MEDIA_EMBED_TYPE) {
+    return false;
+  }
+  const reference = record.embed.$type === QUOTE_EMBED_TYPE
+    ? record.embed.record
+    : record.embed.record?.record;
+  if (!isObject(reference) || typeof reference.uri !== "string" || typeof reference.cid !== "string") {
+    return null;
+  }
+  return true;
+}
+
+function postType({ isRepost, isThreadEntry, isReply, quote }) {
+  if (isRepost) return "repost";
+  if (isThreadEntry) return "thread_entry";
+  if (isReply) return "reply";
+  if (quote) return "quote_post";
+  return "original_post";
+}
+
+function atprotoAuthorFeedValues(source, text) {
+  let payload;
+  try {
+    payload = JSON.parse(text);
+  } catch {
+    return { valid: false, values: [] };
+  }
+  if (!isObject(payload) || !Array.isArray(payload.feed)) {
+    return { valid: false, values: [] };
+  }
+
+  const values = [];
+  for (const entry of payload.feed) {
+    if (!isObject(entry)) return { valid: false, values: [] };
+    const post = atprotoPost(entry.post);
+    if (!post) return { valid: false, values: [] };
+    const reply = replyReferences(post.record);
+    if (!reply) return { valid: false, values: [] };
+    const quote = isQuotePost(post.record);
+    if (quote === null) return { valid: false, values: [] };
+    const repost = isObject(entry.reason) && entry.reason.$type === REPOST_REASON_TYPE;
+    const repostBy = repost ? stringValue(entry.reason.by?.did) : null;
+    const authoredByTarget = post.authorDid === source.actorDid;
+    if (!authoredByTarget && repostBy !== source.actorDid) continue;
+    if (authoredByTarget && post.uri.actorDid !== source.actorDid) {
+      return { valid: false, values: [] };
+    }
+    const createdAt = stringValue(post.record.createdAt) || post.indexedAt;
+    if (!createdAt) return { valid: false, values: [] };
+    values.push({
+      url: post.uri.uri,
+      contentId: post.contentId,
+      postType: postType({
+        isRepost: repostBy === source.actorDid,
+        isThreadEntry: reply.rootActorDid === source.actorDid,
+        isReply: reply.rootId !== null,
+        quote,
+      }),
+      rootId: reply.rootId,
+      parentId: reply.parentId,
+      externalTimestamp:
+        (repost && stringValue(entry.reason.indexedAt)) || createdAt,
+    });
+  }
+  return { valid: true, values };
+}
+
 function rawCandidateValues(source, text) {
+  if (source.kind === "atproto-author-feed") {
+    return atprotoAuthorFeedValues(source, text);
+  }
   if (source.kind === "wordpress-api") return wordPressPostValues(text);
   if (source.kind === "sitemap") return valuesInTag(text, "loc");
   return [
@@ -378,6 +511,16 @@ function rawCandidateValues(source, text) {
 
 export function extractCandidateMetadata(source, text) {
   const rawValues = rawCandidateValues(source, text);
+  if (source.kind === "atproto-author-feed") {
+    if (!rawValues.valid) return [];
+    const seen = new Set();
+    return rawValues.values.filter((candidate) => {
+      if (seen.has(candidate.url)) return false;
+      seen.add(candidate.url);
+      return true;
+    }).slice(0, source.maxCandidates);
+  }
+  if (!Array.isArray(rawValues)) return [];
   const candidates = [];
   const seen = new Set();
   for (const value of rawValues) {
@@ -393,10 +536,17 @@ export function extractCandidateMetadata(source, text) {
     const normalized = url.toString();
     if (seen.has(normalized)) continue;
     seen.add(normalized);
-    candidates.push({
+    const candidate = {
       url: normalized,
       externalTimestamp: typeof value === "string" ? null : value.externalTimestamp,
-    });
+    };
+    if (typeof value !== "string" && value.contentId) {
+      candidate.contentId = value.contentId;
+      candidate.postType = value.postType;
+      candidate.rootId = value.rootId;
+      candidate.parentId = value.parentId;
+    }
+    candidates.push(candidate);
     if (candidates.length >= source.maxCandidates) break;
   }
   return candidates;
@@ -422,6 +572,9 @@ function isExpectedSourceContentType(source, value) {
   if (source.kind === "wordpress-api") {
     return contentType === "" || contentType.includes("application/json");
   }
+  if (source.kind === "atproto-author-feed") {
+    return contentType === "" || contentType.includes("application/json");
+  }
   return (
     contentType === "" ||
     contentType.includes("application/rss+xml") ||
@@ -431,19 +584,25 @@ function isExpectedSourceContentType(source, value) {
 }
 
 function sourceAcceptHeader(source) {
-  return source.kind === "wordpress-api"
+  return source.kind === "wordpress-api" || source.kind === "atproto-author-feed"
     ? "application/json"
     : "application/rss+xml, application/xml;q=0.9, text/xml;q=0.8";
 }
 
 async function readRobotsPolicy(source, options) {
+  if (typeof source.robotsUrl !== "string" || source.robotsUrl === "") {
+    return { allowed: true };
+  }
   const result = await fetchAllowedUrl({
     source,
     url: source.robotsUrl,
     accept: "text/plain, text/*;q=0.9",
     ...options,
   });
-  if (!result.ok) return { allowed: false, reason: `robots_${result.reason}` };
+  if (!result.ok) {
+    if (result.status === 404 || result.status === 410) return { allowed: true };
+    return { allowed: false, reason: `robots_${result.reason}` };
+  }
   if (result.notModified) {
     return { allowed: false, reason: "robots_not_modified" };
   }
@@ -495,16 +654,31 @@ export async function discoverSource(source, {
   if (looksLikeAccessControlPage(body.text)) {
     return { sourceId: source.id, status: "access_control_page" };
   }
+  if (source.kind === "atproto-author-feed") {
+    const parsed = atprotoAuthorFeedValues(source, body.text);
+    if (!parsed.valid) return { sourceId: source.id, status: "invalid_source_payload" };
+  }
+  if (source.kind === "wordpress-api" && !parseWordPressPostValues(body.text).valid) {
+    return { sourceId: source.id, status: "invalid_source_payload" };
+  }
 
   const discoveredAt = now().toISOString();
   const fingerprint = result.etag || result.lastModified;
   const candidates = extractCandidateMetadata(source, body.text).map((candidate) => ({
     sourceId: source.id,
     url: candidate.url,
+    ...(candidate.contentId
+      ? {
+          contentId: candidate.contentId,
+          postType: candidate.postType,
+          rootId: candidate.rootId,
+          parentId: candidate.parentId,
+        }
+      : {}),
     discoveredAt,
     externalTimestamp: candidate.externalTimestamp || result.lastModified,
     etag: result.etag,
-    fingerprint,
+    fingerprint: candidate.contentId || fingerprint,
   }));
   return {
     sourceId: source.id,

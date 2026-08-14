@@ -8,6 +8,17 @@ export const DISCOVERY_USER_AGENT =
 
 export const SOURCE_MANIFEST = Object.freeze([
   Object.freeze({
+    id: "jay-rosen-bluesky",
+    label: "Jay Rosen Bluesky activity",
+    kind: "atproto-author-feed",
+    actorDid: "did:plc:3t37x6vfigdzzp2gjcfnzlz4",
+    endpoint:
+      "https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?actor=did%3Aplc%3A3t37x6vfigdzzp2gjcfnzlz4&filter=posts_and_author_threads&limit=25",
+    fetchOrigins: ["https://public.api.bsky.app"],
+    fetchPathPrefixes: ["/xrpc/app.bsky.feed.getAuthorFeed"],
+    maxCandidates: 25,
+  }),
+  Object.freeze({
     id: "pressthink-wordpress-posts",
     label: "PressThink recent posts",
     kind: "wordpress-api",
@@ -18,6 +29,7 @@ export const SOURCE_MANIFEST = Object.freeze([
     candidateOrigins: ["https://pressthink.org"],
     candidatePathPrefixes: ["/"],
     maxCandidates: 25,
+    minimumIntervalHours: 168,
   }),
 ]);
 

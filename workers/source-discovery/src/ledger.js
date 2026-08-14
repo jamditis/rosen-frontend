@@ -10,7 +10,7 @@ const SQL = Object.freeze({
     ) VALUES (?, ?, ?, 0, 'running')
   `,
   sourceState: `
-    SELECT etag, last_modified
+    SELECT etag, last_modified, last_success_at
     FROM discovery_source_state
     WHERE source_id = ?
   `,
@@ -28,12 +28,17 @@ const SQL = Object.freeze({
   upsertCandidate: `
     INSERT INTO discovery_candidates (
       source_id, canonical_url, first_seen_at, last_seen_at,
-      external_timestamp, etag, fingerprint, latest_run_id
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      external_timestamp, etag, content_id, post_type, root_id, parent_id,
+      fingerprint, latest_run_id
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(source_id, canonical_url) DO UPDATE SET
       last_seen_at = excluded.last_seen_at,
       external_timestamp = COALESCE(excluded.external_timestamp, discovery_candidates.external_timestamp),
       etag = COALESCE(excluded.etag, discovery_candidates.etag),
+      content_id = COALESCE(excluded.content_id, discovery_candidates.content_id),
+      post_type = COALESCE(excluded.post_type, discovery_candidates.post_type),
+      root_id = COALESCE(excluded.root_id, discovery_candidates.root_id),
+      parent_id = COALESCE(excluded.parent_id, discovery_candidates.parent_id),
       fingerprint = COALESCE(excluded.fingerprint, discovery_candidates.fingerprint),
       latest_run_id = excluded.latest_run_id
   `,
@@ -61,7 +66,19 @@ async function sourceState(database, sourceId) {
   return {
     etag: metadata(state?.etag),
     lastModified: metadata(state?.last_modified),
+    lastSuccessAt: metadata(state?.last_success_at),
   };
+}
+
+function sourceIsDue(source, state, checkedAt) {
+  if (!Number.isFinite(source.minimumIntervalHours) || source.minimumIntervalHours <= 0) {
+    return true;
+  }
+  if (!state.lastSuccessAt) return true;
+  const lastSuccess = Date.parse(state.lastSuccessAt);
+  const current = Date.parse(checkedAt);
+  if (!Number.isFinite(lastSuccess) || !Number.isFinite(current)) return true;
+  return current - lastSuccess >= source.minimumIntervalHours * 60 * 60 * 1_000;
 }
 
 async function updateSourceState(database, outcome, checkedAt) {
@@ -91,6 +108,10 @@ async function upsertCandidates(database, runId, candidates) {
         candidate.discoveredAt,
         metadata(candidate.externalTimestamp),
         metadata(candidate.etag),
+        metadata(candidate.contentId),
+        metadata(candidate.postType),
+        metadata(candidate.rootId),
+        metadata(candidate.parentId),
         metadata(candidate.fingerprint),
         runId,
       ),
@@ -123,8 +144,10 @@ export async function runLiveDiscovery({
   try {
     for (const source of sources) {
       const conditional = await sourceState(database, source.id);
-      const outcome = await discoverSource(source, { fetchImpl, now, conditional });
       const checkedAt = now().toISOString();
+      const outcome = sourceIsDue(source, conditional, checkedAt)
+        ? await discoverSource(source, { fetchImpl, now, conditional })
+        : { sourceId: source.id, status: "skipped_interval", candidateCount: 0 };
       outcomes.push(outcome);
       candidateCount += outcome.candidateCount || 0;
       await updateSourceState(database, outcome, checkedAt);
