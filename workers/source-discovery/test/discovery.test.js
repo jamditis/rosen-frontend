@@ -609,6 +609,8 @@ test("feed parsing keeps only allowed, canonical candidate URLs", () => {
       "<item>",
       "<link>https://archive.example/posts/one?utm_source=mail#section</link>",
       "<link>https://archive.example/posts/one</link>",
+      "<link>https://archive.example/posts/two?first=one&amp;second=two</link>",
+      "<link>https://archive.example/posts/three?first=one&amp;amp;second=two</link>",
       "<link>https://outside.example/posts/two</link>",
       "<link>https://archive.example/about/</link>",
       `<link>${overlong}</link>`,
@@ -616,7 +618,11 @@ test("feed parsing keeps only allowed, canonical candidate URLs", () => {
       "</channel></rss>",
     ].join(""),
   );
-  assert.deepEqual(candidates, ["https://archive.example/posts/one"]);
+  assert.deepEqual(candidates, [
+    "https://archive.example/posts/one",
+    "https://archive.example/posts/two?first=one&second=two",
+    "https://archive.example/posts/three?first=one&amp;second=two",
+  ]);
 });
 
 test("the public WordPress index returns only allowed links and item dates", async () => {

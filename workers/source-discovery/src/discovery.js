@@ -395,16 +395,22 @@ export function evaluateRobots(text, { userAgent, pathname }) {
   };
 }
 
+const XML_ENTITY_VALUES = Object.freeze({
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  "#x27": "'",
+  apos: "'",
+  quot: '"',
+});
+
 function decodeXmlValue(value) {
   const cdata = value.match(/^<!\[CDATA\[([\s\S]*?)\]\]>$/i);
   const decoded = cdata ? cdata[1] : value;
-  return decoded
-    .replace(/&amp;/gi, "&")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">")
-    .replace(/&#x27;|&apos;/gi, "'")
-    .replace(/&quot;/gi, '"')
-    .trim();
+  return decoded.replace(
+    /&(amp|lt|gt|#x27|apos|quot);/gi,
+    (_, entity) => XML_ENTITY_VALUES[entity.toLowerCase()],
+  ).trim();
 }
 
 function valuesInTag(text, tagName) {
