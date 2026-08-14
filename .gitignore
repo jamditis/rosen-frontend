@@ -105,6 +105,8 @@ data/social_import/
 
 # Cloudflare Workers dev artifacts
 .wrangler/
+# This JavaScript-only scaffold does not consume generated Wrangler types.
+workers/**/worker-configuration.d.ts
 
 # Git worktrees
 .worktrees/

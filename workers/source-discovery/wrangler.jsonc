@@ -1,0 +1,23 @@
+{
+  "name": "rosen-source-discovery",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-14",
+  "workers_dev": true,
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "triggers": {
+    "crons": ["17 9 * * *"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DISCOVERY_LEDGER",
+      "database_name": "rosen-source-discovery-ledger",
+      "database_id": "1f3aaac0-da6d-45b9-829b-6f7921c32465"
+    }
+  ],
+  "vars": {
+    "DISCOVERY_MODE": "live"
+  }
+}
