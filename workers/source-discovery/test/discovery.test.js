@@ -15,7 +15,10 @@ import {
   readBoundedText,
   runDiscovery,
 } from "../src/discovery.js";
-import { SOURCE_MANIFEST_VERSION } from "../src/source-manifest.js";
+import {
+  SOURCE_MANIFEST,
+  SOURCE_MANIFEST_VERSION,
+} from "../src/source-manifest.js";
 
 function source(overrides = {}) {
   return {
@@ -38,11 +41,12 @@ function blueskySource(overrides = {}) {
     kind: "atproto-author-feed",
     actorDid: "did:plc:3t37x6vfigdzzp2gjcfnzlz4",
     endpoint:
-      "https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?actor=did%3Aplc%3A3t37x6vfigdzzp2gjcfnzlz4&filter=posts_and_author_threads&limit=25",
+      "https://public.api.bsky.app/xrpc/app.bsky.feed.getAuthorFeed?actor=did%3Aplc%3A3t37x6vfigdzzp2gjcfnzlz4&filter=posts_with_replies&limit=25",
     robotsUrl: "https://public.api.bsky.app/robots.txt",
     fetchOrigins: ["https://public.api.bsky.app"],
     fetchPathPrefixes: ["/xrpc/app.bsky.feed.getAuthorFeed", "/robots.txt"],
-    maxCandidates: 25,
+    maxCandidates: 100,
+    maxPages: 4,
     ...overrides,
   };
 }
@@ -67,7 +71,11 @@ function response(body, { status = 200, headers = {} } = {}) {
   return new Response(body, { status, headers });
 }
 
-function fakeDatabase({ state = null, originState = null } = {}) {
+function fakeDatabase({
+  state = null,
+  originState = null,
+  candidateRows = [],
+} = {}) {
   const queries = [];
   const batches = [];
   return {
@@ -82,6 +90,10 @@ function fakeDatabase({ state = null, originState = null } = {}) {
               return sql.includes("FROM discovery_origin_state")
                 ? originState
                 : state;
+            },
+            async all() {
+              queries.push({ operation: "all", sql, params });
+              return { results: candidateRows };
             },
             async run() {
               queries.push({ operation: "run", sql, params });
@@ -102,6 +114,7 @@ const migrationUrls = [
   new URL("../migrations/0001_initial.sql", import.meta.url),
   new URL("../migrations/0002_bluesky_candidate_metadata.sql", import.meta.url),
   new URL("../migrations/0003_origin_backoff.sql", import.meta.url),
+  new URL("../migrations/0004_candidate_history_index.sql", import.meta.url),
 ];
 
 async function sqliteDatabase({
@@ -125,6 +138,17 @@ async function sqliteDatabase({
               try {
                 statement.bind(params);
                 return statement.step() ? statement.getAsObject() : null;
+              } finally {
+                statement.free();
+              }
+            },
+            async all() {
+              const statement = raw.prepare(sql);
+              try {
+                statement.bind(params);
+                const results = [];
+                while (statement.step()) results.push(statement.getAsObject());
+                return { results };
               } finally {
                 statement.free();
               }
@@ -182,7 +206,7 @@ test("the health endpoint exposes no fetch trigger or source URL", async () => {
         id: "jay-rosen-bluesky",
         label: "Jay Rosen Bluesky activity",
         kind: "atproto-author-feed",
-        maxCandidates: 25,
+        maxCandidates: 100,
       },
       {
         id: "pressthink-wordpress-posts",
@@ -269,6 +293,197 @@ test("the fixed Bluesky author feed records compact candidate metadata only", as
       fingerprint: "bafyrepost",
     },
   ]);
+});
+
+test("the fixed Bluesky source includes replies outside Jay-authored threads", () => {
+  const bluesky = SOURCE_MANIFEST.find(({ id }) => id === "jay-rosen-bluesky");
+  const endpoint = new URL(bluesky.endpoint);
+
+  assert.equal(endpoint.searchParams.get("filter"), "posts_with_replies");
+  assert.equal(endpoint.searchParams.get("actor"), bluesky.actorDid);
+});
+
+test("the Bluesky adapter follows a bounded encoded cursor and collects later pages", async () => {
+  const fixture = JSON.parse(await blueskyFixture());
+  const feedCalls = [];
+  const opaqueCursor = "page/2?after=one&kind=reply";
+  const result = await discoverSource(blueskySource(), {
+    fetchImpl: blueskyFetch(async (url) => {
+      feedCalls.push(url);
+      const cursor = new URL(url).searchParams.get("cursor");
+      const payload = cursor === null
+        ? { feed: [fixture.feed[0]], cursor: opaqueCursor }
+        : { feed: [fixture.feed[1]] };
+      return response(JSON.stringify(payload), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }),
+  });
+
+  assert.equal(result.status, "candidates_found");
+  assert.deepEqual(
+    result.candidates.map(({ url }) => url),
+    [fixture.feed[0].post.uri, fixture.feed[1].post.uri],
+  );
+  assert.equal(feedCalls.length, 2);
+  assert.equal(new URL(feedCalls[1]).searchParams.get("cursor"), opaqueCursor);
+  assert.equal(new URL(feedCalls[1]).searchParams.getAll("actor").length, 1);
+});
+
+test("the Bluesky adapter stops pagination at a previously seen candidate", async () => {
+  const fixture = JSON.parse(await blueskyFixture());
+  const feedCalls = [];
+  const result = await discoverSource(blueskySource(), {
+    knownCandidateUrls: new Set([fixture.feed[1].post.uri]),
+    fetchImpl: blueskyFetch(async (url) => {
+      feedCalls.push(url);
+      const cursor = new URL(url).searchParams.get("cursor");
+      const payload = cursor === null
+        ? { feed: [fixture.feed[0]], cursor: "page-2" }
+        : { feed: [fixture.feed[1], fixture.feed[2]], cursor: "page-3" };
+      return response(JSON.stringify(payload), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }),
+  });
+
+  assert.equal(result.status, "candidates_found");
+  assert.deepEqual(
+    result.candidates.map(({ url }) => url),
+    [fixture.feed[0].post.uri],
+  );
+  assert.equal(feedCalls.length, 2);
+});
+
+test("the Bluesky adapter records when its page cap truncates discovery", async () => {
+  const fixture = JSON.parse(await blueskyFixture());
+  let page = 0;
+  const result = await discoverSource(blueskySource({ maxPages: 2 }), {
+    fetchImpl: blueskyFetch(async () => {
+      const entry = fixture.feed[page];
+      page += 1;
+      return response(JSON.stringify({
+        feed: [entry],
+        cursor: `page-${page + 1}`,
+      }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }),
+  });
+
+  assert.equal(result.status, "pagination_truncated");
+  assert.equal(result.paginationTruncated, true);
+  assert.equal(result.candidateCount, 2);
+  assert.equal(page, 2);
+});
+
+test("the Bluesky adapter records truncation when the candidate cap stops paging", async () => {
+  const fixture = JSON.parse(await blueskyFixture());
+  const result = await discoverSource(blueskySource({ maxCandidates: 1 }), {
+    fetchImpl: blueskyFetch(async () => response(JSON.stringify({
+      feed: [fixture.feed[0]],
+      cursor: "page-2",
+    }), {
+      headers: { "Content-Type": "application/json" },
+    })),
+  });
+
+  assert.equal(result.status, "pagination_truncated");
+  assert.equal(result.paginationTruncated, true);
+  assert.equal(result.candidateCount, 1);
+});
+
+test("a truncated Bluesky run does not advance conditional validators", async () => {
+  const fixture = JSON.parse(await blueskyFixture());
+  const result = await discoverSource(blueskySource({ maxPages: 1 }), {
+    fetchImpl: blueskyFetch(async () => response(JSON.stringify({
+      feed: [fixture.feed[0]],
+      cursor: "page-2",
+    }), {
+      headers: {
+        "Content-Type": "application/json",
+        ETag: '"incomplete-page"',
+        "Last-Modified": "Fri, 14 Aug 2026 12:00:00 GMT",
+      },
+    })),
+  });
+
+  assert.equal(result.status, "pagination_truncated");
+  assert.equal(result.etag, undefined);
+  assert.equal(result.lastModified, undefined);
+});
+
+test("the Bluesky adapter rejects a cursor cycle and an oversized encoded URL", async () => {
+  const fixture = JSON.parse(await blueskyFixture());
+  let cyclePage = 0;
+  const cycle = await discoverSource(blueskySource(), {
+    fetchImpl: blueskyFetch(async () => {
+      const entry = fixture.feed[cyclePage];
+      cyclePage += 1;
+      return response(JSON.stringify({ feed: [entry], cursor: "same-cursor" }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }),
+  });
+  assert.equal(cycle.status, "invalid_source_payload");
+  assert.equal(cycle.candidateCount, undefined);
+  assert.equal(cyclePage, 2);
+
+  let oversizedCalls = 0;
+  const oversized = await discoverSource(blueskySource(), {
+    fetchImpl: blueskyFetch(async () => {
+      oversizedCalls += 1;
+      return response(JSON.stringify({
+        feed: [fixture.feed[0]],
+        cursor: "\u0800".repeat(2_048),
+      }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }),
+  });
+  assert.equal(oversized.status, "invalid_source_payload");
+  assert.equal(oversizedCalls, 1);
+});
+
+test("page overlap deduplicates without acting like historical state", async () => {
+  const fixture = JSON.parse(await blueskyFixture());
+  let page = 0;
+  const result = await discoverSource(blueskySource(), {
+    fetchImpl: blueskyFetch(async () => {
+      page += 1;
+      const payload = page === 1
+        ? { feed: [fixture.feed[0]], cursor: "page-2" }
+        : { feed: [fixture.feed[0], fixture.feed[1]] };
+      return response(JSON.stringify(payload), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }),
+  });
+
+  assert.deepEqual(
+    result.candidates.map(({ url }) => url),
+    [fixture.feed[0].post.uri, fixture.feed[1].post.uri],
+  );
+  assert.equal(page, 2);
+});
+
+test("a historical repost does not stop discovery before a newer post", async () => {
+  const fixture = JSON.parse(await blueskyFixture());
+  const repost = fixture.feed[4];
+  const original = fixture.feed[0];
+  const result = await discoverSource(blueskySource(), {
+    knownCandidateUrls: new Set([repost.post.uri]),
+    fetchImpl: blueskyFetch(async () => response(JSON.stringify({
+      feed: [repost, original],
+    }), {
+      headers: { "Content-Type": "application/json" },
+    })),
+  });
+
+  assert.deepEqual(
+    result.candidates.map(({ url }) => url),
+    [original.post.uri],
+  );
 });
 
 test("the Bluesky adapter does not treat post text as an access-control page", async () => {
@@ -421,6 +636,71 @@ test("the Bluesky source stops at its robots policy before fetching the author f
   assert.deepEqual(calls, ["https://public.api.bsky.app/robots.txt"]);
 });
 
+test("the Bluesky source matches robots rules against its fixed query", async () => {
+  const calls = [];
+  const endpoint = new URL(blueskySource().endpoint);
+  const result = await discoverSource(blueskySource(), {
+    fetchImpl: async (url) => {
+      calls.push(url);
+      if (url.endsWith("/robots.txt")) {
+        return response(
+          `User-agent: *\nDisallow: ${endpoint.pathname}${endpoint.search}`,
+        );
+      }
+      return response(await blueskyFixture(), {
+        headers: { "Content-Type": "application/json" },
+      });
+    },
+  });
+
+  assert.equal(result.status, "robots_disallow");
+  assert.deepEqual(calls, ["https://public.api.bsky.app/robots.txt"]);
+});
+
+test("the Bluesky source checks one robots policy against every cursor page", async () => {
+  const fixture = JSON.parse(await blueskyFixture());
+  let feedCalls = 0;
+  const result = await discoverSource(blueskySource(), {
+    fetchImpl: async (url) => {
+      if (url.endsWith("/robots.txt")) {
+        return response([
+          "User-agent: *",
+          "Disallow: /xrpc/app.bsky.feed.getAuthorFeed*cursor=*",
+        ].join("\n"));
+      }
+      feedCalls += 1;
+      return response(JSON.stringify({
+        feed: [fixture.feed[0]],
+        cursor: "page-2",
+      }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    },
+  });
+
+  assert.equal(result.status, "robots_disallow");
+  assert.equal(feedCalls, 1);
+});
+
+test("a second Bluesky page failure discards the partial page set", async () => {
+  const fixture = JSON.parse(await blueskyFixture());
+  let feedCalls = 0;
+  const result = await discoverSource(blueskySource(), {
+    fetchImpl: blueskyFetch(async () => {
+      feedCalls += 1;
+      return feedCalls === 1
+        ? response(JSON.stringify({ feed: [fixture.feed[0]], cursor: "page-2" }), {
+            headers: { "Content-Type": "application/json" },
+          })
+        : response("", { status: 429 });
+    }),
+  });
+
+  assert.equal(result.status, "stop_http_429");
+  assert.equal(result.candidateCount, undefined);
+  assert.equal(result.candidates, undefined);
+});
+
 test("manual redirects stop when a hop leaves the source manifest", async () => {
   const result = await fetchAllowedUrl({
     source: source(),
@@ -455,6 +735,36 @@ test("a Bluesky redirect cannot change the fixed author-feed query", async () =>
   assert.equal(result.ok, false);
   assert.equal(result.reason, "redirect_outside_manifest");
   assert.equal(requests, 1);
+});
+
+test("Bluesky redirects preserve the requested resource and cursor", async () => {
+  const robotsToFeed = await fetchAllowedUrl({
+    source: blueskySource(),
+    url: blueskySource().robotsUrl,
+    accept: "text/plain",
+    fetchImpl: async () => response("", {
+      status: 302,
+      headers: { Location: blueskySource().endpoint },
+    }),
+  });
+  assert.equal(robotsToFeed.ok, false);
+  assert.equal(robotsToFeed.reason, "redirect_outside_manifest");
+
+  const requested = new URL(blueskySource().endpoint);
+  requested.searchParams.set("cursor", "page-2");
+  const changed = new URL(requested);
+  changed.searchParams.set("cursor", "page-3");
+  const changedCursor = await fetchAllowedUrl({
+    source: blueskySource(),
+    url: requested,
+    accept: "application/json",
+    fetchImpl: async () => response("", {
+      status: 302,
+      headers: { Location: changed.toString() },
+    }),
+  });
+  assert.equal(changedCursor.ok, false);
+  assert.equal(changedCursor.reason, "redirect_outside_manifest");
 });
 
 test("bounded reads reject a declared or streamed oversized response", async () => {
@@ -860,7 +1170,7 @@ test("the ledger upserts Bluesky content identifiers and source classifications"
     sql.includes("INSERT INTO discovery_candidates"),
   );
   assert.equal(candidateWrite.sql.includes("ON CONFLICT(source_id, canonical_url)"), true);
-  assert.deepEqual(candidateWrite.params, [
+  assert.deepEqual(candidateWrite.params.slice(0, 12), [
     "jay-rosen-bluesky",
     "at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/original",
     "2026-08-14T12:34:56.000Z",
@@ -874,6 +1184,82 @@ test("the ledger upserts Bluesky content identifiers and source classifications"
     "bafyoriginal",
     "run-bluesky",
   ]);
+});
+
+test("live Bluesky discovery stops at bounded D1 history", async () => {
+  const fixture = JSON.parse(await blueskyFixture());
+  const knownUrl = fixture.feed[1].post.uri;
+  const database = fakeDatabase({ candidateRows: [{ canonical_url: knownUrl }] });
+  let feedCalls = 0;
+  const report = await runLiveDiscovery({
+    database,
+    sources: [blueskySource()],
+    makeRunId: () => "run-known-bluesky",
+    now: () => new Date("2026-08-14T12:34:56.000Z"),
+    fetchImpl: blueskyFetch(async () => {
+      feedCalls += 1;
+      const payload = feedCalls === 1
+        ? { feed: [fixture.feed[0]], cursor: "page-2" }
+        : { feed: [fixture.feed[1], fixture.feed[2]], cursor: "page-3" };
+      return response(JSON.stringify(payload), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }),
+  });
+
+  assert.equal(feedCalls, 2);
+  assert.equal(report.sources[0].candidateCount, 1);
+  const historyRead = database.queries.find(({ operation, sql }) =>
+    operation === "all" && sql.includes("FROM discovery_candidates"),
+  );
+  assert.deepEqual(historyRead.params, ["jay-rosen-bluesky", 100]);
+  const candidateWrites = database.queries.filter(({ sql }) =>
+    sql.includes("INSERT INTO discovery_candidates"),
+  );
+  assert.equal(candidateWrites.length, 1);
+  assert.equal(candidateWrites[0].params[1], fixture.feed[0].post.uri);
+});
+
+test("one 100-candidate run stays under the D1 free query limit", async () => {
+  const fixture = JSON.parse(await blueskyFixture());
+  const entries = Array.from({ length: 100 }, (_, index) => {
+    const entry = structuredClone(fixture.feed[0]);
+    entry.post.uri =
+      `at://did:plc:3t37x6vfigdzzp2gjcfnzlz4/app.bsky.feed.post/page-${index}`;
+    entry.post.cid = `bafy-page-${index}`;
+    entry.post.record.createdAt = new Date(
+      Date.parse("2026-08-14T12:00:00.000Z") - index * 1_000,
+    ).toISOString();
+    return entry;
+  });
+  const database = fakeDatabase();
+  let page = 0;
+  const report = await runLiveDiscovery({
+    database,
+    sources: [blueskySource()],
+    makeRunId: () => "run-100-bluesky",
+    now: () => new Date("2026-08-14T12:34:56.000Z"),
+    fetchImpl: blueskyFetch(async () => {
+      const start = page * 25;
+      page += 1;
+      const payload = {
+        feed: entries.slice(start, start + 25),
+        ...(page < 4 ? { cursor: `page-${page + 1}` } : {}),
+      };
+      return response(JSON.stringify(payload), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }),
+  });
+
+  assert.equal(report.sources[0].candidateCount, 100);
+  const sourceBatch = database.batches[0];
+  const candidateStatements = database.queries.filter(({ sql }) =>
+    sql.includes("INSERT INTO discovery_candidates"),
+  );
+  assert.ok(sourceBatch.length < 50, `source batch used ${sourceBatch.length} queries`);
+  assert.equal(candidateStatements.length, 13);
+  assert.ok(candidateStatements.every(({ params }) => params.length <= 96));
 });
 
 test("a successful source waits for its configured low-frequency interval", async () => {
@@ -1061,6 +1447,11 @@ test("an invalid manifest source does not stop a valid source", async () => {
 
 test("D1 migrations execute the ledger upsert and expire a stale run", async () => {
   const database = await sqliteDatabase();
+  const indexes = sqliteRows(
+    database.raw,
+    "SELECT name FROM sqlite_master WHERE type = 'index' ORDER BY name",
+  ).flat();
+  assert.ok(indexes.includes("discovery_candidates_source_seen_index"));
   try {
     database.raw.run(`
       INSERT INTO discovery_runs (

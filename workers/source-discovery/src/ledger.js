@@ -6,6 +6,12 @@ const BACKOFF_BASE_MS = 15 * 60 * 1_000;
 const BACKOFF_MAX_MS = 24 * 60 * 60 * 1_000;
 const BACKOFF_MAX_FAILURES = 8;
 const STALE_RUN_MS = 25 * 60 * 60 * 1_000;
+const KNOWN_CANDIDATE_LIMIT = 100;
+const CANDIDATE_PARAMETER_COUNT = 12;
+const D1_MAX_BOUND_PARAMETERS = 100;
+const CANDIDATES_PER_UPSERT = Math.floor(
+  D1_MAX_BOUND_PARAMETERS / CANDIDATE_PARAMETER_COUNT,
+);
 
 const SQL = Object.freeze({
   createRun: `
@@ -28,6 +34,13 @@ const SQL = Object.freeze({
     FROM discovery_origin_state
     WHERE origin = ?
   `,
+  knownCandidateUrls: `
+    SELECT canonical_url
+    FROM discovery_candidates
+    WHERE source_id = ?
+    ORDER BY last_seen_at DESC
+    LIMIT ?
+  `,
   updateSourceState: `
     INSERT INTO discovery_source_state (
       source_id, etag, last_modified, last_checked_at, last_success_at, last_status
@@ -48,23 +61,6 @@ const SQL = Object.freeze({
       consecutive_failures = excluded.consecutive_failures,
       last_checked_at = excluded.last_checked_at,
       last_status = excluded.last_status
-  `,
-  upsertCandidate: `
-    INSERT INTO discovery_candidates (
-      source_id, canonical_url, first_seen_at, last_seen_at,
-      external_timestamp, etag, content_id, post_type, root_id, parent_id,
-      fingerprint, latest_run_id
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(source_id, canonical_url) DO UPDATE SET
-      last_seen_at = excluded.last_seen_at,
-      external_timestamp = COALESCE(excluded.external_timestamp, discovery_candidates.external_timestamp),
-      etag = COALESCE(excluded.etag, discovery_candidates.etag),
-      content_id = COALESCE(excluded.content_id, discovery_candidates.content_id),
-      post_type = COALESCE(excluded.post_type, discovery_candidates.post_type),
-      root_id = COALESCE(excluded.root_id, discovery_candidates.root_id),
-      parent_id = COALESCE(excluded.parent_id, discovery_candidates.parent_id),
-      fingerprint = COALESCE(excluded.fingerprint, discovery_candidates.fingerprint),
-      latest_run_id = excluded.latest_run_id
   `,
   completeRun: `
     UPDATE discovery_runs
@@ -125,6 +121,26 @@ async function originState(database, origin) {
         ? state.consecutive_failures
         : 0,
   };
+}
+
+async function knownCandidateUrls(database, source) {
+  if (source.kind !== "atproto-author-feed") return undefined;
+  const result = await database
+    .prepare(SQL.knownCandidateUrls)
+    .bind(source.id, KNOWN_CANDIDATE_LIMIT)
+    .all();
+  if (!Array.isArray(result?.results)) {
+    throw new Error("invalid_candidate_history_result");
+  }
+  const urls = new Set();
+  for (const row of result.results.slice(0, KNOWN_CANDIDATE_LIMIT)) {
+    try {
+      urls.add(canonicalUrl(row?.canonical_url));
+    } catch {
+      // Ignore malformed ledger metadata instead of changing the source boundary.
+    }
+  }
+  return urls;
 }
 
 function sourceIsDue(source, state, checkedAt) {
@@ -207,25 +223,58 @@ function originStateUpdate(database, origin, state, outcome, checkedAt) {
     );
 }
 
+function candidateParameters(runId, candidate) {
+  return [
+    metadata(candidate.sourceId),
+    canonicalUrl(candidate.url),
+    candidate.discoveredAt,
+    candidate.discoveredAt,
+    metadata(candidate.externalTimestamp),
+    metadata(candidate.etag),
+    metadata(candidate.contentId),
+    metadata(candidate.postType),
+    metadata(candidate.rootId),
+    metadata(candidate.parentId),
+    metadata(candidate.fingerprint),
+    runId,
+  ];
+}
+
+function candidateUpsertSql(rowCount) {
+  const values = Array.from(
+    { length: rowCount },
+    () => "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+  ).join(", ");
+  return `
+    INSERT INTO discovery_candidates (
+      source_id, canonical_url, first_seen_at, last_seen_at,
+      external_timestamp, etag, content_id, post_type, root_id, parent_id,
+      fingerprint, latest_run_id
+    ) VALUES ${values}
+    ON CONFLICT(source_id, canonical_url) DO UPDATE SET
+      last_seen_at = excluded.last_seen_at,
+      external_timestamp = COALESCE(excluded.external_timestamp, discovery_candidates.external_timestamp),
+      etag = COALESCE(excluded.etag, discovery_candidates.etag),
+      content_id = COALESCE(excluded.content_id, discovery_candidates.content_id),
+      post_type = COALESCE(excluded.post_type, discovery_candidates.post_type),
+      root_id = COALESCE(excluded.root_id, discovery_candidates.root_id),
+      parent_id = COALESCE(excluded.parent_id, discovery_candidates.parent_id),
+      fingerprint = COALESCE(excluded.fingerprint, discovery_candidates.fingerprint),
+      latest_run_id = excluded.latest_run_id
+  `;
+}
+
 function candidateUpserts(database, runId, candidates) {
-  return candidates.map((candidate) =>
-    database
-      .prepare(SQL.upsertCandidate)
-      .bind(
-        metadata(candidate.sourceId),
-        canonicalUrl(candidate.url),
-        candidate.discoveredAt,
-        candidate.discoveredAt,
-        metadata(candidate.externalTimestamp),
-        metadata(candidate.etag),
-        metadata(candidate.contentId),
-        metadata(candidate.postType),
-        metadata(candidate.rootId),
-        metadata(candidate.parentId),
-        metadata(candidate.fingerprint),
-        runId,
-      ),
-  );
+  const statements = [];
+  for (let offset = 0; offset < candidates.length; offset += CANDIDATES_PER_UPSERT) {
+    const chunk = candidates.slice(offset, offset + CANDIDATES_PER_UPSERT);
+    statements.push(
+      database
+        .prepare(candidateUpsertSql(chunk.length))
+        .bind(...chunk.flatMap((candidate) => candidateParameters(runId, candidate))),
+    );
+  }
+  return statements;
 }
 
 /**
@@ -275,7 +324,12 @@ export async function runLiveDiscovery({
       const originBackoff = await originState(database, origin);
       const outcome = sourceIsDue(source, conditional, checkedAt)
         ? originIsDue(originBackoff, checkedAt)
-          ? await discoverSource(source, { fetchImpl, now, conditional })
+          ? await discoverSource(source, {
+              fetchImpl,
+              now,
+              conditional,
+              knownCandidateUrls: await knownCandidateUrls(database, source),
+            })
           : { sourceId: source.id, status: "skipped_backoff", candidateCount: 0 }
         : { sourceId: source.id, status: "skipped_interval", candidateCount: 0 };
       outcomes.push(outcome);

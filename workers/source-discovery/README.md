@@ -15,8 +15,11 @@ It is a read-only candidate-discovery control plane. It is not the archive scrap
 - It deploys only to `https://rosen-source-discovery.jamditis.workers.dev`.
 - The source manifest is fixed in source code. It allows HTTPS URLs from named origins and paths only.
 - The source manifest is versioned. Increase `SOURCE_MANIFEST_VERSION` only when a reviewed source boundary or adapter shape changes.
-- The public Bluesky source is Jay Rosen's fixed DID `did:plc:3t37x6vfigdzzp2gjcfnzlz4` on the public AT Protocol AppView endpoint. It reads the fixed public API `robots.txt` policy before the author feed.
-- A Bluesky redirect cannot change that fixed author-feed path or query.
+- The public Bluesky source is Jay Rosen's fixed DID `did:plc:3t37x6vfigdzzp2gjcfnzlz4` on the public AT Protocol AppView endpoint. It uses `posts_with_replies` to include Jay's replies outside Jay-authored threads.
+- The Bluesky adapter reads one fixed public API `robots.txt` policy. It checks that policy against the complete query for every page.
+- A Bluesky redirect cannot change the resource, fixed author-feed query, or requested cursor.
+- The Bluesky adapter reads at most four pages and 100 candidates. It stops at a recent known non-repost candidate.
+- The Bluesky adapter reports `pagination_truncated` when a page or candidate limit stops a run. It does not advance conditional validators for that run.
 - The Bluesky adapter classifies original posts, replies, quote posts, reposts, and entries in Jay-authored threads. It does not classify archive value.
 - Each applicable source reads `robots.txt` first. A disallow, crawl delay, 401, 403, 429, CAPTCHA, paywall, large response, invalid payload, or unsafe redirect stops that source.
 - Conditional feed requests use stored ETag and Last-Modified values.
@@ -48,6 +51,8 @@ Apply migrations before deploying:
 wrangler d1 migrations apply rosen-source-discovery-ledger --remote --config wrangler.jsonc
 wrangler deploy --config wrangler.jsonc
 ```
+
+Migration `0004_candidate_history_index.sql` adds the bounded Bluesky history lookup index. Candidate writes use batches that stay below D1's 100-parameter statement limit.
 
 Keep `pressthink.org` unconfigured. This personal account does not control that zone.
 

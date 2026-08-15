@@ -14,6 +14,9 @@ export const MAX_REDIRECTS = 3;
 export const MAX_FEED_BYTES = 256 * 1024;
 export const MAX_ROBOTS_BYTES = 32 * 1024;
 export const MAX_CANDIDATE_URL_LENGTH = 2_048;
+export const MAX_ATPROTO_CURSOR_LENGTH = 2_048;
+export const MAX_ATPROTO_URL_LENGTH = 8_192;
+export const MAX_ATPROTO_PAGES = 4;
 export const REQUEST_TIMEOUT_MS = 10_000;
 export const RESPONSE_READ_TIMEOUT_MS = 10_000;
 
@@ -30,6 +33,16 @@ const POST_COLLECTION = "app.bsky.feed.post";
 const REPOST_REASON_TYPE = "app.bsky.feed.defs#reasonRepost";
 const QUOTE_EMBED_TYPE = "app.bsky.embed.record";
 const QUOTE_WITH_MEDIA_EMBED_TYPE = "app.bsky.embed.recordWithMedia";
+const ATPROTO_FIXED_QUERY = Object.freeze({
+  filter: "posts_with_replies",
+  limit: "25",
+});
+const ATPROTO_QUERY_PARAMETERS = new Set([
+  "actor",
+  "filter",
+  "limit",
+  "cursor",
+]);
 
 function header(response, name) {
   return response.headers?.get?.(name) || "";
@@ -67,16 +80,80 @@ function hasFixedAtprotoResource(source, url) {
   if (source.kind !== "atproto-author-feed") return true;
   try {
     const endpoint = new URL(source.endpoint);
-    if (url.pathname === endpoint.pathname && url.search === endpoint.search) {
+    if (
+      typeof source.robotsUrl === "string" &&
+      source.robotsUrl !== "" &&
+      url.toString() === new URL(source.robotsUrl).toString()
+    ) {
       return true;
     }
-    if (typeof source.robotsUrl !== "string" || source.robotsUrl === "") {
+    if (
+      url.origin !== endpoint.origin ||
+      url.pathname !== endpoint.pathname ||
+      url.hash !== "" ||
+      endpoint.hash !== ""
+    ) {
       return false;
     }
-    return url.toString() === new URL(source.robotsUrl).toString();
+
+    const endpointParameters = [...endpoint.searchParams.keys()];
+    if (
+      endpointParameters.length !== 3 ||
+      endpoint.searchParams.getAll("actor").length !== 1 ||
+      endpoint.searchParams.getAll("filter").length !== 1 ||
+      endpoint.searchParams.getAll("limit").length !== 1 ||
+      endpoint.searchParams.get("actor") !== source.actorDid ||
+      endpoint.searchParams.get("filter") !== ATPROTO_FIXED_QUERY.filter ||
+      endpoint.searchParams.get("limit") !== ATPROTO_FIXED_QUERY.limit
+    ) {
+      return false;
+    }
+
+    const parameters = [...url.searchParams.keys()];
+    if (
+      parameters.some((name) => !ATPROTO_QUERY_PARAMETERS.has(name)) ||
+      url.searchParams.getAll("actor").length !== 1 ||
+      url.searchParams.getAll("filter").length !== 1 ||
+      url.searchParams.getAll("limit").length !== 1 ||
+      url.searchParams.get("actor") !== endpoint.searchParams.get("actor") ||
+      url.searchParams.get("filter") !== endpoint.searchParams.get("filter") ||
+      url.searchParams.get("limit") !== endpoint.searchParams.get("limit")
+    ) {
+      return false;
+    }
+    const cursors = url.searchParams.getAll("cursor");
+    return (
+      cursors.length === 0 ||
+      (cursors.length === 1 &&
+        cursors[0].length > 0 &&
+        cursors[0].length <= MAX_ATPROTO_CURSOR_LENGTH)
+    );
   } catch {
     return false;
   }
+}
+
+function atprotoResourceKey(source, url) {
+  if (source.kind !== "atproto-author-feed") return null;
+  try {
+    if (
+      typeof source.robotsUrl === "string" &&
+      source.robotsUrl !== "" &&
+      url.toString() === new URL(source.robotsUrl).toString()
+    ) {
+      return "robots";
+    }
+    if (!hasFixedAtprotoResource(source, url)) return null;
+    return `feed:${url.searchParams.get("cursor") || ""}`;
+  } catch {
+    return null;
+  }
+}
+
+function redirectPreservesAtprotoResource(source, currentUrl, nextUrl) {
+  if (source.kind !== "atproto-author-feed") return true;
+  const currentKey = atprotoResourceKey(source, currentUrl);
+  return currentKey !== null && currentKey === atprotoResourceKey(source, nextUrl);
 }
 
 export function isAllowedFetchUrl(source, value) {
@@ -223,7 +300,10 @@ export async function fetchAllowedUrl({
     } catch {
       return { ok: false, reason: "invalid_redirect", redirectChain };
     }
-    if (!isAllowedFetchUrl(source, nextUrl)) {
+    if (
+      !isAllowedFetchUrl(source, nextUrl) ||
+      !redirectPreservesAtprotoResource(source, currentUrl, nextUrl)
+    ) {
       return { ok: false, reason: "redirect_outside_manifest", redirectChain };
     }
     currentUrl = nextUrl;
@@ -541,6 +621,13 @@ function atprotoAuthorFeedValues(source, text) {
   if (!isObject(payload) || !Array.isArray(payload.feed)) {
     return { valid: false, values: [] };
   }
+  const cursor = Object.hasOwn(payload, "cursor") ? payload.cursor : null;
+  if (
+    cursor !== null &&
+    (typeof cursor !== "string" || cursor.length > MAX_ATPROTO_CURSOR_LENGTH)
+  ) {
+    return { valid: false, values: [] };
+  }
 
   const values = [];
   for (const entry of payload.feed) {
@@ -575,7 +662,7 @@ function atprotoAuthorFeedValues(source, text) {
         (repost && stringValue(entry.reason.indexedAt)) || createdAt,
     });
   }
-  return { valid: true, values };
+  return { valid: true, values, cursor: cursor || null };
 }
 
 function rawCandidateValues(source, text) {
@@ -694,24 +781,188 @@ async function readRobotsPolicy(source, options) {
     timeoutMs: RESPONSE_READ_TIMEOUT_MS,
   });
   if (!body.ok) return { allowed: false, reason: `robots_${body.reason}` };
-  const policy = evaluateRobots(body.text, {
-    userAgent: DISCOVERY_USER_AGENT,
-    pathname: new URL(source.endpoint).pathname,
-  });
+  const policy = evaluateRobotsForUrl(body.text, source.endpoint);
   if (!policy.allowed) return { allowed: false, reason: "robots_disallow" };
   if (policy.crawlDelaySeconds > 0) {
     return { allowed: false, reason: "robots_crawl_delay" };
   }
-  return { allowed: true };
+  return { allowed: true, text: body.text };
+}
+
+function evaluateRobotsForUrl(text, value) {
+  if (typeof text !== "string") {
+    return { allowed: true, crawlDelaySeconds: 0, reason: "no_robots_policy" };
+  }
+  const url = new URL(value);
+  return evaluateRobots(text, {
+    userAgent: DISCOVERY_USER_AGENT,
+    pathname: `${url.pathname}${url.search}`,
+  });
+}
+
+function atprotoPageLimit(source) {
+  if (!Number.isSafeInteger(source.maxPages) || source.maxPages <= 0) return 1;
+  return Math.min(source.maxPages, MAX_ATPROTO_PAGES);
+}
+
+function discoveredCandidate(source, candidate, discoveredAt, result) {
+  return {
+    sourceId: source.id,
+    url: candidate.url,
+    contentId: candidate.contentId,
+    postType: candidate.postType,
+    rootId: candidate.rootId,
+    parentId: candidate.parentId,
+    discoveredAt,
+    externalTimestamp: candidate.externalTimestamp || result.lastModified,
+    etag: result.etag,
+    fingerprint: candidate.contentId || result.etag || result.lastModified,
+  };
+}
+
+async function discoverAtprotoSource(source, {
+  fetchImpl,
+  now,
+  conditional,
+  knownCandidateUrls,
+  robotsText,
+}) {
+  const maxPages = atprotoPageLimit(source);
+  const knownUrls = knownCandidateUrls instanceof Set
+    ? knownCandidateUrls
+    : new Set();
+  const candidates = [];
+  const seenUrls = new Set();
+  const seenCursors = new Set();
+  let currentUrl = source.endpoint;
+  let firstResult = null;
+  let lastResult = null;
+  let pageCount = 0;
+  let nextCursor = null;
+  let stoppedAtKnownCandidate = false;
+
+  while (pageCount < maxPages && candidates.length < source.maxCandidates) {
+    const pagePolicy = evaluateRobotsForUrl(robotsText, currentUrl);
+    if (!pagePolicy.allowed) {
+      return { sourceId: source.id, status: "robots_disallow" };
+    }
+    if (pagePolicy.crawlDelaySeconds > 0) {
+      return { sourceId: source.id, status: "robots_crawl_delay" };
+    }
+    const result = await fetchAllowedUrl({
+      source,
+      url: currentUrl,
+      accept: sourceAcceptHeader(source),
+      conditional: pageCount === 0 ? conditional : undefined,
+      fetchImpl,
+    });
+    if (!result.ok) return { sourceId: source.id, status: result.reason };
+    if (result.notModified) {
+      if (pageCount !== 0) {
+        return { sourceId: source.id, status: "invalid_source_payload" };
+      }
+      return {
+        sourceId: source.id,
+        status: "not_modified",
+        candidateCount: 0,
+        etag: result.etag,
+        lastModified: result.lastModified,
+        finalUrl: result.finalUrl,
+      };
+    }
+    if (!isExpectedSourceContentType(source, header(result.response, "Content-Type"))) {
+      return { sourceId: source.id, status: "unexpected_content_type" };
+    }
+
+    const body = await readBoundedText(result.response, MAX_FEED_BYTES, {
+      timeoutMs: RESPONSE_READ_TIMEOUT_MS,
+    });
+    if (!body.ok) return { sourceId: source.id, status: body.reason };
+    const parsed = atprotoAuthorFeedValues(source, body.text);
+    if (!parsed.valid) {
+      return { sourceId: source.id, status: "invalid_source_payload" };
+    }
+
+    firstResult ||= result;
+    lastResult = result;
+    pageCount += 1;
+    nextCursor = parsed.cursor;
+    if (nextCursor !== null) {
+      if (seenCursors.has(nextCursor)) {
+        return { sourceId: source.id, status: "invalid_source_payload" };
+      }
+      seenCursors.add(nextCursor);
+    }
+    for (const candidate of parsed.values) {
+      if (knownUrls.has(candidate.url)) {
+        if (candidate.postType === "repost") continue;
+        stoppedAtKnownCandidate = true;
+        break;
+      }
+      if (seenUrls.has(candidate.url)) continue;
+      seenUrls.add(candidate.url);
+      candidates.push(candidate);
+      if (candidates.length >= source.maxCandidates) break;
+    }
+    if (
+      stoppedAtKnownCandidate ||
+      nextCursor === null ||
+      candidates.length >= source.maxCandidates
+    ) {
+      break;
+    }
+
+    const nextUrl = new URL(source.endpoint);
+    nextUrl.searchParams.set("cursor", nextCursor);
+    currentUrl = nextUrl.toString();
+    if (currentUrl.length > MAX_ATPROTO_URL_LENGTH) {
+      return { sourceId: source.id, status: "invalid_source_payload" };
+    }
+  }
+
+  const discoveredAt = now().toISOString();
+  const paginationTruncated =
+    !stoppedAtKnownCandidate &&
+    nextCursor !== null &&
+    (pageCount >= maxPages || candidates.length >= source.maxCandidates);
+  const compactCandidates = candidates.map((candidate) =>
+    discoveredCandidate(source, candidate, discoveredAt, firstResult)
+  );
+  return {
+    sourceId: source.id,
+    status: paginationTruncated
+      ? "pagination_truncated"
+      : compactCandidates.length > 0
+        ? "candidates_found"
+        : "no_candidates",
+    candidateCount: compactCandidates.length,
+    candidates: compactCandidates,
+    finalUrl: lastResult.finalUrl,
+    ...(!paginationTruncated
+      ? { etag: firstResult.etag, lastModified: firstResult.lastModified }
+      : {}),
+    ...(paginationTruncated ? { paginationTruncated: true } : {}),
+  };
 }
 
 export async function discoverSource(source, {
   fetchImpl = globalThis.fetch,
   now = () => new Date(),
   conditional,
+  knownCandidateUrls,
 } = {}) {
   const robots = await readRobotsPolicy(source, { fetchImpl });
   if (!robots.allowed) return { sourceId: source.id, status: robots.reason };
+
+  if (source.kind === "atproto-author-feed") {
+    return discoverAtprotoSource(source, {
+      fetchImpl,
+      now,
+      conditional,
+      knownCandidateUrls,
+      robotsText: robots.text,
+    });
+  }
 
   const result = await fetchAllowedUrl({
     source,
