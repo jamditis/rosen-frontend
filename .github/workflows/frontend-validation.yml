@@ -24,6 +24,7 @@ on:
       - 'backend/entity_extraction_schema.json'
       - 'backend/entity_extraction_schema_v3.json'
       - 'preservation/**'
+      - 'workers/**'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/frontend-validation.yml'
@@ -50,6 +51,7 @@ on:
       - 'backend/entity_extraction_schema.json'
       - 'backend/entity_extraction_schema_v3.json'
       - 'preservation/**'
+      - 'workers/**'
       - 'package.json'
       - 'package-lock.json'
       - '.github/workflows/frontend-validation.yml'
@@ -119,6 +121,9 @@ jobs:
 
       - name: Run frontend test suite
         run: npm run test:frontend
+
+      - name: Run source-discovery Worker tests
+        run: npm run test:workers
 
       - name: Run data integrity test suite
         run: npm run test:data
