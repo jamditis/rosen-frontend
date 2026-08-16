@@ -1,7 +1,7 @@
 name: Pillar 3c — deploy full site to pressthink.org
 
-# Manually-triggered (workflow_dispatch only) full-site transfer.
-# Replaces the manual FileZilla-style deploy with one click in the Actions UI.
+# Weekly and manually triggered full-site transfer of reviewed main.
+# Replaces the manual FileZilla-style deploy with one tested release path.
 #
 # Pairs with backend/scripts/deploy_full_site.py — runs that script against
 # the secrets below. Reuses the same transfer credentials as the per-record
@@ -17,6 +17,8 @@ name: Pillar 3c — deploy full site to pressthink.org
 # the env: block, never directly into run: expressions.
 
 on:
+  schedule:
+    - cron: '17 9 * * 5'
   workflow_dispatch:
     inputs:
       dry_run:
@@ -32,6 +34,8 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
     # Match the five-hour queue bound and reserve the final hour for deployment.
     timeout-minutes: 360
     steps:
@@ -61,6 +65,13 @@ jobs:
         run: |
           git fetch origin main
           git checkout --detach FETCH_HEAD
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Run repository tests
+        id: tests
+        run: npm test
 
       - name: Set up Python 3.13
         uses: actions/setup-python@v6
@@ -111,6 +122,7 @@ jobs:
           fi
 
       - name: Deploy
+        id: deploy
         working-directory: backend
         env:
           # Auth + remote path. ROSEN_SFTP_SITE_PATH is distinct from
@@ -128,11 +140,34 @@ jobs:
           # and silently fall back to password auth.
           ROSEN_SFTP_KEY_PASSPHRASE: ${{ secrets.ROSEN_SFTP_KEY_PASSPHRASE }}
           ROSEN_SFTP_KNOWN_HOSTS: ${{ secrets.ROSEN_SFTP_KNOWN_HOSTS }}
-          # The dry_run input is a typed boolean — safe to flow through env.
-          DRY_RUN: ${{ inputs.dry_run }}
         run: |
           if [ "$DRY_RUN" = "true" ]; then
             poetry run python scripts/deploy_full_site.py --dry-run
           else
             poetry run python scripts/deploy_full_site.py
           fi
+
+      - name: Verify live deploy
+        id: verify_live
+        if: steps.deploy.outcome == 'success' && env.DRY_RUN != 'true'
+        run: node .github/scripts/verify-live-deploy.mjs
+
+      - name: Write deployment summary
+        if: always()
+        env:
+          TEST_OUTCOME: ${{ steps.tests.outcome }}
+          DEPLOY_OUTCOME: ${{ steps.deploy.outcome }}
+          VERIFY_OUTCOME: ${{ steps.verify_live.outcome }}
+          TRIGGER_NAME: ${{ github.event_name }}
+        run: |
+          tested_commit="$(git rev-parse HEAD)"
+          {
+            echo "## Rosen Archive deployment"
+            echo
+            echo "- Trigger: \`$TRIGGER_NAME\`"
+            echo "- Tested main commit: \`$tested_commit\`"
+            echo "- Dry run: \`$DRY_RUN\`"
+            echo "- Tests: \`$TEST_OUTCOME\`"
+            echo "- Deploy: \`$DEPLOY_OUTCOME\`"
+            echo "- Live byte verification: \`$VERIFY_OUTCOME\`"
+          } >> "$GITHUB_STEP_SUMMARY"
