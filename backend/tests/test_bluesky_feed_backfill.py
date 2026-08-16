@@ -1,4 +1,5 @@
 import datetime
+import sys
 
 import pytest
 
@@ -115,7 +116,7 @@ def test_collect_new_rows_honors_since_and_assigns_ids_oldest_first():
                     "This post is already outside the sweep window.",
                 )
             ],
-            "cursor": "page-3",
+            "cursor": None,
         },
     ])
 
@@ -137,7 +138,8 @@ def test_collect_new_rows_honors_since_and_assigns_ids_oldest_first():
         "newest",
     ]
     assert result.rows[0]["responds_to"].endswith("/parent")
-    assert result.stopped_at_since is True
+    assert result.skipped_before_since == 1
+    assert result.complete is True
     assert result.pages == 2
 
 
@@ -179,7 +181,8 @@ def test_collect_new_rows_skips_repost_dates_before_testing_the_window():
         "newest",
     ]
     assert result.skipped_repost == 1
-    assert result.stopped_at_since is False
+    assert result.skipped_before_since == 0
+    assert result.complete is True
 
 
 def test_collect_new_rows_uses_stable_did_instead_of_current_handle():
@@ -252,3 +255,292 @@ def test_collect_new_rows_rejects_nonpositive_samples():
             today="2026-08-15 12:00:00",
             sample=0,
         )
+
+
+def test_collect_new_rows_includes_exact_utc_midnight_and_normalizes_date():
+    page = {
+        "feed": [
+            _feed_item(
+                "exactmidnight",
+                "2026-06-18T02:00:00+02:00",
+                "This post lands exactly on UTC midnight.",
+            ),
+            _feed_item(
+                "beforemidnight",
+                "2026-06-17T23:59:59Z",
+                "This post is one second before the window.",
+            ),
+        ],
+        "cursor": None,
+    }
+
+    result = backfill.collect_new_rows(
+        existing_urls=set(),
+        max_id=3172,
+        since=backfill.parse_since("2026-06-18"),
+        today="2026-08-15 12:00:00",
+        fetch_page_fn=lambda _cursor: page,
+        sleep_fn=lambda _seconds: None,
+    )
+
+    assert [row["id"] for row in result.rows] == ["BSKY-03173"]
+    assert result.rows[0]["publication_date"] == "2026-06-18 00:00:00"
+    assert result.skipped_before_since == 1
+
+
+def test_collect_new_rows_follows_cursor_after_an_empty_page():
+    pages = iter([
+        {"feed": [], "cursor": "after-empty"},
+        {
+            "feed": [
+                _feed_item(
+                    "afterempty",
+                    "2026-07-01T12:00:00Z",
+                    "A later page must not be dropped.",
+                )
+            ],
+            "cursor": None,
+        },
+    ])
+
+    result = backfill.collect_new_rows(
+        existing_urls=set(),
+        max_id=3172,
+        since=backfill.parse_since("2026-06-18"),
+        today="2026-08-15 12:00:00",
+        fetch_page_fn=lambda _cursor: next(pages),
+        sleep_fn=lambda _seconds: None,
+    )
+
+    assert [row["url"].rsplit("/", 1)[-1] for row in result.rows] == [
+        "afterempty"
+    ]
+    assert result.pages == 2
+    assert result.complete is True
+
+
+def test_collect_new_rows_keeps_pinned_original_posts():
+    page = {
+        "feed": [
+            _feed_item(
+                "pinned",
+                "2026-07-01T12:00:00Z",
+                "This pinned post is still Jay's original work.",
+                reason={"$type": "app.bsky.feed.defs#reasonPin"},
+            )
+        ],
+        "cursor": None,
+    }
+
+    result = backfill.collect_new_rows(
+        existing_urls=set(),
+        max_id=3172,
+        since=backfill.parse_since("2026-06-18"),
+        today="2026-08-15 12:00:00",
+        fetch_page_fn=lambda _cursor: page,
+        sleep_fn=lambda _seconds: None,
+    )
+
+    assert [row["url"].rsplit("/", 1)[-1] for row in result.rows] == [
+        "pinned"
+    ]
+    assert result.skipped_repost == 0
+
+
+def test_collect_new_rows_does_not_stop_at_one_out_of_order_old_item():
+    page = {
+        "feed": [
+            _feed_item(
+                "oldclientdate",
+                "2020-01-01T00:00:00Z",
+                "A client supplied an old timestamp.",
+            ),
+            _feed_item(
+                "stillinwindow",
+                "2026-07-01T12:00:00Z",
+                "This later item is still in the requested window.",
+            ),
+        ],
+        "cursor": None,
+    }
+
+    result = backfill.collect_new_rows(
+        existing_urls=set(),
+        max_id=3172,
+        since=backfill.parse_since("2026-06-18"),
+        today="2026-08-15 12:00:00",
+        fetch_page_fn=lambda _cursor: page,
+        sleep_fn=lambda _seconds: None,
+    )
+
+    assert [row["url"].rsplit("/", 1)[-1] for row in result.rows] == [
+        "stillinwindow"
+    ]
+    assert result.skipped_before_since == 1
+
+
+@pytest.mark.parametrize(
+    "bad_item",
+    [
+        "not-a-feed-item",
+        _feed_item(
+            "baduri",
+            "2026-07-01T12:00:00Z",
+            "Bad URI.",
+            uri_did="",
+        ),
+        _feed_item(
+            "badparent",
+            "2026-07-01T12:00:00Z",
+            "Bad parent URI.",
+            reply_to="not-an-at-uri",
+        ),
+    ],
+)
+def test_collect_new_rows_fails_closed_on_malformed_items(bad_item):
+    result = backfill.collect_new_rows(
+        existing_urls=set(),
+        max_id=3172,
+        since=backfill.parse_since("2026-06-18"),
+        today="2026-08-15 12:00:00",
+        fetch_page_fn=lambda _cursor: {"feed": [bad_item], "cursor": None},
+        sleep_fn=lambda _seconds: None,
+    )
+
+    assert result.complete is False
+    assert result.rows == []
+    assert result.failure_reason
+
+
+def test_collect_new_rows_fails_closed_on_cursor_replay():
+    calls = []
+
+    def replaying_fetch(cursor):
+        calls.append(cursor)
+        return {"feed": [], "cursor": "repeated"}
+
+    result = backfill.collect_new_rows(
+        existing_urls=set(),
+        max_id=3172,
+        since=backfill.parse_since("2026-06-18"),
+        today="2026-08-15 12:00:00",
+        fetch_page_fn=replaying_fetch,
+        sleep_fn=lambda _seconds: None,
+        max_pages=10,
+    )
+
+    assert calls == [None, "repeated"]
+    assert result.complete is False
+    assert result.rows == []
+    assert "cursor" in result.failure_reason.lower()
+
+
+def test_collect_new_rows_fails_closed_at_page_cap_without_assigning_ids():
+    def endless_fetch(cursor):
+        page_number = 1 if cursor is None else int(cursor)
+        return {
+            "feed": [
+                _feed_item(
+                    f"post{page_number}",
+                    "2026-07-01T12:00:00Z",
+                    f"Candidate from page {page_number}.",
+                )
+            ],
+            "cursor": str(page_number + 1),
+        }
+
+    result = backfill.collect_new_rows(
+        existing_urls=set(),
+        max_id=3172,
+        since=backfill.parse_since("2026-06-18"),
+        today="2026-08-15 12:00:00",
+        fetch_page_fn=endless_fetch,
+        sleep_fn=lambda _seconds: None,
+        max_pages=2,
+    )
+
+    assert result.pages == 2
+    assert result.complete is False
+    assert result.rows == []
+    assert "page cap" in result.failure_reason.lower()
+
+
+def test_collect_new_rows_deduplicates_existing_did_profile_url():
+    page = {
+        "feed": [
+            _feed_item(
+                "samepost",
+                "2026-07-01T12:00:00Z",
+                "This post already exists under its stable DID URL.",
+            )
+        ],
+        "cursor": None,
+    }
+
+    result = backfill.collect_new_rows(
+        existing_urls={
+            f"https://bsky.app/profile/{JAY_DID}/post/samepost"
+        },
+        max_id=3172,
+        since=backfill.parse_since("2026-06-18"),
+        today="2026-08-15 12:00:00",
+        fetch_page_fn=lambda _cursor: page,
+        sleep_fn=lambda _seconds: None,
+    )
+
+    assert result.rows == []
+    assert result.skipped_existing == 1
+    assert result.complete is True
+
+
+def test_load_existing_urls_preserves_urls_and_stable_identity(tmp_path):
+    csv_path = tmp_path / "social_posts.csv"
+    csv_path.write_text(
+        "id,url\n"
+        "BSKY-00009,https://bsky.app/profile/jayrosen.bsky.social/post/shared\n"
+        f"BSKY-00010,https://bsky.app/profile/{JAY_DID}/post/shared\n",
+        encoding="utf-8",
+    )
+
+    urls, max_id = backfill.load_existing_urls(csv_path)
+
+    assert len(urls) == 2
+    assert max_id == 10
+    assert backfill._existing_post_identities(urls) == {(JAY_DID, "shared")}
+
+
+def test_main_never_opens_write_path_for_an_incomplete_walk(
+    monkeypatch,
+    tmp_path,
+):
+    csv_path = tmp_path / "social_posts.csv"
+    csv_path.write_text("id,url\n", encoding="utf-8")
+    monkeypatch.setattr(backfill, "SOCIAL_POSTS_CSV", csv_path)
+    monkeypatch.setattr(
+        backfill,
+        "collect_new_rows",
+        lambda **_kwargs: backfill.CollectionResult(
+            rows=[],
+            pages=2,
+            complete=False,
+            failure_reason="page cap reached",
+        ),
+    )
+    monkeypatch.setattr(
+        backfill,
+        "atomic_csv_write",
+        lambda _path: pytest.fail("write path opened for incomplete walk"),
+    )
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "bluesky_feed_backfill.py",
+            "--since",
+            "2026-06-18",
+            "--all",
+        ],
+    )
+
+    with pytest.raises(SystemExit, match="No rows written"):
+        backfill.main()
