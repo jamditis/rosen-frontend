@@ -25,6 +25,11 @@ describe('weekly reviewed-main deployment', () => {
 
   it('tests the refreshed main checkout before deployment', () => {
     assert.match(workflow, /uses: actions\/checkout@v6[\s\S]*?ref: main/);
+    assert.match(
+      workflow,
+      /uses: actions\/checkout@v6[\s\S]*?ref: main[\s\S]*?fetch-depth: 0/,
+      'the full test suite requires a non-shallow main checkout',
+    );
     assert.match(workflow, /- name: Refresh main after queue wait[\s\S]*?git checkout --detach FETCH_HEAD/);
     assert.ok(
       workflow.indexOf('- name: Run repository tests') <

@@ -43,6 +43,8 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: main
+          # Census freshness checks require complete history.
+          fetch-depth: 0
           # The reader's original dissertation PDF is a Git LFS object. A
           # pointer-only checkout would upload 133 bytes instead of the PDF.
           lfs: true
