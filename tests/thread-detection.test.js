@@ -202,6 +202,32 @@ describe('short reply filtering', () => {
 // ============================================
 
 describe('thread coverage', () => {
+  it('preserves generated thread IDs when new roots enter the archive', () => {
+    const expectedRootByThreadId = new Map([
+      ['THREAD-00011', 'BSKY-01144'],
+      ['THREAD-00012', 'BSKY-01159'],
+      ['THREAD-00013', 'BSKY-01445'],
+      ['THREAD-00014', 'BSKY-01496'],
+      ['THREAD-00015', 'BSKY-01796'],
+      ['THREAD-00016', 'BSKY-02060'],
+      ['THREAD-00017', 'BSKY-02609'],
+      ['THREAD-00018', 'BSKY-03278'],
+    ]);
+    const threadById = new Map(
+      fullData.records
+        .filter(record => record.id.startsWith('THREAD-'))
+        .map(record => [record.id, record])
+    );
+
+    for (const [threadId, rootId] of expectedRootByThreadId) {
+      assert.equal(
+        threadById.get(threadId)?.thread_data?.thread_id,
+        rootId,
+        `${threadId} must remain assigned to root ${rootId}`
+      );
+    }
+  });
+
   it('THREAD records in details match those in full data', () => {
     const fullThreadIds = fullData.records.filter(r => r.id.startsWith('THREAD-')).map(r => r.id).sort();
     const detailThreadIds = Object.keys(detailsData.details).filter(id => id.startsWith('THREAD-')).sort();

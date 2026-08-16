@@ -12,6 +12,7 @@
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { assignStableThreadIds } from '../data/lib/thread-id-allocator.js';
 
 // ============================================
 // Re-implement thread detection functions
@@ -390,6 +391,135 @@ describe('thread root detection', () => {
     // With minSize 6, should find nothing
     const roots6 = findThreadRoots(posts, 6);
     assert.strictEqual(roots6.length, 0);
+  });
+});
+
+// ============================================
+// Tests: stable thread ID allocation
+// ============================================
+
+function makeThreadRecord(id, rootId) {
+  return {
+    id,
+    thread_data: {
+      thread_id: rootId,
+      posts: [{ id: rootId }],
+    },
+  };
+}
+
+describe('stable thread ID allocation', () => {
+  const priorGeneratedRecords = [
+    makeThreadRecord('THREAD-00011', 'BSKY-01144'),
+    makeThreadRecord('THREAD-00012', 'BSKY-01159'),
+    makeThreadRecord('THREAD-00013', 'BSKY-01445'),
+    makeThreadRecord('THREAD-00014', 'BSKY-01496'),
+    makeThreadRecord('THREAD-00015', 'BSKY-01796'),
+    makeThreadRecord('THREAD-00016', 'BSKY-02060'),
+    makeThreadRecord('THREAD-00017', 'BSKY-02609'),
+  ];
+
+  it('preserves prior IDs when a larger new thread sorts ahead', () => {
+    const assignments = assignStableThreadIds({
+      priorRuntimeRecords: priorGeneratedRecords,
+      sourceThreadRecords: [],
+      detectedRootIds: ['BSKY-03278', ...priorGeneratedRecords.map(record => record.thread_data.thread_id)],
+    });
+
+    for (const record of priorGeneratedRecords) {
+      assert.equal(assignments.get(record.thread_data.thread_id), record.id);
+    }
+    assert.equal(assignments.get('BSKY-03278'), 'THREAD-00018');
+  });
+
+  it('allocates unseen roots deterministically regardless of input order', () => {
+    const input = ['BSKY-Z', 'BSKY-A', 'BSKY-M'];
+    const forward = assignStableThreadIds({
+      priorRuntimeRecords: priorGeneratedRecords,
+      sourceThreadRecords: [],
+      detectedRootIds: input,
+    });
+    const reversed = assignStableThreadIds({
+      priorRuntimeRecords: priorGeneratedRecords,
+      sourceThreadRecords: [],
+      detectedRootIds: [...input].reverse(),
+    });
+
+    assert.deepEqual([...forward], [...reversed]);
+    assert.deepEqual([...forward], [
+      ['BSKY-A', 'THREAD-00018'],
+      ['BSKY-M', 'THREAD-00019'],
+      ['BSKY-Z', 'THREAD-00020'],
+    ]);
+  });
+
+  it('uses max plus one across gaps and source reservations', () => {
+    const assignments = assignStableThreadIds({
+      priorRuntimeRecords: [makeThreadRecord('THREAD-00012', 'BSKY-OLD')],
+      sourceThreadRecords: [makeThreadRecord('THREAD-00020', 'BSKY-CURATED')],
+      detectedRootIds: ['BSKY-NEW'],
+    });
+
+    assert.equal(assignments.get('BSKY-NEW'), 'THREAD-00021');
+  });
+
+  it('rejects one root mapped to different IDs', () => {
+    assert.throws(() => assignStableThreadIds({
+      priorRuntimeRecords: [
+        makeThreadRecord('THREAD-00011', 'BSKY-SAME'),
+        makeThreadRecord('THREAD-00012', 'BSKY-SAME'),
+      ],
+      sourceThreadRecords: [],
+      detectedRootIds: [],
+    }), /root BSKY-SAME maps to both THREAD-00011 and THREAD-00012/);
+  });
+
+  it('rejects one ID mapped to different roots', () => {
+    assert.throws(() => assignStableThreadIds({
+      priorRuntimeRecords: [makeThreadRecord('THREAD-00011', 'BSKY-A')],
+      sourceThreadRecords: [makeThreadRecord('THREAD-00011', 'BSKY-B')],
+      detectedRootIds: [],
+    }), /THREAD-00011 maps to both BSKY-A and BSKY-B/);
+  });
+
+  it('rejects malformed records and root candidates', () => {
+    assert.throws(() => assignStableThreadIds({
+      priorRuntimeRecords: [makeThreadRecord('THREAD-11', 'BSKY-A')],
+      sourceThreadRecords: [],
+      detectedRootIds: [],
+    }), /noncanonical thread ID THREAD-11/);
+
+    assert.throws(() => assignStableThreadIds({
+      priorRuntimeRecords: [{ id: 'THREAD-00011', thread_data: {} }],
+      sourceThreadRecords: [],
+      detectedRootIds: [],
+    }), /THREAD-00011 has no thread root ID/);
+
+    assert.throws(() => assignStableThreadIds({
+      priorRuntimeRecords: [],
+      sourceThreadRecords: [],
+      detectedRootIds: [''],
+    }), /empty thread root ID/);
+
+    assert.throws(() => assignStableThreadIds({
+      priorRuntimeRecords: [{
+        id: 'THREAD-00011',
+        thread_data: {
+          thread_id: 'BSKY-ROOT',
+          posts: [{ id: 'BSKY-OTHER' }],
+        },
+      }],
+      sourceThreadRecords: [],
+      detectedRootIds: [],
+    }), /THREAD-00011 root BSKY-ROOT disagrees with first post BSKY-OTHER/);
+  });
+
+  it('rejects duplicate current root candidates', () => {
+    assert.throws(() => assignStableThreadIds({
+      priorRuntimeRecords: priorGeneratedRecords,
+      sourceThreadRecords: [],
+      detectedRootIds: ['BSKY-NEW', 'BSKY-NEW'],
+    }), /duplicate current thread root BSKY-NEW/);
   });
 });
 

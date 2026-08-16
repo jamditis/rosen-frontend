@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "generated": "2026-08-02T09:21:32.251Z",
+  "generated": "2026-08-16T01:11:00.873Z",
   "baseUrl": "https://pressthink.org/j/rosen-archive",
   "feeds": [
     {
@@ -12,6 +12,11 @@
       "name": "articles",
       "url": "https://pressthink.org/j/rosen-archive/data/feeds/articles.xml",
       "path": "./data/feeds/articles.xml"
+    },
+    {
+      "name": "categories - press-media-criticism",
+      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/press-media-criticism.xml",
+      "path": "./data/feeds/categories/press-media-criticism.xml"
     },
     {
       "name": "categories - politics-democracy",
@@ -27,11 +32,6 @@
       "name": "categories - journalism-theory-practice",
       "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-theory-practice.xml",
       "path": "./data/feeds/categories/journalism-theory-practice.xml"
-    },
-    {
-      "name": "categories - press-media-criticism",
-      "url": "https://pressthink.org/j/rosen-archive/data/feeds/categories/press-media-criticism.xml",
-      "path": "./data/feeds/categories/press-media-criticism.xml"
     },
     {
       "name": "categories - technology-digital-media",
