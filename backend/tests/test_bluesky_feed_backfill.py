@@ -78,6 +78,15 @@ def test_parse_since_treats_a_calendar_date_as_utc_midnight():
     )
 
 
+def test_derive_title_skips_leading_punctuation_and_handle_mentions():
+    text = (
+        "...@scripting.com Hi, Dave. "
+        "I have something I want to dedicate to you."
+    )
+
+    assert backfill.derive_title(text) == "Hi, Dave..."
+
+
 def test_collect_new_rows_honors_since_and_assigns_ids_oldest_first():
     pages = iter([
         {

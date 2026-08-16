@@ -158,10 +158,15 @@ def derive_title(text: str) -> str:
     text = (text or "").strip()
     if not text:
         return "Bluesky post"
+    title_text = re.sub(r"^[^\w@]+", "", text)
+    title_text = re.sub(r"^(?:@\S+(?:\s+|$))+", "", title_text)
+    title_text = re.sub(r"^[^\w@]+", "", title_text)
+    if not title_text:
+        return "Bluesky post"
     # First sentence-ish, capped at 80 chars
-    head = re.split(r"[.!?\n]", text, maxsplit=1)[0]
+    head = re.split(r"[.!?\n]", title_text, maxsplit=1)[0]
     head = head[:80].rstrip()
-    if len(text) > len(head):
+    if len(title_text) > len(head):
         head += "..."
     return head or "Bluesky post"
 
