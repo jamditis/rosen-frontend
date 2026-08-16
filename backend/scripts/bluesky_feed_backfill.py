@@ -8,7 +8,8 @@ tool that walks Jay's full Bluesky feed and picks up posts that aren't yet
 in `data/social_posts.csv`. This script fills that gap.
 
 Mechanism:
-- Walk `app.bsky.feed.getAuthorFeed` for @jayrosen.bsky.social, newest first.
+- Walk `app.bsky.feed.getAuthorFeed` for @jayrosen.bsky.social, newest first,
+  until the requested UTC date boundary.
 - For each post, check if its URL is already in `data/social_posts.csv`.
 - If new: build a row matching the existing BSKY-NNNNN schema (era,
   publisher, content_type, format, scope, era, etc. all mirror existing rows)
@@ -18,14 +19,14 @@ Mechanism:
 Designed to be re-run safely (idempotent — already-present URLs are skipped).
 
 Usage:
-    # Initial sample for review:
-    python backend/scripts/bluesky_feed_backfill.py --sample 50
+    # Review new posts in a bounded stewardship window:
+    python backend/scripts/bluesky_feed_backfill.py --since 2026-06-18 --sample 50
 
-    # Full differential backfill:
-    python backend/scripts/bluesky_feed_backfill.py --all
+    # Fetch every missing post in that window:
+    python backend/scripts/bluesky_feed_backfill.py --since 2026-06-18 --all
 
     # Dry-run (fetch + show what would change, no write):
-    python backend/scripts/bluesky_feed_backfill.py --sample 50 --dry-run
+    python backend/scripts/bluesky_feed_backfill.py --since 2026-06-18 --all --dry-run
 
 Public AT Proto API, no auth, no rate-limit friction at our request rate.
 """
@@ -36,7 +37,9 @@ import datetime
 import re
 import sys
 import time
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable
 
 import requests
 
@@ -50,6 +53,7 @@ csv.field_size_limit(sys.maxsize)
 SOCIAL_POSTS_CSV = REPO_ROOT / "data" / "social_posts.csv"
 
 ACTOR = "jayrosen.bsky.social"
+ACTOR_DID = "did:plc:3t37x6vfigdzzp2gjcfnzlz4"
 API_BASE = "https://public.api.bsky.app/xrpc"
 FEED_ENDPOINT = f"{API_BASE}/app.bsky.feed.getAuthorFeed"
 PAGE_LIMIT = 100  # API max
@@ -80,7 +84,11 @@ PERMISSIONS = "Public Post"
 
 
 def fetch_page(cursor: str | None) -> dict:
-    params = {"actor": ACTOR, "limit": PAGE_LIMIT}
+    params = {
+        "actor": ACTOR,
+        "filter": "posts_with_replies",
+        "limit": PAGE_LIMIT,
+    }
     if cursor:
         params["cursor"] = cursor
     r = requests.get(
@@ -89,6 +97,44 @@ def fetch_page(cursor: str | None) -> dict:
     )
     r.raise_for_status()
     return r.json()
+
+
+def parse_since(value: str) -> datetime.datetime:
+    """Parse a calendar date as the inclusive UTC start of the sweep window."""
+    try:
+        parsed = datetime.datetime.strptime(value, "%Y-%m-%d")
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(
+            "expected a calendar date in YYYY-MM-DD format"
+        ) from exc
+    return parsed.replace(tzinfo=datetime.timezone.utc)
+
+
+def _post_created_at(item: dict) -> datetime.datetime | None:
+    created_at = ((item.get("post") or {}).get("record") or {}).get("createdAt")
+    if not created_at:
+        return None
+    try:
+        parsed = datetime.datetime.fromisoformat(created_at.replace("Z", "+00:00"))
+    except (AttributeError, ValueError):
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=datetime.timezone.utc)
+    return parsed.astimezone(datetime.timezone.utc)
+
+
+@dataclass
+class CollectionResult:
+    rows: list[dict]
+    pages: int = 0
+    seen: int = 0
+    skipped_existing: int = 0
+    skipped_dupe_in_run: int = 0
+    skipped_repost: int = 0
+    skipped_wrong_author: int = 0
+    skipped_bad_date: int = 0
+    skipped_bad_uri: int = 0
+    stopped_at_since: bool = False
 
 
 def load_existing_urls(csv_path: Path) -> tuple[set[str], int]:
@@ -202,93 +248,160 @@ def post_to_row(item: dict, next_id: int, today: str) -> dict | None:
     }
 
 
+def collect_new_rows(
+    *,
+    existing_urls: set[str],
+    max_id: int,
+    since: datetime.datetime,
+    today: str,
+    fetch_page_fn: Callable[[str | None], dict] = fetch_page,
+    sleep_fn: Callable[[float], None] = time.sleep,
+    sample: int | None = None,
+) -> CollectionResult:
+    """Collect missing Jay-authored posts at or after ``since``.
+
+    The API returns newest posts first. Candidate rows are sorted before IDs are
+    assigned so the archive IDs increase in publication order.
+    """
+    if sample is not None and sample < 1:
+        raise ValueError("sample must be at least 1")
+
+    result = CollectionResult(rows=[])
+    seen_in_run: set[str] = set()
+    candidates: list[tuple[datetime.datetime, dict]] = []
+    cursor: str | None = None
+
+    while True:
+        page = fetch_page_fn(cursor)
+        result.pages += 1
+        feed = page.get("feed") or []
+        if not feed:
+            break
+
+        for item in feed:
+            result.seen += 1
+
+            # Repost wrappers can contain another person's words and an older
+            # original date. Do not ingest them or use them to end the window.
+            if item.get("reason"):
+                result.skipped_repost += 1
+                continue
+
+            post = item.get("post") or {}
+            uri = post.get("uri") or ""
+            match = re.match(
+                r"^at://([^/]+)/app\.bsky\.feed\.post/(\w+)$",
+                uri,
+            )
+            if not match:
+                result.skipped_bad_uri += 1
+                continue
+
+            uri_did, rkey = match.groups()
+            author_did = (post.get("author") or {}).get("did")
+            if uri_did != ACTOR_DID or (
+                author_did is not None and author_did != ACTOR_DID
+            ):
+                result.skipped_wrong_author += 1
+                continue
+
+            created_at = _post_created_at(item)
+            if created_at is None:
+                result.skipped_bad_date += 1
+                continue
+            if created_at < since:
+                result.stopped_at_since = True
+                break
+
+            url = f"https://bsky.app/profile/{ACTOR}/post/{rkey}"
+            if url in existing_urls:
+                result.skipped_existing += 1
+                continue
+            if url in seen_in_run:
+                result.skipped_dupe_in_run += 1
+                continue
+
+            seen_in_run.add(url)
+            candidates.append((created_at, item))
+        if result.stopped_at_since:
+            break
+
+        cursor = page.get("cursor")
+        if not cursor:
+            break
+        sleep_fn(0.2)
+
+    candidates.sort(key=lambda candidate: candidate[0])
+    if sample is not None:
+        candidates = candidates[:sample]
+    for offset, (_created_at, item) in enumerate(candidates, start=1):
+        row = post_to_row(item, max_id + offset, today)
+        if row is not None:
+            result.rows.append(row)
+
+    return result
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--sample", type=int, default=None,
-                    help="Stop after fetching this many new (not-yet-in-archive) posts")
-    ap.add_argument("--all", action="store_true",
-                    help="Walk the entire feed until exhausted")
+    ap.add_argument(
+        "--since",
+        type=parse_since,
+        required=True,
+        metavar="YYYY-MM-DD",
+        help="Include posts on or after this UTC calendar date",
+    )
+    mode = ap.add_mutually_exclusive_group(required=True)
+    mode.add_argument(
+        "--sample",
+        type=int,
+        default=None,
+        help="Keep the oldest N missing posts in the bounded window",
+    )
+    mode.add_argument(
+        "--all",
+        action="store_true",
+        help="Keep every missing post in the bounded window",
+    )
     ap.add_argument("--dry-run", action="store_true",
                     help="Print summary, don't write CSV")
     args = ap.parse_args()
 
-    if not args.sample and not args.all:
-        ap.error("Pick --sample N or --all")
+    if args.sample is not None and args.sample < 1:
+        ap.error("--sample must be at least 1")
 
     existing_urls, max_id = load_existing_urls(SOCIAL_POSTS_CSV)
     print(f"Loaded {len(existing_urls):,} existing URLs from social_posts.csv")
     print(f"Highest existing BSKY id: BSKY-{max_id:05d}")
 
-    today = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    new_rows: list[dict] = []
-    seen_in_run: set[str] = set()  # dedup within the current batch — reposts
-    # of the author's own posts surface twice in getAuthorFeed (once as the
-    # original, once with a #reasonRepost wrapper).
-    cursor: str | None = None
-    pages = 0
-    seen = 0
-    skipped_existing = 0
-    skipped_dupe_in_run = 0
-    skipped_repost = 0
-    skipped_wrong_author = 0
-    while True:
-        page = fetch_page(cursor)
-        pages += 1
-        feed = page.get("feed") or []
-        if not feed:
-            print(f"Feed empty at page {pages} — stopping")
-            break
-        for item in feed:
-            seen += 1
-            # Skip reposts entirely. `getAuthorFeed` surfaces both the actor's
-            # original posts AND every post the actor reposted — including
-            # OTHER people's posts. If we ingested reposts they'd be
-            # misattributed to Jay (his URL + his author tag, but the original
-            # words belong to someone else). The simpler rule: only ingest
-            # items without a `reason` field (which marks the entry as
-            # original-author rather than a repost wrapper).
-            if item.get("reason"):
-                skipped_repost += 1
-                continue
-            post = item.get("post") or {}
-            # Defense in depth: also verify the post author IS Jay. Should
-            # always be true once reposts are filtered out, but cheap to check.
-            if (post.get("author") or {}).get("handle") != ACTOR:
-                skipped_wrong_author += 1
-                continue
-            uri = post.get("uri") or ""
-            m = re.match(r"^at://[^/]+/app\.bsky\.feed\.post/(\w+)$", uri)
-            if not m:
-                continue
-            rkey = m.group(1)
-            url = f"https://bsky.app/profile/{ACTOR}/post/{rkey}"
-            if url in existing_urls:
-                skipped_existing += 1
-                continue
-            if url in seen_in_run:
-                skipped_dupe_in_run += 1
-                continue
-            next_id = max_id + 1 + len(new_rows)
-            row = post_to_row(item, next_id, today)
-            if row is None:
-                continue
-            seen_in_run.add(url)
-            new_rows.append(row)
-            if args.sample and len(new_rows) >= args.sample:
-                break
-        if args.sample and len(new_rows) >= args.sample:
-            break
-        cursor = page.get("cursor")
-        if not cursor:
-            print(f"No more cursor at page {pages} — feed exhausted")
-            break
-        time.sleep(0.2)  # gentle on the API
+    today = datetime.datetime.now(datetime.timezone.utc).strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
+    result = collect_new_rows(
+        existing_urls=existing_urls,
+        max_id=max_id,
+        since=args.since,
+        today=today,
+        sample=args.sample,
+    )
+    new_rows = result.rows
 
-    print(f"\nFetched {seen:,} posts across {pages} pages")
-    print(f"Skipped {skipped_repost:,} reposts (own + others' — only original posts ingested)")
-    print(f"Skipped {skipped_wrong_author:,} wrong-author entries (defense-in-depth)")
-    print(f"Skipped {skipped_existing:,} already-in-archive")
-    print(f"Skipped {skipped_dupe_in_run:,} dupes within this run")
+    print(f"Sweep window starts: {args.since.date().isoformat()} 00:00:00 UTC")
+    print(f"\nFetched {result.seen:,} posts across {result.pages} pages")
+    print(
+        f"Skipped {result.skipped_repost:,} reposts "
+        "(own + others' — only original posts ingested)"
+    )
+    print(
+        f"Skipped {result.skipped_wrong_author:,} wrong-author entries "
+        "(defense-in-depth)"
+    )
+    print(f"Skipped {result.skipped_bad_date:,} entries with invalid dates")
+    print(f"Skipped {result.skipped_bad_uri:,} entries with invalid AT URIs")
+    print(f"Skipped {result.skipped_existing:,} already-in-archive")
+    print(f"Skipped {result.skipped_dupe_in_run:,} dupes within this run")
+    if result.stopped_at_since:
+        print("Stopped when the feed reached an original post before --since")
     print(f"New rows to append: {len(new_rows):,}")
     if not new_rows:
         print("Nothing to write.")
@@ -327,7 +440,7 @@ def main():
 
     print(f"\nAppended {len(new_rows):,} rows. Backup at {SOCIAL_POSTS_CSV}.bak")
     print(f"New id range: {new_rows[0]['id']} .. {new_rows[-1]['id']}")
-    print(f"Date range: {new_rows[-1]['publication_date']} .. {new_rows[0]['publication_date']}")
+    print(f"Date range: {new_rows[0]['publication_date']} .. {new_rows[-1]['publication_date']}")
 
 
 if __name__ == "__main__":
