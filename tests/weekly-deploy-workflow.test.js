@@ -42,6 +42,17 @@ describe('weekly reviewed-main deployment', () => {
       /PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD:\s*'1'/,
       'npm ci must skip unused Playwright browsers before a production deploy',
     );
+    assert.match(workflow, /fetch-depth:\s*0\s*\n\s+lfs:\s*false/);
+    assert.doesNotMatch(
+      workflow,
+      /fetch-depth:\s*0\s*\n\s+lfs:\s*true/,
+      'a full-history checkout must not also download every historical LFS blob',
+    );
+    assert.match(
+      workflow,
+      /Refresh main after queue wait[\s\S]*?git lfs pull/,
+      'the detached tested commit still needs the current dissertation PDF',
+    );
   });
 
   it('keeps the lossless release queue and verifies only real deployments', () => {
