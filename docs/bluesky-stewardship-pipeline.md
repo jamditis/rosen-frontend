@@ -37,11 +37,11 @@ The Workers are traffic controllers. They do not own the canonical CSV files, so
 |---|---|---|---|
 | Find activity | Discovery Worker | Read approved public source feeds and record new identifiers. | Worker pilot exists. It currently needs a Bluesky-first source adapter. |
 | Keep a small ledger | D1 | Store source, URI, content ID, times, hashes, and decision state. | Pilot exists. It is not canonical archive data. |
-| Decide and dispatch | Stewardship control Worker | Apply safe routing rules and send admitted candidates to the office runner. | Planned. |
+| Decide and dispatch | Stewardship control Worker | Send candidates that need content or conversation evidence to the office runner, then apply safe admission rules to the returned evidence. | Planned. |
 | Read text and context | Office archive runner | Use public AT Protocol data, then get the complete available thread context. | Existing social tools provide a starting point. |
 | Preserve evidence | Office archive runner plus R2 | Store a time-stamped source payload, manifest, and rendered snapshot. | Planned. |
-| Create an archive record | Existing archive processor | Apply taxonomy, stable IDs, review flags, and source rules. | Existing. |
-| Extract entities | Existing archive processor | Produce schema-checked entity and relationship proposals. | Existing. |
+| Create an archive record | Staged archive processor | Apply taxonomy and source rules before stable IDs or canonical writes. | Planned. It requires a staged-entry refactor around the existing processor. |
+| Extract entities | Social-record processing extension | Produce schema-checked entity and relationship proposals from a post or bounded thread context. | Planned. The existing processor skips text shorter than 500 characters. |
 | Publish graph data | Offline exporter | Build approved public relationship shards. | In progress in issue #807. |
 | Release | Existing GitHub and FTPS path | Run tests, preserve Git history, and publish only after success. | Existing. |
 
@@ -111,23 +111,26 @@ Raw snapshots are preservation evidence. They are not automatically public archi
 
 ## Processing and graph work
 
-After a candidate is admitted, the existing archive processor does the durable work.
+After a candidate is admitted, a staging path does the durable preparation work. It does not write canonical records or graph rows until a curator accepts the staged package.
 
 ```mermaid
 flowchart TD
     A[Admitted candidate] --> B[Safe source and context fetch]
-    B --> C[Normalize title, platform data, dates, and stable record ID]
+    B --> C[Normalize title, platform data, and dates]
     C --> D[Classify with the archive taxonomy]
     D --> E[Validate required fields and confidence]
     E --> F[Extract entities and relationship proposals]
-    F --> G{Evidence and identity clear?}
-    G -->|Yes| H[Approved record and assertions]
-    G -->|No| I[Needs curator review]
-    H --> J[Build static relationship shards]
-    J --> K[Run tests and publish]
+    F --> G[Stage record, entity, and relationship proposals]
+    G --> H{Curator accepts the staged package?}
+    H -->|Yes| I[Assign stable record and entity IDs and append approved rows]
+    H -->|No| J[Revise or reject without changing canonical data]
+    I --> K[Build static relationship shards]
+    K --> L[Run tests and publish]
 ```
 
-Entity extraction produces proposals, not truth. The system matches a proposed entity to a known canonical entity only when its name, type, aliases, and evidence support the match. It sends conflicts and uncertain aliases to a curator.
+Entity extraction produces proposals, not truth. The system stores proposed records, entities, relationships, aliases, and evidence outside the canonical CSV files. It matches a proposed entity to a known canonical entity only when its name, type, aliases, and evidence support the match. A curator must accept that evidence before the system calls the canonical CSV writer, assigns a new canonical ID, or reuses an existing one.
+
+The [current submission processor](../backend/scripts/process_submission.py) is not this staging boundary. It skips entity extraction for text shorter than 500 characters, and its `needs_review` flag does not stop tests and deployment. The social path must therefore either aggregate bounded thread context or use a reviewed short-text extraction rule, then wait for an accepted review event before it invokes the existing canonical writer or publication workflow.
 
 Relationship mapping has two outputs:
 
@@ -143,12 +146,12 @@ The system uses a safe waterfall. It does not try to defeat source restrictions.
 | Problem | First response | Next response | Stop or escalation |
 |---|---|---|---|
 | Unchanged source | Record a healthy no-change run. | None. | No alert. |
-| Temporary network or server error | Retry with bounded backoff. | Retry in the next scheduled run. | Alert after the agreed failure limit. |
+| Temporary network, server, or `429` rate-limit response | Retry with bounded backoff and honor `Retry-After` when present. | Retry in the next scheduled run. | Alert after the agreed failure limit. |
 | Bluesky API shape changes | Reject the payload against its schema. | Preserve the error class and pause that source adapter. | Send an operator task. |
 | Missing thread context | Use the available public root and parent chain. | Mark missing context in the manifest. | Curator decides whether the item can stand alone. |
 | Meaning is unclear | Use deterministic signals and a schema-checked classifier. | Send the candidate to curator review. | Do not auto-publish. |
 | Entity alias or relationship is uncertain | Keep the proposal and evidence separate. | Use approved aliases and a reviewer. | Do not merge the entity automatically. |
-| `401`, `403`, `429`, login wall, CAPTCHA, paywall, or robots restriction | Record `policy_blocked`. | Use an official public API or source-provided export only. | Do not bypass the restriction. |
+| `401`, `403`, login wall, CAPTCHA, paywall, or robots restriction | Record `policy_blocked`. | Use an official public API or source-provided export only. | Do not bypass the restriction. |
 | Test, Git, or FTPS failure | Stop before publication. | Retry only the failed safe stage. | Keep the item in a truthful non-live state. |
 
 The escalation sequence is always the same: deterministic rule, permitted source method, bounded retry, review queue, then a human decision. A technical denial is a stop signal, not a reason to use a more aggressive scraper.
@@ -165,11 +168,12 @@ discovered
   -> preserved
   -> processed
   -> review_required
+  -> accepted
   -> published
 
 discovered | needs_review -> rejected_noise (terminal)
 discovered | context_needed -> policy_blocked (terminal)
-processed -> rejected (terminal)
+review_required -> rejected (terminal)
 ```
 
 Each state change needs a time, rule or operator, reason, and link to the evidence package. A Worker outage can delay discovery. It cannot corrupt the canonical archive because the canonical data remains in the existing repository workflow.
