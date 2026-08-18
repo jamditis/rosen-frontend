@@ -191,6 +191,7 @@ discovered
   -> accepted
   -> published
 
+discovered -> needs_review
 discovered -> admitted
 discovered | context_needed -> retained_source (terminal)
 context_needed -> admitted
