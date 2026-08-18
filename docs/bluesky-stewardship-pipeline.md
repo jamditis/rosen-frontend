@@ -115,7 +115,7 @@ After a candidate is admitted, a staging path does the durable preparation work.
 
 ```mermaid
 flowchart TD
-    A[Admitted candidate] --> B[Safe source and context fetch]
+    A[Admitted candidate] --> B[Load the preserved source and context package]
     B --> C[Normalize title, platform data, and dates]
     C --> D[Classify with the archive taxonomy]
     D --> E[Validate required fields and confidence]
@@ -123,14 +123,16 @@ flowchart TD
     F --> G[Stage record, entity, and relationship proposals]
     G --> H{Curator accepts the staged package?}
     H -->|Yes| I[Assign stable record and entity IDs and append approved rows]
-    H -->|No| J[Revise or reject without changing canonical data]
+    H -->|Revise| J[Return staged proposals for correction]
+    J --> C
+    H -->|Reject| M[Reject without changing canonical data]
     I --> K[Build static relationship shards]
     K --> L[Run tests and publish]
 ```
 
 Entity extraction produces proposals, not truth. The system stores proposed records, entities, relationships, aliases, and evidence outside the canonical CSV files. It matches a proposed entity to a known canonical entity only when its name, type, aliases, and evidence support the match. A curator must accept that evidence before the system calls the canonical CSV writer, assigns a new canonical ID, or reuses an existing one.
 
-The [current submission processor](../backend/scripts/process_submission.py) is not this staging boundary. It skips entity extraction for text shorter than 500 characters, and its `needs_review` flag does not stop tests and deployment. The social path must therefore either aggregate bounded thread context or use a reviewed short-text extraction rule, then wait for an accepted review event before it invokes the existing canonical writer or publication workflow.
+The [current submission processor](../backend/scripts/process_submission.py) is not this staging boundary. Its [runtime configuration](../backend/submission_runtime/config.py) targets `data/archive_records-public.csv`, the Bluesky processor does not supply a `BSKY-*` source ID, it skips entity extraction for text shorter than 500 characters, and its `needs_review` flag does not stop tests and deployment. An accepted Bluesky package therefore needs a dedicated social release adapter. That adapter must follow the [social record contract](../ADDING-RECORDS.md), allocate or reuse a `BSKY-*` ID only after acceptance, append the approved row to [`data/social_posts.csv`](../data/social_posts.csv), write approved entity and relationship rows, and only then invoke the tests and publication workflow. Before acceptance, the social path must either aggregate bounded thread context or use a reviewed short-text extraction rule; it must not hand the package unchanged to the current article-record processor.
 
 Relationship mapping has two outputs:
 
@@ -151,7 +153,8 @@ The system uses a safe waterfall. It does not try to defeat source restrictions.
 | Missing thread context | Use the available public root and parent chain. | Mark missing context in the manifest. | Curator decides whether the item can stand alone. |
 | Meaning is unclear | Use deterministic signals and a schema-checked classifier. | Send the candidate to curator review. | Do not auto-publish. |
 | Entity alias or relationship is uncertain | Keep the proposal and evidence separate. | Use approved aliases and a reviewer. | Do not merge the entity automatically. |
-| `401`, `403`, login wall, CAPTCHA, paywall, or robots restriction | Record `policy_blocked`. | Use an official public API or source-provided export only. | Do not bypass the restriction. |
+| `401` or an unexpected authentication challenge on a nominally public endpoint | Pause the adapter in an operator-attention state. | Check the endpoint, credentials, and proxy configuration. | Retry after the operational fault is corrected; do not record `policy_blocked` without a confirmed access restriction. |
+| Confirmed `403`, login wall, CAPTCHA, paywall, or robots restriction | Record `policy_blocked`. | Use an official public API or source-provided export only. | Do not bypass the restriction. |
 | Test, Git, or FTPS failure | Stop before publication. | Retry only the failed safe stage. | Keep the item in a truthful non-live state. |
 
 The escalation sequence is always the same: deterministic rule, permitted source method, bounded retry, review queue, then a human decision. A technical denial is a stop signal, not a reason to use a more aggressive scraper.
@@ -173,8 +176,11 @@ discovered
 
 discovered | needs_review -> rejected_noise (terminal)
 discovered | context_needed -> policy_blocked (terminal)
+review_required -> revision_requested -> processed
 review_required -> rejected (terminal)
 ```
+
+The admission decision uses the evidence already returned by the permitted discovery and context fetch. Processing after admission reads the immutable preserved package instead of fetching the source again, so an access-policy failure is resolved before the candidate enters the admitted path. A revision changes only staged proposals, records the curator's reason, and loops through validation and `review_required` again; it never mutates canonical rows in place.
 
 Each state change needs a time, rule or operator, reason, and link to the evidence package. A Worker outage can delay discovery. It cannot corrupt the canonical archive because the canonical data remains in the existing repository workflow.
 
