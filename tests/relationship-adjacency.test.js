@@ -383,4 +383,49 @@ describe('record relationship adjacency loader (#807)', () => {
 
     await assert.rejects(loader('RECORD-00001'), /hash does not match the manifest/);
   });
+
+  it('refetches the memoized manifest after a stale-cache integrity mismatch', async () => {
+    const publishedAssertion = approvedAssertion();
+    const nextAssertion = { ...approvedAssertion(), confidence: 0.1 };
+    const published = await shardFixture({
+      schemaVersion: '1.0.0',
+      exportVersion: '1.0.0',
+      shardId: 'a',
+      records: { 'RECORD-00001': [publishedAssertion] },
+    });
+    const nextRelease = await shardFixture({
+      schemaVersion: '1.0.0',
+      exportVersion: '1.0.0',
+      shardId: 'a',
+      records: { 'RECORD-00001': [nextAssertion] },
+    });
+    const requested = [];
+    let manifestFetches = 0;
+    const loader = createRecordRelationshipLoader({
+      fetchImpl: async (url) => {
+        requested.push(url);
+        if (url.endsWith('relationship-adjacency-manifest.json')) {
+          manifestFetches += 1;
+          return bytesResponse(encodeJson({
+            schemaVersion: '1.0.0',
+            exportVersion: '1.0.0',
+            source: {},
+            recordShards: { 'RECORD-00001': 'a' },
+            shards: { a: manifestFetches === 1 ? published.metadata : nextRelease.metadata },
+            omitted: {},
+          }));
+        }
+        return bytesResponse(nextRelease.bytes);
+      },
+    });
+
+    assert.deepEqual(await loader('RECORD-00001'), [nextAssertion]);
+    assert.equal(manifestFetches, 2);
+    assert.deepEqual(requested, [
+      './data/relationship-adjacency-manifest.json',
+      './data/relationship-adjacency-a.json',
+      './data/relationship-adjacency-manifest.json',
+      './data/relationship-adjacency-a.json',
+    ]);
+  });
 });

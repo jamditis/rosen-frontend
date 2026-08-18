@@ -82,6 +82,17 @@ async function fetchJson(fetchImpl, url) {
   return response.json();
 }
 
+class ShardIntegrityError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'ShardIntegrityError';
+  }
+}
+
+function isShardIntegrityError(error) {
+  return Boolean(error) && error.name === 'ShardIntegrityError';
+}
+
 async function fetchVerifiedShard(fetchImpl, url, metadata, shardId) {
   if (
     typeof metadata.sha256 !== 'string'
@@ -98,10 +109,10 @@ async function fetchVerifiedShard(fetchImpl, url, metadata, shardId) {
   }
   const bytes = new Uint8Array(await response.arrayBuffer());
   if (bytes.byteLength !== metadata.bytes) {
-    throw new Error(`Relationship shard ${shardId} size does not match the manifest`);
+    throw new ShardIntegrityError(`Relationship shard ${shardId} size does not match the manifest`);
   }
   if (await sha256Hex(bytes) !== metadata.sha256) {
-    throw new Error(`Relationship shard ${shardId} hash does not match the manifest`);
+    throw new ShardIntegrityError(`Relationship shard ${shardId} hash does not match the manifest`);
   }
   return JSON.parse(new TextDecoder().decode(bytes));
 }
@@ -145,9 +156,7 @@ export function createRecordRelationshipLoader({
     return manifestPromise;
   };
 
-  return async (recordId) => {
-    if (typeof recordId !== 'string' || !recordId.trim()) return [];
-
+  const loadRecord = async (recordId, allowRetry) => {
     const manifest = await loadManifest();
     const shardId = manifest.recordShards[recordId];
     if (typeof shardId !== 'string') return [];
@@ -178,13 +187,28 @@ export function createRecordRelationshipLoader({
         return shard;
       }).catch(error => {
         shardPromises.delete(shardId);
+        if (isShardIntegrityError(error)) {
+          manifestPromise = undefined;
+        }
         throw error;
       }));
     }
 
-    const shard = await shardPromises.get(shardId);
-    const assertions = shard.records[recordId] ?? [];
-    if (!Array.isArray(assertions)) throw new Error(`${recordId} relationship data must be an array`);
-    return assertions.map(assertion => requireApprovedAssertion(assertion, recordId));
+    try {
+      const shard = await shardPromises.get(shardId);
+      const assertions = shard.records[recordId] ?? [];
+      if (!Array.isArray(assertions)) throw new Error(`${recordId} relationship data must be an array`);
+      return assertions.map(assertion => requireApprovedAssertion(assertion, recordId));
+    } catch (error) {
+      if (allowRetry && isShardIntegrityError(error)) {
+        return loadRecord(recordId, false);
+      }
+      throw error;
+    }
+  };
+
+  return async (recordId) => {
+    if (typeof recordId !== 'string' || !recordId.trim()) return [];
+    return loadRecord(recordId, true);
   };
 }
