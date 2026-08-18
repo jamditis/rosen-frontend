@@ -126,31 +126,34 @@ flowchart TD
     E --> F[Extract entities and relationship proposals]
     F --> G[Stage record, entity, and relationship proposals]
     G --> H{Curator accepts the staged package?}
-    H -->|Yes| I[Assign stable record and entity IDs and append approved rows]
+    H -->|Yes| I[Assign stable IDs and build the staged successor set]
     H -->|Revise| J[Return staged proposals for correction]
     J --> C
     H -->|Reject| M[Reject without changing canonical data]
-    I --> K[Regenerate archive JSON and static relationship shards]
+    I --> K[Regenerate against the staged successor set]
     K --> L[Stamp one coordinated release version]
-    L --> N[Verify generated artifacts and run tests]
-    N --> O[Commit, activate, and publish one release bundle]
+    L --> N[Verify staged artifacts and run release tests]
+    N -->|Pass| O[Atomically activate the validated commit]
+    N -->|Correctable failure| J
+    N -->|Stop failure| Q[Stop before activation and send an operator task]
+    O --> P[Publish that exact release bundle]
 ```
 
 Entity extraction produces proposals, not truth. The system stores proposed records, entities, relationships, aliases, and evidence outside the canonical CSV files. It matches a proposed entity to a known canonical entity only when its name, type, aliases, and evidence support the match. A curator must accept that evidence before the system calls the canonical CSV writer, assigns a new canonical ID, or reuses an existing one.
 
-The [current submission processor](../backend/scripts/process_submission.py) is not this staging boundary. Its [runtime configuration](../backend/submission_runtime/config.py) targets `data/archive_records-public.csv`, the Bluesky processor does not supply a `BSKY-*` source ID, it skips entity extraction for text shorter than 500 characters, and its `needs_review` flag does not stop tests and deployment. An accepted Bluesky package therefore needs a dedicated social release adapter. That adapter must follow the [social record contract](../ADDING-RECORDS.md), allocate or reuse a `BSKY-*` ID only after acceptance, stage successor copies of every touched canonical file, run [`data/export-archive-data.js`](../data/export-archive-data.js) against the complete staged set, and verify that the generated JSON contains the accepted record and relationships. It must then run `npm run bump-version -- X.X.X` so `index.html`, `version.json`, every relevant `?v=` import, and [`frontend/sw.js`](../frontend/sw.js) `CACHE_VERSION` advance together. The adapter verifies the complete generated and versioned bundle and runs the release tests before it commits or publishes the package. Before acceptance, the social path must either aggregate bounded thread context or use a reviewed short-text extraction rule; it must not hand the package unchanged to the current article-record processor.
+The [current submission processor](../backend/scripts/process_submission.py) is not this staging boundary. Its [runtime configuration](../backend/submission_runtime/config.py) targets `data/archive_records-public.csv`, the Bluesky processor does not supply a `BSKY-*` source ID, it skips entity extraction for text shorter than 500 characters, and its `needs_review` flag does not stop tests and deployment. An accepted Bluesky package therefore needs a dedicated social release adapter. That adapter must follow the [social record contract](../ADDING-RECORDS.md), allocate or reuse a `BSKY-*` ID only after acceptance, and build successor copies of every touched canonical file in an isolated staging worktree. It runs [`data/export-archive-data.js`](../data/export-archive-data.js) against that complete staged set and verifies that the generated JSON contains the accepted record and relationships. It then runs `npm run bump-version -- X.X.X` so `index.html`, `version.json`, every relevant `?v=` import, and [`frontend/sw.js`](../frontend/sw.js) `CACHE_VERSION` advance together. The adapter verifies the complete generated and versioned bundle and runs the release tests before it creates and activates the canonical commit. A correctable validation failure returns the staged proposals to curator review; it does not alter the canonical head. Before acceptance, the social path must either aggregate bounded thread context or use a reviewed short-text extraction rule; it must not hand the package unchanged to the current article-record processor.
 
 An accepted standalone reply or quote post must also have a curator-approved, non-generic title and a rights-cleared summary of the parent or quoted context in [`data/authored-excerpts.csv`](../data/authored-excerpts.csv). The adapter verifies that the item survives the exporter's short-generic-reply filter where applicable and that the public JSON includes the context summary. If required parent or quoted material cannot be summarized under the rights rules, the item remains only in its preservation package or ships inside an approved public thread; it does not publish as a context-free standalone record.
 
-Before it reads canonical files, allocates IDs, or stages successors, the adapter obtains an exclusive canonical-writer lease with a fencing token. The package receipt records that token, the package ID, accepted IDs, touched paths, and expected before-and-after hashes. Activation atomically verifies the fencing token and every expected before-hash; a mismatch aborts the attempt, discards its staged successors, and restages from the new canonical head. A crash or filesystem failure enters `canonical_recovery`, keeps later writers fenced out, and uses the receipt to finish the complete staged file set or restore every prior file before the package can return to `accepted` and release the lease. Regeneration, tests, Git commit, and publication do not start from a partial or concurrently superseded canonical set.
+Before it reads canonical files, allocates IDs, or stages successors, the adapter obtains an exclusive canonical-writer lease with a fencing token. The package receipt records that token, the package ID, accepted IDs, touched paths, expected before-and-after hashes, validated commit, and release manifest. Activation atomically verifies the fencing token, expected canonical head, and every expected before-hash before it advances the canonical ref to the validated commit. A mismatch discards the staged successors and restages from the new canonical head. The same lease remains held through bundle publication and final verification, so a later package cannot activate or publish an older view of the archive. A crash or filesystem failure enters `canonical_recovery` or `release_recovery`, keeps later writers fenced out, and uses the receipt to finish or restore the complete canonical and published bundles. The package releases the lease only after it reaches `published` or recovery restores the prior canonical and live release.
 
 The current FTPS scripts activate files one at a time, so a mid-upload failure can expose a mixed release. Automated publication for this pipeline needs a bundle-level activation step, such as a versioned release directory and one final pointer switch. Until that exists, a partial upload enters `release_recovery`, blocks later releases, and uses the previous and intended bundle manifests to finish the upload or restore the last known-good bundle before the candidate becomes `published`.
 
 Relationship mapping separates mentions from entity-to-entity relationships:
 
-- Staged proposals retain record-to-entity mentions and entity-to-entity relationships with provenance, confidence, type, direction, and review state until acceptance.
-- Accepted mention edges write to a planned, versioned `data/record_entity_edges.csv` sidecar with `record_id`, `entity_id`, mention role, evidence text, confidence, and review receipt. Both IDs must resolve to accepted canonical rows.
-- Accepted entity-to-entity edges map losslessly to [`data/extracted_relationships.csv`](../data/extracted_relationships.csv), where `source_record_id` is provenance and both endpoints resolve to [`data/extracted_entities.csv`](../data/extracted_entities.csv). A proposal that cannot make that mapping stays staged until a versioned schema extension exists.
+- Staged proposals retain the evidence post URI and author DID along with provenance, confidence, type, direction, and review state. Context from another author never inherits Jay's accepted `record_id` merely because it was captured in the same thread.
+- Accepted mention edges write to a planned, versioned `data/record_entity_edges.csv` sidecar with `record_id`, `entity_id`, mention role, evidence text, confidence, and review receipt. Both IDs must resolve to accepted canonical rows, and the evidence must occur in Jay's accepted post or its rights-cleared public context summary.
+- Accepted entity-to-entity edges map losslessly to [`data/extracted_relationships.csv`](../data/extracted_relationships.csv), where `source_record_id` is provenance and both endpoints resolve to [`data/extracted_entities.csv`](../data/extracted_entities.csv). The cited evidence must occur in Jay's accepted post or its rights-cleared public context summary. Evidence found only in a third party's non-public context stays in the preservation package and cannot create a public record edge. A proposal that cannot make that mapping stays staged until a versioned schema extension exists.
 - The exporter must read the mention sidecar and add every accepted entity to its public record, including singleton mentions with no entity-to-entity edge. It also derives connections from accepted entity-to-entity rows and builds the public-safe static relationship shard.
 
 No Worker infers a relationship during a reader request. The public relationship export is built offline, tested, and released with the archive data.
@@ -189,18 +192,21 @@ discovered
   -> processed
   -> review_required
   -> accepted
+  -> release_validated
+  -> activated
+  -> publishing
   -> published
 
 discovered -> needs_review
 discovered -> admitted
-discovered | context_needed -> retained_source (terminal)
+discovered | context_needed | needs_review -> retained_source (terminal)
 context_needed -> admitted
 discovered | context_needed | needs_review -> rejected_noise (terminal)
 discovered | context_needed -> policy_blocked (terminal)
-review_required -> revision_requested -> processed
+review_required | accepted -> revision_requested -> processed
 review_required -> rejected (terminal)
-accepted -> canonical_recovery -> accepted
-accepted -> release_recovery -> accepted
+release_validated -> canonical_recovery -> activated | accepted
+activated | publishing -> release_recovery -> published | activated
 ```
 
 The admission decision uses the evidence already returned by the permitted discovery and context fetch. Processing after admission reads the immutable preserved package instead of fetching the source again, so an access-policy failure is resolved before the candidate enters the admitted path. A revision changes only staged proposals, records the curator's reason, and loops through validation and `review_required` again; it never mutates canonical rows in place.
