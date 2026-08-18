@@ -36,6 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
     # Match the five-hour queue bound and reserve the final hour for deployment.
     timeout-minutes: 360
     steps:

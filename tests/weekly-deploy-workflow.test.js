@@ -37,6 +37,11 @@ describe('weekly reviewed-main deployment', () => {
       'tests must finish before the deploy step',
     );
     assert.match(workflow, /npm test/);
+    assert.match(
+      workflow,
+      /PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD:\s*'1'/,
+      'npm ci must skip unused Playwright browsers before a production deploy',
+    );
   });
 
   it('keeps the lossless release queue and verifies only real deployments', () => {
