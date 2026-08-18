@@ -11,6 +11,7 @@ import {
   relationshipAdjacencyShardFile,
   validateRelationshipAdjacencyArtifacts,
 } from '../data/lib/relationship-adjacency.js';
+import { buildRepositoryRelationshipAdjacency } from '../data/export-relationship-adjacency.js';
 import { createRecordRelationshipLoader } from '../frontend/services/relationshipAdjacencyService.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -41,6 +42,35 @@ function buildFixture(rows) {
     relationshipTypeHolds: [{ relationshipId: 'REL-HELD' }],
     relationshipCsv: 'canonical relationship source',
   });
+}
+
+function encodeJson(payload) {
+  return new TextEncoder().encode(JSON.stringify(payload));
+}
+
+async function sha256Hex(bytes) {
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function bytesResponse(bytes, ok = true) {
+  return {
+    ok,
+    arrayBuffer: async () => bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
+    json: async () => JSON.parse(new TextDecoder().decode(bytes)),
+  };
+}
+
+async function shardFixture(payload) {
+  const bytes = encodeJson(payload);
+  return {
+    bytes,
+    metadata: {
+      file: `relationship-adjacency-${payload.shardId}.json`,
+      sha256: await sha256Hex(bytes),
+      bytes: bytes.byteLength,
+    },
+  };
 }
 
 describe('public relationship adjacency exporter (#807)', () => {
@@ -173,31 +203,86 @@ describe('public relationship adjacency exporter (#807)', () => {
     const publishedText = Object.values(serializedShards).join('\n');
     assert.doesNotMatch(publishedText, /context_snippet|source_entity_name|target_entity_name/);
   });
+
+  it('counts calendar-invalid extraction dates as invalid provenance', () => {
+    const built = buildFixture([
+      {
+        relationship_id: 'REL-BAD-MONTH',
+        source_record_id: 'RECORD-00001',
+        source_entity_id: 'P0001',
+        relationship_type: 'Mentions',
+        target_entity_id: 'O0001',
+        confidence_score: '0.9',
+        extracted_date: '2026-99-99',
+      },
+      {
+        relationship_id: 'REL-BAD-DAY',
+        source_record_id: 'RECORD-00001',
+        source_entity_id: 'P0001',
+        relationship_type: 'Mentions',
+        target_entity_id: 'O0001',
+        confidence_score: '0.9',
+        extracted_date: '2026-02-30',
+      },
+      {
+        relationship_id: 'REL-OK',
+        source_record_id: 'RECORD-00001',
+        source_entity_id: 'P0001',
+        relationship_type: 'Mentions',
+        target_entity_id: 'O0001',
+        confidence_score: '0.9',
+        extracted_date: '2026-02-28',
+      },
+    ]);
+    assert.equal(built.manifest.omitted.invalidProvenance, 2);
+    const published = Object.values(built.shards)
+      .flatMap(shard => Object.values(shard.records).flat());
+    assert.deepEqual(published.map(assertion => assertion.assertionId), ['REL-OK']);
+  });
+
+  it('byte-matches committed shards to a rebuild from current canonical inputs', () => {
+    const rebuilt = buildRepositoryRelationshipAdjacency(rootDir);
+    const summary = validateRelationshipAdjacencyArtifacts(rebuilt);
+    assert.ok(summary.records > 0);
+    assert.ok(summary.assertions > 0);
+    assert.equal(
+      rebuilt.serializedManifest,
+      fs.readFileSync(path.join(dataDir, 'relationship-adjacency-manifest.json'), 'utf8')
+    );
+    for (const shardId of RELATIONSHIP_ADJACENCY_SHARD_IDS) {
+      assert.equal(
+        rebuilt.serializedShards[shardId],
+        fs.readFileSync(path.join(dataDir, relationshipAdjacencyShardFile(shardId)), 'utf8')
+      );
+    }
+  });
 });
 
 describe('record relationship adjacency loader (#807)', () => {
   it('loads one manifest and one approved shard, never the full graph', async () => {
     const requested = [];
+    const shardPayload = {
+      schemaVersion: '1.0.0',
+      exportVersion: '1.0.0',
+      shardId: 'a',
+      records: { 'RECORD-00001': [approvedAssertion()] },
+    };
+    const shard = await shardFixture(shardPayload);
     const responses = new Map([
-      ['./data/relationship-adjacency-manifest.json', {
+      ['./data/relationship-adjacency-manifest.json', bytesResponse(encodeJson({
         schemaVersion: '1.0.0',
         exportVersion: '1.0.0',
         source: {},
         recordShards: { 'RECORD-00001': 'a' },
-        shards: { a: { file: 'relationship-adjacency-a.json' } },
+        shards: { a: shard.metadata },
         omitted: {},
-      }],
-      ['./data/relationship-adjacency-a.json', {
-        schemaVersion: '1.0.0',
-        exportVersion: '1.0.0',
-        shardId: 'a',
-        records: { 'RECORD-00001': [approvedAssertion()] },
-      }],
+      }))],
+      ['./data/relationship-adjacency-a.json', bytesResponse(shard.bytes)],
     ]);
     const loader = createRecordRelationshipLoader({
       fetchImpl: async (url) => {
         requested.push(url);
-        return { ok: responses.has(url), json: async () => responses.get(url) };
+        return responses.get(url) ?? { ok: false };
       },
     });
 
@@ -214,27 +299,29 @@ describe('record relationship adjacency loader (#807)', () => {
   it('loads shards from the selected manifest directory', async () => {
     const manifestUrl = '/preview/data/relationship-adjacency-manifest.json?v=1';
     const requested = [];
+    const shardPayload = {
+      schemaVersion: '1.0.0',
+      exportVersion: '1.0.0',
+      shardId: 'a',
+      records: { 'RECORD-00001': [approvedAssertion()] },
+    };
+    const shard = await shardFixture(shardPayload);
     const responses = new Map([
-      [manifestUrl, {
+      [manifestUrl, bytesResponse(encodeJson({
         schemaVersion: '1.0.0',
         exportVersion: '1.0.0',
         source: {},
         recordShards: { 'RECORD-00001': 'a' },
-        shards: { a: { file: 'relationship-adjacency-a.json' } },
+        shards: { a: shard.metadata },
         omitted: {},
-      }],
-      ['/preview/data/relationship-adjacency-a.json', {
-        schemaVersion: '1.0.0',
-        exportVersion: '1.0.0',
-        shardId: 'a',
-        records: { 'RECORD-00001': [approvedAssertion()] },
-      }],
+      }))],
+      ['/preview/data/relationship-adjacency-a.json', bytesResponse(shard.bytes)],
     ]);
     const loader = createRecordRelationshipLoader({
       manifestUrl,
       fetchImpl: async (url) => {
         requested.push(url);
-        return { ok: responses.has(url), json: async () => responses.get(url) };
+        return responses.get(url) ?? { ok: false };
       },
     });
 
@@ -250,21 +337,50 @@ describe('record relationship adjacency loader (#807)', () => {
     const loader = createRecordRelationshipLoader({
       fetchImpl: async (url) => {
         requested.push(url);
-        return {
-          ok: true,
-          json: async () => ({
-            schemaVersion: '1.0.0',
-            exportVersion: '1.0.0',
-            source: {},
-            recordShards: { 'RECORD-00001': 'a' },
-            shards: { a: { file: '../private-data.json' } },
-            omitted: {},
-          }),
-        };
+        return bytesResponse(encodeJson({
+          schemaVersion: '1.0.0',
+          exportVersion: '1.0.0',
+          source: {},
+          recordShards: { 'RECORD-00001': 'a' },
+          shards: { a: { file: '../private-data.json' } },
+          omitted: {},
+        }));
       },
     });
 
     await assert.rejects(loader('RECORD-00001'), /invalid file name/);
     assert.deepEqual(requested, ['./data/relationship-adjacency-manifest.json']);
+  });
+
+  it('rejects a structurally valid shard from the wrong release', async () => {
+    const published = await shardFixture({
+      schemaVersion: '1.0.0',
+      exportVersion: '1.0.0',
+      shardId: 'a',
+      records: { 'RECORD-00001': [approvedAssertion()] },
+    });
+    const nextRelease = encodeJson({
+      schemaVersion: '1.0.0',
+      exportVersion: '1.0.0',
+      shardId: 'a',
+      records: { 'RECORD-00001': [{ ...approvedAssertion(), confidence: 0.1 }] },
+    });
+    const loader = createRecordRelationshipLoader({
+      fetchImpl: async (url) => {
+        if (url.endsWith('relationship-adjacency-manifest.json')) {
+          return bytesResponse(encodeJson({
+            schemaVersion: '1.0.0',
+            exportVersion: '1.0.0',
+            source: {},
+            recordShards: { 'RECORD-00001': 'a' },
+            shards: { a: published.metadata },
+            omitted: {},
+          }));
+        }
+        return bytesResponse(nextRelease);
+      },
+    });
+
+    await assert.rejects(loader('RECORD-00001'), /hash does not match the manifest/);
   });
 });

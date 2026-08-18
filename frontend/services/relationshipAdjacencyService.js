@@ -20,6 +20,17 @@ function requireExactKeys(value, expected, label) {
   return object;
 }
 
+function validExtractionDate(value) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const year = Number(value.slice(0, 4));
+  const month = Number(value.slice(5, 7));
+  const day = Number(value.slice(8, 10));
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  return parsed.getUTCFullYear() === year
+    && parsed.getUTCMonth() === month - 1
+    && parsed.getUTCDate() === day;
+}
+
 function requireApprovedAssertion(value, recordId) {
   const assertion = requireExactKeys(value, [
     'assertionId', 'sourceEntityId', 'targetEntityId', 'relationshipType',
@@ -53,17 +64,46 @@ function requireApprovedAssertion(value, recordId) {
     || evidence.recordId !== recordId
     || provenance.sourceRecordId !== recordId
     || provenance.sourceDataset !== 'extracted_relationships.csv'
-    || !/^\d{4}-\d{2}-\d{2}$/.test(provenance.extractedDate)
+    || !validExtractionDate(provenance.extractedDate)
   ) {
     throw new Error(`${recordId} has invalid relationship provenance`);
   }
   return assertion;
 }
 
+async function sha256Hex(bytes) {
+  const digest = await globalThis.crypto.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
 async function fetchJson(fetchImpl, url) {
   const response = await fetchImpl(url);
   if (!response?.ok) throw new Error(`Could not load ${url}`);
   return response.json();
+}
+
+async function fetchVerifiedShard(fetchImpl, url, metadata, shardId) {
+  if (
+    typeof metadata.sha256 !== 'string'
+    || !/^[a-f0-9]{64}$/.test(metadata.sha256)
+    || !Number.isInteger(metadata.bytes)
+    || metadata.bytes < 0
+  ) {
+    throw new Error(`Relationship shard ${shardId} is missing integrity metadata`);
+  }
+  const response = await fetchImpl(url);
+  if (!response?.ok) throw new Error(`Could not load ${url}`);
+  if (typeof response.arrayBuffer !== 'function') {
+    throw new Error(`Could not read ${url}`);
+  }
+  const bytes = new Uint8Array(await response.arrayBuffer());
+  if (bytes.byteLength !== metadata.bytes) {
+    throw new Error(`Relationship shard ${shardId} size does not match the manifest`);
+  }
+  if (await sha256Hex(bytes) !== metadata.sha256) {
+    throw new Error(`Relationship shard ${shardId} hash does not match the manifest`);
+  }
+  return JSON.parse(new TextDecoder().decode(bytes));
 }
 
 function relationshipShardUrl(manifestUrl, shardFile) {
@@ -118,7 +158,12 @@ export function createRecordRelationshipLoader({
     }
 
     if (!shardPromises.has(shardId)) {
-      shardPromises.set(shardId, fetchJson(fetchImpl, relationshipShardUrl(manifestUrl, shardFile)).then(payload => {
+      shardPromises.set(shardId, fetchVerifiedShard(
+        fetchImpl,
+        relationshipShardUrl(manifestUrl, shardFile),
+        shardMetadata,
+        shardId
+      ).then(payload => {
         const shard = requireExactKeys(payload, [
           'schemaVersion', 'exportVersion', 'shardId', 'records',
         ], `relationship shard ${shardId}`);

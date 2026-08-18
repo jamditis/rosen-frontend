@@ -42,7 +42,7 @@ export function writeRelationshipAdjacencyArtifacts({
   return { ...summary, files: relationshipAdjacencyArtifactFiles() };
 }
 
-export function exportRepositoryRelationshipAdjacency(repositoryRoot = path.join(__dirname, '..')) {
+export function loadRelationshipAdjacencyInputs(repositoryRoot = path.join(__dirname, '..')) {
   const dataDir = path.join(repositoryRoot, 'data');
   const relationshipCsv = fs.readFileSync(path.join(dataDir, 'extracted_relationships.csv'), 'utf8');
   const relationships = parse(relationshipCsv, {
@@ -60,14 +60,29 @@ export function exportRepositoryRelationshipAdjacency(repositoryRoot = path.join
     Array.isArray(archiveData.records) ? archiveData.records.map(record => record.id) : []
   );
 
-  return writeRelationshipAdjacencyArtifacts({
+  return {
     dataDir,
     relationships,
     servedRecordIds,
     activeSchema,
     holdPolicy,
     relationshipCsv,
+  };
+}
+
+export function buildRepositoryRelationshipAdjacency(repositoryRoot = path.join(__dirname, '..')) {
+  const inputs = loadRelationshipAdjacencyInputs(repositoryRoot);
+  return buildRelationshipAdjacencyArtifacts({
+    relationships: inputs.relationships,
+    servedRecordIds: inputs.servedRecordIds,
+    acceptedRelationshipTypes: Object.keys(inputs.activeSchema.relationship_types ?? {}),
+    relationshipTypeHolds: inputs.holdPolicy.relationshipTypeHolds ?? [],
+    relationshipCsv: inputs.relationshipCsv,
   });
+}
+
+export function exportRepositoryRelationshipAdjacency(repositoryRoot = path.join(__dirname, '..')) {
+  return writeRelationshipAdjacencyArtifacts(loadRelationshipAdjacencyInputs(repositoryRoot));
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === __filename) {
