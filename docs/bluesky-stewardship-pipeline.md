@@ -140,11 +140,12 @@ An accepted standalone reply must also have a curator-approved, non-generic titl
 
 The current FTPS scripts activate files one at a time, so a mid-upload failure can expose a mixed release. Automated publication for this pipeline needs a bundle-level activation step, such as a versioned release directory and one final pointer switch. Until that exists, a partial upload enters `release_recovery`, blocks later releases, and uses the previous and intended bundle manifests to finish the upload or restore the last known-good bundle before the candidate becomes `published`.
 
-Relationship mapping uses the current entity-to-entity contract:
+Relationship mapping separates mentions from entity-to-entity relationships:
 
-- Staged proposals retain provenance, confidence, type, direction, and review state until acceptance.
+- Staged proposals retain record-to-entity mentions and entity-to-entity relationships with provenance, confidence, type, direction, and review state until acceptance.
+- Accepted mention edges write to a planned, versioned `data/record_entity_edges.csv` sidecar with `record_id`, `entity_id`, mention role, evidence text, confidence, and review receipt. Both IDs must resolve to accepted canonical rows.
 - Accepted entity-to-entity edges map losslessly to [`data/extracted_relationships.csv`](../data/extracted_relationships.csv), where `source_record_id` is provenance and both endpoints resolve to [`data/extracted_entities.csv`](../data/extracted_entities.csv). A proposal that cannot make that mapping stays staged until a versioned schema extension exists.
-- The exporter derives each public record's entity connections from the accepted rows and builds the public-safe static relationship shard.
+- The exporter must read the mention sidecar and add every accepted entity to its public record, including singleton mentions with no entity-to-entity edge. It also derives connections from accepted entity-to-entity rows and builds the public-safe static relationship shard.
 
 No Worker infers a relationship during a reader request. The public relationship export is built offline, tested, and released with the archive data.
 
