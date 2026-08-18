@@ -2195,7 +2195,7 @@ describe('social_posts.csv', () => {
       cwd: repoDir,
       encoding: 'utf-8',
     });
-    assert.match(output, /Social Posts:\s+29747\b/);
+    assert.match(output, /Social Posts:\s+29862\b/);
     assert.doesNotMatch(output, /Bluesky, social media platforms/);
   });
 

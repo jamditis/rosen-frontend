@@ -5,9 +5,19 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records in the &quot;Audience &amp; Public Engagement&quot; category</description>
     <language>en-us</language>
-    <lastBuildDate>Sun, 02 Aug 2026 09:21:32 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 16 Aug 2026 01:11:00 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/categories/audience-public-engagement.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
+  <item>
+    <title>What are your top issues in November’s elections? Inform Roanoke Times coverage</title>
+    <link>https://roanoke.com/news/local/government-politics/elections/article_8d00487d-2a84-492b-abb3-57af9d25727e.html</link>
+    <guid isPermaLink="true">https://roanoke.com/news/local/government-politics/elections/article_8d00487d-2a84-492b-abb3-57af9d25727e.html</guid>
+    <pubDate>Tue, 11 Aug 2026 00:00:00 GMT</pubDate>
+    <description>The Roanoke Times asks readers which issues matter most so those concerns can guide its fall election coverage. Jay Rosen cited the project as a current Citizens Agenda example.</description>
+    <category>Politics &amp; Democracy</category>
+    <category>Audience &amp; Public Engagement</category>
+    <category>Journalism Theory &amp; Practice</category>
+  </item>
   <item>
     <title>Citizens Agenda &apos;26: Help CDN pin down candidates on issues that matter to you</title>
     <link>https://www.cascadiadaily.com/2026/jul/16/citizens-agenda-26-help-cdn-pin-down-candidates-on-issues-that-matter-to-you/</link>
@@ -27,6 +37,16 @@
     <category>Journalism Theory &amp; Practice</category>
     <category>Press &amp; Media Criticism</category>
     <category>Audience &amp; Public Engagement</category>
+  </item>
+  <item>
+    <title>Jay Rosen’s Internet Archive: an Introduction.</title>
+    <link>https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/</link>
+    <guid isPermaLink="true">https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/</guid>
+    <pubDate>Sun, 05 Jul 2026 00:00:00 GMT</pubDate>
+    <description>Jay Rosen and Joe Amditis explain why they built a common, searchable home for Rosen’s online work. The introduction defines the archive as a link-based index, describes its scope and curation, and states its preservation limits.</description>
+    <category>Technology &amp; Digital Media</category>
+    <category>Audience &amp; Public Engagement</category>
+    <category>Journalism Education</category>
   </item>
   <item>
     <title>en.wikipedia.org/wiki/Public_...</title>
@@ -442,24 +462,6 @@
     <description>A Bluesky post by Jay Rosen from 2025-09-24. Topics: Audience &amp; Public Engagement, Technology &amp; Digital Media.</description>
     <category>Audience &amp; Public Engagement</category>
     <category>Technology &amp; Digital Media</category>
-  </item>
-  <item>
-    <title>So are you going to watch Jimmy Kimmel tonight?</title>
-    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3lzkctaqfcs2e</link>
-    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3lzkctaqfcs2e</guid>
-    <pubDate>Wed, 24 Sep 2025 00:00:00 GMT</pubDate>
-    <description>A Bluesky post by Jay Rosen from 2025-09-24. Topics: Press &amp; Media Criticism, Audience &amp; Public Engagement.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Audience &amp; Public Engagement</category>
-  </item>
-  <item>
-    <title>Thanks for asking</title>
-    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3lzcavcuetc2u</link>
-    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3lzcavcuetc2u</guid>
-    <pubDate>Sat, 20 Sep 2025 00:00:00 GMT</pubDate>
-    <description>A Bluesky post by Jay Rosen from 2025-09-20. Topics: Press &amp; Media Criticism, Audience &amp; Public Engagement.</description>
-    <category>Press &amp; Media Criticism</category>
-    <category>Audience &amp; Public Engagement</category>
   </item>
   </channel>
 </rss>

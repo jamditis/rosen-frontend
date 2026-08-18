@@ -4,17 +4,17 @@
     "compatibility": "additive changes within version 1; semantic changes require a new major version"
   },
   "input": {
-    "commit": "31543425c3c2d8af15f1b5dee3c6f2a3fc330b65",
+    "commit": "1c14348b9fec5b0f439c7760523fda4a063ee0b9",
     "dirty": false,
     "schema_version": "stewardship-census/1.0.0",
     "files": [
       {
         "path": "data/archive_records-public.csv",
-        "sha256": "e108dbe7e31573656202abba558904aa6d61eeabc605497ceae1479ff8082cd4"
+        "sha256": "759335a27093e641d187ea020e896b506760fc4a3133f4c6d602bba17a905737"
       },
       {
         "path": "data/social_posts.csv",
-        "sha256": "96a81c28ae6857952e194234c9e68362cc2fb17c75ab04240dc0356aabbe6848"
+        "sha256": "6b96952995e1a2867556cc9e40161b3fc648b4c5d0973058c67c3bd895abe740"
       },
       {
         "path": "data/extracted_entities.csv",
@@ -26,19 +26,19 @@
       },
       {
         "path": "data/archive-data.json",
-        "sha256": "72f5e634555c65e7ee77fb71d853d52424c70b8b4690dd0c5c837280d95294cc"
+        "sha256": "b3cd0248640d692c413b77a12697c2637ffda54ae3435a5d1a785ad1e338137b"
       },
       {
         "path": "data/archive-core.json",
-        "sha256": "0374c1573d1377b039088fc9f9cf2558f640bb6b485596b5282a2cd44c096a62"
+        "sha256": "846f93fe82e5632c5aef00b6f8ea17a81f344348ba542edb417d9791ceebf3c7"
       },
       {
         "path": "data/archive-details.json",
-        "sha256": "210fe531e6346baf6d33f63f7d1e8346ace755282cc8c7da075547a8c9ef261a"
+        "sha256": "62f591707d6e84b9128db45a5c307a26eff93e5812ed65473d5244fe56581d0c"
       },
       {
         "path": "data/archive-entities.json",
-        "sha256": "1ddcd4f21a711b31685736f671c48566cf56466ae95e2e8928025d105975d3c8"
+        "sha256": "5e80d11177586aca99a36ff9dbf2a2e08902a972fc9258101129fd07e66a2fd8"
       },
       {
         "path": "data/authored-excerpts.csv",
@@ -48,76 +48,76 @@
   },
   "records": {
     "source": {
-      "total": 30777,
+      "total": 30898,
       "curated": {
-        "total": 1030,
+        "total": 1036,
         "by_record_type": {
-          "Article": 902,
+          "Article": 905,
           "Book Chapter": 2,
-          "Interview (Audio/Video)": 84,
+          "Interview (Audio/Video)": 86,
           "Newspaper Clipping": 26,
           "Panel Discussion": 1,
           "Social Media Thread": 10,
           "Speech/Lecture": 1,
           "Tweet/Thread": 2,
-          "Video": 2
+          "Video": 3
         },
         "verification": {
-          "verified": 1030,
+          "verified": 1036,
           "unverified": 0,
           "blank": 0
         }
       },
       "social": {
-        "total": 29747,
+        "total": 29862,
         "by_platform": {
-          "Bluesky": 3117,
+          "Bluesky": 3232,
           "Mastodon": 516,
           "Twitter/X": 26114
         },
         "by_record_type": {
-          "Social Media Post": 29747
+          "Social Media Post": 29862
         },
         "verification": {
-          "verified": 29709,
+          "verified": 29824,
           "unverified": 38,
           "blank": 0
         }
       }
     },
     "runtime": {
-      "total": 26698,
+      "total": 26816,
       "by_type": {
         "Dissertation": 1,
-        "article": 1030,
-        "social": 25667
+        "article": 1036,
+        "social": 25779
       },
       "source_backed": {
-        "total": 26690,
-        "curated": 1030,
+        "total": 26807,
+        "curated": 1036,
         "curated_by_record_type": {
-          "Article": 902,
+          "Article": 905,
           "Book Chapter": 2,
-          "Interview (Audio/Video)": 84,
+          "Interview (Audio/Video)": 86,
           "Newspaper Clipping": 26,
           "Panel Discussion": 1,
           "Social Media Thread": 10,
           "Speech/Lecture": 1,
           "Tweet/Thread": 2,
-          "Video": 2
+          "Video": 3
         },
-        "social": 25660,
+        "social": 25771,
         "social_by_platform": {
-          "Bluesky": 2672,
+          "Bluesky": 2783,
           "Mastodon": 481,
           "Twitter/X": 22507
         },
         "social_by_record_type": {
-          "Social Media Post": 25660
+          "Social Media Post": 25771
         }
       },
       "generated": {
-        "thread_containers": 7,
+        "thread_containers": 8,
         "thread_container_ids": [
           "THREAD-00011",
           "THREAD-00012",
@@ -125,7 +125,8 @@
           "THREAD-00014",
           "THREAD-00015",
           "THREAD-00016",
-          "THREAD-00017"
+          "THREAD-00017",
+          "THREAD-00018"
         ],
         "injected": 1,
         "injected_ids": [
@@ -133,26 +134,26 @@
         ]
       },
       "verification": {
-        "verified": 26698,
+        "verified": 26816,
         "unverified": 0,
         "blank": 0
       }
     },
     "reconciliation": {
       "curated": {
-        "source": 1030,
-        "published": 1030,
+        "source": 1036,
+        "published": 1036,
         "filtered": 0
       },
       "social": {
-        "source": 29747,
-        "published": 25660,
-        "filtered": 4087
+        "source": 29862,
+        "published": 25771,
+        "filtered": 4091
       }
     },
     "filtered": {
       "classification": "first_match",
-      "total": 4087,
+      "total": 4091,
       "reasons": [
         {
           "id": "curated_unverified",
@@ -191,7 +192,7 @@
           "label": "Thread member",
           "source": "social",
           "order": 1,
-          "count": 143,
+          "count": 147,
           "record_ids": [
             "BSKY-00580",
             "BSKY-00581",
@@ -335,7 +336,11 @@
             "BSKY-02915",
             "BSKY-02916",
             "BSKY-02917",
-            "BSKY-02918"
+            "BSKY-02918",
+            "BSKY-03278",
+            "BSKY-03279",
+            "BSKY-03281",
+            "BSKY-03283"
           ]
         },
         {
@@ -4348,111 +4353,111 @@
   "fields": {
     "curated_source": {
       "url": {
-        "total": 1030,
-        "present": 1030,
+        "total": 1036,
+        "present": 1036,
         "missing": 0
       },
       "raw_text": {
-        "total": 1030,
-        "present": 1016,
+        "total": 1036,
+        "present": 1022,
         "missing": 14
       },
       "summary": {
-        "total": 1030,
-        "present": 1030,
+        "total": 1036,
+        "present": 1036,
         "missing": 0
       },
       "tags": {
-        "total": 1030,
-        "present": 711,
+        "total": 1036,
+        "present": 717,
         "missing": 319
       },
       "concepts": {
-        "total": 1030,
-        "present": 946,
+        "total": 1036,
+        "present": 952,
         "missing": 84
       },
       "quote": {
-        "total": 1030,
+        "total": 1036,
         "present": 996,
-        "missing": 34
+        "missing": 40
       },
       "related_ids": {
-        "total": 1030,
-        "present": 712,
-        "missing": 318
+        "total": 1036,
+        "present": 713,
+        "missing": 323
       }
     },
     "social_source": {
       "url": {
-        "total": 29747,
-        "present": 29709,
+        "total": 29862,
+        "present": 29824,
         "missing": 38
       },
       "raw_text": {
-        "total": 29747,
-        "present": 29743,
+        "total": 29862,
+        "present": 29858,
         "missing": 4
       },
       "summary": {
-        "total": 29747,
+        "total": 29862,
         "present": 1,
-        "missing": 29746
+        "missing": 29861
       },
       "tags": {
-        "total": 29747,
+        "total": 29862,
         "present": 20217,
-        "missing": 9530
+        "missing": 9645
       },
       "concepts": {
-        "total": 29747,
+        "total": 29862,
         "present": 449,
-        "missing": 29298
+        "missing": 29413
       },
       "quote": {
-        "total": 29747,
-        "present": 25340,
+        "total": 29862,
+        "present": 25455,
         "missing": 4407
       },
       "related_ids": {
-        "total": 29747,
+        "total": 29862,
         "present": 8072,
-        "missing": 21675
+        "missing": 21790
       }
     },
     "runtime": {
       "url": {
-        "total": 26698,
-        "present": 26698,
+        "total": 26816,
+        "present": 26816,
         "missing": 0
       },
       "summary": {
-        "total": 26698,
-        "present": 26698,
+        "total": 26816,
+        "present": 26816,
         "missing": 0
       },
       "tags": {
-        "total": 26698,
-        "present": 18179,
-        "missing": 8519
+        "total": 26816,
+        "present": 18185,
+        "missing": 8631
       },
       "concepts": {
-        "total": 26698,
-        "present": 1359,
-        "missing": 25339
+        "total": 26816,
+        "present": 1365,
+        "missing": 25451
       },
       "quote": {
-        "total": 26698,
-        "present": 26698,
+        "total": 26816,
+        "present": 26816,
         "missing": 0
       },
       "related_ids": {
-        "total": 26698,
+        "total": 26816,
         "present": 877,
-        "missing": 25821
+        "missing": 25939
       },
       "raw_text": {
-        "total": 26698,
+        "total": 26816,
         "present": null,
         "missing": null,
         "status": "not_shipped_by_design"
@@ -4523,14 +4528,14 @@
     "coverage": {
       "curated": {
         "source": {
-          "rows": 1030,
+          "rows": 1036,
           "rows_with_relationship_assertions": 875,
           "relationship_assertions": 11151,
           "rows_with_entity_links": 875,
           "distinct_record_entity_links": 12941
         },
         "published": {
-          "source_backed_rows": 1030,
+          "source_backed_rows": 1036,
           "rows_with_relationship_assertions": 875,
           "relationship_assertions": 11151,
           "rows_with_entity_links": 875,
@@ -4539,14 +4544,14 @@
       },
       "social": {
         "source": {
-          "rows": 29747,
+          "rows": 29862,
           "rows_with_relationship_assertions": 2,
           "relationship_assertions": 2,
           "rows_with_entity_links": 2,
           "distinct_record_entity_links": 4
         },
         "published": {
-          "source_backed_rows": 25660,
+          "source_backed_rows": 25771,
           "rows_with_relationship_assertions": 2,
           "relationship_assertions": 2,
           "rows_with_entity_links": 2,
@@ -4556,14 +4561,14 @@
       "social_by_platform": {
         "Bluesky": {
           "source": {
-            "rows": 3117,
+            "rows": 3232,
             "rows_with_relationship_assertions": 0,
             "relationship_assertions": 0,
             "rows_with_entity_links": 0,
             "distinct_record_entity_links": 0
           },
           "published": {
-            "source_backed_rows": 2672,
+            "source_backed_rows": 2783,
             "rows_with_relationship_assertions": 0,
             "relationship_assertions": 0,
             "rows_with_entity_links": 0,
@@ -4680,10 +4685,10 @@
   },
   "urls": {
     "source": {
-      "total_rows": 30777,
+      "total_rows": 30898,
       "missing": 38,
-      "external_values": 30739,
-      "unique_external_urls": 30729,
+      "external_values": 30860,
+      "unique_external_urls": 30850,
       "duplicate_external_values": 10,
       "internal_values": 0,
       "malformed_values": 0,
@@ -4703,7 +4708,7 @@
         "berks.psu.edu": 1,
         "blog.bleacherreport.com": 1,
         "bonn-institute.org": 1,
-        "bsky.app": 3079,
+        "bsky.app": 3194,
         "buzzmachine.com": 1,
         "bylinesupplement.com": 1,
         "cascadiadaily.com": 1,
@@ -4770,16 +4775,17 @@
         "politico.com": 1,
         "poynder.blogspot.com": 1,
         "poynter.org": 3,
-        "pressthink.org": 30,
+        "pressthink.org": 32,
         "presswatchers.org": 2,
         "prospect.org": 1,
         "publicnotebook.wordpress.com": 26,
         "publicnotice.co": 1,
         "radioopensource.org": 2,
         "reason.com": 1,
-        "rebootnews.wordpress.com": 11,
+        "rebootnews.wordpress.com": 12,
         "recode.net": 2,
         "revkin.substack.com": 1,
+        "roanoke.com": 1,
         "salon.com": 4,
         "smartocto.com": 1,
         "smcvt.edu": 2,
@@ -4794,6 +4800,7 @@
         "thecorrespondent.com": 4,
         "theguardian.com": 7,
         "thenation.com": 2,
+        "therebooting.com": 1,
         "theverge.com": 1,
         "time.com": 1,
         "tmblr.co": 137,
@@ -4809,14 +4816,14 @@
         "wnycstudios.org": 10,
         "x.com": 26115,
         "youtu.be": 14,
-        "youtube.com": 6
+        "youtube.com": 7
       }
     },
     "runtime": {
-      "total_rows": 26698,
+      "total_rows": 26816,
       "missing": 0,
-      "external_values": 26697,
-      "unique_external_urls": 26697,
+      "external_values": 26815,
+      "unique_external_urls": 26815,
       "duplicate_external_values": 0,
       "internal_values": 1,
       "malformed_values": 0,
@@ -4836,7 +4843,7 @@
         "berks.psu.edu": 1,
         "blog.bleacherreport.com": 1,
         "bonn-institute.org": 1,
-        "bsky.app": 2689,
+        "bsky.app": 2801,
         "buzzmachine.com": 1,
         "bylinesupplement.com": 1,
         "cascadiadaily.com": 1,
@@ -4903,16 +4910,17 @@
         "politico.com": 1,
         "poynder.blogspot.com": 1,
         "poynter.org": 3,
-        "pressthink.org": 30,
+        "pressthink.org": 32,
         "presswatchers.org": 2,
         "prospect.org": 1,
         "publicnotebook.wordpress.com": 26,
         "publicnotice.co": 1,
         "radioopensource.org": 2,
         "reason.com": 1,
-        "rebootnews.wordpress.com": 11,
+        "rebootnews.wordpress.com": 12,
         "recode.net": 2,
         "revkin.substack.com": 1,
+        "roanoke.com": 1,
         "salon.com": 4,
         "smartocto.com": 1,
         "smcvt.edu": 2,
@@ -4927,6 +4935,7 @@
         "thecorrespondent.com": 4,
         "theguardian.com": 7,
         "thenation.com": 2,
+        "therebooting.com": 1,
         "theverge.com": 1,
         "time.com": 1,
         "tmblr.co": 137,
@@ -4942,7 +4951,7 @@
         "wnycstudios.org": 10,
         "x.com": 22508,
         "youtu.be": 14,
-        "youtube.com": 6
+        "youtube.com": 7
       }
     }
   },
@@ -30194,32 +30203,32 @@
       {
         "metric": "curated_source",
         "baseline": 1029,
-        "current": 1030,
-        "delta": 1
+        "current": 1036,
+        "delta": 7
       },
       {
         "metric": "social_source",
         "baseline": 29747,
-        "current": 29747,
-        "delta": 0
+        "current": 29862,
+        "delta": 115
       },
       {
         "metric": "published_curated_source",
         "baseline": 950,
-        "current": 1030,
-        "delta": 80
+        "current": 1036,
+        "delta": 86
       },
       {
         "metric": "published_social_source",
         "baseline": 25657,
-        "current": 25660,
-        "delta": 3
+        "current": 25771,
+        "delta": 114
       },
       {
         "metric": "generated_thread_containers",
         "baseline": 8,
-        "current": 7,
-        "delta": -1
+        "current": 8,
+        "delta": 0
       },
       {
         "metric": "injected_records",
@@ -30230,8 +30239,8 @@
       {
         "metric": "published_total",
         "baseline": 26616,
-        "current": 26698,
-        "delta": 82
+        "current": 26816,
+        "delta": 200
       },
       {
         "metric": "entities",

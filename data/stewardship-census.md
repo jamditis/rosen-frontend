@@ -2,22 +2,22 @@
 
 Schema: `stewardship-census/1.0.0`
 
-Input commit: `31543425c3c2d8af15f1b5dee3c6f2a3fc330b65` (input files clean)
+Input commit: `1c14348b9fec5b0f439c7760523fda4a063ee0b9` (input files clean)
 
 ## Record reconciliation
 
 | Group | Source | Published source rows | Filtered |
 | --- | --- | --- | --- |
-| Curated | 1,030 | 1,030 | 0 |
-| Social | 29,747 | 25,660 | 4,087 |
+| Curated | 1,036 | 1,036 | 0 |
+| Social | 29,862 | 25,771 | 4,091 |
 
-Runtime total: 26,698 records, including 7 generated thread containers and 1 injected record.
+Runtime total: 26,816 records, including 8 generated thread containers and 1 injected record.
 
 ### Social source and runtime by platform
 
 | Platform | Source | Published source rows |
 | --- | --- | --- |
-| Bluesky | 3,117 | 2,672 |
+| Bluesky | 3,232 | 2,783 |
 | Mastodon | 516 | 481 |
 | Twitter/X | 26,114 | 22,507 |
 
@@ -27,7 +27,7 @@ Classification is `first_match`; every omitted source row appears in exactly one
 
 | Source | Order | Reason | Count |
 | --- | --- | --- | --- |
-| social | 1 | Thread member | 143 |
+| social | 1 | Thread member | 147 |
 | social | 2 | Repost or quoted-post title | 1,715 |
 | social | 3 | Non-Rosen author | 55 |
 | social | 4 | Short generic reply | 2,170 |
@@ -37,13 +37,13 @@ Classification is `first_match`; every omitted source row appears in exactly one
 
 | Field | Curated source | Social source | Runtime |
 | --- | --- | --- | --- |
-| url | 0 / 1,030 | 38 / 29,747 | 0 / 26,698 |
-| raw text | 14 / 1,030 | 4 / 29,747 | Not shipped by design |
-| summary | 0 / 1,030 | 29,746 / 29,747 | 0 / 26,698 |
-| tags | 319 / 1,030 | 9,530 / 29,747 | 8,519 / 26,698 |
-| concepts | 84 / 1,030 | 29,298 / 29,747 | 25,339 / 26,698 |
-| quote | 34 / 1,030 | 4,407 / 29,747 | 0 / 26,698 |
-| related ids | 318 / 1,030 | 21,675 / 29,747 | 25,821 / 26,698 |
+| url | 0 / 1,036 | 38 / 29,862 | 0 / 26,816 |
+| raw text | 14 / 1,036 | 4 / 29,862 | Not shipped by design |
+| summary | 0 / 1,036 | 29,861 / 29,862 | 0 / 26,816 |
+| tags | 319 / 1,036 | 9,645 / 29,862 | 8,631 / 26,816 |
+| concepts | 84 / 1,036 | 29,413 / 29,862 | 25,451 / 26,816 |
+| quote | 40 / 1,036 | 4,407 / 29,862 | 0 / 26,816 |
+| related ids | 323 / 1,036 | 21,790 / 29,862 | 25,939 / 26,816 |
 
 ## Graph coverage
 
@@ -51,8 +51,8 @@ Entities: 7,324 source, 7,324 runtime. Relationship assertions: 11,153.
 
 | Group | Source rows | Source rows with assertions | Assertions | Published rows | Published rows with assertions |
 | --- | --- | --- | --- | --- | --- |
-| Curated | 1,030 | 875 | 11,151 | 1,030 | 875 |
-| Social | 29,747 | 2 | 2 | 25,660 | 2 |
+| Curated | 1,036 | 875 | 11,151 | 1,036 | 875 |
+| Social | 29,862 | 2 | 2 | 25,771 | 2 |
 
 ### Reference findings
 
@@ -69,9 +69,9 @@ Entities: 7,324 source, 7,324 runtime. Relationship assertions: 11,153.
 
 ## URL and preservation inventory
 
-Source: 30,729 unique external URLs across 120 hosts; 38 rows have no URL.
+Source: 30,850 unique external URLs across 122 hosts; 38 rows have no URL.
 
-Runtime: 26,697 unique external URLs across 120 hosts; 0 rows have no URL.
+Runtime: 26,815 unique external URLs across 122 hosts; 0 rows have no URL.
 
 Preservation link evidence appears in 6 source records. Another 91 records contain archive.org candidates only in prose fields.
 
@@ -81,13 +81,13 @@ Baseline data commit: `5d3d5351346a9712de4f54d95e69ba0f410c6efd`.
 
 | Metric | 2026-07-22 | Current | Delta |
 | --- | --- | --- | --- |
-| curated source | 1,029 | 1,030 | +1 |
-| social source | 29,747 | 29,747 | 0 |
-| published curated source | 950 | 1,030 | +80 |
-| published social source | 25,657 | 25,660 | +3 |
-| generated thread containers | 8 | 7 | -1 |
+| curated source | 1,029 | 1,036 | +7 |
+| social source | 29,747 | 29,862 | +115 |
+| published curated source | 950 | 1,036 | +86 |
+| published social source | 25,657 | 25,771 | +114 |
+| generated thread containers | 8 | 8 | 0 |
 | injected records | 1 | 1 | 0 |
-| published total | 26,616 | 26,698 | +82 |
+| published total | 26,616 | 26,816 | +200 |
 | entities | 8,150 | 7,324 | -826 |
 | relationships | 12,556 | 11,153 | -1,403 |
 

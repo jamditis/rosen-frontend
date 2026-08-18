@@ -5,9 +5,19 @@
     <link>https://pressthink.org/j/rosen-archive</link>
     <description>Archive records in the &quot;Journalism Education&quot; category</description>
     <language>en-us</language>
-    <lastBuildDate>Sun, 02 Aug 2026 09:21:32 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 16 Aug 2026 01:11:00 GMT</lastBuildDate>
     <atom:link href="https://pressthink.org/j/rosen-archive/data/feeds/categories/journalism-education.xml" rel="self" type="application/rss+xml"/>
     <generator>Jay Rosen's Internet Archive RSS Generator</generator>
+  <item>
+    <title>Jay Rosen’s Internet Archive: an Introduction.</title>
+    <link>https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/</link>
+    <guid isPermaLink="true">https://pressthink.org/2026/07/jay-rosens-internet-archive-an-introduction/</guid>
+    <pubDate>Sun, 05 Jul 2026 00:00:00 GMT</pubDate>
+    <description>Jay Rosen and Joe Amditis explain why they built a common, searchable home for Rosen’s online work. The introduction defines the archive as a link-based index, describes its scope and curation, and states its preservation limits.</description>
+    <category>Technology &amp; Digital Media</category>
+    <category>Audience &amp; Public Engagement</category>
+    <category>Journalism Education</category>
+  </item>
   <item>
     <title>I have been there...</title>
     <link>https://bsky.app/profile/jayrosen.bsky.social/post/3mog5545nsk2d</link>
@@ -54,6 +64,16 @@
     <description>A Twitter/X post by Jay Rosen from 2025-10-09. Topics: Journalism Education, Technology &amp; Digital Media.</description>
     <category>Journalism Education</category>
     <category>Technology &amp; Digital Media</category>
+  </item>
+  <item>
+    <title>About Jay Rosen’s 1986 PhD dissertation, “The Impossible Press”</title>
+    <link>https://pressthink.org/2025/10/jay-rosen-1986-dissertation-launch-blog-post/</link>
+    <guid isPermaLink="true">https://pressthink.org/2025/10/jay-rosen-1986-dissertation-launch-blog-post/</guid>
+    <pubDate>Wed, 08 Oct 2025 00:00:00 GMT</pubDate>
+    <description>Jay Rosen recounts his Media Ecology studies and introduces the online release of his 1986 dissertation, The Impossible Press.</description>
+    <category>Journalism Education</category>
+    <category>Journalism Theory &amp; Practice</category>
+    <category>Press &amp; Media Criticism</category>
   </item>
   <item>
     <title>From my new post</title>
@@ -445,24 +465,6 @@
     <description>A Bluesky post by Jay Rosen from 2024-11-13. Topics: Press &amp; Media Criticism, Journalism Education.</description>
     <category>Press &amp; Media Criticism</category>
     <category>Journalism Education</category>
-  </item>
-  <item>
-    <title>Okay, thanks</title>
-    <link>https://bsky.app/profile/jayrosen.bsky.social/post/3lah7o3mmzx2j</link>
-    <guid isPermaLink="true">https://bsky.app/profile/jayrosen.bsky.social/post/3lah7o3mmzx2j</guid>
-    <pubDate>Fri, 08 Nov 2024 00:00:00 GMT</pubDate>
-    <description>A Bluesky post by Jay Rosen from 2024-11-08. Topics: Journalism Education, Journalism Theory &amp; Practice.</description>
-    <category>Journalism Education</category>
-    <category>Journalism Theory &amp; Practice</category>
-  </item>
-  <item>
-    <title>Starting Monday I won&apos;t be continuing at this site</title>
-    <link>https://x.com/jayrosen_nyu/status/1855023143896985736</link>
-    <guid isPermaLink="true">https://x.com/jayrosen_nyu/status/1855023143896985736</guid>
-    <pubDate>Fri, 08 Nov 2024 00:00:00 GMT</pubDate>
-    <description>A Twitter/X post by Jay Rosen from 2024-11-08. Topics: Journalism Education, Technology &amp; Digital Media.</description>
-    <category>Journalism Education</category>
-    <category>Technology &amp; Digital Media</category>
   </item>
   </channel>
 </rss>

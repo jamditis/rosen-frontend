@@ -23,6 +23,7 @@ import { unescapeRow } from './lib/csv-unescape.js';
 import { buildSearchIndex, socialSearchIndexOptions } from './lib/search-index-builder.js';
 import { loadAuthoredExcerpts, resolveSummary } from './lib/summary-resolver.js';
 import { writeRelationshipAdjacencyArtifacts } from './export-relationship-adjacency.js';
+import { assignStableThreadIds } from './lib/thread-id-allocator.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -212,6 +213,24 @@ async function main() {
   // required-files check below: a missing file fails open to no overrides.
   const authoredExcerptsPath = path.join(__dirname, 'authored-excerpts.csv');
   const outputPath = path.join(__dirname, 'archive-data.json');
+
+  // The committed runtime artifact is the registry for generated THREAD IDs.
+  // Read and validate it before any generated file can be overwritten.
+  if (!fs.existsSync(outputPath)) {
+    throw new Error(`prior archive runtime artifact not found at ${outputPath}`);
+  }
+  let priorArchiveData;
+  try {
+    priorArchiveData = JSON.parse(fs.readFileSync(outputPath, 'utf-8'));
+  } catch (error) {
+    throw new Error(`prior archive runtime artifact is invalid: ${error.message}`, { cause: error });
+  }
+  if (!Array.isArray(priorArchiveData.records)) {
+    throw new Error('prior archive runtime artifact has no records array');
+  }
+  const priorRuntimeThreadRecords = priorArchiveData.records.filter(record => (
+    typeof record?.id === 'string' && record.id.startsWith('THREAD-')
+  ));
 
   // Check that files exist
   const filesToCheck = [
@@ -417,7 +436,9 @@ async function main() {
       if (size >= 3) threadRoots.push({ rkey, row, size });
     }
   }
-  threadRoots.sort((a, b) => b.size - a.size);
+  threadRoots.sort((a, b) => (
+    b.size - a.size || (a.rkey < b.rkey ? -1 : a.rkey > b.rkey ? 1 : 0)
+  ));
 
   // Step 5: Collect post IDs covered by existing THREAD records
   const existingThreadRecords = mainRecords.filter(r => r.id.startsWith('THREAD-'));
@@ -430,26 +451,36 @@ async function main() {
 
   // Step 6: Generate new THREAD records and collect all thread member IDs
   const threadMemberIds = new Set([...existingThreadPostIds]);
-  let nextThreadNum = existingThreadRecords.length + 1;
   const generatedThreadRecords = [];
 
-  for (const root of threadRoots) {
+  const threadCandidates = threadRoots.map(root => {
     const posts = collectChainPosts(root.rkey);
-    const postIds = posts.map(p => (p.row.id || p.row.ID));
+    const postIds = posts.map(post => post.row.id || post.row.ID);
+    return {
+      posts,
+      postIds,
+      alreadyCovered: postIds.some(id => existingThreadPostIds.has(id)),
+    };
+  });
+  const rootsToGenerate = threadCandidates
+    .filter(candidate => !candidate.alreadyCovered)
+    .map(candidate => candidate.posts[0].row.id || candidate.posts[0].row.ID);
+  const threadIdByRoot = assignStableThreadIds({
+    priorRuntimeRecords: priorRuntimeThreadRecords,
+    sourceThreadRecords: existingThreadRecords,
+    detectedRootIds: rootsToGenerate,
+  });
 
-    // Check if already covered by an existing THREAD record
-    const alreadyCovered = postIds.some(id => existingThreadPostIds.has(id));
-
+  for (const candidate of threadCandidates) {
+    const { posts, postIds, alreadyCovered } = candidate;
     // Mark all posts as thread members regardless
     postIds.forEach(id => threadMemberIds.add(id));
 
     if (alreadyCovered) continue;
 
-    // Generate a new THREAD record
-    const threadId = `THREAD-${String(nextThreadNum).padStart(5, '0')}`;
-    nextThreadNum++;
-
     const firstRow = posts[0].row;
+    const rootId = firstRow.id || firstRow.ID;
+    const threadId = threadIdByRoot.get(rootId);
     let titleText = (firstRow.raw_text || firstRow.excerpt || '').trim();
     titleText = titleText.replace(/https?:\/\/\S+/g, '').replace(/^(@\S+\s*)+/, '').trim();
     const sentEnd = titleText.search(/[.!?]\s/);
