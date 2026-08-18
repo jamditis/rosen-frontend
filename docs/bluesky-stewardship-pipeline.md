@@ -190,7 +190,7 @@ discovered
 
 discovered -> admitted
 context_needed -> admitted
-discovered | needs_review -> rejected_noise (terminal)
+discovered | context_needed | needs_review -> rejected_noise (terminal)
 discovered | context_needed -> policy_blocked (terminal)
 review_required -> revision_requested -> processed
 review_required -> rejected (terminal)

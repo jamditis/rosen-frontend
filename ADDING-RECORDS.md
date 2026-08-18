@@ -166,12 +166,13 @@ After editing, regenerate the JSON (Step 4) and upload (Step 5) the same way. Th
 After adding records and confirming the site looks right, save your work to the repository:
 
 ```bash
-git add data/archive_records-public.csv data/authored-excerpts.csv data/archive-core.json data/archive-data.json data/archive-details.json
+git add -u -- .
+git diff --cached --name-only
 git commit -m "Add [number] new records through [date]"
 git push
 ```
 
-`data/authored-excerpts.csv` is in that list on purpose: it is the source of your authored excerpts. If you skip it, the JSON still carries the override now, but the next regeneration from a clean checkout has no excerpt to apply and your text reverts to the auto-generated summary.
+Run this from a clean checkout so `git add -u -- .` stages only this release's tracked changes. Before committing, confirm the staged list includes the source CSVs you edited, every generated JSON file, `index.html`, `version.json`, `frontend/sw.js`, and every frontend or standalone-page file changed by the version bump. `data/authored-excerpts.csv` must be present when you changed an authored excerpt; otherwise the next regeneration from a clean checkout loses that override.
 
 This isn't required for the site to work, but it keeps a history of changes and makes it easy to undo mistakes.
 
