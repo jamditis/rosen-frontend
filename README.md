@@ -97,6 +97,14 @@ node data/export-archive-data.js
 
 Adding a record by hand is a three-step process (edit a CSV, run one command, upload the output) — the step-by-step guide, written for non-technical curators, is [`ADDING-RECORDS.md`](ADDING-RECORDS.md).
 
+## Continuous stewardship
+
+New public work now appears mainly on Bluesky. The planned stewardship flow finds Jay Rosen's public posts, keeps meaningful public discourse as record candidates, preserves needed thread context, and sends approved work through the existing archive review and release path.
+
+Read the plain-language system map: [Bluesky-first archive stewardship pipeline](docs/bluesky-stewardship-pipeline.md).
+
+Source discovery does not publish records. The repository data, tests, and deployment workflow remain the publication gate.
+
 ## Running tests
 
 ```bash

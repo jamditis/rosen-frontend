@@ -103,6 +103,14 @@ node data/export-archive-data.js
 
 This takes about 30–60 seconds and produces updated JSON files in the `data/` folder. The script prints progress as it goes: starting the export, reading each CSV file (with a row count for each), processing records, building entities and relationships, and finally writing the four JSON output files. If the run finishes without errors, the updated JSON files are ready to upload.
 
+Next, choose the new release version and stamp every cache and import marker together:
+
+```bash
+npm run bump-version -- X.X.X
+```
+
+This updates `index.html`, `version.json`, the relevant `?v=` import strings, and `frontend/sw.js` `CACHE_VERSION`. Keep all of those changes in the same release. Returning visitors can otherwise receive cached archive JSON from the previous release.
+
 ---
 
 ## Step 5: Upload to the live site
@@ -116,15 +124,15 @@ with it.
 - `data/archive-data.json`
 - `data/archive-details.json`
 
-The site will show the new records immediately — no cache clearing needed.
+Publish the complete versioned bundle in the order documented in [`DEPLOYMENT.md`](DEPLOYMENT.md), with root `index.html`, `frontend/sw.js`, root `sw.js`, and `version.json` last. The coordinated version bump invalidates old browser caches, so visitors do not need to clear them manually.
 
 ---
 
-## Adding social posts (Bluesky, Twitter)
+## Adding social posts (Bluesky, Twitter, Mastodon)
 
-If you want to add posts from Jay's Bluesky account after retirement, use `data/social_posts.csv` instead. The columns are similar, but the `id` field uses a `BSKY-` prefix — again, go one past the current max in the file (as of 2026-07-23 the max is `BSKY-03172`, so the next is `BSKY-03173`). The `content_type` should be `Social Media Post`.
+This is the manual repair and backfill path. Use `data/social_posts.csv`. Select the ID prefix from the post's platform: `BSKY-` for Bluesky, `TWTR-` for Twitter, and `MAST-` for Mastodon. Find the highest ID with that prefix and use the next zero-padded number. For example, `BSKY-03172` is followed by `BSKY-03173`. The `content_type` should be `Social Media Post`.
 
-That file doesn't need to be updated as often — articles and essays are more important for the archive.
+New work now appears mainly on Bluesky. The planned continuous workflow is Bluesky-first. It treats original posts and meaningful public conversation as candidates. It keeps short acknowledgements as thread context, not standalone records. The complete system map is maintained in the public repository `docs/` directory.
 
 ---
 
@@ -158,12 +166,13 @@ After editing, regenerate the JSON (Step 4) and upload (Step 5) the same way. Th
 After adding records and confirming the site looks right, save your work to the repository:
 
 ```bash
-git add data/archive_records-public.csv data/authored-excerpts.csv data/archive-core.json data/archive-data.json data/archive-details.json
+git add -u -- .
+git diff --cached --name-only
 git commit -m "Add [number] new records through [date]"
 git push
 ```
 
-`data/authored-excerpts.csv` is in that list on purpose: it is the source of your authored excerpts. If you skip it, the JSON still carries the override now, but the next regeneration from a clean checkout has no excerpt to apply and your text reverts to the auto-generated summary.
+Run this from a clean checkout so `git add -u -- .` stages only this release's tracked changes. Before committing, confirm the staged list includes the source CSVs you edited, every generated JSON file, `index.html`, `version.json`, `frontend/sw.js`, and every frontend or standalone-page file changed by the version bump. `data/authored-excerpts.csv` must be present when you changed an authored excerpt; otherwise the next regeneration from a clean checkout loses that override.
 
 This isn't required for the site to work, but it keeps a history of changes and makes it easy to undo mistakes.
 
