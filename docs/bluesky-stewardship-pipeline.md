@@ -134,9 +134,11 @@ flowchart TD
 
 Entity extraction produces proposals, not truth. The system stores proposed records, entities, relationships, aliases, and evidence outside the canonical CSV files. It matches a proposed entity to a known canonical entity only when its name, type, aliases, and evidence support the match. A curator must accept that evidence before the system calls the canonical CSV writer, assigns a new canonical ID, or reuses an existing one.
 
-The [current submission processor](../backend/scripts/process_submission.py) is not this staging boundary. Its [runtime configuration](../backend/submission_runtime/config.py) targets `data/archive_records-public.csv`, the Bluesky processor does not supply a `BSKY-*` source ID, it skips entity extraction for text shorter than 500 characters, and its `needs_review` flag does not stop tests and deployment. An accepted Bluesky package therefore needs a dedicated social release adapter. That adapter must follow the [social record contract](../ADDING-RECORDS.md), allocate or reuse a `BSKY-*` ID only after acceptance, append the approved row to [`data/social_posts.csv`](../data/social_posts.csv), write approved entity-to-entity relationship rows in the current schema, run [`data/export-archive-data.js`](../data/export-archive-data.js), verify that the generated JSON contains the accepted record and relationships, and only then invoke the tests and publication workflow. Before acceptance, the social path must either aggregate bounded thread context or use a reviewed short-text extraction rule; it must not hand the package unchanged to the current article-record processor.
+The [current submission processor](../backend/scripts/process_submission.py) is not this staging boundary. Its [runtime configuration](../backend/submission_runtime/config.py) targets `data/archive_records-public.csv`, the Bluesky processor does not supply a `BSKY-*` source ID, it skips entity extraction for text shorter than 500 characters, and its `needs_review` flag does not stop tests and deployment. An accepted Bluesky package therefore needs a dedicated social release adapter. That adapter must follow the [social record contract](../ADDING-RECORDS.md), allocate or reuse a `BSKY-*` ID only after acceptance, stage successor copies of every touched canonical file, run [`data/export-archive-data.js`](../data/export-archive-data.js) against the complete staged set, verify that the generated JSON contains the accepted record and relationships, and only then commit and publish the package. Before acceptance, the social path must either aggregate bounded thread context or use a reviewed short-text extraction rule; it must not hand the package unchanged to the current article-record processor.
 
-An accepted standalone reply must also have a curator-approved, non-generic title and a rights-cleared context summary in [`data/authored-excerpts.csv`](../data/authored-excerpts.csv). The adapter verifies that the reply survives the exporter's short-generic-reply filter and that the public JSON includes the context summary. If the parent cannot be summarized under the rights rules, the reply remains only in its preservation package or ships inside an approved public thread; it does not publish as a context-free standalone record.
+An accepted standalone reply or quote post must also have a curator-approved, non-generic title and a rights-cleared summary of the parent or quoted context in [`data/authored-excerpts.csv`](../data/authored-excerpts.csv). The adapter verifies that the item survives the exporter's short-generic-reply filter where applicable and that the public JSON includes the context summary. If required parent or quoted material cannot be summarized under the rights rules, the item remains only in its preservation package or ships inside an approved public thread; it does not publish as a context-free standalone record.
+
+Before canonical activation, the adapter records an idempotent package receipt with the package ID, accepted IDs, touched paths, and before-and-after hashes. A crash or filesystem failure enters `canonical_recovery`, blocks later packages, and uses that receipt to finish the complete staged file set or restore every prior file before the package can return to `accepted`. Regeneration, tests, Git commit, and publication do not start from a partial canonical set.
 
 The current FTPS scripts activate files one at a time, so a mid-upload failure can expose a mixed release. Automated publication for this pipeline needs a bundle-level activation step, such as a versioned release directory and one final pointer switch. Until that exists, a partial upload enters `release_recovery`, blocks later releases, and uses the previous and intended bundle manifests to finish the upload or restore the last known-good bundle before the candidate becomes `published`.
 
@@ -163,6 +165,7 @@ The system uses a safe waterfall. It does not try to defeat source restrictions.
 | Entity alias or relationship is uncertain | Keep the proposal and evidence separate. | Use approved aliases and a reviewer. | Do not merge the entity automatically. |
 | `401` or an unexpected authentication challenge on a nominally public endpoint | Pause the adapter in an operator-attention state. | Check the endpoint, credentials, and proxy configuration. | Retry after the operational fault is corrected; do not record `policy_blocked` without a confirmed access restriction. |
 | Confirmed `403`, login wall, CAPTCHA, paywall, or robots restriction | Record `policy_blocked`. | Use an official public API or source-provided export only. | Do not bypass the restriction. |
+| Canonical package write fails before commit | Enter `canonical_recovery` and stop later packages. | Use the package receipt and file hashes to finish or restore the full canonical set. | Do not regenerate, test, commit, or publish a partial package. |
 | Test or Git failure before upload | Stop before publication. | Retry only the failed safe stage. | Keep the item in a truthful non-live state. |
 | FTPS failure before bundle activation | Keep the prior bundle active. | Retry and verify the staged bundle. | Do not activate an incomplete release. |
 | FTPS failure after any live file changes | Enter `release_recovery` and stop later releases. | Reconcile the intended and previous bundle manifests. | Finish or restore one complete bundle before marking the item published. |
@@ -184,10 +187,13 @@ discovered
   -> accepted
   -> published
 
+discovered -> admitted
+context_needed -> admitted
 discovered | needs_review -> rejected_noise (terminal)
 discovered | context_needed -> policy_blocked (terminal)
 review_required -> revision_requested -> processed
 review_required -> rejected (terminal)
+accepted -> canonical_recovery -> accepted
 accepted -> release_recovery -> accepted
 ```
 
