@@ -38,7 +38,7 @@ The Workers are traffic controllers. They do not own the canonical CSV files, so
 | Find activity | Discovery Worker | Read approved public source feeds and record new identifiers. | Worker pilot exists. It currently needs a Bluesky-first source adapter. |
 | Keep a small ledger | D1 | Store source, URI, content ID, times, hashes, decision state, and the exact Jay-authored source record observed at discovery. | Pilot exists. It is not canonical archive data. |
 | Decide and dispatch | Stewardship control Worker | Send candidates that need content or conversation evidence to the office runner, then apply safe admission rules to the returned evidence. | Planned. |
-| Read text and context | Office archive runner | Use public AT Protocol data, then get the complete available thread context. | Existing social tools provide a starting point. |
+| Read text and context | Office archive runner | Use public AT Protocol data, then get deterministic bounded thread context. | Existing social tools provide a starting point. |
 | Preserve evidence | Office archive runner plus R2 | Store a time-stamped source payload, manifest, and rendered snapshot. | Planned. |
 | Create an archive record | Staged archive processor | Apply taxonomy and source rules before stable IDs or canonical writes. | Planned. It requires a staged-entry refactor around the existing processor. |
 | Extract entities | Social-record processing extension | Produce schema-checked entity and relationship proposals from a post or bounded thread context. | Planned. The existing processor skips text shorter than 500 characters. |
@@ -58,9 +58,9 @@ The Worker records compact discovery data:
 - Whether the item is an original post, reply, quote post, repost, or thread entry.
 - Parent and root identifiers where the source provides them.
 - A content fingerprint and the discovery run identifier.
-- The exact public AT Protocol record for Jay's post as it appeared at discovery.
+- The exact public AT Protocol record for Jay's post as it appeared at discovery, including attached-media references and metadata but not the referenced blob bytes.
 
-The observed source record is immutable evidence. It protects against an edit or deletion between discovery and the office-runner handoff. The Worker does not store the full conversation or create archive records. It never publishes an item.
+The observed source record is immutable evidence of the text, metadata, and blob references visible at discovery. It protects those fields against an edit or deletion between discovery and the office-runner handoff, but it does not guarantee recovery of attached media bytes. The office runner fetches permitted public blobs when it builds the preservation package and records any media already unavailable at capture time. The Worker does not store the full conversation or create archive records. It never publishes an item.
 
 ## What becomes an archive candidate
 
@@ -70,15 +70,16 @@ Every Jay-authored original post, reply, and quote post can enter the candidate 
 flowchart TD
     A[Jay-authored Bluesky item] --> B{Post type}
     B -->|Original post| C[Candidate for a standalone record]
-    B -->|Quote post or substantive reply| D[Fetch the public conversation context]
-    B -->|Repost without Jay commentary| E[Keep as source activity, not a record]
+    B -->|Quote post or any reply| D[Fetch the public conversation context]
+    B -->|Repost without Jay commentary| E[Retain as terminal source activity]
     C --> F{Meaningful public commentary?}
     D --> F
-    F -->|Yes| G[Admit as record or thread candidate]
-    F -->|Unclear| H[Needs curator review]
+    F -->|Yes| G[Admitted record or thread candidate]
+    F -->|Unclear| H{Curator admission decision}
     F -->|No: acknowledgement or noise| I[Context only or reject]
+    H -->|Admit| G
+    H -->|Reject| I
     G --> J[Preserve the current thread snapshot]
-    H --> J
 ```
 
 A meaningful item usually makes an argument, gives evidence, asks a serious question, adds analysis, responds to another thinker, or contributes to a public discussion about journalism, media, democracy, or related work.
@@ -105,6 +106,8 @@ flowchart LR
 ```
 
 The manifest must conform to [`preservation/preservation-manifest.schema.json`](../preservation/preservation-manifest.schema.json) and pass [`preservation/validate-preservation-manifests.mjs`](../preservation/validate-preservation-manifests.mjs). It represents the selected post, root post, retrieved public posts, and rendered capture with the schema's versioned object, event, artifact, actor, review, storage-copy, and append-only supersession contracts. Capture time, public post identifiers, visible media references, request method, content hashes, and unavailable, deleted, blocked, or size-limited replies belong inside those existing contracts. New vocabulary requires a versioned schema migration instead of an ad hoc thread manifest.
+
+Thread capture is deterministic and bounded. The initial policy always prioritizes the selected post, root, and available parent or quoted-post chain, up to 64 chain entries. It then traverses public replies breadth-first, ordering each depth by creation time and URI, and stops at the first of depth 4, 500 total retrieved posts, 5 MiB of decoded AT Protocol JSON, or 20 source pages where an endpoint paginates. The manifest records the policy version, requested and returned counts, limits reached, last cursor when available, and omitted count when the source reports one. A truncated capture remains reviewable evidence; it is never described as the complete conversation.
 
 SingleFile is a proposed rendered-snapshot tool. It belongs in the controlled office runner, not in the edge Worker. It can save the visible page structure, CSS, and available image references at the capture time. The preservation package must also include a structured source payload and manifest. A rendered HTML file alone is not enough for trustworthy archival replay.
 
@@ -139,7 +142,7 @@ The [current submission processor](../backend/scripts/process_submission.py) is 
 
 An accepted standalone reply or quote post must also have a curator-approved, non-generic title and a rights-cleared summary of the parent or quoted context in [`data/authored-excerpts.csv`](../data/authored-excerpts.csv). The adapter verifies that the item survives the exporter's short-generic-reply filter where applicable and that the public JSON includes the context summary. If required parent or quoted material cannot be summarized under the rights rules, the item remains only in its preservation package or ships inside an approved public thread; it does not publish as a context-free standalone record.
 
-Before canonical activation, the adapter records an idempotent package receipt with the package ID, accepted IDs, touched paths, and before-and-after hashes. A crash or filesystem failure enters `canonical_recovery`, blocks later packages, and uses that receipt to finish the complete staged file set or restore every prior file before the package can return to `accepted`. Regeneration, tests, Git commit, and publication do not start from a partial canonical set.
+Before it reads canonical files, allocates IDs, or stages successors, the adapter obtains an exclusive canonical-writer lease with a fencing token. The package receipt records that token, the package ID, accepted IDs, touched paths, and expected before-and-after hashes. Activation atomically verifies the fencing token and every expected before-hash; a mismatch aborts the attempt, discards its staged successors, and restages from the new canonical head. A crash or filesystem failure enters `canonical_recovery`, keeps later writers fenced out, and uses the receipt to finish the complete staged file set or restore every prior file before the package can return to `accepted` and release the lease. Regeneration, tests, Git commit, and publication do not start from a partial or concurrently superseded canonical set.
 
 The current FTPS scripts activate files one at a time, so a mid-upload failure can expose a mixed release. Automated publication for this pipeline needs a bundle-level activation step, such as a versioned release directory and one final pointer switch. Until that exists, a partial upload enters `release_recovery`, blocks later releases, and uses the previous and intended bundle manifests to finish the upload or restore the last known-good bundle before the candidate becomes `published`.
 
@@ -189,6 +192,7 @@ discovered
   -> published
 
 discovered -> admitted
+discovered | context_needed -> retained_source (terminal)
 context_needed -> admitted
 discovered | context_needed | needs_review -> rejected_noise (terminal)
 discovered | context_needed -> policy_blocked (terminal)
