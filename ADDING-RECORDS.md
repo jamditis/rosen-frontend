@@ -103,6 +103,14 @@ node data/export-archive-data.js
 
 This takes about 30–60 seconds and produces updated JSON files in the `data/` folder. The script prints progress as it goes: starting the export, reading each CSV file (with a row count for each), processing records, building entities and relationships, and finally writing the four JSON output files. If the run finishes without errors, the updated JSON files are ready to upload.
 
+Next, choose the new release version and stamp every cache and import marker together:
+
+```bash
+npm run bump-version -- X.X.X
+```
+
+This updates `index.html`, `version.json`, the relevant `?v=` import strings, and `frontend/sw.js` `CACHE_VERSION`. Keep all of those changes in the same release. Returning visitors can otherwise receive cached archive JSON from the previous release.
+
 ---
 
 ## Step 5: Upload to the live site
@@ -116,7 +124,7 @@ with it.
 - `data/archive-data.json`
 - `data/archive-details.json`
 
-The site will show the new records immediately — no cache clearing needed.
+Publish the complete versioned bundle in the order documented in [`DEPLOYMENT.md`](DEPLOYMENT.md), with root `index.html`, `frontend/sw.js`, root `sw.js`, and `version.json` last. The coordinated version bump invalidates old browser caches, so visitors do not need to clear them manually.
 
 ---
 
