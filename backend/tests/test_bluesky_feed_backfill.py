@@ -69,6 +69,7 @@ def test_fetch_page_requests_replies_in_threads_started_by_other_people(monkeypa
 
     backfill.fetch_page("next-page")
 
+    assert captured["params"]["actor"] == backfill.ACTOR_DID
     assert captured["params"]["filter"] == "posts_with_replies"
     assert captured["params"]["cursor"] == "next-page"
 

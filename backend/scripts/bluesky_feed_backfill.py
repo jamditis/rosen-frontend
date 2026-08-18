@@ -94,7 +94,7 @@ PERMISSIONS = "Public Post"
 
 def fetch_page(cursor: str | None) -> dict:
     params = {
-        "actor": ACTOR,
+        "actor": ACTOR_DID,
         "filter": "posts_with_replies",
         "limit": PAGE_LIMIT,
     }
