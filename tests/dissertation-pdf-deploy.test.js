@@ -86,8 +86,13 @@ describe('dissertation reader PDF deployment (issue #609)', () => {
       /- name: Checkout main[\s\S]*?(?=\n\s+- name:|$)/,
     )?.[0];
     assert.ok(checkout, 'deploy workflow must have a named main checkout step');
-    assert.match(checkout, /^\s*lfs:\s*true\s*$/m,
-      'deploy checkout must materialize LFS files before collect_local_files runs');
+    const deployIndex = workflow.indexOf('- name: Deploy');
+    const lfsPullIndex = workflow.search(/^\s+git lfs pull\s*$/m);
+    assert.ok(lfsPullIndex !== -1, 'deploy must materialize current-tree LFS objects');
+    assert.ok(
+      deployIndex !== -1 && lfsPullIndex < deployIndex,
+      'current-tree LFS objects must exist before collect_local_files runs',
+    );
   });
 
   it('includes the reader PDF in the full-site upload inventory', () => {
