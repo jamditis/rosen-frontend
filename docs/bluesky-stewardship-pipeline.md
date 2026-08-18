@@ -172,6 +172,7 @@ The system uses a safe waterfall. It does not try to defeat source restrictions.
 | Entity alias or relationship is uncertain | Keep the proposal and evidence separate. | Use approved aliases and a reviewer. | Do not merge the entity automatically. |
 | `401` or an unexpected authentication challenge on a nominally public endpoint | Pause the adapter in an operator-attention state. | Check the endpoint, credentials, and proxy configuration. | Retry after the operational fault is corrected; do not record `policy_blocked` without a confirmed access restriction. |
 | Confirmed `403`, login wall, CAPTCHA, paywall, or robots restriction | Record `policy_blocked`. | Use an official public API or source-provided export only. | Do not bypass the restriction. |
+| Confirmed access restriction after admission | Build the preservation package from the immutable discovery record and mark unavailable blobs or snapshots. | If the restriction applies to the source item itself, move `admitted` to `policy_blocked`. | Do not bypass the restriction or fetch the live source again after `preserved`. |
 | Canonical package write fails before commit | Enter `canonical_recovery` and stop later packages. | Use the package receipt and file hashes to finish or restore the full canonical set. | Do not regenerate, test, commit, or publish a partial package. |
 | Test or Git failure before upload | Stop before publication. | Retry only the failed safe stage. | Keep the item in a truthful non-live state. |
 | FTPS failure before bundle activation | Keep the prior bundle active. | Retry and verify the staged bundle. | Do not activate an incomplete release. |
@@ -202,14 +203,14 @@ discovered -> admitted
 discovered | context_needed | needs_review -> retained_source (terminal)
 context_needed -> admitted
 discovered | context_needed | needs_review -> rejected_noise (terminal)
-discovered | context_needed -> policy_blocked (terminal)
+discovered | context_needed | admitted -> policy_blocked (terminal)
 review_required | accepted -> revision_requested -> processed
 review_required -> rejected (terminal)
 release_validated -> canonical_recovery -> activated | accepted
 activated | publishing -> release_recovery -> published | activated
 ```
 
-The admission decision uses the evidence already returned by the permitted discovery and context fetch. Processing after admission reads the immutable preserved package instead of fetching the source again, so an access-policy failure is resolved before the candidate enters the admitted path. A revision changes only staged proposals, records the curator's reason, and loops through validation and `review_required` again; it never mutates canonical rows in place.
+The admission decision uses the evidence already returned by discovery or by the permitted context fetch. An original post can move from `discovered` to `admitted` without a later context fetch. Preservation after admission still fetches permitted public blobs and a rendered snapshot. If that later fetch confirms an access restriction on the source item, the candidate moves from `admitted` to `policy_blocked`. If the restriction only blocks later media or snapshot retrieval, record those artifacts as unavailable and continue to `preserved` with the immutable discovery record. Processing after `preserved` reads that package instead of fetching the source again. A revision changes only staged proposals, records the curator's reason, and loops through validation and `review_required` again; it never mutates canonical rows in place.
 
 Each state change needs a time, rule or operator, reason, and link to the evidence package. A Worker outage can delay discovery. It cannot corrupt the canonical archive because the canonical data remains in the existing repository workflow.
 
