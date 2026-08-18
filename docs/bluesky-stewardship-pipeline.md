@@ -36,14 +36,14 @@ The Workers are traffic controllers. They do not own the canonical CSV files, so
 | Stage | System | Job | Current position |
 |---|---|---|---|
 | Find activity | Discovery Worker | Read approved public source feeds and record new identifiers. | Worker pilot exists. It currently needs a Bluesky-first source adapter. |
-| Keep a small ledger | D1 | Store source, URI, content ID, times, hashes, and decision state. | Pilot exists. It is not canonical archive data. |
+| Keep a small ledger | D1 | Store source, URI, content ID, times, hashes, decision state, and the exact Jay-authored source record observed at discovery. | Pilot exists. It is not canonical archive data. |
 | Decide and dispatch | Stewardship control Worker | Send candidates that need content or conversation evidence to the office runner, then apply safe admission rules to the returned evidence. | Planned. |
 | Read text and context | Office archive runner | Use public AT Protocol data, then get the complete available thread context. | Existing social tools provide a starting point. |
 | Preserve evidence | Office archive runner plus R2 | Store a time-stamped source payload, manifest, and rendered snapshot. | Planned. |
 | Create an archive record | Staged archive processor | Apply taxonomy and source rules before stable IDs or canonical writes. | Planned. It requires a staged-entry refactor around the existing processor. |
 | Extract entities | Social-record processing extension | Produce schema-checked entity and relationship proposals from a post or bounded thread context. | Planned. The existing processor skips text shorter than 500 characters. |
 | Publish graph data | Offline exporter | Build approved public relationship shards. | In progress in issue #807. |
-| Release | Existing GitHub and FTPS path | Run tests, preserve Git history, and publish only after success. | Existing. |
+| Release | Existing GitHub and SFTP/FTPS path | Run tests, preserve Git history, and publish only after success. | File-atomic publication exists; bundle activation and recovery are planned. |
 
 ## The source policy
 
@@ -51,15 +51,16 @@ The discovery Worker should resolve Jay's account to a stable Bluesky DID. A han
 
 It should use public AT Protocol endpoints. It should not use a browser session, copied cookies, or an arbitrary web-page scraper.
 
-The Worker records only compact discovery data:
+The Worker records compact discovery data:
 
 - Jay's DID and the post URI.
 - The content ID and publication time.
 - Whether the item is an original post, reply, quote post, repost, or thread entry.
 - Parent and root identifiers where the source provides them.
 - A content fingerprint and the discovery run identifier.
+- The exact public AT Protocol record for Jay's post as it appeared at discovery.
 
-The Worker does not store the full conversation or create archive records. It never publishes an item.
+The observed source record is immutable evidence. It protects against an edit or deletion between discovery and the office-runner handoff. The Worker does not store the full conversation or create archive records. It never publishes an item.
 
 ## What becomes an archive candidate
 
@@ -126,13 +127,16 @@ flowchart TD
     H -->|Revise| J[Return staged proposals for correction]
     J --> C
     H -->|Reject| M[Reject without changing canonical data]
-    I --> K[Build static relationship shards]
-    K --> L[Run tests and publish]
+    I --> K[Regenerate archive JSON and static relationship shards]
+    K --> L[Verify generated artifacts and run tests]
+    L --> N[Activate and publish one release bundle]
 ```
 
 Entity extraction produces proposals, not truth. The system stores proposed records, entities, relationships, aliases, and evidence outside the canonical CSV files. It matches a proposed entity to a known canonical entity only when its name, type, aliases, and evidence support the match. A curator must accept that evidence before the system calls the canonical CSV writer, assigns a new canonical ID, or reuses an existing one.
 
-The [current submission processor](../backend/scripts/process_submission.py) is not this staging boundary. Its [runtime configuration](../backend/submission_runtime/config.py) targets `data/archive_records-public.csv`, the Bluesky processor does not supply a `BSKY-*` source ID, it skips entity extraction for text shorter than 500 characters, and its `needs_review` flag does not stop tests and deployment. An accepted Bluesky package therefore needs a dedicated social release adapter. That adapter must follow the [social record contract](../ADDING-RECORDS.md), allocate or reuse a `BSKY-*` ID only after acceptance, append the approved row to [`data/social_posts.csv`](../data/social_posts.csv), write approved entity and relationship rows, and only then invoke the tests and publication workflow. Before acceptance, the social path must either aggregate bounded thread context or use a reviewed short-text extraction rule; it must not hand the package unchanged to the current article-record processor.
+The [current submission processor](../backend/scripts/process_submission.py) is not this staging boundary. Its [runtime configuration](../backend/submission_runtime/config.py) targets `data/archive_records-public.csv`, the Bluesky processor does not supply a `BSKY-*` source ID, it skips entity extraction for text shorter than 500 characters, and its `needs_review` flag does not stop tests and deployment. An accepted Bluesky package therefore needs a dedicated social release adapter. That adapter must follow the [social record contract](../ADDING-RECORDS.md), allocate or reuse a `BSKY-*` ID only after acceptance, append the approved row to [`data/social_posts.csv`](../data/social_posts.csv), write approved entity and relationship rows, run [`data/export-archive-data.js`](../data/export-archive-data.js), verify that the generated JSON contains the accepted record and relationships, and only then invoke the tests and publication workflow. Before acceptance, the social path must either aggregate bounded thread context or use a reviewed short-text extraction rule; it must not hand the package unchanged to the current article-record processor.
+
+The current FTPS scripts activate files one at a time, so a mid-upload failure can expose a mixed release. Automated publication for this pipeline needs a bundle-level activation step, such as a versioned release directory and one final pointer switch. Until that exists, a partial upload enters `release_recovery`, blocks later releases, and uses the previous and intended bundle manifests to finish the upload or restore the last known-good bundle before the candidate becomes `published`.
 
 Relationship mapping has two outputs:
 
@@ -155,7 +159,9 @@ The system uses a safe waterfall. It does not try to defeat source restrictions.
 | Entity alias or relationship is uncertain | Keep the proposal and evidence separate. | Use approved aliases and a reviewer. | Do not merge the entity automatically. |
 | `401` or an unexpected authentication challenge on a nominally public endpoint | Pause the adapter in an operator-attention state. | Check the endpoint, credentials, and proxy configuration. | Retry after the operational fault is corrected; do not record `policy_blocked` without a confirmed access restriction. |
 | Confirmed `403`, login wall, CAPTCHA, paywall, or robots restriction | Record `policy_blocked`. | Use an official public API or source-provided export only. | Do not bypass the restriction. |
-| Test, Git, or FTPS failure | Stop before publication. | Retry only the failed safe stage. | Keep the item in a truthful non-live state. |
+| Test or Git failure before upload | Stop before publication. | Retry only the failed safe stage. | Keep the item in a truthful non-live state. |
+| FTPS failure before bundle activation | Keep the prior bundle active. | Retry and verify the staged bundle. | Do not activate an incomplete release. |
+| FTPS failure after any live file changes | Enter `release_recovery` and stop later releases. | Reconcile the intended and previous bundle manifests. | Finish or restore one complete bundle before marking the item published. |
 
 The escalation sequence is always the same: deterministic rule, permitted source method, bounded retry, review queue, then a human decision. A technical denial is a stop signal, not a reason to use a more aggressive scraper.
 
@@ -178,6 +184,7 @@ discovered | needs_review -> rejected_noise (terminal)
 discovered | context_needed -> policy_blocked (terminal)
 review_required -> revision_requested -> processed
 review_required -> rejected (terminal)
+accepted -> release_recovery -> accepted
 ```
 
 The admission decision uses the evidence already returned by the permitted discovery and context fetch. Processing after admission reads the immutable preserved package instead of fetching the source again, so an access-policy failure is resolved before the candidate enters the admitted path. A revision changes only staged proposals, records the curator's reason, and loops through validation and `review_required` again; it never mutates canonical rows in place.
