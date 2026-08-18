@@ -22,6 +22,7 @@ import { ERAS } from './eras.js';
 import { unescapeRow } from './lib/csv-unescape.js';
 import { buildSearchIndex, socialSearchIndexOptions } from './lib/search-index-builder.js';
 import { loadAuthoredExcerpts, resolveSummary } from './lib/summary-resolver.js';
+import { writeRelationshipAdjacencyArtifacts } from './export-relationship-adjacency.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -874,6 +875,33 @@ async function main() {
   fs.writeFileSync(entitiesOutputPath, JSON.stringify(entitiesOutput));
   const entitiesSizeBytes = fs.statSync(entitiesOutputPath).size;
   const entitiesSizeMB = (entitiesSizeBytes / 1024 / 1024).toFixed(2);
+
+  // The public entity graph intentionally remains flattened. Generate the
+  // separate, policy-filtered adjacency artifacts here so a later client or
+  // edge cache can resolve one record without deriving relationships at request
+  // time. The exporter excludes source snippets and holds by construction.
+  console.log('\n🔗 Writing public relationship adjacency artifacts...');
+  const activeRelationshipSchema = JSON.parse(fs.readFileSync(
+    path.join(__dirname, '..', 'backend', 'entity_extraction_schema_v3.json'),
+    'utf8'
+  ));
+  const relationshipHoldPolicy = JSON.parse(fs.readFileSync(
+    path.join(__dirname, 'graph-validation-holds.json'),
+    'utf8'
+  ));
+  const relationshipAdjacencySummary = writeRelationshipAdjacencyArtifacts({
+    dataDir: __dirname,
+    relationships: relationshipsData,
+    servedRecordIds: servedIds,
+    activeSchema: activeRelationshipSchema,
+    holdPolicy: relationshipHoldPolicy,
+    relationshipCsv: relationshipsCsv,
+  });
+  console.log(
+    `  - Wrote ${relationshipAdjacencySummary.files.length} files for ` +
+    `${relationshipAdjacencySummary.records} records and ` +
+    `${relationshipAdjacencySummary.assertions} approved assertions`
+  );
 
   console.log(`\n✅ Export complete!`);
   console.log(`\n📊 Summary:`);

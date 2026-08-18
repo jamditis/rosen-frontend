@@ -131,6 +131,25 @@ _DEPLOY_DATA_FILES: Tuple[str, ...] = (
     'data/archive-analytics.json',
     'data/search-index.json',  # prebuilt MiniSearch full-text index, loaded lazily on first search, issue 276
     'data/social-search-index.json',  # social-body MiniSearch index, loaded lazily on first search, issue 669
+    # Fixed public-safe relationship shards. Upload the manifest last so it
+    # never points a reader at a shard that has not uploaded yet. Issue 807.
+    'data/relationship-adjacency-0.json',
+    'data/relationship-adjacency-1.json',
+    'data/relationship-adjacency-2.json',
+    'data/relationship-adjacency-3.json',
+    'data/relationship-adjacency-4.json',
+    'data/relationship-adjacency-5.json',
+    'data/relationship-adjacency-6.json',
+    'data/relationship-adjacency-7.json',
+    'data/relationship-adjacency-8.json',
+    'data/relationship-adjacency-9.json',
+    'data/relationship-adjacency-a.json',
+    'data/relationship-adjacency-b.json',
+    'data/relationship-adjacency-c.json',
+    'data/relationship-adjacency-d.json',
+    'data/relationship-adjacency-e.json',
+    'data/relationship-adjacency-f.json',
+    'data/relationship-adjacency-manifest.json',
     'data/wiki-seed.json',
     'data/schema.json',  # data dictionary; linked from the open-data download UI
     'data/SCHEMA.md',  # human-readable data guide; linked from participation/open-data UI

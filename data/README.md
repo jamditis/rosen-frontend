@@ -17,6 +17,8 @@ The metadata and derived data (entities, relationships) are licensed [CC BY 4.0]
 | `archive-analytics.json` | ~4 KB | Prebuilt aggregates for the analytics view |
 | `search-index.json` | ~4.4 MB | Prebuilt MiniSearch index for curated records, loaded on first search |
 | `social-search-index.json` | ~7.1 MB | Body-only MiniSearch index for published social posts and served thread containers, loaded on first search |
+| `relationship-adjacency-0.json` to `relationship-adjacency-f.json` | Varies | Sixteen stable public-safe relationship shards, loaded one record at a time |
+| `relationship-adjacency-manifest.json` | Varies | Record-to-shard index, schema version, byte sizes, and SHA-256 hashes |
 | `wiki-seed.json` | ~125 KB | Seed pages for the public archive wiki (`#wiki` route) |
 | `stewardship-census.json` | ~150 KB | Machine-readable source/runtime, graph, field, URL, and preservation coverage census |
 | `stewardship-census.md` | ~4 KB | Concise human-readable census summary and 2026-07-22 baseline comparison |
@@ -61,6 +63,23 @@ npm run export-data  # or: node data/export-archive-data.js
 ```
 
 The script reads the four source CSVs (plus `authored-excerpts.csv`), processes and links the records, and writes the JSON files listed above. It prints progress as it goes, including a row count for each CSV it reads.
+
+### Relationship adjacency export
+
+`npm run export-data` also writes the relationship adjacency manifest and its
+sixteen stable shards. Regenerate only those files with:
+
+```bash
+npm run export:relationship-adjacency
+```
+
+The export publishes an assertion only when its source record is served, its
+relationship type is active, and it has no graph-validation hold. Each
+assertion contains stable entity IDs, relationship type and direction,
+confidence, decision state, and a record-level evidence reference. It excludes
+entity names, context snippets, raw source text, and hold reasons. Here,
+`approved` means the assertion passes the current publication policy. It does
+not claim a separate human review event.
 
 ## Validating graph integrity
 

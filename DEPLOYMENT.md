@@ -51,6 +51,23 @@ data/                               # Published archive data and shared taxonomy
   archive-analytics.json            # Prebuilt analytics aggregates (~1KB, loads on analytics view)
   search-index.json                 # Curated-record MiniSearch index (~1.2MB gzip, loads lazily on first search)
   social-search-index.json          # Social-body MiniSearch index (~2.1MB gzip, loads lazily on first search)
+  relationship-adjacency-0.json     # Public-safe relationship assertions, shard 0
+  relationship-adjacency-1.json     # Public-safe relationship assertions, shard 1
+  relationship-adjacency-2.json     # Public-safe relationship assertions, shard 2
+  relationship-adjacency-3.json     # Public-safe relationship assertions, shard 3
+  relationship-adjacency-4.json     # Public-safe relationship assertions, shard 4
+  relationship-adjacency-5.json     # Public-safe relationship assertions, shard 5
+  relationship-adjacency-6.json     # Public-safe relationship assertions, shard 6
+  relationship-adjacency-7.json     # Public-safe relationship assertions, shard 7
+  relationship-adjacency-8.json     # Public-safe relationship assertions, shard 8
+  relationship-adjacency-9.json     # Public-safe relationship assertions, shard 9
+  relationship-adjacency-a.json     # Public-safe relationship assertions, shard a
+  relationship-adjacency-b.json     # Public-safe relationship assertions, shard b
+  relationship-adjacency-c.json     # Public-safe relationship assertions, shard c
+  relationship-adjacency-d.json     # Public-safe relationship assertions, shard d
+  relationship-adjacency-e.json     # Public-safe relationship assertions, shard e
+  relationship-adjacency-f.json     # Public-safe relationship assertions, shard f
+  relationship-adjacency-manifest.json # Record-to-shard index and integrity hashes. Upload after all shards.
   wiki-seed.json                    # Community wiki seed pages (loads on the #wiki view)
   schema.json                       # Data dictionary, linked from the open-data download UI
   SCHEMA.md                         # Human-readable data guide, linked from Ways to Participate
@@ -164,6 +181,7 @@ For a manual record-data update, upload the regenerated JSON set:
 - `data/archive-analytics.json`
 - `data/search-index.json` (MiniSearch full-text index; regenerated with every record change, so it must ship or full-text search serves the previous index)
 - `data/social-search-index.json` (social-body MiniSearch index; regenerated with every social-record change)
+- `data/relationship-adjacency-0.json` through `data/relationship-adjacency-f.json`, followed by `data/relationship-adjacency-manifest.json` (public-safe record relationship lookup; upload the manifest last)
 
 Then run the full-site deploy so the corresponding record shells are rebuilt
 and reconciled. Do not publish record JSON alone: new or edited share metadata
