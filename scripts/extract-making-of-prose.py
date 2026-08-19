@@ -10,7 +10,7 @@ import re
 from pathlib import Path
 
 
-TAG = re.compile(r"<[^>]+>")
+TAG = re.compile(r"<[^>]+>", re.DOTALL)
 
 
 def text_of(line: str) -> str:
@@ -33,42 +33,65 @@ def extract(source: Path) -> list[tuple[str, str, str, int]]:
     counters: dict[str, int] = {}
     in_article = False
     title_pending = False
+    pending: tuple[str, str, str, int, list[str]] | None = None
 
     def next_number(key: str) -> int:
         counters[key] = counters.get(key, 0) + 1
         return counters[key]
 
+    def capture(anchor: str, kind: str, tag: str, raw: str, line_number: int) -> None:
+        """Capture one element now or defer it until its closing tag."""
+        nonlocal pending
+        if re.search(rf"</{tag}\s*>", raw, re.IGNORECASE):
+            blocks.append((anchor, kind, text_of(raw), line_number))
+        else:
+            pending = (anchor, kind, tag, line_number, [raw])
+
     for line_number, raw in enumerate(source.read_text().splitlines(), start=1):
         line = raw.strip()
 
+        if pending is not None:
+            anchor, kind, tag, start_line, fragments = pending
+            fragments.append(raw)
+            if re.search(rf"</{tag}\s*>", raw, re.IGNORECASE):
+                blocks.append((anchor, kind, text_of("\n".join(fragments)), start_line))
+                pending = None
+            continue
+
         if 'class="dek"' in line:
-            blocks.append(("M.DEK", "meta", text_of(line), line_number))
+            capture("M.DEK", "meta", "p", raw, line_number)
         elif 'class="dek-note"' in line:
-            blocks.append(("M.NOTE", "meta", text_of(line), line_number))
+            capture("M.NOTE", "meta", "p", raw, line_number)
         elif 'class="ch-ref"' in line:
             chapter += 1
             counters = {}
             title_pending = True
-            blocks.append((f"C{chapter}.REF", "chref", text_of(line), line_number))
+            capture(f"C{chapter}.REF", "chref", "span", raw, line_number)
         elif title_pending and line.startswith("<h2>"):
-            blocks.append((f"C{chapter}.T", "title", text_of(line), line_number))
             title_pending = False
+            capture(f"C{chapter}.T", "title", "h2", raw, line_number)
         elif 'class="ch-date"' in line:
-            blocks.append((f"C{chapter}.D", "date", text_of(line), line_number))
+            title_pending = False
+            capture(f"C{chapter}.D", "date", "p", raw, line_number)
         elif has_class(line, "prose"):
+            title_pending = False
             in_article = True
-        elif in_article and line == "</div>":
-            in_article = False
+        elif line == "</div>":
+            title_pending = False
+            if in_article:
+                in_article = False
         elif in_article and 'class="lead"' in line:
-            blocks.append((f"C{chapter}.L", "lead", text_of(line), line_number))
+            capture(f"C{chapter}.L", "lead", "p", raw, line_number)
         elif in_article and 'class="pull"' in line:
-            blocks.append(
-                (f"C{chapter}.Q{next_number('q')}", "pull", text_of(line), line_number)
-            )
+            capture(f"C{chapter}.Q{next_number('q')}", "pull", "p", raw, line_number)
         elif in_article and line.startswith("<p>"):
-            blocks.append(
-                (f"C{chapter}.P{next_number('p')}", "para", text_of(line), line_number)
-            )
+            capture(f"C{chapter}.P{next_number('p')}", "para", "p", raw, line_number)
+        elif line.startswith(("</article", "</section")):
+            title_pending = False
+
+    if pending is not None:
+        anchor, _kind, tag, start_line, _fragments = pending
+        raise ValueError(f"Unclosed <{tag}> for {anchor} at line {start_line}")
 
     return blocks
 

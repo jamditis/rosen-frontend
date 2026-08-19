@@ -56,6 +56,26 @@ describe('making-of prose extractor', () => {
     assert.doesNotMatch(markdown, /Three rules the archive won't break/);
   });
 
+  it('does not invent a chapter title when the heading is missing', () => {
+    const { markdown, anchorMap } = runExtractor(`
+      <section class="chapter">
+        <div class="ch-head">
+          <span class="ch-ref">Chapter 1</span>
+          <p class="ch-date">July 2026</p>
+        </div>
+        <div class="prose">
+          <p>Chapter body.</p>
+        </div>
+      </section>
+      <section class="colophon">
+        <h2>Three rules the archive won't break</h2>
+      </section>
+    `);
+
+    assert.equal(anchorMap['C1.T'], undefined);
+    assert.doesNotMatch(markdown, /Three rules the archive won't break/);
+  });
+
   it('extracts article prose after the case-file class is removed', () => {
     const { markdown, anchorMap } = runExtractor(`
       <article class="chapter">
@@ -74,6 +94,27 @@ describe('making-of prose extractor', () => {
     assert.equal(anchorMap['C1.P1'].text, 'The body.');
     assert.equal(anchorMap['C1.Q1'].text, 'The pull quote.');
     assert.match(markdown, /\[C1\.P1\] The body\./);
+  });
+
+  it('keeps prose that wraps across source lines', () => {
+    const { markdown, anchorMap } = runExtractor(`
+      <article class="chapter">
+        <span class="ch-ref">Chapter 1</span>
+        <h2>Chapter title</h2>
+        <p class="ch-date">July 2026</p>
+        <div class="prose">
+          <p>The body starts
+            on one line, includes <em>emphasis</em>,
+            and finishes on another.</p>
+        </div>
+      </article>
+    `);
+
+    assert.equal(
+      anchorMap['C1.P1'].text,
+      'The body starts on one line, includes emphasis, and finishes on another.',
+    );
+    assert.match(markdown, /\[C1\.P1\] The body starts on one line/);
   });
 
   it('extracts the full current page into one unique 62-anchor manifest', () => {
