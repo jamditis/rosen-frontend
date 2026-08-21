@@ -32,8 +32,8 @@
  * dynamically-imported seam (createExtractor); every other function here is pure
  * and tested without loading the model.
  */
-import { readFileSync } from 'node:fs';
-import { writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import process from 'node:process';
@@ -159,8 +159,16 @@ export function readVectorAt(buffer, i) {
   return { scale, bytes };
 }
 
+/** Return the lowercase SHA-256 digest used to bind the sidecar to the binary. */
+export function sha256Hex(buffer) {
+  return createHash('sha256').update(buffer).digest('hex');
+}
+
 /** The JSON sidecar: everything the worker needs to read the binary by id. */
-export function buildEmbeddingIndex(ids) {
+export function buildEmbeddingIndex(ids, binarySha256) {
+  if (!/^[a-f0-9]{64}$/.test(binarySha256 || '')) {
+    throw new Error('buildEmbeddingIndex: binarySha256 must be a lowercase SHA-256 digest');
+  }
   return {
     version: EMBED_INDEX_VERSION,
     model: MODEL_ID,
@@ -168,6 +176,7 @@ export function buildEmbeddingIndex(ids) {
     quantization: 'int8',
     bytesPerVector: BYTES_PER_VECTOR,
     count: ids.length,
+    binarySha256,
     ids,
   };
 }
@@ -221,7 +230,9 @@ export async function buildEmbeddings(articles, rawTextMap, embed) {
     ids.push(article.id);
     quantized.push(quantizeInt8(vec));
   }
-  return { index: buildEmbeddingIndex(ids), binBuffer: serializeVectors(quantized), count: ids.length };
+  const binBuffer = serializeVectors(quantized);
+  const index = buildEmbeddingIndex(ids, sha256Hex(binBuffer));
+  return { index, binBuffer, count: ids.length };
 }
 
 /**
@@ -286,6 +297,7 @@ export default {
   dequantizeInt8,
   serializeVectors,
   readVectorAt,
+  sha256Hex,
   buildEmbeddingIndex,
   loadPublishedArticles,
   loadRawTextMap,

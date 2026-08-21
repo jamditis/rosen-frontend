@@ -23,9 +23,10 @@ export const BYTES_PER_VECTOR = SCALE_BYTES + EMBED_DIM;
  */
 export const TEMPORAL_PENALTY = 0.92;
 export const TEMPORAL_WINDOW_YEARS = 2;
-export const DEFAULT_EMBEDDINGS_BIN_URL = "../../data/archive-embeddings.bin";
+export const DEFAULT_EMBEDDINGS_BIN_URL =
+  "../../data/archive-embeddings.bin?v=3.8.26";
 export const DEFAULT_EMBEDDINGS_INDEX_URL =
-  "../../data/archive-embeddings.json";
+  "../../data/archive-embeddings.json?v=3.8.26";
 
 function finiteYear(value) {
   if (typeof value === "number") return Number.isFinite(value) ? value : null;
@@ -39,6 +40,27 @@ function toDataView(buffer) {
     return new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
   }
   return new DataView(buffer);
+}
+
+function toUint8Array(buffer) {
+  if (ArrayBuffer.isView(buffer)) {
+    return new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+  }
+  return new Uint8Array(buffer);
+}
+
+/** Compute a browser-native SHA-256 digest for an ArrayBuffer or typed view. */
+export async function digestSha256Hex(
+  buffer,
+  { cryptoImpl = globalThis.crypto } = {},
+) {
+  if (!cryptoImpl?.subtle?.digest) {
+    throw new Error('embeddings digest: Web Crypto SHA-256 is unavailable');
+  }
+  const digest = await cryptoImpl.subtle.digest('SHA-256', toUint8Array(buffer));
+  return Array.from(new Uint8Array(digest), byte =>
+    byte.toString(16).padStart(2, '0'),
+  ).join('');
 }
 
 /** Dequantize the vector at row `i` of the serialized binary into floats. */
@@ -120,6 +142,12 @@ export function assertArtifactContract(buffer, index) {
       `embeddings sidecar: quantization ${index.quantization} is not int8`,
     );
   }
+  if (
+    typeof index.binarySha256 !== "string" ||
+    !/^[a-f0-9]{64}$/.test(index.binarySha256)
+  ) {
+    throw new Error("embeddings sidecar: missing or invalid binarySha256");
+  }
   const expected = count * BYTES_PER_VECTOR;
   if (buffer.byteLength !== expected) {
     throw new Error(
@@ -154,10 +182,30 @@ export function buildEmbeddingStore(buffer, index) {
  * injectable so this loads under a fake fetch in tests and under the real one
  * (worker or main thread) in the browser.
  */
+function cacheBustedSidecarUrl(indexUrl, token) {
+  const separator = indexUrl.includes('?') ? '&' : '?';
+  return `${indexUrl}${separator}integrity=${encodeURIComponent(token)}`;
+}
+
+async function verifyEmbeddingPair(buffer, index, digestImpl) {
+  assertArtifactContract(buffer, index);
+  const actualDigest = await digestImpl(buffer);
+  if (actualDigest !== index.binarySha256) {
+    throw new Error(
+      `embeddings binary: SHA-256 ${actualDigest} does not match sidecar ${index.binarySha256}`,
+    );
+  }
+  return buildEmbeddingStore(buffer, index);
+}
+
 export async function loadEmbeddingStore(
   binUrl,
   indexUrl,
-  { fetchImpl = globalThis.fetch } = {},
+  {
+    fetchImpl = globalThis.fetch,
+    digestImpl = digestSha256Hex,
+    cacheBustToken = () => Date.now().toString(36),
+  } = {},
 ) {
   const [binResponse, indexResponse] = await Promise.all([
     fetchImpl(binUrl),
@@ -171,7 +219,26 @@ export async function loadEmbeddingStore(
     binResponse.arrayBuffer(),
     indexResponse.json(),
   ]);
-  return buildEmbeddingStore(buffer, index);
+
+  try {
+    return await verifyEmbeddingPair(buffer, index, digestImpl);
+  } catch (initialIntegrityError) {
+    // The service worker serves JSON stale-while-revalidate but the binary
+    // network-first. During a release rollover that can briefly pair a fresh
+    // binary with the previous sidecar. Retry the sidecar exactly once under a
+    // new cache key; keep the same binary so this cannot become an unbounded
+    // network loop or mask a genuinely bad artifact pair.
+    const freshIndexUrl = cacheBustedSidecarUrl(indexUrl, cacheBustToken());
+    const freshIndexResponse = await fetchImpl(freshIndexUrl, { cache: 'reload' });
+    if (!freshIndexResponse.ok) {
+      throw new Error(
+        `embeddings index ${freshIndexUrl}: ${freshIndexResponse.status}`,
+        { cause: initialIntegrityError },
+      );
+    }
+    const freshIndex = await freshIndexResponse.json();
+    return verifyEmbeddingPair(buffer, freshIndex, digestImpl);
+  }
 }
 
 /**

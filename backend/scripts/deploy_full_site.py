@@ -147,6 +147,10 @@ _DEPLOY_DATA_FILES: Tuple[str, ...] = (
     'data/archive-analytics.json',
     'data/search-index.json',  # prebuilt MiniSearch full-text index, loaded lazily on first search, issue 276
     'data/social-search-index.json',  # social-body MiniSearch index, loaded lazily on first search, issue 669
+    # Similar-in-theme artifact pair. Upload the binary first and its hash-bound
+    # sidecar second so the live index never advertises bytes that are not present.
+    'data/archive-embeddings.bin',
+    'data/archive-embeddings.json',
     # Fixed public-safe relationship shards. Upload the manifest last so it
     # never points a reader at a shard that has not uploaded yet. Issue 807.
     'data/relationship-adjacency-0.json',
@@ -170,6 +174,11 @@ _DEPLOY_DATA_FILES: Tuple[str, ...] = (
     'data/schema.json',  # data dictionary; linked from the open-data download UI
     'data/SCHEMA.md',  # human-readable data guide; linked from participation/open-data UI
     'data/eras.js',  # canonical era taxonomy imported by the frontend
+)
+
+_RECALL_ARTIFACT_PAIR: Tuple[str, str] = (
+    'data/archive-embeddings.bin',
+    'data/archive-embeddings.json',
 )
 
 # Walking _DEPLOY_DIRS, prune these.
@@ -484,6 +493,121 @@ def _prune_remote_record_shells(
     return removed
 
 
+def _remote_exists(remote, path: str) -> bool:
+    try:
+        remote.stat(path)
+        return True
+    except IOError as exc:
+        if getattr(exc, 'errno', None) in (None, errno.ENOENT):
+            return False
+        raise
+
+
+def _remove_remote_if_exists(remote, path: str) -> None:
+    try:
+        remote.remove(path)
+    except IOError as exc:
+        if getattr(exc, 'errno', None) not in (None, errno.ENOENT):
+            raise
+
+
+def _replace_remote_file(remote, source: str, target: str) -> None:
+    """Rename source over target for both SFTP and the FTPS adapter."""
+    try:
+        remote.posix_rename(source, target)
+    except (IOError, AttributeError):
+        _remove_remote_if_exists(remote, target)
+        remote.rename(source, target)
+
+
+def _publish_recall_artifact_pair(
+    remote,
+    local_by_relpath: Dict[str, Path],
+    cfg: Dict[str, Any],
+    dir_cache: Set[str],
+) -> None:
+    """Publish the hash-bound binary and sidecar as one rollback-safe unit."""
+    entries = []
+    for relpath in _RECALL_ARTIFACT_PAIR:
+        local = local_by_relpath[relpath]
+        final = remote_transfer.scoped_archive_child(cfg['site_path'], relpath)
+        entries.append({
+            'relpath': relpath,
+            'local': local,
+            'final': final,
+            'tmp': f'{final}.pair-tmp',
+            'backup': f'{final}.pair-backup',
+        })
+
+    # Inspect both members before changing either one. If an earlier transaction
+    # stopped before both finals were published, restore every available backup
+    # so a retry starts from the previous complete pair.
+    for entry in entries:
+        _ensure_remote_dir(
+            remote, entry['final'].rsplit('/', 1)[0], dir_cache)
+        entry['final_exists'] = _remote_exists(remote, entry['final'])
+        entry['backup_exists'] = _remote_exists(remote, entry['backup'])
+
+    if any(entry['backup_exists'] for entry in entries):
+        if any(not entry['final_exists'] for entry in entries):
+            for entry in entries:
+                if entry['backup_exists']:
+                    _replace_remote_file(
+                        remote, entry['backup'], entry['final'])
+                elif not entry['final_exists']:
+                    raise RuntimeError(
+                        'cannot restore incomplete recall artifact backup pair'
+                    )
+        else:
+            for entry in entries:
+                _remove_remote_if_exists(remote, entry['backup'])
+
+    for entry in entries:
+        _remove_remote_if_exists(remote, entry['tmp'])
+        remote.put(str(entry['local']), entry['tmp'])
+
+    backed_up = []
+    published = []
+    try:
+        for entry in entries:
+            if _remote_exists(remote, entry['final']):
+                _replace_remote_file(
+                    remote, entry['final'], entry['backup'])
+                backed_up.append(entry)
+
+        for entry in entries:
+            _replace_remote_file(remote, entry['tmp'], entry['final'])
+            published.append(entry)
+    except Exception as publish_error:
+        rollback_errors = []
+        for entry in reversed(published):
+            try:
+                _remove_remote_if_exists(remote, entry['final'])
+            except Exception as exc:  # best-effort rollback, reported below
+                rollback_errors.append(exc)
+        for entry in reversed(backed_up):
+            try:
+                if _remote_exists(remote, entry['backup']):
+                    _replace_remote_file(
+                        remote, entry['backup'], entry['final'])
+            except Exception as exc:  # best-effort rollback, reported below
+                rollback_errors.append(exc)
+        for entry in entries:
+            try:
+                _remove_remote_if_exists(remote, entry['tmp'])
+            except Exception as exc:
+                rollback_errors.append(exc)
+        if rollback_errors:
+            raise RuntimeError(
+                f'{publish_error}; recall artifact rollback also failed: '
+                f'{rollback_errors[0]}'
+            ) from publish_error
+        raise
+
+    for entry in backed_up:
+        _remove_remote_if_exists(remote, entry['backup'])
+
+
 def push_files(
     files: List[Path],
     repo_root: Path,
@@ -517,6 +641,27 @@ def push_files(
     except ValueError as exc:
         return {'ok': False, 'files_pushed': 0, 'error': str(exc)}
 
+    local_by_relpath = {
+        local.relative_to(repo_root).as_posix(): local
+        for local in files
+    }
+    pair_members = [
+        relpath for relpath in _RECALL_ARTIFACT_PAIR
+        if relpath in local_by_relpath
+    ]
+    if pair_members and len(pair_members) != len(_RECALL_ARTIFACT_PAIR):
+        return {
+            'ok': False,
+            'files_pushed': 0,
+            'error': 'recall binary and sidecar must be deployed together',
+        }
+    pair_trigger = None
+    if pair_members:
+        pair_trigger = min(
+            pair_members,
+            key=lambda relpath: list(local_by_relpath).index(relpath),
+        )
+
     pushed = 0
     error: Optional[str] = None
     # The archive root already exists. Treat it as the mkdir boundary so the
@@ -529,6 +674,16 @@ def push_files(
         remote = remote_transfer.connect_remote(cfg)
         for local in files:
             rel = local.relative_to(repo_root).as_posix()
+            if rel == pair_trigger:
+                _publish_recall_artifact_pair(
+                    remote, local_by_relpath, cfg, dir_cache)
+                pushed += len(_RECALL_ARTIFACT_PAIR)
+                if pushed % 25 == 0 or pushed == len(files):
+                    logger.info(f"Pushed {pushed}/{len(files)} files")
+                continue
+            if rel in _RECALL_ARTIFACT_PAIR:
+                continue
+
             remote_final = remote_transfer.scoped_archive_child(
                 cfg['site_path'], rel)
             remote_tmp = f"{remote_final}.tmp"

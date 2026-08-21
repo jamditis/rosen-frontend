@@ -51,6 +51,8 @@ data/                               # Published archive data and shared taxonomy
   archive-analytics.json            # Prebuilt analytics aggregates (~1KB, loads on analytics view)
   search-index.json                 # Curated-record MiniSearch index (~1.2MB gzip, loads lazily on first search)
   social-search-index.json          # Social-body MiniSearch index (~2.1MB gzip, loads lazily on first search)
+  archive-embeddings.bin               # Quantized similar-in-theme vectors; upload before the sidecar
+  archive-embeddings.json              # ID index plus SHA-256 binding to the binary
   relationship-adjacency-0.json     # Public-safe relationship assertions, shard 0
   relationship-adjacency-1.json     # Public-safe relationship assertions, shard 1
   relationship-adjacency-2.json     # Public-safe relationship assertions, shard 2

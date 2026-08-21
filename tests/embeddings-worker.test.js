@@ -18,10 +18,12 @@ import {
   dequantizeInt8,
   serializeVectors,
   readVectorAt,
+  sha256Hex,
   buildEmbeddingIndex,
 } from "../data/lib/embeddings-builder.js";
 import {
   cosine,
+  digestSha256Hex,
   readVector,
   buildEmbeddingStore,
   loadEmbeddingStore,
@@ -48,10 +50,14 @@ const IDS = ["A", "B", "C", "D", "E"];
 const YEARS = { A: 2000, B: 2001, C: 1990, D: 2020, E: 2010 };
 const yearOf = (id) => YEARS[id];
 
+function buildIndex(binBuffer, ids = IDS) {
+  return buildEmbeddingIndex(ids, sha256Hex(binBuffer));
+}
+
 function buildStore() {
   const quantized = IDS.map((id) => quantizeInt8(VECTORS[id]));
   const binBuffer = serializeVectors(quantized);
-  const index = buildEmbeddingIndex(IDS);
+  const index = buildIndex(binBuffer);
   return buildEmbeddingStore(binBuffer, index);
 }
 
@@ -104,7 +110,7 @@ test("buildEmbeddingStore throws when the sidecar count exceeds the binary", () 
     IDS.map((id) => quantizeInt8(VECTORS[id])),
   );
   // Sidecar claims six vectors; the binary holds five (a mixed/stale pair).
-  const index = buildEmbeddingIndex([...IDS, "GHOST"]);
+  const index = buildIndex(binBuffer, [...IDS, "GHOST"]);
   assert.throws(() => buildEmbeddingStore(binBuffer, index), /does not match/);
 });
 
@@ -114,7 +120,7 @@ test("buildEmbeddingStore throws on a dim mismatch (re-embed at a different size
   );
   // A future re-embed at a different dimension would decode with the wrong
   // stride and rank garbage; the reader must reject it instead.
-  const index = { ...buildEmbeddingIndex(IDS), dim: EMBED_DIM - 1 };
+  const index = { ...buildIndex(binBuffer), dim: EMBED_DIM - 1 };
   assert.throws(() => buildEmbeddingStore(binBuffer, index), /dim/);
 });
 
@@ -154,7 +160,7 @@ test("temporal penalty never boosts a negative-cosine same-era match", () => {
   const binBuffer = serializeVectors(
     ids.map((id) => quantizeInt8(opposed[id])),
   );
-  const store = buildEmbeddingStore(binBuffer, buildEmbeddingIndex(ids));
+  const store = buildEmbeddingStore(binBuffer, buildIndex(binBuffer, ids));
   const sameEra = (id) => (id === "Q" ? 2000 : 2001); // within +-2 years
   const [opp] = neighbors(store, "Q", { k: 1, yearOf: sameEra });
   // x0.92 on -1 would give -0.92 (ranked higher); the guard keeps it at -1.
@@ -171,10 +177,37 @@ test("exclude drops the given ids", () => {
   assert.ok(result.some((r) => r.id === "E"));
 });
 
+test("browser SHA-256 matches the build-time digest", async () => {
+  const binBuffer = serializeVectors(IDS.map((id) => quantizeInt8(VECTORS[id])));
+  assert.equal(await digestSha256Hex(binBuffer), sha256Hex(binBuffer));
+});
+
+test("loadEmbeddingStore rejects a same-shape stale binary by digest", async () => {
+  const binBuffer = serializeVectors(IDS.map((id) => quantizeInt8(VECTORS[id])));
+  const index = { ...buildIndex(binBuffer), binarySha256: '0'.repeat(64) };
+  const fetchImpl = async (url) => {
+    if (url.endsWith(".bin")) {
+      return {
+        ok: true,
+        arrayBuffer: async () =>
+          binBuffer.buffer.slice(
+            binBuffer.byteOffset,
+            binBuffer.byteOffset + binBuffer.byteLength,
+          ),
+      };
+    }
+    return { ok: true, json: async () => index };
+  };
+  await assert.rejects(
+    loadEmbeddingStore('x/archive-embeddings.bin', 'x/archive-embeddings.json', { fetchImpl }),
+    /SHA-256 .* does not match sidecar/,
+  );
+});
+
 test("loadEmbeddingStore fetches the binary and sidecar via an injected fetch", async () => {
   const quantized = IDS.map((id) => quantizeInt8(VECTORS[id]));
   const binBuffer = serializeVectors(quantized);
-  const index = buildEmbeddingIndex(IDS);
+  const index = buildIndex(binBuffer);
   const fetchImpl = async (url) => {
     if (url.endsWith(".bin")) {
       return {

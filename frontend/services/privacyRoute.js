@@ -3,7 +3,7 @@
 // module in an old service-worker cache, so new entry points must not require
 // named exports that module did not provide.
 
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.25';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.26';
 
 export const ABOUT_PRIVACY_HASH = 'about/privacy';
 export const ABOUT_PRIVACY_SECTION = 'privacy-and-browser-storage';
