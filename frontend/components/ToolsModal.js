@@ -1,9 +1,9 @@
 // ToolsModal.js - Modal with icons for exploring archive tools
 import { useEffect, useRef, useCallback } from 'react';
-import { html } from '../html.js?v=3.8.26';
+import { html } from '../html.js?v=3.8.27';
 import { X, Compass, Map, BookOpen, HelpCircle, BarChart3, BookMarked, Monitor } from 'lucide-react';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.26';
-import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.26';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.27';
+import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.27';
 
 // Tool definitions with categories
 const TOOLS = {
