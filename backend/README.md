@@ -146,7 +146,7 @@ The pipeline expects two Google Sheets:
 1. **Input Sheet** - Contains URLs to process with columns:
    - URL
    - Status (empty for new, "Processed" for completed)
-   
+
 2. **Output Sheet** - Stores processed results (created automatically)
 
 ---
@@ -181,8 +181,17 @@ poetry run python scripts/diagnostics/data_deduper.py
 # Backfill missing metadata
 poetry run python scripts/backfill/backfill_worker.py
 
-# Backfill missing dates
-poetry run python scripts/run_date_backfill.py
+# Preview the enhanced date backfill against the final worksheet.
+# No Google connection is made without --live.
+poetry run python -m scripts.backfill.date_backfill
+
+# After reviewing an explicit bounded plan, run it live.
+poetry run python -m scripts.backfill.date_backfill \
+  --strategy enhanced \
+  --worksheet test_runs \
+  --start-row 27 \
+  --limit 16 \
+  --live
 
 # Run entity extraction
 poetry run python src/rosen_scraper/entity_extractor.py
@@ -191,6 +200,10 @@ poetry run python src/rosen_scraper/entity_extractor.py
 # Dry run is the default; this does not write to the worksheet.
 poetry run python -m scripts.corrector --rows 27-42
 ```
+
+The date-backfill CLI makes its strategy, worksheet, inclusive start row, and
+optional record limit explicit. It validates and prints the plan before a live
+run; `--live` is required before Google or strategy dependencies are loaded.
 
 The smart corrector accepts `--rows :N` for the first N data records,
 `--rows N-M` for inclusive sheet rows, and `--rows N-` for an open-ended
