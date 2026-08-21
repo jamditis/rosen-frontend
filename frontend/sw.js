@@ -13,7 +13,7 @@
 // Cache version is tied to the app version in version.json. Bumping it on every
 // deploy (alongside index.html and the ?v= import strings) makes the activate
 // handler below drop stale cache namespaces after the release takes control.
-const CACHE_VERSION = '3.8.26';
+const CACHE_VERSION = '3.8.27';
 const CACHE_NAME = `jrda-cache-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `jrda-data-${CACHE_VERSION}`;
 
@@ -81,6 +81,7 @@ const APP_SHELL_FRONTEND_FILES = [
   'services/privacyRoute.js',
   'services/router.js',
   'services/searchIndexLoader.js',
+  'services/semanticRecall.js',
   'services/sqliteService.js',
   'services/tourState.js',
   'services/viewState.js',
@@ -218,7 +219,12 @@ self.addEventListener('fetch', event => {
 
   // Handle data files with stale-while-revalidate
   if (isDataFile(url.pathname)) {
-    event.respondWith(staleWhileRevalidate(event.request, DATA_CACHE_NAME));
+    const { responsePromise, lifetimePromise } = staleWhileRevalidate(
+      event.request,
+      DATA_CACHE_NAME,
+    );
+    event.waitUntil(lifetimePromise);
+    event.respondWith(responsePromise);
     return;
   }
 
@@ -267,6 +273,7 @@ function isStaticAsset(pathname) {
   const isAssetType = pathname.endsWith('.js') ||
     pathname.endsWith('.css') ||
     pathname.endsWith('.wasm') ||
+    pathname.endsWith('.bin') ||
     pathname.endsWith('.ico') ||
     pathname.endsWith('.png') ||
     pathname.endsWith('.jpg') ||
@@ -300,37 +307,45 @@ async function safePut(cache, request, response) {
  * Returns the cached response immediately when present, and refreshes the cache
  * from the network in the background. Failed puts are swallowed by safePut.
  */
-async function staleWhileRevalidate(request, cacheName) {
-  const cache = await caches.open(cacheName);
-  const cachedResponse = await cache.match(request);
-
-  const fetchPromise = fetch(request)
-    .then(response => {
-      if (response.ok) {
-        // Fire-and-forget: safePut self-catches, so the background refresh
-        // never blocks the returned response nor throws an unhandled rejection.
-        safePut(cache, request, response.clone());
-      }
-      return response;
-    })
+function staleWhileRevalidate(request, cacheName) {
+  const cachePromise = caches.open(cacheName);
+  const cachedResponsePromise = cachePromise.then(cache => cache.match(request));
+  const fetchResultPromise = fetch(request)
+    .then(response => ({
+      response,
+      cacheResponse: response.ok ? response.clone() : null,
+    }))
     .catch(err => {
       console.warn('[SW] Network fetch failed:', request.url, err);
-      return null;
+      return { response: null, cacheResponse: null };
     });
 
-  if (cachedResponse) {
-    return cachedResponse;
-  }
+  const responsePromise = (async () => {
+    const cachedResponse = await cachedResponsePromise;
+    if (cachedResponse) {
+      return cachedResponse;
+    }
 
-  const networkResponse = await fetchPromise;
-  if (networkResponse) {
-    return networkResponse;
-  }
+    const { response } = await fetchResultPromise;
+    if (response) {
+      return response;
+    }
 
-  return new Response('Offline and no cached data available', {
-    status: 503,
-    statusText: 'Service Unavailable'
-  });
+    return new Response('Offline and no cached data available', {
+      status: 503,
+      statusText: 'Service Unavailable'
+    });
+  })();
+
+  const lifetimePromise = Promise.all([cachePromise, fetchResultPromise])
+    .then(([cache, { cacheResponse }]) => {
+      if (cacheResponse) {
+        return safePut(cache, request, cacheResponse);
+      }
+      return false;
+    });
+
+  return { responsePromise, lifetimePromise };
 }
 
 /**
@@ -346,9 +361,10 @@ async function cacheFirst(request, cacheName) {
   try {
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
-      // Fire-and-forget so the cache write stays off the response path; safePut
-      // self-catches, so it cannot block the response or reject unhandled.
-      safePut(cache, request, networkResponse.clone());
+      // Keep the fetch response pending until the cache write finishes. This
+      // prevents the worker from terminating before an on-demand asset, such
+      // as the embeddings binary, becomes available for later offline use.
+      await safePut(cache, request, networkResponse.clone());
     }
     return networkResponse;
   } catch (err) {

@@ -24,9 +24,9 @@ export const BYTES_PER_VECTOR = SCALE_BYTES + EMBED_DIM;
 export const TEMPORAL_PENALTY = 0.92;
 export const TEMPORAL_WINDOW_YEARS = 2;
 export const DEFAULT_EMBEDDINGS_BIN_URL =
-  "../../data/archive-embeddings.bin?v=3.8.26";
+  "../../data/archive-embeddings.bin?v=3.8.27";
 export const DEFAULT_EMBEDDINGS_INDEX_URL =
-  "../../data/archive-embeddings.json?v=3.8.26";
+  "../../data/archive-embeddings.json?v=3.8.27";
 
 function finiteYear(value) {
   if (typeof value === "number") return Number.isFinite(value) ? value : null;

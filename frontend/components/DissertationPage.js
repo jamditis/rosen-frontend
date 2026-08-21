@@ -1,11 +1,11 @@
 
 import { useState } from 'react';
-import { html } from '../html.js?v=3.8.26';
+import { html } from '../html.js?v=3.8.27';
 import { BookOpen, ExternalLink, ArrowLeft, Calendar, GraduationCap } from 'lucide-react';
-import MindMap from './MindMap.js?v=3.8.26';
-import DetailPanel from './DetailPanel.js?v=3.8.26';
-import { DISSERTATION_NODES } from './dissertationData.js?v=3.8.26';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.26';
+import MindMap from './MindMap.js?v=3.8.27';
+import DetailPanel from './DetailPanel.js?v=3.8.27';
+import { DISSERTATION_NODES } from './dissertationData.js?v=3.8.27';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.27';
 
 const DissertationPage = ({ onBack, embedded = false }) => {
   const [selectedNode, setSelectedNode] = useState(null);

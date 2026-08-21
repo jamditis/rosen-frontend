@@ -1,14 +1,15 @@
 
 import { useEffect, useRef, useState } from 'react';
-import { html } from '../html.js?v=3.8.26';
-import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2, AlertTriangle, RefreshCw } from 'lucide-react';
-import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.8.26';
-import { ThreadModal } from './ThreadModal.js?v=3.8.26';
-import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.8.26';
-import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.8.26';
-import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.26';
-import { canonicalRecordUrl, shareRecordUrl } from '../utils/recordDeepLink.js?v=3.8.26';
-import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.26';
+import { html } from '../html.js?v=3.8.27';
+import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2, AlertTriangle, RefreshCw, Sparkles } from 'lucide-react';
+import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.8.27';
+import { ThreadModal } from './ThreadModal.js?v=3.8.27';
+import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.8.27';
+import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.8.27';
+import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.27';
+import { canonicalRecordUrl, shareRecordUrl } from '../utils/recordDeepLink.js?v=3.8.27';
+import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.27';
+import { requestSemanticNeighbors, selectSemanticRecords } from '../services/semanticRecall.js?v=3.8.27';
 
 const linkifyText = (text) => {
   const parts = splitUrlsForLinkify(text);
@@ -63,6 +64,9 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
   const [toastMessage, setToastMessage] = useState('');
   const [relatedWorks, setRelatedWorks] = useState([]);
   const [recordEntities, setRecordEntities] = useState([]);
+  const [semanticWorks, setSemanticWorks] = useState([]);
+  const [semanticStatus, setSemanticStatus] = useState('idle');
+  const [semanticRequestKey, setSemanticRequestKey] = useState(0);
 
   // State for lazy-loaded details
   const [fullRecord, setFullRecord] = useState(null);
@@ -183,6 +187,38 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
 
     findRelated();
   }, [currentFullRecord, allRecords]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    if (
+      !isOpen ||
+      !record?.id ||
+      record?.type !== 'article' ||
+      !Array.isArray(allRecords)
+    ) {
+      setSemanticWorks([]);
+      setSemanticStatus('idle');
+      return () => controller.abort();
+    }
+
+    setSemanticWorks([]);
+    setSemanticStatus('loading');
+    requestSemanticNeighbors(record.id, allRecords, { signal: controller.signal })
+      .then(neighbors => {
+        if (controller.signal.aborted) return;
+        const matches = selectSemanticRecords(neighbors, allRecords);
+        setSemanticWorks(matches);
+        setSemanticStatus(matches.length > 0 ? 'ready' : 'empty');
+      })
+      .catch(error => {
+        if (controller.signal.aborted || error?.name === 'AbortError') return;
+        setSemanticWorks([]);
+        setSemanticStatus('error');
+      });
+
+    return () => controller.abort();
+  }, [isOpen, record?.id, allRecords, semanticRequestKey]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -582,6 +618,65 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
                   `)}
                 </div>
               </section>
+            `}
+
+            ${semanticStatus !== 'idle' && semanticStatus !== 'empty' && html`
+              <details key=${record.id} className="archive-record-semantic">
+                <summary>
+                  <span className="archive-record-semantic__title">
+                    <${Sparkles} aria-hidden="true" /> Similar in theme
+                  </span>
+                  <span className="archive-record-semantic__count">
+                    ${semanticStatus === 'loading'
+                      ? 'Finding matches…'
+                      : semanticStatus === 'ready'
+                        ? `${semanticWorks.length} ${semanticWorks.length === 1 ? 'match' : 'matches'}`
+                        : 'Unavailable'}
+                  </span>
+                </summary>
+
+                <div className="archive-record-semantic__body">
+                  ${semanticStatus === 'loading' && html`
+                    <p className="archive-record-semantic__status" role="status">
+                      Comparing this record with the archive’s thematic index…
+                    </p>
+                  `}
+
+                  ${semanticStatus === 'error' && html`
+                    <div className="archive-record-semantic__status" role="status">
+                      <p>The thematic index could not be loaded.</p>
+                      <button
+                        type="button"
+                        onClick=${() => setSemanticRequestKey(key => key + 1)}
+                      >
+                        <${RefreshCw} aria-hidden="true" /> Retry thematic matches
+                      </button>
+                    </div>
+                  `}
+
+                  ${semanticStatus === 'ready' && html`
+                    <p className="archive-record-semantic__note">
+                      Language-pattern matches that may not share tagged people or ideas.
+                    </p>
+                    <div className="archive-record-related__grid">
+                      ${semanticWorks.map(match => html`
+                        <button
+                          type="button"
+                          key=${match.id}
+                          onClick=${() => onSelectRecord(match.id)}
+                        >
+                          <span className="archive-record-related__utility">
+                            <span>${match.date || match.year || 'Undated'}</span>
+                            <span className="archive-record-semantic__signal">sem</span>
+                          </span>
+                          <strong>${match.title}</strong>
+                          <span>${match.pub || match.author || 'Archive record'}</span>
+                        </button>
+                      `)}
+                    </div>
+                  `}
+                </div>
+              </details>
             `}
 
             <section className="archive-record-metadata" aria-labelledby="record-metadata-title">

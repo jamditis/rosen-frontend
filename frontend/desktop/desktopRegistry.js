@@ -1,4 +1,4 @@
-import { ROUTES } from '../services/viewState.js?v=3.8.26';
+import { ROUTES } from '../services/viewState.js?v=3.8.27';
 
 const APP_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const APP_GROUPS = new Set(['explore', 'research', 'help']);
