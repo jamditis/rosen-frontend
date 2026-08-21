@@ -21,7 +21,7 @@ Upload these files and directories from the repo root:
 index.html                          # Main archive page
 sw.js                               # Root-scope service-worker bridge (loads frontend/sw.js)
 favicon.ico                         # Site favicon
-favicon.svg                         # SVG favicon (referenced by index.html, the FAQ, and both data tools)
+favicon.svg                         # SVG favicon (referenced by index.html, the FAQ, and dataviz)
 og-image.png                        # Social sharing card (referenced by the OG/Twitter meta tags)
 shared-styles.css                   # Common styles for standalone tools
 version.json                        # Version metadata
@@ -98,9 +98,8 @@ features/                           # Standalone feature pages
   shared/text-selection.js
   winer-method/                     # Independent public-source archive-method demonstration
 
-tools/                              # Development/exploration tools
-  active/tailwind.css               # Shared Tailwind build both tools load as ../tailwind.css
-  active/dataexplorer/              # Tabular data explorer
+tools/                              # Deployed standalone tools
+  active/tailwind.css               # Shared Tailwind build loaded by dataviz as ../tailwind.css
   active/dataviz/                   # Data visualization
 
 ADDING-RECORDS.md                   # Instructions for adding new records
@@ -143,9 +142,22 @@ dissertation/timeline/
 features/status-report/
 ```
 
+It separately removes this internal prototype directory after a successful
+replacement deploy:
+
+```
+tools/active/dataexplorer/
+```
+
 This cleanup is idempotent. Missing directories are treated as already removed.
 The remaining `dissertation/` pages, the top-level `faq/`, the shipped
-`features/` pages, and `tools/active/` are not part of the cleanup list.
+`features/` pages, and `tools/active/dataviz/` are not part of the cleanup list.
+
+The source under `tools/active/dataexplorer/` remains in the repository as an
+internal prototype. It still depends on a published Google Sheet and is neither
+linked nor deployed; a full-site deploy removes any stale production copy.
+Reconsider public deployment only after it reads local archive artifacts and
+receives a fresh product and security review.
 
 ## What NOT to deploy
 
@@ -163,6 +175,7 @@ Do not upload these to the production server:
 - `package.json`, `package-lock.json` — npm config
 - `CLAUDE.md`, `README.md` — Development docs
 - `features/making-of/` (draft, PR #592). Held pending curator approval of its handoff chapter. Do not upload it, even in a full `features/` sync, until sign-off. Its `og-image.html` is a build-time render template, not a page.
+- `tools/active/dataexplorer/` — Internal prototype retained for possible migration to local archive artifacts; the full deploy prunes any stale public copy.
 
 ## Deploy after adding records
 
