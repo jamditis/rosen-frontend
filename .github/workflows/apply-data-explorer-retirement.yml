@@ -1,0 +1,310 @@
+name: Apply data explorer retirement
+
+on:
+  push:
+    branches:
+      - cleanup/retire-data-explorer-deploy
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apply-data-explorer-retirement
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Apply assertion-guarded edits
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              target = Path(path)
+              text = target.read_text(encoding='utf-8')
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(
+                      f'{path}: expected exactly one source match, found {count}'
+                  )
+              target.write_text(text.replace(old, new), encoding='utf-8')
+
+          replace_once(
+              '.htaccess',
+              """    # Content Security Policy. Validated in-browser across every route + standalone
+    # tool under this exact header (React mount, MiniSearch, sql.js, dataviz,
+    # dataexplorer, YouTube embed) with zero violations before shipping.
+""",
+              """    # Content Security Policy. Validated in-browser across every deployed route +
+    # standalone tool under this exact header (React mount, MiniSearch, sql.js,
+    # dataviz, privacy-enhanced YouTube embed) with zero violations before shipping.
+""",
+          )
+          replace_once(
+              '.htaccess',
+              """    #   cdnjs.cloudflare.com -- SRI-pinned sql.js loader (sqliteService.js), plus
+    #                           noUiSlider (dataviz) and PapaParse (dataexplorer).
+""",
+              """    #   cdnjs.cloudflare.com -- SRI-pinned sql.js loader (sqliteService.js), plus
+    #                           noUiSlider (dataviz).
+""",
+          )
+          replace_once(
+              '.htaccess',
+              """    # connect-src docs.google.com + *.googleusercontent.com  -- the dataexplorer tool
+    #                                 fetches a published Google Sheet CSV (PapaParse
+    #                                 XHR), which 302-redirects from docs.google.com to
+    #                                 a dynamic doc-NN-NN-sheets.googleusercontent.com
+    #                                 host; CSP re-checks the redirect target, so both
+    #                                 must be allowed or the fetch is blocked.
+""",
+              '',
+          )
+          replace_once(
+              '.htaccess',
+              "connect-src 'self' https://esm.sh https://script.google.com https://docs.google.com https://*.googleusercontent.com;",
+              "connect-src 'self' https://esm.sh https://script.google.com;",
+          )
+
+          replace_once(
+              'backend/scripts/deploy_full_site.py',
+              "    'favicon.svg',  # SVG favicon referenced by index.html, the FAQ, and both data tools\n",
+              "    'favicon.svg',  # SVG favicon referenced by index.html, the FAQ, and dataviz\n",
+          )
+          replace_once(
+              'backend/scripts/deploy_full_site.py',
+              """    # Shared Tailwind build for the standalone data tools. It sits at
+    # tools/active/, one level above the two deployed tool dirs, so the dir
+    # walk below never reaches it; both tools load it as ../tailwind.css.
+    # Listed explicitly so a full deploy ships it -- dataexplorer and dataviz
+    # render unstyled without it.
+""",
+              """    # Shared Tailwind build for the standalone data visualization tool. It sits
+    # at tools/active/, one level above the deployed tool dir, so the dir walk
+    # below never reaches it; dataviz loads it as ../tailwind.css.
+    # Listed explicitly so a full deploy ships it.
+""",
+          )
+          replace_once(
+              'backend/scripts/deploy_full_site.py',
+              "    'tools/active/dataexplorer',\n    'tools/active/dataviz',\n",
+              "    'tools/active/dataviz',\n",
+          )
+          replace_once(
+              'backend/scripts/deploy_full_site.py',
+              """    'features/status-report',
+)
+""",
+              """    'features/status-report',
+    # Retain the hardened source as an internal prototype, but remove any
+    # previously uploaded public copy after the replacement deploy succeeds.
+    'tools/active/dataexplorer',
+)
+""",
+          )
+
+          replace_once(
+              'backend/tests/test_deploy_full_site.py',
+              '  - retired dissertation routes are pruned only after uploads finish\n',
+              '  - retired routes and internal prototypes are pruned only after uploads finish\n',
+          )
+          replace_once(
+              'backend/tests/test_deploy_full_site.py',
+              """    def test_all_deploy_data_files_exist(self):
+        for relpath in deploy_full_site._DEPLOY_DATA_FILES:
+            path = _REPO_ROOT / relpath
+            assert path.is_file(), f\"_DEPLOY_DATA_FILES entry missing: {relpath}\"
+""",
+              """    def test_all_deploy_data_files_exist(self):
+        for relpath in deploy_full_site._DEPLOY_DATA_FILES:
+            path = _REPO_ROOT / relpath
+            assert path.is_file(), f\"_DEPLOY_DATA_FILES entry missing: {relpath}\"
+
+    def test_data_explorer_source_is_retained_but_not_deployed(self):
+        path = _REPO_ROOT / 'tools/active/dataexplorer'
+        assert path.is_dir(), 'internal data explorer source should remain available'
+        assert 'tools/active/dataexplorer' not in deploy_full_site._DEPLOY_DIRS
+        assert 'tools/active/dataexplorer' in deploy_full_site._REMOTE_PRUNE_DIRS
+""",
+          )
+          replace_once(
+              'backend/tests/test_deploy_full_site.py',
+              "        assert 'would remove 7 retired directories' in out\n        assert 'dissertation/comparison' in out\n",
+              "        assert 'would remove 8 retired directories' in out\n        assert 'dissertation/comparison' in out\n        assert 'tools/active/dataexplorer' in out\n",
+          )
+          replace_once(
+              'backend/tests/test_deploy_full_site.py',
+              """      - favicon.svg (repo root) is referenced by index.html, the FAQ, the
+        design-system demo, and both data tools, but is not under any deployed
+        dir, so a manifest without it deploys pages with a broken SVG favicon.
+      - tools/active/tailwind.css sits one level above the two deployed tool
+        dirs; dataexplorer and dataviz load it as ../tailwind.css, so a manifest
+        without it deploys both tools unstyled.
+""",
+              """      - favicon.svg (repo root) is referenced by index.html, the FAQ, the
+        design-system demo, and dataviz, but is not under any deployed dir, so
+        a manifest without it deploys pages with a broken SVG favicon.
+      - tools/active/tailwind.css sits one level above the deployed dataviz dir;
+        dataviz loads it as ../tailwind.css, so a manifest without it deploys
+        the tool unstyled.
+""",
+          )
+
+          replace_once(
+              'DEPLOYMENT.md',
+              'favicon.svg                         # SVG favicon (referenced by index.html, the FAQ, and both data tools)\n',
+              'favicon.svg                         # SVG favicon (referenced by index.html, the FAQ, and dataviz)\n',
+          )
+          replace_once(
+              'DEPLOYMENT.md',
+              """tools/                              # Development/exploration tools
+  active/tailwind.css               # Shared Tailwind build both tools load as ../tailwind.css
+  active/dataexplorer/              # Tabular data explorer
+  active/dataviz/                   # Data visualization
+""",
+              """tools/                              # Deployed standalone tools
+  active/tailwind.css               # Shared Tailwind build loaded by dataviz as ../tailwind.css
+  active/dataviz/                   # Data visualization
+""",
+          )
+          replace_once(
+              'DEPLOYMENT.md',
+              """features/status-report/
+```
+
+This cleanup is idempotent. Missing directories are treated as already removed.
+The remaining `dissertation/` pages, the top-level `faq/`, the shipped
+`features/` pages, and `tools/active/` are not part of the cleanup list.
+""",
+              """features/status-report/
+tools/active/dataexplorer/
+```
+
+This cleanup is idempotent. Missing directories are treated as already removed.
+The remaining `dissertation/` pages, the top-level `faq/`, the shipped
+`features/` pages, and `tools/active/dataviz/` are not part of the cleanup list.
+
+The source under `tools/active/dataexplorer/` remains in the repository as an
+internal prototype. It still depends on a published Google Sheet and is neither
+linked nor deployed; a full-site deploy removes any stale production copy.
+Reconsider public deployment only after it reads local archive artifacts and
+receives a fresh product and security review.
+""",
+          )
+          replace_once(
+              'DEPLOYMENT.md',
+              "- `features/making-of/` (draft, PR #592). Held pending curator approval of its handoff chapter. Do not upload it, even in a full `features/` sync, until sign-off. Its `og-image.html` is a build-time render template, not a page.\n",
+              "- `features/making-of/` (draft, PR #592). Held pending curator approval of its handoff chapter. Do not upload it, even in a full `features/` sync, until sign-off. Its `og-image.html` is a build-time render template, not a page.\n- `tools/active/dataexplorer/` — Internal prototype retained for possible migration to local archive artifacts; the full deploy prunes any stale public copy.\n",
+          )
+
+          replace_once(
+              'tests/repo-security.test.js',
+              """  // validated in-browser under this exact header (main app + dataviz + dataexplorer +
+  // the real cdnjs sql.js loader + a youtube frame), so an incomplete OR over-broad CSP
+""",
+              """  // validated in-browser under this exact header (main app + dataviz +
+  // the real cdnjs sql.js loader + a youtube frame), so an incomplete OR over-broad CSP
+""",
+          )
+          replace_once(
+              'tests/repo-security.test.js',
+              """  // script-src: esm.sh module CDN; cdnjs (SRI-pinned sql.js loader + noUiSlider +
+  // PapaParse); jsdelivr (chart.js/treemap in dataviz); 'unsafe-inline' for the inline
+""",
+              """  // script-src: esm.sh module CDN; cdnjs (SRI-pinned sql.js loader +
+  // noUiSlider); jsdelivr (chart.js/treemap in dataviz); 'unsafe-inline' for the inline
+""",
+          )
+          replace_once(
+              'tests/repo-security.test.js',
+              """  // connect-src: esm.sh module fetches; the report/submission fetch (script.google.com);
+  // the dataexplorer published-sheet CSV fetch (docs.google.com, which 302-redirects to
+  // a *.googleusercontent.com host the CSP re-checks).
+  assertSources('connect-src', [
+    \"'self'\",
+    'https://esm.sh',
+    'https://script.google.com',
+    'https://docs.google.com',
+    'https://*.googleusercontent.com',
+  ]);
+""",
+              """  // connect-src: esm.sh module fetches plus the report/submission endpoint.
+  // The internal data explorer no longer widens production CSP for Google Sheets.
+  assertSources('connect-src', [
+    \"'self'\",
+    'https://esm.sh',
+    'https://script.google.com',
+  ]);
+  assert.ok(!directives.get('connect-src').includes('https://docs.google.com'));
+  assert.ok(!directives.get('connect-src').includes('https://*.googleusercontent.com'));
+""",
+          )
+
+          replace_once(
+              'docs/feature-audit/README.md',
+              """All four audit phases finished. The folder is not uniformly frozen, so before you run anything here, check which column it is in.
+""",
+              """All four audit phases finished. The folder is not uniformly frozen, so before you run anything here, check which column it is in.
+
+**Current product override:** The data explorer entries describe the June 2026 deployed state. Issue #583 now classifies `tools/active/dataexplorer/` as an internal prototype: its source and security regression tests remain, but it is not linked or deployed, and full deploys prune any stale production copy. Keep the historical verdicts unchanged as evidence of the earlier state.
+""",
+          )
+
+          explorer_readme = Path('tools/active/dataexplorer/README.md')
+          if explorer_readme.exists():
+              raise SystemExit(f'{explorer_readme}: expected a new file')
+          explorer_readme.write_text(
+              """# Data explorer prototype
+
+**Status: internal; not deployed.**
+
+The tabular data explorer is retained because it has a product specification, a security hardening pass, and useful interaction work. It is not linked from the public archive and is excluded from the full-site deploy because its only runtime data source is a large published Google Sheet with no local fallback.
+
+Production deliberately does not allow the Google Sheet origins in Content Security Policy. A full deploy also removes any previously uploaded `tools/active/dataexplorer/` directory, so an old manual upload cannot leave a hidden public endpoint behind.
+
+Before reconsidering public deployment:
+
+1. Migrate the tool to committed local archive artifacts rather than a live Sheet.
+2. Measure initial and repeat-load cost against the current archive interfaces.
+3. Re-run the product, accessibility, security, and deployment review.
+4. Add an intentional public navigation entry only after those checks pass.
+
+The source-level security regression remains active:
+
+```bash
+node --test tests/data-explorer-security.test.js
+```
+""",
+              encoding='utf-8',
+          )
+          PY
+
+      - name: Validate edits
+        shell: bash
+        run: |
+          git diff --check
+          node --test tests/repo-security.test.js tests/data-explorer-security.test.js
+          python3 -m py_compile backend/scripts/deploy_full_site.py
+          python3 -m pip install --disable-pip-version-check pytest paramiko
+          python3 -m pytest backend/tests/test_deploy_full_site.py
+
+      - name: Commit the completed change
+        shell: bash
+        run: |
+          rm .github/workflows/apply-data-explorer-retirement.yml
+          git config user.name 'Joe Amditis'
+          git config user.email '6799804+jamditis@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'security: retire hidden data explorer from production'
+          git push origin HEAD:${{ github.ref_name }}
