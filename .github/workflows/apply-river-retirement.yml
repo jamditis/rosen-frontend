@@ -1,0 +1,348 @@
+name: Apply RiverOfNews retirement
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches:
+      - cleanup/retire-data-explorer-deploy
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apply-river-retirement-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    if: github.head_ref == 'cleanup/remove-river-of-news' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out the head branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Remove unreachable code and add remote cleanup
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              target = Path(path)
+              text = target.read_text(encoding='utf-8')
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(
+                      f'{path}: expected exactly one source match, found {count}'
+                  )
+              target.write_text(text.replace(old, new), encoding='utf-8')
+
+          component = Path('frontend/components/RiverOfNews.js')
+          if not component.is_file():
+              raise SystemExit(f'{component}: expected live component source')
+          component.unlink()
+
+          css_path = Path('frontend/index.css')
+          css = css_path.read_text(encoding='utf-8')
+          start_marker = '\n.archive-river {\n'
+          end_marker = '\n@media (hover: hover) {'
+          start = css.find(start_marker)
+          end = css.find(end_marker, start + 1)
+          if start < 0 or end < 0:
+              raise SystemExit('frontend/index.css: RiverOfNews block boundaries not found')
+          block = css[start:end]
+          if block.count('.archive-river') < 25:
+              raise SystemExit('frontend/index.css: RiverOfNews block was unexpectedly small')
+          if any(token in block for token in (
+              '.archive-featured-card',
+              '.archive-record-card',
+              '.archive-folder-card',
+          )):
+              raise SystemExit('frontend/index.css: removal block contains non-river selectors')
+          css_path.write_text(css[:start] + css[end:], encoding='utf-8')
+
+          replace_once(
+              'tests/discovery-design-refresh.test.js',
+              "const river = read('frontend/components/RiverOfNews.js');\n",
+              '',
+          )
+          replace_once(
+              'tests/discovery-design-refresh.test.js',
+              "    assert.match(river, /archive-river__item/);\n",
+              '',
+          )
+          replace_once(
+              'tests/discovery-design-refresh.test.js',
+              "    assert.match(river, /role=\"button\"[\\s\\S]*tabIndex=\"0\"/);\n",
+              '',
+          )
+          replace_once(
+              'tests/discovery-design-refresh.test.js',
+              "    assert.match(styles, /\\.archive-river__item/);\n",
+              '',
+          )
+
+          replace_once(
+              'frontend/utils/recordSort.js',
+              """ * chronological. The `|| ''` guards mirror RiverOfNews and keep a record with
+ * a missing date or title from throwing, sorting it as the earliest/empty key
+""",
+              """ * chronological. The `|| ''` guards keep a record with a missing date or title
+ * from throwing, sorting it as the earliest/empty key
+""",
+          )
+
+          replace_once(
+              'backend/scripts/deploy_full_site.py',
+              """_REMOTE_PRUNE_TARGETS: Tuple[str, ...] = (
+    *_REMOTE_PRUNE_DIRS,
+    *_REMOTE_INTERNAL_PRUNE_DIRS,
+)
+
+# features/making-of is intentionally omitted.
+""",
+              """_REMOTE_PRUNE_TARGETS: Tuple[str, ...] = (
+    *_REMOTE_PRUNE_DIRS,
+    *_REMOTE_INTERNAL_PRUNE_DIRS,
+)
+
+# Deleted source files can survive an additive FTP deploy unless they are
+# explicitly removed after the replacement release is live.
+_REMOTE_PRUNE_FILES: Tuple[str, ...] = (
+    'frontend/components/RiverOfNews.js',
+)
+
+# features/making-of is intentionally omitted.
+""",
+          )
+          replace_once(
+              'backend/scripts/deploy_full_site.py',
+              """def _prune_remote_record_shells(
+""",
+              """def _remove_remote_file(remote, remote_file: str) -> bool:
+    \"\"\"Remove one retired remote file, returning False when already absent.\"\"\"
+    try:
+        remote.remove(remote_file)
+        return True
+    except IOError as exc:
+        if getattr(exc, 'errno', None) == errno.ENOENT:
+            return False
+        raise
+
+
+def _prune_remote_record_shells(
+""",
+          )
+          replace_once(
+              'backend/scripts/deploy_full_site.py',
+              """    remote_prune_dirs: Iterable[str] = _REMOTE_PRUNE_TARGETS,
+    record_shells: Optional[Iterable[Path]] = None,
+""",
+              """    remote_prune_dirs: Iterable[str] = _REMOTE_PRUNE_TARGETS,
+    remote_prune_files: Iterable[str] = (),
+    record_shells: Optional[Iterable[Path]] = None,
+""",
+          )
+          replace_once(
+              'backend/scripts/deploy_full_site.py',
+              """        for relpath in remote_prune_dirs:
+            remote_dir = remote_transfer.scoped_archive_child(
+                cfg['site_path'], relpath)
+            if _remove_remote_tree(remote, remote_dir):
+                logger.info(f'Removed non-public directory: {relpath}')
+    except Exception as exc:
+""",
+              """        for relpath in remote_prune_dirs:
+            remote_dir = remote_transfer.scoped_archive_child(
+                cfg['site_path'], relpath)
+            if _remove_remote_tree(remote, remote_dir):
+                logger.info(f'Removed non-public directory: {relpath}')
+
+        for relpath in remote_prune_files:
+            remote_file = remote_transfer.scoped_archive_child(
+                cfg['site_path'], relpath)
+            if _remove_remote_file(remote, remote_file):
+                logger.info(f'Removed retired file: {relpath}')
+    except Exception as exc:
+""",
+          )
+          replace_once(
+              'backend/scripts/deploy_full_site.py',
+              """        for relpath in _REMOTE_INTERNAL_PRUNE_DIRS:
+            print(f'  {relpath}')
+        return 0
+""",
+              """        for relpath in _REMOTE_INTERNAL_PRUNE_DIRS:
+            print(f'  {relpath}')
+        print(
+            f'would remove {len(_REMOTE_PRUNE_FILES)} retired file after upload'
+        )
+        for relpath in _REMOTE_PRUNE_FILES:
+            print(f'  {relpath}')
+        return 0
+""",
+          )
+          replace_once(
+              'backend/scripts/deploy_full_site.py',
+              "result = push_files(files, repo_root, cfg, record_shells=record_pages)\n",
+              """result = push_files(
+        files,
+        repo_root,
+        cfg,
+        remote_prune_files=_REMOTE_PRUNE_FILES,
+        record_shells=record_pages,
+    )
+""",
+          )
+
+          replace_once(
+              'backend/tests/test_deploy_full_site.py',
+              """        assert deploy_full_site._REMOTE_PRUNE_TARGETS == (
+            *expected,
+            'tools/active/dataexplorer',
+        )
+""",
+              """        assert deploy_full_site._REMOTE_PRUNE_TARGETS == (
+            *expected,
+            'tools/active/dataexplorer',
+        )
+        assert deploy_full_site._REMOTE_PRUNE_FILES == (
+            'frontend/components/RiverOfNews.js',
+        )
+""",
+          )
+          replace_once(
+              'backend/tests/test_deploy_full_site.py',
+              """        assert 'would remove 1 internal prototype directory' in out
+        assert 'tools/active/dataexplorer' in out
+""",
+              """        assert 'would remove 1 internal prototype directory' in out
+        assert 'tools/active/dataexplorer' in out
+        assert 'would remove 1 retired file after upload' in out
+        assert 'frontend/components/RiverOfNews.js' in out
+""",
+          )
+          replace_once(
+              'backend/tests/test_deploy_full_site.py',
+              """    def test_remote_prune_removes_nested_files_before_directories(self):
+""",
+              """    def test_remote_file_prune_runs_after_uploads(self, monkeypatch, tmp_path):
+        _set_env(monkeypatch)
+        (tmp_path / 'index.html').write_text('<html>')
+
+        with patch('paramiko.SSHClient') as mock_client_cls:
+            mock_client = MagicMock()
+            mock_sftp = MagicMock()
+            mock_client.open_sftp.return_value = mock_sftp
+            mock_client_cls.return_value = mock_client
+
+            result = deploy_full_site.push_files(
+                [tmp_path / 'index.html'],
+                repo_root=tmp_path,
+                cfg=deploy_full_site._read_env(),
+                remote_prune_dirs=(),
+                remote_prune_files=('frontend/components/RiverOfNews.js',),
+            )
+
+        assert result['ok'] is True
+        remote_file = (
+            '/home/rosen/public_html/j/rosen-archive/'
+            'frontend/components/RiverOfNews.js'
+        )
+        mock_sftp.remove.assert_called_once_with(remote_file)
+        upload_call = next(
+            i for i, call in enumerate(mock_sftp.method_calls)
+            if call[0] == 'posix_rename'
+        )
+        prune_call = next(
+            i for i, call in enumerate(mock_sftp.method_calls)
+            if call[0] == 'remove'
+        )
+        assert prune_call > upload_call
+
+    def test_missing_remote_file_is_already_pruned(self):
+        remote = MagicMock()
+        remote.remove.side_effect = FileNotFoundError(errno.ENOENT, 'not found')
+
+        assert deploy_full_site._remove_remote_file(
+            remote,
+            '/site/frontend/components/RiverOfNews.js',
+        ) is False
+
+    def test_remote_prune_removes_nested_files_before_directories(self):
+""",
+          )
+
+          replace_once(
+              'DEPLOYMENT.md',
+              '## Retired routes removed by a full deploy\n',
+              '## Retired paths removed by a full deploy\n',
+          )
+          replace_once(
+              'DEPLOYMENT.md',
+              """tools/active/dataexplorer/
+```
+
+This cleanup is idempotent. Missing directories are treated as already removed.
+""",
+              """tools/active/dataexplorer/
+```
+
+It also removes this retired frontend source file after the replacement release
+is live:
+
+```
+frontend/components/RiverOfNews.js
+```
+
+This cleanup is idempotent. Missing paths are treated as already removed.
+""",
+          )
+
+          status_path = Path('docs/feature-audit/CURRENT_STATUS.md')
+          status = status_path.read_text(encoding='utf-8')
+          if '## River of News' in status:
+              raise SystemExit('CURRENT_STATUS.md: River retirement already recorded')
+          status_path.write_text(
+              status.rstrip() + """
+
+## River of News
+
+Issue #584 retires `frontend/components/RiverOfNews.js` rather than exposing it as a route. The component was designed for a live feed: every current archive record falls into its collapsed oldest bucket, while its default expanded groups contain no records. The active source, its shipped CSS, and the stale production file are removed. Historical feature-audit verdicts remain unchanged as dated evidence.
+""" + '\n',
+              encoding='utf-8',
+          )
+          PY
+
+      - name: Stamp the frontend release
+        run: npm run bump-version -- 3.8.24
+
+      - name: Validate the generated change
+        shell: bash
+        run: |
+          npm ci
+          node --test tests/version-consistency.test.js tests/bump-version.test.js tests/discovery-design-refresh.test.js
+          python3 -m py_compile backend/scripts/deploy_full_site.py
+          python3 -m pip install --disable-pip-version-check pytest paramiko
+          python3 -m pytest backend/tests/test_deploy_full_site.py
+          git diff --check
+
+      - name: Commit the completed change
+        shell: bash
+        run: |
+          rm .github/workflows/apply-river-retirement.yml
+          git config user.name 'Joe Amditis'
+          git config user.email '6799804+jamditis@users.noreply.github.com'
+          git add -A
+          git diff --cached --check
+          git commit -m 'cleanup: retire unreachable RiverOfNews component'
+          git push origin HEAD:${{ github.head_ref }}
