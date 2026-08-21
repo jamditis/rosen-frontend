@@ -34,11 +34,18 @@ describe('similar-in-theme record strand', () => {
     assert.match(semanticClient, /type: 'module'/);
   });
 
+  it('does not load the artifact for social or other non-embedded record types', () => {
+    assert.match(recordModal, /record\?\.type !== 'article'/);
+  });
+
   it('renders a sem-only details strand after entity-related records', () => {
     const relatedIndex = recordModal.indexOf('archive-record-related');
     const semanticIndex = recordModal.indexOf('archive-record-semantic');
     assert.ok(relatedIndex >= 0 && semanticIndex > relatedIndex);
-    assert.match(recordModal, /<details className="archive-record-semantic">/);
+    assert.match(
+      recordModal,
+      /<details key=\$\{record\.id\} className="archive-record-semantic">/,
+    );
     assert.match(recordModal, /Similar in theme/);
     assert.match(recordModal, /archive-record-semantic__signal">sem</);
   });

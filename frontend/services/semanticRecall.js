@@ -145,9 +145,11 @@ export function createSemanticRecallClient({
         cleanupRequest(requestId)?.reject(makeAbortError());
       };
       const timer = setTimeout(() => {
-        cleanupRequest(requestId)?.reject(
-          new Error('Semantic recall request timed out'),
-        );
+        if (!pending.has(requestId)) return;
+        const error = new Error('Semantic recall request timed out');
+        rejectAll(error);
+        worker?.terminate();
+        worker = null;
       }, timeoutMs);
 
       pending.set(requestId, { resolve, reject, timer, signal, onAbort });

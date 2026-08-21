@@ -191,7 +191,12 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
   useEffect(() => {
     const controller = new AbortController();
 
-    if (!isOpen || !record?.id || !Array.isArray(allRecords)) {
+    if (
+      !isOpen ||
+      !record?.id ||
+      record?.type !== 'article' ||
+      !Array.isArray(allRecords)
+    ) {
       setSemanticWorks([]);
       setSemanticStatus('idle');
       return () => controller.abort();
@@ -616,7 +621,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
             `}
 
             ${semanticStatus !== 'idle' && semanticStatus !== 'empty' && html`
-              <details className="archive-record-semantic">
+              <details key=${record.id} className="archive-record-semantic">
                 <summary>
                   <span className="archive-record-semantic__title">
                     <${Sparkles} aria-hidden="true" /> Similar in theme

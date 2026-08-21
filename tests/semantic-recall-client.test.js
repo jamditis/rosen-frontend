@@ -180,4 +180,29 @@ describe('semantic recall worker client', () => {
     assert.deepEqual(await second, []);
     client.terminate();
   });
+
+  it('recycles a timed-out worker so retry starts with a clean store load', async () => {
+    const workers = [];
+    const client = createSemanticRecallClient({
+      workerFactory: () => {
+        const worker = new FakeWorker();
+        workers.push(worker);
+        return worker;
+      },
+      requestTimeoutMs: 5,
+    });
+
+    await assert.rejects(client.request('A', []), /timed out/);
+    assert.equal(workers[0].terminated, true);
+
+    const retry = client.request('A', []);
+    assert.equal(workers.length, 2);
+    workers[1].emit('message', {
+      type: 'neighbors-result',
+      requestId: 'semantic-2',
+      neighbors: [],
+    });
+    assert.deepEqual(await retry, []);
+    client.terminate();
+  });
 });
