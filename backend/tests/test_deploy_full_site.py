@@ -9,7 +9,7 @@ partial deploy is worse than no deploy).
 These tests cover the load-bearing behaviors:
   - manifest entries all exist on disk (drift between code and reality)
   - DEPLOYMENT.md top-level entries all appear in the manifest
-  - retired dissertation routes are pruned only after uploads finish
+  - retired routes and internal prototypes are pruned only after uploads finish
   - --dry-run does not open a connection
   - missing ROSEN_SFTP_* env exits 2 with a clear stderr message
   - the file collector respects exclusion patterns
@@ -173,7 +173,7 @@ class TestDeploymentMdAlignment:
         tools/active/tailwind.css -- must appear in DEPLOYMENT.md. The
         top-level test only checks first path segments, so a nested file could
         drop from the doc while the manifest stayed correct; a manual deploy
-        following the doc would then omit it (e.g. both data tools unstyled).
+        following the doc would then omit it (e.g. dataviz would be unstyled).
         """
         documented = self._documented_paths(self._fenced_block())
         explicit = (deploy_full_site._DEPLOY_FILES
@@ -627,11 +627,11 @@ class TestReferencedAssetsAreDeployed:
     deployed directory subtrees, so the dir walk never reaches it and a full
     deploy ships pages that reference a file it never uploads. Concretely:
       - favicon.svg (repo root) is referenced by index.html, the FAQ, the
-        design-system demo, and both data tools, but is not under any deployed
-        dir, so a manifest without it deploys pages with a broken SVG favicon.
-      - tools/active/tailwind.css sits one level above the two deployed tool
-        dirs; dataexplorer and dataviz load it as ../tailwind.css, so a manifest
-        without it deploys both tools unstyled.
+        design-system demo, and dataviz, but is not under any deployed dir, so
+        a manifest without it deploys pages with a broken SVG favicon.
+      - tools/active/tailwind.css sits one level above the deployed dataviz dir;
+        dataviz loads it as ../tailwind.css, so a manifest without it deploys
+        the tool unstyled.
     Such a page only "works" on the live server when a past manual upload left
     the file there -- FTP does not delete unlisted files -- which hides the gap
     until a clean deploy or an asset change. This test resolves every
@@ -850,7 +850,7 @@ class TestReferencedAssetsAreDeployed:
 
     def test_tag_ref_re_ignores_data_prefixed_attributes(self):
         """href/src extraction must not read a data-src / data-href decoy as
-        the real attribute. \\b alone matches after the hyphen in data-src, so
+        the real attribute. \b alone matches after the hyphen in data-src, so
         a lazy-load placeholder would be scanned instead of the src a browser
         actually loads -- the same data-* class fixed in the meta regexes.
         """
@@ -973,6 +973,8 @@ class TestDryRun:
         assert 'dry-run' in out.lower() or 'would upload' in out.lower()
         assert 'would remove 7 retired directories' in out
         assert 'dissertation/comparison' in out
+        assert 'would remove 1 internal prototype directory' in out
+        assert 'tools/active/dataexplorer' in out
 
     def test_dry_run_with_missing_env_still_lists_files(self, monkeypatch, capsys):
         # Even without creds, --dry-run should print the file list — useful
@@ -1130,7 +1132,7 @@ class TestUploadPathsUsePosixRename:
 
 
 class TestRetiredRoutes:
-    """Full deploys remove retired public routes."""
+    """Full deploys remove retired public routes and internal prototypes."""
 
     def test_prune_manifest_matches_removed_routes(self):
         expected = (
@@ -1143,6 +1145,13 @@ class TestRetiredRoutes:
             'features/status-report',
         )
         assert deploy_full_site._REMOTE_PRUNE_DIRS == expected
+        assert deploy_full_site._REMOTE_INTERNAL_PRUNE_DIRS == (
+            'tools/active/dataexplorer',
+        )
+        assert deploy_full_site._REMOTE_PRUNE_TARGETS == (
+            *expected,
+            'tools/active/dataexplorer',
+        )
         archived_tools_root = _REPO_ROOT / 'archived' / 'dissertation-tools'
         for relpath in expected[:-1]:
             route_name = pathlib.PurePosixPath(relpath).name
@@ -1151,14 +1160,12 @@ class TestRetiredRoutes:
         assert not (_REPO_ROOT / 'features' / 'status-report').exists()
         assert 'features/status-report' not in deploy_full_site._DEPLOY_DIRS
 
-        # Issue #166 removes only retired tools. Both live development tools
-        # remain tracked and in the upload manifest.
-        for relpath in (
-            'tools/active/dataexplorer',
-            'tools/active/dataviz',
-        ):
-            assert (_REPO_ROOT / relpath).is_dir()
-            assert relpath in deploy_full_site._DEPLOY_DIRS
+        # Dataviz remains public. The hardened explorer source remains tracked,
+        # but issue #583 makes it internal and prunes any stale production copy.
+        assert (_REPO_ROOT / 'tools/active/dataviz').is_dir()
+        assert 'tools/active/dataviz' in deploy_full_site._DEPLOY_DIRS
+        assert (_REPO_ROOT / 'tools/active/dataexplorer').is_dir()
+        assert 'tools/active/dataexplorer' not in deploy_full_site._DEPLOY_DIRS
 
     def test_remote_prune_runs_after_uploads(self, monkeypatch, tmp_path):
         _set_env(monkeypatch)
