@@ -13,7 +13,7 @@
 // Cache version is tied to the app version in version.json. Bumping it on every
 // deploy (alongside index.html and the ?v= import strings) makes the activate
 // handler below drop stale cache namespaces after the release takes control.
-const CACHE_VERSION = '3.8.22';
+const CACHE_VERSION = '3.8.23';
 const CACHE_NAME = `jrda-cache-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `jrda-data-${CACHE_VERSION}`;
 
