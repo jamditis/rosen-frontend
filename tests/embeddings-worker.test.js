@@ -186,7 +186,7 @@ test("loadEmbeddingStore rejects a same-shape stale binary by digest", async () 
   const binBuffer = serializeVectors(IDS.map((id) => quantizeInt8(VECTORS[id])));
   const index = { ...buildIndex(binBuffer), binarySha256: '0'.repeat(64) };
   const fetchImpl = async (url) => {
-    if (url.endsWith(".bin")) {
+    if (url.includes(".bin")) {
       return {
         ok: true,
         arrayBuffer: async () =>

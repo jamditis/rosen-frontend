@@ -182,9 +182,9 @@ export function buildEmbeddingStore(buffer, index) {
  * injectable so this loads under a fake fetch in tests and under the real one
  * (worker or main thread) in the browser.
  */
-function cacheBustedSidecarUrl(indexUrl, token) {
-  const separator = indexUrl.includes('?') ? '&' : '?';
-  return `${indexUrl}${separator}integrity=${encodeURIComponent(token)}`;
+function cacheBustedArtifactUrl(url, token) {
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}integrity=${encodeURIComponent(token)}`;
 }
 
 async function verifyEmbeddingPair(buffer, index, digestImpl) {
@@ -223,21 +223,33 @@ export async function loadEmbeddingStore(
   try {
     return await verifyEmbeddingPair(buffer, index, digestImpl);
   } catch (initialIntegrityError) {
-    // The service worker serves JSON stale-while-revalidate but the binary
-    // network-first. During a release rollover that can briefly pair a fresh
-    // binary with the previous sidecar. Retry the sidecar exactly once under a
-    // new cache key; keep the same binary so this cannot become an unbounded
-    // network loop or mask a genuinely bad artifact pair.
-    const freshIndexUrl = cacheBustedSidecarUrl(indexUrl, cacheBustToken());
-    const freshIndexResponse = await fetchImpl(freshIndexUrl, { cache: 'reload' });
+    // The two parallel requests can observe either order of a release switch.
+    // Refresh both members exactly once under one new cache key so the retry
+    // reads one release without creating an unbounded network loop.
+    const retryToken = cacheBustToken();
+    const freshBinUrl = cacheBustedArtifactUrl(binUrl, retryToken);
+    const freshIndexUrl = cacheBustedArtifactUrl(indexUrl, retryToken);
+    const [freshBinResponse, freshIndexResponse] = await Promise.all([
+      fetchImpl(freshBinUrl, { cache: 'reload' }),
+      fetchImpl(freshIndexUrl, { cache: 'reload' }),
+    ]);
+    if (!freshBinResponse.ok) {
+      throw new Error(
+        `embeddings binary ${freshBinUrl}: ${freshBinResponse.status}`,
+        { cause: initialIntegrityError },
+      );
+    }
     if (!freshIndexResponse.ok) {
       throw new Error(
         `embeddings index ${freshIndexUrl}: ${freshIndexResponse.status}`,
         { cause: initialIntegrityError },
       );
     }
-    const freshIndex = await freshIndexResponse.json();
-    return verifyEmbeddingPair(buffer, freshIndex, digestImpl);
+    const [freshBuffer, freshIndex] = await Promise.all([
+      freshBinResponse.arrayBuffer(),
+      freshIndexResponse.json(),
+    ]);
+    return verifyEmbeddingPair(freshBuffer, freshIndex, digestImpl);
   }
 }
 

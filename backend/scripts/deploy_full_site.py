@@ -612,6 +612,28 @@ def _publish_recall_artifact_pair(
     local_digests = tuple(
         _local_file_digest(entry['local']) for entry in entries)
 
+    # A byte-identical pair needs no rollback storage. Check the public pair
+    # before the first access to the configured private transaction root.
+    for entry in entries:
+        _ensure_remote_dir(
+            remote, entry['final'].rsplit('/', 1)[0], dir_cache)
+        entry['final_exists'] = _remote_exists(remote, entry['final'])
+        entry['legacy_backup_exists'] = _remote_exists(
+            remote, entry['legacy_backup'])
+    if all(entry['final_exists'] for entry in entries):
+        final_digests = tuple(
+            _remote_file_digest(remote, entry['final']) for entry in entries)
+        if final_digests == local_digests:
+            for entry in entries:
+                for legacy_path in (
+                    entry['tmp'],
+                    entry['legacy_backup'],
+                    entry['legacy_backup_tmp'],
+                    entry['legacy_restore_tmp'],
+                ):
+                    _remove_remote_if_exists(remote, legacy_path)
+            return
+
     private_root_exists = bool(
         transaction_root and _remote_exists(remote, transaction_root))
 
@@ -643,11 +665,6 @@ def _publish_recall_artifact_pair(
     # transaction from the configured private root, while still accepting and
     # removing backup files left by the older public-path implementation.
     for entry in entries:
-        _ensure_remote_dir(
-            remote, entry['final'].rsplit('/', 1)[0], dir_cache)
-        entry['final_exists'] = _remote_exists(remote, entry['final'])
-        entry['legacy_backup_exists'] = _remote_exists(
-            remote, entry['legacy_backup'])
         entry['private_backup_exists'] = bool(
             private_root_exists
             and _remote_exists(remote, entry['private_backup']))

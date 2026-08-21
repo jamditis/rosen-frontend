@@ -264,6 +264,29 @@ def test_unchanged_pair_skips_ftps_no_overwrite_switch(tmp_path, monkeypatch):
     assert remote.closed is True
 
 
+def test_unchanged_pair_does_not_probe_private_transaction_root(tmp_path, monkeypatch):
+    binary, sidecar = _fixture(tmp_path)
+    root = "/home/archive/public_html/j/rosen-archive"
+    transaction_root = _transaction_root(root)
+    remote = MemoryRemote(root, fail_stat_target=transaction_root)
+    binary_final = f"{root}/data/archive-embeddings.bin"
+    sidecar_final = f"{root}/data/archive-embeddings.json"
+    remote.files[binary_final] = binary.read_bytes()
+    remote.files[sidecar_final] = sidecar.read_bytes()
+    monkeypatch.setattr(deploy.remote_transfer, "connect_remote", lambda cfg: remote)
+
+    result = deploy.push_files(
+        [binary, sidecar],
+        tmp_path,
+        _cfg(root),
+        remote_prune_dirs=(),
+    )
+
+    assert result == {"ok": True, "files_pushed": 2, "error": None}
+    assert remote.history == []
+    assert remote.closed is True
+
+
 def test_first_publish_falls_back_to_rename_when_target_is_absent(
     tmp_path, monkeypatch
 ):

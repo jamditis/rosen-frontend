@@ -11,10 +11,14 @@ import {
   loadEmbeddingStore,
 } from '../frontend/services/embeddings-worker.js';
 
-function fixturePair() {
+function fixturePair(firstAxis = 0) {
   const vectors = [
-    Array.from({ length: EMBED_DIM }, (_value, index) => (index === 0 ? 1 : 0)),
-    Array.from({ length: EMBED_DIM }, (_value, index) => (index === 1 ? 1 : 0)),
+    Array.from({ length: EMBED_DIM }, (_value, index) =>
+      index === firstAxis ? 1 : 0
+    ),
+    Array.from({ length: EMBED_DIM }, (_value, index) =>
+      index === firstAxis + 1 ? 1 : 0
+    ),
   ];
   const binary = serializeVectors(vectors.map(quantizeInt8));
   const index = buildEmbeddingIndex(['A', 'B'], sha256Hex(binary));
@@ -41,17 +45,17 @@ function indexResponse(index) {
 }
 
 describe('embeddings integrity refresh', () => {
-  it('refetches the sidecar once with a cache-busted URL after a digest mismatch', async () => {
-    const { binary, index } = fixturePair();
-    const staleIndex = { ...index, binarySha256: '0'.repeat(64) };
+  it('refreshes both members when the binary switches before the sidecar', async () => {
+    const { index: oldIndex } = fixturePair();
+    const { binary: newBinary, index: newIndex } = fixturePair(2);
     const calls = [];
     let sidecarReads = 0;
 
     const fetchImpl = async (url, options) => {
       calls.push({ url, options });
-      if (url.includes('.bin')) return binaryResponse(binary);
+      if (url.includes('.bin')) return binaryResponse(newBinary);
       sidecarReads += 1;
-      return indexResponse(sidecarReads === 1 ? staleIndex : index);
+      return indexResponse(sidecarReads === 1 ? oldIndex : newIndex);
     };
 
     const store = await loadEmbeddingStore(
@@ -64,12 +68,54 @@ describe('embeddings integrity refresh', () => {
     );
 
     assert.deepEqual(store.ids, ['A', 'B']);
-    assert.equal(calls.length, 3);
+    assert.equal(calls.length, 4);
     assert.equal(
       calls[2].url,
+      '../../data/archive-embeddings.bin?v=3.8.24&integrity=retry-token',
+    );
+    assert.equal(
+      calls[3].url,
       '../../data/archive-embeddings.json?v=3.8.24&integrity=retry-token',
     );
     assert.deepEqual(calls[2].options, { cache: 'reload' });
+    assert.deepEqual(calls[3].options, { cache: 'reload' });
+  });
+
+  it('refreshes both members when the sidecar switches before the binary', async () => {
+    const { binary: oldBinary } = fixturePair();
+    const { binary: newBinary, index: newIndex } = fixturePair(2);
+    const calls = [];
+    let binaryReads = 0;
+
+    const fetchImpl = async (url, options) => {
+      calls.push({ url, options });
+      if (url.includes('.bin')) {
+        binaryReads += 1;
+        return binaryResponse(binaryReads === 1 ? oldBinary : newBinary);
+      }
+      return indexResponse(newIndex);
+    };
+
+    const store = await loadEmbeddingStore('vectors.bin', 'vectors.json', {
+      fetchImpl,
+      cacheBustToken: () => 'reverse-retry',
+    });
+
+    assert.deepEqual(store.ids, ['A', 'B']);
+    assert.equal(calls.length, 4);
+    assert.deepEqual(
+      calls.slice(2),
+      [
+        {
+          url: 'vectors.bin?integrity=reverse-retry',
+          options: { cache: 'reload' },
+        },
+        {
+          url: 'vectors.json?integrity=reverse-retry',
+          options: { cache: 'reload' },
+        },
+      ],
+    );
   });
 
   it('also retries a structurally stale sidecar before decoding vectors', async () => {
@@ -92,7 +138,7 @@ describe('embeddings integrity refresh', () => {
     assert.equal(sidecarReads, 2);
   });
 
-  it('fails after exactly one fresh-sidecar retry when the pair still disagrees', async () => {
+  it('fails after exactly one fresh-pair retry when the pair still disagrees', async () => {
     const { binary, index } = fixturePair();
     const staleIndex = { ...index, binarySha256: 'f'.repeat(64) };
     const calls = [];
@@ -111,7 +157,7 @@ describe('embeddings integrity refresh', () => {
       }),
       /does not match sidecar/,
     );
-    assert.equal(calls.length, 3);
-    assert.equal(calls.filter(call => call.url.includes('integrity=')).length, 1);
+    assert.equal(calls.length, 4);
+    assert.equal(calls.filter(call => call.url.includes('integrity=')).length, 2);
   });
 });
