@@ -8,15 +8,14 @@ checked-out ``google_credentials.json`` file. That works on a laptop but not in
 a GitHub Action, where the service-account key arrives as a repo secret.
 
 This module gives them one resolver that prefers the CI path and falls back to
-the local file, in the same order as
-``submission_runtime.sheets_callback._load_credentials``:
+the local file. The shared dependency-free environment resolver uses this order:
 
     1. ROSEN_SHEETS_SA_KEY_JSON -- inline service-account JSON (the CI secret)
     2. ROSEN_SHEETS_SA_KEY      -- path to a service-account JSON file
     3. fallback_file            -- a local google_credentials.json (dev default)
 
-Keeping the order identical to sheets_callback lets the maintenance runner and
-the submission workflow share one repo secret instead of maintaining two.
+The maintenance runner and submission workflow therefore share one repo secret
+without coupling their distinct scopes, fallbacks, or failure behavior.
 """
 
 from __future__ import annotations
@@ -27,6 +26,8 @@ from typing import Optional
 
 import gspread
 from google.oauth2.service_account import Credentials
+
+from rosen_scraper.sheets_credentials import resolve_service_account_source
 
 # gspread.open() resolves a sheet by name through Drive, so the token needs the
 # drive scope as well as spreadsheets. These match the scopes the enrichment
@@ -47,14 +48,13 @@ def load_credentials(fallback_file: str = DEFAULT_FALLBACK_FILE) -> Credentials:
     and a missing fallback file raises ``FileNotFoundError`` -- both surface
     loudly so a misconfigured run fails instead of silently authing as nobody.
     """
-    key_json = os.environ.get("ROSEN_SHEETS_SA_KEY_JSON", "").strip()
-    key_path = os.environ.get("ROSEN_SHEETS_SA_KEY", "").strip()
+    source = resolve_service_account_source()
 
-    if key_json:
-        info = json.loads(key_json)
+    if source.kind == "inline_json":
+        info = json.loads(source.value)
         return Credentials.from_service_account_info(info, scopes=SCOPES)
-    if key_path:
-        return Credentials.from_service_account_file(key_path, scopes=SCOPES)
+    if source.kind == "file_path":
+        return Credentials.from_service_account_file(source.value, scopes=SCOPES)
     return Credentials.from_service_account_file(fallback_file, scopes=SCOPES)
 
 
