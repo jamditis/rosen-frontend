@@ -44,8 +44,13 @@ jobs:
           body = []
           for line in lines[start + 1:end]:
               body.append(line[10:] if line.startswith('          ') else line)
+          script = '\n'.join(body) + '\n'
+          script = script.replace(
+              "raise SystemExit(f'{path}: expected exactly one match, found {count}')",
+              "raise SystemExit(f'{path}: expected exactly one match, found {count}; needle={old[:160]!r}')",
+          )
           Path('/tmp/apply-river-retirement.py').write_text(
-              '\n'.join(body) + '\n',
+              script,
               encoding='utf-8',
           )
           PY
