@@ -1,96 +1,13 @@
-# Smart Data Corrector - Phase 2 Complete ✓
+# Smart corrector diagnostics package
 
-**Status:** Core framework + Multimedia processors + PDF generation all complete
-**Date:** 2025-10-22
-**Version:** 1.1.0
+This directory contains the reusable diagnostics and media-processing helpers that support the archive’s canonical smart-corrector command.
 
-## What's Built
+## Supported entry point
 
-### ✅ Core Modules (All Complete)
+Run the corrector from `backend/` through the single maintained CLI:
 
-1. **content_detector.py** - Automatic content type detection
-   - Detects: article, audio, video, social media
-   - Domain overrides for accuracy
-   - Pattern-based URL analysis
-
-2. **quality_validator.py** - Raw text quality assessment
-   - Scores 0.0-1.0 quality
-   - Content-type specific validation
-   - Issue detection (HTML artifacts, errors, etc.)
-
-3. **audio_optimizer.py** - 2x audio speed cost reduction
-   - FFmpeg atempo filter integration
-   - 50% transcription cost savings
-   - Timestamp normalization
-   - Adaptive speed selection
-
-4. **cost_tracker.py** - Budget monitoring and enforcement
-   - Real-time cost tracking
-   - Budget limits with hard stops
-   - Detailed operation logging
-   - Savings reports
-
-5. **smart_data_corrector.py** - Main processing engine
-   - Batch processing
-   - Smart caching decisions
-   - Google Sheets integration
-   - CLI with dry-run mode
-
-### ✅ Phase 2: Multimedia Processors (All Complete)
-
-6. **processors/soundcloud_processor.py** - SoundCloud audio extraction
-   - JSON-LD metadata extraction
-   - Hydration data parsing
-   - Description-as-transcript fallback (if >500 chars)
-   - Cost estimation for transcription
-
-7. **processors/cspan_processor.py** - C-SPAN video transcript extraction
-   - 4-level fallback strategy (embedded → API → page → YouTube)
-   - Speaker name detection
-   - Timestamp preservation
-   - YouTube fallback URL detection
-
-8. **processors/youtube_processor.py** - YouTube caption extraction
-   - **FREE caption extraction** (no transcription cost!)
-   - youtube-transcript-api integration
-   - Manual transcript preference
-   - Auto-generated fallback
-   - Caption cleaning ([Music], [Applause], etc.)
-
-9. **processors/twitter_processor.py** - Twitter/X thread extraction
-   - Nitter proxy with multiple instances
-   - Playwright fallback for reliability
-   - Full thread extraction with numbering
-   - Quote tweet inclusion
-   - Media alt-text preservation
-
-10. **pdf_generator.py** - Accessible PDF generation
-    - Beautiful, WCAG 2.1 AA compliant PDFs
-    - Content-type specific enhancements
-    - Article PDFs with word counts
-    - Audio transcript PDFs with duration
-    - Video transcript PDFs with type labels
-    - Social media thread PDFs with formatting
-    - Screen reader compatibility
-    - Batch generation support
-
-## Test Results
-
-```
-ALL TESTS PASSING:
-✓ Content Detector  - 6/6 tests
-✓ Quality Validator - 5/5 tests
-✓ Audio Optimizer   - FFmpeg integration working
-✓ Cost Tracker      - Estimation and tracking working
-```
-
-## How to use
-
-Run these commands from `backend/`.
-
-### Quick start
 ```bash
-# Preview the first 10 records (dry run is the default)
+# Preview the first 10 records; dry run is the default
 poetry run python -m scripts.corrector --rows :10
 
 # Preview inclusive sheet rows 27 through 42
@@ -100,91 +17,65 @@ poetry run python -m scripts.corrector --rows 27-42
 poetry run python -m scripts.corrector --rows 201- --limit 50 --max-cost 10 --live
 ```
 
-### Options
-```bash
+The former `smart_data_corrector.py` orchestrator and the range-specific `run_smart_corrector*.py` wrappers were retired. Their processing path is now represented by `backend/scripts/corrector.py`, which is range-safe and dry-run by default.
+
+## CLI options
+
+```text
 --rows RANGE   Select :N, N-M, or N- (default: all data rows)
 --limit N      Cap the selected record count
 --resume       Skip leading rows with a completion marker
---max-cost USD Stop before a paid call would exceed this budget (default: 35.00)
+--max-cost USD Stop before a paid call would exceed this budget
 --dry-run      Analyze without worksheet writes (default)
 --live         Write raw text, AI fields, and notes
 ```
 
-## Cost Estimates
+## Package contents
 
-With 2x audio speed optimization enabled:
+### Core diagnostics
 
-| Content Type | Cost per Item | Notes |
-|--------------|---------------|-------|
-| Article (cached) | $0.006 | Just AI analysis |
-| Article (reprocess) | $0.020 | Scraping + AI |
-| Audio (30 min) | $0.36 | 50% savings from 2x speed |
-| Video (20 min) | $0.24 | If transcription needed |
-| Social Media | $0.01 | Light scraping |
+- `content_detector.py` — content-type detection and domain overrides.
+- `quality_validator.py` — raw-text quality scoring and issue detection.
+- `audio_optimizer.py` — optional FFmpeg speed processing and timestamp normalization.
+- `cost_tracker.py` — budget estimation, limits, and operation logging.
 
-**629 rows estimate:** $20-30 (with 70% cached content)
+### Media processors
 
-## Phase 2 Complete ✓
+- `processors/soundcloud_processor.py` — SoundCloud metadata and description extraction.
+- `processors/cspan_processor.py` — C-SPAN transcript fallbacks.
+- `processors/youtube_processor.py` — YouTube caption extraction.
+- `processors/twitter_processor.py` — Twitter/X thread extraction fallbacks.
 
-### ✅ Multimedia Processors (All Complete)
-- [x] **SoundCloud processor** - Metadata extraction with description-as-transcript fallback
-- [x] **C-SPAN processor** - 4-level transcript extraction (embedded → API → page → YouTube)
-- [x] **YouTube processor** - Free caption extraction via youtube-transcript-api (no transcription cost!)
-- [x] **Twitter processor** - Nitter proxy + Playwright fallback for thread extraction
+### Output support
 
-### ✅ PDF Generation (Complete)
-- [x] **SmartCorrectorPDFGenerator** - Beautiful, accessible PDFs for all content types
-  - Article PDFs with word counts
-  - Audio transcript PDFs with duration labels
-  - Video transcript PDFs with type indicators
-  - Social media thread PDFs with numbered tweets
-  - WCAG 2.1 AA compliance
-  - Screen reader compatibility
-
-### What's Next - Phase 3
-- [ ] Integration with main workflow.py pipeline
-- [ ] Batch processing from Google Sheets
-- [ ] End-to-end testing with production data
-- [ ] Performance monitoring and optimization
-
-## Dependencies
-
-All required dependencies are in `requirements.txt`. FFmpeg is required for audio optimization (already in your system PATH).
+- `pdf_generator.py` — accessible, content-aware PDF generation.
 
 ## Architecture
 
-```
-smart_corrector/
-├── Core Framework (Phase 1)
-│   ├── content_detector.py      → URL pattern analysis
-│   ├── quality_validator.py     → Raw text scoring (0.0-1.0)
-│   ├── audio_optimizer.py       → 2x speed processing (50% savings)
-│   ├── cost_tracker.py          → Budget enforcement
-│   └── smart_data_corrector.py  → Main orchestrator
-│
-├── Multimedia Processors (Phase 2)
-│   ├── processors/
-│   │   ├── soundcloud_processor.py   → SoundCloud audio extraction
-│   │   ├── cspan_processor.py        → C-SPAN transcript extraction
-│   │   ├── youtube_processor.py      → YouTube FREE caption extraction
-│   │   └── twitter_processor.py      → Twitter/X thread extraction
-│   │
-│   └── pdf_generator.py         → Accessible PDF generation
-│
-└── Integration Layer
-    └── Google Sheets ↔ Processors ↔ PDFs
+```text
+backend/scripts/corrector.py          canonical range-safe orchestrator
+        |
+        v
+backend/scripts/diagnostics/smart_corrector/
+├── content_detector.py
+├── quality_validator.py
+├── audio_optimizer.py
+├── cost_tracker.py
+├── processors/
+│   ├── soundcloud_processor.py
+│   ├── cspan_processor.py
+│   ├── youtube_processor.py
+│   └── twitter_processor.py
+└── pdf_generator.py
 ```
 
-## Notes
+The canonical command owns row selection, dry-run/live behavior, budget handling, and Google Sheets coordination. This package supplies focused processing helpers; it is not a second CLI or orchestration layer.
 
-- Uses existing `dispatcher.py` for actual content processing
-- Integrates with current Google Sheets workflow
-- Maintains compatibility with existing `data_improver.py`
-- All modules tested and working
+## Verification
 
-## Contact
+From `backend/`:
 
-For issues or questions about this implementation, check:
-- `PRD_SMART_DATA_CORRECTOR.md` - Full specification
-- `AUDIO_SPEED_OPTIMIZATION.md` - Cost reduction details
-- `MULTIMEDIA_PROCESSING_EXAMPLES.md` - Code examples
+```bash
+poetry run pytest tests/test_corrector.py tests/test_corrector_range.py
+poetry run ruff check scripts/corrector.py scripts/diagnostics/smart_corrector tests/test_corrector.py tests/test_corrector_range.py
+```
