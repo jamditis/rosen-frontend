@@ -64,7 +64,7 @@ def _set_env(monkeypatch, **overrides):
         'ROSEN_SFTP_HOST', 'ROSEN_SFTP_USER', 'ROSEN_SFTP_SITE_PATH',
         'ROSEN_SFTP_PASSWORD', 'ROSEN_SFTP_KEY_PATH', 'ROSEN_SFTP_PORT',
         'ROSEN_SFTP_KNOWN_HOSTS', 'ROSEN_SFTP_KEY_PASSPHRASE',
-        'ROSEN_TRANSFER_PROTOCOL',
+        'ROSEN_TRANSFER_PROTOCOL', 'ROSEN_SFTP_TRANSACTION_PATH',
     ):
         monkeypatch.delenv(key, raising=False)
     env = dict(_REQUIRED_ENV)
@@ -1005,6 +1005,20 @@ class TestMissingEnv:
 
 
 class TestTransferConfig:
+    def test_reads_optional_private_transaction_path(self, monkeypatch):
+        _set_env(
+            monkeypatch,
+            ROSEN_SFTP_TRANSACTION_PATH=(
+                '/home/rosen/.rosen-archive-transactions'
+            ),
+        )
+
+        config = deploy_full_site._read_env()
+
+        assert config['transaction_path'] == (
+            '/home/rosen/.rosen-archive-transactions'
+        )
+
     def test_ftps_defaults_to_port_21(self, monkeypatch):
         _set_env(
             monkeypatch,

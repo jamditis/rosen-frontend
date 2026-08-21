@@ -18,6 +18,10 @@ Two distinct env vars on purpose:
 Separate names so a misconfigured per-record workflow can't accidentally
 overwrite anything outside data/.
 
+ROSEN_SFTP_TRANSACTION_PATH names the approved private remote directory for
+recoverable recall-pair rollback state. It must sit outside the public site
+root and end in `.rosen-archive-transactions`.
+
 SFTP key auth shares sftp_push.py's precedence (key over password). In GitHub
 Actions ROSEN_SFTP_KEY_PATH is not a secret: deploy.yml's "Materialize SFTP
 private key" step writes the ROSEN_SFTP_KEY_CONTENT secret to a 0600 runner-temp
@@ -41,6 +45,7 @@ from __future__ import annotations
 
 import argparse
 import errno
+import hashlib
 import logging
 import os
 import shutil
@@ -228,6 +233,8 @@ def _read_env() -> Optional[Dict[str, Any]]:
     host = os.environ.get('ROSEN_SFTP_HOST', '').strip()
     user = os.environ.get('ROSEN_SFTP_USER', '').strip()
     site_path = os.environ.get('ROSEN_SFTP_SITE_PATH', '').strip()
+    transaction_path = os.environ.get(
+        'ROSEN_SFTP_TRANSACTION_PATH', '').strip()
     password = os.environ.get('ROSEN_SFTP_PASSWORD', '')
     key_path = os.environ.get('ROSEN_SFTP_KEY_PATH', '').strip()
     protocol = remote_transfer.normalize_protocol(
@@ -249,6 +256,7 @@ def _read_env() -> Optional[Dict[str, Any]]:
         'port': port,
         'user': user,
         'site_path': site_path.rstrip('/'),
+        'transaction_path': transaction_path.rstrip('/') or None,
         'password': password or None,
         'key_path': key_path or None,
         'key_passphrase': os.environ.get('ROSEN_SFTP_KEY_PASSPHRASE') or None,
@@ -457,6 +465,12 @@ def _remove_remote_tree(sftp, remote_dir: str) -> bool:
 def _remove_remote_file(sftp, remote_path: str) -> bool:
     """Remove one retired remote file, returning False when already absent."""
     try:
+        sftp.stat(remote_path)
+    except IOError as exc:
+        if exc.errno == errno.ENOENT:
+            return False
+        raise
+    try:
         sftp.remove(remote_path)
     except IOError as exc:
         if exc.errno == errno.ENOENT:
@@ -506,6 +520,8 @@ def _remote_exists(remote, path: str) -> bool:
 
 
 def _remove_remote_if_exists(remote, path: str) -> None:
+    if not _remote_exists(remote, path):
+        return
     try:
         remote.remove(path)
     except IOError as exc:
@@ -522,13 +538,35 @@ def _copy_remote_file(remote, source: str, target: str) -> None:
         remote.put(local_copy.name, target)
 
 
-def _replace_remote_file(remote, source: str, target: str) -> None:
-    """Atomically replace target, or fail without deleting the live file.
+def _local_file_digest(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open('rb') as source:
+        for chunk in iter(lambda: source.read(64 * 1024), b''):
+            digest.update(chunk)
+    return digest.hexdigest()
 
-    FTPS has no safe remove-then-rename fallback because readers can observe
-    the gap. A server that cannot overwrite by rename must reject the deploy.
+
+def _remote_file_digest(remote, path: str) -> str:
+    digest = hashlib.sha256()
+    with remote.open(path, 'rb') as source:
+        for chunk in iter(lambda: source.read(64 * 1024), b''):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _replace_remote_file(remote, source: str, target: str) -> None:
+    """Replace target atomically, with a safe absent-target fallback.
+
+    An ordinary rename is safe only when no destination exists. A live target
+    is never removed if the server rejects atomic rename-over-existing.
     """
-    remote.posix_rename(source, target)
+    target_exists = _remote_exists(remote, target)
+    try:
+        remote.posix_rename(source, target)
+    except (IOError, AttributeError):
+        if target_exists:
+            raise
+        remote.rename(source, target)
 
 
 def _publish_recall_artifact_pair(
@@ -538,41 +576,126 @@ def _publish_recall_artifact_pair(
     dir_cache: Set[str],
 ) -> None:
     """Publish the hash-bound binary and sidecar as one rollback-safe unit."""
+    transaction_root = cfg.get('transaction_path')
     entries = []
     for relpath in _RECALL_ARTIFACT_PAIR:
         local = local_by_relpath[relpath]
         final = remote_transfer.scoped_archive_child(cfg['site_path'], relpath)
+        name = Path(relpath).name
         entries.append({
             'relpath': relpath,
             'local': local,
             'final': final,
             'tmp': f'{final}.pair-tmp',
-            'backup': f'{final}.pair-backup',
-            'backup_tmp': f'{final}.pair-backup-tmp',
-            'restore_tmp': f'{final}.pair-restore-tmp',
+            # Read and remove these public paths only for compatibility with
+            # transactions created by older deploy code.
+            'legacy_backup': f'{final}.pair-backup',
+            'legacy_backup_tmp': f'{final}.pair-backup-tmp',
+            'legacy_restore_tmp': f'{final}.pair-restore-tmp',
+            'private_backup': (
+                remote_transfer.scoped_archive_child(
+                    transaction_root, f'{name}.pair-backup')
+                if transaction_root else None
+            ),
+            'private_backup_tmp': (
+                remote_transfer.scoped_archive_child(
+                    transaction_root, f'{name}.pair-backup-tmp')
+                if transaction_root else None
+            ),
+            'private_restore_tmp': (
+                remote_transfer.scoped_archive_child(
+                    transaction_root, f'{name}.pair-restore-tmp')
+                if transaction_root else None
+            ),
         })
 
-    # Inspect both members before changing either one. If an earlier transaction
-    # stopped before both finals were published, restore every available backup
-    # so a retry starts from the previous complete pair.
+    local_digests = tuple(
+        _local_file_digest(entry['local']) for entry in entries)
+
+    private_root_exists = bool(
+        transaction_root and _remote_exists(remote, transaction_root))
+
+    def ensure_private_root() -> None:
+        nonlocal private_root_exists
+        if not transaction_root:
+            raise RuntimeError(
+                'ROSEN_SFTP_TRANSACTION_PATH is required to replace the '
+                'existing recall artifact pair'
+            )
+        if not private_root_exists:
+            remote.mkdir(transaction_root)
+            private_root_exists = True
+
+    def scratch_paths(entry) -> List[str]:
+        paths = [
+            entry['tmp'],
+            entry['legacy_backup_tmp'],
+            entry['legacy_restore_tmp'],
+        ]
+        if private_root_exists:
+            paths.extend([
+                entry['private_backup_tmp'],
+                entry['private_restore_tmp'],
+            ])
+        return paths
+
+    # Inspect both members before changing either one. Recover an interrupted
+    # transaction from the configured private root, while still accepting and
+    # removing backup files left by the older public-path implementation.
     for entry in entries:
         _ensure_remote_dir(
             remote, entry['final'].rsplit('/', 1)[0], dir_cache)
         entry['final_exists'] = _remote_exists(remote, entry['final'])
-        entry['backup_exists'] = _remote_exists(remote, entry['backup'])
+        entry['legacy_backup_exists'] = _remote_exists(
+            remote, entry['legacy_backup'])
+        entry['private_backup_exists'] = bool(
+            private_root_exists
+            and _remote_exists(remote, entry['private_backup']))
 
-    backup_entries = [entry for entry in entries if entry['backup_exists']]
+    has_legacy_backups = any(
+        entry['legacy_backup_exists'] for entry in entries)
+    has_private_backups = any(
+        entry['private_backup_exists'] for entry in entries)
+    if has_legacy_backups and has_private_backups:
+        raise RuntimeError('multiple recall artifact backup locations found')
+
+    if has_private_backups:
+        backup_key = 'private_backup'
+        backup_exists_key = 'private_backup_exists'
+        restore_key = 'private_restore_tmp'
+    else:
+        backup_key = 'legacy_backup'
+        backup_exists_key = 'legacy_backup_exists'
+        # Legacy public backups are read in place, but all newly created
+        # recovery files still belong in the private transaction directory.
+        restore_key = 'private_restore_tmp'
+
+    backup_entries = [
+        entry for entry in entries if entry[backup_exists_key]]
     if backup_entries:
         missing_finals = [entry for entry in entries if not entry['final_exists']]
         if len(backup_entries) == len(entries):
-            restore_entries = backup_entries
+            if not missing_finals:
+                final_digests = tuple(
+                    _remote_file_digest(remote, entry['final'])
+                    for entry in entries)
+                backup_digests = tuple(
+                    _remote_file_digest(remote, entry[backup_key])
+                    for entry in entries)
+                if final_digests in (backup_digests, local_digests):
+                    restore_entries = []
+                else:
+                    restore_entries = backup_entries
+            else:
+                restore_entries = backup_entries
         elif not missing_finals:
             # The process stopped while preparing backups or cleaning them
             # after a complete publish. The public pair is already complete.
             restore_entries = []
         elif (
-            len(missing_finals) == 1
-            and missing_finals[0]['backup_exists']
+            has_legacy_backups
+            and len(missing_finals) == 1
+            and missing_finals[0][backup_exists_key]
         ):
             # Compatibility with the previous move-based backup transaction.
             restore_entries = missing_finals
@@ -581,34 +704,60 @@ def _publish_recall_artifact_pair(
                 'cannot restore incomplete recall artifact backup pair'
             )
 
+        if restore_entries:
+            ensure_private_root()
         for entry in restore_entries:
-            _remove_remote_if_exists(remote, entry['restore_tmp'])
+            _remove_remote_if_exists(remote, entry[restore_key])
             _copy_remote_file(
-                remote, entry['backup'], entry['restore_tmp'])
+                remote, entry[backup_key], entry[restore_key])
         for entry in restore_entries:
             _replace_remote_file(
-                remote, entry['restore_tmp'], entry['final'])
+                remote, entry[restore_key], entry['final'])
         for entry in backup_entries:
-            _remove_remote_if_exists(remote, entry['backup'])
+            _remove_remote_if_exists(remote, entry[backup_key])
+        for entry in entries:
+            entry['final_exists'] = _remote_exists(remote, entry['final'])
 
     for entry in entries:
-        for transaction_path in (
-            entry['tmp'],
-            entry['backup_tmp'],
-            entry['restore_tmp'],
-        ):
+        for transaction_path in scratch_paths(entry):
             _remove_remote_if_exists(remote, transaction_path)
+
+    existing_entries = [entry for entry in entries if entry['final_exists']]
+    if len(existing_entries) == len(entries):
+        final_digests = tuple(
+            _remote_file_digest(remote, entry['final']) for entry in entries)
+        if final_digests == local_digests:
+            return
+        ensure_private_root()
+    elif existing_entries:
+        # An interrupted first publication has no previous complete pair to
+        # preserve. Remove its orphan so the absent-target path can retry.
+        for entry in existing_entries:
+            _remove_remote_if_exists(remote, entry['final'])
+            entry['final_exists'] = False
+
+    if private_root_exists:
+        for entry in entries:
+            for transaction_path in (
+                entry['private_backup'],
+                entry['private_backup_tmp'],
+                entry['private_restore_tmp'],
+            ):
+                _remove_remote_if_exists(remote, transaction_path)
+
+    for entry in entries:
         remote.put(str(entry['local']), entry['tmp'])
 
     backed_up = []
     published = []
     try:
         for entry in entries:
-            if _remote_exists(remote, entry['final']):
+            if entry['final_exists']:
                 _copy_remote_file(
-                    remote, entry['final'], entry['backup_tmp'])
+                    remote, entry['final'], entry['private_backup_tmp'])
                 _replace_remote_file(
-                    remote, entry['backup_tmp'], entry['backup'])
+                    remote, entry['private_backup_tmp'],
+                    entry['private_backup'])
                 backed_up.append(entry)
 
         for entry in entries:
@@ -619,16 +768,25 @@ def _publish_recall_artifact_pair(
         restorable = []
         for entry in backed_up:
             try:
-                _remove_remote_if_exists(remote, entry['restore_tmp'])
+                final_matches_backup = (
+                    _remote_exists(remote, entry['final'])
+                    and _remote_file_digest(remote, entry['final'])
+                    == _remote_file_digest(remote, entry['private_backup'])
+                )
+                if final_matches_backup:
+                    continue
+                _remove_remote_if_exists(
+                    remote, entry['private_restore_tmp'])
                 _copy_remote_file(
-                    remote, entry['backup'], entry['restore_tmp'])
+                    remote, entry['private_backup'],
+                    entry['private_restore_tmp'])
                 restorable.append(entry)
             except Exception as exc:  # best-effort rollback, reported below
                 rollback_errors.append(exc)
         for entry in restorable:
             try:
                 _replace_remote_file(
-                    remote, entry['restore_tmp'], entry['final'])
+                    remote, entry['private_restore_tmp'], entry['final'])
             except Exception as exc:  # best-effort rollback, reported below
                 rollback_errors.append(exc)
         for entry in published:
@@ -638,11 +796,7 @@ def _publish_recall_artifact_pair(
                 except Exception as exc:
                     rollback_errors.append(exc)
         for entry in entries:
-            for transaction_path in (
-                entry['tmp'],
-                entry['backup_tmp'],
-                entry['restore_tmp'],
-            ):
+            for transaction_path in scratch_paths(entry):
                 try:
                     _remove_remote_if_exists(remote, transaction_path)
                 except Exception as exc:
@@ -650,7 +804,8 @@ def _publish_recall_artifact_pair(
         if not rollback_errors:
             for entry in entries:
                 try:
-                    _remove_remote_if_exists(remote, entry['backup'])
+                    _remove_remote_if_exists(
+                        remote, entry['private_backup'])
                 except Exception as exc:
                     rollback_errors.append(exc)
                     break
@@ -662,7 +817,7 @@ def _publish_recall_artifact_pair(
         raise
 
     for entry in backed_up:
-        _remove_remote_if_exists(remote, entry['backup'])
+        _remove_remote_if_exists(remote, entry['private_backup'])
 
 
 def push_files(
@@ -695,6 +850,14 @@ def push_files(
     try:
         cfg['site_path'] = remote_transfer.validate_archive_root(
             cfg['site_path'], cfg.get('protocol', 'sftp'))
+        if cfg.get('transaction_path'):
+            cfg['transaction_path'] = (
+                remote_transfer.validate_recall_transaction_root(
+                    cfg['transaction_path'],
+                    cfg['site_path'],
+                    cfg.get('protocol', 'sftp'),
+                )
+            )
     except ValueError as exc:
         return {'ok': False, 'files_pushed': 0, 'error': str(exc)}
 

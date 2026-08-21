@@ -108,6 +108,27 @@ class FtpsNoOverwriteRemote(MemoryRemote):
         self._rename(source, target)
 
 
+class SftpNoPosixRenameRemote(MemoryRemote):
+    """Model an SFTP server without the posix-rename extension."""
+
+    def posix_rename(self, source, target):
+        raise IOError(errno.EOPNOTSUPP, "posix rename unsupported")
+
+
+class GenericMissingDeleteRemote(MemoryRemote):
+    """Model FTPS DELE returning a generic 550 for an absent path."""
+
+    def __init__(self, root):
+        super().__init__(root)
+        self.remove_attempts = []
+
+    def remove(self, path):
+        self.remove_attempts.append(path)
+        if path not in self.files:
+            raise IOError(errno.EIO, "550 Delete operation failed")
+        super().remove(path)
+
+
 def _fixture(tmp_path):
     data = tmp_path / "data"
     data.mkdir()
@@ -116,6 +137,13 @@ def _fixture(tmp_path):
     binary.write_bytes(b"new-binary")
     sidecar.write_bytes(b'{"binarySha256":"new"}')
     return binary, sidecar
+
+
+def _transaction_root(root):
+    if root.startswith("/"):
+        private_parent = root.split("/public_html/", 1)[0]
+        return f"{private_parent}/.rosen-archive-transactions"
+    return ".rosen-archive-transactions"
 
 
 def _cfg(root):
@@ -129,6 +157,7 @@ def _cfg(root):
         "key_path": None,
         "key_passphrase": None,
         "known_hosts": "/dev/null",
+        "transaction_path": _transaction_root(root),
     }
 
 
@@ -210,6 +239,192 @@ def test_ftps_replacement_failure_keeps_the_live_pair_readable(tmp_path, monkeyp
     assert remote.closed is True
 
 
+def test_unchanged_pair_skips_ftps_no_overwrite_switch(tmp_path, monkeypatch):
+    binary, sidecar = _fixture(tmp_path)
+    root = "j/rosen-archive"
+    remote = FtpsNoOverwriteRemote(root)
+    binary_final = f"{root}/data/archive-embeddings.bin"
+    sidecar_final = f"{root}/data/archive-embeddings.json"
+    remote.files[binary_final] = binary.read_bytes()
+    remote.files[sidecar_final] = sidecar.read_bytes()
+    monkeypatch.setattr(deploy.remote_transfer, "connect_remote", lambda cfg: remote)
+    cfg = _cfg(root)
+    cfg.update({"protocol": "ftps", "port": 21, "transaction_path": None})
+
+    result = deploy.push_files(
+        [binary, sidecar],
+        tmp_path,
+        cfg,
+        remote_prune_dirs=(),
+    )
+
+    assert result == {"ok": True, "files_pushed": 2, "error": None}
+    assert remote.history == []
+    assert _transaction_root(root) not in remote.directories
+    assert remote.closed is True
+
+
+def test_first_publish_falls_back_to_rename_when_target_is_absent(
+    tmp_path, monkeypatch
+):
+    binary, sidecar = _fixture(tmp_path)
+    root = "/home/archive/public_html/j/rosen-archive"
+    remote = SftpNoPosixRenameRemote(root)
+    binary_final = f"{root}/data/archive-embeddings.bin"
+    sidecar_final = f"{root}/data/archive-embeddings.json"
+    monkeypatch.setattr(deploy.remote_transfer, "connect_remote", lambda cfg: remote)
+    cfg = _cfg(root)
+    cfg["transaction_path"] = None
+
+    result = deploy.push_files(
+        [binary, sidecar],
+        tmp_path,
+        cfg,
+        remote_prune_dirs=(),
+    )
+
+    assert result == {"ok": True, "files_pushed": 2, "error": None}
+    assert remote.files[binary_final] == binary.read_bytes()
+    assert remote.files[sidecar_final] == sidecar.read_bytes()
+    assert _transaction_root(root) not in remote.directories
+    assert remote.closed is True
+
+
+def test_retained_backups_stay_outside_the_public_site(tmp_path, monkeypatch):
+    binary, sidecar = _fixture(tmp_path)
+    root = "/home/archive/public_html/j/rosen-archive"
+    transaction_root = "/home/archive/.rosen-archive-transactions"
+    binary_final = f"{root}/data/archive-embeddings.bin"
+    sidecar_final = f"{root}/data/archive-embeddings.json"
+    binary_backup = f"{transaction_root}/archive-embeddings.bin.pair-backup"
+    sidecar_backup = f"{transaction_root}/archive-embeddings.json.pair-backup"
+    remote = MemoryRemote(
+        root,
+        fail_publish_target=sidecar_final,
+        fail_open_target=binary_backup,
+    )
+    remote.files[binary_final] = b"old-binary"
+    remote.files[sidecar_final] = b'{"binarySha256":"old"}'
+    monkeypatch.setattr(deploy.remote_transfer, "connect_remote", lambda cfg: remote)
+    cfg = _cfg(root)
+    cfg["transaction_path"] = transaction_root
+
+    result = deploy.push_files(
+        [binary, sidecar],
+        tmp_path,
+        cfg,
+        remote_prune_dirs=(),
+    )
+
+    assert result["ok"] is False
+    assert "recall artifact rollback also failed" in result["error"]
+    assert remote.files[binary_backup] == b"old-binary"
+    assert remote.files[sidecar_backup] == b'{"binarySha256":"old"}'
+    assert not any(
+        path.startswith(f"{root}/") and ".pair-backup" in path for path in remote.files
+    )
+    assert remote.closed is True
+
+
+def test_changed_pair_requires_a_private_transaction_root(tmp_path, monkeypatch):
+    binary, sidecar = _fixture(tmp_path)
+    root = "/home/archive/public_html/j/rosen-archive"
+    remote = MemoryRemote(root)
+    binary_final = f"{root}/data/archive-embeddings.bin"
+    sidecar_final = f"{root}/data/archive-embeddings.json"
+    remote.files[binary_final] = b"old-binary"
+    remote.files[sidecar_final] = b'{"binarySha256":"old"}'
+    monkeypatch.setattr(deploy.remote_transfer, "connect_remote", lambda cfg: remote)
+    cfg = _cfg(root)
+    cfg["transaction_path"] = None
+
+    result = deploy.push_files(
+        [binary, sidecar],
+        tmp_path,
+        cfg,
+        remote_prune_dirs=(),
+    )
+
+    assert result["ok"] is False
+    assert "ROSEN_SFTP_TRANSACTION_PATH is required" in result["error"]
+    assert remote.files[binary_final] == b"old-binary"
+    assert remote.files[sidecar_final] == b'{"binarySha256":"old"}'
+    assert remote.history == []
+    assert remote.closed is True
+
+
+def test_legacy_backup_recovery_does_not_create_new_public_rollback_files(
+    tmp_path, monkeypatch
+):
+    binary, sidecar = _fixture(tmp_path)
+    root = "/home/archive/public_html/j/rosen-archive"
+    binary_final = f"{root}/data/archive-embeddings.bin"
+    sidecar_final = f"{root}/data/archive-embeddings.json"
+    remote = MemoryRemote(root)
+    remote.files[binary_final] = b"interrupted-new-binary"
+    remote.files[f"{binary_final}.pair-backup"] = b"old-binary"
+    remote.files[f"{sidecar_final}.pair-backup"] = b'{"binarySha256":"old"}'
+    original_files = dict(remote.files)
+    monkeypatch.setattr(deploy.remote_transfer, "connect_remote", lambda cfg: remote)
+    cfg = _cfg(root)
+    cfg["transaction_path"] = None
+
+    result = deploy.push_files(
+        [binary, sidecar],
+        tmp_path,
+        cfg,
+        remote_prune_dirs=(),
+    )
+
+    assert result["ok"] is False
+    assert "ROSEN_SFTP_TRANSACTION_PATH is required" in result["error"]
+    assert remote.files == original_files
+    assert remote.history == []
+    assert remote.closed is True
+
+
+def test_missing_cleanup_stats_before_generic_ftps_delete(tmp_path, monkeypatch):
+    binary, sidecar = _fixture(tmp_path)
+    root = "j/rosen-archive"
+    remote = GenericMissingDeleteRemote(root)
+    monkeypatch.setattr(deploy.remote_transfer, "connect_remote", lambda cfg: remote)
+    cfg = _cfg(root)
+    cfg.update({"protocol": "ftps", "port": 21})
+
+    result = deploy.push_files(
+        [binary, sidecar],
+        tmp_path,
+        cfg,
+        remote_prune_dirs=(),
+    )
+
+    assert result == {"ok": True, "files_pushed": 2, "error": None}
+    assert remote.remove_attempts == []
+    assert remote.closed is True
+
+
+def test_cleanup_does_not_swallow_unknown_stat_failures(tmp_path, monkeypatch):
+    binary, sidecar = _fixture(tmp_path)
+    root = "j/rosen-archive"
+    binary_tmp = f"{root}/data/archive-embeddings.bin.pair-tmp"
+    remote = MemoryRemote(root, fail_stat_target=binary_tmp)
+    monkeypatch.setattr(deploy.remote_transfer, "connect_remote", lambda cfg: remote)
+    cfg = _cfg(root)
+    cfg.update({"protocol": "ftps", "port": 21})
+
+    result = deploy.push_files(
+        [binary, sidecar],
+        tmp_path,
+        cfg,
+        remote_prune_dirs=(),
+    )
+
+    assert result["ok"] is False
+    assert "injected generic stat failure" in result["error"]
+    assert remote.history == []
+    assert remote.closed is True
+
+
 def test_unknown_stat_failure_aborts_before_changing_the_live_pair(
     tmp_path, monkeypatch
 ):
@@ -270,8 +485,9 @@ def test_failed_rollback_keeps_both_backups_for_the_next_deploy(tmp_path, monkey
     root = "/home/archive/public_html/j/rosen-archive"
     binary_final = f"{root}/data/archive-embeddings.bin"
     sidecar_final = f"{root}/data/archive-embeddings.json"
-    binary_backup = f"{binary_final}.pair-backup"
-    sidecar_backup = f"{sidecar_final}.pair-backup"
+    transaction_root = _transaction_root(root)
+    binary_backup = f"{transaction_root}/archive-embeddings.bin.pair-backup"
+    sidecar_backup = f"{transaction_root}/archive-embeddings.json.pair-backup"
     remote = MemoryRemote(
         root,
         fail_publish_target=sidecar_final,
@@ -330,10 +546,16 @@ def test_retry_restores_copy_backups_when_both_mixed_finals_remain(
     binary_final = f"{root}/data/archive-embeddings.bin"
     sidecar_final = f"{root}/data/archive-embeddings.json"
     remote = MemoryRemote(root, fail_publish_target=sidecar_final)
+    transaction_root = _transaction_root(root)
+    remote.directories.add(transaction_root)
     remote.files[binary_final] = b"interrupted-new-binary"
     remote.files[sidecar_final] = b'{"binarySha256":"old"}'
-    remote.files[f"{binary_final}.pair-backup"] = b"old-binary"
-    remote.files[f"{sidecar_final}.pair-backup"] = b'{"binarySha256":"old"}'
+    remote.files[f"{transaction_root}/archive-embeddings.bin.pair-backup"] = (
+        b"old-binary"
+    )
+    remote.files[f"{transaction_root}/archive-embeddings.json.pair-backup"] = (
+        b'{"binarySha256":"old"}'
+    )
     monkeypatch.setattr(deploy.remote_transfer, "connect_remote", lambda cfg: remote)
 
     result = deploy.push_files(

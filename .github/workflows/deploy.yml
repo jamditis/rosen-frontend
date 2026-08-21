@@ -8,6 +8,7 @@ name: Pillar 3c — deploy full site to pressthink.org
 # `submit-record.yml`, plus these deployment settings:
 #   ROSEN_TRANSFER_PROTOCOL → ftps for Edgar's port-21 service
 #   ROSEN_SFTP_SITE_PATH → the archive root (FTPS: j/rosen-archive)
+#   ROSEN_SFTP_TRANSACTION_PATH → private rollback directory outside the site
 # Distinct from ROSEN_SFTP_REMOTE_PATH (the per-record data subdir) so a
 # misconfigured per-record workflow can't accidentally write outside data/.
 #
@@ -138,6 +139,7 @@ jobs:
           ROSEN_SFTP_USER: ${{ secrets.ROSEN_SFTP_USER }}
           ROSEN_SFTP_PASSWORD: ${{ secrets.ROSEN_SFTP_PASSWORD }}
           ROSEN_SFTP_SITE_PATH: ${{ secrets.ROSEN_SFTP_SITE_PATH }}
+          ROSEN_SFTP_TRANSACTION_PATH: ${{ secrets.ROSEN_SFTP_TRANSACTION_PATH }}
           ROSEN_SFTP_PORT: ${{ secrets.ROSEN_SFTP_PORT }}
           # ROSEN_SFTP_KEY_PATH is exported by the "Materialize SFTP private key"
           # step above (via $GITHUB_ENV) when key-auth is enabled. Do not also set
