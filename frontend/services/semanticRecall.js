@@ -154,7 +154,13 @@ export function createSemanticRecallClient({
     const requestId = `semantic-${++nextRequestId}`;
     return new Promise((resolve, reject) => {
       const onAbort = () => {
-        cleanupRequest(requestId)?.reject(makeAbortError());
+        const abortedRequest = cleanupRequest(requestId);
+        if (!abortedRequest) return;
+        abortedRequest.reject(makeAbortError());
+        if (pending.size === 0) {
+          worker?.terminate();
+          worker = null;
+        }
       };
       const timer = setTimeout(() => {
         if (!pending.has(requestId)) return;

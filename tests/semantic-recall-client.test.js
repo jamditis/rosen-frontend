@@ -187,6 +187,56 @@ describe('semantic recall worker client', () => {
     client.terminate();
   });
 
+  it('recycles an idle worker after its only request is aborted', async () => {
+    const workers = [];
+    const client = createSemanticRecallClient({
+      workerFactory: () => {
+        const worker = new FakeWorker();
+        workers.push(worker);
+        return worker;
+      },
+      requestTimeoutMs: 1000,
+    });
+    const controller = new AbortController();
+    const first = client.request('A', [], { signal: controller.signal });
+
+    controller.abort();
+    await assert.rejects(first, error => error.name === 'AbortError');
+    assert.equal(workers[0].terminated, true);
+
+    const retry = client.request('B', []);
+    assert.equal(workers.length, 2);
+    workers[1].emit('message', {
+      type: 'neighbors-result',
+      requestId: 'semantic-2',
+      neighbors: [],
+    });
+    assert.deepEqual(await retry, []);
+    client.terminate();
+  });
+
+  it('keeps the worker while another request remains pending', async () => {
+    const worker = new FakeWorker();
+    const client = createSemanticRecallClient({
+      workerFactory: () => worker,
+      requestTimeoutMs: 1000,
+    });
+    const controller = new AbortController();
+    const aborted = client.request('A', [], { signal: controller.signal });
+    const active = client.request('B', []);
+
+    controller.abort();
+    await assert.rejects(aborted, error => error.name === 'AbortError');
+    assert.equal(worker.terminated, false);
+    worker.emit('message', {
+      type: 'neighbors-result',
+      requestId: 'semantic-2',
+      neighbors: [],
+    });
+    assert.deepEqual(await active, []);
+    client.terminate();
+  });
+
   it('discards a failed worker so the next request can create a clean one', async () => {
     const workers = [];
     const client = createSemanticRecallClient({
