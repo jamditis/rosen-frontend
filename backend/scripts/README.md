@@ -5,6 +5,8 @@ part of the core ingestion pipeline in `src/`. They are grouped by their focus
 area so it is easier to find maintenance helpers without wading through the
 production package.
 
+- `corrector.py` – Canonical range-safe smart-corrector CLI. It is dry-run by
+  default and accepts all historical row selections through `--rows` and `--limit`.
 - `backfill/` – Historical Google Sheets backfill scripts (`*date_backfill.py`,
   `bulk_reprocessor.py`, `backfill_worker.py`). They reprocess rows or patch
   missing metadata and should be run manually only when the live pipeline is

@@ -202,9 +202,9 @@ its default is $35.
 Use `--live` only for a supervised write. Live runs update recovered
 `raw_text`, processing notes, and the canonical AI fields when analysis is
 available: `summary`, `thematic_categories`, `key_concepts`, `tags`, and
-`pull_quote`. The old `run_smart_corrector*.py` commands remain as thin shims
-with their historical row-range defaults, but they now use this CLI and its
-safe dry-run default.
+`pull_quote`. `scripts.corrector` is the only supported smart-corrector entry point.
+Historical row selections are expressed directly with `--rows` and `--limit`;
+there are no range-specific wrapper scripts to drift from the canonical CLI.
 
 ### Running tests
 

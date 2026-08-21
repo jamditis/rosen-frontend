@@ -1673,47 +1673,10 @@ def test_cli_loads_backend_dotenv_before_resolving_runtime_settings(monkeypatch)
     assert exit_code == 0
 
 
-@pytest.mark.parametrize(
-    "script_name, default_call",
-    [
-        ("run_smart_corrector.py", "main()"),
-        ("run_smart_corrector_25.py", "main(default_limit=25)"),
-        ("run_smart_corrector_27_42.py", 'main(default_rows="27-42")'),
-        ("run_smart_corrector_200.py", "main(default_limit=200)"),
-        (
-            "run_smart_corrector_201_plus.py",
-            'main(default_rows="201-", default_limit=50)',
-        ),
-    ],
-)
-def test_legacy_corrector_driver_is_a_credential_free_shim(script_name, default_call):
-    script = Path(__file__).resolve().parents[1] / "scripts" / script_name
-    source = script.read_text(encoding="utf-8")
-
-    assert (
-        "from scripts.corrector import main" in source
-        or "from .corrector import main" in source
-    )
-    assert default_call in source
-    assert "gspread" not in source
-    assert "Credentials" not in source
-
-
-@pytest.mark.parametrize(
-    "script_name",
-    [
-        "corrector.py",
-        "run_smart_corrector.py",
-        "run_smart_corrector_25.py",
-        "run_smart_corrector_27_42.py",
-        "run_smart_corrector_200.py",
-        "run_smart_corrector_201_plus.py",
-    ],
-)
-def test_corrector_scripts_show_help_without_an_installed_package(script_name):
+def test_corrector_script_shows_help_without_an_installed_package():
     backend_dir = Path(__file__).resolve().parents[1]
     result = subprocess.run(
-        [sys.executable, "-S", f"scripts/{script_name}", "--help"],
+        [sys.executable, "-S", "scripts/corrector.py", "--help"],
         cwd=backend_dir,
         env={**os.environ, "PYTHONPATH": ""},
         capture_output=True,
@@ -1723,6 +1686,22 @@ def test_corrector_scripts_show_help_without_an_installed_package(script_name):
 
     assert result.returncode == 0, result.stderr
     assert "usage:" in result.stdout
+
+
+@pytest.mark.parametrize(
+    "script_name",
+    [
+        "run_smart_corrector.py",
+        "run_smart_corrector_25.py",
+        "run_smart_corrector_27_42.py",
+        "run_smart_corrector_200.py",
+        "run_smart_corrector_201_plus.py",
+        "diagnostics/smart_data_corrector.py",
+    ],
+)
+def test_legacy_corrector_entrypoints_are_removed(script_name):
+    backend_dir = Path(__file__).resolve().parents[1]
+    assert not (backend_dir / "scripts" / script_name).exists()
 
 
 def _drive_main_capturing_selected_rows(argv, record_count, **main_kwargs):
