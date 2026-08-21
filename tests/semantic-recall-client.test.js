@@ -36,11 +36,12 @@ describe('semantic recall presentation helpers', () => {
   it('builds a compact finite year lookup from archive records', () => {
     assert.deepEqual(
       buildYearIndex([
-        { id: 'A', year: '2001' },
-        { id: 'B', year: 2010 },
-        { id: 'C', year: '' },
-        { id: 'D', year: 'unknown' },
-        { year: '1999' },
+        { id: 'A', type: 'article', year: '2001' },
+        { id: 'B', type: 'article', year: 2010 },
+        { id: 'C', type: 'article', year: '' },
+        { id: 'D', type: 'article', year: 'unknown' },
+        { id: 'social', type: 'social', year: '2024' },
+        { type: 'article', year: '1999' },
       ]),
       { A: 2001, B: 2010 },
     );
@@ -92,7 +93,7 @@ describe('semantic recall worker client', () => {
       requestTimeoutMs: 1000,
     });
 
-    const first = client.request('A', [{ id: 'A', year: '2000' }]);
+    const first = client.request('A', [{ id: 'A', type: 'article', year: '2000' }]);
     assert.equal(workers.length, 1);
     assert.deepEqual(workers[0].messages[0], {
       type: 'neighbors',
@@ -116,6 +117,38 @@ describe('semantic recall worker client', () => {
       neighbors: [],
     });
     assert.deepEqual(await second, []);
+    client.terminate();
+  });
+
+  it('reuses a compact article-year index for a stable archive collection', async () => {
+    const worker = new FakeWorker();
+    const client = createSemanticRecallClient({
+      workerFactory: () => worker,
+      requestTimeoutMs: 1000,
+    });
+    const records = [
+      { id: 'A', type: 'article', year: '2000' },
+      { id: 'B', type: 'article', year: 2010 },
+      { id: 'social', type: 'social', year: 2024 },
+    ];
+
+    const first = client.request('A', records);
+    assert.deepEqual(worker.messages[0].years, { A: 2000, B: 2010 });
+    worker.emit('message', {
+      type: 'neighbors-result',
+      requestId: 'semantic-1',
+      neighbors: [],
+    });
+    await first;
+
+    const second = client.request('B', records);
+    assert.strictEqual(worker.messages[1].years, worker.messages[0].years);
+    worker.emit('message', {
+      type: 'neighbors-result',
+      requestId: 'semantic-2',
+      neighbors: [],
+    });
+    await second;
     client.terminate();
   });
 

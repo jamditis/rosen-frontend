@@ -30,6 +30,7 @@ function defaultWorkerFactory() {
 export function buildYearIndex(records) {
   const years = {};
   for (const record of Array.isArray(records) ? records : []) {
+    if (record?.type !== 'article') continue;
     if (typeof record?.id !== 'string' || !record.id) continue;
     const rawYear = record.year;
     if (rawYear === null || rawYear === undefined || String(rawYear).trim() === '') {
@@ -74,6 +75,17 @@ export function createSemanticRecallClient({
   let worker = null;
   let nextRequestId = 0;
   const pending = new Map();
+  const yearIndexes = new WeakMap();
+
+  const getYearIndex = (records) => {
+    if (!Array.isArray(records)) return {};
+    let years = yearIndexes.get(records);
+    if (!years) {
+      years = buildYearIndex(records);
+      yearIndexes.set(records, years);
+    }
+    return years;
+  };
 
   const cleanupRequest = (requestId) => {
     const request = pending.get(requestId);
@@ -161,7 +173,7 @@ export function createSemanticRecallClient({
           requestId,
           recordId,
           k,
-          years: buildYearIndex(records),
+          years: getYearIndex(records),
         });
       } catch (error) {
         cleanupRequest(requestId)?.reject(error);

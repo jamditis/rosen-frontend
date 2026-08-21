@@ -40,6 +40,7 @@ const APP_VERSION = JSON.parse(
  */
 function loadSW(hostname = 'pressthink.org', {
   cacheMatch = async () => null,
+  cachePut = async () => {},
   fetchImpl = async () => { throw new Error('offline'); },
 } = {}) {
   const handlers = {};
@@ -47,7 +48,7 @@ function loadSW(hostname = 'pressthink.org', {
   const fakeCache = {
     add: async (url) => { added.push(String(url)); },
     addAll: async (urls) => { urls.forEach(u => added.push(String(u))); },
-    put: async () => {},
+    put: cachePut,
     match: cacheMatch,
   };
   const sandbox = {
@@ -246,6 +247,37 @@ describe('service worker release-boundary module loading', () => {
 
     assert.equal(response, freshModule);
     assert.equal(networkFetches, 1);
+  });
+
+  it('keeps an uncached static response pending until its cache write completes', async () => {
+    let finishPut;
+    let putStarted = false;
+    const putPending = new Promise(resolve => { finishPut = resolve; });
+    const freshModule = {
+      ok: true,
+      clone() { return this; },
+    };
+    const { sandbox } = loadSW('pressthink.org', {
+      cachePut: async () => {
+        putStarted = true;
+        await putPending;
+      },
+      fetchImpl: async () => freshModule,
+    });
+
+    let responseSettled = false;
+    const responsePending = sandbox.cacheFirst({
+      url: `https://pressthink.org${BASE}/data/archive-embeddings.bin?v=${APP_VERSION}`,
+    }, 'test-cache').then(response => {
+      responseSettled = true;
+      return response;
+    });
+    await new Promise(resolve => setImmediate(resolve));
+
+    assert.equal(putStarted, true);
+    assert.equal(responseSettled, false);
+    finishPut();
+    assert.equal(await responsePending, freshModule);
   });
 });
 

@@ -348,9 +348,10 @@ async function cacheFirst(request, cacheName) {
   try {
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
-      // Fire-and-forget so the cache write stays off the response path; safePut
-      // self-catches, so it cannot block the response or reject unhandled.
-      safePut(cache, request, networkResponse.clone());
+      // Keep the fetch response pending until the cache write finishes. This
+      // prevents the worker from terminating before an on-demand asset, such
+      // as the embeddings binary, becomes available for later offline use.
+      await safePut(cache, request, networkResponse.clone());
     }
     return networkResponse;
   } catch (err) {
