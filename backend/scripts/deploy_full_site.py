@@ -523,12 +523,12 @@ def _copy_remote_file(remote, source: str, target: str) -> None:
 
 
 def _replace_remote_file(remote, source: str, target: str) -> None:
-    """Rename source over target for both SFTP and the FTPS adapter."""
-    try:
-        remote.posix_rename(source, target)
-    except (IOError, AttributeError):
-        _remove_remote_if_exists(remote, target)
-        remote.rename(source, target)
+    """Atomically replace target, or fail without deleting the live file.
+
+    FTPS has no safe remove-then-rename fallback because readers can observe
+    the gap. A server that cannot overwrite by rename must reject the deploy.
+    """
+    remote.posix_rename(source, target)
 
 
 def _publish_recall_artifact_pair(

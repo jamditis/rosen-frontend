@@ -99,6 +99,15 @@ class MemoryRemote:
         self.closed = True
 
 
+class FtpsNoOverwriteRemote(MemoryRemote):
+    """Model an FTPS server that refuses rename-over-existing."""
+
+    def posix_rename(self, source, target):
+        if target in self.files:
+            raise IOError(errno.EIO, "rename-over-existing refused")
+        self._rename(source, target)
+
+
 def _fixture(tmp_path):
     data = tmp_path / "data"
     data.mkdir()
@@ -170,6 +179,35 @@ def test_existing_pair_stays_readable_while_backups_are_prepared(tmp_path, monke
     for operation, files in remote.history:
         assert binary_final in files, operation
         assert sidecar_final in files, operation
+
+
+def test_ftps_replacement_failure_keeps_the_live_pair_readable(tmp_path, monkeypatch):
+    binary, sidecar = _fixture(tmp_path)
+    root = "j/rosen-archive"
+    remote = FtpsNoOverwriteRemote(root)
+    binary_final = f"{root}/data/archive-embeddings.bin"
+    sidecar_final = f"{root}/data/archive-embeddings.json"
+    remote.files[binary_final] = b"old-binary"
+    remote.files[sidecar_final] = b'{"binarySha256":"old"}'
+    monkeypatch.setattr(deploy.remote_transfer, "connect_remote", lambda cfg: remote)
+    cfg = _cfg(root)
+    cfg.update({"protocol": "ftps", "port": 21})
+
+    result = deploy.push_files(
+        [binary, sidecar],
+        tmp_path,
+        cfg,
+        remote_prune_dirs=(),
+    )
+
+    assert result["ok"] is False
+    assert "rename-over-existing refused" in result["error"]
+    assert remote.files[binary_final] == b"old-binary"
+    assert remote.files[sidecar_final] == b'{"binarySha256":"old"}'
+    for operation, files in remote.history:
+        assert binary_final in files, operation
+        assert sidecar_final in files, operation
+    assert remote.closed is True
 
 
 def test_unknown_stat_failure_aborts_before_changing_the_live_pair(
