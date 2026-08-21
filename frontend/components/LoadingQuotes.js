@@ -1,6 +1,6 @@
 // LoadingQuotes.js - Rotating dissertation quotes during loading
 import { useState, useEffect } from 'react';
-import { html } from '../html.js?v=3.8.24';
+import { html } from '../html.js?v=3.8.25';
 import { BookOpen } from 'lucide-react';
 
 // Curated quotes from the dissertation for the loading screen

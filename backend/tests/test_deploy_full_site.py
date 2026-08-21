@@ -1293,6 +1293,7 @@ class TestRecordShellReconciliation:
                 repo_root=tmp_path,
                 cfg=deploy_full_site._read_env(),
                 remote_prune_dirs=(),
+                remote_prune_files=(),
                 record_shells=(current,),
             )
 
@@ -1330,14 +1331,14 @@ class TestRecordShellReconciliation:
             deploy_full_site.push_files(
                 [tmp_path / 'index.html'], tmp_path,
                 deploy_full_site._read_env(), remote_prune_dirs=(),
-                record_shells=None,
+                remote_prune_files=(), record_shells=None,
             )
             mock_sftp.listdir_attr.assert_not_called()
 
             result = deploy_full_site.push_files(
                 [tmp_path / 'index.html'], tmp_path,
                 deploy_full_site._read_env(), remote_prune_dirs=(),
-                record_shells=(),
+                remote_prune_files=(), record_shells=(),
             )
 
         assert result['ok'] is True
@@ -1359,7 +1360,7 @@ class TestRecordShellReconciliation:
             result = deploy_full_site.push_files(
                 [tmp_path / 'index.html'], tmp_path,
                 deploy_full_site._read_env(), remote_prune_dirs=(),
-                record_shells=(),
+                remote_prune_files=(), record_shells=(),
             )
 
         assert result['ok'] is False

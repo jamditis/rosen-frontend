@@ -125,6 +125,13 @@ _REMOTE_PRUNE_TARGETS: Tuple[str, ...] = (
     *_REMOTE_INTERNAL_PRUNE_DIRS,
 )
 
+# Exact retired files need separate reconciliation because the surrounding
+# frontend directory remains public. Remove them only after replacement uploads
+# succeed, using the same archive-root scope validation as every upload.
+_REMOTE_PRUNE_FILES: Tuple[str, ...] = (
+    'frontend/components/RiverOfNews.js',
+)
+
 # features/making-of is intentionally omitted. That page is a draft pending
 # curator sign-off, and its handoff chapter carries approval-gated disclosures,
 # so it is held out of the manifest to keep a routine full-site deploy from
@@ -436,6 +443,17 @@ def _remove_remote_tree(sftp, remote_dir: str) -> bool:
     return True
 
 
+def _remove_remote_file(sftp, remote_path: str) -> bool:
+    """Remove one retired remote file, returning False when already absent."""
+    try:
+        sftp.remove(remote_path)
+    except IOError as exc:
+        if exc.errno == errno.ENOENT:
+            return False
+        raise
+    return True
+
+
 def _prune_remote_record_shells(
     sftp,
     remote_dir: str,
@@ -472,6 +490,7 @@ def push_files(
     cfg: Dict[str, Any],
     remote_prune_dirs: Iterable[str] = _REMOTE_PRUNE_TARGETS,
     record_shells: Optional[Iterable[Path]] = None,
+    remote_prune_files: Iterable[str] = _REMOTE_PRUNE_FILES,
 ) -> Dict[str, Any]:
     """Upload files atomically, then reconcile non-public remote content.
 
@@ -536,6 +555,12 @@ def push_files(
             if removed:
                 logger.info(f'Removed {removed} stale record metadata shells')
 
+        for relpath in remote_prune_files:
+            remote_file = remote_transfer.scoped_archive_child(
+                cfg['site_path'], relpath)
+            if _remove_remote_file(remote, remote_file):
+                logger.info(f'Removed retired file: {relpath}')
+
         for relpath in remote_prune_dirs:
             remote_dir = remote_transfer.scoped_archive_child(
                 cfg['site_path'], relpath)
@@ -598,6 +623,12 @@ def main(argv: Optional[List[str]] = None) -> int:
             'prototype directory after upload'
         )
         for relpath in _REMOTE_INTERNAL_PRUNE_DIRS:
+            print(f'  {relpath}')
+        print(
+            f'would remove {len(_REMOTE_PRUNE_FILES)} retired file '
+            'after upload'
+        )
+        for relpath in _REMOTE_PRUNE_FILES:
             print(f'  {relpath}')
         return 0
 

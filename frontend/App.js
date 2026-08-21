@@ -1,45 +1,45 @@
 
 import { Component, Suspense, lazy, useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.8.24';
+import { html } from './html.js?v=3.8.25';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, BookOpen, BookMarked, Compass, HelpCircle, MoreHorizontal, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github, Search, XCircle } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.24';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.24';
-import { withViewTransition } from './utils/viewTransition.js?v=3.8.24';
-import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.24';
-import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.24';
-import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.24';
-import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.24';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.24';
-import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.24';
-import { resolveSitePath } from './utils/pathResolver.js?v=3.8.24';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.8.24';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.25';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.25';
+import { withViewTransition } from './utils/viewTransition.js?v=3.8.25';
+import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.25';
+import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.25';
+import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.25';
+import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.25';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.25';
+import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.25';
+import { resolveSitePath } from './utils/pathResolver.js?v=3.8.25';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.8.25';
 import {
   buildSearchText,
   matchesParsedSearchText,
   normalizeForSearch,
   parseSearchQuery,
   searchLoadedIndexes,
-} from './utils/searchNormalize.js?v=3.8.24';
-import { sortRecords } from './utils/recordSort.js?v=3.8.24';
-import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.24';
-import { formatReleaseDate, loadReleaseMetadata } from './services/releaseMetadata.js?v=3.8.24';
-import Sidebar from './components/Sidebar.js?v=3.8.24';
-import WelcomeModal from './components/WelcomeModal.js?v=3.8.24';
-import RecordView from './components/RecordView.js?v=3.8.24';
-import FeaturedSection from './components/FeaturedSection.js?v=3.8.24';
-import DissertationPage from './components/DissertationPage.js?v=3.8.24';
-import ToolsModal from './components/ToolsModal.js?v=3.8.24';
-import BugReportModal from './components/BugReportModal.js?v=3.8.24';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.24';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.24';
-import EntityBrowser from './components/EntityBrowser.js?v=3.8.24';
-import Timeline from './components/Timeline.js?v=3.8.24';
-import AboutPage from './components/AboutPage.js?v=3.8.24';
-import WikiPage from './components/WikiPage.js?v=3.8.24';
-import StartHerePage from './components/StartHerePage.js?v=3.8.24';
-import ArchiveResults from './components/ArchiveResults.js?v=3.8.24';
+} from './utils/searchNormalize.js?v=3.8.25';
+import { sortRecords } from './utils/recordSort.js?v=3.8.25';
+import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.25';
+import { formatReleaseDate, loadReleaseMetadata } from './services/releaseMetadata.js?v=3.8.25';
+import Sidebar from './components/Sidebar.js?v=3.8.25';
+import WelcomeModal from './components/WelcomeModal.js?v=3.8.25';
+import RecordView from './components/RecordView.js?v=3.8.25';
+import FeaturedSection from './components/FeaturedSection.js?v=3.8.25';
+import DissertationPage from './components/DissertationPage.js?v=3.8.25';
+import ToolsModal from './components/ToolsModal.js?v=3.8.25';
+import BugReportModal from './components/BugReportModal.js?v=3.8.25';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.25';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.25';
+import EntityBrowser from './components/EntityBrowser.js?v=3.8.25';
+import Timeline from './components/Timeline.js?v=3.8.25';
+import AboutPage from './components/AboutPage.js?v=3.8.25';
+import WikiPage from './components/WikiPage.js?v=3.8.25';
+import StartHerePage from './components/StartHerePage.js?v=3.8.25';
+import ArchiveResults from './components/ArchiveResults.js?v=3.8.25';
 
-const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.24'));
+const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.25'));
 
 const NON_RECORD_ROUTES = new Set([
   ROUTES.analytics,

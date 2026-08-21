@@ -127,7 +127,7 @@ deploy also removes safe `r/ID.html` files that no longer correspond to a
 generated non-social record. Unrelated files and directories under `r/` are
 left untouched.
 
-## Retired routes removed by a full deploy
+## Retired routes and files removed by a full deploy
 
 After every listed file uploads successfully, `backend/scripts/deploy_full_site.py`
 removes these retired directories from the production server:
@@ -149,7 +149,14 @@ replacement deploy:
 tools/active/dataexplorer/
 ```
 
-This cleanup is idempotent. Missing directories are treated as already removed.
+It also removes this obsolete frontend module while leaving the surrounding
+`frontend/components/` directory intact:
+
+```
+frontend/components/RiverOfNews.js
+```
+
+This cleanup is idempotent. Missing directories and files are treated as already removed.
 The remaining `dissertation/` pages, the top-level `faq/`, the shipped
 `features/` pages, and `tools/active/dataviz/` are not part of the cleanup list.
 
@@ -158,6 +165,11 @@ internal prototype. It still depends on a published Google Sheet and is neither
 linked nor deployed; a full-site deploy removes any stale production copy.
 Reconsider public deployment only after it reads local archive artifacts and
 receives a fresh product and security review.
+
+The unreachable River of News source is preserved under
+`archived/frontend-prototypes/` as design history. Its relative-time model does
+not fit the historical corpus, its global CSS is no longer shipped, and the
+full-site deploy removes any stale public module after replacement uploads.
 
 ## What NOT to deploy
 

@@ -1,4 +1,12 @@
 /**
+ * ARCHIVED PROTOTYPE — not part of the deployed frontend.
+ *
+ * Issue #584 retired this live-feed design because its relative-time
+ * grouping does not fit the historical archive corpus. Preserve this
+ * snapshot only as design history; do not import it from production.
+ */
+
+/**
  * River of News Component
  *
  * A reverse-chronological stream view inspired by Dave Winer's "River of News" concept.
