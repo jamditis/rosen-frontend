@@ -43,11 +43,13 @@ class MemoryRemote:
         *,
         fail_publish_target: str | None = None,
         fail_stat_target: str | None = None,
+        fail_open_target: str | None = None,
     ):
         self.files: dict[str, bytes] = {}
         self.directories = {root, f"{root}/data"}
         self.fail_publish_target = fail_publish_target
         self.fail_stat_target = fail_stat_target
+        self.fail_open_target = fail_open_target
         self.history: list[tuple[str, dict[str, bytes]]] = []
         self.closed = False
 
@@ -67,6 +69,8 @@ class MemoryRemote:
 
     def open(self, remote, mode="rb"):
         assert mode == "rb"
+        if remote == self.fail_open_target:
+            raise IOError(errno.EIO, "injected backup read failure")
         if remote not in self.files:
             raise IOError(errno.ENOENT, remote)
         return io.BytesIO(self.files[remote])
@@ -220,6 +224,36 @@ def test_sidecar_publish_failure_restores_the_previous_complete_pair(
     assert remote.files[binary_final] == b"old-binary"
     assert remote.files[sidecar_final] == b'{"binarySha256":"old"}'
     assert not any(path.endswith(_TRANSACTION_SUFFIXES) for path in remote.files)
+    assert remote.closed is True
+
+
+def test_failed_rollback_keeps_both_backups_for_the_next_deploy(tmp_path, monkeypatch):
+    binary, sidecar = _fixture(tmp_path)
+    root = "/home/archive/public_html/j/rosen-archive"
+    binary_final = f"{root}/data/archive-embeddings.bin"
+    sidecar_final = f"{root}/data/archive-embeddings.json"
+    binary_backup = f"{binary_final}.pair-backup"
+    sidecar_backup = f"{sidecar_final}.pair-backup"
+    remote = MemoryRemote(
+        root,
+        fail_publish_target=sidecar_final,
+        fail_open_target=binary_backup,
+    )
+    remote.files[binary_final] = b"old-binary"
+    remote.files[sidecar_final] = b'{"binarySha256":"old"}'
+    monkeypatch.setattr(deploy.remote_transfer, "connect_remote", lambda cfg: remote)
+
+    result = deploy.push_files(
+        [binary, sidecar],
+        tmp_path,
+        _cfg(root),
+        remote_prune_dirs=(),
+    )
+
+    assert result["ok"] is False
+    assert "recall artifact rollback also failed" in result["error"]
+    assert remote.files[binary_backup] == b"old-binary"
+    assert remote.files[sidecar_backup] == b'{"binarySha256":"old"}'
     assert remote.closed is True
 
 

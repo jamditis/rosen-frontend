@@ -640,7 +640,6 @@ def _publish_recall_artifact_pair(
         for entry in entries:
             for transaction_path in (
                 entry['tmp'],
-                entry['backup'],
                 entry['backup_tmp'],
                 entry['restore_tmp'],
             ):
@@ -648,6 +647,13 @@ def _publish_recall_artifact_pair(
                     _remove_remote_if_exists(remote, transaction_path)
                 except Exception as exc:
                     rollback_errors.append(exc)
+        if not rollback_errors:
+            for entry in entries:
+                try:
+                    _remove_remote_if_exists(remote, entry['backup'])
+                except Exception as exc:
+                    rollback_errors.append(exc)
+                    break
         if rollback_errors:
             raise RuntimeError(
                 f'{publish_error}; recall artifact rollback also failed: '
