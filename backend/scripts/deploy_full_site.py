@@ -43,8 +43,10 @@ import argparse
 import errno
 import logging
 import os
+import shutil
 import stat
 import sys
+import tempfile
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
@@ -498,7 +500,7 @@ def _remote_exists(remote, path: str) -> bool:
         remote.stat(path)
         return True
     except IOError as exc:
-        if getattr(exc, 'errno', None) in (None, errno.ENOENT):
+        if getattr(exc, 'errno', None) == errno.ENOENT:
             return False
         raise
 
@@ -507,8 +509,17 @@ def _remove_remote_if_exists(remote, path: str) -> None:
     try:
         remote.remove(path)
     except IOError as exc:
-        if getattr(exc, 'errno', None) not in (None, errno.ENOENT):
+        if getattr(exc, 'errno', None) != errno.ENOENT:
             raise
+
+
+def _copy_remote_file(remote, source: str, target: str) -> None:
+    """Copy one remote file without moving its live source path."""
+    with tempfile.NamedTemporaryFile() as local_copy:
+        with remote.open(source, 'rb') as remote_source:
+            shutil.copyfileobj(remote_source, local_copy)
+        local_copy.flush()
+        remote.put(local_copy.name, target)
 
 
 def _replace_remote_file(remote, source: str, target: str) -> None:
@@ -537,6 +548,8 @@ def _publish_recall_artifact_pair(
             'final': final,
             'tmp': f'{final}.pair-tmp',
             'backup': f'{final}.pair-backup',
+            'backup_tmp': f'{final}.pair-backup-tmp',
+            'restore_tmp': f'{final}.pair-restore-tmp',
         })
 
     # Inspect both members before changing either one. If an earlier transaction
@@ -548,22 +561,43 @@ def _publish_recall_artifact_pair(
         entry['final_exists'] = _remote_exists(remote, entry['final'])
         entry['backup_exists'] = _remote_exists(remote, entry['backup'])
 
-    if any(entry['backup_exists'] for entry in entries):
-        if any(not entry['final_exists'] for entry in entries):
-            for entry in entries:
-                if entry['backup_exists']:
-                    _replace_remote_file(
-                        remote, entry['backup'], entry['final'])
-                elif not entry['final_exists']:
-                    raise RuntimeError(
-                        'cannot restore incomplete recall artifact backup pair'
-                    )
+    backup_entries = [entry for entry in entries if entry['backup_exists']]
+    if backup_entries:
+        missing_finals = [entry for entry in entries if not entry['final_exists']]
+        if len(backup_entries) == len(entries):
+            restore_entries = backup_entries
+        elif not missing_finals:
+            # The process stopped while preparing backups or cleaning them
+            # after a complete publish. The public pair is already complete.
+            restore_entries = []
+        elif (
+            len(missing_finals) == 1
+            and missing_finals[0]['backup_exists']
+        ):
+            # Compatibility with the previous move-based backup transaction.
+            restore_entries = missing_finals
         else:
-            for entry in entries:
-                _remove_remote_if_exists(remote, entry['backup'])
+            raise RuntimeError(
+                'cannot restore incomplete recall artifact backup pair'
+            )
+
+        for entry in restore_entries:
+            _remove_remote_if_exists(remote, entry['restore_tmp'])
+            _copy_remote_file(
+                remote, entry['backup'], entry['restore_tmp'])
+        for entry in restore_entries:
+            _replace_remote_file(
+                remote, entry['restore_tmp'], entry['final'])
+        for entry in backup_entries:
+            _remove_remote_if_exists(remote, entry['backup'])
 
     for entry in entries:
-        _remove_remote_if_exists(remote, entry['tmp'])
+        for transaction_path in (
+            entry['tmp'],
+            entry['backup_tmp'],
+            entry['restore_tmp'],
+        ):
+            _remove_remote_if_exists(remote, transaction_path)
         remote.put(str(entry['local']), entry['tmp'])
 
     backed_up = []
@@ -571,8 +605,10 @@ def _publish_recall_artifact_pair(
     try:
         for entry in entries:
             if _remote_exists(remote, entry['final']):
+                _copy_remote_file(
+                    remote, entry['final'], entry['backup_tmp'])
                 _replace_remote_file(
-                    remote, entry['final'], entry['backup'])
+                    remote, entry['backup_tmp'], entry['backup'])
                 backed_up.append(entry)
 
         for entry in entries:
@@ -580,23 +616,38 @@ def _publish_recall_artifact_pair(
             published.append(entry)
     except Exception as publish_error:
         rollback_errors = []
-        for entry in reversed(published):
+        restorable = []
+        for entry in backed_up:
             try:
-                _remove_remote_if_exists(remote, entry['final'])
+                _remove_remote_if_exists(remote, entry['restore_tmp'])
+                _copy_remote_file(
+                    remote, entry['backup'], entry['restore_tmp'])
+                restorable.append(entry)
             except Exception as exc:  # best-effort rollback, reported below
                 rollback_errors.append(exc)
-        for entry in reversed(backed_up):
+        for entry in restorable:
             try:
-                if _remote_exists(remote, entry['backup']):
-                    _replace_remote_file(
-                        remote, entry['backup'], entry['final'])
+                _replace_remote_file(
+                    remote, entry['restore_tmp'], entry['final'])
             except Exception as exc:  # best-effort rollback, reported below
                 rollback_errors.append(exc)
+        for entry in published:
+            if entry not in backed_up:
+                try:
+                    _remove_remote_if_exists(remote, entry['final'])
+                except Exception as exc:
+                    rollback_errors.append(exc)
         for entry in entries:
-            try:
-                _remove_remote_if_exists(remote, entry['tmp'])
-            except Exception as exc:
-                rollback_errors.append(exc)
+            for transaction_path in (
+                entry['tmp'],
+                entry['backup'],
+                entry['backup_tmp'],
+                entry['restore_tmp'],
+            ):
+                try:
+                    _remove_remote_if_exists(remote, transaction_path)
+                except Exception as exc:
+                    rollback_errors.append(exc)
         if rollback_errors:
             raise RuntimeError(
                 f'{publish_error}; recall artifact rollback also failed: '
