@@ -31,30 +31,8 @@ jobs:
         with:
           node-version: 20
 
-      - name: Extract and run the assertion-guarded edit
-        shell: bash
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-
-          workflow = Path('.github/workflows/apply-river-retirement.yml')
-          lines = workflow.read_text(encoding='utf-8').splitlines()
-          start = next(i for i, line in enumerate(lines) if "python3 - <<'PY'" in line)
-          end = next(i for i in range(start + 1, len(lines)) if lines[i].strip() == 'PY')
-          body = []
-          for line in lines[start + 1:end]:
-              body.append(line[10:] if line.startswith('          ') else line)
-          script = '\n'.join(body) + '\n'
-          script = script.replace(
-              "raise SystemExit(f'{path}: expected exactly one match, found {count}')",
-              "raise SystemExit(f'{path}: expected exactly one match, found {count}; needle={old[:160]!r}')",
-          )
-          Path('/tmp/apply-river-retirement.py').write_text(
-              script,
-              encoding='utf-8',
-          )
-          PY
-          python3 /tmp/apply-river-retirement.py
+      - name: Apply assertion-guarded edit
+        run: python3 .github/scripts/apply_river_retirement.py
 
       - name: Stamp release markers
         run: node scripts/bump-version.mjs 3.8.25
@@ -71,6 +49,8 @@ jobs:
         shell: bash
         run: |
           rm .github/workflows/apply-river-retirement.yml
+          rm .github/scripts/apply_river_retirement.py
+          rmdir .github/scripts 2>/dev/null || true
           git config user.name 'Joe Amditis'
           git config user.email '6799804+jamditis@users.noreply.github.com'
           git add -A
