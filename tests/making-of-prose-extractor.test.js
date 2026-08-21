@@ -117,6 +117,59 @@ describe('making-of prose extractor', () => {
     assert.match(markdown, /\[C1\.P1\] The body starts on one line/);
   });
 
+  it('extracts generic prose paragraphs that carry attributes', () => {
+    const { anchorMap } = runExtractor(`
+      <article class="chapter">
+        <span class="ch-ref">Chapter 1</span>
+        <h2>Chapter title</h2>
+        <p class="ch-date">July 2026</p>
+        <div class="prose">
+          <p id="context">The context.</p>
+          <p class="note">The note.</p>
+        </div>
+      </article>
+    `);
+
+    assert.equal(anchorMap['C1.P1'].text, 'The context.');
+    assert.equal(anchorMap['C1.P2'].text, 'The note.');
+  });
+
+  it('preserves word boundaries around inline break tags', () => {
+    const { anchorMap } = runExtractor(`
+      <article class="chapter">
+        <span class="ch-ref">Chapter 1</span>
+        <h2>Chapter title</h2>
+        <p class="ch-date">July 2026</p>
+        <div class="prose">
+          <p>First<br>second<br/>third<br />fourth.</p>
+        </div>
+      </article>
+    `);
+
+    assert.equal(anchorMap['C1.P1'].text, 'First second third fourth.');
+  });
+
+  it('continues extracting until the prose container closes', () => {
+    const { anchorMap } = runExtractor(`
+      <article class="chapter">
+        <span class="ch-ref">Chapter 1</span>
+        <h2>Chapter title</h2>
+        <p class="ch-date">July 2026</p>
+        <div class="prose">
+          <p>Before the callout.</p>
+          <div class="callout">
+            <p>Inside the callout.</p>
+          </div>
+          <p>After the callout.</p>
+        </div>
+      </article>
+    `);
+
+    assert.equal(anchorMap['C1.P1'].text, 'Before the callout.');
+    assert.equal(anchorMap['C1.P2'].text, 'Inside the callout.');
+    assert.equal(anchorMap['C1.P3'].text, 'After the callout.');
+  });
+
   it('extracts the full current page into one unique 62-anchor manifest', () => {
     const source = fs.readFileSync(
       path.join(repoRoot, 'features', 'making-of', 'index.html'),
