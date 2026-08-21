@@ -1,5 +1,5 @@
-import { html } from '../html.js?v=3.8.25';
-import EntityBrowser from '../components/EntityBrowser.js?v=3.8.25';
+import { html } from '../html.js?v=3.8.26';
+import EntityBrowser from '../components/EntityBrowser.js?v=3.8.26';
 
 const DesktopEntityPanel = ({
   records,

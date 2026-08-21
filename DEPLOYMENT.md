@@ -13,6 +13,14 @@ available for other environments, but its absolute paths must end in those same
 archive-root and data-directory suffixes. A missing protocol selector defaults
 to SFTP for backward compatibility and will not reach Edgar's FTPS service.
 
+Set `ROSEN_SFTP_TRANSACTION_PATH` to a pre-approved, HTTP-inaccessible remote
+directory named `.rosen-archive-transactions` outside the archive root. The
+FTPS chroot value is `.rosen-archive-transactions`; SFTP can use an absolute
+private path. The deploy uses this directory only for recoverable recall-pair
+rollback state. First publication and byte-identical redeploys do not require
+rollback files, but changed existing artifacts fail safely if the private path
+is unavailable.
+
 ## Files to deploy
 
 Upload these files and directories from the repo root:
@@ -51,6 +59,8 @@ data/                               # Published archive data and shared taxonomy
   archive-analytics.json            # Prebuilt analytics aggregates (~1KB, loads on analytics view)
   search-index.json                 # Curated-record MiniSearch index (~1.2MB gzip, loads lazily on first search)
   social-search-index.json          # Social-body MiniSearch index (~2.1MB gzip, loads lazily on first search)
+  archive-embeddings.bin               # Quantized similar-in-theme vectors; upload before the sidecar
+  archive-embeddings.json              # ID index plus SHA-256 binding to the binary
   relationship-adjacency-0.json     # Public-safe relationship assertions, shard 0
   relationship-adjacency-1.json     # Public-safe relationship assertions, shard 1
   relationship-adjacency-2.json     # Public-safe relationship assertions, shard 2

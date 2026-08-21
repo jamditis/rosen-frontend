@@ -85,7 +85,7 @@ function deploymentMdDataFiles() {
     if (childIndent === null) childIndent = indent;       // first child sets the direct-child level
     if (indent !== childIndent) continue;                 // skip deeper-nested entries (data/feeds/*)
     const entry = raw.trim().split('#')[0].trim();
-    const m = entry.match(/^([A-Za-z0-9_-]+\.(?:json|js|md))$/i);
+    const m = entry.match(/^([A-Za-z0-9_-]+\.(?:json|js|md|bin))$/i);
     if (m) files.add(`data/${m[1]}`);
   }
   return files;
@@ -96,9 +96,6 @@ function deploymentMdDataFiles() {
 // (verify before adding); if deployed code links or fetches it, deploy it
 // instead — a referenced-but-undeployed file is exactly the #527 404 class.
 const KNOWN_NOT_DEPLOYED = new Map([
-  ['data/archive-embeddings.json',
-    'embeddings build artifact, not referenced by any deployed page (built by ' +
-    'data/lib/embeddings-builder.js)'],
   ['data/graph-validation-holds.json',
     'validator policy input used only by repository and CI graph checks; no ' +
     'deployed page reads it'],
@@ -184,5 +181,9 @@ describe('deploy data manifest classifies every data file', () => {
     }
     assert.ok(deployedDataFiles().has('data/wiki-seed.json'),
       'wiki-seed.json must be in _DEPLOY_DATA_FILES (the #527 fix)');
+    for (const artifact of ['data/archive-embeddings.bin', 'data/archive-embeddings.json']) {
+      assert.ok(deployedDataFiles().has(artifact),
+        `similar-in-theme artifact must deploy: ${artifact}`);
+    }
   });
 });

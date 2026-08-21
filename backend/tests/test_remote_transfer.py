@@ -72,6 +72,44 @@ def test_data_path_must_be_the_archive_data_child():
         remote_transfer.validate_archive_data_path("j/rosen-archive", "ftps")
 
 
+def test_recall_transaction_root_must_be_private_and_outside_the_archive():
+    assert (
+        remote_transfer.validate_recall_transaction_root(
+            "/home/rosen/.rosen-archive-transactions",
+            "/home/rosen/public_html/j/rosen-archive",
+            "sftp",
+        )
+        == "/home/rosen/.rosen-archive-transactions"
+    )
+    assert (
+        remote_transfer.validate_recall_transaction_root(
+            ".rosen-archive-transactions",
+            "j/rosen-archive",
+            "ftps",
+        )
+        == ".rosen-archive-transactions"
+    )
+
+    with pytest.raises(ValueError, match="outside the public archive root"):
+        remote_transfer.validate_recall_transaction_root(
+            "j/rosen-archive/.rosen-archive-transactions",
+            "j/rosen-archive",
+            "ftps",
+        )
+    with pytest.raises(ValueError, match="private chroot directory"):
+        remote_transfer.validate_recall_transaction_root(
+            "private/.rosen-archive-transactions",
+            "j/rosen-archive",
+            "ftps",
+        )
+    with pytest.raises(ValueError, match="must be absolute"):
+        remote_transfer.validate_recall_transaction_root(
+            ".rosen-archive-transactions",
+            "/home/rosen/public_html/j/rosen-archive",
+            "sftp",
+        )
+
+
 @pytest.mark.parametrize(
     "child",
     ("../wp-admin", "/wp-admin", "assets/../../wp-admin", "assets\\admin", ""),

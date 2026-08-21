@@ -22,6 +22,7 @@ from typing import Any, Dict, Tuple
 
 _ARCHIVE_ROOT_PARTS = ("j", "rosen-archive")
 _ARCHIVE_DATA_PARTS = (*_ARCHIVE_ROOT_PARTS, "data")
+_RECALL_TRANSACTION_DIRNAME = ".rosen-archive-transactions"
 _PROTOCOLS = frozenset({"sftp", "ftps"})
 
 
@@ -90,6 +91,44 @@ def validate_archive_data_path(remote_path: str, protocol: str) -> str:
         _ARCHIVE_DATA_PARTS,
         "archive data path",
     )
+
+
+def validate_recall_transaction_root(
+    remote_path: str,
+    archive_root: str,
+    protocol: str,
+) -> str:
+    """Validate the private remote directory used for recall rollback state."""
+    protocol = normalize_protocol(protocol)
+    archive_root = validate_archive_root(archive_root, protocol)
+    try:
+        parts = _validated_parts(remote_path)
+    except ValueError as exc:
+        raise ValueError(
+            f"recall transaction root is not safely scoped: {exc}"
+        ) from exc
+
+    archive_parts = _validated_parts(archive_root)
+    if parts[-1] != _RECALL_TRANSACTION_DIRNAME:
+        raise ValueError(
+            "recall transaction root must end in " f"{_RECALL_TRANSACTION_DIRNAME}"
+        )
+    if parts[: len(archive_parts)] == archive_parts:
+        raise ValueError(
+            "recall transaction root must be outside the public archive root"
+        )
+    if protocol == "sftp" and not remote_path.strip().startswith("/"):
+        raise ValueError("SFTP recall transaction root must be absolute")
+    if protocol == "ftps" and parts != (_RECALL_TRANSACTION_DIRNAME,):
+        raise ValueError(
+            "FTPS recall transaction root must be the private chroot directory "
+            f"{_RECALL_TRANSACTION_DIRNAME}"
+        )
+
+    normalized = "/".join(parts)
+    if protocol == "sftp" and remote_path.strip().startswith("/"):
+        return f"/{normalized}"
+    return normalized
 
 
 def scoped_archive_child(parent: str, relative_path: str) -> str:

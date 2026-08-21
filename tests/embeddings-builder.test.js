@@ -24,6 +24,7 @@ import {
   dequantizeInt8,
   serializeVectors,
   readVectorAt,
+  sha256Hex,
   buildEmbeddingIndex,
   embedArticle,
   buildEmbeddings,
@@ -154,14 +155,17 @@ test('serializeVectors/readVectorAt: round-trips scale and bytes per row', () =>
   assert.equal(r1.bytes[1], q2.bytes[1]);
 });
 
-test('buildEmbeddingIndex: records model, dim, version, and id order', () => {
-  const idx = buildEmbeddingIndex(['RECORD-1', 'RECORD-2']);
+test('buildEmbeddingIndex: records model, dim, version, digest, and id order', () => {
+  const bin = Buffer.from('paired artifact');
+  const digest = sha256Hex(bin);
+  const idx = buildEmbeddingIndex(['RECORD-1', 'RECORD-2'], digest);
   assert.equal(idx.version, EMBED_INDEX_VERSION);
   assert.equal(idx.model, MODEL_ID);
   assert.equal(idx.dim, EMBED_DIM);
   assert.equal(idx.quantization, 'int8');
   assert.equal(idx.bytesPerVector, BYTES_PER_VECTOR);
   assert.equal(idx.count, 2);
+  assert.equal(idx.binarySha256, digest);
   assert.deepEqual(idx.ids, ['RECORD-1', 'RECORD-2']);
 });
 
@@ -193,6 +197,7 @@ test('buildEmbeddings: ids align with input order and binary round-trips', async
   assert.equal(count, 3);
   assert.deepEqual(index.ids, ['RECORD-A', 'RECORD-B', 'RECORD-C']);
   assert.equal(binBuffer.length, 3 * BYTES_PER_VECTOR);
+  assert.equal(index.binarySha256, sha256Hex(binBuffer));
 
   // Row N of the binary, dequantized, must match a fresh encode of article N.
   const expectedC = await embedArticle(articles[2], '', embed);
@@ -217,6 +222,7 @@ test('committed artifact (if present) is self-consistent', () => {
   assert.equal(index.bytesPerVector, BYTES_PER_VECTOR);
   assert.equal(index.ids.length, index.count);
   assert.equal(bin.length, index.count * BYTES_PER_VECTOR, 'binary size must match id count');
+  assert.equal(index.binarySha256, sha256Hex(bin), 'sidecar digest must match binary contents');
   // Every id is unique, so a neighbor lookup can't collide.
   assert.equal(new Set(index.ids).size, index.ids.length, 'ids must be unique');
 });
