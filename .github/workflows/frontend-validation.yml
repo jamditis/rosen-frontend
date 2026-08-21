@@ -30,31 +30,6 @@ on:
       - '.github/workflows/frontend-validation.yml'
   pull_request:
     branches: [ main ]
-    paths:
-      - 'frontend/**'
-      - 'faq/**'
-      - 'tools/**'
-      - 'dissertation/**'
-      - 'dissertation-launch/**'
-      - 'docs/**'
-      - 'features/**'
-      - 'index.html'
-      - 'metadata.json'
-      - 'version.json'
-      - 'shared-styles.css'
-      - '.htaccess'
-      - 'ADDING-RECORDS.md'
-      - 'tests/**'
-      - 'scripts/**'
-      - 'wiki/**'
-      - 'data/**'
-      - 'backend/entity_extraction_schema.json'
-      - 'backend/entity_extraction_schema_v3.json'
-      - 'preservation/**'
-      - 'workers/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/frontend-validation.yml'
 
 jobs:
   validate:
@@ -122,20 +97,8 @@ jobs:
             echo "ok: $d/"
           done
 
-      - name: Run frontend test suite
-        run: npm run test:frontend
-
-      - name: Run source-discovery Worker tests
-        run: npm run test:workers
-
-      - name: Run data integrity test suite
-        run: npm run test:data
-
-      - name: Run extraction coverage check
-        run: npm run test:data:extraction-coverage
-
-      - name: Validate OKF bundle
-        run: npm run test:okf
+      - name: Run complete Node test suite
+        run: npm test
 
       - name: Check HTML documents are well-formed
         run: |
