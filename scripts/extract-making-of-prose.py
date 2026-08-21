@@ -173,6 +173,9 @@ class _MakingOfParser(HTMLParser):
         for index in range(len(self.element_stack) - 1, -1, -1):
             if self.element_stack[index] == tag:
                 del self.element_stack[index:]
+                self.prose_roots = [
+                    root for root in self.prose_roots if root[1] <= index
+                ]
                 return
 
     def handle_data(self, data: str) -> None:
