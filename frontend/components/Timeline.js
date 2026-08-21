@@ -84,7 +84,7 @@ const Timeline = ({ records, selectedYear, onSelectYear }) => {
         >
           <h3 id="archive-timeline-title">Timeline</h3>
           <span className="archive-timeline__range">
-            ${timelineData[0].year}–${timelineData[timelineData.length - 1].year}
+            ${enabledYears[0]}–${enabledYears[enabledYears.length - 1]}
           </span>
           ${isExpanded
             ? html`<${ChevronUp} className="w-4 h-4" aria-hidden="true" />`
