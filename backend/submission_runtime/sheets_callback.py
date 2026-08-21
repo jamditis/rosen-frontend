@@ -5,10 +5,10 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 from typing import Any, Dict
 
 from rosen_scraper.sheets_a1 import quote_tab
+from rosen_scraper.sheets_credentials import resolve_service_account_source
 
 logger = logging.getLogger("submission_runtime.sheets_callback")
 
@@ -21,10 +21,8 @@ _SHEETS_SCOPE = ["https://www.googleapis.com/auth/spreadsheets"]
 
 def _load_credentials():
     """Return google.oauth2 credentials, or None if no SA key is configured."""
-    key_path = os.environ.get("ROSEN_SHEETS_SA_KEY", "").strip()
-    key_json = os.environ.get("ROSEN_SHEETS_SA_KEY_JSON", "").strip()
-
-    if not (key_path or key_json):
+    source = resolve_service_account_source()
+    if source.kind == "unset":
         return None
 
     try:
@@ -34,12 +32,12 @@ def _load_credentials():
         return None
 
     try:
-        if key_json:
-            info = json.loads(key_json)
+        if source.kind == "inline_json":
+            info = json.loads(source.value)
             return service_account.Credentials.from_service_account_info(
                 info, scopes=_SHEETS_SCOPE)
         return service_account.Credentials.from_service_account_file(
-            key_path, scopes=_SHEETS_SCOPE)
+            source.value, scopes=_SHEETS_SCOPE)
     except (json.JSONDecodeError, FileNotFoundError, ValueError) as exc:
         logger.error(f"Failed to load SA credentials: {exc}")
         return None
