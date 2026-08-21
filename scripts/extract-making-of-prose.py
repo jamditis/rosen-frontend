@@ -11,19 +11,53 @@ from pathlib import Path
 
 
 TAG = re.compile(r"<[^>]+>", re.DOTALL)
+BREAK_TAG = re.compile(r"<br\b[^>]*?/?>", re.IGNORECASE)
+START_TAG = re.compile(r"^<([a-z][\w:-]*)\b", re.IGNORECASE)
+START_TAG_FRAGMENT = re.compile(r"^<[a-z][\w:-]*\b[^>]*>", re.IGNORECASE)
+CLASS_ATTRIBUTE = re.compile(
+    r"(?<![\w:-])class\s*=\s*(?:\"([^\"]*)\"|'([^']*)'|([^\s>]+))",
+    re.IGNORECASE,
+)
 
 
 def text_of(line: str) -> str:
     """Return readable text from one source line."""
-    text = TAG.sub("", line)
+    text = BREAK_TAG.sub(" ", line)
+    text = TAG.sub("", text)
     text = html.unescape(text)
     return re.sub(r"\s+", " ", text).strip()
 
 
+def class_tokens(line: str) -> set[str]:
+    """Return class tokens from an HTML start tag."""
+    start_tag = START_TAG_FRAGMENT.match(line)
+    if start_tag is None:
+        return set()
+    match = CLASS_ATTRIBUTE.search(start_tag.group(0))
+    if match is None:
+        return set()
+    value = next(group for group in match.groups() if group is not None)
+    return set(value.split())
+
+
 def has_class(line: str, class_name: str) -> bool:
     """Return whether an HTML start tag contains a class token."""
-    match = re.search(r'class="([^"]*)"', line)
-    return match is not None and class_name in match.group(1).split()
+    return class_name in class_tokens(line)
+
+
+def start_tag_name(line: str) -> str | None:
+    """Return the lower-case start-tag name at the beginning of a source line."""
+    match = START_TAG.match(line)
+    return match.group(1).lower() if match is not None else None
+
+
+def tag_depth_delta(fragment: str, tag: str) -> int:
+    """Return the net nesting change for one container tag."""
+    escaped = re.escape(tag)
+    openings = re.findall(rf"<{escaped}\b[^>]*>", fragment, re.IGNORECASE)
+    self_closing = sum(1 for opening in openings if re.search(r"/\s*>$", opening))
+    closings = re.findall(rf"</{escaped}\s*>", fragment, re.IGNORECASE)
+    return len(openings) - self_closing - len(closings)
 
 
 def extract(source: Path) -> list[tuple[str, str, str, int]]:
@@ -32,6 +66,8 @@ def extract(source: Path) -> list[tuple[str, str, str, int]]:
     chapter = 0
     counters: dict[str, int] = {}
     in_article = False
+    prose_container_tag: str | None = None
+    prose_container_depth = 0
     title_pending = False
     pending: tuple[str, str, str, int, list[str]] | None = None
 
@@ -58,11 +94,11 @@ def extract(source: Path) -> list[tuple[str, str, str, int]]:
                 pending = None
             continue
 
-        if 'class="dek"' in line:
+        if has_class(line, "dek"):
             capture("M.DEK", "meta", "p", raw, line_number)
-        elif 'class="dek-note"' in line:
+        elif has_class(line, "dek-note"):
             capture("M.NOTE", "meta", "p", raw, line_number)
-        elif 'class="ch-ref"' in line:
+        elif has_class(line, "ch-ref"):
             chapter += 1
             counters = {}
             title_pending = True
@@ -70,22 +106,45 @@ def extract(source: Path) -> list[tuple[str, str, str, int]]:
         elif title_pending and line.startswith("<h2>"):
             title_pending = False
             capture(f"C{chapter}.T", "title", "h2", raw, line_number)
-        elif 'class="ch-date"' in line:
+        elif has_class(line, "ch-date"):
             title_pending = False
             capture(f"C{chapter}.D", "date", "p", raw, line_number)
-        elif has_class(line, "prose"):
+        elif not in_article and has_class(line, "prose"):
             title_pending = False
-            in_article = True
-        elif line == "</div>":
-            title_pending = False
-            if in_article:
-                in_article = False
-        elif in_article and 'class="lead"' in line:
-            capture(f"C{chapter}.L", "lead", "p", raw, line_number)
-        elif in_article and 'class="pull"' in line:
-            capture(f"C{chapter}.Q{next_number('q')}", "pull", "p", raw, line_number)
-        elif in_article and line.startswith("<p>"):
-            capture(f"C{chapter}.P{next_number('p')}", "para", "p", raw, line_number)
+            prose_container_tag = start_tag_name(line)
+            if prose_container_tag is not None:
+                prose_container_depth = tag_depth_delta(raw, prose_container_tag)
+                in_article = prose_container_depth > 0
+        elif in_article:
+            if prose_container_tag is not None:
+                prose_container_depth += tag_depth_delta(raw, prose_container_tag)
+                if prose_container_depth <= 0:
+                    in_article = False
+                    prose_container_tag = None
+                    prose_container_depth = 0
+                    title_pending = False
+                    continue
+
+            if start_tag_name(line) == "p":
+                classes = class_tokens(line)
+                if "lead" in classes:
+                    capture(f"C{chapter}.L", "lead", "p", raw, line_number)
+                elif "pull" in classes:
+                    capture(
+                        f"C{chapter}.Q{next_number('q')}",
+                        "pull",
+                        "p",
+                        raw,
+                        line_number,
+                    )
+                else:
+                    capture(
+                        f"C{chapter}.P{next_number('p')}",
+                        "para",
+                        "p",
+                        raw,
+                        line_number,
+                    )
         elif line.startswith(("</article", "</section")):
             title_pending = False
 
