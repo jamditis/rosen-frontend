@@ -170,6 +170,57 @@ describe('making-of prose extractor', () => {
     assert.equal(anchorMap['C1.P3'].text, 'After the callout.');
   });
 
+  it('captures a final paragraph before a same-line container close', () => {
+    const { anchorMap } = runExtractor(`
+      <article class="chapter">
+        <span class="ch-ref">Chapter 1</span>
+        <h2>Chapter title</h2>
+        <p class="ch-date">July 2026</p>
+        <div class="prose"><p>Last paragraph.</p></div>
+        <p>Outside prose.</p>
+      </article>
+    `);
+
+    assert.equal(anchorMap['C1.P1'].text, 'Last paragraph.');
+    assert.equal(anchorMap['C1.P2'], undefined);
+  });
+
+  it('ignores tag-shaped text inside HTML comments', () => {
+    const { anchorMap } = runExtractor(`
+      <article class="chapter">
+        <span class="ch-ref">Chapter 1</span>
+        <h2>Chapter title</h2>
+        <p class="ch-date">July 2026</p>
+        <div class="prose">
+          <!-- old wrapper: <div class="callout"> -->
+          <p>Before the commented close.</p>
+          <!-- old close: </div> -->
+          <p>After the commented close.</p>
+        </div>
+        <p>Outside prose.</p>
+      </article>
+    `);
+
+    assert.equal(anchorMap['C1.P1'].text, 'Before the commented close.');
+    assert.equal(anchorMap['C1.P2'].text, 'After the commented close.');
+    assert.equal(anchorMap['C1.P3'], undefined);
+  });
+
+  it('finds a prose container after an inline wrapper tag', () => {
+    const { anchorMap } = runExtractor(`
+      <article class="chapter">
+        <span class="ch-ref">Chapter 1</span>
+        <h2>Chapter title</h2>
+        <p class="ch-date">July 2026</p>
+        <div><div class="prose">
+          <p>Wrapped prose.</p>
+        </div></div>
+      </article>
+    `);
+
+    assert.equal(anchorMap['C1.P1'].text, 'Wrapped prose.');
+  });
+
   it('extracts the full current page into one unique 62-anchor manifest', () => {
     const source = fs.readFileSync(
       path.join(repoRoot, 'features', 'making-of', 'index.html'),
