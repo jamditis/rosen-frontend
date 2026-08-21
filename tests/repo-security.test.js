@@ -24,12 +24,12 @@ test('.htaccess content security policy allows exactly the required origins', ()
   // lookup to a real directive boundary, so a misspelled or prefixed directive (e.g.
   // `x-script-src`, which browsers ignore and fall back to default-src for) becomes its
   // own key and cannot satisfy a check meant for `script-src`. Every origin was
-  // validated in-browser under this exact header (main app + dataviz + dataexplorer +
-  // the real cdnjs sql.js loader + a youtube frame), so an incomplete OR over-broad CSP
-  // is a #276 regression -- a deploy that blocks the app, or a policy wider than the
-  // deployed surfaces need. Asserting the EXACT token set per directive catches a
-  // missing origin, an out-of-scope addition (e.g. https://unpkg.com), and a look-alike
-  // hijack (https://esm.sh.evil.example) instead of passing a substring match.
+  // validated in-browser under this exact header (main app + dataviz + the real cdnjs
+  // sql.js loader + a youtube frame), so an incomplete OR over-broad CSP is a #276
+  // regression -- a deploy that blocks the app, or a policy wider than the deployed
+  // surfaces need. Asserting the EXACT token set per directive catches a missing
+  // origin, an out-of-scope addition (e.g. https://unpkg.com), and a look-alike hijack
+  // (https://esm.sh.evil.example) instead of passing a substring match.
   const directives = new Map();
   for (const part of cspMatch[1].split(';')) {
     const tokens = part.trim().split(/\s+/).filter(Boolean);
@@ -78,9 +78,9 @@ test('.htaccess content security policy allows exactly the required origins', ()
   };
 
   assertSources('default-src', ["'self'"]);
-  // script-src: esm.sh module CDN; cdnjs (SRI-pinned sql.js loader + noUiSlider +
-  // PapaParse); jsdelivr (chart.js/treemap in dataviz); 'unsafe-inline' for the inline
-  // importmap/config blocks that run site-wide; 'wasm-unsafe-eval' for sql.js.
+  // script-src: esm.sh module CDN; cdnjs (SRI-pinned sql.js loader +
+  // noUiSlider); jsdelivr (chart.js/treemap in dataviz); 'unsafe-inline' for the
+  // inline importmap/config blocks that run site-wide; 'wasm-unsafe-eval' for sql.js.
   assertSources('script-src', [
     "'self'",
     'https://esm.sh',
@@ -97,16 +97,15 @@ test('.htaccess content security policy allows exactly the required origins', ()
     'https://cdnjs.cloudflare.com',
   ]);
   assertSources('font-src', ["'self'", 'https://fonts.gstatic.com']);
-  // connect-src: esm.sh module fetches; the report/submission fetch (script.google.com);
-  // the dataexplorer published-sheet CSV fetch (docs.google.com, which 302-redirects to
-  // a *.googleusercontent.com host the CSP re-checks).
+  // connect-src: esm.sh module fetches plus the branded report/submission endpoint.
+  // The internal data explorer no longer widens production CSP for Google Sheets.
   assertSources('connect-src', [
     "'self'",
     'https://esm.sh',
     'https://script.google.com',
-    'https://docs.google.com',
-    'https://*.googleusercontent.com',
   ]);
+  assert.ok(!directives.get('connect-src').includes('https://docs.google.com'));
+  assert.ok(!directives.get('connect-src').includes('https://*.googleusercontent.com'));
   // frame-src: privacy-enhanced embeds plus the legacy origin during the
   // service-worker cache rollover from the previous deployment.
   assertSources('frame-src', [
