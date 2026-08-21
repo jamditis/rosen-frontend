@@ -101,6 +101,7 @@ const APP_SHELL_FRONTEND_FILES = [
   'utils/searchConfig.js',
   'utils/searchNormalize.js',
   'utils/submitGate.js',
+  'utils/timelineData.js',
   'utils/viewTransition.js'
 ];
 
