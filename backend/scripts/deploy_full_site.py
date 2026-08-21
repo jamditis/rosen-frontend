@@ -46,6 +46,7 @@ from __future__ import annotations
 import argparse
 import errno
 import hashlib
+import json
 import logging
 import os
 import shutil
@@ -554,6 +555,25 @@ def _remote_file_digest(remote, path: str) -> str:
     return digest.hexdigest()
 
 
+def _remote_sidecar_binds_digest(
+    remote,
+    sidecar_path: str,
+    binary_digest: str,
+) -> bool:
+    try:
+        with remote.open(sidecar_path, 'rb') as source:
+            sidecar = json.load(source)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return False
+    expected_digest = (
+        sidecar.get('binarySha256') if isinstance(sidecar, dict) else None
+    )
+    return (
+        isinstance(expected_digest, str)
+        and expected_digest.lower() == binary_digest
+    )
+
+
 def _replace_remote_file(remote, source: str, target: str) -> None:
     """Replace target atomically, with a safe absent-target fallback.
 
@@ -620,6 +640,8 @@ def _publish_recall_artifact_pair(
         entry['final_exists'] = _remote_exists(remote, entry['final'])
         entry['legacy_backup_exists'] = _remote_exists(
             remote, entry['legacy_backup'])
+    has_legacy_backups = any(
+        entry['legacy_backup_exists'] for entry in entries)
     if all(entry['final_exists'] for entry in entries):
         final_digests = tuple(
             _remote_file_digest(remote, entry['final']) for entry in entries)
@@ -634,8 +656,17 @@ def _publish_recall_artifact_pair(
                     _remove_remote_if_exists(remote, legacy_path)
             return
 
+    # With no public member and no legacy backup, this is a first publication.
+    # Private rollback state cannot be needed because no live pair was changed.
+    probe_private_root = bool(
+        any(entry['final_exists'] for entry in entries)
+        or has_legacy_backups
+    )
     private_root_exists = bool(
-        transaction_root and _remote_exists(remote, transaction_root))
+        transaction_root
+        and probe_private_root
+        and _remote_exists(remote, transaction_root)
+    )
 
     def ensure_private_root() -> None:
         nonlocal private_root_exists
@@ -669,8 +700,6 @@ def _publish_recall_artifact_pair(
             private_root_exists
             and _remote_exists(remote, entry['private_backup']))
 
-    has_legacy_backups = any(
-        entry['legacy_backup_exists'] for entry in entries)
     has_private_backups = any(
         entry['private_backup_exists'] for entry in entries)
     if has_legacy_backups and has_private_backups:
@@ -699,7 +728,18 @@ def _publish_recall_artifact_pair(
                 backup_digests = tuple(
                     _remote_file_digest(remote, entry[backup_key])
                     for entry in entries)
-                if final_digests in (backup_digests, local_digests):
+                # The hash-bound live pair is the durable commit record. If it
+                # is valid, retained backups are cleanup state from a publish
+                # that completed before the process stopped.
+                live_pair_is_committed = _remote_sidecar_binds_digest(
+                    remote,
+                    entries[1]['final'],
+                    final_digests[0],
+                )
+                if (
+                    live_pair_is_committed
+                    or final_digests in (backup_digests, local_digests)
+                ):
                     restore_entries = []
                 else:
                     restore_entries = backup_entries

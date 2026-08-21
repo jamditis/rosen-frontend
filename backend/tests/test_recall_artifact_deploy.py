@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import errno
+import hashlib
 import importlib.util
 import io
 import sys
@@ -137,6 +138,11 @@ def _fixture(tmp_path):
     binary.write_bytes(b"new-binary")
     sidecar.write_bytes(b'{"binarySha256":"new"}')
     return binary, sidecar
+
+
+def _sidecar_for(binary: bytes) -> bytes:
+    digest = hashlib.sha256(binary).hexdigest()
+    return f'{{"binarySha256":"{digest}"}}'.encode()
 
 
 def _transaction_root(root):
@@ -310,6 +316,29 @@ def test_first_publish_falls_back_to_rename_when_target_is_absent(
     assert remote.files[binary_final] == binary.read_bytes()
     assert remote.files[sidecar_final] == sidecar.read_bytes()
     assert _transaction_root(root) not in remote.directories
+    assert remote.closed is True
+
+
+def test_first_publish_does_not_probe_private_transaction_root(tmp_path, monkeypatch):
+    binary, sidecar = _fixture(tmp_path)
+    root = "/home/archive/public_html/j/rosen-archive"
+    transaction_root = _transaction_root(root)
+    remote = MemoryRemote(root, fail_stat_target=transaction_root)
+    binary_final = f"{root}/data/archive-embeddings.bin"
+    sidecar_final = f"{root}/data/archive-embeddings.json"
+    monkeypatch.setattr(deploy.remote_transfer, "connect_remote", lambda cfg: remote)
+
+    result = deploy.push_files(
+        [binary, sidecar],
+        tmp_path,
+        _cfg(root),
+        remote_prune_dirs=(),
+    )
+
+    assert result == {"ok": True, "files_pushed": 2, "error": None}
+    assert remote.files[binary_final] == binary.read_bytes()
+    assert remote.files[sidecar_final] == sidecar.read_bytes()
+    assert transaction_root not in remote.directories
     assert remote.closed is True
 
 
@@ -570,14 +599,14 @@ def test_retry_restores_copy_backups_when_both_mixed_finals_remain(
     sidecar_final = f"{root}/data/archive-embeddings.json"
     remote = MemoryRemote(root, fail_publish_target=sidecar_final)
     transaction_root = _transaction_root(root)
+    old_binary = b"old-binary"
+    old_sidecar = _sidecar_for(old_binary)
     remote.directories.add(transaction_root)
     remote.files[binary_final] = b"interrupted-new-binary"
-    remote.files[sidecar_final] = b'{"binarySha256":"old"}'
-    remote.files[f"{transaction_root}/archive-embeddings.bin.pair-backup"] = (
-        b"old-binary"
-    )
+    remote.files[sidecar_final] = old_sidecar
+    remote.files[f"{transaction_root}/archive-embeddings.bin.pair-backup"] = old_binary
     remote.files[f"{transaction_root}/archive-embeddings.json.pair-backup"] = (
-        b'{"binarySha256":"old"}'
+        old_sidecar
     )
     monkeypatch.setattr(deploy.remote_transfer, "connect_remote", lambda cfg: remote)
 
@@ -589,9 +618,51 @@ def test_retry_restores_copy_backups_when_both_mixed_finals_remain(
     )
 
     assert result["ok"] is False
-    assert remote.files[binary_final] == b"old-binary"
-    assert remote.files[sidecar_final] == b'{"binarySha256":"old"}'
+    assert remote.files[binary_final] == old_binary
+    assert remote.files[sidecar_final] == old_sidecar
     assert not any(path.endswith(_TRANSACTION_SUFFIXES) for path in remote.files)
+    assert remote.closed is True
+
+
+def test_completed_pair_with_stale_backups_is_not_rolled_back_on_next_failure(
+    tmp_path, monkeypatch
+):
+    binary, sidecar = _fixture(tmp_path)
+    next_binary = b"next-binary"
+    binary.write_bytes(next_binary)
+    sidecar.write_bytes(_sidecar_for(next_binary))
+
+    root = "/home/archive/public_html/j/rosen-archive"
+    transaction_root = _transaction_root(root)
+    binary_final = f"{root}/data/archive-embeddings.bin"
+    sidecar_final = f"{root}/data/archive-embeddings.json"
+    binary_backup = f"{transaction_root}/archive-embeddings.bin.pair-backup"
+    sidecar_backup = f"{transaction_root}/archive-embeddings.json.pair-backup"
+    committed_binary = b"committed-binary"
+    committed_sidecar = _sidecar_for(committed_binary)
+    old_binary = b"old-binary"
+    remote = MemoryRemote(root, fail_publish_target=sidecar_final)
+    remote.directories.add(transaction_root)
+    remote.files[binary_final] = committed_binary
+    remote.files[sidecar_final] = committed_sidecar
+    remote.files[binary_backup] = old_binary
+    remote.files[sidecar_backup] = _sidecar_for(old_binary)
+    monkeypatch.setattr(deploy.remote_transfer, "connect_remote", lambda cfg: remote)
+
+    result = deploy.push_files(
+        [binary, sidecar],
+        tmp_path,
+        _cfg(root),
+        remote_prune_dirs=(),
+    )
+
+    assert result["ok"] is False
+    assert "injected sidecar publish failure" in result["error"]
+    assert remote.files[binary_final] == committed_binary
+    assert remote.files[sidecar_final] == committed_sidecar
+    assert all(
+        files.get(binary_final) != old_binary for _operation, files in remote.history
+    )
     assert remote.closed is True
 
 
