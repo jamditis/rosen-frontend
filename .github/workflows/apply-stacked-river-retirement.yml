@@ -43,12 +43,7 @@ jobs:
           end = next(i for i in range(start + 1, len(lines)) if lines[i].strip() == 'PY')
           body = []
           for line in lines[start + 1:end]:
-              if line == '':
-                  body.append('')
-                  continue
-              if not line.startswith('          '):
-                  raise SystemExit(f'unexpected embedded-script indentation: {line!r}')
-              body.append(line[10:])
+              body.append(line[10:] if line.startswith('          ') else line)
           Path('/tmp/apply-river-retirement.py').write_text(
               '\n'.join(body) + '\n',
               encoding='utf-8',
