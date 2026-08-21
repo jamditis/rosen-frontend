@@ -4,7 +4,7 @@
 
 Invoked from `.github/workflows/deploy.yml` on workflow_dispatch. Walks the
 hardcoded manifest below, uploads every file through the shared remote adapter
-with an atomic temporary-file rename, then removes explicitly retired remote
+with an atomic temporary-file rename, then removes explicitly non-public remote
 directories.
 It aborts on the first transfer failure (a partial deploy is worse than no
 deploy — half the page would resolve to v3.4.0 imports while the other half
@@ -74,18 +74,16 @@ _DEPLOY_FILES: Tuple[str, ...] = (
     'index.html',
     'sw.js',  # root-scope bridge; imports frontend/sw.js
     'favicon.ico',
-    'favicon.svg',  # SVG favicon referenced by index.html, the FAQ, and both data tools
+    'favicon.svg',  # SVG favicon referenced by index.html, the FAQ, and dataviz
     'og-image.png',  # social card referenced by the OG/Twitter meta tags
     'shared-styles.css',
     'version.json',
     'metadata.json',
     '.htaccess',
     'ADDING-RECORDS.md',
-    # Shared Tailwind build for the standalone data tools. It sits at
-    # tools/active/, one level above the two deployed tool dirs, so the dir
-    # walk below never reaches it; both tools load it as ../tailwind.css.
-    # Listed explicitly so a full deploy ships it -- dataexplorer and dataviz
-    # render unstyled without it.
+    # Shared Tailwind build for the standalone data visualization tool. It sits
+    # at tools/active/, one level above the deployed tool dir, so the dir walk
+    # below never reaches it; dataviz loads it as ../tailwind.css.
     'tools/active/tailwind.css',
 )
 
@@ -98,7 +96,6 @@ _DEPLOY_DIRS: Tuple[str, ...] = (
     'features/shared',
     'features/winer-method',
     'features/participate',
-    'tools/active/dataexplorer',
     'tools/active/dataviz',
     'data/feeds',
 )
@@ -114,6 +111,18 @@ _REMOTE_PRUNE_DIRS: Tuple[str, ...] = (
     'dissertation/glossary',
     'dissertation/timeline',
     'features/status-report',
+)
+
+# The hardened data explorer source remains in the repository as an internal
+# prototype, but any old manually uploaded copy must not remain a hidden public
+# endpoint. Keep this distinct from retired routes so dry-run output records the
+# product decision rather than implying that the source itself was deleted.
+_REMOTE_INTERNAL_PRUNE_DIRS: Tuple[str, ...] = (
+    'tools/active/dataexplorer',
+)
+_REMOTE_PRUNE_TARGETS: Tuple[str, ...] = (
+    *_REMOTE_PRUNE_DIRS,
+    *_REMOTE_INTERNAL_PRUNE_DIRS,
 )
 
 # features/making-of is intentionally omitted. That page is a draft pending
@@ -461,10 +470,10 @@ def push_files(
     files: List[Path],
     repo_root: Path,
     cfg: Dict[str, Any],
-    remote_prune_dirs: Iterable[str] = _REMOTE_PRUNE_DIRS,
+    remote_prune_dirs: Iterable[str] = _REMOTE_PRUNE_TARGETS,
     record_shells: Optional[Iterable[Path]] = None,
 ) -> Dict[str, Any]:
-    """Upload files atomically, then reconcile retired remote content.
+    """Upload files atomically, then reconcile non-public remote content.
 
     Returns {ok, files_pushed, error}. The atomic-rename guarantee mirrors
     backend/submission_runtime/sftp_push.py — readers on the live site
@@ -531,7 +540,7 @@ def push_files(
             remote_dir = remote_transfer.scoped_archive_child(
                 cfg['site_path'], relpath)
             if _remove_remote_tree(remote, remote_dir):
-                logger.info(f'Removed retired directory: {relpath}')
+                logger.info(f'Removed non-public directory: {relpath}')
     except Exception as exc:
         error = f'Transfer error: {exc}'
         logger.error(error)
@@ -583,6 +592,12 @@ def main(argv: Optional[List[str]] = None) -> int:
             'after upload'
         )
         for relpath in _REMOTE_PRUNE_DIRS:
+            print(f'  {relpath}')
+        print(
+            f'would remove {len(_REMOTE_INTERNAL_PRUNE_DIRS)} internal '
+            'prototype directory after upload'
+        )
+        for relpath in _REMOTE_INTERNAL_PRUNE_DIRS:
             print(f'  {relpath}')
         return 0
 
