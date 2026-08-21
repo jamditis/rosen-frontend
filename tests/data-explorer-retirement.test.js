@@ -29,7 +29,7 @@ test('excludes the prototype from uploads and prunes a stale public copy', () =>
   );
   assert.match(
     deploy,
-    /_REMOTE_PRUNE_TARGETS\s*:[^=]*=\s*\(\*_REMOTE_PRUNE_DIRS,\s*\*_REMOTE_INTERNAL_PRUNE_DIRS\)/,
+    /_REMOTE_PRUNE_TARGETS\s*:[^=]*=\s*\(\s*\*_REMOTE_PRUNE_DIRS,\s*\*_REMOTE_INTERNAL_PRUNE_DIRS,\s*\)/,
   );
   assert.match(
     deploy,
@@ -37,7 +37,7 @@ test('excludes the prototype from uploads and prunes a stale public copy', () =>
   );
   assert.match(
     deploy,
-    /would remove \{len\(_REMOTE_INTERNAL_PRUNE_DIRS\)\} internal prototype director/,
+    /len\(_REMOTE_INTERNAL_PRUNE_DIRS\)[\s\S]*internal[\s\S]*prototype director/,
   );
   assert.match(deploymentGuide, /tools\/active\/dataexplorer\/.*Internal prototype/s);
 });
