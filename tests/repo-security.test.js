@@ -98,14 +98,13 @@ test('.htaccess content security policy allows exactly the required origins', ()
   ]);
   assertSources('font-src', ["'self'", 'https://fonts.gstatic.com']);
   // connect-src: esm.sh module fetches plus the branded report/submission endpoint.
-  // The internal data explorer no longer widens production CSP for Google Sheets.
+  // The exact-source assertion also proves the internal data explorer does not widen
+  // production CSP for Google Sheets.
   assertSources('connect-src', [
     "'self'",
     'https://esm.sh',
     'https://script.google.com',
   ]);
-  assert.ok(!directives.get('connect-src').includes('https://docs.google.com'));
-  assert.ok(!directives.get('connect-src').includes('https://*.googleusercontent.com'));
   // frame-src: privacy-enhanced embeds plus the legacy origin during the
   // service-worker cache rollover from the previous deployment.
   assertSources('frame-src', [
