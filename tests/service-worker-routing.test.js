@@ -281,8 +281,8 @@ describe('service worker release-boundary module loading', () => {
   });
 });
 
-describe('service worker embeddings sidecar cache lifetime', () => {
-  it('keeps the first sidecar cache write alive through the fetch event', async () => {
+describe('service worker data cache lifetime', () => {
+  it('keeps the cache write alive without delaying the network response', async () => {
     let finishPut;
     let putStarted = false;
     const putPending = new Promise(resolve => { finishPut = resolve; });
@@ -308,17 +308,24 @@ describe('service worker embeddings sidecar cache lifetime', () => {
     };
 
     handlers.fetch(event);
+    let responseSettled = false;
+    let networkResponse;
+    event.responsePending.then(response => {
+      responseSettled = true;
+      networkResponse = response;
+    });
     await new Promise(resolve => setImmediate(resolve));
 
     assert.equal(putStarted, true);
     assert.equal(event.lifetimes.length, 1);
+    assert.equal(responseSettled, true);
+    assert.equal(networkResponse, freshIndex);
     let lifetimeSettled = false;
     event.lifetimes[0].then(() => { lifetimeSettled = true; });
     await new Promise(resolve => setImmediate(resolve));
     assert.equal(lifetimeSettled, false);
 
     finishPut();
-    assert.equal(await event.responsePending, freshIndex);
     await event.lifetimes[0];
   });
 });

@@ -307,19 +307,19 @@ async function staleWhileRevalidate(request, cacheName, event) {
   const cachedResponse = await cache.match(request);
 
   const fetchPromise = fetch(request)
-    .then(async response => {
-      if (response.ok) {
-        await safePut(cache, request, response.clone());
-      }
-      return response;
-    })
     .catch(err => {
       console.warn('[SW] Network fetch failed:', request.url, err);
       return null;
     });
+  const refreshPromise = fetchPromise.then(response => {
+    if (response?.ok) {
+      return safePut(cache, request, response.clone());
+    }
+    return false;
+  });
   // A cached response still returns immediately, but the fetch event remains
   // alive until its background refresh and cache write finish.
-  event?.waitUntil?.(fetchPromise);
+  event?.waitUntil?.(refreshPromise);
 
   if (cachedResponse) {
     return cachedResponse;
