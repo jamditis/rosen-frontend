@@ -15,3 +15,17 @@ Current status:
 - Public deployment requires migration to committed local archive artifacts and a new product, accessibility, security, and deployment review.
 
 Do not rewrite the historical audit verdicts to match this later decision. Use this file and the linked GitHub issue for current status.
+
+## River of News
+
+Issue #584 supersedes the audit’s `UNREACHABLE` description of `frontend/components/RiverOfNews.js`.
+
+Current status:
+
+- The component is archived under `archived/frontend-prototypes/` rather than wired into production.
+- Its Today / Yesterday / This week defaults were designed for a live feed and do not fit the historical archive corpus.
+- The river-only block has been removed from globally loaded `frontend/index.css`.
+- The full-site deploy removes any stale public copy of the old component module after successful replacement uploads.
+- Reintroducing a river view requires a new grouping model, navigation decision, and accessibility/behavior review.
+
+Do not rewrite the historical audit verdicts. Use this override and issue #584 for current status.

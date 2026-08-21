@@ -7,8 +7,8 @@
  * order a reader expects after picking a year in the volume bars (issue #529).
  *
  * Record dates are ISO 'YYYY-MM-DD', so a lexicographic compare is already
- * chronological. The `|| ''` guards mirror RiverOfNews and keep a record with
- * a missing date or title from throwing, sorting it as the earliest/empty key
+ * chronological. The `|| ''` guards keep a record with a missing date or title
+ * from throwing, sorting it as the earliest/empty key
  * rather than crashing the whole list.
  */
 

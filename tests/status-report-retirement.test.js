@@ -30,8 +30,11 @@ describe('retired status report (#633)', () => {
     );
     assert.doesNotMatch(uploadManifest, /status-report\//,
       'the manual upload manifest must not list the retired report');
-    assert.match(deploymentGuide, /Retired routes removed by a full deploy[\s\S]*features\/status-report\//,
-      'the deployment guide must document the remote cleanup');
+    assert.match(
+      deploymentGuide,
+      /Retired routes and files removed by a full deploy[\s\S]*features\/status-report\//,
+      'the deployment guide must document the remote cleanup',
+    );
   });
 
   it('is absent from shipped-content scans and preview routes', () => {
