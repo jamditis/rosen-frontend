@@ -219,7 +219,7 @@ self.addEventListener('fetch', event => {
 
   // Handle data files with stale-while-revalidate
   if (isDataFile(url.pathname)) {
-    event.respondWith(staleWhileRevalidate(event.request, DATA_CACHE_NAME));
+    event.respondWith(staleWhileRevalidate(event.request, DATA_CACHE_NAME, event));
     return;
   }
 
@@ -302,16 +302,14 @@ async function safePut(cache, request, response) {
  * Returns the cached response immediately when present, and refreshes the cache
  * from the network in the background. Failed puts are swallowed by safePut.
  */
-async function staleWhileRevalidate(request, cacheName) {
+async function staleWhileRevalidate(request, cacheName, event) {
   const cache = await caches.open(cacheName);
   const cachedResponse = await cache.match(request);
 
   const fetchPromise = fetch(request)
-    .then(response => {
+    .then(async response => {
       if (response.ok) {
-        // Fire-and-forget: safePut self-catches, so the background refresh
-        // never blocks the returned response nor throws an unhandled rejection.
-        safePut(cache, request, response.clone());
+        await safePut(cache, request, response.clone());
       }
       return response;
     })
@@ -319,6 +317,9 @@ async function staleWhileRevalidate(request, cacheName) {
       console.warn('[SW] Network fetch failed:', request.url, err);
       return null;
     });
+  // A cached response still returns immediately, but the fetch event remains
+  // alive until its background refresh and cache write finish.
+  event?.waitUntil?.(fetchPromise);
 
   if (cachedResponse) {
     return cachedResponse;

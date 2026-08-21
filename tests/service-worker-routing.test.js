@@ -281,6 +281,48 @@ describe('service worker release-boundary module loading', () => {
   });
 });
 
+describe('service worker embeddings sidecar cache lifetime', () => {
+  it('keeps the first sidecar cache write alive through the fetch event', async () => {
+    let finishPut;
+    let putStarted = false;
+    const putPending = new Promise(resolve => { finishPut = resolve; });
+    const freshIndex = {
+      ok: true,
+      clone() { return this; },
+    };
+    const { handlers } = loadSW('pressthink.org', {
+      cachePut: async () => {
+        putStarted = true;
+        await putPending;
+      },
+      fetchImpl: async () => freshIndex,
+    });
+    const event = {
+      request: {
+        mode: 'cors',
+        url: `https://pressthink.org${BASE}/data/archive-embeddings.json?v=${APP_VERSION}`,
+      },
+      lifetimes: [],
+      respondWith(promise) { this.responsePending = promise; },
+      waitUntil(promise) { this.lifetimes.push(promise); },
+    };
+
+    handlers.fetch(event);
+    await new Promise(resolve => setImmediate(resolve));
+
+    assert.equal(putStarted, true);
+    assert.equal(event.lifetimes.length, 1);
+    let lifetimeSettled = false;
+    event.lifetimes[0].then(() => { lifetimeSettled = true; });
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(lifetimeSettled, false);
+
+    finishPut();
+    assert.equal(await event.responsePending, freshIndex);
+    await event.lifetimes[0];
+  });
+});
+
 describe('service worker offline navigation fallback', () => {
   it('uses the cached app root for an uncached SPA query deep link', async () => {
     const appRoot = { source: 'cached app root' };
