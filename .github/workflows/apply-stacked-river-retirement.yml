@@ -32,7 +32,10 @@ jobs:
           node-version: 20
 
       - name: Apply assertion-guarded edit
-        run: python3 .github/scripts/apply_river_retirement.py
+        shell: bash
+        run: |
+          python3 .github/scripts/apply_river_retirement.py
+          python3 .github/scripts/isolate_river_retirement_tests.py
 
       - name: Stamp release markers
         run: node scripts/bump-version.mjs 3.8.25
@@ -50,6 +53,7 @@ jobs:
         run: |
           rm .github/workflows/apply-river-retirement.yml
           rm .github/scripts/apply_river_retirement.py
+          rm .github/scripts/isolate_river_retirement_tests.py
           rmdir .github/scripts 2>/dev/null || true
           git config user.name 'Joe Amditis'
           git config user.email '6799804+jamditis@users.noreply.github.com'
