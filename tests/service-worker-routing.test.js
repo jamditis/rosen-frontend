@@ -308,6 +308,11 @@ describe('service worker data cache lifetime', () => {
     };
 
     handlers.fetch(event);
+    assert.equal(
+      event.lifetimes.length,
+      1,
+      'waitUntil must be registered before the fetch handler returns',
+    );
     let responseSettled = false;
     let networkResponse;
     event.responsePending.then(response => {
@@ -317,7 +322,6 @@ describe('service worker data cache lifetime', () => {
     await new Promise(resolve => setImmediate(resolve));
 
     assert.equal(putStarted, true);
-    assert.equal(event.lifetimes.length, 1);
     assert.equal(responseSettled, true);
     assert.equal(networkResponse, freshIndex);
     let lifetimeSettled = false;

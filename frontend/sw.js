@@ -219,7 +219,12 @@ self.addEventListener('fetch', event => {
 
   // Handle data files with stale-while-revalidate
   if (isDataFile(url.pathname)) {
-    event.respondWith(staleWhileRevalidate(event.request, DATA_CACHE_NAME, event));
+    const { responsePromise, lifetimePromise } = staleWhileRevalidate(
+      event.request,
+      DATA_CACHE_NAME,
+    );
+    event.waitUntil(lifetimePromise);
+    event.respondWith(responsePromise);
     return;
   }
 
@@ -302,38 +307,45 @@ async function safePut(cache, request, response) {
  * Returns the cached response immediately when present, and refreshes the cache
  * from the network in the background. Failed puts are swallowed by safePut.
  */
-async function staleWhileRevalidate(request, cacheName, event) {
-  const cache = await caches.open(cacheName);
-  const cachedResponse = await cache.match(request);
-
-  const fetchPromise = fetch(request)
+function staleWhileRevalidate(request, cacheName) {
+  const cachePromise = caches.open(cacheName);
+  const cachedResponsePromise = cachePromise.then(cache => cache.match(request));
+  const fetchResultPromise = fetch(request)
+    .then(response => ({
+      response,
+      cacheResponse: response.ok ? response.clone() : null,
+    }))
     .catch(err => {
       console.warn('[SW] Network fetch failed:', request.url, err);
-      return null;
+      return { response: null, cacheResponse: null };
     });
-  const refreshPromise = fetchPromise.then(response => {
-    if (response?.ok) {
-      return safePut(cache, request, response.clone());
+
+  const responsePromise = (async () => {
+    const cachedResponse = await cachedResponsePromise;
+    if (cachedResponse) {
+      return cachedResponse;
     }
-    return false;
-  });
-  // A cached response still returns immediately, but the fetch event remains
-  // alive until its background refresh and cache write finish.
-  event?.waitUntil?.(refreshPromise);
 
-  if (cachedResponse) {
-    return cachedResponse;
-  }
+    const { response } = await fetchResultPromise;
+    if (response) {
+      return response;
+    }
 
-  const networkResponse = await fetchPromise;
-  if (networkResponse) {
-    return networkResponse;
-  }
+    return new Response('Offline and no cached data available', {
+      status: 503,
+      statusText: 'Service Unavailable'
+    });
+  })();
 
-  return new Response('Offline and no cached data available', {
-    status: 503,
-    statusText: 'Service Unavailable'
-  });
+  const lifetimePromise = Promise.all([cachePromise, fetchResultPromise])
+    .then(([cache, { cacheResponse }]) => {
+      if (cacheResponse) {
+        return safePut(cache, request, cacheResponse);
+      }
+      return false;
+    });
+
+  return { responsePromise, lifetimePromise };
 }
 
 /**
