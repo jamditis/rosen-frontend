@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "risks": [
+    {
+      "id": "transformers-build-chain-2026-08",
+      "issue": 804,
+      "status": "accepted-temporarily",
+      "accepted_on": "2026-08-20",
+      "review_by": "2026-10-20",
+      "scope": {
+        "direct_dependency": "@huggingface/transformers",
+        "usage": "build-time text-embedding generation only",
+        "production_exposure": false
+      },
+      "advisories": [
+        {
+          "id": "GHSA-xcpc-8h2w-3j85",
+          "package": "adm-zip",
+          "affected": "<0.6.0",
+          "patched": "0.6.0"
+        },
+        {
+          "id": "GHSA-f88m-g3jw-g9cj",
+          "package": "sharp",
+          "affected": "<0.35.0",
+          "patched": "0.35.0"
+        }
+      ],
+      "rationale": [
+        "The current Transformers.js release pins onnxruntime-node 1.24.3 and requests sharp ^0.34.5, so no supported direct upgrade clears both advisories.",
+        "Forcing onnxruntime-node or sharp outside the upstream dependency constraints could change native runtime or model behavior without an embeddings rebuild and artifact-parity review.",
+        "npm audit --omit=dev reported no production findings when this exception was accepted."
+      ],
+      "controls": [
+        "Keep @huggingface/transformers in devDependencies only.",
+        "Keep the package dynamically imported only by data/lib/embeddings-builder.js.",
+        "Do not add npm overrides for this chain without a successful embeddings build, artifact-parity review, and full test suite.",
+        "Re-review this exception by the review_by date or when Transformers.js publishes a release with patched transitive versions, whichever comes first."
+      ],
+      "retire_when": [
+        "Every locked adm-zip version in the Transformers.js graph is at least 0.6.0.",
+        "Every locked sharp version in the Transformers.js graph is at least 0.35.0.",
+        "The embeddings builder succeeds and generated artifacts are unchanged or their changes are reviewed and explained.",
+        "The full test suite and npm audit complete without high or critical findings."
+      ],
+      "upstream_tracking": [
+        "https://github.com/huggingface/transformers.js/issues/1687",
+        "https://github.com/huggingface/transformers.js/issues/1718"
+      ]
+    }
+  ]
+}
