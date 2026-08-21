@@ -1,0 +1,51 @@
+name: Temporary branch version bump
+
+on:
+  push:
+    branches:
+      - fix/timeline-visible-range
+    paths:
+      - 'frontend/components/Timeline.js'
+      - 'tests/timeline-range.test.js'
+      - 'package.json'
+      - '.github/workflows/branch-version-bump.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Generate canonical version bump
+        id: bump
+        shell: bash
+        run: |
+          current_version=$(node -p "JSON.parse(require('fs').readFileSync('version.json', 'utf8')).version")
+          if [ "$current_version" = "3.8.23" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          node scripts/bump-version.mjs 3.8.23
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit generated version files
+        if: steps.bump.outputs.changed == 'true'
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'chore: bump version to 3.8.23'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
