@@ -1,0 +1,45 @@
+name: Clean temporary branch workflows
+
+on:
+  push:
+    branches:
+      - fix/timeline-visible-range
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Wait for the canonical version bump
+        shell: bash
+        run: |
+          for attempt in $(seq 1 60); do
+            git fetch origin "${GITHUB_REF_NAME}"
+            git reset --hard "origin/${GITHUB_REF_NAME}"
+            current_version=$(node -p "JSON.parse(require('fs').readFileSync('version.json', 'utf8')).version")
+            if [ "$current_version" = "3.8.23" ]; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo 'Version bump did not complete' >&2
+          exit 1
+
+      - name: Remove temporary workflows
+        shell: bash
+        run: |
+          rm -f .github/workflows/branch-version-bump.yml
+          rm -f .github/workflows/cleanup-branch-workflows.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'ci: remove temporary branch workflows'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
