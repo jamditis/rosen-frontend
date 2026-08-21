@@ -45,7 +45,17 @@ test('excludes the prototype from uploads and prunes a stale public copy', () =>
 test('does not widen production CSP for the internal Google Sheet prototype', () => {
   const policy = htaccess.match(/Header set Content-Security-Policy "([^"]+)"/)?.[1];
   assert.ok(policy, 'Content-Security-Policy header is missing');
-  assert.match(policy, /connect-src 'self' https:\/\/esm\.sh https:\/\/script\.google\.com;/);
-  assert.doesNotMatch(policy, /docs\.google\.com/);
-  assert.doesNotMatch(policy, /googleusercontent\.com/);
+
+  const connectSrc = policy
+    .split(';')
+    .map(part => part.trim().split(/\s+/).filter(Boolean))
+    .find(tokens => tokens[0] === 'connect-src');
+
+  assert.deepEqual(connectSrc, [
+    'connect-src',
+    "'self'",
+    'https://esm.sh',
+    'https://script.google.com',
+    'https://script.googleusercontent.com',
+  ]);
 });
