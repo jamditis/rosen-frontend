@@ -4,159 +4,200 @@
 from __future__ import annotations
 
 import argparse
-import html
 import json
-import re
+from dataclasses import dataclass, field
+from html.parser import HTMLParser
 from pathlib import Path
 
 
-TAG = re.compile(r"<[^>]+>", re.DOTALL)
-BREAK_TAG = re.compile(r"<br\b[^>]*?/?>", re.IGNORECASE)
-START_TAG = re.compile(r"^<([a-z][\w:-]*)\b", re.IGNORECASE)
-START_TAG_FRAGMENT = re.compile(r"^<[a-z][\w:-]*\b[^>]*>", re.IGNORECASE)
-CLASS_ATTRIBUTE = re.compile(
-    r"(?<![\w:-])class\s*=\s*(?:\"([^\"]*)\"|'([^']*)'|([^\s>]+))",
-    re.IGNORECASE,
-)
+Block = tuple[str, str, str, int]
+VOID_ELEMENTS = {
+    "area",
+    "base",
+    "br",
+    "col",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "link",
+    "meta",
+    "param",
+    "source",
+    "track",
+    "wbr",
+}
 
 
-def text_of(line: str) -> str:
-    """Return readable text from one source line."""
-    text = BREAK_TAG.sub(" ", line)
-    text = TAG.sub("", text)
-    text = html.unescape(text)
-    return re.sub(r"\s+", " ", text).strip()
+@dataclass
+class _Capture:
+    anchor: str
+    kind: str
+    tag: str
+    depth: int
+    line: int
+    fragments: list[str] = field(default_factory=list)
 
 
-def class_tokens(line: str) -> set[str]:
-    """Return class tokens from an HTML start tag."""
-    start_tag = START_TAG_FRAGMENT.match(line)
-    if start_tag is None:
+class _MakingOfParser(HTMLParser):
+    """Extract prose by following parsed HTML structure rather than source lines."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.blocks: list[Block] = []
+        self.chapter = 0
+        self.counters: dict[str, int] = {}
+        self.title_pending = False
+        self.element_stack: list[str] = []
+        self.prose_roots: list[tuple[str, int]] = []
+        self.capture: _Capture | None = None
+
+    def _next_number(self, key: str) -> int:
+        self.counters[key] = self.counters.get(key, 0) + 1
+        return self.counters[key]
+
+    def _start_capture(self, anchor: str, kind: str, tag: str, depth: int) -> None:
+        self.capture = _Capture(
+            anchor=anchor,
+            kind=kind,
+            tag=tag,
+            depth=depth,
+            line=self.getpos()[0],
+        )
+
+    def _finish_capture(self) -> None:
+        if self.capture is None:
+            return
+        text = " ".join("".join(self.capture.fragments).split())
+        self.blocks.append(
+            (
+                self.capture.anchor,
+                self.capture.kind,
+                text,
+                self.capture.line,
+            )
+        )
+        self.capture = None
+
+    @staticmethod
+    def _classes(attrs: list[tuple[str, str | None]]) -> set[str]:
+        for name, value in attrs:
+            if name == "class":
+                return set((value or "").split())
         return set()
-    match = CLASS_ATTRIBUTE.search(start_tag.group(0))
-    if match is None:
-        return set()
-    value = next(group for group in match.groups() if group is not None)
-    return set(value.split())
+
+    def handle_starttag(
+        self, tag: str, attrs: list[tuple[str, str | None]]
+    ) -> None:
+        tag = tag.lower()
+        if tag in VOID_ELEMENTS:
+            if tag == "br" and self.capture is not None:
+                self.capture.fragments.append(" ")
+            return
+
+        was_in_prose = bool(self.prose_roots)
+        self.element_stack.append(tag)
+        depth = len(self.element_stack)
+
+        if self.capture is not None:
+            return
+
+        classes = self._classes(attrs)
+        if "dek" in classes:
+            self._start_capture("M.DEK", "meta", tag, depth)
+        elif "dek-note" in classes:
+            self._start_capture("M.NOTE", "meta", tag, depth)
+        elif "ch-ref" in classes:
+            self.chapter += 1
+            self.counters = {}
+            self.title_pending = True
+            self._start_capture(f"C{self.chapter}.REF", "chref", tag, depth)
+        elif self.title_pending and tag == "h2":
+            self.title_pending = False
+            self._start_capture(f"C{self.chapter}.T", "title", tag, depth)
+        elif "ch-date" in classes:
+            self.title_pending = False
+            self._start_capture(f"C{self.chapter}.D", "date", tag, depth)
+        elif "prose" in classes and not was_in_prose:
+            self.title_pending = False
+            self.prose_roots.append((tag, depth))
+        elif was_in_prose and tag == "p":
+            if "lead" in classes:
+                self._start_capture(f"C{self.chapter}.L", "lead", tag, depth)
+            elif "pull" in classes:
+                self._start_capture(
+                    f"C{self.chapter}.Q{self._next_number('q')}",
+                    "pull",
+                    tag,
+                    depth,
+                )
+            else:
+                self._start_capture(
+                    f"C{self.chapter}.P{self._next_number('p')}",
+                    "para",
+                    tag,
+                    depth,
+                )
+
+    def handle_startendtag(
+        self, tag: str, attrs: list[tuple[str, str | None]]
+    ) -> None:
+        self.handle_starttag(tag, attrs)
+        if tag.lower() not in VOID_ELEMENTS:
+            self.handle_endtag(tag)
+
+    def handle_endtag(self, tag: str) -> None:
+        tag = tag.lower()
+        depth = len(self.element_stack)
+
+        if (
+            self.capture is not None
+            and tag == self.capture.tag
+            and depth == self.capture.depth
+        ):
+            self._finish_capture()
+
+        if self.prose_roots:
+            root_tag, root_depth = self.prose_roots[-1]
+            if tag == root_tag and depth == root_depth:
+                self.prose_roots.pop()
+
+        if tag in {"article", "section"}:
+            self.title_pending = False
+
+        if self.element_stack and self.element_stack[-1] == tag:
+            self.element_stack.pop()
+            return
+
+        # Recover deterministically from mismatched-but-parseable markup.
+        for index in range(len(self.element_stack) - 1, -1, -1):
+            if self.element_stack[index] == tag:
+                del self.element_stack[index:]
+                return
+
+    def handle_data(self, data: str) -> None:
+        if self.capture is not None:
+            self.capture.fragments.append(data)
+
+    def finish(self) -> None:
+        if self.capture is not None:
+            raise ValueError(
+                f"Unclosed <{self.capture.tag}> for {self.capture.anchor} "
+                f"at line {self.capture.line}"
+            )
 
 
-def has_class(line: str, class_name: str) -> bool:
-    """Return whether an HTML start tag contains a class token."""
-    return class_name in class_tokens(line)
-
-
-def start_tag_name(line: str) -> str | None:
-    """Return the lower-case start-tag name at the beginning of a source line."""
-    match = START_TAG.match(line)
-    return match.group(1).lower() if match is not None else None
-
-
-def tag_depth_delta(fragment: str, tag: str) -> int:
-    """Return the net nesting change for one container tag."""
-    escaped = re.escape(tag)
-    openings = re.findall(rf"<{escaped}\b[^>]*>", fragment, re.IGNORECASE)
-    self_closing = sum(1 for opening in openings if re.search(r"/\s*>$", opening))
-    closings = re.findall(rf"</{escaped}\s*>", fragment, re.IGNORECASE)
-    return len(openings) - self_closing - len(closings)
-
-
-def extract(source: Path) -> list[tuple[str, str, str, int]]:
+def extract(source: Path) -> list[Block]:
     """Extract anchored blocks from the making-of HTML source."""
-    blocks: list[tuple[str, str, str, int]] = []
-    chapter = 0
-    counters: dict[str, int] = {}
-    in_article = False
-    prose_container_tag: str | None = None
-    prose_container_depth = 0
-    title_pending = False
-    pending: tuple[str, str, str, int, list[str]] | None = None
-
-    def next_number(key: str) -> int:
-        counters[key] = counters.get(key, 0) + 1
-        return counters[key]
-
-    def capture(anchor: str, kind: str, tag: str, raw: str, line_number: int) -> None:
-        """Capture one element now or defer it until its closing tag."""
-        nonlocal pending
-        if re.search(rf"</{tag}\s*>", raw, re.IGNORECASE):
-            blocks.append((anchor, kind, text_of(raw), line_number))
-        else:
-            pending = (anchor, kind, tag, line_number, [raw])
-
-    for line_number, raw in enumerate(source.read_text().splitlines(), start=1):
-        line = raw.strip()
-
-        if pending is not None:
-            anchor, kind, tag, start_line, fragments = pending
-            fragments.append(raw)
-            if re.search(rf"</{tag}\s*>", raw, re.IGNORECASE):
-                blocks.append((anchor, kind, text_of("\n".join(fragments)), start_line))
-                pending = None
-            continue
-
-        if has_class(line, "dek"):
-            capture("M.DEK", "meta", "p", raw, line_number)
-        elif has_class(line, "dek-note"):
-            capture("M.NOTE", "meta", "p", raw, line_number)
-        elif has_class(line, "ch-ref"):
-            chapter += 1
-            counters = {}
-            title_pending = True
-            capture(f"C{chapter}.REF", "chref", "span", raw, line_number)
-        elif title_pending and line.startswith("<h2>"):
-            title_pending = False
-            capture(f"C{chapter}.T", "title", "h2", raw, line_number)
-        elif has_class(line, "ch-date"):
-            title_pending = False
-            capture(f"C{chapter}.D", "date", "p", raw, line_number)
-        elif not in_article and has_class(line, "prose"):
-            title_pending = False
-            prose_container_tag = start_tag_name(line)
-            if prose_container_tag is not None:
-                prose_container_depth = tag_depth_delta(raw, prose_container_tag)
-                in_article = prose_container_depth > 0
-        elif in_article:
-            if prose_container_tag is not None:
-                prose_container_depth += tag_depth_delta(raw, prose_container_tag)
-                if prose_container_depth <= 0:
-                    in_article = False
-                    prose_container_tag = None
-                    prose_container_depth = 0
-                    title_pending = False
-                    continue
-
-            if start_tag_name(line) == "p":
-                classes = class_tokens(line)
-                if "lead" in classes:
-                    capture(f"C{chapter}.L", "lead", "p", raw, line_number)
-                elif "pull" in classes:
-                    capture(
-                        f"C{chapter}.Q{next_number('q')}",
-                        "pull",
-                        "p",
-                        raw,
-                        line_number,
-                    )
-                else:
-                    capture(
-                        f"C{chapter}.P{next_number('p')}",
-                        "para",
-                        "p",
-                        raw,
-                        line_number,
-                    )
-        elif line.startswith(("</article", "</section")):
-            title_pending = False
-
-    if pending is not None:
-        anchor, _kind, tag, start_line, _fragments = pending
-        raise ValueError(f"Unclosed <{tag}> for {anchor} at line {start_line}")
-
-    return blocks
+    parser = _MakingOfParser()
+    parser.feed(source.read_text(encoding="utf-8"))
+    parser.close()
+    parser.finish()
+    return parser.blocks
 
 
 def write_outputs(
-    blocks: list[tuple[str, str, str, int]], output_markdown: Path, output_map: Path
+    blocks: list[Block], output_markdown: Path, output_map: Path
 ) -> None:
     """Write the editable Markdown and its source-line map."""
     markdown = [
@@ -190,7 +231,7 @@ def write_outputs(
         else:
             markdown.append(f"\n[{anchor}] {text}")
 
-    output_markdown.write_text("\n".join(markdown) + "\n")
+    output_markdown.write_text("\n".join(markdown) + "\n", encoding="utf-8")
     output_map.write_text(
         json.dumps(
             {
@@ -199,7 +240,8 @@ def write_outputs(
             },
             indent=2,
         )
-        + "\n"
+        + "\n",
+        encoding="utf-8",
     )
 
 
