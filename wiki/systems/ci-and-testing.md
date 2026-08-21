@@ -3,7 +3,7 @@ type: system
 title: CI and testing
 description: The test commands, GitHub Actions gates, and local preview audit paths that protect the archive.
 source: [package.json, tests/, .github/workflows/, AGENTS.md]
-verified: 2026-06-23
+verified: 2026-08-20
 tags: [ci, tests, validation, github-actions]
 timestamp: 2026-06-23
 ---
@@ -14,13 +14,17 @@ Tests use Node's built-in test runner for frontend/data paths and pytest for bac
 
 ## Local commands
 
-- `npm test` — all Node tests in `tests/*.test.js`.
-- `npm run test:data` — data integrity, CSV quality, feed titles, CSV unescape, and PressThink dedup checks.
-- `npm run test:data:extraction-coverage` — coverage check for extraction gaps.
-- `npm run test:pipeline` — data pipeline, thread detection, process-record, and thread algorithm tests.
-- `npm run test:frontend` — version consistency, structure, analytics, record deep links, and needs-review checks.
+- `npm test` — the complete active Node suite: every `tests/*.test.js` file plus the source-discovery Worker tests.
+- `npm run test:data` — a focused local subset for data integrity, CSV quality, feed titles, CSV unescape, PressThink dedup, graph validation, stewardship census, preservation manifests, and relationship adjacency.
+- `npm run test:data:extraction-coverage` — focused extraction-gap coverage.
+- `npm run test:pipeline` — focused data pipeline, thread detection, process-record, and thread algorithm tests.
+- `npm run test:frontend` — a focused frontend subset for fast iteration.
+- `npm run test:workers` — the source-discovery Worker subset.
+- `npm run test:okf` — the OKF bundle, flight-recorder, and blindfold subset.
 - `npm run preview` — local static preview at `http://127.0.0.1:8000/` by default.
 - `npm run preview:audit` — starts preview, walks key routes at mobile and desktop sizes, runs axe, and writes `preview-audit-results/`.
+
+The subgroup scripts are development conveniences, not the merge-coverage boundary. Frontend Validation runs for every pull request to `main` and invokes `npm test`, whose globs automatically include new root Node tests. `tests/ci-node-suite-coverage.test.js` fails if an active Node test moves outside the canonical globs, the workflow stops invoking the complete suite, or a pull-request path filter can skip it.
 
 Backend commands run from `backend/` with Poetry:
 
@@ -36,7 +40,7 @@ Ruff gates backend CI. Black and MyPy currently report without gating in `backen
 
 ## GitHub Actions map
 
-- `frontend-validation.yml` — syntax checks, required entry points, frontend tests, data tests, extraction coverage, HTML shape, CDN reference listing, and TODO/FIXME scan.
+- `frontend-validation.yml` — production dependency audit, syntax checks, required entry points, the complete Node suite, HTML shape, CDN reference listing, and TODO/FIXME scan.
 - `backend-tests.yml` — Poetry install, Playwright Chromium, and pytest for backend changes; also has manual dispatch.
 - `backend-linting.yml` — Ruff gate, Black check, MyPy check.
 - `codeql.yml` — weekly and PR/push JavaScript CodeQL scan.
