@@ -1,0 +1,40 @@
+name: Timeline release stamp
+
+on:
+  push:
+    branches:
+      - fix/timeline-range-label
+
+permissions:
+  contents: write
+
+jobs:
+  stamp:
+    if: github.event.head_commit.message != 'chore: bump archive version to 3.8.23'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Stamp archive version
+        run: node scripts/bump-version.mjs 3.8.23
+
+      - name: Verify timeline and version contracts
+        run: node --test tests/timeline-data.test.js tests/version-consistency.test.js
+
+      - name: Commit release markers
+        run: |
+          git config user.name "Joe Amditis"
+          git config user.email "jamditis@gmail.com"
+          git add -A
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: bump archive version to 3.8.23"
+          git push

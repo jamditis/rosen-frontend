@@ -1,6 +1,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { html } from '../html.js?v=3.8.22';
+import { buildTimelineModel } from '../utils/timelineData.js?v=3.8.22';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const Timeline = ({ records, selectedYear, onSelectYear }) => {
@@ -11,33 +12,10 @@ const Timeline = ({ records, selectedYear, onSelectYear }) => {
   const [rovingYear, setRovingYear] = useState(null);
   const yearButtonRefs = useRef(new Map());
 
-  const timelineData = useMemo(() => {
-    const counts = {};
-    let minYear = 2050;
-    let maxYear = 1900;
-    let hasData = false;
-
-    records.forEach(r => {
-      const y = parseInt(r.year);
-      if (!isNaN(y)) {
-        counts[r.year] = (counts[r.year] || 0) + 1;
-        if (y < minYear) minYear = y;
-        if (y > maxYear) maxYear = y;
-        hasData = true;
-      }
-    });
-    
-    if (!hasData) return [];
-
-    minYear = minYear - 1;
-    maxYear = maxYear + 1;
-
-    const years = [];
-    for (let y = minYear; y <= maxYear; y++) {
-       years.push({ year: y.toString(), count: counts[y.toString()] || 0 });
-    }
-    return years;
-  }, [records]);
+  const { timelineData, dataMinYear, dataMaxYear } = useMemo(
+    () => buildTimelineModel(records),
+    [records],
+  );
 
   const enabledYears = useMemo(
     () => timelineData.filter(data => data.count > 0).map(data => data.year),
@@ -84,7 +62,7 @@ const Timeline = ({ records, selectedYear, onSelectYear }) => {
         >
           <h3 id="archive-timeline-title">Timeline</h3>
           <span className="archive-timeline__range">
-            ${timelineData[0].year}–${timelineData[timelineData.length - 1].year}
+            ${dataMinYear}–${dataMaxYear}
           </span>
           ${isExpanded
             ? html`<${ChevronUp} className="w-4 h-4" aria-hidden="true" />`
