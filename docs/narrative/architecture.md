@@ -245,7 +245,7 @@ Analysis and repair scripts in `scripts/` and `scripts/diagnostics/`:
 - `text_cleaner.py` -- removes HTML artifacts, navigation elements, improves structure
 - `format_converter.py` -- converts CSV strings to JSON arrays for structured fields
 - `populate_new_fields.py` -- automated platform detection, permission classification, collection ID generation
-- `smart_data_corrector.py` -- main processing engine with batch mode, dry-run, and resume
+- `scripts/corrector.py` -- main processing engine with batch mode, dry-run, and resume
 
 **Maintenance:**
 - `auto_categorize_records.py` -- bulk thematic categorization
