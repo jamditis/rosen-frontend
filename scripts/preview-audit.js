@@ -622,8 +622,11 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
   }
   if (route.verifyDesktopEntry) {
     const sourceUrl = page.url();
-    const desktopEntry = page.getByRole('button', { name: 'Explore the archive desktop', exact: true });
+    const desktopEntry = page.getByRole('button', { name: 'Explore the archive desktop, beta', exact: true });
+    await page.getByText('Beta', { exact: true }).waitFor();
+    await page.getByText(/The archive desktop is still in development\./).waitFor();
     await desktopEntry.focus();
+    await assertVisibleFocusOutline(desktopEntry, 'Start here desktop beta status');
     await page.keyboard.press('Enter');
     await page.waitForURL((url) => url.hash === '#desktop');
     await assertFocused(desktopHomeFocusTarget, 'Desktop home after Start here entry');
@@ -1526,7 +1529,7 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
   if (route.verifyToolsDesktopEntry) {
     const sourceUrl = page.url();
     const toolsTrigger = page.getByRole('button', {
-      name: viewport.width < 640 ? 'Tools' : 'More',
+      name: viewport.width < 640 ? 'Tools' : 'More tools',
       exact: true,
     });
     await toolsTrigger.focus();
@@ -1534,7 +1537,10 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     await assertFocused(page.getByLabel('Close tools menu'), 'Tools dialog close control');
 
     const desktopEntry = page.getByRole('button', { name: /^Archive desktop/ });
+    await page.getByText('Archive desktop is still in development', { exact: true }).waitFor();
+    await desktopEntry.getByText('Beta', { exact: true }).waitFor();
     await desktopEntry.focus();
+    await assertVisibleFocusOutline(desktopEntry, 'Tools desktop beta status');
     await page.keyboard.press('Enter');
     await page.waitForURL((url) => url.hash === '#desktop');
     await assertFocused(desktopHomeFocusTarget, 'Desktop home after Tools entry');
