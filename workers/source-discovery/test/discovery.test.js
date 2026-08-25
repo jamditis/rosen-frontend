@@ -223,6 +223,16 @@ test("the health endpoint exposes no fetch trigger or source URL", async () => {
   assert.equal(missing.status, 404);
 });
 
+test("PressThink discovery orders by modification time for retroactive posts", () => {
+  const source = SOURCE_MANIFEST.find(({ id }) => id === "pressthink-wordpress-posts");
+  assert.ok(source);
+
+  const endpoint = new URL(source.endpoint);
+  assert.equal(endpoint.searchParams.get("orderby"), "modified");
+  assert.equal(endpoint.searchParams.get("order"), "desc");
+  assert.deepEqual(endpoint.searchParams.get("_fields").split(",").sort(), ["link", "modified"]);
+});
+
 test("the fixed Bluesky author feed records compact candidate metadata only", async () => {
   const result = await discoverSource(blueskySource(), {
     fetchImpl: blueskyFetch(async () => response(await blueskyFixture(), {
