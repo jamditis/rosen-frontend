@@ -78,6 +78,26 @@ describe('wiki UI wiring', () => {
     assert.match(missingPage, /Wiki page not found/);
   });
 
+  it('resolves valid wiki slugs through the page index into the detail view', () => {
+    // Static component contract: parseWikiHash behavior is tested directly,
+    // while this scoped check binds its valid slug to the rendered WikiDetail.
+    const pageResolution = section(
+      wikiSrc,
+      'const pageIndex',
+      'const counts',
+      'wiki page resolution',
+    );
+    const loadedStates = section(
+      wikiSrc,
+      'if (loading)',
+      'if (activeSlug || notFound)',
+      'loaded wiki states',
+    );
+
+    assert.match(pageResolution, /selectedPage\s*=\s*activeSlug\s*\?\s*\(pageIndex\.get\(activeSlug\)\s*\|\|\s*null\)/);
+    assert.match(loadedStates, /if \(selectedPage\) return html`<\$\{WikiDetail\}\s+page=\$\{selectedPage\}/);
+  });
+
   it('does not link the public app to repo-only markdown files', () => {
     // Static security boundary: repository paths must never become public URLs.
     assert.doesNotMatch(wikiSrc, /href="\.\/docs\/plans\//);
