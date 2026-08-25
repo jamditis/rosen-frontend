@@ -1,6 +1,6 @@
 // Phase 4 re-test: verify every Phase 3 fix in real Chromium against the live
 // local server, and emit retest-phase4.json (id -> {retest_status, notes}).
-// Run: node docs/feature-audit/harness/retest-phase4.mjs   (server must be on :8000)
+// Run: node docs/feature-audit/archive/harness/retest-phase4.mjs
 import { launchBrowser, BASE, sleep } from './lib.mjs';
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -293,7 +293,7 @@ try {
 
 await browser.close();
 
-const out = join(dirname(fileURLToPath(import.meta.url)), '..', 'retest-phase4.json');
+const out = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'retest-phase4.json');
 writeFileSync(out, JSON.stringify(results, null, 2) + '\n');
 const pass = Object.values(results).filter(r => r.retest_status === 'pass').length;
 const fail = Object.values(results).filter(r => r.retest_status === 'fail').length;
