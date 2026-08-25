@@ -4,17 +4,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { sourceSection } from './helpers/source-section.js';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.join(__dirname, '..');
 const read = (...parts) => fs.readFileSync(path.join(rootDir, ...parts), 'utf8');
-
-function section(source, start, end, label) {
-  const startIndex = source.indexOf(start);
-  assert.notEqual(startIndex, -1, `${label} start marker must exist`);
-  const endIndex = source.indexOf(end, startIndex + start.length);
-  assert.notEqual(endIndex, -1, `${label} end marker must exist`);
-  return source.slice(startIndex, endIndex);
-}
 
 describe('wiki UI wiring', () => {
   const appSrc = read('frontend', 'App.js');
@@ -25,13 +19,13 @@ describe('wiki UI wiring', () => {
     // Static contract: this verifies the route-to-loader wiring. The loader is
     // browser-only, so a direct Node import is not practical. Keep each check
     // inside its owning declaration instead of matching across all of App.js.
-    const nonRecordRoutes = section(
+    const nonRecordRoutes = sourceSection(
       appSrc,
       'const NON_RECORD_ROUTES',
       'const DESKTOP_RECORD_APPS',
       'non-record route declaration',
     );
-    const coreLoad = section(
+    const coreLoad = sourceSection(
       appSrc,
       '// Load Data',
       '// Preserve the standard archive',
@@ -50,7 +44,7 @@ describe('wiki UI wiring', () => {
     // This is a reversible unlink, not a delete.
     // Static policy contract: the route remains intentionally reachable while
     // navigation stays hidden. This is source wiring, not user behavior.
-    const toolSelection = section(
+    const toolSelection = sourceSection(
       appSrc,
       'const handleToolSelect',
       '// Load Data',
@@ -69,7 +63,7 @@ describe('wiki UI wiring', () => {
     // parseWikiHash behavior is covered directly in wiki-service.test.js. This
     // static UI contract only checks that its notFound result reaches the
     // explicit missing-page view.
-    const missingPage = section(
+    const missingPage = sourceSection(
       wikiSrc,
       'if (activeSlug || notFound) return html`',
       '\n\n  return html`',
@@ -81,13 +75,13 @@ describe('wiki UI wiring', () => {
   it('resolves valid wiki slugs through the page index into the detail view', () => {
     // Static component contract: parseWikiHash behavior is tested directly,
     // while this scoped check binds its valid slug to the rendered WikiDetail.
-    const pageResolution = section(
+    const pageResolution = sourceSection(
       wikiSrc,
       'const pageIndex',
       'const counts',
       'wiki page resolution',
     );
-    const loadedStates = section(
+    const loadedStates = sourceSection(
       wikiSrc,
       'if (loading)',
       'if (activeSlug || notFound)',
