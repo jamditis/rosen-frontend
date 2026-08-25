@@ -88,4 +88,22 @@ describe('footer release metadata', () => {
     assert.match(archiveService, /loadReleaseMetadata\(\)/);
     assert.doesNotMatch(archiveService, /fetch\(['"]\.\/version\.json/);
   });
+
+  it('shows the data date near the archive results', () => {
+    const app = readFileSync('frontend/App.js', 'utf8');
+
+    assert.match(app, /archive-results__updated/);
+    assert.match(app, /Data updated[\s\S]*dateTime=\$\{releaseMetadata\.updated\}/);
+  });
+
+  it('offers to reload an open tab when a new service worker takes control', () => {
+    const app = readFileSync('frontend/App.js', 'utf8');
+    const index = readFileSync('index.html', 'utf8');
+
+    assert.match(index, /controllerchange/);
+    assert.match(index, /jrda:update-ready/);
+    assert.match(app, /addEventListener\('jrda:update-ready'/);
+    assert.match(app, /New archive data is available/);
+    assert.match(app, /window\.location\.reload\(\)/);
+  });
 });

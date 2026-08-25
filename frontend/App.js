@@ -1,45 +1,45 @@
 
 import { Component, Suspense, lazy, useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.8.28';
+import { html } from './html.js?v=3.8.29';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, BookOpen, BookMarked, Compass, HelpCircle, MoreHorizontal, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github, Search, XCircle } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.28';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.28';
-import { withViewTransition } from './utils/viewTransition.js?v=3.8.28';
-import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.28';
-import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.28';
-import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.28';
-import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.28';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.28';
-import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.28';
-import { resolveSitePath } from './utils/pathResolver.js?v=3.8.28';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.8.28';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.29';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.29';
+import { withViewTransition } from './utils/viewTransition.js?v=3.8.29';
+import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.29';
+import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.29';
+import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.29';
+import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.29';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.29';
+import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.29';
+import { resolveSitePath } from './utils/pathResolver.js?v=3.8.29';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.8.29';
 import {
   buildSearchText,
   matchesParsedSearchText,
   normalizeForSearch,
   parseSearchQuery,
   searchLoadedIndexes,
-} from './utils/searchNormalize.js?v=3.8.28';
-import { sortRecords } from './utils/recordSort.js?v=3.8.28';
-import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.28';
-import { formatReleaseDate, loadReleaseMetadata } from './services/releaseMetadata.js?v=3.8.28';
-import Sidebar from './components/Sidebar.js?v=3.8.28';
-import WelcomeModal from './components/WelcomeModal.js?v=3.8.28';
-import RecordView from './components/RecordView.js?v=3.8.28';
-import FeaturedSection from './components/FeaturedSection.js?v=3.8.28';
-import DissertationPage from './components/DissertationPage.js?v=3.8.28';
-import ToolsModal from './components/ToolsModal.js?v=3.8.28';
-import BugReportModal from './components/BugReportModal.js?v=3.8.28';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.28';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.28';
-import EntityBrowser from './components/EntityBrowser.js?v=3.8.28';
-import Timeline from './components/Timeline.js?v=3.8.28';
-import AboutPage from './components/AboutPage.js?v=3.8.28';
-import WikiPage from './components/WikiPage.js?v=3.8.28';
-import StartHerePage from './components/StartHerePage.js?v=3.8.28';
-import ArchiveResults from './components/ArchiveResults.js?v=3.8.28';
+} from './utils/searchNormalize.js?v=3.8.29';
+import { sortRecords } from './utils/recordSort.js?v=3.8.29';
+import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.29';
+import { formatReleaseDate, loadReleaseMetadata } from './services/releaseMetadata.js?v=3.8.29';
+import Sidebar from './components/Sidebar.js?v=3.8.29';
+import WelcomeModal from './components/WelcomeModal.js?v=3.8.29';
+import RecordView from './components/RecordView.js?v=3.8.29';
+import FeaturedSection from './components/FeaturedSection.js?v=3.8.29';
+import DissertationPage from './components/DissertationPage.js?v=3.8.29';
+import ToolsModal from './components/ToolsModal.js?v=3.8.29';
+import BugReportModal from './components/BugReportModal.js?v=3.8.29';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.29';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.29';
+import EntityBrowser from './components/EntityBrowser.js?v=3.8.29';
+import Timeline from './components/Timeline.js?v=3.8.29';
+import AboutPage from './components/AboutPage.js?v=3.8.29';
+import WikiPage from './components/WikiPage.js?v=3.8.29';
+import StartHerePage from './components/StartHerePage.js?v=3.8.29';
+import ArchiveResults from './components/ArchiveResults.js?v=3.8.29';
 
-const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.28'));
+const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.29'));
 
 const NON_RECORD_ROUTES = new Set([
   ROUTES.analytics,
@@ -139,7 +139,7 @@ const App = () => {
   const [desktopAppId, setDesktopAppId] = useState(() => getDesktopAppIdFromUrl());
   const [desktopOpenAppIds, setDesktopOpenAppIds] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortBy, setSortBy] = useState('date-asc');
+  const [sortBy, setSortBy] = useState('date-desc');
   const [isScrolled, setIsScrolled] = useState(false);
   // Initialise from ?record= so a deep-linked load survives mount. The URL-sync
   // effect below runs on mount with this value already set, so it preserves the
@@ -155,6 +155,7 @@ const App = () => {
   const [announcedResultCount, setAnnouncedResultCount] = useState('');
   const [currentHash, setCurrentHash] = useState(() => window.location.hash);
   const [releaseMetadata, setReleaseMetadata] = useState(null);
+  const [updateAvailable, setUpdateAvailable] = useState(false);
 
   const [filters, setFilters] = useState(() => ({
     ...DEFAULT_FILTERS,
@@ -212,6 +213,12 @@ const App = () => {
   // entities, Start here, desktop windows) claim focus in their own effects.
   // Re-check at paint time and yield to any connected non-body target so this
   // fallback cannot overwrite those richer focus contracts.
+  useEffect(() => {
+    const handleUpdateReady = () => setUpdateAvailable(true);
+    window.addEventListener('jrda:update-ready', handleUpdateReady);
+    return () => window.removeEventListener('jrda:update-ready', handleUpdateReady);
+  }, []);
+
   useEffect(() => {
     const previousRoute = previouslyRenderedRoute.current;
     previouslyRenderedRoute.current = currentRoute;
@@ -1006,6 +1013,13 @@ const App = () => {
 
       <${WorkInProgressBanner} />
 
+      ${updateAvailable && html`
+        <div className="archive-update-notice" role="status">
+          <span>New archive data is available.</span>
+          <button type="button" onClick=${() => window.location.reload()}>Reload archive</button>
+        </div>
+      `}
+
       <header className=${`archive-site-header sticky top-0 z-50 w-full transition-all duration-300 ${
           isScrolled
             ? 'archive-site-header--scrolled'
@@ -1212,6 +1226,11 @@ const App = () => {
                         ? 'Loading archive...'
                         : `${filteredRecords.length} record${filteredRecords.length === 1 ? '' : 's'}${filters.recordIds !== null ? ' in query results' : ''}`}
                     </span>
+                    ${releaseMetadata && html`
+                      <span className="archive-results__updated">
+                        Data updated <time dateTime=${releaseMetadata.updated}>${releaseDate}</time>
+                      </span>
+                    `}
                     <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
                       ${announcedResultCount}
                     </span>

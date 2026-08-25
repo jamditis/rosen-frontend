@@ -52,13 +52,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&family=Special+Elite&display=swap" rel="stylesheet">
 
     <!-- External CSS (versioned for cache busting) -->
-    <link rel="stylesheet" href="./frontend/design-system/legacy-token-bridge.css?v=3.8.28" />
-    <link rel="stylesheet" href="./frontend/design-system/tokens.css?v=3.8.28" />
-    <link rel="stylesheet" href="./frontend/index.css?v=3.8.28" />
+    <link rel="stylesheet" href="./frontend/design-system/legacy-token-bridge.css?v=3.8.29" />
+    <link rel="stylesheet" href="./frontend/design-system/tokens.css?v=3.8.29" />
+    <link rel="stylesheet" href="./frontend/index.css?v=3.8.29" />
 
     <!-- Tailwind CSS (pre-built for production) -->
-    <link rel="stylesheet" href="./frontend/dist/tailwind.css?v=3.8.28" />
-    <link rel="stylesheet" href="./frontend/design-system/recipes.css?v=3.8.28" />
+    <link rel="stylesheet" href="./frontend/dist/tailwind.css?v=3.8.29" />
+    <link rel="stylesheet" href="./frontend/design-system/recipes.css?v=3.8.29" />
 
   <!-- Import Map -->
   <script type="importmap">
@@ -80,7 +80,7 @@
     <div id="root"></div>
     
     <!-- Main Entry Point (versioned for cache busting) -->
-    <script type="module" src="./frontend/index.js?v=3.8.28"></script>
+    <script type="module" src="./frontend/index.js?v=3.8.29"></script>
 
     <!-- Easter egg for the curious -->
     <script>
@@ -104,6 +104,12 @@
       );
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
+          const controlledAtLoad = Boolean(navigator.serviceWorker.controller);
+          if (controlledAtLoad) {
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+              window.dispatchEvent(new Event('jrda:update-ready'));
+            }, { once: true });
+          }
           // Register the root bridge so the worker controls the archive page,
           // not only /frontend/. Checking imported scripts without HTTP-cache
           // reuse makes a frontend/sw.js CACHE_VERSION bump observable even
