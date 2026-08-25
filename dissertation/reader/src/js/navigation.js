@@ -112,8 +112,11 @@ class ReaderNavigation {
       link.classList.toggle('is-active', linkTarget === sectionId);
     });
 
-    // Update URL hash (without scrolling)
-    if (history.replaceState) {
+    // Keep an explicit footnote round trip in browser history while the smooth
+    // scroll crosses tracked headings. ToC navigation replaces it deliberately
+    // in scrollToSection(), so normal section tracking can resume afterward.
+    const hasFootnoteHash = /^#fn(?:ref)?-/.test(window.location.hash);
+    if (history.replaceState && !hasFootnoteHash) {
       history.replaceState(null, null, `#${sectionId}`);
     }
 
@@ -131,6 +134,9 @@ class ReaderNavigation {
     const target = document.getElementById(sectionId);
     if (!target) return;
 
+    if (history.replaceState) {
+      history.replaceState(null, null, `#${sectionId}`);
+    }
     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     // Focus the heading for accessibility

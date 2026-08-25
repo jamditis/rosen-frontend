@@ -13,6 +13,8 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
+import ReaderNavigation from '../dissertation/reader/src/js/navigation.js';
+
 const here = dirname(fileURLToPath(import.meta.url));
 const html = readFileSync(
   join(here, '..', 'dissertation', 'reader', 'index.html'),
@@ -20,6 +22,10 @@ const html = readFileSync(
 );
 const markdown = readFileSync(
   join(here, '..', 'dissertation', 'reader', 'src', 'impossible-press.md'),
+  'utf8',
+);
+const layoutCss = readFileSync(
+  join(here, '..', 'dissertation', 'reader', 'src', 'css', 'layout.css'),
   'utf8',
 );
 
@@ -76,5 +82,104 @@ describe('reader footnote navigation (issue #782)', () => {
       .map((match) => match[1])
       .filter((noteId) => !referenceIds.has(noteId.replace(/^fn-/, 'fnref-')));
     assert.deepEqual(noteIdsWithoutReferences, []);
+  });
+
+  it('puts each multi-block note backlink after all note content', () => {
+    const multiBlockIds = new Set([
+      'fn-chapter-6-5',
+      'fn-chapter-6-6',
+      'fn-chapter-6-8',
+      'fn-chapter-6-9',
+      'fn-chapter-6-11',
+      'fn-chapter-6-12',
+      'fn-chapter-6-13',
+    ]);
+    const noteStarts = [...html.matchAll(
+      /<p id="(fn-[^"]+)" class="footnote" tabindex="-1">/g,
+    )];
+    const foundMultiBlockIds = new Set();
+
+    for (let index = 0; index < noteStarts.length; index += 1) {
+      const noteId = noteStarts[index][1];
+      if (!multiBlockIds.has(noteId)) continue;
+      foundMultiBlockIds.add(noteId);
+
+      const start = noteStarts[index].index;
+      const end = noteStarts[index + 1]?.index ?? html.length;
+      const block = html.slice(start, end);
+      const initialParagraphEnd = block.indexOf('</p>') + 4;
+      const returnParagraphStart = block.indexOf('<p class="footnote-return">');
+      const returnParagraphEnd = block.indexOf('</p>', returnParagraphStart) + 4;
+
+      assert.ok(returnParagraphStart > initialParagraphEnd,
+        `${noteId} return link must follow its continuation blocks`);
+      assert.doesNotMatch(block.slice(0, initialParagraphEnd), /Return to /,
+        `${noteId} initial paragraph must not contain an early return link`);
+      assert.match(block.slice(initialParagraphEnd, returnParagraphStart),
+        /<(?:blockquote|p)[^>]*>[\s\S]*<\/(?:blockquote|p)>/,
+        `${noteId} must retain its continuation blocks before the return link`);
+      assert.equal(block.slice(returnParagraphEnd).trim(), '',
+        `${noteId} return link must be the final part of the note`);
+    }
+
+    assert.deepEqual(foundMultiBlockIds, multiBlockIds);
+  });
+
+  it('preserves explicit footnote hashes during scroll tracking', () => {
+    const originalDocument = globalThis.document;
+    const originalWindow = globalThis.window;
+    const originalHistory = globalThis.history;
+    const originalCustomEvent = globalThis.CustomEvent;
+    const replacements = [];
+    const target = {
+      scrollIntoView() {},
+      setAttribute() {},
+      focus() {},
+    };
+
+    try {
+      globalThis.window = { location: { hash: '#fn-chapter-1-1' } };
+      globalThis.history = {
+        replaceState(_state, _unused, hash) {
+          replacements.push(hash);
+          globalThis.window.location.hash = hash;
+        },
+      };
+      globalThis.document = {
+        dispatchEvent() {},
+        getElementById() { return target; },
+      };
+      globalThis.CustomEvent = class CustomEvent {};
+
+      const navigation = new ReaderNavigation();
+      navigation.setActiveSection('notes');
+      assert.deepEqual(replacements, [], 'scroll tracking must preserve a note hash');
+
+      globalThis.window.location.hash = '#fnref-chapter-1-1';
+      navigation.setActiveSection('chapter-1');
+      assert.deepEqual(replacements, [], 'scroll tracking must preserve a reference hash');
+
+      navigation.scrollToSection('chapter-2');
+      assert.deepEqual(replacements, ['#chapter-2'],
+        'explicit section navigation must leave the footnote round trip');
+
+      navigation.setActiveSection('chapter-3');
+      assert.deepEqual(replacements, ['#chapter-2', '#chapter-3'],
+        'normal section tracking must resume after explicit navigation');
+    } finally {
+      if (originalDocument === undefined) delete globalThis.document;
+      else globalThis.document = originalDocument;
+      if (originalWindow === undefined) delete globalThis.window;
+      else globalThis.window = originalWindow;
+      if (originalHistory === undefined) delete globalThis.history;
+      else globalThis.history = originalHistory;
+      if (originalCustomEvent === undefined) delete globalThis.CustomEvent;
+      else globalThis.CustomEvent = originalCustomEvent;
+    }
+  });
+
+  it('hides nonfunctional return links when printing', () => {
+    assert.match(layoutCss,
+      /@media print[\s\S]*\.footnote-return,[\s\S]*a\.footnote-ref\[href\^="#fnref-"\][\s\S]*display:\s*none !important/);
   });
 });
