@@ -131,14 +131,26 @@ describe('reader footnote navigation (issue #782)', () => {
     const originalHistory = globalThis.history;
     const originalCustomEvent = globalThis.CustomEvent;
     const replacements = [];
+    const documentListeners = {};
+    const buttonListeners = {};
     const target = {
       scrollIntoView() {},
       setAttribute() {},
       focus() {},
     };
+    const backToTop = {
+      classList: { toggle() {} },
+      addEventListener(type, handler) { buttonListeners[type] = handler; },
+    };
 
     try {
-      globalThis.window = { location: { hash: '#fn-chapter-1-1' } };
+      globalThis.window = {
+        location: { hash: '#fn-chapter-1-1', pathname: '/dissertation/reader/', search: '?mode=sepia' },
+        scrollY: 0,
+        innerHeight: 800,
+        addEventListener() {},
+        scrollTo() {},
+      };
       globalThis.history = {
         replaceState(_state, _unused, hash) {
           replacements.push(hash);
@@ -148,6 +160,9 @@ describe('reader footnote navigation (issue #782)', () => {
       globalThis.document = {
         dispatchEvent() {},
         getElementById() { return target; },
+        addEventListener(type, handler) { documentListeners[type] = handler; },
+        querySelector(selector) { return selector === '.back-to-top' ? backToTop : null; },
+        body: { scrollHeight: 4000 },
       };
       globalThis.CustomEvent = class CustomEvent {};
 
@@ -166,6 +181,22 @@ describe('reader footnote navigation (issue #782)', () => {
       navigation.setActiveSection('chapter-3');
       assert.deepEqual(replacements, ['#chapter-2', '#chapter-3'],
         'normal section tracking must resume after explicit navigation');
+
+      navigation.setupKeyboardNav();
+      for (const key of ['Home', 'End']) {
+        globalThis.window.location.hash = '#fn-chapter-1-1';
+        documentListeners.keydown({ key, ctrlKey: true, preventDefault() {} });
+      }
+      assert.deepEqual(replacements.slice(-2), [
+        '/dissertation/reader/?mode=sepia',
+        '/dissertation/reader/?mode=sepia',
+      ], 'Ctrl+Home and Ctrl+End must clear a stale footnote hash');
+
+      navigation.setupBackToTop();
+      globalThis.window.location.hash = '#fnref-chapter-1-1';
+      buttonListeners.click();
+      assert.equal(replacements.at(-1), '/dissertation/reader/?mode=sepia',
+        'Back to top must clear a stale reference hash');
     } finally {
       if (originalDocument === undefined) delete globalThis.document;
       else globalThis.document = originalDocument;

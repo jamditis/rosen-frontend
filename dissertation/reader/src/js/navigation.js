@@ -145,6 +145,15 @@ class ReaderNavigation {
   }
 
   /**
+   * Release a footnote round-trip hash before an explicit page-boundary jump.
+   * The scroll observer can then record the section that the reader reaches.
+   */
+  clearFootnoteHash() {
+    if (!history.replaceState || !/^#fn(?:ref)?-/.test(window.location.hash)) return;
+    history.replaceState(null, null, `${window.location.pathname}${window.location.search}`);
+  }
+
+  /**
    * Setup mobile navigation toggle
    */
   setupMobileNav() {
@@ -226,12 +235,14 @@ class ReaderNavigation {
       // Home/End for beginning/end
       if (e.key === 'Home' && e.ctrlKey) {
         e.preventDefault();
+        this.clearFootnoteHash();
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
 
       if (e.key === 'End' && e.ctrlKey) {
         e.preventDefault();
+        this.clearFootnoteHash();
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         return;
       }
@@ -273,6 +284,7 @@ class ReaderNavigation {
 
     // Click handler
     btn.addEventListener('click', () => {
+      this.clearFootnoteHash();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
