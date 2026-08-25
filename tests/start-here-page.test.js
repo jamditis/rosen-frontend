@@ -23,7 +23,7 @@ describe('Start here page', () => {
     assert.match(page, /Browse the archive/);
     assert.match(page, /routeButton\('archive', 'Search records', Search\)/);
     assert.match(page, /routeButton\('archive', 'Enter the archive', ArrowRight\)/);
-    assert.match(page, /\$\{!embedded && html`[\s\S]*Explore the archive desktop[\s\S]*Prefer a spatial map\?/);
+    assert.match(page, /\$\{!embedded && html`[\s\S]*Explore the archive desktop[\s\S]*Beta[\s\S]*archive desktop is still in development/i);
     assert.doesNotMatch(page, /Take a short tour/);
   });
 
@@ -88,7 +88,7 @@ describe('Start here page', () => {
     assert.match(page, /const ContentTag = embedded \? 'div' : 'main'/);
     assert.match(page, /id=\$\{embedded \? undefined : 'main-content'\}/);
     assert.match(page, /\$\{!embedded && html`<\$\{ArchiveRouteHeader\}/);
-    assert.match(page, /\$\{!embedded && html`\s*<div[\s\S]*Explore the archive desktop[\s\S]*Prefer a spatial map\?/);
+    assert.match(page, /\$\{!embedded && html`\s*<div[\s\S]*Explore the archive desktop[\s\S]*Beta[\s\S]*archive desktop is still in development/i);
     assert.match(page, /if \(embedded\) return;/);
   });
 

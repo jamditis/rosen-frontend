@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { html } from '../html.js?v=3.8.29';
+import { html } from '../html.js?v=3.8.30';
 import {
   AlertCircle,
   ArrowLeft,
@@ -15,8 +15,8 @@ import {
   Search,
   Sparkles
 } from 'lucide-react';
-import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.29';
-import ArchiveRouteHeader from './ArchiveRouteHeader.js?v=3.8.29';
+import { resolveSitePath } from '../utils/pathResolver.js?v=3.8.30';
+import ArchiveRouteHeader from './ArchiveRouteHeader.js?v=3.8.30';
 
 const normalizeTitle = (title = '') => title
   .toLowerCase()
@@ -232,15 +232,17 @@ const StartHerePage = ({
             <div className="mt-8 flex flex-wrap gap-3">
               <button
               type="button"
+              aria-label="Explore the archive desktop, beta"
               onClick=${() => navigate('desktop')}
               className="archive-action archive-action--secondary"
               >
                 <${Monitor} className="h-4 w-4" aria-hidden="true" />
                 Explore the archive desktop
+                <span className="archive-section-label">Beta</span>
               </button>
             </div>
             <p className="mt-3 max-w-2xl font-body text-xs leading-relaxed text-stone-500">
-              Prefer a spatial map? The optional desktop arranges these same archive paths as shortcuts, folders, and windows.
+              The archive desktop is still in development. This optional view arranges the same archive paths as shortcuts, folders, and windows.
             </p>
           `}
 

@@ -57,9 +57,13 @@ describe('desktop route wiring', () => {
     const start = read('frontend/components/StartHerePage.js');
     const tools = read('frontend/components/ToolsModal.js');
     assert.match(start, /Explore the archive desktop/);
+    assert.match(start, /aria-label="Explore the archive desktop, beta"/);
     assert.match(start, /navigate\('desktop'\)/);
+    assert.match(start, /archive-section-label[^>]*>Beta</);
+    assert.match(start, /archive desktop is still in development/i);
     assert.match(tools, /id: 'desktop'/);
     assert.match(tools, /action: 'desktop'/);
+    assert.match(tools, /Archive desktop is still in development/);
   });
 
   it('adds the desktop route to preview audit at mobile, tablet, and desktop sizes', () => {
@@ -76,8 +80,10 @@ describe('desktop route wiring', () => {
       'the optional Start-here entry must be a real keyboard/history audit path');
     assert.match(audit, /slug: 'home-archive',[\s\S]*verifyToolsDesktopEntry: true/,
       'the optional Tools entry must be a real keyboard/history audit path');
-    assert.match(audit, /viewport\.width < 640 \? 'Tools' : 'More'[\s\S]*'Tools dialog close control'[\s\S]*'Desktop home after Tools entry'[\s\S]*'Standard archive main after Tools entry Back'/,
+    assert.match(audit, /viewport\.width < 640 \? 'Tools' : 'More tools'[\s\S]*'Tools dialog close control'[\s\S]*'Desktop home after Tools entry'[\s\S]*'Standard archive main after Tools entry Back'/,
       'responsive Tools triggers must enter the desktop and visibly restore the canonical source');
+    assert.match(audit, /Start here desktop beta status[\s\S]*Tools desktop beta status/,
+      'the rendered audit must verify the beta status on both launch surfaces');
     assert.match(audit, /'Desktop home after Start here entry'[\s\S]*page\.url\(\) !== sourceUrl[\s\S]*'Start here heading after desktop entry Back'/,
       'desktop entry and browser Back must visibly focus both ends of the round trip');
     assert.match(audit, /slug: 'archive-desktop',[\s\S]*url: '\/#desktop',[\s\S]*verifyStartPathRoundTrip: true,[\s\S]*verifyCompactHomeFocus: true/);
