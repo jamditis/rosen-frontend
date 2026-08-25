@@ -17,6 +17,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { sourceSection } from './helpers/source-section.js';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const appJs = fs.readFileSync(path.join(__dirname, '..', 'frontend', 'App.js'), 'utf-8');
 const archiveServiceJs = fs.readFileSync(path.join(__dirname, '..', 'frontend', 'services', 'archiveService.js'), 'utf-8');
@@ -24,48 +26,83 @@ const entityBrowserJs = fs.readFileSync(path.join(__dirname, '..', 'frontend', '
 
 describe('fail-loud error panel is shared across record-backed routes (#369)', () => {
   it('defines a single shared errorPanel keyed on the error state', () => {
-    assert.match(appJs, /const\s+errorPanel\s*=\s*error\s*&&/,
+    // Static render contract: App.js cannot be imported by Node because its UI
+    // dependencies require the browser import map. Restrict the assertion to
+    // the shared panel declaration instead of matching anywhere in the file.
+    const errorPanel = sourceSection(
+      appJs,
+      'const errorPanel',
+      'return html`',
+      'shared route error panel',
+    );
+    assert.match(errorPanel, /const\s+errorPanel\s*=\s*error\s*&&/,
       'a shared errorPanel should render only when error is set');
   });
 
   it('surfaces the error panel on the entity browser route', () => {
-    assert.match(appJs, /isEntityBrowser\s*&&\s*errorPanel/,
+    const entityRoute = sourceSection(
+      appJs,
+      '${isEntityBrowser && errorPanel}',
+      '${isArchiveGrid && html`\n                <${ArchiveResults}',
+      'entity browser route',
+    );
+    assert.match(entityRoute, /isEntityBrowser\s*&&\s*errorPanel/,
       'the entity browser route must render the shared errorPanel during an outage');
-  });
-
-  it('does not render the entity browser when the core load failed', () => {
-    // Guard the gap directly: EntityBrowser must not render an empty browser
-    // when error is set. The render condition must include !error.
-    const match = appJs.match(/isEntityBrowser\s*&&\s*!loading\s*&&\s*!error\s*&&\s*html`/);
-    assert.ok(match,
+    assert.match(entityRoute, /isEntityBrowser\s*&&\s*!loading\s*&&\s*!error\s*&&\s*html`/,
       'EntityBrowser render must be gated on !error so it stays hidden during an outage');
   });
 
   it('still renders the shared panel on the archive grid route', () => {
-    // Regression: the archive grid kept its error panel after the extraction.
-    // `isArchiveGrid && html\`` appears several times (filter button, sidebar,
-    // record grid); the record grid is the terminal branch, so anchor on the
-    // last occurrence and confirm the shared panel renders inside it.
-    const gridIdx = appJs.lastIndexOf('isArchiveGrid && html`');
-    assert.notStrictEqual(gridIdx, -1, 'archive grid branch must exist');
-    assert.ok(appJs.slice(gridIdx, gridIdx + 200).includes('errorPanel'),
+    const recordBackedRoutes = sourceSection(
+      appJs,
+      '${isEntityBrowser && errorPanel}',
+      '${currentRoute === ROUTES.archive',
+      'record-backed route renders',
+    );
+    const archiveGridRoute = sourceSection(
+      recordBackedRoutes,
+      '${isArchiveGrid && html`',
+      '            `}',
+      'archive grid route',
+    );
+    assert.match(archiveGridRoute, /<\$\{ArchiveResults\}[\s\S]*errorPanel=\$\{errorPanel\}[\s\S]*\/>/,
       'the archive grid branch must render the shared errorPanel');
   });
 });
 
 describe('entity-index failures remain distinct from core-data failures', () => {
   it('returns a shaped failure that preserves record-modal fallback behavior', () => {
-    assert.match(
+    const entityLoader = sourceSection(
       archiveServiceJs,
+      'export const fetchEntitiesData',
+      'export const areEntitiesLoaded',
+      'entity data loader',
+    );
+    assert.match(
+      entityLoader,
       /return \{\s*entities:\s*\[\],\s*recordEntityMap:\s*\{\},\s*error:\s*'The entity index could not load\./,
     );
   });
 
   it('renders an explicit shared-browser alert instead of an empty entity list', () => {
-    assert.match(entityBrowserJs, /if \(data\?\.error\)[\s\S]*setLoadError\(data\.error\)/);
-    assert.match(entityBrowserJs, /if \(loadError\)[\s\S]*role="alert"/);
-    assert.match(entityBrowserJs, /Unable to load people and ideas/);
-    assert.match(entityBrowserJs, /window\.location\.reload\(\)/);
-    assert.match(entityBrowserJs, /minHeight:\s*'44px'/);
+    const entityLoad = sourceSection(
+      entityBrowserJs,
+      '// Load entity data',
+      'const { entities: scopedEntities',
+      'entity browser data load',
+    );
+    const errorView = sourceSection(
+      entityBrowserJs,
+      'if (loadError)',
+      '// Resolve the selected entity',
+      'entity browser error view',
+    );
+
+    assert.match(entityLoad, /if \(data\?\.error\)[\s\S]*setLoadError\(data\.error\)/);
+    assert.match(errorView, /role="alert"/);
+    assert.match(errorView, /Unable to load people and ideas/);
+    assert.match(errorView, /window\.location\.reload\(\)/);
+    assert.match(errorView, /className="archive-action archive-action--danger"/,
+      'the reload control must retain the shared minimum-target action recipe');
   });
 });
