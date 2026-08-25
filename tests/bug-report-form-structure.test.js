@@ -51,6 +51,18 @@ describe('branded report form static composition', () => {
     "  useEffect(() => {\n    if (!isOpen) return undefined;",
     'report modal keyboard effect',
   );
+  const returnFocusEffect = sourceSection(
+    modalSrc,
+    '// Remember the exact trigger',
+    '// A submit in flight is the single source of truth',
+    'report modal return-focus effect',
+  );
+  const interactionHandlers = sourceSection(
+    modalSrc,
+    'const setField',
+    '// Open the intent-aware GitHub fallback',
+    'report modal interaction handlers',
+  );
   const fallbackHandler = sourceSection(
     modalSrc,
     'const openFallback',
@@ -125,9 +137,17 @@ describe('branded report form static composition', () => {
       '${recordView}',
       'archive report overlay',
     );
+    const archiveHeader = sourceSection(
+      appSrc,
+      '<header className=${`archive-site-header',
+      '<a href="https://github.com/jamditis"',
+      'archive header report trigger',
+    );
 
     assert.match(modalState, /const \[bugReportOpen, setBugReportOpen\] = useState\(false\)/);
     assert.match(openHandler, /setBugReportOpen\(true\)/);
+    assert.match(archiveHeader, /onClick=\$\{\(\) => openBugReport\('problem'\)\}/);
+    assert.match(archiveHeader, /aria-label="Report a bug"/);
     for (const section of [fullPageOverlay, archiveOverlays]) {
       assert.match(section, /<\$\{BugReportModal\}/);
       assert.match(section, /endpoint=\$\{REPORT_CONFIG\.endpoint\}/);
@@ -138,6 +158,7 @@ describe('branded report form static composition', () => {
     assert.match(modalImports, /ARCHIVE_VERSION, openReportFallback/);
     assert.match(resetEffect, /reportContextRef\.current = captureContext\(\)/);
     assert.match(fallbackHandler, /openReportFallback\(\{ intent, fields, context: reportContextRef\.current \}\)/);
+    assert.match(submitHandler, /if \(result\.fallback\)[\s\S]*setPhase\('fallback'\)/);
     assert.match(fallbackView, /Finish on GitHub/);
     assert.match(fallbackView, /onClick=\$\{\(\) => \{ openFallback\(\); onClose\(\); \}\}/);
   });
@@ -145,6 +166,7 @@ describe('branded report form static composition', () => {
   it('locks editing and every dismissal path during submission', () => {
     assert.match(closeGuard, /if \(phase === 'submitting'\) return/);
     assert.match(keyboardEffect, /e\.key === 'Escape'[\s\S]*requestClose\(\)/);
+    assert.match(interactionHandlers, /e\.target === e\.currentTarget[\s\S]*requestClose\(\)/);
     assert.match(intentTab, /disabled=\$\{submitting\}/);
 
     const fieldGuards = fieldRenderers.match(/disabled=\$\{submitting\}/g) || [];
@@ -177,12 +199,18 @@ describe('branded report form static composition', () => {
   it('retains the accessible dialog, intents, honeypot, and focus loop', () => {
     assert.match(formView, /intentTab\('problem', Bug, 'Report a problem'\)/);
     assert.match(formView, /intentTab\('record', Lightbulb, 'Suggest a record'\)/);
+    assert.match(intentTab, /setIntent\(value\); setFormError\(''\);/);
+    const fieldBindings = fieldRenderers.match(/onInput=\$\{\(e\) => setField\(name, e\.target\.value\)\}/g) || [];
+    assert.equal(fieldBindings.length, 2, 'textarea and input factories must update their owned field');
     assert.match(formView, /aria-hidden="true"[\s\S]*tabindex="-1"[\s\S]*autocomplete="off"/);
+    assert.match(formView, /left-\[-9999px\]/);
     assert.match(dialogView, /role="dialog"/);
     assert.match(dialogView, /aria-modal="true"/);
     assert.match(dialogView, /aria-labelledby="bug-report-title"/);
     assert.match(keyboardEffect, /if \(e\.key !== 'Tab'\) return/);
     assert.match(keyboardEffect, /focusOutside[\s\S]*last\.focus\(\)[\s\S]*first\.focus\(\)/);
+    assert.match(returnFocusEffect, /returnFocusRef\.current = document\.activeElement/);
+    assert.match(returnFocusEffect, /target\.focus\(\{ preventScroll: true \}\)/);
   });
 
   it('versions every local modal import', () => {
@@ -224,6 +252,7 @@ describe('branded report form static composition', () => {
     );
 
     assert.match(dialogView, /archive-report-dialog__header flex-shrink-0/);
+    assert.match(dialogView, /archive-report-dialog__panel flex flex-col overflow-hidden/);
     assert.match(dialogView, /className="flex-1 overflow-y-auto" style=\$\{\{ minHeight: 0 \}\}/);
     assert.match(panelRule, /max-height:\s*calc\(100dvh - 2rem\)/);
     assert.match(touchTargets, /min-height:\s*44px/);
