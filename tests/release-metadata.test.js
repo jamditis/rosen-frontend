@@ -89,11 +89,11 @@ describe('footer release metadata', () => {
     assert.doesNotMatch(archiveService, /fetch\(['"]\.\/version\.json/);
   });
 
-  it('shows the data date near the archive results', () => {
+  it('shows the release date near the archive results', () => {
     const app = readFileSync('frontend/App.js', 'utf8');
 
     assert.match(app, /archive-results__updated/);
-    assert.match(app, /Data updated[\s\S]*dateTime=\$\{releaseMetadata\.updated\}/);
+    assert.match(app, /Site updated[\s\S]*dateTime=\$\{releaseMetadata\.updated\}/);
   });
 
   it('offers to reload an open tab when a new service worker takes control', () => {
@@ -102,8 +102,28 @@ describe('footer release metadata', () => {
 
     assert.match(index, /controllerchange/);
     assert.match(index, /jrda:update-ready/);
+    assert.match(index, /window\.__jrdaUpdateReady\s*=\s*true/);
+    assert.match(app, /useState\(\s*\(\)\s*=>\s*Boolean\(window\.__jrdaUpdateReady\)/);
     assert.match(app, /addEventListener\('jrda:update-ready'/);
-    assert.match(app, /New archive data is available/);
+    assert.match(app, /A new archive release is available/);
     assert.match(app, /window\.location\.reload\(\)/);
+  });
+
+  it('renders the update notice on archive and full-page routes', () => {
+    const app = readFileSync('frontend/App.js', 'utf8');
+
+    assert.match(app, /const updateNotice = updateAvailable/);
+    assert.match(app, /const renderFullPage[\s\S]*\$\{updateNotice\}/);
+    assert.ok((app.match(/\$\{updateNotice\}/g) || []).length >= 2);
+  });
+
+  it('subscribes to controller changes before waiting for page load', () => {
+    const index = readFileSync('index.html', 'utf8');
+    const controllerListener = index.indexOf("addEventListener('controllerchange'");
+    const loadListener = index.indexOf("window.addEventListener('load'");
+
+    assert.ok(controllerListener >= 0);
+    assert.ok(loadListener >= 0);
+    assert.ok(controllerListener < loadListener);
   });
 });

@@ -103,13 +103,14 @@
         'Running without the service-worker cache: large archive data (>5 MB) is refetched on each navigation. See issue #428.'
       );
       if ('serviceWorker' in navigator) {
+        const controlledAtEvaluation = Boolean(navigator.serviceWorker.controller);
+        if (controlledAtEvaluation) {
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            window.__jrdaUpdateReady = true;
+            window.dispatchEvent(new Event('jrda:update-ready'));
+          }, { once: true });
+        }
         window.addEventListener('load', () => {
-          const controlledAtLoad = Boolean(navigator.serviceWorker.controller);
-          if (controlledAtLoad) {
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-              window.dispatchEvent(new Event('jrda:update-ready'));
-            }, { once: true });
-          }
           // Register the root bridge so the worker controls the archive page,
           // not only /frontend/. Checking imported scripts without HTTP-cache
           // reuse makes a frontend/sw.js CACHE_VERSION bump observable even

@@ -155,7 +155,9 @@ const App = () => {
   const [announcedResultCount, setAnnouncedResultCount] = useState('');
   const [currentHash, setCurrentHash] = useState(() => window.location.hash);
   const [releaseMetadata, setReleaseMetadata] = useState(null);
-  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [updateAvailable, setUpdateAvailable] = useState(
+    () => Boolean(window.__jrdaUpdateReady),
+  );
 
   const [filters, setFilters] = useState(() => ({
     ...DEFAULT_FILTERS,
@@ -728,6 +730,12 @@ const App = () => {
   const minYear = years.length ? Math.min(...years) : 0;
   const maxYear = years.length ? Math.max(...years) : 0;
   const releaseDate = releaseMetadata ? formatReleaseDate(releaseMetadata.updated) : '';
+  const updateNotice = updateAvailable && html`
+    <div className="archive-update-notice" role="status">
+      <span>A new archive release is available.</span>
+      <button type="button" onClick=${() => window.location.reload()}>Reload archive</button>
+    </div>
+  `;
 
   // One <RecordView> element for the default archive route. RecordView owns the
   // selected-record lookup and prev/next nav math that App.js used to compute
@@ -875,6 +883,7 @@ const App = () => {
   // because the modal only existed in the archive shell below.
   const renderFullPage = (page, routeOverlay = null) => html`
     <div className="min-h-screen flex flex-col archive-canvas">
+      ${updateNotice}
       ${page}
       ${routeOverlay}
       <${BugReportModal}
@@ -1012,13 +1021,7 @@ const App = () => {
       ${recordView}
 
       <${WorkInProgressBanner} />
-
-      ${updateAvailable && html`
-        <div className="archive-update-notice" role="status">
-          <span>New archive data is available.</span>
-          <button type="button" onClick=${() => window.location.reload()}>Reload archive</button>
-        </div>
-      `}
+      ${updateNotice}
 
       <header className=${`archive-site-header sticky top-0 z-50 w-full transition-all duration-300 ${
           isScrolled
@@ -1228,7 +1231,7 @@ const App = () => {
                     </span>
                     ${releaseMetadata && html`
                       <span className="archive-results__updated">
-                        Data updated <time dateTime=${releaseMetadata.updated}>${releaseDate}</time>
+                        Site updated <time dateTime=${releaseMetadata.updated}>${releaseDate}</time>
                       </span>
                     `}
                     <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
