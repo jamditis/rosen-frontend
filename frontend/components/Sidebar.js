@@ -1,12 +1,12 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { html } from '../html.js?v=3.8.30';
+import { html } from '../html.js?v=3.8.31';
 import { X, Search, XCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import {
   findSearchSuggestions,
   normalizeForSearch,
-} from '../utils/searchNormalize.js?v=3.8.30';
-import { CONTENT_TYPE_OPTIONS } from '../constants.js?v=3.8.30';
+} from '../utils/searchNormalize.js?v=3.8.31';
+import { CONTENT_TYPE_OPTIONS } from '../constants.js?v=3.8.31';
 
 const Sidebar = ({
   facets,
