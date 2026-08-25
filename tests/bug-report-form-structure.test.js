@@ -155,7 +155,7 @@ describe('branded report form static composition', () => {
   });
 
   it('keeps intent-aware fallback state inside the modal', () => {
-    assert.match(modalImports, /ARCHIVE_VERSION, openReportFallback/);
+    assert.match(modalImports, /import \{ ARCHIVE_VERSION, openReportFallback \} from '\.\.\/utils\/bugReport\.js\?v=\d+\.\d+\.\d+'/);
     assert.match(resetEffect, /reportContextRef\.current = captureContext\(\)/);
     assert.match(fallbackHandler, /openReportFallback\(\{ intent, fields, context: reportContextRef\.current \}\)/);
     assert.match(submitHandler, /if \(result\.fallback\)[\s\S]*setPhase\('fallback'\)/);
@@ -165,7 +165,7 @@ describe('branded report form static composition', () => {
 
   it('locks editing and every dismissal path during submission', () => {
     assert.match(closeGuard, /if \(phase === 'submitting'\) return/);
-    assert.match(keyboardEffect, /e\.key === 'Escape'[\s\S]*requestClose\(\)/);
+    assert.match(keyboardEffect, /e\.key === 'Escape'[\s\S]*e\.preventDefault\(\)[\s\S]*e\.stopPropagation\(\)[\s\S]*requestClose\(\)/);
     assert.match(interactionHandlers, /e\.target === e\.currentTarget[\s\S]*requestClose\(\)/);
     assert.match(intentTab, /disabled=\$\{submitting\}/);
 
@@ -175,7 +175,7 @@ describe('branded report form static composition', () => {
     assert.equal(formButtonGuards.length, 2, 'fallback and submit buttons must lock during submit');
 
     assert.match(dialogView, /onClick=\$\{handleBackdrop\}/);
-    assert.match(dialogView, /onClick=\$\{requestClose\}[\s\S]*disabled=\$\{submitting\}/);
+    assert.match(dialogView, /ref=\$\{closeButtonRef\}[\s\S]*onClick=\$\{requestClose\}[\s\S]*disabled=\$\{submitting\}/);
   });
 
   it('keeps ambiguous-error recovery on the idempotent submit path', () => {
@@ -185,8 +185,8 @@ describe('branded report form static composition', () => {
   });
 
   it('connects one report key and one tested submit gate to the submit handler', () => {
-    assert.match(modalImports, /createSubmitGate/);
-    assert.match(modalImports, /buildReportPayload, validateReport, submitReport, newReportKey/);
+    assert.match(modalImports, /import \{ createSubmitGate \} from '\.\.\/utils\/submitGate\.js\?v=\d+\.\d+\.\d+'/);
+    assert.match(modalImports, /import \{ buildReportPayload, validateReport, submitReport, newReportKey \} from '\.\.\/utils\/reportSubmit\.js\?v=\d+\.\d+\.\d+'/);
     assert.match(resetEffect, /gateRef\.current\.reset\(\)/);
     assert.match(resetEffect, /setReportKey\(newReportKey\(\)\)/);
     assert.match(submitHandler, /idempotencyKey: reportKey/);
@@ -194,6 +194,7 @@ describe('branded report form static composition', () => {
     assert.match(submitHandler, /gateRef\.current\.isCurrent\(seq\)/);
     assert.match(submitHandler, /submitReport\(\{ endpoint, payload \}\)/);
     assert.match(submitHandler, /gateRef\.current\.end\(seq\)/);
+    assert.doesNotMatch(modalSrc, /submittingRef/);
   });
 
   it('retains the accessible dialog, intents, honeypot, and focus loop', () => {
@@ -208,6 +209,7 @@ describe('branded report form static composition', () => {
     assert.match(dialogView, /aria-modal="true"/);
     assert.match(dialogView, /aria-labelledby="bug-report-title"/);
     assert.match(keyboardEffect, /if \(e\.key !== 'Tab'\) return/);
+    assert.match(keyboardEffect, /const focusOutside = !modalRef\.current\?\.contains\(document\.activeElement\)/);
     assert.match(keyboardEffect, /focusOutside[\s\S]*last\.focus\(\)[\s\S]*first\.focus\(\)/);
     assert.match(returnFocusEffect, /returnFocusRef\.current = document\.activeElement/);
     assert.match(returnFocusEffect, /target\.focus\(\{ preventScroll: true \}\)/);
@@ -253,7 +255,7 @@ describe('branded report form static composition', () => {
 
     assert.match(dialogView, /archive-report-dialog__header flex-shrink-0/);
     assert.match(dialogView, /archive-report-dialog__panel flex flex-col overflow-hidden/);
-    assert.match(dialogView, /className="flex-1 overflow-y-auto" style=\$\{\{ minHeight: 0 \}\}/);
+    assert.match(dialogView, /className="flex-1 overflow-y-auto" style=\$\{\{ minHeight: 0 \}\}>[\s\S]*\$\{body\(\)\}/);
     assert.match(panelRule, /max-height:\s*calc\(100dvh - 2rem\)/);
     assert.match(touchTargets, /min-height:\s*44px/);
     assert.match(touchTargets, /archive-report-dialog-close[\s\S]*min-width:\s*44px/);
