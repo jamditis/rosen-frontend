@@ -38,7 +38,7 @@ describe('wiki UI wiring', () => {
       'core data load',
     );
 
-    assert.match(nonRecordRoutes, /ROUTES\.wiki/);
+    assert.match(nonRecordRoutes, /const NON_RECORD_ROUTES\s*=\s*new Set\(\[[\s\S]*ROUTES\.wiki[\s\S]*\]\);/);
     assert.match(coreLoad, /NON_RECORD_ROUTES\.has\(currentRoute\)\s*&&\s*!desktopNeedsRecords\) return/);
   });
 
