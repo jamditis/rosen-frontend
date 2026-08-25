@@ -25,6 +25,27 @@ There's no database, no CMS login, no complex system. The CSV file is the source
 
 ---
 
+## Publishing older work online for the first time
+
+Use the original date when you publish a verbatim copy of an older talk, essay,
+or other work on PressThink. Set the WordPress post date to the date when the
+work was first delivered or circulated.
+
+Put this note at the top of the post:
+
+> Editor's note: This work was originally delivered on [original date] and was
+> first published online on [online publication date].
+
+Use today's WordPress date when you write a new post about an older event. The
+new post is new work, even when the event is historical.
+
+The archive checks PressThink for recently modified posts, so it can discover a
+newly posted item with an older post date. During ingestion, it stores the date
+shown by PressThink as `publication_date`. A verbatim republication therefore
+appears in the archive at its original date, not at its online publication date.
+
+---
+
 ## Step 1: Open the CSV file
 
 Open this file in your text editor or a spreadsheet app like Excel or Google Sheets:
