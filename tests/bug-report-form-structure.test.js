@@ -99,6 +99,12 @@ describe('branded report form static composition', () => {
     "// phase === 'form' | 'submitting'",
     'report modal error view',
   );
+  const errorMarkup = sourceSection(
+    errorView,
+    '      return html`',
+    '\n    }\n',
+    'report modal error markup',
+  );
   const formView = sourceSection(
     modalSrc,
     "// phase === 'form' | 'submitting'",
@@ -180,8 +186,11 @@ describe('branded report form static composition', () => {
 
   it('keeps ambiguous-error recovery on the idempotent submit path', () => {
     assert.match(errorView, /That did not go through/);
-    assert.match(errorView, /setPhase\('form'\)[\s\S]*Try again/);
-    assert.doesNotMatch(errorView, /Open the issue form|onClick=\$\{\(\) => \{ openFallback/);
+    assert.match(errorMarkup, /setPhase\('form'\)[\s\S]*Try again/);
+    assert.doesNotMatch(errorMarkup, /<a\b|href=|openFallback|openReportFallback/);
+    const recoveryControls = errorMarkup.match(/<(?:button|a)\b/g) || [];
+    assert.equal(recoveryControls.length, 1,
+      'the idempotent retry must be the only recovery control on the error screen');
   });
 
   it('connects one report key and one tested submit gate to the submit handler', () => {
