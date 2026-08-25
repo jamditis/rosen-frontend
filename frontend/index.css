@@ -3618,6 +3618,37 @@ mark {
   font-variant-numeric: tabular-nums;
 }
 
+.archive-results__updated {
+  color: var(--archive-ink-muted);
+  font-family: var(--font-body);
+  font-size: var(--font-size-xs);
+}
+
+.archive-update-notice {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--archive-rule-strong);
+  color: var(--archive-ink);
+  background: var(--archive-manila);
+  font-size: var(--font-size-sm);
+  box-shadow: var(--archive-shadow-raised);
+}
+
+.archive-update-notice button {
+  min-height: var(--archive-target-min);
+  padding-inline: 0.75rem;
+  border: 1px solid var(--archive-ink);
+  background: var(--archive-paper);
+  font-weight: var(--font-weight-bold);
+}
+
 .archive-results-scope {
   display: flex;
   flex-wrap: wrap;

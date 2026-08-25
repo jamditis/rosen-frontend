@@ -2,9 +2,10 @@
  * Ordering for the record grid.
  *
  * The grid renders this array row-major (a CSS `grid`, left-to-right then
- * top-to-bottom), so the array order IS the reading order. 'date-asc', the
- * default, reads oldest-first across each row: the chronological timeline
- * order a reader expects after picking a year in the volume bars (issue #529).
+ * top-to-bottom), so the array order IS the reading order. 'date-asc' remains
+ * available for a chronological timeline after a reader picks a year in the
+ * volume bars (issue #529). The archive opens with 'date-desc' so fresh work is
+ * visible first.
  *
  * Record dates are ISO 'YYYY-MM-DD', so a lexicographic compare is already
  * chronological. The `|| ''` guards keep a record with a missing date or title

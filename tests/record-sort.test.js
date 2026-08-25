@@ -91,14 +91,14 @@ describe('sortRecords — per-year record ordering (#529)', () => {
     assert.deepEqual(out, ['y', 'x']); // '' sorts before any real date
   });
 
-  it('date-asc is the default the year filter relies on', () => {
-    // The app sets sortBy to 'date-asc' explicitly (App.js), so a year click
-    // shows the oldest record first. That app default and the helper's date-desc
-    // fallback are not in conflict: 'date-asc' is a recognised key, so the
-    // fallback never runs for it; date-desc only catches an unrecognised key and
-    // keeps the historical newest-first default. Guard that 'date-asc' stays
-    // recognised, so a year click never silently falls through to date-desc.
+  it('keeps chronological order available as an explicit sort', () => {
+    // Readers can still select oldest-first when they want a chronological
+    // sequence, even though the archive now opens with its newest records.
     assert.ok(RECORD_SORTS.includes('date-asc'));
+  });
+
+  it('opens the archive with newest records first', () => {
+    assert.match(appSrc, /useState\('date-desc'\)/);
   });
 });
 
