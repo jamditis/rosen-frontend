@@ -112,8 +112,11 @@ class ReaderNavigation {
       link.classList.toggle('is-active', linkTarget === sectionId);
     });
 
-    // Update URL hash (without scrolling)
-    if (history.replaceState) {
+    // Keep an explicit footnote round trip in browser history while the smooth
+    // scroll crosses tracked headings. ToC navigation replaces it deliberately
+    // in scrollToSection(), so normal section tracking can resume afterward.
+    const hasFootnoteHash = /^#fn(?:ref)?-/.test(window.location.hash);
+    if (history.replaceState && !hasFootnoteHash) {
       history.replaceState(null, null, `#${sectionId}`);
     }
 
@@ -131,11 +134,23 @@ class ReaderNavigation {
     const target = document.getElementById(sectionId);
     if (!target) return;
 
+    if (history.replaceState) {
+      history.replaceState(null, null, `#${sectionId}`);
+    }
     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     // Focus the heading for accessibility
     target.setAttribute('tabindex', '-1');
     target.focus({ preventScroll: true });
+  }
+
+  /**
+   * Release a footnote round-trip hash before an explicit page-boundary jump.
+   * The scroll observer can then record the section that the reader reaches.
+   */
+  clearFootnoteHash() {
+    if (!history.replaceState || !/^#fn(?:ref)?-/.test(window.location.hash)) return;
+    history.replaceState(null, null, `${window.location.pathname}${window.location.search}`);
   }
 
   /**
@@ -220,12 +235,14 @@ class ReaderNavigation {
       // Home/End for beginning/end
       if (e.key === 'Home' && e.ctrlKey) {
         e.preventDefault();
+        this.clearFootnoteHash();
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
 
       if (e.key === 'End' && e.ctrlKey) {
         e.preventDefault();
+        this.clearFootnoteHash();
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         return;
       }
@@ -267,6 +284,7 @@ class ReaderNavigation {
 
     // Click handler
     btn.addEventListener('click', () => {
+      this.clearFootnoteHash();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }

@@ -596,7 +596,9 @@ body {
   .reader-nav,
   .progress-bar,
   .back-to-top,
-  .settings-panel {
+  .settings-panel,
+  .footnote-return,
+  a.footnote-ref[href^="#fnref-"] {
     display: none !important;
   }
 
