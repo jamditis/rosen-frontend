@@ -6,27 +6,28 @@
 // Phase 4 retest shape:   { "MODAL-16": { retest_status, notes } }
 //
 // Usage:
-//   node docs/feature-audit/apply-verdicts.mjs           # apply test_* fields (verdicts-*.json)
-//   node docs/feature-audit/apply-verdicts.mjs fix       # apply fix_* fields  (fixes-*.json)
-//   node docs/feature-audit/apply-verdicts.mjs retest    # apply retest_status (retest-*.json)
+//   node docs/feature-audit/archive/apply-verdicts.mjs           # apply test_* fields
+//   node docs/feature-audit/archive/apply-verdicts.mjs fix       # apply fix_* fields
+//   node docs/feature-audit/archive/apply-verdicts.mjs retest    # apply retest_status
 
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
+const auditRoot = join(here, '..');
 const arg = process.argv[2];
 const mode = arg === 'retest' ? 'retest' : arg === 'fix' ? 'fix' : 'test';
-const masterPath = join(here, 'feature-stories.json');
+const masterPath = join(auditRoot, 'feature-stories.json');
 const master = JSON.parse(readFileSync(masterPath, 'utf8'));
 const byId = new Map(master.map(r => [r.id, r]));
 
 const prefix = mode === 'retest' ? 'retest-' : mode === 'fix' ? 'fixes-' : 'verdicts-';
-const files = readdirSync(here).filter(f => f.startsWith(prefix) && f.endsWith('.json'));
+const files = readdirSync(auditRoot).filter(f => f.startsWith(prefix) && f.endsWith('.json'));
 
 let applied = 0, missing = [];
 for (const f of files) {
-  const v = JSON.parse(readFileSync(join(here, f), 'utf8'));
+  const v = JSON.parse(readFileSync(join(auditRoot, f), 'utf8'));
   for (const [id, val] of Object.entries(v)) {
     const row = byId.get(id);
     if (!row) { missing.push(id); continue; }
