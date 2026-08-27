@@ -127,7 +127,7 @@ Design doc only: `docs/plans/2026-05-24-pillar3-authoring-workflow-design.md`. Z
 
 In execution order. Joe owns step 1; everything else flows from his decisions.
 
-1. **Joe resolves the five remaining architectural decisions.** See [decisions-pending.md](./decisions-pending.md). URL canonicalization, Pillar 3a deploy mechanism, Pillar 3b scope, social-platform backfill priority, and the entity-loading stack (wire or shelve, #503). The era taxonomy and dissertation-tools decisions are recorded there as decided; the separate SQLite validator remains approved as future work.
+1. **Joe resolves the four remaining architectural decisions.** See [decisions-pending.md](./decisions-pending.md). URL canonicalization, Pillar 3a deploy mechanism, Pillar 3b scope, and social-platform backfill priority. The era taxonomy and entity-loading-stack decisions (the latter: shelve, #503) are recorded there as decided; the separate SQLite validator remains approved as future work.
 
 2. **Pillar 3a credentials + smoke test.** Issue #226. Joe creates the GitHub App, adds the 11 secrets, runs three smoke tests (scrape-fail, dedup, full success). ~30 min after approval.
 
