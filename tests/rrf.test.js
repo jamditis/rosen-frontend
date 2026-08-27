@@ -16,7 +16,7 @@ import {
   DEFAULT_RRF_K,
   LABEL_LEXICAL,
   LABEL_SEMANTIC,
-} from '../data/lib/rrf.js';
+} from '../frontend/utils/rrf.js';
 
 // A small worked example reused across tests. With k=60 the per-rank weights are
 // 1/61, 1/62, 1/63 for ranks 1, 2, 3.

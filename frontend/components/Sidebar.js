@@ -1,12 +1,13 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { html } from '../html.js?v=3.8.32';
+import { html } from '../html.js?v=3.8.33';
 import { X, Search, XCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import {
   findSearchSuggestions,
   normalizeForSearch,
-} from '../utils/searchNormalize.js?v=3.8.32';
-import { CONTENT_TYPE_OPTIONS } from '../constants.js?v=3.8.32';
+} from '../utils/searchNormalize.js?v=3.8.33';
+import { CONTENT_TYPE_OPTIONS } from '../constants.js?v=3.8.33';
+import SemanticSearchToggle from './SemanticSearchToggle.js?v=3.8.33';
 
 const Sidebar = ({
   facets,
@@ -16,6 +17,9 @@ const Sidebar = ({
   onClose,
   resetFilters,
   autocompleteIndex,
+  // Opt-in semantic search state owned by App (#279). Absent in shells that do
+  // not offer the toggle, so the search group renders without it.
+  semanticSearch = null,
   variant = 'standard',
 }) => {
   const [suggestions, setSuggestions] = useState([]);
@@ -214,6 +218,12 @@ const Sidebar = ({
               `}
             </div>
             <p className="archive-filter-sidebar__hint">Searches metadata, article text, and social post text</p>
+            ${semanticSearch && html`
+              <${SemanticSearchToggle}
+                ...${semanticSearch}
+                inputId=${`${searchInputId}-semantic`}
+              />
+            `}
           </div>
 
           <div className="archive-filter-group border-t border-stone-200 pt-4">

@@ -22,11 +22,12 @@
  * `chipFor(sources)` ('kw', 'sem', 'kw·sem') is the result-chip badge #279
  * wants with no separate tagging pass.
  *
- * Pure and side-effect free: rank lists in -> fused ranking out. Not wired into
- * the frontend; it is the one piece of #279 that is independent of the still-open
- * runtime dependencies (#276 runtime FTS, #278/#397 cosine worker), so it is
- * buildable and testable now. See the issue thread for why the rest of #279 is
- * gated on those landing first.
+ * Pure and side-effect free: rank lists in -> fused ranking out. It was built
+ * first, before its two legs existed, and lived under data/lib/ while it was
+ * inert. It now runs in the browser: App.js fuses the MiniSearch hit order with
+ * the semantic hit order here, so the module moved into frontend/utils/ where
+ * the deploy walk and the service-worker shell pick it up like any other
+ * runtime module. It has no build-time caller.
  */
 
 // Smoothing constant. Larger k flattens the contribution of top ranks (so deep

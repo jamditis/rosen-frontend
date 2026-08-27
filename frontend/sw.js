@@ -13,7 +13,7 @@
 // Cache version is tied to the app version in version.json. Bumping it on every
 // deploy (alongside index.html and the ?v= import strings) makes the activate
 // handler below drop stale cache namespaces after the release takes control.
-const CACHE_VERSION = '3.8.32';
+const CACHE_VERSION = '3.8.33';
 const CACHE_NAME = `jrda-cache-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `jrda-data-${CACHE_VERSION}`;
 
@@ -63,6 +63,7 @@ const APP_SHELL_FRONTEND_FILES = [
   'components/QueryBuilder.js',
   'components/RecordModal.js',
   'components/RecordView.js',
+  'components/SemanticSearchToggle.js',
   'components/Sidebar.js',
   'components/StartHerePage.js',
   'components/ThreadModal.js',
@@ -81,7 +82,13 @@ const APP_SHELL_FRONTEND_FILES = [
   'services/privacyRoute.js',
   'services/router.js',
   'services/searchIndexLoader.js',
+  // The two recall workers and their clients. The workers are fetched under the
+  // same versioned URLs the clients construct, so caching them here keeps a
+  // worker and the module it imports on one release.
+  'services/embeddings-worker.js',
   'services/semanticRecall.js',
+  'services/semantic-search-worker.js',
+  'services/semanticSearch.js',
   'services/siteTools.js',
   'services/sqliteService.js',
   'services/tourState.js',
@@ -99,6 +106,7 @@ const APP_SHELL_FRONTEND_FILES = [
   'utils/recordSort.js',
   'utils/reportDeepLink.js',
   'utils/reportSubmit.js',
+  'utils/rrf.js',
   'utils/sanitizeHref.js',
   'utils/searchConfig.js',
   'utils/searchNormalize.js',
