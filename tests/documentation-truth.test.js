@@ -35,18 +35,35 @@ describe('documentation truth', () => {
     const workflowsDir = path.join(rootDir, '.github', 'workflows');
     const realWorkflows = fs
       .readdirSync(workflowsDir)
-      .filter((name) => name.endsWith('.yml'))
+      .filter((name) => /\.ya?ml$/.test(name))
       .sort();
+
+    // Anchor the scan to the .github/workflows/ tree block itself, not the
+    // whole file — a filename mentioned elsewhere in prose (e.g. in the
+    // "Preview audit" section) must not satisfy this check.
+    const lines = guide.split('\n');
+    const headerIndex = lines.findIndex((line) => line.includes('.github/workflows/'));
+    assert.ok(headerIndex !== -1, 'CLAUDE.md must have a .github/workflows/ tree entry');
+
+    const treeBlockLines = [];
+    for (let i = headerIndex + 1; i < lines.length; i++) {
+      if (/^│\s+[├└]──/.test(lines[i])) {
+        treeBlockLines.push(lines[i]);
+      } else {
+        break;
+      }
+    }
+    const treeBlock = treeBlockLines.join('\n');
 
     for (const name of realWorkflows) {
       assert.ok(
-        guide.includes(name),
-        `CLAUDE.md's workflow list is missing ${name}, which exists in .github/workflows/`,
+        treeBlock.includes(name),
+        `CLAUDE.md's .github/workflows/ tree block is missing ${name}, which exists in .github/workflows/`,
       );
     }
 
-    const countMatch = guide.match(/CI\/CD \((\d+) workflows\)/);
-    assert.ok(countMatch, 'CLAUDE.md must state the workflow count as "CI/CD (N workflows)"');
+    const countMatch = lines[headerIndex].match(/CI\/CD \((\d+) workflows\)/);
+    assert.ok(countMatch, 'CLAUDE.md must state the workflow count as "CI/CD (N workflows)" on the tree entry line');
     assert.strictEqual(
       Number(countMatch[1]),
       realWorkflows.length,
@@ -54,9 +71,10 @@ describe('documentation truth', () => {
     );
   });
 
-  it('does not point agents at the nonexistent backend/tools/backfill/ path', () => {
+  it('does not point agents at the nonexistent backend/tools/ path', () => {
     const backfillWorker = path.join(rootDir, 'backend', 'scripts', 'backfill', 'backfill_worker.py');
     assert.ok(fs.existsSync(backfillWorker), 'backend/scripts/backfill/backfill_worker.py must exist');
+    assert.ok(!fs.existsSync(path.join(rootDir, 'backend', 'tools')), 'backend/tools/ must not exist');
 
     for (const docPath of [
       'CLAUDE.md',
@@ -65,8 +83,8 @@ describe('documentation truth', () => {
       const contents = fs.readFileSync(path.join(rootDir, docPath), 'utf8');
       assert.doesNotMatch(
         contents,
-        /tools\/backfill\/backfill_worker\.py/,
-        `${docPath} must not reference the nonexistent backend/tools/backfill/ path`,
+        /tools\/(backfill|diagnostics)\//,
+        `${docPath} must not reference the nonexistent backend/tools/ path`,
       );
     }
   });
@@ -86,7 +104,7 @@ describe('documentation truth', () => {
     );
     assert.doesNotMatch(
       workerSource,
-      /argparse/,
+      /\bimport\s+argparse\b|\bArgumentParser\(/,
       'this test assumes backfill_worker.py takes no CLI arguments; update the doc assertion above if it grows a parser',
     );
   });

@@ -359,9 +359,9 @@ cp backend/.env.example backend/.env
 
 ### Key commands
 ```bash
-poetry run python src/workflow.py                       # Main pipeline
-poetry run python tools/diagnostics/data_deduper.py     # Dedup data
-poetry run python -m scripts.backfill.backfill_worker   # Backfill pull quotes and raw text
+poetry run python src/rosen_scraper/workflow.py          # Main pipeline
+poetry run python scripts/diagnostics/data_deduper.py    # Dedup data
+poetry run python -m scripts.backfill.backfill_worker    # Backfill pull quotes and raw text
 ```
 
 Supports: Articles, Videos, Twitter/X, Tumblr, Newspaper Clippings (PDF OCR).
