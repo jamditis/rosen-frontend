@@ -19,7 +19,7 @@ import {
   reciprocalRankFusion,
   LABEL_LEXICAL,
   LABEL_SEMANTIC,
-} from './rrf.js?v=3.8.34';
+} from './rrf.js?v=3.8.35';
 
 /** Sort key for the fused hybrid order. Offered only while a query is active. */
 export const RELEVANCE_SORT = 'relevance';
@@ -35,6 +35,26 @@ export const DEFAULT_SORT = 'date-desc';
  * keyword chip: an unlabelled card beside labelled ones reads as a bug.
  */
 export const LEXICAL_SIGNAL = chipFor([LABEL_LEXICAL]);
+
+const SEARCH_SIGNAL_PRESENTATION = Object.freeze({
+  [LEXICAL_SIGNAL]: Object.freeze({
+    label: 'Matching words',
+    description: 'This record uses words from your search.',
+  }),
+  [chipFor([LABEL_SEMANTIC])]: Object.freeze({
+    label: 'Related meaning',
+    description: 'This record discusses the idea in your search, even when it uses different words.',
+  }),
+  [chipFor([LABEL_LEXICAL, LABEL_SEMANTIC])]: Object.freeze({
+    label: 'Words and meaning',
+    description: 'This record matches both the words and the idea in your search.',
+  }),
+});
+
+/** Convert internal ranking source codes into reader-facing language. */
+export function presentSearchSignal(signal) {
+  return SEARCH_SIGNAL_PRESENTATION[signal] || SEARCH_SIGNAL_PRESENTATION[LEXICAL_SIGNAL];
+}
 
 /**
  * Fuse the two hit orders into one ranking plus its provenance chips.
@@ -118,6 +138,7 @@ export default {
   RELEVANCE_SORT,
   DEFAULT_SORT,
   LEXICAL_SIGNAL,
+  presentSearchSignal,
   buildSearchRanking,
   orderByFusedRank,
   sortForSemanticToggle,

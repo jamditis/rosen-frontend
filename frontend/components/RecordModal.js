@@ -1,15 +1,15 @@
 
 import { useEffect, useRef, useState } from 'react';
-import { html } from '../html.js?v=3.8.34';
+import { html } from '../html.js?v=3.8.35';
 import { X, ExternalLink, ArrowLeft, ArrowRight, Quote, CheckCircle, Link, Share2, Loader2, AlertTriangle, RefreshCw, Sparkles } from 'lucide-react';
-import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.8.34';
-import { ThreadModal } from './ThreadModal.js?v=3.8.34';
-import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.8.34';
-import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.8.34';
-import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.34';
-import { canonicalRecordUrl, shareRecordUrl } from '../utils/recordDeepLink.js?v=3.8.34';
-import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.34';
-import { requestSemanticNeighbors, selectSemanticRecords } from '../services/semanticRecall.js?v=3.8.34';
+import { fetchRecordDetails, fetchEntitiesData, areEntitiesLoaded, calculateEntityConnectionStrength, getEntitiesByRecord } from '../services/archiveService.js?v=3.8.35';
+import { ThreadModal } from './ThreadModal.js?v=3.8.35';
+import { splitUrlsForLinkify } from '../utils/linkify.js?v=3.8.35';
+import { sanitizeHref } from '../utils/sanitizeHref.js?v=3.8.35';
+import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.35';
+import { canonicalRecordUrl, shareRecordUrl } from '../utils/recordDeepLink.js?v=3.8.35';
+import { acquireBodyScrollLock } from '../services/bodyScrollLock.js?v=3.8.35';
+import { requestSemanticNeighbors, selectSemanticRecords } from '../services/semanticRecall.js?v=3.8.35';
 
 const linkifyText = (text) => {
   const parts = splitUrlsForLinkify(text);
@@ -667,7 +667,7 @@ const RecordModal = ({ record, allRecords, isOpen, onClose, onNext, onPrev, onSe
                         >
                           <span className="archive-record-related__utility">
                             <span>${match.date || match.year || 'Undated'}</span>
-                            <span className="archive-record-semantic__signal">sem</span>
+                            <span className="archive-record-semantic__signal">Related meaning</span>
                           </span>
                           <strong>${match.title}</strong>
                           <span>${match.pub || match.author || 'Archive record'}</span>

@@ -26,6 +26,7 @@ import {
   readVectorAt,
   sha256Hex,
   buildEmbeddingIndex,
+  selectPublishedDocuments,
   embedArticle,
   buildEmbeddings,
 } from '../data/lib/embeddings-builder.js';
@@ -167,6 +168,17 @@ test('buildEmbeddingIndex: records model, dim, version, digest, and id order', (
   assert.equal(idx.count, 2);
   assert.equal(idx.binarySha256, digest);
   assert.deepEqual(idx.ids, ['RECORD-1', 'RECORD-2']);
+});
+
+test('selectPublishedDocuments includes every non-social searchable record', () => {
+  const selected = selectPublishedDocuments({
+    records: [
+      { id: 'RECORD-A', type: 'article', title: 'Article', summary: 'Summary' },
+      { id: 'DISSERTATION-A', type: 'Dissertation', title: 'Dissertation', summary: 'Summary' },
+      { id: 'BSKY-A', type: 'social', title: 'Post', summary: 'Summary' },
+    ],
+  });
+  assert.deepEqual(selected.map(record => record.id), ['RECORD-A', 'DISSERTATION-A']);
 });
 
 test('embedArticle: long body triggers two encodes, short body one', async () => {

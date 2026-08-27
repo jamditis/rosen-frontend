@@ -199,9 +199,14 @@ describe('deploy data manifest classifies every data file', () => {
     }
     assert.ok(deployedDataFiles().has('data/wiki-seed.json'),
       'wiki-seed.json must be in _DEPLOY_DATA_FILES (the #527 fix)');
-    for (const artifact of ['data/archive-embeddings.bin', 'data/archive-embeddings.json']) {
+    for (const artifact of [
+      'data/archive-embeddings.bin',
+      'data/archive-embeddings.json',
+      'data/archive-social-embeddings.bin',
+      'data/archive-social-embeddings.json',
+    ]) {
       assert.ok(deployedDataFiles().has(artifact),
-        `similar-in-theme artifact must deploy: ${artifact}`);
+        `meaning-search artifact must deploy: ${artifact}`);
     }
   });
 });

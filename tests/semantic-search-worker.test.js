@@ -20,12 +20,15 @@ import { fileURLToPath } from 'node:url';
 import {
   DEFAULT_MIN_SCORE,
   DEFAULT_QUERY_K,
+  DEFAULT_SOCIAL_MIN_SCORE,
+  DEFAULT_SOCIAL_QUERY_K,
   MAX_QUERY_CHARS,
   QUERY_MODEL_ID,
   QUERY_PREFIX,
   TRANSFORMERS_MODULE_URL,
   buildQueryText,
   rankQuery,
+  rankSemanticStores,
   registerSemanticSearchWorker,
 } from '../frontend/services/semantic-search-worker.js';
 import { EMBED_DIM } from '../frontend/services/embeddings-worker.js';
@@ -128,6 +131,19 @@ test('fails loudly on a query vector of the wrong width', () => {
   );
 });
 
+test('expands results across curated and social stores without letting posts take over', () => {
+  const curated = axisStore();
+  const social = axisStore();
+  social.ids = ['BSKY-A', 'BSKY-B', 'BSKY-C'];
+  const matches = rankSemanticStores(
+    { curated, social },
+    mixedQuery([0.9, 0.8, 0.7]),
+    { minScore: 0, socialMinScore: 0, k: 4, socialK: 1 },
+  );
+  assert.equal(matches.length, 4);
+  assert.equal(matches.filter(match => match.id.startsWith('BSKY-')).length, 1);
+});
+
 // A scope stand-in with the two methods the worker boundary needs.
 function fakeScope() {
   const sent = [];
@@ -140,11 +156,17 @@ function fakeScope() {
   };
 }
 
-function workerFixture({ loadStore, createEncoder } = {}) {
+function workerFixture({
+  loadStore,
+  loadCuratedStore,
+  loadSocialStore,
+  createEncoder,
+} = {}) {
   const scope = fakeScope();
   const encodes = [];
   registerSemanticSearchWorker(scope, {
-    loadStore: loadStore || (async () => axisStore()),
+    loadCuratedStore: loadCuratedStore || loadStore || (async () => axisStore()),
+    loadSocialStore: loadSocialStore || (async () => null),
     createEncoder: createEncoder || (async () => async (text) => {
       encodes.push(text);
       return mixedQuery([0.9, 0.4, 0.1]);
@@ -178,6 +200,16 @@ test('warmup loads the artifact and reports coverage without ranking', async () 
   assert.deepEqual(encodes, []);
 });
 
+test('coverage includes the edited-record and social stores', async () => {
+  const { scope } = workerFixture({
+    loadSocialStore: async () => axisStore(),
+  });
+  scope.deliver({ type: 'semantic-warmup', requestId: 'w1' });
+  await new Promise(resolve => setTimeout(resolve, 0));
+
+  assert.equal(scope.sent[0].count, 6);
+});
+
 test('reports a failed artifact load as an error the client can fall back from', async () => {
   const { scope } = workerFixture({
     loadStore: async () => { throw new Error('embeddings binary: 404'); },
@@ -206,6 +238,36 @@ test('retries the load on a later request instead of failing forever', async () 
   assert.equal(scope.sent[0].type, 'semantic-query-error');
   assert.equal(scope.sent[1].type, 'semantic-query-result');
   assert.equal(attempts, 2);
+});
+
+test('retries a failed social load without reloading the curated store', async () => {
+  let curatedLoads = 0;
+  let socialLoads = 0;
+  const socialStore = axisStore();
+  socialStore.ids = ['BSKY-A', 'BSKY-B', 'BSKY-C'];
+  const { scope } = workerFixture({
+    loadCuratedStore: async () => {
+      curatedLoads += 1;
+      return axisStore();
+    },
+    loadSocialStore: async () => {
+      socialLoads += 1;
+      if (socialLoads === 1) throw new Error('temporary social outage');
+      return socialStore;
+    },
+  });
+
+  scope.deliver({ type: 'semantic-warmup', requestId: 'w1' });
+  await new Promise(resolve => setTimeout(resolve, 0));
+  scope.deliver({ type: 'semantic-query', requestId: 'q1', query: 'press', minScore: 0 });
+  await new Promise(resolve => setTimeout(resolve, 0));
+
+  assert.equal(scope.sent[0].type, 'semantic-warmup-result');
+  assert.equal(scope.sent[0].count, 3);
+  assert.equal(scope.sent[1].type, 'semantic-query-result');
+  assert.equal(scope.sent[1].count, 6);
+  assert.equal(curatedLoads, 1);
+  assert.equal(socialLoads, 2);
 });
 
 test('loads the artifact and the model once across many queries', async () => {
@@ -241,5 +303,7 @@ test('rejects a request with no usable requestId', async () => {
 
 test('defaults keep one query cheap and its matches relevant', () => {
   assert.ok(DEFAULT_QUERY_K > 0 && DEFAULT_QUERY_K <= 50);
+  assert.ok(DEFAULT_SOCIAL_QUERY_K > 0 && DEFAULT_SOCIAL_QUERY_K < DEFAULT_QUERY_K);
   assert.ok(DEFAULT_MIN_SCORE > 0 && DEFAULT_MIN_SCORE < 1);
+  assert.ok(DEFAULT_SOCIAL_MIN_SCORE > DEFAULT_MIN_SCORE && DEFAULT_SOCIAL_MIN_SCORE < 1);
 });

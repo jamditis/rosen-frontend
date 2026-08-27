@@ -3522,6 +3522,98 @@ mark {
   line-height: var(--line-height-normal);
 }
 
+.archive-semantic-toggle__help {
+  min-height: var(--archive-target-min);
+  padding: 0;
+  border: 0;
+  color: var(--archive-sky-dark);
+  background: transparent;
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-bold);
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
+  cursor: pointer;
+}
+
+.archive-semantic-toggle__help:hover {
+  color: var(--archive-ink);
+}
+
+.archive-semantic-help {
+  width: min(38rem, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  padding: 0;
+  border: 2px solid var(--archive-ink);
+  color: var(--archive-ink);
+  background: var(--archive-paper);
+  box-shadow: var(--archive-shadow-large);
+}
+
+.archive-semantic-help::backdrop {
+  background: var(--archive-backdrop);
+}
+
+.archive-semantic-help__panel {
+  max-height: calc(100dvh - 2.25rem);
+  overflow-y: auto;
+}
+
+.archive-semantic-help__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.25rem 1rem;
+  border-bottom: 2px solid var(--archive-ink);
+}
+
+.archive-semantic-help__header h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--font-size-xl);
+}
+
+.archive-semantic-help__close {
+  display: grid;
+  flex: 0 0 auto;
+  min-width: var(--archive-target-min);
+  min-height: var(--archive-target-min);
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--archive-rule-strong);
+  background: var(--archive-paper-deep);
+  line-height: 0;
+  cursor: pointer;
+}
+
+.archive-semantic-help__close svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.archive-semantic-help__body {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+}
+
+.archive-semantic-help__body :is(h3, p, ul) {
+  margin: 0;
+}
+
+.archive-semantic-help__body h3 {
+  font-family: var(--font-display);
+  font-size: var(--font-size-base);
+}
+
+.archive-semantic-help__body ul {
+  display: grid;
+  gap: 0.65rem;
+  padding-left: 1.25rem;
+}
+
 .archive-filter-group {
   padding-top: 1rem;
   border-top-color: var(--archive-rule);
@@ -4192,7 +4284,7 @@ mark {
   border-color: var(--archive-amber);
 }
 
-/* Hybrid-search provenance chip: kw, sem, or kw·sem (#279). */
+/* Plain-language source label for hybrid search results (#279). */
 .archive-record-card__label--signal {
   border-style: dashed;
   color: var(--archive-ink-muted);

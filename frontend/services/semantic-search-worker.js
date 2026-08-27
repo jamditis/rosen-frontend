@@ -31,7 +31,7 @@ import {
   normalizeInPlace,
   DEFAULT_EMBEDDINGS_BIN_URL,
   DEFAULT_EMBEDDINGS_INDEX_URL,
-} from './embeddings-worker.js?v=3.8.34';
+} from './embeddings-worker.js?v=3.8.35';
 
 // The sentence-transformer that produced data/archive-embeddings.bin. A query
 // encoded by any other model lands in a different space and ranks noise.
@@ -47,6 +47,13 @@ export const QUERY_PREFIX =
 // a browser module by the CDN the app already imports React from.
 export const TRANSFORMERS_MODULE_URL =
   'https://esm.sh/@huggingface/transformers@4.2.0';
+
+// Semantic search loads this larger social store. The similar-in-theme feature
+// continues to load only the smaller edited-record store.
+export const DEFAULT_SOCIAL_EMBEDDINGS_BIN_URL =
+  '../../data/archive-social-embeddings.bin?v=3.8.35';
+export const DEFAULT_SOCIAL_EMBEDDINGS_INDEX_URL =
+  '../../data/archive-social-embeddings.json?v=3.8.35';
 
 /**
  * Every host this worker reaches at runtime, so the deployed Content Security
@@ -77,7 +84,7 @@ export const ENCODER_CONNECT_HOSTS = Object.freeze([
   'https://cdn.jsdelivr.net',
 ]);
 
-// How many articles one query may return, and how similar a match must be to
+// How many records one query may return, and how similar a match must be to
 // count.
 //
 // Measured against the committed vectors with the shipped model: off-topic and
@@ -89,7 +96,12 @@ export const ENCODER_CONNECT_HOSTS = Object.freeze([
 // tests/semantic-search-score-floor.test.js holds both properties to the real
 // artifact. Both values are overridable per request.
 export const DEFAULT_QUERY_K = 25;
+export const DEFAULT_SOCIAL_QUERY_K = 8;
 export const DEFAULT_MIN_SCORE = 0.6;
+// The social corpus is 25 times larger and its short posts produce more chance
+// similarities. Its higher floor removes those false matches while retaining
+// the measured on-topic social results.
+export const DEFAULT_SOCIAL_MIN_SCORE = 0.65;
 
 /** Longest query text the encoder accepts, so a paste cannot stall the worker. */
 export const MAX_QUERY_CHARS = 500;
@@ -126,6 +138,42 @@ export function rankQuery(store, queryVector, { k = DEFAULT_QUERY_K, minScore = 
   return scored.slice(0, k);
 }
 
+/**
+ * Rank both stores while keeping short social posts from taking over a page.
+ */
+export function rankSemanticStores(
+  { curated, social },
+  queryVector,
+  {
+    k = DEFAULT_QUERY_K,
+    socialK = DEFAULT_SOCIAL_QUERY_K,
+    minScore = DEFAULT_MIN_SCORE,
+    socialMinScore = DEFAULT_SOCIAL_MIN_SCORE,
+  } = {},
+) {
+  if (!curated) throw new Error('semantic search: curated store is required');
+  if (!Number.isInteger(socialK) || socialK < 0) {
+    throw new Error('semantic search: socialK must be a non-negative integer');
+  }
+
+  const matches = rankQuery(curated, queryVector, { k, minScore });
+  if (social && socialK > 0) {
+    matches.push(...rankQuery(social, queryVector, {
+      k: Math.min(k, socialK),
+      minScore: socialMinScore,
+    }));
+  }
+
+  const bestById = new Map();
+  for (const match of matches) {
+    const previous = bestById.get(match.id);
+    if (!previous || match.score > previous.score) bestById.set(match.id, match);
+  }
+  return [...bestById.values()]
+    .sort((a, b) => b.score - a.score || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+    .slice(0, k);
+}
+
 /** Add the retrieval prefix and trim the query to the encoder's input budget. */
 export function buildQueryText(query) {
   const text = String(query ?? '').trim();
@@ -154,25 +202,31 @@ async function defaultCreateEncoder() {
  * Requests:
  *   `{ type: 'semantic-warmup', requestId }` loads the artifact and the model
  *   without ranking anything, so the toggle can report readiness and the number
- *   of articles the semantic leg covers.
- *   `{ type: 'semantic-query', requestId, query, k?, minScore? }` ranks one query.
+ *   of records the semantic leg covers.
+ *   `{ type: 'semantic-query', requestId, query, k?, socialK?, minScore?,
+ *      socialMinScore? }`
+ *   ranks one query.
  *
  * Responses carry the same `requestId` so the caller can discard a late answer:
  *   `{ type: 'semantic-warmup-result', requestId, count }`
  *   `{ type: 'semantic-query-result', requestId, query, matches, count }`
  *   `{ type: 'semantic-query-error', requestId, error }`
  *
- * A failed load clears its cached promise, so a later request retries after a
- * transient network or deploy error instead of failing forever.
+ * A failed required load clears its cached promise, so a later request retries
+ * after a transient network or deploy error. The optional social store fails
+ * open without clearing the curated store, then retries independently.
  */
 export function registerSemanticSearchWorker(
   scope,
   {
-    loadStore = () =>
-      loadEmbeddingStore(
-        DEFAULT_EMBEDDINGS_BIN_URL,
-        DEFAULT_EMBEDDINGS_INDEX_URL,
-      ),
+    loadCuratedStore = () => loadEmbeddingStore(
+      DEFAULT_EMBEDDINGS_BIN_URL,
+      DEFAULT_EMBEDDINGS_INDEX_URL,
+    ),
+    loadSocialStore = () => loadEmbeddingStore(
+      DEFAULT_SOCIAL_EMBEDDINGS_BIN_URL,
+      DEFAULT_SOCIAL_EMBEDDINGS_INDEX_URL,
+    ),
     createEncoder = defaultCreateEncoder,
   } = {},
 ) {
@@ -184,20 +238,45 @@ export function registerSemanticSearchWorker(
     throw new Error('semantic search worker: invalid worker scope');
   }
 
-  let storePromise;
+  let curatedStorePromise;
+  let socialStorePromise;
   let encoderPromise;
 
-  const getStore = () => {
-    if (!storePromise) {
-      storePromise = Promise.resolve()
-        .then(() => loadStore())
+  const getCuratedStore = () => {
+    if (!curatedStorePromise) {
+      curatedStorePromise = Promise.resolve()
+        .then(() => loadCuratedStore())
         .catch((error) => {
-          storePromise = undefined;
+          curatedStorePromise = undefined;
           throw error;
         });
     }
-    return storePromise;
+    return curatedStorePromise;
   };
+
+  const getSocialStore = () => {
+    if (!socialStorePromise) {
+      socialStorePromise = Promise.resolve()
+        .then(() => loadSocialStore())
+        .catch((error) => {
+          socialStorePromise = undefined;
+          console.warn('semantic search: social store unavailable', error);
+          return null;
+        });
+    }
+    return socialStorePromise;
+  };
+
+  const getStores = async () => {
+    const [curated, social] = await Promise.all([
+      getCuratedStore(),
+      getSocialStore(),
+    ]);
+    return { curated, social };
+  };
+
+  const coveredCount = stores =>
+    stores.curated.ids.length + (stores.social?.ids.length || 0);
 
   const getEncoder = () => {
     if (!encoderPromise) {
@@ -228,27 +307,30 @@ export function registerSemanticSearchWorker(
       }
 
       if (type === 'semantic-warmup') {
-        const [store] = await Promise.all([getStore(), getEncoder()]);
+        const [stores] = await Promise.all([getStores(), getEncoder()]);
         scope.postMessage({
           type: 'semantic-warmup-result',
           requestId,
-          count: store.ids.length,
+          count: coveredCount(stores),
         });
         return;
       }
 
       const text = buildQueryText(request.query);
-      const [store, encode] = await Promise.all([getStore(), getEncoder()]);
-      const matches = rankQuery(store, await encode(text), {
+      const [stores, encode] = await Promise.all([getStores(), getEncoder()]);
+      const matches = rankSemanticStores(stores, await encode(text), {
         k: request.k ?? DEFAULT_QUERY_K,
+        socialK: request.socialK ?? DEFAULT_SOCIAL_QUERY_K,
         minScore: request.minScore ?? DEFAULT_MIN_SCORE,
+        socialMinScore:
+          request.socialMinScore ?? request.minScore ?? DEFAULT_SOCIAL_MIN_SCORE,
       });
       scope.postMessage({
         type: 'semantic-query-result',
         requestId,
         query: request.query,
         matches,
-        count: store.ids.length,
+        count: coveredCount(stores),
       });
     } catch (error) {
       scope.postMessage({
