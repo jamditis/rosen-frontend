@@ -1050,6 +1050,35 @@ def render_markdown(report: dict, generated_on: str) -> str:
             )
         add("")
 
+    add("## What counts as confirmed")
+    add("")
+    add(
+        "A work is present only when one of three tiers matches it to an "
+        "archive row. Every other outcome is review or missing."
+    )
+    add("")
+    add(
+        "- `exact_url` — the source url is an archive row's url, after both are "
+        "reduced to one key. This is the strongest evidence the report has."
+    )
+    add(
+        "- `body_fingerprint` — the first twelve words of the post's own text "
+        "match the opening of a row. A fingerprint that two rows share is "
+        "dropped, never resolved to one of them."
+    )
+    add(
+        "- `title_strong` — same publication date, and the titles agree. Near "
+        "identical token sets agree. One title inside another agrees only when "
+        "the overlap is still high and the extra words are not a part marker, "
+        "because serial posts differ by a part marker alone."
+    )
+    add(
+        "- One archive row holds one work. If two source works both reach a "
+        "present grade against the same row, only the stronger tier keeps it "
+        "and the other goes to review."
+    )
+    add("")
+
     distinct = report["distinct_works"]
     dt = distinct["totals"]
 

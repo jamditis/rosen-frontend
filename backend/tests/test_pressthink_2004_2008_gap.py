@@ -1052,6 +1052,19 @@ def test_the_report_does_not_change_with_the_inventory_order():
     assert forward == backward
 
 
+def test_markdown_says_what_each_tier_needs_before_it_confirms():
+    # A reader who sees a work in the review table has to be able to find out
+    # what the matcher wanted and did not get.
+    inv = gap.load_inventory(FIXTURE_INVENTORY)
+    text = gap.render_markdown(gap.build_report([inv], []), "2026-08-27")
+    assert "## What counts as confirmed" in text
+    assert "`exact_url`" in text
+    assert "`body_fingerprint`" in text
+    assert "`title_strong`" in text
+    assert "part marker" in text
+    assert "One archive row holds one work." in text
+
+
 def test_markdown_decomposes_the_follow_up_work_and_links_the_owners():
     inv = gap.load_inventory(FIXTURE_INVENTORY)
     report = gap.build_report([inv], [])
