@@ -698,17 +698,17 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "deferred",
       "endpointDivergence": {
-        "violatingRows": 23,
-        "totalRows": 289,
+        "violatingRows": 22,
+        "totalRows": 291,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00107_REL_001",
           "RECORD-00355_REL_003",
           "RECORD-00446_REL_006",
           "RECORD-00537_REL_006",
-          "RECORD-00535_REL_001"
+          "RECORD-00001_REL_007"
         ],
-        "note": "23 of 289 current Supports rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Supports is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+        "note": "22 of 291 current Supports rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Supports is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes. RECORD-00535_REL_001 (Reporters Without Borders Supports PressThink) dropped out of this count on 2026-08-27 when PressThink's duplicate Work-typed entity W0666 was merged into the Organization-typed O0033 (issue #859), since Organization is an allowed Supports target and Work was not."
       },
       "directionalContradictions": {
         "pairCount": 8,

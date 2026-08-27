@@ -4654,8 +4654,8 @@ RECORD-00626_REL_001,RECORD-00626,P0005,Jay Rosen,Pioneered,C0048,Civic Journali
 RECORD-00626_REL_003,RECORD-00626,P1673,Joshua Micah Marshall,Founded By,O0073,Talking Points Memo,Joshua Micah Marshall’s Talking Points Memo and its offspring.,1,2025-10-29
 RECORD-00654_REL_004,RECORD-00654,P0005,Jay Rosen,Pioneered,C0006,Transparency,"Third pillar: transparency, also called disclosure, so we know where you’re coming from and what your stake is in the matter under review, if any.",0.7,2025-10-29
 RECORD-00660_REL_001,RECORD-00660,O1234,News Creator Corps,Inspired By,P0005,Jay Rosen,"Rosen wrote in a blog post laying out the thinking behind his new position... This is the foundational idea behind NCC: the way people get their information has changed, and the way to make sure they’",0.9,2025-10-29
-RECORD-00535_REL_001,RECORD-00535,O0207,Reporters Without Borders,Supports,W0666,PressThink,"PressThink, I learned today, won its first ever award: the Reporters Without Borders Freedom Blog Award",1,2026-05-27
-RECORD-00535_REL_002,RECORD-00535,W0666,PressThink,Mentions,E0223,Reporters Without Borders Freedom Blog Award,PressThink won for 'the Americas.',1,2026-05-27
+RECORD-00535_REL_001,RECORD-00535,O0207,Reporters Without Borders,Supports,O0033,PressThink,"PressThink, I learned today, won its first ever award: the Reporters Without Borders Freedom Blog Award",1,2026-05-27
+RECORD-00535_REL_002,RECORD-00535,O0033,PressThink,Mentions,E0223,Reporters Without Borders Freedom Blog Award,PressThink won for 'the Americas.',1,2026-05-27
 RECORD-00535_REL_003,RECORD-00535,O0207,Reporters Without Borders,Founded By,E0223,Reporters Without Borders Freedom Blog Award,Reporters Without Borders Freedom Blog Award for sites 'defending freedom of expression.',1,2026-05-27
 RECORD-00535_REL_004,RECORD-00535,P2216,Jeff Ooi,Owns,W0667,Screenshots,Screenshots…by Jeff Ooi,1,2026-05-27
 RECORD-00535_REL_005,RECORD-00535,P2215,Mojtaba Saminejad,Mentions,E0223,Reporters Without Borders Freedom Blog Award,especially with Mojtaba Saminejad of Iran (whose story of imprisonment is told here and here),1,2026-05-27
@@ -4664,7 +4664,7 @@ RECORD-00535_REL_007,RECORD-00535,P0024,Bob Franken,Originated By,C0654,Citizen 
 RECORD-00535_REL_008,RECORD-00535,W0296,Bloggers vs. Journalists is Over,Published In,O1311,Berkman Center for Internet and Society,"In my paper for Harvard's Berkman Center, Bloggers vs. Journalists is Over",1,2026-05-27
 RECORD-00535_REL_009,RECORD-00535,W0296,Bloggers vs. Journalists is Over,Discusses,C0656,First Amendment franchise,"the extension to many more people of a First Amendment franchise, the right to publish your thoughts to the world",1,2026-05-27
 RECORD-00535_REL_010,RECORD-00535,C0656,First Amendment franchise,Inspired By,P1331,A.J. Liebling,adding a coda to A.J. Liebling's famous remark: 'Freedom of the press belongs to those who own one',1,2026-05-27
-RECORD-00535_REL_011,RECORD-00535,C0655,Press Nation,Originated By,W0666,PressThink,"Professional journalists are one tribe in Press Nation, and there are others.",0.9,2026-05-27
+RECORD-00535_REL_011,RECORD-00535,C0655,Press Nation,Originated By,O0033,PressThink,"Professional journalists are one tribe in Press Nation, and there are others.",0.9,2026-05-27
 RECORD-00535_REL_012,RECORD-00535,W0672,The 11 Layers of Citizen Journalism,Originated By,P0898,Steve Outing,"Steve Outing of Poynter, The 11 Layers of Citizen Journalism",1,2026-05-27
 RECORD-00535_REL_013,RECORD-00535,P0898,Steve Outing,Affiliated With,O0309,Poynter Institute,Steve Outing of Poynter,1,2026-05-27
 RECORD-00535_REL_014,RECORD-00535,P0863,Floyd Abrams,Supports,P1043,Judith Miller,"Floyd Abrams, the attorney defending Judith Miller and Matthew Cooper in their refusal to name confidential sources",1,2026-05-27
@@ -4673,10 +4673,10 @@ RECORD-00535_REL_016,RECORD-00535,P1043,Judith Miller,Affiliated With,O0002,The 
 RECORD-00535_REL_017,RECORD-00535,P0863,Floyd Abrams,Supports,C0656,First Amendment franchise,I think a blogger ought to be protected also. It seems to me that the purpose of this privilege is to protect the people who play a function in American life.,1,2026-05-27
 RECORD-00535_REL_018,RECORD-00535,P1057,Michael Kinsley,Affiliated With,O0028,Los Angeles Times,"the boss of the opinion pages, Michael Kinsley, brings them down from the mountaintop",1,2026-05-27
 RECORD-00535_REL_019,RECORD-00535,P1198,Nick Kristof,Discusses,P2217,Mukhtaran Bibi,"the Pakistani anti-rape activist Mukhtaran Bibi, a remarkable and courageous woman detained by the authorities. Read about her in Nick Kristof's column.",1,2026-05-27
-RECORD-00535_REL_020,RECORD-00535,W0666,PressThink,Discusses,C0655,Press Nation,PressThink says it takes more than one to make for a truly free press these days.,0.9,2026-05-27
-RECORD-00535_REL_021,RECORD-00535,W0666,PressThink,Discusses,C0102,Citizen Journalism,"if you're suspicious of the romance in citizen journalism, I really cannot blame you",0.9,2026-05-27
-RECORD-00535_REL_022,RECORD-00535,W0666,PressThink,Discusses,C0657,Universal principles of journalism,are there universals in a practice like reporting the news?,0.9,2026-05-27
-RECORD-00535_REL_023,RECORD-00535,W0666,PressThink,Criticizes,C0654,Citizen of the world,my last post questioning whether 'citizen of the world' is a valid ID for an American journalist in Iraq,1,2026-05-27
+RECORD-00535_REL_020,RECORD-00535,O0033,PressThink,Discusses,C0655,Press Nation,PressThink says it takes more than one to make for a truly free press these days.,0.9,2026-05-27
+RECORD-00535_REL_021,RECORD-00535,O0033,PressThink,Discusses,C0102,Citizen Journalism,"if you're suspicious of the romance in citizen journalism, I really cannot blame you",0.9,2026-05-27
+RECORD-00535_REL_022,RECORD-00535,O0033,PressThink,Discusses,C0657,Universal principles of journalism,are there universals in a practice like reporting the news?,0.9,2026-05-27
+RECORD-00535_REL_023,RECORD-00535,O0033,PressThink,Criticizes,C0654,Citizen of the world,my last post questioning whether 'citizen of the world' is a valid ID for an American journalist in Iraq,1,2026-05-27
 RECORD-00535_REL_024,RECORD-00535,P0128,Dan Gillmor,Discusses,P2216,Jeff Ooi,see Dan Gillmor on Ooi's struggle with the thought police in Malaysia,1,2026-05-27
 RECORD-00535_REL_025,RECORD-00535,P0010,Jeff Jarvis,Discusses,O0197,BBC,Jarvis also notes that the BBC has posted a comprehensive and free course in shooting video,1,2026-05-27
 RECORD-00837_REL_001,RECORD-00837,P2218,Bill Schneider,Affiliated With,O0015,CNN,"Mitt Romney has pulled ahead in New Hampshire... Thanks, Bill Schneider!",1,2026-05-27
@@ -5616,7 +5616,7 @@ RECORD-00505_REL_023,RECORD-00505,P0070,Matt Welch,Cites,E0267,2000 Democratic N
 RECORD-00505_REL_024,RECORD-00505,P0070,Matt Welch,Mentions,P0010,Jeff Jarvis,Matt Welch in comments at Jeff Jarvis's Buzzzmachine,1,2026-05-27
 RECORD-00505_REL_025,RECORD-00505,P0489,Chris Lydon,Affiliated With,O0681,BOP News,"Chris Lydon did an audio interview with me about the convention, the bloggers and what it all meant— over at BOP News.",1,2026-05-27
 RECORD-00505_REL_026,RECORD-00505,O0057,The Wall Street Journal,Discusses,C0763,Blogging as political dialogue,"'Bloggers have written their way into the mainstream and the media may never be the same,' The Wall Street Journal enthused",1,2026-05-27
-RECORD-00505_REL_027,RECORD-00505,W0666,PressThink,Discusses,E0107,2004 Democratic National Convention,"Jay Rosen, chairman of the journalism department at New York University, who runs the PressThink blog",1,2026-05-27
+RECORD-00505_REL_027,RECORD-00505,O0033,PressThink,Discusses,E0107,2004 Democratic National Convention,"Jay Rosen, chairman of the journalism department at New York University, who runs the PressThink blog",1,2026-05-27
 RECORD-00505_REL_028,RECORD-00505,E0107,2004 Democratic National Convention,Inspired By,E0043,"September 11, 2001 Attacks","Normalcy takes over, life before 09/11 regains itself.",0.9,2026-05-27
 RECORD-00505_REL_029,RECORD-00505,C0761,The Perimeter,Expands On,C0764,Post-9/11 security culture,the security perimeter militarizes your mind and sets you on edge,0.9,2026-05-27
 RECORD-00505_REL_030,RECORD-00505,P2327,Jessica Bram,Discusses,E0107,2004 Democratic National Convention,"Jessica Bram, writing at Westport Now, July 29... The Fleet Center convention site is a fortress surrounded by concrete barricades",1,2026-05-27
@@ -5756,7 +5756,7 @@ RECORD-00632_REL_009,RECORD-00632,P0322,Laura Poitras,Affiliated With,L0028,Berl
 RECORD-00632_REL_010,RECORD-00632,W0091,Patriot Act,Inspired By,E0245,September 11 attacks,"Right after 9/11, the Patriot Act was passed. The US government went into high gear with total information awareness",0.9,2026-05-27
 RECORD-00632_REL_011,RECORD-00632,W0091,Patriot Act,Pioneered,C0783,Total information awareness,the US government went into high gear with total information awareness with the aim of tracking every electronic trace we make,0.9,2026-05-27
 RECORD-00632_REL_012,RECORD-00632,O0027,National Security Agency,Pioneered,C0782,Surveillance state,trying to outwit or out-encrypt the surveillance state is going to be a losing battle,0.8,2026-05-27
-RECORD-00632_REL_013,RECORD-00632,W0666,PressThink,Affiliated With,O1313,New York University,"Jay Rosen, a writer and professor of journalism at New York University. He writes a blog, Press Think",1,2026-05-27
+RECORD-00632_REL_013,RECORD-00632,O0033,PressThink,Affiliated With,O1313,New York University,"Jay Rosen, a writer and professor of journalism at New York University. He writes a blog, Press Think",1,2026-05-27
 RECORD-00632_REL_014,RECORD-00632,W0762,Espionage Act,Mentions,P0318,Glenn Greenwald,the government has shown that it's capable of using the Espionage Act against people who inform the press. And it's possible that that could be extended to journalists,0.7,2026-05-27
 RECORD-00632_REL_015,RECORD-00632,P0320,Edward Snowden,Criticizes,C0782,Surveillance state,It's just now that we are seeing people try to expose how extensive that surveillance is.,0.9,2026-05-27
 RECORD-00632_REL_016,RECORD-00632,P0318,Glenn Greenwald,Affiliated With,P0322,Laura Poitras,"Glenn Greenwald and Laura Poitras, she's in Berlin, he's in Rio de Janeiro",0.8,2026-05-27
@@ -5969,7 +5969,7 @@ RECORD-00650_REL_008,RECORD-00650,P2396,Thamus,Criticizes,C0831,Writing as techn
 RECORD-00650_REL_009,RECORD-00650,O0192,Google,Mentions,C0828,Information overload,"so accustomed to the instant gratification of a Google search that we lose the patience for deeper, more reflective forms of thought",0.85,2026-05-27
 RECORD-00650_REL_010,RECORD-00650,C0830,Knowledge vs. acquaintance,Expands On,C0828,Information overload,"as one observer of information overload put it, we are armed not with knowledge of things, but acquaintance with them",0.9,2026-05-27
 RECORD-00651_REL_001,RECORD-00651,C0098,The people formerly known as the audience,Originated By,P0005,Jay Rosen,The people formerly known as the audience are those who were on the receiving end of a media system that ran one way,1,2026-05-27
-RECORD-00651_REL_002,RECORD-00651,W0666,PressThink,Affiliated With,P0005,Jay Rosen,"Read the whole text at Jay Rosen's blog, Press Think",1,2026-05-27
+RECORD-00651_REL_002,RECORD-00651,O0033,PressThink,Affiliated With,P0005,Jay Rosen,"Read the whole text at Jay Rosen's blog, Press Think",1,2026-05-27
 RECORD-00651_REL_003,RECORD-00651,C0098,The people formerly known as the audience,Discusses,C0832,Web 2.0,People who were once media consumers are now producers of it too... It's what Web 2.0 means.,1,2026-05-27
 RECORD-00651_REL_004,RECORD-00651,P0005,Jay Rosen,Pioneered,C0745,Transparency in journalism,"the watchword for the press is not objectivity, but transparency... journalists have to show their work and reveal... how they came to their conclusions",0.9,2026-05-27
 RECORD-00651_REL_005,RECORD-00651,C0745,Transparency in journalism,Criticizes,C0313,Objectivity in Journalism,"the watchword for the press is not objectivity, but transparency",1,2026-05-27
@@ -6118,11 +6118,11 @@ RECORD-00672_REL_008,RECORD-00672,P1043,Judith Miller,Pioneered,C0861,The Miller
 RECORD-00672_REL_009,RECORD-00672,P1043,Judith Miller,Discusses,C0380,Federal shield law,"she went to jail to dramatize the need for a federal shield law, but leaving out that her case would not have been covered by the law's protections.",1,2026-05-27
 RECORD-00672_REL_010,RECORD-00672,P1043,Judith Miller,Mentions,E0290,Judith Miller's 85 days in jail / Libby case,During her 40 days of crisis I called her the unreliable narrator.,1,2026-05-27
 RECORD-00672_REL_011,RECORD-00672,E0290,Judith Miller's 85 days in jail / Libby case,Mentions,P1093,Patrick Fitzgerald,just like her stories to Patrick Fitzgerald.,0.9,2026-05-27
-RECORD-00672_REL_012,RECORD-00672,W0666,PressThink,Discusses,C0745,Transparency in journalism,We hear a lot these days about transparency coming to journalism; and it's a true fact. There's a lot more scrutiny and openness.,0.9,2026-05-27
+RECORD-00672_REL_012,RECORD-00672,O0033,PressThink,Discusses,C0745,Transparency in journalism,We hear a lot these days about transparency coming to journalism; and it's a true fact. There's a lot more scrutiny and openness.,0.9,2026-05-27
 RECORD-00672_REL_013,RECORD-00672,P1043,Judith Miller,Criticizes,C0745,Transparency in journalism,"Judith Miller may be the only investigative reporter alive who doesn't care if you understand, because she does.",0.8,2026-05-27
 RECORD-00673_REL_001,RECORD-00673,P0005,Jay Rosen,Originated By,W0296,Bloggers vs. Journalists is Over,"Elaborating on an essay, 'Bloggers vs. Journalists Is Over'",1,2026-05-27
 RECORD-00673_REL_002,RECORD-00673,P0005,Jay Rosen,Affiliated With,O1313,New York University,Associate professor of journalism at NYU,1,2026-05-27
-RECORD-00673_REL_003,RECORD-00673,P0005,Jay Rosen,Originated By,W0666,PressThink,author of journalism blog Pressthink.org,1,2026-05-27
+RECORD-00673_REL_003,RECORD-00673,P0005,Jay Rosen,Originated By,O0033,PressThink,author of journalism blog Pressthink.org,1,2026-05-27
 RECORD-00673_REL_004,RECORD-00673,P0005,Jay Rosen,Originated By,C0098,The people formerly known as the audience,from the producers of media to the people formerly known as the audience. That's what I like to call them,1,2026-05-27
 RECORD-00673_REL_005,RECORD-00673,P0005,Jay Rosen,Originated By,C0863,Loss of sovereignty in the press,this has led to a loss of sovereignty in the press... a loss of exclusive control,1,2026-05-27
 RECORD-00673_REL_006,RECORD-00673,P0005,Jay Rosen,Criticizes,C0313,Objectivity in Journalism,"Objectivity as an ethical touchstone, as one of my sources said, is faltering in mainstream journalism",0.9,2026-05-27
@@ -6227,12 +6227,12 @@ RECORD-00675_REL_040,RECORD-00675,P1206,Nicholas Lemann,Affiliated With,O0032,Th
 RECORD-00675_REL_041,RECORD-00675,P1206,Nicholas Lemann,Affiliated With,L0059,New Orleans,"Nick Lemann, who's from New Orleans",1,2026-05-27
 RECORD-00675_REL_042,RECORD-00675,P0010,Jeff Jarvis,Discusses,E0117,Hurricane Katrina,Jeff Jarvis said anger wasn't the best part of journalism's performance after Katrina,1,2026-05-27
 RECORD-00675_REL_043,RECORD-00675,P1437,Aaron Brown,Affiliated With,O0015,CNN,Aaron Brown turned his langorous gaze to the camera,1,2026-05-27
-RECORD-00675_REL_044,RECORD-00675,C0451,Opposition press,Discusses,W0666,PressThink,"At my weblog, PressThink, I once asked if we were headed for an opposition press.",1,2026-05-27
+RECORD-00675_REL_044,RECORD-00675,C0451,Opposition press,Discusses,O0033,PressThink,"At my weblog, PressThink, I once asked if we were headed for an opposition press.",1,2026-05-27
 RECORD-00675_REL_045,RECORD-00675,C0451,Opposition press,Discusses,O0448,Bush Administration,"How can it be avoided if, say, we begin to see the press locked out of New Orleans as the authorities assert control?",0.8,2026-05-27
 RECORD-00675_REL_046,RECORD-00675,C0868,Palace Press,Criticizes,O0023,The Washington Post,a false fact from an off-the-record source... gets into the Washington Post. That sounds like the behavior of a palace press.,1,2026-05-27
 RECORD-00675_REL_047,RECORD-00675,C0869,"Triangular Relationship of Press, Administration and Public",Discusses,E0117,Hurricane Katrina,"What appears to be a struggle between the White House and the press is always a triangular relationship among journalists, the Administration and the public.",1,2026-05-27
 RECORD-00675_REL_048,RECORD-00675,C0870,Balance of Power Shift,Discusses,E0117,Hurricane Katrina,"A balance-of-power shift that is specific to the Katrina situation is, I think, more descriptive of what's happened with the press",1,2026-05-27
-RECORD-00675_REL_049,RECORD-00675,W0666,PressThink,Affiliated With,O1313,New York University,Jay Rosen teaches journalism at New York University... His weblog is PressThink.,1,2026-05-27
+RECORD-00675_REL_049,RECORD-00675,O0033,PressThink,Affiliated With,O1313,New York University,Jay Rosen teaches journalism at New York University... His weblog is PressThink.,1,2026-05-27
 RECORD-00675_REL_050,RECORD-00675,P1435,David Verdi,Affiliated With,O0221,NBC News,"David Verdi, a senior vice president for NBC News",1,2026-05-27
 RECORD-00675_REL_051,RECORD-00675,O1462,nola.com,Discusses,E0117,Hurricane Katrina,"nola.com, by turning itself into an online forum, has been an inspiration",1,2026-05-27
 RECORD-00675_REL_052,RECORD-00675,O0029,Newsweek,Mentions,P1432,Kathleen Babineaux Blanco,Newsweek also had it [the false claim about Gov. Blanco],0.9,2026-05-27
@@ -6271,7 +6271,7 @@ RECORD-00676_REL_031,RECORD-00676,P1452,Diane McNulty,Affiliated With,O0002,The 
 RECORD-00676_REL_032,RECORD-00676,P0009,Andrew Sullivan,Criticizes,W0419,TimesSelect,I would have linked to John Tierney's excellent NYT op-ed today... But only Times Select readers can read the link. So I won't.,1,2026-05-27
 RECORD-00676_REL_033,RECORD-00676,P0009,Andrew Sullivan,Affiliated With,O0023,The Washington Post,"next Tuesday, this blog is going to be streamed to the Washington Post's online opinion section",0.9,2026-05-27
 RECORD-00676_REL_034,RECORD-00676,P0579,Doc Searls,Criticizes,W0419,TimesSelect,This whole thing looks like an ugly political compromise between warring factions inside the paper,1,2026-05-27
-RECORD-00676_REL_035,RECORD-00676,W0666,PressThink,Discusses,W0419,TimesSelect,PressThink post on a topic in the news,0.8,2026-05-27
+RECORD-00676_REL_035,RECORD-00676,O0033,PressThink,Discusses,W0419,TimesSelect,PressThink post on a topic in the news,0.8,2026-05-27
 RECORD-00676_REL_036,RECORD-00676,W0419,TimesSelect,Discusses,C0874,Exclusivity,The phrase 'exclusive online accesss' advertises two different goods... The second good being advertised is exclusivity.,1,2026-05-27
 RECORD-00676_REL_037,RECORD-00676,P1418,Martin Nisenholtz,Originated By,C0873,Times loyalist,the notion of the 'Times loyalist' -- perhaps 1.5 million to 2 million readers who are devoted to the New York Times brand,0.9,2026-05-27
 RECORD-00677_REL_001,RECORD-00677,P0005,Jay Rosen,Criticizes,P0321,Bob Woodward,"Woodward for so long was a symbol of adversarial journalism because of the Watergate legend. But he really has become an access journalist, someone who's an insider.",1,2026-05-27
@@ -6330,7 +6330,7 @@ RECORD-00678_REL_010,RECORD-00678,P0005,Jay Rosen,Discusses,P0916,John Harris,"Q
 RECORD-00678_REL_011,RECORD-00678,P0005,Jay Rosen,Discusses,P0270,Jim Brady,"Q & A with Jim Brady, executive editor, WashingtonPost.com, and Jay Rosen, PressThink",1,2026-05-27
 RECORD-00678_REL_012,RECORD-00678,P0005,Jay Rosen,Discusses,E0295,The Froomkin Foofaraw,Yesterday I interviewed two key players in a dispute at the Washington Post over Dan Froomkin's Web column,1,2026-05-27
 RECORD-00678_REL_013,RECORD-00678,P0005,Jay Rosen,Affiliated With,O1313,New York University,Jay Rosen teaches journalism at New York University,1,2026-05-27
-RECORD-00678_REL_014,RECORD-00678,P0005,Jay Rosen,Originated By,W0666,PressThink,writes the weblog PressThink,1,2026-05-27
+RECORD-00678_REL_014,RECORD-00678,P0005,Jay Rosen,Originated By,O0033,PressThink,writes the weblog PressThink,1,2026-05-27
 RECORD-00678_REL_015,RECORD-00678,E0295,The Froomkin Foofaraw,Mentions,W0330,White House Briefing,some of what lies behind the seemingly 'small' events in The Froomkin Foofaraw,1,2026-05-27
 RECORD-00678_REL_016,RECORD-00678,P1399,Joel Achenbach,Originated By,W0417,Achenblog,the Post's Joel Achenbach... weighs in via his Achenblog,1,2026-05-27
 RECORD-00678_REL_017,RECORD-00678,P2419,Marty Kaplan,Affiliated With,O0034,The Huffington Post,Huffington Post writers Marty Kaplan and Jane Hamsher have already spoken,1,2026-05-27
@@ -6415,7 +6415,7 @@ RECORD-00680_REL_026,RECORD-00680,W0702,The Note,Mentions,O1010,Roll Call,"Roll 
 RECORD-00680_REL_027,RECORD-00680,W0812,Hotline,Published In,O0465,National Journal,The Note and Hotline compete in the space online,0.9,2026-05-27
 RECORD-00680_REL_028,RECORD-00680,W0813,Face the Nation,Published In,O0419,CBS News,"We expect our staff to be making appearances on Face the Nation, and perhaps other CBS News shows",1,2026-05-27
 RECORD-00680_REL_029,RECORD-00680,P0916,John Harris,Mentions,E0004,Iraq War,what started out as the left's critique of the Iraq war increasingly defines the center,1,2026-05-27
-RECORD-00680_REL_030,RECORD-00680,P0916,John Harris,Mentions,W0666,PressThink,"In your own way, you are an example of this with PressThink",1,2026-05-27
+RECORD-00680_REL_030,RECORD-00680,P0916,John Harris,Mentions,O0033,PressThink,"In your own way, you are an example of this with PressThink",1,2026-05-27
 RECORD-00681_REL_001,RECORD-00681,P1163,Ron Suskind,Originated By,W0352,Without a Doubt,"Ron Suskind's article, Without a Doubt, published in the New York Times Magazine shortly before the 2004 election.",1,2026-05-27
 RECORD-00681_REL_002,RECORD-00681,W0352,Without a Doubt,Published In,O1465,The New York Times Magazine,"Ron Suskind's article, Without a Doubt, published in the New York Times Magazine shortly before the 2004 election.",1,2026-05-27
 RECORD-00681_REL_003,RECORD-00681,C0347,Reality-based Community,Originated By,W0352,Without a Doubt,"That passage caused a sensation when it was published, and the sensation introduced a new term, the reality-based community, into political talk.",1,2026-05-27
@@ -6470,7 +6470,7 @@ RECORD-00682_REL_020,RECORD-00682,P0068,Howard Kurtz,Criticizes,P0739,Dick Chene
 RECORD-00682_REL_021,RECORD-00682,P0014,George W. Bush,Supports,P0739,Dick Cheney,President Bush has allowed Cheney to become perhaps the most powerful vice president in history and has provided him with unparalleled autonomy,1,2026-05-27
 RECORD-00682_REL_022,RECORD-00682,P1071,Brit Hume,Discusses,P0739,Dick Cheney,"'I thought that made good sense because you can get as accurate a story as possible from somebody who knew and understood hunting,' he told Britt Hume of Fox News.",1,2026-05-27
 RECORD-00682_REL_023,RECORD-00682,P1075,Bill Plante,Criticizes,P0739,Dick Cheney,No other vice president in the White Houses I've covered has had the ability to write his own rules the way this one has.,1,2026-05-27
-RECORD-00682_REL_024,RECORD-00682,W0666,PressThink,Discusses,C0292,Rollback,Jay Rosen teaches journalism at New York University and is the author of PressThink.,0.8,2026-05-27
+RECORD-00682_REL_024,RECORD-00682,O0033,PressThink,Discusses,C0292,Rollback,Jay Rosen teaches journalism at New York University and is the author of PressThink.,0.8,2026-05-27
 RECORD-00682_REL_025,RECORD-00682,E0300,Cheney hunting accident,Published In,O0664,Corpus Christi Caller-Times,"disclosed at the property owner's discretion to the townsfolk... via their local newspaper, the Corpus Christi Caller-Times.",1,2026-05-27
 RECORD-00684_REL_001,RECORD-00684,O1470,Association for Education in Journalism and Mass Communication,Criticizes,P0014,George W. Bush,The membership of the Association for Education in Journalism and Mass Communication urges the Bush administration to abandon its anti-press policies.,1,2026-05-27
 RECORD-00684_REL_002,RECORD-00684,P2429,David T.Z. Mindich,Affiliated With,O1470,Association for Education in Journalism and Mass Communication,It was brought to the floor of the annual convention by David Mindich of St. Michael's College,1,2026-05-27
@@ -6548,7 +6548,7 @@ RECORD-00686_REL_025,RECORD-00686,P1136,Mark Cuban,Pioneered,C0898,Sources Go Di
 RECORD-00686_REL_026,RECORD-00686,P1136,Mark Cuban,Owns,O1475,Dallas Mavericks,Mark Cuban of the Dallas Mavericks,1,2026-05-27
 RECORD-00686_REL_027,RECORD-00686,P0005,Jay Rosen,Originated By,C0901,Balance of Power Between Sources and Reporters,"Readers have more power because they have more sources, and sources have more power because they can go direct to readers.",1,2026-05-27
 RECORD-00686_REL_028,RECORD-00686,P0005,Jay Rosen,Originated By,C0900,Reporter's Narrative Frame,it happened because a certain narrative takes hold in the reporter's mind. I thought it was the wrong one for the event.,1,2026-05-27
-RECORD-00686_REL_029,RECORD-00686,P0005,Jay Rosen,Originated By,W0666,PressThink,Jay Rosen teaches journalism at New York Univesity and writes the blog PressThink,1,2026-05-27
+RECORD-00686_REL_029,RECORD-00686,P0005,Jay Rosen,Originated By,O0033,PressThink,Jay Rosen teaches journalism at New York Univesity and writes the blog PressThink,1,2026-05-27
 RECORD-00686_REL_030,RECORD-00686,P0005,Jay Rosen,Affiliated With,O1313,New York University,Jay Rosen teaches journalism at New York Univesity,1,2026-05-27
 RECORD-00687_REL_001,RECORD-00687,O0447,OffTheBus,Affiliated With,O0456,NewAssignment.Net,"OffTheBus is a collaboration between NewAssignment.Net, a non-profit pilot project based at New York University's Department of Journalism, and the Huffington Post",1,2026-05-27
 RECORD-00687_REL_002,RECORD-00687,O0447,OffTheBus,Affiliated With,O0034,The Huffington Post,"OffTheBus is a collaboration between NewAssignment.Net... and the Huffington Post, a for-profit news and information site.",1,2026-05-27
@@ -6602,10 +6602,10 @@ RECORD-00690_REL_009,RECORD-00690,P0143,Vivian Schiller,Affiliated With,O1477,NY
 RECORD-00690_REL_010,RECORD-00690,P1348,Staci Kramer,Affiliated With,O0864,PaidContent.org,Staci Kramer at PaidContent.org has the view from the Times,1,2026-05-27
 RECORD-00690_REL_011,RECORD-00690,P0932,Simon Waldman,Affiliated With,O0223,Guardian Media Group,the director of digtial strategy and development for the Guardian Media Group,1,2026-05-27
 RECORD-00690_REL_012,RECORD-00690,P0932,Simon Waldman,Originated By,W0297,The Importance of Being Permanent,"Simon Waldman's guest post at PressThink, The Importance of Being Permanent",1,2026-05-27
-RECORD-00690_REL_013,RECORD-00690,W0297,The Importance of Being Permanent,Published In,W0666,PressThink,"Simon Waldman's guest post at PressThink, The Importance of Being Permanent. (Jan. 2005)",1,2026-05-27
+RECORD-00690_REL_013,RECORD-00690,W0297,The Importance of Being Permanent,Published In,O0033,PressThink,"Simon Waldman's guest post at PressThink, The Importance of Being Permanent. (Jan. 2005)",1,2026-05-27
 RECORD-00690_REL_014,RECORD-00690,P0932,Simon Waldman,Originated By,C0907,Web permanence,Permanence is about ensuring you have a real presence on the Net.,0.9,2026-05-27
 RECORD-00690_REL_015,RECORD-00690,P0005,Jay Rosen,Originated By,W0828,Charging for Columnists: Notes and Comment on the Launch of TimesSelect,"I went back to my post from two years ago, Charging for Columnists.",1,2026-05-27
-RECORD-00690_REL_016,RECORD-00690,P0005,Jay Rosen,Originated By,W0666,PressThink,"My blog, PressThink, has its own version of search optimization",1,2026-05-27
+RECORD-00690_REL_016,RECORD-00690,P0005,Jay Rosen,Originated By,O0033,PressThink,"My blog, PressThink, has its own version of search optimization",1,2026-05-27
 RECORD-00690_REL_017,RECORD-00690,W0828,Charging for Columnists: Notes and Comment on the Launch of TimesSelect,Discusses,C0906,Times-Select,Charging for Columnists: Notes and Comment on the Launch of TimesSelect.,1,2026-05-27
 RECORD-00690_REL_018,RECORD-00690,O0002,The New York Times,Owns,O0011,About.com,When the Times bought About.com it brought an open-to-search mentality into its organization,1,2026-05-27
 RECORD-00690_REL_019,RECORD-00690,P1816,Scott Karp,Originated By,C0909,Link-based economy,NYTimes.com is ahead of other sites in realizing the value of premium content by opening it up to the web's link-based economy.,0.8,2026-05-27
@@ -6768,7 +6768,7 @@ RECORD-00698_REL_016,RECORD-00698,C0922,The jerk at the podium,Discusses,P0764,S
 RECORD-00698_REL_017,RECORD-00698,C0292,Rollback,Discusses,O0126,White House,One of the constraints that Cheney and Bush wanted to obliterate was the interlocutor. (Thus: rollback.),0.9,2026-05-27
 RECORD-00698_REL_018,RECORD-00698,O0732,Al Qaeda,Criticizes,P0014,George W. Bush,"Al Qaeda makes announcements, and like the president's they instantly travel around the world. But Al Qaeda doesn't have to answer questions.",0.8,2026-05-27
 RECORD-00698_REL_019,RECORD-00698,P0354,Osama bin Laden,Affiliated With,O0732,Al Qaeda,That gives Osama and company an edge.,1,2026-05-27
-RECORD-00698_REL_020,RECORD-00698,W0666,PressThink,Affiliated With,O1313,New York University,"Jay Rosen teaches journalism at New York University and writes the blog, PressThink.",1,2026-05-27
+RECORD-00698_REL_020,RECORD-00698,O0033,PressThink,Affiliated With,O1313,New York University,"Jay Rosen teaches journalism at New York University and writes the blog, PressThink.",1,2026-05-27
 RECORD-00698_REL_021,RECORD-00698,W0826,OffTheBus,Published In,O0691,HuffPost,He is also co-publisher with Arianna Huffington of Huff Post's OffTheBus.,1,2026-05-27
 RECORD-00698_REL_022,RECORD-00698,P0183,Arianna Huffington,Founded By,W0826,OffTheBus,co-publisher with Arianna Huffington of Huff Post's OffTheBus,1,2026-05-27
 RECORD-00698_REL_023,RECORD-00698,C0925,Opacity of executive power,Discusses,O0126,White House,"The goal, I think, was to make the American presidency more opaque, so that no one could see in.",1,2026-05-27
@@ -6953,7 +6953,7 @@ RECORD-00707_REL_016,RECORD-00707,C0042,Citizens agenda,Discusses,E0318,2020 Uni
 RECORD-00707_REL_017,RECORD-00707,C0948,Political vs. politicised distinction,Expands On,C0042,Citizens agenda,"Because it pressures the candidates to address these issues rather than those, the citizens agenda is a political project. But it can be done without unduly politicising election coverage",0.8,2026-05-27
 RECORD-00707_REL_018,RECORD-00707,P0099,Peter Baker,Mentions,P0073,Donald Trump,When the president is using you as a hate object in order to discredit the entire mainstream press,0.7,2026-05-27
 RECORD-00707_REL_019,RECORD-00707,E0319,2016 United States presidential election,Mentions,P0073,Donald Trump,prevent a repeat of the debacle in 2016,0.9,2026-05-27
-RECORD-00707_REL_020,RECORD-00707,W0666,PressThink,Discusses,C0042,Citizens agenda,"This article was originally published on Jay Rosen's blog, PressThink.",1,2026-05-27
+RECORD-00707_REL_020,RECORD-00707,O0033,PressThink,Discusses,C0042,Citizens agenda,"This article was originally published on Jay Rosen's blog, PressThink.",1,2026-05-27
 RECORD-00708_REL_001,RECORD-00708,P0073,Donald Trump,Criticizes,E0318,2020 United States presidential election,the president is using the powers he won by election to destroy public confidence in the results of the next election,1,2026-05-27
 RECORD-00708_REL_002,RECORD-00708,P0073,Donald Trump,Criticizes,O1505,United States Postal Service,"Trump has constructed a new threat: his sabotaging of the Post Office, a part of the government that is more necessary than ever to this year's election",1,2026-05-27
 RECORD-00708_REL_003,RECORD-00708,P2471,Rob Wijnberg,Affiliated With,O0305,The Correspondent,"Rob Wijnberg, Founding editor",1,2026-05-27
@@ -7017,7 +7017,7 @@ RECORD-00710_REL_007,RECORD-00710,C0960,Manufacture of confusion as governance,C
 RECORD-00710_REL_008,RECORD-00710,C0959,Decentering Trump,Discusses,P0073,Donald Trump,Dislodge Trump from his position as 'protagonist' of the coronavirus story,1,2026-05-27
 RECORD-00710_REL_009,RECORD-00710,P0209,Ben Smith,Affiliated With,O0002,The New York Times,"Ben Smith, now the media columnist at The New York Times",1,2026-05-27
 RECORD-00710_REL_010,RECORD-00710,P0209,Ben Smith,Supports,C0959,Decentering Trump,Here I agree with Ben Smith... the coronavirus story isn't 'about' the president.,0.9,2026-05-27
-RECORD-00710_REL_011,RECORD-00710,W0869,The plan is to have no plan,Published In,W0666,PressThink,"This article was originally published on Jay Rosen's blog, PressThink.",1,2026-05-27
+RECORD-00710_REL_011,RECORD-00710,W0869,The plan is to have no plan,Published In,O0033,PressThink,"This article was originally published on Jay Rosen's blog, PressThink.",1,2026-05-27
 RECORD-00710_REL_012,RECORD-00710,O0067,USA Today,Owned By,O0845,Gannett,the major newspaper chains like Gannett (publisher of USA Today),1,2026-05-27
 RECORD-00710_REL_013,RECORD-00710,O0058,Politico,Criticizes,P0073,Donald Trump,Trump's mismanagement helped fuel coronavirus crisis,0.9,2026-05-27
 RECORD-00710_REL_014,RECORD-00710,O0221,NBC News,Criticizes,O0126,White House,"Mismanagement, missed opportunities: How the White House bungled the coronavirus response",0.9,2026-05-27
@@ -7052,21 +7052,21 @@ RECORD-00711_REL_021,RECORD-00711,C0952,Threat Urgency Index,Discusses,E0318,202
 RECORD-00711_REL_022,RECORD-00711,P0125,Nate Silver,Inspired By,C0952,Threat Urgency Index,"an editorial product published online and in a newsletter, sort of like Nate Silver's election forecast",0.8,2026-05-27
 RECORD-00711_REL_023,RECORD-00711,O0076,Facebook,Discusses,C0962,Threat Modeling,"At Facebook, our Red Team ran large exercises against the company twice a year.",1,2026-05-27
 RECORD-00712_REL_001,RECORD-00712,O0179,Studio 20,Affiliated With,O1313,New York University,"Studio 20, NYU's master's level concentration on digital first journalism",1,2026-05-27
-RECORD-00712_REL_002,RECORD-00712,W0666,PressThink,Published In,O1519,IJNet,originally appeared on Jay Rosen's website Press Think and is republished on IJNet with permission,1,2026-05-27
+RECORD-00712_REL_002,RECORD-00712,O0033,PressThink,Published In,O1519,IJNet,originally appeared on Jay Rosen's website Press Think and is republished on IJNet with permission,1,2026-05-27
 RECORD-00712_REL_003,RECORD-00712,O0095,BuzzFeed,Pioneered,C0971,Native advertising,Native advertising and the agency model… The way Buzzfeed and Vice do it.,0.9,2026-05-27
 RECORD-00712_REL_004,RECORD-00712,O1517,Vice Media,Pioneered,C0971,Native advertising,Native advertising and the agency model… The way Buzzfeed and Vice do it.,0.9,2026-05-27
 RECORD-00712_REL_005,RECORD-00712,O0115,ProPublica,Discusses,C0403,Open Journalism,"Non-profit models… as with ProPublica, Minn Post and Texas Tribune.",0.7,2026-05-27
 RECORD-00712_REL_006,RECORD-00712,O0173,De Correspondent,Pioneered,C0972,Curation,"Crowd funding and membership… as with Beacon, De Correspondent, The Guardian, Voice of San Diego",0.8,2026-05-27
 RECORD-00712_REL_007,RECORD-00712,O0158,The Guardian,Pioneered,C0972,Curation,"Crowd funding and membership… as with Beacon, De Correspondent, The Guardian, Voice of San Diego",0.8,2026-05-27
-RECORD-00712_REL_008,RECORD-00712,C0661,Personal Franchise Model,Originated By,W0666,PressThink,The personal franchise model in news. Based around an individual journalist's online following.,0.9,2026-05-27
+RECORD-00712_REL_008,RECORD-00712,C0661,Personal Franchise Model,Originated By,O0033,PressThink,The personal franchise model in news. Based around an individual journalist's online following.,0.9,2026-05-27
 RECORD-00712_REL_009,RECORD-00712,C0403,Open Journalism,Expands On,C0259,Networked Journalism,"Open journalism: Including the verification of user-generated content, networked journalism, crowd sourcing",0.9,2026-05-27
-RECORD-00712_REL_010,RECORD-00712,P2489,Steve Buttry,Cites,W0666,PressThink,Steve Buttry's annotated response to my list. He adds a great many more resources,0.9,2026-05-27
+RECORD-00712_REL_010,RECORD-00712,P2489,Steve Buttry,Cites,O0033,PressThink,Steve Buttry's annotated response to my list. He adds a great many more resources,0.9,2026-05-27
 RECORD-00712_REL_011,RECORD-00712,O1425,Gigaom,Discusses,C0971,Native advertising,Selling specialized research… by subscription as Giga Om does,0.7,2026-05-27
 RECORD-00712_REL_012,RECORD-00712,O0574,Techdirt,Discusses,C0971,Native advertising,Selling specialized research… via conversation as Techdirt does,0.7,2026-05-27
-RECORD-00712_REL_013,RECORD-00712,W0666,PressThink,Originated By,C0098,The people formerly known as the audience,The people formerly known as the audience in fruitful collaboration with journalists,0.95,2026-05-27
-RECORD-00712_REL_014,RECORD-00712,W0666,PressThink,Discusses,C0968,Data journalism,"Data journalism. In all senses: collecting data sets, connecting to data through API's, data visualization",0.8,2026-05-27
-RECORD-00712_REL_015,RECORD-00712,W0666,PressThink,Discusses,C0969,Robot journalism,"Automation and robot journalism. If machines can do it cheaper and better, human journalists can move up the value chain",0.8,2026-05-27
-RECORD-00712_REL_016,RECORD-00712,W0666,PressThink,Discusses,C0970,News as a service,"News as a service. Rather than a product appearing on the news company's schedule, a service that helps a user do something",0.8,2026-05-27
+RECORD-00712_REL_013,RECORD-00712,O0033,PressThink,Originated By,C0098,The people formerly known as the audience,The people formerly known as the audience in fruitful collaboration with journalists,0.95,2026-05-27
+RECORD-00712_REL_014,RECORD-00712,O0033,PressThink,Discusses,C0968,Data journalism,"Data journalism. In all senses: collecting data sets, connecting to data through API's, data visualization",0.8,2026-05-27
+RECORD-00712_REL_015,RECORD-00712,O0033,PressThink,Discusses,C0969,Robot journalism,"Automation and robot journalism. If machines can do it cheaper and better, human journalists can move up the value chain",0.8,2026-05-27
+RECORD-00712_REL_016,RECORD-00712,O0033,PressThink,Discusses,C0970,News as a service,"News as a service. Rather than a product appearing on the news company's schedule, a service that helps a user do something",0.8,2026-05-27
 RECORD-00713_REL_001,RECORD-00713,P2490,Michael Barthel,Originated By,W0874,Hold the Reddit Hype,I read 'Hold the Reddit Hype' by Michael Barthel,1,2026-05-27
 RECORD-00713_REL_002,RECORD-00713,W0874,Hold the Reddit Hype,Published In,O0030,Salon,Why Salon's article on Reddit's Aurora reporting ticked me off,1,2026-05-27
 RECORD-00713_REL_003,RECORD-00713,P0005,Jay Rosen,Criticizes,W0874,Hold the Reddit Hype,This piece is so far below Salon's standards. You cannot come out with an article suggesting that Salon is going to clear away the hype surrounding Reddit,1,2026-05-27
@@ -7082,7 +7082,7 @@ RECORD-00713_REL_012,RECORD-00713,P0005,Jay Rosen,Originated By,C0973,Linkless h
 RECORD-00713_REL_013,RECORD-00713,P0005,Jay Rosen,Originated By,W0029,What Are Journalists For?,"author of 'What Are Journalists For?' (1999, Yale University Press)",1,2026-05-27
 RECORD-00713_REL_014,RECORD-00713,W0029,What Are Journalists For?,Published In,O0116,Yale University Press,"'What Are Journalists For?' (1999, Yale University Press)",1,2026-05-27
 RECORD-00713_REL_015,RECORD-00713,P0005,Jay Rosen,Affiliated With,O1313,New York University,chairman of the Journalism Department at New York University,1,2026-05-27
-RECORD-00713_REL_016,RECORD-00713,P0005,Jay Rosen,Originated By,W0666,PressThink,"This originally appeared on his weblog, PressThink",1,2026-05-27
+RECORD-00713_REL_016,RECORD-00713,P0005,Jay Rosen,Originated By,O0033,PressThink,"This originally appeared on his weblog, PressThink",1,2026-05-27
 RECORD-00713_REL_017,RECORD-00713,P0005,Jay Rosen,Originated By,W0875,From 'Write us a Post' to 'Fill out this Form': Progress in Pro-Am Journalism,"Last year, I gave a talk at the Personal Democracy Forum about it",1,2026-05-27
 RECORD-00713_REL_018,RECORD-00713,W0875,From 'Write us a Post' to 'Fill out this Form': Progress in Pro-Am Journalism,Occurred At,E0323,Personal Democracy Forum 2011,I gave a talk at the Personal Democracy Forum about it,1,2026-05-27
 RECORD-00713_REL_019,RECORD-00713,P0005,Jay Rosen,Discusses,C0126,Pro-Am journalism,"Crowdsourcing and citizen journalism, pro-am and open journalism are things I care about and write about",1,2026-05-27
@@ -7106,8 +7106,8 @@ RECORD-00715_REL_008,RECORD-00715,P0073,Donald Trump,Mentions,L0194,Mexico,he wi
 RECORD-00715_REL_009,RECORD-00715,O0015,CNN,Affiliated With,C0978,Campaign journalism norms,"Journalists in the media filing center watch as Republican presidential candidates participate in the Houston debate in February, sponsored by CNN.",0.7,2026-05-27
 RECORD-00716_REL_001,RECORD-00716,P0005,Jay Rosen,Affiliated With,O1313,New York University,Press critic and NYU journalism professor Jay Rosen,1,2026-05-27
 RECORD-00716_REL_002,RECORD-00716,C0659,The View from Nowhere,Originated By,P0005,Jay Rosen,Jay Rosen — best known for coining the phrase 'the view from nowhere',1,2026-05-27
-RECORD-00716_REL_003,RECORD-00716,W0666,PressThink,Owned By,P0005,Jay Rosen,exploring these difficulties over the course of the campaign on his influential Pressthink blog,1,2026-05-27
-RECORD-00716_REL_004,RECORD-00716,W0878,What the campaign press should not be neutral toward,Published In,W0666,PressThink,On Oct. 23 he summed it all up with a succinct framework of six ideas on 'What the campaign press should not be neutral toward.',1,2026-05-27
+RECORD-00716_REL_003,RECORD-00716,O0033,PressThink,Owned By,P0005,Jay Rosen,exploring these difficulties over the course of the campaign on his influential Pressthink blog,1,2026-05-27
+RECORD-00716_REL_004,RECORD-00716,W0878,What the campaign press should not be neutral toward,Published In,O0033,PressThink,On Oct. 23 he summed it all up with a succinct framework of six ideas on 'What the campaign press should not be neutral toward.',1,2026-05-27
 RECORD-00716_REL_005,RECORD-00716,W0878,What the campaign press should not be neutral toward,Originated By,P0005,Jay Rosen,On Oct. 23 he summed it all up with a succinct framework of six ideas,1,2026-05-27
 RECORD-00716_REL_006,RECORD-00716,P0005,Jay Rosen,Criticizes,P0073,Donald Trump,"Trump has made war, in effect, on the very possibility of objective reporting",0.9,2026-05-27
 RECORD-00716_REL_007,RECORD-00716,P0005,Jay Rosen,Discusses,E0325,2016 U.S. Presidential Campaign,Salon reached out to interview Rosen about this framework... framed in terms of media coverage of the 2016 campaign,1,2026-05-27
@@ -7167,7 +7167,7 @@ RECORD-00717_REL_034,RECORD-00717,E0328,Launch of the Membership Puzzle Project,
 RECORD-00717_REL_035,RECORD-00717,O0173,De Correspondent,Pioneered,C0988,Data minimization privacy policy,This principle is also the basis for our data minimization privacy policy.,0.95,2026-05-27
 RECORD-00717_REL_036,RECORD-00717,O0132,Voice of San Diego,Discusses,C0982,Membership model,traveling to key sites [Voice of San Diego membership levels],0.7,2026-05-27
 RECORD-00717_REL_037,RECORD-00717,O0162,Texas Tribune,Discusses,C0982,Membership model,"Member-funded journalism has a long history here, most obviously in public radio but not only there [Texas Tribune]",0.6,2026-05-27
-RECORD-00718_REL_001,RECORD-00718,W0666,PressThink,Discusses,C0062,Civic Journalism Movement,"PressThink, a blog about journalism's ordeals in the age of the Web, which he launched in 2003",0.9,2026-05-27
+RECORD-00718_REL_001,RECORD-00718,O0033,PressThink,Discusses,C0062,Civic Journalism Movement,"PressThink, a blog about journalism's ordeals in the age of the Web, which he launched in 2003",0.9,2026-05-27
 RECORD-00718_REL_002,RECORD-00718,W0883,What Are Journalists For,Discusses,C0062,Civic Journalism Movement,"his book, 'What Are Journalists For,' which was about the rise of the civic journalism movement",1,2026-05-27
 RECORD-00718_REL_003,RECORD-00718,W0883,What Are Journalists For,Published In,O0116,Yale University Press,"In 1999, Yale University Press published his book, 'What Are Journalists For'",1,2026-05-27
 RECORD-00718_REL_004,RECORD-00718,W0673,OfftheBus.Net,Founded By,P0183,Arianna Huffington,"He was the co-publisher, with Arianna Huffington, of OfftheBus.Net",1,2026-05-27
@@ -7190,7 +7190,7 @@ RECORD-00720_REL_006,RECORD-00720,O0173,De Correspondent,Pioneered,C0982,Members
 RECORD-00720_REL_007,RECORD-00720,O0173,De Correspondent,Supports,C0981,Optimizing for trust,Optimized for trust was a plausible description of the model they were developing as the world's most successful member-funded news site,0.9,2026-05-27
 RECORD-00720_REL_008,RECORD-00720,P0005,Jay Rosen,Originated By,C0659,The View from Nowhere,the practice of disclosure... is more optimal for the production of trust than... the View from Nowhere,1,2026-05-27
 RECORD-00720_REL_009,RECORD-00720,P0005,Jay Rosen,Criticizes,C0014,Savvy style,"It was mostly a critique of the 'savvy' style in the mainstream press, where the object is to get inside the game",1,2026-05-27
-RECORD-00720_REL_010,RECORD-00720,P0005,Jay Rosen,Originated By,W0666,PressThink,"He is the author of PressThink, a blog about journalism's ordeals in the age of the Web, which he launched in 2003.",1,2026-05-27
+RECORD-00720_REL_010,RECORD-00720,P0005,Jay Rosen,Originated By,O0033,PressThink,"He is the author of PressThink, a blog about journalism's ordeals in the age of the Web, which he launched in 2003.",1,2026-05-27
 RECORD-00720_REL_011,RECORD-00720,P0005,Jay Rosen,Originated By,W0020,Why Political Coverage is Broken,"Five years before Trump's victory I had given a lecture in Melbourne, Australia entitled, 'Why Political Coverage is Broken.'",1,2026-05-27
 RECORD-00720_REL_012,RECORD-00720,P0005,Jay Rosen,Originated By,W0884,Winter is Coming: Prospects for the American Press Under Trump,After the election I wrote a two-part post called 'Winter is Coming' that summarized a bleak situation,1,2026-05-27
 RECORD-00720_REL_013,RECORD-00720,P2471,Rob Wijnberg,Originated By,W0885,Unbreaking News,"In his excellent series, 'Unbreaking News', which explains De Correspondent's public philosophy, founder and editor-in-chief Rob Wijnberg",1,2026-05-27
@@ -7211,7 +7211,7 @@ RECORD-00720_REL_027,RECORD-00720,O0173,De Correspondent,Supports,C0156,Construc
 RECORD-00720_REL_028,RECORD-00720,P2471,Rob Wijnberg,Originated By,C0989,Recency bias,"'The problem isn't liberal bias, it's recency bias.'",0.9,2026-05-27
 RECORD-00720_REL_029,RECORD-00720,P0005,Jay Rosen,Affiliated With,O0173,De Correspondent,"I decided to work with a small Dutch site, De Correspondent.",1,2026-05-27
 RECORD-00720_REL_030,RECORD-00720,P0005,Jay Rosen,Affiliated With,O0305,The Correspondent,he's an 'ambassador' for The Correspondent in its drive to expand to the U.S.,1,2026-05-27
-RECORD-00721_REL_001,RECORD-00721,W0666,PressThink,Affiliated With,O1313,New York University,"He is the author of PressThink, a blog about journalism and its ordeals, which he introduced in September 2003.",0.7,2026-05-27
+RECORD-00721_REL_001,RECORD-00721,O0033,PressThink,Affiliated With,O1313,New York University,"He is the author of PressThink, a blog about journalism and its ordeals, which he introduced in September 2003.",0.7,2026-05-27
 RECORD-00721_REL_002,RECORD-00721,W0029,What Are Journalists For?,Published In,O0116,Yale University Press,"His 1999 book, What Are Journalists For? (Yale University Press)",1,2026-05-27
 RECORD-00721_REL_003,RECORD-00721,W0029,What Are Journalists For?,Discusses,C0062,Civic Journalism Movement,is about the rise of the civic journalism movement during the pre-internet era,1,2026-05-27
 RECORD-00721_REL_004,RECORD-00721,O0164,Membership Puzzle Project,Affiliated With,O0098,Knight Foundation,"director of the Membership Puzzle Project, funded by the Knight Foundation, Democracy Fund and Luminate",1,2026-05-27
@@ -7328,9 +7328,9 @@ RECORD-00727_REL_004,RECORD-00727,P2513,John Dinges,Discusses,C1005,New roles fo
 RECORD-00727_REL_005,RECORD-00727,P0342,"Davis Merritt, Jr.",Pioneered,C1005,New roles for journalism,"a discussion of new roles for journalism w/...Davis Merritt, Jr.",0.8,2026-05-27
 RECORD-00727_REL_006,RECORD-00727,O1536,NYPR Archive Collections,Affiliated With,O0226,WNYC,"The NYPR Archive Collections | Jan 1, 2000 ... WNYC archives id: 9156",0.9,2026-05-27
 RECORD-00729_REL_001,RECORD-00729,P0005,Jay Rosen,Affiliated With,O1313,New York University,Jay Rosen is a professor of journalism at New York University,1,2026-05-27
-RECORD-00729_REL_002,RECORD-00729,P0005,Jay Rosen,Originated By,W0666,PressThink,"author of PressThink, a weblog about journalism and its ordeals",1,2026-05-27
-RECORD-00729_REL_003,RECORD-00729,W0666,PressThink,Supports,E0338,Reporters Without Borders 2005 Freedom Blog award,"In June 2005, PressThink won the Reporters Without Borders 2005 Freedom Blog award for outstanding defense of free expression",1,2026-05-27
-RECORD-00729_REL_004,RECORD-00729,O0207,Reporters Without Borders,Mentions,W0666,PressThink,PressThink won the Reporters Without Borders 2005 Freedom Blog award,1,2026-05-27
+RECORD-00729_REL_002,RECORD-00729,P0005,Jay Rosen,Originated By,O0033,PressThink,"author of PressThink, a weblog about journalism and its ordeals",1,2026-05-27
+RECORD-00729_REL_003,RECORD-00729,O0033,PressThink,Supports,E0338,Reporters Without Borders 2005 Freedom Blog award,"In June 2005, PressThink won the Reporters Without Borders 2005 Freedom Blog award for outstanding defense of free expression",1,2026-05-27
+RECORD-00729_REL_004,RECORD-00729,O0207,Reporters Without Borders,Mentions,O0033,PressThink,PressThink won the Reporters Without Borders 2005 Freedom Blog award,1,2026-05-27
 RECORD-00729_REL_005,RECORD-00729,P0005,Jay Rosen,Founded By,W0084,NewAssignment.net,"In July 2006 he launched NewAssignment.Net, his experimental site for pro-am, open source reporting projects",1,2026-05-27
 RECORD-00729_REL_006,RECORD-00729,W0891,Assignment Zero,Affiliated With,O1537,Wired.com,"The first one was called Assignment Zero, a collaboration with Wired.com",1,2026-05-27
 RECORD-00729_REL_007,RECORD-00729,W0673,OfftheBus.Net,Affiliated With,O1350,Huffington Post,A second project is OfftheBus.Net with the Huffington Post,1,2026-05-27
@@ -7365,7 +7365,7 @@ RECORD-00730_REL_016,RECORD-00730,W0894,Studio 20,Inspired By,C1006,American pra
 RECORD-00730_REL_017,RECORD-00730,W0893,The Local: East Village,Discusses,C1007,Journalism education reform,what could this mean for the future of journalism education?,1,2026-05-27
 RECORD-00730_REL_018,RECORD-00730,P1835,Donica Mensing,Discusses,C1007,Journalism education reform,there are some structural factors in higher education that can pose a challenge for these kinds of projects.,0.9,2026-05-27
 RECORD-00730_REL_019,RECORD-00730,P2515,Tim Stenovec,Affiliated With,W0893,The Local: East Village,Tim Stenovec is taking the lead on community relationships within the East Village,1,2026-05-27
-RECORD-00730_REL_020,RECORD-00730,W0666,PressThink,Discusses,W0893,The Local: East Village,his post at PressThink covers all the nooks and crannies of this partnership,1,2026-05-27
+RECORD-00730_REL_020,RECORD-00730,O0033,PressThink,Discusses,W0893,The Local: East Village,his post at PressThink covers all the nooks and crannies of this partnership,1,2026-05-27
 RECORD-00730_REL_021,RECORD-00730,P2514,Seth C. Lewis,Affiliated With,O0808,Nieman Journalism Lab,"By Seth C. Lewis, posted on Nieman Journalism Lab",1,2026-05-27
 RECORD-00732_REL_001,RECORD-00732,P0073,Donald Trump,Affiliated With,O0126,White House,the relationship between journalists and the White House was more poisonous or fundamentally undemocratic than it is under President Trump,1,2026-05-27
 RECORD-00732_REL_002,RECORD-00732,P0188,Sean Spicer,Affiliated With,O0126,White House,the very first statement Sean Spicer made from the briefing room podium,1,2026-05-27
@@ -7441,8 +7441,8 @@ RECORD-00736_REL_009,RECORD-00736,P0005,Jay Rosen,Discusses,C0020,Democratic bac
 RECORD-00736_REL_010,RECORD-00736,P0005,Jay Rosen,Mentions,W0722,Reliable Sources,"Jay Rosen, journalism professor at New York University, said on 'Reliable Sources' Sunday.",1,2026-05-27
 RECORD-00736_REL_011,RECORD-00736,C0958,Urgency Index,Discusses,C0020,Democratic backsliding,an 'urgency index' that measures democratic backsliding,1,2026-05-27
 RECORD-00737_REL_001,RECORD-00737,P0005,Jay Rosen,Affiliated With,O1313,New York University,"New York University professor Jay Rosen, long one of my favorite commentators on journalism",1,2026-05-27
-RECORD-00737_REL_002,RECORD-00737,P0005,Jay Rosen,Originated By,W0666,PressThink,the author of a blog called PressThink,1,2026-05-27
-RECORD-00737_REL_003,RECORD-00737,W0897,"A Current List of My Top Problems in PressThink, May 2021",Published In,W0666,PressThink,Below are a couple of excerpts from Rosen's post,1,2026-05-27
+RECORD-00737_REL_002,RECORD-00737,P0005,Jay Rosen,Originated By,O0033,PressThink,the author of a blog called PressThink,1,2026-05-27
+RECORD-00737_REL_003,RECORD-00737,W0897,"A Current List of My Top Problems in PressThink, May 2021",Published In,O0033,PressThink,Below are a couple of excerpts from Rosen's post,1,2026-05-27
 RECORD-00737_REL_004,RECORD-00737,P0005,Jay Rosen,Criticizes,C1019,Both sides model of news coverage,That mental model still undergirds almost all activity in political journalism. But it is falling apart.,0.95,2026-05-27
 RECORD-00737_REL_005,RECORD-00737,P0005,Jay Rosen,Discusses,C1018,Objectivity norm,The big norm for about a century has been the objectivity norm,0.9,2026-05-27
 RECORD-00737_REL_006,RECORD-00737,P0073,Donald Trump,Criticizes,C1018,Objectivity norm,"It had been on the ropes before Donald Trump, but he delivered the coup de grace.",0.85,2026-05-27
@@ -7453,7 +7453,7 @@ RECORD-00737_REL_010,RECORD-00737,P0005,Jay Rosen,Cites,P0118,Charlie Warzel,"as
 RECORD-00737_REL_011,RECORD-00737,P0118,Charlie Warzel,Criticizes,C0071,Newsworthiness,"'Newsworthiness' is a big fat dodge, or as Charlie Warzel put it, 'a choice masquerading as an inevitability.'",0.95,2026-05-27
 RECORD-00737_REL_012,RECORD-00737,P0005,Jay Rosen,Criticizes,C0071,Newsworthiness,Almost every act of disinformation Donald Trump ever committed was in one way or another 'newsworthy' by previous standards. Were all these acts worth amplifying? They were not.,0.95,2026-05-27
 RECORD-00737_REL_013,RECORD-00737,W0898,Asymmetry Between the Major Parties Fries the Circuits of the Mainstream Press,Originated By,P0005,Jay Rosen,"As I wrote five years ago, asymmetry between the major parties fries the circuits of the mainstream press.",1,2026-05-27
-RECORD-00737_REL_014,RECORD-00737,W0898,Asymmetry Between the Major Parties Fries the Circuits of the Mainstream Press,Published In,W0666,PressThink,asymmetry between the major parties fries the circuits of the mainstream press [linked PressThink post],1,2026-05-27
+RECORD-00737_REL_014,RECORD-00737,W0898,Asymmetry Between the Major Parties Fries the Circuits of the Mainstream Press,Published In,O0033,PressThink,asymmetry between the major parties fries the circuits of the mainstream press [linked PressThink post],1,2026-05-27
 RECORD-00737_REL_015,RECORD-00737,C1020,Asymmetry between the major parties,Originated By,P0005,Jay Rosen,"As I wrote five years ago, asymmetry between the major parties fries the circuits of the mainstream press.",0.9,2026-05-27
 RECORD-00737_REL_016,RECORD-00737,P0073,Donald Trump,Mentions,E0343,Trump presidency,the rise of Donald Trump overturned a great many norms,1,2026-05-27
 RECORD-00737_REL_017,RECORD-00737,P2523,Eric Black,Affiliated With,O1518,MinnPost,Eric Black Ink [MinnPost column],1,2026-05-27
@@ -7595,13 +7595,13 @@ RECORD-00748_REL_012,RECORD-00748,P2543,Kathy Lohr,Discusses,L0011,Philadelphia,
 RECORD-00749_REL_001,RECORD-00749,C1037,Thin legitimacy,Criticizes,O0076,Facebook,"When you sign up for a Facebook account, you have to agree to this long list that most people don't read. That's thin legitimacy.",1,2026-05-27
 RECORD-00749_REL_002,RECORD-00749,C1038,Thick legitimacy,Discusses,O0076,Facebook,Thick legitimacy is when you really understand the deal... they may realize that thick legitimacy is what they need to keep operating,1,2026-05-27
 RECORD-00749_REL_003,RECORD-00749,O0076,Facebook,Criticizes,O1381,PBS Newshour,"Facebook... has, in a way, replaced their relationship with users of the news. Instead of going to their favorite news site, just find new stories in their Facebook news feed.",0.9,2026-05-27
-RECORD-00749_REL_004,RECORD-00749,W0666,PressThink,Affiliated With,O1313,New York University,New York University journalism professor Jay Rosen. He runs the Web site PressThink.org,1,2026-05-27
+RECORD-00749_REL_004,RECORD-00749,O0033,PressThink,Affiliated With,O1313,New York University,New York University journalism professor Jay Rosen. He runs the Web site PressThink.org,1,2026-05-27
 RECORD-00749_REL_005,RECORD-00749,P0244,Judy Woodruff,Affiliated With,O1381,PBS Newshour,JUDY WOODRUFF: Now to another in our Brief But Spectacular series,1,2026-05-27
 RECORD-00749_REL_006,RECORD-00749,C1040,Filter bubble,Discusses,O0076,Facebook,Some people say the problem is that people are always listening to voices that they already agree with on social media.,0.7,2026-05-27
 RECORD-00749_REL_007,RECORD-00749,C1037,Thin legitimacy,Expands On,C1038,Thick legitimacy,That's thin legitimacy. Thick legitimacy is when you really understand the deal.,1,2026-05-27
 RECORD-00749_REL_008,RECORD-00749,C1039,Democracy as participant sport,Criticizes,O0076,Facebook,Democracy is not a spectator sport. It's a participant thing... we're not going to have serious journalism unless you choose it.,0.8,2026-05-27
 RECORD-00750_REL_001,RECORD-00750,P0005,Jay Rosen,Affiliated With,O1313,New York University,"Jay Rosen, author of the PRESSthink blog... and journalism professor at NYU",1,2026-05-27
-RECORD-00750_REL_002,RECORD-00750,W0666,PressThink,Originated By,P0005,Jay Rosen,"Jay Rosen, author of the PRESSthink blog",1,2026-05-27
+RECORD-00750_REL_002,RECORD-00750,O0033,PressThink,Originated By,P0005,Jay Rosen,"Jay Rosen, author of the PRESSthink blog",1,2026-05-27
 RECORD-00750_REL_003,RECORD-00750,P0005,Jay Rosen,Published In,W0907,PBS MediaShift Idea Lab,a contributor to PBS MediaShift's Idea Lab,1,2026-05-27
 RECORD-00750_REL_004,RECORD-00750,P0005,Jay Rosen,Affiliated With,O1557,Spot.us,also is an adviser to Spot.us,1,2026-05-27
 RECORD-00750_REL_005,RECORD-00750,O1557,Spot.us,Founded By,P0726,David Cohn,"Spot.us, a project kickstarted by David Cohn",1,2026-05-27
@@ -7738,8 +7738,8 @@ RECORD-00759_REL_030,RECORD-00759,O0305,The Correspondent,Mentions,L0003,United 
 RECORD-00760_REL_001,RECORD-00760,P0005,Jay Rosen,Affiliated With,O1313,New York University,Jay Rosen teaches journalism at New York University and directs the school's Studio 20 program.,1,2026-05-27
 RECORD-00760_REL_002,RECORD-00760,P0005,Jay Rosen,Affiliated With,O0179,Studio 20,directs the school's Studio 20 program,1,2026-05-27
 RECORD-00760_REL_003,RECORD-00760,O0179,Studio 20,Affiliated With,O1313,New York University,directs the school's Studio 20 program,1,2026-05-27
-RECORD-00760_REL_004,RECORD-00760,W0666,PressThink,Originated By,P0005,Jay Rosen,He also write about the media and journalism in his blog PressThink.,1,2026-05-27
-RECORD-00760_REL_005,RECORD-00760,W0861,Send the interns,Published In,W0666,PressThink,"In your most recent post on PressThink, you wrote that major media outlets like CNN and The New York Times should start sending interns to the White House press briefings",1,2026-05-27
+RECORD-00760_REL_004,RECORD-00760,O0033,PressThink,Originated By,P0005,Jay Rosen,He also write about the media and journalism in his blog PressThink.,1,2026-05-27
+RECORD-00760_REL_005,RECORD-00760,W0861,Send the interns,Published In,O0033,PressThink,"In your most recent post on PressThink, you wrote that major media outlets like CNN and The New York Times should start sending interns to the White House press briefings",1,2026-05-27
 RECORD-00760_REL_006,RECORD-00760,P0005,Jay Rosen,Criticizes,P0073,Donald Trump,He's been writing about the relationship between the Trump Administration and the press and how he thinks that press should cover President Trump.,0.9,2026-05-27
 RECORD-00760_REL_007,RECORD-00760,P0005,Jay Rosen,Criticizes,O1204,Trump Administration,Trump doesn't just want to criticize and put down the news media. He wants to replace it. He wants to be the source of information for what's going on in the Trump government.,0.9,2026-05-27
 RECORD-00760_REL_008,RECORD-00760,P0073,Donald Trump,Affiliated With,O1204,Trump Administration,President Donald Trump has a tense and at times hostile relationship with the media,1,2026-05-27
@@ -7769,7 +7769,7 @@ RECORD-00761_REL_009,RECORD-00761,O1579,The Scott Trust,Supports,O0158,The Guard
 RECORD-00761_REL_010,RECORD-00761,O0115,ProPublica,Supports,C1064,Independent public interest journalism,"ProPublica is a non-profit investigative newsroom, donor supported, that sometimes shares its work with for-profit newspapers.",0.9,2026-05-27
 RECORD-00761_REL_011,RECORD-00761,O0312,The Atavist,Owns,O1580,The Creativist,"the Atavist, which produces narrative non-fiction — also called long form journalism — and hopes to profit from a publishing platform, the Creativist",0.9,2026-05-27
 RECORD-00761_REL_012,RECORD-00761,O0312,The Atavist,Mentions,O0205,First Look Media,A good comparison point for that relationship is a company like the Atavist,0.8,2026-05-27
-RECORD-00761_REL_013,RECORD-00761,W0666,PressThink,Discusses,O0205,First Look Media,"As I previously explained to readers of PressThink, I am an adviser to Omidyar's company",1,2026-05-27
+RECORD-00761_REL_013,RECORD-00761,O0033,PressThink,Discusses,O0205,First Look Media,"As I previously explained to readers of PressThink, I am an adviser to Omidyar's company",1,2026-05-27
 RECORD-00761_REL_014,RECORD-00761,E0358,First Look Media launch announcement,Occurred At,L0001,New York City,"First Look Media is currently securing space and setting up operations in New York City, San Francisco, and Washington, D.C.",0.7,2026-05-27
 RECORD-00761_REL_015,RECORD-00761,E0358,First Look Media launch announcement,Occurred At,L0025,San Francisco,"setting up operations in New York City, San Francisco, and Washington, D.C.",0.7,2026-05-27
 RECORD-00761_REL_016,RECORD-00761,E0358,First Look Media launch announcement,Occurred At,L0204,"Washington, D.C.","setting up operations in New York City, San Francisco, and Washington, D.C.",0.7,2026-05-27
@@ -7821,7 +7821,7 @@ RECORD-00763_REL_023,RECORD-00763,P0253,Ken Doctor,Published In,O0808,Nieman Jou
 RECORD-00763_REL_024,RECORD-00763,P0005,Jay Rosen,Published In,O0808,Nieman Journalism Lab,Rosen... explained in an essay for the Nieman Journalism Lab that he was intrigued because The Correspondent has been 'optimized for trust.',1,2026-05-27
 RECORD-00763_REL_025,RECORD-00763,O0002,The New York Times,Mentions,O0023,The Washington Post,at a moment when The New York Times and The Washington Post are engaged in a high-profile battle for paying subscribers.,0.7,2026-05-27
 RECORD-00764_REL_001,RECORD-00764,P0005,Jay Rosen,Affiliated With,O1313,New York University,JAY ROSEN is a professor of journalism at New York University and an insightful critic of the media.,1,2026-05-27
-RECORD-00764_REL_002,RECORD-00764,P0005,Jay Rosen,Founded By,W0666,PressThink,"Mr Rosen has a blog of his own, PressThink",1,2026-05-27
+RECORD-00764_REL_002,RECORD-00764,P0005,Jay Rosen,Founded By,O0033,PressThink,"Mr Rosen has a blog of his own, PressThink",1,2026-05-27
 RECORD-00764_REL_003,RECORD-00764,P0005,Jay Rosen,Originated By,W0029,What Are Journalists For?,"He has also written a book, titled 'What Are Journalists For?', about the rise of the civic-journalism movement.",1,2026-05-27
 RECORD-00764_REL_004,RECORD-00764,W0029,What Are Journalists For?,Discusses,C0048,Civic Journalism,"a book, titled 'What Are Journalists For?', about the rise of the civic-journalism movement.",1,2026-05-27
 RECORD-00764_REL_005,RECORD-00764,P0005,Jay Rosen,Published In,O0213,The Economist,Here's how The Economist introduced its interview of Jay Rosen,1,2026-05-27
@@ -7872,7 +7872,7 @@ RECORD-00766_REL_004,RECORD-00766,P2574,Roger Berkowitz,Discusses,E0363,Blogging
 RECORD-00766_REL_005,RECORD-00766,E0363,Blogging and the New Public Intellectual panel,Occurred At,O1590,Hannah Arendt Center for Politics and Humanities,part of the 'Blogging and the New Public Intellectual' series,0.9,2026-05-27
 RECORD-00766_REL_006,RECORD-00766,O1590,Hannah Arendt Center for Politics and Humanities,Affiliated With,O1591,Bard College,bard.edu/hannaharendtcenter — the Hannah Arendt Center is housed at Bard College,1,2026-05-27
 RECORD-00766_REL_007,RECORD-00766,P0005,Jay Rosen,Affiliated With,O1313,New York University,"Jay Rosen is a media critic, a writer, and a professor of journalism at New York University.",1,2026-05-27
-RECORD-00766_REL_008,RECORD-00766,P0005,Jay Rosen,Founded By,W0666,PressThink,"You can visit his blog, 'Pressthink' here",1,2026-05-27
+RECORD-00766_REL_008,RECORD-00766,P0005,Jay Rosen,Founded By,O0033,PressThink,"You can visit his blog, 'Pressthink' here",1,2026-05-27
 RECORD-00766_REL_009,RECORD-00766,P2547,Megan Garber,Affiliated With,O0051,The Atlantic,Megan Garber is a staff writer at The Atlantic.,1,2026-05-27
 RECORD-00766_REL_010,RECORD-00766,P2547,Megan Garber,Affiliated With,O0808,Nieman Journalism Lab,"She was formerly an assistant editor at the Nieman Journalism Lab, where she wrote about innovations in the media.",1,2026-05-27
 RECORD-00766_REL_011,RECORD-00766,P0005,Jay Rosen,Originated By,C1076,Journalist as heightened informed citizen,"Rosen thinks of the journalist, 'as a heightened form of an informed citizen.'",0.9,2026-05-27
@@ -7917,8 +7917,8 @@ RECORD-00768_REL_010,RECORD-00768,P0326,Bob Garfield,Affiliated With,O0226,WNYC,
 RECORD-00768_REL_011,RECORD-00768,C1080,Fairness bias,Discusses,O1594,National Public Radio,"Fairness bias is a huge problem in public radio, in my opinion, as is political timidity",1,2026-05-27
 RECORD-00768_REL_012,RECORD-00768,C1081,Transparency over objectivity,Expands On,C1080,Fairness bias,accuracy and transparency are far more important than the appearance of objectivity,0.9,2026-05-27
 RECORD-00768_REL_013,RECORD-00768,P2580,Caitlin Curran,Discusses,E0364,Occupy Wall Street,People who do participate are able to tell the story of Occupy Wall Street,0.8,2026-05-27
-RECORD-00768_REL_014,RECORD-00768,W0666,PressThink,Affiliated With,O1313,New York University,Jay Rosen teaches journalism at NYU and blogs at pressthink.org,1,2026-05-27
-RECORD-00768_REL_015,RECORD-00768,W0666,PressThink,Pioneered,C1081,Transparency over objectivity,Jay Rosen... believes that accuracy and transparency are far more important than the appearance of objectivity,0.9,2026-05-27
+RECORD-00768_REL_014,RECORD-00768,O0033,PressThink,Affiliated With,O1313,New York University,Jay Rosen teaches journalism at NYU and blogs at pressthink.org,1,2026-05-27
+RECORD-00768_REL_015,RECORD-00768,O0033,PressThink,Pioneered,C1081,Transparency over objectivity,Jay Rosen... believes that accuracy and transparency are far more important than the appearance of objectivity,0.9,2026-05-27
 RECORD-00769_REL_001,RECORD-00769,P0005,Jay Rosen,Affiliated With,O1313,New York University,NYU professor Jay Rosen proposed something simple yet revolutionary,1,2026-05-27
 RECORD-00769_REL_002,RECORD-00769,P0005,Jay Rosen,Originated By,C1082,Fact-checking Sunday shows,"NYU Journalism Professor Jay Rosen proposed something simple that was, at the same time, revolutionary: Why don't the Sunday morning talk shows fact-check their guests?",1,2026-05-27
 RECORD-00769_REL_003,RECORD-00769,W0927,My Simple Fix for the Messed Up Sunday Shows,Originated By,P0005,Jay Rosen,"In a blog post, Rosen argued that there was plenty wrong with the Sunday show format",1,2026-05-27
@@ -7972,10 +7972,10 @@ RECORD-00772_REL_012,RECORD-00772,C1084,He Said / She Said Journalism,Expands On
 RECORD-00772_REL_013,RECORD-00772,E0367,Jay Rosen visit to Mercer Center for Collaborative Journalism,Occurred At,O1598,Mercer University Center for Collaborative Journalism,Rosen was the main attraction at a live recording of The Pub on my home turf — Mercer University's Center for Collaborative Journalism,1,2026-05-27
 RECORD-00772_REL_014,RECORD-00772,C0659,The View from Nowhere,Criticizes,P2124,Adam Ragusea,"As Adam pointed out, there is no 'view from nowhere' — Ragusea pushed back on the term in the show",0.7,2026-05-27
 RECORD-00772_REL_015,RECORD-00772,P2124,Adam Ragusea,Affiliated With,O1599,Georgia Public Broadcasting,"Photos: Grant Blankenship, Georgia Public Broadcasting",0.6,2026-05-27
-RECORD-00773_REL_001,RECORD-00773,P0182,Jim Romenesko,Mentions,W0666,PressThink,Jim Romenesko summarizes a PressThink post by Jay Rosen explaining why he didn't become a newspaperman.,1,2026-05-27
+RECORD-00773_REL_001,RECORD-00773,P0182,Jim Romenesko,Mentions,O0033,PressThink,Jim Romenesko summarizes a PressThink post by Jay Rosen explaining why he didn't become a newspaperman.,1,2026-05-27
 RECORD-00773_REL_002,RECORD-00773,P0182,Jim Romenesko,Affiliated With,O0309,Poynter Institute,"From 1999 to 2011, Jim Romenesko maintained the Romenesko page for the Poynter Institute.",1,2026-05-27
 RECORD-00773_REL_003,RECORD-00773,E0368,Removal from Buffalo Courier-Express building,Occurred At,O1541,Buffalo Courier-Express,the editor who had security take him out of the Buffalo Courier-Express building in 1979,1,2026-05-27
-RECORD-00773_REL_004,RECORD-00773,W0666,PressThink,Discusses,E0368,Removal from Buffalo Courier-Express building,"He explains what happened, and catches up with the editor who had security take him out of the Buffalo Courier-Express building in 1979.",1,2026-05-27
+RECORD-00773_REL_004,RECORD-00773,O0033,PressThink,Discusses,E0368,Removal from Buffalo Courier-Express building,"He explains what happened, and catches up with the editor who had security take him out of the Buffalo Courier-Express building in 1979.",1,2026-05-27
 RECORD-00774_REL_001,RECORD-00774,P0005,Jay Rosen,Affiliated With,O1313,New York University,"New York University journalism professor Jay Rosen, a major thinker in our field",1,2026-05-27
 RECORD-00774_REL_002,RECORD-00774,P0005,Jay Rosen,Originated By,W0932,Why I Am Not a Journalist: A True Story,I was delighted to find him writing a personal essay about his youth,1,2026-05-27
 RECORD-00774_REL_003,RECORD-00774,W0932,Why I Am Not a Journalist: A True Story,Published In,O0033,PressThink,a personal essay about his youth (pressthink.org/2010/09/why-i-am-not-a-journalist-a-true-story/),1,2026-05-27
@@ -7996,7 +7996,7 @@ RECORD-00776_REL_008,RECORD-00776,C1052,Membership model in journalism,Originate
 RECORD-00777_REL_001,RECORD-00777,C1037,Thin legitimacy,Criticizes,O0076,Facebook,"When you sign up for a Facebook account, you have to agree to this long list that most people don't read. That's thin legitimacy.",1,2026-05-27
 RECORD-00777_REL_002,RECORD-00777,C1037,Thin legitimacy,Discusses,C1038,Thick legitimacy,Thick legitimacy is when you really understand the deal.,1,2026-05-27
 RECORD-00777_REL_003,RECORD-00777,C1038,Thick legitimacy,Discusses,O0076,Facebook,"they may realize that thick legitimacy is what they need to keep operating, because people trust Facebook",0.9,2026-05-27
-RECORD-00777_REL_004,RECORD-00777,W0666,PressThink,Affiliated With,O1313,New York University,New York University journalism professor Jay Rosen. He runs the Web site PressThink.org,1,2026-05-27
+RECORD-00777_REL_004,RECORD-00777,O0033,PressThink,Affiliated With,O1313,New York University,New York University journalism professor Jay Rosen. He runs the Web site PressThink.org,1,2026-05-27
 RECORD-00777_REL_005,RECORD-00777,P0244,Judy Woodruff,Affiliated With,O1381,PBS Newshour,JUDY WOODRUFF: Now to another in our Brief But Spectacular series,1,2026-05-27
 RECORD-00777_REL_006,RECORD-00777,W0048,Brief But Spectacular,Published In,O1381,PBS Newshour,"another in our Brief But Spectacular series, where we ask interesting people to share their passions",1,2026-05-27
 RECORD-00777_REL_007,RECORD-00777,C1087,Social Media as News Source,Discusses,O0076,Facebook,Facebook doesn't have an editor in chief -- so it's up to consumers to be selective about their news sources,0.9,2026-05-27
@@ -8026,7 +8026,7 @@ RECORD-00784_REL_002,RECORD-00784,W0936,Recode Media with Peter Kafka,Affiliated
 RECORD-00784_REL_003,RECORD-00784,W0936,Recode Media with Peter Kafka,Published In,O1605,Recode,Recode Media with Peter Kafka,1,2026-05-27
 RECORD-00784_REL_004,RECORD-00784,P0351,Peter Kafka,Affiliated With,O1605,Recode,Recode Media with Peter Kafka,1,2026-05-27
 RECORD-00784_REL_005,RECORD-00784,P2589,Eric Johnson,Affiliated With,O1605,Recode,by Eric Johnson,1,2026-05-27
-RECORD-00784_REL_006,RECORD-00784,W0881,"Prospects for the American Press Under Trump, Part Two",Published In,W0666,PressThink,Drawing from a recent essay about how the press can rationally react to Trump,1,2026-05-27
+RECORD-00784_REL_006,RECORD-00784,W0881,"Prospects for the American Press Under Trump, Part Two",Published In,O0033,PressThink,Drawing from a recent essay about how the press can rationally react to Trump,1,2026-05-27
 RECORD-00784_REL_007,RECORD-00784,W0881,"Prospects for the American Press Under Trump, Part Two",Discusses,P0073,Donald Trump,a recent essay about how the press can rationally react to Trump,1,2026-05-27
 RECORD-00784_REL_008,RECORD-00784,C0659,The View from Nowhere,Expands On,C0528,Voice of God,"Ditching the 'view from nowhere,' or the 'voice of God'",0.9,2026-05-27
 RECORD-00784_REL_009,RECORD-00784,C0659,The View from Nowhere,Originated By,O1313,New York University,NYU journalism professor Jay Rosen,0.8,2026-05-27
@@ -8090,7 +8090,7 @@ RECORD-00787_REL_028,RECORD-00787,P2595,Jauvan Moradi,Criticizes,C0407,Culture W
 RECORD-00787_REL_029,RECORD-00787,P0012,Mark Glaser,Cites,C0659,The View from Nowhere,The 'view from nowhere' only goes so far.,1,2026-05-27
 RECORD-00788_REL_001,RECORD-00788,O0179,Studio 20,Affiliated With,O1313,New York University,"Studio 20, a journalism master's program at New York University",1,2026-05-27
 RECORD-00788_REL_002,RECORD-00788,W0937,News Literacy 2016,Affiliated With,O0179,Studio 20,"The project is the work of Studio 20, a journalism master's program at New York University",1,2026-05-27
-RECORD-00788_REL_003,RECORD-00788,W0938,How to Be Literate in What's Changing Journalism,Published In,W0666,PressThink,The project's impetus dates to a post on Rosen's PressThink blog in November 2014,1,2026-05-27
+RECORD-00788_REL_003,RECORD-00788,W0938,How to Be Literate in What's Changing Journalism,Published In,O0033,PressThink,The project's impetus dates to a post on Rosen's PressThink blog in November 2014,1,2026-05-27
 RECORD-00788_REL_004,RECORD-00788,W0937,News Literacy 2016,Inspired By,W0938,How to Be Literate in What's Changing Journalism,"The project's impetus dates to a post on Rosen's PressThink blog in November 2014, which was a list of topics students should master",0.9,2026-05-27
 RECORD-00788_REL_005,RECORD-00788,P2598,Chris Lusk,Affiliated With,O0179,Studio 20,"Chris Lusk, another Studio 20 student who spearheaded the design and web development side of the project",1,2026-05-27
 RECORD-00788_REL_006,RECORD-00788,P2599,Kim Bode,Affiliated With,W0937,News Literacy 2016,"Kim Bode, the News Literacy project manager",1,2026-05-27
@@ -8111,7 +8111,7 @@ RECORD-00789_REL_008,RECORD-00789,P0073,Donald Trump,Mentions,E0374,First week o
 RECORD-00789_REL_009,RECORD-00789,E0374,First week of the Trump administration,Occurred At,L0249,White House,President Donald Trump poses with union leaders in the Oval Office at the White House in Washington,1,2026-05-27
 RECORD-00789_REL_010,RECORD-00789,C1106,Mexico City Policy,Originated By,P0073,Donald Trump,Trump's first executive action on abortion,0.6,2026-05-27
 RECORD-00790_REL_001,RECORD-00790,P0005,Jay Rosen,Affiliated With,O1313,New York University,Jay Rosen has been on the journalism faculty at New York University since 1986,1,2026-05-27
-RECORD-00790_REL_002,RECORD-00790,P0005,Jay Rosen,Originated By,W0666,PressThink,"Rosen is the author of PressThink, a blog about journalism and its ordeals",1,2026-05-27
+RECORD-00790_REL_002,RECORD-00790,P0005,Jay Rosen,Originated By,O0033,PressThink,"Rosen is the author of PressThink, a blog about journalism and its ordeals",1,2026-05-27
 RECORD-00790_REL_003,RECORD-00790,P0005,Jay Rosen,Originated By,W0029,What Are Journalists For?,"In 1999, Yale University Press published his book, What Are Journalists For?",1,2026-05-27
 RECORD-00790_REL_004,RECORD-00790,W0029,What Are Journalists For?,Published In,O0116,Yale University Press,"Yale University Press published his book, What Are Journalists For?",1,2026-05-27
 RECORD-00790_REL_005,RECORD-00790,W0029,What Are Journalists For?,Discusses,C0048,Civic Journalism,"What Are Journalists For?, which is about the rise of the civic journalism movement",1,2026-05-27
@@ -8137,7 +8137,7 @@ RECORD-00790_REL_024,RECORD-00790,O1619,Stand Up! with Pete Dominick,Discusses,P
 RECORD-00790_REL_025,RECORD-00790,P2600,Pete Dominick,Originated By,O1619,Stand Up! with Pete Dominick,"Stand Up is a daily podcast. I book, host, edit, post and promote new episodes",1,2026-05-27
 RECORD-00790_REL_026,RECORD-00790,C0048,Civic Journalism,Expands On,C1107,Membership models for journalism,civic journalism movement ... membership models for the support of public service journalism,0.7,2026-05-27
 RECORD-00791_REL_001,RECORD-00791,P0005,Jay Rosen,Affiliated With,O1313,New York University,"Jay teaches journalism at NYU, where he has been on the faculty since 1986. From 1999 to 2004 he was chair.",1,2026-05-27
-RECORD-00791_REL_002,RECORD-00791,W0666,PressThink,Originated By,P0005,Jay Rosen,"He is the author of PressThink, a blog about journalism's ordeals in the age of the Web, which he launched in 2003.",1,2026-05-27
+RECORD-00791_REL_002,RECORD-00791,O0033,PressThink,Originated By,P0005,Jay Rosen,"He is the author of PressThink, a blog about journalism's ordeals in the age of the Web, which he launched in 2003.",1,2026-05-27
 RECORD-00791_REL_003,RECORD-00791,W0029,What Are Journalists For?,Originated By,P0005,Jay Rosen,"In 1999, Yale University Press published his book, What Are Journalists For?",1,2026-05-27
 RECORD-00791_REL_004,RECORD-00791,W0029,What Are Journalists For?,Published In,O0116,Yale University Press,"In 1999, Yale University Press published his book, What Are Journalists For?",1,2026-05-27
 RECORD-00791_REL_005,RECORD-00791,W0029,What Are Journalists For?,Discusses,C0062,Civic Journalism Movement,"his book, What Are Journalists For?, which was about the rise of the civic journalism movement.",1,2026-05-27
@@ -8163,7 +8163,7 @@ RECORD-00793_REL_005,RECORD-00793,P2601,Amy Siskind,Originated By,W0939,The Week
 RECORD-00793_REL_006,RECORD-00793,P2601,Amy Siskind,Affiliated With,O1623,The New Agenda,"President of The New Agenda, a non-profit dedicated to the advancement of women",1,2026-05-27
 RECORD-00793_REL_007,RECORD-00793,W0029,What Are Journalists For?,Published In,O0116,Yale University Press,"His book, What Are Journalists For? (Yale University Press 1999)",1,2026-05-27
 RECORD-00793_REL_008,RECORD-00793,W0029,What Are Journalists For?,Discusses,C0062,Civic Journalism Movement,"What Are Journalists For? (Yale University Press 1999), is about the rise of the civic journalism movement",1,2026-05-27
-RECORD-00793_REL_009,RECORD-00793,W0666,PressThink,Discusses,C0062,Civic Journalism Movement,"PressThink, a blog about journalism and its ordeals",0.7,2026-05-27
+RECORD-00793_REL_009,RECORD-00793,O0033,PressThink,Discusses,C0062,Civic Journalism Movement,"PressThink, a blog about journalism and its ordeals",0.7,2026-05-27
 RECORD-00793_REL_010,RECORD-00793,P2602,Leah Wright Rigueur,Affiliated With,O1624,SNF Agora Institute,Leah Wright Rigueur is Associate Research Professor at the SNF Agora Institute,1,2026-05-27
 RECORD-00793_REL_011,RECORD-00793,P2602,Leah Wright Rigueur,Affiliated With,O0189,Johns Hopkins University,Associate Research Professor at the SNF Agora Institute and in the Department of History at Johns Hopkins University,1,2026-05-27
 RECORD-00793_REL_012,RECORD-00793,O1624,SNF Agora Institute,Affiliated With,O0189,Johns Hopkins University,SNF Agora Institute and in the Department of History at Johns Hopkins University,0.9,2026-05-27
@@ -8227,7 +8227,7 @@ RECORD-00797_REL_019,RECORD-00797,O1630,Investigative Reporting Workshop,Affilia
 RECORD-00797_REL_020,RECORD-00797,O0164,Membership Puzzle Project,Affiliated With,O1563,News Revenue Hub,they will be core partners in the work with New York University and De Correspondent,0.8,2026-05-27
 RECORD-00798_REL_001,RECORD-00798,O1606,Saint Michael's College,Discusses,E0381,Why do we need 'professional' journalists if anyone can report the news?,Saint Michael's College presents Jay Rosen... presenting a talk,1,2026-05-27
 RECORD-00798_REL_002,RECORD-00798,E0381,Why do we need 'professional' journalists if anyone can report the news?,Occurred At,L0251,Cheray Science Hall Room 101,at 7 p.m. in Cheray Science Hall Room 101,1,2026-05-27
-RECORD-00798_REL_003,RECORD-00798,W0666,PressThink,Affiliated With,O1313,New York University,author of the influential PressThink blog,0.8,2026-05-27
+RECORD-00798_REL_003,RECORD-00798,O0033,PressThink,Affiliated With,O1313,New York University,author of the influential PressThink blog,0.8,2026-05-27
 RECORD-00798_REL_004,RECORD-00798,W0029,What Are Journalists For?,Published In,O0116,Yale University Press,"In 1999, Yale University Press published his book, What Are Journalists For?",1,2026-05-27
 RECORD-00798_REL_005,RECORD-00798,W0029,What Are Journalists For?,Discusses,C0048,Civic Journalism,about the rise of the civic journalism movement,1,2026-05-27
 RECORD-00798_REL_006,RECORD-00798,O1616,Project on Public Life and the Press,Affiliated With,O0098,Knight Foundation,"director of the Project on Public Life and the Press, funded by the Knight Foundation",1,2026-05-27
@@ -8240,8 +8240,8 @@ RECORD-00799_REL_003,RECORD-00799,C0051,Horse-race journalism,Discusses,C1119,Ci
 RECORD-00799_REL_004,RECORD-00799,C1119,Citizens' agenda,Criticizes,C0051,Horse-race journalism,more important to focus on what our country needs rather than which nose crosses first,0.85,2026-05-27
 RECORD-00799_REL_005,RECORD-00799,O1635,upstart magazine,Discusses,E0382,Walkley Media Conference,upstart thanks the MEAA for permission to record and publish Jay Rosen's conversation,0.9,2026-05-27
 RECORD-00800_REL_001,RECORD-00800,P0005,Jay Rosen,Affiliated With,O1313,New York University,Rosen is an NYU journalism professor and one of the sharpest media critics in the U.S.,1,2026-05-27
-RECORD-00800_REL_002,RECORD-00800,P0005,Jay Rosen,Owns,W0666,PressThink,you might want to read Jay Rosen's post at his PressThink site,1,2026-05-27
-RECORD-00800_REL_003,RECORD-00800,W0940,How to be literate in what's changing in journalism,Published In,W0666,PressThink,Jay Rosen's post at his PressThink site: How to be literate in what's changing in journalism,1,2026-05-27
+RECORD-00800_REL_002,RECORD-00800,P0005,Jay Rosen,Owns,O0033,PressThink,you might want to read Jay Rosen's post at his PressThink site,1,2026-05-27
+RECORD-00800_REL_003,RECORD-00800,W0940,How to be literate in what's changing in journalism,Published In,O0033,PressThink,Jay Rosen's post at his PressThink site: How to be literate in what's changing in journalism,1,2026-05-27
 RECORD-00800_REL_004,RECORD-00800,P0005,Jay Rosen,Originated By,W0940,How to be literate in what's changing in journalism,How to be literate in what's changing in journalism,1,2026-05-27
 RECORD-00800_REL_005,RECORD-00800,W0940,How to be literate in what's changing in journalism,Discusses,C1105,Digital thinking,what he expects students in his 'digital thinking' class to master by the end of the term,0.9,2026-05-27
 RECORD-00800_REL_006,RECORD-00800,W0940,How to be literate in what's changing in journalism,Discusses,C1120,News as product or service,thinking of news as a product or service,0.9,2026-05-27
@@ -8283,7 +8283,7 @@ RECORD-00803_REL_015,RECORD-00803,O0582,Groklaw,Pioneered,C0102,Citizen Journali
 RECORD-00803_REL_016,RECORD-00803,O0073,Talking Points Memo,Discusses,E0383,U.S. Attorneys firings investigation,Talking Points Memo drives the U.S. Attorneys firings into the national spotlight,1,2026-05-27
 RECORD-00803_REL_017,RECORD-00803,O0589,Sunlight Foundation,Supports,C0102,Citizen Journalism,"Porkbusters, the Sunlight Foundation and TPM Muckraker expose congressional earmarks",0.85,2026-05-27
 RECORD-00803_REL_018,RECORD-00803,O0834,ePluribus Media,Discusses,E0117,Hurricane Katrina,"Members of the ePluribus Media community create a detailed timeline of key events before, during and after the Aug. 29, 2005, hurricane",1,2026-05-27
-RECORD-00803_REL_019,RECORD-00803,W0666,PressThink,Affiliated With,O1313,New York University,Jay Rosen is an associate professor of journalism at New York University and runs the PressThink blog.,1,2026-05-27
+RECORD-00803_REL_019,RECORD-00803,O0033,PressThink,Affiliated With,O1313,New York University,Jay Rosen is an associate professor of journalism at New York University and runs the PressThink blog.,1,2026-05-27
 RECORD-00803_REL_020,RECORD-00803,P0009,Andrew Sullivan,Pioneered,C0218,Blogosphere,"Skube said he had 'scanned a bunch of blogs,' but could think of only one scanee, Andrew Sullivan.",0.7,2026-05-27
 RECORD-00804_REL_001,RECORD-00804,W0351,Downing Street Memo,Criticizes,O0448,Bush Administration,"The leaked memo's importance has to do with a certain attitude about facts, namely that they can be 'fixed around the policy'",0.9,2026-05-27
 RECORD-00804_REL_002,RECORD-00804,C1126,Court of Appeal in the State of Supreme News Judgment,Expands On,C0506,News Judgment,"now there is a Court of Appeal in the State of Supreme News Judgment, and everyone knows the initial verdict can be reversed",1,2026-05-27
@@ -8454,7 +8454,7 @@ RECORD-00809_REL_015,RECORD-00809,O1647,Wizbang,Discusses,E0393,Killian Document
 RECORD-00809_REL_016,RECORD-00809,W0948,Thornburgh-Bocardi Report,Discusses,E0393,Killian Documents / National Guard Memo Controversy,the National Guard memo disaster at '60 Minutes: Wednesday' and the Thornburgh-Bocardi report on it that came out in January 2005,1,2026-05-27
 RECORD-00809_REL_017,RECORD-00809,P0702,Jessie Walker,Affiliated With,O0444,Reason magazine,Jessie Walker of Reason magazine,1,2026-05-27
 RECORD-00809_REL_018,RECORD-00809,P0702,Jessie Walker,Originated By,C1134,Media ecosystem (old media and new media),The old media and the new media weren't at loggerheads with each other... They complemented each other. They were part of the same ecosystem.,0.9,2026-05-27
-RECORD-00809_REL_019,RECORD-00809,W0666,PressThink,Published In,O1313,New York University,Jay Rosen is on the journalism faculty at New York University. His weblog is PressThink.,0.9,2026-05-27
+RECORD-00809_REL_019,RECORD-00809,O0033,PressThink,Published In,O1313,New York University,Jay Rosen is on the journalism faculty at New York University. His weblog is PressThink.,0.9,2026-05-27
 RECORD-00809_REL_020,RECORD-00809,P0446,Todd Gitlin,Affiliated With,O0064,Columbia University,"Todd Gitlin, a professor at Columbia University",1,2026-05-27
 RECORD-00809_REL_021,RECORD-00809,P0703,Ingrid Ciprian-Matthews,Affiliated With,O0419,CBS News,"Ingrid Ciprian-Matthews, senior broadcast producer for the 'Evening News'",1,2026-05-27
 RECORD-00809_REL_022,RECORD-00809,P0025,Stephen Spruiell,Affiliated With,O0020,National Review,"narrowing the differences between the National Review's media blogger, Stephen Spruiell, and CBS News",1,2026-05-27
@@ -8505,7 +8505,7 @@ RECORD-00810_REL_031,RECORD-00810,E0397,DeLay ethics rules change vote,Mentions,
 RECORD-00810_REL_032,RECORD-00810,E0396,Killian Memos / Rathergate,Mentions,P0555,Dan Rather,has figured in more than one PressThink post during the saga of Dan Rather and the Killian Memos.,1,2026-05-27
 RECORD-00810_REL_033,RECORD-00810,P0821,Andrew Heyward,Originated By,C1139,Illusion of omniscience,The illusion of omniscience is hurting news. 'That's the way it is' journalism isn't credible anymore.,0.9,2026-05-27
 RECORD-00810_REL_034,RECORD-00810,P1416,Jonathan Klein,Criticizes,C0447,Big Media,Jonathan Klein... who famously defined a blogger as some 'guy sitting in his living room in his pajamas',0.8,2026-05-27
-RECORD-00810_REL_035,RECORD-00810,W0666,PressThink,Discusses,E0395,"Big Media, the Bloggers roundtable",Which is basically the subject of the book I am writing.,0.8,2026-05-27
+RECORD-00810_REL_035,RECORD-00810,O0033,PressThink,Discusses,E0395,"Big Media, the Bloggers roundtable",Which is basically the subject of the book I am writing.,0.8,2026-05-27
 RECORD-00810_REL_036,RECORD-00810,O1464,New York Times Digital,Owns,W0419,TimesSelect,"Martin Nisenholtz, CEO of New York Times Digital, which just introduced TimesSelect.",1,2026-05-27
 RECORD-00810_REL_037,RECORD-00810,P2616,Kevin Sites,Affiliated With,O1648,Yahoo News,a company on the rise (with news about Kevin Sites and new columnists),0.9,2026-05-27
 RECORD-00810_REL_038,RECORD-00810,E0395,"Big Media, the Bloggers roundtable",Discusses,C1136,Citizens media,"evangelist for citizens media... About Big Media, the Bloggers and where the two are likely to meet",0.9,2026-05-27
@@ -8587,9 +8587,9 @@ RECORD-00813_REL_016,RECORD-00813,P2297,Douglas Jehl,Affiliated With,O1653,The N
 RECORD-00813_REL_017,RECORD-00813,P0147,Jill Abramson,Affiliated With,O0002,The New York Times,"Jill Abramson, who was the Washington bureau chief at the time, and... is now managing editor of The Times",1,2026-05-27
 RECORD-00813_REL_018,RECORD-00813,P0492,Joan Didion,Originated By,C0735,Pictures that shimmer,"one of those 'pictures that shimmer,' in Joan Didion's phrase",1,2026-05-27
 RECORD-00813_REL_019,RECORD-00813,C1145,The News Comes in Code,Discusses,W0725,News Comes in Code: Judy Miller's Return to the Times,"'The news comes in code, and mostly the silences speak.' Last week, that's how I described what happens",1,2026-05-27
-RECORD-00813_REL_020,RECORD-00813,W0725,News Comes in Code: Judy Miller's Return to the Times,Published In,W0666,PressThink,Earlier at Jay Rosen's PressThink... News Comes in Code: Judy Miller's Return to the Times (Oct. 4),1,2026-05-27
-RECORD-00813_REL_021,RECORD-00813,W0958,Judith Miller and Her Times,Published In,W0666,PressThink,Judith Miller and Her Times (Oct. 2),1,2026-05-27
-RECORD-00813_REL_022,RECORD-00813,W0726,Rollback,Published In,W0666,PressThink,"as I noted in my July 16 post, Rollback",1,2026-05-27
+RECORD-00813_REL_020,RECORD-00813,W0725,News Comes in Code: Judy Miller's Return to the Times,Published In,O0033,PressThink,Earlier at Jay Rosen's PressThink... News Comes in Code: Judy Miller's Return to the Times (Oct. 4),1,2026-05-27
+RECORD-00813_REL_021,RECORD-00813,W0958,Judith Miller and Her Times,Published In,O0033,PressThink,Judith Miller and Her Times (Oct. 2),1,2026-05-27
+RECORD-00813_REL_022,RECORD-00813,W0726,Rollback,Published In,O0033,PressThink,"as I noted in my July 16 post, Rollback",1,2026-05-27
 RECORD-00813_REL_023,RECORD-00813,P0638,Steve Lovelady,Affiliated With,O1652,Columbia Journalism Review Daily,Steve Lovelady of CJR Daily said Keller should recuse himself,1,2026-05-27
 RECORD-00813_REL_024,RECORD-00813,P0638,Steve Lovelady,Criticizes,P0030,Bill Keller,Steve Lovelady of CJR Daily said Keller should recuse himself from the editing of it,0.9,2026-05-27
 RECORD-00813_REL_025,RECORD-00813,P0183,Arianna Huffington,Criticizes,O0002,The New York Times,"Arianna Huffington wrote, 'Has the New York Times ceased journalistic operations?'",1,2026-05-27
@@ -8658,10 +8658,10 @@ RECORD-00815_REL_017,RECORD-00815,P0861,Paul McLeary,Criticizes,O0002,The New Yo
 RECORD-00815_REL_018,RECORD-00815,P0638,Steve Lovelady,Criticizes,O0268,Society of Professional Journalists,SPJ revealed that it doesn't share the discontent of many in the industry,0.9,2026-05-27
 RECORD-00815_REL_019,RECORD-00815,P0861,Paul McLeary,Criticizes,O0268,Society of Professional Journalists,SPJ revealed that it doesn't share the discontent of many in the industry,0.9,2026-05-27
 RECORD-00815_REL_020,RECORD-00815,O0518,American Society of Journalists and Authors,Criticizes,P1043,Judith Miller,American Society of Journalists and Authors (ASJA) had to reverse a committee decision to give Miller a Conscience in Media award,0.8,2026-05-27
-RECORD-00815_REL_021,RECORD-00815,W0961,Armchair Critic Speculates,Published In,W0666,PressThink,Armchair Critic Speculates... my last post,1,2026-05-27
-RECORD-00815_REL_022,RECORD-00815,W0958,Judith Miller and Her Times,Published In,W0666,PressThink,Judith Miller and Her Times (Oct. 2),1,2026-05-27
-RECORD-00815_REL_023,RECORD-00815,W0725,News Comes in Code: Judy Miller's Return to the Times,Published In,W0666,PressThink,News Comes in Code: Judy Miller's Return to the Times,1,2026-05-27
-RECORD-00815_REL_024,RECORD-00815,W0960,The Shimmer: Missing Data at the New York Times,Published In,W0666,PressThink,The Shimmer: Missing Data at the New York Times,1,2026-05-27
+RECORD-00815_REL_021,RECORD-00815,W0961,Armchair Critic Speculates,Published In,O0033,PressThink,Armchair Critic Speculates... my last post,1,2026-05-27
+RECORD-00815_REL_022,RECORD-00815,W0958,Judith Miller and Her Times,Published In,O0033,PressThink,Judith Miller and Her Times (Oct. 2),1,2026-05-27
+RECORD-00815_REL_023,RECORD-00815,W0725,News Comes in Code: Judy Miller's Return to the Times,Published In,O0033,PressThink,News Comes in Code: Judy Miller's Return to the Times,1,2026-05-27
+RECORD-00815_REL_024,RECORD-00815,W0960,The Shimmer: Missing Data at the New York Times,Published In,O0033,PressThink,The Shimmer: Missing Data at the New York Times,1,2026-05-27
 RECORD-00815_REL_025,RECORD-00815,W0275,Morning Edition,Published In,O0031,NPR,"NPR's 'Morning Edition,' Oct. 13",1,2026-05-27
 RECORD-00815_REL_026,RECORD-00815,E0402,SPJ National Convention 2005,Occurred At,L0254,"Las Vegas, Nevada","SPJ's national conference [in Las Vegas] at 8:15- 9 a.m., Oct. 18",1,2026-05-27
 RECORD-00815_REL_027,RECORD-00815,E0403,California First Amendment Coalition Open Government Assembly,Occurred At,L0255,"Fullerton, California","California First Amendment Coalition's annual Open Government Assembly in Fullerton, California",1,2026-05-27
@@ -8756,7 +8756,7 @@ RECORD-00818_REL_019,RECORD-00818,C1157,Civil disobedience defense for journalis
 RECORD-00818_REL_020,RECORD-00818,C1158,Reporter-newspaper contract,Originated By,P1392,Richard Stevenson,"there is, or should be, a contract between the paper and its reporters... that the paper will go to the mat to back them up institutionally",1,2026-05-27
 RECORD-00818_REL_021,RECORD-00818,P1043,Judith Miller,Discusses,C0380,Federal shield law,Judith Miller's case would not have been covered by a federal shield law... travel the country and even testify to Congress about the federal shield law,1,2026-05-27
 RECORD-00818_REL_022,RECORD-00818,P1043,Judith Miller,Occurred At,L0002,Iraq,"she told a Naval officer in Iraq, I'm cleared for that, but he isn't",1,2026-05-27
-RECORD-00818_REL_023,RECORD-00818,W0666,PressThink,Affiliated With,O1313,New York University,Jay Rosen teaches journalism at New York University and writes the weblog PressThink,1,2026-05-27
+RECORD-00818_REL_023,RECORD-00818,O0033,PressThink,Affiliated With,O1313,New York University,Jay Rosen teaches journalism at New York University and writes the weblog PressThink,1,2026-05-27
 RECORD-00818_REL_024,RECORD-00818,O0002,The New York Times,Supports,P1043,Judith Miller,this newspaper and this page gave Ms. Miller unwavering support,1,2026-05-27
 RECORD-00818_REL_025,RECORD-00818,P1043,Judith Miller,Affiliated With,P1496,Lewis Libby,she went to jail until Mr. Libby assured her directly that he was freeing her from her promise,0.9,2026-05-27
 RECORD-00820_REL_001,RECORD-00820,P2416,"Arthur Sulzberger, Jr.",Mentions,P0049,Charlie Rose,"Thursday night's interview with Charlie Rose was a low point in the public life of Arthur Sulzberger, Jr.",1,2026-05-27
@@ -8778,7 +8778,7 @@ RECORD-00820_REL_016,RECORD-00820,P0411,Jayson Blair,Affiliated With,O0002,The N
 RECORD-00820_REL_017,RECORD-00820,E0254,Jayson Blair plagiarism scandal,Occurred At,O0002,The New York Times,"The Jayson Blair episode was much worse, Sulzberger said.",1,2026-05-27
 RECORD-00820_REL_018,RECORD-00820,P2623,Ken Lay,Affiliated With,O0322,Enron,"truthtelling in the style of Ed Meese, or Terry McAuliffe, or Ken Lay from Enron",1,2026-05-27
 RECORD-00820_REL_019,RECORD-00820,P2416,"Arthur Sulzberger, Jr.",Mentions,P2622,Ed Meese,"This was truthtelling in the style of Ed Meese, or Terry McAuliffe, or Ken Lay from Enron.",0.8,2026-05-27
-RECORD-00820_REL_020,RECORD-00820,W0666,PressThink,Affiliated With,O1313,New York University,Jay Rosen teaches journalism at New York University. His weblog is PressThink,1,2026-05-27
+RECORD-00820_REL_020,RECORD-00820,O0033,PressThink,Affiliated With,O1313,New York University,Jay Rosen teaches journalism at New York University. His weblog is PressThink,1,2026-05-27
 RECORD-00820_REL_021,RECORD-00820,C1159,Weapons of mass destruction coverage,Discusses,O0002,The New York Times,Lingering doubts about the Times coverage of weapons of mass destruction,1,2026-05-27
 RECORD-00820_REL_022,RECORD-00820,C1160,Miller-speak,Criticizes,O0002,The New York Times,How typical that is of the newspaper's Miller-speak.,0.9,2026-05-27
 RECORD-00820_REL_023,RECORD-00820,E0409,Judith Miller case,Discusses,C1159,Weapons of mass destruction coverage,Lingering doubts about the Times coverage of weapons of mass destruction... were not submerged factors in the Miller mess,0.9,2026-05-27
@@ -8802,7 +8802,7 @@ RECORD-00821_REL_017,RECORD-00821,P2624,Mark Fitzgerald,Originated By,W0972,Re-T
 RECORD-00821_REL_018,RECORD-00821,W0972,Re-Thinking Knight Ridder's Future,Published In,O0025,Editor & Publisher,"Re-Thinking Knight Ridder's Future. (Editor & Publisher, Nov. 17)",1,2026-05-27
 RECORD-00821_REL_019,RECORD-00821,P0010,Jeff Jarvis,Originated By,W0973,Who Wants to Buy a Newspaper?,"Jeff Jarvis reacts to this post: What this industry needs most is new perspectives, not just local perspectives.",1,2026-05-27
 RECORD-00821_REL_020,RECORD-00821,P0010,Jeff Jarvis,Criticizes,C1161,Main Street Strategy,"What this industry needs most is new perspectives, not just local perspectives.",0.8,2026-05-27
-RECORD-00821_REL_021,RECORD-00821,W0666,PressThink,Published In,O1313,New York University,Jay Rosen teaches journalism at New York University and writes the weblog PressThink,0.9,2026-05-27
+RECORD-00821_REL_021,RECORD-00821,O0033,PressThink,Published In,O1313,New York University,Jay Rosen teaches journalism at New York University and writes the weblog PressThink,0.9,2026-05-27
 RECORD-00821_REL_022,RECORD-00821,E0410,Knight-Ridder put up for sale,Mentions,O1660,Knight-Ridder Inc.,"On November 14, Knight-Ridder Inc., announced that it would put it itself up for sale",1,2026-05-27
 RECORD-00821_REL_023,RECORD-00821,P2625,George Steinbrenner,Mentions,C1161,Main Street Strategy,Every town has its George Steinbrenner.,0.7,2026-05-27
 RECORD-00822_REL_001,RECORD-00822,P2626,Becky Wagoner,Affiliated With,O1668,Inter-Mountain,"Becky Wagoner, the reporter for the local daily... covering the rescue for the Inter-Mountain newspaper of Elkins, W.Va.",1,2026-05-27
@@ -8817,7 +8817,7 @@ RECORD-00822_REL_009,RECORD-00822,E0268,Sago mine disaster,Occurred At,L0259,"Sa
 RECORD-00822_REL_010,RECORD-00822,O0015,CNN,Criticizes,E0411,Misreporting that 12 miners were alive,CNN people have made a second observation: that their mistake was unavoidable. This I do not agree with.,0.9,2026-05-27
 RECORD-00822_REL_011,RECORD-00822,P1148,Anderson Cooper,Criticizes,E0411,Misreporting that 12 miners were alive,"Cooper showed no signs of bearing this skill, and yet he seems satisfied that he did all he could.",0.95,2026-05-27
 RECORD-00822_REL_012,RECORD-00822,P1416,Jonathan Klein,Criticizes,E0411,Misreporting that 12 miners were alive,"Most bullish of all was CNN president Jonathan Klein, who offered no apologies and hailed his cable network's performance",0.95,2026-05-27
-RECORD-00822_REL_013,RECORD-00822,W0666,PressThink,Discusses,E0411,Misreporting that 12 miners were alive,I don't blame the news media for initially false information about the West Virginia mining disaster.,1,2026-05-27
+RECORD-00822_REL_013,RECORD-00822,O0033,PressThink,Discusses,E0411,Misreporting that 12 miners were alive,I don't blame the news media for initially false information about the West Virginia mining disaster.,1,2026-05-27
 RECORD-00822_REL_014,RECORD-00822,W0975,CNN Presents: Sago mine disaster special,Discusses,E0268,Sago mine disaster,"CNN Presents, an hour-long special recapping the Sago mine disaster",1,2026-05-27
 RECORD-00822_REL_015,RECORD-00822,W0976,Behind the Scenes (Anderson Cooper account),Discusses,E0411,Misreporting that 12 miners were alive,"For those of us in the media, I'm not sure what we could have done to keep this news from spreading like it did.",1,2026-05-27
 RECORD-00822_REL_016,RECORD-00822,P0068,Howard Kurtz,Criticizes,O0015,CNN,Neither does Howard Kurtz... see the Reliable Sources transcript,0.85,2026-05-27
@@ -8845,16 +8845,16 @@ RECORD-00823_REL_011,RECORD-00823,P0916,John Harris,Affiliated With,O0023,The Wa
 RECORD-00823_REL_012,RECORD-00823,P1886,Jack Abramoff,Pioneered,E0413,Jack Abramoff scandal,the Jack Abramoff scandal itself,1,2026-05-27
 RECORD-00823_REL_013,RECORD-00823,P0270,Jim Brady,Supports,C0745,Transparency in journalism,I'm all for transparency and am more than willing to talk about this decision publicly,1,2026-05-27
 RECORD-00823_REL_014,RECORD-00823,P0270,Jim Brady,Supports,C1168,Civility in online comments,The issue here was civility. Whether it's from the left or the right,1,2026-05-27
-RECORD-00823_REL_015,RECORD-00823,W0666,PressThink,Discusses,C0745,Transparency in journalism,Driving up the internal costs of opening outward is not smart politics for those who want two-way newspapers,0.9,2026-05-27
+RECORD-00823_REL_015,RECORD-00823,O0033,PressThink,Discusses,C0745,Transparency in journalism,Driving up the internal costs of opening outward is not smart politics for those who want two-way newspapers,0.9,2026-05-27
 RECORD-00823_REL_016,RECORD-00823,O0476,Washingtonpost.com,Affiliated With,O0007,Technorati,We cut a deal with Technorati that points to blogs discussing Post content,1,2026-05-27
 RECORD-00823_REL_017,RECORD-00823,O0469,Media Matters,Criticizes,P1144,Deborah Howell,Fishbowl DC on Media Matters vs. Deborah Howell,0.8,2026-05-27
 RECORD-00823_REL_018,RECORD-00823,E0412,post.blog comment shutdown,Discusses,C1168,Civility in online comments,I don't think 'civility' gets Brady anywhere... a commitment to having open comments means a commitment to moderating them carefully,0.9,2026-05-27
 RECORD-00823_REL_019,RECORD-00823,E0412,post.blog comment shutdown,Discusses,C0745,Transparency in journalism,"If the press decides to close itself off because the costs of participating in the new openness are judged to be too high, that is a loss for everyone",1,2026-05-27
 RECORD-00823_REL_020,RECORD-00823,P0068,Howard Kurtz,Criticizes,P1144,Deborah Howell,"the ombudsman's misstatement--or 'inartfully worded' one, as Howard Kurtz said",0.8,2026-05-27
 RECORD-00823_REL_021,RECORD-00823,P0701,Vaughn Ververs,Affiliated With,O1669,CBS News Public Eye,Vaughn Ververs at Public Eye,1,2026-05-27
-RECORD-00823_REL_022,RECORD-00823,W0666,PressThink,Discusses,P0270,Jim Brady,"Here's my Q & A with Brady, which we did by e-mail late last night and this morning",1,2026-05-27
+RECORD-00823_REL_022,RECORD-00823,O0033,PressThink,Discusses,P0270,Jim Brady,"Here's my Q & A with Brady, which we did by e-mail late last night and this morning",1,2026-05-27
 RECORD-00824_REL_001,RECORD-00824,P0916,John Harris,Affiliated With,O0023,The Washington Post,"John Harris, the national politics editor of the Washington Post",1,2026-05-27
-RECORD-00824_REL_002,RECORD-00824,P0005,Jay Rosen,Originated By,W0666,PressThink,"my weblog, PressThink",1,2026-05-27
+RECORD-00824_REL_002,RECORD-00824,P0005,Jay Rosen,Originated By,O0033,PressThink,"my weblog, PressThink",1,2026-05-27
 RECORD-00824_REL_003,RECORD-00824,P0005,Jay Rosen,Discusses,P0916,John Harris,a long and very interesting Q and A with John Harris... Harris pulled the plug and decided against publishing the interview,1,2026-05-27
 RECORD-00824_REL_004,RECORD-00824,P0005,Jay Rosen,Criticizes,P0739,Dick Cheney,Cheney changed the rules of disclosure... abandoning a ritual he has no use for,0.95,2026-05-27
 RECORD-00824_REL_005,RECORD-00824,P0005,Jay Rosen,Criticizes,P0438,John Ashcroft,John Ashcroft used the Secret Service to bar newspaper reporters from press conferencing with him,0.95,2026-05-27
@@ -8971,7 +8971,7 @@ RECORD-00828_REL_002,RECORD-00828,W0191,Polling Place Photo Project,Affiliated W
 RECORD-00828_REL_003,RECORD-00828,O1678,Design for Democracy,Affiliated With,O0524,AIGA,"Design for Democracy is a strategic program of AIGA, its consulting and teaching wing.",1,2026-05-27
 RECORD-00828_REL_004,RECORD-00828,W0191,Polling Place Photo Project,Affiliated With,O1678,Design for Democracy,as part of AIGA's Design for Democracy initiative,1,2026-05-27
 RECORD-00828_REL_005,RECORD-00828,O0456,NewAssignment.Net,Supports,W0191,Polling Place Photo Project,"NewAssignment.Net, my pilot project in open source journalism, is a co-sponsor and consultant to PPPP.",1,2026-05-27
-RECORD-00828_REL_006,RECORD-00828,P0877,William Drenttel,Pioneered,W0666,PressThink,"Three years ago he designed PressThink, my blog.",1,2026-05-27
+RECORD-00828_REL_006,RECORD-00828,P0877,William Drenttel,Pioneered,O0033,PressThink,"Three years ago he designed PressThink, my blog.",1,2026-05-27
 RECORD-00828_REL_007,RECORD-00828,P0877,William Drenttel,Founded By,W0983,Design Observer,"Later he started a successful blog of his own, Design Observer.",1,2026-05-27
 RECORD-00828_REL_008,RECORD-00828,P2630,Michael Bierut,Affiliated With,W0983,Design Observer,"edited and authored by Michael Bierut, William Drenttel and Jessica Helfand",1,2026-05-27
 RECORD-00828_REL_009,RECORD-00828,P2631,Jessica Helfand,Affiliated With,W0983,Design Observer,"edited and authored by Michael Bierut, William Drenttel and Jessica Helfand",1,2026-05-27
@@ -9023,7 +9023,7 @@ RECORD-00829_REL_024,RECORD-00829,P0063,Jane Hamsher,Affiliated With,O0581,Fired
 RECORD-00829_REL_025,RECORD-00829,P0063,Jane Hamsher,Criticizes,O1009,Allbritton Communications,I can just hear the sales pitch for this future dinosaur... 'We'll tap the great untapped center',0.9,2026-05-27
 RECORD-00829_REL_026,RECORD-00829,P0005,Jay Rosen,Mentions,P0002,Digby,On their dream team of political interpreters would John Harris and Jim VandeHei ever put Digby? Of course they wouldn't.,1,2026-05-27
 RECORD-00829_REL_027,RECORD-00829,P0005,Jay Rosen,Affiliated With,O1313,New York University,Jay Rosen teaches journalism at New York University,1,2026-05-27
-RECORD-00829_REL_028,RECORD-00829,P0005,Jay Rosen,Originated By,W0666,PressThink,Jay Rosen... is the author of PressThink,1,2026-05-27
+RECORD-00829_REL_028,RECORD-00829,P0005,Jay Rosen,Originated By,O0033,PressThink,Jay Rosen... is the author of PressThink,1,2026-05-27
 RECORD-00829_REL_029,RECORD-00829,P0005,Jay Rosen,Founded By,O0456,NewAssignment.Net,His new venture is NewAssignment.Net,1,2026-05-27
 RECORD-00829_REL_030,RECORD-00829,P0511,Adam Nagourney,Affiliated With,O0002,The New York Times,a new vision of political reporting results from hiring Adam Nagourney (or his equivalents),0.8,2026-05-27
 RECORD-00829_REL_031,RECORD-00829,O1354,Capitol Leader,Occurred At,L0260,"Washington, DC","a new Washington newspaper, the Capitol Leader",1,2026-05-27
@@ -9083,7 +9083,7 @@ RECORD-00832_REL_014,RECORD-00832,W0101,The Boys on the Bus,Mentions,E0231,2008 
 RECORD-00833_REL_001,RECORD-00833,O0002,The New York Times,Criticizes,E0421,White House Correspondents Association Dinner 2007,journalists at the New York Times will no longer participate in the bloated and compromised White House Correspondents Association dinner,1,2026-05-27
 RECORD-00833_REL_002,RECORD-00833,E0421,White House Correspondents Association Dinner 2007,Affiliated With,O1688,White House Correspondents Association,"the White House Correspondents' Association has, however, provoked left-leaning political activists",1,2026-05-27
 RECORD-00833_REL_003,RECORD-00833,P0005,Jay Rosen,Affiliated With,O1313,New York University,Jay Rosen is on the journalism faculty at New York University,1,2026-05-27
-RECORD-00833_REL_004,RECORD-00833,P0005,Jay Rosen,Originated By,W0666,PressThink,"writes the blog PressThink, where this first appeared",1,2026-05-27
+RECORD-00833_REL_004,RECORD-00833,P0005,Jay Rosen,Originated By,O0033,PressThink,"writes the blog PressThink, where this first appeared",1,2026-05-27
 RECORD-00833_REL_005,RECORD-00833,P0612,Frank Rich,Criticizes,E0421,White House Correspondents Association Dinner 2007,The dinner is a crystallization of the press's failures in the post-9/11 era,1,2026-05-27
 RECORD-00833_REL_006,RECORD-00833,P0612,Frank Rich,Affiliated With,O0002,The New York Times,engage with Frank Rich's argument in Sunday's Times,1,2026-05-27
 RECORD-00833_REL_007,RECORD-00833,P0762,David Carr,Criticizes,E0421,White House Correspondents Association Dinner 2007,The dinner itself only seemed to emphasize the distance between Washington and the rest of the country,1,2026-05-27
@@ -9141,8 +9141,8 @@ RECORD-00834_REL_019,RECORD-00834,P0030,Bill Keller,Affiliated With,O0002,The Ne
 RECORD-00834_REL_020,RECORD-00834,P0014,George W. Bush,Criticizes,C0152,Watchdog press,"the consensus...that the Washington press corps was a legitimate part of the modern presidency...was rejected outright by Bush, Cheney, and Andrew Card",0.9,2026-05-27
 RECORD-00834_REL_021,RECORD-00834,P0739,Dick Cheney,Criticizes,C0152,Watchdog press,"was rejected outright by Bush, Cheney, and Andrew Card",0.9,2026-05-27
 RECORD-00834_REL_022,RECORD-00834,P0742,Andrew Card,Criticizes,C0152,Watchdog press,"was rejected outright by Bush, Cheney, and Andrew Card",0.9,2026-05-27
-RECORD-00834_REL_023,RECORD-00834,C0757,Pressthink,Originated By,W0666,PressThink,"their belief system, their pressthink",1,2026-05-27
-RECORD-00834_REL_024,RECORD-00834,W0666,PressThink,Affiliated With,O1313,New York University,"Jay Rosen teaches journalism at New York University and writes the blog, PressThink",1,2026-05-27
+RECORD-00834_REL_023,RECORD-00834,C0757,Pressthink,Originated By,O0033,PressThink,"their belief system, their pressthink",1,2026-05-27
+RECORD-00834_REL_024,RECORD-00834,O0033,PressThink,Affiliated With,O1313,New York University,"Jay Rosen teaches journalism at New York University and writes the blog, PressThink",1,2026-05-27
 RECORD-00834_REL_025,RECORD-00834,P0255,Jim Rutenberg,Discusses,C1194,Bloggers vs. journalists debate,recruiting me into a miscast bloggers vs. journalists debate,0.9,2026-05-27
 RECORD-00834_REL_026,RECORD-00834,O0023,The Washington Post,Discusses,C1196,Press failure on Iraq War,newspapers like yours and the Washington Post have done more to reckon with their collapse under Bush,0.8,2026-05-27
 RECORD-00834_REL_027,RECORD-00834,O0002,The New York Times,Discusses,C1196,Press failure on Iraq War,newspapers like yours...have done more to reckon with their collapse under Bush,0.8,2026-05-27
@@ -9294,7 +9294,7 @@ RECORD-00840_REL_022,RECORD-00840,C1212,Savvy vs naive framing,Expands On,C1211,
 RECORD-00840_REL_023,RECORD-00840,P0683,Phil de Vellis,Discusses,C0421,Gatekeepers,"There are still gatekeepers. There are just a lot more of them, and new ones all the time.",1,2026-05-27
 RECORD-00840_REL_024,RECORD-00840,P0679,Jerome Armstrong,Originated By,C1213,Generational gap in campaign Internet strategy,"It's a generational gap between the decision makers that lead the candidates and campaigns, and the campaign managers",1,2026-05-27
 RECORD-00840_REL_025,RECORD-00840,C1213,Generational gap in campaign Internet strategy,Affiliated With,O0059,Democratic Party,I know people on all these campaigns that work on the Internet and they're frustrated as hell. That's throughout the Democratic Party.,0.9,2026-05-27
-RECORD-00840_REL_026,RECORD-00840,W0666,PressThink,Affiliated With,O1313,New York University,"Jay Rosen teaches journalism at New York University, and writes the blog PressThink",1,2026-05-27
+RECORD-00840_REL_026,RECORD-00840,O0033,PressThink,Affiliated With,O1313,New York University,"Jay Rosen teaches journalism at New York University, and writes the blog PressThink",1,2026-05-27
 RECORD-00840_REL_027,RECORD-00840,W0673,OfftheBus.Net,Affiliated With,O1350,Huffington Post,he'll be collaborating with the Huffington Post on OfftheBus.Net,1,2026-05-27
 RECORD-00840_REL_028,RECORD-00840,P0063,Jane Hamsher,Mentions,P0093,Hillary Clinton,Hillary Clinton and Barack Obama probably don't need the netroots behind them-- they just need us not to hate them.,1,2026-05-27
 RECORD-00840_REL_029,RECORD-00840,P0063,Jane Hamsher,Mentions,P0088,Barack Obama,Hillary Clinton and Barack Obama probably don't need the netroots behind them-- they just need us not to hate them.,1,2026-05-27
@@ -9434,7 +9434,7 @@ RECORD-00847_REL_019,RECORD-00847,P1130,Warren Strobel,Affiliated With,O0209,Kni
 RECORD-00847_REL_020,RECORD-00847,P1130,Warren Strobel,Discusses,E0161,Invasion of Iraq,"in the run-up to the invasion of Iraq, the closer your sources were to the White House, the more likely they were to be wrong",1,2026-05-27
 RECORD-00847_REL_021,RECORD-00847,P1775,Lawrence Wilkerson,Affiliated With,P0774,Colin Powell,"Lawrence Wilkerson, a Republican, and the former top aide to Colin Powell",1,2026-05-27
 RECORD-00847_REL_022,RECORD-00847,P1775,Lawrence Wilkerson,Criticizes,O0448,Bush Administration,They are radical. They're not conservative. They've stolen my party and I would like my party back.,1,2026-05-27
-RECORD-00847_REL_023,RECORD-00847,P0005,Jay Rosen,Owns,W0666,PressThink,Jay Rosen teaches journalism at New York University and writes PressThink.,1,2026-05-27
+RECORD-00847_REL_023,RECORD-00847,P0005,Jay Rosen,Owns,O0033,PressThink,Jay Rosen teaches journalism at New York University and writes PressThink.,1,2026-05-27
 RECORD-00847_REL_024,RECORD-00847,P0005,Jay Rosen,Affiliated With,O1313,New York University,Jay Rosen teaches journalism at New York University,1,2026-05-27
 RECORD-00847_REL_025,RECORD-00847,P0005,Jay Rosen,Founded By,W0826,OffTheBus,"He is also co-publisher, with Arianna Huffington, of OffTheBus",1,2026-05-27
 RECORD-00847_REL_026,RECORD-00847,P0183,Arianna Huffington,Founded By,W0826,OffTheBus,"co-publisher, with Arianna Huffington, of OffTheBus",1,2026-05-27
@@ -9568,7 +9568,7 @@ RECORD-00853_REL_006,RECORD-00853,P0055,Larry Kart,Originated By,C1234,Iconoclas
 RECORD-00853_REL_007,RECORD-00853,W0013,"We Scream, We Swoon. How Dumb Can We Get?",Published In,O0023,The Washington Post,"Outlook Section of Washington Post Sunday when it published We Scream, We Swoon. How Dumb Can We Get?",1,2026-05-27
 RECORD-00853_REL_008,RECORD-00853,P0058,Charlotte Allen,Originated By,W0013,"We Scream, We Swoon. How Dumb Can We Get?","he ran Charlotte Allen's piece to provoke, but not to offend",1,2026-05-27
 RECORD-00853_REL_009,RECORD-00853,P0056,John Pomfret,Published In,W0013,"We Scream, We Swoon. How Dumb Can We Get?","the editor responsible, John Pomfret, told Laura Rozen that he ran Charlotte Allen's piece to provoke",1,2026-05-27
-RECORD-00853_REL_010,RECORD-00853,W0666,PressThink,Criticizes,O0002,The New York Times,"My plea ran at PressThink, the Huff Post, and the Letters column at Romenesko",0.9,2026-05-27
+RECORD-00853_REL_010,RECORD-00853,O0033,PressThink,Criticizes,O0002,The New York Times,"My plea ran at PressThink, the Huff Post, and the Letters column at Romenesko",0.9,2026-05-27
 RECORD-00853_REL_011,RECORD-00853,W0014,The Fact Checker,Affiliated With,O0023,The Washington Post,The Washington Post has this nifty 'truth squad' feature called The Fact Checker,1,2026-05-27
 RECORD-00853_REL_012,RECORD-00853,P0066,Michael Dobbs,Affiliated With,W0014,The Fact Checker,It's Michael Dobbs putting questionable campaign claims to the test,1,2026-05-27
 RECORD-00853_REL_013,RECORD-00853,P0069,Jim Hoagland,Originated By,W0686,Long Winter for the Media,"In Long Winter for the Media, Jim Hoagland, columnist for the same Post",1,2026-05-27
@@ -9872,10 +9872,10 @@ RECORD-00878_REL_010,RECORD-00878,W0789,Meet the Press,Discusses,E0457,Planned P
 RECORD-00878_REL_011,RECORD-00878,W0789,Meet the Press,Discusses,E0458,San Bernardino shooting,"we saw it play out yesterday after we learned a Muslim married couple killed 14 in San Bernadino, CA",0.9,2026-05-27
 RECORD-00878_REL_012,RECORD-00878,W0986,The Daily Show,Criticizes,C1264,Leave it there press,Every time you laughed at the Daily Show's treatment of you with no companion sense of dread. (They're on to us.),0.85,2026-05-27
 RECORD-00878_REL_013,RECORD-00878,E0116,White House Correspondents Dinner,Mentions,C1264,Leave it there press,Every eye you rolled at the humorless scolds who rage at the White House Correspondents dinner.,0.7,2026-05-27
-RECORD-00878_REL_014,RECORD-00878,C1264,Leave it there press,Originated By,W0666,PressThink,This post was originally published at PressThink.,1,2026-05-27
+RECORD-00878_REL_014,RECORD-00878,C1264,Leave it there press,Originated By,O0033,PressThink,This post was originally published at PressThink.,1,2026-05-27
 RECORD-00878_REL_015,RECORD-00878,C1264,Leave it there press,Published In,O0691,HuffPost,Reposted at HuffPost from PressThink original,0.9,2026-05-27
 RECORD-00879_REL_001,RECORD-00879,W0029,What Are Journalists For?,Discusses,C0047,Public Journalism,"his book, What Are Journalists For? The premise of his project was that, as an act of civic conscience, major media might abandon the celebrity circus approach",0.95,2026-05-27
-RECORD-00879_REL_002,RECORD-00879,W0666,PressThink,Discusses,C0047,Public Journalism,"the spirit burns bright on his blog, PressThink",0.9,2026-05-27
+RECORD-00879_REL_002,RECORD-00879,O0033,PressThink,Discusses,C0047,Public Journalism,"the spirit burns bright on his blog, PressThink",0.9,2026-05-27
 RECORD-00879_REL_003,RECORD-00879,C0047,Public Journalism,Expands On,C1269,Democratization of Journalism Tools,we're in sight of real public journalism... because: the tools of journalism are being democratized,0.85,2026-05-27
 RECORD-00879_REL_004,RECORD-00879,C1267,The Blog Effect,Criticizes,C1268,One-to-Many Broadcasting Model,the one-to-many broadcasting model of communications doesn't describe the world anymore,0.9,2026-05-27
 RECORD-00879_REL_005,RECORD-00879,O0002,The New York Times,Occurred At,E0167,Jayson Blair Scandal,the New York Times' internal review of the Jason Blair scandal,1,2026-05-27
@@ -9893,7 +9893,7 @@ RECORD-00880_REL_006,RECORD-00880,W0751,1984,Originated By,P0526,George Orwell,"
 RECORD-00880_REL_007,RECORD-00880,W1018,Brave New World,Originated By,P2660,Aldous Huxley,"Aldous Huxley's dark vision, as expressed in Brave New World",1,2026-05-27
 RECORD-00880_REL_008,RECORD-00880,W0034,Amusing Ourselves to Death,Discusses,W0751,1984,"in the forward to Amusing Ourselves to Death, Neil Postman says that we shouldn't be afraid of Orwell's dark vision",0.9,2026-05-27
 RECORD-00880_REL_009,RECORD-00880,W0034,Amusing Ourselves to Death,Discusses,W1018,Brave New World,"What we should fear, actually, is Aldous Huxley's dark vision, as expressed in Brave New World",1,2026-05-27
-RECORD-00880_REL_010,RECORD-00880,W0666,PressThink,Discusses,W0034,Amusing Ourselves to Death,Rosen counts Postman as both mentor and hero and joins Brooke to discuss Amusing Ourselves to Death,0.8,2026-05-27
+RECORD-00880_REL_010,RECORD-00880,O0033,PressThink,Discusses,W0034,Amusing Ourselves to Death,Rosen counts Postman as both mentor and hero and joins Brooke to discuss Amusing Ourselves to Death,0.8,2026-05-27
 RECORD-00880_REL_011,RECORD-00880,O0441,On The Media,Affiliated With,O0226,WNYC,"This is On the Media, from WNYC",1,2026-05-27
 RECORD-00880_REL_012,RECORD-00880,P0325,Brooke Gladstone,Affiliated With,O0441,On The Media,"BROOKE GLADSTONE: ... This is On the Media, from WNYC. I'm Brooke Gladstone.",1,2026-05-27
 RECORD-00880_REL_013,RECORD-00880,P0326,Bob Garfield,Affiliated With,O0441,On The Media,BOB GARFIELD: And I'm Bob Garfield.,1,2026-05-27
@@ -9943,7 +9943,7 @@ RECORD-00884_REL_009,RECORD-00884,P2664,Bryan Alvarez,Affiliated With,O1728,Figu
 RECORD-00884_REL_010,RECORD-00884,P2664,Bryan Alvarez,Mentions,W1023,Channels with Peter Kafka,Bryan Alvarez explains podcast subscriptions on the episode,0.8,2026-05-27
 RECORD-00885_REL_001,RECORD-00885,P0102,Brian Stelter,Affiliated With,W0722,Reliable Sources,"Brian Stelter, Host",1,2026-05-27
 RECORD-00885_REL_002,RECORD-00885,W0722,Reliable Sources,Affiliated With,O0015,CNN,"To learn more about how CNN protects listener privacy, visit cnn.com/privacy",0.9,2026-05-27
-RECORD-00885_REL_003,RECORD-00885,W0666,PressThink,Affiliated With,O1313,New York University,"Jay Rosen, who teaches journalism at NYU and authors the PressThink blog",1,2026-05-27
+RECORD-00885_REL_003,RECORD-00885,O0033,PressThink,Affiliated With,O1313,New York University,"Jay Rosen, who teaches journalism at NYU and authors the PressThink blog",1,2026-05-27
 RECORD-00885_REL_004,RECORD-00885,P0385,Roger Ailes,Affiliated With,O0014,Fox News,more extreme than when Roger Ailes ran the network,1,2026-05-27
 RECORD-00885_REL_005,RECORD-00885,C1279,Demand-driven news,Discusses,O0014,Fox News,Fox is becoming in some way more demand-driven because its audience is in the driver's seat,1,2026-05-27
 RECORD-00885_REL_006,RECORD-00885,C1278,Shifted political universe,Discusses,O0014,Fox News,the difficulty of describing a 'shifted political universe' in the United States,0.9,2026-05-27
@@ -9952,13 +9952,13 @@ RECORD-00885_REL_008,RECORD-00885,C1280,Severing people from reality,Criticizes,
 RECORD-00885_REL_009,RECORD-00885,O0014,Fox News,Mentions,E0461,January 6 Capitol attack,Do you want January 6 to be the fault of Antifa? You can have that.,0.9,2026-05-27
 RECORD-00885_REL_010,RECORD-00885,O1729,Antifa,Mentions,E0461,January 6 Capitol attack,Do you want January 6 to be the fault of Antifa?,0.8,2026-05-27
 RECORD-00885_REL_011,RECORD-00885,P0073,Donald Trump,Mentions,E0280,2020 U.S. Presidential Election,Do you want Trump to have won the 2020 election? You can have that.,1,2026-05-27
-RECORD-00885_REL_012,RECORD-00885,C0663,Pro-democracy journalism,Originated By,W0666,PressThink,"Jay Rosen, who teaches journalism at NYU and authors the PressThink blog",0.8,2026-05-27
-RECORD-00886_REL_001,RECORD-00886,W0666,PressThink,Affiliated With,O1313,New York University,Professor Jay Rosen has taught journalism at New York University since 1986... in 2003 he started PressThink,0.9,2026-05-27
-RECORD-00886_REL_002,RECORD-00886,W0666,PressThink,Discusses,C1281,Media and democracy,"PressThink, an influential thought-leadership platform which addresses the big-picture challenges faced by the media",0.9,2026-05-27
+RECORD-00885_REL_012,RECORD-00885,C0663,Pro-democracy journalism,Originated By,O0033,PressThink,"Jay Rosen, who teaches journalism at NYU and authors the PressThink blog",0.8,2026-05-27
+RECORD-00886_REL_001,RECORD-00886,O0033,PressThink,Affiliated With,O1313,New York University,Professor Jay Rosen has taught journalism at New York University since 1986... in 2003 he started PressThink,0.9,2026-05-27
+RECORD-00886_REL_002,RECORD-00886,O0033,PressThink,Discusses,C1281,Media and democracy,"PressThink, an influential thought-leadership platform which addresses the big-picture challenges faced by the media",0.9,2026-05-27
 RECORD-00886_REL_003,RECORD-00886,C1282,Two-party system asymmetry,Discusses,P0073,Donald Trump,the Trump administration still casts a shadow over US politics... we live in a two-party system... one of the two is anti-democratic,0.9,2026-05-27
-RECORD-00886_REL_004,RECORD-00886,W0666,PressThink,Criticizes,O0014,Fox News,attacks Fox News for the corrosive role it plays in America by deliberately and cynically provoking rage or loyalty,1,2026-05-27
-RECORD-00886_REL_005,RECORD-00886,W0666,PressThink,Criticizes,O0076,Facebook,condemns the ungovernable Facebook which is now a danger to democracy around the world,1,2026-05-27
-RECORD-00886_REL_006,RECORD-00886,W0666,PressThink,Criticizes,P0073,Donald Trump,Jay argues the Trump administration still casts a shadow over US politics,0.9,2026-05-27
+RECORD-00886_REL_004,RECORD-00886,O0033,PressThink,Criticizes,O0014,Fox News,attacks Fox News for the corrosive role it plays in America by deliberately and cynically provoking rage or loyalty,1,2026-05-27
+RECORD-00886_REL_005,RECORD-00886,O0033,PressThink,Criticizes,O0076,Facebook,condemns the ungovernable Facebook which is now a danger to democracy around the world,1,2026-05-27
+RECORD-00886_REL_006,RECORD-00886,O0033,PressThink,Criticizes,P0073,Donald Trump,Jay argues the Trump administration still casts a shadow over US politics,0.9,2026-05-27
 RECORD-00887_REL_001,RECORD-00887,W1024,The Ezra Klein Show,Affiliated With,P0113,Ezra Klein,The Ezra Klein Show,1,2026-05-27
 RECORD-00887_REL_002,RECORD-00887,W1024,The Ezra Klein Show,Published In,O0002,The New York Times,Channel: The New York Times,1,2026-05-27
 RECORD-00887_REL_003,RECORD-00887,W1024,The Ezra Klein Show,Affiliated With,P0114,Nicole Hemmer,This episode is guest-hosted by Nicole Hemmer,1,2026-05-27
@@ -10034,8 +10034,8 @@ RECORD-00889_REL_006,RECORD-00889,P2503,Jennifer Rubin,Affiliated With,O0023,The
 RECORD-00889_REL_007,RECORD-00889,W1034,Resistance: How Women Saved Democracy From Donald Trump,Originated By,P2503,Jennifer Rubin,"Author of ""Resistance: How Women Saved Democracy From Donald Trump""",1,2026-05-27
 RECORD-00889_REL_008,RECORD-00889,W1034,Resistance: How Women Saved Democracy From Donald Trump,Discusses,P0073,Donald Trump,Resistance: How Women Saved Democracy From Donald Trump,0.9,2026-05-27
 RECORD-00889_REL_009,RECORD-00889,W1033,Jen Rubin's Green Room: Jay Rosen (Episode 13),Published In,O1733,Politicon,Channel: Politicon,1,2026-05-27
-RECORD-00889_REL_010,RECORD-00889,W0666,PressThink,Affiliated With,O1313,New York University,PressThink.org | NYU,0.8,2026-05-27
-RECORD-00889_REL_011,RECORD-00889,C1288,Savviness in journalism,Originated By,W0666,PressThink,re-establishing truths over savviness,0.7,2026-05-27
+RECORD-00889_REL_010,RECORD-00889,O0033,PressThink,Affiliated With,O1313,New York University,PressThink.org | NYU,0.8,2026-05-27
+RECORD-00889_REL_011,RECORD-00889,C1288,Savviness in journalism,Originated By,O0033,PressThink,re-establishing truths over savviness,0.7,2026-05-27
 RECORD-00890_REL_001,RECORD-00890,C0042,Citizens agenda,Criticizes,C0059,Horse Race Model,The Citizens Agenda is an alternative model for election coverage that doesn't begin where the national press tends to begin. That is the approach normally described as the horse race model,1,2026-05-27
 RECORD-00890_REL_002,RECORD-00890,C0042,Citizens agenda,Originated By,P0180,Neil Postman,Jay Rosen advocates the Citizens Agenda model as an alternative to the horse race approach,0.9,2026-05-27
 RECORD-00890_REL_003,RECORD-00890,O0164,Membership Puzzle Project,Supports,O0098,Knight Foundation,"director of the Membership Puzzle Project, funded by the Knight Foundation, Democracy Fund and Luminate",1,2026-05-27
@@ -10057,7 +10057,7 @@ RECORD-00890_REL_018,RECORD-00890,C0004,View from Nowhere,Originated By,P0180,Ne
 RECORD-00890_REL_019,RECORD-00890,C0042,Citizens agenda,Expands On,C1292,Voter Guide,one of the most valuable things that local newsrooms can do in their election coverage is usually called a voter's guide,0.8,2026-05-27
 RECORD-00890_REL_020,RECORD-00890,E0312,2024 U.S. Presidential Election,Discusses,C0042,Citizens agenda,"in the world that we are in and the election year that we are in, a sense of reality can come back to election news that way",0.8,2026-05-27
 RECORD-00890_REL_021,RECORD-00890,P0073,Donald Trump,Mentions,E0312,2024 U.S. Presidential Election,they've sort of learned some of their lessons with Donald Trump. They're much more skeptical about him,0.9,2026-05-27
-RECORD-00890_REL_022,RECORD-00890,W0666,PressThink,Mentions,P0180,Neil Postman,"PressThink, a blog about journalism and its ordeals, which he introduced in September 2003",0.6,2026-05-27
+RECORD-00890_REL_022,RECORD-00890,O0033,PressThink,Mentions,P0180,Neil Postman,"PressThink, a blog about journalism and its ordeals, which he introduced in September 2003",0.6,2026-05-27
 RECORD-00891_REL_001,RECORD-00891,P0290,Dave Winer,Discusses,W1038,Rebooting the News #7,This week's 40-plus minute podcast with Jay Rosen and myself.,1,2026-05-27
 RECORD-00891_REL_002,RECORD-00891,W1038,Rebooting the News #7,Published In,O1737,Rebooting the News,"In Podcast on April 26, 2009 by Dave Winer",1,2026-05-27
 RECORD-00891_REL_003,RECORD-00891,O1737,Rebooting the News,Founded By,P0290,Dave Winer,Rebooting the News podcast hosted by Dave Winer,0.8,2026-05-27
@@ -10329,7 +10329,7 @@ RECORD-00819_REL_018,RECORD-00819,P1652,Franklin Foer,Published In,O0300,New Yor
 RECORD-00819_REL_019,RECORD-00819,P0468,Donald Rumsfeld,Mentions,P1043,Judith Miller,"an agreement so sensitive that, according to one Times editor, Rumsfeld himself signed off on it",0.85,2026-05-27
 RECORD-00819_REL_020,RECORD-00819,P0468,Donald Rumsfeld,Affiliated With,O1756,U.S. Department of Defense,Rumsfeld himself signed off on it,1,2026-05-27
 RECORD-00819_REL_021,RECORD-00819,W1076,The Miller Case,Published In,O0002,The New York Times,"the New York Times released its report, The Miller Case",1,2026-05-27
-RECORD-00819_REL_022,RECORD-00819,W0666,PressThink,Originated By,P0005,Jay Rosen,"I published a detailed post at my weblog, PressThink",1,2026-05-27
+RECORD-00819_REL_022,RECORD-00819,O0033,PressThink,Originated By,P0005,Jay Rosen,"I published a detailed post at my weblog, PressThink",1,2026-05-27
 RECORD-00819_REL_023,RECORD-00819,O0631,Central Intelligence Agency,Criticizes,P1043,Judith Miller,"Officials from the CIA, the Defense Intelligence Agency and the Pentagon say they have no idea what New York Times reporter Judith Miller was talking about",0.9,2026-05-27
 RECORD-00819_REL_024,RECORD-00819,O1050,Defense Intelligence Agency,Criticizes,P1043,Judith Miller,the Defense Intelligence Agency... say they have no idea what New York Times reporter Judith Miller was talking about,0.9,2026-05-27
 RECORD-00819_REL_025,RECORD-00819,O1756,U.S. Department of Defense,Criticizes,P1043,Judith Miller,the Pentagon say they have no idea what New York Times reporter Judith Miller was talking about,0.9,2026-05-27
