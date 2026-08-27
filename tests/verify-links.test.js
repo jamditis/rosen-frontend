@@ -20,7 +20,8 @@ import {
   collectFeaturedUrls,
   checkFeaturedUrlWellFormedness,
   checkExternalLiveness,
-  runExternalLivenessSweep
+  runExternalLivenessSweep,
+  parseArgs
 } from '../scripts/verify-links.js';
 import { loadState } from '../scripts/lib/link-check-state.js';
 
@@ -451,5 +452,67 @@ describe('checkFeaturedUrlWellFormedness', () => {
   it('returns no findings for an all-clean set', () => {
     const featuredUrls = [{ id: 'feat-1 (image)', url: 'https://images.unsplash.com/photo' }];
     assert.deepEqual(checkFeaturedUrlWellFormedness(featuredUrls), []);
+  });
+});
+
+describe('verify-links CLI argument parsing', () => {
+  it('rejects a non-numeric --concurrency instead of silently starting no workers', () => {
+    assert.throws(() => parseArgs(['--concurrency', 'abc']), /--concurrency must be a positive integer/);
+  });
+
+  it('rejects a zero or negative --concurrency', () => {
+    assert.throws(() => parseArgs(['--concurrency', '0']), /--concurrency must be a positive integer/);
+    assert.throws(() => parseArgs(['--concurrency', '-1']), /--concurrency must be a positive integer/);
+  });
+
+  it('rejects a fractional --concurrency rather than truncating it silently', () => {
+    assert.throws(() => parseArgs(['--concurrency', '1.5']), /--concurrency must be a positive integer/);
+  });
+
+  it('rejects a --concurrency with no value instead of parsing undefined as NaN', () => {
+    assert.throws(() => parseArgs(['--concurrency']), /--concurrency requires a value/);
+    assert.throws(() => parseArgs(['--external', '--concurrency']), /--concurrency requires a value/);
+  });
+
+  it('accepts a well-formed --concurrency', () => {
+    assert.equal(parseArgs(['--concurrency', '4']).concurrency, 4);
+  });
+
+  it('leaves concurrency undefined when the flag is absent, so the library default applies', () => {
+    assert.equal(parseArgs(['--external']).concurrency, undefined);
+  });
+
+  it('validates the other numeric flags that share the same NaN hazard', () => {
+    assert.throws(() => parseArgs(['--max', 'abc']), /--max must be a positive integer/);
+    assert.throws(() => parseArgs(['--timeout-ms', '0']), /--timeout-ms must be a positive integer/);
+    // 0 is a documented, meaningful value for these two: it disables the
+    // breaker and the inter-request delay respectively.
+    assert.equal(parseArgs(['--max-host-failures', '0']).maxHostFailures, 0);
+    assert.equal(parseArgs(['--delay-ms', '0']).delayMs, 0);
+    assert.throws(() => parseArgs(['--max-host-failures', '-1']), /--max-host-failures must be a non-negative integer/);
+    assert.throws(() => parseArgs(['--delay-ms', 'abc']), /--delay-ms must be a non-negative integer/);
+  });
+
+  it('rejects a value-taking flag left at the end of argv', () => {
+    assert.throws(() => parseArgs(['--out']), /--out requires a value/);
+    assert.throws(() => parseArgs(['--state-file']), /--state-file requires a value/);
+  });
+});
+
+describe('checkExternalLiveness worker-pool guard', () => {
+  it('refuses a concurrency that would start no workers, rather than reporting unprobed urls as checked', async (t) => {
+    // The dangerous shape: no worker ever runs, `skipped` stays empty, so
+    // `checked` equals every target and runExternalLivenessSweep persists the
+    // whole slice as healthy without a single request having been made.
+    const fetchMock = t.mock.method(globalThis, 'fetch', async () => ({ status: 200, headers: { get: () => null } }));
+    const urls = ['https://example.com/a', 'https://example.com/b'];
+
+    for (const concurrency of [Number.NaN, 0, -1, 1.5]) {
+      await assert.rejects(
+        () => checkExternalLiveness(urls, { delayMs: 0, concurrency }),
+        /concurrency must be a positive integer/
+      );
+    }
+    assert.equal(fetchMock.mock.callCount(), 0);
   });
 });

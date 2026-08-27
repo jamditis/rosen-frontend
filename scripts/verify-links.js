@@ -371,6 +371,14 @@ function classify(status) {
 // the breaker entirely.
 export async function checkExternalLiveness(urls, opts = {}) {
   const { concurrency = 6, timeoutMs = 10000, delayMs = 150, max = Infinity, sourceMap = null, maxHostFailures = 3 } = opts;
+  // A pool size that is NaN or below 1 starts no workers at all, and the
+  // "checked" count below would then claim every target was probed when none
+  // was -- state the caller persists as healthy. Refuse it rather than return
+  // a clean-looking result for work that never happened. The CLI already
+  // rejects such a value in parseArgs; this covers a programmatic caller.
+  if (!Number.isInteger(concurrency) || concurrency < 1) {
+    throw new Error(`checkExternalLiveness: concurrency must be a positive integer, got: ${concurrency}`);
+  }
   const targets = [...new Set(urls)].slice(0, max);
   // Record id(s) carrying each url, so a failure names the record(s) to repair.
   const idsFor = (url) => (sourceMap ? sourceMap.get(url) || [] : []);
@@ -524,7 +532,31 @@ export function buildReport({ data, internal, url, featured = [], external, revi
 
 // ----- CLI -----
 
-function parseArgs(argv) {
+// Every flag below takes exactly one value. Reading it through requireValue
+// keeps a flag left at the end of argv from silently becoming `undefined`,
+// which Number() then turns into NaN.
+function requireValue(argv, index, flag) {
+  const value = argv[index];
+  if (value === undefined) throw new Error(`${flag} requires a value`);
+  return value;
+}
+
+// A NaN or non-positive numeric option does not degrade gracefully here, it
+// fails silently: `Math.min(NaN, n)` makes checkExternalLiveness's worker pool
+// empty, so no url is probed, none is reported skipped, and every target is
+// counted as checked -- which runExternalLivenessSweep then writes to the
+// persisted state as healthy. Reject the bad value at the CLI instead.
+function integerOption(argv, index, flag, { min }) {
+  const raw = requireValue(argv, index, flag);
+  const parsed = Number(raw);
+  if (!Number.isInteger(parsed) || parsed < min) {
+    const shape = min === 0 ? 'a non-negative integer' : 'a positive integer';
+    throw new Error(`${flag} must be ${shape}, got: ${raw}`);
+  }
+  return parsed;
+}
+
+export function parseArgs(argv) {
   const args = {
     external: false,
     reportOnly: false,
@@ -543,13 +575,15 @@ function parseArgs(argv) {
     const a = argv[i];
     if (a === '--external') args.external = true;
     else if (a === '--report-only') args.reportOnly = true;
-    else if (a === '--out') args.out = argv[++i];
-    else if (a === '--max') args.max = Number(argv[++i]);
-    else if (a === '--state-file') args.stateFile = argv[++i];
-    else if (a === '--concurrency') args.concurrency = Number(argv[++i]);
-    else if (a === '--timeout-ms') args.timeoutMs = Number(argv[++i]);
-    else if (a === '--delay-ms') args.delayMs = Number(argv[++i]);
-    else if (a === '--max-host-failures') args.maxHostFailures = Number(argv[++i]);
+    else if (a === '--out') args.out = requireValue(argv, ++i, '--out');
+    else if (a === '--max') args.max = integerOption(argv, ++i, '--max', { min: 1 });
+    else if (a === '--state-file') args.stateFile = requireValue(argv, ++i, '--state-file');
+    else if (a === '--concurrency') args.concurrency = integerOption(argv, ++i, '--concurrency', { min: 1 });
+    else if (a === '--timeout-ms') args.timeoutMs = integerOption(argv, ++i, '--timeout-ms', { min: 1 });
+    // 0 is meaningful for both of these: it disables the inter-request delay
+    // and the per-host circuit breaker respectively, so they allow it.
+    else if (a === '--delay-ms') args.delayMs = integerOption(argv, ++i, '--delay-ms', { min: 0 });
+    else if (a === '--max-host-failures') args.maxHostFailures = integerOption(argv, ++i, '--max-host-failures', { min: 0 });
   }
   return args;
 }
@@ -617,5 +651,10 @@ async function main(argv) {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main(process.argv.slice(2));
+  main(process.argv.slice(2)).catch((error) => {
+    // A rejected argument is operator error, not a crash: print the reason it
+    // names and exit non-zero instead of dumping a stack trace.
+    console.error(`verify-links failed: ${error.message}`);
+    process.exitCode = 1;
+  });
 }
