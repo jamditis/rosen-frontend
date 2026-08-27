@@ -148,6 +148,7 @@ describe('semantic search toggle', () => {
     assert.match(help, /createPortal\(dialog, document\.body\)/);
     assert.match(css, /\.archive-semantic-help__close\s*\{[^}]*display:\s*grid;[^}]*place-items:\s*center;/s);
     assert.match(help, /The model does not write or answer anything/);
+    assert.match(help, /for \$\{covered\} archive records\./);
     assert.match(help, /Your search stays in this browser/);
     assert.match(help, /Matching words/);
     assert.match(help, /Related meaning/);
