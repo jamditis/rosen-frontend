@@ -148,8 +148,13 @@ export function createSemanticSearchClient({
     return post({ type: 'semantic-query', query, k, minScore }, options);
   };
 
+  // Drop the worker and the model it holds. Called when the reader switches the
+  // toggle off: the download stays in the browser cache, so turning it back on
+  // reloads from disk. In-flight requests are rejected as aborts, not failures,
+  // so an answer that arrives after the reader has left cannot report the
+  // feature as broken.
   const terminate = () => {
-    dropWorker(new Error('Semantic search client terminated'));
+    dropWorker(makeAbortError());
   };
 
   return { warmup, search, terminate };

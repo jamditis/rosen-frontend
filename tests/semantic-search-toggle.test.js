@@ -1,15 +1,19 @@
 /**
- * Opt-in semantic search toggle and the hybrid ranking it feeds (#279).
+ * How the semantic toggle is wired into the app shell (#279).
  *
  * App.js cannot be imported here (it resolves esm.sh import-map specifiers the
- * node runner does not have), so its wiring is asserted from source, the same
- * way the similar-in-theme strand is checked in similar-in-theme-wiring.test.js.
+ * node runner does not have), so this file is limited to what source text can
+ * honestly show: which module owns a decision, which files ship together, and
+ * the markup of the control.
  *
- * What these pin, in order of what would hurt most if it broke:
- *  - off by default, and off loads nothing;
- *  - a failed load falls back to keyword search instead of breaking search;
- *  - the two legs are fused with RRF, not concatenated;
- *  - the toggle is a real labelled control, not a bare clickable span.
+ * The behavior itself is tested for real elsewhere, and that is where a change
+ * in behavior should fail:
+ *  - tests/search-ranking.test.js: fusion, chips, fused ordering, and the sort
+ *    key the toggle selects;
+ *  - tests/semantic-search-worker.test.js: encoding, ranking, worker protocol;
+ *  - tests/semantic-search-score-floor.test.js: the score floor on real vectors;
+ *  - tests/semantic-search-client.test.js: aborts, timeouts, worker lifecycle;
+ *  - tests/semantic-search-csp.test.js: the deployed policy allows the model.
  */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -45,6 +49,15 @@ describe('semantic search toggle', () => {
     );
   });
 
+  it('drops the worker and its model when the reader turns it off', () => {
+    assert.match(app, /terminateSemanticSearch\(\)/);
+    const handler = app.slice(app.indexOf('const handleSemanticToggle'));
+    assert.ok(
+      handler.indexOf('terminateSemanticSearch()') < handler.indexOf('warmupSemanticSearch()'),
+      'the off branch must release the worker',
+    );
+  });
+
   it('falls back to keyword search when the worker or the artifact fails', () => {
     assert.match(app, /setSemanticStatus\('error'\)/);
     assert.match(app, /setSemanticEnabled\(false\)/);
@@ -54,40 +67,39 @@ describe('semantic search toggle', () => {
     );
   });
 
-  it('fuses the lexical and semantic legs with reciprocal rank fusion', () => {
+  it('keeps the ranking and the sort key in one tested module', () => {
     assert.match(
       app,
-      new RegExp(`from './utils/rrf\\.js\\?v=${versionPattern}'`),
+      new RegExp(`from './utils/searchRanking\\.js\\?v=${versionPattern}'`),
     );
-    assert.match(app, /reciprocalRankFusion\(\{\s*\[LABEL_LEXICAL\]: lexicalOrder,\s*\[LABEL_SEMANTIC\]: semantic,\s*\}\)/);
-    assert.match(app, /chipFor\(hit\.sources\)/);
+    // The decisions are imported, not reimplemented inline, so the behavioral
+    // tests cover what the app actually runs.
+    for (const call of [
+      'buildSearchRanking({ lexicalOrder, semanticOrder })',
+      'orderByFusedRank(sortRecords(res, DEFAULT_SORT), fusedRanks)',
+      'sortForSemanticToggle(prev,',
+      'sortForQueryChange(prev,',
+    ]) {
+      assert.ok(app.includes(call), `App.js must call ${call}`);
+    }
+    // Relevance stays out of RECORD_SORTS: every key there needs a comparator
+    // in recordSort.js, and the site-tools schema reads that list.
+    assert.doesNotMatch(read('frontend', 'utils', 'recordSort.js'), /relevance/);
   });
 
   it('lets a semantic-only match into the results', () => {
     assert.match(app, /\|\| semanticIds\.has\(r\.id\)/);
   });
 
-  it('orders results by fused rank under a relevance sort', () => {
-    assert.match(app, /const RELEVANCE_SORT = 'relevance'/);
-    assert.match(app, /if \(sortBy === RELEVANCE_SORT\)/);
-    assert.match(app, /fusedRanks\.get\(a\.record\.id\) \?\? Infinity/);
-    // Relevance stays out of RECORD_SORTS: every key there needs a comparator
-    // in recordSort.js, and the site-tools schema reads that list.
-    const recordSort = read('frontend', 'utils', 'recordSort.js');
-    assert.doesNotMatch(recordSort, /relevance/);
+  it('badges every result while chips are on', () => {
+    assert.match(results, /searchSignals\.get\(item\.id\) \|\| LEXICAL_SIGNAL/);
+    assert.match(results, /archive-record-card__label--signal/);
+    assert.match(css, /\.archive-record-card__label--signal/);
   });
 
   it('debounces the encode so one query is encoded per settled phrase', () => {
     assert.match(app, /SEMANTIC_QUERY_DEBOUNCE_MS/);
     assert.match(app, /clearTimeout\(timer\);\s*controller\.abort\(\);/);
-  });
-
-  it('badges each result with its provenance chip', () => {
-    assert.match(results, /searchSignals\?\.get\(item\.id\)/);
-    assert.match(results, /archive-record-card__label--signal/);
-    assert.match(css, /\.archive-record-card__label--signal/);
-    // Chips appear only when both legs can contribute.
-    assert.match(app, /semantic\.length > 0/);
   });
 
   it('offers the control beside both archive search boxes', () => {
@@ -101,8 +113,16 @@ describe('semantic search toggle', () => {
     assert.match(toggle, /<label className="archive-semantic-toggle__control" htmlFor=\$\{inputId\}>/);
     assert.match(toggle, /type="checkbox"/);
     assert.match(toggle, /aria-describedby=\$\{hintId\}/);
-    assert.match(toggle, /role="status"/);
     assert.match(css, /\.archive-semantic-toggle__control/);
+  });
+
+  it('announces a state change once, not once per copy of the toggle', () => {
+    // Both copies can be in the accessibility tree at the same time (the filter
+    // drawer over the mobile search box), so the live region belongs to neither.
+    assert.doesNotMatch(toggle, /role="status"/);
+    assert.match(app, /data-semantic-status/);
+    assert.equal(app.match(/data-semantic-status/g).length, 1);
+    assert.match(app, /semanticStatusMessage\(semanticSearchProps\)/);
   });
 
   it('says what turning it on costs, and what it covers', () => {
@@ -117,6 +137,7 @@ describe('semantic search toggle', () => {
       'services/semantic-search-worker.js',
       'services/embeddings-worker.js',
       'utils/rrf.js',
+      'utils/searchRanking.js',
     ]) {
       assert.ok(
         serviceWorker.includes(`'${file}'`),
@@ -132,6 +153,10 @@ describe('semantic search toggle', () => {
     assert.match(
       worker,
       new RegExp(`'\\./embeddings-worker\\.js\\?v=${versionPattern}'`),
+    );
+    assert.match(
+      read('frontend', 'utils', 'searchRanking.js'),
+      new RegExp(`'\\./rrf\\.js\\?v=${versionPattern}'`),
     );
   });
 });

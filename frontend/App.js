@@ -21,8 +21,19 @@ import {
   searchLoadedIndexes,
 } from './utils/searchNormalize.js?v=3.8.33';
 import { sortRecords } from './utils/recordSort.js?v=3.8.33';
-import { chipFor, reciprocalRankFusion, LABEL_LEXICAL, LABEL_SEMANTIC } from './utils/rrf.js?v=3.8.33';
-import { requestSemanticSearch, warmupSemanticSearch } from './services/semanticSearch.js?v=3.8.33';
+import {
+  DEFAULT_SORT,
+  RELEVANCE_SORT,
+  buildSearchRanking,
+  orderByFusedRank,
+  sortForQueryChange,
+  sortForSemanticToggle,
+} from './utils/searchRanking.js?v=3.8.33';
+import {
+  requestSemanticSearch,
+  terminateSemanticSearch,
+  warmupSemanticSearch,
+} from './services/semanticSearch.js?v=3.8.33';
 import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.33';
 import { formatReleaseDate, loadReleaseMetadata } from './services/releaseMetadata.js?v=3.8.33';
 import Sidebar from './components/Sidebar.js?v=3.8.33';
@@ -40,7 +51,7 @@ import AboutPage from './components/AboutPage.js?v=3.8.33';
 import WikiPage from './components/WikiPage.js?v=3.8.33';
 import StartHerePage from './components/StartHerePage.js?v=3.8.33';
 import ArchiveResults from './components/ArchiveResults.js?v=3.8.33';
-import SemanticSearchToggle from './components/SemanticSearchToggle.js?v=3.8.33';
+import SemanticSearchToggle, { semanticStatusMessage } from './components/SemanticSearchToggle.js?v=3.8.33';
 
 const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.33'));
 
@@ -63,13 +74,12 @@ const DESKTOP_GUIDED_SHELL_DESTINATIONS = new Set([
 const ROUTE_ENTRY_FOCUS_SELECTOR = '[data-route-entry-focus], #main-content';
 const MAX_MINI_INDEX_RETRIES = 3;
 
-// Sort key for the hybrid ranking (#279). It is deliberately NOT in
+// RELEVANCE_SORT (imported from utils/searchRanking.js) is deliberately NOT in
 // RECORD_SORTS: that list is the site-tools contract, and every key in it must
 // have a comparator in recordSort.js. Relevance has no comparator because it
-// orders by fused search rank, which lives in this component, so it is offered
-// only while a search term is active and is handled before sortRecords runs.
-const RELEVANCE_SORT = 'relevance';
-
+// orders by fused search rank, so it is offered only while a search term is
+// active and is handled before sortRecords runs.
+//
 // Wait this long after the last keystroke before encoding a query. One encode
 // per typed word instead of one per letter.
 const SEMANTIC_QUERY_DEBOUNCE_MS = 350;
@@ -623,29 +633,36 @@ const App = () => {
   // here is not fatal: the toggle drops back to off with a "not available"
   // line, and search stays lexical.
   const handleSemanticToggle = useCallback((next) => {
+    // Relevance is only listed while a query is active, so the sort follows the
+    // toggle only when there is something to rank. Selecting it with an empty
+    // search box would leave the sort control blank.
+    const hasQuery = Boolean(filters.search.trim());
     setSemanticEnabled(next);
     setSemanticHits(EMPTY_SEMANTIC_HITS);
+    setSortBy(prev => sortForSemanticToggle(prev, { enabled: next, hasQuery }));
     if (!next) {
       setSemanticStatus('idle');
-      setSortBy(prev => (prev === RELEVANCE_SORT ? 'date-desc' : prev));
+      // Give back the model's memory. The browser keeps the download cached, so
+      // turning it on again reloads from disk rather than from the network.
+      terminateSemanticSearch();
       return;
     }
     setSemanticStatus('loading');
-    // Fused relevance is the point of the toggle, so ranking follows it. The
-    // sort control keeps working, so a reader can go back to a date order.
-    setSortBy(RELEVANCE_SORT);
     warmupSemanticSearch()
       .then((result) => {
         setSemanticCoverage(result.count);
         setSemanticStatus('ready');
       })
       .catch((err) => {
+        // Terminating the worker aborts this request. That is the reader
+        // switching the toggle off, not a failure to report.
+        if (err.name === 'AbortError') return;
         console.warn('[search] semantic search unavailable; keyword search only:', err.message);
         setSemanticEnabled(false);
         setSemanticStatus('error');
-        setSortBy(prev => (prev === RELEVANCE_SORT ? 'date-desc' : prev));
+        setSortBy(prev => sortForSemanticToggle(prev, { enabled: false, hasQuery }));
       });
-  }, []);
+  }, [filters.search]);
 
   // One encode per settled query. The request is dropped, not cancelled, when
   // the reader types again: the worker keeps the model it already loaded.
@@ -670,6 +687,9 @@ const App = () => {
           setSemanticHits(EMPTY_SEMANTIC_HITS);
           setSemanticStatus('error');
           setSemanticEnabled(false);
+          // Same recovery as a failed warmup: the semantic leg is gone, so the
+          // sort it selected goes with it.
+          setSortBy(prev => sortForSemanticToggle(prev, { enabled: false, hasQuery: true }));
         });
     }, SEMANTIC_QUERY_DEBOUNCE_MS);
     return () => {
@@ -687,23 +707,10 @@ const App = () => {
     const lexicalOrder = rawTerm && miniRevision > 0 && miniRefs.current.length > 0
       ? searchLoadedIndexes(miniRefs.current, rawTerm).map(hit => hit.id)
       : [];
-    const semantic = semanticEnabled && semanticHits.query === rawTerm
+    const semanticOrder = semanticEnabled && semanticHits.query === rawTerm
       ? semanticHits.ids
       : [];
-    const fused = reciprocalRankFusion({
-      [LABEL_LEXICAL]: lexicalOrder,
-      [LABEL_SEMANTIC]: semantic,
-    });
-    return {
-      fusedRanks: new Map(fused.map((hit, index) => [hit.id, index])),
-      // Chips only make sense once both legs can contribute, so they are shown
-      // only while semantic search is on.
-      searchSignals: semantic.length > 0
-        ? new Map(fused.map(hit => [hit.id, chipFor(hit.sources)]))
-        : null,
-      semanticIds: new Set(semantic),
-      lexicalIds: lexicalOrder.length > 0 ? new Set(lexicalOrder) : null,
-    };
+    return buildSearchRanking({ lexicalOrder, semanticOrder });
   }, [filters.search, miniRevision, semanticEnabled, semanticHits]);
 
   const filteredRecords = useMemo(() => {
@@ -756,14 +763,7 @@ const App = () => {
     if (sortBy === RELEVANCE_SORT) {
       // Fused rank first, then newest-first for everything the ranked legs did
       // not reach (a substring-only match carries no rank to fuse).
-      const byDate = sortRecords(res, 'date-desc');
-      return byDate
-        .map((record, index) => ({ record, index }))
-        .sort((a, b) => (
-          (fusedRanks.get(a.record.id) ?? Infinity) - (fusedRanks.get(b.record.id) ?? Infinity)
-          || a.index - b.index
-        ))
-        .map(entry => entry.record);
+      return orderByFusedRank(sortRecords(res, DEFAULT_SORT), fusedRanks);
     }
 
     res = sortRecords(res, sortBy);
@@ -777,12 +777,19 @@ const App = () => {
 
   // Relevance needs a query to rank against, and the sort control only offers
   // it while one is active. Clearing the search returns to newest-first so the
-  // control never shows a value it no longer lists.
+  // control never shows a value it no longer lists. Starting a fresh query with
+  // semantic search on picks relevance back up, which is what the toggle is
+  // for; editing an active query leaves the reader's chosen sort alone.
+  const hadQueryRef = useRef(false);
   useEffect(() => {
-    if (!filters.search.trim()) {
-      setSortBy(prev => (prev === RELEVANCE_SORT ? 'date-desc' : prev));
-    }
-  }, [filters.search]);
+    const hasQuery = Boolean(filters.search.trim());
+    setSortBy(prev => sortForQueryChange(prev, {
+      hasQuery,
+      hadQuery: hadQueryRef.current,
+      semanticEnabled,
+    }));
+    hadQueryRef.current = hasQuery;
+  }, [filters.search, semanticEnabled]);
 
   // Derive viewMode from route for backward-compatible logic
   const viewMode = currentRoute === ROUTES.folders
@@ -892,7 +899,10 @@ const App = () => {
   `;
 
   // One toggle state, two places to reach it: the filter sidebar search group
-  // and the compact search box above the results.
+  // and the compact search box above the results. Both copies can sit in the
+  // accessibility tree at once (the filter drawer over the mobile search box),
+  // so neither carries a live region: the results toolbar announces the state
+  // once for both.
   const semanticSearchProps = {
     enabled: semanticEnabled,
     status: semanticStatus,
@@ -1384,6 +1394,15 @@ const App = () => {
                     `}
                     <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
                       ${announcedResultCount}
+                    </span>
+                    <span
+                      className="sr-only"
+                      data-semantic-status
+                      role="status"
+                      aria-live="polite"
+                      aria-atomic="true"
+                    >
+                      ${semanticStatusMessage(semanticSearchProps)}
                     </span>
                     ${activeScopeTokens.length > 0 && html`
                       <div className="archive-results-scope" aria-label="Active archive scope">

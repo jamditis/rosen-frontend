@@ -166,7 +166,7 @@ const DesktopArchivePanel = ({
         <label className="desktop-sort-control">
           <span>Sort</span>
           <select value=${sortBy} onChange=${(event) => setSortBy(event.target.value)}>
-            ${Boolean(filters.search.trim()) && html`<option value="relevance">Relevance</option>`}
+            ${Boolean(filters.search.trim()) && html`<option value=${RELEVANCE_SORT}>Relevance</option>`}
             <option value="date-desc">Newest first</option>
             <option value="date-asc">Oldest first</option>
             <option value="title-asc">Title (A–Z)</option>

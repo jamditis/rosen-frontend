@@ -110,6 +110,7 @@ const APP_SHELL_FRONTEND_FILES = [
   'utils/sanitizeHref.js',
   'utils/searchConfig.js',
   'utils/searchNormalize.js',
+  'utils/searchRanking.js',
   'utils/submitGate.js',
   'utils/timelineData.js',
   'utils/viewTransition.js'

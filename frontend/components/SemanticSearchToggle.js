@@ -2,6 +2,26 @@ import { html } from '../html.js?v=3.8.33';
 import { Sparkles } from 'lucide-react';
 
 /**
+ * Short line for the archive's live region, announced when the semantic state
+ * changes (#279).
+ *
+ * The toggle is rendered twice, once beside each search box, so it must not
+ * carry the live region itself: two copies in the accessibility tree announce
+ * one change twice. App renders one live region and feeds it this message.
+ */
+export function semanticStatusMessage({ enabled, status = 'idle', coverage = null } = {}) {
+  if (status === 'error') {
+    return 'Semantic search is not available. Keyword search still works.';
+  }
+  if (!enabled) return 'Semantic search off.';
+  if (status === 'loading') return 'Semantic search is loading the language model.';
+  if (status === 'searching') return 'Finding records by meaning.';
+  return Number.isFinite(coverage) && coverage > 0
+    ? `Semantic search on. Ranking ${coverage.toLocaleString()} articles by meaning.`
+    : 'Semantic search on.';
+}
+
+/**
  * The opt-in semantic search switch that sits beside the archive search box
  * (#279).
  *
@@ -15,8 +35,9 @@ import { Sparkles } from 'lucide-react';
  *
  * A plain checkbox, not a custom widget: it is keyboard operable, announces its
  * own state, and takes the app's focus ring for free. `describedBy` ties the
- * status line to the control so a screen reader hears the cost and the current
- * state with the label.
+ * hint to the control so a screen reader hears the cost and the current state
+ * with the label. The hint is a description only; the change announcement comes
+ * from the single live region App owns.
  */
 const SemanticSearchToggle = ({
   enabled,
@@ -58,7 +79,7 @@ const SemanticSearchToggle = ({
         <${Sparkles} className="archive-semantic-toggle__icon" aria-hidden="true" />
         <span>Semantic</span>
       </label>
-      <p id=${hintId} className="archive-semantic-toggle__hint" role="status">
+      <p id=${hintId} className="archive-semantic-toggle__hint">
         ${hint}
       </p>
     </div>
