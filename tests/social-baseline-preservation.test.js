@@ -10,6 +10,7 @@ import { stringify } from 'csv-stringify/sync';
 
 import {
   buildChecksumPin,
+  checkChecksumDrift,
   convertSocialBaselineCsv,
   convertSocialBaselineRows,
   diffChecksumPin,
@@ -418,6 +419,71 @@ describe('social baseline preservation (#717)', () => {
           assert.match(error.stderr, /only runs against the real data\/social_posts\.csv/);
           return true;
         });
+      } finally {
+        fs.rmSync(temporaryDir, { recursive: true, force: true });
+      }
+    });
+
+    it('fails the default-corpus drift check when the pin file is missing, instead of reporting success', () => {
+      // The whole point of --verify on the real corpus is the drift check. A
+      // pin that is absent (never written, deleted, or lost in a checkout)
+      // used to turn it into a schema-only pass that still printed
+      // "Verified ... rows" and exited 0.
+      const missingPin = path.join(os.tmpdir(), 'social-baseline-pin-that-does-not-exist.json');
+      assert.throws(
+        () => checkChecksumDrift(fixtureRows, { pinPath: missingPin, required: true }),
+        /checksum pin/,
+      );
+      assert.throws(
+        () => checkChecksumDrift(fixtureRows, { pinPath: missingPin, required: true }),
+        /--write-checksums/,
+      );
+    });
+
+    it('fails the default-corpus drift check when the pin file is unparseable', () => {
+      const temporaryDir = fs.mkdtempSync(path.join(os.tmpdir(), 'social-baseline-corrupt-pin-'));
+      try {
+        const pinPath = path.join(temporaryDir, 'pin.json');
+        fs.writeFileSync(pinPath, '{ not json');
+        assert.throws(
+          () => checkChecksumDrift(fixtureRows, { pinPath, required: true }),
+          /checksum pin/,
+        );
+      } finally {
+        fs.rmSync(temporaryDir, { recursive: true, force: true });
+      }
+    });
+
+    it('skips the drift check without failing for a non-default corpus', () => {
+      const missingPin = path.join(os.tmpdir(), 'social-baseline-pin-that-does-not-exist.json');
+      assert.equal(checkChecksumDrift(fixtureRows, { pinPath: missingPin, required: false }), '');
+    });
+
+    it('reports the matched pin when the pin is present and current', () => {
+      const temporaryDir = fs.mkdtempSync(path.join(os.tmpdir(), 'social-baseline-good-pin-'));
+      try {
+        const pinPath = path.join(temporaryDir, 'pin.json');
+        fs.writeFileSync(pinPath, JSON.stringify(buildChecksumPin(fixtureRows, { generatedAt: importedAt })));
+        const note = checkChecksumDrift(fixtureRows, { pinPath, required: true });
+        assert.match(note, /checksum pin matched/);
+        assert.match(note, new RegExp(`${fixtureRows.length} pinned rows`));
+      } finally {
+        fs.rmSync(temporaryDir, { recursive: true, force: true });
+      }
+    });
+
+    it('still fails on real drift when the pin is present', () => {
+      const temporaryDir = fs.mkdtempSync(path.join(os.tmpdir(), 'social-baseline-drifted-pin-'));
+      try {
+        const pinPath = path.join(temporaryDir, 'pin.json');
+        fs.writeFileSync(pinPath, JSON.stringify(buildChecksumPin(fixtureRows, { generatedAt: importedAt })));
+        const mutated = fixtureRows.map((row, index) => (
+          index === 0 ? { ...row, excerpt: `${row.excerpt} (edited)` } : row
+        ));
+        assert.throws(
+          () => checkChecksumDrift(mutated, { pinPath, required: true }),
+          /row\(s\) changed since the checksum pin was written/,
+        );
       } finally {
         fs.rmSync(temporaryDir, { recursive: true, force: true });
       }

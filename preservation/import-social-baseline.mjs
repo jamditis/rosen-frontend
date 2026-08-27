@@ -55,7 +55,13 @@
  * Run the compatibility check (also compares against the checksum pin):
  *   node preservation/import-social-baseline.mjs --verify
  *
- * Refresh the checksum pin after an intentional data change:
+ * Against the real data/social_posts.csv the pin is mandatory: if it cannot
+ * be read, --verify fails rather than falling back to a schema-only pass,
+ * because a run that checked nothing for drift must not report success. A
+ * fixture or scratch CSV has no pin and is schema-checked only.
+ *
+ * Refresh the checksum pin after an intentional data change, or write a new
+ * one when re-pinning the corpus on purpose:
  *   node preservation/import-social-baseline.mjs --write-checksums
  */
 
@@ -253,6 +259,64 @@ export function diffChecksumPin(pin, rawRows) {
 }
 
 /**
+ * Read the committed checksum pin. `required` is true for the real corpus,
+ * where the pin is the only thing that makes `--verify` a drift check rather
+ * than a re-derivation of the digests it is about to compare against itself.
+ * A missing or unparseable pin is therefore a failure there, not a reason to
+ * quietly downgrade the run to a schema-only check: verification would print
+ * success and exit 0 while checking nothing about drift at all.
+ *
+ * A non-default corpus (a fixture or scratch CSV) never consults the pin, so
+ * `required` is false and this returns null.
+ */
+export function readChecksumPin(pinPath, { required }) {
+  if (!required) return null;
+  let raw;
+  try {
+    raw = fs.readFileSync(pinPath, 'utf8');
+  } catch (error) {
+    throw new Error(
+      `the committed checksum pin ${pinPath} could not be read (${error.code ?? error.message}), `
+      + 'so --verify cannot check the default corpus for drift. Restore the pin from version '
+      + 'control, or run --write-checksums to write a new one if this corpus is being re-pinned '
+      + 'on purpose.',
+    );
+  }
+  try {
+    return JSON.parse(raw);
+  } catch (error) {
+    throw new Error(
+      `the committed checksum pin ${pinPath} is not valid JSON (${error.message}), so --verify `
+      + 'cannot check the default corpus for drift. Restore the pin from version control, or '
+      + 'run --write-checksums to write a new one if this corpus is being re-pinned on purpose.',
+    );
+  }
+}
+
+/**
+ * Compare the current rows against the committed checksum pin and return the
+ * human-readable note --verify appends to its success line. Throws when a
+ * pinned row's content has drifted, and (for the default corpus) when the pin
+ * itself cannot be read. Returns an empty note for a non-default corpus,
+ * which has no pin to compare against.
+ */
+export function checkChecksumDrift(rawRows, { pinPath, required }) {
+  const pin = readChecksumPin(pinPath, { required });
+  if (!pin) return '';
+  const { mismatched, added, removed } = diffChecksumPin(pin, rawRows);
+  if (mismatched.length > 0) {
+    const shown = mismatched.slice(0, 10).join(', ');
+    const more = mismatched.length > 10 ? `, and ${mismatched.length - 10} more` : '';
+    throw new Error(
+      `${mismatched.length} row(s) changed since the checksum pin was written: ${shown}${more}. `
+      + 'If this change is intended, run --write-checksums to update the pin.',
+    );
+  }
+  return ` (checksum pin matched: ${pin.rowCount} pinned rows, `
+    + `${added.length} new since pin, ${removed.length} removed since pin)`;
+}
+
+/**
  * Convert already-parsed social_posts.csv rows (plain objects, one per row)
  * into a preservation-manifest v1 baseline. Exported separately from the CSV
  * reader so tests and future importers can feed rows directly.
@@ -441,21 +505,13 @@ function main() {
   validatePreservationManifest(manifest);
 
   if (verify) {
-    let driftNote = '';
-    if (isDefaultCorpus && fs.existsSync(checksumsPath)) {
-      const pin = JSON.parse(fs.readFileSync(checksumsPath, 'utf8'));
-      const { mismatched, added, removed } = diffChecksumPin(pin, rawRows);
-      if (mismatched.length > 0) {
-        const shown = mismatched.slice(0, 10).join(', ');
-        const more = mismatched.length > 10 ? `, and ${mismatched.length - 10} more` : '';
-        throw new Error(
-          `${mismatched.length} row(s) changed since the checksum pin was written: ${shown}${more}. `
-          + 'If this change is intended, run --write-checksums to update the pin.',
-        );
-      }
-      driftNote = ` (checksum pin matched: ${pin.rowCount} pinned rows, `
-        + `${added.length} new since pin, ${removed.length} removed since pin)`;
-    }
+    // The pin is required for the default corpus and absent by design for a
+    // fixture path, so `required` carries that distinction rather than an
+    // existsSync check that silently skipped the drift check either way.
+    const driftNote = checkChecksumDrift(rawRows, {
+      pinPath: checksumsPath,
+      required: isDefaultCorpus,
+    });
     console.log(
       `Verified ${stats.total} social baseline rows `
       + `(${stats.missingUrlCount} marked missing-url) against preservation schema v1${driftNote}`,
