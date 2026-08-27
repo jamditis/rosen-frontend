@@ -90,7 +90,7 @@ Counts verified against current `data/` on 2026-07-07:
 
 | File | Records | Contents |
 |------|---------|----------|
-| `data/archive_records-public.csv` | 1,029 | Non-social archive records (799 RECORD, 137 TUMBLR, 83 CLIP, 10 THREAD). Line count is high (~50k+) due to multi-line text fields. Max record id is `RECORD-00904`; next ID for new records is `RECORD-00905`. |
+| `data/archive_records-public.csv` | 1,037 | Non-social archive records (808 RECORD, 137 TUMBLR, 82 CLIP, 10 THREAD). Line count is high (~50k+) due to multi-line text fields. Max record id is `RECORD-00918`; next ID for new records is `RECORD-00919`. |
 | `data/social_posts.csv` | 29,747 | Twitter/X and Bluesky posts. Max BSKY id is `BSKY-03172`. |
 | `data/extracted_entities.csv` | 7,323 | Named entities (people, orgs, concepts) |
 | `data/extracted_relationships.csv` | 11,153 | Entity-to-record relationships |
@@ -179,7 +179,7 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── archive-core.json            # Lightweight records (~13 MB)
 │   ├── archive-details.json         # Full details (~13 MB)
 │   ├── archive-entities.json        # Entity graph (~1.1 MB)
-│   ├── archive_records-public.csv   # Source records (1,029 rows)
+│   ├── archive_records-public.csv   # Source records (1,037 rows)
 │   ├── social_posts.csv             # Social media posts (29,747 rows)
 │   ├── extracted_entities.csv       # Named entities (7,323 rows)
 │   ├── extracted_relationships.csv  # Entity relationships (11,153 rows)
