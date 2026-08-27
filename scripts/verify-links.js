@@ -14,6 +14,12 @@
 //     Plus URL well-formedness: every record.url is an absolute http(s) URL.
 //   - External (network, opt-in via --external): a gentle HEAD liveness probe of
 //     each unique external URL, rate-limited and classified. Report-only.
+//     Which urls a capped run probes is not the front slice every time: a
+//     persisted rotating cursor and per-url revisit cadence (issue #710,
+//     scripts/lib/link-check-state.js) pick a different eligible slice each
+//     run, so a run past --max eventually reaches every url. State lives in
+//     --state-file (default data/link-check-state.json) and must be carried
+//     forward between runs -- see .github/workflows/verify-external-links.yml.
 //
 // Exit code: non-zero when internal-integrity findings exist, so this can gate a
 // clean dataset in CI. External liveness never changes the exit code (network
@@ -23,6 +29,7 @@
 //   node scripts/verify-links.js                 # internal checks, human summary
 //   node scripts/verify-links.js --out report.json
 //   node scripts/verify-links.js --external --max 500   # also probe liveness
+//   node scripts/verify-links.js --external --max 500 --state-file data/link-check-state.json
 //   node scripts/verify-links.js --report-only   # never exit non-zero
 
 import fs from 'node:fs';
@@ -30,6 +37,15 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { FEATURED_WORKS } from '../frontend/constants.js';
 import { splitUrlsForLinkify } from '../frontend/utils/linkify.js';
+import {
+  loadState,
+  saveState,
+  selectEligibleUrls,
+  recordResults,
+  diffFindings,
+  detectCorpusChanges,
+  pruneRemovedUrls
+} from './lib/link-check-state.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, '..', 'data');
@@ -328,6 +344,13 @@ function classify(status) {
 // between starts so a single source host is not hammered. robots.txt is not
 // fetched per host (probing already-published source URLs with HEAD is low
 // impact); that is a documented limitation, not an oversight.
+//
+// `max` here is only a safety cap, not the progress mechanism (issue #710):
+// the caller (main(), via selectEligibleUrls in ./lib/link-check-state.js)
+// is expected to already have picked which urls this run should check, using
+// a persisted rotating cursor and revisit cadence, so every run advances
+// through a different slice of the corpus instead of `[...new
+// Set(urls)].slice(0, max)` re-checking the same front slice forever.
 export async function checkExternalLiveness(urls, opts = {}) {
   const { concurrency = 6, timeoutMs = 10000, delayMs = 150, max = Infinity, sourceMap = null } = opts;
   const targets = [...new Set(urls)].slice(0, max);
@@ -358,7 +381,7 @@ export async function checkExternalLiveness(urls, opts = {}) {
         const failureType = classify(status);
         if (failureType) {
           const ids = idsFor(url);
-          findings.push({ category: 'external', failureType, sourceId: ids[0] ?? null, sourceIds: ids, target: url, detail: `HTTP ${status}${location ? ` -> ${location}` : ''}` });
+          findings.push({ category: 'external', failureType, sourceId: ids[0] ?? null, sourceIds: ids, target: url, status, location: location ?? null, detail: `HTTP ${status}${location ? ` -> ${location}` : ''}` });
         }
       } catch (err) {
         const ids = idsFor(url);
@@ -373,7 +396,7 @@ export async function checkExternalLiveness(urls, opts = {}) {
 
 // ----- report -----
 
-export function buildReport({ data, internal, url, featured = [], external }) {
+export function buildReport({ data, internal, url, featured = [], external, revisit = null, corpusChanges = null }) {
   const findings = [...internal, ...url, ...featured, ...(external ? external.findings : [])];
   return {
     generated: new Date().toISOString(),
@@ -385,8 +408,17 @@ export function buildReport({ data, internal, url, featured = [], external }) {
       malformedUrls: url.length,
       featuredMalformed: featured.length,
       externalChecked: external ? external.checked : 0,
-      externalFailures: external ? external.findings.length : 0
+      externalFailures: external ? external.findings.length : 0,
+      // issue #710: how this run's external findings compare with the last
+      // recorded state, and how the url corpus itself has shifted. Both are
+      // null when --external was not requested (no state to compare against).
+      revisit: revisit
+        ? { new: revisit.new.length, persistent: revisit.persistent.length, recovered: revisit.recovered.length, changed: revisit.changed.length }
+        : null,
+      corpusChanges: corpusChanges ? { added: corpusChanges.added.length, removed: corpusChanges.removed.length } : null
     },
+    revisit,
+    corpusChanges,
     findings
   };
 }
@@ -394,13 +426,14 @@ export function buildReport({ data, internal, url, featured = [], external }) {
 // ----- CLI -----
 
 function parseArgs(argv) {
-  const args = { external: false, reportOnly: false, out: null, max: Infinity };
+  const args = { external: false, reportOnly: false, out: null, max: Infinity, stateFile: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--external') args.external = true;
     else if (a === '--report-only') args.reportOnly = true;
     else if (a === '--out') args.out = argv[++i];
     else if (a === '--max') args.max = Number(argv[++i]);
+    else if (a === '--state-file') args.stateFile = argv[++i];
   }
   return args;
 }
@@ -424,16 +457,41 @@ async function main(argv) {
   const featuredUrls = collectFeaturedUrls(FEATURED_WORKS);
   const featured = checkFeaturedUrlWellFormedness(featuredUrls);
   let external = null;
+  let revisit = null;
+  let corpusChanges = null;
   if (args.external) {
-    // Featured urls FIRST: checkExternalLiveness truncates with slice(0, max), so whatever sits at
-    // the tail is dropped under --max. The featured cards are the launch-critical surface #479 is
-    // about (and the only probe that catches a withdrawn-but-well-formed image), so they must never
-    // be the ones a --max cap skips. There are ~40 of them, so they cost a negligible slice of the budget.
     const sourceMap = buildUrlSourceMap([...featuredUrls, ...urlRecords]);
-    external = await checkExternalLiveness([...sourceMap.keys()], { max: args.max, sourceMap });
+    const candidateUrls = [...sourceMap.keys()];
+    const stateFile = args.stateFile || path.join(DATA_DIR, 'link-check-state.json');
+    const now = Date.now();
+    const prevState = loadState(stateFile);
+
+    corpusChanges = detectCorpusChanges(prevState, candidateUrls);
+
+    // Featured urls are always eligible: they are the launch-critical surface
+    // #479 is about (and the only probe that catches a withdrawn-but-well-formed
+    // image), so they must never be the ones a rotating tail leaves for later.
+    // Everything else is chosen by sweeping forward from the persisted cursor
+    // (issue #710) so a capped run advances through a different slice of the
+    // corpus each time, instead of always re-checking the same front slice.
+    const { selected, nextCursor } = selectEligibleUrls(candidateUrls, prevState, {
+      max: args.max,
+      now,
+      alwaysEligible: featuredUrls.map((f) => f.url).filter(Boolean)
+    });
+
+    external = await checkExternalLiveness(selected, { sourceMap });
+
+    const findingsByUrl = new Map(external.findings.map((f) => [f.target, f]));
+    revisit = diffFindings(prevState, selected, findingsByUrl);
+
+    let nextState = recordResults(prevState, { checkedUrls: selected, findingsByUrl }, now);
+    nextState.cursor = nextCursor;
+    nextState = pruneRemovedUrls(nextState, candidateUrls);
+    saveState(stateFile, nextState);
   }
 
-  const report = buildReport({ data, internal, url, featured, external });
+  const report = buildReport({ data, internal, url, featured, external, revisit, corpusChanges });
   if (args.out) {
     fs.writeFileSync(args.out, JSON.stringify(report, null, 2));
   }
@@ -445,6 +503,8 @@ async function main(argv) {
       `  malformed urls: ${s.malformedUrls}\n` +
       `  malformed featured urls: ${s.featuredMalformed}\n` +
       (args.external ? `  external probed: ${s.externalChecked}, failures: ${s.externalFailures}\n` : '') +
+      (s.revisit ? `  revisit: new ${s.revisit.new}, persistent ${s.revisit.persistent}, recovered ${s.revisit.recovered}, changed ${s.revisit.changed}\n` : '') +
+      (s.corpusChanges ? `  corpus: +${s.corpusChanges.added} -${s.corpusChanges.removed}\n` : '') +
       (args.out ? `  report written: ${args.out}\n` : '')
   );
 

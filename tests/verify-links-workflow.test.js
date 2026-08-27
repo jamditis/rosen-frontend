@@ -21,3 +21,23 @@ describe('scheduled external link verification (#558)', () => {
     assert.match(workflow, /path:\s*verify-links-report\.json/);
   });
 });
+
+describe('durable link-check progress across scheduled runs (#710)', () => {
+  it('carries a persisted state file into the sweep instead of only a short-lived Actions artifact', () => {
+    const workflow = fs.readFileSync(workflowUrl, 'utf8');
+    assert.match(workflow, /verify-links[^\n]*--state-file\s+data\/link-check-state\.json/);
+  });
+
+  it('has write access and commits the advanced state back to main', () => {
+    const workflow = fs.readFileSync(workflowUrl, 'utf8');
+    assert.match(workflow, /permissions:\s*\n\s*contents:\s*write/);
+    assert.match(workflow, /git add data\/link-check-state\.json/);
+    assert.match(workflow, /git commit -m/);
+    assert.match(workflow, /git push origin HEAD:main/);
+  });
+
+  it('skips the commit when the sweep did not change the state file', () => {
+    const workflow = fs.readFileSync(workflowUrl, 'utf8');
+    assert.match(workflow, /git diff --quiet -- data\/link-check-state\.json/);
+  });
+});
