@@ -972,15 +972,13 @@ const App = () => {
     return () => clearTimeout(timer);
   }, [recordsSkipping]);
 
-  // Clearing the category clears its note, so a stale line cannot outlive the
-  // filter that produced it.
-  useEffect(() => {
-    if (brokenRecord && !filters.categories.includes(brokenRecord.category)) {
-      setBrokenRecord(null);
-    }
-  }, [brokenRecord, filters.categories]);
-
   const showYearNote = isArchiveGrid && dissertationYearSearch && !yearNoteDismissed;
+  // The broken-record note stands on its own until the visitor closes it. It
+  // used to go away as soon as the category left the filter, but five clicks on
+  // one chip leave that filter off again, so the note was cleared in the same
+  // commit that set it and the line was gone before anyone could read it. The
+  // line is a remark about the category, not a description of the current view,
+  // so it reads either way.
   const showBrokenRecordNote = isArchiveGrid && Boolean(brokenRecord);
 
   const activeScopeTokens = [

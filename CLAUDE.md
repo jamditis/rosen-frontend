@@ -139,6 +139,13 @@ note dismissible, one console line per load, and any motion turned off under
 `prefers-reduced-motion` with the words still on the page. Keep them out of
 site copy, navigation, and public-facing pages — the surprise is the point.
 
+One more rule covers layout. An extra may change the layout in answer to a
+key or a click, never on a timer of its own. A page that reflows while someone
+is only reading it scores that shift against the site's layout-shift budget,
+and the audit never sees these routes because no audit route triggers them.
+The typewriter follows this rule: its timer only marks the treatment as spent,
+and the next key or pointer press takes it off.
+
 ## Directory structure
 
 Verified against repo state on 2026-05-25. Component, test, and workflow lists are not enumerated exhaustively — run `ls` for the current set.

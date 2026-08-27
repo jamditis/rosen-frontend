@@ -4806,14 +4806,17 @@ mark {
   letter-spacing: var(--letter-spacing-wide);
 }
 
+/* The page fills the shell it sits in, which is already at least one viewport
+   tall. Asking for a viewport height here as well pushed the shell past the
+   viewport whenever the update notice was showing, and an empty one-line page
+   picked up a scrollbar. */
 .archive-nowhere {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  min-height: 100vh;
-  min-height: 100dvh;
   padding: 2rem 1.5rem;
   text-align: center;
 }

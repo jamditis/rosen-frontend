@@ -35,9 +35,10 @@ const Sidebar = ({
   ));
   const searchRef = useRef(null);
   const searchInputRef = useRef(null);
-  // Counts quick repeat toggles of one category. Held in a ref so counting
-  // never re-renders the filter panel.
-  const categoryStreak = useRef(createRapidRepeatCounter());
+  // Counts quick repeat clicks on one category. Held in a ref so counting
+  // never re-renders the filter panel, and built on the first click so no
+  // counter is made and thrown away on every render.
+  const categoryStreak = useRef(null);
 
   const handleSearchChange = (e) => {
     const val = e.target.value;
@@ -57,6 +58,13 @@ const Sidebar = ({
     setShowSuggestions(false);
   };
 
+  // True on the click that completes a streak. Every click on the chip counts,
+  // whether it turns the filter on or off, so five clicks are five clicks.
+  const countCategoryClick = (cat) => {
+    if (!categoryStreak.current) categoryStreak.current = createRapidRepeatCounter();
+    return categoryStreak.current.register(cat, Date.now());
+  };
+
   const toggleCategory = (cat) => {
     setFilters(prev => {
       const exists = prev.categories.includes(cat);
@@ -65,7 +73,7 @@ const Sidebar = ({
         categories: exists ? prev.categories.filter(c => c !== cat) : [...prev.categories, cat]
       };
     });
-    if (onCategoryStreak && categoryStreak.current.register(cat, Date.now())) {
+    if (onCategoryStreak && countCategoryClick(cat)) {
       onCategoryStreak(cat);
     }
   };

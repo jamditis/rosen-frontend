@@ -40,6 +40,10 @@ import {
   WATCHDOG_MESSAGE,
   logWatchdog,
 } from '../frontend/utils/consoleWatchdog.js';
+import {
+  TYPEWRITER_CLASS,
+  installTypewriterEgg,
+} from '../frontend/services/typewriterEgg.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.join(__dirname, '..');
@@ -96,6 +100,89 @@ describe('the typewriter sequence', () => {
     assert.equal(isTypingTarget({ tagName: 'DIV', isContentEditable: true }), true);
     assert.equal(isTypingTarget({ tagName: 'DIV' }), false);
     assert.equal(isTypingTarget(null), false);
+  });
+});
+
+describe('the typewriter treatment', () => {
+  const delay = (ms) => new Promise(resolve => { setTimeout(resolve, ms); });
+
+  // A stand-in for the document: it holds one handler per event type and the
+  // set of classes on the body, which is all this module touches.
+  const makeDoc = () => {
+    const handlers = new Map();
+    const classes = new Set();
+    return {
+      body: {
+        classList: {
+          add: (name) => classes.add(name),
+          remove: (name) => classes.delete(name),
+        },
+      },
+      addEventListener: (type, handler) => handlers.set(type, handler),
+      removeEventListener: (type) => handlers.delete(type),
+      fire: (type, event = {}) => handlers.get(type)?.(event),
+      wearing: () => classes.has(TYPEWRITER_CLASS),
+    };
+  };
+
+  const typeSequence = (doc, target = { tagName: 'BODY' }) => {
+    for (const character of TYPEWRITER_SEQUENCE.split('')) {
+      doc.fire('keydown', { key: character, target });
+    }
+  };
+
+  // Always remove the listener and the pending timer, even when a check
+  // fails, so one bad assertion cannot hold the test run open.
+  const withEgg = async (durationMs, run) => {
+    const doc = makeDoc();
+    const teardown = installTypewriterEgg({ doc, durationMs });
+    try {
+      await run(doc, teardown);
+    } finally {
+      teardown();
+    }
+  };
+
+  it('waits for the visitor before it puts the page back', async () => {
+    await withEgg(5, async (doc) => {
+      typeSequence(doc);
+      assert.equal(doc.wearing(), true);
+
+      await delay(40);
+      // The timer only marks the treatment as spent. Swapping the font back
+      // reflows the page, so it never happens on its own while someone is
+      // reading. An unasked-for reflow counts against the page's layout-shift
+      // score; one that follows a key or a click does not.
+      assert.equal(doc.wearing(), true);
+
+      doc.fire('pointerdown', {});
+      assert.equal(doc.wearing(), false);
+    });
+  });
+
+  it('lets Escape end it from inside a form field', async () => {
+    await withEgg(200, async (doc) => {
+      typeSequence(doc);
+      assert.equal(doc.wearing(), true);
+
+      doc.fire('keydown', { key: 'Escape', target: { tagName: 'INPUT' } });
+      assert.equal(doc.wearing(), false);
+    });
+  });
+
+  it('ignores the sequence typed into the search box', async () => {
+    await withEgg(200, async (doc) => {
+      typeSequence(doc, { tagName: 'INPUT' });
+      assert.equal(doc.wearing(), false);
+    });
+  });
+
+  it('takes the treatment off when it is removed', async () => {
+    await withEgg(200, async (doc, teardown) => {
+      typeSequence(doc);
+      teardown();
+      assert.equal(doc.wearing(), false);
+    });
   });
 });
 
@@ -218,6 +305,15 @@ describe('the hidden route', () => {
     assert.match(appSrc, new RegExp(`canonicalRecordUrl\\(window\\.location\\.href, NOWHERE_RECORD_ID\\)`));
     assert.match(NOWHERE_RECORD_ID, /^RECORD-\d{5}$/);
   });
+
+  it('fills the page shell without outgrowing it', () => {
+    // The page sits inside a min-h-screen flex column. A viewport-height rule
+    // here pushed the column past the viewport whenever the update notice was
+    // showing, so an empty one-line page picked up a scrollbar.
+    const block = cssSrc.match(/\.archive-nowhere \{[^}]*\}/)?.[0] || '';
+    assert.match(block, /flex: 1 1 auto/);
+    assert.doesNotMatch(block, /min-height:\s*100(vh|dvh)/);
+  });
 });
 
 describe('the notes above the results', () => {
@@ -246,12 +342,22 @@ describe('the notes above the results', () => {
 describe('the wiring in the archive shell', () => {
   it('counts category streaks without changing how the filter behaves', () => {
     assert.match(sidebarSrc, /onCategoryStreak = null/);
-    assert.match(sidebarSrc, /categoryStreak = useRef\(createRapidRepeatCounter\(\)\)/);
-    assert.match(
-      sidebarSrc,
-      /if \(onCategoryStreak && categoryStreak\.current\.register\(cat, Date\.now\(\)\)\) \{/,
-    );
+    // The counter is built on first use, not on every render.
+    assert.match(sidebarSrc, /categoryStreak = useRef\(null\)/);
+    assert.match(sidebarSrc, /categoryStreak\.current = createRapidRepeatCounter\(\)/);
+    assert.match(sidebarSrc, /if \(onCategoryStreak && countCategoryClick\(cat\)\)/);
     assert.match(appSrc, /onCategoryStreak=\$\{handleCategoryStreak\}/);
+  });
+
+  it('keeps the broken-record note on screen once it lands', () => {
+    // The note used to be cleared by an effect watching filters.categories.
+    // Five clicks on one chip flip it back to unselected, so that effect ran
+    // in the same commit that set the note and the line was gone before anyone
+    // could read it. The note now leaves only when the visitor dismisses it.
+    const clears = appSrc.match(/setBrokenRecord\(null\)/g) || [];
+    assert.equal(clears.length, 1);
+    assert.match(appSrc, /onDismiss=\$\{\(\) => setBrokenRecord\(null\)\}/);
+    assert.doesNotMatch(appSrc, /filters\.categories\.includes\(brokenRecord\.category\)/);
   });
 
   it('keeps the skip off by default and ends it on a timer', () => {
@@ -269,13 +375,12 @@ describe('the wiring in the archive shell', () => {
   });
 
   it('starts the console watchdog and the typewriter once, at mount', () => {
-    assert.match(indexSrc, /logWatchdog\(\);\s*\n\s*installTypewriterEgg\(\);/);
-    assert.match(indexSrc, /try \{[\s\S]*installTypewriterEgg\(\);[\s\S]*\} catch/);
+    assert.equal((indexSrc.match(/logWatchdog\(\)/g) || []).length, 1);
+    assert.equal((indexSrc.match(/installTypewriterEgg\(\)/g) || []).length, 1);
+    assert.match(indexSrc, /try \{[\s\S]*?installTypewriterEgg\(\);[\s\S]*?\} catch/);
   });
 
-  it('lets Escape end the typewriter early and reverts it on a timer', () => {
-    assert.match(typewriterSrc, /event\.key === 'Escape'[\s\S]*stop\(\)/);
-    assert.match(typewriterSrc, /timer = setTimeout\(stop, durationMs\)/);
+  it('leaves the search box and the forms alone', () => {
     assert.match(typewriterSrc, /isTypingTarget\(event\.target\)\) return/);
   });
 });
