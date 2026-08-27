@@ -37,6 +37,9 @@ export const ROUTES = {
   analytics: 'analytics',
   wiki: 'wiki',
   desktop: 'desktop',
+  // Hidden route (#754). Nothing in the site navigation links to it, but it is
+  // a real route: it parses, serialises, and renders like every other one.
+  nowhere: 'nowhere',
 };
 
 export const DEFAULT_ROUTE = ROUTES.archive;

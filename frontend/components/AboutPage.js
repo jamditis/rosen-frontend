@@ -1,10 +1,37 @@
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { html } from '../html.js?v=3.8.33';
 import { ArrowLeft, ArrowRight, Archive, BookOpen, Network, Search, Github, Mail } from 'lucide-react';
 import ArchiveRouteHeader from './ArchiveRouteHeader.js?v=3.8.33';
+import { IDLE_LINE, IDLE_REVEAL_MS } from '../utils/easterEggs.js?v=3.8.33';
+
+const IDLE_RESET_EVENTS = ['pointerdown', 'keydown', 'wheel', 'scroll', 'touchstart'];
 
 const AboutPage = ({ onBack, onStart, onParticipate, records }) => {
+  // Still here? (#754) One line appears after two quiet minutes on this page.
+  // It is plain text at the end of the page: no dialog, no live region, and no
+  // focus change, so a reader who stays put is never interrupted.
+  const [idleLineShown, setIdleLineShown] = useState(false);
+
+  useEffect(() => {
+    if (idleLineShown) return undefined;
+
+    let timer = null;
+    const restart = () => {
+      if (timer !== null) clearTimeout(timer);
+      timer = setTimeout(() => setIdleLineShown(true), IDLE_REVEAL_MS);
+    };
+
+    restart();
+    for (const name of IDLE_RESET_EVENTS) {
+      window.addEventListener(name, restart, { passive: true });
+    }
+
+    return () => {
+      if (timer !== null) clearTimeout(timer);
+      for (const name of IDLE_RESET_EVENTS) window.removeEventListener(name, restart);
+    };
+  }, [idleLineShown]);
 
   // Calculate live stats from records
   const stats = useMemo(() => {
@@ -232,6 +259,10 @@ const AboutPage = ({ onBack, onStart, onParticipate, records }) => {
             Back to archive
           </button>
         </div>
+
+        ${idleLineShown && html`
+          <p className="archive-idle-line">${IDLE_LINE}</p>
+        `}
 
       </main>
     </div>

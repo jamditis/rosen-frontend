@@ -47,6 +47,9 @@ const ArchiveResults = ({
   onOpenFolder,
   onPageChange,
   onClearFilters,
+  // Brief stuck-record skip for the broken-record extra (#754). Off by
+  // default, and the CSS drops the movement under reduced motion.
+  skipping = false,
 }) => {
   const openCard = (event, recordId) => {
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -55,7 +58,7 @@ const ArchiveResults = ({
   };
 
   return html`
-    <div className=${compact ? 'archive-results archive-results--compact desktop-archive-results' : 'archive-results'}>
+    <div className=${`${compact ? 'archive-results archive-results--compact desktop-archive-results' : 'archive-results'}${skipping ? ' archive-results--skipping' : ''}`}>
       ${errorPanel}
 
       ${!errorPanel && loading && html`<${LoadingQuotes} />`}

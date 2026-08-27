@@ -7,6 +7,7 @@ import {
   normalizeForSearch,
 } from '../utils/searchNormalize.js?v=3.8.33';
 import { CONTENT_TYPE_OPTIONS } from '../constants.js?v=3.8.33';
+import { createRapidRepeatCounter } from '../utils/easterEggs.js?v=3.8.33';
 import SemanticSearchToggle from './SemanticSearchToggle.js?v=3.8.33';
 
 const Sidebar = ({
@@ -21,6 +22,10 @@ const Sidebar = ({
   // not offer the toggle, so the search group renders without it.
   semanticSearch = null,
   variant = 'standard',
+  // Called when one category is toggled five times in quick succession
+  // (#754). Optional: shells that do not offer the extra simply omit it, and
+  // the filter itself behaves the same either way.
+  onCategoryStreak = null,
 }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -30,6 +35,9 @@ const Sidebar = ({
   ));
   const searchRef = useRef(null);
   const searchInputRef = useRef(null);
+  // Counts quick repeat toggles of one category. Held in a ref so counting
+  // never re-renders the filter panel.
+  const categoryStreak = useRef(createRapidRepeatCounter());
 
   const handleSearchChange = (e) => {
     const val = e.target.value;
@@ -57,6 +65,9 @@ const Sidebar = ({
         categories: exists ? prev.categories.filter(c => c !== cat) : [...prev.categories, cat]
       };
     });
+    if (onCategoryStreak && categoryStreak.current.register(cat, Date.now())) {
+      onCategoryStreak(cat);
+    }
   };
 
   const handleEraChange = (era) => {

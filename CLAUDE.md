@@ -121,8 +121,23 @@ Hash-based SPA routing (`frontend/services/router.js`):
 | Analytics | `#analytics` | `AnalyticsDashboard.js` | Archive statistics |
 | Wiki | `#wiki` / `#wiki/:slug` | `WikiPage.js` | Maintained deep links; not currently in public navigation |
 | Archive desktop | `#desktop` / `#desktop/:app` | lazy `DesktopShell.js` | Optional alternate exploration shell |
+| Nowhere | `#nowhere` | `NowherePage.js` | Hidden route; never linked from navigation |
 
 Record deep links: `?record=RECORD_ID` opens a record modal on any route.
+
+### Hidden extras
+
+The archive carries a small set of hidden extras (#754). Their triggers and
+copy live in `frontend/utils/easterEggs.js` and
+`frontend/utils/consoleWatchdog.js`; the wiring sits in `App.js`, `Sidebar.js`,
+`ArchiveResults.js`, `AboutPage.js`, `index.js`,
+`services/typewriterEgg.js`, and the two components `NowherePage.js` and
+`EasterEggNote.js`. `tests/easter-eggs.test.js` covers them.
+
+House rules for anything added here: no sound, no focus traps, every surfaced
+note dismissible, one console line per load, and any motion turned off under
+`prefers-reduced-motion` with the words still on the page. Keep them out of
+site copy, navigation, and public-facing pages — the surprise is the point.
 
 ## Directory structure
 
