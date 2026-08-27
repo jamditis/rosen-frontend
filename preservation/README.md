@@ -231,28 +231,64 @@ platform disappears before its screenshot is captured.
 This is a baseline import, not a live crawl. It never makes a network call and
 never edits `data/social_posts.csv`. Each row becomes one `social-post` object
 keyed by its own stable archive record ID (`BSKY-*`, `TWTR-*`, `MAST-*`), plus
-one `metadata` artifact that preserves the full row — including its raw text —
-behind a SHA-256 digest. The event vocabulary treats this the same way as a
-real retrieval attempt that intentionally made no request:
+one `metadata` artifact. That artifact is a SHA-256 digest of the row and
+nothing more: it is a fixity anchor, not a byte store. Its `uri` is a content
+hash (`urn:sha256:<digest>`), not a resolvable location, and `storageCopies` is
+empty, because this baseline keeps no separate copy of the row. The archive's
+real, byte-for-byte copy of the row is `data/social_posts.csv` itself, which
+this script only ever reads.
 
-| Row state | Event | `httpOutcome` | `review.state` |
-|---|---|---|---|
-| Has a canonical URL | `capture-attempt` | `not-requested` | `accepted` when the row's own `verified` column is `TRUE`, otherwise `review-required` |
-| No recoverable canonical URL | `artifact-created` | n/a (no `retrieval` payload) | `review-required` |
+For a row that has a canonical URL, every field the row carries — its raw
+text, excerpt, pull quote, taxonomy fields, engagement counts,
+`related_to`/`responds_to`, and the rest — is copied verbatim into that row's
+event as `normalizationEvidence.observations` (see `FIELD_MAPPING` in
+`import-social-baseline.mjs` for the full column crosswalk). That is where the
+row's content actually lives in the manifest; the artifact digest is a check
+against it, not a container for it. The event vocabulary treats this the same
+way as a real retrieval attempt that intentionally made no request:
+
+| Row state | Event | `httpOutcome` | `review.state` | Carries `normalizationEvidence`? |
+|---|---|---|---|---|
+| Has a canonical URL | `capture-attempt` | `not-requested` | `not-reviewed` | Yes — every populated field, verbatim |
+| No recoverable canonical URL | `artifact-created` | n/a (no `retrieval` payload) | `review-required` | No — the schema's `artifact-created` event type carries only `artifactId` |
+
+`review.state` is `not-reviewed` on every baseline `capture-attempt`, whether
+or not the row's own `verified` column is `TRUE`: no capture was attempted, so
+nothing has actually been reviewed and accepted yet. `accepted` is reserved for
+a real capture or an explicit `review-decision` event made later. The CSV's own
+`verified` column is not discarded — it is preserved honestly as
+`observations.verified` — it just does not get promoted to the event's review
+state, which would conflate "the archive already checked this content" with
+"this preservation event was reviewed."
 
 A row with no canonical URL — its source link was removed as unresolved — still
-gets an object and a preserved artifact, but its canonical source becomes an
+gets an object and a digest artifact, but its canonical source becomes an
 explicit `urn:rosen:social-source:missing-url:<id>` placeholder instead of a
 fabricated link, and the row's own `notes` (or a default explanation) becomes
-the event's review notes. This is the documented missing state; nothing is
-silently dropped. An image-only post with an empty `raw_text` is not treated as
-missing — it keeps its real URL and a normal `capture-attempt`, and the
-preserved text is honestly recorded as empty (`observations.preservedTextSource:
-"none"`).
+the event's review notes. As of the current corpus this is 38 rows. **These 38
+rows are the thinnest ones in the manifest.** Because the schema does not allow
+`normalizationEvidence` on an `artifact-created` event, they get no
+observations at all — no preserved text, no author, no platform, and no
+`related_to`/`responds_to`. Of the current 38, 19 have `related_to`, 4 have
+`responds_to`, and all 38 have `raw_text` in the CSV — none of that reaches the
+manifest for these rows today. The row's own data is untouched in
+`data/social_posts.csv`, so nothing is lost from the archive itself, but the
+manifest does not yet carry it either. Do not read these rows as "preserved" in
+the same sense as a row with a URL; they are only "accounted for," pending a
+schema change that lets an `artifact-created` event (or a future dedicated
+event type) carry `normalizationEvidence` too. This gap is exactly the one
+issue #717's acceptance criteria about threads, replies, and deleted-post
+evidence are aimed at, and it is not closed for these 38 rows yet.
 
-`related_to` and `responds_to` are preserved verbatim inside
-`normalizationEvidence.observations`, so thread and reply relationships survive
-even though the schema has no dedicated relationship field yet.
+An image-only post with an empty `raw_text` is not treated as missing — it
+keeps its real URL and a normal `capture-attempt`, and the preserved text is
+honestly recorded as empty (`observations.preservedTextSource: "none"`).
+
+For every row that does have a canonical URL, `related_to` and `responds_to`
+are preserved verbatim inside `normalizationEvidence.observations`, so thread
+and reply relationships for those rows survive even though the schema has no
+dedicated relationship field yet. That guarantee does not extend to the 38
+missing-url rows described above.
 
 A later stewardship stage (the live discovery-and-capture pipeline in
 `docs/bluesky-stewardship-pipeline.md`) can append real `capture-attempt`,
@@ -260,14 +296,36 @@ A later stewardship stage (the live discovery-and-capture pipeline in
 this baseline without touching it — the append-only model means the baseline
 stays intact as better evidence arrives.
 
-Run the compatibility check:
+### Detecting drift
+
+`import-social-baseline.mjs` rebuilds its manifest fresh from
+`data/social_posts.csv` on every run. At 123 MB, the full manifest is too
+large to commit, so nothing pins today's digests against tomorrow's — on its
+own, `--verify` only re-derives digests from whatever the CSV currently says
+and checks that the result is schema-valid, which cannot catch a later run
+truncating or rewriting a batch of rows.
+
+`preservation/social-baseline-checksums.json` closes that gap. It is a small,
+committed file mapping each row's stable ID to its SHA-256 digest — a few MB,
+not 123. `--verify` compares the current CSV against this pin and fails loudly
+if any pinned row's digest changed:
 
 ```text
 node preservation/import-social-baseline.mjs --verify
 ```
 
-This validates the complete corpus (tens of thousands of rows) and can take on
-the order of a minute; it is not part of `npm test`, only `npm run
-validate:preservation`. `tests/social-baseline-preservation.test.js` covers
-behavior with small fixtures plus bounded and full-corpus structural checks
-against the real CSV, so `npm test` stays fast.
+After an intentional data change (new rows added, a correction applied),
+refresh the pin deliberately:
+
+```text
+node preservation/import-social-baseline.mjs --write-checksums
+```
+
+`--write-checksums` only ever runs against the real `data/social_posts.csv`,
+so a test fixture or scratch CSV can never overwrite the committed pin.
+
+The `--verify` run above validates the complete corpus (tens of thousands of
+rows) and can take on the order of a minute; it is not part of `npm test`,
+only `npm run validate:preservation`. `tests/social-baseline-preservation.test.js`
+covers behavior with small fixtures plus bounded and full-corpus structural
+checks against the real CSV, so `npm test` stays fast.
