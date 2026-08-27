@@ -19,6 +19,30 @@
       "summary": "Initial registry (issue #737). Endpoint-type constraints for accepted types are inferred from current usage in extracted_relationships.csv (falling back to backend/entity_extraction_schema_v3.json's valid_source_types/valid_target_types for the five types with zero current usage: Authored By, Quoted, Interviewed, Responds To, Founded). Legacy ambiguous types (Founded By, Owned By, Created, Covers) and the not-yet-wired Influenced type are marked status: \"deferred\" rather than guessed; their direction, inverse, symmetry, and temporal scope are curator decisions, not automation output."
     }
   ],
+  "examples": {
+    "temporalScope": [
+      {
+        "temporalScope": "interval",
+        "relationshipId": "RECORD-00022_REL_006",
+        "assertion": "Jay Rosen affiliated with NYU",
+        "note": "\"Affiliated With\" is an ongoing state, not a single moment: Jay Rosen's affiliation with NYU can start and later end. extracted_relationships.csv has no start/end date column today, so this interval is not yet structurally captured; temporalScope: \"interval\" records that the gap is meaningful, for a future backfill to fill in."
+      },
+      {
+        "temporalScope": "instant",
+        "relationshipId": "RECORD-00150_REL_016",
+        "assertion": "Killing the Buddha: A Heretic’s Bible published in Free Press",
+        "note": "\"Published In\" names a single publication event. It does not change or need a duration, so temporalScope: \"instant\" needs no additional date fields beyond the relationship's own extracted_date and the record it came from."
+      }
+    ],
+    "disputedAssertions": [
+      {
+        "disputedAssertionsAllowed": false,
+        "hypothetical": true,
+        "scenario": "Two source records disagree on whether Organization X owns Organization Y (one reports a 2020 sale, the other still names the original owner).",
+        "note": "extracted_relationships.csv has no negation, dispute, or superseded-by column, so this disagreement cannot be recorded as a qualified or disputed assertion today; both rows would sit in the graph as unqualified facts. disputedAssertionsAllowed is false for every type in this registry for that reason — it names a real gap in the row shape, not a per-type curator choice. Closing it needs a new column (or a status field) before any type's flag can turn true."
+      }
+    ]
+  },
   "types": {
     "Authored By": {
       "status": "accepted",

@@ -560,6 +560,28 @@ describe('committed relationship type registry (#737)', () => {
     assert.match(entry.deferralReason, /548/);
   });
 
+  it('grounds its temporal-scope examples in relationship rows that still exist', async () => {
+    const [registry, relationshipRows] = await Promise.all([
+      loadRegistry(),
+      readCanonicalCsv(path.join(repositoryRoot, 'data/extracted_relationships.csv')),
+    ]);
+    const rowById = new Map(relationshipRows.map(row => [row.relationship_id, row]));
+
+    assert.ok(registry.examples?.temporalScope?.length > 0);
+    assert.ok(registry.examples?.disputedAssertions?.length > 0);
+
+    for (const example of registry.examples.temporalScope) {
+      const row = rowById.get(example.relationshipId);
+      assert.ok(row, `${example.relationshipId}: example relationship no longer exists`);
+      const entry = registry.types[row.relationship_type];
+      assert.equal(
+        entry.temporalScope,
+        example.temporalScope,
+        `${example.relationshipId}: example temporalScope does not match its type's registry entry`
+      );
+    }
+  });
+
   it('validates the current repository data against the committed registry with zero endpoint-type violations', async () => {
     const dataset = await loadRepositoryGraphDataset(repositoryRoot);
     assert.ok(Object.keys(dataset.policy.relationshipTypeRegistry).length > 0);
