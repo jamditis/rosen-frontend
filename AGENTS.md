@@ -69,7 +69,13 @@ and desktop viewports, runs `axe-core` for WCAG 2.1 AA, and writes
 `preview-audit-results/axe-report.html` plus per-route screenshots. It also
 measures layout shift per route and checks it against the budgets in
 `scripts/layout-shift-budgets.js`. It exits non-zero if violations or budget
-regressions are found.
+regressions are found, and CI runs it through
+`.github/workflows/layout-shift-budget.yml`.
+
+On a machine whose browser cannot reach the CDN, run
+`node scripts/mirror-audit-modules.js` first and audit with
+`PREVIEW_AUDIT_MODULE_CACHE=1`. Without it the app never mounts and only the
+standalone pages are measured.
 
 Backend pipeline work lives in `backend/` and uses Poetry:
 
