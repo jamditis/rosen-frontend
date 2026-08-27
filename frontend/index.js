@@ -1,6 +1,7 @@
 import { createRoot } from 'react-dom/client';
-import { html } from './html.js?v=3.8.31';
-import App from './App.js?v=3.8.31';
+import { html } from './html.js?v=3.8.32';
+import App from './App.js?v=3.8.32';
+import { registerArchiveSiteTools } from './services/siteTools.js?v=3.8.32';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -9,6 +10,11 @@ if (!rootElement) {
 
 const root = createRoot(rootElement);
 root.render(html`<${App} />`);
+
+// WebMCP is progressive enhancement. Supporting browsers receive structured,
+// read-only archive tools. Every other browser continues with the same app.
+registerArchiveSiteTools()
+  .catch(error => console.warn('[site tools] registration failed:', error.message));
 
 // Opt-in client-side performance instrumentation (#280). Off by default;
 // enable with `localStorage.jrda_debug = '1'` in DevTools and reload (the #170

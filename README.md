@@ -27,6 +27,14 @@ On the live site:
 - **[FAQ](https://pressthink.org/j/rosen-archive/faq/)** — common questions about the archive and the dissertation
 - **[Ways to participate](https://pressthink.org/j/rosen-archive/features/participate/)** — how to suggest records, report problems, or use the data
 
+### Site tools for AI agents
+
+The main archive registers four read-only WebMCP site tools in supporting
+browsers. They list accepted archive facets, search public records, read one
+record, and find its related entities. The tools use the same public data and
+search logic as the visible archive. They do not change page state, archive
+records, or source files. Browsers without WebMCP support use the site normally.
+
 ## Open data
 
 The archive's data is part of the public record and free to use. See [`data/README.md`](data/README.md) for the full data guide, including:
