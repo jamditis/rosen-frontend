@@ -90,10 +90,10 @@ Counts verified against current `data/` on 2026-07-07:
 
 | File | Records | Contents |
 |------|---------|----------|
-| `data/archive_records-public.csv` | 1,037 | Non-social archive records (808 RECORD, 137 TUMBLR, 82 CLIP, 10 THREAD). Line count is high (~50k+) due to multi-line text fields. Max record id is `RECORD-00918`; next ID for new records is `RECORD-00919`. |
+| `data/archive_records-public.csv` | 1,030 | Non-social archive records (801 RECORD, 137 TUMBLR, 82 CLIP, 10 THREAD). Line count is high (~50k+) due to multi-line text fields. Max record id is `RECORD-00918`; next ID for new records is `RECORD-00919`. |
 | `data/social_posts.csv` | 29,747 | Twitter/X and Bluesky posts. Max BSKY id is `BSKY-03172`. |
-| `data/extracted_entities.csv` | 7,323 | Named entities (people, orgs, concepts) |
-| `data/extracted_relationships.csv` | 11,153 | Entity-to-record relationships |
+| `data/extracted_entities.csv` | 7,303 | Named entities (people, orgs, concepts) |
+| `data/extracted_relationships.csv` | 10,976 | Entity-to-record relationships |
 
 ### Regenerating JSON from CSV
 
@@ -201,10 +201,10 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── archive-core.json            # Lightweight records (~13 MB)
 │   ├── archive-details.json         # Full details (~13 MB)
 │   ├── archive-entities.json        # Entity graph (~1.1 MB)
-│   ├── archive_records-public.csv   # Source records (1,037 rows)
+│   ├── archive_records-public.csv   # Source records (1,030 rows)
 │   ├── social_posts.csv             # Social media posts (29,747 rows)
-│   ├── extracted_entities.csv       # Named entities (7,323 rows)
-│   ├── extracted_relationships.csv  # Entity relationships (11,153 rows)
+│   ├── extracted_entities.csv       # Named entities (7,303 rows)
+│   ├── extracted_relationships.csv  # Entity relationships (10,976 rows)
 │   ├── export-archive-data.js       # JSON generator script
 │   ├── schema.json                  # Data schema
 │   └── README.md                    # Data dictionary

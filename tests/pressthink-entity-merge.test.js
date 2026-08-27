@@ -80,16 +80,19 @@ describe('PressThink entity dedup (#859)', () => {
 
   it('re-points every relationship that used to reference W0666 at O0033 without losing any', async () => {
     // Before the merge: 131 relationship rows already referenced O0033 and
-    // 104 referenced W0666 (source or target). After the merge every one of
-    // those 235 references must still be present, now all pointed at O0033.
+    // 104 referenced W0666 (source or target), so the merge alone leaves 235.
+    // Two of those rows, RECORD-00846_REL_030 and RECORD-00857_REL_032, were
+    // extracted from records the duplicate adjudication dropped in the same
+    // release (issue #867), which takes the final total to 233. Every other
+    // reference must still be present, now all pointed at O0033.
     const relationships = await loadRelationships();
     const referencingO0033 = relationships.filter(
       (row) => row.source_entity_id === 'O0033' || row.target_entity_id === 'O0033',
     );
     assert.equal(
       referencingO0033.length,
-      235,
-      `expected exactly 235 relationship rows referencing O0033 after the merge, got ${referencingO0033.length}`,
+      233,
+      `expected exactly 233 relationship rows referencing O0033 after the merge, got ${referencingO0033.length}`,
     );
   });
 
