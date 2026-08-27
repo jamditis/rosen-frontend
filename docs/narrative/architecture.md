@@ -123,9 +123,9 @@ Google's URL Context tool (via Gemini API) is the primary extraction method. It 
 |--------|---------|
 | `backfill_worker.py` | Fills missing `pull_quote` and `raw_text` data. |
 | `bulk_reprocessor.py` | Full archive reprocessing with multi-strategy content extraction. |
-| `simple_date_backfill.py` | URL pattern extraction for publication dates (93.8% success on PressThink URLs). |
-| `enhanced_date_backfill.py` | OpenGraph, JSON-LD, RSS, and video API date extraction. |
-| `publication_date_backfill.py` | AI-powered date extraction via Gemini for remaining gaps. |
+| `date_backfill.py` | Fills missing publication dates in Google Sheets. `--strategy simple` reads the URL, `enhanced` also reads the page, `publication` adds a Gemini fallback. Preview-first; `--live` is required to write. |
+| `backfill_missing_dates.py` | Writes hand-checked publication dates into the archive CSV for records whose source carries no date. |
+| `date_extraction.py` | Shared URL date parser used by the date backfill. |
 
 
 ## Entity extraction pipeline

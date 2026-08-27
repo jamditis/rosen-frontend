@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Credential-free tests for the explicit date-backfill CLI (issue #189)."""
+"""Credential-free tests for the consolidated date backfill (issue #189).
+
+The three strategy files are gone. One ``DateBackfiller`` walks the sheet and a
+strategy name picks the resolver chain, so these tests drive the class with its
+Google connection bypassed (``__new__`` plus a fake worksheet) and assert on the
+cells it would write.
+"""
 
 from __future__ import annotations
 
@@ -8,14 +14,15 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-from types import ModuleType, SimpleNamespace
 
 import pytest
 
-from scripts.backfill import date_backfill
 from scripts.backfill.date_backfill import (
+    STRATEGY_SPECS,
+    DateBackfiller,
     DateBackfillPlan,
     build_parser,
+    normalize_date,
     run_date_backfill,
     select_row_window,
 )
@@ -33,25 +40,16 @@ class FakeSpreadsheet:
 class FakeBackfiller:
     instances = []
 
-    def __init__(self, *, worksheet="final"):
+    def __init__(self, strategy, worksheet):
+        self.strategy = strategy
         self.sh = FakeSpreadsheet()
         self.final_ws = self.sh.worksheet(worksheet)
         self.calls = []
         type(self).instances.append(self)
 
-    def backfill_publication_dates(self, start_row=2, max_rows=None):
-        self.calls.append(("publication", start_row, max_rows))
-
-    def backfill_missing_dates(self, start_row=2, end_row=None):
-        self.calls.append(("enhanced", start_row, end_row))
-
-
-class WorksheetAwareBackfiller(FakeBackfiller):
-    def __init__(self, *, worksheet):
-        self.sh = FakeSpreadsheet()
-        self.final_ws = self.sh.worksheet(worksheet)
-        self.calls = []
-        type(self).instances.append(self)
+    def backfill(self, start_row=2, limit=None):
+        self.calls.append((start_row, limit))
+        return {"inspected": 0, "filled": 0}
 
 
 class FakeWorksheet:
@@ -66,49 +64,22 @@ class FakeWorksheet:
         self.updates.extend(updates)
 
 
+def make_backfiller(strategy, sheet):
+    """Build a backfiller without touching Google credentials."""
+    backfiller = DateBackfiller.__new__(DateBackfiller)
+    backfiller.strategy = strategy
+    backfiller.spec = STRATEGY_SPECS[strategy]
+    backfiller.final_ws = sheet
+    backfiller._model = None
+    return backfiller
+
+
 @pytest.fixture(autouse=True)
 def clear_instances():
     FakeBackfiller.instances.clear()
 
 
-def _stub_strategy_dependencies(monkeypatch):
-    gspread = ModuleType("gspread")
-    gspread.service_account = lambda **_kwargs: None
-    monkeypatch.setitem(sys.modules, "gspread", gspread)
-
-    dotenv = ModuleType("dotenv")
-    dotenv.load_dotenv = lambda: None
-    monkeypatch.setitem(sys.modules, "dotenv", dotenv)
-
-    requests = ModuleType("requests")
-    requests.get = lambda *_args, **_kwargs: SimpleNamespace(content=b"")
-    monkeypatch.setitem(sys.modules, "requests", requests)
-
-    bs4 = ModuleType("bs4")
-    bs4.BeautifulSoup = lambda *_args, **_kwargs: None
-    monkeypatch.setitem(sys.modules, "bs4", bs4)
-
-    google = ModuleType("google")
-    google.__path__ = []
-    genai = ModuleType("google.generativeai")
-    genai.configure = lambda **_kwargs: None
-    genai.GenerativeModel = lambda *_args, **_kwargs: object()
-    google.generativeai = genai
-    monkeypatch.setitem(sys.modules, "google", google)
-    monkeypatch.setitem(sys.modules, "google.generativeai", genai)
-
-
-def _load_strategy(monkeypatch, filename, module_name):
-    backend_dir = Path(__file__).resolve().parents[1]
-    backfill_dir = backend_dir / "scripts" / "backfill"
-    _stub_strategy_dependencies(monkeypatch)
-    monkeypatch.syspath_prepend(str(backfill_dir))
-    monkeypatch.setitem(sys.modules, "date_backfill", date_backfill)
-
-    spec = importlib.util.spec_from_file_location(module_name, backfill_dir / filename)
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+# --- CLI surface ---------------------------------------------------------
 
 
 def test_parser_defaults_to_a_non_executing_explicit_plan():
@@ -153,13 +124,21 @@ def test_parser_rejects_non_positive_or_malformed_limits(bad_limit):
         build_parser().parse_args(["--limit", bad_limit])
 
 
+def test_parser_offers_every_strategy():
+    for strategy in ("simple", "enhanced", "publication"):
+        assert build_parser().parse_args(["--strategy", strategy]).strategy == strategy
+
+
 def test_row_window_maps_sheet_rows_to_the_matching_input_records():
     rows = [f"sheet-row-{row}" for row in range(2, 31)]
     assert select_row_window(rows, 27, 2) == ["sheet-row-27", "sheet-row-28"]
     assert select_row_window(rows, 40, 5) == []
 
 
-def test_preview_does_not_load_google_or_strategy_dependencies():
+# --- dispatch ------------------------------------------------------------
+
+
+def test_preview_does_not_build_a_backfiller():
     plan = DateBackfillPlan(
         strategy="enhanced",
         worksheet="test_runs",
@@ -169,8 +148,8 @@ def test_preview_does_not_load_google_or_strategy_dependencies():
     )
     result = run_date_backfill(
         plan,
-        backfiller_loader=lambda strategy: pytest.fail(
-            f"preview loaded the {strategy} strategy"
+        backfiller_factory=lambda strategy, _worksheet: pytest.fail(
+            f"preview built the {strategy} backfiller"
         ),
     )
     assert result == {
@@ -184,18 +163,9 @@ def test_preview_does_not_load_google_or_strategy_dependencies():
     }
 
 
-@pytest.mark.parametrize(
-    "strategy,limit,expected_call",
-    [
-        ("simple", 16, ("publication", 27, 16)),
-        ("publication", 16, ("publication", 27, 16)),
-        ("enhanced", 16, ("enhanced", 27, 42)),
-        ("enhanced", None, ("enhanced", 27, None)),
-    ],
-)
-def test_live_dispatch_preserves_each_strategy_interface(
-    strategy, limit, expected_call
-):
+@pytest.mark.parametrize("strategy", ["simple", "enhanced", "publication"])
+@pytest.mark.parametrize("limit", [16, None])
+def test_live_dispatch_passes_one_window_to_every_strategy(strategy, limit):
     plan = DateBackfillPlan(
         strategy=strategy,
         worksheet="test_runs",
@@ -203,37 +173,17 @@ def test_live_dispatch_preserves_each_strategy_interface(
         limit=limit,
         live=True,
     )
-    result = run_date_backfill(
-        plan,
-        backfiller_loader=lambda _selected: FakeBackfiller,
-    )
+    result = run_date_backfill(plan, backfiller_factory=FakeBackfiller)
+
     instance = FakeBackfiller.instances[-1]
+    assert instance.strategy == strategy
     assert instance.sh.requested == ["test_runs"]
     assert instance.final_ws == "worksheet:test_runs"
-    assert instance.calls == [expected_call]
+    assert instance.calls == [(27, limit)]
     assert result["executed"] is True
 
 
-def test_live_dispatch_opens_the_requested_worksheet_during_construction():
-    plan = DateBackfillPlan(
-        strategy="simple",
-        worksheet="staging_only",
-        start_row=2,
-        limit=1,
-        live=True,
-    )
-
-    run_date_backfill(
-        plan,
-        backfiller_loader=lambda _selected: WorksheetAwareBackfiller,
-    )
-
-    instance = WorksheetAwareBackfiller.instances[-1]
-    assert instance.sh.requested == ["staging_only"]
-    assert instance.final_ws == "worksheet:staging_only"
-
-
-def test_blank_worksheet_is_rejected_before_loading_a_strategy():
+def test_blank_worksheet_is_rejected_before_building_a_backfiller():
     plan = DateBackfillPlan(
         strategy="enhanced",
         worksheet="   ",
@@ -244,81 +194,214 @@ def test_blank_worksheet_is_rejected_before_loading_a_strategy():
     with pytest.raises(ValueError, match="worksheet must not be blank"):
         run_date_backfill(
             plan,
-            backfiller_loader=lambda _strategy: pytest.fail("strategy was loaded"),
+            backfiller_factory=lambda *_args: pytest.fail("a backfiller was built"),
         )
 
 
-def test_publication_strategy_reads_and_writes_the_same_sheet_rows(monkeypatch):
-    module = _load_strategy(
-        monkeypatch,
-        "publication_date_backfill.py",
-        "publication_date_backfill_test",
+def test_unknown_strategy_is_rejected():
+    plan = DateBackfillPlan(
+        strategy="guess",
+        worksheet="final",
+        start_row=2,
+        limit=None,
+        live=True,
     )
+    with pytest.raises(ValueError, match="unknown strategy"):
+        run_date_backfill(
+            plan,
+            backfiller_factory=lambda *_args: pytest.fail("a backfiller was built"),
+        )
+
+
+# --- the shared sheet walk ------------------------------------------------
+
+
+def test_backfill_reads_and_writes_the_same_sheet_rows():
     headers = ["url", "title", "excerpt", "publication_date"]
     rows = [[f"url-{row}", f"Title {row}", "", ""] for row in range(2, 31)]
     sheet = FakeWorksheet([headers, *rows])
-    backfiller = module.PublicationDateBackfiller.__new__(
-        module.PublicationDateBackfiller
-    )
-    backfiller.final_ws = sheet
-    seen_urls = []
-    backfiller.extract_date_from_url = lambda url: (
-        seen_urls.append(url) or "01/15/2020"
-    )
-    backfiller.extract_date_from_web = lambda _url: None
-    backfiller.extract_date_with_ai = lambda _url, _title, _excerpt: None
+    backfiller = make_backfiller("publication", sheet)
+    seen = []
+    backfiller.resolve_from_url = lambda url: seen.append(url) or "01/15/2020"
+    backfiller.resolve_from_page = lambda _url: None
+    backfiller.resolve_with_ai = lambda *_args: None
 
-    backfiller.backfill_publication_dates(start_row=27, max_rows=2)
+    summary = backfiller.backfill(start_row=27, limit=2)
 
-    assert seen_urls == ["url-27", "url-28"]
+    assert seen == ["url-27", "url-28"]
     assert [update["range"] for update in sheet.updates] == ["D27", "D28"]
+    assert summary["filled"] == 2
+    assert summary["by_source"] == {"url": 2}
 
 
-def test_publication_strategy_treats_a_header_only_sheet_as_a_noop(monkeypatch, capsys):
-    module = _load_strategy(
-        monkeypatch,
-        "publication_date_backfill.py",
-        "publication_date_backfill_empty_test",
-    )
+def test_backfill_treats_a_header_only_sheet_as_a_noop(capsys):
     sheet = FakeWorksheet([["url", "title", "excerpt", "publication_date"]])
-    backfiller = module.PublicationDateBackfiller.__new__(
-        module.PublicationDateBackfiller
-    )
-    backfiller.final_ws = sheet
-    backfiller.extract_date_from_url = lambda _url: None
-    backfiller.extract_date_from_web = lambda _url: None
-    backfiller.extract_date_with_ai = lambda _url, _title, _excerpt: None
+    backfiller = make_backfiller("simple", sheet)
+    backfiller.resolve_from_url = lambda _url: None
 
-    backfiller.backfill_publication_dates(start_row=2, max_rows=10)
+    summary = backfiller.backfill(start_row=2, limit=10)
 
     output = capsys.readouterr().out
     assert sheet.updates == []
+    assert summary["inspected"] == 0
     assert "Total inspected: 0" in output
     assert "Success rate: 0.0%" in output
 
 
-def test_enhanced_summary_uses_only_available_selected_rows(monkeypatch, capsys):
-    module = _load_strategy(
-        monkeypatch,
-        "enhanced_date_backfill.py",
-        "enhanced_date_backfill_test",
-    )
+def test_summary_uses_only_available_selected_rows(capsys):
     headers = ["url", "publication_date"]
     rows = [[f"url-{row}", ""] for row in range(2, 7)]
     sheet = FakeWorksheet([headers, *rows])
-    backfiller = module.EnhancedDateBackfiller.__new__(module.EnhancedDateBackfiller)
-    backfiller.final_ws = sheet
-    seen_urls = []
-    backfiller.extract_date_from_url = lambda url: seen_urls.append(url) or None
-    backfiller.extract_date_from_metadata = lambda _url: None
+    backfiller = make_backfiller("enhanced", sheet)
+    seen = []
+    backfiller.resolve_from_url = lambda url: seen.append(url) or None
+    backfiller.resolve_from_page = lambda _url: None
 
-    backfiller.backfill_missing_dates(start_row=5, end_row=104)
+    summary = backfiller.backfill(start_row=5, limit=100)
 
     output = capsys.readouterr().out
-    assert seen_urls == ["url-5", "url-6"]
+    assert seen == ["url-5", "url-6"]
+    assert summary["inspected"] == 2
+    assert summary["not_found"] == 2
     assert "Inspecting 2 records" in output
     assert "No date found: 2" in output
     assert "No date found: 100" not in output
+
+
+def test_rows_that_already_have_a_date_are_left_alone():
+    headers = ["url", "publication_date"]
+    sheet = FakeWorksheet([headers, ["url-2", "01/01/1999"], ["url-3", ""]])
+    backfiller = make_backfiller("simple", sheet)
+    seen = []
+    backfiller.resolve_from_url = lambda url: seen.append(url) or "02/02/2002"
+
+    summary = backfiller.backfill()
+
+    assert seen == ["url-3"]
+    assert [update["range"] for update in sheet.updates] == ["B3"]
+    assert summary["already_dated"] == 1
+
+
+def test_a_missing_publication_date_column_stops_the_run(capsys):
+    sheet = FakeWorksheet([["url", "title"], ["url-2", "Title"]])
+    backfiller = make_backfiller("simple", sheet)
+    backfiller.resolve_from_url = lambda _url: pytest.fail("a row was resolved")
+
+    summary = backfiller.backfill()
+
+    assert summary["filled"] == 0
+    assert sheet.updates == []
+    assert "publication_date column not found" in capsys.readouterr().out
+
+
+def test_the_target_cell_is_correct_past_column_z():
+    headers = [f"col{index}" for index in range(27)] + ["publication_date", "url"]
+    sheet = FakeWorksheet([headers, [""] * 27 + ["", "url-2"]])
+    backfiller = make_backfiller("simple", sheet)
+    backfiller.resolve_from_url = lambda _url: "03/04/2005"
+
+    backfiller.backfill()
+
+    assert [update["range"] for update in sheet.updates] == ["AB2"]
+
+
+# --- resolver chains ------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "strategy,expected",
+    [
+        ("simple", ("url",)),
+        ("enhanced", ("url", "page")),
+        ("publication", ("url", "page", "ai")),
+    ],
+)
+def test_each_strategy_declares_its_resolver_chain(strategy, expected):
+    assert STRATEGY_SPECS[strategy].resolvers == expected
+
+
+def test_simple_never_reaches_the_network_or_the_model():
+    headers = ["url", "publication_date"]
+    sheet = FakeWorksheet([headers, ["url-2", ""]])
+    backfiller = make_backfiller("simple", sheet)
+    backfiller.resolve_from_url = lambda _url: None
+    backfiller.resolve_from_page = lambda _url: pytest.fail("simple read a page")
+    backfiller.resolve_with_ai = lambda *_args: pytest.fail("simple called the model")
+
+    backfiller.backfill()
+
+    assert sheet.updates == []
+
+
+def test_enhanced_falls_back_to_the_page_but_not_the_model():
+    headers = ["url", "publication_date"]
+    sheet = FakeWorksheet([headers, ["url-2", ""]])
+    backfiller = make_backfiller("enhanced", sheet)
+    backfiller.resolve_from_url = lambda _url: None
+    backfiller.resolve_from_page = lambda _url: "05/06/2007"
+    backfiller.resolve_with_ai = lambda *_args: pytest.fail("enhanced called the model")
+
+    summary = backfiller.backfill()
+
+    assert summary["by_source"] == {"page": 1}
+
+
+def test_publication_reaches_the_model_last_and_gets_the_record_context():
+    headers = ["url", "title", "excerpt", "publication_date"]
+    sheet = FakeWorksheet([headers, ["url-2", "A title", "An excerpt", ""]])
+    backfiller = make_backfiller("publication", sheet)
+    seen = []
+    backfiller.resolve_from_url = lambda _url: None
+    backfiller.resolve_from_page = lambda _url: None
+    backfiller.resolve_with_ai = lambda *args: seen.append(args) or "07/08/2009"
+
+    summary = backfiller.backfill()
+
+    assert seen == [("url-2", "A title", "An excerpt")]
+    assert summary["by_source"] == {"ai": 1}
+
+
+# --- shared date normaliser ----------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "raw,expected",
+    [
+        # Formats every historical strategy accepted.
+        ("2020-01-15", "01/15/2020"),
+        ("01/15/2020", "01/15/2020"),
+        ("01-15-2020", "01/15/2020"),
+        ("January 15, 2020", "01/15/2020"),
+        ("Jan 15, 2020", "01/15/2020"),
+        ("15 January 2020", "01/15/2020"),
+        ("2020-01-15T09:30:00", "01/15/2020"),
+        # Formats only one strategy accepted; the union keeps them all.
+        ("2020-01-15 09:30:00", "01/15/2020"),
+        ("2020-01-15T09:30:00.500Z", "01/15/2020"),
+        ("2020-01-15T09:30:00Z", "01/15/2020"),
+        ("15 Jan 2020", "01/15/2020"),
+        ("Wednesday, January 15, 2020", "01/15/2020"),
+        ("Wed, Jan 15, 2020", "01/15/2020"),
+        # Label and timezone trimming now applies to every strategy.
+        ("Published: 2020-01-15", "01/15/2020"),
+        ("2020-01-15T09:30:00 UTC", "01/15/2020"),
+        # Year and month only falls back to the first of the month.
+        ("2020-01", "01/01/2020"),
+        # Nothing usable.
+        ("", None),
+        (None, None),
+        ("sometime last spring", None),
+    ],
+)
+def test_normalize_date(raw, expected):
+    assert normalize_date(raw) == expected
+
+
+def test_month_before_day_is_preserved_for_ambiguous_slash_dates():
+    assert normalize_date("01/02/2020") == "01/02/2020"
+
+
+# --- retired entry points -------------------------------------------------
 
 
 def test_canonical_script_shows_help_without_installed_backfill_dependencies():
@@ -336,9 +419,34 @@ def test_canonical_script_shows_help_without_installed_backfill_dependencies():
         assert option in result.stdout
 
 
-def test_hardcoded_legacy_wrapper_is_removed():
+@pytest.mark.parametrize(
+    "retired",
+    [
+        "scripts/run_date_backfill.py",
+        "scripts/run_backfill.py",
+        "scripts/backfill_missing_dates.py",
+        "scripts/backfill/simple_date_backfill.py",
+        "scripts/backfill/enhanced_date_backfill.py",
+        "scripts/backfill/publication_date_backfill.py",
+    ],
+)
+def test_consolidated_files_are_gone(retired):
     backend_dir = Path(__file__).resolve().parents[1]
-    assert not (backend_dir / "scripts/run_date_backfill.py").exists()
+    assert not (backend_dir / retired).exists()
+
+
+@pytest.mark.parametrize(
+    "module",
+    [
+        "scripts.backfill.date_backfill",
+        "scripts.backfill.backfill_worker",
+        "scripts.backfill.backfill_missing_dates",
+    ],
+)
+def test_every_surviving_entry_point_is_reachable_as_a_module(module):
+    # The retired run_* wrappers only existed to set up sys.path. Each entry
+    # point must resolve under `python -m` without them.
+    assert importlib.util.find_spec(module) is not None
 
 
 def test_backend_guide_keeps_full_context_and_uses_the_canonical_cli():
@@ -347,4 +455,5 @@ def test_backend_guide_keeps_full_context_and_uses_the_canonical_cli():
 
     assert len(guide.splitlines()) > 450
     assert "python scripts/run_date_backfill.py" not in guide
+    assert "python scripts/run_backfill.py" not in guide
     assert "python -m scripts.backfill.date_backfill" in guide
