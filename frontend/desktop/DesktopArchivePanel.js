@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import ArchiveResults from '../components/ArchiveResults.js?v=3.8.33';
 import Sidebar from '../components/Sidebar.js?v=3.8.33';
+import { RELEVANCE_SORT } from '../utils/searchRanking.js?v=3.8.33';
 
 const DesktopArchivePanel = ({
   viewMode,
