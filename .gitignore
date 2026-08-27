@@ -98,6 +98,10 @@ playwright-report/
 preview-audit-results/
 preview-audit-results-*/
 
+# Mirrored CDN responses for the preview audit
+# (node scripts/mirror-audit-modules.js)
+preview-audit-cache/
+
 # Entity extraction working data
 data/social_import/
 .firecrawl/

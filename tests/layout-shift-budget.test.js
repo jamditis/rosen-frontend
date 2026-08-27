@@ -1,6 +1,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   BUDGET_TOLERANCE,
   LAYOUT_SHIFT_BASELINE,
@@ -16,7 +18,11 @@ import {
   summarizeLayoutShifts,
 } from '../scripts/layout-shift-budgets.js';
 
-const auditSource = readFileSync('scripts/preview-audit.js', 'utf8');
+// Resolve from this file, not from the working directory: the suite has to
+// run the same way from a subdirectory as from the repo root.
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const auditSource = readFileSync(resolve(REPO_ROOT, 'scripts', 'preview-audit.js'), 'utf8');
+const probeSource = readFileSync(resolve(REPO_ROOT, 'scripts', 'layout-shift-probe.js'), 'utf8');
 const routeSlugs = [...auditSource.matchAll(/slug: '([^']+)'/g)].map((match) => match[1]);
 
 describe('layout-shift route classes', () => {
@@ -91,6 +97,26 @@ describe('layout-shift summaries', () => {
     assert.equal(summary.reachedGraceLimit, true);
   });
 
+  it('names the elements that moved the most', () => {
+    const summary = summarizeLayoutShifts([
+      { value: 0.2, startTime: 100, hadRecentInput: false, sources: ['#main-content'] },
+      { value: 0.5, startTime: 200, hadRecentInput: false, sources: ['.archive-card', '#main-content'] },
+      { value: 0.05, startTime: 300, hadRecentInput: false, sources: [] },
+    ], { hydrationEndsAt: 500 });
+    assert.deepEqual(summary.topSources, [
+      { selector: '#main-content', value: 0.7 },
+      { selector: '.archive-card', value: 0.5 },
+    ]);
+  });
+
+  it('reports no sources when the browser gave none', () => {
+    const summary = summarizeLayoutShifts(
+      [{ value: 0.2, startTime: 100, hadRecentInput: false }],
+      { hydrationEndsAt: 500 },
+    );
+    assert.deepEqual(summary.topSources, []);
+  });
+
   it('ignores malformed entries instead of producing NaN', () => {
     const summary = summarizeLayoutShifts(
       [null, { value: Number.NaN, startTime: 10 }, { value: 0.1, startTime: Number.NaN }],
@@ -101,7 +127,9 @@ describe('layout-shift summaries', () => {
 });
 
 describe('layout-shift budget evaluation', () => {
-  const standalone = { slug: 'faq', url: '/faq/' };
+  // A standalone route with no exception of its own, so these cases read the
+  // class budget.
+  const standalone = { slug: 'dissertation', url: '/dissertation/' };
 
   it('passes a route inside its budget', () => {
     const evaluation = evaluateLayoutShiftBudget(standalone, { hydration: 0.01, settled: 0 });
@@ -164,7 +192,7 @@ describe('layout-shift baseline and exceptions', () => {
     // The baseline is a measured reference for the report. Budgets do the
     // gating on their own, so an empty baseline must not weaken the check.
     const evaluation = evaluateLayoutShiftBudget(
-      { slug: 'faq', url: '/faq/' },
+      { slug: 'dissertation', url: '/dissertation/' },
       { hydration: 9, settled: 9 },
     );
     assert.equal(evaluation.withinBudget, false);
@@ -241,19 +269,46 @@ describe('layout-shift failure collection', () => {
     assert.match(line, /mobile home-archive/);
     assert.match(line, /settled CLS 0\.4/);
     assert.match(line, /budget 0\.02/);
+    assert.doesNotMatch(line, /never went quiet/);
+  });
+
+  it('says when a failing route never went quiet', () => {
+    // Otherwise a truncated phase split reads like an ordinary regression.
+    const evaluation = evaluateLayoutShiftBudget(
+      { slug: 'dissertation', url: '/dissertation/' },
+      { hydration: 0.01, settled: 0.4, reachedGraceLimit: true },
+    );
+    const [failure] = collectLayoutShiftFailures([
+      { route: 'dissertation', viewport: 'mobile', layoutShift: evaluation },
+    ]);
+    assert.equal(failure.reachedGraceLimit, true);
+    assert.match(formatLayoutShiftFailure(failure), /never went quiet/);
   });
 });
 
 describe('preview audit layout-shift wiring', () => {
   it('installs the observer before any document script', () => {
-    assert.match(auditSource, /function installLayoutShiftObserver\(context\)/);
-    assert.match(auditSource, /context\.addInitScript/);
-    assert.match(auditSource, /type: 'layout-shift', buffered: true/);
+    assert.match(probeSource, /export function installLayoutShiftObserver\(context\)/);
+    assert.match(probeSource, /context\.addInitScript/);
+    assert.match(probeSource, /type: 'layout-shift', buffered: true/);
     assert.match(auditSource, /await installLayoutShiftObserver\(context\)/);
   });
 
+  it('gives every route its own document before measuring it', () => {
+    // tests/layout-shift-navigation.browser.test.js drives this against a real
+    // browser. This only holds the wiring in place.
+    assert.match(auditSource, /requiresFreshDocument\(page\.url\(\), targetUrl\.toString\(\), BASE\)/);
+    assert.match(auditSource, /await page\.goto\(BOOTSTRAP_URL/);
+  });
+
+  it('waits for the details body, not the request, before measuring', () => {
+    assert.match(auditSource, /page\.waitForResponse\(/);
+    assert.match(auditSource, /response\.finished\(\)/);
+    assert.match(auditSource, /measureLayoutShift\(page, \{ startupSettled \}\)/);
+  });
+
   it('measures each route before any interaction check runs', () => {
-    const measureAt = auditSource.indexOf('const layoutShiftMeasurement = await measureLayoutShift(page)');
+    const measureAt = auditSource.indexOf('const layoutShiftMeasurement = await measureLayoutShift(page');
     const firstInteraction = auditSource.indexOf('if (route.verifyReportFirst)');
     assert.ok(measureAt > 0, 'route measurement call is missing');
     assert.ok(measureAt < firstInteraction, 'measurement must precede the interaction checks');

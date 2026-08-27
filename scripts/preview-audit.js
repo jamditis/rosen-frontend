@@ -9,19 +9,30 @@
 // ROUTES below to add more.
 
 import { spawn } from 'node:child_process';
-import { mkdir, writeFile, rm } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, rm } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { AxeBuilder } from '@axe-core/playwright';
 import {
-  LAYOUT_SHIFT_TIMING,
+  LAYOUT_SHIFT_BASELINE,
   LAYOUT_SHIFT_BASELINE_RUN,
-  summarizeLayoutShifts,
   evaluateLayoutShiftBudget,
   collectLayoutShiftFailures,
   formatLayoutShiftFailure,
 } from './layout-shift-budgets.js';
+import {
+  installLayoutShiftObserver,
+  measureLayoutShift,
+  requiresFreshDocument,
+} from './layout-shift-probe.js';
+import {
+  MODULE_CACHE_DIR,
+  MODULE_CACHE_INDEX,
+  cacheLookupKeys,
+  isMirroredHost,
+} from './mirror-audit-modules.js';
 
 const PORT = Number(process.env.PREVIEW_PORT || 8765);
 // Pick a connect target for Playwright that's always routable, regardless
@@ -43,6 +54,16 @@ const REQUESTED_VIEWPORT = (process.env.PREVIEW_AUDIT_VIEWPORT || '').trim();
 // Seeding mode measures layout shift and writes the values, but never fails on
 // budget. Use it to refresh the baseline in scripts/layout-shift-budgets.js.
 const LAYOUT_SHIFT_SEED_MODE = process.env.PREVIEW_AUDIT_LAYOUT_SHIFT_SEED === '1';
+// Serve the CDN modules and fonts from the local mirror instead of the
+// network. Run `node scripts/mirror-audit-modules.js` first. A machine whose
+// browser cannot reach the CDN needs this to measure the React routes at all,
+// and it removes CDN latency as a source of run-to-run movement everywhere
+// else.
+const MODULE_CACHE_MODE = process.env.PREVIEW_AUDIT_MODULE_CACHE === '1';
+// Tiny same-origin document the audit lands on between routes. It runs no
+// script, so it costs one static file, and it gives the next route both a
+// fresh document and a reachable localStorage.
+const BOOTSTRAP_URL = `${BASE}/version.json`;
 const OUT_DIR_ROOT = resolve(fileURLToPath(import.meta.url), '..', '..', 'preview-audit-results');
 const OUT_DIR = REQUESTED_VIEWPORT
   ? resolve(OUT_DIR_ROOT, 'shards', REQUESTED_VIEWPORT)
@@ -258,62 +279,79 @@ async function startServer() {
   return proc;
 }
 
-// Collect Layout Instability entries from the first paint on. The script runs
-// before any document script on every navigation, so each route starts with an
-// empty list. `buffered: true` still hands over entries the browser recorded
-// before the observer attached.
-function installLayoutShiftObserver(context) {
-  return context.addInitScript(() => {
-    window.__previewLayoutShifts = [];
-    try {
-      const observer = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
-          window.__previewLayoutShifts.push({
-            value: entry.value,
-            startTime: entry.startTime,
-            hadRecentInput: entry.hadRecentInput,
-          });
-        }
-      });
-      observer.observe({ type: 'layout-shift', buffered: true });
-    } catch {
-      // A browser without the Layout Instability API reports no shifts.
+// URLs the browser asked for that the mirror does not hold. The run reports
+// them and fails, because a page missing its React module or a web font is not
+// the page the budgets describe.
+const missingModules = new Set();
+
+let moduleCache = null;
+
+async function loadModuleCache() {
+  if (moduleCache) return moduleCache;
+  if (!existsSync(MODULE_CACHE_INDEX)) {
+    throw new Error(
+      'PREVIEW_AUDIT_MODULE_CACHE=1 needs a mirror. '
+      + 'Run `node scripts/mirror-audit-modules.js` first.',
+    );
+  }
+  const { entries } = JSON.parse(await readFile(MODULE_CACHE_INDEX, 'utf8'));
+  moduleCache = new Map();
+  for (const [url, entry] of Object.entries(entries)) {
+    moduleCache.set(url, { ...entry, path: resolve(MODULE_CACHE_DIR, entry.file) });
+  }
+  console.log(`Module cache: ${moduleCache.size} mirrored responses from ${MODULE_CACHE_DIR}`);
+  return moduleCache;
+}
+
+// Serve every mirrored third-party response from the local cache. Page-level
+// routes still win, so the routes that mock a record or a video are unaffected.
+// Hosts outside the mirror (a link target, an image on someone else's server)
+// pass through exactly as they do without this mode.
+async function applyModuleCache(context) {
+  const bodies = await loadModuleCache();
+  const lookup = (url) => cacheLookupKeys(url).map((key) => bodies.get(key)).find(Boolean) || null;
+  const isMirrored = (url) => isMirroredHost(url.host) || Boolean(lookup(url.toString()));
+  await context.route(isMirrored, async (route, request) => {
+    const cached = lookup(request.url());
+    if (!cached) {
+      missingModules.add(request.url());
+      await route.abort();
+      return;
     }
+    await route.fulfill({
+      status: 200,
+      contentType: cached.contentType,
+      headers: { 'access-control-allow-origin': '*', 'cache-control': 'no-store' },
+      body: await readFile(cached.path),
+    });
   });
 }
 
-// Wait for the route to stop shifting, mark that quiet point, then watch a
-// short idle window for anything that shifts afterwards. Nothing touches the
-// page during the idle window, so what it records is instability the visitor
-// would see on a page that already looked finished.
-async function measureLayoutShift(page) {
-  const readEntries = () => page.evaluate(
-    () => (window.__previewLayoutShifts || []).map((entry) => ({ ...entry })),
-  );
-  const deadline = Date.now() + LAYOUT_SHIFT_TIMING.maxGraceMs;
-  let entries = await readEntries();
-  let seen = entries.length;
-  let quietSince = Date.now();
-  let reachedGraceLimit = false;
-  for (;;) {
-    if (Date.now() - quietSince >= LAYOUT_SHIFT_TIMING.quietMs) break;
-    if (Date.now() >= deadline) {
-      reachedGraceLimit = true;
-      break;
+// Every context the audit opens needs the same third-party wiring. The
+// isolated contexts that check an invalid record, a failed desktop load, a
+// compact viewport, or a minimized-window restore load the app too, and a
+// context without the mirror would never mount it.
+async function newAuditContext(browser, options) {
+  const context = await browser.newContext(options);
+  if (MODULE_CACHE_MODE) await applyModuleCache(context);
+  return context;
+}
+
+// Load the archive root once per page, before any route is measured. Nothing
+// is checked or recorded here: the point is only that the fonts, the modules,
+// and the first corpus render are already paid for when the first measured
+// route loads.
+async function warmUpPage(page, viewport) {
+  await page.setViewportSize({ width: viewport.width, height: viewport.height });
+  await page.goto(`${BASE}/`, { waitUntil: 'networkidle', timeout: 60000 }).catch(() => {});
+  await page.waitForTimeout(1500);
+  await page.evaluate(() => {
+    try {
+      localStorage.clear();
+    } catch {
+      // A storage policy can block this; the route seeding writes what it needs.
     }
-    await page.waitForTimeout(LAYOUT_SHIFT_TIMING.pollMs);
-    entries = await readEntries();
-    if (entries.length !== seen) {
-      seen = entries.length;
-      quietSince = Date.now();
-    }
-  }
-  const hydrationEndsAt = entries.length
-    ? Math.max(...entries.map((entry) => entry.startTime))
-    : 0;
-  await page.waitForTimeout(LAYOUT_SHIFT_TIMING.settledObservationMs);
-  const settledEntries = await readEntries();
-  return summarizeLayoutShifts(settledEntries, { hydrationEndsAt, reachedGraceLimit });
+  }).catch(() => {});
 }
 
 async function assertArchiveRootReturn(page, locator, label) {
@@ -405,23 +443,37 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       });
     });
   }
-  // Spatial memory is intentionally persistent in production. Keep each audit
-  // route deterministic, then opt into one explicit concurrent-window case.
-  if (page.url().startsWith(BASE)) {
-    await page.evaluate((desktopLayout) => {
-      if (desktopLayout) {
-        localStorage.setItem('jrda-desktop-layout', JSON.stringify(desktopLayout));
-      } else {
-        localStorage.removeItem('jrda-desktop-layout');
-      }
-    }, route.desktopLayout || null);
-  }
   const targetUrl = new URL(BASE + route.url);
   if (route.slug === 'archive-desktop' || route.slug.startsWith('desktop-')) {
     // A distinct document navigation remounts DesktopShell so the in-memory
     // layout cannot leak from the previous hash-only route.
     targetUrl.searchParams.set('_audit', `${viewport.name}-${route.slug}`);
   }
+  // Land on the bootstrap document when the route would otherwise reuse the
+  // current one. Two things depend on it: the app has to remount so the route
+  // is measured from its own first paint, and localStorage has to be writable
+  // before the document that reads it loads. A fresh page starts at
+  // about:blank, where it is not, which is why the first route of a run needs
+  // this as much as a hash-only transition does.
+  if (requiresFreshDocument(page.url(), targetUrl.toString(), BASE)) {
+    // Leaving a route can abort whatever it still had in flight. Those aborts
+    // belong to the route that just finished, not to this one.
+    setApplicationNetworkCapture(false);
+    try {
+      await page.goto(BOOTSTRAP_URL, { waitUntil: 'domcontentloaded', timeout: 15000 });
+    } finally {
+      setApplicationNetworkCapture(true);
+    }
+  }
+  // Spatial memory is intentionally persistent in production. Keep each audit
+  // route deterministic, then opt into one explicit concurrent-window case.
+  await page.evaluate((desktopLayout) => {
+    if (desktopLayout) {
+      localStorage.setItem('jrda-desktop-layout', JSON.stringify(desktopLayout));
+    } else {
+      localStorage.removeItem('jrda-desktop-layout');
+    }
+  }, route.desktopLayout || null);
   const archiveDetailsRequests = [];
   const captureArchiveDetails = (request) => {
     if (new URL(request.url()).pathname.endsWith('/data/archive-details.json')) {
@@ -430,13 +482,19 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
   };
   // The warmup starts one second after the core corpus commits to React. A
   // fixed post-navigation pause can race that timer on slower machines, so
-  // arm the request waiter before navigation and let the actual fetch be the
-  // readiness signal for routes that intentionally preload full details.
-  const expectedArchiveDetailsRequest = route.archiveDetails === 'require'
-    ? page.waitForRequest(
-      (request) => new URL(request.url()).pathname.endsWith('/data/archive-details.json'),
+  // arm the waiter before navigation and let the fetch itself be the readiness
+  // signal for routes that intentionally preload full details. Wait for the
+  // body, not the headers: the parse and the re-render that follow it are the
+  // part that moves the layout, and treating the route as ready before they
+  // happen is what pushed startup work into the settled phase.
+  const expectedArchiveDetails = route.archiveDetails === 'require'
+    ? page.waitForResponse(
+      (response) => new URL(response.url()).pathname.endsWith('/data/archive-details.json'),
       { timeout: 15000 },
-    ).catch(() => null)
+    ).then(async (response) => {
+      await response.finished().catch(() => {});
+      return response;
+    }).catch(() => null)
     : null;
   if (route.archiveDetails) page.on('request', captureArchiveDetails);
   try {
@@ -444,7 +502,7 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     // Async React render + lazy-loaded sql.js, plus the intentional 1s details
     // warmup on standard/Archive/Folder surfaces: small extra settle.
     await page.waitForTimeout(1500);
-    if (expectedArchiveDetailsRequest) await expectedArchiveDetailsRequest;
+    if (expectedArchiveDetails) await expectedArchiveDetails;
   } finally {
     if (route.archiveDetails) page.off('request', captureArchiveDetails);
   }
@@ -462,7 +520,15 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     );
   }
   // Measure before any interaction check runs, so the idle window is idle.
-  const layoutShiftMeasurement = await measureLayoutShift(page);
+  // The startup gate holds the phase boundary open until the route's own
+  // known startup work is done: the details file for the routes that warm it,
+  // and the web fonts everywhere, since a font swap moves text.
+  const startupSettled = Promise.all([
+    expectedArchiveDetails,
+    page.evaluate(() => (document.fonts ? document.fonts.ready.then(() => undefined) : undefined))
+      .catch(() => undefined),
+  ]);
+  const layoutShiftMeasurement = await measureLayoutShift(page, { startupSettled });
   const layoutShift = evaluateLayoutShiftBudget(route, layoutShiftMeasurement);
   if (route.verifyReportFirst) {
     const reportDialog = page.getByRole('dialog', { name: 'Report a problem or suggest a record' });
@@ -580,10 +646,19 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       const recordDialog = page.locator('.archive-record-dialog[role="dialog"]');
       await recordDialog.waitFor({ state: 'hidden' });
       await reportDialog.waitFor();
-      const nestedReportState = await reportDialog.evaluate((element) => ({
-        focusInside: element.contains(document.activeElement),
-        page: window.location.href,
-      }));
+      // The app restores focus a frame after the record dialog hides, so read
+      // the result the way assertFocused does: settle, then check, and give it
+      // a bounded number of tries. Reading it in the same tick as the hide
+      // catches document.body on a slow machine and fails a working page.
+      let nestedReportState = null;
+      for (let attempt = 0; attempt < 10; attempt += 1) {
+        await page.waitForTimeout(100);
+        nestedReportState = await reportDialog.evaluate((element) => ({
+          focusInside: element.contains(document.activeElement),
+          page: window.location.href,
+        }));
+        if (nestedReportState.focusInside) break;
+      }
       if (!nestedReportState.focusInside) {
         throw new Error(`Record close moved focus outside its nested report: ${JSON.stringify(nestedReportState)}`);
       }
@@ -1403,7 +1478,7 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
   if (route.verifyDeferredInvalidRecord) {
     const browser = page.context().browser();
     if (!browser) throw new Error('Invalid-record focus audit could not create an isolated browser context');
-    const invalidContext = await browser.newContext({
+    const invalidContext = await newAuditContext(browser, {
       viewport: { width: viewport.width, height: viewport.height },
       serviceWorkers: 'block',
     });
@@ -1470,7 +1545,7 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
   if (route.verifyDesktopLoadFailure) {
     const browser = page.context().browser();
     if (!browser) throw new Error('Desktop failure audit could not create an isolated browser context');
-    const failureContext = await browser.newContext({
+    const failureContext = await newAuditContext(browser, {
       viewport: { width: viewport.width, height: viewport.height },
       serviceWorkers: 'block',
     });
@@ -1530,7 +1605,7 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
   if (route.verifyCompactHomeFocus && viewport.name === 'mobile') {
     const browser = page.context().browser();
     if (!browser) throw new Error('Compact-home audit could not create an isolated browser context');
-    const compactContext = await browser.newContext({
+    const compactContext = await newAuditContext(browser, {
       viewport: { width: 320, height: 568 },
       serviceWorkers: 'block',
     });
@@ -1813,7 +1888,7 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
 
     const browser = page.context().browser();
     if (!browser) throw new Error('Minimized-window restore audit could not create an isolated context');
-    const restoreContext = await browser.newContext({
+    const restoreContext = await newAuditContext(browser, {
       viewport: wideViewport,
       serviceWorkers: 'block',
     });
@@ -1979,7 +2054,7 @@ function renderLayoutShiftRows(rows) {
     const shift = r.layoutShift;
     if (!shift) {
       return `<tr><td><span class="badge">${esc(r.route)}</span></td><td>${esc(r.viewport)}</td>`
-        + '<td colspan="4" class="v-minor">not measured (route errored)</td></tr>';
+        + '<td colspan="5" class="v-minor">not measured (route errored)</td></tr>';
     }
     const cell = (phase) => {
       const measured = shift.measured?.[phase] ?? 0;
@@ -1990,12 +2065,19 @@ function renderLayoutShiftRows(rows) {
         + (baseline === undefined ? '' : ` <span class="badge">baseline ${esc(baseline)}</span>`)
         + '</td>';
     };
+    const truncated = shift.measured?.reachedGraceLimit
+      ? ' <span class="badge">never went quiet</span>'
+      : '';
+    const sources = (shift.measured?.topSources || [])
+      .map((source) => `${source.selector} ${source.value}`)
+      .join(', ');
     return `<tr>
       <td><span class="badge">${esc(r.route)}</span></td>
       <td>${esc(r.viewport)}</td>
-      <td>${esc(shift.routeClass)}${shift.isException ? ' <span class="badge">exception</span>' : ''}</td>
+      <td>${esc(shift.routeClass)}${shift.isException ? ' <span class="badge">exception</span>' : ''}${truncated}</td>
       ${cell('hydration')}
       ${cell('settled')}
+      <td class="v-minor">${esc(sources || 'nothing moved')}</td>
       <td class="v-minor">${esc(shift.note)}</td>
     </tr>`;
   }).join('');
@@ -2060,11 +2142,16 @@ function renderReport(rows) {
     Hydration covers shifts up to the point each route first goes quiet, which
     is expected application startup. Settled covers shifts after that quiet
     point with no user input, which is instability a visitor sees on a page
-    that already looked finished. A seeded baseline, where one is shown, comes
-    from the run dated ${esc(LAYOUT_SHIFT_BASELINE_RUN)}.
+    that already looked finished. A route marked "never went quiet" kept
+    shifting through the whole grace window, so its phase split is truncated.
+  </p>
+  <p>
+    ${Object.keys(LAYOUT_SHIFT_BASELINE).length === 0
+    ? 'No baseline is seeded yet, so the budget is the only reference in this table.'
+    : `Baselines come from the seeding run dated ${esc(LAYOUT_SHIFT_BASELINE_RUN)}.`}
   </p>
   <table>
-    <thead><tr><th>Route</th><th>Viewport</th><th>Class</th><th>Hydration CLS</th><th>Settled CLS</th><th>Budget note</th></tr></thead>
+    <thead><tr><th>Route</th><th>Viewport</th><th>Class</th><th>Hydration CLS</th><th>Settled CLS</th><th>What moved</th><th>Budget note</th></tr></thead>
     <tbody>
       ${renderLayoutShiftRows(rows)}
     </tbody>
@@ -2082,12 +2169,18 @@ async function main() {
 
     const browser = await launchBrowser();
     try {
-      const context = await browser.newContext({ serviceWorkers: 'block' });
+      const context = await newAuditContext(browser, { serviceWorkers: 'block' });
       await installLayoutShiftObserver(context);
       const rows = [];
       for (const viewport of VIEWPORTS) {
         const page = await context.newPage();
         try {
+          // Warm the page once before anything is measured. A cold browser
+          // pays for the fonts, the modules, and the first render of the
+          // corpus, and that cost lands on whichever route happens to run
+          // first. Warming makes every route start from the same state, so a
+          // run scoped to one route reports what a full run reports for it.
+          await warmUpPage(page, viewport);
           for (const route of ROUTES) {
             if (!isAuditedRoute(route)) continue;
             console.log(`  ${viewport.name.padEnd(8)} ${route.url}`);
@@ -2147,8 +2240,11 @@ async function main() {
               }
               const measured = row.layoutShift?.measured;
               if (measured) {
+                const worst = measured.topSources?.[0];
                 console.log(
                   `    layout shift: hydration ${measured.hydration} settled ${measured.settled}`
+                  + (worst ? ` worst ${worst.selector} ${worst.value}` : '')
+                  + (measured.reachedGraceLimit ? ' (never went quiet)' : '')
                   + (row.layoutShift.withinBudget ? '' : ' OVER BUDGET'),
                 );
               }
@@ -2186,11 +2282,28 @@ async function main() {
         JSON.stringify(baseline, null, 2),
       );
 
+      if (missingModules.size > 0) {
+        // Root, not the shard directory: the mirror script reads this file as
+        // extra seeds, and a sharded run must not hide the list from it.
+        await mkdir(OUT_DIR_ROOT, { recursive: true });
+        await writeFile(
+          resolve(OUT_DIR_ROOT, 'missing-modules.json'),
+          `${JSON.stringify([...missingModules], null, 2)}\n`,
+        );
+      }
+
       const totalViolations = rows.reduce((s, r) => s + r.violations.length, 0);
       const budgetFailures = collectLayoutShiftFailures(rows);
       console.log(`\nReport: ${resolve(OUT_DIR, 'axe-report.html')}`);
       console.log(`Total violations: ${totalViolations}`);
       console.log(`Layout-shift budget failures: ${budgetFailures.length}`);
+      if (missingModules.size > 0) {
+        console.error(
+          `The module cache is missing ${missingModules.size} responses the pages asked for. `
+          + 'Rerun `node scripts/mirror-audit-modules.js` and audit again.',
+        );
+        for (const url of missingModules) console.error(`  ${url}`);
+      }
       for (const failure of budgetFailures) {
         console.error(`  ${formatLayoutShiftFailure(failure)}`);
       }
@@ -2201,6 +2314,10 @@ async function main() {
       }
       if (totalViolations > 0) process.exitCode = 1;
       if (budgetFailures.length > 0 && !LAYOUT_SHIFT_SEED_MODE) process.exitCode = 1;
+      // A page that never received its React module or its web font is not the
+      // page these budgets describe, so an incomplete mirror fails the run
+      // even while seeding.
+      if (missingModules.size > 0) process.exitCode = 1;
     } finally {
       await browser.close();
     }
