@@ -25,9 +25,8 @@ _BACKEND = pathlib.Path(__file__).resolve().parents[1]
 
 # script (relative to backend/) -> the parents[N] depth that reaches backend/.
 SCRIPTS = {
-    "scripts/backfill/enhanced_date_backfill.py": 2,
-    "scripts/backfill/publication_date_backfill.py": 2,
-    "scripts/backfill/simple_date_backfill.py": 2,
+    # The three date-backfill strategies were merged into one module (#189).
+    "scripts/backfill/date_backfill.py": 2,
     "scripts/diagnostics/text_cleaner.py": 2,
     "scripts/diagnostics/smart_corrector/gdrive_overflow_handler.py": 3,
     "scripts/verify_extraction_sheets.py": 1,

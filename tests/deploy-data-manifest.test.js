@@ -99,9 +99,23 @@ const KNOWN_NOT_DEPLOYED = new Map([
   ['data/graph-validation-holds.json',
     'validator policy input used only by repository and CI graph checks; no ' +
     'deployed page reads it'],
+  ['data/relationship-type-registry.json',
+    'relationship-type semantics used only by scripts/validate-graph-data.mjs ' +
+    '(issue #737); no deployed page reads it'],
   ['data/stewardship-census.json',
     'repository stewardship report, not referenced by any deployed page (built ' +
     'by scripts/build-stewardship-census.mjs)'],
+  ['data/preservation-sample.json',
+    'preservation pilot manifest for curator/reviewer and pilot-runner use, not ' +
+    'referenced by any deployed page (built by scripts/select-preservation-sample.mjs)'],
+  ['data/preservation-sample.sources.json',
+    'blind worker-facing projection of the same pilot manifest (id/objectType/url ' +
+    'only, no stratum or reason), not referenced by any deployed page (built by ' +
+    'scripts/select-preservation-sample.mjs)'],
+  ['data/link-check-state.json',
+    'workflow-internal traversal state for the scheduled external-link liveness ' +
+    'sweep (issue #710, .github/workflows/verify-external-links.yml); read and ' +
+    'written only by scripts/verify-links.js, not fetched by any deployed page'],
 ]);
 
 // A data file is "deployed" if it is listed individually or lives under a data/

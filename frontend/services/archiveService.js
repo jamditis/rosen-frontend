@@ -1,5 +1,5 @@
 
-import { DATA_CONFIG } from '../constants.js?v=3.8.32';
+import { DATA_CONFIG } from '../constants.js?v=3.8.33';
 import {
   initDatabase,
   loadArchiveData as loadSqliteData,
@@ -13,15 +13,15 @@ import {
   getCategoryCoOccurrence,
   searchRecords as sqlSearchRecords,
   getStats as getSqliteStats
-} from './sqliteService.js?v=3.8.32';
-import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.8.32';
-import { searchIndexOptions, socialSearchIndexOptions } from '../utils/searchConfig.js?v=3.8.32';
-import { escapeCsvCell } from '../utils/csvSafety.js?v=3.8.32';
-import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.8.32';
-import { CACHE_VERSION, CACHE_TTL_MS, MAX_LOCALSTORAGE_SIZE, cacheKeyFor } from './cacheConfig.js?v=3.8.32';
-import { raceTimeout } from '../utils/raceTimeout.js?v=3.8.32';
-import { createResilientSearchIndexLoader, loadSearchIndexArtifact } from './searchIndexLoader.js?v=3.8.32';
-import { loadReleaseMetadata } from './releaseMetadata.js?v=3.8.32';
+} from './sqliteService.js?v=3.8.33';
+import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.8.33';
+import { searchIndexOptions, socialSearchIndexOptions } from '../utils/searchConfig.js?v=3.8.33';
+import { escapeCsvCell } from '../utils/csvSafety.js?v=3.8.33';
+import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.8.33';
+import { CACHE_VERSION, CACHE_TTL_MS, MAX_LOCALSTORAGE_SIZE, cacheKeyFor } from './cacheConfig.js?v=3.8.33';
+import { raceTimeout } from '../utils/raceTimeout.js?v=3.8.33';
+import { createResilientSearchIndexLoader, loadSearchIndexArtifact } from './searchIndexLoader.js?v=3.8.33';
+import { loadReleaseMetadata } from './releaseMetadata.js?v=3.8.33';
 
 // Routine cache-hit / fetch-start logs are silent in production. Set
 // `localStorage.jrda_debug = '1'` in DevTools and reload to opt in (#170).

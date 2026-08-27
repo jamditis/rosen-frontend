@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: verify-external-links
@@ -19,8 +19,23 @@ jobs:
     env:
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
     steps:
+      # A write-capable token is needed to commit the advanced link-check
+      # state back to main (see "Commit updated link-check state" below).
+      # The App is the same bot identity used by the other automated-commit
+      # workflows (submit-record.yml, submit-prototype.yml).
+      - name: Mint GitHub App installation token
+        id: app-token
+        continue-on-error: true
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.ROSEN_GH_APP_ID }}
+          private-key: ${{ secrets.ROSEN_GH_APP_PRIVATE_KEY }}
+
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          token: ${{ steps.app-token.outputs.token || github.token }}
+          ref: main
 
       - name: Set up Node.js
         uses: actions/setup-node@v6
@@ -31,10 +46,64 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Configure git identity
+        run: |
+          git config user.name "rosen-archive-bot[bot]"
+          git config user.email "rosen-archive-bot[bot]@users.noreply.github.com"
+
       - name: Verify internal and external links
         # At the 10-second per-URL timeout and six-worker pool, 3,000 probes
         # remain within the two-hour job limit even in the all-timeout case.
-        run: npm run verify-links -- --external --report-only --max 3000 --out verify-links-report.json
+        #
+        # --max no longer means "check the first 3,000 urls every week" --
+        # data/link-check-state.json carries a rotating cursor and a per-url
+        # revisit cadence forward between runs (issue #710), so each run
+        # advances through a different slice of the corpus and every url
+        # becomes eligible again on its own schedule instead of never being
+        # reached past index 3,000.
+        run: npm run verify-links -- --external --report-only --max 3000 --state-file data/link-check-state.json --out verify-links-report.json
+
+      - name: Commit updated link-check state
+        # The state file IS this job's durable progress -- the next scheduled
+        # run needs last week's cursor and per-url cadence to know what is
+        # already due, and a 30-day Actions artifact is not enough history
+        # for that (issue #710). Commit only when the sweep actually moved
+        # something, so a run with nothing new to record does not spam main
+        # with no-op commits.
+        #
+        # `git add` before diffing is required, not cosmetic: `git diff --quiet`
+        # against an UNTRACKED path always exits 0 ("no difference"), so on the
+        # very first run (before this file is committed at all) the old guard
+        # took the "nothing to commit" branch forever and the file never became
+        # tracked. Diffing --cached after staging catches both an untracked file
+        # and a modified tracked one.
+        #
+        # main can advance between this job's checkout and its push (another
+        # merge, another scheduled workflow), so a plain push can be rejected
+        # non-fast-forward. Retry a few times, rebasing onto the latest main
+        # each time, rather than losing this run's advanced cursor.
+        run: |
+          git add data/link-check-state.json
+          if git diff --cached --quiet -- data/link-check-state.json; then
+            echo "No change to data/link-check-state.json; nothing to commit."
+            exit 0
+          fi
+
+          git commit -m "chore: advance external-link check state"
+
+          attempts=5
+          for attempt in $(seq 1 "$attempts"); do
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            if [ "$attempt" -eq "$attempts" ]; then
+              echo "Could not push the advanced link-check state after $attempts attempts." >&2
+              exit 1
+            fi
+            echo "Push rejected (attempt $attempt/$attempts); rebasing onto the latest main and retrying."
+            git fetch origin main
+            git rebase origin/main
+          done
 
       - name: Upload link report
         if: always()

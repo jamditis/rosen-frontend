@@ -50,12 +50,15 @@ test('does not widen production CSP for the internal Google Sheet prototype', ()
     .split(';')
     .map(part => part.trim().split(/\s+/).filter(Boolean))
     .find(tokens => tokens[0] === 'connect-src');
+  assert.ok(connectSrc, 'connect-src directive is missing');
+  const sources = connectSrc.slice(1);
 
-  assert.deepEqual(connectSrc, [
-    'connect-src',
-    "'self'",
-    'https://esm.sh',
-    'https://script.google.com',
-    'https://script.googleusercontent.com',
-  ]);
+  // Exactly the two Apps Script hosts the report/submission endpoint needs, and
+  // nothing the prototype would want: no docs.google.com for published sheets,
+  // no wildcard googleusercontent host. The complete token set is pinned once,
+  // in tests/repo-security.test.js.
+  assert.deepEqual(
+    sources.filter(source => source.includes('google')),
+    ['https://script.google.com', 'https://script.googleusercontent.com'],
+  );
 });

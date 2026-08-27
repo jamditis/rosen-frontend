@@ -274,6 +274,35 @@ viewports, runs `axe-core` for WCAG 2.1 AA, and writes
 `preview-audit-results/screenshots/{viewport}/`. Exits non-zero if any
 violations are found.
 
+The audit also budgets layout shift per route. Each route is split into a
+hydration phase, which ends when the route first goes quiet, and a settled
+phase, which covers shifts after that with no user input. Both phases are
+checked against the budget for the route class (archive, record, desktop, or
+standalone) in `scripts/layout-shift-budgets.js`, and the run exits non-zero on
+a regression. Every route is loaded in its own document, so a hash-only step
+between two routes cannot carry the first route's shifts into the second.
+Measuring adds roughly two to seven minutes to a full run.
+
+`.github/workflows/layout-shift-budget.yml` runs the audit for every frontend
+pull request, one job per viewport, and publishes the candidate against the
+recorded baseline with `node scripts/layout-shift-delta.js`.
+
+Environment switches:
+
+- `PREVIEW_AUDIT_LAYOUT_SHIFT_SEED=1` measures without failing and writes
+  `preview-audit-results/layout-shift-baseline.json`, which is how the baseline
+  in `scripts/layout-shift-budgets.js` is refreshed.
+- `PREVIEW_AUDIT_MODULE_CACHE=1` serves React, the fonts, and the other
+  third-party assets from the local mirror written by
+  `node scripts/mirror-audit-modules.js`. A browser that cannot reach the CDN
+  never mounts the app, so this is the only way to measure the React routes on
+  such a machine.
+- `PREVIEW_AUDIT_CHROMIUM_PATH` points the audit at a Chromium binary already
+  on the machine.
+- `PREVIEW_AUDIT_ROUTES` narrows a run to a comma-separated list of route
+  slugs.
+- `PREVIEW_AUDIT_VIEWPORT` narrows a run to one viewport.
+
 ## Testing
 
 Tests use Node.js built-in test runner (`node --test`). The suite under `tests/` covers data integrity, CSV quality, pipeline, thread algorithm/detection, frontend structure, view-state, route vocabulary, linkify, entity-index, service-worker cache, HTTP cached loader, fetch error handling, schema BOM, data-explorer security, version consistency, process-record, and the current design-system surfaces. Run `find tests -maxdepth 1 -name '*.test.js' -print | sort` for the current file inventory.

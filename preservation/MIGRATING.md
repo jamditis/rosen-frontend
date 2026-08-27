@@ -79,6 +79,28 @@ path. Because the source artifact does not record a storage URI, the migrated
 artifact has no named storage copies. A later storage-copy event can add that
 fact append-only.
 
+## Social baseline v1 import
+
+`import-social-baseline.mjs` is not a migration of an existing preservation
+artifact; it is the first packaging of the pre-schema `data/social_posts.csv`
+rows into schema v1. Every object, event, and artifact ID derives from the
+row's own stable archive record ID (`BSKY-*`, `TWTR-*`, `MAST-*`) and a SHA-256
+digest of the row, never from a local path or run order, so re-running the
+importer against an unchanged CSV reproduces the same IDs.
+
+Run the check:
+
+```text
+node preservation/import-social-baseline.mjs --verify
+```
+
+Because this baseline makes no live retrieval, every event uses the schema's
+`not-requested` retrieval outcome (or, for a row with no recoverable canonical
+URL, an `artifact-created` event alone) rather than claiming a capture that did
+not happen. A later stage that performs a real capture, fixity check, storage
+copy, or rights decision appends new events on top of this baseline; it does
+not edit or replace the baseline events.
+
 ## Recovery and rollback
 
 Rollback means returning consumers to the earlier retained manifest and

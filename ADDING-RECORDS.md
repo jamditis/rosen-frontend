@@ -182,6 +182,98 @@ After editing, regenerate the JSON (Step 4) and upload (Step 5) the same way. Th
 
 ---
 
+## Adding or removing a thematic category
+
+Step 2 above tags one record with categories that already exist. This section
+is different: it's for changing the category list itself — for example,
+adding a whole new category like "Local news" so it can show up in the
+sidebar. Adding a category is fully self-service. Removing one is almost
+self-service — one step needs a developer, and it's called out below.
+
+### Where the category list lives
+
+The full list lives in one file: `backend/schema.json`, under
+`taxonomy.thematic_categories`. Each entry has a `name` and a `description`.
+
+The "Thematic categories to use" list in Step 2 above is a copy of that same
+list, written for people editing the CSV by hand. A test checks that the two
+match. If you change one, change the other the same way.
+
+### To add a new category
+
+1. Open `backend/schema.json`. Add a new entry under
+   `taxonomy.thematic_categories`, with a `name` and a short `description`.
+   Follow the style of the entries already there.
+2. Open `ADDING-RECORDS.md` (this file). Add the same category name as a new
+   bullet under "Thematic categories to use" in Step 2, anywhere in the list.
+3. Tag at least one record with the new category. Open
+   `data/archive_records-public.csv` and add the category name to the
+   `thematic_categories` column of any record it fits, the same way you'd tag
+   a record with an existing category (see Step 2). A category with zero
+   records tagged will not show up anywhere on the site — the sidebar only
+   lists categories that are actually on records. The sidebar also shows only
+   the first 10 categories alphabetically, with a "view all" link for the
+   rest. Six categories fit today with nothing hidden, but a new name late in
+   the alphabet can land behind that link instead of showing right away.
+4. Regenerate the JSON and bump the version, the same as Step 4 above:
+   `node data/export-archive-data.js`, then `npm run bump-version -- X.X.X`.
+5. Upload and commit, the same as Step 5 and "Committing your changes" below.
+
+Do steps 1 and 2 before step 3. A separate repair tool a developer runs from
+time to time (`backend/scripts/archive_record_reviewer.py`) checks every
+record's categories against `backend/schema.json`. If it finds a category
+name it does not recognize, it tries to guess the closest existing category
+and rewrites your new category to that guess. If no guess is close enough, it
+deletes the unrecognized category from the record instead — silently, with
+no category left in its place. Adding the name to `schema.json` first stops
+that from happening.
+
+A developer can also teach the auto-categorizer
+(`backend/scripts/auto_categorize_records.py`) to apply the new category to
+matching records automatically. That is optional — manual tagging in the CSV
+works fine on its own.
+
+### To remove a category
+
+1. Make sure no record needs it anymore. Open
+   `data/archive_records-public.csv` and update the `thematic_categories`
+   column on any record that still has it, so the removed name is not left on
+   any row.
+2. Remove the entry from `backend/schema.json`
+   (`taxonomy.thematic_categories`) and from the "Thematic categories to use"
+   list in Step 2 above.
+3. Ask a developer to check `backend/scripts/auto_categorize_records.py` for
+   a rule that names the removed category, in `CATEGORY_PATTERNS` or
+   `URL_PATTERNS`. Every current category has at least one such rule, so
+   check both. If a rule exists, it must be deleted in the same change. This
+   step needs a developer, because it is a Python file edit, not a CSV or
+   Markdown edit.
+
+   Skipping this step breaks the backend for everyone, not just the removed
+   category: the auto-categorizer refuses to run at all, and the backend
+   test suite fails before a single test runs. That turns the pull request's
+   CI check red.
+4. Regenerate the JSON, bump the version, upload, and commit — the same steps
+   as adding a category.
+
+If a record still carries the removed name when you regenerate, that name
+keeps showing up in the sidebar. The sidebar list is built from what is
+actually on records, not read straight from `schema.json`, so one leftover
+record keeps an orphaned name alive until that record is fixed.
+
+### Category colors are automatic
+
+You do not need to pick or assign a color for a new category. The sidebar
+list itself is plain text — a checkbox and a label, no color. Color shows up
+elsewhere: on each record card's accent stripe and on folder cards, chosen
+automatically from a fixed set of colors in `frontend/constants.js`. The
+color is based on the category's name, so the same category always gets the
+same color, and a new category just gets one of the existing colors. Two
+categories can end up with the same color — that is expected and is not a
+bug.
+
+---
+
 ## Committing your changes to GitHub
 
 After adding records and confirming the site looks right, save your work to the repository:

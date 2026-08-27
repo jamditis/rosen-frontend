@@ -22,6 +22,10 @@ The metadata and derived data (entities, relationships) are licensed [CC BY 4.0]
 | `wiki-seed.json` | ~125 KB | Seed pages for the public archive wiki (`#wiki` route) |
 | `stewardship-census.json` | ~150 KB | Machine-readable source/runtime, graph, field, URL, and preservation coverage census |
 | `stewardship-census.md` | ~4 KB | Concise human-readable census summary and 2026-07-22 baseline comparison |
+| `preservation-sample.json` | ~60 KB | Versioned 100-source manifest for the preservation pilot (issue #704); curator/reviewer eyes only |
+| `preservation-sample.md` | ~2 KB | Human-readable coverage summary for the same pilot sample; curator/reviewer eyes only |
+| `preservation-sample.sources.json` | ~10 KB | Blind worker-facing projection of the same sample: id, objectType, url only, no stratum or reason |
+| `link-check-state.json` | grows with the url corpus (roughly 1 MB per 3,000 urls checked; a full sweep of the whole corpus is several MB) | Workflow-internal traversal state for the scheduled external-link liveness sweep (issue #710) — the persisted rotating cursor and per-url revisit cadence in `scripts/lib/link-check-state.js`. Not read by the site; committed to main every week by `.github/workflows/verify-external-links.yml` so the next scheduled run knows what is already due. Written as compact JSON, not pretty-printed, to keep that weekly commit small. |
 
 ### Source CSVs (the source of truth)
 
@@ -40,6 +44,7 @@ Counts verified 2026-07-23; they grow as records are added.
 |------|---------|
 | `SCHEMA.md` | Human-readable data dictionary — start here if you want to use the data |
 | `schema.json` | Machine-readable schema, linked from the site's open-data download UI |
+| `relationship-type-registry.json` | Machine-readable relationship-type semantics — endpoint types, direction, inverse, temporal scope (issue #737) |
 | `eras.js` | The canonical era taxonomy, shared with the frontend |
 | `authored-excerpts.csv` | Curator-written summaries that override auto-generated ones |
 | `feeds/` | RSS feeds (full archive, articles, per-category, per-era) and OPML subscription lists |
@@ -100,10 +105,63 @@ only; no SQLite file is committed or treated as canonical.
 
 Rows with unregistered relationship semantics must have an exact, reviewed
 entry in `graph-validation-holds.json`. Holds are explicit temporary states,
-not additions to the accepted relationship vocabulary. The per-relationship
-semantic endpoint matrix remains part of the relationship-type audit in issue
-#737; this validator requires both endpoints to resolve to typed entities without
-prematurely declaring that matrix canonical.
+not additions to the accepted relationship vocabulary.
+
+`relationship-type-registry.json` is the machine-readable answer to the
+relationship-type audit in issue #737: for every relationship type present in
+`extracted_relationships.csv` or in the active extraction schema
+(`backend/entity_extraction_schema_v3.json`), it records the allowed source
+and target entity types, direction, inverse type, self-link and
+multiple-assertion policy, temporal scope, disputed-assertion support, and a
+human-readable label. Allowed source/target entity types come from the
+extraction schema's `valid_source_types`/`valid_target_types` — the
+curator-authored contract — never from what the current data happens to
+contain, so the registry can't be widened just by leaving bad data in place.
+
+The validator uses the registry to reject a relationship whose endpoint
+entity types are not allowed for its type, to reject a self-referential edge
+under a type whose `allowSelfLinks` is `false`, and to reject a symmetric,
+inverse-labeled, or candidate-inverse-labeled type asserted redundantly in
+both directions (that would otherwise silently duplicate one edge under two
+labels). `allowSelfLinks` is enforced only where the registry states it: a
+type absent from the registry, or one that leaves the field unset, is not
+self-link-constrained, the same as for endpoint types. No committed row is
+currently a self-link, so no grandfathering list exists for it; if one ever
+becomes necessary it belongs beside `duplicateEdgeExceptions`.
+
+Because every registered type sets `allowMultipleAssertions: true`, a
+(source, type, target) triple names a collection of edges — one per record
+that asserted it — and the duplicate check compares against all of them, so
+two unrelated records cannot mask a contradiction a third record contains.
+
+Two things soften pure "always enforce" for existing data, both explicit
+rather than silent:
+
+- A type can carry `"endpointEnforcement": "deferred"` alongside an
+  `endpointDivergence` block (violation counts and example relationship IDs).
+  That means the schema disagrees with some already-committed rows for that
+  type; cleaning them up is a curator decision, so the validator records the
+  divergence instead of failing on it, while new rows are still expected to
+  follow the declared types.
+- `graph-validation-holds.json`'s `duplicateEdgeExceptions` names specific
+  entity-ID pairs and type pairs (for example `Owns`/`Owned By` for the same
+  two entities) that are known, pending curator review, to encode one fact
+  twice. Any such duplicate not named there still fails validation; an
+  exception that no longer matches any duplicate edge also fails (it would be
+  a stale entry hiding a fix that already happened).
+
+Types whose historical meaning is still ambiguous — legacy inverse-style
+labels like `Founded By` and `Owned By`, one-off labels like `Created` and
+`Covers`, and the not-yet-wired `Influenced` type (issues #344 / #548) — are
+marked `"status": "deferred"` in the registry instead of guessed: the
+validator does not enforce endpoint types, direction, or an inverse for a
+deferred type, and still requires an exact hold for each of its rows exactly
+as before. Choosing that semantics is a curator decision, not something this
+validator infers. `directionalContradictions` on a handful of types (for
+example `Originated By`) inventories entity pairs where the same fact is
+currently asserted in both directions under one type — automation can detect
+that contradiction, per issue #737's boundary, but not decide which row (if
+either) is correct.
 
 Published records that are intentionally generated without a canonical CSV row
 must likewise have their exact stable ID listed in
@@ -125,6 +183,22 @@ The census stamps the most recent Git commit that changed an input file, the cle
 The command refuses to write a stamped report while any census input is dirty. After a data change, run the data tests and commit the source and runtime files first. The committed-report freshness subtest skips while those inputs are dirty, then resumes after that commit. Run `npm run census:stewardship`, rerun the test, and commit the two reports. This two-commit sequence keeps the input commit truthful and lets the freshness test compare the generated files byte for byte. The automated submission and master-sheet sync pipelines use this same data-commit-then-report-commit sequence before they push.
 
 `tests/stewardship-census.test.js` exercises representative fixtures, proves an intentional source-row change alters the census, and fails when the committed reports drift from regenerated output.
+
+## Preservation pilot sample
+
+Regenerate the 100-source preservation pilot sample (issue #704, epic #696) from the canonical CSVs and the stewardship census:
+
+```bash
+npm run sample:preservation
+```
+
+The command writes `preservation-sample.json`, `preservation-sample.md`, and `preservation-sample.sources.json`. The JSON contract is `preservation-sample/1.0.0`, and output carries no wall-clock timestamp: the same seed against unchanged inputs reproduces byte-identical output, which is the property `tests/preservation-sample.test.js` checks directly. Pass `--seed <value>` for a different reproducible sample, or `--sample-size <n>` to change the target count from the default 100.
+
+Hand `preservation-sample.sources.json` to whoever runs the blind pilot capture pass — it carries only `id`, `objectType`, and `url` for each source, plus the schema, provenance, and credential policy, with no stratum, reason, or expected-outcome field. `preservation-sample.json` and `preservation-sample.md` carry the full curator/reviewer view (`selection`, with the stratum and reason behind every pick) and must never be handed to the worker.
+
+The sample is stratified across curated and social platforms (PressThink long-form writing, newspaper clippings, Tumblr, threads, Twitter/X, Bluesky, Mastodon), URL outcome (missing, a documented redirector host, a documented capture-difficult host, or an otherwise live-looking URL), verified/unverified status, presence or absence of raw text and extracted-graph links, a few notable (heavily cross-referenced or single-point-of-failure) sources, and page shape (PDF, media, dynamic social timeline, static HTML) — plus a seeded uniform-random slice of at least 10% of the sample to catch whatever the named strata miss. `data/preservation-sample.json`'s `quotas` array records each stratum's target, actual selection, and shortfall.
+
+The manifest carries two parallel arrays, same IDs and order. `sources` (`id`, `objectType`, `url`) is the blind view meant for whoever runs the pilot capture pass — it carries no hint about why a source was picked. `selection` adds `stratum`, `group`, `reason`, and the audit fields behind the pick (platform, URL status, verified, raw-text/graph-link presence, host); it is for curator and reviewer eyes only and must never be handed to the blind worker.
 
 For the full record-adding walkthrough — written for non-technical curators — see [`ADDING-RECORDS.md`](../ADDING-RECORDS.md). For which files to upload to production, see [`DEPLOYMENT.md`](../DEPLOYMENT.md).
 

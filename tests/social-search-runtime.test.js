@@ -170,7 +170,9 @@ describe('lazy social full-text search runtime (#669)', () => {
   it('unions hits from every loaded index with the substring search', () => {
     assert.match(appSource, /miniRefs\.current\s*=\s*result\.indexes/);
     assert.match(appSource, /searchLoadedIndexes\(miniRefs\.current, rawTerm\)/);
-    assert.match(appSource, /substringMatch\s*\|\|\s*\(miniIds && miniIds\.has\(r\.id\)\)/);
+    // The hit ids moved into the fusion memo when #279 added a third, semantic
+    // path to this union. Both index kinds must still reach the filter.
+    assert.match(appSource, /substringMatch\s*\|\|\s*\(lexicalIds && lexicalIds\.has\(r\.id\)\)/);
     assert.match(appSource, /setMiniRetryTick\(tick => tick \+ 1\)/);
     assert.match(appSource, /if \(result\.complete\)[\s\S]*else \{[\s\S]*scheduleRetry\(\)/);
     assert.match(appSource, /const MAX_MINI_INDEX_RETRIES = 3/);

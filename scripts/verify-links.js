@@ -1,9 +1,13 @@
 #!/usr/bin/env node
 // Pre-launch link-integrity and backlink verification sweep (issue #345).
 //
-// Read-only. Emits a triage report and never mutates a record. The point is to
-// surface drift before launch, not to fix it in place: data repairs belong to
-// the record-repair issues (#294 re-scrape, #242 / #315 recovery).
+// Never mutates a record. The point is to surface drift before launch, not to
+// fix it in place: data repairs belong to the record-repair issues (#294
+// re-scrape, #242 / #315 recovery). It is NOT fully read-only on disk, though:
+// with --external, it writes the persisted traversal state to --state-file
+// (data/link-check-state.json by default, no flag required) so a local sweep
+// leaves that one file changed in the working tree. See the "External" bullet
+// below and scripts/lib/link-check-state.js.
 //
 // Two layers:
 //   - Internal (offline, deterministic, always run): every internal reference
@@ -14,6 +18,12 @@
 //     Plus URL well-formedness: every record.url is an absolute http(s) URL.
 //   - External (network, opt-in via --external): a gentle HEAD liveness probe of
 //     each unique external URL, rate-limited and classified. Report-only.
+//     Which urls a capped run probes is not the front slice every time: a
+//     persisted rotating cursor and per-url revisit cadence (issue #710,
+//     scripts/lib/link-check-state.js) pick a different eligible slice each
+//     run, so a run past --max eventually reaches every url. State lives in
+//     --state-file (default data/link-check-state.json) and must be carried
+//     forward between runs -- see .github/workflows/verify-external-links.yml.
 //
 // Exit code: non-zero when internal-integrity findings exist, so this can gate a
 // clean dataset in CI. External liveness never changes the exit code (network
@@ -23,6 +33,9 @@
 //   node scripts/verify-links.js                 # internal checks, human summary
 //   node scripts/verify-links.js --out report.json
 //   node scripts/verify-links.js --external --max 500   # also probe liveness
+//   node scripts/verify-links.js --external --max 500 --state-file data/link-check-state.json
+//   node scripts/verify-links.js --external --concurrency 4 --timeout-ms 8000 --delay-ms 250
+//   node scripts/verify-links.js --external --max-host-failures 3   # 0 disables the breaker
 //   node scripts/verify-links.js --report-only   # never exit non-zero
 
 import fs from 'node:fs';
@@ -30,6 +43,15 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { FEATURED_WORKS } from '../frontend/constants.js';
 import { splitUrlsForLinkify } from '../frontend/utils/linkify.js';
+import {
+  loadState,
+  saveState,
+  selectEligibleUrls,
+  recordResults,
+  diffFindings,
+  detectCorpusChanges,
+  pruneRemovedUrls
+} from './lib/link-check-state.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, '..', 'data');
@@ -324,18 +346,82 @@ function classify(status) {
   return 'server_error_url';
 }
 
+// Which failure types count against a host's circuit breaker. A redirect is
+// reported (a record's url should be repaired to its canonical target) but it
+// is NOT evidence the host is failing to answer -- it answered, promptly and
+// correctly. Counting it burned the budget of exactly the hosts that behave
+// well: one that canonicalizes http->https, or adds a trailing slash, hit the
+// limit after three urls and had the rest of its corpus skipped for the run.
+const BREAKER_FAILURE_TYPES = new Set(['client_error_url', 'server_error_url']);
+
+function countsAgainstHostBudget(failureType) {
+  return BREAKER_FAILURE_TYPES.has(failureType);
+}
+
 // Gentle by design: a small concurrency pool, a per-request timeout, and a delay
 // between starts so a single source host is not hammered. robots.txt is not
 // fetched per host (probing already-published source URLs with HEAD is low
-// impact); that is a documented limitation, not an oversight.
+// impact); that is a documented limitation, not an oversight. concurrency,
+// timeoutMs and delayMs are configurable (CLI: --concurrency, --timeout-ms,
+// --delay-ms) rather than fixed, per issue #710's acceptance criteria.
+//
+// `max` here is only a safety cap, not the progress mechanism (issue #710):
+// the caller (main(), via selectEligibleUrls in ./lib/link-check-state.js)
+// is expected to already have picked which urls this run should check, using
+// a persisted rotating cursor and revisit cadence, so every run advances
+// through a different slice of the corpus instead of `[...new
+// Set(urls)].slice(0, max)` re-checking the same front slice forever.
+//
+// maxHostFailures is a per-run circuit breaker: once a host accumulates that
+// many consecutive failures/timeouts THIS run, no further probes are sent to
+// it for the rest of the run, so one unavailable host cannot burn the whole
+// run's time budget (issue #710 acceptance criterion) at the expense of every
+// other host's urls. Only a host that is actually failing to answer counts --
+// 4xx, 5xx, and unreachable/timeout. A 3xx is a reported finding but a healthy
+// response, so it resets the counter like a 200 does; see
+// BREAKER_FAILURE_TYPES. Skipped urls are returned separately from `findings` and
+// are NOT considered checked -- the caller must not fold them into the
+// persisted per-url state as healthy, since they were never actually probed;
+// they simply remain due and get picked up by a later run. Pass 0 to disable
+// the breaker entirely.
 export async function checkExternalLiveness(urls, opts = {}) {
-  const { concurrency = 6, timeoutMs = 10000, delayMs = 150, max = Infinity, sourceMap = null } = opts;
+  const { concurrency = 6, timeoutMs = 10000, delayMs = 150, max = Infinity, sourceMap = null, maxHostFailures = 3 } = opts;
+  // A pool size that is NaN or below 1 starts no workers at all, and the
+  // "checked" count below would then claim every target was probed when none
+  // was -- state the caller persists as healthy. Refuse it rather than return
+  // a clean-looking result for work that never happened. The CLI already
+  // rejects such a value in parseArgs; this covers a programmatic caller.
+  if (!Number.isInteger(concurrency) || concurrency < 1) {
+    throw new Error(`checkExternalLiveness: concurrency must be a positive integer, got: ${concurrency}`);
+  }
   const targets = [...new Set(urls)].slice(0, max);
   // Record id(s) carrying each url, so a failure names the record(s) to repair.
   const idsFor = (url) => (sourceMap ? sourceMap.get(url) || [] : []);
   const findings = [];
+  const skipped = [];
+  const hostConsecutiveFailures = new Map();
+  const exhaustedHosts = new Set();
   let cursor = 0;
   let nextStart = 0;
+
+  function hostOf(url) {
+    try {
+      return new URL(url).hostname;
+    } catch {
+      return null;
+    }
+  }
+
+  function recordHostOutcome(host, failed) {
+    if (!host || maxHostFailures <= 0) return;
+    if (!failed) {
+      hostConsecutiveFailures.delete(host);
+      return;
+    }
+    const count = (hostConsecutiveFailures.get(host) || 0) + 1;
+    hostConsecutiveFailures.set(host, count);
+    if (count >= maxHostFailures) exhaustedHosts.add(host);
+  }
 
   // Shared throttle: space request STARTS by delayMs across all workers, not
   // per-worker, so a pool of N workers cannot fire N probes at once. The slot is
@@ -352,15 +438,24 @@ export async function checkExternalLiveness(urls, opts = {}) {
   async function worker() {
     while (cursor < targets.length) {
       const url = targets[cursor++];
+      const host = hostOf(url);
+      if (host && exhaustedHosts.has(host)) {
+        skipped.push(url);
+        continue;
+      }
       await throttle();
       try {
         const { status, location } = await probe(url, { timeoutMs });
         const failureType = classify(status);
+        // A redirect resolves the counter the same way a 200 does: the host
+        // is up and answering, so it must not accumulate toward exhaustion.
+        recordHostOutcome(host, countsAgainstHostBudget(failureType));
         if (failureType) {
           const ids = idsFor(url);
-          findings.push({ category: 'external', failureType, sourceId: ids[0] ?? null, sourceIds: ids, target: url, detail: `HTTP ${status}${location ? ` -> ${location}` : ''}` });
+          findings.push({ category: 'external', failureType, sourceId: ids[0] ?? null, sourceIds: ids, target: url, status, location: location ?? null, detail: `HTTP ${status}${location ? ` -> ${location}` : ''}` });
         }
       } catch (err) {
+        recordHostOutcome(host, true);
         const ids = idsFor(url);
         findings.push({ category: 'external', failureType: 'unreachable_url', sourceId: ids[0] ?? null, sourceIds: ids, target: url, detail: err.name === 'AbortError' ? `timeout after ${timeoutMs}ms` : err.message });
       }
@@ -368,12 +463,60 @@ export async function checkExternalLiveness(urls, opts = {}) {
   }
 
   await Promise.all(Array.from({ length: Math.min(concurrency, targets.length) }, worker));
-  return { checked: targets.length, findings };
+  return { checked: targets.length - skipped.length, findings, skipped };
+}
+
+// ----- external sweep orchestration (issue #710) -----
+
+// Runs one scheduled sweep's worth of external-liveness work against a
+// persisted state file: load the last run's state, pick this run's eligible
+// urls, probe them, diff and record the results, and save the updated state
+// back to disk. Pulled out of main() so the load/select/probe/record/save
+// wiring itself is directly testable against a real state file on disk --
+// not just the pure functions it calls, hand-threaded, the way earlier tests
+// exercised loadState/saveState (never) and selectEligibleUrls/recordResults
+// (only by reassigning state.cursor in the test itself).
+export async function runExternalLivenessSweep({ featuredUrls, urlRecords, stateFile, max = Infinity, now = Date.now(), liveness = {} }) {
+  const sourceMap = buildUrlSourceMap([...featuredUrls, ...urlRecords]);
+  const candidateUrls = [...sourceMap.keys()];
+  const prevState = loadState(stateFile);
+
+  const corpusChanges = detectCorpusChanges(prevState, candidateUrls);
+
+  // Featured urls are always eligible: they are the launch-critical surface
+  // #479 is about (and the only probe that catches a withdrawn-but-well-formed
+  // image), so they must never be the ones a rotating tail leaves for later.
+  // Everything else is chosen by sweeping forward from the persisted cursor
+  // (issue #710) so a capped run advances through a different slice of the
+  // corpus each time, instead of always re-checking the same front slice.
+  const { selected, nextCursor } = selectEligibleUrls(candidateUrls, prevState, {
+    max,
+    now,
+    alwaysEligible: featuredUrls.map((f) => f.url).filter(Boolean)
+  });
+
+  const external = await checkExternalLiveness(selected, { sourceMap, ...liveness });
+
+  // A url the per-host breaker skipped was never actually probed this run, so
+  // it must not be folded into the persisted state as healthy -- it stays due
+  // and a later run picks it up.
+  const skippedSet = new Set(external.skipped);
+  const checkedUrls = selected.filter((u) => !skippedSet.has(u));
+
+  const findingsByUrl = new Map(external.findings.map((f) => [f.target, f]));
+  const revisit = diffFindings(prevState, checkedUrls, findingsByUrl);
+
+  let nextState = recordResults(prevState, { checkedUrls, findingsByUrl }, now);
+  nextState.cursor = nextCursor;
+  nextState = pruneRemovedUrls(nextState, candidateUrls);
+  saveState(stateFile, nextState);
+
+  return { external, revisit, corpusChanges };
 }
 
 // ----- report -----
 
-export function buildReport({ data, internal, url, featured = [], external }) {
+export function buildReport({ data, internal, url, featured = [], external, revisit = null, corpusChanges = null }) {
   const findings = [...internal, ...url, ...featured, ...(external ? external.findings : [])];
   return {
     generated: new Date().toISOString(),
@@ -385,22 +528,79 @@ export function buildReport({ data, internal, url, featured = [], external }) {
       malformedUrls: url.length,
       featuredMalformed: featured.length,
       externalChecked: external ? external.checked : 0,
-      externalFailures: external ? external.findings.length : 0
+      // Urls the per-host circuit breaker skipped this run (an unavailable
+      // host must not consume the whole run, issue #710) -- not failures,
+      // just not-yet-checked; they remain due for a later run.
+      externalSkipped: external && external.skipped ? external.skipped.length : 0,
+      externalFailures: external ? external.findings.length : 0,
+      // issue #710: how this run's external findings compare with the last
+      // recorded state, and how the url corpus itself has shifted. Both are
+      // null when --external was not requested (no state to compare against).
+      revisit: revisit
+        ? { new: revisit.new.length, persistent: revisit.persistent.length, recovered: revisit.recovered.length, changed: revisit.changed.length }
+        : null,
+      corpusChanges: corpusChanges ? { added: corpusChanges.added.length, removed: corpusChanges.removed.length } : null
     },
+    revisit,
+    corpusChanges,
     findings
   };
 }
 
 // ----- CLI -----
 
-function parseArgs(argv) {
-  const args = { external: false, reportOnly: false, out: null, max: Infinity };
+// Every flag below takes exactly one value. Reading it through requireValue
+// keeps a flag left at the end of argv from silently becoming `undefined`,
+// which Number() then turns into NaN.
+function requireValue(argv, index, flag) {
+  const value = argv[index];
+  if (value === undefined) throw new Error(`${flag} requires a value`);
+  return value;
+}
+
+// A NaN or non-positive numeric option does not degrade gracefully here, it
+// fails silently: `Math.min(NaN, n)` makes checkExternalLiveness's worker pool
+// empty, so no url is probed, none is reported skipped, and every target is
+// counted as checked -- which runExternalLivenessSweep then writes to the
+// persisted state as healthy. Reject the bad value at the CLI instead.
+function integerOption(argv, index, flag, { min }) {
+  const raw = requireValue(argv, index, flag);
+  const parsed = Number(raw);
+  if (!Number.isInteger(parsed) || parsed < min) {
+    const shape = min === 0 ? 'a non-negative integer' : 'a positive integer';
+    throw new Error(`${flag} must be ${shape}, got: ${raw}`);
+  }
+  return parsed;
+}
+
+export function parseArgs(argv) {
+  const args = {
+    external: false,
+    reportOnly: false,
+    out: null,
+    max: Infinity,
+    stateFile: null,
+    // Left undefined (not a fixed default here) when the flag is absent, so
+    // checkExternalLiveness's own defaults apply -- these are only ever
+    // "set" when the caller actually passed the flag.
+    concurrency: undefined,
+    timeoutMs: undefined,
+    delayMs: undefined,
+    maxHostFailures: undefined
+  };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--external') args.external = true;
     else if (a === '--report-only') args.reportOnly = true;
-    else if (a === '--out') args.out = argv[++i];
-    else if (a === '--max') args.max = Number(argv[++i]);
+    else if (a === '--out') args.out = requireValue(argv, ++i, '--out');
+    else if (a === '--max') args.max = integerOption(argv, ++i, '--max', { min: 1 });
+    else if (a === '--state-file') args.stateFile = requireValue(argv, ++i, '--state-file');
+    else if (a === '--concurrency') args.concurrency = integerOption(argv, ++i, '--concurrency', { min: 1 });
+    else if (a === '--timeout-ms') args.timeoutMs = integerOption(argv, ++i, '--timeout-ms', { min: 1 });
+    // 0 is meaningful for both of these: it disables the inter-request delay
+    // and the per-host circuit breaker respectively, so they allow it.
+    else if (a === '--delay-ms') args.delayMs = integerOption(argv, ++i, '--delay-ms', { min: 0 });
+    else if (a === '--max-host-failures') args.maxHostFailures = integerOption(argv, ++i, '--max-host-failures', { min: 0 });
   }
   return args;
 }
@@ -424,16 +624,25 @@ async function main(argv) {
   const featuredUrls = collectFeaturedUrls(FEATURED_WORKS);
   const featured = checkFeaturedUrlWellFormedness(featuredUrls);
   let external = null;
+  let revisit = null;
+  let corpusChanges = null;
   if (args.external) {
-    // Featured urls FIRST: checkExternalLiveness truncates with slice(0, max), so whatever sits at
-    // the tail is dropped under --max. The featured cards are the launch-critical surface #479 is
-    // about (and the only probe that catches a withdrawn-but-well-formed image), so they must never
-    // be the ones a --max cap skips. There are ~40 of them, so they cost a negligible slice of the budget.
-    const sourceMap = buildUrlSourceMap([...featuredUrls, ...urlRecords]);
-    external = await checkExternalLiveness([...sourceMap.keys()], { max: args.max, sourceMap });
+    const stateFile = args.stateFile || path.join(DATA_DIR, 'link-check-state.json');
+    ({ external, revisit, corpusChanges } = await runExternalLivenessSweep({
+      featuredUrls,
+      urlRecords,
+      stateFile,
+      max: args.max,
+      liveness: {
+        concurrency: args.concurrency,
+        timeoutMs: args.timeoutMs,
+        delayMs: args.delayMs,
+        maxHostFailures: args.maxHostFailures
+      }
+    }));
   }
 
-  const report = buildReport({ data, internal, url, featured, external });
+  const report = buildReport({ data, internal, url, featured, external, revisit, corpusChanges });
   if (args.out) {
     fs.writeFileSync(args.out, JSON.stringify(report, null, 2));
   }
@@ -444,7 +653,9 @@ async function main(argv) {
       `  internal backlink failures: ${s.internalFailures}\n` +
       `  malformed urls: ${s.malformedUrls}\n` +
       `  malformed featured urls: ${s.featuredMalformed}\n` +
-      (args.external ? `  external probed: ${s.externalChecked}, failures: ${s.externalFailures}\n` : '') +
+      (args.external ? `  external probed: ${s.externalChecked}, failures: ${s.externalFailures}${s.externalSkipped ? `, skipped (host budget): ${s.externalSkipped}` : ''}\n` : '') +
+      (s.revisit ? `  revisit: new ${s.revisit.new}, persistent ${s.revisit.persistent}, recovered ${s.revisit.recovered}, changed ${s.revisit.changed}\n` : '') +
+      (s.corpusChanges ? `  corpus: +${s.corpusChanges.added} -${s.corpusChanges.removed}\n` : '') +
       (args.out ? `  report written: ${args.out}\n` : '')
   );
 
@@ -457,5 +668,10 @@ async function main(argv) {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main(process.argv.slice(2));
+  main(process.argv.slice(2)).catch((error) => {
+    // A rejected argument is operator error, not a crash: print the reason it
+    // names and exit non-zero instead of dumping a stack trace.
+    console.error(`verify-links failed: ${error.message}`);
+    process.exitCode = 1;
+  });
 }

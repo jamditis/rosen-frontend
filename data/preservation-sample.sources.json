@@ -1,0 +1,534 @@
+{
+  "schema": {
+    "id": "preservation-sample/1.0.0",
+    "compatibility": "additive changes within version 1; semantic changes require a new major version"
+  },
+  "input": {
+    "commit": "abfd3f754762c7f78054b9bd1df24e5f13b2de69",
+    "dirty": false,
+    "files": [
+      {
+        "path": "data/archive_records-public.csv",
+        "sha256": "759335a27093e641d187ea020e896b506760fc4a3133f4c6d602bba17a905737"
+      },
+      {
+        "path": "data/social_posts.csv",
+        "sha256": "ca18abe13dcd09afa13d4d8d37e62742f6acc0abb2cc90a779129e36e27b336c"
+      },
+      {
+        "path": "data/extracted_relationships.csv",
+        "sha256": "d840e8b51b8ccf71a9cc9ea72f36254c1f58e25ed79609a04fb332520d47f544"
+      },
+      {
+        "path": "data/stewardship-census.json",
+        "sha256": "c4d91404a7f69c5e6315799f9e8dbea62641875c2e1ec895cf9e3e811e3904f5"
+      }
+    ],
+    "census_schema_id": "stewardship-census/1.0.0"
+  },
+  "credential_policy": "The pilot worker must never supply login credentials, a paid subscription, a session cookie, or any other access-control circumvention to fetch a source. A paywalled, login-gated, or bot-walled response (for example, from a newspapers.com clipping) is a valid, recorded failure for that source — not a signal to authenticate or work around the wall.",
+  "seed": "rosen-preservation-pilot-v1",
+  "sample_size": 100,
+  "sources": [
+    {
+      "id": "BSKY-00223",
+      "objectType": "social-post",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3lz5h2qgi6c2r"
+    },
+    {
+      "id": "BSKY-00262",
+      "objectType": "social-post",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3lyj7jltcoc2l"
+    },
+    {
+      "id": "BSKY-00334",
+      "objectType": "social-post",
+      "url": null
+    },
+    {
+      "id": "BSKY-00441",
+      "objectType": "social-post",
+      "url": null
+    },
+    {
+      "id": "BSKY-00735",
+      "objectType": "social-post",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3lt2wb6ui6224"
+    },
+    {
+      "id": "BSKY-01284",
+      "objectType": "social-post",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3lntepd6v4c2i"
+    },
+    {
+      "id": "BSKY-01537",
+      "objectType": "social-post",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3ljqmgpcnsk2m"
+    },
+    {
+      "id": "BSKY-01640",
+      "objectType": "social-post",
+      "url": null
+    },
+    {
+      "id": "BSKY-01674",
+      "objectType": "social-post",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3li2zuy5wek2b"
+    },
+    {
+      "id": "BSKY-02043",
+      "objectType": "social-post",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3lba4pk53ec2z"
+    },
+    {
+      "id": "BSKY-02068",
+      "objectType": "social-post",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3latw7iu53c2o"
+    },
+    {
+      "id": "BSKY-02254",
+      "objectType": "social-post",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3kymyfqp5ul2q"
+    },
+    {
+      "id": "BSKY-02563",
+      "objectType": "social-post",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3kk2incfz5h2o"
+    },
+    {
+      "id": "BSKY-02585",
+      "objectType": "social-post",
+      "url": null
+    },
+    {
+      "id": "BSKY-02628",
+      "objectType": "social-post",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3ki6t76rcxx2x"
+    },
+    {
+      "id": "BSKY-02690",
+      "objectType": "social-post",
+      "url": null
+    },
+    {
+      "id": "BSKY-02847",
+      "objectType": "social-post",
+      "url": null
+    },
+    {
+      "id": "BSKY-03062",
+      "objectType": "social-post",
+      "url": null
+    },
+    {
+      "id": "CLIP-00019",
+      "objectType": "archive-record",
+      "url": "https://www.newspapers.com/image/709291829/"
+    },
+    {
+      "id": "CLIP-00038",
+      "objectType": "archive-record",
+      "url": "https://www.newspapers.com/image/1107218285/"
+    },
+    {
+      "id": "CLIP-00048",
+      "objectType": "archive-record",
+      "url": "https://www.newspapers.com/image/258299148/"
+    },
+    {
+      "id": "CLIP-00064",
+      "objectType": "archive-record",
+      "url": "https://www.newspapers.com/image/855475789/"
+    },
+    {
+      "id": "CLIP-00065",
+      "objectType": "archive-record",
+      "url": "https://www.newspapers.com/image/900458453/"
+    },
+    {
+      "id": "CLIP-00067",
+      "objectType": "archive-record",
+      "url": "https://www.newspapers.com/image/231162524/"
+    },
+    {
+      "id": "CLIP-00069",
+      "objectType": "archive-record",
+      "url": "https://www.newspapers.com/image/1032743624/"
+    },
+    {
+      "id": "MAST-00198",
+      "objectType": "social-post",
+      "url": "https://mastodon.social/@jayrosen_nyu/110000484390685222"
+    },
+    {
+      "id": "MAST-00212",
+      "objectType": "social-post",
+      "url": "https://mastodon.social/@jayrosen_nyu/109971723364972052"
+    },
+    {
+      "id": "MAST-00234",
+      "objectType": "social-post",
+      "url": "https://mastodon.social/@jayrosen_nyu/109940357157764317"
+    },
+    {
+      "id": "MAST-00316",
+      "objectType": "social-post",
+      "url": "https://mastodon.social/@jayrosen_nyu/109650497829004134"
+    },
+    {
+      "id": "MAST-00390",
+      "objectType": "social-post",
+      "url": "https://mastodon.social/@jayrosen_nyu/109413743864691616"
+    },
+    {
+      "id": "MAST-00514",
+      "objectType": "social-post",
+      "url": "https://mastodon.social/@jayrosen_nyu/109297832030550476"
+    },
+    {
+      "id": "RECORD-00012",
+      "objectType": "archive-record",
+      "url": "http://archive.pressthink.org/2008/02/28/three_bizarre_v_p.html"
+    },
+    {
+      "id": "RECORD-00024",
+      "objectType": "archive-record",
+      "url": "https://www.cnn.com/videos/business/2021/12/12/professor-jay-rosen-on-pro-democracy-agenda-for-media.cnn"
+    },
+    {
+      "id": "RECORD-00036",
+      "objectType": "archive-record",
+      "url": "https://youtu.be/Za7ssuNyzE0"
+    },
+    {
+      "id": "RECORD-00101",
+      "objectType": "archive-record",
+      "url": "http://archive.pressthink.org/2003/08/29/sloganeering.html"
+    },
+    {
+      "id": "RECORD-00136",
+      "objectType": "archive-record",
+      "url": "http://archive.pressthink.org/2003/10/01/front_line.html"
+    },
+    {
+      "id": "RECORD-00154",
+      "objectType": "archive-record",
+      "url": "http://archive.pressthink.org/2003/10/25/bias_answers.html"
+    },
+    {
+      "id": "RECORD-00171",
+      "objectType": "archive-record",
+      "url": "http://archive.pressthink.org/2004/02/07/crash_site_p.html"
+    },
+    {
+      "id": "RECORD-00280",
+      "objectType": "archive-record",
+      "url": "http://archive.pressthink.org/2005/02/18/mcg_glcl_p.html"
+    },
+    {
+      "id": "RECORD-00333",
+      "objectType": "archive-record",
+      "url": "http://archive.pressthink.org/2008/12/30/bettinger_qa_p.html"
+    },
+    {
+      "id": "RECORD-00354",
+      "objectType": "archive-record",
+      "url": "http://archive.pressthink.org/2007/11/01/beat_reporting_p.html"
+    },
+    {
+      "id": "RECORD-00439",
+      "objectType": "archive-record",
+      "url": "http://archive.pressthink.org/2006/05/13/gagl_sn_p.html"
+    },
+    {
+      "id": "RECORD-00495",
+      "objectType": "archive-record",
+      "url": "http://archive.pressthink.org/2004/03/10/politics_lull_p.html"
+    },
+    {
+      "id": "RECORD-00520",
+      "objectType": "archive-record",
+      "url": "http://archive.pressthink.org/2008/09/03/mccain_strategy_p.html"
+    },
+    {
+      "id": "RECORD-00533",
+      "objectType": "archive-record",
+      "url": "http://archive.pressthink.org/2006/06/22/blgrc_iv_p.html"
+    },
+    {
+      "id": "RECORD-00653",
+      "objectType": "archive-record",
+      "url": "https://publicnotebook.wordpress.com/2009/12/28/my-simple-fix-for-the-messed-up-sunday-shows/"
+    },
+    {
+      "id": "RECORD-00662",
+      "objectType": "archive-record",
+      "url": "https://jayrosen.tumblr.com/post/243813457/sources-of-subsidy-in-the-production-of-news-a"
+    },
+    {
+      "id": "RECORD-00667",
+      "objectType": "archive-record",
+      "url": "https://www.upenn.edu/static/pnc/ptrosen.html"
+    },
+    {
+      "id": "RECORD-00668",
+      "objectType": "archive-record",
+      "url": "http://www.huffingtonpost.com/jay-rosen/murray-waas-is-the-woodwa_b_18875.html"
+    },
+    {
+      "id": "RECORD-00703",
+      "objectType": "archive-record",
+      "url": "https://www.offmessage.net/p/36-thoughts-on-the-2024-campaign"
+    },
+    {
+      "id": "RECORD-00721",
+      "objectType": "archive-record",
+      "url": "https://lucid.substack.com/p/lucid-interview-jay-rosen"
+    },
+    {
+      "id": "RECORD-00728",
+      "objectType": "archive-record",
+      "url": "https://www.pbs.org/moyers/journal/02062009/profile1.html"
+    },
+    {
+      "id": "RECORD-00750",
+      "objectType": "archive-record",
+      "url": "https://www.pbs.org/newshour/arts/jay-rosen-on-sxsw-the-future-of-context-and-microloans-for-journalists"
+    },
+    {
+      "id": "RECORD-00767",
+      "objectType": "archive-record",
+      "url": "https://knightfoundation.org/press/releases/new-york-university-to-launch-membership-puzzle-project-to-advance-sustainability-and-trust-in-journalism-with-515-000-in-new-funding/"
+    },
+    {
+      "id": "RECORD-00777",
+      "objectType": "archive-record",
+      "url": "https://www.pbs.org/newshour/brief/200771/jay-rosen"
+    },
+    {
+      "id": "RECORD-00783",
+      "objectType": "archive-record",
+      "url": "https://fora.tv/2010/08/13/Jay_Rosen_The_Future_of_Context"
+    },
+    {
+      "id": "RECORD-00795",
+      "objectType": "archive-record",
+      "url": "https://liberalarts.tamu.edu/blog/2017/03/24/after-the-agora-jay-rosen-rebuilding-trust-in-media/"
+    },
+    {
+      "id": "RECORD-00828",
+      "objectType": "archive-record",
+      "url": "https://www.huffpost.com/entry/political-ergonomics-and-_b_33042"
+    },
+    {
+      "id": "RECORD-00903",
+      "objectType": "archive-record",
+      "url": "https://pressthink.org/2026/04/subscribers-buy-a-product-members-join-the-cause/"
+    },
+    {
+      "id": "RECORD-00905",
+      "objectType": "archive-record",
+      "url": "https://ubyssey.ca/margins/world-cup-coverage/"
+    },
+    {
+      "id": "RECORD-00911",
+      "objectType": "archive-record",
+      "url": "https://www.cascadiadaily.com/2026/jul/16/citizens-agenda-26-help-cdn-pin-down-candidates-on-issues-that-matter-to-you/"
+    },
+    {
+      "id": "THREAD-00001",
+      "objectType": "archive-record",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3lrbmko44y22x"
+    },
+    {
+      "id": "THREAD-00002",
+      "objectType": "archive-record",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3lnqic4ckqk2f"
+    },
+    {
+      "id": "THREAD-00006",
+      "objectType": "archive-record",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3k7s2mw56jy2g"
+    },
+    {
+      "id": "TUMBLR-00014",
+      "objectType": "archive-record",
+      "url": "https://tmblr.co/ZCJQUyAwdymk"
+    },
+    {
+      "id": "TUMBLR-00025",
+      "objectType": "archive-record",
+      "url": "https://tmblr.co/ZCJQUy1QWMt1"
+    },
+    {
+      "id": "TUMBLR-00026",
+      "objectType": "archive-record",
+      "url": "https://tmblr.co/ZCJQUy1R0I6Z"
+    },
+    {
+      "id": "TUMBLR-00030",
+      "objectType": "archive-record",
+      "url": "https://tmblr.co/ZCJQUyHB1AUo"
+    },
+    {
+      "id": "TUMBLR-00055",
+      "objectType": "archive-record",
+      "url": "https://tmblr.co/ZCJQUyDnLJ0"
+    },
+    {
+      "id": "TUMBLR-00061",
+      "objectType": "archive-record",
+      "url": "https://tmblr.co/ZCJQUyEHm-v"
+    },
+    {
+      "id": "TUMBLR-00081",
+      "objectType": "archive-record",
+      "url": "https://tmblr.co/ZCJQUyToZmhS"
+    },
+    {
+      "id": "TUMBLR-00105",
+      "objectType": "archive-record",
+      "url": "https://tmblr.co/ZCJQUyOHL7t"
+    },
+    {
+      "id": "TWTR-00570",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1364959762509668356"
+    },
+    {
+      "id": "TWTR-01551",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1352104689127534594"
+    },
+    {
+      "id": "TWTR-01664",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1350891673157578752"
+    },
+    {
+      "id": "TWTR-02761",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1335285899366690817"
+    },
+    {
+      "id": "TWTR-03424",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1326296116871229442"
+    },
+    {
+      "id": "TWTR-04002",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1320048594146254861"
+    },
+    {
+      "id": "TWTR-04860",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1312798509196869632"
+    },
+    {
+      "id": "TWTR-05406",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1303430870037073921"
+    },
+    {
+      "id": "TWTR-05905",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1297355090215436289"
+    },
+    {
+      "id": "TWTR-05999",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1296107474001571841"
+    },
+    {
+      "id": "TWTR-07801",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1270494150803296260"
+    },
+    {
+      "id": "TWTR-08183",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1264993098314199040"
+    },
+    {
+      "id": "TWTR-10859",
+      "objectType": "social-post",
+      "url": "https://x.com/ChrisCillizza/status/1222691220566237185"
+    },
+    {
+      "id": "TWTR-10986",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1220725022710554627"
+    },
+    {
+      "id": "TWTR-11048",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1219304255494017024"
+    },
+    {
+      "id": "TWTR-12318",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1186703881100771328"
+    },
+    {
+      "id": "TWTR-12471",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1182843181215440896"
+    },
+    {
+      "id": "TWTR-13642",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1158475558076014605"
+    },
+    {
+      "id": "TWTR-14323",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1147211033104343040"
+    },
+    {
+      "id": "TWTR-15092",
+      "objectType": "social-post",
+      "url": "https://x.com/rasmus_kleis/status/1133418384115273728"
+    },
+    {
+      "id": "TWTR-15175",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1130984193629073408"
+    },
+    {
+      "id": "TWTR-16011",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1818118830503170350"
+    },
+    {
+      "id": "TWTR-17865",
+      "objectType": "social-post",
+      "url": "https://x.com/AoDespair/status/1708550520758038734"
+    },
+    {
+      "id": "TWTR-18458",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1685350206190018561"
+    },
+    {
+      "id": "TWTR-19235",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1662990940116582400"
+    },
+    {
+      "id": "TWTR-19358",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1659964499712004098"
+    },
+    {
+      "id": "TWTR-22045",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1559606177893421056"
+    },
+    {
+      "id": "TWTR-24858",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1466524924449808388"
+    }
+  ]
+}

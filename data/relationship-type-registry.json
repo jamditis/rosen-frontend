@@ -1,0 +1,1048 @@
+{
+  "schemaVersion": "1.1.0",
+  "description": "Machine-readable relationship-type registry for the Jay Rosen Internet Archive knowledge graph. Formalizes allowed endpoint entity types, direction, inverse relationships, self-link and multi-assertion policy, temporal scope, and disputed-assertion support for every relationship type present in data/extracted_relationships.csv or in backend/entity_extraction_schema_v3.json. See data/README.md and scripts/validate-graph-data.mjs for how this is enforced, and issue #737 for the audit that produced it.",
+  "entityTypes": [
+    "Concept",
+    "Event",
+    "Location",
+    "Organization",
+    "Person",
+    "Work"
+  ],
+  "evidenceStandards": {
+    "pipeline-default": "Extracted from source record text by the entity-extraction pipeline (backend/entity_extraction_schema_v3.json), carrying a context snippet and a 0-1 confidence_score. The archive graph accepts assertions at any confidence today (no minimum threshold); acceptance is gated by referential integrity (extracted_entities.csv), the accepted/held relationship-type split (data/graph-validation-holds.json), and this registry's endpoint-type constraints."
+  },
+  "migrationNotes": [
+    {
+      "version": "1.0.0",
+      "date": "2026-08-27",
+      "summary": "Initial registry (issue #737). Endpoint-type constraints for accepted types are inferred from current usage in extracted_relationships.csv (falling back to backend/entity_extraction_schema_v3.json's valid_source_types/valid_target_types for the five types with zero current usage: Authored By, Quoted, Interviewed, Responds To, Founded). Legacy ambiguous types (Founded By, Owned By, Created, Covers) and the not-yet-wired Influenced type are marked status: \"deferred\" rather than guessed; their direction, inverse, symmetry, and temporal scope are curator decisions, not automation output."
+    },
+    {
+      "version": "1.1.0",
+      "date": "2026-08-27",
+      "summary": "Endpoint-type constraints for every accepted type now derive from backend/entity_extraction_schema_v3.json's valid_source_types/valid_target_types (curator-authored) instead of being inferred from current usage. That surfaced 3,390 existing relationship rows across 13 types whose recorded endpoint types the schema does not allow; each affected type now carries an endpointDivergence block (counts + example relationship IDs) and endpointEnforcement: \"deferred\" instead of silently widening the allowlist to match the dirty data. Types with no observed divergence carry endpointEnforcement: \"enforced\". Separately inventoried directionalContradictions on Originated By, Affiliated With, and Founded By record entity pairs where the same fact is asserted in both directions under one type. Owns gained a candidateInverseType (Owned By) so the duplicate-edge check can detect -- and, via data/graph-validation-holds.json duplicateEdgeExceptions, tolerate pending -- the small number of rows that already encode one ownership fact under both labels. None of this changes any type's status, direction, or temporal scope; it documents what the data already contains and defers cleanup to curator review, per issue #737's boundary."
+    }
+  ],
+  "examples": {
+    "temporalScope": [
+      {
+        "temporalScope": "interval",
+        "relationshipId": "RECORD-00022_REL_006",
+        "assertion": "Jay Rosen affiliated with NYU",
+        "note": "\"Affiliated With\" is an ongoing state, not a single moment: Jay Rosen's affiliation with NYU can start and later end. extracted_relationships.csv has no start/end date column today, so this interval is not yet structurally captured; temporalScope: \"interval\" records that the gap is meaningful, for a future backfill to fill in."
+      },
+      {
+        "temporalScope": "instant",
+        "relationshipId": "RECORD-00150_REL_016",
+        "assertion": "Killing the Buddha: A Heretic’s Bible published in Free Press",
+        "note": "\"Published In\" names a single publication event. It does not change or need a duration, so temporalScope: \"instant\" needs no additional date fields beyond the relationship's own extracted_date and the record it came from."
+      }
+    ],
+    "disputedAssertions": [
+      {
+        "disputedAssertionsAllowed": false,
+        "hypothetical": true,
+        "scenario": "Two source records disagree on whether Organization X owns Organization Y (one reports a 2020 sale, the other still names the original owner).",
+        "note": "extracted_relationships.csv has no negation, dispute, or superseded-by column, so this disagreement cannot be recorded as a qualified or disputed assertion today; both rows would sit in the graph as unqualified facts. disputedAssertionsAllowed is false for every type in this registry for that reason — it names a real gap in the row shape, not a per-type curator choice. Closing it needs a new column (or a status field) before any type's flag can turn true."
+      }
+    ]
+  },
+  "types": {
+    "Authored By": {
+      "status": "accepted",
+      "description": "Work A was written or authored by person B. Use for articles, books, papers, and posts.",
+      "allowedSourceTypes": [
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Person"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "authored by",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "endpointEnforcement": "enforced"
+    },
+    "Quoted": {
+      "status": "accepted",
+      "description": "Person or work A directly quotes person B.",
+      "allowedSourceTypes": [
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Person"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "quoted",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "endpointEnforcement": "enforced"
+    },
+    "Interviewed": {
+      "status": "accepted",
+      "description": "Person A interviewed person B.",
+      "allowedSourceTypes": [
+        "Person"
+      ],
+      "allowedTargetTypes": [
+        "Person"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "interviewed",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "endpointEnforcement": "enforced"
+    },
+    "Responds To": {
+      "status": "accepted",
+      "description": "Person or work A is responding to or rebutting person, work, or event B.",
+      "allowedSourceTypes": [
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Event",
+        "Person",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "responds to",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "endpointEnforcement": "enforced"
+    },
+    "Mentions": {
+      "status": "accepted",
+      "description": "Entity A mentions entity B in passing or substantively.",
+      "allowedSourceTypes": [
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Event",
+        "Location",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "mentions",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "endpointEnforcement": "deferred",
+      "endpointDivergence": {
+        "violatingRows": 227,
+        "totalRows": 1592,
+        "asOfDate": "2026-08-27",
+        "exampleRelationshipIds": [
+          "RECORD-00003_REL_007",
+          "RECORD-00022_REL_014",
+          "RECORD-00022_REL_015",
+          "RECORD-00026_REL_010",
+          "RECORD-00027_REL_009"
+        ],
+        "note": "227 of 1592 current Mentions rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Mentions is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+      },
+      "directionalContradictions": {
+        "pairCount": 31,
+        "rowsInvolved": 74,
+        "asOfDate": "2026-08-27",
+        "examplePairs": [
+          {
+            "forwardId": "RECORD-00020_REL_007",
+            "forwardAssertion": "The New York Times -> Donald Trump",
+            "backwardId": "RECORD-00604_REL_003",
+            "backwardAssertion": "Donald Trump -> The New York Times"
+          },
+          {
+            "forwardId": "RECORD-00021_REL_015",
+            "forwardAssertion": "The Washington Post -> Donald Trump",
+            "backwardId": "RECORD-00043_REL_004",
+            "backwardAssertion": "Donald Trump -> The Washington Post"
+          },
+          {
+            "forwardId": "RECORD-00101_REL_008",
+            "forwardAssertion": "Fox News -> CNN",
+            "backwardId": "RECORD-00029_REL_011",
+            "backwardAssertion": "CNN -> Fox News"
+          }
+        ],
+        "note": "31 entity pairs (74 rows) currently have Mentions asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+      }
+    },
+    "Criticizes": {
+      "status": "accepted",
+      "description": "Entity A criticizes or negatively evaluates entity B.",
+      "allowedSourceTypes": [
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Concept",
+        "Event",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "criticizes",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "endpointEnforcement": "deferred",
+      "endpointDivergence": {
+        "violatingRows": 72,
+        "totalRows": 1140,
+        "asOfDate": "2026-08-27",
+        "exampleRelationshipIds": [
+          "RECORD-00070_REL_003",
+          "RECORD-00070_REL_004",
+          "RECORD-00158_REL_006",
+          "RECORD-00281_REL_001",
+          "RECORD-00306_REL_001"
+        ],
+        "note": "72 of 1140 current Criticizes rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Criticizes is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+      },
+      "directionalContradictions": {
+        "pairCount": 7,
+        "rowsInvolved": 19,
+        "asOfDate": "2026-08-27",
+        "examplePairs": [
+          {
+            "forwardId": "RECORD-00710_REL_017",
+            "forwardAssertion": "The New York Times -> Donald Trump",
+            "backwardId": "RECORD-00021_REL_006",
+            "backwardAssertion": "Donald Trump -> The New York Times"
+          },
+          {
+            "forwardId": "RECORD-00710_REL_016",
+            "forwardAssertion": "The Washington Post -> Donald Trump",
+            "backwardId": "RECORD-00021_REL_007",
+            "backwardAssertion": "Donald Trump -> The Washington Post"
+          },
+          {
+            "forwardId": "RECORD-00358_REL_015",
+            "forwardAssertion": "The New York Times -> John McCain",
+            "backwardId": "RECORD-00874_REL_016",
+            "backwardAssertion": "John McCain -> The New York Times"
+          }
+        ],
+        "note": "7 entity pairs (19 rows) currently have Criticizes asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+      }
+    },
+    "Cites": {
+      "status": "accepted",
+      "description": "Entity A cites or references entity B as source material.",
+      "allowedSourceTypes": [
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "cites",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "endpointEnforcement": "deferred",
+      "endpointDivergence": {
+        "violatingRows": 34,
+        "totalRows": 166,
+        "asOfDate": "2026-08-27",
+        "exampleRelationshipIds": [
+          "RECORD-00353_REL_005",
+          "RECORD-00400_REL_021",
+          "RECORD-00584_REL_014",
+          "RECORD-00490_REL_025",
+          "RECORD-00498_REL_024"
+        ],
+        "note": "34 of 166 current Cites rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Cites is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+      },
+      "directionalContradictions": {
+        "pairCount": 3,
+        "rowsInvolved": 7,
+        "asOfDate": "2026-08-27",
+        "examplePairs": [
+          {
+            "forwardId": "RECORD-00098_REL_015",
+            "forwardAssertion": "Jay Rosen -> Brian Beutler",
+            "backwardId": "RECORD-00703_REL_001",
+            "backwardAssertion": "Brian Beutler -> Jay Rosen"
+          },
+          {
+            "forwardId": "RECORD-00224_REL_008",
+            "forwardAssertion": "Jay Rosen -> Dan Froomkin",
+            "backwardId": "RECORD-00178_REL_003",
+            "backwardAssertion": "Dan Froomkin -> Jay Rosen"
+          },
+          {
+            "forwardId": "RECORD-00444_REL_004",
+            "forwardAssertion": "Jay Rosen -> Jeff Jarvis",
+            "backwardId": "RECORD-00486_REL_018",
+            "backwardAssertion": "Jeff Jarvis -> Jay Rosen"
+          }
+        ],
+        "note": "3 entity pairs (7 rows) currently have Cites asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+      }
+    },
+    "Discusses": {
+      "status": "accepted",
+      "description": "Entity A discusses or analyzes concept, event, or work B in depth.",
+      "allowedSourceTypes": [
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Concept",
+        "Event",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "discusses",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "endpointEnforcement": "deferred",
+      "endpointDivergence": {
+        "violatingRows": 963,
+        "totalRows": 2480,
+        "asOfDate": "2026-08-27",
+        "exampleRelationshipIds": [
+          "RECORD-00002_REL_027",
+          "RECORD-00002_REL_028",
+          "RECORD-00003_REL_006",
+          "RECORD-00005_REL_004",
+          "RECORD-00020_REL_004"
+        ],
+        "note": "963 of 2480 current Discusses rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Discusses is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+      },
+      "directionalContradictions": {
+        "pairCount": 10,
+        "rowsInvolved": 20,
+        "asOfDate": "2026-08-27",
+        "examplePairs": [
+          {
+            "forwardId": "RECORD-00054_REL_003",
+            "forwardAssertion": "Jay Rosen -> Mark Jacob",
+            "backwardId": "RECORD-00724_REL_023",
+            "backwardAssertion": "Mark Jacob -> Jay Rosen"
+          },
+          {
+            "forwardId": "RECORD-00067_REL_003",
+            "forwardAssertion": "Public Journalism -> The press",
+            "backwardId": "RECORD-00067_REL_005",
+            "backwardAssertion": "The press -> Public Journalism"
+          },
+          {
+            "forwardId": "RECORD-00686_REL_004",
+            "forwardAssertion": "Jay Rosen -> Howard Kurtz",
+            "backwardId": "RECORD-00267_REL_002",
+            "backwardAssertion": "Howard Kurtz -> Jay Rosen"
+          }
+        ],
+        "note": "10 entity pairs (20 rows) currently have Discusses asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+      }
+    },
+    "Expands On": {
+      "status": "accepted",
+      "description": "Entity A expands, elaborates, or builds upon concept or work B.",
+      "allowedSourceTypes": [
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Concept",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "expands on",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "endpointEnforcement": "deferred",
+      "endpointDivergence": {
+        "violatingRows": 155,
+        "totalRows": 194,
+        "asOfDate": "2026-08-27",
+        "exampleRelationshipIds": [
+          "RECORD-00051_REL_004",
+          "RECORD-00061_REL_005",
+          "RECORD-00066_REL_005",
+          "RECORD-00066_REL_006",
+          "RECORD-00066_REL_007"
+        ],
+        "note": "155 of 194 current Expands On rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Expands On is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+      },
+      "directionalContradictions": {
+        "pairCount": 3,
+        "rowsInvolved": 7,
+        "asOfDate": "2026-08-27",
+        "examplePairs": [
+          {
+            "forwardId": "RECORD-00687_REL_010",
+            "forwardAssertion": "Master Narrative -> Horse Race Coverage",
+            "backwardId": "RECORD-00837_REL_011",
+            "backwardAssertion": "Horse Race Coverage -> Master Narrative"
+          },
+          {
+            "forwardId": "RECORD-00876_REL_016",
+            "forwardAssertion": "False Balance -> He Said, She Said Journalism",
+            "backwardId": "RECORD-00700_REL_012",
+            "backwardAssertion": "He Said, She Said Journalism -> False Balance"
+          },
+          {
+            "forwardId": "RECORD-00701_REL_012",
+            "forwardAssertion": "View from Nowhere -> View From Somewhere",
+            "backwardId": "RECORD-00877_REL_022",
+            "backwardAssertion": "View From Somewhere -> View from Nowhere"
+          }
+        ],
+        "note": "3 entity pairs (7 rows) currently have Expands On asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+      }
+    },
+    "Affiliated With": {
+      "status": "accepted",
+      "description": "Person A is affiliated, employed by, or associated with organization B.",
+      "allowedSourceTypes": [
+        "Person"
+      ],
+      "allowedTargetTypes": [
+        "Organization"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "interval",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "affiliated with",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "endpointEnforcement": "deferred",
+      "endpointDivergence": {
+        "violatingRows": 717,
+        "totalRows": 3209,
+        "asOfDate": "2026-08-27",
+        "exampleRelationshipIds": [
+          "RECORD-00003_REL_004",
+          "RECORD-00020_REL_006",
+          "RECORD-00020_REL_008",
+          "RECORD-00020_REL_009",
+          "RECORD-00020_REL_010"
+        ],
+        "note": "717 of 3209 current Affiliated With rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Affiliated With is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+      },
+      "directionalContradictions": {
+        "pairCount": 55,
+        "rowsInvolved": 211,
+        "asOfDate": "2026-08-27",
+        "examplePairs": [
+          {
+            "forwardId": "RECORD-00458_REL_005",
+            "forwardAssertion": "The New York Times -> Len Apcar",
+            "backwardId": "RECORD-00002_REL_025",
+            "backwardAssertion": "Len Apcar -> The New York Times"
+          },
+          {
+            "forwardId": "RECORD-00003_REL_004",
+            "forwardAssertion": "CNN -> David Bohrman",
+            "backwardId": "RECORD-00808_REL_025",
+            "backwardAssertion": "David Bohrman -> CNN"
+          },
+          {
+            "forwardId": "RECORD-00458_REL_002",
+            "forwardAssertion": "The New York Times -> Catherine Mathis",
+            "backwardId": "RECORD-00004_REL_004",
+            "backwardAssertion": "Catherine Mathis -> The New York Times"
+          }
+        ],
+        "note": "55 entity pairs (211 rows) currently have Affiliated With asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+      }
+    },
+    "Published In": {
+      "status": "accepted",
+      "description": "Work A was published in or by organization B.",
+      "allowedSourceTypes": [
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Organization"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "published in",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "endpointEnforcement": "deferred",
+      "endpointDivergence": {
+        "violatingRows": 251,
+        "totalRows": 538,
+        "asOfDate": "2026-08-27",
+        "exampleRelationshipIds": [
+          "RECORD-00005_REL_002",
+          "RECORD-00035_REL_003",
+          "RECORD-00037_REL_002",
+          "RECORD-00039_REL_007",
+          "RECORD-00047_REL_001"
+        ],
+        "note": "251 of 538 current Published In rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Published In is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+      },
+      "directionalContradictions": {
+        "pairCount": 8,
+        "rowsInvolved": 16,
+        "asOfDate": "2026-08-27",
+        "examplePairs": [
+          {
+            "forwardId": "RECORD-00005_REL_002",
+            "forwardAssertion": "The New York Times -> Bush Secretly Lifted Some Limits on Spying in U.S.",
+            "backwardId": "RECORD-00679_REL_005",
+            "backwardAssertion": "Bush Secretly Lifted Some Limits on Spying in U.S. -> The New York Times"
+          },
+          {
+            "forwardId": "RECORD-00249_REL_004",
+            "forwardAssertion": "PressThink -> Jay Rosen",
+            "backwardId": "RECORD-00039_REL_007",
+            "backwardAssertion": "Jay Rosen -> PressThink"
+          },
+          {
+            "forwardId": "RECORD-00264_REL_010",
+            "forwardAssertion": "NPR -> On the Media",
+            "backwardId": "RECORD-00426_REL_025",
+            "backwardAssertion": "On the Media -> NPR"
+          }
+        ],
+        "note": "8 entity pairs (16 rows) currently have Published In asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+      }
+    },
+    "Originated By": {
+      "status": "accepted",
+      "description": "Concept A was originated or coined by person B.",
+      "allowedSourceTypes": [
+        "Concept"
+      ],
+      "allowedTargetTypes": [
+        "Person"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "originated by",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "endpointEnforcement": "deferred",
+      "endpointDivergence": {
+        "violatingRows": 638,
+        "totalRows": 763,
+        "asOfDate": "2026-08-27",
+        "exampleRelationshipIds": [
+          "RECORD-00005_REL_018",
+          "RECORD-00020_REL_003",
+          "RECORD-00021_REL_008",
+          "RECORD-00021_REL_009",
+          "RECORD-00022_REL_003"
+        ],
+        "note": "638 of 763 current Originated By rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Originated By is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+      },
+      "directionalContradictions": {
+        "pairCount": 44,
+        "rowsInvolved": 138,
+        "asOfDate": "2026-08-27",
+        "examplePairs": [
+          {
+            "forwardId": "RECORD-00679_REL_030",
+            "forwardAssertion": "Ron Brynaert -> Does the New York Times Have a Learning Disability?",
+            "backwardId": "RECORD-00005_REL_018",
+            "backwardAssertion": "Does the New York Times Have a Learning Disability? -> Ron Brynaert"
+          },
+          {
+            "forwardId": "RECORD-00080_REL_007",
+            "forwardAssertion": "View from Nowhere -> Jay Rosen",
+            "backwardId": "RECORD-00020_REL_003",
+            "backwardAssertion": "Jay Rosen -> View from Nowhere"
+          },
+          {
+            "forwardId": "RECORD-00026_REL_011",
+            "forwardAssertion": "Verification in Reverse -> Jay Rosen",
+            "backwardId": "RECORD-00021_REL_009",
+            "backwardAssertion": "Jay Rosen -> Verification in Reverse"
+          }
+        ],
+        "note": "44 entity pairs (138 rows) currently have Originated By asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+      }
+    },
+    "Occurred At": {
+      "status": "accepted",
+      "description": "Event A occurred at location B.",
+      "allowedSourceTypes": [
+        "Event"
+      ],
+      "allowedTargetTypes": [
+        "Location"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "occurred at",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "endpointEnforcement": "deferred",
+      "endpointDivergence": {
+        "violatingRows": 143,
+        "totalRows": 252,
+        "asOfDate": "2026-08-27",
+        "exampleRelationshipIds": [
+          "RECORD-00003_REL_001",
+          "RECORD-00036_REL_001",
+          "RECORD-00079_REL_013",
+          "RECORD-00079_REL_014",
+          "RECORD-00079_REL_015"
+        ],
+        "note": "143 of 252 current Occurred At rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Occurred At is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+      },
+      "directionalContradictions": {
+        "pairCount": 2,
+        "rowsInvolved": 4,
+        "asOfDate": "2026-08-27",
+        "examplePairs": [
+          {
+            "forwardId": "RECORD-00079_REL_014",
+            "forwardAssertion": "San Francisco -> First Look Media",
+            "backwardId": "RECORD-00106_REL_005",
+            "backwardAssertion": "First Look Media -> San Francisco"
+          },
+          {
+            "forwardId": "RECORD-00813_REL_028",
+            "forwardAssertion": "Jayson Blair Scandal -> The New York Times",
+            "backwardId": "RECORD-00879_REL_005",
+            "backwardAssertion": "The New York Times -> Jayson Blair Scandal"
+          }
+        ],
+        "note": "2 entity pairs (4 rows) currently have Occurred At asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+      }
+    },
+    "Supports": {
+      "status": "accepted",
+      "description": "Entity A supports, advocates for, or defends entity B.",
+      "allowedSourceTypes": [
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Concept",
+        "Event",
+        "Organization",
+        "Person"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "interval",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "supports",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "endpointEnforcement": "deferred",
+      "endpointDivergence": {
+        "violatingRows": 23,
+        "totalRows": 291,
+        "asOfDate": "2026-08-27",
+        "exampleRelationshipIds": [
+          "RECORD-00107_REL_001",
+          "RECORD-00355_REL_003",
+          "RECORD-00446_REL_006",
+          "RECORD-00537_REL_006",
+          "RECORD-00535_REL_001"
+        ],
+        "note": "23 of 291 current Supports rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Supports is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+      },
+      "directionalContradictions": {
+        "pairCount": 8,
+        "rowsInvolved": 22,
+        "asOfDate": "2026-08-27",
+        "examplePairs": [
+          {
+            "forwardId": "RECORD-00839_REL_023",
+            "forwardAssertion": "NewAssignment.Net -> Craig Newmark",
+            "backwardId": "RECORD-00314_REL_005",
+            "backwardAssertion": "Craig Newmark -> NewAssignment.Net"
+          },
+          {
+            "forwardId": "RECORD-00839_REL_024",
+            "forwardAssertion": "NewAssignment.Net -> Sunlight Foundation",
+            "backwardId": "RECORD-00326_REL_001",
+            "backwardAssertion": "Sunlight Foundation -> NewAssignment.Net"
+          },
+          {
+            "forwardId": "RECORD-00758_REL_009",
+            "forwardAssertion": "Knight Foundation -> Membership Puzzle Project",
+            "backwardId": "RECORD-00890_REL_003",
+            "backwardAssertion": "Membership Puzzle Project -> Knight Foundation"
+          }
+        ],
+        "note": "8 entity pairs (22 rows) currently have Supports asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+      }
+    },
+    "Owns": {
+      "status": "accepted",
+      "description": "Organization or person A owns or controls organization B (media ownership, corporate structure).",
+      "allowedSourceTypes": [
+        "Organization",
+        "Person"
+      ],
+      "allowedTargetTypes": [
+        "Organization"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "interval",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "owns",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "inverseNote": "The candidate inverse label \"Owned By\" is recorded as candidateInverseType so the validator can detect when the same fact is asserted under both labels, but it is not a formal inverseType: Owned By's own endpoint ordering is inconsistent (see the Owned By entry below), so which row (if either) is correct is a pending curator decision, not something this registry asserts.",
+      "endpointEnforcement": "deferred",
+      "endpointDivergence": {
+        "violatingRows": 17,
+        "totalRows": 66,
+        "asOfDate": "2026-08-27",
+        "exampleRelationshipIds": [
+          "RECORD-00535_REL_004",
+          "RECORD-00013_REL_001",
+          "RECORD-00676_REL_003",
+          "RECORD-00690_REL_001",
+          "RECORD-00741_REL_011"
+        ],
+        "note": "17 of 66 current Owns rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Owns is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+      },
+      "candidateInverseType": "Owned By"
+    },
+    "Founded": {
+      "status": "accepted",
+      "description": "Person or organization A founded organization B. Only for creating organizations, publications as ongoing entities, or major projects, not for writing individual articles.",
+      "allowedSourceTypes": [
+        "Organization",
+        "Person"
+      ],
+      "allowedTargetTypes": [
+        "Organization"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "founded",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "inverseNote": "The candidate inverse label \"Founded By\" is recorded as candidateInverseType so the validator can detect when the same fact is asserted under both labels, but it is not a formal inverseType: Founded By's own endpoint ordering is inconsistent (see the Founded By entry below), so which row (if either) is correct is a pending curator decision, not something this registry asserts.",
+      "endpointEnforcement": "enforced",
+      "candidateInverseType": "Founded By"
+    },
+    "Pioneered": {
+      "status": "accepted",
+      "description": "Person A pioneered, invented, or was first to develop concept B.",
+      "allowedSourceTypes": [
+        "Person"
+      ],
+      "allowedTargetTypes": [
+        "Concept"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "pioneered",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "endpointEnforcement": "deferred",
+      "endpointDivergence": {
+        "violatingRows": 115,
+        "totalRows": 232,
+        "asOfDate": "2026-08-27",
+        "exampleRelationshipIds": [
+          "RECORD-00010_REL_001",
+          "RECORD-00746_REL_005",
+          "RECORD-00746_REL_006",
+          "RECORD-00012_REL_004",
+          "RECORD-00013_REL_005"
+        ],
+        "note": "115 of 232 current Pioneered rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Pioneered is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+      },
+      "directionalContradictions": {
+        "pairCount": 3,
+        "rowsInvolved": 11,
+        "asOfDate": "2026-08-27",
+        "examplePairs": [
+          {
+            "forwardId": "RECORD-00754_REL_010",
+            "forwardAssertion": "Civic Journalism -> Jay Rosen",
+            "backwardId": "RECORD-00626_REL_001",
+            "backwardAssertion": "Jay Rosen -> Civic Journalism"
+          },
+          {
+            "forwardId": "RECORD-00693_REL_019",
+            "forwardAssertion": "Radical openness with the press -> John McCain",
+            "backwardId": "RECORD-00488_REL_018",
+            "backwardAssertion": "John McCain -> Radical openness with the press"
+          },
+          {
+            "forwardId": "RECORD-00696_REL_020",
+            "forwardAssertion": "Pro-Am journalism -> OffTheBus",
+            "backwardId": "RECORD-00843_REL_016",
+            "backwardAssertion": "OffTheBus -> Pro-Am journalism"
+          }
+        ],
+        "note": "3 entity pairs (11 rows) currently have Pioneered asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+      }
+    },
+    "Inspired By": {
+      "status": "accepted",
+      "description": "Work or concept A was inspired by, influenced by, or built upon work, concept, or person B.",
+      "allowedSourceTypes": [
+        "Concept",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Concept",
+        "Person",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "inspired by",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "endpointEnforcement": "deferred",
+      "endpointDivergence": {
+        "violatingRows": 35,
+        "totalRows": 59,
+        "asOfDate": "2026-08-27",
+        "exampleRelationshipIds": [
+          "RECORD-00491_REL_001",
+          "RECORD-00660_REL_001",
+          "RECORD-00011_REL_028",
+          "RECORD-00426_REL_034",
+          "RECORD-00488_REL_003"
+        ],
+        "note": "35 of 59 current Inspired By rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Inspired By is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+      }
+    },
+    "Founded By": {
+      "status": "deferred",
+      "description": "Legacy label used as an apparent inverse of Founded (\"A Founded By B\" intended to mean B founded A).",
+      "observedSourceTypes": [
+        "Event",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "observedTargetTypes": [
+        "Event",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "directionality": null,
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "deferred",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": null,
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "deferralReason": "Endpoint ordering is inconsistent across existing assertions: the source entity is sometimes the founder and sometimes the founded organization or work. Direction, formal inverse-of-Founded status, and symmetry cannot be inferred safely from current usage and are held pending curator review (see data/graph-validation-holds.json).",
+      "relatedIssues": [
+        737
+      ],
+      "directionalContradictions": {
+        "pairCount": 7,
+        "rowsInvolved": 31,
+        "asOfDate": "2026-08-27",
+        "examplePairs": [
+          {
+            "forwardId": "RECORD-00010_REL_002",
+            "forwardAssertion": "Jay Rosen -> NewAssignment.net",
+            "backwardId": "RECORD-00010_REL_004",
+            "backwardAssertion": "NewAssignment.net -> Jay Rosen"
+          },
+          {
+            "forwardId": "RECORD-00763_REL_015",
+            "forwardAssertion": "Jay Rosen -> What Are Journalists For?",
+            "backwardId": "RECORD-00069_REL_001",
+            "backwardAssertion": "What Are Journalists For? -> Jay Rosen"
+          },
+          {
+            "forwardId": "RECORD-00501_REL_002",
+            "forwardAssertion": "PressThink -> Jay Rosen",
+            "backwardId": "RECORD-00837_REL_025",
+            "backwardAssertion": "Jay Rosen -> PressThink"
+          }
+        ],
+        "note": "7 entity pairs (31 rows) assert Founded By in both directions for the same two entities. This is the same endpoint-ordering inconsistency named in deferralReason above, made concrete."
+      }
+    },
+    "Owned By": {
+      "status": "deferred",
+      "description": "Legacy label used as an apparent inverse of Owns (\"A Owned By B\" intended to mean B owns A).",
+      "observedSourceTypes": [
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "observedTargetTypes": [
+        "Organization",
+        "Person"
+      ],
+      "directionality": null,
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "deferred",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": null,
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "deferralReason": "Endpoint ordering is inconsistent across existing assertions, matching the same issue as Founded By. Direction and formal inverse-of-Owns status are held pending curator review (see data/graph-validation-holds.json).",
+      "relatedIssues": [
+        737
+      ]
+    },
+    "Created": {
+      "status": "deferred",
+      "description": "Single legacy assertion of unclear scope relative to Founded, Originated By, and Pioneered.",
+      "observedSourceTypes": [
+        "Person"
+      ],
+      "observedTargetTypes": [
+        "Concept"
+      ],
+      "directionality": null,
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "deferred",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": null,
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "deferralReason": "Only one historical assertion exists and its intended meaning next to Founded, Originated By, and Pioneered was never curator-reviewed (see data/graph-validation-holds.json).",
+      "relatedIssues": [
+        737
+      ]
+    },
+    "Covers": {
+      "status": "deferred",
+      "description": "Single legacy assertion of unclear scope, possibly press coverage of a person by an organization.",
+      "observedSourceTypes": [
+        "Organization"
+      ],
+      "observedTargetTypes": [
+        "Person"
+      ],
+      "directionality": null,
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "deferred",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": null,
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "deferralReason": "Only one historical assertion exists and its intended meaning was never curator-reviewed (see data/graph-validation-holds.json).",
+      "relatedIssues": [
+        737
+      ]
+    },
+    "Influenced": {
+      "status": "deferred",
+      "description": "Forward, outbound counterpart to Inspired By, Expands On, and Cites: source entity had a downstream effect the target can be traced to. Documented in data/SCHEMA.md as a count-0 forward declaration.",
+      "observedSourceTypes": [],
+      "observedTargetTypes": [],
+      "directionality": null,
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "deferred",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": null,
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "deferralReason": "Valid source and target types, and whether a record itself can be the influencer, are undecided. Not yet wired into the machine-enforced extraction schema (backend/entity_extraction_schema_v3.json) or the writer allowlists, so it stays unpopulated and unenforced until issues #344 and #548 resolve.",
+      "relatedIssues": [
+        344,
+        548
+      ]
+    }
+  }
+}

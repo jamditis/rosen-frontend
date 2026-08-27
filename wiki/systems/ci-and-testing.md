@@ -22,7 +22,50 @@ Tests use Node's built-in test runner for frontend/data paths and pytest for bac
 - `npm run test:workers` — the source-discovery Worker subset.
 - `npm run test:okf` — the OKF bundle, flight-recorder, and blindfold subset.
 - `npm run preview` — local static preview at `http://127.0.0.1:8000/` by default.
-- `npm run preview:audit` — starts preview, walks key routes at mobile and desktop sizes, runs axe, and writes `preview-audit-results/`.
+- `npm run preview:audit` — starts preview, walks key routes at mobile and desktop sizes, runs axe, measures layout shift, and writes `preview-audit-results/`.
+
+The preview audit also budgets layout shift per route. It records every
+Layout Instability entry, splits each route into a hydration phase and a
+settled phase at the point the route first goes quiet, and fails the run when
+either phase goes over the budget for its route class. Budgets, baselines, and
+the route classes live in `scripts/layout-shift-budgets.js`, and the
+measurement itself in `scripts/layout-shift-probe.js`.
+
+Three test files cover it. `tests/layout-shift-budget.test.js` covers the
+budget arithmetic, `tests/layout-shift-probe.test.js` drives the quiet loop on
+a fake clock, and `tests/layout-shift-navigation.browser.test.js` drives a real
+browser to prove each route measures its own document. The browser file skips
+itself when no Playwright browser is installed.
+
+Measuring costs each route state about one second when the page settles at
+once, and up to about three and a half seconds when it keeps shifting. Over 41
+route states and three viewports that is roughly two to seven extra minutes on
+a full run.
+
+Environment switches:
+
+- `PREVIEW_AUDIT_CHROMIUM_PATH` — use a Chromium binary already on the machine.
+- `PREVIEW_AUDIT_ROUTES` — a comma-separated list of route slugs, for
+  re-measuring one route after a fix. Leave it unset for a release run.
+- `PREVIEW_AUDIT_VIEWPORT` — audit one viewport, writing under
+  `preview-audit-results/shards/<viewport>/`.
+- `PREVIEW_AUDIT_LAYOUT_SHIFT_SEED=1` — measure and write
+  `preview-audit-results/layout-shift-baseline.json` without failing on
+  budget. Use it to refresh the baseline in `scripts/layout-shift-budgets.js`.
+- `PREVIEW_AUDIT_MODULE_CACHE=1` — serve the third-party modules, fonts, and
+  images from the local mirror. Run `node scripts/mirror-audit-modules.js`
+  first. A browser that cannot reach the CDN never mounts the app, so this is
+  the only way to measure the React routes on such a machine, and it keeps CDN
+  latency out of the numbers everywhere else.
+
+### Layout shift in CI
+
+`.github/workflows/layout-shift-budget.yml` runs the audit on pull requests
+that touch the frontend or the audit itself. It mirrors the third-party
+responses, runs one job per viewport, uploads each run's results, and then
+publishes the candidate against the recorded baseline with
+`node scripts/layout-shift-delta.js`. Frontend Validation still skips the
+browser download, so the audit runs only in this workflow.
 
 The subgroup scripts are development conveniences, not the merge-coverage boundary. Frontend Validation runs for every pull request to `main` and invokes `npm test`, whose globs automatically include new root Node tests. `tests/ci-node-suite-coverage.test.js` fails if an active Node test moves outside the canonical globs, the workflow stops invoking the complete suite, or a pull-request path filter can skip it.
 

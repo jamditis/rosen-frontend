@@ -64,6 +64,83 @@ describe('component exports', () => {
 });
 
 // ============================================
+// Shared-constant resolution
+// ============================================
+
+// There is no bundler to resolve identifiers at build time, so a shared constant
+// that a module uses but never imports is only discovered when a browser reaches
+// that line -- and inside a lazily mounted route the ReferenceError is swallowed
+// by the route's error boundary, which shows a generic failure instead of naming
+// the module. That is exactly how a missing RELEVANCE_SORT import broke desktop
+// search only after a query was typed. This walks every shipped frontend module
+// and resolves the SCREAMING_SNAKE_CASE names it references -- the naming shape
+// the codebase reserves for cross-module constants -- against what the module
+// imports or declares itself.
+
+const frontendModulePaths = (dir, out = []) => {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    // dist/ is pre-built Tailwind output, not authored modules.
+    if (entry.isDirectory()) {
+      if (entry.name === 'dist' || entry.name === 'node_modules') continue;
+      frontendModulePaths(full, out);
+    } else if (entry.name.endsWith('.js') && !entry.name.startsWith('.')) {
+      out.push(full);
+    }
+  }
+  return out;
+};
+
+// Comments and string/template contents are not code, and a SCREAMING_SNAKE name
+// inside them (a SQL placeholder, a prose mention) is not a reference to resolve.
+const withoutCommentsAndStrings = (source) => source
+  .replace(/\/\*[\s\S]*?\*\//g, ' ')
+  .replace(/(^|[^:])\/\/[^\n]*/g, '$1 ')
+  .replace(/'(?:[^'\\\n]|\\.)*'/g, "''")
+  .replace(/"(?:[^"\\\n]|\\.)*"/g, '""');
+
+const SHARED_CONSTANT = /\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b/g;
+
+describe('shared constant resolution', () => {
+  it('every SCREAMING_SNAKE_CASE constant a frontend module uses is imported or declared there', () => {
+    const unresolved = [];
+
+    for (const file of frontendModulePaths(frontendDir)) {
+      const source = fs.readFileSync(file, 'utf-8');
+      const code = withoutCommentsAndStrings(source);
+      const available = new Set();
+
+      // Import clauses: default, namespace, and named bindings alike.
+      for (const match of source.matchAll(/\bimport\s+([^;]*?)\s+from\s*['"][^'"]+['"]/g)) {
+        for (const name of match[1].matchAll(/[A-Za-z_$][\w$]*/g)) available.add(name[0]);
+      }
+      for (const match of code.matchAll(/\b(?:const|let|var|function|class)\s+([A-Za-z_$][\w$]*)/g)) {
+        available.add(match[1]);
+      }
+      // Destructured module-scope bindings, e.g. `const { A_B } = opts`.
+      for (const match of code.matchAll(/\bconst\s*\{([^}]*)\}/g)) {
+        for (const name of match[1].matchAll(/[A-Za-z_$][\w$]*/g)) available.add(name[0]);
+      }
+
+      for (const match of code.matchAll(SHARED_CONSTANT)) {
+        const before = code.slice(Math.max(0, match.index - 2), match.index);
+        const after = code.slice(match.index + match[0].length);
+        // A property read (`values.SEARCH_TERM`) or an object key (`SEARCH_TERM:`)
+        // names a field, not a binding that has to resolve in this module.
+        if (/\.\s*$/.test(before)) continue;
+        if (/^\s*:/.test(after)) continue;
+        if (available.has(match[0])) continue;
+        unresolved.push(`${path.relative(rootDir, file)}: ${match[0]}`);
+      }
+    }
+
+    assert.deepStrictEqual(unresolved, [],
+      `Frontend modules reference constants they neither import nor declare, so the browser `
+      + `throws ReferenceError when the line runs: ${unresolved.join(', ')}`);
+  });
+});
+
+// ============================================
 // HTML entry point
 // ============================================
 

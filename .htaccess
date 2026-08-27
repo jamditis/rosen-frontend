@@ -99,9 +99,11 @@
     # Block unused browser capabilities by default
     Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
 
-    # Content Security Policy. Validated in-browser across every deployed route +
-    # standalone tool under this exact header (React mount, MiniSearch, sql.js,
-    # dataviz, privacy-enhanced YouTube embed) with zero violations before shipping.
+    # Content Security Policy. The React mount, MiniSearch, sql.js, dataviz, and
+    # the privacy-enhanced YouTube embed were validated in-browser across every
+    # deployed route and standalone tool, with zero violations before shipping.
+    # The semantic-search hosts (see connect-src below) were added later and are
+    # derived from the pinned transformers build, not from a live-site run.
     # script-src:
     #   'unsafe-inline'      -- the zero-build app runs inline scripts site-wide:
     #                           index.html's <script type="importmap"> plus small inline
@@ -115,6 +117,20 @@
     # style-src cdnjs.cloudflare.com -- noUiSlider stylesheet (dataviz).
     # connect-src script.google.com -- the branded report/submission endpoint (#509 fetch).
     # connect-src script.googleusercontent.com -- Apps Script ContentService redirect target.
+    # connect-src huggingface.co -- model config, tokenizer, and weights for the opt-in
+    #                           semantic search encoder (#279). Only fetched after a reader
+    #                           turns the toggle on.
+    # connect-src *.hf.co, *.huggingface.co -- huggingface.co redirects a weights download to
+    #                           whichever storage host it is using (an xet bridge today,
+    #                           cdn-lfs hosts on older repos), and a redirect is re-checked
+    #                           against connect-src. The host names are not stable enough to
+    #                           pin one by one, so the two suffixes stand in for them. Both
+    #                           are read-only model downloads the reader asked for.
+    # connect-src cdn.jsdelivr.net -- the onnxruntime-web WebAssembly binary that runs the
+    #                           encoder. jsdelivr is already in script-src for dataviz, but a
+    #                           wasm binary is fetched, not scripted, so it needs this too.
+    #                           Self-hosting the model and the wasm would let all four
+    #                           semantic-search sources go away.
     # frame-src www.youtube-nocookie.com -- Privacy-enhanced YouTube embeds.
     # frame-src www.youtube.com -- Temporary cache-rollover compatibility for
     #                           returning visitors whose 3.8.15 service worker
@@ -133,7 +149,7 @@
     #                           external image hosts), so a wider allowance only opens an
     #                           arbitrary-origin beacon path with no deployed benefit.
     # Verify HSTS at the Cloudflare/host layer before adding here (avoid duplicate header).
-    Header set Content-Security-Policy "default-src 'self'; script-src 'self' https://esm.sh https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://esm.sh https://script.google.com https://script.googleusercontent.com; frame-src https://www.youtube-nocookie.com https://www.youtube.com; img-src 'self' data: https://images.unsplash.com https://journalism.nyu.edu https://pressthink.org; object-src 'none'; base-uri 'self'; form-action 'self'"
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' https://esm.sh https://cdnjs.cloudflare.com https://cdn.jsdelivr.net 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://esm.sh https://script.google.com https://script.googleusercontent.com https://huggingface.co https://*.hf.co https://*.huggingface.co https://cdn.jsdelivr.net; frame-src https://www.youtube-nocookie.com https://www.youtube.com; img-src 'self' data: https://images.unsplash.com https://journalism.nyu.edu https://pressthink.org; object-src 'none'; base-uri 'self'; form-action 'self'"
 
     # Add cache control headers for data files
     <FilesMatch "\.(json)$">

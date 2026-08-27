@@ -1,10 +1,11 @@
-import { html } from '../html.js?v=3.8.32';
+import { html } from '../html.js?v=3.8.33';
 import { ChevronLeft, ChevronRight, FolderOpen, SearchX } from 'lucide-react';
-import { COLORS } from '../constants.js?v=3.8.32';
-import { hashString } from '../services/archiveService.js?v=3.8.32';
-import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.32';
-import { canonicalRecordUrl } from '../utils/recordDeepLink.js?v=3.8.32';
-import LoadingQuotes from './LoadingQuotes.js?v=3.8.32';
+import { COLORS } from '../constants.js?v=3.8.33';
+import { hashString } from '../services/archiveService.js?v=3.8.33';
+import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.33';
+import { LEXICAL_SIGNAL } from '../utils/searchRanking.js?v=3.8.33';
+import { canonicalRecordUrl } from '../utils/recordDeepLink.js?v=3.8.33';
+import LoadingQuotes from './LoadingQuotes.js?v=3.8.33';
 
 const Highlight = ({ text, term }) => {
   if (!term || term.length < 2) return html`<span>${text}</span>`;
@@ -34,6 +35,12 @@ const ArchiveResults = ({
   folderGroups,
   viewMode,
   searchTerm,
+  // Map of record id to its hybrid-search provenance chip: 'kw', 'sem', or
+  // 'kw·sem' (#279). Null unless semantic search is on, so a plain keyword
+  // search does not label every card. A record the ranked legs never reached
+  // still matched the typed words by substring, so it gets the keyword chip:
+  // while chips are on, every card carries one.
+  searchSignals = null,
   currentPage,
   totalPages,
   onSelectRecord,
@@ -77,6 +84,9 @@ const ArchiveResults = ({
             const primaryCategory = item.categories[0] || 'Uncategorized';
             const colorIndex = hashString(primaryCategory) % COLORS.length;
             const theme = COLORS[colorIndex];
+            const signal = searchSignals
+              ? (searchSignals.get(item.id) || LEXICAL_SIGNAL)
+              : null;
 
             return html`
               <article
@@ -108,6 +118,18 @@ const ArchiveResults = ({
                   </p>
 
                   <div className="archive-record-card__labels">
+                    ${signal && html`
+                      <span
+                        className="archive-record-card__label archive-record-card__label--signal"
+                        title=${signal === 'kw'
+                          ? 'Matched your keywords'
+                          : signal === 'sem'
+                            ? 'Matched the meaning of your words, not the words themselves'
+                            : 'Matched both your keywords and their meaning'}
+                      >
+                        ${signal}
+                      </span>
+                    `}
                     ${item.categories.slice(0, 2).map((category, index) => html`
                       <span
                         key=${category}

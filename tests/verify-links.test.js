@@ -7,6 +7,9 @@
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import {
   isWellFormedHttpUrl,
   isValidRecordUrl,
@@ -15,8 +18,12 @@ import {
   collectUrlRecords,
   buildUrlSourceMap,
   collectFeaturedUrls,
-  checkFeaturedUrlWellFormedness
+  checkFeaturedUrlWellFormedness,
+  checkExternalLiveness,
+  runExternalLivenessSweep,
+  parseArgs
 } from '../scripts/verify-links.js';
+import { loadState } from '../scripts/lib/link-check-state.js';
 
 const fixture = {
   version: 'test',
@@ -319,6 +326,140 @@ describe('collectFeaturedUrls (FEATURED_WORKS image + link hotlinks, issue #479)
   });
 });
 
+describe('checkExternalLiveness per-host circuit breaker (issue #710)', () => {
+  it('stops probing a host after maxHostFailures consecutive failures, without counting the rest as checked', async (t) => {
+    const calls = [];
+    t.mock.method(globalThis, 'fetch', async (url) => {
+      calls.push(String(url));
+      if (String(url).includes('dead.example')) return { status: 500, headers: { get: () => null } };
+      return { status: 200, headers: { get: () => null } };
+    });
+
+    const urls = [...Array.from({ length: 5 }, (_, i) => `https://dead.example/${i}`), 'https://healthy.example/a'];
+    // concurrency: 1 keeps host-failure counting deterministic -- with the
+    // default pool, several dead.example probes can race in flight before
+    // any one of them updates the breaker.
+    const result = await checkExternalLiveness(urls, { delayMs: 0, concurrency: 1, maxHostFailures: 2 });
+
+    const deadCalls = calls.filter((u) => u.includes('dead.example'));
+    assert.equal(deadCalls.length, 2, 'the breaker stops the host after 2 consecutive failures');
+    assert.equal(result.skipped.length, 3, 'the remaining dead.example urls are skipped, not probed');
+    assert.equal(result.checked, urls.length - 3, '"checked" excludes skipped urls');
+    assert.ok(calls.some((u) => u.includes('healthy.example')), 'a different host is unaffected by the breaker');
+  });
+
+  it('does not trip the breaker across different hosts', async (t) => {
+    t.mock.method(globalThis, 'fetch', async () => ({ status: 500, headers: { get: () => null } }));
+    const urls = Array.from({ length: 5 }, (_, i) => `https://host-${i}.example/x`);
+    const result = await checkExternalLiveness(urls, { delayMs: 0, maxHostFailures: 2 });
+    assert.equal(result.skipped.length, 0);
+    assert.equal(result.checked, urls.length);
+  });
+
+  it('maxHostFailures: 0 disables the breaker entirely', async (t) => {
+    t.mock.method(globalThis, 'fetch', async () => ({ status: 500, headers: { get: () => null } }));
+    const urls = Array.from({ length: 10 }, (_, i) => `https://dead.example/${i}`);
+    const result = await checkExternalLiveness(urls, { delayMs: 0, maxHostFailures: 0 });
+    assert.equal(result.skipped.length, 0);
+    assert.equal(result.checked, urls.length);
+  });
+
+  it('does not trip the breaker on ordinary redirects, so a host that canonicalizes urls keeps being probed', async (t) => {
+    // A 301/302 is a report-only finding, not a host that is failing to answer:
+    // one host canonicalizing http->https or adding a trailing slash used to
+    // exhaust its own budget after 3 redirects and get the rest of its urls
+    // skipped -- which is most of the archive's own source hosts.
+    const calls = [];
+    t.mock.method(globalThis, 'fetch', async (url) => {
+      calls.push(String(url));
+      return { status: 301, headers: { get: () => 'https://canonical.example/moved' } };
+    });
+
+    const urls = Array.from({ length: 6 }, (_, i) => `https://canonical.example/${i}`);
+    const result = await checkExternalLiveness(urls, { delayMs: 0, concurrency: 1, maxHostFailures: 3 });
+
+    assert.equal(calls.length, urls.length, 'every url on the redirecting host is still probed');
+    assert.equal(result.skipped.length, 0, 'redirects never exhaust a host budget');
+    assert.equal(result.checked, urls.length);
+    assert.equal(result.findings.length, urls.length, 'each redirect is still reported as a finding');
+    assert.ok(result.findings.every((f) => f.failureType === 'redirect_url'));
+  });
+
+  it('counts a real failure that follows redirects on the same host', async (t) => {
+    // Redirects must not reset the counter into uselessness either: a host
+    // that redirects and then genuinely dies still trips the breaker.
+    const statuses = [301, 301, 500, 500, 500, 200];
+    let i = 0;
+    t.mock.method(globalThis, 'fetch', async () => ({
+      status: statuses[i++],
+      headers: { get: () => null }
+    }));
+
+    const urls = Array.from({ length: 6 }, (_, j) => `https://mixed.example/${j}`);
+    const result = await checkExternalLiveness(urls, { delayMs: 0, concurrency: 1, maxHostFailures: 3 });
+
+    assert.equal(result.skipped.length, 1, 'the 3 server errors still exhaust the host');
+    assert.equal(result.checked, urls.length - 1);
+  });
+
+  it('a recovered probe on a host resets its consecutive-failure count', async (t) => {
+    const statuses = [500, 200, 500, 500];
+    let i = 0;
+    t.mock.method(globalThis, 'fetch', async () => ({ status: statuses[i++], headers: { get: () => null } }));
+    const urls = Array.from({ length: 4 }, (_, j) => `https://flaky.example/${j}`);
+    const result = await checkExternalLiveness(urls, { delayMs: 0, concurrency: 1, maxHostFailures: 2 });
+    // fail, ok (resets count), fail, fail -> never reaches 2 CONSECUTIVE failures.
+    assert.equal(result.skipped.length, 0);
+    assert.equal(result.checked, urls.length);
+  });
+});
+
+describe('runExternalLivenessSweep (main() wiring: load -> select -> probe -> record -> save)', () => {
+  function tempStatePath() {
+    return path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'verify-links-sweep-')), 'state.json');
+  }
+
+  it('persists progress to a real state file across two sweeps, the way two scheduled runs would see each other', async (t) => {
+    t.mock.method(globalThis, 'fetch', async () => ({ status: 200, headers: { get: () => null } }));
+
+    const urlRecords = Array.from({ length: 12 }, (_, i) => ({ id: `R${i}`, url: `https://example.com/${i}` }));
+    const stateFile = tempStatePath();
+
+    const run1 = await runExternalLivenessSweep({ featuredUrls: [], urlRecords, stateFile, max: 4, now: Date.now(), liveness: { delayMs: 0 } });
+    assert.equal(run1.external.checked, 4);
+
+    const afterRun1 = loadState(stateFile);
+    assert.equal(Object.keys(afterRun1.urls).length, 4, 'run 1 wrote 4 checked urls to the real state file');
+
+    await runExternalLivenessSweep({ featuredUrls: [], urlRecords, stateFile, max: 4, now: Date.now() + 1000, liveness: { delayMs: 0 } });
+    const afterRun2 = loadState(stateFile);
+    assert.equal(Object.keys(afterRun2.urls).length, 8, "run 2 read run 1's file back and advanced past it");
+  });
+
+  it('does not mark a url skipped by the per-host breaker as healthy in the saved state', async (t) => {
+    t.mock.method(globalThis, 'fetch', async () => ({ status: 503, headers: { get: () => null } }));
+
+    const urlRecords = Array.from({ length: 5 }, (_, i) => ({ id: `R${i}`, url: `https://dead.example/${i}` }));
+    const stateFile = tempStatePath();
+
+    await runExternalLivenessSweep({
+      featuredUrls: [],
+      urlRecords,
+      stateFile,
+      max: 5,
+      now: Date.now(),
+      liveness: { concurrency: 1, maxHostFailures: 2, delayMs: 0 }
+    });
+
+    const state = loadState(stateFile);
+    // Only the 2 urls actually probed before the breaker tripped are recorded;
+    // the other 3 must be entirely absent from state, not stamped "ok".
+    const recorded = Object.values(state.urls);
+    assert.equal(recorded.length, 2, 'urls the breaker skipped are not recorded at all -- they stay due');
+    for (const entry of recorded) assert.equal(entry.lastStatus, 'failing');
+  });
+});
+
 describe('checkFeaturedUrlWellFormedness', () => {
   it('passes absolute http(s) hotlinks and flags anything else', () => {
     const featuredUrls = [
@@ -349,5 +490,67 @@ describe('checkFeaturedUrlWellFormedness', () => {
   it('returns no findings for an all-clean set', () => {
     const featuredUrls = [{ id: 'feat-1 (image)', url: 'https://images.unsplash.com/photo' }];
     assert.deepEqual(checkFeaturedUrlWellFormedness(featuredUrls), []);
+  });
+});
+
+describe('verify-links CLI argument parsing', () => {
+  it('rejects a non-numeric --concurrency instead of silently starting no workers', () => {
+    assert.throws(() => parseArgs(['--concurrency', 'abc']), /--concurrency must be a positive integer/);
+  });
+
+  it('rejects a zero or negative --concurrency', () => {
+    assert.throws(() => parseArgs(['--concurrency', '0']), /--concurrency must be a positive integer/);
+    assert.throws(() => parseArgs(['--concurrency', '-1']), /--concurrency must be a positive integer/);
+  });
+
+  it('rejects a fractional --concurrency rather than truncating it silently', () => {
+    assert.throws(() => parseArgs(['--concurrency', '1.5']), /--concurrency must be a positive integer/);
+  });
+
+  it('rejects a --concurrency with no value instead of parsing undefined as NaN', () => {
+    assert.throws(() => parseArgs(['--concurrency']), /--concurrency requires a value/);
+    assert.throws(() => parseArgs(['--external', '--concurrency']), /--concurrency requires a value/);
+  });
+
+  it('accepts a well-formed --concurrency', () => {
+    assert.equal(parseArgs(['--concurrency', '4']).concurrency, 4);
+  });
+
+  it('leaves concurrency undefined when the flag is absent, so the library default applies', () => {
+    assert.equal(parseArgs(['--external']).concurrency, undefined);
+  });
+
+  it('validates the other numeric flags that share the same NaN hazard', () => {
+    assert.throws(() => parseArgs(['--max', 'abc']), /--max must be a positive integer/);
+    assert.throws(() => parseArgs(['--timeout-ms', '0']), /--timeout-ms must be a positive integer/);
+    // 0 is a documented, meaningful value for these two: it disables the
+    // breaker and the inter-request delay respectively.
+    assert.equal(parseArgs(['--max-host-failures', '0']).maxHostFailures, 0);
+    assert.equal(parseArgs(['--delay-ms', '0']).delayMs, 0);
+    assert.throws(() => parseArgs(['--max-host-failures', '-1']), /--max-host-failures must be a non-negative integer/);
+    assert.throws(() => parseArgs(['--delay-ms', 'abc']), /--delay-ms must be a non-negative integer/);
+  });
+
+  it('rejects a value-taking flag left at the end of argv', () => {
+    assert.throws(() => parseArgs(['--out']), /--out requires a value/);
+    assert.throws(() => parseArgs(['--state-file']), /--state-file requires a value/);
+  });
+});
+
+describe('checkExternalLiveness worker-pool guard', () => {
+  it('refuses a concurrency that would start no workers, rather than reporting unprobed urls as checked', async (t) => {
+    // The dangerous shape: no worker ever runs, `skipped` stays empty, so
+    // `checked` equals every target and runExternalLivenessSweep persists the
+    // whole slice as healthy without a single request having been made.
+    const fetchMock = t.mock.method(globalThis, 'fetch', async () => ({ status: 200, headers: { get: () => null } }));
+    const urls = ['https://example.com/a', 'https://example.com/b'];
+
+    for (const concurrency of [Number.NaN, 0, -1, 1.5]) {
+      await assert.rejects(
+        () => checkExternalLiveness(urls, { delayMs: 0, concurrency }),
+        /concurrency must be a positive integer/
+      );
+    }
+    assert.equal(fetchMock.mock.callCount(), 0);
   });
 });

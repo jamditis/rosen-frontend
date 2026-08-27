@@ -1,0 +1,1719 @@
+{
+  "source_id": "wayback-cdx",
+  "source_name": "Wayback Machine capture index for archive.pressthink.org (2004-2008)",
+  "provenance": "https://web.archive.org/cdx/search/cdx?url=archive.pressthink.org*&collapse=urlkey&fl=original,timestamp,mimetype,statuscode,digest&filter=statuscode:200&filter=mimetype:text/html",
+  "retrieved_at": "2026-08-27",
+  "coverage_note": "every distinct dated post url the Wayback Machine captured with a 200 html response; urls only, no titles, so only the url tier can run against it. It reads the same crawl as the monthly index, so it is not an independent source",
+  "entries": [
+    {
+      "url": "http://archive.pressthink.org/2004/01/03/inside_baseball.html",
+      "date": "2004-01-03",
+      "evidence": "https://web.archive.org/web/20100922083536/http://archive.pressthink.org:80/2004/01/03/inside_baseball.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/01/07/press_religion.html",
+      "date": "2004-01-07",
+      "evidence": "https://web.archive.org/web/20100924162404/http://archive.pressthink.org:80/2004/01/07/press_religion.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/01/10/reporter_adopt.html",
+      "date": "2004-01-10",
+      "evidence": "https://web.archive.org/web/20110727184955/http://archive.pressthink.org/2004/01/10/reporter_adopt.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/01/13/interview_gans.html",
+      "date": "2004-01-13",
+      "evidence": "https://web.archive.org/web/20110811212711/http://archive.pressthink.org/2004/01/13/interview_gans.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/01/14/watch_sites.html",
+      "date": "2004-01-14",
+      "evidence": "https://web.archive.org/web/20110811220551/http://archive.pressthink.org/2004/01/14/watch_sites.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/01/19/dean_primer.html",
+      "date": "2004-01-19",
+      "evidence": "https://web.archive.org/web/20110811215115/http://archive.pressthink.org/2004/01/19/dean_primer.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/01/21/iowa_campbell.html",
+      "date": "2004-01-21",
+      "evidence": "https://web.archive.org/web/20110811205354/http://archive.pressthink.org/2004/01/21/iowa_campbell.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/01/23/davos_masses.html",
+      "date": "2004-01-23",
+      "evidence": "https://web.archive.org/web/20110714061852/http://archive.pressthink.org:80/2004/01/23/davos_masses.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/01/23/press_player.html",
+      "date": "2004-01-23",
+      "evidence": "https://web.archive.org/web/20100924162710/http://archive.pressthink.org:80/2004/01/23/press_player.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/01/25/davos_sketch.html",
+      "date": "2004-01-25",
+      "evidence": "https://web.archive.org/web/20101028144934/http://archive.pressthink.org:80/2004/01/25/davos_sketch.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/01/28/cowles_speech.html",
+      "date": "2004-01-28",
+      "evidence": "https://web.archive.org/web/20111019070234/http://archive.pressthink.org/2004/01/28/cowles_speech.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/01/29/blitzer_loser.html",
+      "date": "2004-01-29",
+      "evidence": "https://web.archive.org/web/20110811221622/http://archive.pressthink.org/2004/01/29/blitzer_loser.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/01/29/nangle_dissent.html",
+      "date": "2004-01-29",
+      "evidence": "https://web.archive.org/web/20111019150137/http://archive.pressthink.org/2004/01/29/nangle_dissent.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/02/07/crash_site.html",
+      "date": "2004-02-07",
+      "evidence": "https://web.archive.org/web/20110811215251/http://archive.pressthink.org/2004/02/07/crash_site.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/02/12/point_trippi.html",
+      "date": "2004-02-12",
+      "evidence": "https://web.archive.org/web/20110310172139/http://archive.pressthink.org:80/2004/02/12/point_trippi.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/02/14/reuters_wrong.html",
+      "date": "2004-02-14",
+      "evidence": "https://web.archive.org/web/20110309050520/http://archive.pressthink.org:80/2004/02/14/reuters_wrong.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/02/17/campaign_desk.html",
+      "date": "2004-02-17",
+      "evidence": "https://web.archive.org/web/20110811205858/http://archive.pressthink.org/2004/02/17/campaign_desk.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/02/23/gopnik_time.html",
+      "date": "2004-02-23",
+      "evidence": "https://web.archive.org/web/20100924162202/http://archive.pressthink.org:80/2004/02/23/gopnik_time.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/02/25/roth_reply.html",
+      "date": "2004-02-25",
+      "evidence": "https://web.archive.org/web/20110811204249/http://archive.pressthink.org/2004/02/25/roth_reply.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/02/29/off_grid.html",
+      "date": "2004-02-29",
+      "evidence": "https://web.archive.org/web/20100924162409/http://archive.pressthink.org:80/2004/02/29/off_grid.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/03/08/weblog_demos.html",
+      "date": "2004-03-08",
+      "evidence": "https://web.archive.org/web/20100924162414/http://archive.pressthink.org:80/2004/03/08/weblog_demos.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/03/09/cjr_job.html",
+      "date": "2004-03-09",
+      "evidence": "https://web.archive.org/web/20110811205132/http://archive.pressthink.org/2004/03/09/cjr_job.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/03/10/politics_lull.html",
+      "date": "2004-03-10",
+      "evidence": "https://web.archive.org/web/20110505183745/http://archive.pressthink.org:80/2004/03/10/politics_lull.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/03/15/lott_case.html",
+      "date": "2004-03-15",
+      "evidence": "https://web.archive.org/web/20110429020837/http://archive.pressthink.org:80/2004/03/15/lott_case.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/03/17/patterico_wins.html",
+      "date": "2004-03-17",
+      "evidence": "https://web.archive.org/web/20110430104822/http://archive.pressthink.org:80/2004/03/17/patterico_wins.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/03/20/die_strategy.html",
+      "date": "2004-03-20",
+      "evidence": "https://web.archive.org/web/20100924162719/http://archive.pressthink.org:80/2004/03/20/die_strategy.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/03/25/con_prep.html",
+      "date": "2004-03-25",
+      "evidence": "https://web.archive.org/web/20100920203516/http://archive.pressthink.org:80/2004/03/25/con_prep.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/03/25/neil_tribute.html",
+      "date": "2004-03-25",
+      "evidence": "https://web.archive.org/web/20110721185043/http://archive.pressthink.org/2004/03/25/neil_tribute.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/03/31/ryan_video.html",
+      "date": "2004-03-31",
+      "evidence": "https://web.archive.org/web/20110727184649/http://archive.pressthink.org/2004/03/31/ryan_video.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/04/07/atrios_kos.html",
+      "date": "2004-04-07",
+      "evidence": "https://web.archive.org/web/20110714062429/http://archive.pressthink.org:80/2004/04/07/atrios_kos.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/04/13/bush_live.html",
+      "date": "2004-04-13",
+      "evidence": "https://web.archive.org/web/20110529073633/http://archive.pressthink.org:80/2004/04/13/bush_live.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/04/16/con_prelude.html",
+      "date": "2004-04-16",
+      "evidence": "https://web.archive.org/web/20101001121856/http://archive.pressthink.org:80/2004/04/16/con_prelude.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/04/20/prsa_ryan.html",
+      "date": "2004-04-20",
+      "evidence": "https://web.archive.org/web/20110811214348/http://archive.pressthink.org/2004/04/20/prsa_ryan.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/04/25/bush_muscle.html",
+      "date": "2004-04-25",
+      "evidence": "https://web.archive.org/web/20101027113626/http://archive.pressthink.org:80/2004/04/25/bush_muscle.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/04/29/q_and_a.html",
+      "date": "2004-04-29",
+      "evidence": "https://web.archive.org/web/20100921153850/http://archive.pressthink.org:80/2004/04/29/q_and_a.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/05/01/koppel_statement.html",
+      "date": "2004-05-01",
+      "evidence": "https://web.archive.org/web/20110811202647/http://archive.pressthink.org/2004/05/01/koppel_statement.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/05/10/murrow_bettag.html",
+      "date": "2004-05-10",
+      "evidence": "https://web.archive.org/web/20110811215730/http://archive.pressthink.org/2004/05/10/murrow_bettag.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/05/16/berg_video.html",
+      "date": "2004-05-16",
+      "evidence": "https://web.archive.org/web/20111019065317/http://archive.pressthink.org/2004/05/16/berg_video.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/05/21/burns_war.html",
+      "date": "2004-05-21",
+      "evidence": "https://web.archive.org/web/20111019135900/http://archive.pressthink.org/2004/05/21/burns_war.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/05/22/qa_bias.html",
+      "date": "2004-05-22",
+      "evidence": "https://web.archive.org/web/20111019135527/http://archive.pressthink.org/2004/05/22/qa_bias.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/05/26/iraq_story.html",
+      "date": "2004-05-26",
+      "evidence": "https://web.archive.org/web/20100924162425/http://archive.pressthink.org:80/2004/05/26/iraq_story.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/05/29/lee_note.html",
+      "date": "2004-05-29",
+      "evidence": "https://web.archive.org/web/20110811220308/http://archive.pressthink.org/2004/05/29/lee_note.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/05/31/quarter_mil.html",
+      "date": "2004-05-31",
+      "evidence": "https://web.archive.org/web/20110811205807/http://archive.pressthink.org/2004/05/31/quarter_mil.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/06/04/ruten_milbank.html",
+      "date": "2004-06-04",
+      "evidence": "https://web.archive.org/web/20100924162435/http://archive.pressthink.org:80/2004/06/04/ruten_milbank.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/06/09/reagan_words.html",
+      "date": "2004-06-09",
+      "evidence": "https://web.archive.org/web/20110811205811/http://archive.pressthink.org/2004/06/09/reagan_words.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/06/17/bias_ward.html",
+      "date": "2004-06-17",
+      "evidence": "https://web.archive.org/web/20110811220321/http://archive.pressthink.org/2004/06/17/bias_ward.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/06/23/reality_bush.html",
+      "date": "2004-06-23",
+      "evidence": "https://web.archive.org/web/20101121052846/http://archive.pressthink.org:80/2004/06/23/reality_bush.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/06/28/gates_blog.html",
+      "date": "2004-06-28",
+      "evidence": "https://web.archive.org/web/20111019153050/http://archive.pressthink.org/2004/06/28/gates_blog.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/07/02/rather_time.html",
+      "date": "2004-07-02",
+      "evidence": "https://web.archive.org/web/20110714014026/http://archive.pressthink.org:80/2004/07/02/rather_time.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/07/07/blog_boston.html",
+      "date": "2004-07-07",
+      "evidence": "https://web.archive.org/web/20100924162730/http://archive.pressthink.org:80/2004/07/07/blog_boston.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/07/12/after_spin.html",
+      "date": "2004-07-12",
+      "evidence": "https://web.archive.org/web/20110714014056/http://archive.pressthink.org:80/2004/07/12/after_spin.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/07/16/revealer_forum.html",
+      "date": "2004-07-16",
+      "evidence": "https://web.archive.org/web/20100924162735/http://archive.pressthink.org:80/2004/07/16/revealer_forum.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/07/19/jones_thin.html",
+      "date": "2004-07-19",
+      "evidence": "https://web.archive.org/web/20110429092750/http://archive.pressthink.org:80/2004/07/19/jones_thin.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/07/21/mailer_con.html",
+      "date": "2004-07-21",
+      "evidence": "https://web.archive.org/web/20110424045608/http://archive.pressthink.org:80/2004/07/21/mailer_con.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/07/22/bos_update.html",
+      "date": "2004-07-22",
+      "evidence": "https://web.archive.org/web/20110429090520/http://archive.pressthink.org:80/2004/07/22/bos_update.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/07/23/kleb_shot.html",
+      "date": "2004-07-23",
+      "evidence": "https://web.archive.org/web/20111019142427/http://archive.pressthink.org/2004/07/23/kleb_shot.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/07/23/wknd_bos.html",
+      "date": "2004-07-23",
+      "evidence": "https://web.archive.org/web/20111019141448/http://archive.pressthink.org/2004/07/23/wknd_bos.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/07/25/nwsdy_bos.html",
+      "date": "2004-07-25",
+      "evidence": "https://web.archive.org/web/20100924161913/http://archive.pressthink.org:80/2004/07/25/nwsdy_bos.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/07/26/bos_monday.html",
+      "date": "2004-07-26",
+      "evidence": "https://web.archive.org/web/20111019141634/http://archive.pressthink.org/2004/07/26/bos_monday.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/07/28/con_wisdom.html",
+      "date": "2004-07-28",
+      "evidence": "https://web.archive.org/web/20111019073909/http://archive.pressthink.org/2004/07/28/con_wisdom.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/07/29/edsall_blogs.html",
+      "date": "2004-07-29",
+      "evidence": "https://web.archive.org/web/20111019142300/http://archive.pressthink.org/2004/07/29/edsall_blogs.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/07/29/guide_speech.html",
+      "date": "2004-07-29",
+      "evidence": "https://web.archive.org/web/20111019142155/http://archive.pressthink.org/2004/07/29/guide_speech.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/07/30/queda_came.html",
+      "date": "2004-07-30",
+      "evidence": "https://web.archive.org/web/20111019141649/http://archive.pressthink.org/2004/07/30/queda_came.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/02/bos_debrief.html",
+      "date": "2004-08-02",
+      "evidence": "https://web.archive.org/web/20111019151309/http://archive.pressthink.org/2004/08/02/bos_debrief.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/02/debrief_one.html",
+      "date": "2004-08-02",
+      "evidence": "https://web.archive.org/web/20111019144705/http://archive.pressthink.org/2004/08/02/debrief_one.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/03/ep_column.html",
+      "date": "2004-08-03",
+      "evidence": "https://web.archive.org/web/20111019144442/http://archive.pressthink.org/2004/08/03/ep_column.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/05/dnc_dbrf2.html",
+      "date": "2004-08-05",
+      "evidence": "https://web.archive.org/web/20111019144512/http://archive.pressthink.org/2004/08/05/dnc_dbrf2.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/08/unity_dc.html",
+      "date": "2004-08-08",
+      "evidence": "https://web.archive.org/web/20110916031350/http://archive.pressthink.org:80/2004/08/08/unity_dc.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/09/unity_letters.html",
+      "date": "2004-08-09",
+      "evidence": "https://web.archive.org/web/20111019144828/http://archive.pressthink.org/2004/08/09/unity_letters.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/10/unity_prez.html",
+      "date": "2004-08-10",
+      "evidence": "https://web.archive.org/web/20111019144218/http://archive.pressthink.org/2004/08/10/unity_prez.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/11/heaton_unity.html",
+      "date": "2004-08-11",
+      "evidence": "https://web.archive.org/web/20111019151356/http://archive.pressthink.org/2004/08/11/heaton_unity.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/12/unity_gonzalez.html",
+      "date": "2004-08-12",
+      "evidence": "https://web.archive.org/web/20111019144629/http://archive.pressthink.org/2004/08/12/unity_gonzalez.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/13/after_911.html",
+      "date": "2004-08-13",
+      "evidence": "https://web.archive.org/web/20111019143208/http://archive.pressthink.org/2004/08/13/after_911.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/19/911_react.html",
+      "date": "2004-08-19",
+      "evidence": "https://web.archive.org/web/20110916001511/http://archive.pressthink.org:80/2004/08/19/911_react.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/23/swift_sad.html",
+      "date": "2004-08-23",
+      "evidence": "https://web.archive.org/web/20110530025727/http://archive.pressthink.org:80/2004/08/23/swift_sad.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/24/sky_intro.html",
+      "date": "2004-08-24",
+      "evidence": "https://web.archive.org/web/20110915032917/http://archive.pressthink.org:80/2004/08/24/sky_intro.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/26/conv_sec.html",
+      "date": "2004-08-26",
+      "evidence": "https://web.archive.org/web/20111019151347/http://archive.pressthink.org/2004/08/26/conv_sec.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/27/rnc_jitter.html",
+      "date": "2004-08-27",
+      "evidence": "https://web.archive.org/web/20111019151757/http://archive.pressthink.org/2004/08/27/rnc_jitter.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/27/rnc_theatre.html",
+      "date": "2004-08-27",
+      "evidence": "https://web.archive.org/web/20111019144457/http://archive.pressthink.org/2004/08/27/rnc_theatre.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/30/rnc_red.html",
+      "date": "2004-08-30",
+      "evidence": "https://web.archive.org/web/20111019151602/http://archive.pressthink.org/2004/08/30/rnc_red.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/31/cnn_rnc.html",
+      "date": "2004-08-31",
+      "evidence": "https://web.archive.org/web/20111019144439/http://archive.pressthink.org/2004/08/31/cnn_rnc.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/09/01/swift_rnc.html",
+      "date": "2004-09-01",
+      "evidence": "https://web.archive.org/web/20110706091656/http://archive.pressthink.org:80/2004/09/01/swift_rnc.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/09/02/rnc_2008.html",
+      "date": "2004-09-02",
+      "evidence": "https://web.archive.org/web/20111019153054/http://archive.pressthink.org/2004/09/02/rnc_2008.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/09/10/herald_rules.html",
+      "date": "2004-09-10",
+      "evidence": "https://web.archive.org/web/20110811214011/http://archive.pressthink.org/2004/09/10/herald_rules.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/09/11/cbs_docs.html",
+      "date": "2004-09-11",
+      "evidence": "https://web.archive.org/web/20110811195742/http://archive.pressthink.org/2004/09/11/cbs_docs.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/09/14/legacy_time.html",
+      "date": "2004-09-14",
+      "evidence": "https://web.archive.org/web/20110420001245/http://archive.pressthink.org:80/2004/09/14/legacy_time.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/09/15/get_win.html",
+      "date": "2004-09-15",
+      "evidence": "https://web.archive.org/web/20110811195706/http://archive.pressthink.org/2004/09/15/get_win.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/09/18/cbs_theatre.html",
+      "date": "2004-09-18",
+      "evidence": "https://web.archive.org/web/20110502075600/http://archive.pressthink.org:80/2004/09/18/cbs_theatre.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/09/20/rather_bulletin.html",
+      "date": "2004-09-20",
+      "evidence": "https://web.archive.org/web/20110727185017/http://archive.pressthink.org/2004/09/20/rather_bulletin.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/09/22/gour_talk.html",
+      "date": "2004-09-22",
+      "evidence": "https://web.archive.org/web/20100924162739/http://archive.pressthink.org:80/2004/09/22/gour_talk.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/09/24/cbs_comm.html",
+      "date": "2004-09-24",
+      "evidence": "https://web.archive.org/web/20110402090128/http://archive.pressthink.org:80/2004/09/24/cbs_comm.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/09/28/four_years.html",
+      "date": "2004-09-28",
+      "evidence": "https://web.archive.org/web/20110811215836/http://archive.pressthink.org/2004/09/28/four_years.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/09/29/spun_miami.html",
+      "date": "2004-09-29",
+      "evidence": "https://web.archive.org/web/20110811220516/http://archive.pressthink.org/2004/09/29/spun_miami.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/10/01/lehrer_deb.html",
+      "date": "2004-10-01",
+      "evidence": "https://web.archive.org/web/20101119123539/http://archive.pressthink.org/2004/10/01/lehrer_deb.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/10/02/coleman_hit.html",
+      "date": "2004-10-02",
+      "evidence": "https://web.archive.org/web/20101119123536/http://archive.pressthink.org/2004/10/02/coleman_hit.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/10/04/satullo_view.html",
+      "date": "2004-10-04",
+      "evidence": "https://web.archive.org/web/20100924161918/http://archive.pressthink.org:80/2004/10/04/satullo_view.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/10/08/cs_respond.html",
+      "date": "2004-10-08",
+      "evidence": "https://web.archive.org/web/20101119123526/http://archive.pressthink.org/2004/10/08/cs_respond.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/10/08/e_fassihi.html",
+      "date": "2004-10-08",
+      "evidence": "https://web.archive.org/web/20101119123522/http://archive.pressthink.org/2004/10/08/e_fassihi.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/10/09/kerry_deal.html",
+      "date": "2004-10-09",
+      "evidence": "https://web.archive.org/web/20101119123518/http://archive.pressthink.org/2004/10/09/kerry_deal.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/10/13/sinclair_acts.html",
+      "date": "2004-10-13",
+      "evidence": "https://web.archive.org/web/20101119123512/http://archive.pressthink.org/2004/10/13/sinclair_acts.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/10/16/sinclair_ctd.html",
+      "date": "2004-10-16",
+      "evidence": "https://web.archive.org/web/20101119123508/http://archive.pressthink.org/2004/10/16/sinclair_ctd.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/10/19/more_sbg.html",
+      "date": "2004-10-19",
+      "evidence": "https://web.archive.org/web/20101119123504/http://archive.pressthink.org/2004/10/19/more_sbg.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/10/21/air_sbg.html",
+      "date": "2004-10-21",
+      "evidence": "https://web.archive.org/web/20101119123500/http://archive.pressthink.org/2004/10/21/air_sbg.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/10/23/strain_pol.html",
+      "date": "2004-10-23",
+      "evidence": "https://web.archive.org/web/20101119123455/http://archive.pressthink.org/2004/10/23/strain_pol.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/10/29/mcgill_essay.html",
+      "date": "2004-10-29",
+      "evidence": "https://web.archive.org/web/20101119123451/http://archive.pressthink.org/2004/10/29/mcgill_essay.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/10/31/elec_wknd.html",
+      "date": "2004-10-31",
+      "evidence": "https://web.archive.org/web/20101119123444/http://archive.pressthink.org/2004/10/31/elec_wknd.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/11/01/wein_traub.html",
+      "date": "2004-11-01",
+      "evidence": "https://web.archive.org/web/20101119123440/http://archive.pressthink.org/2004/11/01/wein_traub.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/11/02/qts_ed.html",
+      "date": "2004-11-02",
+      "evidence": "https://web.archive.org/web/20101119123436/http://archive.pressthink.org/2004/11/02/qts_ed.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/11/03/op_press.html",
+      "date": "2004-11-03",
+      "evidence": "https://web.archive.org/web/20101119123432/http://archive.pressthink.org/2004/11/03/op_press.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/11/06/ntc_cont.html",
+      "date": "2004-11-06",
+      "evidence": "https://web.archive.org/web/20101119123429/http://archive.pressthink.org/2004/11/06/ntc_cont.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/11/07/con_stanford.html",
+      "date": "2004-11-07",
+      "evidence": "https://web.archive.org/web/20101119123425/http://archive.pressthink.org/2004/11/07/con_stanford.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/11/08/ijj_la.html",
+      "date": "2004-11-08",
+      "evidence": "https://web.archive.org/web/20101119123421/http://archive.pressthink.org/2004/11/08/ijj_la.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/11/09/welch_react.html",
+      "date": "2004-11-09",
+      "evidence": "https://web.archive.org/web/20101119123417/http://archive.pressthink.org/2004/11/09/welch_react.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/11/11/siegal_mem.html",
+      "date": "2004-11-11",
+      "evidence": "https://web.archive.org/web/20101119123412/http://archive.pressthink.org/2004/11/11/siegal_mem.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/11/13/ona_live.html",
+      "date": "2004-11-13",
+      "evidence": "https://web.archive.org/web/20101119123408/http://archive.pressthink.org/2004/11/13/ona_live.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/11/16/snclr_vision.html",
+      "date": "2004-11-16",
+      "evidence": "https://web.archive.org/web/20101119123404/http://archive.pressthink.org/2004/11/16/snclr_vision.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/11/17/shaw_rply.html",
+      "date": "2004-11-17",
+      "evidence": "https://web.archive.org/web/20101119123359/http://archive.pressthink.org/2004/11/17/shaw_rply.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/11/23/rather_exit.html",
+      "date": "2004-11-23",
+      "evidence": "https://web.archive.org/web/20101119123351/http://archive.pressthink.org/2004/11/23/rather_exit.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/11/23/weldn_mv.html",
+      "date": "2004-11-23",
+      "evidence": "https://web.archive.org/web/20101119123355/http://archive.pressthink.org/2004/11/23/weldn_mv.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/11/29/loser_bgmd.html",
+      "date": "2004-11-29",
+      "evidence": "https://web.archive.org/web/20101119123346/http://archive.pressthink.org/2004/11/29/loser_bgmd.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/12/01/glaser_co.html",
+      "date": "2004-12-01",
+      "evidence": "https://web.archive.org/web/20101119123340/http://archive.pressthink.org/2004/12/01/glaser_co.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/12/02/rect_glsr.html",
+      "date": "2004-12-02",
+      "evidence": "https://web.archive.org/web/20101119123335/http://archive.pressthink.org/2004/12/02/rect_glsr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/12/07/bkmn_cfc.html",
+      "date": "2004-12-07",
+      "evidence": "https://web.archive.org/web/20101119123330/http://archive.pressthink.org/2004/12/07/bkmn_cfc.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/12/09/spn_stone.html",
+      "date": "2004-12-09",
+      "evidence": "https://web.archive.org/web/20101119123326/http://archive.pressthink.org/2004/12/09/spn_stone.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/12/10/cbs_lstn.html",
+      "date": "2004-12-10",
+      "evidence": "https://web.archive.org/web/20101119123322/http://archive.pressthink.org/2004/12/10/cbs_lstn.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/12/15/berk_olav.html",
+      "date": "2004-12-15",
+      "evidence": "https://web.archive.org/web/20101119123318/http://archive.pressthink.org/2004/12/15/berk_olav.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/12/18/grns_nr.html",
+      "date": "2004-12-18",
+      "evidence": "https://web.archive.org/web/20101028100054/http://archive.pressthink.org:80/2004/12/18/grns_nr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/12/21/grnsbr_flw.html",
+      "date": "2004-12-21",
+      "evidence": "https://web.archive.org/web/20101026231741/http://archive.pressthink.org:80/2004/12/21/grnsbr_flw.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/12/26/tptn04_intro.html",
+      "date": "2004-12-26",
+      "evidence": "https://web.archive.org/web/20101119123302/http://archive.pressthink.org/2004/12/26/tptn04_intro.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/12/28/tptn04_opsc.html",
+      "date": "2004-12-28",
+      "evidence": "https://web.archive.org/web/20101119123258/http://archive.pressthink.org/2004/12/28/tptn04_opsc.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/12/28/zack_grnsbr.html",
+      "date": "2004-12-28",
+      "evidence": "https://web.archive.org/web/20101119123253/http://archive.pressthink.org/2004/12/28/zack_grnsbr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/12/29/tp04_lctr.html",
+      "date": "2004-12-29",
+      "evidence": "https://web.archive.org/web/20100924161923/http://archive.pressthink.org:80/2004/12/29/tp04_lctr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/01/01/tptn_cntr.html",
+      "date": "2005-01-01",
+      "evidence": "https://web.archive.org/web/20101119123243/http://archive.pressthink.org/2005/01/01/tptn_cntr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/01/04/lex_report.html",
+      "date": "2005-01-04",
+      "evidence": "https://web.archive.org/web/20101119123234/http://archive.pressthink.org/2005/01/04/lex_report.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/01/04/tptn_good.html",
+      "date": "2005-01-04",
+      "evidence": "https://web.archive.org/web/20101119123238/http://archive.pressthink.org/2005/01/04/tptn_good.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/01/07/wldm_perm.html",
+      "date": "2005-01-07",
+      "evidence": "https://web.archive.org/web/20101119123230/http://archive.pressthink.org/2005/01/07/wldm_perm.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/01/10/cbs_rept05.html",
+      "date": "2005-01-10",
+      "evidence": "https://web.archive.org/web/20101119123227/http://archive.pressthink.org/2005/01/10/cbs_rept05.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/01/12/rathr_ltr.html",
+      "date": "2005-01-12",
+      "evidence": "https://web.archive.org/web/20101119123220/http://archive.pressthink.org/2005/01/12/rathr_ltr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/01/19/ktch_pr.html",
+      "date": "2005-01-19",
+      "evidence": "https://web.archive.org/web/20101119123216/http://archive.pressthink.org/2005/01/19/ktch_pr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/01/20/stn_ktc.html",
+      "date": "2005-01-20",
+      "evidence": "https://web.archive.org/web/20101119123212/http://archive.pressthink.org/2005/01/20/stn_ktc.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/01/21/berk_essy.html",
+      "date": "2005-01-21",
+      "evidence": "https://web.archive.org/web/20100924161928/http://archive.pressthink.org:80/2005/01/21/berk_essy.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/01/22/ktc_live.html",
+      "date": "2005-01-22",
+      "evidence": "https://web.archive.org/web/20101119123200/http://archive.pressthink.org/2005/01/22/ktc_live.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/01/23/bjc_after.html",
+      "date": "2005-01-23",
+      "evidence": "https://web.archive.org/web/20101119123156/http://archive.pressthink.org/2005/01/23/bjc_after.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/01/26/bkm_iii.html",
+      "date": "2005-01-26",
+      "evidence": "https://web.archive.org/web/20101119123150/http://archive.pressthink.org/2005/01/26/bkm_iii.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/01/26/bkm_two.html",
+      "date": "2005-01-26",
+      "evidence": "https://web.archive.org/web/20101119123146/http://archive.pressthink.org/2005/01/26/bkm_two.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/01/26/brkm_own.html",
+      "date": "2005-01-26",
+      "evidence": "https://web.archive.org/web/20101119123141/http://archive.pressthink.org/2005/01/26/brkm_own.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/01/28/arch_fwp.html",
+      "date": "2005-01-28",
+      "evidence": "https://web.archive.org/web/20101119123135/http://archive.pressthink.org/2005/01/28/arch_fwp.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/01/29/shf_pbl.html",
+      "date": "2005-01-29",
+      "evidence": "https://web.archive.org/web/20101119123130/http://archive.pressthink.org/2005/01/29/shf_pbl.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/02/01/akin_int.html",
+      "date": "2005-02-01",
+      "evidence": "https://web.archive.org/web/20101119123125/http://archive.pressthink.org/2005/02/01/akin_int.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/02/03/sbxr_bx.html",
+      "date": "2005-02-03",
+      "evidence": "https://web.archive.org/web/20101119123120/http://archive.pressthink.org/2005/02/03/sbxr_bx.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/02/04/book_anc.html",
+      "date": "2005-02-04",
+      "evidence": "https://web.archive.org/web/20101119123117/http://archive.pressthink.org/2005/02/04/book_anc.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/02/05/jdn_note.html",
+      "date": "2005-02-05",
+      "evidence": "https://web.archive.org/web/20101119123112/http://archive.pressthink.org/2005/02/05/jdn_note.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/02/06/jdn_pol.html",
+      "date": "2005-02-06",
+      "evidence": "https://web.archive.org/web/20101119123108/http://archive.pressthink.org/2005/02/06/jdn_pol.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/02/07/samb_esn.html",
+      "date": "2005-02-07",
+      "evidence": "https://web.archive.org/web/20101119123103/http://archive.pressthink.org/2005/02/07/samb_esn.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/02/10/jrd_qust.html",
+      "date": "2005-02-10",
+      "evidence": "https://web.archive.org/web/20101119123059/http://archive.pressthink.org/2005/02/10/jrd_qust.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/02/11/esn_res.html",
+      "date": "2005-02-11",
+      "evidence": "https://web.archive.org/web/20101119123054/http://archive.pressthink.org/2005/02/11/esn_res.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/02/13/colr_jrd.html",
+      "date": "2005-02-13",
+      "evidence": "https://web.archive.org/web/20101006210125/http://archive.pressthink.org:80/2005/02/13/colr_jrd.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/02/14/jdn_ltr.html",
+      "date": "2005-02-14",
+      "evidence": "https://web.archive.org/web/20101119123045/http://archive.pressthink.org/2005/02/14/jdn_ltr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/02/18/mcg_glcl.html",
+      "date": "2005-02-18",
+      "evidence": "https://web.archive.org/web/20101119123041/http://archive.pressthink.org/2005/02/18/mcg_glcl.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/02/20/abt_nyt.html",
+      "date": "2005-02-20",
+      "evidence": "https://web.archive.org/web/20101119123036/http://archive.pressthink.org/2005/02/20/abt_nyt.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/02/23/abt_ltrs.html",
+      "date": "2005-02-23",
+      "evidence": "https://web.archive.org/web/20101119123032/http://archive.pressthink.org/2005/02/23/abt_ltrs.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/02/25/wht_prss.html",
+      "date": "2005-02-25",
+      "evidence": "https://web.archive.org/web/20101119123027/http://archive.pressthink.org/2005/02/25/wht_prss.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/03/01/svd_kpln.html",
+      "date": "2005-03-01",
+      "evidence": "https://web.archive.org/web/20100924161933/http://archive.pressthink.org:80/2005/03/01/svd_kpln.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/03/04/wht_flwp.html",
+      "date": "2005-03-04",
+      "evidence": "https://web.archive.org/web/20101119123016/http://archive.pressthink.org/2005/03/04/wht_flwp.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/03/06/nw_jrlsm.html",
+      "date": "2005-03-06",
+      "evidence": "https://web.archive.org/web/20101119123011/http://archive.pressthink.org/2005/03/06/nw_jrlsm.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/03/08/nlsn_blg.html",
+      "date": "2005-03-08",
+      "evidence": "https://web.archive.org/web/20101119123006/http://archive.pressthink.org/2005/03/08/nlsn_blg.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/03/10/ktz_dscd.html",
+      "date": "2005-03-10",
+      "evidence": "https://web.archive.org/web/20101119123002/http://archive.pressthink.org/2005/03/10/ktz_dscd.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/03/14/kmng_pwr.html",
+      "date": "2005-03-14",
+      "evidence": "https://web.archive.org/web/20101119122956/http://archive.pressthink.org/2005/03/14/kmng_pwr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/03/21/be_press.html",
+      "date": "2005-03-21",
+      "evidence": "https://web.archive.org/web/20101119122950/http://archive.pressthink.org/2005/03/21/be_press.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/03/24/bu_res.html",
+      "date": "2005-03-24",
+      "evidence": "https://web.archive.org/web/20101119122946/http://archive.pressthink.org/2005/03/24/bu_res.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/03/29/nwsp_dwn.html",
+      "date": "2005-03-29",
+      "evidence": "https://web.archive.org/web/20100924162222/http://archive.pressthink.org:80/2005/03/29/nwsp_dwn.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/03/31/tnn_vs.html",
+      "date": "2005-03-31",
+      "evidence": "https://web.archive.org/web/20101119122935/http://archive.pressthink.org/2005/03/31/tnn_vs.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/04/05/ctz_pckt.html",
+      "date": "2005-04-05",
+      "evidence": "https://web.archive.org/web/20101119122929/http://archive.pressthink.org/2005/04/05/ctz_pckt.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/04/11/clg_out.html",
+      "date": "2005-04-11",
+      "evidence": "https://web.archive.org/web/20101119122925/http://archive.pressthink.org/2005/04/11/clg_out.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/04/14/gru_int.html",
+      "date": "2005-04-14",
+      "evidence": "https://web.archive.org/web/20101006210130/http://archive.pressthink.org:80/2005/04/14/gru_int.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/04/17/ltr_rgm.html",
+      "date": "2005-04-17",
+      "evidence": "https://web.archive.org/web/20101119122918/http://archive.pressthink.org/2005/04/17/ltr_rgm.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/04/19/clm_ltr.html",
+      "date": "2005-04-19",
+      "evidence": "https://web.archive.org/web/20101119122912/http://archive.pressthink.org/2005/04/19/clm_ltr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/04/21/nol_stnd.html",
+      "date": "2005-04-21",
+      "evidence": "https://web.archive.org/web/20101119122907/http://archive.pressthink.org/2005/04/21/nol_stnd.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/04/24/ptr_ror.html",
+      "date": "2005-04-24",
+      "evidence": "https://web.archive.org/web/20101119122903/http://archive.pressthink.org/2005/04/24/ptr_ror.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/04/25/tp_ltrs.html",
+      "date": "2005-04-25",
+      "evidence": "https://web.archive.org/web/20101119122859/http://archive.pressthink.org/2005/04/25/tp_ltrs.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/04/27/mig_nwsp.html",
+      "date": "2005-04-27",
+      "evidence": "https://web.archive.org/web/20100926213343/http://archive.pressthink.org:80/2005/04/27/mig_nwsp.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/05/02/mig_dev.html",
+      "date": "2005-05-02",
+      "evidence": "https://web.archive.org/web/20101119122850/http://archive.pressthink.org/2005/05/02/mig_dev.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/05/03/strp_wh.html",
+      "date": "2005-05-03",
+      "evidence": "https://web.archive.org/web/20101119122847/http://archive.pressthink.org/2005/05/03/strp_wh.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/05/06/deak_lc.html",
+      "date": "2005-05-06",
+      "evidence": "https://web.archive.org/web/20101119122842/http://archive.pressthink.org/2005/05/06/deak_lc.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/05/08/rutt_evo.html",
+      "date": "2005-05-08",
+      "evidence": "https://web.archive.org/web/20101119122838/http://archive.pressthink.org/2005/05/08/rutt_evo.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/05/11/steve_smith.html",
+      "date": "2005-05-11",
+      "evidence": "https://web.archive.org/web/20101119122832/http://archive.pressthink.org/2005/05/11/steve_smith.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/05/13/okrt_prs.html",
+      "date": "2005-05-13",
+      "evidence": "https://web.archive.org/web/20101119122806/http://archive.pressthink.org/2005/05/13/okrt_prs.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/05/17/nwsk_err.html",
+      "date": "2005-05-17",
+      "evidence": "https://web.archive.org/web/20101119122802/http://archive.pressthink.org/2005/05/17/nwsk_err.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/05/22/trst_nwsk.html",
+      "date": "2005-05-22",
+      "evidence": "https://web.archive.org/web/20101119122815/http://archive.pressthink.org/2005/05/22/trst_nwsk.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/05/26/drm_qsts.html",
+      "date": "2005-05-26",
+      "evidence": "https://web.archive.org/web/20101119122834/http://archive.pressthink.org/2005/05/26/drm_qsts.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/06/05/wtrg_js.html",
+      "date": "2005-06-05",
+      "evidence": "https://web.archive.org/web/20101119122839/http://archive.pressthink.org/2005/06/05/wtrg_js.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/06/10/frkn_nro.html",
+      "date": "2005-06-10",
+      "evidence": "https://web.archive.org/web/20101119122844/http://archive.pressthink.org/2005/06/10/frkn_nro.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/06/15/rsf_awd.html",
+      "date": "2005-06-15",
+      "evidence": "https://web.archive.org/web/20101119122849/http://archive.pressthink.org/2005/06/15/rsf_awd.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/06/19/dwn_mmo.html",
+      "date": "2005-06-19",
+      "evidence": "https://web.archive.org/web/20101119122852/http://archive.pressthink.org/2005/06/19/dwn_mmo.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/06/28/malr_blg.html",
+      "date": "2005-06-28",
+      "evidence": "https://web.archive.org/web/20101119122857/http://archive.pressthink.org/2005/06/28/malr_blg.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/07/02/sprm_crt.html",
+      "date": "2005-07-02",
+      "evidence": "https://web.archive.org/web/20101119122901/http://archive.pressthink.org/2005/07/02/sprm_crt.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/07/07/novk_ch.html",
+      "date": "2005-07-07",
+      "evidence": "https://web.archive.org/web/20101119122905/http://archive.pressthink.org/2005/07/07/novk_ch.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/07/16/rll_back.html",
+      "date": "2005-07-16",
+      "evidence": "https://web.archive.org/web/20100924162507/http://archive.pressthink.org:80/2005/07/16/rll_back.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/07/21/schl_jsc.html",
+      "date": "2005-07-21",
+      "evidence": "https://web.archive.org/web/20101119122914/http://archive.pressthink.org/2005/07/21/schl_jsc.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/07/27/blg_hrcf.html",
+      "date": "2005-07-27",
+      "evidence": "https://web.archive.org/web/20101119122919/http://archive.pressthink.org/2005/07/27/blg_hrcf.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/07/31/blgh_rep.html",
+      "date": "2005-07-31",
+      "evidence": "https://web.archive.org/web/20100924162233/http://archive.pressthink.org:80/2005/07/31/blgh_rep.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/08/05/nvk_strm.html",
+      "date": "2005-08-05",
+      "evidence": "https://web.archive.org/web/20101119122927/http://archive.pressthink.org/2005/08/05/nvk_strm.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/08/14/sant_jrl.html",
+      "date": "2005-08-14",
+      "evidence": "https://web.archive.org/web/20101119122931/http://archive.pressthink.org/2005/08/14/sant_jrl.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/08/19/ab_rlfwd.html",
+      "date": "2005-08-19",
+      "evidence": "https://web.archive.org/web/20101119122938/http://archive.pressthink.org/2005/08/19/ab_rlfwd.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/08/23/opn_thrd.html",
+      "date": "2005-08-23",
+      "evidence": "https://web.archive.org/web/20101119122943/http://archive.pressthink.org/2005/08/23/opn_thrd.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/08/31/gn_fshg.html",
+      "date": "2005-08-31",
+      "evidence": "https://web.archive.org/web/20101119122948/http://archive.pressthink.org/2005/08/31/gn_fshg.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/09/09/ktr_aft.html",
+      "date": "2005-09-09",
+      "evidence": "https://web.archive.org/web/20101119122953/http://archive.pressthink.org/2005/09/09/ktr_aft.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/09/16/opn_ltr.html",
+      "date": "2005-09-16",
+      "evidence": "https://web.archive.org/web/20101119122959/http://archive.pressthink.org/2005/09/16/opn_ltr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/09/22/tms_slct.html",
+      "date": "2005-09-22",
+      "evidence": "https://web.archive.org/web/20100924205634/http://archive.pressthink.org:80/2005/09/22/tms_slct.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/09/29/msm_blgr.html",
+      "date": "2005-09-29",
+      "evidence": "https://web.archive.org/web/20100924162238/http://archive.pressthink.org:80/2005/09/29/msm_blgr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/10/02/jd_mllrt.html",
+      "date": "2005-10-02",
+      "evidence": "https://web.archive.org/web/20101119123014/http://archive.pressthink.org/2005/10/02/jd_mllrt.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/10/04/tms_pst.html",
+      "date": "2005-10-04",
+      "evidence": "https://web.archive.org/web/20101119123019/http://archive.pressthink.org/2005/10/04/tms_pst.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/10/10/shmr_nyt.html",
+      "date": "2005-10-10",
+      "evidence": "https://web.archive.org/web/20101119123024/http://archive.pressthink.org/2005/10/10/shmr_nyt.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/10/12/spec_mlr.html",
+      "date": "2005-10-12",
+      "evidence": "https://web.archive.org/web/20101119123030/http://archive.pressthink.org/2005/10/12/spec_mlr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/10/14/nc_mlr.html",
+      "date": "2005-10-14",
+      "evidence": "https://web.archive.org/web/20101119123034/http://archive.pressthink.org/2005/10/14/nc_mlr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/10/15/mlr_act.html",
+      "date": "2005-10-15",
+      "evidence": "https://web.archive.org/web/20101119123038/http://archive.pressthink.org/2005/10/15/mlr_act.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/10/19/hwd_era.html",
+      "date": "2005-10-19",
+      "evidence": "https://web.archive.org/web/20101119123043/http://archive.pressthink.org/2005/10/19/hwd_era.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/10/21/brk_pt.html",
+      "date": "2005-10-21",
+      "evidence": "https://web.archive.org/web/20101119123052/http://archive.pressthink.org/2005/10/21/brk_pt.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/10/21/jm_clrc.html",
+      "date": "2005-10-21",
+      "evidence": "https://web.archive.org/web/20101119123047/http://archive.pressthink.org/2005/10/21/jm_clrc.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/10/31/bry_tmsm.html",
+      "date": "2005-10-31",
+      "evidence": "https://web.archive.org/web/20101119123057/http://archive.pressthink.org/2005/10/31/bry_tmsm.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/11/05/jd_spjm.html",
+      "date": "2005-11-05",
+      "evidence": "https://web.archive.org/web/20101119123101/http://archive.pressthink.org/2005/11/05/jd_spjm.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/11/14/lw_h2tn.html",
+      "date": "2005-11-14",
+      "evidence": "https://web.archive.org/web/20101119123106/http://archive.pressthink.org/2005/11/14/lw_h2tn.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/11/23/spk_ss.html",
+      "date": "2005-11-23",
+      "evidence": "https://web.archive.org/web/20101119123110/http://archive.pressthink.org/2005/11/23/spk_ss.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/11/30/lz_bcfc.html",
+      "date": "2005-11-30",
+      "evidence": "https://web.archive.org/web/20101119123114/http://archive.pressthink.org/2005/11/30/lz_bcfc.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/12/09/wdwd_grk.html",
+      "date": "2005-12-09",
+      "evidence": "https://web.archive.org/web/20100924162248/http://archive.pressthink.org:80/2005/12/09/wdwd_grk.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/12/13/frm_qa.html",
+      "date": "2005-12-13",
+      "evidence": "https://web.archive.org/web/20101119123122/http://archive.pressthink.org/2005/12/13/frm_qa.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/12/17/jb_ldfr.html",
+      "date": "2005-12-17",
+      "evidence": "https://web.archive.org/web/20100924162815/http://archive.pressthink.org:80/2005/12/17/jb_ldfr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/12/19/fr_rply.html",
+      "date": "2005-12-19",
+      "evidence": "https://web.archive.org/web/20101119123132/http://archive.pressthink.org/2005/12/19/fr_rply.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2005/12/24/spy_nyt.html",
+      "date": "2005-12-24",
+      "evidence": "https://web.archive.org/web/20101119123137/http://archive.pressthink.org/2005/12/24/spy_nyt.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/01/01/clm_nsa.html",
+      "date": "2006-01-01",
+      "evidence": "https://web.archive.org/web/20101119123143/http://archive.pressthink.org/2006/01/01/clm_nsa.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/01/05/wv_rtwg.html",
+      "date": "2006-01-05",
+      "evidence": "https://web.archive.org/web/20101119123147/http://archive.pressthink.org/2006/01/05/wv_rtwg.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/01/09/cnn_wv.html",
+      "date": "2006-01-09",
+      "evidence": "https://web.archive.org/web/20101119123152/http://archive.pressthink.org/2006/01/09/cnn_wv.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/01/16/gl_brsta.html",
+      "date": "2006-01-16",
+      "evidence": "https://web.archive.org/web/20101015015343/http://archive.pressthink.org:80/2006/01/16/gl_brsta.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/01/20/jmb_qa.html",
+      "date": "2006-01-20",
+      "evidence": "https://web.archive.org/web/20101009023148/http://archive.pressthink.org:80/2006/01/20/jmb_qa.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/01/24/end_hwl.html",
+      "date": "2006-01-24",
+      "evidence": "https://web.archive.org/web/20101119123208/http://archive.pressthink.org/2006/01/24/end_hwl.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/01/30/ams_intro.html",
+      "date": "2006-01-30",
+      "evidence": "https://web.archive.org/web/20101119123213/http://archive.pressthink.org/2006/01/30/ams_intro.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/02/06/blu_plt.html",
+      "date": "2006-02-06",
+      "evidence": "https://web.archive.org/web/20101119123218/http://archive.pressthink.org/2006/02/06/blu_plt.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/02/16/chn_ftz.html",
+      "date": "2006-02-16",
+      "evidence": "https://web.archive.org/web/20101119123222/http://archive.pressthink.org/2006/02/16/chn_ftz.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/03/01/bps_launch.html",
+      "date": "2006-03-01",
+      "evidence": "https://web.archive.org/web/20101005014516/http://archive.pressthink.org:80/2006/03/01/bps_launch.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/03/13/sder_blogs.html",
+      "date": "2006-03-13",
+      "evidence": "https://web.archive.org/web/20101019015620/http://archive.pressthink.org:80/2006/03/13/sder_blogs.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/03/17/nwsp_natr.html",
+      "date": "2006-03-17",
+      "evidence": "https://web.archive.org/web/20101119123235/http://archive.pressthink.org/2006/03/17/nwsp_natr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/03/24/bd_wapo.html",
+      "date": "2006-03-24",
+      "evidence": "https://web.archive.org/web/20101119123239/http://archive.pressthink.org/2006/03/24/bd_wapo.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/04/04/kllr_trsp.html",
+      "date": "2006-04-04",
+      "evidence": "https://web.archive.org/web/20101003110947/http://archive.pressthink.org:80/2006/04/04/kllr_trsp.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/04/09/waas_now.html",
+      "date": "2006-04-09",
+      "evidence": "https://web.archive.org/web/20100921194005/http://archive.pressthink.org:80/2006/04/09/waas_now.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/04/20/mcl_rlbk.html",
+      "date": "2006-04-20",
+      "evidence": "https://web.archive.org/web/20101003110855/http://archive.pressthink.org:80/2006/04/20/mcl_rlbk.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/04/26/cmts_fxd.html",
+      "date": "2006-04-26",
+      "evidence": "https://web.archive.org/web/20101119123300/http://archive.pressthink.org/2006/04/26/cmts_fxd.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/04/28/snow_rlb.html",
+      "date": "2006-04-28",
+      "evidence": "https://web.archive.org/web/20100927225632/http://archive.pressthink.org:80/2006/04/28/snow_rlb.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/05/07/snw_goss.html",
+      "date": "2006-05-07",
+      "evidence": "https://web.archive.org/web/20101119123310/http://archive.pressthink.org/2006/05/07/snw_goss.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/05/13/gagl_sn.html",
+      "date": "2006-05-13",
+      "evidence": "https://web.archive.org/web/20101119123315/http://archive.pressthink.org/2006/05/13/gagl_sn.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/05/18/snw_brief.html",
+      "date": "2006-05-18",
+      "evidence": "https://web.archive.org/web/20101119123320/http://archive.pressthink.org/2006/05/18/snw_brief.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/06/02/pray_phl.html",
+      "date": "2006-06-02",
+      "evidence": "https://web.archive.org/web/20101025024955/http://archive.pressthink.org/2006/06/02/pray_phl.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/06/22/blgrc_iv.html",
+      "date": "2006-06-22",
+      "evidence": "https://web.archive.org/web/20100922083546/http://archive.pressthink.org:80/2006/06/22/blgrc_iv.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/06/22/knsds_bc4.html",
+      "date": "2006-06-22",
+      "evidence": "https://web.archive.org/web/20101025024944/http://archive.pressthink.org/2006/06/22/knsds_bc4.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/06/27/ppl_frmr.html",
+      "date": "2006-06-27",
+      "evidence": "https://web.archive.org/web/20100924162000/http://archive.pressthink.org:80/2006/06/27/ppl_frmr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/07/07/clsf_war.html",
+      "date": "2006-07-07",
+      "evidence": "https://web.archive.org/web/20100929131137/http://archive.pressthink.org/2006/07/07/clsf_war.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/07/14/free_fbs.html",
+      "date": "2006-07-14",
+      "evidence": "https://web.archive.org/web/20101017090935/http://archive.pressthink.org:80/2006/07/14/free_fbs.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/07/25/nadn_qa.html",
+      "date": "2006-07-25",
+      "evidence": "https://web.archive.org/web/20100924162253/http://archive.pressthink.org:80/2006/07/25/nadn_qa.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/07/28/nadn_pt2.html",
+      "date": "2006-07-28",
+      "evidence": "https://web.archive.org/web/20101119123357/http://archive.pressthink.org/2006/07/28/nadn_pt2.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/08/04/nicl_am.html",
+      "date": "2006-08-04",
+      "evidence": "https://web.archive.org/web/20101119123402/http://archive.pressthink.org/2006/08/04/nicl_am.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/08/05/blg_tbl.html",
+      "date": "2006-08-05",
+      "evidence": "https://web.archive.org/web/20101119123406/http://archive.pressthink.org/2006/08/05/blg_tbl.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/08/08/pl_bass.html",
+      "date": "2006-08-08",
+      "evidence": "https://web.archive.org/web/20100925201201/http://archive.pressthink.org:80/2006/08/08/pl_bass.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/08/11/na_mrpbl.html",
+      "date": "2006-08-11",
+      "evidence": "https://web.archive.org/web/20101119123414/http://archive.pressthink.org/2006/08/11/na_mrpbl.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/08/15/ear_ntw.html",
+      "date": "2006-08-15",
+      "evidence": "https://web.archive.org/web/20101119123419/http://archive.pressthink.org/2006/08/15/ear_ntw.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/08/27/na_jrnl.html",
+      "date": "2006-08-27",
+      "evidence": "https://web.archive.org/web/20101119123423/http://archive.pressthink.org/2006/08/27/na_jrnl.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/09/07/slt_gift.html",
+      "date": "2006-09-07",
+      "evidence": "https://web.archive.org/web/20101119123427/http://archive.pressthink.org/2006/09/07/slt_gift.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/09/20/rts_gft.html",
+      "date": "2006-09-20",
+      "evidence": "https://web.archive.org/web/20101119123430/http://archive.pressthink.org/2006/09/20/rts_gft.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/10/04/slashdot_reader.html",
+      "date": "2006-10-04",
+      "evidence": "https://web.archive.org/web/20101119123434/http://archive.pressthink.org/2006/10/04/slashdot_reader.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/10/07/sunlights_new.html",
+      "date": "2006-10-07",
+      "evidence": "https://web.archive.org/web/20101119123438/http://archive.pressthink.org/2006/10/07/sunlights_new.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/10/31/harper_basen.html",
+      "date": "2006-10-31",
+      "evidence": "https://web.archive.org/web/20101119123442/http://archive.pressthink.org/2006/10/31/harper_basen.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/11/02/pppp_ancr.html",
+      "date": "2006-11-02",
+      "evidence": "https://web.archive.org/web/20101119123446/http://archive.pressthink.org/2006/11/02/pppp_ancr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/11/13/john_mcquade.html",
+      "date": "2006-11-13",
+      "evidence": "https://web.archive.org/web/20101119123453/http://archive.pressthink.org/2006/11/13/john_mcquade.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/11/14/ptwo_mcquaid.html",
+      "date": "2006-11-14",
+      "evidence": "https://web.archive.org/web/20101119123458/http://archive.pressthink.org/2006/11/14/ptwo_mcquaid.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/11/22/harris_vande.html",
+      "date": "2006-11-22",
+      "evidence": "https://web.archive.org/web/20101119123502/http://archive.pressthink.org/2006/11/22/harris_vande.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/12/06/harris_q_a.html",
+      "date": "2006-12-06",
+      "evidence": "https://web.archive.org/web/20101119123506/http://archive.pressthink.org/2006/12/06/harris_q_a.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/12/15/newspaper_chain.html",
+      "date": "2006-12-15",
+      "evidence": "https://web.archive.org/web/20101101035152/http://archive.pressthink.org:80/2006/12/15/newspaper_chain.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2006/12/18/suskind_empiricism.html",
+      "date": "2006-12-18",
+      "evidence": "https://web.archive.org/web/20100924162532/http://archive.pressthink.org:80/2006/12/18/suskind_empiricism.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/01/01/placeblogger_com.html",
+      "date": "2007-01-01",
+      "evidence": "https://web.archive.org/web/20101010034540/http://archive.pressthink.org/2007/01/01/placeblogger_com.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/01/09/warbloggers_ap.html",
+      "date": "2007-01-09",
+      "evidence": "https://web.archive.org/web/20101010034552/http://archive.pressthink.org/2007/01/09/warbloggers_ap.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/03/09/libby_fdl.html",
+      "date": "2007-03-09",
+      "evidence": "https://web.archive.org/web/20100924162303/http://archive.pressthink.org:80/2007/03/09/libby_fdl.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/03/14/az_announce.html",
+      "date": "2007-03-14",
+      "evidence": "https://web.archive.org/web/20101119123534/http://archive.pressthink.org/2007/03/14/az_announce.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/03/19/az_helpwtd.html",
+      "date": "2007-03-19",
+      "evidence": "https://web.archive.org/web/20101119123538/http://archive.pressthink.org/2007/03/19/az_helpwtd.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/03/27/huffpost_nan.html",
+      "date": "2007-03-27",
+      "evidence": "https://web.archive.org/web/20101119123541/http://archive.pressthink.org/2007/03/27/huffpost_nan.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/03/29/porter_mclellan.html",
+      "date": "2007-03-29",
+      "evidence": "https://web.archive.org/web/20111019151818/http://archive.pressthink.org/2007/03/29/porter_mclellan.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/05/01/when_fairness_r.html",
+      "date": "2007-05-01",
+      "evidence": "https://web.archive.org/web/20111019153004/http://archive.pressthink.org/2007/05/01/when_fairness_r.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/05/07/az_update.html",
+      "date": "2007-05-07",
+      "evidence": "https://web.archive.org/web/20111019150716/http://archive.pressthink.org/2007/05/07/az_update.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/05/08/lewis_reply.html",
+      "date": "2007-05-08",
+      "evidence": "https://web.archive.org/web/20101117070846/http://archive.pressthink.org:80/2007/05/08/lewis_reply.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/05/17/interview_week.html",
+      "date": "2007-05-17",
+      "evidence": "https://web.archive.org/web/20101120015551/http://archive.pressthink.org:80/2007/05/17/interview_week.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/05/21/kurtz_interview.html",
+      "date": "2007-05-21",
+      "evidence": "https://web.archive.org/web/20110811220446/http://archive.pressthink.org/2007/05/21/kurtz_interview.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/05/31/when_the_press.html",
+      "date": "2007-05-31",
+      "evidence": "https://web.archive.org/web/20110412231648/http://archive.pressthink.org:80/2007/05/31/when_the_press.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/06/04/currmudgeon_nh.html",
+      "date": "2007-06-04",
+      "evidence": "https://web.archive.org/web/20100924162308/http://archive.pressthink.org:80/2007/06/04/currmudgeon_nh.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/06/15/idea_race08.html",
+      "date": "2007-06-15",
+      "evidence": "https://web.archive.org/web/20110412231508/http://archive.pressthink.org:80/2007/06/15/idea_race08.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/06/19/otb_amze.html",
+      "date": "2007-06-19",
+      "evidence": "https://web.archive.org/web/20110811220456/http://archive.pressthink.org/2007/06/19/otb_amze.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/06/27/mother_jones.html",
+      "date": "2007-06-27",
+      "evidence": "https://web.archive.org/web/20110811214429/http://archive.pressthink.org/2007/06/27/mother_jones.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/07/09/qa_surowiecki.html",
+      "date": "2007-07-09",
+      "evidence": "https://web.archive.org/web/20110811200203/http://archive.pressthink.org/2007/07/09/qa_surowiecki.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/07/20/az_otb.html",
+      "date": "2007-07-20",
+      "evidence": "https://web.archive.org/web/20101119005001/http://archive.pressthink.org:80/2007/07/20/az_otb.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/07/31/newinf_bus.html",
+      "date": "2007-07-31",
+      "evidence": "https://web.archive.org/web/20100924162314/http://archive.pressthink.org:80/2007/07/31/newinf_bus.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/08/03/yearly_kos_note.html",
+      "date": "2007-08-03",
+      "evidence": "https://web.archive.org/web/20110811203235/http://archive.pressthink.org/2007/08/03/yearly_kos_note.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/08/05/yrkos_press.html",
+      "date": "2007-08-05",
+      "evidence": "https://web.archive.org/web/20110131112232/http://archive.pressthink.org:80/2007/08/05/yrkos_press.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/08/14/rove_and_press.html",
+      "date": "2007-08-14",
+      "evidence": "https://web.archive.org/web/20100924162319/http://archive.pressthink.org:80/2007/08/14/rove_and_press.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/08/20/my_advice_retir.html",
+      "date": "2007-08-20",
+      "evidence": "https://web.archive.org/web/20110811204009/http://archive.pressthink.org/2007/08/20/my_advice_retir.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/08/21/help_make_my_bl.html",
+      "date": "2007-08-21",
+      "evidence": "https://web.archive.org/web/20110811220111/http://archive.pressthink.org/2007/08/21/help_make_my_bl.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/08/22/blowback_the_jo.html",
+      "date": "2007-08-22",
+      "evidence": "https://web.archive.org/web/20110514070706/http://archive.pressthink.org:80/2007/08/22/blowback_the_jo.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/09/04/grnwl_rove.html",
+      "date": "2007-09-04",
+      "evidence": "https://web.archive.org/web/20110914195723/http://archive.pressthink.org:80/2007/09/04/grnwl_rove.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/09/12/savage_nrrt.html",
+      "date": "2007-09-12",
+      "evidence": "https://web.archive.org/web/20111019080621/http://archive.pressthink.org/2007/09/12/savage_nrrt.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/09/14/a_letter_arrive.html",
+      "date": "2007-09-14",
+      "evidence": "https://web.archive.org/web/20101109133402/http://archive.pressthink.org/2007/09/14/a_letter_arrive.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/09/18/rip_times_selec.html",
+      "date": "2007-09-18",
+      "evidence": "https://web.archive.org/web/20101109133348/http://archive.pressthink.org/2007/09/18/rip_times_selec.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/09/21/rather.html",
+      "date": "2007-09-21",
+      "evidence": "https://web.archive.org/web/20101109133328/http://archive.pressthink.org/2007/09/21/rather.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/10/09/what_i_learned.html",
+      "date": "2007-10-09",
+      "evidence": "https://web.archive.org/web/20100924162329/http://archive.pressthink.org:80/2007/10/09/what_i_learned.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/10/18/site_coordinates.html",
+      "date": "2007-10-18",
+      "evidence": "https://web.archive.org/web/20101109133343/http://archive.pressthink.org/2007/10/18/site_coordinates.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/11/01/beat_reporting.html",
+      "date": "2007-11-01",
+      "evidence": "https://web.archive.org/web/20101109133357/http://archive.pressthink.org/2007/11/01/beat_reporting.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/11/11/cleveland.html",
+      "date": "2007-11-11",
+      "evidence": "https://web.archive.org/web/20100929131204/http://archive.pressthink.org/2007/11/11/cleveland.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/11/14/beat_reps.html",
+      "date": "2007-11-14",
+      "evidence": "https://web.archive.org/web/20100929130627/http://archive.pressthink.org/2007/11/14/beat_reps.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/11/25/mcclellan_stg.html",
+      "date": "2007-11-25",
+      "evidence": "https://web.archive.org/web/20100929131216/http://archive.pressthink.org/2007/11/25/mcclellan_stg.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2007/12/29/conservative_el.html",
+      "date": "2007-12-29",
+      "evidence": "https://web.archive.org/web/20110811205043/http://archive.pressthink.org/2007/12/29/conservative_el.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/01/20/the_campaign_pr.html",
+      "date": "2008-01-20",
+      "evidence": "https://web.archive.org/web/20100922083627/http://archive.pressthink.org:80/2008/01/20/the_campaign_pr.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/02/21/some_riddles_qu.html",
+      "date": "2008-02-21",
+      "evidence": "https://web.archive.org/web/20110424045613/http://archive.pressthink.org:80/2008/02/21/some_riddles_qu.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/02/25/cliff_notes_ver.html",
+      "date": "2008-02-25",
+      "evidence": "https://web.archive.org/web/20110811220158/http://archive.pressthink.org/2008/02/25/cliff_notes_ver.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/02/25/hoyt_keller.html",
+      "date": "2008-02-25",
+      "evidence": "https://web.archive.org/web/20110717100240/http://archive.pressthink.org:80/2008/02/25/hoyt_keller.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/02/28/three_bizarre_v.html",
+      "date": "2008-02-28",
+      "evidence": "https://web.archive.org/web/20110811195925/http://archive.pressthink.org/2008/02/28/three_bizarre_v.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/03/04/three_stories_f.html",
+      "date": "2008-03-04",
+      "evidence": "https://web.archive.org/web/20110721184536/http://archive.pressthink.org/2008/03/04/three_stories_f.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/03/14/pincus_neutrality.html",
+      "date": "2008-03-14",
+      "evidence": "https://web.archive.org/web/20100924162612/http://archive.pressthink.org:80/2008/03/14/pincus_neutrality.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/03/18/obama_to_the_be.html",
+      "date": "2008-03-18",
+      "evidence": "https://web.archive.org/web/20110424045650/http://archive.pressthink.org:80/2008/03/18/obama_to_the_be.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/03/26/mccain_bank.html",
+      "date": "2008-03-26",
+      "evidence": "https://web.archive.org/web/20110429093706/http://archive.pressthink.org:80/2008/03/26/mccain_bank.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/03/31/developing_as_m.html",
+      "date": "2008-03-31",
+      "evidence": "https://web.archive.org/web/20110811215420/http://archive.pressthink.org/2008/03/31/developing_as_m.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/04/15/mayhill_fowler.html",
+      "date": "2008-04-15",
+      "evidence": "https://web.archive.org/web/20101028100058/http://archive.pressthink.org:80/2008/04/15/mayhill_fowler.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/04/22/business_model.html",
+      "date": "2008-04-22",
+      "evidence": "https://web.archive.org/web/20100924161853/http://archive.pressthink.org:80/2008/04/22/business_model.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/04/28/madison_newsps.html",
+      "date": "2008-04-28",
+      "evidence": "https://web.archive.org/web/20110721184944/http://archive.pressthink.org/2008/04/28/madison_newsps.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/05/06/mouse_media.html",
+      "date": "2008-05-06",
+      "evidence": "https://web.archive.org/web/20110811220428/http://archive.pressthink.org/2008/05/06/mouse_media.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/05/29/mcclellan_regrets.html",
+      "date": "2008-05-29",
+      "evidence": "https://web.archive.org/web/20111019153041/http://archive.pressthink.org/2008/05/29/mcclellan_regrets.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/06/09/fowler_clinton.html",
+      "date": "2008-06-09",
+      "evidence": "https://web.archive.org/web/20111019071616/http://archive.pressthink.org/2008/06/09/fowler_clinton.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/06/16/mccain_news_hun.html",
+      "date": "2008-06-16",
+      "evidence": "https://web.archive.org/web/20110811220116/http://archive.pressthink.org/2008/06/16/mccain_news_hun.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/06/19/beatblog_update.html",
+      "date": "2008-06-19",
+      "evidence": "https://web.archive.org/web/20110509083115/http://archive.pressthink.org:80/2008/06/19/beatblog_update.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/06/26/pdf.html",
+      "date": "2008-06-26",
+      "evidence": "https://web.archive.org/web/20100924162901/http://archive.pressthink.org:80/2008/06/26/pdf.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/07/08/big_daddy_left.html",
+      "date": "2008-07-08",
+      "evidence": "https://web.archive.org/web/20100929131235/http://archive.pressthink.org/2008/07/08/big_daddy_left.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/07/14/a_most_useful_d.html",
+      "date": "2008-07-14",
+      "evidence": "https://web.archive.org/web/20100924162622/http://archive.pressthink.org:80/2008/07/14/a_most_useful_d.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/08/04/abcnews_qs.html",
+      "date": "2008-08-04",
+      "evidence": "https://web.archive.org/web/20100929131248/http://archive.pressthink.org/2008/08/04/abcnews_qs.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/08/07/ross_replies.html",
+      "date": "2008-08-07",
+      "evidence": "https://web.archive.org/web/20110313215823/http://archive.pressthink.org:80/2008/08/07/ross_replies.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/08/13/national_explain.html",
+      "date": "2008-08-13",
+      "evidence": "https://web.archive.org/web/20100924162023/http://archive.pressthink.org:80/2008/08/13/national_explain.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/08/20/motherjones_hype.html",
+      "date": "2008-08-20",
+      "evidence": "https://web.archive.org/web/20110413151412/http://archive.pressthink.org/2008/08/20/motherjones_hype.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/09/03/mccain_strategy.html",
+      "date": "2008-09-03",
+      "evidence": "https://web.archive.org/web/20110413151318/http://archive.pressthink.org/2008/09/03/mccain_strategy.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/09/18/because_we_have.html",
+      "date": "2008-09-18",
+      "evidence": "https://web.archive.org/web/20100921153855/http://archive.pressthink.org:80/2008/09/18/because_we_have.html"
+    },
+    {
+      "url": "http://archive.pressthink.org/2008/12/30/bettinger_qa.html",
+      "date": "2008-12-30",
+      "evidence": "https://web.archive.org/web/20100920220617/http://archive.pressthink.org:80/2008/12/30/bettinger_qa.html"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+id,url,content_type,platform,raw_text,verified,gdrive_pdf_link,gdrive_raw_file_link,gdrive_transcript_link,length_in_seconds
+RECORD-00001,https://pressthink.org/one,Article,PressThink,text one,TRUE,,,,
+RECORD-00002,https://pressthink.org/two,Article,PressThink,,TRUE,,,,
+RECORD-00003,,Article,PressThink,text three,FALSE,,,,
+CLIP-00001,https://www.newspapers.com/clip/1,Newspaper Clipping,Newspaper,clip text,TRUE,https://drive.google.com/x,,,
+TUMBLR-00001,https://tmblr.co/post1,,Tumblr,tumblr text,TRUE,,,,
+THREAD-00001,https://pressthink.org/thread1,Social Media Thread,,thread text,TRUE,,,,
+RECORD-00004,https://obscureblog.example.com/post,Article,Web,text four,TRUE,,,,
+RECORD-00005,https://pressthink.org/five,Interview (Audio/Video),PressThink,text five,TRUE,,,,1200
+RECORD-00006,https://pressthink.org/six,Article,PressThink,text six,TRUE,,,,
+RECORD-00007,https://pressthink.org/seven,Article,PressThink,text seven,TRUE,,,,

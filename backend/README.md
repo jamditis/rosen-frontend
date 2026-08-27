@@ -179,7 +179,7 @@ poetry run python src/rosen_scraper/workflow.py
 poetry run python scripts/diagnostics/data_deduper.py
 
 # Backfill missing metadata
-poetry run python scripts/backfill/backfill_worker.py
+poetry run python -m scripts.backfill.backfill_worker
 
 # Preview the enhanced date backfill against the final worksheet.
 # No Google connection is made without --live.
@@ -203,7 +203,10 @@ poetry run python -m scripts.corrector --rows 27-42
 
 The date-backfill CLI makes its strategy, worksheet, inclusive start row, and
 optional record limit explicit. It validates and prints the plan before a live
-run; `--live` is required before Google or strategy dependencies are loaded.
+run; `--live` is required before Google or the scraping dependencies are loaded.
+The strategy picks how far the backfill looks for a date: `simple` reads the
+URL, `enhanced` also reads the page, and `publication` adds a Gemini fallback.
+One module holds all three (see `scripts/backfill/README.md`).
 
 The smart corrector accepts `--rows :N` for the first N data records,
 `--rows N-M` for inclusive sheet rows, and `--rows N-` for an open-ended

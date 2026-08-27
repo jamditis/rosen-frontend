@@ -8,6 +8,7 @@ schema.json edit (plus the ADDING-RECORDS list these tests pin) rather than a
 code change across scripts (issue #524, Jay's self-service ask). They also
 confirm the loader fails loud rather than running with an empty allow-list.
 """
+
 import json
 import re
 from pathlib import Path
@@ -24,7 +25,9 @@ ADDING_RECORDS = REPO / "ADDING-RECORDS.md"
 
 def _schema_names(key):
     taxonomy_block = json.loads(SCHEMA.read_text(encoding="utf-8-sig"))["taxonomy"]
-    return [item["name"] if isinstance(item, dict) else item for item in taxonomy_block[key]]
+    return [
+        item["name"] if isinstance(item, dict) else item for item in taxonomy_block[key]
+    ]
 
 
 def test_loader_matches_schema_json():
@@ -39,7 +42,9 @@ def test_loader_matches_schema_json():
 
 def test_reviewer_vocab_comes_from_schema():
     # Reddens if any list is re-hardcoded and then drifts from schema.
-    assert archive_record_reviewer.VALID_CATEGORIES == _schema_names("thematic_categories")
+    assert archive_record_reviewer.VALID_CATEGORIES == _schema_names(
+        "thematic_categories"
+    )
     assert archive_record_reviewer.VALID_ERAS == _schema_names("era")
     assert archive_record_reviewer.VALID_CONCEPTS == _schema_names("key_concepts")
     assert archive_record_reviewer.VALID_SCOPES == _schema_names("scope")
@@ -71,7 +76,9 @@ def test_loader_fails_closed_on_missing_schema(monkeypatch, tmp_path):
 
 def test_loader_fails_closed_on_empty_vocabulary(monkeypatch, tmp_path):
     broken = tmp_path / "schema.json"
-    broken.write_text(json.dumps({"taxonomy": {"thematic_categories": []}}), encoding="utf-8")
+    broken.write_text(
+        json.dumps({"taxonomy": {"thematic_categories": []}}), encoding="utf-8"
+    )
     monkeypatch.setattr(taxonomy, "SCHEMA_PATH", broken)
     with pytest.raises(RuntimeError, match="missing or empty"):
         taxonomy.thematic_categories()
@@ -80,10 +87,43 @@ def test_loader_fails_closed_on_empty_vocabulary(monkeypatch, tmp_path):
 def test_auto_categorize_guard_raises_on_unknown_bucket(monkeypatch):
     # A rule keyed to a bucket schema no longer lists is a real bug: the guard
     # must stop the run. Drop a bucket that has a rule so its key goes unknown.
-    shrunk = [c for c in _schema_names("thematic_categories") if c != "Journalism Education"]
+    shrunk = [
+        c for c in _schema_names("thematic_categories") if c != "Journalism Education"
+    ]
     monkeypatch.setattr(auto_categorize_records, "thematic_categories", lambda: shrunk)
     with pytest.raises(SystemExit, match="not in backend/schema.json"):
         auto_categorize_records._assert_patterns_match_schema()
+
+
+def test_auto_categorize_guard_passes_when_rule_removed_with_bucket(monkeypatch):
+    # Pins the "To remove a category" runbook step in ADDING-RECORDS.md: a
+    # category removal must also drop its CATEGORY_PATTERNS / URL_PATTERNS
+    # entries in the same change. Do both, and the guard is satisfied (this
+    # is the counterpart to test_auto_categorize_guard_raises_on_unknown_bucket
+    # above, which proves the guard fires when only schema.json is edited).
+    shrunk = [
+        c for c in _schema_names("thematic_categories") if c != "Journalism Education"
+    ]
+    monkeypatch.setattr(auto_categorize_records, "thematic_categories", lambda: shrunk)
+    monkeypatch.setattr(
+        auto_categorize_records,
+        "CATEGORY_PATTERNS",
+        {
+            k: v
+            for k, v in auto_categorize_records.CATEGORY_PATTERNS.items()
+            if k != "Journalism Education"
+        },
+    )
+    monkeypatch.setattr(
+        auto_categorize_records,
+        "URL_PATTERNS",
+        {
+            k: v
+            for k, v in auto_categorize_records.URL_PATTERNS.items()
+            if k != "Journalism Education"
+        },
+    )
+    auto_categorize_records._assert_patterns_match_schema()  # must not raise
 
 
 def test_auto_categorize_allows_manual_only_category(monkeypatch):

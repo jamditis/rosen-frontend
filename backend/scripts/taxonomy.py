@@ -8,9 +8,13 @@ keep their own hardcoded copies of these lists. Duplicated lists drift: a copy
 can be edited without the others and nothing catches it. Loading them from one
 place means a stale copy fails test_taxonomy_single_source instead of shipping.
 
-To add or remove a thematic category, edit `taxonomy.thematic_categories` in
+To add a thematic category, edit `taxonomy.thematic_categories` in
 backend/schema.json and the mirrored list in ADDING-RECORDS.md, which a test
 keeps in step; the reviewer and auto-categorizer then follow with no code edit.
+Removing one is not code-edit-free: if auto_categorize_records.py's
+CATEGORY_PATTERNS or URL_PATTERNS still names the removed bucket, the module
+raises SystemExit on import (see _assert_patterns_match_schema below), so a
+removal must also drop that bucket's keyword rules in the same change.
 Eras, concepts, formats, and scopes have no doc mirror, so those are a
 schema.json edit alone.
 """

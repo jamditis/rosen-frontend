@@ -1,45 +1,59 @@
 
 import { Component, Suspense, lazy, useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.8.32';
+import { html } from './html.js?v=3.8.33';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, BookOpen, BookMarked, Compass, HelpCircle, MoreHorizontal, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github, Search, XCircle } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.32';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.32';
-import { withViewTransition } from './utils/viewTransition.js?v=3.8.32';
-import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.32';
-import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.32';
-import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.32';
-import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.32';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.32';
-import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.32';
-import { resolveSitePath } from './utils/pathResolver.js?v=3.8.32';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.8.32';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.33';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.33';
+import { withViewTransition } from './utils/viewTransition.js?v=3.8.33';
+import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.33';
+import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.33';
+import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.33';
+import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.33';
+import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.33';
+import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.33';
+import { resolveSitePath } from './utils/pathResolver.js?v=3.8.33';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.8.33';
 import {
   buildSearchText,
   matchesParsedSearchText,
   normalizeForSearch,
   parseSearchQuery,
   searchLoadedIndexes,
-} from './utils/searchNormalize.js?v=3.8.32';
-import { sortRecords } from './utils/recordSort.js?v=3.8.32';
-import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.32';
-import { formatReleaseDate, loadReleaseMetadata } from './services/releaseMetadata.js?v=3.8.32';
-import Sidebar from './components/Sidebar.js?v=3.8.32';
-import WelcomeModal from './components/WelcomeModal.js?v=3.8.32';
-import RecordView from './components/RecordView.js?v=3.8.32';
-import FeaturedSection from './components/FeaturedSection.js?v=3.8.32';
-import DissertationPage from './components/DissertationPage.js?v=3.8.32';
-import ToolsModal from './components/ToolsModal.js?v=3.8.32';
-import BugReportModal from './components/BugReportModal.js?v=3.8.32';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.32';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.32';
-import EntityBrowser from './components/EntityBrowser.js?v=3.8.32';
-import Timeline from './components/Timeline.js?v=3.8.32';
-import AboutPage from './components/AboutPage.js?v=3.8.32';
-import WikiPage from './components/WikiPage.js?v=3.8.32';
-import StartHerePage from './components/StartHerePage.js?v=3.8.32';
-import ArchiveResults from './components/ArchiveResults.js?v=3.8.32';
+} from './utils/searchNormalize.js?v=3.8.33';
+import { sortRecords } from './utils/recordSort.js?v=3.8.33';
+import {
+  DEFAULT_SORT,
+  RELEVANCE_SORT,
+  buildSearchRanking,
+  orderByFusedRank,
+  sortForQueryChange,
+  sortForSemanticToggle,
+} from './utils/searchRanking.js?v=3.8.33';
+import {
+  requestSemanticSearch,
+  terminateSemanticSearch,
+  warmupSemanticSearch,
+} from './services/semanticSearch.js?v=3.8.33';
+import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.33';
+import { formatReleaseDate, loadReleaseMetadata } from './services/releaseMetadata.js?v=3.8.33';
+import Sidebar from './components/Sidebar.js?v=3.8.33';
+import WelcomeModal from './components/WelcomeModal.js?v=3.8.33';
+import RecordView from './components/RecordView.js?v=3.8.33';
+import FeaturedSection from './components/FeaturedSection.js?v=3.8.33';
+import DissertationPage from './components/DissertationPage.js?v=3.8.33';
+import ToolsModal from './components/ToolsModal.js?v=3.8.33';
+import BugReportModal from './components/BugReportModal.js?v=3.8.33';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.33';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.33';
+import EntityBrowser from './components/EntityBrowser.js?v=3.8.33';
+import Timeline from './components/Timeline.js?v=3.8.33';
+import AboutPage from './components/AboutPage.js?v=3.8.33';
+import WikiPage from './components/WikiPage.js?v=3.8.33';
+import StartHerePage from './components/StartHerePage.js?v=3.8.33';
+import ArchiveResults from './components/ArchiveResults.js?v=3.8.33';
+import SemanticSearchToggle, { semanticStatusMessage } from './components/SemanticSearchToggle.js?v=3.8.33';
 
-const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.32'));
+const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.33'));
 
 const NON_RECORD_ROUTES = new Set([
   ROUTES.analytics,
@@ -59,6 +73,20 @@ const DESKTOP_GUIDED_SHELL_DESTINATIONS = new Set([
 
 const ROUTE_ENTRY_FOCUS_SELECTOR = '[data-route-entry-focus], #main-content';
 const MAX_MINI_INDEX_RETRIES = 3;
+
+// RELEVANCE_SORT (imported from utils/searchRanking.js) is deliberately NOT in
+// RECORD_SORTS: that list is the site-tools contract, and every key in it must
+// have a comparator in recordSort.js. Relevance has no comparator because it
+// orders by fused search rank, so it is offered only while a search term is
+// active and is handled before sortRecords runs.
+//
+// Wait this long after the last keystroke before encoding a query. One encode
+// per typed word instead of one per letter.
+const SEMANTIC_QUERY_DEBOUNCE_MS = 350;
+
+// One frozen empty result, so a cleared query does not create a new object and
+// re-run the filter memo on every render.
+const EMPTY_SEMANTIC_HITS = Object.freeze({ query: '', ids: [] });
 const getCurrentRouteWithPrivacyFallback = () =>
   resolvePrivacyRoute(getCurrentRoute(), window.location.hash);
 
@@ -140,6 +168,12 @@ const App = () => {
   const [desktopOpenAppIds, setDesktopOpenAppIds] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState('date-desc');
+  // Opt-in semantic search (#279). Off on every visit: turning it on downloads
+  // a model, so the choice is never made for the reader by a stored setting.
+  const [semanticEnabled, setSemanticEnabled] = useState(false);
+  const [semanticStatus, setSemanticStatus] = useState('idle');
+  const [semanticCoverage, setSemanticCoverage] = useState(null);
+  const [semanticHits, setSemanticHits] = useState(EMPTY_SEMANTIC_HITS);
   const [isScrolled, setIsScrolled] = useState(false);
   // Initialise from ?record= so a deep-linked load survives mount. The URL-sync
   // effect below runs on mount with this value already set, so it preserves the
@@ -594,6 +628,91 @@ const App = () => {
       .finally(() => { miniLoading.current = false; });
   }, [filters.search, miniComplete, miniRetryTick]);
 
+  // Turning the toggle on loads the vectors and the model before the reader
+  // types, and tells us how many articles the semantic leg covers. A failure
+  // here is not fatal: the toggle drops back to off with a "not available"
+  // line, and search stays lexical.
+  const handleSemanticToggle = useCallback((next) => {
+    // Relevance is only listed while a query is active, so the sort follows the
+    // toggle only when there is something to rank. Selecting it with an empty
+    // search box would leave the sort control blank.
+    const hasQuery = Boolean(filters.search.trim());
+    setSemanticEnabled(next);
+    setSemanticHits(EMPTY_SEMANTIC_HITS);
+    setSortBy(prev => sortForSemanticToggle(prev, { enabled: next, hasQuery }));
+    if (!next) {
+      setSemanticStatus('idle');
+      // Give back the model's memory. The browser keeps the download cached, so
+      // turning it on again reloads from disk rather than from the network.
+      terminateSemanticSearch();
+      return;
+    }
+    setSemanticStatus('loading');
+    warmupSemanticSearch()
+      .then((result) => {
+        setSemanticCoverage(result.count);
+        setSemanticStatus('ready');
+      })
+      .catch((err) => {
+        // Terminating the worker aborts this request. That is the reader
+        // switching the toggle off, not a failure to report.
+        if (err.name === 'AbortError') return;
+        console.warn('[search] semantic search unavailable; keyword search only:', err.message);
+        setSemanticEnabled(false);
+        setSemanticStatus('error');
+        setSortBy(prev => sortForSemanticToggle(prev, { enabled: false, hasQuery }));
+      });
+  }, [filters.search]);
+
+  // One encode per settled query. The request is dropped, not cancelled, when
+  // the reader types again: the worker keeps the model it already loaded.
+  useEffect(() => {
+    const query = filters.search.trim();
+    if (!semanticEnabled || !query) {
+      setSemanticHits(EMPTY_SEMANTIC_HITS);
+      return undefined;
+    }
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      setSemanticStatus(prev => (prev === 'ready' ? 'searching' : prev));
+      requestSemanticSearch(query, { signal: controller.signal })
+        .then((result) => {
+          setSemanticHits({ query, ids: result.matches.map(match => match.id) });
+          setSemanticCoverage(result.count);
+          setSemanticStatus('ready');
+        })
+        .catch((err) => {
+          if (err.name === 'AbortError') return;
+          console.warn('[search] semantic query failed; keyword results only:', err.message);
+          setSemanticHits(EMPTY_SEMANTIC_HITS);
+          setSemanticStatus('error');
+          setSemanticEnabled(false);
+          // Same recovery as a failed warmup: the semantic leg is gone, so the
+          // sort it selected goes with it.
+          setSortBy(prev => sortForSemanticToggle(prev, { enabled: false, hasQuery: true }));
+        });
+    }, SEMANTIC_QUERY_DEBOUNCE_MS);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [semanticEnabled, filters.search]);
+
+  // Fused hybrid ranking (#279). The lexical leg is the MiniSearch hit order,
+  // the semantic leg is the cosine order, and RRF merges them on rank alone
+  // because BM25 scores and cosine similarities are not on a shared scale.
+  // `signals` carries each hit's provenance chip: kw, sem, or kw·sem.
+  const { fusedRanks, searchSignals, semanticIds, lexicalIds } = useMemo(() => {
+    const rawTerm = filters.search.trim();
+    const lexicalOrder = rawTerm && miniRevision > 0 && miniRefs.current.length > 0
+      ? searchLoadedIndexes(miniRefs.current, rawTerm).map(hit => hit.id)
+      : [];
+    const semanticOrder = semanticEnabled && semanticHits.query === rawTerm
+      ? semanticHits.ids
+      : [];
+    return buildSearchRanking({ lexicalOrder, semanticOrder });
+  }, [filters.search, miniRevision, semanticEnabled, semanticHits]);
+
   const filteredRecords = useMemo(() => {
     const term = normalizeForSearch(filters.search);
     // Union the substring blob with both MiniSearch full-text indexes: a record
@@ -603,17 +722,17 @@ const App = () => {
     // last word may be a prefix", how a search box is expected to narrow.
     const rawTerm = filters.search.trim();
     const parsedQuery = parseSearchQuery(rawTerm);
-    let miniIds = null;
-    if (rawTerm && miniRevision > 0 && miniRefs.current.length > 0) {
-      miniIds = new Set(
-        searchLoadedIndexes(miniRefs.current, rawTerm).map(hit => hit.id)
-      );
-    }
+    // The semantic leg is a third additive path: it can surface a record whose
+    // words never match the query at all, which is the whole point of #279.
     let res = queryRecords.filter((r, i) => {
       const substringMatch = parsedQuery.phraseKeys.length > 0
         ? matchesParsedSearchText(searchIndex[i], parsedQuery)
         : searchIndex[i].includes(term);
-      if (term && !(substringMatch || (miniIds && miniIds.has(r.id)))) return false;
+      if (term && !(
+        substringMatch
+        || (lexicalIds && lexicalIds.has(r.id))
+        || semanticIds.has(r.id)
+      )) return false;
 
       if (filters.categories.length > 0) {
         const hasAll = filters.categories.every(cat => r.categories.includes(cat));
@@ -641,14 +760,36 @@ const App = () => {
       return true;
     });
 
+    if (sortBy === RELEVANCE_SORT) {
+      // Fused rank first, then newest-first for everything the ranked legs did
+      // not reach (a substring-only match carries no rank to fuse).
+      return orderByFusedRank(sortRecords(res, DEFAULT_SORT), fusedRanks);
+    }
+
     res = sortRecords(res, sortBy);
 
     return res;
-  }, [queryRecords, searchIndex, filters, sortBy, miniRevision]);
+  }, [queryRecords, searchIndex, filters, sortBy, lexicalIds, semanticIds, fusedRanks]);
 
   useEffect(() => {
     setCurrentPage(1);
   }, [filters, sortBy]);
+
+  // Relevance needs a query to rank against, and the sort control only offers
+  // it while one is active. Clearing the search returns to newest-first so the
+  // control never shows a value it no longer lists. Starting a fresh query with
+  // semantic search on picks relevance back up, which is what the toggle is
+  // for; editing an active query leaves the reader's chosen sort alone.
+  const hadQueryRef = useRef(false);
+  useEffect(() => {
+    const hasQuery = Boolean(filters.search.trim());
+    setSortBy(prev => sortForQueryChange(prev, {
+      hasQuery,
+      hadQuery: hadQueryRef.current,
+      semanticEnabled,
+    }));
+    hadQueryRef.current = hasQuery;
+  }, [filters.search, semanticEnabled]);
 
   // Derive viewMode from route for backward-compatible logic
   const viewMode = currentRoute === ROUTES.folders
@@ -756,6 +897,18 @@ const App = () => {
       nestedDialogOpen=${bugReportOpen}
     />
   `;
+
+  // One toggle state, two places to reach it: the filter sidebar search group
+  // and the compact search box above the results. Both copies can sit in the
+  // accessibility tree at once (the filter drawer over the mobile search box),
+  // so neither carries a live region: the results toolbar announces the state
+  // once for both.
+  const semanticSearchProps = {
+    enabled: semanticEnabled,
+    status: semanticStatus,
+    coverage: semanticCoverage,
+    onToggle: handleSemanticToggle,
+  };
 
   const isEntityBrowser = currentRoute === ROUTES.entities;
   const isWiki = currentRoute === ROUTES.wiki;
@@ -1116,6 +1269,7 @@ const App = () => {
                 onClose=${closeSidebar}
                 resetFilters=${() => setFilters({ ...DEFAULT_FILTERS })}
                 autocompleteIndex=${autocompleteIndex}
+                semanticSearch=${semanticSearchProps}
              />
          `}
 
@@ -1216,6 +1370,10 @@ const App = () => {
                       </button>
                     `}
                 </div>
+                <${SemanticSearchToggle}
+                  ...${semanticSearchProps}
+                  inputId="archive-mobile-semantic-search"
+                />
             </div>
 
             <div className="archive-results-toolbar scroll-mt-24" ref=${recordsRef}>
@@ -1236,6 +1394,15 @@ const App = () => {
                     `}
                     <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
                       ${announcedResultCount}
+                    </span>
+                    <span
+                      className="sr-only"
+                      data-semantic-status
+                      role="status"
+                      aria-live="polite"
+                      aria-atomic="true"
+                    >
+                      ${semanticStatusMessage(semanticSearchProps)}
                     </span>
                     ${activeScopeTokens.length > 0 && html`
                       <div className="archive-results-scope" aria-label="Active archive scope">
@@ -1304,6 +1471,9 @@ const App = () => {
                         onChange=${(e) => setSortBy(e.target.value)}
                         className="archive-control archive-sort-control__select"
                         >
+                            ${Boolean(filters.search.trim()) && html`
+                              <option value=${RELEVANCE_SORT}>Relevance</option>
+                            `}
                             <option value="date-desc">Newest first</option>
                             <option value="date-asc">Oldest first</option>
                             <option value="title-asc">Title (A-Z)</option>
@@ -1352,6 +1522,7 @@ const App = () => {
                   folderGroups=${folderGroups}
                   viewMode=${viewMode}
                   searchTerm=${filters.search}
+                  searchSignals=${searchSignals}
                   currentPage=${currentPage}
                   totalPages=${totalPages}
                   onSelectRecord=${selectRecord}

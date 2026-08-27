@@ -1,0 +1,43 @@
+{
+  "source_id": "sample-monthly-index",
+  "source_name": "Hand-verified sample of the PressThink monthly archive page for 2004-08",
+  "provenance": "https://web.archive.org/web/20110811215744/http://archive.pressthink.org/2004/08/",
+  "retrieved_at": "2026-08-27",
+  "coverage_note": "five hand-checked rows from one month, used only to pin the inventory file interface in tests",
+  "entries": [
+    {
+      "url": "http://archive.pressthink.org/2004/08/31/cnn_rnc.html",
+      "date": "2004-08-31",
+      "title": "Down at the Tick Tock Diner, I Caught Up With CNN",
+      "body": "In which the demise of the network sky box is confirmed, a conceit of Americana (the typical diner) is indulged, and subtle differences appear in how the protests are to be weighed against events at the convention.",
+      "evidence": "https://web.archive.org/web/20110811215744/http://archive.pressthink.org/2004/08/"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/30/rnc_red.html",
+      "date": "2004-08-30",
+      "title": "RNC Drops the Battleship-Style Stage; Goes Lighter, More Flexible",
+      "body": "And after the big march went by--saying what it came to say--I went to look at what the Republicans did to transform the Garden, a space I know well.",
+      "evidence": "https://web.archive.org/web/20110811215744/http://archive.pressthink.org/2004/08/"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/26/conv_sec.html",
+      "date": "2004-08-26",
+      "title": "The Convention in Section View",
+      "body": "A short tour of the hall, level by level, and of who gets to stand where.",
+      "evidence": "https://web.archive.org/web/20110811215744/http://archive.pressthink.org/2004/08/"
+    },
+    {
+      "url": "http://archive.pressthink.org/2004/08/02/debrief_one.html",
+      "date": "2004-08-02",
+      "title": "Convention De-Briefing Begins: August 2-3",
+      "body": "The first round of questions and answers after the Democratic convention closed.",
+      "evidence": "https://web.archive.org/web/20110811215744/http://archive.pressthink.org/2004/08/"
+    },
+    {
+      "url": "http://archive.pressthink.org/2011/05/09/out_of_window.html",
+      "date": "2011-05-09",
+      "title": "A post outside the measured window",
+      "evidence": "https://web.archive.org/web/20110811215744/http://archive.pressthink.org/2011/05/"
+    }
+  ]
+}

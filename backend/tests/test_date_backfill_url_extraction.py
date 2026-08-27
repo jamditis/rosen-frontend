@@ -8,13 +8,10 @@ Two things are locked in here:
    I/O layer to mock. This is the regression guard the issue's acceptance
    criteria ask for before the three date-backfill strategies are consolidated.
 
-2. A drift guard: each strategy class
-   (``SimpleDateBackfiller`` / ``PublicationDateBackfiller`` /
-   ``EnhancedDateBackfiller``) must now delegate to the shared function rather
-   than carry its own copy. The classes are loaded by file path (they live in
-   the non-packaged ``scripts/backfill/`` directory, the same pattern as
-   ``test_diagnostic_scripts_resolve.py``) and their ``extract_date_from_url``
-   is called unbound so no Google credentials are needed.
+2. A drift guard: ``DateBackfiller.resolve_from_url`` must delegate to the
+   shared function rather than carry its own copy. The method is called unbound
+   so no Google credentials are needed. Before issue #189 the guard covered
+   three strategy classes; they are now one.
 """
 
 from __future__ import annotations
@@ -24,6 +21,8 @@ import inspect
 import pathlib
 
 import pytest
+
+from scripts.backfill import date_backfill
 
 _BACKFILL = pathlib.Path(__file__).resolve().parents[1] / "scripts" / "backfill"
 
@@ -79,36 +78,25 @@ def test_none_input_returns_none():
     assert extract_date_from_url(None) is None
 
 
-# (module name, filename, class name) for each strategy that must delegate.
-_STRATEGIES = [
-    ("simple_date_backfill", "simple_date_backfill.py", "SimpleDateBackfiller"),
-    (
-        "publication_date_backfill",
-        "publication_date_backfill.py",
-        "PublicationDateBackfiller",
-    ),
-    ("enhanced_date_backfill", "enhanced_date_backfill.py", "EnhancedDateBackfiller"),
-]
-
-
 class _DummySelf:
     """Stand-in for ``self``; the delegating method ignores it."""
 
 
-@pytest.mark.parametrize("name,filename,classname", _STRATEGIES)
-def test_strategy_delegates_to_shared_extractor(name, filename, classname):
-    module = _load(name, filename)
+def test_backfiller_delegates_to_shared_extractor():
+    from scripts.backfill.date_backfill import DateBackfiller
 
-    # Structural guard: the strategy must call the shared helper, not a
+    # Structural guard: the backfiller must call the shared helper, not a
     # re-pasted copy. The module-level name must resolve to the shared module,
     # and the method body must be the one-line delegation. A future copy-paste
     # regression fails here even if it still produces identical output.
-    assert module.extract_date_from_url.__module__ == "date_extraction"
-    method_src = inspect.getsource(getattr(module, classname).extract_date_from_url)
+    assert (
+        date_backfill.extract_date_from_url.__module__
+        == "scripts.backfill.date_extraction"
+    )
+    method_src = inspect.getsource(DateBackfiller.resolve_from_url)
     assert "return extract_date_from_url(url)" in method_src
 
     # Behaviour guard: the delegating method matches the shared function.
-    cls = getattr(module, classname)
     dummy = _DummySelf()
     for url, _expected in _CASES:
-        assert cls.extract_date_from_url(dummy, url) == extract_date_from_url(url)
+        assert DateBackfiller.resolve_from_url(dummy, url) == extract_date_from_url(url)

@@ -5,8 +5,12 @@ Background (issue #189): the three date-backfill strategies in this package --
 ``simple_date_backfill``, ``publication_date_backfill``, and
 ``enhanced_date_backfill`` -- each carried a byte-for-byte copy of the same
 URL-pattern parser. Three copies meant a regex fix had to land in three places
-or the strategies would silently drift. This module holds the single canonical
-implementation; each strategy now delegates to it.
+or the strategies would silently drift. This module took the parser first; the
+strategies themselves were later merged into ``date_backfill.DateBackfiller``,
+whose ``resolve_from_url`` delegates here.
+
+The parser stays in its own module because it is the one piece with no Google
+Sheets, no network, and no optional dependency behind it.
 
 The function is pure (no Google Sheets, no network), so it is unit-testable on
 its own -- see ``backend/tests/test_date_backfill_url_extraction.py``.

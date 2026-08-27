@@ -236,8 +236,13 @@ describe('archive discovery visual-system refresh', () => {
   });
 
   it('waits for the intentional details warmup instead of racing its timer', () => {
-    assert.match(audit, /expectedArchiveDetailsRequest\s*=\s*route\.archiveDetails === 'require'/);
-    assert.match(audit, /page\.waitForRequest\([\s\S]*archive-details\.json/);
-    assert.match(audit, /await expectedArchiveDetailsRequest/);
+    assert.match(audit, /expectedArchiveDetails\s*=\s*route\.archiveDetails === 'require'/);
+    // The body, not the request. The parse and the re-render that follow the
+    // response are the part that moves the layout, so treating the route as
+    // ready when the request goes out books startup work as settled
+    // instability on a slower machine (#772).
+    assert.match(audit, /page\.waitForResponse\([\s\S]*archive-details\.json/);
+    assert.match(audit, /response\.finished\(\)/);
+    assert.match(audit, /await expectedArchiveDetails/);
   });
 });
