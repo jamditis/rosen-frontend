@@ -1,26 +1,34 @@
 
 import { Component, Suspense, lazy, useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { html } from './html.js?v=3.8.33';
+import { html } from './html.js?v=3.8.34';
 import { Newspaper, SlidersHorizontal, LayoutGrid, Folder, BookOpen, BookMarked, Compass, HelpCircle, MoreHorizontal, AlertCircle, ChevronUp, BarChart3, Users, Info, Bug, Github, Search, XCircle } from 'lucide-react';
-import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.33';
-import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.33';
-import { withViewTransition } from './utils/viewTransition.js?v=3.8.33';
-import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.33';
-import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.33';
-import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.33';
-import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.33';
-import { setRecordParam } from './utils/recordDeepLink.js?v=3.8.33';
-import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.33';
-import { resolveSitePath } from './utils/pathResolver.js?v=3.8.33';
-import { recordNeedsReview } from './utils/needsReview.js?v=3.8.33';
+import { fetchCoreData, fetchRecordDetails, preloadDetails, loadSearchIndex } from './services/archiveService.js?v=3.8.34';
+import { perfMark, perfMeasure } from './utils/perfMark.js?v=3.8.34';
+import { withViewTransition } from './utils/viewTransition.js?v=3.8.34';
+import { CONTENT_TYPE_OPTIONS, ITEMS_PER_PAGE, REPORT_CONFIG } from './constants.js?v=3.8.34';
+import { ROUTES, getCurrentRoute, getDesktopAppIdFromUrl, getEntityIdFromUrl, navigateTo, navigateToDesktop, getRecordIdFromUrl, migrateLegacyUrl } from './services/router.js?v=3.8.34';
+import { parseViewState, viewStateToUrl } from './services/viewState.js?v=3.8.34';
+import { ABOUT_PRIVACY_HASH, getPrivacyDetailsHref, resolvePrivacyRoute } from './services/privacyRoute.js?v=3.8.34';
+import { canonicalRecordUrl, setRecordParam } from './utils/recordDeepLink.js?v=3.8.34';
+import {
+  BROKEN_RECORD_SKIP_MS,
+  DISSERTATION_YEAR_NOTE,
+  NOWHERE_RECORD_ID,
+  brokenRecordLine,
+  isDissertationYearQuery,
+  summarizeBrokenRecord,
+} from './utils/easterEggs.js?v=3.8.34';
+import { readReportDeepLink } from './utils/reportDeepLink.js?v=3.8.34';
+import { resolveSitePath } from './utils/pathResolver.js?v=3.8.34';
+import { recordNeedsReview } from './utils/needsReview.js?v=3.8.34';
 import {
   buildSearchText,
   matchesParsedSearchText,
   normalizeForSearch,
   parseSearchQuery,
   searchLoadedIndexes,
-} from './utils/searchNormalize.js?v=3.8.33';
-import { sortRecords } from './utils/recordSort.js?v=3.8.33';
+} from './utils/searchNormalize.js?v=3.8.34';
+import { sortRecords } from './utils/recordSort.js?v=3.8.34';
 import {
   DEFAULT_SORT,
   RELEVANCE_SORT,
@@ -28,37 +36,41 @@ import {
   orderByFusedRank,
   sortForQueryChange,
   sortForSemanticToggle,
-} from './utils/searchRanking.js?v=3.8.33';
+} from './utils/searchRanking.js?v=3.8.34';
 import {
   requestSemanticSearch,
   terminateSemanticSearch,
   warmupSemanticSearch,
-} from './services/semanticSearch.js?v=3.8.33';
-import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.33';
-import { formatReleaseDate, loadReleaseMetadata } from './services/releaseMetadata.js?v=3.8.33';
-import Sidebar from './components/Sidebar.js?v=3.8.33';
-import WelcomeModal from './components/WelcomeModal.js?v=3.8.33';
-import RecordView from './components/RecordView.js?v=3.8.33';
-import FeaturedSection from './components/FeaturedSection.js?v=3.8.33';
-import DissertationPage from './components/DissertationPage.js?v=3.8.33';
-import ToolsModal from './components/ToolsModal.js?v=3.8.33';
-import BugReportModal from './components/BugReportModal.js?v=3.8.33';
-import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.33';
-import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.33';
-import EntityBrowser from './components/EntityBrowser.js?v=3.8.33';
-import Timeline from './components/Timeline.js?v=3.8.33';
-import AboutPage from './components/AboutPage.js?v=3.8.33';
-import WikiPage from './components/WikiPage.js?v=3.8.33';
-import StartHerePage from './components/StartHerePage.js?v=3.8.33';
-import ArchiveResults from './components/ArchiveResults.js?v=3.8.33';
-import SemanticSearchToggle, { semanticStatusMessage } from './components/SemanticSearchToggle.js?v=3.8.33';
+} from './services/semanticSearch.js?v=3.8.34';
+import { deriveFacetsForRecords, intersectByRecordIds } from './services/queryComposition.js?v=3.8.34';
+import { formatReleaseDate, loadReleaseMetadata } from './services/releaseMetadata.js?v=3.8.34';
+import Sidebar from './components/Sidebar.js?v=3.8.34';
+import WelcomeModal from './components/WelcomeModal.js?v=3.8.34';
+import RecordView from './components/RecordView.js?v=3.8.34';
+import FeaturedSection from './components/FeaturedSection.js?v=3.8.34';
+import DissertationPage from './components/DissertationPage.js?v=3.8.34';
+import ToolsModal from './components/ToolsModal.js?v=3.8.34';
+import BugReportModal from './components/BugReportModal.js?v=3.8.34';
+import WorkInProgressBanner from './components/WorkInProgressBanner.js?v=3.8.34';
+import AnalyticsDashboard from './components/AnalyticsDashboard.js?v=3.8.34';
+import EntityBrowser from './components/EntityBrowser.js?v=3.8.34';
+import Timeline from './components/Timeline.js?v=3.8.34';
+import AboutPage from './components/AboutPage.js?v=3.8.34';
+import WikiPage from './components/WikiPage.js?v=3.8.34';
+import StartHerePage from './components/StartHerePage.js?v=3.8.34';
+import ArchiveResults from './components/ArchiveResults.js?v=3.8.34';
+import EasterEggNote from './components/EasterEggNote.js?v=3.8.34';
+import NowherePage from './components/NowherePage.js?v=3.8.34';
+import SemanticSearchToggle, { semanticStatusMessage } from './components/SemanticSearchToggle.js?v=3.8.34';
 
-const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.33'));
+const DesktopShell = lazy(() => import('./desktop/DesktopShell.js?v=3.8.34'));
 
 const NON_RECORD_ROUTES = new Set([
   ROUTES.analytics,
   ROUTES.wiki,
   ROUTES.desktop,
+  // The hidden route is one line of text. It never needs the core data.
+  ROUTES.nowhere,
 ]);
 
 const DESKTOP_RECORD_APPS = new Set(['archive', 'folders', 'entities', 'start', 'findings']);
@@ -192,6 +204,11 @@ const App = () => {
   const [updateAvailable, setUpdateAvailable] = useState(
     () => Boolean(window.__jrdaUpdateReady),
   );
+  // Hidden extras (#754). Each one waits for a deliberate action, shows one
+  // dismissible line, and leaves reading, search, and navigation untouched.
+  const [brokenRecord, setBrokenRecord] = useState(null);
+  const [recordsSkipping, setRecordsSkipping] = useState(false);
+  const [yearNoteDismissed, setYearNoteDismissed] = useState(false);
 
   const [filters, setFilters] = useState(() => ({
     ...DEFAULT_FILTERS,
@@ -461,6 +478,22 @@ const App = () => {
   const clearQueryFilter = useCallback(() => {
     setFilters(prev => ({ ...prev, recordIds: null }));
   }, []);
+
+  // Broken record (#754): five quick clicks on one category filter. The list
+  // skips like a stuck record, and a note says how long that category has been
+  // repeating itself. A category with fewer than two records shows nothing.
+  const handleCategoryStreak = useCallback((category) => {
+    const summary = summarizeBrokenRecord(category, records);
+    if (!summary) return;
+    setBrokenRecord(summary);
+    setRecordsSkipping(true);
+  }, [records]);
+
+  // The hidden route links to the essay behind its one line.
+  const openNowhereEssay = useCallback(() => {
+    navigateTo(ROUTES.archive, NOWHERE_RECORD_ID);
+    selectRecord(NOWHERE_RECORD_ID);
+  }, [selectRecord]);
 
   // Tool selection handler
   const handleToolSelect = useCallback((action) => {
@@ -924,6 +957,30 @@ const App = () => {
 
   const contentTypeLabel = CONTENT_TYPE_OPTIONS.find(option => option.value === filters.type)?.label;
 
+  // Class of 1986 (#754): searching the dissertation year, and nothing else,
+  // surfaces one note. Changing the search brings the note back for the next
+  // person who lands on that exact query.
+  const dissertationYearSearch = isDissertationYearQuery(filters.search);
+  useEffect(() => {
+    if (!dissertationYearSearch) setYearNoteDismissed(false);
+  }, [dissertationYearSearch]);
+
+  // The skip is short and ends itself, so nothing keeps moving on the page.
+  useEffect(() => {
+    if (!recordsSkipping) return undefined;
+    const timer = setTimeout(() => setRecordsSkipping(false), BROKEN_RECORD_SKIP_MS);
+    return () => clearTimeout(timer);
+  }, [recordsSkipping]);
+
+  const showYearNote = isArchiveGrid && dissertationYearSearch && !yearNoteDismissed;
+  // The broken-record note stands on its own until the visitor closes it. It
+  // used to go away as soon as the category left the filter, but five clicks on
+  // one chip leave that filter off again, so the note was cleared in the same
+  // commit that set it and the line was gone before anyone could read it. The
+  // line is a remark about the category, not a description of the current view,
+  // so it reads either way.
+  const showBrokenRecordNote = isArchiveGrid && Boolean(brokenRecord);
+
   const activeScopeTokens = [
     filters.search ? { key: 'search', kind: 'search', label: `Search: “${filters.search}”` } : null,
     ...filters.categories.map(category => ({
@@ -1122,6 +1179,19 @@ const App = () => {
     `);
   }
 
+  // Hidden route (#754). Nothing links here; it is reached only by typing the
+  // hash. It renders a normal full page so anyone who finds it can read it,
+  // focus it, and leave it.
+  if (currentRoute === ROUTES.nowhere) {
+    return renderFullPage(html`
+      <${NowherePage}
+        onBack=${() => goTo(ROUTES.archive)}
+        onOpenEssay=${openNowhereEssay}
+        essayHref=${canonicalRecordUrl(window.location.href, NOWHERE_RECORD_ID)}
+      />
+    `);
+  }
+
   if (isAnalytics) {
     return renderFullPage(html`
       <${AnalyticsDashboard}
@@ -1270,6 +1340,7 @@ const App = () => {
                 resetFilters=${() => setFilters({ ...DEFAULT_FILTERS })}
                 autocompleteIndex=${autocompleteIndex}
                 semanticSearch=${semanticSearchProps}
+                onCategoryStreak=${handleCategoryStreak}
              />
          `}
 
@@ -1375,6 +1446,22 @@ const App = () => {
                   inputId="archive-mobile-semantic-search"
                 />
             </div>
+
+            ${showYearNote && html`
+              <${EasterEggNote}
+                text=${DISSERTATION_YEAR_NOTE}
+                linkHref=${resolveSitePath('dissertation/reader/')}
+                linkLabel="Read the dissertation"
+                onDismiss=${() => setYearNoteDismissed(true)}
+              />
+            `}
+
+            ${showBrokenRecordNote && html`
+              <${EasterEggNote}
+                text=${brokenRecordLine(brokenRecord)}
+                onDismiss=${() => setBrokenRecord(null)}
+              />
+            `}
 
             <div className="archive-results-toolbar scroll-mt-24" ref=${recordsRef}>
                 <div className="archive-results-summary">
@@ -1529,6 +1616,7 @@ const App = () => {
                   onOpenFolder=${handleFolderClick}
                   onPageChange=${handlePageChange}
                   onClearFilters=${() => setFilters({ ...DEFAULT_FILTERS })}
+                  skipping=${recordsSkipping}
                 />
             `}
 

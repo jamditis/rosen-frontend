@@ -1,19 +1,22 @@
 /**
  * Shared cache configuration for the Archive's storage layer.
  *
- * archiveService.js and loaders/httpCachedLoader.js both cache the entity
- * payload under the same key and version so the two code paths interoperate
- * during the entity-loader migration (#130). These constants and the key hash
- * live here so they cannot drift: bumping CACHE_VERSION in one place now
- * invalidates every cache by construction, instead of relying on a
- * "bump both together" comment that a future edit can forget.
+ * archiveService.js reads the entity payload cache through these constants
+ * and the key hash below, so they live here rather than inline: bumping
+ * CACHE_VERSION in one place invalidates every cache by construction,
+ * instead of relying on a "bump it everywhere" comment a future edit can
+ * forget. (Formerly shared with loaders/httpCachedLoader.js, an unwired
+ * entity-loading path removed in #503.)
  */
 
 // Increment to invalidate all caches (e.g. after a breaking payload change).
-// v10: the 9c entity cleanup rewrote archive-entities.json; bump so a returning
-// visitor's cached pre-cleanup entity payload is dropped instead of served for
-// up to CACHE_TTL_MS after deploy.
-export const CACHE_VERSION = 'v10';
+// v11: the 3.8.34 data release genuinely changed the archive payloads -- seven
+// duplicate records dropped (#867), RECORD-00918 added by the RECORD-00429
+// split (#863), and the duplicate PressThink entity merged into O0033 (#859).
+// A returning visitor holding a v10 payload would otherwise be served records
+// that no longer exist, and a stale entity graph, for up to CACHE_TTL_MS after
+// deploy.
+export const CACHE_VERSION = 'v11';
 
 // Entity data is small (~1MB), so a short TTL keeps it current cheaply.
 export const CACHE_TTL_MS = 1000 * 60 * 30; // 30 minutes
@@ -22,9 +25,8 @@ export const CACHE_TTL_MS = 1000 * 60 * 30; // 30 minutes
 export const MAX_LOCALSTORAGE_SIZE = 5 * 1024 * 1024;
 
 /**
- * djb2 hash of the data URL, namespaced under archive_json_. Both the legacy
- * archiveService cache and the httpCachedLoader adapter address entries with
- * this exact key, so they must compute it identically.
+ * djb2 hash of the data URL, namespaced under archive_json_. archiveService's
+ * cache addresses entries with this exact key.
  * @param {string} url
  * @returns {string}
  */

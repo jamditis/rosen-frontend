@@ -90,10 +90,10 @@ Counts verified against current `data/` on 2026-07-07:
 
 | File | Records | Contents |
 |------|---------|----------|
-| `data/archive_records-public.csv` | 1,029 | Non-social archive records (799 RECORD, 137 TUMBLR, 83 CLIP, 10 THREAD). Line count is high (~50k+) due to multi-line text fields. Max record id is `RECORD-00904`; next ID for new records is `RECORD-00905`. |
-| `data/social_posts.csv` | 29,747 | Twitter/X and Bluesky posts. Max BSKY id is `BSKY-03172`. |
-| `data/extracted_entities.csv` | 8,152 | Named entities (people, orgs, concepts) |
-| `data/extracted_relationships.csv` | 12,560 | Entity-to-record relationships |
+| `data/archive_records-public.csv` | 1,030 | Non-social archive records (801 RECORD, 137 TUMBLR, 82 CLIP, 10 THREAD). Line count is high (~50k+) due to multi-line text fields. Max record id is `RECORD-00918`; next ID for new records is `RECORD-00919`. |
+| `data/social_posts.csv` | 29,868 | Twitter/X and Bluesky posts. Max BSKY id is `BSKY-03334`. |
+| `data/extracted_entities.csv` | 7,303 | Named entities (people, orgs, concepts) |
+| `data/extracted_relationships.csv` | 10,976 | Entity-to-record relationships |
 
 ### Regenerating JSON from CSV
 
@@ -121,8 +121,30 @@ Hash-based SPA routing (`frontend/services/router.js`):
 | Analytics | `#analytics` | `AnalyticsDashboard.js` | Archive statistics |
 | Wiki | `#wiki` / `#wiki/:slug` | `WikiPage.js` | Maintained deep links; not currently in public navigation |
 | Archive desktop | `#desktop` / `#desktop/:app` | lazy `DesktopShell.js` | Optional alternate exploration shell |
+| Nowhere | `#nowhere` | `NowherePage.js` | Hidden route; never linked from navigation |
 
 Record deep links: `?record=RECORD_ID` opens a record modal on any route.
+
+### Hidden extras
+
+The archive carries a small set of hidden extras (#754). Their triggers and
+copy live in `frontend/utils/easterEggs.js` and
+`frontend/utils/consoleWatchdog.js`; the wiring sits in `App.js`, `Sidebar.js`,
+`ArchiveResults.js`, `AboutPage.js`, `index.js`,
+`services/typewriterEgg.js`, and the two components `NowherePage.js` and
+`EasterEggNote.js`. `tests/easter-eggs.test.js` covers them.
+
+House rules for anything added here: no sound, no focus traps, every surfaced
+note dismissible, one console line per load, and any motion turned off under
+`prefers-reduced-motion` with the words still on the page. Keep them out of
+site copy, navigation, and public-facing pages — the surprise is the point.
+
+One more rule covers layout. An extra may change the layout in answer to a
+key or a click, never on a timer of its own. A page that reflows while someone
+is only reading it scores that shift against the site's layout-shift budget,
+and the audit never sees these routes because no audit route triggers them.
+The typewriter follows this rule: its timer only marks the treatment as spent,
+and the next key or pointer press takes it off.
 
 ## Directory structure
 
@@ -179,10 +201,10 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── archive-core.json            # Lightweight records (~13 MB)
 │   ├── archive-details.json         # Full details (~13 MB)
 │   ├── archive-entities.json        # Entity graph (~1.1 MB)
-│   ├── archive_records-public.csv   # Source records (1,029 rows)
-│   ├── social_posts.csv             # Social media posts (29,747 rows)
-│   ├── extracted_entities.csv       # Named entities (8,152 rows)
-│   ├── extracted_relationships.csv  # Entity relationships (12,560 rows)
+│   ├── archive_records-public.csv   # Source records (1,030 rows)
+│   ├── social_posts.csv             # Social media posts (29,868 rows)
+│   ├── extracted_entities.csv       # Named entities (7,303 rows)
+│   ├── extracted_relationships.csv  # Entity relationships (10,976 rows)
 │   ├── export-archive-data.js       # JSON generator script
 │   ├── schema.json                  # Data schema
 │   └── README.md                    # Data dictionary
@@ -216,14 +238,19 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── screenshots/                 # PNGs referenced from other docs
 │   └── (top-level audits: DATA_QUALITY_AUDIT_*, ENTITY_EXTRACTION_PIPELINE, HANDOFF, JAY_ADDING_RECORDS, JAY_ROSEN_HANDOFF_GOAL_PROGRESS, LAUNCH_VALIDATION_REPORT, QUESTIONS_FOR_ROSEN_CALL, issue-210-duplicate-findings)
 │
-├── .github/workflows/               # CI/CD (9 workflows)
+├── .github/workflows/               # CI/CD (14 workflows)
 │   ├── frontend-validation.yml      # HTML/JS syntax, CDN link checks
 │   ├── backend-tests.yml            # pytest
 │   ├── backend-linting.yml          # ruff, black, mypy
 │   ├── codeql.yml                   # CodeQL security scan
+│   ├── layout-shift-budget.yml      # Layout-shift budget gate, one job per viewport
 │   ├── post-merge.yml               # Post-merge dashboard sync
 │   ├── submit-record.yml            # Pillar 3a — submit record
 │   ├── sweep-stuck-rows.yml         # Pillar 3a — sweep stuck submission rows
+│   ├── submit-prototype.yml         # Pillar 3b — submit prototype record
+│   ├── deploy.yml                   # Pillar 3c — full-site deploy to pressthink.org
+│   ├── maintenance.yml              # Manual-dispatch batch maintenance jobs
+│   ├── verify-external-links.yml    # Weekly external link check
 │   ├── claude-code-review.yml       # Claude code review
 │   └── claude.yml                   # Claude integration
 │
@@ -305,7 +332,7 @@ Environment switches:
 
 ## Testing
 
-Tests use Node.js built-in test runner (`node --test`). The suite under `tests/` covers data integrity, CSV quality, pipeline, thread algorithm/detection, frontend structure, view-state, route vocabulary, linkify, entity-index, service-worker cache, HTTP cached loader, fetch error handling, schema BOM, data-explorer security, version consistency, process-record, and the current design-system surfaces. Run `find tests -maxdepth 1 -name '*.test.js' -print | sort` for the current file inventory.
+Tests use Node.js built-in test runner (`node --test`). The suite under `tests/` covers data integrity, CSV quality, pipeline, thread algorithm/detection, frontend structure, view-state, route vocabulary, linkify, service-worker cache, fetch error handling, schema BOM, data-explorer security, version consistency, process-record, and the current design-system surfaces. Run `find tests -maxdepth 1 -name '*.test.js' -print | sort` for the current file inventory.
 
 ```bash
 npm test                   # Run the full suite
@@ -354,9 +381,9 @@ cp backend/.env.example backend/.env
 
 ### Key commands
 ```bash
-poetry run python src/workflow.py                      # Main pipeline
-poetry run python tools/diagnostics/data_deduper.py    # Dedup data
-poetry run python tools/backfill/backfill_worker.py    # Fill missing fields
+poetry run python src/rosen_scraper/workflow.py          # Main pipeline
+poetry run python scripts/diagnostics/data_deduper.py    # Dedup data
+poetry run python -m scripts.backfill.backfill_worker    # Backfill pull quotes and raw text
 ```
 
 Supports: Articles, Videos, Twitter/X, Tumblr, Newspaper Clippings (PDF OCR).
@@ -378,7 +405,7 @@ Supports: Articles, Videos, Twitter/X, Tumblr, Newspaper Clippings (PDF OCR).
 
 ## Known issues
 
-- Social media records (29,747) have generic titles ("Tweet by Jay Rosen", "Post by Jay Rosen"). Fixing this would require AI-based title generation from post content.
+- Social media records (29,868) have generic titles ("Tweet by Jay Rosen", "Post by Jay Rosen"). Fixing this would require AI-based title generation from post content.
 - Browser localStorage can fill up on the live site due to data size. The ~13 MB `archive-core.json` exceeds localStorage's ~5 MB cap, so the core-data cache uses IndexedDB (`frontend/services/idbCache.js`, #275) — it structured-clones the parsed object on read (no `JSON.parse`) and persists across tab close. The old localStorage/sessionStorage path remains as a fallback for browsers where IndexedDB is blocked (Safari Private, Firefox strict tracking protection).
 - Thread records have placeholder titles ("[Bluesky Thread]") — needs content-based title generation.
 - Roughly 200 records have zero extracted relationships, most because their `raw_text` column is empty (issues #207 / #211). Extraction can be rerun once the raw_text gap-fill in issue #208 (PressThink sweep) and #209 (HuffPost sweep) lands.

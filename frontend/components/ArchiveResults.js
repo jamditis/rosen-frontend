@@ -1,11 +1,11 @@
-import { html } from '../html.js?v=3.8.33';
+import { html } from '../html.js?v=3.8.34';
 import { ChevronLeft, ChevronRight, FolderOpen, SearchX } from 'lucide-react';
-import { COLORS } from '../constants.js?v=3.8.33';
-import { hashString } from '../services/archiveService.js?v=3.8.33';
-import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.33';
-import { LEXICAL_SIGNAL } from '../utils/searchRanking.js?v=3.8.33';
-import { canonicalRecordUrl } from '../utils/recordDeepLink.js?v=3.8.33';
-import LoadingQuotes from './LoadingQuotes.js?v=3.8.33';
+import { COLORS } from '../constants.js?v=3.8.34';
+import { hashString } from '../services/archiveService.js?v=3.8.34';
+import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.34';
+import { LEXICAL_SIGNAL } from '../utils/searchRanking.js?v=3.8.34';
+import { canonicalRecordUrl } from '../utils/recordDeepLink.js?v=3.8.34';
+import LoadingQuotes from './LoadingQuotes.js?v=3.8.34';
 
 const Highlight = ({ text, term }) => {
   if (!term || term.length < 2) return html`<span>${text}</span>`;
@@ -47,6 +47,9 @@ const ArchiveResults = ({
   onOpenFolder,
   onPageChange,
   onClearFilters,
+  // Brief stuck-record skip for the broken-record extra (#754). Off by
+  // default, and the CSS drops the movement under reduced motion.
+  skipping = false,
 }) => {
   const openCard = (event, recordId) => {
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -55,7 +58,7 @@ const ArchiveResults = ({
   };
 
   return html`
-    <div className=${compact ? 'archive-results archive-results--compact desktop-archive-results' : 'archive-results'}>
+    <div className=${`${compact ? 'archive-results archive-results--compact desktop-archive-results' : 'archive-results'}${skipping ? ' archive-results--skipping' : ''}`}>
       ${errorPanel}
 
       ${!errorPanel && loading && html`<${LoadingQuotes} />`}

@@ -1,5 +1,5 @@
 
-import { DATA_CONFIG } from '../constants.js?v=3.8.33';
+import { DATA_CONFIG } from '../constants.js?v=3.8.34';
 import {
   initDatabase,
   loadArchiveData as loadSqliteData,
@@ -13,15 +13,15 @@ import {
   getCategoryCoOccurrence,
   searchRecords as sqlSearchRecords,
   getStats as getSqliteStats
-} from './sqliteService.js?v=3.8.33';
-import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.8.33';
-import { searchIndexOptions, socialSearchIndexOptions } from '../utils/searchConfig.js?v=3.8.33';
-import { escapeCsvCell } from '../utils/csvSafety.js?v=3.8.33';
-import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.8.33';
-import { CACHE_VERSION, CACHE_TTL_MS, MAX_LOCALSTORAGE_SIZE, cacheKeyFor } from './cacheConfig.js?v=3.8.33';
-import { raceTimeout } from '../utils/raceTimeout.js?v=3.8.33';
-import { createResilientSearchIndexLoader, loadSearchIndexArtifact } from './searchIndexLoader.js?v=3.8.33';
-import { loadReleaseMetadata } from './releaseMetadata.js?v=3.8.33';
+} from './sqliteService.js?v=3.8.34';
+import { IS_LOCAL, BASE_PATH } from '../utils/pathResolver.js?v=3.8.34';
+import { searchIndexOptions, socialSearchIndexOptions } from '../utils/searchConfig.js?v=3.8.34';
+import { escapeCsvCell } from '../utils/csvSafety.js?v=3.8.34';
+import { idbGet, idbSet, idbClear } from './idbCache.js?v=3.8.34';
+import { CACHE_VERSION, CACHE_TTL_MS, MAX_LOCALSTORAGE_SIZE, cacheKeyFor } from './cacheConfig.js?v=3.8.34';
+import { raceTimeout } from '../utils/raceTimeout.js?v=3.8.34';
+import { createResilientSearchIndexLoader, loadSearchIndexArtifact } from './searchIndexLoader.js?v=3.8.34';
+import { loadReleaseMetadata } from './releaseMetadata.js?v=3.8.34';
 
 // Routine cache-hit / fetch-start logs are silent in production. Set
 // `localStorage.jrda_debug = '1'` in DevTools and reload to opt in (#170).
@@ -193,8 +193,7 @@ const DISSERTATION_RECORD = {
 };
 
 // Cache configuration (CACHE_VERSION / CACHE_TTL_MS / MAX_LOCALSTORAGE_SIZE
-// and the cacheKeyFor hash) is shared with loaders/httpCachedLoader.js via
-// cacheConfig.js so the two cache paths cannot drift.
+// and the cacheKeyFor hash) lives in cacheConfig.js rather than inline.
 
 /**
  * Check version.json on the server. If the version has changed,
@@ -417,7 +416,7 @@ export const fetchCoreData = async () => {
     // partial deploy) as a successful load of a 1-record archive — visitors
     // and monitors could not tell it apart from the real one. App.js's
     // .catch renders the explicit "Unable to load archive" error state
-    // instead. Mirrors httpCachedLoader.js, which forbids the same masking.
+    // instead.
     console.error('Error fetching core data:', error);
     throw error;
   }
@@ -514,6 +513,62 @@ export const toRecords = (payload) =>
   }));
 
 /**
+ * True when a parsed entities payload has the shape fetchEntitiesData and
+ * buildEntityMaps expect. Both tolerate drift silently by design —
+ * buildEntityMaps guards each field with Array.isArray and just skips it,
+ * and toRecords falls back to `{}` for a missing recordEntityMap — so a
+ * renamed or retyped field would otherwise build an empty entity index with
+ * no error instead of failing loud (#503). `entities` must always be an
+ * array. `records`, when present, must be an array too (so a malformed
+ * `records` cannot silently take precedence over a valid `recordEntityMap`
+ * and then get skipped by buildEntityMaps); when `records` is absent,
+ * `recordEntityMap` must be a real, non-array object.
+ * @param {unknown} payload
+ * @returns {boolean}
+ */
+export const isValidEntitiesPayload = (payload) => {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return false;
+  if (!Array.isArray(payload.entities)) return false;
+
+  const { records, recordEntityMap } = payload;
+  if (records !== undefined && records !== null) {
+    return Array.isArray(records);
+  }
+  return (
+    recordEntityMap !== undefined &&
+    recordEntityMap !== null &&
+    typeof recordEntityMap === 'object' &&
+    !Array.isArray(recordEntityMap)
+  );
+};
+
+/**
+ * The shaped failure fetchEntitiesData returns on a fetch/parse error, or on
+ * a payload (fresh or cached) that fails isValidEntitiesPayload. One source
+ * for both call sites keeps them from drifting apart — the earlier duplicate
+ * literal is what let one copy go untested (#503).
+ * @returns {{entities: Array, recordEntityMap: Object, error: string}}
+ */
+const entityLoadFailure = () => ({
+  entities: [],
+  recordEntityMap: {},
+  error: 'The entity index could not load. Archive records remain available.',
+});
+
+/**
+ * Remove one cache entry from both Web Storage backends. getCachedData
+ * already does this inline for a TTL-expired entry; fetchEntitiesData reuses
+ * it to drop a version-matched entry whose payload shape has drifted, so a
+ * later call re-fetches instead of replaying the same bad entry (#503).
+ * @param {string} url
+ */
+const evictCachedData = (url) => {
+  const cacheKey = cacheKeyFor(url);
+  try { sessionStorage.removeItem(cacheKey); } catch {}
+  try { localStorage.removeItem(cacheKey); } catch {}
+};
+
+/**
  * Fetch entities data (on-demand, when the entity browser opens)
  */
 export const fetchEntitiesData = async () => {
@@ -529,29 +584,49 @@ export const fetchEntitiesData = async () => {
 
   entitiesLoading = true;
   entitiesLoadPromise = (async () => {
-    const dataUrl = DATA_CONFIG.archive_entities;
-
-    // Check cache first
-    const cached = getCachedData(dataUrl);
-    if (cached) {
-      debug('Using cached entities data');
-      entitiesCache = cached;
-      buildEntityMaps({
-        entities: cached.entities,
-        records: toRecords(cached)
-      });
-      return cached;
-    }
-
-    debug('Fetching entities data from:', dataUrl);
-
+    // The whole body runs under one try/catch/finally now, cache check
+    // included, so every exit path — cache hit, cache-shape-drift, network
+    // success, network failure — resets entitiesLoading exactly once. The
+    // shape-drift branch used to return early before this finally existed,
+    // which left entitiesLoading stuck true and wedged every later call
+    // behind the memoized failure (#503).
     try {
+      const dataUrl = DATA_CONFIG.archive_entities;
+
+      // Check cache first
+      const cached = getCachedData(dataUrl);
+      if (cached) {
+        if (!isValidEntitiesPayload(cached)) {
+          // A cache entry written before this shape check shipped, or one
+          // corrupted in Web Storage, can carry the same drift a fresh fetch
+          // can. Evict it so a later call re-fetches instead of replaying
+          // the same drifted entry for the full CACHE_TTL_MS, then route
+          // this call through the identical shaped failure the network
+          // branch uses rather than building an empty entity index from it.
+          console.error('Cached entities data has an unexpected shape; treating as a load failure.');
+          evictCachedData(dataUrl);
+          return entityLoadFailure();
+        }
+        debug('Using cached entities data');
+        entitiesCache = cached;
+        buildEntityMaps({
+          entities: cached.entities,
+          records: toRecords(cached)
+        });
+        return cached;
+      }
+
+      debug('Fetching entities data from:', dataUrl);
+
       const response = await fetch(dataUrl);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
+      if (!isValidEntitiesPayload(data)) {
+        throw new Error('Entity data has an unexpected shape (entities is not an array, or records/recordEntityMap is malformed)');
+      }
       entitiesCache = data;
 
       // Build entity maps for the entity browser
@@ -570,11 +645,7 @@ export const fetchEntitiesData = async () => {
       // so keep returning a shaped payload for that consumer. Carry the
       // failure explicitly so EntityBrowser can distinguish an outage from a
       // legitimate empty scope instead of presenting a silent zero-result UI.
-      return {
-        entities: [],
-        recordEntityMap: {},
-        error: 'The entity index could not load. Archive records remain available.',
-      };
+      return entityLoadFailure();
     } finally {
       entitiesLoading = false;
     }

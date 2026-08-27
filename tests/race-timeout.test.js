@@ -1,7 +1,8 @@
-// Unit tests for the shared raceTimeout helper (#487). It replaced three
+// Unit tests for the shared raceTimeout helper (#487). It replaced
 // near-identical promise-vs-timeout races (archiveService.withVersionTimeout,
-// httpCachedLoader.withTimeout, idbCache.withTimeout); these pin both of its
-// contracts so the consolidation cannot silently change either call site.
+// idbCache.withTimeout, and — until #503 shelved that stack —
+// httpCachedLoader.withTimeout); these pin both of its contracts so the
+// consolidation cannot silently change either remaining call site.
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';

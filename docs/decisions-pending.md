@@ -119,13 +119,17 @@ Order is roughly by how many other things each decision unblocks. Resolve in ord
 
 ---
 
-## 6. Wire or shelve the ports-and-adapters entity-loading stack
+## 6. Wire or shelve the ports-and-adapters entity-loading stack — decided
 
 **Issue:** [#503](https://github.com/jamditis/rosen-frontend/issues/503) (spun from #487; refs [#130](https://github.com/jamditis/rosen-frontend/issues/130))
+**Status:** Decided by Joe on 2026-08-27 (curator ruling on #503).
+**Decision:** Shelve (option B, fixed in place). `frontend/services/loaders/` (`entityDataLoader.js`, `httpCachedLoader.js`, `inMemoryLoader.js`), `frontend/services/entityIndex.js`, and their isolated test suites (`tests/entity-index.test.js`, `tests/http-cached-loader.test.js`) are deleted; git history keeps the code recoverable if #130 is ever wanted for its own sake. The shared shape-drift gap described below (a 200 response that parses but has drifted shape building an empty entity index with no error) is fixed in the live path first: `fetchEntitiesData` now validates a payload's shape (`isValidEntitiesPayload` in `archiveService.js`) before accepting either a cached or freshly fetched entity payload, and routes a validation failure through the same shaped `error` result as a fetch or parse failure.
 **Blocks:** closing the #130 entity-loader migration; the repo carrying two entity-loading stacks, one of them dead
 **Why now:** PR #504 (#487) consolidated the cache config (`cacheConfig.js`) and the timeout-race helper (`frontend/utils/raceTimeout.js`) that both stacks share, so the drift hazard between them is already gone. What is left is a duplication of intent, and it only grows as more code lands on either path. Added 2026-07-08.
 
 **Updated 2026-08-07: the fact this decision turned on is no longer true.** The brief below was written on 2026-07-08 and rested on the live path masking a failed entity load as an empty Archive. PR [#628](https://github.com/jamditis/rosen-frontend/pull/628) (commit `e8e8b00`, merged 2026-07-19) fixed that, eleven days later and for its own reasons. `fetchEntitiesData` now returns an explicit `error` string on fetch or parse failure (`archiveService.js:575-579`), and `EntityBrowser` reads it into `loadError` and renders it in a `role="alert"` panel (`EntityBrowser.js:56-59, 259-265`). Re-verified against the working tree at `d4d1ce1`, and `tests/fail-loud-routes.test.js:56-71` pins both halves in CI, so this is a receipt rather than a claim. The fetch-and-parse correctness argument that decided A and C over B is gone. A successful response with a drifted payload shape remains a fail-loud gap, described below, and must be part of any fix-in-place path. The revised reading is under **Recommendation**; the setup and options below are kept, corrected in place, because their cost estimates still hold.
+
+**Note:** the code described below is the pre-decision state, kept as the record of what the choice weighed. `loaders/`, `entityIndex.js`, and their test suites (`tests/entity-index.test.js`, `tests/http-cached-loader.test.js`) were deleted as part of this decision, so line citations into them (e.g. `httpCachedLoader.js:242`, `entityIndex.js:27`) no longer resolve.
 
 **The setup (verified against the code):** two entity-loading stacks coexist.
 
@@ -169,8 +173,8 @@ What would flip it back to A: wanting #130 closed for its own sake. The port is 
 When you're back at a desk:
 
 1. Resolve decisions 1-2 first (they unblock the most downstream work).
-2. Decisions 3-5 are independent — handle in any order.
-3. Decision 6 is self-contained: the block above has the verified code state, the options, and a recommendation, so no extra research is needed to make the call.
+2. Decisions 3-4 are independent — handle in any order.
+3. Decisions 5-6 are already decided; kept above as the record of what was decided and why.
 4. Once all six are resolved, work through the critical path in [definition-of-done.md](./definition-of-done.md).
 
 For each decision, the recommended option is the default if you don't want to think hard. The other options are there if the recommendation doesn't fit something only you know.

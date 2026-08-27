@@ -6,7 +6,7 @@
  *   resolve-mode (default): resolve to the promise's value, or to `fallback`
  *     if it rejects or does not settle within `ms`. Never rejects. Bounds a
  *     check that must not stall work a fallback can already satisfy
- *     (archiveService version check; httpCachedLoader version check).
+ *     (archiveService's version check).
  *
  *   reject-mode (`rejectOnTimeout: true`): resolve to the promise's value;
  *     reject with the promise's own error if it rejects, or with a timeout

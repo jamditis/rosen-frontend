@@ -129,13 +129,13 @@ python scripts/diagnostics/data_deduper.py --dry-run
 # 2. Review and apply deduplication
 python scripts/diagnostics/data_deduper.py
 
-# 3. Backfill missing summaries
-python scripts/backfill/backfill_worker.py --field summary
+# 3. Backfill missing pull quotes and raw text (takes no arguments; re-scrapes
+#    any un-noted row missing pull_quote or raw_text and writes back only the
+#    field that is missing. Updates the Google Sheet's test_runs tab, not the
+#    repo CSV.)
+python -m scripts.backfill.backfill_worker
 
-# 4. Backfill missing concepts
-python scripts/backfill/backfill_worker.py --field concepts
-
-# 5. Validate against schema
+# 4. Validate against schema
 python scripts/validate_schema.py
 ```
 

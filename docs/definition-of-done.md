@@ -65,7 +65,7 @@ Design doc only: `docs/plans/2026-05-24-pillar3-authoring-workflow-design.md`. Z
 
 ### 6. Tests — Complete (recently realigned)
 
-17 test files, ~4,048 lines. Frontend/data layer (8 core files: `csv-quality`, `data-integrity`, `data-pipeline`, `frontend-structure`, `process-record`, `thread-algorithm`, `thread-detection`, `version-consistency`) plus newer additions (`entity-index`, `http-cached-loader`, `fetch-error-handling`, `linkify`, `schema-no-bom`, `service-worker-cache`, `view-state`). Backend pytest realigned via PRs #249/#251/#252 after the May `src/` refactor; #250 gated credentialed + Selenium tests so CI skips cleanly.
+17 test files, ~4,048 lines. Frontend/data layer (8 core files: `csv-quality`, `data-integrity`, `data-pipeline`, `frontend-structure`, `process-record`, `thread-algorithm`, `thread-detection`, `version-consistency`) plus newer additions (`fetch-error-handling`, `linkify`, `schema-no-bom`, `service-worker-cache`, `view-state`). Backend pytest realigned via PRs #249/#251/#252 after the May `src/` refactor; #250 gated credentialed + Selenium tests so CI skips cleanly.
 
 **Coverage caveat:** `tests/version-consistency.test.js` enforces `index.html` + `frontend/**.js` ONLY. Dissertation pages, `archived/`, and `features/` subpages are NOT enforced on version bumps. Sweep them by hand. Tracked in the v3.3.0 session-state memory.
 
@@ -127,7 +127,7 @@ Design doc only: `docs/plans/2026-05-24-pillar3-authoring-workflow-design.md`. Z
 
 In execution order. Joe owns step 1; everything else flows from his decisions.
 
-1. **Joe resolves the five remaining architectural decisions.** See [decisions-pending.md](./decisions-pending.md). URL canonicalization, Pillar 3a deploy mechanism, Pillar 3b scope, social-platform backfill priority, and the entity-loading stack (wire or shelve, #503). The era taxonomy and dissertation-tools decisions are recorded there as decided; the separate SQLite validator remains approved as future work.
+1. **Joe resolves the four remaining architectural decisions.** See [decisions-pending.md](./decisions-pending.md). URL canonicalization, Pillar 3a deploy mechanism, Pillar 3b scope, and social-platform backfill priority. The era taxonomy and entity-loading-stack decisions (the latter: shelve, #503) are recorded there as decided; the separate SQLite validator remains approved as future work.
 
 2. **Pillar 3a credentials + smoke test.** Issue #226. Joe creates the GitHub App, adds the 11 secrets, runs three smoke tests (scrape-fail, dedup, full success). ~30 min after approval.
 

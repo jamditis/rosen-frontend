@@ -4,13 +4,13 @@
     "compatibility": "additive changes within version 1; semantic changes require a new major version"
   },
   "input": {
-    "commit": "8552d5bc800dd504888b1f5d03bdaa87e9ab562d",
+    "commit": "38fe2628df9afb3d84b4ddc7c10d644b61bdaec6",
     "dirty": false,
     "schema_version": "stewardship-census/1.0.0",
     "files": [
       {
         "path": "data/archive_records-public.csv",
-        "sha256": "759335a27093e641d187ea020e896b506760fc4a3133f4c6d602bba17a905737"
+        "sha256": "947ac360c7f38f3e4387f4914eb394c9aaa408fa1d01aa3b14bc8c27b9e7369d"
       },
       {
         "path": "data/social_posts.csv",
@@ -18,27 +18,27 @@
       },
       {
         "path": "data/extracted_entities.csv",
-        "sha256": "adc1f69f1bda13d46c6436f3d48081630285b6844ffef161eff06d6a543b2593"
+        "sha256": "9152a4c0ec1066b40acb1678886462938e3b3625b05de3fc67a7808fe1a91e1a"
       },
       {
         "path": "data/extracted_relationships.csv",
-        "sha256": "d840e8b51b8ccf71a9cc9ea72f36254c1f58e25ed79609a04fb332520d47f544"
+        "sha256": "c882b1d51d2dab9bbc5183e7a6d3607393242de852aa4c72378ed1c53647877e"
       },
       {
         "path": "data/archive-data.json",
-        "sha256": "5305f7dec0488133635c97ce224138a054a6272d412cb8a4bfcdebed0a3f2a6b"
+        "sha256": "99c087eb4f52ca68d65ef32fc71e97be63c138aa5d1568183a71c4df02fd33b3"
       },
       {
         "path": "data/archive-core.json",
-        "sha256": "bf6df8d668b7a8c4ab440bc3ad659f0b3f8f912b56844c3b94cf6fee8c4609d2"
+        "sha256": "6cc6c4d3a02e0126e73d365f508f824d97f4926ca5fb9347af1e09fa47786330"
       },
       {
         "path": "data/archive-details.json",
-        "sha256": "118efafd5711f8322fbb6081776f7f878e7ef00963cb838d6e11c0c8bd10832a"
+        "sha256": "b8ddb5f52dce6033fa1f9a1f2040ee5cc5ea0afc63beb27ed95d540aaea6e66c"
       },
       {
         "path": "data/archive-entities.json",
-        "sha256": "4100bf82dff5016238399398892e0f151a72ea26b45a086fc0337d8037f8f077"
+        "sha256": "feb03e4df0cbfde6c5e233f0ef39237f55b770e0df665dece3afa518bce83280"
       },
       {
         "path": "data/authored-excerpts.csv",
@@ -48,11 +48,11 @@
   },
   "records": {
     "source": {
-      "total": 30904,
+      "total": 30898,
       "curated": {
-        "total": 1036,
+        "total": 1030,
         "by_record_type": {
-          "Article": 905,
+          "Article": 899,
           "Book Chapter": 2,
           "Interview (Audio/Video)": 86,
           "Newspaper Clipping": 26,
@@ -63,7 +63,7 @@
           "Video": 3
         },
         "verification": {
-          "verified": 1036,
+          "verified": 1030,
           "unverified": 0,
           "blank": 0
         }
@@ -86,17 +86,17 @@
       }
     },
     "runtime": {
-      "total": 26822,
+      "total": 26816,
       "by_type": {
         "Dissertation": 1,
-        "article": 1036,
+        "article": 1030,
         "social": 25785
       },
       "source_backed": {
-        "total": 26813,
-        "curated": 1036,
+        "total": 26807,
+        "curated": 1030,
         "curated_by_record_type": {
-          "Article": 905,
+          "Article": 899,
           "Book Chapter": 2,
           "Interview (Audio/Video)": 86,
           "Newspaper Clipping": 26,
@@ -134,15 +134,15 @@
         ]
       },
       "verification": {
-        "verified": 26822,
+        "verified": 26816,
         "unverified": 0,
         "blank": 0
       }
     },
     "reconciliation": {
       "curated": {
-        "source": 1036,
-        "published": 1036,
+        "source": 1030,
+        "published": 1030,
         "filtered": 0
       },
       "social": {
@@ -4353,39 +4353,39 @@
   "fields": {
     "curated_source": {
       "url": {
-        "total": 1036,
-        "present": 1036,
+        "total": 1030,
+        "present": 1030,
         "missing": 0
       },
       "raw_text": {
-        "total": 1036,
-        "present": 1022,
+        "total": 1030,
+        "present": 1016,
         "missing": 14
       },
       "summary": {
-        "total": 1036,
-        "present": 1036,
+        "total": 1030,
+        "present": 1030,
         "missing": 0
       },
       "tags": {
-        "total": 1036,
+        "total": 1030,
         "present": 717,
-        "missing": 319
+        "missing": 313
       },
       "concepts": {
-        "total": 1036,
+        "total": 1030,
         "present": 952,
-        "missing": 84
+        "missing": 78
       },
       "quote": {
-        "total": 1036,
-        "present": 996,
+        "total": 1030,
+        "present": 990,
         "missing": 40
       },
       "related_ids": {
-        "total": 1036,
+        "total": 1030,
         "present": 713,
-        "missing": 323
+        "missing": 317
       }
     },
     "social_source": {
@@ -4427,37 +4427,37 @@
     },
     "runtime": {
       "url": {
-        "total": 26822,
-        "present": 26822,
+        "total": 26816,
+        "present": 26816,
         "missing": 0
       },
       "summary": {
-        "total": 26822,
-        "present": 26822,
+        "total": 26816,
+        "present": 26816,
         "missing": 0
       },
       "tags": {
-        "total": 26822,
+        "total": 26816,
         "present": 18185,
-        "missing": 8637
+        "missing": 8631
       },
       "concepts": {
-        "total": 26822,
+        "total": 26816,
         "present": 1365,
-        "missing": 25457
+        "missing": 25451
       },
       "quote": {
-        "total": 26822,
-        "present": 26822,
+        "total": 26816,
+        "present": 26816,
         "missing": 0
       },
       "related_ids": {
-        "total": 26822,
-        "present": 877,
+        "total": 26816,
+        "present": 871,
         "missing": 25945
       },
       "raw_text": {
-        "total": 26822,
+        "total": 26816,
         "present": null,
         "missing": null,
         "status": "not_shipped_by_design"
@@ -4466,80 +4466,80 @@
   },
   "graph": {
     "entities": {
-      "total": 7324,
+      "total": 7303,
       "by_type": {
-        "Concept": 1306,
-        "Event": 467,
+        "Concept": 1298,
+        "Event": 465,
         "Location": 262,
-        "Organization": 1643,
-        "Person": 2656,
-        "Work": 990
+        "Organization": 1640,
+        "Person": 2652,
+        "Work": 986
       },
-      "detached_from_relationships": 1720,
+      "detached_from_relationships": 1715,
       "blank_first_mention": 0,
-      "runtime_total": 7324
+      "runtime_total": 7303
     },
     "relationships": {
-      "total": 11153,
+      "total": 10976,
       "by_type": {
-        "Affiliated With": 3209,
-        "Cites": 166,
+        "Affiliated With": 3157,
+        "Cites": 163,
         "Covers": 1,
         "Created": 1,
-        "Criticizes": 1140,
-        "Discusses": 2480,
-        "Expands On": 194,
-        "Founded By": 129,
+        "Criticizes": 1114,
+        "Discusses": 2462,
+        "Expands On": 187,
+        "Founded By": 124,
         "Inspired By": 59,
-        "Mentions": 1592,
-        "Occurred At": 252,
-        "Originated By": 763,
-        "Owned By": 40,
-        "Owns": 66,
-        "Pioneered": 232,
-        "Published In": 538,
-        "Supports": 291
+        "Mentions": 1583,
+        "Occurred At": 247,
+        "Originated By": 729,
+        "Owned By": 38,
+        "Owns": 64,
+        "Pioneered": 225,
+        "Published In": 533,
+        "Supports": 289
       },
       "by_confidence_score": {
-        "1": 4453,
+        "1": 4328,
         "0.5": 3,
         "0.6": 74,
         "0.7": 703,
-        "0.8": 1395,
+        "0.8": 1386,
         "0.84": 2,
-        "0.85": 63,
-        "0.9": 2481,
+        "0.85": 60,
+        "0.9": 2451,
         "0.91": 1,
         "0.92": 1,
         "0.93": 3,
         "0.94": 4,
-        "0.95": 176,
+        "0.95": 171,
         "0.96": 6,
         "0.97": 6,
         "0.98": 12,
         "0.99": 39,
-        "1.0": 1731
+        "1.0": 1726
       },
       "by_confidence": {
-        "high": 10373,
+        "high": 10196,
         "medium": 780
       }
     },
     "coverage": {
       "curated": {
         "source": {
-          "rows": 1036,
-          "rows_with_relationship_assertions": 875,
-          "relationship_assertions": 11151,
-          "rows_with_entity_links": 875,
-          "distinct_record_entity_links": 12941
+          "rows": 1030,
+          "rows_with_relationship_assertions": 869,
+          "relationship_assertions": 10974,
+          "rows_with_entity_links": 869,
+          "distinct_record_entity_links": 12771
         },
         "published": {
-          "source_backed_rows": 1036,
-          "rows_with_relationship_assertions": 875,
-          "relationship_assertions": 11151,
-          "rows_with_entity_links": 875,
-          "distinct_record_entity_links": 12941
+          "source_backed_rows": 1030,
+          "rows_with_relationship_assertions": 869,
+          "relationship_assertions": 10974,
+          "rows_with_entity_links": 869,
+          "distinct_record_entity_links": 12771
         }
       },
       "social": {
@@ -4685,10 +4685,10 @@
   },
   "urls": {
     "source": {
-      "total_rows": 30904,
+      "total_rows": 30898,
       "missing": 38,
-      "external_values": 30866,
-      "unique_external_urls": 30856,
+      "external_values": 30860,
+      "unique_external_urls": 30850,
       "duplicate_external_values": 10,
       "internal_values": 0,
       "malformed_values": 0,
@@ -4701,7 +4701,7 @@
         "archive.blogs.harvard.edu": 1,
         "archive.nytimes.com": 1,
         "archive.org": 2,
-        "archive.pressthink.org": 419,
+        "archive.pressthink.org": 420,
         "archive.thinkprogress.org": 1,
         "asc.upenn.edu": 1,
         "ascmediarisk.org": 1,
@@ -4734,7 +4734,7 @@
         "grist.org": 1,
         "hac.bard.edu": 1,
         "huffingtonpost.com": 25,
-        "huffpost.com": 80,
+        "huffpost.com": 74,
         "ijnet.org": 1,
         "insidehighered.com": 1,
         "isoj.org": 1,
@@ -4762,7 +4762,7 @@
         "newscreatorcorps.org": 1,
         "newspapers.com": 82,
         "niemanlab.org": 11,
-        "npr.org": 4,
+        "npr.org": 3,
         "nybooks.com": 2,
         "nytimes.com": 1,
         "nyunews.com": 1,
@@ -4820,10 +4820,10 @@
       }
     },
     "runtime": {
-      "total_rows": 26822,
+      "total_rows": 26816,
       "missing": 0,
-      "external_values": 26821,
-      "unique_external_urls": 26821,
+      "external_values": 26815,
+      "unique_external_urls": 26815,
       "duplicate_external_values": 0,
       "internal_values": 1,
       "malformed_values": 0,
@@ -4836,7 +4836,7 @@
         "archive.blogs.harvard.edu": 1,
         "archive.nytimes.com": 1,
         "archive.org": 2,
-        "archive.pressthink.org": 419,
+        "archive.pressthink.org": 420,
         "archive.thinkprogress.org": 1,
         "asc.upenn.edu": 1,
         "ascmediarisk.org": 1,
@@ -4869,7 +4869,7 @@
         "grist.org": 1,
         "hac.bard.edu": 1,
         "huffingtonpost.com": 25,
-        "huffpost.com": 80,
+        "huffpost.com": 74,
         "ijnet.org": 1,
         "insidehighered.com": 1,
         "isoj.org": 1,
@@ -4897,7 +4897,7 @@
         "newscreatorcorps.org": 1,
         "newspapers.com": 82,
         "niemanlab.org": 11,
-        "npr.org": 4,
+        "npr.org": 3,
         "nybooks.com": 2,
         "nytimes.com": 1,
         "nyunews.com": 1,
@@ -5013,7 +5013,7 @@
     },
     "embedded_candidates": {
       "records": 91,
-      "matches": 5033,
+      "matches": 5034,
       "evidence": [
         {
           "record_id": "RECORD-00340",
@@ -24142,6 +24142,11 @@
         },
         {
           "record_id": "RECORD-00781",
+          "field": "notes",
+          "value": "https://web.archive.org/web/20100420125457/http://jayrosen.posterous.com/david-gregory-no-i-wont-fact-check-my-guests"
+        },
+        {
+          "record_id": "RECORD-00781",
           "field": "raw_text",
           "value": "http://web.archive.org/web/20100420125457/http://abcnews.go.com/ThisWeek/"
         },
@@ -30203,8 +30208,8 @@
       {
         "metric": "curated_source",
         "baseline": 1029,
-        "current": 1036,
-        "delta": 7
+        "current": 1030,
+        "delta": 1
       },
       {
         "metric": "social_source",
@@ -30215,8 +30220,8 @@
       {
         "metric": "published_curated_source",
         "baseline": 950,
-        "current": 1036,
-        "delta": 86
+        "current": 1030,
+        "delta": 80
       },
       {
         "metric": "published_social_source",
@@ -30239,20 +30244,20 @@
       {
         "metric": "published_total",
         "baseline": 26616,
-        "current": 26822,
-        "delta": 206
+        "current": 26816,
+        "delta": 200
       },
       {
         "metric": "entities",
         "baseline": 8150,
-        "current": 7324,
-        "delta": -826
+        "current": 7303,
+        "delta": -847
       },
       {
         "metric": "relationships",
         "baseline": 12556,
-        "current": 11153,
-        "delta": -1403
+        "current": 10976,
+        "delta": -1580
       }
     ],
     "explanation": [

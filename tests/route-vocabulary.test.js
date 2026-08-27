@@ -58,6 +58,7 @@ describe('route vocabulary single source of truth', () => {
       'dissertation',
       'entities',
       'folders',
+      'nowhere',
       'start',
       'wiki',
     ]);

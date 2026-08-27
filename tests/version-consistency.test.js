@@ -275,9 +275,8 @@ describe('import version consistency', () => {
 
 describe('CACHE_VERSION', () => {
   it('cacheConfig.js has a CACHE_VERSION defined', () => {
-    // The data-cache version lives in services/cacheConfig.js (#487), shared by
-    // archiveService.js and loaders/httpCachedLoader.js so the two cache paths
-    // cannot drift. (Separate from sw.js's CACHE_VERSION, checked below.)
+    // The data-cache version lives in services/cacheConfig.js (#487), read by
+    // archiveService.js. (Separate from sw.js's CACHE_VERSION, checked below.)
     const content = fs.readFileSync(path.join(frontendDir, 'services', 'cacheConfig.js'), 'utf-8');
     const match = content.match(/const CACHE_VERSION\s*=\s*['"](.+?)['"]/);
     assert.ok(match, 'CACHE_VERSION not found in cacheConfig.js');

@@ -70,11 +70,11 @@ cp .env.example .env
 ## Key commands
 
 ```bash
-poetry run python src/workflow.py                              # Run main pipeline
-poetry run python tools/diagnostics/data_deduper.py            # Deduplicate data
-poetry run python tools/backfill/backfill_worker.py            # Fill missing fields
-poetry run pytest                                              # Run tests
-poetry run pytest --cov                                        # Tests with coverage
+poetry run python src/rosen_scraper/workflow.py                  # Run main pipeline
+poetry run python scripts/diagnostics/data_deduper.py            # Deduplicate data
+poetry run python -m scripts.backfill.backfill_worker            # Backfill pull quotes and raw text
+poetry run pytest                                                 # Run tests
+poetry run pytest --cov                                           # Tests with coverage
 ```
 
 ## Schema

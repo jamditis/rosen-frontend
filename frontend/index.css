@@ -4742,3 +4742,142 @@ mark {
     margin-left: 1.5rem;
   }
 }
+
+/* Hidden extras (#754).
+
+   Four surfaces: the quiet dismissible note, the stuck-record skip, the
+   typewriter treatment, and the hidden #nowhere page. Every rule here follows
+   the same two limits. Motion is optional, so anything that moves is turned
+   off under prefers-reduced-motion while the words stay on the page. And
+   nothing here changes how the archive reads when no extra is showing. */
+
+.archive-notice.archive-egg-note {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  --archive-notice-accent: var(--archive-ink-faint);
+  --archive-notice-background: var(--archive-paper-deep);
+}
+
+.archive-egg-note__line {
+  flex: 1 1 auto;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--archive-ink);
+}
+
+.archive-egg-note__link {
+  flex: 0 0 auto;
+  min-height: var(--archive-target-min);
+  display: inline-flex;
+  align-items: center;
+  font-weight: var(--font-weight-bold);
+  color: var(--archive-ink);
+  text-decoration: underline;
+}
+
+.archive-egg-note__close {
+  flex: 0 0 auto;
+  min-width: var(--archive-target-min);
+  min-height: var(--archive-target-min);
+  color: var(--archive-ink-muted);
+}
+
+/* The record skips twice and stops. It never repeats on its own. */
+.archive-results--skipping {
+  animation: archive-record-skip 320ms steps(3, end) 2;
+}
+
+@keyframes archive-record-skip {
+  0% { transform: translateX(0); }
+  35% { transform: translateX(-5px); }
+  70% { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+/* The typewriter is a face, not a movement: it swaps the page font for a few
+   seconds and reverts itself, so there is no animation to reduce. */
+.archive-typewriter-egg,
+.archive-typewriter-egg .font-body,
+.archive-typewriter-egg .font-display {
+  font-family: var(--font-display);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+/* The page fills the shell it sits in, which is already at least one viewport
+   tall. Asking for a viewport height here as well pushed the shell past the
+   viewport whenever the update notice was showing, and an empty one-line page
+   picked up a scrollbar. */
+.archive-nowhere {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.archive-nowhere__line {
+  max-width: 32rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 4vw, 2.25rem);
+  line-height: 1.4;
+  color: var(--archive-ink);
+}
+
+.archive-nowhere__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.archive-nowhere__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--archive-target-min);
+  padding: 0.35rem 0.15rem;
+  border: 0;
+  background: none;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--archive-ink-muted);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.archive-nowhere__link:hover {
+  color: var(--archive-ink);
+}
+
+.archive-idle-line {
+  margin: 3rem auto 2rem;
+  max-width: 34rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--archive-ink-faint);
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .archive-idle-line {
+    animation: archive-idle-fade var(--duration-slow, 480ms) var(--ease-out, ease-out);
+  }
+}
+
+@keyframes archive-idle-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .archive-results--skipping {
+    animation: none;
+  }
+}

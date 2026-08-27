@@ -31,7 +31,7 @@ import {
   normalizeInPlace,
   DEFAULT_EMBEDDINGS_BIN_URL,
   DEFAULT_EMBEDDINGS_INDEX_URL,
-} from './embeddings-worker.js?v=3.8.33';
+} from './embeddings-worker.js?v=3.8.34';
 
 // The sentence-transformer that produced data/archive-embeddings.bin. A query
 // encoded by any other model lands in a different space and ranks noise.

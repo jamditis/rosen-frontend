@@ -683,21 +683,6 @@
       "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
     },
     {
-      "relationshipId": "RECORD-00846_REL_030",
-      "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
-    },
-    {
-      "relationshipId": "RECORD-00846_REL_031",
-      "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
-    },
-    {
-      "relationshipId": "RECORD-00846_REL_032",
-      "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
-    },
-    {
       "relationshipId": "RECORD-00847_REL_025",
       "observedType": "Founded By",
       "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
@@ -728,21 +713,6 @@
       "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
     },
     {
-      "relationshipId": "RECORD-00857_REL_004",
-      "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
-    },
-    {
-      "relationshipId": "RECORD-00857_REL_005",
-      "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
-    },
-    {
-      "relationshipId": "RECORD-00857_REL_006",
-      "observedType": "Founded By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
-    },
-    {
       "relationshipId": "RECORD-00859_REL_014",
       "observedType": "Founded By",
       "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
@@ -764,11 +734,6 @@
     },
     {
       "relationshipId": "RECORD-00876_REL_006",
-      "observedType": "Owned By",
-      "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
-    },
-    {
-      "relationshipId": "RECORD-00877_REL_030",
       "observedType": "Owned By",
       "reason": "Legacy inverse relationship type awaiting semantic normalization in issue #737."
     },
@@ -877,12 +842,7 @@
     {
       "entityIds": ["P0005", "O0033"],
       "types": ["Owns", "Owned By"],
-      "reason": "Records assert 'Jay Rosen Owns PressThink' against the Organization-typed PressThink entity O0033 (RECORD-00501_REL_003, RECORD-00835_REL_025) and separately 'PressThink Owned By Jay Rosen' against the same entity (RECORD-00483_REL_002) -- the same ownership fact encoded twice under Owns and its unconfirmed candidate inverse Owned By. Which label to keep is a pending curator decision (issue #737)."
-    },
-    {
-      "entityIds": ["P0005", "W0666"],
-      "types": ["Owns", "Owned By"],
-      "reason": "Records assert 'Jay Rosen Owns PressThink' against the Work-typed PressThink entity W0666 (RECORD-00800_REL_002, RECORD-00847_REL_023) and separately 'PressThink Owned By Jay Rosen' against the same entity (RECORD-00716_REL_003) -- the same ownership fact encoded twice under Owns and its unconfirmed candidate inverse Owned By. W0666 is a duplicate of the Organization-typed PressThink entity O0033 (extracted_entities.csv has PressThink registered under both an Organization row and a Work row); resolving that entity-dedup gap is separate curator/pipeline work, not part of issue #737."
+      "reason": "Records assert 'Jay Rosen Owns PressThink' against the PressThink entity O0033 (RECORD-00501_REL_003, RECORD-00835_REL_025, RECORD-00800_REL_002, RECORD-00847_REL_023) and separately 'PressThink Owned By Jay Rosen' against the same entity (RECORD-00483_REL_002, RECORD-00716_REL_003) -- the same ownership fact encoded twice under Owns and its unconfirmed candidate inverse Owned By. Which label to keep is a pending curator decision (issue #737). PressThink's duplicate Work-typed entity W0666 was merged into O0033 on 2026-08-27 (issue #859), which is why this entry now covers relationship rows that used to be split across two exceptions, one per entity id."
     }
   ]
 }

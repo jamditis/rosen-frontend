@@ -208,24 +208,37 @@ and temporal scope of every type, use
 #737) — where this table and the registry disagree, the registry governs, and
 this table should be corrected to match it, not the other way around.
 
-Two things the registry tracks that this table doesn't:
+Three things the registry tracks that this table doesn't:
 
 - **Endpoint-type divergence.** Some current rows have a source or target
   entity type the schema doesn't allow for that type — for example, an
   `Occurred At` row whose source isn't an `Event` or whose target isn't a
-  `Location`, even though that's the type's declared shape. The registry
-  records these under each affected type's `endpointDivergence` (counts and
-  example relationship IDs) and marks that type's endpoint-type enforcement
-  `"deferred"` until a curator reviews and fixes the backlog. New rows should
-  still follow the declared endpoint types.
-- **`Owned By` and `Founded By` are not confirmed inverses.** They read like
-  the inverse of `Owns` and `Founded` ("A Owned By B" meaning "B owns A"), but
-  the source/target ordering is inconsistent across existing rows — sometimes
-  the founder or owner is the source entity, sometimes the target. The
-  registry marks both `"status": "deferred"` rather than asserting a
-  direction it can't confirm from the data; which rows (if any) need
-  correcting is a curator decision, not something this document or the
-  registry decides on its own.
+  `Location`, even though that's the type's declared shape. Every affected
+  type records this under its `endpointDivergence` (counts and example
+  relationship IDs), and its `endpointEnforcement` says what that means:
+  `"deferred"` means no curator ruling exists yet (`Occurred At` is the only
+  one left in this state); `"reviewed"` means a curator ruling settled the
+  endpoint rule (issue #737's 2026-08-27 comment), but rows that predate it
+  and still don't fit are not validation failures — `node
+  scripts/validate-graph-data.mjs` collects them into the committed
+  [`relationship-review-report.json`](relationship-review-report.json)
+  instead of throwing. New rows should still follow the declared endpoint
+  types either way.
+- **`Owned By` and `Founded By` now have a curator-confirmed direction, but
+  stay `"status": "deferred"`.** The 2026-08-27 ruling settled the reading
+  ("A Owned By B" / "A Founded By B" means B owns / founded A — source is the
+  owned or founded entity, target is the owner or founder), so their
+  `directionality` is no longer null. They stay `"deferred"` here only because
+  neither is part of the active extraction schema
+  (`backend/entity_extraction_schema_v3.json`) — that field tracks whether a
+  type is schema-derived and writable going forward, not whether its meaning
+  is settled. Rows that still read backward under the confirmed direction are
+  in the review report, same as any other `"reviewed"` type.
+- **`Discusses`' direction, `Occurred At`, and `Covers` stay open.** The
+  2026-08-27 ruling widened `Discusses`' endpoint types but left its
+  direction split — both readings are documented in its registry entry's
+  `directionNote`. `Occurred At` and `Covers` were not ruled on at all; both
+  readings stay in their `deferralReason`/`endpointDivergence.note`.
 
 ### Impact / influence (defined for #344, backfill pending)
 

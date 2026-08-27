@@ -1,7 +1,9 @@
 import { createRoot } from 'react-dom/client';
-import { html } from './html.js?v=3.8.33';
-import App from './App.js?v=3.8.33';
-import { registerArchiveSiteTools } from './services/siteTools.js?v=3.8.33';
+import { html } from './html.js?v=3.8.34';
+import App from './App.js?v=3.8.34';
+import { registerArchiveSiteTools } from './services/siteTools.js?v=3.8.34';
+import { logWatchdog } from './utils/consoleWatchdog.js?v=3.8.34';
+import { installTypewriterEgg } from './services/typewriterEgg.js?v=3.8.34';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -10,6 +12,16 @@ if (!rootElement) {
 
 const root = createRoot(rootElement);
 root.render(html`<${App} />`);
+
+// Hidden extras (#754): the console watchdog barks once per load, and the
+// typewriter waits for its sequence. Both are additive, silent, and wrapped so
+// a failure here can never take down the app mounted above.
+try {
+  logWatchdog();
+  installTypewriterEgg();
+} catch {
+  // An archive that loads matters more than an extra that does not.
+}
 
 // WebMCP is progressive enhancement. Supporting browsers receive structured,
 // read-only archive tools. Every other browser continues with the same app.

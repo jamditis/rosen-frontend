@@ -1,13 +1,14 @@
 
 import { useState, useEffect, useRef } from 'react';
-import { html } from '../html.js?v=3.8.33';
+import { html } from '../html.js?v=3.8.34';
 import { X, Search, XCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import {
   findSearchSuggestions,
   normalizeForSearch,
-} from '../utils/searchNormalize.js?v=3.8.33';
-import { CONTENT_TYPE_OPTIONS } from '../constants.js?v=3.8.33';
-import SemanticSearchToggle from './SemanticSearchToggle.js?v=3.8.33';
+} from '../utils/searchNormalize.js?v=3.8.34';
+import { CONTENT_TYPE_OPTIONS } from '../constants.js?v=3.8.34';
+import { createRapidRepeatCounter } from '../utils/easterEggs.js?v=3.8.34';
+import SemanticSearchToggle from './SemanticSearchToggle.js?v=3.8.34';
 
 const Sidebar = ({
   facets,
@@ -21,6 +22,10 @@ const Sidebar = ({
   // not offer the toggle, so the search group renders without it.
   semanticSearch = null,
   variant = 'standard',
+  // Called when one category is toggled five times in quick succession
+  // (#754). Optional: shells that do not offer the extra simply omit it, and
+  // the filter itself behaves the same either way.
+  onCategoryStreak = null,
 }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -30,6 +35,10 @@ const Sidebar = ({
   ));
   const searchRef = useRef(null);
   const searchInputRef = useRef(null);
+  // Counts quick repeat clicks on one category. Held in a ref so counting
+  // never re-renders the filter panel, and built on the first click so no
+  // counter is made and thrown away on every render.
+  const categoryStreak = useRef(null);
 
   const handleSearchChange = (e) => {
     const val = e.target.value;
@@ -49,6 +58,13 @@ const Sidebar = ({
     setShowSuggestions(false);
   };
 
+  // True on the click that completes a streak. Every click on the chip counts,
+  // whether it turns the filter on or off, so five clicks are five clicks.
+  const countCategoryClick = (cat) => {
+    if (!categoryStreak.current) categoryStreak.current = createRapidRepeatCounter();
+    return categoryStreak.current.register(cat, Date.now());
+  };
+
   const toggleCategory = (cat) => {
     setFilters(prev => {
       const exists = prev.categories.includes(cat);
@@ -57,6 +73,9 @@ const Sidebar = ({
         categories: exists ? prev.categories.filter(c => c !== cat) : [...prev.categories, cat]
       };
     });
+    if (onCategoryStreak && countCategoryClick(cat)) {
+      onCategoryStreak(cat);
+    }
   };
 
   const handleEraChange = (era) => {
