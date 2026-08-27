@@ -193,8 +193,7 @@ const DISSERTATION_RECORD = {
 };
 
 // Cache configuration (CACHE_VERSION / CACHE_TTL_MS / MAX_LOCALSTORAGE_SIZE
-// and the cacheKeyFor hash) is shared with loaders/httpCachedLoader.js via
-// cacheConfig.js so the two cache paths cannot drift.
+// and the cacheKeyFor hash) lives in cacheConfig.js rather than inline.
 
 /**
  * Check version.json on the server. If the version has changed,
@@ -417,7 +416,7 @@ export const fetchCoreData = async () => {
     // partial deploy) as a successful load of a 1-record archive — visitors
     // and monitors could not tell it apart from the real one. App.js's
     // .catch renders the explicit "Unable to load archive" error state
-    // instead. Mirrors httpCachedLoader.js, which forbids the same masking.
+    // instead.
     console.error('Error fetching core data:', error);
     throw error;
   }
@@ -514,6 +513,36 @@ export const toRecords = (payload) =>
   }));
 
 /**
+ * True when a parsed entities payload has the shape fetchEntitiesData and
+ * buildEntityMaps expect. Both tolerate drift silently by design —
+ * buildEntityMaps guards each field with Array.isArray and just skips it,
+ * and toRecords falls back to `{}` for a missing recordEntityMap — so a
+ * renamed or retyped field would otherwise build an empty entity index with
+ * no error instead of failing loud (#503). `entities` must always be an
+ * array. `records`, when present, must be an array too (so a malformed
+ * `records` cannot silently take precedence over a valid `recordEntityMap`
+ * and then get skipped by buildEntityMaps); when `records` is absent,
+ * `recordEntityMap` must be a real, non-array object.
+ * @param {unknown} payload
+ * @returns {boolean}
+ */
+export const isValidEntitiesPayload = (payload) => {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return false;
+  if (!Array.isArray(payload.entities)) return false;
+
+  const { records, recordEntityMap } = payload;
+  if (records !== undefined && records !== null) {
+    return Array.isArray(records);
+  }
+  return (
+    recordEntityMap !== undefined &&
+    recordEntityMap !== null &&
+    typeof recordEntityMap === 'object' &&
+    !Array.isArray(recordEntityMap)
+  );
+};
+
+/**
  * Fetch entities data (on-demand, when the entity browser opens)
  */
 export const fetchEntitiesData = async () => {
@@ -534,6 +563,18 @@ export const fetchEntitiesData = async () => {
     // Check cache first
     const cached = getCachedData(dataUrl);
     if (cached) {
+      if (!isValidEntitiesPayload(cached)) {
+        // A cache entry written before this shape check shipped, or one
+        // corrupted in Web Storage, can carry the same drift a fresh fetch
+        // can. Route it through the identical shaped failure below rather
+        // than building an empty entity index from it.
+        console.error('Cached entities data has an unexpected shape; treating as a load failure.');
+        return {
+          entities: [],
+          recordEntityMap: {},
+          error: 'The entity index could not load. Archive records remain available.',
+        };
+      }
       debug('Using cached entities data');
       entitiesCache = cached;
       buildEntityMaps({
@@ -552,6 +593,9 @@ export const fetchEntitiesData = async () => {
       }
 
       const data = await response.json();
+      if (!isValidEntitiesPayload(data)) {
+        throw new Error('Entity data has an unexpected shape (entities is not an array, or records/recordEntityMap is malformed)');
+      }
       entitiesCache = data;
 
       // Build entity maps for the entity browser

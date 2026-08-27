@@ -11,9 +11,9 @@
  *
  *   invertRecordEntityMap(recordEntityMap) - entity id -> [record ids], the
  *       transpose of the record->entity map already shipped in
- *       archive-entities.json. Both archiveService.buildEntityMaps and
- *       entityIndex.createEntityIndex compute this inline at load; this is that
- *       same inversion as one pure, tested function.
+ *       archive-entities.json. archiveService.buildEntityMaps computes this
+ *       inline at load; this is that same inversion as one pure, tested
+ *       function.
  *
  * Pure and side-effect-free: no fs, no fetch, no globals. These are the
  * decomposed cores #277 would consume; nothing here writes an artifact or

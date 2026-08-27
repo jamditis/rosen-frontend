@@ -3,7 +3,7 @@
  *
  * #277 wants to move two jobs to build time: facet posting lists (replacing the
  * per-filter Array scan) and a pre-baked entity->records map (replacing the
- * load-time inversion in archiveService/entityIndex). This script grounds that
+ * load-time inversion in archiveService.buildEntityMaps). This script grounds that
  * proposal in current data instead of the issue's estimates, which were written
  * when the archive was ~10x smaller. It prints:
  *
