@@ -7,6 +7,7 @@ import {
   buildPreservationSample,
   formatPreservationSampleJson,
   formatPreservationSampleMarkdown,
+  parseArgs,
   DEFAULT_QUOTAS
 } from '../scripts/select-preservation-sample.mjs';
 
@@ -288,5 +289,30 @@ describe('preservation sample selection (real corpus, default quotas)', () => {
       assert.equal(typeof manifest.credential_policy, 'string');
       assert.match(manifest.credential_policy, /never supply|credential/i);
     }
+  });
+});
+
+describe('preservation sample CLI argument parsing', () => {
+  it('rejects a non-numeric --sample-size instead of silently producing NaN', () => {
+    assert.throws(() => parseArgs(['--sample-size', 'abc']), /--sample-size must be a positive integer/);
+  });
+
+  it('rejects a zero or negative --sample-size', () => {
+    assert.throws(() => parseArgs(['--sample-size', '0']), /--sample-size must be a positive integer/);
+    assert.throws(() => parseArgs(['--sample-size', '-5']), /--sample-size must be a positive integer/);
+  });
+
+  it('rejects a --sample-size with no value instead of taking the next flag as its value', () => {
+    assert.throws(() => parseArgs(['--sample-size']), /--sample-size requires a value/);
+  });
+
+  it('rejects a --seed with no value instead of using the literal string "undefined"', () => {
+    assert.throws(() => parseArgs(['--seed']), /--seed requires a value/);
+  });
+
+  it('accepts a well-formed --sample-size and --seed', () => {
+    const args = parseArgs(['--sample-size', '20', '--seed', 'my-seed']);
+    assert.equal(args.sampleSize, 20);
+    assert.equal(args.seed, 'my-seed');
   });
 });

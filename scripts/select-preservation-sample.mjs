@@ -571,7 +571,16 @@ export function formatPreservationSampleMarkdown(manifest) {
 
 // ----- CLI -----
 
-function parseArgs(argv) {
+// Every flag here takes exactly one value; `next` reads it and rejects a
+// missing one so `--seed` at the end of argv can't silently become the
+// literal string "undefined".
+function requireValue(argv, index, flag) {
+  const value = argv[index];
+  if (value === undefined) throw new Error(`${flag} requires a value`);
+  return value;
+}
+
+export function parseArgs(argv) {
   const args = {
     dataDir: path.join(ROOT_DIR, 'data'),
     outputDir: path.join(ROOT_DIR, 'data'),
@@ -580,11 +589,17 @@ function parseArgs(argv) {
   };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
-    if (arg === '--data-dir') args.dataDir = path.resolve(argv[++index]);
-    else if (arg === '--output-dir') args.outputDir = path.resolve(argv[++index]);
-    else if (arg === '--seed') args.seed = argv[++index];
-    else if (arg === '--sample-size') args.sampleSize = Number(argv[++index]);
-    else throw new Error(`Unknown argument: ${arg}`);
+    if (arg === '--data-dir') args.dataDir = path.resolve(requireValue(argv, ++index, '--data-dir'));
+    else if (arg === '--output-dir') args.outputDir = path.resolve(requireValue(argv, ++index, '--output-dir'));
+    else if (arg === '--seed') args.seed = requireValue(argv, ++index, '--seed');
+    else if (arg === '--sample-size') {
+      const raw = requireValue(argv, ++index, '--sample-size');
+      const parsed = Number(raw);
+      if (!Number.isInteger(parsed) || parsed <= 0) {
+        throw new Error(`--sample-size must be a positive integer, got: ${raw}`);
+      }
+      args.sampleSize = parsed;
+    } else throw new Error(`Unknown argument: ${arg}`);
   }
   return args;
 }
