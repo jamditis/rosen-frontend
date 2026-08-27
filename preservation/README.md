@@ -25,6 +25,8 @@ manifest instead of editing it.
   into schema v1 without changing its source file.
 - `import-social-baseline.mjs` packages the existing `data/social_posts.csv`
   rows into a schema v1 baseline without making a live network call.
+- `import-preservation-sample.mjs` projects `data/preservation-sample.json`'s
+  100 pilot sources into schema v1 objects without changing the sample file.
 - `examples/` contains successful capture, existing Wayback, bot-wall,
   oversize-abort, and rights-hold manifests.
 - `MIGRATING.md` defines compatibility and migration rules.
@@ -329,3 +331,38 @@ rows) and can take on the order of a minute; it is not part of `npm test`,
 only `npm run validate:preservation`. `tests/social-baseline-preservation.test.js`
 covers behavior with small fixtures plus bounded and full-corpus structural
 checks against the real CSV, so `npm test` stays fast.
+
+## Preservation sample compatibility
+
+`data/preservation-sample.json` (issue #704) lists the 100 sources chosen for
+the preservation pilot, each a plain `{ id, objectType, url }` under its own
+`preservation-sample/1.0.0` schema. That shape predates this manifest's object
+vocabulary, so `import-preservation-sample.mjs` (issue #857) projects it into
+schema v1 objects without editing the sample file, its generator
+(`scripts/select-preservation-sample.mjs`), or its schema:
+
+| Sample field | Preservation field |
+|---|---|
+| `id` | `sourceRecordId` and the object ID's stable suffix |
+| `objectType` | passed through as `objectType`, and the object ID's type segment |
+| `url` | `canonicalSourceUrl`, or a `urn:rosen:social-source:missing-url:<id>` placeholder when the source has no url |
+
+The pilot has not run a capture yet, so there is no retrieval evidence to
+package: the projected manifest carries `objects` only, with `events` and
+`artifacts` both empty (the schema allows either to be empty). A later
+stewardship stage can append real `source-check` and `capture-attempt` events
+on top of this projection without touching it.
+
+Seven of the 100 sources have no recoverable url. Rather than invent one, they
+reuse the same `urn:rosen:social-source:missing-url:<id>` convention the
+social-post baseline above already established — all seven are `social-post`
+sources, so the existing convention covers them as-is. A url-less source of
+any other `objectType` has no established convention to borrow, so the
+adapter fails loudly on one instead of fabricating a new placeholder scheme
+for it.
+
+Verify the current 100-source sample against schema v1:
+
+```text
+node preservation/import-preservation-sample.mjs --verify
+```

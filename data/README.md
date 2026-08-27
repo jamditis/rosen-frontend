@@ -200,6 +200,8 @@ The sample is stratified across curated and social platforms (PressThink long-fo
 
 The manifest carries two parallel arrays, same IDs and order. `sources` (`id`, `objectType`, `url`) is the blind view meant for whoever runs the pilot capture pass — it carries no hint about why a source was picked. `selection` adds `stratum`, `group`, `reason`, and the audit fields behind the pick (platform, URL status, verified, raw-text/graph-link presence, host); it is for curator and reviewer eyes only and must never be handed to the blind worker.
 
+To check `preservation-sample.json` against `preservation-manifest.schema.json`'s object vocabulary (urn-form object IDs, non-null `canonicalSourceUrl`), see `preservation/import-preservation-sample.mjs` and the "Preservation sample compatibility" section of [`preservation/README.md`](../preservation/README.md).
+
 For the full record-adding walkthrough — written for non-technical curators — see [`ADDING-RECORDS.md`](../ADDING-RECORDS.md). For which files to upload to production, see [`DEPLOYMENT.md`](../DEPLOYMENT.md).
 
 ### A note on history
