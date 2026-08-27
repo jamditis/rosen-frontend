@@ -166,8 +166,8 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
-        "violatingRows": 46,
-        "totalRows": 1592,
+        "violatingRows": 45,
+        "totalRows": 1583,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00043_REL_016",
@@ -176,7 +176,7 @@
           "RECORD-00089_REL_007",
           "RECORD-00126_REL_005"
         ],
-        "note": "46 of 1592 current Mentions rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 widened allowedSourceTypes to include Event and allowedTargetTypes to include Concept. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "45 of 1583 current Mentions rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 widened allowedSourceTypes to include Event and allowedTargetTypes to include Concept. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
         "pairCount": 31,
@@ -202,7 +202,7 @@
             "backwardAssertion": "CNN -> Fox News"
           }
         ],
-        "note": "31 entity pairs (74 rows) currently have Mentions asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+        "note": "31 entity pairs (73 rows) currently have Mentions asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       },
       "directionNote": "Reversed pairs are two separate, independently true facts, not the same fact recorded twice (issue #737 curator ruling, 2026-08-27). Direction stays as declared. The directionalContradictions list above is historical evidence for that ruling, not a review to-do list."
     },
@@ -234,7 +234,7 @@
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
         "violatingRows": 7,
-        "totalRows": 1140,
+        "totalRows": 1114,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00503_REL_032",
@@ -243,7 +243,7 @@
           "RECORD-00684_REL_014",
           "RECORD-00708_REL_021"
         ],
-        "note": "7 of 1140 current Criticizes rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Concept to allowedSourceTypes (concepts can criticize other concepts, e.g. \"Weblogging criticizes View from Nowhere\"). These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "7 of 1114 current Criticizes rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Concept to allowedSourceTypes (concepts can criticize other concepts, e.g. \"Weblogging criticizes View from Nowhere\"). These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
         "pairCount": 7,
@@ -299,7 +299,7 @@
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
         "violatingRows": 16,
-        "totalRows": 166,
+        "totalRows": 163,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00499_REL_040",
@@ -308,7 +308,7 @@
           "RECORD-00687_REL_007",
           "RECORD-00689_REL_014"
         ],
-        "note": "16 of 166 current Cites rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Concept to allowedSourceTypes (an idea can cite another idea as source material, matching the same ruling for Criticizes, Discusses, Expands On, and Pioneered) and to allowedTargetTypes (citing an idea, not just a person, work, or organization, is normal usage). These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "16 of 163 current Cites rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Concept to allowedSourceTypes (an idea can cite another idea as source material, matching the same ruling for Criticizes, Discusses, Expands On, and Pioneered) and to allowedTargetTypes (citing an idea, not just a person, work, or organization, is normal usage). These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
         "pairCount": 3,
@@ -365,8 +365,8 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
-        "violatingRows": 126,
-        "totalRows": 2480,
+        "violatingRows": 125,
+        "totalRows": 2462,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00003_REL_006",
@@ -375,7 +375,7 @@
           "RECORD-00071_REL_007",
           "RECORD-00082_REL_001"
         ],
-        "note": "126 of 2480 current Discusses rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Concept to allowedSourceTypes and Organization plus Person to allowedTargetTypes. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "125 of 2462 current Discusses rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Concept to allowedSourceTypes and Organization plus Person to allowedTargetTypes. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
         "pairCount": 10,
@@ -429,7 +429,7 @@
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
         "violatingRows": 18,
-        "totalRows": 194,
+        "totalRows": 187,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00061_REL_005",
@@ -438,7 +438,7 @@
           "RECORD-00291_REL_010",
           "RECORD-00300_REL_011"
         ],
-        "note": "18 of 194 current Expands On rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Concept to allowedSourceTypes (at 80% of all rows, a concept expanding on another concept, e.g. \"Public Journalism expands on democracy,\" is the dominant real-world pattern, not the exception). These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "18 of 187 current Expands On rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Concept to allowedSourceTypes (at 80% of all rows, a concept expanding on another concept, e.g. \"Public Journalism expands on democracy,\" is the dominant real-world pattern, not the exception). These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
         "pairCount": 2,
@@ -458,7 +458,7 @@
             "backwardAssertion": "He Said, She Said Journalism -> False Balance"
           }
         ],
-        "note": "3 entity pairs (7 rows) currently have Expands On asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+        "note": "2 entity pairs (5 rows) currently have Expands On asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       },
       "directionNote": "Reversed pairs are two separate, independently true facts, not the same fact recorded twice (issue #737 curator ruling, 2026-08-27). Direction stays as declared. The directionalContradictions list above is historical evidence for that ruling, not a review to-do list."
     },
@@ -483,7 +483,7 @@
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
         "violatingRows": 707,
-        "totalRows": 3154,
+        "totalRows": 3157,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00003_REL_004",
@@ -492,11 +492,11 @@
           "RECORD-00020_REL_009",
           "RECORD-00020_REL_010"
         ],
-        "note": "717 of 3209 current Affiliated With rows have a source or target entity type outside the declared allowlist. The issue #737 curator ruling, 2026-08-27, keeps this type strictly directed (Person source, Organization target); do not widen it. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "707 of 3157 current Affiliated With rows have a source or target entity type outside the declared allowlist. The issue #737 curator ruling, 2026-08-27, keeps this type strictly directed (Person source, Organization target); do not widen it. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
         "pairCount": 55,
-        "rowsInvolved": 207,
+        "rowsInvolved": 208,
         "asOfDate": "2026-08-27",
         "examplePairs": [
           {
@@ -518,7 +518,7 @@
             "backwardAssertion": "Catherine Mathis -> The New York Times"
           }
         ],
-        "note": "55 entity pairs (211 rows) currently have Affiliated With asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+        "note": "55 entity pairs (208 rows) currently have Affiliated With asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       },
       "directionNote": "Reversed rows are the same employment or membership fact recorded backward, not a second fact (issue #737 curator ruling, 2026-08-27) -- unlike Mentions or Criticizes, \"employer affiliated with employee\" and \"employee affiliated with employer\" describe one relationship. Each reversed row is a candidate for a swap or a drop, listed in data/relationship-review-report.json for curator review."
     },
@@ -543,8 +543,8 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
-        "violatingRows": 128,
-        "totalRows": 538,
+        "violatingRows": 114,
+        "totalRows": 533,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00005_REL_002",
@@ -553,7 +553,7 @@
           "RECORD-00060_REL_001",
           "RECORD-00098_REL_014"
         ],
-        "note": "128 of 538 current Published In rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Person to allowedSourceTypes (\"Jay Rosen published in PressThink\" is normal byline shorthand, not an error). These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "114 of 533 current Published In rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Person to allowedSourceTypes (\"Jay Rosen published in PressThink\" is normal byline shorthand, not an error). These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
         "pairCount": 8,
@@ -603,8 +603,8 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
-        "violatingRows": 566,
-        "totalRows": 763,
+        "violatingRows": 541,
+        "totalRows": 729,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00005_REL_018",
@@ -613,10 +613,10 @@
           "RECORD-00042_REL_010",
           "RECORD-00045_REL_004"
         ],
-        "note": "566 of 763 current Originated By rows still have a source or target entity type outside the newly declared allowlist. Most of these were already off-schema under the old declared shape (a Person or Work endpoint where the type doesn't allow one) and are unrelated to the direction flip below. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "541 of 729 current Originated By rows still have a source or target entity type outside the newly declared allowlist. Most of these were already off-schema under the old declared shape (a Person or Work endpoint where the type doesn't allow one) and are unrelated to the direction flip below. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
-        "pairCount": 32,
+        "pairCount": 31,
         "rowsInvolved": 109,
         "asOfDate": "2026-08-27",
         "examplePairs": [
@@ -639,7 +639,7 @@
             "backwardAssertion": "Jay Rosen -> Verification in Reverse"
           }
         ],
-        "note": "44 entity pairs (138 rows) currently have Originated By asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+        "note": "31 entity pairs (109 rows) currently have Originated By asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       },
       "directionNote": "The issue #737 curator ruling, 2026-08-27, flips the declared direction from Concept (source) / Person (target) to Person (source) / Concept (target), matching the intuitive \"Rosen originated View from Nowhere\" reading. The ruling sheet's premise -- that 638 of 763 rows (84%) already ran Person -> Concept -- does not hold up against the data: Person -> Concept is only 197 of 763 rows (26%), Concept -> Person is 125 (16%), and the remaining 441 rows are spread across 16 other endpoint shapes (Work -> Person, Person -> Work, Concept -> Organization, and 13 more). The flip moves the share that already conformed from 125 rows to 197, not to 638. The 566 rows that do not fit the new Person -> Concept allowlist -- including the 125 in the old Concept -> Person order -- are the ones flagged in data/relationship-review-report.json for curator review; see endpointDivergence above for the current count. Reviewing them is a curator decision (issue #737), not a validator failure; separately, Person -> Work pairs among the flagged rows (like Ron Brynaert and \"Does the New York Times Have a Learning Disability?\") likely belong to Authored By instead of Originated By."
     },
@@ -663,8 +663,8 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "deferred",
       "endpointDivergence": {
-        "violatingRows": 140,
-        "totalRows": 246,
+        "violatingRows": 141,
+        "totalRows": 247,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00003_REL_001",
@@ -673,7 +673,7 @@
           "RECORD-00079_REL_014",
           "RECORD-00079_REL_015"
         ],
-        "note": "143 of 252 current Occurred At rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Occurred At is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes. Confirmed still deferred by the issue #737 curator ruling, 2026-08-27: the sample rows don't even agree with each other on ordering (some run organization -> location, others the reverse for the same organization), so no rule is declared here yet. Both readings -- \"an organization's location, mistakenly filed under Occurred At\" and \"a real event, recorded with the wrong endpoint types\" -- stay documented pending a manual read of the source text."
+        "note": "141 of 247 current Occurred At rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Occurred At is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes. Confirmed still deferred by the issue #737 curator ruling, 2026-08-27: the sample rows don't even agree with each other on ordering (some run organization -> location, others the reverse for the same organization), so no rule is declared here yet. Both readings -- \"an organization's location, mistakenly filed under Occurred At\" and \"a real event, recorded with the wrong endpoint types\" -- stay documented pending a manual read of the source text."
       },
       "directionalContradictions": {
         "pairCount": 2,
@@ -723,7 +723,7 @@
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
         "violatingRows": 6,
-        "totalRows": 291,
+        "totalRows": 289,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00001_REL_007",
@@ -732,7 +732,7 @@
           "RECORD-00717_REL_009",
           "RECORD-00721_REL_016"
         ],
-        "note": "6 of 291 current Supports rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Work to allowedTargetTypes (\"an organization supports a project or publication\" is common usage). These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "6 of 289 current Supports rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Work to allowedTargetTypes (\"an organization supports a project or publication\" is common usage). These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
         "pairCount": 8,
@@ -785,16 +785,15 @@
       "inverseNote": "The candidate inverse label \"Owned By\" is recorded as candidateInverseType so the validator can detect when the same fact is asserted under both labels. The issue #737 curator ruling, 2026-08-27, confirms Owned By as Owns' inverse in meaning (see directionNote below and the Owned By entry's rulingNote); inverseType stays null here anyway, because Owned By remains status: \"deferred\" -- it sits outside the active extraction schema (backend/entity_extraction_schema_v3.json), and inverseType is reserved for a formal pairing between two accepted types. candidateInverseType is now a deliberate, permanent hold on that promotion, not an unresolved question.",
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
-        "violatingRows": 4,
-        "totalRows": 66,
+        "violatingRows": 3,
+        "totalRows": 64,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00690_REL_001",
           "RECORD-00741_REL_011",
-          "RECORD-00812_REL_013",
-          "RECORD-00855_REL_007"
+          "RECORD-00812_REL_013"
         ],
-        "note": "4 of 66 current Owns rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Work to allowedTargetTypes (owning a publication or format, like \"Jay Rosen owns PressThink,\" is the clear dominant non-Organization pattern). The remaining rows have an Event or Concept target that looks like entity mistyping (for example \"TimesSelect\" recorded once as a Work and once as a Concept) and are listed in data/relationship-review-report.json for individual, entity-by-entity review rather than a further schema widening. New rows must follow the declared endpoint types."
+        "note": "3 of 64 current Owns rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Work to allowedTargetTypes (owning a publication or format, like \"Jay Rosen owns PressThink,\" is the clear dominant non-Organization pattern). The remaining rows have an Event or Concept target that looks like entity mistyping (for example \"TimesSelect\" recorded once as a Work and once as a Concept) and are listed in data/relationship-review-report.json for individual, entity-by-entity review rather than a further schema widening. New rows must follow the declared endpoint types."
       },
       "candidateInverseType": "Owned By",
       "directionNote": "The issue #737 curator ruling, 2026-08-27, confirms Owned By as Owns' inverse (source = owned entity, target = owner). The 5 rows that already encode one ownership fact under both labels stay recorded in data/graph-validation-holds.json duplicateEdgeExceptions pending a manual cleanup that drops the Owned By side, per the ruling's recommendation to keep Owns as the canonical label; this implementation does not edit extracted_relationships.csv rows."
@@ -846,7 +845,7 @@
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
         "violatingRows": 41,
-        "totalRows": 232,
+        "totalRows": 225,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00746_REL_005",
@@ -855,7 +854,7 @@
           "RECORD-00496_REL_002",
           "RECORD-00496_REL_004"
         ],
-        "note": "41 of 232 current Pioneered rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Organization and Concept to allowedSourceTypes and Work to allowedTargetTypes. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
+        "note": "41 of 225 current Pioneered rows still have a source or target entity type outside the declared allowlist, even after the issue #737 curator ruling, 2026-08-27 added Organization and Concept to allowedSourceTypes and Work to allowedTargetTypes. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures. New rows must follow the declared endpoint types."
       },
       "directionalContradictions": {
         "pairCount": 3,
@@ -881,7 +880,7 @@
             "backwardAssertion": "OffTheBus -> Pro-Am journalism"
           }
         ],
-        "note": "3 entity pairs (11 rows) currently have Pioneered asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+        "note": "3 entity pairs (10 rows) currently have Pioneered asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       },
       "directionNote": "The issue #737 curator ruling, 2026-08-27, resolves this type's prior split verdict: a concept as the source (like \"Citizens agenda pioneered Hearken\") is valid usage, not a backward row, matching how concepts act as agents elsewhere in Rosen's critical vocabulary. Rows like that one still have an Organization target, which allowedTargetTypes does not cover, so they stay in data/relationship-review-report.json pending individual review rather than a further widening."
     },
@@ -934,8 +933,8 @@
       ],
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
-        "violatingRows": 108,
-        "totalRows": 129,
+        "violatingRows": 103,
+        "totalRows": 124,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00010_REL_002",
@@ -944,7 +943,7 @@
           "RECORD-00301_REL_007",
           "RECORD-00324_REL_001"
         ],
-        "note": "108 of 129 held Founded By rows read backward under the curator-confirmed direction (source = founded entity, target = founder; issue #737 curator ruling, 2026-08-27) -- for example \"Jay Rosen -> PressThink\" instead of the confirmed \"PressThink -> Jay Rosen.\" This is a majority of the type, matching the ruling's own conclusion that most Founded By rows need an individual pass. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures, since this type stays outside the active extraction schema and every row is already held."
+        "note": "103 of 124 held Founded By rows read backward under the curator-confirmed direction (source = founded entity, target = founder; issue #737 curator ruling, 2026-08-27) -- for example \"Jay Rosen -> PressThink\" instead of the confirmed \"PressThink -> Jay Rosen.\" This is a majority of the type, matching the ruling's own conclusion that most Founded By rows need an individual pass. These rows are listed in data/relationship-review-report.json for curator review; they are not validation failures, since this type stays outside the active extraction schema and every row is already held."
       },
       "observedSourceTypes": [
         "Event",
@@ -973,7 +972,7 @@
       ],
       "directionalContradictions": {
         "pairCount": 7,
-        "rowsInvolved": 28,
+        "rowsInvolved": 30,
         "asOfDate": "2026-08-27",
         "examplePairs": [
           {
@@ -995,7 +994,7 @@
             "backwardAssertion": "Jay Rosen -> PressThink"
           }
         ],
-        "note": "7 entity pairs (31 rows) assert Founded By in both directions for the same two entities. This is the same endpoint-ordering inconsistency named in deferralReason above, made concrete."
+        "note": "7 entity pairs (30 rows) assert Founded By in both directions for the same two entities. This is the same endpoint-ordering inconsistency named in deferralReason above, made concrete."
       },
       "rulingNote": "The issue #737 curator ruling, 2026-08-27, adopts \"source = founded entity, target = founder\" as the formal direction, confirming Founded By as Founded's inverse in meaning (2 of the 3 sampled pairs and the plain-English reading support it). This type stays \"deferred\" here because it is not part of the active extraction schema (backend/entity_extraction_schema_v3.json) -- the ruling settles what the label means, not whether the pipeline should write it going forward. Separately, book or article targets (like \"What Are Journalists For?\") likely belong to Authored By instead of Founded By or Founded, since Founded's own schema is scoped to organizations, not works."
     },
@@ -1013,12 +1012,12 @@
       "endpointEnforcement": "reviewed",
       "endpointDivergence": {
         "violatingRows": 1,
-        "totalRows": 40,
+        "totalRows": 38,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00743_REL_005"
         ],
-        "note": "1 of 40 held Owned By rows reads backward under the curator-confirmed direction (source = owned entity, target = owner; issue #737 curator ruling, 2026-08-27) -- \"Graham family -> The Washington Post\" instead of \"The Washington Post -> Graham family.\" Every other traced example already reads correctly. This row is listed in data/relationship-review-report.json for curator review; it is not a validation failure, since this type stays outside the active extraction schema and every row is already held."
+        "note": "1 of 38 held Owned By rows reads backward under the curator-confirmed direction (source = owned entity, target = owner; issue #737 curator ruling, 2026-08-27) -- \"Graham family -> The Washington Post\" instead of \"The Washington Post -> Graham family.\" Every other traced example already reads correctly. This row is listed in data/relationship-review-report.json for curator review; it is not a validation failure, since this type stays outside the active extraction schema and every row is already held."
       },
       "observedSourceTypes": [
         "Organization",
