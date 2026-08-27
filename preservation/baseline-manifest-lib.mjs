@@ -85,6 +85,8 @@ export const BASELINE_CATEGORIES = [
       'data/social-search-index.json',
       'data/archive-embeddings.bin',
       'data/archive-embeddings.json',
+      'data/archive-social-embeddings.bin',
+      'data/archive-social-embeddings.json',
       'data/wiki-seed.json',
     ],
   },

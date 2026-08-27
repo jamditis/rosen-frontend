@@ -1,11 +1,11 @@
-import { html } from '../html.js?v=3.8.34';
+import { html } from '../html.js?v=3.8.35';
 import { ChevronLeft, ChevronRight, FolderOpen, SearchX } from 'lucide-react';
-import { COLORS } from '../constants.js?v=3.8.34';
-import { hashString } from '../services/archiveService.js?v=3.8.34';
-import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.34';
-import { LEXICAL_SIGNAL } from '../utils/searchRanking.js?v=3.8.34';
-import { canonicalRecordUrl } from '../utils/recordDeepLink.js?v=3.8.34';
-import LoadingQuotes from './LoadingQuotes.js?v=3.8.34';
+import { COLORS } from '../constants.js?v=3.8.35';
+import { hashString } from '../services/archiveService.js?v=3.8.35';
+import { recordNeedsReview } from '../utils/needsReview.js?v=3.8.35';
+import { LEXICAL_SIGNAL, presentSearchSignal } from '../utils/searchRanking.js?v=3.8.35';
+import { canonicalRecordUrl } from '../utils/recordDeepLink.js?v=3.8.35';
+import LoadingQuotes from './LoadingQuotes.js?v=3.8.35';
 
 const Highlight = ({ text, term }) => {
   if (!term || term.length < 2) return html`<span>${text}</span>`;
@@ -90,6 +90,7 @@ const ArchiveResults = ({
             const signal = searchSignals
               ? (searchSignals.get(item.id) || LEXICAL_SIGNAL)
               : null;
+            const signalCopy = signal ? presentSearchSignal(signal) : null;
 
             return html`
               <article
@@ -124,13 +125,9 @@ const ArchiveResults = ({
                     ${signal && html`
                       <span
                         className="archive-record-card__label archive-record-card__label--signal"
-                        title=${signal === 'kw'
-                          ? 'Matched your keywords'
-                          : signal === 'sem'
-                            ? 'Matched the meaning of your words, not the words themselves'
-                            : 'Matched both your keywords and their meaning'}
+                        title=${signalCopy.description}
                       >
-                        ${signal}
+                        ${signalCopy.label}
                       </span>
                     `}
                     ${item.categories.slice(0, 2).map((category, index) => html`

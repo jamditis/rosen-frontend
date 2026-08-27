@@ -159,6 +159,10 @@ _DEPLOY_DATA_FILES: Tuple[str, ...] = (
     # sidecar second so the live index never advertises bytes that are not present.
     'data/archive-embeddings.bin',
     'data/archive-embeddings.json',
+    # Meaning-search vectors for social posts. Keep each binary immediately
+    # before its hash-bound sidecar.
+    'data/archive-social-embeddings.bin',
+    'data/archive-social-embeddings.json',
     # Fixed public-safe relationship shards. Upload the manifest last so it
     # never points a reader at a shard that has not uploaded yet. Issue 807.
     'data/relationship-adjacency-0.json',
@@ -187,6 +191,14 @@ _DEPLOY_DATA_FILES: Tuple[str, ...] = (
 _RECALL_ARTIFACT_PAIR: Tuple[str, str] = (
     'data/archive-embeddings.bin',
     'data/archive-embeddings.json',
+)
+_SOCIAL_RECALL_ARTIFACT_PAIR: Tuple[str, str] = (
+    'data/archive-social-embeddings.bin',
+    'data/archive-social-embeddings.json',
+)
+_RECALL_ARTIFACT_PAIRS: Tuple[Tuple[str, str], ...] = (
+    _RECALL_ARTIFACT_PAIR,
+    _SOCIAL_RECALL_ARTIFACT_PAIR,
 )
 
 # Walking _DEPLOY_DIRS, prune these.
@@ -594,11 +606,12 @@ def _publish_recall_artifact_pair(
     local_by_relpath: Dict[str, Path],
     cfg: Dict[str, Any],
     dir_cache: Set[str],
+    artifact_pair: Tuple[str, str] = _RECALL_ARTIFACT_PAIR,
 ) -> None:
     """Publish the hash-bound binary and sidecar as one rollback-safe unit."""
     transaction_root = cfg.get('transaction_path')
     entries = []
-    for relpath in _RECALL_ARTIFACT_PAIR:
+    for relpath in artifact_pair:
         local = local_by_relpath[relpath]
         final = remote_transfer.scoped_archive_child(cfg['site_path'], relpath)
         name = Path(relpath).name
@@ -922,22 +935,27 @@ def push_files(
         local.relative_to(repo_root).as_posix(): local
         for local in files
     }
-    pair_members = [
-        relpath for relpath in _RECALL_ARTIFACT_PAIR
-        if relpath in local_by_relpath
-    ]
-    if pair_members and len(pair_members) != len(_RECALL_ARTIFACT_PAIR):
-        return {
-            'ok': False,
-            'files_pushed': 0,
-            'error': 'recall binary and sidecar must be deployed together',
-        }
-    pair_trigger = None
-    if pair_members:
-        pair_trigger = min(
-            pair_members,
-            key=lambda relpath: list(local_by_relpath).index(relpath),
-        )
+    pair_by_member: Dict[str, Tuple[str, str]] = {}
+    pair_by_trigger: Dict[str, Tuple[str, str]] = {}
+    for artifact_pair in _RECALL_ARTIFACT_PAIRS:
+        pair_members = [
+            relpath for relpath in artifact_pair
+            if relpath in local_by_relpath
+        ]
+        if pair_members and len(pair_members) != len(artifact_pair):
+            return {
+                'ok': False,
+                'files_pushed': 0,
+                'error': 'recall binary and sidecar must be deployed together',
+            }
+        if pair_members:
+            pair_trigger = min(
+                pair_members,
+                key=lambda relpath: list(local_by_relpath).index(relpath),
+            )
+            pair_by_trigger[pair_trigger] = artifact_pair
+            for relpath in pair_members:
+                pair_by_member[relpath] = artifact_pair
 
     pushed = 0
     error: Optional[str] = None
@@ -951,14 +969,15 @@ def push_files(
         remote = remote_transfer.connect_remote(cfg)
         for local in files:
             rel = local.relative_to(repo_root).as_posix()
-            if rel == pair_trigger:
+            if rel in pair_by_trigger:
+                artifact_pair = pair_by_trigger[rel]
                 _publish_recall_artifact_pair(
-                    remote, local_by_relpath, cfg, dir_cache)
-                pushed += len(_RECALL_ARTIFACT_PAIR)
+                    remote, local_by_relpath, cfg, dir_cache, artifact_pair)
+                pushed += len(artifact_pair)
                 if pushed % 25 == 0 or pushed == len(files):
                     logger.info(f"Pushed {pushed}/{len(files)} files")
                 continue
-            if rel in _RECALL_ARTIFACT_PAIR:
+            if rel in pair_by_member:
                 continue
 
             remote_final = remote_transfer.scoped_archive_child(

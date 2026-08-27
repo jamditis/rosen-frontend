@@ -18,6 +18,7 @@ import {
   RELEVANCE_SORT,
   buildSearchRanking,
   orderByFusedRank,
+  presentSearchSignal,
   sortForQueryChange,
   sortForSemanticToggle,
 } from '../frontend/utils/searchRanking.js';
@@ -48,6 +49,21 @@ test('labels each hit with the legs it came from', () => {
   assert.equal(searchSignals.get('a'), 'kw');
   assert.equal(searchSignals.get('z'), 'sem');
   assert.equal(searchSignals.get('b'), 'kw·sem');
+});
+
+test('presents internal source codes in plain English', () => {
+  assert.deepEqual(presentSearchSignal('kw'), {
+    label: 'Matching words',
+    description: 'This record uses words from your search.',
+  });
+  assert.deepEqual(presentSearchSignal('sem'), {
+    label: 'Related meaning',
+    description: 'This record discusses the idea in your search, even when it uses different words.',
+  });
+  assert.deepEqual(presentSearchSignal('kw·sem'), {
+    label: 'Words and meaning',
+    description: 'This record matches both the words and the idea in your search.',
+  });
 });
 
 test('shows no chips while only one leg can contribute', () => {

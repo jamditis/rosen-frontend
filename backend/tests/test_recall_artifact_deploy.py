@@ -140,6 +140,16 @@ def _fixture(tmp_path):
     return binary, sidecar
 
 
+def _social_fixture(tmp_path):
+    data = tmp_path / "data"
+    data.mkdir(exist_ok=True)
+    binary = data / "archive-social-embeddings.bin"
+    sidecar = data / "archive-social-embeddings.json"
+    binary.write_bytes(b"new-social-binary")
+    sidecar.write_bytes(b'{"binarySha256":"new-social"}')
+    return binary, sidecar
+
+
 def _sidecar_for(binary: bytes) -> bytes:
     digest = hashlib.sha256(binary).hexdigest()
     return f'{{"binarySha256":"{digest}"}}'.encode()
@@ -190,6 +200,25 @@ def test_pair_publish_replaces_both_files_and_cleans_transaction_paths(
     assert remote.files[binary_final] == b"new-binary"
     assert remote.files[sidecar_final] == b'{"binarySha256":"new"}'
     assert not any(path.endswith(_TRANSACTION_SUFFIXES) for path in remote.files)
+    assert remote.closed is True
+
+
+def test_social_pair_uses_the_same_atomic_publish_path(tmp_path, monkeypatch):
+    binary, sidecar = _social_fixture(tmp_path)
+    root = "/home/archive/public_html/j/rosen-archive"
+    remote = MemoryRemote(root)
+    monkeypatch.setattr(deploy.remote_transfer, "connect_remote", lambda cfg: remote)
+
+    result = deploy.push_files(
+        [binary, sidecar],
+        tmp_path,
+        _cfg(root),
+        remote_prune_dirs=(),
+    )
+
+    assert result == {"ok": True, "files_pushed": 2, "error": None}
+    assert remote.files[f"{root}/data/archive-social-embeddings.bin"] == b"new-social-binary"
+    assert remote.files[f"{root}/data/archive-social-embeddings.json"] == b'{"binarySha256":"new-social"}'
     assert remote.closed is True
 
 

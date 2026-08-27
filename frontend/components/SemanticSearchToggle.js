@@ -1,5 +1,7 @@
-import { html } from '../html.js?v=3.8.34';
+import { useState } from 'react';
+import { html } from '../html.js?v=3.8.35';
 import { Sparkles } from 'lucide-react';
+import SemanticSearchHelpDialog from './SemanticSearchHelpDialog.js?v=3.8.35';
 
 /**
  * Short line for the archive's live region, announced when the semantic state
@@ -11,14 +13,14 @@ import { Sparkles } from 'lucide-react';
  */
 export function semanticStatusMessage({ enabled, status = 'idle', coverage = null } = {}) {
   if (status === 'error') {
-    return 'Semantic search is not available. Keyword search still works.';
+    return 'Search by meaning is not available. Search by words still works.';
   }
-  if (!enabled) return 'Semantic search off.';
-  if (status === 'loading') return 'Semantic search is loading the language model.';
+  if (!enabled) return 'Search by meaning is off.';
+  if (status === 'loading') return 'Search by meaning is loading the language model.';
   if (status === 'searching') return 'Finding records by meaning.';
   return Number.isFinite(coverage) && coverage > 0
-    ? `Semantic search on. Ranking ${coverage.toLocaleString()} articles by meaning.`
-    : 'Semantic search on.';
+    ? `Search by meaning is on. Searching ${coverage.toLocaleString()} records.`
+    : 'Search by meaning is on.';
 }
 
 /**
@@ -29,9 +31,8 @@ export function semanticStatusMessage({ enabled, status = 'idle', coverage = nul
  * Turning it on downloads a language model once, so the off state says so
  * before the reader commits to it.
  *
- * The archive holds far more records than the semantic index covers, and only
- * articles are embedded, so the on state names the covered set rather than
- * implying the whole archive is ranked by meaning.
+ * The on state reports the loaded coverage so the reader can confirm how much
+ * of the archive is ready to search by meaning.
  *
  * A plain checkbox, not a custom widget: it is keyboard operable, announces its
  * own state, and takes the app's focus ring for free. `describedBy` ties the
@@ -46,24 +47,26 @@ const SemanticSearchToggle = ({
   onToggle,
   inputId = 'semantic-search',
 }) => {
+  const [helpOpen, setHelpOpen] = useState(false);
   const hintId = `${inputId}-hint`;
+  const helpId = `${inputId}-help`;
   const covered = Number.isFinite(coverage) && coverage > 0
     ? coverage.toLocaleString()
     : null;
 
   let hint;
   if (status === 'error') {
-    hint = 'Semantic search is not available right now. Keyword search still works.';
+    hint = 'Search by meaning is not available right now. Search by words still works.';
   } else if (!enabled) {
-    hint = 'Also find records that match what you mean, not just the words you typed. Downloads a language model (about 30 MB) the first time.';
+    hint = 'Also find records that match what you mean, not just the words you typed. Downloads about 50 MB the first time.';
   } else if (status === 'loading') {
     hint = 'Loading the language model. The first time takes a few seconds.';
   } else if (status === 'searching') {
     hint = 'Finding records by meaning...';
   } else {
     hint = covered
-      ? `Ranking ${covered} articles by meaning. Results are marked kw, sem, or kw·sem.`
-      : 'Ranking articles by meaning. Results are marked kw, sem, or kw·sem.';
+      ? `Searching ${covered} records by meaning. Each result says how it matched.`
+      : 'Searching records by meaning. Each result says how it matched.';
   }
 
   return html`
@@ -77,11 +80,26 @@ const SemanticSearchToggle = ({
           aria-describedby=${hintId}
         />
         <${Sparkles} className="archive-semantic-toggle__icon" aria-hidden="true" />
-        <span>Semantic</span>
+        <span>Search by meaning</span>
       </label>
       <p id=${hintId} className="archive-semantic-toggle__hint">
         ${hint}
       </p>
+      <button
+        type="button"
+        className="archive-semantic-toggle__help"
+        onClick=${() => setHelpOpen(true)}
+        aria-haspopup="dialog"
+        aria-controls=${helpId}
+      >
+        How does this work?
+      </button>
+      <${SemanticSearchHelpDialog}
+        isOpen=${helpOpen}
+        onClose=${() => setHelpOpen(false)}
+        coverage=${coverage}
+        dialogId=${helpId}
+      />
     </div>
   `;
 };

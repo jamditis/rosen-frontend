@@ -6,20 +6,20 @@
  * idea but no tagged entity (26% of articles carry zero entity coverage), and
  * abstractive bridges between concepts that never co-occur as entities.
  *
- * Each published article is encoded into one 384-dim vector with
+ * Each published non-social record is encoded into one 384-dim vector with
  * bge-small-en-v1.5 (via @huggingface/transformers, a build-time-only devDependency
  * -- it never reaches the browser, exactly like minisearch in #276). Vectors are
  * INT8-quantized with a per-vector scale and concatenated into a compact binary
- * (~359 KB for 947 articles) plus a JSON id index.
+ * plus a JSON id index.
  *
  * Why iterate archive-data.json, not the CSV (unlike search-index-builder.js):
  * a "similar in theme" neighbor must be a record the user can actually open, and
- * the openable set is exactly what the exporter published into archive-data.json
- * (type === 'article'). Building from the CSV would embed unpublished rows whose
+ * the openable set is exactly what the exporter published into archive-data.json.
+ * Building from the CSV would embed unpublished rows whose
  * ids resolve to nothing in the runtime, producing dead vectors and broken
  * neighbor links. raw_text is the one field archive-data.json drops, so it is
- * joined back from the CSV by id; the 46 published articles with no CSV raw_text
- * embed on title + summary alone (still theme-bearing).
+ * joined back from the CSV by id. Records with no CSV raw_text embed on title
+ * and summary alone, which still carry their theme.
  *
  * Why first+last mean-pool: bge-small caps at 512 tokens (~2,000 chars), but the
  * median essay is 9,271 chars, so a single encode sees only the lede. Rosen's
@@ -61,7 +61,7 @@ export const BYTES_PER_VECTOR = SCALE_BYTES + EMBED_DIM;
 // Bump on any regeneration whose vectors change (model, pooling, or chunk size).
 // The runtime worker and the service-worker cache key off this so stale vectors
 // can't ship silently after a deploy (see #278 C6).
-export const EMBED_INDEX_VERSION = '1.1.0';
+export const EMBED_INDEX_VERSION = '1.2.0';
 
 const str = (v) => (v == null ? '' : String(v));
 
@@ -181,13 +181,16 @@ export function buildEmbeddingIndex(ids, binarySha256) {
   };
 }
 
-/** Published articles (the served set) from archive-data.json. */
-export function loadPublishedArticles(archiveDataPath) {
-  const data = JSON.parse(readFileSync(archiveDataPath, 'utf8'));
-  const records = data.records || [];
-  return records
-    .filter((r) => r.type === 'article')
+/** Published non-social records that can appear in semantic results. */
+export function selectPublishedDocuments(data) {
+  return (data?.records || [])
+    .filter((record) => record.type !== 'social')
     .map((r) => ({ id: str(r.id), title: str(r.title), summary: str(r.summary) }));
+}
+
+/** Published non-social records (the served set) from archive-data.json. */
+export function loadPublishedDocuments(archiveDataPath) {
+  return selectPublishedDocuments(JSON.parse(readFileSync(archiveDataPath, 'utf8')));
 }
 
 /** Map of record id -> raw_text from the source CSV. */
@@ -260,15 +263,15 @@ async function main() {
   const binPath = path.join(root, 'data', 'archive-embeddings.bin');
   const jsonPath = path.join(root, 'data', 'archive-embeddings.json');
 
-  const articles = loadPublishedArticles(archiveDataPath);
+  const documents = loadPublishedDocuments(archiveDataPath);
   const rawTextMap = loadRawTextMap(csvPath);
-  const withRaw = articles.filter((a) => (rawTextMap.get(a.id) || '').length > 0).length;
+  const withRaw = documents.filter((record) => (rawTextMap.get(record.id) || '').length > 0).length;
   console.log(
-    `embeddings: ${articles.length} articles (${withRaw} with raw_text, ${articles.length - withRaw} title+summary only)`,
+    `embeddings: ${documents.length} records (${withRaw} with raw_text, ${documents.length - withRaw} title+summary only)`,
   );
 
   const embed = await createExtractor();
-  const { index, binBuffer, count } = await buildEmbeddings(articles, rawTextMap, embed);
+  const { index, binBuffer, count } = await buildEmbeddings(documents, rawTextMap, embed);
 
   writeFileSync(binPath, binBuffer);
   writeFileSync(jsonPath, JSON.stringify(index));
@@ -299,7 +302,8 @@ export default {
   readVectorAt,
   sha256Hex,
   buildEmbeddingIndex,
-  loadPublishedArticles,
+  selectPublishedDocuments,
+  loadPublishedDocuments,
   loadRawTextMap,
   embedArticle,
   buildEmbeddings,

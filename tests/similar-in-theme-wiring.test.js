@@ -47,7 +47,7 @@ describe('similar-in-theme record strand', () => {
       /<details key=\$\{record\.id\} className="archive-record-semantic">/,
     );
     assert.match(recordModal, /Similar in theme/);
-    assert.match(recordModal, /archive-record-semantic__signal">sem</);
+    assert.match(recordModal, /archive-record-semantic__signal">Related meaning</);
   });
 
   it('distinguishes loading, errors, matches, and a genuinely empty result', () => {

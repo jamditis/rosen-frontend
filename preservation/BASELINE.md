@@ -15,7 +15,7 @@ issue #702's scope:
 | Category | Files |
 |---|---|
 | `source-csv` | `data/archive_records-public.csv`, `data/social_posts.csv` |
-| `runtime-json` | `data/archive-core.json`, `data/archive-details.json`, `data/archive-data.json`, `data/archive-analytics.json`, `data/search-index.json`, `data/social-search-index.json`, `data/archive-embeddings.bin`, `data/archive-embeddings.json`, `data/wiki-seed.json` |
+| `runtime-json` | `data/archive-core.json`, `data/archive-details.json`, `data/archive-data.json`, `data/archive-analytics.json`, `data/search-index.json`, `data/social-search-index.json`, `data/archive-embeddings.bin`, `data/archive-embeddings.json`, `data/archive-social-embeddings.bin`, `data/archive-social-embeddings.json`, `data/wiki-seed.json` |
 | `entity-relationship-data` | `data/extracted_entities.csv`, `data/extracted_relationships.csv`, `data/archive-entities.json`, `data/relationship-adjacency-manifest.json`, and the 16 `data/relationship-adjacency-*.json` shards |
 | `schema` | `data/schema.json`, `data/SCHEMA.md`, `data/eras.js` |
 

@@ -46,10 +46,6 @@ const ARTIFACTS_NAMING_RECORDS = [
 // #863) added RECORD-00918 to the same release.
 const CURATED_RECORD_COUNT = 1030;
 
-// RECORD-00918 was recovered from a Wayback capture on a machine that could not
-// run the embedding model, so it is a published article with no vector yet.
-const PENDING_EMBEDDING = ['RECORD-00918'];
-
 // Each dropped record with the fuller capture that supersedes it.
 const DROPPED = new Map([
   ['RECORD-00077', 'RECORD-00747'],
@@ -167,27 +163,16 @@ describe('2026-08-27 duplicate adjudication (#867)', () => {
     assert.equal(analytics.stats.entities, entities.length);
   });
 
-  it('keeps the embedding sidecar and binary row-aligned with the published articles', () => {
+  it('keeps the embedding sidecar and binary row-aligned with published documents', () => {
     const index = JSON.parse(read('data/archive-embeddings.json'));
     const binary = read('data/archive-embeddings.bin');
     const archive = JSON.parse(read('data/archive-data.json'));
-    const publishedArticleIds = archive.records
-      .filter((record) => record.type === 'article')
+    const publishedDocumentIds = archive.records
+      .filter((record) => record.type !== 'social')
       .map((record) => record.id);
 
-    const pending = new Set(PENDING_EMBEDDING);
-    for (const recordId of PENDING_EMBEDDING) {
-      assert.ok(
-        publishedArticleIds.includes(recordId),
-        `${recordId} is listed as pending an embedding but is not a published article`
-      );
-    }
-
-    assert.deepEqual(
-      index.ids,
-      publishedArticleIds.filter((recordId) => !pending.has(recordId))
-    );
-    assert.equal(index.ids.length, publishedArticleIds.length - PENDING_EMBEDDING.length);
+    assert.deepEqual(index.ids, publishedDocumentIds);
+    assert.equal(index.ids.length, publishedDocumentIds.length);
     assert.equal(index.ids.length, index.count);
     assert.equal(binary.length, index.count * index.bytesPerVector);
   });

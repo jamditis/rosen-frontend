@@ -28,6 +28,7 @@ const version = JSON.parse(read('version.json')).version;
 const versionPattern = version.replaceAll('.', '\\.');
 const app = read('frontend', 'App.js');
 const toggle = read('frontend', 'components', 'SemanticSearchToggle.js');
+const help = read('frontend', 'components', 'SemanticSearchHelpDialog.js');
 const sidebar = read('frontend', 'components', 'Sidebar.js');
 const results = read('frontend', 'components', 'ArchiveResults.js');
 const serviceWorker = read('frontend', 'sw.js');
@@ -63,7 +64,7 @@ describe('semantic search toggle', () => {
     assert.match(app, /setSemanticEnabled\(false\)/);
     assert.match(
       toggle,
-      /Semantic search is not available right now\. Keyword search still works\./,
+      /Search by meaning is not available right now\. Search by words still works\./,
     );
   });
 
@@ -93,8 +94,17 @@ describe('semantic search toggle', () => {
 
   it('badges every result while chips are on', () => {
     assert.match(results, /searchSignals\.get\(item\.id\) \|\| LEXICAL_SIGNAL/);
+    assert.match(results, /presentSearchSignal\(signal\)/);
     assert.match(results, /archive-record-card__label--signal/);
     assert.match(css, /\.archive-record-card__label--signal/);
+  });
+
+  it('uses plain-language result labels', () => {
+    for (const label of ['Matching words', 'Related meaning', 'Words and meaning']) {
+      assert.match(read('frontend', 'utils', 'searchRanking.js'), new RegExp(label));
+    }
+    assert.doesNotMatch(results, />\s*\$\{signal\}\s*</);
+    assert.doesNotMatch(toggle, /Results are marked kw, sem, or kw·sem/);
   });
 
   it('debounces the encode so one query is encoded per settled phrase', () => {
@@ -114,6 +124,7 @@ describe('semantic search toggle', () => {
     assert.match(toggle, /type="checkbox"/);
     assert.match(toggle, /aria-describedby=\$\{hintId\}/);
     assert.match(css, /\.archive-semantic-toggle__control/);
+    assert.match(toggle, /<span>Search by meaning<\/span>/);
   });
 
   it('announces a state change once, not once per copy of the toggle', () => {
@@ -126,13 +137,28 @@ describe('semantic search toggle', () => {
   });
 
   it('says what turning it on costs, and what it covers', () => {
-    assert.match(toggle, /Downloads a language model \(about 30 MB\) the first time\./);
-    assert.match(toggle, /Ranking \$\{covered\} articles by meaning/);
+    assert.match(toggle, /Downloads about 50 MB the first time\./);
+    assert.match(toggle, /Searching \$\{covered\} records by meaning/);
+  });
+
+  it('opens a plain-language explanation without enabling search', () => {
+    assert.match(toggle, /How does this work\?/);
+    assert.match(toggle, /SemanticSearchHelpDialog/);
+    assert.match(help, /<dialog/);
+    assert.match(help, /createPortal\(dialog, document\.body\)/);
+    assert.match(css, /\.archive-semantic-help__close\s*\{[^}]*display:\s*grid;[^}]*place-items:\s*center;/s);
+    assert.match(help, /The model does not write or answer anything/);
+    assert.match(help, /Your search stays in this browser/);
+    assert.match(help, /Matching words/);
+    assert.match(help, /Related meaning/);
+    assert.match(help, /Words and meaning/);
+    assert.doesNotMatch(help, /\bkw\b|\bsem\b|kw·sem/);
   });
 
   it('ships the toggle, the client, and the worker on one release', () => {
     for (const file of [
       'components/SemanticSearchToggle.js',
+      'components/SemanticSearchHelpDialog.js',
       'services/semanticSearch.js',
       'services/semantic-search-worker.js',
       'services/embeddings-worker.js',
@@ -153,6 +179,14 @@ describe('semantic search toggle', () => {
     assert.match(
       worker,
       new RegExp(`'\\./embeddings-worker\\.js\\?v=${versionPattern}'`),
+    );
+    assert.match(
+      worker,
+      new RegExp(`archive-social-embeddings\\.bin\\?v=${versionPattern}`),
+    );
+    assert.match(
+      worker,
+      new RegExp(`archive-social-embeddings\\.json\\?v=${versionPattern}`),
     );
     assert.match(
       read('frontend', 'utils', 'searchRanking.js'),
