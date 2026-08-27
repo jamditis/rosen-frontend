@@ -92,6 +92,12 @@ function createSchema(database) {
       name TEXT PRIMARY KEY
     );
 
+    -- Gate: is this relationship type currently writable (accepted, per the
+    -- active extraction schema) or explicitly held (per graph-validation-holds.json)?
+    -- The richer per-type semantics (endpoint-type constraints, direction, inverse,
+    -- self-link/multi-assertion policy, temporal scope) live in the JS-side
+    -- relationship type registry (data/relationship-type-registry.json, issue #737)
+    -- and are enforced in validateGraphDataset, not in this table.
     CREATE TABLE relationship_type_registry (
       name TEXT NOT NULL,
       validation_state TEXT NOT NULL CHECK (validation_state IN ('accepted', 'held')),
@@ -491,6 +497,69 @@ function asArray(value, label) {
   return value;
 }
 
+function asPlainObject(value, label) {
+  if (!value || Array.isArray(value) || typeof value !== 'object') {
+    throw new GraphValidationError(`${label} must be an object`);
+  }
+  return value;
+}
+
+/**
+ * Endpoint-type constraints, direction, inverse, self-link/multi-assertion
+ * policy, and temporal scope for every relationship type (issue #737). Keyed
+ * by relationship type name; see data/relationship-type-registry.json for the
+ * live registry and its field documentation.
+ *
+ * Only `allowedSourceTypes` / `allowedTargetTypes` are enforced as a hard
+ * constraint (and only for entries present here — a type missing from the
+ * registry is not endpoint-constrained). `directionality` / `inverseType`
+ * feed the symmetric/inverse duplicate-edge check. Deferred entries
+ * (status !== 'accepted') carry no enforceable constraint: their semantics
+ * are an open curator decision, not something this validator should guess.
+ */
+function edgeKey(sourceEntityId, relationshipType, targetEntityId) {
+  return `${sourceEntityId} ${relationshipType} ${targetEntityId}`;
+}
+
+/**
+ * Reject relationships whose type registry entry marks the type symmetric or
+ * gives it a resolved inverseType, when the reverse-direction edge is also
+ * present under the same (symmetric) or inverse type — that pair encodes the
+ * same real-world fact twice and would otherwise silently duplicate an edge.
+ */
+function assertNoDuplicateSymmetricOrInverseEdges(acceptedEdges, relationshipTypeRegistry) {
+  const edgesByKey = new Map();
+  for (const edge of acceptedEdges) {
+    edgesByKey.set(edgeKey(edge.sourceEntityId, edge.relationshipType, edge.targetEntityId), edge.id);
+  }
+
+  for (const edge of acceptedEdges) {
+    if (edge.sourceEntityId === edge.targetEntityId) continue; // self-links are rejected separately
+    const registryEntry = relationshipTypeRegistry[edge.relationshipType];
+    if (!registryEntry) continue;
+
+    if (registryEntry.directionality === 'symmetric') {
+      const reverseId = edgesByKey.get(edgeKey(edge.targetEntityId, edge.relationshipType, edge.sourceEntityId));
+      if (reverseId && reverseId !== edge.id) {
+        throw new GraphValidationError(
+          `${edge.id}: symmetric type ${edge.relationshipType} duplicates edge ${reverseId} asserted in the reverse direction`
+        );
+      }
+    }
+
+    if (registryEntry.inverseType) {
+      const inverseId = edgesByKey.get(
+        edgeKey(edge.targetEntityId, registryEntry.inverseType, edge.sourceEntityId)
+      );
+      if (inverseId) {
+        throw new GraphValidationError(
+          `${edge.id}: type ${edge.relationshipType} duplicates edge ${inverseId} via its inverse type ${registryEntry.inverseType}`
+        );
+      }
+    }
+  }
+}
+
 export async function validateGraphDataset(dataset) {
   const policy = dataset?.policy ?? {};
   const entityTypes = asArray(policy.entityTypes ?? [], 'policy.entityTypes');
@@ -501,6 +570,10 @@ export async function validateGraphDataset(dataset) {
   const relationshipTypeHolds = asArray(
     policy.relationshipTypeHolds ?? [],
     'policy.relationshipTypeHolds'
+  );
+  const relationshipTypeRegistry = asPlainObject(
+    policy.relationshipTypeRegistry ?? {},
+    'policy.relationshipTypeRegistry'
   );
   const generatedPublishedRecordIds = asArray(
     policy.generatedPublishedRecordIds ?? [],
@@ -618,6 +691,7 @@ export async function validateGraphDataset(dataset) {
 
     assertEntityCopiesAgree(database);
 
+    const acceptedEdges = [];
     for (const relationship of relationships) {
       const id = requiredText(relationship.id, 'relationship', 'id');
       const sourceRecordId = requiredText(relationship.sourceRecordId, id, 'sourceRecordId');
@@ -660,6 +734,24 @@ export async function validateGraphDataset(dataset) {
             `${id}: targetEntityName does not match target entity ${targetEntityId}`
           );
         }
+
+        // Endpoint-type constraints (issue #737): only enforced when the type
+        // has a registry entry with resolved allowed source/target types.
+        // A type absent from the registry, or held/deferred there, is not
+        // endpoint-constrained here — that semantic decision is still open.
+        const registryEntry = relationshipTypeRegistry[relationshipType];
+        if (registryEntry?.allowedSourceTypes && !registryEntry.allowedSourceTypes.includes(sourceEntity.type)) {
+          throw new GraphValidationError(
+            `${id}: source entity type ${sourceEntity.type} is not an allowed source type for ${relationshipType}`
+          );
+        }
+        if (registryEntry?.allowedTargetTypes && !registryEntry.allowedTargetTypes.includes(targetEntity.type)) {
+          throw new GraphValidationError(
+            `${id}: target entity type ${targetEntity.type} is not an allowed target type for ${relationshipType}`
+          );
+        }
+
+        acceptedEdges.push({ id, sourceEntityId, relationshipType, targetEntityId });
       }
 
       const confidence = relationship.confidence === null || relationship.confidence === undefined
@@ -681,6 +773,8 @@ export async function validateGraphDataset(dataset) {
         ]
       );
     }
+
+    assertNoDuplicateSymmetricOrInverseEdges(acceptedEdges, relationshipTypeRegistry);
 
     for (const [relationshipId, hold] of holdByRelationshipId) {
       const matchingRelationship = relationships.find(relationship => (
@@ -798,13 +892,15 @@ function publishedEntityFromJson(entity) {
 
 export function validationPolicyFromSchemas(
   activeSchema,
-  holdPolicy
+  holdPolicy,
+  relationshipTypeRegistry = {}
 ) {
   return {
     entityTypes: Object.keys(activeSchema.entity_types ?? {}),
     acceptedRelationshipTypes: Object.keys(activeSchema.relationship_types ?? {}),
     relationshipTypeHolds: holdPolicy.relationshipTypeHolds,
     generatedPublishedRecordIds: holdPolicy.generatedPublishedRecordIds ?? [],
+    relationshipTypeRegistry,
   };
 }
 
@@ -819,6 +915,7 @@ export async function loadRepositoryGraphDataset(repositoryRoot) {
     archiveEntities,
     extractionSchemaV3,
     holdPolicy,
+    relationshipTypeRegistryFile,
   ] = await Promise.all([
     readCanonicalCsv(path.join(root, 'data/archive_records-public.csv')),
     readCanonicalCsv(path.join(root, 'data/social_posts.csv')),
@@ -828,10 +925,11 @@ export async function loadRepositoryGraphDataset(repositoryRoot) {
     readJson(path.join(root, 'data/archive-entities.json')),
     readJson(path.join(root, 'backend/entity_extraction_schema_v3.json')),
     readJson(path.join(root, 'data/graph-validation-holds.json')),
+    readJson(path.join(root, 'data/relationship-type-registry.json')),
   ]);
 
   return {
-    policy: validationPolicyFromSchemas(extractionSchemaV3, holdPolicy),
+    policy: validationPolicyFromSchemas(extractionSchemaV3, holdPolicy, relationshipTypeRegistryFile.types),
     sourceRecords: [...archiveRecords, ...socialRecords].map(record => ({ id: record.id })),
     publishedRecords: archiveData.records.map(record => ({
       id: record.id,

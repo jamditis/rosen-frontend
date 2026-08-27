@@ -99,6 +99,9 @@ const KNOWN_NOT_DEPLOYED = new Map([
   ['data/graph-validation-holds.json',
     'validator policy input used only by repository and CI graph checks; no ' +
     'deployed page reads it'],
+  ['data/relationship-type-registry.json',
+    'relationship-type semantics used only by scripts/validate-graph-data.mjs ' +
+    '(issue #737); no deployed page reads it'],
   ['data/stewardship-census.json',
     'repository stewardship report, not referenced by any deployed page (built ' +
     'by scripts/build-stewardship-census.mjs)'],

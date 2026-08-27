@@ -44,6 +44,7 @@ Counts verified 2026-07-23; they grow as records are added.
 |------|---------|
 | `SCHEMA.md` | Human-readable data dictionary — start here if you want to use the data |
 | `schema.json` | Machine-readable schema, linked from the site's open-data download UI |
+| `relationship-type-registry.json` | Machine-readable relationship-type semantics — endpoint types, direction, inverse, temporal scope (issue #737) |
 | `eras.js` | The canonical era taxonomy, shared with the frontend |
 | `authored-excerpts.csv` | Curator-written summaries that override auto-generated ones |
 | `feeds/` | RSS feeds (full archive, articles, per-category, per-era) and OPML subscription lists |
@@ -104,10 +105,26 @@ only; no SQLite file is committed or treated as canonical.
 
 Rows with unregistered relationship semantics must have an exact, reviewed
 entry in `graph-validation-holds.json`. Holds are explicit temporary states,
-not additions to the accepted relationship vocabulary. The per-relationship
-semantic endpoint matrix remains part of the relationship-type audit in issue
-#737; this validator requires both endpoints to resolve to typed entities without
-prematurely declaring that matrix canonical.
+not additions to the accepted relationship vocabulary.
+
+`relationship-type-registry.json` is the machine-readable answer to the
+relationship-type audit in issue #737: for every relationship type present in
+`extracted_relationships.csv` or in the active extraction schema
+(`backend/entity_extraction_schema_v3.json`), it records the allowed source
+and target entity types, direction, inverse type, self-link and
+multiple-assertion policy, temporal scope, disputed-assertion support, and a
+human-readable label. The validator uses it to reject a relationship whose
+endpoint entity types are not allowed for its type, and to reject a symmetric
+or inverse-labeled type asserted redundantly in both directions (that would
+otherwise silently duplicate one edge under two labels). Types whose
+historical meaning is still ambiguous — legacy inverse-style labels like
+`Founded By` and `Owned By`, one-off labels like `Created` and `Covers`, and
+the not-yet-wired `Influenced` type (issues #344 / #548) — are marked
+`"status": "deferred"` in the registry instead of guessed: the validator does
+not enforce endpoint types, direction, or an inverse for a deferred type, and
+still requires an exact hold for each of its rows exactly as before.
+Choosing that semantics is a curator decision, not something this validator
+infers.
 
 Published records that are intentionally generated without a canonical CSV row
 must likewise have their exact stable ID listed in

@@ -350,3 +350,221 @@ describe('generated SQLite graph validator (#731)', () => {
     );
   });
 });
+
+describe('relationship type registry enforcement (#737)', () => {
+  it('rejects a source entity type that is not allowed for the relationship type', async () => {
+    const fixture = validFixture();
+    fixture.policy.relationshipTypeRegistry = {
+      'Affiliated With': { allowedSourceTypes: ['Organization'], allowedTargetTypes: ['Organization'] },
+    };
+
+    await rejectsWith(fixture, 'REL-00001', 'source entity type', 'Person', 'Affiliated With');
+  });
+
+  it('rejects a target entity type that is not allowed for the relationship type', async () => {
+    const fixture = validFixture();
+    fixture.policy.relationshipTypeRegistry = {
+      'Affiliated With': { allowedSourceTypes: ['Person'], allowedTargetTypes: ['Person'] },
+    };
+
+    await rejectsWith(fixture, 'REL-00001', 'target entity type', 'Organization', 'Affiliated With');
+  });
+
+  it('does not constrain a type absent from the registry', async () => {
+    const fixture = validFixture();
+    fixture.policy.relationshipTypeRegistry = {
+      'Some Other Type': { allowedSourceTypes: ['Organization'], allowedTargetTypes: ['Organization'] },
+    };
+
+    const summary = await validateGraphDataset(fixture);
+    assert.equal(summary.relationships, 1);
+  });
+
+  it('rejects a symmetric type asserted redundantly in both directions', async () => {
+    const fixture = validFixture();
+    fixture.policy.acceptedRelationshipTypes = ['Mentions'];
+    fixture.policy.relationshipTypeRegistry = {
+      Mentions: { directionality: 'symmetric' },
+    };
+    fixture.relationships = [
+      {
+        id: 'REL-00001',
+        sourceRecordId: 'RECORD-00001',
+        sourceEntityId: 'P0001',
+        sourceEntityName: 'Jay Rosen',
+        type: 'Mentions',
+        targetEntityId: 'O0001',
+        targetEntityName: 'PressThink',
+        confidence: 0.9,
+      },
+      {
+        id: 'REL-00002',
+        sourceRecordId: 'RECORD-00001',
+        sourceEntityId: 'O0001',
+        sourceEntityName: 'PressThink',
+        type: 'Mentions',
+        targetEntityId: 'P0001',
+        targetEntityName: 'Jay Rosen',
+        confidence: 0.9,
+      },
+    ];
+
+    await rejectsWith(fixture, 'REL-00001', 'symmetric', 'Mentions', 'duplicates edge REL-00002');
+  });
+
+  it('rejects a type duplicating an edge already asserted under its inverse type', async () => {
+    const fixture = validFixture();
+    fixture.policy.acceptedRelationshipTypes = ['Owns', 'Owned By'];
+    fixture.policy.relationshipTypeRegistry = {
+      Owns: { inverseType: 'Owned By' },
+      'Owned By': { inverseType: 'Owns' },
+    };
+    fixture.relationships = [
+      {
+        id: 'REL-00001',
+        sourceRecordId: 'RECORD-00001',
+        sourceEntityId: 'P0001',
+        sourceEntityName: 'Jay Rosen',
+        type: 'Owns',
+        targetEntityId: 'O0001',
+        targetEntityName: 'PressThink',
+        confidence: 0.9,
+      },
+      {
+        id: 'REL-00002',
+        sourceRecordId: 'RECORD-00001',
+        sourceEntityId: 'O0001',
+        sourceEntityName: 'PressThink',
+        type: 'Owned By',
+        targetEntityId: 'P0001',
+        targetEntityName: 'Jay Rosen',
+        confidence: 0.9,
+      },
+    ];
+
+    await rejectsWith(fixture, 'REL-00001', 'Owns', 'duplicates edge REL-00002', 'inverse type Owned By');
+  });
+
+  it('allows a self-referential symmetric-type edge without treating it as a duplicate', async () => {
+    const fixture = validFixture();
+    fixture.policy.acceptedRelationshipTypes = ['Mentions'];
+    fixture.policy.relationshipTypeRegistry = { Mentions: { directionality: 'symmetric' } };
+    fixture.publishedRecords[0].relatedIds = ['P0001'];
+    fixture.recordEntityMap['RECORD-00001'] = ['P0001'];
+    fixture.relationships = [{
+      id: 'REL-00001',
+      sourceRecordId: 'RECORD-00001',
+      sourceEntityId: 'P0001',
+      sourceEntityName: 'Jay Rosen',
+      type: 'Mentions',
+      targetEntityId: 'P0001',
+      targetEntityName: 'Jay Rosen',
+      confidence: 0.9,
+    }];
+
+    const summary = await validateGraphDataset(fixture);
+    assert.equal(summary.relationships, 1);
+  });
+});
+
+describe('committed relationship type registry (#737)', () => {
+  async function loadRegistry() {
+    return JSON.parse(
+      await readFile(path.join(repositoryRoot, 'data/relationship-type-registry.json'), 'utf8')
+    );
+  }
+
+  it('has a schema version and at least one migration note', async () => {
+    const registry = await loadRegistry();
+
+    assert.equal(typeof registry.schemaVersion, 'string');
+    assert.ok(registry.schemaVersion.length > 0);
+    assert.ok(Array.isArray(registry.migrationNotes));
+    assert.ok(registry.migrationNotes.length > 0);
+    for (const note of registry.migrationNotes) {
+      assert.equal(typeof note.version, 'string');
+      assert.equal(typeof note.summary, 'string');
+    }
+  });
+
+  it('covers every relationship type currently present in extracted_relationships.csv', async () => {
+    const [registry, relationshipRows] = await Promise.all([
+      loadRegistry(),
+      readCanonicalCsv(path.join(repositoryRoot, 'data/extracted_relationships.csv')),
+    ]);
+
+    const observedTypes = new Set(relationshipRows.map(row => row.relationship_type).filter(Boolean));
+    const missing = [...observedTypes].filter(type => !registry.types[type]);
+    assert.deepStrictEqual(missing, [], 'every type observed in the CSV must have a registry entry');
+  });
+
+  it('covers every relationship type in the active extraction schema, matching its accepted set', async () => {
+    const [registry, activeSchema] = await Promise.all([
+      loadRegistry(),
+      readFile(path.join(repositoryRoot, 'backend/entity_extraction_schema_v3.json'), 'utf8').then(JSON.parse),
+    ]);
+
+    const schemaTypes = Object.keys(activeSchema.relationship_types ?? {}).sort();
+    const acceptedRegistryTypes = Object.entries(registry.types)
+      .filter(([, entry]) => entry.status === 'accepted')
+      .map(([name]) => name)
+      .sort();
+
+    assert.deepStrictEqual(
+      acceptedRegistryTypes,
+      schemaTypes,
+      'accepted registry entries must derive from (and only from) the active writer schema'
+    );
+  });
+
+  it('gives every accepted type resolved endpoint types drawn from the registry entity types', async () => {
+    const registry = await loadRegistry();
+    const validEntityTypes = new Set(registry.entityTypes);
+
+    for (const [name, entry] of Object.entries(registry.types)) {
+      if (entry.status !== 'accepted') continue;
+      assert.ok(Array.isArray(entry.allowedSourceTypes) && entry.allowedSourceTypes.length > 0, `${name}: allowedSourceTypes`);
+      assert.ok(Array.isArray(entry.allowedTargetTypes) && entry.allowedTargetTypes.length > 0, `${name}: allowedTargetTypes`);
+      for (const type of [...entry.allowedSourceTypes, ...entry.allowedTargetTypes]) {
+        assert.ok(validEntityTypes.has(type), `${name}: ${type} is not a registered entity type`);
+      }
+      assert.equal(typeof entry.directionality, 'string', `${name}: directionality`);
+      assert.equal(typeof entry.temporalScope, 'string', `${name}: temporalScope`);
+      assert.notEqual(entry.temporalScope, 'deferred', `${name}: accepted types must not defer temporal scope`);
+    }
+  });
+
+  it('marks semantically ambiguous legacy types deferred instead of guessing their semantics', async () => {
+    const registry = await loadRegistry();
+
+    for (const name of ['Founded By', 'Owned By', 'Created', 'Covers']) {
+      const entry = registry.types[name];
+      assert.ok(entry, `${name}: missing from registry`);
+      assert.equal(entry.status, 'deferred', `${name}: status`);
+      assert.equal(entry.directionality, null, `${name}: directionality must not be guessed`);
+      assert.equal(entry.inverseType, null, `${name}: inverseType must not be guessed`);
+      assert.equal(entry.temporalScope, 'deferred', `${name}: temporalScope must not be guessed`);
+      assert.equal(typeof entry.deferralReason, 'string', `${name}: deferralReason`);
+      assert.ok(entry.deferralReason.length > 0, `${name}: deferralReason`);
+    }
+  });
+
+  it('records an explicit deferral for influence modeling pending issues #344 and #548', async () => {
+    const registry = await loadRegistry();
+    const entry = registry.types.Influenced;
+
+    assert.ok(entry, 'Influenced entry is missing from the registry');
+    assert.equal(entry.status, 'deferred');
+    assert.deepStrictEqual(entry.relatedIssues, [344, 548]);
+    assert.match(entry.deferralReason, /344/);
+    assert.match(entry.deferralReason, /548/);
+  });
+
+  it('validates the current repository data against the committed registry with zero endpoint-type violations', async () => {
+    const dataset = await loadRepositoryGraphDataset(repositoryRoot);
+    assert.ok(Object.keys(dataset.policy.relationshipTypeRegistry).length > 0);
+
+    const summary = await validateGraphDataset(dataset);
+    assert.ok(summary.relationships > 11_000);
+  });
+});

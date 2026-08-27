@@ -1,0 +1,603 @@
+{
+  "schemaVersion": "1.0.0",
+  "description": "Machine-readable relationship-type registry for the Jay Rosen Internet Archive knowledge graph. Formalizes allowed endpoint entity types, direction, inverse relationships, self-link and multi-assertion policy, temporal scope, and disputed-assertion support for every relationship type present in data/extracted_relationships.csv or in backend/entity_extraction_schema_v3.json. See data/README.md and scripts/validate-graph-data.mjs for how this is enforced, and issue #737 for the audit that produced it.",
+  "entityTypes": [
+    "Concept",
+    "Event",
+    "Location",
+    "Organization",
+    "Person",
+    "Work"
+  ],
+  "evidenceStandards": {
+    "pipeline-default": "Extracted from source record text by the entity-extraction pipeline (backend/entity_extraction_schema_v3.json), carrying a context snippet and a 0-1 confidence_score. The archive graph accepts assertions at any confidence today (no minimum threshold); acceptance is gated by referential integrity (extracted_entities.csv), the accepted/held relationship-type split (data/graph-validation-holds.json), and this registry's endpoint-type constraints."
+  },
+  "migrationNotes": [
+    {
+      "version": "1.0.0",
+      "date": "2026-08-27",
+      "summary": "Initial registry (issue #737). Endpoint-type constraints for accepted types are inferred from current usage in extracted_relationships.csv (falling back to backend/entity_extraction_schema_v3.json's valid_source_types/valid_target_types for the five types with zero current usage: Authored By, Quoted, Interviewed, Responds To, Founded). Legacy ambiguous types (Founded By, Owned By, Created, Covers) and the not-yet-wired Influenced type are marked status: \"deferred\" rather than guessed; their direction, inverse, symmetry, and temporal scope are curator decisions, not automation output."
+    }
+  ],
+  "types": {
+    "Authored By": {
+      "status": "accepted",
+      "description": "Work A was written or authored by person B. Use for articles, books, papers, and posts.",
+      "allowedSourceTypes": [
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Person"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "authored by",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default"
+    },
+    "Quoted": {
+      "status": "accepted",
+      "description": "Person or work A directly quotes person B.",
+      "allowedSourceTypes": [
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Person"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "quoted",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default"
+    },
+    "Interviewed": {
+      "status": "accepted",
+      "description": "Person A interviewed person B.",
+      "allowedSourceTypes": [
+        "Person"
+      ],
+      "allowedTargetTypes": [
+        "Person"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "interviewed",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default"
+    },
+    "Responds To": {
+      "status": "accepted",
+      "description": "Person or work A is responding to or rebutting person, work, or event B.",
+      "allowedSourceTypes": [
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Event",
+        "Person",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "responds to",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default"
+    },
+    "Mentions": {
+      "status": "accepted",
+      "description": "Entity A mentions entity B in passing or substantively.",
+      "allowedSourceTypes": [
+        "Concept",
+        "Event",
+        "Location",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Concept",
+        "Event",
+        "Location",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "mentions",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default"
+    },
+    "Criticizes": {
+      "status": "accepted",
+      "description": "Entity A criticizes or negatively evaluates entity B.",
+      "allowedSourceTypes": [
+        "Concept",
+        "Event",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Concept",
+        "Event",
+        "Location",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "criticizes",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default"
+    },
+    "Cites": {
+      "status": "accepted",
+      "description": "Entity A cites or references entity B as source material.",
+      "allowedSourceTypes": [
+        "Concept",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Concept",
+        "Event",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "cites",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default"
+    },
+    "Discusses": {
+      "status": "accepted",
+      "description": "Entity A discusses or analyzes concept, event, or work B in depth.",
+      "allowedSourceTypes": [
+        "Concept",
+        "Event",
+        "Location",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Concept",
+        "Event",
+        "Location",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "discusses",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default"
+    },
+    "Expands On": {
+      "status": "accepted",
+      "description": "Entity A expands, elaborates, or builds upon concept or work B.",
+      "allowedSourceTypes": [
+        "Concept",
+        "Event",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Concept",
+        "Event",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "expands on",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default"
+    },
+    "Affiliated With": {
+      "status": "accepted",
+      "description": "Person A is affiliated, employed by, or associated with organization B.",
+      "allowedSourceTypes": [
+        "Concept",
+        "Event",
+        "Location",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Concept",
+        "Event",
+        "Location",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "interval",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "affiliated with",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default"
+    },
+    "Published In": {
+      "status": "accepted",
+      "description": "Work A was published in or by organization B.",
+      "allowedSourceTypes": [
+        "Concept",
+        "Event",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Concept",
+        "Event",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "published in",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default"
+    },
+    "Originated By": {
+      "status": "accepted",
+      "description": "Concept A was originated or coined by person B.",
+      "allowedSourceTypes": [
+        "Concept",
+        "Event",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Concept",
+        "Event",
+        "Location",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "originated by",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default"
+    },
+    "Occurred At": {
+      "status": "accepted",
+      "description": "Event A occurred at location B.",
+      "allowedSourceTypes": [
+        "Concept",
+        "Event",
+        "Location",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Concept",
+        "Event",
+        "Location",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "occurred at",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default"
+    },
+    "Supports": {
+      "status": "accepted",
+      "description": "Entity A supports, advocates for, or defends entity B.",
+      "allowedSourceTypes": [
+        "Event",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Concept",
+        "Event",
+        "Location",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "interval",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "supports",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default"
+    },
+    "Owns": {
+      "status": "accepted",
+      "description": "Organization or person A owns or controls organization B (media ownership, corporate structure).",
+      "allowedSourceTypes": [
+        "Organization",
+        "Person"
+      ],
+      "allowedTargetTypes": [
+        "Concept",
+        "Event",
+        "Organization",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "interval",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "owns",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "inverseNote": "The candidate inverse label \"Owned By\" is held pending endpoint-order normalization (see the Owned By entry below); no formal inverseType is registered yet."
+    },
+    "Founded": {
+      "status": "accepted",
+      "description": "Person or organization A founded organization B. Only for creating organizations, publications as ongoing entities, or major projects, not for writing individual articles.",
+      "allowedSourceTypes": [
+        "Organization",
+        "Person"
+      ],
+      "allowedTargetTypes": [
+        "Organization"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "founded",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "inverseNote": "The candidate inverse label \"Founded By\" is held pending endpoint-order normalization (see the Founded By entry below); no formal inverseType is registered yet."
+    },
+    "Pioneered": {
+      "status": "accepted",
+      "description": "Person A pioneered, invented, or was first to develop concept B.",
+      "allowedSourceTypes": [
+        "Concept",
+        "Event",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Concept",
+        "Event",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "pioneered",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default"
+    },
+    "Inspired By": {
+      "status": "accepted",
+      "description": "Work or concept A was inspired by, influenced by, or built upon work, concept, or person B.",
+      "allowedSourceTypes": [
+        "Concept",
+        "Event",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "allowedTargetTypes": [
+        "Concept",
+        "Event",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "directionality": "directed",
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "instant",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": "inspired by",
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default"
+    },
+    "Founded By": {
+      "status": "deferred",
+      "description": "Legacy label used as an apparent inverse of Founded (\"A Founded By B\" intended to mean B founded A).",
+      "observedSourceTypes": [
+        "Event",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "observedTargetTypes": [
+        "Event",
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "directionality": null,
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "deferred",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": null,
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "deferralReason": "Endpoint ordering is inconsistent across existing assertions: the source entity is sometimes the founder and sometimes the founded organization or work. Direction, formal inverse-of-Founded status, and symmetry cannot be inferred safely from current usage and are held pending curator review (see data/graph-validation-holds.json).",
+      "relatedIssues": [
+        737
+      ]
+    },
+    "Owned By": {
+      "status": "deferred",
+      "description": "Legacy label used as an apparent inverse of Owns (\"A Owned By B\" intended to mean B owns A).",
+      "observedSourceTypes": [
+        "Organization",
+        "Person",
+        "Work"
+      ],
+      "observedTargetTypes": [
+        "Organization",
+        "Person"
+      ],
+      "directionality": null,
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "deferred",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": null,
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "deferralReason": "Endpoint ordering is inconsistent across existing assertions, matching the same issue as Founded By. Direction and formal inverse-of-Owns status are held pending curator review (see data/graph-validation-holds.json).",
+      "relatedIssues": [
+        737
+      ]
+    },
+    "Created": {
+      "status": "deferred",
+      "description": "Single legacy assertion of unclear scope relative to Founded, Originated By, and Pioneered.",
+      "observedSourceTypes": [
+        "Person"
+      ],
+      "observedTargetTypes": [
+        "Concept"
+      ],
+      "directionality": null,
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "deferred",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": null,
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "deferralReason": "Only one historical assertion exists and its intended meaning next to Founded, Originated By, and Pioneered was never curator-reviewed (see data/graph-validation-holds.json).",
+      "relatedIssues": [
+        737
+      ]
+    },
+    "Covers": {
+      "status": "deferred",
+      "description": "Single legacy assertion of unclear scope, possibly press coverage of a person by an organization.",
+      "observedSourceTypes": [
+        "Organization"
+      ],
+      "observedTargetTypes": [
+        "Person"
+      ],
+      "directionality": null,
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "deferred",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": null,
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "deferralReason": "Only one historical assertion exists and its intended meaning was never curator-reviewed (see data/graph-validation-holds.json).",
+      "relatedIssues": [
+        737
+      ]
+    },
+    "Influenced": {
+      "status": "deferred",
+      "description": "Forward, outbound counterpart to Inspired By, Expands On, and Cites: source entity had a downstream effect the target can be traced to. Documented in data/SCHEMA.md as a count-0 forward declaration.",
+      "observedSourceTypes": [],
+      "observedTargetTypes": [],
+      "directionality": null,
+      "inverseType": null,
+      "allowSelfLinks": false,
+      "allowMultipleAssertions": true,
+      "temporalScope": "deferred",
+      "disputedAssertionsAllowed": false,
+      "forwardLabel": null,
+      "inverseLabel": null,
+      "evidenceStandard": "pipeline-default",
+      "deferralReason": "Valid source and target types, and whether a record itself can be the influencer, are undecided. Not yet wired into the machine-enforced extraction schema (backend/entity_extraction_schema_v3.json) or the writer allowlists, so it stays unpopulated and unenforced until issues #344 and #548 resolve.",
+      "relatedIssues": [
+        344,
+        548
+      ]
+    }
+  }
+}
