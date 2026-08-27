@@ -123,8 +123,9 @@ describe('resolveBaselineFiles', () => {
   });
 
   it('keeps the real category list pointed at files that actually exist in this repository', () => {
-    // This is the guardrail CLAUDE.md asks for: if data/ is restructured, this
-    // fails loudly here instead of silently shrinking a real baseline later.
+    // Protects against BASELINE_CATEGORIES drifting from what is actually on
+    // disk: if a listed data file is renamed or removed, this fails here
+    // instead of a real baseline silently shrinking later.
     const files = resolveBaselineFiles(realRepoRoot);
     assert.ok(files.length > 0);
     const categoryIds = new Set(BASELINE_CATEGORIES.map((c) => c.id));
@@ -294,6 +295,17 @@ describe('buildBaselineBag / verifyBaselineBag', () => {
       assert.equal(entry.sha256, sha256Of(original));
       assert.equal(entry.bytes, original.length);
     }
+
+    // Categories are derived from the files actually packaged (the fixture
+    // category ids), not from the real repository's BASELINE_CATEGORIES —
+    // a fixture bag must never claim categories it did not include.
+    assert.deepEqual(
+      manifest.categories,
+      [
+        { id: 'fixture-csv', description: null },
+        { id: 'fixture-json', description: null },
+      ],
+    );
 
     // BagIt structure.
     assert.equal(fs.readFileSync(path.join(bagDir, 'bagit.txt'), 'utf8').includes('BagIt-Version: 1.0'), true);

@@ -223,6 +223,7 @@ export function buildBaselineBag({
   generatedAt = new Date(),
   toolVersion = TOOL_VERSION,
   description = DEFAULT_DESCRIPTION,
+  categories = BASELINE_CATEGORIES,
 }) {
   if (fs.existsSync(outputDir) && fs.readdirSync(outputDir).length > 0) {
     throw new BaselineManifestError(`refusing to write into a non-empty output directory: ${outputDir}`);
@@ -271,6 +272,17 @@ export function buildBaselineBag({
   if (commitInfo.pinJustification) bagInfoLines.push(`Pin-Justification: ${commitInfo.pinJustification}`);
   fs.writeFileSync(path.join(outputDir, 'bag-info.txt'), `${bagInfoLines.join('\n')}\n`);
 
+  // Derived from the files actually packaged, not from the full configured
+  // category list — a fixture or partial build should never claim categories
+  // it did not include.
+  const categoryLookup = new Map(categories.map((category) => [category.id, category]));
+  const packagedCategories = [...new Set(fileEntries.map((entry) => entry.category))]
+    .sort()
+    .map((id) => {
+      const known = categoryLookup.get(id);
+      return { id, description: known ? known.description : null };
+    });
+
   const baselineManifest = {
     schemaVersion: '1.0.0',
     toolVersion,
@@ -284,7 +296,7 @@ export function buildBaselineBag({
     description,
     totalFiles: fileEntries.length,
     totalBytes,
-    categories: BASELINE_CATEGORIES.map((category) => ({ id: category.id, description: category.description })),
+    categories: packagedCategories,
     files: fileEntries,
   };
   fs.writeFileSync(
