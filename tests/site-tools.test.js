@@ -197,6 +197,52 @@ describe('archive site-tool registration', () => {
     assert.equal('relatedRecordIds' in record.record, false);
   });
 
+  it('includes record-only publications in facets and accepts them in search', async () => {
+    const dissertationPublication = 'New York University (Ph.D. Dissertation)';
+    const tools = createArchiveSiteTools({
+      loadCoreData: async () => ({
+        records: [
+          ...records,
+          {
+            id: 'dissertation-1986',
+            title: 'The Impossible Press',
+            date: '1986-01-01',
+            year: '1986',
+            era: 'Before PressThink (Pre-2003)',
+            pub: dissertationPublication,
+            categories: ['Journalism Theory & Practice'],
+            type: 'article',
+            verified: true,
+          },
+        ],
+        facets: coreData.facets,
+      }),
+      loadFullTextIndexes: async () => ({ indexes: [], complete: true, failures: [] }),
+    });
+    const facetTool = tools.find(tool => tool.name === 'get_archive_facets');
+    const searchTool = tools.find(tool => tool.name === 'search_archive');
+
+    const facets = await facetTool.execute({});
+    const result = await searchTool.execute({ publication: dissertationPublication });
+
+    assert.ok(facets.publications.includes(dissertationPublication));
+    assert.deepEqual(result.records.map(record => record.id), ['dissertation-1986']);
+  });
+
+  it('reports when related entity identifiers are truncated', async () => {
+    const relatedIds = Array.from({ length: 51 }, (_, index) => `P${index + 1}`);
+    const tools = createArchiveSiteTools({
+      loadCoreData: async () => coreData,
+      loadRecordDetails: async () => ({ relatedIds }),
+    });
+    const recordTool = tools.find(tool => tool.name === 'get_archive_record');
+
+    const result = await recordTool.execute({ record_id: 'RECORD-00001' });
+
+    assert.equal(result.record.relatedEntityIds.length, 50);
+    assert.ok(result.record.truncatedFields.includes('relatedEntityIds'));
+  });
+
   it('does nothing when the browser has no WebMCP support', async () => {
     let loadCalls = 0;
     const registered = await registerArchiveSiteTools({

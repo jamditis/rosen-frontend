@@ -260,6 +260,18 @@ function validateFacetSelections(input, facets = {}) {
   }
 }
 
+function collectPublications(data = {}) {
+  const records = Array.isArray(data?.records) ? data.records : [];
+  const configured = Array.isArray(data?.facets?.publications)
+    ? data.facets.publications
+    : [];
+  return [...new Set([
+    ...configured,
+    ...records.map(record => record?.pub),
+  ].filter(value => typeof value === 'string' && value.trim()).map(value => value.trim()))]
+    .sort((left, right) => left.localeCompare(right));
+}
+
 function clipText(value, maxLength) {
   const text = typeof value === 'string' ? value : '';
   return text.length <= maxLength ? text : `${text.slice(0, maxLength - 1)}…`;
@@ -311,7 +323,7 @@ export function createArchiveSiteTools(dependencies = {}) {
           recordCount: Array.isArray(data?.records) ? data.records.length : 0,
           categories: data?.facets?.categories || [],
           eras: data?.facets?.eras || [],
-          publications: data?.facets?.publications || [],
+          publications: collectPublications(data),
           contentTypes: CONTENT_TYPES,
         };
       },
@@ -351,7 +363,10 @@ export function createArchiveSiteTools(dependencies = {}) {
       execute: async (input) => {
         const parsedInput = parseSearchInput(input);
         const data = await getCoreData();
-        validateFacetSelections(parsedInput, data?.facets);
+        validateFacetSelections(parsedInput, {
+          ...(data?.facets || {}),
+          publications: collectPublications(data),
+        });
 
         let indexes = [];
         let searchCoverage = parsedInput.query ? 'core fields only' : 'not applicable';
@@ -407,9 +422,11 @@ export function createArchiveSiteTools(dependencies = {}) {
         const details = await loadRecordDetails(recordId) || {};
         const summary = details.summary || coreRecord.summaryPreview || '';
         const quote = details.quote || '';
+        const relatedEntityIds = Array.isArray(details.relatedIds) ? details.relatedIds : [];
         const truncatedFields = [];
         if (summary.length > MAX_DETAIL_LENGTH) truncatedFields.push('summary');
         if (quote.length > MAX_QUOTE_LENGTH) truncatedFields.push('quote');
+        if (relatedEntityIds.length > MAX_DETAIL_ITEMS) truncatedFields.push('relatedEntityIds');
 
         return {
           found: true,
@@ -423,9 +440,7 @@ export function createArchiveSiteTools(dependencies = {}) {
               : [],
             tags: Array.isArray(details.tags) ? details.tags.slice(0, MAX_DETAIL_ITEMS) : [],
             sourceUrl: details.url || '',
-            relatedEntityIds: Array.isArray(details.relatedIds)
-              ? details.relatedIds.slice(0, MAX_DETAIL_ITEMS)
-              : [],
+            relatedEntityIds: relatedEntityIds.slice(0, MAX_DETAIL_ITEMS),
             truncatedFields,
           },
         };
