@@ -234,7 +234,14 @@ describe('preservation sample selection (real corpus, default quotas)', () => {
     assert.ok((byStatus.likely_live || 0) > 0);
     // Known failures must not crowd out ordinary pages (issue #704 acceptance
     // criteria): known_difficult should stay a clear minority of the sample.
-    assert.ok(byStatus.known_difficult <= 30, `known_difficult grew to ${byStatus.known_difficult}% of the sample`);
+    // Compare a share, not a raw count, so this still means something under
+    // --sample-size instead of only happening to read right at 100.
+    const knownDifficultShare = (byStatus.known_difficult || 0) / manifest.sample_size;
+    assert.ok(
+      knownDifficultShare <= 0.3,
+      `known_difficult grew to ${Math.round(knownDifficultShare * 1000) / 10}% of the sample ` +
+        `(${byStatus.known_difficult}/${manifest.sample_size})`
+    );
   });
 
   it('covers verified and unverified, present and absent raw text, and present and absent graph links', () => {
