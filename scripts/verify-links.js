@@ -346,6 +346,18 @@ function classify(status) {
   return 'server_error_url';
 }
 
+// Which failure types count against a host's circuit breaker. A redirect is
+// reported (a record's url should be repaired to its canonical target) but it
+// is NOT evidence the host is failing to answer -- it answered, promptly and
+// correctly. Counting it burned the budget of exactly the hosts that behave
+// well: one that canonicalizes http->https, or adds a trailing slash, hit the
+// limit after three urls and had the rest of its corpus skipped for the run.
+const BREAKER_FAILURE_TYPES = new Set(['client_error_url', 'server_error_url']);
+
+function countsAgainstHostBudget(failureType) {
+  return BREAKER_FAILURE_TYPES.has(failureType);
+}
+
 // Gentle by design: a small concurrency pool, a per-request timeout, and a delay
 // between starts so a single source host is not hammered. robots.txt is not
 // fetched per host (probing already-published source URLs with HEAD is low
@@ -364,7 +376,10 @@ function classify(status) {
 // many consecutive failures/timeouts THIS run, no further probes are sent to
 // it for the rest of the run, so one unavailable host cannot burn the whole
 // run's time budget (issue #710 acceptance criterion) at the expense of every
-// other host's urls. Skipped urls are returned separately from `findings` and
+// other host's urls. Only a host that is actually failing to answer counts --
+// 4xx, 5xx, and unreachable/timeout. A 3xx is a reported finding but a healthy
+// response, so it resets the counter like a 200 does; see
+// BREAKER_FAILURE_TYPES. Skipped urls are returned separately from `findings` and
 // are NOT considered checked -- the caller must not fold them into the
 // persisted per-url state as healthy, since they were never actually probed;
 // they simply remain due and get picked up by a later run. Pass 0 to disable
@@ -432,7 +447,9 @@ export async function checkExternalLiveness(urls, opts = {}) {
       try {
         const { status, location } = await probe(url, { timeoutMs });
         const failureType = classify(status);
-        recordHostOutcome(host, Boolean(failureType));
+        // A redirect resolves the counter the same way a 200 does: the host
+        // is up and answering, so it must not accumulate toward exhaustion.
+        recordHostOutcome(host, countsAgainstHostBudget(failureType));
         if (failureType) {
           const ids = idsFor(url);
           findings.push({ category: 'external', failureType, sourceId: ids[0] ?? null, sourceIds: ids, target: url, status, location: location ?? null, detail: `HTTP ${status}${location ? ` -> ${location}` : ''}` });

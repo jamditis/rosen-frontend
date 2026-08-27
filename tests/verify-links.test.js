@@ -364,6 +364,44 @@ describe('checkExternalLiveness per-host circuit breaker (issue #710)', () => {
     assert.equal(result.checked, urls.length);
   });
 
+  it('does not trip the breaker on ordinary redirects, so a host that canonicalizes urls keeps being probed', async (t) => {
+    // A 301/302 is a report-only finding, not a host that is failing to answer:
+    // one host canonicalizing http->https or adding a trailing slash used to
+    // exhaust its own budget after 3 redirects and get the rest of its urls
+    // skipped -- which is most of the archive's own source hosts.
+    const calls = [];
+    t.mock.method(globalThis, 'fetch', async (url) => {
+      calls.push(String(url));
+      return { status: 301, headers: { get: () => 'https://canonical.example/moved' } };
+    });
+
+    const urls = Array.from({ length: 6 }, (_, i) => `https://canonical.example/${i}`);
+    const result = await checkExternalLiveness(urls, { delayMs: 0, concurrency: 1, maxHostFailures: 3 });
+
+    assert.equal(calls.length, urls.length, 'every url on the redirecting host is still probed');
+    assert.equal(result.skipped.length, 0, 'redirects never exhaust a host budget');
+    assert.equal(result.checked, urls.length);
+    assert.equal(result.findings.length, urls.length, 'each redirect is still reported as a finding');
+    assert.ok(result.findings.every((f) => f.failureType === 'redirect_url'));
+  });
+
+  it('counts a real failure that follows redirects on the same host', async (t) => {
+    // Redirects must not reset the counter into uselessness either: a host
+    // that redirects and then genuinely dies still trips the breaker.
+    const statuses = [301, 301, 500, 500, 500, 200];
+    let i = 0;
+    t.mock.method(globalThis, 'fetch', async () => ({
+      status: statuses[i++],
+      headers: { get: () => null }
+    }));
+
+    const urls = Array.from({ length: 6 }, (_, j) => `https://mixed.example/${j}`);
+    const result = await checkExternalLiveness(urls, { delayMs: 0, concurrency: 1, maxHostFailures: 3 });
+
+    assert.equal(result.skipped.length, 1, 'the 3 server errors still exhaust the host');
+    assert.equal(result.checked, urls.length - 1);
+  });
+
   it('a recovered probe on a host resets its consecutive-failure count', async (t) => {
     const statuses = [500, 200, 500, 500];
     let i = 0;
