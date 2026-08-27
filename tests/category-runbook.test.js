@@ -7,9 +7,10 @@ import { fileURLToPath } from 'node:url';
 // Issue #524: Jay asked to be able to add or remove a thematic category
 // himself. ADDING-RECORDS.md now documents that runbook. These tests pin the
 // runbook's factual claims to the actual source, so a later refactor that
-// breaks a claim (e.g. giving categories fixed per-name colors, or reading
-// the sidebar list straight from schema.json) fails a test instead of
-// quietly making the guide wrong.
+// breaks a claim (e.g. giving categories fixed per-name colors, coloring the
+// sidebar's checkboxes, reading the sidebar list straight from schema.json,
+// or sorting the facet list by record count instead of alphabetically) fails
+// a test instead of quietly making the guide wrong.
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -19,6 +20,11 @@ const archiveResults = fs.readFileSync(
   'utf8',
 );
 const constants = fs.readFileSync(path.join(rootDir, 'frontend/constants.js'), 'utf8');
+const sidebar = fs.readFileSync(path.join(rootDir, 'frontend/components/Sidebar.js'), 'utf8');
+const exportScript = fs.readFileSync(
+  path.join(rootDir, 'data/export-archive-data.js'),
+  'utf8',
+);
 const schema = JSON.parse(fs.readFileSync(path.join(rootDir, 'backend/schema.json'), 'utf8'));
 
 describe('thematic category self-service runbook (ADDING-RECORDS.md)', () => {
@@ -62,6 +68,23 @@ describe('the runbook\'s color claim matches the code', () => {
 
   it('constants.js still exports COLORS as one fixed palette shared by every category', () => {
     assert.match(constants, /export const COLORS\s*=\s*\[/);
+  });
+
+  it('Sidebar.js still renders thematic categories as plain checkboxes, with no color of any kind', () => {
+    // The runbook says the sidebar list is plain text, not a colored badge.
+    // Sidebar.js must not import or reference the color palette at all.
+    assert.doesNotMatch(sidebar, /COLORS/);
+    assert.match(sidebar, /type="checkbox"/);
+  });
+});
+
+describe("the runbook's sidebar cap claim matches the code", () => {
+  it('Sidebar.js still shows only the first 10 categories by default', () => {
+    assert.match(sidebar, /facets\.categories\.slice\(0,\s*10\)/);
+  });
+
+  it('the exported category facet is still sorted alphabetically, not by record count', () => {
+    assert.match(exportScript, /categories:\s*Array\.from\(categories\)\.sort\(\)/);
   });
 });
 

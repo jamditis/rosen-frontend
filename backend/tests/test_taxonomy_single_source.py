@@ -86,6 +86,27 @@ def test_auto_categorize_guard_raises_on_unknown_bucket(monkeypatch):
         auto_categorize_records._assert_patterns_match_schema()
 
 
+def test_auto_categorize_guard_passes_when_rule_removed_with_bucket(monkeypatch):
+    # Pins the "To remove a category" runbook step in ADDING-RECORDS.md: a
+    # category removal must also drop its CATEGORY_PATTERNS / URL_PATTERNS
+    # entries in the same change. Do both, and the guard is satisfied (this
+    # is the counterpart to test_auto_categorize_guard_raises_on_unknown_bucket
+    # above, which proves the guard fires when only schema.json is edited).
+    shrunk = [c for c in _schema_names("thematic_categories") if c != "Journalism Education"]
+    monkeypatch.setattr(auto_categorize_records, "thematic_categories", lambda: shrunk)
+    monkeypatch.setattr(
+        auto_categorize_records,
+        "CATEGORY_PATTERNS",
+        {k: v for k, v in auto_categorize_records.CATEGORY_PATTERNS.items() if k != "Journalism Education"},
+    )
+    monkeypatch.setattr(
+        auto_categorize_records,
+        "URL_PATTERNS",
+        {k: v for k, v in auto_categorize_records.URL_PATTERNS.items() if k != "Journalism Education"},
+    )
+    auto_categorize_records._assert_patterns_match_schema()  # must not raise
+
+
 def test_auto_categorize_allows_manual_only_category(monkeypatch):
     # A new canonical bucket with no keyword rule must not block the run: a new
     # category needs no placeholder rules to be valid (issue #524).
