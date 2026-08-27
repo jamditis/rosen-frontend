@@ -51,6 +51,14 @@ export const DEFAULT_DESCRIPTION =
 // content groups named in issue #702's scope. Keep this list in sync with
 // data/README.md and the CLAUDE.md data tables — resolveBaselineFiles() fails
 // loudly instead of silently skipping a file if one of these paths moves.
+//
+// This list must also stay a superset of every file individually listed in
+// backend/scripts/deploy_full_site.py _DEPLOY_DATA_FILES (the files the live
+// site actually ships), or list the omission with a reason next to
+// KNOWN_NOT_BASELINED in tests/baseline-manifest.test.js. That test fails the
+// build the same way tests/deploy-data-manifest.test.js does for #527: a new
+// deployed data file must be a deliberate include-or-exclude decision here,
+// not a silent gap a baseline quietly stops covering.
 const RELATIONSHIP_ADJACENCY_SHARDS = [
   ...'0123456789abcdef',
 ].map((hex) => `data/relationship-adjacency-${hex}.json`);
@@ -66,11 +74,18 @@ export const BASELINE_CATEGORIES = [
   },
   {
     id: 'runtime-json',
-    description: 'Generated runtime JSON the frontend loads (rebuilt by data/export-archive-data.js).',
+    description: 'Generated runtime data the frontend loads, rebuilt by data/export-archive-data.js and the '
+      + 'other data/*.js build scripts (search indexes, analytics, embeddings, wiki seed data).',
     paths: [
       'data/archive-core.json',
       'data/archive-details.json',
       'data/archive-data.json',
+      'data/archive-analytics.json',
+      'data/search-index.json',
+      'data/social-search-index.json',
+      'data/archive-embeddings.bin',
+      'data/archive-embeddings.json',
+      'data/wiki-seed.json',
     ],
   },
   {
@@ -86,9 +101,11 @@ export const BASELINE_CATEGORIES = [
   },
   {
     id: 'schema',
-    description: 'The data schema the export pipeline and frontend agree on.',
+    description: 'The schema and reference files the export pipeline and frontend agree on.',
     paths: [
       'data/schema.json',
+      'data/SCHEMA.md',
+      'data/eras.js',
     ],
   },
 ];

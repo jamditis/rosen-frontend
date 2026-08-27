@@ -15,9 +15,9 @@ issue #702's scope:
 | Category | Files |
 |---|---|
 | `source-csv` | `data/archive_records-public.csv`, `data/social_posts.csv` |
-| `runtime-json` | `data/archive-core.json`, `data/archive-details.json`, `data/archive-data.json` |
+| `runtime-json` | `data/archive-core.json`, `data/archive-details.json`, `data/archive-data.json`, `data/archive-analytics.json`, `data/search-index.json`, `data/social-search-index.json`, `data/archive-embeddings.bin`, `data/archive-embeddings.json`, `data/wiki-seed.json` |
 | `entity-relationship-data` | `data/extracted_entities.csv`, `data/extracted_relationships.csv`, `data/archive-entities.json`, `data/relationship-adjacency-manifest.json`, and the 16 `data/relationship-adjacency-*.json` shards |
-| `schema` | `data/schema.json` |
+| `schema` | `data/schema.json`, `data/SCHEMA.md`, `data/eras.js` |
 
 Every path is explicit — there is no wildcard scan of `data/`, so audit
 reports, working CSVs (`data/records_needing_categories.csv`, and similar),
@@ -26,6 +26,13 @@ and other non-baseline files never end up in a snapshot by accident.
 path is missing or renamed, so a baseline never silently shrinks. If you move
 or rename one of these files, update `BASELINE_CATEGORIES` in
 `preservation/baseline-manifest-lib.mjs` in the same change.
+
+This list is checked against `backend/scripts/deploy_full_site.py`'s
+`_DEPLOY_DATA_FILES` — every data file the live site actually ships.
+`tests/baseline-manifest.test.js` fails if a file is added there and this
+list is not updated to include it (or to explicitly exclude it with a
+reason), the same guard `tests/deploy-data-manifest.test.js` added for #527
+so a shipped data file can no longer silently drop out of coverage.
 
 ## Commit `43bb423` exists, but this tool pins HEAD instead
 

@@ -17,6 +17,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import {
   ACCEPTANCE_CRITERIA_COMMIT,
@@ -31,7 +32,10 @@ import {
 import { runCreateBaseline } from '../preservation/create-baseline-manifest.mjs';
 import { runVerifyBaseline } from '../preservation/verify-baseline-manifest.mjs';
 
-const realRepoRoot = process.cwd();
+// Resolved from this file's own location, like every other path in this
+// suite, so `node --test path/to/this/file` behaves the same from any cwd.
+const realRepoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const deployScriptPath = path.join(realRepoRoot, 'backend', 'scripts', 'deploy_full_site.py');
 
 function sha256Of(text) {
   return crypto.createHash('sha256').update(text).digest('hex');
@@ -128,6 +132,53 @@ describe('resolveBaselineFiles', () => {
       categoryIds,
       new Set(['source-csv', 'runtime-json', 'entity-relationship-data', 'schema']),
     );
+  });
+});
+
+// Data files this tool deliberately does not baseline, even though the live
+// site deploys them, each with a reason. A file belongs here only after
+// deciding it should not be baselined — the default expectation is that a
+// deployed data file gets added to BASELINE_CATEGORIES instead.
+const KNOWN_NOT_BASELINED = new Map([]);
+
+// Extract a Python tuple of string literals named `name` from
+// backend/scripts/deploy_full_site.py (e.g. _DEPLOY_DATA_FILES).
+function pyTuple(name) {
+  const py = fs.readFileSync(deployScriptPath, 'utf8');
+  const block = py.match(new RegExp(`${name}\\s*:[^=]*=\\s*\\(([\\s\\S]*?)\\)`));
+  assert.ok(block, `deploy_full_site.py: could not find the ${name} tuple`);
+  return [...block[1].matchAll(/['"]([^'"]+)['"]/g)].map((m) => m[1]);
+}
+
+describe('BASELINE_CATEGORIES vs the deploy manifest', () => {
+  it('covers, or explicitly excludes, every data file the deploy script ships individually', () => {
+    // Mirrors the #527 guard in tests/deploy-data-manifest.test.js: a data
+    // file the live site deploys must be a deliberate baseline
+    // include-or-exclude decision, not a silent gap. This does not cover
+    // _DEPLOY_DIRS (e.g. data/feeds, walked recursively) — those are
+    // per-category generated feeds, not named files this tool tracks
+    // individually.
+    const deployedFiles = pyTuple('_DEPLOY_DATA_FILES');
+    const baselinedPaths = new Set(BASELINE_CATEGORIES.flatMap((category) => category.paths));
+
+    const unbaselined = deployedFiles.filter(
+      (rel) => !baselinedPaths.has(rel) && !KNOWN_NOT_BASELINED.has(rel),
+    );
+
+    assert.deepStrictEqual(
+      unbaselined,
+      [],
+      'Deployed data file(s) missing from BASELINE_CATEGORIES: each must be added to '
+      + 'preservation/baseline-manifest-lib.mjs BASELINE_CATEGORIES (and preservation/BASELINE.md), '
+      + 'or to KNOWN_NOT_BASELINED in this test with a reason. Leaving it unlisted is exactly how a '
+      + `baseline quietly stops covering a shipped data file:\n  ${unbaselined.join('\n  ')}`,
+    );
+  });
+
+  it('never both baselines and excludes the same file', () => {
+    const baselinedPaths = new Set(BASELINE_CATEGORIES.flatMap((category) => category.paths));
+    const contradictions = [...KNOWN_NOT_BASELINED.keys()].filter((rel) => baselinedPaths.has(rel));
+    assert.deepStrictEqual(contradictions, []);
   });
 });
 
