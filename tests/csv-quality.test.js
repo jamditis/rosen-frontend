@@ -1161,17 +1161,8 @@ describe('archive_records-public.csv', () => {
         summary: 'Rosen examines John Harris and Jim VandeHei\'s move from the Washington Post to an Allbritton political news venture and argues that its "next generation" rhetoric masks a conventional insider model rather than a genuine break with traditional political journalism.',
         sourceSha: 'd016a2d297345b93c34e2f56feefcb4e273d2dd4ebca4f438600b2b35d93c1f4',
       }],
-      ['RECORD-00830', {
-        title: 'The Retreat from Empiricism and Ron Suskind\'s Intellectual Scoop',
-        url: 'https://www.huffpost.com/entry/the-retreat-from-empirici_b_36772',
-        publicationDate: '2006-12-20',
-        wordCount: '3406',
-        rawTextSha: '885e4df566bf98f1c5b5b13c719409dc7da884422376d7c171f58aaf6154295e',
-        excerpt: 'The press is capable of doing that--fuzzing things up--because it never came to terms with what Suskind reported in 2004. Of course, neither did the political system. Or the Republican party, or its sensible wing-- the elders, the responsible people.',
-        pullQuote: 'Even realism has an obligation to be realistic.',
-        summary: 'Rosen argues that Ron Suskind\'s reporting captured a deeper "retreat from empiricism" in the Bush administration, and that the press and political class have failed to absorb that story even as realism returns to foreign-policy debate.',
-        sourceSha: 'b535887edd0d17740967ee370ff05d7b8a90fc32b3a6caf3809ea95851b48005',
-      }],
+      // RECORD-00830 was in this pilot. The curator dropped it on 2026-08-27
+      // (#867) as a truncated second capture of RECORD-00681.
       ['RECORD-00831', {
         title: 'Situation Grave and Deteriorating for the Agnewocracy',
         url: 'https://www.huffpost.com/entry/situation-grave-and-deter_b_38525',
@@ -1414,17 +1405,8 @@ describe('archive_records-public.csv', () => {
         summary: 'Rosen reviews press coverage of YearlyKos and finds more respect between political reporters and the liberal blogosphere than in earlier years. He argues that reporters are absorbing Dan Gillmor\'s lesson that readers know more than they do, though wariness and Iraq-war accountability remain unresolved.',
         sourceSha: 'ab3c305fded823f14ed251b7398f3b06d5aa40280ef74d252ca4330b7c353dd7',
       }],
-      ['RECORD-00846', {
-        title: 'Karl Rove and the Cult of Savviness in Our Political Press',
-        url: 'https://www.huffpost.com/entry/karl-rove-and-the-cult-of_b_60411',
-        publicationDate: '2007-08-14',
-        wordCount: '1146',
-        rawTextSha: '72dbfb5246cc8b0d683d29118ec10edc3782f27aac264326a0363860b735fd88',
-        excerpt: 'I think that the real -- and undeclared -- ideology of American journalism is savviness, which is what made the press so vulnerable to the likes of Karl Rove.',
-        pullQuote: 'Conservatives think the ideology of the Washington press corps is liberal.',
-        summary: 'Rosen uses Karl Rove\'s resignation to argue that American political journalism\'s undeclared ideology is savviness. He says reporters admired Rove\'s tactical skill so much that they underplayed his extremism and the damage his politics did.',
-        sourceSha: 'd1aa601f359f0032c03450a61053dcdd3540f447468d99a1f85ef5e773ba5920',
-      }],
+      // RECORD-00846 was in this pilot. The curator dropped it on 2026-08-27
+      // (#867) as a truncated second capture of RECORD-00685.
       ['RECORD-00847', {
         title: '"Would You Guys Like us to Come Without You?"',
         url: 'https://www.huffpost.com/entry/would-you-guys-like-us-to_b_63176',
@@ -1567,17 +1549,8 @@ describe('archive_records-public.csv', () => {
         summary: "Rosen argues that neutrality claims like Clark Hoyt's defense of the Times trap the media-bias debate, and that journalists must recognize the politics in their work and make it transparent, as Josh Marshall's TPM does by joining accountability reporting to an open display of political conviction.",
         sourceSha: '1dacc962fe486d4bf1ba6d0fb8427a4120100a4f6662fc9f03f7bf6b8d3cd42d',
       }],
-      ['RECORD-00855', {
-        title: 'Obama Tells the Best Political Team on Television: You Guys Have a Choice...',
-        url: 'https://www.huffpost.com/entry/obama-tells-the-best-poli_b_92139',
-        publicationDate: '2008-03-18',
-        wordCount: '685',
-        rawTextSha: 'c2ca3b27f4321ff8980ec768a320cc143d21825810afecb63e097ff094a73c34',
-        excerpt: 'In fact it was a [speech](https://www.huffpost.com/entry/obama-race-speech-read-t_n_92077) aimed right at figures like Blitzer, at the [best political team](http://www.cnn.com/POLITICS/best.political.team/archive/) on television, and all the makers of our election year spectacle.',
-        pullQuote: 'Moments after it concluded Wolf Blitzer was asked to tell us what he heard in it.',
-        summary: "Rosen criticizes CNN and Wolf Blitzer for reducing Obama's race speech to campaign tactics instead of engaging its challenge to the campaign spectacle and the press's role in keeping race controversies alive.",
-        sourceSha: '99eee19f175791a76156c90f92c23f1efe6685ee1816b8723a8634e82cdf5df8',
-      }],
+      // RECORD-00855 was in this pilot. The curator dropped it on 2026-08-27
+      // (#867) as a truncated second capture of RECORD-00695.
       ['RECORD-00856', {
         title: 'Where Did McCain Get What He\'s Got "in the Bank" with the Press?',
         url: 'https://www.huffpost.com/entry/where-did-mccain-get-what_b_93711',
@@ -1589,17 +1562,8 @@ describe('archive_records-public.csv', () => {
         summary: "Rosen asks why Chuck Todd said John McCain had enough credibility 'in the bank' with the press after falsely linking Al Qaeda in Iraq to Iran, arguing that banked capital came from McCain's open, on-the-record ease with reporters on the Straight Talk Express rather than demonstrated foreign-policy mastery.",
         sourceSha: '61069523ad8e8d889f0c7165227a32150dc4812e27ab0885899523d42de7e7b7',
       }],
-      ['RECORD-00857', {
-        title: 'The Uncharted: From Off The Bus to Meet the Press',
-        url: 'https://www.huffpost.com/entry/the-uncharted-from-off-th_b_96575',
-        publicationDate: '2008-04-22',
-        wordCount: '2470',
-        rawTextSha: '22c51b32da698e47140d442dcd86d43114d7f764b32fe62ce559bf03d5f8f6af',
-        excerpt: "They became public because [Mayhill Fowler](https://www.huffpost.com/mayhill-fowler) reported them for OffTheBus Friday afternoon. Russert used Mayhill's quotes again on [another story](https://www.huffpost.com/entry/obama-says-no-to-foreign_b_95357) she broke earlier in the week.",
-        pullQuote: 'One of these was OffTheBus itself, the site I started with Arianna Huffington last year.',
-        summary: "Rosen argues that Meet the Press erased Mayhill Fowler and OffTheBus from the Obama 'bitter' controversy, showing how old media struggled to credit pro-am campaign reporting even when it drove the story.",
-        sourceSha: 'b910fdc1de0d3682ba28281a7ba056949a2e08a59f5ada2c338a8ac72c5de842',
-      }],
+      // RECORD-00857 was in this pilot. The curator dropped it on 2026-08-27
+      // (#867) as a truncated second capture of RECORD-00696.
       ['RECORD-00858', {
         title: 'They Were Undercover Campaign Volunteers',
         url: 'https://www.huffpost.com/entry/they-were-undercover-camp_b_97529',
@@ -1845,18 +1809,8 @@ describe('archive_records-public.csv', () => {
         sourceSha: 'b1ed6da2177915cca79483da7d577db37476269bfa71d427e4da328e5e815721',
         sourcePattern: /Modern HuffPost source verified 2026-07-23/,
       }],
-      ['RECORD-00873', {
-        title: 'Hype Busters at Mother Jones Bring the Noise',
-        url: 'https://www.huffpost.com/entry/hype-busters-at-mother-jo_b_120078',
-        publicationDate: '2008-09-20',
-        wordCount: '1513',
-        rawTextSha: '8587258f83ca4b66503d95b69e030b9c111bf52b3e093798f365bd748f6c58d3',
-        excerpt: 'Mother Jones is currently running a feature offering us the views of 24 writers, thinkers and historians on a question the editors find important: "Is Obama exaggerating when he compares his campaign to the great progressive moments in US history?"',
-        pullQuote: 'Is the concept really so hard for the editors of Mother Jones to grasp?',
-        summary: 'Rosen critiques Mother Jones\'s Obama hype-busting package, arguing that attempts to puncture campaign hype can become another form of hype when the framing is careless.',
-        sourceSha: 'daae6c220c00a9c5bbf057cc7335f7d302a099f4ed44a5d53ddcabe398c30670',
-        sourcePattern: /Modern HuffPost source verified 2026-07-23/,
-      }],
+      // RECORD-00873 was in this pilot. The curator dropped it on 2026-08-27
+      // (#867) as a truncated second capture of RECORD-00692.
     ]);
 
     for (const [id, source] of expected) {
@@ -1918,17 +1872,8 @@ describe('archive_records-public.csv', () => {
         summary: 'Rosen criticizes he said, she said journalism as a newsroom refuge that avoids judging competing truth claims, using AIG bailout coverage to argue that reporters should move beyond stenographic dispute framing.',
         sourceSha: 'aa074de890fbdedabf7995c7914a96419e01eacb8292f1b5a18cd39e731525ad',
       }],
-      ['RECORD-00877', {
-        title: 'The Politics of the New Huffington Post at AOL',
-        url: 'https://www.huffpost.com/entry/the-politics-of-the-new-h_b_821112',
-        publicationDate: '2011-02-10',
-        wordCount: '1306',
-        rawTextSha: 'd0a7ccd044bcf915f136af7fe05a4d2db511657458dc8763013a7ff0708b0a75',
-        excerpt: 'Is ideological innovation possible in online journalism, and will we see it from this merger? No one ever thinks to ask that. Without understanding why, we just assume the answer is no.',
-        pullQuote: '( Howard Kurtz: "Can a fast-moving, irreverent, and sometimes racy product keep its DNA once transplanted into a very different corporate culture?")\n\n2\\.',
-        summary: 'Rosen argues that coverage of AOL\'s purchase of HuffPost asked practical merger questions while ignoring whether the deal could produce ideological innovation in online journalism.',
-        sourceSha: 'defa25d8de9e9068f681fd117f583c4f39c1d0c321af667dd84e0b24bda076da',
-      }],
+      // RECORD-00877 was in this pilot. The curator dropped it on 2026-08-27
+      // (#867) as a truncated second capture of RECORD-00701.
       ['RECORD-00878', {
         title: 'The Many Ways Journalists Are Complicit in Political Polarization',
         url: 'https://www.huffpost.com/entry/leave-it-there-press_b_8739698',

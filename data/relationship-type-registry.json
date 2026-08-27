@@ -159,8 +159,8 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "deferred",
       "endpointDivergence": {
-        "violatingRows": 227,
-        "totalRows": 1592,
+        "violatingRows": 226,
+        "totalRows": 1581,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00003_REL_007",
@@ -169,11 +169,11 @@
           "RECORD-00026_REL_010",
           "RECORD-00027_REL_009"
         ],
-        "note": "227 of 1592 current Mentions rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Mentions is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+        "note": "226 of 1581 current Mentions rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Mentions is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
       },
       "directionalContradictions": {
         "pairCount": 31,
-        "rowsInvolved": 74,
+        "rowsInvolved": 73,
         "asOfDate": "2026-08-27",
         "examplePairs": [
           {
@@ -195,7 +195,7 @@
             "backwardAssertion": "CNN -> Fox News"
           }
         ],
-        "note": "31 entity pairs (74 rows) currently have Mentions asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+        "note": "31 entity pairs (73 rows) currently have Mentions asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       }
     },
     "Criticizes": {
@@ -225,7 +225,7 @@
       "endpointEnforcement": "deferred",
       "endpointDivergence": {
         "violatingRows": 72,
-        "totalRows": 1140,
+        "totalRows": 1114,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00070_REL_003",
@@ -234,7 +234,7 @@
           "RECORD-00281_REL_001",
           "RECORD-00306_REL_001"
         ],
-        "note": "72 of 1140 current Criticizes rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Criticizes is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+        "note": "72 of 1114 current Criticizes rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Criticizes is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
       },
       "directionalContradictions": {
         "pairCount": 7,
@@ -286,8 +286,8 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "deferred",
       "endpointDivergence": {
-        "violatingRows": 34,
-        "totalRows": 166,
+        "violatingRows": 33,
+        "totalRows": 163,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00353_REL_005",
@@ -296,7 +296,7 @@
           "RECORD-00490_REL_025",
           "RECORD-00498_REL_024"
         ],
-        "note": "34 of 166 current Cites rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Cites is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+        "note": "33 of 163 current Cites rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Cites is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
       },
       "directionalContradictions": {
         "pairCount": 3,
@@ -349,8 +349,8 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "deferred",
       "endpointDivergence": {
-        "violatingRows": 963,
-        "totalRows": 2480,
+        "violatingRows": 955,
+        "totalRows": 2457,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00002_REL_027",
@@ -359,7 +359,7 @@
           "RECORD-00005_REL_004",
           "RECORD-00020_REL_004"
         ],
-        "note": "963 of 2480 current Discusses rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Discusses is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+        "note": "955 of 2457 current Discusses rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Discusses is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
       },
       "directionalContradictions": {
         "pairCount": 10,
@@ -410,8 +410,8 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "deferred",
       "endpointDivergence": {
-        "violatingRows": 155,
-        "totalRows": 194,
+        "violatingRows": 149,
+        "totalRows": 187,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00051_REL_004",
@@ -420,11 +420,11 @@
           "RECORD-00066_REL_006",
           "RECORD-00066_REL_007"
         ],
-        "note": "155 of 194 current Expands On rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Expands On is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+        "note": "149 of 187 current Expands On rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Expands On is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
       },
       "directionalContradictions": {
-        "pairCount": 3,
-        "rowsInvolved": 7,
+        "pairCount": 2,
+        "rowsInvolved": 5,
         "asOfDate": "2026-08-27",
         "examplePairs": [
           {
@@ -438,15 +438,9 @@
             "forwardAssertion": "False Balance -> He Said, She Said Journalism",
             "backwardId": "RECORD-00700_REL_012",
             "backwardAssertion": "He Said, She Said Journalism -> False Balance"
-          },
-          {
-            "forwardId": "RECORD-00701_REL_012",
-            "forwardAssertion": "View from Nowhere -> View From Somewhere",
-            "backwardId": "RECORD-00877_REL_022",
-            "backwardAssertion": "View From Somewhere -> View from Nowhere"
           }
         ],
-        "note": "3 entity pairs (7 rows) currently have Expands On asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+        "note": "2 entity pairs (5 rows) currently have Expands On asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       }
     },
     "Affiliated With": {
@@ -469,8 +463,8 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "deferred",
       "endpointDivergence": {
-        "violatingRows": 717,
-        "totalRows": 3209,
+        "violatingRows": 707,
+        "totalRows": 3154,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00003_REL_004",
@@ -479,11 +473,11 @@
           "RECORD-00020_REL_009",
           "RECORD-00020_REL_010"
         ],
-        "note": "717 of 3209 current Affiliated With rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Affiliated With is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+        "note": "707 of 3154 current Affiliated With rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Affiliated With is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
       },
       "directionalContradictions": {
         "pairCount": 55,
-        "rowsInvolved": 211,
+        "rowsInvolved": 207,
         "asOfDate": "2026-08-27",
         "examplePairs": [
           {
@@ -505,7 +499,7 @@
             "backwardAssertion": "Catherine Mathis -> The New York Times"
           }
         ],
-        "note": "55 entity pairs (211 rows) currently have Affiliated With asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+        "note": "55 entity pairs (207 rows) currently have Affiliated With asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       }
     },
     "Published In": {
@@ -528,8 +522,8 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "deferred",
       "endpointDivergence": {
-        "violatingRows": 251,
-        "totalRows": 538,
+        "violatingRows": 250,
+        "totalRows": 533,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00005_REL_002",
@@ -538,7 +532,7 @@
           "RECORD-00039_REL_007",
           "RECORD-00047_REL_001"
         ],
-        "note": "251 of 538 current Published In rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Published In is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+        "note": "250 of 533 current Published In rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Published In is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
       },
       "directionalContradictions": {
         "pairCount": 8,
@@ -587,8 +581,8 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "deferred",
       "endpointDivergence": {
-        "violatingRows": 638,
-        "totalRows": 763,
+        "violatingRows": 608,
+        "totalRows": 729,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00005_REL_018",
@@ -597,11 +591,11 @@
           "RECORD-00021_REL_009",
           "RECORD-00022_REL_003"
         ],
-        "note": "638 of 763 current Originated By rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Originated By is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+        "note": "608 of 729 current Originated By rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Originated By is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
       },
       "directionalContradictions": {
-        "pairCount": 44,
-        "rowsInvolved": 138,
+        "pairCount": 32,
+        "rowsInvolved": 109,
         "asOfDate": "2026-08-27",
         "examplePairs": [
           {
@@ -623,7 +617,7 @@
             "backwardAssertion": "Jay Rosen -> Verification in Reverse"
           }
         ],
-        "note": "44 entity pairs (138 rows) currently have Originated By asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+        "note": "32 entity pairs (109 rows) currently have Originated By asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       }
     },
     "Occurred At": {
@@ -646,8 +640,8 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "deferred",
       "endpointDivergence": {
-        "violatingRows": 143,
-        "totalRows": 252,
+        "violatingRows": 140,
+        "totalRows": 246,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00003_REL_001",
@@ -656,7 +650,7 @@
           "RECORD-00079_REL_014",
           "RECORD-00079_REL_015"
         ],
-        "note": "143 of 252 current Occurred At rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Occurred At is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+        "note": "140 of 246 current Occurred At rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Occurred At is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
       },
       "directionalContradictions": {
         "pairCount": 2,
@@ -705,7 +699,7 @@
       "endpointEnforcement": "deferred",
       "endpointDivergence": {
         "violatingRows": 23,
-        "totalRows": 291,
+        "totalRows": 289,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00107_REL_001",
@@ -714,7 +708,7 @@
           "RECORD-00537_REL_006",
           "RECORD-00535_REL_001"
         ],
-        "note": "23 of 291 current Supports rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Supports is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+        "note": "23 of 289 current Supports rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Supports is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
       },
       "directionalContradictions": {
         "pairCount": 8,
@@ -765,8 +759,8 @@
       "inverseNote": "The candidate inverse label \"Owned By\" is recorded as candidateInverseType so the validator can detect when the same fact is asserted under both labels, but it is not a formal inverseType: Owned By's own endpoint ordering is inconsistent (see the Owned By entry below), so which row (if either) is correct is a pending curator decision, not something this registry asserts.",
       "endpointEnforcement": "deferred",
       "endpointDivergence": {
-        "violatingRows": 17,
-        "totalRows": 66,
+        "violatingRows": 16,
+        "totalRows": 64,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00535_REL_004",
@@ -775,7 +769,7 @@
           "RECORD-00690_REL_001",
           "RECORD-00741_REL_011"
         ],
-        "note": "17 of 66 current Owns rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Owns is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+        "note": "16 of 64 current Owns rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Owns is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
       },
       "candidateInverseType": "Owned By"
     },
@@ -822,8 +816,8 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "deferred",
       "endpointDivergence": {
-        "violatingRows": 115,
-        "totalRows": 232,
+        "violatingRows": 113,
+        "totalRows": 225,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00010_REL_001",
@@ -832,11 +826,11 @@
           "RECORD-00012_REL_004",
           "RECORD-00013_REL_005"
         ],
-        "note": "115 of 232 current Pioneered rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Pioneered is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+        "note": "113 of 225 current Pioneered rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Pioneered is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
       },
       "directionalContradictions": {
         "pairCount": 3,
-        "rowsInvolved": 11,
+        "rowsInvolved": 10,
         "asOfDate": "2026-08-27",
         "examplePairs": [
           {
@@ -858,7 +852,7 @@
             "backwardAssertion": "OffTheBus -> Pro-Am journalism"
           }
         ],
-        "note": "3 entity pairs (11 rows) currently have Pioneered asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
+        "note": "3 entity pairs (10 rows) currently have Pioneered asserted in both directions for the same two entities. At least one row in each pair is backwards relative to this type's declared direction. Which row (if either) to correct or remove is a pending curator decision (issue #737); this type stays \"accepted\" because it derives from the active extraction schema, but its endpoint enforcement is deferred (see endpointDivergence) until this backlog is resolved."
       }
     },
     "Inspired By": {
@@ -927,7 +921,7 @@
       ],
       "directionalContradictions": {
         "pairCount": 7,
-        "rowsInvolved": 31,
+        "rowsInvolved": 28,
         "asOfDate": "2026-08-27",
         "examplePairs": [
           {
@@ -949,7 +943,7 @@
             "backwardAssertion": "Jay Rosen -> PressThink"
           }
         ],
-        "note": "7 entity pairs (31 rows) assert Founded By in both directions for the same two entities. This is the same endpoint-ordering inconsistency named in deferralReason above, made concrete."
+        "note": "7 entity pairs (28 rows) assert Founded By in both directions for the same two entities. This is the same endpoint-ordering inconsistency named in deferralReason above, made concrete."
       }
     },
     "Owned By": {

@@ -578,14 +578,6 @@ RECORD-00076_REL_009,RECORD-00076,O0071,MSNBC,Criticizes,P0313,Keith Olbermann,W
 RECORD-00076_REL_011,RECORD-00076,O0023,The Washington Post,Mentions,P0256,Dave Weigel,"During the episode in which a fine young reporter, Dave Weigel, lost his job at the Washington Post because he was perceived as insufficiently uncommitted",1.0,2025-10-22
 RECORD-00076_REL_012,RECORD-00076,P0209,Ben Smith,Supports,C0050,Objectivity,Ben Smith stood up for this kind of pluralism: “My personal view is that ideological and neutral journalism can flourish side by side,0.8,2025-10-22
 RECORD-00076_REL_014,RECORD-00076,P0312,Thomas Nagel,Expands On,C0050,Objectivity,"If it means trying to see things in that fuller perspective Thomas Nagel talked about–pulling the camera back, revealing our previous position as only one of many–I second the motion.",0.7,2025-10-22
-RECORD-00077_REL_001,RECORD-00077,P0045,David Folkenflik,Discusses,P0005,Jay Rosen,David Folkenflik brings us an influential media critic who argues that mainstream American journalists do cling to their own ideology,0.9,2025-10-22
-RECORD-00077_REL_003,RECORD-00077,P0485,Leonard Downie Jr.,Criticizes,C0004,View from Nowhere,"For much of the conventional press that is, of course, crazy talk.",0.8,2025-10-22
-RECORD-00077_REL_004,RECORD-00077,P0485,Leonard Downie Jr.,Affiliated With,O0023,The Washington Post,"That's Leonard Downie, the Post's former executive editor",1.0,2025-10-22
-RECORD-00077_REL_005,RECORD-00077,P0313,Keith Olbermann,Affiliated With,O0071,MSNBC,Keith Olbermann (MSNBC),1.0,2025-10-22
-RECORD-00077_REL_006,RECORD-00077,P0315,Joe Scarborough,Affiliated With,O0221,NBC News,NBC News suspended opinion hosts Keith Olbermann and Joe Scarborough,1.0,2025-10-22
-RECORD-00077_REL_007,RECORD-00077,P0311,Juan Williams,Affiliated With,O0220,NPR News,NPR terminated the contract of former news analyst Juan Williams,1.0,2025-10-22
-RECORD-00077_REL_008,RECORD-00077,P0316,Peter S. Goodman,Affiliated With,O0034,The Huffington Post,Peter S. Goodman to leave his job as national economics correspondent for The New York Times to become business editor at the liberal Huffington Post,1.0,2025-10-22
-RECORD-00077_REL_009,RECORD-00077,P0316,Peter S. Goodman,Affiliated With,O0002,The New York Times,Peter S. Goodman to leave his job as national economics correspondent for The New York Times to become business editor at the liberal Huffington Post,1.0,2025-10-22
 RECORD-00078_REL_001,RECORD-00078,P0318,Glenn Greenwald,Affiliated With,O0002,The New York Times,"Glenn Greenwald, recently of The Guardian",0.9,2025-10-22
 RECORD-00078_REL_002,RECORD-00078,P0318,Glenn Greenwald,Discusses,C0111,Old Testament Journalism,In his journalism there is no natural separation between political argument and information about what’s happening.,0.8,2025-10-22
 RECORD-00078_REL_003,RECORD-00078,O0002,The New York Times,Discusses,C0112,New Testament Journalism,New York Times journalism is the more recent tradition.,0.7,2025-10-22
@@ -9036,52 +9028,6 @@ RECORD-00829_REL_029,RECORD-00829,P0005,Jay Rosen,Founded By,O0456,NewAssignment
 RECORD-00829_REL_030,RECORD-00829,P0511,Adam Nagourney,Affiliated With,O0002,The New York Times,a new vision of political reporting results from hiring Adam Nagourney (or his equivalents),0.8,2026-05-27
 RECORD-00829_REL_031,RECORD-00829,O1354,Capitol Leader,Occurred At,L0260,"Washington, DC","a new Washington newspaper, the Capitol Leader",1,2026-05-27
 RECORD-00829_REL_032,RECORD-00829,O1352,WJLA-TV,Occurred At,L0260,"Washington, DC",WJLA-TV--the ABC affiliate in DC,1,2026-05-27
-RECORD-00830_REL_001,RECORD-00830,P1163,Ron Suskind,Originated By,W0352,Without a Doubt,"Ron Suskind's article, Without a Doubt, published in the New York Times Magazine shortly before the 2004 election.",1,2026-05-27
-RECORD-00830_REL_002,RECORD-00830,W0352,Without a Doubt,Published In,O0002,The New York Times,"Ron Suskind's article, Without a Doubt, published in the New York Times Magazine shortly before the 2004 election.",1,2026-05-27
-RECORD-00830_REL_003,RECORD-00830,W0352,Without a Doubt,Originated By,C0347,Reality-based Community,"That passage caused a sensation when it was published, and the sensation introduced a new term, the reality-based community, into political talk.",1,2026-05-27
-RECORD-00830_REL_004,RECORD-00830,W0352,Without a Doubt,Criticizes,P0014,George W. Bush,"Without a Doubt (subtitled 'Faith, Certainty and the Presidency of George W. Bush')",0.9,2026-05-27
-RECORD-00830_REL_005,RECORD-00830,P1163,Ron Suskind,Originated By,C0579,Retreat from empiricism,"Suskind, I felt, got to the essence of it with his phrase, the 'retreat from empiricism.'",1,2026-05-27
-RECORD-00830_REL_006,RECORD-00830,C0579,Retreat from empiricism,Mentions,P0014,George W. Bush,"a retreat from empiricism, a sometimes bullying impatience with doubters and even friendly questioners.",0.9,2026-05-27
-RECORD-00830_REL_007,RECORD-00830,P0005,Jay Rosen,Discusses,W0352,Without a Doubt,"The only piece of political journalism ever to make me cry was Ron Suskind's article, Without a Doubt",1,2026-05-27
-RECORD-00830_REL_008,RECORD-00830,P0005,Jay Rosen,Discusses,C0347,Reality-based Community,"Realist...and reality-based, which is not a classic term but more of an instant classic, are quite different ideas.",1,2026-05-27
-RECORD-00830_REL_009,RECORD-00830,P0005,Jay Rosen,Expands On,C0579,Retreat from empiricism,He was telling us that reality-based policy-making--and the mechanisms for it--had gotten dumped.,0.9,2026-05-27
-RECORD-00830_REL_010,RECORD-00830,O1466,Iraq Study Group,Originated By,W0817,Iraq Study Group Report,The release of the Iraq Study Group's report on December 6th,1,2026-05-27
-RECORD-00830_REL_011,RECORD-00830,P2016,James Baker,Affiliated With,O1466,Iraq Study Group,"the re-emergence of James Baker, famous for being pragmatist, a realist, and a fixer",1,2026-05-27
-RECORD-00830_REL_012,RECORD-00830,P2016,James Baker,Affiliated With,C0886,Realism (foreign policy),"James Baker, famous for being pragmatist, a realist, and a fixer",0.9,2026-05-27
-RECORD-00830_REL_013,RECORD-00830,P0014,George W. Bush,Pioneered,C0579,Retreat from empiricism,A different pattern had appeared under George W. Bush and Dick Cheney. The normal checks and balances had been overcome,0.9,2026-05-27
-RECORD-00830_REL_014,RECORD-00830,P0739,Dick Cheney,Affiliated With,P0014,George W. Bush,A different pattern had appeared under George W. Bush and Dick Cheney.,1,2026-05-27
-RECORD-00830_REL_015,RECORD-00830,P0005,Jay Rosen,Criticizes,P0739,Dick Cheney,Cheney is by common agreement in the press the most powerful and least scrutinized Vice President in modern American history.,0.9,2026-05-27
-RECORD-00830_REL_016,RECORD-00830,P0341,Hannah Arendt,Originated By,C1188,Action vs. behavior,The distinction between action and behavior is originally Hannah Arendt's.,1,2026-05-27
-RECORD-00830_REL_017,RECORD-00830,P0005,Jay Rosen,Cites,C1188,Action vs. behavior,"The contrast I would draw is between the actions of Bush, a political innovator, and the behavior of previous presidents",1,2026-05-27
-RECORD-00830_REL_018,RECORD-00830,P0030,Bill Keller,Originated By,C0888,Intellectual scoop,what Bill Keller and others at the New York Times call an intellectual scoop.,1,2026-05-27
-RECORD-00830_REL_019,RECORD-00830,P1163,Ron Suskind,Originated By,W0814,The Price of Loyalty,two by Suskind (The Price of Loyalty and The One Percent Doctrine),1,2026-05-27
-RECORD-00830_REL_020,RECORD-00830,P1163,Ron Suskind,Originated By,W0815,The One Percent Doctrine,two by Suskind (The Price of Loyalty and The One Percent Doctrine),1,2026-05-27
-RECORD-00830_REL_021,RECORD-00830,P1202,George Packer,Originated By,W0816,The Assassins' Gate,George Packer's The Assassins' Gate,1,2026-05-27
-RECORD-00830_REL_022,RECORD-00830,P1932,Thomas E. Ricks,Originated By,W0575,Fiasco,Thomas Ricks's Fiasco,1,2026-05-27
-RECORD-00830_REL_023,RECORD-00830,P0321,Bob Woodward,Originated By,W0592,State of Denial,Bob Woodward's State of Denial,1,2026-05-27
-RECORD-00830_REL_024,RECORD-00830,P0321,Bob Woodward,Originated By,W0165,Plan of Attack,Bob Woodward...wrote Plan of Attack because at the time it was a more credible book,1,2026-05-27
-RECORD-00830_REL_025,RECORD-00830,P0005,Jay Rosen,Originated By,W0726,Rollback,See my essay called Rollback,1,2026-05-27
-RECORD-00830_REL_026,RECORD-00830,P1294,Karen Hughes,Affiliated With,P0014,George W. Bush,"Bush's former communications director, Karen Hughes",1,2026-05-27
-RECORD-00830_REL_027,RECORD-00830,P0488,Karl Rove,Affiliated With,P0014,George W. Bush,a profile that Suskind wrote for Esquire about Karl Rove,1,2026-05-27
-RECORD-00830_REL_028,RECORD-00830,P2427,Paul O'Neill,Affiliated With,P0014,George W. Bush,his book with bounced Treasury Secretary Paul O'Neill,1,2026-05-27
-RECORD-00830_REL_029,RECORD-00830,P2017,John DiIulio,Affiliated With,O1684,White House Office of Faith-Based and Community Initiatives,"John DiIulio, who served briefly as director of the White House Office of Faith-Based and Community Initiatives",1,2026-05-27
-RECORD-00830_REL_030,RECORD-00830,P1934,Jay Garner,Affiliated With,E0004,Iraq War,When Jay Garner returns to the White House from running the American effort in Iraq,1,2026-05-27
-RECORD-00830_REL_031,RECORD-00830,P2103,Mark Danner,Discusses,E0004,Iraq War,Mark Danner talks of a 'war of imagination' that Bush and his advisers preferred to fight.,0.9,2026-05-27
-RECORD-00830_REL_032,RECORD-00830,P2428,Lawrence D. Freedman,Affiliated With,O1468,Foreign Affairs,consider Lawrence D. Freedman's observation in Foreign Affairs (Jan./Feb. 2006),1,2026-05-27
-RECORD-00830_REL_033,RECORD-00830,P0095,Glenn Kessler,Affiliated With,O0023,The Washington Post,Glenn Kessler and Thomas E. Ricks reported in the Dec. 7 Washington Post,1,2026-05-27
-RECORD-00830_REL_034,RECORD-00830,P1932,Thomas E. Ricks,Affiliated With,O0023,The Washington Post,Glenn Kessler and Thomas E. Ricks reported in the Dec. 7 Washington Post,1,2026-05-27
-RECORD-00830_REL_035,RECORD-00830,P0916,John Harris,Affiliated With,O0023,The Washington Post,"John Harris, then the political editor of the Washington Post",1,2026-05-27
-RECORD-00830_REL_036,RECORD-00830,P0324,Dan Froomkin,Affiliated With,O0023,The Washington Post,Dan Froomkin said the report and reactions to it 'marked a restoration of reality in Washington.',1,2026-05-27
-RECORD-00830_REL_037,RECORD-00830,P0005,Jay Rosen,Affiliated With,O1313,New York University,Jay Rosen teaches journalism at New York University,1,2026-05-27
-RECORD-00830_REL_038,RECORD-00830,E0004,Iraq War,Occurred At,L0002,Iraq,"the United States, the most powerful country in the world, invaded Iraq with no particular and specific idea of what it was going to do there",1,2026-05-27
-RECORD-00830_REL_039,RECORD-00830,E0299,Release of the Iraq Study Group Report,Occurred At,L0204,"Washington, D.C.",Dan Froomkin said the report and reactions to it 'marked a restoration of reality in Washington.',0.9,2026-05-27
-RECORD-00830_REL_040,RECORD-00830,P0005,Jay Rosen,Criticizes,O0448,Bush Administration,the expansion of executive power (led by the vice president) through a revolt against empiricism (led by the chief executive),0.95,2026-05-27
-RECORD-00830_REL_041,RECORD-00830,P1163,Ron Suskind,Criticizes,O0448,Bush Administration,"a disdain for contemplation or deliberation, an embrace of decisiveness, a retreat from empiricism",0.9,2026-05-27
-RECORD-00830_REL_042,RECORD-00830,O1466,Iraq Study Group,Supports,C0886,Realism (foreign policy),The Iraq Study Group report released yesterday might well be titled 'The Realist Manifesto.',0.9,2026-05-27
-RECORD-00830_REL_043,RECORD-00830,W0817,Iraq Study Group Report,Discusses,C0886,Realism (foreign policy),The Iraq Study Group report released yesterday might well be titled 'The Realist Manifesto.',0.95,2026-05-27
-RECORD-00830_REL_044,RECORD-00830,C0347,Reality-based Community,Expands On,C1189,Empiricism,I nodded and murmured something about enlightenment principles and empiricism.,0.8,2026-05-27
-RECORD-00830_REL_045,RECORD-00830,C0579,Retreat from empiricism,Expands On,C1189,Empiricism,retreat from empiricism,0.95,2026-05-27
-RECORD-00830_REL_046,RECORD-00830,O1467,National Security Council,Criticizes,O0448,Bush Administration,"the by-passing of the National Security Council, which was created to prevent exactly these events.",0.8,2026-05-27
 RECORD-00831_REL_001,RECORD-00831,P0084,Spiro Agnew,Pioneered,C0139,Liberal Media Bias,"today's bias warriors are the inheritors, through Agnew, of that idea",0.9,2026-05-27
 RECORD-00831_REL_002,RECORD-00831,P0187,Barry Goldwater,Originated By,C0139,Liberal Media Bias,The idea that the liberal press has to be overcome for conservatives truly to take power started with the Goldwater campaign in 1964,0.95,2026-05-27
 RECORD-00831_REL_003,RECORD-00831,P1930,Martin Knight,Supports,P0084,Spiro Agnew,Spiro Agnew was recently lionized at RedState.com in a post by Martin Knight,0.9,2026-05-27
@@ -9466,42 +9412,6 @@ RECORD-00845_REL_028,RECORD-00845,P0916,John Harris,Criticizes,P0209,Ben Smith,"
 RECORD-00845_REL_029,RECORD-00845,C0041,Horse race journalism,Expands On,C0709,Responsibility not to be labeled,"For the horse race is a great way of discharging your phony--in fact, surreal--responsibility not to be labeled.",0.9,2026-05-27
 RECORD-00845_REL_030,RECORD-00845,P2219,Jay Carney,Supports,C1220,Two-way conversation,The blogosphere's critique of the mainstream media has been overwhelmingly healthy,0.8,2026-05-27
 RECORD-00845_REL_031,RECORD-00845,P0053,Michael Scherer,Supports,C1220,Two-way conversation,"Simply put, news is no longer a one-way process. It is now much more of a conversation between journalist and reader.",0.9,2026-05-27
-RECORD-00846_REL_001,RECORD-00846,P0005,Jay Rosen,Originated By,C0405,Savviness,"the real -- and undeclared -- ideology of American journalism is savviness, which is what made the press so vulnerable to the likes of Karl Rove.",1,2026-05-27
-RECORD-00846_REL_002,RECORD-00846,P0005,Jay Rosen,Criticizes,P0488,Karl Rove,this cult that Karl Rove understood and exploited for political gain.,1,2026-05-27
-RECORD-00846_REL_003,RECORD-00846,P0005,Jay Rosen,Criticizes,O0416,Washington press corps,the real -- and undeclared -- ideology of American journalism is savviness,1,2026-05-27
-RECORD-00846_REL_004,RECORD-00846,P0488,Karl Rove,Criticizes,O0416,Washington press corps,Karl Rove once said that the press is 'less liberal than it is oppositional.',0.9,2026-05-27
-RECORD-00846_REL_005,RECORD-00846,P1290,Josh Green,Discusses,P0488,Karl Rove,"Josh Green, a reporter for the Atlantic Monthly who actually took the time to understand Rove's career, totaled up his winnings in a 2004 article",1,2026-05-27
-RECORD-00846_REL_006,RECORD-00846,P1290,Josh Green,Affiliated With,O0763,The Atlantic Monthly,"Josh Green, a reporter for the Atlantic Monthly",1,2026-05-27
-RECORD-00846_REL_007,RECORD-00846,W0349,Karl Rove in a Corner,Originated By,P1290,Josh Green,totaled up his winnings in a 2004 article ('Karl Rove in a Corner'),1,2026-05-27
-RECORD-00846_REL_008,RECORD-00846,W0349,Karl Rove in a Corner,Published In,O0763,The Atlantic Monthly,"Josh Green, a reporter for the Atlantic Monthly... 'Karl Rove in a Corner'",1,2026-05-27
-RECORD-00846_REL_009,RECORD-00846,W0350,The Rove Presidency,Originated By,P1290,Josh Green,Green was all over the talk shows yesterday because of his recent article in the Atlantic on what went wrong with The Rove Presidency,1,2026-05-27
-RECORD-00846_REL_010,RECORD-00846,W0350,The Rove Presidency,Published In,O0763,The Atlantic Monthly,his recent article in the Atlantic on what went wrong with The Rove Presidency,1,2026-05-27
-RECORD-00846_REL_011,RECORD-00846,W0349,Karl Rove in a Corner,Discusses,P0488,Karl Rove,Karl Rove in a Corner... Rove's career record is a truly impressive 34-7,1,2026-05-27
-RECORD-00846_REL_012,RECORD-00846,P0194,Mark Halperin,Pioneered,C0405,Savviness,Mark Halperin of Time magazine and ABC News lectured his colleagues on this... in that cult Halperin would qualify as a high priest.,0.9,2026-05-27
-RECORD-00846_REL_013,RECORD-00846,P0194,Mark Halperin,Affiliated With,O0070,Time magazine,Mark Halperin of Time magazine and ABC News,1,2026-05-27
-RECORD-00846_REL_014,RECORD-00846,P0194,Mark Halperin,Affiliated With,O0055,ABC News,Mark Halperin of Time magazine and ABC News,1,2026-05-27
-RECORD-00846_REL_015,RECORD-00846,P0005,Jay Rosen,Criticizes,P0194,Mark Halperin,Nitpickers vs. winners is how the cult of savviness frames things. And in that cult Halperin would qualify as a high priest.,1,2026-05-27
-RECORD-00846_REL_016,RECORD-00846,P0488,Karl Rove,Affiliated With,P0014,George W. Bush,"Bush and Rove, as a team, have never lost to Democrats",1,2026-05-27
-RECORD-00846_REL_017,RECORD-00846,P1291,Mark Ambinder,Affiliated With,O0763,The Atlantic Monthly,"Green's colleague at the Atlantic, Mark Ambinder",1,2026-05-27
-RECORD-00846_REL_018,RECORD-00846,P1291,Mark Ambinder,Discusses,P0488,Karl Rove,"'Boy, did Karl Rove get in his gut the biases, predilections, worldviews, habits, ticks and insecurities of the national media.'",1,2026-05-27
-RECORD-00846_REL_019,RECORD-00846,P0488,Karl Rove,Originated By,C0897,Realignment theory,"part of Rove's 'realignment theory' was to 'delegitimize, decertify and discombobulate the press'",0.9,2026-05-27
-RECORD-00846_REL_020,RECORD-00846,P0488,Karl Rove,Pioneered,C0406,Press Rollback,"See my posts on press rollback and decertification, policies for which Rove was 'the architect.'",0.9,2026-05-27
-RECORD-00846_REL_021,RECORD-00846,P0488,Karl Rove,Pioneered,C1222,Decertification of the press,"press rollback and decertification, policies for which Rove was 'the architect.'",0.9,2026-05-27
-RECORD-00846_REL_022,RECORD-00846,P0005,Jay Rosen,Originated By,C0406,Press Rollback,See my posts on press rollback and decertification,1,2026-05-27
-RECORD-00846_REL_023,RECORD-00846,P0005,Jay Rosen,Originated By,C1222,Decertification of the press,See my posts on press rollback and decertification,1,2026-05-27
-RECORD-00846_REL_024,RECORD-00846,P1092,Matt Cooper,Mentions,P0488,Karl Rove,Matt Cooper is one we know about because of the trial of Scooter Libby. ('Spoke to Rove on double super secret background...'),1,2026-05-27
-RECORD-00846_REL_025,RECORD-00846,P1092,Matt Cooper,Mentions,P0738,Scooter Libby,Matt Cooper is one we know about because of the trial of Scooter Libby.,1,2026-05-27
-RECORD-00846_REL_026,RECORD-00846,P0712,Jim VandeHei,Affiliated With,O0058,Politico,Jim VandeHei and Mike Allen in the Politico,1,2026-05-27
-RECORD-00846_REL_027,RECORD-00846,P1262,Mike Allen,Affiliated With,O0058,Politico,Jim VandeHei and Mike Allen in the Politico,1,2026-05-27
-RECORD-00846_REL_028,RECORD-00846,P1210,Jacob Weisberg,Affiliated With,O0038,Slate,the Jacob Weisbergs of the world can pick nits all they want with Rove,0.8,2026-05-27
-RECORD-00846_REL_029,RECORD-00846,P0005,Jay Rosen,Affiliated With,O1313,New York University,Jay Rosen teaches journalism at New York University,1,2026-05-27
-RECORD-00846_REL_030,RECORD-00846,P0005,Jay Rosen,Founded By,O0033,PressThink,"writes the blog PressThink, where this first appeared",1,2026-05-27
-RECORD-00846_REL_031,RECORD-00846,P0005,Jay Rosen,Founded By,O0447,OffTheBus,"He is also co-publisher, with Arianna Huffington, of OffTheBus",1,2026-05-27
-RECORD-00846_REL_032,RECORD-00846,P0183,Arianna Huffington,Founded By,O0447,OffTheBus,"co-publisher, with Arianna Huffington, of OffTheBus",1,2026-05-27
-RECORD-00846_REL_033,RECORD-00846,O0447,OffTheBus,Affiliated With,O0034,The Huffington Post,"co-publisher, with Arianna Huffington, of OffTheBus, which is open platform campaign coverage",0.8,2026-05-27
-RECORD-00846_REL_034,RECORD-00846,C0405,Savviness,Expands On,C0041,Horse race journalism,Of a piece with its fixation on the horse race,0.9,2026-05-27
-RECORD-00846_REL_035,RECORD-00846,P0743,Eric Boehlert,Cites,P0194,Mark Halperin,Mark Halperin of Time magazine and ABC News lectured his colleagues on this days before the 2006 elections (Hat tip Eric Boehlert).,0.9,2026-05-27
-RECORD-00846_REL_036,RECORD-00846,P0488,Karl Rove,Discusses,C0231,"He Said, She Said Journalism","Rove had the 'he said, she said' press figured out, according to Green",0.9,2026-05-27
 RECORD-00847_REL_001,RECORD-00847,P1131,Stephen Hadley,Affiliated With,O1358,The White House,National Security Adviser Stephen Hadley had a good question for the White House press corps Monday,1,2026-05-27
 RECORD-00847_REL_002,RECORD-00847,P0014,George W. Bush,Mentions,E0437,Bush's surprise visit to Iraq,the President--surprise!--flew to Iraq,1,2026-05-27
 RECORD-00847_REL_003,RECORD-00847,E0437,Bush's surprise visit to Iraq,Occurred At,L0002,Iraq,the President--surprise!--flew to Iraq,1,2026-05-27
@@ -9715,20 +9625,6 @@ RECORD-00854_REL_045,RECORD-00854,P0012,Mark Glaser,Affiliated With,O0003,PBS,Ma
 RECORD-00854_REL_046,RECORD-00854,P0008,Josh Marshall,Criticizes,P0014,George W. Bush,Marshall is a liberal Democrat skeptical of the Bush agenda,0.9,2026-05-27
 RECORD-00854_REL_047,RECORD-00854,W1008,Clark Hoyt column on 2008 campaign bias,Discusses,E0224,2008 U.S. presidential campaign,the Times is not 'shooting down the middle' in its coverage of the 2008 campaign,1,2026-05-27
 RECORD-00854_REL_048,RECORD-00854,W0365,Power of the Pen: A Call for Journalistic Courage,Expands On,C1236,The informed display of political conviction,Pincus does something rare for any mainstream journalist: he openly argues for a more political press,0.9,2026-05-27
-RECORD-00855_REL_001,RECORD-00855,P0848,Wolf Blitzer,Affiliated With,O0015,CNN,"Wolf's ear is the big ear for the Best Political Team on Television, according to CNN.",1,2026-05-27
-RECORD-00855_REL_002,RECORD-00855,P0088,Barack Obama,Originated By,W1011,A More Perfect Union (Obama race speech),I was watching CNN for Obama's speech. Moments after it concluded Wolf Blitzer was asked to tell us what he heard in it.,1,2026-05-27
-RECORD-00855_REL_003,RECORD-00855,P1025,Jeremiah Wright,Affiliated With,O1481,Trinity United Church of Christ,if Trinity United Church of Christ conformed to the caricatures being peddled by some commentators,1,2026-05-27
-RECORD-00855_REL_004,RECORD-00855,P0094,Greg Sargent,Affiliated With,O0073,Talking Points Memo,as Greg Sargent at TPM said,1,2026-05-27
-RECORD-00855_REL_005,RECORD-00855,P1026,Charles Murray,Originated By,W0837,The Bell Curve,"Charles Murray--yes, that Charles Murray [linked to The Bell Curve]",1,2026-05-27
-RECORD-00855_REL_006,RECORD-00855,P1026,Charles Murray,Affiliated With,O0629,The Corner,Charles Murray... at The Corner said 'It is so far above the standard we're used to from our pols...',0.9,2026-05-27
-RECORD-00855_REL_007,RECORD-00855,O0015,CNN,Owns,C0916,Best Political Team on Television,"the big ear for the Best Political Team on Television, according to CNN",1,2026-05-27
-RECORD-00855_REL_008,RECORD-00855,P0848,Wolf Blitzer,Pioneered,C0041,Horse race journalism,"Blitzer... did the savvier-than-thou, horse race thing tells you about his priorities",0.8,2026-05-27
-RECORD-00855_REL_009,RECORD-00855,P0848,Wolf Blitzer,Discusses,W1011,A More Perfect Union (Obama race speech),"according to Blitzer, Obama's speech boils down to a 'pre-emptive strike' against various attacks on the way",1,2026-05-27
-RECORD-00855_REL_010,RECORD-00855,P0094,Greg Sargent,Discusses,W1011,A More Perfect Union (Obama race speech),"Greg Sargent at TPM said, 'Obama's speech, throughout, asks its listeners to transcend themselves'",1,2026-05-27
-RECORD-00855_REL_011,RECORD-00855,P1026,Charles Murray,Discusses,W1011,A More Perfect Union (Obama race speech),"Charles Murray... said 'It is so far above the standard we're used to from our pols... rhetorically, but also in capturing a lot of nuance about race in America.'",1,2026-05-27
-RECORD-00855_REL_012,RECORD-00855,W1011,A More Perfect Union (Obama race speech),Criticizes,C0041,Horse race journalism,"it was a speech aimed right at figures like Blitzer, at the best political team on television, and all the makers of our election year spectacle",0.9,2026-05-27
-RECORD-00855_REL_013,RECORD-00855,W1011,A More Perfect Union (Obama race speech),Discusses,P1025,Jeremiah Wright,If all that I knew of Reverend Wright were the snippets of those sermons that have run in an endless loop on the television and You Tube,1,2026-05-27
-RECORD-00855_REL_014,RECORD-00855,C1241,Savvier-than-thou political analysis,Expands On,C0041,Horse race journalism,"did the savvier-than-thou, horse race thing tells you about his priorities... and his imaginative range as an interpreter of politics (pretty close to zero.)",0.8,2026-05-27
 RECORD-00856_REL_001,RECORD-00856,P0949,John McCain,Mentions,O1710,Al Qaeda in Iraq,John McCain's strange assertion that Al Qaeda in Iraq was being trained and supported by the Iranians.,1,2026-05-27
 RECORD-00856_REL_002,RECORD-00856,P0949,John McCain,Mentions,L0264,Iran,Al Qaeda in Iraq was being trained and supported by the Iranians.,1,2026-05-27
 RECORD-00856_REL_003,RECORD-00856,P0476,Joe Lieberman,Mentions,P0949,John McCain,he backed off the claim after Joe Lieberman whispered something in his ear.,1,2026-05-27
@@ -9766,39 +9662,6 @@ RECORD-00856_REL_034,RECORD-00856,P0348,Chuck Todd,Affiliated With,W0789,Meet th
 RECORD-00856_REL_035,RECORD-00856,P0949,John McCain,Affiliated With,O0045,Republican Party,more willing to criticize his own party than other Republicans,1,2026-05-27
 RECORD-00856_REL_036,RECORD-00856,P0949,John McCain,Affiliated With,E0224,2008 U.S. presidential campaign,presidential candidate McCain's coverage in the 2008 campaign,0.9,2026-05-27
 RECORD-00856_REL_037,RECORD-00856,P0088,Barack Obama,Affiliated With,E0224,2008 U.S. presidential campaign,One unanswered question about Barack Obama is whether he will have the confidence to take the General Petraeus approach,0.9,2026-05-27
-RECORD-00857_REL_001,RECORD-00857,P0706,Mayhill Fowler,Affiliated With,O0447,OffTheBus,"She is also a citizen journalist with a platform: OffTheBus, which resides at the Huffington Post.",1,2026-05-27
-RECORD-00857_REL_002,RECORD-00857,P0706,Mayhill Fowler,Originated By,W0522,No Surprise that Hard Pressed Pennsylvanians Turn Bitter,"Mayhill Fowler's story, No Surprise that Hard Pressed Pennsylvanians Turn Bitter",1,2026-05-27
-RECORD-00857_REL_003,RECORD-00857,W0522,No Surprise that Hard Pressed Pennsylvanians Turn Bitter,Published In,O0447,OffTheBus,Mayhill Fowler reported them for OffTheBus Friday afternoon.,1,2026-05-27
-RECORD-00857_REL_004,RECORD-00857,O0447,OffTheBus,Owned By,O0034,The Huffington Post,"OffTheBus, which resides at the Huffington Post.",1,2026-05-27
-RECORD-00857_REL_005,RECORD-00857,P0183,Arianna Huffington,Founded By,O0447,OffTheBus,"OffTheBus itself, the site I started with Arianna Huffington last year.",1,2026-05-27
-RECORD-00857_REL_006,RECORD-00857,P0183,Arianna Huffington,Founded By,O0034,The Huffington Post,"Arianna Huffington, co-founder of the Huffington Post which hosts OffTheBus.",0.9,2026-05-27
-RECORD-00857_REL_007,RECORD-00857,P1020,Tim Russert,Affiliated With,O0279,Meet the Press,Tim Russert's show Sunday... Meet the Press made no mention of her,1,2026-05-27
-RECORD-00857_REL_008,RECORD-00857,P1020,Tim Russert,Criticizes,P0706,Mayhill Fowler,"Tim and his staff decided on erasure... Meet the Press made no mention of her, or OffTheBus, or the Huffington Post.",0.9,2026-05-27
-RECORD-00857_REL_009,RECORD-00857,O0279,Meet the Press,Criticizes,O0447,OffTheBus,"Meet the Press made no mention of her, or OffTheBus, or the Huffington Post.",0.85,2026-05-27
-RECORD-00857_REL_010,RECORD-00857,P0706,Mayhill Fowler,Supports,P0088,Barack Obama,Mayhill Fowler was an Obama supporter who sometimes found it necessary to be a critic of the campaign.,1,2026-05-27
-RECORD-00857_REL_011,RECORD-00857,P0706,Mayhill Fowler,Criticizes,P0088,Barack Obama,She felt it showed bad judgment by her candidate.,0.9,2026-05-27
-RECORD-00857_REL_012,RECORD-00857,P0062,Jay Newton-Small,Affiliated With,O0070,Time magazine,Jay Newton-Small of Time magazine changed her scoop into a leak,1,2026-05-27
-RECORD-00857_REL_013,RECORD-00857,P0062,Jay Newton-Small,Criticizes,P0706,Mayhill Fowler,Jay Newton-Small of Time magazine changed her scoop into a leak from someone inside the campaign,0.85,2026-05-27
-RECORD-00857_REL_014,RECORD-00857,P1262,Mike Allen,Affiliated With,O0058,Politico,Mike Allen of the Politico in 12 reasons 'bitter' is bad for Obama,1,2026-05-27
-RECORD-00857_REL_015,RECORD-00857,P1262,Mike Allen,Originated By,W0838,12 reasons 'bitter' is bad for Obama,Mike Allen of the Politico in 12 reasons 'bitter' is bad for Obama,1,2026-05-27
-RECORD-00857_REL_016,RECORD-00857,W0838,12 reasons 'bitter' is bad for Obama,Criticizes,O0034,The Huffington Post,"couldn't even find the word 'website' to describe the Huffington Post, which became... 'a liberally oriented organization'",0.8,2026-05-27
-RECORD-00857_REL_017,RECORD-00857,P0707,Marc Cooper,Affiliated With,O0447,OffTheBus,"Marc Cooper, editorial director of OffTheBus",1,2026-05-27
-RECORD-00857_REL_018,RECORD-00857,P0707,Marc Cooper,Originated By,W0839,Inside the Obama-Guns-God-Bitterness Storm,"See Cooper's post, Inside the Obama-Guns-God-Bitterness Storm",1,2026-05-27
-RECORD-00857_REL_019,RECORD-00857,P0184,Amanda Michel,Affiliated With,O0447,OffTheBus,OffTheBus project director Amanda Michel,1,2026-05-27
-RECORD-00857_REL_020,RECORD-00857,P1532,Roy Sekoff,Affiliated With,O0034,The Huffington Post,"Roy Sekoff, editor of the HuffPost",1,2026-05-27
-RECORD-00857_REL_021,RECORD-00857,P2439,Katharine Q. Seelye,Affiliated With,O0002,The New York Times,Katharine Seelye's account in the New York Times,1,2026-05-27
-RECORD-00857_REL_022,RECORD-00857,P1291,Mark Ambinder,Affiliated With,O0051,The Atlantic,explained well by Mark Ambinder of the Atlantic,1,2026-05-27
-RECORD-00857_REL_023,RECORD-00857,P2440,Bill Burton,Affiliated With,O1713,Obama for America,Obama campaign spokesman Bill Burton said Tuesday,1,2026-05-27
-RECORD-00857_REL_024,RECORD-00857,P2441,Joe Garofoli,Affiliated With,O0531,San Francisco Chronicle,from reporter Joe Garofoli in the San Francisco Chronicle,1,2026-05-27
-RECORD-00857_REL_025,RECORD-00857,O0447,OffTheBus,Pioneered,C0102,Citizen Journalism,Citizen journalism isn't a hypothetical in this campaign... It's Mayhill Fowler... a citizen journalist with a platform: OffTheBus,0.9,2026-05-27
-RECORD-00857_REL_026,RECORD-00857,O0447,OffTheBus,Pioneered,C0126,Pro-Am journalism,"Huffington Post's pro-am campaign news site, OffTheBus",0.95,2026-05-27
-RECORD-00857_REL_027,RECORD-00857,P0706,Mayhill Fowler,Occurred At,E0444,"Obama San Francisco fundraiser (April 6, 2008)","recorded Obama's words at an April 6th San Francisco fundraiser, and then wrote about what concerned her",1,2026-05-27
-RECORD-00857_REL_028,RECORD-00857,P0088,Barack Obama,Occurred At,E0444,"Obama San Francisco fundraiser (April 6, 2008)","Last Sunday Barack Obama went to a fundraiser in San Francisco, made some comments.",1,2026-05-27
-RECORD-00857_REL_029,RECORD-00857,E0444,"Obama San Francisco fundraiser (April 6, 2008)",Occurred At,L0025,San Francisco,The invitation she had to the Pacific Heights fundraiser on April 6,1,2026-05-27
-RECORD-00857_REL_030,RECORD-00857,W0522,No Surprise that Hard Pressed Pennsylvanians Turn Bitter,Discusses,L0005,Pennsylvania,Obama's attempt to interpret Pennsylvania voters to California supporters,0.95,2026-05-27
-RECORD-00857_REL_031,RECORD-00857,W0522,No Surprise that Hard Pressed Pennsylvanians Turn Bitter,Discusses,E0444,"Obama San Francisco fundraiser (April 6, 2008)","started the story in Pennsylvania, and approached Obama's comments in California cautiously",1,2026-05-27
-RECORD-00857_REL_032,RECORD-00857,W0666,PressThink,Discusses,C0102,Citizen Journalism,For lots of other reactions and debate--with links--see the PressThink version of this post.,0.85,2026-05-27
-RECORD-00857_REL_033,RECORD-00857,C0126,Pro-Am journalism,Expands On,C0102,Citizen Journalism,"Huffington Post's pro-am campaign news site, OffTheBus... a citizen journalist with a platform",0.8,2026-05-27
 RECORD-00858_REL_001,RECORD-00858,W1012,I was a Clinton Volunteer,Cites,P2650,Tom Namako,"I was a Clinton Volunteer, reported by Tom Namako",1,2026-05-27
 RECORD-00858_REL_002,RECORD-00858,W1013,I was an Obama Volunteer,Cites,P2651,Mike Newall,"I was an Obama Volunteer, reported by Mike Newall",1,2026-05-27
 RECORD-00858_REL_003,RECORD-00858,P2650,Tom Namako,Affiliated With,O1714,Philadelphia City Paper,They're both writers for City Paper,1,2026-05-27
@@ -9947,26 +9810,6 @@ RECORD-00872_REL_027,RECORD-00872,P0414,Marcy Wheeler,Discusses,E0451,2001 anthr
 RECORD-00872_REL_028,RECORD-00872,P1713,Charles Feldman,Criticizes,O0055,ABC News,It is vital that ABC News tells the American public how it came by its anthrax stories to see just who it was who manipulated the network,1,2026-05-27
 RECORD-00872_REL_029,RECORD-00872,P1101,Wendy Hoke,Discusses,C0380,Federal shield law,ABC's anthrax coverage throws a curious light on attempts to pass a Federal shield law,0.9,2026-05-27
 RECORD-00872_REL_030,RECORD-00872,P0534,Scott Rosenberg,Supports,C1254,Exposure of lying sources,"Scott Rosenberg: when sources lie or mislead, 'the public good probably demands that you expose them.'",1,2026-05-27
-RECORD-00873_REL_001,RECORD-00873,O0159,Mother Jones,Published In,W0320,The Audacity of Hype?,Mother Jones is currently running a feature called The Audacity of Hype?,1,2026-05-27
-RECORD-00873_REL_002,RECORD-00873,O0159,Mother Jones,Criticizes,P0088,Barack Obama,"Mother Jones, a progressive magazine, accuse Obama of the same thing McCain is attacking him for",0.9,2026-05-27
-RECORD-00873_REL_003,RECORD-00873,W0320,The Audacity of Hype?,Discusses,P0088,Barack Obama,Is Barack Obama exaggerating when he compares his campaign to the great progressive moments in US history?,1,2026-05-27
-RECORD-00873_REL_004,RECORD-00873,P1215,David Corn,Affiliated With,O0159,Mother Jones,"David Corn, Washington bureau chief for Mother Jones",1,2026-05-27
-RECORD-00873_REL_005,RECORD-00873,P1217,Jonathan Stein,Affiliated With,O0159,Mother Jones,"At the MoJo blog, Jonathan Stein posts Obama's Historical Comparisons",1,2026-05-27
-RECORD-00873_REL_006,RECORD-00873,P1217,Jonathan Stein,Originated By,W1016,Obama's Historical Comparisons,"Jonathan Stein posts Obama's Historical Comparisons, with more explanation",1,2026-05-27
-RECORD-00873_REL_007,RECORD-00873,P1217,Jonathan Stein,Originated By,W0832,Barack Obama's Messiah Complex,"earlier observation by Jonathan Stein at the MoJo blog, back in February. Barack Obama's Messiah Complex",1,2026-05-27
-RECORD-00873_REL_008,RECORD-00873,P1098,Dan Kennedy,Originated By,W0830,The audacity of Mother Jones,"Dan Kennedy, The audacity of Mother Jones",1,2026-05-27
-RECORD-00873_REL_009,RECORD-00873,P1098,Dan Kennedy,Criticizes,W0320,The Audacity of Hype?,So had Dan Kennedy. ('Let's have the precise language.'),0.9,2026-05-27
-RECORD-00873_REL_010,RECORD-00873,P1216,Pat Buchanan,Criticizes,P0088,Barack Obama,They're provoking Pat Buchanan and giving him a forum to say things like... It is absurd to argue that the nomination or an election of Barack Obama would be as important,0.9,2026-05-27
-RECORD-00873_REL_011,RECORD-00873,P0949,John McCain,Criticizes,P0088,Barack Obama,the McCain camp already mocking his messiah complex and calling him 'The One.',0.9,2026-05-27
-RECORD-00873_REL_012,RECORD-00873,P0878,Russ Walker,Affiliated With,O0476,Washingtonpost.com,"Russ Walker, formerly an editor at washingtonpost.com",1,2026-05-27
-RECORD-00873_REL_013,RECORD-00873,O0358,Columbia Journalism Review,Criticizes,W0320,The Audacity of Hype?,CJR's Campaign Desk read it. Mother Jones's Obama feature falls flat,0.9,2026-05-27
-RECORD-00873_REL_014,RECORD-00873,W0831,Mother Jones's Obama feature falls flat,Criticizes,W0320,The Audacity of Hype?,Mother Jones's Obama feature falls flat,1,2026-05-27
-RECORD-00873_REL_015,RECORD-00873,W0830,The audacity of Mother Jones,Criticizes,O0159,Mother Jones,It's not so much that MoJo is completely wrong; it's that the magazine is being reductionist and stupid.,0.9,2026-05-27
-RECORD-00873_REL_016,RECORD-00873,P0088,Barack Obama,Affiliated With,E0452,2008 Obama Presidential Campaign,Obama '08 to the great movements for freedom and justice in our history,1,2026-05-27
-RECORD-00873_REL_017,RECORD-00873,W0320,The Audacity of Hype?,Discusses,C0367,Hype-busting,Hype-busting and the exercise of hype are very closely related things,0.8,2026-05-27
-RECORD-00873_REL_018,RECORD-00873,W0832,Barack Obama's Messiah Complex,Discusses,C1255,Messiah complex,Barack Obama's Messiah Complex,1,2026-05-27
-RECORD-00873_REL_019,RECORD-00873,O0159,Mother Jones,Originated By,C1256,"Smart, fearless journalism","That would be 'smart, fearless journalism,' circa World Wide Web.",0.8,2026-05-27
-RECORD-00873_REL_020,RECORD-00873,P1215,David Corn,Affiliated With,W0320,The Audacity of Hype?,the email I got from David Corn as he pushed out to his list a promo for the Mother Jones feature,0.9,2026-05-27
 RECORD-00874_REL_001,RECORD-00874,P0949,John McCain,Pioneered,C1257,Culture war strategy,John McCain's convention gambit is now a culture war strategy.,0.9,2026-05-27
 RECORD-00874_REL_002,RECORD-00874,P0949,John McCain,Affiliated With,P1152,Sarah Palin,the decision to nominate Alaska Governor Sarah Palin,1,2026-05-27
 RECORD-00874_REL_003,RECORD-00874,P1152,Sarah Palin,Affiliated With,L0266,Alaska,Alaska Governor Sarah Palin,1,2026-05-27
@@ -10016,37 +9859,6 @@ RECORD-00876_REL_029,RECORD-00876,O1456,Congressional Budget Office,Discusses,C0
 RECORD-00876_REL_030,RECORD-00876,O1485,Drexel Burnham Lambert,Affiliated With,O1486,AIG Financial Products,He created the Financial Products division in 1987 with traders from soon-to-be disgraced Drexel Burnham Lambert,1,2026-05-27
 RECORD-00876_REL_031,RECORD-00876,E0456,2008 financial crisis and AIG bailout,Discusses,O1722,American International Group,running critique of the business press after the banking meltdown,0.9,2026-05-27
 RECORD-00876_REL_032,RECORD-00876,W0849,Ex-Chairman of A.I.G. Says Bailout Has Failed,Discusses,E0456,2008 financial crisis and AIG bailout,Ex-Chairman of A.I.G. Says Bailout Has Failed,1,2026-05-27
-RECORD-00877_REL_001,RECORD-00877,O1392,AOL,Owns,O0034,The Huffington Post,AOL will purchase The Huffington Post and Arianna Huffington will become the editor-in-chief of all AOL properties,1,2026-05-27
-RECORD-00877_REL_002,RECORD-00877,P0183,Arianna Huffington,Affiliated With,O0034,The Huffington Post,Arianna Huffington will become the editor-in-chief of all AOL properties,1,2026-05-27
-RECORD-00877_REL_003,RECORD-00877,P2447,Tim Armstrong,Affiliated With,O1392,AOL,"Tim Armstrong, CEO of AOL",1,2026-05-27
-RECORD-00877_REL_004,RECORD-00877,P0183,Arianna Huffington,Affiliated With,O1392,AOL,Arianna Huffington will become the editor-in-chief of all AOL properties,1,2026-05-27
-RECORD-00877_REL_005,RECORD-00877,O1392,AOL,Occurred At,E0310,AOL acquisition of The Huffington Post,Monday's announcement that AOL will purchase The Huffington Post,1,2026-05-27
-RECORD-00877_REL_006,RECORD-00877,C0004,View from Nowhere,Originated By,P0005,Jay Rosen,The new AOL should announce that its dropping the View From Nowhere,1,2026-05-27
-RECORD-00877_REL_007,RECORD-00877,C0134,View From Somewhere,Originated By,P0005,Jay Rosen,"What will work is pluralism, transparency and the View from Somewhere",1,2026-05-27
-RECORD-00877_REL_008,RECORD-00877,P0005,Jay Rosen,Criticizes,C0004,View from Nowhere,The new AOL should announce that its dropping the View From Nowhere... viewlessness won't be mandatory because it's not the best way to generate trust,1,2026-05-27
-RECORD-00877_REL_009,RECORD-00877,P0183,Arianna Huffington,Originated By,C0929,Beyond left and right,"It's time for all of us in journalism to move beyond left and right. Truly, it is an obsolete way of looking at the problems America is facing.",0.9,2026-05-27
-RECORD-00877_REL_010,RECORD-00877,P0005,Jay Rosen,Criticizes,C0929,Beyond left and right,I don't think the 'beyond left and right' construct is breaking through the unofficial prohibition we have on ideological innovation in journalism. It sounds bland and safe,1,2026-05-27
-RECORD-00877_REL_011,RECORD-00877,P0005,Jay Rosen,Criticizes,O1488,No Labels,the dubious campaign that goes by the name No Labels ('Not Left. Not Right. Forward.'),1,2026-05-27
-RECORD-00877_REL_012,RECORD-00877,P0005,Jay Rosen,Originated By,C1262,Ideological innovation in journalism,"Is ideological innovation possible in online journalism, and will we see it from this merger?",0.9,2026-05-27
-RECORD-00877_REL_013,RECORD-00877,P0005,Jay Rosen,Discusses,E0310,AOL acquisition of The Huffington Post,The top five questions journalists have about Monday's announcement that AOL will purchase The Huffington Post,1,2026-05-27
-RECORD-00877_REL_014,RECORD-00877,P0068,Howard Kurtz,Discusses,E0310,AOL acquisition of The Huffington Post,"Howard Kurtz: 'Can a fast-moving, irreverent, and sometimes racy product keep its DNA once transplanted into a very different corporate culture?'",1,2026-05-27
-RECORD-00877_REL_015,RECORD-00877,P0253,Ken Doctor,Discusses,E0310,AOL acquisition of The Huffington Post,"Will AOL now lean left? (Ken Doctor, for example.)",0.9,2026-05-27
-RECORD-00877_REL_016,RECORD-00877,P1084,Jeffrey Brown,Mentions,P0183,Arianna Huffington,Jeffrey Brown of the Newshour on PBS put it this way when he interviewed Huffington and Tim Armstrong,1,2026-05-27
-RECORD-00877_REL_017,RECORD-00877,P1084,Jeffrey Brown,Affiliated With,O1381,PBS Newshour,Jeffrey Brown of the Newshour on PBS,1,2026-05-27
-RECORD-00877_REL_018,RECORD-00877,P2448,Kathleen Parker,Affiliated With,O0015,CNN,Kathleen Parker on CNN's Parker Spitzer,1,2026-05-27
-RECORD-00877_REL_019,RECORD-00877,P2448,Kathleen Parker,Discusses,P0183,Arianna Huffington,PARKER: The Huffington Post is known as a liberal web site... How do you see it merging with AOL?,1,2026-05-27
-RECORD-00877_REL_020,RECORD-00877,O0034,The Huffington Post,Mentions,O0118,Drudge Report,the liberal version of the Drudge Report as a way of giving voice for people who have a different political view,0.8,2026-05-27
-RECORD-00877_REL_021,RECORD-00877,P0005,Jay Rosen,Cites,O1489,Patch,"We've already begun this with the editors at Patch. They post a bio, a little about their politics and religious beliefs",1,2026-05-27
-RECORD-00877_REL_022,RECORD-00877,C0134,View From Somewhere,Expands On,C0004,View from Nowhere,"the new AOL should announce that its dropping the View From Nowhere... What will work is pluralism, transparency and the View from Somewhere",1,2026-05-27
-RECORD-00877_REL_023,RECORD-00877,P0183,Arianna Huffington,Mentions,P0315,Joe Scarborough,People ranging from Newt Gingrich to David Frum and Joe Scarborough and Tony Blankley have been blogging on The Huffington Post,1,2026-05-27
-RECORD-00877_REL_024,RECORD-00877,P0183,Arianna Huffington,Mentions,P2316,David Frum,People ranging from Newt Gingrich to David Frum and Joe Scarborough and Tony Blankley have been blogging on The Huffington Post,1,2026-05-27
-RECORD-00877_REL_025,RECORD-00877,P0183,Arianna Huffington,Mentions,P0199,Newt Gingrich,People ranging from Newt Gingrich to David Frum and Joe Scarborough and Tony Blankley have been blogging on The Huffington Post,1,2026-05-27
-RECORD-00877_REL_026,RECORD-00877,P0183,Arianna Huffington,Mentions,P2452,George Will,"Pat Buchanan or Joe Scarborough, or Richard Haass or George Will who oppose the war in Afghanistan",1,2026-05-27
-RECORD-00877_REL_027,RECORD-00877,P0183,Arianna Huffington,Mentions,P1216,Pat Buchanan,"Pat Buchanan or Joe Scarborough, or Richard Haass or George Will who oppose the war in Afghanistan",1,2026-05-27
-RECORD-00877_REL_028,RECORD-00877,C1263,Pluralism in journalism,Originated By,P0005,Jay Rosen,"Pluralism: Many voices, coming from many perspectives, and reflecting many different starting points",1,2026-05-27
-RECORD-00877_REL_029,RECORD-00877,C0745,Transparency in journalism,Originated By,P0005,Jay Rosen,Transparency: All our contributors and the journalists we employ will have a page that links to their byline and tells the user where they're coming from,1,2026-05-27
-RECORD-00877_REL_030,RECORD-00877,O1490,Huffington Post Media Group,Owned By,O1392,AOL,That wouldn't work for AOL or the expanded Huffington Post Media Group,0.9,2026-05-27
-RECORD-00877_REL_031,RECORD-00877,P0005,Jay Rosen,Mentions,P2657,Michael Arrington,Can you imagine Arianna trying to boss around Mike Arrington?,0.9,2026-05-27
 RECORD-00878_REL_001,RECORD-00878,P0348,Chuck Todd,Affiliated With,W0789,Meet the Press,"Over at the 'Meet the Press' site, where NBC's Chuck Todd holds forth",1,2026-05-27
 RECORD-00878_REL_002,RECORD-00878,P0348,Chuck Todd,Affiliated With,O0221,NBC News,NBC's Chuck Todd holds forth,1,2026-05-27
 RECORD-00878_REL_003,RECORD-00878,W0789,Meet the Press,Owned By,O0221,NBC News,"'Meet the Press' site, where NBC's Chuck Todd holds forth",1,2026-05-27

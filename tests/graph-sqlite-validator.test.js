@@ -342,7 +342,10 @@ describe('generated SQLite graph validator (#731)', () => {
     assert.ok(summary.sourceRecords > 30_000);
     assert.ok(summary.publishedRecords > 26_000);
     assert.ok(summary.sourceEntities > 7_000);
-    assert.ok(summary.relationships > 11_000);
+    // Floors, not counts: they catch a graph that loaded empty or truncated.
+    // The relationship floor dropped from 11,000 when the #867 duplicate
+    // removal took the graph from 11,153 rows to 10,965.
+    assert.ok(summary.relationships > 10_500);
     assert.strictEqual(
       summary.heldRelationships,
       dataset.policy.relationshipTypeHolds.length,
@@ -978,7 +981,7 @@ describe('committed relationship type registry (#737)', () => {
     assert.ok(Object.keys(dataset.policy.relationshipTypeRegistry).length > 0);
 
     const summary = await validateGraphDataset(dataset);
-    assert.ok(summary.relationships > 11_000);
+    assert.ok(summary.relationships > 10_500);
   });
 
   it('has zero endpoint-type violations among types whose enforcement is not deferred', async () => {
