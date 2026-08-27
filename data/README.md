@@ -113,18 +113,43 @@ relationship-type audit in issue #737: for every relationship type present in
 (`backend/entity_extraction_schema_v3.json`), it records the allowed source
 and target entity types, direction, inverse type, self-link and
 multiple-assertion policy, temporal scope, disputed-assertion support, and a
-human-readable label. The validator uses it to reject a relationship whose
-endpoint entity types are not allowed for its type, and to reject a symmetric
-or inverse-labeled type asserted redundantly in both directions (that would
-otherwise silently duplicate one edge under two labels). Types whose
-historical meaning is still ambiguous — legacy inverse-style labels like
-`Founded By` and `Owned By`, one-off labels like `Created` and `Covers`, and
-the not-yet-wired `Influenced` type (issues #344 / #548) — are marked
-`"status": "deferred"` in the registry instead of guessed: the validator does
-not enforce endpoint types, direction, or an inverse for a deferred type, and
-still requires an exact hold for each of its rows exactly as before.
-Choosing that semantics is a curator decision, not something this validator
-infers.
+human-readable label. Allowed source/target entity types come from the
+extraction schema's `valid_source_types`/`valid_target_types` — the
+curator-authored contract — never from what the current data happens to
+contain, so the registry can't be widened just by leaving bad data in place.
+
+The validator uses the registry to reject a relationship whose endpoint
+entity types are not allowed for its type, and to reject a symmetric,
+inverse-labeled, or candidate-inverse-labeled type asserted redundantly in
+both directions (that would otherwise silently duplicate one edge under two
+labels). Two things soften pure "always enforce" for existing data, both
+explicit rather than silent:
+
+- A type can carry `"endpointEnforcement": "deferred"` alongside an
+  `endpointDivergence` block (violation counts and example relationship IDs).
+  That means the schema disagrees with some already-committed rows for that
+  type; cleaning them up is a curator decision, so the validator records the
+  divergence instead of failing on it, while new rows are still expected to
+  follow the declared types.
+- `graph-validation-holds.json`'s `duplicateEdgeExceptions` names specific
+  entity-ID pairs and type pairs (for example `Owns`/`Owned By` for the same
+  two entities) that are known, pending curator review, to encode one fact
+  twice. Any such duplicate not named there still fails validation; an
+  exception that no longer matches any duplicate edge also fails (it would be
+  a stale entry hiding a fix that already happened).
+
+Types whose historical meaning is still ambiguous — legacy inverse-style
+labels like `Founded By` and `Owned By`, one-off labels like `Created` and
+`Covers`, and the not-yet-wired `Influenced` type (issues #344 / #548) — are
+marked `"status": "deferred"` in the registry instead of guessed: the
+validator does not enforce endpoint types, direction, or an inverse for a
+deferred type, and still requires an exact hold for each of its rows exactly
+as before. Choosing that semantics is a curator decision, not something this
+validator infers. `directionalContradictions` on a handful of types (for
+example `Originated By`) inventories entity pairs where the same fact is
+currently asserted in both directions under one type — automation can detect
+that contradiction, per issue #737's boundary, but not decide which row (if
+either) is correct.
 
 Published records that are intentionally generated without a canonical CSV row
 must likewise have their exact stable ID listed in

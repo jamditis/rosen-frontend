@@ -936,3 +936,20 @@ describe('committed relationship type registry (#737)', () => {
     assert.ok(sawAtLeastOnePair, 'expected at least one Owns/Owned By pair encoding the same fact twice in the live data');
   });
 });
+
+describe('data/SCHEMA.md reconciliation with the registry (#737)', () => {
+  it('does not describe Owned By or Founded By as a confirmed inverse the registry itself defers', async () => {
+    const schemaMd = await readFile(path.join(repositoryRoot, 'data/SCHEMA.md'), 'utf8');
+
+    assert.doesNotMatch(
+      schemaMd,
+      /`Owned By`[^\n]*Inverse of `Owns`/,
+      'SCHEMA.md must not claim Owned By is a confirmed inverse of Owns; relationship-type-registry.json defers that (status: "deferred")'
+    );
+    assert.match(
+      schemaMd,
+      /relationship-type-registry\.json/,
+      'SCHEMA.md should point readers at relationship-type-registry.json as the source of truth for endpoint types, direction, and inverse relationships'
+    );
+  });
+});

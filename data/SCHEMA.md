@@ -177,7 +177,7 @@ Fifteen relationship types are in active use. The counts below are a snapshot of
 
 | Type | Count | Meaning |
 |------|------:|---------|
-| `Affiliated With` | 1,413 | Entity has a stable association with another (person↔organization, organization↔organization) |
+| `Affiliated With` | 1,413 | A person has a stable association with an organization (employment, membership) |
 | `Discusses` | 1,330 | Record discusses the entity as a topic |
 | `Mentions` | 913 | Record mentions the entity in passing |
 | `Criticizes` | 398 | Record makes a critical assessment of the entity |
@@ -187,10 +187,10 @@ Fifteen relationship types are in active use. The counts below are a snapshot of
 | `Supports` | 47 | Record argues in favor of the entity / its position |
 | `Cites` | 46 | Record formally cites the entity |
 | `Expands On` | 37 | Record builds on a prior idea by the entity |
-| `Founded By` | 9 | Organization was founded by the named person |
+| `Founded By` | 9 | Legacy label naming who founded an organization or work; see the note on ordering below |
 | `Pioneered` | 5 | Entity pioneered a movement / method |
 | `Owns` | 3 | Entity owns the target |
-| `Owned By` | 3 | Inverse of `Owns` |
+| `Owned By` | 3 | Legacy label naming who owns the target; see the note on ordering below |
 | `Inspired By` | 3 | Entity was inspired by the target |
 
 Notes:
@@ -198,6 +198,34 @@ Notes:
 - The long tail (`Owns`, `Owned By`, `Inspired By`, `Pioneered`) is small enough that future cleanup may consolidate them. Don't introduce new types without a corresponding update here.
 - All relationship rows pass referential integrity (every source/target entity ID exists in `extracted_entities.csv`).
 - `Influenced` is defined below for issue #344 (downstream impact) but is not yet populated, and it is not yet in the machine-enforced extraction schema (`backend/entity_extraction_schema_v3.json`) or the writer allowlists (`entity_csv_writer.py`, `batch_entity_extraction.py`), which skip any relationship type they do not recognize. Its count stays zero until #344's backfill adds it to those allowlists and runs; until then this is a documented forward declaration of the type, not a writable one. Wiring it into the schema and allowlists is tracked separately.
+
+### The registry is the source of truth for endpoint types, direction, and inverses
+
+The "Meaning" column above is a human summary for browsing the data. For the
+exact allowed source/target entity types, direction, inverse relationship,
+and temporal scope of every type, use
+[`relationship-type-registry.json`](relationship-type-registry.json) (issue
+#737) — where this table and the registry disagree, the registry governs, and
+this table should be corrected to match it, not the other way around.
+
+Two things the registry tracks that this table doesn't:
+
+- **Endpoint-type divergence.** Some current rows have a source or target
+  entity type the schema doesn't allow for that type — for example, an
+  `Occurred At` row whose source isn't an `Event` or whose target isn't a
+  `Location`, even though that's the type's declared shape. The registry
+  records these under each affected type's `endpointDivergence` (counts and
+  example relationship IDs) and marks that type's endpoint-type enforcement
+  `"deferred"` until a curator reviews and fixes the backlog. New rows should
+  still follow the declared endpoint types.
+- **`Owned By` and `Founded By` are not confirmed inverses.** They read like
+  the inverse of `Owns` and `Founded` ("A Owned By B" meaning "B owns A"), but
+  the source/target ordering is inconsistent across existing rows — sometimes
+  the founder or owner is the source entity, sometimes the target. The
+  registry marks both `"status": "deferred"` rather than asserting a
+  direction it can't confirm from the data; which rows (if any) need
+  correcting is a curator decision, not something this document or the
+  registry decides on its own.
 
 ### Impact / influence (defined for #344, backfill pending)
 
