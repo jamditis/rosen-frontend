@@ -23,6 +23,8 @@ manifest instead of editing it.
   uniqueness, references, and append-only supersession.
 - `import-winer-evidence.mjs` maps the existing Winer method evidence artifact
   into schema v1 without changing its source file.
+- `import-social-baseline.mjs` packages the existing `data/social_posts.csv`
+  rows into a schema v1 baseline without making a live network call.
 - `examples/` contains successful capture, existing Wayback, bot-wall,
   oversize-abort, and rights-hold manifests.
 - `MIGRATING.md` defines compatibility and migration rules.
@@ -217,3 +219,55 @@ node preservation/import-winer-evidence.mjs --verify
 The adapter records an empty storage-copy list because the existing evidence
 names response digests, not durable storage locations. A later storage event may
 append a named copy without rewriting the imported capture event.
+
+## Social post preservation baseline
+
+Per-post browser screenshots for `data/social_posts.csv` will take years to
+reach every row. `import-social-baseline.mjs` (issue #717) does not wait for
+that: it packages the rows that already exist today into a schema v1 baseline,
+so the archive's own evidence survives even if a live post is deleted or a
+platform disappears before its screenshot is captured.
+
+This is a baseline import, not a live crawl. It never makes a network call and
+never edits `data/social_posts.csv`. Each row becomes one `social-post` object
+keyed by its own stable archive record ID (`BSKY-*`, `TWTR-*`, `MAST-*`), plus
+one `metadata` artifact that preserves the full row — including its raw text —
+behind a SHA-256 digest. The event vocabulary treats this the same way as a
+real retrieval attempt that intentionally made no request:
+
+| Row state | Event | `httpOutcome` | `review.state` |
+|---|---|---|---|
+| Has a canonical URL | `capture-attempt` | `not-requested` | `accepted` when the row's own `verified` column is `TRUE`, otherwise `review-required` |
+| No recoverable canonical URL | `artifact-created` | n/a (no `retrieval` payload) | `review-required` |
+
+A row with no canonical URL — its source link was removed as unresolved — still
+gets an object and a preserved artifact, but its canonical source becomes an
+explicit `urn:rosen:social-source:missing-url:<id>` placeholder instead of a
+fabricated link, and the row's own `notes` (or a default explanation) becomes
+the event's review notes. This is the documented missing state; nothing is
+silently dropped. An image-only post with an empty `raw_text` is not treated as
+missing — it keeps its real URL and a normal `capture-attempt`, and the
+preserved text is honestly recorded as empty (`observations.preservedTextSource:
+"none"`).
+
+`related_to` and `responds_to` are preserved verbatim inside
+`normalizationEvidence.observations`, so thread and reply relationships survive
+even though the schema has no dedicated relationship field yet.
+
+A later stewardship stage (the live discovery-and-capture pipeline in
+`docs/bluesky-stewardship-pipeline.md`) can append real `capture-attempt`,
+`fixity-check`, `storage-copy-created`, and `rights-decision` events on top of
+this baseline without touching it — the append-only model means the baseline
+stays intact as better evidence arrives.
+
+Run the compatibility check:
+
+```text
+node preservation/import-social-baseline.mjs --verify
+```
+
+This validates the complete corpus (tens of thousands of rows) and can take on
+the order of a minute; it is not part of `npm test`, only `npm run
+validate:preservation`. `tests/social-baseline-preservation.test.js` covers
+behavior with small fixtures plus bounded and full-corpus structural checks
+against the real CSV, so `npm test` stays fast.
