@@ -45,22 +45,22 @@ Random component: 23 of 100 (23%).
 
 | Platform group | Count |
 | --- | --- |
-| bluesky | 15 |
-| mastodon | 5 |
-| newspaper_clipping | 5 |
-| pressthink_longform | 30 |
+| bluesky | 18 |
+| mastodon | 6 |
+| newspaper_clipping | 7 |
+| pressthink_longform | 29 |
 | thread | 3 |
-| tumblr | 10 |
-| twitter_x | 32 |
+| tumblr | 9 |
+| twitter_x | 28 |
 
 ## By URL status
 
 | URL status | Count |
 | --- | --- |
-| known_difficult | 20 |
-| likely_live | 61 |
+| known_difficult | 19 |
+| likely_live | 64 |
 | missing | 7 |
-| redirector | 12 |
+| redirector | 10 |
 
 ## By page type
 
@@ -68,6 +68,7 @@ Random component: 23 of 100 (23%).
 | --- | --- |
 | dynamic | 52 |
 | media | 6 |
-| pdf | 18 |
-| static | 24 |
+| pdf | 7 |
+| redirect | 9 |
+| static | 26 |
 

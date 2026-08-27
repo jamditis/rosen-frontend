@@ -179,25 +179,26 @@
       "social": 52
     },
     "by_platform_group": {
-      "bluesky": 15,
-      "mastodon": 5,
-      "newspaper_clipping": 5,
-      "pressthink_longform": 30,
+      "bluesky": 18,
+      "mastodon": 6,
+      "newspaper_clipping": 7,
+      "pressthink_longform": 29,
       "thread": 3,
-      "tumblr": 10,
-      "twitter_x": 32
+      "tumblr": 9,
+      "twitter_x": 28
     },
     "by_url_status": {
-      "known_difficult": 20,
-      "likely_live": 61,
+      "known_difficult": 19,
+      "likely_live": 64,
       "missing": 7,
-      "redirector": 12
+      "redirector": 10
     },
     "by_page_type": {
       "dynamic": 52,
       "media": 6,
-      "pdf": 18,
-      "static": 24
+      "pdf": 7,
+      "redirect": 9,
+      "static": 26
     }
   },
   "sources": [
@@ -227,9 +228,9 @@
       "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3lt2wb6ui6224"
     },
     {
-      "id": "BSKY-00853",
+      "id": "BSKY-01284",
       "objectType": "social-post",
-      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3lrytl4lc2225"
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3lntepd6v4c2i"
     },
     {
       "id": "BSKY-01537",
@@ -252,14 +253,29 @@
       "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3lba4pk53ec2z"
     },
     {
+      "id": "BSKY-02068",
+      "objectType": "social-post",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3latw7iu53c2o"
+    },
+    {
       "id": "BSKY-02254",
       "objectType": "social-post",
       "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3kymyfqp5ul2q"
     },
     {
+      "id": "BSKY-02563",
+      "objectType": "social-post",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3kk2incfz5h2o"
+    },
+    {
       "id": "BSKY-02585",
       "objectType": "social-post",
       "url": null
+    },
+    {
+      "id": "BSKY-02628",
+      "objectType": "social-post",
+      "url": "https://bsky.app/profile/jayrosen.bsky.social/post/3ki6t76rcxx2x"
     },
     {
       "id": "BSKY-02690",
@@ -277,19 +293,29 @@
       "url": null
     },
     {
+      "id": "CLIP-00019",
+      "objectType": "archive-record",
+      "url": "https://www.newspapers.com/image/709291829/"
+    },
+    {
+      "id": "CLIP-00038",
+      "objectType": "archive-record",
+      "url": "https://www.newspapers.com/image/1107218285/"
+    },
+    {
       "id": "CLIP-00048",
       "objectType": "archive-record",
       "url": "https://www.newspapers.com/image/258299148/"
     },
     {
-      "id": "CLIP-00050",
-      "objectType": "archive-record",
-      "url": "https://www.newspapers.com/image/234501782/"
-    },
-    {
       "id": "CLIP-00064",
       "objectType": "archive-record",
       "url": "https://www.newspapers.com/image/855475789/"
+    },
+    {
+      "id": "CLIP-00065",
+      "objectType": "archive-record",
+      "url": "https://www.newspapers.com/image/900458453/"
     },
     {
       "id": "CLIP-00067",
@@ -317,6 +343,11 @@
       "url": "https://mastodon.social/@jayrosen_nyu/109940357157764317"
     },
     {
+      "id": "MAST-00316",
+      "objectType": "social-post",
+      "url": "https://mastodon.social/@jayrosen_nyu/109650497829004134"
+    },
+    {
       "id": "MAST-00390",
       "objectType": "social-post",
       "url": "https://mastodon.social/@jayrosen_nyu/109413743864691616"
@@ -332,9 +363,9 @@
       "url": "http://archive.pressthink.org/2008/02/28/three_bizarre_v_p.html"
     },
     {
-      "id": "RECORD-00030",
+      "id": "RECORD-00024",
       "objectType": "archive-record",
-      "url": "https://youtu.be/n8PtTFGl6hg"
+      "url": "https://www.cnn.com/videos/business/2021/12/12/professor-jay-rosen-on-pro-democracy-agenda-for-media.cnn"
     },
     {
       "id": "RECORD-00036",
@@ -357,19 +388,9 @@
       "url": "http://archive.pressthink.org/2003/10/25/bias_answers.html"
     },
     {
-      "id": "RECORD-00166",
-      "objectType": "archive-record",
-      "url": "http://archive.pressthink.org/2003/12/29/krugman_list.html"
-    },
-    {
       "id": "RECORD-00171",
       "objectType": "archive-record",
       "url": "http://archive.pressthink.org/2004/02/07/crash_site_p.html"
-    },
-    {
-      "id": "RECORD-00244",
-      "objectType": "archive-record",
-      "url": "http://archive.pressthink.org/2004/08/02/bos_debrief_p.html"
     },
     {
       "id": "RECORD-00280",
@@ -392,11 +413,6 @@
       "url": "http://archive.pressthink.org/2006/05/13/gagl_sn_p.html"
     },
     {
-      "id": "RECORD-00486",
-      "objectType": "archive-record",
-      "url": "http://archive.pressthink.org/2004/04/13/bush_live_p.html"
-    },
-    {
       "id": "RECORD-00495",
       "objectType": "archive-record",
       "url": "http://archive.pressthink.org/2004/03/10/politics_lull_p.html"
@@ -410,11 +426,6 @@
       "id": "RECORD-00533",
       "objectType": "archive-record",
       "url": "http://archive.pressthink.org/2006/06/22/blgrc_iv_p.html"
-    },
-    {
-      "id": "RECORD-00626",
-      "objectType": "archive-record",
-      "url": "https://radioopensource.org/the-news-about-the-news-jay-rosen/"
     },
     {
       "id": "RECORD-00653",
@@ -452,9 +463,24 @@
       "url": "https://www.pbs.org/moyers/journal/02062009/profile1.html"
     },
     {
-      "id": "RECORD-00740",
+      "id": "RECORD-00750",
       "objectType": "archive-record",
-      "url": "https://www.wnycstudios.org/podcasts/otm/segments/cnn-impossible-dilemma-on-the-media"
+      "url": "https://www.pbs.org/newshour/arts/jay-rosen-on-sxsw-the-future-of-context-and-microloans-for-journalists"
+    },
+    {
+      "id": "RECORD-00767",
+      "objectType": "archive-record",
+      "url": "https://knightfoundation.org/press/releases/new-york-university-to-launch-membership-puzzle-project-to-advance-sustainability-and-trust-in-journalism-with-515-000-in-new-funding/"
+    },
+    {
+      "id": "RECORD-00777",
+      "objectType": "archive-record",
+      "url": "https://www.pbs.org/newshour/brief/200771/jay-rosen"
+    },
+    {
+      "id": "RECORD-00783",
+      "objectType": "archive-record",
+      "url": "https://fora.tv/2010/08/13/Jay_Rosen_The_Future_of_Context"
     },
     {
       "id": "RECORD-00795",
@@ -537,9 +563,9 @@
       "url": "https://tmblr.co/ZCJQUyOHL7t"
     },
     {
-      "id": "TUMBLR-00113",
-      "objectType": "archive-record",
-      "url": "https://tmblr.co/ZCJQUyQB2f6"
+      "id": "TWTR-00570",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1364959762509668356"
     },
     {
       "id": "TWTR-01551",
@@ -547,9 +573,14 @@
       "url": "https://x.com/jayrosen_nyu/status/1352104689127534594"
     },
     {
-      "id": "TWTR-01838",
+      "id": "TWTR-01664",
       "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1348672489086472193"
+      "url": "https://x.com/jayrosen_nyu/status/1350891673157578752"
+    },
+    {
+      "id": "TWTR-02761",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1335285899366690817"
     },
     {
       "id": "TWTR-03424",
@@ -557,14 +588,34 @@
       "url": "https://x.com/jayrosen_nyu/status/1326296116871229442"
     },
     {
-      "id": "TWTR-04141",
+      "id": "TWTR-04002",
       "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1318687929112342529"
+      "url": "https://x.com/jayrosen_nyu/status/1320048594146254861"
     },
     {
-      "id": "TWTR-04471",
+      "id": "TWTR-04860",
       "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1317280068985565184"
+      "url": "https://x.com/jayrosen_nyu/status/1312798509196869632"
+    },
+    {
+      "id": "TWTR-05406",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1303430870037073921"
+    },
+    {
+      "id": "TWTR-05905",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1297355090215436289"
+    },
+    {
+      "id": "TWTR-05999",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1296107474001571841"
+    },
+    {
+      "id": "TWTR-07801",
+      "objectType": "social-post",
+      "url": "https://x.com/jayrosen_nyu/status/1270494150803296260"
     },
     {
       "id": "TWTR-08183",
@@ -572,44 +623,29 @@
       "url": "https://x.com/jayrosen_nyu/status/1264993098314199040"
     },
     {
-      "id": "TWTR-08460",
+      "id": "TWTR-10859",
       "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1261365641463775232"
+      "url": "https://x.com/ChrisCillizza/status/1222691220566237185"
     },
     {
-      "id": "TWTR-08625",
+      "id": "TWTR-10986",
       "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1258221821993893888"
+      "url": "https://x.com/jayrosen_nyu/status/1220725022710554627"
     },
     {
-      "id": "TWTR-08815",
+      "id": "TWTR-11048",
       "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1254802585283899392"
+      "url": "https://x.com/jayrosen_nyu/status/1219304255494017024"
     },
     {
-      "id": "TWTR-09178",
+      "id": "TWTR-12318",
       "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1249740644060467207"
+      "url": "https://x.com/jayrosen_nyu/status/1186703881100771328"
     },
     {
-      "id": "TWTR-09650",
+      "id": "TWTR-12471",
       "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1245186513631162368"
-    },
-    {
-      "id": "TWTR-10132",
-      "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1240989790012608512"
-    },
-    {
-      "id": "TWTR-11042",
-      "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1219345447438995458"
-    },
-    {
-      "id": "TWTR-13418",
-      "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1162175381929152513"
+      "url": "https://x.com/jayrosen_nyu/status/1182843181215440896"
     },
     {
       "id": "TWTR-13642",
@@ -622,39 +658,29 @@
       "url": "https://x.com/jayrosen_nyu/status/1147211033104343040"
     },
     {
-      "id": "TWTR-14723",
-      "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1139549462894907392"
-    },
-    {
       "id": "TWTR-15092",
       "objectType": "social-post",
       "url": "https://x.com/rasmus_kleis/status/1133418384115273728"
     },
     {
-      "id": "TWTR-15413",
+      "id": "TWTR-15175",
       "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1123044346733957120"
+      "url": "https://x.com/jayrosen_nyu/status/1130984193629073408"
     },
     {
-      "id": "TWTR-16446",
+      "id": "TWTR-16011",
       "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1781896286356046111"
+      "url": "https://x.com/jayrosen_nyu/status/1818118830503170350"
     },
     {
-      "id": "TWTR-17198",
+      "id": "TWTR-17865",
       "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1743733143469797825"
+      "url": "https://x.com/AoDespair/status/1708550520758038734"
     },
     {
-      "id": "TWTR-17447",
+      "id": "TWTR-18458",
       "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1722276015857336788"
-    },
-    {
-      "id": "TWTR-18361",
-      "objectType": "social-post",
-      "url": "https://x.com/jerrymberger/status/1690359230551715840"
+      "url": "https://x.com/jayrosen_nyu/status/1685350206190018561"
     },
     {
       "id": "TWTR-19235",
@@ -662,19 +688,9 @@
       "url": "https://x.com/jayrosen_nyu/status/1662990940116582400"
     },
     {
-      "id": "TWTR-20544",
+      "id": "TWTR-19358",
       "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1618066795252051968"
-    },
-    {
-      "id": "TWTR-20661",
-      "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1608236235939528704"
-    },
-    {
-      "id": "TWTR-21758",
-      "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1567299166463819778"
+      "url": "https://x.com/jayrosen_nyu/status/1659964499712004098"
     },
     {
       "id": "TWTR-22045",
@@ -682,24 +698,9 @@
       "url": "https://x.com/jayrosen_nyu/status/1559606177893421056"
     },
     {
-      "id": "TWTR-22250",
+      "id": "TWTR-24858",
       "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1553127733936406528"
-    },
-    {
-      "id": "TWTR-22426",
-      "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1546324106517299201"
-    },
-    {
-      "id": "TWTR-22458",
-      "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1545044771625787398"
-    },
-    {
-      "id": "TWTR-22570",
-      "objectType": "social-post",
-      "url": "https://x.com/jayrosen_nyu/status/1540027120637943808"
+      "url": "https://x.com/jayrosen_nyu/status/1466524924449808388"
     }
   ],
   "selection": [
@@ -774,7 +775,7 @@
       "host": "bsky.app"
     },
     {
-      "id": "BSKY-00853",
+      "id": "BSKY-01284",
       "stratum": "random_seed_slice",
       "group": "random",
       "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
@@ -844,10 +845,38 @@
       "host": "bsky.app"
     },
     {
+      "id": "BSKY-02068",
+      "stratum": "random_seed_slice",
+      "group": "random",
+      "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
+      "source": "social",
+      "platform_group": "bluesky",
+      "url_status": "likely_live",
+      "page_type": "dynamic",
+      "verified": true,
+      "has_raw_text": true,
+      "has_graph_links": false,
+      "host": "bsky.app"
+    },
+    {
       "id": "BSKY-02254",
       "stratum": "platform_bluesky",
       "group": "platform",
       "reason": "Bluesky post.",
+      "source": "social",
+      "platform_group": "bluesky",
+      "url_status": "likely_live",
+      "page_type": "dynamic",
+      "verified": true,
+      "has_raw_text": true,
+      "has_graph_links": false,
+      "host": "bsky.app"
+    },
+    {
+      "id": "BSKY-02563",
+      "stratum": "random_seed_slice",
+      "group": "random",
+      "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
       "source": "social",
       "platform_group": "bluesky",
       "url_status": "likely_live",
@@ -870,6 +899,20 @@
       "has_raw_text": true,
       "has_graph_links": false,
       "host": null
+    },
+    {
+      "id": "BSKY-02628",
+      "stratum": "random_seed_slice",
+      "group": "random",
+      "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
+      "source": "social",
+      "platform_group": "bluesky",
+      "url_status": "likely_live",
+      "page_type": "dynamic",
+      "verified": true,
+      "has_raw_text": true,
+      "has_graph_links": false,
+      "host": "bsky.app"
     },
     {
       "id": "BSKY-02690",
@@ -914,6 +957,34 @@
       "host": null
     },
     {
+      "id": "CLIP-00019",
+      "stratum": "page_pdf",
+      "group": "page_type",
+      "reason": "PDF-shaped capture rather than a rendered web page.",
+      "source": "curated",
+      "platform_group": "newspaper_clipping",
+      "url_status": "known_difficult",
+      "page_type": "pdf",
+      "verified": true,
+      "has_raw_text": true,
+      "has_graph_links": false,
+      "host": "newspapers.com"
+    },
+    {
+      "id": "CLIP-00038",
+      "stratum": "page_pdf",
+      "group": "page_type",
+      "reason": "PDF-shaped capture rather than a rendered web page.",
+      "source": "curated",
+      "platform_group": "newspaper_clipping",
+      "url_status": "known_difficult",
+      "page_type": "pdf",
+      "verified": true,
+      "has_raw_text": true,
+      "has_graph_links": false,
+      "host": "newspapers.com"
+    },
+    {
       "id": "CLIP-00048",
       "stratum": "platform_newspaper_clipping",
       "group": "platform",
@@ -921,21 +992,7 @@
       "source": "curated",
       "platform_group": "newspaper_clipping",
       "url_status": "known_difficult",
-      "page_type": "static",
-      "verified": true,
-      "has_raw_text": true,
-      "has_graph_links": false,
-      "host": "newspapers.com"
-    },
-    {
-      "id": "CLIP-00050",
-      "stratum": "page_static",
-      "group": "page_type",
-      "reason": "Plain static HTML page.",
-      "source": "curated",
-      "platform_group": "newspaper_clipping",
-      "url_status": "known_difficult",
-      "page_type": "static",
+      "page_type": "pdf",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": false,
@@ -953,6 +1010,20 @@
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
+      "host": "newspapers.com"
+    },
+    {
+      "id": "CLIP-00065",
+      "stratum": "page_pdf",
+      "group": "page_type",
+      "reason": "PDF-shaped capture rather than a rendered web page.",
+      "source": "curated",
+      "platform_group": "newspaper_clipping",
+      "url_status": "known_difficult",
+      "page_type": "pdf",
+      "verified": true,
+      "has_raw_text": true,
+      "has_graph_links": false,
       "host": "newspapers.com"
     },
     {
@@ -1026,6 +1097,20 @@
       "host": "mastodon.social"
     },
     {
+      "id": "MAST-00316",
+      "stratum": "random_seed_slice",
+      "group": "random",
+      "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
+      "source": "social",
+      "platform_group": "mastodon",
+      "url_status": "likely_live",
+      "page_type": "dynamic",
+      "verified": true,
+      "has_raw_text": true,
+      "has_graph_links": false,
+      "host": "mastodon.social"
+    },
+    {
       "id": "MAST-00390",
       "stratum": "platform_mastodon",
       "group": "platform",
@@ -1061,25 +1146,25 @@
       "source": "curated",
       "platform_group": "pressthink_longform",
       "url_status": "known_difficult",
-      "page_type": "pdf",
+      "page_type": "static",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
       "host": "archive.pressthink.org"
     },
     {
-      "id": "RECORD-00030",
-      "stratum": "page_media",
+      "id": "RECORD-00024",
+      "stratum": "page_static",
       "group": "page_type",
-      "reason": "Audio/video-heavy page (interview, panel, podcast, broadcast).",
+      "reason": "Plain static HTML page.",
       "source": "curated",
       "platform_group": "pressthink_longform",
-      "url_status": "redirector",
-      "page_type": "media",
+      "url_status": "likely_live",
+      "page_type": "static",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
-      "host": "youtu.be"
+      "host": "cnn.com"
     },
     {
       "id": "RECORD-00036",
@@ -1103,7 +1188,7 @@
       "source": "curated",
       "platform_group": "pressthink_longform",
       "url_status": "known_difficult",
-      "page_type": "pdf",
+      "page_type": "static",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
@@ -1117,7 +1202,7 @@
       "source": "curated",
       "platform_group": "pressthink_longform",
       "url_status": "known_difficult",
-      "page_type": "pdf",
+      "page_type": "static",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
@@ -1131,21 +1216,7 @@
       "source": "curated",
       "platform_group": "pressthink_longform",
       "url_status": "known_difficult",
-      "page_type": "pdf",
-      "verified": true,
-      "has_raw_text": true,
-      "has_graph_links": true,
-      "host": "archive.pressthink.org"
-    },
-    {
-      "id": "RECORD-00166",
-      "stratum": "page_pdf",
-      "group": "page_type",
-      "reason": "PDF-shaped capture rather than a rendered web page.",
-      "source": "curated",
-      "platform_group": "pressthink_longform",
-      "url_status": "known_difficult",
-      "page_type": "pdf",
+      "page_type": "static",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
@@ -1159,21 +1230,7 @@
       "source": "curated",
       "platform_group": "pressthink_longform",
       "url_status": "known_difficult",
-      "page_type": "pdf",
-      "verified": true,
-      "has_raw_text": true,
-      "has_graph_links": true,
-      "host": "archive.pressthink.org"
-    },
-    {
-      "id": "RECORD-00244",
-      "stratum": "page_pdf",
-      "group": "page_type",
-      "reason": "PDF-shaped capture rather than a rendered web page.",
-      "source": "curated",
-      "platform_group": "pressthink_longform",
-      "url_status": "known_difficult",
-      "page_type": "pdf",
+      "page_type": "static",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
@@ -1187,7 +1244,7 @@
       "source": "curated",
       "platform_group": "pressthink_longform",
       "url_status": "known_difficult",
-      "page_type": "pdf",
+      "page_type": "static",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
@@ -1201,7 +1258,7 @@
       "source": "curated",
       "platform_group": "pressthink_longform",
       "url_status": "known_difficult",
-      "page_type": "pdf",
+      "page_type": "static",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
@@ -1215,7 +1272,7 @@
       "source": "curated",
       "platform_group": "pressthink_longform",
       "url_status": "known_difficult",
-      "page_type": "pdf",
+      "page_type": "static",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
@@ -1229,21 +1286,7 @@
       "source": "curated",
       "platform_group": "pressthink_longform",
       "url_status": "known_difficult",
-      "page_type": "pdf",
-      "verified": true,
-      "has_raw_text": true,
-      "has_graph_links": true,
-      "host": "archive.pressthink.org"
-    },
-    {
-      "id": "RECORD-00486",
-      "stratum": "page_pdf",
-      "group": "page_type",
-      "reason": "PDF-shaped capture rather than a rendered web page.",
-      "source": "curated",
-      "platform_group": "pressthink_longform",
-      "url_status": "known_difficult",
-      "page_type": "pdf",
+      "page_type": "static",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
@@ -1257,7 +1300,7 @@
       "source": "curated",
       "platform_group": "pressthink_longform",
       "url_status": "known_difficult",
-      "page_type": "pdf",
+      "page_type": "static",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
@@ -1271,7 +1314,7 @@
       "source": "curated",
       "platform_group": "pressthink_longform",
       "url_status": "known_difficult",
-      "page_type": "pdf",
+      "page_type": "static",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
@@ -1285,25 +1328,11 @@
       "source": "curated",
       "platform_group": "pressthink_longform",
       "url_status": "known_difficult",
-      "page_type": "pdf",
+      "page_type": "static",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
       "host": "archive.pressthink.org"
-    },
-    {
-      "id": "RECORD-00626",
-      "stratum": "page_media",
-      "group": "page_type",
-      "reason": "Audio/video-heavy page (interview, panel, podcast, broadcast).",
-      "source": "curated",
-      "platform_group": "pressthink_longform",
-      "url_status": "likely_live",
-      "page_type": "media",
-      "verified": true,
-      "has_raw_text": true,
-      "has_graph_links": true,
-      "host": "radioopensource.org"
     },
     {
       "id": "RECORD-00653",
@@ -1355,7 +1384,7 @@
       "source": "curated",
       "platform_group": "pressthink_longform",
       "url_status": "redirector",
-      "page_type": "static",
+      "page_type": "redirect",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
@@ -1404,7 +1433,7 @@
       "host": "pbs.org"
     },
     {
-      "id": "RECORD-00740",
+      "id": "RECORD-00750",
       "stratum": "page_media",
       "group": "page_type",
       "reason": "Audio/video-heavy page (interview, panel, podcast, broadcast).",
@@ -1415,7 +1444,49 @@
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
-      "host": "wnycstudios.org"
+      "host": "pbs.org"
+    },
+    {
+      "id": "RECORD-00767",
+      "stratum": "page_static",
+      "group": "page_type",
+      "reason": "Plain static HTML page.",
+      "source": "curated",
+      "platform_group": "pressthink_longform",
+      "url_status": "likely_live",
+      "page_type": "static",
+      "verified": true,
+      "has_raw_text": true,
+      "has_graph_links": true,
+      "host": "knightfoundation.org"
+    },
+    {
+      "id": "RECORD-00777",
+      "stratum": "page_media",
+      "group": "page_type",
+      "reason": "Audio/video-heavy page (interview, panel, podcast, broadcast).",
+      "source": "curated",
+      "platform_group": "pressthink_longform",
+      "url_status": "likely_live",
+      "page_type": "media",
+      "verified": true,
+      "has_raw_text": true,
+      "has_graph_links": true,
+      "host": "pbs.org"
+    },
+    {
+      "id": "RECORD-00783",
+      "stratum": "page_media",
+      "group": "page_type",
+      "reason": "Audio/video-heavy page (interview, panel, podcast, broadcast).",
+      "source": "curated",
+      "platform_group": "pressthink_longform",
+      "url_status": "likely_live",
+      "page_type": "media",
+      "verified": true,
+      "has_raw_text": true,
+      "has_graph_links": true,
+      "host": "fora.tv"
     },
     {
       "id": "RECORD-00795",
@@ -1537,7 +1608,7 @@
       "source": "curated",
       "platform_group": "tumblr",
       "url_status": "redirector",
-      "page_type": "static",
+      "page_type": "redirect",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
@@ -1551,7 +1622,7 @@
       "source": "curated",
       "platform_group": "tumblr",
       "url_status": "redirector",
-      "page_type": "static",
+      "page_type": "redirect",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
@@ -1565,7 +1636,7 @@
       "source": "curated",
       "platform_group": "tumblr",
       "url_status": "redirector",
-      "page_type": "static",
+      "page_type": "redirect",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
@@ -1579,7 +1650,7 @@
       "source": "curated",
       "platform_group": "tumblr",
       "url_status": "redirector",
-      "page_type": "static",
+      "page_type": "redirect",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
@@ -1593,7 +1664,7 @@
       "source": "curated",
       "platform_group": "tumblr",
       "url_status": "redirector",
-      "page_type": "static",
+      "page_type": "redirect",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": false,
@@ -1607,7 +1678,7 @@
       "source": "curated",
       "platform_group": "tumblr",
       "url_status": "redirector",
-      "page_type": "static",
+      "page_type": "redirect",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
@@ -1621,7 +1692,7 @@
       "source": "curated",
       "platform_group": "tumblr",
       "url_status": "redirector",
-      "page_type": "static",
+      "page_type": "redirect",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
@@ -1635,25 +1706,25 @@
       "source": "curated",
       "platform_group": "tumblr",
       "url_status": "redirector",
-      "page_type": "static",
+      "page_type": "redirect",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": true,
       "host": "tmblr.co"
     },
     {
-      "id": "TUMBLR-00113",
-      "stratum": "page_static",
-      "group": "page_type",
-      "reason": "Plain static HTML page.",
-      "source": "curated",
-      "platform_group": "tumblr",
-      "url_status": "redirector",
-      "page_type": "static",
+      "id": "TWTR-00570",
+      "stratum": "random_seed_slice",
+      "group": "random",
+      "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
+      "source": "social",
+      "platform_group": "twitter_x",
+      "url_status": "likely_live",
+      "page_type": "dynamic",
       "verified": true,
       "has_raw_text": true,
       "has_graph_links": false,
-      "host": "tmblr.co"
+      "host": "x.com"
     },
     {
       "id": "TWTR-01551",
@@ -1670,7 +1741,21 @@
       "host": "x.com"
     },
     {
-      "id": "TWTR-01838",
+      "id": "TWTR-01664",
+      "stratum": "page_dynamic",
+      "group": "page_type",
+      "reason": "Client-rendered social timeline rather than static HTML.",
+      "source": "social",
+      "platform_group": "twitter_x",
+      "url_status": "likely_live",
+      "page_type": "dynamic",
+      "verified": true,
+      "has_raw_text": true,
+      "has_graph_links": false,
+      "host": "x.com"
+    },
+    {
+      "id": "TWTR-02761",
       "stratum": "random_seed_slice",
       "group": "random",
       "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
@@ -1698,7 +1783,7 @@
       "host": "x.com"
     },
     {
-      "id": "TWTR-04141",
+      "id": "TWTR-04002",
       "stratum": "random_seed_slice",
       "group": "random",
       "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
@@ -1712,7 +1797,63 @@
       "host": "x.com"
     },
     {
-      "id": "TWTR-04471",
+      "id": "TWTR-04860",
+      "stratum": "random_seed_slice",
+      "group": "random",
+      "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
+      "source": "social",
+      "platform_group": "twitter_x",
+      "url_status": "likely_live",
+      "page_type": "dynamic",
+      "verified": true,
+      "has_raw_text": true,
+      "has_graph_links": false,
+      "host": "x.com"
+    },
+    {
+      "id": "TWTR-05406",
+      "stratum": "random_seed_slice",
+      "group": "random",
+      "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
+      "source": "social",
+      "platform_group": "twitter_x",
+      "url_status": "likely_live",
+      "page_type": "dynamic",
+      "verified": true,
+      "has_raw_text": true,
+      "has_graph_links": false,
+      "host": "x.com"
+    },
+    {
+      "id": "TWTR-05905",
+      "stratum": "random_seed_slice",
+      "group": "random",
+      "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
+      "source": "social",
+      "platform_group": "twitter_x",
+      "url_status": "likely_live",
+      "page_type": "dynamic",
+      "verified": true,
+      "has_raw_text": true,
+      "has_graph_links": false,
+      "host": "x.com"
+    },
+    {
+      "id": "TWTR-05999",
+      "stratum": "page_dynamic",
+      "group": "page_type",
+      "reason": "Client-rendered social timeline rather than static HTML.",
+      "source": "social",
+      "platform_group": "twitter_x",
+      "url_status": "likely_live",
+      "page_type": "dynamic",
+      "verified": true,
+      "has_raw_text": true,
+      "has_graph_links": false,
+      "host": "x.com"
+    },
+    {
+      "id": "TWTR-07801",
       "stratum": "random_seed_slice",
       "group": "random",
       "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
@@ -1740,7 +1881,7 @@
       "host": "x.com"
     },
     {
-      "id": "TWTR-08460",
+      "id": "TWTR-10859",
       "stratum": "random_seed_slice",
       "group": "random",
       "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
@@ -1754,7 +1895,7 @@
       "host": "x.com"
     },
     {
-      "id": "TWTR-08625",
+      "id": "TWTR-10986",
       "stratum": "random_seed_slice",
       "group": "random",
       "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
@@ -1768,7 +1909,7 @@
       "host": "x.com"
     },
     {
-      "id": "TWTR-08815",
+      "id": "TWTR-11048",
       "stratum": "random_seed_slice",
       "group": "random",
       "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
@@ -1782,7 +1923,7 @@
       "host": "x.com"
     },
     {
-      "id": "TWTR-09178",
+      "id": "TWTR-12318",
       "stratum": "random_seed_slice",
       "group": "random",
       "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
@@ -1796,49 +1937,7 @@
       "host": "x.com"
     },
     {
-      "id": "TWTR-09650",
-      "stratum": "random_seed_slice",
-      "group": "random",
-      "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
-      "source": "social",
-      "platform_group": "twitter_x",
-      "url_status": "likely_live",
-      "page_type": "dynamic",
-      "verified": true,
-      "has_raw_text": true,
-      "has_graph_links": false,
-      "host": "x.com"
-    },
-    {
-      "id": "TWTR-10132",
-      "stratum": "random_seed_slice",
-      "group": "random",
-      "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
-      "source": "social",
-      "platform_group": "twitter_x",
-      "url_status": "likely_live",
-      "page_type": "dynamic",
-      "verified": true,
-      "has_raw_text": true,
-      "has_graph_links": false,
-      "host": "x.com"
-    },
-    {
-      "id": "TWTR-11042",
-      "stratum": "random_seed_slice",
-      "group": "random",
-      "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
-      "source": "social",
-      "platform_group": "twitter_x",
-      "url_status": "likely_live",
-      "page_type": "dynamic",
-      "verified": true,
-      "has_raw_text": true,
-      "has_graph_links": false,
-      "host": "x.com"
-    },
-    {
-      "id": "TWTR-13418",
+      "id": "TWTR-12471",
       "stratum": "random_seed_slice",
       "group": "random",
       "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
@@ -1880,20 +1979,6 @@
       "host": "x.com"
     },
     {
-      "id": "TWTR-14723",
-      "stratum": "random_seed_slice",
-      "group": "random",
-      "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
-      "source": "social",
-      "platform_group": "twitter_x",
-      "url_status": "likely_live",
-      "page_type": "dynamic",
-      "verified": true,
-      "has_raw_text": true,
-      "has_graph_links": false,
-      "host": "x.com"
-    },
-    {
       "id": "TWTR-15092",
       "stratum": "platform_twitter_x",
       "group": "platform",
@@ -1908,7 +1993,7 @@
       "host": "x.com"
     },
     {
-      "id": "TWTR-15413",
+      "id": "TWTR-15175",
       "stratum": "random_seed_slice",
       "group": "random",
       "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
@@ -1922,35 +2007,7 @@
       "host": "x.com"
     },
     {
-      "id": "TWTR-16446",
-      "stratum": "page_dynamic",
-      "group": "page_type",
-      "reason": "Client-rendered social timeline rather than static HTML.",
-      "source": "social",
-      "platform_group": "twitter_x",
-      "url_status": "likely_live",
-      "page_type": "dynamic",
-      "verified": true,
-      "has_raw_text": true,
-      "has_graph_links": false,
-      "host": "x.com"
-    },
-    {
-      "id": "TWTR-17198",
-      "stratum": "page_dynamic",
-      "group": "page_type",
-      "reason": "Client-rendered social timeline rather than static HTML.",
-      "source": "social",
-      "platform_group": "twitter_x",
-      "url_status": "likely_live",
-      "page_type": "dynamic",
-      "verified": true,
-      "has_raw_text": true,
-      "has_graph_links": false,
-      "host": "x.com"
-    },
-    {
-      "id": "TWTR-17447",
+      "id": "TWTR-16011",
       "stratum": "random_seed_slice",
       "group": "random",
       "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
@@ -1964,7 +2021,21 @@
       "host": "x.com"
     },
     {
-      "id": "TWTR-18361",
+      "id": "TWTR-17865",
+      "stratum": "random_seed_slice",
+      "group": "random",
+      "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
+      "source": "social",
+      "platform_group": "twitter_x",
+      "url_status": "likely_live",
+      "page_type": "dynamic",
+      "verified": true,
+      "has_raw_text": true,
+      "has_graph_links": false,
+      "host": "x.com"
+    },
+    {
+      "id": "TWTR-18458",
       "stratum": "random_seed_slice",
       "group": "random",
       "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
@@ -1992,35 +2063,7 @@
       "host": "x.com"
     },
     {
-      "id": "TWTR-20544",
-      "stratum": "random_seed_slice",
-      "group": "random",
-      "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
-      "source": "social",
-      "platform_group": "twitter_x",
-      "url_status": "likely_live",
-      "page_type": "dynamic",
-      "verified": true,
-      "has_raw_text": true,
-      "has_graph_links": false,
-      "host": "x.com"
-    },
-    {
-      "id": "TWTR-20661",
-      "stratum": "random_seed_slice",
-      "group": "random",
-      "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
-      "source": "social",
-      "platform_group": "twitter_x",
-      "url_status": "likely_live",
-      "page_type": "dynamic",
-      "verified": true,
-      "has_raw_text": true,
-      "has_graph_links": false,
-      "host": "x.com"
-    },
-    {
-      "id": "TWTR-21758",
+      "id": "TWTR-19358",
       "stratum": "random_seed_slice",
       "group": "random",
       "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
@@ -2048,49 +2091,7 @@
       "host": "x.com"
     },
     {
-      "id": "TWTR-22250",
-      "stratum": "random_seed_slice",
-      "group": "random",
-      "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
-      "source": "social",
-      "platform_group": "twitter_x",
-      "url_status": "likely_live",
-      "page_type": "dynamic",
-      "verified": true,
-      "has_raw_text": true,
-      "has_graph_links": false,
-      "host": "x.com"
-    },
-    {
-      "id": "TWTR-22426",
-      "stratum": "random_seed_slice",
-      "group": "random",
-      "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
-      "source": "social",
-      "platform_group": "twitter_x",
-      "url_status": "likely_live",
-      "page_type": "dynamic",
-      "verified": true,
-      "has_raw_text": true,
-      "has_graph_links": false,
-      "host": "x.com"
-    },
-    {
-      "id": "TWTR-22458",
-      "stratum": "random_seed_slice",
-      "group": "random",
-      "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",
-      "source": "social",
-      "platform_group": "twitter_x",
-      "url_status": "likely_live",
-      "page_type": "dynamic",
-      "verified": true,
-      "has_raw_text": true,
-      "has_graph_links": false,
-      "host": "x.com"
-    },
-    {
-      "id": "TWTR-22570",
+      "id": "TWTR-24858",
       "stratum": "random_seed_slice",
       "group": "random",
       "reason": "Uniform random draw from the remaining eligible universe under seed \"rosen-preservation-pilot-v1\", to catch failure modes the named strata do not anticipate.",

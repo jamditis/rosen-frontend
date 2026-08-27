@@ -254,13 +254,29 @@ function urlStatusOf({ url, host }) {
   return 'likely_live';
 }
 
-function pageTypeOf({ source, contentType, platformField, url, row }) {
+function pageTypeOf({ source, contentType, platformField, url, host, row }) {
   const isPdfUrl = typeof url === 'string' && /\.pdf(?:$|\?)/i.test(url);
-  if (isPdfUrl || isPresent(row.gdrive_pdf_link) || contentType === 'Newspaper Clipping') return 'pdf';
+  // Newspaper clippings are scanned print pages, reached through newspapers.com's
+  // JS image viewer -- a PDF/OCR-shaped capture path, not a rendered web article.
+  // Keyed on platform/host (both consistently "Newspaper" / "newspapers.com" for
+  // every clipping row) rather than the CSV's content_type column, which only
+  // reads "Newspaper Clipping" for 26 of the corpus's 82 clipping rows and
+  // "Article" for the other 56 -- content_type alone would miss most of them.
+  // row.gdrive_pdf_link is deliberately NOT part of this check: it is an
+  // internal Drive backup the pilot worker never sees (it is not carried into
+  // the `sources` view), so it says nothing about the shape of the page the
+  // worker will actually fetch.
+  const isNewspaperClipping = platformField === 'Newspaper' || host === 'newspapers.com';
+  if (isPdfUrl || isNewspaperClipping) return 'pdf';
   if (MEDIA_CONTENT_TYPES.has(contentType) || MEDIA_PLATFORM_FIELDS.has(platformField) || isPresent(row.length_in_seconds)) {
     return 'media';
   }
   if (source === 'social') return 'dynamic';
+  // A redirector host (see KNOWN_REDIRECTOR_HOSTS) is never the final page: the
+  // URL on record is a short link or a retired domain that forwards elsewhere,
+  // so this script has no way to know the destination's rendered shape. Calling
+  // that "static HTML" would be a guess it cannot back up.
+  if (host && KNOWN_REDIRECTOR_HOSTS.has(host)) return 'redirect';
   return 'static';
 }
 
@@ -303,7 +319,7 @@ function buildEntries({ curated, social, relationships }) {
       relationshipCount,
       platformGroup: platformGroupOf({ source, id, contentType, platformField }),
       urlStatus: urlStatusOf({ url, host }),
-      pageType: pageTypeOf({ source, contentType, platformField, url, row }),
+      pageType: pageTypeOf({ source, contentType, platformField, url, host, row }),
       highValue: relationshipCount >= HIGH_VALUE_RELATIONSHIP_THRESHOLD,
       atRisk: Boolean(url) && !hasBackup && (hostFrequency.get(host) || 0) <= AT_RISK_HOST_FREQUENCY_MAX
     };
