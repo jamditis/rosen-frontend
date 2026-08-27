@@ -49,6 +49,13 @@ export function loadState(filePath) {
     if (!parsed || typeof parsed !== 'object' || typeof parsed.urls !== 'object' || parsed.urls === null) {
       return createEmptyState();
     }
+    // A file whose own version does not match what this code understands is
+    // not "current state with a relabelled version" -- it is a format this
+    // code was not written to read. Start clean instead of silently stamping
+    // STATE_VERSION onto a shape a future format change may have altered.
+    if (parsed.version !== STATE_VERSION) {
+      return createEmptyState();
+    }
     return { version: STATE_VERSION, cursor: Number.isInteger(parsed.cursor) ? parsed.cursor : 0, urls: parsed.urls };
   } catch {
     // Missing file (first-ever run) or corrupt JSON: start clean rather than
@@ -58,7 +65,10 @@ export function loadState(filePath) {
 }
 
 export function saveState(filePath, state) {
-  fs.writeFileSync(filePath, `${JSON.stringify(state, null, 2)}\n`);
+  // Compact, not pretty-printed: this file is committed to main every scheduled
+  // run and grows with the full url corpus (tens of thousands of entries), so
+  // indentation whitespace is pure waste multiplied across every future commit.
+  fs.writeFileSync(filePath, `${JSON.stringify(state)}\n`);
 }
 
 // failureType is whatever scripts/verify-links.js's classify() produced
@@ -110,18 +120,24 @@ export function selectEligibleUrls(allUrls, state, opts = {}) {
 
   if (rotatable.length > 0 && budget > 0) {
     const total = rotatable.length;
-    let index = ((cursor % total) + total) % total;
-    // Sweep at most once fully around the rotatable list per run: past that,
-    // nothing left is due, and looping further would just spin.
-    for (let seen = 0; seen < total && budget > 0; seen++) {
-      const url = rotatable[index];
+    // Get this run's full wraparound sweep order from the persisted cursor by
+    // delegating the modular start/wrap arithmetic to advanceCursor
+    // (./rotating-cursor.js) rather than re-deriving it here. Then layer the
+    // per-url revisit cadence on top: skip anything not due yet, and stop once
+    // the budget fills or a full lap is done -- past that nothing left is due,
+    // and looping further would just spin.
+    const { selected: sweepOrder } = advanceCursor(rotatable, cursor, total);
+    const start = ((cursor % total) + total) % total;
+    let consumed = 0;
+    for (const url of sweepOrder) {
+      if (budget <= 0) break;
+      consumed++;
       if (isDue(urlState[url], now, intervals)) {
         selected.push(url);
         budget--;
       }
-      index = (index + 1) % total;
     }
-    nextCursor = index;
+    nextCursor = (start + consumed) % total;
   }
 
   return { selected, nextCursor };

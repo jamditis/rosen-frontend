@@ -11,15 +11,22 @@
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { advanceCursor } from '../scripts/lib/rotating-cursor.js';
 import {
+  STATE_VERSION,
   DEFAULT_REVISIT_INTERVALS_MS,
   classifyStatusBucket,
   isDue,
+  loadState,
+  saveState,
   selectEligibleUrls,
   recordResults,
   diffFindings,
   detectCorpusChanges,
+  pruneRemovedUrls,
   createEmptyState
 } from '../scripts/lib/link-check-state.js';
 
@@ -252,6 +259,97 @@ describe('diffFindings (new / persistent / recovered / changed)', () => {
     assert.deepEqual(diff.persistent, []);
     assert.deepEqual(diff.recovered, []);
     assert.deepEqual(diff.changed, []);
+  });
+});
+
+describe('loadState / saveState (real filesystem round trip, not hand-threaded)', () => {
+  // The other describe blocks above call selectEligibleUrls/recordResults directly
+  // and assign state.cursor themselves -- that proves the pure functions are
+  // correct, but it never exercises loadState or saveState, so a wiring bug in
+  // scripts/verify-links.js's main() (e.g. forgetting to persist the cursor, or
+  // reloading before the previous save lands) would still pass every test above.
+  // These tests go through the real file on disk between "runs" instead, the way
+  // two separate scheduled workflow invocations actually would.
+  function tempStatePath() {
+    return path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'link-check-state-')), 'state.json');
+  }
+
+  it('loadState returns an empty state when the file does not exist yet (first-ever run)', () => {
+    const file = tempStatePath();
+    assert.deepEqual(loadState(file), createEmptyState());
+  });
+
+  it('loadState returns an empty state for corrupt JSON rather than throwing', () => {
+    const file = tempStatePath();
+    fs.writeFileSync(file, '{not valid json');
+    assert.deepEqual(loadState(file), createEmptyState());
+  });
+
+  it('loadState resets to empty when the file version does not match STATE_VERSION', () => {
+    const file = tempStatePath();
+    fs.writeFileSync(file, JSON.stringify({ version: STATE_VERSION + 1, cursor: 7, urls: { x: {} } }));
+    assert.deepEqual(loadState(file), createEmptyState());
+  });
+
+  it('a second run reads what the first run saved and resumes past it, via real fs -- not an in-memory handoff', () => {
+    const file = tempStatePath();
+    const urls = Array.from({ length: 10 }, (_, i) => `https://example.com/${i}`);
+
+    // Run 1: nothing persisted yet.
+    let state = loadState(file);
+    assert.deepEqual(state, createEmptyState());
+    const now1 = Date.now();
+    const run1 = selectEligibleUrls(urls, state, { max: 3, now: now1 });
+    let saved = recordResults(state, { checkedUrls: run1.selected, findingsByUrl: new Map() }, now1);
+    saved.cursor = run1.nextCursor;
+    saved = pruneRemovedUrls(saved, urls);
+    saveState(file, saved);
+
+    // Run 2: a fresh loadState() call, as a completely separate process/run would do.
+    const reloaded = loadState(file);
+    assert.equal(reloaded.cursor, run1.nextCursor, 'the cursor written to disk is what the next run reads back');
+    for (const url of run1.selected) {
+      assert.ok(reloaded.urls[url], `${url} was recorded to disk`);
+      assert.equal(reloaded.urls[url].lastStatus, 'ok');
+    }
+
+    const now2 = now1 + 1000;
+    const run2 = selectEligibleUrls(urls, reloaded, { max: 3, now: now2 });
+    assert.notDeepEqual(run2.selected, run1.selected, 'run 2 starts where run 1 stopped, not the same front slice');
+    for (const url of run2.selected) {
+      assert.ok(!run1.selected.includes(url), `${url} was re-checked instead of advancing`);
+    }
+  });
+
+  it('saveState writes compact JSON (a single line) rather than pretty-printed output', () => {
+    const file = tempStatePath();
+    saveState(file, createEmptyState());
+    const raw = fs.readFileSync(file, 'utf-8');
+    assert.equal(raw.trim().split('\n').length, 1, 'the committed state file should not carry pretty-print indentation');
+    assert.deepEqual(JSON.parse(raw), createEmptyState());
+  });
+});
+
+describe('pruneRemovedUrls', () => {
+  it('drops state entries for urls no longer in the current corpus', () => {
+    const state = {
+      version: STATE_VERSION,
+      cursor: 5,
+      urls: {
+        'https://example.com/kept': { lastStatus: 'ok' },
+        'https://example.com/gone': { lastStatus: 'ok' }
+      }
+    };
+    const pruned = pruneRemovedUrls(state, ['https://example.com/kept']);
+    assert.deepEqual(Object.keys(pruned.urls), ['https://example.com/kept']);
+    assert.equal(pruned.cursor, 5, 'pruning does not disturb the cursor');
+  });
+
+  it('keeps every entry when nothing was removed from the corpus', () => {
+    const state = createEmptyState();
+    state.urls['https://example.com/a'] = { lastStatus: 'ok' };
+    const pruned = pruneRemovedUrls(state, ['https://example.com/a']);
+    assert.deepEqual(pruned.urls, state.urls);
   });
 });
 
