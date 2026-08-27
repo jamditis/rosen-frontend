@@ -129,13 +129,11 @@ python scripts/diagnostics/data_deduper.py --dry-run
 # 2. Review and apply deduplication
 python scripts/diagnostics/data_deduper.py
 
-# 3. Backfill missing summaries
-python scripts/backfill/backfill_worker.py --field summary
+# 3. Backfill missing pull quotes and raw text (takes no arguments;
+#    it always fills both fields together for every row that needs one)
+python scripts/backfill/backfill_worker.py
 
-# 4. Backfill missing concepts
-python scripts/backfill/backfill_worker.py --field concepts
-
-# 5. Validate against schema
+# 4. Validate against schema
 python scripts/validate_schema.py
 ```
 

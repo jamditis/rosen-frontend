@@ -29,4 +29,65 @@ describe('documentation truth', () => {
       }
     }
   });
+
+  it('lists every real .github/workflows/*.yml file in CLAUDE.md, with a matching count', () => {
+    const guide = fs.readFileSync(path.join(rootDir, 'CLAUDE.md'), 'utf8');
+    const workflowsDir = path.join(rootDir, '.github', 'workflows');
+    const realWorkflows = fs
+      .readdirSync(workflowsDir)
+      .filter((name) => name.endsWith('.yml'))
+      .sort();
+
+    for (const name of realWorkflows) {
+      assert.ok(
+        guide.includes(name),
+        `CLAUDE.md's workflow list is missing ${name}, which exists in .github/workflows/`,
+      );
+    }
+
+    const countMatch = guide.match(/CI\/CD \((\d+) workflows\)/);
+    assert.ok(countMatch, 'CLAUDE.md must state the workflow count as "CI/CD (N workflows)"');
+    assert.strictEqual(
+      Number(countMatch[1]),
+      realWorkflows.length,
+      'CLAUDE.md\'s stated workflow count must match the number of files in .github/workflows/',
+    );
+  });
+
+  it('does not point agents at the nonexistent backend/tools/backfill/ path', () => {
+    const backfillWorker = path.join(rootDir, 'backend', 'scripts', 'backfill', 'backfill_worker.py');
+    assert.ok(fs.existsSync(backfillWorker), 'backend/scripts/backfill/backfill_worker.py must exist');
+
+    for (const docPath of [
+      'CLAUDE.md',
+      path.join('docs', 'agent-personas', 'data-pipeline-engineer.md'),
+    ]) {
+      const contents = fs.readFileSync(path.join(rootDir, docPath), 'utf8');
+      assert.doesNotMatch(
+        contents,
+        /tools\/backfill\/backfill_worker\.py/,
+        `${docPath} must not reference the nonexistent backend/tools/backfill/ path`,
+      );
+    }
+  });
+
+  it('does not document --field flags for backfill_worker.py, which takes no arguments', () => {
+    const skillPath = path.join(rootDir, '.claude', 'skills', 'data-pipeline.md');
+    const contents = fs.readFileSync(skillPath, 'utf8');
+    assert.doesNotMatch(
+      contents,
+      /backfill_worker\.py\s+--field/,
+      '.claude/skills/data-pipeline.md must not document --field flags backfill_worker.py does not implement',
+    );
+
+    const workerSource = fs.readFileSync(
+      path.join(rootDir, 'backend', 'scripts', 'backfill', 'backfill_worker.py'),
+      'utf8',
+    );
+    assert.doesNotMatch(
+      workerSource,
+      /argparse/,
+      'this test assumes backfill_worker.py takes no CLI arguments; update the doc assertion above if it grows a parser',
+    );
+  });
 });
