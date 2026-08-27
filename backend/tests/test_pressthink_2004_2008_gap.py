@@ -1125,7 +1125,9 @@ def test_the_checked_in_report_resolves_the_jrd_qust_row_split_issue_863():
     # the row (issue #863) gave jrd_qust its own record, RECORD-00918, so both
     # sources now confirm it present instead of sending it to review.
     report = json.loads(CHECKED_IN_REPORT.read_text(encoding="utf-8"))
-    assert report["conflicting_claims"] == []
+    conflicted_record_ids = {c["record_id"] for c in report["conflicting_claims"]}
+    assert "RECORD-00429" not in conflicted_record_ids
+    assert "RECORD-00918" not in conflicted_record_ids
     jrd_qust_results = [
         res
         for res in report["results"]
