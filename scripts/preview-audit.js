@@ -421,6 +421,19 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       throw new Error(`${label} did not own focus`);
     }
   };
+  // page.waitForURL reports only "Timeout 30000ms exceeded", which cannot say
+  // which call in a route timed out or where the page actually ended up. Name
+  // the expectation and report the URL the run was left on, so a failure that
+  // only shows up on a CI runner can be read from the log instead of guessed at.
+  const waitForUrl = async (predicate, description) => {
+    try {
+      await page.waitForURL(predicate);
+    } catch (err) {
+      throw new Error(
+        `${description}: still at ${page.url()} after ${err.message.split('\n')[0]}`,
+      );
+    }
+  };
   const assertVisibleFocusOutline = async (locator, label) => {
     const focusStyle = await locator.evaluate((element) => {
       const styles = getComputedStyle(element);
@@ -885,10 +898,26 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
 
     const startButton = page.getByRole('button', { name: 'Start', exact: true });
     const startMenu = page.getByRole('menu', { name: 'Archive desktop Start menu' });
-    await startButton.click();
-    await startMenu.waitFor();
+    // The Start menu moves focus to its first item on the animation frame after
+    // it opens, so opening it and driving it in the same breath is a race:
+    // whatever the run focused gets the focus yanked back to the first item,
+    // and the key that follows activates the wrong destination. Wait for the
+    // menu to finish taking its own focus before touching it.
+    const openStartMenu = async (label) => {
+      await startButton.click();
+      await startMenu.waitFor();
+      await assertFocused(
+        startMenu.getByRole('menuitem').first(),
+        `First Start menu destination before ${label}`,
+      );
+    };
+
+    await openStartMenu('the method');
     await startMenu.getByRole('menuitem', { name: /^The method/ }).click();
-    await page.waitForURL((url) => url.pathname.endsWith('/features/winer-method/'));
+    await waitForUrl(
+      (url) => url.pathname.endsWith('/features/winer-method/'),
+      'Start menu method launch never reached /features/winer-method/',
+    );
     await assertArchiveRootReturn(
       page,
       page.getByRole('link', { name: "Return to Jay Rosen's Internet Archive" }),
@@ -908,10 +937,13 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     // The canonical route-entry fallback must move focus into the destination
     // instead of leaving it on <body>, while Back still reconstructs desktop
     // focus and closed-popup state.
-    await startButton.click();
+    await openStartMenu('about');
     await startMenu.getByRole('menuitem', { name: /^About/ }).focus();
     await page.keyboard.press('Enter');
-    await page.waitForURL((url) => url.hash === '#about');
+    await waitForUrl(
+      (url) => url.hash === '#about',
+      'Start menu about launch never reached #about',
+    );
     const aboutHeading = page.getByRole('heading', { name: 'About this archive', level: 1 });
     await assertFocused(aboutHeading, 'About heading after Start navigation');
     await assertVisibleFocusOutline(aboutHeading, 'About heading after keyboard Start navigation');
@@ -925,9 +957,12 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
     }
     await assertFocused(desktopHomeFocusTarget, 'Desktop home after about browser Back');
 
-    await startButton.click();
+    await openStartMenu('participate');
     await startMenu.getByRole('menuitem', { name: /^Participate/ }).click();
-    await page.waitForURL((url) => url.pathname.endsWith('/features/participate/'));
+    await waitForUrl(
+      (url) => url.pathname.endsWith('/features/participate/'),
+      'Start menu participate launch never reached /features/participate/',
+    );
     await assertArchiveRootReturn(
       page,
       page.locator('.archive-link'),
