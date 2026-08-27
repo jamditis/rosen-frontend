@@ -643,6 +643,53 @@ describe('relationship type registry enforcement (#737)', () => {
     const summary = await validateGraphDataset(fixture);
     assert.equal(summary.relationships, 1);
   });
+
+  it('still finds a same-record symmetric duplicate when other records overwrite both directional keys', async () => {
+    // allowMultipleAssertions lets several records assert the same directional
+    // edge, so a (source, type, target) key names a COLLECTION of edges, not
+    // one. Keeping only the last edge per key let two unrelated records hide a
+    // real contradiction: RECORD-00001 asserts the symmetric fact in both
+    // directions, but the reverse lookup for each of its edges resolves to a
+    // different record's edge, so neither comparison matches on sourceRecordId.
+    const fixture = validFixture();
+    fixture.policy.acceptedRelationshipTypes = ['Mentions'];
+    fixture.policy.relationshipTypeRegistry = { Mentions: { directionality: 'symmetric' } };
+    for (const id of ['RECORD-00002', 'RECORD-00003']) {
+      fixture.sourceRecords.push({ id });
+      fixture.publishedRecords.push({ id, relatedIds: ['P0001', 'O0001'] });
+      fixture.recordEntityMap[id] = ['P0001', 'O0001'];
+    }
+    const forward = (id, sourceRecordId) => ({
+      id,
+      sourceRecordId,
+      sourceEntityId: 'P0001',
+      sourceEntityName: 'Jay Rosen',
+      type: 'Mentions',
+      targetEntityId: 'O0001',
+      targetEntityName: 'PressThink',
+      confidence: 0.9,
+    });
+    const reverse = (id, sourceRecordId) => ({
+      id,
+      sourceRecordId,
+      sourceEntityId: 'O0001',
+      sourceEntityName: 'PressThink',
+      type: 'Mentions',
+      targetEntityId: 'P0001',
+      targetEntityName: 'Jay Rosen',
+      confidence: 0.9,
+    });
+    // Order matters: the last write for each directional key must belong to a
+    // record other than RECORD-00001, which is what masked the duplicate.
+    fixture.relationships = [
+      forward('REL-00001', 'RECORD-00001'),
+      forward('REL-00002', 'RECORD-00002'),
+      reverse('REL-00003', 'RECORD-00001'),
+      reverse('REL-00004', 'RECORD-00003'),
+    ];
+
+    await rejectsWith(fixture, 'symmetric', 'Mentions', 'REL-0000(1|3)');
+  });
 });
 
 describe('committed relationship type registry (#737)', () => {

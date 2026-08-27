@@ -552,10 +552,24 @@ function assertNoDuplicateSymmetricOrInverseEdges(
   duplicateEdgeExceptions,
   markExceptionUsed
 ) {
+  // Every type in the registry allows multiple assertions, so a
+  // (source, type, target) triple names a COLLECTION of edges -- one per
+  // record that asserted it -- not a single edge. Keeping only the last one
+  // per key let two unrelated records mask a real contradiction between them:
+  // the reverse lookup for each half of a same-record symmetric pair could
+  // resolve to some other record's edge, and the sourceRecordId comparison
+  // below would then find no match. Store them all and compare against every
+  // candidate.
   const edgesByKey = new Map();
   for (const edge of edges) {
-    edgesByKey.set(edgeKey(edge.sourceEntityId, edge.relationshipType, edge.targetEntityId), edge);
+    const key = edgeKey(edge.sourceEntityId, edge.relationshipType, edge.targetEntityId);
+    const bucket = edgesByKey.get(key);
+    if (bucket) bucket.push(edge);
+    else edgesByKey.set(key, [edge]);
   }
+  const edgesAt = (sourceEntityId, relationshipType, targetEntityId) => (
+    edgesByKey.get(edgeKey(sourceEntityId, relationshipType, targetEntityId)) ?? []
+  );
 
   function findMatchingException(entityIdA, entityIdB, typeA, typeB) {
     return duplicateEdgeExceptions.find(exception => {
@@ -579,8 +593,9 @@ function assertNoDuplicateSymmetricOrInverseEdges(
     if (!registryEntry) continue;
 
     if (registryEntry.directionality === 'symmetric') {
-      const reverseEdge = edgesByKey.get(edgeKey(edge.targetEntityId, edge.relationshipType, edge.sourceEntityId));
-      if (reverseEdge && reverseEdge.id !== edge.id && reverseEdge.sourceRecordId === edge.sourceRecordId) {
+      const reverseEdge = edgesAt(edge.targetEntityId, edge.relationshipType, edge.sourceEntityId)
+        .find(candidate => candidate.id !== edge.id && candidate.sourceRecordId === edge.sourceRecordId);
+      if (reverseEdge) {
         throw new GraphValidationError(
           `${edge.id}: symmetric type ${edge.relationshipType} duplicates edge ${reverseEdge.id} asserted in the reverse direction`
         );
@@ -589,7 +604,7 @@ function assertNoDuplicateSymmetricOrInverseEdges(
 
     const resolvedInverseType = registryEntry.inverseType || registryEntry.candidateInverseType;
     if (resolvedInverseType) {
-      const inverseEdge = edgesByKey.get(edgeKey(edge.targetEntityId, resolvedInverseType, edge.sourceEntityId));
+      const [inverseEdge] = edgesAt(edge.targetEntityId, resolvedInverseType, edge.sourceEntityId);
       if (inverseEdge) {
         const exception = findMatchingException(
           edge.sourceEntityId,

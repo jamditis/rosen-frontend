@@ -122,8 +122,15 @@ The validator uses the registry to reject a relationship whose endpoint
 entity types are not allowed for its type, and to reject a symmetric,
 inverse-labeled, or candidate-inverse-labeled type asserted redundantly in
 both directions (that would otherwise silently duplicate one edge under two
-labels). Two things soften pure "always enforce" for existing data, both
-explicit rather than silent:
+labels).
+
+Because every registered type sets `allowMultipleAssertions: true`, a
+(source, type, target) triple names a collection of edges — one per record
+that asserted it — and the duplicate check compares against all of them, so
+two unrelated records cannot mask a contradiction a third record contains.
+
+Two things soften pure "always enforce" for existing data, both explicit
+rather than silent:
 
 - A type can carry `"endpointEnforcement": "deferred"` alongside an
   `endpointDivergence` block (violation counts and example relationship IDs).
