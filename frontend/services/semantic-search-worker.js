@@ -48,10 +48,46 @@ export const QUERY_PREFIX =
 export const TRANSFORMERS_MODULE_URL =
   'https://esm.sh/@huggingface/transformers@4.2.0';
 
+/**
+ * Every host this worker reaches at runtime, so the deployed Content Security
+ * Policy can be checked against it (tests/semantic-search-csp.test.js).
+ *
+ * The module is one import, but loading a model is three separate downloads:
+ *
+ *  - esm.sh serves the transformers module itself;
+ *  - huggingface.co serves the model config, tokenizer, and weights, and
+ *    redirects the weights to whichever storage host it is using that day
+ *    (today an xet bridge under hf.co; older repos use cdn-lfs hosts). A
+ *    redirect is re-checked against connect-src, so the targets must be
+ *    allowed too, not just huggingface.co;
+ *  - cdn.jsdelivr.net serves the onnxruntime-web WebAssembly runtime, which is
+ *    where transformers points wasmPaths by default.
+ *
+ * All three are fetch/XHR, so all three are connect-src. Miss one and the
+ * feature fails on the live site while working in local development, where no
+ * policy header is served.
+ */
+export const ENCODER_CONNECT_HOSTS = Object.freeze([
+  'https://esm.sh',
+  'https://huggingface.co',
+  'https://cas-bridge.xethub.hf.co',
+  'https://us.aws.cdn.hf.co',
+  'https://cdn-lfs-us-1.hf.co',
+  'https://cdn-lfs.huggingface.co',
+  'https://cdn.jsdelivr.net',
+]);
+
 // How many articles one query may return, and how similar a match must be to
-// count. Cosine between a bge query and a matching passage sits well above 0.6;
-// below that the ranking is topic-blob noise, which is the failure mode the
-// hybrid merge is supposed to avoid. Both are overridable per request.
+// count.
+//
+// Measured against the committed vectors with the shipped model: off-topic and
+// nonsense queries top out near 0.52, real questions reach 0.74. A floor of 0.6
+// sits in that gap, so a query with no semantic match returns nothing instead
+// of topic-blob noise, which is the failure mode the hybrid merge must avoid.
+// A broad question clears the floor hundreds of times over in a single-author
+// archive, so k, not the floor, is what keeps one query cheap.
+// tests/semantic-search-score-floor.test.js holds both properties to the real
+// artifact. Both values are overridable per request.
 export const DEFAULT_QUERY_K = 25;
 export const DEFAULT_MIN_SCORE = 0.6;
 
