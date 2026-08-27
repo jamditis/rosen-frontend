@@ -8,12 +8,13 @@
 //
 // Usage:
 //   node preservation/verify-baseline-manifest.mjs <bag-directory>
-//   node preservation/verify-baseline-manifest.mjs <bag-directory> --data-dir <dir>
+//   node preservation/verify-baseline-manifest.mjs <bag-directory> --restore-root <checkout-dir>
 //   npm run baseline:verify -- <bag-directory>
 //
-// --data-dir checks a restored data/ tree (for example a fresh checkout) held
-// somewhere other than <bag-directory>/data, without recopying files into the
-// bag itself.
+// --restore-root checks a restored checkout held somewhere other than
+// <bag-directory>/data — its value is the checkout ROOT (for example a fresh
+// clone), not a data/ directory: the repository-relative "data/..." path is
+// re-joined onto whatever you pass, the same as BASELINE.md's restore step 5.
 
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -21,11 +22,12 @@ import { BaselineManifestError, verifyBaselineBag } from './baseline-manifest-li
 
 function parseArgs(argv) {
   let bagDir = null;
-  let dataDir = null;
+  let restoreRoot = null;
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
-    if (arg === '--data-dir') {
-      dataDir = argv[i + 1];
+    if (arg === '--restore-root') {
+      if (i + 1 >= argv.length) throw new BaselineManifestError(`"${arg}" requires a value (usage: ${arg} <dir>)`);
+      restoreRoot = argv[i + 1];
       i += 1;
     } else if (!bagDir) {
       bagDir = arg;
@@ -34,21 +36,21 @@ function parseArgs(argv) {
     }
   }
   if (!bagDir) {
-    throw new BaselineManifestError('usage: verify-baseline-manifest.mjs <bag-directory> [--data-dir <dir>]');
+    throw new BaselineManifestError('usage: verify-baseline-manifest.mjs <bag-directory> [--restore-root <dir>]');
   }
-  return { bagDir: path.resolve(bagDir), dataDir: dataDir ? path.resolve(dataDir) : undefined };
+  return { bagDir: path.resolve(bagDir), restoreRoot: restoreRoot ? path.resolve(restoreRoot) : undefined };
 }
 
 export function runVerifyBaseline(argv) {
-  const { bagDir, dataDir } = parseArgs(argv);
-  const result = verifyBaselineBag({ bagDir, dataDir });
-  return { bagDir, dataDir, result };
+  const { bagDir, restoreRoot } = parseArgs(argv);
+  const result = verifyBaselineBag({ bagDir, dataDir: restoreRoot });
+  return { bagDir, restoreRoot, result };
 }
 
 function main(argv) {
-  const { bagDir, dataDir, result } = runVerifyBaseline(argv);
+  const { bagDir, restoreRoot, result } = runVerifyBaseline(argv);
 
-  console.log(`baseline: checked ${result.checkedFiles} payload file(s) in ${dataDir ?? path.join(bagDir, 'data')}`);
+  console.log(`baseline: checked ${result.checkedFiles} payload file(s) in ${restoreRoot ?? path.join(bagDir, 'data')}`);
   for (const entry of result.missing) console.error(`baseline: MISSING ${entry}`);
   for (const entry of result.mismatches) {
     console.error(`baseline: MISMATCH ${entry.path} — expected ${entry.expectedSha256}, got ${entry.actualSha256}`);
@@ -59,6 +61,14 @@ function main(argv) {
       console.error(`baseline: MISMATCH tag file ${entry.path} — expected ${entry.expectedSha256}, got ${entry.actualSha256}`);
     }
     if (result.tag.error) console.error(`baseline: ${result.tag.error}`);
+  }
+  if (result.oxum && !result.oxum.ok) {
+    console.error(
+      `baseline: PAYLOAD COUNT MISMATCH — bag-info.txt records ${result.oxum.expected.count} file(s) / `
+      + `${result.oxum.expected.octets} byte(s), the payload directory actually has `
+      + `${result.oxum.actual.count} file(s) / ${result.oxum.actual.bytes} byte(s) `
+      + '(an extra or missing file outside the manifest, most likely)',
+    );
   }
 
   if (result.ok) {

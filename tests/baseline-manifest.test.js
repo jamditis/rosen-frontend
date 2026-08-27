@@ -314,6 +314,9 @@ describe('buildBaselineBag / verifyBaselineBag', () => {
     assert.deepEqual(result.mismatches, []);
     assert.deepEqual(result.missing, []);
     assert.equal(result.tag.ok, true);
+    assert.equal(result.oxum.ok, true);
+    assert.equal(result.oxum.actual.count, 3);
+    assert.equal(result.oxum.expected.count, 3);
   });
 
   it('refuses to write into a non-empty output directory', () => {
@@ -392,6 +395,26 @@ describe('buildBaselineBag / verifyBaselineBag', () => {
     assert.deepEqual(result.mismatches, []);
   });
 
+  it('fails verification when an extra file is injected into the payload directory', () => {
+    const files = resolveBaselineFiles(root, fixtureCategories);
+    const bagDir = freshDir('inject');
+    buildBaselineBag({
+      repoRoot: root, outputDir: bagDir, files, commitInfo: fixtureCommitInfo,
+    });
+
+    // A per-file manifest walk alone would not notice this: every listed
+    // file is still untouched. Only the Payload-Oxum count/byte check does.
+    fs.writeFileSync(path.join(bagDir, 'data', 'data', 'injected.csv'), 'id,name\n9,ghost\n');
+
+    const result = verifyBaselineBag({ bagDir });
+    assert.deepEqual(result.mismatches, []);
+    assert.deepEqual(result.missing, []);
+    assert.equal(result.ok, false);
+    assert.equal(result.oxum.ok, false);
+    assert.equal(result.oxum.actual.count, 4);
+    assert.equal(result.oxum.expected.count, 3);
+  });
+
   it('verifies a restored data/ tree against the original bag via dataDir', () => {
     const files = resolveBaselineFiles(root, fixtureCategories);
     const bagDir = freshDir('restore-source');
@@ -405,6 +428,10 @@ describe('buildBaselineBag / verifyBaselineBag', () => {
 
     const restored = verifyBaselineBag({ bagDir, dataDir: restoreDir });
     assert.equal(restored.ok, true);
+    // The Payload-Oxum completeness check only applies to the bag in place —
+    // a restored checkout legitimately holds files the baseline never
+    // claimed to cover, so it is skipped (not failed) here.
+    assert.equal(restored.oxum, null);
 
     fs.writeFileSync(path.join(restoreDir, 'data', 'sample-b.csv'), 'tampered restore\n');
     const restoredAfterTamper = verifyBaselineBag({ bagDir, dataDir: restoreDir });
@@ -466,6 +493,14 @@ describe('CLI wrappers', () => {
     );
   });
 
+  it('runVerifyBaseline errors on --restore-root with a missing value instead of silently falling back', () => {
+    const bagDir = freshDir('verify-missing-flag-value');
+    assert.throws(
+      () => runVerifyBaseline([bagDir, '--restore-root']),
+      (err) => err instanceof BaselineManifestError && /requires a value/.test(err.message),
+    );
+  });
+
   it('creates a real baseline bag from this repository and verifies it end to end', () => {
     const outputDir = freshDir('real-repo-cli');
     fs.rmSync(outputDir, { recursive: true, force: true });
@@ -491,5 +526,20 @@ describe('CLI wrappers', () => {
     const created = runCreateBaseline(realRepoRoot, ['--output', outputDir, '--pin-justification', 'custom reason']);
     assert.equal(created.commitInfo.pinJustification, 'custom reason');
     assert.equal(created.manifest.pinJustification, 'custom reason');
+  });
+
+  it('runVerifyBaseline accepts --restore-root and checks a restored checkout root', () => {
+    const files = resolveBaselineFiles(root, fixtureCategories);
+    const bagDir = freshDir('restore-root-cli');
+    buildBaselineBag({
+      repoRoot: root, outputDir: bagDir, files, commitInfo: fixtureCommitInfo,
+    });
+
+    const checkoutRoot = freshDir('restore-root-checkout');
+    fs.cpSync(path.join(bagDir, 'data'), checkoutRoot, { recursive: true });
+
+    const { restoreRoot, result } = runVerifyBaseline([bagDir, '--restore-root', checkoutRoot]);
+    assert.equal(restoreRoot, path.resolve(checkoutRoot));
+    assert.equal(result.ok, true);
   });
 });

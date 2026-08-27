@@ -124,13 +124,20 @@ tag file (`bagit.txt`, `bag-info.txt`, `manifest-sha256.txt`,
 `baseline-manifest.json`), compares each against its recorded digest, and
 prints every mismatch or missing file. It exits non-zero on any failure.
 
+When verifying the bag in place (no `--restore-root`), it also recounts every
+file and byte under the payload directory and compares the totals against
+`Payload-Oxum` in `bag-info.txt`. Checking each manifest entry only proves the
+files it lists are unchanged — it says nothing about a file added to the
+payload directory that the manifest never listed in the first place. The
+Payload-Oxum count-and-byte-total check catches that case too.
+
 Because the manifest only stores paths relative to the bag's own root, this
 works the same way from a clean copy in a different directory — copy the
 whole bag anywhere (a new machine, a freshly mounted drive, a scratch
 directory) and verify it there. A deliberately altered payload file, a
-deleted payload file, or an altered tag file (`bag-info.txt`, etc.) is
-reported as a failure, not silently accepted; `tests/baseline-manifest.test.js`
-exercises all three cases.
+deleted payload file, an injected extra payload file, or an altered tag file
+(`bag-info.txt`, etc.) is reported as a failure, not silently accepted;
+`tests/baseline-manifest.test.js` exercises all four cases.
 
 ## Restoring a baseline
 
@@ -146,13 +153,17 @@ exercises all three cases.
    them back into it:
 
    ```bash
-   npm run baseline:verify -- <bag-dir> --data-dir <checkout>
+   npm run baseline:verify -- <bag-dir> --restore-root <checkout>
    ```
 
-   `--data-dir` tells the verifier to read payload files from
-   `<checkout>/<path>` instead of `<bag-dir>/data/data/<path>`, so you can
+   `--restore-root <checkout>` tells the verifier to read payload files from
+   `<checkout>/<path>` instead of `<bag-dir>/data/data/<path>` — pass the
+   checkout's root directory, not its `data/` subdirectory, so you can
    confirm a restore matches the frozen baseline exactly, without needing a
-   second full copy of the payload.
+   second full copy of the payload. The Payload-Oxum completeness check is
+   skipped in this mode: a real checkout's `data/` directory legitimately
+   holds files the baseline never claimed to cover, so counting all of them
+   would be a false positive, not a finding.
 
 Step 5 is the same mechanism `tests/baseline-manifest.test.js` uses to prove
 the restore procedure recreates the exact packaged files.
@@ -175,6 +186,6 @@ npm run baseline:create -- --output <dir>              # build a baseline bag
 npm run baseline:create -- --output <dir> \
   --pin-justification "<text>"                          # override the default HEAD-pin reason
 npm run baseline:verify -- <bag-dir>                    # verify a bag in place
-npm run baseline:verify -- <bag-dir> --data-dir <d>     # verify a restored data/ tree
+npm run baseline:verify -- <bag-dir> --restore-root <d> # verify a restored checkout
 node --test tests/baseline-manifest.test.js             # run the test suite for this tool
 ```

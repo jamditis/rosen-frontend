@@ -316,6 +316,40 @@ function parseManifestLines(text, sourceLabel) {
     });
 }
 
+// Parse the "Payload-Oxum: <octets>.<count>" line bag-info.txt records at
+// build time (see buildBaselineBag). Returns null when the line is absent
+// instead of throwing, so a hand-built or legacy bag without one just skips
+// the completeness check below rather than failing to verify at all.
+function parsePayloadOxum(bagInfoText) {
+  const match = /^Payload-Oxum:\s*(\d+)\.(\d+)$/m.exec(bagInfoText);
+  if (!match) return null;
+  return { octets: Number(match[1]), count: Number(match[2]) };
+}
+
+// Recursively count regular files and total bytes under rootDir. Returns
+// zeros for a directory that does not exist, so a bag whose payload was
+// deleted entirely is reported as a payload/manifest mismatch elsewhere
+// rather than throwing here.
+function walkFileStats(rootDir) {
+  let count = 0;
+  let bytes = 0;
+  if (!fs.existsSync(rootDir)) return { count, bytes };
+  const stack = [rootDir];
+  while (stack.length > 0) {
+    const current = stack.pop();
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      const entryPath = path.join(current, entry.name);
+      if (entry.isDirectory()) {
+        stack.push(entryPath);
+      } else if (entry.isFile()) {
+        count += 1;
+        bytes += fs.statSync(entryPath).size;
+      }
+    }
+  }
+  return { count, bytes };
+}
+
 function verifyTagManifest(bagDir) {
   const tagManifestPath = path.join(bagDir, 'tagmanifest-sha256.txt');
   if (!fs.existsSync(tagManifestPath)) {
@@ -340,8 +374,20 @@ function verifyTagManifest(bagDir) {
 
 // Verify a bag's payload files against manifest-sha256.txt, and its tag files
 // against tagmanifest-sha256.txt. By default the payload is read from
-// `<bagDir>/data`; pass `dataDir` to check a restored data/ tree living
+// `<bagDir>/data`; pass `dataDir` to check a restored checkout root living
 // somewhere else instead (see preservation/BASELINE.md's restore procedure).
+//
+// When verifying the bag in place (no `dataDir`), this also checks the
+// payload directory's total file count and byte total against the
+// Payload-Oxum recorded in bag-info.txt at build time. A per-file manifest
+// walk alone only proves the files it lists are unchanged — it says nothing
+// about a file that was added to the payload directory afterward and was
+// never in the manifest to begin with. Oxum catches that: an extra or
+// injected payload file changes the total count and byte sum, so it fails
+// verification instead of passing silently. This check is skipped for a
+// restored checkout (`dataDir` set), because a real checkout's data/
+// directory legitimately holds many files the baseline never claimed to
+// cover, and counting all of them would be a false positive, not a finding.
 export function verifyBaselineBag({ bagDir, dataDir }) {
   const resolvedDataDir = dataDir ?? path.join(bagDir, 'data');
   const manifestPath = path.join(bagDir, 'manifest-sha256.txt');
@@ -370,11 +416,26 @@ export function verifyBaselineBag({ bagDir, dataDir }) {
 
   const tag = verifyTagManifest(bagDir);
 
+  let oxum = null;
+  if (!dataDir) {
+    const bagInfoPath = path.join(bagDir, 'bag-info.txt');
+    const expected = fs.existsSync(bagInfoPath) ? parsePayloadOxum(fs.readFileSync(bagInfoPath, 'utf8')) : null;
+    if (expected) {
+      const actual = walkFileStats(path.join(resolvedDataDir, 'data'));
+      oxum = {
+        expected,
+        actual,
+        ok: actual.count === expected.count && actual.bytes === expected.octets,
+      };
+    }
+  }
+
   return {
-    ok: mismatches.length === 0 && missing.length === 0 && tag.ok,
+    ok: mismatches.length === 0 && missing.length === 0 && tag.ok && (oxum ? oxum.ok : true),
     checkedFiles: entries.length,
     mismatches,
     missing,
     tag,
+    oxum,
   };
 }
