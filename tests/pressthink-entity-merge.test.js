@@ -58,9 +58,10 @@ describe('PressThink entity dedup (#859)', () => {
     const canonical = entities.find((row) => row.entity_id === 'O0033');
     assert.ok(canonical, 'O0033 must still exist as the canonical PressThink entity');
     // O0033 carried 251 mentions and W0666 carried 1 before the merge; the
-    // combined total must not be lower than that sum.
-    assert.ok(
-      Number(canonical.total_mentions) >= 252,
+    // combined total must equal that sum exactly.
+    assert.equal(
+      Number(canonical.total_mentions),
+      252,
       `expected O0033 total_mentions to include W0666's folded-in mentions, got ${canonical.total_mentions}`,
     );
   });
@@ -85,9 +86,10 @@ describe('PressThink entity dedup (#859)', () => {
     const referencingO0033 = relationships.filter(
       (row) => row.source_entity_id === 'O0033' || row.target_entity_id === 'O0033',
     );
-    assert.ok(
-      referencingO0033.length >= 235,
-      `expected at least 235 relationship rows referencing O0033 after the merge, got ${referencingO0033.length}`,
+    assert.equal(
+      referencingO0033.length,
+      235,
+      `expected exactly 235 relationship rows referencing O0033 after the merge, got ${referencingO0033.length}`,
     );
   });
 
