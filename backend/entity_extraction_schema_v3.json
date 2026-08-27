@@ -88,27 +88,27 @@
     },
     "Mentions": {
       "description": "Entity A mentions entity B in passing or substantively",
-      "valid_source_types": ["Person", "Organization", "Work"],
-      "valid_target_types": ["Person", "Organization", "Work", "Event", "Location"]
+      "valid_source_types": ["Person", "Organization", "Work", "Event"],
+      "valid_target_types": ["Person", "Organization", "Work", "Event", "Location", "Concept"]
     },
     "Criticizes": {
       "description": "Entity A criticizes or negatively evaluates entity B",
-      "valid_source_types": ["Person", "Organization", "Work"],
+      "valid_source_types": ["Person", "Organization", "Work", "Concept"],
       "valid_target_types": ["Person", "Organization", "Work", "Concept", "Event"]
     },
     "Cites": {
       "description": "Entity A cites or references entity B as source material",
       "valid_source_types": ["Person", "Work"],
-      "valid_target_types": ["Work", "Person", "Organization"]
+      "valid_target_types": ["Work", "Person", "Organization", "Concept"]
     },
     "Discusses": {
       "description": "Entity A discusses or analyzes concept/event B in depth",
-      "valid_source_types": ["Person", "Work", "Organization"],
-      "valid_target_types": ["Concept", "Event", "Work"]
+      "valid_source_types": ["Person", "Work", "Organization", "Concept"],
+      "valid_target_types": ["Concept", "Event", "Work", "Organization", "Person"]
     },
     "Expands On": {
       "description": "Entity A expands, elaborates, or builds upon concept/work B",
-      "valid_source_types": ["Person", "Work"],
+      "valid_source_types": ["Person", "Work", "Concept"],
       "valid_target_types": ["Concept", "Work"]
     },
     "Affiliated With": {
@@ -118,13 +118,13 @@
     },
     "Published In": {
       "description": "Work A was published in/by Organization B",
-      "valid_source_types": ["Work"],
+      "valid_source_types": ["Work", "Person"],
       "valid_target_types": ["Organization"]
     },
     "Originated By": {
-      "description": "Concept A was originated or coined by Person B",
-      "valid_source_types": ["Concept"],
-      "valid_target_types": ["Person"]
+      "description": "Person A originated or coined Concept B",
+      "valid_source_types": ["Person"],
+      "valid_target_types": ["Concept"]
     },
     "Occurred At": {
       "description": "Event A occurred at Location B",
@@ -134,12 +134,12 @@
     "Supports": {
       "description": "Entity A supports, advocates for, or defends entity B",
       "valid_source_types": ["Person", "Organization", "Work"],
-      "valid_target_types": ["Person", "Organization", "Concept", "Event"]
+      "valid_target_types": ["Person", "Organization", "Concept", "Event", "Work"]
     },
     "Owns": {
       "description": "Organization/Person A owns or controls Organization B (media ownership, corporate structure)",
       "valid_source_types": ["Organization", "Person"],
-      "valid_target_types": ["Organization"],
+      "valid_target_types": ["Organization", "Work"],
       "examples": ["Jeff Bezos Owns The Washington Post", "News Corp Owns Fox News"]
     },
     "Founded": {
@@ -150,14 +150,14 @@
       "do_not_use_for": ["Individual articles", "Single blog posts", "Tweets", "Any content that someone 'wrote' rather than 'founded'"]
     },
     "Pioneered": {
-      "description": "Person A pioneered, invented, or was first to develop Concept B",
-      "valid_source_types": ["Person"],
-      "valid_target_types": ["Concept"],
+      "description": "Person, Organization, or Concept A pioneered, invented, or was first to develop Concept or Work B",
+      "valid_source_types": ["Person", "Organization", "Concept"],
+      "valid_target_types": ["Concept", "Work"],
       "examples": ["Jay Rosen Pioneered 'View from Nowhere' concept"]
     },
     "Inspired By": {
-      "description": "Work or Concept A was inspired by, influenced by, or built upon Work/Concept/Person B",
-      "valid_source_types": ["Work", "Concept"],
+      "description": "Work, Concept, or Person A was inspired by, influenced by, or built upon Work/Concept/Person B",
+      "valid_source_types": ["Work", "Concept", "Person"],
       "valid_target_types": ["Work", "Concept", "Person"]
     }
   },

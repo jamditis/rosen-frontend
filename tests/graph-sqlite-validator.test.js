@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
   GraphValidationError,
+  buildEndpointReviewReport,
   loadRepositoryGraphDataset,
   readCanonicalCsv,
   validationPolicyFromSchemas,
@@ -112,6 +113,7 @@ describe('generated SQLite graph validator (#731)', () => {
       relationships: 1,
       recordEntityLinks: 2,
       heldRelationships: 0,
+      endpointReviewRows: [],
     });
   });
 
@@ -399,6 +401,60 @@ describe('relationship type registry enforcement (#737)', () => {
 
     const summary = await validateGraphDataset(fixture);
     assert.equal(summary.relationships, 1);
+  });
+
+  it('does not throw for a type marked endpointEnforcement: "reviewed", but records the row for review', async () => {
+    // issue #868: "reviewed" means the endpoint rule is curator-settled (unlike
+    // "deferred", which has no ruling yet), but a pre-existing violation is
+    // still not a validation failure -- it lands in endpointReviewRows instead,
+    // for the caller to write into the committed review report.
+    const fixture = validFixture();
+    fixture.policy.relationshipTypeRegistry = {
+      'Affiliated With': {
+        allowedSourceTypes: ['Organization'],
+        allowedTargetTypes: ['Organization'],
+        endpointEnforcement: 'reviewed',
+      },
+    };
+
+    const summary = await validateGraphDataset(fixture);
+    assert.equal(summary.relationships, 1);
+    assert.deepStrictEqual(summary.endpointReviewRows, [{
+      relationshipId: 'REL-00001',
+      relationshipType: 'Affiliated With',
+      sourceEntityId: 'P0001',
+      sourceEntityType: 'Person',
+      sourceEntityName: 'Jay Rosen',
+      targetEntityId: 'O0001',
+      targetEntityType: 'Organization',
+      targetEntityName: 'PressThink',
+      validationState: 'accepted',
+    }]);
+  });
+
+  it('collects a "reviewed" violation from a held relationship too, not just accepted ones', async () => {
+    // Founded By and Owned By (issue #868) are always held, never accepted --
+    // they sit outside the active extraction schema -- but the review
+    // collection still needs to see their rows.
+    const fixture = validFixture();
+    fixture.relationships[0].type = 'Owned By';
+    fixture.policy.relationshipTypeHolds = [{
+      relationshipId: 'REL-00001',
+      observedType: 'Owned By',
+      reason: 'Legacy inverse relationship type awaiting semantic normalization in issue #737.',
+    }];
+    fixture.policy.relationshipTypeRegistry = {
+      'Owned By': {
+        allowedSourceTypes: ['Organization', 'Work'],
+        allowedTargetTypes: ['Organization', 'Person'],
+        endpointEnforcement: 'reviewed',
+      },
+    };
+
+    const summary = await validateGraphDataset(fixture);
+    assert.equal(summary.heldRelationships, 1);
+    assert.equal(summary.endpointReviewRows.length, 1);
+    assert.equal(summary.endpointReviewRows[0].validationState, 'held');
   });
 
   it('rejects a symmetric type asserted redundantly in both directions', async () => {
@@ -850,17 +906,23 @@ describe('committed relationship type registry (#737)', () => {
     }
   });
 
-  it('marks a type endpointEnforcement: "deferred" only when it has a recorded divergence, and vice versa', async () => {
+  it('marks a type endpointEnforcement: "enforced", "reviewed", or "deferred" consistently with whether it has a recorded divergence', async () => {
+    // "deferred" (no curator ruling yet) and "reviewed" (issue #868: the
+    // endpoint rule is curator-settled, but pre-existing violations are not
+    // failures) both carry a divergence snapshot; "enforced" (zero known
+    // violations) must not.
     const registry = await loadRegistry();
 
     for (const [name, entry] of Object.entries(registry.types)) {
       if (entry.status !== 'accepted') continue;
       assert.ok(
-        entry.endpointEnforcement === 'enforced' || entry.endpointEnforcement === 'deferred',
-        `${name}: endpointEnforcement must be "enforced" or "deferred"`
+        entry.endpointEnforcement === 'enforced'
+          || entry.endpointEnforcement === 'reviewed'
+          || entry.endpointEnforcement === 'deferred',
+        `${name}: endpointEnforcement must be "enforced", "reviewed", or "deferred"`
       );
-      if (entry.endpointEnforcement === 'deferred') {
-        assert.ok(entry.endpointDivergence, `${name}: deferred enforcement must record an endpointDivergence`);
+      if (entry.endpointEnforcement === 'deferred' || entry.endpointEnforcement === 'reviewed') {
+        assert.ok(entry.endpointDivergence, `${name}: deferred/reviewed enforcement must record an endpointDivergence`);
       } else {
         assert.equal(entry.endpointDivergence, undefined, `${name}: enforced types must not carry an endpointDivergence`);
       }
@@ -928,10 +990,15 @@ describe('committed relationship type registry (#737)', () => {
     assert.ok(sawAtLeastOneContradiction, 'expected at least one type to carry a recorded directionalContradictions entry');
   });
 
-  it('marks semantically ambiguous legacy types deferred instead of guessing their semantics', async () => {
+  it('marks Created and Covers deferred instead of guessing their semantics', async () => {
+    // Covers stays fully deferred per the issue #737 ruling (2026-08-27): the
+    // sheet found the data genuinely split and left it undecided. Created is
+    // recommended for retirement (see the next test) but its own direction
+    // was never in question, so it also keeps a null directionality here --
+    // nothing about its semantics is newly guessed by this ruling.
     const registry = await loadRegistry();
 
-    for (const name of ['Founded By', 'Owned By', 'Created', 'Covers']) {
+    for (const name of ['Created', 'Covers']) {
       const entry = registry.types[name];
       assert.ok(entry, `${name}: missing from registry`);
       assert.equal(entry.status, 'deferred', `${name}: status`);
@@ -940,6 +1007,36 @@ describe('committed relationship type registry (#737)', () => {
       assert.equal(entry.temporalScope, 'deferred', `${name}: temporalScope must not be guessed`);
       assert.equal(typeof entry.deferralReason, 'string', `${name}: deferralReason`);
       assert.ok(entry.deferralReason.length > 0, `${name}: deferralReason`);
+      assert.equal(typeof entry.rulingNote, 'string', `${name}: rulingNote`);
+      assert.match(entry.rulingNote, /737/, `${name}: rulingNote should cite issue #737`);
+    }
+    assert.equal(registry.types.Created.recommendedRetypeTo, 'Pioneered');
+  });
+
+  it('gives Founded By and Owned By a curator-confirmed direction, but keeps them outside the active schema', async () => {
+    // issue #868: the curator ruled on the direction of both legacy labels
+    // (source = founded/owned entity, target = founder/owner), so it is no
+    // longer guessed -- but both stay "deferred" here because neither is
+    // part of the active extraction schema (backend/entity_extraction_schema_v3.json),
+    // and status: "accepted" is reserved for types the schema derives.
+    const registry = await loadRegistry();
+    const validEntityTypes = new Set(registry.entityTypes);
+
+    for (const name of ['Founded By', 'Owned By']) {
+      const entry = registry.types[name];
+      assert.ok(entry, `${name}: missing from registry`);
+      assert.equal(entry.status, 'deferred', `${name}: status stays deferred outside the active schema`);
+      assert.equal(entry.directionality, 'directed', `${name}: direction is now curator-confirmed`);
+      assert.equal(entry.inverseType, null, `${name}: inverseType stays unresolved (not promoted to accepted)`);
+      assert.ok(Array.isArray(entry.allowedSourceTypes) && entry.allowedSourceTypes.length > 0, `${name}: allowedSourceTypes`);
+      assert.ok(Array.isArray(entry.allowedTargetTypes) && entry.allowedTargetTypes.length > 0, `${name}: allowedTargetTypes`);
+      for (const type of [...entry.allowedSourceTypes, ...entry.allowedTargetTypes]) {
+        assert.ok(validEntityTypes.has(type), `${name}: ${type} is not a registered entity type`);
+      }
+      assert.equal(entry.endpointEnforcement, 'reviewed', `${name}: rows that read backward go to the review report, not a validation failure`);
+      assert.ok(entry.endpointDivergence, `${name}: reviewed enforcement must record an endpointDivergence`);
+      assert.equal(typeof entry.rulingNote, 'string', `${name}: rulingNote`);
+      assert.match(entry.rulingNote, /737/, `${name}: rulingNote should cite issue #737`);
     }
   });
 
@@ -1045,6 +1142,61 @@ describe('committed relationship type registry (#737)', () => {
       }
     }
     assert.ok(sawAtLeastOnePair, 'expected at least one Owns/Owned By pair encoding the same fact twice in the live data');
+  });
+});
+
+describe('endpoint review report (#868)', () => {
+  it('groups review rows by type, sorted, without mutating the input', () => {
+    const rows = [
+      { relationshipId: 'RECORD-00002_REL_001', relationshipType: 'Mentions' },
+      { relationshipId: 'RECORD-00001_REL_001', relationshipType: 'Mentions' },
+      { relationshipId: 'RECORD-00003_REL_001', relationshipType: 'Affiliated With' },
+    ];
+    const originalOrder = rows.map(row => row.relationshipId);
+
+    const report = buildEndpointReviewReport(rows);
+
+    assert.deepStrictEqual(rows.map(row => row.relationshipId), originalOrder, 'must not mutate the input array');
+    assert.equal(report.totalRows, 3);
+    assert.equal(report.sourceIssue, 737);
+    assert.deepStrictEqual(Object.keys(report.byType), ['Affiliated With', 'Mentions']);
+    assert.equal(report.byType.Mentions.count, 2);
+    assert.deepStrictEqual(
+      report.byType.Mentions.rows.map(row => row.relationshipId),
+      ['RECORD-00001_REL_001', 'RECORD-00002_REL_001'],
+      'rows within a type must be sorted by relationshipId for a stable diff'
+    );
+  });
+
+  it('returns a byte-identical report for the same input across two calls (no wall-clock field)', () => {
+    const rows = [{ relationshipId: 'RECORD-00001_REL_001', relationshipType: 'Mentions' }];
+    assert.deepStrictEqual(buildEndpointReviewReport(rows), buildEndpointReviewReport(rows));
+  });
+
+  it('produces an empty-but-valid report when nothing is flagged', () => {
+    const report = buildEndpointReviewReport([]);
+    assert.equal(report.totalRows, 0);
+    assert.deepStrictEqual(report.byType, {});
+  });
+
+  it('matches the committed data/relationship-review-report.json for the current repository data', async () => {
+    // The committed file is a build artifact of validateGraphDataset +
+    // buildEndpointReviewReport, exactly like scripts/validate-graph-data.mjs
+    // writes when run directly. Regenerating it here and comparing catches a
+    // stale commit -- a registry or CSV edit that should have refreshed the
+    // report but didn't.
+    const [dataset, committedReport] = await Promise.all([
+      loadRepositoryGraphDataset(repositoryRoot),
+      readFile(path.join(repositoryRoot, 'data/relationship-review-report.json'), 'utf8').then(JSON.parse),
+    ]);
+    const summary = await validateGraphDataset(dataset);
+    const freshReport = buildEndpointReviewReport(summary.endpointReviewRows);
+
+    assert.deepStrictEqual(
+      freshReport,
+      committedReport,
+      'data/relationship-review-report.json is stale; regenerate it with `node scripts/validate-graph-data.mjs`'
+    );
   });
 });
 

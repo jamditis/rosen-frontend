@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { readFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'csv-parse/sync';
@@ -789,6 +789,7 @@ export async function validateGraphDataset(dataset) {
     assertEntityCopiesAgree(database);
 
     const graphEdges = [];
+    const endpointReviewRows = [];
     for (const relationship of relationships) {
       const id = requiredText(relationship.id, 'relationship', 'id');
       const sourceRecordId = requiredText(relationship.sourceRecordId, id, 'sourceRecordId');
@@ -818,9 +819,16 @@ export async function validateGraphDataset(dataset) {
         throw new GraphValidationError(`${id}: type ${relationshipType} is not accepted or explicitly held`);
       }
 
+      // Looked up regardless of validationState: the endpoint-type review
+      // collection below (issue #868) applies to held relationships too --
+      // Founded By and Owned By carry a curator-confirmed direction now, but
+      // every row of theirs is "held", not "accepted" (they remain outside
+      // the active extraction schema).
+      const sourceEntity = sourceEntityById.get(sourceEntityId);
+      const targetEntity = sourceEntityById.get(targetEntityId);
+      const registryEntry = relationshipTypeRegistry[relationshipType];
+
       if (validationState === 'accepted') {
-        const sourceEntity = sourceEntityById.get(sourceEntityId);
-        const targetEntity = sourceEntityById.get(targetEntityId);
         if (sourceEntity.name !== sourceEntityName) {
           throw new GraphValidationError(
             `${id}: sourceEntityName does not match source entity ${sourceEntityId}`
@@ -832,17 +840,19 @@ export async function validateGraphDataset(dataset) {
           );
         }
 
-        // Endpoint-type constraints (issue #737): only enforced when the type
-        // has a registry entry with resolved allowed source/target types AND
-        // that entry does not mark endpointEnforcement: "deferred". A type
-        // absent from the registry, held/deferred there, or explicitly
-        // deferred despite being accepted (see endpointDivergence in
-        // data/relationship-type-registry.json) is not endpoint-constrained
-        // here — cleaning up existing rows that predate a narrowed allowlist
+        // Endpoint-type constraints (issue #737): enforced by default for any
+        // type with a registry entry and resolved allowed source/target
+        // types, UNLESS that entry marks endpointEnforcement: "deferred" (no
+        // curator ruling yet) or "reviewed" (issue #868: the endpoint rule is
+        // curator-settled, but pre-existing violations are not failures --
+        // they are collected into endpointReviewRows below instead, together
+        // with held relationships whose type carries the same enforcement
+        // level). Cleaning up existing rows that predate a narrowed allowlist
         // is a curator decision, not something this validator enforces
         // silently by widening the allowlist to match the dirty data.
-        const registryEntry = relationshipTypeRegistry[relationshipType];
-        const endpointTypesEnforced = registryEntry && registryEntry.endpointEnforcement !== 'deferred';
+        const endpointTypesEnforced = registryEntry
+          && registryEntry.endpointEnforcement !== 'deferred'
+          && registryEntry.endpointEnforcement !== 'reviewed';
         if (endpointTypesEnforced && registryEntry.allowedSourceTypes && !registryEntry.allowedSourceTypes.includes(sourceEntity.type)) {
           throw new GraphValidationError(
             `${id}: source entity type ${sourceEntity.type} is not an allowed source type for ${relationshipType}`
@@ -868,6 +878,33 @@ export async function validateGraphDataset(dataset) {
             `${id}: ${relationshipType} does not allow self-links, but source and target are both ${sourceEntityId}`
           );
         }
+      }
+
+      // Endpoint-type review collection (issue #868). A "reviewed" type has
+      // a curator-settled endpoint rule (unlike "deferred", which has none
+      // yet), but pre-existing rows that don't fit it are not validation
+      // failures -- they land here instead, and the caller writes them to a
+      // committed review report. Runs for accepted AND held relationships
+      // (Founded By and Owned By are always held, never accepted, since they
+      // sit outside the active extraction schema).
+      if (
+        registryEntry?.endpointEnforcement === 'reviewed'
+        && registryEntry.allowedSourceTypes
+        && registryEntry.allowedTargetTypes
+        && (!registryEntry.allowedSourceTypes.includes(sourceEntity.type)
+          || !registryEntry.allowedTargetTypes.includes(targetEntity.type))
+      ) {
+        endpointReviewRows.push({
+          relationshipId: id,
+          relationshipType,
+          sourceEntityId,
+          sourceEntityType: sourceEntity.type,
+          sourceEntityName,
+          targetEntityId,
+          targetEntityType: targetEntity.type,
+          targetEntityName,
+          validationState,
+        });
       }
 
       // Collected for the duplicate-edge check below regardless of
@@ -971,6 +1008,7 @@ export async function validateGraphDataset(dataset) {
       relationships: relationships.length,
       recordEntityLinks: linkCount,
       heldRelationships: heldCount,
+      endpointReviewRows,
     };
   } catch (error) {
     try {
@@ -988,6 +1026,46 @@ export async function validateGraphDataset(dataset) {
 
 async function readJson(filePath) {
   return JSON.parse(await readFile(filePath, 'utf8'));
+}
+
+/**
+ * Turn the flat endpointReviewRows list from validateGraphDataset into the
+ * committed review report (issue #868): one section per relationship type,
+ * sorted for a stable diff, so a curator can open the file and see exactly
+ * which rows still don't fit a curator-ruled endpoint-type or direction rule
+ * -- without that backlog ever failing validation.
+ */
+export function buildEndpointReviewReport(endpointReviewRows) {
+  // No wall-clock timestamp: the report is a pure function of the current
+  // data and registry, so two runs against the same input produce a
+  // byte-identical file. That keeps `git diff` meaningful (the file only
+  // changes when a row or rule actually changes) and this function testable
+  // without mocking the clock.
+  const byType = {};
+  for (const row of [...endpointReviewRows].sort((a, b) => a.relationshipId.localeCompare(b.relationshipId))) {
+    const bucket = byType[row.relationshipType] ?? (byType[row.relationshipType] = { count: 0, rows: [] });
+    bucket.count += 1;
+    bucket.rows.push(row);
+  }
+  for (const type of Object.keys(byType).sort()) {
+    // Re-insert in sorted key order so the committed file's top-level key
+    // order is stable regardless of relationship input order.
+    const bucket = byType[type];
+    delete byType[type];
+    byType[type] = bucket;
+  }
+  return {
+    sourceIssue: 737,
+    implementedByIssue: 868,
+    note:
+      'Rows a curator-settled relationship-type rule (endpointEnforcement: "reviewed" in '
+      + 'data/relationship-type-registry.json) flags but does not fail validation on. Regenerated by '
+      + '`node scripts/validate-graph-data.mjs` every run; edit the registry or the source CSVs, not this '
+      + 'file, to change its contents. Row presence here is not a claim that the row is wrong -- see each '
+      + "type's endpointDivergence.note and directionNote in the registry for what the rule is and why.",
+    totalRows: endpointReviewRows.length,
+    byType,
+  };
 }
 
 export async function readCanonicalCsv(filePath) {
@@ -1093,11 +1171,18 @@ async function main() {
     const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
     const dataset = await loadRepositoryGraphDataset(repositoryRoot);
     const summary = await validateGraphDataset(dataset);
+
+    const reportPath = path.join(repositoryRoot, 'data/relationship-review-report.json');
+    const report = buildEndpointReviewReport(summary.endpointReviewRows);
+    await writeFile(reportPath, JSON.stringify(report, null, 2) + '\n', 'utf8');
+
     console.log(
       `Graph validation passed: ${summary.sourceRecords} source records, `
       + `${summary.publishedRecords} published records, ${summary.sourceEntities} entities, `
       + `${summary.relationships} relationships, ${summary.recordEntityLinks} record/entity links, `
-      + `${summary.heldRelationships} explicit holds (generated ${summary.database} SQLite database)`
+      + `${summary.heldRelationships} explicit holds, ${report.totalRows} rows flagged for curator review `
+      + `across ${Object.keys(report.byType).length} types (written to data/relationship-review-report.json; `
+      + `generated ${summary.database} SQLite database)`
     );
   } catch (error) {
     console.error(`Graph validation failed: ${error.message}`);
