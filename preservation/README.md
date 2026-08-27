@@ -1,5 +1,11 @@
 # Preservation manifest
 
+This file documents the per-object preservation manifest (issue #701): a
+versioned stewardship sidecar that connects an archive object to source
+checks, captures, artifacts, storage copies, fixity checks, rights decisions,
+and human review. For the separate, whole-archive checksummed baseline
+snapshot (issue #702), see [`BASELINE.md`](BASELINE.md) instead.
+
 The preservation manifest is a versioned stewardship sidecar. It connects an
 archive object to source checks, captures, artifacts, storage copies, fixity
 checks, rights decisions, and human review without adding operations metadata

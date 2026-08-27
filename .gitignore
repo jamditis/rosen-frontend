@@ -116,6 +116,13 @@ workers/**/worker-configuration.d.ts
 # FTP deploy staging (derived artifacts; see DEPLOYMENT.md)
 ftp-upload/
 
+# Archive baseline snapshots (preservation/create-baseline-manifest.mjs, #702).
+# The tool defaults to writing outside the repo entirely (the OS temp folder),
+# but this is a safety net in case a baseline is ever created with an
+# in-tree --output path. Large generated payload copies do not belong in
+# normal frontend git history — see preservation/BASELINE.md.
+/preservation/baseline/
+
 # Internal Claude session files
 .claude/phase4-*
 .claude/plan.md
