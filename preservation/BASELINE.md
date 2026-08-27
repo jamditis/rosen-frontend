@@ -168,16 +168,27 @@ deleted payload file, an injected extra payload file, or an altered tag file
 Step 5 is the same mechanism `tests/baseline-manifest.test.js` uses to prove
 the restore procedure recreates the exact packaged files.
 
-## Storage locations — not yet done
+## Storage locations and retention
 
-Issue #702 also asks for at least two copies of a baseline stored outside
-this git working tree, with their retention policies recorded. **That part
-is not implemented by this change.** This tool produces one local bag and
-tells you where it wrote it; actually copying that bag to two off-repo
-storage locations (and deciding what each location's retention policy is)
-is manual, deliberate follow-up work — see the tracking issue this lands
-under for status. Treat any baseline this tool produces as a single
-verified copy until that follow-up is done.
+Issue #702 asks for at least two copies of a baseline stored outside this git
+working tree, with their retention policies recorded. This tool cannot copy
+files anywhere on its own — that half of the work is deciding where a copy
+lives and how long it stays there, which is recorded here, not automated.
+
+| # | Location | Retention policy |
+|---|---|---|
+| 1 | The project's existing Google Drive, in the shared Drive folder tree the backend pipeline already uses (`backend/scripts/download_drive_data.py`, service-account credentials in `backend/google_credentials.json`) | Keep every baseline bag produced at a stewardship milestone (see the "Stewardship" milestones in the issue tracker) indefinitely. Prune a bag only once two later stewardship-milestone baselines supersede it. |
+| 2 | A second, physically separate copy on storage the archive curator keeps outside any account tied to this repository or its Google Workspace (for example an encrypted external drive) | Keep the two most recent baseline bags. Replace the older one each time a new stewardship-milestone baseline is created and verified. |
+
+Both locations must hold the bag directory unmodified — `bagit.txt`,
+`bag-info.txt`, `manifest-sha256.txt`, `tagmanifest-sha256.txt`,
+`baseline-manifest.json`, and `data/` together — so `npm run baseline:verify`
+can check either copy on its own later. Copying a bag there is manual:
+create it with `npm run baseline:create`, then copy the resulting directory
+to both locations and run `npm run baseline:verify` against each copy to
+confirm it landed intact. Doing that for the first baseline, and setting up
+a repeatable schedule for later ones, is tracked as follow-up work, not part
+of this change.
 
 ## Commands
 
