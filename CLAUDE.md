@@ -91,7 +91,7 @@ Counts verified against current `data/` on 2026-07-07:
 | File | Records | Contents |
 |------|---------|----------|
 | `data/archive_records-public.csv` | 1,030 | Non-social archive records (801 RECORD, 137 TUMBLR, 82 CLIP, 10 THREAD). Line count is high (~50k+) due to multi-line text fields. Max record id is `RECORD-00918`; next ID for new records is `RECORD-00919`. |
-| `data/social_posts.csv` | 29,747 | Twitter/X and Bluesky posts. Max BSKY id is `BSKY-03172`. |
+| `data/social_posts.csv` | 29,868 | Twitter/X and Bluesky posts. Max BSKY id is `BSKY-03334`. |
 | `data/extracted_entities.csv` | 7,303 | Named entities (people, orgs, concepts) |
 | `data/extracted_relationships.csv` | 10,976 | Entity-to-record relationships |
 
@@ -202,7 +202,7 @@ Verified against repo state on 2026-05-25. Component, test, and workflow lists a
 │   ├── archive-details.json         # Full details (~13 MB)
 │   ├── archive-entities.json        # Entity graph (~1.1 MB)
 │   ├── archive_records-public.csv   # Source records (1,030 rows)
-│   ├── social_posts.csv             # Social media posts (29,747 rows)
+│   ├── social_posts.csv             # Social media posts (29,868 rows)
 │   ├── extracted_entities.csv       # Named entities (7,303 rows)
 │   ├── extracted_relationships.csv  # Entity relationships (10,976 rows)
 │   ├── export-archive-data.js       # JSON generator script
@@ -405,7 +405,7 @@ Supports: Articles, Videos, Twitter/X, Tumblr, Newspaper Clippings (PDF OCR).
 
 ## Known issues
 
-- Social media records (29,747) have generic titles ("Tweet by Jay Rosen", "Post by Jay Rosen"). Fixing this would require AI-based title generation from post content.
+- Social media records (29,868) have generic titles ("Tweet by Jay Rosen", "Post by Jay Rosen"). Fixing this would require AI-based title generation from post content.
 - Browser localStorage can fill up on the live site due to data size. The ~13 MB `archive-core.json` exceeds localStorage's ~5 MB cap, so the core-data cache uses IndexedDB (`frontend/services/idbCache.js`, #275) — it structured-clones the parsed object on read (no `JSON.parse`) and persists across tab close. The old localStorage/sessionStorage path remains as a fallback for browsers where IndexedDB is blocked (Safari Private, Firefox strict tracking protection).
 - Thread records have placeholder titles ("[Bluesky Thread]") — needs content-based title generation.
 - Roughly 200 records have zero extracted relationships, most because their `raw_text` column is empty (issues #207 / #211). Extraction can be rerun once the raw_text gap-fill in issue #208 (PressThink sweep) and #209 (HuffPost sweep) lands.
