@@ -1,9 +1,13 @@
 #!/usr/bin/env node
 // Pre-launch link-integrity and backlink verification sweep (issue #345).
 //
-// Read-only. Emits a triage report and never mutates a record. The point is to
-// surface drift before launch, not to fix it in place: data repairs belong to
-// the record-repair issues (#294 re-scrape, #242 / #315 recovery).
+// Never mutates a record. The point is to surface drift before launch, not to
+// fix it in place: data repairs belong to the record-repair issues (#294
+// re-scrape, #242 / #315 recovery). It is NOT fully read-only on disk, though:
+// with --external, it writes the persisted traversal state to --state-file
+// (data/link-check-state.json by default, no flag required) so a local sweep
+// leaves that one file changed in the working tree. See the "External" bullet
+// below and scripts/lib/link-check-state.js.
 //
 // Two layers:
 //   - Internal (offline, deterministic, always run): every internal reference
@@ -30,6 +34,8 @@
 //   node scripts/verify-links.js --out report.json
 //   node scripts/verify-links.js --external --max 500   # also probe liveness
 //   node scripts/verify-links.js --external --max 500 --state-file data/link-check-state.json
+//   node scripts/verify-links.js --external --concurrency 4 --timeout-ms 8000 --delay-ms 250
+//   node scripts/verify-links.js --external --max-host-failures 3   # 0 disables the breaker
 //   node scripts/verify-links.js --report-only   # never exit non-zero
 
 import fs from 'node:fs';
@@ -343,7 +349,9 @@ function classify(status) {
 // Gentle by design: a small concurrency pool, a per-request timeout, and a delay
 // between starts so a single source host is not hammered. robots.txt is not
 // fetched per host (probing already-published source URLs with HEAD is low
-// impact); that is a documented limitation, not an oversight.
+// impact); that is a documented limitation, not an oversight. concurrency,
+// timeoutMs and delayMs are configurable (CLI: --concurrency, --timeout-ms,
+// --delay-ms) rather than fixed, per issue #710's acceptance criteria.
 //
 // `max` here is only a safety cap, not the progress mechanism (issue #710):
 // the caller (main(), via selectEligibleUrls in ./lib/link-check-state.js)
@@ -351,14 +359,46 @@ function classify(status) {
 // a persisted rotating cursor and revisit cadence, so every run advances
 // through a different slice of the corpus instead of `[...new
 // Set(urls)].slice(0, max)` re-checking the same front slice forever.
+//
+// maxHostFailures is a per-run circuit breaker: once a host accumulates that
+// many consecutive failures/timeouts THIS run, no further probes are sent to
+// it for the rest of the run, so one unavailable host cannot burn the whole
+// run's time budget (issue #710 acceptance criterion) at the expense of every
+// other host's urls. Skipped urls are returned separately from `findings` and
+// are NOT considered checked -- the caller must not fold them into the
+// persisted per-url state as healthy, since they were never actually probed;
+// they simply remain due and get picked up by a later run. Pass 0 to disable
+// the breaker entirely.
 export async function checkExternalLiveness(urls, opts = {}) {
-  const { concurrency = 6, timeoutMs = 10000, delayMs = 150, max = Infinity, sourceMap = null } = opts;
+  const { concurrency = 6, timeoutMs = 10000, delayMs = 150, max = Infinity, sourceMap = null, maxHostFailures = 3 } = opts;
   const targets = [...new Set(urls)].slice(0, max);
   // Record id(s) carrying each url, so a failure names the record(s) to repair.
   const idsFor = (url) => (sourceMap ? sourceMap.get(url) || [] : []);
   const findings = [];
+  const skipped = [];
+  const hostConsecutiveFailures = new Map();
+  const exhaustedHosts = new Set();
   let cursor = 0;
   let nextStart = 0;
+
+  function hostOf(url) {
+    try {
+      return new URL(url).hostname;
+    } catch {
+      return null;
+    }
+  }
+
+  function recordHostOutcome(host, failed) {
+    if (!host || maxHostFailures <= 0) return;
+    if (!failed) {
+      hostConsecutiveFailures.delete(host);
+      return;
+    }
+    const count = (hostConsecutiveFailures.get(host) || 0) + 1;
+    hostConsecutiveFailures.set(host, count);
+    if (count >= maxHostFailures) exhaustedHosts.add(host);
+  }
 
   // Shared throttle: space request STARTS by delayMs across all workers, not
   // per-worker, so a pool of N workers cannot fire N probes at once. The slot is
@@ -375,15 +415,22 @@ export async function checkExternalLiveness(urls, opts = {}) {
   async function worker() {
     while (cursor < targets.length) {
       const url = targets[cursor++];
+      const host = hostOf(url);
+      if (host && exhaustedHosts.has(host)) {
+        skipped.push(url);
+        continue;
+      }
       await throttle();
       try {
         const { status, location } = await probe(url, { timeoutMs });
         const failureType = classify(status);
+        recordHostOutcome(host, Boolean(failureType));
         if (failureType) {
           const ids = idsFor(url);
           findings.push({ category: 'external', failureType, sourceId: ids[0] ?? null, sourceIds: ids, target: url, status, location: location ?? null, detail: `HTTP ${status}${location ? ` -> ${location}` : ''}` });
         }
       } catch (err) {
+        recordHostOutcome(host, true);
         const ids = idsFor(url);
         findings.push({ category: 'external', failureType: 'unreachable_url', sourceId: ids[0] ?? null, sourceIds: ids, target: url, detail: err.name === 'AbortError' ? `timeout after ${timeoutMs}ms` : err.message });
       }
@@ -391,7 +438,55 @@ export async function checkExternalLiveness(urls, opts = {}) {
   }
 
   await Promise.all(Array.from({ length: Math.min(concurrency, targets.length) }, worker));
-  return { checked: targets.length, findings };
+  return { checked: targets.length - skipped.length, findings, skipped };
+}
+
+// ----- external sweep orchestration (issue #710) -----
+
+// Runs one scheduled sweep's worth of external-liveness work against a
+// persisted state file: load the last run's state, pick this run's eligible
+// urls, probe them, diff and record the results, and save the updated state
+// back to disk. Pulled out of main() so the load/select/probe/record/save
+// wiring itself is directly testable against a real state file on disk --
+// not just the pure functions it calls, hand-threaded, the way earlier tests
+// exercised loadState/saveState (never) and selectEligibleUrls/recordResults
+// (only by reassigning state.cursor in the test itself).
+export async function runExternalLivenessSweep({ featuredUrls, urlRecords, stateFile, max = Infinity, now = Date.now(), liveness = {} }) {
+  const sourceMap = buildUrlSourceMap([...featuredUrls, ...urlRecords]);
+  const candidateUrls = [...sourceMap.keys()];
+  const prevState = loadState(stateFile);
+
+  const corpusChanges = detectCorpusChanges(prevState, candidateUrls);
+
+  // Featured urls are always eligible: they are the launch-critical surface
+  // #479 is about (and the only probe that catches a withdrawn-but-well-formed
+  // image), so they must never be the ones a rotating tail leaves for later.
+  // Everything else is chosen by sweeping forward from the persisted cursor
+  // (issue #710) so a capped run advances through a different slice of the
+  // corpus each time, instead of always re-checking the same front slice.
+  const { selected, nextCursor } = selectEligibleUrls(candidateUrls, prevState, {
+    max,
+    now,
+    alwaysEligible: featuredUrls.map((f) => f.url).filter(Boolean)
+  });
+
+  const external = await checkExternalLiveness(selected, { sourceMap, ...liveness });
+
+  // A url the per-host breaker skipped was never actually probed this run, so
+  // it must not be folded into the persisted state as healthy -- it stays due
+  // and a later run picks it up.
+  const skippedSet = new Set(external.skipped);
+  const checkedUrls = selected.filter((u) => !skippedSet.has(u));
+
+  const findingsByUrl = new Map(external.findings.map((f) => [f.target, f]));
+  const revisit = diffFindings(prevState, checkedUrls, findingsByUrl);
+
+  let nextState = recordResults(prevState, { checkedUrls, findingsByUrl }, now);
+  nextState.cursor = nextCursor;
+  nextState = pruneRemovedUrls(nextState, candidateUrls);
+  saveState(stateFile, nextState);
+
+  return { external, revisit, corpusChanges };
 }
 
 // ----- report -----
@@ -408,6 +503,10 @@ export function buildReport({ data, internal, url, featured = [], external, revi
       malformedUrls: url.length,
       featuredMalformed: featured.length,
       externalChecked: external ? external.checked : 0,
+      // Urls the per-host circuit breaker skipped this run (an unavailable
+      // host must not consume the whole run, issue #710) -- not failures,
+      // just not-yet-checked; they remain due for a later run.
+      externalSkipped: external && external.skipped ? external.skipped.length : 0,
       externalFailures: external ? external.findings.length : 0,
       // issue #710: how this run's external findings compare with the last
       // recorded state, and how the url corpus itself has shifted. Both are
@@ -426,7 +525,20 @@ export function buildReport({ data, internal, url, featured = [], external, revi
 // ----- CLI -----
 
 function parseArgs(argv) {
-  const args = { external: false, reportOnly: false, out: null, max: Infinity, stateFile: null };
+  const args = {
+    external: false,
+    reportOnly: false,
+    out: null,
+    max: Infinity,
+    stateFile: null,
+    // Left undefined (not a fixed default here) when the flag is absent, so
+    // checkExternalLiveness's own defaults apply -- these are only ever
+    // "set" when the caller actually passed the flag.
+    concurrency: undefined,
+    timeoutMs: undefined,
+    delayMs: undefined,
+    maxHostFailures: undefined
+  };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--external') args.external = true;
@@ -434,6 +546,10 @@ function parseArgs(argv) {
     else if (a === '--out') args.out = argv[++i];
     else if (a === '--max') args.max = Number(argv[++i]);
     else if (a === '--state-file') args.stateFile = argv[++i];
+    else if (a === '--concurrency') args.concurrency = Number(argv[++i]);
+    else if (a === '--timeout-ms') args.timeoutMs = Number(argv[++i]);
+    else if (a === '--delay-ms') args.delayMs = Number(argv[++i]);
+    else if (a === '--max-host-failures') args.maxHostFailures = Number(argv[++i]);
   }
   return args;
 }
@@ -460,35 +576,19 @@ async function main(argv) {
   let revisit = null;
   let corpusChanges = null;
   if (args.external) {
-    const sourceMap = buildUrlSourceMap([...featuredUrls, ...urlRecords]);
-    const candidateUrls = [...sourceMap.keys()];
     const stateFile = args.stateFile || path.join(DATA_DIR, 'link-check-state.json');
-    const now = Date.now();
-    const prevState = loadState(stateFile);
-
-    corpusChanges = detectCorpusChanges(prevState, candidateUrls);
-
-    // Featured urls are always eligible: they are the launch-critical surface
-    // #479 is about (and the only probe that catches a withdrawn-but-well-formed
-    // image), so they must never be the ones a rotating tail leaves for later.
-    // Everything else is chosen by sweeping forward from the persisted cursor
-    // (issue #710) so a capped run advances through a different slice of the
-    // corpus each time, instead of always re-checking the same front slice.
-    const { selected, nextCursor } = selectEligibleUrls(candidateUrls, prevState, {
+    ({ external, revisit, corpusChanges } = await runExternalLivenessSweep({
+      featuredUrls,
+      urlRecords,
+      stateFile,
       max: args.max,
-      now,
-      alwaysEligible: featuredUrls.map((f) => f.url).filter(Boolean)
-    });
-
-    external = await checkExternalLiveness(selected, { sourceMap });
-
-    const findingsByUrl = new Map(external.findings.map((f) => [f.target, f]));
-    revisit = diffFindings(prevState, selected, findingsByUrl);
-
-    let nextState = recordResults(prevState, { checkedUrls: selected, findingsByUrl }, now);
-    nextState.cursor = nextCursor;
-    nextState = pruneRemovedUrls(nextState, candidateUrls);
-    saveState(stateFile, nextState);
+      liveness: {
+        concurrency: args.concurrency,
+        timeoutMs: args.timeoutMs,
+        delayMs: args.delayMs,
+        maxHostFailures: args.maxHostFailures
+      }
+    }));
   }
 
   const report = buildReport({ data, internal, url, featured, external, revisit, corpusChanges });
@@ -502,7 +602,7 @@ async function main(argv) {
       `  internal backlink failures: ${s.internalFailures}\n` +
       `  malformed urls: ${s.malformedUrls}\n` +
       `  malformed featured urls: ${s.featuredMalformed}\n` +
-      (args.external ? `  external probed: ${s.externalChecked}, failures: ${s.externalFailures}\n` : '') +
+      (args.external ? `  external probed: ${s.externalChecked}, failures: ${s.externalFailures}${s.externalSkipped ? `, skipped (host budget): ${s.externalSkipped}` : ''}\n` : '') +
       (s.revisit ? `  revisit: new ${s.revisit.new}, persistent ${s.revisit.persistent}, recovered ${s.revisit.recovered}, changed ${s.revisit.changed}\n` : '') +
       (s.corpusChanges ? `  corpus: +${s.corpusChanges.added} -${s.corpusChanges.removed}\n` : '') +
       (args.out ? `  report written: ${args.out}\n` : '')

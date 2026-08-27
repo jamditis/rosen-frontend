@@ -7,6 +7,9 @@
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import {
   isWellFormedHttpUrl,
   isValidRecordUrl,
@@ -15,8 +18,11 @@ import {
   collectUrlRecords,
   buildUrlSourceMap,
   collectFeaturedUrls,
-  checkFeaturedUrlWellFormedness
+  checkFeaturedUrlWellFormedness,
+  checkExternalLiveness,
+  runExternalLivenessSweep
 } from '../scripts/verify-links.js';
+import { loadState } from '../scripts/lib/link-check-state.js';
 
 const fixture = {
   version: 'test',
@@ -316,6 +322,102 @@ describe('collectFeaturedUrls (FEATURED_WORKS image + link hotlinks, issue #479)
   it('handles an empty or absent list', () => {
     assert.deepEqual(collectFeaturedUrls([]), []);
     assert.deepEqual(collectFeaturedUrls(undefined), []);
+  });
+});
+
+describe('checkExternalLiveness per-host circuit breaker (issue #710)', () => {
+  it('stops probing a host after maxHostFailures consecutive failures, without counting the rest as checked', async (t) => {
+    const calls = [];
+    t.mock.method(globalThis, 'fetch', async (url) => {
+      calls.push(String(url));
+      if (String(url).includes('dead.example')) return { status: 500, headers: { get: () => null } };
+      return { status: 200, headers: { get: () => null } };
+    });
+
+    const urls = [...Array.from({ length: 5 }, (_, i) => `https://dead.example/${i}`), 'https://healthy.example/a'];
+    // concurrency: 1 keeps host-failure counting deterministic -- with the
+    // default pool, several dead.example probes can race in flight before
+    // any one of them updates the breaker.
+    const result = await checkExternalLiveness(urls, { delayMs: 0, concurrency: 1, maxHostFailures: 2 });
+
+    const deadCalls = calls.filter((u) => u.includes('dead.example'));
+    assert.equal(deadCalls.length, 2, 'the breaker stops the host after 2 consecutive failures');
+    assert.equal(result.skipped.length, 3, 'the remaining dead.example urls are skipped, not probed');
+    assert.equal(result.checked, urls.length - 3, '"checked" excludes skipped urls');
+    assert.ok(calls.some((u) => u.includes('healthy.example')), 'a different host is unaffected by the breaker');
+  });
+
+  it('does not trip the breaker across different hosts', async (t) => {
+    t.mock.method(globalThis, 'fetch', async () => ({ status: 500, headers: { get: () => null } }));
+    const urls = Array.from({ length: 5 }, (_, i) => `https://host-${i}.example/x`);
+    const result = await checkExternalLiveness(urls, { delayMs: 0, maxHostFailures: 2 });
+    assert.equal(result.skipped.length, 0);
+    assert.equal(result.checked, urls.length);
+  });
+
+  it('maxHostFailures: 0 disables the breaker entirely', async (t) => {
+    t.mock.method(globalThis, 'fetch', async () => ({ status: 500, headers: { get: () => null } }));
+    const urls = Array.from({ length: 10 }, (_, i) => `https://dead.example/${i}`);
+    const result = await checkExternalLiveness(urls, { delayMs: 0, maxHostFailures: 0 });
+    assert.equal(result.skipped.length, 0);
+    assert.equal(result.checked, urls.length);
+  });
+
+  it('a recovered probe on a host resets its consecutive-failure count', async (t) => {
+    const statuses = [500, 200, 500, 500];
+    let i = 0;
+    t.mock.method(globalThis, 'fetch', async () => ({ status: statuses[i++], headers: { get: () => null } }));
+    const urls = Array.from({ length: 4 }, (_, j) => `https://flaky.example/${j}`);
+    const result = await checkExternalLiveness(urls, { delayMs: 0, concurrency: 1, maxHostFailures: 2 });
+    // fail, ok (resets count), fail, fail -> never reaches 2 CONSECUTIVE failures.
+    assert.equal(result.skipped.length, 0);
+    assert.equal(result.checked, urls.length);
+  });
+});
+
+describe('runExternalLivenessSweep (main() wiring: load -> select -> probe -> record -> save)', () => {
+  function tempStatePath() {
+    return path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'verify-links-sweep-')), 'state.json');
+  }
+
+  it('persists progress to a real state file across two sweeps, the way two scheduled runs would see each other', async (t) => {
+    t.mock.method(globalThis, 'fetch', async () => ({ status: 200, headers: { get: () => null } }));
+
+    const urlRecords = Array.from({ length: 12 }, (_, i) => ({ id: `R${i}`, url: `https://example.com/${i}` }));
+    const stateFile = tempStatePath();
+
+    const run1 = await runExternalLivenessSweep({ featuredUrls: [], urlRecords, stateFile, max: 4, now: Date.now(), liveness: { delayMs: 0 } });
+    assert.equal(run1.external.checked, 4);
+
+    const afterRun1 = loadState(stateFile);
+    assert.equal(Object.keys(afterRun1.urls).length, 4, 'run 1 wrote 4 checked urls to the real state file');
+
+    await runExternalLivenessSweep({ featuredUrls: [], urlRecords, stateFile, max: 4, now: Date.now() + 1000, liveness: { delayMs: 0 } });
+    const afterRun2 = loadState(stateFile);
+    assert.equal(Object.keys(afterRun2.urls).length, 8, "run 2 read run 1's file back and advanced past it");
+  });
+
+  it('does not mark a url skipped by the per-host breaker as healthy in the saved state', async (t) => {
+    t.mock.method(globalThis, 'fetch', async () => ({ status: 503, headers: { get: () => null } }));
+
+    const urlRecords = Array.from({ length: 5 }, (_, i) => ({ id: `R${i}`, url: `https://dead.example/${i}` }));
+    const stateFile = tempStatePath();
+
+    await runExternalLivenessSweep({
+      featuredUrls: [],
+      urlRecords,
+      stateFile,
+      max: 5,
+      now: Date.now(),
+      liveness: { concurrency: 1, maxHostFailures: 2, delayMs: 0 }
+    });
+
+    const state = loadState(stateFile);
+    // Only the 2 urls actually probed before the breaker tripped are recorded;
+    // the other 3 must be entirely absent from state, not stamped "ok".
+    const recorded = Object.values(state.urls);
+    assert.equal(recorded.length, 2, 'urls the breaker skipped are not recorded at all -- they stay due');
+    for (const entry of recorded) assert.equal(entry.lastStatus, 'failing');
   });
 });
 
