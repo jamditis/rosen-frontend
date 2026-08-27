@@ -156,14 +156,17 @@ function fakeScope() {
   };
 }
 
-function workerFixture({ loadStore, loadStores, createEncoder } = {}) {
+function workerFixture({
+  loadStore,
+  loadCuratedStore,
+  loadSocialStore,
+  createEncoder,
+} = {}) {
   const scope = fakeScope();
   const encodes = [];
   registerSemanticSearchWorker(scope, {
-    loadStores: loadStores || (async () => ({
-      curated: await (loadStore || (async () => axisStore()))(),
-      social: null,
-    })),
+    loadCuratedStore: loadCuratedStore || loadStore || (async () => axisStore()),
+    loadSocialStore: loadSocialStore || (async () => null),
     createEncoder: createEncoder || (async () => async (text) => {
       encodes.push(text);
       return mixedQuery([0.9, 0.4, 0.1]);
@@ -199,7 +202,7 @@ test('warmup loads the artifact and reports coverage without ranking', async () 
 
 test('coverage includes the edited-record and social stores', async () => {
   const { scope } = workerFixture({
-    loadStores: async () => ({ curated: axisStore(), social: axisStore() }),
+    loadSocialStore: async () => axisStore(),
   });
   scope.deliver({ type: 'semantic-warmup', requestId: 'w1' });
   await new Promise(resolve => setTimeout(resolve, 0));
@@ -235,6 +238,36 @@ test('retries the load on a later request instead of failing forever', async () 
   assert.equal(scope.sent[0].type, 'semantic-query-error');
   assert.equal(scope.sent[1].type, 'semantic-query-result');
   assert.equal(attempts, 2);
+});
+
+test('retries a failed social load without reloading the curated store', async () => {
+  let curatedLoads = 0;
+  let socialLoads = 0;
+  const socialStore = axisStore();
+  socialStore.ids = ['BSKY-A', 'BSKY-B', 'BSKY-C'];
+  const { scope } = workerFixture({
+    loadCuratedStore: async () => {
+      curatedLoads += 1;
+      return axisStore();
+    },
+    loadSocialStore: async () => {
+      socialLoads += 1;
+      if (socialLoads === 1) throw new Error('temporary social outage');
+      return socialStore;
+    },
+  });
+
+  scope.deliver({ type: 'semantic-warmup', requestId: 'w1' });
+  await new Promise(resolve => setTimeout(resolve, 0));
+  scope.deliver({ type: 'semantic-query', requestId: 'q1', query: 'press', minScore: 0 });
+  await new Promise(resolve => setTimeout(resolve, 0));
+
+  assert.equal(scope.sent[0].type, 'semantic-warmup-result');
+  assert.equal(scope.sent[0].count, 3);
+  assert.equal(scope.sent[1].type, 'semantic-query-result');
+  assert.equal(scope.sent[1].count, 6);
+  assert.equal(curatedLoads, 1);
+  assert.equal(socialLoads, 2);
 });
 
 test('loads the artifact and the model once across many queries', async () => {

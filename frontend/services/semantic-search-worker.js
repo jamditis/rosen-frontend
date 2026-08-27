@@ -212,32 +212,21 @@ async function defaultCreateEncoder() {
  *   `{ type: 'semantic-query-result', requestId, query, matches, count }`
  *   `{ type: 'semantic-query-error', requestId, error }`
  *
- * A failed load clears its cached promise, so a later request retries after a
- * transient network or deploy error instead of failing forever.
+ * A failed required load clears its cached promise, so a later request retries
+ * after a transient network or deploy error. The optional social store fails
+ * open without clearing the curated store, then retries independently.
  */
 export function registerSemanticSearchWorker(
   scope,
   {
-    loadStores = async () => {
-      const [curatedResult, socialResult] = await Promise.allSettled([
-        loadEmbeddingStore(
-          DEFAULT_EMBEDDINGS_BIN_URL,
-          DEFAULT_EMBEDDINGS_INDEX_URL,
-        ),
-        loadEmbeddingStore(
-          DEFAULT_SOCIAL_EMBEDDINGS_BIN_URL,
-          DEFAULT_SOCIAL_EMBEDDINGS_INDEX_URL,
-        ),
-      ]);
-      if (curatedResult.status === 'rejected') throw curatedResult.reason;
-      if (socialResult.status === 'rejected') {
-        console.warn('semantic search: social store unavailable', socialResult.reason);
-      }
-      return {
-        curated: curatedResult.value,
-        social: socialResult.status === 'fulfilled' ? socialResult.value : null,
-      };
-    },
+    loadCuratedStore = () => loadEmbeddingStore(
+      DEFAULT_EMBEDDINGS_BIN_URL,
+      DEFAULT_EMBEDDINGS_INDEX_URL,
+    ),
+    loadSocialStore = () => loadEmbeddingStore(
+      DEFAULT_SOCIAL_EMBEDDINGS_BIN_URL,
+      DEFAULT_SOCIAL_EMBEDDINGS_INDEX_URL,
+    ),
     createEncoder = defaultCreateEncoder,
   } = {},
 ) {
@@ -249,19 +238,41 @@ export function registerSemanticSearchWorker(
     throw new Error('semantic search worker: invalid worker scope');
   }
 
-  let storesPromise;
+  let curatedStorePromise;
+  let socialStorePromise;
   let encoderPromise;
 
-  const getStores = () => {
-    if (!storesPromise) {
-      storesPromise = Promise.resolve()
-        .then(() => loadStores())
+  const getCuratedStore = () => {
+    if (!curatedStorePromise) {
+      curatedStorePromise = Promise.resolve()
+        .then(() => loadCuratedStore())
         .catch((error) => {
-          storesPromise = undefined;
+          curatedStorePromise = undefined;
           throw error;
         });
     }
-    return storesPromise;
+    return curatedStorePromise;
+  };
+
+  const getSocialStore = () => {
+    if (!socialStorePromise) {
+      socialStorePromise = Promise.resolve()
+        .then(() => loadSocialStore())
+        .catch((error) => {
+          socialStorePromise = undefined;
+          console.warn('semantic search: social store unavailable', error);
+          return null;
+        });
+    }
+    return socialStorePromise;
+  };
+
+  const getStores = async () => {
+    const [curated, social] = await Promise.all([
+      getCuratedStore(),
+      getSocialStore(),
+    ]);
+    return { curated, social };
   };
 
   const coveredCount = stores =>
