@@ -1,0 +1,9 @@
+id,url,platform,raw_text,verified
+TWTR-00001,https://x.com/jayrosen/status/1,Twitter/X,tweet one,TRUE
+TWTR-00002,https://x.com/jayrosen/status/2,Twitter/X,,TRUE
+TWTR-00003,https://x.com/jayrosen/status/3,Twitter/X,tweet three,FALSE
+BSKY-00001,https://bsky.app/profile/jayrosen/post/1,Bluesky,bsky one,TRUE
+BSKY-00002,https://bsky.app/profile/jayrosen/post/2,Bluesky,bsky two,TRUE
+MAST-00001,https://mastodon.social/@jayrosen/1,Mastodon,mast one,TRUE
+MAST-00002,https://mastodon.social/@jayrosen/2,Mastodon,mast two,TRUE
+TWTR-00004,,Twitter/X,tweet four,TRUE

@@ -22,6 +22,8 @@ The metadata and derived data (entities, relationships) are licensed [CC BY 4.0]
 | `wiki-seed.json` | ~125 KB | Seed pages for the public archive wiki (`#wiki` route) |
 | `stewardship-census.json` | ~150 KB | Machine-readable source/runtime, graph, field, URL, and preservation coverage census |
 | `stewardship-census.md` | ~4 KB | Concise human-readable census summary and 2026-07-22 baseline comparison |
+| `preservation-sample.json` | ~60 KB | Versioned 100-source manifest for the preservation pilot (issue #704) |
+| `preservation-sample.md` | ~2 KB | Human-readable coverage summary for the same pilot sample |
 
 ### Source CSVs (the source of truth)
 
@@ -125,6 +127,20 @@ The census stamps the most recent Git commit that changed an input file, the cle
 The command refuses to write a stamped report while any census input is dirty. After a data change, run the data tests and commit the source and runtime files first. The committed-report freshness subtest skips while those inputs are dirty, then resumes after that commit. Run `npm run census:stewardship`, rerun the test, and commit the two reports. This two-commit sequence keeps the input commit truthful and lets the freshness test compare the generated files byte for byte. The automated submission and master-sheet sync pipelines use this same data-commit-then-report-commit sequence before they push.
 
 `tests/stewardship-census.test.js` exercises representative fixtures, proves an intentional source-row change alters the census, and fails when the committed reports drift from regenerated output.
+
+## Preservation pilot sample
+
+Regenerate the 100-source preservation pilot sample (issue #704, epic #696) from the canonical CSVs and the stewardship census:
+
+```bash
+npm run sample:preservation
+```
+
+The command writes `preservation-sample.json` and `preservation-sample.md`. The JSON contract is `preservation-sample/1.0.0`, and output carries no wall-clock timestamp: the same seed against unchanged inputs reproduces byte-identical output, which is the property `tests/preservation-sample.test.js` checks directly. Pass `--seed <value>` for a different reproducible sample, or `--sample-size <n>` to change the target count from the default 100.
+
+The sample is stratified across curated and social platforms (PressThink long-form writing, newspaper clippings, Tumblr, threads, Twitter/X, Bluesky, Mastodon), URL outcome (missing, a documented redirector host, a documented capture-difficult host, or an otherwise live-looking URL), verified/unverified status, presence or absence of raw text and extracted-graph links, a few notable (heavily cross-referenced or single-point-of-failure) sources, and page shape (PDF, media, dynamic social timeline, static HTML) — plus a seeded uniform-random slice of at least 10% of the sample to catch whatever the named strata miss. `data/preservation-sample.json`'s `quotas` array records each stratum's target, actual selection, and shortfall.
+
+The manifest carries two parallel arrays, same IDs and order. `sources` (`id`, `objectType`, `url`) is the blind view meant for whoever runs the pilot capture pass — it carries no hint about why a source was picked. `selection` adds `stratum`, `group`, `reason`, and the audit fields behind the pick (platform, URL status, verified, raw-text/graph-link presence, host); it is for curator and reviewer eyes only and must never be handed to the blind worker.
 
 For the full record-adding walkthrough — written for non-technical curators — see [`ADDING-RECORDS.md`](../ADDING-RECORDS.md). For which files to upload to production, see [`DEPLOYMENT.md`](../DEPLOYMENT.md).
 
