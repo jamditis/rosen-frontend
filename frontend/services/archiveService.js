@@ -543,6 +543,32 @@ export const isValidEntitiesPayload = (payload) => {
 };
 
 /**
+ * The shaped failure fetchEntitiesData returns on a fetch/parse error, or on
+ * a payload (fresh or cached) that fails isValidEntitiesPayload. One source
+ * for both call sites keeps them from drifting apart — the earlier duplicate
+ * literal is what let one copy go untested (#503).
+ * @returns {{entities: Array, recordEntityMap: Object, error: string}}
+ */
+const entityLoadFailure = () => ({
+  entities: [],
+  recordEntityMap: {},
+  error: 'The entity index could not load. Archive records remain available.',
+});
+
+/**
+ * Remove one cache entry from both Web Storage backends. getCachedData
+ * already does this inline for a TTL-expired entry; fetchEntitiesData reuses
+ * it to drop a version-matched entry whose payload shape has drifted, so a
+ * later call re-fetches instead of replaying the same bad entry (#503).
+ * @param {string} url
+ */
+const evictCachedData = (url) => {
+  const cacheKey = cacheKeyFor(url);
+  try { sessionStorage.removeItem(cacheKey); } catch {}
+  try { localStorage.removeItem(cacheKey); } catch {}
+};
+
+/**
  * Fetch entities data (on-demand, when the entity browser opens)
  */
 export const fetchEntitiesData = async () => {
@@ -558,35 +584,40 @@ export const fetchEntitiesData = async () => {
 
   entitiesLoading = true;
   entitiesLoadPromise = (async () => {
-    const dataUrl = DATA_CONFIG.archive_entities;
-
-    // Check cache first
-    const cached = getCachedData(dataUrl);
-    if (cached) {
-      if (!isValidEntitiesPayload(cached)) {
-        // A cache entry written before this shape check shipped, or one
-        // corrupted in Web Storage, can carry the same drift a fresh fetch
-        // can. Route it through the identical shaped failure below rather
-        // than building an empty entity index from it.
-        console.error('Cached entities data has an unexpected shape; treating as a load failure.');
-        return {
-          entities: [],
-          recordEntityMap: {},
-          error: 'The entity index could not load. Archive records remain available.',
-        };
-      }
-      debug('Using cached entities data');
-      entitiesCache = cached;
-      buildEntityMaps({
-        entities: cached.entities,
-        records: toRecords(cached)
-      });
-      return cached;
-    }
-
-    debug('Fetching entities data from:', dataUrl);
-
+    // The whole body runs under one try/catch/finally now, cache check
+    // included, so every exit path — cache hit, cache-shape-drift, network
+    // success, network failure — resets entitiesLoading exactly once. The
+    // shape-drift branch used to return early before this finally existed,
+    // which left entitiesLoading stuck true and wedged every later call
+    // behind the memoized failure (#503).
     try {
+      const dataUrl = DATA_CONFIG.archive_entities;
+
+      // Check cache first
+      const cached = getCachedData(dataUrl);
+      if (cached) {
+        if (!isValidEntitiesPayload(cached)) {
+          // A cache entry written before this shape check shipped, or one
+          // corrupted in Web Storage, can carry the same drift a fresh fetch
+          // can. Evict it so a later call re-fetches instead of replaying
+          // the same drifted entry for the full CACHE_TTL_MS, then route
+          // this call through the identical shaped failure the network
+          // branch uses rather than building an empty entity index from it.
+          console.error('Cached entities data has an unexpected shape; treating as a load failure.');
+          evictCachedData(dataUrl);
+          return entityLoadFailure();
+        }
+        debug('Using cached entities data');
+        entitiesCache = cached;
+        buildEntityMaps({
+          entities: cached.entities,
+          records: toRecords(cached)
+        });
+        return cached;
+      }
+
+      debug('Fetching entities data from:', dataUrl);
+
       const response = await fetch(dataUrl);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -614,11 +645,7 @@ export const fetchEntitiesData = async () => {
       // so keep returning a shaped payload for that consumer. Carry the
       // failure explicitly so EntityBrowser can distinguish an outage from a
       // legitimate empty scope instead of presenting a silent zero-result UI.
-      return {
-        entities: [],
-        recordEntityMap: {},
-        error: 'The entity index could not load. Archive records remain available.',
-      };
+      return entityLoadFailure();
     } finally {
       entitiesLoading = false;
     }
