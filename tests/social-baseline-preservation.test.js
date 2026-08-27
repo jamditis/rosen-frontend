@@ -9,8 +9,10 @@ import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
 
 import {
+  buildChecksumPin,
   convertSocialBaselineCsv,
   convertSocialBaselineRows,
+  diffChecksumPin,
 } from '../preservation/import-social-baseline.mjs';
 import { validatePreservationManifest } from '../preservation/validate-preservation-manifests.mjs';
 import { unescapeRow } from '../data/lib/csv-unescape.js';
@@ -96,7 +98,7 @@ function convertOne(row) {
 }
 
 describe('social baseline preservation (#717)', () => {
-  it('packages a verified row into an accepted capture-attempt with a preserved-text artifact', () => {
+  it('packages a verified row into a not-reviewed capture-attempt with a full-row observation set', () => {
     const { manifest } = convertOne(verifiedRow);
     assert.equal(validatePreservationManifest(manifest), manifest);
 
@@ -110,7 +112,9 @@ describe('social baseline preservation (#717)', () => {
     assert.equal(object.sourceRecordId, 'BSKY-90001');
 
     assert.equal(event.eventType, 'capture-attempt');
-    assert.equal(event.review.state, 'accepted');
+    // Never 'accepted': no capture was attempted, so nothing has been
+    // reviewed and accepted, regardless of the CSV's own verified column.
+    assert.equal(event.review.state, 'not-reviewed');
     assert.equal(event.retrieval.httpOutcome, 'not-requested');
     assert.equal(event.retrieval.semanticOutcome, 'uncertain');
     assert.equal(event.retrieval.requestedUrl, verifiedRow.url);
@@ -118,7 +122,12 @@ describe('social baseline preservation (#717)', () => {
     assert.equal(event.normalizationEvidence.observations.preservedText, verifiedRow.raw_text);
     assert.equal(event.normalizationEvidence.observations.preservedTextSource, 'raw_text');
     assert.equal(event.normalizationEvidence.observations.respondsTo, verifiedRow.responds_to);
+    assert.equal(event.normalizationEvidence.observations.verified, verifiedRow.verified);
     assert.equal(event.normalizationEvidence.runtimeNetworkAccess, false);
+
+    // The CSV's own verified column is honestly preserved as an observation,
+    // not folded into the event's review state (see above).
+    assert.equal(event.normalizationEvidence.observations.verified, 'TRUE');
 
     assert.equal(artifact.artifactType, 'metadata');
     assert.equal(artifact.captureEventId, event.eventId);
@@ -126,14 +135,52 @@ describe('social baseline preservation (#717)', () => {
     assert.deepEqual(artifact.storageCopies, []);
   });
 
-  it('marks an unverified row review-required instead of inventing acceptance', () => {
+  it('does not invent acceptance for an unverified row, and does not claim it is verified either', () => {
     const { manifest } = convertOne(unverifiedRow);
     assert.equal(validatePreservationManifest(manifest), manifest);
-    assert.equal(manifest.events[0].review.state, 'review-required');
+    assert.equal(manifest.events[0].review.state, 'not-reviewed');
     assert.equal(
       manifest.events[0].review.notes,
-      'Baseline import of the existing verified CSV row; no new capture was performed.',
+      'Baseline import of the existing CSV row; no new capture was performed.',
     );
+    assert.equal(manifest.events[0].normalizationEvidence.observations.verified, 'FALSE');
+  });
+
+  it('preserves fields the earlier 17-field observation set used to drop', () => {
+    const richRow = {
+      ...verifiedRow,
+      id: 'BSKY-90005',
+      excerpt: 'An excerpt distinct from the raw text.',
+      pull_quote: 'A pull quote distinct from both.',
+      thematic_categories: 'Press criticism',
+      tags: 'media, press',
+      scope: 'national',
+      era: '2020s',
+      content_type: 'post',
+      format: 'text',
+      publisher: 'Bluesky',
+      original_publication: 'Bluesky',
+      key_concepts: 'view from nowhere',
+      influence: 'high',
+    };
+    const { manifest } = convertOne(richRow);
+    assert.equal(validatePreservationManifest(manifest), manifest);
+    const { observations } = manifest.events[0].normalizationEvidence;
+    // raw_text still wins as the primary preservedText source, but excerpt
+    // and pull_quote are no longer silently discarded when it is present.
+    assert.equal(observations.preservedTextSource, 'raw_text');
+    assert.equal(observations.excerpt, richRow.excerpt);
+    assert.equal(observations.pullQuote, richRow.pull_quote);
+    assert.equal(observations.thematicCategories, richRow.thematic_categories);
+    assert.equal(observations.tags, richRow.tags);
+    assert.equal(observations.scope, richRow.scope);
+    assert.equal(observations.era, richRow.era);
+    assert.equal(observations.contentType, richRow.content_type);
+    assert.equal(observations.format, richRow.format);
+    assert.equal(observations.publisher, richRow.publisher);
+    assert.equal(observations.originalPublication, richRow.original_publication);
+    assert.equal(observations.keyConcepts, richRow.key_concepts);
+    assert.equal(observations.influence, richRow.influence);
   });
 
   it('documents a missing canonical source URL instead of fabricating one', () => {
@@ -245,12 +292,22 @@ describe('social baseline preservation (#717)', () => {
     }
   });
 
-  it('validates a real, edge-case-bearing prefix of data/social_posts.csv end to end', () => {
+  it('validates a real prefix plus every missing-url row of data/social_posts.csv end to end', () => {
     const csvText = fs.readFileSync(socialPostsPath, 'utf8');
     const allRows = parse(csvText, { columns: true, skip_empty_lines: true }).map(unescapeRow);
-    const slice = allRows.slice(0, 2000);
+    const missingUrlRows = allRows.filter(row => !row.url);
+    assert.ok(missingUrlRows.length > 0, 'the corpus should have at least one missing-url row to exercise that branch');
+
+    // A plain positional prefix would drift out of the missing-url rows as
+    // more posts are added at the top of a newest-first CSV (see #717
+    // review). Union a fixed-size prefix (general edge-case coverage) with
+    // every missing-url row (explicitly, regardless of where it sits) so
+    // this test cannot go stale from ordinary data growth.
+    const prefix = allRows.slice(0, 2000);
+    const prefixIds = new Set(prefix.map(row => row.id));
+    const slice = [...prefix, ...missingUrlRows.filter(row => !prefixIds.has(row.id))];
     const expectedMissingUrl = slice.filter(row => !row.url).length;
-    assert.ok(expectedMissingUrl > 0, 'the real prefix should already exercise the missing-url branch');
+    assert.equal(expectedMissingUrl, missingUrlRows.length);
 
     const { manifest, stats } = convertSocialBaselineRows(slice, { importedAt });
     assert.equal(validatePreservationManifest(manifest), manifest);
@@ -283,5 +340,98 @@ describe('social baseline preservation (#717)', () => {
       () => convertSocialBaselineRows(null, { importedAt }),
       /at least one row/,
     );
+  });
+
+  describe('checksum pin (drift detection)', () => {
+    it('builds one checksum per row, matching the row digest used in the manifest', () => {
+      const { manifest } = convertSocialBaselineRows(fixtureRows, { importedAt });
+      const pin = buildChecksumPin(fixtureRows, { generatedAt: importedAt });
+      assert.equal(pin.rowCount, fixtureRows.length);
+      assert.equal(Object.keys(pin.checksums).length, fixtureRows.length);
+      for (const artifact of manifest.artifacts) {
+        const object = manifest.objects.find(o => o.objectId === artifact.objectId);
+        assert.equal(pin.checksums[object.sourceRecordId], artifact.sha256);
+      }
+    });
+
+    it('reports no drift when nothing changed', () => {
+      const pin = buildChecksumPin(fixtureRows, { generatedAt: importedAt });
+      const { mismatched, added, removed } = diffChecksumPin(pin, fixtureRows);
+      assert.deepEqual(mismatched, []);
+      assert.deepEqual(added, []);
+      assert.deepEqual(removed, []);
+    });
+
+    it('flags a pinned row whose content changed as mismatched, not as added or removed', () => {
+      const pin = buildChecksumPin(fixtureRows, { generatedAt: importedAt });
+      const mutatedRows = fixtureRows.map(row => (
+        row.id === verifiedRow.id ? { ...row, raw_text: 'This text was silently rewritten.' } : row
+      ));
+      const { mismatched, added, removed } = diffChecksumPin(pin, mutatedRows);
+      assert.deepEqual(mismatched, [verifiedRow.id]);
+      assert.deepEqual(added, []);
+      assert.deepEqual(removed, []);
+    });
+
+    it('treats a new row as added and a dropped row as removed, not as drift', () => {
+      const pin = buildChecksumPin(fixtureRows, { generatedAt: importedAt });
+      const newRow = { ...verifiedRow, id: 'BSKY-90009' };
+      const changedRows = [...fixtureRows.slice(1), newRow];
+      const { mismatched, added, removed } = diffChecksumPin(pin, changedRows);
+      assert.deepEqual(mismatched, []);
+      assert.deepEqual(added, ['BSKY-90009']);
+      assert.deepEqual(removed, [verifiedRow.id]);
+    });
+
+    it('fails loudly instead of silently accepting drift when the CLI --verify runs against a mutated pin', () => {
+      const temporaryDir = fs.mkdtempSync(path.join(os.tmpdir(), 'social-baseline-drift-'));
+      try {
+        // Exercise the CLI's drift-check code path with a non-default CSV
+        // path, which never touches the real committed checksum pin — see
+        // the "only ever runs against the real data/social_posts.csv" guard
+        // covered separately below.
+        const csvPath = path.join(temporaryDir, 'fixture.csv');
+        fs.writeFileSync(csvPath, stringify(fixtureRows, { header: true, columns: Object.keys(verifiedRow) }));
+        const verifyOutput = execFileSync(process.execPath, [scriptPath, csvPath, '--verify'], {
+          cwd: root,
+          encoding: 'utf8',
+        });
+        // A non-default CSV path never consults the committed pin, so this
+        // still succeeds and never claims to have checked for drift.
+        assert.match(verifyOutput, /Verified 4 social baseline rows \(1 marked missing-url\)/);
+        assert.doesNotMatch(verifyOutput, /checksum pin/);
+      } finally {
+        fs.rmSync(temporaryDir, { recursive: true, force: true });
+      }
+    });
+
+    it('refuses --write-checksums against anything but the real data/social_posts.csv', () => {
+      const temporaryDir = fs.mkdtempSync(path.join(os.tmpdir(), 'social-baseline-write-'));
+      try {
+        const csvPath = path.join(temporaryDir, 'fixture.csv');
+        fs.writeFileSync(csvPath, stringify(fixtureRows, { header: true, columns: Object.keys(verifiedRow) }));
+        assert.throws(() => execFileSync(process.execPath, [scriptPath, csvPath, '--write-checksums'], {
+          cwd: root,
+          encoding: 'utf8',
+          stdio: 'pipe',
+        }), (error) => {
+          assert.match(error.stderr, /only runs against the real data\/social_posts\.csv/);
+          return true;
+        });
+      } finally {
+        fs.rmSync(temporaryDir, { recursive: true, force: true });
+      }
+    });
+
+    it('rejects an unrecognized flag instead of silently treating it as an input path', () => {
+      assert.throws(() => execFileSync(process.execPath, [scriptPath, '--help'], {
+        cwd: root,
+        encoding: 'utf8',
+        stdio: 'pipe',
+      }), (error) => {
+        assert.match(error.stderr, /unknown flag --help/);
+        return true;
+      });
+    });
   });
 });
