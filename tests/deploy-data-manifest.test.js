@@ -109,6 +109,10 @@ const KNOWN_NOT_DEPLOYED = new Map([
     'blind worker-facing projection of the same pilot manifest (id/objectType/url ' +
     'only, no stratum or reason), not referenced by any deployed page (built by ' +
     'scripts/select-preservation-sample.mjs)'],
+  ['data/link-check-state.json',
+    'workflow-internal traversal state for the scheduled external-link liveness ' +
+    'sweep (issue #710, .github/workflows/verify-external-links.yml); read and ' +
+    'written only by scripts/verify-links.js, not fetched by any deployed page'],
 ]);
 
 // A data file is "deployed" if it is listed individually or lives under a data/

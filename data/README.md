@@ -25,6 +25,7 @@ The metadata and derived data (entities, relationships) are licensed [CC BY 4.0]
 | `preservation-sample.json` | ~60 KB | Versioned 100-source manifest for the preservation pilot (issue #704); curator/reviewer eyes only |
 | `preservation-sample.md` | ~2 KB | Human-readable coverage summary for the same pilot sample; curator/reviewer eyes only |
 | `preservation-sample.sources.json` | ~10 KB | Blind worker-facing projection of the same sample: id, objectType, url only, no stratum or reason |
+| `link-check-state.json` | grows with the url corpus (roughly 1 MB per 3,000 urls checked; a full sweep of the whole corpus is several MB) | Workflow-internal traversal state for the scheduled external-link liveness sweep (issue #710) — the persisted rotating cursor and per-url revisit cadence in `scripts/lib/link-check-state.js`. Not read by the site; committed to main every week by `.github/workflows/verify-external-links.yml` so the next scheduled run knows what is already due. Written as compact JSON, not pretty-printed, to keep that weekly commit small. |
 
 ### Source CSVs (the source of truth)
 

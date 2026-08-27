@@ -36,8 +36,26 @@ describe('durable link-check progress across scheduled runs (#710)', () => {
     assert.match(workflow, /git push origin HEAD:main/);
   });
 
-  it('skips the commit when the sweep did not change the state file', () => {
+  it('stages the file before diffing, so an untracked state file is not mistaken for "no change"', () => {
+    // git diff --quiet against an untracked path always exits 0 ("no
+    // difference"), which is exactly the bug that left the fix inert: the
+    // guard must diff the STAGED state (after `git add`), not the working
+    // tree, so a brand-new tracked-for-the-first-time file is still seen as
+    // a change to commit.
     const workflow = fs.readFileSync(workflowUrl, 'utf8');
-    assert.match(workflow, /git diff --quiet -- data\/link-check-state\.json/);
+    const addIndex = workflow.indexOf('git add data/link-check-state.json');
+    const diffIndex = workflow.indexOf('git diff --cached --quiet -- data/link-check-state.json');
+    assert.notEqual(addIndex, -1, 'workflow must stage the state file');
+    assert.notEqual(diffIndex, -1, 'workflow must diff the STAGED (--cached) state, not the working tree');
+    assert.ok(addIndex < diffIndex, '`git add` must run before the `--cached` diff guard');
+  });
+
+  it('retries the push with a rebase instead of losing this run\'s cursor on a non-fast-forward rejection', () => {
+    // main can advance between checkout and push (another merge, another
+    // scheduled workflow); a bare `git push` with no retry throws away this
+    // run's advanced cursor and per-url cadence on a rejected push.
+    const workflow = fs.readFileSync(workflowUrl, 'utf8');
+    assert.match(workflow, /git fetch origin main/);
+    assert.match(workflow, /git rebase origin\/main/);
   });
 });

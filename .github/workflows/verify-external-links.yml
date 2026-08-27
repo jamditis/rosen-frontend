@@ -25,6 +25,7 @@ jobs:
       # workflows (submit-record.yml, submit-prototype.yml).
       - name: Mint GitHub App installation token
         id: app-token
+        continue-on-error: true
         uses: actions/create-github-app-token@v1
         with:
           app-id: ${{ secrets.ROSEN_GH_APP_ID }}
@@ -69,14 +70,40 @@ jobs:
         # for that (issue #710). Commit only when the sweep actually moved
         # something, so a run with nothing new to record does not spam main
         # with no-op commits.
+        #
+        # `git add` before diffing is required, not cosmetic: `git diff --quiet`
+        # against an UNTRACKED path always exits 0 ("no difference"), so on the
+        # very first run (before this file is committed at all) the old guard
+        # took the "nothing to commit" branch forever and the file never became
+        # tracked. Diffing --cached after staging catches both an untracked file
+        # and a modified tracked one.
+        #
+        # main can advance between this job's checkout and its push (another
+        # merge, another scheduled workflow), so a plain push can be rejected
+        # non-fast-forward. Retry a few times, rebasing onto the latest main
+        # each time, rather than losing this run's advanced cursor.
         run: |
-          if git diff --quiet -- data/link-check-state.json; then
+          git add data/link-check-state.json
+          if git diff --cached --quiet -- data/link-check-state.json; then
             echo "No change to data/link-check-state.json; nothing to commit."
-          else
-            git add data/link-check-state.json
-            git commit -m "chore: advance external-link check state"
-            git push origin HEAD:main
+            exit 0
           fi
+
+          git commit -m "chore: advance external-link check state"
+
+          attempts=5
+          for attempt in $(seq 1 "$attempts"); do
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            if [ "$attempt" -eq "$attempts" ]; then
+              echo "Could not push the advanced link-check state after $attempts attempts." >&2
+              exit 1
+            fi
+            echo "Push rejected (attempt $attempt/$attempts); rebasing onto the latest main and retrying."
+            git fetch origin main
+            git rebase origin/main
+          done
 
       - name: Upload link report
         if: always()
