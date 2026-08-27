@@ -13,12 +13,17 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import {
   DEFAULT_MIN_SCORE,
   DEFAULT_QUERY_K,
   MAX_QUERY_CHARS,
   QUERY_MODEL_ID,
   QUERY_PREFIX,
+  TRANSFORMERS_MODULE_URL,
   buildQueryText,
   rankQuery,
   registerSemanticSearchWorker,
@@ -49,6 +54,20 @@ function mixedQuery(weights) {
 
 test('pins the runtime model to the model that built the stored vectors', () => {
   assert.equal(QUERY_MODEL_ID, BUILDER_MODEL_ID);
+});
+
+test('runs the same transformers major the builder is pinned to', () => {
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+  const packageJson = JSON.parse(
+    fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'),
+  );
+  const buildRange = packageJson.devDependencies['@huggingface/transformers'];
+  const buildMajor = buildRange.match(/(\d+)/)[1];
+  assert.match(
+    TRANSFORMERS_MODULE_URL,
+    new RegExp(`^https://esm\\.sh/@huggingface/transformers@${buildMajor}\\.`),
+    'the runtime encoder and the build-time encoder must share a major version',
+  );
 });
 
 test('prefixes the query with the instruction bge prescribes for queries', () => {
