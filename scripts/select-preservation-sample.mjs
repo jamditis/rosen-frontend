@@ -88,6 +88,21 @@ const KNOWN_DIFFICULT_HOSTS = new Set(['archive.pressthink.org', 'newspapers.com
 // never the final destination.
 const KNOWN_REDIRECTOR_HOSTS = new Set(['tmblr.co', 'huffingtonpost.com', 'youtu.be']);
 
+// newspapers.com sits behind a subscription paywall (see the comment above).
+// Including it is deliberate -- acceptance criterion "no source requires
+// private credentials or access-control circumvention" is a rule for the
+// pilot worker's behavior, not a ban on ever sampling a gated host. The
+// worker must never log in, supply a session cookie, or otherwise pay for or
+// bypass access; hitting a paywall wall is the correct, expected, recorded
+// outcome for that source. This string is carried in the manifest itself so
+// the policy travels with the sample instead of living only in this comment.
+const CREDENTIAL_POLICY =
+  'The pilot worker must never supply login credentials, a paid subscription, a ' +
+  'session cookie, or any other access-control circumvention to fetch a source. ' +
+  'A paywalled, login-gated, or bot-walled response (for example, from a ' +
+  'newspapers.com clipping) is a valid, recorded failure for that source — not ' +
+  'a signal to authenticate or work around the wall.';
+
 const MEDIA_CONTENT_TYPES = new Set(['Video', 'Interview (Audio/Video)', 'Panel Discussion', 'Speech/Lecture']);
 const MEDIA_PLATFORM_FIELDS = new Set(['YouTube', 'Podcast', 'SoundCloud', 'Radio', 'Television']);
 
@@ -477,6 +492,7 @@ export function buildPreservationSample({
       ...(input || describeInput(rootDir, inputs.files)),
       census_schema_id: inputs.census?.schema?.id ?? null
     },
+    credential_policy: CREDENTIAL_POLICY,
     seed,
     sample_size: sampleSize,
     quotas: quotaReport,
@@ -518,7 +534,11 @@ export function formatPreservationSampleMarkdown(manifest) {
     `Input commit: \`${manifest.input.commit}\` (${manifest.input.dirty ? 'input files dirty' : 'input files clean'}), stewardship census \`${manifest.input.census_schema_id}\`.`,
     '',
     'This file is a human-readable summary. The versioned manifest is `preservation-sample.json`.',
-    'Only `sources` there is meant for the blind pilot worker -- `selection` (and the tables below) are for curator review.',
+    'Only `sources` there is meant for the blind pilot worker — `selection` (and the tables below) are for curator review.',
+    '',
+    '## Credential policy',
+    '',
+    manifest.credential_policy,
     '',
     '## Coverage',
     '',

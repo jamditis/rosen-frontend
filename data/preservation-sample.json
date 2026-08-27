@@ -26,6 +26,7 @@
     ],
     "census_schema_id": "stewardship-census/1.0.0"
   },
+  "credential_policy": "The pilot worker must never supply login credentials, a paid subscription, a session cookie, or any other access-control circumvention to fetch a source. A paywalled, login-gated, or bot-walled response (for example, from a newspapers.com clipping) is a valid, recorded failure for that source — not a signal to authenticate or work around the wall.",
   "seed": "rosen-preservation-pilot-v1",
   "sample_size": 100,
   "quotas": [

@@ -264,10 +264,29 @@ describe('preservation sample selection (real corpus, default quotas)', () => {
     }
   });
 
-  it('requires no private credentials: every non-null source URL is a plain http(s) address', () => {
+  it('requires no private credentials: URLs carry no embedded auth, and any paywalled host is covered by a stated no-credential policy', () => {
     for (const item of manifest.sources) {
       if (item.url === null) continue;
-      assert.match(item.url, /^https?:\/\//);
+      assert.match(item.url, /^https?:\/\//, `${item.id} url must be a plain http(s) address`);
+      const parsed = new URL(item.url);
+      assert.equal(parsed.username, '', `${item.id} url must not embed a username`);
+      assert.equal(parsed.password, '', `${item.id} url must not embed a password`);
+      assert.ok(
+        !/[?&](?:api[_-]?key|token|auth|session|passwd?|password)=/i.test(item.url),
+        `${item.id} url must not carry an embedded credential/token query parameter`
+      );
+    }
+
+    // A source can still sit behind a login/paywall (e.g. newspapers.com, see
+    // KNOWN_DIFFICULT_HOSTS) -- the acceptance criterion is about what the
+    // pilot worker is allowed to do, not about which hosts may appear. So
+    // whenever a known-difficult host is present, the manifest must carry the
+    // policy telling the worker a paywall response is a recorded failure, not
+    // a reason to authenticate.
+    const hasKnownDifficultHost = manifest.selection.some(s => s.url_status === 'known_difficult');
+    if (hasKnownDifficultHost) {
+      assert.equal(typeof manifest.credential_policy, 'string');
+      assert.match(manifest.credential_policy, /never supply|credential/i);
     }
   });
 });

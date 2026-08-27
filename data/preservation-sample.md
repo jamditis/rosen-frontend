@@ -5,7 +5,11 @@ Schema `preservation-sample/1.0.0`. Seed `rosen-preservation-pilot-v1`. Sample s
 Input commit: `abfd3f754762c7f78054b9bd1df24e5f13b2de69` (input files clean), stewardship census `stewardship-census/1.0.0`.
 
 This file is a human-readable summary. The versioned manifest is `preservation-sample.json`.
-Only `sources` there is meant for the blind pilot worker -- `selection` (and the tables below) are for curator review.
+Only `sources` there is meant for the blind pilot worker — `selection` (and the tables below) are for curator review.
+
+## Credential policy
+
+The pilot worker must never supply login credentials, a paid subscription, a session cookie, or any other access-control circumvention to fetch a source. A paywalled, login-gated, or bot-walled response (for example, from a newspapers.com clipping) is a valid, recorded failure for that source — not a signal to authenticate or work around the wall.
 
 ## Coverage
 
