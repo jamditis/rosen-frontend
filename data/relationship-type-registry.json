@@ -522,8 +522,8 @@
       "evidenceStandard": "pipeline-default",
       "endpointEnforcement": "deferred",
       "endpointDivergence": {
-        "violatingRows": 250,
-        "totalRows": 533,
+        "violatingRows": 238,
+        "totalRows": 538,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00005_REL_002",
@@ -532,7 +532,7 @@
           "RECORD-00039_REL_007",
           "RECORD-00047_REL_001"
         ],
-        "note": "250 of 533 current Published In rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Published In is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+        "note": "238 of 538 current Published In rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Published In is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes. This count dropped from 251 on 2026-08-27 when PressThink's duplicate Work-typed entity W0666 was merged into the Organization-typed O0033 (issue #859): 13 Published In rows that had PressThink as a Work-typed endpoint became endpoint-compliant once PressThink resolved to an Organization."
       },
       "directionalContradictions": {
         "pairCount": 8,
@@ -759,8 +759,8 @@
       "inverseNote": "The candidate inverse label \"Owned By\" is recorded as candidateInverseType so the validator can detect when the same fact is asserted under both labels, but it is not a formal inverseType: Owned By's own endpoint ordering is inconsistent (see the Owned By entry below), so which row (if either) is correct is a pending curator decision, not something this registry asserts.",
       "endpointEnforcement": "deferred",
       "endpointDivergence": {
-        "violatingRows": 16,
-        "totalRows": 64,
+        "violatingRows": 15,
+        "totalRows": 66,
         "asOfDate": "2026-08-27",
         "exampleRelationshipIds": [
           "RECORD-00535_REL_004",
@@ -769,7 +769,7 @@
           "RECORD-00690_REL_001",
           "RECORD-00741_REL_011"
         ],
-        "note": "16 of 64 current Owns rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Owns is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes."
+        "note": "15 of 66 current Owns rows have a source or target entity type outside this type's schema-declared allowlist (many are simply the reverse of a schema-compliant assertion). Cleaning up this backlog is a curator decision, so endpoint-type enforcement for Owns is deferred until it is resolved (issue #737); the validator does not fail on these rows today. New rows should still follow the declared allowedSourceTypes/allowedTargetTypes. This count dropped from 17 on 2026-08-27 when PressThink's duplicate Work-typed entity W0666 was merged into the Organization-typed O0033 (issue #859): 2 Owns rows that had PressThink as a Work-typed endpoint became endpoint-compliant once PressThink resolved to an Organization."
       },
       "candidateInverseType": "Owned By"
     },
