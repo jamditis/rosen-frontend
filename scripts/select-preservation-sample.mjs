@@ -153,13 +153,12 @@ export function inspectPreservationSampleInputGitState({ rootDir = ROOT_DIR, fil
 
 function describeInput(rootDir, files) {
   const state = inspectPreservationSampleInputGitState({ rootDir, files });
-  // A shallow-marked clone is only a real problem when it actually prevented
-  // finding the commit that last touched these input files (an empty `commit`
-  // from `git log -1 -- <paths>`). Some worktrees report `--is-shallow-repository`
-  // as true (e.g. a stale/empty `.git/shallow` marker) while still holding
-  // complete history for every tracked path, so refusing on the flag alone
-  // would reject a perfectly good, fully-traceable run.
-  if (state.shallow && !state.commit) {
+  // Refuse on the shallow flag alone, matching build-stewardship-census.mjs.
+  // A shallow clone's boundary commit is grafted parentless, so `git log -1 --
+  // <paths>` still resolves a commit even though the history behind it is
+  // truncated -- checking for an empty `commit` here would never catch a real
+  // shallow clone, only defeating the guard it exists to enforce.
+  if (state.shallow) {
     throw new Error(
       'Preservation sample input provenance requires complete Git history. Fetch with --unshallow or clone with full history.'
     );
