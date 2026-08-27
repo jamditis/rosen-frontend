@@ -285,6 +285,11 @@ async function startServer() {
 const missingModules = new Set();
 
 let moduleCache = null;
+// Image URLs the mirror could not reach. They are not missing modules: the
+// mirror already decided they are optional, because each one lands in a box the
+// page sizes itself. Keeping them separate is what lets the audit fail their
+// requests fast without failing the run.
+let unmirroredAssets = new Set();
 
 async function loadModuleCache() {
   if (moduleCache) return moduleCache;
@@ -294,12 +299,22 @@ async function loadModuleCache() {
       + 'Run `node scripts/mirror-audit-modules.js` first.',
     );
   }
-  const { entries } = JSON.parse(await readFile(MODULE_CACHE_INDEX, 'utf8'));
+  const { entries, unmirrored } = JSON.parse(await readFile(MODULE_CACHE_INDEX, 'utf8'));
   moduleCache = new Map();
   for (const [url, entry] of Object.entries(entries)) {
     moduleCache.set(url, { ...entry, path: resolve(MODULE_CACHE_DIR, entry.file) });
   }
+  unmirroredAssets = new Set(
+    (Array.isArray(unmirrored) ? unmirrored : []).map((entry) => entry?.url).filter(Boolean),
+  );
   console.log(`Module cache: ${moduleCache.size} mirrored responses from ${MODULE_CACHE_DIR}`);
+  if (unmirroredAssets.size > 0) {
+    console.warn(
+      `Module cache: ${unmirroredAssets.size} image URL(s) the mirror could not reach. `
+      + 'Their requests fail immediately instead of waiting on the same host:',
+    );
+    for (const url of unmirroredAssets) console.warn(`  ${url}`);
+  }
   return moduleCache;
 }
 
@@ -310,10 +325,20 @@ async function loadModuleCache() {
 async function applyModuleCache(context) {
   const bodies = await loadModuleCache();
   const lookup = (url) => cacheLookupKeys(url).map((key) => bodies.get(key)).find(Boolean) || null;
-  const isMirrored = (url) => isMirroredHost(url.host) || Boolean(lookup(url.toString()));
+  const isMirrored = (url) => isMirroredHost(url.host)
+    || unmirroredAssets.has(url.toString())
+    || Boolean(lookup(url.toString()));
   await context.route(isMirrored, async (route, request) => {
     const cached = lookup(request.url());
     if (!cached) {
+      // The mirror already proved it could not reach this image. Fail the
+      // request now rather than letting the page wait on the same host: that
+      // wait is what would move the measurement, and the box the image sits in
+      // is sized by the page whether or not the bytes arrive.
+      if (unmirroredAssets.has(request.url())) {
+        await route.abort();
+        return;
+      }
       missingModules.add(request.url());
       await route.abort();
       return;
@@ -381,8 +406,18 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
   );
   const assertFocused = async (locator, label) => {
     await locator.waitFor();
-    await page.waitForTimeout(100);
-    if (!await locator.evaluate((element) => document.activeElement === element)) {
+    // An element can mount a frame or more before focus reaches it: the lazy
+    // desktop shell loads its chunk, places its windows, and only then moves
+    // focus. Settle and re-read a bounded number of times, the way the
+    // nested-report check below already does -- reading once on a fixed delay
+    // catches the intermediate state and fails a working page on a loaded
+    // machine. Focus that never lands still fails, one second later.
+    let focused = false;
+    for (let attempt = 0; attempt < 10 && !focused; attempt += 1) {
+      await page.waitForTimeout(100);
+      focused = await locator.evaluate((element) => document.activeElement === element);
+    }
+    if (!focused) {
       throw new Error(`${label} did not own focus`);
     }
   };
@@ -1787,6 +1822,14 @@ async function auditOne(page, route, viewport, setApplicationNetworkCapture = ()
       await page.keyboard.press('Enter');
       const startMenu = page.getByRole('menu', { name: 'Archive desktop Start menu' });
       await startMenu.waitFor();
+      // The menu moves focus to its first item once it mounts. A navigation key
+      // pressed before that lands goes to the menu container, where nothing
+      // consumes it, and the End below is simply lost. Wait for focus first,
+      // the way the Start menu route does.
+      await assertFocused(
+        startMenu.getByRole('menuitem').first(),
+        'First Start item at 200%-zoom equivalent',
+      );
       await page.keyboard.press('End');
       const standardExit = startMenu.getByRole('menuitem', { name: /^Standard archive/ });
       await assertFocused(standardExit, 'Last Start item at 200%-zoom equivalent');

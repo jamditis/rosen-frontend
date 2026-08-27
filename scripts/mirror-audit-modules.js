@@ -71,6 +71,82 @@ export const EXTRA_ASSET_SEEDS = [
 const CHROME_UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) '
   + 'Chrome/140.0.0.0 Safari/537.36';
 
+// A CI runner reaches every one of these hosts over the public internet. Node's
+// fetch has no timeout and no retry of its own, so one dropped connection threw
+// `TypeError: fetch failed` -- a message that names neither the URL nor the
+// reason -- and took the whole layout-shift gate down before it measured
+// anything (#852).
+const FETCH_TIMEOUT_MS = 20000;
+const FETCH_ATTEMPTS = 3;
+const RETRY_BASE_DELAY_MS = 500;
+
+// Statuses worth another attempt. A 404 or a 403 says the same thing every
+// time, so retrying one only slows the failure down.
+export function isRetryableStatus(status) {
+  return status === 408 || status === 425 || status === 429 || status >= 500;
+}
+
+// `TypeError: fetch failed` keeps the real reason in err.cause. Walk the chain
+// so the log names what actually went wrong instead of that one flat string.
+export function describeFetchFailure(err) {
+  const parts = [];
+  for (let current = err; current; current = current.cause) {
+    const text = current.code ? `${current.code} ${current.message}` : current.message;
+    if (text && !parts.includes(text)) parts.push(text);
+  }
+  return parts.join(': ') || 'unknown error';
+}
+
+// Which failures are fatal.
+//
+// MIRRORED_HOSTS carry the app's modules, stylesheets, and web fonts. A page
+// that never received them is not the page the budgets describe -- the FAQ
+// exception exists because a display-font swap reflows a section -- so a miss
+// there has to stop the run, and the audit fails on one too.
+//
+// The image seeds are the other case. Every one of them is drawn into a box the
+// page has already sized: `.about-image` and `.scholar-headshot` fix 150px and
+// 72px in dissertation/index.html, the participate portrait carries width and
+// height attributes, and the featured-work images fill a grid cell at width and
+// height 100%. Whether those bytes arrive changes what the page looks like, not
+// how it is laid out, so one slow image host must not delete a whole run's
+// measurements.
+export function isRequiredMirror(url) {
+  return MIRRORED_HOSTS.has(new URL(url).host);
+}
+
+const sleep = (ms) => new Promise((done) => { setTimeout(done, ms); });
+
+// One URL, with a per-attempt timeout and backoff between attempts. Throws with
+// the URL and the underlying reason once the attempts are spent.
+async function fetchMirrored(url) {
+  let failure = 'unknown error';
+  let attempts = 0;
+  for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt += 1) {
+    attempts = attempt;
+    let response;
+    try {
+      response = await fetch(url, {
+        headers: { 'user-agent': CHROME_UA },
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      });
+    } catch (err) {
+      // DNS, TLS, a reset connection, or the per-attempt timeout. Every one of
+      // those is worth another try.
+      failure = describeFetchFailure(err);
+      if (attempt === FETCH_ATTEMPTS) break;
+      await sleep(RETRY_BASE_DELAY_MS * 2 ** (attempt - 1));
+      continue;
+    }
+    if (response.ok) return response;
+    failure = `HTTP ${response.status}${response.statusText ? ` ${response.statusText}` : ''}`;
+    await response.body?.cancel().catch(() => {});
+    if (!isRetryableStatus(response.status) || attempt === FETCH_ATTEMPTS) break;
+    await sleep(RETRY_BASE_DELAY_MS * 2 ** (attempt - 1));
+  }
+  throw new Error(`${url}: ${failure} (${attempts} attempt${attempts === 1 ? '' : 's'})`);
+}
+
 // Static seeds: every runtime URL the audited pages name in their markup.
 // Discovered imports extend this list while the crawl runs.
 const SEED_FILES = [
@@ -194,6 +270,7 @@ async function mirror() {
     throw new Error('No CDN URLs found to mirror. Check the seed file list.');
   }
   const index = {};
+  const unmirrored = [];
   const seen = new Set();
   let bytes = 0;
 
@@ -201,9 +278,18 @@ async function mirror() {
     const url = queue.shift();
     if (seen.has(url)) continue;
     seen.add(url);
-    const response = await fetch(url, { headers: { 'user-agent': CHROME_UA } });
-    if (!response.ok) {
-      throw new Error(`Mirror fetch failed: ${response.status} ${url}`);
+    let response;
+    try {
+      response = await fetchMirrored(url);
+    } catch (err) {
+      if (isRequiredMirror(url)) throw new Error(`Mirror fetch failed: ${err.message}`);
+      // An image host the mirror could not reach. Record it rather than
+      // aborting: the audit reads this list and fails the browser's request for
+      // the same URL immediately, so the run neither waits on a host that just
+      // proved slow nor pretends it mirrored something it did not.
+      unmirrored.push({ url, reason: err.message.slice(url.length + 2) });
+      console.warn(`  unmirrored  ${url}`);
+      continue;
     }
     const contentType = response.headers.get('content-type') || 'application/octet-stream';
     const buffer = Buffer.from(await response.arrayBuffer());
@@ -223,10 +309,21 @@ async function mirror() {
 
   await writeFile(
     MODULE_CACHE_INDEX,
-    `${JSON.stringify({ mirroredAt: new Date().toISOString(), entries: index }, null, 2)}\n`,
+    `${JSON.stringify({
+      mirroredAt: new Date().toISOString(),
+      entries: index,
+      unmirrored,
+    }, null, 2)}\n`,
   );
   console.log(`\nMirrored ${Object.keys(index).length} responses, ${(bytes / 1024).toFixed(0)} KB`);
   console.log(`Cache: ${MODULE_CACHE_DIR}`);
+  if (unmirrored.length > 0) {
+    console.warn(
+      `\n${unmirrored.length} image URL(s) could not be mirrored. The audit will fail their `
+      + 'requests fast, which is what the page already renders when the host is down:',
+    );
+    for (const { url, reason } of unmirrored) console.warn(`  ${url}\n    ${reason}`);
+  }
   console.log('Run the audit with PREVIEW_AUDIT_MODULE_CACHE=1 to use it.');
 }
 

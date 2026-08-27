@@ -14,8 +14,11 @@ import {
   EXTRA_ASSET_SEEDS,
   MIRRORED_HOSTS,
   cacheLookupKeys,
+  describeFetchFailure,
   findReferences,
   isMirroredHost,
+  isRequiredMirror,
+  isRetryableStatus,
   normalizeUrl,
 } from '../scripts/mirror-audit-modules.js';
 
@@ -101,5 +104,70 @@ describe('audit wiring', () => {
 
   it('writes the missing list where the mirror script reads it', () => {
     assert.match(auditSource, /resolve\(OUT_DIR_ROOT, 'missing-modules\.json'\)/);
+  });
+
+  it('fails an unreachable image fast instead of waiting on the same host', () => {
+    // The mirror records what it could not reach; the audit has to route those
+    // URLs itself, or the browser waits on the host that just timed out and the
+    // wait moves the measurement.
+    assert.match(auditSource, /unmirroredAssets\.has\(url\.toString\(\)\)/);
+    assert.match(auditSource, /if \(unmirroredAssets\.has\(request\.url\(\)\)\) \{/);
+  });
+});
+
+// A transient network failure on one third-party host used to abort the mirror
+// before the audit measured anything, and the log said only "fetch failed"
+// (#852). Retries fix the transient case; the required/optional split keeps a
+// permanently unreachable image host from deleting the whole gate.
+describe('mirror resilience', () => {
+  it('retries the statuses that can change and gives up on the ones that cannot', () => {
+    for (const status of [408, 425, 429, 500, 502, 503, 504]) {
+      assert.equal(isRetryableStatus(status), true, `${status} should be retried`);
+    }
+    for (const status of [400, 401, 403, 404, 410]) {
+      assert.equal(isRetryableStatus(status), false, `${status} should not be retried`);
+    }
+  });
+
+  it('names the underlying reason instead of a bare fetch failure', () => {
+    const cause = Object.assign(new Error('connect ETIMEDOUT 1.2.3.4:443'), { code: 'ETIMEDOUT' });
+    const err = Object.assign(new TypeError('fetch failed'), { cause });
+    const described = describeFetchFailure(err);
+    assert.match(described, /fetch failed/);
+    assert.match(described, /ETIMEDOUT/);
+  });
+
+  it('survives an error with no message and no cause', () => {
+    assert.equal(describeFetchFailure(new Error('')), 'unknown error');
+  });
+
+  it('treats runtime code, stylesheets, and fonts as required', () => {
+    for (const url of [
+      'https://esm.sh/react@18.2.0',
+      'https://fonts.googleapis.com/css2?family=Special+Elite',
+      'https://fonts.gstatic.com/s/robotomono/v31/x.woff2',
+      'https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js',
+    ]) {
+      assert.equal(isRequiredMirror(url), true, `${url} must fail the mirror when unreachable`);
+    }
+  });
+
+  it('treats the one-off images as optional, because the page sizes their boxes', () => {
+    for (const url of EXTRA_ASSET_SEEDS) {
+      assert.equal(isRequiredMirror(url), false, `${url} must not be able to abort the gate`);
+    }
+    assert.equal(isRequiredMirror('https://images.unsplash.com/photo-1?w=800'), false);
+  });
+
+  it('keeps every mirrored host on the required side of the split', () => {
+    // The two sets have to stay in step: a host added to MIRRORED_HOSTS serves
+    // code or fonts, and dropping it to optional would let a page be measured
+    // without the modules the budgets describe.
+    for (const host of MIRRORED_HOSTS) {
+      assert.equal(isRequiredMirror(`https://${host}/thing`), true, `${host} must be required`);
+    }
+    for (const host of ASSET_HOSTS) {
+      assert.equal(isRequiredMirror(`https://${host}/thing.jpg`), false, `${host} must be optional`);
+    }
   });
 });
