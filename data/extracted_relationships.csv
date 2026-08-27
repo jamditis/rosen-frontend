@@ -11214,3 +11214,14 @@ RECORD-00909_REL_007,RECORD-00909,O1762,Journal Register Company,Mentions,P0010,
 RECORD-00909_REL_008,RECORD-00909,O1762,Journal Register Company,Mentions,P0931,Emily Bell,The YouTube description says Paton’s advisory team included Emily Bell.,0.95,2026-07-24
 TWTR-17930_REL_001,TWTR-17930,P2012,Murdoch,Created,C0133,resentment news,Rosen calls resentment news Murdoch's signature product.,0.8,2026-07-06
 TWTR-07504_REL_001,TWTR-07504,O2247,The New York Times politics desk,Covers,P2353,Jared Kushner,Post says Rosen reserves highest skepticism for Times reporting about Kushner.,0.8,2026-07-06
+RECORD-00918_REL_001,RECORD-00918,P0630,Eason Jordan,Occurred At,O0423,World Economic Forum,"Speaking at a panel session on democracy and the media at the annual meeting of the World Economic Forum, Mr. Jordan startled his audience",0.9,2026-08-27
+RECORD-00918_REL_002,RECORD-00918,P0406,Hugh Hewitt,Discusses,P0630,Eason Jordan,"Hugh Hewitt, who has broadcast the Jordan story on several platforms",0.9,2026-08-27
+RECORD-00918_REL_003,RECORD-00918,P0638,Steve Lovelady,Discusses,P0406,Hugh Hewitt,"criticism of one of its leaders, Hugh Hewitt, who has",0.9,2026-08-27
+RECORD-00918_REL_004,RECORD-00918,P0635,Bret Stephens,Affiliated With,O1344,Wall Street Journal,"The Wall Street Journal’s Bret Stephens, who covered the panel for his paper",1.0,2026-08-27
+RECORD-00918_REL_005,RECORD-00918,P0634,Rony Abovitz,Discusses,P0630,Eason Jordan,Do US Troops Target Journalists in Iraq?,0.8,2026-08-27
+RECORD-00918_REL_006,RECORD-00918,P2094,Rony Albovitz,Affiliated With,O0423,World Economic Forum,"the eyewitness account by Rony Albovitz, Jan. 28 at the World Economic Forum’s blog",0.9,2026-08-27
+RECORD-00918_REL_007,RECORD-00918,P0952,Robert Cox,Discusses,P0634,Rony Abovitz,"As Robert Cox put it, “this is a truly blogger-driven story since the original reporting was on the official WEF blog.”",0.9,2026-08-27
+RECORD-00918_REL_008,RECORD-00918,P1098,Dan Kennedy,Discusses,P0630,Eason Jordan,Dan Kennedy of the Boston Phoenix asks at his Media Log,0.9,2026-08-27
+RECORD-00918_REL_009,RECORD-00918,P0663,Michelle Malkin,Mentions,P0635,Bret Stephens,Michelle Malkin on the Stephens piece,0.8,2026-08-27
+RECORD-00918_REL_010,RECORD-00918,P0664,LaShawn Barber,Mentions,P0635,Bret Stephens,"LaShawn Barber posted about it, and one of her readers sent it in",0.8,2026-08-27
+RECORD-00918_REL_011,RECORD-00918,P2092,Danny Schechter,Affiliated With,O0015,CNN,"Schechter, a former producer at both CNN and ABC",0.9,2026-08-27

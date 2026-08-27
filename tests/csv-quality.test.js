@@ -2643,7 +2643,7 @@ describe('extracted_entities.csv', () => {
       ['P1015', { recordId: 'RECORD-00101', phrase: 'Matthew Yglesisas' }],
       ['P1213', { recordId: 'RECORD-00115', phrase: 'Salaam Pax' }],
       ['P2012', { recordId: 'RECORD-00138', phrase: 'Rupert Murdoch' }],
-      ['P2094', { recordId: 'RECORD-00170', phrase: 'Rony Albovitz' }],
+      ['P2094', { recordId: 'RECORD-00918', phrase: 'Rony Albovitz' }],
     ]);
     const entitiesById = new Map(entities.map(entity => [entity.entity_id, entity]));
     const recordsById = new Map(archiveRecords.map(record => [record.id, record]));

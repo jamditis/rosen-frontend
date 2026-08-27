@@ -1109,7 +1109,6 @@ def test_the_checked_in_report_keeps_the_known_false_matches_out_of_present():
     report = json.loads(CHECKED_IN_REPORT.read_text(encoding="utf-8"))
     false_matches = {
         "archive.pressthink.org/2005/01/26/brkm_own",
-        "archive.pressthink.org/2005/02/10/jrd_qust",
     }
     graded = {
         res["canonical_url"]: res["status"]
@@ -1118,6 +1117,23 @@ def test_the_checked_in_report_keeps_the_known_false_matches_out_of_present():
     }
     assert set(graded) == false_matches
     assert "present" not in graded.values()
+
+
+def test_the_checked_in_report_resolves_the_jrd_qust_row_split_issue_863():
+    # jrd_qust used to lose the one-row-one-work guard to RECORD-00429, which
+    # stored the samb_esn URL alongside jrd_qust's title and date. Splitting
+    # the row (issue #863) gave jrd_qust its own record, RECORD-00918, so both
+    # sources now confirm it present instead of sending it to review.
+    report = json.loads(CHECKED_IN_REPORT.read_text(encoding="utf-8"))
+    assert report["conflicting_claims"] == []
+    jrd_qust_results = [
+        res
+        for res in report["results"]
+        if res["canonical_url"] == "archive.pressthink.org/2005/02/10/jrd_qust"
+    ]
+    assert jrd_qust_results, "jrd_qust must still appear in the report"
+    assert all(res["status"] == "present" for res in jrd_qust_results)
+    assert all(res["matched_id"] == "RECORD-00918" for res in jrd_qust_results)
 
 
 def test_checked_in_fixture_inventory_matches_the_documented_shape():

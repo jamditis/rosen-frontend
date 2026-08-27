@@ -23,8 +23,8 @@
     }
   ],
   "archive": {
-    "rows_indexed": 1783,
-    "rows_in_window": 452,
+    "rows_indexed": 1784,
+    "rows_in_window": 453,
     "ambiguous_fingerprints": 31
   },
   "candidates_considered": 684,
@@ -66,26 +66,12 @@
       }
     }
   },
-  "conflicting_claims": [
-    {
-      "record_id": "RECORD-00429",
-      "kept": {
-        "canonical_url": "archive.pressthink.org/2005/02/07/samb_esn",
-        "tier": "exact_url"
-      },
-      "sent_to_review": [
-        {
-          "canonical_url": "archive.pressthink.org/2005/02/10/jrd_qust",
-          "tier": "title_strong"
-        }
-      ]
-    }
-  ],
+  "conflicting_claims": [],
   "distinct_works": {
     "count": 342,
     "totals": {
-      "present": 338,
-      "needs_review": 2,
+      "present": 339,
+      "needs_review": 1,
       "missing": 2
     },
     "by_year": {
@@ -93,8 +79,8 @@
         "present": 132
       },
       "2005": {
-        "present": 94,
-        "needs_review": 2,
+        "present": 95,
+        "needs_review": 1,
         "missing": 1
       },
       "2006": {
@@ -144,37 +130,27 @@
         "evidence": "https://web.archive.org/web/20100924162458/http://archive.pressthink.org/2005/01/",
         "matched_id": "RECORD-00200",
         "note": "weak title overlap on the same publication date; RECORD-00200 is already claimed by archive.pressthink.org/2005/01/26/bkm_iii on the exact_url tier"
-      },
-      {
-        "date": "2005-02-10",
-        "title": "Blog Storm Troopers or Pack Journalism at its Best?",
-        "url": "http://archive.pressthink.org/2005/02/10/jrd_qust.html",
-        "canonical_url": "archive.pressthink.org/2005/02/10/jrd_qust",
-        "source_id": "wayback-monthly-index",
-        "evidence": "https://web.archive.org/web/20100924162749/http://archive.pressthink.org/2005/02/",
-        "matched_id": "RECORD-00429",
-        "note": "RECORD-00429 is already claimed by archive.pressthink.org/2005/02/07/samb_esn on the exact_url tier; one archive row cannot hold two works, so a curator decides which work this row holds"
       }
     ]
   },
   "totals": {
-    "present": 676,
-    "needs_review": 2,
-    "missing": 6
+    "present": 678,
+    "needs_review": 1,
+    "missing": 5
   },
   "tier_counts": {
-    "exact_url": 676,
-    "missing": 6,
-    "review": 2
+    "exact_url": 678,
+    "missing": 5,
+    "review": 1
   },
   "by_year": {
     "2004": {
       "present": 264
     },
     "2005": {
-      "present": 188,
-      "needs_review": 2,
-      "missing": 4
+      "present": 190,
+      "needs_review": 1,
+      "missing": 3
     },
     "2006": {
       "present": 92,
@@ -189,12 +165,12 @@
   },
   "by_source": {
     "wayback-cdx": {
-      "present": 338,
-      "missing": 4
+      "present": 339,
+      "missing": 3
     },
     "wayback-monthly-index": {
-      "present": 338,
-      "needs_review": 2,
+      "present": 339,
+      "needs_review": 1,
       "missing": 2
     }
   },
@@ -204,8 +180,8 @@
         "present": 132
       },
       "2005": {
-        "present": 94,
-        "missing": 3
+        "present": 95,
+        "missing": 2
       },
       "2006": {
         "present": 46,
@@ -223,8 +199,8 @@
         "present": 132
       },
       "2005": {
-        "present": 94,
-        "needs_review": 2,
+        "present": 95,
+        "needs_review": 1,
         "missing": 1
       },
       "2006": {
@@ -4839,7 +4815,7 @@
       "source_id": "wayback-cdx",
       "evidence": "https://web.archive.org/web/20101119123103/http://archive.pressthink.org/2005/02/07/samb_esn.html",
       "matched_id": "RECORD-00429",
-      "matched_title": "Blog Storm Troopers or Pack Journalism at its Best?",
+      "matched_title": "Richard Sambrook of the BBC: What Eason Jordan Said in Davos",
       "score": 1.0,
       "note": "",
       "tier": "exact_url",
@@ -4854,7 +4830,7 @@
       "source_id": "wayback-monthly-index",
       "evidence": "https://web.archive.org/web/20100924162749/http://archive.pressthink.org/2005/02/",
       "matched_id": "RECORD-00429",
-      "matched_title": "Blog Storm Troopers or Pack Journalism at its Best?",
+      "matched_title": "Richard Sambrook of the BBC: What Eason Jordan Said in Davos",
       "score": 1.0,
       "note": "",
       "tier": "exact_url",
@@ -4868,12 +4844,12 @@
       "title": null,
       "source_id": "wayback-cdx",
       "evidence": "https://web.archive.org/web/20101119123059/http://archive.pressthink.org/2005/02/10/jrd_qust.html",
-      "matched_id": null,
-      "matched_title": null,
-      "score": null,
-      "note": "this source supplies no title or body, so only the url tier could run",
-      "tier": "missing",
-      "status": "missing"
+      "matched_id": "RECORD-00918",
+      "matched_title": "Blog Storm Troopers or Pack Journalism at its Best?",
+      "score": 1.0,
+      "note": "",
+      "tier": "exact_url",
+      "status": "present"
     },
     {
       "url": "http://archive.pressthink.org/2005/02/10/jrd_qust.html",
@@ -4883,12 +4859,12 @@
       "title": "Blog Storm Troopers or Pack Journalism at its Best?",
       "source_id": "wayback-monthly-index",
       "evidence": "https://web.archive.org/web/20100924162749/http://archive.pressthink.org/2005/02/",
-      "matched_id": "RECORD-00429",
+      "matched_id": "RECORD-00918",
       "matched_title": "Blog Storm Troopers or Pack Journalism at its Best?",
       "score": 1.0,
-      "note": "RECORD-00429 is already claimed by archive.pressthink.org/2005/02/07/samb_esn on the exact_url tier; one archive row cannot hold two works, so a curator decides which work this row holds",
-      "tier": "review",
-      "status": "needs_review"
+      "note": "",
+      "tier": "exact_url",
+      "status": "present"
     },
     {
       "url": "http://archive.pressthink.org/2005/02/11/esn_res.html",
