@@ -72,15 +72,32 @@ describe('fail-loud error panel is shared across record-backed routes (#369)', (
 
 describe('entity-index failures remain distinct from core-data failures', () => {
   it('returns a shaped failure that preserves record-modal fallback behavior', () => {
+    const failureHelper = sourceSection(
+      archiveServiceJs,
+      'const entityLoadFailure',
+      'const evictCachedData',
+      'entity load failure helper',
+    );
+    assert.match(
+      failureHelper,
+      /entities:\s*\[\],\s*recordEntityMap:\s*\{\},\s*error:\s*'The entity index could not load\./,
+    );
+
+    // fetchEntitiesData has two return paths that must fail the same way: a
+    // cache entry whose shape has drifted, and a fetch/parse error. Both
+    // must route through the one entityLoadFailure() source above instead of
+    // repeating the literal, or the untested copy is free to drift from the
+    // tested one (#503).
     const entityLoader = sourceSection(
       archiveServiceJs,
       'export const fetchEntitiesData',
       'export const areEntitiesLoaded',
       'entity data loader',
     );
-    assert.match(
-      entityLoader,
-      /return \{\s*entities:\s*\[\],\s*recordEntityMap:\s*\{\},\s*error:\s*'The entity index could not load\./,
+    const failureCallCount = (entityLoader.match(/return entityLoadFailure\(\);/g) || []).length;
+    assert.equal(
+      failureCallCount, 2,
+      'both the cache-shape-drift branch and the network catch branch must return the shared failure shape'
     );
   });
 

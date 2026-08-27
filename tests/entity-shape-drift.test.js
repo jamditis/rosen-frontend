@@ -121,4 +121,60 @@ describe('fetchEntitiesData rejects a shape-drifted payload instead of masking i
     assert.equal(result.error, undefined);
     assert.deepEqual(result.entities, entities);
   });
+
+  it('evicts a version-matched cached payload that has drifted shape, and self-heals on the next call', async () => {
+    // Regression coverage for #503: every case above stubs storage with
+    // getItem returning null, so getCachedData always misses and only the
+    // network branch ever runs. None of them exercise the cache-hit
+    // validation branch that held the bug — a drifted-shape cached entry
+    // left entitiesLoading stuck true, wedging every later call behind a
+    // memoized failure without ever touching the network.
+    const { CACHE_VERSION } = await import('../frontend/services/cacheConfig.js');
+    const { DATA_CONFIG } = await import('../frontend/constants.js');
+    const { cacheKeyFor } = await import('../frontend/services/cacheConfig.js');
+
+    const cacheKey = cacheKeyFor(DATA_CONFIG.archive_entities);
+    const store = new Map();
+    store.set(cacheKey, JSON.stringify({
+      data: { entities: { oops: 'not an array' } },
+      timestamp: Date.now(),
+      version: CACHE_VERSION,
+    }));
+
+    globalThis.localStorage = {
+      getItem: (key) => (store.has(key) ? store.get(key) : null),
+      setItem: (key, value) => { store.set(key, value); },
+      removeItem: (key) => { store.delete(key); },
+      get length() { return store.size; },
+      key: (i) => Array.from(store.keys())[i] ?? null,
+    };
+    globalThis.sessionStorage = stubStorage();
+
+    let fetchCallCount = 0;
+    const realEntities = [{ id: 'E1', type: 'Person', name: 'Jay Rosen' }];
+    globalThis.fetch = async () => {
+      fetchCallCount += 1;
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ entities: realEntities, recordEntityMap: { 'R-1': ['E1'] } }),
+      };
+    };
+
+    const { fetchEntitiesData } = await freshService();
+
+    const first = await fetchEntitiesData();
+    assert.equal(
+      typeof first.error, 'string',
+      'a drifted (non-array) entities field in a cached entry must surface as a shaped error, not an empty success'
+    );
+    assert.deepEqual(first.entities, []);
+    assert.equal(fetchCallCount, 0, 'a cache hit must not touch the network');
+    assert.equal(store.has(cacheKey), false, 'the drifted cache entry must be evicted so it cannot be replayed');
+
+    const second = await fetchEntitiesData();
+    assert.equal(fetchCallCount, 1, 'a later call must reach the network instead of replaying the memoized failure');
+    assert.equal(second.error, undefined);
+    assert.deepEqual(second.entities, realEntities);
+  });
 });
