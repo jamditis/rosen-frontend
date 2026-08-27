@@ -203,7 +203,10 @@ match. If you change one, change the other the same way.
 
 1. Open `backend/schema.json`. Add a new entry under
    `taxonomy.thematic_categories`, with a `name` and a short `description`.
-   Follow the style of the entries already there.
+   Follow the style of the entries already there. Pick a name that reads as
+   clearly different from every existing one: a test blocks a new name that
+   is a near-duplicate of an existing category, such as a different case, an
+   `&` vs `and` swap, a singular/plural change, or very similar spelling.
 2. Open `ADDING-RECORDS.md` (this file). Add the same category name as a new
    bullet under "Thematic categories to use" in Step 2, anywhere in the list.
 3. Tag at least one record with the new category. Open
