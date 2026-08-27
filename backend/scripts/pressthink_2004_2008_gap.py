@@ -1317,12 +1317,16 @@ def render_markdown(report: dict, generated_on: str) -> str:
     )
     add("")
     missing_works = distinct.get("missing_works") or []
+    missing_count = len(missing_works)
+    missing_noun = "work" if missing_count == 1 else "works"
+    missing_verb = "has" if missing_count == 1 else "have"
     add(
-        f"**{len(missing_works)} works have no archive row at all.** They are "
-        "source preservation work (#697): capture the Wayback copy first, then "
-        "decide whether the work earns a record. Read the titles before "
-        "opening that work. Some of these are the site's own housekeeping "
-        "notices rather than essays, and a notice is not the same kind of loss."
+        f"**{missing_count} {missing_noun} {missing_verb} no archive row at "
+        "all.** They are source preservation work (#697): capture the "
+        "Wayback copy first, then decide whether the work earns a record. "
+        "Read the titles before opening that work. Some of these are the "
+        "site's own housekeeping notices rather than essays, and a notice is "
+        "not the same kind of loss."
     )
     add("")
     if not missing_works:
@@ -1338,11 +1342,14 @@ def render_markdown(report: dict, generated_on: str) -> str:
             )
     add("")
     review_works = distinct.get("needs_review_works") or []
+    review_count = len(review_works)
+    review_noun = "work" if review_count == 1 else "works"
+    review_verb = "has" if review_count == 1 else "have"
     add(
-        f"**{len(review_works)} works have a candidate archive row whose "
-        "identity is in doubt.** They are record quality work (#723): settle "
-        "what each row holds, fix the row, then re-run this report. Nothing "
-        "here needs recovery until the row is settled."
+        f"**{review_count} {review_noun} {review_verb} a candidate archive "
+        "row whose identity is in doubt.** They are record quality work "
+        "(#723): settle what each row holds, fix the row, then re-run this "
+        "report. Nothing here needs recovery until the row is settled."
     )
     add("")
     if not review_works:
