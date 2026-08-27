@@ -119,10 +119,15 @@ curator-authored contract — never from what the current data happens to
 contain, so the registry can't be widened just by leaving bad data in place.
 
 The validator uses the registry to reject a relationship whose endpoint
-entity types are not allowed for its type, and to reject a symmetric,
+entity types are not allowed for its type, to reject a self-referential edge
+under a type whose `allowSelfLinks` is `false`, and to reject a symmetric,
 inverse-labeled, or candidate-inverse-labeled type asserted redundantly in
 both directions (that would otherwise silently duplicate one edge under two
-labels).
+labels). `allowSelfLinks` is enforced only where the registry states it: a
+type absent from the registry, or one that leaves the field unset, is not
+self-link-constrained, the same as for endpoint types. No committed row is
+currently a self-link, so no grandfathering list exists for it; if one ever
+becomes necessary it belongs beside `duplicateEdgeExceptions`.
 
 Because every registered type sets `allowMultipleAssertions: true`, a
 (source, type, target) triple names a collection of edges — one per record

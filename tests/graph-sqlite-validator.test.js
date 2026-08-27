@@ -690,6 +690,67 @@ describe('relationship type registry enforcement (#737)', () => {
 
     await rejectsWith(fixture, 'symmetric', 'Mentions', 'REL-0000(1|3)');
   });
+
+  it('rejects a self-referential edge whose registry entry disallows self-links', async () => {
+    const fixture = validFixture();
+    fixture.policy.relationshipTypeRegistry = { 'Affiliated With': { allowSelfLinks: false } };
+    fixture.publishedRecords[0].relatedIds = ['P0001'];
+    fixture.recordEntityMap['RECORD-00001'] = ['P0001'];
+    fixture.relationships = [{
+      id: 'REL-00001',
+      sourceRecordId: 'RECORD-00001',
+      sourceEntityId: 'P0001',
+      sourceEntityName: 'Jay Rosen',
+      type: 'Affiliated With',
+      targetEntityId: 'P0001',
+      targetEntityName: 'Jay Rosen',
+      confidence: 0.9,
+    }];
+
+    await rejectsWith(fixture, 'REL-00001', 'Affiliated With', 'self');
+  });
+
+  it('allows a self-referential edge whose registry entry permits self-links', async () => {
+    const fixture = validFixture();
+    fixture.policy.relationshipTypeRegistry = { 'Affiliated With': { allowSelfLinks: true } };
+    fixture.publishedRecords[0].relatedIds = ['P0001'];
+    fixture.recordEntityMap['RECORD-00001'] = ['P0001'];
+    fixture.relationships = [{
+      id: 'REL-00001',
+      sourceRecordId: 'RECORD-00001',
+      sourceEntityId: 'P0001',
+      sourceEntityName: 'Jay Rosen',
+      type: 'Affiliated With',
+      targetEntityId: 'P0001',
+      targetEntityName: 'Jay Rosen',
+      confidence: 0.9,
+    }];
+
+    const summary = await validateGraphDataset(fixture);
+    assert.equal(summary.relationships, 1);
+  });
+
+  it('leaves a self-referential edge alone when its type has no registry entry', async () => {
+    // A type absent from the registry is not self-link-constrained here, the
+    // same way it is not endpoint-constrained: the registry is the only source
+    // of that policy, and silence in it is not a prohibition.
+    const fixture = validFixture();
+    fixture.publishedRecords[0].relatedIds = ['P0001'];
+    fixture.recordEntityMap['RECORD-00001'] = ['P0001'];
+    fixture.relationships = [{
+      id: 'REL-00001',
+      sourceRecordId: 'RECORD-00001',
+      sourceEntityId: 'P0001',
+      sourceEntityName: 'Jay Rosen',
+      type: 'Affiliated With',
+      targetEntityId: 'P0001',
+      targetEntityName: 'Jay Rosen',
+      confidence: 0.9,
+    }];
+
+    const summary = await validateGraphDataset(fixture);
+    assert.equal(summary.relationships, 1);
+  });
 });
 
 describe('committed relationship type registry (#737)', () => {

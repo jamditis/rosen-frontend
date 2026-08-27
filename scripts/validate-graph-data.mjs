@@ -588,7 +588,10 @@ function assertNoDuplicateSymmetricOrInverseEdges(
   }
 
   for (const edge of edges) {
-    if (edge.sourceEntityId === edge.targetEntityId) continue; // self-links are rejected separately
+    // A self-link has no reverse direction to duplicate, so it is not part of
+    // this analysis. Whether it is permitted at all is the registry's
+    // allowSelfLinks check, enforced where the endpoint types are.
+    if (edge.sourceEntityId === edge.targetEntityId) continue;
     const registryEntry = relationshipTypeRegistry[edge.relationshipType];
     if (!registryEntry) continue;
 
@@ -848,6 +851,21 @@ export async function validateGraphDataset(dataset) {
         if (endpointTypesEnforced && registryEntry.allowedTargetTypes && !registryEntry.allowedTargetTypes.includes(targetEntity.type)) {
           throw new GraphValidationError(
             `${id}: target entity type ${targetEntity.type} is not an allowed target type for ${relationshipType}`
+          );
+        }
+
+        // Self-link policy (issue #737). The registry records allowSelfLinks
+        // for every type and nothing read it, so an edge pointing an entity at
+        // itself passed validation under a type that forbids it -- "Jay Rosen
+        // interviewed Jay Rosen". Enforced only when the registry entry says
+        // so explicitly: a type absent from the registry, or one that leaves
+        // the field unset, is not self-link-constrained here, the same way it
+        // is not endpoint-constrained. No committed row is a self-link, so
+        // this needs no grandfathering list; if one is ever needed it belongs
+        // alongside duplicateEdgeExceptions in data/graph-validation-holds.json.
+        if (registryEntry?.allowSelfLinks === false && sourceEntityId === targetEntityId) {
+          throw new GraphValidationError(
+            `${id}: ${relationshipType} does not allow self-links, but source and target are both ${sourceEntityId}`
           );
         }
       }
