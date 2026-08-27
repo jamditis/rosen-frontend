@@ -65,7 +65,7 @@ Design doc only: `docs/plans/2026-05-24-pillar3-authoring-workflow-design.md`. Z
 
 ### 6. Tests — Complete (recently realigned)
 
-17 test files, ~4,048 lines. Frontend/data layer (8 core files: `csv-quality`, `data-integrity`, `data-pipeline`, `frontend-structure`, `process-record`, `thread-algorithm`, `thread-detection`, `version-consistency`) plus newer additions (`entity-index`, `http-cached-loader`, `fetch-error-handling`, `linkify`, `schema-no-bom`, `service-worker-cache`, `view-state`). Backend pytest realigned via PRs #249/#251/#252 after the May `src/` refactor; #250 gated credentialed + Selenium tests so CI skips cleanly.
+17 test files, ~4,048 lines. Frontend/data layer (8 core files: `csv-quality`, `data-integrity`, `data-pipeline`, `frontend-structure`, `process-record`, `thread-algorithm`, `thread-detection`, `version-consistency`) plus newer additions (`fetch-error-handling`, `linkify`, `schema-no-bom`, `service-worker-cache`, `view-state`). Backend pytest realigned via PRs #249/#251/#252 after the May `src/` refactor; #250 gated credentialed + Selenium tests so CI skips cleanly.
 
 **Coverage caveat:** `tests/version-consistency.test.js` enforces `index.html` + `frontend/**.js` ONLY. Dissertation pages, `archived/`, and `features/` subpages are NOT enforced on version bumps. Sweep them by hand. Tracked in the v3.3.0 session-state memory.
 

@@ -310,7 +310,7 @@ Environment switches:
 
 ## Testing
 
-Tests use Node.js built-in test runner (`node --test`). The suite under `tests/` covers data integrity, CSV quality, pipeline, thread algorithm/detection, frontend structure, view-state, route vocabulary, linkify, entity-index, service-worker cache, HTTP cached loader, fetch error handling, schema BOM, data-explorer security, version consistency, process-record, and the current design-system surfaces. Run `find tests -maxdepth 1 -name '*.test.js' -print | sort` for the current file inventory.
+Tests use Node.js built-in test runner (`node --test`). The suite under `tests/` covers data integrity, CSV quality, pipeline, thread algorithm/detection, frontend structure, view-state, route vocabulary, linkify, service-worker cache, fetch error handling, schema BOM, data-explorer security, version consistency, process-record, and the current design-system surfaces. Run `find tests -maxdepth 1 -name '*.test.js' -print | sort` for the current file inventory.
 
 ```bash
 npm test                   # Run the full suite
