@@ -30,6 +30,8 @@ The `docs/` directory holds the project's working documentation — history, pla
 - [`research/`](research/) — dated discovery and inventory writeups
 - [`bluesky-stewardship-pipeline.md`](bluesky-stewardship-pipeline.md) — the current source, preservation, processing, and escalation map for continuous archive stewardship
 - [`feature-audit/`](feature-audit/) — the June 2026 feature inventory, its two current catalog checks, test-pinned harnesses, and separated historical phase machinery
+- [`pressthink-recovery-index-2026-07-23.md`](pressthink-recovery-index-2026-07-23.md) — the 2009-onward PressThink recovery evidence index
+- [`pressthink-2004-2008-gap-2026-08-27.md`](pressthink-2004-2008-gap-2026-08-27.md) — the Movable Type era gap measurement, regenerated from the checked-in inventories in [`backend/inventories/`](../backend/inventories/README.md)
 - Top-level audit reports (data quality, entity extraction, launch validation) — point-in-time snapshots, dated in their filenames or headers
 
 ### Contributor reference
