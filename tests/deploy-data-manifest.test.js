@@ -102,6 +102,9 @@ const KNOWN_NOT_DEPLOYED = new Map([
   ['data/stewardship-census.json',
     'repository stewardship report, not referenced by any deployed page (built ' +
     'by scripts/build-stewardship-census.mjs)'],
+  ['data/preservation-sample.json',
+    'preservation pilot manifest for curator/reviewer and pilot-runner use, not ' +
+    'referenced by any deployed page (built by scripts/select-preservation-sample.mjs)'],
 ]);
 
 // A data file is "deployed" if it is listed individually or lives under a data/
