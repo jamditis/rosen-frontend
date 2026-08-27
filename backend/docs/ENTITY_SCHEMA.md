@@ -243,10 +243,10 @@ The system extracts 15 types of relationships between entities. Each relationshi
 
 ### 8. Originated By
 
-**Description:** Concept A was originated or coined by person B
+**Description:** Person A originated or coined concept B
 
 **Valid Patterns:**
-- Concept → Person
+- Person → Concept
 
 **Example:** "View from Nowhere" originated by Jay Rosen
 
@@ -729,9 +729,9 @@ Margaret Sullivan's work on media accountability.
     "confidence_score": 1.0
   },
   {
-    "source_entity_id": "C0001",
+    "source_entity_id": "P0001",
     "relationship_type": "Originated By",
-    "target_entity_id": "P0001",
+    "target_entity_id": "C0001",
     "context": "what he calls 'The Church of the Savvy'",
     "confidence_score": 1.0
   },
