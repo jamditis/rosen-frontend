@@ -23,6 +23,12 @@
  * still has evidence keeps its row and has its first mention moved to the
  * earliest record it genuinely appears in.
  *
+ * Dropping a record also dates the two curator-maintained graph policy files, so
+ * this refreshes both in the same pass: it prunes the relationship-type holds
+ * that name a dropped record, and recounts the #737 census the relationship-type
+ * registry records against the smaller table. See
+ * data/lib/graph-policy-refresh.js.
+ *
  * Editing strategy: rows the migration does not change are never re-serialized.
  * See data/lib/csv-record-surgery.js for why that matters -- these CSVs hold
  * bare-LF newlines inside CRLF records, and a full rewrite changes every row's
@@ -35,6 +41,13 @@
  *     node data/fixes/apply-2026-08-27-duplicate-adjudication.js
  *     node data/lib/embeddings-splice.js RECORD-00077 RECORD-00830 ...
  *     node data/export-archive-data.js
+ *     git add -A data && git commit
+ *     npm run census:stewardship
+ *
+ * The census reads the committed source and runtime data and refuses to run on a
+ * dirty tree, so it comes after the commit and its two reports go in a second
+ * commit. Those five steps reproduce the whole migration; nothing else is edited
+ * by hand.
  *
  * Usage: node data/fixes/apply-2026-08-27-duplicate-adjudication.js [--dry-run]
  * Re-runs are a no-op: with the records already gone there is nothing to edit.
@@ -49,6 +62,11 @@ import {
   serializeRecord,
   verifyEdit,
 } from '../lib/csv-record-surgery.js';
+import { unescapeRow } from '../lib/csv-unescape.js';
+import {
+  pruneRelationshipTypeHolds,
+  refreshRelationshipTypeCensus,
+} from '../lib/graph-policy-refresh.js';
 
 const DRY_RUN = process.argv.includes('--dry-run');
 const DATA_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -56,6 +74,10 @@ const DATA_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const RECORDS_PATH = path.join(DATA_DIR, 'archive_records-public.csv');
 const RELATIONSHIPS_PATH = path.join(DATA_DIR, 'extracted_relationships.csv');
 const ENTITIES_PATH = path.join(DATA_DIR, 'extracted_entities.csv');
+const HOLDS_PATH = path.join(DATA_DIR, 'graph-validation-holds.json');
+const REGISTRY_PATH = path.join(DATA_DIR, 'relationship-type-registry.json');
+// The date the curator ruled, stamped on every census figure this refreshes.
+const AS_OF_DATE = '2026-08-27';
 // Entities can be first mentioned in a tweet or a Bluesky post, so a first
 // mention only counts as dangling when it is in neither source file. Reading
 // the records alone would read every social first mention as dangling and move
@@ -149,11 +171,48 @@ function commit(filePath, file, result, failures) {
     return;
   }
   if (DRY_RUN) return;
-  // Same-directory temp file plus a rename, so an interrupted run never leaves
-  // a half-written CSV where the archive's only copy of the data used to be.
+  writeAtomically(filePath, result.text);
+}
+
+/**
+ * Write through a same-directory temp file and a rename, so an interrupted run
+ * never leaves a half-written file where the archive's only copy used to be.
+ */
+function writeAtomically(filePath, text) {
   const tmp = `${filePath}.tmp`;
-  writeFileSync(tmp, result.text, 'utf-8');
+  writeFileSync(tmp, text, 'utf-8');
   renameSync(tmp, filePath);
+}
+
+/**
+ * Bring the two graph policy files back in step with the smaller table.
+ *
+ * Both are read from disk and written back here rather than left to the curator,
+ * because the numbers in them are a count of the relationship rows and nothing
+ * else in the repo recounts them.
+ */
+function refreshGraphPolicy(relationshipRecords, entityRecords, failures) {
+  const holds = pruneRelationshipTypeHolds(readFileSync(HOLDS_PATH, 'utf-8'), DROP_IDS.keys());
+  for (const problem of holds.problems) failures.push(`graph-validation-holds.json: ${problem}`);
+  if (!holds.problems.length && holds.removed.length && !DRY_RUN) {
+    writeAtomically(HOLDS_PATH, holds.text);
+  }
+
+  const registry = JSON.parse(readFileSync(REGISTRY_PATH, 'utf-8'));
+  const census = refreshRelationshipTypeCensus(registry, {
+    // The census counts values, so it reads the rows the way the site does.
+    relationshipRows: relationshipRecords.map(unescapeRow),
+    entityRows: entityRecords.map(unescapeRow),
+    asOfDate: AS_OF_DATE,
+  });
+  for (const problem of census.problems) {
+    failures.push(`relationship-type-registry.json: ${problem}`);
+  }
+  if (!census.problems.length && census.changes.length && !DRY_RUN) {
+    writeAtomically(REGISTRY_PATH, `${JSON.stringify(census.registry, null, 2)}\n`);
+  }
+
+  return { holds, census };
 }
 
 function main() {
@@ -230,6 +289,10 @@ function main() {
   commit(RELATIONSHIPS_PATH, relationships, relationshipPlan, failures);
   commit(ENTITIES_PATH, entities, entityPlan, failures);
 
+  // Counted against the rows that survive, not the rows on disk, so a dry run
+  // reports the same census a real run would write.
+  const policy = refreshGraphPolicy(relationshipPlan.expected, entityPlan.expected, failures);
+
   console.log(`\nDuplicate adjudication migration${DRY_RUN ? ' (dry run)' : ''}`);
   if (alreadyDone) console.log('  the seven records are already gone; nothing to do');
   else if (missing.length) console.log(`  not in the CSV, skipped: ${missing.join(', ')}`);
@@ -238,6 +301,9 @@ function main() {
   console.log(`  relationships removed  : ${relationshipPlan.removed}`);
   console.log(`  entities removed       : ${entityPlan.removed}`);
   console.log(`  entity rows edited     : ${entityPlan.edited}`);
+  console.log(`  graph holds pruned     : ${policy.holds.removed.length}`);
+  console.log(`  registry counts redone : ${policy.census.changes.length}`);
+  for (const change of policy.census.changes) console.log(`    - ${change}`);
 
   if (failures.length) {
     console.error('\nAborted without writing: the edit did not verify.');

@@ -14,7 +14,7 @@
  * not change, only which ones are present.
  *
  * Used by the #867 duplicate migration (see
- * data/fixes/apply-2026-08-27-duplicate-adjudication.py) and by any later record
+ * data/fixes/apply-2026-08-27-duplicate-adjudication.js) and by any later record
  * removal. Run it after the source CSV is edited and before the exporter:
  *
  *     node data/lib/embeddings-splice.js RECORD-00830 RECORD-00846

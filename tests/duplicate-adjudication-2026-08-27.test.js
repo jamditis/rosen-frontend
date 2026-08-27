@@ -17,6 +17,33 @@ import { parse } from 'csv-parse/sync';
 const rootDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (relativePath) => fs.readFileSync(path.join(rootDir, relativePath));
 
+// Every committed file that names records one by one. The adjacency shards are
+// collected by pattern because a record's shard is chosen by a hash of its id,
+// so a hard-coded list would silently stop covering a renamed set.
+const ARTIFACTS_NAMING_RECORDS = [
+  'data/archive_records-public.csv',
+  'data/extracted_entities.csv',
+  'data/extracted_relationships.csv',
+  'data/archive-core.json',
+  'data/archive-details.json',
+  'data/archive-data.json',
+  'data/search-index.json',
+  'data/archive-entities.json',
+  'data/archive-embeddings.json',
+  'data/graph-validation-holds.json',
+  'data/relationship-type-registry.json',
+  'data/relationship-adjacency-manifest.json',
+  'data/stewardship-census.json',
+  ...fs
+    .readdirSync(path.join(rootDir, 'data'))
+    .filter((name) => /^relationship-adjacency-[^.]+\.json$/.test(name))
+    .map((name) => `data/${name}`),
+];
+
+// The reports that hold counts rather than ids. Sweeping them for a dropped id
+// would pass no matter how stale they were, so they are checked by their totals.
+const CURATED_RECORD_COUNT = 1029;
+
 // Each dropped record with the fuller capture that supersedes it.
 const DROPPED = new Map([
   ['RECORD-00077', 'RECORD-00747'],
@@ -30,19 +57,13 @@ const DROPPED = new Map([
 
 describe('2026-08-27 duplicate adjudication (#867)', () => {
   it('removes the seven duplicate ids from source and every derived artifact', () => {
-    for (const relativePath of [
-      'data/archive_records-public.csv',
-      'data/extracted_entities.csv',
-      'data/extracted_relationships.csv',
-      'data/archive-core.json',
-      'data/archive-details.json',
-      'data/archive-data.json',
-      'data/search-index.json',
-      'data/archive-entities.json',
-      'data/archive-embeddings.json',
-      'data/graph-validation-holds.json',
-      'data/relationship-type-registry.json',
-    ]) {
+    // The adjacency shards are split by record id, so at least one shard must be
+    // on the list for the check to mean anything.
+    assert.ok(
+      ARTIFACTS_NAMING_RECORDS.some((name) => name.startsWith('data/relationship-adjacency-')),
+      'expected the relationship adjacency shards to be part of the sweep',
+    );
+    for (const relativePath of ARTIFACTS_NAMING_RECORDS) {
       const contents = read(relativePath);
       for (const droppedId of DROPPED.keys()) {
         assert.equal(
@@ -104,6 +125,40 @@ describe('2026-08-27 duplicate adjudication (#867)', () => {
         );
       }
     }
+  });
+
+  it('counts the surviving records in the reports that hold totals, not ids', () => {
+    // A record drop leaves these reports readable and wrong: they never name the
+    // dropped ids, so the sweep above cannot see them go stale. Their totals can.
+    // tests/stewardship-census.test.js compares the census byte for byte, but it
+    // steps aside when its inputs are uncommitted, which is exactly the state a
+    // migration is run in.
+    const records = parse(read('data/archive_records-public.csv').toString('utf8'), {
+      columns: true,
+      skip_empty_lines: true,
+    });
+    assert.equal(records.length, CURATED_RECORD_COUNT);
+
+    const census = JSON.parse(read('data/stewardship-census.json'));
+    assert.equal(census.records.reconciliation.curated.source, CURATED_RECORD_COUNT);
+    assert.equal(census.records.reconciliation.curated.published, CURATED_RECORD_COUNT);
+
+    const relationships = parse(read('data/extracted_relationships.csv').toString('utf8'), {
+      columns: true,
+      skip_empty_lines: true,
+    });
+    assert.equal(census.graph.relationships.total, relationships.length);
+
+    const entities = parse(read('data/extracted_entities.csv').toString('utf8'), {
+      columns: true,
+      skip_empty_lines: true,
+    });
+    assert.equal(census.graph.entities.total, entities.length);
+
+    const archive = JSON.parse(read('data/archive-data.json'));
+    const analytics = JSON.parse(read('data/archive-analytics.json'));
+    assert.equal(analytics.stats.records, archive.records.length);
+    assert.equal(analytics.stats.entities, entities.length);
   });
 
   it('keeps the embedding sidecar and binary row-aligned with the published articles', () => {
