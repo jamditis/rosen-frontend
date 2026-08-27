@@ -28,6 +28,7 @@ const MAX_DETAIL_LENGTH = 6000;
 const MAX_QUOTE_LENGTH = 3000;
 const MAX_DETAIL_ITEMS = 50;
 const CONTENT_TYPES = ['article', 'twitter', 'bluesky'];
+const TWITTER_PUBLICATIONS = new Set(['twitter', 'twitter/x']);
 const ENTITY_TYPES = ['Person', 'Organization', 'Concept', 'Work', 'Event', 'Location'];
 
 function asInputObject(input) {
@@ -125,7 +126,7 @@ function matchesContentType(record, contentType) {
   if (record.type !== 'social') return false;
   const publication = normalizeForSearch(record.pub);
   if (contentType === 'twitter') {
-    return publication.includes('twitter') || publication.includes('x.com');
+    return TWITTER_PUBLICATIONS.has(publication);
   }
   return contentType === 'bluesky' && publication.includes('bluesky');
 }

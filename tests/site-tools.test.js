@@ -96,6 +96,26 @@ describe('archive site-tool search', () => {
     assert.equal(result.records[0].id, 'TWITTER-00001');
   });
 
+  it('matches exact Twitter publication labels without accepting host substrings', () => {
+    const result = searchArchiveRecords([
+      ...records,
+      {
+        id: 'SOCIAL-00001',
+        title: 'Unrelated social record',
+        date: '2025-03-01',
+        year: '2025',
+        era: 'Platform Transition & Future Models (2021-Present)',
+        pub: 'news.example-x.com',
+        categories: ['Journalism Theory & Practice'],
+        type: 'social',
+        verified: true,
+        summaryPreview: 'A record from another social publication.',
+      },
+    ], { content_type: 'twitter', limit: 10 });
+
+    assert.deepEqual(result.records.map(record => record.id), ['TWITTER-00001']);
+  });
+
   it('rejects unsupported filters instead of silently broadening the search', () => {
     assert.throws(
       () => searchArchiveRecords(records, { content_type: 'video' }),
